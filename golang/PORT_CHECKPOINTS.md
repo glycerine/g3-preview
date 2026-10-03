@@ -169,3 +169,21 @@ audit pass on the exact four-file overlay
 `.cache/release/numeric-consumers-8d9b20f`. Logs:
 `.cache/numeric-consumer-isolated-{native,debug,checked-debug,vet,source}.log`.
 The broader backend baseline remains unfinished and RED separately.
+
+
+Imported Hensel exponent16 now has an independent descriptor/object/raw-block
+census before fault disable or cleanup. The sweep covers 208 release and 228
+debug refusals plus success, including genuine big numeric roots and one
+pending physical object in each profile. Unpublished/cleanup-pending branches
+are supported by the census but were not exercised by this campaign.
+
+Debug ordinal157 leaves the actual lower-bound failed token. A focused direct-
+allocator fixture proves ordinary factors Close remains guarded and retains
+its closing owner. A separate explicit caller SetZ changes only the source mode
+flag, preserves bounds/physical roots and permits cleanup retry. This caller
+action is not credited as Hensel recovery. Native/debug tests, vet and source/
+no-generics pass in `.cache/release/hensel-physical-8ade92d`; logs are
+`.cache/factors-owner/hensel-physical-final-{native,debug}.log` and
+`.cache/factors-owner/hensel-physical-{profile-final,vet,source}.log`.
+The older Words-per-cell family audits remain RED pending their exact physical
+root migration; source lexical vector ownership needs further qualification.
