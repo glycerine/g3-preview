@@ -1392,3 +1392,18 @@ tests retain the completed source components on failures. See
 MPZ_POWER_PUBLICATION_PACKET.md for frozen gates and remaining boundaries.
 Source allocator/backend integration, other staged arithmetic and the complete
 solver/proof/interpolation goal remain open; no whole source unit is promoted.
+
+
+## Polynomial root isolation and interval refinement
+
+The actual DRS/Sturm isolation algorithms, square-free dispatch, four-case
+refinable conversion, precision refinement and rational-to-binary bracketing
+now run over concrete binary output vectors and owning frame stacks. Tests first
+port all selected registered cases, including the full degree70 polynomial,
+then check independent root/interval arithmetic, source traversal and immediate
+allocation/cancellation ownership. Actual registered execution yields540 source
+assertions (317 ENSURE/223 VERIFY); print-only routines add no claimed source
+assertions. See UPOLYNOMIAL_ROOT_ISOLATION_PACKET.md for frozen gates and
+representation boundaries. Factorization, multivariate/algebraic consumers,
+printers and full solver/proof/interpolation remain required. No whole source
+unit is promoted; the ledger remains33ported/145partial/1924unported.

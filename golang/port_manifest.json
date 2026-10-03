@@ -30672,7 +30672,15 @@
         "mpnum/upolynomial_sequence_test.go",
         "upolynomial_sequence_source_test.go",
         "upolynomial_sturm_source_test.go",
-        "upolynomial_transform_model_test.go"
+        "upolynomial_transform_model_test.go",
+        "mpnum/upolynomial_binary_vector.go",
+        "mpnum/upolynomial_isolation.go",
+        "mpnum/upolynomial_sturm_isolation.go",
+        "mpnum/upolynomial_refinement.go",
+        "upolynomial_isolation_source_test.go",
+        "upolynomial_refinement_source_test.go",
+        "upolynomial_isolation_model_test.go",
+        "mpnum/upolynomial_isolation_storage_test.go"
       ],
       "tests": [
         "TestUPolynomialScalarExtentAndLayout",
@@ -30732,7 +30740,26 @@
         "TestUPolynomialSturmRationalEuclideanOracle",
         "TestUPolynomialFullTransformFiniteOracles",
         "TestUPolynomialRootCountBoundsSourceBranches",
-        "TestUPolynomialSequenceSelfGrowthCloseAndAscendingBigReset"
+        "TestUPolynomialSequenceSelfGrowthCloseAndAscendingBigReset",
+        "TestUPolynomialIsolationRegisteredTwentyFourDatasets",
+        "TestUPolynomialIsolationRegisteredDegreeSeventy",
+        "TestUPolynomialRefinableNineRegisteredCalls",
+        "TestUPolynomialRefineTwoRegisteredPrecisionInputs",
+        "TestUPolynomialQ2BQNineRegisteredIntervals",
+        "TestUPolynomialRefineAndNormalizeAllPublicRoutes",
+        "TestUPolynomialQ2BQAliasedOutputSourceDebugSite",
+        "TestUPolynomialRefinementFaultPrefixesImmediateRoots",
+        "TestUPolynomialIsolationAllDispatchRoutesIndependent",
+        "TestUPolynomialBinaryVectorOwnershipResizeReserveAndPlateau",
+        "TestUPolynomialBinaryVectorConstructionAndPushFailurePrefixes",
+        "TestUPolynomialBinaryVectorBigCopyFaultImmediateRoots",
+        "TestUPolynomialIsolationRemoveZeroExistingPublicRegression",
+        "TestUPolynomialIsolationDefinedOutputAliases",
+        "TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph",
+        "TestUPolynomialIsolationZeroResetPublicationBeforeRefusal",
+        "TestUPolynomialIsolationPackedFrameAndScalarExtents",
+        "TestUPolynomialBinaryVectorActualAscendingDestruction",
+        "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
       ],
       "conditionals": [
         {
@@ -31619,18 +31646,53 @@
           "tests": [
             "TestUPolynomialSequenceUnsignedVectorExtent"
           ]
+        },
+        {
+          "name": "DRS and Sturm root isolation, square-free dispatch, refinable/precision intervals and rational-to-binary conversion",
+          "status": "partial",
+          "go_target": "upolynomial_isolation_source_test.go",
+          "tests": [
+            "TestUPolynomialIsolationRegisteredTwentyFourDatasets",
+            "TestUPolynomialIsolationRegisteredDegreeSeventy",
+            "TestUPolynomialRefinableNineRegisteredCalls",
+            "TestUPolynomialRefineTwoRegisteredPrecisionInputs",
+            "TestUPolynomialQ2BQNineRegisteredIntervals",
+            "TestUPolynomialRefineAndNormalizeAllPublicRoutes",
+            "TestUPolynomialQ2BQAliasedOutputSourceDebugSite",
+            "TestUPolynomialRefinementFaultPrefixesImmediateRoots",
+            "TestUPolynomialIsolationAllDispatchRoutesIndependent",
+            "TestUPolynomialBinaryVectorOwnershipResizeReserveAndPlateau",
+            "TestUPolynomialBinaryVectorConstructionAndPushFailurePrefixes",
+            "TestUPolynomialBinaryVectorBigCopyFaultImmediateRoots",
+            "TestUPolynomialIsolationRemoveZeroExistingPublicRegression",
+            "TestUPolynomialIsolationDefinedOutputAliases",
+            "TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph",
+            "TestUPolynomialIsolationZeroResetPublicationBeforeRefusal"
+          ]
+        },
+        {
+          "name": "binary output vectors and packed DRS/owning Sturm frame storage",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_isolation_storage_test.go",
+          "tests": [
+            "TestUPolynomialIsolationPackedFrameAndScalarExtents",
+            "TestUPolynomialBinaryVectorActualAscendingDestruction",
+            "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
+          ]
         }
       ],
       "ownership": [
         "Actual Int coefficient arrays with concrete scalar descriptor pages/backing origins, all twenty-one scratch vectors and real modular child. Physical views guard at actual dereferences and follow swaps; old/new growth and immediate numeric roots are charged. See UPOLYNOMIAL_PORT_STATUS.md.",
         "Real source content/division/GCD scratch, lexical scoped numerals/vectors, modular restoration, retained failure prefixes and actual numeric-root checks; see UPOLYNOMIAL_GCD_PORT_STATUS.md.",
-        "Actual flat coefficient storage plus two independent unsigned metadata vectors, partial row publication, source read timing, charged cold owner and manager Close guard. See UPOLYNOMIAL_STURM_PACKET.md; lexical numeral/vector cleanup is an explicit Go error adapter."
+        "Actual flat coefficient storage plus two independent unsigned metadata vectors, partial row publication, source read timing, charged cold owner and manager Close guard. See UPOLYNOMIAL_STURM_PACKET.md; lexical numeral/vector cleanup is an explicit Go error adapter.",
+        "Isolation uses charged concrete binary output vectors and lexical coefficient/frame backings; actual initialized extents and source ascending/reverse destruction orders are retained. Refusal/cancellation tests audit real output and manager cells/Words before fault disabling. See UPOLYNOMIAL_ROOT_ISOLATION_PACKET.md; allocator/backend integration remains open."
       ],
       "deviations": [
         "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full isolation/refinement/conversion/factorization/algebraic and printers remain open; input conversion adapters do not establish complete registered tests.",
         "Registered tests retain explicit dense input conversion adapters. Unported multivariate conversion, root isolation/refinement/factorization and remaining registered test actions keep each complete source unit partial. Explicit cleanup on Go errors preserves rooted completed prefixes; it does not claim native C++ exception continuation.",
         "WithCount copies the raw source pointer/size binding without dereference; indexed array GCD preserves early-one skipping and later content-copy failure publication. Late CRA sweep exercises actual post-append reservations, not virtual fault callbacks.",
-        "Selected sequence/Sturm/transform/Descartes/bounds algorithms translated. RowView binds source coeffs(i) plus size(i); source unsigned header8 is extent arithmetic while actual Go metadata arrays charge4*capacity and slice fields are in the charged cold owner. Source printers, full root isolation/refinement, multivariate conversion, factorization and algebraic consumers remain open; source units remain partial."
+        "Selected sequence/Sturm/transform/Descartes/bounds algorithms translated. RowView binds source coeffs(i) plus size(i); source unsigned header8 is extent arithmetic while actual Go metadata arrays charge4*capacity and slice fields are in the charged cold owner. Source printers, full root isolation/refinement, multivariate conversion, factorization and algebraic consumers remain open; source units remain partial.",
+        "Owning reads and checked scalar lifetimes are Go adapters. Full-capacity guard rejects undersized source wrapped allocations after separate literal uint32 growth checks; raw allocation/header publication for that undefined domain is not represented. Multivariate conversion, factorization, algebraic consumers, full printers/TRACE and nonselected alternatives remain open."
       ]
     },
     {
@@ -31663,7 +31725,15 @@
         "mpnum/upolynomial_sequence_test.go",
         "upolynomial_sequence_source_test.go",
         "upolynomial_sturm_source_test.go",
-        "upolynomial_transform_model_test.go"
+        "upolynomial_transform_model_test.go",
+        "mpnum/upolynomial_binary_vector.go",
+        "mpnum/upolynomial_isolation.go",
+        "mpnum/upolynomial_sturm_isolation.go",
+        "mpnum/upolynomial_refinement.go",
+        "upolynomial_isolation_source_test.go",
+        "upolynomial_refinement_source_test.go",
+        "upolynomial_isolation_model_test.go",
+        "mpnum/upolynomial_isolation_storage_test.go"
       ],
       "tests": [
         "TestUPolynomialScalarExtentAndLayout",
@@ -31723,7 +31793,26 @@
         "TestUPolynomialSturmRationalEuclideanOracle",
         "TestUPolynomialFullTransformFiniteOracles",
         "TestUPolynomialRootCountBoundsSourceBranches",
-        "TestUPolynomialSequenceSelfGrowthCloseAndAscendingBigReset"
+        "TestUPolynomialSequenceSelfGrowthCloseAndAscendingBigReset",
+        "TestUPolynomialIsolationRegisteredTwentyFourDatasets",
+        "TestUPolynomialIsolationRegisteredDegreeSeventy",
+        "TestUPolynomialRefinableNineRegisteredCalls",
+        "TestUPolynomialRefineTwoRegisteredPrecisionInputs",
+        "TestUPolynomialQ2BQNineRegisteredIntervals",
+        "TestUPolynomialRefineAndNormalizeAllPublicRoutes",
+        "TestUPolynomialQ2BQAliasedOutputSourceDebugSite",
+        "TestUPolynomialRefinementFaultPrefixesImmediateRoots",
+        "TestUPolynomialIsolationAllDispatchRoutesIndependent",
+        "TestUPolynomialBinaryVectorOwnershipResizeReserveAndPlateau",
+        "TestUPolynomialBinaryVectorConstructionAndPushFailurePrefixes",
+        "TestUPolynomialBinaryVectorBigCopyFaultImmediateRoots",
+        "TestUPolynomialIsolationRemoveZeroExistingPublicRegression",
+        "TestUPolynomialIsolationDefinedOutputAliases",
+        "TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph",
+        "TestUPolynomialIsolationZeroResetPublicationBeforeRefusal",
+        "TestUPolynomialIsolationPackedFrameAndScalarExtents",
+        "TestUPolynomialBinaryVectorActualAscendingDestruction",
+        "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
       ],
       "conditionals": [
         {
@@ -32050,18 +32139,53 @@
           "tests": [
             "TestUPolynomialSequenceUnsignedVectorExtent"
           ]
+        },
+        {
+          "name": "DRS and Sturm root isolation, square-free dispatch, refinable/precision intervals and rational-to-binary conversion",
+          "status": "partial",
+          "go_target": "upolynomial_isolation_source_test.go",
+          "tests": [
+            "TestUPolynomialIsolationRegisteredTwentyFourDatasets",
+            "TestUPolynomialIsolationRegisteredDegreeSeventy",
+            "TestUPolynomialRefinableNineRegisteredCalls",
+            "TestUPolynomialRefineTwoRegisteredPrecisionInputs",
+            "TestUPolynomialQ2BQNineRegisteredIntervals",
+            "TestUPolynomialRefineAndNormalizeAllPublicRoutes",
+            "TestUPolynomialQ2BQAliasedOutputSourceDebugSite",
+            "TestUPolynomialRefinementFaultPrefixesImmediateRoots",
+            "TestUPolynomialIsolationAllDispatchRoutesIndependent",
+            "TestUPolynomialBinaryVectorOwnershipResizeReserveAndPlateau",
+            "TestUPolynomialBinaryVectorConstructionAndPushFailurePrefixes",
+            "TestUPolynomialBinaryVectorBigCopyFaultImmediateRoots",
+            "TestUPolynomialIsolationRemoveZeroExistingPublicRegression",
+            "TestUPolynomialIsolationDefinedOutputAliases",
+            "TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph",
+            "TestUPolynomialIsolationZeroResetPublicationBeforeRefusal"
+          ]
+        },
+        {
+          "name": "binary output vectors and packed DRS/owning Sturm frame storage",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_isolation_storage_test.go",
+          "tests": [
+            "TestUPolynomialIsolationPackedFrameAndScalarExtents",
+            "TestUPolynomialBinaryVectorActualAscendingDestruction",
+            "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
+          ]
         }
       ],
       "ownership": [
         "Actual Int coefficient arrays with concrete scalar descriptor pages/backing origins, all twenty-one scratch vectors and real modular child. Physical views guard at actual dereferences and follow swaps; old/new growth and immediate numeric roots are charged. See UPOLYNOMIAL_PORT_STATUS.md.",
         "Real source content/division/GCD scratch, lexical scoped numerals/vectors, modular restoration, retained failure prefixes and actual numeric-root checks; see UPOLYNOMIAL_GCD_PORT_STATUS.md.",
-        "Actual flat coefficient storage plus two independent unsigned metadata vectors, partial row publication, source read timing, charged cold owner and manager Close guard. See UPOLYNOMIAL_STURM_PACKET.md; lexical numeral/vector cleanup is an explicit Go error adapter."
+        "Actual flat coefficient storage plus two independent unsigned metadata vectors, partial row publication, source read timing, charged cold owner and manager Close guard. See UPOLYNOMIAL_STURM_PACKET.md; lexical numeral/vector cleanup is an explicit Go error adapter.",
+        "Isolation uses charged concrete binary output vectors and lexical coefficient/frame backings; actual initialized extents and source ascending/reverse destruction orders are retained. Refusal/cancellation tests audit real output and manager cells/Words before fault disabling. See UPOLYNOMIAL_ROOT_ISOLATION_PACKET.md; allocator/backend integration remains open."
       ],
       "deviations": [
         "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full isolation/refinement/conversion/factorization/algebraic and printers remain open; input conversion adapters do not establish complete registered tests.",
         "Registered tests retain explicit dense input conversion adapters. Unported multivariate conversion, root isolation/refinement/factorization and remaining registered test actions keep each complete source unit partial. Explicit cleanup on Go errors preserves rooted completed prefixes; it does not claim native C++ exception continuation.",
         "WithCount copies the raw source pointer/size binding without dereference; indexed array GCD preserves early-one skipping and later content-copy failure publication. Late CRA sweep exercises actual post-append reservations, not virtual fault callbacks.",
-        "Selected sequence/Sturm/transform/Descartes/bounds algorithms translated. RowView binds source coeffs(i) plus size(i); source unsigned header8 is extent arithmetic while actual Go metadata arrays charge4*capacity and slice fields are in the charged cold owner. Source printers, full root isolation/refinement, multivariate conversion, factorization and algebraic consumers remain open; source units remain partial."
+        "Selected sequence/Sturm/transform/Descartes/bounds algorithms translated. RowView binds source coeffs(i) plus size(i); source unsigned header8 is extent arithmetic while actual Go metadata arrays charge4*capacity and slice fields are in the charged cold owner. Source printers, full root isolation/refinement, multivariate conversion, factorization and algebraic consumers remain open; source units remain partial.",
+        "Owning reads and checked scalar lifetimes are Go adapters. Full-capacity guard rejects undersized source wrapped allocations after separate literal uint32 growth checks; raw allocation/header publication for that undefined domain is not represented. Multivariate conversion, factorization, algebraic consumers, full printers/TRACE and nonselected alternatives remain open."
       ]
     },
     {
@@ -89524,7 +89648,15 @@
         "mpnum/upolynomial_sequence_test.go",
         "upolynomial_sequence_source_test.go",
         "upolynomial_sturm_source_test.go",
-        "upolynomial_transform_model_test.go"
+        "upolynomial_transform_model_test.go",
+        "mpnum/upolynomial_binary_vector.go",
+        "mpnum/upolynomial_isolation.go",
+        "mpnum/upolynomial_sturm_isolation.go",
+        "mpnum/upolynomial_refinement.go",
+        "upolynomial_isolation_source_test.go",
+        "upolynomial_refinement_source_test.go",
+        "upolynomial_isolation_model_test.go",
+        "mpnum/upolynomial_isolation_storage_test.go"
       ],
       "tests": [
         "TestUPolynomialScalarExtentAndLayout",
@@ -89584,7 +89716,26 @@
         "TestUPolynomialSturmRationalEuclideanOracle",
         "TestUPolynomialFullTransformFiniteOracles",
         "TestUPolynomialRootCountBoundsSourceBranches",
-        "TestUPolynomialSequenceSelfGrowthCloseAndAscendingBigReset"
+        "TestUPolynomialSequenceSelfGrowthCloseAndAscendingBigReset",
+        "TestUPolynomialIsolationRegisteredTwentyFourDatasets",
+        "TestUPolynomialIsolationRegisteredDegreeSeventy",
+        "TestUPolynomialRefinableNineRegisteredCalls",
+        "TestUPolynomialRefineTwoRegisteredPrecisionInputs",
+        "TestUPolynomialQ2BQNineRegisteredIntervals",
+        "TestUPolynomialRefineAndNormalizeAllPublicRoutes",
+        "TestUPolynomialQ2BQAliasedOutputSourceDebugSite",
+        "TestUPolynomialRefinementFaultPrefixesImmediateRoots",
+        "TestUPolynomialIsolationAllDispatchRoutesIndependent",
+        "TestUPolynomialBinaryVectorOwnershipResizeReserveAndPlateau",
+        "TestUPolynomialBinaryVectorConstructionAndPushFailurePrefixes",
+        "TestUPolynomialBinaryVectorBigCopyFaultImmediateRoots",
+        "TestUPolynomialIsolationRemoveZeroExistingPublicRegression",
+        "TestUPolynomialIsolationDefinedOutputAliases",
+        "TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph",
+        "TestUPolynomialIsolationZeroResetPublicationBeforeRefusal",
+        "TestUPolynomialIsolationPackedFrameAndScalarExtents",
+        "TestUPolynomialBinaryVectorActualAscendingDestruction",
+        "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
       ],
       "conditionals": [
         {
@@ -89887,18 +90038,53 @@
             "TestUPolynomialFullTransformFiniteOracles",
             "TestUPolynomialRootCountBoundsSourceBranches"
           ]
+        },
+        {
+          "name": "DRS and Sturm root isolation, square-free dispatch, refinable/precision intervals and rational-to-binary conversion",
+          "status": "partial",
+          "go_target": "upolynomial_isolation_source_test.go",
+          "tests": [
+            "TestUPolynomialIsolationRegisteredTwentyFourDatasets",
+            "TestUPolynomialIsolationRegisteredDegreeSeventy",
+            "TestUPolynomialRefinableNineRegisteredCalls",
+            "TestUPolynomialRefineTwoRegisteredPrecisionInputs",
+            "TestUPolynomialQ2BQNineRegisteredIntervals",
+            "TestUPolynomialRefineAndNormalizeAllPublicRoutes",
+            "TestUPolynomialQ2BQAliasedOutputSourceDebugSite",
+            "TestUPolynomialRefinementFaultPrefixesImmediateRoots",
+            "TestUPolynomialIsolationAllDispatchRoutesIndependent",
+            "TestUPolynomialBinaryVectorOwnershipResizeReserveAndPlateau",
+            "TestUPolynomialBinaryVectorConstructionAndPushFailurePrefixes",
+            "TestUPolynomialBinaryVectorBigCopyFaultImmediateRoots",
+            "TestUPolynomialIsolationRemoveZeroExistingPublicRegression",
+            "TestUPolynomialIsolationDefinedOutputAliases",
+            "TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph",
+            "TestUPolynomialIsolationZeroResetPublicationBeforeRefusal"
+          ]
+        },
+        {
+          "name": "binary output vectors and packed DRS/owning Sturm frame storage",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_isolation_storage_test.go",
+          "tests": [
+            "TestUPolynomialIsolationPackedFrameAndScalarExtents",
+            "TestUPolynomialBinaryVectorActualAscendingDestruction",
+            "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
+          ]
         }
       ],
       "ownership": [
         "Actual Int coefficient arrays with concrete scalar descriptor pages/backing origins, all twenty-one scratch vectors and real modular child. Physical views guard at actual dereferences and follow swaps; old/new growth and immediate numeric roots are charged. See UPOLYNOMIAL_PORT_STATUS.md.",
         "Real source content/division/GCD scratch, lexical scoped numerals/vectors, modular restoration, retained failure prefixes and actual numeric-root checks; see UPOLYNOMIAL_GCD_PORT_STATUS.md.",
-        "Actual flat coefficient storage plus two independent unsigned metadata vectors, partial row publication, source read timing, charged cold owner and manager Close guard. See UPOLYNOMIAL_STURM_PACKET.md; lexical numeral/vector cleanup is an explicit Go error adapter."
+        "Actual flat coefficient storage plus two independent unsigned metadata vectors, partial row publication, source read timing, charged cold owner and manager Close guard. See UPOLYNOMIAL_STURM_PACKET.md; lexical numeral/vector cleanup is an explicit Go error adapter.",
+        "Isolation uses charged concrete binary output vectors and lexical coefficient/frame backings; actual initialized extents and source ascending/reverse destruction orders are retained. Refusal/cancellation tests audit real output and manager cells/Words before fault disabling. See UPOLYNOMIAL_ROOT_ISOLATION_PACKET.md; allocator/backend integration remains open."
       ],
       "deviations": [
         "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full isolation/refinement/conversion/factorization/algebraic and printers remain open; input conversion adapters do not establish complete registered tests.",
         "Registered tests retain explicit dense input conversion adapters. Unported multivariate conversion, root isolation/refinement/factorization and remaining registered test actions keep each complete source unit partial. Explicit cleanup on Go errors preserves rooted completed prefixes; it does not claim native C++ exception continuation.",
         "WithCount copies the raw source pointer/size binding without dereference; indexed array GCD preserves early-one skipping and later content-copy failure publication. Late CRA sweep exercises actual post-append reservations, not virtual fault callbacks.",
-        "Selected sequence/Sturm/transform/Descartes/bounds algorithms translated. RowView binds source coeffs(i) plus size(i); source unsigned header8 is extent arithmetic while actual Go metadata arrays charge4*capacity and slice fields are in the charged cold owner. Source printers, full root isolation/refinement, multivariate conversion, factorization and algebraic consumers remain open; source units remain partial."
+        "Selected sequence/Sturm/transform/Descartes/bounds algorithms translated. RowView binds source coeffs(i) plus size(i); source unsigned header8 is extent arithmetic while actual Go metadata arrays charge4*capacity and slice fields are in the charged cold owner. Source printers, full root isolation/refinement, multivariate conversion, factorization and algebraic consumers remain open; source units remain partial.",
+        "Owning reads and checked scalar lifetimes are Go adapters. Full-capacity guard rejects undersized source wrapped allocations after separate literal uint32 growth checks; raw allocation/header publication for that undefined domain is not represented. Multivariate conversion, factorization, algebraic consumers, full printers/TRACE and nonselected alternatives remain open."
       ]
     },
     {
@@ -102834,7 +103020,9 @@
         "mpnum/mpbq_format.go",
         "mpnum/mpbq_debug.go",
         "mpnum/mpbq_debug_release.go",
-        "mpnum/scoped_binary.go"
+        "mpnum/scoped_binary.go",
+        "mpnum/upolynomial_binary_vector.go",
+        "mpnum/upolynomial_isolation_storage_test.go"
       ],
       "tests": [
         "TestBinarySourceTst1",
@@ -102850,7 +103038,10 @@
         "TestBinaryFormattingBranchesAndFaultPublication",
         "TestBinaryOwnerConstructorAndScopedVector",
         "TestBinaryFailureImmediateRoots",
-        "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+        "TestBinaryVectorFailurePrefixesAndScopedRoutes",
+        "TestUPolynomialIsolationPackedFrameAndScalarExtents",
+        "TestUPolynomialBinaryVectorActualAscendingDestruction",
+        "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
       ],
       "conditionals": [
         {
@@ -103264,13 +103455,25 @@
         {
           "name": "TRACE/STRACE actions and inherited custom ostream persistent flags/locale/stream state integration",
           "status": "unported"
+        },
+        {
+          "name": "concrete binary vector logical reserve/resize, owning move growth and ascending reset; isolation frame specializations",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_isolation_storage_test.go",
+          "tests": [
+            "TestUPolynomialIsolationPackedFrameAndScalarExtents",
+            "TestUPolynomialBinaryVectorActualAscendingDestruction",
+            "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
+          ]
         }
       ],
       "ownership": [
-        "Concrete pointer-free numerator/exponent; borrowed IntegerManager and debug RationalService share actual Budget. Actual cold header and eleven retained numeral roots charged; lexical roots released on all Go errors. Source destructor order, deep scope/vector ownership, whole new backing overlaps old backing. Immediate cells/Words/diagnostics graph oracle precedes formatting/cleanup. See MPBQ_PORT_STATUS.md."
+        "Concrete pointer-free numerator/exponent; borrowed IntegerManager and debug RationalService share actual Budget. Actual cold header and eleven retained numeral roots charged; lexical roots released on all Go errors. Source destructor order, deep scope/vector ownership, whole new backing overlaps old backing. Immediate cells/Words/diagnostics graph oracle precedes formatting/cleanup. See MPBQ_PORT_STATUS.md.",
+        "Isolation uses charged concrete binary output vectors and lexical coefficient/frame backings; actual initialized extents and source ascending/reverse destruction orders are retained. Refusal/cancellation tests audit real output and manager cells/Words before fault disabling. See UPOLYNOMIAL_ROOT_ISOLATION_PACKET.md; allocator/backend integration remains open."
       ],
       "deviations": [
-        "Explicit owner-local contexts and Close replace global diagnostic service/RAII. Imported foreign rational numerators/denominators copied through their real owners. Undefined degree-zero and interval preconditions have typed adapters; finite raw negative/unreduced shapes remain source behavior. Selected byte output stages in charged retained workspace; final strings caller-owned. Integer storage error adapters inherited; completed BQ statement/exponent/alias prefixes retained. Open trace/custom ostream integration keeps whole unit partial."
+        "Explicit owner-local contexts and Close replace global diagnostic service/RAII. Imported foreign rational numerators/denominators copied through their real owners. Undefined degree-zero and interval preconditions have typed adapters; finite raw negative/unreduced shapes remain source behavior. Selected byte output stages in charged retained workspace; final strings caller-owned. Integer storage error adapters inherited; completed BQ statement/exponent/alias prefixes retained. Open trace/custom ostream integration keeps whole unit partial.",
+        "Owning reads and checked scalar lifetimes are Go adapters. Full-capacity guard rejects undersized source wrapped allocations after separate literal uint32 growth checks; raw allocation/header publication for that undefined domain is not represented. Multivariate conversion, factorization, algebraic consumers, full printers/TRACE and nonselected alternatives remain open."
       ]
     },
     {
@@ -103287,7 +103490,9 @@
         "mpnum/mpbq_format.go",
         "mpnum/mpbq_debug.go",
         "mpnum/mpbq_debug_release.go",
-        "mpnum/scoped_binary.go"
+        "mpnum/scoped_binary.go",
+        "mpnum/upolynomial_binary_vector.go",
+        "mpnum/upolynomial_isolation_storage_test.go"
       ],
       "tests": [
         "TestBinarySourceTst1",
@@ -103303,7 +103508,10 @@
         "TestBinaryFormattingBranchesAndFaultPublication",
         "TestBinaryOwnerConstructorAndScopedVector",
         "TestBinaryFailureImmediateRoots",
-        "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+        "TestBinaryVectorFailurePrefixesAndScopedRoutes",
+        "TestUPolynomialIsolationPackedFrameAndScalarExtents",
+        "TestUPolynomialBinaryVectorActualAscendingDestruction",
+        "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
       ],
       "conditionals": [
         {
@@ -103468,13 +103676,25 @@
         {
           "name": "TRACE/STRACE actions and inherited custom ostream persistent flags/locale/stream state integration",
           "status": "unported"
+        },
+        {
+          "name": "concrete binary vector logical reserve/resize, owning move growth and ascending reset; isolation frame specializations",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_isolation_storage_test.go",
+          "tests": [
+            "TestUPolynomialIsolationPackedFrameAndScalarExtents",
+            "TestUPolynomialBinaryVectorActualAscendingDestruction",
+            "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
+          ]
         }
       ],
       "ownership": [
-        "Concrete pointer-free numerator/exponent; borrowed IntegerManager and debug RationalService share actual Budget. Actual cold header and eleven retained numeral roots charged; lexical roots released on all Go errors. Source destructor order, deep scope/vector ownership, whole new backing overlaps old backing. Immediate cells/Words/diagnostics graph oracle precedes formatting/cleanup. See MPBQ_PORT_STATUS.md."
+        "Concrete pointer-free numerator/exponent; borrowed IntegerManager and debug RationalService share actual Budget. Actual cold header and eleven retained numeral roots charged; lexical roots released on all Go errors. Source destructor order, deep scope/vector ownership, whole new backing overlaps old backing. Immediate cells/Words/diagnostics graph oracle precedes formatting/cleanup. See MPBQ_PORT_STATUS.md.",
+        "Isolation uses charged concrete binary output vectors and lexical coefficient/frame backings; actual initialized extents and source ascending/reverse destruction orders are retained. Refusal/cancellation tests audit real output and manager cells/Words before fault disabling. See UPOLYNOMIAL_ROOT_ISOLATION_PACKET.md; allocator/backend integration remains open."
       ],
       "deviations": [
-        "Explicit owner-local contexts and Close replace global diagnostic service/RAII. Imported foreign rational numerators/denominators copied through their real owners. Undefined degree-zero and interval preconditions have typed adapters; finite raw negative/unreduced shapes remain source behavior. Selected byte output stages in charged retained workspace; final strings caller-owned. Integer storage error adapters inherited; completed BQ statement/exponent/alias prefixes retained. Open trace/custom ostream integration keeps whole unit partial."
+        "Explicit owner-local contexts and Close replace global diagnostic service/RAII. Imported foreign rational numerators/denominators copied through their real owners. Undefined degree-zero and interval preconditions have typed adapters; finite raw negative/unreduced shapes remain source behavior. Selected byte output stages in charged retained workspace; final strings caller-owned. Integer storage error adapters inherited; completed BQ statement/exponent/alias prefixes retained. Open trace/custom ostream integration keeps whole unit partial.",
+        "Owning reads and checked scalar lifetimes are Go adapters. Full-capacity guard rejects undersized source wrapped allocations after separate literal uint32 growth checks; raw allocation/header publication for that undefined domain is not represented. Multivariate conversion, factorization, algebraic consumers, full printers/TRACE and nonselected alternatives remain open."
       ]
     },
     {
@@ -119629,7 +119849,9 @@
         "sat_solver_watch_store.go",
         "sat_storage_vector.go",
         "util_param_descrs.go",
-        "ast_shared_occs.go"
+        "ast_shared_occs.go",
+        "mpnum/upolynomial_binary_vector.go",
+        "mpnum/upolynomial_isolation_storage_test.go"
       ],
       "tests": [
         "TestParamDescrsBudgetFailuresAndWarmDuplicate",
@@ -119735,7 +119957,10 @@
         "TestSATSolverModelConverterImplicitInterruptedCopyAndRestart",
         "TestSATSolverModelConverterImplicitCopyUninitializedCapacityGuard",
         "TestSATSolverModelConverterImplicitCloneSharedBorrowedBudget",
-        "TestSATSolverModelConverterImplicitAssignmentAscendingDestroyAndCopy"
+        "TestSATSolverModelConverterImplicitAssignmentAscendingDestroyAndCopy",
+        "TestUPolynomialIsolationPackedFrameAndScalarExtents",
+        "TestUPolynomialBinaryVectorActualAscendingDestruction",
+        "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
       ],
       "conditionals": [
         {
@@ -119984,6 +120209,16 @@
             "TestSATSolverModelConverterImplicitCloneSharedBorrowedBudget",
             "TestSATSolverModelConverterImplicitAssignmentAscendingDestroyAndCopy"
           ]
+        },
+        {
+          "name": "concrete binary vector logical reserve/resize, owning move growth and ascending reset; isolation frame specializations",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_isolation_storage_test.go",
+          "tests": [
+            "TestUPolynomialIsolationPackedFrameAndScalarExtents",
+            "TestUPolynomialBinaryVectorActualAscendingDestruction",
+            "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
+          ]
         }
       ],
       "ownership": [
@@ -119992,13 +120227,15 @@
         "Selected concrete nested literal payload and nontrivial model entry copy adaptations preserve source logical capacities, full retained trivial backing, exact-capacity logical copy, and ascending clone/destruct prefixes. Local SAT char membership storage preserves source uint32 growth arithmetic. Physical pooled storage and all cold metadata remain charged.",
         "Actual four-uint64 watch payloads preserve val1/val2 plus widened scalar clause provenance; separate charged lifetime bitmap tracks erased live tails and destroyed holes. Common cold owner/directories and all arena descriptor/page/free storage and old/new overlaps charged. Exact nested copies, destroy-before-assignment, backing-transferring move/swap and real display/erase routes; see SAT_SOLVER_WATCH_STORE_PORT_STATUS.md.",
         "Concrete AST expr identity-table and shared-occurrence owners preserve source bucket-order callbacks, borrowing, actual node shared flags and charged backing/header peaks. See AST_SPARSE_SHARED_PORT_STATUS.md.",
-        "Model class-copy owns exact-capacity outer and deep nested literal vectors. Assignment destroys destination ascending before copy, publishes source size/capacity before constructors and retains completed prefixes; safe Go cleanup/restart tracks actual constructed roots. See SAT_MODEL_COPY_PORT_STATUS.md."
+        "Model class-copy owns exact-capacity outer and deep nested literal vectors. Assignment destroys destination ascending before copy, publishes source size/capacity before constructors and retains completed prefixes; safe Go cleanup/restart tracks actual constructed roots. See SAT_MODEL_COPY_PORT_STATUS.md.",
+        "Isolation uses charged concrete binary output vectors and lexical coefficient/frame backings; actual initialized extents and source ascending/reverse destruction orders are retained. Refusal/cancellation tests audit real output and manager cells/Words before fault disabling. See UPOLYNOMIAL_ROOT_ISOLATION_PACKET.md; allocator/backend integration remains open."
       ],
       "deviations": [
         "Concrete solver-specific storage, not complete generic vector template surface. Owning model Clone/Assign, other specializations and source-undefined continuation behavior remain explicitly separate.",
         "Literal storage guards physical capacity and stale tokens, but does not track construction of never-written spare slots. Source-defined initialized retained-slot behavior is verified; validation of every C++ initialized-lifetime domain is not claimed.",
         "Composite payload/bitmap preparation is an explicit Go storage adapter; completed pool growth remains charged on refusal. Iterators follow actual scalar backing across moves/swaps, and guard only actual free/reallocation or ended-slot lifetime. Null-backing Shrink/SetEnd retains finite source release no-op. Outer solver watch vector and propagation remain open; quadratic SortByKind is an additional semantic-order convenience adapter, not completed std::stable_sort backend/complexity integration.",
-        "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See AST_SPARSE_SHARED_PORT_STATUS.md."
+        "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See AST_SPARSE_SHARED_PORT_STATUS.md.",
+        "Owning reads and checked scalar lifetimes are Go adapters. Full-capacity guard rejects undersized source wrapped allocations after separate literal uint32 growth checks; raw allocation/header publication for that undefined domain is not represented. Multivariate conversion, factorization, algebraic consumers, full printers/TRACE and nonselected alternatives remain open."
       ]
     },
     {

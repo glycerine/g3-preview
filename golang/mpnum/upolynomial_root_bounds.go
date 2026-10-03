@@ -19,6 +19,9 @@ func (m *UPolynomialManager) RemoveZeroRoots(v UPolynomialView, out UPolynomial)
 	if e != nil {
 		return e
 	}
+	return m.removeZeroRootsState(v, &d.state)
+}
+func (m *UPolynomialManager) removeZeroRootsState(v UPolynomialView, out *upolyVectorState) error {
 	if modularSourceDebug && v.count == 0 {
 		return ErrUPolynomialAssertion
 	}
@@ -31,7 +34,7 @@ func (m *UPolynomialManager) RemoveZeroRoots(v UPolynomialView, out UPolynomial)
 		return e
 	}
 	if !zero {
-		return m.setView(&d.state, v)
+		return m.setView(out, v)
 	}
 	i := uint32(0)
 	for {
@@ -52,7 +55,7 @@ func (m *UPolynomialManager) RemoveZeroRoots(v UPolynomialView, out UPolynomial)
 		i++
 	}
 	n := v.count - i
-	if e = m.reserve(&d.state, n); e != nil {
+	if e = m.reserve(out, n); e != nil {
 		return e
 	}
 	for j := uint32(0); j < n; j++ {
@@ -60,11 +63,11 @@ func (m *UPolynomialManager) RemoveZeroRoots(v UPolynomialView, out UPolynomial)
 		if e != nil {
 			return e
 		}
-		if e = m.modular.Copy(&m.values(&d.state)[j], a); e != nil {
+		if e = m.modular.Copy(&m.values(out)[j], a); e != nil {
 			return e
 		}
 	}
-	return m.setSize(&d.state, n)
+	return m.setSize(out, n)
 }
 func (m *UPolynomialManager) HasOneHalfRoot(v UPolynomialView) (bool, error) {
 	if e := m.check(); e != nil {
