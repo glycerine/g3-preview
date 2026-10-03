@@ -484,8 +484,15 @@ func TestInfRationalFullHeaderQueriesAndAliases(t *testing.T) {
 	serviceMust(t, e)
 	infText(t, s, &n, "3")
 	infText(t, s, &d, "1")
-	if _, e = s.InfNumerator(&a); !errors.Is(e, ErrInfRationalDomain) {
-		t.Fatal(e)
+	extracted, err := s.InfNumerator(&a)
+	if modularSourceDebug {
+		if !errors.Is(err, ErrInfRationalDomain) || extracted.ownerID != 0 {
+			t.Fatal(err, extracted)
+		}
+	} else {
+		serviceMust(t, err)
+		infText(t, s, &extracted, "7")
+		serviceMust(t, s.InfDel(&extracted))
 	}
 	serviceMust(t, s.InfAddAssign(&a, &a))
 	infText(t, s, &a, "(14/5 -e*4/3)")

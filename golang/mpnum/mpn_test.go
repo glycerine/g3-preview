@@ -4,6 +4,7 @@
 package mpnum
 
 import (
+	"errors"
 	"github.com/glycerine/g3/golang/arena"
 	"math/big"
 	"math/rand"
@@ -216,8 +217,6 @@ func TestNaturalInvalidPreconditions(t *testing.T) {
 		func() { m.Mul([]uint32{1}, []uint32{2}, nil) },
 		func() { m.Div([]uint32{1}, []uint32{0}, []uint32{0}, []uint32{0}) },
 		func() { m.Div([]uint32{1}, []uint32{1, 1}, nil, make([]uint32, 2)) },
-		func() { m.String(nil) },
-		func() { m.String([]uint32{0, 0}) },
 	}
 	for i, call := range cases {
 		func() {
@@ -228,6 +227,12 @@ func TestNaturalInvalidPreconditions(t *testing.T) {
 			}()
 			call()
 		}()
+	}
+	if value, e := m.String(nil); !errors.Is(e, arena.ErrBounds) || value != "" || m.formatting.active || m.formatting.pending {
+		t.Fatal("source empty reversal access then lexical unwind", value, e)
+	}
+	if value, e := m.String([]uint32{0, 0}); e != nil || value != "0" {
+		t.Fatal("source multi-limb leading zero is finite", value, e)
 	}
 }
 

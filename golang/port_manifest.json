@@ -54884,7 +54884,14 @@
         "sat_solver_propagation.go",
         "sat_solver_propagation_control.go",
         "sat_solver_propagation_control_test.go",
-        "sat_solver_propagation_test.go"
+        "sat_solver_propagation_test.go",
+        "sat_solver_diff_levels_test.go",
+        "sat_solver_clause_lifecycle.go",
+        "sat_solver_clause_lifecycle_test.go",
+        "sat_solver_clause_attach.go",
+        "sat_solver_clause_attach_test.go",
+        "sat_solver_backtrack.go",
+        "sat_solver_backtrack_test.go"
       ],
       "tests": [
         "TestSATSolverClauseCoreFiniteSimplification",
@@ -54916,7 +54923,26 @@
         "TestSATSolverPropagationClauseBranchCompactionAndMoveRefusal",
         "TestSATSolverPropagationCapturedBackingAtEnd",
         "TestSATSolverPropagationWarmActualBackingPlateau",
-        "TestSATSolverPropagationLastSelfMoveRawLifetime"
+        "TestSATSolverPropagationLastSelfMoveRawLifetime",
+        "TestSATSolverLiteralSpanDiffLevelsFiniteOracle",
+        "TestSATSolverLiteralSpanDiffLevelsAccessAndFailurePrefixes",
+        "TestSATSolverLiteralSpanDiffLevelsSourceDebugAndWarm",
+        "TestSATSolverLiteralSpanDiffLevelsWrappedReserveAndOwner",
+        "TestSATSolverClauseLifecycleActualArityAndOwnership",
+        "TestSATSolverClauseLifecyclePendingCandidateRefusal",
+        "TestSATSolverClauseActualAllocationPublicationFaultPrefixes",
+        "TestSATSolverClauseCandidateCleanupPreservesPublishedBorrowers",
+        "TestSATSolverClauseEmptyTautologyAndDeleteCounters",
+        "TestSATSolverClauseAttachDetachActualKinds",
+        "TestSATSolverClauseScopedReinitOrdering",
+        "TestSATSolverClauseLearnedWatchActualSelection",
+        "TestSATSolverAttachBinaryAndTernaryFiniteMatrices",
+        "TestSATSolverAttachNaryReorderAndWatchFaultPrefixes",
+        "TestSATSolverBacktrackRealTrailQueueAndReinit",
+        "TestSATSolverBacktrackExtensionAndOwnerPrefixes",
+        "TestSATSolverUnassignInvalidOldActualReadPrefix",
+        "TestSATSolverReinitIncreasingShrinkRetainedSourceSlots",
+        "TestSATSolverPushActualStatementReadTiming"
       ],
       "conditionals": [
         {
@@ -55409,6 +55435,39 @@
             "TestSATSolverPropagationWarmActualBackingPlateau",
             "TestSATSolverPropagationLastSelfMoveRawLifetime"
           ]
+        },
+        {
+          "name": "num_diff_levels source2218\u20132238 on borrowed literal spans and actual clause storage; same reserve/mark/reset body and source DEBUG assignment assertion",
+          "status": "ported",
+          "go_target": "sat_solver_propagation_control.go",
+          "tests": [
+            "TestSATSolverLiteralSpanDiffLevelsFiniteOracle",
+            "TestSATSolverLiteralSpanDiffLevelsAccessAndFailurePrefixes",
+            "TestSATSolverLiteralSpanDiffLevelsSourceDebugAndWarm",
+            "TestSATSolverLiteralSpanDiffLevelsWrappedReserveAndOwner"
+          ]
+        },
+        {
+          "name": "Source185\u2013345/463\u2013493 null-extension clause creation/attach/detach with actual candidate ownership, then2531\u20132616 push/pop/unassign/reinit; extension, PopReinit and full solver remain open",
+          "status": "partial",
+          "go_target": "sat_solver_clause_lifecycle.go",
+          "tests": [
+            "TestSATSolverClauseLifecycleActualArityAndOwnership",
+            "TestSATSolverClauseLifecyclePendingCandidateRefusal",
+            "TestSATSolverClauseActualAllocationPublicationFaultPrefixes",
+            "TestSATSolverClauseCandidateCleanupPreservesPublishedBorrowers",
+            "TestSATSolverClauseEmptyTautologyAndDeleteCounters",
+            "TestSATSolverClauseAttachDetachActualKinds",
+            "TestSATSolverClauseScopedReinitOrdering",
+            "TestSATSolverClauseLearnedWatchActualSelection",
+            "TestSATSolverAttachBinaryAndTernaryFiniteMatrices",
+            "TestSATSolverAttachNaryReorderAndWatchFaultPrefixes",
+            "TestSATSolverBacktrackRealTrailQueueAndReinit",
+            "TestSATSolverBacktrackExtensionAndOwnerPrefixes",
+            "TestSATSolverUnassignInvalidOldActualReadPrefix",
+            "TestSATSolverReinitIncreasingShrinkRetainedSourceSlots",
+            "TestSATSolverPushActualStatementReadTiming"
+          ]
         }
       ],
       "ownership": [
@@ -55442,7 +55501,14 @@
         "sat_solver_propagation.go",
         "sat_solver_propagation_control.go",
         "sat_solver_propagation_control_test.go",
-        "sat_solver_propagation_test.go"
+        "sat_solver_propagation_test.go",
+        "sat_solver_diff_levels_test.go",
+        "sat_solver_clause_lifecycle.go",
+        "sat_solver_clause_lifecycle_test.go",
+        "sat_solver_clause_attach.go",
+        "sat_solver_clause_attach_test.go",
+        "sat_solver_backtrack.go",
+        "sat_solver_backtrack_test.go"
       ],
       "tests": [
         "TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots",
@@ -55474,7 +55540,26 @@
         "TestSATSolverPropagationClauseBranchCompactionAndMoveRefusal",
         "TestSATSolverPropagationCapturedBackingAtEnd",
         "TestSATSolverPropagationWarmActualBackingPlateau",
-        "TestSATSolverPropagationLastSelfMoveRawLifetime"
+        "TestSATSolverPropagationLastSelfMoveRawLifetime",
+        "TestSATSolverLiteralSpanDiffLevelsFiniteOracle",
+        "TestSATSolverLiteralSpanDiffLevelsAccessAndFailurePrefixes",
+        "TestSATSolverLiteralSpanDiffLevelsSourceDebugAndWarm",
+        "TestSATSolverLiteralSpanDiffLevelsWrappedReserveAndOwner",
+        "TestSATSolverClauseLifecycleActualArityAndOwnership",
+        "TestSATSolverClauseLifecyclePendingCandidateRefusal",
+        "TestSATSolverClauseActualAllocationPublicationFaultPrefixes",
+        "TestSATSolverClauseCandidateCleanupPreservesPublishedBorrowers",
+        "TestSATSolverClauseEmptyTautologyAndDeleteCounters",
+        "TestSATSolverClauseAttachDetachActualKinds",
+        "TestSATSolverClauseScopedReinitOrdering",
+        "TestSATSolverClauseLearnedWatchActualSelection",
+        "TestSATSolverAttachBinaryAndTernaryFiniteMatrices",
+        "TestSATSolverAttachNaryReorderAndWatchFaultPrefixes",
+        "TestSATSolverBacktrackRealTrailQueueAndReinit",
+        "TestSATSolverBacktrackExtensionAndOwnerPrefixes",
+        "TestSATSolverUnassignInvalidOldActualReadPrefix",
+        "TestSATSolverReinitIncreasingShrinkRetainedSourceSlots",
+        "TestSATSolverPushActualStatementReadTiming"
       ],
       "conditionals": [
         {
@@ -55550,6 +55635,39 @@
             "TestSATSolverPropagationCapturedBackingAtEnd",
             "TestSATSolverPropagationWarmActualBackingPlateau",
             "TestSATSolverPropagationLastSelfMoveRawLifetime"
+          ]
+        },
+        {
+          "name": "num_diff_levels source2218\u20132238 on borrowed literal spans and actual clause storage; same reserve/mark/reset body and source DEBUG assignment assertion",
+          "status": "ported",
+          "go_target": "sat_solver_propagation_control.go",
+          "tests": [
+            "TestSATSolverLiteralSpanDiffLevelsFiniteOracle",
+            "TestSATSolverLiteralSpanDiffLevelsAccessAndFailurePrefixes",
+            "TestSATSolverLiteralSpanDiffLevelsSourceDebugAndWarm",
+            "TestSATSolverLiteralSpanDiffLevelsWrappedReserveAndOwner"
+          ]
+        },
+        {
+          "name": "Source185\u2013345/463\u2013493 null-extension clause creation/attach/detach with actual candidate ownership, then2531\u20132616 push/pop/unassign/reinit; extension, PopReinit and full solver remain open",
+          "status": "partial",
+          "go_target": "sat_solver_clause_lifecycle.go",
+          "tests": [
+            "TestSATSolverClauseLifecycleActualArityAndOwnership",
+            "TestSATSolverClauseLifecyclePendingCandidateRefusal",
+            "TestSATSolverClauseActualAllocationPublicationFaultPrefixes",
+            "TestSATSolverClauseCandidateCleanupPreservesPublishedBorrowers",
+            "TestSATSolverClauseEmptyTautologyAndDeleteCounters",
+            "TestSATSolverClauseAttachDetachActualKinds",
+            "TestSATSolverClauseScopedReinitOrdering",
+            "TestSATSolverClauseLearnedWatchActualSelection",
+            "TestSATSolverAttachBinaryAndTernaryFiniteMatrices",
+            "TestSATSolverAttachNaryReorderAndWatchFaultPrefixes",
+            "TestSATSolverBacktrackRealTrailQueueAndReinit",
+            "TestSATSolverBacktrackExtensionAndOwnerPrefixes",
+            "TestSATSolverUnassignInvalidOldActualReadPrefix",
+            "TestSATSolverReinitIncreasingShrinkRetainedSourceSlots",
+            "TestSATSolverPushActualStatementReadTiming"
           ]
         }
       ],
@@ -96394,7 +96512,8 @@
       "status": "partial",
       "go_targets": [
         "mpnum/inf_eps_rational.go",
-        "mpnum/inf_scalar_projection_test.go"
+        "mpnum/inf_scalar_projection_test.go",
+        "mpnum/mp_raw_projection_test.go"
       ],
       "tests": [
         "TestInfEpsInfFiniteTripleOracles",
@@ -96413,7 +96532,18 @@
         "TestInfScalarProjectionFacadeRawFieldsAndNarrowing",
         "TestInfScalarProjectionOwnershipAndWarmGraph",
         "TestInfScalarProjectionRegisteredDefaultGetter",
-        "TestInfScalarProjectionRawManagerEndangeredReads"
+        "TestInfScalarProjectionRawManagerEndangeredReads",
+        "TestRawProjectionCopyShapesAndAliases",
+        "TestRawProjectionQueriesAndUnreadComponents",
+        "TestRawProjectionSelectedCopiesAndResetOrder",
+        "TestRawProjectionCopyLateReadAndFailurePrefixes",
+        "TestRawProjectionServiceAndInfOwningReferences",
+        "TestRawProjectionInfExtractionSourceDebugBoundary",
+        "TestRawProjectionInfQueriesAndShortCircuits",
+        "TestRawProjectionOwningBigCopiesAndMemberFailureOrder",
+        "TestRawProjectionWarmPhysicalGraphAndIdentity",
+        "TestRawProjectionNestedOwnerAtActualBranch",
+        "TestRawProjectionBothPoliciesAllComponentAliases"
       ],
       "conditionals": [
         {
@@ -96440,7 +96570,7 @@
       "methods": [
         {
           "name": "actual inf_rational specialization constructors/copy/destruction/reset/swap",
-          "status": "ported",
+          "status": "partial",
           "go_target": "mpnum/inf_eps_rational.go",
           "tests": [
             "TestInfEpsInfFiniteTripleOracles",
@@ -96565,8 +96695,8 @@
           ]
         },
         {
-          "name": "Remaining source-defined raw component projection, sign/hash and owning-copy domains",
-          "status": "unported"
+          "name": "Remaining raw constructors/setters/swap/move/arithmetic domains and owning projection diagnostic cleanup-refusal retention",
+          "status": "partial"
         },
         {
           "name": "Source scalar IsInt/IsRational and signed/unsigned64 fit/getter family, DEBUG assertions and release FIRST projection with actual component short circuit",
@@ -96579,6 +96709,24 @@
             "TestInfScalarProjectionOwnershipAndWarmGraph",
             "TestInfScalarProjectionRegisteredDefaultGetter",
             "TestInfScalarProjectionRawManagerEndangeredReads"
+          ]
+        },
+        {
+          "name": "Raw infinity then nested FIRST/EPS copy, selected nested references/hash/sign with actual nested owner branch; owning projection cleanup-refusal retention remains open",
+          "status": "partial",
+          "go_target": "mpnum/inf_eps_rational.go",
+          "tests": [
+            "TestRawProjectionCopyShapesAndAliases",
+            "TestRawProjectionQueriesAndUnreadComponents",
+            "TestRawProjectionSelectedCopiesAndResetOrder",
+            "TestRawProjectionCopyLateReadAndFailurePrefixes",
+            "TestRawProjectionServiceAndInfOwningReferences",
+            "TestRawProjectionInfExtractionSourceDebugBoundary",
+            "TestRawProjectionInfQueriesAndShortCircuits",
+            "TestRawProjectionOwningBigCopiesAndMemberFailureOrder",
+            "TestRawProjectionWarmPhysicalGraphAndIdentity",
+            "TestRawProjectionNestedOwnerAtActualBranch",
+            "TestRawProjectionBothPoliciesAllComponentAliases"
           ]
         }
       ],
@@ -96690,7 +96838,8 @@
       "status": "partial",
       "go_targets": [
         "mpnum/inf_int_rational.go",
-        "mpnum/inf_scalar_projection_test.go"
+        "mpnum/inf_scalar_projection_test.go",
+        "mpnum/mp_raw_projection_test.go"
       ],
       "tests": [
         "TestInfIntRationalSourceConstructorsConstantsLifetime",
@@ -96711,7 +96860,18 @@
         "TestInfScalarProjectionFacadeRawFieldsAndNarrowing",
         "TestInfScalarProjectionOwnershipAndWarmGraph",
         "TestInfScalarProjectionRegisteredDefaultGetter",
-        "TestInfScalarProjectionRawManagerEndangeredReads"
+        "TestInfScalarProjectionRawManagerEndangeredReads",
+        "TestRawProjectionCopyShapesAndAliases",
+        "TestRawProjectionQueriesAndUnreadComponents",
+        "TestRawProjectionSelectedCopiesAndResetOrder",
+        "TestRawProjectionCopyLateReadAndFailurePrefixes",
+        "TestRawProjectionServiceAndInfOwningReferences",
+        "TestRawProjectionInfExtractionSourceDebugBoundary",
+        "TestRawProjectionInfQueriesAndShortCircuits",
+        "TestRawProjectionOwningBigCopiesAndMemberFailureOrder",
+        "TestRawProjectionWarmPhysicalGraphAndIdentity",
+        "TestRawProjectionNestedOwnerAtActualBranch",
+        "TestRawProjectionBothPoliciesAllComponentAliases"
       ],
       "conditionals": [
         {
@@ -96746,7 +96906,7 @@
       "methods": [
         {
           "name": "all active constructors, copy/assignment, reset/swap/destruction and constants",
-          "status": "ported",
+          "status": "partial",
           "go_target": "mpnum/inf_int_rational.go",
           "tests": [
             "TestInfIntRationalSourceConstructorsConstantsLifetime",
@@ -96825,8 +96985,8 @@
           ]
         },
         {
-          "name": "Remaining source-defined raw component projection, sign/hash and owning-copy domains",
-          "status": "unported"
+          "name": "Remaining raw constructors/setters/swap/move/arithmetic domains and owning projection diagnostic cleanup-refusal retention",
+          "status": "partial"
         },
         {
           "name": "Source scalar IsInt/IsRational and signed/unsigned64 fit/getter family, DEBUG assertions and release FIRST projection with actual component short circuit",
@@ -96839,6 +96999,24 @@
             "TestInfScalarProjectionOwnershipAndWarmGraph",
             "TestInfScalarProjectionRegisteredDefaultGetter",
             "TestInfScalarProjectionRawManagerEndangeredReads"
+          ]
+        },
+        {
+          "name": "Raw FIRST receiver copy, selected references/hash/sign and DEBUG-only numerator/denominator EPS assertions; owning projection cleanup-refusal retention remains open",
+          "status": "partial",
+          "go_target": "mpnum/inf_int_rational.go",
+          "tests": [
+            "TestRawProjectionCopyShapesAndAliases",
+            "TestRawProjectionQueriesAndUnreadComponents",
+            "TestRawProjectionSelectedCopiesAndResetOrder",
+            "TestRawProjectionCopyLateReadAndFailurePrefixes",
+            "TestRawProjectionServiceAndInfOwningReferences",
+            "TestRawProjectionInfExtractionSourceDebugBoundary",
+            "TestRawProjectionInfQueriesAndShortCircuits",
+            "TestRawProjectionOwningBigCopiesAndMemberFailureOrder",
+            "TestRawProjectionWarmPhysicalGraphAndIdentity",
+            "TestRawProjectionNestedOwnerAtActualBranch",
+            "TestRawProjectionBothPoliciesAllComponentAliases"
           ]
         }
       ],
@@ -96959,7 +97137,8 @@
       "status": "partial",
       "go_targets": [
         "mpnum/inf_rational.go",
-        "mpnum/inf_scalar_projection_test.go"
+        "mpnum/inf_scalar_projection_test.go",
+        "mpnum/mp_raw_projection_test.go"
       ],
       "tests": [
         "TestInfRationalSource80Assertions",
@@ -96986,7 +97165,18 @@
         "TestInfScalarProjectionFacadeRawFieldsAndNarrowing",
         "TestInfScalarProjectionOwnershipAndWarmGraph",
         "TestInfScalarProjectionRegisteredDefaultGetter",
-        "TestInfScalarProjectionRawManagerEndangeredReads"
+        "TestInfScalarProjectionRawManagerEndangeredReads",
+        "TestRawProjectionCopyShapesAndAliases",
+        "TestRawProjectionQueriesAndUnreadComponents",
+        "TestRawProjectionSelectedCopiesAndResetOrder",
+        "TestRawProjectionCopyLateReadAndFailurePrefixes",
+        "TestRawProjectionServiceAndInfOwningReferences",
+        "TestRawProjectionInfExtractionSourceDebugBoundary",
+        "TestRawProjectionInfQueriesAndShortCircuits",
+        "TestRawProjectionOwningBigCopiesAndMemberFailureOrder",
+        "TestRawProjectionWarmPhysicalGraphAndIdentity",
+        "TestRawProjectionNestedOwnerAtActualBranch",
+        "TestRawProjectionBothPoliciesAllComponentAliases"
       ],
       "conditionals": [
         {
@@ -97029,7 +97219,7 @@
       "methods": [
         {
           "name": "all active constructors, assignment, reset, swap, destruction and constants",
-          "status": "ported",
+          "status": "partial",
           "go_target": "mpnum/inf_rational.go",
           "tests": [
             "TestInfRationalSource80Assertions",
@@ -97117,7 +97307,7 @@
         },
         {
           "name": "floor/ceil and numerator/denominator source domain branches",
-          "status": "ported",
+          "status": "partial",
           "go_target": "mpnum/inf_rational.go",
           "tests": [
             "TestInfRationalSource80Assertions",
@@ -97149,8 +97339,8 @@
           ]
         },
         {
-          "name": "Remaining source-defined raw component projection, sign/hash and owning-copy domains",
-          "status": "unported"
+          "name": "Remaining raw constructors/setters/swap/move/arithmetic domains and owning projection diagnostic cleanup-refusal retention",
+          "status": "partial"
         },
         {
           "name": "Source scalar IsInt/IsRational and signed/unsigned64 fit/getter family, DEBUG assertions and release FIRST projection with actual component short circuit",
@@ -97163,6 +97353,24 @@
             "TestInfScalarProjectionOwnershipAndWarmGraph",
             "TestInfScalarProjectionRegisteredDefaultGetter",
             "TestInfScalarProjectionRawManagerEndangeredReads"
+          ]
+        },
+        {
+          "name": "Raw FIRST then EPS receiver copy, selected reference/hash/sign and DEBUG-only extraction EPS assertions; owning projection cleanup-refusal retention remains open",
+          "status": "partial",
+          "go_target": "mpnum/inf_rational.go",
+          "tests": [
+            "TestRawProjectionCopyShapesAndAliases",
+            "TestRawProjectionQueriesAndUnreadComponents",
+            "TestRawProjectionSelectedCopiesAndResetOrder",
+            "TestRawProjectionCopyLateReadAndFailurePrefixes",
+            "TestRawProjectionServiceAndInfOwningReferences",
+            "TestRawProjectionInfExtractionSourceDebugBoundary",
+            "TestRawProjectionInfQueriesAndShortCircuits",
+            "TestRawProjectionOwningBigCopiesAndMemberFailureOrder",
+            "TestRawProjectionWarmPhysicalGraphAndIdentity",
+            "TestRawProjectionNestedOwnerAtActualBranch",
+            "TestRawProjectionBothPoliciesAllComponentAliases"
           ]
         }
       ],
@@ -106157,7 +106365,10 @@
         "mpnum/mpn.go",
         "mpnum/mpn_indexed.go",
         "mpnum/mpn_storage.go",
-        "mpnum/mp_format.go"
+        "mpnum/mp_format.go",
+        "mpnum/mpn_format_scope.go",
+        "mpnum/mpn_format_scope_test.go",
+        "mpnum/mpn_source_finalize.go"
       ],
       "tests": [
         "TestNaturalArithmeticOracle",
@@ -106175,7 +106386,17 @@
         "TestOwnedFormattingBudgetLimit",
         "TestNaturalPreparedAddBackStorageAdaptation",
         "TestOwnedTextGrowthPeakAndRefusal",
-        "TestNumericStringHostOwnershipBoundary"
+        "TestNumericStringHostOwnershipBoundary",
+        "TestNaturalFormattingLexicalSourceLocals",
+        "TestNaturalFormattingFailedConstructorRetainsRealRoot",
+        "TestNaturalFormattingPendingLocalDoesNotBlockDivision",
+        "TestNaturalFormattingLeadingZeroSourceDomain",
+        "TestNaturalFormattingReusableInlineScopeWarm",
+        "TestNaturalFormattingEmptyGuardAfterLocalActions",
+        "TestNaturalSourceFinalizeRetainsFailedLexicalLocal",
+        "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
+        "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
+        "TestNaturalSourceFinalizeColdLifecycleGuards"
       ],
       "conditionals": [
         {
@@ -106365,8 +106586,8 @@
           ]
         },
         {
-          "name": "div",
-          "status": "ported",
+          "name": "div shared Algorithm D and source early-return bodies; unused pending-verification scope guard and public span domain remain open",
+          "status": "partial",
           "go_target": "mpnum/mpn_indexed.go",
           "tests": [
             "TestNaturalArithmeticOracle",
@@ -106480,8 +106701,8 @@
           ]
         },
         {
-          "name": "to_string",
-          "status": "ported",
+          "name": "to_string: decimal arithmetic and actual lexical limb locals; exact caller char-buffer bounds/lbuf/size_t output actions remain open",
+          "status": "partial",
           "go_target": "mpnum/mp_format.go",
           "tests": [
             "TestNaturalArithmeticOracle",
@@ -106536,6 +106757,40 @@
         {
           "name": "trace_nl",
           "status": "unported"
+        },
+        {
+          "name": "Actual Natural reverse published-member SourceFinalize, parent source integration and separate owning cleanup retain failed lexical/unpublished expansion roots; cold guards at reached owners",
+          "status": "ported",
+          "go_target": "mpnum/mpn_source_finalize.go",
+          "tests": [
+            "TestNaturalFormattingLexicalSourceLocals",
+            "TestNaturalFormattingFailedConstructorRetainsRealRoot",
+            "TestNaturalFormattingPendingLocalDoesNotBlockDivision",
+            "TestNaturalFormattingLeadingZeroSourceDomain",
+            "TestNaturalFormattingReusableInlineScopeWarm",
+            "TestNaturalFormattingEmptyGuardAfterLocalActions",
+            "TestNaturalSourceFinalizeRetainsFailedLexicalLocal",
+            "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
+            "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
+            "TestNaturalSourceFinalizeColdLifecycleGuards"
+          ]
+        },
+        {
+          "name": "to_string multi-limb lexical temp/numerator/denominator construction, reverse destruction and failed-constructor retained roots in charged embedded scope; caller char/lbuf/full output lifetime remains open",
+          "status": "partial",
+          "go_target": "mpnum/mpn_format_scope.go",
+          "tests": [
+            "TestNaturalFormattingLexicalSourceLocals",
+            "TestNaturalFormattingFailedConstructorRetainsRealRoot",
+            "TestNaturalFormattingPendingLocalDoesNotBlockDivision",
+            "TestNaturalFormattingLeadingZeroSourceDomain",
+            "TestNaturalFormattingReusableInlineScopeWarm",
+            "TestNaturalFormattingEmptyGuardAfterLocalActions",
+            "TestNaturalSourceFinalizeRetainsFailedLexicalLocal",
+            "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
+            "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
+            "TestNaturalSourceFinalizeColdLifecycleGuards"
+          ]
         }
       ],
       "ownership": [
@@ -106555,7 +106810,10 @@
         "mpnum/mpn.go",
         "mpnum/mpn_indexed.go",
         "mpnum/mpn_storage.go",
-        "mpnum/mp_format.go"
+        "mpnum/mp_format.go",
+        "mpnum/mpn_format_scope.go",
+        "mpnum/mpn_format_scope_test.go",
+        "mpnum/mpn_source_finalize.go"
       ],
       "tests": [
         "TestNaturalArithmeticOracle",
@@ -106573,7 +106831,17 @@
         "TestOwnedFormattingBudgetLimit",
         "TestNaturalPreparedAddBackStorageAdaptation",
         "TestOwnedTextGrowthPeakAndRefusal",
-        "TestNumericStringHostOwnershipBoundary"
+        "TestNumericStringHostOwnershipBoundary",
+        "TestNaturalFormattingLexicalSourceLocals",
+        "TestNaturalFormattingFailedConstructorRetainsRealRoot",
+        "TestNaturalFormattingPendingLocalDoesNotBlockDivision",
+        "TestNaturalFormattingLeadingZeroSourceDomain",
+        "TestNaturalFormattingReusableInlineScopeWarm",
+        "TestNaturalFormattingEmptyGuardAfterLocalActions",
+        "TestNaturalSourceFinalizeRetainsFailedLexicalLocal",
+        "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
+        "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
+        "TestNaturalSourceFinalizeColdLifecycleGuards"
       ],
       "conditionals": [
         {
@@ -106701,8 +106969,8 @@
           ]
         },
         {
-          "name": "div",
-          "status": "ported",
+          "name": "div shared Algorithm D and source early-return bodies; unused pending-verification scope guard and public span domain remain open",
+          "status": "partial",
           "go_target": "mpnum/mpn_indexed.go",
           "tests": [
             "TestNaturalArithmeticOracle",
@@ -106816,8 +107084,8 @@
           ]
         },
         {
-          "name": "to_string",
-          "status": "ported",
+          "name": "to_string: decimal arithmetic and actual lexical limb locals; exact caller char-buffer bounds/lbuf/size_t output actions remain open",
+          "status": "partial",
           "go_target": "mpnum/mp_format.go",
           "tests": [
             "TestNaturalArithmeticOracle",
@@ -106872,6 +107140,40 @@
         {
           "name": "trace_nl",
           "status": "unported"
+        },
+        {
+          "name": "Actual Natural reverse published-member SourceFinalize, parent source integration and separate owning cleanup retain failed lexical/unpublished expansion roots; cold guards at reached owners",
+          "status": "ported",
+          "go_target": "mpnum/mpn_source_finalize.go",
+          "tests": [
+            "TestNaturalFormattingLexicalSourceLocals",
+            "TestNaturalFormattingFailedConstructorRetainsRealRoot",
+            "TestNaturalFormattingPendingLocalDoesNotBlockDivision",
+            "TestNaturalFormattingLeadingZeroSourceDomain",
+            "TestNaturalFormattingReusableInlineScopeWarm",
+            "TestNaturalFormattingEmptyGuardAfterLocalActions",
+            "TestNaturalSourceFinalizeRetainsFailedLexicalLocal",
+            "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
+            "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
+            "TestNaturalSourceFinalizeColdLifecycleGuards"
+          ]
+        },
+        {
+          "name": "to_string multi-limb lexical temp/numerator/denominator construction, reverse destruction and failed-constructor retained roots in charged embedded scope; caller char/lbuf/full output lifetime remains open",
+          "status": "partial",
+          "go_target": "mpnum/mpn_format_scope.go",
+          "tests": [
+            "TestNaturalFormattingLexicalSourceLocals",
+            "TestNaturalFormattingFailedConstructorRetainsRealRoot",
+            "TestNaturalFormattingPendingLocalDoesNotBlockDivision",
+            "TestNaturalFormattingLeadingZeroSourceDomain",
+            "TestNaturalFormattingReusableInlineScopeWarm",
+            "TestNaturalFormattingEmptyGuardAfterLocalActions",
+            "TestNaturalSourceFinalizeRetainsFailedLexicalLocal",
+            "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
+            "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
+            "TestNaturalSourceFinalizeColdLifecycleGuards"
+          ]
         }
       ],
       "ownership": [
@@ -107536,7 +107838,8 @@
         "mpnum/construction_failure.go",
         "mpnum/inf_scalar_projection_test.go",
         "mpnum/mpq_source_finalize.go",
-        "mpnum/transitive_source_finalize_test.go"
+        "mpnum/transitive_source_finalize_test.go",
+        "mpnum/mp_raw_projection_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -107717,7 +108020,18 @@
         "TestServiceSourceFinalizeActualCacheDenominatorGuard",
         "TestTransitiveSourceFinalizeActualChildScratchHole",
         "TestTransitiveSourceFinalizeColdOwnerAndReadinessGuards",
-        "TestServiceSourceFinalizeActualHookAndConstantOrder"
+        "TestServiceSourceFinalizeActualHookAndConstantOrder",
+        "TestRawProjectionCopyShapesAndAliases",
+        "TestRawProjectionQueriesAndUnreadComponents",
+        "TestRawProjectionSelectedCopiesAndResetOrder",
+        "TestRawProjectionCopyLateReadAndFailurePrefixes",
+        "TestRawProjectionServiceAndInfOwningReferences",
+        "TestRawProjectionInfExtractionSourceDebugBoundary",
+        "TestRawProjectionInfQueriesAndShortCircuits",
+        "TestRawProjectionOwningBigCopiesAndMemberFailureOrder",
+        "TestRawProjectionWarmPhysicalGraphAndIdentity",
+        "TestRawProjectionNestedOwnerAtActualBranch",
+        "TestRawProjectionBothPoliciesAllComponentAliases"
       ],
       "conditionals": [
         {
@@ -108636,6 +108950,24 @@
             "TestTransitiveSourceFinalizeColdOwnerAndReadinessGuards",
             "TestServiceSourceFinalizeActualHookAndConstantOrder"
           ]
+        },
+        {
+          "name": "Source mpq.h191\u2013237,562,666\u2013669 same-owner receiver Copy, scalar sign/structural predicates/NUM hash and selected direct component extraction; no whole-pair raw-denominator preflight",
+          "status": "ported",
+          "go_target": "mpnum/mpq_inspect.go",
+          "tests": [
+            "TestRawProjectionCopyShapesAndAliases",
+            "TestRawProjectionQueriesAndUnreadComponents",
+            "TestRawProjectionSelectedCopiesAndResetOrder",
+            "TestRawProjectionCopyLateReadAndFailurePrefixes",
+            "TestRawProjectionServiceAndInfOwningReferences",
+            "TestRawProjectionInfExtractionSourceDebugBoundary",
+            "TestRawProjectionInfQueriesAndShortCircuits",
+            "TestRawProjectionOwningBigCopiesAndMemberFailureOrder",
+            "TestRawProjectionWarmPhysicalGraphAndIdentity",
+            "TestRawProjectionNestedOwnerAtActualBranch",
+            "TestRawProjectionBothPoliciesAllComponentAliases"
+          ]
         }
       ],
       "ownership": [
@@ -108751,7 +109083,10 @@
         "mpnum/mpz_constructor_unwind.go",
         "mpnum/mpz_construction_failure_test.go",
         "mpnum/mpz_allocator_phase_b_test.go",
-        "mpnum/mp_scalar_projection_test.go"
+        "mpnum/mp_scalar_projection_test.go",
+        "mpnum/mpn_format_scope.go",
+        "mpnum/mpn_format_scope_test.go",
+        "mpnum/mpn_source_finalize.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -108939,7 +109274,17 @@
         "TestScalarProjectionRetainedSizeHeaderReads",
         "TestScalarProjectionRationalRawNumeratorsAndPredicates",
         "TestScalarProjectionFloatRawIEEEAndDebugAssertion",
-        "TestScalarProjectionInvalidOwnershipAndWarmGraph"
+        "TestScalarProjectionInvalidOwnershipAndWarmGraph",
+        "TestNaturalFormattingLexicalSourceLocals",
+        "TestNaturalFormattingFailedConstructorRetainsRealRoot",
+        "TestNaturalFormattingPendingLocalDoesNotBlockDivision",
+        "TestNaturalFormattingLeadingZeroSourceDomain",
+        "TestNaturalFormattingReusableInlineScopeWarm",
+        "TestNaturalFormattingEmptyGuardAfterLocalActions",
+        "TestNaturalSourceFinalizeRetainsFailedLexicalLocal",
+        "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
+        "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
+        "TestNaturalSourceFinalizeColdLifecycleGuards"
       ],
       "conditionals": [
         {
@@ -110534,6 +110879,23 @@
             "TestIntegerConstructorRefusalRetainsTransitiveOwnership",
             "TestIntegerScratchSpanDoesNotPublishPhysicalSize"
           ]
+        },
+        {
+          "name": "Actual Natural reverse published-member SourceFinalize, parent source integration and separate owning cleanup retain failed lexical/unpublished expansion roots; cold guards at reached owners",
+          "status": "ported",
+          "go_target": "mpnum/mpn_source_finalize.go",
+          "tests": [
+            "TestNaturalFormattingLexicalSourceLocals",
+            "TestNaturalFormattingFailedConstructorRetainsRealRoot",
+            "TestNaturalFormattingPendingLocalDoesNotBlockDivision",
+            "TestNaturalFormattingLeadingZeroSourceDomain",
+            "TestNaturalFormattingReusableInlineScopeWarm",
+            "TestNaturalFormattingEmptyGuardAfterLocalActions",
+            "TestNaturalSourceFinalizeRetainsFailedLexicalLocal",
+            "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
+            "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
+            "TestNaturalSourceFinalizeColdLifecycleGuards"
+          ]
         }
       ],
       "ownership": [
@@ -110607,7 +110969,10 @@
         "mpnum/mpz_constructor_unwind.go",
         "mpnum/mpz_construction_failure_test.go",
         "mpnum/mpz_allocator_phase_b_test.go",
-        "mpnum/mp_scalar_projection_test.go"
+        "mpnum/mp_scalar_projection_test.go",
+        "mpnum/mpn_format_scope.go",
+        "mpnum/mpn_format_scope_test.go",
+        "mpnum/mpn_source_finalize.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -110796,7 +111161,17 @@
         "TestScalarProjectionRetainedSizeHeaderReads",
         "TestScalarProjectionRationalRawNumeratorsAndPredicates",
         "TestScalarProjectionFloatRawIEEEAndDebugAssertion",
-        "TestScalarProjectionInvalidOwnershipAndWarmGraph"
+        "TestScalarProjectionInvalidOwnershipAndWarmGraph",
+        "TestNaturalFormattingLexicalSourceLocals",
+        "TestNaturalFormattingFailedConstructorRetainsRealRoot",
+        "TestNaturalFormattingPendingLocalDoesNotBlockDivision",
+        "TestNaturalFormattingLeadingZeroSourceDomain",
+        "TestNaturalFormattingReusableInlineScopeWarm",
+        "TestNaturalFormattingEmptyGuardAfterLocalActions",
+        "TestNaturalSourceFinalizeRetainsFailedLexicalLocal",
+        "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
+        "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
+        "TestNaturalSourceFinalizeColdLifecycleGuards"
       ],
       "conditionals": [
         {
@@ -111966,6 +112341,23 @@
             "TestIntegerSourceCellSizeUnsignedDomain",
             "TestIntegerConstructorRefusalRetainsTransitiveOwnership",
             "TestIntegerScratchSpanDoesNotPublishPhysicalSize"
+          ]
+        },
+        {
+          "name": "Actual Natural reverse published-member SourceFinalize, parent source integration and separate owning cleanup retain failed lexical/unpublished expansion roots; cold guards at reached owners",
+          "status": "ported",
+          "go_target": "mpnum/mpn_source_finalize.go",
+          "tests": [
+            "TestNaturalFormattingLexicalSourceLocals",
+            "TestNaturalFormattingFailedConstructorRetainsRealRoot",
+            "TestNaturalFormattingPendingLocalDoesNotBlockDivision",
+            "TestNaturalFormattingLeadingZeroSourceDomain",
+            "TestNaturalFormattingReusableInlineScopeWarm",
+            "TestNaturalFormattingEmptyGuardAfterLocalActions",
+            "TestNaturalSourceFinalizeRetainsFailedLexicalLocal",
+            "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
+            "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
+            "TestNaturalSourceFinalizeColdLifecycleGuards"
           ]
         }
       ],
@@ -115102,7 +115494,8 @@
         "mpnum/rational_service.go",
         "mpnum/rational_service_ops.go",
         "mpnum/rational_service_extra.go",
-        "mpnum/inf_scalar_projection_test.go"
+        "mpnum/inf_scalar_projection_test.go",
+        "mpnum/mp_raw_projection_test.go"
       ],
       "tests": [
         "TestSourceRationalConversionAssertions",
@@ -115159,7 +115552,18 @@
         "TestInfScalarProjectionFacadeRawFieldsAndNarrowing",
         "TestInfScalarProjectionOwnershipAndWarmGraph",
         "TestInfScalarProjectionRegisteredDefaultGetter",
-        "TestInfScalarProjectionRawManagerEndangeredReads"
+        "TestInfScalarProjectionRawManagerEndangeredReads",
+        "TestRawProjectionCopyShapesAndAliases",
+        "TestRawProjectionQueriesAndUnreadComponents",
+        "TestRawProjectionSelectedCopiesAndResetOrder",
+        "TestRawProjectionCopyLateReadAndFailurePrefixes",
+        "TestRawProjectionServiceAndInfOwningReferences",
+        "TestRawProjectionInfExtractionSourceDebugBoundary",
+        "TestRawProjectionInfQueriesAndShortCircuits",
+        "TestRawProjectionOwningBigCopiesAndMemberFailureOrder",
+        "TestRawProjectionWarmPhysicalGraphAndIdentity",
+        "TestRawProjectionNestedOwnerAtActualBranch",
+        "TestRawProjectionBothPoliciesAllComponentAliases"
       ],
       "conditionals": [
         {
@@ -115260,7 +115664,7 @@
         },
         {
           "name": "explicit deep copy/move/swap/destruction through owner-local service",
-          "status": "ported",
+          "status": "partial",
           "go_target": "mpnum/rational_service.go",
           "tests": [
             "TestRationalServiceSourceConstructorAssertions",
@@ -115358,7 +115762,7 @@
         },
         {
           "name": "fresh integer-valued div/rem/mod/GCD, numerator/denominator, rounding and power results",
-          "status": "ported",
+          "status": "partial",
           "go_target": "mpnum/rational_service_ops.go",
           "tests": [
             "TestRationalFacadeSourceTST1",
@@ -115489,7 +115893,7 @@
         },
         {
           "name": "owned self/zero projections and display/decimal forwarding",
-          "status": "ported",
+          "status": "partial",
           "go_target": "mpnum/rational_service_extra.go",
           "tests": [
             "TestRationalServiceExtraSourceTST8",
@@ -115507,8 +115911,8 @@
           ]
         },
         {
-          "name": "Remaining source-defined raw component projection, sign/hash and owning-copy domains",
-          "status": "unported"
+          "name": "Remaining raw constructors/setters/swap/move/arithmetic domains and owning projection diagnostic cleanup-refusal retention",
+          "status": "partial"
         },
         {
           "name": "Actual owner-local facade scalar queries/getters/Float64 preserve source raw-domain, narrowing and DEBUG-only fit behavior",
@@ -115521,6 +115925,24 @@
             "TestInfScalarProjectionOwnershipAndWarmGraph",
             "TestInfScalarProjectionRegisteredDefaultGetter",
             "TestInfScalarProjectionRawManagerEndangeredReads"
+          ]
+        },
+        {
+          "name": "Owner-local raw Copy/query/hash and owning projections preserve source selected reads; unpublished lexical cleanup-refusal retention remains open",
+          "status": "partial",
+          "go_target": "mpnum/rational_service_ops.go",
+          "tests": [
+            "TestRawProjectionCopyShapesAndAliases",
+            "TestRawProjectionQueriesAndUnreadComponents",
+            "TestRawProjectionSelectedCopiesAndResetOrder",
+            "TestRawProjectionCopyLateReadAndFailurePrefixes",
+            "TestRawProjectionServiceAndInfOwningReferences",
+            "TestRawProjectionInfExtractionSourceDebugBoundary",
+            "TestRawProjectionInfQueriesAndShortCircuits",
+            "TestRawProjectionOwningBigCopiesAndMemberFailureOrder",
+            "TestRawProjectionWarmPhysicalGraphAndIdentity",
+            "TestRawProjectionNestedOwnerAtActualBranch",
+            "TestRawProjectionBothPoliciesAllComponentAliases"
           ]
         }
       ],

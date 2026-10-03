@@ -16,7 +16,7 @@ func (m *RationalManager) Field() bool   { return true }
 // Sign retains source m_val: small numerators return their entire inline value,
 // while big numerators return -1/+1. It is not a normalized mathematical sign.
 func (m *RationalManager) Sign(a *Rational) (int32, error) {
-	if e := m.check(a); e != nil {
+	if e := m.checkScalarValue(a); e != nil {
 		return 0, e
 	}
 	return a.num.val, nil
@@ -63,13 +63,13 @@ func (m *RationalManager) IsInt(a *Rational) (bool, error) {
 	return isIntegerRational(a), nil
 }
 func (m *RationalManager) IsOne(a *Rational) (bool, error) {
-	if e := m.check(a); e != nil {
+	if e := m.checkScalarValue(a); e != nil {
 		return false, e
 	}
 	return isOneInteger(&a.num) && isOneInteger(&a.den), nil
 }
 func (m *RationalManager) IsMinusOne(a *Rational) (bool, error) {
-	if e := m.check(a); e != nil {
+	if e := m.checkScalarValue(a); e != nil {
 		return false, e
 	}
 	return a.num.IsSmall() && a.num.val == -1 && isOneInteger(&a.den), nil
@@ -78,7 +78,7 @@ func (m *RationalManager) IsMinusOne(a *Rational) (bool, error) {
 // Hash is deliberately numerator-only; fraction collisions and sign-free big
 // magnitude hashes are source behavior, resolved by source structural equality.
 func (m *RationalManager) Hash(a *Rational) (uint32, error) {
-	if e := m.check(a); e != nil {
+	if e := m.checkScalarValue(a); e != nil {
 		return 0, e
 	}
 	return m.z.Hash(&a.num)
@@ -256,28 +256,40 @@ func (m *RationalManager) Float64(a *Rational) (float64, error) {
 // Extraction copies owned payloads explicitly and does not normalize either
 // source or result. Component output aliases follow the source Copy action.
 func (m *RationalManager) Numerator(a *Rational, out *Int) error {
-	if e := m.check(a); e != nil {
+	if e := m.checkScalarValue(a); e != nil {
 		return e
 	}
 	return m.z.Copy(out, &a.num)
 }
 func (m *RationalManager) Denominator(a *Rational, out *Int) error {
-	if e := m.check(a); e != nil {
+	if e := m.checkScalarValue(a); e != nil {
 		return e
 	}
 	return m.z.Copy(out, &a.den)
 }
 func (m *RationalManager) NumeratorRational(a, out *Rational) error {
-	if e := m.check(a); e != nil {
+	if e := m.checkScalarValue(a); e != nil {
 		return e
 	}
-	return m.SetInteger(out, &a.num)
+	if e := m.checkScalarValue(out); e != nil {
+		return e
+	}
+	if e := m.z.Copy(&out.num, &a.num); e != nil {
+		return e
+	}
+	return m.resetDenominator(out)
 }
 func (m *RationalManager) DenominatorRational(a, out *Rational) error {
-	if e := m.check(a); e != nil {
+	if e := m.checkScalarValue(a); e != nil {
 		return e
 	}
-	return m.SetInteger(out, &a.den)
+	if e := m.checkScalarValue(out); e != nil {
+		return e
+	}
+	if e := m.z.Copy(&out.num, &a.den); e != nil {
+		return e
+	}
+	return m.resetDenominator(out)
 }
 
 // SetInteger and the thin setters publish source numerator actions followed by

@@ -60,10 +60,9 @@ func (m *IntegerManager) SourceFinalize() error {
 			*ref = 0
 		case 6:
 			if m.natural != nil {
-				if e := m.natural.CloseChecked(); e != nil {
+				if e := m.natural.SourceFinalize(); e != nil {
 					return fail(e)
 				}
-				m.natural = nil
 			}
 		case 7:
 			e := m.allocator.Close()

@@ -1,0 +1,291 @@
+// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+package g3
+
+import (
+	"github.com/glycerine/g3/golang/arena"
+	"reflect"
+)
+
+// Sole clause ownership lies in original/learned or the explicit interrupted
+// raw-candidate root. Reinit/watch states are actual nonowning source borrowers.
+// This owner is not a complete solver constructor or source debug destructor.
+type satSolverClauseLifecycle struct {
+	self                                                       *satSolverClauseLifecycle
+	propagation                                                *satSolverPropagationState
+	budget                                                     *arena.Budget
+	original, learned                                          []satStoredClauseRef
+	reinit                                                     []satClauseWrapper
+	scopes                                                     []satSolverScope
+	pendingCandidate                                           satStoredClauseRef
+	ownerBytes                                                 uint64
+	mkBinary, mkTernary, mkNary, deleted, nonLearnedGeneration uint32
+	reinitInitialized, scopesInitialized                       uint32
+	closeOriginal, closeLearned                                uint32
+	originalDone, learnedDone, closing, closed                 bool
+}
+type satSolverScope struct {
+	trailLimit, reinitLimit uint32
+	inconsistent            bool
+}
+
+func newSATSolverClauseLifecycle(p *satSolverPropagationState, b *arena.Budget) (*satSolverClauseLifecycle, error) {
+	if e := p.open(); e != nil {
+		return nil, e
+	}
+	n := uint64(reflect.TypeOf(satSolverClauseLifecycle{}).Size())
+	if e := b.Reserve(n); e != nil {
+		return nil, e
+	}
+	s := &satSolverClauseLifecycle{propagation: p, budget: b, ownerBytes: n}
+	s.self = s
+	return s, nil
+}
+func (s *satSolverClauseLifecycle) open() error {
+	if s == nil || s.self != s {
+		return ErrSATOwner
+	}
+	if s.closed || s.closing {
+		return arena.ErrClosed
+	}
+	return s.propagation.open()
+}
+func (s *satSolverClauseLifecycle) pushClause(learned bool, c satStoredClauseRef) error {
+	if learned {
+		if len(s.learned) == cap(s.learned) {
+			n, bytes, e := satVariableNextCapacity(uint32(cap(s.learned)), uint64(reflect.TypeOf(satStoredClauseRef{}).Size()), 8, uint64(^uint(0)>>1))
+			if e != nil {
+				return e
+			}
+			if e = s.budget.Reserve(bytes); e != nil {
+				return e
+			}
+			next := make([]satStoredClauseRef, len(s.learned), n)
+			copy(next[:cap(s.learned)], s.learned[:cap(s.learned)])
+			s.budget.Release(uint64(cap(s.learned)) * uint64(reflect.TypeOf(satStoredClauseRef{}).Size()))
+			s.learned = next
+		}
+		s.learned = append(s.learned, c)
+	} else {
+		if len(s.original) == cap(s.original) {
+			n, bytes, e := satVariableNextCapacity(uint32(cap(s.original)), uint64(reflect.TypeOf(satStoredClauseRef{}).Size()), 8, uint64(^uint(0)>>1))
+			if e != nil {
+				return e
+			}
+			if e = s.budget.Reserve(bytes); e != nil {
+				return e
+			}
+			next := make([]satStoredClauseRef, len(s.original), n)
+			copy(next[:cap(s.original)], s.original[:cap(s.original)])
+			s.budget.Release(uint64(cap(s.original)) * uint64(reflect.TypeOf(satStoredClauseRef{}).Size()))
+			s.original = next
+		}
+		s.original = append(s.original, c)
+	}
+	return nil
+}
+func (s *satSolverClauseLifecycle) pushWrapper(w satClauseWrapper) error {
+	if len(s.reinit) == cap(s.reinit) {
+		n, bytes, e := satVariableNextCapacity(uint32(cap(s.reinit)), uint64(reflect.TypeOf(satClauseWrapper{}).Size()), 16, uint64(^uint(0)>>1))
+		if e != nil {
+			return e
+		}
+		if e = s.budget.Reserve(bytes); e != nil {
+			return e
+		}
+		next := make([]satClauseWrapper, len(s.reinit), n)
+		copy(next[:cap(s.reinit)], s.reinit[:cap(s.reinit)])
+		s.budget.Release(uint64(cap(s.reinit)) * uint64(reflect.TypeOf(satClauseWrapper{}).Size()))
+		s.reinit = next
+	}
+	s.reinit = append(s.reinit, w)
+	if uint32(len(s.reinit)) > s.reinitInitialized {
+		s.reinitInitialized = uint32(len(s.reinit))
+	}
+	return nil
+}
+
+// publishCandidate is an explicit Go continuation, not a source constructor retry.
+// It publishes the same retained allocated object without replaying attachment.
+func (s *satSolverClauseLifecycle) publishCandidate(learned bool) error {
+	if e := s.open(); e != nil {
+		return e
+	}
+	c := s.pendingCandidate
+	if c == (satStoredClauseRef{}) {
+		return arena.ErrInvalidSlot
+	}
+	if e := s.propagation.clauses.validate(c); e != nil {
+		return e
+	}
+	if e := s.pushClause(learned, c); e != nil {
+		return e
+	}
+	s.pendingCandidate = satStoredClauseRef{}
+	return nil
+}
+func (s *satSolverClauseLifecycle) delClause(c satStoredClauseRef) error {
+	if e := s.open(); e != nil {
+		return e
+	}
+	a := s.propagation.clauses
+	learned, e := a.Learned(c)
+	if e != nil {
+		return e
+	}
+	if !learned {
+		s.nonLearnedGeneration++
+	}
+	if e = a.Delete(c); e != nil {
+		return e
+	}
+	s.deleted++
+	return nil
+}
+
+// Explicit interrupted-candidate teardown consumes ONLY its retained ownership.
+// Source-completed watches/reinit remain, and their real stale accesses are guarded.
+func (s *satSolverClauseLifecycle) cleanupCandidate() error {
+	if e := s.open(); e != nil {
+		return e
+	}
+	if s.pendingCandidate == (satStoredClauseRef{}) {
+		return nil
+	}
+	if e := s.propagation.clauses.Delete(s.pendingCandidate); e != nil {
+		return e
+	}
+	s.pendingCandidate = satStoredClauseRef{}
+	return nil
+}
+func (s *satSolverClauseLifecycle) mkClauseCore(n uint32, lits []satLiteral, learned bool) (satStoredClauseRef, error) {
+	if e := s.open(); e != nil {
+		return satStoredClauseRef{}, e
+	}
+	if s.pendingCandidate != (satStoredClauseRef{}) {
+		return satStoredClauseRef{}, ErrSATOwner
+	}
+	p := s.propagation
+	if !learned {
+		v := p.variables.clauseState()
+		keep, e := v.simplifyClause(p.variables.scopeLevel, &n, lits)
+		if e != nil {
+			return satStoredClauseRef{}, e
+		}
+		if !keep {
+			return satStoredClauseRef{}, nil
+		}
+		s.nonLearnedGeneration++
+	}
+	switch n {
+	case 0:
+		p.setConflict(satJustification{}, satDefaultLiteral())
+		return satStoredClauseRef{}, nil
+	case 1:
+		if len(lits) == 0 {
+			return satStoredClauseRef{}, arena.ErrBounds
+		}
+		return satStoredClauseRef{}, p.assign(lits[0], satJustification{})
+	case 2:
+		if len(lits) < 2 {
+			return satStoredClauseRef{}, arena.ErrBounds
+		}
+		return satStoredClauseRef{}, s.mkBinClause(lits[0], lits[1], learned)
+	case 3:
+		return s.mkTerClause(lits, learned)
+	default:
+		return s.mkNaryClause(n, lits, learned)
+	}
+}
+func (s *satSolverClauseLifecycle) mkTerClause(lits []satLiteral, learned bool) (satStoredClauseRef, error) {
+	s.mkTernary++
+	c, e := s.propagation.clauses.MkClauseN(3, lits, learned)
+	if e != nil {
+		return c, e
+	}
+	s.pendingCandidate = c
+	reinit, e := s.attachTerClause(c)
+	if e != nil {
+		return c, e
+	}
+	if reinit && !learned {
+		if e = s.pushReinitStack(c); e != nil {
+			return c, e
+		}
+	}
+	return c, s.publishCandidate(learned)
+}
+func (s *satSolverClauseLifecycle) mkNaryClause(n uint32, lits []satLiteral, learned bool) (satStoredClauseRef, error) {
+	s.mkNary++
+	c, e := s.propagation.clauses.MkClauseN(n, lits, learned)
+	if e != nil {
+		return c, e
+	}
+	s.pendingCandidate = c
+	if satStorageSourceDebug && learned {
+		flag, e := s.propagation.clauses.Learned(c)
+		if e != nil {
+			return c, e
+		}
+		if !flag {
+			return c, ErrSATAssertion
+		}
+	}
+	reinit, e := s.attachNaryClause(c)
+	if e != nil {
+		return c, e
+	}
+	if reinit && !learned {
+		if e = s.pushReinitStack(c); e != nil {
+			return c, e
+		}
+	}
+	return c, s.publishCandidate(learned)
+}
+func (s *satSolverClauseLifecycle) Close() error {
+	if s == nil || s.self != s {
+		return ErrSATOwner
+	}
+	if s.closed {
+		return nil
+	}
+	s.closing = true
+	a := s.propagation.clauses
+	for s.closeOriginal < uint32(len(s.original)) {
+		if e := a.Delete(s.original[s.closeOriginal]); e != nil {
+			return e
+		}
+		s.closeOriginal++
+	}
+	if !s.originalDone {
+		s.nonLearnedGeneration++
+		s.originalDone = true
+	}
+	for s.closeLearned < uint32(len(s.learned)) {
+		if e := a.Delete(s.learned[s.closeLearned]); e != nil {
+			return e
+		}
+		s.closeLearned++
+	}
+	if !s.learnedDone {
+		s.nonLearnedGeneration++
+		s.learnedDone = true
+	}
+	if s.pendingCandidate != (satStoredClauseRef{}) {
+		if e := a.Delete(s.pendingCandidate); e != nil {
+			return e
+		}
+		s.pendingCandidate = satStoredClauseRef{}
+	}
+	// Adapter physical finalization after source clause deletion, reverse member order.
+	s.budget.Release(uint64(cap(s.scopes)) * uint64(reflect.TypeOf(satSolverScope{}).Size()))
+	s.scopes = nil
+	s.budget.Release(uint64(cap(s.reinit)) * uint64(reflect.TypeOf(satClauseWrapper{}).Size()))
+	s.reinit = nil
+	s.budget.Release(uint64(cap(s.learned)+cap(s.original)) * uint64(reflect.TypeOf(satStoredClauseRef{}).Size()))
+	s.learned = nil
+	s.original = nil
+	s.budget.Release(s.ownerBytes)
+	s.ownerBytes = 0
+	s.closed = true
+	return nil
+}

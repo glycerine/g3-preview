@@ -101,10 +101,34 @@ func TestIntegerRationalCombinedFormat(t *testing.T) {
 	if e != nil || s != want {
 		t.Fatal(e)
 	}
-	var formatError error
-	if allocations := testing.AllocsPerRun(10, func() { _, formatError = m.FormatInto(&a, dst[:len(want)]) }); allocations != 0 || formatError != nil {
-		t.Fatal(allocations, formatError)
+	// Each source conversion freshly constructs temp(lng) and numer(lng+1).
+	// Independent buffer.h unsigned doubling gives 6+8 real allocations for
+	// these two operands. Runtime owns data and initialization backing for
+	// each call; the embedded scope adds no separate Go allocation.
+	var events uint64
+	for _, bits := range []int{numerator.BitLen(), denominator.BitLen()} {
+		limbs := (bits + 31) / 32
+		for _, size := range []int{limbs, limbs + 1} {
+			for capacity := 16; capacity < size; capacity *= 2 {
+				events++
+			}
+		}
 	}
+	if events != 14 {
+		t.Fatal("source constructor fixture changed", events)
+	}
+	beforeWarm := numericWarmProfileSnapshot(t, m.z, m.z.budget)
+	var formatError error
+	allocations := testing.AllocsPerRun(10, func() { _, formatError = m.FormatInto(&a, dst[:len(want)]) })
+	afterWarm := numericWarmProfileSnapshot(t, m.z, m.z.budget)
+	if formatError != nil || afterWarm.count-beforeWarm.count != events*11 || allocations != 2*float64(events) || m.z.natural.formatting.active || m.z.natural.formatting.pending {
+		t.Fatal("actual source lexical allocations", allocations, events, afterWarm.count-beforeWarm.count, formatError)
+	}
+	numericWarmProfileAudit(t, m.z, m.z.budget, beforeWarm, allocations, true)
+	if string(dst[:len(want)]) != want {
+		t.Fatal("warm output value")
+	}
+	qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den})
 	before := append([]byte(nil), dst...)
 	_, e = m.FormatInto(&a, dst[:len(want)-1])
 	if !errors.Is(e, ErrShortBuffer) || !bytes.Equal(before, dst) {
@@ -290,7 +314,7 @@ func TestFormattingBudgetFailuresAndLifetime(t *testing.T) {
 				budget.FailAfter(-1)
 				if e != nil {
 					failures++
-					if !errors.Is(e, arena.ErrInjectedFailure) || !bytes.Equal(before, dst) {
+					if !numericPhysicalReservationRefusal(e) || !bytes.Equal(before, dst) {
 						t.Fatal(kind, warm, fault, n, e, "published")
 					}
 				} else {

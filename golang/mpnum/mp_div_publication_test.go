@@ -468,9 +468,13 @@ func TestDivisionPublicationServiceInvalidResultCopyAndCleanup(t *testing.T) {
 	zero := serviceValue(t, s, "0")
 	out, e := s.Div(&a, &zero)
 	facadeAudit(t, s, &a, &zero, &out)
-	if !errors.Is(e, ErrUninitializedRational) || out.ownerID != 0 {
-		t.Fatal("Go value-result Copy boundary after finite raw division", e, out)
+	if e != nil || out.ownerID != s.ownerID || out.raw.num != NewInt(1) || out.raw.den != NewInt(0) {
+		t.Fatal("source value-result Copy preserves finite raw division", e, out)
 	}
+	if a.raw.num != NewInt(2) || a.raw.den != NewInt(1) {
+		t.Fatal("value-result division retains its input", a.raw)
+	}
+	serviceMust(t, s.Del(&out))
 	serviceMust(t, s.DivAssign(&a, &zero))
 	facadeAudit(t, s, &a, &zero)
 	if a.raw.num != NewInt(1) || a.raw.den != NewInt(0) {

@@ -100,6 +100,11 @@ func integerPhysicalAudit(t *testing.T, m *IntegerManager, public ...*Int) {
 	if m.natural.verificationActive {
 		buffers = append(buffers, &m.natural.verification)
 	}
+	if m.natural.formatting.active || m.natural.formatting.pending {
+		for i := range m.natural.formatting.locals {
+			buffers = append(buffers, &m.natural.formatting.locals[i])
+		}
+	}
 	for _, s := range buffers {
 		for _, r := range []memory.Block{s.raw, s.pending} {
 			if r == (memory.Block{}) {

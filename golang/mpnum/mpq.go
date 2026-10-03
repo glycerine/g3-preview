@@ -184,14 +184,11 @@ func (m *RationalManager) Swap(a, b *Rational) error {
 	return m.z.Swap(&a.den, &b.den)
 }
 func (m *RationalManager) Copy(dst, src *Rational) error {
-	if e := m.check(dst); e != nil {
+	if e := m.checkScalarValue(dst); e != nil {
 		return e
 	}
-	if e := m.check(src); e != nil {
+	if e := m.checkScalarValue(src); e != nil {
 		return e
-	}
-	if dst == src {
-		return nil
 	}
 	if e := m.z.Copy(&dst.num, &src.num); e != nil {
 		return e

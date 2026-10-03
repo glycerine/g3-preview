@@ -127,10 +127,38 @@ func (s *satSolverPropagationState) checkpoint() error {
 	return nil
 }
 func (s *satSolverPropagationState) numDiffLevels(c satStoredClauseRef) (uint32, error) {
+	if e := s.open(); e != nil {
+		return 0, e
+	}
 	n, e := s.clauses.Size(c)
 	if e != nil {
 		return 0, e
 	}
+	return s.numDiffLevelsCore(n, nil, c, true)
+}
+
+// Source num_diff_levels accepts a pointer and an independent unsigned count.
+// The caller's concrete literal storage is borrowed; accesses are checked at
+// each source dereference, after reserve and any preceding marks.
+func (s *satSolverPropagationState) numDiffLevelsLiterals(n uint32, lits []satLiteral) (uint32, error) {
+	if e := s.open(); e != nil {
+		return 0, e
+	}
+	return s.numDiffLevelsCore(n, lits, satStoredClauseRef{}, false)
+}
+
+func (s *satSolverPropagationState) diffLevelLiteral(i uint32, lits []satLiteral, c satStoredClauseRef, clause bool) (satLiteral, error) {
+	if clause {
+		return s.clauses.Literal(c, i)
+	}
+	if uint64(i) >= uint64(cap(lits)) {
+		return 0, arena.ErrBounds
+	}
+	return lits[:cap(lits)][i], nil
+}
+
+// Both concrete storage routes execute the same source reserve/mark/reset body.
+func (s *satSolverPropagationState) numDiffLevelsCore(n uint32, lits []satLiteral, c satStoredClauseRef, clause bool) (uint32, error) {
 	need := s.variables.scopeLevel + 1
 	// Literal reserve(sz,false) grows logical size and default-fills new entries.
 	if need > uint32(len(s.diffLevels.data)) {
@@ -158,7 +186,7 @@ func (s *satSolverPropagationState) numDiffLevels(c satStoredClauseRef) (uint32,
 	}
 	var count uint32
 	for i := uint32(0); i < n; i++ {
-		l, e := s.clauses.Literal(c, i)
+		l, e := s.diffLevelLiteral(i, lits, c, clause)
 		if e != nil {
 			return count, e
 		}
@@ -187,7 +215,7 @@ func (s *satSolverPropagationState) numDiffLevels(c satStoredClauseRef) (uint32,
 		}
 	}
 	for i := uint32(0); i < n; i++ {
-		l, e := s.clauses.Literal(c, i)
+		l, e := s.diffLevelLiteral(i, lits, c, clause)
 		if e != nil {
 			return count, e
 		}

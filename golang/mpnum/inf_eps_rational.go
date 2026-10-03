@@ -1,6 +1,7 @@
 // Copyright (c) 2013 Microsoft Corporation. Licensed under the MIT license.
-// Translation of src/util/inf_eps_rational.h<inf_rational>; raw-domain
-// owning projections and sign/hash entry adapters remain separate obligations.
+// Translation of src/util/inf_eps_rational.h<inf_rational>. Selected raw-domain
+// projections/sign/hash retain source reads; diagnostic cleanup-refusal ownership
+// and other raw-domain arithmetic adapters remain separate obligations.
 package mpnum
 
 // OwnedInfEpsInfRational represents infinity*i + (first + epsilon*second).
@@ -42,6 +43,12 @@ func (s *RationalService) infEpsInfCopy(dst, src *OwnedInfEpsInfRational) error 
 	if e := s.manager.Copy(&dst.infinity, &src.infinity); e != nil {
 		return e
 	}
+	if e := s.infScalarOwner(&dst.numeral); e != nil {
+		return e
+	}
+	if e := s.infScalarOwner(&src.numeral); e != nil {
+		return e
+	}
 	return s.infCopy(&dst.numeral, &src.numeral)
 }
 func (s *RationalService) infEpsInfClone(src *OwnedInfEpsInfRational) (OwnedInfEpsInfRational, error) {
@@ -64,7 +71,7 @@ func (s *RationalService) InfEpsInfClone(src *OwnedInfEpsInfRational) (OwnedInfE
 		return OwnedInfEpsInfRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(src); e != nil {
+	if e := s.infEpsScalarOwner(src); e != nil {
 		return OwnedInfEpsInfRational{}, e
 	}
 	return s.infEpsInfClone(src)
@@ -74,10 +81,10 @@ func (s *RationalService) InfEpsInfCopy(dst, src *OwnedInfEpsInfRational) error 
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(dst); e != nil {
+	if e := s.infEpsScalarOwner(dst); e != nil {
 		return e
 	}
-	if e := s.infEpsInfCheck(src); e != nil {
+	if e := s.infEpsScalarOwner(src); e != nil {
 		return e
 	}
 	return s.infEpsInfCopy(dst, src)
@@ -222,7 +229,10 @@ func (s *RationalService) InfEpsInfGetNumeral(v *OwnedInfEpsInfRational) (OwnedI
 		return OwnedInfRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
+		return OwnedInfRational{}, e
+	}
+	if e := s.infScalarOwner(&v.numeral); e != nil {
 		return OwnedInfRational{}, e
 	}
 	return s.infClone(&v.numeral)
@@ -232,11 +242,14 @@ func (s *RationalService) InfEpsInfHash(v *OwnedInfEpsInfRational) (uint32, erro
 		return 0, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return 0, e
 	}
 	i, e := s.manager.Hash(&v.infinity)
 	if e != nil {
+		return 0, e
+	}
+	if e := s.infScalarOwner(&v.numeral); e != nil {
 		return 0, e
 	}
 	a, e := s.manager.Hash(&v.numeral.first)
@@ -562,7 +575,7 @@ func (s *RationalService) InfEpsInfGetInfinity(v *OwnedInfEpsInfRational) (Owned
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return OwnedRational{}, e
 	}
 	return s.copyOutput(&v.infinity)
@@ -572,7 +585,10 @@ func (s *RationalService) InfEpsInfGetRational(v *OwnedInfEpsInfRational) (Owned
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
+		return OwnedRational{}, e
+	}
+	if e := s.infScalarOwner(&v.numeral); e != nil {
 		return OwnedRational{}, e
 	}
 	return s.copyOutput(&v.numeral.first)
@@ -582,7 +598,10 @@ func (s *RationalService) InfEpsInfGetInfinitesimal(v *OwnedInfEpsInfRational) (
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
+		return OwnedRational{}, e
+	}
+	if e := s.infScalarOwner(&v.numeral); e != nil {
 		return OwnedRational{}, e
 	}
 	return s.copyOutput(&v.numeral.second)
@@ -592,7 +611,7 @@ func (s *RationalService) InfEpsInfIsFinite(v *OwnedInfEpsInfRational) (bool, er
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return false, e
 	}
 	return v.infinity.num.val == 0, nil
@@ -672,21 +691,30 @@ func (s *RationalService) InfEpsInfIsZero(v *OwnedInfEpsInfRational) (bool, erro
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return false, e
 	}
-	return v.infinity.num.val == 0 && v.numeral.first.num.val == 0 && v.numeral.second.num.val == 0, nil
+	if v.infinity.num.val != 0 {
+		return false, nil
+	}
+	if e := s.infScalarOwner(&v.numeral); e != nil {
+		return false, e
+	}
+	return v.numeral.first.num.val == 0 && v.numeral.second.num.val == 0, nil
 }
 func (s *RationalService) InfEpsInfIsOne(v *OwnedInfEpsInfRational) (bool, error) {
 	if e := s.lock(); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return false, e
 	}
 	if v.infinity.num.val != 0 {
 		return false, nil
+	}
+	if e := s.infScalarOwner(&v.numeral); e != nil {
+		return false, e
 	}
 	ok, e := s.manager.IsOne(&v.numeral.first)
 	return ok && v.numeral.second.num.val == 0, e
@@ -696,11 +724,14 @@ func (s *RationalService) InfEpsInfIsMinusOne(v *OwnedInfEpsInfRational) (bool, 
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return false, e
 	}
 	if v.infinity.num.val != 0 {
 		return false, nil
+	}
+	if e := s.infScalarOwner(&v.numeral); e != nil {
+		return false, e
 	}
 	ok, e := s.manager.IsMinusOne(&v.numeral.first)
 	return ok && v.numeral.second.num.val == 0, e
@@ -710,8 +741,13 @@ func (s *RationalService) InfEpsInfIsPos(v *OwnedInfEpsInfRational) (bool, error
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return false, e
+	}
+	if v.infinity.num.val == 0 {
+		if e := s.infScalarOwner(&v.numeral); e != nil {
+			return false, e
+		}
 	}
 	return s.infEpsInfSign(v) > 0, nil
 }
@@ -720,8 +756,13 @@ func (s *RationalService) InfEpsInfIsNeg(v *OwnedInfEpsInfRational) (bool, error
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return false, e
+	}
+	if v.infinity.num.val == 0 {
+		if e := s.infScalarOwner(&v.numeral); e != nil {
+			return false, e
+		}
 	}
 	return s.infEpsInfSign(v) < 0, nil
 }
@@ -730,8 +771,13 @@ func (s *RationalService) InfEpsInfIsNonPos(v *OwnedInfEpsInfRational) (bool, er
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return false, e
+	}
+	if v.infinity.num.val == 0 {
+		if e := s.infScalarOwner(&v.numeral); e != nil {
+			return false, e
+		}
 	}
 	return s.infEpsInfSign(v) <= 0, nil
 }
@@ -740,8 +786,13 @@ func (s *RationalService) InfEpsInfIsNonNeg(v *OwnedInfEpsInfRational) (bool, er
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return false, e
+	}
+	if v.infinity.num.val == 0 {
+		if e := s.infScalarOwner(&v.numeral); e != nil {
+			return false, e
+		}
 	}
 	return s.infEpsInfSign(v) >= 0, nil
 }

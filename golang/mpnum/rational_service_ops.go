@@ -308,8 +308,14 @@ func (s *RationalService) facadeUnary(a *OwnedRational, op rationalFacadeUnaryOp
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(a); e != nil {
-		return OwnedRational{}, e
+	if op == facadeNumerator || op == facadeDenominator {
+		if e := s.rationalScalarOwner(a); e != nil {
+			return OwnedRational{}, e
+		}
+	} else {
+		if e := s.check(a); e != nil {
+			return OwnedRational{}, e
+		}
 	}
 	work := NewRational()
 	defer s.manager.drop(&work)
@@ -465,7 +471,7 @@ func (s *RationalService) IsPos(a *OwnedRational) (bool, error) {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return false, e
 	}
 	return s.manager.IsPos(&a.raw)
@@ -475,7 +481,7 @@ func (s *RationalService) IsNeg(a *OwnedRational) (bool, error) {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return false, e
 	}
 	return s.manager.IsNeg(&a.raw)
@@ -485,7 +491,7 @@ func (s *RationalService) IsZero(a *OwnedRational) (bool, error) {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return false, e
 	}
 	return s.manager.IsZero(&a.raw)
@@ -495,7 +501,7 @@ func (s *RationalService) IsOne(a *OwnedRational) (bool, error) {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return false, e
 	}
 	return s.manager.IsOne(&a.raw)
@@ -505,7 +511,7 @@ func (s *RationalService) IsMinusOne(a *OwnedRational) (bool, error) {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return false, e
 	}
 	return s.manager.IsMinusOne(&a.raw)
@@ -515,7 +521,7 @@ func (s *RationalService) IsNonNeg(a *OwnedRational) (bool, error) {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return false, e
 	}
 	return s.manager.IsNonNeg(&a.raw)
@@ -525,7 +531,7 @@ func (s *RationalService) IsNonPos(a *OwnedRational) (bool, error) {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return false, e
 	}
 	return s.manager.IsNonPos(&a.raw)
@@ -649,7 +655,7 @@ func (s *RationalService) Hash(a *OwnedRational) (uint32, error) {
 		return 0, e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return 0, e
 	}
 	return s.manager.Hash(&a.raw)

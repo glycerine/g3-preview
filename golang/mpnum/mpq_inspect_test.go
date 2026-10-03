@@ -350,8 +350,8 @@ func TestRationalInspectionStatisticsFloatAndDomains(t *testing.T) {
 	}
 	m.z.Del(&a.num)
 	var raw Rational
-	if _, e := m.Hash(&raw); !errors.Is(e, ErrUninitializedRational) {
-		t.Fatal(e)
+	if h, e := m.Hash(&raw); e != nil || h != 0 {
+		t.Fatal("source hashes only inline NUM of raw zero", h, e)
 	}
 	valid := NewRational()
 	m.Close()
@@ -408,10 +408,18 @@ func TestRationalInspectionFloatExceptionalBranches(t *testing.T) {
 func TestRationalInspectionGuardResultAndBorrowLifetime(t *testing.T) {
 	m, _ := rationalManager(t, false)
 	var raw Rational
-	for _, call := range []func(*Rational) (bool, error){m.IsPos, m.IsNeg, m.IsZero, m.IsNonPos, m.IsNonNeg, m.IsOne, m.IsMinusOne, m.IsEven} {
-		if got, e := call(&raw); !errors.Is(e, ErrUninitializedRational) || got {
-			t.Fatal("invalid bool result", got, e)
+	for _, q := range []struct {
+		call func(*Rational) (bool, error)
+		want bool
+	}{
+		{m.IsPos, false}, {m.IsNeg, false}, {m.IsZero, true}, {m.IsNonPos, true}, {m.IsNonNeg, true}, {m.IsOne, false}, {m.IsMinusOne, false},
+	} {
+		if got, e := q.call(&raw); e != nil || got != q.want {
+			t.Fatal("source scalar fields of raw zero", got, e)
 		}
+	}
+	if got, e := m.IsEven(&raw); !errors.Is(e, ErrUninitializedRational) || got {
+		t.Fatal("unchanged arithmetic parity guard", got, e)
 	}
 	for _, call := range []func(*Rational) (bool, error){m.IsInt, m.IsInt64, m.IsUint64, m.IsUnsigned, m.IsInt32} {
 		if got, e := call(&raw); e != nil || got {

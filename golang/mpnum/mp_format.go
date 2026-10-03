@@ -89,18 +89,21 @@ func checkedTextEnd(offset uint32, n uint64) (uint32, error) {
 }
 
 // prepareNatural follows source normalize / div_1 / unnormalize by ten. The
-// three source local limb buffers are retained by the operation owner; no input
-// copy or digit array is allocated outside its shared Budget.
+// three source local limb buffers have fresh source lifetimes in the embedded
+// charged owner. Text remains an explicit output assembly adapter.
 func (m *NaturalManager) prepareNatural(a limbView, offset uint32) (uint32, error) {
 	if e := m.check(); e != nil {
 		return 0, e
 	}
-	if a.size == 0 || a.size > 1 && a.read(a.size-1) == 0 {
-		panic("mpnum: unnormalized decimal input")
-	}
 	end, e := checkedTextEnd(offset, 11*uint64(a.size))
 	if e != nil {
 		return 0, e
+	}
+	if end == offset {
+		end, e = checkedTextEnd(offset, 1)
+		if e != nil {
+			return 0, e
+		}
 	}
 	if e = m.reserveText(end); e != nil {
 		return 0, e
@@ -119,18 +122,12 @@ func (m *NaturalManager) prepareNatural(a limbView, offset uint32) (uint32, erro
 		m.reverseText(offset, j)
 		return j, nil
 	}
-	if a.size == math.MaxUint32 {
-		return 0, arena.ErrBounds
+	if e = m.beginFormattingLocals(a.size); e != nil {
+		return 0, e
 	}
-	sizes := [3]uint32{a.size, a.size + 1, 1}
-	for i, size := range sizes {
-		if e = m.resizeScratch(&m.formatScratch[i], &m.formatCapacity[i], size); e != nil {
-			return 0, e
-		}
-	}
-	temp := limbView{words: m.words, ref: m.formatScratch[0], size: a.size}
-	numer := limbView{words: m.words, ref: m.formatScratch[1], size: a.size + 1}
-	denom := limbView{words: m.words, ref: m.formatScratch[2], size: 1}
+	temp := limbView{runtime: m.runtime, source: &m.formatting.locals[0], size: a.size}
+	numer := limbView{runtime: m.runtime, source: &m.formatting.locals[1], size: a.size + 1}
+	denom := limbView{runtime: m.runtime, source: &m.formatting.locals[2], size: 1}
 	for i := uint32(0); i < a.size; i++ {
 		temp.write(i, a.read(i))
 	}
@@ -139,6 +136,7 @@ func (m *NaturalManager) prepareNatural(a limbView, offset uint32) (uint32, erro
 	denom.write(0, uint32(10)<<d)
 	for temp.size > 0 && (temp.size > 1 || temp.read(0) != 0) {
 		numer.size = temp.size + 1
+		numer.source.pos = numer.size
 		numer.write(temp.size, temp.read(temp.size-1)>>(32-d))
 		for i := temp.size - 1; i > 0; i-- {
 			numer.write(i, temp.read(i)<<d|temp.read(i-1)>>(32-d))
@@ -150,9 +148,22 @@ func (m *NaturalManager) prepareNatural(a limbView, offset uint32) (uint32, erro
 		j++
 		for temp.size > 0 && temp.read(temp.size-1) == 0 {
 			temp.size--
+			temp.source.pos = temp.size
 		}
 	}
+	// Source writes the terminator before its size_t j--. Empty input
+	// endangers the following reversal; retain earlier constructor/actions.
+	m.textWrite(j, 0)
+	if guard := formattingReversalGuard(j - offset); guard != nil {
+		if e = m.finishFormattingLocals(); e != nil {
+			return 0, e
+		}
+		return 0, guard
+	}
 	m.reverseText(offset, j)
+	if e = m.finishFormattingLocals(); e != nil {
+		return 0, e
+	}
 	return j, nil
 }
 func (m *NaturalManager) publishText(dst []byte, n uint32) (int, error) {

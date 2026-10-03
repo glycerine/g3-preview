@@ -82,7 +82,7 @@ func (s *RationalService) InfClone(src *OwnedInfRational) (OwnedInfRational, err
 		return OwnedInfRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(src); e != nil {
+	if e := s.infScalarOwner(src); e != nil {
 		return OwnedInfRational{}, e
 	}
 	return s.infClone(src)
@@ -92,10 +92,10 @@ func (s *RationalService) InfCopy(dst, src *OwnedInfRational) error {
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(dst); e != nil {
+	if e := s.infScalarOwner(dst); e != nil {
 		return e
 	}
-	if e := s.infCheck(src); e != nil {
+	if e := s.infScalarOwner(src); e != nil {
 		return e
 	}
 	return s.infCopy(dst, src)
@@ -254,7 +254,7 @@ func (s *RationalService) InfGetRational(v *OwnedInfRational) (OwnedRational, er
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return OwnedRational{}, e
 	}
 	return s.copyOutput(&v.first)
@@ -267,7 +267,7 @@ func (s *RationalService) InfGetInfinitesimal(v *OwnedInfRational) (OwnedRationa
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return OwnedRational{}, e
 	}
 	return s.copyOutput(&v.second)
@@ -277,7 +277,7 @@ func (s *RationalService) InfHash(v *OwnedInfRational) (uint32, error) {
 		return 0, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return 0, e
 	}
 	a, e := s.manager.Hash(&v.first)
@@ -504,10 +504,10 @@ func (s *RationalService) infNumDen(v *OwnedInfRational, den bool) (OwnedInfRati
 		return OwnedInfRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return OwnedInfRational{}, e
 	}
-	if v.second.num.val != 0 {
+	if modularSourceDebug && v.second.num.val != 0 {
 		return OwnedInfRational{}, ErrInfRationalDomain
 	}
 	tmp := NewRational()
@@ -697,7 +697,7 @@ func (s *RationalService) InfIsZero(v *OwnedInfRational) (bool, error) {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return false, e
 	}
 	return v.first.num.val == 0 && v.second.num.val == 0, nil
@@ -707,7 +707,7 @@ func (s *RationalService) InfIsOne(v *OwnedInfRational) (bool, error) {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return false, e
 	}
 	ok, e := s.manager.IsOne(&v.first)
@@ -718,7 +718,7 @@ func (s *RationalService) InfIsMinusOne(v *OwnedInfRational) (bool, error) {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return false, e
 	}
 	ok, e := s.manager.IsMinusOne(&v.first)
@@ -729,7 +729,7 @@ func (s *RationalService) InfIsPos(v *OwnedInfRational) (bool, error) {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return false, e
 	}
 	return s.infSign(v) > 0, nil
@@ -739,7 +739,7 @@ func (s *RationalService) InfIsNeg(v *OwnedInfRational) (bool, error) {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return false, e
 	}
 	return s.infSign(v) < 0, nil
@@ -749,7 +749,7 @@ func (s *RationalService) InfIsNonPos(v *OwnedInfRational) (bool, error) {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return false, e
 	}
 	return s.infSign(v) <= 0, nil
@@ -759,7 +759,7 @@ func (s *RationalService) InfIsNonNeg(v *OwnedInfRational) (bool, error) {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return false, e
 	}
 	return s.infSign(v) >= 0, nil

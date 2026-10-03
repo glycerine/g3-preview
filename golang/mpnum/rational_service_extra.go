@@ -137,7 +137,7 @@ func (s *RationalService) ToRational(a *OwnedRational) (OwnedRational, error) {
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return OwnedRational{}, e
 	}
 	return s.copyOutput(&a.raw)
@@ -150,7 +150,7 @@ func (s *RationalService) GetInfinitesimal(a *OwnedRational) (OwnedRational, err
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return OwnedRational{}, e
 	}
 	return s.copyOutput(&s.zero)
@@ -160,7 +160,7 @@ func (s *RationalService) IsRational(a *OwnedRational) (bool, error) {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return false, e
 	}
 	return true, nil
@@ -225,7 +225,7 @@ func (s *RationalService) componentToScopedInt(a *OwnedRational, dst *ScopedInt,
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return e
 	}
 	if _, e := dst.Get(); e != nil {

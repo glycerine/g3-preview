@@ -8,35 +8,41 @@ import (
 	"reflect"
 )
 
-// NaturalManager owns source division scratch and retained formatting workspace.
+// NaturalManager owns source division scratch, an embedded lexical formatting
+// scope, and the explicitly separate retained output assembly adapter.
 // Operands/output slices are borrowed only during a call. A manager may not be
 // copied or used concurrently. Close invalidates the service. Requested source
 // capacities are kept separate from arena geometric allocation classes.
 type NaturalManager struct {
-	self                        *NaturalManager
-	runtime                     *memory.Runtime
-	ownsRuntime                 bool
-	division                    [4]sourceLimbBuffer
-	verification                sourceLimbBuffer
-	verificationActive          bool
-	originalCause, cleanupCause error
-	words                       *arena.Words
-	divScratch                  [4]arena.VectorRef
-	divCapacity                 [4]uint32
-	formatScratch               [3]arena.VectorRef
-	formatCapacity              [3]uint32
-	text                        *arena.SmallBytes
-	textRef                     arena.SmallBytesRef
-	textCapacity                uint32
-	config                      arena.VectorConfig
-	budget                      *arena.Budget
-	headerBytes                 uint64
-	ownsWords, closed           bool
+	self                              *NaturalManager
+	runtime                           *memory.Runtime
+	ownsRuntime                       bool
+	division                          [4]sourceLimbBuffer
+	verification                      sourceLimbBuffer
+	formatting                        naturalFormattingScope
+	sourceFinalizing, sourceFinalized bool
+	sourceStage                       uint8
+	sourceCause                       error
+	verificationActive                bool
+	originalCause, cleanupCause       error
+	words                             *arena.Words
+	divScratch                        [4]arena.VectorRef
+	divCapacity                       [4]uint32
+	// Zero compatibility fields: no numeral/formatting payload is allocated here.
+	formatScratch              [3]arena.VectorRef
+	formatCapacity             [3]uint32
+	text                       *arena.SmallBytes
+	textRef                    arena.SmallBytesRef
+	textCapacity               uint32
+	config                     arena.VectorConfig
+	budget                     *arena.Budget
+	headerBytes                uint64
+	ownsWords, closed, closing bool
 }
 
 // NewNaturalManager owns a real memory runtime and the source four inline16
-// buffers. The remaining formatting Words are genuine retained storage until
-// the separate source lexical formatting integration lands.
+// buffers. Formatting locals use real lexical source buffers; retained text is
+// a separate output assembly adapter until char/ostream integration lands.
 func NewNaturalManager(c arena.VectorConfig) (*NaturalManager, error) {
 	words, e := arena.NewWords(c)
 	if e != nil {
@@ -110,7 +116,7 @@ func (m *NaturalManager) check() error {
 	if m.self != m {
 		return memory.ErrRuntimeOwner
 	}
-	if m.closed || m.runtime == nil {
+	if m.closed || m.closing || m.runtime == nil || m.sourceFinalizing || m.originalCause != nil {
 		return arena.ErrClosed
 	}
 	if m.verificationActive {
@@ -133,8 +139,22 @@ func (m *NaturalManager) CloseChecked() error {
 	if m.closed {
 		return nil
 	}
+	m.closing = true
 	fail := func(e error) error { m.cleanupCause = e; return e }
+	if m.sourceFinalizing && !m.sourceFinalized {
+		if e := m.sourceFinalizeMembers(); e != nil {
+			return fail(e)
+		}
+	}
 	if m.runtime != nil {
+		if m.formatting.active {
+			if e := m.finishFormattingLocals(); e != nil {
+				return fail(e)
+			}
+		}
+		if e := m.CleanupFormatting(); e != nil {
+			return fail(e)
+		}
 		if m.verificationActive {
 			if e := m.verification.finalize(m.runtime); e != nil {
 				return fail(e)
@@ -251,6 +271,14 @@ func (m *NaturalManager) overflowPayloads() uint32 {
 			count++
 		}
 		if m.division[i].pending != (memory.Block{}) {
+			count++
+		}
+	}
+	for i := range m.formatting.locals {
+		if m.formatting.locals[i].raw != (memory.Block{}) {
+			count++
+		}
+		if m.formatting.locals[i].pending != (memory.Block{}) {
 			count++
 		}
 	}

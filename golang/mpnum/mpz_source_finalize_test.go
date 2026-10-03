@@ -177,7 +177,7 @@ func TestIntegerSourceFinalizeDiagnosticFailureRetainsCaller(t *testing.T) {
 		if e = m.SourceFinalize(); !errors.Is(e, memory.ErrAllocatorIO) {
 			t.Fatal("actual source diagnostic refusal", e)
 		}
-		if m.cleanupCause != e || m.headerBytes == 0 || m.cells.Stats().Live != 1 || m.natural != nil || m.tmp != [2]numericCellRef{} || m.arg != [2]numericCellRef{} || m.two64.cell != 0 || m.intMin.cell != 0 {
+		if m.cleanupCause != e || m.headerBytes == 0 || m.cells.Stats().Live != 1 || (m.natural == nil || !m.natural.sourceFinalized || m.natural.sourceStage != 4 || m.natural.headerBytes == 0) || m.tmp != [2]numericCellRef{} || m.arg != [2]numericCellRef{} || m.two64.cell != 0 || m.intMin.cell != 0 {
 			t.Fatal("completed source destructor prefix lost", e)
 		}
 		if rt.Stats().LiveBlocks != 1 {

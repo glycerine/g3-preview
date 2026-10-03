@@ -124,7 +124,7 @@ func TestTransitiveSourceFinalizeActualDiagnosticPrefix(t *testing.T) {
 			if e := transitiveSourceRun(m, s); !errors.Is(e, memory.ErrAllocatorIO) {
 				t.Fatal("real post-pool-free diagnostic refusal", e)
 			}
-			if m.cleanupStage != 9 || m.sourceFinalized || m.z.sourceFinalizeStage != 7 || rt.Stats().LiveBlocks != 1 || m.z.natural != nil || m.headerBytes == 0 {
+			if m.cleanupStage != 9 || m.sourceFinalized || m.z.sourceFinalizeStage != 7 || rt.Stats().LiveBlocks != 1 || (m.z.natural == nil || !m.z.natural.sourceFinalized || m.z.natural.sourceStage != 4 || m.z.natural.headerBytes == 0) || m.headerBytes == 0 {
 				t.Fatal("source diagnostic prefix lost")
 			}
 			if s != nil && (s.cleanupStage != 25 || s.sourceFinalized || s.cacheBytes != 0) {

@@ -196,10 +196,16 @@ func (s *RationalService) InfIntDel(v *OwnedInfIntRational) error {
 	return nil
 }
 func (s *RationalService) InfIntCopy(dst, src *OwnedInfIntRational) error {
-	if e := s.lockInfInt2(dst, src); e != nil {
+	if e := s.lock(); e != nil {
 		return e
 	}
 	defer s.mu.Unlock()
+	if e := s.infIntScalarOwner(dst); e != nil {
+		return e
+	}
+	if e := s.infIntScalarOwner(src); e != nil {
+		return e
+	}
 	if e := s.manager.Copy(&dst.first, &src.first); e != nil {
 		return e
 	}
@@ -465,10 +471,13 @@ func (s *RationalService) InfIntAbs(v *OwnedInfIntRational) (OwnedInfIntRational
 	return out, nil
 }
 func (s *RationalService) InfIntHash(v *OwnedInfIntRational) (uint32, error) {
-	if e := s.lockInfInt(v); e != nil {
+	if e := s.lock(); e != nil {
 		return 0, e
 	}
 	defer s.mu.Unlock()
+	if e := s.infIntScalarOwner(v); e != nil {
+		return 0, e
+	}
 	h, e := s.manager.Hash(&v.first)
 	return h ^ (uint32(v.second) + 1), e
 }
@@ -517,20 +526,26 @@ func (s *RationalService) InfIntString(v *OwnedInfIntRational) (string, error) {
 	return s.manager.z.natural.finalString(n)
 }
 func (s *RationalService) InfIntFirst(v *OwnedInfIntRational) (OwnedRational, error) {
-	if e := s.lockInfInt(v); e != nil {
+	if e := s.lock(); e != nil {
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
+	if e := s.infIntScalarOwner(v); e != nil {
+		return OwnedRational{}, e
+	}
 	return s.copyOutput(&v.first)
 }
 func (s *RationalService) InfIntRational(v *OwnedInfIntRational) (OwnedRational, error) {
 	return s.InfIntFirst(v)
 }
 func (s *RationalService) InfIntInfinitesimal(v *OwnedInfIntRational) (OwnedRational, error) {
-	if e := s.lockInfInt(v); e != nil {
+	if e := s.lock(); e != nil {
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
+	if e := s.infIntScalarOwner(v); e != nil {
+		return OwnedRational{}, e
+	}
 	out := OwnedRational{raw: NewRational(), ownerID: s.ownerID}
 	if e := s.manager.SetInt64(&out.raw, int64(v.second)); e != nil {
 		s.manager.Del(&out.raw)
@@ -539,7 +554,7 @@ func (s *RationalService) InfIntInfinitesimal(v *OwnedInfIntRational) (OwnedRati
 	return out, nil
 }
 func (s *RationalService) partInfInt(v *OwnedInfIntRational, den bool) (OwnedInfIntRational, error) {
-	if v.second != 0 {
+	if modularSourceDebug && v.second != 0 {
 		return OwnedInfIntRational{}, ErrInfIntNotRational
 	}
 	part := NewRational()
@@ -561,17 +576,23 @@ func (s *RationalService) partInfInt(v *OwnedInfIntRational, den bool) (OwnedInf
 	return out, nil
 }
 func (s *RationalService) InfIntNumerator(v *OwnedInfIntRational) (OwnedInfIntRational, error) {
-	if e := s.lockInfInt(v); e != nil {
+	if e := s.lock(); e != nil {
 		return OwnedInfIntRational{}, e
 	}
 	defer s.mu.Unlock()
+	if e := s.infIntScalarOwner(v); e != nil {
+		return OwnedInfIntRational{}, e
+	}
 	return s.partInfInt(v, false)
 }
 func (s *RationalService) InfIntDenominator(v *OwnedInfIntRational) (OwnedInfIntRational, error) {
-	if e := s.lockInfInt(v); e != nil {
+	if e := s.lock(); e != nil {
 		return OwnedInfIntRational{}, e
 	}
 	defer s.mu.Unlock()
+	if e := s.infIntScalarOwner(v); e != nil {
+		return OwnedInfIntRational{}, e
+	}
 	return s.partInfInt(v, true)
 }
 func (s *RationalService) roundInfInt(v *OwnedInfIntRational, ceil bool) (OwnedRational, error) {
@@ -706,52 +727,73 @@ func (s *RationalService) InfIntUint64(v *OwnedInfIntRational) (uint64, error) {
 	return s.infIntUnsignedProjectionLocked(v)
 }
 func (s *RationalService) InfIntIsZero(v *OwnedInfIntRational) (bool, error) {
-	if e := s.lockInfInt(v); e != nil {
+	if e := s.lock(); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
+	if e := s.infIntScalarOwner(v); e != nil {
+		return false, e
+	}
 	return v.first.num.val == 0 && v.second == 0, nil
 }
 func (s *RationalService) InfIntIsOne(v *OwnedInfIntRational) (bool, error) {
-	if e := s.lockInfInt(v); e != nil {
+	if e := s.lock(); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
+	if e := s.infIntScalarOwner(v); e != nil {
+		return false, e
+	}
 	return isOneInteger(&v.first.num) && isIntegerRational(&v.first) && v.second == 0, nil
 }
 func (s *RationalService) InfIntIsMinusOne(v *OwnedInfIntRational) (bool, error) {
-	if e := s.lockInfInt(v); e != nil {
+	if e := s.lock(); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
+	if e := s.infIntScalarOwner(v); e != nil {
+		return false, e
+	}
 	return v.first.num.IsSmall() && v.first.num.val == -1 && isIntegerRational(&v.first) && v.second == 0, nil
 }
 func (s *RationalService) InfIntIsNeg(v *OwnedInfIntRational) (bool, error) {
-	if e := s.lockInfInt(v); e != nil {
+	if e := s.lock(); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
+	if e := s.infIntScalarOwner(v); e != nil {
+		return false, e
+	}
 	return v.first.num.val < 0 || (v.first.num.val == 0 && v.second < 0), nil
 }
 func (s *RationalService) InfIntIsPos(v *OwnedInfIntRational) (bool, error) {
-	if e := s.lockInfInt(v); e != nil {
+	if e := s.lock(); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
+	if e := s.infIntScalarOwner(v); e != nil {
+		return false, e
+	}
 	return v.first.num.val > 0 || (v.first.num.val == 0 && v.second > 0), nil
 }
 func (s *RationalService) InfIntIsNonNeg(v *OwnedInfIntRational) (bool, error) {
-	if e := s.lockInfInt(v); e != nil {
+	if e := s.lock(); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
+	if e := s.infIntScalarOwner(v); e != nil {
+		return false, e
+	}
 	return v.first.num.val > 0 || (v.first.num.val == 0 && v.second >= 0), nil
 }
 func (s *RationalService) InfIntIsNonPos(v *OwnedInfIntRational) (bool, error) {
-	if e := s.lockInfInt(v); e != nil {
+	if e := s.lock(); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
+	if e := s.infIntScalarOwner(v); e != nil {
+		return false, e
+	}
 	return v.first.num.val < 0 || (v.first.num.val == 0 && v.second <= 0), nil
 }
 func (s *RationalService) InfIntIsRational(v *OwnedInfIntRational) (bool, error) {
@@ -959,9 +1001,12 @@ func (s *RationalService) InfIntRationalGreaterEqual(a *OwnedRational, b *OwnedI
 }
 
 func (s *RationalService) InfIntClone(v *OwnedInfIntRational) (OwnedInfIntRational, error) {
-	if e := s.lockInfInt(v); e != nil {
+	if e := s.lock(); e != nil {
 		return OwnedInfIntRational{}, e
 	}
 	defer s.mu.Unlock()
+	if e := s.infIntScalarOwner(v); e != nil {
+		return OwnedInfIntRational{}, e
+	}
 	return s.copyInfInt(v)
 }

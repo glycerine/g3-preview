@@ -166,10 +166,10 @@ func (s *RationalService) Copy(dst, src *OwnedRational) error {
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(dst); e != nil {
+	if e := s.rationalScalarOwner(dst); e != nil {
 		return e
 	}
-	if e := s.check(src); e != nil {
+	if e := s.rationalScalarOwner(src); e != nil {
 		return e
 	}
 	return s.manager.Copy(&dst.raw, &src.raw)
