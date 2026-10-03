@@ -317,3 +317,18 @@ All15 tests pass in isolated full native/checked/checked-JS modules, race and ve
 WASI builds and combined module gates pass. Synthesized copy operations and other
 payloads remain open, so the source header stays partial. Parser/AST integration
 and the full solver objective remain open.
+
+## Concrete source integer heap
+
+IntHeap preserves the source heap algorithm, mutable borrowed priorities, inverse
+positions, tie behavior, bounds/reset, swap, traversal/display and explicit deep
+copying. Both original finite fixtures and all active assertions were ported first
+and went RED before implementation. Independent review caught resize capacity
+history; a RED regression drove exact repeated source vector expansion. Copy APIs
+and unsigned allocation-size limits also obtained RED before implementation.
+
+All9 heap tests pass, covering independent minima, source array/output order,
+budgets/failures, peaks, both swap reservations, lifetime, epoch and warm allocation
+behavior. Combined native and checked races, full actual checked JS, checked vet,
+WASI build and source/no-generics audit pass. Heap source/header tests are audited;
+solver consumers and the full AST/solver/proof/interpolation goal remain open.

@@ -77015,9 +77015,21 @@
       "sha256": "3706ff918ca7b64a8cb44ec3647a2507a71db4fb02c79dd35d73e73183bde8fc",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "util_int_heap_test.go"
+      ],
+      "tests": [
+        "TestIntHeapSourceAssertions",
+        "TestIntHeapIndependentMutableOracle",
+        "TestIntHeapSourceShapeFindLEAndLifetime",
+        "TestIntHeapBudgetsFailuresSwapAndWarm",
+        "TestIntHeapFindLEFailureAndSourceCapacity",
+        "TestIntHeapEpochBoundsIteratorAndComparatorSwap",
+        "TestIntHeapSourceBoundsGrowth",
+        "TestIntHeapCopyAndAllocationSizeBoundary",
+        "TestIntHeapSwapSecondReservationAndFinitePeak"
+      ],
       "conditionals": [
         {
           "line": 76,
@@ -77074,11 +77086,48 @@
           "text": "ENSURE(h.check_invariant());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "tst1 original N*3 and extraction assertions",
+          "status": "ported",
+          "go_target": "util_int_heap_test.go",
+          "tests": [
+            "TestIntHeapSourceAssertions"
+          ]
+        },
+        {
+          "name": "init_values and lt_proc2 comparator assertion",
+          "status": "ported",
+          "go_target": "util_int_heap_test.go",
+          "tests": [
+            "TestIntHeapSourceAssertions"
+          ]
+        },
+        {
+          "name": "tst2 original N*10 commands/assertions/diagnostic output",
+          "status": "ported",
+          "go_target": "util_int_heap_test.go",
+          "tests": [
+            "TestIntHeapSourceAssertions"
+          ]
+        },
+        {
+          "name": "tst_heap original three seeds/draw order",
+          "status": "ported",
+          "go_target": "util_int_heap_test.go",
+          "tests": [
+            "TestIntHeapSourceAssertions"
+          ]
+        }
+      ],
+      "ownership": [
+        "Test-only borrowed priority arrays and owner-local heaps; fixtures close/refund; original print-only diagnostics captured in test output."
+      ],
+      "deviations": [
+        "Trace/verbosity infrastructure is not part of this utility test port. Independent bounded oracle and lifetime/budget checks supplement source assertions."
+      ]
     },
     {
       "path": "src/test/heap_trie.cpp",
@@ -86281,9 +86330,21 @@
       "sha256": "6451a4522708f62df4ead0d6bc893820987d60012e532decb92d57646b8249bd",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "util_int_heap.go"
+      ],
+      "tests": [
+        "TestIntHeapSourceAssertions",
+        "TestIntHeapIndependentMutableOracle",
+        "TestIntHeapSourceShapeFindLEAndLifetime",
+        "TestIntHeapBudgetsFailuresSwapAndWarm",
+        "TestIntHeapFindLEFailureAndSourceCapacity",
+        "TestIntHeapEpochBoundsIteratorAndComparatorSwap",
+        "TestIntHeapSourceBoundsGrowth",
+        "TestIntHeapCopyAndAllocationSizeBoundary",
+        "TestIntHeapSwapSecondReservationAndFinitePeak"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -86432,11 +86493,178 @@
           "text": "CASSERT(\"heap\", check_invariant());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "constructor/destructor and implicit deep copy/assignment",
+          "status": "ported",
+          "go_target": "util_int_heap.go",
+          "tests": [
+            "TestIntHeapSourceAssertions",
+            "TestIntHeapIndependentMutableOracle",
+            "TestIntHeapSourceShapeFindLEAndLifetime",
+            "TestIntHeapBudgetsFailuresSwapAndWarm",
+            "TestIntHeapFindLEFailureAndSourceCapacity",
+            "TestIntHeapEpochBoundsIteratorAndComparatorSwap",
+            "TestIntHeapSourceBoundsGrowth",
+            "TestIntHeapCopyAndAllocationSizeBoundary",
+            "TestIntHeapSwapSecondReservationAndFinitePeak"
+          ]
+        },
+        {
+          "name": "less_than/left/right/parent and invariant checks",
+          "status": "ported",
+          "go_target": "util_int_heap.go",
+          "tests": [
+            "TestIntHeapSourceAssertions",
+            "TestIntHeapIndependentMutableOracle",
+            "TestIntHeapSourceShapeFindLEAndLifetime",
+            "TestIntHeapBudgetsFailuresSwapAndWarm",
+            "TestIntHeapFindLEFailureAndSourceCapacity",
+            "TestIntHeapEpochBoundsIteratorAndComparatorSwap",
+            "TestIntHeapSourceBoundsGrowth",
+            "TestIntHeapCopyAndAllocationSizeBoundary",
+            "TestIntHeapSwapSecondReservationAndFinitePeak"
+          ]
+        },
+        {
+          "name": "move_up/move_down",
+          "status": "ported",
+          "go_target": "util_int_heap.go",
+          "tests": [
+            "TestIntHeapSourceAssertions",
+            "TestIntHeapIndependentMutableOracle",
+            "TestIntHeapSourceShapeFindLEAndLifetime",
+            "TestIntHeapBudgetsFailuresSwapAndWarm",
+            "TestIntHeapFindLEFailureAndSourceCapacity",
+            "TestIntHeapEpochBoundsIteratorAndComparatorSwap",
+            "TestIntHeapSourceBoundsGrowth",
+            "TestIntHeapCopyAndAllocationSizeBoundary",
+            "TestIntHeapSwapSecondReservationAndFinitePeak"
+          ]
+        },
+        {
+          "name": "empty/contains/size/get_bounds/min_value",
+          "status": "ported",
+          "go_target": "util_int_heap.go",
+          "tests": [
+            "TestIntHeapSourceAssertions",
+            "TestIntHeapIndependentMutableOracle",
+            "TestIntHeapSourceShapeFindLEAndLifetime",
+            "TestIntHeapBudgetsFailuresSwapAndWarm",
+            "TestIntHeapFindLEFailureAndSourceCapacity",
+            "TestIntHeapEpochBoundsIteratorAndComparatorSwap",
+            "TestIntHeapSourceBoundsGrowth",
+            "TestIntHeapCopyAndAllocationSizeBoundary",
+            "TestIntHeapSwapSecondReservationAndFinitePeak"
+          ]
+        },
+        {
+          "name": "insert/erase/erase_min/decreased/increased",
+          "status": "ported",
+          "go_target": "util_int_heap.go",
+          "tests": [
+            "TestIntHeapSourceAssertions",
+            "TestIntHeapIndependentMutableOracle",
+            "TestIntHeapSourceShapeFindLEAndLifetime",
+            "TestIntHeapBudgetsFailuresSwapAndWarm",
+            "TestIntHeapFindLEFailureAndSourceCapacity",
+            "TestIntHeapEpochBoundsIteratorAndComparatorSwap",
+            "TestIntHeapSourceBoundsGrowth",
+            "TestIntHeapCopyAndAllocationSizeBoundary",
+            "TestIntHeapSwapSecondReservationAndFinitePeak"
+          ]
+        },
+        {
+          "name": "reset/clear/set_bounds/reserve",
+          "status": "ported",
+          "go_target": "util_int_heap.go",
+          "tests": [
+            "TestIntHeapSourceAssertions",
+            "TestIntHeapIndependentMutableOracle",
+            "TestIntHeapSourceShapeFindLEAndLifetime",
+            "TestIntHeapBudgetsFailuresSwapAndWarm",
+            "TestIntHeapFindLEFailureAndSourceCapacity",
+            "TestIntHeapEpochBoundsIteratorAndComparatorSwap",
+            "TestIntHeapSourceBoundsGrowth",
+            "TestIntHeapCopyAndAllocationSizeBoundary",
+            "TestIntHeapSwapSecondReservationAndFinitePeak"
+          ]
+        },
+        {
+          "name": "mutable/const begin/end checked iteration",
+          "status": "ported",
+          "go_target": "util_int_heap.go",
+          "tests": [
+            "TestIntHeapSourceAssertions",
+            "TestIntHeapIndependentMutableOracle",
+            "TestIntHeapSourceShapeFindLEAndLifetime",
+            "TestIntHeapBudgetsFailuresSwapAndWarm",
+            "TestIntHeapFindLEFailureAndSourceCapacity",
+            "TestIntHeapEpochBoundsIteratorAndComparatorSwap",
+            "TestIntHeapSourceBoundsGrowth",
+            "TestIntHeapCopyAndAllocationSizeBoundary",
+            "TestIntHeapSwapSecondReservationAndFinitePeak"
+          ]
+        },
+        {
+          "name": "swap",
+          "status": "ported",
+          "go_target": "util_int_heap.go",
+          "tests": [
+            "TestIntHeapSourceAssertions",
+            "TestIntHeapIndependentMutableOracle",
+            "TestIntHeapSourceShapeFindLEAndLifetime",
+            "TestIntHeapBudgetsFailuresSwapAndWarm",
+            "TestIntHeapFindLEFailureAndSourceCapacity",
+            "TestIntHeapEpochBoundsIteratorAndComparatorSwap",
+            "TestIntHeapSourceBoundsGrowth",
+            "TestIntHeapCopyAndAllocationSizeBoundary",
+            "TestIntHeapSwapSecondReservationAndFinitePeak"
+          ]
+        },
+        {
+          "name": "find_le",
+          "status": "ported",
+          "go_target": "util_int_heap.go",
+          "tests": [
+            "TestIntHeapSourceAssertions",
+            "TestIntHeapIndependentMutableOracle",
+            "TestIntHeapSourceShapeFindLEAndLifetime",
+            "TestIntHeapBudgetsFailuresSwapAndWarm",
+            "TestIntHeapFindLEFailureAndSourceCapacity",
+            "TestIntHeapEpochBoundsIteratorAndComparatorSwap",
+            "TestIntHeapSourceBoundsGrowth",
+            "TestIntHeapCopyAndAllocationSizeBoundary",
+            "TestIntHeapSwapSecondReservationAndFinitePeak"
+          ]
+        },
+        {
+          "name": "recursive display",
+          "status": "ported",
+          "go_target": "util_int_heap.go",
+          "tests": [
+            "TestIntHeapSourceAssertions",
+            "TestIntHeapIndependentMutableOracle",
+            "TestIntHeapSourceShapeFindLEAndLifetime",
+            "TestIntHeapBudgetsFailuresSwapAndWarm",
+            "TestIntHeapFindLEFailureAndSourceCapacity",
+            "TestIntHeapEpochBoundsIteratorAndComparatorSwap",
+            "TestIntHeapSourceBoundsGrowth",
+            "TestIntHeapCopyAndAllocationSizeBoundary",
+            "TestIntHeapSwapSecondReservationAndFinitePeak"
+          ]
+        }
+      ],
+      "ownership": [
+        "Owner-local concrete signed-int32 value/inverse vectors; borrowed strict comparator environment; retained budgeted query vectors; cold checked iterators; complete header/backing and old+new charges. See INT_HEAP_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Typed precondition/closed/overflow/epoch errors replace invalid source operations. Safe readonly iterators replace raw mutable backing pointers.",
+        "Retained budgeted find_le workspace stages caller output; failed predictable preparation preserves caller result. Deep Assign stages a charged clone before publication.",
+        "Source signed-shift overflow children are discarded; all representable source child pushes and traversal order are preserved."
+      ]
     },
     {
       "path": "src/util/hwf.cpp",
