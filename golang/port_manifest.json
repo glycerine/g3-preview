@@ -51352,7 +51352,9 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "sat_solver_clause_use_list.go"
+        "sat_solver_clause_use_list.go",
+        "sat_solver_clause_use_lists.go",
+        "sat_solver_clause_use_lists_test.go"
       ],
       "tests": [
         "TestSATClauseUseListActualColdAndGrowthPeakCharges",
@@ -51374,7 +51376,25 @@
         "TestSATClauseUseListPartialIterationFinishesAndAllRemoved",
         "TestSATClauseUseListPayloadFailurePrefixAndReleaseInvariantTraversal",
         "TestSATClauseUseListSourceDebugPreconditionsAndReleaseBodies",
-        "TestSATClauseUseListSourceReadThenWriteAndResetRefusalPrefixes"
+        "TestSATClauseUseListSourceReadThenWriteAndResetRefusalPrefixes",
+        "TestSATClauseUseListsLiteralRoutingAndEraseExcept",
+        "TestSATClauseUseListsSameAddressReconstruction",
+        "TestSATClauseUseListsOuterGrowthInvalidatesChild",
+        "TestSATClauseUseListsLaterLiteralFailurePreservesPrefix",
+        "TestSATClauseUseListsInitUnsignedWrapAndFinalize",
+        "TestSATClauseUseListsIteratorCurrentInnerBackingAndDestructor",
+        "TestSATClauseUseListsRemovedMasksIndependent",
+        "TestSATClauseUseListsDuplicateAndRepeatedErase",
+        "TestSATClauseUseListsConstructorFailureGraph",
+        "TestSATClauseUseListsInitRefusalCompletedGrowth",
+        "TestSATClauseUseListsInsertionFaultRootsAndPrefixes",
+        "TestSATClauseUseListsPhysicalRecordAndHostBounds",
+        "TestSATClauseUseListsWarmZeroAllocationAndNoClauseOwnership",
+        "TestSATClauseUseListsEndedAndNeverConstructedSlots",
+        "TestSATClauseUseListsRawCurrentAndPayloadFailurePrefix",
+        "TestSATClauseUseListsEraseNotRemovedAndReleaseMissing",
+        "TestSATClauseUseListsExactOwnedGraphAndColdGuards",
+        "TestSATClauseUseListsDestructorBeyondCapturedEnd"
       ],
       "conditionals": [
         {
@@ -51437,13 +51457,40 @@
             "TestSATClauseUseListSourceDebugPreconditionsAndReleaseBodies",
             "TestSATClauseUseListSourceReadThenWriteAndResetRefusalPrefixes"
           ]
+        },
+        {
+          "name": "inline lazy-list methods and iterator actual current-payload access through outer backing references",
+          "status": "ported",
+          "go_target": "sat_solver_clause_use_lists.go",
+          "tests": [
+            "TestSATClauseUseListsLiteralRoutingAndEraseExcept",
+            "TestSATClauseUseListsSameAddressReconstruction",
+            "TestSATClauseUseListsOuterGrowthInvalidatesChild",
+            "TestSATClauseUseListsLaterLiteralFailurePreservesPrefix",
+            "TestSATClauseUseListsInitUnsignedWrapAndFinalize",
+            "TestSATClauseUseListsIteratorCurrentInnerBackingAndDestructor",
+            "TestSATClauseUseListsRemovedMasksIndependent",
+            "TestSATClauseUseListsDuplicateAndRepeatedErase",
+            "TestSATClauseUseListsConstructorFailureGraph",
+            "TestSATClauseUseListsInitRefusalCompletedGrowth",
+            "TestSATClauseUseListsInsertionFaultRootsAndPrefixes",
+            "TestSATClauseUseListsPhysicalRecordAndHostBounds",
+            "TestSATClauseUseListsWarmZeroAllocationAndNoClauseOwnership",
+            "TestSATClauseUseListsEndedAndNeverConstructedSlots",
+            "TestSATClauseUseListsRawCurrentAndPayloadFailurePrefix",
+            "TestSATClauseUseListsEraseNotRemovedAndReleaseMissing",
+            "TestSATClauseUseListsExactOwnedGraphAndColdGuards",
+            "TestSATClauseUseListsDestructorBeyondCapturedEnd"
+          ]
         }
       ],
       "ownership": [
-        "Charged concrete cold list owns actual clause vector and borrows real clause allocators. By-value iterator borrows current vector object, captures only scalar count/indexes and preserves actual read/write/callback prefixes; see SAT_SOLVER_CLAUSE_USE_LIST_PORT_STATUS.md."
+        "Charged concrete cold list owns actual clause vector and borrows real clause allocators. By-value iterator borrows current vector object, captures only scalar count/indexes and preserves actual read/write/callback prefixes; see SAT_SOLVER_CLAUSE_USE_LIST_PORT_STATUS.md.",
+        "Pointer-free32-byte inline records, one chargedWords pool, five-word clause tokens and cold borrowed allocator. Same-address reconstruction follows retained references; outer relocation/free invalidates at actual access. Source destruction, growth and literal action prefixes preserved. See SAT_SOLVER_CLAUSE_USE_LISTS_PORT_STATUS.md."
       ],
       "deviations": [
-        "Explicit iterator Close and owner lifetime guards. Implicit moves, inactive nonlazy branch, STRACE and full solver consumers remain open."
+        "Explicit iterator Close and owner lifetime guards. Implicit moves, inactive nonlazy branch, STRACE and full solver consumers remain open.",
+        "Selected LP64 source extents are distinct from actual Go stride/pool graph. Inline storage and pooled metadata are fully charged. Implicit copy/move, nonlazy/TRACE and full simplifier/solver remain open; no source registered use_list assertions are claimed."
       ]
     },
     {
@@ -51453,7 +51500,9 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "sat_solver_clause_use_list.go"
+        "sat_solver_clause_use_list.go",
+        "sat_solver_clause_use_lists.go",
+        "sat_solver_clause_use_lists_test.go"
       ],
       "tests": [
         "TestSATClauseUseListActualColdAndGrowthPeakCharges",
@@ -51475,7 +51524,25 @@
         "TestSATClauseUseListPartialIterationFinishesAndAllRemoved",
         "TestSATClauseUseListPayloadFailurePrefixAndReleaseInvariantTraversal",
         "TestSATClauseUseListSourceDebugPreconditionsAndReleaseBodies",
-        "TestSATClauseUseListSourceReadThenWriteAndResetRefusalPrefixes"
+        "TestSATClauseUseListSourceReadThenWriteAndResetRefusalPrefixes",
+        "TestSATClauseUseListsLiteralRoutingAndEraseExcept",
+        "TestSATClauseUseListsSameAddressReconstruction",
+        "TestSATClauseUseListsOuterGrowthInvalidatesChild",
+        "TestSATClauseUseListsLaterLiteralFailurePreservesPrefix",
+        "TestSATClauseUseListsInitUnsignedWrapAndFinalize",
+        "TestSATClauseUseListsIteratorCurrentInnerBackingAndDestructor",
+        "TestSATClauseUseListsRemovedMasksIndependent",
+        "TestSATClauseUseListsDuplicateAndRepeatedErase",
+        "TestSATClauseUseListsConstructorFailureGraph",
+        "TestSATClauseUseListsInitRefusalCompletedGrowth",
+        "TestSATClauseUseListsInsertionFaultRootsAndPrefixes",
+        "TestSATClauseUseListsPhysicalRecordAndHostBounds",
+        "TestSATClauseUseListsWarmZeroAllocationAndNoClauseOwnership",
+        "TestSATClauseUseListsEndedAndNeverConstructedSlots",
+        "TestSATClauseUseListsRawCurrentAndPayloadFailurePrefix",
+        "TestSATClauseUseListsEraseNotRemovedAndReleaseMissing",
+        "TestSATClauseUseListsExactOwnedGraphAndColdGuards",
+        "TestSATClauseUseListsDestructorBeyondCapturedEnd"
       ],
       "conditionals": [
         {
@@ -51646,13 +51713,40 @@
             "TestSATClauseUseListSourceDebugPreconditionsAndReleaseBodies",
             "TestSATClauseUseListSourceReadThenWriteAndResetRefusalPrefixes"
           ]
+        },
+        {
+          "name": "inline lazy-list methods and iterator actual current-payload access through outer backing references",
+          "status": "ported",
+          "go_target": "sat_solver_clause_use_lists.go",
+          "tests": [
+            "TestSATClauseUseListsLiteralRoutingAndEraseExcept",
+            "TestSATClauseUseListsSameAddressReconstruction",
+            "TestSATClauseUseListsOuterGrowthInvalidatesChild",
+            "TestSATClauseUseListsLaterLiteralFailurePreservesPrefix",
+            "TestSATClauseUseListsInitUnsignedWrapAndFinalize",
+            "TestSATClauseUseListsIteratorCurrentInnerBackingAndDestructor",
+            "TestSATClauseUseListsRemovedMasksIndependent",
+            "TestSATClauseUseListsDuplicateAndRepeatedErase",
+            "TestSATClauseUseListsConstructorFailureGraph",
+            "TestSATClauseUseListsInitRefusalCompletedGrowth",
+            "TestSATClauseUseListsInsertionFaultRootsAndPrefixes",
+            "TestSATClauseUseListsPhysicalRecordAndHostBounds",
+            "TestSATClauseUseListsWarmZeroAllocationAndNoClauseOwnership",
+            "TestSATClauseUseListsEndedAndNeverConstructedSlots",
+            "TestSATClauseUseListsRawCurrentAndPayloadFailurePrefix",
+            "TestSATClauseUseListsEraseNotRemovedAndReleaseMissing",
+            "TestSATClauseUseListsExactOwnedGraphAndColdGuards",
+            "TestSATClauseUseListsDestructorBeyondCapturedEnd"
+          ]
         }
       ],
       "ownership": [
-        "Charged concrete cold list owns actual clause vector and borrows real clause allocators. By-value iterator borrows current vector object, captures only scalar count/indexes and preserves actual read/write/callback prefixes; see SAT_SOLVER_CLAUSE_USE_LIST_PORT_STATUS.md."
+        "Charged concrete cold list owns actual clause vector and borrows real clause allocators. By-value iterator borrows current vector object, captures only scalar count/indexes and preserves actual read/write/callback prefixes; see SAT_SOLVER_CLAUSE_USE_LIST_PORT_STATUS.md.",
+        "Pointer-free32-byte inline records, one chargedWords pool, five-word clause tokens and cold borrowed allocator. Same-address reconstruction follows retained references; outer relocation/free invalidates at actual access. Source destruction, growth and literal action prefixes preserved. See SAT_SOLVER_CLAUSE_USE_LISTS_PORT_STATUS.md."
       ],
       "deviations": [
-        "Explicit iterator Close and owner lifetime guards. Implicit moves, inactive nonlazy branch, STRACE and full solver consumers remain open."
+        "Explicit iterator Close and owner lifetime guards. Implicit moves, inactive nonlazy branch, STRACE and full solver consumers remain open.",
+        "Selected LP64 source extents are distinct from actual Go stride/pool graph. Inline storage and pooled metadata are fully charged. Implicit copy/move, nonlazy/TRACE and full simplifier/solver remain open; no source registered use_list assertions are claimed."
       ]
     },
     {
@@ -53499,9 +53593,31 @@
       "sha256": "3ca576a5a9af07d608d5f19352b0661abaff5a743b09522658031cc4df656b09",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_solver_clause_use_lists.go",
+        "sat_solver_clause_use_lists_test.go"
+      ],
+      "tests": [
+        "TestSATClauseUseListsLiteralRoutingAndEraseExcept",
+        "TestSATClauseUseListsSameAddressReconstruction",
+        "TestSATClauseUseListsOuterGrowthInvalidatesChild",
+        "TestSATClauseUseListsLaterLiteralFailurePreservesPrefix",
+        "TestSATClauseUseListsInitUnsignedWrapAndFinalize",
+        "TestSATClauseUseListsIteratorCurrentInnerBackingAndDestructor",
+        "TestSATClauseUseListsRemovedMasksIndependent",
+        "TestSATClauseUseListsDuplicateAndRepeatedErase",
+        "TestSATClauseUseListsConstructorFailureGraph",
+        "TestSATClauseUseListsInitRefusalCompletedGrowth",
+        "TestSATClauseUseListsInsertionFaultRootsAndPrefixes",
+        "TestSATClauseUseListsPhysicalRecordAndHostBounds",
+        "TestSATClauseUseListsWarmZeroAllocationAndNoClauseOwnership",
+        "TestSATClauseUseListsEndedAndNeverConstructedSlots",
+        "TestSATClauseUseListsRawCurrentAndPayloadFailurePrefix",
+        "TestSATClauseUseListsEraseNotRemovedAndReleaseMissing",
+        "TestSATClauseUseListsExactOwnedGraphAndColdGuards",
+        "TestSATClauseUseListsDestructorBeyondCapturedEnd"
+      ],
       "conditionals": [
         {
           "line": 750,
@@ -53592,18 +53708,70 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "literal-indexed use_list init/insert/erase/erase-except/get/finalize through concrete inline lazy-list storage",
+          "status": "ported",
+          "go_target": "sat_solver_clause_use_lists.go",
+          "tests": [
+            "TestSATClauseUseListsLiteralRoutingAndEraseExcept",
+            "TestSATClauseUseListsSameAddressReconstruction",
+            "TestSATClauseUseListsOuterGrowthInvalidatesChild",
+            "TestSATClauseUseListsLaterLiteralFailurePreservesPrefix",
+            "TestSATClauseUseListsInitUnsignedWrapAndFinalize",
+            "TestSATClauseUseListsIteratorCurrentInnerBackingAndDestructor",
+            "TestSATClauseUseListsRemovedMasksIndependent",
+            "TestSATClauseUseListsDuplicateAndRepeatedErase",
+            "TestSATClauseUseListsConstructorFailureGraph",
+            "TestSATClauseUseListsInitRefusalCompletedGrowth",
+            "TestSATClauseUseListsInsertionFaultRootsAndPrefixes",
+            "TestSATClauseUseListsPhysicalRecordAndHostBounds",
+            "TestSATClauseUseListsWarmZeroAllocationAndNoClauseOwnership",
+            "TestSATClauseUseListsEndedAndNeverConstructedSlots",
+            "TestSATClauseUseListsRawCurrentAndPayloadFailurePrefix",
+            "TestSATClauseUseListsEraseNotRemovedAndReleaseMissing",
+            "TestSATClauseUseListsExactOwnedGraphAndColdGuards",
+            "TestSATClauseUseListsDestructorBeyondCapturedEnd"
+          ]
+        }
+      ],
+      "ownership": [
+        "Pointer-free32-byte inline records, one chargedWords pool, five-word clause tokens and cold borrowed allocator. Same-address reconstruction follows retained references; outer relocation/free invalidates at actual access. Source destruction, growth and literal action prefixes preserved. See SAT_SOLVER_CLAUSE_USE_LISTS_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Selected LP64 source extents are distinct from actual Go stride/pool graph. Inline storage and pooled metadata are fully charged. Implicit copy/move, nonlazy/TRACE and full simplifier/solver remain open; no source registered use_list assertions are claimed."
+      ]
     },
     {
       "path": "src/sat/sat_simplifier.h",
       "sha256": "d2a2d46302077c837ed22480be93a570ec0d74339c8b071ed6808ed2332e254a",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_solver_clause_use_lists.go",
+        "sat_solver_clause_use_lists_test.go"
+      ],
+      "tests": [
+        "TestSATClauseUseListsLiteralRoutingAndEraseExcept",
+        "TestSATClauseUseListsSameAddressReconstruction",
+        "TestSATClauseUseListsOuterGrowthInvalidatesChild",
+        "TestSATClauseUseListsLaterLiteralFailurePreservesPrefix",
+        "TestSATClauseUseListsInitUnsignedWrapAndFinalize",
+        "TestSATClauseUseListsIteratorCurrentInnerBackingAndDestructor",
+        "TestSATClauseUseListsRemovedMasksIndependent",
+        "TestSATClauseUseListsDuplicateAndRepeatedErase",
+        "TestSATClauseUseListsConstructorFailureGraph",
+        "TestSATClauseUseListsInitRefusalCompletedGrowth",
+        "TestSATClauseUseListsInsertionFaultRootsAndPrefixes",
+        "TestSATClauseUseListsPhysicalRecordAndHostBounds",
+        "TestSATClauseUseListsWarmZeroAllocationAndNoClauseOwnership",
+        "TestSATClauseUseListsEndedAndNeverConstructedSlots",
+        "TestSATClauseUseListsRawCurrentAndPayloadFailurePrefix",
+        "TestSATClauseUseListsEraseNotRemovedAndReleaseMissing",
+        "TestSATClauseUseListsExactOwnedGraphAndColdGuards",
+        "TestSATClauseUseListsDestructorBeyondCapturedEnd"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -53616,9 +53784,39 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "literal-indexed use_list init/insert/erase/erase-except/get/finalize through concrete inline lazy-list storage",
+          "status": "ported",
+          "go_target": "sat_solver_clause_use_lists.go",
+          "tests": [
+            "TestSATClauseUseListsLiteralRoutingAndEraseExcept",
+            "TestSATClauseUseListsSameAddressReconstruction",
+            "TestSATClauseUseListsOuterGrowthInvalidatesChild",
+            "TestSATClauseUseListsLaterLiteralFailurePreservesPrefix",
+            "TestSATClauseUseListsInitUnsignedWrapAndFinalize",
+            "TestSATClauseUseListsIteratorCurrentInnerBackingAndDestructor",
+            "TestSATClauseUseListsRemovedMasksIndependent",
+            "TestSATClauseUseListsDuplicateAndRepeatedErase",
+            "TestSATClauseUseListsConstructorFailureGraph",
+            "TestSATClauseUseListsInitRefusalCompletedGrowth",
+            "TestSATClauseUseListsInsertionFaultRootsAndPrefixes",
+            "TestSATClauseUseListsPhysicalRecordAndHostBounds",
+            "TestSATClauseUseListsWarmZeroAllocationAndNoClauseOwnership",
+            "TestSATClauseUseListsEndedAndNeverConstructedSlots",
+            "TestSATClauseUseListsRawCurrentAndPayloadFailurePrefix",
+            "TestSATClauseUseListsEraseNotRemovedAndReleaseMissing",
+            "TestSATClauseUseListsExactOwnedGraphAndColdGuards",
+            "TestSATClauseUseListsDestructorBeyondCapturedEnd"
+          ]
+        }
+      ],
+      "ownership": [
+        "Pointer-free32-byte inline records, one chargedWords pool, five-word clause tokens and cold borrowed allocator. Same-address reconstruction follows retained references; outer relocation/free invalidates at actual access. Source destruction, growth and literal action prefixes preserved. See SAT_SOLVER_CLAUSE_USE_LISTS_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Selected LP64 source extents are distinct from actual Go stride/pool graph. Inline storage and pooled metadata are fully charged. Implicit copy/move, nonlazy/TRACE and full simplifier/solver remain open; no source registered use_list assertions are claimed."
+      ]
     },
     {
       "path": "src/sat/sat_simplifier_params.hpp",

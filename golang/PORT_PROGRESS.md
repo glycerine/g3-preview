@@ -1292,3 +1292,15 @@ and initialized-byte lifetimes. Source getters never substitute Budget.Used.
 See RAW_MEMORY_PORT_STATUS.md. Full runtime initialization, typed-owner hooks
 and process transports remain open; ledger remains33ported/142partial/1927unported.
 The complete solver/proof/interpolation objective remains required.
+
+
+## Literal-indexed SAT simplifier use lists
+
+The actual use_list wrapper and inline lazy children now preserve ordered literal
+actions, same-address reconstruction, outer backing invalidation and source
+iterator destruction. Eighteen tests-first/source-action groups include finite
+compaction, exact owned graph and injected failure prefixes; root review caught
+and regression-tested the destructor's i<size condition after an extra release
+Next. See SAT_SOLVER_CLAUSE_USE_LISTS_PORT_STATUS.md. Default simplification,
+implicit moves/copies and the complete solver remain required. Both simplifier
+units become partial; ledger33ported/144partial/1925unported.
