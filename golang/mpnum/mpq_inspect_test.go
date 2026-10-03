@@ -448,21 +448,73 @@ func TestRationalInspectionEveryFailurePrefix(t *testing.T) {
 				case 8:
 					e = m.Dec(&a)
 				}
-				b.FailAfter(-1)
 				// Independently enumerate caller/base/source-cache roots immediately; no
 				// formatter or Close is allowed to hide a lost temporary. This existing
 				// test audit lists only known concrete ownership fields, never all live slots.
 				qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &out.num, &out.den, &z, &integerOut, &bank[0], &bank[1]})
+				b.FailAfter(-1)
 				if e != nil {
 					failures++
-					if !errors.Is(e, arena.ErrInjectedFailure) || a != beforeA || out != beforeOut || z != beforeZ || integerOut != beforeInt {
-						t.Fatal("failure publication", synch, operation, fault, e)
+					if !errors.Is(e, arena.ErrInjectedFailure) || a != beforeA || z != beforeZ {
+						t.Fatal("failure changed source", synch, operation, fault, e)
+					}
+					// big_set publishes sign and a failed owning descriptor before
+					// its allocation returns; reset_denominator follows only success.
+					wantOut, wantInteger := beforeOut, beforeInt
+					switch operation {
+					case 0, 1:
+						wantInteger = Int{val: 1, cell: m.z.failedRef}
+					case 2, 3, 5, 6:
+						wantOut.num = Int{val: 1, cell: m.z.failedRef}
+					}
+					if out != wantOut || integerOut != wantInteger {
+						t.Fatal("source allocation prefix", synch, operation, fault, out, integerOut)
+					}
+					if operation == 0 || operation == 1 {
+						if _, readError := m.z.Sign(&integerOut); !errors.Is(readError, arena.ErrInvalidSlot) {
+							t.Fatal("failed descriptor readable", readError)
+						}
 					}
 					inspectionAssertMagnitude(t, m.z, &a.num, limbs)
 					inspectionAssertMagnitude(t, m.z, &a.den, limbs[:129])
 					inspectionAssertMagnitude(t, m.z, &z, limbs)
 				} else {
 					completed = true
+					switch operation {
+					case 0:
+						inspectionAssertMagnitude(t, m.z, &integerOut, limbs)
+					case 1:
+						inspectionAssertMagnitude(t, m.z, &integerOut, limbs[:129])
+					case 2, 5, 6:
+						inspectionAssertMagnitude(t, m.z, &out.num, limbs)
+					case 3:
+						inspectionAssertMagnitude(t, m.z, &out.num, limbs[:129])
+					case 4:
+						value, readError := m.Uint64(&out)
+						if readError != nil || value != math.MaxUint64 {
+							t.Fatal("successful unsigned setter", value, readError)
+						}
+					case 7, 8:
+						n, d := new(big.Int), new(big.Int)
+						for i := len(limbs) - 1; i >= 0; i-- {
+							n.Lsh(n, 32).Add(n, new(big.Int).SetUint64(uint64(limbs[i])))
+							if i < len(limbs)-1 {
+								d.Lsh(d, 32).Add(d, new(big.Int).SetUint64(uint64(limbs[i])))
+							}
+						}
+						want := new(big.Rat).SetFrac(n, d)
+						if operation == 7 {
+							want.Add(want, big.NewRat(1, 1))
+						} else {
+							want.Sub(want, big.NewRat(1, 1))
+						}
+						if rationalString(t, m, &a) != want.RatString() {
+							t.Fatal("successful normalized increment/decrement", operation)
+						}
+					}
+					if operation >= 2 && operation <= 6 && out.den != NewInt(1) {
+						t.Fatal("successful setter denominator", operation, out.den)
+					}
 				}
 				m.Close()
 				if b.Used() != 0 {
@@ -621,6 +673,7 @@ func TestRationalInspectionAliasedCopyFailureCleanup(t *testing.T) {
 			case 2:
 				e = m.DenominatorRational(&a, &a)
 			}
+			qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den})
 			b.FailAfter(-1)
 			if e != nil {
 				failures++
@@ -631,8 +684,16 @@ func TestRationalInspectionAliasedCopyFailureCleanup(t *testing.T) {
 				inspectionAssertMagnitude(t, m.z, &a.den, digits[:129])
 			} else {
 				completed = true
+				if operation == 0 {
+					inspectionAssertMagnitude(t, m.z, &a.num, digits)
+					inspectionAssertMagnitude(t, m.z, &a.den, digits)
+				} else {
+					inspectionAssertMagnitude(t, m.z, &a.num, digits[:129])
+					if a.den != NewInt(1) {
+						t.Fatal("successful alias denominator", operation, a.den)
+					}
+				}
 			}
-			qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den})
 			m.Close()
 			if b.Used() != 0 {
 				t.Fatal(b.Used())
@@ -641,9 +702,10 @@ func TestRationalInspectionAliasedCopyFailureCleanup(t *testing.T) {
 				break
 			}
 		}
-		// Some source self/component copies reuse all existing storage; only an
-		// operation requiring growth must demonstrate injected allocation failure.
-		if !completed || operation == 0 && failures == 0 {
+		// Source self/component copies can reuse all existing storage; an
+		// operation without a new physical reservation need not fail. The separate
+		// fresh-output sweep verifies allocation failures at real growth boundaries.
+		if !completed {
 			t.Fatal(operation, completed, failures)
 		}
 	}

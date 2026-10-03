@@ -235,8 +235,23 @@ func TestIntegerDivisionZeroAndBudgetFailure(t *testing.T) {
 	if e := m.MachineDivRem(&a, &b, &q, &r); !errors.Is(e, arena.ErrInjectedFailure) || q.val != 19 || r.val != 23 {
 		t.Fatal("failed division published output", e)
 	}
+	// Source ensure_tmp frees the insufficient old cell before refusal.
+	if m.tmp[0] != 0 {
+		t.Fatal("failed scratch replacement was retained")
+	}
+	mpzPublicationAudit(t, m, &a, &b, &q, &r)
+	// ensure_tmp replacement refusal follows old-free, before output setter.
+	if m.tmp[0] != 0 {
+		t.Fatal("failed replacement scratch retained")
+	}
+	mpzPublicationAudit(t, m, &a, &b, &q, &r)
 	budget.FailAfter(-1)
-	if e := m.MachineDivRem(&a, &b, &q, &r); e != nil {
+	m.Close()
+	fresh, _ := integerManager(t)
+	a = NewInt(0)
+	q, r = NewInt(19), NewInt(23)
+	setIntegerOracle(t, fresh, &a, oracle([]uint32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17}))
+	if e := fresh.MachineDivRem(&a, &b, &q, &r); e != nil {
 		t.Fatal(e)
 	}
 }
@@ -297,22 +312,36 @@ func TestIntegerDivisionAllAllocationFailurePoints(t *testing.T) {
 		}
 		m.SetLimbs(&a, aa)
 		m.SetLimbs(&b, bb)
-		before := m.cells.Stats().Live
 		budget.FailAfter(after)
 		err := m.MachineDivRem(&a, &b, &q, &r)
-		budget.FailAfter(-1)
 		if err != nil {
 			failures++
-			if !errors.Is(err, arena.ErrInjectedFailure) || q.val != 19 || q.cell != 0 || r.val != 23 || r.cell != 0 || m.cells.Stats().Live != before {
-				t.Fatalf("failure %d published/leaked: %v %v %v", after, err, q, r)
+			if !errors.Is(err, arena.ErrInjectedFailure) {
+				t.Fatal(after, err)
 			}
-			// All partially grown scratch remains manager-owned and reusable.
-			if e := m.MachineDivRem(&a, &b, &q, &r); e != nil {
-				t.Fatal("retry after failure", after, e)
+			// mpz.h:156/source cpp503–505: scratch can be missing and
+			// caller outputs can already own transferred cells. Count actual
+			// named roots before formatting, fault disable, or owner cleanup.
+			refs := [10]numericCellRef{m.tmp[0], m.tmp[1], m.arg[0], m.arg[1], m.intMin.cell, m.two64.cell, a.cell, b.cell, q.cell, r.cell}
+			live := uint32(0)
+			for _, ref := range refs {
+				if ref != 0 && validNumericRef(m.cells, ref) {
+					live++
+				}
 			}
+			if m.cells.Stats().Live != live || m.words.Stats().Live != live+4 {
+				t.Fatalf("failure %d unnamed ownership: cells=%d words=%d named=%d", after, m.cells.Stats().Live, m.words.Stats().Live, live)
+			}
+			budget.FailAfter(-1)
+			m.Close()
+			if budget.Used() != 0 {
+				t.Fatal("failed source continuation cleanup", after, budget.Used())
+			}
+			continue
 		} else {
 			successes++
 		}
+		budget.FailAfter(-1)
 		expectedQ, expectedR := new(big.Int), new(big.Int)
 		expectedQ.QuoRem(oracle(aa), oracle(bb), expectedR)
 		if integerString(t, m, &q) != expectedQ.String() || integerString(t, m, &r) != expectedR.String() {
@@ -388,7 +417,6 @@ func TestIntegerEuclideanStagedFailurePointsAndAliases(t *testing.T) {
 				if alias == 2 {
 					dst = &b
 				}
-				before := m.cells.Stats().Live
 				budget.FailAfter(after)
 				var err error
 				if modulus {
@@ -396,23 +424,24 @@ func TestIntegerEuclideanStagedFailurePointsAndAliases(t *testing.T) {
 				} else {
 					err = m.Div(&a, &b, dst)
 				}
-				budget.FailAfter(-1)
 				if err != nil {
 					failures++
-					if !errors.Is(err, arena.ErrInjectedFailure) || integerString(t, m, &a) != av.String() || integerString(t, m, &b) != bv.String() || out.val != 17 || out.cell != 0 || m.cells.Stats().Live != before {
-						t.Fatalf("operation mod=%v alias=%d failure=%d did not preserve state: %v", modulus, alias, after, err)
+					if !errors.Is(err, arena.ErrInjectedFailure) {
+						t.Fatal(alias, after, err)
 					}
-					if modulus {
-						err = m.Mod(&a, &b, dst)
-					} else {
-						err = m.Div(&a, &b, dst)
+					// mpz.h:156 and mpz.cpp:274 publish completed source prefixes.
+					// A missing scratch is not repaired for a fabricated retry.
+					mpzPublicationAudit(t, m, &a, &b, &out)
+					budget.FailAfter(-1)
+					m.Close()
+					if budget.Used() != 0 {
+						t.Fatal("failed source continuation leaked", budget.Used())
 					}
-					if err != nil {
-						t.Fatal("retry", err)
-					}
+					continue
 				} else {
 					successes++
 				}
+				budget.FailAfter(-1)
 				expectedQ, expectedR := new(big.Int), new(big.Int)
 				expectedQ.DivMod(av, bv, expectedR)
 				expected := expectedQ
@@ -479,21 +508,26 @@ func TestIntegerMultiplicationFailurePointsAndAliases(t *testing.T) {
 			if alias == 2 {
 				dst = &b
 			}
-			before := m.cells.Stats().Live
 			budget.FailAfter(after)
 			err := m.Mul(&a, &b, dst)
-			budget.FailAfter(-1)
 			if err != nil {
 				failures++
-				if !errors.Is(err, arena.ErrInjectedFailure) || integerString(t, m, &a) != av.String() || integerString(t, m, &b) != bv.String() || out.val != 17 || m.cells.Stats().Live != before {
-					t.Fatal("failed multiplication changed owner values", alias, after, err)
+				if !errors.Is(err, arena.ErrInjectedFailure) {
+					t.Fatal(alias, after, err)
 				}
-				if e := m.Mul(&a, &b, dst); e != nil {
-					t.Fatal(e)
+				// mpz.h:156 and mpz.cpp:274 publish completed source prefixes.
+				// A missing scratch is not repaired for a fabricated retry.
+				mpzPublicationAudit(t, m, &a, &b, &out)
+				budget.FailAfter(-1)
+				m.Close()
+				if budget.Used() != 0 {
+					t.Fatal("failed source continuation leaked", budget.Used())
 				}
+				continue
 			} else {
 				successes++
 			}
+			budget.FailAfter(-1)
 			if integerString(t, m, dst) != expected.String() {
 				t.Fatal(alias, after)
 			}
@@ -528,8 +562,8 @@ func TestIntegerDivisionWidthBoundaries(t *testing.T) {
 	m.Reset(&r)
 	r.val = 23
 	// Force cell exhaustion without relying on already retained free capacity:
-	// this separate initialized owner has its live-slot limit at constructor6.
-	tight, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{PageSize: 1, SlotLimit: 6}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 1}}})
+	// this separate initialized owner has its slot limit at the six source cells plus one dead adapter token.
+	tight, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{PageSize: 1, SlotLimit: 7}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 1}}})
 	if e != nil {
 		t.Fatal(e)
 	}

@@ -1319,3 +1319,19 @@ UPOLYNOMIAL_GCD_PORT_STATUS.md. Sturm, isolation/refinement, factorization,
 multivariate conversion and algebraic consumers remain required. The active
 prime-table unit becomes partial; ledger33ported/145partial/1924unported.
 The complete solver/proof/interpolation objective remains open.
+
+
+## Internal integer allocation and publication reconciliation
+
+Selected MPZ scratch replacement, big/digit setters, result transfer, paired
+division and Div/Mod now preserve actual source action order rather than
+staging replacement allocations. Tests-first failures expose published results,
+freed old cells and exact owned dead-token continuations; composed rational,
+binary and infinitesimal cleanup releases live companions without weakening
+read/provenance checks. Retired descriptors are metadata, not live numerals;
+polynomial diagnostics and dependent tests use immediate named ownership graphs.
+See MPZ_SOURCE_PUBLICATION_PORT_STATUS.md. Frozen full native and checked/debug,
+234 named race and actual JS groups, vet, WASI compile and source/no-generics
+gates pass. Source allocator topology, bitwise/GCD/Power/root/rational staging
+and the complete solver/proof/interpolation goal remain open. Ledger remains
+33ported/145partial/1924unported; selected allocation method evidence is partial.

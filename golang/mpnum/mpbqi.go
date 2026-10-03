@@ -57,6 +57,18 @@ func (m *BinaryIntervalManager) check(a *BinaryInterval) error {
 	}
 	return m.bounds.pair(&a.lower, &a.upper)
 }
+func (m *BinaryIntervalManager) checkCleanup(a *BinaryInterval) error {
+	if e := m.open(); e != nil {
+		return e
+	}
+	if a == nil {
+		return arena.ErrInvalidSlot
+	}
+	if e := m.bounds.checkCleanup(&a.lower); e != nil {
+		return e
+	}
+	return m.bounds.checkCleanup(&a.upper)
+}
 func (m *BinaryIntervalManager) pair(a, b *BinaryInterval) error {
 	if e := m.check(a); e != nil {
 		return e
@@ -99,7 +111,7 @@ func (m *BinaryIntervalManager) Close() {
 	m.closed = true
 }
 func (m *BinaryIntervalManager) Del(a *BinaryInterval) error {
-	if e := m.check(a); e != nil {
+	if e := m.checkCleanup(a); e != nil {
 		return e
 	}
 	if e := m.bounds.Del(&a.lower); e != nil {
@@ -108,7 +120,7 @@ func (m *BinaryIntervalManager) Del(a *BinaryInterval) error {
 	return m.bounds.Del(&a.upper)
 }
 func (m *BinaryIntervalManager) Reset(a *BinaryInterval) error {
-	if e := m.check(a); e != nil {
+	if e := m.checkCleanup(a); e != nil {
 		return e
 	}
 	if e := m.bounds.Reset(&a.lower); e != nil {

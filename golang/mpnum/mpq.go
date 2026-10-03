@@ -72,6 +72,24 @@ func (m *RationalManager) check(a *Rational) error {
 	}
 	return nil
 }
+func (m *RationalManager) checkCleanup(a *Rational) error {
+	if m.closed {
+		return arena.ErrClosed
+	}
+	if a == nil {
+		return arena.ErrInvalidSlot
+	}
+	if e := m.z.checkCleanup(&a.num); e != nil {
+		return e
+	}
+	if e := m.z.checkCleanup(&a.den); e != nil {
+		return e
+	}
+	if a.den.val == 0 {
+		return ErrUninitializedRational
+	}
+	return nil
+}
 func (m *RationalManager) drop(a *Rational) { m.z.Del(&a.num); m.z.Del(&a.den) }
 func (m *RationalManager) Close() {
 	if m.closed {
@@ -101,7 +119,7 @@ func isIntegerRational(a *Rational) bool { return a.den.IsSmall() && a.den.val =
 func isOneInteger(a *Int) bool           { return a.IsSmall() && a.val == 1 }
 
 func (m *RationalManager) Del(a *Rational) error {
-	if e := m.check(a); e != nil {
+	if e := m.checkCleanup(a); e != nil {
 		return e
 	}
 	if e := m.z.Del(&a.num); e != nil {
@@ -110,7 +128,7 @@ func (m *RationalManager) Del(a *Rational) error {
 	return m.z.Del(&a.den)
 }
 func (m *RationalManager) Reset(a *Rational) error {
-	if e := m.check(a); e != nil {
+	if e := m.checkCleanup(a); e != nil {
 		return e
 	}
 	if e := m.z.Reset(&a.num); e != nil {

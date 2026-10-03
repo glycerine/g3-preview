@@ -461,9 +461,9 @@ func TestInfIntRationalFaultPrefixesTemporaryCleanup(t *testing.T) {
 		s, b := serviceNew(t)
 		a := infIntValue(t, s, "123456789012345678901234567890/19", 7)
 		r := infIntValue(t, s, "998877665544332211009988776655/23", -2)
-		cells, words, scratch := s.manager.z.cells.Stats().Live, s.manager.z.words.Stats().Live, serviceScratchRefs(s)
 		b.FailAfter(n)
 		out, e := s.InfIntAdd(&a, &r)
+		serviceAuditRationalRoots(t, s, &a.first, &r.first, &out.first) // immediate before format/Del
 		b.FailAfter(-1)
 		if e != nil {
 			failures++
@@ -474,9 +474,6 @@ func TestInfIntRationalFaultPrefixesTemporaryCleanup(t *testing.T) {
 			successes++
 			infIntCheck(t, s, &out, new(big.Rat).Add(infIntBigRat("123456789012345678901234567890/19"), infIntBigRat("998877665544332211009988776655/23")).RatString(), 5)
 			serviceMust(t, s.InfIntDel(&out))
-		}
-		if s.manager.z.cells.Stats().Live != cells || s.manager.z.words.Stats().Live != words+serviceScratchRefs(s)-scratch {
-			t.Fatal("temporary leak before teardown", n, s.manager.z.cells.Stats().Live, cells, s.manager.z.words.Stats().Live, words, scratch, serviceScratchRefs(s))
 		}
 		infIntCheck(t, s, &a, "123456789012345678901234567890/19", 7)
 		infIntCheck(t, s, &r, "998877665544332211009988776655/23", -2)
@@ -534,6 +531,7 @@ func TestInfIntRationalAliasReReadWarmReuseAndGuards(t *testing.T) {
 	serviceMust(t, s.InfIntSetParts(&a, &r, 2))
 	copy, _ := s.InfIntNewValue()
 	serviceMust(t, s.InfIntCopy(&copy, &a))
+	serviceMust(t, s.InfIntCopy(&copy, &a)) // prepare actual transient copy peak
 	b.FailAfter(0)
 	var err error
 	allocs := testing.AllocsPerRun(100, func() {
@@ -616,7 +614,6 @@ func TestInfIntRationalPostFailureAndGetterIndependence(t *testing.T) {
 		for n := int64(0); n < 40; n++ {
 			s, b := serviceNew(t)
 			a := infIntValue(t, s, "123456789012345678901234567890/99887766554433221101", -4)
-			cells, words, scratch := s.manager.z.cells.Stats().Live, s.manager.z.words.Stats().Live, serviceScratchRefs(s)
 			b.FailAfter(n)
 			var old OwnedInfIntRational
 			var e error
@@ -625,6 +622,7 @@ func TestInfIntRationalPostFailureAndGetterIndependence(t *testing.T) {
 			} else {
 				old, e = s.InfIntPostInc(&a)
 			}
+			serviceAuditRationalRoots(t, s, &a.first, &old.first) // actual remaining roots before format/Del
 			b.FailAfter(-1)
 			if e != nil {
 				failures++
@@ -634,9 +632,6 @@ func TestInfIntRationalPostFailureAndGetterIndependence(t *testing.T) {
 			} else {
 				successes++
 				serviceMust(t, s.InfIntDel(&old))
-			}
-			if s.manager.z.cells.Stats().Live != cells || s.manager.z.words.Stats().Live != words+serviceScratchRefs(s)-scratch {
-				t.Fatal("post temporary leak before teardown", dec, n)
 			}
 			want := infIntBigRat("123456789012345678901234567890/99887766554433221101")
 			if e == nil {

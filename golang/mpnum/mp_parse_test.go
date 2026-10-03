@@ -218,19 +218,17 @@ func TestParserBudgetFailureCleanup(t *testing.T) {
 					}
 					budget.FailAfter(after)
 					e := call()
+					qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &out})
 					budget.FailAfter(-1)
 					if e != nil {
 						failures++
 						if !errors.Is(e, arena.ErrInjectedFailure) || rationalString(t, m, &a) != "17/13" || integerString(t, m.z, &out) != "17" {
 							t.Fatal("parser failure published", synch, text, integer, after, e)
 						}
-						if e = call(); e != nil {
-							t.Fatal("retry", e)
-						}
 					} else {
 						successes++
 					}
-					if integer == 1 {
+					if e == nil && integer == 1 {
 						var digits strings.Builder
 						for i := 0; i < len(text); i++ {
 							if text[i] >= '0' && text[i] <= '9' {
@@ -245,7 +243,7 @@ func TestParserBudgetFailureCleanup(t *testing.T) {
 							expected.Neg(expected)
 						}
 						assertIntegerPowerOracle(t, m.z, &out, expected)
-					} else {
+					} else if e == nil {
 						expected, ok := new(big.Rat).SetString(text)
 						if !ok {
 							t.Fatal("oracle fixture")
@@ -255,7 +253,7 @@ func TestParserBudgetFailureCleanup(t *testing.T) {
 							expected.Quo(expected, big.NewRat(13, 1))
 						}
 						if rationalString(t, m, &a) != expected.RatString() {
-							t.Fatal("retried rational mismatch", synch, text, after, expected)
+							t.Fatal("successful rational mismatch", synch, text, after, expected)
 						}
 					}
 					m.Close()

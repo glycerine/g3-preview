@@ -385,7 +385,6 @@ func TestRationalOpsAllPredictableFailurePrefixes(t *testing.T) {
 				}
 				originalOutput := rationalString(t, m, &out)
 				sa, sb, sc := rationalString(t, m, &a), rationalString(t, m, &b), rationalString(t, m, &c)
-				baselineCells, baselineWords := m.z.cells.Stats().Live, m.z.words.Stats().Live
 				budget.FailAfter(prefix)
 				var e error
 				switch operation {
@@ -418,9 +417,6 @@ func TestRationalOpsAllPredictableFailurePrefixes(t *testing.T) {
 				// allocate scratch or mask an orphaned temporary.
 				if e != nil {
 					qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &b.num, &b.den, &c.num, &c.den, &out.num, &out.den, &z})
-					if synch && (m.z.cells.Stats().Live != baselineCells || m.z.words.Stats().Live != baselineWords) {
-						t.Fatal("synchronized retained temporary", operation, prefix, baselineCells, m.z.cells.Stats().Live, baselineWords, m.z.words.Stats().Live)
-					}
 				}
 				budget.FailAfter(-1)
 				if e != nil {
@@ -457,11 +453,13 @@ func TestRationalOpsAllPredictableFailurePrefixes(t *testing.T) {
 
 // Known roots, rather than scanning all live allocations, form the expected
 // ownership graph. No unreferenced temporary can justify its own presence.
+// The owner's failed allocation token is charged, permanently dead metadata,
+// not a live cell or payload. Every other invalid known root is still rejected.
 func qopsAuditLiveOwnership(t *testing.T, m *RationalManager, public []*Int) {
 	t.Helper()
 	cells := make([]numericCellRef, 0, 32)
 	addCell := func(r numericCellRef) {
-		if r == 0 {
+		if r == 0 || (m.z.failedRef != 0 && r == m.z.failedRef) {
 			return
 		}
 		for _, old := range cells {
@@ -487,7 +485,7 @@ func qopsAuditLiveOwnership(t *testing.T, m *RationalManager, public []*Int) {
 	}
 	scratch := []*Int{&m.nTmp, &m.addTmp1, &m.addTmp2, &m.addMulTmp.num, &m.addMulTmp.den, &m.ltTmp1.num, &m.ltTmp1.den, &m.ltTmp2.num, &m.ltTmp2.den}
 	for _, n := range scratch {
-		if m.synchronized && n.cell != 0 {
+		if m.synchronized && n.cell != 0 && n.cell != m.z.failedRef {
 			t.Fatal("local mode retained rational scratch")
 		}
 		if !m.synchronized {

@@ -23,6 +23,15 @@ func (s *RationalService) infEpsInfCheck(v *OwnedInfEpsInfRational) error {
 	}
 	return s.infCheck(&v.numeral)
 }
+func (s *RationalService) infEpsInfCheckCleanup(v *OwnedInfEpsInfRational) error {
+	if v == nil || v.ownerID == 0 || v.ownerID != s.ownerID {
+		return ErrRationalServiceOwner
+	}
+	if e := s.manager.checkCleanup(&v.infinity); e != nil {
+		return e
+	}
+	return s.infCheckCleanup(&v.numeral)
+}
 func (s *RationalService) infEpsInfDestroy(v *OwnedInfEpsInfRational) {
 	s.infDestroy(&v.numeral)
 	s.manager.Del(&v.infinity)
@@ -77,7 +86,7 @@ func (s *RationalService) InfEpsInfDel(v *OwnedInfEpsInfRational) error {
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsInfCheckCleanup(v); e != nil {
 		return e
 	}
 	s.infEpsInfDestroy(v)

@@ -367,7 +367,7 @@ func TestPowerShiftFailureCleanup(t *testing.T) {
 						ratDst = &a
 						intDst = &integer
 					}
-					original := rationalString(t, m, &a)
+					_ = rationalString(t, m, &a)
 					call := func() error {
 						switch op {
 						case 0:
@@ -382,18 +382,23 @@ func TestPowerShiftFailureCleanup(t *testing.T) {
 					}
 					budget.FailAfter(after)
 					err := call()
-					budget.FailAfter(-1)
 					if err != nil {
 						failures++
-						if !errors.Is(err, arena.ErrInjectedFailure) || rationalString(t, m, &a) != original || rationalString(t, m, &out) != "17" || integerString(t, m.z, &integer) != n.String() || integerString(t, m.z, &result) != "17" {
-							t.Fatal("power/shift failure published", synch, op, alias, after, err)
+						if !errors.Is(err, arena.ErrInjectedFailure) {
+							t.Fatal(synch, op, alias, after, err)
 						}
-						if err = call(); err != nil {
-							t.Fatal("retry", err)
+						// Source power's intermediate integer setters retain completed prefixes.
+						qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &out.num, &out.den, &integer, &result})
+						budget.FailAfter(-1)
+						m.Close()
+						if budget.Used() != 0 {
+							t.Fatal("failed power source roots leaked", budget.Used())
 						}
+						continue
 					} else {
 						successes++
 					}
+					budget.FailAfter(-1)
 					switch op {
 					case 0:
 						assertIntegerPowerOracle(t, m.z, intDst, new(big.Int).Exp(n, big.NewInt(7), nil))

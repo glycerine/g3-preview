@@ -50,9 +50,9 @@ func (m *UPolynomialManager) borrowedModulus() (*Int, error) {
 }
 
 type UPolynomialStats struct {
-	OwnerBytes, DirectoryBytes, PageBytes, BackingBytes, ModularBytes, TotalBytes                                        uint64
-	IntegerCellSlots, IntegerLiveCells, IntegerWordsRefs, IntegerNaturalWordsRefs, IntegerCachedCells, OwnedNumeralCells uint32
-	LivePolynomials, LiveBackings                                                                                        uint32
+	OwnerBytes, DirectoryBytes, PageBytes, BackingBytes, ModularBytes, TotalBytes                                                             uint64
+	IntegerCellSlots, IntegerLiveCells, IntegerRetiredCells, IntegerWordsRefs, IntegerNaturalWordsRefs, IntegerCachedCells, OwnedNumeralCells uint32
+	LivePolynomials, LiveBackings                                                                                                             uint32
 }
 
 // Stats accounts the concrete physical storage graph; numeral cell payloads
@@ -75,19 +75,20 @@ func (m *UPolynomialManager) Stats() UPolynomialStats {
 	z := m.config.Integer
 	s.IntegerLiveCells = z.cells.Stats().Live
 	s.IntegerCellSlots = z.cells.Stats().Slots
+	s.IntegerRetiredCells = z.cells.Stats().Retired
 	s.IntegerWordsRefs = z.words.Stats().Live
 	for _, ref := range z.tmp {
-		if ref != 0 {
+		if validNumericRef(z.cells, ref) {
 			s.IntegerCachedCells++
 		}
 	}
 	for _, ref := range z.arg {
-		if ref != 0 {
+		if validNumericRef(z.cells, ref) {
 			s.IntegerCachedCells++
 		}
 	}
 	for _, a := range [2]Int{z.intMin, z.two64} {
-		if a.cell != 0 {
+		if validNumericRef(z.cells, a.cell) {
 			s.IntegerCachedCells++
 		}
 	}
@@ -104,7 +105,7 @@ func (m *UPolynomialManager) Stats() UPolynomialStats {
 		}
 	}
 	for _, a := range [7]Int{m.modular.p, m.modular.lower, m.modular.upper, m.modular.invTmp1, m.modular.invTmp2, m.modular.invTmp3, m.modular.divTmp} {
-		if a.cell != 0 {
+		if validNumericRef(z.cells, a.cell) {
 			s.OwnedNumeralCells++
 		}
 	}
@@ -113,7 +114,7 @@ func (m *UPolynomialManager) Stats() UPolynomialStats {
 			d := &page.rows[i]
 			if d.live {
 				for j := uint32(0); j < d.state.size; j++ {
-					if m.values(&d.state)[j].cell != 0 {
+					if validNumericRef(z.cells, m.values(&d.state)[j].cell) {
 						s.OwnedNumeralCells++
 					}
 				}
@@ -123,7 +124,7 @@ func (m *UPolynomialManager) Stats() UPolynomialStats {
 	states := [21]*upolyVectorState{&m.basic, &m.div1, &m.div2, &m.exactDiv, &m.gcd1, &m.gcd2, &m.cra, &m.mgcd[0], &m.mgcd[1], &m.mgcd[2], &m.mgcd[3], &m.mgcd[4], &m.mgcd[5], &m.sqf1, &m.sqf2, &m.pw, &m.db, &m.dbab1, &m.dbab2, &m.tr, &m.push}
 	for _, state := range states {
 		for j := uint32(0); j < state.size; j++ {
-			if m.values(state)[j].cell != 0 {
+			if validNumericRef(z.cells, m.values(state)[j].cell) {
 				s.OwnedNumeralCells++
 			}
 		}

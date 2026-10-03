@@ -639,7 +639,7 @@ func TestUPolynomialSourceCopyAndRationalPrefixes(t *testing.T) {
 	// blocks, so budget refusal must not assume a fresh limb allocation.
 	var fillers [16]mpnum.Int
 	filled := 0
-	for st := m.Stats(); st.IntegerLiveCells < st.IntegerCellSlots || st.IntegerLiveCells%8 != 0; st = m.Stats() {
+	for st := m.Stats(); st.IntegerLiveCells+st.IntegerRetiredCells < st.IntegerCellSlots || (st.IntegerLiveCells+st.IntegerRetiredCells)%8 != 0; st = m.Stats() {
 		if filled == len(fillers) {
 			t.Fatal("cell saturation bound", st)
 		}
@@ -668,11 +668,13 @@ func TestUPolynomialSourceCopyAndRationalPrefixes(t *testing.T) {
 	if e := q.Integers().Del(&n); e != nil {
 		t.Fatal(e)
 	}
-	if e := m.ReadCoefficient(p, 1, &n); e != nil {
-		t.Fatal(e)
+	// The second Copy published its sign and an owned failed-allocation
+	// token. Reading that source-undefined pointer must remain guarded.
+	if e := m.ReadCoefficient(p, 1, &n); !errors.Is(e, arena.ErrInvalidSlot) {
+		t.Fatal("failed second copy read guard", e)
 	}
-	if got, e := q.Integers().Int64(&n); e != nil || got != 2 {
-		t.Fatal("failed second copy changed output", got, e)
+	if got, e := q.Integers().Int64(&n); e != nil || got != 7 {
+		t.Fatal("rejected read changed caller destination", got, e)
 	}
 	if e := q.Integers().Del(&n); e != nil {
 		t.Fatal(e)

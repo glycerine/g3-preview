@@ -11,6 +11,7 @@ import (
 )
 
 var ErrConversion = errors.New("mpnum: integer conversion out of range")
+var ErrIntegerAssertion = errors.New("mpnum: source integer assertion failed")
 
 // Int is a pointer-free, owner-local mutable integer. With a zero cell ref,
 // val is an inline int32. Otherwise val is the sign (-1/+1). A big Int must
@@ -41,6 +42,7 @@ type IntegerManager struct {
 	cells         *numericCellSlab
 	words         *arena.Words
 	tmp, arg      [2]numericCellRef
+	failedRef     numericCellRef  // permanently dead, charged auxiliary descriptor
 	natural       *NaturalManager // child borrows this manager's Words and Budget
 	intMin, two64 Int
 	closed        bool
@@ -61,13 +63,19 @@ func NewIntegerManager(config IntegerConfig) (*IntegerManager, error) {
 		config.Cells.Budget.Release(header)
 		return nil, e
 	}
+	failedSlot, failedGeneration, e := cells.reserveDead()
+	if e != nil {
+		cells.Close()
+		config.Cells.Budget.Release(header)
+		return nil, e
+	}
 	words, e := arena.NewWords(config.Words)
 	if e != nil {
 		cells.Close()
 		config.Cells.Budget.Release(header)
 		return nil, e
 	}
-	m := &IntegerManager{cells: cells, words: words, budget: config.Cells.Budget, headerBytes: header}
+	m := &IntegerManager{cells: cells, words: words, budget: config.Cells.Budget, headerBytes: header, failedRef: makeNumericRef(failedSlot, failedGeneration)}
 	fail := func(err error) (*IntegerManager, error) { m.Close(); return nil, err }
 	m.natural, e = newNaturalManager(config.Words, words, false)
 	if e != nil {
@@ -96,6 +104,20 @@ func NewIntegerManager(config IntegerConfig) (*IntegerManager, error) {
 	return m, nil
 }
 
+// checkCleanup accepts the owner's permanently dead allocation token only for
+// release/reset after a source allocation prefix. Ordinary reads use check.
+func (m *IntegerManager) checkCleanup(a *Int) error {
+	if m.closed {
+		return arena.ErrClosed
+	}
+	if a == nil {
+		return arena.ErrInvalidSlot
+	}
+	if m.failedRef != 0 && a.cell == m.failedRef {
+		return nil
+	}
+	return m.check(a)
+}
 func (m *IntegerManager) check(a *Int) error {
 	if m.closed {
 		return arena.ErrClosed
@@ -137,6 +159,20 @@ func (m *IntegerManager) writeDigit(ref numericCellRef, i, v uint32) {
 		panic(e)
 	}
 }
+
+// prepareTmpSpan guards the actual scratch-span access after ensureTmp has
+// completed its source unsigned allocation/publication prefixes. It does not
+// reject the finite wrapped allocation itself or poison other live numerals.
+func (m *IntegerManager) prepareTmpSpan(idx int, size uint32) error {
+	if idx < 0 || idx >= len(m.tmp) || m.tmp[idx] == 0 {
+		return arena.ErrInvalidSlot
+	}
+	if size > m.cell(m.tmp[idx]).capacity {
+		return arena.ErrBounds
+	}
+	m.resizeCell(m.tmp[idx], size)
+	return nil
+}
 func (m *IntegerManager) resizeCell(ref numericCellRef, size uint32) {
 	c := m.cell(ref)
 	if size > c.capacity {
@@ -151,8 +187,8 @@ func (m *IntegerManager) resizeCell(ref numericCellRef, size uint32) {
 	m.store(ref, c)
 }
 func (m *IntegerManager) allocate(capacity, size uint32) (numericCellRef, error) {
-	if capacity < 6 {
-		capacity = 6
+	if modularSourceDebug && capacity < 6 {
+		return 0, ErrIntegerAssertion
 	}
 	slot, gen, e := m.cells.Allocate()
 	if e != nil {
@@ -215,6 +251,10 @@ func (m *IntegerManager) Close() {
 // Del preserves the source's m_val after releasing a big cell. Thus deleting a
 // big positive/negative value leaves inline +1/-1. Reset additionally writes 0.
 func (m *IntegerManager) Del(a *Int) error {
+	if !m.closed && a != nil && m.failedRef != 0 && a.cell == m.failedRef {
+		a.cell = 0
+		return nil
+	}
 	if e := m.check(a); e != nil {
 		return e
 	}
@@ -304,8 +344,13 @@ func (m *IntegerManager) SetLimbs(a *Int, digits []uint32) error {
 		return arena.ErrBounds
 	}
 	size := uint32(len(digits))
+	a.val = 1 // source publication precedes the allocation branches
 	ref := a.cell
 	if ref == 0 || m.cell(ref).capacity < size {
+		if ref != 0 {
+			m.free(ref)
+		}
+		a.cell = m.failedRef
 		var e error
 		ref, e = m.allocate(max(size, 6), size)
 		if e != nil {
@@ -317,12 +362,8 @@ func (m *IntegerManager) SetLimbs(a *Int, digits []uint32) error {
 	for i, v := range digits {
 		m.writeDigit(ref, uint32(i), v)
 	}
-	old := a.cell
 	a.cell = ref
 	a.val = 1
-	if old != 0 && old != ref {
-		m.free(old)
-	}
 	return nil
 }
 func (m *IntegerManager) Copy(dst, src *Int) error {
@@ -344,8 +385,13 @@ func (m *IntegerManager) Copy(dst, src *Int) error {
 		return nil
 	}
 	source := m.cell(src.cell)
+	dst.val = src.val // big_set publishes sign before allocation/free
 	ref := dst.cell
 	if ref == 0 || m.cell(ref).capacity < source.size {
+		if ref != 0 {
+			m.free(ref)
+		}
+		dst.cell = m.failedRef
 		var e error
 		ref, e = m.allocate(source.capacity, source.size)
 		if e != nil {
@@ -357,12 +403,8 @@ func (m *IntegerManager) Copy(dst, src *Int) error {
 	for i := uint32(0); i < source.size; i++ {
 		m.writeDigit(ref, i, m.digit(src.cell, i))
 	}
-	old := dst.cell
 	dst.cell = ref
 	dst.val = src.val
-	if old != 0 && old != ref {
-		m.free(old)
-	}
 	return nil
 }
 
@@ -479,66 +521,57 @@ func (m *IntegerManager) Compare(a, b *Int) (int, error) {
 }
 
 func (m *IntegerManager) ensureTmp(idx int, size uint32) error {
+	if idx < 0 || idx >= len(m.tmp) || m.tmp[idx] == 0 {
+		return arena.ErrInvalidSlot
+	}
 	if m.cell(m.tmp[idx]).capacity >= size {
 		return nil
 	}
-	capacity := (3*uint64(size) + 1) >> 1
-	if capacity > math.MaxUint32 {
-		return arena.ErrBounds
-	}
-	ref, e := m.allocate(uint32(capacity), 0)
+	m.free(m.tmp[idx])
+	m.tmp[idx] = 0                // source leaves a dangling pointer; Go keeps a guarded hole
+	capacity := (3*size + 1) >> 1 // actual unsigned32 source arithmetic
+	ref, e := m.allocate(capacity, 0)
 	if e != nil {
 		return e
 	}
-	m.free(m.tmp[idx])
 	m.tmp[idx] = ref
+	if modularSourceDebug && m.cell(ref).capacity < size {
+		return ErrIntegerAssertion
+	}
 	return nil
 }
 func (m *IntegerManager) publishTmp(dst *Int, sign int32, size uint32) error {
-	return m.publishTmpAt(0, dst, sign, size, 0)
+	return m.publishTmpAt(0, dst, sign, size)
 }
 
-// publishTmpAt consumes an optional preallocated replacement scratch cell.
-// This lets paired division prepare allocations before publishing either value.
-func (m *IntegerManager) publishTmpAt(idx int, dst *Int, sign int32, size uint32, replacement numericCellRef) error {
+// publishTmpAt publishes the source sign/pointer/size prefix before requesting
+// missing scratch. Paired division calls the setters sequentially.
+func (m *IntegerManager) publishTmpAt(idx int, dst *Int, sign int32, size uint32) error {
+	if idx < 0 || idx >= len(m.tmp) || m.tmp[idx] == 0 {
+		return arena.ErrInvalidSlot
+	}
 	ref := m.tmp[idx]
 	for size > 0 && m.digit(ref, size-1) == 0 {
 		size--
 	}
 	if size == 0 {
-		if replacement != 0 {
-			m.free(replacement)
-		}
 		return m.Reset(dst)
 	}
 	if size == 1 && m.digit(ref, 0) <= math.MaxInt32 {
-		if replacement != 0 {
-			m.free(replacement)
-		}
 		v := int32(m.digit(ref, 0))
 		if sign < 0 {
 			v = -v
 		}
 		return m.SetInt64(dst, int64(v))
 	}
-	old := dst.cell
-	if old == 0 {
-		if replacement != 0 {
-			old = replacement
-		} else {
-			var e error
-			old, e = m.allocate(6, 0)
-			if e != nil {
-				return e
-			}
-		}
-	} else if replacement != 0 {
-		m.free(replacement)
-	}
-	m.resizeCell(ref, size)
-	dst.cell = ref
 	dst.val = sign
-	m.tmp[idx] = old
+	dst.cell, m.tmp[idx] = m.tmp[idx], dst.cell
+	m.resizeCell(ref, size)
+	if m.tmp[idx] == 0 {
+		var e error
+		m.tmp[idx], e = m.allocate(6, 0)
+		return e
+	}
 	return nil
 }
 func (m *IntegerManager) Add(a, b, c *Int) error { return m.addSub(a, b, c, false) }
@@ -571,7 +604,9 @@ func (m *IntegerManager) addSub(a, b, c *Int, subtract bool) error {
 		if e := m.ensureTmp(0, n+1); e != nil {
 			return e
 		}
-		m.resizeCell(m.tmp[0], n+1)
+		if e := m.prepareTmpSpan(0, n+1); e != nil {
+			return e
+		}
 		var k uint32
 		for j := uint32(0); j < n; j++ {
 			u, v := m.digit(ca, j), m.digit(cb, j)
@@ -602,7 +637,9 @@ func (m *IntegerManager) addSub(a, b, c *Int, subtract bool) error {
 	if e := m.ensureTmp(0, n); e != nil {
 		return e
 	}
-	m.resizeCell(m.tmp[0], n)
+	if e := m.prepareTmpSpan(0, n); e != nil {
+		return e
+	}
 	var k uint32
 	for j := uint32(0); j < n; j++ {
 		u, v := m.digit(ca, j), m.digit(cb, j)

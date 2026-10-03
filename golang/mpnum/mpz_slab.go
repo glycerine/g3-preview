@@ -195,6 +195,25 @@ func (s *numericCellSlab) Recycle(slot arena.Slot) error {
 	return nil
 }
 
+// reserveDead allocates one real, fully charged ledger slot that can never
+// become an ordinary live numeral. It represents undefined source pointer
+// states after an allocation error, without changing the hot Int layout.
+func (s *numericCellSlab) reserveDead() (arena.Slot, arena.Generation, error) {
+	slot, generation, err := s.Allocate()
+	if err != nil {
+		return 0, 0, err
+	}
+	p, i := s.location(slot)
+	state := s.state(slot)
+	s.pages[p].records[i] = numericCell{}
+	state.live = false
+	state.retired = true
+	s.pages[p].live--
+	s.live--
+	s.retired++
+	return slot, generation, nil
+}
+
 // TrimFreePages drops wholly dead record pages. arena.Generation metadata is retained.
 func (s *numericCellSlab) TrimFreePages() {
 	if s.closed {

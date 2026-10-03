@@ -270,11 +270,9 @@ func TestRationalServiceCacheFailurePrefixes(t *testing.T) {
 	failures, successes := 0, 0
 	for n := int64(0); n < 160; n++ {
 		s, b := serviceNew(t)
-		baseCells := s.manager.z.cells.Stats().Live
-		baseWords := s.manager.z.words.Stats().Live
-		baseScratch := serviceScratchRefs(s)
 		b.FailAfter(n)
 		v, e := s.PowerOfTwo(67)
+		serviceAuditRationalRoots(t, s, &v.raw) // immediate pre-render/pre-Del graph
 		b.FailAfter(-1)
 		if e != nil {
 			failures++
@@ -288,21 +286,13 @@ func TestRationalServiceCacheFailurePrefixes(t *testing.T) {
 		}
 		// Cache growth is a committed source prefix. Temporary curr/two/result values
 		// must already be gone, before owner Close could mask any leaked numeral.
-		expected := uint32(0)
+		// Source ensure_tmp can free its old buffer before failing: cached roots
+		// are added to the ACTUAL remaining manager graph, not a fixed-six baseline.
 		for i := range s.cache {
-			if s.cache[i].num.cell != 0 {
-				expected++
-			}
-			if s.cache[i].den.cell != 0 {
-				expected++
-			}
 			got, err := s.manager.String(&s.cache[i])
 			if err != nil || got != new(big.Int).Lsh(big.NewInt(1), uint(i)).String() {
 				t.Fatal(n, i, got, err)
 			}
-		}
-		if s.manager.z.cells.Stats().Live != baseCells+expected || s.manager.z.words.Stats().Live != baseWords+expected+serviceScratchRefs(s)-baseScratch {
-			t.Fatal("temporary leak before Close", n, s.manager.z.cells.Stats().Live, baseCells, expected, s.manager.z.words.Stats().Live, baseWords)
 		}
 		serviceMust(t, s.Close())
 		if b.Used() != 0 {
@@ -672,4 +662,25 @@ func TestRationalServiceSourceSignedFractionShape(t *testing.T) {
 	if failures == 0 || successes == 0 {
 		t.Fatal(failures, successes)
 	}
+}
+
+// Audit actual live roots before formatting or teardown. Missing source TMP
+// buffers and the reserved permanently-dead failure token are not live cells;
+// qopsAuditLiveOwnership validates the manager's actual physical ownership.
+func serviceAuditRationalRoots(t *testing.T, s *RationalService, values ...*Rational) {
+	t.Helper()
+	roots := []*Int{}
+	add := func(q *Rational) { roots = append(roots, &q.num, &q.den) }
+	for _, q := range []*Rational{&s.zero, &s.one, &s.minusOne, &s.infZero.first, &s.infZero.second, &s.infOne.first, &s.infOne.second, &s.infMinusOne.first, &s.infMinusOne.second, &s.infIntZero.first, &s.infIntOne.first, &s.infIntMinusOne.first} {
+		add(q)
+	}
+	for i := range s.cache {
+		add(&s.cache[i])
+	}
+	for _, q := range values {
+		if q != nil {
+			add(q)
+		}
+	}
+	qopsAuditLiveOwnership(t, s.manager, roots)
 }

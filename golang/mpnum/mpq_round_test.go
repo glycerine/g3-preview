@@ -254,31 +254,31 @@ func TestRationalRoundFailureCleanup(t *testing.T) {
 					}
 					budget.FailAfter(after)
 					err := call()
+					qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &out.num, &out.den, &integer})
 					budget.FailAfter(-1)
 					if err != nil {
 						failures++
 						if !errors.Is(err, arena.ErrInjectedFailure) || rationalString(t, m, &a) != original || rationalString(t, m, &out) != "17" || integerString(t, m.z, &integer) != "17" {
 							t.Fatal("round failure publication", synch, op, alias, after, err)
 						}
-						if err = call(); err != nil {
-							t.Fatal(err)
-						}
 					} else {
 						successes++
 					}
 					want := independentRound(n, d, op == 1 || op == 3)
-					switch op {
-					case 0, 1:
-						if integerString(t, m.z, intDst) != want.String() {
-							t.Fatal(op, alias, after)
-						}
-					case 2, 3:
-						if rationalString(t, m, dst) != want.String() {
-							t.Fatal(op, alias, after)
-						}
-					case 4:
-						if power != 0 || rationalString(t, m, &a) != original {
-							t.Fatal(power)
+					if err == nil {
+						switch op {
+						case 0, 1:
+							if integerString(t, m.z, intDst) != want.String() {
+								t.Fatal(op, alias, after)
+							}
+						case 2, 3:
+							if rationalString(t, m, dst) != want.String() {
+								t.Fatal(op, alias, after)
+							}
+						case 4:
+							if power != 0 || rationalString(t, m, &a) != original {
+								t.Fatal(power)
+							}
 						}
 					}
 					m.Close()

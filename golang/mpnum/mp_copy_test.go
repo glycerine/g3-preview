@@ -165,7 +165,7 @@ func TestNumeralCopyFromFailurePrefixesAndImmediateOwnership(t *testing.T) {
 				}
 				// Occupy the actual free cell pool so every new allocation is observable.
 				var fillers []Int
-				for dest.z.cells.Stats().Live < dest.z.cells.Stats().Slots {
+				for dest.z.cells.Stats().Live+dest.z.cells.Stats().Retired < dest.z.cells.Stats().Slots {
 					var x Int
 					if e := dest.z.SetUint64(&x, math.MaxUint64); e != nil {
 						t.Fatal(e)

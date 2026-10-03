@@ -134,7 +134,10 @@ func (s *RationalService) Del(v *OwnedRational) error {
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(v); e != nil {
+	if v == nil || v.ownerID == 0 || v.ownerID != s.ownerID {
+		return ErrRationalServiceOwner
+	}
+	if e := s.manager.checkCleanup(&v.raw); e != nil {
 		return e
 	}
 	if e := s.manager.Del(&v.raw); e != nil {

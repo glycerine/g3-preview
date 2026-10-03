@@ -491,7 +491,7 @@ func TestScopedNumeralHeadersFailuresAndSourcePushPrefix(t *testing.T) {
 	// the new deep-copy cell must actually reserve a page, rather than guessing
 	// that the next allocation is cold.
 	var fillers []Int
-	for m.cells.Stats().Live < m.cells.Stats().Slots {
+	for m.cells.Stats().Live+m.cells.Stats().Retired < m.cells.Stats().Slots {
 		var filler Int
 		if e := m.SetUint64(&filler, 1<<63); e != nil {
 			t.Fatal(e)
@@ -625,7 +625,7 @@ func TestScopedRationalVectorIndependentLifecycleAndFailures(t *testing.T) {
 		v.Shrink(0)
 		// Occupy existing free cell slots so the deep copy is genuinely cold.
 		var fillers []Int
-		for m.z.cells.Stats().Live < m.z.cells.Stats().Slots {
+		for m.z.cells.Stats().Live+m.z.cells.Stats().Retired < m.z.cells.Stats().Slots {
 			var x Int
 			m.z.SetUint64(&x, 1<<63)
 			fillers = append(fillers, x)
@@ -661,7 +661,7 @@ func TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak(t *testing.T) {
 		num, _ := s.Get()
 		m.SetFraction(num, -9223372036854775807, 18446744073709551615)
 		var fillers []Int
-		for m.z.cells.Stats().Live < m.z.cells.Stats().Slots {
+		for m.z.cells.Stats().Live+m.z.cells.Stats().Retired < m.z.cells.Stats().Slots {
 			var x Int
 			if e := m.z.SetUint64(&x, 1<<63); e != nil {
 				t.Fatal(e)

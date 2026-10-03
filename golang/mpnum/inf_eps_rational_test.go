@@ -590,7 +590,7 @@ func infEpsFillCellPage(t *testing.T, s *RationalService) []OwnedRational {
 	var values []OwnedRational
 	for {
 		stats := s.manager.z.cells.Stats()
-		if stats.Live == stats.Slots && stats.Slots%2 == 0 {
+		if stats.Live+stats.Retired == stats.Slots && stats.Slots%2 == 0 {
 			return values
 		}
 		v, e := s.NewValue()

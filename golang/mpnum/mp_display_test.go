@@ -218,8 +218,6 @@ func TestNumericDisplayReservationFailureCleanup(t *testing.T) {
 						}
 					}
 					beforeA := a // Scalar identity snapshot; does not acquire ownership.
-					live, wordsLive := m.z.cells.Stats().Live, m.z.words.Stats().Live
-					fmtRefs := displayFormatterRefs(m.z.natural)
 					b.FailAfter(fault)
 					var n int
 					switch operation {
@@ -230,11 +228,11 @@ func TestNumericDisplayReservationFailureCleanup(t *testing.T) {
 					case 2:
 						n, e = m.FormatDecimalInto(&a, 20, false, dst)
 					}
-					b.FailAfter(-1)
 					// Assert immediate ownership before formatting or Close can mask a leak.
-					delta := displayFormatterRefs(m.z.natural) - fmtRefs
-					if m.z.cells.Stats().Live != live || m.z.words.Stats().Live != wordsLive+delta || a != beforeA {
-						t.Fatal("display ownership/input", synch, operation, warm, fault, m.z.cells.Stats().Live, live, m.z.words.Stats().Live, wordsLive, delta)
+					qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den})
+					b.FailAfter(-1)
+					if a != beforeA {
+						t.Fatal("display changed input", synch, operation, warm, fault)
 					}
 					if e != nil {
 						failures++

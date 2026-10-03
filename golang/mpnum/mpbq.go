@@ -82,6 +82,15 @@ func (m *BinaryRationalManager) check(a *BinaryRational) error {
 	}
 	return m.z.check(&a.num)
 }
+func (m *BinaryRationalManager) checkCleanup(a *BinaryRational) error {
+	if e := m.open(); e != nil {
+		return e
+	}
+	if a == nil {
+		return arena.ErrInvalidSlot
+	}
+	return m.z.checkCleanup(&a.num)
+}
 func (m *BinaryRationalManager) pair(a, b *BinaryRational) error {
 	if e := m.check(a); e != nil {
 		return e
@@ -128,13 +137,13 @@ func (m *BinaryRationalManager) Stats() (BinaryRationalStats, error) {
 	return BinaryRationalStats{HeaderBytes: m.headerBytes, LiveScratchNumerators: n}, nil
 }
 func (m *BinaryRationalManager) Del(a *BinaryRational) error {
-	if e := m.check(a); e != nil {
+	if e := m.checkCleanup(a); e != nil {
 		return e
 	}
 	return m.z.Del(&a.num)
 }
 func (m *BinaryRationalManager) Reset(a *BinaryRational) error {
-	if e := m.check(a); e != nil {
+	if e := m.checkCleanup(a); e != nil {
 		return e
 	}
 	if e := m.z.Reset(&a.num); e != nil {

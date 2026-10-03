@@ -61,25 +61,33 @@ func TestBinaryIntervalFailurePrefixes(t *testing.T) {
 				case 7:
 					e = m.AddInteger(&a, &large, out)
 				}
-				b.FailAfter(-1)
 				if e != nil && !errors.Is(e, arena.ErrInjectedFailure) {
 					t.Fatal(op, alias, prefix, e)
 				}
 				extra := BinaryInterval{lower: BinaryRational{num: large}} // Nonowning audit view.
 				intervalAudit(t, m, &a, &c, &d, &extra)
+				b.FailAfter(-1)
 				if op < 3 && e != nil {
-					// Source lower Copy may have published, upper must retain 9.
-					old := NewInt(7)
-					lowerOld, x := z.Equal(&c.lower.num, &old)
-					serviceMust(t, x)
 					wanted := &a.lower.num
 					if op == 2 {
 						wanted = &large
 					}
-					lowerNew, x := z.Equal(&c.lower.num, wanted)
-					serviceMust(t, x)
-					if (!lowerOld && !lowerNew) || c.upper.num.cell != 0 || c.upper.num.val != 9 {
-						t.Fatal("setter publication prefix", op, prefix)
+					if c.lower.num.cell == z.failedRef {
+						if c.lower.num.val != wanted.val || c.lower.k != 0 || c.upper.num != NewInt(9) {
+							t.Fatal("lower allocation publication precedes upper copy", op, prefix, c)
+						}
+						if x := z.check(&c.lower.num); !errors.Is(x, arena.ErrInvalidSlot) {
+							t.Fatal("failed lower read guard", x)
+						}
+					} else {
+						lowerNew, x := z.Equal(&c.lower.num, wanted)
+						serviceMust(t, x)
+						if !lowerNew || c.upper.num.cell != z.failedRef || c.upper.num.val != wanted.val || c.upper.k != 0 {
+							t.Fatal("completed lower precedes upper allocation publication", op, prefix, c)
+						}
+						if x := z.check(&c.upper.num); !errors.Is(x, arena.ErrInvalidSlot) {
+							t.Fatal("failed upper read guard", x)
+						}
 					}
 				}
 				if e != nil {

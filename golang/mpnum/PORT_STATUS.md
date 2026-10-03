@@ -1,3 +1,7 @@
+<!-- Historical packet evidence follows. The MPZ source-publication follow-up
+     supersedes earlier fixed scratch-count and automatic retry claims.
+     Higher-level staged wrappers remain explicit fidelity work. -->
+
 # Numeric foundation packet
 
 This file is a chronological packet log: later entries and the current
@@ -172,11 +176,13 @@ manager is prohibited. Owner identity is not embedded; matching numeric bits
 from different managers cannot detect foreign use. A future public wrapper must
 validate owning context. Copy here traverses one owner's source cells; a future
 explicit cross-owner copy must traverse the source service. Confinement replaces
-OpenMP locking. Errors during allocation preserve destinations: fresh storage
-is allocated before old cells are dropped, and replacement scratch is reserved
-before publication. This differs from C++ failure behavior but prevents partial
-publication under the plan's injected budget failures. Failed allocations may
-retain reusable arena capacity; Close proves complete budget release.
+OpenMP locking. Selected allocation/publication routes now preserve the C++
+action prefix: insufficient scratch and big-set destination cells are freed
+before replacement allocation; result setters publish before replenishing
+missing scratch. ensure_capacity separately retains old storage until replacement.
+Failed destination pointers become owned, permanently dead descriptor tokens
+with guarded reads and explicit cleanup. No automatic scratch repair or retry
+is promised. See ../MPZ_SOURCE_PUBLICATION_PORT_STATUS.md.
 
 MPZ persistent cells, payloads and manager scratch cells are accounted by arena
 budgets. Cold owner headers, MPN reusable scratch, and String's local copied
@@ -244,14 +250,12 @@ metadata share the manager's arena budget. This resolves MPZ division scratch
 budgeting; standalone NaturalManager scratch, String formatting, and cold header
 budgets remain unresolved as previously recorded.
 
-Storage failure adaptation: paired quot/rem preallocates replacement scratch
-before either result publication, and Mul publishes only after capacity is ready.
-Div/Mod stage owner-local numerals until all adjustment allocations succeed,
-then Move commits the result. Every staged numeral is explicitly deleted on
-failure. Staging increases peak owned cells/capacity and changes physical
-allocation/deletion timing from C++; no allocation-profile equivalence is claimed.
-The source divisor/output reread is emulated using staged work when c==b, so
-normal arithmetic and the source alias defects below remain exactly observable.
+Source publication follow-up: paired quot/rem publishes the quotient before the
+remainder, without preallocating replacement scratch. Mul publishes its result
+before replenishing scratch. Div/Mod mutate the caller destination and reread
+aliases at the actual source adjustment action. Source undefined failure states
+receive guarded Go cleanup; valid completed results remain readable. Source
+allocator topology and exact malloc profiles are still open.
 Division by zero returns classified ErrDivideByZero and leaves destinations unchanged;
 source division by zero has no valid mathematical contract (native undefined
 arithmetic/unreachable paths). This explicit development error is not UNKNOWN.
@@ -272,9 +276,11 @@ scratch capacity and complete Close budget release are explicitly asserted.
 
 Predictable failure sweeps: 32 paired-division reservation positions; 2 Euclidean
 operations x 3 destination shapes x 40 reservation positions; 3 multiplication
-destination shapes x 16 positions. Every failure preserves destinations and alias
-inputs, retains no extra live numeric cell, retries to the exact expected result,
-and releases its whole budget on Close. These are finite deterministic injected
+destination shapes x 16 positions. The reconciled tests audit independently
+named live cells and Words before formatting or teardown, including transferred
+results, freed scratch and guarded failed tokens. Successful endpoints retain
+the exact arithmetic oracle; failure paths do not require implicit scratch
+repair. Close releases the whole charged graph. These are finite deterministic injected
 budget checks, not claims about arbitrary Go runtime OOM/cancellation recovery.
 
 Known preserved source alias defects (independently derived from executable

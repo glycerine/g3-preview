@@ -262,8 +262,11 @@ func TestIntegerFailureCleanup(t *testing.T) {
 		t.Fatal(err)
 	}
 	budget.FailAfter(-1)
-	if integerString(t, m, &a) != "17" || m.cells.Stats().Live != before {
-		t.Fatal("failed set published or leaked cell")
+	if a.val != 1 || a.cell != m.failedRef || m.cells.Stats().Live != before {
+		t.Fatal("source digit setter sign/failure token or roots", a)
+	}
+	if _, e := m.Int64(&a); e != arena.ErrInvalidSlot {
+		t.Fatal("failed source pointer read", e)
 	}
 	m.Close()
 	if _, e := m.String(&a); !errors.Is(e, arena.ErrClosed) {
@@ -283,8 +286,11 @@ func TestIntegerFailurePublication(t *testing.T) {
 		err := m.SetLimbs(&a, digits)
 		budget.FailAfter(-1)
 		if err != nil {
-			if integerString(t, m, &a) != "17" || m.cells.Stats().Live != before || m.words.Stats().Live != beforeWords {
-				t.Fatalf("allocation failure %d published or leaked", after)
+			if a.val != 1 || a.cell != m.failedRef || m.cells.Stats().Live != before || m.words.Stats().Live != beforeWords {
+				t.Fatalf("source allocation failure %d sign/token/roots", after)
+			}
+			if _, e := m.Int64(&a); e != arena.ErrInvalidSlot {
+				t.Fatal("invalid source publication read", e)
 			}
 		}
 	}
@@ -292,15 +298,26 @@ func TestIntegerFailurePublication(t *testing.T) {
 	out := NewInt(17)
 	one := NewInt(1)
 	budget.FailAfter(0)
-	// A big result into a small destination requires replacing the transferred
-	// manager scratch before publication. Inject failure in that replacement.
+	// mpz.cpp:274–279 publishes the big result before requesting missing
+	// scratch. Failure leaves a valid output and an empty manager scratch.
 	err := m.Add(&m.two64, &one, &out)
-	budget.FailAfter(-1)
-	if !errors.Is(err, arena.ErrInjectedFailure) || integerString(t, m, &out) != "17" {
-		t.Fatal("failed Add published output", err)
+	if !errors.Is(err, arena.ErrInjectedFailure) || out.cell == 0 || out.val != 1 || m.tmp[0] != 0 || m.cell(out.cell).size != 3 || m.digit(out.cell, 0) != 1 || m.digit(out.cell, 2) != 1 {
+		t.Fatal("source Add publication prefix", err)
 	}
+	if e := m.Add(&m.two64, &one, &out); e != arena.ErrInvalidSlot {
+		t.Fatal("missing scratch guard", e)
+	}
+	budget.FailAfter(-1)
+	if integerString(t, m, &out) != "18446744073709551617" {
+		t.Fatal("published result mathematics")
+	}
+	m.Close()
+	// Retain the original successful mathematical assertion on a fresh owner;
+	// native source does not provide a retry contract for its dangling scratch.
+	m, _ = integerManager(t)
+	out = NewInt(17)
 	if err = m.Add(&m.two64, &one, &out); err != nil || integerString(t, m, &out) != "18446744073709551617" {
-		t.Fatal("failed scratch cannot be reused", err)
+		t.Fatal("source successful Add", err)
 	}
 }
 

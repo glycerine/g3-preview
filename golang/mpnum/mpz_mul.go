@@ -28,7 +28,9 @@ func (m *IntegerManager) Mul(a, b, c *Int) error {
 	if e := m.ensureTmp(0, uint32(size)); e != nil {
 		return e
 	}
-	m.resizeCell(m.tmp[0], uint32(size))
+	if e := m.prepareTmpSpan(0, uint32(size)); e != nil {
+		return e
+	}
 	m.multiplyCells(ca, cb, m.tmp[0])
 	sign := int32(1)
 	if sa != sb {

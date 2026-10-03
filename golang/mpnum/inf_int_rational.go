@@ -179,10 +179,16 @@ func (s *RationalService) InfIntMinusOne() (OwnedInfIntRational, error) {
 	return s.copyInfInt(&s.infIntMinusOne)
 }
 func (s *RationalService) InfIntDel(v *OwnedInfIntRational) error {
-	if e := s.lockInfInt(v); e != nil {
+	if e := s.lock(); e != nil {
 		return e
 	}
 	defer s.mu.Unlock()
+	if v == nil || v.ownerID == 0 || v.ownerID != s.ownerID {
+		return ErrRationalServiceOwner
+	}
+	if e := s.manager.checkCleanup(&v.first); e != nil {
+		return e
+	}
 	if e := s.manager.Del(&v.first); e != nil {
 		return e
 	}

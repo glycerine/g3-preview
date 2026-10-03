@@ -171,17 +171,24 @@ func TestBinaryVectorFailurePrefixesAndScopedRoutes(t *testing.T) {
 		serviceMust(t, v.Push(&a))
 		b.FailAfter(prefix)
 		e = v.Push(&a)
-		b.FailAfter(-1)
 		roots := []*BinaryRational{&a}
 		for i := range v.data {
 			roots = append(roots, &v.data[i])
 		}
 		binaryAudit(t, m, roots...)
+		b.FailAfter(-1)
 		if e != nil && v.Size() != 2 && v.Size() != 3 {
 			t.Fatal(prefix, v.Size(), e)
 		}
-		if v.Size() == 3 && e != nil && v.data[2].num.cell != 0 {
-			t.Fatal("source default publication")
+		if v.Size() == 3 && e != nil {
+			// The vector publishes its default element before integer Copy;
+			// Copy publishes sign and failed allocation identity before k.
+			if v.data[2].num.cell != m.z.failedRef || v.data[2].num.val != a.num.val || v.data[2].k != 0 {
+				t.Fatal("source integer-copy publication", prefix, v.data[2])
+			}
+			if x := m.z.check(&v.data[2].num); !errors.Is(x, arena.ErrInvalidSlot) {
+				t.Fatal("failed numeral remains unreadable", x)
+			}
 		}
 		serviceMust(t, v.Close())
 		serviceMust(t, m.Del(&a))

@@ -263,7 +263,6 @@ func TestIntegerFacadeDupIncDecFailureRoots(t *testing.T) {
 			case 2:
 				copy, e = m.Dup(&a)
 			}
-			b.FailAfter(-1)
 			if e != nil {
 				failures++
 				if !errors.Is(e, arena.ErrInjectedFailure) {
@@ -277,9 +276,7 @@ func TestIntegerFacadeDupIncDecFailureRoots(t *testing.T) {
 						t.Fatal("failed mutation")
 					}
 				}
-				if m.cells.Stats().Live != baseline {
-					t.Fatal("lost temporary before Close", op, prefix)
-				}
+				mpzPublicationAudit(t, m, &a, &copy)
 			} else {
 				complete = true
 				if op == 2 {
@@ -290,6 +287,7 @@ func TestIntegerFacadeDupIncDecFailureRoots(t *testing.T) {
 					t.Fatal("Inc/Dec roots")
 				}
 			}
+			b.FailAfter(-1)
 			m.Del(&a)
 			m.Del(&copy)
 			m.Close()

@@ -339,8 +339,6 @@ func TestIntegerRootAndSquareFailureCleanup(t *testing.T) {
 						dst = &a
 					}
 					inputBefore, outputBefore := integerString(t, m, &a), integerString(t, m, dst)
-					live := m.cells.Stats().Live
-					wordsLive := m.words.Stats().Live
 					b.FailAfter(fault)
 					var exact bool
 					var e error
@@ -352,12 +350,10 @@ func TestIntegerRootAndSquareFailureCleanup(t *testing.T) {
 					case 2:
 						exact, e = m.IsPerfectSquare(&a, dst)
 					}
-					b.FailAfter(-1)
 					if e != nil {
 						// Inspect live ownership BEFORE String or Close can run.
-						if m.cells.Stats().Live != live || m.words.Stats().Live != wordsLive {
-							t.Fatal("immediate root ownership", operation, alias, bigOutput, fault, m.cells.Stats().Live, live, m.words.Stats().Live, wordsLive)
-						}
+						qopsAuditLiveOwnership(t, &RationalManager{z: m}, []*Int{&a, &out})
+						b.FailAfter(-1)
 						failures++
 						if !errors.Is(e, arena.ErrInjectedFailure) {
 							t.Fatal(operation, alias, fault, e)
@@ -367,6 +363,7 @@ func TestIntegerRootAndSquareFailureCleanup(t *testing.T) {
 							t.Fatal("root publication/temporary leak", operation, alias, fault)
 						}
 					} else {
+						b.FailAfter(-1)
 						completed = true
 						want, p := rootOracle(large, 2)
 						if operation == 2 && alias {
@@ -420,8 +417,6 @@ func TestRationalRootSquareFailureCleanup(t *testing.T) {
 							dst = &a
 						}
 						beforeA, beforeOut := rationalString(t, m, &a), rationalString(t, m, dst)
-						live := m.z.cells.Stats().Live
-						wordsLive := m.z.words.Stats().Live
 						b.FailAfter(fault)
 						var precise bool
 						var e error
@@ -433,19 +428,18 @@ func TestRationalRootSquareFailureCleanup(t *testing.T) {
 						case 2:
 							precise, e = m.IsIntPerfectSquare(&a, dst)
 						}
-						b.FailAfter(-1)
 						if e != nil {
 							// These source branches do not normalize; no cached
 							// rational GCD may legitimately add a live cell here.
 							// Check BEFORE formatter or blanket owner Close.
-							if m.z.cells.Stats().Live != live || m.z.words.Stats().Live != wordsLive {
-								t.Fatal("immediate rational root ownership", synch, op, alias, bigOutput, fault, m.z.cells.Stats().Live, live, m.z.words.Stats().Live, wordsLive)
-							}
+							qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &out.num, &out.den})
+							b.FailAfter(-1)
 							failed = true
 							if !errors.Is(e, arena.ErrInjectedFailure) || rationalString(t, m, &a) != beforeA || rationalString(t, m, dst) != beforeOut {
 								t.Fatal("rational root publication", synch, op, alias, fault, e)
 							}
 						} else {
+							b.FailAfter(-1)
 							completed = true
 							if op != 0 && alias {
 								if !precise || rationalString(t, m, dst) != "0" {

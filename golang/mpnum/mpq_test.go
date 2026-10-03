@@ -417,22 +417,20 @@ func TestRationalArithmeticFailureCleanup(t *testing.T) {
 					}
 					budget.FailAfter(after)
 					err := call()
+					qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &b.num, &b.den, &out.num, &out.den})
 					budget.FailAfter(-1)
 					if err != nil {
 						failures++
 						if !errors.Is(err, arena.ErrInjectedFailure) || rationalString(t, m, &a) != ar.RatString() || rationalString(t, m, &b) != br.RatString() || rationalString(t, m, &out) != "17" {
 							t.Fatal("failed rational operation changed destination/input", synch, op, alias, after, err)
 						}
-						// Reusable unsynchronized caches may own additional live cells on failure;
-						// Close must reclaim those, while no partial value escapes to an operand.
-						if err = call(); err != nil {
-							t.Fatal("retry", err)
-						}
+						// Source TMP can be transferred before its replacement allocation
+						// fails. No implicit scratch repair or retry contract exists.
 					} else {
 						successes++
 					}
-					if rationalString(t, m, dst) != want.RatString() {
-						t.Fatal("retried rational result", synch, op, alias, after)
+					if err == nil && rationalString(t, m, dst) != want.RatString() {
+						t.Fatal("successful rational result", synch, op, alias, after)
 					}
 					m.Close()
 					if budget.Used() != 0 {
@@ -475,14 +473,12 @@ func TestRationalCopySetterFailureCleanup(t *testing.T) {
 				}
 				budget.FailAfter(after)
 				err := call()
+				qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &out.num, &out.den, &numerator, &denominator})
 				budget.FailAfter(-1)
 				if err != nil {
 					failures++
 					if !errors.Is(err, arena.ErrInjectedFailure) || rationalString(t, m, &out) != "17" {
 						t.Fatal("failed rational setter published", synch, op, after, err)
-					}
-					if e := call(); e != nil {
-						t.Fatal(e)
 					}
 				} else {
 					successes++
@@ -491,7 +487,7 @@ func TestRationalCopySetterFailureCleanup(t *testing.T) {
 				if op == 2 {
 					want.SetFrac(big.NewInt(math.MinInt64), new(big.Int).SetUint64(math.MaxUint64))
 				}
-				if rationalString(t, m, &out) != want.RatString() {
+				if err == nil && rationalString(t, m, &out) != want.RatString() {
 					t.Fatal(op, after)
 				}
 				m.Close()
@@ -559,20 +555,18 @@ func TestRationalColdSetterFailureCleanup(t *testing.T) {
 			out := NewRational()
 			budget.FailAfter(after)
 			err := m.SetFraction(&out, math.MinInt64, math.MaxUint64)
+			qopsAuditLiveOwnership(t, m, []*Int{&out.num, &out.den})
 			budget.FailAfter(-1)
 			if err != nil {
 				failures++
 				if !errors.Is(err, arena.ErrInjectedFailure) || rationalString(t, m, &out) != "0" {
 					t.Fatal(after, err)
 				}
-				if err = m.SetFraction(&out, math.MinInt64, math.MaxUint64); err != nil {
-					t.Fatal(err)
-				}
 			} else {
 				successes++
 			}
 			want := new(big.Rat).SetFrac(big.NewInt(math.MinInt64), new(big.Int).SetUint64(math.MaxUint64))
-			if rationalString(t, m, &out) != want.RatString() {
+			if err == nil && rationalString(t, m, &out) != want.RatString() {
 				t.Fatal(after)
 			}
 			m.Close()

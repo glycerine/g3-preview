@@ -194,21 +194,25 @@ func TestIntegerGCDFailureCleanup(t *testing.T) {
 			if alias == 2 {
 				dst = &b
 			}
-			live := m.cells.Stats().Live
 			budget.FailAfter(after)
 			err := m.GCD(&a, &b, dst)
-			budget.FailAfter(-1)
 			if err != nil {
 				failures++
-				if !errors.Is(err, arena.ErrInjectedFailure) || integerString(t, m, &a) != x.String() || integerString(t, m, &b) != y.String() || out.val != 17 || out.cell != 0 || m.cells.Stats().Live != live {
-					t.Fatal("failed gcd changed destination/leaked", alias, after, err)
+				if !errors.Is(err, arena.ErrInjectedFailure) {
+					t.Fatal(alias, after, err)
 				}
-				if e := m.GCD(&a, &b, dst); e != nil {
-					t.Fatal("retry", e)
+				// Source big_set/result setters may complete publication before failure.
+				mpzPublicationAudit(t, m, &a, &b, &out)
+				budget.FailAfter(-1)
+				m.Close()
+				if budget.Used() != 0 {
+					t.Fatal("failed source roots leaked", budget.Used())
 				}
+				continue
 			} else {
 				successes++
 			}
+			budget.FailAfter(-1)
 			if integerString(t, m, dst) != "1" {
 				t.Fatal("gcd fibonacci", alias, after)
 			}
@@ -261,7 +265,6 @@ func TestIntegerAddMulSubMulFailureCleanup(t *testing.T) {
 				if alias == 3 {
 					dst = &c
 				}
-				live := m.cells.Stats().Live
 				budget.FailAfter(after)
 				var err error
 				if sub {
@@ -269,23 +272,23 @@ func TestIntegerAddMulSubMulFailureCleanup(t *testing.T) {
 				} else {
 					err = m.AddMul(&a, &b, &c, dst)
 				}
-				budget.FailAfter(-1)
 				if err != nil {
 					failures++
-					if !errors.Is(err, arena.ErrInjectedFailure) || integerString(t, m, &a) != av.String() || integerString(t, m, &b) != bv.String() || integerString(t, m, &c) != cv.String() || out.val != 17 || out.cell != 0 || m.cells.Stats().Live != live {
-						t.Fatal("failed fused operation published/leaked", sub, alias, after, err)
+					if !errors.Is(err, arena.ErrInjectedFailure) {
+						t.Fatal(alias, after, err)
 					}
-					if sub {
-						err = m.SubMul(&a, &b, &c, dst)
-					} else {
-						err = m.AddMul(&a, &b, &c, dst)
+					// Source big_set/result setters may complete publication before failure.
+					mpzPublicationAudit(t, m, &a, &b, &c, &out)
+					budget.FailAfter(-1)
+					m.Close()
+					if budget.Used() != 0 {
+						t.Fatal("failed source roots leaked", budget.Used())
 					}
-					if err != nil {
-						t.Fatal(err)
-					}
+					continue
 				} else {
 					successes++
 				}
+				budget.FailAfter(-1)
 				if integerString(t, m, dst) != expected.String() {
 					t.Fatal("fused operation", sub, alias, after)
 				}

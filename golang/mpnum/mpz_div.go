@@ -93,32 +93,19 @@ func (m *IntegerManager) Div(a, b, c *Int) error {
 		}
 	}
 	if a.val < 0 {
-		// Owner-local staged values preserve outputs on predictable allocation
-		// failures. Source branch operands are unchanged except that c==b reads
-		// the quotient work value, emulating the source's overwritten divisor.
-		var work, tmp Int
-		defer m.Del(&work)
-		defer m.Del(&tmp)
-		if e := m.MachineDivRem(a, b, &work, &tmp); e != nil {
+		var tmp Int
+		defer m.Del(&tmp) // explicit Go cleanup on failed source actions
+		if e := m.MachineDivRem(a, b, c, &tmp); e != nil {
 			return e
-		}
-		divisor := b
-		if c == b {
-			divisor = &work
 		}
 		if tmp.val != 0 {
 			one := NewInt(1)
-			var e error
-			if divisor.val < 0 {
-				e = m.Add(&work, &one, &work)
-			} else {
-				e = m.Sub(&work, &one, &work)
+			if b.val < 0 {
+				return m.Add(c, &one, c)
 			}
-			if e != nil {
-				return e
-			}
+			return m.Sub(c, &one, c)
 		}
-		return m.Move(c, &work)
+		return nil
 	}
 	return m.MachineDiv(a, b, c)
 }
@@ -131,27 +118,16 @@ func (m *IntegerManager) Mod(a, b, c *Int) error {
 			return e
 		}
 	}
-	var work Int
-	defer m.Del(&work)
-	if e := m.Rem(a, b, &work); e != nil {
+	if e := m.Rem(a, b, c); e != nil {
 		return e
 	}
-	divisor := b
-	if c == b {
-		divisor = &work
-	}
-	if work.val < 0 {
-		var e error
-		if divisor.val > 0 {
-			e = m.Add(&work, divisor, &work)
-		} else {
-			e = m.Sub(&work, divisor, &work)
+	if c.val < 0 {
+		if b.val > 0 {
+			return m.Add(c, b, c)
 		}
-		if e != nil {
-			return e
-		}
+		return m.Sub(c, b, c)
 	}
-	return m.Move(c, &work)
+	return nil
 }
 
 func (m *IntegerManager) normalizedTmpSize(idx int, size uint32) uint32 {
@@ -159,13 +135,6 @@ func (m *IntegerManager) normalizedTmpSize(idx int, size uint32) uint32 {
 		size--
 	}
 	return size
-}
-func (m *IntegerManager) replacementForTmp(idx int, dst *Int, size uint32) (numericCellRef, error) {
-	size = m.normalizedTmpSize(idx, size)
-	if dst.cell != 0 || size == 0 || size == 1 && m.digit(m.tmp[idx], 0) <= math.MaxInt32 {
-		return 0, nil
-	}
-	return m.allocate(6, 0)
 }
 func (m *IntegerManager) quotRemCore(a, b, q, r *Int, mode int) error {
 	sa, ca := m.signCell(a, 0)
@@ -189,42 +158,26 @@ func (m *IntegerManager) quotRemCore(a, b, q, r *Int, mode int) error {
 	if e := m.ensureTmp(1, rsize); e != nil {
 		return e
 	}
-	m.resizeCell(m.tmp[0], qsize)
-	m.resizeCell(m.tmp[1], rsize)
-	if e := m.divideCells(ca, cb); e != nil {
+	if e := m.prepareTmpSpan(0, qsize); e != nil {
 		return e
 	}
-	var qreplacement, rreplacement numericCellRef
-	var e error
-	if mode != remainderOnly {
-		qreplacement, e = m.replacementForTmp(0, q, qsize)
-		if e != nil {
-			return e
-		}
+	if e := m.prepareTmpSpan(1, rsize); e != nil {
+		return e
 	}
-	if mode != quotientOnly {
-		rreplacement, e = m.replacementForTmp(1, r, rsize)
-		if e != nil {
-			if qreplacement != 0 {
-				m.free(qreplacement)
-			}
-			return e
-		}
+	if e := m.divideCells(ca, cb); e != nil {
+		return e
 	}
 	sign := int32(1)
 	if sa != sb {
 		sign = -1
 	}
 	if mode != remainderOnly {
-		if e = m.publishTmpAt(0, q, sign, qsize, qreplacement); e != nil {
-			if rreplacement != 0 {
-				m.free(rreplacement)
-			}
+		if e := m.publishTmpAt(0, q, sign, qsize); e != nil {
 			return e
 		}
 	}
 	if mode != quotientOnly {
-		return m.publishTmpAt(1, r, sa, rsize, rreplacement)
+		return m.publishTmpAt(1, r, sa, rsize)
 	}
 	return nil
 }

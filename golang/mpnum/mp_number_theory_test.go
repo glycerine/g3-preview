@@ -311,6 +311,21 @@ func TestNumberTheoryRationalResetPrefixAndOutputAliasing(t *testing.T) {
 	qopsMust(t, m.SetInt64(&r1, -26))
 	qopsMust(t, m.SetInt64(&r2, 7))
 	e = m.ExtendedGCD(&r1, &r2, &r1, &b, &g)
+	qopsAuditLiveOwnership(t, m, []*Int{&r1.num, &r1.den, &r2.num, &r2.den, &a.num, &a.den, &b.num, &b.den, &g.num, &g.den})
+	if !errors.Is(e, arena.ErrInvalidSlot) {
+		t.Fatal("destroyed source scratch is not repaired on continuation", e)
+	}
+	for _, q := range []*Rational{&r1, &r2, &a, &b, &g} {
+		qopsMust(t, m.Del(q))
+	}
+	// The source alias arithmetic remains tested independently of the owner
+	// whose failed allocation destroyed a scratch buffer.
+	m, _ = rationalManager(t, true)
+	r1, r2, a, b, g = NewRational(), NewRational(), NewRational(), NewRational(), NewRational()
+	qopsMust(t, m.SetInt64(&r1, -26))
+	qopsMust(t, m.SetInt64(&r2, 7))
+	qopsMust(t, m.SetInt64(&g, 23))
+	e = m.ExtendedGCD(&r1, &r2, &r1, &b, &g)
 	wantG := "1"
 	if sourceExtendedGCDDebug {
 		if !errors.Is(e, errExtendedGCDInvariant) {

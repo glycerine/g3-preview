@@ -7,6 +7,7 @@ import (
 	"errors"
 	"github.com/glycerine/g3/golang/arena"
 	"github.com/glycerine/g3/golang/mpnum"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -57,15 +58,9 @@ func TestSexprDebugBVComparisonFailureRoots(t *testing.T) {
 			filler[i], _ = q.NewValue()
 			sxMust(t, q.Copy(&filler[i], &c))
 		}
-		before, e := q.Stats()
-		sxMust(t, e)
 		b.FailAfter(prefix)
-		e = m.sexprBVDiagnostic(&c, 16)
-		after, err := q.Stats()
-		sxMust(t, err)
-		if before.LiveCells != after.LiveCells || before.LivePayloads != after.LivePayloads {
-			t.Fatal("debug comparison temp leak", prefix, before, after)
-		}
+		e := m.sexprBVDiagnostic(&c, 16)
+		sexprAuditNumericRoots(t, q, &c, filler[:])
 		if e != nil {
 			if !errors.Is(e, arena.ErrInjectedFailure) {
 				t.Fatal(e)
@@ -91,5 +86,78 @@ func TestSexprDebugBVComparisonFailureRoots(t *testing.T) {
 	}
 	if !success || failures == 0 {
 		t.Fatal(success, failures)
+	}
+}
+
+// Enumerate known source roots, not live allocations. Reflection reads only
+// scalar test diagnostics; production does not expose or box numeric records.
+func sexprAuditNumericRoots(t *testing.T, q *mpnum.RationalService, value *mpnum.OwnedRational, filler []mpnum.OwnedRational) {
+	t.Helper()
+	service := reflect.ValueOf(q).Elem()
+	manager := service.FieldByName("manager").Elem()
+	integer := manager.FieldByName("z").Elem()
+	failed := integer.FieldByName("failedRef").Uint()
+	cells := make(map[uint64]bool)
+	add := func(ref uint64) {
+		if ref != 0 && ref != failed {
+			cells[ref] = true
+		}
+	}
+	var numeral func(reflect.Value)
+	numeral = func(v reflect.Value) {
+		if v.Kind() != reflect.Struct {
+			return
+		}
+		if r := v.FieldByName("cell"); r.IsValid() {
+			add(r.Uint())
+			return
+		}
+		for i := 0; i < v.NumField(); i++ {
+			numeral(v.Field(i))
+		}
+	}
+	for _, name := range []string{"tmp", "arg"} {
+		v := integer.FieldByName(name)
+		for i := 0; i < v.Len(); i++ {
+			add(v.Index(i).Uint())
+		}
+	}
+	for _, name := range []string{"intMin", "two64"} {
+		numeral(integer.FieldByName(name))
+	}
+	for _, name := range []string{"nTmp", "addTmp1", "addTmp2", "addMulTmp", "ltTmp1", "ltTmp2"} {
+		numeral(manager.FieldByName(name))
+	}
+	for _, name := range []string{"zero", "one", "minusOne", "infZero", "infOne", "infMinusOne", "infIntZero", "infIntOne", "infIntMinusOne"} {
+		numeral(service.FieldByName(name))
+	}
+	cache := service.FieldByName("cache")
+	for i := 0; i < cache.Len(); i++ {
+		numeral(cache.Index(i))
+	}
+	public := func(v *mpnum.OwnedRational) {
+		if _, e := q.IsNeg(v); e != nil {
+			t.Fatal("invalid public comparison root", e)
+		}
+		numeral(reflect.ValueOf(v).Elem())
+	}
+	public(value)
+	for i := range filler {
+		public(&filler[i])
+	}
+	natural := integer.FieldByName("natural").Elem()
+	payloads := uint32(len(cells))
+	for _, name := range []string{"divScratch", "formatScratch"} {
+		refs := natural.FieldByName(name)
+		for i := 0; i < refs.Len(); i++ {
+			if refs.Index(i).FieldByName("Slot").Uint() != 0 {
+				payloads++
+			}
+		}
+	}
+	stats, e := q.Stats()
+	sxMust(t, e)
+	if stats.LiveCells != uint32(len(cells)) || stats.LivePayloads != payloads {
+		t.Fatal("unnamed debug comparison root", stats, len(cells), payloads)
 	}
 }

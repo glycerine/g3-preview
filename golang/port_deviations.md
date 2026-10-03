@@ -144,3 +144,15 @@ Scalar identities replace machine addresses in budgeted prefix rendering with
 host-int bounds. Int32 suppressed callbacks expose no invented value service;
 actual AST/dependency/bound callbacks and diagnostics remain open.
 See PARRAY_PORT_STATUS.md.
+
+### Integer allocation and publication prefixes
+
+Selected internal MPZ setters and Div/Mod now preserve source old-free, sign,
+result transfer and sequential quotient/remainder publication order. One charged
+retired descriptor represents a failed replacement without changing Int layout;
+reads reject it, while owner-qualified Del/Reset clear it and release live
+companions. Missing scratch is guarded at its next actual access and is not
+automatically repaired. Wrapped finite allocations occur before the guarded
+undersized span access. These Go continuations do not claim C++ exception
+recovery. Source small-object allocator topology, global memory events and
+higher-level staged wrappers remain open. See MPZ_SOURCE_PUBLICATION_PORT_STATUS.md.

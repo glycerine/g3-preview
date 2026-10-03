@@ -44,6 +44,15 @@ func (s *RationalService) infCheck(v *OwnedInfRational) error {
 	}
 	return s.manager.check(&v.second)
 }
+func (s *RationalService) infCheckCleanup(v *OwnedInfRational) error {
+	if v == nil || v.ownerID == 0 || v.ownerID != s.ownerID {
+		return ErrRationalServiceOwner
+	}
+	if e := s.manager.checkCleanup(&v.first); e != nil {
+		return e
+	}
+	return s.manager.checkCleanup(&v.second)
+}
 func (s *RationalService) infEmpty() OwnedInfRational {
 	return OwnedInfRational{first: NewRational(), second: NewRational(), ownerID: s.ownerID}
 }
@@ -96,7 +105,7 @@ func (s *RationalService) InfDel(v *OwnedInfRational) error {
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infCheckCleanup(v); e != nil {
 		return e
 	}
 	s.infDestroy(v)

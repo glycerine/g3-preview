@@ -286,7 +286,7 @@ func TestRationalServiceExtraFailurePrefixesAndOwnership(t *testing.T) {
 			// next source constructor actually requires a budget reservation.
 			var bank []OwnedRational
 			if op == 9 || op == 10 {
-				for s.manager.z.cells.Stats().Live < s.manager.z.cells.Stats().Slots {
+				for s.manager.z.cells.Stats().Live+s.manager.z.cells.Stats().Retired < s.manager.z.cells.Stats().Slots {
 					v, e := s.NewValue()
 					serviceMust(t, e)
 					serviceMust(t, s.Copy(&v, &a))
