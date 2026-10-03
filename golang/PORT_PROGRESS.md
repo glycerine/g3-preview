@@ -302,3 +302,18 @@ New APIs went RED before implementation. Isolated full native and checked JS
 module tests, native/checked tests, races, vet, source audit and WASI compilation
 pass. Other table specializations, string-to-int map and enabled statistics remain
 open; the full solver objective is unchanged.
+
+## Scoped symbol-to-int32 bindings
+
+SymbolInt32Table now ports all ten source assertions and every declared source
+method for int32: nested trails, reverse undo, append and domain/range traversal.
+Source dynamic symbol hashes, physical tombstones/inactive data, strict growth
+and cleanup, scoped overwrite bypass and vector capacities are preserved.
+Allocating undo/append use fully charged physical staging; source-compatible
+warm paths allocate nothing. A review regression first failed for empty
+high-occupancy scope undo, then passed after its unnecessary staging was removed.
+
+All15 tests pass in isolated full native/checked/checked-JS modules, race and vet;
+WASI builds and combined module gates pass. Synthesized copy operations and other
+payloads remain open, so the source header stays partial. Parser/AST integration
+and the full solver objective remain open.

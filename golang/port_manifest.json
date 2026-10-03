@@ -82439,9 +82439,27 @@
       "sha256": "ba72eb9b1ae2aa8fd66adfbd340ccb8d8f4eb01405a893ed3a6e24c6829b8321",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "util_symbol_table_test.go"
+      ],
+      "tests": [
+        "TestSymbolInt32TableColdMutex",
+        "TestSymbolInt32TableSourceAssertions",
+        "TestSymbolInt32TableIndependentScopes",
+        "TestSymbolInt32TableHashPolicyAndTrail",
+        "TestSymbolInt32TableAppendAndSentinels",
+        "TestSymbolInt32TableBudgetFailureAndWarm",
+        "TestSymbolInt32TablePhysicalBucketsAndReset",
+        "TestSymbolInt32TableStagedFailureAtomicity",
+        "TestSymbolInt32TableVectorCapacitiesAndBudgetPeaks",
+        "TestSymbolInt32TableCleanupFailureAndDynamicHash",
+        "TestSymbolInt32TableAppendFaultSweepAndPeak",
+        "TestSymbolInt32TableExactUndoPeakBudget",
+        "TestSymbolInt32TablePreparedGrowthAndWarmAppend",
+        "TestSymbolInt32TableConstructorAndSourceGuards",
+        "TestSymbolInt32TableHighOccupancyNoGrowthScopes"
+      ],
       "assertions": [
         {
           "line": 24,
@@ -82484,11 +82502,24 @@
           "text": "ENSURE(!t.contains(symbol(\"foo\")));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "tst_symbol_table all ten ENSURE assertions",
+          "status": "ported",
+          "go_target": "util_symbol_table_test.go",
+          "tests": [
+            "TestSymbolInt32TableSourceAssertions"
+          ]
+        }
+      ],
+      "ownership": [
+        "Owner-local SymbolManager and concrete int32 table replace source global spelling cache and template; all test fixtures close owners."
+      ],
+      "deviations": [
+        "Independent scope/bucket oracles and predictable failure tests supplement original assertions."
+      ]
     },
     {
       "path": "src/test/tbv.cpp",
@@ -85717,7 +85748,8 @@
       "go_targets": [
         "utilhash/uint_map.go",
         "bitset/uint_set_map.go",
-        "utilhash/str_hashtable.go"
+        "utilhash/str_hashtable.go",
+        "util_symbol_table.go"
       ],
       "tests": [
         "TestUintMapSourceMapAssertions",
@@ -85763,7 +85795,22 @@
         "TestStrHashtableMultiOriginFailureOrderAndAccounting",
         "TestStrHashtableMultiOriginSwapGraphFailures",
         "TestStrHashtableMultiOriginQueryMethodsAndCollisionOrder",
-        "TestStrHashtableMultiOriginIndependentOracleAndDirectoryPeak"
+        "TestStrHashtableMultiOriginIndependentOracleAndDirectoryPeak",
+        "TestSymbolInt32TableColdMutex",
+        "TestSymbolInt32TableSourceAssertions",
+        "TestSymbolInt32TableIndependentScopes",
+        "TestSymbolInt32TableHashPolicyAndTrail",
+        "TestSymbolInt32TableAppendAndSentinels",
+        "TestSymbolInt32TableBudgetFailureAndWarm",
+        "TestSymbolInt32TablePhysicalBucketsAndReset",
+        "TestSymbolInt32TableStagedFailureAtomicity",
+        "TestSymbolInt32TableVectorCapacitiesAndBudgetPeaks",
+        "TestSymbolInt32TableCleanupFailureAndDynamicHash",
+        "TestSymbolInt32TableAppendFaultSweepAndPeak",
+        "TestSymbolInt32TableExactUndoPeakBudget",
+        "TestSymbolInt32TablePreparedGrowthAndWarmAppend",
+        "TestSymbolInt32TableConstructorAndSourceGuards",
+        "TestSymbolInt32TableHighOccupancyNoGrowthScopes"
       ],
       "conditionals": [
         {
@@ -86190,6 +86237,28 @@
             "TestStrHashtableSourceInitialCapacity",
             "TestStrHashtablePartialRemovalAndStrictReset",
             "TestStrHashtableEpochExhaustion"
+          ]
+        },
+        {
+          "name": "symbol/int32 concrete sentinel hashing/probing/growth/erase/reset and source-order iteration",
+          "status": "ported",
+          "go_target": "util_symbol_table.go",
+          "tests": [
+            "TestSymbolInt32TableColdMutex",
+            "TestSymbolInt32TableSourceAssertions",
+            "TestSymbolInt32TableIndependentScopes",
+            "TestSymbolInt32TableHashPolicyAndTrail",
+            "TestSymbolInt32TableAppendAndSentinels",
+            "TestSymbolInt32TableBudgetFailureAndWarm",
+            "TestSymbolInt32TablePhysicalBucketsAndReset",
+            "TestSymbolInt32TableStagedFailureAtomicity",
+            "TestSymbolInt32TableVectorCapacitiesAndBudgetPeaks",
+            "TestSymbolInt32TableCleanupFailureAndDynamicHash",
+            "TestSymbolInt32TableAppendFaultSweepAndPeak",
+            "TestSymbolInt32TableExactUndoPeakBudget",
+            "TestSymbolInt32TablePreparedGrowthAndWarmAppend",
+            "TestSymbolInt32TableConstructorAndSourceGuards",
+            "TestSymbolInt32TableHighOccupancyNoGrowthScopes"
           ]
         }
       ],
@@ -102299,9 +102368,27 @@
       "sha256": "ebb97249e3df7344be8926974cc3fbee266cf2d802bbbb456b536b262862a38a",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_symbol_table.go"
+      ],
+      "tests": [
+        "TestSymbolInt32TableColdMutex",
+        "TestSymbolInt32TableSourceAssertions",
+        "TestSymbolInt32TableIndependentScopes",
+        "TestSymbolInt32TableHashPolicyAndTrail",
+        "TestSymbolInt32TableAppendAndSentinels",
+        "TestSymbolInt32TableBudgetFailureAndWarm",
+        "TestSymbolInt32TablePhysicalBucketsAndReset",
+        "TestSymbolInt32TableStagedFailureAtomicity",
+        "TestSymbolInt32TableVectorCapacitiesAndBudgetPeaks",
+        "TestSymbolInt32TableCleanupFailureAndDynamicHash",
+        "TestSymbolInt32TableAppendFaultSweepAndPeak",
+        "TestSymbolInt32TableExactUndoPeakBudget",
+        "TestSymbolInt32TablePreparedGrowthAndWarmAppend",
+        "TestSymbolInt32TableConstructorAndSourceGuards",
+        "TestSymbolInt32TableHighOccupancyNoGrowthScopes"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -102326,11 +102413,223 @@
           "text": "SASSERT(m_trail_stack.size() == old_size);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "int32 constructor/destructor",
+          "status": "ported",
+          "go_target": "util_symbol_table.go",
+          "tests": [
+            "TestSymbolInt32TableColdMutex",
+            "TestSymbolInt32TableSourceAssertions",
+            "TestSymbolInt32TableIndependentScopes",
+            "TestSymbolInt32TableHashPolicyAndTrail",
+            "TestSymbolInt32TableAppendAndSentinels",
+            "TestSymbolInt32TableBudgetFailureAndWarm",
+            "TestSymbolInt32TablePhysicalBucketsAndReset",
+            "TestSymbolInt32TableStagedFailureAtomicity",
+            "TestSymbolInt32TableVectorCapacitiesAndBudgetPeaks",
+            "TestSymbolInt32TableCleanupFailureAndDynamicHash",
+            "TestSymbolInt32TableAppendFaultSweepAndPeak",
+            "TestSymbolInt32TableExactUndoPeakBudget",
+            "TestSymbolInt32TablePreparedGrowthAndWarmAppend",
+            "TestSymbolInt32TableConstructorAndSourceGuards",
+            "TestSymbolInt32TableHighOccupancyNoGrowthScopes"
+          ]
+        },
+        {
+          "name": "int32 key_data constructors/hash/equality and sentinel hash_entry methods",
+          "status": "ported",
+          "go_target": "util_symbol_table.go",
+          "tests": [
+            "TestSymbolInt32TableColdMutex",
+            "TestSymbolInt32TableSourceAssertions",
+            "TestSymbolInt32TableIndependentScopes",
+            "TestSymbolInt32TableHashPolicyAndTrail",
+            "TestSymbolInt32TableAppendAndSentinels",
+            "TestSymbolInt32TableBudgetFailureAndWarm",
+            "TestSymbolInt32TablePhysicalBucketsAndReset",
+            "TestSymbolInt32TableStagedFailureAtomicity",
+            "TestSymbolInt32TableVectorCapacitiesAndBudgetPeaks",
+            "TestSymbolInt32TableCleanupFailureAndDynamicHash",
+            "TestSymbolInt32TableAppendFaultSweepAndPeak",
+            "TestSymbolInt32TableExactUndoPeakBudget",
+            "TestSymbolInt32TablePreparedGrowthAndWarmAppend",
+            "TestSymbolInt32TableConstructorAndSourceGuards",
+            "TestSymbolInt32TableHighOccupancyNoGrowthScopes"
+          ]
+        },
+        {
+          "name": "int32 reset",
+          "status": "ported",
+          "go_target": "util_symbol_table.go",
+          "tests": [
+            "TestSymbolInt32TableColdMutex",
+            "TestSymbolInt32TableSourceAssertions",
+            "TestSymbolInt32TableIndependentScopes",
+            "TestSymbolInt32TableHashPolicyAndTrail",
+            "TestSymbolInt32TableAppendAndSentinels",
+            "TestSymbolInt32TableBudgetFailureAndWarm",
+            "TestSymbolInt32TablePhysicalBucketsAndReset",
+            "TestSymbolInt32TableStagedFailureAtomicity",
+            "TestSymbolInt32TableVectorCapacitiesAndBudgetPeaks",
+            "TestSymbolInt32TableCleanupFailureAndDynamicHash",
+            "TestSymbolInt32TableAppendFaultSweepAndPeak",
+            "TestSymbolInt32TableExactUndoPeakBudget",
+            "TestSymbolInt32TablePreparedGrowthAndWarmAppend",
+            "TestSymbolInt32TableConstructorAndSourceGuards",
+            "TestSymbolInt32TableHighOccupancyNoGrowthScopes"
+          ]
+        },
+        {
+          "name": "int32 find/contains",
+          "status": "ported",
+          "go_target": "util_symbol_table.go",
+          "tests": [
+            "TestSymbolInt32TableColdMutex",
+            "TestSymbolInt32TableSourceAssertions",
+            "TestSymbolInt32TableIndependentScopes",
+            "TestSymbolInt32TableHashPolicyAndTrail",
+            "TestSymbolInt32TableAppendAndSentinels",
+            "TestSymbolInt32TableBudgetFailureAndWarm",
+            "TestSymbolInt32TablePhysicalBucketsAndReset",
+            "TestSymbolInt32TableStagedFailureAtomicity",
+            "TestSymbolInt32TableVectorCapacitiesAndBudgetPeaks",
+            "TestSymbolInt32TableCleanupFailureAndDynamicHash",
+            "TestSymbolInt32TableAppendFaultSweepAndPeak",
+            "TestSymbolInt32TableExactUndoPeakBudget",
+            "TestSymbolInt32TablePreparedGrowthAndWarmAppend",
+            "TestSymbolInt32TableConstructorAndSourceGuards",
+            "TestSymbolInt32TableHighOccupancyNoGrowthScopes"
+          ]
+        },
+        {
+          "name": "int32 get_scope_level",
+          "status": "ported",
+          "go_target": "util_symbol_table.go",
+          "tests": [
+            "TestSymbolInt32TableColdMutex",
+            "TestSymbolInt32TableSourceAssertions",
+            "TestSymbolInt32TableIndependentScopes",
+            "TestSymbolInt32TableHashPolicyAndTrail",
+            "TestSymbolInt32TableAppendAndSentinels",
+            "TestSymbolInt32TableBudgetFailureAndWarm",
+            "TestSymbolInt32TablePhysicalBucketsAndReset",
+            "TestSymbolInt32TableStagedFailureAtomicity",
+            "TestSymbolInt32TableVectorCapacitiesAndBudgetPeaks",
+            "TestSymbolInt32TableCleanupFailureAndDynamicHash",
+            "TestSymbolInt32TableAppendFaultSweepAndPeak",
+            "TestSymbolInt32TableExactUndoPeakBudget",
+            "TestSymbolInt32TablePreparedGrowthAndWarmAppend",
+            "TestSymbolInt32TableConstructorAndSourceGuards",
+            "TestSymbolInt32TableHighOccupancyNoGrowthScopes"
+          ]
+        },
+        {
+          "name": "int32 insert",
+          "status": "ported",
+          "go_target": "util_symbol_table.go",
+          "tests": [
+            "TestSymbolInt32TableColdMutex",
+            "TestSymbolInt32TableSourceAssertions",
+            "TestSymbolInt32TableIndependentScopes",
+            "TestSymbolInt32TableHashPolicyAndTrail",
+            "TestSymbolInt32TableAppendAndSentinels",
+            "TestSymbolInt32TableBudgetFailureAndWarm",
+            "TestSymbolInt32TablePhysicalBucketsAndReset",
+            "TestSymbolInt32TableStagedFailureAtomicity",
+            "TestSymbolInt32TableVectorCapacitiesAndBudgetPeaks",
+            "TestSymbolInt32TableCleanupFailureAndDynamicHash",
+            "TestSymbolInt32TableAppendFaultSweepAndPeak",
+            "TestSymbolInt32TableExactUndoPeakBudget",
+            "TestSymbolInt32TablePreparedGrowthAndWarmAppend",
+            "TestSymbolInt32TableConstructorAndSourceGuards",
+            "TestSymbolInt32TableHighOccupancyNoGrowthScopes"
+          ]
+        },
+        {
+          "name": "int32 begin_scope/end_scope",
+          "status": "ported",
+          "go_target": "util_symbol_table.go",
+          "tests": [
+            "TestSymbolInt32TableColdMutex",
+            "TestSymbolInt32TableSourceAssertions",
+            "TestSymbolInt32TableIndependentScopes",
+            "TestSymbolInt32TableHashPolicyAndTrail",
+            "TestSymbolInt32TableAppendAndSentinels",
+            "TestSymbolInt32TableBudgetFailureAndWarm",
+            "TestSymbolInt32TablePhysicalBucketsAndReset",
+            "TestSymbolInt32TableStagedFailureAtomicity",
+            "TestSymbolInt32TableVectorCapacitiesAndBudgetPeaks",
+            "TestSymbolInt32TableCleanupFailureAndDynamicHash",
+            "TestSymbolInt32TableAppendFaultSweepAndPeak",
+            "TestSymbolInt32TableExactUndoPeakBudget",
+            "TestSymbolInt32TablePreparedGrowthAndWarmAppend",
+            "TestSymbolInt32TableConstructorAndSourceGuards",
+            "TestSymbolInt32TableHighOccupancyNoGrowthScopes"
+          ]
+        },
+        {
+          "name": "int32 append",
+          "status": "ported",
+          "go_target": "util_symbol_table.go",
+          "tests": [
+            "TestSymbolInt32TableColdMutex",
+            "TestSymbolInt32TableSourceAssertions",
+            "TestSymbolInt32TableIndependentScopes",
+            "TestSymbolInt32TableHashPolicyAndTrail",
+            "TestSymbolInt32TableAppendAndSentinels",
+            "TestSymbolInt32TableBudgetFailureAndWarm",
+            "TestSymbolInt32TablePhysicalBucketsAndReset",
+            "TestSymbolInt32TableStagedFailureAtomicity",
+            "TestSymbolInt32TableVectorCapacitiesAndBudgetPeaks",
+            "TestSymbolInt32TableCleanupFailureAndDynamicHash",
+            "TestSymbolInt32TableAppendFaultSweepAndPeak",
+            "TestSymbolInt32TableExactUndoPeakBudget",
+            "TestSymbolInt32TablePreparedGrowthAndWarmAppend",
+            "TestSymbolInt32TableConstructorAndSourceGuards",
+            "TestSymbolInt32TableHighOccupancyNoGrowthScopes"
+          ]
+        },
+        {
+          "name": "int32 get_range/get_dom",
+          "status": "ported",
+          "go_target": "util_symbol_table.go",
+          "tests": [
+            "TestSymbolInt32TableColdMutex",
+            "TestSymbolInt32TableSourceAssertions",
+            "TestSymbolInt32TableIndependentScopes",
+            "TestSymbolInt32TableHashPolicyAndTrail",
+            "TestSymbolInt32TableAppendAndSentinels",
+            "TestSymbolInt32TableBudgetFailureAndWarm",
+            "TestSymbolInt32TablePhysicalBucketsAndReset",
+            "TestSymbolInt32TableStagedFailureAtomicity",
+            "TestSymbolInt32TableVectorCapacitiesAndBudgetPeaks",
+            "TestSymbolInt32TableCleanupFailureAndDynamicHash",
+            "TestSymbolInt32TableAppendFaultSweepAndPeak",
+            "TestSymbolInt32TableExactUndoPeakBudget",
+            "TestSymbolInt32TablePreparedGrowthAndWarmAppend",
+            "TestSymbolInt32TableConstructorAndSourceGuards",
+            "TestSymbolInt32TableHighOccupancyNoGrowthScopes"
+          ]
+        },
+        {
+          "name": "implicit copy constructor/assignment",
+          "status": "unported"
+        },
+        {
+          "name": "other payload specializations",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Borrowed SymbolManager outlives the concrete int32 table. Scalar entry/trail/scope records, cold mutex/header, all backing capacities and transaction workspace are budgeted. Reverse undo preserves physical sentinels and retained data. See SYMBOL_TABLE_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Global symbol domain becomes explicit borrowed owner; invalid sentinel/foreign/dead keys and iterator-invalidating self append return typed precondition errors.",
+        "Potentially allocating scope undo/append replay source actions on a charged physical graph before atomic publication. Go initializes unused scalar payloads. No-allocation preflight retains warm source paths."
+      ]
     },
     {
       "path": "src/util/timeit.cpp",
