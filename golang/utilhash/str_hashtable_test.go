@@ -472,11 +472,10 @@ func TestStrHashtableKeyOwnerAndStats(t *testing.T) {
 	mapMust(t, a.Assign(shared))
 	mapMust(t, a.Union(shared))
 	mapMust(t, a.Intersect(shared))
-	for _, operation := range []func(*StrHashtable) error{a.Assign, a.Union, a.Intersect} {
-		if e := operation(b); !errors.Is(e, arena.ErrConfig) {
-			t.Fatal("unsupported multi-region operation", e)
-		}
-	}
+	mapMust(t, b.Insert(kb))
+	mapMust(t, a.Union(b))
+	mapMust(t, a.Intersect(b))
+	mapMust(t, a.Assign(b))
 	budget := arena.NewBudget(1 << 20)
 	charged, e := NewStrHashtable(region, StrHashtableConfig{Budget: budget})
 	mapMust(t, e)
@@ -488,6 +487,434 @@ func TestStrHashtableKeyOwnerAndStats(t *testing.T) {
 	s = charged.Stats()
 	if s.OwnerBytes != 0 || s.TableBytes != 0 || budget.Used() != 0 {
 		t.Fatal("closed table charges", s)
+	}
+}
+
+func TestStrHashtableMultiOriginQueriesAndAdoption(t *testing.T) {
+	a, ra := newSH(t)
+	b, rb := newSH(t)
+	ka, kb := strStore(t, a, "equal", 0), strStore(t, b, "equal", 0)
+	mapMust(t, a.Insert(ka))
+	before := a.Stats()
+	ref, ok, e := a.FindFrom(rb, kb)
+	mapMust(t, e)
+	if !ok || a.Stats() != before {
+		t.Fatal("foreign query adopted metadata")
+	}
+	key, e := ref.Key()
+	mapMust(t, e)
+	if key != ka {
+		t.Fatal("foreign strcmp")
+	}
+	inserted, ref, e := a.InsertIfNotThereCoreFrom(rb, kb)
+	mapMust(t, e)
+	if inserted || a.Stats() != before {
+		t.Fatal("duplicate adopted incoming pointer")
+	}
+	key, e = ref.Key()
+	mapMust(t, e)
+	if key != ka {
+		t.Fatal("duplicate pointer replacement")
+	}
+	mapMust(t, a.InsertFrom(rb, kb))
+	after := a.Stats()
+	if after.DirectoryBytes == 0 {
+		t.Fatal("retained foreign pointer not accounted")
+	}
+	key, e = ref.Key()
+	mapMust(t, e)
+	if key != kb {
+		t.Fatal("equal-key pointer did not replace")
+	}
+	if ok, e := a.ContainsFrom(ra, ka); e != nil || !ok {
+		t.Fatal("query opposite owner", e)
+	}
+	if _, _, e := a.FindFrom(ra, kb); !errors.Is(e, arena.ErrInvalidSlot) {
+		t.Fatal("foreign key owner mismatch", e)
+	}
+	borrowed, e := BorrowCString(rb, kb.Allocation(), kb.Offset())
+	mapMust(t, e)
+	if borrowed != kb {
+		t.Fatal("independent borrow identity")
+	}
+	if allocs := testing.AllocsPerRun(50, func() {
+		if _, _, e := a.FindFrom(ra, ka); e != nil {
+			panic(e)
+		}
+		if _, e := a.ContainsFrom(rb, kb); e != nil {
+			panic(e)
+		}
+	}); allocs != 0 {
+		t.Fatal("foreign queries allocate", allocs)
+	}
+	mapMust(t, a.Reset())
+	if a.Stats().DirectoryBytes != after.DirectoryBytes || !rb.IsLive(kb.Allocation()) {
+		t.Fatal("reset discarded retained binding or bytes")
+	}
+}
+
+func TestStrHashtableMultiOriginOperatorsCloneAndLifetime(t *testing.T) {
+	a, ra := newSH(t)
+	b, rb := newSH(t)
+	c, rc := newSH(t)
+	ka := strStore(t, a, "shared", 0)
+	kb := strStore(t, b, "shared", 8)
+	onlyB := strStore(t, b, "onlyb", 0)
+	onlyC := strStore(t, c, "onlyc", 0)
+	mapMust(t, a.Insert(ka))
+	mapMust(t, b.Insert(kb))
+	mapMust(t, b.Insert(onlyB))
+	mapMust(t, b.InsertFrom(rc, onlyC))
+	mapMust(t, a.Union(b))
+	if a.Size() != 3 {
+		t.Fatal("multi-owner union")
+	}
+	got, ok, e := a.Find(ka)
+	mapMust(t, e)
+	if !ok || got != kb {
+		t.Fatal("source pointer overwrite")
+	}
+	clone, e := a.Clone()
+	mapMust(t, e)
+	defer clone.Close()
+	if clone.Size() != 3 || clone.Stats().DirectoryBytes == 0 {
+		t.Fatal("clone binding graph")
+	}
+	for _, k := range []StrKey{kb, onlyB, onlyC} {
+		got, ok, e := clone.Find(k)
+		mapMust(t, e)
+		if !ok || got != k {
+			t.Fatal("clone copied spelling")
+		}
+	}
+	mapMust(t, c.Insert(onlyC))
+	mapMust(t, a.Intersect(c))
+	if a.Size() != 1 || !strContains(t, a, onlyC) {
+		t.Fatal("foreign intersection")
+	}
+	mapMust(t, a.Assign(b))
+	if a.Size() != 3 {
+		t.Fatal("foreign assignment")
+	}
+	mapMust(t, a.Assign(a))
+	mapMust(t, a.Union(a))
+	mapMust(t, a.Intersect(a))
+	mapMust(t, a.Swap(c))
+	if a.region != rc || c.region != ra || c.Size() != 3 || a.Size() != 1 {
+		t.Fatal("swap primary and bindings")
+	}
+	for _, k := range []StrKey{kb, onlyB, onlyC} {
+		if !strContains(t, c, k) {
+			t.Fatal("swap lost owner binding")
+		}
+	}
+	mark, e := rb.PushScope()
+	mapMust(t, e)
+	temporary := strStore(t, b, "temporary", 0)
+	mapMust(t, c.InsertFrom(rb, temporary))
+	view, _, e := c.FindCore(temporary)
+	mapMust(t, e)
+	mapMust(t, rb.Rollback(mark))
+	if _, e := view.Key(); !errors.Is(e, arena.ErrInvalidSlot) {
+		t.Fatal("borrowed rollback not detected", e)
+	}
+	if !rc.IsLive(onlyC.Allocation()) || !ra.IsLive(ka.Allocation()) {
+		t.Fatal("operators released region bytes")
+	}
+}
+
+func TestStrHashtableMultiOriginFailureOrderAndAccounting(t *testing.T) {
+	_, primary := newSH(t)
+	peer, foreign := newSH(t)
+	budget := arena.NewBudget(1 << 20)
+	h, e := NewStrHashtable(primary, StrHashtableConfig{Budget: budget})
+	mapMust(t, e)
+	defer h.Close()
+	local, e := BorrowCString(primary, strStore(t, h, "same", 0).Allocation(), 0)
+	mapMust(t, e)
+	incoming := strStore(t, peer, "same", 0)
+	mapMust(t, h.Insert(local))
+	ref, _, e := h.FindCore(local)
+	mapMust(t, e)
+	before := h.Stats()
+	used := budget.Used()
+	budget.FailAfter(0)
+	e = h.InsertFrom(foreign, incoming)
+	budget.FailAfter(-1)
+	if !errors.Is(e, arena.ErrInjectedFailure) || h.Stats() != before || budget.Used() != used {
+		t.Fatal("adoption failure mutated graph", e)
+	}
+	key, e := ref.Key()
+	mapMust(t, e)
+	if key != local {
+		t.Fatal("adoption failure pointer overwrite")
+	}
+	h.epoch = ^uint64(0)
+	newKey := strStore(t, peer, "new", 0)
+	e = h.InsertFrom(foreign, newKey)
+	if !errors.Is(e, arena.ErrBounds) || h.Stats() != before || budget.Used() != used {
+		t.Fatal("exhaustion adopted unused owner", e)
+	}
+	h.epoch = ref.epoch
+	mapMust(t, h.InsertFrom(foreign, incoming))
+	stats := h.Stats()
+	if stats.DirectoryBytes == 0 || budget.Used() != stats.OwnerBytes+stats.TableBytes+stats.DirectoryBytes {
+		t.Fatal("directory graph charge", stats, budget.Used())
+	}
+	// Source ascending buckets determine which partial Union insertion survives
+	// the second cold directory growth failure; no bulk pre-adoption is allowed.
+	source, second := newSH(t)
+	thirdTable, third := newSH(t)
+	s1 := strStore(t, source, "boo", 0)
+	s2 := strStore(t, thirdTable, "foo", 0)
+	mapMust(t, source.Insert(s1))
+	mapMust(t, source.InsertFrom(third, s2))
+	var order []StrKey
+	for it := source.Begin(); !it.AtEnd(); {
+		k, e := it.Key()
+		mapMust(t, e)
+		order = append(order, k)
+		mapMust(t, it.Next())
+	}
+	destination, e := NewStrHashtable(primary, StrHashtableConfig{Budget: budget})
+	mapMust(t, e)
+	budget.FailAfter(1)
+	e = destination.Union(source)
+	budget.FailAfter(-1)
+	if !errors.Is(e, arena.ErrInjectedFailure) || destination.Size() != 1 {
+		t.Fatal("source partial union prefix", e, destination.Stats())
+	}
+	if got, ok, e := destination.Find(order[0]); e != nil || !ok || got != order[0] {
+		t.Fatal("wrong completed source bucket", got, e)
+	}
+	if _, ok, e := destination.FindFrom(third, order[1]); e != nil || ok {
+		t.Fatal("failed source bucket inserted", e)
+	}
+	destination.Close()
+	// Clone failures at header/table/directory prefix unwind all destination
+	// charges while keeping source bindings and borrowed allocations live.
+	mapMust(t, h.InsertFrom(second, s1))
+	mapMust(t, h.InsertFrom(third, s2))
+	used = budget.Used()
+	for fail := int64(0); fail < 5; fail++ {
+		budget.FailAfter(fail)
+		clone, e := h.Clone()
+		budget.FailAfter(-1)
+		if e == nil {
+			clone.Close()
+		} else if !errors.Is(e, arena.ErrInjectedFailure) {
+			t.Fatal(e)
+		}
+		if budget.Used() != used {
+			t.Fatal("failed clone binding leak", fail, budget.Used(), used)
+		}
+	}
+}
+
+func TestStrHashtableMultiOriginSwapGraphFailures(t *testing.T) {
+	for failureOwner := 0; failureOwner < 2; failureOwner++ {
+		for fail := int64(0); fail < 2; fail++ {
+			_, ra := newSH(t)
+			_, rb := newSH(t)
+			third, rc := newSH(t)
+			ba, bb := arena.NewBudget(1<<20), arena.NewBudget(1<<20)
+			a, e := NewStrHashtable(ra, StrHashtableConfig{Budget: ba})
+			mapMust(t, e)
+			b, e := NewStrHashtable(rb, StrHashtableConfig{Budget: bb, InitialCapacity: 16})
+			mapMust(t, e)
+			ka, kb, kc := strStore(t, a, "a", 0), strStore(t, b, "b", 0), strStore(t, third, "c", 0)
+			mapMust(t, a.Insert(ka))
+			mapMust(t, b.Insert(kb))
+			mapMust(t, a.InsertFrom(rc, kc))
+			beforeA, beforeB := a.Stats(), b.Stats()
+			usedA, usedB := ba.Used(), bb.Used()
+			if failureOwner == 0 {
+				ba.FailAfter(fail)
+			} else {
+				bb.FailAfter(fail)
+			}
+			e = a.Swap(b)
+			ba.FailAfter(-1)
+			bb.FailAfter(-1)
+			if e != nil {
+				if !errors.Is(e, arena.ErrInjectedFailure) || a.Stats() != beforeA || b.Stats() != beforeB || ba.Used() != usedA || bb.Used() != usedB {
+					t.Fatal("partial table+directory transfer", e)
+				}
+			} else {
+				if a.region != rb || b.region != ra || b.Stats().DirectoryBytes != beforeA.DirectoryBytes || a.Stats().DirectoryBytes != beforeB.DirectoryBytes || !strContains(t, b, kc) {
+					t.Fatal("swap graph binding")
+				}
+				sa, sb := a.Stats(), b.Stats()
+				if ba.Used() != sa.OwnerBytes+sa.TableBytes+sa.DirectoryBytes || bb.Used() != sb.OwnerBytes+sb.TableBytes+sb.DirectoryBytes {
+					t.Fatal("wrong transferred directory charges")
+				}
+			}
+			a.Close()
+			b.Close()
+			if ba.Used() != 0 || bb.Used() != 0 || !rc.IsLive(kc.Allocation()) {
+				t.Fatal("swap close leaked/released spelling")
+			}
+		}
+	}
+}
+
+func TestStrHashtableMultiOriginQueryMethodsAndCollisionOrder(t *testing.T) {
+	h, _ := newSH(t)
+	b, rb := newSH(t)
+	c, rc := newSH(t)
+	query, rq := newSH(t)
+	keys := collisionStrKeys(t, h, 7, 7, 4)
+	texts := make([]string, 4)
+	for i, k := range keys {
+		var e error
+		texts[i], e = h.Text(k)
+		mapMust(t, e)
+	}
+	kb, kc, kq := strStore(t, b, texts[1], 0), strStore(t, c, texts[2], 0), strStore(t, query, texts[0]+"\x00ignored", 3)
+	mapMust(t, h.Insert(keys[0]))
+	mapMust(t, h.InsertFrom(rb, kb))
+	mapMust(t, h.InsertFrom(rc, kc))
+	want := []StrKey{kb, kc, keys[0]}
+	i := 0
+	for it := h.Begin(); !it.AtEnd(); {
+		k, e := it.Key()
+		mapMust(t, e)
+		if k != want[i] {
+			t.Fatal("mixed-owner source wrapped buckets")
+		}
+		i++
+		mapMust(t, it.Next())
+	}
+	if i != 3 {
+		t.Fatal("bucket count")
+	}
+	before := h.Stats()
+	out := StrKey{}
+	ok, e := h.FindIntoFrom(rq, kq, &out)
+	mapMust(t, e)
+	if !ok || out != keys[0] || h.Stats() != before {
+		t.Fatal("foreign output find adopted")
+	}
+	it, e := h.FindIteratorFrom(rq, kq)
+	mapMust(t, e)
+	ref, e := it.Ref()
+	mapMust(t, e)
+	if ref.slot != 7 {
+		t.Fatal("foreign finditerator bucket")
+	}
+	mapMust(t, h.RemoveFrom(rq, kq))
+	if h.Stats().DirectoryBytes != before.DirectoryBytes || h.Deleted() != 1 {
+		t.Fatal("foreign Remove adopted owner")
+	}
+	// Entry mutation borrows a new owner but preserves its cached hash and epoch.
+	replacement := strStore(t, query, texts[1], 0)
+	stored, _, e := h.FindCore(kb)
+	mapMust(t, e)
+	epoch := h.epoch
+	mapMust(t, stored.SetKeyFrom(rq, replacement))
+	if h.epoch != epoch {
+		t.Fatal("metadata adoption invalidated borrow")
+	}
+	got, e := stored.Key()
+	mapMust(t, e)
+	if got != replacement {
+		t.Fatal("foreign SetKey pointer")
+	}
+	added := strStore(t, query, texts[3], 0)
+	mapMust(t, h.InsertFrom(rq, added))
+	addedRef, _, e := h.FindFrom(rq, added)
+	mapMust(t, e)
+	if addedRef.slot != 7 {
+		t.Fatal("mixed-owner tombstone placement")
+	}
+	mapMust(t, h.EraseFrom(rq, added))
+	if _, e := h.InsertIfNotThereFrom(rq, replacement); e != nil {
+		t.Fatal(e)
+	}
+	if _, e := h.InsertIfNotThere2From(rq, replacement); e != nil {
+		t.Fatal(e)
+	}
+	mapMust(t, rq.Close())
+	if _, _, e := h.FindFrom(rq, replacement); !errors.Is(e, arena.ErrClosed) {
+		t.Fatal("closed query owner guard", e)
+	}
+}
+
+func TestStrHashtableMultiOriginIndependentOracleAndDirectoryPeak(t *testing.T) {
+	h, _ := newSH(t)
+	p1, _ := newSH(t)
+	p2, _ := newSH(t)
+	pools := []*StrHashtable{h, p1, p2}
+	keys := make([][]StrKey, 3)
+	for owner, pool := range pools {
+		keys[owner] = make([]StrKey, 12)
+		for i := range keys[owner] {
+			keys[owner][i] = strStore(t, pool, fmt.Sprintf("oracle%d", i), uint32(owner*3))
+		}
+	}
+	oracle := make(map[int]StrKey)
+	for step := 0; step < 450; step++ {
+		index := (step*7 + 1) % 12
+		owner := (step*5 + 1) % 3
+		key := keys[owner][index]
+		if step%4 == 0 {
+			mapMust(t, h.RemoveFrom(pools[owner].region, key))
+			delete(oracle, index)
+		} else {
+			mapMust(t, h.InsertFrom(pools[owner].region, key))
+			oracle[index] = key
+		}
+		if h.Size() != uint32(len(oracle)) || !h.CheckInvariant() {
+			t.Fatal("multi-origin oracle size", step)
+		}
+		for i := 0; i < 12; i++ {
+			queryOwner := (step + i) % 3
+			ref, found, e := h.FindFrom(pools[queryOwner].region, keys[queryOwner][i])
+			mapMust(t, e)
+			want, present := oracle[i]
+			if found != present {
+				t.Fatal("foreign membership", step, i)
+			}
+			if found {
+				got, e := ref.Key()
+				mapMust(t, e)
+				if got != want {
+					t.Fatal("independent latest pointer", step, i)
+				}
+			}
+		}
+	}
+	seen := make(map[StrKey]bool)
+	for it := h.Begin(); !it.AtEnd(); {
+		k, e := it.Key()
+		mapMust(t, e)
+		seen[k] = true
+		mapMust(t, it.Next())
+	}
+	for _, key := range oracle {
+		if !seen[key] {
+			t.Fatal("multi-origin iteration missing pointer")
+		}
+	}
+	if len(seen) != len(oracle) {
+		t.Fatal("multi-origin iteration duplicate")
+	}
+	root := uint64(reflect.TypeOf(StrHashtable{}).Size())
+	oneDirectory := uint64(reflect.TypeOf(strOwner{}).Size())
+	limit := root + 8*strHashEntryBytes + 3*oneDirectory - 1
+	budget := arena.NewBudget(limit)
+	limited, e := NewStrHashtable(h.region, StrHashtableConfig{Budget: budget})
+	mapMust(t, e)
+	mapMust(t, limited.InsertFrom(p1.region, keys[1][0]))
+	before := limited.Stats()
+	used := budget.Used()
+	e = limited.InsertFrom(p2.region, keys[2][1])
+	if !errors.Is(e, arena.ErrBudget) || limited.Stats() != before || budget.Used() != used {
+		t.Fatal("directory old+new peak not reserved", e)
+	}
+	limited.Close()
+	if budget.Used() != 0 {
+		t.Fatal("directory peak close leak")
 	}
 }
 

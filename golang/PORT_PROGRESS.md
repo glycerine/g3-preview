@@ -288,3 +288,17 @@ fault-prefix, peak-budget, lifetime, independent arithmetic and warm-zero-alloca
 checks. Isolated full native and g3checked module tests, both races, vet, actual
 checked JS registrations and WASI builds pass. MPN diagnostics, further numeric
 methods and the full AST/solver objective remain open.
+
+## Multi-origin borrowed string table
+
+The borrowed StrHashtable specialization now supports foreign owner queries,
+insertions, entry replacement, assignment, union, intersection, cloning and swap
+with scalar hot records and a budgeted cold directory. Source bucket/action order,
+cached hashes, pointer-overwrite semantics and bulk failure prefixes are retained.
+No spelling is copied or freed by the table. All18 tests pass, including independent
+three-owner models, adoption failures, graph peaks and transfer rollback.
+
+New APIs went RED before implementation. Isolated full native and checked JS
+module tests, native/checked tests, races, vet, source audit and WASI compilation
+pass. Other table specializations, string-to-int map and enabled statistics remain
+open; the full solver objective is unchanged.

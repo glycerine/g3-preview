@@ -222,3 +222,98 @@ serialized caller allocates its owned spelling. An existing hit without growth
 still succeeds at maximum epoch. Source growth-before-lookup is unchanged. The
 new miss test was RED on nil error at maximum epoch, then GREEN after this
 preflight; preparation leaves table contents and charges unchanged on refusal.
+
+## Multi-origin StrHashtable completion packet
+
+This packet supersedes the preceding **partial owner-bound specialization** and
+its multi-region ErrConfig gap. The concrete source StrHashtable now supports
+borrowed C strings from several independent byte-region owners in all applicable
+core operators. The primary region remains an implicit binding; secondary
+bindings are held in a cold `[]strOwner` directory sorted by unique uint64 origin.
+StrKey and the32-byte scalar hot entry are unchanged. The directory holds one
+Go pointer per borrowed owner, never a pointer/string/interface per hot entry;
+no Go maps, generics or unsafe are introduced. Binary search is deterministic
+and does not influence source table probing, placement or traversal.
+
+| Previously restricted source action | Completed concrete counterpart |
+| --- | --- |
+| construct a borrowed spelling independent of target table | `BorrowCString(region,ref,offset)` validates first-NUL prefix, owner and lifetime; allocates nothing |
+| hash/equality/query through arbitrary borrowed pointers | explicit source region in `FindFrom`/`ContainsFrom`, `FindIntoFrom`, `FindIteratorFrom`; source hash/strcmp helpers resolve each stored spelling's origin |
+| insert and insert-if-absent from another owner | `InsertFrom`, `InsertIfNotThereCoreFrom`, `InsertIfNotThereFrom`, `InsertIfNotThere2From`; publish-only owner adoption |
+| erase/remove by a foreign equal spelling | `RemoveFrom`, `EraseFrom`; no query-owner adoption |
+| replace source entry pointer while retaining cached hash | `SetKeyFrom`; equal spelling/hash required, full borrowed pointer replacement, same entry epoch |
+| multi-owner copy assignment and union | `Assign`, `Union`, destination Reset then source ascending USED buckets and complete pointer overwrite |
+| multi-owner intersection | destination `Clone`, cloned ascending buckets, nonadopting foreign queries against other table, source-ordered removal |
+| copy constructor/clone | source cached-hash placement with per-USED owner adoption; no spelling copies, failed destination prefix fully closed/refunded |
+| swap | primary binding/table/secondary directory/counters exchanged together; atomic cross-budget incoming table+directory reservations |
+
+Known-origin convenience methods keep their signatures and resolve stored
+origins through the directory. Foreign queries use an explicit region argument
+and validate its OwnerID against StrKey before reading, even when raw allocation
+coordinates match another owner. Unknown/mismatched origins and closed/dead byte
+borrows return typed arena errors; raw BytesRegionRef construction still follows
+its owner-local token precondition. CString/Text/FindCString/entry Key and all
+byte comparisons now resolve the correct owner; no primary-pool reinterpretation
+is possible. Transient foreign queries and duplicate insert-if-absent hits adopt
+no owner and allocate no directory. Equal-key Insert replaces the complete
+pointer and adopts its new region only after hash/equality succeed. SetKeyFrom
+similarly performs all checks before adoption/publication. Adoption failure leaves
+the existing pointer and entry ref intact.
+
+Source order remains authoritative: growth precedes lookup, even duplicate
+lookup; owner registration is delayed until the actual source insertion or
+overwrite branch. A new-entry exhaustion refusal occurs before owner adoption.
+No multi-entry bulk pre-adoption or iteration rearrangement is used. Union and
+Assign retain earlier source-bucket actions when a later directory or table
+allocation fails. Intersection queries never register its temporary clone's
+owners into the other table. Clone uses cached hashes directly, visits source
+buckets ascending and preserves source shallow key identity; it copies only
+USED entries/bindings. It does not read spelling bytes merely to copy their
+cached references, so callers must still satisfy the borrowed lifetime contract.
+
+Metadata accounting: Stats adds `DirectoryBytes`. Every directory growth checks
+platform/count bounds, reserves the full replacement capacity while the old
+directory remains charged, then copies/releases/publishes. The sorted directory
+uses geometric capacities1/2/4/... as an explicit storage adaptation; it does
+not change source table capacities or ordering. Both table and directory arrays
+are accounted by the table's Budget; bound regions report/pay for their own
+graphs. Directory growth never increments the membership epoch because no
+directory pointer escapes. Region bindings remain until table Close, including
+after removal/reset/finalize, an explicit metadata-retention adaptation. Close
+drops primary and secondary Go references and refunds all owner/table/directory
+charges, without invoking any region mutation or deallocation.
+
+Across distinct budgets, Swap first reserves each incoming **table+directory**
+graph, refunds the first reservation if the second fails, then releases outgoing
+charges and performs only infallible exchanges. Root headers and callbacks stay
+with their owners; region budgets are untouched. Graph bounds derive from checked
+uint32 directory counts, safe table capacity and platform array sizes. Epoch
+preflights/Close exhaustion behavior from the earlier correction remain intact.
+Primary-only Symbol service usage keeps DirectoryBytes zero and its existing
+budget-sum regression passes without changes to any g3 Symbol files.
+
+TDD: the new multi-origin tests and removal of prior ErrConfig expectations were
+first RED on missing foreign APIs/directory stats. Translation reached GREEN;
+foreign query-output/iterator/remove/entry-replacement methods separately obtained
+RED before implementation. There are now18 StrHashtable tests. New cases cover
+cross-owner equal spellings and complete pointer overwrite, absent duplicate
+without adoption, mismatched-origin rejection, readonly foreign-query accounting,
+all multi-owner operators/self guards/clone and exact wrapped collision buckets,
+third-owner replacement, scoped lifetime rollback and closed-owner errors,
+source-bucket partial Union after the second registration failure, clone-prefix
+failure unwind, directory old+new finite peak refusal, table+directory transfer
+failure on either destination, retained bindings through reset and complete Close
+refund. A450-operation independent three-owner oracle checks both mathematical
+membership and the latest retained pointer against test-only Go maps, plus full
+iteration. Warmed foreign FindFrom/ContainsFrom allocate zero Go objects.
+
+Final native and checked utilhash tests, vet, actual fresh-count JS/wasm execution,
+WASI cross-build and targeted main-package Symbol regressions pass. Every callable
+method of this assigned concrete str_hashtable/ptr_hashtable specialization now
+has a counterpart including its full multi-origin core assignment/union/
+intersection behavior. Raw C-address compatibility and optional enabled source
+statistics remain separate representation/conditional features. The source
+string→int map's14 assertions and scoped binding container are still separate
+variants and are not claimed by this packet; no string→int implementation was
+started here. WASI execution retains the previously documented installed-runtime
+startup limitation.

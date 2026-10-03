@@ -40,17 +40,24 @@ type StrHashtableConfig struct {
 	InitialCapacity uint32
 }
 
-// StrHashtable binds one borrowed region. Close/Reset/Erase never release
-// spelling bytes. Cross-region Swap exchanges the binding with its table;
-// Assign/Union/Intersect require a shared binding. This owning struct must not
-// be copied. Region Reset/rollback/Close invalidates all affected borrowed keys.
+type strOwner struct {
+	origin uint64
+	region *arena.BytesRegion
+}
+
+// StrHashtable borrows its primary region and every adopted secondary region.
+// Close/Reset/Erase never release spelling bytes. Swap exchanges bindings with
+// the table. This owning struct must not be copied. Region Reset/rollback/Close
+// invalidates affected keys; callers keep all borrowed regions alive.
 type StrHashtable struct {
 	table                 []strHashEntry
 	region                *arena.BytesRegion
+	owners                []strOwner
 	config                StrHashtableConfig
 	size, deleted         uint32
 	epoch                 uint64
 	rootBytes, tableBytes uint64
+	directoryBytes        uint64
 	closed                bool
 }
 
@@ -117,15 +124,89 @@ func (h *StrHashtable) Capacity() uint32       { return uint32(len(h.table)) }
 func (h *StrHashtable) Deleted() uint32        { return h.deleted }
 func (h *StrHashtable) CollisionCount() uint64 { return 0 }
 
-// StrHashtableStats accounts only this owner and scalar table; the borrowed
-// region reports its own graph separately and is never charged by this table.
+// StrHashtableStats accounts this owner, scalar table and cold owner directory.
+// Borrowed regions report their own graphs and are never charged by this table.
 type StrHashtableStats struct {
-	OwnerBytes, TableBytes  uint64
-	Size, Deleted, Capacity uint32
+	OwnerBytes, TableBytes, DirectoryBytes uint64
+	Size, Deleted, Capacity                uint32
 }
 
 func (h *StrHashtable) Stats() StrHashtableStats {
-	return StrHashtableStats{h.rootBytes, h.tableBytes, h.size, h.deleted, h.Capacity()}
+	return StrHashtableStats{h.rootBytes, h.tableBytes, h.directoryBytes, h.size, h.deleted, h.Capacity()}
+}
+
+func (h *StrHashtable) keyRegion(k StrKey) (*arena.BytesRegion, error) {
+	if k.origin == h.region.OwnerID() {
+		return h.region, nil
+	}
+	lo, hi := 0, len(h.owners)
+	for lo < hi {
+		mid := lo + (hi-lo)/2
+		if h.owners[mid].origin < k.origin {
+			lo = mid + 1
+		} else {
+			hi = mid
+		}
+	}
+	if lo < len(h.owners) && h.owners[lo].origin == k.origin {
+		return h.owners[lo].region, nil
+	}
+	return nil, arena.ErrInvalidSlot
+}
+
+// adopt records a cold borrowed owner only when its spelling is retained.
+// Sorted scalar origins make lookup deterministic. Directory movement does not
+// invalidate entry borrows because no pointer into this directory escapes.
+func (h *StrHashtable) adopt(r *arena.BytesRegion) error {
+	if r == nil {
+		return arena.ErrInvalidSlot
+	}
+	id := r.OwnerID()
+	if id == h.region.OwnerID() {
+		return nil
+	}
+	lo, hi := 0, len(h.owners)
+	for lo < hi {
+		mid := lo + (hi-lo)/2
+		if h.owners[mid].origin < id {
+			lo = mid + 1
+		} else {
+			hi = mid
+		}
+	}
+	if lo < len(h.owners) && h.owners[lo].origin == id {
+		if h.owners[lo].region != r {
+			return arena.ErrInvalidSlot
+		}
+		return nil
+	}
+	if len(h.owners) == cap(h.owners) {
+		capacity := cap(h.owners)
+		if capacity == 0 {
+			capacity = 1
+		} else {
+			if capacity > int(^uint(0)>>1)/2 {
+				return arena.ErrBounds
+			}
+			capacity *= 2
+		}
+		entryBytes := uint64(reflect.TypeOf(strOwner{}).Size())
+		if uint64(capacity) > uint64(^uint32(0)) || uint64(capacity) > uint64(^uint(0)>>1)/entryBytes {
+			return arena.ErrBounds
+		}
+		amount := uint64(capacity) * entryBytes
+		if e := h.config.Budget.Reserve(amount); e != nil {
+			return e
+		}
+		owners := make([]strOwner, len(h.owners), capacity)
+		copy(owners, h.owners)
+		h.config.Budget.Release(h.directoryBytes)
+		h.owners, h.directoryBytes = owners, amount
+	}
+	h.owners = h.owners[:len(h.owners)+1]
+	copy(h.owners[lo+1:], h.owners[lo:len(h.owners)-1])
+	h.owners[lo] = strOwner{id, r}
+	return nil
 }
 
 // CString finds source strlen within the allocation bound. An empty spelling
@@ -134,42 +215,58 @@ func (h *StrHashtable) CString(ref arena.BytesRegionRef, offset uint32) (StrKey,
 	if e := h.open(); e != nil {
 		return StrKey{}, e
 	}
-	size, e := h.region.Size(ref)
+	return BorrowCString(h.region, ref, offset)
+}
+
+// BorrowCString constructs a checked scalar borrow without adopting or
+// allocating table metadata. The raw allocation ref is owner-local to region.
+func BorrowCString(region *arena.BytesRegion, ref arena.BytesRegionRef, offset uint32) (StrKey, error) {
+	if region == nil {
+		return StrKey{}, arena.ErrInvalidSlot
+	}
+	size, e := region.Size(ref)
 	if e != nil {
 		return StrKey{}, e
 	}
-	if !h.region.IsLive(ref) {
+	if !region.IsLive(ref) {
 		return StrKey{}, arena.ErrInvalidSlot
 	}
 	if offset >= size {
 		return StrKey{}, arena.ErrBounds
 	}
 	for i := offset; i < size; i++ {
-		b, e := h.region.Read(ref, i)
+		b, e := region.Read(ref, i)
 		if e != nil {
 			return StrKey{}, e
 		}
 		if b == 0 {
-			return StrKey{ref, offset, i - offset, h.region.OwnerID()}, nil
+			return StrKey{ref, offset, i - offset, region.OwnerID()}, nil
 		}
 	}
 	return StrKey{}, arena.ErrBounds
 }
 func (h *StrHashtable) validateKey(k StrKey) error {
-	if k.origin != h.region.OwnerID() {
-		return arena.ErrInvalidSlot
-	}
-	size, e := h.region.Size(k.ref)
+	r, e := h.keyRegion(k)
 	if e != nil {
 		return e
 	}
-	if !h.region.IsLive(k.ref) {
+	return validateStrKey(r, k)
+}
+func validateStrKey(region *arena.BytesRegion, k StrKey) error {
+	if region == nil || k.origin != region.OwnerID() {
+		return arena.ErrInvalidSlot
+	}
+	size, e := region.Size(k.ref)
+	if e != nil {
+		return e
+	}
+	if !region.IsLive(k.ref) {
 		return arena.ErrInvalidSlot
 	}
 	if uint64(k.offset)+uint64(k.length) >= uint64(size) {
 		return arena.ErrBounds
 	}
-	b, e := h.region.Read(k.ref, k.offset+k.length)
+	b, e := region.Read(k.ref, k.offset+k.length)
 	if e != nil {
 		return e
 	}
@@ -185,7 +282,14 @@ func (h *StrHashtable) Hash(k StrKey) (uint32, error) {
 	if e := h.open(); e != nil {
 		return 0, e
 	}
-	if e := h.validateKey(k); e != nil {
+	r, e := h.keyRegion(k)
+	if e != nil {
+		return 0, e
+	}
+	return hashStrKey(r, k)
+}
+func hashStrKey(region *arena.BytesRegion, k StrKey) (uint32, error) {
+	if e := validateStrKey(region, k); e != nil {
 		return 0, e
 	}
 	var readError error
@@ -196,7 +300,7 @@ func (h *StrHashtable) Hash(k StrKey) (uint32, error) {
 			if i >= k.length {
 				break
 			}
-			b, e := h.region.Read(k.ref, k.offset+i)
+			b, e := region.Read(k.ref, k.offset+i)
 			if e != nil {
 				readError = e
 				return 0
@@ -211,21 +315,32 @@ func (h *StrHashtable) Equal(a, b StrKey) (bool, error) {
 	if e := h.open(); e != nil {
 		return false, e
 	}
-	if e := h.validateKey(a); e != nil {
+	ra, e := h.keyRegion(a)
+	if e != nil {
 		return false, e
 	}
-	if e := h.validateKey(b); e != nil {
+	rb, e := h.keyRegion(b)
+	if e != nil {
+		return false, e
+	}
+	return equalStrKeys(ra, a, rb, b)
+}
+func equalStrKeys(ra *arena.BytesRegion, a StrKey, rb *arena.BytesRegion, b StrKey) (bool, error) {
+	if e := validateStrKey(ra, a); e != nil {
+		return false, e
+	}
+	if e := validateStrKey(rb, b); e != nil {
 		return false, e
 	}
 	if a.length != b.length {
 		return false, nil
 	}
 	for i := uint32(0); i < a.length; i++ {
-		x, e := h.region.Read(a.ref, a.offset+i)
+		x, e := ra.Read(a.ref, a.offset+i)
 		if e != nil {
 			return false, e
 		}
-		y, e := h.region.Read(b.ref, b.offset+i)
+		y, e := rb.Read(b.ref, b.offset+i)
 		if e != nil {
 			return false, e
 		}
@@ -242,10 +357,14 @@ func (h *StrHashtable) Text(k StrKey) (string, error) {
 	if e := h.validateKey(k); e != nil {
 		return "", e
 	}
+	region, e := h.keyRegion(k)
+	if e != nil {
+		return "", e
+	}
 	var out strings.Builder
 	out.Grow(int(k.length))
 	for i := uint32(0); i < k.length; i++ {
-		b, e := h.region.Read(k.ref, k.offset+i)
+		b, e := region.Read(k.ref, k.offset+i)
 		if e != nil {
 			return "", e
 		}
@@ -294,10 +413,20 @@ func (h *StrHashtable) prepareInsert() error {
 	return nil
 }
 func (h *StrHashtable) insert(key StrKey, overwrite bool) (bool, StrHashtableEntryRef, error) {
+	if e := h.open(); e != nil {
+		return false, StrHashtableEntryRef{}, e
+	}
+	region, e := h.keyRegion(key)
+	if e != nil {
+		return false, StrHashtableEntryRef{}, e
+	}
+	return h.insertFrom(region, key, overwrite)
+}
+func (h *StrHashtable) insertFrom(region *arena.BytesRegion, key StrKey, overwrite bool) (bool, StrHashtableEntryRef, error) {
 	if e := h.prepareInsert(); e != nil {
 		return false, StrHashtableEntryRef{}, e
 	}
-	hash, e := h.Hash(key)
+	hash, e := hashStrKey(region, key)
 	if e != nil {
 		return false, StrHashtableEntryRef{}, e
 	}
@@ -309,12 +438,19 @@ func (h *StrHashtable) insert(key StrKey, overwrite bool) (bool, StrHashtableEnt
 		switch entry.state {
 		case strHashUsed:
 			if entry.hash == hash {
-				equal, e := h.Equal(entry.key, key)
+				storedRegion, e := h.keyRegion(entry.key)
+				if e != nil {
+					return false, StrHashtableEntryRef{}, e
+				}
+				equal, e := equalStrKeys(storedRegion, entry.key, region, key)
 				if e != nil {
 					return false, StrHashtableEntryRef{}, e
 				}
 				if equal {
 					if overwrite {
+						if e := h.adopt(region); e != nil {
+							return false, StrHashtableEntryRef{}, e
+						}
 						entry.key = key
 					}
 					return false, h.ref(i), nil
@@ -322,6 +458,9 @@ func (h *StrHashtable) insert(key StrKey, overwrite bool) (bool, StrHashtableEnt
 			}
 		case strHashFree:
 			if e := h.canBump(); e != nil {
+				return false, StrHashtableEntryRef{}, e
+			}
+			if e := h.adopt(region); e != nil {
 				return false, StrHashtableEntryRef{}, e
 			}
 			slot := i
@@ -351,8 +490,29 @@ func (h *StrHashtable) InsertIfNotThere(k StrKey) (StrHashtableEntryRef, error) 
 func (h *StrHashtable) InsertIfNotThere2(k StrKey) (StrHashtableEntryRef, error) {
 	return h.InsertIfNotThere(k)
 }
+func (h *StrHashtable) InsertFrom(region *arena.BytesRegion, k StrKey) error {
+	_, _, e := h.insertFrom(region, k, true)
+	return e
+}
+func (h *StrHashtable) InsertIfNotThereCoreFrom(region *arena.BytesRegion, k StrKey) (bool, StrHashtableEntryRef, error) {
+	return h.insertFrom(region, k, false)
+}
+func (h *StrHashtable) InsertIfNotThereFrom(region *arena.BytesRegion, k StrKey) (StrHashtableEntryRef, error) {
+	_, r, e := h.insertFrom(region, k, false)
+	return r, e
+}
+func (h *StrHashtable) InsertIfNotThere2From(region *arena.BytesRegion, k StrKey) (StrHashtableEntryRef, error) {
+	return h.InsertIfNotThereFrom(region, k)
+}
 func (h *StrHashtable) findSlot(key StrKey) (uint32, bool, error) {
-	hash, e := h.Hash(key)
+	region, e := h.keyRegion(key)
+	if e != nil {
+		return 0, false, e
+	}
+	return h.findSlotFrom(region, key)
+}
+func (h *StrHashtable) findSlotFrom(region *arena.BytesRegion, key StrKey) (uint32, bool, error) {
+	hash, e := hashStrKey(region, key)
 	if e != nil {
 		return 0, false, e
 	}
@@ -361,7 +521,11 @@ func (h *StrHashtable) findSlot(key StrKey) (uint32, bool, error) {
 	for step := uint32(0); step < h.Capacity(); step++ {
 		entry := h.table[i]
 		if entry.state == strHashUsed && entry.hash == hash {
-			equal, e := h.Equal(entry.key, key)
+			storedRegion, e := h.keyRegion(entry.key)
+			if e != nil {
+				return 0, false, e
+			}
+			equal, e := equalStrKeys(storedRegion, entry.key, region, key)
 			if e != nil {
 				return 0, false, e
 			}
@@ -387,6 +551,35 @@ func (h *StrHashtable) FindCore(k StrKey) (StrHashtableEntryRef, bool, error) {
 	return h.ref(i), true, nil
 }
 func (h *StrHashtable) Contains(k StrKey) (bool, error) { _, ok, e := h.FindCore(k); return ok, e }
+
+// FindFrom reads an explicit foreign query owner without retaining it or
+// allocating directory metadata. The returned ref borrows the stored entry.
+func (h *StrHashtable) FindFrom(region *arena.BytesRegion, k StrKey) (StrHashtableEntryRef, bool, error) {
+	if e := h.open(); e != nil {
+		return StrHashtableEntryRef{}, false, e
+	}
+	i, ok, e := h.findSlotFrom(region, k)
+	if e != nil || !ok {
+		return StrHashtableEntryRef{}, ok, e
+	}
+	return h.ref(i), true, nil
+}
+func (h *StrHashtable) ContainsFrom(region *arena.BytesRegion, k StrKey) (bool, error) {
+	_, ok, e := h.FindFrom(region, k)
+	return ok, e
+}
+func (h *StrHashtable) FindIntoFrom(region *arena.BytesRegion, k StrKey, out *StrKey) (bool, error) {
+	r, found, e := h.FindFrom(region, k)
+	if e != nil || !found {
+		return found, e
+	}
+	key, e := r.Key()
+	if e != nil {
+		return false, e
+	}
+	*out = key
+	return true, nil
+}
 func (h *StrHashtable) Find(k StrKey) (StrKey, bool, error) {
 	r, ok, e := h.FindCore(k)
 	if e != nil || !ok {
@@ -427,10 +620,14 @@ func (h *StrHashtable) FindCString(s string) (StrHashtableEntryRef, bool, error)
 			if e := h.validateKey(entry.key); e != nil {
 				return StrHashtableEntryRef{}, false, e
 			}
+			region, e := h.keyRegion(entry.key)
+			if e != nil {
+				return StrHashtableEntryRef{}, false, e
+			}
 			equal := entry.key.length == uint32(len(s))
 			if equal {
 				for j := uint32(0); j < entry.key.length; j++ {
-					b, e := h.region.Read(entry.key.ref, entry.key.offset+j)
+					b, e := region.Read(entry.key.ref, entry.key.offset+j)
 					if e != nil {
 						return StrHashtableEntryRef{}, false, e
 					}
@@ -474,7 +671,17 @@ func (h *StrHashtable) Remove(k StrKey) error {
 	if e := h.open(); e != nil {
 		return e
 	}
-	i, ok, e := h.findSlot(k)
+	region, e := h.keyRegion(k)
+	if e != nil {
+		return e
+	}
+	return h.RemoveFrom(region, k)
+}
+func (h *StrHashtable) RemoveFrom(region *arena.BytesRegion, k StrKey) error {
+	if e := h.open(); e != nil {
+		return e
+	}
+	i, ok, e := h.findSlotFrom(region, k)
 	if e != nil || !ok {
 		return e
 	}
@@ -497,6 +704,9 @@ func (h *StrHashtable) Remove(k StrKey) error {
 	return nil
 }
 func (h *StrHashtable) Erase(k StrKey) error { return h.Remove(k) }
+func (h *StrHashtable) EraseFrom(region *arena.BytesRegion, k StrKey) error {
+	return h.RemoveFrom(region, k)
+}
 func (h *StrHashtable) replaceEmpty(n uint32) error {
 	if e := h.canBump(); e != nil {
 		return e
@@ -551,9 +761,12 @@ func (h *StrHashtable) Close() {
 	if h.closed {
 		return
 	}
-	h.config.Budget.Release(h.rootBytes + h.tableBytes)
+	h.config.Budget.Release(h.rootBytes + h.tableBytes + h.directoryBytes)
 	h.table = nil
+	h.owners = nil
+	h.region = nil
 	h.rootBytes, h.tableBytes = 0, 0
+	h.directoryBytes = 0
 	h.size, h.deleted = 0, 0
 	h.closed = true
 	if h.epoch != ^uint64(0) {
@@ -568,24 +781,40 @@ func (h *StrHashtable) Clone() (*StrHashtable, error) {
 	if e != nil {
 		return nil, e
 	}
-	copyStrTable(h.table, r.table)
+	mask := r.Capacity() - 1
+	for _, entry := range h.table {
+		if entry.state != strHashUsed {
+			continue
+		}
+		owner, e := h.keyRegion(entry.key)
+		if e != nil {
+			r.Close()
+			return nil, e
+		}
+		if e := r.adopt(owner); e != nil {
+			r.Close()
+			return nil, e
+		}
+		i := entry.hash & mask
+		for r.table[i].state != strHashFree {
+			i = (i + 1) & mask
+		}
+		r.table[i] = entry
+	}
 	r.size = h.size
 	return r, nil
 }
-func (h *StrHashtable) sameRegion(other *StrHashtable) error {
+func (h *StrHashtable) bothOpen(other *StrHashtable) error {
 	if e := h.open(); e != nil {
 		return e
 	}
 	if e := other.open(); e != nil {
 		return e
 	}
-	if h.region != other.region {
-		return arena.ErrConfig
-	}
 	return nil
 }
 func (h *StrHashtable) Assign(src *StrHashtable) error {
-	if e := h.sameRegion(src); e != nil {
+	if e := h.bothOpen(src); e != nil {
 		return e
 	}
 	if h == src {
@@ -597,7 +826,7 @@ func (h *StrHashtable) Assign(src *StrHashtable) error {
 	return h.Union(src)
 }
 func (h *StrHashtable) Union(src *StrHashtable) error {
-	if e := h.sameRegion(src); e != nil {
+	if e := h.bothOpen(src); e != nil {
 		return e
 	}
 	if h == src {
@@ -605,7 +834,11 @@ func (h *StrHashtable) Union(src *StrHashtable) error {
 	}
 	for _, entry := range src.table {
 		if entry.state == strHashUsed {
-			if e := h.Insert(entry.key); e != nil {
+			owner, e := src.keyRegion(entry.key)
+			if e != nil {
+				return e
+			}
+			if e := h.InsertFrom(owner, entry.key); e != nil {
 				return e
 			}
 		}
@@ -613,7 +846,7 @@ func (h *StrHashtable) Union(src *StrHashtable) error {
 	return nil
 }
 func (h *StrHashtable) Intersect(src *StrHashtable) error {
-	if e := h.sameRegion(src); e != nil {
+	if e := h.bothOpen(src); e != nil {
 		return e
 	}
 	if h == src {
@@ -626,7 +859,11 @@ func (h *StrHashtable) Intersect(src *StrHashtable) error {
 	defer copy.Close()
 	for _, entry := range copy.table {
 		if entry.state == strHashUsed {
-			ok, e := src.Contains(entry.key)
+			owner, e := copy.keyRegion(entry.key)
+			if e != nil {
+				return e
+			}
+			ok, e := src.ContainsFrom(owner, entry.key)
 			if e != nil {
 				return e
 			}
@@ -656,18 +893,22 @@ func (h *StrHashtable) Swap(other *StrHashtable) error {
 		return e
 	}
 	if h.config.Budget != other.config.Budget {
-		if e := h.config.Budget.Reserve(other.tableBytes); e != nil {
+		incoming := other.tableBytes + other.directoryBytes
+		outgoing := h.tableBytes + h.directoryBytes
+		if e := h.config.Budget.Reserve(incoming); e != nil {
 			return e
 		}
-		if e := other.config.Budget.Reserve(h.tableBytes); e != nil {
-			h.config.Budget.Release(other.tableBytes)
+		if e := other.config.Budget.Reserve(outgoing); e != nil {
+			h.config.Budget.Release(incoming)
 			return e
 		}
-		h.config.Budget.Release(h.tableBytes)
-		other.config.Budget.Release(other.tableBytes)
+		h.config.Budget.Release(outgoing)
+		other.config.Budget.Release(incoming)
 	}
 	h.table, other.table = other.table, h.table
 	h.region, other.region = other.region, h.region
+	h.owners, other.owners = other.owners, h.owners
+	h.directoryBytes, other.directoryBytes = other.directoryBytes, h.directoryBytes
 	h.tableBytes, other.tableBytes = other.tableBytes, h.tableBytes
 	h.size, other.size = other.size, h.size
 	h.deleted, other.deleted = other.deleted, h.deleted
@@ -680,9 +921,17 @@ func (h *StrHashtable) CheckInvariant() bool {
 		return false
 	}
 	var used, deleted uint32
+	for i, owner := range h.owners {
+		if owner.region == nil || owner.origin != owner.region.OwnerID() || owner.origin == h.region.OwnerID() || i != 0 && h.owners[i-1].origin >= owner.origin {
+			return false
+		}
+	}
 	for _, e := range h.table {
 		if e.state == strHashUsed {
 			used++
+			if _, err := h.keyRegion(e.key); err != nil {
+				return false
+			}
 		} else if e.state == strHashDeleted {
 			deleted++
 		}
@@ -758,7 +1007,17 @@ func (r StrHashtableEntryRef) SetKey(k StrKey) error {
 	if e := r.validate(); e != nil {
 		return e
 	}
-	hash, e := r.owner.Hash(k)
+	region, e := r.owner.keyRegion(k)
+	if e != nil {
+		return e
+	}
+	return r.SetKeyFrom(region, k)
+}
+func (r StrHashtableEntryRef) SetKeyFrom(region *arena.BytesRegion, k StrKey) error {
+	if e := r.validate(); e != nil {
+		return e
+	}
+	hash, e := hashStrKey(region, k)
 	if e != nil {
 		return e
 	}
@@ -766,12 +1025,19 @@ func (r StrHashtableEntryRef) SetKey(k StrKey) error {
 	if hash != entry.hash {
 		return arena.ErrBounds
 	}
-	equal, e := r.owner.Equal(entry.key, k)
+	storedRegion, e := r.owner.keyRegion(entry.key)
+	if e != nil {
+		return e
+	}
+	equal, e := equalStrKeys(storedRegion, entry.key, region, k)
 	if e != nil {
 		return e
 	}
 	if !equal {
 		return arena.ErrBounds
+	}
+	if e := r.owner.adopt(region); e != nil {
+		return e
 	}
 	entry.key = k
 	return nil
@@ -795,6 +1061,16 @@ func (h *StrHashtable) End() StrHashtableIterator {
 }
 func (h *StrHashtable) FindIterator(k StrKey) (StrHashtableIterator, error) {
 	r, ok, e := h.FindCore(k)
+	if e != nil {
+		return StrHashtableIterator{}, e
+	}
+	if !ok {
+		return h.End(), nil
+	}
+	return StrHashtableIterator{h, h.epoch, r.slot, h.Capacity()}, nil
+}
+func (h *StrHashtable) FindIteratorFrom(region *arena.BytesRegion, k StrKey) (StrHashtableIterator, error) {
+	r, ok, e := h.FindFrom(region, k)
 	if e != nil {
 		return StrHashtableIterator{}, e
 	}
