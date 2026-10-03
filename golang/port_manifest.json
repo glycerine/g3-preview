@@ -28355,9 +28355,35 @@
       "sha256": "130a104fbe67be08a2aa86de46509609b2d163b6eaca2cc111f34369f49c35c2",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/algebraic_root.go",
+        "mpnum/algebraic_vector.go",
+        "mpnum/algebraic_isolation.go",
+        "mpnum/algebraic_refinement.go",
+        "mpnum/algebraic_compare.go",
+        "mpnum/algebraic_root_test.go",
+        "mpnum/algebraic_cell_source_test.go",
+        "mpnum/algebraic_pipeline_test.go",
+        "mpnum/algebraic_compare_test.go",
+        "algebraic_root_source_test.go"
+      ],
+      "tests": [
+        "TestAlgebraicSourceRootCounts",
+        "TestAlgebraicRootCopyRefineAndIndex",
+        "TestAlgebraicNullZeroAndRationalCells",
+        "TestAlgebraicCellSourceMutableNewAndExisting",
+        "TestAlgebraicCellSourceConstInputPreserved",
+        "TestAlgebraicCellSourceLeadingPositiveAndCopyFlags",
+        "TestAlgebraicCellSourceAllPublicationFailurePrefixes",
+        "TestAlgebraicIndependentRefinementAndRationalConversion",
+        "TestAlgebraicPartialCopySourceDelGuard",
+        "TestAlgebraicSourceUnsignedMagnitude",
+        "TestAlgebraicCompareMinimalAndMagnitudeRefinement",
+        "TestAlgebraicCompareSturmTarskiIndependentOrder",
+        "TestAlgebraicCompareSequenceReservationPrefixes",
+        "TestAlgebraicRealResourceCancellationBeforeMinimalRefine"
+      ],
       "conditionals": [
         {
           "line": 142,
@@ -28760,18 +28786,95 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "selected cell construction/copy/source destruction cpp180–218/360–539; unfinished construction guards and distinct owning abort",
+          "status": "partial",
+          "go_target": "mpnum/algebraic_root.go",
+          "tests": [
+            "TestAlgebraicNullZeroAndRationalCells",
+            "TestAlgebraicCellSourceMutableNewAndExisting",
+            "TestAlgebraicCellSourceConstInputPreserved",
+            "TestAlgebraicCellSourceLeadingPositiveAndCopyFlags",
+            "TestAlgebraicCellSourceAllPublicationFailurePrefixes",
+            "TestAlgebraicPartialCopySourceDelGuard"
+          ]
+        },
+        {
+          "name": "univariate factor/isolate/sort/index selection cpp541–684; selected dense-input prerequisite, full multivariate constructor and wrappers OPEN",
+          "status": "partial",
+          "go_target": "mpnum/algebraic_isolation.go",
+          "tests": [
+            "TestAlgebraicSourceRootCounts",
+            "TestAlgebraicRootCopyRefineAndIndex"
+          ]
+        },
+        {
+          "name": "predicates cpp243–335, magnitude/refinement cpp703–781 and saved interval cpp897–929; IsRational temporary-reference lifetime is explicitly adapted",
+          "status": "partial",
+          "go_target": "mpnum/algebraic_refinement.go",
+          "tests": [
+            "TestAlgebraicIndependentRefinementAndRationalConversion",
+            "TestAlgebraicSourceUnsignedMagnitude"
+          ]
+        },
+        {
+          "name": "basic/root/rational dispatch and interval/minimal/refinement/Sturm–Tarski comparison cpp1669–1821/1867–1885",
+          "status": "partial",
+          "go_target": "mpnum/algebraic_compare.go",
+          "tests": [
+            "TestAlgebraicCompareMinimalAndMagnitudeRefinement",
+            "TestAlgebraicCompareSturmTarskiIndependentOrder",
+            "TestAlgebraicCompareSequenceReservationPrefixes"
+          ]
+        }
+      ],
+      "ownership": [
+        "RootCore is an explicit prerequisite borrowing actual same-cohort rational/polynomial/factor/binary/interval/runtime allocator services; it does not implement source imp constructor cpp65–126 or fabricate multivariate x/y.",
+        "Actual scalar cell fields are encoded in real SmallAllocator payloads; pointer-free locator metadata contains no duplicate owning numerals. Coefficients use actual owning typed UPolynomial backing with declared storage extent/initialization adaptation. Caller/vector values, pending construction, lexical rational/predicate intervals, private factor/isolation vectors and comparison sequence remain distinct named roots.",
+        "Source Del guards endangered partial construction reads; explicit owning abort drains genuine fields and retains physical cleanup progress. Owning close rejects caller roots instead of sweeping the locator registry."
+      ],
+      "deviations": [
+        "Basic24/root56 byte scalar codec and typed UPolynomial coefficient backing are Go storage adaptations, not claims about C++ sizeof or raw coefficient allocator extents.",
+        "External std::sort is adapted to concrete heap sort; comparison/refinement/checkpoint order can differ by backend. Source comparison bodies and errors remain actual.",
+        "IsRational cpp292 passes algebraic_cell* through temporary anum (header366–371) into save_intervals numeral const& (cpp897–929); source reference dangles after construction. The Go lifetime adaptation binds the actual current caller and refreshes its handle after conversion; independent tests cover adapted behavior, not a source-defined dangling-reference result.",
+        "Selected uint32 arithmetic/conversion profile is explicit; full manager construction, multivariate/resultant arithmetic, plugins, printers, and complete header/registered test surfaces remain OPEN."
+      ]
     },
     {
       "path": "src/math/polynomial/algebraic_numbers.h",
       "sha256": "10f6f3f3cbf7e4e14261465d161e8a7a59de6ead0138cf9674cbd53001850e72",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/algebraic_root.go",
+        "mpnum/algebraic_vector.go",
+        "mpnum/algebraic_isolation.go",
+        "mpnum/algebraic_refinement.go",
+        "mpnum/algebraic_compare.go",
+        "mpnum/algebraic_root_test.go",
+        "mpnum/algebraic_cell_source_test.go",
+        "mpnum/algebraic_pipeline_test.go",
+        "mpnum/algebraic_compare_test.go",
+        "algebraic_root_source_test.go"
+      ],
+      "tests": [
+        "TestAlgebraicSourceRootCounts",
+        "TestAlgebraicRootCopyRefineAndIndex",
+        "TestAlgebraicNullZeroAndRationalCells",
+        "TestAlgebraicCellSourceMutableNewAndExisting",
+        "TestAlgebraicCellSourceConstInputPreserved",
+        "TestAlgebraicCellSourceLeadingPositiveAndCopyFlags",
+        "TestAlgebraicCellSourceAllPublicationFailurePrefixes",
+        "TestAlgebraicIndependentRefinementAndRationalConversion",
+        "TestAlgebraicPartialCopySourceDelGuard",
+        "TestAlgebraicSourceUnsignedMagnitude",
+        "TestAlgebraicCompareMinimalAndMagnitudeRefinement",
+        "TestAlgebraicCompareSturmTarskiIndependentOrder",
+        "TestAlgebraicCompareSequenceReservationPrefixes",
+        "TestAlgebraicRealResourceCancellationBeforeMinimalRefine"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -28794,9 +28897,60 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "selected cell construction/copy/source destruction cpp180–218/360–539; unfinished construction guards and distinct owning abort",
+          "status": "partial",
+          "go_target": "mpnum/algebraic_root.go",
+          "tests": [
+            "TestAlgebraicNullZeroAndRationalCells",
+            "TestAlgebraicCellSourceMutableNewAndExisting",
+            "TestAlgebraicCellSourceConstInputPreserved",
+            "TestAlgebraicCellSourceLeadingPositiveAndCopyFlags",
+            "TestAlgebraicCellSourceAllPublicationFailurePrefixes",
+            "TestAlgebraicPartialCopySourceDelGuard"
+          ]
+        },
+        {
+          "name": "univariate factor/isolate/sort/index selection cpp541–684; selected dense-input prerequisite, full multivariate constructor and wrappers OPEN",
+          "status": "partial",
+          "go_target": "mpnum/algebraic_isolation.go",
+          "tests": [
+            "TestAlgebraicSourceRootCounts",
+            "TestAlgebraicRootCopyRefineAndIndex"
+          ]
+        },
+        {
+          "name": "predicates cpp243–335, magnitude/refinement cpp703–781 and saved interval cpp897–929; IsRational temporary-reference lifetime is explicitly adapted",
+          "status": "partial",
+          "go_target": "mpnum/algebraic_refinement.go",
+          "tests": [
+            "TestAlgebraicIndependentRefinementAndRationalConversion",
+            "TestAlgebraicSourceUnsignedMagnitude"
+          ]
+        },
+        {
+          "name": "basic/root/rational dispatch and interval/minimal/refinement/Sturm–Tarski comparison cpp1669–1821/1867–1885",
+          "status": "partial",
+          "go_target": "mpnum/algebraic_compare.go",
+          "tests": [
+            "TestAlgebraicCompareMinimalAndMagnitudeRefinement",
+            "TestAlgebraicCompareSturmTarskiIndependentOrder",
+            "TestAlgebraicCompareSequenceReservationPrefixes"
+          ]
+        }
+      ],
+      "ownership": [
+        "RootCore is an explicit prerequisite borrowing actual same-cohort rational/polynomial/factor/binary/interval/runtime allocator services; it does not implement source imp constructor cpp65–126 or fabricate multivariate x/y.",
+        "Actual scalar cell fields are encoded in real SmallAllocator payloads; pointer-free locator metadata contains no duplicate owning numerals. Coefficients use actual owning typed UPolynomial backing with declared storage extent/initialization adaptation. Caller/vector values, pending construction, lexical rational/predicate intervals, private factor/isolation vectors and comparison sequence remain distinct named roots.",
+        "Source Del guards endangered partial construction reads; explicit owning abort drains genuine fields and retains physical cleanup progress. Owning close rejects caller roots instead of sweeping the locator registry."
+      ],
+      "deviations": [
+        "Basic24/root56 byte scalar codec and typed UPolynomial coefficient backing are Go storage adaptations, not claims about C++ sizeof or raw coefficient allocator extents.",
+        "External std::sort is adapted to concrete heap sort; comparison/refinement/checkpoint order can differ by backend. Source comparison bodies and errors remain actual.",
+        "IsRational cpp292 passes algebraic_cell* through temporary anum (header366–371) into save_intervals numeral const& (cpp897–929); source reference dangles after construction. The Go lifetime adaptation binds the actual current caller and refreshes its handle after conversion; independent tests cover adapted behavior, not a source-defined dangling-reference result.",
+        "Selected uint32 arithmetic/conversion profile is explicit; full manager construction, multivariate/resultant arithmetic, plugins, printers, and complete header/registered test surfaces remain OPEN."
+      ]
     },
     {
       "path": "src/math/polynomial/algebraic_params.hpp",
@@ -55011,7 +55165,11 @@
         "sat_solver_runtime_trail.go",
         "sat_solver_runtime_activity_trail_test.go",
         "sat_solver_runtime_justification.go",
-        "sat_solver_runtime_justification_test.go"
+        "sat_solver_runtime_justification_test.go",
+        "sat_solver_conflict_analysis.go",
+        "sat_solver_conflict_analysis_test.go",
+        "sat_solver_lemma_minimization.go",
+        "sat_solver_lemma_minimization_test.go"
       ],
       "tests": [
         "TestSATSolverClauseCoreFiniteSimplification",
@@ -55093,7 +55251,19 @@
         "TestSATSolverJustificationStaleGenerationAndForeignAllocatorTiming",
         "TestSATSolverJustificationGrowthCopiesSourceAndMetadataHasRealPeak",
         "TestSATSolverJustificationTLSPendingAtActualSourceAllocation",
-        "TestSATSolverJustificationRetainedInitializedSlotAndCurrentMember"
+        "TestSATSolverJustificationRetainedInitializedSlotAndCurrentMember",
+        "TestSATSolverLemmaMinimizationOwnedHeaderAndLifetime",
+        "TestSATSolverLemmaAntecedentActualAllocationPrefixes",
+        "TestSATSolverLemmaMinimizationWholeOperationFaultPublication",
+        "TestSATSolverLemmaMinimizationConstructorBudgetIdentityAndRefusal",
+        "TestSATSolverLemmaMinimizationDeepVectorGrowthFaultPrefixes",
+        "TestSATSolverLemmaMinimizationIndependentFiniteDAG",
+        "TestSATSolverLemmaMinimizationSourceCompactionAndApproxCollision",
+        "TestSATSolverLemmaMinimizationClauseBranchesAndRejectedSuffix",
+        "TestSATSolverLemmaMinimizationTernaryShortCircuitAndExternalGuard",
+        "TestSATSolverLemmaMinimizationWarmPhysicalPlateau",
+        "TestSATSolverLemmaMinimizationClauseDebugSiteAndStaleBorrow",
+        "TestSATSolverLemmaMinimizationEmptyAndFirstUIPDebugRoutes"
       ],
       "conditionals": [
         {
@@ -55531,7 +55701,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "simplify_clause_core and scope dispatch; select_watch_lit; select_learned_watch_lit (source367\u2013465)",
+          "name": "simplify_clause_core and scope dispatch; select_watch_lit; select_learned_watch_lit (source367–465)",
           "status": "ported",
           "go_target": "sat_solver_clause_core.go",
           "tests": [
@@ -55543,7 +55713,7 @@
           ]
         },
         {
-          "name": "Complete source135\u2013160 MkVar body on actual variable columns/watch lists/activity/queue and borrowed elimination todo",
+          "name": "Complete source135–160 MkVar body on actual variable columns/watch lists/activity/queue and borrowed elimination todo",
           "status": "ported",
           "go_target": "sat_solver_variable_state.go",
           "tests": [
@@ -55588,7 +55758,7 @@
           ]
         },
         {
-          "name": "num_diff_levels source2218\u20132238 on borrowed literal spans and actual clause storage; same reserve/mark/reset body and source DEBUG assignment assertion",
+          "name": "num_diff_levels source2218–2238 on borrowed literal spans and actual clause storage; same reserve/mark/reset body and source DEBUG assignment assertion",
           "status": "ported",
           "go_target": "sat_solver_propagation_control.go",
           "tests": [
@@ -55599,7 +55769,7 @@
           ]
         },
         {
-          "name": "Source185\u2013345/463\u2013493 null-extension clause creation/attach/detach with actual candidate ownership, then2531\u20132616 push/pop/unassign/reinit; extension, PopReinit and full solver remain open",
+          "name": "Source185–345/463–493 null-extension clause creation/attach/detach with actual candidate ownership, then2531–2616 push/pop/unassign/reinit; extension, PopReinit and full solver remain open",
           "status": "partial",
           "go_target": "sat_solver_clause_lifecycle.go",
           "tests": [
@@ -55678,6 +55848,25 @@
             "TestSATSolverJustificationTLSPendingAtActualSourceAllocation",
             "TestSATSolverJustificationRetainedInitializedSlotAndCurrentMember"
           ]
+        },
+        {
+          "name": "Source lemma minimization and actual conflict-analysis Runtime vectors; first-UIP, default search and real extension dispatch remain open",
+          "status": "partial",
+          "go_target": "sat_solver_lemma_minimization.go",
+          "tests": [
+            "TestSATSolverLemmaMinimizationOwnedHeaderAndLifetime",
+            "TestSATSolverLemmaAntecedentActualAllocationPrefixes",
+            "TestSATSolverLemmaMinimizationWholeOperationFaultPublication",
+            "TestSATSolverLemmaMinimizationConstructorBudgetIdentityAndRefusal",
+            "TestSATSolverLemmaMinimizationDeepVectorGrowthFaultPrefixes",
+            "TestSATSolverLemmaMinimizationIndependentFiniteDAG",
+            "TestSATSolverLemmaMinimizationSourceCompactionAndApproxCollision",
+            "TestSATSolverLemmaMinimizationClauseBranchesAndRejectedSuffix",
+            "TestSATSolverLemmaMinimizationTernaryShortCircuitAndExternalGuard",
+            "TestSATSolverLemmaMinimizationWarmPhysicalPlateau",
+            "TestSATSolverLemmaMinimizationClauseDebugSiteAndStaleBorrow",
+            "TestSATSolverLemmaMinimizationEmptyAndFirstUIPDebugRoutes"
+          ]
         }
       ],
       "ownership": [
@@ -55729,7 +55918,11 @@
         "sat_solver_runtime_trail.go",
         "sat_solver_runtime_activity_trail_test.go",
         "sat_solver_runtime_justification.go",
-        "sat_solver_runtime_justification_test.go"
+        "sat_solver_runtime_justification_test.go",
+        "sat_solver_conflict_analysis.go",
+        "sat_solver_conflict_analysis_test.go",
+        "sat_solver_lemma_minimization.go",
+        "sat_solver_lemma_minimization_test.go"
       ],
       "tests": [
         "TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots",
@@ -55811,7 +56004,19 @@
         "TestSATSolverJustificationStaleGenerationAndForeignAllocatorTiming",
         "TestSATSolverJustificationGrowthCopiesSourceAndMetadataHasRealPeak",
         "TestSATSolverJustificationTLSPendingAtActualSourceAllocation",
-        "TestSATSolverJustificationRetainedInitializedSlotAndCurrentMember"
+        "TestSATSolverJustificationRetainedInitializedSlotAndCurrentMember",
+        "TestSATSolverLemmaMinimizationOwnedHeaderAndLifetime",
+        "TestSATSolverLemmaAntecedentActualAllocationPrefixes",
+        "TestSATSolverLemmaMinimizationWholeOperationFaultPublication",
+        "TestSATSolverLemmaMinimizationConstructorBudgetIdentityAndRefusal",
+        "TestSATSolverLemmaMinimizationDeepVectorGrowthFaultPrefixes",
+        "TestSATSolverLemmaMinimizationIndependentFiniteDAG",
+        "TestSATSolverLemmaMinimizationSourceCompactionAndApproxCollision",
+        "TestSATSolverLemmaMinimizationClauseBranchesAndRejectedSuffix",
+        "TestSATSolverLemmaMinimizationTernaryShortCircuitAndExternalGuard",
+        "TestSATSolverLemmaMinimizationWarmPhysicalPlateau",
+        "TestSATSolverLemmaMinimizationClauseDebugSiteAndStaleBorrow",
+        "TestSATSolverLemmaMinimizationEmptyAndFirstUIPDebugRoutes"
       ],
       "conditionals": [
         {
@@ -55845,7 +56050,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Complete source135\u2013160 MkVar body on actual variable columns/watch lists/activity/queue and borrowed elimination todo",
+          "name": "Complete source135–160 MkVar body on actual variable columns/watch lists/activity/queue and borrowed elimination todo",
           "status": "ported",
           "go_target": "sat_solver_variable_state.go",
           "tests": [
@@ -55890,7 +56095,7 @@
           ]
         },
         {
-          "name": "num_diff_levels source2218\u20132238 on borrowed literal spans and actual clause storage; same reserve/mark/reset body and source DEBUG assignment assertion",
+          "name": "num_diff_levels source2218–2238 on borrowed literal spans and actual clause storage; same reserve/mark/reset body and source DEBUG assignment assertion",
           "status": "ported",
           "go_target": "sat_solver_propagation_control.go",
           "tests": [
@@ -55901,7 +56106,7 @@
           ]
         },
         {
-          "name": "Source185\u2013345/463\u2013493 null-extension clause creation/attach/detach with actual candidate ownership, then2531\u20132616 push/pop/unassign/reinit; extension, PopReinit and full solver remain open",
+          "name": "Source185–345/463–493 null-extension clause creation/attach/detach with actual candidate ownership, then2531–2616 push/pop/unassign/reinit; extension, PopReinit and full solver remain open",
           "status": "partial",
           "go_target": "sat_solver_clause_lifecycle.go",
           "tests": [
@@ -55979,6 +56184,25 @@
             "TestSATSolverJustificationGrowthCopiesSourceAndMetadataHasRealPeak",
             "TestSATSolverJustificationTLSPendingAtActualSourceAllocation",
             "TestSATSolverJustificationRetainedInitializedSlotAndCurrentMember"
+          ]
+        },
+        {
+          "name": "Source lemma minimization and actual conflict-analysis Runtime vectors; first-UIP, default search and real extension dispatch remain open",
+          "status": "partial",
+          "go_target": "sat_solver_lemma_minimization.go",
+          "tests": [
+            "TestSATSolverLemmaMinimizationOwnedHeaderAndLifetime",
+            "TestSATSolverLemmaAntecedentActualAllocationPrefixes",
+            "TestSATSolverLemmaMinimizationWholeOperationFaultPublication",
+            "TestSATSolverLemmaMinimizationConstructorBudgetIdentityAndRefusal",
+            "TestSATSolverLemmaMinimizationDeepVectorGrowthFaultPrefixes",
+            "TestSATSolverLemmaMinimizationIndependentFiniteDAG",
+            "TestSATSolverLemmaMinimizationSourceCompactionAndApproxCollision",
+            "TestSATSolverLemmaMinimizationClauseBranchesAndRejectedSuffix",
+            "TestSATSolverLemmaMinimizationTernaryShortCircuitAndExternalGuard",
+            "TestSATSolverLemmaMinimizationWarmPhysicalPlateau",
+            "TestSATSolverLemmaMinimizationClauseDebugSiteAndStaleBorrow",
+            "TestSATSolverLemmaMinimizationEmptyAndFirstUIPDebugRoutes"
           ]
         }
       ],
@@ -81033,9 +81257,17 @@
       "sha256": "a8e34b0bef84d6bf905ee4241fa7f5642f4a96d7fa0b9ef425c023e45ae15a16",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "algebraic_root_source_test.go",
+        "mpnum/algebraic_root_test.go",
+        "mpnum/algebraic_compare_test.go"
+      ],
+      "tests": [
+        "TestAlgebraicRegisteredUnivariateRootCounts",
+        "TestAlgebraicRegisteredWilkinsonTwentyIntegerRoots",
+        "TestAlgebraicCompareSourceOverlappingRootFixture"
+      ],
       "assertions": [
         {
           "line": 57,
@@ -81092,9 +81324,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "registered tst1 selected root-count inputs cpp57/65/91/107 and tst_wilkinson cpp224–248 count/twenty IsInt actions; dense polynomial construction adapter; remaining arithmetic/print/driver actions OPEN",
+          "status": "partial",
+          "go_target": "algebraic_root_source_test.go",
+          "tests": [
+            "TestAlgebraicRegisteredUnivariateRootCounts",
+            "TestAlgebraicRegisteredWilkinsonTwentyIntegerRoots"
+          ]
+        }
+      ],
+      "ownership": [
+        "Selected tests use real RationalService, polynomial/factor/binary/interval/SmallAllocator owners and actual resource/cooperation services. Whole registered test driver remains open."
+      ],
+      "deviations": [
+        "Source multivariate expression construction is adapted to independently expanded dense coefficients and actual dense multiplication. This is selected assertion/input coverage, not complete registered tst1/tst_wilkinson execution."
+      ]
     },
     {
       "path": "src/test/api.cpp",
@@ -96929,7 +97175,8 @@
         "mpnum/mp_raw_projection_test.go",
         "mpnum/rational_lexical_scope.go",
         "mpnum/mp_lexical_scope_test.go",
-        "mpnum/mp_lexical_constructor_test.go"
+        "mpnum/mp_lexical_constructor_test.go",
+        "mpnum/inf_approx_raw_test.go"
       ],
       "tests": [
         "TestInfEpsInfFiniteTripleOracles",
@@ -96974,7 +97221,15 @@
         "TestConstructorInfPowerUsesPrvalueMove",
         "TestConstructorCompletedUnwindPrecedesOwningAbort",
         "TestConstructorEightRootsAndWarmBoundary",
-        "TestConstructorExpressionFailedCopyPhase"
+        "TestConstructorExpressionFailedCopyPhase",
+        "TestInfApproxRawPowerSelectedBranches",
+        "TestInfApproxUnreadPowerFields",
+        "TestInfApproxPublicRationalRawDependencies",
+        "TestInfApproxSignedValueConstructionAndRawAssignments",
+        "TestInfApproxFirstCopyFailurePrecedesUnreadEPS",
+        "TestInfApproxFiniteSignParityAndProductTable",
+        "TestInfApproxPowerActualMaskAndEarlierRefusal",
+        "TestInfApproxRawProductReachedZeroDenominators"
       ],
       "conditionals": [
         {
@@ -97188,6 +97443,14 @@
             "TestConstructorEightRootsAndWarmBoundary",
             "TestConstructorExpressionFailedCopyPhase"
           ]
+        },
+        {
+          "name": "Nested numeral/pair/int32 assignment ordering through actual infinity/FIRST/EPS actions; other constructors remain open",
+          "status": "partial",
+          "go_target": "mpnum/inf_eps_rational.go",
+          "tests": [
+            "TestInfApproxSignedValueConstructionAndRawAssignments"
+          ]
         }
       ],
       "ownership": [
@@ -97196,7 +97459,7 @@
       ],
       "deviations": [
         "Source const references return owning copies; source scalar assertion domains are typed errors. Mixed equality defect and exact nonsaturating infinity coefficient retained. No actual registered direct source assertion counts invented.",
-        "Source h131\u2013147 selected component reference projections ignore unrelated infinity/numeral components; current owning forwards check all denominators and Copy rejects source-finite raw denominator0. NUM-only sign/hash routes retain separate raw-domain debt.",
+        "Source h131–147 selected component reference projections ignore unrelated infinity/numeral components; current owning forwards check all denominators and Copy rejects source-finite raw denominator0. NUM-only sign/hash routes retain separate raw-domain debt.",
         "Malformed32-bit requested-byte layouts are labelled guarded Go boundary evidence, not ordinary valid C++ destructor allocation failure. Budget supplies actual allocation refusal/failed-copy token only, never simulated Del failure. Selected scope records preserve original vs cleanup causes; broader raw constructor/reset/alias/default-copy-constructor arithmetic temporaries, registry/global ownership and transport remain partial. Cross-owner staged CopyFrom is explicit Go ownership bridge, not a source alias transaction. No whole-unit/API/registered assertion promotion."
       ]
     },
@@ -97304,7 +97567,8 @@
         "mpnum/mp_raw_projection_test.go",
         "mpnum/rational_lexical_scope.go",
         "mpnum/mp_lexical_scope_test.go",
-        "mpnum/mp_lexical_constructor_test.go"
+        "mpnum/mp_lexical_constructor_test.go",
+        "mpnum/inf_approx_raw_test.go"
       ],
       "tests": [
         "TestInfIntRationalSourceConstructorsConstantsLifetime",
@@ -97351,7 +97615,15 @@
         "TestConstructorInfPowerUsesPrvalueMove",
         "TestConstructorCompletedUnwindPrecedesOwningAbort",
         "TestConstructorEightRootsAndWarmBoundary",
-        "TestConstructorExpressionFailedCopyPhase"
+        "TestConstructorExpressionFailedCopyPhase",
+        "TestInfApproxRawPowerSelectedBranches",
+        "TestInfApproxUnreadPowerFields",
+        "TestInfApproxPublicRationalRawDependencies",
+        "TestInfApproxSignedValueConstructionAndRawAssignments",
+        "TestInfApproxFirstCopyFailurePrecedesUnreadEPS",
+        "TestInfApproxFiniteSignParityAndProductTable",
+        "TestInfApproxPowerActualMaskAndEarlierRefusal",
+        "TestInfApproxRawProductReachedZeroDenominators"
       ],
       "conditionals": [
         {
@@ -97527,6 +97799,14 @@
             "TestConstructorEightRootsAndWarmBoundary",
             "TestConstructorExpressionFailedCopyPhase"
           ]
+        },
+        {
+          "name": "Signed fraction/rational value construction and selected assignment phases through actual public rational algorithms; other overloads remain open",
+          "status": "partial",
+          "go_target": "mpnum/inf_int_rational.go",
+          "tests": [
+            "TestInfApproxSignedValueConstructionAndRawAssignments"
+          ]
         }
       ],
       "ownership": [
@@ -97536,7 +97816,7 @@
       "deviations": [
         "Global constants and borrowed rational accessors are owner-local/independent-copy adapters. Signed32 overflow, INT_MIN negation and formatting negation are explicit typed undefined-domain failures with source defined prefixes retained.",
         "No registered source inf_int_rational test exists; independent finite/fault/alias/ownership checks are supplied without inventing source assertion coverage.",
-        "Source h129\u2013137 returns FIRST without a denominator-domain assertion; InfIntFirst/Rational/Infinitesimal still enter ordinary checkInfInt and owning Copy, rejecting source-finite raw denominator0 and inspecting unrelated FIRST before constructing epsilon. Sign/hash NUM-only routes retain separate raw-domain debt.",
+        "Source h129–137 returns FIRST without a denominator-domain assertion; InfIntFirst/Rational/Infinitesimal still enter ordinary checkInfInt and owning Copy, rejecting source-finite raw denominator0 and inspecting unrelated FIRST before constructing epsilon. Sign/hash NUM-only routes retain separate raw-domain debt.",
         "Malformed32-bit requested-byte layouts are labelled guarded Go boundary evidence, not ordinary valid C++ destructor allocation failure. Budget supplies actual allocation refusal/failed-copy token only, never simulated Del failure. Selected scope records preserve original vs cleanup causes; broader raw constructor/reset/alias/default-copy-constructor arithmetic temporaries, registry/global ownership and transport remain partial. Cross-owner staged CopyFrom is explicit Go ownership bridge, not a source alias transaction. No whole-unit/API/registered assertion promotion."
       ]
     },
@@ -97549,7 +97829,8 @@
       "go_targets": [
         "mpnum/inf_rational.go",
         "mpnum/mp_lexical_constructor_test.go",
-        "mpnum/inf_guard_profile_test.go"
+        "mpnum/inf_guard_profile_test.go",
+        "mpnum/inf_approx_raw_test.go"
       ],
       "tests": [
         "TestInfRationalSource80Assertions",
@@ -97576,7 +97857,15 @@
         "TestInfGuardZeroFirstDivisionProfiles",
         "TestInfGuardRootProfilesAndUnreadFields",
         "TestInfGuardUnreadDivisorAndLowerRoot",
-        "TestInfGuardAllocationPrecedenceAndWarmRoots"
+        "TestInfGuardAllocationPrecedenceAndWarmRoots",
+        "TestInfApproxRawPowerSelectedBranches",
+        "TestInfApproxUnreadPowerFields",
+        "TestInfApproxPublicRationalRawDependencies",
+        "TestInfApproxSignedValueConstructionAndRawAssignments",
+        "TestInfApproxFirstCopyFailurePrecedesUnreadEPS",
+        "TestInfApproxFiniteSignParityAndProductTable",
+        "TestInfApproxPowerActualMaskAndEarlierRefusal",
+        "TestInfApproxRawProductReachedZeroDenominators"
       ],
       "assertions": [
         {
@@ -97653,6 +97942,20 @@
             "TestInfGuardUnreadDivisorAndLowerRoot",
             "TestInfGuardAllocationPrecedenceAndWarmRoots"
           ]
+        },
+        {
+          "name": "inf_mult/sup_mult and inf_power/sup_power source branches, full-expression temporaries and selected reached raw scalar profiles",
+          "status": "ported",
+          "go_target": "mpnum/inf_rational.go",
+          "tests": [
+            "TestInfApproxRawPowerSelectedBranches",
+            "TestInfApproxUnreadPowerFields",
+            "TestInfApproxPublicRationalRawDependencies",
+            "TestInfApproxFirstCopyFailurePrecedesUnreadEPS",
+            "TestInfApproxFiniteSignParityAndProductTable",
+            "TestInfApproxPowerActualMaskAndEarlierRefusal",
+            "TestInfApproxRawProductReachedZeroDenominators"
+          ]
         }
       ],
       "ownership": [
@@ -97675,7 +97978,8 @@
         "mpnum/mp_raw_projection_test.go",
         "mpnum/rational_lexical_scope.go",
         "mpnum/mp_lexical_scope_test.go",
-        "mpnum/inf_guard_profile_test.go"
+        "mpnum/inf_guard_profile_test.go",
+        "mpnum/inf_approx_raw_test.go"
       ],
       "tests": [
         "TestInfRationalSource80Assertions",
@@ -97726,7 +98030,15 @@
         "TestInfGuardZeroFirstDivisionProfiles",
         "TestInfGuardRootProfilesAndUnreadFields",
         "TestInfGuardUnreadDivisorAndLowerRoot",
-        "TestInfGuardAllocationPrecedenceAndWarmRoots"
+        "TestInfGuardAllocationPrecedenceAndWarmRoots",
+        "TestInfApproxRawPowerSelectedBranches",
+        "TestInfApproxUnreadPowerFields",
+        "TestInfApproxPublicRationalRawDependencies",
+        "TestInfApproxSignedValueConstructionAndRawAssignments",
+        "TestInfApproxFirstCopyFailurePrecedesUnreadEPS",
+        "TestInfApproxFiniteSignParityAndProductTable",
+        "TestInfApproxPowerActualMaskAndEarlierRefusal",
+        "TestInfApproxRawProductReachedZeroDenominators"
       ],
       "conditionals": [
         {
@@ -97949,6 +98261,14 @@
             "TestInfGuardUnreadDivisorAndLowerRoot",
             "TestInfGuardAllocationPrecedenceAndWarmRoots"
           ]
+        },
+        {
+          "name": "Selected Inf scalar setters and reached FIRST/EPS raw assignment phases; remaining overloads and structural stale-field profiles remain open",
+          "status": "partial",
+          "go_target": "mpnum/inf_rational.go",
+          "tests": [
+            "TestInfApproxSignedValueConstructionAndRawAssignments"
+          ]
         }
       ],
       "ownership": [
@@ -97959,7 +98279,7 @@
       "deviations": [
         "Global constants/borrowed accessors replaced by owner-local constants and explicit independent copies; typed checked source-assertion errors. Signed INT_MIN constructor-negation uses widened defined adapter. Source trace/assertion-message infrastructure remains separate.",
         "Inactive/commented general pair arithmetic and duplicate #if0 approximation declarations are not runtime implementations; all eight compiled approximation functions are ported, including coarse/defective roots/powers.",
-        "Source h135\u2013143 component reference projections read only the selected component; InfFirst/InfRational/Infinitesimal still check both denominators and owning Copy rejects source-finite raw denominator0. NUM-only sign/hash routes retain separate raw-domain debt.",
+        "Source h135–143 component reference projections read only the selected component; InfFirst/InfRational/Infinitesimal still check both denominators and owning Copy rejects source-finite raw denominator0. NUM-only sign/hash routes retain separate raw-domain debt.",
         "Malformed32-bit requested-byte layouts are labelled guarded Go boundary evidence, not ordinary valid C++ destructor allocation failure. Budget supplies actual allocation refusal/failed-copy token only, never simulated Del failure. Selected scope records preserve original vs cleanup causes; broader raw constructor/reset/alias/default-copy-constructor arithmetic temporaries, registry/global ownership and transport remain partial. Cross-owner staged CopyFrom is explicit Go ownership bridge, not a source alias transaction. No whole-unit/API/registered assertion promotion."
       ]
     },
@@ -108014,7 +108334,9 @@
         "mpnum/mpq_source_finalize.go",
         "mpnum/transitive_source_finalize_test.go",
         "mpnum/mp_display_scope.go",
-        "mpnum/mp_display_scope_test.go"
+        "mpnum/mp_display_scope_test.go",
+        "mpnum/mpq_raw_arithmetic_scope.go",
+        "mpnum/mpq_raw_arithmetic_scope_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -108135,7 +108457,12 @@
         "TestTransitiveSourceFinalizeActualChildScratchHole",
         "TestTransitiveSourceFinalizeColdOwnerAndReadinessGuards",
         "TestServiceSourceFinalizeActualHookAndConstantOrder",
-        "TestRawDecimalFailedDenominatorRetainsCopiedNumerator"
+        "TestRawDecimalFailedDenominatorRetainsCopiedNumerator",
+        "TestRationalRawPowerBodyExceptionRetainsLocal",
+        "TestRationalRawNormalizeBodyExceptionRetainsLocal",
+        "TestRationalRawAddBodyExceptionRetainsLocals",
+        "TestRationalRawArithmeticEndGuardAndRetry",
+        "TestRationalRawOwningCloseStopsOwnerEntry"
       ],
       "assertions": [
         {
@@ -108591,6 +108918,18 @@
           "tests": [
             "TestRawDecimalFailedDenominatorRetainsCopiedNumerator"
           ]
+        },
+        {
+          "name": "RAW Power source normal-end cleanup and separate actual retained owner/abort with stopped-close guards; other raw scopes remain open",
+          "status": "partial",
+          "go_target": "mpnum/mpq_raw_arithmetic_scope.go",
+          "tests": [
+            "TestRationalRawPowerBodyExceptionRetainsLocal",
+            "TestRationalRawNormalizeBodyExceptionRetainsLocal",
+            "TestRationalRawAddBodyExceptionRetainsLocals",
+            "TestRationalRawArithmeticEndGuardAndRetry",
+            "TestRationalRawOwningCloseStopsOwnerEntry"
+          ]
         }
       ],
       "ownership": [
@@ -108657,7 +108996,9 @@
         "mpnum/transitive_source_finalize_test.go",
         "mpnum/mp_raw_projection_test.go",
         "mpnum/rational_lexical_scope.go",
-        "mpnum/mp_lexical_scope_test.go"
+        "mpnum/mp_lexical_scope_test.go",
+        "mpnum/mpq_raw_arithmetic_scope.go",
+        "mpnum/mpq_raw_arithmetic_scope_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -108858,7 +109199,12 @@
         "TestLexicalCloneFailedMemberReadUnwind",
         "TestLexicalCallerDestructorLateMemberRead",
         "TestLexicalOriginalFailureAndCleanupCause",
-        "TestLexicalRationalManagerOneRootContinuation"
+        "TestLexicalRationalManagerOneRootContinuation",
+        "TestRationalRawPowerBodyExceptionRetainsLocal",
+        "TestRationalRawNormalizeBodyExceptionRetainsLocal",
+        "TestRationalRawAddBodyExceptionRetainsLocals",
+        "TestRationalRawArithmeticEndGuardAndRetry",
+        "TestRationalRawOwningCloseStopsOwnerEntry"
       ],
       "conditionals": [
         {
@@ -109779,7 +110125,7 @@
           ]
         },
         {
-          "name": "Source mpq.h191\u2013237,562,666\u2013669 same-owner receiver Copy, scalar sign/structural predicates/NUM hash and selected direct component extraction; no whole-pair raw-denominator preflight",
+          "name": "Source mpq.h191–237,562,666–669 same-owner receiver Copy, scalar sign/structural predicates/NUM hash and selected direct component extraction; no whole-pair raw-denominator preflight",
           "status": "ported",
           "go_target": "mpnum/mpq_inspect.go",
           "tests": [
@@ -109810,6 +110156,18 @@
             "TestLexicalCallerDestructorLateMemberRead",
             "TestLexicalOriginalFailureAndCleanupCause",
             "TestLexicalRationalManagerOneRootContinuation"
+          ]
+        },
+        {
+          "name": "SYNCH RAW addition/subtraction/normalization source end order with actual pending roots and separate owning abort; other source profiles remain open",
+          "status": "partial",
+          "go_target": "mpnum/mpq_raw_arithmetic_scope.go",
+          "tests": [
+            "TestRationalRawPowerBodyExceptionRetainsLocal",
+            "TestRationalRawNormalizeBodyExceptionRetainsLocal",
+            "TestRationalRawAddBodyExceptionRetainsLocals",
+            "TestRationalRawArithmeticEndGuardAndRetry",
+            "TestRationalRawOwningCloseStopsOwnerEntry"
           ]
         }
       ],

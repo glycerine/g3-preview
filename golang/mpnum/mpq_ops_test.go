@@ -550,5 +550,15 @@ func qopsAuditLiveOwnership(t *testing.T, m *RationalManager, public []*Int) {
 			roots = append(roots, n)
 		}
 	}
+	raw := &m.rawArithmetic
+	if raw.powerActive {
+		roots = append(roots, &raw.power.num, &raw.power.den)
+	}
+	if raw.addActive {
+		roots = append(roots, &raw.addOne, &raw.addTwo)
+	}
+	if raw.normActive {
+		roots = append(roots, &raw.norm)
+	}
 	integerPhysicalAudit(t, m.z, roots...)
 }

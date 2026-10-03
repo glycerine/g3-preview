@@ -124,22 +124,8 @@ func (s *RationalService) InfIntFromFraction(n, d int32) (_lexOut OwnedInfIntRat
 		return OwnedInfIntRational{}, e
 	}
 	defer s.endLexicalInfInt(&_lexOut, &_lexErr)
-	if d == 0 {
-		return OwnedInfIntRational{}, ErrDivideByZero
-	}
 	out := s.newInfInt()
-	nn, dd := int64(n), int64(d)
-	if dd < 0 {
-		nn = -nn
-		dd = -dd
-	}
-	e := s.manager.z.SetInt64(&out.first.num, nn)
-	if e == nil {
-		e = s.manager.z.SetInt64(&out.first.den, dd)
-	}
-	if e == nil {
-		e = s.manager.normalize(&out.first)
-	}
+	e := s.manager.SetFractionSigned(&out.first, n, d)
 	if e != nil {
 		s.abortLexicalRational(&out.first)
 		return OwnedInfIntRational{}, e
@@ -155,7 +141,7 @@ func (s *RationalService) InfIntFromRational(r *OwnedRational, epsilon int32) (_
 		return OwnedInfIntRational{}, e
 	}
 	defer s.endLexicalInfInt(&_lexOut, &_lexErr)
-	if e := s.check(r); e != nil {
+	if e := s.rationalScalarOwner(r); e != nil {
 		return OwnedInfIntRational{}, e
 	}
 	out := s.newInfInt()
@@ -226,7 +212,15 @@ func (s *RationalService) InfIntCopy(dst, src *OwnedInfIntRational) error {
 	return nil
 }
 func (s *RationalService) InfIntSetParts(dst *OwnedInfIntRational, src *OwnedRational, epsilon int32) error {
-	if e := s.lockInfIntRat(dst, src); e != nil {
+	if e := s.lock(); e != nil {
+		return e
+	}
+	if e := s.infIntScalarOwner(dst); e != nil {
+		s.mu.Unlock()
+		return e
+	}
+	if e := s.rationalScalarOwner(src); e != nil {
+		s.mu.Unlock()
 		return e
 	}
 	defer s.mu.Unlock()
@@ -240,7 +234,11 @@ func (s *RationalService) InfIntSetRational(dst *OwnedInfIntRational, src *Owned
 	return s.InfIntSetParts(dst, src, 0)
 }
 func (s *RationalService) InfIntSetInt(dst *OwnedInfIntRational, n int32) error {
-	if e := s.lockInfInt(dst); e != nil {
+	if e := s.lock(); e != nil {
+		return e
+	}
+	if e := s.infIntScalarOwner(dst); e != nil {
+		s.mu.Unlock()
 		return e
 	}
 	defer s.mu.Unlock()

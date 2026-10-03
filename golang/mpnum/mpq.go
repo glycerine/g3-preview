@@ -31,6 +31,7 @@ type RationalConfig struct {
 // Manager header bytes include all retained scalar rational scratch members.
 type RationalManager struct {
 	lexical                                        rationalManagerLexicalScope
+	rawArithmetic                                  rationalRawArithmeticScope
 	self                                           *RationalManager
 	originalCause, cleanupCause                    error
 	cleanupStage                                   uint8
@@ -208,11 +209,8 @@ func (m *RationalManager) checkSetter(a *Rational) error {
 // ordinary rational-read domain. Source Mul/Div can consume and publish zero
 // denominators; their arithmetic determines the first endangered operation.
 func (m *RationalManager) checkIntegerFields(a *Rational) error {
-	if m == nil {
-		return memory.ErrRuntimeOwner
-	}
-	if m.closed {
-		return arena.ErrClosed
+	if e := m.checkOwnerReady(); e != nil {
+		return e
 	}
 	if a == nil {
 		return arena.ErrInvalidSlot
@@ -312,23 +310,36 @@ func (m *RationalManager) SetParts(a *Rational, n, d *Int) error {
 	}
 	return m.normalize(a)
 }
-func (m *RationalManager) normalize(a *Rational) error {
-	var local Int
+func (m *RationalManager) normalize(a *Rational) (_rawErr error) {
 	tmp := &m.nTmp
 	if m.synchronized {
-		tmp = &local
-		defer m.z.Del(&local)
+		r := &m.rawArithmetic
+		if r.normActive {
+			return ErrRationalRawArithmeticPending
+		}
+		r.norm = Int{}
+		r.normActive = true
+		r.normEnd = false
+		r.normGuard = false
+		r.normCause = nil
+		tmp = &r.norm
+		defer m.finishRawNormalize(&_rawErr)
 	}
 	if e := m.z.GCD(&a.num, &a.den, tmp); e != nil {
 		return e
 	}
-	if isOneInteger(tmp) {
-		return nil
+	if !isOneInteger(tmp) {
+		if e := m.z.Div(&a.num, tmp, &a.num); e != nil {
+			return e
+		}
+		if e := m.z.Div(&a.den, tmp, &a.den); e != nil {
+			return e
+		}
 	}
-	if e := m.z.Div(&a.num, tmp, &a.num); e != nil {
-		return e
+	if m.synchronized {
+		return m.rawNormalizeEnd()
 	}
-	return m.z.Div(&a.den, tmp, &a.den)
+	return nil
 }
 
 // Inv copies into the actual destination before the source in-place action.
@@ -429,9 +440,9 @@ func (m *RationalManager) Compare(a, b *Rational) (int, error) {
 
 func (m *RationalManager) Add(a, b, out *Rational) error { return m.addSub(a, b, out, false) }
 func (m *RationalManager) Sub(a, b, out *Rational) error { return m.addSub(a, b, out, true) }
-func (m *RationalManager) addSub(a, b, out *Rational, subtract bool) error {
+func (m *RationalManager) addSub(a, b, out *Rational, subtract bool) (_rawErr error) {
 	for _, n := range []*Rational{a, b, out} {
-		if e := m.check(n); e != nil {
+		if e := m.checkScalarValue(n); e != nil {
 			return e
 		}
 	}
@@ -450,20 +461,21 @@ func (m *RationalManager) addSub(a, b, out *Rational, subtract bool) error {
 		}
 		return nil
 	}
-	var localOne, localTwo Int
-	cleanupOne, cleanupTwo := false, false
 	one, two := &m.addTmp1, &m.addTmp2
 	if m.synchronized {
-		one, two = &localOne, &localTwo
-		cleanupOne, cleanupTwo = true, true
-		defer func() {
-			if cleanupOne {
-				m.z.Del(one)
-			}
-			if cleanupTwo {
-				m.z.Del(two)
-			}
-		}()
+		r := &m.rawArithmetic
+		if r.addActive {
+			return ErrRationalRawArithmeticPending
+		}
+		r.addOne = Int{}
+		r.addTwo = Int{}
+		r.addActive = true
+		r.addEnd = false
+		r.addGuard = false
+		r.addCursor = 0
+		r.addCause = nil
+		one, two = &r.addOne, &r.addTwo
+		defer m.finishRawAdd(&_rawErr)
 	}
 	if e := m.z.Mul(&a.num, &b.den, one); e != nil {
 		return e
@@ -487,16 +499,7 @@ func (m *RationalManager) addSub(a, b, out *Rational, subtract bool) error {
 		return e
 	}
 	if m.synchronized {
-		// Source ordinary completion deletes tmp1 before tmp2. Deferred
-		// ownership cleanup applies only to an interrupted Go action.
-		if e = m.z.Del(one); e != nil {
-			return e
-		}
-		cleanupOne = false
-		if e = m.z.Del(two); e != nil {
-			return e
-		}
-		cleanupTwo = false
+		return m.rawAddEnd()
 	}
 	return nil
 }

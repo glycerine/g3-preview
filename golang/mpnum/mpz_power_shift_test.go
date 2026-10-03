@@ -378,6 +378,9 @@ func TestRationalPowerIndependentAndDomains(t *testing.T) {
 					t.Fatal("first real square refusal", base, out, e)
 				}
 				budget.FailAfter(-1)
+				if e := m.CleanupRawArithmetic(); e != nil {
+					t.Fatal(e)
+				}
 			} else {
 				want := int32(1)
 				if base == 0 {
@@ -503,9 +506,15 @@ func TestPowerShiftWarmStorageAndLifetime(t *testing.T) {
 		numericWarmProfileAudit(t, m.z, budget, beforeWarm, got, modularSourceDebug)
 		qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &out.num, &out.den, &result})
 		var raw Rational
-		if e := m.Power(&raw, 2, &out); !errors.Is(e, ErrUninitializedRational) {
-			t.Fatal(e)
+		// Source copies raw 0/0, publishes out=1, then its first unused
+		// square reaches normalize's actual Integer division by gcd(0,0).
+		if e := m.Power(&raw, 2, &out); !errors.Is(e, ErrDivideByZero) {
+			t.Fatal(synch, e)
 		}
+		if raw != (Rational{}) || out != (Rational{num: NewInt(1), den: NewInt(1)}) {
+			t.Fatal("source raw power publication", synch, raw, out)
+		}
+		qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &out.num, &out.den, &result, &raw.num, &raw.den})
 		m.Close()
 		if e := m.z.Power(&result, 2, &result); !errors.Is(e, arena.ErrClosed) {
 			t.Fatal(e)

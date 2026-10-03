@@ -37,6 +37,17 @@ func upolyPhysicalExtraNumerals(extras []upolyPhysicalExtraOwners, addInt func(r
 			for i := 0; i < int(scope.FieldByName("count").Uint()); i++ {
 				addRat(scope.FieldByName("roots").Index(i))
 			}
+			raw := v.FieldByName("rawArithmetic")
+			if raw.FieldByName("powerActive").Bool() {
+				addRat(raw.FieldByName("power"))
+			}
+			if raw.FieldByName("addActive").Bool() {
+				addInt(raw.FieldByName("addOne"))
+				addInt(raw.FieldByName("addTwo"))
+			}
+			if raw.FieldByName("normActive").Bool() {
+				addInt(raw.FieldByName("norm"))
+			}
 		}
 		for _, s := range x.RationalServices {
 			v := reflect.ValueOf(s).Elem()
@@ -72,15 +83,7 @@ func upolyPhysicalExtraNumerals(extras []upolyPhysicalExtraOwners, addInt func(r
 			addInt(v.FieldByName("den"))
 		}
 		for _, m := range x.RationalManagers {
-			v := reflect.ValueOf(m).Elem()
-			for _, f := range []string{"nTmp", "addTmp1", "addTmp2"} {
-				addInt(v.FieldByName(f))
-			}
-			for _, f := range []string{"addMulTmp", "ltTmp1", "ltTmp2"} {
-				r := v.FieldByName(f)
-				addInt(r.FieldByName("num"))
-				addInt(r.FieldByName("den"))
-			}
+			addManager(reflect.ValueOf(m).Elem())
 		}
 		for _, b := range x.BinaryValues {
 			addInt(reflect.ValueOf(b).Elem().FieldByName("num"))

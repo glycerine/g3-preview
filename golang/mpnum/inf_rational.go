@@ -203,10 +203,10 @@ func (s *RationalService) InfSetRational(v *OwnedInfRational, a *OwnedRational) 
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return e
 	}
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return e
 	}
 	if e := s.manager.Copy(&v.first, &a.raw); e != nil {
@@ -219,13 +219,13 @@ func (s *RationalService) InfSetPair(v *OwnedInfRational, a, b *OwnedRational) e
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return e
 	}
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return e
 	}
-	if e := s.check(b); e != nil {
+	if e := s.rationalScalarOwner(b); e != nil {
 		return e
 	}
 	if e := s.manager.Copy(&v.first, &a.raw); e != nil {
@@ -238,10 +238,10 @@ func (s *RationalService) InfSetOffset(v *OwnedInfRational, a *OwnedRational, po
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return e
 	}
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return e
 	}
 	if e := s.manager.Copy(&v.first, &a.raw); e != nil {
@@ -1065,7 +1065,8 @@ func (s *RationalService) InfPostDec(v *OwnedInfRational) (_lexOut OwnedInfRatio
 }
 
 // Named return values are transferred to the caller; lvalue compound-expression
-// return copies are explicit in infRatExpr and infBinary. No local survives error.
+// return copies are explicit in infRatExpr and infBinary. Stopped source
+// destructors and RAW manager body locals retain their actual charged roots.
 func (s *RationalService) infApproxCheck(a, b *OwnedInfRational) error {
 	if e := s.infCheck(a); e != nil {
 		return e
@@ -1156,7 +1157,10 @@ func (s *RationalService) InfLowerMult(a, b *OwnedInfRational) (OwnedInfRational
 		return OwnedInfRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infApproxCheck(a, b); e != nil {
+	if e := s.infScalarOwner(a); e != nil {
+		return OwnedInfRational{}, e
+	}
+	if e := s.infScalarOwner(b); e != nil {
 		return OwnedInfRational{}, e
 	}
 	return s.infMult(a, b, false)
@@ -1166,7 +1170,10 @@ func (s *RationalService) InfUpperMult(a, b *OwnedInfRational) (OwnedInfRational
 		return OwnedInfRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infApproxCheck(a, b); e != nil {
+	if e := s.infScalarOwner(a); e != nil {
+		return OwnedInfRational{}, e
+	}
+	if e := s.infScalarOwner(b); e != nil {
 		return OwnedInfRational{}, e
 	}
 	return s.infMult(a, b, true)
@@ -1367,7 +1374,7 @@ func (s *RationalService) InfLowerPower(v *OwnedInfRational, n uint32) (OwnedInf
 		return OwnedInfRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return OwnedInfRational{}, e
 	}
 	return s.infPower(v, n, false)
@@ -1377,7 +1384,7 @@ func (s *RationalService) InfUpperPower(v *OwnedInfRational, n uint32) (OwnedInf
 		return OwnedInfRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return OwnedInfRational{}, e
 	}
 	return s.infPower(v, n, true)
@@ -1487,7 +1494,7 @@ func (s *RationalService) InfSetInt32(v *OwnedInfRational, n int32) (_lexErr err
 		return e
 	}
 	defer s.endLexicalError(&_lexErr)
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return e
 	}
 	tmp := NewRational()
@@ -1511,27 +1518,13 @@ func (s *RationalService) InfSetFractionSigned(v *OwnedInfRational, n, d int32) 
 		return e
 	}
 	defer s.endLexicalError(&_lexErr)
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return e
-	}
-	if d == 0 {
-		return ErrDivideByZero
-	}
-	nn, dd := int64(n), int64(d)
-	if dd < 0 {
-		nn = -nn
-		dd = -dd
 	}
 	work := NewRational()
 	workComplete := false
 	defer s.endLexicalLocal(&work, &workComplete)
-	if e := s.manager.z.SetInt64(&work.num, nn); e != nil {
-		return e
-	}
-	if e := s.manager.z.SetInt64(&work.den, dd); e != nil {
-		return e
-	}
-	if e := s.manager.normalize(&work); e != nil {
+	if e := s.manager.SetFractionSigned(&work, n, d); e != nil {
 		return e
 	}
 	workComplete = true

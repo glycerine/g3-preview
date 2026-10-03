@@ -535,6 +535,8 @@ func TestRationalFacadeModHatNumBitsAndPowerDomains(t *testing.T) {
 	if v, e := s.Expt(&a, -1); e == nil || v.ownerID != 0 {
 		t.Fatal(v, e)
 	}
+	facadeAudit(t, s, &a, &b)
+	serviceMust(t, s.manager.CleanupRawArithmetic())
 	serviceMust(t, s.SetInt64(&a, 0))
 	v, e := s.Power(&a, 0)
 	serviceMust(t, e)

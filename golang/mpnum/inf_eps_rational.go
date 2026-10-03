@@ -176,10 +176,10 @@ func (s *RationalService) InfEpsInfSetNumeral(v *OwnedInfEpsInfRational, n *Owne
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return e
 	}
-	if e := s.infCheck(n); e != nil {
+	if e := s.infScalarOwner(n); e != nil {
 		return e
 	}
 	if e := s.manager.Reset(&v.infinity); e != nil {
@@ -192,13 +192,13 @@ func (s *RationalService) InfEpsInfSetPair(v *OwnedInfEpsInfRational, i *OwnedRa
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return e
 	}
-	if e := s.check(i); e != nil {
+	if e := s.rationalScalarOwner(i); e != nil {
 		return e
 	}
-	if e := s.infCheck(n); e != nil {
+	if e := s.infScalarOwner(n); e != nil {
 		return e
 	}
 	if e := s.manager.Copy(&v.infinity, &i.raw); e != nil {
@@ -211,7 +211,7 @@ func (s *RationalService) InfEpsInfSetInt32(v *OwnedInfEpsInfRational, n int32) 
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return e
 	}
 	if e := s.manager.Reset(&v.infinity); e != nil {
