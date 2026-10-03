@@ -88119,7 +88119,11 @@
         "TestInfIntRationalPostFailureAndGetterIndependence",
         "TestRationalServiceInfinitesimalHeaderOwnership",
         "TestRationalServiceInfinitesimalConstructorFailureRefunds",
-        "TestRationalServiceInfinitesimalFinalizerTraversal"
+        "TestRationalServiceInfinitesimalFinalizerTraversal",
+        "TestInfFormatOneFinalAllocation",
+        "TestInfFormatSignedZeroAndDomain",
+        "TestInfFormatFailurePrefixesImmediateRoots",
+        "TestInfFormatWorkspaceGrowthPeak"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -88163,10 +88167,22 @@
             "TestRationalServiceInfinitesimalConstructorFailureRefunds",
             "TestRationalServiceInfinitesimalFinalizerTraversal"
           ]
+        },
+        {
+          "name": "to_string owner-accounted shared workspace with one final caller output",
+          "status": "ported",
+          "go_target": "mpnum/inf_int_rational.go",
+          "tests": [
+            "TestInfFormatOneFinalAllocation",
+            "TestInfFormatSignedZeroAndDomain",
+            "TestInfFormatFailurePrefixesImmediateRoots",
+            "TestInfFormatWorkspaceGrowthPeak"
+          ]
         }
       ],
       "ownership": [
-        "Concrete raw rational plus signed32 epsilon and scalar service provenance; existing service mutex/manager owns storage. Arithmetic publishes rational first then epsilon; scalar integer projection is reread after first multiplication. Explicit ownership and source temporary copies retained. See INF_INT_RATIONAL_PORT_STATUS.md."
+        "Concrete raw rational plus signed32 epsilon and scalar service provenance; existing service mutex/manager owns storage. Arithmetic publishes rational first then epsilon; scalar integer projection is reread after first multiplication. Explicit ownership and source temporary copies retained. See INF_INT_RATIONAL_PORT_STATUS.md.",
+        "Formatting has no intermediate host strings: existing budgeted manager text workspace preserves first/epsilon formatting and source abs temporary full-expression cleanup. Caller receives exactly one final string. See INF_FORMAT_PORT_STATUS.md."
       ],
       "deviations": [
         "Global constants and borrowed rational accessors are owner-local/independent-copy adapters. Signed32 overflow, INT_MIN negation and formatting negation are explicit typed undefined-domain failures with source defined prefixes retained.",
@@ -88441,7 +88457,11 @@
         "TestInfRationalIntegerConstructorCopyRoute",
         "TestRationalServiceInfinitesimalHeaderOwnership",
         "TestRationalServiceInfinitesimalConstructorFailureRefunds",
-        "TestRationalServiceInfinitesimalFinalizerTraversal"
+        "TestRationalServiceInfinitesimalFinalizerTraversal",
+        "TestInfFormatOneFinalAllocation",
+        "TestInfFormatSignedZeroAndDomain",
+        "TestInfFormatFailurePrefixesImmediateRoots",
+        "TestInfFormatWorkspaceGrowthPeak"
       ],
       "conditionals": [
         {
@@ -88591,10 +88611,22 @@
             "TestRationalServiceInfinitesimalConstructorFailureRefunds",
             "TestRationalServiceInfinitesimalFinalizerTraversal"
           ]
+        },
+        {
+          "name": "to_string owner-accounted shared workspace with one final caller output",
+          "status": "ported",
+          "go_target": "mpnum/inf_rational.go",
+          "tests": [
+            "TestInfFormatOneFinalAllocation",
+            "TestInfFormatSignedZeroAndDomain",
+            "TestInfFormatFailurePrefixesImmediateRoots",
+            "TestInfFormatWorkspaceGrowthPeak"
+          ]
         }
       ],
       "ownership": [
-        "Two concrete pointer-free rational components plus scalar provenance, owned by existing service and synchronized raw manager. Assignment/arithmetic first then second; implicit member destruction second then first. Full-expression copies and cleanup, partial output roots and exact budgets tested. See INF_RATIONAL_PORT_STATUS.md."
+        "Two concrete pointer-free rational components plus scalar provenance, owned by existing service and synchronized raw manager. Assignment/arithmetic first then second; implicit member destruction second then first. Full-expression copies and cleanup, partial output roots and exact budgets tested. See INF_RATIONAL_PORT_STATUS.md.",
+        "Formatting has no intermediate host strings: existing budgeted manager text workspace preserves first/epsilon formatting and source abs temporary full-expression cleanup. Caller receives exactly one final string. See INF_FORMAT_PORT_STATUS.md."
       ],
       "deviations": [
         "Global constants/borrowed accessors replaced by owner-local constants and explicit independent copies; typed checked source-assertion errors. Signed INT_MIN constructor-negation uses widened defined adapter. Source trace/assertion-message infrastructure remains separate.",

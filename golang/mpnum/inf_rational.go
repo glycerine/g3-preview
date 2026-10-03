@@ -286,30 +286,11 @@ func (s *RationalService) InfString(v *OwnedInfRational) (string, error) {
 	if e := s.infCheck(v); e != nil {
 		return "", e
 	}
-	if v.second.num.val == 0 {
-		return s.manager.String(&v.first)
-	}
-	a, e := s.manager.String(&v.first)
+	n, e := s.infEpsInfPrepareNumeral(v, 0)
 	if e != nil {
 		return "", e
 	}
-	abs := NewRational()
-	defer s.manager.Del(&abs)
-	if e = s.manager.Copy(&abs, &v.second); e != nil {
-		return "", e
-	}
-	if e = s.manager.Abs(&abs); e != nil {
-		return "", e
-	}
-	b, e := s.manager.String(&abs)
-	if e != nil {
-		return "", e
-	}
-	sign := " +e*"
-	if v.second.num.val < 0 {
-		sign = " -e*"
-	}
-	return "(" + a + sign + b + ")", nil
+	return s.manager.z.natural.finalString(n)
 }
 func (s *RationalService) infSign(v *OwnedInfRational) int32 {
 	if v.first.num.val != 0 {

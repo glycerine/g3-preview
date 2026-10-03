@@ -5,7 +5,6 @@ package mpnum
 import (
 	"errors"
 	"math"
-	"strconv"
 )
 
 var ErrInfIntOverflow = errors.New("mpnum: infinitesimal integer signed overflow")
@@ -472,20 +471,44 @@ func (s *RationalService) InfIntString(v *OwnedInfIntRational) (string, error) {
 		return "", e
 	}
 	defer s.mu.Unlock()
-	first, e := s.manager.String(&v.first)
+	var n uint32
+	var e error
+	if v.second != 0 {
+		n, e = s.manager.z.natural.appendDisplay(0, "(")
+		if e != nil {
+			return "", e
+		}
+	}
+	n, e = s.infEpsInfPrepareRational(&v.first, n)
 	if e != nil {
 		return "", e
 	}
-	if v.second == 0 {
-		return first, nil
+	if v.second != 0 {
+		// Source formats the first component before the signed coefficient.
+		if v.second == math.MinInt32 {
+			return "", ErrInfIntOverflow
+		}
+		coefficient := v.second
+		sign := " +e*"
+		if coefficient < 0 {
+			sign = " -e*"
+			coefficient = -coefficient
+		}
+		n, e = s.manager.z.natural.appendDisplay(n, sign)
+		if e != nil {
+			return "", e
+		}
+		value := NewInt(coefficient)
+		n, e = s.manager.z.prepareInteger(&value, n)
+		if e != nil {
+			return "", e
+		}
+		n, e = s.manager.z.natural.appendDisplay(n, ")")
+		if e != nil {
+			return "", e
+		}
 	}
-	if v.second == math.MinInt32 {
-		return "", ErrInfIntOverflow
-	}
-	if v.second < 0 {
-		return "(" + first + " -e*" + strconv.FormatInt(-int64(v.second), 10) + ")", nil
-	}
-	return "(" + first + " +e*" + strconv.FormatInt(int64(v.second), 10) + ")", nil
+	return s.manager.z.natural.finalString(n)
 }
 func (s *RationalService) InfIntFirst(v *OwnedInfIntRational) (OwnedRational, error) {
 	if e := s.lockInfInt(v); e != nil {

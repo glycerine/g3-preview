@@ -610,3 +610,11 @@ growth fixes. Owned metadata and temporary storage are physically budgeted,
 with immediate failed-prefix ownership audits. See PARAM_DESCRS_PORT_STATUS.md.
 cmd_context_types.cpp kind labels are complete; params_ref and command runtime
 methods remain open. Dictionary coverage records this concrete specialization.
+
+## Infinitesimal formatting ownership correction
+
+InfString and InfIntString now stage every intermediate byte in the existing
+budgeted formatter workspace and allocate only one final caller output.
+Four tests began behavioral RED at three warmed allocations, then passed with
+one; signed/domain cases, source abs lifetime, immediate failure roots and
+old/new workspace growth peaks are covered. See INF_FORMAT_PORT_STATUS.md.
