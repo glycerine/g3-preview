@@ -566,9 +566,7 @@ func TestUPolynomialImmediateNumericFailureAccounting(t *testing.T) {
 		if now.IntegerLiveCells != external+now.OwnedNumeralCells+now.IntegerCachedCells {
 			t.Fatal("untracked numeric temporary", fail, base, now)
 		}
-		if now.IntegerWordsRefs != now.IntegerLiveCells+now.IntegerNaturalWordsRefs {
-			t.Fatal("untracked limb descriptor", fail, now)
-		}
+		upolyHenselAuditPhysical(t, []*mpnum.UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{Rationals: []*mpnum.Rational{&point}, RationalManagers: []*mpnum.RationalManager{q}})
 		b.FailAfter(-1)
 		if e = q.Del(&point); e != nil {
 			t.Fatal(e)
@@ -911,9 +909,7 @@ func TestUPolynomialAllSelectedOutputFailurePrefixes(t *testing.T) {
 			if now.IntegerLiveCells != external+now.OwnedNumeralCells+now.IntegerCachedCells {
 				t.Fatal("unowned temporary after output prefix", op, fail, base, now)
 			}
-			if now.IntegerWordsRefs != now.IntegerLiveCells+now.IntegerNaturalWordsRefs {
-				t.Fatal("lost Words root after output prefix", op, fail, now)
-			}
+			upolyHenselAuditPhysical(t, []*mpnum.UPolynomialManager{m}, nil)
 			b.FailAfter(-1)
 		}
 	}

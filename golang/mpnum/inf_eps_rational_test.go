@@ -407,7 +407,7 @@ func TestInfEpsInfFailurePrefixesImmediateRoots(t *testing.T) {
 			}
 			infEpsAudit(t, s, []*OwnedInfEpsInfRational{&a, &b, &out}, []*OwnedInfRational{&numeral}, infEpsRootsWithFiller([]*OwnedRational{&c, &q}, filler)) // before restore, format, Del, Close
 			if e != nil {
-				if !errors.Is(e, arena.ErrInjectedFailure) {
+				if !numericPhysicalReservationRefusal(e) {
 					t.Fatal(op, prefix, e)
 				}
 				failures++
@@ -492,7 +492,7 @@ func TestInfEpsInfAliasesCancellationAndAssignmentPrefix(t *testing.T) {
 		e = owner.InfEpsInfSetNumeral(&out, &num)
 		infEpsAudit(t, owner, []*OwnedInfEpsInfRational{&out}, []*OwnedInfRational{&num}, infEpsRootsWithFiller(nil, filler))
 		if e != nil {
-			if !errors.Is(e, arena.ErrInjectedFailure) {
+			if !numericPhysicalReservationRefusal(e) {
 				t.Fatal(e)
 			}
 			if out.infinity.num.val != 0 {
@@ -533,7 +533,7 @@ func TestInfEpsInfDestructorReverseMemberOrder(t *testing.T) {
 }
 
 func TestInfEpsInfStructuralEqualityAndReturnCopy(t *testing.T) {
-	s, _ := serviceNew(t)
+	s, _ := servicePublicationDirectOwner(t)
 	a := infEpsValue(t, s, "1/2", "-5", "0")
 	b := infEpsValue(t, s, "1/2", "5", "0")
 	serviceMust(t, s.manager.z.SetInt64(&b.infinity.num, 2))
@@ -552,9 +552,8 @@ func TestInfEpsInfStructuralEqualityAndReturnCopy(t *testing.T) {
 	seen := false
 	for prefix := int64(0); prefix < 60; prefix++ {
 		run := func(copyReturn bool) bool {
-			budget := arena.NewBudget(1 << 25)
-			owner, e := NewRationalService(serviceConfig(budget))
-			serviceMust(t, e)
+			owner, budget := servicePublicationDirectOwner(t)
+			var e error
 			defer owner.Close()
 			text := new(big.Int).Add(new(big.Int).Lsh(big.NewInt(1), 220), big.NewInt(3)).String()
 			x := infEpsValue(t, owner, text, text, text)
@@ -651,9 +650,9 @@ func TestInfEpsInfPointerFreeWarmPaths(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		run()
 	}
-	if n := testing.AllocsPerRun(50, run); n != 0 {
-		t.Fatal("warm boxed allocation", n)
-	}
+	before := numericWarmProfileSnapshot(t, s.manager.z, s.manager.z.budget)
+	n := testing.AllocsPerRun(50, run)
+	numericWarmProfileAudit(t, s.manager.z, s.manager.z.budget, before, n, sourceExtendedGCDDebug)
 	serviceMust(t, s.InfEpsInfDel(&a))
 	serviceMust(t, s.InfEpsInfDel(&b))
 	serviceMust(t, s.Del(&c))
@@ -668,9 +667,16 @@ func TestInfEpsInfFormattingOneFinalAllocation(t *testing.T) {
 	}
 	var got string
 	var err error
-	if n := testing.AllocsPerRun(50, func() { got, err = s.InfEpsInfString(&v) }); n != 1 || err != nil || got != want {
+	before := numericWarmProfileSnapshot(t, s.manager.z, s.manager.z.budget)
+	wantAllocs := float64(1)
+	if sourceExtendedGCDDebug {
+		wantAllocs = 3
+	} // Lexical abs-copy data and initialization metadata.
+	n := testing.AllocsPerRun(50, func() { got, err = s.InfEpsInfString(&v) })
+	if n != wantAllocs || err != nil || got != want {
 		t.Fatal("final output allocations", n, got, err)
 	}
+	numericWarmProfileAudit(t, s.manager.z, s.manager.z.budget, before, 0, sourceExtendedGCDDebug)
 	serviceMust(t, s.InfEpsInfDel(&v))
 }
 func TestInfEpsInfConstructorSignedScalarShapes(t *testing.T) {

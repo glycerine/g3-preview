@@ -81,8 +81,8 @@ func TestIntegerSourceIntMinSubtraction(t *testing.T) {
 
 func TestIntegerConstructorOwnership(t *testing.T) {
 	m, _ := integerManager(t)
-	if m.cells.Stats().Live != 6 || m.words.Stats().Live != 4 {
-		t.Fatal("six actual source objects plus four transitional Natural buffers")
+	if m.cells.Stats().Live != 6 || m.words.Stats().Live != 0 {
+		t.Fatal("six actual source objects; four actual inline Natural buffers have no allocated payload")
 	}
 	var objects [6]memory.ObjectRef
 	for i, ref := range []numericCellRef{m.tmp[0], m.tmp[1], m.arg[0], m.arg[1], m.intMin.cell, m.two64.cell} {
@@ -294,7 +294,7 @@ func TestIntegerFailureCleanup(t *testing.T) {
 	// Force enough words to need a new capacity class and descriptor/cell pages.
 	before := m.cells.Stats().Live
 	err := m.SetLimbs(&a, []uint32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17})
-	if !errors.Is(err, arena.ErrInjectedFailure) {
+	if !numericPhysicalReservationRefusal(err) {
 		t.Fatal(err)
 	}
 	budget.FailAfter(-1)
@@ -330,14 +330,14 @@ func TestIntegerFailurePublication(t *testing.T) {
 			}
 		}
 	}
-	m, budget := integerManager(t)
+	m, budget := mpzPublicationDirectOwner(t)
 	out := NewInt(17)
 	one := NewInt(1)
 	budget.FailAfter(0)
 	// mpz.cpp:274–279 publishes the big result before requesting missing
 	// scratch. Failure leaves a valid output and an empty manager scratch.
 	err := m.Add(&m.two64, &one, &out)
-	if !errors.Is(err, arena.ErrInjectedFailure) || out.cell == 0 || out.val != 1 || m.tmp[0] != 0 || m.cell(out.cell).size != 3 || m.digit(out.cell, 0) != 1 || m.digit(out.cell, 2) != 1 {
+	if !numericPhysicalReservationRefusal(err) || out.cell == 0 || out.val != 1 || m.tmp[0] != 0 || m.cell(out.cell).size != 3 || m.digit(out.cell, 0) != 1 || m.digit(out.cell, 2) != 1 {
 		t.Fatal("source Add publication prefix", err)
 	}
 	if e := m.Add(&m.two64, &one, &out); e != arena.ErrInvalidSlot {

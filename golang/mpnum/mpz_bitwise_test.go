@@ -136,7 +136,7 @@ func TestIntegerBitwiseFailurePublicationAndWarm(t *testing.T) {
 			}
 			if e != nil {
 				failed = true
-				if !errors.Is(e, arena.ErrInjectedFailure) {
+				if !numericPhysicalReservationRefusal(e) {
 					t.Fatal(e)
 				}
 				// Source final digit setter can free/publish before requesting storage.
@@ -167,8 +167,11 @@ func TestIntegerBitwiseFailurePublicationAndWarm(t *testing.T) {
 		bitwiseMust(t, m.BitwiseXor(&a, &b, &out))
 		bitwiseMust(t, m.BitwiseNot(129, &a, &out))
 	}
-	budget.FailAfter(0)
-	if n := testing.AllocsPerRun(100, func() {
+	beforeWarm := numericWarmProfileSnapshot(t, m, budget)
+	if !modularSourceDebug {
+		budget.FailAfter(0)
+	}
+	n := testing.AllocsPerRun(100, func() {
 		if e := m.BitwiseOr(&a, &b, &out); e != nil {
 			panic(e)
 		}
@@ -181,9 +184,9 @@ func TestIntegerBitwiseFailurePublicationAndWarm(t *testing.T) {
 		if e := m.BitwiseNot(129, &a, &out); e != nil {
 			panic(e)
 		}
-	}); n != 0 {
-		t.Fatal("warm owned operations allocate", n)
-	}
+	})
+	numericWarmProfileAudit(t, m, budget, beforeWarm, n, modularSourceDebug)
+	integerPhysicalAudit(t, m, &a, &b, &out)
 	budget.FailAfter(-1)
 }
 
@@ -246,7 +249,7 @@ func TestIntegerBitwiseAliasedFailurePublication(t *testing.T) {
 				}
 				if e != nil {
 					failed = true
-					if !errors.Is(e, arena.ErrInjectedFailure) {
+					if !numericPhysicalReservationRefusal(e) {
 						t.Fatal(e)
 					}
 					// Source final digit setter can free/publish before requesting storage.

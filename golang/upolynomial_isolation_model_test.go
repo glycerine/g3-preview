@@ -3,6 +3,7 @@ package g3
 
 import (
 	"errors"
+	"fmt"
 	"github.com/glycerine/g3/golang/arena"
 	"github.com/glycerine/g3/golang/mpnum"
 	"testing"
@@ -115,7 +116,7 @@ func TestUPolynomialBinaryVectorConstructionAndPushFailurePrefixes(t *testing.T)
 	before := budget.Used()
 	budget.FailAfter(0)
 	v, e := b.NewVector()
-	if !errors.Is(e, arena.ErrInjectedFailure) || v != nil || budget.Used() != before {
+	if !numericStorageReservationRefusal(e) || v != nil || budget.Used() != before {
 		t.Fatal("constructor prefix", v, e, before, budget.Used())
 	}
 	budget.FailAfter(-1)
@@ -123,7 +124,7 @@ func TestUPolynomialBinaryVectorConstructionAndPushFailurePrefixes(t *testing.T)
 	a := mpnum.NewBinaryInt(1)
 	budget.FailAfter(0)
 	e = v.PushCopy(&a)
-	if !errors.Is(e, arena.ErrInjectedFailure) || upolyIsolationSize(t, v) != 0 {
+	if !numericStorageReservationRefusal(e) || upolyIsolationSize(t, v) != 0 {
 		t.Fatal("push grow prefix", e)
 	}
 	budget.FailAfter(-1)
@@ -165,13 +166,15 @@ func TestUPolynomialBinaryVectorBigCopyFaultImmediateRoots(t *testing.T) {
 		e := v.PushCopy(&a)
 		graph, vec := m.Stats(), v.Stats()
 		binary, e2 := b.Stats()
-		if e2 != nil || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+vec.OwnedNumeralCells+binary.LiveScratchNumerators+1 || graph.IntegerWordsRefs != graph.IntegerLiveCells+graph.IntegerNaturalWordsRefs {
+		if e2 != nil || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+vec.OwnedNumeralCells+binary.LiveScratchNumerators+1 {
 			t.Fatal("immediate binary output graph", fault, e, e2, graph, vec, binary)
 		}
+
+		upolyHenselAuditPhysical(t, []*mpnum.UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{BinaryValues: []*mpnum.BinaryRational{&a}, BinaryManagers: []*mpnum.BinaryRationalManager{b}, BinaryVectors: []*mpnum.BinaryRationalVector{v}})
 		budget.FailAfter(-1)
 		if e != nil {
 			failures++
-			if !errors.Is(e, arena.ErrInjectedFailure) {
+			if !numericStorageReservationRefusal(e) {
 				t.Fatal(fault, e)
 			}
 		} else {
@@ -262,45 +265,56 @@ func TestUPolynomialIsolationDefinedOutputAliases(t *testing.T) {
 func TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph(t *testing.T) {
 	for route := 0; route < 2; route++ {
 		failures, successes := 0, 0
-		for fault := int64(0); fault < 256; fault++ {
-			m, q, budget := upolySourceOwner(t)
-			b := upolyIsolationBinaryOwner(t, q, budget)
-			r, l, u := upolyIsolationVector(t, b), upolyIsolationVector(t, b), upolyIsolationVector(t, b)
-			p := upolyIsolationProduct(t, m, [][]int32{{-1, 4}, {-3, 4}})
-			budget.FailAfter(fault)
-			var e error
-			if route == 0 {
-				e = m.DRSIsolateRootsWithBounds(mustUPolyView(t, m, p), 128, 128, b, r, l, u)
-			} else {
-				e = m.SturmIsolateRootsWithBounds(mustUPolyView(t, m, p), 128, 128, b, r, l, u)
-			}
-			graph := m.Stats()
-			scratch, e2 := b.Stats()
-			roots := r.Stats().OwnedNumeralCells + l.Stats().OwnedNumeralCells + u.Stats().OwnedNumeralCells
-			if e2 != nil || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+scratch.LiveScratchNumerators+roots || graph.IntegerWordsRefs != graph.IntegerLiveCells+graph.IntegerNaturalWordsRefs {
-				t.Fatal("immediate isolation graph", route, fault, e, e2, graph, scratch, roots)
-			}
-			budget.FailAfter(-1)
-			if e != nil {
-				failures++
-				if !errors.Is(e, arena.ErrInjectedFailure) {
-					t.Fatal(route, fault, e)
+		// Exact fresh checked-debug calibration needs2594/2496 reservations
+		// for128-bit bounded isolation, and16146 forprecision100 refinement.
+		// These finite horizons retain every refusal through the actual success.
+		for fault := int64(0); fault < 4096; fault++ {
+			if !t.Run(fmt.Sprintf("%d/%d", route, fault), func(t *testing.T) {
+				m, q, budget := upolySourceOwner(t)
+				b := upolyIsolationBinaryOwner(t, q, budget)
+				r, l, u := upolyIsolationVector(t, b), upolyIsolationVector(t, b), upolyIsolationVector(t, b)
+				p := upolyIsolationProduct(t, m, [][]int32{{-1, 4}, {-3, 4}})
+				budget.FailAfter(fault)
+				var e error
+				if route == 0 {
+					e = m.DRSIsolateRootsWithBounds(mustUPolyView(t, m, p), 128, 128, b, r, l, u)
+				} else {
+					e = m.SturmIsolateRootsWithBounds(mustUPolyView(t, m, p), 128, 128, b, r, l, u)
 				}
-			} else {
-				successes++
-				counts := upolyIsolationCounts{}
-				upolyIsolationMatch(t, q, b, r, l, u, []upolyIsolationRational{{1, 4}, {3, 4}}, &counts)
-			}
-			for _, v := range []*mpnum.BinaryRationalVector{r, l, u} {
-				if e = v.Reset(); e != nil {
-					t.Fatal(route, fault, e)
+				graph := m.Stats()
+				scratch, e2 := b.Stats()
+				roots := r.Stats().OwnedNumeralCells + l.Stats().OwnedNumeralCells + u.Stats().OwnedNumeralCells
+				if e2 != nil || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+scratch.LiveScratchNumerators+roots {
+					t.Fatal("immediate isolation graph", route, fault, e, e2, graph, scratch, roots)
 				}
+
+				upolyHenselAuditPhysical(t, []*mpnum.UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{BinaryManagers: []*mpnum.BinaryRationalManager{b}, BinaryVectors: []*mpnum.BinaryRationalVector{r, l, u}})
+				budget.FailAfter(-1)
+				if e != nil {
+					failures++
+					if !numericStorageReservationRefusal(e) {
+						t.Fatal(route, fault, e)
+					}
+				} else {
+					successes++
+					counts := upolyIsolationCounts{}
+					upolyIsolationMatch(t, q, b, r, l, u, []upolyIsolationRational{{1, 4}, {3, 4}}, &counts)
+				}
+				for _, v := range []*mpnum.BinaryRationalVector{r, l, u} {
+					if e = v.Reset(); e != nil {
+						t.Fatal(route, fault, e)
+					}
+				}
+				graph = m.Stats()
+				scratch, e2 = b.Stats()
+				if e2 != nil || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+scratch.LiveScratchNumerators {
+					t.Fatal("lost local/frame", route, fault, e2, graph)
+				}
+
+			}) {
+				t.FailNow()
 			}
-			graph = m.Stats()
-			scratch, e2 = b.Stats()
-			if e2 != nil || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+scratch.LiveScratchNumerators {
-				t.Fatal("lost local/frame", route, fault, e2, graph)
-			}
+			// Each subtest's actual owner cleanup runs before the next fresh fixture.
 			if successes != 0 {
 				break
 			}
@@ -354,7 +368,7 @@ func TestUPolynomialIsolationZeroResetPublicationBeforeRefusal(t *testing.T) {
 	e := m.SquareFreeIsolateRoots(mustUPolyView(t, m, p), b, r, l, u)
 	graph := m.Stats()
 	scratch, e2 := b.Stats()
-	if !errors.Is(e, arena.ErrInjectedFailure) || e2 != nil || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+scratch.LiveScratchNumerators+r.Stats().OwnedNumeralCells+l.Stats().OwnedNumeralCells+u.Stats().OwnedNumeralCells || upolyIsolationSize(t, r) != 1 || upolyIsolationSize(t, l) != 0 || upolyIsolationSize(t, u) != 0 {
+	if !numericStorageReservationRefusal(e) || e2 != nil || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+scratch.LiveScratchNumerators+r.Stats().OwnedNumeralCells+l.Stats().OwnedNumeralCells+u.Stats().OwnedNumeralCells || upolyIsolationSize(t, r) != 1 || upolyIsolationSize(t, l) != 0 || upolyIsolationSize(t, u) != 0 {
 		t.Fatal("reset roots/lower/upper and publish zero before nz backing refusal", e, e2, graph, r.Stats(), l.Stats(), u.Stats())
 	}
 	budget.FailAfter(-1)

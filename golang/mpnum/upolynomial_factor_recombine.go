@@ -150,7 +150,7 @@ func (s *UPolynomialFactorizationService) factorPrimeTrial(zp *UPolynomialManage
 	}
 	return 1, nil
 }
-func (s *UPolynomialFactorizationService) factorSquareFree(f UPolynomialView, fs *UPolynomialFactors, k uint32, params UPolynomialFactorParams) (bool, error) {
+func (s *UPolynomialFactorizationService) factorSquareFree(f UPolynomialView, fs *UPolynomialFactors, k uint32, params UPolynomialFactorParams) (completed bool, failure error) {
 	m := s.manager
 	nm := m.modular
 	if modularSourceDebug {
@@ -158,51 +158,57 @@ func (s *UPolynomialFactorizationService) factorSquareFree(f UPolynomialView, fs
 			return false, e
 		}
 	}
-	var fpp upolyVectorState
-	defer m.dropLocalVector(&fpp)
-	if e := m.setView(&fpp, f); e != nil {
+	c, e := s.newSquareFreeScope()
+	if e != nil {
 		return false, e
 	}
-	if e := s.flipLeadingIfNegative(&fpp, fs, k); e != nil {
+	defer func() {
+		if e := s.CleanupRetained(); e != nil && failure == nil {
+			failure = e
+		}
+	}()
+	c.constructed = 1
+	if e := m.setView(&c.fpp, f); e != nil {
 		return false, e
 	}
-	var p Int
-	defer nm.Del(&p)
-	if e := nm.SetInt32(&p, 2); e != nil {
+	if e := s.flipLeadingIfNegative(&c.fpp, fs, k); e != nil {
+		return false, e
+	}
+	c.constructed = 2
+	if e := nm.SetInt32(&c.p, 2); e != nil {
 		return false, e
 	}
 	zp, e := NewRelatedUPolynomialManager(m)
 	if e != nil {
 		return false, e
 	}
-	defer zp.Close()
-	if e = zp.SetZP(&p); e != nil {
+	c.zp = zp
+	c.constructed = 3
+	if e = zp.SetZP(&c.p); e != nil {
 		return false, e
 	}
 	best, e := zp.NewFactors()
 	if e != nil {
 		return false, e
 	}
-	defer best.Close()
-	var bestP Int
-	defer nm.Del(&bestP)
-	if e = nm.SetInt32(&bestP, 2); e != nil {
+	c.best = best
+	c.constructed = 4
+	c.constructed = 5
+	if e = nm.SetInt32(&c.bestP, 2); e != nil {
 		return false, e
 	}
-	var ds upolyFactorDegreeState
-	defer ds.close(m.config.Integer.budget)
+	c.constructed = 6
 	// Explicit construction adapter for the ill-formed C++ degree_set(zp_upm):
 	// run the existing factors constructor on its already created EMPTY zp_fs.
 	// That source body pushes true and gives max_degree()==0 for first swap.
-	if e = ds.init(best); e != nil {
+	if e = c.ds.init(best); e != nil {
 		return false, e
 	}
 	iterator, e := NewPrimeIterator(s.config.Primes)
 	if e != nil {
 		return false, e
 	}
-	var gcdTmp Int
-	defer nm.Del(&gcdTmp)
+	c.constructed = 7
 	trials := uint32(0)
 	for trials < params.PrimeTrials {
 		if e = m.checkpoint(); e != nil {
@@ -213,29 +219,29 @@ func (s *UPolynomialFactorizationService) factorSquareFree(f UPolynomialView, fs
 			return false, e
 		}
 		if next > uint64(params.MaxPrime) {
-			return false, fs.PushCopy(m.stateView(&fpp), k)
+			return false, fs.PushCopy(m.stateView(&c.fpp), k)
 		}
-		if e = nm.SetUint64(&p, next); e != nil {
+		if e = nm.SetUint64(&c.p, next); e != nil {
 			return false, e
 		}
-		if e = zp.SetZP(&p); e != nil {
+		if e = zp.SetZP(&c.p); e != nil {
 			return false, e
 		}
-		top, e := m.read(m.stateView(&fpp), fpp.size-1)
+		top, e := m.read(m.stateView(&c.fpp), c.fpp.size-1)
 		if e != nil {
 			return false, e
 		}
-		if e = nm.GCD(&p, top, &gcdTmp); e != nil {
+		if e = nm.GCD(&c.p, top, &c.gcdTmp); e != nil {
 			return false, e
 		}
-		one, e := nm.IsOne(&gcdTmp)
+		one, e := nm.IsOne(&c.gcdTmp)
 		if e != nil {
 			return false, e
 		}
 		if !one {
 			continue
 		}
-		route, e := s.factorPrimeTrial(zp, &fpp, fs, best, k, &p, &bestP, &ds, &trials)
+		route, e := s.factorPrimeTrial(zp, &c.fpp, fs, best, k, &c.p, &c.bestP, &c.ds, &trials)
 		if e != nil {
 			return false, e
 		}
@@ -243,10 +249,10 @@ func (s *UPolynomialFactorizationService) factorSquareFree(f UPolynomialView, fs
 			return true, nil
 		}
 	}
-	if e = zp.SetZP(&bestP); e != nil {
+	if e = zp.SetZP(&c.bestP); e != nil {
 		return false, e
 	}
-	exponent, e := s.mignotteBound(m.stateView(&fpp), &bestP)
+	exponent, e := s.mignotteBound(m.stateView(&c.fpp), &c.bestP)
 	if e != nil {
 		return false, e
 	}
@@ -254,45 +260,42 @@ func (s *UPolynomialFactorizationService) factorSquareFree(f UPolynomialView, fs
 	if e != nil {
 		return false, e
 	}
-	defer zpe.Close()
-	if e = zpe.SetZP(&bestP); e != nil {
+	c.zpe = zpe
+	c.constructed = 8
+	if e = zpe.SetZP(&c.bestP); e != nil {
 		return false, e
 	}
 	lifted, e := zpe.NewFactors()
 	if e != nil {
 		return false, e
 	}
-	defer lifted.Close()
-	if e = s.henselFactors(m.stateView(&fpp), best, exponent, lifted); e != nil {
+	c.lifted = lifted
+	c.constructed = 9
+	if e = s.henselFactors(m.stateView(&c.fpp), best, exponent, lifted); e != nil {
 		return false, e
 	}
-	var leading Int
-	defer nm.Del(&leading)
-	top, e := m.read(m.stateView(&fpp), fpp.size-1)
+	c.constructed = 10
+	top, e := m.read(m.stateView(&c.fpp), c.fpp.size-1)
 	if e != nil {
 		return false, e
 	}
-	if e = zpe.modular.Copy(&leading, top); e != nil {
+	if e = zpe.modular.Copy(&c.leading, top); e != nil {
 		return false, e
 	}
-	if e = m.mulScalarState(&fpp, &leading); e != nil {
+	if e = m.mulScalarState(&c.fpp, &c.leading); e != nil {
 		return false, e
 	}
-	var it upolyFactorCombinationState
-	it.factors = lifted
-	defer it.close()
-	if e = it.init(lifted, &ds); e != nil {
+	c.it.factors = lifted
+	c.constructed = 11
+	if e = c.it.init(lifted, &c.ds); e != nil {
 		return false, e
 	}
-	var trial, quotient upolyVectorState
-	defer m.dropLocalVector(&trial)
-	defer m.dropLocalVector(&quotient)
-	var trialContent Int
-	defer nm.Del(&trialContent)
+	c.constructed = 13
+	c.constructed = 14
 	result, remove := true, false
 	counter := uint32(0)
 	for {
-		more, e := it.next(remove)
+		more, e := c.it.next(remove)
 		if e != nil {
 			return false, e
 		}
@@ -307,12 +310,12 @@ func (s *UPolynomialFactorizationService) factorSquareFree(f UPolynomialView, fs
 			result = false
 			break
 		}
-		degree, e := it.degree()
+		degree, e := c.it.degree()
 		if e != nil {
 			return false, e
 		}
 		left := degree <= best.totalDegree/2
-		used, e := s.selectFactorTrial(&it, &leading, &fpp, &trial, left)
+		used, e := s.selectFactorTrial(&c.it, &c.leading, &c.fpp, &c.trial, left)
 		if e != nil {
 			return false, e
 		}
@@ -320,34 +323,34 @@ func (s *UPolynomialFactorizationService) factorSquareFree(f UPolynomialView, fs
 			remove = false
 			continue
 		}
-		if e = zpe.mulScalarState(&trial, &leading); e != nil {
+		if e = zpe.mulScalarState(&c.trial, &c.leading); e != nil {
 			return false, e
 		}
-		exact, e := m.exactDivState(m.stateView(&fpp), m.stateView(&trial), &quotient)
+		exact, e := m.exactDivState(m.stateView(&c.fpp), m.stateView(&c.trial), &c.quotient)
 		if e != nil {
 			return false, e
 		}
 		if exact {
 			if !left {
-				trial, quotient = quotient, trial
+				c.trial, c.quotient = c.quotient, c.trial
 			}
-			if e = m.primitiveState(m.stateView(&trial), &trial, &trialContent); e != nil {
+			if e = m.primitiveState(m.stateView(&c.trial), &c.trial, &c.trialContent); e != nil {
 				return false, e
 			}
-			if e = fs.PushCopy(m.stateView(&trial), k); e != nil {
+			if e = fs.PushCopy(m.stateView(&c.trial), k); e != nil {
 				return false, e
 			}
-			if e = m.primitiveState(m.stateView(&quotient), &fpp, &trialContent); e != nil {
+			if e = m.primitiveState(m.stateView(&c.quotient), &c.fpp, &c.trialContent); e != nil {
 				return false, e
 			}
-			top, e := m.read(m.stateView(&fpp), fpp.size-1)
+			top, e := m.read(m.stateView(&c.fpp), c.fpp.size-1)
 			if e != nil {
 				return false, e
 			}
-			if e = nm.Copy(&leading, top); e != nil {
+			if e = nm.Copy(&c.leading, top); e != nil {
 				return false, e
 			}
-			if e = m.mulScalarState(&fpp, &leading); e != nil {
+			if e = m.mulScalarState(&c.fpp, &c.leading); e != nil {
 				return false, e
 			}
 			remove = true
@@ -355,18 +358,18 @@ func (s *UPolynomialFactorizationService) factorSquareFree(f UPolynomialView, fs
 			remove = false
 		}
 	}
-	if fpp.size > 1 {
-		if e = m.divScalar(m.stateView(&fpp), &leading); e != nil {
+	if c.fpp.size > 1 {
+		if e = m.divScalar(m.stateView(&c.fpp), &c.leading); e != nil {
 			return false, e
 		}
-		if e = fs.PushCopy(m.stateView(&fpp), k); e != nil {
+		if e = fs.PushCopy(m.stateView(&c.fpp), k); e != nil {
 			return false, e
 		}
 	} else if modularSourceDebug {
-		if fpp.size != 1 {
+		if c.fpp.size != 1 {
 			return false, ErrUPolynomialAssertion
 		}
-		one, e := nm.IsOne(&m.values(&fpp)[fpp.size-1])
+		one, e := nm.IsOne(&m.values(&c.fpp)[c.fpp.size-1])
 		if e != nil {
 			return false, e
 		}

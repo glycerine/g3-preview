@@ -7,6 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
 )
 
 var ErrUninitializedRational = errors.New("mpnum: rational has zero denominator; use NewRational")
@@ -189,8 +190,45 @@ func (m *RationalManager) Copy(dst, src *Rational) error {
 	}
 	return m.z.Copy(&dst.den, &src.den)
 }
+
+// checkSetter authorizes explicit initialization/reinitialization, including
+// inline denominator0. Failed/stale Integer handles remain ordinary errors;
+// arithmetic and source-read checks retain their separate denominator policy.
+func (m *RationalManager) checkSetter(a *Rational) error {
+	if m == nil {
+		return memory.ErrRuntimeOwner
+	}
+	if m.closed {
+		return arena.ErrClosed
+	}
+	if a == nil {
+		return arena.ErrInvalidSlot
+	}
+	if e := m.z.check(&a.num); e != nil {
+		return e
+	}
+	return m.z.check(&a.den)
+}
+func (m *RationalManager) SetInt32(a *Rational, n int32) error {
+	if e := m.checkSetter(a); e != nil {
+		return e
+	}
+	if e := m.z.SetInt32(&a.num, n); e != nil {
+		return e
+	}
+	return m.resetDenominator(a)
+}
+func (m *RationalManager) SetUint32(a *Rational, n uint32) error {
+	if e := m.checkSetter(a); e != nil {
+		return e
+	}
+	if e := m.z.SetUint32(&a.num, n); e != nil {
+		return e
+	}
+	return m.resetDenominator(a)
+}
 func (m *RationalManager) SetInt64(a *Rational, n int64) error {
-	if e := m.check(a); e != nil {
+	if e := m.checkSetter(a); e != nil {
 		return e
 	}
 	if e := m.z.SetInt64(&a.num, n); e != nil {
@@ -199,58 +237,67 @@ func (m *RationalManager) SetInt64(a *Rational, n int64) error {
 	return m.resetDenominator(a)
 }
 func (m *RationalManager) SetFraction(a *Rational, n int64, d uint64) error {
-	if e := m.check(a); e != nil {
+	if e := m.checkSetter(a); e != nil {
 		return e
 	}
-	if d == 0 {
-		return ErrDivideByZero
+	if modularSourceDebug && d == 0 {
+		return ErrIntegerAssertion
 	}
-	work := NewRational()
-	defer m.drop(&work)
-	if e := m.z.SetInt64(&work.num, n); e != nil {
+	if e := m.z.SetInt64(&a.num, n); e != nil {
 		return e
 	}
-	if e := m.z.SetUint64(&work.den, d); e != nil {
+	if e := m.z.SetUint64(&a.den, d); e != nil {
 		return e
 	}
-	if e := m.normalize(&work); e != nil {
+	return m.normalize(a)
+}
+
+// SetFractionSigned is the source signed32 pair overload. Widening the two
+// local negations defines intended INT_MIN magnitudes where C++ unary signed
+// negation is undefined; it preserves the existing service adapter.
+func (m *RationalManager) SetFractionSigned(a *Rational, n, d int32) error {
+	if e := m.checkSetter(a); e != nil {
 		return e
 	}
-	return m.Move(a, &work)
+	if modularSourceDebug && d == 0 {
+		return ErrIntegerAssertion
+	}
+	nn, dd := int64(n), int64(d)
+	if dd < 0 {
+		nn = -nn
+		dd = -dd
+	}
+	if e := m.z.SetInt64(&a.num, nn); e != nil {
+		return e
+	}
+	if e := m.z.SetInt64(&a.den, dd); e != nil {
+		return e
+	}
+	return m.normalize(a)
 }
 func (m *RationalManager) SetParts(a *Rational, n, d *Int) error {
-	if e := m.check(a); e != nil {
-		return e
-	}
-	if e := m.z.check(n); e != nil {
+	if e := m.checkSetter(a); e != nil {
 		return e
 	}
 	if e := m.z.check(d); e != nil {
 		return e
 	}
-	if d.val == 0 {
-		return ErrDivideByZero
-	}
-	work := NewRational()
-	defer m.drop(&work)
-	if e := m.z.Copy(&work.num, n); e != nil {
+	negative := d.val < 0 // source branch decision precedes both caller Copies
+	if e := m.z.Copy(&a.num, n); e != nil {
 		return e
 	}
-	if e := m.z.Copy(&work.den, d); e != nil {
+	if e := m.z.Copy(&a.den, d); e != nil {
 		return e
 	}
-	if d.val < 0 {
-		if e := m.z.Neg(&work.num); e != nil {
+	if negative {
+		if e := m.z.Neg(&a.num); e != nil {
 			return e
 		}
-		if e := m.z.Neg(&work.den); e != nil {
+		if e := m.z.Neg(&a.den); e != nil {
 			return e
 		}
 	}
-	if e := m.normalize(&work); e != nil {
-		return e
-	}
-	return m.Move(a, &work)
+	return m.normalize(a)
 }
 func (m *RationalManager) normalize(a *Rational) error {
 	var local Int

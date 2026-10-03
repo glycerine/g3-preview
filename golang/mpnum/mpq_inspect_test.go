@@ -455,7 +455,7 @@ func TestRationalInspectionEveryFailurePrefix(t *testing.T) {
 				b.FailAfter(-1)
 				if e != nil {
 					failures++
-					if !errors.Is(e, arena.ErrInjectedFailure) || (operation < 7 && a != beforeA) || z != beforeZ {
+					if !numericPhysicalReservationRefusal(e) || (operation < 7 && a != beforeA) || z != beforeZ {
 						t.Fatal("failure changed source", synch, operation, fault, e)
 					}
 					// big_set publishes sign and a failed owning descriptor before
@@ -587,18 +587,19 @@ func TestRationalInspectionWarmAllocationAndIndependentValues(t *testing.T) {
 			t.Fatal("pure inspection", synch, allocs, e)
 		}
 		calls := []func() error{func() error { return m.Numerator(&a, &n) }, func() error { return m.Denominator(&a, &d) }, func() error { return m.NumeratorRational(&a, &out) }, func() error { return m.DenominatorRational(&a, &out) }, func() error { return m.SetInteger(&out, &n) }, func() error { return m.SetUint64(&out, math.MaxUint64) }, func() error { return m.SetLimbs(&out, []uint32{1, 0, 1}) }, func() error { return m.Inc(&a) }, func() error { return m.Dec(&a) }}
-		for _, call := range calls {
+		for index, call := range calls {
 			for i := 0; i < 4; i++ {
 				if e = call(); e != nil {
 					t.Fatal(e)
 				}
 			}
-			b.FailAfter(0)
+			beforeWarm := numericWarmProfileSnapshot(t, m.z, b)
 			allocs = testing.AllocsPerRun(20, func() { e = call() })
 			b.FailAfter(-1)
-			if e != nil || allocs != 0 {
+			if e != nil {
 				t.Fatal("warm inspection mutation", synch, allocs, e)
 			}
+			numericWarmProfileAudit(t, m.z, b, beforeWarm, allocs, m.z.allocator.Stats().DirectObjects > 0 && index >= 7)
 		}
 		for _, v := range []int64{math.MinInt64, -4294967296, -2147483648, -1, 0, 1, 2147483647, 4294967295, math.MaxInt64} {
 			x := NewRational()
@@ -681,7 +682,6 @@ func TestRationalInspectionAliasedCopyFailureCleanup(t *testing.T) {
 			m.z.SetLimbs(&a.num, digits)
 			m.z.SetLimbs(&a.den, digits[:129])
 			before := a
-			live, wordsLive := m.z.cells.Stats().Live, m.z.words.Stats().Live
 			b.FailAfter(fault)
 			var e error
 			switch operation {
@@ -696,11 +696,13 @@ func TestRationalInspectionAliasedCopyFailureCleanup(t *testing.T) {
 			b.FailAfter(-1)
 			if e != nil {
 				failures++
-				if !errors.Is(e, arena.ErrInjectedFailure) || a != before || m.z.cells.Stats().Live != live || m.z.words.Stats().Live != wordsLive {
-					t.Fatal("alias failure", operation, fault, e)
+				if !numericPhysicalReservationRefusal(e) {
+					t.Fatal("alias failure category", operation, fault, e)
+				}
+				if operation != 0 || a.num != before.num || a.den.val != before.num.val || a.den.cell != m.z.failedRef {
+					t.Fatal("source failed component Copy prefix", operation, fault, a, e)
 				}
 				inspectionAssertMagnitude(t, m.z, &a.num, digits)
-				inspectionAssertMagnitude(t, m.z, &a.den, digits[:129])
 			} else {
 				completed = true
 				if operation == 0 {

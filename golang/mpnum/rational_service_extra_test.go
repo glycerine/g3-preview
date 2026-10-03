@@ -267,7 +267,7 @@ func TestRationalServiceExtraFailurePrefixesAndOwnership(t *testing.T) {
 	for op := 0; op < 12; op++ {
 		failures, success := 0, false
 		for fault := int64(0); fault < 512; fault++ {
-			s, budget := serviceNew(t)
+			s, budget := servicePublicationDirectOwner(t)
 			a := serviceValue(t, s, "1329227995784915872903807060280344577")
 			b := serviceValue(t, s, "18446744073709551617")
 			if op >= 4 && op <= 8 {
@@ -322,29 +322,29 @@ func TestRationalServiceExtraFailurePrefixesAndOwnership(t *testing.T) {
 			case 11:
 				_, e = s.DecimalString(&x, 1024, false)
 			}
-			budget.FailAfter(-1)
 			roots := []*OwnedRational{&a, &b, &x, &y, &out}
 			for i := range bank {
 				roots = append(roots, &bank[i])
 			}
 			facadeAudit(t, s, roots...) // pre-render, pre-Del
+			budget.FailAfter(-1)
 			if e != nil {
 				failures++
-				if !errors.Is(e, arena.ErrInjectedFailure) || out.ownerID != 0 {
+				if !numericPhysicalReservationRefusal(e) || out.ownerID != 0 {
 					t.Fatal(op, fault, out, e)
 				}
 				// Manager ExtendedGCD deliberately publishes output denominator/coefficient
 				// prefixes. Other operations keep caller output unchanged on failure.
 				if op != 4 {
-					serviceText(t, s, &x, oldX)
+					serviceIndependentText(t, s, &x, oldX)
 				} else if !isOneInteger(&x.raw.den) || !isOneInteger(&y.raw.den) {
 					t.Fatal("source coefficient denominator prefix missing")
 				}
 			} else {
 				success = true
 			}
-			serviceText(t, s, &a, oldA)
-			serviceText(t, s, &b, oldB)
+			serviceIndependentText(t, s, &a, oldA)
+			serviceIndependentText(t, s, &b, oldB)
 			if out.ownerID != 0 {
 				serviceMust(t, s.Del(&out))
 			}
@@ -404,7 +404,7 @@ func extraFormatError(_ int, e error) error { return e }
 func extraBoolError(_ bool, e error) error  { return e }
 
 func TestRationalServiceExtraWarmReuse(t *testing.T) {
-	s, _ := serviceNew(t)
+	s, budget := serviceNew(t)
 	a := serviceValue(t, s, "18446744073709551617")
 	b := serviceValue(t, s, "4294967295")
 	out, _ := s.NewValue()
@@ -434,9 +434,9 @@ func TestRationalServiceExtraWarmReuse(t *testing.T) {
 	for i := 0; i < 4; i++ {
 		run()
 	}
-	if n := testing.AllocsPerRun(30, run); n != 0 {
-		t.Fatal(n)
-	}
+	beforeWarm := numericWarmProfileSnapshot(t, s.manager.z, budget)
+	n := testing.AllocsPerRun(30, run)
+	numericWarmProfileAudit(t, s.manager.z, budget, beforeWarm, n, s.manager.z.allocator.Stats().DirectObjects > 0)
 }
 
 func TestRationalServiceExtraIndependentRootsAndCoefficients(t *testing.T) {
@@ -574,7 +574,7 @@ func TestRationalServiceExtraIntegerBridgeFailureCleanup(t *testing.T) {
 			facadeAudit(t, s, &a, &out)
 			if e != nil {
 				failures++
-				if !errors.Is(e, arena.ErrInjectedFailure) || out.ownerID != 0 {
+				if !numericPhysicalReservationRefusal(e) || out.ownerID != 0 {
 					t.Fatal(op, fault, e)
 				}
 				serviceText(t, s, &a, "3/7")
@@ -617,7 +617,7 @@ func TestRationalServiceExtraIntegerBridgeFailureCleanup(t *testing.T) {
 			budget.FailAfter(-1)
 			if e != nil {
 				failures++
-				if !errors.Is(e, arena.ErrInjectedFailure) || m.cells.Stats().Live != cells || m.words.Stats().Live != words {
+				if !numericPhysicalReservationRefusal(e) || m.cells.Stats().Live != cells || m.words.Stats().Live != words {
 					t.Fatal(denominator, fault, e, "unreachable destination-owner temp")
 				}
 				if dst.num.val != 17 || !dst.num.IsSmall() {
@@ -681,7 +681,7 @@ func TestRationalServiceExtraScopedRationalConstructor(t *testing.T) {
 			facadeAudit(t, dest, &a, &out)
 			if e != nil {
 				failures++
-				if !errors.Is(e, arena.ErrInjectedFailure) || out.ownerID != 0 {
+				if !numericPhysicalReservationRefusal(e) || out.ownerID != 0 {
 					t.Fatal(op, fault, e)
 				}
 				serviceText(t, dest, &a, "3/7")
@@ -720,7 +720,7 @@ func TestRationalServiceExtraToScopedRationalOwnershipAndFailures(t *testing.T) 
 		qopsAuditLiveOwnership(t, m, []*Int{&dst.num.num, &dst.num.den})
 		facadeAudit(t, s, &a)
 		if e != nil {
-			if !errors.Is(e, arena.ErrInjectedFailure) {
+			if !numericPhysicalReservationRefusal(e) {
 				t.Fatal(fault, e)
 			}
 			if rationalString(t, m, &dst.num) != "3/7" {

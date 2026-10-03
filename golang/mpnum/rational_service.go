@@ -266,30 +266,7 @@ func (s *RationalService) SetFractionSigned(v *OwnedRational, n, d int32) error 
 	if e := s.check(v); e != nil {
 		return e
 	}
-	if d == 0 {
-		return ErrDivideByZero
-	}
-	// Source valid-int32 order: negate n then d before either setter. Widening
-	// defines INT_MIN signed-negation UB; it is not an observed C++ result.
-	nn, dd := int64(n), int64(d)
-	if dd < 0 {
-		nn = -nn
-		dd = -dd
-	}
-	// Both source int32 fields use signed setters. The uint64 denominator
-	// overload has a different INT_MAX shape and cannot represent this ctor.
-	work := NewRational()
-	defer s.manager.Del(&work)
-	if e := s.manager.z.SetInt64(&work.num, nn); e != nil {
-		return e
-	}
-	if e := s.manager.z.SetInt64(&work.den, dd); e != nil {
-		return e
-	}
-	if e := s.manager.normalize(&work); e != nil {
-		return e
-	}
-	return s.manager.Move(&v.raw, &work)
+	return s.manager.SetFractionSigned(&v.raw, n, d)
 }
 func (s *RationalService) SetString(v *OwnedRational, text string) error {
 	if e := s.lock(); e != nil {

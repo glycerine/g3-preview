@@ -4,7 +4,6 @@ package mpnum
 
 import (
 	"errors"
-	"github.com/glycerine/g3/golang/arena"
 	"math/big"
 	"strings"
 	"testing"
@@ -115,7 +114,7 @@ func TestRationalBitwiseFailureOwnershipAndDenominatorPublication(t *testing.T) 
 				qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &b.num, &b.den, &out.num, &out.den})
 				if e != nil {
 					failures++
-					if !errors.Is(e, arena.ErrInjectedFailure) {
+					if !numericPhysicalReservationRefusal(e) {
 						t.Fatal(op, alias, fault, e)
 					}
 					if dst.den != beforeDen {

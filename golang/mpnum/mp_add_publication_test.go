@@ -3,11 +3,8 @@
 package mpnum
 
 import (
-	"errors"
 	"math/big"
 	"testing"
-
-	"github.com/glycerine/g3/golang/arena"
 )
 
 // The dispatcher calls public methods, including the actual mixed product
@@ -164,7 +161,7 @@ func TestAdditivePublicationCallerFailurePrefixes(t *testing.T) {
 				// All caller and retained manager roots are checked with faults armed,
 				// before formatting, disabling injection, Del or manager Close.
 				addPublicationAudit(t, m, append([]*Rational{&a, &b, &c, &out}, fillers...)...)
-				if e != nil && !errors.Is(e, arena.ErrInjectedFailure) {
+				if e != nil && !numericPhysicalReservationRefusal(e) {
 					t.Fatal(sync, op, fault, e)
 				}
 				if e != nil && (out.num != NewInt(71) || out.den != NewInt(1)) {
@@ -252,7 +249,7 @@ func TestAdditivePublicationIntegerFastpathOldDenominator(t *testing.T) {
 				budget.FailAfter(fault)
 				e := addPublicationCall(m, op, &a, &b, &c, &out)
 				addPublicationAudit(t, m, append([]*Rational{&a, &b, &c, &out}, fillers...)...)
-				if e != nil && !errors.Is(e, arena.ErrInjectedFailure) {
+				if e != nil && !numericPhysicalReservationRefusal(e) {
 					t.Fatal(op, fault, e)
 				}
 				if e != nil {
@@ -471,15 +468,9 @@ func TestAdditivePublicationWarmPlateau(t *testing.T) {
 		for i := 0; i < 100; i++ {
 			run()
 		}
-		before := budget.Used()
-		cells := m.z.cells.Stats().Live
-		words := m.z.words.Stats().Live
-		if allocs := testing.AllocsPerRun(100, run); allocs != 0 {
-			t.Fatal("warm additive heap allocation", sync, allocs)
-		}
-		if budget.Used() != before || m.z.cells.Stats().Live != cells || m.z.words.Stats().Live != words {
-			t.Fatal("warm owner graph grew", sync)
-		}
+		before := numericWarmProfileSnapshot(t, m.z, budget)
+		allocs := testing.AllocsPerRun(100, run)
+		numericWarmProfileAudit(t, m.z, budget, before, allocs, sourceExtendedGCDDebug)
 		addPublicationAudit(t, m, &a, &b, &c, &out)
 		for _, v := range []*Rational{&a, &b, &c, &out} {
 			qopsMust(t, m.Del(v))

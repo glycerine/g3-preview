@@ -465,9 +465,10 @@ func TestInfIntRationalFaultPrefixesTemporaryCleanup(t *testing.T) {
 		out, e := s.InfIntAdd(&a, &r)
 		serviceAuditRationalRoots(t, s, &a.first, &r.first, &out.first) // immediate before format/Del
 		b.FailAfter(-1)
+		serviceMust(t, s.manager.z.CleanupPendingAllocation())
 		if e != nil {
 			failures++
-			if !errors.Is(e, arena.ErrInjectedFailure) {
+			if !numericPhysicalReservationRefusal(e) {
 				t.Fatal(n, e)
 			}
 		} else {
@@ -487,7 +488,7 @@ func TestInfIntRationalFaultPrefixesTemporaryCleanup(t *testing.T) {
 	if failures == 0 || successes == 0 {
 		t.Fatal(failures, successes)
 	}
-	s, b := serviceNew(t)
+	s, b := servicePublicationDirectOwner(t)
 	src := infIntValue(t, s, "123456789012345678901234567890/19", 99)
 	dst := infIntValue(t, s, "3", 7)
 	var fillers []OwnedRational
@@ -503,10 +504,11 @@ func TestInfIntRationalFaultPrefixesTemporaryCleanup(t *testing.T) {
 		roots = append(roots, &fillers[i].raw)
 	}
 	serviceAuditRationalRoots(t, s, roots...)
-	if !errors.Is(e, arena.ErrInjectedFailure) || dst.first.num.cell != s.manager.z.failedRef || dst.first.den != NewInt(1) || dst.second != 7 || !errors.Is(s.manager.z.check(&dst.first.num), arena.ErrInvalidSlot) {
+	if !numericPhysicalReservationRefusal(e) || dst.first.num.cell != s.manager.z.failedRef || dst.first.den != NewInt(1) || dst.second != 7 || !errors.Is(s.manager.z.check(&dst.first.num), arena.ErrInvalidSlot) {
 		t.Fatal("first component Copy refusal before epsilon publication", dst, e)
 	}
 	b.FailAfter(-1)
+	serviceMust(t, s.manager.z.CleanupPendingAllocation())
 	infIntCheck(t, s, &src, "123456789012345678901234567890/19", 99)
 	for i := range fillers {
 		serviceMust(t, s.Del(&fillers[i]))
@@ -630,7 +632,7 @@ func TestInfIntRationalPostFailureAndGetterIndependence(t *testing.T) {
 			b.FailAfter(-1)
 			if e != nil {
 				failures++
-				if !errors.Is(e, arena.ErrInjectedFailure) || old.ownerID != 0 {
+				if !numericPhysicalReservationRefusal(e) || old.ownerID != 0 {
 					t.Fatal(n, e, old.ownerID)
 				}
 			} else {

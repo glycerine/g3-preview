@@ -122,7 +122,10 @@ func TestNaturalBorrowedDivisionFailureAtomic(t *testing.T) {
 		b[i] = 0x12345678
 	}
 	b[len(b)-1] = 0x80000000
+	wq, wr := new(big.Int), new(big.Int)
+	wq.QuoRem(oracle(a), oracle(b), wr)
 	completed := false
+	beforeOutputFailures, afterOutputFailures := 0, 0
 	for fault := int64(0); fault < 128; fault++ {
 		budget := arena.NewBudget(1 << 22)
 		m, e := NewNaturalManager(arena.VectorConfig{PageSize: 32, Descriptors: arena.Config{PageSize: 2, Budget: budget}})
@@ -138,26 +141,79 @@ func TestNaturalBorrowedDivisionFailureAtomic(t *testing.T) {
 		}
 		budget.FailAfter(fault)
 		_, e = m.Div(a, b, q, r)
-		budget.FailAfter(-1)
-		if e != nil {
-			for _, v := range q {
-				if v != 123 {
-					t.Fatal(fault, "quotient publication")
+		// Source mpn.cpp:208–223 constructs the debug verification buffer only
+		// after quotient and unnormalized remainder publication is complete.
+		if m.division[3].size() != 0 {
+			t.Fatal("fixture unexpectedly entered conditional add-back", fault)
+		}
+		roots := map[memory.Block]bool{}
+		buffers := []*sourceLimbBuffer{&m.division[0], &m.division[1], &m.division[2], &m.division[3]}
+		if m.verificationActive {
+			buffers = append(buffers, &m.verification)
+		}
+		for _, buf := range buffers {
+			for _, ref := range []memory.Block{buf.raw, buf.pending} {
+				if ref == (memory.Block{}) {
+					continue
+				}
+				if roots[ref] {
+					t.Fatal("duplicated actual borrowed-division root", fault)
+				}
+				roots[ref] = true
+				if _, err := m.runtime.ReadUint32(ref, 0); err != nil && !errors.Is(err, memory.ErrRuntimeUninitialized) {
+					t.Fatal("invalid physical division root", fault, err)
 				}
 			}
-			for _, v := range r {
-				if v != 456 {
-					t.Fatal(fault, "remainder publication")
+		}
+		ws, rs := m.words.Stats(), m.runtime.Stats()
+		owned := m.headerBytes + rs.TotalBytes + ws.OwnerBytes + ws.PayloadBytes + ws.BlockMetadataBytes + ws.DirectoryBytes + ws.Descriptors.OwnerBytes + ws.Descriptors.RecordBytes + ws.Descriptors.MetadataBytes + ws.Descriptors.DirectoryBytes
+		if rs.LiveBlocks != uint32(len(roots)) || ws.Live != 0 || owned != budget.Used() {
+			t.Fatal("unnamed borrowed-division storage", fault, rs, len(roots), owned, budget.Used())
+		}
+		if e != nil {
+			if !numericPhysicalReservationRefusal(e) {
+				t.Fatal("unexpected division refusal", fault, e)
+			}
+			if m.verificationActive {
+				afterOutputFailures++
+				if !modularSourceDebug || oracle(q).Cmp(wq) != 0 || oracle(r).Cmp(wr) != 0 {
+					t.Fatal("complete outputs before source verification refusal", fault, e)
+				}
+			} else {
+				beforeOutputFailures++
+				for _, v := range q {
+					if v != 123 {
+						t.Fatal(fault, "early quotient publication")
+					}
+				}
+				for _, v := range r {
+					if v != 456 {
+						t.Fatal(fault, "early remainder publication")
+					}
 				}
 			}
 		} else {
-			wq, wr := new(big.Int), new(big.Int)
-			wq.QuoRem(oracle(a), oracle(b), wr)
 			if oracle(q).Cmp(wq) != 0 || oracle(r).Cmp(wr) != 0 {
 				t.Fatal("division oracle")
 			}
 			completed = true
 		}
+		for i, v := range a {
+			if v != 0xfedcba98 {
+				t.Fatal("borrowed numerator mutated", i)
+			}
+		}
+		for i, v := range b {
+			want := uint32(0x12345678)
+			if i == len(b)-1 {
+				want = 0x80000000
+			}
+			if v != want {
+				t.Fatal("borrowed denominator mutated", i)
+			}
+		}
+		budget.FailAfter(-1)
+
 		m.Close()
 		if budget.Used() != 0 {
 			t.Fatal("scratch leak", fault, budget.Used())
@@ -166,8 +222,8 @@ func TestNaturalBorrowedDivisionFailureAtomic(t *testing.T) {
 			break
 		}
 	}
-	if !completed {
-		t.Fatal("division sweep incomplete")
+	if !completed || beforeOutputFailures == 0 || (modularSourceDebug && afterOutputFailures == 0) || (!modularSourceDebug && afterOutputFailures != 0) {
+		t.Fatal("division source-phase sweep incomplete", completed, beforeOutputFailures, afterOutputFailures)
 	}
 }
 
@@ -322,7 +378,7 @@ func TestNaturalNestedOwnerAccounting(t *testing.T) {
 	}
 	ws := words.Stats()
 	bs := m.text.Stats()
-	measured := m.headerBytes + ws.OwnerBytes + ws.PayloadBytes + ws.BlockMetadataBytes + ws.DirectoryBytes + ws.Descriptors.OwnerBytes + ws.Descriptors.RecordBytes + ws.Descriptors.MetadataBytes + ws.Descriptors.DirectoryBytes + bs.OwnerBytes + bs.PayloadBytes + bs.MetadataBytes + bs.DirectoryBytes
+	measured := m.RuntimeOwner().Stats().TotalBytes + m.headerBytes + ws.OwnerBytes + ws.PayloadBytes + ws.BlockMetadataBytes + ws.DirectoryBytes + ws.Descriptors.OwnerBytes + ws.Descriptors.RecordBytes + ws.Descriptors.MetadataBytes + ws.Descriptors.DirectoryBytes + bs.OwnerBytes + bs.PayloadBytes + bs.MetadataBytes + bs.DirectoryBytes
 	if measured != b.Used() {
 		t.Fatal("complete owner graph", measured, b.Used())
 	}

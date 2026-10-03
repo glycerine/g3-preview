@@ -484,7 +484,9 @@ func TestScopedRationalVectorAndScalarLifetimes(t *testing.T) {
 	}
 }
 func TestScopedNumeralHeadersFailuresAndSourcePushPrefix(t *testing.T) {
-	m, b := integerManager(t)
+	// This action-timing fixture uses the actual direct source profile so the
+	// copied big numeral requires physical preparation despite warmed pool slots.
+	m, b := mpzPublicationDirectOwner(t)
 	base := b.Used()
 	b.FailAfter(0)
 	if s, e := NewScopedInt(m); s != nil || !errors.Is(e, arena.ErrInjectedFailure) || b.Used() != base {
@@ -510,6 +512,10 @@ func TestScopedNumeralHeadersFailuresAndSourcePushPrefix(t *testing.T) {
 		}
 		fillers = append(fillers, filler)
 	}
+	roots := []*Int{&big}
+	for i := range fillers {
+		roots = append(roots, &fillers[i])
+	}
 	live := m.cells.Stats().Live
 	wordsLive := m.words.Stats().Live
 	usedBefore := b.Used()
@@ -517,6 +523,7 @@ func TestScopedNumeralHeadersFailuresAndSourcePushPrefix(t *testing.T) {
 	if e = v.Push(&big); !errors.Is(e, arena.ErrInjectedFailure) || v.Size() != 1 || v.Capacity() != 2 {
 		t.Fatal("source default appended before copy", e, v.Size())
 	}
+	integerPhysicalAudit(t, m, roots...)
 	if m.cells.Stats().Live != live {
 		t.Fatal("failed push leaked a temporary cell")
 	}
@@ -628,8 +635,8 @@ func TestScopedRationalVectorIndependentLifecycleAndFailures(t *testing.T) {
 				}
 				m.Del(&out)
 			}
-			if m.z.cells.Stats().Live != baseCells+bigCount*2 || m.z.words.Stats().Live != baseWords+bigCount*2 {
-				t.Fatal("immediate rational cell/payload lifecycle oracle", step, m.z.cells.Stats().Live, baseCells, bigCount)
+			if m.z.cells.Stats().Live != baseCells+bigCount*2 || m.z.words.Stats().Live != baseWords {
+				t.Fatal("immediate rational cell/retained formatter lifecycle oracle", step, m.z.cells.Stats().Live, baseCells, bigCount)
 			}
 		}
 		v.Reset()
@@ -644,9 +651,8 @@ func TestScopedRationalVectorIndependentLifecycleAndFailures(t *testing.T) {
 		}
 		live := m.z.cells.Stats().Live
 		payloads := m.z.words.Stats().Live
-		used := b.Used()
 		b.FailAfter(0)
-		if e := v.Push(&big); !errors.Is(e, arena.ErrInjectedFailure) || v.Size() != 1 {
+		if e := v.Push(&big); !numericPhysicalReservationRefusal(e) || v.Size() != 1 {
 			t.Fatal("rational source append prefix", e)
 		}
 		roots := []*Int{&small.num, &small.den, &big.num, &big.den, &v.data[0].num, &v.data[0].den}
@@ -654,19 +660,34 @@ func TestScopedRationalVectorIndependentLifecycleAndFailures(t *testing.T) {
 			roots = append(roots, &fillers[i])
 		}
 		qopsAuditLiveOwnership(t, m, roots)
-		if m.z.cells.Stats().Live != live || m.z.words.Stats().Live != payloads || b.Used() != used || v.data[0].den != NewInt(1) || v.data[0].num.cell != m.z.failedRef || v.data[0].num.val != big.num.val || !errors.Is(m.z.check(&v.data[0].num), arena.ErrInvalidSlot) {
-			t.Fatal("rational failed Copy owns exact numerator failed descriptor before denominator action")
+		setterPairPrefix(t, m, &v.data[0], "0", "1", roundPublicationDecode(t, m.z, &big.num), roundPublicationDecode(t, m.z, &big.den), true)
+		published := uint32(0)
+		for _, n := range []*Int{&v.data[0].num, &v.data[0].den} {
+			if n.cell != 0 && n.cell != m.z.failedRef {
+				published++
+			}
+		}
+		if m.z.cells.Stats().Live != live+published || m.z.words.Stats().Live != payloads {
+			t.Fatal("actual source copy descriptors", m.z.cells.Stats().Live, live, published)
+		}
+		// The source object allocation can complete before descriptor refusal;
+		// retained physical objects/metadata must remain fully charged and named.
+		vectorCharge := uint64(reflect.TypeOf(ScopedRationalVector{}).Size()) + uint64(cap(v.data))*uint64(reflect.TypeOf(Rational{}).Size())
+		if b.Used() != m.headerBytes+integerActualOwnedBytes(m.z)+vectorCharge {
+			t.Fatal("actual rational vector physical graph", b.Used(), integerActualOwnedBytes(m.z), m.headerBytes, vectorCharge)
 		}
 		b.FailAfter(-1)
+		qopsMust(t, m.z.CleanupPendingAllocation()) // explicit unassigned-object cleanup, after immediate source audit
 		for i := range fillers {
 			m.z.Del(&fillers[i])
 		}
 		beforeClose := b.Used()
+		integerBefore := integerActualOwnedBytes(m.z)
 		coldCharge := uint64(reflect.TypeOf(ScopedRationalVector{}).Size()) + uint64(cap(v.data))*uint64(reflect.TypeOf(Rational{}).Size())
 		if e := v.Close(); e != nil {
 			t.Fatal("actual failed-component vector Close", e)
 		}
-		if beforeClose-b.Used() != coldCharge {
+		if beforeClose-b.Used() != coldCharge+integerBefore-integerActualOwnedBytes(m.z) {
 			t.Fatal("vector physical header/backing refund", beforeClose, b.Used(), coldCharge)
 		}
 		if m.z.cells.Stats().Live != baseCells || m.z.words.Stats().Live != baseWords {
@@ -696,20 +717,38 @@ func TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak(t *testing.T) {
 		words := m.z.words.Stats().Live
 		b.FailAfter(prefix)
 		copy, e := s.Clone()
+		roots := []*Int{&num.num, &num.den}
+		for i := range fillers {
+			roots = append(roots, &fillers[i])
+		}
+		if copy != nil {
+			roots = append(roots, &copy.num.num, &copy.num.den)
+		}
+		qopsAuditLiveOwnership(t, m, roots)
+		ownerCharge := uint64(reflect.TypeOf(ScopedRational{}).Size())
+		if copy != nil {
+			ownerCharge *= 2
+		}
+		if b.Used() != m.headerBytes+integerActualOwnedBytes(m.z)+ownerCharge {
+			t.Fatal("actual clone owners and physical roots", prefix, b.Used(), ownerCharge)
+		}
 		if e != nil {
 			failed++
-			if !errors.Is(e, arena.ErrInjectedFailure) || copy != nil || m.z.cells.Stats().Live != cells || m.z.words.Stats().Live != words {
+			if !numericPhysicalReservationRefusal(e) || copy != nil || m.z.cells.Stats().Live != cells || m.z.words.Stats().Live != words {
 				t.Fatal("clone immediate cleanup", prefix, e)
 			}
 		} else {
 			passed++
 			b.FailAfter(-1)
-			copy.Close()
+			if e := copy.Close(); e != nil {
+				t.Fatal(e)
+			}
 			if m.z.cells.Stats().Live != cells || m.z.words.Stats().Live != words {
 				t.Fatal("clone close immediate graph")
 			}
 		}
 		b.FailAfter(-1)
+		qopsMust(t, m.z.CleanupPendingAllocation()) // explicit release after pre-cleanup audit
 		for i := range fillers {
 			m.z.Del(&fillers[i])
 		}

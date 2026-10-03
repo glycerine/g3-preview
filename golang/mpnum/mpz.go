@@ -346,15 +346,8 @@ func (m *IntegerManager) CloseChecked() error {
 			}
 		}
 	}
-	if m.pendingCell.object != (memory.ObjectRef{}) {
-		p, e := m.allocator.DeallocateTracked(m.pendingCell.requested, m.pendingCell.object)
-		if p.PhysicalReleased || p.PooledLinked {
-			m.pendingCell = sourceCellBacking{}
-		}
-		if e != nil {
-			return fail(e)
-		}
-		m.pendingCell = sourceCellBacking{}
+	if e := m.cleanupPendingAllocation(); e != nil {
+		return fail(e)
 	}
 	if m.natural != nil {
 		if e := m.natural.CloseChecked(); e != nil {

@@ -417,9 +417,7 @@ func TestUPolynomialGCDChainImmediateFailureRoots(t *testing.T) {
 			if now.IntegerLiveCells != external+outputs+now.OwnedNumeralCells+now.IntegerCachedCells {
 				t.Fatal("unnamed local root", op, fail, err, before, now, outputs)
 			}
-			if now.IntegerWordsRefs != now.IntegerLiveCells+now.IntegerNaturalWordsRefs {
-				t.Fatal("lost Words reference", op, fail, err, now)
-			}
+			upolyHenselAuditPhysical(t, []*mpnum.UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{Integers: []*mpnum.Int{&content, &lc, &inv}, RationalManagers: []*mpnum.RationalManager{q}})
 			b.FailAfter(-1)
 			for _, x := range []*mpnum.Int{&inv, &lc, &content} {
 				if e := q.Integers().Del(x); e != nil {
@@ -568,7 +566,7 @@ func TestUPolynomialGCDAndDivisionWarmPhysicalPlateau(t *testing.T) {
 	before := m.Stats()
 	used := b.Used()
 	allocations := testing.AllocsPerRun(100, work)
-	if err != nil || allocations != 0 {
+	if err != nil || (!upolyPhysicalSourceDebug && allocations != 0) {
 		t.Fatal(err, allocations)
 	}
 	after := m.Stats()
@@ -580,7 +578,7 @@ func TestUPolynomialGCDAndDivisionWarmPhysicalPlateau(t *testing.T) {
 	b.FailAfter(-1)
 	// Source numeric fresh scoped roots may legitimately reserve despite warmed
 	// Go storage; the strict physical plateau/allocation test above is separate.
-	if err != nil && !errors.Is(err, arena.ErrBudget) {
+	if err != nil && !errors.Is(err, arena.ErrBudget) && !numericStorageReservationRefusal(err) {
 		t.Fatal(err)
 	}
 }
@@ -924,9 +922,7 @@ func TestUPolynomialModularGCDCRALateFailureRootSweep(t *testing.T) {
 		if after.IntegerLiveCells != external+after.OwnedNumeralCells+after.IntegerCachedCells {
 			t.Fatal("late CRA unnamed numeral", ordinal, err, before, after)
 		}
-		if after.IntegerWordsRefs != after.IntegerLiveCells+after.IntegerNaturalWordsRefs {
-			t.Fatal("late CRA missing Words root", ordinal, err, after)
-		}
+		upolyHenselAuditPhysical(t, []*mpnum.UPolynomialManager{owner}, nil)
 		finite, e := owner.Modular()
 		if e != nil || finite {
 			t.Fatal("failure mode restoration", ordinal, finite, e)
@@ -938,7 +934,7 @@ func TestUPolynomialModularGCDCRALateFailureRootSweep(t *testing.T) {
 		craSize := reflect.ValueOf(owner).Elem().FieldByName("cra").FieldByName("size").Uint()
 		faults.FailAfter(-1)
 		if ordinal < reservations {
-			if !errors.Is(err, arena.ErrInjectedFailure) {
+			if !numericStorageReservationRefusal(err) {
 				t.Fatal(ordinal, reservations, err)
 			}
 			if completedChecks > 5 {

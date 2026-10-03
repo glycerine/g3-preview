@@ -283,7 +283,7 @@ func TestSourceShiftDefectAndPowerDomains(t *testing.T) {
 			e := m.Power(&a, p, &out)
 			mpzPublicationAudit(t, m, &a, &out)
 			if large {
-				if !errors.Is(e, arena.ErrInjectedFailure) {
+				if !numericPhysicalReservationRefusal(e) {
 					t.Fatal(base, p, e)
 				}
 				if out != NewInt(1) {
@@ -305,7 +305,7 @@ func TestSourceShiftDefectAndPowerDomains(t *testing.T) {
 					t.Fatal(base, p, out, e)
 				}
 			} else if base == 2 && p >= 1<<31 {
-				if !errors.Is(e, arena.ErrBudget) && !errors.Is(e, arena.ErrBounds) {
+				if !errors.Is(e, arena.ErrBudget) && !errors.Is(e, arena.ErrBounds) && !numericPhysicalReservationRefusal(e) {
 					t.Fatal(base, p, e)
 				}
 				mpzPublicationAudit(t, m, &a, &out)
@@ -374,7 +374,7 @@ func TestRationalPowerIndependentAndDomains(t *testing.T) {
 			e := m.Power(&a, 1<<31, &out)
 			qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &out.num, &out.den})
 			if base == 2 {
-				if !errors.Is(e, arena.ErrInjectedFailure) || out.num != NewInt(1) || out.den != NewInt(1) {
+				if !numericPhysicalReservationRefusal(e) || out.num != NewInt(1) || out.den != NewInt(1) {
 					t.Fatal("first real square refusal", base, out, e)
 				}
 				budget.FailAfter(-1)
@@ -431,7 +431,7 @@ func TestPowerShiftFailureCleanup(t *testing.T) {
 					err := call()
 					if err != nil {
 						failures++
-						if !errors.Is(err, arena.ErrInjectedFailure) {
+						if !numericPhysicalReservationRefusal(err) {
 							t.Fatal(synch, op, alias, after, err)
 						}
 						// Source power's intermediate integer setters retain completed prefixes.
@@ -473,7 +473,7 @@ func TestPowerShiftFailureCleanup(t *testing.T) {
 }
 func TestPowerShiftWarmStorageAndLifetime(t *testing.T) {
 	for _, synch := range []bool{false, true} {
-		m, _ := rationalManager(t, synch)
+		m, budget := rationalManager(t, synch)
 		a, out := NewRational(), NewRational()
 		m.SetFraction(&a, (1<<35)+7, 13)
 		var result Int
@@ -494,10 +494,14 @@ func TestPowerShiftWarmStorageAndLifetime(t *testing.T) {
 				t.Fatal(e)
 			}
 		}
+		beforeWarm := numericWarmProfileSnapshot(t, m.z, budget)
 		var err error
-		if got := testing.AllocsPerRun(20, func() { err = call() }); got != 0 || err != nil {
+		got := testing.AllocsPerRun(20, func() { err = call() })
+		if err != nil {
 			t.Fatal(synch, got, err)
 		}
+		numericWarmProfileAudit(t, m.z, budget, beforeWarm, got, modularSourceDebug)
+		qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &out.num, &out.den, &result})
 		var raw Rational
 		if e := m.Power(&raw, 2, &out); !errors.Is(e, ErrUninitializedRational) {
 			t.Fatal(e)
@@ -548,7 +552,7 @@ func TestShiftUnsignedBoundsAndPromotions(t *testing.T) {
 	m.SetInt64(&out, 17)
 	e := m.Mul2k(&a, math.MaxUint32, &out)
 	mpzPublicationAudit(t, m, &a, &out)
-	if (!errors.Is(e, arena.ErrBudget) && !errors.Is(e, arena.ErrBounds)) || integerString(t, m, &out) != "9223372036854775807" || integerString(t, m, &a) != "9223372036854775807" {
+	if (!errors.Is(e, arena.ErrBudget) && !errors.Is(e, arena.ErrBounds) && !numericPhysicalReservationRefusal(e)) || integerString(t, m, &out) != "9223372036854775807" || integerString(t, m, &a) != "9223372036854775807" {
 		t.Fatal(e)
 	}
 	if e := m.MachineDiv2k(&a, math.MaxUint32, &out); e != nil || integerString(t, m, &out) != "0" {
@@ -580,7 +584,7 @@ func TestPowerDomainAliases(t *testing.T) {
 				t.Fatal(base, a, e)
 			}
 		case 3:
-			if !errors.Is(e, arena.ErrInjectedFailure) || a != NewInt(1) {
+			if !numericPhysicalReservationRefusal(e) || a != NewInt(1) {
 				t.Fatal(base, a, e)
 			}
 			budget.FailAfter(-1)
@@ -597,7 +601,7 @@ func TestPowerDomainAliases(t *testing.T) {
 		b.FailAfter(0)
 		e := rm.Power(&a, 1<<31, &a)
 		qopsAuditLiveOwnership(t, rm, []*Int{&a.num, &a.den})
-		if !errors.Is(e, arena.ErrInjectedFailure) || a.num != NewInt(1) || a.den != NewInt(1) {
+		if !numericPhysicalReservationRefusal(e) || a.num != NewInt(1) || a.den != NewInt(1) {
 			t.Fatal(synch, a, e)
 		}
 		b.FailAfter(-1)

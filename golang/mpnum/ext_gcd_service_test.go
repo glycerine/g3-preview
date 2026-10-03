@@ -7,7 +7,6 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/glycerine/g3/golang/arena"
 )
 
 func TestExtendedGCDWrapperSource999Cases(t *testing.T) {
@@ -114,7 +113,7 @@ func TestExtendedGCDWrapperImmediateFailureOwnership(t *testing.T) {
 		budget.FailAfter(-1)
 		if err != nil {
 			failures++
-			if !errors.Is(err, arena.ErrInjectedFailure) {
+			if !numericPhysicalReservationRefusal(err) {
 				t.Fatalf("prefix %d: %v", prefix, err)
 			}
 			if g.raw.IsSmall() && x.raw.IsSmall() && y.raw.IsSmall() &&

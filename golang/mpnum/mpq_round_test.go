@@ -259,7 +259,7 @@ func TestRationalRoundFailureCleanup(t *testing.T) {
 					err := call()
 					qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &out.num, &out.den, &integer})
 					if err != nil {
-						if !errors.Is(err, arena.ErrInjectedFailure) {
+						if !numericPhysicalReservationRefusal(err) {
 							t.Fatal("round source error", synch, op, alias, after, err)
 						}
 						if op == 4 {
@@ -355,7 +355,7 @@ func TestRationalRoundInitializationAndClose(t *testing.T) {
 
 func TestRationalRoundWarmZeroAllocations(t *testing.T) {
 	for _, synch := range []bool{false, true} {
-		m, _ := rationalManager(t, synch)
+		m, budget := rationalManager(t, synch)
 		a, out := NewRational(), NewRational()
 		n := new(big.Int).Lsh(big.NewInt(1), 300)
 		n.Add(n, big.NewInt(7))
@@ -382,9 +382,12 @@ func TestRationalRoundWarmZeroAllocations(t *testing.T) {
 				t.Fatal(e)
 			}
 		}
+		beforeWarm := numericWarmProfileSnapshot(t, m.z, budget)
 		var err error
-		if got := testing.AllocsPerRun(20, func() { err = call() }); got != 0 || err != nil {
-			t.Fatal(synch, got, err)
+		got := testing.AllocsPerRun(20, func() { err = call() })
+		if err != nil {
+			t.Fatal(err)
 		}
+		numericWarmProfileAudit(t, m.z, budget, beforeWarm, got, m.z.allocator.Stats().DirectObjects > 0)
 	}
 }

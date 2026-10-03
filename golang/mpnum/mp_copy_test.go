@@ -187,7 +187,7 @@ func TestNumeralCopyFromFailurePrefixesAndImmediateOwnership(t *testing.T) {
 				}
 				if e != nil {
 					failed = true
-					if !errors.Is(e, arena.ErrInjectedFailure) || b != beforeB || dest.z.cells.Stats().Live != cells || dest.z.words.Stats().Live != words {
+					if !numericPhysicalReservationRefusal(e) || b != beforeB || dest.z.cells.Stats().Live != cells || dest.z.words.Stats().Live != words {
 						t.Fatal("copy failure ownership/publication", rational, bigOutput, prefix, e)
 					}
 				} else {
@@ -275,14 +275,16 @@ func TestNumeralCopyFromWarmGuardsAndSameOwner(t *testing.T) {
 		}
 	}
 	before := qb.Used()
-	qb.FailAfter(0)
-	if allocations := testing.AllocsPerRun(100, func() {
+	if !sourceExtendedGCDDebug {
+		qb.FailAfter(0)
+	}
+	physicalBefore := numericWarmProfileSnapshot(t, qd.z, qb)
+	allocations := testing.AllocsPerRun(100, func() {
 		if e := qd.CopyFrom(&qout, qs, &qa); e != nil {
 			panic(e)
 		}
-	}); allocations != 0 {
-		t.Fatal("rational copy allocations", allocations)
-	}
+	})
+	numericWarmProfileAudit(t, qd.z, qb, physicalBefore, allocations, sourceExtendedGCDDebug)
 	if qb.Used() != before {
 		t.Fatal("warm rational copy budget")
 	}

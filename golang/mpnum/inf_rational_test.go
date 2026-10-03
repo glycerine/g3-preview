@@ -4,6 +4,7 @@ package mpnum
 import (
 	"errors"
 	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
 	"math/big"
 	"testing"
 )
@@ -559,9 +560,15 @@ func TestInfRationalFailurePrefixesImmediateRoots(t *testing.T) {
 	for op := 0; op < 15; op++ {
 		success := false
 		failures := 0
-		for prefix := int64(0); prefix < 512; prefix++ {
+		for prefix := int64(0); prefix < 4096; prefix++ {
 			budget := arena.NewBudget(1 << 25)
-			s, e := NewRationalService(serviceConfig(budget))
+			config := serviceConfig(budget)
+			// Scalar arithmetic and integer floor copies reuse pooled storage; select
+			// the supported direct profile to exercise real source malloc refusals.
+			if op == 9 || op == 10 || op == 12 {
+				config.Integers.Profile = memory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+			}
+			s, e := NewRationalService(config)
 			serviceMust(t, e)
 			huge := new(big.Int).Add(new(big.Int).Lsh(big.NewInt(1), 220), big.NewInt(3)).String()
 			eps := new(big.Int).Add(new(big.Int).Lsh(big.NewInt(1), 175), big.NewInt(5)).String()
@@ -615,7 +622,7 @@ func TestInfRationalFailurePrefixesImmediateRoots(t *testing.T) {
 			// actual public roots plus service-owned constants/cache can justify cells.
 			infAuditRoots(t, s, []*OwnedInfRational{&a, &b, &value}, []*OwnedRational{&qa, &qe, &qb, &qm, &c, &rational})
 			if e != nil {
-				if !errors.Is(e, arena.ErrInjectedFailure) {
+				if !numericPhysicalReservationRefusal(e) {
 					t.Fatal(op, prefix, e)
 				}
 				failures++

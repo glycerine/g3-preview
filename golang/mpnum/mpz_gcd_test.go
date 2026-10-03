@@ -181,7 +181,7 @@ func TestIntegerGCDFailureCleanup(t *testing.T) {
 	}
 	for alias := 0; alias < 3; alias++ {
 		failures, successes := 0, 0
-		for after := int64(0); after < 40; after++ {
+		for after := int64(0); after < 2048; after++ {
 			m, budget := integerManager(t)
 			var a, b Int
 			out := NewInt(17)
@@ -198,7 +198,7 @@ func TestIntegerGCDFailureCleanup(t *testing.T) {
 			err := m.GCD(&a, &b, dst)
 			if err != nil {
 				failures++
-				if !errors.Is(err, arena.ErrInjectedFailure) {
+				if !numericPhysicalReservationRefusal(err) {
 					t.Fatal(alias, after, err)
 				}
 				// Source big_set/result setters may complete publication before failure.
@@ -220,6 +220,7 @@ func TestIntegerGCDFailureCleanup(t *testing.T) {
 			if budget.Used() != 0 {
 				t.Fatal("close budget", budget.Used())
 			}
+			break
 		}
 		if failures == 0 || successes == 0 {
 			t.Fatal("fault sweep missed completion boundary", alias, failures, successes)
@@ -274,7 +275,7 @@ func TestIntegerAddMulSubMulFailureCleanup(t *testing.T) {
 				}
 				if err != nil {
 					failures++
-					if !errors.Is(err, arena.ErrInjectedFailure) {
+					if !numericPhysicalReservationRefusal(err) {
 						t.Fatal(alias, after, err)
 					}
 					// Source big_set/result setters may complete publication before failure.
@@ -326,7 +327,7 @@ func TestIntegerGCDZeroPromotionFailure(t *testing.T) {
 }
 
 func TestIntegerGCDAndFusedWarmAllocations(t *testing.T) {
-	m, _ := integerManager(t)
+	m, budget := integerManager(t)
 	var a, b, c, g, out Int
 	x, y := big.NewInt(1), big.NewInt(1)
 	for i := 0; i < 400; i++ {
@@ -341,6 +342,11 @@ func TestIntegerGCDAndFusedWarmAllocations(t *testing.T) {
 	if e := m.AddMul(&a, &b, &c, &out); e != nil {
 		t.Fatal(e)
 	}
+	// Prime SubMul too: the retained graph must plateau across every route.
+	if e := m.SubMul(&a, &b, &c, &out); e != nil {
+		t.Fatal(e)
+	}
+	beforeWarm := numericWarmProfileSnapshot(t, m, budget)
 	var operationError error
 	allocations := testing.AllocsPerRun(100, func() {
 		operationError = m.GCD(&a, &b, &g)
@@ -351,9 +357,11 @@ func TestIntegerGCDAndFusedWarmAllocations(t *testing.T) {
 			operationError = m.SubMul(&a, &b, &c, &out)
 		}
 	})
-	if operationError != nil || allocations != 0 {
+	if operationError != nil {
 		t.Fatal("warmed gcd/fused operations allocate", allocations, operationError)
 	}
+	numericWarmProfileAudit(t, m, budget, beforeWarm, allocations, modularSourceDebug)
+	integerPhysicalAudit(t, m, &a, &b, &c, &g, &out)
 	if integerString(t, m, &g) != "1" {
 		t.Fatal("gcd warm result")
 	}

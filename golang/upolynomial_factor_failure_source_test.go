@@ -43,11 +43,17 @@ func TestUPolynomialFactorFullAlgorithmImmediateFailureRoots(t *testing.T) {
 		_, err := service.Factor(mustUPolyView(t, m, p), fs, mpnum.DefaultUPolynomialFactorParams())
 		// Exact concrete vector/physical cell census precedes fault disabling,
 		// formatting, result deletion and any owning cleanup.
-		upolyHenselAuditPhysical(t, []*mpnum.UPolynomialManager{m}, []*mpnum.UPolynomialFactors{fs})
+		upolyHenselAuditPhysical(t, []*mpnum.UPolynomialManager{m}, []*mpnum.UPolynomialFactors{fs}, upolyPhysicalExtraOwners{Services: []*mpnum.UPolynomialFactorizationService{service}})
 		if err != nil && !upolyHenselAllocationRefusal(m.IntegerManager(), err) {
 			t.Fatal(ordinal, err)
 		}
 		b.FailAfter(-1)
+		if service.Stats().RetainedScopes != 0 {
+			upolyHenselCallerSetZForDeadBounds(t, []*mpnum.UPolynomialManager{m}, []*mpnum.UPolynomialFactors{fs}, upolyPhysicalExtraOwners{Services: []*mpnum.UPolynomialFactorizationService{service}})
+			if e = service.CleanupRetained(); e != nil {
+				t.Fatal(ordinal, e)
+			}
+		}
 		if err == nil {
 			successes++
 			if n, e := fs.DistinctFactors(); e != nil || n != 3 {

@@ -4,7 +4,6 @@ package mpnum
 
 import (
 	"errors"
-	"github.com/glycerine/g3/golang/arena"
 	"math/big"
 	"testing"
 )
@@ -29,7 +28,7 @@ func bitPublicationPrefix(t *testing.T, m *IntegerManager, out *Int, old string,
 	if out.cell == m.failedRef {
 		return
 	}
-	got := integerString(t, m, out)
+	got := roundPublicationDecode(t, m, out).String()
 	if got == old || got == "0" {
 		return
 	}
@@ -129,7 +128,7 @@ func TestBitwisePublicationCallerPrefixes(t *testing.T) {
 				e := bitPublicationCall(m, op, &a, &b, dst)
 				mpzPublicationAudit(t, m, &a, &b, &out)
 				if e != nil {
-					if !errors.Is(e, arena.ErrInjectedFailure) {
+					if !numericPhysicalReservationRefusal(e) {
 						t.Fatal(op, alias, fault, e)
 					}
 					if *dst != old {
@@ -296,7 +295,7 @@ func TestBitwisePublicationFinalUnusedActions(t *testing.T) {
 	for op := 0; op < 4; op++ {
 		completeFailure, success := false, false
 		for fault := int64(0); fault < 256; fault++ {
-			m, budget := mpzPublicationOwner(t)
+			m, budget := mpzPublicationDirectOwner(t)
 			var a, b, out Int
 			qopsMust(t, m.SetUint64(&a, ^uint64(0)))
 			qopsMust(t, m.SetUint64(&b, ^uint64(0)-1))
@@ -311,7 +310,7 @@ func TestBitwisePublicationFinalUnusedActions(t *testing.T) {
 			mpzPublicationAudit(t, m, &a, &b, &out)
 			budget.FailAfter(-1)
 			if e != nil {
-				if !errors.Is(e, arena.ErrInjectedFailure) {
+				if !numericPhysicalReservationRefusal(e) {
 					t.Fatal(e)
 				}
 				if out.cell != m.failedRef {
@@ -343,7 +342,7 @@ func TestBitwisePublicationRationalDenominatorFailureAliases(t *testing.T) {
 			for alias := 0; alias < 3; alias++ {
 				changed, success := false, false
 				for fault := int64(0); fault < 256; fault++ {
-					m, budget := rationalManager(t, sync)
+					m, budget := rationalPublicationDirectOwner(t, sync)
 					a, b, out := NewRational(), NewRational(), NewRational()
 					qopsMust(t, m.SetString(&a, "1461501637330902918203684832716283019655932542981"))
 					qopsMust(t, m.SetString(&b, "18446744073709551617"))
@@ -365,7 +364,7 @@ func TestBitwisePublicationRationalDenominatorFailureAliases(t *testing.T) {
 					}
 					qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &b.num, &b.den, &out.num, &out.den})
 					if e != nil {
-						if !errors.Is(e, arena.ErrInjectedFailure) {
+						if !numericPhysicalReservationRefusal(e) {
 							t.Fatal(op, alias, fault, e)
 						}
 						if dst.den != den {
@@ -418,7 +417,7 @@ func TestBitwisePublicationEarlyFailurePrecedesBoundary(t *testing.T) {
 		budget.FailAfter(0)
 		e := bitPublicationCall(m, op, &a, &b, &out)
 		mpzPublicationAudit(t, m, &a, &b, &out)
-		if !errors.Is(e, arena.ErrInjectedFailure) || out != NewInt(71) {
+		if !numericPhysicalReservationRefusal(e) || out != NewInt(71) {
 			t.Fatal("copy refusal before output reset/boundary", op, e, out)
 		}
 		budget.FailAfter(-1)
@@ -460,7 +459,7 @@ func TestBitwisePublicationServiceFailureRoots(t *testing.T) {
 	for op := 0; op < 4; op++ {
 		failed, success := false, false
 		for fault := int64(0); fault < 512; fault++ {
-			s, budget := serviceNew(t)
+			s, budget := servicePublicationDirectOwner(t)
 			a := serviceValue(t, s, "1461501637330902918203684832716283019655932542981")
 			b := serviceValue(t, s, "18446744073709551617")
 			beforeA, e := s.String(&a)
@@ -482,7 +481,7 @@ func TestBitwisePublicationServiceFailureRoots(t *testing.T) {
 			facadeAudit(t, s, &a, &b, &out)
 			if e != nil {
 				failed = true
-				if !errors.Is(e, arena.ErrInjectedFailure) || out.ownerID != 0 {
+				if !numericPhysicalReservationRefusal(e) || out.ownerID != 0 {
 					t.Fatal(op, fault, e, out)
 				}
 			} else {
@@ -516,7 +515,7 @@ func TestBitwisePublicationServiceFailureRoots(t *testing.T) {
 }
 
 func TestBitwisePublicationBigNotZeroWidthCopyOrder(t *testing.T) {
-	m, budget := mpzPublicationOwner(t)
+	m, budget := mpzPublicationDirectOwner(t)
 	var a, out Int
 	qopsMust(t, m.SetString(&a, "18446744073709551617"))
 	out = NewInt(71)
@@ -533,7 +532,7 @@ func TestBitwisePublicationBigNotZeroWidthCopyOrder(t *testing.T) {
 	budget.FailAfter(0)
 	e := m.BitwiseNot(0, &a, &out)
 	mpzPublicationAudit(t, m, roots...)
-	if !errors.Is(e, arena.ErrInjectedFailure) || out != NewInt(71) {
+	if !numericPhysicalReservationRefusal(e) || out != NewInt(71) {
 		t.Fatal("source copy precedes zero-width output reset", e, out)
 	}
 	budget.FailAfter(-1)

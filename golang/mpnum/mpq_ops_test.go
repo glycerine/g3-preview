@@ -4,7 +4,6 @@ package mpnum
 
 import (
 	"errors"
-	"github.com/glycerine/g3/golang/arena"
 	"math/big"
 	"testing"
 )
@@ -311,7 +310,7 @@ func TestRationalOpsSourceComponentAliasActionOrder(t *testing.T) {
 
 func TestRationalOpsLargeLimbScratchBranchesAndWarm(t *testing.T) {
 	for _, synch := range []bool{false, true} {
-		m, _ := rationalManager(t, synch)
+		m, budget := rationalManager(t, synch)
 		a, b, c, out := NewRational(), NewRational(), NewRational(), NewRational()
 		var z Int
 		an := new(big.Int).Add(new(big.Int).Lsh(big.NewInt(1), 120), big.NewInt(7))
@@ -356,14 +355,13 @@ func TestRationalOpsLargeLimbScratchBranchesAndWarm(t *testing.T) {
 		for i := 0; i < 20; i++ {
 			qopsMust(t, m.AddMulInt(&a, &z, &c, &out))
 		}
+		beforeWarm := numericWarmProfileSnapshot(t, m.z, budget)
 		allocs := testing.AllocsPerRun(20, func() {
 			if e := m.AddMulInt(&a, &z, &c, &out); e != nil {
 				panic(e)
 			}
 		})
-		if allocs != 0 {
-			t.Fatal("warm fused Go allocations", synch, allocs)
-		}
+		numericWarmProfileAudit(t, m.z, budget, beforeWarm, allocs, m.z.allocator.Stats().DirectObjects > 0)
 		qopsMust(t, m.Del(&unit))
 		for _, q := range []*Rational{&a, &b, &c, &out} {
 			qopsMust(t, m.Del(q))
@@ -378,7 +376,7 @@ func TestRationalOpsAllPredictableFailurePrefixes(t *testing.T) {
 	for _, synch := range []bool{false, true} {
 		for operation := 0; operation < 12; operation++ {
 			success := false
-			for prefix := int64(0); prefix < 80; prefix++ {
+			for prefix := int64(0); prefix < 512; prefix++ {
 				m, budget := rationalManager(t, synch)
 				a, b, c, out := NewRational(), NewRational(), NewRational(), NewRational()
 				var z Int
@@ -433,7 +431,7 @@ func TestRationalOpsAllPredictableFailurePrefixes(t *testing.T) {
 				}
 				budget.FailAfter(-1)
 				if e != nil {
-					if !errors.Is(e, arena.ErrInjectedFailure) {
+					if !numericPhysicalReservationRefusal(e) {
 						t.Fatal("unexpected failure", operation, prefix, e)
 					}
 					if operation == 2 || operation == 3 || operation == 7 {
@@ -486,6 +484,28 @@ func TestRationalOpsAllPredictableFailurePrefixes(t *testing.T) {
 							pd = new(big.Int).Mul(ar.Denom(), tmp.Denom())
 						}
 						addPublicationExpectRaw(t, m, &out, old.Num().String(), old.Denom().String(), pn, pd)
+					} else if operation >= 8 {
+						// Raw forwarding acts on NUM first; source Div/Mod can publish
+						// machine output before their signed correction fails.
+						dividend := new(big.Int).Neg(new(big.Int).Set(n))
+						quotient, remainder := new(big.Int), new(big.Int)
+						quotient.QuoRem(dividend, d, remainder)
+						allowed := []string{"17"}
+						if operation == 8 || operation == 9 {
+							allowed = append(allowed, quotient.String())
+							if operation == 8 && remainder.Sign() != 0 {
+								allowed = append(allowed, new(big.Int).Sub(quotient, big.NewInt(1)).String())
+							}
+						} else {
+							allowed = append(allowed, remainder.String())
+							if operation == 11 && remainder.Sign() < 0 {
+								allowed = append(allowed, new(big.Int).Add(remainder, d).String())
+							}
+						}
+						powerPublicationComponent(t, m.z, &out.num, allowed...)
+						if out.den != NewInt(1) {
+							t.Fatal("DEN reset only after integer success", operation, prefix, out.den)
+						}
 					} else if rationalString(t, m, &out) != originalOutput {
 						t.Fatal("partial output", operation, prefix)
 					}
@@ -520,69 +540,15 @@ func TestRationalOpsAllPredictableFailurePrefixes(t *testing.T) {
 // not a live cell or payload. Every other invalid known root is still rejected.
 func qopsAuditLiveOwnership(t *testing.T, m *RationalManager, public []*Int) {
 	t.Helper()
-	cells := make([]numericCellRef, 0, 32)
-	addCell := func(r numericCellRef) {
-		if r == 0 || (m.z.failedRef != 0 && r == m.z.failedRef) {
-			return
-		}
-		for _, old := range cells {
-			if old == r {
-				return
-			}
-		}
-		if !validNumericRef(m.z.cells, r) {
-			t.Fatal("invalid known numeric root")
-		}
-		cells = append(cells, r)
-	}
-	for _, r := range m.z.tmp {
-		addCell(r)
-	}
-	for _, r := range m.z.arg {
-		addCell(r)
-	}
-	addCell(m.z.intMin.cell)
-	addCell(m.z.two64.cell)
-	for _, n := range public {
-		addCell(n.cell)
-	}
+	roots := append([]*Int(nil), public...)
 	scratch := []*Int{&m.nTmp, &m.addTmp1, &m.addTmp2, &m.addMulTmp.num, &m.addMulTmp.den, &m.ltTmp1.num, &m.ltTmp1.den, &m.ltTmp2.num, &m.ltTmp2.den}
 	for _, n := range scratch {
 		if m.synchronized && n.cell != 0 && n.cell != m.z.failedRef {
 			t.Fatal("local mode retained rational scratch")
 		}
 		if !m.synchronized {
-			addCell(n.cell)
+			roots = append(roots, n)
 		}
 	}
-	if uint32(len(cells)) != m.z.cells.Stats().Live {
-		t.Fatalf("live cell graph: known%d actual%d", len(cells), m.z.cells.Stats().Live)
-	}
-	words := make([]arena.VectorRef, 0, 40)
-	addWords := func(r arena.VectorRef) {
-		if r == (arena.VectorRef{}) {
-			return
-		}
-		if !m.z.words.IsLive(r) {
-			t.Fatal("invalid known word root")
-		}
-		for _, old := range words {
-			if old == r {
-				return
-			}
-		}
-		words = append(words, r)
-	}
-	for _, r := range cells {
-		addWords(m.z.cell(r).payload)
-	}
-	for _, r := range m.z.natural.divScratch {
-		addWords(r)
-	}
-	for _, r := range m.z.natural.formatScratch {
-		addWords(r)
-	}
-	if uint32(len(words)) != m.z.words.Stats().Live {
-		t.Fatalf("live words graph: known%d actual%d", len(words), m.z.words.Stats().Live)
-	}
+	integerPhysicalAudit(t, m.z, roots...)
 }

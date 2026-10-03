@@ -8,7 +8,6 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/glycerine/g3/golang/arena"
 )
 
 func gcdPublicationFillCells(t *testing.T, m *IntegerManager) []*Int {
@@ -25,7 +24,7 @@ func TestGCDPublicationZeroCopyBeforeMinimumPromotion(t *testing.T) {
 	for _, sync := range []bool{false, true} {
 		for _, reverse := range []bool{false, true} {
 			for alias := 0; alias < 3; alias++ {
-				q, budget := rationalManager(t, sync)
+				q, budget := rationalPublicationDirectOwner(t, sync)
 				m := q.z
 				zero, minimum, out := NewInt(0), NewInt(math.MinInt32), NewInt(17)
 				dst := []*Int{&out, &zero, &minimum}[alias]
@@ -37,7 +36,7 @@ func TestGCDPublicationZeroCopyBeforeMinimumPromotion(t *testing.T) {
 				budget.FailAfter(0)
 				e := m.GCD(a, b, dst)
 				qopsAuditLiveOwnership(t, q, append([]*Int{&zero, &minimum, &out}, bank...))
-				if !errors.Is(e, arena.ErrInjectedFailure) {
+				if !numericPhysicalReservationRefusal(e) {
 					t.Fatal(sync, reverse, alias, e)
 				}
 				// Source Set(c,INT_MIN) precedes Abs(c)'s actual promotion allocation.
@@ -85,7 +84,7 @@ func TestGCDPublicationZeroBigCopyRefusal(t *testing.T) {
 			budget.FailAfter(0)
 			e := m.GCD(a, b, &out)
 			qopsAuditLiveOwnership(t, q, []*Int{&zero, &other, &out})
-			if !errors.Is(e, arena.ErrInjectedFailure) {
+			if !numericPhysicalReservationRefusal(e) {
 				t.Fatal(sync, reverse, e)
 			}
 			if out.val != -1 || out.cell != m.failedRef || validNumericRef(m.cells, old) {

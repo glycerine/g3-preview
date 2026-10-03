@@ -100,7 +100,7 @@ func TestBinaryOwnerConstructorAndScopedVector(t *testing.T) {
 func TestBinaryFailureImmediateRoots(t *testing.T) {
 	for op := 0; op < 8; op++ {
 		completed := false
-		for prefix := int64(0); prefix < 160; prefix++ {
+		for prefix := int64(0); prefix < 4096; prefix++ {
 			m, b := binaryManager(t)
 			var a, c, out BinaryRational
 			serviceMust(t, m.z.SetString(&a.num, "100000000000000000000000000000000000000000000000000000000000000000000000003"))
@@ -128,9 +128,12 @@ func TestBinaryFailureImmediateRoots(t *testing.T) {
 			case 7:
 				converted, e = m.ToOwnedRational(m.diagnostics, &a)
 			}
-			b.FailAfter(-1)
 			binaryCellsAudit(t, m, &a, &c, &out)
 			facadeAudit(t, m.diagnostics, &converted)
+			if e != nil && !numericPhysicalReservationRefusal(e) {
+				t.Fatal("actual physical refusal", op, prefix, e)
+			}
+			b.FailAfter(-1)
 			if e != nil && converted.ownerID != 0 {
 				t.Fatal("failed conversion published owner")
 			}
@@ -139,6 +142,7 @@ func TestBinaryFailureImmediateRoots(t *testing.T) {
 			}
 			if e == nil {
 				completed = true
+				t.Logf("operation %d first successful reservation ordinal %d", op, prefix)
 			}
 			serviceMust(t, m.Del(&a))
 			serviceMust(t, m.Del(&c))

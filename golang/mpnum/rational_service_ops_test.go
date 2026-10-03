@@ -4,7 +4,6 @@ package mpnum
 
 import (
 	"errors"
-	"github.com/glycerine/g3/golang/arena"
 	"math"
 	"math/big"
 	"testing"
@@ -562,8 +561,8 @@ func TestRationalFacadeAllocationFailureOwnership(t *testing.T) {
 	// integer scratch is an allowed known root; lexical facade temps are not.
 	for op := 0; op < 20; op++ {
 		failures, success := 0, false
-		for fault := int64(0); fault < 256; fault++ {
-			s, budget := serviceNew(t)
+		for fault := int64(0); fault < 1024; fault++ {
+			s, budget := servicePublicationDirectOwner(t)
 			a := serviceValue(t, s, "123456789012345678901234567890123456789/11")
 			b := serviceValue(t, s, "98765432109876543210987654321/13")
 			c := serviceValue(t, s, "314159265358979323846264338327/17")
@@ -623,7 +622,7 @@ func TestRationalFacadeAllocationFailureOwnership(t *testing.T) {
 			budget.FailAfter(-1)
 			if e != nil {
 				failures++
-				if !errors.Is(e, arena.ErrInjectedFailure) || out.ownerID != 0 {
+				if !numericPhysicalReservationRefusal(e) || out.ownerID != 0 {
 					t.Fatal(op, fault, out, e)
 				}
 				if op == 14 || op == 15 || op == 16 {
@@ -647,12 +646,12 @@ func TestRationalFacadeAllocationFailureOwnership(t *testing.T) {
 					}
 					addPublicationExpectRaw(t, s.manager, &a.raw, left.Num().String(), left.Denom().String(), pn, pd)
 				} else {
-					serviceText(t, s, &a, before)
+					serviceIndependentText(t, s, &a, before)
 				}
 			} else {
 				success = true
 			}
-			serviceText(t, s, &b, bBefore)
+			serviceIndependentText(t, s, &b, bBefore)
 			if out.ownerID != 0 {
 				serviceMust(t, s.Del(&out))
 			}
@@ -731,7 +730,7 @@ func TestRationalFacadeProvenanceAndNoncanonicalSourceShapes(t *testing.T) {
 }
 
 func TestRationalFacadeWarmZeroAllocations(t *testing.T) {
-	s, _ := serviceNew(t)
+	s, budget := serviceNew(t)
 	a := serviceValue(t, s, "123456789012345678901234567890/7")
 	b := serviceValue(t, s, "11/13")
 	defer s.Del(&a)
@@ -762,9 +761,9 @@ func TestRationalFacadeWarmZeroAllocations(t *testing.T) {
 	for i := 0; i < 5; i++ {
 		run()
 	}
-	if n := testing.AllocsPerRun(50, run); n != 0 {
-		t.Fatal("warm facade allocations", n)
-	}
+	beforeWarm := numericWarmProfileSnapshot(t, s.manager.z, budget)
+	n := testing.AllocsPerRun(50, run)
+	numericWarmProfileAudit(t, s.manager.z, budget, beforeWarm, n, s.manager.z.allocator.Stats().DirectObjects > 0)
 }
 
 func TestRationalFacadeInspectionForwardingAndSourceOutputAliases(t *testing.T) {
@@ -846,7 +845,7 @@ func TestRationalFacadeCompoundFailureAliases(t *testing.T) {
 	for op := 0; op < 9; op++ {
 		for alias := 0; alias < 2; alias++ {
 			failures, success := 0, false
-			for fault := int64(0); fault < 256; fault++ {
+			for fault := int64(0); fault < 1024; fault++ {
 				s, budget := serviceNew(t)
 				a := serviceValue(t, s, "123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890/11")
 				b := serviceValue(t, s, "98765432109876543210987654321/13")
@@ -898,7 +897,7 @@ func TestRationalFacadeCompoundFailureAliases(t *testing.T) {
 				budget.FailAfter(-1)
 				if e != nil {
 					failures++
-					if !errors.Is(e, arena.ErrInjectedFailure) {
+					if !numericPhysicalReservationRefusal(e) {
 						t.Fatal(op, alias, fault, e)
 					}
 					if op == 2 {
@@ -919,7 +918,7 @@ func TestRationalFacadeCompoundFailureAliases(t *testing.T) {
 						num := powerPublicationComponent(t, s.manager.z, &a.raw.num, left.Num().String(), rawNum, product.Num().String())
 						powerPublicationComponent(t, s.manager.z, &a.raw.den, left.Denom().String(), rawDen, product.Denom().String())
 						if num == "failed" || num == left.Num().String() {
-							if integerString(t, s.manager.z, &a.raw.den) != left.Denom().String() {
+							if roundPublicationDecode(t, s.manager.z, &a.raw.den).String() != left.Denom().String() {
 								t.Fatal("denominator preceded numerator MulAssign", alias, fault)
 							}
 						}
@@ -965,9 +964,9 @@ func TestRationalFacadeCompoundFailureAliases(t *testing.T) {
 						pd := new(big.Int).Mul(left.Denom(), right.Denom())
 						addPublicationExpectRaw(t, s.manager, &a.raw, left.Num().String(), left.Denom().String(), pn, pd)
 					} else {
-						serviceText(t, s, &a, before)
+						serviceIndependentText(t, s, &a, before)
 					}
-					serviceText(t, s, &b, bBefore)
+					serviceIndependentText(t, s, &b, bBefore)
 				} else {
 					success = true
 				}

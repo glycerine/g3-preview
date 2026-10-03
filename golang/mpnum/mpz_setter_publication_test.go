@@ -23,7 +23,7 @@ func TestIntegerBaseTwoPowerDestructiveCapacityPrefix(t *testing.T) {
 	b.FailAfter(0)
 	e := m.Power(&two, 1024, &out)
 	mpzPublicationAudit(t, m, &out)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
+	if !numericPhysicalReservationRefusal(e) {
 		t.Fatal(e)
 	}
 	if out.val != 1 || out.cell != m.failedRef {
@@ -55,7 +55,7 @@ func TestIntegerAllocateIfNeededAndPreservingCapacityDistinct(t *testing.T) {
 			e = m.allocateIfNeeded(&out, 33)
 		}
 		mpzPublicationAudit(t, m, &out)
-		if !errors.Is(e, arena.ErrInjectedFailure) {
+		if !numericPhysicalReservationRefusal(e) {
 			t.Fatal(preserve, e)
 		}
 		if preserve {
@@ -80,7 +80,7 @@ func TestIntegerAllocateIfNeededSmallAndReuseBranches(t *testing.T) {
 	b.FailAfter(0)
 	e := m.allocateIfNeeded(&out, 33)
 	mpzPublicationAudit(t, m, &out)
-	if !errors.Is(e, arena.ErrInjectedFailure) || out.val != 1 || out.cell != m.failedRef {
+	if !numericPhysicalReservationRefusal(e) || out.val != 1 || out.cell != m.failedRef {
 		t.Fatal("small sign before allocation", out, e)
 	}
 	if e = m.Reset(&out); e != nil {
@@ -109,7 +109,7 @@ func TestIntegerBigScalarSetterAllocationBeforeSign(t *testing.T) {
 	// These ordinary refusal branches were source-correct before this packet;
 	// this is independent confirmation, not a claimed behavioral RED.
 	for _, unsigned := range []bool{false, true} {
-		m, b := mpzPublicationOwner(t)
+		m, b := mpzPublicationDirectOwner(t)
 		out := NewInt(-17)
 		before := mpzPublicationSnapshot(m, b)
 		b.FailAfter(0)
@@ -120,7 +120,7 @@ func TestIntegerBigScalarSetterAllocationBeforeSign(t *testing.T) {
 			e = m.SetInt64(&out, -(1 << 40))
 		}
 		mpzPublicationAudit(t, m, &out)
-		if !errors.Is(e, arena.ErrInjectedFailure) || out != NewInt(-17) || mpzPublicationSnapshot(m, b) != before {
+		if !numericPhysicalReservationRefusal(e) || out != NewInt(-17) || mpzPublicationSnapshot(m, b) != before {
 			t.Fatal("scalar allocation precedes sign", out, e)
 		}
 	}
@@ -289,7 +289,7 @@ func TestIntegerBaseTwoPowerReservationSweepAndRetainedCapacity(t *testing.T) {
 		mpzPublicationAudit(t, m, &out)
 		if e != nil {
 			refused = true
-			if !errors.Is(e, arena.ErrInjectedFailure) || out.cell != m.failedRef || out.val != 1 || validNumericRef(m.cells, old) {
+			if !numericPhysicalReservationRefusal(e) || out.cell != m.failedRef || out.val != 1 || validNumericRef(m.cells, old) {
 				t.Fatal("allocation prefix", prefix, out, e)
 			}
 		} else {

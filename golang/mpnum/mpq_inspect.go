@@ -245,11 +245,11 @@ func (m *RationalManager) DenominatorRational(a, out *Rational) error {
 	return m.SetInteger(out, &a.den)
 }
 
-// SetInteger and the thin setters preserve source numerator publication followed
-// by reset_denominator. The existing integer operations prepare storage before
-// publication; denominator reset cannot allocate. No borrowed limb slice remains.
+// SetInteger and the thin setters publish source numerator actions followed by
+// reset_denominator. Errors retain actual Integer publication prefixes and leave
+// DEN untouched if NUM fails. No borrowed limb slice remains.
 func (m *RationalManager) SetInteger(a *Rational, n *Int) error {
-	if e := m.check(a); e != nil {
+	if e := m.checkSetter(a); e != nil {
 		return e
 	}
 	if e := m.z.Copy(&a.num, n); e != nil {
@@ -258,7 +258,7 @@ func (m *RationalManager) SetInteger(a *Rational, n *Int) error {
 	return m.resetDenominator(a)
 }
 func (m *RationalManager) SetUint64(a *Rational, n uint64) error {
-	if e := m.check(a); e != nil {
+	if e := m.checkSetter(a); e != nil {
 		return e
 	}
 	if e := m.z.SetUint64(&a.num, n); e != nil {
@@ -267,7 +267,7 @@ func (m *RationalManager) SetUint64(a *Rational, n uint64) error {
 	return m.resetDenominator(a)
 }
 func (m *RationalManager) SetLimbs(a *Rational, digits []uint32) error {
-	if e := m.check(a); e != nil {
+	if e := m.checkSetter(a); e != nil {
 		return e
 	}
 	if e := m.z.SetLimbs(&a.num, digits); e != nil {

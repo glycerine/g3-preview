@@ -20,7 +20,7 @@ func powerPublicationComponent(t *testing.T, m *IntegerManager, a *Int, allowed 
 		}
 		return "failed"
 	}
-	s := integerString(t, m, a)
+	s := roundPublicationDecode(t, m, a).String()
 	for _, want := range allowed {
 		if s == want {
 			return s
@@ -81,7 +81,7 @@ func TestPowerPublicationIntegerBudgetBeforeMaskWrap(t *testing.T) {
 	b.FailAfter(0)
 	e := m.Power(&a, 1<<31, &out)
 	mpzPublicationAudit(t, m, &a, &out)
-	if !errors.Is(e, arena.ErrInjectedFailure) || out != NewInt(1) {
+	if !numericPhysicalReservationRefusal(e) || out != NewInt(1) {
 		t.Fatal("source finite square refusal after output1, before mask wrap", out, e)
 	}
 }
@@ -118,7 +118,7 @@ func TestPowerPublicationRationalBudgetBeforeMaskWrap(t *testing.T) {
 		b.FailAfter(0)
 		e := m.Power(&a, 1<<31, &out)
 		qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &out.num, &out.den})
-		if !errors.Is(e, arena.ErrInjectedFailure) || out.num != NewInt(1) || out.den != NewInt(1) {
+		if !numericPhysicalReservationRefusal(e) || out.num != NewInt(1) || out.den != NewInt(1) {
 			t.Fatal("rational source output1 precedes finite growth refusal", synch, out, e)
 		}
 	}
@@ -157,7 +157,7 @@ func TestPowerPublicationRationalActualWrapPrefix(t *testing.T) {
 
 func TestPowerPublicationFinalUnusedSquareRefusal(t *testing.T) {
 	for _, alias := range []bool{false, true} {
-		m, budget := mpzPublicationOwner(t)
+		m, budget := mpzPublicationDirectOwner(t)
 		a, out := NewInt(46341), NewInt(17)
 		dst := &out
 		if alias {
@@ -166,13 +166,13 @@ func TestPowerPublicationFinalUnusedSquareRefusal(t *testing.T) {
 		budget.FailAfter(0)
 		e := m.Power(&a, 1, dst)
 		mpzPublicationAudit(t, m, &a, &out)
-		if !errors.Is(e, arena.ErrInjectedFailure) || *dst != NewInt(46341) {
+		if !numericPhysicalReservationRefusal(e) || *dst != NewInt(46341) {
 			t.Fatal("final unused integer square follows completed output", alias, *dst, e)
 		}
 	}
 	for _, synch := range []bool{false, true} {
 		for _, alias := range []bool{false, true} {
-			m, budget := rationalManager(t, synch)
+			m, budget := rationalPublicationDirectOwner(t, synch)
 			a, out := NewRational(), NewRational()
 			qopsMust(t, m.SetInt64(&a, 46341))
 			qopsMust(t, m.SetFraction(&out, 17, 5))
@@ -183,7 +183,7 @@ func TestPowerPublicationFinalUnusedSquareRefusal(t *testing.T) {
 			budget.FailAfter(0)
 			e := m.Power(&a, 1, dst)
 			qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &out.num, &out.den})
-			if !errors.Is(e, arena.ErrInjectedFailure) || dst.num != NewInt(46341) || dst.den != NewInt(1) {
+			if !numericPhysicalReservationRefusal(e) || dst.num != NewInt(46341) || dst.den != NewInt(1) {
 				t.Fatal("final unused rational square follows completed output", synch, alias, *dst, e)
 			}
 		}
@@ -206,7 +206,7 @@ func TestPowerPublicationBigInputCopyPrecedesOutputOne(t *testing.T) {
 		budget.FailAfter(0)
 		e := m.Power(&a, 0, dst)
 		mpzPublicationAudit(t, m, &a, &out)
-		if !errors.Is(e, arena.ErrInjectedFailure) || *dst != old {
+		if !numericPhysicalReservationRefusal(e) || *dst != old {
 			t.Fatal("input copy refuses before output1", alias, *dst, e)
 		}
 	}
@@ -218,7 +218,7 @@ func TestPowerPublicationBigInputCopyPrecedesOutputOne(t *testing.T) {
 		budget.FailAfter(0)
 		e := m.Power(&a, 0, &out)
 		qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &out.num, &out.den})
-		if !errors.Is(e, arena.ErrInjectedFailure) || out.num != NewInt(17) || out.den != NewInt(5) {
+		if !numericPhysicalReservationRefusal(e) || out.num != NewInt(17) || out.den != NewInt(5) {
 			t.Fatal("rational local Copy refuses before output1", synch, out, e)
 		}
 	}
@@ -278,7 +278,7 @@ func TestPowerPublicationLeftShiftCopyPrecedesPromotionRefusal(t *testing.T) {
 	b.FailAfter(0)
 	e := m.Mul2k(&a, 1024, &out)
 	mpzPublicationAudit(t, m, &a, &out)
-	if !errors.Is(e, arena.ErrInjectedFailure) || out != NewInt(-3) {
+	if !numericPhysicalReservationRefusal(e) || out != NewInt(-3) {
 		t.Fatal("caller copy precedes preserving promotion refusal", out, e)
 	}
 }
@@ -293,7 +293,7 @@ func TestPowerPublicationRightShiftCopyRefusalPrefix(t *testing.T) {
 	b.FailAfter(0)
 	e := m.MachineDiv2k(&a, 0, &out)
 	mpzPublicationAudit(t, m, &a, &out)
-	if !errors.Is(e, arena.ErrInjectedFailure) || out.val != a.val || out.cell != m.failedRef {
+	if !numericPhysicalReservationRefusal(e) || out.val != a.val || out.cell != m.failedRef {
 		t.Fatal("copy-output setter failure prefix precedes k0 shortcut", out, e)
 	}
 	qopsMust(t, m.Del(&out))
@@ -312,7 +312,7 @@ func TestPowerPublicationRationalCopyComponentRefusal(t *testing.T) {
 		b.FailAfter(0)
 		e := m.Copy(&out, &a)
 		qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &out.num, &out.den})
-		if !errors.Is(e, arena.ErrInjectedFailure) || out.num != NewInt(3) || out.den.val != a.den.val || out.den.cell != m.z.failedRef {
+		if !numericPhysicalReservationRefusal(e) || out.num != NewInt(3) || out.den.val != a.den.val || out.den.cell != m.z.failedRef {
 			t.Fatal("numerator Copy completes before denominator destructive allocation refusal", synch, out, e)
 		}
 		qopsMust(t, m.Del(&out))
@@ -332,7 +332,7 @@ func TestPowerPublicationRationalMulComponentRefusal(t *testing.T) {
 		budget.FailAfter(0)
 		e := m.Mul(&a, &b, &out)
 		qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &b.num, &b.den, &out.num, &out.den})
-		if !errors.Is(e, arena.ErrInjectedFailure) || out.num != NewInt(21) || out.den != NewInt(5) {
+		if !numericPhysicalReservationRefusal(e) || out.num != NewInt(21) || out.den != NewInt(5) {
 			t.Fatal("numerator Mul completes before denominator scratch growth refusal", synch, out, e)
 		}
 		qopsMust(t, m.Del(&out))

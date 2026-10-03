@@ -188,7 +188,7 @@ func TestNumericDisplayReservationFailureCleanup(t *testing.T) {
 		for operation := 0; operation < 3; operation++ {
 			for _, warm := range []bool{false, true} {
 				completed, failures := false, 0
-				for fault := int64(0); fault < 192; fault++ {
+				for fault := int64(0); fault < 2048; fault++ {
 					b := arena.NewBudget(1 << 24)
 					cfg := IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 32, Descriptors: arena.Config{PageSize: 2, Budget: b}}}
 					m, e := NewRationalManager(RationalConfig{Integers: cfg, Synchronized: synch})
@@ -236,7 +236,7 @@ func TestNumericDisplayReservationFailureCleanup(t *testing.T) {
 					}
 					if e != nil {
 						failures++
-						if !errors.Is(e, arena.ErrInjectedFailure) || !bytes.Equal(dst, bytes.Repeat([]byte{'!'}, len(dst))) {
+						if !numericPhysicalReservationRefusal(e) || !bytes.Equal(dst, bytes.Repeat([]byte{'!'}, len(dst))) {
 							t.Fatal("display failure publication", synch, operation, warm, fault, n, e)
 						}
 					} else {
@@ -321,21 +321,32 @@ func TestNumericDisplayWarmAllocationBoundaries(t *testing.T) {
 				}
 			}
 			var e error
-			b.FailAfter(0)
+			if !sourceExtendedGCDDebug {
+				b.FailAfter(0)
+			}
+			before := numericWarmProfileSnapshot(t, m.z, b)
 			allocations := testing.AllocsPerRun(30, func() { _, e = call() })
 			b.FailAfter(-1)
-			if allocations != 0 || e != nil {
+			if e != nil {
 				t.Fatal("warm caller buffer", synch, allocations, e)
 			}
+			numericWarmProfileAudit(t, m.z, b, before, allocations, sourceExtendedGCDDebug)
 		}
 		stringsCalls := []func() (string, error){func() (string, error) { return m.z.SMT2String(&a.num, true) }, func() (string, error) { return m.SMT2String(&a, true) }, func() (string, error) { return m.DecimalString(&a, 20, false) }}
 		for _, call := range stringsCalls {
 			var text string
 			var e error
+			before := numericWarmProfileSnapshot(t, m.z, b)
 			allocations := testing.AllocsPerRun(30, func() { text, e = call() })
-			if allocations != 1 || e != nil || text == "" {
-				t.Fatal("final host string", synch, allocations, e)
+			after := numericWarmProfileSnapshot(t, m.z, b)
+			// AllocsPerRun includes its one warmup. Each real Runtime allocation
+			// owns data and initialized-byte metadata; the result string adds one.
+			events := after.count - before.count
+			wantAllocs := float64(1) + 2*float64(events)/31
+			if events%31 != 0 || allocations != wantAllocs || e != nil || text == "" {
+				t.Fatal("final host string", synch, allocations, wantAllocs, e)
 			}
+			numericWarmProfileAudit(t, m.z, b, before, 0, sourceExtendedGCDDebug)
 		}
 	}
 }

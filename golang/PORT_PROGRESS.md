@@ -3,8 +3,8 @@
 [Current facts](#current-facts-and-conflict-resolution) · [TODO](#todo--prioritized-handoff) · [FINISHED](#finished--committed-subset-with-explicit-limits) · [Source inventory](#source-inventory--current-ledger-not-historical-packet-counts) · [Evidence](#current-failure-evidence-and-paused-working-tree) · [Family audits](#family-audits-against-actual-code-and-evidence)
 
 Audit baseline: repository HEAD `c08ebb2` before the documentation consolidation
-commit, 2026-10-03. Development was paused for this audit; resume only after
-this audited consolidation and deletions are committed. This document is
+commit, 2026-10-03. The documentation consolidation was committed as `b780471`; implementation
+recovery resumed afterward. The preserved audit baseline below is historical. This document is
 the single maintained narrative source for progress, source maps, outstanding
 work, validation evidence, adaptations and handoff. Do not create new packet,
 status, checkpoint or separate progress documents. Update the TODO and FINISHED
@@ -21,23 +21,48 @@ passing suites do not satisfy this objective.
 - Source ledger: **2,102 units; 33 ported, 148 partial, 1,921 unported**. All **677
   API operations remain unported** in the machine inventory. Source fingerprint:
   `f8480997c14e2d6c414f40c60ce5095ef40a89ce6d1bcf1ed196c5d682d42d8f`.
-- The default native and checked/debug suites are **RED**. Latest full baseline
-  logs: `.cache/current-full-native.log` and `.cache/current-full-debug.log`.
-  The checked/debug numeric package aborts at an out-of-memory panic in the old
-  CopyFrom warm fixture. Historical full GREEN runs were of older frozen trees;
-  they do not certify HEAD or the current worktree.
-- HEAD contains `5e99cf8` Natural division, `16658cc` tests-first rational setters,
-  and `c08ebb2` stronger factorization owner audits. The latter checkpoints include
-  failing tests. The user's newer requirement supersedes permission for RED
-  checkpoints: keep tests-first RED in the working tree, fix it, and require full
-  native/checked-debug GREEN before further implementation commits. Do not tag,
-  skip, delete or weaken failures to manufacture a green suite.
-- Current Go changes are **uncommitted drafts**, distinct from HEAD. The direct
-  setter draft and charged factorization lexical scope have focused passing
-  evidence, but their latest bytes and the combined recovery tree have not passed
-  full checks. Do not promote them as finished or resume from a claimed green
-  baseline. The documentation-only consolidation commit is explicitly requested
-  before development resumes; it does not commit or certify those Go drafts.
+- Both full suites are **GREEN** on the frozen71-file Go recovery tree:
+  `go test ./... -timeout=30m` and
+  `go test -tags g3checked,g3debug ./... -timeout=30m`, terminal0 in
+  `.cache/recovery-verified-0.log` and `.cache/recovery-verified-1.log`.
+  Native root/numeric durations12.900s/77.130s; checked/debug757.538s/182.698s.
+  The exhaustive original-precision debug sweep needs the documented longer
+  timeout. No failing tests were hidden, tagged, skipped or deleted.
+- Native/debug vet and source/no-generics audit pass on the same Go bytes:
+  `.cache/recovery-verified-vet-0.log`, `.cache/recovery-verified-vet-1.log`,
+  `.cache/recovery-verified-source.log`. All71 hashes match
+  `.cache/recovery-final-go-hashes.json`. No source/API units were promoted.
+- Documentation consolidation `b780471` preceded this implementation recovery.
+  Earlier RED checkpoints are historical saved work; the restored green tree
+  supersedes them. Keep tests-first RED in the working tree and require both
+  full suites before each future implementation commit.
+- Factorization now retains actual charged lexical owners and an unfinished
+  reverse-destruction cursor when cleanup is refused. All14 stages were reviewed;
+  empty-service cleanup, retained owner refusal606, full algorithm immediate
+  failure roots, all37 registered numeric recipes and the combined suites pass.
+  Explicit caller SetZ follows immediate audit; the algorithm does not repair
+  failed bounds, change modes or roll back outputs during recovery.
+- Source-ordered rational setters publish NUM then DEN, latch the negative-DEN
+  branch before copies and reread actual aliases. Initializers and debug-only
+  scalar d0 assertions retain their source behavior. Exact89 source/oracle groups
+  pass each profile, as do the full suites. This does not complete the mpq unit.
+- Binary Stats formerly counted a dead failed scratch token as live. A genuine
+  allocation-refusal regression observed RED before changing that diagnostic to
+  `validNumericRef`; native/debug and full checks now pass. Precision100 refinement
+  audits all16146 refusals+success, and conversion audits all64 debug refusals+
+  success. Nested route subtests preserve paths, every ordinal and graph checks.
+- Physical recovery audits named allocator objects, inline Natural buffers,
+  actual Runtime overflow and genuine Words storage. Cold action-timing fixtures
+  select a supported direct profile only where warmed pooling has no reservation;
+  ordinary pooled warm tests remain. Fault-output oracles independently decode
+  scalar/limb fields instead of invoking damaged formatting scratch. Release warm
+  paths retain zero-allocation checks; debug lexical source allocations preserve
+  the exact physical plateau and advance actual counters.
+- Explicit `IntegerManager.CleanupPendingAllocation` releases an actual unassigned
+  object/raw allocator root after immediate audit. It does not repair failed
+  numerals, scratch holes or source OOM/counter history, and preserves
+  `CloseChecked`'s existing teardown order. This is not SourceFinalize or completion
+  of the tagged constructor/owner-error API campaign.
 - No Go generics in production, tests, tools or generated code. No unsafe/cgo or
   production math/big substitution; keep concrete pointer-free hot records,
   charged actual cold owners/backing peaks and real retained cleanup roots.
@@ -62,44 +87,12 @@ passing suites do not satisfy this objective.
 
 ## TODO — prioritized handoff
 
-- [ ] Restore the full native and `g3checked,g3debug` suites to GREEN. Resolve actual
-  ownership/publication defects and exact obsolete fixtures independently. Do not
-  commit more RED implementation checkpoints. Re-run after changes; the paused
-  recovery tree is not currently a validated release candidate.
-- [ ] Factorization lexical retention draft: verify the latest empty-service Close
-  correction (`TestUPolynomialFactorEmptyServiceOwnHeaderCleanup`), review all
-  fourteen reverse source lifetime stages, verify exact source ordering and
-  charged retained owners, and run final native/debug/vet/source checks. Original
-  debug refusal606 loses an upper-bound numeric descriptor and owner headers
-  because ignored deferred Close errors discard lexical lifted/core pointers.
-  Draft scope retains named vectors/Ints/zp/best/zpe/lifted and teardown cursor;
-  explicit caller SetZ occurs only after immediate audit, then cleanup retry.
-  It is an adapter for source-undefined interrupted destruction, not recovery
-  performed by the algorithm. Audit other ignored lexical cleanup paths too.
-- [ ] Rational setter draft: direct source NUM then DEN publication, latched
-  negative-DEN branch and actual later alias rereads; general pair accepts
-  source-defined raw ±1/0 and publishes 0/0 before endangered divide guard.
-  Scalar pair d0 assertion is debug-only. Review changed initializer entry and
-  signed/int32/uint32 overloads against all source setters; reconcile dependent
-  transaction/guard/count fixtures and validate the combined suite.
-- [ ] Integer physical integration tests: finish actual named descriptor/object/
-  raw-block/Words census, constructor/header charges and genuine cold/direct
-  fault action fixtures. Latest direct-profile changes are not validated.
-  Correct `integerActualOwnedBytes` double-count of SmallBytes DirectBytes
-  (PayloadBytes already includes direct backing). Preserve default pooled/warm
-  profile tests and real source action assertions.
-- [ ] Polynomial GCD/sequence/isolation/refinement audits: ten migrated groups pass
-  natively in `.cache/root-upoly-migrate-native.log`. Debug latest selected run
-  still has no first-success endpoint for isolation/refinement within2,048
-  refusals (`.cache/root-upoly-migrate-debug2.log`). Determine actual reservation
-  horizon without weakening math/root assertions, and preserve all real fault
-  prefixes. Debug lexical allocations are real even with stable physical bytes.
-- [ ] Finish remaining numeric recovery obligations recorded below: InfInt pending
-  physical object prevents post-failure formatting; no public retained-cleanup
-  continuation exists beyond CloseChecked. Source owner cleanup/API needs review,
-  not an automatic repair. Inf/InfEps copy and formatting/debug plateau assertions,
-  CopyFrom warm panic/atomic adapter contract, raw source fault timing, service
-  constants/cache census and scoped numeral ownership require validation.
+- [ ] Maintain full native and checked/debug GREEN across implementation commits;
+  commit each coherent green chunk promptly. Use the documented30-minute debug
+  timeout for the exhaustive original-precision refinement campaign.
+- [ ] Audit broader ignored lexical cleanup paths beyond the now-retained
+  factor_square_free scope. Its bounded source algorithm/owner campaigns pass,
+  but they do not establish exhaustive coverage of every input/exception path.
 - [ ] Mandatory owner/error/SourceFinalize missing-API campaign remains tagged
   `port_pending_mpz` in `mpnum/mpz_allocator_phase_b_test.go`; ConstructionFailure
   and SourceFinalize are absent. Run `go test -tags port_pending_mpz ./mpnum`
@@ -135,6 +128,13 @@ passing suites do not satisfy this objective.
 
 ## FINISHED — committed subset, with explicit limits
 
+- [x] Restored both full suites, native/debug vet and source/no-generics audit.
+  This checkpoint saves source-ordered rational setters, charged factorization
+  lexical retention, explicit pending-allocation cleanup, truthful binary scratch
+  Stats, and dependent physical/publication/warm tests. Original128-bit isolation,
+  precision100 refinement, all reservation prefixes and mathematical assertions
+  remain. Full checked/debug executes the named factorization failure-root test.
+  No source/API completion counts changed; remaining lifecycle/API work stays TODO.
 - [x] Audited all 111 family records plus three global records; preserved source
   maps, gaps and failure/handoff evidence in this document; removed 113 redundant
   files and repaired references. This document and instruction updates are the
@@ -148,7 +148,7 @@ passing suites do not satisfy this objective.
 - [x] Natural actual inline16 division, conditional addback after quotient decrement,
   actual post-output debug lexical verification and checked owning cleanup:
   `5e99cf8`. Selected native/debug, vet/source passed on frozen tree, plus affected
-  parser/statistics composition. Full suites remain RED separately.
+  parser/statistics composition. Its earlier full-suite RED baseline is superseded by this recovery.
 - [x] Direct rational parser publication and explicit initializer/reparser:
   `e9f911f`. Twelve selected native/debug parser groups and vet/source passed.
 - [x] Truthful service numeric object/pending-cell statistics (`8d9b20f`), exact
@@ -391,6 +391,11 @@ in the family audits below still block whole-unit completion.
 | src/util/z3_exception.h | util_z3_exception.go, util_printf.go | TestZ3ExceptionSourceCodesAndLabels, TestDefaultExceptionSourceStringAndEmbeddedNUL, TestPrintfSourceExceptionConsumerAndCallsiteForms, TestPrintfIntegerFlagsWidthsPrecisionsAndDomains, TestPrintfCBytesNullPrecisionAndCharacterCount, TestPrintfSourceBufferCapacitiesTruncationAndGrowLoop, TestPrintfLinuxI64WidthAndExplicitMismatchBoundary, TestPrintfMalformedUnsupportedAndSignedCountOverflow, TestPrintfBudgetFailureEventsAndOwnerGuards, TestPrintfIndependentFiniteIntegerAndPaddingOracle, TestPrintfSignedCountOverflowOnEscapedPercent, TestPrintfBudgetPeakExactAndObserverPanicCleanup, TestPrintfByteBoundaryAndBackendEventClassification |
 
 ## Current failure evidence and paused working tree
+
+This section preserves the pre-recovery audit baseline and paused draft hashes.
+It is historical; current GREEN evidence and committed recovery are recorded above.
+Interrupted/default-timeout debug runs were incomplete evidence, not passing gates;
+only the final full30-minute command's terminal0 certifies the combined tree.
 
 These logs are local evidence, not portable test artifacts. Reproduce native
 with `go test ./...` and checked/debug with `go test -tags g3checked,g3debug ./...`

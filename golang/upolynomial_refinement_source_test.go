@@ -2,8 +2,7 @@
 package g3
 
 import (
-	"errors"
-	"github.com/glycerine/g3/golang/arena"
+	"fmt"
 	"github.com/glycerine/g3/golang/mpnum"
 	"math/big"
 	"reflect"
@@ -265,95 +264,110 @@ func upolyIsolationCallerNumerators(m *mpnum.UPolynomialManager, values ...*mpnu
 }
 func TestUPolynomialRefinementFaultPrefixesImmediateRoots(t *testing.T) {
 	for route := 0; route < 2; route++ {
-		failures, successes := 0, 0
-		for fault := int64(0); fault < 128; fault++ {
-			m, q, budget := upolySourceOwner(t)
-			bqm := upolyIsolationBinaryOwner(t, q, budget)
-			p := upolySourceNew(t, m, []int32{-2, 0, 1})
-			v := mustUPolyView(t, m, p)
-			a, b := mpnum.NewBinaryInt(1), mpnum.NewBinaryInt(2)
-			c, d := mpnum.NewBinaryRational(), mpnum.NewBinaryRational()
-			qa, qb := mpnum.NewRational(), mpnum.NewRational()
-			if route == 1 {
-				if e := m.SetInts(p, []mpnum.Int{mpnum.NewInt(-1), mpnum.NewInt(1)}); e != nil {
-					t.Fatal(e)
+		if !t.Run(fmt.Sprintf("%d", route), func(t *testing.T) {
+			failures, successes := 0, 0
+			// Exact fresh checked-debug calibration needs2594/2496 reservations
+			// for128-bit bounded isolation, and16146 forprecision100 refinement.
+			// These finite horizons retain every refusal through the actual success.
+			for fault := int64(0); fault < 32768; fault++ {
+				if !t.Run(fmt.Sprintf("%d", fault), func(t *testing.T) {
+					m, q, budget := upolySourceOwner(t)
+					bqm := upolyIsolationBinaryOwner(t, q, budget)
+					p := upolySourceNew(t, m, []int32{-2, 0, 1})
+					v := mustUPolyView(t, m, p)
+					a, b := mpnum.NewBinaryInt(1), mpnum.NewBinaryInt(2)
+					c, d := mpnum.NewBinaryRational(), mpnum.NewBinaryRational()
+					qa, qb := mpnum.NewRational(), mpnum.NewRational()
+					if route == 1 {
+						if e := m.SetInts(p, []mpnum.Int{mpnum.NewInt(-1), mpnum.NewInt(1)}); e != nil {
+							t.Fatal(e)
+						}
+						v = mustUPolyView(t, m, p)
+						var num, den mpnum.Int
+						if e := m.IntegerManager().SetLimbs(&den, []uint32{0, 0, 0, 16}); e != nil {
+							t.Fatal(e)
+						}
+						one := mpnum.NewInt(1)
+						if e := m.IntegerManager().Sub(&den, &one, &num); e != nil {
+							t.Fatal(e)
+						}
+						if e := q.SetParts(&qa, &num, &den); e != nil {
+							t.Fatal(e)
+						}
+						if e := m.IntegerManager().Add(&den, &one, &num); e != nil {
+							t.Fatal(e)
+						}
+						if e := q.SetParts(&qb, &num, &den); e != nil {
+							t.Fatal(e)
+						}
+						if e := m.IntegerManager().Del(&num); e != nil {
+							t.Fatal(e)
+						}
+						if e := m.IntegerManager().Del(&den); e != nil {
+							t.Fatal(e)
+						}
+					}
+					// Input rationals have exactly four big components, all valid before the
+					// operation; this route never mutates their components.
+					inputs := uint32(0)
+					if route == 1 {
+						inputs = 4
+					}
+					budget.FailAfter(fault)
+					var e error
+					if route == 0 {
+						_, e = m.RefineToPrecision(v, bqm, &a, &b, 100)
+					} else {
+						_, e = m.ConvertRationalToBinaryInterval(v, q, &qa, &qb, bqm, &c, &d)
+					}
+					graph := m.Stats()
+					scratch, e2 := bqm.Stats()
+					callers := upolyIsolationCallerNumerators(m, &a, &b, &c, &d) + inputs
+					if e2 != nil || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+scratch.LiveScratchNumerators+callers {
+						t.Fatal("immediate refine/conversion graph", route, fault, e, e2, graph, scratch, callers)
+					}
+
+					upolyHenselAuditPhysical(t, []*mpnum.UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{Rationals: []*mpnum.Rational{&qa, &qb}, RationalManagers: []*mpnum.RationalManager{q}, BinaryValues: []*mpnum.BinaryRational{&a, &b, &c, &d}, BinaryManagers: []*mpnum.BinaryRationalManager{bqm}})
+					budget.FailAfter(-1)
+					if e != nil {
+						failures++
+						if !numericStorageReservationRefusal(e) {
+							t.Fatal(route, fault, e)
+						}
+					} else {
+						successes++
+					}
+					for _, value := range []*mpnum.BinaryRational{&a, &b, &c, &d} {
+						if e = bqm.Del(value); e != nil {
+							t.Fatal(route, fault, e)
+						}
+					}
+					if e = q.Del(&qa); e != nil {
+						t.Fatal(e)
+					}
+					if e = q.Del(&qb); e != nil {
+						t.Fatal(e)
+					}
+					graph = m.Stats()
+					scratch, e2 = bqm.Stats()
+					if e2 != nil || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+scratch.LiveScratchNumerators {
+						t.Fatal("untracked lexical root", route, fault, e2, graph)
+					}
+
+				}) {
+					t.FailNow()
 				}
-				v = mustUPolyView(t, m, p)
-				var num, den mpnum.Int
-				if e := m.IntegerManager().SetLimbs(&den, []uint32{0, 0, 0, 16}); e != nil {
-					t.Fatal(e)
-				}
-				one := mpnum.NewInt(1)
-				if e := m.IntegerManager().Sub(&den, &one, &num); e != nil {
-					t.Fatal(e)
-				}
-				if e := q.SetParts(&qa, &num, &den); e != nil {
-					t.Fatal(e)
-				}
-				if e := m.IntegerManager().Add(&den, &one, &num); e != nil {
-					t.Fatal(e)
-				}
-				if e := q.SetParts(&qb, &num, &den); e != nil {
-					t.Fatal(e)
-				}
-				if e := m.IntegerManager().Del(&num); e != nil {
-					t.Fatal(e)
-				}
-				if e := m.IntegerManager().Del(&den); e != nil {
-					t.Fatal(e)
+				// Each subtest's actual owner cleanup runs before the next fresh fixture.
+				if successes != 0 {
+					break
 				}
 			}
-			// Input rationals have exactly four big components, all valid before the
-			// operation; this route never mutates their components.
-			inputs := uint32(0)
-			if route == 1 {
-				inputs = 4
+			if failures == 0 || successes == 0 {
+				t.Fatal(route, failures, successes)
 			}
-			budget.FailAfter(fault)
-			var e error
-			if route == 0 {
-				_, e = m.RefineToPrecision(v, bqm, &a, &b, 100)
-			} else {
-				_, e = m.ConvertRationalToBinaryInterval(v, q, &qa, &qb, bqm, &c, &d)
-			}
-			graph := m.Stats()
-			scratch, e2 := bqm.Stats()
-			callers := upolyIsolationCallerNumerators(m, &a, &b, &c, &d) + inputs
-			if e2 != nil || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+scratch.LiveScratchNumerators+callers || graph.IntegerWordsRefs != graph.IntegerLiveCells+graph.IntegerNaturalWordsRefs {
-				t.Fatal("immediate refine/conversion graph", route, fault, e, e2, graph, scratch, callers)
-			}
-			budget.FailAfter(-1)
-			if e != nil {
-				failures++
-				if !errors.Is(e, arena.ErrInjectedFailure) {
-					t.Fatal(route, fault, e)
-				}
-			} else {
-				successes++
-			}
-			for _, value := range []*mpnum.BinaryRational{&a, &b, &c, &d} {
-				if e = bqm.Del(value); e != nil {
-					t.Fatal(route, fault, e)
-				}
-			}
-			if e = q.Del(&qa); e != nil {
-				t.Fatal(e)
-			}
-			if e = q.Del(&qb); e != nil {
-				t.Fatal(e)
-			}
-			graph = m.Stats()
-			scratch, e2 = bqm.Stats()
-			if e2 != nil || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+scratch.LiveScratchNumerators {
-				t.Fatal("untracked lexical root", route, fault, e2, graph)
-			}
-			if successes != 0 {
-				break
-			}
+			t.Log("real refine/conversion refusal ordinals", route, failures, successes)
+		}) {
+			t.FailNow()
 		}
-		if failures == 0 || successes == 0 {
-			t.Fatal(route, failures, successes)
-		}
-		t.Log("real refine/conversion refusal ordinals", route, failures, successes)
 	}
 }

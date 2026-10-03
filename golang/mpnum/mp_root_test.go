@@ -321,7 +321,7 @@ func TestIntegerRootAndSquareFailureCleanup(t *testing.T) {
 		for _, bigOutput := range []bool{false, true} {
 			for _, alias := range []bool{false, true} {
 				failures, completed := 0, false
-				for fault := int64(0); fault < 128; fault++ {
+				for fault := int64(0); fault < 2048; fault++ {
 					m, b := integerManager(t)
 					var a, out Int
 					setIntegerOracle(t, m, &a, large)
@@ -355,7 +355,7 @@ func TestIntegerRootAndSquareFailureCleanup(t *testing.T) {
 						qopsAuditLiveOwnership(t, &RationalManager{z: m}, []*Int{&a, &out})
 						b.FailAfter(-1)
 						failures++
-						if !errors.Is(e, arena.ErrInjectedFailure) {
+						if !numericPhysicalReservationRefusal(e) {
 							t.Fatal(operation, alias, fault, e)
 						}
 						// Every method call preserves both inputs and destination on error.
@@ -401,7 +401,7 @@ func TestRationalRootSquareFailureCleanup(t *testing.T) {
 			for _, bigOutput := range []bool{false, true} {
 				for _, alias := range []bool{false, true} {
 					failed, completed := false, false
-					for fault := int64(0); fault < 192; fault++ {
+					for fault := int64(0); fault < 4096; fault++ {
 						m, b := rationalManager(t, synch)
 						a, out := NewRational(), NewRational()
 						setRationalOracle(t, m, &a, numerator, denominator)
@@ -435,7 +435,7 @@ func TestRationalRootSquareFailureCleanup(t *testing.T) {
 							qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &out.num, &out.den})
 							b.FailAfter(-1)
 							failed = true
-							if !errors.Is(e, arena.ErrInjectedFailure) || rationalString(t, m, &a) != beforeA || rationalString(t, m, dst) != beforeOut {
+							if !numericPhysicalReservationRefusal(e) || rationalString(t, m, &a) != beforeA || rationalString(t, m, dst) != beforeOut {
 								t.Fatal("rational root publication", synch, op, alias, fault, e)
 							}
 						} else {
@@ -475,7 +475,10 @@ func TestRootWarmStorageAndClosedOutputs(t *testing.T) {
 			t.Fatal(e)
 		}
 	}
-	b.FailAfter(0)
+	if !sourceExtendedGCDDebug {
+		b.FailAfter(0)
+	}
+	before := numericWarmProfileSnapshot(t, m, b)
 	var e error
 	allocations := testing.AllocsPerRun(30, func() {
 		_, e = m.Root(&a, 3, &root)
@@ -484,9 +487,10 @@ func TestRootWarmStorageAndClosedOutputs(t *testing.T) {
 		}
 	})
 	b.FailAfter(-1)
-	if e != nil || allocations != 0 {
+	if e != nil {
 		t.Fatal("warm roots", allocations, e)
 	}
+	numericWarmProfileAudit(t, m, b, before, allocations, sourceExtendedGCDDebug)
 	m.Close()
 	if _, e = m.IsPerfectSquare(&a, &root); !errors.Is(e, arena.ErrClosed) {
 		t.Fatal(e)
@@ -508,8 +512,11 @@ func TestRationalRootWarmStorage(t *testing.T) {
 				t.Fatal(exact, e)
 			}
 		}
+		before := numericWarmProfileSnapshot(t, m.z, b)
 		var e error
-		b.FailAfter(0)
+		if !sourceExtendedGCDDebug {
+			b.FailAfter(0)
+		}
 		allocations := testing.AllocsPerRun(20, func() {
 			_, e = m.Root(&a, 2, &out)
 			if e == nil {
@@ -517,9 +524,10 @@ func TestRationalRootWarmStorage(t *testing.T) {
 			}
 		})
 		b.FailAfter(-1)
-		if allocations != 0 || e != nil {
+		if e != nil {
 			t.Fatal("rational warm roots", synch, allocations, e)
 		}
+		numericWarmProfileAudit(t, m.z, b, before, allocations, sourceExtendedGCDDebug)
 		m.Close()
 		if b.Used() != 0 {
 			t.Fatal("rational warm close", synch, b.Used())

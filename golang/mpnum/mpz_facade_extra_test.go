@@ -265,7 +265,7 @@ func TestIntegerFacadeDupIncDecFailureRoots(t *testing.T) {
 			}
 			if e != nil {
 				failures++
-				if !errors.Is(e, arena.ErrInjectedFailure) {
+				if !numericPhysicalReservationRefusal(e) {
 					t.Fatal(e)
 				}
 				if a.cell != oldCell || a.val != oldVal || m.cell(a.cell).size != oldSize {

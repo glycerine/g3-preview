@@ -468,7 +468,7 @@ func TestIntegerModularPredictableFailurePrefixes(t *testing.T) {
 				}
 				// Audit before formatting, deleting any caller result or closing an owner.
 				modularAudit(t, m, []*Int{&a, &b, &c})
-				if e != nil && !errors.Is(e, arena.ErrInjectedFailure) && !errors.Is(e, arena.ErrBudget) {
+				if e != nil && !numericPhysicalReservationRefusal(e) && !errors.Is(e, arena.ErrBudget) {
 					t.Fatal(e)
 				}
 				if op == "power" && e != nil {
@@ -662,7 +662,7 @@ func TestIntegerModularConstructorOwnershipAndRefusal(t *testing.T) {
 			b.FailAfter(prefix)
 			m, e := NewIntegerModularManagerWithModulus(z, &p, true)
 			if e != nil {
-				if !errors.Is(e, arena.ErrInjectedFailure) {
+				if !numericPhysicalReservationRefusal(e) {
 					t.Fatal(e)
 				}
 				qopsAuditLiveOwnership(t, &RationalManager{z: z}, []*Int{&p})
@@ -690,7 +690,7 @@ func TestIntegerModularConstructorOwnershipAndRefusal(t *testing.T) {
 	before := b.Used()
 	b.FailAfter(0)
 	if n := testing.AllocsPerRun(100, func() {
-		if m, e := NewIntegerModularManager(z); m != nil || !errors.Is(e, arena.ErrInjectedFailure) {
+		if m, e := NewIntegerModularManager(z); m != nil || !numericPhysicalReservationRefusal(e) {
 			panic("refusal")
 		}
 	}); n != 0 {

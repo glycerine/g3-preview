@@ -130,7 +130,7 @@ func (m *BinaryRationalManager) Stats() (BinaryRationalStats, error) {
 	}
 	n := uint32(0)
 	for _, v := range [...]Int{m.tmp, m.tmp2, m.addMulTmp.num, m.selectIntTmp1, m.selectIntTmp2, m.selectSmallTmp, m.selectSmallTmp1.num, m.selectSmallTmp2.num, m.divTmp1, m.divTmp2, m.divTmp3} {
-		if v.cell != 0 {
+		if validNumericRef(m.z.cells, v.cell) {
 			n++
 		}
 	}

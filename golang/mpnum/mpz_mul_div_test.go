@@ -232,7 +232,7 @@ func TestIntegerDivisionZeroAndBudgetFailure(t *testing.T) {
 	m.SetLimbs(&a, []uint32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17})
 	b = NewInt(7)
 	budget.FailAfter(0)
-	if e := m.MachineDivRem(&a, &b, &q, &r); !errors.Is(e, arena.ErrInjectedFailure) || q.val != 19 || r.val != 23 {
+	if e := m.MachineDivRem(&a, &b, &q, &r); !numericPhysicalReservationRefusal(e) || q.val != 19 || r.val != 23 {
 		t.Fatal("failed division published output", e)
 	}
 	// Source ensure_tmp frees the insufficient old cell before refusal.
@@ -316,22 +316,13 @@ func TestIntegerDivisionAllAllocationFailurePoints(t *testing.T) {
 		err := m.MachineDivRem(&a, &b, &q, &r)
 		if err != nil {
 			failures++
-			if !errors.Is(err, arena.ErrInjectedFailure) {
+			if !numericPhysicalReservationRefusal(err) {
 				t.Fatal(after, err)
 			}
 			// mpz.h:156/source cpp503–505: scratch can be missing and
 			// caller outputs can already own transferred cells. Count actual
 			// named roots before formatting, fault disable, or owner cleanup.
-			refs := [10]numericCellRef{m.tmp[0], m.tmp[1], m.arg[0], m.arg[1], m.intMin.cell, m.two64.cell, a.cell, b.cell, q.cell, r.cell}
-			live := uint32(0)
-			for _, ref := range refs {
-				if ref != 0 && validNumericRef(m.cells, ref) {
-					live++
-				}
-			}
-			if m.cells.Stats().Live != live || m.words.Stats().Live != live+4 {
-				t.Fatalf("failure %d unnamed ownership: cells=%d words=%d named=%d", after, m.cells.Stats().Live, m.words.Stats().Live, live)
-			}
+			mpzPublicationAudit(t, m, &a, &b, &q, &r)
 			budget.FailAfter(-1)
 			m.Close()
 			if budget.Used() != 0 {
@@ -426,7 +417,7 @@ func TestIntegerEuclideanStagedFailurePointsAndAliases(t *testing.T) {
 				}
 				if err != nil {
 					failures++
-					if !errors.Is(err, arena.ErrInjectedFailure) {
+					if !numericPhysicalReservationRefusal(err) {
 						t.Fatal(alias, after, err)
 					}
 					// mpz.h:156 and mpz.cpp:274 publish completed source prefixes.
@@ -512,7 +503,7 @@ func TestIntegerMultiplicationFailurePointsAndAliases(t *testing.T) {
 			err := m.Mul(&a, &b, dst)
 			if err != nil {
 				failures++
-				if !errors.Is(err, arena.ErrInjectedFailure) {
+				if !numericPhysicalReservationRefusal(err) {
 					t.Fatal(alias, after, err)
 				}
 				// mpz.h:156 and mpz.cpp:274 publish completed source prefixes.

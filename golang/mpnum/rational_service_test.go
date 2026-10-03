@@ -243,7 +243,7 @@ func TestRationalServiceConstructorBudgetUnwind(t *testing.T) {
 		s, e := NewRationalService(serviceConfig(b))
 		if e != nil {
 			failures++
-			if !errors.Is(e, arena.ErrInjectedFailure) || b.Used() != 0 {
+			if !numericPhysicalReservationRefusal(e) || b.Used() != 0 {
 				t.Fatal(n, e, b.Used())
 			}
 		} else {
@@ -276,7 +276,7 @@ func TestRationalServiceCacheFailurePrefixes(t *testing.T) {
 		b.FailAfter(-1)
 		if e != nil {
 			failures++
-			if !errors.Is(e, arena.ErrInjectedFailure) {
+			if !numericPhysicalReservationRefusal(e) {
 				t.Fatal(n, e)
 			}
 		} else {
@@ -323,10 +323,12 @@ func TestRationalServiceCopyFailureAndWarmReuse(t *testing.T) {
 		roots = append(roots, &fillers[i].raw)
 	}
 	serviceAuditRationalRoots(t, s, roots...)
-	if !errors.Is(e, arena.ErrInjectedFailure) || dst.raw.num.cell != s.manager.z.failedRef || dst.raw.den != NewInt(1) || !errors.Is(s.manager.z.check(&dst.raw.num), arena.ErrInvalidSlot) {
-		t.Fatal("sequential Copy numerator refusal", dst, e)
+	if !numericPhysicalReservationRefusal(e) {
+		t.Fatal("Copy category", dst, e)
 	}
+	setterPairPrefix(t, s.manager, &dst.raw, "7", "1", roundPublicationDecode(t, s.manager.z, &src.raw.num), roundPublicationDecode(t, s.manager.z, &src.raw.den), true)
 	b.FailAfter(-1)
+	serviceMust(t, s.manager.z.CleanupPendingAllocation()) // explicit release after immediate named audit
 	sourceWant, ok := new(big.Rat).SetString("1234567890123456789012345678901234567890/99887766554433221100")
 	if !ok {
 		t.Fatal("invalid independent source fixture")
@@ -347,7 +349,7 @@ func TestRationalServiceCopyFailureAndWarmReuse(t *testing.T) {
 	warm, e = s.PowerOfTwo(80)
 	serviceMust(t, e)
 	serviceMust(t, s.Del(&warm))
-	b.FailAfter(0)
+	beforeWarm := numericWarmProfileSnapshot(t, s.manager.z, b)
 	var failed error
 	allocs := testing.AllocsPerRun(100, func() {
 		v, e := s.PowerOfTwo(80)
@@ -360,9 +362,10 @@ func TestRationalServiceCopyFailureAndWarmReuse(t *testing.T) {
 		}
 	})
 	b.FailAfter(-1)
-	if failed != nil || allocs != 0 {
-		t.Fatal(failed, allocs)
+	if failed != nil {
+		t.Fatal(failed)
 	}
+	numericWarmProfileAudit(t, s.manager.z, b, beforeWarm, allocs, s.manager.z.allocator.Stats().DirectObjects > 0)
 	serviceMust(t, s.Del(&src))
 	serviceMust(t, s.Del(&dst))
 }
@@ -464,7 +467,7 @@ func TestRationalServiceCrossOwnerFailureAndSameOwnerCopy(t *testing.T) {
 		b.FailAfter(-1)
 		if e != nil {
 			failures++
-			if !errors.Is(e, arena.ErrInjectedFailure) || dest.manager.z.cells.Stats().Live != cells || dest.manager.z.words.Stats().Live != words {
+			if !numericPhysicalReservationRefusal(e) || dest.manager.z.cells.Stats().Live != cells || dest.manager.z.words.Stats().Live != words {
 				t.Fatal(n, e, "immediate temporary ownership leak")
 			}
 			serviceText(t, dest, &out, "3")
@@ -513,17 +516,33 @@ func TestRationalServiceForeignSmallValuesAndInvalidGuards(t *testing.T) {
 	if _, e := a.String(&foreign); !errors.Is(e, ErrRationalServiceOwner) {
 		t.Fatal(e)
 	}
-	if e := a.SetFractionSigned(&local, 1, 0); !errors.Is(e, ErrDivideByZero) {
-		t.Fatal(e)
-	}
-	if e := a.SetFraction(&local, 1, 0); !errors.Is(e, ErrDivideByZero) {
-		t.Fatal(e)
-	}
-	if local.raw.num.val != 17 || !local.raw.IsSmall() {
-		t.Fatal("guard changed value")
+	for _, signed := range []bool{true, false} {
+		var e error
+		if signed {
+			e = a.SetFractionSigned(&local, 1, 0)
+		} else {
+			e = a.SetFraction(&local, 1, 0)
+		}
+		serviceAuditRationalRoots(t, a, &local.raw)
+		if modularSourceDebug {
+			if !errors.Is(e, ErrIntegerAssertion) || local.raw != (Rational{num: NewInt(17), den: NewInt(1)}) {
+				t.Fatal("debug source zero DEN assertion", local, e)
+			}
+		} else {
+			if e != nil || local.raw != (Rational{num: NewInt(1), den: NewInt(0)}) {
+				t.Fatal("finite source invalid denominator publication", local, e)
+			}
+			if _, e = a.String(&local); !errors.Is(e, ErrUninitializedRational) {
+				t.Fatal(e)
+			}
+			// Explicit cleanup action; no successful arithmetic retry on invalid fields.
+			serviceMust(t, a.Del(&local))
+			local, _ = a.NewValue()
+			serviceMust(t, a.SetInt64(&local, 17))
+		}
 	}
 	if ba.Used() != used {
-		t.Fatal("guard changed charges", ba.Used(), used)
+		t.Fatal("inline branch changed charges", ba.Used(), used)
 	}
 	serviceText(t, a, &local, "17")
 	serviceMust(t, a.Del(&local))
@@ -645,22 +664,21 @@ func TestRationalServiceSourceSignedFractionShape(t *testing.T) {
 		owner, b := serviceNew(t)
 		out, _ := owner.NewValue()
 		serviceMust(t, owner.SetInt64(&out, 3))
-		cells, words := owner.manager.z.cells.Stats().Live, owner.manager.z.words.Stats().Live
 		b.FailAfter(n)
 		err := owner.SetFractionSigned(&out, math.MinInt32, -1)
-		b.FailAfter(-1)
+		serviceAuditRationalRoots(t, owner, &out.raw)
 		if err != nil {
 			failures++
-			if !errors.Is(err, arena.ErrInjectedFailure) || owner.manager.z.cells.Stats().Live != cells || owner.manager.z.words.Stats().Live != words {
+			if !numericPhysicalReservationRefusal(err) {
 				t.Fatal("signed pair temporary leak before teardown", n, err)
 			}
-			if out.raw.num.val != 3 || !out.raw.IsSmall() {
-				t.Fatal("failed staged pair published", out)
-			}
+			setterPairPrefix(t, owner.manager, &out.raw, "3", "1", big.NewInt(2147483648), big.NewInt(1), false)
 		} else {
 			successes++
+			b.FailAfter(-1)
 			serviceText(t, owner, &out, "2147483648")
 		}
+		b.FailAfter(-1)
 		serviceMust(t, owner.Del(&out))
 		serviceMust(t, owner.Close())
 		if b.Used() != 0 {
@@ -691,4 +709,18 @@ func serviceAuditRationalRoots(t *testing.T, s *RationalService, values ...*Rati
 		}
 	}
 	qopsAuditLiveOwnership(t, s.manager, roots)
+}
+
+// Failure-route checks read physical published components without allocating
+// the source decimal formatter's scratch after a failed arithmetic action.
+func serviceIndependentText(t *testing.T, s *RationalService, a *OwnedRational, want string) {
+	t.Helper()
+	expected, ok := new(big.Rat).SetString(want)
+	if !ok {
+		t.Fatal(want)
+	}
+	n, d := roundPublicationDecode(t, s.manager.z, &a.raw.num), roundPublicationDecode(t, s.manager.z, &a.raw.den)
+	if n.Cmp(expected.Num()) != 0 || d.Cmp(expected.Denom()) != 0 {
+		t.Fatal("source raw components changed", n, d, expected)
+	}
 }

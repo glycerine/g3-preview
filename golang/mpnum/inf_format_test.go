@@ -28,9 +28,18 @@ func TestInfFormatOneFinalAllocation(t *testing.T) {
 	}
 	var text string
 	var err error
-	if n := testing.AllocsPerRun(50, func() { text, err = s.InfString(&v) }); n != 1 || err != nil || text != want {
+	before := numericWarmProfileSnapshot(t, s.manager.z, s.manager.z.budget)
+	// Direct DEBUG allocation owns the lexical absolute-value copy: data and
+	// initialized-byte metadata, in addition to the final output string.
+	wantAllocs := float64(1)
+	if sourceExtendedGCDDebug {
+		wantAllocs = 3
+	}
+	n := testing.AllocsPerRun(50, func() { text, err = s.InfString(&v) })
+	if n != wantAllocs || err != nil || text != want {
 		t.Error("rational epsilon final output allocations", n, text, err)
 	}
+	numericWarmProfileAudit(t, s.manager.z, s.manager.z.budget, before, 0, sourceExtendedGCDDebug)
 	if n := testing.AllocsPerRun(50, func() { text, err = s.InfIntString(&iv) }); n != 1 || err != nil || text != iwant {
 		t.Fatal("integer epsilon final output allocations", n, text, err)
 	}
@@ -110,7 +119,7 @@ func TestInfFormatFailurePrefixesImmediateRoots(t *testing.T) {
 				t.Fatal("format released caller storage")
 			}
 			if e != nil {
-				if !errors.Is(e, arena.ErrInjectedFailure) {
+				if !numericPhysicalReservationRefusal(e) {
 					t.Fatal(kind, prefix, e)
 				}
 				failures++

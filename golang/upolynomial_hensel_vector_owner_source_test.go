@@ -2,7 +2,9 @@
 package g3
 
 import (
+	"errors"
 	"fmt"
+	"github.com/glycerine/g3/golang/arena"
 	"github.com/glycerine/g3/golang/mpnum"
 	"reflect"
 	"testing"
@@ -33,7 +35,12 @@ func TestUPolynomialHenselConcreteVectorOwnerCensus(t *testing.T) {
 
 // Every live coefficient buffer must be reachable through a concrete source
 // vector state; the storage registry is physical metadata, not a vector owner.
-func upolyHenselCheckVectorOwners(cores []*mpnum.UPolynomialManager, factors []*mpnum.UPolynomialFactors) error {
+func upolyHenselCheckVectorOwners(cores []*mpnum.UPolynomialManager, factors []*mpnum.UPolynomialFactors, extras ...upolyPhysicalExtraOwners) error {
+	var e error
+	cores, factors, e = upolyPhysicalRetainedOwners(cores, factors, extras)
+	if e != nil {
+		return e
+	}
 	stores := map[uint64]reflect.Value{}
 	for _, core := range cores {
 		v := reflect.ValueOf(core).Elem()
@@ -113,6 +120,24 @@ func upolyHenselCheckVectorOwners(cores []*mpnum.UPolynomialManager, factors []*
 			}
 		}
 	}
+	if e := upolyPhysicalExtraVectors(extras, add); e != nil {
+		return e
+	}
+	for _, extra := range extras {
+		for _, service := range extra.Services {
+			scope := reflect.ValueOf(service).Elem().FieldByName("scope")
+			if scope.IsNil() {
+				continue
+			}
+			scope = scope.Elem()
+			core := scope.FieldByName("manager").Elem()
+			for _, field := range []string{"fpp", "trial", "quotient"} {
+				if e := add(core, scope.FieldByName(field), "retained factorSquareFree."+field); e != nil {
+					return e
+				}
+			}
+		}
+	}
 	for origin, store := range stores {
 		backings := store.FieldByName("backings")
 		for i := 0; i < backings.Len(); i++ {
@@ -126,4 +151,52 @@ func upolyHenselCheckVectorOwners(cores []*mpnum.UPolynomialManager, factors []*
 		}
 	}
 	return nil
+}
+
+// Only actual declared retained lexical owner fields are roots. Accessors borrow
+// the charged owners; no live-descriptor registry can manufacture ownership.
+func upolyPhysicalRetainedOwners(cores []*mpnum.UPolynomialManager, factors []*mpnum.UPolynomialFactors, extras []upolyPhysicalExtraOwners) ([]*mpnum.UPolynomialManager, []*mpnum.UPolynomialFactors, error) {
+	cs := append([]*mpnum.UPolynomialManager(nil), cores...)
+	fs := append([]*mpnum.UPolynomialFactors(nil), factors...)
+	for _, extra := range extras {
+		for _, service := range extra.Services {
+			for i := uint32(0); i < 2; i++ {
+				c, e := service.RetainedCleanupCore(i)
+				if errors.Is(e, arena.ErrBounds) {
+					break
+				}
+				if e != nil {
+					return nil, nil, e
+				}
+				found := false
+				for _, old := range cs {
+					if old == c {
+						found = true
+					}
+				}
+				if !found {
+					cs = append(cs, c)
+				}
+			}
+			for i := uint32(0); i < 2; i++ {
+				f, e := service.RetainedCleanupFactors(i)
+				if errors.Is(e, arena.ErrBounds) {
+					break
+				}
+				if e != nil {
+					return nil, nil, e
+				}
+				found := false
+				for _, old := range fs {
+					if old == f {
+						found = true
+					}
+				}
+				if !found {
+					fs = append(fs, f)
+				}
+			}
+		}
+	}
+	return cs, fs, nil
 }

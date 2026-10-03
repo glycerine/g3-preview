@@ -40,7 +40,7 @@ func TestIntegerBackendScratchHeaderAndSpareDigit(t *testing.T) {
 	if v, e := c.backing.readWord(m.allocator, 0); e != nil || v != 1 {
 		t.Fatal("size publication", v, e)
 	}
-	if c.payload != (arena.VectorRef{}) || m.words.Stats().Live != 4 {
+	if c.payload != (arena.VectorRef{}) || m.words.Stats().Live != 0 {
 		t.Fatal("duplicate numeric payload")
 	}
 	if e = m.Del(&x); e != nil {

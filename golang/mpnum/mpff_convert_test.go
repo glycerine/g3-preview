@@ -94,9 +94,10 @@ func TestFastFloatRationalRawShapeAndConversionFailures(t *testing.T) {
 			if !m.toPlus {
 				t.Fatal("rounding not restored", op, fail)
 			}
-			if e != nil && !errors.Is(e, arena.ErrInjectedFailure) {
+			if e != nil && !numericPhysicalReservationRefusal(e) {
 				t.Fatal(op, fail, e)
 			}
+			budget.FailAfter(-1) // only after immediate actual physical/named root audits
 			serviceMust(t, m.Del(&a))
 			serviceMust(t, qm.Del(&out))
 			serviceMust(t, qm.Del(&q))

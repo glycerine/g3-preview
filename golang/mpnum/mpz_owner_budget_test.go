@@ -2,6 +2,7 @@ package mpnum
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/golang/arena"
@@ -33,8 +34,7 @@ func TestIntegerOwnerHeaderBudgets(t *testing.T) {
 	if m.headerBytes != uint64(reflect.TypeOf(IntegerManager{}).Size()) {
 		t.Fatal("integer owner missing")
 	}
-	cs, ws := m.cells.Stats(), m.words.Stats()
-	measured := m.headerBytes + m.natural.headerBytes + cs.OwnerBytes + cs.RecordBytes + cs.MetadataBytes + cs.DirectoryBytes + ws.OwnerBytes + ws.PayloadBytes + ws.BlockMetadataBytes + ws.DirectoryBytes + ws.Descriptors.OwnerBytes + ws.Descriptors.RecordBytes + ws.Descriptors.MetadataBytes + ws.Descriptors.DirectoryBytes
+	measured := integerActualOwnedBytes(m)
 	if b.Used() != measured {
 		t.Fatal("nested storage counted incorrectly", b.Used(), measured)
 	}
@@ -72,5 +72,26 @@ func TestIntegerOwnerConstructorFailureUnwind(t *testing.T) {
 	_, err := NewIntegerManager(IntegerConfig{Cells: arena.Config{PageSize: 3, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
 	if err != arena.ErrConfig || b.Used() != 0 {
 		t.Fatal("invalid nested config unwind", err, b.Used())
+	}
+}
+
+// A >256-byte retained formatting buffer takes SmallBytes' real direct branch.
+// PayloadBytes already includes that backing; DirectBytes is classification.
+func TestIntegerPhysicalBudgetGraphAfterDirectFormatting(t *testing.T) {
+	m, b := mpzPublicationOwner(t)
+	var a Int
+	want := "1" + strings.Repeat("0", 800)
+	if e := m.SetString(&a, want); e != nil {
+		t.Fatal(e)
+	}
+	if got := integerString(t, m, &a); got != want {
+		t.Fatal("format value changed")
+	}
+	if m.natural.text == nil || m.natural.text.Stats().DirectBytes == 0 {
+		t.Fatal("fixture did not exercise direct text backing")
+	}
+	integerPhysicalAudit(t, m, &a)
+	if got, want := integerActualOwnedBytes(m), b.Used(); got != want {
+		t.Fatal("real owner graph differs", got, want)
 	}
 }

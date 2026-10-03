@@ -7,8 +7,6 @@ import (
 	"errors"
 	"math/big"
 	"testing"
-
-	"github.com/glycerine/g3/golang/arena"
 )
 
 func TestExtendedGCDDebugSourceAssertion(t *testing.T) {
@@ -73,7 +71,7 @@ func TestExtendedGCDDebugDiagnosticOrderAndFailures(t *testing.T) {
 		qopsAuditLiveOwnership(t, m, roots)
 		budget.FailAfter(-1)
 		if e != nil {
-			if !errors.Is(e, arena.ErrInjectedFailure) {
+			if !numericPhysicalReservationRefusal(e) {
 				t.Fatal(prefix, e)
 			}
 			failures++

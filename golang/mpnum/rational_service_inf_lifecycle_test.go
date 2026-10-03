@@ -3,7 +3,6 @@
 package mpnum
 
 import (
-	"errors"
 	"reflect"
 	"testing"
 
@@ -36,7 +35,7 @@ func TestRationalServiceInfinitesimalConstructorFailureRefunds(t *testing.T) {
 		b.FailAfter(prefix)
 		s, err := NewRationalService(serviceConfig(b))
 		if err != nil {
-			if !errors.Is(err, arena.ErrInjectedFailure) {
+			if !numericPhysicalReservationRefusal(err) {
 				t.Fatalf("prefix %d: %v", prefix, err)
 			}
 			if s != nil || b.Used() != 0 {
@@ -82,9 +81,10 @@ func TestRationalServiceInfinitesimalFinalizerTraversal(t *testing.T) {
 	if got := s.manager.z.cells.Stats().Live; got != cells-uint32(len(refs)) {
 		t.Fatalf("constant cells: %d, want %d", got, cells-uint32(len(refs)))
 	}
-	if got := s.manager.z.words.Stats().Live; got != words-uint32(len(refs)) {
-		t.Fatalf("constant payloads: %d, want %d", got, words-uint32(len(refs)))
+	if got := s.manager.z.words.Stats().Live; got != words {
+		t.Fatalf("retained actual formatter payloads: %d, want %d", got, words)
 	}
+	serviceAuditRationalRoots(t, s)
 	if len(s.cache) != cacheLen || s.cache[40].num.cell != cacheRef {
 		t.Fatal("infinitesimal hooks destroyed the later powers cache")
 	}

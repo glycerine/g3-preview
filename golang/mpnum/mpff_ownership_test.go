@@ -161,7 +161,7 @@ func TestFastFloatConstructorReservationPrefixes(t *testing.T) {
 		b.FailAfter(fail)
 		m, e := NewFastFloatManager(c)
 		if e != nil {
-			if !errors.Is(e, arena.ErrInjectedFailure) {
+			if !numericPhysicalReservationRefusal(e) {
 				t.Fatal(fail, e)
 			}
 		} else {
@@ -213,7 +213,7 @@ func TestFastFloatArithmeticFailureRoots(t *testing.T) {
 				e = m.Copy(&out, &a)
 			}
 			fastAudit(t, m, &a, &b, &out)
-			if e != nil && !errors.Is(e, arena.ErrInjectedFailure) {
+			if e != nil && !numericPhysicalReservationRefusal(e) {
 				t.Fatal(op, fail, e)
 			}
 			// Del remains allocation-free with the same exhausted injector armed.
@@ -298,7 +298,7 @@ func TestFastFloatFormattingFailureAndWarmStorage(t *testing.T) {
 			}
 			fastAudit(t, m, &a)
 			if e != nil {
-				if !errors.Is(e, arena.ErrInjectedFailure) {
+				if !numericPhysicalReservationRefusal(e) {
 					t.Fatal(op, fail, e)
 				}
 				for _, v := range dst {
@@ -437,7 +437,7 @@ func TestFastFloatScopedFailureLifetimes(t *testing.T) {
 				roots = append(roots, &v.values[i])
 			}
 			fastAudit(t, m, roots...)
-			if e != nil && !errors.Is(e, arena.ErrInjectedFailure) {
+			if e != nil && !numericPhysicalReservationRefusal(e) {
 				t.Fatal(op, fail, e)
 			}
 			if out != nil {
@@ -489,7 +489,7 @@ func TestFastFloatDivisionSourceDiagnosticPrefix(t *testing.T) {
 func fastOwnedBytes(m *FastFloatManager) uint64 {
 	s := m.words.Stats()
 	d := s.Descriptors
-	n := m.headerBytes + m.natural.headerBytes + s.OwnerBytes + s.PayloadBytes + s.BlockMetadataBytes + s.DirectoryBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes
+	n := m.natural.RuntimeOwner().Stats().TotalBytes + m.headerBytes + m.natural.headerBytes + s.OwnerBytes + s.PayloadBytes + s.BlockMetadataBytes + s.DirectoryBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes
 	if m.natural.text != nil {
 		b := m.natural.text.Stats()
 		n += b.OwnerBytes + b.PayloadBytes + b.MetadataBytes + b.DirectoryBytes
@@ -499,7 +499,7 @@ func fastOwnedBytes(m *FastFloatManager) uint64 {
 func TestFastFloatActualWholeGraphCharges(t *testing.T) {
 	m := fastManager(t, 5)
 	budget := m.config.Storage.Descriptors.Budget
-	if m.words.Stats().Live != 11 || m.capacity != 1024 || m.live != 1 {
+	if m.words.Stats().Live != 7 || m.capacity != 1024 || m.live != 1 {
 		t.Fatal("cold graph", m.words.Stats(), m.capacity, m.live)
 	}
 	if budget.Used() != fastOwnedBytes(m) {

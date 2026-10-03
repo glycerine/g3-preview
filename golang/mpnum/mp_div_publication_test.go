@@ -4,7 +4,6 @@ package mpnum
 
 import (
 	"errors"
-	"github.com/glycerine/g3/golang/arena"
 	"math/big"
 	"testing"
 )
@@ -131,7 +130,7 @@ func TestDivisionPublicationCallerFailurePrefixes(t *testing.T) {
 					}
 					divPublicationAudit(t, m, &a, &b, &out)
 					if e != nil {
-						if !errors.Is(e, arena.ErrInjectedFailure) {
+						if !numericPhysicalReservationRefusal(e) {
 							t.Fatal(sync, op, alias, fault, e)
 						}
 					} else {
@@ -300,7 +299,7 @@ func TestDivisionPublicationInverseInPlaceOverload(t *testing.T) {
 func TestDivisionPublicationInverseMinNegFailureOrder(t *testing.T) {
 	for _, sync := range []bool{false, true} {
 		for _, alias := range []bool{false, true} {
-			m, budget := rationalManager(t, sync)
+			m, budget := rationalPublicationDirectOwner(t, sync)
 			a := Rational{num: NewInt(-2147483648), den: NewInt(1)}
 			out := NewRational()
 			qopsMust(t, m.SetInt64(&out, 71))
@@ -322,7 +321,7 @@ func TestDivisionPublicationInverseMinNegFailureOrder(t *testing.T) {
 			budget.FailAfter(0)
 			e := m.Inv(&a, dst)
 			qopsAuditLiveOwnership(t, m, roots)
-			if !errors.Is(e, arena.ErrInjectedFailure) || dst.num != NewInt(-2147483648) || dst.den != NewInt(1) {
+			if !numericPhysicalReservationRefusal(e) || dst.num != NewInt(-2147483648) || dst.den != NewInt(1) {
 				t.Fatal("Copy then Neg refusal before later Neg/Swap", alias, e, *dst)
 			}
 			budget.FailAfter(-1)
@@ -344,7 +343,7 @@ func TestDivisionPublicationEarlierAllocationPrecedesZeroDomain(t *testing.T) {
 		budget.FailAfter(0)
 		e := m.Div(&a, &b, &out)
 		divPublicationAudit(t, m, &a, &b, &out)
-		if !errors.Is(e, arena.ErrInjectedFailure) {
+		if !numericPhysicalReservationRefusal(e) {
 			t.Fatal("real growth precedes later n/0 actions", e)
 		}
 		budget.FailAfter(-1)
@@ -610,7 +609,7 @@ func TestDivisionPublicationIntegerForwardRawSignsAliases(t *testing.T) {
 
 func TestDivisionPublicationWarmStorage(t *testing.T) {
 	for _, sync := range []bool{false, true} {
-		m, _ := rationalManager(t, sync)
+		m, budget := rationalManager(t, sync)
 		a, b, out := NewRational(), NewRational(), NewRational()
 		qopsMust(t, m.SetString(&a, "18446744073709551617/4294967297"))
 		qopsMust(t, m.SetString(&b, "4294967297/65537"))
@@ -624,9 +623,9 @@ func TestDivisionPublicationWarmStorage(t *testing.T) {
 		for i := 0; i < 10; i++ {
 			run()
 		}
-		if n := testing.AllocsPerRun(50, run); n != 0 {
-			t.Fatal("warm owning source arithmetic allocated host metadata", sync, n)
-		}
+		before := numericWarmProfileSnapshot(t, m.z, budget)
+		n := testing.AllocsPerRun(50, run)
+		numericWarmProfileAudit(t, m.z, budget, before, n, sourceExtendedGCDDebug)
 		divPublicationAudit(t, m, &a, &b, &out)
 		qopsMust(t, m.Del(&a))
 		qopsMust(t, m.Del(&b))
@@ -698,7 +697,7 @@ func TestDivisionPublicationInverseCopyFailureBeforeDebugAssertion(t *testing.T)
 		budget.FailAfter(0)
 		e := m.Inv(&a, &out)
 		qopsAuditLiveOwnership(t, m, roots)
-		if !errors.Is(e, arena.ErrInjectedFailure) || out.num != NewInt(0) || out.den.cell != m.z.failedRef {
+		if !numericPhysicalReservationRefusal(e) || out.num != NewInt(0) || out.den.cell != m.z.failedRef {
 			t.Fatal("real denominator Copy precedes zero assertion/Swap", e, out)
 		}
 		budget.FailAfter(-1)
@@ -733,7 +732,7 @@ func TestDivisionPublicationInverseTwoMinNegActions(t *testing.T) {
 			qopsAuditLiveOwnership(t, m, roots)
 			if e != nil {
 				failed = true
-				if !errors.Is(e, arena.ErrInjectedFailure) {
+				if !numericPhysicalReservationRefusal(e) {
 					t.Fatal(e)
 				}
 			} else {

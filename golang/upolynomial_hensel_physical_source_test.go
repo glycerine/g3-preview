@@ -97,9 +97,14 @@ type upolyHenselPhysicalGraph struct{ Named, Unpublished, Cleanup, Pending, Obje
 
 // Read-only independent physical ownership audit. Reflection reads scalar
 // metadata; it neither borrows mutable payloads nor repairs failed numerals.
-func upolyHenselAuditPhysical(t *testing.T, cores []*mpnum.UPolynomialManager, factors []*mpnum.UPolynomialFactors) upolyHenselPhysicalGraph {
+func upolyHenselAuditPhysical(t *testing.T, cores []*mpnum.UPolynomialManager, factors []*mpnum.UPolynomialFactors, extras ...upolyPhysicalExtraOwners) upolyHenselPhysicalGraph {
+	var e error
+	cores, factors, e = upolyPhysicalRetainedOwners(cores, factors, extras)
+	if e != nil {
+		t.Fatal(e)
+	}
 	t.Helper()
-	if e := upolyHenselCheckVectorOwners(cores, factors); e != nil {
+	if e := upolyHenselCheckVectorOwners(cores, factors, extras...); e != nil {
 		t.Fatal(e)
 	}
 	var graph upolyHenselPhysicalGraph
@@ -171,6 +176,19 @@ func upolyHenselAuditPhysical(t *testing.T, cores []*mpnum.UPolynomialManager, f
 	}
 	for _, fs := range factors {
 		addInt(reflect.ValueOf(fs).Elem().FieldByName("constant"))
+	}
+	upolyPhysicalExtraNumerals(extras, addInt)
+	for _, extra := range extras {
+		for _, service := range extra.Services {
+			scope := reflect.ValueOf(service).Elem().FieldByName("scope")
+			if scope.IsNil() {
+				continue
+			}
+			scope = scope.Elem()
+			for _, field := range []string{"p", "bestP", "gcdTmp", "leading", "trialContent"} {
+				addInt(scope.FieldByName(field))
+			}
+		}
 	}
 	runtime := z.FieldByName("memory").Elem()
 	blocks := runtime.FieldByName("blocks")
@@ -411,7 +429,12 @@ func TestUPolynomialHenselImportedBigModulusPhysicalFailureRoots(t *testing.T) {
 
 // Explicit caller recovery after a failed source setup_p. This only toggles
 // source m_z; it does not repair p/bounds, numerals, scratch or Hensel outputs.
-func upolyHenselCallerSetZForDeadBounds(t *testing.T, cores []*mpnum.UPolynomialManager, owners []*mpnum.UPolynomialFactors) uint32 {
+func upolyHenselCallerSetZForDeadBounds(t *testing.T, cores []*mpnum.UPolynomialManager, owners []*mpnum.UPolynomialFactors, extras ...upolyPhysicalExtraOwners) uint32 {
+	var e error
+	cores, owners, e = upolyPhysicalRetainedOwners(cores, owners, extras)
+	if e != nil {
+		t.Fatal(e)
+	}
 	t.Helper()
 	failed := reflect.ValueOf(cores[0].IntegerManager()).Elem().FieldByName("failedRef").Uint()
 	transitions := uint32(0)
@@ -427,11 +450,11 @@ func upolyHenselCallerSetZForDeadBounds(t *testing.T, cores []*mpnum.UPolynomial
 		if !dead {
 			continue
 		}
-		before := upolyHenselAuditPhysical(t, cores, owners)
+		before := upolyHenselAuditPhysical(t, cores, owners, extras...)
 		if e := core.SetZ(); e != nil {
 			t.Fatal("explicit caller source mode transition", e)
 		}
-		if after := upolyHenselAuditPhysical(t, cores, owners); after != before {
+		if after := upolyHenselAuditPhysical(t, cores, owners, extras...); after != before {
 			t.Fatal("SetZ changed physical roots", before, after)
 		}
 		for i, field := range []string{"p", "lower", "upper"} {

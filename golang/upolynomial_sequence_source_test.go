@@ -88,11 +88,12 @@ func TestUPolynomialSequenceExactMetadataFailurePrefixes(t *testing.T) {
 		owned := m.Stats()
 		// Audit before disabling faults/reading numerals/Close. All coefficients are
 		// inline, so no sequence numeral cell justifies an unreferenced live root.
-		if owned.IntegerLiveCells != owned.IntegerCachedCells+owned.OwnedNumeralCells || owned.IntegerWordsRefs != owned.IntegerLiveCells+owned.IntegerNaturalWordsRefs || stats.OwnedNumeralCells != 0 {
+		if owned.IntegerLiveCells != owned.IntegerCachedCells+owned.OwnedNumeralCells || stats.OwnedNumeralCells != 0 {
 			t.Fatal("immediate scalar graph", fault, owned, stats)
 		}
+		upolyHenselAuditPhysical(t, []*mpnum.UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{Sequences: []*mpnum.UPolynomialSequence{seq}})
 		b.FailAfter(-1)
-		if !errors.Is(e, arena.ErrInjectedFailure) {
+		if !numericStorageReservationRefusal(e) {
 			t.Fatal(fault, e)
 		}
 		wantBegin, wantSize := uint32(0), uint32(0)
@@ -124,7 +125,7 @@ func TestUPolynomialSequencePhysicalOwnerAndCloseGuard(t *testing.T) {
 	b.FailAfter(0)
 	allocs := testing.AllocsPerRun(10, func() {
 		seq, e := m.NewSequence()
-		if !errors.Is(e, arena.ErrInjectedFailure) || seq != nil {
+		if !numericStorageReservationRefusal(e) || seq != nil {
 			t.Fatal(seq, e)
 		}
 	})
@@ -214,13 +215,14 @@ func TestUPolynomialSequenceBigCopyFailureImmediateGraph(t *testing.T) {
 		b.FailAfter(fault)
 		e := seq.PushCopy(mustUPolyView(t, m, p))
 		managerGraph, sequenceGraph := m.Stats(), seq.Stats()
-		if managerGraph.IntegerLiveCells != managerGraph.IntegerCachedCells+managerGraph.OwnedNumeralCells+sequenceGraph.OwnedNumeralCells || managerGraph.IntegerWordsRefs != managerGraph.IntegerLiveCells+managerGraph.IntegerNaturalWordsRefs {
+		if managerGraph.IntegerLiveCells != managerGraph.IntegerCachedCells+managerGraph.OwnedNumeralCells+sequenceGraph.OwnedNumeralCells {
 			t.Fatal("immediate complete graph", fault, e, managerGraph, sequenceGraph)
 		}
+		upolyHenselAuditPhysical(t, []*mpnum.UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{Sequences: []*mpnum.UPolynomialSequence{seq}})
 		b.FailAfter(-1)
 		if e != nil {
 			failures++
-			if !errors.Is(e, arena.ErrInjectedFailure) {
+			if !numericStorageReservationRefusal(e) {
 				t.Fatal(fault, e)
 			}
 		} else {
@@ -285,20 +287,21 @@ func TestUPolynomialTransformCancellationAfterComposition(t *testing.T) {
 
 func TestUPolynomialSturmFailureAndCancellationImmediateGraph(t *testing.T) {
 	failures, successes := 0, 0
-	for fault := int64(0); fault < 192; fault++ {
+	for fault := int64(0); fault < 2048; fault++ {
 		m, _, budget := upolySourceOwner(t)
 		p := upolySourceNew(t, m, []int32{8, 2, 8, 10, 10, 0, 1, 0, 1, 3, 7})
 		seq := upolySturmSequence(t, m)
 		budget.FailAfter(fault)
 		e := m.SturmSequence(mustUPolyView(t, m, p), seq)
 		graph, external := m.Stats(), seq.Stats()
-		if graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+external.OwnedNumeralCells || graph.IntegerWordsRefs != graph.IntegerLiveCells+graph.IntegerNaturalWordsRefs {
+		if graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+external.OwnedNumeralCells {
 			t.Fatal("Sturm immediate roots", fault, e, graph, external)
 		}
+		upolyHenselAuditPhysical(t, []*mpnum.UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{Sequences: []*mpnum.UPolynomialSequence{seq}})
 		budget.FailAfter(-1)
 		if e != nil {
 			failures++
-			if !errors.Is(e, arena.ErrInjectedFailure) {
+			if !numericStorageReservationRefusal(e) {
 				t.Fatal(fault, e)
 			}
 		} else {
@@ -417,10 +420,13 @@ func TestUPolynomialSequenceSelfGrowthCloseAndAscendingBigReset(t *testing.T) {
 		}
 	}
 	used := budget.Used()
+	physicalBefore := m.IntegerManager().RuntimeOwner().Stats().TotalBytes
+	arraysBefore := seq.Stats().TotalBytes
 	if e = seq.Reset(); e != nil {
 		t.Fatal(e)
 	}
-	if budget.Used() != used || seq.Stats().OwnedNumeralCells != 0 {
+	physicalAfter := m.IntegerManager().RuntimeOwner().Stats().TotalBytes
+	if budget.Used() != used-(physicalBefore-physicalAfter) || seq.Stats().TotalBytes != arraysBefore || seq.Stats().OwnedNumeralCells != 0 {
 		t.Fatal("reset retains arrays and frees owned roots", used, budget.Used(), seq.Stats())
 	}
 	var probes [3]mpnum.Int

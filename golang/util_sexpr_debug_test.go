@@ -67,7 +67,7 @@ func TestSexprDebugBVComparisonFailureRoots(t *testing.T) {
 		e := m.sexprBVDiagnostic(&c, 16)
 		sexprAuditNumericRoots(t, q, &c, filler[:])
 		if e != nil {
-			if !errors.Is(e, arena.ErrInjectedFailure) {
+			if !numericStorageReservationRefusal(e) {
 				t.Fatal(e)
 			}
 			failures++
@@ -159,6 +159,34 @@ func sexprAuditNumericRoots(t *testing.T, q *mpnum.RationalService, value *mpnum
 				payloads++
 			}
 		}
+	}
+	// Division overflow owns actual Runtime blocks rather than Words vectors.
+	// Enumerate only the four source division buffers and active debug verifier.
+	buffers := natural.FieldByName("division")
+	raw := make(map[[3]uint64]bool)
+	addRaw := func(buffer reflect.Value) {
+		for _, name := range []string{"raw", "pending"} {
+			block := buffer.FieldByName(name)
+			key := [3]uint64{block.FieldByName("origin").Uint(), block.FieldByName("slot").Uint(), block.FieldByName("generation").Uint()}
+			if key == [3]uint64{} {
+				continue
+			}
+			if raw[key] {
+				t.Fatal("duplicate Natural physical root", key)
+			}
+			raw[key] = true
+		}
+	}
+	for i := 0; i < buffers.Len(); i++ {
+		addRaw(buffers.Index(i))
+	}
+	if natural.FieldByName("verificationActive").Bool() {
+		addRaw(natural.FieldByName("verification"))
+	}
+	payloads += uint32(len(raw))
+	pending := integer.FieldByName("pendingCell").FieldByName("object")
+	if pending.FieldByName("owner").Uint() != 0 {
+		payloads++
 	}
 	stats, e := q.Stats()
 	sxMust(t, e)

@@ -3,13 +3,11 @@
 package mpnum
 
 import (
-	"errors"
 	"fmt"
 	"math"
 	"math/big"
 	"testing"
 
-	"github.com/glycerine/g3/golang/arena"
 )
 
 func roundPublicationFillCells(t *testing.T, m *IntegerManager) []*Int {
@@ -64,7 +62,7 @@ func TestRoundPublicationIntegralCopyRefusal(t *testing.T) {
 					budget.FailAfter(0)
 					e := roundPublicationCall(q, &a, &out, &integer, op)
 					qopsAuditLiveOwnership(t, q, []*Int{&a.num, &a.den, &out.num, &out.den, &integer})
-					if !errors.Is(e, arena.ErrInjectedFailure) {
+					if !numericPhysicalReservationRefusal(e) {
 						t.Fatal(sync, op, oldBig, negative, e)
 					}
 					if dst.val != a.num.val || dst.cell != q.z.failedRef {
@@ -118,7 +116,7 @@ func TestRoundPublicationQuotientBeforeCeilCorrectionRefusal(t *testing.T) {
 			budget.FailAfter(0)
 			e := roundPublicationCall(q, &a, &out, &integer, op)
 			qopsAuditLiveOwnership(t, q, roots)
-			if !errors.Is(e, arena.ErrInjectedFailure) {
+			if !numericPhysicalReservationRefusal(e) {
 				t.Fatal(sync, rationalOut, e)
 			}
 			if *dst != NewInt(math.MaxInt32) {

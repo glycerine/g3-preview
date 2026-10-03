@@ -14,11 +14,22 @@ import (
 // This fixture deliberately uses real manager storage and reservation faults.
 // Observe each failing action before Del, String, disabling the fault, or Close.
 func mpzPublicationOwner(t *testing.T) (*IntegerManager, *arena.Budget) {
+	return mpzPublicationOwnerProfile(t, memory.SmallAllocatorProfile{})
+}
+
+// The genuine source Debug NonWindows direct branch makes each new physical
+// object a real cold allocation, even when release pool classes are warmed.
+// Used only for action-timing fault fixtures; default pooled tests remain.
+func mpzPublicationDirectOwner(t *testing.T) (*IntegerManager, *arena.Budget) {
+	return mpzPublicationOwnerProfile(t, memory.SmallAllocatorProfile{PointerBits: 64, Debug: true})
+}
+func mpzPublicationOwnerProfile(t *testing.T, profile memory.SmallAllocatorProfile) (*IntegerManager, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(1 << 20)
 	m, err := NewIntegerManager(IntegerConfig{
-		Cells: arena.Config{PageSize: 2, Budget: b},
-		Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}},
+		Cells:   arena.Config{PageSize: 2, Budget: b},
+		Profile: profile,
+		Words:   arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}},
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -91,13 +102,13 @@ func TestIntegerSourceTmpFreeBeforeReplacementFailure(t *testing.T) {
 }
 
 func TestIntegerSourceResultPublishedBeforeMissingTmpFailure(t *testing.T) {
-	m, b := mpzPublicationOwner(t)
+	m, b := mpzPublicationDirectOwner(t)
 	oldTmp := m.tmp[0]
 	before := mpzPublicationSnapshot(m, b)
 	out, one := NewInt(17), NewInt(1)
 	b.FailAfter(0)
 	err := m.Add(&m.two64, &one, &out)
-	if err != arena.ErrInjectedFailure {
+	if !numericPhysicalReservationRefusal(err) {
 		t.Fatalf("expected missing scratch refusal, got %v", err)
 	}
 	// mpz.cpp publishes sign, swaps the output pointer and publishes size
@@ -119,7 +130,7 @@ func TestIntegerSourceResultPublishedBeforeMissingTmpFailure(t *testing.T) {
 }
 
 func TestIntegerSourceBigSetFreesOldBeforeAllocationFailure(t *testing.T) {
-	m, b := mpzPublicationOwner(t)
+	m, b := mpzPublicationDirectOwner(t)
 	var dst, src Int
 	if err := m.SetInt64(&dst, 1<<40); err != nil {
 		t.Fatal(err)
@@ -136,7 +147,7 @@ func TestIntegerSourceBigSetFreesOldBeforeAllocationFailure(t *testing.T) {
 	before := mpzPublicationSnapshot(m, b)
 	b.FailAfter(0)
 	err := m.Copy(&dst, &src)
-	if err != arena.ErrInjectedFailure {
+	if !numericPhysicalReservationRefusal(err) {
 		t.Fatalf("expected big_set allocation refusal, got %v", err)
 	}
 	// Source big_set publishes target.m_val before releasing insufficient
@@ -159,7 +170,7 @@ func TestIntegerSourceDigitSetterFreesOldBeforeAllocationFailure(t *testing.T) {
 	digits[0], digits[32] = 9, 1
 	b.FailAfter(0)
 	err := m.SetLimbs(&dst, digits[:])
-	if err != arena.ErrInjectedFailure {
+	if !numericPhysicalReservationRefusal(err) {
 		t.Fatalf("expected digit setter allocation refusal, got %v", err)
 	}
 	if dst.val != 1 {
@@ -178,7 +189,7 @@ func TestIntegerSourceEnsureCapacityRetainsOldUntilReplacement(t *testing.T) {
 	before := mpzPublicationSnapshot(m, b)
 	b.FailAfter(0)
 	err := m.ensureOwnedCapacity(&a, 33)
-	if err != arena.ErrInjectedFailure {
+	if !numericPhysicalReservationRefusal(err) {
 		t.Fatalf("expected replacement allocation refusal, got %v", err)
 	}
 	if a.cell != old || a.val != -1 || !validNumericRef(m.cells, old) {
@@ -268,7 +279,7 @@ func TestIntegerSourceSmallDestinationFailureKeepsSignAndInvalidToken(t *testing
 		} else {
 			e = m.SetLimbs(&dst, digits[:])
 		}
-		if e != arena.ErrInjectedFailure {
+		if !numericPhysicalReservationRefusal(e) {
 			t.Fatal(copyRoute, e)
 		}
 		wantSign := int32(1)
@@ -294,13 +305,13 @@ func TestIntegerSourceSmallDestinationFailureKeepsSignAndInvalidToken(t *testing
 }
 
 func TestIntegerSourcePairedDivisionPublishesQuotientBeforeMissingScratch(t *testing.T) {
-	m, b := mpzPublicationOwner(t)
+	m, b := mpzPublicationDirectOwner(t)
 	q, r, one := NewInt(19), NewInt(23), NewInt(1)
 	oldTmp := m.tmp[0]
 	before := mpzPublicationSnapshot(m, b)
 	b.FailAfter(0)
 	e := m.MachineDivRem(&m.two64, &one, &q, &r)
-	if e != arena.ErrInjectedFailure {
+	if !numericPhysicalReservationRefusal(e) {
 		t.Fatal(e)
 	}
 	if q.cell != oldTmp || q.val != 1 || !validNumericRef(m.cells, q.cell) {
@@ -414,7 +425,7 @@ func TestIntegerSourceTmpUnsignedCapacityGuardAfterOldFree(t *testing.T) {
 
 func TestIntegerSourceDivModWrapperDestinationBeforeFailure(t *testing.T) {
 	for _, modRoute := range []bool{false, true} {
-		m, b := mpzPublicationOwner(t)
+		m, b := mpzPublicationDirectOwner(t)
 		var a, divisor Int
 		if e := m.Copy(&a, &m.two64); e != nil {
 			t.Fatal(e)
@@ -443,7 +454,7 @@ func TestIntegerSourceDivModWrapperDestinationBeforeFailure(t *testing.T) {
 		} else {
 			e = m.Div(&a, &divisor, &out)
 		}
-		if e != arena.ErrInjectedFailure {
+		if !numericPhysicalReservationRefusal(e) {
 			t.Fatal(modRoute, e)
 		}
 		if out.cell != oldTmp || out.val != -1 || !validNumericRef(m.cells, out.cell) {
@@ -491,7 +502,7 @@ func mpzPublicationFailLeaf(t *testing.T, z *IntegerManager, b *arena.Budget, le
 	var digits [33]uint32
 	digits[0], digits[32] = 9, 1
 	b.FailAfter(0)
-	if e := z.SetLimbs(leaf, digits[:]); e != arena.ErrInjectedFailure {
+	if e := z.SetLimbs(leaf, digits[:]); !numericPhysicalReservationRefusal(e) {
 		t.Fatal(e)
 	}
 	if leaf.cell != z.failedRef {
@@ -513,6 +524,7 @@ func TestIntegerSourcePartialRationalCleanup(t *testing.T) {
 			t.Fatal(e)
 		}
 		mpzPublicationFailLeaf(t, q.z, b, &a.num)
+		companionRef := a.den.cell
 		before := mpzPublicationSnapshot(q.z, b)
 		if q.check(&a) != arena.ErrInvalidSlot {
 			t.Fatal("rational read guard changed")
@@ -525,8 +537,10 @@ func TestIntegerSourcePartialRationalCleanup(t *testing.T) {
 		if e != nil {
 			t.Fatal("partial cleanup rejected", reset, e)
 		}
+		integerPhysicalAudit(t, q.z)
+		mpzPublicationExpectFreed(t, q.z, b, companionRef, before)
 		after := mpzPublicationSnapshot(q.z, b)
-		if after.cells+1 != before.cells || after.words+1 != before.words || a.num.cell != 0 || a.den.cell != 0 {
+		if after.cells+1 != before.cells || after.words != before.words || a.num.cell != 0 || a.den.cell != 0 {
 			t.Fatal("live companion not released exactly once", before, after, a)
 		}
 		if reset && (a.num.val != 0 || a.den.val != 1) {
@@ -545,7 +559,7 @@ func TestIntegerSourcePartialRationalCleanup(t *testing.T) {
 }
 func TestIntegerSourcePartialBinaryCleanup(t *testing.T) {
 	for _, reset := range []bool{false, true} {
-		z, b := mpzPublicationOwner(t)
+		z, b := mpzPublicationDirectOwner(t)
 		diag, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
 		if e != nil {
 			t.Fatal(e)
@@ -565,6 +579,7 @@ func TestIntegerSourcePartialBinaryCleanup(t *testing.T) {
 			t.Fatal(e)
 		}
 		mpzPublicationFailLeaf(t, z, b, &a.lower.num)
+		companionRef := a.upper.num.cell
 		before := mpzPublicationSnapshot(z, b)
 		if im.check(&a) != arena.ErrInvalidSlot {
 			t.Fatal("interval read guard changed")
@@ -577,8 +592,10 @@ func TestIntegerSourcePartialBinaryCleanup(t *testing.T) {
 		if e != nil {
 			t.Fatal("partial interval cleanup rejected", reset, e)
 		}
+		integerPhysicalAudit(t, z)
+		mpzPublicationExpectFreed(t, z, b, companionRef, before)
 		after := mpzPublicationSnapshot(z, b)
-		if after.cells+1 != before.cells || after.words+1 != before.words || a.lower.num.cell != 0 || a.upper.num.cell != 0 {
+		if after.cells+1 != before.cells || after.words != before.words || a.lower.num.cell != 0 || a.upper.num.cell != 0 {
 			t.Fatal("interval companion not released", before, after, a)
 		}
 		if reset && (a.lower.k != 0 || a.upper.k != 0) {
@@ -607,6 +624,7 @@ func TestIntegerSourcePartialOwnedRationalCleanup(t *testing.T) {
 		t.Fatal(e)
 	}
 	mpzPublicationFailLeaf(t, s.manager.z, b, &v.raw.num)
+	companionRef := v.raw.den.cell
 	before := mpzPublicationSnapshot(s.manager.z, b)
 	foreign := OwnedRational{raw: NewRational(), ownerID: s.ownerID + 1}
 	if s.Del(&foreign) != ErrRationalServiceOwner {
@@ -618,8 +636,10 @@ func TestIntegerSourcePartialOwnedRationalCleanup(t *testing.T) {
 	if e = s.Del(&v); e != nil {
 		t.Fatal("owned partial cleanup rejected", e)
 	}
+	integerPhysicalAudit(t, s.manager.z)
+	mpzPublicationExpectFreed(t, s.manager.z, b, companionRef, before)
 	after := mpzPublicationSnapshot(s.manager.z, b)
-	if after.cells+1 != before.cells || after.words+1 != before.words || v.ownerID != 0 {
+	if after.cells+1 != before.cells || after.words != before.words || v.ownerID != 0 {
 		t.Fatal("owned companion cleanup", before, after, v)
 	}
 	b.FailAfter(-1)
@@ -689,6 +709,7 @@ func TestIntegerSourcePartialInfCleanup(t *testing.T) {
 				t.Fatal(e)
 			}
 			mpzPublicationFailLeaf(t, s.manager.z, b, leaf)
+			companionRef := companion.cell
 			before := mpzPublicationSnapshot(s.manager.z, b)
 			switch kind {
 			case 0:
@@ -710,8 +731,10 @@ func TestIntegerSourcePartialInfCleanup(t *testing.T) {
 			if e != nil {
 				t.Fatal("partial Inf cleanup rejected", kind, e)
 			}
+			integerPhysicalAudit(t, s.manager.z)
+			mpzPublicationExpectFreed(t, s.manager.z, b, companionRef, before)
 			after := mpzPublicationSnapshot(s.manager.z, b)
-			if after.cells+1 != before.cells || after.words+1 != before.words {
+			if after.cells+1 != before.cells || after.words != before.words {
 				t.Fatal("Inf companion cleanup", kind, before, after)
 			}
 			switch kind {
@@ -756,66 +779,5 @@ func TestIntegerSourcePartialInfCleanup(t *testing.T) {
 // A missing scratch or the exact owned failed descriptor is not a live root.
 func mpzPublicationAudit(t *testing.T, m *IntegerManager, public ...*Int) {
 	t.Helper()
-	var cells [48]numericCellRef
-	nc := 0
-	add := func(ref numericCellRef) {
-		if ref == 0 || ref == m.failedRef {
-			return
-		}
-		if !validNumericRef(m.cells, ref) {
-			t.Fatal("invalid ordinary named root", ref)
-		}
-		for _, r := range cells[:nc] {
-			if r == ref {
-				return
-			}
-		}
-		cells[nc] = ref
-		nc++
-	}
-	for _, r := range m.tmp {
-		add(r)
-	}
-	for _, r := range m.arg {
-		add(r)
-	}
-	add(m.intMin.cell)
-	add(m.two64.cell)
-	for _, n := range public {
-		if n != nil {
-			add(n.cell)
-		}
-	}
-	if uint32(nc) != m.cells.Stats().Live {
-		t.Fatal("unnamed live cells", nc, m.cells.Stats().Live)
-	}
-	var words [64]arena.VectorRef
-	nw := 0
-	addWords := func(r arena.VectorRef) {
-		if r == (arena.VectorRef{}) {
-			return
-		}
-		if !m.words.IsLive(r) {
-			t.Fatal("invalid named word root", r)
-		}
-		for _, old := range words[:nw] {
-			if old == r {
-				return
-			}
-		}
-		words[nw] = r
-		nw++
-	}
-	for _, r := range cells[:nc] {
-		addWords(m.cell(r).payload)
-	}
-	for _, r := range m.natural.divScratch {
-		addWords(r)
-	}
-	for _, r := range m.natural.formatScratch {
-		addWords(r)
-	}
-	if uint32(nw) != m.words.Stats().Live {
-		t.Fatal("unnamed live words", nw, m.words.Stats().Live)
-	}
+	integerPhysicalAudit(t, m, public...)
 }

@@ -138,13 +138,21 @@ func TestRationalCheckedInitializationAndZero(t *testing.T) {
 	if _, e := m.String(&raw); !errors.Is(e, ErrUninitializedRational) {
 		t.Fatal("raw zero read", e)
 	}
-	if e := m.SetInt64(&raw, 1); !errors.Is(e, ErrUninitializedRational) {
-		t.Fatal("raw destination accepted", e)
+	if e := m.SetInt64(&raw, 1); e != nil || raw != (Rational{num: NewInt(1), den: NewInt(1)}) {
+		t.Fatal("explicit scalar initialization", raw, e)
 	}
-	if e := m.SetFraction(&valid, 1, 0); !errors.Is(e, ErrDivideByZero) || rationalString(t, m, &valid) != "0" {
-		t.Fatal(e)
+	e := m.SetFraction(&valid, 1, 0)
+	qopsAuditLiveOwnership(t, m, []*Int{&raw.num, &raw.den, &valid.num, &valid.den})
+	if modularSourceDebug {
+		if !errors.Is(e, ErrIntegerAssertion) || valid != NewRational() {
+			t.Fatal(valid, e)
+		}
+	} else if e != nil || valid.num != NewInt(1) || valid.den != NewInt(0) {
+		t.Fatal(valid, e)
 	}
-	e := m.Inv(&valid, &valid)
+	// Reset the finite invalid output explicitly before the independent zero inverse.
+	qopsMust(t, m.Reset(&valid))
+	e = m.Inv(&valid, &valid)
 	divPublicationAudit(t, m, &valid)
 	if modularSourceDebug {
 		if !errors.Is(e, ErrIntegerAssertion) || valid != NewRational() {
@@ -369,7 +377,7 @@ func TestRationalConstructorAllocationFailures(t *testing.T) {
 		m, e := NewRationalManager(RationalConfig{Integers: IntegerConfig{Cells: arena.Config{PageSize: 1, Budget: budget}, Words: arena.VectorConfig{PageSize: 8, Descriptors: arena.Config{PageSize: 1, Budget: budget}}}})
 		if e != nil {
 			failures++
-			if !errors.Is(e, arena.ErrInjectedFailure) {
+			if !numericPhysicalReservationRefusal(e) {
 				t.Fatal(e)
 			}
 		} else {
@@ -410,7 +418,7 @@ func TestRationalArithmeticFailureCleanup(t *testing.T) {
 				case 4:
 					want.Inv(ar)
 				}
-				for after := int64(0); after < 48; after++ {
+				for after := int64(0); after < 1024; after++ {
 					m, budget := rationalManager(t, synch)
 					a, b, out := NewRational(), NewRational(), NewRational()
 					setRationalOracle(t, m, &a, an, ad)
@@ -444,7 +452,7 @@ func TestRationalArithmeticFailureCleanup(t *testing.T) {
 					budget.FailAfter(-1)
 					if err != nil {
 						failures++
-						if !errors.Is(err, arena.ErrInjectedFailure) {
+						if !numericPhysicalReservationRefusal(err) {
 							t.Fatal("unexpected rational failure", synch, op, alias, after, err)
 						}
 						if op == 2 {
@@ -453,14 +461,14 @@ func TestRationalArithmeticFailureCleanup(t *testing.T) {
 							num := powerPublicationComponent(t, m.z, &dst.num, beforeNum, productNum, want.Num().String())
 							powerPublicationComponent(t, m.z, &dst.den, beforeDen, productDen, want.Denom().String())
 							if num == "failed" || num == beforeNum {
-								if integerString(t, m.z, &dst.den) != beforeDen {
+								if roundPublicationDecode(t, m.z, &dst.den).String() != beforeDen {
 									t.Fatal("denominator acted before numerator Mul completed", synch, alias, after)
 								}
 							}
-							if dst != &a && rationalString(t, m, &a) != ar.RatString() {
+							if dst != &a && rationalIndependentString(t, m, &a) != ar.RatString() {
 								t.Fatal("non-destination a changed", synch, alias, after)
 							}
-							if dst != &b && rationalString(t, m, &b) != br.RatString() {
+							if dst != &b && rationalIndependentString(t, m, &b) != br.RatString() {
 								t.Fatal("non-destination b changed", synch, alias, after)
 							}
 						} else if op == 3 || op == 4 {
@@ -475,10 +483,10 @@ func TestRationalArithmeticFailureCleanup(t *testing.T) {
 								powerPublicationComponent(t, m.z, &dst.num, beforeNum, ar.Num().String(), absNum, negDen)
 								powerPublicationComponent(t, m.z, &dst.den, beforeDen, ar.Denom().String(), negDen, absNum)
 							}
-							if dst != &a && rationalString(t, m, &a) != ar.RatString() {
+							if dst != &a && rationalIndependentString(t, m, &a) != ar.RatString() {
 								t.Fatal("non-destination a changed", op, alias, after)
 							}
-							if dst != &b && rationalString(t, m, &b) != br.RatString() {
+							if dst != &b && rationalIndependentString(t, m, &b) != br.RatString() {
 								t.Fatal("non-destination b changed", op, alias, after)
 							}
 						} else if op == 0 || op == 1 {
@@ -491,13 +499,13 @@ func TestRationalArithmeticFailureCleanup(t *testing.T) {
 							}
 							pd := new(big.Int).Mul(ar.Denom(), br.Denom())
 							addPublicationExpectRaw(t, m, dst, beforeNum, beforeDen, pn, pd)
-							if dst != &a && rationalString(t, m, &a) != ar.RatString() {
+							if dst != &a && rationalIndependentString(t, m, &a) != ar.RatString() {
 								t.Fatal("non-destination a changed", op, alias, after)
 							}
-							if dst != &b && rationalString(t, m, &b) != br.RatString() {
+							if dst != &b && rationalIndependentString(t, m, &b) != br.RatString() {
 								t.Fatal("non-destination b changed", op, alias, after)
 							}
-						} else if rationalString(t, m, &a) != ar.RatString() || rationalString(t, m, &b) != br.RatString() || rationalString(t, m, &out) != "17" {
+						} else if rationalIndependentString(t, m, &a) != ar.RatString() || rationalIndependentString(t, m, &b) != br.RatString() || rationalIndependentString(t, m, &out) != "17" {
 							t.Fatal("failed rational operation changed destination/input", synch, op, alias, after, err)
 						}
 						// Source TMP can be transferred before its replacement allocation
@@ -511,6 +519,9 @@ func TestRationalArithmeticFailureCleanup(t *testing.T) {
 					m.Close()
 					if budget.Used() != 0 {
 						t.Fatal("failed rational owner leaked budget", budget.Used())
+					}
+					if err == nil {
+						break
 					}
 				}
 				// Inv may reuse all storage already reserved by fixture normalization.
@@ -529,8 +540,8 @@ func TestRationalCopySetterFailureCleanup(t *testing.T) {
 	for _, synch := range []bool{false, true} {
 		for op := 0; op < 3; op++ {
 			failures, successes := 0, 0
-			for after := int64(0); after < 40; after++ {
-				m, budget := rationalManager(t, synch)
+			for after := int64(0); after < 512; after++ {
+				m, budget := rationalPublicationDirectOwner(t, synch)
 				a, out := NewRational(), NewRational()
 				setRationalOracle(t, m, &a, n, d)
 				m.SetInt64(&out, 17)
@@ -550,10 +561,13 @@ func TestRationalCopySetterFailureCleanup(t *testing.T) {
 				budget.FailAfter(after)
 				err := call()
 				qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &out.num, &out.den, &numerator, &denominator})
+				if err != nil && op != 0 {
+					setterPairPrefix(t, m, &out, "17", "1", wantSetterNumerator(op, n), wantSetterDenominator(op, d), op == 1)
+				}
 				budget.FailAfter(-1)
 				if err != nil {
 					failures++
-					if !errors.Is(err, arena.ErrInjectedFailure) {
+					if !numericPhysicalReservationRefusal(err) {
 						t.Fatal("unexpected setter failure", synch, op, after, err)
 					}
 					if op == 0 {
@@ -567,8 +581,6 @@ func TestRationalCopySetterFailureCleanup(t *testing.T) {
 						if rationalString(t, m, &a) != new(big.Rat).SetFrac(n, d).RatString() {
 							t.Fatal("Copy source changed", synch, after)
 						}
-					} else if rationalString(t, m, &out) != "17" {
-						t.Fatal("failed rational setter published", synch, op, after, err)
 					}
 				} else {
 					successes++
@@ -595,7 +607,7 @@ func TestRationalCopySetterFailureCleanup(t *testing.T) {
 
 func TestRationalWarmStorageAndScratchModes(t *testing.T) {
 	for _, synch := range []bool{false, true} {
-		m, _ := rationalManager(t, synch)
+		m, budget := rationalManager(t, synch)
 		a, b, out := NewRational(), NewRational(), NewRational()
 		m.SetFraction(&a, 1<<40, 7)
 		m.SetFraction(&b, (1<<40)+1, 11)
@@ -606,6 +618,7 @@ func TestRationalWarmStorageAndScratchModes(t *testing.T) {
 			m.Div(&a, &b, &out)
 			m.Compare(&a, &b)
 		}
+		beforeWarm := numericWarmProfileSnapshot(t, m.z, budget)
 		var operationError error
 		allocations := testing.AllocsPerRun(20, func() {
 			operationError = m.Add(&a, &b, &out)
@@ -622,9 +635,10 @@ func TestRationalWarmStorageAndScratchModes(t *testing.T) {
 				_, operationError = m.Compare(&a, &b)
 			}
 		})
-		if operationError != nil || allocations != 0 {
+		if operationError != nil {
 			t.Fatal("warm rational storage allocates", synch, allocations, operationError)
 		}
+		numericWarmProfileAudit(t, m.z, budget, beforeWarm, allocations, m.z.allocator.Stats().DirectObjects > 0)
 		if synch {
 			if m.addTmp1.cell != 0 || m.addTmp2.cell != 0 || m.ltTmp1.num.cell != 0 || m.ltTmp2.num.cell != 0 || m.nTmp.cell != 0 {
 				t.Fatal("local-temp mode retained caches")
@@ -640,16 +654,19 @@ func TestRationalWarmStorageAndScratchModes(t *testing.T) {
 func TestRationalColdSetterFailureCleanup(t *testing.T) {
 	for _, synch := range []bool{false, true} {
 		failures, successes := 0, 0
-		for after := int64(0); after < 24; after++ {
-			m, budget := rationalManager(t, synch)
+		for after := int64(0); after < 128; after++ {
+			m, budget := rationalPublicationDirectOwner(t, synch)
 			out := NewRational()
 			budget.FailAfter(after)
 			err := m.SetFraction(&out, math.MinInt64, math.MaxUint64)
 			qopsAuditLiveOwnership(t, m, []*Int{&out.num, &out.den})
+			if err != nil {
+				setterPairPrefix(t, m, &out, "0", "1", big.NewInt(math.MinInt64), new(big.Int).SetUint64(math.MaxUint64), false)
+			}
 			budget.FailAfter(-1)
 			if err != nil {
 				failures++
-				if !errors.Is(err, arena.ErrInjectedFailure) || rationalString(t, m, &out) != "0" {
+				if !numericPhysicalReservationRefusal(err) {
 					t.Fatal(after, err)
 				}
 			} else {
@@ -673,24 +690,23 @@ func TestRationalColdSetterFailureCleanup(t *testing.T) {
 func TestRationalColdInverseFailureCleanup(t *testing.T) {
 	for _, synch := range []bool{false, true} {
 		failures, successes := 0, 0
-		for after := int64(0); after < 24; after++ {
-			m, budget := rationalManager(t, synch)
+		for after := int64(0); after < 128; after++ {
+			m, budget := rationalPublicationDirectOwner(t, synch)
 			a := Rational{num: NewInt(math.MinInt32), den: NewInt(1)}
 			budget.FailAfter(after)
 			err := m.Inv(&a, &a)
+			qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den})
 			budget.FailAfter(-1)
 			if err != nil {
 				failures++
-				if !errors.Is(err, arena.ErrInjectedFailure) || rationalString(t, m, &a) != "-2147483648" {
+				if !numericPhysicalReservationRefusal(err) || rationalString(t, m, &a) != "-2147483648" {
 					t.Fatal(after, err)
 				}
-				if err = m.Inv(&a, &a); err != nil {
-					t.Fatal(err)
-				}
+				// No arithmetic retry after failure: the original source state is independently checked.
 			} else {
 				successes++
 			}
-			if rationalString(t, m, &a) != "-1/2147483648" {
+			if err == nil && rationalString(t, m, &a) != "-1/2147483648" {
 				t.Fatal(after)
 			}
 			m.Close()
@@ -702,4 +718,55 @@ func TestRationalColdInverseFailureCleanup(t *testing.T) {
 			t.Fatal("cold inverse boundary", failures, successes)
 		}
 	}
+}
+
+// Exact paired actions for SetParts/SetFraction: NUM acts before DEN, and
+// normalization divides NUM before DEN. This is not a Cartesian prefix model.
+func setterPairPrefix(t *testing.T, m *RationalManager, out *Rational, oldN, oldD string, n, d *big.Int, copyGrowth bool) {
+	t.Helper()
+	component := func(v *Int) string {
+		if v.cell == m.z.failedRef {
+			if !copyGrowth {
+				t.Fatal("scalar initial allocation cannot publish failed Copy token")
+			}
+			return "failed"
+		}
+		return roundPublicationDecode(t, m.z, v).String()
+	}
+	nn, dd := component(&out.num), component(&out.den)
+	normalized := new(big.Rat).SetFrac(n, d)
+	allowed := [][2]string{{oldN, oldD}, {n.String(), oldD}, {n.String(), d.String()}, {normalized.Num().String(), d.String()}, {normalized.Num().String(), normalized.Denom().String()}}
+	if copyGrowth {
+		allowed = append(allowed, [2]string{"failed", oldD}, [2]string{n.String(), "failed"})
+	}
+	for _, p := range allowed {
+		if nn == p[0] && dd == p[1] {
+			return
+		}
+	}
+	t.Fatal("outside source setter paired actions", nn, dd, allowed)
+}
+func wantSetterNumerator(op int, n *big.Int) *big.Int {
+	if op == 2 {
+		return big.NewInt(math.MinInt64)
+	}
+	return n
+}
+func wantSetterDenominator(op int, d *big.Int) *big.Int {
+	if op == 2 {
+		return new(big.Int).SetUint64(math.MaxUint64)
+	}
+	return d
+}
+
+// Raw source component inspection after a failed action must not consume or
+// allocate the formatter's numerical scratch. No normalization hides aliases.
+func rationalIndependentString(t *testing.T, m *RationalManager, a *Rational) string {
+	t.Helper()
+	n := roundPublicationDecode(t, m.z, &a.num).String()
+	d := roundPublicationDecode(t, m.z, &a.den).String()
+	if d == "1" {
+		return n
+	}
+	return n + "/" + d
 }

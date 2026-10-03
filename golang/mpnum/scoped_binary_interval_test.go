@@ -61,7 +61,7 @@ func TestBinaryIntervalFailurePrefixes(t *testing.T) {
 				case 7:
 					e = m.AddInteger(&a, &large, out)
 				}
-				if e != nil && !errors.Is(e, arena.ErrInjectedFailure) {
+				if e != nil && !numericPhysicalReservationRefusal(e) {
 					t.Fatal(op, alias, prefix, e)
 				}
 				extra := BinaryInterval{lower: BinaryRational{num: large}} // Nonowning audit view.
@@ -119,12 +119,22 @@ func TestBinaryIntervalFailurePrefixes(t *testing.T) {
 		}
 	}
 	// Neg lower publication precedes failing INT_MIN negation on upper.
-	m := intervalManager(t)
+	z, _ := mpzPublicationDirectOwner(t)
+	diagnostics, e := NewRationalService(serviceConfig(z.budget))
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, diagnostics.Close()) })
+	bounds, e := NewBinaryRationalManager(z, BinaryRationalConfig{Diagnostics: diagnostics})
+	serviceMust(t, e)
+	t.Cleanup(bounds.Close)
+	m, e := NewBinaryIntervalManager(bounds)
+	serviceMust(t, e)
+	t.Cleanup(m.Close)
 	a := BinaryInterval{lower: NewBinaryInt(-5), upper: NewBinaryInt(-2147483648)}
 	m.bounds.z.budget.FailAfter(0)
-	e := m.Neg(&a)
+	e = m.Neg(&a)
+	intervalAudit(t, m, &a) // Audit before disabling the physical fault.
 	m.bounds.z.budget.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) || a.lower.num.val != 5 || a.upper.num.val != -2147483648 {
+	if !numericPhysicalReservationRefusal(e) || a.lower.num.val != 5 || a.upper.num.val != -2147483648 {
 		t.Fatal("neg source prefix", e, a)
 	}
 	intervalAudit(t, m, &a)
@@ -191,7 +201,7 @@ func TestBinaryIntervalFormattingAndWarmStorage(t *testing.T) {
 	m.bounds.z.budget.FailAfter(0)
 	_, e := m.FormatInto(&a, dst[:])
 	m.bounds.z.budget.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) || dst != before {
+	if !numericPhysicalReservationRefusal(e) || dst != before {
 		t.Fatal("format growth publication", e)
 	}
 	intervalAudit(t, m, &a, &b, &c)
@@ -212,7 +222,7 @@ func TestBinaryIntervalPredicateShortCircuits(t *testing.T) {
 	m.bounds.z.budget.FailAfter(0)
 	_, e = m.bounds.LessEqual(&b.upper, &a.lower)
 	m.bounds.z.budget.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
+	if !numericPhysicalReservationRefusal(e) {
 		t.Fatal("second comparison did not require storage", e)
 	}
 	intervalAudit(t, m, &a, &b)
@@ -233,7 +243,7 @@ func TestBinaryIntervalOwnerAndScope(t *testing.T) {
 	b := m.bounds.z.budget
 	baseline := b.Used()
 	b.FailAfter(0)
-	if _, e := NewBinaryIntervalManager(m.bounds); !errors.Is(e, arena.ErrInjectedFailure) {
+	if _, e := NewBinaryIntervalManager(m.bounds); !numericPhysicalReservationRefusal(e) {
 		t.Fatal(e)
 	}
 	if b.Used() != baseline {
@@ -241,7 +251,7 @@ func TestBinaryIntervalOwnerAndScope(t *testing.T) {
 	}
 	b.FailAfter(-1)
 	b.FailAfter(0)
-	if _, e := NewScopedBinaryInterval(m); !errors.Is(e, arena.ErrInjectedFailure) {
+	if _, e := NewScopedBinaryInterval(m); !numericPhysicalReservationRefusal(e) {
 		t.Fatal(e)
 	}
 	if b.Used() != baseline {

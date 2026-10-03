@@ -239,7 +239,7 @@ func TestNumberTheoryFailurePrefixRootsBeforeFormatting(t *testing.T) {
 				qopsAuditLiveOwnership(t, m, []*Int{&as[0].num, &as[0].den, &as[1].num, &as[1].den, &as[2].num, &as[2].den, &a.num, &a.den, &b.num, &b.den, &g.num, &g.den})
 			}
 			budget.FailAfter(-1)
-			if e != nil && !errors.Is(e, arena.ErrInjectedFailure) {
+			if e != nil && !numericPhysicalReservationRefusal(e) {
 				t.Fatal("unexpected source prefix failure", operation, prefix, e)
 			}
 			if e == nil {
@@ -310,16 +310,24 @@ func TestNumberTheoryRationalResetPrefixAndOutputAliasing(t *testing.T) {
 	e := m.ExtendedGCD(&r1, &r2, &a, &b, &g)
 	qopsAuditLiveOwnership(t, m, []*Int{&r1.num, &r1.den, &r2.num, &r2.den, &a.num, &a.den, &b.num, &b.den, &g.num, &g.den})
 	budget.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) || a.den != NewInt(1) || b.den != NewInt(1) || g.den != NewInt(1) {
+	if !numericPhysicalReservationRefusal(e) || a.den != NewInt(1) || b.den != NewInt(1) || g.den != NewInt(1) {
 		t.Fatal("source denominator reset precedes local allocation", e)
 	}
 	qopsMust(t, m.SetInt64(&r1, -26))
 	qopsMust(t, m.SetInt64(&r2, 7))
+	// The pooled metadata-refusal prefix reaches an invalid source scratch
+	// access during this aliased continuation. The direct debug refusal occurs
+	// earlier, leaving that path intact through the source Bezout assertion.
 	e = m.ExtendedGCD(&r1, &r2, &r1, &b, &g)
 	qopsAuditLiveOwnership(t, m, []*Int{&r1.num, &r1.den, &r2.num, &r2.den, &a.num, &a.den, &b.num, &b.den, &g.num, &g.den})
-	if !errors.Is(e, arena.ErrInvalidSlot) {
-		t.Fatal("destroyed source scratch is not repaired on continuation", e)
+	wantContinuation := error(arena.ErrInvalidSlot)
+	if sourceExtendedGCDDebug {
+		wantContinuation = errExtendedGCDInvariant
 	}
+	if !errors.Is(e, wantContinuation) {
+		t.Fatal("source-profile completed prefix continuation", e)
+	}
+
 	for _, q := range []*Rational{&r1, &r2, &a, &b, &g} {
 		qopsMust(t, m.Del(q))
 	}

@@ -56,3 +56,9 @@ RED observations in the working tree, implement the corresponding fix, and
 require passing full native and checked/debug suites before committing. Preserve
 meaningful assertions; do not hide existing failures with tags or skips. Continue
 committing small coherent changes frequently once these checks are green.
+
+The exhaustive checked/debug refinement fault sweep retains the original
+100-bit precision and every actual reservation prefix. It can exceed Go's
+default ten-minute timeout. Use `go test -tags g3checked,g3debug ./... -timeout=30m` for the full
+checked/debug gate; do not truncate that campaign
+to fit the default timeout. Native full validation remains `go test ./...`.
