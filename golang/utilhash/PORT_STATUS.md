@@ -69,3 +69,156 @@ Independent tests include a 6,000-operation finite Go-map oracle (Go maps are te
 Assigned variant audit: all table2map/u_map operations and applicable core algorithms have counterparts. General core dump requires streamable data; source `_key_data<unsigned,unsigned>` has no ostream operator, so that latent method is not callable for this instantiation and no invented Go rendering format was added. Other hash/equality/storage specializations, optional enabled HASHTABLE_STATISTICS accounting, generic streamable-table dump, direct-index uint_map<T*>, and UintSet-key map demo integration remain explicitly unported separate components. This is a concrete source specialization, not a completed generic hash-table/map subsystem.
 
 Final packet gates: CGO-disabled native and g3checked tests, vet, actual js/wasm execution (Node v22.22.2 with toolchain-matched clean-environment wrapper) and WASI cross-build pass, including bitset dependency tests. Existing custom-toolchain WASI startup limitation remains recorded separately. Coordinator additionally reported fresh-cache verbose JS execution of all UintMap tests and full-module release/checked/race/vet/WASI-build gates passing. No Go generic declaration or instantiation is introduced.
+
+## Borrowed C-string hashtable packet — partial owner-bound specialization
+
+Added `str_hashtable.go` and `str_hashtable_test.go` for
+`src/util/str_hashtable.h`'s `ptr_hashtable<char,str_hash_proc,str_eq_proc>` and
+its applicable core_hashtable/ptr_hash_entry algorithms. Copyright Microsoft
+2006, Leonardo de Moura. This packet supplies the owner-bound string set needed
+by the symbol interner; it does **not** claim the full arbitrary-pointer source
+container, the separate string→int map, symbol service, or scoped symbol bindings.
+
+| Assigned source operation | Owner-bound counterpart / remaining scope |
+| --- | --- |
+| str_hash_proc strlen/string_hash(seed17), str_eq_proc strcmp equality | `CString`, `Hash`, `Equal`, `FindCString`; first-NUL prefix, raw byte equality |
+| ptr_hashtable/core constructor, explicit initial_capacity | `NewStrHashtable`, config `InitialCapacity` (zero selects8), source power-of-two capacities including1/2/4 |
+| core copy constructor/destructor | `Clone`, `Close`; shallow spelling borrows, owned scalar table only |
+| ptr_hash_entry cached hash, pointer data, FREE/DELETED state | `strHashEntry`, ref `Hash`/`Key`/`SetKey`, explicit scalar state replaces reserved pointer0/1 |
+| alloc_table/delete_table, copy_table/move_table/expand_table/cleanup | `allocateTable`, table charge release, `copyStrTable`, `rehash`, `prepareInsert`; no byte copies/releases |
+| insert const/rvalue; insert-if-absent core/ref/entry | `Insert`, `InsertIfNotThereCore`, `InsertIfNotThere`, `InsertIfNotThere2`; scalar borrow copying requires no spelling allocation |
+| find_core/find data output/contains/find iterator | `FindCore`, `Find`/`FindInto`, `Contains`, `FindIterator` |
+| begin/end and iterator scan/dereference/arrow/prefix/postfix/equality | `Begin`/`End`, `scan`, `Ref`/`Key`, `Next`/`PostNext`, `Equal` and negation; ordinary cold iterator value assignment |
+| remove/erase, reset/finalize | `Remove`/`Erase`, `Reset`/`Finalize`; pointer sentinel transitions drop the table reference without freeing bytes |
+| empty/size/capacity, invariant/collision count | matching concrete methods; source disabled collision statistics returnzero |
+| dump ostream of char pointers | `Dump`, exact bracket/space byte rendering in ascending buckets |
+| swap | `Swap` exchanges table and borrowed region binding; owner header/budget/callback stay fixed |
+| core assignment/union/intersection | `Assign`/`Union`/`Intersect` for a shared region; **multi-region variants remain unported** and return ErrConfig before mutation |
+| source interner external input then owned spelling replacement | additional `PrepareFindCString` and equal-only ref `SetKey`; source symbol service is a separate packet |
+
+Storage/lifetime: a cold table binds one borrowed `*arena.BytesRegion`. Each
+32-byte pointer-free entry stores hash/state and a `StrKey` containing region
+slot/generation, byte offset, C-string logical length and uint64 origin identity.
+No per-spelling object, Go string, Go map, interface, generic declaration, raw
+pointer or unsafe storage occurs in hot records. `BytesRegion.OwnerID` is stable
+through reset/rollback/Close and prevents a foreign StrKey with numerically equal
+slot/generation/offset from accessing the wrong region. Same-region clones and
+independently constructed tables accept each other's keys. Raw BytesRegionRef
+arguments to CString retain the arena's explicit owner-local token precondition;
+the returned opaque StrKey carries the origin and is checked at table boundaries.
+
+CString scans within the allocation to its first NUL; empty strings require a
+live terminating byte. Explicit offset permits borrowing a spelling after its
+source hash prefix. Input bytes must remain immutable and live while borrowed;
+region rollback/reset/Close makes affected key accesses return typed invalid-slot
+or closed errors. Table destruction, removal, reset, rehash and clone never call
+region Allocate/Write/Free/Close. Source ptr_hash_entry removal overwrites its
+pointer with FREE/DELETED sentinels; the table's key descriptor is cleared on
+those transitions, while the region allocation remains owned independently.
+Clone preserves the exact borrowed descriptor, not a newly allocated spelling.
+
+Hash seed is17 and uses the existing validated Jenkins core via WordReader,
+assembling little-endian source word loads from byte reads and signed-char tails.
+The first NUL and every suffix byte are excluded, unlike utilhash.String's
+explicit-length behavior. strcmp equality is raw unsigned-byte identity; no
+Unicode normalization, rune conversion or case folding is applied. Cached
+uint32 hashes are copied during rehash/clone, never recalculated for placement.
+Entry SetKey models the symbol interner replacing its temporary source pointer
+with an owned pointer, and checks equal spelling/hash so no invalid cached hash
+can be silently introduced. It preserves the entry borrow; structural membership
+changes, reallocation/reset/swap invalidate cold owner/epoch/slot refs and cursors.
+
+Exact table behavior remains source linear probing with wrapped ascending slots,
+last-tombstone reuse only after finding FREE, strict `(size+deleted)*4 > cap*3`
+growth before even duplicate lookup, FREE removal only when the next wrapped
+bucket is FREE, and cleanup only when deleted>size and deleted>64. The cold
+OutOfMemory callback suppresses cleanup. Reset counts only buckets already FREE
+before clearing, halves at most once when cap>16 and free*4>cap*3, and returns
+early for empty-clean tables. Finalize uses64 only above64. Stats reports only
+table owner/header and array charges; the borrowed region reports its graph
+separately. Array reservations bound old+new allocation peaks. Cross-budget Swap
+pre-reserves both incoming arrays, rolls back if the second reserve fails, and
+exchanges binding/table/counters only after success, with exhausted epochs checked
+upfront. It neither transfers region budget charges nor assumes region ownership.
+
+Allocation adaptations: failed constructor/rehash/Clone leave no table charge
+leak; failed expansion leaves membership and refs intact. Reset/finalize reserve
+a replacement before destroying old data, so predictable failures preserve the
+old table rather than the source unsafe post-delete failure. Remove occurs
+before cleanup allocation, so failed cleanup returns an error with removal and
+tombstones retained, matching source action order. Multi-entry operations remain
+source-ordered partial updates rather than transactions. Capacity beyond the
+safe source uint32 load-predicate range and platform slice bounds is diagnosed.
+
+PrepareFindCString performs source growth-before-duplicate lookup using a
+transient Go string prefix; no query string is retained in entries. A missing
+query leaves no pending borrowed entry: the caller allocates an owner spelling
+and publishes it with InsertIfNotThereCore. This allows safe failure before
+publication instead of the source interner's dangling temporary after region
+allocation failure. Source serialized owner access must encompass that sequence.
+It returns only an epoch-checked cold ref on hits, never a mutable table pointer.
+
+Remaining source gap: arbitrary pointer spellings can originate in several
+independent owners, whereas this concrete table has one region binding. The
+full source multi-origin Assign/Union/Intersect are **not ported**; future work
+requires a concrete cold owner directory and scalar origin records, not silent
+foreign-ref reinterpretation. Swap already supports different bound regions.
+Table byte-pool mutation/marking ownership is caller-owned; spelling regions
+must outlive all borrowing tables. Optional enabled HASHTABLE_STATISTICS counters
+and arbitrary-address/C API pointer compatibility remain separate adaptations.
+
+TDD: the first test packet was RED on missing StrHashtable/BytesRegion APIs.
+Stats, initial capacity, and foreign-origin tests were RED before implementation;
+the arena's approved OwnerID hook made origin tests GREEN. There is no standalone
+active str_hashtable test file. This packet tests its source algorithms directly
+with finite expectations and a 900-step independent byte-string membership
+oracle (Go maps only in tests). Active `src/test/map.cpp` has14 string→int map
+assertions and remains a separate variant; `src/test/symbol.cpp`'s23 assertions
+and `symbol_table.cpp`'s10 scoped assertions likewise remain separate work here.
+No claim substitutes a borrowed set for those original value/binding tests.
+
+Finite hash constants for empty/foo/boo, lengths11/12/13 and high bytes80/ff
+were collected from actual source hash.cpp with GCC into golang/.cache and
+recorded inline with the exact permanent test inputs. Tests are hermetic and
+do not compile C++, read source headers, or need testdata. The initial reference
+g++ command omitted TMPDIR: temporary compiler intermediates may have used /tmp;
+its source/output were under golang/.cache and no persistent external artifacts
+remain. This was reported immediately, and subsequent tool/compiler commands
+set TMPDIR/GOTMPDIR/GOCACHE beneath golang as required.
+
+Coverage includes C-string truncation/nonzero offsets/empty/unterminated input,
+raw high bytes and source dump format, equal-key pointer overwrite/absent pointer
+retention, borrowed clone/removal/reset/close, scoped rollback invalidation,
+foreign-origin rejection, cached-hash replacement, small initial capacities,
+wrapped probing, last tombstone reuse, strict growth/cleanup/reset boundaries,
+OOM skip, constructor/expansion/Clone/reset/finalize failure, old+new peak refusal,
+partial deletion before failed cleanup, cross-budget cross-region Swap rollback,
+postfix/cold borrow lifetimes, same-owner operators and unsupported multi-owner
+errors. Warmed FindCString/Insert allocate zero Go objects in AllocsPerRun.
+
+Packet gates: CGO-disabled native and g3checked utilhash tests, vet, actual
+fresh-count JS/wasm execution using Node v22.22.2, WASI cross-build and no-generics
+portcheck pass. The recorded custom-Go WASI startup limitation remains an
+execution caveat; this packet makes no WASI execution claim. Completion is
+**partial owner-bound StrHashtable**, with the multi-origin source operations
+listed above remaining for a later concrete specialization.
+
+Central review correction: structural epoch exhaustion now returns typed
+ErrBounds before new-entry publication, table reservation/rehash, removal,
+nonempty reset/finalize replacement, or either side of Swap. Existing-key
+overwrite, missing removal, empty-clean Reset/Finalize and self-Swap remain
+available when no structural change is needed. If removal consumes the final
+epoch, subsequent cleanup fails before reservation while retaining that source
+ordered removal/tombstone action. Close always releases storage and invalidates
+borrows via closed state, skipping an unavailable increment instead of panicking
+after release. Tests were first RED on a post-mutation epoch panic, then GREEN
+with canBump preflight, including both Swap owners and unchanged charges/entries/
+borrows after refusal. This supersedes the earlier general exhaustion wording
+with explicit failure boundaries; no epoch is recycled or wrapped.
+
+Interner preparation correction: a PrepareFindCString miss additionally checks
+canBump before returning success, so an exhausted table refuses **before** the
+serialized caller allocates its owned spelling. An existing hit without growth
+still succeeds at maximum epoch. Source growth-before-lookup is unchanged. The
+new miss test was RED on nil error at maximum epoch, then GREEN after this
+preflight; preparation leaves table contents and charges unchanged on refusal.

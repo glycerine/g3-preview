@@ -85656,7 +85656,8 @@
       "status": "partial",
       "go_targets": [
         "utilhash/uint_map.go",
-        "bitset/uint_set_map.go"
+        "bitset/uint_set_map.go",
+        "utilhash/str_hashtable.go"
       ],
       "tests": [
         "TestUintMapSourceMapAssertions",
@@ -85684,7 +85685,19 @@
         "TestUintSetMapGrowthTombstonesAndReset",
         "TestUintSetMapCleanupAndOutOfMemory",
         "TestUintSetMapCopyAssignmentShapeAndIterator",
-        "TestUintSetMapRehashFailureAndTemporaryCopies"
+        "TestUintSetMapRehashFailureAndTemporaryCopies",
+        "TestStrHashtableSourceHashCStringAndEquality",
+        "TestStrHashtableBorrowedLifetimeAndReplacement",
+        "TestStrHashtableSourceProbeThresholdAndTombstones",
+        "TestStrHashtableOperationsAndOutput",
+        "TestStrHashtableIndependentOracleAndCStringLookup",
+        "TestStrHashtableBudgetsSwapAndStaleViews",
+        "TestStrHashtableDumpCStringBytes",
+        "TestStrHashtableKeyOwnerAndStats",
+        "TestStrHashtableCleanupResetAndFailurePeaks",
+        "TestStrHashtableSourceInitialCapacity",
+        "TestStrHashtablePartialRemovalAndStrictReset",
+        "TestStrHashtableEpochExhaustion"
       ],
       "conditionals": [
         {
@@ -85987,16 +86000,114 @@
             "TestUintSetMapCopyAssignmentShapeAndIterator",
             "TestUintSetMapRehashFailureAndTemporaryCopies"
           ]
+        },
+        {
+          "name": "single-region str_hash_proc/str_eq_proc NUL-prefix source hashing/equality",
+          "status": "ported",
+          "go_target": "utilhash/str_hashtable.go",
+          "tests": [
+            "TestStrHashtableSourceHashCStringAndEquality",
+            "TestStrHashtableBorrowedLifetimeAndReplacement",
+            "TestStrHashtableSourceProbeThresholdAndTombstones",
+            "TestStrHashtableOperationsAndOutput",
+            "TestStrHashtableIndependentOracleAndCStringLookup",
+            "TestStrHashtableBudgetsSwapAndStaleViews",
+            "TestStrHashtableDumpCStringBytes",
+            "TestStrHashtableKeyOwnerAndStats",
+            "TestStrHashtableCleanupResetAndFailurePeaks",
+            "TestStrHashtableSourceInitialCapacity",
+            "TestStrHashtablePartialRemovalAndStrictReset",
+            "TestStrHashtableEpochExhaustion"
+          ]
+        },
+        {
+          "name": "single-region borrowed string insertion/find/remove/rehash/reset/finalize/clone/cached entry replacement",
+          "status": "ported",
+          "go_target": "utilhash/str_hashtable.go",
+          "tests": [
+            "TestStrHashtableSourceHashCStringAndEquality",
+            "TestStrHashtableBorrowedLifetimeAndReplacement",
+            "TestStrHashtableSourceProbeThresholdAndTombstones",
+            "TestStrHashtableOperationsAndOutput",
+            "TestStrHashtableIndependentOracleAndCStringLookup",
+            "TestStrHashtableBudgetsSwapAndStaleViews",
+            "TestStrHashtableDumpCStringBytes",
+            "TestStrHashtableKeyOwnerAndStats",
+            "TestStrHashtableCleanupResetAndFailurePeaks",
+            "TestStrHashtableSourceInitialCapacity",
+            "TestStrHashtablePartialRemovalAndStrictReset",
+            "TestStrHashtableEpochExhaustion"
+          ]
+        },
+        {
+          "name": "single-region borrowed table assignment/union/intersection",
+          "status": "ported",
+          "go_target": "utilhash/str_hashtable.go",
+          "tests": [
+            "TestStrHashtableSourceHashCStringAndEquality",
+            "TestStrHashtableBorrowedLifetimeAndReplacement",
+            "TestStrHashtableSourceProbeThresholdAndTombstones",
+            "TestStrHashtableOperationsAndOutput",
+            "TestStrHashtableIndependentOracleAndCStringLookup",
+            "TestStrHashtableBudgetsSwapAndStaleViews",
+            "TestStrHashtableDumpCStringBytes",
+            "TestStrHashtableKeyOwnerAndStats",
+            "TestStrHashtableCleanupResetAndFailurePeaks",
+            "TestStrHashtableSourceInitialCapacity",
+            "TestStrHashtablePartialRemovalAndStrictReset",
+            "TestStrHashtableEpochExhaustion"
+          ]
+        },
+        {
+          "name": "cross-region borrowed binding swap with atomic table budget transfer",
+          "status": "ported",
+          "go_target": "utilhash/str_hashtable.go",
+          "tests": [
+            "TestStrHashtableSourceHashCStringAndEquality",
+            "TestStrHashtableBorrowedLifetimeAndReplacement",
+            "TestStrHashtableSourceProbeThresholdAndTombstones",
+            "TestStrHashtableOperationsAndOutput",
+            "TestStrHashtableIndependentOracleAndCStringLookup",
+            "TestStrHashtableBudgetsSwapAndStaleViews",
+            "TestStrHashtableDumpCStringBytes",
+            "TestStrHashtableKeyOwnerAndStats",
+            "TestStrHashtableCleanupResetAndFailurePeaks",
+            "TestStrHashtableSourceInitialCapacity",
+            "TestStrHashtablePartialRemovalAndStrictReset",
+            "TestStrHashtableEpochExhaustion"
+          ]
+        },
+        {
+          "name": "source bucket-order string dump/iterator and disabled-statistics collision count",
+          "status": "ported",
+          "go_target": "utilhash/str_hashtable.go",
+          "tests": [
+            "TestStrHashtableSourceHashCStringAndEquality",
+            "TestStrHashtableBorrowedLifetimeAndReplacement",
+            "TestStrHashtableSourceProbeThresholdAndTombstones",
+            "TestStrHashtableOperationsAndOutput",
+            "TestStrHashtableIndependentOracleAndCStringLookup",
+            "TestStrHashtableBudgetsSwapAndStaleViews",
+            "TestStrHashtableDumpCStringBytes",
+            "TestStrHashtableKeyOwnerAndStats",
+            "TestStrHashtableCleanupResetAndFailurePeaks",
+            "TestStrHashtableSourceInitialCapacity",
+            "TestStrHashtablePartialRemovalAndStrictReset",
+            "TestStrHashtableEpochExhaustion"
+          ]
         }
       ],
       "ownership": [
         "Concrete scalar u_map<uint32> specialization with budgeted cold header and pointer-free entries. Other key/entry variants and source string map or Windows sentinel set remain unported. See utilhash/PORT_STATUS.md.",
-        "Scalar owned key refs preserve synthesized capacity-copy assignment and retained FREE/DELETED payloads. Rehash duplicates used keys before old table destruction; Swap moves owners without key-copy actions. See bitset/PORT_STATUS.md."
+        "Scalar owned key refs preserve synthesized capacity-copy assignment and retained FREE/DELETED payloads. Rehash duplicates used keys before old table destruction; Swap moves owners without key-copy actions. See bitset/PORT_STATUS.md.",
+        "StrHashtable borrows immutable region spellings through scalar origin/ref/offset/length records. Table lifecycle never copies/frees spellings; cold owner/table budgets and safe epochs are audited. Full multi-origin Assign/Union/Intersect/general pointer borrowing remain unported. See utilhash/PORT_STATUS.md."
       ],
       "deviations": [
         "Checked cold owner/epoch snapshots replace borrowed entry pointers; structural mutation invalidates snapshots.",
         "Budgeted reset/finalize/cross-owner swap reserve before publication. A failed post-removal tombstone cleanup preserves the completed removal.",
-        "Readonly owner/epoch key views replace mutable raw borrows. Predictable replacement failure preserves old contents and adds documented peak storage; partial bulk operations remain source ordered."
+        "Readonly owner/epoch key views replace mutable raw borrows. Predictable replacement failure preserves old contents and adds documented peak storage; partial bulk operations remain source ordered.",
+        "C pointers/sentinels become scalar keys and FREE/DELETED/USED states with cold checked entry/iterator wrappers. Owner-local raw region refs must not be reinterpreted across regions; opaque keys diagnose origin mismatch.",
+        "Predictable reset/finalize/rehash failures prepare replacements before publication. Epoch exhaustion preflights structural mutation; Close always releases even at max epoch. Preparation rejects exhausted-epoch misses before caller spelling allocation, while existing hits remain valid."
       ]
     },
     {
@@ -101027,9 +101138,24 @@
       "sha256": "e6bbfd47cff10b6def5cc1ab1ea5a4d3a47da70e39a9d51de2f063b59dca22a5",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "utilhash/str_hashtable.go"
+      ],
+      "tests": [
+        "TestStrHashtableSourceHashCStringAndEquality",
+        "TestStrHashtableBorrowedLifetimeAndReplacement",
+        "TestStrHashtableSourceProbeThresholdAndTombstones",
+        "TestStrHashtableOperationsAndOutput",
+        "TestStrHashtableIndependentOracleAndCStringLookup",
+        "TestStrHashtableBudgetsSwapAndStaleViews",
+        "TestStrHashtableDumpCStringBytes",
+        "TestStrHashtableKeyOwnerAndStats",
+        "TestStrHashtableCleanupResetAndFailurePeaks",
+        "TestStrHashtableSourceInitialCapacity",
+        "TestStrHashtablePartialRemovalAndStrictReset",
+        "TestStrHashtableEpochExhaustion"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -101042,9 +101168,110 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "single-region str_hash_proc/str_eq_proc NUL-prefix source hashing/equality",
+          "status": "ported",
+          "go_target": "utilhash/str_hashtable.go",
+          "tests": [
+            "TestStrHashtableSourceHashCStringAndEquality",
+            "TestStrHashtableBorrowedLifetimeAndReplacement",
+            "TestStrHashtableSourceProbeThresholdAndTombstones",
+            "TestStrHashtableOperationsAndOutput",
+            "TestStrHashtableIndependentOracleAndCStringLookup",
+            "TestStrHashtableBudgetsSwapAndStaleViews",
+            "TestStrHashtableDumpCStringBytes",
+            "TestStrHashtableKeyOwnerAndStats",
+            "TestStrHashtableCleanupResetAndFailurePeaks",
+            "TestStrHashtableSourceInitialCapacity",
+            "TestStrHashtablePartialRemovalAndStrictReset",
+            "TestStrHashtableEpochExhaustion"
+          ]
+        },
+        {
+          "name": "single-region borrowed string insertion/find/remove/rehash/reset/finalize/clone/cached entry replacement",
+          "status": "ported",
+          "go_target": "utilhash/str_hashtable.go",
+          "tests": [
+            "TestStrHashtableSourceHashCStringAndEquality",
+            "TestStrHashtableBorrowedLifetimeAndReplacement",
+            "TestStrHashtableSourceProbeThresholdAndTombstones",
+            "TestStrHashtableOperationsAndOutput",
+            "TestStrHashtableIndependentOracleAndCStringLookup",
+            "TestStrHashtableBudgetsSwapAndStaleViews",
+            "TestStrHashtableDumpCStringBytes",
+            "TestStrHashtableKeyOwnerAndStats",
+            "TestStrHashtableCleanupResetAndFailurePeaks",
+            "TestStrHashtableSourceInitialCapacity",
+            "TestStrHashtablePartialRemovalAndStrictReset",
+            "TestStrHashtableEpochExhaustion"
+          ]
+        },
+        {
+          "name": "single-region borrowed table assignment/union/intersection",
+          "status": "ported",
+          "go_target": "utilhash/str_hashtable.go",
+          "tests": [
+            "TestStrHashtableSourceHashCStringAndEquality",
+            "TestStrHashtableBorrowedLifetimeAndReplacement",
+            "TestStrHashtableSourceProbeThresholdAndTombstones",
+            "TestStrHashtableOperationsAndOutput",
+            "TestStrHashtableIndependentOracleAndCStringLookup",
+            "TestStrHashtableBudgetsSwapAndStaleViews",
+            "TestStrHashtableDumpCStringBytes",
+            "TestStrHashtableKeyOwnerAndStats",
+            "TestStrHashtableCleanupResetAndFailurePeaks",
+            "TestStrHashtableSourceInitialCapacity",
+            "TestStrHashtablePartialRemovalAndStrictReset",
+            "TestStrHashtableEpochExhaustion"
+          ]
+        },
+        {
+          "name": "cross-region borrowed binding swap with atomic table budget transfer",
+          "status": "ported",
+          "go_target": "utilhash/str_hashtable.go",
+          "tests": [
+            "TestStrHashtableSourceHashCStringAndEquality",
+            "TestStrHashtableBorrowedLifetimeAndReplacement",
+            "TestStrHashtableSourceProbeThresholdAndTombstones",
+            "TestStrHashtableOperationsAndOutput",
+            "TestStrHashtableIndependentOracleAndCStringLookup",
+            "TestStrHashtableBudgetsSwapAndStaleViews",
+            "TestStrHashtableDumpCStringBytes",
+            "TestStrHashtableKeyOwnerAndStats",
+            "TestStrHashtableCleanupResetAndFailurePeaks",
+            "TestStrHashtableSourceInitialCapacity",
+            "TestStrHashtablePartialRemovalAndStrictReset",
+            "TestStrHashtableEpochExhaustion"
+          ]
+        },
+        {
+          "name": "source bucket-order string dump/iterator and disabled-statistics collision count",
+          "status": "ported",
+          "go_target": "utilhash/str_hashtable.go",
+          "tests": [
+            "TestStrHashtableSourceHashCStringAndEquality",
+            "TestStrHashtableBorrowedLifetimeAndReplacement",
+            "TestStrHashtableSourceProbeThresholdAndTombstones",
+            "TestStrHashtableOperationsAndOutput",
+            "TestStrHashtableIndependentOracleAndCStringLookup",
+            "TestStrHashtableBudgetsSwapAndStaleViews",
+            "TestStrHashtableDumpCStringBytes",
+            "TestStrHashtableKeyOwnerAndStats",
+            "TestStrHashtableCleanupResetAndFailurePeaks",
+            "TestStrHashtableSourceInitialCapacity",
+            "TestStrHashtablePartialRemovalAndStrictReset",
+            "TestStrHashtableEpochExhaustion"
+          ]
+        }
+      ],
+      "ownership": [
+        "StrHashtable borrows immutable region spellings through scalar origin/ref/offset/length records. Table lifecycle never copies/frees spellings; cold owner/table budgets and safe epochs are audited. Full multi-origin Assign/Union/Intersect/general pointer borrowing remain unported. See utilhash/PORT_STATUS.md."
+      ],
+      "deviations": [
+        "C pointers/sentinels become scalar keys and FREE/DELETED/USED states with cold checked entry/iterator wrappers. Owner-local raw region refs must not be reinterpreted across regions; opaque keys diagnose origin mismatch.",
+        "Predictable reset/finalize/rehash failures prepare replacements before publication. Epoch exhaustion preflights structural mutation; Close always releases even at max epoch. Preparation rejects exhausted-epoch misses before caller spelling allocation, while existing hits remain valid."
+      ]
     },
     {
       "path": "src/util/stream_buffer.h",

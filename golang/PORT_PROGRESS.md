@@ -225,3 +225,16 @@ RED led to GREEN with independent byte/page models and failure/lifetime checks.
 Region methods/ownership are audited; general page-user bindings remain partial.
 Combined full native/checked races and vet pass; all14 new region cases execute
 under checked Nodejs/wasm, and WASI compilation passes. Full solver remains open.
+
+## Borrowed string hash-table specialization
+
+StrHashtable now preserves source CString hashes/equality, cached hashes,
+linear probing, last tombstones, strict growth/cleanup, bucket order and borrowed
+spelling lifetime. Foreign opaque keys carry scalar region origins. Swap exchanges
+bindings with table data and transfers table charges atomically. Multi-origin
+assignment/union/intersection remain explicit source gaps, not completed methods.
+
+Tests-first RED reached GREEN; central review added RED regressions for epoch
+exhaustion before mutation and before interner allocation. Complete combined
+native/checked races/vet, actual checked JS execution of all12 table tests and
+WASI compilation pass. Owner-local prepared lookup supports the symbol service.
