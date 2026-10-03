@@ -50783,14 +50783,32 @@
       "status": "partial",
       "go_targets": [
         "sat_main_config_descrs.go",
-        "sat_main_config_descrs_test.go"
+        "sat_main_config_descrs_test.go",
+        "sat_main_config.go",
+        "sat_main_config_update.go"
       ],
       "tests": [
         "TestSATMainConfigGeneratedDescriptorBytesAndOrder",
         "TestSATMainConfigGeneratedDescriptorDuplicateSourceInsert",
         "TestSATMainConfigGeneratedDescriptorFailurePrefixes",
         "TestSATMainConfigGeneratedDescriptorLifetime",
-        "TestSATMainConfigGeneratedDescriptorWarmDuplicateAllocations"
+        "TestSATMainConfigGeneratedDescriptorWarmDuplicateAllocations",
+        "TestSATMainConfigActualDefaultsAndIndeterminateGCFields",
+        "TestSATMainConfigAllScalarRoutesAndLocalHiddenFields",
+        "TestSATMainConfigCloneAssignImplicitScalarCopy",
+        "TestSATMainConfigCloneFaultAndSameSymbolsAssignment",
+        "TestSATMainConfigColdSymbolFaultPrefixes",
+        "TestSATMainConfigConstructorFailureAndWarmZeroAllocation",
+        "TestSATMainConfigConstructorPolicyFailureKeepsOnlyBorrowedPrefixes",
+        "TestSATMainConfigCurrentRealModuleAndWrongKindFallback",
+        "TestSATMainConfigEveryPolicyAndDynamicRetention",
+        "TestSATMainConfigIEEEParametersUnrestricted",
+        "TestSATMainConfigInitialMaskAndUnusedDimacsCore",
+        "TestSATMainConfigInvalidRestartAndGCPrefixes",
+        "TestSATMainConfigMegabyteSourceHostWidths",
+        "TestSATMainConfigOwnerAndLifetimeGuards",
+        "TestSATMainConfigSequentialInvalidPhasePrefix",
+        "TestSATMainConfigTypedModuleFallbackAndSeedLocalReread"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -50812,10 +50830,34 @@
           "status": "unported",
           "go_target": "",
           "tests": []
+        },
+        {
+          "name": "complete config constructor/update and implicit scalar/symbol copying; all generated getter routes consumed by config",
+          "status": "ported",
+          "go_target": "sat_main_config_update.go",
+          "tests": [
+            "TestSATMainConfigActualDefaultsAndIndeterminateGCFields",
+            "TestSATMainConfigAllScalarRoutesAndLocalHiddenFields",
+            "TestSATMainConfigCloneAssignImplicitScalarCopy",
+            "TestSATMainConfigCloneFaultAndSameSymbolsAssignment",
+            "TestSATMainConfigColdSymbolFaultPrefixes",
+            "TestSATMainConfigConstructorFailureAndWarmZeroAllocation",
+            "TestSATMainConfigConstructorPolicyFailureKeepsOnlyBorrowedPrefixes",
+            "TestSATMainConfigCurrentRealModuleAndWrongKindFallback",
+            "TestSATMainConfigEveryPolicyAndDynamicRetention",
+            "TestSATMainConfigIEEEParametersUnrestricted",
+            "TestSATMainConfigInitialMaskAndUnusedDimacsCore",
+            "TestSATMainConfigInvalidRestartAndGCPrefixes",
+            "TestSATMainConfigMegabyteSourceHostWidths",
+            "TestSATMainConfigOwnerAndLifetimeGuards",
+            "TestSATMainConfigSequentialInvalidPhasePrefix",
+            "TestSATMainConfigTypedModuleFallbackAndSeedLocalReread"
+          ]
         }
       ],
       "ownership": [
-        "Static collector borrows ParamDescrs; exact literals are read immediately by existing charged dictionary/packed text owners. Caller retains partial source insertion prefix on errors. No intermediate metadata vector or scalar policy owner is introduced. See SAT_CONFIG_DESCRS_PORT_STATUS.md."
+        "Static collector borrows ParamDescrs; exact literals are read immediately by existing charged dictionary/packed text owners. Caller retains partial source insertion prefix on errors. No intermediate metadata vector or scalar policy owner is introduced. See SAT_CONFIG_DESCRS_PORT_STATUS.md.",
+        "One charged cold config header borrows actual registry/context/symbol owners; each update retains/destroys a current real module snapshot. Sequential assignments, dyn-only uninitialized masks and failure prefixes preserved. See SAT_MAIN_CONFIG_PORT_STATUS.md; full solver and unconsumed generated facade remain open."
       ],
       "deviations": [
         "Preserved source generated sat_params.hpp is absent: collector translated from authoritative sat_params.pyg and mk_genfile_common.py defaults/module/emit actions. Existing ParamDescrs owned-text adaptation and fault points apply; actual registry/config/full solver remain open."
@@ -50829,14 +50871,32 @@
       "status": "partial",
       "go_targets": [
         "sat_main_config_descrs.go",
-        "sat_main_config_descrs_test.go"
+        "sat_main_config_descrs_test.go",
+        "sat_main_config.go",
+        "sat_main_config_update.go"
       ],
       "tests": [
         "TestSATMainConfigGeneratedDescriptorBytesAndOrder",
         "TestSATMainConfigGeneratedDescriptorDuplicateSourceInsert",
         "TestSATMainConfigGeneratedDescriptorFailurePrefixes",
         "TestSATMainConfigGeneratedDescriptorLifetime",
-        "TestSATMainConfigGeneratedDescriptorWarmDuplicateAllocations"
+        "TestSATMainConfigGeneratedDescriptorWarmDuplicateAllocations",
+        "TestSATMainConfigActualDefaultsAndIndeterminateGCFields",
+        "TestSATMainConfigAllScalarRoutesAndLocalHiddenFields",
+        "TestSATMainConfigCloneAssignImplicitScalarCopy",
+        "TestSATMainConfigCloneFaultAndSameSymbolsAssignment",
+        "TestSATMainConfigColdSymbolFaultPrefixes",
+        "TestSATMainConfigConstructorFailureAndWarmZeroAllocation",
+        "TestSATMainConfigConstructorPolicyFailureKeepsOnlyBorrowedPrefixes",
+        "TestSATMainConfigCurrentRealModuleAndWrongKindFallback",
+        "TestSATMainConfigEveryPolicyAndDynamicRetention",
+        "TestSATMainConfigIEEEParametersUnrestricted",
+        "TestSATMainConfigInitialMaskAndUnusedDimacsCore",
+        "TestSATMainConfigInvalidRestartAndGCPrefixes",
+        "TestSATMainConfigMegabyteSourceHostWidths",
+        "TestSATMainConfigOwnerAndLifetimeGuards",
+        "TestSATMainConfigSequentialInvalidPhasePrefix",
+        "TestSATMainConfigTypedModuleFallbackAndSeedLocalReread"
       ],
       "conditionals": [
         {
@@ -50868,10 +50928,34 @@
           "status": "unported",
           "go_target": "",
           "tests": []
+        },
+        {
+          "name": "complete config constructor/update and implicit scalar/symbol copying; all generated getter routes consumed by config",
+          "status": "ported",
+          "go_target": "sat_main_config_update.go",
+          "tests": [
+            "TestSATMainConfigActualDefaultsAndIndeterminateGCFields",
+            "TestSATMainConfigAllScalarRoutesAndLocalHiddenFields",
+            "TestSATMainConfigCloneAssignImplicitScalarCopy",
+            "TestSATMainConfigCloneFaultAndSameSymbolsAssignment",
+            "TestSATMainConfigColdSymbolFaultPrefixes",
+            "TestSATMainConfigConstructorFailureAndWarmZeroAllocation",
+            "TestSATMainConfigConstructorPolicyFailureKeepsOnlyBorrowedPrefixes",
+            "TestSATMainConfigCurrentRealModuleAndWrongKindFallback",
+            "TestSATMainConfigEveryPolicyAndDynamicRetention",
+            "TestSATMainConfigIEEEParametersUnrestricted",
+            "TestSATMainConfigInitialMaskAndUnusedDimacsCore",
+            "TestSATMainConfigInvalidRestartAndGCPrefixes",
+            "TestSATMainConfigMegabyteSourceHostWidths",
+            "TestSATMainConfigOwnerAndLifetimeGuards",
+            "TestSATMainConfigSequentialInvalidPhasePrefix",
+            "TestSATMainConfigTypedModuleFallbackAndSeedLocalReread"
+          ]
         }
       ],
       "ownership": [
-        "Static collector borrows ParamDescrs; exact literals are read immediately by existing charged dictionary/packed text owners. Caller retains partial source insertion prefix on errors. No intermediate metadata vector or scalar policy owner is introduced. See SAT_CONFIG_DESCRS_PORT_STATUS.md."
+        "Static collector borrows ParamDescrs; exact literals are read immediately by existing charged dictionary/packed text owners. Caller retains partial source insertion prefix on errors. No intermediate metadata vector or scalar policy owner is introduced. See SAT_CONFIG_DESCRS_PORT_STATUS.md.",
+        "One charged cold config header borrows actual registry/context/symbol owners; each update retains/destroys a current real module snapshot. Sequential assignments, dyn-only uninitialized masks and failure prefixes preserved. See SAT_MAIN_CONFIG_PORT_STATUS.md; full solver and unconsumed generated facade remain open."
       ],
       "deviations": [
         "Preserved source generated sat_params.hpp is absent: collector translated from authoritative sat_params.pyg and mk_genfile_common.py defaults/module/emit actions. Existing ParamDescrs owned-text adaptation and fault points apply; actual registry/config/full solver remain open."
@@ -52160,14 +52244,32 @@
       "status": "partial",
       "go_targets": [
         "sat_main_config_descrs.go",
-        "sat_main_config_descrs_test.go"
+        "sat_main_config_descrs_test.go",
+        "sat_main_config.go",
+        "sat_main_config_update.go"
       ],
       "tests": [
         "TestSATMainConfigGeneratedDescriptorBytesAndOrder",
         "TestSATMainConfigGeneratedDescriptorDuplicateSourceInsert",
         "TestSATMainConfigGeneratedDescriptorFailurePrefixes",
         "TestSATMainConfigGeneratedDescriptorLifetime",
-        "TestSATMainConfigGeneratedDescriptorWarmDuplicateAllocations"
+        "TestSATMainConfigGeneratedDescriptorWarmDuplicateAllocations",
+        "TestSATMainConfigActualDefaultsAndIndeterminateGCFields",
+        "TestSATMainConfigAllScalarRoutesAndLocalHiddenFields",
+        "TestSATMainConfigCloneAssignImplicitScalarCopy",
+        "TestSATMainConfigCloneFaultAndSameSymbolsAssignment",
+        "TestSATMainConfigColdSymbolFaultPrefixes",
+        "TestSATMainConfigConstructorFailureAndWarmZeroAllocation",
+        "TestSATMainConfigConstructorPolicyFailureKeepsOnlyBorrowedPrefixes",
+        "TestSATMainConfigCurrentRealModuleAndWrongKindFallback",
+        "TestSATMainConfigEveryPolicyAndDynamicRetention",
+        "TestSATMainConfigIEEEParametersUnrestricted",
+        "TestSATMainConfigInitialMaskAndUnusedDimacsCore",
+        "TestSATMainConfigInvalidRestartAndGCPrefixes",
+        "TestSATMainConfigMegabyteSourceHostWidths",
+        "TestSATMainConfigOwnerAndLifetimeGuards",
+        "TestSATMainConfigSequentialInvalidPhasePrefix",
+        "TestSATMainConfigTypedModuleFallbackAndSeedLocalReread"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -52189,10 +52291,34 @@
           "status": "unported",
           "go_target": "",
           "tests": []
+        },
+        {
+          "name": "complete config constructor/update and implicit scalar/symbol copying; all generated getter routes consumed by config",
+          "status": "ported",
+          "go_target": "sat_main_config_update.go",
+          "tests": [
+            "TestSATMainConfigActualDefaultsAndIndeterminateGCFields",
+            "TestSATMainConfigAllScalarRoutesAndLocalHiddenFields",
+            "TestSATMainConfigCloneAssignImplicitScalarCopy",
+            "TestSATMainConfigCloneFaultAndSameSymbolsAssignment",
+            "TestSATMainConfigColdSymbolFaultPrefixes",
+            "TestSATMainConfigConstructorFailureAndWarmZeroAllocation",
+            "TestSATMainConfigConstructorPolicyFailureKeepsOnlyBorrowedPrefixes",
+            "TestSATMainConfigCurrentRealModuleAndWrongKindFallback",
+            "TestSATMainConfigEveryPolicyAndDynamicRetention",
+            "TestSATMainConfigIEEEParametersUnrestricted",
+            "TestSATMainConfigInitialMaskAndUnusedDimacsCore",
+            "TestSATMainConfigInvalidRestartAndGCPrefixes",
+            "TestSATMainConfigMegabyteSourceHostWidths",
+            "TestSATMainConfigOwnerAndLifetimeGuards",
+            "TestSATMainConfigSequentialInvalidPhasePrefix",
+            "TestSATMainConfigTypedModuleFallbackAndSeedLocalReread"
+          ]
         }
       ],
       "ownership": [
-        "Static collector borrows ParamDescrs; exact literals are read immediately by existing charged dictionary/packed text owners. Caller retains partial source insertion prefix on errors. No intermediate metadata vector or scalar policy owner is introduced. See SAT_CONFIG_DESCRS_PORT_STATUS.md."
+        "Static collector borrows ParamDescrs; exact literals are read immediately by existing charged dictionary/packed text owners. Caller retains partial source insertion prefix on errors. No intermediate metadata vector or scalar policy owner is introduced. See SAT_CONFIG_DESCRS_PORT_STATUS.md.",
+        "One charged cold config header borrows actual registry/context/symbol owners; each update retains/destroys a current real module snapshot. Sequential assignments, dyn-only uninitialized masks and failure prefixes preserved. See SAT_MAIN_CONFIG_PORT_STATUS.md; full solver and unconsumed generated facade remain open."
       ],
       "deviations": [
         "Preserved source generated sat_params.hpp is absent: collector translated from authoritative sat_params.pyg and mk_genfile_common.py defaults/module/emit actions. Existing ParamDescrs owned-text adaptation and fault points apply; actual registry/config/full solver remain open."

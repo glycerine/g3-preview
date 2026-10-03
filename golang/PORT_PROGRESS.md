@@ -1228,3 +1228,16 @@ race/actual JS groups, vet, WASI build and source/no-generics verification.
 See GPARAMS_REGISTRY_PORT_STATUS.md. Full generated catalogs and process binding
 remain open; gparams.cpp/h become partial, ledger33ported/99partial/1970unported.
 SAT search, SMT/theories, proof/checker and interpolation remain required.
+
+
+## Actual SAT main configuration updates
+
+The complete source configuration constructor/update now uses current real
+registry module snapshots and all twenty-six source scalar assignments.
+Tests-first coverage preserves all enum branches, local/module typed fallback,
+hidden local-only options, uninitialized dyn-only fields, unrestricted IEEE
+values and sequential invalid-policy prefixes. Four frozen Go files passed
+full native/debug against committed registrye59f032, twenty-one exact race/
+actual JS groups, vet, WASI and source/no-generics checks. See
+SAT_MAIN_CONFIG_PORT_STATUS.md. Ledger remains33ported/99partial/1970unported;
+complete SAT search and the full solver/proof/interpolation goal remain open.
