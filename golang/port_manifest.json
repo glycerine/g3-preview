@@ -79325,7 +79325,8 @@
       "role": "test",
       "status": "partial",
       "go_targets": [
-        "mpnum/mpq.go"
+        "mpnum/mpq.go",
+        "mpnum/mpq_round.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -79339,7 +79340,14 @@
         "TestRationalCopySetterFailureCleanup",
         "TestRationalWarmStorageAndScratchModes",
         "TestRationalColdSetterFailureCleanup",
-        "TestRationalColdInverseFailureCleanup"
+        "TestRationalColdInverseFailureCleanup",
+        "TestRationalSourcePrevPowerOfTwo",
+        "TestIntegerSourceLogBounds",
+        "TestIntegerLogSignsSizesAndOwnership",
+        "TestRationalRoundIndependentAndAliases",
+        "TestRationalRoundFailureCleanup",
+        "TestRationalRoundInitializationAndClose",
+        "TestRationalRoundWarmZeroAllocations"
       ],
       "conditionals": [
         {
@@ -79425,7 +79433,8 @@
       "ownership_audited": false,
       "methods": [],
       "ownership": [
-        "Concrete numerator/denominator scalar Int pair, explicit NewRational 0/1; raw Go zero diagnosed. Base manager and scratch numerals owner-local, independently budgeted manager/header children. Partial source methods and formatting gaps remain. See mpnum/PORT_STATUS.md."
+        "Concrete numerator/denominator scalar Int pair, explicit NewRational 0/1; raw Go zero diagnosed. Base manager and scratch numerals owner-local, independently budgeted manager/header children. Partial source methods and formatting gaps remain. See mpnum/PORT_STATUS.md.",
+        "Source prev-power assertions and log bounds translated; test powers are independent fixture generation until production Power is implemented. See mpnum/PORT_STATUS.md."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -79442,7 +79451,8 @@
         "mpnum/mpn.go",
         "mpnum/mpz_mul.go",
         "mpnum/mpz_div.go",
-        "mpnum/mpz_gcd.go"
+        "mpnum/mpz_gcd.go",
+        "mpnum/mpz_log.go"
       ],
       "tests": [
         "TestSourceMPZMagnitudeProjections",
@@ -79464,7 +79474,14 @@
         "TestIntegerGCDFailureCleanup",
         "TestIntegerAddMulSubMulFailureCleanup",
         "TestIntegerGCDZeroPromotionFailure",
-        "TestIntegerGCDAndFusedWarmAllocations"
+        "TestIntegerGCDAndFusedWarmAllocations",
+        "TestRationalSourcePrevPowerOfTwo",
+        "TestIntegerSourceLogBounds",
+        "TestIntegerLogSignsSizesAndOwnership",
+        "TestRationalRoundIndependentAndAliases",
+        "TestRationalRoundFailureCleanup",
+        "TestRationalRoundInitializationAndClose",
+        "TestRationalRoundWarmZeroAllocations"
       ],
       "conditionals": [
         {
@@ -79604,7 +79621,8 @@
       "ownership": [
         "Magnitude projections only; signed manager assertions remain unported.",
         "Signed multiplication assertions and print-only square expectations strengthened. Remaining parser/GCD/root/bitwise/shift source assertions remain unported.",
-        "Active 50-case GCD coherence uses bounded independent prime-product fixture generator. INT_MIN GCD print case strengthened to exact 2^31 expectation; see mpnum/PORT_STATUS.md."
+        "Active 50-case GCD coherence uses bounded independent prime-product fixture generator. INT_MIN GCD print case strengthened to exact 2^31 expectation; see mpnum/PORT_STATUS.md.",
+        "Source prev-power assertions and log bounds translated; test powers are independent fixture generation until production Power is implemented. See mpnum/PORT_STATUS.md."
       ],
       "deviations": []
     },
@@ -94635,7 +94653,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "mpnum/mpq.go"
+        "mpnum/mpq.go",
+        "mpnum/mpq_round.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -94649,7 +94668,14 @@
         "TestRationalCopySetterFailureCleanup",
         "TestRationalWarmStorageAndScratchModes",
         "TestRationalColdSetterFailureCleanup",
-        "TestRationalColdInverseFailureCleanup"
+        "TestRationalColdInverseFailureCleanup",
+        "TestRationalSourcePrevPowerOfTwo",
+        "TestIntegerSourceLogBounds",
+        "TestIntegerLogSignsSizesAndOwnership",
+        "TestRationalRoundIndependentAndAliases",
+        "TestRationalRoundFailureCleanup",
+        "TestRationalRoundInitializationAndClose",
+        "TestRationalRoundWarmZeroAllocations"
       ],
       "assertions": [
         {
@@ -94835,6 +94861,34 @@
             "TestRationalColdSetterFailureCleanup",
             "TestRationalColdInverseFailureCleanup"
           ]
+        },
+        {
+          "name": "floor/ceil integer output and rational wrappers",
+          "status": "ported",
+          "go_target": "mpnum/mpq_round.go",
+          "tests": [
+            "TestRationalSourcePrevPowerOfTwo",
+            "TestIntegerSourceLogBounds",
+            "TestIntegerLogSignsSizesAndOwnership",
+            "TestRationalRoundIndependentAndAliases",
+            "TestRationalRoundFailureCleanup",
+            "TestRationalRoundInitializationAndClose",
+            "TestRationalRoundWarmZeroAllocations"
+          ]
+        },
+        {
+          "name": "rational prev_power_of_two",
+          "status": "ported",
+          "go_target": "mpnum/mpq_round.go",
+          "tests": [
+            "TestRationalSourcePrevPowerOfTwo",
+            "TestIntegerSourceLogBounds",
+            "TestIntegerLogSignsSizesAndOwnership",
+            "TestRationalRoundIndependentAndAliases",
+            "TestRationalRoundFailureCleanup",
+            "TestRationalRoundInitializationAndClose",
+            "TestRationalRoundWarmZeroAllocations"
+          ]
         }
       ],
       "ownership": [
@@ -94852,7 +94906,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "mpnum/mpq.go"
+        "mpnum/mpq.go",
+        "mpnum/mpq_round.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -94866,7 +94921,14 @@
         "TestRationalCopySetterFailureCleanup",
         "TestRationalWarmStorageAndScratchModes",
         "TestRationalColdSetterFailureCleanup",
-        "TestRationalColdInverseFailureCleanup"
+        "TestRationalColdInverseFailureCleanup",
+        "TestRationalSourcePrevPowerOfTwo",
+        "TestIntegerSourceLogBounds",
+        "TestIntegerLogSignsSizesAndOwnership",
+        "TestRationalRoundIndependentAndAliases",
+        "TestRationalRoundFailureCleanup",
+        "TestRationalRoundInitializationAndClose",
+        "TestRationalRoundWarmZeroAllocations"
       ],
       "conditionals": [
         {
@@ -95122,6 +95184,34 @@
             "TestRationalColdSetterFailureCleanup",
             "TestRationalColdInverseFailureCleanup"
           ]
+        },
+        {
+          "name": "floor/ceil integer output and rational wrappers",
+          "status": "ported",
+          "go_target": "mpnum/mpq_round.go",
+          "tests": [
+            "TestRationalSourcePrevPowerOfTwo",
+            "TestIntegerSourceLogBounds",
+            "TestIntegerLogSignsSizesAndOwnership",
+            "TestRationalRoundIndependentAndAliases",
+            "TestRationalRoundFailureCleanup",
+            "TestRationalRoundInitializationAndClose",
+            "TestRationalRoundWarmZeroAllocations"
+          ]
+        },
+        {
+          "name": "rational prev_power_of_two",
+          "status": "ported",
+          "go_target": "mpnum/mpq_round.go",
+          "tests": [
+            "TestRationalSourcePrevPowerOfTwo",
+            "TestIntegerSourceLogBounds",
+            "TestIntegerLogSignsSizesAndOwnership",
+            "TestRationalRoundIndependentAndAliases",
+            "TestRationalRoundFailureCleanup",
+            "TestRationalRoundInitializationAndClose",
+            "TestRationalRoundWarmZeroAllocations"
+          ]
         }
       ],
       "ownership": [
@@ -95181,7 +95271,8 @@
         "mpnum/mpz_mul.go",
         "mpnum/mpz_div.go",
         "mpnum/mpz_gcd.go",
-        "mpnum/mpz_slab.go"
+        "mpnum/mpz_slab.go",
+        "mpnum/mpz_log.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -95212,7 +95303,14 @@
         "TestIntegerGCDZeroPromotionFailure",
         "TestIntegerGCDAndFusedWarmAllocations",
         "TestIntegerOwnerHeaderBudgets",
-        "TestIntegerOwnerConstructorFailureUnwind"
+        "TestIntegerOwnerConstructorFailureUnwind",
+        "TestRationalSourcePrevPowerOfTwo",
+        "TestIntegerSourceLogBounds",
+        "TestIntegerLogSignsSizesAndOwnership",
+        "TestRationalRoundIndependentAndAliases",
+        "TestRationalRoundFailureCleanup",
+        "TestRationalRoundInitializationAndClose",
+        "TestRationalRoundWarmZeroAllocations"
       ],
       "conditionals": [
         {
@@ -96284,6 +96382,20 @@
             "TestIntegerGCDZeroPromotionFailure",
             "TestIntegerGCDAndFusedWarmAllocations"
           ]
+        },
+        {
+          "name": "log2/mlog2/bitsize/prev_power_of_two selected internal limbs",
+          "status": "ported",
+          "go_target": "mpnum/mpz_log.go",
+          "tests": [
+            "TestRationalSourcePrevPowerOfTwo",
+            "TestIntegerSourceLogBounds",
+            "TestIntegerLogSignsSizesAndOwnership",
+            "TestRationalRoundIndependentAndAliases",
+            "TestRationalRoundFailureCleanup",
+            "TestRationalRoundInitializationAndClose",
+            "TestRationalRoundWarmZeroAllocations"
+          ]
         }
       ],
       "ownership": [
@@ -96308,7 +96420,8 @@
         "mpnum/mpz_mul.go",
         "mpnum/mpz_div.go",
         "mpnum/mpz_gcd.go",
-        "mpnum/mpz_slab.go"
+        "mpnum/mpz_slab.go",
+        "mpnum/mpz_log.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -96339,7 +96452,14 @@
         "TestIntegerGCDZeroPromotionFailure",
         "TestIntegerGCDAndFusedWarmAllocations",
         "TestIntegerOwnerHeaderBudgets",
-        "TestIntegerOwnerConstructorFailureUnwind"
+        "TestIntegerOwnerConstructorFailureUnwind",
+        "TestRationalSourcePrevPowerOfTwo",
+        "TestIntegerSourceLogBounds",
+        "TestIntegerLogSignsSizesAndOwnership",
+        "TestRationalRoundIndependentAndAliases",
+        "TestRationalRoundFailureCleanup",
+        "TestRationalRoundInitializationAndClose",
+        "TestRationalRoundWarmZeroAllocations"
       ],
       "conditionals": [
         {
@@ -96922,6 +97042,20 @@
             "TestIntegerAddMulSubMulFailureCleanup",
             "TestIntegerGCDZeroPromotionFailure",
             "TestIntegerGCDAndFusedWarmAllocations"
+          ]
+        },
+        {
+          "name": "log2/mlog2/bitsize/prev_power_of_two selected internal limbs",
+          "status": "ported",
+          "go_target": "mpnum/mpz_log.go",
+          "tests": [
+            "TestRationalSourcePrevPowerOfTwo",
+            "TestIntegerSourceLogBounds",
+            "TestIntegerLogSignsSizesAndOwnership",
+            "TestRationalRoundIndependentAndAliases",
+            "TestRationalRoundFailureCleanup",
+            "TestRationalRoundInitializationAndClose",
+            "TestRationalRoundWarmZeroAllocations"
           ]
         }
       ],
@@ -101205,12 +101339,20 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "utilhash/random.go"
+        "utilhash/random.go",
+        "mpnum/mpz_log.go"
       ],
       "tests": [
         "TestSourceRandomVectors",
         "TestShuffleTraversal",
-        "TestSourceZeroSeed"
+        "TestSourceZeroSeed",
+        "TestRationalSourcePrevPowerOfTwo",
+        "TestIntegerSourceLogBounds",
+        "TestIntegerLogSignsSizesAndOwnership",
+        "TestRationalRoundIndependentAndAliases",
+        "TestRationalRoundFailureCleanup",
+        "TestRationalRoundInitializationAndClose",
+        "TestRationalRoundWarmZeroAllocations"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -101244,6 +101386,20 @@
             "TestShuffleTraversal",
             "TestSourceZeroSeed"
           ]
+        },
+        {
+          "name": "log2(unsigned) concrete mask primitive",
+          "status": "ported",
+          "go_target": "mpnum/mpz_log.go",
+          "tests": [
+            "TestRationalSourcePrevPowerOfTwo",
+            "TestIntegerSourceLogBounds",
+            "TestIntegerLogSignsSizesAndOwnership",
+            "TestRationalRoundIndependentAndAliases",
+            "TestRationalRoundFailureCleanup",
+            "TestRationalRoundInitializationAndClose",
+            "TestRationalRoundWarmZeroAllocations"
+          ]
         }
       ],
       "ownership": [
@@ -101258,12 +101414,20 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "utilhash/random.go"
+        "utilhash/random.go",
+        "mpnum/mpz_log.go"
       ],
       "tests": [
         "TestSourceRandomVectors",
         "TestShuffleTraversal",
-        "TestSourceZeroSeed"
+        "TestSourceZeroSeed",
+        "TestRationalSourcePrevPowerOfTwo",
+        "TestIntegerSourceLogBounds",
+        "TestIntegerLogSignsSizesAndOwnership",
+        "TestRationalRoundIndependentAndAliases",
+        "TestRationalRoundFailureCleanup",
+        "TestRationalRoundInitializationAndClose",
+        "TestRationalRoundWarmZeroAllocations"
       ],
       "conditionals": [
         {
@@ -101464,6 +101628,20 @@
             "TestSourceRandomVectors",
             "TestShuffleTraversal",
             "TestSourceZeroSeed"
+          ]
+        },
+        {
+          "name": "log2(unsigned) concrete mask primitive",
+          "status": "ported",
+          "go_target": "mpnum/mpz_log.go",
+          "tests": [
+            "TestRationalSourcePrevPowerOfTwo",
+            "TestIntegerSourceLogBounds",
+            "TestIntegerLogSignsSizesAndOwnership",
+            "TestRationalRoundIndependentAndAliases",
+            "TestRationalRoundFailureCleanup",
+            "TestRationalRoundInitializationAndClose",
+            "TestRationalRoundWarmZeroAllocations"
           ]
         }
       ],

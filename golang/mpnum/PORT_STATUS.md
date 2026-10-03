@@ -371,11 +371,11 @@ Compare; equality; div with its divisor/output alias branch; both inv forms
 through Inv(a,out); integer/fraction display through String. Integers exposes
 the owned base manager for already translated inherited integer operations.
 Unimplemented MPQ methods include parsers/scientific notation, Power,
-floor/ceil, prev_power_of_two/log, decimal/SMT2/display variants, getters and
+decimal/SMT2/display variants, getters and
 numerator-only swaps, scalar mixed arithmetic overloads, rational AddMul,
 GCD/LCM/divisibility, approximate conversions, and the separate rational wrapper.
 No partial parser is exposed. Source scientific parsing requires Power;
-source prev_power_of_two tests also require Floor and integer Log2.
+source prev_power_of_two dependencies are completed by the rounding/log packet below.
 
 RationalConfig.Synchronized selects the source SYNCH local-temporary branch;
 false uses retained nTmp/addTmp1/addTmp2/ltTmp1/ltTmp2. These retain the source
@@ -399,7 +399,8 @@ implementation then reached GREEN. Active source tst0 divides (2/3)/(4/3)
 into its divisor and asserts 1/2; bug1/bug2 assert in-place inverses of +/-2.
 Active tst1 inherited big-integer arithmetic and comparisons are retained with
 independent fixture setup instead of advertising the missing source parser.
-Parser, decimal print-only and prev_power_of_two source cases remain deferred.
+Parser and decimal print-only source cases remain deferred; prev_power_of_two
+source cases are completed in the later packet.
 Independent math/big.Rat tests add 250 signed multi-limb fraction pairs, each
 Add/Sub/Mul/Div with separate/left/right destination, reciprocal, comparison and
 equality; zero/negative denominators, INT_MIN, reduction and all-self aliases.
@@ -431,3 +432,76 @@ for js/wasm and wasip1/wasm. Cross-builds are compilation evidence, not wasm
 runtime execution. All edits, build caches, temp directories and output artifacts
 remain under golang. No Go generics, unsafe, production math/big, source-file
 runtime fixtures or global manager were introduced.
+
+
+## Integer bit positions and rational rounding packet
+
+Status remains **partial MPZ and MPQ**. New mpz_log.go, mpq_round.go and
+mpq_round_test.go only; no shared arithmetic, arena, ownership or manifest
+changes. Source mpz.cpp/mpq.cpp bodies, mpz.h/mpq.h wrappers and util.cpp
+unsigned log2 helper were read before translation. No production Power or
+shift method was introduced as scaffolding.
+
+| Source method | Go counterpart |
+| --- | --- |
+| unsigned helper log2 | private log2Uint32, exact 16/8/4/2/1 mask algorithm |
+| mpz log2 / mlog2 / bitsize | Log2 / MLog2 / Bitsize, top 32-bit limb and size computation |
+| mpz prev_power_of_two | IntegerManager.PrevPowerOfTwo delegates Log2 |
+| mpq floor / ceil to mpz | FloorToInt / CeilToInt |
+| mpq floor / ceil to mpq | Floor / Ceil, denominator reset to one |
+| mpq prev_power_of_two | RationalManager.PrevPowerOfTwo, scoped integer Floor then integer wrapper |
+
+Log2 returns zero for nonpositive input; MLog2 returns zero for nonnegative
+input. These are explicit source branches, not positivity preconditions or
+mathematical real logarithms. Bitsize follows the source statistics convention
+and returns one for zero. Small negative magnitude uses int64 before narrowing
+to uint32; this makes the intended INT_MIN magnitude defined instead of relying
+on source signed unary-negation overflow. The source top-limb position and
+bit-size calculations are checked before narrowing to uint32 and report bounds
+errors if their source unsigned counters would overflow.
+
+Floor/Ceil retain the source is-integer copy branch; otherwise MachineDiv
+truncates toward zero, then the captured numerator sign determines subtraction
+or addition of one. The initialized normalized-rational invariant ensures a
+noninteger fraction has nonzero remainder; no substitute algorithm or extra
+remainder check was inserted. Both integer and rational output forms preserve
+successful source output aliases. Work numerals are staged for failure atomicity;
+this adds temporary peak ownership and changes cleanup timing, while persistent
+storage and scratch stay with existing budgeted managers. PrevPowerOfTwo cleans
+its scoped integer on every return. No additional retained numerical cache,
+production math/big, Go generics, unsafe or global manager was introduced.
+
+TDD permanent tests failed with missing rounding/log APIs (RED), then the
+translation passed (GREEN). All 16 active source tst_prev_power_2 assertions
+are retained in both scratch modes. All 2000 active source tst_log2 bound cases
+are retained: integers 0..999 and 1000 consecutive values after the actual big
+fixture. Test-only mathematical powers supply the bound checker, so an
+unimplemented production Power is not claimed. Source fixtures are permanently
+embedded; no runtime source read or reference executable is needed.
+
+Additional tests use 500 signed exact fractions (including multi-limb values),
+independent math/big quotient/remainder rounding, both output forms, separate
+and same-rational destinations and integer output/numerator alias. They cover
+zero, integral/reduced cases, negative fractions, zero/negative logarithm
+semantics, INT_MIN/INT64_MIN magnitudes and 200 independent signed log inputs.
+Log queries retain the same budget usage and succeed with FailAfter(0), proving
+that these read-only operations do not need new owned storage. Invalid raw
+rationals and closed owners are diagnosed. Two modes x 5 operations x 2 output
+alias forms x 48 budget reservation positions check failure publication,
+retry exact results and Close budget zero. Warmed rounding and PrevPowerOfTwo
+allocate zero Go objects on the bounded workload.
+
+Full Power, IsPowerOfTwo, Mul2k/MachineDiv2k, parsers, scalar mixed rational
+methods, decimal formatting and previously deferred higher arithmetic remain
+unimplemented. Pending Power must explicitly address the source general
+uint32 mask-loop nontermination at p>=2^31; pending shifts must preserve the
+source small INT_MIN/right-shift31 defect in a labeled regression. Standalone
+NaturalManager and String scratch/output ownership remains the separately
+approved next storage packet, not a closed gate here.
+
+Final rounding/log validation: native release/checked race suites pass; vet
+and the required portcheck no-generics/source-gate audit pass; release/checked
+test binaries cross-build for js/wasm and wasip1/wasm. Combined mpnum coverage
+is 88.9%, not complete path coverage. Wasm cross-builds are compilation evidence,
+not runtime execution. All command cache/temp/output and project edits remain
+under golang. No manifest or git changes were made by this packet.
