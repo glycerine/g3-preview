@@ -1176,8 +1176,8 @@ func (s *RationalService) infDiv(a, b *OwnedInfRational, upper bool) (_lexOut Ow
 		return OwnedInfRational{}, e
 	}
 	defer s.endLexicalInf(&_lexOut, &_lexErr)
-	if b.first.num.val == 0 {
-		return OwnedInfRational{}, ErrDivideByZero
+	if sourceExtendedGCDDebug && b.first.num.val == 0 {
+		return OwnedInfRational{}, ErrInfRationalDomain
 	}
 	// Source default result is completed BEFORE evaluating the branch.
 	result := s.infEmpty()
@@ -1250,7 +1250,10 @@ func (s *RationalService) InfLowerDiv(a, b *OwnedInfRational) (OwnedInfRational,
 		return OwnedInfRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infApproxCheck(a, b); e != nil {
+	if e := s.infScalarOwner(a); e != nil {
+		return OwnedInfRational{}, e
+	}
+	if e := s.infScalarOwner(b); e != nil {
 		return OwnedInfRational{}, e
 	}
 	return s.infDiv(a, b, false)
@@ -1260,7 +1263,10 @@ func (s *RationalService) InfUpperDiv(a, b *OwnedInfRational) (OwnedInfRational,
 		return OwnedInfRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infApproxCheck(a, b); e != nil {
+	if e := s.infScalarOwner(a); e != nil {
+		return OwnedInfRational{}, e
+	}
+	if e := s.infScalarOwner(b); e != nil {
 		return OwnedInfRational{}, e
 	}
 	return s.infDiv(a, b, true)
@@ -1381,10 +1387,10 @@ func (s *RationalService) InfLowerRoot(v *OwnedInfRational, n uint32) (OwnedInfR
 		return OwnedInfRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return OwnedInfRational{}, e
 	}
-	if s.infSign(v) < 0 {
+	if sourceExtendedGCDDebug && s.infSign(v) < 0 {
 		return OwnedInfRational{}, ErrInfRationalDomain
 	}
 	return s.infEmpty(), nil
@@ -1394,10 +1400,10 @@ func (s *RationalService) InfUpperRoot(v *OwnedInfRational, n uint32) (OwnedInfR
 		return OwnedInfRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return OwnedInfRational{}, e
 	}
-	if s.infSign(v) < 0 {
+	if sourceExtendedGCDDebug && s.infSign(v) < 0 {
 		return OwnedInfRational{}, ErrInfRationalDomain
 	}
 	return s.infClone(v)

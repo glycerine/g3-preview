@@ -10,6 +10,8 @@ import (
 // Every entry is supplied by its actual caller owner; storage directories do
 // not supply missing lexical roots.
 type upolyPhysicalExtraOwners struct {
+	RationalServices []*mpnum.RationalService
+	SexprManagers    []*SexprManager
 	Services         []*mpnum.UPolynomialFactorizationService
 	Integers         []*mpnum.Int
 	Rationals        []*mpnum.Rational
@@ -22,6 +24,45 @@ type upolyPhysicalExtraOwners struct {
 
 func upolyPhysicalExtraNumerals(extras []upolyPhysicalExtraOwners, addInt func(reflect.Value)) {
 	for _, x := range extras {
+
+		addRat := func(v reflect.Value) { addInt(v.FieldByName("num")); addInt(v.FieldByName("den")) }
+		addManager := func(v reflect.Value) {
+			for _, f := range []string{"nTmp", "addTmp1", "addTmp2"} {
+				addInt(v.FieldByName(f))
+			}
+			for _, f := range []string{"addMulTmp", "ltTmp1", "ltTmp2"} {
+				addRat(v.FieldByName(f))
+			}
+			scope := v.FieldByName("lexical")
+			for i := 0; i < int(scope.FieldByName("count").Uint()); i++ {
+				addRat(scope.FieldByName("roots").Index(i))
+			}
+		}
+		for _, s := range x.RationalServices {
+			v := reflect.ValueOf(s).Elem()
+			addManager(v.FieldByName("manager").Elem())
+			for _, f := range []string{"zero", "one", "minusOne"} {
+				addRat(v.FieldByName(f))
+			}
+			cache := v.FieldByName("cache")
+			for i := 0; i < cache.Len(); i++ {
+				addRat(cache.Index(i))
+			}
+			scope := v.FieldByName("lexical")
+			for i := 0; i < int(scope.FieldByName("count").Uint()); i++ {
+				addRat(scope.FieldByName("roots").Index(i))
+			}
+		}
+		for _, s := range x.SexprManagers {
+			for _, page := range s.pages {
+				for i := range page.nodes {
+					r := &page.nodes[i]
+					if r.live && (r.kind == SexprNumeral || r.kind == SexprBVNumeral) {
+						addRat(reflect.ValueOf(r.numeral).FieldByName("raw"))
+					}
+				}
+			}
+		}
 		for _, n := range x.Integers {
 			addInt(reflect.ValueOf(n).Elem())
 		}

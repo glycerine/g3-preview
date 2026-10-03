@@ -18,10 +18,17 @@ passing suites do not satisfy this objective.
 
 ## Current facts and conflict resolution
 
-- Source ledger: **2,102 units; 28 ported, 155 partial, 1,919 unported**. All **677
+- Source ledger: **2,102 units; 28 ported, 157 partial, 1,917 unported**. All **677
   API operations remain unported** in the machine inventory. Source fingerprint:
   `f8480997c14e2d6c414f40c60ce5095ef40a89ce6d1bcf1ed196c5d682d42d8f`.
-- Verified617-Go-file follow-up covers SAT activity/trail actual Runtime storage,
+- Verified626-Go-file follow-up: full native terminal0 (main13.174s/numeric91.229s)
+  and full checked/debug terminal0 (main715.140s/numeric218.103s), in
+  `.cache/converter-guards-{native,debug}.log`. Both vet profiles and synchronized
+  source/no-generics audit are terminal0. All626 Go files/hash values match
+  `.cache/converter-guards-go-hashes.json`. Fresh named factor full-algorithm
+  immediate-failure test passes both profiles. No failing campaign was skipped,
+  hidden, truncated or weakened; selected source limits remain explicit below.
+- Committed `29bf724` verified617-Go-file follow-up covers SAT activity/trail actual Runtime storage,
   external ExtendedGCD constructor frames, shared/TLS FF Runtime and negative
   SMT2 completed temporary lifetimes. Both full suites are GREEN: native terminal0
   in `.cache/ownership-followup-native.log` (main13.402s/numeric95.009s), debug
@@ -751,21 +758,153 @@ precision and every actual failure prefix; no WASM/WASI/race gate was run.
   source assertion or immediate ownership check was removed.
 
 
+## Converter, justification and source guard follow-up after29bf724
+
+The previous goal turn made verified progress in29bf724, with full native/debug,
+both vets and synchronized source audit GREEN and a clean worktree. Current
+follow-up passed both combined full suites before its commit. The
+combined626-Go-file tree is frozen in `.cache/converter-guards-go-hashes.json`;
+Full native is terminal0 (main13.174s/numeric91.229s), and both vet profiles
+are terminal0 in the corresponding `.cache/converter-guards-*.log` files.
+Full checked/debug is terminal0 (main715.140s/numeric218.103s) in
+`.cache/converter-guards-debug.log`; all original refinement fault prefixes and
+precision remain enabled. Final synchronized source/no-generics audit is terminal0 in
+`.cache/converter-guards-audit-final.log`.
+The converter cpp/header are newly partial: ledger now28 ported/157 partial/1917
+unported, with unchanged2102 total,677 unported APIs and source fingerprint.
+No registered ENSURE/VERIFY credit is added by these new Go tests.
+Fresh targeted `TestUPolynomialFactorFullAlgorithmImmediateFailureRoots`
+passes both native0.815s and checked/debug1.710s on this frozen tree.
+
+- SAT justification now owns actual source8 two-word Runtime storage. All five
+  tags retain literal unsigned encodings and source copy/size publication. A
+  separately charged real12-byte provenance element plus fixed borrowed clause
+  allocator retains Go generation/kind guards; producer slot is explicitly NOT
+  claimed to be physical pointer/segment clause_offset32. That compact allocator
+  contract remains open. Source maps: sat_justification.h24–58, solver.h102,
+  solver.cpp143/513, vector.h59–100/303–308/351–365. Raw source val1→val2 and
+  push size++ precede real Go provenance reservation; incomplete overwrite clears
+  old provenance without restoring source bytes or reconstructing registry roots.
+  Genuine raw allocation RED, missing-API RED and size-publication behavior RED
+  are `raw-red.log`, `provenance-isolated-api-red.log` and
+  `push-size-prefix-red.log` under `.cache/sat-justification-runtime/`.
+  Reviewed exact fixture changes use MkVar242/12, first trail266/13 and real TLS
+  requests99856/99880/99750 for the same level/activity/trail source sites.
+  All20 MkVar refusals and one success, plus trail1/1, remain. Actual quota test
+  holds old24 bytes while real new144-byte provenance backing is refused, using
+  a fresh calibrated immutable Budget. All261 focused SAT groups pass both
+  profiles; vet passes; exact11-file freeze in `final-sha256.txt` in that directory.
+- Inf lower/upper division and root use reached scalar source guards rather than
+  universal full-rational preflight. Zero-FIRST and negative-root assertions are
+  DEBUG only. Release division can publish raw FIRST/EPS ±1/0 or reach the actual
+  Integer DivideByZero; lower root returns completed DEFAULT0 without numeral
+  reads, upper copies FIRST thenEPS. Strict ordinary readers remain unchanged.
+  Source maps: inf_rational.cpp80–111/169–179 and corresponding DEFAULT/pair-COPY
+  header constructors. Four new groups exercise unread/stale fields, true first
+  BIG Copy refusal, immediate physical census and inline warmGo0. Genuine RED
+  in `.cache/inf-guard-{native,debug}-red.log` plus isolated unread/precedence
+  logs; exact old universal error fixture corrected after observed RED, preserving
+  foreign/closed/math/owning assertions. All62 focused RUN/PASS pass native0.690s
+  and debug1.198s; vet passes. Three-file freeze `.cache/inf-guard-frozen.json`.
+  Approximate Mul/Power and general raw constructor domains remain open.
+- Binary decimal/interval raw mpz locals now survive thrown operations, matching
+  source explicit end labels. The charged Binary manager retains six actual Int
+  records and separate normal-end/owning cursors. Scalar end deletes n1,v1,two_k1;
+  interval end deletes n1,v1,n2,v2,two_k1,two_k2. Source maps: mpbq.cpp426–457,
+  460–515; existing private manager order47–59 retained by checked owning close.
+  This does not claim literal standalone SourceFinalize. True behavioral RED
+  `.cache/binary-display-prefix-red.log` showed old unconditional defer destroying
+  completed v1 after real Power refusal. New five groups cover all scalar11 and
+  interval17 refusals then success, normal end paths, inline warmGo0, retained
+  exceptional roots and guarded physical-free continuation. Public oversized
+  reallocations reach clearly labelled host-size/signed-overflow undefined-domain
+  evidence; every one of six source frees is audited before cursor acknowledgement,
+  with exact counters preserved. No fake exhaustion/counter reset is introduced.
+  Old DEBUG fixture audits and explicitly cleans source assertion leftovers before
+  next call. Actual diagnostics service remains required. All30 relevant tests
+  pass native0.256s/debug3.153s with vet GREEN in
+  `.cache/binary-display-final-{native,debug,vet}.log`. Six frozen files; shared
+  Integer production untouched. Stream/platform/global lifecycle remains open.
+- Real s-expression-to-univariate-polynomial recursive parser now uses actual
+  Sexpr records and the rational service's same Integer owner. Source maps:
+  sexpr2upolynomial.cpp25–113 and header exception constructor/entry point.
+  Preserve depth>65536, head/arity checks, first argument mutation before later
+  errors, unary negation, Reset of each scoped argument, add/mul(arg,p,p),
+  sub(p,arg,p), borrowed unsigned exponent and owning constant COPY before IsInt.
+  Actual source vectors are recorded in charged reusable cold frame metadata;
+  their payloads are destroyed in source inner→outer order. Embedded charged
+  concrete rational callback context holds partial-constructor abort until older
+  vectors unwind; copied/expired context guards reject use outside its borrow.
+  Coefficient parse exception is constructed before completed local destruction;
+  primary and cleanup causes remain distinct and returned together. Explicit
+  owning cleanup acknowledges completed scalar destruction, then vectors, then
+  queued partial abort. No parser string/Go polynomial/big.Int substitutes for
+  real algorithms. Missing-API RED `.cache/sexpr-polynomial-api-red.log`; isolated
+  focused root tests pass in `.cache/review/sexpr-polynomial/golang/.cache/`.
+  Native13 and debug22 actual reservation refusals plus one success are audited
+  immediately with named Sexpr/service/vector roots before fault disabling.
+  Independent expansion, every parser branch/location, exact depth and published
+  prefix tests execute. Warm atom conversion allocatesGo0; multi-argument source
+  allocates/destroys one actual argument backing each call. The first Go0 warm
+  assumption was corrected after source review/profiling, not labelled source
+  behavior RED. Review found raw-denominator preflight and copied-context defects;
+  genuine RED `.cache/upoly-context-behavior-red.log` drove corrections. Real
+  guarded completed-destruction evidence also found missing returned cleanup cause
+  in `.cache/upoly-context-cause-red.log`, corrected while uncommitted. Real
+  vector-only stop also exposed stale unrelated-service error state in
+  `.cache/upoly-context-vector-only-red.log`; service cause now retains only actual
+  pending rational roots while the converter owns its vector stop independently.
+  All six isolated context tests pass both profiles with both vets in
+  `.cache/upoly-context-isolated-{native,debug,vet,vet-debug}.log`; exact test freeze
+  SHA647ac559da56925c3fff84d02a6d8daf76b6f0782705739515821564a20f6092.
+  The attempted late context API-only RED actually completed GREEN and receives
+  no RED credit. Full
+  command base-exception integration, arithmetic plugin and algebraic consumers
+  remain open. No whole-plugin or whole-unit completion claim.
+
+### Next source lanes from read-only dependency review
+
+- SAT lemma minimization is the next bounded conflict-analysis family:
+  solver.cpp2238–2402, using actual same-Runtime lemma/unmark/min-stack vectors,
+  real assignment reasons, level approximation and clause allocator. Tests must
+  preserve mark-before-reservation failures and source compaction; never repair
+  marks on abort. Full FIRST-UIP/search additionally requires dynamic subsumption,
+  real probing cache producers, assumption cores and default simplification.
+  Default minimize_lemmas/dyn_sub_res cannot be disabled to bypass dependencies.
+- Inf approximate Mul/Power requires the actual shared Rational Add/Sub/Power
+  entry profiles and raw constructor/assignment phases, not only colder Inf
+  guards. Source inf_rational.cpp25–54/115–167 and rational constructors admit
+  branch-specific unread fields/raw1/0 copies. Use source sign/parity tables,
+  actual earlier allocation refusals, completed-expression destruction and
+  immediate physical census. C++11 multiplication operand evaluation direction
+  is unspecified; do not claim the selected profile is universally mandated.
+  Existing registered80 source assertions retain their unchanged credit.
+- Algebraic basic/root cell ownership plus isolate/refine/deep-copy/MkRoot/compare
+  is the next univariate algorithm lane (algebraic_numbers.cpp33–53,180–211,
+  362–539,567–684,729–781,1669–1821). Existing polynomial and binary interval
+  algorithms provide real dependencies; overlapping comparison uses Sturm–Tarski,
+  not the commented resultant alternative. Preserve null zero, mutating rational
+  predicates, conditional interval restore and indexed-root errors. The full
+  constructor/plugin still needs multivariate ownership/variables and resultants;
+  do not substitute a rational-only plugin or fake algebraic tokens. Registered
+  tst_algebraic's nine functions remain a complete-suite obligation.
+
 ## TODO — prioritized handoff
 
 - [ ] Remaining constructor/lifetime closure: raw scalar-overload/value constructor
   domains, public standalone move
-  adapters, InfDiv zero-FIRST and InfRoot negativity guard profiles remain open.
+  adapters and broader Inf approximation/constructor guard profiles remain open.
   Selected external ExtendedGCD frames now unwind completed locals before partial
   abort; broader caller stacks remain open. Preserve charged9/1 root bounds and
   zero warm allocations.
-- [ ] Remaining SAT memory families: justification/pointer/watch/clause storage,
+- [ ] Remaining SAT memory families: compact physical clause_offset and pointer/watch/clause storage,
   other literal domains, full solver and shared global Runtime integration.
-  Nine char columns, uint32 levels/activity and literal32 trail now use actual
+  Nine char columns, uint32 levels/activity, source8 justification and literal32 trail now use actual
   same-Runtime source storage;
   other columns must not claim source8-byte pointers via expanded Go handle tickets.
-- [ ] Remaining numeric display families: binary raw decimal/interval mpbq.cpp426/460 explicit end-label locals, broader
-  raw decimal assertions and stream/global/locale/architecture profiles. Rational
+- [ ] Remaining numeric display families: broader raw decimal assertions and
+  stream/global/locale/architecture profiles; binary raw decimal/interval explicit
+  end-label lifetimes now execute with separate owning abort. Rational
   mpq.cpp156 raw locals now retain actual early-failure roots; MPFF full-precision
   char1024/unsigned1024/16 scopes and borrowed/TLS Runtime config are integrated.
   Permanent mantissa/storage topology and unsupported profile closure remain open.
@@ -793,7 +932,8 @@ precision and every actual failure prefix; no WASM/WASI/race gate was run.
 - [ ] General rational Copy/public read boundaries, scalar projection/getters,
   ostream/TRACE/diagnostic transport,
   source domain guards and remaining whole mpz/mpq methods/overloads.
-- [ ] Polynomial multivariate/algebraic construction, full registered tests,
+- [ ] Polynomial multivariate/algebraic construction, arithmetic-plugin consumers
+  of the now-translated sexpr2upolynomial parser, full registered tests,
   diagnostics/trace/printers/global primes/OpenMP and remaining source methods.
 - [ ] Actual SAT propagation/search/conflict/default simplification/inprocessing,
   scope trail and user-scope test. Existing configs/watch/clause/use-list/model
@@ -814,6 +954,14 @@ precision and every actual failure prefix; no WASM/WASI/race gate was run.
 
 ## FINISHED — committed subset, with explicit limits
 
+- [x] Recursive source polynomial expression conversion through actual Sexpr,
+  Rational and UPolynomial owners; source justification Runtime storage with
+  concrete provenance; selected Inf scalar read profiles and binary raw display
+  end-label lifetimes. All626 frozen Go files pass both full suites, both vets
+  and final source/no-generics audit. The two converter units are partial;
+  compact clause offsets, remaining raw numeric profiles, full algebraic/plugin
+  consumers, full solver and all677 APIs remain open. No registered assertion
+  credit or whole-fork completion claim is added.
 - [x] Remaining eight SAT char columns and unsigned level use assignment's actual
   Runtime; selected numeric COPY/VALUE/DEFAULT constructor phases and nested
   helper unwind are explicit; MPFF full precision uses real lexical char1024 and
@@ -981,7 +1129,7 @@ gaps. No API operation or new registered source assertion is claimed complete.
 | src/util/str_hashtable.h | utilhash/str_hashtable.go, utilhash/str_int32_map.go | TestStrHashtableSourceHashCStringAndEquality, TestStrHashtableBorrowedLifetimeAndReplacement, TestStrHashtableSourceProbeThresholdAndTombstones, TestStrHashtableOperationsAndOutput, TestStrHashtableIndependentOracleAndCStringLookup, TestStrHashtableBudgetsSwapAndStaleViews, TestStrHashtableDumpCStringBytes, TestStrHashtableKeyOwnerAndStats, TestStrHashtableMultiOriginQueriesAndAdoption, TestStrHashtableMultiOriginOperatorsCloneAndLifetime, TestStrHashtableMultiOriginFailureOrderAndAccounting, TestStrHashtableMultiOriginSwapGraphFailures, TestStrHashtableMultiOriginQueryMethodsAndCollisionOrder, TestStrHashtableMultiOriginIndependentOracleAndDirectoryPeak, TestStrHashtableCleanupResetAndFailurePeaks, TestStrHashtableSourceInitialCapacity, TestStrHashtablePartialRemovalAndStrictReset, TestStrHashtableEpochExhaustion, TestStrInt32MapSourceMap14Assertions, TestStrInt32MapForeignBorrowAndMutableValues, TestStrInt32MapIndependentOracleAndBuckets, TestStrInt32MapCopyOperatorsAndBudget, TestStrInt32MapHashCachedCopiesAndDefaultPayload, TestStrInt32MapWrappedTombstonesGrowthAndCleanup, TestStrInt32MapResetFinalizeThresholdsAndEpoch, TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm, TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes, TestStrInt32MapConcreteArchitectureLayoutAndBudget |
 | src/util/symbol.cpp | util_symbol.go | TestSymbolSourceAssertions, TestSymbolTagsNullBytesAndCachedHash, TestSymbolOwnerFailureLifetimeAndWarmIntern, TestSymbolConcurrentInternIdentity, TestSymbolIndependentBytesAndPrefixOrder, TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens |
 
-### TODO partial source-unit rows (155)
+### TODO partial source-unit rows (157)
 
 These implemented targets are partial; source-method/ownership/test gaps recorded
 in the family audits below still block whole-unit completion.
@@ -1015,6 +1163,8 @@ in the family audits below still block whole-unit completion.
 | src/interp/interp_params.hpp | util_gparams.go, util_gparams_catalog.go, util_gparams_catalog_collectors.go, util_gparams_catalog_dispatch.go | TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher, TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse, TestGlobalParamsCatalogConstructorFailureAndDomains, TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix, TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription |
 | src/math/polynomial/algebraic_params.hpp | util_gparams.go, util_gparams_catalog.go, util_gparams_catalog_collectors.go, util_gparams_catalog_dispatch.go | TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher, TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse, TestGlobalParamsCatalogConstructorFailureAndDomains, TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix, TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription |
 | src/math/polynomial/polynomial_primes.h | mpnum/upolynomial_gcd_primes.go, upolynomial_gcd_source_test.go | TestUPolynomialModularGCDCRAAndAllPrimeFallback, TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime |
+| src/math/polynomial/sexpr2upolynomial.cpp | sexpr_upolynomial.go, sexpr_upolynomial_test.go, mpnum/upolynomial_rational_context.go, mpnum/upolynomial_rational_context_test.go | TestSexprPolynomialSourceArithmetic, TestSexprPolynomialErrorsAndCompletedPrefix, TestSexprPolynomialDepthBoundary, TestSexprPolynomialActualFaultPrefixes, TestSexprPolynomialWarmAndRemainingKinds, TestUPolynomialContextRawConstantCopy, TestUPolynomialContextBorrowIdentity, TestUPolynomialContextVectorStopAPI, TestUPolynomialContextExceptionBeforeCompletedDestructor, TestUPolynomialContextPartialCopyWaitsForStoppedVector, TestUPolynomialContextVectorOnlyStopDoesNotPoisonService |
+| src/math/polynomial/sexpr2upolynomial.h | sexpr_upolynomial.go, sexpr_upolynomial_test.go, mpnum/upolynomial_rational_context.go, mpnum/upolynomial_rational_context_test.go | TestSexprPolynomialSourceArithmetic, TestSexprPolynomialErrorsAndCompletedPrefix, TestSexprPolynomialDepthBoundary, TestSexprPolynomialActualFaultPrefixes, TestSexprPolynomialWarmAndRemainingKinds, TestUPolynomialContextRawConstantCopy, TestUPolynomialContextBorrowIdentity, TestUPolynomialContextVectorStopAPI, TestUPolynomialContextExceptionBeforeCompletedDestructor, TestUPolynomialContextPartialCopyWaitsForStoppedVector, TestUPolynomialContextVectorOnlyStopDoesNotPoisonService |
 | src/math/polynomial/upolynomial.cpp | mpnum/upolynomial.go, mpnum/upolynomial_eval.go, mpnum/upolynomial_modes.go, mpnum/upolynomial_ops.go, mpnum/upolynomial_storage.go, mpnum/upolynomial_vector.go, upolynomial_source_test.go, mpnum/upolynomial_content.go, mpnum/upolynomial_division.go, mpnum/upolynomial_division_remainder.go, mpnum/upolynomial_gcd.go, mpnum/upolynomial_gcd_extended.go, mpnum/upolynomial_gcd_modular.go, mpnum/upolynomial_gcd_primes.go, upolynomial_division_source_test.go, upolynomial_gcd_source_test.go, mpnum/upolynomial_sequence.go, mpnum/upolynomial_sturm.go, mpnum/upolynomial_transforms.go, mpnum/upolynomial_root_bounds.go, mpnum/upolynomial_sequence_test.go, upolynomial_sequence_source_test.go, upolynomial_sturm_source_test.go, upolynomial_transform_model_test.go, mpnum/upolynomial_binary_vector.go, mpnum/upolynomial_isolation.go, mpnum/upolynomial_sturm_isolation.go, mpnum/upolynomial_refinement.go, upolynomial_isolation_source_test.go, upolynomial_refinement_source_test.go, upolynomial_isolation_model_test.go, mpnum/upolynomial_isolation_storage_test.go, mpnum/upolynomial_coefficient_store.go, mpnum/upolynomial_coefficient_store_test.go, upolynomial_coefficient_store_source_test.go, upolynomial_coefficient_store_lifetime_test.go, mpnum/upolynomial_store_adoption.go, upolynomial_coefficient_store_adoption_test.go | TestUPolynomialScalarExtentAndLayout, TestUPolynomialSourceUnsignedExtent, TestUPolynomialColdDirectoryBounds, TestUPolynomialSourceNinePretranslationENSURE, TestUPolynomialSourceBasicCoefficientRoutes, TestUPolynomialStorageOwnershipAndPhysicalViews, TestUPolynomialFiniteArithmeticAndDirectDerivative, TestUPolynomialViewOverloadsAndModularShape, TestUPolynomialRawViewActualReadTiming, TestUPolynomialPredicatesTrimSourceStorage, TestUPolynomialIndependentScaledEvaluation, TestUPolynomialRealCheckpointCancellationPrefixes, TestUPolynomialImmediateNumericFailureAccounting, TestUPolynomialColdFailureAndWarmZeroAllocation, TestUPolynomialSourceCopyAndRationalPrefixes, TestUPolynomialConcreteScopedVectorActions, TestUPolynomialSourceLifecycleAndNumericDestructionOrder, TestUPolynomialAllSelectedOutputFailurePrefixes, TestUPolynomialIndependentConvolutionAllAliases, TestUPolynomialScalarModeAndDirectCheckpoint, TestUPolynomialRawMutableScalarOverloads, TestUPolynomialExactDivisionSourceThirtyENSURE, TestUPolynomialFieldDivisionIndependentFinite, TestUPolynomialDivisionPublishedPrefixes, TestUPolynomialContentNormalizationSourceBranches, TestUPolynomialRemainderSignedSourceBranches, TestUPolynomialExtendedGCDSourceZ7, TestUPolynomialGCDAndSquareFreeIndependent, TestUPolynomialGCDRegisteredZAndZPInputs, TestUPolynomialExtendedGCDRegisteredZ13Input, TestUPolynomialGCDRegisteredFirstDerivativeExample, TestUPolynomialGCDChainImmediateFailureRoots, TestUPolynomialGCDRawZeroCountsAndSourceAliases, TestUPolynomialModularGCDCRAAndAllPrimeFallback, TestUPolynomialGCDAndDivisionWarmPhysicalPlateau, TestUPolynomialExtendedGCDNonmonicAndOutputAliasQuirks, TestUPolynomialPrimitiveRawAliasReserveAndMonicPrefixes, TestUPolynomialGCDChainRawOverloadAndEmptyFieldRoutes, TestUPolynomialCancelledModularGCDZeroHostAllocation, TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime, TestUPolynomialContentRawEarlyOneAndLateReadPrefix, TestUPolynomialModularGCDCRALateFailureRootSweep, TestUPolynomialSequenceUnsignedVectorExtent, TestUPolynomialSequenceCopyMoveAndRetainedRows, TestUPolynomialSequenceExactMetadataFailurePrefixes, TestUPolynomialSequencePhysicalOwnerAndCloseGuard, TestUPolynomialHalfRootStackDivisorNoReservation, TestUPolynomialSequenceBigCopyFailureImmediateGraph, TestUPolynomialTransformCancellationAfterComposition, TestUPolynomialSturmFailureAndCancellationImmediateGraph, TestUPolynomialSourceSixteenTransformENSURE, TestUPolynomialSourceFiveHalfRootENSURE, TestUPolynomialSturmFourierAndRootIDIndependent, TestUPolynomialRegisteredSturmAndTarskiInputs, TestUPolynomialSturmRationalEuclideanOracle, TestUPolynomialFullTransformFiniteOracles, TestUPolynomialRootCountBoundsSourceBranches, TestUPolynomialSequenceSelfGrowthCloseAndAscendingBigReset, TestUPolynomialIsolationRegisteredTwentyFourDatasets, TestUPolynomialIsolationRegisteredDegreeSeventy, TestUPolynomialRefinableNineRegisteredCalls, TestUPolynomialRefineTwoRegisteredPrecisionInputs, TestUPolynomialQ2BQNineRegisteredIntervals, TestUPolynomialRefineAndNormalizeAllPublicRoutes, TestUPolynomialQ2BQAliasedOutputSourceDebugSite, TestUPolynomialRefinementFaultPrefixesImmediateRoots, TestUPolynomialIsolationAllDispatchRoutesIndependent, TestUPolynomialBinaryVectorOwnershipResizeReserveAndPlateau, TestUPolynomialBinaryVectorConstructionAndPushFailurePrefixes, TestUPolynomialBinaryVectorBigCopyFaultImmediateRoots, TestUPolynomialIsolationRemoveZeroExistingPublicRegression, TestUPolynomialIsolationDefinedOutputAliases, TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph, TestUPolynomialIsolationZeroResetPublicationBeforeRefusal, TestUPolynomialIsolationPackedFrameAndScalarExtents, TestUPolynomialBinaryVectorActualAscendingDestruction, TestUPolynomialIsolationSSPopAndDestructorActualOrder, TestUPolynomialStoreRelatedConstructorFailureUnwinds, TestUPolynomialStoreCopiedClosedGuardsAndDistinctOrdinary, TestUPolynomialStoreGrowthGenerationAndRealCloseGuards, TestUPolynomialStoreSingleChargeCohortGraph, TestUPolynomialStoreRelatedExtendedGCDIntermediateProvenance, TestUPolynomialStoreBigChildRootsSurviveParentClose, TestUPolynomialRelatedCoreActualCrossCoreReadAndMode, TestUPolynomialRelatedCoreStoreLifetimeAndScalarBorrow, TestUPolynomialCoefficientStoreCounterAndColdLayout, TestUPolynomialStoreIndependentAdoptionTransferAndOldPhysicalViews, TestUPolynomialStoreAdoptionFailurePrefixAndCohortGraph, TestUPolynomialStoreRelatedInheritsImportedBindingsAndUnwinds |
 | src/math/polynomial/upolynomial.h | mpnum/upolynomial.go, mpnum/upolynomial_eval.go, mpnum/upolynomial_modes.go, mpnum/upolynomial_ops.go, mpnum/upolynomial_storage.go, mpnum/upolynomial_vector.go, upolynomial_source_test.go, mpnum/upolynomial_content.go, mpnum/upolynomial_division.go, mpnum/upolynomial_division_remainder.go, mpnum/upolynomial_gcd.go, mpnum/upolynomial_gcd_extended.go, mpnum/upolynomial_gcd_modular.go, mpnum/upolynomial_gcd_primes.go, upolynomial_division_source_test.go, upolynomial_gcd_source_test.go, mpnum/upolynomial_sequence.go, mpnum/upolynomial_sturm.go, mpnum/upolynomial_transforms.go, mpnum/upolynomial_root_bounds.go, mpnum/upolynomial_sequence_test.go, upolynomial_sequence_source_test.go, upolynomial_sturm_source_test.go, upolynomial_transform_model_test.go, mpnum/upolynomial_binary_vector.go, mpnum/upolynomial_isolation.go, mpnum/upolynomial_sturm_isolation.go, mpnum/upolynomial_refinement.go, upolynomial_isolation_source_test.go, upolynomial_refinement_source_test.go, upolynomial_isolation_model_test.go, mpnum/upolynomial_isolation_storage_test.go, mpnum/upolynomial_coefficient_store.go, mpnum/upolynomial_coefficient_store_test.go, upolynomial_coefficient_store_source_test.go, upolynomial_coefficient_store_lifetime_test.go, mpnum/upolynomial_store_adoption.go, upolynomial_coefficient_store_adoption_test.go | TestUPolynomialScalarExtentAndLayout, TestUPolynomialSourceUnsignedExtent, TestUPolynomialColdDirectoryBounds, TestUPolynomialSourceNinePretranslationENSURE, TestUPolynomialSourceBasicCoefficientRoutes, TestUPolynomialStorageOwnershipAndPhysicalViews, TestUPolynomialFiniteArithmeticAndDirectDerivative, TestUPolynomialViewOverloadsAndModularShape, TestUPolynomialRawViewActualReadTiming, TestUPolynomialPredicatesTrimSourceStorage, TestUPolynomialIndependentScaledEvaluation, TestUPolynomialRealCheckpointCancellationPrefixes, TestUPolynomialImmediateNumericFailureAccounting, TestUPolynomialColdFailureAndWarmZeroAllocation, TestUPolynomialSourceCopyAndRationalPrefixes, TestUPolynomialConcreteScopedVectorActions, TestUPolynomialSourceLifecycleAndNumericDestructionOrder, TestUPolynomialAllSelectedOutputFailurePrefixes, TestUPolynomialIndependentConvolutionAllAliases, TestUPolynomialScalarModeAndDirectCheckpoint, TestUPolynomialRawMutableScalarOverloads, TestUPolynomialExactDivisionSourceThirtyENSURE, TestUPolynomialFieldDivisionIndependentFinite, TestUPolynomialDivisionPublishedPrefixes, TestUPolynomialContentNormalizationSourceBranches, TestUPolynomialRemainderSignedSourceBranches, TestUPolynomialExtendedGCDSourceZ7, TestUPolynomialGCDAndSquareFreeIndependent, TestUPolynomialGCDRegisteredZAndZPInputs, TestUPolynomialExtendedGCDRegisteredZ13Input, TestUPolynomialGCDRegisteredFirstDerivativeExample, TestUPolynomialGCDChainImmediateFailureRoots, TestUPolynomialGCDRawZeroCountsAndSourceAliases, TestUPolynomialModularGCDCRAAndAllPrimeFallback, TestUPolynomialGCDAndDivisionWarmPhysicalPlateau, TestUPolynomialExtendedGCDNonmonicAndOutputAliasQuirks, TestUPolynomialPrimitiveRawAliasReserveAndMonicPrefixes, TestUPolynomialGCDChainRawOverloadAndEmptyFieldRoutes, TestUPolynomialCancelledModularGCDZeroHostAllocation, TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime, TestUPolynomialContentRawEarlyOneAndLateReadPrefix, TestUPolynomialModularGCDCRALateFailureRootSweep, TestUPolynomialSequenceUnsignedVectorExtent, TestUPolynomialSequenceCopyMoveAndRetainedRows, TestUPolynomialSequenceExactMetadataFailurePrefixes, TestUPolynomialSequencePhysicalOwnerAndCloseGuard, TestUPolynomialHalfRootStackDivisorNoReservation, TestUPolynomialSequenceBigCopyFailureImmediateGraph, TestUPolynomialTransformCancellationAfterComposition, TestUPolynomialSturmFailureAndCancellationImmediateGraph, TestUPolynomialSourceSixteenTransformENSURE, TestUPolynomialSourceFiveHalfRootENSURE, TestUPolynomialSturmFourierAndRootIDIndependent, TestUPolynomialRegisteredSturmAndTarskiInputs, TestUPolynomialSturmRationalEuclideanOracle, TestUPolynomialFullTransformFiniteOracles, TestUPolynomialRootCountBoundsSourceBranches, TestUPolynomialSequenceSelfGrowthCloseAndAscendingBigReset, TestUPolynomialIsolationRegisteredTwentyFourDatasets, TestUPolynomialIsolationRegisteredDegreeSeventy, TestUPolynomialRefinableNineRegisteredCalls, TestUPolynomialRefineTwoRegisteredPrecisionInputs, TestUPolynomialQ2BQNineRegisteredIntervals, TestUPolynomialRefineAndNormalizeAllPublicRoutes, TestUPolynomialQ2BQAliasedOutputSourceDebugSite, TestUPolynomialRefinementFaultPrefixesImmediateRoots, TestUPolynomialIsolationAllDispatchRoutesIndependent, TestUPolynomialBinaryVectorOwnershipResizeReserveAndPlateau, TestUPolynomialBinaryVectorConstructionAndPushFailurePrefixes, TestUPolynomialBinaryVectorBigCopyFaultImmediateRoots, TestUPolynomialIsolationRemoveZeroExistingPublicRegression, TestUPolynomialIsolationDefinedOutputAliases, TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph, TestUPolynomialIsolationZeroResetPublicationBeforeRefusal, TestUPolynomialIsolationPackedFrameAndScalarExtents, TestUPolynomialBinaryVectorActualAscendingDestruction, TestUPolynomialIsolationSSPopAndDestructorActualOrder, TestUPolynomialStoreRelatedConstructorFailureUnwinds, TestUPolynomialStoreCopiedClosedGuardsAndDistinctOrdinary, TestUPolynomialStoreGrowthGenerationAndRealCloseGuards, TestUPolynomialStoreSingleChargeCohortGraph, TestUPolynomialStoreRelatedExtendedGCDIntermediateProvenance, TestUPolynomialStoreBigChildRootsSurviveParentClose, TestUPolynomialRelatedCoreActualCrossCoreReadAndMode, TestUPolynomialRelatedCoreStoreLifetimeAndScalarBorrow, TestUPolynomialCoefficientStoreCounterAndColdLayout, TestUPolynomialStoreIndependentAdoptionTransferAndOldPhysicalViews, TestUPolynomialStoreAdoptionFailurePrefixAndCohortGraph, TestUPolynomialStoreRelatedInheritsImportedBindingsAndUnwinds |
 | src/math/realclosure/rcf_params.hpp | util_gparams.go, util_gparams_catalog.go, util_gparams_catalog_collectors.go, util_gparams_catalog_dispatch.go | TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher, TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse, TestGlobalParamsCatalogConstructorFailureAndDomains, TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix, TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription |

@@ -11,6 +11,9 @@ import (
 func binaryCellsAudit(t *testing.T, m *BinaryRationalManager, values ...*BinaryRational) {
 	t.Helper()
 	roots := []*Int{&m.tmp, &m.tmp2, &m.addMulTmp.num, &m.selectIntTmp1, &m.selectIntTmp2, &m.selectSmallTmp, &m.selectSmallTmp1.num, &m.selectSmallTmp2.num, &m.divTmp1, &m.divTmp2, &m.divTmp3}
+	for i := range m.display.values {
+		roots = append(roots, &m.display.values[i])
+	}
 	for _, v := range values {
 		roots = append(roots, &v.num)
 	}

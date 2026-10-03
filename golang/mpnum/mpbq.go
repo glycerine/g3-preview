@@ -43,6 +43,9 @@ type BinaryRationalManager struct {
 	divTmp1, divTmp2, divTmp3                    Int
 	headerBytes                                  uint64
 	closed                                       bool
+	closing                                      bool
+	cleanupStage                                 uint8
+	display                                      binaryDisplayScope
 }
 type BinaryRationalStats struct {
 	HeaderBytes           uint64
@@ -68,7 +71,7 @@ func (m *BinaryRationalManager) open() error {
 	if m == nil || m.self != m {
 		return ErrBinaryOwner
 	}
-	if m.closed || m.z.closed {
+	if m.closed || m.closing || m.z.closed {
 		return arena.ErrClosed
 	}
 	return nil
@@ -105,24 +108,36 @@ func (m *BinaryRationalManager) triple(a, b, r *BinaryRational) error {
 }
 func (m *BinaryRationalManager) Precise() bool { return true }
 func (m *BinaryRationalManager) Field() bool   { return false }
+func (m *BinaryRationalManager) CloseChecked() error {
+	if m == nil || m.self != m {
+		return ErrBinaryOwner
+	}
+	if m.closed {
+		return nil
+	}
+	m.closing = true
+	if e := m.CleanupDisplay(); e != nil {
+		return e
+	}
+	roots := [11]*Int{&m.addMulTmp.num, &m.tmp, &m.tmp2, &m.selectIntTmp1, &m.selectIntTmp2, &m.selectSmallTmp, &m.selectSmallTmp1.num, &m.selectSmallTmp2.num, &m.divTmp1, &m.divTmp2, &m.divTmp3}
+	for m.cleanupStage < 11 {
+		if e := m.z.Del(roots[m.cleanupStage]); e != nil {
+			return e
+		}
+		m.cleanupStage++
+	}
+	m.z.budget.Release(m.headerBytes)
+	m.headerBytes = 0
+	m.closed = true
+	return nil
+}
 func (m *BinaryRationalManager) Close() {
 	if m == nil || m.self != m || m.closed {
 		return
 	}
-	m.z.Del(&m.addMulTmp.num)
-	m.z.Del(&m.tmp)
-	m.z.Del(&m.tmp2)
-	m.z.Del(&m.selectIntTmp1)
-	m.z.Del(&m.selectIntTmp2)
-	m.z.Del(&m.selectSmallTmp)
-	m.z.Del(&m.selectSmallTmp1.num)
-	m.z.Del(&m.selectSmallTmp2.num)
-	m.z.Del(&m.divTmp1)
-	m.z.Del(&m.divTmp2)
-	m.z.Del(&m.divTmp3)
-	m.z.budget.Release(m.headerBytes)
-	m.headerBytes = 0
-	m.closed = true
+	if e := m.CloseChecked(); e != nil {
+		panic(e)
+	}
 }
 func (m *BinaryRationalManager) Stats() (BinaryRationalStats, error) {
 	if e := m.open(); e != nil {

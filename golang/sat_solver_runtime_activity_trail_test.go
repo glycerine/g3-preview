@@ -15,13 +15,13 @@ func TestSATSolverActivityAndLiteralTrailUseActualRuntime(t *testing.T) {
 	satOK(t, e)
 	n, e := v.memory.AllocationSize()
 	satOK(t, e)
-	if n != 210 || v.memory.Stats().LiveBlocks != 11 {
+	if n != 242 || v.memory.Stats().LiveBlocks != 12 {
 		t.Fatal("actual activity source allocation missing", n, v.memory.Stats())
 	}
 	satOK(t, v.trailPush(satMakeLiteral(0, true)))
 	n, e = v.memory.AllocationSize()
 	satOK(t, e)
-	if n != 234 || v.memory.Stats().LiveBlocks != 12 {
+	if n != 266 || v.memory.Stats().LiveBlocks != 13 {
 		t.Fatal("actual literal32 trail allocation missing", n, v.memory.Stats())
 	}
 }
@@ -202,7 +202,7 @@ func TestSATSolverRuntimeActivityTLSFailurePendingSourcePrefix(t *testing.T) {
 	satOK(t, e)
 	v, e := newSATSolverVariableState(todo, b, arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: b}}, r)
 	satOK(t, e)
-	prefix, e := r.Allocate(99912)
+	prefix, e := r.Allocate(99880)
 	satOK(t, e)
 	satOK(t, r.SetMaxSize(1))
 	_, e = v.mkVar(true, true)
@@ -234,9 +234,9 @@ func TestSATSolverRuntimeTrailTLSPendingPreservesVectorPrefix(t *testing.T) {
 	satOK(t, e)
 	_, e = v.mkVar(false, true)
 	satOK(t, e)
-	// Real prior extents210 + this block99790 reach100000 exactly; trail24
+	// Real prior extents242 + this block99758 reach100000 exactly; trail24
 	// crosses the actual TLS threshold after owned physical publication.
-	prefix, e := r.Allocate(99782)
+	prefix, e := r.Allocate(99750)
 	satOK(t, e)
 	satOK(t, r.SetMaxSize(1))
 	e = v.trailPush(satMakeLiteral(0, true))

@@ -306,15 +306,33 @@ func TestInfRationalOwnershipErrors(t *testing.T) {
 		t.Fatal(e)
 	}
 	z := infValue(t, s, 0, 1, "1")
-	if _, e := s.InfLowerDiv(&v, &z); !errors.Is(e, ErrDivideByZero) {
-		t.Fatal(e)
+	div, e := s.InfLowerDiv(&v, &z)
+	if sourceExtendedGCDDebug {
+		if !errors.Is(e, ErrInfRationalDomain) {
+			t.Fatal(e)
+		}
+	} else {
+		serviceMust(t, e)
+		if div.first.num.val != 1 || div.first.den.val != 0 || div.second.num.val != -1 || div.second.den.val != 0 {
+			t.Fatal(div)
+		}
+		infAuditRoots(t, s, []*OwnedInfRational{&v, &z, &div}, nil)
+		serviceMust(t, s.InfDel(&div))
 	}
 	root, e := s.InfLowerRoot(&z, 2)
 	serviceMust(t, e)
 	serviceMust(t, s.InfDel(&root))
 	serviceMust(t, s.InfNeg(&z))
-	if _, e := s.InfUpperRoot(&z, 2); !errors.Is(e, ErrInfRationalDomain) {
-		t.Fatal(e)
+	root, e = s.InfUpperRoot(&z, 2)
+	if sourceExtendedGCDDebug {
+		if !errors.Is(e, ErrInfRationalDomain) {
+			t.Fatal(e)
+		}
+	} else {
+		serviceMust(t, e)
+		infText(t, s, &root, "(0 -e*1)")
+		infAuditRoots(t, s, []*OwnedInfRational{&v, &z, &root}, nil)
+		serviceMust(t, s.InfDel(&root))
 	}
 	serviceMust(t, s.Close())
 	if _, e := s.InfHash(&v); !errors.Is(e, arena.ErrClosed) {

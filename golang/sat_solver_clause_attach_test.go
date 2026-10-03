@@ -70,7 +70,7 @@ func TestSATSolverClauseLearnedWatchActualSelection(t *testing.T) {
 	if x != 4 || len(s.learned) != 1 || len(s.reinit) != 0 || p.clausePropagations != 1 {
 		t.Fatal("actual highest-level learned watch", x)
 	}
-	if v.justification.data[0] != newSATClauseJustification(satClauseOffset(c)) {
+	if satJustificationTestValue(t, &v.justification, 0) != newSATClauseJustification(satClauseOffset(c)) {
 		t.Fatal("actual clause assignment")
 	}
 	satLifecycleAssertOwned(t, s)

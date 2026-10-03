@@ -30609,12 +30609,55 @@
       "sha256": "1bd7ad5f93357043bfdd4b7b8ea5ba4badc197889e055d61fc5699b9c9da1322",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sexpr_upolynomial.go",
+        "sexpr_upolynomial_test.go",
+        "mpnum/upolynomial_rational_context.go",
+        "mpnum/upolynomial_rational_context_test.go"
+      ],
+      "tests": [
+        "TestSexprPolynomialSourceArithmetic",
+        "TestSexprPolynomialErrorsAndCompletedPrefix",
+        "TestSexprPolynomialDepthBoundary",
+        "TestSexprPolynomialActualFaultPrefixes",
+        "TestSexprPolynomialWarmAndRemainingKinds",
+        "TestUPolynomialContextRawConstantCopy",
+        "TestUPolynomialContextBorrowIdentity",
+        "TestUPolynomialContextVectorStopAPI",
+        "TestUPolynomialContextExceptionBeforeCompletedDestructor",
+        "TestUPolynomialContextPartialCopyWaitsForStoppedVector",
+        "TestUPolynomialContextVectorOnlyStopDoesNotPoisonService"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Recursive sexpr-to-upolynomial source arithmetic, error locations/depth/published prefixes and scoped vector/rational lifetime on real same-owner services; arithmetic plugin consumer and general cmd_exception integration remain open",
+          "status": "partial",
+          "go_target": "sexpr_upolynomial.go",
+          "tests": [
+            "TestSexprPolynomialSourceArithmetic",
+            "TestSexprPolynomialErrorsAndCompletedPrefix",
+            "TestSexprPolynomialDepthBoundary",
+            "TestSexprPolynomialActualFaultPrefixes",
+            "TestSexprPolynomialWarmAndRemainingKinds"
+          ]
+        },
+        {
+          "name": "Same-Integer owning rational constant and borrowed exponent context with explicit ordered cleanup and reached provenance guards",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_rational_context.go",
+          "tests": [
+            "TestUPolynomialContextRawConstantCopy",
+            "TestUPolynomialContextBorrowIdentity",
+            "TestUPolynomialContextVectorStopAPI",
+            "TestUPolynomialContextExceptionBeforeCompletedDestructor",
+            "TestUPolynomialContextPartialCopyWaitsForStoppedVector",
+            "TestUPolynomialContextVectorOnlyStopDoesNotPoisonService"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -30623,9 +30666,26 @@
       "sha256": "8873fc798da121c11f92f928cbdc5c0ebf1102b6635ff672b35524edaec3cce1",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sexpr_upolynomial.go",
+        "sexpr_upolynomial_test.go",
+        "mpnum/upolynomial_rational_context.go",
+        "mpnum/upolynomial_rational_context_test.go"
+      ],
+      "tests": [
+        "TestSexprPolynomialSourceArithmetic",
+        "TestSexprPolynomialErrorsAndCompletedPrefix",
+        "TestSexprPolynomialDepthBoundary",
+        "TestSexprPolynomialActualFaultPrefixes",
+        "TestSexprPolynomialWarmAndRemainingKinds",
+        "TestUPolynomialContextRawConstantCopy",
+        "TestUPolynomialContextBorrowIdentity",
+        "TestUPolynomialContextVectorStopAPI",
+        "TestUPolynomialContextExceptionBeforeCompletedDestructor",
+        "TestUPolynomialContextPartialCopyWaitsForStoppedVector",
+        "TestUPolynomialContextVectorOnlyStopDoesNotPoisonService"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -30638,7 +30698,33 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Recursive sexpr-to-upolynomial source arithmetic, error locations/depth/published prefixes and scoped vector/rational lifetime on real same-owner services; arithmetic plugin consumer and general cmd_exception integration remain open",
+          "status": "partial",
+          "go_target": "sexpr_upolynomial.go",
+          "tests": [
+            "TestSexprPolynomialSourceArithmetic",
+            "TestSexprPolynomialErrorsAndCompletedPrefix",
+            "TestSexprPolynomialDepthBoundary",
+            "TestSexprPolynomialActualFaultPrefixes",
+            "TestSexprPolynomialWarmAndRemainingKinds"
+          ]
+        },
+        {
+          "name": "Same-Integer owning rational constant and borrowed exponent context with explicit ordered cleanup and reached provenance guards",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_rational_context.go",
+          "tests": [
+            "TestUPolynomialContextRawConstantCopy",
+            "TestUPolynomialContextBorrowIdentity",
+            "TestUPolynomialContextVectorStopAPI",
+            "TestUPolynomialContextExceptionBeforeCompletedDestructor",
+            "TestUPolynomialContextPartialCopyWaitsForStoppedVector",
+            "TestUPolynomialContextVectorOnlyStopDoesNotPoisonService"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -53262,11 +53348,21 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "sat_justification.go"
+        "sat_justification.go",
+        "sat_solver_runtime_justification.go",
+        "sat_solver_runtime_justification_test.go"
       ],
       "tests": [
         "TestSATJustificationSourceAllKindsAndRawGetters",
-        "TestSATStorageSourceTextAndWidthActions"
+        "TestSATStorageSourceTextAndWidthActions",
+        "TestSATSolverJustificationActualEightByteSourceAllocation",
+        "TestSATSolverJustificationProvenanceRefusalFollowsRawSourceCopy",
+        "TestSATSolverJustificationPushSizePublishesBeforeProvenanceRefusal",
+        "TestSATSolverJustificationFiveKindsActualWordsAndWarmMetadata",
+        "TestSATSolverJustificationStaleGenerationAndForeignAllocatorTiming",
+        "TestSATSolverJustificationGrowthCopiesSourceAndMetadataHasRealPeak",
+        "TestSATSolverJustificationTLSPendingAtActualSourceAllocation",
+        "TestSATSolverJustificationRetainedInitializedSlotAndCurrentMember"
       ],
       "conditionals": [
         {
@@ -53307,6 +53403,21 @@
         {
           "name": "whole runtime conditional debug-tag/TRACE policy and remaining consumer integration",
           "status": "unported"
+        },
+        {
+          "name": "Actual source8 two-word justification Runtime column and separately charged clause provenance with fixed borrowed allocator; compact physical clause_offset encoding remains open",
+          "status": "partial",
+          "go_target": "sat_solver_runtime_justification.go",
+          "tests": [
+            "TestSATSolverJustificationActualEightByteSourceAllocation",
+            "TestSATSolverJustificationProvenanceRefusalFollowsRawSourceCopy",
+            "TestSATSolverJustificationPushSizePublishesBeforeProvenanceRefusal",
+            "TestSATSolverJustificationFiveKindsActualWordsAndWarmMetadata",
+            "TestSATSolverJustificationStaleGenerationAndForeignAllocatorTiming",
+            "TestSATSolverJustificationGrowthCopiesSourceAndMetadataHasRealPeak",
+            "TestSATSolverJustificationTLSPendingAtActualSourceAllocation",
+            "TestSATSolverJustificationRetainedInitializedSlotAndCurrentMember"
+          ]
         }
       ],
       "ownership": [
@@ -54898,7 +55009,9 @@
         "sat_solver_scalar_runtime_test.go",
         "sat_solver_runtime_activity.go",
         "sat_solver_runtime_trail.go",
-        "sat_solver_runtime_activity_trail_test.go"
+        "sat_solver_runtime_activity_trail_test.go",
+        "sat_solver_runtime_justification.go",
+        "sat_solver_runtime_justification_test.go"
       ],
       "tests": [
         "TestSATSolverClauseCoreFiniteSimplification",
@@ -54972,7 +55085,15 @@
         "TestSATSolverRuntimeTrailAllActualRefusalPrefixes",
         "TestSATSolverRuntimeActivityTLSFailurePendingSourcePrefix",
         "TestSATSolverRuntimeTrailTLSPendingPreservesVectorPrefix",
-        "TestSATSolverRuntimeActivityCurrentBorrowAfterGrowthAndColdGuards"
+        "TestSATSolverRuntimeActivityCurrentBorrowAfterGrowthAndColdGuards",
+        "TestSATSolverJustificationActualEightByteSourceAllocation",
+        "TestSATSolverJustificationProvenanceRefusalFollowsRawSourceCopy",
+        "TestSATSolverJustificationPushSizePublishesBeforeProvenanceRefusal",
+        "TestSATSolverJustificationFiveKindsActualWordsAndWarmMetadata",
+        "TestSATSolverJustificationStaleGenerationAndForeignAllocatorTiming",
+        "TestSATSolverJustificationGrowthCopiesSourceAndMetadataHasRealPeak",
+        "TestSATSolverJustificationTLSPendingAtActualSourceAllocation",
+        "TestSATSolverJustificationRetainedInitializedSlotAndCurrentMember"
       ],
       "conditionals": [
         {
@@ -55542,6 +55663,21 @@
             "TestSATSolverRuntimeTrailTLSPendingPreservesVectorPrefix",
             "TestSATSolverRuntimeActivityCurrentBorrowAfterGrowthAndColdGuards"
           ]
+        },
+        {
+          "name": "Actual source8 two-word justification Runtime column and separately charged clause provenance with fixed borrowed allocator; compact physical clause_offset encoding remains open",
+          "status": "partial",
+          "go_target": "sat_solver_runtime_justification.go",
+          "tests": [
+            "TestSATSolverJustificationActualEightByteSourceAllocation",
+            "TestSATSolverJustificationProvenanceRefusalFollowsRawSourceCopy",
+            "TestSATSolverJustificationPushSizePublishesBeforeProvenanceRefusal",
+            "TestSATSolverJustificationFiveKindsActualWordsAndWarmMetadata",
+            "TestSATSolverJustificationStaleGenerationAndForeignAllocatorTiming",
+            "TestSATSolverJustificationGrowthCopiesSourceAndMetadataHasRealPeak",
+            "TestSATSolverJustificationTLSPendingAtActualSourceAllocation",
+            "TestSATSolverJustificationRetainedInitializedSlotAndCurrentMember"
+          ]
         }
       ],
       "ownership": [
@@ -55591,7 +55727,9 @@
         "sat_solver_scalar_runtime_test.go",
         "sat_solver_runtime_activity.go",
         "sat_solver_runtime_trail.go",
-        "sat_solver_runtime_activity_trail_test.go"
+        "sat_solver_runtime_activity_trail_test.go",
+        "sat_solver_runtime_justification.go",
+        "sat_solver_runtime_justification_test.go"
       ],
       "tests": [
         "TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots",
@@ -55665,7 +55803,15 @@
         "TestSATSolverRuntimeTrailAllActualRefusalPrefixes",
         "TestSATSolverRuntimeActivityTLSFailurePendingSourcePrefix",
         "TestSATSolverRuntimeTrailTLSPendingPreservesVectorPrefix",
-        "TestSATSolverRuntimeActivityCurrentBorrowAfterGrowthAndColdGuards"
+        "TestSATSolverRuntimeActivityCurrentBorrowAfterGrowthAndColdGuards",
+        "TestSATSolverJustificationActualEightByteSourceAllocation",
+        "TestSATSolverJustificationProvenanceRefusalFollowsRawSourceCopy",
+        "TestSATSolverJustificationPushSizePublishesBeforeProvenanceRefusal",
+        "TestSATSolverJustificationFiveKindsActualWordsAndWarmMetadata",
+        "TestSATSolverJustificationStaleGenerationAndForeignAllocatorTiming",
+        "TestSATSolverJustificationGrowthCopiesSourceAndMetadataHasRealPeak",
+        "TestSATSolverJustificationTLSPendingAtActualSourceAllocation",
+        "TestSATSolverJustificationRetainedInitializedSlotAndCurrentMember"
       ],
       "conditionals": [
         {
@@ -55818,6 +55964,21 @@
             "TestSATSolverRuntimeActivityTLSFailurePendingSourcePrefix",
             "TestSATSolverRuntimeTrailTLSPendingPreservesVectorPrefix",
             "TestSATSolverRuntimeActivityCurrentBorrowAfterGrowthAndColdGuards"
+          ]
+        },
+        {
+          "name": "Actual source8 two-word justification Runtime column and separately charged clause provenance with fixed borrowed allocator; compact physical clause_offset encoding remains open",
+          "status": "partial",
+          "go_target": "sat_solver_runtime_justification.go",
+          "tests": [
+            "TestSATSolverJustificationActualEightByteSourceAllocation",
+            "TestSATSolverJustificationProvenanceRefusalFollowsRawSourceCopy",
+            "TestSATSolverJustificationPushSizePublishesBeforeProvenanceRefusal",
+            "TestSATSolverJustificationFiveKindsActualWordsAndWarmMetadata",
+            "TestSATSolverJustificationStaleGenerationAndForeignAllocatorTiming",
+            "TestSATSolverJustificationGrowthCopiesSourceAndMetadataHasRealPeak",
+            "TestSATSolverJustificationTLSPendingAtActualSourceAllocation",
+            "TestSATSolverJustificationRetainedInitializedSlotAndCurrentMember"
           ]
         }
       ],
@@ -97387,7 +97548,8 @@
       "status": "ported",
       "go_targets": [
         "mpnum/inf_rational.go",
-        "mpnum/mp_lexical_constructor_test.go"
+        "mpnum/mp_lexical_constructor_test.go",
+        "mpnum/inf_guard_profile_test.go"
       ],
       "tests": [
         "TestInfRationalSource80Assertions",
@@ -97410,7 +97572,11 @@
         "TestConstructorInfPowerUsesPrvalueMove",
         "TestConstructorCompletedUnwindPrecedesOwningAbort",
         "TestConstructorEightRootsAndWarmBoundary",
-        "TestConstructorExpressionFailedCopyPhase"
+        "TestConstructorExpressionFailedCopyPhase",
+        "TestInfGuardZeroFirstDivisionProfiles",
+        "TestInfGuardRootProfilesAndUnreadFields",
+        "TestInfGuardUnreadDivisorAndLowerRoot",
+        "TestInfGuardAllocationPrecedenceAndWarmRoots"
       ],
       "assertions": [
         {
@@ -97476,6 +97642,17 @@
             "TestRationalServiceInfinitesimalConstructorFailureRefunds",
             "TestRationalServiceInfinitesimalFinalizerTraversal"
           ]
+        },
+        {
+          "name": "Selected inf_div/sup_div/inf_root/sup_root DEBUG scalar guards, reached raw fields and release DEFAULT/COPY routes with actual lexical cleanup",
+          "status": "ported",
+          "go_target": "mpnum/inf_rational.go",
+          "tests": [
+            "TestInfGuardZeroFirstDivisionProfiles",
+            "TestInfGuardRootProfilesAndUnreadFields",
+            "TestInfGuardUnreadDivisorAndLowerRoot",
+            "TestInfGuardAllocationPrecedenceAndWarmRoots"
+          ]
         }
       ],
       "ownership": [
@@ -97497,7 +97674,8 @@
         "mpnum/inf_scalar_projection_test.go",
         "mpnum/mp_raw_projection_test.go",
         "mpnum/rational_lexical_scope.go",
-        "mpnum/mp_lexical_scope_test.go"
+        "mpnum/mp_lexical_scope_test.go",
+        "mpnum/inf_guard_profile_test.go"
       ],
       "tests": [
         "TestInfRationalSource80Assertions",
@@ -97544,7 +97722,11 @@
         "TestLexicalCloneFailedMemberReadUnwind",
         "TestLexicalCallerDestructorLateMemberRead",
         "TestLexicalOriginalFailureAndCleanupCause",
-        "TestLexicalRationalManagerOneRootContinuation"
+        "TestLexicalRationalManagerOneRootContinuation",
+        "TestInfGuardZeroFirstDivisionProfiles",
+        "TestInfGuardRootProfilesAndUnreadFields",
+        "TestInfGuardUnreadDivisorAndLowerRoot",
+        "TestInfGuardAllocationPrecedenceAndWarmRoots"
       ],
       "conditionals": [
         {
@@ -97755,6 +97937,17 @@
             "TestLexicalCallerDestructorLateMemberRead",
             "TestLexicalOriginalFailureAndCleanupCause",
             "TestLexicalRationalManagerOneRootContinuation"
+          ]
+        },
+        {
+          "name": "Selected inf_div/sup_div/inf_root/sup_root DEBUG scalar guards, reached raw fields and release DEFAULT/COPY routes with actual lexical cleanup",
+          "status": "ported",
+          "go_target": "mpnum/inf_rational.go",
+          "tests": [
+            "TestInfGuardZeroFirstDivisionProfiles",
+            "TestInfGuardRootProfilesAndUnreadFields",
+            "TestInfGuardUnreadDivisorAndLowerRoot",
+            "TestInfGuardAllocationPrecedenceAndWarmRoots"
           ]
         }
       ],
@@ -104457,7 +104650,9 @@
         "mpnum/mpbq_debug_release.go",
         "mpnum/scoped_binary.go",
         "mpnum/upolynomial_binary_vector.go",
-        "mpnum/upolynomial_isolation_storage_test.go"
+        "mpnum/upolynomial_isolation_storage_test.go",
+        "mpnum/mpbq_display_scope.go",
+        "mpnum/mpbq_display_scope_test.go"
       ],
       "tests": [
         "TestBinarySourceTst1",
@@ -104476,7 +104671,12 @@
         "TestBinaryVectorFailurePrefixesAndScopedRoutes",
         "TestUPolynomialIsolationPackedFrameAndScalarExtents",
         "TestUPolynomialBinaryVectorActualAscendingDestruction",
-        "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
+        "TestUPolynomialIsolationSSPopAndDestructorActualOrder",
+        "TestBinaryDecimalErrorDoesNotExecuteSourceEndLabel",
+        "TestBinaryDisplayScopeAPIAndGuards",
+        "TestBinaryRawDisplayAllFaultPrefixesAndOwningAbort",
+        "TestBinarySourceEndLabelsAndInlineWarm",
+        "TestBinarySourceEndLabelGuardedPhysicalFreeContinuation"
       ],
       "conditionals": [
         {
@@ -104900,6 +105100,18 @@
             "TestUPolynomialBinaryVectorActualAscendingDestruction",
             "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
           ]
+        },
+        {
+          "name": "Actual raw decimal/interval locals and explicit end-label deletion cursors; exceptional raw roots retained for checked owning cleanup; broader binary lifecycle remains open",
+          "status": "partial",
+          "go_target": "mpnum/mpbq_display_scope.go",
+          "tests": [
+            "TestBinaryDecimalErrorDoesNotExecuteSourceEndLabel",
+            "TestBinaryDisplayScopeAPIAndGuards",
+            "TestBinaryRawDisplayAllFaultPrefixesAndOwningAbort",
+            "TestBinarySourceEndLabelsAndInlineWarm",
+            "TestBinarySourceEndLabelGuardedPhysicalFreeContinuation"
+          ]
         }
       ],
       "ownership": [
@@ -104927,7 +105139,9 @@
         "mpnum/mpbq_debug_release.go",
         "mpnum/scoped_binary.go",
         "mpnum/upolynomial_binary_vector.go",
-        "mpnum/upolynomial_isolation_storage_test.go"
+        "mpnum/upolynomial_isolation_storage_test.go",
+        "mpnum/mpbq_display_scope.go",
+        "mpnum/mpbq_display_scope_test.go"
       ],
       "tests": [
         "TestBinarySourceTst1",
@@ -104946,7 +105160,12 @@
         "TestBinaryVectorFailurePrefixesAndScopedRoutes",
         "TestUPolynomialIsolationPackedFrameAndScalarExtents",
         "TestUPolynomialBinaryVectorActualAscendingDestruction",
-        "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
+        "TestUPolynomialIsolationSSPopAndDestructorActualOrder",
+        "TestBinaryDecimalErrorDoesNotExecuteSourceEndLabel",
+        "TestBinaryDisplayScopeAPIAndGuards",
+        "TestBinaryRawDisplayAllFaultPrefixesAndOwningAbort",
+        "TestBinarySourceEndLabelsAndInlineWarm",
+        "TestBinarySourceEndLabelGuardedPhysicalFreeContinuation"
       ],
       "conditionals": [
         {
@@ -105120,6 +105339,18 @@
             "TestUPolynomialIsolationPackedFrameAndScalarExtents",
             "TestUPolynomialBinaryVectorActualAscendingDestruction",
             "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
+          ]
+        },
+        {
+          "name": "Actual raw decimal/interval locals and explicit end-label deletion cursors; exceptional raw roots retained for checked owning cleanup; broader binary lifecycle remains open",
+          "status": "partial",
+          "go_target": "mpnum/mpbq_display_scope.go",
+          "tests": [
+            "TestBinaryDecimalErrorDoesNotExecuteSourceEndLabel",
+            "TestBinaryDisplayScopeAPIAndGuards",
+            "TestBinaryRawDisplayAllFaultPrefixesAndOwningAbort",
+            "TestBinarySourceEndLabelsAndInlineWarm",
+            "TestBinarySourceEndLabelGuardedPhysicalFreeContinuation"
           ]
         }
       ],
@@ -116185,7 +116416,9 @@
         "mpnum/mp_raw_projection_test.go",
         "mpnum/rational_lexical_scope.go",
         "mpnum/mp_lexical_scope_test.go",
-        "mpnum/mp_lexical_constructor_test.go"
+        "mpnum/mp_lexical_constructor_test.go",
+        "mpnum/upolynomial_rational_context.go",
+        "mpnum/upolynomial_rational_context_test.go"
       ],
       "tests": [
         "TestSourceRationalConversionAssertions",
@@ -116272,7 +116505,13 @@
         "TestExtendedGCDWrapperCoefficientOuterBoundary",
         "TestExtendedGCDWrapperCopyConstructorUnwindOrder",
         "TestExtendedGCDWrapperWarmPhysicalBoundary",
-        "TestExtendedGCDWrapperNineRetainedDiagnosticRecords"
+        "TestExtendedGCDWrapperNineRetainedDiagnosticRecords",
+        "TestUPolynomialContextRawConstantCopy",
+        "TestUPolynomialContextBorrowIdentity",
+        "TestUPolynomialContextVectorStopAPI",
+        "TestUPolynomialContextExceptionBeforeCompletedDestructor",
+        "TestUPolynomialContextPartialCopyWaitsForStoppedVector",
+            "TestUPolynomialContextVectorOnlyStopDoesNotPoisonService"
       ],
       "conditionals": [
         {
@@ -116692,6 +116931,19 @@
             "TestExtendedGCDWrapperCopyConstructorUnwindOrder",
             "TestExtendedGCDWrapperWarmPhysicalBoundary",
             "TestExtendedGCDWrapperNineRetainedDiagnosticRecords"
+          ]
+        },
+        {
+          "name": "Concrete same-Integer polynomial rational borrow context, owning constant COPY/exception/destruction timing and completed-before-partial cleanup; source global binding remains open",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_rational_context.go",
+          "tests": [
+            "TestUPolynomialContextRawConstantCopy",
+            "TestUPolynomialContextBorrowIdentity",
+            "TestUPolynomialContextVectorStopAPI",
+            "TestUPolynomialContextExceptionBeforeCompletedDestructor",
+            "TestUPolynomialContextPartialCopyWaitsForStoppedVector",
+            "TestUPolynomialContextVectorOnlyStopDoesNotPoisonService"
           ]
         }
       ],

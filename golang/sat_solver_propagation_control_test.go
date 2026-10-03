@@ -10,7 +10,12 @@ import (
 
 func satPropagationFixture(t *testing.T, n uint32) (*satSolverPropagationState, *satSolverVariableState, *arena.Budget) {
 	t.Helper()
-	v, _, b := satVariableStateFixture(t)
+	return satPropagationFixtureWithBudget(t, n, arena.NewBudget(^uint64(0)))
+}
+
+func satPropagationFixtureWithBudget(t *testing.T, n uint32, b *arena.Budget) (*satSolverPropagationState, *satSolverVariableState, *arena.Budget) {
+	t.Helper()
+	v, _, _ := satVariableStateFixtureWithBudget(t, b)
 	for i := uint32(0); i < n; i++ {
 		_, e := v.mkVar(false, true)
 		satOK(t, e)

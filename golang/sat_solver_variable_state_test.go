@@ -11,7 +11,11 @@ import (
 
 func satVariableStateFixture(t *testing.T) (*satSolverVariableState, *satSolverUintSet, *arena.Budget) {
 	t.Helper()
-	b := arena.NewBudget(^uint64(0))
+	return satVariableStateFixtureWithBudget(t, arena.NewBudget(^uint64(0)))
+}
+
+func satVariableStateFixtureWithBudget(t *testing.T, b *arena.Budget) (*satSolverVariableState, *satSolverUintSet, *arena.Budget) {
+	t.Helper()
 	todo, e := newSATSolverUintSet(b)
 	satOK(t, e)
 	mem, e := memory.NewRuntime(memory.RuntimeConfig{Budget: b})
@@ -49,7 +53,7 @@ func TestSATSolverMkVarFullSourceEighteenActionsAndByteClauseView(t *testing.T) 
 				t.Fatal(l, value)
 			}
 		}
-		if satScalarTestUint(t, &s.level, i) != ^uint32(0) || s.justification.data[i] != (satJustification{}) || satAssignmentTestValue(t, &s.phase, i) != 2 || satAssignmentTestValue(t, &s.previousPhase, i) != 2 {
+		if satScalarTestUint(t, &s.level, i) != ^uint32(0) || satJustificationTestValue(t, &s.justification, i) != (satJustification{}) || satAssignmentTestValue(t, &s.phase, i) != 2 || satAssignmentTestValue(t, &s.previousPhase, i) != 2 {
 			t.Fatal("source values", i)
 		}
 		if satAssignmentTestValue(t, &s.decision, i) != int8(map[bool]int{true: 1}[i%3 != 0]) || satAssignmentTestValue(t, &s.external, i) != int8(i%2) {
@@ -74,7 +78,7 @@ func TestSATSolverMkVarFullSourceEighteenActionsAndByteClauseView(t *testing.T) 
 
 func satVariableAssertFirstPrefix(t *testing.T, s *satSolverVariableState) {
 	t.Helper()
-	sizes := []int{len(s.watches.lists), int(satAssignmentTestSize(t, &s.assignment)), len(s.justification.data), int(satAssignmentTestSize(t, &s.decision)), int(satAssignmentTestSize(t, &s.eliminated)), int(satAssignmentTestSize(t, &s.external)), int(s.activity.Size()), int(satScalarTestUintSize(t, &s.level)), int(satAssignmentTestSize(t, &s.mark)), int(satAssignmentTestSize(t, &s.literalMark)), int(satAssignmentTestSize(t, &s.phase)), int(satAssignmentTestSize(t, &s.previousPhase)), int(satAssignmentTestSize(t, &s.assignedSinceGC))}
+	sizes := []int{len(s.watches.lists), int(satAssignmentTestSize(t, &s.assignment)), int(satJustificationTestSize(t, &s.justification)), int(satAssignmentTestSize(t, &s.decision)), int(satAssignmentTestSize(t, &s.eliminated)), int(satAssignmentTestSize(t, &s.external)), int(s.activity.Size()), int(satScalarTestUintSize(t, &s.level)), int(satAssignmentTestSize(t, &s.mark)), int(satAssignmentTestSize(t, &s.literalMark)), int(satAssignmentTestSize(t, &s.phase)), int(satAssignmentTestSize(t, &s.previousPhase)), int(satAssignmentTestSize(t, &s.assignedSinceGC))}
 	want := []int{2, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1}
 	unfinished := false
 	for i, n := range sizes {

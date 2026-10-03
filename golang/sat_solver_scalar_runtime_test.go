@@ -15,7 +15,7 @@ func TestSATSolverScalarColumnsReachSameRuntime(t *testing.T) {
 	satOK(t, e)
 	amount, e := v.memory.AllocationSize()
 	satOK(t, e)
-	if amount != 210 || v.memory.Stats().LiveBlocks != 11 {
+	if amount != 242 || v.memory.Stats().LiveBlocks != 12 {
 		t.Fatal("all actual scalar source allocations", amount, v.memory.Stats())
 	}
 }
@@ -36,7 +36,7 @@ func satScalarTestUintSize(t *testing.T, c *satSolverRuntimeUintColumn) uint32 {
 func satScalarAuditRoots(t *testing.T, v *satSolverVariableState, external ...memory.Block) {
 	t.Helper()
 	roots := append([]memory.Block{}, external...)
-	for _, c := range []*satSolverAssignmentColumn{&v.decision, &v.mark, &v.literalMark, &v.eliminated, &v.external, &v.phase, &v.previousPhase, &v.assignedSinceGC, &v.level.raw, &v.activity.values.raw, &v.trail.values.raw} {
+	for _, c := range []*satSolverAssignmentColumn{&v.decision, &v.mark, &v.literalMark, &v.eliminated, &v.external, &v.phase, &v.previousPhase, &v.assignedSinceGC, &v.level.raw, &v.activity.values.raw, &v.trail.values.raw, &v.justification.raw} {
 		if !c.pendingReplaces && c.block != (memory.Block{}) {
 			roots = append(roots, c.block)
 		}
@@ -154,7 +154,7 @@ func TestSATSolverScalarLevelTLSFailureRetainsNamedPendingAndPrefix(t *testing.T
 	satOK(t, e)
 	v, e := newSATSolverVariableState(todo, b, arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: b}}, r)
 	satOK(t, e)
-	prefix, e := r.Allocate(99888)
+	prefix, e := r.Allocate(99856)
 	satOK(t, e)
 	satOK(t, r.SetMaxSize(1))
 	_, e = v.mkVar(true, true)
@@ -182,7 +182,7 @@ func TestSATSolverScalarReverseMemberRawDestruction(t *testing.T) {
 	satOK(t, e)
 	// Actual Runtime release cursors verify source reverse declaration order;
 	// other arena-only members introduce no invented Runtime release events.
-	order := []memory.Block{v.assignedSinceGC.block, v.previousPhase.block, v.phase.block, v.activity.values.raw.block, v.level.raw.block, v.external.block, v.eliminated.block, v.literalMark.block, v.mark.block, v.decision.block, v.assignment.block}
+	order := []memory.Block{v.assignedSinceGC.block, v.previousPhase.block, v.phase.block, v.activity.values.raw.block, v.level.raw.block, v.external.block, v.eliminated.block, v.literalMark.block, v.mark.block, v.decision.block, v.justification.raw.block, v.assignment.block}
 	satOK(t, v.Close())
 	records := reflect.ValueOf(v.memory).Elem().FieldByName("blocks")
 	for i, h := range order {

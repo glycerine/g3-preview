@@ -32,7 +32,7 @@ func TestSATSolverPropagateBinaryTernaryAndConflictCleanup(t *testing.T) {
 	if ok || !s.inconsistent || s.binaryPropagations != 1 || s.ternaryPropagations != 1 {
 		t.Fatal(ok, s.binaryPropagations, s.ternaryPropagations)
 	}
-	if v.justification.data[1] != newSATBinaryJustification(1) || v.justification.data[2] != newSATTernaryJustification(satMakeLiteral(1, true), 1) {
+	if satJustificationTestValue(t, &v.justification, 1) != newSATBinaryJustification(1) || satJustificationTestValue(t, &v.justification, 2) != newSATTernaryJustification(satMakeLiteral(1, true), 1) {
 		t.Fatal("source justifications")
 	}
 	a, e := v.watches.Get(0)
@@ -78,7 +78,7 @@ func TestSATSolverPropagateClauseMoveUnitGlueAndConflict(t *testing.T) {
 	if !ok || s.clausePropagations != 1 {
 		t.Fatal(ok, s.clausePropagations)
 	}
-	if v.justification.data[1] != newSATClauseJustification(o) {
+	if satJustificationTestValue(t, &v.justification, 1) != newSATClauseJustification(o) {
 		t.Fatal("unit justification")
 	}
 	glue, e := s.clauses.Glue(c)

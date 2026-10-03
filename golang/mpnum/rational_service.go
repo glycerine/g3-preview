@@ -41,6 +41,7 @@ type RationalServiceStats struct {
 // requires external owner confinement; independent service locks do not make
 // the Budget safe for concurrent use. Never shallow-copy this owner.
 type RationalService struct {
+	polynomialContext                              UPolynomialRationalContext
 	lexical                                        rationalLexicalScope
 	mu                                             sync.Mutex
 	manager                                        *RationalManager

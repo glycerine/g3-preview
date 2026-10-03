@@ -18,7 +18,7 @@ type satSolverVariableState struct {
 	assignment                                                                               satSolverAssignmentColumn
 	memory                                                                                   *memory.Runtime
 	decision, mark, literalMark, eliminated, external, phase, previousPhase, assignedSinceGC satSolverAssignmentColumn
-	justification                                                                            satVariableJustificationColumn
+	justification                                                                            satSolverRuntimeJustificationColumn
 	level                                                                                    satSolverRuntimeUintColumn
 	activity                                                                                 *satSolverRuntimeActivity
 	queue                                                                                    *satVarQueue
@@ -55,6 +55,7 @@ func newSATSolverVariableState(todo *satSolverUintSet, b *arena.Budget, c arena.
 	s.self = s
 	s.memory = raw
 	s.assignment.bind(raw)
+	s.justification.bind(raw, b)
 	for _, col := range []*satSolverAssignmentColumn{&s.decision, &s.mark, &s.literalMark, &s.eliminated, &s.external, &s.phase, &s.previousPhase, &s.assignedSinceGC} {
 		col.bind(raw)
 	}
@@ -112,7 +113,7 @@ func (s *satSolverVariableState) mkVar(ext, dvar bool) (satBoolVar, error) {
 	if e := s.assignment.push(int8(lUndef)); e != nil {
 		return v, e
 	}
-	if e := s.justification.push(s.budget, satJustification{}); e != nil {
+	if e := s.justification.push(satJustification{}); e != nil {
 		return v, e
 	}
 	decision := int8(0)
@@ -226,7 +227,7 @@ func (s *satSolverVariableState) Stats() satSolverVariableStats {
 		return satSolverVariableStats{}
 	}
 	out := satSolverVariableStats{OwnerBytes: s.ownerBytes, NumVars: s.numVars(), MkVarCount: s.mkVarCount}
-	out.ColumnBytes += uint64(reflect.TypeOf(satJustification{}).Size()) * uint64(cap(s.justification.data))
+	out.ColumnBytes += s.justification.provenanceBytes
 	if s.watches != nil {
 		out.WatchBytes = s.watches.Stats().TotalBytes
 	}
@@ -331,7 +332,9 @@ func (s *satSolverVariableState) Close() error {
 	if e := s.decision.finalize(); e != nil {
 		return e
 	}
-	s.justification.finalize(s.budget)
+	if e := s.justification.finalize(); e != nil {
+		return e
+	}
 	if e := s.assignment.finalize(); e != nil {
 		return e
 	}

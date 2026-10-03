@@ -71,6 +71,10 @@ func TestBinaryFormattingBranchesAndFaultPublication(t *testing.T) {
 		if !errors.Is(e, ErrBinaryInvariant) {
 			t.Fatal(e)
 		}
+		// Raw mpz locals do not execute the end label when the source assertion
+		// stops this invocation. Audit that prefix, then explicitly abort ownership.
+		binaryAudit(t, m, &a)
+		serviceMust(t, m.CleanupDisplay())
 	} else if e != nil || got != "1.0" {
 		t.Fatal(got, e)
 	}

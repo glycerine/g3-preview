@@ -60,6 +60,9 @@ func newSATSolverPropagationState(v *satSolverVariableState, a *satClauseAllocat
 	if _, e := mem.AllocationSize(); e != nil {
 		return nil, e
 	}
+	if e := v.justification.bindClauses(a); e != nil {
+		return nil, e
+	}
 	n := uint64(reflect.TypeOf(satSolverPropagationState{}).Size())
 	if e := b.Reserve(n); e != nil {
 		return nil, e

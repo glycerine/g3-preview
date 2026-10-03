@@ -10,12 +10,12 @@ func TestSATSolverAssignConflictStatusSourceOrder(t *testing.T) {
 	s, v, _ := satPropagationFixture(t, 3)
 	j := newSATBinaryJustification(satMakeLiteral(2, true))
 	satOK(t, s.assign(satMakeLiteral(0, true), j))
-	if satAssignmentTestValue(t, &v.assignment, 0) != int8(lFalse) || satAssignmentTestValue(t, &v.assignment, 1) != int8(lTrue) || !v.justification.data[0].None() || satScalarTestUint(t, &v.level, 0) != 0 || satAssignmentTestValue(t, &v.phase, 0) != 1 || satAssignmentTestValue(t, &v.assignedSinceGC, 0) != 1 {
+	if satAssignmentTestValue(t, &v.assignment, 0) != int8(lFalse) || satAssignmentTestValue(t, &v.assignment, 1) != int8(lTrue) || !satJustificationTestValue(t, &v.justification, 0).None() || satScalarTestUint(t, &v.level, 0) != 0 || satAssignmentTestValue(t, &v.phase, 0) != 1 || satAssignmentTestValue(t, &v.assignedSinceGC, 0) != 1 {
 		t.Fatal("base assignment")
 	}
 	v.scopeLevel = 3
 	satOK(t, s.assign(satMakeLiteral(1, false), j))
-	if v.justification.data[1] != j || satScalarTestUint(t, &v.level, 1) != 3 || satAssignmentTestValue(t, &v.phase, 1) != 0 {
+	if satJustificationTestValue(t, &v.justification, 1) != j || satScalarTestUint(t, &v.level, 1) != 3 || satAssignmentTestValue(t, &v.phase, 1) != 0 {
 		t.Fatal("scoped assignment")
 	}
 	c, e := s.clauses.MkClause([]satLiteral{satMakeLiteral(0, false), satMakeLiteral(2, false)}, false)
