@@ -50268,9 +50268,18 @@
       "sha256": "d6577e8da7b2a07cb13959816adf5bbed512cf7049ebf5351ff600b7620e1ba2",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_types.go",
+        "sat_sets.go"
+      ],
+      "tests": [
+        "TestSourceSATLiteralConstructors",
+        "TestSATLiteralAndModelRendering",
+        "TestSATSetOrderAndOwnership",
+        "TestSATLiteralSets",
+        "TestSATSetFiniteModel"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -50305,8 +50314,239 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "literal constructors",
+          "status": "ported",
+          "go_target": "sat_types.go",
+          "tests": [
+            "TestSourceSATLiteralConstructors",
+            "TestSATLiteralAndModelRendering",
+            "TestSATSetOrderAndOwnership",
+            "TestSATLiteralSets",
+            "TestSATSetFiniteModel"
+          ]
+        },
+        {
+          "name": "literal::var",
+          "status": "ported",
+          "go_target": "sat_types.go",
+          "tests": [
+            "TestSourceSATLiteralConstructors",
+            "TestSATLiteralAndModelRendering",
+            "TestSATSetOrderAndOwnership",
+            "TestSATLiteralSets",
+            "TestSATSetFiniteModel"
+          ]
+        },
+        {
+          "name": "literal::sign",
+          "status": "ported",
+          "go_target": "sat_types.go",
+          "tests": [
+            "TestSourceSATLiteralConstructors",
+            "TestSATLiteralAndModelRendering",
+            "TestSATSetOrderAndOwnership",
+            "TestSATLiteralSets",
+            "TestSATSetFiniteModel"
+          ]
+        },
+        {
+          "name": "literal::unsign",
+          "status": "ported",
+          "go_target": "sat_types.go",
+          "tests": [
+            "TestSourceSATLiteralConstructors",
+            "TestSATLiteralAndModelRendering",
+            "TestSATSetOrderAndOwnership",
+            "TestSATLiteralSets",
+            "TestSATSetFiniteModel"
+          ]
+        },
+        {
+          "name": "literal::index",
+          "status": "ported",
+          "go_target": "sat_types.go",
+          "tests": [
+            "TestSourceSATLiteralConstructors",
+            "TestSATLiteralAndModelRendering",
+            "TestSATSetOrderAndOwnership",
+            "TestSATLiteralSets",
+            "TestSATSetFiniteModel"
+          ]
+        },
+        {
+          "name": "literal::neg",
+          "status": "ported",
+          "go_target": "sat_types.go",
+          "tests": [
+            "TestSourceSATLiteralConstructors",
+            "TestSATLiteralAndModelRendering",
+            "TestSATSetOrderAndOwnership",
+            "TestSATLiteralSets",
+            "TestSATSetFiniteModel"
+          ]
+        },
+        {
+          "name": "literal::to_uint",
+          "status": "ported",
+          "go_target": "sat_types.go",
+          "tests": [
+            "TestSourceSATLiteralConstructors",
+            "TestSATLiteralAndModelRendering",
+            "TestSATSetOrderAndOwnership",
+            "TestSATLiteralSets",
+            "TestSATSetFiniteModel"
+          ]
+        },
+        {
+          "name": "literal::hash",
+          "status": "ported",
+          "go_target": "sat_types.go",
+          "tests": [
+            "TestSourceSATLiteralConstructors",
+            "TestSATLiteralAndModelRendering",
+            "TestSATSetOrderAndOwnership",
+            "TestSATLiteralSets",
+            "TestSATSetFiniteModel"
+          ]
+        },
+        {
+          "name": "to_literal",
+          "status": "ported",
+          "go_target": "sat_types.go",
+          "tests": [
+            "TestSourceSATLiteralConstructors",
+            "TestSATLiteralAndModelRendering",
+            "TestSATSetOrderAndOwnership",
+            "TestSATLiteralSets",
+            "TestSATSetFiniteModel"
+          ]
+        },
+        {
+          "name": "value_at",
+          "status": "ported",
+          "go_target": "sat_types.go",
+          "tests": [
+            "TestSourceSATLiteralConstructors",
+            "TestSATLiteralAndModelRendering",
+            "TestSATSetOrderAndOwnership",
+            "TestSATLiteralSets",
+            "TestSATSetFiniteModel"
+          ]
+        },
+        {
+          "name": "literal/model/DIMACS/vector printers",
+          "status": "ported",
+          "go_target": "sat_types.go",
+          "tests": [
+            "TestSourceSATLiteralConstructors",
+            "TestSATLiteralAndModelRendering",
+            "TestSATSetOrderAndOwnership",
+            "TestSATLiteralSets",
+            "TestSATSetFiniteModel"
+          ]
+        },
+        {
+          "name": "uint_set::insert/remove/contains",
+          "status": "ported",
+          "go_target": "sat_sets.go",
+          "tests": [
+            "TestSourceSATLiteralConstructors",
+            "TestSATLiteralAndModelRendering",
+            "TestSATSetOrderAndOwnership",
+            "TestSATLiteralSets",
+            "TestSATSetFiniteModel"
+          ]
+        },
+        {
+          "name": "uint_set::operator=",
+          "status": "ported",
+          "go_target": "sat_sets.go",
+          "tests": [
+            "TestSourceSATLiteralConstructors",
+            "TestSATLiteralAndModelRendering",
+            "TestSATSetOrderAndOwnership",
+            "TestSATLiteralSets",
+            "TestSATSetFiniteModel"
+          ]
+        },
+        {
+          "name": "uint_set::erase",
+          "status": "ported",
+          "go_target": "sat_sets.go",
+          "tests": [
+            "TestSourceSATLiteralConstructors",
+            "TestSATLiteralAndModelRendering",
+            "TestSATSetOrderAndOwnership",
+            "TestSATLiteralSets",
+            "TestSATSetFiniteModel"
+          ]
+        },
+        {
+          "name": "uint_set::reset/finalize",
+          "status": "ported",
+          "go_target": "sat_sets.go",
+          "tests": [
+            "TestSourceSATLiteralConstructors",
+            "TestSATLiteralAndModelRendering",
+            "TestSATSetOrderAndOwnership",
+            "TestSATLiteralSets",
+            "TestSATSetFiniteModel"
+          ]
+        },
+        {
+          "name": "uint_set::operator&=",
+          "status": "ported",
+          "go_target": "sat_sets.go",
+          "tests": [
+            "TestSourceSATLiteralConstructors",
+            "TestSATLiteralAndModelRendering",
+            "TestSATSetOrderAndOwnership",
+            "TestSATLiteralSets",
+            "TestSATSetFiniteModel"
+          ]
+        },
+        {
+          "name": "uint_set::operator|=",
+          "status": "ported",
+          "go_target": "sat_sets.go",
+          "tests": [
+            "TestSourceSATLiteralConstructors",
+            "TestSATLiteralAndModelRendering",
+            "TestSATSetOrderAndOwnership",
+            "TestSATLiteralSets",
+            "TestSATSetFiniteModel"
+          ]
+        },
+        {
+          "name": "literal_set construction/assignment/copy/vector conversion",
+          "status": "ported",
+          "go_target": "sat_sets.go",
+          "tests": [
+            "TestSourceSATLiteralConstructors",
+            "TestSATLiteralAndModelRendering",
+            "TestSATSetOrderAndOwnership",
+            "TestSATLiteralSets",
+            "TestSATSetFiniteModel"
+          ]
+        },
+        {
+          "name": "literal_set insert/remove/pop/contains/iteration/reset/finalize/union/intersection",
+          "status": "ported",
+          "go_target": "sat_sets.go",
+          "tests": [
+            "TestSourceSATLiteralConstructors",
+            "TestSATLiteralAndModelRendering",
+            "TestSATSetOrderAndOwnership",
+            "TestSATLiteralSets",
+            "TestSATSetFiniteModel"
+          ]
+        }
+      ],
+      "ownership": [
+        "Owned scalar backing arrays. Reset retains capacity; finalize drops references. Explicit copies; source removal/iteration order preserved. Solver budgets/errors/diagnostics still pending; see SAT_PORT_STATUS.md."
+      ],
       "deviations": []
     },
     {
@@ -74586,7 +74826,14 @@
       "go_targets": [
         "bitset/bit_vector.go"
       ],
-      "tests": [],
+      "tests": [
+        "TestSourceResizeCrash",
+        "TestSourceOr",
+        "TestSourceAnd",
+        "TestSourceReset",
+        "TestSourceEq",
+        "TestBoundedOperationOracle"
+      ],
       "assertions": [
         {
           "line": 34,
@@ -76152,9 +76399,20 @@
       "sha256": "d40631f4bc3423271cb76785ed24c17d41704c0551b6f411c87159cee8dcc64f",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "bitset/fixed_bit_vector.go"
+      ],
+      "tests": [
+        "TestFixedSourceTst1",
+        "TestFixedSourceOr",
+        "TestFixedSourceEq",
+        "TestFixedRangeAliasTraversal",
+        "TestFixedOwnershipAndLifetime",
+        "TestFixedSourceHash",
+        "TestFixedBoundedOracle",
+        "TestFixedBudgetsAndReuse"
+      ],
       "assertions": [
         {
           "line": 34,
@@ -76215,8 +76473,101 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "fixed_bit_vector access/masks/set/unset/get",
+          "status": "ported",
+          "go_target": "bitset/fixed_bit_vector.go",
+          "tests": [
+            "TestFixedSourceTst1",
+            "TestFixedSourceOr",
+            "TestFixedSourceEq",
+            "TestFixedRangeAliasTraversal",
+            "TestFixedOwnershipAndLifetime",
+            "TestFixedSourceHash",
+            "TestFixedBoundedOracle",
+            "TestFixedBudgetsAndReuse"
+          ]
+        },
+        {
+          "name": "manager construction/root/reset/deallocate/destruction",
+          "status": "ported",
+          "go_target": "bitset/fixed_bit_vector.go",
+          "tests": [
+            "TestFixedSourceTst1",
+            "TestFixedSourceOr",
+            "TestFixedSourceEq",
+            "TestFixedRangeAliasTraversal",
+            "TestFixedOwnershipAndLifetime",
+            "TestFixedSourceHash",
+            "TestFixedBoundedOracle",
+            "TestFixedBudgetsAndReuse"
+          ]
+        },
+        {
+          "name": "allocate/allocate0/allocate1/allocate(copy)",
+          "status": "ported",
+          "go_target": "bitset/fixed_bit_vector.go",
+          "tests": [
+            "TestFixedSourceTst1",
+            "TestFixedSourceOr",
+            "TestFixedSourceEq",
+            "TestFixedRangeAliasTraversal",
+            "TestFixedOwnershipAndLifetime",
+            "TestFixedSourceHash",
+            "TestFixedBoundedOracle",
+            "TestFixedBudgetsAndReuse"
+          ]
+        },
+        {
+          "name": "fill0/fill1/copy/assign/range copy",
+          "status": "ported",
+          "go_target": "bitset/fixed_bit_vector.go",
+          "tests": [
+            "TestFixedSourceTst1",
+            "TestFixedSourceOr",
+            "TestFixedSourceEq",
+            "TestFixedRangeAliasTraversal",
+            "TestFixedOwnershipAndLifetime",
+            "TestFixedSourceHash",
+            "TestFixedBoundedOracle",
+            "TestFixedBudgetsAndReuse"
+          ]
+        },
+        {
+          "name": "AND/OR/XOR/NOT/equals/contains",
+          "status": "ported",
+          "go_target": "bitset/fixed_bit_vector.go",
+          "tests": [
+            "TestFixedSourceTst1",
+            "TestFixedSourceOr",
+            "TestFixedSourceEq",
+            "TestFixedRangeAliasTraversal",
+            "TestFixedOwnershipAndLifetime",
+            "TestFixedSourceHash",
+            "TestFixedBoundedOracle",
+            "TestFixedBudgetsAndReuse"
+          ]
+        },
+        {
+          "name": "hash/word/last_word/display",
+          "status": "ported",
+          "go_target": "bitset/fixed_bit_vector.go",
+          "tests": [
+            "TestFixedSourceTst1",
+            "TestFixedSourceOr",
+            "TestFixedSourceEq",
+            "TestFixedRangeAliasTraversal",
+            "TestFixedOwnershipAndLifetime",
+            "TestFixedSourceHash",
+            "TestFixedBoundedOracle",
+            "TestFixedBudgetsAndReuse"
+          ]
+        }
+      ],
+      "ownership": [
+        "Manager owns pooled fixed-width word descriptors and embedded zero root. Explicit Clone/Assign/Deallocate/Reset/Close. Source allocator replaced by arena; full named method ledger is in bitset/PORT_STATUS.md."
+      ],
       "deviations": []
     },
     {
@@ -82826,9 +83177,13 @@
       "sha256": "3d6116ce36ec7b8da8e803a01c8ed5726cd7292a0f92cfe8899fdffae9a54364",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_approx_set.go"
+      ],
+      "tests": [
+        "TestSATApproximation"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -82841,8 +83196,35 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "approx_set_tpl uint32 insert/may_contain/must_not_contain",
+          "status": "ported",
+          "go_target": "sat_approx_set.go",
+          "tests": [
+            "TestSATApproximation"
+          ]
+        },
+        {
+          "name": "approx_set_tpl uint32 union/intersection/subtract",
+          "status": "ported",
+          "go_target": "sat_approx_set.go",
+          "tests": [
+            "TestSATApproximation"
+          ]
+        },
+        {
+          "name": "approx_set_tpl uint32 subset/equality/empty/reset",
+          "status": "ported",
+          "go_target": "sat_approx_set.go",
+          "tests": [
+            "TestSATApproximation"
+          ]
+        }
+      ],
+      "ownership": [
+        "Scalar uint32 SAT specialization only; generic adapters, 64-bit specialization and iterator remain unported."
+      ],
       "deviations": []
     },
     {
@@ -83180,7 +83562,14 @@
       "go_targets": [
         "bitset/bit_vector.go"
       ],
-      "tests": [],
+      "tests": [
+        "TestSourceResizeCrash",
+        "TestSourceOr",
+        "TestSourceAnd",
+        "TestSourceReset",
+        "TestSourceEq",
+        "TestBoundedOperationOracle"
+      ],
       "conditionals": [
         {
           "line": 189,
@@ -83226,7 +83615,14 @@
       "go_targets": [
         "bitset/bit_vector.go"
       ],
-      "tests": [],
+      "tests": [
+        "TestSourceResizeCrash",
+        "TestSourceOr",
+        "TestSourceAnd",
+        "TestSourceReset",
+        "TestSourceEq",
+        "TestBoundedOperationOracle"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -84414,13 +84810,117 @@
       "sha256": "0d5365877dd99f38453369bc57dadfe0d4907a5e1663ac86aaebc218b504ca41",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "bitset/fixed_bit_vector.go"
+      ],
+      "tests": [
+        "TestFixedSourceTst1",
+        "TestFixedSourceOr",
+        "TestFixedSourceEq",
+        "TestFixedRangeAliasTraversal",
+        "TestFixedOwnershipAndLifetime",
+        "TestFixedSourceHash",
+        "TestFixedBoundedOracle",
+        "TestFixedBudgetsAndReuse"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "fixed_bit_vector access/masks/set/unset/get",
+          "status": "ported",
+          "go_target": "bitset/fixed_bit_vector.go",
+          "tests": [
+            "TestFixedSourceTst1",
+            "TestFixedSourceOr",
+            "TestFixedSourceEq",
+            "TestFixedRangeAliasTraversal",
+            "TestFixedOwnershipAndLifetime",
+            "TestFixedSourceHash",
+            "TestFixedBoundedOracle",
+            "TestFixedBudgetsAndReuse"
+          ]
+        },
+        {
+          "name": "manager construction/root/reset/deallocate/destruction",
+          "status": "ported",
+          "go_target": "bitset/fixed_bit_vector.go",
+          "tests": [
+            "TestFixedSourceTst1",
+            "TestFixedSourceOr",
+            "TestFixedSourceEq",
+            "TestFixedRangeAliasTraversal",
+            "TestFixedOwnershipAndLifetime",
+            "TestFixedSourceHash",
+            "TestFixedBoundedOracle",
+            "TestFixedBudgetsAndReuse"
+          ]
+        },
+        {
+          "name": "allocate/allocate0/allocate1/allocate(copy)",
+          "status": "ported",
+          "go_target": "bitset/fixed_bit_vector.go",
+          "tests": [
+            "TestFixedSourceTst1",
+            "TestFixedSourceOr",
+            "TestFixedSourceEq",
+            "TestFixedRangeAliasTraversal",
+            "TestFixedOwnershipAndLifetime",
+            "TestFixedSourceHash",
+            "TestFixedBoundedOracle",
+            "TestFixedBudgetsAndReuse"
+          ]
+        },
+        {
+          "name": "fill0/fill1/copy/assign/range copy",
+          "status": "ported",
+          "go_target": "bitset/fixed_bit_vector.go",
+          "tests": [
+            "TestFixedSourceTst1",
+            "TestFixedSourceOr",
+            "TestFixedSourceEq",
+            "TestFixedRangeAliasTraversal",
+            "TestFixedOwnershipAndLifetime",
+            "TestFixedSourceHash",
+            "TestFixedBoundedOracle",
+            "TestFixedBudgetsAndReuse"
+          ]
+        },
+        {
+          "name": "AND/OR/XOR/NOT/equals/contains",
+          "status": "ported",
+          "go_target": "bitset/fixed_bit_vector.go",
+          "tests": [
+            "TestFixedSourceTst1",
+            "TestFixedSourceOr",
+            "TestFixedSourceEq",
+            "TestFixedRangeAliasTraversal",
+            "TestFixedOwnershipAndLifetime",
+            "TestFixedSourceHash",
+            "TestFixedBoundedOracle",
+            "TestFixedBudgetsAndReuse"
+          ]
+        },
+        {
+          "name": "hash/word/last_word/display",
+          "status": "ported",
+          "go_target": "bitset/fixed_bit_vector.go",
+          "tests": [
+            "TestFixedSourceTst1",
+            "TestFixedSourceOr",
+            "TestFixedSourceEq",
+            "TestFixedRangeAliasTraversal",
+            "TestFixedOwnershipAndLifetime",
+            "TestFixedSourceHash",
+            "TestFixedBoundedOracle",
+            "TestFixedBudgetsAndReuse"
+          ]
+        }
+      ],
+      "ownership": [
+        "Manager owns pooled fixed-width word descriptors and embedded zero root. Explicit Clone/Assign/Deallocate/Reset/Close. Source allocator replaced by arena; full named method ledger is in bitset/PORT_STATUS.md."
+      ],
       "deviations": []
     },
     {
@@ -84428,9 +84928,20 @@
       "sha256": "600c8f53cb9a4dc6e12f5d78bac3348dbf728837e611822fda09af1f8dad6844",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "bitset/fixed_bit_vector.go"
+      ],
+      "tests": [
+        "TestFixedSourceTst1",
+        "TestFixedSourceOr",
+        "TestFixedSourceEq",
+        "TestFixedRangeAliasTraversal",
+        "TestFixedOwnershipAndLifetime",
+        "TestFixedSourceHash",
+        "TestFixedBoundedOracle",
+        "TestFixedBudgetsAndReuse"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -84461,8 +84972,101 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "fixed_bit_vector access/masks/set/unset/get",
+          "status": "ported",
+          "go_target": "bitset/fixed_bit_vector.go",
+          "tests": [
+            "TestFixedSourceTst1",
+            "TestFixedSourceOr",
+            "TestFixedSourceEq",
+            "TestFixedRangeAliasTraversal",
+            "TestFixedOwnershipAndLifetime",
+            "TestFixedSourceHash",
+            "TestFixedBoundedOracle",
+            "TestFixedBudgetsAndReuse"
+          ]
+        },
+        {
+          "name": "manager construction/root/reset/deallocate/destruction",
+          "status": "ported",
+          "go_target": "bitset/fixed_bit_vector.go",
+          "tests": [
+            "TestFixedSourceTst1",
+            "TestFixedSourceOr",
+            "TestFixedSourceEq",
+            "TestFixedRangeAliasTraversal",
+            "TestFixedOwnershipAndLifetime",
+            "TestFixedSourceHash",
+            "TestFixedBoundedOracle",
+            "TestFixedBudgetsAndReuse"
+          ]
+        },
+        {
+          "name": "allocate/allocate0/allocate1/allocate(copy)",
+          "status": "ported",
+          "go_target": "bitset/fixed_bit_vector.go",
+          "tests": [
+            "TestFixedSourceTst1",
+            "TestFixedSourceOr",
+            "TestFixedSourceEq",
+            "TestFixedRangeAliasTraversal",
+            "TestFixedOwnershipAndLifetime",
+            "TestFixedSourceHash",
+            "TestFixedBoundedOracle",
+            "TestFixedBudgetsAndReuse"
+          ]
+        },
+        {
+          "name": "fill0/fill1/copy/assign/range copy",
+          "status": "ported",
+          "go_target": "bitset/fixed_bit_vector.go",
+          "tests": [
+            "TestFixedSourceTst1",
+            "TestFixedSourceOr",
+            "TestFixedSourceEq",
+            "TestFixedRangeAliasTraversal",
+            "TestFixedOwnershipAndLifetime",
+            "TestFixedSourceHash",
+            "TestFixedBoundedOracle",
+            "TestFixedBudgetsAndReuse"
+          ]
+        },
+        {
+          "name": "AND/OR/XOR/NOT/equals/contains",
+          "status": "ported",
+          "go_target": "bitset/fixed_bit_vector.go",
+          "tests": [
+            "TestFixedSourceTst1",
+            "TestFixedSourceOr",
+            "TestFixedSourceEq",
+            "TestFixedRangeAliasTraversal",
+            "TestFixedOwnershipAndLifetime",
+            "TestFixedSourceHash",
+            "TestFixedBoundedOracle",
+            "TestFixedBudgetsAndReuse"
+          ]
+        },
+        {
+          "name": "hash/word/last_word/display",
+          "status": "ported",
+          "go_target": "bitset/fixed_bit_vector.go",
+          "tests": [
+            "TestFixedSourceTst1",
+            "TestFixedSourceOr",
+            "TestFixedSourceEq",
+            "TestFixedRangeAliasTraversal",
+            "TestFixedOwnershipAndLifetime",
+            "TestFixedSourceHash",
+            "TestFixedBoundedOracle",
+            "TestFixedBudgetsAndReuse"
+          ]
+        }
+      ],
+      "ownership": [
+        "Manager owns pooled fixed-width word descriptors and embedded zero root. Explicit Clone/Assign/Deallocate/Reset/Close. Source allocator replaced by arena; full named method ledger is in bitset/PORT_STATUS.md."
+      ],
       "deviations": []
     },
     {
@@ -85730,13 +86334,52 @@
       "sha256": "7504ea3d4b4ab894a0d53c357322d960b56236f1f0ffce04a6b000644d53640b",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "status": "ported",
+      "go_targets": [
+        "util_lbool.go"
+      ],
+      "tests": [
+        "TestLiftedBooleanSourceSemantics"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "operator~",
+          "status": "ported",
+          "go_target": "util_lbool.go",
+          "tests": [
+            "TestLiftedBooleanSourceSemantics"
+          ]
+        },
+        {
+          "name": "to_lbool",
+          "status": "ported",
+          "go_target": "util_lbool.go",
+          "tests": [
+            "TestLiftedBooleanSourceSemantics"
+          ]
+        },
+        {
+          "name": "operator<<",
+          "status": "ported",
+          "go_target": "util_lbool.go",
+          "tests": [
+            "TestLiftedBooleanSourceSemantics"
+          ]
+        },
+        {
+          "name": "to_sat_str",
+          "status": "ported",
+          "go_target": "util_lbool.go",
+          "tests": [
+            "TestLiftedBooleanSourceSemantics"
+          ]
+        }
+      ],
+      "ownership": [
+        "Scalar int32 values; immutable result strings. All source methods audited; no owned children or cleanup."
+      ],
       "deviations": []
     },
     {
@@ -85744,9 +86387,13 @@
       "sha256": "34941869bd5d245bc1f61b829e589e96ad7557ba248df9970bbf297591ba28f4",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "util_lbool.go"
+      ],
+      "tests": [
+        "TestLiftedBooleanSourceSemantics"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -85757,10 +86404,45 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "operator~",
+          "status": "ported",
+          "go_target": "util_lbool.go",
+          "tests": [
+            "TestLiftedBooleanSourceSemantics"
+          ]
+        },
+        {
+          "name": "to_lbool",
+          "status": "ported",
+          "go_target": "util_lbool.go",
+          "tests": [
+            "TestLiftedBooleanSourceSemantics"
+          ]
+        },
+        {
+          "name": "operator<<",
+          "status": "ported",
+          "go_target": "util_lbool.go",
+          "tests": [
+            "TestLiftedBooleanSourceSemantics"
+          ]
+        },
+        {
+          "name": "to_sat_str",
+          "status": "ported",
+          "go_target": "util_lbool.go",
+          "tests": [
+            "TestLiftedBooleanSourceSemantics"
+          ]
+        }
+      ],
+      "ownership": [
+        "Scalar int32 values; immutable result strings. All source methods audited; no owned children or cleanup."
+      ],
       "deviations": []
     },
     {
@@ -93524,9 +94206,20 @@
       "sha256": "677698562746fdfa6d280f345d6efb805e810e3157c860881d22a9e8a0597aa3",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/mpz.go"
+      ],
+      "tests": [
+        "TestIntegerSourceBug3",
+        "TestIntegerSourceIntMinSubtraction",
+        "TestIntegerConstructorOwnership",
+        "TestIntegerSetConversionBoundaries",
+        "TestIntegerOwnership",
+        "TestIntegerArithmeticOracle",
+        "TestIntegerFailureCleanup",
+        "TestIntegerMultiLimbOracleAndSourceBug1"
+      ],
       "conditionals": [
         {
           "line": 26,
@@ -94281,8 +94974,191 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "mpz scalar constructor",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceBug3",
+            "TestIntegerSourceIntMinSubtraction",
+            "TestIntegerConstructorOwnership",
+            "TestIntegerSetConversionBoundaries",
+            "TestIntegerOwnership",
+            "TestIntegerArithmeticOracle",
+            "TestIntegerFailureCleanup",
+            "TestIntegerMultiLimbOracleAndSourceBug1"
+          ]
+        },
+        {
+          "name": "mpz_manager constructor/destructor",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceBug3",
+            "TestIntegerSourceIntMinSubtraction",
+            "TestIntegerConstructorOwnership",
+            "TestIntegerSetConversionBoundaries",
+            "TestIntegerOwnership",
+            "TestIntegerArithmeticOracle",
+            "TestIntegerFailureCleanup",
+            "TestIntegerMultiLimbOracleAndSourceBug1"
+          ]
+        },
+        {
+          "name": "allocate/deallocate/ensure_tmp_capacity",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceBug3",
+            "TestIntegerSourceIntMinSubtraction",
+            "TestIntegerConstructorOwnership",
+            "TestIntegerSetConversionBoundaries",
+            "TestIntegerOwnership",
+            "TestIntegerArithmeticOracle",
+            "TestIntegerFailureCleanup",
+            "TestIntegerMultiLimbOracleAndSourceBug1"
+          ]
+        },
+        {
+          "name": "set_i64/set_big_i64/set_big_ui64",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceBug3",
+            "TestIntegerSourceIntMinSubtraction",
+            "TestIntegerConstructorOwnership",
+            "TestIntegerSetConversionBoundaries",
+            "TestIntegerOwnership",
+            "TestIntegerArithmeticOracle",
+            "TestIntegerFailureCleanup",
+            "TestIntegerMultiLimbOracleAndSourceBug1"
+          ]
+        },
+        {
+          "name": "unsigned digit-vector set",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceBug3",
+            "TestIntegerSourceIntMinSubtraction",
+            "TestIntegerConstructorOwnership",
+            "TestIntegerSetConversionBoundaries",
+            "TestIntegerOwnership",
+            "TestIntegerArithmeticOracle",
+            "TestIntegerFailureCleanup",
+            "TestIntegerMultiLimbOracleAndSourceBug1"
+          ]
+        },
+        {
+          "name": "big_set/copy set",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceBug3",
+            "TestIntegerSourceIntMinSubtraction",
+            "TestIntegerConstructorOwnership",
+            "TestIntegerSetConversionBoundaries",
+            "TestIntegerOwnership",
+            "TestIntegerArithmeticOracle",
+            "TestIntegerFailureCleanup",
+            "TestIntegerMultiLimbOracleAndSourceBug1"
+          ]
+        },
+        {
+          "name": "move set/swap/del/reset",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceBug3",
+            "TestIntegerSourceIntMinSubtraction",
+            "TestIntegerConstructorOwnership",
+            "TestIntegerSetConversionBoundaries",
+            "TestIntegerOwnership",
+            "TestIntegerArithmeticOracle",
+            "TestIntegerFailureCleanup",
+            "TestIntegerMultiLimbOracleAndSourceBug1"
+          ]
+        },
+        {
+          "name": "neg/abs/get_sign_cell/big_compare",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceBug3",
+            "TestIntegerSourceIntMinSubtraction",
+            "TestIntegerConstructorOwnership",
+            "TestIntegerSetConversionBoundaries",
+            "TestIntegerOwnership",
+            "TestIntegerArithmeticOracle",
+            "TestIntegerFailureCleanup",
+            "TestIntegerMultiLimbOracleAndSourceBug1"
+          ]
+        },
+        {
+          "name": "add/sub/big_add_sub",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceBug3",
+            "TestIntegerSourceIntMinSubtraction",
+            "TestIntegerConstructorOwnership",
+            "TestIntegerSetConversionBoundaries",
+            "TestIntegerOwnership",
+            "TestIntegerArithmeticOracle",
+            "TestIntegerFailureCleanup",
+            "TestIntegerMultiLimbOracleAndSourceBug1"
+          ]
+        },
+        {
+          "name": "scratch set IDX0 only",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceBug3",
+            "TestIntegerSourceIntMinSubtraction",
+            "TestIntegerConstructorOwnership",
+            "TestIntegerSetConversionBoundaries",
+            "TestIntegerOwnership",
+            "TestIntegerArithmeticOracle",
+            "TestIntegerFailureCleanup",
+            "TestIntegerMultiLimbOracleAndSourceBug1"
+          ]
+        },
+        {
+          "name": "is_abs_uint64/big_abs_to_uint64/is_uint64/is_int64/get_uint64/get_int64",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceBug3",
+            "TestIntegerSourceIntMinSubtraction",
+            "TestIntegerConstructorOwnership",
+            "TestIntegerSetConversionBoundaries",
+            "TestIntegerOwnership",
+            "TestIntegerArithmeticOracle",
+            "TestIntegerFailureCleanup",
+            "TestIntegerMultiLimbOracleAndSourceBug1"
+          ]
+        },
+        {
+          "name": "display/to_string",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceBug3",
+            "TestIntegerSourceIntMinSubtraction",
+            "TestIntegerConstructorOwnership",
+            "TestIntegerSetConversionBoundaries",
+            "TestIntegerOwnership",
+            "TestIntegerArithmeticOracle",
+            "TestIntegerFailureCleanup",
+            "TestIntegerMultiLimbOracleAndSourceBug1"
+          ]
+        }
+      ],
+      "ownership": [
+        "Persistent cells and limbs in slabs/word pages. Copy/Move/Swap explicit; source scratch/cached constants retained. Owner identity caller contract; rendering/header budgets and remaining source operations unresolved. See mpnum/PORT_STATUS.md."
+      ],
       "deviations": []
     },
     {
@@ -94290,9 +95166,20 @@
       "sha256": "41891597e12173581e7ae3f108c048897761c48a191b06fd3ba160d1e98049b1",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/mpz.go"
+      ],
+      "tests": [
+        "TestIntegerSourceBug3",
+        "TestIntegerSourceIntMinSubtraction",
+        "TestIntegerConstructorOwnership",
+        "TestIntegerSetConversionBoundaries",
+        "TestIntegerOwnership",
+        "TestIntegerArithmeticOracle",
+        "TestIntegerFailureCleanup",
+        "TestIntegerMultiLimbOracleAndSourceBug1"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -94559,8 +95446,191 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "mpz scalar constructor",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceBug3",
+            "TestIntegerSourceIntMinSubtraction",
+            "TestIntegerConstructorOwnership",
+            "TestIntegerSetConversionBoundaries",
+            "TestIntegerOwnership",
+            "TestIntegerArithmeticOracle",
+            "TestIntegerFailureCleanup",
+            "TestIntegerMultiLimbOracleAndSourceBug1"
+          ]
+        },
+        {
+          "name": "mpz_manager constructor/destructor",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceBug3",
+            "TestIntegerSourceIntMinSubtraction",
+            "TestIntegerConstructorOwnership",
+            "TestIntegerSetConversionBoundaries",
+            "TestIntegerOwnership",
+            "TestIntegerArithmeticOracle",
+            "TestIntegerFailureCleanup",
+            "TestIntegerMultiLimbOracleAndSourceBug1"
+          ]
+        },
+        {
+          "name": "allocate/deallocate/ensure_tmp_capacity",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceBug3",
+            "TestIntegerSourceIntMinSubtraction",
+            "TestIntegerConstructorOwnership",
+            "TestIntegerSetConversionBoundaries",
+            "TestIntegerOwnership",
+            "TestIntegerArithmeticOracle",
+            "TestIntegerFailureCleanup",
+            "TestIntegerMultiLimbOracleAndSourceBug1"
+          ]
+        },
+        {
+          "name": "set_i64/set_big_i64/set_big_ui64",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceBug3",
+            "TestIntegerSourceIntMinSubtraction",
+            "TestIntegerConstructorOwnership",
+            "TestIntegerSetConversionBoundaries",
+            "TestIntegerOwnership",
+            "TestIntegerArithmeticOracle",
+            "TestIntegerFailureCleanup",
+            "TestIntegerMultiLimbOracleAndSourceBug1"
+          ]
+        },
+        {
+          "name": "unsigned digit-vector set",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceBug3",
+            "TestIntegerSourceIntMinSubtraction",
+            "TestIntegerConstructorOwnership",
+            "TestIntegerSetConversionBoundaries",
+            "TestIntegerOwnership",
+            "TestIntegerArithmeticOracle",
+            "TestIntegerFailureCleanup",
+            "TestIntegerMultiLimbOracleAndSourceBug1"
+          ]
+        },
+        {
+          "name": "big_set/copy set",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceBug3",
+            "TestIntegerSourceIntMinSubtraction",
+            "TestIntegerConstructorOwnership",
+            "TestIntegerSetConversionBoundaries",
+            "TestIntegerOwnership",
+            "TestIntegerArithmeticOracle",
+            "TestIntegerFailureCleanup",
+            "TestIntegerMultiLimbOracleAndSourceBug1"
+          ]
+        },
+        {
+          "name": "move set/swap/del/reset",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceBug3",
+            "TestIntegerSourceIntMinSubtraction",
+            "TestIntegerConstructorOwnership",
+            "TestIntegerSetConversionBoundaries",
+            "TestIntegerOwnership",
+            "TestIntegerArithmeticOracle",
+            "TestIntegerFailureCleanup",
+            "TestIntegerMultiLimbOracleAndSourceBug1"
+          ]
+        },
+        {
+          "name": "neg/abs/get_sign_cell/big_compare",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceBug3",
+            "TestIntegerSourceIntMinSubtraction",
+            "TestIntegerConstructorOwnership",
+            "TestIntegerSetConversionBoundaries",
+            "TestIntegerOwnership",
+            "TestIntegerArithmeticOracle",
+            "TestIntegerFailureCleanup",
+            "TestIntegerMultiLimbOracleAndSourceBug1"
+          ]
+        },
+        {
+          "name": "add/sub/big_add_sub",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceBug3",
+            "TestIntegerSourceIntMinSubtraction",
+            "TestIntegerConstructorOwnership",
+            "TestIntegerSetConversionBoundaries",
+            "TestIntegerOwnership",
+            "TestIntegerArithmeticOracle",
+            "TestIntegerFailureCleanup",
+            "TestIntegerMultiLimbOracleAndSourceBug1"
+          ]
+        },
+        {
+          "name": "scratch set IDX0 only",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceBug3",
+            "TestIntegerSourceIntMinSubtraction",
+            "TestIntegerConstructorOwnership",
+            "TestIntegerSetConversionBoundaries",
+            "TestIntegerOwnership",
+            "TestIntegerArithmeticOracle",
+            "TestIntegerFailureCleanup",
+            "TestIntegerMultiLimbOracleAndSourceBug1"
+          ]
+        },
+        {
+          "name": "is_abs_uint64/big_abs_to_uint64/is_uint64/is_int64/get_uint64/get_int64",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceBug3",
+            "TestIntegerSourceIntMinSubtraction",
+            "TestIntegerConstructorOwnership",
+            "TestIntegerSetConversionBoundaries",
+            "TestIntegerOwnership",
+            "TestIntegerArithmeticOracle",
+            "TestIntegerFailureCleanup",
+            "TestIntegerMultiLimbOracleAndSourceBug1"
+          ]
+        },
+        {
+          "name": "display/to_string",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceBug3",
+            "TestIntegerSourceIntMinSubtraction",
+            "TestIntegerConstructorOwnership",
+            "TestIntegerSetConversionBoundaries",
+            "TestIntegerOwnership",
+            "TestIntegerArithmeticOracle",
+            "TestIntegerFailureCleanup",
+            "TestIntegerMultiLimbOracleAndSourceBug1"
+          ]
+        }
+      ],
+      "ownership": [
+        "Persistent cells and limbs in slabs/word pages. Copy/Move/Swap explicit; source scratch/cached constants retained. Owner identity caller contract; rendering/header budgets and remaining source operations unresolved. See mpnum/PORT_STATUS.md."
+      ],
       "deviations": []
     },
     {
@@ -95904,9 +96974,17 @@
       "sha256": "23908446c761dfb4e7b1165f2545f69f3e8726b7139f07b30133488559562eb3",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "arena/region.go"
+      ],
+      "tests": [
+        "TestRegionNestedLifetime",
+        "TestRegionCleanupBeforeRecycle",
+        "TestRegionUndoStateMachine",
+        "TestRegionBudgetFailure",
+        "TestRegionGenerationAcrossResetTrim"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -95941,8 +97019,59 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "typed record allocation adaptation",
+          "status": "ported",
+          "go_target": "arena/region.go",
+          "tests": [
+            "TestRegionNestedLifetime",
+            "TestRegionCleanupBeforeRecycle",
+            "TestRegionUndoStateMachine",
+            "TestRegionBudgetFailure",
+            "TestRegionGenerationAcrossResetTrim"
+          ]
+        },
+        {
+          "name": "push_scope/marked rollback adaptation",
+          "status": "ported",
+          "go_target": "arena/region.go",
+          "tests": [
+            "TestRegionNestedLifetime",
+            "TestRegionCleanupBeforeRecycle",
+            "TestRegionUndoStateMachine",
+            "TestRegionBudgetFailure",
+            "TestRegionGenerationAcrossResetTrim"
+          ]
+        },
+        {
+          "name": "counted pop_scope adaptation",
+          "status": "ported",
+          "go_target": "arena/region.go",
+          "tests": [
+            "TestRegionNestedLifetime",
+            "TestRegionCleanupBeforeRecycle",
+            "TestRegionUndoStateMachine",
+            "TestRegionBudgetFailure",
+            "TestRegionGenerationAcrossResetTrim"
+          ]
+        },
+        {
+          "name": "reset/release adaptation",
+          "status": "ported",
+          "go_target": "arena/region.go",
+          "tests": [
+            "TestRegionNestedLifetime",
+            "TestRegionCleanupBeforeRecycle",
+            "TestRegionUndoStateMachine",
+            "TestRegionBudgetFailure",
+            "TestRegionGenerationAcrossResetTrim"
+          ]
+        }
+      ],
+      "ownership": [
+        "Typed marked storage adapts byte region allocation; reverse caller cleanup before storage recycle. Variable byte payload region and source trail subclass semantics remain open. See arena/PORT_STATUS.md."
+      ],
       "deviations": []
     },
     {
@@ -95950,9 +97079,17 @@
       "sha256": "fab2ab6cdc6bdc067f38a8908c7591e9dc90bfea116823d2c744ead9238b32d1",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "arena/region.go"
+      ],
+      "tests": [
+        "TestRegionNestedLifetime",
+        "TestRegionCleanupBeforeRecycle",
+        "TestRegionUndoStateMachine",
+        "TestRegionBudgetFailure",
+        "TestRegionGenerationAcrossResetTrim"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -95977,8 +97114,59 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "typed record allocation adaptation",
+          "status": "ported",
+          "go_target": "arena/region.go",
+          "tests": [
+            "TestRegionNestedLifetime",
+            "TestRegionCleanupBeforeRecycle",
+            "TestRegionUndoStateMachine",
+            "TestRegionBudgetFailure",
+            "TestRegionGenerationAcrossResetTrim"
+          ]
+        },
+        {
+          "name": "push_scope/marked rollback adaptation",
+          "status": "ported",
+          "go_target": "arena/region.go",
+          "tests": [
+            "TestRegionNestedLifetime",
+            "TestRegionCleanupBeforeRecycle",
+            "TestRegionUndoStateMachine",
+            "TestRegionBudgetFailure",
+            "TestRegionGenerationAcrossResetTrim"
+          ]
+        },
+        {
+          "name": "counted pop_scope adaptation",
+          "status": "ported",
+          "go_target": "arena/region.go",
+          "tests": [
+            "TestRegionNestedLifetime",
+            "TestRegionCleanupBeforeRecycle",
+            "TestRegionUndoStateMachine",
+            "TestRegionBudgetFailure",
+            "TestRegionGenerationAcrossResetTrim"
+          ]
+        },
+        {
+          "name": "reset/release adaptation",
+          "status": "ported",
+          "go_target": "arena/region.go",
+          "tests": [
+            "TestRegionNestedLifetime",
+            "TestRegionCleanupBeforeRecycle",
+            "TestRegionUndoStateMachine",
+            "TestRegionBudgetFailure",
+            "TestRegionGenerationAcrossResetTrim"
+          ]
+        }
+      ],
+      "ownership": [
+        "Typed marked storage adapts byte region allocation; reverse caller cleanup before storage recycle. Variable byte payload region and source trail subclass semantics remain open. See arena/PORT_STATUS.md."
+      ],
       "deviations": []
     },
     {

@@ -58,3 +58,51 @@ frontends. wasm compilation is not wasm runtime acceptance.
 
 All authored files, scratch, build outputs and configured Go cache/temp paths
 stay below `golang/`. Git commits are explicitly requested by the user.
+
+## Second foundation integration
+
+Typed regions, fixed-width bit vectors, initial signed integer manager ownership
+and Add/Sub, and SAT literal/set primitives have reached tests-first GREEN.
+The ledger now records their translated methods while keeping incomplete units
+partial. Scalar lbool units are fully translated; this does not complete a solver.
+
+The full current module passed CGO-disabled release and checked tests, checked
+race tests, vet, WASI cross-build, and actual js/wasm tests using the installed
+matching Go wrapper with Node 22.22.2. Source-reference inventory still matches
+its explicitly recorded current baseline. WASI execution remains blocked in the
+installed custom Go runtime before user code, as the utility package notes
+explain; 32-bit execution also remains unverified after a host syscall failure.
+
+MPZ formatting/header/scratch budgets remain an explicit foundation gate, along
+with remaining arithmetic, parameter/registration/container work. Typed regions
+do not yet implement every byte-payload lifetime or solver-specific trail class.
+No P1/AST/solver/full-port gate is declared complete.
+
+## User implementation rule: no Go generics
+
+The user requires concrete Go types and functions throughout the project,
+including tests, tools and generated code. See `AGENTS.md`. This supersedes the
+plan's generic allocator sketches. Existing generic slabs/vectors/regions,
+handle validators and shuffle must be converted while preserving their tests,
+ownership, budgets and pointer-free representation. The concrete conversion below supersedes these earlier generic APIs.
+
+
+## Concrete storage integration
+
+All authored Go code now uses concrete types: Slab32/Slab64, descriptor slabs,
+Words/Vectors64/Vectors32Signed, Region32/Region64, and a numericCellSlab owned
+by mpnum. Record and undo tests also use concrete implementations. Shuffle is
+concrete for uint32 and int32. No per-record interface boxing or unsafe storage
+was introduced. Recursive pointer-freedom audits use reflect.TypeOf.
+
+Tests were migrated to the new API before implementations, producing RED builds.
+The no-generics checker likewise started RED, rejected the earlier infrastructure,
+and now passes. It scans project Go declarations, explicit type arguments and
+known generic standard-library calls, excluding build scratch/cache; this syntax
+guard complements implementation review. Source-generation and future package
+work must maintain the same rule.
+
+Full module release/checked tests, checked race tests, vet and actual js/wasm
+execution pass after integration. Warmed allocator and MPZ Add/Sub operations
+still assert zero Go allocations. The source coverage, budget and platform gaps
+recorded above remain open; no full foundation/solver milestone is asserted.
