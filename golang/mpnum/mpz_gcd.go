@@ -1,0 +1,268 @@
+// Copyright (c) 2006 Microsoft Corporation
+// Source: src/util/mpz.cpp gcd_core and gcd(_MP_INTERNAL / LEHMER_GCD),
+// src/util/mpz.h addmul/submul. Original author: Leonardo de Moura.
+package mpnum
+
+import "math"
+
+// U32GCD and U64GCD are concrete translations of the source binary gcd_core.
+// The source template is specialized explicitly to obey the no-generics rule.
+func U32GCD(u, v uint32) uint32 {
+	if u == 0 {
+		return v
+	}
+	if v == 0 {
+		return u
+	}
+	var k uint
+	for (u|v)&1 == 0 {
+		u >>= 1
+		v >>= 1
+		k++
+	}
+	for u&1 == 0 {
+		u >>= 1
+	}
+	for {
+		for v&1 == 0 {
+			v >>= 1
+		}
+		if u < v {
+			v -= u
+		} else {
+			diff := u - v
+			u = v
+			v = diff
+		}
+		v >>= 1
+		if v == 0 {
+			break
+		}
+	}
+	return u << k
+}
+func U64GCD(u, v uint64) uint64 {
+	if u == 0 {
+		return v
+	}
+	if v == 0 {
+		return u
+	}
+	var k uint
+	for (u|v)&1 == 0 {
+		u >>= 1
+		v >>= 1
+		k++
+	}
+	for u&1 == 0 {
+		u >>= 1
+	}
+	for {
+		for v&1 == 0 {
+			v >>= 1
+		}
+		if u < v {
+			v -= u
+		} else {
+			diff := u - v
+			u = v
+			v = diff
+		}
+		v >>= 1
+		if v == 0 {
+			break
+		}
+	}
+	return u << k
+}
+
+// AddMul stores a+b*c, preserving the source +/-1 shortcut predicates (only
+// inline +/-1 qualify). Temporary cleanup is explicit on both success/error.
+func (m *IntegerManager) AddMul(a, b, c, d *Int) error {
+	for _, n := range []*Int{a, b, c, d} {
+		if e := m.check(n); e != nil {
+			return e
+		}
+	}
+	if b.IsSmall() && b.val == 1 {
+		return m.Add(a, c, d)
+	}
+	if b.IsSmall() && b.val == -1 {
+		return m.Sub(a, c, d)
+	}
+	var tmp Int
+	defer m.Del(&tmp)
+	if e := m.Mul(b, c, &tmp); e != nil {
+		return e
+	}
+	return m.Add(a, &tmp, d)
+}
+
+// SubMul stores a-b*c with the source corresponding shortcut branches.
+func (m *IntegerManager) SubMul(a, b, c, d *Int) error {
+	for _, n := range []*Int{a, b, c, d} {
+		if e := m.check(n); e != nil {
+			return e
+		}
+	}
+	if b.IsSmall() && b.val == 1 {
+		return m.Sub(a, c, d)
+	}
+	if b.IsSmall() && b.val == -1 {
+		return m.Add(a, c, d)
+	}
+	var tmp Int
+	defer m.Del(&tmp)
+	if e := m.Mul(b, c, &tmp); e != nil {
+		return e
+	}
+	return m.Sub(a, &tmp, d)
+}
+
+// GCD translates the internal backend's selected Lehmer algorithm, not the
+// inactive Euclid/binary alternatives. It returns the nonnegative gcd, including
+// gcd(0,0)=0. Destination may alias either input. All working Ints are explicit
+// owner-local copies and are deleted on error before any destination publication.
+func (m *IntegerManager) GCD(a, b, c *Int) error {
+	for _, n := range []*Int{a, b, c} {
+		if e := m.check(n); e != nil {
+			return e
+		}
+	}
+	if a.IsSmall() && b.IsSmall() && a.val != math.MinInt32 && b.val != math.MinInt32 {
+		av, bv := a.val, b.val
+		if av < 0 {
+			av = -av
+		}
+		if bv < 0 {
+			bv = -bv
+		}
+		return m.SetInt64(c, int64(U32GCD(uint32(av), uint32(bv))))
+	}
+	if a.val == 0 || b.val == 0 {
+		// Staging the source Copy+Abs zero fastpath avoids publishing INT_MIN
+		// before a promotion allocation can fail; arithmetic is unchanged.
+		var work Int
+		defer m.Del(&work)
+		source := a
+		if a.val == 0 {
+			source = b
+		}
+		if e := m.Copy(&work, source); e != nil {
+			return e
+		}
+		if e := m.Abs(&work); e != nil {
+			return e
+		}
+		return m.Move(c, &work)
+	}
+	var a1, b1, t, r, tmp Int
+	defer func() { m.Del(&a1); m.Del(&b1); m.Del(&r); m.Del(&t); m.Del(&tmp) }()
+	if e := m.Copy(&a1, a); e != nil {
+		return e
+	}
+	if e := m.Copy(&b1, b); e != nil {
+		return e
+	}
+	if e := m.Abs(&a1); e != nil {
+		return e
+	}
+	if e := m.Abs(&b1); e != nil {
+		return e
+	}
+	cmp, e := m.Compare(&a1, &b1)
+	if e != nil {
+		return e
+	}
+	if cmp < 0 {
+		if e = m.Swap(&a1, &b1); e != nil {
+			return e
+		}
+	}
+	for {
+		if b1.IsSmall() {
+			if a1.IsSmall() {
+				return m.SetInt64(c, int64(U32GCD(uint32(a1.val), uint32(b1.val))))
+			}
+			for b1.val != 0 {
+				if e = m.Rem(&a1, &b1, &tmp); e != nil {
+					return e
+				}
+				if e = m.Swap(&a1, &b1); e != nil {
+					return e
+				}
+				if e = m.Swap(&b1, &tmp); e != nil {
+					return e
+				}
+			}
+			return m.Swap(c, &a1)
+		}
+		asize, bsize := m.cell(a1.cell).size, m.cell(b1.cell).size
+		ahat := int64(m.digit(a1.cell, asize-1))
+		bhat := int64(0)
+		if bsize == asize {
+			bhat = int64(m.digit(b1.cell, bsize-1))
+		}
+		A, B, C, D := int64(1), int64(0), int64(0), int64(1)
+		for {
+			if bhat+C == 0 || bhat+D == 0 {
+				break
+			}
+			quotient := (ahat + A) / (bhat + C)
+			if quotient != (ahat+B)/(bhat+D) {
+				break
+			}
+			T := A - quotient*C
+			A = C
+			C = T
+			T = B - quotient*D
+			B = D
+			D = T
+			T = ahat - quotient*bhat
+			ahat = bhat
+			bhat = T
+		}
+		if B == 0 {
+			if e = m.Rem(&a1, &b1, &t); e != nil {
+				return e
+			}
+			if e = m.Swap(&a1, &b1); e != nil {
+				return e
+			}
+			if e = m.Swap(&b1, &t); e != nil {
+				return e
+			}
+		} else {
+			if e = m.SetInt64(&tmp, A); e != nil {
+				return e
+			}
+			if e = m.Mul(&a1, &tmp, &t); e != nil {
+				return e
+			}
+			if e = m.SetInt64(&tmp, B); e != nil {
+				return e
+			}
+			if e = m.AddMul(&t, &tmp, &b1, &t); e != nil {
+				return e
+			}
+			if e = m.SetInt64(&tmp, C); e != nil {
+				return e
+			}
+			if e = m.Mul(&a1, &tmp, &r); e != nil {
+				return e
+			}
+			if e = m.SetInt64(&tmp, D); e != nil {
+				return e
+			}
+			if e = m.AddMul(&r, &tmp, &b1, &r); e != nil {
+				return e
+			}
+			if e = m.Swap(&a1, &t); e != nil {
+				return e
+			}
+			if e = m.Swap(&b1, &r); e != nil {
+				return e
+			}
+		}
+	}
+}

@@ -79373,7 +79373,8 @@
       "go_targets": [
         "mpnum/mpn.go",
         "mpnum/mpz_mul.go",
-        "mpnum/mpz_div.go"
+        "mpnum/mpz_div.go",
+        "mpnum/mpz_gcd.go"
       ],
       "tests": [
         "TestSourceMPZMagnitudeProjections",
@@ -79387,7 +79388,15 @@
         "TestIntegerSourceDivisionAliasDefects",
         "TestIntegerDivisionAllAllocationFailurePoints",
         "TestIntegerEuclideanStagedFailurePointsAndAliases",
-        "TestIntegerDivisionWidthBoundaries"
+        "TestIntegerDivisionWidthBoundaries",
+        "TestIntegerScalarGCD",
+        "TestIntegerSourceGCDCoherence",
+        "TestIntegerGCDSignedLimbAliases",
+        "TestIntegerAddMulSubMulPrerequisites",
+        "TestIntegerGCDFailureCleanup",
+        "TestIntegerAddMulSubMulFailureCleanup",
+        "TestIntegerGCDZeroPromotionFailure",
+        "TestIntegerGCDAndFusedWarmAllocations"
       ],
       "conditionals": [
         {
@@ -79526,7 +79535,8 @@
       "methods": [],
       "ownership": [
         "Magnitude projections only; signed manager assertions remain unported.",
-        "Signed multiplication assertions and print-only square expectations strengthened. Remaining parser/GCD/root/bitwise/shift source assertions remain unported."
+        "Signed multiplication assertions and print-only square expectations strengthened. Remaining parser/GCD/root/bitwise/shift source assertions remain unported.",
+        "Active 50-case GCD coherence uses bounded independent prime-product fixture generator. INT_MIN GCD print case strengthened to exact 2^31 expectation; see mpnum/PORT_STATUS.md."
       ],
       "deviations": []
     },
@@ -94371,7 +94381,8 @@
       "go_targets": [
         "mpnum/mpz.go",
         "mpnum/mpz_mul.go",
-        "mpnum/mpz_div.go"
+        "mpnum/mpz_div.go",
+        "mpnum/mpz_gcd.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -94392,7 +94403,15 @@
         "TestIntegerSourceDivisionAliasDefects",
         "TestIntegerDivisionAllAllocationFailurePoints",
         "TestIntegerEuclideanStagedFailurePointsAndAliases",
-        "TestIntegerDivisionWidthBoundaries"
+        "TestIntegerDivisionWidthBoundaries",
+        "TestIntegerScalarGCD",
+        "TestIntegerSourceGCDCoherence",
+        "TestIntegerGCDSignedLimbAliases",
+        "TestIntegerAddMulSubMulPrerequisites",
+        "TestIntegerGCDFailureCleanup",
+        "TestIntegerAddMulSubMulFailureCleanup",
+        "TestIntegerGCDZeroPromotionFailure",
+        "TestIntegerGCDAndFusedWarmAllocations"
       ],
       "conditionals": [
         {
@@ -95419,6 +95438,51 @@
             "TestIntegerDivisionWidthBoundaries",
             "TestIntegerMulDivisionWarmAllocations"
           ]
+        },
+        {
+          "name": "gcd_core/u_gcd/u64_gcd concrete binary specializations",
+          "status": "ported",
+          "go_target": "mpnum/mpz_gcd.go",
+          "tests": [
+            "TestIntegerScalarGCD",
+            "TestIntegerSourceGCDCoherence",
+            "TestIntegerGCDSignedLimbAliases",
+            "TestIntegerAddMulSubMulPrerequisites",
+            "TestIntegerGCDFailureCleanup",
+            "TestIntegerAddMulSubMulFailureCleanup",
+            "TestIntegerGCDZeroPromotionFailure",
+            "TestIntegerGCDAndFusedWarmAllocations"
+          ]
+        },
+        {
+          "name": "scalar gcd selected internal LEHMER_GCD",
+          "status": "ported",
+          "go_target": "mpnum/mpz_gcd.go",
+          "tests": [
+            "TestIntegerScalarGCD",
+            "TestIntegerSourceGCDCoherence",
+            "TestIntegerGCDSignedLimbAliases",
+            "TestIntegerAddMulSubMulPrerequisites",
+            "TestIntegerGCDFailureCleanup",
+            "TestIntegerAddMulSubMulFailureCleanup",
+            "TestIntegerGCDZeroPromotionFailure",
+            "TestIntegerGCDAndFusedWarmAllocations"
+          ]
+        },
+        {
+          "name": "addmul/submul",
+          "status": "ported",
+          "go_target": "mpnum/mpz_gcd.go",
+          "tests": [
+            "TestIntegerScalarGCD",
+            "TestIntegerSourceGCDCoherence",
+            "TestIntegerGCDSignedLimbAliases",
+            "TestIntegerAddMulSubMulPrerequisites",
+            "TestIntegerGCDFailureCleanup",
+            "TestIntegerAddMulSubMulFailureCleanup",
+            "TestIntegerGCDZeroPromotionFailure",
+            "TestIntegerGCDAndFusedWarmAllocations"
+          ]
         }
       ],
       "ownership": [
@@ -95427,7 +95491,8 @@
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
-        "Div/Mod use staged owner cells, increasing storage peak and changing physical allocation timing; source arithmetic and alias defects preserved."
+        "Div/Mod use staged owner cells, increasing storage peak and changing physical allocation timing; source arithmetic and alias defects preserved.",
+        "GCD zero-case Copy+Abs staged before destination Move for failure atomicity. Array/extended GCD and LCM remain unported."
       ]
     },
     {
@@ -95439,7 +95504,8 @@
       "go_targets": [
         "mpnum/mpz.go",
         "mpnum/mpz_mul.go",
-        "mpnum/mpz_div.go"
+        "mpnum/mpz_div.go",
+        "mpnum/mpz_gcd.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -95460,7 +95526,15 @@
         "TestIntegerSourceDivisionAliasDefects",
         "TestIntegerDivisionAllAllocationFailurePoints",
         "TestIntegerEuclideanStagedFailurePointsAndAliases",
-        "TestIntegerDivisionWidthBoundaries"
+        "TestIntegerDivisionWidthBoundaries",
+        "TestIntegerScalarGCD",
+        "TestIntegerSourceGCDCoherence",
+        "TestIntegerGCDSignedLimbAliases",
+        "TestIntegerAddMulSubMulPrerequisites",
+        "TestIntegerGCDFailureCleanup",
+        "TestIntegerAddMulSubMulFailureCleanup",
+        "TestIntegerGCDZeroPromotionFailure",
+        "TestIntegerGCDAndFusedWarmAllocations"
       ],
       "conditionals": [
         {
@@ -95999,6 +96073,51 @@
             "TestIntegerDivisionWidthBoundaries",
             "TestIntegerMulDivisionWarmAllocations"
           ]
+        },
+        {
+          "name": "gcd_core/u_gcd/u64_gcd concrete binary specializations",
+          "status": "ported",
+          "go_target": "mpnum/mpz_gcd.go",
+          "tests": [
+            "TestIntegerScalarGCD",
+            "TestIntegerSourceGCDCoherence",
+            "TestIntegerGCDSignedLimbAliases",
+            "TestIntegerAddMulSubMulPrerequisites",
+            "TestIntegerGCDFailureCleanup",
+            "TestIntegerAddMulSubMulFailureCleanup",
+            "TestIntegerGCDZeroPromotionFailure",
+            "TestIntegerGCDAndFusedWarmAllocations"
+          ]
+        },
+        {
+          "name": "scalar gcd selected internal LEHMER_GCD",
+          "status": "ported",
+          "go_target": "mpnum/mpz_gcd.go",
+          "tests": [
+            "TestIntegerScalarGCD",
+            "TestIntegerSourceGCDCoherence",
+            "TestIntegerGCDSignedLimbAliases",
+            "TestIntegerAddMulSubMulPrerequisites",
+            "TestIntegerGCDFailureCleanup",
+            "TestIntegerAddMulSubMulFailureCleanup",
+            "TestIntegerGCDZeroPromotionFailure",
+            "TestIntegerGCDAndFusedWarmAllocations"
+          ]
+        },
+        {
+          "name": "addmul/submul",
+          "status": "ported",
+          "go_target": "mpnum/mpz_gcd.go",
+          "tests": [
+            "TestIntegerScalarGCD",
+            "TestIntegerSourceGCDCoherence",
+            "TestIntegerGCDSignedLimbAliases",
+            "TestIntegerAddMulSubMulPrerequisites",
+            "TestIntegerGCDFailureCleanup",
+            "TestIntegerAddMulSubMulFailureCleanup",
+            "TestIntegerGCDZeroPromotionFailure",
+            "TestIntegerGCDAndFusedWarmAllocations"
+          ]
         }
       ],
       "ownership": [
@@ -96007,7 +96126,8 @@
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
-        "Div/Mod use staged owner cells, increasing storage peak and changing physical allocation timing; source arithmetic and alias defects preserved."
+        "Div/Mod use staged owner cells, increasing storage peak and changing physical allocation timing; source arithmetic and alias defects preserved.",
+        "GCD zero-case Copy+Abs staged before destination Move for failure atomicity. Array/extended GCD and LCM remain unported."
       ]
     },
     {

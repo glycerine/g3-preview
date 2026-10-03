@@ -122,8 +122,8 @@ the source requested capacity (6), preserving the source scratch growth policy.
 Explicitly unimplemented source methods/overloads: `cell_size` (representation
 replaced by arena accounting), `allocate_if_needed`, `ensure_capacity`,
 `normalize` (standalone; publication normalization is translated), `size_info`,
-`sz_lt`, `precise`, `field`, `inc`, `dec`, `addmul`, `submul`,
-`gcd` (all three overloads), `lcm`, `divides`,
+`sz_lt`, `precise`, `field`, `inc`, `dec`,
+`gcd` (array and extended overloads), `lcm`, `divides`,
 `inv`, `bitwise_or`, `bitwise_and`, `bitwise_xor`, `bitwise_not`, decimal-string
 `set`, the named int32/uint32 setter overloads (their behavior is available through
 SetInt64/SetLimbs), `dup`, `is_pos`, `is_neg`, `is_zero`, `sign`, `is_nonpos`,
@@ -134,7 +134,7 @@ overloads, both `machine_div2k` overloads, both `mul2k` overloads,
 `power_of_two_multiple`, `log2`, `mlog2`, `bitsize`, `is_perfect_square`,
 `prev_power_of_two`, both `root` overloads, `is_even`, `is_odd`, `decompose`.
 GMP/MSBIGNUM-specific operations remain inventoried platform alternatives,
-not implementations. Standalone `u_gcd`/`u64_gcd` remain unported.
+not implementations. Standalone `u_gcd`/`u64_gcd` are now translated as U32GCD/U64GCD.
 
 MPZ tests were authored before implementation, producing undefined
 IntegerManager/Int/function errors (RED). Implementation made them pass (GREEN).
@@ -205,7 +205,7 @@ inside golang; no later arithmetic packet is included in this conversion.
 ## Internal MPZ multiplication and division packet
 
 Status remains **partial MPZ**. The earlier unimplemented-method inventory now
-excludes the translated methods below; remaining items there and all MPQ/GCD/
+excludes the translated methods below; remaining items there and all MPQ/
 rounding/higher numerical managers are still unimplemented. The source methods
 and actual tests were read before porting; no C++ reference experiments ran.
 
@@ -280,7 +280,7 @@ source control flow, not C++ observed goldens):
   introduced. Mathematically independent paired tests use distinct outputs.
 
 Source numeric parser, named comparison convenience wrappers, power/two-shift,
-GCD/bitwise/root/log and other inventory entries remain unported. This packet
+array/extended GCD/bitwise/root/log and other inventory entries remain unported. This packet
 does not complete the manager, full arithmetic gate, or full-fork port.
 
 Verified final packet gates: native release and checked race tests pass; vet
@@ -290,3 +290,63 @@ unexercised error branches and is not claimed complete path coverage. Cross-buil
 results are compilation evidence, not wasm runtime execution. Files written:
 mpz_mul.go, mpz_div.go, mpz_mul_div_test.go, the approved mpz.go shared helper/
 scratch changes, and this status document. All artifacts/cache remain in golang.
+
+## Selected internal Lehmer GCD and fused arithmetic packet
+
+Status remains **partial MPZ**. No shared mpz.go, manifest, or arena changes
+were needed. New files: mpz_gcd.go and mpz_gcd_test.go. Source methods and
+conditional selection were read before translation: the internal backend
+defines LEHMER_GCD, while EUCLID_GCD/BINARY_GCD/LS_BINARY_GCD are inactive.
+The port preserves that choice; inactive alternatives are not substituted.
+
+| Source operation | Go counterpart |
+| --- | --- |
+| scalar `gcd_core`, `u_gcd` | `U32GCD`; explicit uint32 binary algorithm specialization |
+| scalar `gcd_core`, `u64_gcd` | `U64GCD`; explicit uint64 binary algorithm specialization |
+| `addmul`, `submul` | `AddMul`, `SubMul`; source inline +/-1 shortcuts and temporary product/cleanup |
+| `gcd(a,b,c)` | `GCD`; source small-int/INT_MIN exclusions, zero fast paths, exact Lehmer A/B/C/D matrix update, B==0 remainder fallback, small-divisor finishing loop |
+
+Lehmer coefficients and top-word approximations retain explicit int64 widths;
+32-bit cells and existing exact multiplication/remainder managers supply all
+full-value arithmetic. No production math/big, Go generics, unsafe, raw slice
+borrows, new numerical caches, or approximate arithmetic were introduced.
+All owned working numerals are explicitly deleted in source cleanup order,
+including on allocation failures. Source zero-case Copy+Abs is staged before
+Move so INT_MIN promotion failure cannot publish a partial destination; this
+changes temporary storage/cleanup timing, not arithmetic. Main source GCD
+publishes only at its final swap/set, so destination aliases preserve inputs
+through the work phase. Logical temporary cells and all arithmetic scratch
+retain existing arena budget/growth policies. The previously documented MPN
+formatting/header budget limitations are still unresolved.
+
+TDD tests first failed with missing GCD/U32GCD/U64GCD/AddMul/SubMul (RED), then
+the algorithms passed (GREEN). Active rand_tst_gcd(50,3,2) coherence is retained
+as 50 finite exact GCD checks with independent math/big expectations. Its
+rand/168-prime/Power generator is adapted to an independent fixed-seed generator
+over the first 16 source primes, exponents 1..2, inclusion ratio 1/3 and both
+signs. This is labeled a bounded fixture-generation adaptation: production Power
+is neither used as an oracle nor claimed implemented. The source inactive
+tst_gcd stress loop remains inventoried, not silently activated. Active
+tst_gcd_bug prints GCD(INT_MIN,INT_MIN); added independent expectation is 2^31.
+
+Additional independent checks: every signed pair in [-20,20]^2; scalar unsigned
+width boundaries; 250 signed operands up to 16 limbs with both destination
+aliases; zero/equal/one cases and 400-step consecutive Fibonacci inputs for
+multi-update Lehmer batches. AddMul/SubMul cover 8^3 signed boundary triples,
+both operations, and separate/all three operand destinations. Failure sweeps
+check 3 GCD destinations x 40 reservation positions and 2 fused operations x
+4 destinations x 24 positions, plus zero-case INT_MIN promotion failure. Failed
+operations preserve values and live-cell counts, retry to independently exact
+answers, and Close returns the budget to zero. Warmed GCD/AddMul/SubMul are
+verified to allocate zero Go objects on the tested bounded workload.
+
+Array GCD, extended GCD, LCM, divisibility, decimal parsing, power/shifts,
+bitwise/root/log, MPQ and other prior inventory entries remain unimplemented.
+No new source defect was inferred for these selected methods; bounded passing
+tests do not establish correctness for all unbounded inputs or close the port.
+
+Final packet validation: native release/checked race tests pass; vet passes;
+release/checked test binaries cross-build for js/wasm and wasip1/wasm. Combined
+mpnum statement coverage is 90.4%, not complete path coverage. No wasm runtime
+execution is claimed from these builds. Every write/temp/cache/output is within
+golang, including command TMPDIR/GOTMPDIR/GOCACHE settings.
