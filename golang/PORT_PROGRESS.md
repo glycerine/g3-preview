@@ -1495,3 +1495,23 @@ Independent frozen parent checks passed full native/debug suites, exact49
 lower-memory race/actual-JS RUN/PASS groups, vet, WASI build/test compilation
 and integrated source/evidence/no-generics audit on the rational-division base.
 Concurrent incomplete API drafts were excluded from this coherent chunk.
+
+
+## Source prime generator, explicit owner profile
+
+The actual constructor and ascending odd/filter/append generator now run with
+a charged concrete cache and borrowed iterator. Tests first expose missing
+APIs, then execute all10000 registered primes through the actual IntegerManager
+root, yielding2073824 original divisor assertions. Source cache-hit/capacity
+order, index wrap and the literal reversed growth loop are preserved, with a
+checked nontermination boundary after its first complete body. Independent
+primality/failure tests audit actual retained cache prefixes and lexical cleanup.
+See PRIME_GENERATOR_PORT_STATUS.md. Global/nullptr iterator binding, OpenMP
+locking, generated lifecycle and printed output remain required; all three
+source units are partial. Full factorization and solver/proof/interpolation
+remain required. Ledger:33ported/148partial/1921unported.
+
+Independent frozen parent checks passed full native/debug suites, exact6prime
+race/actual-JS RUN/PASS groups, vet, WASI build/test compilation and integrated
+source/evidence/no-generics audit. Independent sieve/isqrt confirms actual
+registered endpoints and2073824 assertions. Concurrent RED drafts were excluded.

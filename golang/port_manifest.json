@@ -87309,20 +87309,57 @@
       "sha256": "30218199609a68ab087ab8c0aa08c5fb26945fb8780888b047955a56d190ee20",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/prime_generator.go",
+        "mpnum/prime_generator_test.go",
+        "prime_generator_source_test.go"
+      ],
+      "tests": [
+        "TestPrimeGeneratorRegisteredTenThousandWithIntegerRoot",
+        "TestPrimeGeneratorSparseReadAndReversedLoopPrefixes",
+        "TestPrimeIteratorIndexBeforeRefusalWrapAndColdOwner",
+        "TestPrimeGeneratorConstructorAndSparseFailureAccounting",
+        "TestPrimeGeneratorWarmCachedReadAndFinalizeDomain",
+        "TestPrimeGeneratorUnsignedSourceExtent"
+      ],
       "assertions": [
         {
           "line": 38,
           "text": "ENSURE(p % i != 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Explicit-owner constructor, exact odd/filter/append loops, cache lookup and literal reversed growth guard, finalization, borrowed iterator increment-before-lookup",
+          "status": "partial",
+          "go_target": "mpnum/prime_generator.go",
+          "tests": [
+            "TestPrimeGeneratorSparseReadAndReversedLoopPrefixes",
+            "TestPrimeIteratorIndexBeforeRefusalWrapAndColdOwner",
+            "TestPrimeGeneratorConstructorAndSparseFailureAccounting",
+            "TestPrimeGeneratorWarmCachedReadAndFinalizeDomain",
+            "TestPrimeGeneratorUnsignedSourceExtent"
+          ]
+        },
+        {
+          "name": "Registered 10000-prime campaign with actual IntegerManager root and 2073824 divisor ENSURE executions",
+          "status": "partial",
+          "go_target": "prime_generator_source_test.go",
+          "tests": [
+            "TestPrimeGeneratorRegisteredTenThousandWithIntegerRoot"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual charged concrete cold cache owner and full-capacity uint64 arrays; lexical todo destroys backing on each error with actual published cache prefix retained. Borrowed iterator does not own the cache. See PRIME_GENERATOR_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Explicit confined cache owner is selected Go profile. Default global/nullptr iterator binding, OpenMP global locking, generated global finalizer and source print/flush stream remain required. Source reversed nonterminating growth executes one complete16384 body then checked repeated-condition guard; later indefinite source allocation prefixes are not claimed.",
+        "Unsigned source vector extent checks remain separate from full typed-array extent guards; wrapped undersized raw allocation/header behavior and source memory-runtime vector integration remain open. Full prime source units remain partial."
+      ]
     },
     {
       "path": "src/test/proof_checker.cpp",
@@ -113826,29 +113863,77 @@
       "sha256": "a1bab2289a380cdad7160167dc05fd9366017fed66ebec626b70e2cb6c3aab8d",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/prime_generator.go",
+        "mpnum/prime_generator_test.go",
+        "prime_generator_source_test.go"
+      ],
+      "tests": [
+        "TestPrimeGeneratorRegisteredTenThousandWithIntegerRoot",
+        "TestPrimeGeneratorSparseReadAndReversedLoopPrefixes",
+        "TestPrimeIteratorIndexBeforeRefusalWrapAndColdOwner",
+        "TestPrimeGeneratorConstructorAndSparseFailureAccounting",
+        "TestPrimeGeneratorWarmCachedReadAndFinalizeDomain",
+        "TestPrimeGeneratorUnsignedSourceExtent"
+      ],
       "assertions": [
         {
           "line": 37,
           "text": "SASSERT(m_primes[j] == 3);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Explicit-owner constructor, exact odd/filter/append loops, cache lookup and literal reversed growth guard, finalization, borrowed iterator increment-before-lookup",
+          "status": "partial",
+          "go_target": "mpnum/prime_generator.go",
+          "tests": [
+            "TestPrimeGeneratorSparseReadAndReversedLoopPrefixes",
+            "TestPrimeIteratorIndexBeforeRefusalWrapAndColdOwner",
+            "TestPrimeGeneratorConstructorAndSparseFailureAccounting",
+            "TestPrimeGeneratorWarmCachedReadAndFinalizeDomain",
+            "TestPrimeGeneratorUnsignedSourceExtent"
+          ]
+        },
+        {
+          "name": "Registered 10000-prime campaign with actual IntegerManager root and 2073824 divisor ENSURE executions",
+          "status": "partial",
+          "go_target": "prime_generator_source_test.go",
+          "tests": [
+            "TestPrimeGeneratorRegisteredTenThousandWithIntegerRoot"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual charged concrete cold cache owner and full-capacity uint64 arrays; lexical todo destroys backing on each error with actual published cache prefix retained. Borrowed iterator does not own the cache. See PRIME_GENERATOR_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Explicit confined cache owner is selected Go profile. Default global/nullptr iterator binding, OpenMP global locking, generated global finalizer and source print/flush stream remain required. Source reversed nonterminating growth executes one complete16384 body then checked repeated-condition guard; later indefinite source allocation prefixes are not claimed.",
+        "Unsigned source vector extent checks remain separate from full typed-array extent guards; wrapped undersized raw allocation/header behavior and source memory-runtime vector integration remain open. Full prime source units remain partial."
+      ]
     },
     {
       "path": "src/util/prime_generator.h",
       "sha256": "9483e518ac6b51b446b986afa3ef45556db70436f909ffe05fa3e93a7b782250",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/prime_generator.go",
+        "mpnum/prime_generator_test.go",
+        "prime_generator_source_test.go"
+      ],
+      "tests": [
+        "TestPrimeGeneratorRegisteredTenThousandWithIntegerRoot",
+        "TestPrimeGeneratorSparseReadAndReversedLoopPrefixes",
+        "TestPrimeIteratorIndexBeforeRefusalWrapAndColdOwner",
+        "TestPrimeGeneratorConstructorAndSparseFailureAccounting",
+        "TestPrimeGeneratorWarmCachedReadAndFinalizeDomain",
+        "TestPrimeGeneratorUnsignedSourceExtent"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -113859,11 +113944,37 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Explicit-owner constructor, exact odd/filter/append loops, cache lookup and literal reversed growth guard, finalization, borrowed iterator increment-before-lookup",
+          "status": "partial",
+          "go_target": "mpnum/prime_generator.go",
+          "tests": [
+            "TestPrimeGeneratorSparseReadAndReversedLoopPrefixes",
+            "TestPrimeIteratorIndexBeforeRefusalWrapAndColdOwner",
+            "TestPrimeGeneratorConstructorAndSparseFailureAccounting",
+            "TestPrimeGeneratorWarmCachedReadAndFinalizeDomain",
+            "TestPrimeGeneratorUnsignedSourceExtent"
+          ]
+        },
+        {
+          "name": "Registered 10000-prime campaign with actual IntegerManager root and 2073824 divisor ENSURE executions",
+          "status": "partial",
+          "go_target": "prime_generator_source_test.go",
+          "tests": [
+            "TestPrimeGeneratorRegisteredTenThousandWithIntegerRoot"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual charged concrete cold cache owner and full-capacity uint64 arrays; lexical todo destroys backing on each error with actual published cache prefix retained. Borrowed iterator does not own the cache. See PRIME_GENERATOR_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Explicit confined cache owner is selected Go profile. Default global/nullptr iterator binding, OpenMP global locking, generated global finalizer and source print/flush stream remain required. Source reversed nonterminating growth executes one complete16384 body then checked repeated-condition guard; later indefinite source allocation prefixes are not claimed.",
+        "Unsigned source vector extent checks remain separate from full typed-array extent guards; wrapped undersized raw allocation/header behavior and source memory-runtime vector integration remain open. Full prime source units remain partial."
+      ]
     },
     {
       "path": "src/util/ptr_scoped_buffer.h",
