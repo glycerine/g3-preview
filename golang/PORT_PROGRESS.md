@@ -346,3 +346,17 @@ sweeps, release of old big outputs and zero-allocation warm
 paths. Prospective full native/checked races/actual checked JS modules, vet,
 WASI build and source/no-generics audit pass. Other MPZ/MPQ methods, full numerical
 wrapper and all solver/AST/proof/interpolation milestones remain open.
+
+## Scoped binding deep copies
+
+Explicit Clone and Assign now preserve the source implicit member-copy policies.
+Clone rehashes USED entries at source capacity and copies live marked trails and
+limits at exact vector capacities. Assign resets/replays the destination table
+through its own shrink/growth policy, then copies source vector history; it stages
+all actions in fully charged storage before publishing. The borrowed symbol
+manager and destination Budget are retained, and cold mutexes are never copied.
+
+Four new tests went RED before implementation; all19 scoped-table tests pass
+with source bucket/capacity models, scope undo, exact peaks and failure prefixes.
+Isolated full native/checked/actual checked JS modules, race, vet, WASI compilation
+and source/no-generics audit pass. Other symbol payloads and full solver remain open.

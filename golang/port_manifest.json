@@ -82523,7 +82523,11 @@
         "TestSymbolInt32TableExactUndoPeakBudget",
         "TestSymbolInt32TablePreparedGrowthAndWarmAppend",
         "TestSymbolInt32TableConstructorAndSourceGuards",
-        "TestSymbolInt32TableHighOccupancyNoGrowthScopes"
+        "TestSymbolInt32TableHighOccupancyNoGrowthScopes",
+        "TestSymbolInt32TableSourceCloneScopedHistory",
+        "TestSymbolInt32TableSourceAssignDestinationPolicy",
+        "TestSymbolInt32TableCopyFailureSweeps",
+        "TestSymbolInt32TableCopyEmptyAndExactPeaks"
       ],
       "assertions": [
         {
@@ -85875,7 +85879,11 @@
         "TestSymbolInt32TableExactUndoPeakBudget",
         "TestSymbolInt32TablePreparedGrowthAndWarmAppend",
         "TestSymbolInt32TableConstructorAndSourceGuards",
-        "TestSymbolInt32TableHighOccupancyNoGrowthScopes"
+        "TestSymbolInt32TableHighOccupancyNoGrowthScopes",
+        "TestSymbolInt32TableSourceCloneScopedHistory",
+        "TestSymbolInt32TableSourceAssignDestinationPolicy",
+        "TestSymbolInt32TableCopyFailureSweeps",
+        "TestSymbolInt32TableCopyEmptyAndExactPeaks"
       ],
       "conditionals": [
         {
@@ -86323,7 +86331,11 @@
             "TestSymbolInt32TableExactUndoPeakBudget",
             "TestSymbolInt32TablePreparedGrowthAndWarmAppend",
             "TestSymbolInt32TableConstructorAndSourceGuards",
-            "TestSymbolInt32TableHighOccupancyNoGrowthScopes"
+            "TestSymbolInt32TableHighOccupancyNoGrowthScopes",
+            "TestSymbolInt32TableSourceCloneScopedHistory",
+            "TestSymbolInt32TableSourceAssignDestinationPolicy",
+            "TestSymbolInt32TableCopyFailureSweeps",
+            "TestSymbolInt32TableCopyEmptyAndExactPeaks"
           ]
         }
       ],
@@ -102753,7 +102765,11 @@
         "TestSymbolInt32TableExactUndoPeakBudget",
         "TestSymbolInt32TablePreparedGrowthAndWarmAppend",
         "TestSymbolInt32TableConstructorAndSourceGuards",
-        "TestSymbolInt32TableHighOccupancyNoGrowthScopes"
+        "TestSymbolInt32TableHighOccupancyNoGrowthScopes",
+        "TestSymbolInt32TableSourceCloneScopedHistory",
+        "TestSymbolInt32TableSourceAssignDestinationPolicy",
+        "TestSymbolInt32TableCopyFailureSweeps",
+        "TestSymbolInt32TableCopyEmptyAndExactPeaks"
       ],
       "conditionals": [
         {
@@ -102982,7 +102998,14 @@
         },
         {
           "name": "implicit copy constructor/assignment",
-          "status": "unported"
+          "status": "ported",
+          "go_target": "util_symbol_table.go",
+          "tests": [
+            "TestSymbolInt32TableSourceCloneScopedHistory",
+            "TestSymbolInt32TableSourceAssignDestinationPolicy",
+            "TestSymbolInt32TableCopyFailureSweeps",
+            "TestSymbolInt32TableCopyEmptyAndExactPeaks"
+          ]
         },
         {
           "name": "other payload specializations",
@@ -102990,11 +103013,13 @@
         }
       ],
       "ownership": [
-        "Borrowed SymbolManager outlives the concrete int32 table. Scalar entry/trail/scope records, cold mutex/header, all backing capacities and transaction workspace are budgeted. Reverse undo preserves physical sentinels and retained data. See SYMBOL_TABLE_PORT_STATUS.md."
+        "Borrowed SymbolManager outlives the concrete int32 table. Scalar entry/trail/scope records, cold mutex/header, all backing capacities and transaction workspace are budgeted. Reverse undo preserves physical sentinels and retained data. See SYMBOL_TABLE_PORT_STATUS.md.",
+        "Explicit Clone rehashes USED source buckets at source capacity and copies live marked vector history/capacities. Assign stages destination reset/replay policy and source vector copies; manager/Budget stay with destination. See SYMBOL_TABLE_PORT_STATUS.md."
       ],
       "deviations": [
         "Global symbol domain becomes explicit borrowed owner; invalid sentinel/foreign/dead keys and iterator-invalidating self append return typed precondition errors.",
-        "Potentially allocating scope undo/append replay source actions on a charged physical graph before atomic publication. Go initializes unused scalar payloads. No-allocation preflight retains warm source paths."
+        "Potentially allocating scope undo/append replay source actions on a charged physical graph before atomic publication. Go initializes unused scalar payloads. No-allocation preflight retains warm source paths.",
+        "Charged physical staging preserves destination on predictable assignment failure, including complete old+new peaks; new Clone mutex is freshly initialized. Source unconstructed spare vector cells become zero scalar storage."
       ]
     },
     {

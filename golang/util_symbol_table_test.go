@@ -975,3 +975,274 @@ func TestSymbolInt32TableHighOccupancyNoGrowthScopes(t *testing.T) {
 	}
 	b.FailAfter(-1)
 }
+
+func TestSymbolInt32TableSourceCloneScopedHistory(t *testing.T) {
+	m := symbolManagerTest(t, nil, false)
+	src := symbolIntTableTest(t, m, nil)
+	src.Insert(NumericalSymbol(0), 1)
+	src.Insert(NumericalSymbol(8), 2)
+	src.Insert(NumericalSymbol(16), 3)
+	src.erase(&src.symbolInt32State, NumericalSymbol(8))
+	src.BeginScope()
+	src.Insert(NumericalSymbol(0), 10)
+	src.Insert(NumericalSymbol(24), 4)
+	src.BeginScope()
+	src.Insert(NumericalSymbol(24), 40)
+	b := arena.NewBudget(math.MaxUint64)
+	copy, e := src.Clone(b)
+	if e != nil {
+		t.Fatal(e)
+	}
+	defer copy.Close()
+	if copy.manager != src.manager || copy.budget != b || copy.Stats().Capacity != src.Stats().Capacity || copy.deleted != 0 {
+		t.Fatal("source copy rehash", copy.Stats())
+	}
+	if !reflect.DeepEqual(copy.trail, src.trail) || !reflect.DeepEqual(copy.limits, src.limits) || cap(copy.trail) != cap(src.trail) || cap(copy.limits) != cap(src.limits) {
+		t.Fatal("copy live marked history and exact vector capacities")
+	}
+	if &copy.table[0] == &src.table[0] || &copy.trail[0] == &src.trail[0] || &copy.limits[0] == &src.limits[0] {
+		t.Fatal("deep copy aliases")
+	}
+	o := newSymbolBucketOracle(len(src.table))
+	for _, entry := range src.table {
+		if used(entry.key) {
+			o.insert(int64(entry.key.value), entry.data)
+		}
+	}
+	checkSymbolBuckets(t, copy, o)
+	if e = copy.EndScope(); e != nil {
+		t.Fatal(e)
+	}
+	if v, _, _ := copy.Find(NumericalSymbol(24)); v != 4 {
+		t.Fatal(v)
+	}
+	if v, _, _ := src.Find(NumericalSymbol(24)); v != 40 {
+		t.Fatal("copy changed source")
+	}
+	copy.EndScope()
+	if v, _, _ := copy.Find(NumericalSymbol(0)); v != 1 {
+		t.Fatal(v)
+	}
+	if _, ok, _ := copy.Find(NumericalSymbol(24)); ok {
+		t.Fatal("marked new binding survived")
+	}
+	s := copy.Stats()
+	if b.Used() != s.OwnerBytes+s.TableBytes+s.TrailBytes+s.ScopeBytes {
+		t.Fatal("clone charge")
+	}
+	copy.Close()
+	if b.Used() != 0 {
+		t.Fatal("clone close")
+	}
+}
+
+func TestSymbolInt32TableSourceAssignDestinationPolicy(t *testing.T) {
+	m := symbolManagerTest(t, nil, false)
+	src := symbolIntTableTest(t, m, nil)
+	src.Insert(NumericalSymbol(0), 5)
+	src.BeginScope()
+	src.Insert(NumericalSymbol(8), 6)
+	b := arena.NewBudget(math.MaxUint64)
+	dst, e := NewSymbolInt32Table(m, SymbolInt32TableConfig{InitialCapacity: 128, Budget: b})
+	if e != nil {
+		t.Fatal(e)
+	}
+	defer dst.Close()
+	dst.Insert(NumericalSymbol(77), 77)
+	if e = dst.Assign(src); e != nil {
+		t.Fatal(e)
+	}
+	if dst.Stats().Capacity != 64 || dst.budget != b || !reflect.DeepEqual(dst.trail, src.trail) || cap(dst.trail) != cap(src.trail) {
+		t.Fatal("assignment reset/replay destination capacity", dst.Stats())
+	}
+	dst.EndScope()
+	if _, ok, _ := dst.Find(NumericalSymbol(8)); ok {
+		t.Fatal("assigned scoped new binding survived")
+	}
+	if _, ok, _ := src.Find(NumericalSymbol(8)); !ok {
+		t.Fatal("assignment aliases source")
+	}
+	before := dst.Stats()
+	b.FailAfter(0)
+	if e = dst.Assign(dst); e != nil || dst.Stats() != before {
+		t.Fatal("self assignment", e)
+	}
+	b.FailAfter(-1)
+	// A source larger than the destination grows by ordinary threshold replay.
+	large, e := NewSymbolInt32Table(m, SymbolInt32TableConfig{InitialCapacity: 128})
+	if e != nil {
+		t.Fatal(e)
+	}
+	defer large.Close()
+	for i := uint32(0); i < 30; i++ {
+		large.Insert(NumericalSymbol(i*8), int32(i))
+	}
+	small := symbolIntTableTest(t, m, nil)
+	if e = small.Assign(large); e != nil {
+		t.Fatal(e)
+	}
+	if small.Stats().Capacity != 64 {
+		t.Fatal("assignment must not clone source capacity", small.Stats())
+	}
+	other := symbolManagerTest(t, nil, false)
+	foreign := symbolIntTableTest(t, other, nil)
+	if e = small.Assign(foreign); !errors.Is(e, ErrSymbolOwner) {
+		t.Fatal(e)
+	}
+}
+
+func TestSymbolInt32TableCopyFailureSweeps(t *testing.T) {
+	m := symbolManagerTest(t, nil, false)
+	src := symbolIntTableTest(t, m, nil)
+	for i := uint32(0); i < 20; i++ {
+		src.Insert(NumericalSymbol(i*8), int32(i))
+	}
+	src.BeginScope()
+	src.Insert(NumericalSymbol(0), 99)
+	src.BeginScope()
+	src.Insert(NumericalSymbol(777), 777)
+	failed, passed := 0, 0
+	for prefix := int64(0); prefix < 8; prefix++ {
+		b := arena.NewBudget(math.MaxUint64)
+		b.FailAfter(prefix)
+		c, e := src.Clone(b)
+		if e != nil {
+			failed++
+			if !errors.Is(e, arena.ErrInjectedFailure) || c != nil || b.Used() != 0 {
+				t.Fatal("clone unwind", prefix, e, b.Used())
+			}
+		} else {
+			passed++
+			c.Close()
+			if b.Used() != 0 {
+				t.Fatal("clone release")
+			}
+		}
+	}
+	if failed == 0 || passed == 0 {
+		t.Fatal("clone sweep")
+	}
+	failed, passed = 0, 0
+	for prefix := int64(0); prefix < 12; prefix++ {
+		b := arena.NewBudget(math.MaxUint64)
+		dst := symbolIntTableTest(t, m, b)
+		dst.Insert(NumericalSymbol(99), 99)
+		dst.BeginScope()
+		dst.Insert(NumericalSymbol(99), 100)
+		before := dst.Stats()
+		table := append([]symbolInt32Entry(nil), dst.table...)
+		trail := append([]symbolInt32Entry(nil), dst.trail...)
+		limits := append([]uint32(nil), dst.limits...)
+		used := b.Used()
+		b.FailAfter(prefix)
+		e := dst.Assign(src)
+		if e != nil {
+			failed++
+			if !errors.Is(e, arena.ErrInjectedFailure) || dst.Stats() != before || b.Used() != used || !reflect.DeepEqual(dst.table, table) || !reflect.DeepEqual(dst.trail, trail) || !reflect.DeepEqual(dst.limits, limits) {
+				t.Fatal("assign atomicity", prefix, e)
+			}
+		} else {
+			passed++
+			b.FailAfter(-1)
+			dst.EndScope()
+			dst.EndScope()
+			if v, ok, _ := dst.Find(NumericalSymbol(0)); !ok || v != 0 {
+				t.Fatal("assigned history")
+			}
+		}
+		b.FailAfter(-1)
+		dst.Close()
+		if b.Used() != 0 {
+			t.Fatal("assign release", prefix, b.Used())
+		}
+	}
+	if failed == 0 || passed == 0 {
+		t.Fatal("assign sweep endpoints", failed, passed)
+	}
+	src.Close()
+	if _, e := src.Clone(nil); !errors.Is(e, arena.ErrClosed) {
+		t.Fatal(e)
+	}
+}
+
+func TestSymbolInt32TableCopyEmptyAndExactPeaks(t *testing.T) {
+	m := symbolManagerTest(t, nil, false)
+	header := uint64(reflect.TypeOf(SymbolInt32Table{}).Size())
+	graph := header + symbolInt32EntryBytes(8)
+	for _, limit := range []uint64{graph*2 - 1, graph * 2} {
+		b := arena.NewBudget(limit)
+		src := symbolIntTableTest(t, m, b)
+		src.Insert(NumericalSymbol(1), 9)
+		before := src.Stats()
+		c, e := src.Clone(b)
+		if limit < graph*2 {
+			if !errors.Is(e, arena.ErrBudget) || c != nil || src.Stats() != before || b.Used() != graph {
+				t.Fatal("shared-budget clone peak", e, b.Used())
+			}
+		} else {
+			if e != nil || b.Used() != graph*2 {
+				t.Fatal("exact clone peak", e, b.Used())
+			}
+			src.Close()
+			if v, ok, e := c.Find(NumericalSymbol(1)); e != nil || !ok || v != 9 {
+				t.Fatal("source close invalidated clone")
+			}
+			c.Close()
+		}
+		src.Close()
+		if b.Used() != 0 {
+			t.Fatal("shared clone release")
+		}
+	}
+	retained := symbolIntTableTest(t, m, nil)
+	retained.BeginScope()
+	retained.Insert(NumericalSymbol(0), 1)
+	retained.EndScope()
+	empty, e := retained.Clone(nil)
+	if e != nil {
+		t.Fatal(e)
+	}
+	defer empty.Close()
+	if len(empty.trail) != 0 || cap(empty.trail) != cap(retained.trail) || len(empty.limits) != 0 || cap(empty.limits) != cap(retained.limits) {
+		t.Fatal("copy empty retained vectors")
+	}
+	src := symbolIntTableTest(t, m, nil)
+	src.Insert(NumericalSymbol(1), 1)
+	for i := 0; i < 4; i++ {
+		src.BeginScope()
+		src.Insert(NumericalSymbol(1), int32(i))
+	}
+	oldGraph := symbolInt32EntryBytes(8) + symbolInt32EntryBytes(2) + 8
+	newVectors := symbolInt32EntryBytes(cap(src.trail)) + uint64(cap(src.limits))*4
+	peak := header + oldGraph*2 + newVectors
+	for _, limit := range []uint64{peak - 1, peak} {
+		b := arena.NewBudget(limit)
+		dst := symbolIntTableTest(t, m, b)
+		dst.Insert(NumericalSymbol(7), 7)
+		dst.BeginScope()
+		dst.Insert(NumericalSymbol(7), 8)
+		before := dst.Stats()
+		used := b.Used()
+		e := dst.Assign(src)
+		if limit < peak {
+			if !errors.Is(e, arena.ErrBudget) || dst.Stats() != before || b.Used() != used {
+				t.Fatal("assignment one below peak", e, b.Used())
+			}
+		} else if e != nil || dst.ScopeLevel() != 4 {
+			t.Fatal("assignment exact peak", e)
+		}
+		dst.Close()
+		if b.Used() != 0 {
+			t.Fatal("assignment peak release")
+		}
+	}
+	// Source vector assignment from never-allocated empty vectors frees the old
+	// destination's retained vectors, unlike Reset's retain-capacity behavior.
+	never := symbolIntTableTest(t, m, nil)
+	if e := retained.Assign(never); e != nil {
+		t.Fatal(e)
+	}
+	if cap(retained.trail) != 0 || cap(retained.limits) != 0 {
+		t.Fatal("empty source vector assignment")
+	}
+}

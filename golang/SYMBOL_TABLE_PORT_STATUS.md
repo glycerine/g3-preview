@@ -163,6 +163,75 @@ minimal wrapper with retained TMPDIR were used.
 Verbose logs: .cache/release/scoped-table-final/.cache/native.log,
 checked-native.log, checked-js.log. No manifest or git writes were made.
 
+## Source implicit deep copy and assignment completion
+
+Added Clone(destinationBudget *arena.Budget) and Assign(other *SymbolInt32Table)
+after re-reading symbol_table.h implicit member operations, core_hashtable's copy
+constructor/destructor/assignment, and complete vector copy_core/copy constructor/
+assignment/destruction paths. First new tests observed missing-method compile RED;
+implementation and four new source-policy/lifetime/failure tests are GREEN.
+
+Clone maps core_hashtable copy constructor (hashtable.h:261-269): exact source
+table capacity, USED-only rehash in source bucket order, deleted count0. It copies
+both vectors at exact source capacities with live marked history and limits
+(vector.h:102-120,156-164). Spare vector records are not constructed/copied in C++
+and are zero-initialized in Go. This differs intentionally from the physical
+transaction copy, which preserves every original bucket and inactive record.
+The owner and all arrays are independent, borrow the same SymbolManager, and charge
+the supplied destination Budget (nil is unlimited). Fresh cold mutexes are created;
+no Go mutex is copied as a value. Source destruction maps Close's own-graph release.
+
+Assign maps member assignment in source declaration order: core_hashtable::operator=
+(hashtable.h:620-627) first RESETs the destination and then inserts source USED
+buckets through ordinary hash-table growth policy. Assignment table capacity is
+therefore determined by destination reset/shrink/grow history, rather than cloned
+source capacity. Only afterward are trail and limit vector capacities/live elements
+copied via vector::operator= (vector.h:190-203). Assign retains destination manager
+and Budget, requires the same borrowed manager, and self-assignment is a no-op
+after lifetime checks. Never-allocated source vectors release destination retained
+capacity; allocated-but-empty source vectors retain their source capacities in the
+copy. This source distinction was found during the audit and tested explicitly.
+
+Assignment stages a charged physical destination graph, executes source table
+reset/replay and vector copies in it, and commits only after successful preparation.
+Source reset-first allocation exceptions could expose partial assignment; Go
+predictable failures instead preserve destination state. All simultaneous old,
+staged and newly prepared arrays are charged. Clone constructor unwind releases
+header and all successfully prepared arrays. Successful fault prefixes consume
+the existing Budget controller policy; Used charges unwind on later failure.
+Non-self copies allocate as the source operations require, plus the documented
+assignment transaction workspace; no warm zero-allocation copy promise is made.
+
+New tests: SourceCloneScopedHistory, SourceAssignDestinationPolicy,
+CopyFailureSweeps, CopyEmptyAndExactPeaks. They cover tombstone removal and exact
+source-capacity clone bucket replay; pointer independence; marked nested history
+undo independently after copy; destination half shrink/ordinary growth on assign;
+source close while clone remains usable; shared and separate destination budgets;
+empty-but-retained versus never-allocated source vectors; clone/assignment fault
+sweeps with both failed and successful endpoints; self/foreign/dead-owner guards;
+and exact clone/assignment old+new peaks (one byte below fails unchanged, exact
+amount succeeds). Existing fifteen tests still pass, including no-allocation paths.
+
+Prospective final tree: golang/.cache/release/scoped-table-copy-final, from
+git archive HEAD:golang at8a8ae0a70582d7779dc1b4e6d301e7ff637b72b1, overlaid ONLY
+the three owned scoped-table files. Full native and g3checked native ./...,
+actual full g3checked JS/wasm ./..., full vet, checked scoped-table races,
+root WASI test build and no-generics portcheck all PASS. All nineteen scoped-table
+test names were compared with declaration names and found registered/PASS in
+each native/checked-native/actual-JS verbose log. Native sessions83880,
+checked-native83646, actual-JS66549, vet48677, WASI47515 completed exit0;
+checked race54379 and portcheck80046 also exit0. Logs are tree/.cache/native.log,
+checked-native.log and checked-js.log. Workspace full gates during the same turn
+were blocked by the unrelated numeric Root packet's intentional compile RED;
+the complete green gates above use the isolated prospective tree. All fresh
+cache/temp/runtime outputs remain under golang/.cache, with normal compiler
+environment and minimal Node-only wrapper preserving TMPDIR.
+
+The source implicit deep copy/assignment dependency for this concrete int32 table
+is now covered. Other payload specializations, domain consumers and any separate
+move/swap API remain outside this packet. No manifest/progress/git or other owner
+files were changed.
+
 Central scope audit: this chunk completes every explicitly declared symbol_table
 method for int32. Synthesized copy construction/assignment still require explicit
 owned APIs; other payload specializations remain open. The source header remains

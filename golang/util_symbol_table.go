@@ -447,29 +447,154 @@ func (h *SymbolInt32Table) Reset() error {
 		return e
 	}
 	defer h.unlock()
-	if h.size == 0 && h.deleted == 0 {
-		h.trail = h.trail[:0]
-		h.limits = h.limits[:0]
+	if e := h.resetTable(&h.symbolInt32State); e != nil {
+		return e
+	}
+	h.trail = h.trail[:0]
+	h.limits = h.limits[:0]
+	return nil
+}
+func (h *SymbolInt32Table) resetTable(s *symbolInt32State) error {
+	if s.size == 0 && s.deleted == 0 {
 		return nil
 	}
-	free := uint64(len(h.table)) - uint64(h.size) - uint64(h.deleted)
-	if len(h.table) > 16 && free*4 > uint64(len(h.table))*3 {
-		n := len(h.table) / 2
+	free := uint64(len(s.table)) - uint64(s.size) - uint64(s.deleted)
+	if len(s.table) > 16 && free*4 > uint64(len(s.table))*3 {
+		n := len(s.table) / 2
 		if e := h.budget.Reserve(symbolInt32EntryBytes(n)); e != nil {
 			return e
 		}
 		p := make([]symbolInt32Entry, n)
-		h.budget.Release(symbolInt32EntryBytes(len(h.table)))
-		h.table = p
+		h.budget.Release(symbolInt32EntryBytes(len(s.table)))
+		s.table = p
 	} else {
-		for i := range h.table {
-			h.table[i].key = Symbol{}
+		for i := range s.table {
+			s.table[i].key = Symbol{}
 		}
 	}
-	h.size = 0
-	h.deleted = 0
-	h.trail = h.trail[:0]
-	h.limits = h.limits[:0]
+	s.size = 0
+	s.deleted = 0
+	return nil
+}
+
+// copyVectors follows vector::copy_core: copy live elements, retaining the
+// source capacity. Spare source elements are not constructed/copied in C++.
+func (h *SymbolInt32Table) copyVectors(dst, src *symbolInt32State) error {
+	trailBytes := symbolInt32EntryBytes(cap(src.trail))
+	scopeBytes := uint64(cap(src.limits)) * 4
+	var trail []symbolInt32Entry
+	var limits []uint32
+	if trailBytes > 0 {
+		if e := h.budget.Reserve(trailBytes); e != nil {
+			return e
+		}
+		trail = make([]symbolInt32Entry, len(src.trail), cap(src.trail))
+		copy(trail, src.trail)
+	}
+	if scopeBytes > 0 {
+		if e := h.budget.Reserve(scopeBytes); e != nil {
+			h.budget.Release(trailBytes)
+			return e
+		}
+		limits = make([]uint32, len(src.limits), cap(src.limits))
+		copy(limits, src.limits)
+	}
+	h.budget.Release(symbolInt32EntryBytes(cap(dst.trail)) + uint64(cap(dst.limits))*4)
+	dst.trail = trail
+	dst.limits = limits
+	return nil
+}
+
+// Clone implements the source implicit copy constructor: table entries rehash
+// USED buckets at exactly source capacity, while vectors copy their capacities
+// and live marked history. The new owner borrows the same manager and charges
+// all of its storage to destinationBudget; mutexes are freshly initialized.
+func (h *SymbolInt32Table) Clone(destinationBudget *arena.Budget) (*SymbolInt32Table, error) {
+	if e := h.lock(); e != nil {
+		return nil, e
+	}
+	defer h.unlock()
+	header := uint64(reflect.TypeOf(SymbolInt32Table{}).Size())
+	if e := destinationBudget.Reserve(header); e != nil {
+		return nil, e
+	}
+	copy := &SymbolInt32Table{manager: h.manager, budget: destinationBudget}
+	table, e := copy.newTable(&h.symbolInt32State, uint32(len(h.table)))
+	if e != nil {
+		destinationBudget.Release(header)
+		return nil, e
+	}
+	copy.table = table
+	copy.size = h.size
+	if e = copy.copyVectors(&copy.symbolInt32State, &h.symbolInt32State); e != nil {
+		destinationBudget.Release(header + copy.symbolInt32State.bytes())
+		return nil, e
+	}
+	return copy, nil
+}
+
+// Assign implements implicit member assignment. Unlike Clone, source
+// core_hashtable::operator= resets the destination then replays source buckets
+// through normal table insertion; destination capacity may shrink or grow.
+// A charged physical destination copy stages the transaction so predictable
+// failure leaves its graph unchanged. Manager and Budget are never reassigned.
+func (h *SymbolInt32Table) Assign(other *SymbolInt32Table) error {
+	if other == nil {
+		return ErrSymbolTablePrecondition
+	}
+	symbolInt32AppendMutex.Lock()
+	defer symbolInt32AppendMutex.Unlock()
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if other != h {
+		other.mu.Lock()
+		defer other.mu.Unlock()
+	}
+	h.manager.mu.Lock()
+	defer h.manager.mu.Unlock()
+	if e := h.open(); e != nil {
+		return e
+	}
+	if other.closed {
+		return arena.ErrClosed
+	}
+	if h.manager != other.manager {
+		return ErrSymbolOwner
+	}
+	if h == other {
+		return nil
+	}
+	p, e := h.clonePhysical(&h.symbolInt32State)
+	if e != nil {
+		return e
+	}
+	if e = h.resetTable(&p); e != nil {
+		h.budget.Release(p.bytes())
+		return e
+	}
+	for _, entry := range other.table {
+		if !used(entry.key) {
+			continue
+		}
+		if tableNeedsGrowth(&p) {
+			var table []symbolInt32Entry
+			table, e = h.newTable(&p, uint32(len(p.table))*2)
+			if e != nil {
+				h.budget.Release(p.bytes())
+				return e
+			}
+			h.budget.Release(symbolInt32EntryBytes(len(p.table)))
+			p.table = table
+			p.deleted = 0
+		}
+		h.put(&p, entry)
+	}
+	if e = h.copyVectors(&p, &other.symbolInt32State); e != nil {
+		h.budget.Release(p.bytes())
+		return e
+	}
+	h.budget.Release(h.symbolInt32State.bytes())
+	h.symbolInt32State = p
 	return nil
 }
 func (h *SymbolInt32Table) Append(other *SymbolInt32Table) error {
