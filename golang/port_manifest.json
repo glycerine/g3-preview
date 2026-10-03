@@ -81275,11 +81275,20 @@
       "role": "test",
       "status": "partial",
       "go_targets": [
-        "mpnum/mpq_parse.go"
+        "mpnum/mpq_parse.go",
+        "mpnum/mpq_ops.go"
       ],
       "tests": [
         "TestSourceStringAssertions",
-        "TestSourceParserLiteralInventory"
+        "TestSourceParserLiteralInventory",
+        "TestRationalOpsSourceTst9All24Assertions",
+        "TestRationalOpsMixedFiniteOraclesAndAliases",
+        "TestRationalOpsFusedAllOutputAliases",
+        "TestRationalOpsIntegerWrappersOracleAndSourceAliasQuirks",
+        "TestRationalOpsIntegerProductsRatDivQuirksAndGuards",
+        "TestRationalOpsSourceComponentAliasActionOrder",
+        "TestRationalOpsLargeLimbScratchBranchesAndWarm",
+        "TestRationalOpsAllPredictableFailurePrefixes"
       ],
       "assertions": [
         {
@@ -81941,11 +81950,30 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [
-        "Selected active textual inputs/assertion projections execute through concrete MPQ manager; the full global rational wrapper/test algorithm suite remains unported. No public-wrapper completion claim. See mpnum/PORT_STATUS.md."
+      "methods": [
+        {
+          "name": "tst9 all24 active signed Euclidean reconstruction/modulus assertions via manager",
+          "status": "ported",
+          "go_target": "mpnum/mpq_ops.go",
+          "tests": [
+            "TestRationalOpsSourceTst9All24Assertions",
+            "TestRationalOpsMixedFiniteOraclesAndAliases",
+            "TestRationalOpsFusedAllOutputAliases",
+            "TestRationalOpsIntegerWrappersOracleAndSourceAliasQuirks",
+            "TestRationalOpsIntegerProductsRatDivQuirksAndGuards",
+            "TestRationalOpsSourceComponentAliasActionOrder",
+            "TestRationalOpsLargeLimbScratchBranchesAndWarm",
+            "TestRationalOpsAllPredictableFailurePrefixes"
+          ]
+        }
       ],
-      "deviations": []
+      "ownership": [
+        "Selected active textual inputs/assertion projections execute through concrete MPQ manager; the full global rational wrapper/test algorithm suite remains unported. No public-wrapper completion claim. See mpnum/PORT_STATUS.md.",
+        "Mixed/fused locals use borrowed integer-manager storage; nonsynch reuses existing named caches, synch deletes all locals. Failed-prefix tests independently audit immediate live cells/Words before rendering or teardown. See mpnum/RATIONAL_OPS_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Staged mixed outputs adapt source allocation failure publication while emulating component-aliased source reads. Integer-only assertions and zero divisors become typed errors; negative-denominator RatDiv and direct integer output alias defects remain."
+      ]
     },
     {
       "path": "src/test/rcf.cpp",
@@ -96557,7 +96585,8 @@
         "mpnum/mpq_parse.go",
         "mpnum/mp_format.go",
         "mpnum/mpq_root.go",
-        "mpnum/mp_display.go"
+        "mpnum/mp_display.go",
+        "mpnum/mpq_ops.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -96623,7 +96652,15 @@
         "TestNumericDisplayReservationFailureCleanup",
         "TestNumericDisplayWorkspaceGrowthAndBudget",
         "TestNumericDisplayWarmAllocationBoundaries",
-        "TestSourceNoncanonicalRationalDisplayActions"
+        "TestSourceNoncanonicalRationalDisplayActions",
+        "TestRationalOpsSourceTst9All24Assertions",
+        "TestRationalOpsMixedFiniteOraclesAndAliases",
+        "TestRationalOpsFusedAllOutputAliases",
+        "TestRationalOpsIntegerWrappersOracleAndSourceAliasQuirks",
+        "TestRationalOpsIntegerProductsRatDivQuirksAndGuards",
+        "TestRationalOpsSourceComponentAliasActionOrder",
+        "TestRationalOpsLargeLimbScratchBranchesAndWarm",
+        "TestRationalOpsAllPredictableFailurePrefixes"
       ],
       "conditionals": [
         {
@@ -97036,6 +97073,186 @@
             "TestNumericDisplayWarmAllocationBoundaries",
             "TestSourceNoncanonicalRationalDisplayActions"
           ]
+        },
+        {
+          "name": "add/rat_add(mpq,mpz,mpq)",
+          "status": "ported",
+          "go_target": "mpnum/mpq_ops.go",
+          "tests": [
+            "TestRationalOpsSourceTst9All24Assertions",
+            "TestRationalOpsMixedFiniteOraclesAndAliases",
+            "TestRationalOpsFusedAllOutputAliases",
+            "TestRationalOpsIntegerWrappersOracleAndSourceAliasQuirks",
+            "TestRationalOpsIntegerProductsRatDivQuirksAndGuards",
+            "TestRationalOpsSourceComponentAliasActionOrder",
+            "TestRationalOpsLargeLimbScratchBranchesAndWarm",
+            "TestRationalOpsAllPredictableFailurePrefixes"
+          ]
+        },
+        {
+          "name": "mul/rat_mul(mpz,mpq,mpq)",
+          "status": "ported",
+          "go_target": "mpnum/mpq_ops.go",
+          "tests": [
+            "TestRationalOpsSourceTst9All24Assertions",
+            "TestRationalOpsMixedFiniteOraclesAndAliases",
+            "TestRationalOpsFusedAllOutputAliases",
+            "TestRationalOpsIntegerWrappersOracleAndSourceAliasQuirks",
+            "TestRationalOpsIntegerProductsRatDivQuirksAndGuards",
+            "TestRationalOpsSourceComponentAliasActionOrder",
+            "TestRationalOpsLargeLimbScratchBranchesAndWarm",
+            "TestRationalOpsAllPredictableFailurePrefixes"
+          ]
+        },
+        {
+          "name": "mul(mpz,mpz,mpq)",
+          "status": "ported",
+          "go_target": "mpnum/mpq_ops.go",
+          "tests": [
+            "TestRationalOpsSourceTst9All24Assertions",
+            "TestRationalOpsMixedFiniteOraclesAndAliases",
+            "TestRationalOpsFusedAllOutputAliases",
+            "TestRationalOpsIntegerWrappersOracleAndSourceAliasQuirks",
+            "TestRationalOpsIntegerProductsRatDivQuirksAndGuards",
+            "TestRationalOpsSourceComponentAliasActionOrder",
+            "TestRationalOpsLargeLimbScratchBranchesAndWarm",
+            "TestRationalOpsAllPredictableFailurePrefixes"
+          ]
+        },
+        {
+          "name": "div(mpq,mpz,mpq)",
+          "status": "ported",
+          "go_target": "mpnum/mpq_ops.go",
+          "tests": [
+            "TestRationalOpsSourceTst9All24Assertions",
+            "TestRationalOpsMixedFiniteOraclesAndAliases",
+            "TestRationalOpsFusedAllOutputAliases",
+            "TestRationalOpsIntegerWrappersOracleAndSourceAliasQuirks",
+            "TestRationalOpsIntegerProductsRatDivQuirksAndGuards",
+            "TestRationalOpsSourceComponentAliasActionOrder",
+            "TestRationalOpsLargeLimbScratchBranchesAndWarm",
+            "TestRationalOpsAllPredictableFailurePrefixes"
+          ]
+        },
+        {
+          "name": "acc_div(mpq,mpz)",
+          "status": "ported",
+          "go_target": "mpnum/mpq_ops.go",
+          "tests": [
+            "TestRationalOpsSourceTst9All24Assertions",
+            "TestRationalOpsMixedFiniteOraclesAndAliases",
+            "TestRationalOpsFusedAllOutputAliases",
+            "TestRationalOpsIntegerWrappersOracleAndSourceAliasQuirks",
+            "TestRationalOpsIntegerProductsRatDivQuirksAndGuards",
+            "TestRationalOpsSourceComponentAliasActionOrder",
+            "TestRationalOpsLargeLimbScratchBranchesAndWarm",
+            "TestRationalOpsAllPredictableFailurePrefixes"
+          ]
+        },
+        {
+          "name": "rat_div(mpz,mpz,mpq)",
+          "status": "ported",
+          "go_target": "mpnum/mpq_ops.go",
+          "tests": [
+            "TestRationalOpsSourceTst9All24Assertions",
+            "TestRationalOpsMixedFiniteOraclesAndAliases",
+            "TestRationalOpsFusedAllOutputAliases",
+            "TestRationalOpsIntegerWrappersOracleAndSourceAliasQuirks",
+            "TestRationalOpsIntegerProductsRatDivQuirksAndGuards",
+            "TestRationalOpsSourceComponentAliasActionOrder",
+            "TestRationalOpsLargeLimbScratchBranchesAndWarm",
+            "TestRationalOpsAllPredictableFailurePrefixes"
+          ]
+        },
+        {
+          "name": "addmul/submul(mpq,mpq,mpq,mpq)",
+          "status": "ported",
+          "go_target": "mpnum/mpq_ops.go",
+          "tests": [
+            "TestRationalOpsSourceTst9All24Assertions",
+            "TestRationalOpsMixedFiniteOraclesAndAliases",
+            "TestRationalOpsFusedAllOutputAliases",
+            "TestRationalOpsIntegerWrappersOracleAndSourceAliasQuirks",
+            "TestRationalOpsIntegerProductsRatDivQuirksAndGuards",
+            "TestRationalOpsSourceComponentAliasActionOrder",
+            "TestRationalOpsLargeLimbScratchBranchesAndWarm",
+            "TestRationalOpsAllPredictableFailurePrefixes"
+          ]
+        },
+        {
+          "name": "addmul/submul(mpq,mpz,mpq,mpq)",
+          "status": "ported",
+          "go_target": "mpnum/mpq_ops.go",
+          "tests": [
+            "TestRationalOpsSourceTst9All24Assertions",
+            "TestRationalOpsMixedFiniteOraclesAndAliases",
+            "TestRationalOpsFusedAllOutputAliases",
+            "TestRationalOpsIntegerWrappersOracleAndSourceAliasQuirks",
+            "TestRationalOpsIntegerProductsRatDivQuirksAndGuards",
+            "TestRationalOpsSourceComponentAliasActionOrder",
+            "TestRationalOpsLargeLimbScratchBranchesAndWarm",
+            "TestRationalOpsAllPredictableFailurePrefixes"
+          ]
+        },
+        {
+          "name": "idiv/machine_idiv(mpq,mpq,mpq)",
+          "status": "ported",
+          "go_target": "mpnum/mpq_ops.go",
+          "tests": [
+            "TestRationalOpsSourceTst9All24Assertions",
+            "TestRationalOpsMixedFiniteOraclesAndAliases",
+            "TestRationalOpsFusedAllOutputAliases",
+            "TestRationalOpsIntegerWrappersOracleAndSourceAliasQuirks",
+            "TestRationalOpsIntegerProductsRatDivQuirksAndGuards",
+            "TestRationalOpsSourceComponentAliasActionOrder",
+            "TestRationalOpsLargeLimbScratchBranchesAndWarm",
+            "TestRationalOpsAllPredictableFailurePrefixes"
+          ]
+        },
+        {
+          "name": "idiv/machine_idiv(mpq,mpq,mpz)",
+          "status": "ported",
+          "go_target": "mpnum/mpq_ops.go",
+          "tests": [
+            "TestRationalOpsSourceTst9All24Assertions",
+            "TestRationalOpsMixedFiniteOraclesAndAliases",
+            "TestRationalOpsFusedAllOutputAliases",
+            "TestRationalOpsIntegerWrappersOracleAndSourceAliasQuirks",
+            "TestRationalOpsIntegerProductsRatDivQuirksAndGuards",
+            "TestRationalOpsSourceComponentAliasActionOrder",
+            "TestRationalOpsLargeLimbScratchBranchesAndWarm",
+            "TestRationalOpsAllPredictableFailurePrefixes"
+          ]
+        },
+        {
+          "name": "rem/mod(mpq,mpq,mpq)",
+          "status": "ported",
+          "go_target": "mpnum/mpq_ops.go",
+          "tests": [
+            "TestRationalOpsSourceTst9All24Assertions",
+            "TestRationalOpsMixedFiniteOraclesAndAliases",
+            "TestRationalOpsFusedAllOutputAliases",
+            "TestRationalOpsIntegerWrappersOracleAndSourceAliasQuirks",
+            "TestRationalOpsIntegerProductsRatDivQuirksAndGuards",
+            "TestRationalOpsSourceComponentAliasActionOrder",
+            "TestRationalOpsLargeLimbScratchBranchesAndWarm",
+            "TestRationalOpsAllPredictableFailurePrefixes"
+          ]
+        },
+        {
+          "name": "rem/mod(mpq,mpq,mpz)",
+          "status": "ported",
+          "go_target": "mpnum/mpq_ops.go",
+          "tests": [
+            "TestRationalOpsSourceTst9All24Assertions",
+            "TestRationalOpsMixedFiniteOraclesAndAliases",
+            "TestRationalOpsFusedAllOutputAliases",
+            "TestRationalOpsIntegerWrappersOracleAndSourceAliasQuirks",
+            "TestRationalOpsIntegerProductsRatDivQuirksAndGuards",
+            "TestRationalOpsSourceComponentAliasActionOrder",
+            "TestRationalOpsLargeLimbScratchBranchesAndWarm",
+            "TestRationalOpsAllPredictableFailurePrefixes"
+          ]
         }
       ],
       "ownership": [
@@ -97044,7 +97261,8 @@
         "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md.",
         "Numeric division and decimal formatting use child NaturalManager indexed scratch; all retained storage is budgeted, final host string is caller-owned. See mpnum/PORT_STATUS.md.",
         "Root/square stage prior output and source alias rereads with existing owner-budgeted numerals, preserving finite false-result parts and synchronized/unsynchronized normalization policy. See ROOT_PORT_STATUS.md.",
-        "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md."
+        "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md.",
+        "Mixed/fused locals use borrowed integer-manager storage; nonsynch reuses existing named caches, synch deletes all locals. Failed-prefix tests independently audit immediate live cells/Words before rendering or teardown. See mpnum/RATIONAL_OPS_PORT_STATUS.md."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -97052,7 +97270,8 @@
         "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits.",
         "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors.",
         "Source fractional square identity alias reaches undefined zero/zero normalization; adapter reports ErrDivideByZero and preserves original caller fraction. Root false outputs remain deliberately unnormalized, and prior denominator survives inexact numerator.",
-        "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text."
+        "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text.",
+        "Staged mixed outputs adapt source allocation failure publication while emulating component-aliased source reads. Integer-only assertions and zero divisors become typed errors; negative-denominator RatDiv and direct integer output alias defects remain."
       ]
     },
     {

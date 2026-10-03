@@ -418,3 +418,15 @@ independent finite decimals, raw outputs, exact old-plus-new growth budgets,
 failure cleanup before teardown and allocation-free warm buffer formatting.
 Tests first reached missing-API RED, then GREEN. See NUMERIC_DISPLAY_PORT_STATUS.md.
 Other numeral/wrapper and all solver milestones remain open.
+
+## Mixed and fused rational arithmetic
+
+Eighteen concrete mixed/fused and integer-valued rational operations now preserve
+source arithmetic, local/cached scratch branches and component alias reads.
+RatDiv keeps negative denominators and wrappers keep integer division/modulus
+output-divisor quirks. Eight test groups port all24 active rational tst9
+assertions and add bounded independent oracles, alias fixtures, large-limb warm
+paths and injected failures with immediate root-based cells/Words accounting.
+Missing APIs and a component alias fixture were observed RED before translation
+and correction. See mpnum/RATIONAL_OPS_PORT_STATUS.md. Remaining numerical methods,
+rational wrapper and full AST/solver/proof/interpolation scope stay open.
