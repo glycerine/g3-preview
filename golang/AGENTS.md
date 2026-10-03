@@ -25,3 +25,12 @@ subtree. Port source assertions to Go tests before translating the corresponding
 implementation, and retain independent bounded correctness checks. After each
 coherent green chunk, make a git commit with a pithy one-to-three-sentence
 message. Git metadata writes necessary for those requested commits are allowed.
+
+## Current verification scope
+
+The user requests faster porting while the implementation uses a single
+goroutine. Defer JavaScript/WASM and WASI builds or execution, and race checks,
+at this stage. Do not include them as gates for current port chunks. Use native
+tests, checked/debug tests, appropriate static checks, and the source/evidence
+and no-generics audit. Preserve the plan's portable architecture; deferred
+platform and concurrency verification remains a later completion obligation.
