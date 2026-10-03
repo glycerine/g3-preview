@@ -82302,9 +82302,18 @@
       "sha256": "7e111b349555dcdaf78ce5806a2404506936850264a1188b2bc212b6f648ac80",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "util_symbol.go"
+      ],
+      "tests": [
+        "TestSymbolSourceAssertions",
+        "TestSymbolTagsNullBytesAndCachedHash",
+        "TestSymbolOwnerFailureLifetimeAndWarmIntern",
+        "TestSymbolConcurrentInternIdentity",
+        "TestSymbolIndependentBytesAndPrefixOrder",
+        "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
+      ],
       "assertions": [
         {
           "line": 27,
@@ -82399,11 +82408,31 @@
           "text": "ENSURE(lt(symbol(\"zzz\"), symbol(\"zzzb\")));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "tst1/tst_symbol all23 active ENSUREs and exact output",
+          "status": "ported",
+          "go_target": "util_symbol.go",
+          "tests": [
+            "TestSymbolSourceAssertions",
+            "TestSymbolTagsNullBytesAndCachedHash",
+            "TestSymbolOwnerFailureLifetimeAndWarmIntern",
+            "TestSymbolConcurrentInternIdentity",
+            "TestSymbolIndependentBytesAndPrefixOrder",
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
+          ]
+        }
+      ],
+      "ownership": [
+        "Explicit owner-local SymbolManager (GO_PORT_PLAN.md B storage ownership) replaces mutable global cache. Manager owns region+table, strings live until Close, hot Symbol records contain only scalar origin/ref/generation/tag. Other managers are separate identity domains. Full nested cold/payload budget graph and mutex-protected canonical interning are audited. See SYMBOL_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Native tagged pointers become explicit scalar tags/refs and owner-bound opaque tokens; callers cannot reinterpret a foreign symbol or raw address. Source full uint32 AMD64 numerical baseline remains valid on every Go target, independently of configurable4/8 byte page geometry.",
+        "Interner prepares source growth/probe, fills owned hash-prefix/spelling/NUL, then publishes; predictable failure never retains a caller query pointer. Earlier prepared storage may remain charged. Returned text is caller-owned, not temporarily budget-reserved.",
+        "Source null/marked/numeric-invalid data operations return typed precondition errors instead of invalid dereferences; identical marked/dummy Less still returnsfalse before dereference as source."
+      ]
     },
     {
       "path": "src/test/symbol_table.cpp",
@@ -101505,9 +101534,18 @@
       "sha256": "840d0480a03ddb1b0ed529338baebb4d32ad385db6fabd5f7037bcaa2b2db1bb",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "util_symbol.go"
+      ],
+      "tests": [
+        "TestSymbolSourceAssertions",
+        "TestSymbolTagsNullBytesAndCachedHash",
+        "TestSymbolOwnerFailureLifetimeAndWarmIntern",
+        "TestSymbolConcurrentInternIdentity",
+        "TestSymbolIndependentBytesAndPrefixOrder",
+        "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
+      ],
       "assertions": [
         {
           "line": 57,
@@ -101546,20 +101584,127 @@
           "text": "SASSERT(*str1 > *str2);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "internal_symbol_table get_str and explicit initialize/finalize owner lifecycle",
+          "status": "ported",
+          "go_target": "util_symbol.go",
+          "tests": [
+            "TestSymbolSourceAssertions",
+            "TestSymbolTagsNullBytesAndCachedHash",
+            "TestSymbolOwnerFailureLifetimeAndWarmIntern",
+            "TestSymbolConcurrentInternIdentity",
+            "TestSymbolIndependentBytesAndPrefixOrder",
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
+          ]
+        },
+        {
+          "name": "numeric/string/null construction and string assignment",
+          "status": "ported",
+          "go_target": "util_symbol.go",
+          "tests": [
+            "TestSymbolSourceAssertions",
+            "TestSymbolTagsNullBytesAndCachedHash",
+            "TestSymbolOwnerFailureLifetimeAndWarmIntern",
+            "TestSymbolConcurrentInternIdentity",
+            "TestSymbolIndependentBytesAndPrefixOrder",
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
+          ]
+        },
+        {
+          "name": "is_marked/mark/unmark/dummy/is_numerical/get_num",
+          "status": "ported",
+          "go_target": "util_symbol.go",
+          "tests": [
+            "TestSymbolSourceAssertions",
+            "TestSymbolTagsNullBytesAndCachedHash",
+            "TestSymbolOwnerFailureLifetimeAndWarmIntern",
+            "TestSymbolConcurrentInternIdentity",
+            "TestSymbolIndependentBytesAndPrefixOrder",
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
+          ]
+        },
+        {
+          "name": "symbol identity/CString equality/hash predicates",
+          "status": "ported",
+          "go_target": "util_symbol.go",
+          "tests": [
+            "TestSymbolSourceAssertions",
+            "TestSymbolTagsNullBytesAndCachedHash",
+            "TestSymbolOwnerFailureLifetimeAndWarmIntern",
+            "TestSymbolConcurrentInternIdentity",
+            "TestSymbolIndependentBytesAndPrefixOrder",
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
+          ]
+        },
+        {
+          "name": "str/ostream/string_buffer/bare_str nullable rendering",
+          "status": "ported",
+          "go_target": "util_symbol.go",
+          "tests": [
+            "TestSymbolSourceAssertions",
+            "TestSymbolTagsNullBytesAndCachedHash",
+            "TestSymbolOwnerFailureLifetimeAndWarmIntern",
+            "TestSymbolConcurrentInternIdentity",
+            "TestSymbolIndependentBytesAndPrefixOrder",
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
+          ]
+        },
+        {
+          "name": "contains/size/source signed-char lt",
+          "status": "ported",
+          "go_target": "util_symbol.go",
+          "tests": [
+            "TestSymbolSourceAssertions",
+            "TestSymbolTagsNullBytesAndCachedHash",
+            "TestSymbolOwnerFailureLifetimeAndWarmIntern",
+            "TestSymbolConcurrentInternIdentity",
+            "TestSymbolIndependentBytesAndPrefixOrder",
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
+          ]
+        },
+        {
+          "name": "c_ptr/mk_symbol_from_c_ptr opaque token adaptation",
+          "status": "ported",
+          "go_target": "util_symbol.go",
+          "tests": [
+            "TestSymbolSourceAssertions",
+            "TestSymbolTagsNullBytesAndCachedHash",
+            "TestSymbolOwnerFailureLifetimeAndWarmIntern",
+            "TestSymbolConcurrentInternIdentity",
+            "TestSymbolIndependentBytesAndPrefixOrder",
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
+          ]
+        }
+      ],
+      "ownership": [
+        "Explicit owner-local SymbolManager (GO_PORT_PLAN.md B storage ownership) replaces mutable global cache. Manager owns region+table, strings live until Close, hot Symbol records contain only scalar origin/ref/generation/tag. Other managers are separate identity domains. Full nested cold/payload budget graph and mutex-protected canonical interning are audited. See SYMBOL_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Native tagged pointers become explicit scalar tags/refs and owner-bound opaque tokens; callers cannot reinterpret a foreign symbol or raw address. Source full uint32 AMD64 numerical baseline remains valid on every Go target, independently of configurable4/8 byte page geometry.",
+        "Interner prepares source growth/probe, fills owned hash-prefix/spelling/NUL, then publishes; predictable failure never retains a caller query pointer. Earlier prepared storage may remain charged. Returned text is caller-owned, not temporarily budget-reserved.",
+        "Source null/marked/numeric-invalid data operations return typed precondition errors instead of invalid dereferences; identical marked/dummy Less still returnsfalse before dereference as source."
+      ]
     },
     {
       "path": "src/util/symbol.h",
       "sha256": "60ce765fb3b761ec178ceec7db59f7ddbce00dd0fad5148f6a8ec234f62b4fbf",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "util_symbol.go"
+      ],
+      "tests": [
+        "TestSymbolSourceAssertions",
+        "TestSymbolTagsNullBytesAndCachedHash",
+        "TestSymbolOwnerFailureLifetimeAndWarmIntern",
+        "TestSymbolConcurrentInternIdentity",
+        "TestSymbolIndependentBytesAndPrefixOrder",
+        "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -101608,11 +101753,109 @@
           "text": "SASSERT(!s.is_marked());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "internal_symbol_table get_str and explicit initialize/finalize owner lifecycle",
+          "status": "ported",
+          "go_target": "util_symbol.go",
+          "tests": [
+            "TestSymbolSourceAssertions",
+            "TestSymbolTagsNullBytesAndCachedHash",
+            "TestSymbolOwnerFailureLifetimeAndWarmIntern",
+            "TestSymbolConcurrentInternIdentity",
+            "TestSymbolIndependentBytesAndPrefixOrder",
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
+          ]
+        },
+        {
+          "name": "numeric/string/null construction and string assignment",
+          "status": "ported",
+          "go_target": "util_symbol.go",
+          "tests": [
+            "TestSymbolSourceAssertions",
+            "TestSymbolTagsNullBytesAndCachedHash",
+            "TestSymbolOwnerFailureLifetimeAndWarmIntern",
+            "TestSymbolConcurrentInternIdentity",
+            "TestSymbolIndependentBytesAndPrefixOrder",
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
+          ]
+        },
+        {
+          "name": "is_marked/mark/unmark/dummy/is_numerical/get_num",
+          "status": "ported",
+          "go_target": "util_symbol.go",
+          "tests": [
+            "TestSymbolSourceAssertions",
+            "TestSymbolTagsNullBytesAndCachedHash",
+            "TestSymbolOwnerFailureLifetimeAndWarmIntern",
+            "TestSymbolConcurrentInternIdentity",
+            "TestSymbolIndependentBytesAndPrefixOrder",
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
+          ]
+        },
+        {
+          "name": "symbol identity/CString equality/hash predicates",
+          "status": "ported",
+          "go_target": "util_symbol.go",
+          "tests": [
+            "TestSymbolSourceAssertions",
+            "TestSymbolTagsNullBytesAndCachedHash",
+            "TestSymbolOwnerFailureLifetimeAndWarmIntern",
+            "TestSymbolConcurrentInternIdentity",
+            "TestSymbolIndependentBytesAndPrefixOrder",
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
+          ]
+        },
+        {
+          "name": "str/ostream/string_buffer/bare_str nullable rendering",
+          "status": "ported",
+          "go_target": "util_symbol.go",
+          "tests": [
+            "TestSymbolSourceAssertions",
+            "TestSymbolTagsNullBytesAndCachedHash",
+            "TestSymbolOwnerFailureLifetimeAndWarmIntern",
+            "TestSymbolConcurrentInternIdentity",
+            "TestSymbolIndependentBytesAndPrefixOrder",
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
+          ]
+        },
+        {
+          "name": "contains/size/source signed-char lt",
+          "status": "ported",
+          "go_target": "util_symbol.go",
+          "tests": [
+            "TestSymbolSourceAssertions",
+            "TestSymbolTagsNullBytesAndCachedHash",
+            "TestSymbolOwnerFailureLifetimeAndWarmIntern",
+            "TestSymbolConcurrentInternIdentity",
+            "TestSymbolIndependentBytesAndPrefixOrder",
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
+          ]
+        },
+        {
+          "name": "c_ptr/mk_symbol_from_c_ptr opaque token adaptation",
+          "status": "ported",
+          "go_target": "util_symbol.go",
+          "tests": [
+            "TestSymbolSourceAssertions",
+            "TestSymbolTagsNullBytesAndCachedHash",
+            "TestSymbolOwnerFailureLifetimeAndWarmIntern",
+            "TestSymbolConcurrentInternIdentity",
+            "TestSymbolIndependentBytesAndPrefixOrder",
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
+          ]
+        }
+      ],
+      "ownership": [
+        "Explicit owner-local SymbolManager (GO_PORT_PLAN.md B storage ownership) replaces mutable global cache. Manager owns region+table, strings live until Close, hot Symbol records contain only scalar origin/ref/generation/tag. Other managers are separate identity domains. Full nested cold/payload budget graph and mutex-protected canonical interning are audited. See SYMBOL_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Native tagged pointers become explicit scalar tags/refs and owner-bound opaque tokens; callers cannot reinterpret a foreign symbol or raw address. Source full uint32 AMD64 numerical baseline remains valid on every Go target, independently of configurable4/8 byte page geometry.",
+        "Interner prepares source growth/probe, fills owned hash-prefix/spelling/NUL, then publishes; predictable failure never retains a caller query pointer. Earlier prepared storage may remain charged. Returned text is caller-owned, not temporarily budget-reserved.",
+        "Source null/marked/numeric-invalid data operations return typed precondition errors instead of invalid dereferences; identical marked/dummy Less still returnsfalse before dereference as source."
+      ]
     },
     {
       "path": "src/util/symbol_table.h",

@@ -255,3 +255,21 @@ use the production parser for source setup. Combined full native/checked races,
 vet, actual checked JS execution of all9 new parser tests and WASI builds pass.
 Public rational wrapper, remaining numerical methods and scratch ownership remain
 open; the full solver objective is unchanged.
+
+## Complete selected symbol service
+
+Concrete pointer-free symbols and an explicit owner-local interning service now
+preserve source numeric/null/marked tags, identity, cached hash prefixes,
+rendering, CString equality, contains/size and signed-byte/termination ordering.
+All23 active source assertions and exact output were ported first and went RED,
+then GREEN. Added nullable bare-spelling and marked identity-order regressions
+also went RED before their changes. An independent review verified the complete
+source method/ownership map and closed the prepared-miss epoch failure gap.
+
+Independent byte/order oracles, both logical pointer geometries, complete budget
+sum and constructor/failure/close checks, canonical concurrent interning and
+warm zero allocation pass. Combined full native/checked races and vet pass;
+all6 symbol tests execute under checked JS, and WASI compilation passes.
+Raw pointers/global cache become explicit owner/token adaptations per the plan;
+context integration, scoped symbol tables, other container/numeric gaps and all
+AST/solver/proof/interpolation milestones remain open.
