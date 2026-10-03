@@ -1150,3 +1150,18 @@ registry remains under implementation; see GPARAMS_PORT_STATUS.md.
 Full native/debug integration on HEAD1ccea0b, exact22 named race/actual JS
 results, vet, WASI compilation and source/no-generics audit passed. Ledger
 counts remain33ported/89partial/1980unported.
+
+
+## Actual single-thread source cooperation
+
+The real cooperate.cpp selected _NO_OMP_ profile now preserves runtime enable,
+owner0 checkpoint handoff and source section/task assertion and destruction
+sites. A charged concrete cold owner replaces process globals; unused task names
+are not retained. Tests first failed on missing APIs, then five action/ownership
+groups and a sixth actual C++ thirteen-transition release fixture passed.
+Full native/debug, release and debug race/actual JS, vet and WASI compilation
+passed. See UTIL_COOPERATE_PORT_STATUS.md. OpenMP multilane and TRACE profiles
+remain open; this provides the actual single-thread polynomial checkpoint service.
+
+Source/no-generics audit passed; cooperate.cpp/h become partial with
+ledger33ported/91partial/1978unported.

@@ -88909,9 +88909,21 @@
       "sha256": "54cfa4774c70486aba60852ec22d35098ea8327b2ad242d0cb5d32178b4a2b8c",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_cooperate.go",
+        "util_cooperate_debug.go",
+        "util_cooperate_nodebug.go",
+        "util_cooperate_test.go"
+      ],
+      "tests": [
+        "TestCooperationNoOMPSourceCheckpointAndSection",
+        "TestCooperationNoOMPSourceAssertionSites",
+        "TestCooperationNoOMPTaskReleaseAndRuntimeEnable",
+        "TestCooperationColdOwnerFaultAndCopies",
+        "TestCooperationNoOMPZeroWarmAllocations",
+        "TestCooperationActualCPPNoOMPReleaseTrace"
+      ],
       "assertions": [
         {
           "line": 44,
@@ -88938,20 +88950,56 @@
           "text": "SASSERT(omp_in_parallel());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "actual _NO_OMP_ enabled/checkpoint/cooperate and section/task constructors/destructors",
+          "status": "ported",
+          "go_target": "util_cooperate.go",
+          "tests": [
+            "TestCooperationNoOMPSourceCheckpointAndSection",
+            "TestCooperationNoOMPSourceAssertionSites",
+            "TestCooperationNoOMPTaskReleaseAndRuntimeEnable",
+            "TestCooperationColdOwnerFaultAndCopies",
+            "TestCooperationNoOMPZeroWarmAllocations",
+            "TestCooperationActualCPPNoOMPReleaseTrace"
+          ]
+        },
+        {
+          "name": "OpenMP multilane scheduling, recursive locks and conditional TRACE streams",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Source global lock/enable state becomes one charged, self-guarded cold operation owner. Empty lexical section/task objects use balanced Begin/End calls; task spelling is not retained because source m_task is never written. See UTIL_COOPERATE_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Selected actual z3_omp.h _NO_OMP_ compile profile: thread0, not parallel and no-op lock primitives. Runtime enabled/disabled state and source debug assertion positions execute. Other OpenMP profile remains open; no disabled callback substitute. Typed owner/lifetime errors adapt Go storage."
+      ]
     },
     {
       "path": "src/util/cooperate.h",
       "sha256": "d5961d245cd368c12bee65220b57f49d3e273280fec951a9baa8079b9d788a80",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_cooperate.go",
+        "util_cooperate_debug.go",
+        "util_cooperate_nodebug.go",
+        "util_cooperate_test.go"
+      ],
+      "tests": [
+        "TestCooperationNoOMPSourceCheckpointAndSection",
+        "TestCooperationNoOMPSourceAssertionSites",
+        "TestCooperationNoOMPTaskReleaseAndRuntimeEnable",
+        "TestCooperationColdOwnerFaultAndCopies",
+        "TestCooperationNoOMPZeroWarmAllocations",
+        "TestCooperationActualCPPNoOMPReleaseTrace"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -88962,11 +89010,35 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "actual _NO_OMP_ enabled/checkpoint/cooperate and section/task constructors/destructors",
+          "status": "ported",
+          "go_target": "util_cooperate.go",
+          "tests": [
+            "TestCooperationNoOMPSourceCheckpointAndSection",
+            "TestCooperationNoOMPSourceAssertionSites",
+            "TestCooperationNoOMPTaskReleaseAndRuntimeEnable",
+            "TestCooperationColdOwnerFaultAndCopies",
+            "TestCooperationNoOMPZeroWarmAllocations",
+            "TestCooperationActualCPPNoOMPReleaseTrace"
+          ]
+        },
+        {
+          "name": "OpenMP multilane scheduling, recursive locks and conditional TRACE streams",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Source global lock/enable state becomes one charged, self-guarded cold operation owner. Empty lexical section/task objects use balanced Begin/End calls; task spelling is not retained because source m_task is never written. See UTIL_COOPERATE_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Selected actual z3_omp.h _NO_OMP_ compile profile: thread0, not parallel and no-op lock primitives. Runtime enabled/disabled state and source debug assertion positions execute. Other OpenMP profile remains open; no disabled callback substitute. Typed owner/lifetime errors adapt Go storage."
+      ]
     },
     {
       "path": "src/util/critical_flet.h",
