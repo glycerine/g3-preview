@@ -213,16 +213,6 @@ type astBuiltinPluginState struct {
 	userTable                    astUserDictionary
 }
 
-type astDependencyConstructionState struct {
-	owner     *ASTManager
-	allocator *arena.SmallBytes
-	todo      []arena.SmallBytesRef
-}
-type astDependencyArrayConstructionState struct {
-	owner             *astDependencyConstructionState
-	allocator         *arena.SmallBytes
-	getTmp, rerootTmp []arena.SmallBytesRef
-}
 type ASTManager struct {
 	mu                                                                                                 sync.Mutex
 	self                                                                                               *ASTManager
@@ -259,10 +249,10 @@ type ASTManager struct {
 	deletionHead, deletionCurrent                                                                      astNodeRef
 	pendingDeletionHead, pendingDeletionCurrent                                                        astNodeRef
 	exprArrays                                                                                         astExprArrayManager
-	// Actual empty constructor state for dependency_manager and its array
-	// manager. No callable dependency algorithm is exposed until that packet.
-	dependencies     astDependencyConstructionState
-	dependencyArrays astDependencyArrayConstructionState
+	// Actual AST-valued dependency manager and persistent-array specialization;
+	// borrowed owners are bound eagerly and scratch backing is charged on use.
+	dependencies     astDependencyManager
+	dependencyArrays astDependencyArrayManager
 }
 
 func astNextOrigin() (uint64, error) {

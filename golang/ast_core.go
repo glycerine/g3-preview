@@ -47,8 +47,8 @@ func newASTManager(c ASTManagerConfig, format bool) (*ASTManager, error) {
 		return fail(e)
 	}
 	m.exprArrays = astExprArrayManager{owner: m, allocator: m.allocator, budget: m.budget, id: m.origin, preserve: true}
-	m.dependencies = astDependencyConstructionState{owner: m, allocator: m.allocator}
-	m.dependencyArrays = astDependencyArrayConstructionState{owner: &m.dependencies, allocator: m.allocator}
+	m.dependencies = astDependencyManager{owner: m, allocator: m.allocator}
+	m.dependencyArrays = astDependencyArrayManager{owner: m, allocator: m.allocator, budget: m.budget, id: m.origin, preserve: true}
 	m.families, e = NewFamilyManager(c.Symbols, c.Budget)
 	if e != nil {
 		return fail(e)
@@ -313,6 +313,8 @@ func (m *ASTManager) closeCore() error {
 		m.families = nil
 	}
 	m.exprArrays.closeAfterNodeTeardown()
+	m.dependencies.closeAfterNodeTeardown()
+	m.dependencyArrays.closeAfterNodeTeardown()
 	m.releasePages()
 	m.closed = true
 	m.closing = false

@@ -1002,3 +1002,22 @@ Implicit converter owning Clone/Assign and TRACE diagnostics remain open.
 The real full SAT solver/default inprocessing/runtime source test remains RED
 and is excluded from this separately verified prerequisite commit. No complete
 SAT/SMT/interpolation solver claim is made; the original goal remains active.
+
+## Actual AST dependency and dependency-array integration
+
+Real AST-valued leaves/joins, RC30, FIFO identity traversal, stable in-place
+linearization and LIFO destruction are implemented with actual AST callbacks.
+The persistent dependency-array specialization preserves source retained raw
+tokens, inverse patches, shared roots and allocation/reference prefixes.
+Twenty-five new groups plus eager binding passed;356 source parray conditions
+are explicitly adapted to this reference-enabled specialization, not claimed
+as original direct dependency-specialization assertions.
+
+Review regressions corrected source copy-before-INC, debug RC0 refusal
+consumption, copied-prefix cleanup and raw retained Get before actual lifetime
+dereference. Full native/debug,26 named race/actual JavaScript, vet/WASI compile
+and final source/no-generics checks passed. The full manager/solver/interpolation
+objective remains active. Source ownership aliases, alternate scoped configs,
+TRACE and specific private parray/Reroot diagnostics remain open, as enumerated
+in AST_DEPENDENCY_PACKET.md. Only dependency.h/ast_util.h become partial;
+final ledger counts33ported/84partial/1985unported.
