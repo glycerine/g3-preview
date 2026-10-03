@@ -1118,3 +1118,22 @@ See AST_DEPENDENCY_REF_PACKET.md for source methods, hashes, prefixes and the
 preserved uninstantiable C++ buffer-copy constructor. ref_buffer.h becomes
 partial; ledger33ported/88partial/1981unported. Full consumers and the complete
 solver/proof/interpolation scope remain open.
+
+
+## Actual centered integer/modular arithmetic
+
+The concrete mpzzp manager now borrows the real IntegerManager and owns its
+seven source numerals, preserving centered Z/GF(p)/Zp operations and mode
+publication. Actual inverse swaps before its final assertion; finite powers
+perform their final unused square. Mutable conversions normalize while const
+conversions do not. Tests-first review corrected universal debug guards and
+copied/zero cold-owner lifetime checks. Source constructor indeterminate prime
+reads and high-bit power nontermination receive typed guards only at the actual
+read/wrap; safe Go local cleanup is distinguished from raw MPZ source failures.
+
+Five immutable Go files passed full native/debug on the actual dependency
+owning-alias base,13 exact race/actual JS groups, vet, WASI compilation and
+source/no-generics gates. MPZZP_PORT_STATUS.md records full selected methods,
+hashes and immediate allocation-prefix root audits. mpzzp.h becomes partial;
+ledger33ported/89partial/1980unported. Dense polynomial/GCD/Sturm/algebraic and
+actual arithmetic plugin algorithms remain within the full active goal.

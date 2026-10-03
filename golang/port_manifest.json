@@ -106725,9 +106725,28 @@
       "sha256": "b372ab1061ddb4eb352f07d7fe0fe921363992bcd5c9442ba55efec413cab1a5",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/mpzzp.go",
+        "mpnum/mpzzp_debug.go",
+        "mpnum/mpzzp_nodebug.go",
+        "mpnum/mpzzp_ops.go"
+      ],
+      "tests": [
+        "TestIntegerModularCenteredOracle",
+        "TestIntegerModularModeAndUnknownPrime",
+        "TestIntegerModularInverseAndPowerActions",
+        "TestIntegerModularMutableConversionAndAliases",
+        "TestIntegerModularHeaderRefusalAndWarm",
+        "TestIntegerModularCompleteScalarRoutes",
+        "TestIntegerModularConversionOverloadsAndDisplay",
+        "TestIntegerModularPredictableFailurePrefixes",
+        "TestIntegerModularReleaseSetupPreconditions",
+        "TestIntegerModularFiniteSourceQuirks",
+        "TestIntegerModularExplicitInPlaceOverloads",
+        "TestIntegerModularColdOwnerIdentity",
+        "TestIntegerModularConstructorOwnershipAndRefusal"
+      ],
       "conditionals": [
         {
           "line": 26,
@@ -106914,9 +106933,74 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Lifecycle, seven real numeral fields, mode and centered normalization",
+          "status": "partial",
+          "go_target": "mpnum/mpzzp.go",
+          "tests": [
+            "TestIntegerModularCenteredOracle",
+            "TestIntegerModularModeAndUnknownPrime",
+            "TestIntegerModularInverseAndPowerActions",
+            "TestIntegerModularMutableConversionAndAliases",
+            "TestIntegerModularHeaderRefusalAndWarm",
+            "TestIntegerModularCompleteScalarRoutes",
+            "TestIntegerModularConversionOverloadsAndDisplay",
+            "TestIntegerModularPredictableFailurePrefixes",
+            "TestIntegerModularReleaseSetupPreconditions",
+            "TestIntegerModularFiniteSourceQuirks",
+            "TestIntegerModularExplicitInPlaceOverloads",
+            "TestIntegerModularColdOwnerIdentity",
+            "TestIntegerModularConstructorOwnershipAndRefusal"
+          ]
+        },
+        {
+          "name": "Actual inverse/division/GCD/extendedGCD and source unsignedmask power",
+          "status": "partial",
+          "go_target": "mpnum/mpzzp.go",
+          "tests": [
+            "TestIntegerModularCenteredOracle",
+            "TestIntegerModularModeAndUnknownPrime",
+            "TestIntegerModularInverseAndPowerActions",
+            "TestIntegerModularMutableConversionAndAliases",
+            "TestIntegerModularHeaderRefusalAndWarm",
+            "TestIntegerModularCompleteScalarRoutes",
+            "TestIntegerModularConversionOverloadsAndDisplay",
+            "TestIntegerModularPredictableFailurePrefixes",
+            "TestIntegerModularReleaseSetupPreconditions",
+            "TestIntegerModularFiniteSourceQuirks",
+            "TestIntegerModularExplicitInPlaceOverloads",
+            "TestIntegerModularColdOwnerIdentity",
+            "TestIntegerModularConstructorOwnershipAndRefusal"
+          ]
+        },
+        {
+          "name": "All scalar predicates/arithmetic/fused/sets/const-mutable conversion/bit/log/root/formatting overloads",
+          "status": "partial",
+          "go_target": "mpnum/mpzzp_ops.go",
+          "tests": [
+            "TestIntegerModularCenteredOracle",
+            "TestIntegerModularModeAndUnknownPrime",
+            "TestIntegerModularInverseAndPowerActions",
+            "TestIntegerModularMutableConversionAndAliases",
+            "TestIntegerModularHeaderRefusalAndWarm",
+            "TestIntegerModularCompleteScalarRoutes",
+            "TestIntegerModularConversionOverloadsAndDisplay",
+            "TestIntegerModularPredictableFailurePrefixes",
+            "TestIntegerModularReleaseSetupPreconditions",
+            "TestIntegerModularFiniteSourceQuirks",
+            "TestIntegerModularExplicitInPlaceOverloads",
+            "TestIntegerModularColdOwnerIdentity",
+            "TestIntegerModularConstructorOwnershipAndRefusal"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual charged cold wrapper owns seven pointer-free Ints and borrows real IntegerManager/Budget; source ordered fields and scratch/publication preserved. Cold self guard rejects copied/zero owner; source modulus copied public accessor distinguished from actual private borrowed numeral. See MPZZP_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Source modulus constructors leave prime flag indeterminate; typed guard only actual read, not invented release Div precondition. Source Power maskwrap nontermination diagnosed after completed actions; deferred local/constructor cleanup is safe Go ownership adaptation, not claimed raw MPZ exception destructor. Source TRACE/unsupported/undefined and full consumer algorithms remain open. See MPZZP_PORT_STATUS.md."
+      ]
     },
     {
       "path": "src/util/nat_set.h",
