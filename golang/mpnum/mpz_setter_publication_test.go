@@ -223,6 +223,10 @@ func TestIntegerNormalizeOwnedSourceBranches(t *testing.T) {
 			t.Fatal(e)
 		}
 		out := Int{val: tc.sign, cell: ref}
+		// mpz.h:124–128 initializes capacity only. The fixture is constructing
+		// a numeral, so publish its pointer and source m_size before digits.
+		m.publishCell(ref)
+		m.resizeCell(ref, uint32(len(tc.digits)))
 		for i, d := range tc.digits {
 			m.writeDigit(ref, uint32(i), d)
 		}

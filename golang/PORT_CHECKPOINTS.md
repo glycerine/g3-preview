@@ -129,3 +129,17 @@ accounting correction. Debug consumers reach separately held Memout101 category
 expectations; the Params sweep reaches a separately held warm-pool no-reservation
 case. Full native baseline remains RED in `.cache/post-cell-native.log`; this
 statistics correction does not claim completion of backend integration.
+
+
+Two physical-cell fixtures now match actual source initialization and wrapped
+allocation. Normalize initialization explicitly publishes pointer and size;
+the UINT_MAX scratch request distinguishes a rounded eight-byte replacement
+from a retained four-byte object whose capacity write is out of bounds. Tests
+verify old descriptor generation/object invalidation, initialized capacity,
+uninitialized size, physical prefixes, actual span guards and complete owning
+cleanup. Named native/debug RED preceded this correction. Eleven relevant
+groups, vet and source/no-generics audit pass on the exact two-file overlay
+`.cache/release/mpz-fixtures-final-8ade92d`; logs:
+`.cache/mpz-fixtures-eleven-{native,debug}.log` and
+`.cache/mpz-fixtures-final-{vet,source}.log`. No numerical algorithm changed;
+remaining broader backend failures remain separate integration work.

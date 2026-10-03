@@ -327,14 +327,89 @@ func TestIntegerSourcePairedDivisionPublishesQuotientBeforeMissingScratch(t *tes
 func TestIntegerSourceTmpUnsignedCapacityGuardAfterOldFree(t *testing.T) {
 	m, b := mpzPublicationOwner(t)
 	old := m.tmp[0]
+	oldObject := m.cell(old).backing.object
+	oldGeneration := m.cells.state(numericSlot(old)).generation
 	before := mpzPublicationSnapshot(m, b)
-	// Source new_capacity = (3*capacity+1)>>1 uses unsigned32. The
-	// MaxUint32 request wraps to MaxInt32, not a uint64-overflow rejection.
+	oldRawExtent := uint64(32) + uint64(m.memory.SizeTBits()/8)
+	// mpz.h:159–162 frees the old object, computes unsigned new capacity,
+	// then allocate writes capacity before its caller publishes the pointer.
+	// UINT_MAX -> INT_MAX capacity -> unsigned cell_size 4 (mpz.h:122).
 	e := m.ensureTmp(0, ^uint32(0))
-	if e != arena.ErrBudget && e != arena.ErrBounds {
-		t.Fatal("expected finite-budget/host-size refusal of wrapped request", e)
+	if m.cells.IsLive(numericSlot(old), oldGeneration) {
+		t.Fatal("old descriptor generation survived destructive replacement")
 	}
-	mpzPublicationExpectFreed(t, m, b, old, before)
+	if _, _, err := m.allocator.RawLocation(oldObject); err != memory.ErrAllocatorOwner {
+		t.Fatal("old actual object remained accessible", err)
+	}
+	if m.pendingCell.object != (memory.ObjectRef{}) {
+		// Debug NonWindows uses exact-size direct backing; ILP32 pooling also
+		// rounds four bytes to four. The capacity word is outside this object.
+		pending := m.pendingCell
+		extent, err := m.allocator.ObjectExtent(pending.object)
+		if err != nil || extent != 4 || pending.requested != 4 || e != arena.ErrBounds {
+			t.Fatal("actual endangered capacity write", extent, e, err)
+		}
+		if m.tmp[0] != 0 || m.cells.Stats().Live+1 != before.cells {
+			t.Fatal("undefined capacity access published descriptor/tmp")
+		}
+		if _, err = pending.readWord(m.allocator, 0); !errors.Is(err, memory.ErrRuntimeUninitialized) {
+			t.Fatal("pending source m_size initialized", err)
+		}
+		if _, err = pending.readWord(m.allocator, 4); err != arena.ErrBounds {
+			t.Fatal("capacity word escaped rounded object", err)
+		}
+		if before.chunks == 0 {
+			physical := m.memory.Stats().PhysicalBytes
+			newRawExtent := uint64(4) + uint64(m.memory.SizeTBits()/8)
+			if physical+oldRawExtent != before.physical+newRawExtent {
+				t.Fatal("actual free/allocation physical prefix", before.physical, physical)
+			}
+		}
+	} else {
+		// LP64 pooling rounds request4 to8; capacity succeeds and the new tmp
+		// pointer is published before the source debug capacity assertion.
+		if modularSourceDebug {
+			if e != ErrIntegerAssertion {
+				t.Fatal("source post-publication capacity assertion", e)
+			}
+		} else if e != nil {
+			t.Fatal("defined wrapped LP64 allocation", e)
+		}
+		ref := m.tmp[0]
+		if ref == 0 || !validNumericRef(m.cells, ref) {
+			t.Fatal("new source pointer not live")
+		}
+		c := m.cell(ref)
+		extent, err := m.allocator.ObjectExtent(c.backing.object)
+		if err != nil || c.capacity != 0x7fffffff || c.backing.requested != 4 || extent != 8 {
+			t.Fatal("source unsigned capacity/actual rounding", c, extent, err)
+		}
+		if v, err := c.backing.readWord(m.allocator, 4); err != nil || v != 0x7fffffff {
+			t.Fatal("physical capacity publication", v, err)
+		}
+		if _, err := c.backing.readWord(m.allocator, 0); !errors.Is(err, memory.ErrRuntimeUninitialized) {
+			t.Fatal("replacement source size synthesized", err)
+		}
+		after := mpzPublicationSnapshot(m, b)
+		if after.cells != before.cells || after.words != before.words || after.physical != before.physical+8192+uint64(m.memory.SizeTBits()/8) {
+			t.Fatal("actual new class chunk prefix", before, after)
+		}
+		if e = m.prepareTmpSpan(0, ^uint32(0)); e != arena.ErrBounds {
+			t.Fatal("guard at actual oversized span access", e)
+		}
+		if m.tmp[0] != ref || mpzPublicationSnapshot(m, b) != after || m.cell(ref).span != 0 {
+			t.Fatal("span refusal changed completed roots")
+		}
+	}
+	if m.words.Stats().Live != before.words {
+		t.Fatal("numeric source allocation fabricated Words root")
+	}
+	if e = m.CloseChecked(); e != nil {
+		t.Fatal("owning physical-prefix cleanup", e)
+	}
+	if b.Used() != 0 {
+		t.Fatal("retained source root leaked", b.Used())
+	}
 }
 
 func TestIntegerSourceDivModWrapperDestinationBeforeFailure(t *testing.T) {
