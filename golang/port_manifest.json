@@ -2896,9 +2896,20 @@
       "sha256": "81c11ede810dc135a9e0c42b87ce721f2b2d972b32b32ca11b01b30918805d90",
       "component": "ackermannization",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -2911,8 +2922,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -3016,9 +3042,20 @@
       "sha256": "4869771a7e400341bea0672d30d82ad2973b310ea6d883d94463820810a8ee88",
       "component": "ackermannization",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -3031,8 +3068,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -15111,9 +15163,20 @@
       "sha256": "7d8895e0e210d35436b5aaaa93eb824b4ca64c57a31dd2ad7414114e7c008193",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -15126,8 +15189,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -15893,9 +15971,20 @@
       "sha256": "560de5b04fa04bb4304e696d12198c42ac91c3d8bbd47a03b74f007bb4645acc",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "assertions": [
         {
           "line": 79,
@@ -16004,8 +16093,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -16013,9 +16117,20 @@
       "sha256": "569f5c9cf9a1ccb40ec6812b6bcf5993cb2b1bb0da5ca1fa78ab3583fac0dc63",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -16028,8 +16143,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -16037,9 +16167,20 @@
       "sha256": "95bf0c852f3a37898c024cd94b8b7f39f8ae1999a242535725498b54b2bfa774",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -16052,8 +16193,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -16511,9 +16667,20 @@
       "sha256": "2087b33deb1ea8271a654b4d757af1f39bb88ba7d884328e69d6e251962fcdd9",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -16526,8 +16693,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -16657,9 +16839,20 @@
       "sha256": "db35bc2546189e941fa931092b6c3030dfdde789d92b70344969c1aba151ce93",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -16672,8 +16865,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -17349,9 +17557,20 @@
       "sha256": "3ea48a9aaf4e963842210187a2261ea4f020fc3e08a3eb68c4d3a42ca1c20871",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -17364,8 +17583,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -17503,9 +17737,20 @@
       "sha256": "7dc7e99f3ddb9bbde7a3edf1ffd1ecd910d15e86a2c09026f1df115a34d21de7",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -17518,8 +17763,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -18279,9 +18539,20 @@
       "sha256": "b31fb8aad246efac68934880efa991671a885cdfa1355371f47d34c130adb311",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -18294,8 +18565,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -19057,9 +19343,20 @@
       "sha256": "f8ab87c91980d2f1ed259f7e6c50ff955604d8fc511f96c9c47665c5ee36d3a2",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -19072,8 +19369,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -19995,9 +20307,20 @@
       "sha256": "826bdd3f5399261577ae024d62aee1adc8a2fa27de3b74a15cbadec8a2232742",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -20010,8 +20333,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -20587,9 +20925,20 @@
       "sha256": "e58e0860c8fa2dd41ce6ed85a73c6490083427f13a1dcaf933de3251a2054033",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -20602,8 +20951,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -21125,9 +21489,20 @@
       "sha256": "0dce2c6cadee2f1b4a409b6f9549615567f0918d2568829470a12afaf36bf992",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -21140,8 +21515,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -23199,13 +23589,39 @@
       "sha256": "d7a23c364cd4141afad2d31339e19f65e4f475a7f018021fdc4ec458b872fe19",
       "component": "cmd_context",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -23213,9 +23629,20 @@
       "sha256": "d52f95bca382465501162c99914ad2ca2d2ba82b2af23b51ba295e8737a560ce",
       "component": "cmd_context",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -23228,8 +23655,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -25409,9 +25851,20 @@
       "sha256": "daee2b3402763d0b71beb5ad0ae2c2d7da64f1a18bb57bd0ade8e107377dbc85",
       "component": "interp",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -25424,8 +25877,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -28335,9 +28803,20 @@
       "sha256": "964aff3521baa5624fb57240b12e897f94b1c91f6bea2f27e8e1eaf931ef3c5f",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -28350,8 +28829,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -31271,9 +31765,20 @@
       "sha256": "36e500d8969537cac4c628d9730cbaad01002a61e1621c50a4a58ef9a61b8689",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -31286,8 +31791,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -34393,9 +34913,20 @@
       "sha256": "0cf305165a4dbe83a019f6f600d37293862e72be5ac0cadcca9a15924e61badd",
       "component": "model",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -34408,8 +34939,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -34645,9 +35191,20 @@
       "sha256": "38950508d7155ef0bc057faeb8598082950fbbe521fce1032bf8dd08da226870",
       "component": "model",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -34660,8 +35217,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -35645,9 +36217,20 @@
       "sha256": "9b464292f7f8ad2409be764a04b9f45ab59c452cd2084fd06dd5ee8b672ad554",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -35660,8 +36243,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -45671,9 +46269,20 @@
       "sha256": "5a303fe15ce6ce2334f637e957ac0e0ee45fee9670e3de9a535cfaa6e99e9e18",
       "component": "nlsat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -45686,8 +46295,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -46687,9 +47311,20 @@
       "sha256": "e08ed20495a1f4bd11e39aa939a65b79e23e72ec2c1ba640c5c67b4c0c583881",
       "component": "opt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -46702,8 +47337,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -47879,9 +48529,20 @@
       "sha256": "18b17fb81d735175e45b0fb3f7fb00f0ad5569e0c7d82fb59f5b6efde492e5fd",
       "component": "parsers",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -47894,8 +48555,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -50127,9 +50803,20 @@
       "sha256": "58ffd6f8486fa11980b3934777b27c4e425e2afa442fd802eec92eecc05e45d6",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -50142,8 +50829,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -52357,9 +53059,20 @@
       "sha256": "e253cef347626558a87c85938349996f7a203500d39280f390dc89abe3045284",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -52372,8 +53085,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -52597,9 +53325,20 @@
       "sha256": "3f230001e4b89584956eb6ba59ea4a7bb48977fb975096d914686315fa1144c5",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -52612,8 +53351,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -52761,9 +53515,20 @@
       "sha256": "6c5097defa9b8789e0e21bb92ac0ddc5406a8073a4bdb2c14d51678141790ab9",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -52776,8 +53541,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -57496,9 +58276,20 @@
       "sha256": "09b28acdc4c25f4f86ca7a4c1f149abe9c245fbe0f07ecb13fbc1c039600d25e",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -57511,8 +58302,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -69844,9 +70650,20 @@
       "sha256": "2378a45d9eae15beded43d64c4f1e61a16e12e5c35b6eedc0e325bfefbe815b4",
       "component": "solver",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -69859,8 +70676,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -76628,9 +77460,20 @@
       "sha256": "d75b2e4c33753b231ac4599d33c376e0f56e87da015796f9baddf1650709fa9c",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -76643,8 +77486,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -77404,9 +78262,20 @@
       "sha256": "0c63264a9ddeba2668c08c36856e10e763a1f56f5b6dbe9b41267b4f56ea08e6",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -77419,8 +78288,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -80628,13 +81512,39 @@
       "sha256": "682377f035394159980e4362ca7d303c6488d0ad17c592c8d4fdc5d40b8ff723",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_dispatch.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -90450,13 +91360,39 @@
       "sha256": "50f9f1037080177fc94238dc662a6db726dc4eecdcaa3e85bcb12aba322fad65",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -90464,9 +91400,20 @@
       "sha256": "b8ddf548e2a75db2319f9a2745fff28cd6098af9dbd6d0e33797ae3fceb515f9",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -90479,8 +91426,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {
@@ -91062,7 +92024,10 @@
         "util_gparams_names.go",
         "util_gparams_nodebug.go",
         "util_gparams_parse.go",
-        "util_gparams_values.go"
+        "util_gparams_values.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
@@ -91086,7 +92051,12 @@
         "TestGlobalParamsResetOwnerDirectoryPlateauAndWarmSnapshots",
         "TestGlobalParamsSetterFaultPrefixesImmediateOwnedGraph",
         "TestGlobalParamsThreeDictionaryLayoutsAndPhysicalBucketOrder",
-        "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule"
+        "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule",
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
       ],
       "assertions": [
         {
@@ -91181,10 +92151,23 @@
             "TestGlobalParamsThreeDictionaryLayoutsAndPhysicalBucketOrder",
             "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule"
           ]
+        },
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
         }
       ],
       "ownership": [
-        "Concrete charged registry header, three independent scalar dictionaries, owned descriptor roots and ParamsRef cells; canonical borrowed Symbol strings and deferred borrowed BytesRegion description reads. Immediate failure graph and source publication-prefix checks; see GPARAMS_REGISTRY_PORT_STATUS.md."
+        "Concrete charged registry header, three independent scalar dictionaries, owned descriptor roots and ParamsRef cells; canonical borrowed Symbol strings and deferred borrowed BytesRegion description reads. Immediate failure graph and source publication-prefix checks; see GPARAMS_REGISTRY_PORT_STATUS.md.",
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
       ],
       "deviations": [
         "Explicit runtime lifetime, C long32/64 and C-locale IEEE64 profiles, charged Go scratch/backings and two borrowed byte streams. Complete generated catalog, process singleton/stdout wiring, OpenMP and physical global allocation hooks remain open."
@@ -91204,7 +92187,10 @@
         "util_gparams_names.go",
         "util_gparams_nodebug.go",
         "util_gparams_parse.go",
-        "util_gparams_values.go"
+        "util_gparams_values.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
       ],
       "tests": [
         "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
@@ -91228,7 +92214,12 @@
         "TestGlobalParamsResetOwnerDirectoryPlateauAndWarmSnapshots",
         "TestGlobalParamsSetterFaultPrefixesImmediateOwnedGraph",
         "TestGlobalParamsThreeDictionaryLayoutsAndPhysicalBucketOrder",
-        "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule"
+        "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule",
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
       ],
       "conditionals": [
         {
@@ -91271,10 +92262,23 @@
             "TestGlobalParamsThreeDictionaryLayoutsAndPhysicalBucketOrder",
             "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule"
           ]
+        },
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
         }
       ],
       "ownership": [
-        "Concrete charged registry header, three independent scalar dictionaries, owned descriptor roots and ParamsRef cells; canonical borrowed Symbol strings and deferred borrowed BytesRegion description reads. Immediate failure graph and source publication-prefix checks; see GPARAMS_REGISTRY_PORT_STATUS.md."
+        "Concrete charged registry header, three independent scalar dictionaries, owned descriptor roots and ParamsRef cells; canonical borrowed Symbol strings and deferred borrowed BytesRegion description reads. Immediate failure graph and source publication-prefix checks; see GPARAMS_REGISTRY_PORT_STATUS.md.",
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
       ],
       "deviations": [
         "Explicit runtime lifetime, C long32/64 and C-locale IEEE64 profiles, charged Go scratch/backings and two borrowed byte streams. Complete generated catalog, process singleton/stdout wiring, OpenMP and physical global allocation hooks remain open."
@@ -96566,9 +97570,20 @@
       "sha256": "05c3a08d15fec382fc2fa6854806fc2e7f090aaaac29895ed810b47d1076694a",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+        "TestGlobalParamsCatalogConstructorFailureAndDomains",
+        "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -96581,8 +97596,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "status": "ported",
+          "go_target": "util_gparams_catalog_collectors.go",
+          "tests": [
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
+            "TestGlobalParamsCatalogConstructorFailureAndDomains",
+            "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
+            "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See GPARAMS_CATALOG_PORT_STATUS.md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+      ],
       "deviations": []
     },
     {

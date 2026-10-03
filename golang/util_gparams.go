@@ -13,6 +13,7 @@ var ErrGlobalParamsOwner = errors.New("g3: global parameters owner or lifetime m
 var ErrGlobalParamsRegistrationMissing = errors.New("g3: actual parameter registration dispatcher missing")
 
 type GlobalParamsConfig struct {
+	Catalog                                     *GlobalParamsCatalog
 	Budget                                      *arena.Budget
 	DescriptorPageSize, DescriptorWordsPageSize uint32
 	CLongBits                                   uint8
@@ -30,6 +31,7 @@ type gparamsRegionBinding struct {
 	region *arena.BytesRegion
 }
 type GlobalParams struct {
+	catalog                                *GlobalParamsCatalog
 	mu                                     sync.Mutex
 	self                                   *GlobalParams
 	symbols                                *SymbolManager
@@ -73,6 +75,21 @@ func NewGlobalParams(s *SymbolManager, p *ParamsContext, c GlobalParamsConfig) (
 	if e := p.open(); e != nil {
 		return nil, e
 	}
+	if c.Catalog != nil {
+		if c.Register != nil {
+			return nil, arena.ErrConfig
+		}
+		c.Catalog.mu.Lock()
+		e := c.Catalog.open()
+		same := c.Catalog.symbols == s
+		c.Catalog.mu.Unlock()
+		if e != nil {
+			return nil, e
+		}
+		if !same {
+			return nil, ErrGlobalParamsOwner
+		}
+	}
 	longBits := c.CLongBits
 	if longBits == 0 {
 		longBits = 64
@@ -85,7 +102,7 @@ func NewGlobalParams(s *SymbolManager, p *ParamsContext, c GlobalParamsConfig) (
 	if e := c.Budget.Reserve(n); e != nil {
 		return nil, e
 	}
-	g := &GlobalParams{symbols: s, context: p, budget: c.Budget, register: c.Register, ownerBytes: n}
+	g := &GlobalParams{symbols: s, context: p, budget: c.Budget, register: c.Register, ownerBytes: n, catalog: c.Catalog}
 	g.self = g
 	g.cLongBits = longBits
 	fail := func(e error) (*GlobalParams, error) { _ = g.Close(); return nil, e }
@@ -126,6 +143,11 @@ func (g *GlobalParams) ensureRegistered() error {
 		return nil
 	}
 	g.modulesRegistered = true
+	if g.catalog != nil {
+		g.registering = true
+		defer func() { g.registering = false }()
+		return g.catalog.Register(GlobalParamsRegistrar{g})
+	}
 	if g.register == nil {
 		return ErrGlobalParamsRegistrationMissing
 	}

@@ -1,9 +1,10 @@
 # Actual SAT generated parameter descriptors
 
 Source sat::config::collect_param_descrs delegates to generated sat_params.
-The generated sat_params.hpp is absent from this preserved checkout. The actual
-sat_params.pyg plus scripts/mk_genfile_common.py max_memory_param, pyg_default
-and collector emission bodies define all24 literal inserts. Production repeats
+The actual preserved sat_params.hpp is present (SHA256
+e253cef347626558a87c85938349996f7a203500d39280f390dc89abe3045284).
+Its24 collector inserts match sat_params.pyg and scripts/mk_genfile_common.py
+max_memory_param, pyg_default and collector emission bodies. Production repeats
 those exact calls in declaration order without a host metadata array, generic
 iterator, descriptor ownership transfer or intermediate output string. Static
 input spelling is read immediately by actual ParamDescrs.InsertName; existing

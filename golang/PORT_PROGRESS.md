@@ -1254,3 +1254,17 @@ Eight frozen Go files passed full native/debug, exact race/actual JS, vet, WASI
 and source/no-generics gates. See UPOLYNOMIAL_PORT_STATUS.md. Full content,
 division, GCD, Sturm, isolation/refinement and algebraic consumers remain required.
 Ledger33ported/102partial/1967unported; the full solver/proof/interpolation objective remains open.
+
+
+## Complete preserved global parameter catalog
+
+The complete test-runtime dispatcher now collects all458 ordered insertion
+attempts into450 distinct descriptors, with two globals, thirty-two module
+calls and sixteen exact borrowed-description assignments. Five new tests-first
+groups plus twenty-two registry groups verify exact metadata, publication order,
+shared description lifetime and immediate pending-owner fault graphs. Seven
+frozen Go files passed full native/debug, exact27 race/actual JS groups, vet,
+WASI and source/no-generics gates. Coordinator independently checked every
+ordered metadata row against actual C++ collector bodies. See
+GPARAMS_CATALOG_PORT_STATUS.md. Generated value accessors and full runtime
+initializers/alternative catalog selections remain open. Ledger33ported/140partial/1929unported; full solver/proof/interpolation remains required.
