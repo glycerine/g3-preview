@@ -83894,9 +83894,15 @@
       "sha256": "930e1ccc0bb2d2a892bfb28a6697f5f0a987275036016e155a139aca3db243ba",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_cancel_handler.go"
+      ],
+      "tests": [
+        "TestCancelHandlerSourceLifetime",
+        "TestCancelHandlerSourceNestedAndReset",
+        "TestCancelHandlerWarmNoAllocation"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -83909,9 +83915,44 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "reslimit cancellation specialization constructor/destructor",
+          "status": "ported",
+          "go_target": "util_cancel_handler.go",
+          "tests": [
+            "TestCancelHandlerSourceLifetime",
+            "TestCancelHandlerSourceNestedAndReset",
+            "TestCancelHandlerWarmNoAllocation"
+          ]
+        },
+        {
+          "name": "reslimit cancellation specialization invoke/canceled",
+          "status": "ported",
+          "go_target": "util_cancel_handler.go",
+          "tests": [
+            "TestCancelHandlerSourceLifetime",
+            "TestCancelHandlerSourceNestedAndReset",
+            "TestCancelHandlerWarmNoAllocation"
+          ]
+        },
+        {
+          "name": "event caller enum/caller_id metadata",
+          "status": "ported",
+          "go_target": "util_cancel_handler.go",
+          "tests": [
+            "TestCancelHandlerSourceLifetime",
+            "TestCancelHandlerSourceNestedAndReset",
+            "TestCancelHandlerWarmNoAllocation"
+          ]
+        }
+      ],
+      "ownership": [
+        "Cold borrowed reslimit owner; explicit close once, serialized event invocation. Other specializations and OS dispatch pending. See RLIMIT_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Concrete resource specialization replaces C++ template/virtual dispatch; repeated explicit close harmless."
+      ]
     },
     {
       "path": "src/util/chashtable.h",
@@ -84750,9 +84791,15 @@
       "sha256": "3643b7e5ef94e3aff2bb534730f5dca8b2c9569f8896f0977266d92347c8146a",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_cancel_handler.go"
+      ],
+      "tests": [
+        "TestCancelHandlerSourceLifetime",
+        "TestCancelHandlerSourceNestedAndReset",
+        "TestCancelHandlerWarmNoAllocation"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -84765,9 +84812,44 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "reslimit cancellation specialization constructor/destructor",
+          "status": "ported",
+          "go_target": "util_cancel_handler.go",
+          "tests": [
+            "TestCancelHandlerSourceLifetime",
+            "TestCancelHandlerSourceNestedAndReset",
+            "TestCancelHandlerWarmNoAllocation"
+          ]
+        },
+        {
+          "name": "reslimit cancellation specialization invoke/canceled",
+          "status": "ported",
+          "go_target": "util_cancel_handler.go",
+          "tests": [
+            "TestCancelHandlerSourceLifetime",
+            "TestCancelHandlerSourceNestedAndReset",
+            "TestCancelHandlerWarmNoAllocation"
+          ]
+        },
+        {
+          "name": "event caller enum/caller_id metadata",
+          "status": "ported",
+          "go_target": "util_cancel_handler.go",
+          "tests": [
+            "TestCancelHandlerSourceLifetime",
+            "TestCancelHandlerSourceNestedAndReset",
+            "TestCancelHandlerWarmNoAllocation"
+          ]
+        }
+      ],
+      "ownership": [
+        "Cold borrowed reslimit owner; explicit close once, serialized event invocation. Other specializations and OS dispatch pending. See RLIMIT_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Concrete resource specialization replaces C++ template/virtual dispatch; repeated explicit close harmless."
+      ]
     },
     {
       "path": "src/util/ext_gcd.h",

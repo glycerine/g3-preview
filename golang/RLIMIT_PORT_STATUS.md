@@ -64,3 +64,22 @@ PORT_PROGRESS.md; WASI compilation is not runtime acceptance.
 The general common_msgs class (other strings), cancellation event-handler
 families, timeout/memory services and domain consumer integration remain separate
 source units. This packet supplies resource counting/cancellation only.
+
+## Concrete cancellation event scope
+
+`util_cancel_handler.go` translates `cancel_eh<reslimit>` and the event caller
+IDs from `event_handler.h`. Its cold handler borrows a resource service and uses
+explicit deferred close in place of its destructor. The first invocation fixes
+the caller ID and increments cancellation once; later invocations have no effect.
+Only an invoked handler decrements on close, and the original canceled/caller
+fields remain observable. Nested handlers and external counter reset preserve
+source behavior. Handler invoke/close must be serialized; counter propagation
+retains the resource service's asynchronous safety. No template/generic or
+interface dispatch is introduced. Other event-handler specializations and the
+OS timer/signal dispatch remain separate unported units.
+
+Added finite tests (no dedicated source suite) went RED on missing handler/caller
+symbols before implementation, then GREEN. Tests cover first-caller order, quiet
+handler cleanup, nested propagated cancellation, reset before cleanup, exact enum
+numbers and zero warmed allocations. An isolated prospective-commit tree is used
+for whole-module gates while other agents have intentionally RED tests in progress.
