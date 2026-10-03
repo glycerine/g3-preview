@@ -1165,3 +1165,20 @@ remain open; this provides the actual single-thread polynomial checkpoint servic
 
 Source/no-generics audit passed; cooperate.cpp/h become partial with
 ledger33ported/91partial/1978unported.
+
+
+## Descriptor formatting into charged output
+
+Actual parameter descriptor display now writes directly to a borrowed
+StringBuffer64, reading canonical symbols and packed metadata without an
+intermediate output string. Source sort/name transforms, description assertion
+positions and output failure prefixes are preserved. Five tests-first groups
+include the source uint32 scratch-byte overflow regression, huge indentation
+stopped by actual growth refusal, and immediate temporary/destination accounting.
+Four new Go files on HEADfb08673 passed full native/debug, eighteen exact named
+race/actual JS groups, vet, WASI compilation and source/no-generics checks.
+See PARAM_DESCRS_STREAM_PORT_STATUS.md. Registry composition and the complete
+solver/proof/interpolation objective remain open.
+
+Root final-source/no-generics audit passed; ledger counts remain
+33ported/91partial/1978unported.
