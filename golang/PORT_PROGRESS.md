@@ -463,3 +463,14 @@ missing-API RED then GREEN, with independent source-close lifetimes, every
 reservation prefix, immediate live-cell/Words accounting and warm allocations.
 Raw managers retain their caller-supplied owner contract; public provenance and
 AST consumers remain separate work. See NUMERAL_COPY_PORT_STATUS.md.
+
+## Integer and rational number theory
+
+Array GCD, release extended GCD, signed LCM and divisibility now preserve source
+action order; integer-valued rational wrappers include source denominator-reset
+prefixes and the fractional singleton array branch. Nine test groups began with
+missing APIs RED and pass source calls, independent exact oracles, finite alias
+fixtures, canonical large coefficients and immediate failure ownership audits.
+ExtendedGCD source Z3DEBUG diagnostic arithmetic remains explicitly unported;
+its complete conditional coverage and the separate ext_gcd.h wrapper are open.
+See NUMBER_THEORY_PORT_STATUS.md. Full numeric/AST/solver milestones stay open.

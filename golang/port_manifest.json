@@ -81308,7 +81308,8 @@
       "status": "partial",
       "go_targets": [
         "mpnum/mpq_parse.go",
-        "mpnum/mpq_ops.go"
+        "mpnum/mpq_ops.go",
+        "mpnum/mpq_number_theory.go"
       ],
       "tests": [
         "TestSourceStringAssertions",
@@ -81320,7 +81321,16 @@
         "TestRationalOpsIntegerProductsRatDivQuirksAndGuards",
         "TestRationalOpsSourceComponentAliasActionOrder",
         "TestRationalOpsLargeLimbScratchBranchesAndWarm",
-        "TestRationalOpsAllPredictableFailurePrefixes"
+        "TestRationalOpsAllPredictableFailurePrefixes",
+        "TestNumberTheorySourceRationalGCDAndSignedSequence",
+        "TestNumberTheorySourceInverse999Cases",
+        "TestNumberTheoryIntegerFiniteOraclesAndSignedLCM",
+        "TestNumberTheoryArraySourceOrderAndRationalSingleton",
+        "TestNumberTheoryFrozenExtendedGCDAliases",
+        "TestNumberTheoryCanonicalSourceCoefficients",
+        "TestNumberTheoryFailurePrefixRootsBeforeFormatting",
+        "TestNumberTheoryLargeCanonicalCoefficientsAndLCM",
+        "TestNumberTheoryRationalResetPrefixAndOutputAliasing"
       ],
       "assertions": [
         {
@@ -81997,14 +82007,48 @@
             "TestRationalOpsLargeLimbScratchBranchesAndWarm",
             "TestRationalOpsAllPredictableFailurePrefixes"
           ]
+        },
+        {
+          "name": "tst1 gcd(12,8)=4 assertion through concrete manager",
+          "status": "ported",
+          "go_target": "mpnum/mpq_number_theory.go",
+          "tests": [
+            "TestNumberTheorySourceRationalGCDAndSignedSequence",
+            "TestNumberTheorySourceInverse999Cases",
+            "TestNumberTheoryIntegerFiniteOraclesAndSignedLCM",
+            "TestNumberTheoryArraySourceOrderAndRationalSingleton",
+            "TestNumberTheoryFrozenExtendedGCDAliases",
+            "TestNumberTheoryCanonicalSourceCoefficients",
+            "TestNumberTheoryFailurePrefixRootsBeforeFormatting",
+            "TestNumberTheoryLargeCanonicalCoefficientsAndLCM",
+            "TestNumberTheoryRationalResetPrefixAndOutputAliasing"
+          ]
+        },
+        {
+          "name": "tst6 nine active signed extended-GCD calls (no source assertions)",
+          "status": "ported",
+          "go_target": "mpnum/mpq_number_theory.go",
+          "tests": [
+            "TestNumberTheorySourceRationalGCDAndSignedSequence",
+            "TestNumberTheorySourceInverse999Cases",
+            "TestNumberTheoryIntegerFiniteOraclesAndSignedLCM",
+            "TestNumberTheoryArraySourceOrderAndRationalSingleton",
+            "TestNumberTheoryFrozenExtendedGCDAliases",
+            "TestNumberTheoryCanonicalSourceCoefficients",
+            "TestNumberTheoryFailurePrefixRootsBeforeFormatting",
+            "TestNumberTheoryLargeCanonicalCoefficientsAndLCM",
+            "TestNumberTheoryRationalResetPrefixAndOutputAliasing"
+          ]
         }
       ],
       "ownership": [
         "Selected active textual inputs/assertion projections execute through concrete MPQ manager; the full global rational wrapper/test algorithm suite remains unported. No public-wrapper completion claim. See mpnum/PORT_STATUS.md.",
-        "Mixed/fused locals use borrowed integer-manager storage; nonsynch reuses existing named caches, synch deletes all locals. Failed-prefix tests independently audit immediate live cells/Words before rendering or teardown. See mpnum/RATIONAL_OPS_PORT_STATUS.md."
+        "Mixed/fused locals use borrowed integer-manager storage; nonsynch reuses existing named caches, synch deletes all locals. Failed-prefix tests independently audit immediate live cells/Words before rendering or teardown. See mpnum/RATIONAL_OPS_PORT_STATUS.md.",
+        "Number theory locals use existing budgeted numerical cells/Words and are always deleted in source order. ExtendedGCD preserves coefficient publication/failure prefixes and rational denominator reset timing; immediate failed-prefix caller/cache roots audited. See NUMBER_THEORY_PORT_STATUS.md."
       ],
       "deviations": [
-        "Staged mixed outputs adapt source allocation failure publication while emulating component-aliased source reads. Integer-only assertions and zero divisors become typed errors; negative-denominator RatDiv and direct integer output alias defects remain."
+        "Staged mixed outputs adapt source allocation failure publication while emulating component-aliased source reads. Integer-only assertions and zero divisors become typed errors; negative-denominator RatDiv and direct integer output alias defects remain.",
+        "Selected release ExtendedGCD preserves finite aliases and modified-input sign rereads. Source Z3DEBUG diagnostic arithmetic remains unported; g3checked selects reference validation only. ext_gcd.h wrapper algorithm remains separate and is not credited from manager inverse properties."
       ]
     },
     {
@@ -96176,7 +96220,8 @@
         "mpnum/mpq_parse.go",
         "mpnum/mp_format.go",
         "mpnum/mpq_root.go",
-        "mpnum/mp_display.go"
+        "mpnum/mp_display.go",
+        "mpnum/mpq_number_theory.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -96242,7 +96287,16 @@
         "TestNumericDisplayReservationFailureCleanup",
         "TestNumericDisplayWorkspaceGrowthAndBudget",
         "TestNumericDisplayWarmAllocationBoundaries",
-        "TestSourceNoncanonicalRationalDisplayActions"
+        "TestSourceNoncanonicalRationalDisplayActions",
+        "TestNumberTheorySourceRationalGCDAndSignedSequence",
+        "TestNumberTheorySourceInverse999Cases",
+        "TestNumberTheoryIntegerFiniteOraclesAndSignedLCM",
+        "TestNumberTheoryArraySourceOrderAndRationalSingleton",
+        "TestNumberTheoryFrozenExtendedGCDAliases",
+        "TestNumberTheoryCanonicalSourceCoefficients",
+        "TestNumberTheoryFailurePrefixRootsBeforeFormatting",
+        "TestNumberTheoryLargeCanonicalCoefficientsAndLCM",
+        "TestNumberTheoryRationalResetPrefixAndOutputAliasing"
       ],
       "assertions": [
         {
@@ -96585,6 +96639,22 @@
             "TestNumericDisplayWarmAllocationBoundaries",
             "TestSourceNoncanonicalRationalDisplayActions"
           ]
+        },
+        {
+          "name": "gcd(array) including fractional singleton and early one",
+          "status": "ported",
+          "go_target": "mpnum/mpq_number_theory.go",
+          "tests": [
+            "TestNumberTheorySourceRationalGCDAndSignedSequence",
+            "TestNumberTheorySourceInverse999Cases",
+            "TestNumberTheoryIntegerFiniteOraclesAndSignedLCM",
+            "TestNumberTheoryArraySourceOrderAndRationalSingleton",
+            "TestNumberTheoryFrozenExtendedGCDAliases",
+            "TestNumberTheoryCanonicalSourceCoefficients",
+            "TestNumberTheoryFailurePrefixRootsBeforeFormatting",
+            "TestNumberTheoryLargeCanonicalCoefficientsAndLCM",
+            "TestNumberTheoryRationalResetPrefixAndOutputAliasing"
+          ]
         }
       ],
       "ownership": [
@@ -96593,7 +96663,8 @@
         "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md.",
         "Numeric division and decimal formatting use child NaturalManager indexed scratch; all retained storage is budgeted, final host string is caller-owned. See mpnum/PORT_STATUS.md.",
         "Root/square stage prior output and source alias rereads with existing owner-budgeted numerals, preserving finite false-result parts and synchronized/unsynchronized normalization policy. See ROOT_PORT_STATUS.md.",
-        "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md."
+        "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md.",
+        "Number theory locals use existing budgeted numerical cells/Words and are always deleted in source order. ExtendedGCD preserves coefficient publication/failure prefixes and rational denominator reset timing; immediate failed-prefix caller/cache roots audited. See NUMBER_THEORY_PORT_STATUS.md."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -96601,7 +96672,8 @@
         "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits.",
         "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors.",
         "Source fractional square identity alias reaches undefined zero/zero normalization; adapter reports ErrDivideByZero and preserves original caller fraction. Root false outputs remain deliberately unnormalized, and prior denominator survives inexact numerator.",
-        "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text."
+        "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text.",
+        "Selected release ExtendedGCD preserves finite aliases and modified-input sign rereads. Source Z3DEBUG diagnostic arithmetic remains unported; g3checked selects reference validation only. ext_gcd.h wrapper algorithm remains separate and is not credited from manager inverse properties."
       ]
     },
     {
@@ -96619,7 +96691,8 @@
         "mpnum/mpq_root.go",
         "mpnum/mp_display.go",
         "mpnum/mpq_ops.go",
-        "mpnum/mp_copy.go"
+        "mpnum/mp_copy.go",
+        "mpnum/mpq_number_theory.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -96698,7 +96771,16 @@
         "TestIntegerCopyFromIndependentOwnersAndSourceClose",
         "TestRationalCopyFromRawStatesAndIndependentLifetime",
         "TestNumeralCopyFromFailurePrefixesAndImmediateOwnership",
-        "TestNumeralCopyFromWarmGuardsAndSameOwner"
+        "TestNumeralCopyFromWarmGuardsAndSameOwner",
+        "TestNumberTheorySourceRationalGCDAndSignedSequence",
+        "TestNumberTheorySourceInverse999Cases",
+        "TestNumberTheoryIntegerFiniteOraclesAndSignedLCM",
+        "TestNumberTheoryArraySourceOrderAndRationalSingleton",
+        "TestNumberTheoryFrozenExtendedGCDAliases",
+        "TestNumberTheoryCanonicalSourceCoefficients",
+        "TestNumberTheoryFailurePrefixRootsBeforeFormatting",
+        "TestNumberTheoryLargeCanonicalCoefficientsAndLCM",
+        "TestNumberTheoryRationalResetPrefixAndOutputAliasing"
       ],
       "conditionals": [
         {
@@ -97291,6 +97373,70 @@
             "TestRationalOpsLargeLimbScratchBranchesAndWarm",
             "TestRationalOpsAllPredictableFailurePrefixes"
           ]
+        },
+        {
+          "name": "gcd integer-valued pair wrapper",
+          "status": "ported",
+          "go_target": "mpnum/mpq_number_theory.go",
+          "tests": [
+            "TestNumberTheorySourceRationalGCDAndSignedSequence",
+            "TestNumberTheorySourceInverse999Cases",
+            "TestNumberTheoryIntegerFiniteOraclesAndSignedLCM",
+            "TestNumberTheoryArraySourceOrderAndRationalSingleton",
+            "TestNumberTheoryFrozenExtendedGCDAliases",
+            "TestNumberTheoryCanonicalSourceCoefficients",
+            "TestNumberTheoryFailurePrefixRootsBeforeFormatting",
+            "TestNumberTheoryLargeCanonicalCoefficientsAndLCM",
+            "TestNumberTheoryRationalResetPrefixAndOutputAliasing"
+          ]
+        },
+        {
+          "name": "gcd extended integer-valued wrapper denominator-reset prefix",
+          "status": "ported",
+          "go_target": "mpnum/mpq_number_theory.go",
+          "tests": [
+            "TestNumberTheorySourceRationalGCDAndSignedSequence",
+            "TestNumberTheorySourceInverse999Cases",
+            "TestNumberTheoryIntegerFiniteOraclesAndSignedLCM",
+            "TestNumberTheoryArraySourceOrderAndRationalSingleton",
+            "TestNumberTheoryFrozenExtendedGCDAliases",
+            "TestNumberTheoryCanonicalSourceCoefficients",
+            "TestNumberTheoryFailurePrefixRootsBeforeFormatting",
+            "TestNumberTheoryLargeCanonicalCoefficientsAndLCM",
+            "TestNumberTheoryRationalResetPrefixAndOutputAliasing"
+          ]
+        },
+        {
+          "name": "lcm integer-valued wrapper",
+          "status": "ported",
+          "go_target": "mpnum/mpq_number_theory.go",
+          "tests": [
+            "TestNumberTheorySourceRationalGCDAndSignedSequence",
+            "TestNumberTheorySourceInverse999Cases",
+            "TestNumberTheoryIntegerFiniteOraclesAndSignedLCM",
+            "TestNumberTheoryArraySourceOrderAndRationalSingleton",
+            "TestNumberTheoryFrozenExtendedGCDAliases",
+            "TestNumberTheoryCanonicalSourceCoefficients",
+            "TestNumberTheoryFailurePrefixRootsBeforeFormatting",
+            "TestNumberTheoryLargeCanonicalCoefficientsAndLCM",
+            "TestNumberTheoryRationalResetPrefixAndOutputAliasing"
+          ]
+        },
+        {
+          "name": "divides integer-valued wrapper",
+          "status": "ported",
+          "go_target": "mpnum/mpq_number_theory.go",
+          "tests": [
+            "TestNumberTheorySourceRationalGCDAndSignedSequence",
+            "TestNumberTheorySourceInverse999Cases",
+            "TestNumberTheoryIntegerFiniteOraclesAndSignedLCM",
+            "TestNumberTheoryArraySourceOrderAndRationalSingleton",
+            "TestNumberTheoryFrozenExtendedGCDAliases",
+            "TestNumberTheoryCanonicalSourceCoefficients",
+            "TestNumberTheoryFailurePrefixRootsBeforeFormatting",
+            "TestNumberTheoryLargeCanonicalCoefficientsAndLCM",
+            "TestNumberTheoryRationalResetPrefixAndOutputAliasing"
+          ]
         }
       ],
       "ownership": [
@@ -97301,7 +97447,8 @@
         "Root/square stage prior output and source alias rereads with existing owner-budgeted numerals, preserving finite false-result parts and synchronized/unsynchronized normalization policy. See ROOT_PORT_STATUS.md.",
         "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md.",
         "Mixed/fused locals use borrowed integer-manager storage; nonsynch reuses existing named caches, synch deletes all locals. Failed-prefix tests independently audit immediate live cells/Words before rendering or teardown. See mpnum/RATIONAL_OPS_PORT_STATUS.md.",
-        "Explicit-owner CopyFrom uses source indexed limbs and destination-owned cells/Words. Source set/copy shapes are preserved; rational pair staging preserves raw signed/unreduced representation. Raw records require genuine caller-supplied owners; public provenance is a separate service. See NUMERAL_COPY_PORT_STATUS.md."
+        "Explicit-owner CopyFrom uses source indexed limbs and destination-owned cells/Words. Source set/copy shapes are preserved; rational pair staging preserves raw signed/unreduced representation. Raw records require genuine caller-supplied owners; public provenance is a separate service. See NUMERAL_COPY_PORT_STATUS.md.",
+        "Number theory locals use existing budgeted numerical cells/Words and are always deleted in source order. ExtendedGCD preserves coefficient publication/failure prefixes and rational denominator reset timing; immediate failed-prefix caller/cache roots audited. See NUMBER_THEORY_PORT_STATUS.md."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -97311,7 +97458,8 @@
         "Source fractional square identity alias reaches undefined zero/zero normalization; adapter reports ErrDivideByZero and preserves original caller fraction. Root false outputs remain deliberately unnormalized, and prior denominator survives inexact numerator.",
         "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text.",
         "Staged mixed outputs adapt source allocation failure publication while emulating component-aliased source reads. Integer-only assertions and zero divisors become typed errors; negative-denominator RatDiv and direct integer output alias defects remain.",
-        "B12 replaces the one-global-manager ownership assumption with explicit cross-manager deep copy. No foreign handle or serialization is passed into destination arithmetic; destination outlives source Close. This is an ownership adaptation, not AST translation completion."
+        "B12 replaces the one-global-manager ownership assumption with explicit cross-manager deep copy. No foreign handle or serialization is passed into destination arithmetic; destination outlives source Close. This is an ownership adaptation, not AST translation completion.",
+        "Selected release ExtendedGCD preserves finite aliases and modified-input sign rereads. Source Z3DEBUG diagnostic arithmetic remains unported; g3checked selects reference validation only. ext_gcd.h wrapper algorithm remains separate and is not credited from manager inverse properties."
       ]
     },
     {
@@ -97372,7 +97520,8 @@
         "mpnum/mpz_root.go",
         "mpnum/mpz_misc.go",
         "mpnum/mp_display.go",
-        "mpnum/mp_copy.go"
+        "mpnum/mp_copy.go",
+        "mpnum/mpz_number_theory.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -97474,7 +97623,16 @@
         "TestIntegerCopyFromIndependentOwnersAndSourceClose",
         "TestRationalCopyFromRawStatesAndIndependentLifetime",
         "TestNumeralCopyFromFailurePrefixesAndImmediateOwnership",
-        "TestNumeralCopyFromWarmGuardsAndSameOwner"
+        "TestNumeralCopyFromWarmGuardsAndSameOwner",
+        "TestNumberTheorySourceRationalGCDAndSignedSequence",
+        "TestNumberTheorySourceInverse999Cases",
+        "TestNumberTheoryIntegerFiniteOraclesAndSignedLCM",
+        "TestNumberTheoryArraySourceOrderAndRationalSingleton",
+        "TestNumberTheoryFrozenExtendedGCDAliases",
+        "TestNumberTheoryCanonicalSourceCoefficients",
+        "TestNumberTheoryFailurePrefixRootsBeforeFormatting",
+        "TestNumberTheoryLargeCanonicalCoefficientsAndLCM",
+        "TestNumberTheoryRationalResetPrefixAndOutputAliasing"
       ],
       "conditionals": [
         {
@@ -98836,6 +98994,76 @@
             "TestNumericDisplayWarmAllocationBoundaries",
             "TestSourceNoncanonicalRationalDisplayActions"
           ]
+        },
+        {
+          "name": "gcd(array) active sequential branch",
+          "status": "ported",
+          "go_target": "mpnum/mpz_number_theory.go",
+          "tests": [
+            "TestNumberTheorySourceRationalGCDAndSignedSequence",
+            "TestNumberTheorySourceInverse999Cases",
+            "TestNumberTheoryIntegerFiniteOraclesAndSignedLCM",
+            "TestNumberTheoryArraySourceOrderAndRationalSingleton",
+            "TestNumberTheoryFrozenExtendedGCDAliases",
+            "TestNumberTheoryCanonicalSourceCoefficients",
+            "TestNumberTheoryFailurePrefixRootsBeforeFormatting",
+            "TestNumberTheoryLargeCanonicalCoefficientsAndLCM",
+            "TestNumberTheoryRationalResetPrefixAndOutputAliasing"
+          ]
+        },
+        {
+          "name": "gcd extended selected release coefficient/action sequence",
+          "status": "ported",
+          "go_target": "mpnum/mpz_number_theory.go",
+          "tests": [
+            "TestNumberTheorySourceRationalGCDAndSignedSequence",
+            "TestNumberTheorySourceInverse999Cases",
+            "TestNumberTheoryIntegerFiniteOraclesAndSignedLCM",
+            "TestNumberTheoryArraySourceOrderAndRationalSingleton",
+            "TestNumberTheoryFrozenExtendedGCDAliases",
+            "TestNumberTheoryCanonicalSourceCoefficients",
+            "TestNumberTheoryFailurePrefixRootsBeforeFormatting",
+            "TestNumberTheoryLargeCanonicalCoefficientsAndLCM",
+            "TestNumberTheoryRationalResetPrefixAndOutputAliasing"
+          ]
+        },
+        {
+          "name": "lcm all signed source shortcuts",
+          "status": "ported",
+          "go_target": "mpnum/mpz_number_theory.go",
+          "tests": [
+            "TestNumberTheorySourceRationalGCDAndSignedSequence",
+            "TestNumberTheorySourceInverse999Cases",
+            "TestNumberTheoryIntegerFiniteOraclesAndSignedLCM",
+            "TestNumberTheoryArraySourceOrderAndRationalSingleton",
+            "TestNumberTheoryFrozenExtendedGCDAliases",
+            "TestNumberTheoryCanonicalSourceCoefficients",
+            "TestNumberTheoryFailurePrefixRootsBeforeFormatting",
+            "TestNumberTheoryLargeCanonicalCoefficientsAndLCM",
+            "TestNumberTheoryRationalResetPrefixAndOutputAliasing"
+          ]
+        },
+        {
+          "name": "divides zero and scoped remainder branch",
+          "status": "ported",
+          "go_target": "mpnum/mpz_number_theory.go",
+          "tests": [
+            "TestNumberTheorySourceRationalGCDAndSignedSequence",
+            "TestNumberTheorySourceInverse999Cases",
+            "TestNumberTheoryIntegerFiniteOraclesAndSignedLCM",
+            "TestNumberTheoryArraySourceOrderAndRationalSingleton",
+            "TestNumberTheoryFrozenExtendedGCDAliases",
+            "TestNumberTheoryCanonicalSourceCoefficients",
+            "TestNumberTheoryFailurePrefixRootsBeforeFormatting",
+            "TestNumberTheoryLargeCanonicalCoefficientsAndLCM",
+            "TestNumberTheoryRationalResetPrefixAndOutputAliasing"
+          ]
+        },
+        {
+          "name": "extended gcd Z3DEBUG diagnostic mul/mul/add/equality sequence",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
         }
       ],
       "ownership": [
@@ -98850,7 +99078,8 @@
         "Scalar inspection borrows indexed manager cells/Words and allocates no owner storage. Decompose publishes caller-owned digits; sufficient caller capacity allocates nothing. See MPZ_MISC_PORT_STATUS.md.",
         "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md.",
         "Earlier scratch IDX0-only inventory is superseded by publishTmpAt handling division IDX1 as well; see mpnum/mpz_div.go and source division tests.",
-        "Explicit-owner CopyFrom uses source indexed limbs and destination-owned cells/Words. Source set/copy shapes are preserved; rational pair staging preserves raw signed/unreduced representation. Raw records require genuine caller-supplied owners; public provenance is a separate service. See NUMERAL_COPY_PORT_STATUS.md."
+        "Explicit-owner CopyFrom uses source indexed limbs and destination-owned cells/Words. Source set/copy shapes are preserved; rational pair staging preserves raw signed/unreduced representation. Raw records require genuine caller-supplied owners; public provenance is a separate service. See NUMERAL_COPY_PORT_STATUS.md.",
+        "Number theory locals use existing budgeted numerical cells/Words and are always deleted in source order. ExtendedGCD preserves coefficient publication/failure prefixes and rational denominator reset timing; immediate failed-prefix caller/cache roots audited. See NUMBER_THEORY_PORT_STATUS.md."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -98862,7 +99091,8 @@
         "Typed root domain errors replace degree-zero division and negative-even/integer-only assertions. Nonnegative square output/input identity retains source reset-to-zero alias result; allocation errors preserve destination.",
         "32-bit accessor source assertions become ErrConversion; INT_MIN decomposition uses defined wider magnitude arithmetic. Floating UINT_MAX radix, unsigned length/count wrap and sign-free big hash remain source behavior.",
         "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text.",
-        "B12 replaces the one-global-manager ownership assumption with explicit cross-manager deep copy. No foreign handle or serialization is passed into destination arithmetic; destination outlives source Close. This is an ownership adaptation, not AST translation completion."
+        "B12 replaces the one-global-manager ownership assumption with explicit cross-manager deep copy. No foreign handle or serialization is passed into destination arithmetic; destination outlives source Close. This is an ownership adaptation, not AST translation completion.",
+        "Selected release ExtendedGCD preserves finite aliases and modified-input sign rereads. Source Z3DEBUG diagnostic arithmetic remains unported; g3checked selects reference validation only. ext_gcd.h wrapper algorithm remains separate and is not credited from manager inverse properties."
       ]
     },
     {
@@ -98885,7 +99115,8 @@
         "mpnum/mpz_root.go",
         "mpnum/mpz_misc.go",
         "mpnum/mp_display.go",
-        "mpnum/mp_copy.go"
+        "mpnum/mp_copy.go",
+        "mpnum/mpz_number_theory.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -98987,7 +99218,16 @@
         "TestIntegerCopyFromIndependentOwnersAndSourceClose",
         "TestRationalCopyFromRawStatesAndIndependentLifetime",
         "TestNumeralCopyFromFailurePrefixesAndImmediateOwnership",
-        "TestNumeralCopyFromWarmGuardsAndSameOwner"
+        "TestNumeralCopyFromWarmGuardsAndSameOwner",
+        "TestNumberTheorySourceRationalGCDAndSignedSequence",
+        "TestNumberTheorySourceInverse999Cases",
+        "TestNumberTheoryIntegerFiniteOraclesAndSignedLCM",
+        "TestNumberTheoryArraySourceOrderAndRationalSingleton",
+        "TestNumberTheoryFrozenExtendedGCDAliases",
+        "TestNumberTheoryCanonicalSourceCoefficients",
+        "TestNumberTheoryFailurePrefixRootsBeforeFormatting",
+        "TestNumberTheoryLargeCanonicalCoefficientsAndLCM",
+        "TestNumberTheoryRationalResetPrefixAndOutputAliasing"
       ],
       "conditionals": [
         {
@@ -99861,6 +100101,70 @@
             "TestNumericDisplayWarmAllocationBoundaries",
             "TestSourceNoncanonicalRationalDisplayActions"
           ]
+        },
+        {
+          "name": "gcd(array) active sequential branch",
+          "status": "ported",
+          "go_target": "mpnum/mpz_number_theory.go",
+          "tests": [
+            "TestNumberTheorySourceRationalGCDAndSignedSequence",
+            "TestNumberTheorySourceInverse999Cases",
+            "TestNumberTheoryIntegerFiniteOraclesAndSignedLCM",
+            "TestNumberTheoryArraySourceOrderAndRationalSingleton",
+            "TestNumberTheoryFrozenExtendedGCDAliases",
+            "TestNumberTheoryCanonicalSourceCoefficients",
+            "TestNumberTheoryFailurePrefixRootsBeforeFormatting",
+            "TestNumberTheoryLargeCanonicalCoefficientsAndLCM",
+            "TestNumberTheoryRationalResetPrefixAndOutputAliasing"
+          ]
+        },
+        {
+          "name": "gcd extended selected release coefficient/action sequence",
+          "status": "ported",
+          "go_target": "mpnum/mpz_number_theory.go",
+          "tests": [
+            "TestNumberTheorySourceRationalGCDAndSignedSequence",
+            "TestNumberTheorySourceInverse999Cases",
+            "TestNumberTheoryIntegerFiniteOraclesAndSignedLCM",
+            "TestNumberTheoryArraySourceOrderAndRationalSingleton",
+            "TestNumberTheoryFrozenExtendedGCDAliases",
+            "TestNumberTheoryCanonicalSourceCoefficients",
+            "TestNumberTheoryFailurePrefixRootsBeforeFormatting",
+            "TestNumberTheoryLargeCanonicalCoefficientsAndLCM",
+            "TestNumberTheoryRationalResetPrefixAndOutputAliasing"
+          ]
+        },
+        {
+          "name": "lcm all signed source shortcuts",
+          "status": "ported",
+          "go_target": "mpnum/mpz_number_theory.go",
+          "tests": [
+            "TestNumberTheorySourceRationalGCDAndSignedSequence",
+            "TestNumberTheorySourceInverse999Cases",
+            "TestNumberTheoryIntegerFiniteOraclesAndSignedLCM",
+            "TestNumberTheoryArraySourceOrderAndRationalSingleton",
+            "TestNumberTheoryFrozenExtendedGCDAliases",
+            "TestNumberTheoryCanonicalSourceCoefficients",
+            "TestNumberTheoryFailurePrefixRootsBeforeFormatting",
+            "TestNumberTheoryLargeCanonicalCoefficientsAndLCM",
+            "TestNumberTheoryRationalResetPrefixAndOutputAliasing"
+          ]
+        },
+        {
+          "name": "divides zero and scoped remainder branch",
+          "status": "ported",
+          "go_target": "mpnum/mpz_number_theory.go",
+          "tests": [
+            "TestNumberTheorySourceRationalGCDAndSignedSequence",
+            "TestNumberTheorySourceInverse999Cases",
+            "TestNumberTheoryIntegerFiniteOraclesAndSignedLCM",
+            "TestNumberTheoryArraySourceOrderAndRationalSingleton",
+            "TestNumberTheoryFrozenExtendedGCDAliases",
+            "TestNumberTheoryCanonicalSourceCoefficients",
+            "TestNumberTheoryFailurePrefixRootsBeforeFormatting",
+            "TestNumberTheoryLargeCanonicalCoefficientsAndLCM",
+            "TestNumberTheoryRationalResetPrefixAndOutputAliasing"
+          ]
         }
       ],
       "ownership": [
@@ -99875,7 +100179,8 @@
         "Scalar inspection borrows indexed manager cells/Words and allocates no owner storage. Decompose publishes caller-owned digits; sufficient caller capacity allocates nothing. See MPZ_MISC_PORT_STATUS.md.",
         "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md.",
         "Earlier scratch IDX0-only inventory is superseded by publishTmpAt handling division IDX1 as well; see mpnum/mpz_div.go and source division tests.",
-        "Explicit-owner CopyFrom uses source indexed limbs and destination-owned cells/Words. Source set/copy shapes are preserved; rational pair staging preserves raw signed/unreduced representation. Raw records require genuine caller-supplied owners; public provenance is a separate service. See NUMERAL_COPY_PORT_STATUS.md."
+        "Explicit-owner CopyFrom uses source indexed limbs and destination-owned cells/Words. Source set/copy shapes are preserved; rational pair staging preserves raw signed/unreduced representation. Raw records require genuine caller-supplied owners; public provenance is a separate service. See NUMERAL_COPY_PORT_STATUS.md.",
+        "Number theory locals use existing budgeted numerical cells/Words and are always deleted in source order. ExtendedGCD preserves coefficient publication/failure prefixes and rational denominator reset timing; immediate failed-prefix caller/cache roots audited. See NUMBER_THEORY_PORT_STATUS.md."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -99887,7 +100192,8 @@
         "Typed root domain errors replace degree-zero division and negative-even/integer-only assertions. Nonnegative square output/input identity retains source reset-to-zero alias result; allocation errors preserve destination.",
         "32-bit accessor source assertions become ErrConversion; INT_MIN decomposition uses defined wider magnitude arithmetic. Floating UINT_MAX radix, unsigned length/count wrap and sign-free big hash remain source behavior.",
         "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text.",
-        "B12 replaces the one-global-manager ownership assumption with explicit cross-manager deep copy. No foreign handle or serialization is passed into destination arithmetic; destination outlives source Close. This is an ownership adaptation, not AST translation completion."
+        "B12 replaces the one-global-manager ownership assumption with explicit cross-manager deep copy. No foreign handle or serialization is passed into destination arithmetic; destination outlives source Close. This is an ownership adaptation, not AST translation completion.",
+        "Selected release ExtendedGCD preserves finite aliases and modified-input sign rereads. Source Z3DEBUG diagnostic arithmetic remains unported; g3checked selects reference validation only. ext_gcd.h wrapper algorithm remains separate and is not credited from manager inverse properties."
       ]
     },
     {
