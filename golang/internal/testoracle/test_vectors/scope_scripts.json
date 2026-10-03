@@ -1,0 +1,12 @@
+[
+ {"name":"nested_push_pop_assumption_lifetime","derivation":"Added finite script motivated by src/test/sat_user_scope.cpp's active-formula coherence invariant. Base p or q is SAT. Frame not p remains SAT. Nested not q is UNSAT. Pop removes not q. Temporary assumption not q is UNSAT but the next unassumed query is SAT. Removing not p permits q=false,p=true.","variables":2,"steps":[
+  {"op":"add","clause":[1,2]}, {"op":"check","sat":true},
+  {"op":"push"}, {"op":"add","clause":[-1]}, {"op":"check","sat":true},
+  {"op":"push"}, {"op":"add","clause":[-2]}, {"op":"check","sat":false},
+  {"op":"pop"}, {"op":"check","sat":true},
+  {"op":"check","assumptions":[-2],"sat":false}, {"op":"check","sat":true},
+  {"op":"pop"}, {"op":"check","assumptions":[-2],"sat":true},
+  {"op":"push"}, {"op":"push"}, {"op":"check","sat":true},
+  {"op":"pop"}, {"op":"pop"}, {"op":"check","sat":true}
+ ]}
+]

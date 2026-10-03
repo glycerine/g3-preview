@@ -1,0 +1,11 @@
+[
+ {"name":"source_assumption_sat","provenance":"src/test/check_assumptions.cpp VERIFY(res1 == l_true)","derivation":"With p=false choose q=true; then p or q or r holds.","variables":3,"clauses":[[1,2,3]],"assumptions":[-1],"sat":true},
+ {"name":"source_final_query_added_unsat_expectation","provenance":"src/test/check_assumptions.cpp final crash-regression query; source has no final status assertion","derivation":"Asserted not p and assumed not q,not r force all three false, contradicting p or q or r.","variables":3,"clauses":[[1,2,3],[-1]],"assumptions":[-2,-3],"sat":false},
+ {"name":"empty_cnf","provenance":"added mathematical boundary coverage","derivation":"The empty conjunction is true, including over no variables.","variables":0,"clauses":[],"assumptions":[],"sat":true},
+ {"name":"empty_clause","provenance":"added mathematical boundary coverage","derivation":"An empty disjunction is false.","variables":0,"clauses":[[]],"assumptions":[],"sat":false},
+ {"name":"opposite_units","provenance":"added mathematical boundary coverage","derivation":"p and not p cannot both hold.","variables":1,"clauses":[[1],[-1]],"assumptions":[],"sat":false},
+ {"name":"tautology_duplicates","provenance":"added mathematical clause coverage","derivation":"The clause contains both p and not p and is always true; duplicates do not change this.","variables":1,"clauses":[[1,1,-1]],"assumptions":[],"sat":true},
+ {"name":"binary_chain","provenance":"added mathematical clause coverage","derivation":"p plus not p or q forces q; not q contradicts it.","variables":2,"clauses":[[1],[-1,2],[-2]],"assumptions":[],"sat":false},
+ {"name":"long_clause_final_variable","provenance":"added mathematical clause coverage","derivation":"All first five variables are assumed false; the sixth can be true.","variables":6,"clauses":[[1,2,3,4,5,6]],"assumptions":[-1,-2,-3,-4,-5],"sat":true},
+ {"name":"contradictory_assumptions","provenance":"added mathematical assumption coverage","derivation":"Assuming both p and not p is inconsistent even with no clauses.","variables":1,"clauses":[],"assumptions":[1,-1],"sat":false}
+]
