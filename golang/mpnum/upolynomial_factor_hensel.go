@@ -221,10 +221,18 @@ func (s *UPolynomialFactorizationService) henselQuadraticIteration(zpe *UPolynom
 		return e
 	}
 	var d uint32
+	// A can be newly allocated by the prime core even when input factors
+	// borrow a fourth store. Bind its actual origin at this lifted-core read.
+	if e := zpe.adoptState(m, A); e != nil {
+		return e
+	}
 	if e := zpe.divRemCore(m.stateView(&tmp1), m.stateView(A), &d, &t, &T); e != nil {
 		return e
 	}
 	if e := zpe.mul(m.stateView(&g), m.stateView(U), &tmp1); e != nil {
+		return e
+	}
+	if e := zpe.adoptState(m, B); e != nil {
 		return e
 	}
 	if e := zpe.mul(m.stateView(&t), m.stateView(B), &tmp2); e != nil {

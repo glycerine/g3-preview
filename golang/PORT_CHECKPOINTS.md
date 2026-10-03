@@ -80,3 +80,14 @@ evidence/no-generics audit on 0c9d695; logs are
 `.cache/factors-close-parent-{native,debug,vet,source}.log`. Actual leaf cleanup
 refusal and retained lexical factorization contexts remain backend integration
 obligations. The independent allocator draft was excluded from these gates.
+
+
+Imported-factor Hensel lifting now adopts newly created prime-core A/B backing
+at the actual lifted-core reads. A fourth donor store exposed a genuine owner
+error before this correction. Isolated HEAD083b174 plus only the two Hensel
+files passes seven Hensel groups in native/debug profiles. The strengthened
+immediate-root sweep passes 151 release and 155 debug refusal ordinals plus
+success, including the actual-read binding reservation at ordinal 78/80.
+Logs: `.cache/factors-owner/hensel-read-binding-{native,debug}.log`.
+The separate unfinished physical-cell backend was excluded from these checks;
+its existing root-audit migrations remain required. No source-unit promotion.
