@@ -79522,7 +79522,8 @@
         "mpnum/mpz_gcd.go",
         "mpnum/mpz_log.go",
         "mpnum/mpz_power_shift.go",
-        "mpnum/mpz_parse.go"
+        "mpnum/mpz_parse.go",
+        "mpnum/mpz_bitwise_test.go"
       ],
       "tests": [
         "TestSourceMPZMagnitudeProjections",
@@ -79567,7 +79568,13 @@
         "TestParserBudgetFailureCleanup",
         "TestParserWarmLifetimeAndInitialization",
         "TestSourceParserLiteralInventory",
-        "TestParserSourceIntMinRepresentation"
+        "TestParserSourceIntMinRepresentation",
+        "TestIntegerSourceBitwiseBug4",
+        "TestIntegerBitwiseIndependentOracleAndAliases",
+        "TestIntegerBitwiseFailurePublicationAndWarm",
+        "TestIntegerBitwiseSourcePreconditions",
+        "TestIntegerBitwiseAliasedFailurePublication",
+        "TestIntegerBitwiseSmallPathsReleaseBigOutput"
       ],
       "conditionals": [
         {
@@ -79703,7 +79710,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "active bug4 bitwise_or alias assertion and output",
+          "status": "ported",
+          "go_target": "mpnum/mpz_bitwise_test.go",
+          "tests": [
+            "TestIntegerSourceBitwiseBug4"
+          ]
+        }
+      ],
       "ownership": [
         "Magnitude projections only; signed manager assertions remain unported.",
         "Signed multiplication assertions and print-only square expectations strengthened. Remaining parser/GCD/root/bitwise/shift source assertions remain unported.",
@@ -96441,7 +96457,8 @@
         "mpnum/mpz_log.go",
         "mpnum/mpz_power_shift.go",
         "mpnum/mpz_parse.go",
-        "mpnum/mp_format.go"
+        "mpnum/mp_format.go",
+        "mpnum/mpz_bitwise.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -96507,7 +96524,13 @@
         "TestOwnedFormattingBudgetLimit",
         "TestNaturalPreparedAddBackStorageAdaptation",
         "TestOwnedTextGrowthPeakAndRefusal",
-        "TestNumericStringHostOwnershipBoundary"
+        "TestNumericStringHostOwnershipBoundary",
+        "TestIntegerSourceBitwiseBug4",
+        "TestIntegerBitwiseIndependentOracleAndAliases",
+        "TestIntegerBitwiseFailurePublicationAndWarm",
+        "TestIntegerBitwiseSourcePreconditions",
+        "TestIntegerBitwiseAliasedFailurePublication",
+        "TestIntegerBitwiseSmallPathsReleaseBigOutput"
       ],
       "conditionals": [
         {
@@ -97651,6 +97674,58 @@
             "TestSourceParserLiteralInventory",
             "TestParserSourceIntMinRepresentation"
           ]
+        },
+        {
+          "name": "bitwise_or",
+          "status": "ported",
+          "go_target": "mpnum/mpz_bitwise.go",
+          "tests": [
+            "TestIntegerSourceBitwiseBug4",
+            "TestIntegerBitwiseIndependentOracleAndAliases",
+            "TestIntegerBitwiseFailurePublicationAndWarm",
+            "TestIntegerBitwiseSourcePreconditions",
+            "TestIntegerBitwiseAliasedFailurePublication",
+            "TestIntegerBitwiseSmallPathsReleaseBigOutput"
+          ]
+        },
+        {
+          "name": "bitwise_and",
+          "status": "ported",
+          "go_target": "mpnum/mpz_bitwise.go",
+          "tests": [
+            "TestIntegerSourceBitwiseBug4",
+            "TestIntegerBitwiseIndependentOracleAndAliases",
+            "TestIntegerBitwiseFailurePublicationAndWarm",
+            "TestIntegerBitwiseSourcePreconditions",
+            "TestIntegerBitwiseAliasedFailurePublication",
+            "TestIntegerBitwiseSmallPathsReleaseBigOutput"
+          ]
+        },
+        {
+          "name": "bitwise_xor",
+          "status": "ported",
+          "go_target": "mpnum/mpz_bitwise.go",
+          "tests": [
+            "TestIntegerSourceBitwiseBug4",
+            "TestIntegerBitwiseIndependentOracleAndAliases",
+            "TestIntegerBitwiseFailurePublicationAndWarm",
+            "TestIntegerBitwiseSourcePreconditions",
+            "TestIntegerBitwiseAliasedFailurePublication",
+            "TestIntegerBitwiseSmallPathsReleaseBigOutput"
+          ]
+        },
+        {
+          "name": "bitwise_not",
+          "status": "ported",
+          "go_target": "mpnum/mpz_bitwise.go",
+          "tests": [
+            "TestIntegerSourceBitwiseBug4",
+            "TestIntegerBitwiseIndependentOracleAndAliases",
+            "TestIntegerBitwiseFailurePublicationAndWarm",
+            "TestIntegerBitwiseSourcePreconditions",
+            "TestIntegerBitwiseAliasedFailurePublication",
+            "TestIntegerBitwiseSmallPathsReleaseBigOutput"
+          ]
         }
       ],
       "ownership": [
@@ -97659,14 +97734,16 @@
         "IntegerManager, numericCellSlab, Words and descriptor owner headers now individually budgeted without double charging. Constructor rollback and complete Close tested; standalone MPN/formatting still pending. See BUDGET_PORT_STATUS.md.",
         "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending.",
         "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md.",
-        "Numeric division and decimal formatting use child NaturalManager indexed scratch; all retained storage is budgeted, final host string is caller-owned. See mpnum/PORT_STATUS.md."
+        "Numeric division and decimal formatting use child NaturalManager indexed scratch; all retained storage is budgeted, final host string is caller-owned. See mpnum/PORT_STATUS.md.",
+        "Bitwise source local numerals use budgeted manager cells/Words; ordered64-bit arithmetic chunks and final actions are retained. Staged result preserves outputs on failure; see mpnum/BITWISE_PORT_STATUS.md."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
         "Div/Mod use staged owner cells, increasing storage peak and changing physical allocation timing; source arithmetic and alias defects preserved.",
         "GCD zero-case Copy+Abs staged before destination Move for failure atomicity. Array/extended GCD and LCM remain unported.",
         "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits.",
-        "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors."
+        "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors.",
+        "Unsigned low63-bit mask defines intended bitwise_not signed-shift boundary. Negative source operands produce ErrBitwiseDomain; source local cleanup/partial output on allocation failures become explicit cleanup/staged publication."
       ]
     },
     {
@@ -97684,7 +97761,8 @@
         "mpnum/mpz_log.go",
         "mpnum/mpz_power_shift.go",
         "mpnum/mpz_parse.go",
-        "mpnum/mp_format.go"
+        "mpnum/mp_format.go",
+        "mpnum/mpz_bitwise.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -97750,7 +97828,13 @@
         "TestOwnedFormattingBudgetLimit",
         "TestNaturalPreparedAddBackStorageAdaptation",
         "TestOwnedTextGrowthPeakAndRefusal",
-        "TestNumericStringHostOwnershipBoundary"
+        "TestNumericStringHostOwnershipBoundary",
+        "TestIntegerSourceBitwiseBug4",
+        "TestIntegerBitwiseIndependentOracleAndAliases",
+        "TestIntegerBitwiseFailurePublicationAndWarm",
+        "TestIntegerBitwiseSourcePreconditions",
+        "TestIntegerBitwiseAliasedFailurePublication",
+        "TestIntegerBitwiseSmallPathsReleaseBigOutput"
       ],
       "conditionals": [
         {
@@ -98406,6 +98490,58 @@
             "TestSourceParserLiteralInventory",
             "TestParserSourceIntMinRepresentation"
           ]
+        },
+        {
+          "name": "bitwise_or",
+          "status": "ported",
+          "go_target": "mpnum/mpz_bitwise.go",
+          "tests": [
+            "TestIntegerSourceBitwiseBug4",
+            "TestIntegerBitwiseIndependentOracleAndAliases",
+            "TestIntegerBitwiseFailurePublicationAndWarm",
+            "TestIntegerBitwiseSourcePreconditions",
+            "TestIntegerBitwiseAliasedFailurePublication",
+            "TestIntegerBitwiseSmallPathsReleaseBigOutput"
+          ]
+        },
+        {
+          "name": "bitwise_and",
+          "status": "ported",
+          "go_target": "mpnum/mpz_bitwise.go",
+          "tests": [
+            "TestIntegerSourceBitwiseBug4",
+            "TestIntegerBitwiseIndependentOracleAndAliases",
+            "TestIntegerBitwiseFailurePublicationAndWarm",
+            "TestIntegerBitwiseSourcePreconditions",
+            "TestIntegerBitwiseAliasedFailurePublication",
+            "TestIntegerBitwiseSmallPathsReleaseBigOutput"
+          ]
+        },
+        {
+          "name": "bitwise_xor",
+          "status": "ported",
+          "go_target": "mpnum/mpz_bitwise.go",
+          "tests": [
+            "TestIntegerSourceBitwiseBug4",
+            "TestIntegerBitwiseIndependentOracleAndAliases",
+            "TestIntegerBitwiseFailurePublicationAndWarm",
+            "TestIntegerBitwiseSourcePreconditions",
+            "TestIntegerBitwiseAliasedFailurePublication",
+            "TestIntegerBitwiseSmallPathsReleaseBigOutput"
+          ]
+        },
+        {
+          "name": "bitwise_not",
+          "status": "ported",
+          "go_target": "mpnum/mpz_bitwise.go",
+          "tests": [
+            "TestIntegerSourceBitwiseBug4",
+            "TestIntegerBitwiseIndependentOracleAndAliases",
+            "TestIntegerBitwiseFailurePublicationAndWarm",
+            "TestIntegerBitwiseSourcePreconditions",
+            "TestIntegerBitwiseAliasedFailurePublication",
+            "TestIntegerBitwiseSmallPathsReleaseBigOutput"
+          ]
         }
       ],
       "ownership": [
@@ -98414,14 +98550,16 @@
         "IntegerManager, numericCellSlab, Words and descriptor owner headers now individually budgeted without double charging. Constructor rollback and complete Close tested; standalone MPN/formatting still pending. See BUDGET_PORT_STATUS.md.",
         "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending.",
         "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md.",
-        "Numeric division and decimal formatting use child NaturalManager indexed scratch; all retained storage is budgeted, final host string is caller-owned. See mpnum/PORT_STATUS.md."
+        "Numeric division and decimal formatting use child NaturalManager indexed scratch; all retained storage is budgeted, final host string is caller-owned. See mpnum/PORT_STATUS.md.",
+        "Bitwise source local numerals use budgeted manager cells/Words; ordered64-bit arithmetic chunks and final actions are retained. Staged result preserves outputs on failure; see mpnum/BITWISE_PORT_STATUS.md."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
         "Div/Mod use staged owner cells, increasing storage peak and changing physical allocation timing; source arithmetic and alias defects preserved.",
         "GCD zero-case Copy+Abs staged before destination Move for failure atomicity. Array/extended GCD and LCM remain unported.",
         "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits.",
-        "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors."
+        "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors.",
+        "Unsigned low63-bit mask defines intended bitwise_not signed-shift boundary. Negative source operands produce ErrBitwiseDomain; source local cleanup/partial output on allocation failures become explicit cleanup/staged publication."
       ]
     },
     {

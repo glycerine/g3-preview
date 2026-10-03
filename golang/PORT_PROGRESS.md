@@ -332,3 +332,17 @@ budgets/failures, peaks, both swap reservations, lifetime, epoch and warm alloca
 behavior. Combined native and checked races, full actual checked JS, checked vet,
 WASI build and source/no-generics audit pass. Heap source/header tests are audited;
 solver consumers and the full AST/solver/proof/interpolation goal remain open.
+
+## Integer bitwise source algorithms
+
+BitwiseOr/And/Xor/Not now preserve the selected source's repeated64-bit
+arithmetic chunk algorithms and all final source actions. The active bug4
+assertion/output and independent numerical, width and alias oracles were written
+first, observed RED, then reached GREEN. Source domain assertions are typed
+errors; budgeted local cleanup and staged publication preserve failed outputs.
+
+All6 tests pass, including pre-Close temporary accounting, both aliased fault
+sweeps, release of old big outputs and zero-allocation warm
+paths. Prospective full native/checked races/actual checked JS modules, vet,
+WASI build and source/no-generics audit pass. Other MPZ/MPQ methods, full numerical
+wrapper and all solver/AST/proof/interpolation milestones remain open.
