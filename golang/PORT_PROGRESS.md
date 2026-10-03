@@ -781,3 +781,16 @@ external num_put platform adaptation, not completed statistics production.
 The Statistics audit now records the real nonadvancing internal key loop;
 locales, process rounding, other stream runtimes, collectors and solver
 consumers remain open. See FLOAT_STREAM_PORT_STATUS.md.
+
+## Concrete open binary rational intervals
+
+The selected MPBQI manager now implements its executable open finite interval
+methods and owning scopes with three retained multiplication scratch bounds.
+Ten test groups began missing-API RED, adapt four real shared-template source
+assertions, and check independent dyadic arithmetic, exact source alias/Disjoint
+quirks, immediate physical ownership and completed failure prefixes. Independent
+frozen full native/checked-debug, ten named race/actual JS, vet/WASI compilation
+checks passed. Generic closed/other numerical configurations, field-only inverse
+and division, persistent ostream and real polynomial/algebraic consumers remain
+open. Three source units are partial; full solver scope is unchanged. See
+MPBQI_PORT_STATUS.md.

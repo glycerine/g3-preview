@@ -80443,9 +80443,23 @@
       "sha256": "494dc210d056651e5354821d723cdb4475fb3bc85d29f17a975d542f7b64ebcc",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/mpbqi_test.go",
+        "mpnum/scoped_binary_interval_test.go"
+      ],
+      "tests": [
+        "TestBinaryIntervalQueriesAndScalarRoutes",
+        "TestBinaryIntervalArithmeticAliasesAndPowers",
+        "TestBinaryIntervalSourceSharedTemplate",
+        "TestBinaryIntervalSourceDefects",
+        "TestBinaryIntervalIndependentArithmetic",
+        "TestBinaryIntervalFailurePrefixes",
+        "TestBinaryIntervalFormattingAndWarmStorage",
+        "TestBinaryIntervalPredicateShortCircuits",
+        "TestBinaryIntervalOwnerAndScope",
+        "TestBinaryIntervalRetainedProductsAndDeepCopies"
+      ],
       "assertions": [
         {
           "line": 26,
@@ -80780,11 +80794,28 @@
           "text": "ENSURE(nm.eq(z.upper(), mpz(6)));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "tst2 four shared-template ENSURE assertions adapted from Int/open to MPBQ/open with k=0",
+          "status": "ported",
+          "go_target": "mpnum/mpbqi_test.go",
+          "tests": [
+            "TestBinaryIntervalSourceSharedTemplate"
+          ]
+        },
+        {
+          "name": "Original Int/open specialization, ext_numeral and old SMT interval tests and complete registered old_interval execution",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Adapted tst2 owns x/y/z lexical intervals and destroys z/y/x in source brace order. Independent owning numeral graph checks supplement four adapted source assertions; this does not implement other source interval domains."
+      ],
+      "deviations": [
+        "Four shared-template assertions are adapted from unsynch_mpz_manager,false through MPBQ integer endpoints; they are not original MPBQI assertions. Added endpoint byte expectations do not claim complete source printed lines. Original Int/SMT/ext_numeral domains and full old_interval registration remain open."
+      ]
     },
     {
       "path": "src/test/optional.cpp",
@@ -84488,9 +84519,24 @@
       "sha256": "50b5eb3b85751316d5845522a2b601ab2147df51504eda9e88abc8b35d8da41e",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/mpbqi.go",
+        "mpnum/mpbqi_format.go",
+        "mpnum/scoped_binary_interval.go"
+      ],
+      "tests": [
+        "TestBinaryIntervalQueriesAndScalarRoutes",
+        "TestBinaryIntervalArithmeticAliasesAndPowers",
+        "TestBinaryIntervalSourceSharedTemplate",
+        "TestBinaryIntervalSourceDefects",
+        "TestBinaryIntervalIndependentArithmetic",
+        "TestBinaryIntervalFailurePrefixes",
+        "TestBinaryIntervalFormattingAndWarmStorage",
+        "TestBinaryIntervalPredicateShortCircuits",
+        "TestBinaryIntervalOwnerAndScope",
+        "TestBinaryIntervalRetainedProductsAndDeepCopies"
+      ],
       "conditionals": [
         {
           "line": 24,
@@ -84543,11 +84589,88 @@
           "text": "SASSERT(n % 2 == 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "MPBQ/open lifecycle, bounds, setters, predicates, subset/disjoint and all precedes overloads",
+          "status": "ported",
+          "go_target": "mpnum/mpbqi.go",
+          "tests": [
+            "TestBinaryIntervalQueriesAndScalarRoutes",
+            "TestBinaryIntervalArithmeticAliasesAndPowers",
+            "TestBinaryIntervalSourceSharedTemplate",
+            "TestBinaryIntervalSourceDefects",
+            "TestBinaryIntervalIndependentArithmetic",
+            "TestBinaryIntervalFailurePrefixes",
+            "TestBinaryIntervalFormattingAndWarmStorage",
+            "TestBinaryIntervalPredicateShortCircuits",
+            "TestBinaryIntervalOwnerAndScope",
+            "TestBinaryIntervalRetainedProductsAndDeepCopies"
+          ]
+        },
+        {
+          "name": "MPBQ/open add/sub/mul/power, exact alias rereads and retained four-corner scratch actions",
+          "status": "ported",
+          "go_target": "mpnum/mpbqi.go",
+          "tests": [
+            "TestBinaryIntervalQueriesAndScalarRoutes",
+            "TestBinaryIntervalArithmeticAliasesAndPowers",
+            "TestBinaryIntervalSourceSharedTemplate",
+            "TestBinaryIntervalSourceDefects",
+            "TestBinaryIntervalIndependentArithmetic",
+            "TestBinaryIntervalFailurePrefixes",
+            "TestBinaryIntervalFormattingAndWarmStorage",
+            "TestBinaryIntervalPredicateShortCircuits",
+            "TestBinaryIntervalOwnerAndScope",
+            "TestBinaryIntervalRetainedProductsAndDeepCopies"
+          ]
+        },
+        {
+          "name": "MPBQ/open scoped_interval lifecycle, borrows, reset and swap",
+          "status": "ported",
+          "go_target": "mpnum/scoped_binary_interval.go",
+          "tests": [
+            "TestBinaryIntervalQueriesAndScalarRoutes",
+            "TestBinaryIntervalArithmeticAliasesAndPowers",
+            "TestBinaryIntervalSourceSharedTemplate",
+            "TestBinaryIntervalSourceDefects",
+            "TestBinaryIntervalIndependentArithmetic",
+            "TestBinaryIntervalFailurePrefixes",
+            "TestBinaryIntervalFormattingAndWarmStorage",
+            "TestBinaryIntervalPredicateShortCircuits",
+            "TestBinaryIntervalOwnerAndScope",
+            "TestBinaryIntervalRetainedProductsAndDeepCopies"
+          ]
+        },
+        {
+          "name": "MPBQ/open default display bytes with staged owning workspace",
+          "status": "ported",
+          "go_target": "mpnum/mpbqi_format.go",
+          "tests": [
+            "TestBinaryIntervalQueriesAndScalarRoutes",
+            "TestBinaryIntervalArithmeticAliasesAndPowers",
+            "TestBinaryIntervalSourceSharedTemplate",
+            "TestBinaryIntervalSourceDefects",
+            "TestBinaryIntervalIndependentArithmetic",
+            "TestBinaryIntervalFailurePrefixes",
+            "TestBinaryIntervalFormattingAndWarmStorage",
+            "TestBinaryIntervalPredicateShortCircuits",
+            "TestBinaryIntervalOwnerAndScope",
+            "TestBinaryIntervalRetainedProductsAndDeepCopies"
+          ]
+        },
+        {
+          "name": "Other numeral/closed configurations, field-only inv/div, persistent ostream and generic algorithm consumers",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Concrete pointer-free endpoints borrow one BinaryRationalManager domain. Actual cold manager and scope headers are charged; three retained multiplication scratch numerators preserve old output ownership. Source endpoint/destructor order and immediate reachable numeral/Words/diagnostic graphs are audited before formatting and teardown. See MPBQI_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Concrete MPBQ/open specialization replaces C++ templates without Go generics. Explicit lifetime/provenance guards and typed failures preserve completed source statement prefixes. Staged byte output and final caller-owned strings replace selected display calls; persistent ostream state, other numeral/closed specializations and real downstream consumers remain open."
+      ]
     },
     {
       "path": "src/util/bit_util.cpp",
@@ -96507,9 +96630,24 @@
       "sha256": "c668f30005b6915604e0b033064b905c565bd6bdc0d8b666580103f82eae4cfd",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/mpbqi.go",
+        "mpnum/mpbqi_format.go",
+        "mpnum/scoped_binary_interval.go"
+      ],
+      "tests": [
+        "TestBinaryIntervalQueriesAndScalarRoutes",
+        "TestBinaryIntervalArithmeticAliasesAndPowers",
+        "TestBinaryIntervalSourceSharedTemplate",
+        "TestBinaryIntervalSourceDefects",
+        "TestBinaryIntervalIndependentArithmetic",
+        "TestBinaryIntervalFailurePrefixes",
+        "TestBinaryIntervalFormattingAndWarmStorage",
+        "TestBinaryIntervalPredicateShortCircuits",
+        "TestBinaryIntervalOwnerAndScope",
+        "TestBinaryIntervalRetainedProductsAndDeepCopies"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -96520,11 +96658,71 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "MPBQI constructor, inherited setter routes and derived mpz singleton/set/add",
+          "status": "ported",
+          "go_target": "mpnum/mpbqi.go",
+          "tests": [
+            "TestBinaryIntervalQueriesAndScalarRoutes",
+            "TestBinaryIntervalArithmeticAliasesAndPowers",
+            "TestBinaryIntervalSourceSharedTemplate",
+            "TestBinaryIntervalSourceDefects",
+            "TestBinaryIntervalIndependentArithmetic",
+            "TestBinaryIntervalFailurePrefixes",
+            "TestBinaryIntervalFormattingAndWarmStorage",
+            "TestBinaryIntervalPredicateShortCircuits",
+            "TestBinaryIntervalOwnerAndScope",
+            "TestBinaryIntervalRetainedProductsAndDeepCopies"
+          ]
+        },
+        {
+          "name": "Inherited executable MPBQ/open manager and lexical scoped interval",
+          "status": "ported",
+          "go_target": "mpnum/scoped_binary_interval.go",
+          "tests": [
+            "TestBinaryIntervalQueriesAndScalarRoutes",
+            "TestBinaryIntervalArithmeticAliasesAndPowers",
+            "TestBinaryIntervalSourceSharedTemplate",
+            "TestBinaryIntervalSourceDefects",
+            "TestBinaryIntervalIndependentArithmetic",
+            "TestBinaryIntervalFailurePrefixes",
+            "TestBinaryIntervalFormattingAndWarmStorage",
+            "TestBinaryIntervalPredicateShortCircuits",
+            "TestBinaryIntervalOwnerAndScope",
+            "TestBinaryIntervalRetainedProductsAndDeepCopies"
+          ]
+        },
+        {
+          "name": "Selected default byte display",
+          "status": "ported",
+          "go_target": "mpnum/mpbqi_format.go",
+          "tests": [
+            "TestBinaryIntervalQueriesAndScalarRoutes",
+            "TestBinaryIntervalArithmeticAliasesAndPowers",
+            "TestBinaryIntervalSourceSharedTemplate",
+            "TestBinaryIntervalSourceDefects",
+            "TestBinaryIntervalIndependentArithmetic",
+            "TestBinaryIntervalFailurePrefixes",
+            "TestBinaryIntervalFormattingAndWarmStorage",
+            "TestBinaryIntervalPredicateShortCircuits",
+            "TestBinaryIntervalOwnerAndScope",
+            "TestBinaryIntervalRetainedProductsAndDeepCopies"
+          ]
+        },
+        {
+          "name": "Persistent ostream integration and real polynomial/algebraic consumers",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Concrete pointer-free endpoints borrow one BinaryRationalManager domain. Actual cold manager and scope headers are charged; three retained multiplication scratch numerators preserve old output ownership. Source endpoint/destructor order and immediate reachable numeral/Words/diagnostic graphs are audited before formatting and teardown. See MPBQI_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Concrete MPBQ/open specialization replaces C++ templates without Go generics. Explicit lifetime/provenance guards and typed failures preserve completed source statement prefixes. Staged byte output and final caller-owned strings replace selected display calls; persistent ostream state, other numeral/closed specializations and real downstream consumers remain open."
+      ]
     },
     {
       "path": "src/util/mpf.cpp",
