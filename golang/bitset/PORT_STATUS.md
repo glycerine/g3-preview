@@ -59,3 +59,37 @@ Width bound: fixed-manager constructors reject numBits > UINT32_MAX−31 with ar
 
 No-generics conversion: constructor header accounting now uses reflect.TypeOf(FixedManager{}) rather than the generic reflect.TypeFor helper. FixedRef/Words APIs retain their concrete signatures while the arena owner replaces its underlying generic storage. No Go generic declarations or instantiations remain in this packet.
 Concrete conversion validation: bitset tests pass against the concrete arena Words implementation on native, checked-tag and actual js/wasm execution; vet and WASI cross-build pass. The existing source assertions, finite masked/hash fixtures, bounded bool-vector oracle and zero-allocation pool checks remain enabled.
+
+## uint_set packet
+
+Added `uint_set.go`/`uint_set_test.go`, translating all declared operations in `src/util/uint_set.h`, copyright Microsoft 2006, Leonardo de Moura (2006-12-07). This is the dense unsigned-integer utility set; SAT-local dense-set classes are separate components. Its storage is an owner-local slice of pointer-free uint32 words. No Go generics, interfaces for element storage, unsafe, maps, or production random generator are used.
+
+| Source operation | Go counterpart / contract |
+| --- | --- |
+| default constructor / destructor | zero value `UintSet`, explicit `Close` releases backing storage |
+| copy constructor | `Clone`, source push-back loop preserving logical words and deriving capacity anew |
+| implicit source assignment through unsigned_vector | `Assign`, deep copy with source capacity, self-assignment guard |
+| swap, reset | `Swap`, `Reset` retaining capacity and zero logical length |
+| get_max_elem | `MaxElem`, **exclusive** 32*logical-word-size endpoint, not maximum member and not backing capacity |
+| empty, insert, remove, contains, num_elems | `Empty`, `Insert`, `Remove`, `Contains`, `NumElems` |
+| operator OR/AND | `Union`, `Intersect`; union grows to source.size()+1, intersection shrinks to source logical size |
+| equality/inequality, subset_of | `Equal`/its negation, `SubsetOf`; trailing zero words do not affect equality |
+| begin, end | `Begin`, `End` constructing value iterators |
+| iterator construction, scan_idx, scan_word, scan | `iterator`, `scanIndex`, `scanWord`, `scan`, original word/bit traversal order |
+| iterator dereference/equality/inequality | `Value`, `Equal`/its negation; source compares index only even across different sets |
+| iterator prefix/postfix increment, assignment | `Next`, `PostNext`, `Assign`; postfix returns old iterator value |
+| get_hash, hash/eq functor wrappers | `Hash`, concrete `UintSetHasher`/`UintSetEqual` |
+| ostream display | `String`, original ascending loop and brace/comma format |
+| inherited physical vector capacity inspection | additional `CapacityWords` for storage audit |
+
+Ownership/capacity fidelity: source unsigned_vector growth starts at 2 words, then (3*old+1)>>1 and expands repeatedly until the requested logical word size fits. Go allocation follows that schedule instead of append's unspecified capacity schedule. Reset and intersection retain physical capacity; growth zero-initializes newly logical words, so stale removed/reset members do not return. The source uint_set copy constructor pushes only logical words, while its implicitly generated assignment copies the base vector's capacity; both behaviors and independence are tested separately. Close maps the source backing-store release to Go owner cleanup. Copying a Go UintSet struct is documented as aliasing and must not replace Clone/Assign. Iterators borrow the owner and require no set mutation during traversal. Invalid end increments panic rather than proceeding past the source invariant.
+
+Numerical fidelity: every membership word/mask and hash accumulator is uint32. Source NumElems invokes GCC __builtin_popcount; Go's bits.OnesCount32 is the equivalent platform population-count primitive. Source Hash is h += (i+1)*word[i] modulo 2^32; it does **not** call the generic utilhash string/combine functions, so this packet has no endian/char hashing adaptation. Weighted hash overflow and trailing-zero invariance have exact finite tests. Source get_max_elem overflows when logical length reaches 2^27 words, breaking iterator/display bounds. Insert/Union diagnose such invalid extents before changing/growing storage instead of silently hiding members; the guard and preservation of existing membership/capacity are tested using UINT32_MAX without giant allocation. The source vector's allocation-size/capacity overflow is also diagnosed.
+
+Source tests: `src/test/main.cpp` registers TST(uint_set), `src/test/CMakeLists.txt` includes uint_set.cpp, and **all** tst1/tst2/tst3/tst4/tst5 calls in that file are active. Tests were written first and observed RED on undefined UintSet operations; translation then reached GREEN. tst1's exact assertion categories (count, empty, every membership) use deterministic independent PCG choices with the original 100 repeated bounded domains and fewer than 1000 operations each. tst2 preserves 1000 repetitions for each domain 1/10/31/32/100 and all 100 singleton probes. tst3 translates every assertion at n=12 and n=100, including duplicate insertion, subset direction, copies and singleton-subset equivalence; tst4 covers bit 32. No source uint-set tests are disabled.
+
+`tst5` contains print-only hash observations and a uint_map< unsigned > integration demonstration. Its hash/render observations have embedded finite expectations in `test_vectors/uint_set_prints.json`, independently calculated from source masks and the weighted formula: hash sequence 0,2,6,8198,8214. The value-key copy independence is tested, but the source map insertion, bucket traversal and key/value iteration demonstration remains explicitly **unported map integration**; a UintSet port does not claim a map implementation. No assertion was weakened or dropped to hide that prerequisite. The source key map's iteration order is not replaced by a Go map.
+
+A separate 3,000-step independent bool-array set oracle checks membership, cardinality, empty/equality/subset relations, union/intersection/reset/assignment/swap and complete ascending iteration. Additional deterministic cases cover all iterator operations (including equality across owners with equal index), wrapper functors, source union's extra logical zero word, retained capacity, cloning vs assignment, swap/reset/Close and weighted hash wraparound. Warmed bounded insert/remove/count/hash/union/intersection/iteration allocate zero Go objects. Ordinary tests embed permanent fixtures, never compile C++ or import the repository source, and use no testdata files.
+
+Final packet checks: CGO-disabled native tests, g3checked tests, vet, actual js/wasm execution with Node v22.22.2, and WASI cross-build pass. The installed custom Go runtime's previously documented WASI startup failure remains separate from package execution. Every method in the assigned uint_set header has a counterpart or explicit operator-expression equivalent. Generic source map integration and other unsigned_vector/container operations remain separate production coverage work; they are not claimed complete by this packet.
