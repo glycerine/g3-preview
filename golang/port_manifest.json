@@ -79093,14 +79093,49 @@
       "sha256": "c880c266a05137dfe3f01e798bae724bd7a7066d43ba62a072e3a977711a9a55",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "mpnum/mpbq_test.go"
+      ],
+      "tests": [
+        "TestBinarySourceTst1",
+        "TestBinarySourceTst2"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "tst1: actual scoped arithmetic expression trace and four approximation directions",
+          "status": "ported",
+          "go_target": "mpnum/mpbq_test.go",
+          "tests": [
+            "TestBinarySourceTst1"
+          ]
+        },
+        {
+          "name": "tst2: actual aliased approx_div(5,3,128)",
+          "status": "ported",
+          "go_target": "mpnum/mpbq_test.go",
+          "tests": [
+            "TestBinarySourceTst2"
+          ]
+        },
+        {
+          "name": "tst_mpbq invokes both active bodies",
+          "status": "ported",
+          "go_target": "mpnum/mpbq_test.go",
+          "tests": [
+            "TestBinarySourceTst1",
+            "TestBinarySourceTst2"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual expression temporaries and named scoped values close at full-expression and source brace boundaries; both numerical owners close separately."
+      ],
+      "deviations": [
+        "Source has zero ENSURE assertions; six printed values checked against independent permanent integer expectations. No reference executable dependency."
+      ]
     },
     {
       "path": "src/test/mpf.cpp",
@@ -95815,9 +95850,33 @@
       "sha256": "7e41a89e8b45c1a00282090370b2cd237a165a593d9d694f2f477e92c6a74d6e",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/mpbq.go",
+        "mpnum/mpbq_arithmetic.go",
+        "mpnum/mpbq_root.go",
+        "mpnum/mpbq_select.go",
+        "mpnum/mpbq_format.go",
+        "mpnum/mpbq_debug.go",
+        "mpnum/mpbq_debug_release.go",
+        "mpnum/scoped_binary.go"
+      ],
+      "tests": [
+        "TestBinarySourceTst1",
+        "TestBinarySourceTst2",
+        "TestBinaryMixedConversionsAndIntervals",
+        "TestBinarySourceShapeDomainsAndPrefixes",
+        "TestBinaryRootBoundsFinite",
+        "TestBinaryScalarForwardersAndWarmWorkspace",
+        "TestBinaryDebugEnclosureShortCircuit",
+        "TestBinaryArithmeticFiniteAliases",
+        "TestBinarySelectionRootsAndApprox",
+        "TestBinaryFormattingExact",
+        "TestBinaryFormattingBranchesAndFaultPublication",
+        "TestBinaryOwnerConstructorAndScopedVector",
+        "TestBinaryFailureImmediateRoots",
+        "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+      ],
       "conditionals": [
         {
           "line": 30,
@@ -96098,20 +96157,179 @@
           "text": "SASSERT(k_prime == 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "constructor/destructor/reset(vector), normalize and magnitudes",
+          "status": "ported",
+          "go_target": "mpnum/mpbq.go",
+          "tests": [
+            "TestBinarySourceTst1",
+            "TestBinarySourceTst2",
+            "TestBinaryMixedConversionsAndIntervals",
+            "TestBinarySourceShapeDomainsAndPrefixes",
+            "TestBinaryRootBoundsFinite",
+            "TestBinaryScalarForwardersAndWarmWorkspace",
+            "TestBinaryDebugEnclosureShortCircuit",
+            "TestBinaryArithmeticFiniteAliases",
+            "TestBinarySelectionRootsAndApprox",
+            "TestBinaryFormattingExact",
+            "TestBinaryFormattingBranchesAndFaultPublication",
+            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryFailureImmediateRoots",
+            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+          ]
+        },
+        {
+          "name": "add/sub/mul mixed and BQ, shifts, power and all comparison overloads",
+          "status": "ported",
+          "go_target": "mpnum/mpbq_arithmetic.go",
+          "tests": [
+            "TestBinarySourceTst1",
+            "TestBinarySourceTst2",
+            "TestBinaryMixedConversionsAndIntervals",
+            "TestBinarySourceShapeDomainsAndPrefixes",
+            "TestBinaryRootBoundsFinite",
+            "TestBinaryScalarForwardersAndWarmWorkspace",
+            "TestBinaryDebugEnclosureShortCircuit",
+            "TestBinaryArithmeticFiniteAliases",
+            "TestBinarySelectionRootsAndApprox",
+            "TestBinaryFormattingExact",
+            "TestBinaryFormattingBranchesAndFaultPublication",
+            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryFailureImmediateRoots",
+            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+          ]
+        },
+        {
+          "name": "root_lower/upper, floor/ceil, to_mpbq/to_mpq/to_rational",
+          "status": "ported",
+          "go_target": "mpnum/mpbq_root.go",
+          "tests": [
+            "TestBinarySourceTst1",
+            "TestBinarySourceTst2",
+            "TestBinaryMixedConversionsAndIntervals",
+            "TestBinarySourceShapeDomainsAndPrefixes",
+            "TestBinaryRootBoundsFinite",
+            "TestBinaryScalarForwardersAndWarmWorkspace",
+            "TestBinaryDebugEnclosureShortCircuit",
+            "TestBinaryArithmeticFiniteAliases",
+            "TestBinarySelectionRootsAndApprox",
+            "TestBinaryFormattingExact",
+            "TestBinaryFormattingBranchesAndFaultPublication",
+            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryFailureImmediateRoots",
+            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+          ]
+        },
+        {
+          "name": "four select_integer and four select_small paths, refine_lower/upper, approx/approx_div",
+          "status": "ported",
+          "go_target": "mpnum/mpbq_select.go",
+          "tests": [
+            "TestBinarySourceTst1",
+            "TestBinarySourceTst2",
+            "TestBinaryMixedConversionsAndIntervals",
+            "TestBinarySourceShapeDomainsAndPrefixes",
+            "TestBinaryRootBoundsFinite",
+            "TestBinaryScalarForwardersAndWarmWorkspace",
+            "TestBinaryDebugEnclosureShortCircuit",
+            "TestBinaryArithmeticFiniteAliases",
+            "TestBinarySelectionRootsAndApprox",
+            "TestBinaryFormattingExact",
+            "TestBinaryFormattingBranchesAndFaultPublication",
+            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryFailureImmediateRoots",
+            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+          ]
+        },
+        {
+          "name": "to_string/display/display_pp/display_smt2/display_decimal single and interval, default byte profile",
+          "status": "ported",
+          "go_target": "mpnum/mpbq_format.go",
+          "tests": [
+            "TestBinarySourceTst1",
+            "TestBinarySourceTst2",
+            "TestBinaryMixedConversionsAndIntervals",
+            "TestBinarySourceShapeDomainsAndPrefixes",
+            "TestBinaryRootBoundsFinite",
+            "TestBinaryScalarForwardersAndWarmWorkspace",
+            "TestBinaryDebugEnclosureShortCircuit",
+            "TestBinaryArithmeticFiniteAliases",
+            "TestBinarySelectionRootsAndApprox",
+            "TestBinaryFormattingExact",
+            "TestBinaryFormattingBranchesAndFaultPublication",
+            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryFailureImmediateRoots",
+            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+          ]
+        },
+        {
+          "name": "selected MPBQ_DEBUG rational actions and source SASSERT short circuit; VERIFY executes in release",
+          "status": "ported",
+          "go_target": "mpnum/mpbq_debug.go",
+          "tests": [
+            "TestBinarySourceTst1",
+            "TestBinarySourceTst2",
+            "TestBinaryMixedConversionsAndIntervals",
+            "TestBinarySourceShapeDomainsAndPrefixes",
+            "TestBinaryRootBoundsFinite",
+            "TestBinaryScalarForwardersAndWarmWorkspace",
+            "TestBinaryDebugEnclosureShortCircuit",
+            "TestBinaryArithmeticFiniteAliases",
+            "TestBinarySelectionRootsAndApprox",
+            "TestBinaryFormattingExact",
+            "TestBinaryFormattingBranchesAndFaultPublication",
+            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryFailureImmediateRoots",
+            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+          ]
+        },
+        {
+          "name": "TRACE/STRACE actions and inherited custom ostream persistent flags/locale/stream state integration",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Concrete pointer-free numerator/exponent; borrowed IntegerManager and debug RationalService share actual Budget. Actual cold header and eleven retained numeral roots charged; lexical roots released on all Go errors. Source destructor order, deep scope/vector ownership, whole new backing overlaps old backing. Immediate cells/Words/diagnostics graph oracle precedes formatting/cleanup. See MPBQ_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Explicit owner-local contexts and Close replace global diagnostic service/RAII. Imported foreign rational numerators/denominators copied through their real owners. Undefined degree-zero and interval preconditions have typed adapters; finite raw negative/unreduced shapes remain source behavior. Selected byte output stages in charged retained workspace; final strings caller-owned. Integer storage error adapters inherited; completed BQ statement/exponent/alias prefixes retained. Open trace/custom ostream integration keeps whole unit partial."
+      ]
     },
     {
       "path": "src/util/mpbq.h",
       "sha256": "778a55dd32aa2661f814e491328e71f06b50c4b2bc6d098428185c8739439cc9",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/mpbq.go",
+        "mpnum/mpbq_arithmetic.go",
+        "mpnum/mpbq_root.go",
+        "mpnum/mpbq_select.go",
+        "mpnum/mpbq_format.go",
+        "mpnum/mpbq_debug.go",
+        "mpnum/mpbq_debug_release.go",
+        "mpnum/scoped_binary.go"
+      ],
+      "tests": [
+        "TestBinarySourceTst1",
+        "TestBinarySourceTst2",
+        "TestBinaryMixedConversionsAndIntervals",
+        "TestBinarySourceShapeDomainsAndPrefixes",
+        "TestBinaryRootBoundsFinite",
+        "TestBinaryScalarForwardersAndWarmWorkspace",
+        "TestBinaryDebugEnclosureShortCircuit",
+        "TestBinaryArithmeticFiniteAliases",
+        "TestBinarySelectionRootsAndApprox",
+        "TestBinaryFormattingExact",
+        "TestBinaryFormattingBranchesAndFaultPublication",
+        "TestBinaryOwnerConstructorAndScopedVector",
+        "TestBinaryFailureImmediateRoots",
+        "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+      ],
       "conditionals": [
         {
           "line": 27,
@@ -96122,11 +96340,167 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mpbq constructors/k/numerator-copy/swap, manager setters/predicates, inline forwarding, scoped int32/Int macros",
+          "status": "ported",
+          "go_target": "mpnum/mpbq.go",
+          "tests": [
+            "TestBinarySourceTst1",
+            "TestBinarySourceTst2",
+            "TestBinaryMixedConversionsAndIntervals",
+            "TestBinarySourceShapeDomainsAndPrefixes",
+            "TestBinaryRootBoundsFinite",
+            "TestBinaryScalarForwardersAndWarmWorkspace",
+            "TestBinaryDebugEnclosureShortCircuit",
+            "TestBinaryArithmeticFiniteAliases",
+            "TestBinarySelectionRootsAndApprox",
+            "TestBinaryFormattingExact",
+            "TestBinaryFormattingBranchesAndFaultPublication",
+            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryFailureImmediateRoots",
+            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+          ]
+        },
+        {
+          "name": "constructor/destructor/reset(vector), normalize and magnitudes",
+          "status": "ported",
+          "go_target": "mpnum/mpbq.go",
+          "tests": [
+            "TestBinarySourceTst1",
+            "TestBinarySourceTst2",
+            "TestBinaryMixedConversionsAndIntervals",
+            "TestBinarySourceShapeDomainsAndPrefixes",
+            "TestBinaryRootBoundsFinite",
+            "TestBinaryScalarForwardersAndWarmWorkspace",
+            "TestBinaryDebugEnclosureShortCircuit",
+            "TestBinaryArithmeticFiniteAliases",
+            "TestBinarySelectionRootsAndApprox",
+            "TestBinaryFormattingExact",
+            "TestBinaryFormattingBranchesAndFaultPublication",
+            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryFailureImmediateRoots",
+            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+          ]
+        },
+        {
+          "name": "add/sub/mul mixed and BQ, shifts, power and all comparison overloads",
+          "status": "ported",
+          "go_target": "mpnum/mpbq_arithmetic.go",
+          "tests": [
+            "TestBinarySourceTst1",
+            "TestBinarySourceTst2",
+            "TestBinaryMixedConversionsAndIntervals",
+            "TestBinarySourceShapeDomainsAndPrefixes",
+            "TestBinaryRootBoundsFinite",
+            "TestBinaryScalarForwardersAndWarmWorkspace",
+            "TestBinaryDebugEnclosureShortCircuit",
+            "TestBinaryArithmeticFiniteAliases",
+            "TestBinarySelectionRootsAndApprox",
+            "TestBinaryFormattingExact",
+            "TestBinaryFormattingBranchesAndFaultPublication",
+            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryFailureImmediateRoots",
+            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+          ]
+        },
+        {
+          "name": "root_lower/upper, floor/ceil, to_mpbq/to_mpq/to_rational",
+          "status": "ported",
+          "go_target": "mpnum/mpbq_root.go",
+          "tests": [
+            "TestBinarySourceTst1",
+            "TestBinarySourceTst2",
+            "TestBinaryMixedConversionsAndIntervals",
+            "TestBinarySourceShapeDomainsAndPrefixes",
+            "TestBinaryRootBoundsFinite",
+            "TestBinaryScalarForwardersAndWarmWorkspace",
+            "TestBinaryDebugEnclosureShortCircuit",
+            "TestBinaryArithmeticFiniteAliases",
+            "TestBinarySelectionRootsAndApprox",
+            "TestBinaryFormattingExact",
+            "TestBinaryFormattingBranchesAndFaultPublication",
+            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryFailureImmediateRoots",
+            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+          ]
+        },
+        {
+          "name": "four select_integer and four select_small paths, refine_lower/upper, approx/approx_div",
+          "status": "ported",
+          "go_target": "mpnum/mpbq_select.go",
+          "tests": [
+            "TestBinarySourceTst1",
+            "TestBinarySourceTst2",
+            "TestBinaryMixedConversionsAndIntervals",
+            "TestBinarySourceShapeDomainsAndPrefixes",
+            "TestBinaryRootBoundsFinite",
+            "TestBinaryScalarForwardersAndWarmWorkspace",
+            "TestBinaryDebugEnclosureShortCircuit",
+            "TestBinaryArithmeticFiniteAliases",
+            "TestBinarySelectionRootsAndApprox",
+            "TestBinaryFormattingExact",
+            "TestBinaryFormattingBranchesAndFaultPublication",
+            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryFailureImmediateRoots",
+            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+          ]
+        },
+        {
+          "name": "to_string/display/display_pp/display_smt2/display_decimal single and interval, default byte profile",
+          "status": "ported",
+          "go_target": "mpnum/mpbq_format.go",
+          "tests": [
+            "TestBinarySourceTst1",
+            "TestBinarySourceTst2",
+            "TestBinaryMixedConversionsAndIntervals",
+            "TestBinarySourceShapeDomainsAndPrefixes",
+            "TestBinaryRootBoundsFinite",
+            "TestBinaryScalarForwardersAndWarmWorkspace",
+            "TestBinaryDebugEnclosureShortCircuit",
+            "TestBinaryArithmeticFiniteAliases",
+            "TestBinarySelectionRootsAndApprox",
+            "TestBinaryFormattingExact",
+            "TestBinaryFormattingBranchesAndFaultPublication",
+            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryFailureImmediateRoots",
+            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+          ]
+        },
+        {
+          "name": "selected MPBQ_DEBUG rational actions and source SASSERT short circuit; VERIFY executes in release",
+          "status": "ported",
+          "go_target": "mpnum/mpbq_debug.go",
+          "tests": [
+            "TestBinarySourceTst1",
+            "TestBinarySourceTst2",
+            "TestBinaryMixedConversionsAndIntervals",
+            "TestBinarySourceShapeDomainsAndPrefixes",
+            "TestBinaryRootBoundsFinite",
+            "TestBinaryScalarForwardersAndWarmWorkspace",
+            "TestBinaryDebugEnclosureShortCircuit",
+            "TestBinaryArithmeticFiniteAliases",
+            "TestBinarySelectionRootsAndApprox",
+            "TestBinaryFormattingExact",
+            "TestBinaryFormattingBranchesAndFaultPublication",
+            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryFailureImmediateRoots",
+            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+          ]
+        },
+        {
+          "name": "TRACE/STRACE actions and inherited custom ostream persistent flags/locale/stream state integration",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Concrete pointer-free numerator/exponent; borrowed IntegerManager and debug RationalService share actual Budget. Actual cold header and eleven retained numeral roots charged; lexical roots released on all Go errors. Source destructor order, deep scope/vector ownership, whole new backing overlaps old backing. Immediate cells/Words/diagnostics graph oracle precedes formatting/cleanup. See MPBQ_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Explicit owner-local contexts and Close replace global diagnostic service/RAII. Imported foreign rational numerators/denominators copied through their real owners. Undefined degree-zero and interval preconditions have typed adapters; finite raw negative/unreduced shapes remain source behavior. Selected byte output stages in charged retained workspace; final strings caller-owned. Integer storage error adapters inherited; completed BQ statement/exponent/alias prefixes retained. Open trace/custom ostream integration keeps whole unit partial."
+      ]
     },
     {
       "path": "src/util/mpbqi.h",
@@ -106002,7 +106376,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "mpnum/scoped_numeral.go"
+        "mpnum/scoped_numeral.go",
+        "mpnum/scoped_binary.go"
       ],
       "tests": [
         "TestScopedNumeralSourceTstScoped",
@@ -106015,7 +106390,21 @@
         "TestScopedRationalVectorAndScalarLifetimes",
         "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
         "TestScopedRationalVectorIndependentLifecycleAndFailures",
-        "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak"
+        "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak",
+        "TestBinarySourceTst1",
+        "TestBinarySourceTst2",
+        "TestBinaryMixedConversionsAndIntervals",
+        "TestBinarySourceShapeDomainsAndPrefixes",
+        "TestBinaryRootBoundsFinite",
+        "TestBinaryScalarForwardersAndWarmWorkspace",
+        "TestBinaryDebugEnclosureShortCircuit",
+        "TestBinaryArithmeticFiniteAliases",
+        "TestBinarySelectionRootsAndApprox",
+        "TestBinaryFormattingExact",
+        "TestBinaryFormattingBranchesAndFaultPublication",
+        "TestBinaryOwnerConstructorAndScopedVector",
+        "TestBinaryFailureImmediateRoots",
+        "TestBinaryVectorFailurePrefixesAndScopedRoutes"
       ],
       "conditionals": [
         {
@@ -106101,13 +106490,57 @@
             "TestScopedRationalVectorIndependentLifecycleAndFailures",
             "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak"
           ]
+        },
+        {
+          "name": "concrete MPBQ constructor/get/m/assignment/copy/reset/swap/neg and destructor",
+          "status": "ported",
+          "go_target": "mpnum/scoped_binary.go",
+          "tests": [
+            "TestBinarySourceTst1",
+            "TestBinarySourceTst2",
+            "TestBinaryMixedConversionsAndIntervals",
+            "TestBinarySourceShapeDomainsAndPrefixes",
+            "TestBinaryRootBoundsFinite",
+            "TestBinaryScalarForwardersAndWarmWorkspace",
+            "TestBinaryDebugEnclosureShortCircuit",
+            "TestBinaryArithmeticFiniteAliases",
+            "TestBinarySelectionRootsAndApprox",
+            "TestBinaryFormattingExact",
+            "TestBinaryFormattingBranchesAndFaultPublication",
+            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryFailureImmediateRoots",
+            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+          ]
+        },
+        {
+          "name": "concrete MPBQ add/sub/mul compound and copy arithmetic, six comparison routes, five predicates and byte display",
+          "status": "ported",
+          "go_target": "mpnum/scoped_binary.go",
+          "tests": [
+            "TestBinarySourceTst1",
+            "TestBinarySourceTst2",
+            "TestBinaryMixedConversionsAndIntervals",
+            "TestBinarySourceShapeDomainsAndPrefixes",
+            "TestBinaryRootBoundsFinite",
+            "TestBinaryScalarForwardersAndWarmWorkspace",
+            "TestBinaryDebugEnclosureShortCircuit",
+            "TestBinaryArithmeticFiniteAliases",
+            "TestBinarySelectionRootsAndApprox",
+            "TestBinaryFormattingExact",
+            "TestBinaryFormattingBranchesAndFaultPublication",
+            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryFailureImmediateRoots",
+            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+          ]
         }
       ],
       "ownership": [
-        "Concrete scoped Int/Rational objects borrow managers; all cold headers and actual old+new pointer-free backing are charged. Deep copy owns independent limbs, source ascending truncation releases them, vector failure prefixes retained. See SCOPED_NUMERAL_PORT_STATUS.md."
+        "Concrete scoped Int/Rational objects borrow managers; all cold headers and actual old+new pointer-free backing are charged. Deep copy owns independent limbs, source ascending truncation releases them, vector failure prefixes retained. See SCOPED_NUMERAL_PORT_STATUS.md.",
+        "MPBQ specialization owns deep numerator values and real cold headers/backing; self identity/manager checks, borrowed owner lifetime, grow transfer and old/new peak audited. See MPBQ_PORT_STATUS.md."
       ],
       "deviations": [
-        "Explicit Close substitutes RAII; self identity rejects shallow Go owner copies. Vectors expose deep Read/Set rather than escaping indexed element addresses. Source noncopyable vector remains noncopyable; other numeral manager specializations stay open."
+        "Explicit Close substitutes RAII; self identity rejects shallow Go owner copies. Vectors expose deep Read/Set rather than escaping indexed element addresses. Source noncopyable vector remains noncopyable; other numeral manager specializations stay open.",
+        "Concrete MPBQ specialization; unsupported source div/rem/abs template instantiations are not invented. Other manager specializations and full custom ostream integration remain open."
       ]
     },
     {
@@ -106141,7 +106574,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "mpnum/scoped_numeral.go"
+        "mpnum/scoped_numeral.go",
+        "mpnum/scoped_binary.go"
       ],
       "tests": [
         "TestScopedNumeralSourceTstScoped",
@@ -106154,7 +106588,21 @@
         "TestScopedRationalVectorAndScalarLifetimes",
         "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
         "TestScopedRationalVectorIndependentLifecycleAndFailures",
-        "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak"
+        "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak",
+        "TestBinarySourceTst1",
+        "TestBinarySourceTst2",
+        "TestBinaryMixedConversionsAndIntervals",
+        "TestBinarySourceShapeDomainsAndPrefixes",
+        "TestBinaryRootBoundsFinite",
+        "TestBinaryScalarForwardersAndWarmWorkspace",
+        "TestBinaryDebugEnclosureShortCircuit",
+        "TestBinaryArithmeticFiniteAliases",
+        "TestBinarySelectionRootsAndApprox",
+        "TestBinaryFormattingExact",
+        "TestBinaryFormattingBranchesAndFaultPublication",
+        "TestBinaryOwnerConstructorAndScopedVector",
+        "TestBinaryFailureImmediateRoots",
+        "TestBinaryVectorFailurePrefixesAndScopedRoutes"
       ],
       "conditionals": [
         {
@@ -106204,13 +106652,57 @@
             "TestScopedRationalVectorIndependentLifecycleAndFailures",
             "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak"
           ]
+        },
+        {
+          "name": "concrete MPBQ constructor/m/size/capacity/borrow and destructor",
+          "status": "ported",
+          "go_target": "mpnum/scoped_binary.go",
+          "tests": [
+            "TestBinarySourceTst1",
+            "TestBinarySourceTst2",
+            "TestBinaryMixedConversionsAndIntervals",
+            "TestBinarySourceShapeDomainsAndPrefixes",
+            "TestBinaryRootBoundsFinite",
+            "TestBinaryScalarForwardersAndWarmWorkspace",
+            "TestBinaryDebugEnclosureShortCircuit",
+            "TestBinaryArithmeticFiniteAliases",
+            "TestBinarySelectionRootsAndApprox",
+            "TestBinaryFormattingExact",
+            "TestBinaryFormattingBranchesAndFaultPublication",
+            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryFailureImmediateRoots",
+            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+          ]
+        },
+        {
+          "name": "concrete MPBQ reset/push/pop/shrink/resize; source ascending cleanup and default-element failed-push prefix",
+          "status": "ported",
+          "go_target": "mpnum/scoped_binary.go",
+          "tests": [
+            "TestBinarySourceTst1",
+            "TestBinarySourceTst2",
+            "TestBinaryMixedConversionsAndIntervals",
+            "TestBinarySourceShapeDomainsAndPrefixes",
+            "TestBinaryRootBoundsFinite",
+            "TestBinaryScalarForwardersAndWarmWorkspace",
+            "TestBinaryDebugEnclosureShortCircuit",
+            "TestBinaryArithmeticFiniteAliases",
+            "TestBinarySelectionRootsAndApprox",
+            "TestBinaryFormattingExact",
+            "TestBinaryFormattingBranchesAndFaultPublication",
+            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryFailureImmediateRoots",
+            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+          ]
         }
       ],
       "ownership": [
-        "Concrete scoped Int/Rational objects borrow managers; all cold headers and actual old+new pointer-free backing are charged. Deep copy owns independent limbs, source ascending truncation releases them, vector failure prefixes retained. See SCOPED_NUMERAL_PORT_STATUS.md."
+        "Concrete scoped Int/Rational objects borrow managers; all cold headers and actual old+new pointer-free backing are charged. Deep copy owns independent limbs, source ascending truncation releases them, vector failure prefixes retained. See SCOPED_NUMERAL_PORT_STATUS.md.",
+        "MPBQ specialization owns deep numerator values and real cold headers/backing; self identity/manager checks, borrowed owner lifetime, grow transfer and old/new peak audited. See MPBQ_PORT_STATUS.md."
       ],
       "deviations": [
-        "Explicit Close substitutes RAII; self identity rejects shallow Go owner copies. Vectors expose deep Read/Set rather than escaping indexed element addresses. Source noncopyable vector remains noncopyable; other numeral manager specializations stay open."
+        "Explicit Close substitutes RAII; self identity rejects shallow Go owner copies. Vectors expose deep Read/Set rather than escaping indexed element addresses. Source noncopyable vector remains noncopyable; other numeral manager specializations stay open.",
+        "Concrete MPBQ specialization; unsupported source div/rem/abs template instantiations are not invented. Other manager specializations and full custom ostream integration remain open."
       ]
     },
     {

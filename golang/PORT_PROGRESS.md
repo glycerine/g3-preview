@@ -752,3 +752,17 @@ inverse index defect; review-driven RED added checked physical host bounds.
 Integrated full native/checked-debug, race/actual JS, vet/WASI and no-generics
 gates passed. Actual AST/dependency/bound callbacks, the real AST million-update
 test and automatic source diagnostics remain open. See PARRAY_PORT_STATUS.md.
+
+## Binary rational arithmetic and owning scopes
+
+The selected internal32 MPBQ contract now includes arithmetic, roots, directed
+approximation, all four interval-selection paths, rational conversions, and
+plain/pretty/SMT2/decimal byte output. Fourteen test groups began missing-API RED
+and retain both active print-only source bodies (zero ENSURE, six independent
+expected outputs). Alias publication, raw-shape rounding/refinement quirks,
+source debug short-circuit, immediate numeral ownership, charged scope/vector
+backing and failure prefixes have permanent regressions. Frozen integrated full
+native/checked-debug, named race/actual JS, vet and WASI compilation are checked
+independently. Whole MPBQ units remain partial for source trace and full ostream
+integration; MPBQI, polynomial/algebraic managers
+and the full solver remain open. See MPBQ_PORT_STATUS.md.
