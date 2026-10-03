@@ -201,3 +201,15 @@ audits. Vet and source/evidence/no-generics pass on the three-file overlay
 RED on documented backend dependencies. Frozen hashes/logs and remaining
 scientific-denominator/service/pair-setter contracts are recorded in
 `MPQ_PARSER_PUBLICATION_PACKET.md`; no whole-source completion is claimed.
+
+
+Natural division now uses four actual inline16 source buffers with Runtime
+overflow, conditional add-back growth after quotient decrement, and the real
+post-output Z3DEBUG lexical verification temporary. Pending `port_pending_mpn`
+is removed because the constructor/Runtime/CloseChecked APIs execute. The
+eight-file checkpoint passed 32 selected native and checked/debug groups, full
+vet and source/no-generics in the frozen isolated tree documented in
+`NATURAL_BACKEND_NEXT_PACKET.md`. A second isolated overlay on HEAD e9f911f
+passed the affected Natural, parser-publication and service-statistics groups
+in native and checked/debug profiles. Broader backend suites remain RED;
+SourceFinalize, lexical formatting and transitive outer cleanup are unfinished.

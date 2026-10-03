@@ -120,7 +120,7 @@ func NewIntegerManager(config IntegerConfig) (*IntegerManager, error) {
 	if e != nil {
 		return fail(e)
 	}
-	m.natural, e = newNaturalManager(config.Words, m.words, false)
+	m.natural, e = newNaturalManagerWithMemory(config.Words, m.words, false, m.memory)
 	if e != nil {
 		return fail(e)
 	}
@@ -357,7 +357,9 @@ func (m *IntegerManager) CloseChecked() error {
 		m.pendingCell = sourceCellBacking{}
 	}
 	if m.natural != nil {
-		m.natural.Close()
+		if e := m.natural.CloseChecked(); e != nil {
+			return fail(e)
+		}
 		m.natural = nil
 	}
 	if m.words != nil {

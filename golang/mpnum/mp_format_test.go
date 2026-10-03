@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"errors"
 	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
 	"math/big"
 	"reflect"
 	"testing"
@@ -23,10 +24,13 @@ func TestNaturalOwnedConstructorAndClose(t *testing.T) {
 			}
 			continue
 		}
-		for i, r := range m.divScratch {
-			c, e := m.words.Cap(r)
-			if e != nil || c < 16 || m.divCapacity[i] != 16 {
-				t.Fatal(i, c, e)
+		if m.words.Stats().Live != 0 || m.RuntimeOwner().Stats().LiveBlocks != 0 {
+			t.Fatal("source inline constructor allocated payload")
+		}
+		for i := range m.division {
+			buffer := &m.division[i]
+			if buffer.capacity() != 16 || buffer.size() != 0 || buffer.raw != (memory.Block{}) || buffer.pending != (memory.Block{}) || m.divScratch[i] != (arena.VectorRef{}) || m.divCapacity[i] != 16 {
+				t.Fatal("actual source inline constructor", i, buffer)
 			}
 		}
 		m.Close()
@@ -384,9 +388,8 @@ func TestOwnedFormattingBudgetLimit(t *testing.T) {
 }
 
 func TestNaturalPreparedAddBackStorageAdaptation(t *testing.T) {
-	// A pure power-of-two divisor cannot require Algorithm D add-back here.
-	// Failure preparation deliberately still grows the retained ab buffer before
-	// the single source arithmetic pass; this is a storage-profile adaptation.
+	// src/util/mpn.cpp:341-344 grows ab only after subtraction borrows and
+	// quotient is decremented. A power-of-two divisor needs no add-back here.
 	m := naturalManager(t)
 	a := make([]uint32, 40)
 	b := make([]uint32, 19)
@@ -401,18 +404,39 @@ func TestNaturalPreparedAddBackStorageAdaptation(t *testing.T) {
 	}
 	wq, wr := new(big.Int), new(big.Int)
 	wq.QuoRem(oracle(a), oracle(b), wr)
-	if oracle(q).Cmp(wq) != 0 || oracle(r).Cmp(wr) != 0 || m.divCapacity != ([4]uint32{64, 32, 32, 32}) || m.budget.Used() <= before {
+	if oracle(q).Cmp(wq) != 0 || oracle(r).Cmp(wr) != 0 || m.divCapacity != ([4]uint32{64, 32, 32, 16}) || m.budget.Used() <= before {
 		t.Fatal("prepared requested capacities", m.divCapacity)
 	}
-	for i := uint32(0); i < 21; i++ {
-		if m.divRead(m.divScratch[3], i) != 0 {
-			t.Fatal("fixture unexpectedly used add-back")
+	ab := &m.division[3]
+	if ab.pos != 0 || ab.initialized != 0 || ab.raw != (memory.Block{}) || ab.pending != (memory.Block{}) {
+		t.Fatal("unused ab must remain uninitialized inline", ab)
+	}
+	baseline := m.RuntimeOwner().Stats()
+	charge := m.budget.Used()
+	state := m.RuntimeOwner().State()
+	if modularSourceDebug {
+		// Each actual debug invocation constructs and destroys its lexical temp;
+		// no universal zero-Go-allocation claim applies to these source mallocs.
+		for iteration := 0; iteration < 10; iteration++ {
+			previous := m.RuntimeOwner().State().GlobalCount
+			if _, e := m.Div(a, b, q, r); e != nil {
+				t.Fatal(e)
+			}
+			now := m.RuntimeOwner().State()
+			if now.GlobalCount <= previous || now.GlobalSize != state.GlobalSize || now.LocalSize != state.LocalSize || m.RuntimeOwner().Stats() != baseline || m.budget.Used() != charge {
+				t.Fatal("lexical temp physical destruction", state, now, baseline, m.RuntimeOwner().Stats())
+			}
+		}
+	} else {
+		var failure error
+		if allocations := testing.AllocsPerRun(100, func() { _, failure = m.Div(a, b, q, r) }); allocations != 0 || failure != nil {
+			t.Fatal(allocations, failure)
+		}
+		if m.RuntimeOwner().State() != state || m.RuntimeOwner().Stats() != baseline || m.budget.Used() != charge {
+			t.Fatal("release warm division allocated actual storage")
 		}
 	}
-	var e error
-	if allocations := testing.AllocsPerRun(100, func() { _, e = m.Div(a, b, q, r) }); allocations != 0 || e != nil {
-		t.Fatal(allocations, e)
-	}
+
 }
 
 func TestOwnedTextGrowthPeakAndRefusal(t *testing.T) {

@@ -4,6 +4,7 @@ package mpnum
 
 import (
 	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
 	"reflect"
 )
 
@@ -12,70 +13,147 @@ import (
 // copied or used concurrently. Close invalidates the service. Requested source
 // capacities are kept separate from arena geometric allocation classes.
 type NaturalManager struct {
-	words             *arena.Words
-	divScratch        [4]arena.VectorRef
-	divCapacity       [4]uint32
-	formatScratch     [3]arena.VectorRef
-	formatCapacity    [3]uint32
-	text              *arena.SmallBytes
-	textRef           arena.SmallBytesRef
-	textCapacity      uint32
-	config            arena.VectorConfig
-	budget            *arena.Budget
-	headerBytes       uint64
-	ownsWords, closed bool
+	self                        *NaturalManager
+	runtime                     *memory.Runtime
+	ownsRuntime                 bool
+	division                    [4]sourceLimbBuffer
+	verification                sourceLimbBuffer
+	verificationActive          bool
+	originalCause, cleanupCause error
+	words                       *arena.Words
+	divScratch                  [4]arena.VectorRef
+	divCapacity                 [4]uint32
+	formatScratch               [3]arena.VectorRef
+	formatCapacity              [3]uint32
+	text                        *arena.SmallBytes
+	textRef                     arena.SmallBytesRef
+	textCapacity                uint32
+	config                      arena.VectorConfig
+	budget                      *arena.Budget
+	headerBytes                 uint64
+	ownsWords, closed           bool
 }
 
-// NewNaturalManager charges all cold owner headers and the source four inline
-// 16-limb buffers. Arena pages replace C++ inline storage, changing allocation
-// timing while retaining source requested capacity/doubling policies.
+// NewNaturalManager owns a real memory runtime and the source four inline16
+// buffers. The remaining formatting Words are genuine retained storage until
+// the separate source lexical formatting integration lands.
 func NewNaturalManager(c arena.VectorConfig) (*NaturalManager, error) {
 	words, e := arena.NewWords(c)
 	if e != nil {
 		return nil, e
 	}
 	m, e := newNaturalManager(c, words, true)
-	if e != nil {
+	if e != nil && m == nil {
 		words.Close()
 	}
 	return m, e
 }
 func newNaturalManager(c arena.VectorConfig, words *arena.Words, owns bool) (*NaturalManager, error) {
+	return newNaturalManagerWithMemory(c, words, owns, nil)
+}
+func newNaturalManagerWithMemory(c arena.VectorConfig, words *arena.Words, owns bool, runtime *memory.Runtime) (*NaturalManager, error) {
 	header := uint64(reflect.TypeOf(NaturalManager{}).Size())
 	if e := c.Descriptors.Budget.Reserve(header); e != nil {
 		return nil, e
 	}
-	m := &NaturalManager{words: words, config: c, budget: c.Descriptors.Budget, headerBytes: header, ownsWords: owns}
-	for i := range m.divScratch {
-		r, e := words.Allocate(0, 16)
+	m := &NaturalManager{words: words, config: c, budget: c.Descriptors.Budget, headerBytes: header, ownsWords: owns, runtime: runtime}
+	m.self = m
+	for i := range m.divCapacity {
+		m.divCapacity[i] = 16
+	}
+	if runtime == nil {
+		m.ownsRuntime = true
+		var e error
+		m.runtime, e = memory.NewRuntime(memory.RuntimeConfig{Budget: m.budget, SizeTBits: uint8(32 << (^uint(0) >> 63))})
 		if e != nil {
-			m.Close()
+			m.originalCause = e
+			if cleanup := m.CloseChecked(); cleanup != nil {
+				return nil, m
+			}
 			return nil, e
 		}
-		m.divScratch[i] = r
-		m.divCapacity[i] = 16
 	}
 	return m, nil
 }
+func (m *NaturalManager) RuntimeOwner() *memory.Runtime {
+	if m == nil || m.self != m {
+		return nil
+	}
+	return m.runtime
+}
+func (m *NaturalManager) Error() string { return "mpnum: retained Natural cleanup owner" }
+func (m *NaturalManager) Unwrap() error {
+	if m == nil {
+		return nil
+	}
+	if m.originalCause != nil {
+		return m.originalCause
+	}
+	return m.cleanupCause
+}
+func (m *NaturalManager) OriginalCause() error {
+	if m == nil {
+		return nil
+	}
+	return m.originalCause
+}
+func (m *NaturalManager) CleanupCause() error {
+	if m == nil {
+		return nil
+	}
+	return m.cleanupCause
+}
 func (m *NaturalManager) check() error {
-	if m == nil || m.closed || m.words == nil {
+	if m == nil || m.words == nil {
 		return arena.ErrClosed
+	}
+	if m.self != m {
+		return memory.ErrRuntimeOwner
+	}
+	if m.closed || m.runtime == nil {
+		return arena.ErrClosed
+	}
+	if m.verificationActive {
+		return arena.ErrInvalidSlot
 	}
 	return nil
 }
 func (m *NaturalManager) Close() {
-	if m == nil || m.closed {
+	if m == nil {
 		return
 	}
-	if m.words != nil {
-		for _, r := range m.divScratch {
-			if r != (arena.VectorRef{}) {
-				m.words.Free(r)
+	if e := m.CloseChecked(); e != nil {
+		panic(m)
+	}
+}
+func (m *NaturalManager) CloseChecked() error {
+	if m == nil || m.self != m {
+		return memory.ErrRuntimeOwner
+	}
+	if m.closed {
+		return nil
+	}
+	fail := func(e error) error { m.cleanupCause = e; return e }
+	if m.runtime != nil {
+		if m.verificationActive {
+			if e := m.verification.finalize(m.runtime); e != nil {
+				return fail(e)
+			}
+			m.verificationActive = false
+		}
+		for i := 3; i >= 0; i-- {
+			if e := m.division[i].finalize(m.runtime); e != nil {
+				return fail(e)
 			}
 		}
-		for _, r := range m.formatScratch {
+	}
+	if m.words != nil {
+		for i, r := range m.formatScratch {
 			if r != (arena.VectorRef{}) {
-				m.words.Free(r)
+				if e := m.words.Free(r); e != nil {
+					return fail(e)
+				}
+				m.formatScratch[i] = arena.VectorRef{}
 			}
 		}
 	}
@@ -86,11 +164,16 @@ func (m *NaturalManager) Close() {
 	if m.ownsWords && m.words != nil {
 		m.words.Close()
 	}
-	m.divScratch = [4]arena.VectorRef{}
-	m.formatScratch = [3]arena.VectorRef{}
+	if m.ownsRuntime && m.runtime != nil {
+		if e := m.runtime.Close(); e != nil {
+			return fail(e)
+		}
+	}
 	m.budget.Release(m.headerBytes)
 	m.headerBytes = 0
 	m.closed = true
+	m.cleanupCause = nil
+	return nil
 }
 func sourceCapacity(current, needed uint32) (uint32, error) {
 	if current == 0 {
@@ -127,8 +210,27 @@ func (m *NaturalManager) resizeScratch(ref *arena.VectorRef, capacity *uint32, s
 	return nil
 }
 func (m *NaturalManager) resizeDiv(i int, n uint32) error {
-	return m.resizeScratch(&m.divScratch[i], &m.divCapacity[i], n)
+	if i < 0 || i >= 4 {
+		return arena.ErrBounds
+	}
+	e := m.division[i].resize(m.runtime, n)
+	m.divCapacity[i] = m.division[i].capacity()
+	return e
 }
+func (m *NaturalManager) sourceDivRead(r int, i uint32) uint32 {
+	v, e := m.division[r].read(m.runtime, i)
+	if e != nil {
+		panic(e)
+	}
+	return v
+}
+func (m *NaturalManager) sourceDivWrite(r int, i, v uint32) {
+	if e := m.division[r].write(m.runtime, i, v); e != nil {
+		panic(e)
+	}
+}
+
+// Legacy test diagnostic only. Division never stores Words references.
 func (m *NaturalManager) divRead(r arena.VectorRef, i uint32) uint32 {
 	v, e := m.words.Read(r, i)
 	if e != nil {
@@ -136,8 +238,29 @@ func (m *NaturalManager) divRead(r arena.VectorRef, i uint32) uint32 {
 	}
 	return v
 }
-func (m *NaturalManager) divWrite(r arena.VectorRef, i, v uint32) {
-	if e := m.words.Write(r, i, v); e != nil {
-		panic(e)
+
+// overflowPayloads counts actual live/pending source allocations. Inline16
+// buffers have no physical payload, and released Runtime blocks clear tokens.
+func (m *NaturalManager) overflowPayloads() uint32 {
+	if m == nil || m.self != m || m.closed {
+		return 0
 	}
+	var count uint32
+	for i := range m.division {
+		if m.division[i].raw != (memory.Block{}) {
+			count++
+		}
+		if m.division[i].pending != (memory.Block{}) {
+			count++
+		}
+	}
+	if m.verificationActive {
+		if m.verification.raw != (memory.Block{}) {
+			count++
+		}
+		if m.verification.pending != (memory.Block{}) {
+			count++
+		}
+	}
+	return count
 }

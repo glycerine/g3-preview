@@ -12,6 +12,8 @@ import (
 // No view is persisted in a manager or exposes an arena backing slice.
 type limbView struct {
 	external  []uint32
+	runtime   *memory.Runtime
+	source    *sourceLimbBuffer
 	allocator *memory.SmallAllocator
 	backing   sourceCellBacking
 	words     *arena.Words
@@ -20,6 +22,16 @@ type limbView struct {
 }
 
 func (v limbView) read(i uint32) uint32 {
+	if i >= v.size {
+		panic(arena.ErrBounds)
+	}
+	if v.source != nil {
+		n, e := v.source.read(v.runtime, i)
+		if e != nil {
+			panic(e)
+		}
+		return n
+	}
 	if v.allocator != nil {
 		n, e := v.backing.readWord(v.allocator, 8+4*uint64(i))
 		if e != nil {
@@ -37,6 +49,15 @@ func (v limbView) read(i uint32) uint32 {
 	return n
 }
 func (v limbView) write(i, n uint32) {
+	if i >= v.size {
+		panic(arena.ErrBounds)
+	}
+	if v.source != nil {
+		if e := v.source.write(v.runtime, i, n); e != nil {
+			panic(e)
+		}
+		return
+	}
 	if v.allocator != nil {
 		if e := v.backing.writeWord(v.allocator, 8+4*uint64(i), n); e != nil {
 			panic(e)
@@ -56,7 +77,8 @@ func (v limbView) write(i, n uint32) {
 // panic. len(a)>=len(b), the denominator is normalized/nonzero, q has
 // len(a)-len(b)+1 limbs, and r has len(b). Neither output overlaps an input
 // or the other output. The integer manager stages its own permitted aliases.
-// Predictable scratch failures leave both borrowed outputs unchanged.
+// Source completed output prefixes remain visible when later scratch or debug
+// lexical verification allocations fail.
 func (m *NaturalManager) Div(a, b, q, r []uint32) (bool, error) {
 	if len(b) == 0 || len(a) < len(b) || b[len(b)-1] == 0 || len(q) != len(a)-len(b)+1 || len(r) != len(b) {
 		panic("mpnum: invalid division operands or buffers")
@@ -73,17 +95,43 @@ func (m *NaturalManager) divide(a, b, q, r limbView) (bool, error) {
 		return false, e
 	}
 	na, nb := a.size, b.size
+	// src/util/mpn.cpp:158-168 precedes denominator checks and returns
+	// before the common debug verification. Unsigned underflow is retained;
+	// only each endangered output access is guarded.
+	if na < nb {
+		count := uint64(na) - uint64(nb) + 1
+		if m.runtime.SizeTBits() == 32 {
+			count = uint64(uint32(count))
+		}
+		for i := uint64(0); i < count; i++ {
+			if i >= uint64(q.size) {
+				return false, arena.ErrBounds
+			}
+			q.write(uint32(i), 0)
+		}
+		for i := uint32(0); i < nb; i++ {
+			if i >= r.size {
+				return false, arena.ErrBounds
+			}
+			var v uint32
+			if i < na {
+				v = a.read(i)
+			}
+			r.write(i, v)
+		}
+		return false, nil
+	}
 	if na == 1 && nb == 1 {
 		q.write(0, a.read(0)/b.read(0))
 		r.write(0, a.read(0)%b.read(0))
-		return false, nil
+		return false, m.sourceVerifyDivision(a, b, q, r)
 	}
 	if na == nb && a.read(na-1) < b.read(nb-1) {
 		q.write(0, 0)
 		for i := uint32(0); i < nb; i++ {
 			r.write(i, a.read(i))
 		}
-		return false, nil
+		return false, m.sourceVerifyDivision(a, b, q, r)
 	}
 	if na == math.MaxUint32 {
 		return false, arena.ErrBounds
@@ -98,42 +146,28 @@ func (m *NaturalManager) divide(a, b, q, r limbView) (bool, error) {
 	if e := m.resizeDiv(1, nb); e != nil {
 		return false, e
 	}
-	if nb > 1 {
-		if nb > math.MaxUint32-2 {
-			return false, arena.ErrBounds
-		}
-		if e := m.resizeDiv(2, nb+1); e != nil {
-			return false, e
-		}
-		// Reserve possible add-back before borrowed outputs publish. This may
-		// grow ab on a path that never uses it; arithmetic remains one source
-		// Algorithm D pass. The storage-profile adaptation is documented.
-		if e := m.resizeDiv(3, nb+2); e != nil {
-			return false, e
-		}
-	}
-	u, v := m.divScratch[0], m.divScratch[1]
+	u, v := 0, 1
 	if d == 0 {
-		m.divWrite(u, na, 0)
+		m.sourceDivWrite(u, na, 0)
 		for i := uint32(0); i < na; i++ {
-			m.divWrite(u, i, a.read(i))
+			m.sourceDivWrite(u, i, a.read(i))
 		}
 		for i := uint32(0); i < nb; i++ {
-			m.divWrite(v, i, b.read(i))
+			m.sourceDivWrite(v, i, b.read(i))
 		}
 	} else {
-		m.divWrite(u, na, a.read(na-1)>>(32-d))
+		m.sourceDivWrite(u, na, a.read(na-1)>>(32-d))
 		for i := na - 1; i > 0; i-- {
-			m.divWrite(u, i, a.read(i)<<d|a.read(i-1)>>(32-d))
+			m.sourceDivWrite(u, i, a.read(i)<<d|a.read(i-1)>>(32-d))
 		}
-		m.divWrite(u, 0, a.read(0)<<d)
+		m.sourceDivWrite(u, 0, a.read(0)<<d)
 		for i := nb - 1; i > 0; i-- {
-			m.divWrite(v, i, b.read(i)<<d|b.read(i-1)>>(32-d))
+			m.sourceDivWrite(v, i, b.read(i)<<d|b.read(i-1)>>(32-d))
 		}
-		m.divWrite(v, 0, b.read(0)<<d)
+		m.sourceDivWrite(v, 0, b.read(0)<<d)
 	}
 	if nb == 1 {
-		divideViewOne(limbView{words: m.words, ref: u, size: na + 1}, m.divRead(v, 0), q)
+		divideViewOne(limbView{runtime: m.runtime, source: &m.division[u], size: na + 1}, m.sourceDivRead(v, 0), q)
 	} else {
 		if e := m.divideMany(na+1, nb, q); e != nil {
 			return false, e
@@ -141,16 +175,16 @@ func (m *NaturalManager) divide(a, b, q, r limbView) (bool, error) {
 	}
 	if d == 0 {
 		for i := uint32(0); i < nb; i++ {
-			r.write(i, m.divRead(u, i))
+			r.write(i, m.sourceDivRead(u, i))
 		}
 	} else {
 		mask := uint32(1)<<d - 1
 		for i := uint32(0); i+1 < nb; i++ {
-			r.write(i, m.divRead(u, i)>>d|(m.divRead(u, i+1)&mask)<<(32-d))
+			r.write(i, m.sourceDivRead(u, i)>>d|(m.sourceDivRead(u, i+1)&mask)<<(32-d))
 		}
-		r.write(nb-1, m.divRead(u, nb-1)>>d)
+		r.write(nb-1, m.sourceDivRead(u, nb-1)>>d)
 	}
-	return true, nil
+	return true, m.sourceVerifyDivision(a, b, q, r)
 }
 func divideViewOne(a limbView, b uint32, q limbView) {
 	denom := uint64(b)
@@ -181,20 +215,20 @@ func (m *NaturalManager) divideMany(size, n uint32, q limbView) error {
 	if e := m.resizeDiv(2, n+1); e != nil {
 		return e
 	}
-	u, v, ms := m.divScratch[0], m.divScratch[1], m.divScratch[2]
+	u, v, ms := 0, 1, 2
 	count := size - n
 	const base = uint64(1) << 32
 	for remaining := count; remaining > 0; remaining-- {
 		j := remaining - 1
-		temp := uint64(m.divRead(u, j+n))<<32 | uint64(m.divRead(u, j+n-1))
-		qh := temp / uint64(m.divRead(v, n-1))
-		rh := temp % uint64(m.divRead(v, n-1))
+		temp := uint64(m.sourceDivRead(u, j+n))<<32 | uint64(m.sourceDivRead(u, j+n-1))
+		qh := temp / uint64(m.sourceDivRead(v, n-1))
+		rh := temp % uint64(m.sourceDivRead(v, n-1))
 		for {
-			if qh < base && qh*uint64(m.divRead(v, n-2)) <= (rh<<32)+uint64(m.divRead(u, j+n-2)) {
+			if qh < base && qh*uint64(m.sourceDivRead(v, n-2)) <= (rh<<32)+uint64(m.sourceDivRead(u, j+n-2)) {
 				break
 			}
 			qh--
-			rh += uint64(m.divRead(v, n-1))
+			rh += uint64(m.sourceDivRead(v, n-1))
 			if rh >= base {
 				break
 			}
@@ -204,25 +238,25 @@ func (m *NaturalManager) divideMany(size, n uint32, q limbView) error {
 		}
 		small := uint32(qh)
 		// Source mul(&small,1,v,n,ms), Algorithm M with the zero-digit branch.
-		m.divWrite(ms, 0, 0)
+		m.sourceDivWrite(ms, 0, 0)
 		for i := uint32(0); i < n; i++ {
-			digit := m.divRead(v, i)
+			digit := m.sourceDivRead(v, i)
 			if digit == 0 {
-				m.divWrite(ms, i+1, 0)
+				m.sourceDivWrite(ms, i+1, 0)
 				continue
 			}
-			t := uint64(small)*uint64(digit) + uint64(m.divRead(ms, i))
-			m.divWrite(ms, i, uint32(t))
-			m.divWrite(ms, i+1, uint32(t>>32))
+			t := uint64(small)*uint64(digit) + uint64(m.sourceDivRead(ms, i))
+			m.sourceDivWrite(ms, i, uint32(t))
+			m.sourceDivWrite(ms, i+1, uint32(t>>32))
 		}
 		var borrow uint32
 		for i := uint32(0); i < n+1; i++ {
-			a, b := m.divRead(u, j+i), m.divRead(ms, i)
+			a, b := m.sourceDivRead(u, j+i), m.sourceDivRead(ms, i)
 			r := a - b
 			c1 := r > a
 			out := r - borrow
 			c2 := out > r
-			m.divWrite(u, j+i, out)
+			m.sourceDivWrite(u, j+i, out)
 			borrow = 0
 			if c1 || c2 {
 				borrow = 1
@@ -234,27 +268,27 @@ func (m *NaturalManager) divideMany(size, n uint32, q limbView) error {
 			if e := m.resizeDiv(3, n+2); e != nil {
 				return e
 			}
-			ab := m.divScratch[3]
+			ab := 3
 			var carry uint32
 			for i := uint32(0); i < n+1; i++ {
 				a := uint32(0)
 				if i < n {
-					a = m.divRead(v, i)
+					a = m.sourceDivRead(v, i)
 				}
-				b := m.divRead(u, j+i)
+				b := m.sourceDivRead(u, j+i)
 				r := a + b
 				c1 := r < a
 				out := r + carry
 				c2 := out < r
-				m.divWrite(ab, i, out)
+				m.sourceDivWrite(ab, i, out)
 				carry = 0
 				if c1 || c2 {
 					carry = 1
 				}
 			}
-			m.divWrite(ab, n+1, carry)
+			m.sourceDivWrite(ab, n+1, carry)
 			for i := uint32(0); i < n+1; i++ {
-				m.divWrite(u, j+i, m.divRead(ab, i))
+				m.sourceDivWrite(u, j+i, m.sourceDivRead(ab, i))
 			}
 		}
 	}
