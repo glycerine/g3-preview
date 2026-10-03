@@ -741,3 +741,14 @@ finite byte output, owner provenance/lifetime and unchanged borrowed budgets.
 No source ENSURE assertions are invented. Full native/checked-debug, named race
 and actual JS, vet/WASI/source-no-generics gates passed. See SORT_SIZE_PORT_STATUS.md.
 ast.h/.cpp remain partial for all other AST nodes, managers and plugins.
+
+## Concrete persistent integer arrays
+
+Both source int32 root policies now use real ROOT/SET/PUSH/POP trails, reversals,
+materialization and RC30 ownership. Tests began missing-API RED and retain all712
+registered int32 ENSURE executions, plus independent version and graph oracles.
+Fifteen groups preserve defined failure prefixes and the proven source PUSH
+inverse index defect; review-driven RED added checked physical host bounds.
+Integrated full native/checked-debug, race/actual JS, vet/WASI and no-generics
+gates passed. Actual AST/dependency/bound callbacks, the real AST million-update
+test and automatic source diagnostics remain open. See PARRAY_PORT_STATUS.md.

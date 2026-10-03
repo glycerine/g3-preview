@@ -80824,9 +80824,27 @@
       "sha256": "e5f59ddfc5bc172cfaf3bb5e86e9e8bbff6a39e5998a727e3fed6548285e4fc2",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_parray_test.go"
+      ],
+      "tests": [
+        "TestPArraySource712Assertions",
+        "TestPArrayIndependentVersionOracle",
+        "TestPArrayRootTrailOwnershipAndWidths",
+        "TestPArrayLifetimeCapacityAndWarmPlateau",
+        "TestPArrayPredictableFailurePrefixes",
+        "TestPArrayInvalidAndDisplay",
+        "TestPArraySourcePushRerootOffByOne",
+        "TestPArrayUnaffectedRerootRoutesBothPolicies",
+        "TestPArraySourcePushRerootDefectPreservedWithRootPolicy",
+        "TestPArrayMaterializationAndRerootFailureGraphs",
+        "TestPArrayStrictThresholdsAndRetainedSlots",
+        "TestPArrayMkFailureClearsReleasedOutput",
+        "TestPArrayDisplayPrefixFaultAndBorrowedAllocationBounds",
+        "TestPArrayNilOutputChecks",
+        "TestPArrayFormatHostBoundsWithoutAllocation"
+      ],
       "conditionals": [
         {
           "line": 230,
@@ -80971,11 +80989,48 @@
           "text": "ENSURE(m.get(a3, 18) == 40);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "active tst1 both preserve-root policies, 15 ENSURE executions per policy",
+          "status": "ported",
+          "go_target": "util_parray_test.go",
+          "tests": [
+            "TestPArraySource712Assertions"
+          ]
+        },
+        {
+          "name": "active tst2 both preserve-root policies, 213 ENSURE executions per policy",
+          "status": "ported",
+          "go_target": "util_parray_test.go",
+          "tests": [
+            "TestPArraySource712Assertions"
+          ]
+        },
+        {
+          "name": "active tst3 both preserve-root policies, 128 ENSURE executions per policy",
+          "status": "ported",
+          "go_target": "util_parray_test.go",
+          "tests": [
+            "TestPArraySource712Assertions"
+          ]
+        },
+        {
+          "name": "active tst5 real AST 100 variables and 1000000 updates, zero ENSURE, process memory output",
+          "status": "unported"
+        },
+        {
+          "name": "disabled #if0 old expression configuration/tst4 and diagnostic trace profiles",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Source refs use explicit Copy/Del and both int32 policies; 712 exact active ENSURE executions preserve short-circuit routes. Independent graph oracle counts caller refs+edges, unique cells/blocks and physical charges immediately before cleanup. Actual AST stress requires its genuine owner/callbacks. See PARRAY_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Independent mathematical version oracle excludes only the documented source defective PUSH reroot by materialization; exact source-defect and unaffected reroot regressions remain active in both policies. No AST million-update or machine-memory-output claim is inferred from int32 coverage."
+      ]
     },
     {
       "path": "src/test/pb2bv.cpp",
@@ -103660,9 +103715,27 @@
       "sha256": "ab7e68860d0ef09daa8beb170ff93fd5bc1faa3ad13c27fe9503bd4a2611d5eb",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_parray.go"
+      ],
+      "tests": [
+        "TestPArraySource712Assertions",
+        "TestPArrayIndependentVersionOracle",
+        "TestPArrayRootTrailOwnershipAndWidths",
+        "TestPArrayLifetimeCapacityAndWarmPlateau",
+        "TestPArrayPredictableFailurePrefixes",
+        "TestPArrayInvalidAndDisplay",
+        "TestPArraySourcePushRerootOffByOne",
+        "TestPArrayUnaffectedRerootRoutesBothPolicies",
+        "TestPArraySourcePushRerootDefectPreservedWithRootPolicy",
+        "TestPArrayMaterializationAndRerootFailureGraphs",
+        "TestPArrayStrictThresholdsAndRetainedSlots",
+        "TestPArrayMkFailureClearsReleasedOutput",
+        "TestPArrayDisplayPrefixFaultAndBorrowedAllocationBounds",
+        "TestPArrayNilOutputChecks",
+        "TestPArrayFormatHostBoundsWithoutAllocation"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -103867,11 +103940,250 @@
           "text": "SASSERT(r.root());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "concrete int32 manager/ref construction, allocator encoding and ownership",
+          "status": "ported",
+          "go_target": "util_parray.go",
+          "tests": [
+            "TestPArraySource712Assertions",
+            "TestPArrayIndependentVersionOracle",
+            "TestPArrayRootTrailOwnershipAndWidths",
+            "TestPArrayLifetimeCapacityAndWarmPlateau",
+            "TestPArrayPredictableFailurePrefixes",
+            "TestPArrayInvalidAndDisplay",
+            "TestPArraySourcePushRerootOffByOne",
+            "TestPArrayUnaffectedRerootRoutesBothPolicies",
+            "TestPArraySourcePushRerootDefectPreservedWithRootPolicy",
+            "TestPArrayMaterializationAndRerootFailureGraphs",
+            "TestPArrayStrictThresholdsAndRetainedSlots",
+            "TestPArrayMkFailureClearsReleasedOutput",
+            "TestPArrayDisplayPrefixFaultAndBorrowedAllocationBounds",
+            "TestPArrayNilOutputChecks",
+            "TestPArrayFormatHostBoundsWithoutAllocation"
+          ]
+        },
+        {
+          "name": "allocate/deallocate values, capacity, source 0/2/3/5/8 growth and full-capacity copying",
+          "status": "ported",
+          "go_target": "util_parray.go",
+          "tests": [
+            "TestPArraySource712Assertions",
+            "TestPArrayIndependentVersionOracle",
+            "TestPArrayRootTrailOwnershipAndWidths",
+            "TestPArrayLifetimeCapacityAndWarmPlateau",
+            "TestPArrayPredictableFailurePrefixes",
+            "TestPArrayInvalidAndDisplay",
+            "TestPArraySourcePushRerootOffByOne",
+            "TestPArrayUnaffectedRerootRoutesBothPolicies",
+            "TestPArraySourcePushRerootDefectPreservedWithRootPolicy",
+            "TestPArrayMaterializationAndRerootFailureGraphs",
+            "TestPArrayStrictThresholdsAndRetainedSlots",
+            "TestPArrayMkFailureClearsReleasedOutput",
+            "TestPArrayDisplayPrefixFaultAndBorrowedAllocationBounds",
+            "TestPArrayNilOutputChecks",
+            "TestPArrayFormatHostBoundsWithoutAllocation"
+          ]
+        },
+        {
+          "name": "cell mk/del/inc/dec source 30-bit reference counter and iterative cleanup",
+          "status": "ported",
+          "go_target": "util_parray.go",
+          "tests": [
+            "TestPArraySource712Assertions",
+            "TestPArrayIndependentVersionOracle",
+            "TestPArrayRootTrailOwnershipAndWidths",
+            "TestPArrayLifetimeCapacityAndWarmPlateau",
+            "TestPArrayPredictableFailurePrefixes",
+            "TestPArrayInvalidAndDisplay",
+            "TestPArraySourcePushRerootOffByOne",
+            "TestPArrayUnaffectedRerootRoutesBothPolicies",
+            "TestPArraySourcePushRerootDefectPreservedWithRootPolicy",
+            "TestPArrayMaterializationAndRerootFailureGraphs",
+            "TestPArrayStrictThresholdsAndRetainedSlots",
+            "TestPArrayMkFailureClearsReleasedOutput",
+            "TestPArrayDisplayPrefixFaultAndBorrowedAllocationBounds",
+            "TestPArrayNilOutputChecks",
+            "TestPArrayFormatHostBoundsWithoutAllocation"
+          ]
+        },
+        {
+          "name": "rset/rpush_back/rpop_back and suppressed int32 value callbacks",
+          "status": "ported",
+          "go_target": "util_parray.go",
+          "tests": [
+            "TestPArraySource712Assertions",
+            "TestPArrayIndependentVersionOracle",
+            "TestPArrayRootTrailOwnershipAndWidths",
+            "TestPArrayLifetimeCapacityAndWarmPlateau",
+            "TestPArrayPredictableFailurePrefixes",
+            "TestPArrayInvalidAndDisplay",
+            "TestPArraySourcePushRerootOffByOne",
+            "TestPArrayUnaffectedRerootRoutesBothPolicies",
+            "TestPArraySourcePushRerootDefectPreservedWithRootPolicy",
+            "TestPArrayMaterializationAndRerootFailureGraphs",
+            "TestPArrayStrictThresholdsAndRetainedSlots",
+            "TestPArrayMkFailureClearsReleasedOutput",
+            "TestPArrayDisplayPrefixFaultAndBorrowedAllocationBounds",
+            "TestPArrayNilOutputChecks",
+            "TestPArrayFormatHostBoundsWithoutAllocation"
+          ]
+        },
+        {
+          "name": "mk/del/copy including self retain-before-release and update counter reset",
+          "status": "ported",
+          "go_target": "util_parray.go",
+          "tests": [
+            "TestPArraySource712Assertions",
+            "TestPArrayIndependentVersionOracle",
+            "TestPArrayRootTrailOwnershipAndWidths",
+            "TestPArrayLifetimeCapacityAndWarmPlateau",
+            "TestPArrayPredictableFailurePrefixes",
+            "TestPArrayInvalidAndDisplay",
+            "TestPArraySourcePushRerootOffByOne",
+            "TestPArrayUnaffectedRerootRoutesBothPolicies",
+            "TestPArraySourcePushRerootDefectPreservedWithRootPolicy",
+            "TestPArrayMaterializationAndRerootFailureGraphs",
+            "TestPArrayStrictThresholdsAndRetainedSlots",
+            "TestPArrayMkFailureClearsReleasedOutput",
+            "TestPArrayDisplayPrefixFaultAndBorrowedAllocationBounds",
+            "TestPArrayNilOutputChecks",
+            "TestPArrayFormatHostBoundsWithoutAllocation"
+          ]
+        },
+        {
+          "name": "size/empty and mutable get strict trail threshold8",
+          "status": "ported",
+          "go_target": "util_parray.go",
+          "tests": [
+            "TestPArraySource712Assertions",
+            "TestPArrayIndependentVersionOracle",
+            "TestPArrayRootTrailOwnershipAndWidths",
+            "TestPArrayLifetimeCapacityAndWarmPlateau",
+            "TestPArrayPredictableFailurePrefixes",
+            "TestPArrayInvalidAndDisplay",
+            "TestPArraySourcePushRerootOffByOne",
+            "TestPArrayUnaffectedRerootRoutesBothPolicies",
+            "TestPArraySourcePushRerootDefectPreservedWithRootPolicy",
+            "TestPArrayMaterializationAndRerootFailureGraphs",
+            "TestPArrayStrictThresholdsAndRetainedSlots",
+            "TestPArrayMkFailureClearsReleasedOutput",
+            "TestPArrayDisplayPrefixFaultAndBorrowedAllocationBounds",
+            "TestPArrayNilOutputChecks",
+            "TestPArrayFormatHostBoundsWithoutAllocation"
+          ]
+        },
+        {
+          "name": "set/push_back/pop_back scalar and From alias overloads, shared-root inverse publication",
+          "status": "ported",
+          "go_target": "util_parray.go",
+          "tests": [
+            "TestPArraySource712Assertions",
+            "TestPArrayIndependentVersionOracle",
+            "TestPArrayRootTrailOwnershipAndWidths",
+            "TestPArrayLifetimeCapacityAndWarmPlateau",
+            "TestPArrayPredictableFailurePrefixes",
+            "TestPArrayInvalidAndDisplay",
+            "TestPArraySourcePushRerootOffByOne",
+            "TestPArrayUnaffectedRerootRoutesBothPolicies",
+            "TestPArraySourcePushRerootDefectPreservedWithRootPolicy",
+            "TestPArrayMaterializationAndRerootFailureGraphs",
+            "TestPArrayStrictThresholdsAndRetainedSlots",
+            "TestPArrayMkFailureClearsReleasedOutput",
+            "TestPArrayDisplayPrefixFaultAndBorrowedAllocationBounds",
+            "TestPArrayNilOutputChecks",
+            "TestPArrayFormatHostBoundsWithoutAllocation"
+          ]
+        },
+        {
+          "name": "copy_values/get_values source replay and materialization",
+          "status": "ported",
+          "go_target": "util_parray.go",
+          "tests": [
+            "TestPArraySource712Assertions",
+            "TestPArrayIndependentVersionOracle",
+            "TestPArrayRootTrailOwnershipAndWidths",
+            "TestPArrayLifetimeCapacityAndWarmPlateau",
+            "TestPArrayPredictableFailurePrefixes",
+            "TestPArrayInvalidAndDisplay",
+            "TestPArraySourcePushRerootOffByOne",
+            "TestPArrayUnaffectedRerootRoutesBothPolicies",
+            "TestPArraySourcePushRerootDefectPreservedWithRootPolicy",
+            "TestPArrayMaterializationAndRerootFailureGraphs",
+            "TestPArrayStrictThresholdsAndRetainedSlots",
+            "TestPArrayMkFailureClearsReleasedOutput",
+            "TestPArrayDisplayPrefixFaultAndBorrowedAllocationBounds",
+            "TestPArrayNilOutputChecks",
+            "TestPArrayFormatHostBoundsWithoutAllocation"
+          ]
+        },
+        {
+          "name": "unshare/unfold/reroot source trail reversals and preserved PUSH inverse index defect",
+          "status": "ported",
+          "go_target": "util_parray.go",
+          "tests": [
+            "TestPArraySource712Assertions",
+            "TestPArrayIndependentVersionOracle",
+            "TestPArrayRootTrailOwnershipAndWidths",
+            "TestPArrayLifetimeCapacityAndWarmPlateau",
+            "TestPArrayPredictableFailurePrefixes",
+            "TestPArrayInvalidAndDisplay",
+            "TestPArraySourcePushRerootOffByOne",
+            "TestPArrayUnaffectedRerootRoutesBothPolicies",
+            "TestPArraySourcePushRerootDefectPreservedWithRootPolicy",
+            "TestPArrayMaterializationAndRerootFailureGraphs",
+            "TestPArrayStrictThresholdsAndRetainedSlots",
+            "TestPArrayMkFailureClearsReleasedOutput",
+            "TestPArrayDisplayPrefixFaultAndBorrowedAllocationBounds",
+            "TestPArrayNilOutputChecks",
+            "TestPArrayFormatHostBoundsWithoutAllocation"
+          ]
+        },
+        {
+          "name": "display_info source structure with scalar identity and budgeted host-bounded prefix output",
+          "status": "ported",
+          "go_target": "util_parray.go",
+          "tests": [
+            "TestPArraySource712Assertions",
+            "TestPArrayIndependentVersionOracle",
+            "TestPArrayRootTrailOwnershipAndWidths",
+            "TestPArrayLifetimeCapacityAndWarmPlateau",
+            "TestPArrayPredictableFailurePrefixes",
+            "TestPArrayInvalidAndDisplay",
+            "TestPArraySourcePushRerootOffByOne",
+            "TestPArrayUnaffectedRerootRoutesBothPolicies",
+            "TestPArraySourcePushRerootDefectPreservedWithRootPolicy",
+            "TestPArrayMaterializationAndRerootFailureGraphs",
+            "TestPArrayStrictThresholdsAndRetainedSlots",
+            "TestPArrayMkFailureClearsReleasedOutput",
+            "TestPArrayDisplayPrefixFaultAndBorrowedAllocationBounds",
+            "TestPArrayNilOutputChecks",
+            "TestPArrayFormatHostBoundsWithoutAllocation"
+          ]
+        },
+        {
+          "name": "manager() borrowed dummy value-manager identity accessor; int32 callback object not exposed by Go configuration adapter",
+          "status": "partial"
+        },
+        {
+          "name": "automatic source SASSERT/TRACE diagnostic routing and machine-address rendering",
+          "status": "unported"
+        },
+        {
+          "name": "real AST expression/dependency callbacks, subpaving bounds and other template configurations",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Borrowed real SmallBytes allocator plus explicit shared-budget lifetime contract. Fixed pointer-free encoded cells and full-capacity value blocks including actual source size_t header charged by allocator; cold manager/scratch charged once separately. RC30, source publication/destruction order and immediate unique graph/physical quota oracles preserved. Close requires liveCells0 and never closes allocator. See PARRAY_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Source invalid null/bounds/reference access has typed guards. Mk clears a destroyed output on failed replacement; PUSH reroot preflights payload growth before unsafe ROOT-to-POP retag. Defined update-counter/From/firstPush/sharedPush/scratch prefixes remain observable.",
+        "Source finite PUSH reroot inverse index defect preserved with mathematical-vs-source fixtures in both policies; independent version oracle materializes before only that defective route. Scalar slot/generation replaces pointer display; temporary formatting bytes and overlap charged, actual host-int representability checked.",
+        "Int32 source configuration suppresses every value retain/release callback. No fake AST/value-manager callback service is provided; the source dummy-manager identity accessor is an explicit configuration adaptation, and real callback specializations remain open."
+      ]
     },
     {
       "path": "src/util/permutation.cpp",

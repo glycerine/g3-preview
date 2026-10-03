@@ -132,3 +132,15 @@ RationalService IsUint64 then Uint64 calls preserve source classification;
 negative, fractional and too-large inputs become very-big without an invented
 cardinality domain check. No mutable owner/header or fake AST manager is added.
 See SORT_SIZE_PORT_STATUS.md.
+
+### Persistent-array ownership and unsafe source continuations
+
+Actual SmallBytes owns encoded scalar cells/value blocks with source capacity
+headers; a separate cold manager owns only its header and retained scratch.
+Mk clears its destroyed caller output on replacement failure. PUSH reroot
+preflights growth before the source unsafe union retag; all defined publication
+prefixes remain. The finite PUSH inverse index defect is retained explicitly.
+Scalar identities replace machine addresses in budgeted prefix rendering with
+host-int bounds. Int32 suppressed callbacks expose no invented value service;
+actual AST/dependency/bound callbacks and diagnostics remain open.
+See PARRAY_PORT_STATUS.md.
