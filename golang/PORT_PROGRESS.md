@@ -1268,3 +1268,15 @@ WASI and source/no-generics gates. Coordinator independently checked every
 ordered metadata row against actual C++ collector bodies. See
 GPARAMS_CATALOG_PORT_STATUS.md. Generated value accessors and full runtime
 initializers/alternative catalog selections remain open. Ledger33ported/140partial/1929unported; full solver/proof/interpolation remains required.
+
+
+## Actual lazy clause-use-list compression
+
+Source lazy list methods and lexical iterator compression now use actual
+clause vectors and removed-flag reads. Tests-first coverage preserves captured
+counts with current backing, Begin writes, partial iterator cleanup, current
+assignment bindings and release unsigned counter bodies. Two frozen Go files
+passed full native/debug and twenty exact race/actual JS groups, vet, WASI
+and source/no-generics checks. See SAT_SOLVER_CLAUSE_USE_LIST_PORT_STATUS.md.
+Implicit moves/nonlazy/TRACE and complete solver remain open. Sourcecpp/h
+become partial; ledger33ported/142partial/1927unported.

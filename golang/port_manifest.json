@@ -51350,9 +51350,32 @@
       "sha256": "97f55406648121cc4e0ed7ebfc53f085171e5e261776c3fd424233328e6fcf65",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_solver_clause_use_list.go"
+      ],
+      "tests": [
+        "TestSATClauseUseListActualColdAndGrowthPeakCharges",
+        "TestSATClauseUseListAtEndScalarAfterVectorClose",
+        "TestSATClauseUseListBeginConsumeAndDestructorCompletion",
+        "TestSATClauseUseListCloneReservationSweep",
+        "TestSATClauseUseListConstructCloneAssignFailureAccounting",
+        "TestSATClauseUseListEverySourceAssertionSite",
+        "TestSATClauseUseListFiniteIndependentStableCompaction",
+        "TestSATClauseUseListImplicitAssignmentCurrentVectorAndRealBindings",
+        "TestSATClauseUseListInsertEraseNotRemovedReset",
+        "TestSATClauseUseListInsertGrowthFailureAndWarmIteratorNoAllocation",
+        "TestSATClauseUseListIteratorCurrentBackingAfterGrowth",
+        "TestSATClauseUseListIteratorCurrentLogicalDebugRetainedRelease",
+        "TestSATClauseUseListIteratorFollowsVectorSwap",
+        "TestSATClauseUseListIteratorPhysicalBoundAndClosedOwner",
+        "TestSATClauseUseListLazyEraseAndUnsignedUnderflow",
+        "TestSATClauseUseListNextRemovedAssertionAndCurrentCopy",
+        "TestSATClauseUseListPartialIterationFinishesAndAllRemoved",
+        "TestSATClauseUseListPayloadFailurePrefixAndReleaseInvariantTraversal",
+        "TestSATClauseUseListSourceDebugPreconditionsAndReleaseBodies",
+        "TestSATClauseUseListSourceReadThenWriteAndResetRefusalPrefixes"
+      ],
       "conditionals": [
         {
           "line": 25,
@@ -51387,18 +51410,73 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "complete selected LAZY_USE_LIST explicit methods/iterator compression/destruction and legal implicit copy routes",
+          "status": "ported",
+          "go_target": "sat_solver_clause_use_list.go",
+          "tests": [
+            "TestSATClauseUseListActualColdAndGrowthPeakCharges",
+            "TestSATClauseUseListAtEndScalarAfterVectorClose",
+            "TestSATClauseUseListBeginConsumeAndDestructorCompletion",
+            "TestSATClauseUseListCloneReservationSweep",
+            "TestSATClauseUseListConstructCloneAssignFailureAccounting",
+            "TestSATClauseUseListEverySourceAssertionSite",
+            "TestSATClauseUseListFiniteIndependentStableCompaction",
+            "TestSATClauseUseListImplicitAssignmentCurrentVectorAndRealBindings",
+            "TestSATClauseUseListInsertEraseNotRemovedReset",
+            "TestSATClauseUseListInsertGrowthFailureAndWarmIteratorNoAllocation",
+            "TestSATClauseUseListIteratorCurrentBackingAfterGrowth",
+            "TestSATClauseUseListIteratorCurrentLogicalDebugRetainedRelease",
+            "TestSATClauseUseListIteratorFollowsVectorSwap",
+            "TestSATClauseUseListIteratorPhysicalBoundAndClosedOwner",
+            "TestSATClauseUseListLazyEraseAndUnsignedUnderflow",
+            "TestSATClauseUseListNextRemovedAssertionAndCurrentCopy",
+            "TestSATClauseUseListPartialIterationFinishesAndAllRemoved",
+            "TestSATClauseUseListPayloadFailurePrefixAndReleaseInvariantTraversal",
+            "TestSATClauseUseListSourceDebugPreconditionsAndReleaseBodies",
+            "TestSATClauseUseListSourceReadThenWriteAndResetRefusalPrefixes"
+          ]
+        }
+      ],
+      "ownership": [
+        "Charged concrete cold list owns actual clause vector and borrows real clause allocators. By-value iterator borrows current vector object, captures only scalar count/indexes and preserves actual read/write/callback prefixes; see SAT_SOLVER_CLAUSE_USE_LIST_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Explicit iterator Close and owner lifetime guards. Implicit moves, inactive nonlazy branch, STRACE and full solver consumers remain open."
+      ]
     },
     {
       "path": "src/sat/sat_clause_use_list.h",
       "sha256": "b2b968c1172f8c93495b2b4ce773b669dcae05314f5416c39842350efd641bc6",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_solver_clause_use_list.go"
+      ],
+      "tests": [
+        "TestSATClauseUseListActualColdAndGrowthPeakCharges",
+        "TestSATClauseUseListAtEndScalarAfterVectorClose",
+        "TestSATClauseUseListBeginConsumeAndDestructorCompletion",
+        "TestSATClauseUseListCloneReservationSweep",
+        "TestSATClauseUseListConstructCloneAssignFailureAccounting",
+        "TestSATClauseUseListEverySourceAssertionSite",
+        "TestSATClauseUseListFiniteIndependentStableCompaction",
+        "TestSATClauseUseListImplicitAssignmentCurrentVectorAndRealBindings",
+        "TestSATClauseUseListInsertEraseNotRemovedReset",
+        "TestSATClauseUseListInsertGrowthFailureAndWarmIteratorNoAllocation",
+        "TestSATClauseUseListIteratorCurrentBackingAfterGrowth",
+        "TestSATClauseUseListIteratorCurrentLogicalDebugRetainedRelease",
+        "TestSATClauseUseListIteratorFollowsVectorSwap",
+        "TestSATClauseUseListIteratorPhysicalBoundAndClosedOwner",
+        "TestSATClauseUseListLazyEraseAndUnsignedUnderflow",
+        "TestSATClauseUseListNextRemovedAssertionAndCurrentCopy",
+        "TestSATClauseUseListPartialIterationFinishesAndAllRemoved",
+        "TestSATClauseUseListPayloadFailurePrefixAndReleaseInvariantTraversal",
+        "TestSATClauseUseListSourceDebugPreconditionsAndReleaseBodies",
+        "TestSATClauseUseListSourceReadThenWriteAndResetRefusalPrefixes"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -51541,9 +51619,41 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "complete selected LAZY_USE_LIST explicit methods/iterator compression/destruction and legal implicit copy routes",
+          "status": "ported",
+          "go_target": "sat_solver_clause_use_list.go",
+          "tests": [
+            "TestSATClauseUseListActualColdAndGrowthPeakCharges",
+            "TestSATClauseUseListAtEndScalarAfterVectorClose",
+            "TestSATClauseUseListBeginConsumeAndDestructorCompletion",
+            "TestSATClauseUseListCloneReservationSweep",
+            "TestSATClauseUseListConstructCloneAssignFailureAccounting",
+            "TestSATClauseUseListEverySourceAssertionSite",
+            "TestSATClauseUseListFiniteIndependentStableCompaction",
+            "TestSATClauseUseListImplicitAssignmentCurrentVectorAndRealBindings",
+            "TestSATClauseUseListInsertEraseNotRemovedReset",
+            "TestSATClauseUseListInsertGrowthFailureAndWarmIteratorNoAllocation",
+            "TestSATClauseUseListIteratorCurrentBackingAfterGrowth",
+            "TestSATClauseUseListIteratorCurrentLogicalDebugRetainedRelease",
+            "TestSATClauseUseListIteratorFollowsVectorSwap",
+            "TestSATClauseUseListIteratorPhysicalBoundAndClosedOwner",
+            "TestSATClauseUseListLazyEraseAndUnsignedUnderflow",
+            "TestSATClauseUseListNextRemovedAssertionAndCurrentCopy",
+            "TestSATClauseUseListPartialIterationFinishesAndAllRemoved",
+            "TestSATClauseUseListPayloadFailurePrefixAndReleaseInvariantTraversal",
+            "TestSATClauseUseListSourceDebugPreconditionsAndReleaseBodies",
+            "TestSATClauseUseListSourceReadThenWriteAndResetRefusalPrefixes"
+          ]
+        }
+      ],
+      "ownership": [
+        "Charged concrete cold list owns actual clause vector and borrows real clause allocators. By-value iterator borrows current vector object, captures only scalar count/indexes and preserves actual read/write/callback prefixes; see SAT_SOLVER_CLAUSE_USE_LIST_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Explicit iterator Close and owner lifetime guards. Implicit moves, inactive nonlazy branch, STRACE and full solver consumers remain open."
+      ]
     },
     {
       "path": "src/sat/sat_cleaner.cpp",
