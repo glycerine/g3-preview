@@ -590,3 +590,12 @@ and output allocation checks. Debug alias assertions are tested alongside the
 source release prefixes. See RATIONAL_FACADE_EXTRA_PORT_STATUS.md.
 The rational.h active unit is complete; raw-manager conditionals and full solver
 requirements are not inferred complete from this facade.
+
+## Concrete infinity-and-epsilon numeral
+
+The sole actual inf_eps_rational<inf_rational> specialization now has a complete
+concrete triple representation and owned service API. Eleven tests began RED
+and cover independent finite triple arithmetic, the mixed equality defect,
+nonsaturating infinity, component publication/destruction, source returned
+copies, fault roots and one final caller string allocation. No absent source
+numeric assertion registration is invented. See INF_EPS_RATIONAL_PORT_STATUS.md.

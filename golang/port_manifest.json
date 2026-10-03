@@ -87771,9 +87771,23 @@
       "sha256": "820b5ed5288b4154315abc8b858fd9d198749d0dd0e8ed416b155f4e39e19998",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "mpnum/inf_eps_rational.go"
+      ],
+      "tests": [
+        "TestInfEpsInfFiniteTripleOracles",
+        "TestInfEpsInfSourceQuirksAndHeader",
+        "TestInfEpsInfConstantsPredicatesAndMixedRoutes",
+        "TestInfEpsInfLifetimeAndDomain",
+        "TestInfEpsInfFailurePrefixesImmediateRoots",
+        "TestInfEpsInfAliasesCancellationAndAssignmentPrefix",
+        "TestInfEpsInfDestructorReverseMemberOrder",
+        "TestInfEpsInfStructuralEqualityAndReturnCopy",
+        "TestInfEpsInfPointerFreeWarmPaths",
+        "TestInfEpsInfFormattingOneFinalAllocation",
+        "TestInfEpsInfConstructorSignedScalarShapes"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -87794,11 +87808,142 @@
           "text": "SASSERT(is_uint64());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "actual inf_rational specialization constructors/copy/destruction/reset/swap",
+          "status": "ported",
+          "go_target": "mpnum/inf_eps_rational.go",
+          "tests": [
+            "TestInfEpsInfFiniteTripleOracles",
+            "TestInfEpsInfSourceQuirksAndHeader",
+            "TestInfEpsInfConstantsPredicatesAndMixedRoutes",
+            "TestInfEpsInfLifetimeAndDomain",
+            "TestInfEpsInfFailurePrefixesImmediateRoots",
+            "TestInfEpsInfAliasesCancellationAndAssignmentPrefix",
+            "TestInfEpsInfDestructorReverseMemberOrder",
+            "TestInfEpsInfStructuralEqualityAndReturnCopy",
+            "TestInfEpsInfPointerFreeWarmPaths",
+            "TestInfEpsInfFormattingOneFinalAllocation",
+            "TestInfEpsInfConstructorSignedScalarShapes"
+          ]
+        },
+        {
+          "name": "hash/display and owned component projections",
+          "status": "ported",
+          "go_target": "mpnum/inf_eps_rational.go",
+          "tests": [
+            "TestInfEpsInfFiniteTripleOracles",
+            "TestInfEpsInfSourceQuirksAndHeader",
+            "TestInfEpsInfConstantsPredicatesAndMixedRoutes",
+            "TestInfEpsInfLifetimeAndDomain",
+            "TestInfEpsInfFailurePrefixesImmediateRoots",
+            "TestInfEpsInfAliasesCancellationAndAssignmentPrefix",
+            "TestInfEpsInfDestructorReverseMemberOrder",
+            "TestInfEpsInfStructuralEqualityAndReturnCopy",
+            "TestInfEpsInfPointerFreeWarmPaths",
+            "TestInfEpsInfFormattingOneFinalAllocation",
+            "TestInfEpsInfConstructorSignedScalarShapes"
+          ]
+        },
+        {
+          "name": "constants/sign/integer/finite/scalar conversion predicates",
+          "status": "ported",
+          "go_target": "mpnum/inf_eps_rational.go",
+          "tests": [
+            "TestInfEpsInfFiniteTripleOracles",
+            "TestInfEpsInfSourceQuirksAndHeader",
+            "TestInfEpsInfConstantsPredicatesAndMixedRoutes",
+            "TestInfEpsInfLifetimeAndDomain",
+            "TestInfEpsInfFailurePrefixesImmediateRoots",
+            "TestInfEpsInfAliasesCancellationAndAssignmentPrefix",
+            "TestInfEpsInfDestructorReverseMemberOrder",
+            "TestInfEpsInfStructuralEqualityAndReturnCopy",
+            "TestInfEpsInfPointerFreeWarmPaths",
+            "TestInfEpsInfFormattingOneFinalAllocation",
+            "TestInfEpsInfConstructorSignedScalarShapes"
+          ]
+        },
+        {
+          "name": "pair and both rational directions relational source routes",
+          "status": "ported",
+          "go_target": "mpnum/inf_eps_rational.go",
+          "tests": [
+            "TestInfEpsInfFiniteTripleOracles",
+            "TestInfEpsInfSourceQuirksAndHeader",
+            "TestInfEpsInfConstantsPredicatesAndMixedRoutes",
+            "TestInfEpsInfLifetimeAndDomain",
+            "TestInfEpsInfFailurePrefixesImmediateRoots",
+            "TestInfEpsInfAliasesCancellationAndAssignmentPrefix",
+            "TestInfEpsInfDestructorReverseMemberOrder",
+            "TestInfEpsInfStructuralEqualityAndReturnCopy",
+            "TestInfEpsInfPointerFreeWarmPaths",
+            "TestInfEpsInfFormattingOneFinalAllocation",
+            "TestInfEpsInfConstructorSignedScalarShapes"
+          ]
+        },
+        {
+          "name": "compound/value arithmetic with ordered component and return copies",
+          "status": "ported",
+          "go_target": "mpnum/inf_eps_rational.go",
+          "tests": [
+            "TestInfEpsInfFiniteTripleOracles",
+            "TestInfEpsInfSourceQuirksAndHeader",
+            "TestInfEpsInfConstantsPredicatesAndMixedRoutes",
+            "TestInfEpsInfLifetimeAndDomain",
+            "TestInfEpsInfFailurePrefixesImmediateRoots",
+            "TestInfEpsInfAliasesCancellationAndAssignmentPrefix",
+            "TestInfEpsInfDestructorReverseMemberOrder",
+            "TestInfEpsInfStructuralEqualityAndReturnCopy",
+            "TestInfEpsInfPointerFreeWarmPaths",
+            "TestInfEpsInfFormattingOneFinalAllocation",
+            "TestInfEpsInfConstructorSignedScalarShapes"
+          ]
+        },
+        {
+          "name": "increment/postfix/negation/abs/fused accumulation",
+          "status": "ported",
+          "go_target": "mpnum/inf_eps_rational.go",
+          "tests": [
+            "TestInfEpsInfFiniteTripleOracles",
+            "TestInfEpsInfSourceQuirksAndHeader",
+            "TestInfEpsInfConstantsPredicatesAndMixedRoutes",
+            "TestInfEpsInfLifetimeAndDomain",
+            "TestInfEpsInfFailurePrefixesImmediateRoots",
+            "TestInfEpsInfAliasesCancellationAndAssignmentPrefix",
+            "TestInfEpsInfDestructorReverseMemberOrder",
+            "TestInfEpsInfStructuralEqualityAndReturnCopy",
+            "TestInfEpsInfPointerFreeWarmPaths",
+            "TestInfEpsInfFormattingOneFinalAllocation",
+            "TestInfEpsInfConstructorSignedScalarShapes"
+          ]
+        },
+        {
+          "name": "floor/ceil ignoring infinity source commented assertions",
+          "status": "ported",
+          "go_target": "mpnum/inf_eps_rational.go",
+          "tests": [
+            "TestInfEpsInfFiniteTripleOracles",
+            "TestInfEpsInfSourceQuirksAndHeader",
+            "TestInfEpsInfConstantsPredicatesAndMixedRoutes",
+            "TestInfEpsInfLifetimeAndDomain",
+            "TestInfEpsInfFailurePrefixesImmediateRoots",
+            "TestInfEpsInfAliasesCancellationAndAssignmentPrefix",
+            "TestInfEpsInfDestructorReverseMemberOrder",
+            "TestInfEpsInfStructuralEqualityAndReturnCopy",
+            "TestInfEpsInfPointerFreeWarmPaths",
+            "TestInfEpsInfFormattingOneFinalAllocation",
+            "TestInfEpsInfConstructorSignedScalarShapes"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete pointer-free triple and scalar service provenance. Infinity publishes first, nested members first then second; destructor reverses members. Existing manager budget accounts numeric cells/Words/text scratch; one final caller string. Actual only repository Numeral=inf_rational specialization, no Go generics. See INF_EPS_RATIONAL_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Source const references return owning copies; source scalar assertion domains are typed errors. Mixed equality defect and exact nonsaturating infinity coefficient retained. No actual registered direct source assertion counts invented."
+      ]
     },
     {
       "path": "src/util/inf_int_rational.cpp",
