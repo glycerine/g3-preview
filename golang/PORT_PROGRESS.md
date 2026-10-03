@@ -1,5 +1,27 @@
 # Port progress
 
+## Real standalone SAT storage integration
+
+The concrete clause allocator/temporary clauses, binary/wrapper records and
+vectors, borrowed clause sets, watches/watch lists, justifications and mutable
+activity-backed variable queue now preserve their source methods and failure
+prefixes. Tests first exposed missing APIs; independent review regressions
+then corrected escaping iterator wrappers, retained scalar capacity, SetEnd
+ordering and watch erase-tail lifetimes. All records remain concrete and
+pointer-free; real lifetime metadata and old/new backing peaks are charged.
+
+The sixteen-file packet passed full native and checked/debug tests on the
+committed AST prerequisite, forty named race and actual JS groups, vet, WASI
+compilation and no-generics/source audits. Exact aliases, invalid source
+instantiations, conditional diagnostics and ownership adapters are in
+SAT_STORAGE_PORT_STATUS.md. Eight SAT source units moved to partial; the
+ledger now records2,102 units/677 APIs:33 ported,77 partial,1,992 unported.
+
+Storage has no propagation/search or solver result. The full SAT solver and
+its registered scope test continue as an actual algorithmic packet with their
+real simplification/default-policy dependencies; no reduced solver is substituted.
+Proof/checker, SMT/theories and interpolation remain within the active goal.
+
 ## Real AST runtime integration
 
 The first runtime packet now supplies all five node kinds, six parameter kinds,

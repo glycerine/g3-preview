@@ -48754,9 +48754,31 @@
       "sha256": "862cd6ea1c065ee1ef4e1477380e4f93d2e1a66facbcf8ec627f7ec496b7ec82",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_clause_storage.go",
+        "sat_clause_large.go"
+      ],
+      "tests": [
+        "TestSATClauseSetSourceOrderAndGhostPrefixes",
+        "TestSATClauseSetActualCopyMoveFailureOrder",
+        "TestSATClauseSourceLifecycleFlagsAndApprox",
+        "TestSATClauseReleaseDebugBodiesAndModels",
+        "TestSATTmpClauseSourceReuseAndDestroyBeforeGrow",
+        "TestSATClauseSourceIDsLocatorsAndDeleteFailure",
+        "TestSATClauseWideExtentAndBudgetRefusal",
+        "TestSATClauseElimUnsignedWrapBoundary",
+        "TestSATClauseReleaseRetainedLiteralAccess",
+        "TestSATClauseCheckedIterationAndApproxCount",
+        "TestSATStoragePointerFreeOwnershipAndConstructorFailure",
+        "TestSATLargeClauseBackendLedgerBudgetAndFaults",
+        "TestSATStorageVectorFailurePrefixesAndBudgetPeaks",
+        "TestSATStorageSourceTextAndWidthActions",
+        "TestSATStorageWarmNoAllocationsAndClosedBorrow",
+        "TestSATStorageOwnerIdentityExhaustionAndOOMRecycle",
+        "TestSATBinClauseVectorRealSpecialization",
+        "TestSATClauseVectorBorrowedForeignCopyLifetime"
+      ],
       "conditionals": [
         {
           "line": 128,
@@ -48899,18 +48921,78 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "normal/temporary clause construction, extent allocation, ID recycle-before-delete and exact temporary reuse/destroy-before-grow",
+          "status": "partial",
+          "go_target": "sat_clause_storage.go",
+          "tests": [
+            "TestSATClauseSetSourceOrderAndGhostPrefixes",
+            "TestSATClauseSetActualCopyMoveFailureOrder",
+            "TestSATClauseSourceLifecycleFlagsAndApprox",
+            "TestSATClauseReleaseDebugBodiesAndModels",
+            "TestSATTmpClauseSourceReuseAndDestroyBeforeGrow",
+            "TestSATClauseSourceIDsLocatorsAndDeleteFailure",
+            "TestSATClauseWideExtentAndBudgetRefusal",
+            "TestSATClauseElimUnsignedWrapBoundary",
+            "TestSATClauseReleaseRetainedLiteralAccess",
+            "TestSATClauseCheckedIterationAndApproxCount",
+            "TestSATStoragePointerFreeOwnershipAndConstructorFailure",
+            "TestSATLargeClauseBackendLedgerBudgetAndFaults",
+            "TestSATStorageVectorFailurePrefixesAndBudgetPeaks",
+            "TestSATStorageSourceTextAndWidthActions",
+            "TestSATStorageWarmNoAllocationsAndClosedBorrow",
+            "TestSATStorageOwnerIdentityExhaustionAndOOMRecycle",
+            "TestSATBinClauseVectorRealSpecialization",
+            "TestSATClauseVectorBorrowedForeignCopyLifetime"
+          ]
+        },
+        {
+          "name": "whole runtime conditional debug-tag/TRACE policy and remaining consumer integration",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Concrete scalar clause locators are distinct from source IDs. Actual cold headers/directories/backing and allocation overlap are budgeted; small versus wide physical clause storage uses real allocations. Activity queues borrow actual mutable vectors; sets/vectors retain source bindings and copy/move prefixes. Watched erase retains live tails while actual destruction ends per-slot lifetime tracked by fully charged metadata. All twelve iterator factories return scalar values with zero escaping-wrapper allocation. See SAT_STORAGE_PORT_STATUS.md for exact16-file/40-test evidence."
+      ],
+      "deviations": [
+        "Pointer ABI becomes owner/kind/slot/generation locators and explicit typed invalid-domain guards. No fake address ordering, global OOM service, external extension callback, solver result or propagation/search algorithm is provided by this storage packet. Source OutOfMemory callback is borrowed; source global policy, conditional CASSERT tag control and TRACE/printer runtime remain open. Concrete vector aliases/invalid source instantiations and self-append/Fill nontermination adapters are recorded explicitly. No Go generics are used."
+      ]
     },
     {
       "path": "src/sat/sat_clause.h",
       "sha256": "b66b1e936801b63d3d93f504cd934089ed755a4720081d03c94effc1a5c57707",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_clause_storage.go",
+        "sat_clause_large.go",
+        "sat_storage_vector.go"
+      ],
+      "tests": [
+        "TestSATClauseSetSourceOrderAndGhostPrefixes",
+        "TestSATClauseSetActualCopyMoveFailureOrder",
+        "TestSATClauseSourceLifecycleFlagsAndApprox",
+        "TestSATClauseReleaseDebugBodiesAndModels",
+        "TestSATTmpClauseSourceReuseAndDestroyBeforeGrow",
+        "TestSATClauseSourceIDsLocatorsAndDeleteFailure",
+        "TestSATClauseWideExtentAndBudgetRefusal",
+        "TestSATClauseElimUnsignedWrapBoundary",
+        "TestSATClauseReleaseRetainedLiteralAccess",
+        "TestSATClauseCheckedIterationAndApproxCount",
+        "TestSATStoragePointerFreeOwnershipAndConstructorFailure",
+        "TestSATLargeClauseBackendLedgerBudgetAndFaults",
+        "TestSATStorageVectorFailurePrefixesAndBudgetPeaks",
+        "TestSATStorageSourceTextAndWidthActions",
+        "TestSATStorageWarmNoAllocationsAndClosedBorrow",
+        "TestSATStorageOwnerIdentityExhaustionAndOOMRecycle",
+        "TestSATBinClauseVectorRealSpecialization",
+        "TestSATClauseVectorBorrowedForeignCopyLifetime",
+        "TestSATScalarVectorReleaseRetainedBodies",
+        "TestSATScalarSetEndSourcePublication",
+        "TestSATScalarExpansionRetainsBackingPrefix"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -48981,18 +49063,60 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "clause flags/literals/approximation/elimination/display, binary/wrapper records, actual clause allocation and temporary-clause lifecycle",
+          "status": "partial",
+          "go_target": "sat_clause_storage.go",
+          "tests": [
+            "TestSATClauseSetSourceOrderAndGhostPrefixes",
+            "TestSATClauseSetActualCopyMoveFailureOrder",
+            "TestSATClauseSourceLifecycleFlagsAndApprox",
+            "TestSATClauseReleaseDebugBodiesAndModels",
+            "TestSATTmpClauseSourceReuseAndDestroyBeforeGrow",
+            "TestSATClauseSourceIDsLocatorsAndDeleteFailure",
+            "TestSATClauseWideExtentAndBudgetRefusal",
+            "TestSATClauseElimUnsignedWrapBoundary",
+            "TestSATClauseReleaseRetainedLiteralAccess",
+            "TestSATClauseCheckedIterationAndApproxCount",
+            "TestSATStoragePointerFreeOwnershipAndConstructorFailure",
+            "TestSATLargeClauseBackendLedgerBudgetAndFaults",
+            "TestSATStorageVectorFailurePrefixesAndBudgetPeaks",
+            "TestSATStorageSourceTextAndWidthActions",
+            "TestSATStorageWarmNoAllocationsAndClosedBorrow",
+            "TestSATStorageOwnerIdentityExhaustionAndOOMRecycle",
+            "TestSATBinClauseVectorRealSpecialization",
+            "TestSATClauseVectorBorrowedForeignCopyLifetime",
+            "TestSATScalarVectorReleaseRetainedBodies",
+            "TestSATScalarSetEndSourcePublication",
+            "TestSATScalarExpansionRetainsBackingPrefix"
+          ]
+        },
+        {
+          "name": "whole runtime conditional debug-tag/TRACE policy and remaining consumer integration",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Concrete scalar clause locators are distinct from source IDs. Actual cold headers/directories/backing and allocation overlap are budgeted; small versus wide physical clause storage uses real allocations. Activity queues borrow actual mutable vectors; sets/vectors retain source bindings and copy/move prefixes. Watched erase retains live tails while actual destruction ends per-slot lifetime tracked by fully charged metadata. All twelve iterator factories return scalar values with zero escaping-wrapper allocation. See SAT_STORAGE_PORT_STATUS.md for exact16-file/40-test evidence."
+      ],
+      "deviations": [
+        "Pointer ABI becomes owner/kind/slot/generation locators and explicit typed invalid-domain guards. No fake address ordering, global OOM service, external extension callback, solver result or propagation/search algorithm is provided by this storage packet. Source OutOfMemory callback is borrowed; source global policy, conditional CASSERT tag control and TRACE/printer runtime remain open. Concrete vector aliases/invalid source instantiations and self-append/Fill nontermination adapters are recorded explicitly. No Go generics are used."
+      ]
     },
     {
       "path": "src/sat/sat_clause_set.cpp",
       "sha256": "ca1fe1b4e757849ab7b0d2a6dce8e0391ec0ebcb3d174df28a0e5e4585001db0",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_clause_set.go"
+      ],
+      "tests": [
+        "TestSATClauseSetSourceOrderAndGhostPrefixes",
+        "TestSATClauseSetActualCopyMoveFailureOrder"
+      ],
       "assertions": [
         {
           "line": 31,
@@ -49033,18 +49157,44 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "clause set removal, last swap and source ID-binding/copy/move action order",
+          "status": "partial",
+          "go_target": "sat_clause_set.go",
+          "tests": [
+            "TestSATClauseSetSourceOrderAndGhostPrefixes",
+            "TestSATClauseSetActualCopyMoveFailureOrder"
+          ]
+        },
+        {
+          "name": "whole runtime conditional debug-tag/TRACE policy and remaining consumer integration",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Concrete scalar clause locators are distinct from source IDs. Actual cold headers/directories/backing and allocation overlap are budgeted; small versus wide physical clause storage uses real allocations. Activity queues borrow actual mutable vectors; sets/vectors retain source bindings and copy/move prefixes. Watched erase retains live tails while actual destruction ends per-slot lifetime tracked by fully charged metadata. All twelve iterator factories return scalar values with zero escaping-wrapper allocation. See SAT_STORAGE_PORT_STATUS.md for exact16-file/40-test evidence."
+      ],
+      "deviations": [
+        "Pointer ABI becomes owner/kind/slot/generation locators and explicit typed invalid-domain guards. No fake address ordering, global OOM service, external extension callback, solver result or propagation/search algorithm is provided by this storage packet. Source OutOfMemory callback is borrowed; source global policy, conditional CASSERT tag control and TRACE/printer runtime remain open. Concrete vector aliases/invalid source instantiations and self-append/Fill nontermination adapters are recorded explicitly. No Go generics are used."
+      ]
     },
     {
       "path": "src/sat/sat_clause_set.h",
       "sha256": "4b69e9601f4fb27e16cf80727d32d6cbca5793c32baccd626deb4c9d6d76622d",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_clause_set.go"
+      ],
+      "tests": [
+        "TestSATClauseSetSourceOrderAndGhostPrefixes",
+        "TestSATClauseSetActualCopyMoveFailureOrder",
+        "TestSATVectorIteratorEpochRetiresWithoutWrap",
+        "TestSATIteratorConcreteValueContracts",
+        "TestSATIteratorEscapingValuesNoAllocations"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -49057,9 +49207,30 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "concrete two-vector clause set insert/erase/pop/reset/iteration and ghost membership prefixes",
+          "status": "partial",
+          "go_target": "sat_clause_set.go",
+          "tests": [
+            "TestSATClauseSetSourceOrderAndGhostPrefixes",
+            "TestSATClauseSetActualCopyMoveFailureOrder",
+            "TestSATVectorIteratorEpochRetiresWithoutWrap",
+            "TestSATIteratorConcreteValueContracts",
+            "TestSATIteratorEscapingValuesNoAllocations"
+          ]
+        },
+        {
+          "name": "whole runtime conditional debug-tag/TRACE policy and remaining consumer integration",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Concrete scalar clause locators are distinct from source IDs. Actual cold headers/directories/backing and allocation overlap are budgeted; small versus wide physical clause storage uses real allocations. Activity queues borrow actual mutable vectors; sets/vectors retain source bindings and copy/move prefixes. Watched erase retains live tails while actual destruction ends per-slot lifetime tracked by fully charged metadata. All twelve iterator factories return scalar values with zero escaping-wrapper allocation. See SAT_STORAGE_PORT_STATUS.md for exact16-file/40-test evidence."
+      ],
+      "deviations": [
+        "Pointer ABI becomes owner/kind/slot/generation locators and explicit typed invalid-domain guards. No fake address ordering, global OOM service, external extension callback, solver result or propagation/search algorithm is provided by this storage packet. Source OutOfMemory callback is borrowed; source global policy, conditional CASSERT tag control and TRACE/printer runtime remain open. Concrete vector aliases/invalid source instantiations and self-append/Fill nontermination adapters are recorded explicitly. No Go generics are used."
+      ]
     },
     {
       "path": "src/sat/sat_clause_use_list.cpp",
@@ -49724,9 +49895,14 @@
       "sha256": "0a3af366718264233e8a9bc7598d871fccf150356a36c010cee3462396258a48",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_justification.go"
+      ],
+      "tests": [
+        "TestSATJustificationSourceAllKindsAndRawGetters",
+        "TestSATStorageSourceTextAndWidthActions"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -49753,9 +49929,27 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "all justification encodings, raw getters and exact ordinary ostream output",
+          "status": "partial",
+          "go_target": "sat_justification.go",
+          "tests": [
+            "TestSATJustificationSourceAllKindsAndRawGetters",
+            "TestSATStorageSourceTextAndWidthActions"
+          ]
+        },
+        {
+          "name": "whole runtime conditional debug-tag/TRACE policy and remaining consumer integration",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Concrete scalar clause locators are distinct from source IDs. Actual cold headers/directories/backing and allocation overlap are budgeted; small versus wide physical clause storage uses real allocations. Activity queues borrow actual mutable vectors; sets/vectors retain source bindings and copy/move prefixes. Watched erase retains live tails while actual destruction ends per-slot lifetime tracked by fully charged metadata. All twelve iterator factories return scalar values with zero escaping-wrapper allocation. See SAT_STORAGE_PORT_STATUS.md for exact16-file/40-test evidence."
+      ],
+      "deviations": [
+        "Pointer ABI becomes owner/kind/slot/generation locators and explicit typed invalid-domain guards. No fake address ordering, global OOM service, external extension callback, solver result or propagation/search algorithm is provided by this storage packet. Source OutOfMemory callback is borrowed; source global policy, conditional CASSERT tag control and TRACE/printer runtime remain open. Concrete vector aliases/invalid source instantiations and self-append/Fill nontermination adapters are recorded explicitly. No Go generics are used."
+      ]
     },
     {
       "path": "src/sat/sat_model_converter.cpp",
@@ -51218,9 +51412,17 @@
       "sha256": "642aaa8dd58e029bef06825e7ca0a8662c00fea89f79dcfd75e17b8ada6ded68",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_var_queue.go"
+      ],
+      "tests": [
+        "TestSATVarQueueIndependentMutableActivityModel",
+        "TestSATVarQueueConstructorCloneFailureAndMovedReset",
+        "TestSATVarQueueRealActivityPriorityEventsAndLifecycle",
+        "TestSATVarQueueSourceGhostAndEmptyReset",
+        "TestSATVarQueueUnsignedNegativeIndexBoundary"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -51239,32 +51441,99 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "actual mutable activity queue heap, constructor/mk_var/activity/unassign/delete/next/reset and source ghost prefixes",
+          "status": "partial",
+          "go_target": "sat_var_queue.go",
+          "tests": [
+            "TestSATVarQueueIndependentMutableActivityModel",
+            "TestSATVarQueueConstructorCloneFailureAndMovedReset",
+            "TestSATVarQueueRealActivityPriorityEventsAndLifecycle",
+            "TestSATVarQueueSourceGhostAndEmptyReset",
+            "TestSATVarQueueUnsignedNegativeIndexBoundary"
+          ]
+        },
+        {
+          "name": "whole runtime conditional debug-tag/TRACE policy and remaining consumer integration",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Concrete scalar clause locators are distinct from source IDs. Actual cold headers/directories/backing and allocation overlap are budgeted; small versus wide physical clause storage uses real allocations. Activity queues borrow actual mutable vectors; sets/vectors retain source bindings and copy/move prefixes. Watched erase retains live tails while actual destruction ends per-slot lifetime tracked by fully charged metadata. All twelve iterator factories return scalar values with zero escaping-wrapper allocation. See SAT_STORAGE_PORT_STATUS.md for exact16-file/40-test evidence."
+      ],
+      "deviations": [
+        "Pointer ABI becomes owner/kind/slot/generation locators and explicit typed invalid-domain guards. No fake address ordering, global OOM service, external extension callback, solver result or propagation/search algorithm is provided by this storage packet. Source OutOfMemory callback is borrowed; source global policy, conditional CASSERT tag control and TRACE/printer runtime remain open. Concrete vector aliases/invalid source instantiations and self-append/Fill nontermination adapters are recorded explicitly. No Go generics are used."
+      ]
     },
     {
       "path": "src/sat/sat_watched.cpp",
       "sha256": "8ffc73b9e0e8cd99b2d5a663af51f3aa629f522d4bfdce6e896c066be3037d27",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_watched.go",
+        "sat_storage_vector.go"
+      ],
+      "tests": [
+        "TestSATStorageSourceTextAndWidthActions",
+        "TestSATWatchEraseRetainedLifetimesAndGrowthPrefix",
+        "TestSATWatchLifetimeMetadataBudget",
+        "TestSATWatchedSourceTagsWidthDefectAndErase"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "watched display and erase_clause first-match behavior with retained erase-tail lifetime",
+          "status": "partial",
+          "go_target": "sat_watched.go",
+          "tests": [
+            "TestSATStorageSourceTextAndWidthActions",
+            "TestSATWatchEraseRetainedLifetimesAndGrowthPrefix",
+            "TestSATWatchLifetimeMetadataBudget",
+            "TestSATWatchedSourceTagsWidthDefectAndErase"
+          ]
+        },
+        {
+          "name": "whole runtime conditional debug-tag/TRACE policy and remaining consumer integration",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Concrete scalar clause locators are distinct from source IDs. Actual cold headers/directories/backing and allocation overlap are budgeted; small versus wide physical clause storage uses real allocations. Activity queues borrow actual mutable vectors; sets/vectors retain source bindings and copy/move prefixes. Watched erase retains live tails while actual destruction ends per-slot lifetime tracked by fully charged metadata. All twelve iterator factories return scalar values with zero escaping-wrapper allocation. See SAT_STORAGE_PORT_STATUS.md for exact16-file/40-test evidence."
+      ],
+      "deviations": [
+        "Pointer ABI becomes owner/kind/slot/generation locators and explicit typed invalid-domain guards. No fake address ordering, global OOM service, external extension callback, solver result or propagation/search algorithm is provided by this storage packet. Source OutOfMemory callback is borrowed; source global policy, conditional CASSERT tag control and TRACE/printer runtime remain open. Concrete vector aliases/invalid source instantiations and self-append/Fill nontermination adapters are recorded explicitly. No Go generics are used."
+      ]
     },
     {
       "path": "src/sat/sat_watched.h",
       "sha256": "1d2969f295a5f9ab042c5997fdc0717dc6cfe74711c6037802a780c78c72bf28",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_watched.go",
+        "sat_storage_vector.go"
+      ],
+      "tests": [
+        "TestSATStorageVectorFailurePrefixesAndBudgetPeaks",
+        "TestSATConcreteVectorSourceCapacityAndCopyPolicies",
+        "TestSATBinClauseVectorRealSpecialization",
+        "TestSATClauseVectorBorrowedForeignCopyLifetime",
+        "TestSATScalarVectorReleaseRetainedBodies",
+        "TestSATConcreteVectorIndependentOperations",
+        "TestSATVectorCrossBudgetSwapAndMoveFailure",
+        "TestSATVectorIteratorEpochRetiresWithoutWrap",
+        "TestSATIteratorConcreteValueContracts",
+        "TestSATIteratorEscapingValuesNoAllocations",
+        "TestSATWatchEraseRetainedLifetimesAndGrowthPrefix",
+        "TestSATWatchLifetimeMetadataBudget",
+        "TestSATWatchedSourceTagsWidthDefectAndErase",
+        "TestSATPackedSourceGetterSetterDomains"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -51375,9 +51644,39 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "all watched tag constructors/getters/setters and stable class ordering; concrete watch-list vector lifetimes and growth",
+          "status": "partial",
+          "go_target": "sat_watched.go",
+          "tests": [
+            "TestSATStorageVectorFailurePrefixesAndBudgetPeaks",
+            "TestSATConcreteVectorSourceCapacityAndCopyPolicies",
+            "TestSATBinClauseVectorRealSpecialization",
+            "TestSATClauseVectorBorrowedForeignCopyLifetime",
+            "TestSATScalarVectorReleaseRetainedBodies",
+            "TestSATConcreteVectorIndependentOperations",
+            "TestSATVectorCrossBudgetSwapAndMoveFailure",
+            "TestSATVectorIteratorEpochRetiresWithoutWrap",
+            "TestSATIteratorConcreteValueContracts",
+            "TestSATIteratorEscapingValuesNoAllocations",
+            "TestSATWatchEraseRetainedLifetimesAndGrowthPrefix",
+            "TestSATWatchLifetimeMetadataBudget",
+            "TestSATWatchedSourceTagsWidthDefectAndErase",
+            "TestSATPackedSourceGetterSetterDomains"
+          ]
+        },
+        {
+          "name": "whole runtime conditional debug-tag/TRACE policy and remaining consumer integration",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Concrete scalar clause locators are distinct from source IDs. Actual cold headers/directories/backing and allocation overlap are budgeted; small versus wide physical clause storage uses real allocations. Activity queues borrow actual mutable vectors; sets/vectors retain source bindings and copy/move prefixes. Watched erase retains live tails while actual destruction ends per-slot lifetime tracked by fully charged metadata. All twelve iterator factories return scalar values with zero escaping-wrapper allocation. See SAT_STORAGE_PORT_STATUS.md for exact16-file/40-test evidence."
+      ],
+      "deviations": [
+        "Pointer ABI becomes owner/kind/slot/generation locators and explicit typed invalid-domain guards. No fake address ordering, global OOM service, external extension callback, solver result or propagation/search algorithm is provided by this storage packet. Source OutOfMemory callback is borrowed; source global policy, conditional CASSERT tag control and TRACE/printer runtime remain open. Concrete vector aliases/invalid source instantiations and self-append/Fill nontermination adapters are recorded explicitly. No Go generics are used."
+      ]
     },
     {
       "path": "src/sat/tactic/CMakeLists.txt",
@@ -88522,21 +88821,27 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
+        "sat_var_queue.go",
         "util_int_heap.go"
       ],
       "tests": [
-        "TestIntHeapSourceAssertions",
-        "TestIntHeapIndependentMutableOracle",
-        "TestIntHeapSourceShapeFindLEAndLifetime",
         "TestIntHeapBudgetsFailuresSwapAndWarm",
-        "TestIntHeapFindLEFailureAndSourceCapacity",
-        "TestIntHeapEpochBoundsIteratorAndComparatorSwap",
-        "TestIntHeapSourceBoundsGrowth",
         "TestIntHeapCopyAndAllocationSizeBoundary",
-        "TestIntHeapSwapSecondReservationAndFinitePeak",
-        "TestIntHeapSourceInsertFailurePrefix",
+        "TestIntHeapEpochBoundsIteratorAndComparatorSwap",
+        "TestIntHeapFindLEFailureAndSourceCapacity",
+        "TestIntHeapIndependentMutableOracle",
+        "TestIntHeapSourceAssertions",
+        "TestIntHeapSourceBoundsGrowth",
         "TestIntHeapSourceEmptyResetAndGhostGuards",
-        "TestIntHeapSourceGhostInRangeContinuation"
+        "TestIntHeapSourceGhostInRangeContinuation",
+        "TestIntHeapSourceInsertFailurePrefix",
+        "TestIntHeapSourceShapeFindLEAndLifetime",
+        "TestIntHeapSwapSecondReservationAndFinitePeak",
+        "TestSATVarQueueConstructorCloneFailureAndMovedReset",
+        "TestSATVarQueueIndependentMutableActivityModel",
+        "TestSATVarQueueRealActivityPriorityEventsAndLifecycle",
+        "TestSATVarQueueSourceGhostAndEmptyReset",
+        "TestSATVarQueueUnsignedNegativeIndexBoundary"
       ],
       "conditionals": [
         {
@@ -88862,6 +89167,18 @@
             "TestIntHeapSourceBoundsGrowth",
             "TestIntHeapCopyAndAllocationSizeBoundary",
             "TestIntHeapSwapSecondReservationAndFinitePeak"
+          ]
+        },
+        {
+          "name": "concrete SAT variable-priority heap specialization over borrowed real mutable activity",
+          "status": "ported",
+          "go_target": "sat_var_queue.go",
+          "tests": [
+            "TestSATVarQueueIndependentMutableActivityModel",
+            "TestSATVarQueueConstructorCloneFailureAndMovedReset",
+            "TestSATVarQueueRealActivityPriorityEventsAndLifecycle",
+            "TestSATVarQueueSourceGhostAndEmptyReset",
+            "TestSATVarQueueUnsignedNegativeIndexBoundary"
           ]
         }
       ],
@@ -112049,22 +112366,40 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "sat_storage_vector.go",
         "util_param_descrs.go"
       ],
       "tests": [
-        "TestParamDescrsSourceHistoryDefaultsAndDisplay",
-        "TestParamDescrsSourceModuleAndNullKinds",
-        "TestParamDescrsSourceKindLabelsAndHelpers",
-        "TestParamDescrsCopyBucketOrderLifetimeAndPrefix",
-        "TestParamDescrsIndependentDictionaryStateMachine",
         "TestParamDescrsBudgetFailuresAndWarmDuplicate",
-        "TestParamDescrsSourceProbeThresholdAndCleanup",
-        "TestParamDescrsOwnershipNullableMetadataAndGuards",
+        "TestParamDescrsCheckedCapacityBoundaries",
+        "TestParamDescrsCopyBucketOrderLifetimeAndPrefix",
         "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
-        "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
+        "TestParamDescrsIndependentDictionaryStateMachine",
         "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
+        "TestParamDescrsOwnershipNullableMetadataAndGuards",
+        "TestParamDescrsSourceHistoryDefaultsAndDisplay",
+        "TestParamDescrsSourceKindLabelsAndHelpers",
+        "TestParamDescrsSourceModuleAndNullKinds",
+        "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
         "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
-        "TestParamDescrsCheckedCapacityBoundaries"
+        "TestParamDescrsSourceProbeThresholdAndCleanup",
+        "TestSATBinClauseVectorRealSpecialization",
+        "TestSATClauseVectorBorrowedForeignCopyLifetime",
+        "TestSATConcreteSourceConstructorsAndFillRecursion",
+        "TestSATConcreteVectorIndependentOperations",
+        "TestSATConcreteVectorSourceCapacityAndCopyPolicies",
+        "TestSATIteratorConcreteValueContracts",
+        "TestSATIteratorEscapingValuesNoAllocations",
+        "TestSATScalarExpansionRetainsBackingPrefix",
+        "TestSATScalarSetEndSourcePublication",
+        "TestSATScalarVectorReleaseRetainedBodies",
+        "TestSATStoragePointerFreeOwnershipAndConstructorFailure",
+        "TestSATStorageVectorFailurePrefixesAndBudgetPeaks",
+        "TestSATVarQueueConstructorCloneFailureAndMovedReset",
+        "TestSATVectorCrossBudgetSwapAndMoveFailure",
+        "TestSATVectorIteratorEpochRetiresWithoutWrap",
+        "TestSATWatchEraseRetainedLifetimesAndGrowthPrefix",
+        "TestSATWatchLifetimeMetadataBudget"
       ],
       "conditionals": [
         {
@@ -112192,10 +112527,31 @@
             "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
             "TestParamDescrsCheckedCapacityBoundaries"
           ]
+        },
+        {
+          "name": "concrete SAT watched/clause-pointer/wrapper/activity/binary-vector valid constructor and operation specializations",
+          "status": "partial",
+          "go_target": "sat_storage_vector.go",
+          "tests": [
+            "TestSATStorageVectorFailurePrefixesAndBudgetPeaks",
+            "TestSATConcreteVectorSourceCapacityAndCopyPolicies",
+            "TestSATBinClauseVectorRealSpecialization",
+            "TestSATClauseVectorBorrowedForeignCopyLifetime",
+            "TestSATScalarVectorReleaseRetainedBodies",
+            "TestSATConcreteVectorIndependentOperations",
+            "TestSATVectorCrossBudgetSwapAndMoveFailure",
+            "TestSATVectorIteratorEpochRetiresWithoutWrap",
+            "TestSATScalarSetEndSourcePublication",
+            "TestSATScalarExpansionRetainsBackingPrefix",
+            "TestSATWatchEraseRetainedLifetimesAndGrowthPrefix",
+            "TestSATWatchLifetimeMetadataBudget",
+            "TestSATWatchedSourceTagsWidthDefectAndErase"
+          ]
         }
       ],
       "ownership": [
-        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md."
+        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md.",
+        "SAT vector headers/backing/lifetime metadata use actual host widths, real 2-to-(3n+1)/2 growth and old/new peaks. Trivial reallocation copies retained capacity, watched erase/destroy lifetime is distinguished. Value iterators do not allocate cold wrappers. Source impossible constructors/equality overloads are not fabricated; aliases and raw pointer adapters are in SAT_STORAGE_PORT_STATUS.md."
       ],
       "deviations": []
     },
