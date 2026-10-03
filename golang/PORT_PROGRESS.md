@@ -1195,3 +1195,23 @@ groups, vet, WASI build and source/no-generics gates. See
 SAT_CONFIG_DESCRS_PORT_STATUS.md. config.cpp/h and sat_params.pyg become partial;
 ledger33ported/94partial/1975unported. Actual config updates, registry catalog and
 full solver algorithms remain required within the active objective.
+
+
+## Actual expression substitution and scoped ownership
+
+Concrete expression substitution now runs actual AST/proof/dependency callbacks
+through three independent scalar tables. Scoped substitution uses real owning
+AST trail and retained unsigned limits. Tests-first review caught live-bucket
+overwrite, finalize publication order, later-root Reset prefixes, unused-input
+validation, retained-limit release Pop growth and interrupted destructor replay.
+Source NULL-definition quirks and late freed-key hash guards retain actual
+publication prefixes. Same-entry consumed callback completion and finite
+cleanup continuation are explicit Go adapters, not source rollback.
+
+Seven frozen Go files passed full native/debug on current HEAD81529c8, exact31
+checked-debug race/actual JS groups, vet, WASI test/full compilation and
+source/no-generics verification. See AST_EXPR_SUBSTITUTION_PACKET.md. Actual
+display requires the real SMT pretty-printer and remains open. Source
+expr_substitution.cpp/h and selected ref_util.h map callback loops become
+partial; ledger33ported/97partial/1972unported. Full consumers and the complete
+solver/proof/interpolation objective remain required.

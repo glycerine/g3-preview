@@ -13031,9 +13031,49 @@
       "sha256": "3b139e38d247b0d765ea4cea3ba0926d3567f1489ea7667451dbee17371efe88",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "ast_expr_substitution.go",
+        "ast_expr_substitution_failure_test.go",
+        "ast_expr_substitution_ops.go",
+        "ast_expr_substitution_scope.go",
+        "ast_expr_substitution_scope_test.go",
+        "ast_expr_substitution_table.go",
+        "ast_expr_substitution_test.go"
+      ],
+      "tests": [
+        "TestASTExprSubstitutionActualMapOutputsAndReferenceOrder",
+        "TestASTExprSubstitutionAllPolicyMapsAndAliasedFindOutputs",
+        "TestASTExprSubstitutionBoundedIndependentReferenceModel",
+        "TestASTExprSubstitutionCollisionsWrapAndLastTombstone",
+        "TestASTExprSubstitutionConstructorEveryReservationPrefix",
+        "TestASTExprSubstitutionConsumedEraseFinishesSameEntry",
+        "TestASTExprSubstitutionDestructorExecutesSourceSparseReset",
+        "TestASTExprSubstitutionDisabledPolicyDoesNotInspectUnusedForeignArguments",
+        "TestASTExprSubstitutionExplicitProofGuardRunsAfterPrimaryConstruction",
+        "TestASTExprSubstitutionFinalizeRefusalPreservesOldCapacity",
+        "TestASTExprSubstitutionGrowthFailurePreservesEachMapPrefix",
+        "TestASTExprSubstitutionLateEraseHashGuardReturnsRawConsumedPrefix",
+        "TestASTExprSubstitutionNullDefinitionRepeatedNewBranch",
+        "TestASTExprSubstitutionNullOptionalOverwriteSourceProfiles",
+        "TestASTExprSubstitutionPhysicalLayoutBoundsAndBorrowedProvenance",
+        "TestASTExprSubstitutionPrimaryGrowthRefusalAllowsSourceRetry",
+        "TestASTExprSubstitutionRegisteredConstructorAndPolicies",
+        "TestASTExprSubstitutionResetConsumedErrorPreservesLaterEntries",
+        "TestASTExprSubstitutionResetFailureKeepsLaterDependencyTableRoots",
+        "TestASTExprSubstitutionResetRefusalKeepsConsumedKeyProgress",
+        "TestASTExprSubstitutionWarmNoAllocationsUnderRefusal",
+        "TestASTScopedExprSubstitutionActualTrailAndBorrowedDestructor",
+        "TestASTScopedExprSubstitutionCleanupKeepsTrailAndNestedScopes",
+        "TestASTScopedExprSubstitutionConstructorEveryReservationPrefix",
+        "TestASTScopedExprSubstitutionConsumedPopErrorResumesSuffix",
+        "TestASTScopedExprSubstitutionDestructorAfterConsumedPopError",
+        "TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix",
+        "TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding",
+        "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
+        "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
+        "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths"
+      ],
       "assertions": [
         {
           "line": 52,
@@ -13056,20 +13096,147 @@
           "text": "SASSERT(entry_dep != 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "actual expr_substitution constructors, policies, owning insert/replace/erase/reset/cleanup/destructor and sequential raw find outputs",
+          "status": "ported",
+          "go_target": "ast_expr_substitution_ops.go",
+          "tests": [
+            "TestASTExprSubstitutionActualMapOutputsAndReferenceOrder",
+            "TestASTExprSubstitutionAllPolicyMapsAndAliasedFindOutputs",
+            "TestASTExprSubstitutionBoundedIndependentReferenceModel",
+            "TestASTExprSubstitutionCollisionsWrapAndLastTombstone",
+            "TestASTExprSubstitutionConstructorEveryReservationPrefix",
+            "TestASTExprSubstitutionConsumedEraseFinishesSameEntry",
+            "TestASTExprSubstitutionDestructorExecutesSourceSparseReset",
+            "TestASTExprSubstitutionDisabledPolicyDoesNotInspectUnusedForeignArguments",
+            "TestASTExprSubstitutionExplicitProofGuardRunsAfterPrimaryConstruction",
+            "TestASTExprSubstitutionFinalizeRefusalPreservesOldCapacity",
+            "TestASTExprSubstitutionGrowthFailurePreservesEachMapPrefix",
+            "TestASTExprSubstitutionLateEraseHashGuardReturnsRawConsumedPrefix",
+            "TestASTExprSubstitutionNullDefinitionRepeatedNewBranch",
+            "TestASTExprSubstitutionNullOptionalOverwriteSourceProfiles",
+            "TestASTExprSubstitutionPhysicalLayoutBoundsAndBorrowedProvenance",
+            "TestASTExprSubstitutionPrimaryGrowthRefusalAllowsSourceRetry",
+            "TestASTExprSubstitutionRegisteredConstructorAndPolicies",
+            "TestASTExprSubstitutionResetConsumedErrorPreservesLaterEntries",
+            "TestASTExprSubstitutionResetFailureKeepsLaterDependencyTableRoots",
+            "TestASTExprSubstitutionResetRefusalKeepsConsumedKeyProgress",
+            "TestASTExprSubstitutionWarmNoAllocationsUnderRefusal",
+            "TestASTScopedExprSubstitutionActualTrailAndBorrowedDestructor",
+            "TestASTScopedExprSubstitutionCleanupKeepsTrailAndNestedScopes",
+            "TestASTScopedExprSubstitutionConstructorEveryReservationPrefix",
+            "TestASTScopedExprSubstitutionConsumedPopErrorResumesSuffix",
+            "TestASTScopedExprSubstitutionDestructorAfterConsumedPopError",
+            "TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix",
+            "TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding",
+            "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
+            "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
+            "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths"
+          ]
+        },
+        {
+          "name": "scoped_expr_substitution actual trail/limits insert, reset, push/pop, lookup/forwarding and destruction without resetting borrowed map",
+          "status": "ported",
+          "go_target": "ast_expr_substitution_scope.go",
+          "tests": [
+            "TestASTExprSubstitutionActualMapOutputsAndReferenceOrder",
+            "TestASTExprSubstitutionAllPolicyMapsAndAliasedFindOutputs",
+            "TestASTExprSubstitutionBoundedIndependentReferenceModel",
+            "TestASTExprSubstitutionCollisionsWrapAndLastTombstone",
+            "TestASTExprSubstitutionConstructorEveryReservationPrefix",
+            "TestASTExprSubstitutionConsumedEraseFinishesSameEntry",
+            "TestASTExprSubstitutionDestructorExecutesSourceSparseReset",
+            "TestASTExprSubstitutionDisabledPolicyDoesNotInspectUnusedForeignArguments",
+            "TestASTExprSubstitutionExplicitProofGuardRunsAfterPrimaryConstruction",
+            "TestASTExprSubstitutionFinalizeRefusalPreservesOldCapacity",
+            "TestASTExprSubstitutionGrowthFailurePreservesEachMapPrefix",
+            "TestASTExprSubstitutionLateEraseHashGuardReturnsRawConsumedPrefix",
+            "TestASTExprSubstitutionNullDefinitionRepeatedNewBranch",
+            "TestASTExprSubstitutionNullOptionalOverwriteSourceProfiles",
+            "TestASTExprSubstitutionPhysicalLayoutBoundsAndBorrowedProvenance",
+            "TestASTExprSubstitutionPrimaryGrowthRefusalAllowsSourceRetry",
+            "TestASTExprSubstitutionRegisteredConstructorAndPolicies",
+            "TestASTExprSubstitutionResetConsumedErrorPreservesLaterEntries",
+            "TestASTExprSubstitutionResetFailureKeepsLaterDependencyTableRoots",
+            "TestASTExprSubstitutionResetRefusalKeepsConsumedKeyProgress",
+            "TestASTExprSubstitutionWarmNoAllocationsUnderRefusal",
+            "TestASTScopedExprSubstitutionActualTrailAndBorrowedDestructor",
+            "TestASTScopedExprSubstitutionCleanupKeepsTrailAndNestedScopes",
+            "TestASTScopedExprSubstitutionConstructorEveryReservationPrefix",
+            "TestASTScopedExprSubstitutionConsumedPopErrorResumesSuffix",
+            "TestASTScopedExprSubstitutionDestructorAfterConsumedPopError",
+            "TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix",
+            "TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding",
+            "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
+            "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
+            "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths"
+          ]
+        },
+        {
+          "name": "display through actual mk_pp/SMT2 printer; compiler-generated unsafe owner copies and full rewriter/tactic consumers",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Actual128-byte owner, independent24-byte table entries and48-byte scoped owner are encoded in existing charged AST allocators; no existing manager fields changed. Real source INC/DEC, scalar progress and retained pointer/limits semantics preserve consumed roots. See AST_EXPR_SUBSTITUTION_PACKET.md."
+      ],
+      "deviations": [
+        "Source AST pointer entries become scalar locators with real physical width accounting; source undefined stale hashing and interrupted cleanup use typed guards/progress at actual reads/actions. Same-entry consumed errors finish finite owned cleanup; later Reset entries stop, destructor completes lexical cleanup or retains owner on refusal. Actual displays and full consumers remain open."
+      ]
     },
     {
       "path": "src/ast/expr_substitution.h",
       "sha256": "82f8200ed2e58630137b96a6162235beef9fbe40be20b224dca24b073e5f16dd",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "ast_expr_substitution.go",
+        "ast_expr_substitution_failure_test.go",
+        "ast_expr_substitution_ops.go",
+        "ast_expr_substitution_scope.go",
+        "ast_expr_substitution_scope_test.go",
+        "ast_expr_substitution_table.go",
+        "ast_expr_substitution_test.go"
+      ],
+      "tests": [
+        "TestASTExprSubstitutionActualMapOutputsAndReferenceOrder",
+        "TestASTExprSubstitutionAllPolicyMapsAndAliasedFindOutputs",
+        "TestASTExprSubstitutionBoundedIndependentReferenceModel",
+        "TestASTExprSubstitutionCollisionsWrapAndLastTombstone",
+        "TestASTExprSubstitutionConstructorEveryReservationPrefix",
+        "TestASTExprSubstitutionConsumedEraseFinishesSameEntry",
+        "TestASTExprSubstitutionDestructorExecutesSourceSparseReset",
+        "TestASTExprSubstitutionDisabledPolicyDoesNotInspectUnusedForeignArguments",
+        "TestASTExprSubstitutionExplicitProofGuardRunsAfterPrimaryConstruction",
+        "TestASTExprSubstitutionFinalizeRefusalPreservesOldCapacity",
+        "TestASTExprSubstitutionGrowthFailurePreservesEachMapPrefix",
+        "TestASTExprSubstitutionLateEraseHashGuardReturnsRawConsumedPrefix",
+        "TestASTExprSubstitutionNullDefinitionRepeatedNewBranch",
+        "TestASTExprSubstitutionNullOptionalOverwriteSourceProfiles",
+        "TestASTExprSubstitutionPhysicalLayoutBoundsAndBorrowedProvenance",
+        "TestASTExprSubstitutionPrimaryGrowthRefusalAllowsSourceRetry",
+        "TestASTExprSubstitutionRegisteredConstructorAndPolicies",
+        "TestASTExprSubstitutionResetConsumedErrorPreservesLaterEntries",
+        "TestASTExprSubstitutionResetFailureKeepsLaterDependencyTableRoots",
+        "TestASTExprSubstitutionResetRefusalKeepsConsumedKeyProgress",
+        "TestASTExprSubstitutionWarmNoAllocationsUnderRefusal",
+        "TestASTScopedExprSubstitutionActualTrailAndBorrowedDestructor",
+        "TestASTScopedExprSubstitutionCleanupKeepsTrailAndNestedScopes",
+        "TestASTScopedExprSubstitutionConstructorEveryReservationPrefix",
+        "TestASTScopedExprSubstitutionConsumedPopErrorResumesSuffix",
+        "TestASTScopedExprSubstitutionDestructorAfterConsumedPopError",
+        "TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix",
+        "TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding",
+        "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
+        "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
+        "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -13080,11 +13247,98 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "actual expr_substitution constructors, policies, owning insert/replace/erase/reset/cleanup/destructor and sequential raw find outputs",
+          "status": "ported",
+          "go_target": "ast_expr_substitution_ops.go",
+          "tests": [
+            "TestASTExprSubstitutionActualMapOutputsAndReferenceOrder",
+            "TestASTExprSubstitutionAllPolicyMapsAndAliasedFindOutputs",
+            "TestASTExprSubstitutionBoundedIndependentReferenceModel",
+            "TestASTExprSubstitutionCollisionsWrapAndLastTombstone",
+            "TestASTExprSubstitutionConstructorEveryReservationPrefix",
+            "TestASTExprSubstitutionConsumedEraseFinishesSameEntry",
+            "TestASTExprSubstitutionDestructorExecutesSourceSparseReset",
+            "TestASTExprSubstitutionDisabledPolicyDoesNotInspectUnusedForeignArguments",
+            "TestASTExprSubstitutionExplicitProofGuardRunsAfterPrimaryConstruction",
+            "TestASTExprSubstitutionFinalizeRefusalPreservesOldCapacity",
+            "TestASTExprSubstitutionGrowthFailurePreservesEachMapPrefix",
+            "TestASTExprSubstitutionLateEraseHashGuardReturnsRawConsumedPrefix",
+            "TestASTExprSubstitutionNullDefinitionRepeatedNewBranch",
+            "TestASTExprSubstitutionNullOptionalOverwriteSourceProfiles",
+            "TestASTExprSubstitutionPhysicalLayoutBoundsAndBorrowedProvenance",
+            "TestASTExprSubstitutionPrimaryGrowthRefusalAllowsSourceRetry",
+            "TestASTExprSubstitutionRegisteredConstructorAndPolicies",
+            "TestASTExprSubstitutionResetConsumedErrorPreservesLaterEntries",
+            "TestASTExprSubstitutionResetFailureKeepsLaterDependencyTableRoots",
+            "TestASTExprSubstitutionResetRefusalKeepsConsumedKeyProgress",
+            "TestASTExprSubstitutionWarmNoAllocationsUnderRefusal",
+            "TestASTScopedExprSubstitutionActualTrailAndBorrowedDestructor",
+            "TestASTScopedExprSubstitutionCleanupKeepsTrailAndNestedScopes",
+            "TestASTScopedExprSubstitutionConstructorEveryReservationPrefix",
+            "TestASTScopedExprSubstitutionConsumedPopErrorResumesSuffix",
+            "TestASTScopedExprSubstitutionDestructorAfterConsumedPopError",
+            "TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix",
+            "TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding",
+            "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
+            "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
+            "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths"
+          ]
+        },
+        {
+          "name": "scoped_expr_substitution actual trail/limits insert, reset, push/pop, lookup/forwarding and destruction without resetting borrowed map",
+          "status": "ported",
+          "go_target": "ast_expr_substitution_scope.go",
+          "tests": [
+            "TestASTExprSubstitutionActualMapOutputsAndReferenceOrder",
+            "TestASTExprSubstitutionAllPolicyMapsAndAliasedFindOutputs",
+            "TestASTExprSubstitutionBoundedIndependentReferenceModel",
+            "TestASTExprSubstitutionCollisionsWrapAndLastTombstone",
+            "TestASTExprSubstitutionConstructorEveryReservationPrefix",
+            "TestASTExprSubstitutionConsumedEraseFinishesSameEntry",
+            "TestASTExprSubstitutionDestructorExecutesSourceSparseReset",
+            "TestASTExprSubstitutionDisabledPolicyDoesNotInspectUnusedForeignArguments",
+            "TestASTExprSubstitutionExplicitProofGuardRunsAfterPrimaryConstruction",
+            "TestASTExprSubstitutionFinalizeRefusalPreservesOldCapacity",
+            "TestASTExprSubstitutionGrowthFailurePreservesEachMapPrefix",
+            "TestASTExprSubstitutionLateEraseHashGuardReturnsRawConsumedPrefix",
+            "TestASTExprSubstitutionNullDefinitionRepeatedNewBranch",
+            "TestASTExprSubstitutionNullOptionalOverwriteSourceProfiles",
+            "TestASTExprSubstitutionPhysicalLayoutBoundsAndBorrowedProvenance",
+            "TestASTExprSubstitutionPrimaryGrowthRefusalAllowsSourceRetry",
+            "TestASTExprSubstitutionRegisteredConstructorAndPolicies",
+            "TestASTExprSubstitutionResetConsumedErrorPreservesLaterEntries",
+            "TestASTExprSubstitutionResetFailureKeepsLaterDependencyTableRoots",
+            "TestASTExprSubstitutionResetRefusalKeepsConsumedKeyProgress",
+            "TestASTExprSubstitutionWarmNoAllocationsUnderRefusal",
+            "TestASTScopedExprSubstitutionActualTrailAndBorrowedDestructor",
+            "TestASTScopedExprSubstitutionCleanupKeepsTrailAndNestedScopes",
+            "TestASTScopedExprSubstitutionConstructorEveryReservationPrefix",
+            "TestASTScopedExprSubstitutionConsumedPopErrorResumesSuffix",
+            "TestASTScopedExprSubstitutionDestructorAfterConsumedPopError",
+            "TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix",
+            "TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding",
+            "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
+            "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
+            "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths"
+          ]
+        },
+        {
+          "name": "display through actual mk_pp/SMT2 printer; compiler-generated unsafe owner copies and full rewriter/tactic consumers",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Actual128-byte owner, independent24-byte table entries and48-byte scoped owner are encoded in existing charged AST allocators; no existing manager fields changed. Real source INC/DEC, scalar progress and retained pointer/limits semantics preserve consumed roots. See AST_EXPR_SUBSTITUTION_PACKET.md."
+      ],
+      "deviations": [
+        "Source AST pointer entries become scalar locators with real physical width accounting; source undefined stale hashing and interrupted cleanup use typed guards/progress at actual reads/actions. Same-entry consumed errors finish finite owned cleanup; later Reset entries stop, destructor completes lexical cleanup or retains owner on refusal. Actual displays and full consumers remain open."
+      ]
     },
     {
       "path": "src/ast/factor_equivs.cpp",
@@ -90721,7 +90975,9 @@
         "utilhash/str_int32_map.go",
         "util_param_descrs.go",
         "ast_shared_occs_iterator.go",
-        "ast_sparse_mark.go"
+        "ast_sparse_mark.go",
+        "ast_expr_substitution_table.go",
+        "ast_expr_substitution_ops.go"
       ],
       "tests": [
         "TestUintMapSourceMapAssertions",
@@ -90830,7 +91086,38 @@
         "TestASTSparseMarkLastTombstoneAndCurrentHashReads",
         "TestASTSparseMarkPendingResetCanFinishAtFinalEpoch",
         "TestASTSparseMarkResetAndFinalizeFreeBeforeReserve",
-        "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
+        "TestASTSparseSharedExpressionDomainsAndASTWideVisited",
+        "TestASTExprSubstitutionActualMapOutputsAndReferenceOrder",
+        "TestASTExprSubstitutionAllPolicyMapsAndAliasedFindOutputs",
+        "TestASTExprSubstitutionBoundedIndependentReferenceModel",
+        "TestASTExprSubstitutionCollisionsWrapAndLastTombstone",
+        "TestASTExprSubstitutionConstructorEveryReservationPrefix",
+        "TestASTExprSubstitutionConsumedEraseFinishesSameEntry",
+        "TestASTExprSubstitutionDestructorExecutesSourceSparseReset",
+        "TestASTExprSubstitutionDisabledPolicyDoesNotInspectUnusedForeignArguments",
+        "TestASTExprSubstitutionExplicitProofGuardRunsAfterPrimaryConstruction",
+        "TestASTExprSubstitutionFinalizeRefusalPreservesOldCapacity",
+        "TestASTExprSubstitutionGrowthFailurePreservesEachMapPrefix",
+        "TestASTExprSubstitutionLateEraseHashGuardReturnsRawConsumedPrefix",
+        "TestASTExprSubstitutionNullDefinitionRepeatedNewBranch",
+        "TestASTExprSubstitutionNullOptionalOverwriteSourceProfiles",
+        "TestASTExprSubstitutionPhysicalLayoutBoundsAndBorrowedProvenance",
+        "TestASTExprSubstitutionPrimaryGrowthRefusalAllowsSourceRetry",
+        "TestASTExprSubstitutionRegisteredConstructorAndPolicies",
+        "TestASTExprSubstitutionResetConsumedErrorPreservesLaterEntries",
+        "TestASTExprSubstitutionResetFailureKeepsLaterDependencyTableRoots",
+        "TestASTExprSubstitutionResetRefusalKeepsConsumedKeyProgress",
+        "TestASTExprSubstitutionWarmNoAllocationsUnderRefusal",
+        "TestASTScopedExprSubstitutionActualTrailAndBorrowedDestructor",
+        "TestASTScopedExprSubstitutionCleanupKeepsTrailAndNestedScopes",
+        "TestASTScopedExprSubstitutionConstructorEveryReservationPrefix",
+        "TestASTScopedExprSubstitutionConsumedPopErrorResumesSuffix",
+        "TestASTScopedExprSubstitutionDestructorAfterConsumedPopError",
+        "TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix",
+        "TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding",
+        "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
+        "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
+        "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths"
       ],
       "conditionals": [
         {
@@ -91485,6 +91772,44 @@
             "TestASTSharedOccurrencesIteratorActualBackingLifetime",
             "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
           ]
+        },
+        {
+          "name": "selected concrete expr-key maps: current AST hash, full linear/wrapped probes and last tombstone, grow-before-duplicate, erase/rebuild, reset and finalize publication",
+          "status": "ported",
+          "go_target": "ast_expr_substitution_table.go",
+          "tests": [
+            "TestASTExprSubstitutionActualMapOutputsAndReferenceOrder",
+            "TestASTExprSubstitutionAllPolicyMapsAndAliasedFindOutputs",
+            "TestASTExprSubstitutionBoundedIndependentReferenceModel",
+            "TestASTExprSubstitutionCollisionsWrapAndLastTombstone",
+            "TestASTExprSubstitutionConstructorEveryReservationPrefix",
+            "TestASTExprSubstitutionConsumedEraseFinishesSameEntry",
+            "TestASTExprSubstitutionDestructorExecutesSourceSparseReset",
+            "TestASTExprSubstitutionDisabledPolicyDoesNotInspectUnusedForeignArguments",
+            "TestASTExprSubstitutionExplicitProofGuardRunsAfterPrimaryConstruction",
+            "TestASTExprSubstitutionFinalizeRefusalPreservesOldCapacity",
+            "TestASTExprSubstitutionGrowthFailurePreservesEachMapPrefix",
+            "TestASTExprSubstitutionLateEraseHashGuardReturnsRawConsumedPrefix",
+            "TestASTExprSubstitutionNullDefinitionRepeatedNewBranch",
+            "TestASTExprSubstitutionNullOptionalOverwriteSourceProfiles",
+            "TestASTExprSubstitutionPhysicalLayoutBoundsAndBorrowedProvenance",
+            "TestASTExprSubstitutionPrimaryGrowthRefusalAllowsSourceRetry",
+            "TestASTExprSubstitutionRegisteredConstructorAndPolicies",
+            "TestASTExprSubstitutionResetConsumedErrorPreservesLaterEntries",
+            "TestASTExprSubstitutionResetFailureKeepsLaterDependencyTableRoots",
+            "TestASTExprSubstitutionResetRefusalKeepsConsumedKeyProgress",
+            "TestASTExprSubstitutionWarmNoAllocationsUnderRefusal",
+            "TestASTScopedExprSubstitutionActualTrailAndBorrowedDestructor",
+            "TestASTScopedExprSubstitutionCleanupKeepsTrailAndNestedScopes",
+            "TestASTScopedExprSubstitutionConstructorEveryReservationPrefix",
+            "TestASTScopedExprSubstitutionConsumedPopErrorResumesSuffix",
+            "TestASTScopedExprSubstitutionDestructorAfterConsumedPopError",
+            "TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix",
+            "TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding",
+            "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
+            "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
+            "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths"
+          ]
         }
       ],
       "ownership": [
@@ -91493,7 +91818,8 @@
         "StrHashtable borrows immutable region spellings through scalar origin/ref/offset/length records. Table lifecycle never copies/frees spellings; cold owner/table budgets and safe epochs are audited. Multi-origin Assign/Union/Intersect and foreign borrow/query/mutation paths are complete for this specialization; other entry types and optional enabled statistics remain open. See utilhash/PORT_STATUS.md.",
         "CString/int32 default entries retain complete borrowed key/value data on FREE/DELETED. Fixed40-byte scalar entries, budgeted header/table/directory, borrowed origins and source cached hash/bucket/action order; see utilhash/STR_INT32_MAP_PORT_STATUS.md.",
         "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md.",
-        "Concrete AST expr identity-table and shared-occurrence owners preserve source bucket-order callbacks, borrowing, actual node shared flags and charged backing/header peaks. See AST_SPARSE_SHARED_PORT_STATUS.md."
+        "Concrete AST expr identity-table and shared-occurrence owners preserve source bucket-order callbacks, borrowing, actual node shared flags and charged backing/header peaks. See AST_SPARSE_SHARED_PORT_STATUS.md.",
+        "Three selected expression substitution map backings retain distinct capacities and actual ownership bits; expansion temporaries are nonowning, sparse reset publishes half-capacity before allocation and finalize publishes64 after allocation. Generic maps remain partial."
       ],
       "deviations": [
         "Checked cold owner/epoch snapshots replace borrowed entry pointers; structural mutation invalidates snapshots.",
@@ -107225,7 +107551,9 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "ast_sparse_mark.go"
+        "ast_sparse_mark.go",
+        "ast_expr_substitution_table.go",
+        "ast_expr_substitution_ops.go"
       ],
       "tests": [
         "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
@@ -107248,7 +107576,38 @@
         "TestASTSparseMarkLastTombstoneAndCurrentHashReads",
         "TestASTSparseMarkPendingResetCanFinishAtFinalEpoch",
         "TestASTSparseMarkResetAndFinalizeFreeBeforeReserve",
-        "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
+        "TestASTSparseSharedExpressionDomainsAndASTWideVisited",
+        "TestASTExprSubstitutionActualMapOutputsAndReferenceOrder",
+        "TestASTExprSubstitutionAllPolicyMapsAndAliasedFindOutputs",
+        "TestASTExprSubstitutionBoundedIndependentReferenceModel",
+        "TestASTExprSubstitutionCollisionsWrapAndLastTombstone",
+        "TestASTExprSubstitutionConstructorEveryReservationPrefix",
+        "TestASTExprSubstitutionConsumedEraseFinishesSameEntry",
+        "TestASTExprSubstitutionDestructorExecutesSourceSparseReset",
+        "TestASTExprSubstitutionDisabledPolicyDoesNotInspectUnusedForeignArguments",
+        "TestASTExprSubstitutionExplicitProofGuardRunsAfterPrimaryConstruction",
+        "TestASTExprSubstitutionFinalizeRefusalPreservesOldCapacity",
+        "TestASTExprSubstitutionGrowthFailurePreservesEachMapPrefix",
+        "TestASTExprSubstitutionLateEraseHashGuardReturnsRawConsumedPrefix",
+        "TestASTExprSubstitutionNullDefinitionRepeatedNewBranch",
+        "TestASTExprSubstitutionNullOptionalOverwriteSourceProfiles",
+        "TestASTExprSubstitutionPhysicalLayoutBoundsAndBorrowedProvenance",
+        "TestASTExprSubstitutionPrimaryGrowthRefusalAllowsSourceRetry",
+        "TestASTExprSubstitutionRegisteredConstructorAndPolicies",
+        "TestASTExprSubstitutionResetConsumedErrorPreservesLaterEntries",
+        "TestASTExprSubstitutionResetFailureKeepsLaterDependencyTableRoots",
+        "TestASTExprSubstitutionResetRefusalKeepsConsumedKeyProgress",
+        "TestASTExprSubstitutionWarmNoAllocationsUnderRefusal",
+        "TestASTScopedExprSubstitutionActualTrailAndBorrowedDestructor",
+        "TestASTScopedExprSubstitutionCleanupKeepsTrailAndNestedScopes",
+        "TestASTScopedExprSubstitutionConstructorEveryReservationPrefix",
+        "TestASTScopedExprSubstitutionConsumedPopErrorResumesSuffix",
+        "TestASTScopedExprSubstitutionDestructorAfterConsumedPopError",
+        "TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix",
+        "TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding",
+        "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
+        "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
+        "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths"
       ],
       "conditionals": [
         {
@@ -107314,10 +107673,49 @@
           "status": "unported",
           "go_target": "",
           "tests": []
+        },
+        {
+          "name": "selected concrete expr-key maps: current AST hash, full linear/wrapped probes and last tombstone, grow-before-duplicate, erase/rebuild, reset and finalize publication",
+          "status": "ported",
+          "go_target": "ast_expr_substitution_table.go",
+          "tests": [
+            "TestASTExprSubstitutionActualMapOutputsAndReferenceOrder",
+            "TestASTExprSubstitutionAllPolicyMapsAndAliasedFindOutputs",
+            "TestASTExprSubstitutionBoundedIndependentReferenceModel",
+            "TestASTExprSubstitutionCollisionsWrapAndLastTombstone",
+            "TestASTExprSubstitutionConstructorEveryReservationPrefix",
+            "TestASTExprSubstitutionConsumedEraseFinishesSameEntry",
+            "TestASTExprSubstitutionDestructorExecutesSourceSparseReset",
+            "TestASTExprSubstitutionDisabledPolicyDoesNotInspectUnusedForeignArguments",
+            "TestASTExprSubstitutionExplicitProofGuardRunsAfterPrimaryConstruction",
+            "TestASTExprSubstitutionFinalizeRefusalPreservesOldCapacity",
+            "TestASTExprSubstitutionGrowthFailurePreservesEachMapPrefix",
+            "TestASTExprSubstitutionLateEraseHashGuardReturnsRawConsumedPrefix",
+            "TestASTExprSubstitutionNullDefinitionRepeatedNewBranch",
+            "TestASTExprSubstitutionNullOptionalOverwriteSourceProfiles",
+            "TestASTExprSubstitutionPhysicalLayoutBoundsAndBorrowedProvenance",
+            "TestASTExprSubstitutionPrimaryGrowthRefusalAllowsSourceRetry",
+            "TestASTExprSubstitutionRegisteredConstructorAndPolicies",
+            "TestASTExprSubstitutionResetConsumedErrorPreservesLaterEntries",
+            "TestASTExprSubstitutionResetFailureKeepsLaterDependencyTableRoots",
+            "TestASTExprSubstitutionResetRefusalKeepsConsumedKeyProgress",
+            "TestASTExprSubstitutionWarmNoAllocationsUnderRefusal",
+            "TestASTScopedExprSubstitutionActualTrailAndBorrowedDestructor",
+            "TestASTScopedExprSubstitutionCleanupKeepsTrailAndNestedScopes",
+            "TestASTScopedExprSubstitutionConstructorEveryReservationPrefix",
+            "TestASTScopedExprSubstitutionConsumedPopErrorResumesSuffix",
+            "TestASTScopedExprSubstitutionDestructorAfterConsumedPopError",
+            "TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix",
+            "TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding",
+            "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
+            "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
+            "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths"
+          ]
         }
       ],
       "ownership": [
-        "Concrete AST expr identity-table and shared-occurrence owners preserve source bucket-order callbacks, borrowing, actual node shared flags and charged backing/header peaks. See AST_SPARSE_SHARED_PORT_STATUS.md."
+        "Concrete AST expr identity-table and shared-occurrence owners preserve source bucket-order callbacks, borrowing, actual node shared flags and charged backing/header peaks. See AST_SPARSE_SHARED_PORT_STATUS.md.",
+        "Three selected expression substitution map backings retain distinct capacities and actual ownership bits; expansion temporaries are nonowning, sparse reset publishes half-capacity before allocation and finalize publishes64 after allocation. Generic maps remain partial."
       ],
       "deviations": [
         "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See AST_SPARSE_SHARED_PORT_STATUS.md."
@@ -110371,9 +110769,43 @@
       "sha256": "36c91bcffd121a3a2bc2a8bda1857565bc8422753a173dbd8d6e976e237515fc",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "ast_expr_substitution_ops.go"
+      ],
+      "tests": [
+        "TestASTExprSubstitutionActualMapOutputsAndReferenceOrder",
+        "TestASTExprSubstitutionAllPolicyMapsAndAliasedFindOutputs",
+        "TestASTExprSubstitutionBoundedIndependentReferenceModel",
+        "TestASTExprSubstitutionCollisionsWrapAndLastTombstone",
+        "TestASTExprSubstitutionConstructorEveryReservationPrefix",
+        "TestASTExprSubstitutionConsumedEraseFinishesSameEntry",
+        "TestASTExprSubstitutionDestructorExecutesSourceSparseReset",
+        "TestASTExprSubstitutionDisabledPolicyDoesNotInspectUnusedForeignArguments",
+        "TestASTExprSubstitutionExplicitProofGuardRunsAfterPrimaryConstruction",
+        "TestASTExprSubstitutionFinalizeRefusalPreservesOldCapacity",
+        "TestASTExprSubstitutionGrowthFailurePreservesEachMapPrefix",
+        "TestASTExprSubstitutionLateEraseHashGuardReturnsRawConsumedPrefix",
+        "TestASTExprSubstitutionNullDefinitionRepeatedNewBranch",
+        "TestASTExprSubstitutionNullOptionalOverwriteSourceProfiles",
+        "TestASTExprSubstitutionPhysicalLayoutBoundsAndBorrowedProvenance",
+        "TestASTExprSubstitutionPrimaryGrowthRefusalAllowsSourceRetry",
+        "TestASTExprSubstitutionRegisteredConstructorAndPolicies",
+        "TestASTExprSubstitutionResetConsumedErrorPreservesLaterEntries",
+        "TestASTExprSubstitutionResetFailureKeepsLaterDependencyTableRoots",
+        "TestASTExprSubstitutionResetRefusalKeepsConsumedKeyProgress",
+        "TestASTExprSubstitutionWarmNoAllocationsUnderRefusal",
+        "TestASTScopedExprSubstitutionActualTrailAndBorrowedDestructor",
+        "TestASTScopedExprSubstitutionCleanupKeepsTrailAndNestedScopes",
+        "TestASTScopedExprSubstitutionConstructorEveryReservationPrefix",
+        "TestASTScopedExprSubstitutionConsumedPopErrorResumesSuffix",
+        "TestASTScopedExprSubstitutionDestructorAfterConsumedPopError",
+        "TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix",
+        "TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding",
+        "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
+        "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
+        "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -110384,11 +110816,60 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "selected expr_substitution dec_ref_map_key_values and proof/dependency dec_ref_map_values source loops",
+          "status": "ported",
+          "go_target": "ast_expr_substitution_ops.go",
+          "tests": [
+            "TestASTExprSubstitutionActualMapOutputsAndReferenceOrder",
+            "TestASTExprSubstitutionAllPolicyMapsAndAliasedFindOutputs",
+            "TestASTExprSubstitutionBoundedIndependentReferenceModel",
+            "TestASTExprSubstitutionCollisionsWrapAndLastTombstone",
+            "TestASTExprSubstitutionConstructorEveryReservationPrefix",
+            "TestASTExprSubstitutionConsumedEraseFinishesSameEntry",
+            "TestASTExprSubstitutionDestructorExecutesSourceSparseReset",
+            "TestASTExprSubstitutionDisabledPolicyDoesNotInspectUnusedForeignArguments",
+            "TestASTExprSubstitutionExplicitProofGuardRunsAfterPrimaryConstruction",
+            "TestASTExprSubstitutionFinalizeRefusalPreservesOldCapacity",
+            "TestASTExprSubstitutionGrowthFailurePreservesEachMapPrefix",
+            "TestASTExprSubstitutionLateEraseHashGuardReturnsRawConsumedPrefix",
+            "TestASTExprSubstitutionNullDefinitionRepeatedNewBranch",
+            "TestASTExprSubstitutionNullOptionalOverwriteSourceProfiles",
+            "TestASTExprSubstitutionPhysicalLayoutBoundsAndBorrowedProvenance",
+            "TestASTExprSubstitutionPrimaryGrowthRefusalAllowsSourceRetry",
+            "TestASTExprSubstitutionRegisteredConstructorAndPolicies",
+            "TestASTExprSubstitutionResetConsumedErrorPreservesLaterEntries",
+            "TestASTExprSubstitutionResetFailureKeepsLaterDependencyTableRoots",
+            "TestASTExprSubstitutionResetRefusalKeepsConsumedKeyProgress",
+            "TestASTExprSubstitutionWarmNoAllocationsUnderRefusal",
+            "TestASTScopedExprSubstitutionActualTrailAndBorrowedDestructor",
+            "TestASTScopedExprSubstitutionCleanupKeepsTrailAndNestedScopes",
+            "TestASTScopedExprSubstitutionConstructorEveryReservationPrefix",
+            "TestASTScopedExprSubstitutionConsumedPopErrorResumesSuffix",
+            "TestASTScopedExprSubstitutionDestructorAfterConsumedPopError",
+            "TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix",
+            "TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding",
+            "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
+            "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
+            "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths"
+          ]
+        },
+        {
+          "name": "generic managers/maps, keys-only and collection specializations",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Real AST/dependency DEC callbacks run in ascending physical bucket order, key before value, with consumed/refused state recorded in actual table entries. Reset publication follows callbacks; remaining generic utility specializations remain open."
+      ],
+      "deviations": [
+        "Interrupted Go callback cleanup resumes scalar progress rather than replaying consumed references; same-entry completion and destructor continuation are distinguished from C++ exception semantics."
+      ]
     },
     {
       "path": "src/util/ref_vector.h",
