@@ -52889,10 +52889,32 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "sat_watched.go",
-        "sat_storage_vector.go"
+        "sat_solver_watch_store.go",
+        "sat_storage_vector.go",
+        "sat_watched.go"
       ],
       "tests": [
+        "TestSATSolverWatchStoreActualWatchDisplayAndStableSort",
+        "TestSATSolverWatchStoreAssignmentConstructionGuardPrefix",
+        "TestSATSolverWatchStoreBitmapWordBoundaryAndRawClauseBorrow",
+        "TestSATSolverWatchStoreCodecAndCapacity",
+        "TestSATSolverWatchStoreConstructorRoutesAndBounds",
+        "TestSATSolverWatchStoreConstructorUnwind",
+        "TestSATSolverWatchStoreCopyLifetimeAndLedger",
+        "TestSATSolverWatchStoreCrossCopyAndAssignment",
+        "TestSATSolverWatchStoreDefaultBackAndTernaryRoutes",
+        "TestSATSolverWatchStoreEraseClauseDestroysTail",
+        "TestSATSolverWatchStoreErasePopHolesAndGrowth",
+        "TestSATSolverWatchStoreFailureAndWarmValues",
+        "TestSATSolverWatchStoreFailureSweepAndPhysicalAccounting",
+        "TestSATSolverWatchStoreFiniteBudgetRefusal",
+        "TestSATSolverWatchStoreIndependentLifetimeModel",
+        "TestSATSolverWatchStoreIteratorAndMove",
+        "TestSATSolverWatchStoreIteratorsFollowMoveAndSwapBacking",
+        "TestSATSolverWatchStoreNullBackingShrinkAndSetEnd",
+        "TestSATSolverWatchStoreOwnerLedgerRetirement",
+        "TestSATSolverWatchStoreSourceHelpersAndReverse",
+        "TestSATSolverWatchStoreSourceProfileBoundaries",
         "TestSATStorageSourceTextAndWidthActions",
         "TestSATWatchEraseRetainedLifetimesAndGrowthPrefix",
         "TestSATWatchLifetimeMetadataBudget",
@@ -52915,13 +52937,43 @@
         {
           "name": "whole runtime conditional debug-tag/TRACE policy and remaining consumer integration",
           "status": "unported"
+        },
+        {
+          "name": "Concrete common-owner solver watch-list storage/copy/move/lifetime/iterator specialization",
+          "status": "partial",
+          "go_target": "sat_solver_watch_store.go",
+          "tests": [
+            "TestSATSolverWatchStoreCodecAndCapacity",
+            "TestSATSolverWatchStoreErasePopHolesAndGrowth",
+            "TestSATSolverWatchStoreCopyLifetimeAndLedger",
+            "TestSATSolverWatchStoreEraseClauseDestroysTail",
+            "TestSATSolverWatchStoreFailureAndWarmValues",
+            "TestSATSolverWatchStoreIteratorAndMove",
+            "TestSATSolverWatchStoreCrossCopyAndAssignment",
+            "TestSATSolverWatchStoreSourceProfileBoundaries",
+            "TestSATSolverWatchStoreSourceHelpersAndReverse",
+            "TestSATSolverWatchStoreFailureSweepAndPhysicalAccounting",
+            "TestSATSolverWatchStoreConstructorUnwind",
+            "TestSATSolverWatchStoreIndependentLifetimeModel",
+            "TestSATSolverWatchStoreOwnerLedgerRetirement",
+            "TestSATSolverWatchStoreActualWatchDisplayAndStableSort",
+            "TestSATSolverWatchStoreConstructorRoutesAndBounds",
+            "TestSATSolverWatchStoreBitmapWordBoundaryAndRawClauseBorrow",
+            "TestSATSolverWatchStoreDefaultBackAndTernaryRoutes",
+            "TestSATSolverWatchStoreAssignmentConstructionGuardPrefix",
+            "TestSATSolverWatchStoreNullBackingShrinkAndSetEnd",
+            "TestSATSolverWatchStoreIteratorsFollowMoveAndSwapBacking",
+            "TestSATSolverWatchStoreFiniteBudgetRefusal"
+          ]
         }
       ],
       "ownership": [
-        "Concrete scalar clause locators are distinct from source IDs. Actual cold headers/directories/backing and allocation overlap are budgeted; small versus wide physical clause storage uses real allocations. Activity queues borrow actual mutable vectors; sets/vectors retain source bindings and copy/move prefixes. Watched erase retains live tails while actual destruction ends per-slot lifetime tracked by fully charged metadata. All twelve iterator factories return scalar values with zero escaping-wrapper allocation. See SAT_STORAGE_PORT_STATUS.md for exact16-file/40-test evidence."
+        "Concrete scalar clause locators are distinct from source IDs. Actual cold headers/directories/backing and allocation overlap are budgeted; small versus wide physical clause storage uses real allocations. Activity queues borrow actual mutable vectors; sets/vectors retain source bindings and copy/move prefixes. Watched erase retains live tails while actual destruction ends per-slot lifetime tracked by fully charged metadata. All twelve iterator factories return scalar values with zero escaping-wrapper allocation. See SAT_STORAGE_PORT_STATUS.md for exact16-file/40-test evidence.",
+        "Actual four-uint64 watch payloads preserve val1/val2 plus widened scalar clause provenance; separate charged lifetime bitmap tracks erased live tails and destroyed holes. Common cold owner/directories and all arena descriptor/page/free storage and old/new overlaps charged. Exact nested copies, destroy-before-assignment, backing-transferring move/swap and real display/erase routes; see SAT_SOLVER_WATCH_STORE_PORT_STATUS.md."
       ],
       "deviations": [
-        "Pointer ABI becomes owner/kind/slot/generation locators and explicit typed invalid-domain guards. No fake address ordering, global OOM service, external extension callback, solver result or propagation/search algorithm is provided by this storage packet. Source OutOfMemory callback is borrowed; source global policy, conditional CASSERT tag control and TRACE/printer runtime remain open. Concrete vector aliases/invalid source instantiations and self-append/Fill nontermination adapters are recorded explicitly. No Go generics are used."
+        "Pointer ABI becomes owner/kind/slot/generation locators and explicit typed invalid-domain guards. No fake address ordering, global OOM service, external extension callback, solver result or propagation/search algorithm is provided by this storage packet. Source OutOfMemory callback is borrowed; source global policy, conditional CASSERT tag control and TRACE/printer runtime remain open. Concrete vector aliases/invalid source instantiations and self-append/Fill nontermination adapters are recorded explicitly. No Go generics are used.",
+        "Composite payload/bitmap preparation is an explicit Go storage adapter; completed pool growth remains charged on refusal. Iterators follow actual scalar backing across moves/swaps, and guard only actual free/reallocation or ended-slot lifetime. Null-backing Shrink/SetEnd retains finite source release no-op. Outer solver watch vector and propagation remain open; quadratic SortByKind is an additional semantic-order convenience adapter, not completed std::stable_sort backend/complexity integration."
       ]
     },
     {
@@ -52931,24 +52983,46 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "sat_watched.go",
-        "sat_storage_vector.go"
+        "sat_solver_watch_store.go",
+        "sat_storage_vector.go",
+        "sat_watched.go"
       ],
       "tests": [
-        "TestSATStorageVectorFailurePrefixesAndBudgetPeaks",
-        "TestSATConcreteVectorSourceCapacityAndCopyPolicies",
         "TestSATBinClauseVectorRealSpecialization",
         "TestSATClauseVectorBorrowedForeignCopyLifetime",
-        "TestSATScalarVectorReleaseRetainedBodies",
         "TestSATConcreteVectorIndependentOperations",
-        "TestSATVectorCrossBudgetSwapAndMoveFailure",
-        "TestSATVectorIteratorEpochRetiresWithoutWrap",
+        "TestSATConcreteVectorSourceCapacityAndCopyPolicies",
         "TestSATIteratorConcreteValueContracts",
         "TestSATIteratorEscapingValuesNoAllocations",
+        "TestSATPackedSourceGetterSetterDomains",
+        "TestSATScalarVectorReleaseRetainedBodies",
+        "TestSATSolverWatchStoreActualWatchDisplayAndStableSort",
+        "TestSATSolverWatchStoreAssignmentConstructionGuardPrefix",
+        "TestSATSolverWatchStoreBitmapWordBoundaryAndRawClauseBorrow",
+        "TestSATSolverWatchStoreCodecAndCapacity",
+        "TestSATSolverWatchStoreConstructorRoutesAndBounds",
+        "TestSATSolverWatchStoreConstructorUnwind",
+        "TestSATSolverWatchStoreCopyLifetimeAndLedger",
+        "TestSATSolverWatchStoreCrossCopyAndAssignment",
+        "TestSATSolverWatchStoreDefaultBackAndTernaryRoutes",
+        "TestSATSolverWatchStoreEraseClauseDestroysTail",
+        "TestSATSolverWatchStoreErasePopHolesAndGrowth",
+        "TestSATSolverWatchStoreFailureAndWarmValues",
+        "TestSATSolverWatchStoreFailureSweepAndPhysicalAccounting",
+        "TestSATSolverWatchStoreFiniteBudgetRefusal",
+        "TestSATSolverWatchStoreIndependentLifetimeModel",
+        "TestSATSolverWatchStoreIteratorAndMove",
+        "TestSATSolverWatchStoreIteratorsFollowMoveAndSwapBacking",
+        "TestSATSolverWatchStoreNullBackingShrinkAndSetEnd",
+        "TestSATSolverWatchStoreOwnerLedgerRetirement",
+        "TestSATSolverWatchStoreSourceHelpersAndReverse",
+        "TestSATSolverWatchStoreSourceProfileBoundaries",
+        "TestSATStorageVectorFailurePrefixesAndBudgetPeaks",
+        "TestSATVectorCrossBudgetSwapAndMoveFailure",
+        "TestSATVectorIteratorEpochRetiresWithoutWrap",
         "TestSATWatchEraseRetainedLifetimesAndGrowthPrefix",
         "TestSATWatchLifetimeMetadataBudget",
-        "TestSATWatchedSourceTagsWidthDefectAndErase",
-        "TestSATPackedSourceGetterSetterDomains"
+        "TestSATWatchedSourceTagsWidthDefectAndErase"
       ],
       "conditionals": [
         {
@@ -53085,13 +53159,43 @@
         {
           "name": "whole runtime conditional debug-tag/TRACE policy and remaining consumer integration",
           "status": "unported"
+        },
+        {
+          "name": "Concrete common-owner solver watch-list storage/copy/move/lifetime/iterator specialization",
+          "status": "partial",
+          "go_target": "sat_solver_watch_store.go",
+          "tests": [
+            "TestSATSolverWatchStoreCodecAndCapacity",
+            "TestSATSolverWatchStoreErasePopHolesAndGrowth",
+            "TestSATSolverWatchStoreCopyLifetimeAndLedger",
+            "TestSATSolverWatchStoreEraseClauseDestroysTail",
+            "TestSATSolverWatchStoreFailureAndWarmValues",
+            "TestSATSolverWatchStoreIteratorAndMove",
+            "TestSATSolverWatchStoreCrossCopyAndAssignment",
+            "TestSATSolverWatchStoreSourceProfileBoundaries",
+            "TestSATSolverWatchStoreSourceHelpersAndReverse",
+            "TestSATSolverWatchStoreFailureSweepAndPhysicalAccounting",
+            "TestSATSolverWatchStoreConstructorUnwind",
+            "TestSATSolverWatchStoreIndependentLifetimeModel",
+            "TestSATSolverWatchStoreOwnerLedgerRetirement",
+            "TestSATSolverWatchStoreActualWatchDisplayAndStableSort",
+            "TestSATSolverWatchStoreConstructorRoutesAndBounds",
+            "TestSATSolverWatchStoreBitmapWordBoundaryAndRawClauseBorrow",
+            "TestSATSolverWatchStoreDefaultBackAndTernaryRoutes",
+            "TestSATSolverWatchStoreAssignmentConstructionGuardPrefix",
+            "TestSATSolverWatchStoreNullBackingShrinkAndSetEnd",
+            "TestSATSolverWatchStoreIteratorsFollowMoveAndSwapBacking",
+            "TestSATSolverWatchStoreFiniteBudgetRefusal"
+          ]
         }
       ],
       "ownership": [
-        "Concrete scalar clause locators are distinct from source IDs. Actual cold headers/directories/backing and allocation overlap are budgeted; small versus wide physical clause storage uses real allocations. Activity queues borrow actual mutable vectors; sets/vectors retain source bindings and copy/move prefixes. Watched erase retains live tails while actual destruction ends per-slot lifetime tracked by fully charged metadata. All twelve iterator factories return scalar values with zero escaping-wrapper allocation. See SAT_STORAGE_PORT_STATUS.md for exact16-file/40-test evidence."
+        "Concrete scalar clause locators are distinct from source IDs. Actual cold headers/directories/backing and allocation overlap are budgeted; small versus wide physical clause storage uses real allocations. Activity queues borrow actual mutable vectors; sets/vectors retain source bindings and copy/move prefixes. Watched erase retains live tails while actual destruction ends per-slot lifetime tracked by fully charged metadata. All twelve iterator factories return scalar values with zero escaping-wrapper allocation. See SAT_STORAGE_PORT_STATUS.md for exact16-file/40-test evidence.",
+        "Actual four-uint64 watch payloads preserve val1/val2 plus widened scalar clause provenance; separate charged lifetime bitmap tracks erased live tails and destroyed holes. Common cold owner/directories and all arena descriptor/page/free storage and old/new overlaps charged. Exact nested copies, destroy-before-assignment, backing-transferring move/swap and real display/erase routes; see SAT_SOLVER_WATCH_STORE_PORT_STATUS.md."
       ],
       "deviations": [
-        "Pointer ABI becomes owner/kind/slot/generation locators and explicit typed invalid-domain guards. No fake address ordering, global OOM service, external extension callback, solver result or propagation/search algorithm is provided by this storage packet. Source OutOfMemory callback is borrowed; source global policy, conditional CASSERT tag control and TRACE/printer runtime remain open. Concrete vector aliases/invalid source instantiations and self-append/Fill nontermination adapters are recorded explicitly. No Go generics are used."
+        "Pointer ABI becomes owner/kind/slot/generation locators and explicit typed invalid-domain guards. No fake address ordering, global OOM service, external extension callback, solver result or propagation/search algorithm is provided by this storage packet. Source OutOfMemory callback is borrowed; source global policy, conditional CASSERT tag control and TRACE/printer runtime remain open. Concrete vector aliases/invalid source instantiations and self-append/Fill nontermination adapters are recorded explicitly. No Go generics are used.",
+        "Composite payload/bitmap preparation is an explicit Go storage adapter; completed pool growth remains charged on refusal. Iterators follow actual scalar backing across moves/swaps, and guard only actual free/reallocation or ended-slot lifetime. Null-backing Shrink/SetEnd retains finite source release no-op. Outer solver watch vector and propagation remain open; quadratic SortByKind is an additional semantic-order convenience adapter, not completed std::stable_sort backend/complexity integration."
       ]
     },
     {
@@ -114448,6 +114552,7 @@
         "sat_solver_model_converter.go",
         "sat_solver_nested_store.go",
         "sat_solver_uint_set.go",
+        "sat_solver_watch_store.go",
         "sat_storage_vector.go",
         "util_param_descrs.go"
       ],
@@ -114499,6 +114604,27 @@
         "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
         "TestSATSolverUintSetSourceOrderAndOperations",
         "TestSATSolverUintSetValueIteratorRetainedLifetime",
+        "TestSATSolverWatchStoreActualWatchDisplayAndStableSort",
+        "TestSATSolverWatchStoreAssignmentConstructionGuardPrefix",
+        "TestSATSolverWatchStoreBitmapWordBoundaryAndRawClauseBorrow",
+        "TestSATSolverWatchStoreCodecAndCapacity",
+        "TestSATSolverWatchStoreConstructorRoutesAndBounds",
+        "TestSATSolverWatchStoreConstructorUnwind",
+        "TestSATSolverWatchStoreCopyLifetimeAndLedger",
+        "TestSATSolverWatchStoreCrossCopyAndAssignment",
+        "TestSATSolverWatchStoreDefaultBackAndTernaryRoutes",
+        "TestSATSolverWatchStoreEraseClauseDestroysTail",
+        "TestSATSolverWatchStoreErasePopHolesAndGrowth",
+        "TestSATSolverWatchStoreFailureAndWarmValues",
+        "TestSATSolverWatchStoreFailureSweepAndPhysicalAccounting",
+        "TestSATSolverWatchStoreFiniteBudgetRefusal",
+        "TestSATSolverWatchStoreIndependentLifetimeModel",
+        "TestSATSolverWatchStoreIteratorAndMove",
+        "TestSATSolverWatchStoreIteratorsFollowMoveAndSwapBacking",
+        "TestSATSolverWatchStoreNullBackingShrinkAndSetEnd",
+        "TestSATSolverWatchStoreOwnerLedgerRetirement",
+        "TestSATSolverWatchStoreSourceHelpersAndReverse",
+        "TestSATSolverWatchStoreSourceProfileBoundaries",
         "TestSATStoragePointerFreeOwnershipAndConstructorFailure",
         "TestSATStorageVectorFailurePrefixesAndBudgetPeaks",
         "TestSATVarQueueConstructorCloneFailureAndMovedReset",
@@ -114683,16 +114809,46 @@
             "TestSATSolverUintSetGhostDefinedSpareTailRelease",
             "TestSATSolverUintSetSourceCharCapacityOverflowMath"
           ]
+        },
+        {
+          "name": "Concrete common-owner solver watch-list storage/copy/move/lifetime/iterator specialization",
+          "status": "partial",
+          "go_target": "sat_solver_watch_store.go",
+          "tests": [
+            "TestSATSolverWatchStoreCodecAndCapacity",
+            "TestSATSolverWatchStoreErasePopHolesAndGrowth",
+            "TestSATSolverWatchStoreCopyLifetimeAndLedger",
+            "TestSATSolverWatchStoreEraseClauseDestroysTail",
+            "TestSATSolverWatchStoreFailureAndWarmValues",
+            "TestSATSolverWatchStoreIteratorAndMove",
+            "TestSATSolverWatchStoreCrossCopyAndAssignment",
+            "TestSATSolverWatchStoreSourceProfileBoundaries",
+            "TestSATSolverWatchStoreSourceHelpersAndReverse",
+            "TestSATSolverWatchStoreFailureSweepAndPhysicalAccounting",
+            "TestSATSolverWatchStoreConstructorUnwind",
+            "TestSATSolverWatchStoreIndependentLifetimeModel",
+            "TestSATSolverWatchStoreOwnerLedgerRetirement",
+            "TestSATSolverWatchStoreActualWatchDisplayAndStableSort",
+            "TestSATSolverWatchStoreConstructorRoutesAndBounds",
+            "TestSATSolverWatchStoreBitmapWordBoundaryAndRawClauseBorrow",
+            "TestSATSolverWatchStoreDefaultBackAndTernaryRoutes",
+            "TestSATSolverWatchStoreAssignmentConstructionGuardPrefix",
+            "TestSATSolverWatchStoreNullBackingShrinkAndSetEnd",
+            "TestSATSolverWatchStoreIteratorsFollowMoveAndSwapBacking",
+            "TestSATSolverWatchStoreFiniteBudgetRefusal"
+          ]
         }
       ],
       "ownership": [
         "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md.",
         "SAT vector headers/backing/lifetime metadata use actual host widths, real 2-to-(3n+1)/2 growth and old/new peaks. Trivial reallocation copies retained capacity, watched erase/destroy lifetime is distinguished. Value iterators do not allocate cold wrappers. Source impossible constructors/equality overloads are not fabricated; aliases and raw pointer adapters are in SAT_STORAGE_PORT_STATUS.md.",
-        "Selected concrete nested literal payload and nontrivial model entry copy adaptations preserve source logical capacities, full retained trivial backing, exact-capacity logical copy, and ascending clone/destruct prefixes. Local SAT char membership storage preserves source uint32 growth arithmetic. Physical pooled storage and all cold metadata remain charged."
+        "Selected concrete nested literal payload and nontrivial model entry copy adaptations preserve source logical capacities, full retained trivial backing, exact-capacity logical copy, and ascending clone/destruct prefixes. Local SAT char membership storage preserves source uint32 growth arithmetic. Physical pooled storage and all cold metadata remain charged.",
+        "Actual four-uint64 watch payloads preserve val1/val2 plus widened scalar clause provenance; separate charged lifetime bitmap tracks erased live tails and destroyed holes. Common cold owner/directories and all arena descriptor/page/free storage and old/new overlaps charged. Exact nested copies, destroy-before-assignment, backing-transferring move/swap and real display/erase routes; see SAT_SOLVER_WATCH_STORE_PORT_STATUS.md."
       ],
       "deviations": [
         "Concrete solver-specific storage, not complete generic vector template surface. Owning model Clone/Assign, other specializations and source-undefined continuation behavior remain explicitly separate.",
-        "Literal storage guards physical capacity and stale tokens, but does not track construction of never-written spare slots. Source-defined initialized retained-slot behavior is verified; validation of every C++ initialized-lifetime domain is not claimed."
+        "Literal storage guards physical capacity and stale tokens, but does not track construction of never-written spare slots. Source-defined initialized retained-slot behavior is verified; validation of every C++ initialized-lifetime domain is not claimed.",
+        "Composite payload/bitmap preparation is an explicit Go storage adapter; completed pool growth remains charged on refusal. Iterators follow actual scalar backing across moves/swaps, and guard only actual free/reallocation or ended-slot lifetime. Null-backing Shrink/SetEnd retains finite source release no-op. Outer solver watch vector and propagation remain open; quadratic SortByKind is an additional semantic-order convenience adapter, not completed std::stable_sort backend/complexity integration."
       ]
     },
     {

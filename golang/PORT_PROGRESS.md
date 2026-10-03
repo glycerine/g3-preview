@@ -1021,3 +1021,15 @@ objective remains active. Source ownership aliases, alternate scoped configs,
 TRACE and specific private parray/Reroot diagnostics remain open, as enumerated
 in AST_DEPENDENCY_PACKET.md. Only dependency.h/ast_util.h become partial;
 final ledger counts33ported/84partial/1985unported.
+
+## Common solver watch payload storage
+
+The concrete common-owner watched-list service encodes scalar clause provenance
+and tracks actual per-slot lifetime in charged arena payloads/bitmaps. Source
+copy/move/erase/resize/publication order and full retained capacity are preserved.
+Review regressions corrected null-backing release no-ops and pointer iterators
+following physically transferred backing through move/swap until real lifetime
+ends. Twenty-one named groups and full native/debug, race/actual JS, vet/WASI,
+source/no-generics checks passed. Existing watched/vector units remain partial;
+full solver propagation, outer storage and std sorting backend remain open.
+See SAT_SOLVER_WATCH_STORE_PORT_STATUS.md for immutable evidence and adapters.
