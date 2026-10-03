@@ -1304,3 +1304,18 @@ and regression-tested the destructor's i<size condition after an extra release
 Next. See SAT_SOLVER_CLAUSE_USE_LISTS_PORT_STATUS.md. Default simplification,
 implicit moves/copies and the complete solver remain required. Both simplifier
 units become partial; ledger33ported/144partial/1925unported.
+
+
+## Polynomial content, division and complete selected GCD chain
+
+Actual primitive/content normalization, pseudo/exact division, signed remainder,
+Euclidean/subresultant/modular GCD, centered prime-image reconstruction, extended
+GCD and square-free predicates now use the committed concrete numeric owners.
+Tests-first coverage ports all thirty exact-division ENSURE routes and preserves
+source aliases, nonmonic extended-GCD quirks, raw array read timing and immediate
+failure roots. The exact active231-prime table is checked directly against source;
+late reconstruction tests reach actual post-append reservation failures. See
+UPOLYNOMIAL_GCD_PORT_STATUS.md. Sturm, isolation/refinement, factorization,
+multivariate conversion and algebraic consumers remain required. The active
+prime-table unit becomes partial; ledger33ported/145partial/1924unported.
+The complete solver/proof/interpolation objective remains open.

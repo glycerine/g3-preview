@@ -106,6 +106,10 @@ func (m *UPolynomialManager) addSubViews(a, b UPolynomialView, out UPolynomial, 
 	if e != nil {
 		return e
 	}
+	return m.addSubState(a, b, &d.state, sub)
+}
+func (m *UPolynomialManager) addSubState(a, b UPolynomialView, out *upolyVectorState, sub bool) error {
+	var e error
 	s := &m.basic
 	if modularSourceDebug && (m.alias(a, s) || m.alias(b, s)) {
 		return ErrUPolynomialAssertion
@@ -164,7 +168,7 @@ func (m *UPolynomialManager) addSubViews(a, b UPolynomialView, out UPolynomial, 
 	if e = m.setSize(s, hi); e != nil {
 		return e
 	}
-	d.state, *s = *s, d.state
+	*out, *s = *s, *out
 	return nil
 }
 func (m *UPolynomialManager) Add(p, q, out UPolynomial) error {
@@ -294,7 +298,10 @@ func (m *UPolynomialManager) DerivativeView(v UPolynomialView, out UPolynomial) 
 	if e != nil {
 		return e
 	}
-	s := &d.state
+	return m.derivativeState(v, &d.state)
+}
+func (m *UPolynomialManager) derivativeState(v UPolynomialView, s *upolyVectorState) error {
+	var e error
 	if v.count <= 1 {
 		return m.reset(s)
 	}

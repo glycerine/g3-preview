@@ -156,3 +156,11 @@ targets; corrected metadata separates three mpnum declaration groups from
 eighteen root integration groups. No Go source changed. Final source/no-generics
 audit65261 passed, ledger33ported/102partial/1967unported. Full upolynomial
 and algebraic/solver/proof/interpolation obligations remain open.
+
+
+The subsequent content/division/GCD packet is recorded in
+UPOLYNOMIAL_GCD_PORT_STATUS.md. It adds the selected complete division and GCD
+chain, source exact-division assertions, prime reconstruction and square-free
+predicates with final42-group cross-platform evidence. The remaining Sturm,
+root isolation/refinement, conversion, factorization and algebraic consumers
+continue toward the full arithmetic/solver goal.

@@ -30267,9 +30267,15 @@
       "sha256": "9c843cc5f57cd291392a69d86290daf25c5c5a7937f0476eec7b57829822f426",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/upolynomial_gcd_primes.go",
+        "upolynomial_gcd_source_test.go"
+      ],
+      "tests": [
+        "TestUPolynomialModularGCDCRAAndAllPrimeFallback",
+        "TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -30294,9 +30300,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "selected active ordered NUM_BIG_PRIMES231/g_big_primes table",
+          "status": "ported",
+          "go_target": "upolynomial_gcd_source_test.go",
+          "tests": [
+            "TestUPolynomialModularGCDCRAAndAllPrimeFallback",
+            "TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime"
+          ]
+        }
+      ],
+      "ownership": [
+        "Immutable package-level scalar table; no per-entry roots or allocations. Coordinator compared all231 ordered literals directly with the preserved active source branch."
+      ],
+      "deviations": [
+        "Inactive #if0 alternative prime table remains inventoried and untranslated; selected active table is exact."
+      ]
     },
     {
       "path": "src/math/polynomial/polynomial_var2value.h",
@@ -30635,7 +30655,16 @@
         "mpnum/upolynomial_ops.go",
         "mpnum/upolynomial_storage.go",
         "mpnum/upolynomial_vector.go",
-        "upolynomial_source_test.go"
+        "upolynomial_source_test.go",
+        "mpnum/upolynomial_content.go",
+        "mpnum/upolynomial_division.go",
+        "mpnum/upolynomial_division_remainder.go",
+        "mpnum/upolynomial_gcd.go",
+        "mpnum/upolynomial_gcd_extended.go",
+        "mpnum/upolynomial_gcd_modular.go",
+        "mpnum/upolynomial_gcd_primes.go",
+        "upolynomial_division_source_test.go",
+        "upolynomial_gcd_source_test.go"
       ],
       "tests": [
         "TestUPolynomialScalarExtentAndLayout",
@@ -30658,7 +30687,28 @@
         "TestUPolynomialAllSelectedOutputFailurePrefixes",
         "TestUPolynomialIndependentConvolutionAllAliases",
         "TestUPolynomialScalarModeAndDirectCheckpoint",
-        "TestUPolynomialRawMutableScalarOverloads"
+        "TestUPolynomialRawMutableScalarOverloads",
+        "TestUPolynomialExactDivisionSourceThirtyENSURE",
+        "TestUPolynomialFieldDivisionIndependentFinite",
+        "TestUPolynomialDivisionPublishedPrefixes",
+        "TestUPolynomialContentNormalizationSourceBranches",
+        "TestUPolynomialRemainderSignedSourceBranches",
+        "TestUPolynomialExtendedGCDSourceZ7",
+        "TestUPolynomialGCDAndSquareFreeIndependent",
+        "TestUPolynomialGCDRegisteredZAndZPInputs",
+        "TestUPolynomialExtendedGCDRegisteredZ13Input",
+        "TestUPolynomialGCDRegisteredFirstDerivativeExample",
+        "TestUPolynomialGCDChainImmediateFailureRoots",
+        "TestUPolynomialGCDRawZeroCountsAndSourceAliases",
+        "TestUPolynomialModularGCDCRAAndAllPrimeFallback",
+        "TestUPolynomialGCDAndDivisionWarmPhysicalPlateau",
+        "TestUPolynomialExtendedGCDNonmonicAndOutputAliasQuirks",
+        "TestUPolynomialPrimitiveRawAliasReserveAndMonicPrefixes",
+        "TestUPolynomialGCDChainRawOverloadAndEmptyFieldRoutes",
+        "TestUPolynomialCancelledModularGCDZeroHostAllocation",
+        "TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime",
+        "TestUPolynomialContentRawEarlyOneAndLateReadPrefix",
+        "TestUPolynomialModularGCDCRALateFailureRootSweep"
       ],
       "conditionals": [
         {
@@ -31281,13 +31331,184 @@
             "TestUPolynomialScalarModeAndDirectCheckpoint",
             "TestUPolynomialRawMutableScalarOverloads"
           ]
+        },
+        {
+          "name": "get_primitive_and_content/get_primitive; normalize both overloads",
+          "status": "ported",
+          "go_target": "upolynomial_gcd_source_test.go",
+          "tests": [
+            "TestUPolynomialExactDivisionSourceThirtyENSURE",
+            "TestUPolynomialFieldDivisionIndependentFinite",
+            "TestUPolynomialDivisionPublishedPrefixes",
+            "TestUPolynomialContentNormalizationSourceBranches",
+            "TestUPolynomialRemainderSignedSourceBranches",
+            "TestUPolynomialExtendedGCDSourceZ7",
+            "TestUPolynomialGCDAndSquareFreeIndependent",
+            "TestUPolynomialGCDRegisteredZAndZPInputs",
+            "TestUPolynomialExtendedGCDRegisteredZ13Input",
+            "TestUPolynomialGCDRegisteredFirstDerivativeExample",
+            "TestUPolynomialGCDChainImmediateFailureRoots",
+            "TestUPolynomialGCDRawZeroCountsAndSourceAliases",
+            "TestUPolynomialModularGCDCRAAndAllPrimeFallback",
+            "TestUPolynomialGCDAndDivisionWarmPhysicalPlateau",
+            "TestUPolynomialExtendedGCDNonmonicAndOutputAliasQuirks",
+            "TestUPolynomialPrimitiveRawAliasReserveAndMonicPrefixes",
+            "TestUPolynomialGCDChainRawOverloadAndEmptyFieldRoutes",
+            "TestUPolynomialCancelledModularGCDZeroHostAllocation",
+            "TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime",
+            "TestUPolynomialContentRawEarlyOneAndLateReadPrefix",
+            "TestUPolynomialModularGCDCRALateFailureRootSweep"
+          ]
+        },
+        {
+          "name": "scalar div; div_rem_core/div_rem/div; divides/exact_div",
+          "status": "ported",
+          "go_target": "upolynomial_division_source_test.go",
+          "tests": [
+            "TestUPolynomialExactDivisionSourceThirtyENSURE",
+            "TestUPolynomialFieldDivisionIndependentFinite",
+            "TestUPolynomialDivisionPublishedPrefixes",
+            "TestUPolynomialContentNormalizationSourceBranches",
+            "TestUPolynomialRemainderSignedSourceBranches",
+            "TestUPolynomialExtendedGCDSourceZ7",
+            "TestUPolynomialGCDAndSquareFreeIndependent",
+            "TestUPolynomialGCDRegisteredZAndZPInputs",
+            "TestUPolynomialExtendedGCDRegisteredZ13Input",
+            "TestUPolynomialGCDRegisteredFirstDerivativeExample",
+            "TestUPolynomialGCDChainImmediateFailureRoots",
+            "TestUPolynomialGCDRawZeroCountsAndSourceAliases",
+            "TestUPolynomialModularGCDCRAAndAllPrimeFallback",
+            "TestUPolynomialGCDAndDivisionWarmPhysicalPlateau",
+            "TestUPolynomialExtendedGCDNonmonicAndOutputAliasQuirks",
+            "TestUPolynomialPrimitiveRawAliasReserveAndMonicPrefixes",
+            "TestUPolynomialGCDChainRawOverloadAndEmptyFieldRoutes",
+            "TestUPolynomialCancelledModularGCDZeroHostAllocation",
+            "TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime",
+            "TestUPolynomialContentRawEarlyOneAndLateReadPrefix",
+            "TestUPolynomialModularGCDCRALateFailureRootSweep"
+          ]
+        },
+        {
+          "name": "rem and signed pseudo-remainder",
+          "status": "ported",
+          "go_target": "upolynomial_gcd_source_test.go",
+          "tests": [
+            "TestUPolynomialExactDivisionSourceThirtyENSURE",
+            "TestUPolynomialFieldDivisionIndependentFinite",
+            "TestUPolynomialDivisionPublishedPrefixes",
+            "TestUPolynomialContentNormalizationSourceBranches",
+            "TestUPolynomialRemainderSignedSourceBranches",
+            "TestUPolynomialExtendedGCDSourceZ7",
+            "TestUPolynomialGCDAndSquareFreeIndependent",
+            "TestUPolynomialGCDRegisteredZAndZPInputs",
+            "TestUPolynomialExtendedGCDRegisteredZ13Input",
+            "TestUPolynomialGCDRegisteredFirstDerivativeExample",
+            "TestUPolynomialGCDChainImmediateFailureRoots",
+            "TestUPolynomialGCDRawZeroCountsAndSourceAliases",
+            "TestUPolynomialModularGCDCRAAndAllPrimeFallback",
+            "TestUPolynomialGCDAndDivisionWarmPhysicalPlateau",
+            "TestUPolynomialExtendedGCDNonmonicAndOutputAliasQuirks",
+            "TestUPolynomialPrimitiveRawAliasReserveAndMonicPrefixes",
+            "TestUPolynomialGCDChainRawOverloadAndEmptyFieldRoutes",
+            "TestUPolynomialCancelledModularGCDZeroHostAllocation",
+            "TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime",
+            "TestUPolynomialContentRawEarlyOneAndLateReadPrefix",
+            "TestUPolynomialModularGCDCRALateFailureRootSweep"
+          ]
+        },
+        {
+          "name": "flip_sign_if_lm_neg; euclid_gcd/subresultant_gcd; mk_monic overloads",
+          "status": "ported",
+          "go_target": "upolynomial_gcd_source_test.go",
+          "tests": [
+            "TestUPolynomialExactDivisionSourceThirtyENSURE",
+            "TestUPolynomialFieldDivisionIndependentFinite",
+            "TestUPolynomialDivisionPublishedPrefixes",
+            "TestUPolynomialContentNormalizationSourceBranches",
+            "TestUPolynomialRemainderSignedSourceBranches",
+            "TestUPolynomialExtendedGCDSourceZ7",
+            "TestUPolynomialGCDAndSquareFreeIndependent",
+            "TestUPolynomialGCDRegisteredZAndZPInputs",
+            "TestUPolynomialExtendedGCDRegisteredZ13Input",
+            "TestUPolynomialGCDRegisteredFirstDerivativeExample",
+            "TestUPolynomialGCDChainImmediateFailureRoots",
+            "TestUPolynomialGCDRawZeroCountsAndSourceAliases",
+            "TestUPolynomialModularGCDCRAAndAllPrimeFallback",
+            "TestUPolynomialGCDAndDivisionWarmPhysicalPlateau",
+            "TestUPolynomialExtendedGCDNonmonicAndOutputAliasQuirks",
+            "TestUPolynomialPrimitiveRawAliasReserveAndMonicPrefixes",
+            "TestUPolynomialGCDChainRawOverloadAndEmptyFieldRoutes",
+            "TestUPolynomialCancelledModularGCDZeroHostAllocation",
+            "TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime",
+            "TestUPolynomialContentRawEarlyOneAndLateReadPrefix",
+            "TestUPolynomialModularGCDCRALateFailureRootSweep"
+          ]
+        },
+        {
+          "name": "square_free/is_square_free; ext_gcd with actual lexical vectors and debug diagnostic",
+          "status": "ported",
+          "go_target": "upolynomial_gcd_source_test.go",
+          "tests": [
+            "TestUPolynomialExactDivisionSourceThirtyENSURE",
+            "TestUPolynomialFieldDivisionIndependentFinite",
+            "TestUPolynomialDivisionPublishedPrefixes",
+            "TestUPolynomialContentNormalizationSourceBranches",
+            "TestUPolynomialRemainderSignedSourceBranches",
+            "TestUPolynomialExtendedGCDSourceZ7",
+            "TestUPolynomialGCDAndSquareFreeIndependent",
+            "TestUPolynomialGCDRegisteredZAndZPInputs",
+            "TestUPolynomialExtendedGCDRegisteredZ13Input",
+            "TestUPolynomialGCDRegisteredFirstDerivativeExample",
+            "TestUPolynomialGCDChainImmediateFailureRoots",
+            "TestUPolynomialGCDRawZeroCountsAndSourceAliases",
+            "TestUPolynomialModularGCDCRAAndAllPrimeFallback",
+            "TestUPolynomialGCDAndDivisionWarmPhysicalPlateau",
+            "TestUPolynomialExtendedGCDNonmonicAndOutputAliasQuirks",
+            "TestUPolynomialPrimitiveRawAliasReserveAndMonicPrefixes",
+            "TestUPolynomialGCDChainRawOverloadAndEmptyFieldRoutes",
+            "TestUPolynomialCancelledModularGCDZeroHostAllocation",
+            "TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime",
+            "TestUPolynomialContentRawEarlyOneAndLateReadPrefix",
+            "TestUPolynomialModularGCDCRALateFailureRootSweep"
+          ]
+        },
+        {
+          "name": "CRA_combine_images; mod_gcd/gcd; selected scoped_set_zp lexical restoration",
+          "status": "ported",
+          "go_target": "upolynomial_gcd_source_test.go",
+          "tests": [
+            "TestUPolynomialExactDivisionSourceThirtyENSURE",
+            "TestUPolynomialFieldDivisionIndependentFinite",
+            "TestUPolynomialDivisionPublishedPrefixes",
+            "TestUPolynomialContentNormalizationSourceBranches",
+            "TestUPolynomialRemainderSignedSourceBranches",
+            "TestUPolynomialExtendedGCDSourceZ7",
+            "TestUPolynomialGCDAndSquareFreeIndependent",
+            "TestUPolynomialGCDRegisteredZAndZPInputs",
+            "TestUPolynomialExtendedGCDRegisteredZ13Input",
+            "TestUPolynomialGCDRegisteredFirstDerivativeExample",
+            "TestUPolynomialGCDChainImmediateFailureRoots",
+            "TestUPolynomialGCDRawZeroCountsAndSourceAliases",
+            "TestUPolynomialModularGCDCRAAndAllPrimeFallback",
+            "TestUPolynomialGCDAndDivisionWarmPhysicalPlateau",
+            "TestUPolynomialExtendedGCDNonmonicAndOutputAliasQuirks",
+            "TestUPolynomialPrimitiveRawAliasReserveAndMonicPrefixes",
+            "TestUPolynomialGCDChainRawOverloadAndEmptyFieldRoutes",
+            "TestUPolynomialCancelledModularGCDZeroHostAllocation",
+            "TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime",
+            "TestUPolynomialContentRawEarlyOneAndLateReadPrefix",
+            "TestUPolynomialModularGCDCRALateFailureRootSweep"
+          ]
         }
       ],
       "ownership": [
-        "Actual Int coefficient arrays with concrete scalar descriptor pages/backing origins, all twenty-one scratch vectors and real modular child. Physical views guard at actual dereferences and follow swaps; old/new growth and immediate numeric roots are charged. See UPOLYNOMIAL_PORT_STATUS.md."
+        "Actual Int coefficient arrays with concrete scalar descriptor pages/backing origins, all twenty-one scratch vectors and real modular child. Physical views guard at actual dereferences and follow swaps; old/new growth and immediate numeric roots are charged. See UPOLYNOMIAL_PORT_STATUS.md.",
+        "Real source content/division/GCD scratch, lexical scoped numerals/vectors, modular restoration, retained failure prefixes and actual numeric-root checks; see UPOLYNOMIAL_GCD_PORT_STATUS.md."
       ],
       "deviations": [
-        "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full content/division/GCD/Sturm/isolation/refinement/conversion/algebraic and printers remain open; input conversion adapters do not establish complete registered tests."
+        "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full Sturm/isolation/refinement/conversion/factorization/algebraic and printers remain open; input conversion adapters do not establish complete registered tests.",
+        "Registered tests retain explicit dense input conversion adapters. Unported multivariate conversion, Sturm/root isolation/refinement/factorization and remaining registered test actions keep each complete source unit partial. Explicit cleanup on Go errors preserves rooted completed prefixes; it does not claim native C++ exception continuation.",
+        "WithCount copies the raw source pointer/size binding without dereference; indexed array GCD preserves early-one skipping and later content-copy failure publication. Late CRA sweep exercises actual post-append reservations, not virtual fault callbacks."
       ]
     },
     {
@@ -31303,7 +31524,16 @@
         "mpnum/upolynomial_ops.go",
         "mpnum/upolynomial_storage.go",
         "mpnum/upolynomial_vector.go",
-        "upolynomial_source_test.go"
+        "upolynomial_source_test.go",
+        "mpnum/upolynomial_content.go",
+        "mpnum/upolynomial_division.go",
+        "mpnum/upolynomial_division_remainder.go",
+        "mpnum/upolynomial_gcd.go",
+        "mpnum/upolynomial_gcd_extended.go",
+        "mpnum/upolynomial_gcd_modular.go",
+        "mpnum/upolynomial_gcd_primes.go",
+        "upolynomial_division_source_test.go",
+        "upolynomial_gcd_source_test.go"
       ],
       "tests": [
         "TestUPolynomialScalarExtentAndLayout",
@@ -31326,7 +31556,28 @@
         "TestUPolynomialAllSelectedOutputFailurePrefixes",
         "TestUPolynomialIndependentConvolutionAllAliases",
         "TestUPolynomialScalarModeAndDirectCheckpoint",
-        "TestUPolynomialRawMutableScalarOverloads"
+        "TestUPolynomialRawMutableScalarOverloads",
+        "TestUPolynomialExactDivisionSourceThirtyENSURE",
+        "TestUPolynomialFieldDivisionIndependentFinite",
+        "TestUPolynomialDivisionPublishedPrefixes",
+        "TestUPolynomialContentNormalizationSourceBranches",
+        "TestUPolynomialRemainderSignedSourceBranches",
+        "TestUPolynomialExtendedGCDSourceZ7",
+        "TestUPolynomialGCDAndSquareFreeIndependent",
+        "TestUPolynomialGCDRegisteredZAndZPInputs",
+        "TestUPolynomialExtendedGCDRegisteredZ13Input",
+        "TestUPolynomialGCDRegisteredFirstDerivativeExample",
+        "TestUPolynomialGCDChainImmediateFailureRoots",
+        "TestUPolynomialGCDRawZeroCountsAndSourceAliases",
+        "TestUPolynomialModularGCDCRAAndAllPrimeFallback",
+        "TestUPolynomialGCDAndDivisionWarmPhysicalPlateau",
+        "TestUPolynomialExtendedGCDNonmonicAndOutputAliasQuirks",
+        "TestUPolynomialPrimitiveRawAliasReserveAndMonicPrefixes",
+        "TestUPolynomialGCDChainRawOverloadAndEmptyFieldRoutes",
+        "TestUPolynomialCancelledModularGCDZeroHostAllocation",
+        "TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime",
+        "TestUPolynomialContentRawEarlyOneAndLateReadPrefix",
+        "TestUPolynomialModularGCDCRALateFailureRootSweep"
       ],
       "conditionals": [
         {
@@ -31389,13 +31640,184 @@
             "TestUPolynomialScalarModeAndDirectCheckpoint",
             "TestUPolynomialRawMutableScalarOverloads"
           ]
+        },
+        {
+          "name": "get_primitive_and_content/get_primitive; normalize both overloads",
+          "status": "ported",
+          "go_target": "upolynomial_gcd_source_test.go",
+          "tests": [
+            "TestUPolynomialExactDivisionSourceThirtyENSURE",
+            "TestUPolynomialFieldDivisionIndependentFinite",
+            "TestUPolynomialDivisionPublishedPrefixes",
+            "TestUPolynomialContentNormalizationSourceBranches",
+            "TestUPolynomialRemainderSignedSourceBranches",
+            "TestUPolynomialExtendedGCDSourceZ7",
+            "TestUPolynomialGCDAndSquareFreeIndependent",
+            "TestUPolynomialGCDRegisteredZAndZPInputs",
+            "TestUPolynomialExtendedGCDRegisteredZ13Input",
+            "TestUPolynomialGCDRegisteredFirstDerivativeExample",
+            "TestUPolynomialGCDChainImmediateFailureRoots",
+            "TestUPolynomialGCDRawZeroCountsAndSourceAliases",
+            "TestUPolynomialModularGCDCRAAndAllPrimeFallback",
+            "TestUPolynomialGCDAndDivisionWarmPhysicalPlateau",
+            "TestUPolynomialExtendedGCDNonmonicAndOutputAliasQuirks",
+            "TestUPolynomialPrimitiveRawAliasReserveAndMonicPrefixes",
+            "TestUPolynomialGCDChainRawOverloadAndEmptyFieldRoutes",
+            "TestUPolynomialCancelledModularGCDZeroHostAllocation",
+            "TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime",
+            "TestUPolynomialContentRawEarlyOneAndLateReadPrefix",
+            "TestUPolynomialModularGCDCRALateFailureRootSweep"
+          ]
+        },
+        {
+          "name": "scalar div; div_rem_core/div_rem/div; divides/exact_div",
+          "status": "ported",
+          "go_target": "upolynomial_division_source_test.go",
+          "tests": [
+            "TestUPolynomialExactDivisionSourceThirtyENSURE",
+            "TestUPolynomialFieldDivisionIndependentFinite",
+            "TestUPolynomialDivisionPublishedPrefixes",
+            "TestUPolynomialContentNormalizationSourceBranches",
+            "TestUPolynomialRemainderSignedSourceBranches",
+            "TestUPolynomialExtendedGCDSourceZ7",
+            "TestUPolynomialGCDAndSquareFreeIndependent",
+            "TestUPolynomialGCDRegisteredZAndZPInputs",
+            "TestUPolynomialExtendedGCDRegisteredZ13Input",
+            "TestUPolynomialGCDRegisteredFirstDerivativeExample",
+            "TestUPolynomialGCDChainImmediateFailureRoots",
+            "TestUPolynomialGCDRawZeroCountsAndSourceAliases",
+            "TestUPolynomialModularGCDCRAAndAllPrimeFallback",
+            "TestUPolynomialGCDAndDivisionWarmPhysicalPlateau",
+            "TestUPolynomialExtendedGCDNonmonicAndOutputAliasQuirks",
+            "TestUPolynomialPrimitiveRawAliasReserveAndMonicPrefixes",
+            "TestUPolynomialGCDChainRawOverloadAndEmptyFieldRoutes",
+            "TestUPolynomialCancelledModularGCDZeroHostAllocation",
+            "TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime",
+            "TestUPolynomialContentRawEarlyOneAndLateReadPrefix",
+            "TestUPolynomialModularGCDCRALateFailureRootSweep"
+          ]
+        },
+        {
+          "name": "rem and signed pseudo-remainder",
+          "status": "ported",
+          "go_target": "upolynomial_gcd_source_test.go",
+          "tests": [
+            "TestUPolynomialExactDivisionSourceThirtyENSURE",
+            "TestUPolynomialFieldDivisionIndependentFinite",
+            "TestUPolynomialDivisionPublishedPrefixes",
+            "TestUPolynomialContentNormalizationSourceBranches",
+            "TestUPolynomialRemainderSignedSourceBranches",
+            "TestUPolynomialExtendedGCDSourceZ7",
+            "TestUPolynomialGCDAndSquareFreeIndependent",
+            "TestUPolynomialGCDRegisteredZAndZPInputs",
+            "TestUPolynomialExtendedGCDRegisteredZ13Input",
+            "TestUPolynomialGCDRegisteredFirstDerivativeExample",
+            "TestUPolynomialGCDChainImmediateFailureRoots",
+            "TestUPolynomialGCDRawZeroCountsAndSourceAliases",
+            "TestUPolynomialModularGCDCRAAndAllPrimeFallback",
+            "TestUPolynomialGCDAndDivisionWarmPhysicalPlateau",
+            "TestUPolynomialExtendedGCDNonmonicAndOutputAliasQuirks",
+            "TestUPolynomialPrimitiveRawAliasReserveAndMonicPrefixes",
+            "TestUPolynomialGCDChainRawOverloadAndEmptyFieldRoutes",
+            "TestUPolynomialCancelledModularGCDZeroHostAllocation",
+            "TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime",
+            "TestUPolynomialContentRawEarlyOneAndLateReadPrefix",
+            "TestUPolynomialModularGCDCRALateFailureRootSweep"
+          ]
+        },
+        {
+          "name": "flip_sign_if_lm_neg; euclid_gcd/subresultant_gcd; mk_monic overloads",
+          "status": "ported",
+          "go_target": "upolynomial_gcd_source_test.go",
+          "tests": [
+            "TestUPolynomialExactDivisionSourceThirtyENSURE",
+            "TestUPolynomialFieldDivisionIndependentFinite",
+            "TestUPolynomialDivisionPublishedPrefixes",
+            "TestUPolynomialContentNormalizationSourceBranches",
+            "TestUPolynomialRemainderSignedSourceBranches",
+            "TestUPolynomialExtendedGCDSourceZ7",
+            "TestUPolynomialGCDAndSquareFreeIndependent",
+            "TestUPolynomialGCDRegisteredZAndZPInputs",
+            "TestUPolynomialExtendedGCDRegisteredZ13Input",
+            "TestUPolynomialGCDRegisteredFirstDerivativeExample",
+            "TestUPolynomialGCDChainImmediateFailureRoots",
+            "TestUPolynomialGCDRawZeroCountsAndSourceAliases",
+            "TestUPolynomialModularGCDCRAAndAllPrimeFallback",
+            "TestUPolynomialGCDAndDivisionWarmPhysicalPlateau",
+            "TestUPolynomialExtendedGCDNonmonicAndOutputAliasQuirks",
+            "TestUPolynomialPrimitiveRawAliasReserveAndMonicPrefixes",
+            "TestUPolynomialGCDChainRawOverloadAndEmptyFieldRoutes",
+            "TestUPolynomialCancelledModularGCDZeroHostAllocation",
+            "TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime",
+            "TestUPolynomialContentRawEarlyOneAndLateReadPrefix",
+            "TestUPolynomialModularGCDCRALateFailureRootSweep"
+          ]
+        },
+        {
+          "name": "square_free/is_square_free; ext_gcd with actual lexical vectors and debug diagnostic",
+          "status": "ported",
+          "go_target": "upolynomial_gcd_source_test.go",
+          "tests": [
+            "TestUPolynomialExactDivisionSourceThirtyENSURE",
+            "TestUPolynomialFieldDivisionIndependentFinite",
+            "TestUPolynomialDivisionPublishedPrefixes",
+            "TestUPolynomialContentNormalizationSourceBranches",
+            "TestUPolynomialRemainderSignedSourceBranches",
+            "TestUPolynomialExtendedGCDSourceZ7",
+            "TestUPolynomialGCDAndSquareFreeIndependent",
+            "TestUPolynomialGCDRegisteredZAndZPInputs",
+            "TestUPolynomialExtendedGCDRegisteredZ13Input",
+            "TestUPolynomialGCDRegisteredFirstDerivativeExample",
+            "TestUPolynomialGCDChainImmediateFailureRoots",
+            "TestUPolynomialGCDRawZeroCountsAndSourceAliases",
+            "TestUPolynomialModularGCDCRAAndAllPrimeFallback",
+            "TestUPolynomialGCDAndDivisionWarmPhysicalPlateau",
+            "TestUPolynomialExtendedGCDNonmonicAndOutputAliasQuirks",
+            "TestUPolynomialPrimitiveRawAliasReserveAndMonicPrefixes",
+            "TestUPolynomialGCDChainRawOverloadAndEmptyFieldRoutes",
+            "TestUPolynomialCancelledModularGCDZeroHostAllocation",
+            "TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime",
+            "TestUPolynomialContentRawEarlyOneAndLateReadPrefix",
+            "TestUPolynomialModularGCDCRALateFailureRootSweep"
+          ]
+        },
+        {
+          "name": "CRA_combine_images; mod_gcd/gcd; selected scoped_set_zp lexical restoration",
+          "status": "ported",
+          "go_target": "upolynomial_gcd_source_test.go",
+          "tests": [
+            "TestUPolynomialExactDivisionSourceThirtyENSURE",
+            "TestUPolynomialFieldDivisionIndependentFinite",
+            "TestUPolynomialDivisionPublishedPrefixes",
+            "TestUPolynomialContentNormalizationSourceBranches",
+            "TestUPolynomialRemainderSignedSourceBranches",
+            "TestUPolynomialExtendedGCDSourceZ7",
+            "TestUPolynomialGCDAndSquareFreeIndependent",
+            "TestUPolynomialGCDRegisteredZAndZPInputs",
+            "TestUPolynomialExtendedGCDRegisteredZ13Input",
+            "TestUPolynomialGCDRegisteredFirstDerivativeExample",
+            "TestUPolynomialGCDChainImmediateFailureRoots",
+            "TestUPolynomialGCDRawZeroCountsAndSourceAliases",
+            "TestUPolynomialModularGCDCRAAndAllPrimeFallback",
+            "TestUPolynomialGCDAndDivisionWarmPhysicalPlateau",
+            "TestUPolynomialExtendedGCDNonmonicAndOutputAliasQuirks",
+            "TestUPolynomialPrimitiveRawAliasReserveAndMonicPrefixes",
+            "TestUPolynomialGCDChainRawOverloadAndEmptyFieldRoutes",
+            "TestUPolynomialCancelledModularGCDZeroHostAllocation",
+            "TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime",
+            "TestUPolynomialContentRawEarlyOneAndLateReadPrefix",
+            "TestUPolynomialModularGCDCRALateFailureRootSweep"
+          ]
         }
       ],
       "ownership": [
-        "Actual Int coefficient arrays with concrete scalar descriptor pages/backing origins, all twenty-one scratch vectors and real modular child. Physical views guard at actual dereferences and follow swaps; old/new growth and immediate numeric roots are charged. See UPOLYNOMIAL_PORT_STATUS.md."
+        "Actual Int coefficient arrays with concrete scalar descriptor pages/backing origins, all twenty-one scratch vectors and real modular child. Physical views guard at actual dereferences and follow swaps; old/new growth and immediate numeric roots are charged. See UPOLYNOMIAL_PORT_STATUS.md.",
+        "Real source content/division/GCD scratch, lexical scoped numerals/vectors, modular restoration, retained failure prefixes and actual numeric-root checks; see UPOLYNOMIAL_GCD_PORT_STATUS.md."
       ],
       "deviations": [
-        "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full content/division/GCD/Sturm/isolation/refinement/conversion/algebraic and printers remain open; input conversion adapters do not establish complete registered tests."
+        "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full Sturm/isolation/refinement/conversion/factorization/algebraic and printers remain open; input conversion adapters do not establish complete registered tests.",
+        "Registered tests retain explicit dense input conversion adapters. Unported multivariate conversion, Sturm/root isolation/refinement/factorization and remaining registered test actions keep each complete source unit partial. Explicit cleanup on Go errors preserves rooted completed prefixes; it does not claim native C++ exception continuation.",
+        "WithCount copies the raw source pointer/size binding without dereference; indexed array GCD preserves early-one skipping and later content-copy failure publication. Late CRA sweep exercises actual post-append reservations, not virtual fault callbacks."
       ]
     },
     {
@@ -88706,7 +89128,16 @@
         "mpnum/upolynomial_ops.go",
         "mpnum/upolynomial_storage.go",
         "mpnum/upolynomial_vector.go",
-        "upolynomial_source_test.go"
+        "upolynomial_source_test.go",
+        "mpnum/upolynomial_content.go",
+        "mpnum/upolynomial_division.go",
+        "mpnum/upolynomial_division_remainder.go",
+        "mpnum/upolynomial_gcd.go",
+        "mpnum/upolynomial_gcd_extended.go",
+        "mpnum/upolynomial_gcd_modular.go",
+        "mpnum/upolynomial_gcd_primes.go",
+        "upolynomial_division_source_test.go",
+        "upolynomial_gcd_source_test.go"
       ],
       "tests": [
         "TestUPolynomialScalarExtentAndLayout",
@@ -88729,7 +89160,28 @@
         "TestUPolynomialAllSelectedOutputFailurePrefixes",
         "TestUPolynomialIndependentConvolutionAllAliases",
         "TestUPolynomialScalarModeAndDirectCheckpoint",
-        "TestUPolynomialRawMutableScalarOverloads"
+        "TestUPolynomialRawMutableScalarOverloads",
+        "TestUPolynomialExactDivisionSourceThirtyENSURE",
+        "TestUPolynomialFieldDivisionIndependentFinite",
+        "TestUPolynomialDivisionPublishedPrefixes",
+        "TestUPolynomialContentNormalizationSourceBranches",
+        "TestUPolynomialRemainderSignedSourceBranches",
+        "TestUPolynomialExtendedGCDSourceZ7",
+        "TestUPolynomialGCDAndSquareFreeIndependent",
+        "TestUPolynomialGCDRegisteredZAndZPInputs",
+        "TestUPolynomialExtendedGCDRegisteredZ13Input",
+        "TestUPolynomialGCDRegisteredFirstDerivativeExample",
+        "TestUPolynomialGCDChainImmediateFailureRoots",
+        "TestUPolynomialGCDRawZeroCountsAndSourceAliases",
+        "TestUPolynomialModularGCDCRAAndAllPrimeFallback",
+        "TestUPolynomialGCDAndDivisionWarmPhysicalPlateau",
+        "TestUPolynomialExtendedGCDNonmonicAndOutputAliasQuirks",
+        "TestUPolynomialPrimitiveRawAliasReserveAndMonicPrefixes",
+        "TestUPolynomialGCDChainRawOverloadAndEmptyFieldRoutes",
+        "TestUPolynomialCancelledModularGCDZeroHostAllocation",
+        "TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime",
+        "TestUPolynomialContentRawEarlyOneAndLateReadPrefix",
+        "TestUPolynomialModularGCDCRALateFailureRootSweep"
       ],
       "conditionals": [
         {
@@ -88982,13 +89434,44 @@
             "TestUPolynomialScalarModeAndDirectCheckpoint",
             "TestUPolynomialRawMutableScalarOverloads"
           ]
+        },
+        {
+          "name": "ten dense exact-division cases with all thirty ENSURE routes; registered print-only GCD/extended-GCD inputs checked by independent expectations",
+          "status": "ported",
+          "go_target": "upolynomial_division_source_test.go",
+          "tests": [
+            "TestUPolynomialExactDivisionSourceThirtyENSURE",
+            "TestUPolynomialFieldDivisionIndependentFinite",
+            "TestUPolynomialDivisionPublishedPrefixes",
+            "TestUPolynomialContentNormalizationSourceBranches",
+            "TestUPolynomialRemainderSignedSourceBranches",
+            "TestUPolynomialExtendedGCDSourceZ7",
+            "TestUPolynomialGCDAndSquareFreeIndependent",
+            "TestUPolynomialGCDRegisteredZAndZPInputs",
+            "TestUPolynomialExtendedGCDRegisteredZ13Input",
+            "TestUPolynomialGCDRegisteredFirstDerivativeExample",
+            "TestUPolynomialGCDChainImmediateFailureRoots",
+            "TestUPolynomialGCDRawZeroCountsAndSourceAliases",
+            "TestUPolynomialModularGCDCRAAndAllPrimeFallback",
+            "TestUPolynomialGCDAndDivisionWarmPhysicalPlateau",
+            "TestUPolynomialExtendedGCDNonmonicAndOutputAliasQuirks",
+            "TestUPolynomialPrimitiveRawAliasReserveAndMonicPrefixes",
+            "TestUPolynomialGCDChainRawOverloadAndEmptyFieldRoutes",
+            "TestUPolynomialCancelledModularGCDZeroHostAllocation",
+            "TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime",
+            "TestUPolynomialContentRawEarlyOneAndLateReadPrefix",
+            "TestUPolynomialModularGCDCRALateFailureRootSweep"
+          ]
         }
       ],
       "ownership": [
-        "Actual Int coefficient arrays with concrete scalar descriptor pages/backing origins, all twenty-one scratch vectors and real modular child. Physical views guard at actual dereferences and follow swaps; old/new growth and immediate numeric roots are charged. See UPOLYNOMIAL_PORT_STATUS.md."
+        "Actual Int coefficient arrays with concrete scalar descriptor pages/backing origins, all twenty-one scratch vectors and real modular child. Physical views guard at actual dereferences and follow swaps; old/new growth and immediate numeric roots are charged. See UPOLYNOMIAL_PORT_STATUS.md.",
+        "Real source content/division/GCD scratch, lexical scoped numerals/vectors, modular restoration, retained failure prefixes and actual numeric-root checks; see UPOLYNOMIAL_GCD_PORT_STATUS.md."
       ],
       "deviations": [
-        "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full content/division/GCD/Sturm/isolation/refinement/conversion/algebraic and printers remain open; input conversion adapters do not establish complete registered tests."
+        "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full Sturm/isolation/refinement/conversion/factorization/algebraic and printers remain open; input conversion adapters do not establish complete registered tests.",
+        "Registered tests retain explicit dense input conversion adapters. Unported multivariate conversion, Sturm/root isolation/refinement/factorization and remaining registered test actions keep each complete source unit partial. Explicit cleanup on Go errors preserves rooted completed prefixes; it does not claim native C++ exception continuation.",
+        "WithCount copies the raw source pointer/size binding without dereference; indexed array GCD preserves early-one skipping and later content-copy failure publication. Late CRA sweep exercises actual post-append reservations, not virtual fault callbacks."
       ]
     },
     {
