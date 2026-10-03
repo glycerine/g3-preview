@@ -36,16 +36,17 @@ type RationalServiceStats struct {
 // This mutex serializes all manager actions. A shared borrowed Budget still
 // requires external owner confinement; independent service locks do not make
 // the Budget safe for concurrent use. Never shallow-copy this owner.
-// Infinitesimal initialization/finalization hooks remain outside this core.
 type RationalService struct {
-	mu                      sync.Mutex
-	manager                 *RationalManager
-	self                    *RationalService
-	ownerID                 uint64
-	zero, one, minusOne     Rational
-	cache                   []Rational
-	cacheBytes, headerBytes uint64
-	closed                  bool
+	mu                                    sync.Mutex
+	manager                               *RationalManager
+	self                                  *RationalService
+	ownerID                               uint64
+	zero, one, minusOne                   Rational
+	infZero, infOne, infMinusOne          OwnedInfRational
+	infIntZero, infIntOne, infIntMinusOne OwnedInfIntRational
+	cache                                 []Rational
+	cacheBytes, headerBytes               uint64
+	closed                                bool
 }
 
 func nextRationalServiceID() (uint64, error) {
@@ -85,6 +86,12 @@ func NewRationalService(c RationalServiceConfig) (*RationalService, error) {
 	}
 	if e == nil {
 		e = m.SetInt64(&s.minusOne, -1)
+	}
+	if e == nil {
+		e = s.initInfRationalConstants()
+	}
+	if e == nil {
+		e = s.initInfIntRationalConstants()
 	}
 	if e != nil {
 		s.Close()
@@ -443,6 +450,13 @@ func (s *RationalService) destroyCache() {
 	s.manager.budget.Release(s.cacheBytes)
 	s.cacheBytes = 0
 }
+
+// The two source finalizer hooks run before the powers vector is destroyed.
+// Caller holds the service lock (or the constructor has not published it).
+func (s *RationalService) destroyInfinitesimalConstants() {
+	s.destroyInfRationalConstants()
+	s.destroyInfIntRationalConstants()
+}
 func (s *RationalService) Close() error {
 	if s == nil || s.self != s {
 		return ErrRationalServiceCopy
@@ -452,8 +466,9 @@ func (s *RationalService) Close() error {
 	if s.closed {
 		return nil
 	}
-	// Source finalization: ascending cache destructors, zero, one, minus one,
-	// manager. Infinitesimal finalizer hooks remain unported.
+	// Source finalization: rational infinitesimals, integer infinitesimals,
+	// ascending cache destructors, zero, one, minus one, manager.
+	s.destroyInfinitesimalConstants()
 	s.destroyCache()
 	s.manager.Del(&s.zero)
 	s.manager.Del(&s.one)

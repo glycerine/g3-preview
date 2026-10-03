@@ -530,3 +530,33 @@ the actual power/assignment setup, independent signed Bezout checks, aliases,
 provenance and immediate failure ownership/prefixes. See
 EXT_GCD_WRAPPER_PORT_STATUS.md. The manager's distinct ExtendedGCD algorithm is
 not substituted; its Z3DEBUG diagnostic branch still remains open.
+
+## Owner-local infinitesimal rationals and complete service lifecycle
+
+Both active infinitesimal representations now use concrete pointer-free owning
+records in the existing rational service. All active header methods, rational
+approximation functions, signed-epsilon behavior, owned accessors and constants
+are translated. First/second publication order and reverse member destruction
+retain source actions; coarse roots/powers are preserved. The service now runs
+both infinitesimal initialization/finalization hooks in source order and charges
+all six constants in its actual header. See INF_RATIONAL_PORT_STATUS.md,
+INF_INT_RATIONAL_PORT_STATUS.md and RATIONAL_INF_LIFECYCLE_PORT_STATUS.md.
+
+Twelve rational-infinitesimal groups began RED and port all62 source ENSURE sites
+executing80 checks plus finite exact bounds, expression/alias/failure tests.
+Ten integer-infinitesimal groups provide independent coverage; no absent source
+test registration or assertion counts are invented. Three parent lifecycle
+groups began behavioral RED and verify header, unwind and production destruction
+traversal. Source-route defects found in increments and signed constructors were
+fixed after behavioral RED.
+
+Final frozen combined full native, checked race and actual checked JS/Wasm suites
+passed, with all41 new test groups explicitly RUN/PASS in JS. Checked vet, WASI
+build and no-generics/source audit passed; WASI runtime is not claimed. Complete
+solver, AST, proof and interpolation milestones remain open. Next numeric gaps
+include remaining rational facade wrappers, inf_eps_rational and source Z3DEBUG
+extended-GCD diagnostics; AST parameters and ownership consumers remain open.
+
+Final source inventory:2102 units,677 APIs;21 ported,40 partial,2041 unported.
+The active rational.cpp service algorithms/hooks and both infinitesimal units
+are complete; rational.h and the full solver scope remain incomplete.

@@ -77326,9 +77326,24 @@
       "sha256": "0635ed360976cc3f6a1e7a3554dd17698b86b4eb549c45c467c1edb922018617",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "mpnum/inf_rational_test.go"
+      ],
+      "tests": [
+        "TestInfRationalSource80Assertions",
+        "TestInfRationalApproximationFrozenBranches",
+        "TestInfRationalOwnershipErrors",
+        "TestInfRationalIndependentFiniteBounds",
+        "TestInfRationalFullHeaderQueriesAndAliases",
+        "TestInfRationalRawStateComparisonRoutes",
+        "TestInfRationalFailurePrefixesImmediateRoots",
+        "TestInfRationalComponentAliasSourceRereads",
+        "TestInfRationalIncrementSourceRationalRoute",
+        "TestInfRationalCompoundReturnCopyFailure",
+        "TestInfRationalCoarseRootAndFusedComponentAlias",
+        "TestInfRationalIntegerConstructorCopyRoute"
+      ],
       "assertions": [
         {
           "line": 26,
@@ -77579,11 +77594,35 @@
           "text": "ENSURE(inf_rational(1,2) == abs(-inf_rational(1,2)));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "all62 active ENSURE sites executing80 assertions, including twice-called helper and tst0",
+          "status": "ported",
+          "go_target": "mpnum/inf_rational_test.go",
+          "tests": [
+            "TestInfRationalSource80Assertions",
+            "TestInfRationalApproximationFrozenBranches",
+            "TestInfRationalOwnershipErrors",
+            "TestInfRationalIndependentFiniteBounds",
+            "TestInfRationalFullHeaderQueriesAndAliases",
+            "TestInfRationalRawStateComparisonRoutes",
+            "TestInfRationalFailurePrefixesImmediateRoots",
+            "TestInfRationalComponentAliasSourceRereads",
+            "TestInfRationalIncrementSourceRationalRoute",
+            "TestInfRationalCompoundReturnCopyFailure",
+            "TestInfRationalCoarseRootAndFusedComponentAlias",
+            "TestInfRationalIntegerConstructorCopyRoute"
+          ]
+        }
+      ],
+      "ownership": [
+        "Explicit service-owned test values and expression temporaries are destroyed; all source assertions plus independent finite bounds, aliases and immediate-root failure sweeps."
+      ],
+      "deviations": [
+        "Diagnostic tracing and assertion message formatting are separate infrastructure; source constructors, operators, predicates and comparison routes execute through the concrete owner facade."
+      ]
     },
     {
       "path": "src/test/install_tactic.cpp",
@@ -87766,23 +87805,101 @@
       "sha256": "ff015c7ba05fbc9dd77a58e4226b803004e573c72b8fd77e1d2022e40a343486",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "mpnum/inf_int_rational.go"
+      ],
+      "tests": [
+        "TestInfIntRationalSourceConstructorsConstantsLifetime",
+        "TestInfIntRationalIndependentArithmeticAndAliases",
+        "TestInfIntRationalOverflowSourcePrefixesAndScalarDomain",
+        "TestInfIntRationalComparisonsSignsAndRounding",
+        "TestInfIntRationalAccessorsHashDisplayPostOperations",
+        "TestInfIntRationalConversionsAndMixedComparisons",
+        "TestInfIntRationalFaultPrefixesTemporaryCleanup",
+        "TestInfIntRationalAliasReReadWarmReuseAndGuards",
+        "TestInfIntRationalIncrementSourceRationalRoute",
+        "TestInfIntRationalPostFailureAndGetterIndependence",
+        "TestRationalServiceInfinitesimalHeaderOwnership",
+        "TestRationalServiceInfinitesimalConstructorFailureRefunds",
+        "TestRationalServiceInfinitesimalFinalizerTraversal"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "complete to_string including source defined-domain formatting",
+          "status": "ported",
+          "go_target": "mpnum/inf_int_rational.go",
+          "tests": [
+            "TestInfIntRationalSourceConstructorsConstantsLifetime",
+            "TestInfIntRationalIndependentArithmeticAndAliases",
+            "TestInfIntRationalOverflowSourcePrefixesAndScalarDomain",
+            "TestInfIntRationalComparisonsSignsAndRounding",
+            "TestInfIntRationalAccessorsHashDisplayPostOperations",
+            "TestInfIntRationalConversionsAndMixedComparisons",
+            "TestInfIntRationalFaultPrefixesTemporaryCleanup",
+            "TestInfIntRationalAliasReReadWarmReuseAndGuards",
+            "TestInfIntRationalIncrementSourceRationalRoute",
+            "TestInfIntRationalPostFailureAndGetterIndependence",
+            "TestRationalServiceInfinitesimalHeaderOwnership",
+            "TestRationalServiceInfinitesimalConstructorFailureRefunds",
+            "TestRationalServiceInfinitesimalFinalizerTraversal"
+          ]
+        },
+        {
+          "name": "owner-local constant definitions and initialize/init/finalize wrappers",
+          "status": "ported",
+          "go_target": "mpnum/inf_int_rational.go",
+          "tests": [
+            "TestInfIntRationalSourceConstructorsConstantsLifetime",
+            "TestInfIntRationalIndependentArithmeticAndAliases",
+            "TestInfIntRationalOverflowSourcePrefixesAndScalarDomain",
+            "TestInfIntRationalComparisonsSignsAndRounding",
+            "TestInfIntRationalAccessorsHashDisplayPostOperations",
+            "TestInfIntRationalConversionsAndMixedComparisons",
+            "TestInfIntRationalFaultPrefixesTemporaryCleanup",
+            "TestInfIntRationalAliasReReadWarmReuseAndGuards",
+            "TestInfIntRationalIncrementSourceRationalRoute",
+            "TestInfIntRationalPostFailureAndGetterIndependence",
+            "TestRationalServiceInfinitesimalHeaderOwnership",
+            "TestRationalServiceInfinitesimalConstructorFailureRefunds",
+            "TestRationalServiceInfinitesimalFinalizerTraversal"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete raw rational plus signed32 epsilon and scalar service provenance; existing service mutex/manager owns storage. Arithmetic publishes rational first then epsilon; scalar integer projection is reread after first multiplication. Explicit ownership and source temporary copies retained. See INF_INT_RATIONAL_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Global constants and borrowed rational accessors are owner-local/independent-copy adapters. Signed32 overflow, INT_MIN negation and formatting negation are explicit typed undefined-domain failures with source defined prefixes retained.",
+        "No registered source inf_int_rational test exists; independent finite/fault/alias/ownership checks are supplied without inventing source assertion coverage."
+      ]
     },
     {
       "path": "src/util/inf_int_rational.h",
       "sha256": "6f2ce95052ff18cc2e6fd7103741c1959c6004a4207fa9b366492d4e94ba95c8",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "mpnum/inf_int_rational.go"
+      ],
+      "tests": [
+        "TestInfIntRationalSourceConstructorsConstantsLifetime",
+        "TestInfIntRationalIndependentArithmeticAndAliases",
+        "TestInfIntRationalOverflowSourcePrefixesAndScalarDomain",
+        "TestInfIntRationalComparisonsSignsAndRounding",
+        "TestInfIntRationalAccessorsHashDisplayPostOperations",
+        "TestInfIntRationalConversionsAndMixedComparisons",
+        "TestInfIntRationalFaultPrefixesTemporaryCleanup",
+        "TestInfIntRationalAliasReReadWarmReuseAndGuards",
+        "TestInfIntRationalIncrementSourceRationalRoute",
+        "TestInfIntRationalPostFailureAndGetterIndependence",
+        "TestRationalServiceInfinitesimalHeaderOwnership",
+        "TestRationalServiceInfinitesimalConstructorFailureRefunds",
+        "TestRationalServiceInfinitesimalFinalizerTraversal"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -87811,20 +87928,124 @@
           "text": "SASSERT(r.m_second == 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "all active constructors, copy/assignment, reset/swap/destruction and constants",
+          "status": "ported",
+          "go_target": "mpnum/inf_int_rational.go",
+          "tests": [
+            "TestInfIntRationalSourceConstructorsConstantsLifetime",
+            "TestInfIntRationalIndependentArithmeticAndAliases",
+            "TestInfIntRationalOverflowSourcePrefixesAndScalarDomain",
+            "TestInfIntRationalComparisonsSignsAndRounding",
+            "TestInfIntRationalAccessorsHashDisplayPostOperations",
+            "TestInfIntRationalConversionsAndMixedComparisons",
+            "TestInfIntRationalFaultPrefixesTemporaryCleanup",
+            "TestInfIntRationalAliasReReadWarmReuseAndGuards",
+            "TestInfIntRationalIncrementSourceRationalRoute",
+            "TestInfIntRationalPostFailureAndGetterIndependence",
+            "TestRationalServiceInfinitesimalHeaderOwnership",
+            "TestRationalServiceInfinitesimalConstructorFailureRefunds",
+            "TestRationalServiceInfinitesimalFinalizerTraversal"
+          ]
+        },
+        {
+          "name": "hash/eq functors, full inspection/conversion and owned component/numerator/denominator access",
+          "status": "ported",
+          "go_target": "mpnum/inf_int_rational.go",
+          "tests": [
+            "TestInfIntRationalSourceConstructorsConstantsLifetime",
+            "TestInfIntRationalIndependentArithmeticAndAliases",
+            "TestInfIntRationalOverflowSourcePrefixesAndScalarDomain",
+            "TestInfIntRationalComparisonsSignsAndRounding",
+            "TestInfIntRationalAccessorsHashDisplayPostOperations",
+            "TestInfIntRationalConversionsAndMixedComparisons",
+            "TestInfIntRationalFaultPrefixesTemporaryCleanup",
+            "TestInfIntRationalAliasReReadWarmReuseAndGuards",
+            "TestInfIntRationalIncrementSourceRationalRoute",
+            "TestInfIntRationalPostFailureAndGetterIndependence",
+            "TestRationalServiceInfinitesimalHeaderOwnership",
+            "TestRationalServiceInfinitesimalConstructorFailureRefunds",
+            "TestRationalServiceInfinitesimalFinalizerTraversal"
+          ]
+        },
+        {
+          "name": "complete compound/value/unary arithmetic, scalar projection/reread and prefix/postfix routes",
+          "status": "ported",
+          "go_target": "mpnum/inf_int_rational.go",
+          "tests": [
+            "TestInfIntRationalSourceConstructorsConstantsLifetime",
+            "TestInfIntRationalIndependentArithmeticAndAliases",
+            "TestInfIntRationalOverflowSourcePrefixesAndScalarDomain",
+            "TestInfIntRationalComparisonsSignsAndRounding",
+            "TestInfIntRationalAccessorsHashDisplayPostOperations",
+            "TestInfIntRationalConversionsAndMixedComparisons",
+            "TestInfIntRationalFaultPrefixesTemporaryCleanup",
+            "TestInfIntRationalAliasReReadWarmReuseAndGuards",
+            "TestInfIntRationalIncrementSourceRationalRoute",
+            "TestInfIntRationalPostFailureAndGetterIndependence",
+            "TestRationalServiceInfinitesimalHeaderOwnership",
+            "TestRationalServiceInfinitesimalConstructorFailureRefunds",
+            "TestRationalServiceInfinitesimalFinalizerTraversal"
+          ]
+        },
+        {
+          "name": "all pair and mixed comparison operators, lexicographic sign, floor and ceil",
+          "status": "ported",
+          "go_target": "mpnum/inf_int_rational.go",
+          "tests": [
+            "TestInfIntRationalSourceConstructorsConstantsLifetime",
+            "TestInfIntRationalIndependentArithmeticAndAliases",
+            "TestInfIntRationalOverflowSourcePrefixesAndScalarDomain",
+            "TestInfIntRationalComparisonsSignsAndRounding",
+            "TestInfIntRationalAccessorsHashDisplayPostOperations",
+            "TestInfIntRationalConversionsAndMixedComparisons",
+            "TestInfIntRationalFaultPrefixesTemporaryCleanup",
+            "TestInfIntRationalAliasReReadWarmReuseAndGuards",
+            "TestInfIntRationalIncrementSourceRationalRoute",
+            "TestInfIntRationalPostFailureAndGetterIndependence",
+            "TestRationalServiceInfinitesimalHeaderOwnership",
+            "TestRationalServiceInfinitesimalConstructorFailureRefunds",
+            "TestRationalServiceInfinitesimalFinalizerTraversal"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete raw rational plus signed32 epsilon and scalar service provenance; existing service mutex/manager owns storage. Arithmetic publishes rational first then epsilon; scalar integer projection is reread after first multiplication. Explicit ownership and source temporary copies retained. See INF_INT_RATIONAL_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Global constants and borrowed rational accessors are owner-local/independent-copy adapters. Signed32 overflow, INT_MIN negation and formatting negation are explicit typed undefined-domain failures with source defined prefixes retained.",
+        "No registered source inf_int_rational test exists; independent finite/fault/alias/ownership checks are supplied without inventing source assertion coverage."
+      ]
     },
     {
       "path": "src/util/inf_rational.cpp",
       "sha256": "80d76cc3d656565cbe3ba93c72530123b04cae924b7abd25a87eacd0915f965c",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "mpnum/inf_rational.go"
+      ],
+      "tests": [
+        "TestInfRationalSource80Assertions",
+        "TestInfRationalApproximationFrozenBranches",
+        "TestInfRationalOwnershipErrors",
+        "TestInfRationalIndependentFiniteBounds",
+        "TestInfRationalFullHeaderQueriesAndAliases",
+        "TestInfRationalRawStateComparisonRoutes",
+        "TestInfRationalFailurePrefixesImmediateRoots",
+        "TestInfRationalComponentAliasSourceRereads",
+        "TestInfRationalIncrementSourceRationalRoute",
+        "TestInfRationalCompoundReturnCopyFailure",
+        "TestInfRationalCoarseRootAndFusedComponentAlias",
+        "TestInfRationalIntegerConstructorCopyRoute",
+        "TestRationalServiceInfinitesimalHeaderOwnership",
+        "TestRationalServiceInfinitesimalConstructorFailureRefunds",
+        "TestRationalServiceInfinitesimalFinalizerTraversal"
+      ],
       "assertions": [
         {
           "line": 82,
@@ -87843,20 +88064,88 @@
           "text": "SASSERT(!r.is_neg());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "complete inf_mult/sup_mult, inf_div/sup_div, inf_power/sup_power, inf_root/sup_root algorithms",
+          "status": "ported",
+          "go_target": "mpnum/inf_rational.go",
+          "tests": [
+            "TestInfRationalSource80Assertions",
+            "TestInfRationalApproximationFrozenBranches",
+            "TestInfRationalOwnershipErrors",
+            "TestInfRationalIndependentFiniteBounds",
+            "TestInfRationalFullHeaderQueriesAndAliases",
+            "TestInfRationalRawStateComparisonRoutes",
+            "TestInfRationalFailurePrefixesImmediateRoots",
+            "TestInfRationalComponentAliasSourceRereads",
+            "TestInfRationalIncrementSourceRationalRoute",
+            "TestInfRationalCompoundReturnCopyFailure",
+            "TestInfRationalCoarseRootAndFusedComponentAlias",
+            "TestInfRationalIntegerConstructorCopyRoute",
+            "TestRationalServiceInfinitesimalHeaderOwnership",
+            "TestRationalServiceInfinitesimalConstructorFailureRefunds",
+            "TestRationalServiceInfinitesimalFinalizerTraversal"
+          ]
+        },
+        {
+          "name": "owner-local constant definitions and initialize/init/finalize wrappers",
+          "status": "ported",
+          "go_target": "mpnum/inf_rational.go",
+          "tests": [
+            "TestInfRationalSource80Assertions",
+            "TestInfRationalApproximationFrozenBranches",
+            "TestInfRationalOwnershipErrors",
+            "TestInfRationalIndependentFiniteBounds",
+            "TestInfRationalFullHeaderQueriesAndAliases",
+            "TestInfRationalRawStateComparisonRoutes",
+            "TestInfRationalFailurePrefixesImmediateRoots",
+            "TestInfRationalComponentAliasSourceRereads",
+            "TestInfRationalIncrementSourceRationalRoute",
+            "TestInfRationalCompoundReturnCopyFailure",
+            "TestInfRationalCoarseRootAndFusedComponentAlias",
+            "TestInfRationalIntegerConstructorCopyRoute",
+            "TestRationalServiceInfinitesimalHeaderOwnership",
+            "TestRationalServiceInfinitesimalConstructorFailureRefunds",
+            "TestRationalServiceInfinitesimalFinalizerTraversal"
+          ]
+        }
+      ],
+      "ownership": [
+        "Two concrete pointer-free rational components plus scalar provenance, owned by existing service and synchronized raw manager. Assignment/arithmetic first then second; implicit member destruction second then first. Full-expression copies and cleanup, partial output roots and exact budgets tested. See INF_RATIONAL_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Global constants/borrowed accessors replaced by owner-local constants and explicit independent copies; typed checked source-assertion errors. Signed INT_MIN constructor-negation uses widened defined adapter. Source trace/assertion-message infrastructure remains separate.",
+        "Inactive/commented general pair arithmetic and duplicate #if0 approximation declarations are not runtime implementations; all eight compiled approximation functions are ported, including coarse/defective roots/powers."
+      ]
     },
     {
       "path": "src/util/inf_rational.h",
       "sha256": "bb3b33c5eca9ab63baf24202070f9cb717331ce9d6b81a651f2abdee28823591",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "mpnum/inf_rational.go"
+      ],
+      "tests": [
+        "TestInfRationalSource80Assertions",
+        "TestInfRationalApproximationFrozenBranches",
+        "TestInfRationalOwnershipErrors",
+        "TestInfRationalIndependentFiniteBounds",
+        "TestInfRationalFullHeaderQueriesAndAliases",
+        "TestInfRationalRawStateComparisonRoutes",
+        "TestInfRationalFailurePrefixesImmediateRoots",
+        "TestInfRationalComponentAliasSourceRereads",
+        "TestInfRationalIncrementSourceRationalRoute",
+        "TestInfRationalCompoundReturnCopyFailure",
+        "TestInfRationalCoarseRootAndFusedComponentAlias",
+        "TestInfRationalIntegerConstructorCopyRoute",
+        "TestRationalServiceInfinitesimalHeaderOwnership",
+        "TestRationalServiceInfinitesimalConstructorFailureRefunds",
+        "TestRationalServiceInfinitesimalFinalizerTraversal"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -87893,11 +88182,127 @@
           "text": "SASSERT(r.m_second.is_zero());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "all active constructors, assignment, reset, swap, destruction and constants",
+          "status": "ported",
+          "go_target": "mpnum/inf_rational.go",
+          "tests": [
+            "TestInfRationalSource80Assertions",
+            "TestInfRationalApproximationFrozenBranches",
+            "TestInfRationalOwnershipErrors",
+            "TestInfRationalIndependentFiniteBounds",
+            "TestInfRationalFullHeaderQueriesAndAliases",
+            "TestInfRationalRawStateComparisonRoutes",
+            "TestInfRationalFailurePrefixesImmediateRoots",
+            "TestInfRationalComponentAliasSourceRereads",
+            "TestInfRationalIncrementSourceRationalRoute",
+            "TestInfRationalCompoundReturnCopyFailure",
+            "TestInfRationalCoarseRootAndFusedComponentAlias",
+            "TestInfRationalIntegerConstructorCopyRoute",
+            "TestRationalServiceInfinitesimalHeaderOwnership",
+            "TestRationalServiceInfinitesimalConstructorFailureRefunds",
+            "TestRationalServiceInfinitesimalFinalizerTraversal"
+          ]
+        },
+        {
+          "name": "hash/eq functors, string/stream value, inspection, extraction and owned accessors",
+          "status": "ported",
+          "go_target": "mpnum/inf_rational.go",
+          "tests": [
+            "TestInfRationalSource80Assertions",
+            "TestInfRationalApproximationFrozenBranches",
+            "TestInfRationalOwnershipErrors",
+            "TestInfRationalIndependentFiniteBounds",
+            "TestInfRationalFullHeaderQueriesAndAliases",
+            "TestInfRationalRawStateComparisonRoutes",
+            "TestInfRationalFailurePrefixesImmediateRoots",
+            "TestInfRationalComponentAliasSourceRereads",
+            "TestInfRationalIncrementSourceRationalRoute",
+            "TestInfRationalCompoundReturnCopyFailure",
+            "TestInfRationalCoarseRootAndFusedComponentAlias",
+            "TestInfRationalIntegerConstructorCopyRoute",
+            "TestRationalServiceInfinitesimalHeaderOwnership",
+            "TestRationalServiceInfinitesimalConstructorFailureRefunds",
+            "TestRationalServiceInfinitesimalFinalizerTraversal"
+          ]
+        },
+        {
+          "name": "all active compound/value/unary/fused arithmetic and rational-one prefix/postfix routes",
+          "status": "ported",
+          "go_target": "mpnum/inf_rational.go",
+          "tests": [
+            "TestInfRationalSource80Assertions",
+            "TestInfRationalApproximationFrozenBranches",
+            "TestInfRationalOwnershipErrors",
+            "TestInfRationalIndependentFiniteBounds",
+            "TestInfRationalFullHeaderQueriesAndAliases",
+            "TestInfRationalRawStateComparisonRoutes",
+            "TestInfRationalFailurePrefixesImmediateRoots",
+            "TestInfRationalComponentAliasSourceRereads",
+            "TestInfRationalIncrementSourceRationalRoute",
+            "TestInfRationalCompoundReturnCopyFailure",
+            "TestInfRationalCoarseRootAndFusedComponentAlias",
+            "TestInfRationalIntegerConstructorCopyRoute",
+            "TestRationalServiceInfinitesimalHeaderOwnership",
+            "TestRationalServiceInfinitesimalConstructorFailureRefunds",
+            "TestRationalServiceInfinitesimalFinalizerTraversal"
+          ]
+        },
+        {
+          "name": "all pair and mixed comparison operators with source LT/EQ short-circuit and reversal",
+          "status": "ported",
+          "go_target": "mpnum/inf_rational.go",
+          "tests": [
+            "TestInfRationalSource80Assertions",
+            "TestInfRationalApproximationFrozenBranches",
+            "TestInfRationalOwnershipErrors",
+            "TestInfRationalIndependentFiniteBounds",
+            "TestInfRationalFullHeaderQueriesAndAliases",
+            "TestInfRationalRawStateComparisonRoutes",
+            "TestInfRationalFailurePrefixesImmediateRoots",
+            "TestInfRationalComponentAliasSourceRereads",
+            "TestInfRationalIncrementSourceRationalRoute",
+            "TestInfRationalCompoundReturnCopyFailure",
+            "TestInfRationalCoarseRootAndFusedComponentAlias",
+            "TestInfRationalIntegerConstructorCopyRoute",
+            "TestRationalServiceInfinitesimalHeaderOwnership",
+            "TestRationalServiceInfinitesimalConstructorFailureRefunds",
+            "TestRationalServiceInfinitesimalFinalizerTraversal"
+          ]
+        },
+        {
+          "name": "floor/ceil and numerator/denominator source domain branches",
+          "status": "ported",
+          "go_target": "mpnum/inf_rational.go",
+          "tests": [
+            "TestInfRationalSource80Assertions",
+            "TestInfRationalApproximationFrozenBranches",
+            "TestInfRationalOwnershipErrors",
+            "TestInfRationalIndependentFiniteBounds",
+            "TestInfRationalFullHeaderQueriesAndAliases",
+            "TestInfRationalRawStateComparisonRoutes",
+            "TestInfRationalFailurePrefixesImmediateRoots",
+            "TestInfRationalComponentAliasSourceRereads",
+            "TestInfRationalIncrementSourceRationalRoute",
+            "TestInfRationalCompoundReturnCopyFailure",
+            "TestInfRationalCoarseRootAndFusedComponentAlias",
+            "TestInfRationalIntegerConstructorCopyRoute",
+            "TestRationalServiceInfinitesimalHeaderOwnership",
+            "TestRationalServiceInfinitesimalConstructorFailureRefunds",
+            "TestRationalServiceInfinitesimalFinalizerTraversal"
+          ]
+        }
+      ],
+      "ownership": [
+        "Two concrete pointer-free rational components plus scalar provenance, owned by existing service and synchronized raw manager. Assignment/arithmetic first then second; implicit member destruction second then first. Full-expression copies and cleanup, partial output roots and exact budgets tested. See INF_RATIONAL_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Global constants/borrowed accessors replaced by owner-local constants and explicit independent copies; typed checked source-assertion errors. Signed INT_MIN constructor-negation uses widened defined adapter. Source trace/assertion-message infrastructure remains separate.",
+        "Inactive/commented general pair arithmetic and duplicate #if0 approximation declarations are not runtime implementations; all eight compiled approximation functions are ported, including coarse/defective roots/powers."
+      ]
     },
     {
       "path": "src/util/inf_s_integer.cpp",
@@ -101823,9 +102228,11 @@
       "sha256": "4479ae33541ebd0481884deab48fabea327183d53e34ab3c6639246812adbd69",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "mpnum/rational_service.go"
+        "mpnum/rational_service.go",
+        "mpnum/inf_rational.go",
+        "mpnum/inf_int_rational.go"
       ],
       "tests": [
         "TestRationalServiceSourceConstructorAssertions",
@@ -101842,7 +102249,32 @@
         "TestRationalServiceForeignSmallValuesAndInvalidGuards",
         "TestRationalServiceCacheRelocationMoveAndDestruction",
         "TestRationalServiceSourceUnsignedConstructorBoundary",
-        "TestRationalServiceSourceSignedFractionShape"
+        "TestRationalServiceSourceSignedFractionShape",
+        "TestRationalServiceInfinitesimalHeaderOwnership",
+        "TestRationalServiceInfinitesimalConstructorFailureRefunds",
+        "TestRationalServiceInfinitesimalFinalizerTraversal",
+        "TestInfRationalSource80Assertions",
+        "TestInfRationalApproximationFrozenBranches",
+        "TestInfRationalOwnershipErrors",
+        "TestInfRationalIndependentFiniteBounds",
+        "TestInfRationalFullHeaderQueriesAndAliases",
+        "TestInfRationalRawStateComparisonRoutes",
+        "TestInfRationalFailurePrefixesImmediateRoots",
+        "TestInfRationalComponentAliasSourceRereads",
+        "TestInfRationalIncrementSourceRationalRoute",
+        "TestInfRationalCompoundReturnCopyFailure",
+        "TestInfRationalCoarseRootAndFusedComponentAlias",
+        "TestInfRationalIntegerConstructorCopyRoute",
+        "TestInfIntRationalSourceConstructorsConstantsLifetime",
+        "TestInfIntRationalIndependentArithmeticAndAliases",
+        "TestInfIntRationalOverflowSourcePrefixesAndScalarDomain",
+        "TestInfIntRationalComparisonsSignsAndRounding",
+        "TestInfIntRationalAccessorsHashDisplayPostOperations",
+        "TestInfIntRationalConversionsAndMixedComparisons",
+        "TestInfIntRationalFaultPrefixesTemporaryCleanup",
+        "TestInfIntRationalAliasReReadWarmReuseAndGuards",
+        "TestInfIntRationalIncrementSourceRationalRoute",
+        "TestInfIntRationalPostFailureAndGetterIndependence"
       ],
       "conditionals": [
         {
@@ -101854,8 +102286,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "owner-local manager and zero/one/minus-one core initialization/finalization",
@@ -101903,16 +102335,43 @@
         },
         {
           "name": "inf_rational/inf_int_rational initialization and finalization hooks",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "status": "ported",
+          "go_target": "mpnum/rational_service.go",
+          "tests": [
+            "TestRationalServiceInfinitesimalHeaderOwnership",
+            "TestRationalServiceInfinitesimalConstructorFailureRefunds",
+            "TestRationalServiceInfinitesimalFinalizerTraversal",
+            "TestInfRationalSource80Assertions",
+            "TestInfRationalApproximationFrozenBranches",
+            "TestInfRationalOwnershipErrors",
+            "TestInfRationalIndependentFiniteBounds",
+            "TestInfRationalFullHeaderQueriesAndAliases",
+            "TestInfRationalRawStateComparisonRoutes",
+            "TestInfRationalFailurePrefixesImmediateRoots",
+            "TestInfRationalComponentAliasSourceRereads",
+            "TestInfRationalIncrementSourceRationalRoute",
+            "TestInfRationalCompoundReturnCopyFailure",
+            "TestInfRationalCoarseRootAndFusedComponentAlias",
+            "TestInfRationalIntegerConstructorCopyRoute",
+            "TestInfIntRationalSourceConstructorsConstantsLifetime",
+            "TestInfIntRationalIndependentArithmeticAndAliases",
+            "TestInfIntRationalOverflowSourcePrefixesAndScalarDomain",
+            "TestInfIntRationalComparisonsSignsAndRounding",
+            "TestInfIntRationalAccessorsHashDisplayPostOperations",
+            "TestInfIntRationalConversionsAndMixedComparisons",
+            "TestInfIntRationalFaultPrefixesTemporaryCleanup",
+            "TestInfIntRationalAliasReReadWarmReuseAndGuards",
+            "TestInfIntRationalIncrementSourceRationalRoute",
+            "TestInfIntRationalPostFailureAndGetterIndependence"
+          ]
         }
       ],
       "ownership": [
-        "Owner-local RationalService owns synchronized numerical manager, constants and pointer-free cache; scalar provenance on OwnedRational validates all public operands. Cold mutexes ordered by immutable ownerID for CopyFrom; all headers/backing/old+new charged. See RATIONAL_SERVICE_PORT_STATUS.md."
+        "Owner-local RationalService owns synchronized numerical manager, constants and pointer-free cache; scalar provenance on OwnedRational validates all public operands. Cold mutexes ordered by immutable ownerID for CopyFrom; all headers/backing/old+new charged. See RATIONAL_SERVICE_PORT_STATUS.md.",
+        "All six infinitesimal constants are actual pointer-free service fields included in reflected header bytes. Constructor order rational/InfRat/InfInt; finalization InfRat/InfInt/cache/rational constants/manager. Production hook traversal observed via free-slot reuse before manager close. See RATIONAL_INF_LIFECYCLE_PORT_STATUS.md."
       ],
       "deviations": [
-        "Global mutable manager/cache replaced with explicit owner-local service. Constants return independent deep values; owning token Del invalidates provenance, source move val history retained. Cache failed-prefix/retry actions preserved; INT_MIN signed-negation domain uses explicit wider magnitude adaptation. Broad facade and infinitesimal hooks remain incomplete."
+        "Global mutable numerical manager/cache/constants become an explicit owner-local service; getters produce independent values and scalar provenance guards service domains. Full cpp algorithms and hooks are ported; header facade still partial. Windows compiler warning pragma has no Go runtime counterpart."
       ]
     },
     {

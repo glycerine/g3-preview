@@ -1,7 +1,8 @@
 # Owner-local rational service core
 
-Status: selected core implemented and tested; `util/rational.h` and
-`util/rational.cpp` remain **partial**. Owned files are
+Status: selected core implemented and tested. Subsequent infinitesimal lifecycle
+integration completes active `util/rational.cpp`; `util/rational.h` remains
+**partial**. See RATIONAL_INF_LIFECYCLE_PORT_STATUS.md. Core files are
 `mpnum/rational_service.go`, `mpnum/rational_service_test.go`, and this status.
 Existing manager files are unchanged; the parent integrates the global port
 ledger and manifest for this packet.
@@ -26,9 +27,10 @@ No Go generics, unsafe storage, boxed hot records, or per-value heap owners.
 | Owner/budget diagnostics adapter | `OwnerID`, `Stats`, constructor unwind and cold self-identity checks; no new numerical algorithms. |
 
 Source infinitesimal initialize/finalize hooks at `rational.cpp:56-62,70-71,76-77`
-remain pending. The remaining rational wrapper arithmetic, comparisons beyond
-Equal, number theory, conversions/display variants, raw mpq/mpz constructors,
-and other header helpers are not claimed by this packet. It does not complete
+are now implemented by the subsequent owner-local lifecycle packet. Subsequent
+RATIONAL_FACADE_PORT_STATUS.md covers selected wrapper arithmetic/comparisons.
+Remaining wrapper roots/squares, bitwise, display variants and checked raw
+interoperability are not claimed by this core packet. It does not complete
 all active `src/test/rational.cpp` tests.
 
 ## Ownership, synchronization and checked boundaries
