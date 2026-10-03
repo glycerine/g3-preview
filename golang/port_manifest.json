@@ -30664,7 +30664,15 @@
         "mpnum/upolynomial_gcd_modular.go",
         "mpnum/upolynomial_gcd_primes.go",
         "upolynomial_division_source_test.go",
-        "upolynomial_gcd_source_test.go"
+        "upolynomial_gcd_source_test.go",
+        "mpnum/upolynomial_sequence.go",
+        "mpnum/upolynomial_sturm.go",
+        "mpnum/upolynomial_transforms.go",
+        "mpnum/upolynomial_root_bounds.go",
+        "mpnum/upolynomial_sequence_test.go",
+        "upolynomial_sequence_source_test.go",
+        "upolynomial_sturm_source_test.go",
+        "upolynomial_transform_model_test.go"
       ],
       "tests": [
         "TestUPolynomialScalarExtentAndLayout",
@@ -30708,7 +30716,23 @@
         "TestUPolynomialCancelledModularGCDZeroHostAllocation",
         "TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime",
         "TestUPolynomialContentRawEarlyOneAndLateReadPrefix",
-        "TestUPolynomialModularGCDCRALateFailureRootSweep"
+        "TestUPolynomialModularGCDCRALateFailureRootSweep",
+        "TestUPolynomialSequenceUnsignedVectorExtent",
+        "TestUPolynomialSequenceCopyMoveAndRetainedRows",
+        "TestUPolynomialSequenceExactMetadataFailurePrefixes",
+        "TestUPolynomialSequencePhysicalOwnerAndCloseGuard",
+        "TestUPolynomialHalfRootStackDivisorNoReservation",
+        "TestUPolynomialSequenceBigCopyFailureImmediateGraph",
+        "TestUPolynomialTransformCancellationAfterComposition",
+        "TestUPolynomialSturmFailureAndCancellationImmediateGraph",
+        "TestUPolynomialSourceSixteenTransformENSURE",
+        "TestUPolynomialSourceFiveHalfRootENSURE",
+        "TestUPolynomialSturmFourierAndRootIDIndependent",
+        "TestUPolynomialRegisteredSturmAndTarskiInputs",
+        "TestUPolynomialSturmRationalEuclideanOracle",
+        "TestUPolynomialFullTransformFiniteOracles",
+        "TestUPolynomialRootCountBoundsSourceBranches",
+        "TestUPolynomialSequenceSelfGrowthCloseAndAscendingBigReset"
       ],
       "conditionals": [
         {
@@ -31499,16 +31523,114 @@
             "TestUPolynomialContentRawEarlyOneAndLateReadPrefix",
             "TestUPolynomialModularGCDCRALateFailureRootSweep"
           ]
+        },
+        {
+          "name": "upolynomial_sequence flat push/reset/scoped destruction and captured row binding",
+          "status": "ported",
+          "go_target": "upolynomial_sequence_source_test.go",
+          "tests": [
+            "TestUPolynomialSequenceCopyMoveAndRetainedRows",
+            "TestUPolynomialSequenceExactMetadataFailurePrefixes",
+            "TestUPolynomialSequencePhysicalOwnerAndCloseGuard",
+            "TestUPolynomialHalfRootStackDivisorNoReservation",
+            "TestUPolynomialSequenceBigCopyFailureImmediateGraph",
+            "TestUPolynomialTransformCancellationAfterComposition",
+            "TestUPolynomialSturmFailureAndCancellationImmediateGraph",
+            "TestUPolynomialSequenceSelfGrowthCloseAndAscendingBigReset",
+            "TestUPolynomialSourceSixteenTransformENSURE",
+            "TestUPolynomialSourceFiveHalfRootENSURE",
+            "TestUPolynomialSturmFourierAndRootIDIndependent",
+            "TestUPolynomialRegisteredSturmAndTarskiInputs",
+            "TestUPolynomialSturmRationalEuclideanOracle",
+            "TestUPolynomialFullTransformFiniteOracles",
+            "TestUPolynomialRootCountBoundsSourceBranches"
+          ]
+        },
+        {
+          "name": "sturm_seq_core; unary/pair sturm_seq; sturm_tarski_seq; fourier_seq; four sign_variations locations; get_root_id",
+          "status": "ported",
+          "go_target": "upolynomial_sturm_source_test.go",
+          "tests": [
+            "TestUPolynomialSequenceCopyMoveAndRetainedRows",
+            "TestUPolynomialSequenceExactMetadataFailurePrefixes",
+            "TestUPolynomialSequencePhysicalOwnerAndCloseGuard",
+            "TestUPolynomialHalfRootStackDivisorNoReservation",
+            "TestUPolynomialSequenceBigCopyFailureImmediateGraph",
+            "TestUPolynomialTransformCancellationAfterComposition",
+            "TestUPolynomialSturmFailureAndCancellationImmediateGraph",
+            "TestUPolynomialSequenceSelfGrowthCloseAndAscendingBigReset",
+            "TestUPolynomialSourceSixteenTransformENSURE",
+            "TestUPolynomialSourceFiveHalfRootENSURE",
+            "TestUPolynomialSturmFourierAndRootIDIndependent",
+            "TestUPolynomialRegisteredSturmAndTarskiInputs",
+            "TestUPolynomialSturmRationalEuclideanOracle",
+            "TestUPolynomialFullTransformFiniteOracles",
+            "TestUPolynomialRootCountBoundsSourceBranches"
+          ]
+        },
+        {
+          "name": "all translate/compose transforms; p_minus_x; p_1_div_x; five Set-before-transform header overloads",
+          "status": "ported",
+          "go_target": "upolynomial_transform_model_test.go",
+          "tests": [
+            "TestUPolynomialSequenceCopyMoveAndRetainedRows",
+            "TestUPolynomialSequenceExactMetadataFailurePrefixes",
+            "TestUPolynomialSequencePhysicalOwnerAndCloseGuard",
+            "TestUPolynomialHalfRootStackDivisorNoReservation",
+            "TestUPolynomialSequenceBigCopyFailureImmediateGraph",
+            "TestUPolynomialTransformCancellationAfterComposition",
+            "TestUPolynomialSturmFailureAndCancellationImmediateGraph",
+            "TestUPolynomialSequenceSelfGrowthCloseAndAscendingBigReset",
+            "TestUPolynomialSourceSixteenTransformENSURE",
+            "TestUPolynomialSourceFiveHalfRootENSURE",
+            "TestUPolynomialSturmFourierAndRootIDIndependent",
+            "TestUPolynomialRegisteredSturmAndTarskiInputs",
+            "TestUPolynomialSturmRationalEuclideanOracle",
+            "TestUPolynomialFullTransformFiniteOracles",
+            "TestUPolynomialRootCountBoundsSourceBranches"
+          ]
+        },
+        {
+          "name": "zero/half-root predicates/removal; sign_changes/descartes_bound three variants; Cauchy and Knuth upper bounds; nonzero lower bound",
+          "status": "ported",
+          "go_target": "upolynomial_transform_model_test.go",
+          "tests": [
+            "TestUPolynomialSequenceCopyMoveAndRetainedRows",
+            "TestUPolynomialSequenceExactMetadataFailurePrefixes",
+            "TestUPolynomialSequencePhysicalOwnerAndCloseGuard",
+            "TestUPolynomialHalfRootStackDivisorNoReservation",
+            "TestUPolynomialSequenceBigCopyFailureImmediateGraph",
+            "TestUPolynomialTransformCancellationAfterComposition",
+            "TestUPolynomialSturmFailureAndCancellationImmediateGraph",
+            "TestUPolynomialSequenceSelfGrowthCloseAndAscendingBigReset",
+            "TestUPolynomialSourceSixteenTransformENSURE",
+            "TestUPolynomialSourceFiveHalfRootENSURE",
+            "TestUPolynomialSturmFourierAndRootIDIndependent",
+            "TestUPolynomialRegisteredSturmAndTarskiInputs",
+            "TestUPolynomialSturmRationalEuclideanOracle",
+            "TestUPolynomialFullTransformFiniteOracles",
+            "TestUPolynomialRootCountBoundsSourceBranches"
+          ]
+        },
+        {
+          "name": "unsigned sequence vector source capacity and bounded physical extent arithmetic",
+          "status": "ported",
+          "go_target": "mpnum/upolynomial_sequence.go",
+          "tests": [
+            "TestUPolynomialSequenceUnsignedVectorExtent"
+          ]
         }
       ],
       "ownership": [
         "Actual Int coefficient arrays with concrete scalar descriptor pages/backing origins, all twenty-one scratch vectors and real modular child. Physical views guard at actual dereferences and follow swaps; old/new growth and immediate numeric roots are charged. See UPOLYNOMIAL_PORT_STATUS.md.",
-        "Real source content/division/GCD scratch, lexical scoped numerals/vectors, modular restoration, retained failure prefixes and actual numeric-root checks; see UPOLYNOMIAL_GCD_PORT_STATUS.md."
+        "Real source content/division/GCD scratch, lexical scoped numerals/vectors, modular restoration, retained failure prefixes and actual numeric-root checks; see UPOLYNOMIAL_GCD_PORT_STATUS.md.",
+        "Actual flat coefficient storage plus two independent unsigned metadata vectors, partial row publication, source read timing, charged cold owner and manager Close guard. See UPOLYNOMIAL_STURM_PACKET.md; lexical numeral/vector cleanup is an explicit Go error adapter."
       ],
       "deviations": [
-        "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full Sturm/isolation/refinement/conversion/factorization/algebraic and printers remain open; input conversion adapters do not establish complete registered tests.",
-        "Registered tests retain explicit dense input conversion adapters. Unported multivariate conversion, Sturm/root isolation/refinement/factorization and remaining registered test actions keep each complete source unit partial. Explicit cleanup on Go errors preserves rooted completed prefixes; it does not claim native C++ exception continuation.",
-        "WithCount copies the raw source pointer/size binding without dereference; indexed array GCD preserves early-one skipping and later content-copy failure publication. Late CRA sweep exercises actual post-append reservations, not virtual fault callbacks."
+        "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full isolation/refinement/conversion/factorization/algebraic and printers remain open; input conversion adapters do not establish complete registered tests.",
+        "Registered tests retain explicit dense input conversion adapters. Unported multivariate conversion, root isolation/refinement/factorization and remaining registered test actions keep each complete source unit partial. Explicit cleanup on Go errors preserves rooted completed prefixes; it does not claim native C++ exception continuation.",
+        "WithCount copies the raw source pointer/size binding without dereference; indexed array GCD preserves early-one skipping and later content-copy failure publication. Late CRA sweep exercises actual post-append reservations, not virtual fault callbacks.",
+        "Selected sequence/Sturm/transform/Descartes/bounds algorithms translated. RowView binds source coeffs(i) plus size(i); source unsigned header8 is extent arithmetic while actual Go metadata arrays charge4*capacity and slice fields are in the charged cold owner. Source printers, full root isolation/refinement, multivariate conversion, factorization and algebraic consumers remain open; source units remain partial."
       ]
     },
     {
@@ -31533,7 +31655,15 @@
         "mpnum/upolynomial_gcd_modular.go",
         "mpnum/upolynomial_gcd_primes.go",
         "upolynomial_division_source_test.go",
-        "upolynomial_gcd_source_test.go"
+        "upolynomial_gcd_source_test.go",
+        "mpnum/upolynomial_sequence.go",
+        "mpnum/upolynomial_sturm.go",
+        "mpnum/upolynomial_transforms.go",
+        "mpnum/upolynomial_root_bounds.go",
+        "mpnum/upolynomial_sequence_test.go",
+        "upolynomial_sequence_source_test.go",
+        "upolynomial_sturm_source_test.go",
+        "upolynomial_transform_model_test.go"
       ],
       "tests": [
         "TestUPolynomialScalarExtentAndLayout",
@@ -31577,7 +31707,23 @@
         "TestUPolynomialCancelledModularGCDZeroHostAllocation",
         "TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime",
         "TestUPolynomialContentRawEarlyOneAndLateReadPrefix",
-        "TestUPolynomialModularGCDCRALateFailureRootSweep"
+        "TestUPolynomialModularGCDCRALateFailureRootSweep",
+        "TestUPolynomialSequenceUnsignedVectorExtent",
+        "TestUPolynomialSequenceCopyMoveAndRetainedRows",
+        "TestUPolynomialSequenceExactMetadataFailurePrefixes",
+        "TestUPolynomialSequencePhysicalOwnerAndCloseGuard",
+        "TestUPolynomialHalfRootStackDivisorNoReservation",
+        "TestUPolynomialSequenceBigCopyFailureImmediateGraph",
+        "TestUPolynomialTransformCancellationAfterComposition",
+        "TestUPolynomialSturmFailureAndCancellationImmediateGraph",
+        "TestUPolynomialSourceSixteenTransformENSURE",
+        "TestUPolynomialSourceFiveHalfRootENSURE",
+        "TestUPolynomialSturmFourierAndRootIDIndependent",
+        "TestUPolynomialRegisteredSturmAndTarskiInputs",
+        "TestUPolynomialSturmRationalEuclideanOracle",
+        "TestUPolynomialFullTransformFiniteOracles",
+        "TestUPolynomialRootCountBoundsSourceBranches",
+        "TestUPolynomialSequenceSelfGrowthCloseAndAscendingBigReset"
       ],
       "conditionals": [
         {
@@ -31808,16 +31954,114 @@
             "TestUPolynomialContentRawEarlyOneAndLateReadPrefix",
             "TestUPolynomialModularGCDCRALateFailureRootSweep"
           ]
+        },
+        {
+          "name": "upolynomial_sequence flat push/reset/scoped destruction and captured row binding",
+          "status": "ported",
+          "go_target": "upolynomial_sequence_source_test.go",
+          "tests": [
+            "TestUPolynomialSequenceCopyMoveAndRetainedRows",
+            "TestUPolynomialSequenceExactMetadataFailurePrefixes",
+            "TestUPolynomialSequencePhysicalOwnerAndCloseGuard",
+            "TestUPolynomialHalfRootStackDivisorNoReservation",
+            "TestUPolynomialSequenceBigCopyFailureImmediateGraph",
+            "TestUPolynomialTransformCancellationAfterComposition",
+            "TestUPolynomialSturmFailureAndCancellationImmediateGraph",
+            "TestUPolynomialSequenceSelfGrowthCloseAndAscendingBigReset",
+            "TestUPolynomialSourceSixteenTransformENSURE",
+            "TestUPolynomialSourceFiveHalfRootENSURE",
+            "TestUPolynomialSturmFourierAndRootIDIndependent",
+            "TestUPolynomialRegisteredSturmAndTarskiInputs",
+            "TestUPolynomialSturmRationalEuclideanOracle",
+            "TestUPolynomialFullTransformFiniteOracles",
+            "TestUPolynomialRootCountBoundsSourceBranches"
+          ]
+        },
+        {
+          "name": "sturm_seq_core; unary/pair sturm_seq; sturm_tarski_seq; fourier_seq; four sign_variations locations; get_root_id",
+          "status": "ported",
+          "go_target": "upolynomial_sturm_source_test.go",
+          "tests": [
+            "TestUPolynomialSequenceCopyMoveAndRetainedRows",
+            "TestUPolynomialSequenceExactMetadataFailurePrefixes",
+            "TestUPolynomialSequencePhysicalOwnerAndCloseGuard",
+            "TestUPolynomialHalfRootStackDivisorNoReservation",
+            "TestUPolynomialSequenceBigCopyFailureImmediateGraph",
+            "TestUPolynomialTransformCancellationAfterComposition",
+            "TestUPolynomialSturmFailureAndCancellationImmediateGraph",
+            "TestUPolynomialSequenceSelfGrowthCloseAndAscendingBigReset",
+            "TestUPolynomialSourceSixteenTransformENSURE",
+            "TestUPolynomialSourceFiveHalfRootENSURE",
+            "TestUPolynomialSturmFourierAndRootIDIndependent",
+            "TestUPolynomialRegisteredSturmAndTarskiInputs",
+            "TestUPolynomialSturmRationalEuclideanOracle",
+            "TestUPolynomialFullTransformFiniteOracles",
+            "TestUPolynomialRootCountBoundsSourceBranches"
+          ]
+        },
+        {
+          "name": "all translate/compose transforms; p_minus_x; p_1_div_x; five Set-before-transform header overloads",
+          "status": "ported",
+          "go_target": "upolynomial_transform_model_test.go",
+          "tests": [
+            "TestUPolynomialSequenceCopyMoveAndRetainedRows",
+            "TestUPolynomialSequenceExactMetadataFailurePrefixes",
+            "TestUPolynomialSequencePhysicalOwnerAndCloseGuard",
+            "TestUPolynomialHalfRootStackDivisorNoReservation",
+            "TestUPolynomialSequenceBigCopyFailureImmediateGraph",
+            "TestUPolynomialTransformCancellationAfterComposition",
+            "TestUPolynomialSturmFailureAndCancellationImmediateGraph",
+            "TestUPolynomialSequenceSelfGrowthCloseAndAscendingBigReset",
+            "TestUPolynomialSourceSixteenTransformENSURE",
+            "TestUPolynomialSourceFiveHalfRootENSURE",
+            "TestUPolynomialSturmFourierAndRootIDIndependent",
+            "TestUPolynomialRegisteredSturmAndTarskiInputs",
+            "TestUPolynomialSturmRationalEuclideanOracle",
+            "TestUPolynomialFullTransformFiniteOracles",
+            "TestUPolynomialRootCountBoundsSourceBranches"
+          ]
+        },
+        {
+          "name": "zero/half-root predicates/removal; sign_changes/descartes_bound three variants; Cauchy and Knuth upper bounds; nonzero lower bound",
+          "status": "ported",
+          "go_target": "upolynomial_transform_model_test.go",
+          "tests": [
+            "TestUPolynomialSequenceCopyMoveAndRetainedRows",
+            "TestUPolynomialSequenceExactMetadataFailurePrefixes",
+            "TestUPolynomialSequencePhysicalOwnerAndCloseGuard",
+            "TestUPolynomialHalfRootStackDivisorNoReservation",
+            "TestUPolynomialSequenceBigCopyFailureImmediateGraph",
+            "TestUPolynomialTransformCancellationAfterComposition",
+            "TestUPolynomialSturmFailureAndCancellationImmediateGraph",
+            "TestUPolynomialSequenceSelfGrowthCloseAndAscendingBigReset",
+            "TestUPolynomialSourceSixteenTransformENSURE",
+            "TestUPolynomialSourceFiveHalfRootENSURE",
+            "TestUPolynomialSturmFourierAndRootIDIndependent",
+            "TestUPolynomialRegisteredSturmAndTarskiInputs",
+            "TestUPolynomialSturmRationalEuclideanOracle",
+            "TestUPolynomialFullTransformFiniteOracles",
+            "TestUPolynomialRootCountBoundsSourceBranches"
+          ]
+        },
+        {
+          "name": "unsigned sequence vector source capacity and bounded physical extent arithmetic",
+          "status": "ported",
+          "go_target": "mpnum/upolynomial_sequence.go",
+          "tests": [
+            "TestUPolynomialSequenceUnsignedVectorExtent"
+          ]
         }
       ],
       "ownership": [
         "Actual Int coefficient arrays with concrete scalar descriptor pages/backing origins, all twenty-one scratch vectors and real modular child. Physical views guard at actual dereferences and follow swaps; old/new growth and immediate numeric roots are charged. See UPOLYNOMIAL_PORT_STATUS.md.",
-        "Real source content/division/GCD scratch, lexical scoped numerals/vectors, modular restoration, retained failure prefixes and actual numeric-root checks; see UPOLYNOMIAL_GCD_PORT_STATUS.md."
+        "Real source content/division/GCD scratch, lexical scoped numerals/vectors, modular restoration, retained failure prefixes and actual numeric-root checks; see UPOLYNOMIAL_GCD_PORT_STATUS.md.",
+        "Actual flat coefficient storage plus two independent unsigned metadata vectors, partial row publication, source read timing, charged cold owner and manager Close guard. See UPOLYNOMIAL_STURM_PACKET.md; lexical numeral/vector cleanup is an explicit Go error adapter."
       ],
       "deviations": [
-        "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full Sturm/isolation/refinement/conversion/factorization/algebraic and printers remain open; input conversion adapters do not establish complete registered tests.",
-        "Registered tests retain explicit dense input conversion adapters. Unported multivariate conversion, Sturm/root isolation/refinement/factorization and remaining registered test actions keep each complete source unit partial. Explicit cleanup on Go errors preserves rooted completed prefixes; it does not claim native C++ exception continuation.",
-        "WithCount copies the raw source pointer/size binding without dereference; indexed array GCD preserves early-one skipping and later content-copy failure publication. Late CRA sweep exercises actual post-append reservations, not virtual fault callbacks."
+        "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full isolation/refinement/conversion/factorization/algebraic and printers remain open; input conversion adapters do not establish complete registered tests.",
+        "Registered tests retain explicit dense input conversion adapters. Unported multivariate conversion, root isolation/refinement/factorization and remaining registered test actions keep each complete source unit partial. Explicit cleanup on Go errors preserves rooted completed prefixes; it does not claim native C++ exception continuation.",
+        "WithCount copies the raw source pointer/size binding without dereference; indexed array GCD preserves early-one skipping and later content-copy failure publication. Late CRA sweep exercises actual post-append reservations, not virtual fault callbacks.",
+        "Selected sequence/Sturm/transform/Descartes/bounds algorithms translated. RowView binds source coeffs(i) plus size(i); source unsigned header8 is extent arithmetic while actual Go metadata arrays charge4*capacity and slice fields are in the charged cold owner. Source printers, full root isolation/refinement, multivariate conversion, factorization and algebraic consumers remain open; source units remain partial."
       ]
     },
     {
@@ -89137,7 +89381,15 @@
         "mpnum/upolynomial_gcd_modular.go",
         "mpnum/upolynomial_gcd_primes.go",
         "upolynomial_division_source_test.go",
-        "upolynomial_gcd_source_test.go"
+        "upolynomial_gcd_source_test.go",
+        "mpnum/upolynomial_sequence.go",
+        "mpnum/upolynomial_sturm.go",
+        "mpnum/upolynomial_transforms.go",
+        "mpnum/upolynomial_root_bounds.go",
+        "mpnum/upolynomial_sequence_test.go",
+        "upolynomial_sequence_source_test.go",
+        "upolynomial_sturm_source_test.go",
+        "upolynomial_transform_model_test.go"
       ],
       "tests": [
         "TestUPolynomialScalarExtentAndLayout",
@@ -89181,7 +89433,23 @@
         "TestUPolynomialCancelledModularGCDZeroHostAllocation",
         "TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime",
         "TestUPolynomialContentRawEarlyOneAndLateReadPrefix",
-        "TestUPolynomialModularGCDCRALateFailureRootSweep"
+        "TestUPolynomialModularGCDCRALateFailureRootSweep",
+        "TestUPolynomialSequenceUnsignedVectorExtent",
+        "TestUPolynomialSequenceCopyMoveAndRetainedRows",
+        "TestUPolynomialSequenceExactMetadataFailurePrefixes",
+        "TestUPolynomialSequencePhysicalOwnerAndCloseGuard",
+        "TestUPolynomialHalfRootStackDivisorNoReservation",
+        "TestUPolynomialSequenceBigCopyFailureImmediateGraph",
+        "TestUPolynomialTransformCancellationAfterComposition",
+        "TestUPolynomialSturmFailureAndCancellationImmediateGraph",
+        "TestUPolynomialSourceSixteenTransformENSURE",
+        "TestUPolynomialSourceFiveHalfRootENSURE",
+        "TestUPolynomialSturmFourierAndRootIDIndependent",
+        "TestUPolynomialRegisteredSturmAndTarskiInputs",
+        "TestUPolynomialSturmRationalEuclideanOracle",
+        "TestUPolynomialFullTransformFiniteOracles",
+        "TestUPolynomialRootCountBoundsSourceBranches",
+        "TestUPolynomialSequenceSelfGrowthCloseAndAscendingBigReset"
       ],
       "conditionals": [
         {
@@ -89462,16 +89730,40 @@
             "TestUPolynomialContentRawEarlyOneAndLateReadPrefix",
             "TestUPolynomialModularGCDCRALateFailureRootSweep"
           ]
+        },
+        {
+          "name": "sixteen remaining translate_q/reciprocal ENSURE and five half-root ENSURE routes; registered print-only Sturm/Tarski dense inputs",
+          "status": "partial",
+          "go_target": "upolynomial_sturm_source_test.go",
+          "tests": [
+            "TestUPolynomialSequenceCopyMoveAndRetainedRows",
+            "TestUPolynomialSequenceExactMetadataFailurePrefixes",
+            "TestUPolynomialSequencePhysicalOwnerAndCloseGuard",
+            "TestUPolynomialHalfRootStackDivisorNoReservation",
+            "TestUPolynomialSequenceBigCopyFailureImmediateGraph",
+            "TestUPolynomialTransformCancellationAfterComposition",
+            "TestUPolynomialSturmFailureAndCancellationImmediateGraph",
+            "TestUPolynomialSequenceSelfGrowthCloseAndAscendingBigReset",
+            "TestUPolynomialSourceSixteenTransformENSURE",
+            "TestUPolynomialSourceFiveHalfRootENSURE",
+            "TestUPolynomialSturmFourierAndRootIDIndependent",
+            "TestUPolynomialRegisteredSturmAndTarskiInputs",
+            "TestUPolynomialSturmRationalEuclideanOracle",
+            "TestUPolynomialFullTransformFiniteOracles",
+            "TestUPolynomialRootCountBoundsSourceBranches"
+          ]
         }
       ],
       "ownership": [
         "Actual Int coefficient arrays with concrete scalar descriptor pages/backing origins, all twenty-one scratch vectors and real modular child. Physical views guard at actual dereferences and follow swaps; old/new growth and immediate numeric roots are charged. See UPOLYNOMIAL_PORT_STATUS.md.",
-        "Real source content/division/GCD scratch, lexical scoped numerals/vectors, modular restoration, retained failure prefixes and actual numeric-root checks; see UPOLYNOMIAL_GCD_PORT_STATUS.md."
+        "Real source content/division/GCD scratch, lexical scoped numerals/vectors, modular restoration, retained failure prefixes and actual numeric-root checks; see UPOLYNOMIAL_GCD_PORT_STATUS.md.",
+        "Actual flat coefficient storage plus two independent unsigned metadata vectors, partial row publication, source read timing, charged cold owner and manager Close guard. See UPOLYNOMIAL_STURM_PACKET.md; lexical numeral/vector cleanup is an explicit Go error adapter."
       ],
       "deviations": [
-        "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full Sturm/isolation/refinement/conversion/factorization/algebraic and printers remain open; input conversion adapters do not establish complete registered tests.",
-        "Registered tests retain explicit dense input conversion adapters. Unported multivariate conversion, Sturm/root isolation/refinement/factorization and remaining registered test actions keep each complete source unit partial. Explicit cleanup on Go errors preserves rooted completed prefixes; it does not claim native C++ exception continuation.",
-        "WithCount copies the raw source pointer/size binding without dereference; indexed array GCD preserves early-one skipping and later content-copy failure publication. Late CRA sweep exercises actual post-append reservations, not virtual fault callbacks."
+        "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full isolation/refinement/conversion/factorization/algebraic and printers remain open; input conversion adapters do not establish complete registered tests.",
+        "Registered tests retain explicit dense input conversion adapters. Unported multivariate conversion, root isolation/refinement/factorization and remaining registered test actions keep each complete source unit partial. Explicit cleanup on Go errors preserves rooted completed prefixes; it does not claim native C++ exception continuation.",
+        "WithCount copies the raw source pointer/size binding without dereference; indexed array GCD preserves early-one skipping and later content-copy failure publication. Late CRA sweep exercises actual post-append reservations, not virtual fault callbacks.",
+        "Selected sequence/Sturm/transform/Descartes/bounds algorithms translated. RowView binds source coeffs(i) plus size(i); source unsigned header8 is extent arithmetic while actual Go metadata arrays charge4*capacity and slice fields are in the charged cold owner. Source printers, full root isolation/refinement, multivariate conversion, factorization and algebraic consumers remain open; source units remain partial."
       ]
     },
     {

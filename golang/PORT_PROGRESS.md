@@ -1349,3 +1349,17 @@ and checked/debug pass. Vet, WASI compilation and no-generics/source gates pass.
 See MPZ_SETTER_PORT_STATUS.md. Scalar infallible write layout, generic Power,
 0^0 release/debug policy, shifts, other staged wrappers and true source allocator
 integration remain required. Neither whole MPZ unit becomes complete.
+
+
+## Dense sequences, Sturm transforms and root-count prerequisites
+
+The actual flat three-vector sequence, Sturm/Tarski/Fourier chains, four sign
+variation locations, RootID, all selected transforms and Descartes/root bounds
+now use the concrete committed numeral owners. Tests first port sixteen remaining
+translation/reciprocal ENSURE routes and five half-root routes, with an independent
+rational Euclidean oracle, actual allocation refusals and cancellation prefixes.
+The source lexical [-1,2] divisor uses a concrete stack span over the existing
+division core. See UPOLYNOMIAL_STURM_PACKET.md for final gates, lifetime and
+physical accounting evidence. Root isolation/refinement, multivariate conversion,
+factorization, algebraic consumers and printers remain required. No whole source
+unit is promoted; ledger remains33ported/145partial/1924unported.

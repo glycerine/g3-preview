@@ -1,3 +1,8 @@
+Selected polynomial flat sequence/Sturm/Tarski/Fourier, transforms, variation
+and root-bound prerequisites are implemented; see ../UPOLYNOMIAL_STURM_PACKET.md
+for source mapping and tests-first evidence. Full isolation/refinement,
+factorization, multivariate/algebraic consumers and numeral staging remain open.
+
 Selected destructive capacity and base-two Power now preserve caller publication;
 see ../MPZ_SETTER_PORT_STATUS.md for current scope and remaining staging work.
 

@@ -52,18 +52,49 @@ func (m *UPolynomialManager) DivScalarView(v UPolynomialView, b *Int) error {
 	return m.divScalar(v, b)
 }
 
+// Concrete borrowed divisor representation; immediate is used only for the
+// actual source lexical mpz[-1,2]. Pointer receivers borrow that caller frame,
+// never an address of a by-value numeral copy or a fake directory binding.
+type upolyDivisorSpan struct {
+	view      UPolynomialView
+	immediate bool
+	pair      [2]Int
+}
+
+func (b *upolyDivisorSpan) count() uint32 {
+	if b.immediate {
+		return 2
+	}
+	return b.view.count
+}
+func (m *UPolynomialManager) readDivisor(b *upolyDivisorSpan, i uint32) (*Int, error) {
+	if b.immediate {
+		if i >= 2 {
+			return nil, arena.ErrBounds
+		}
+		return &b.pair[i], nil
+	}
+	return m.read(b.view, i)
+}
+func (m *UPolynomialManager) aliasDivisor(b *upolyDivisorSpan, s *upolyVectorState) bool {
+	return !b.immediate && m.alias(b.view, s)
+}
 func (m *UPolynomialManager) divRemCore(a, b UPolynomialView, d *uint32, q, r *upolyVectorState) error {
+	span := upolyDivisorSpan{view: b}
+	return m.divRemCoreSpan(a, &span, d, q, r)
+}
+func (m *UPolynomialManager) divRemCoreSpan(a UPolynomialView, b *upolyDivisorSpan, d *uint32, q, r *upolyVectorState) error {
 	if d == nil {
 		return arena.ErrBounds
 	}
-	if modularSourceDebug && (m.alias(a, q) || m.alias(b, q) || m.alias(a, r) || m.alias(b, r)) {
+	if modularSourceDebug && (m.alias(a, q) || m.aliasDivisor(b, q) || m.alias(a, r) || m.aliasDivisor(b, r)) {
 		return ErrUPolynomialAssertion
 	}
 	*d = 0
-	if modularSourceDebug && b.count == 0 {
+	if modularSourceDebug && b.count() == 0 {
 		return ErrUPolynomialAssertion
 	}
-	if b.count == 1 {
+	if b.count() == 1 {
 		if e := m.setView(q, a); e != nil {
 			return e
 		}
@@ -72,7 +103,7 @@ func (m *UPolynomialManager) divRemCore(a, b UPolynomialView, d *uint32, q, r *u
 			return e
 		}
 		if field {
-			bn, e := m.read(b, 0)
+			bn, e := m.readDivisor(b, 0)
 			if e != nil {
 				return e
 			}
@@ -92,13 +123,13 @@ func (m *UPolynomialManager) divRemCore(a, b UPolynomialView, d *uint32, q, r *u
 		return nil
 	}
 	var qsz uint32
-	if a.count >= b.count {
-		qsz = a.count - b.count + 1
+	if a.count >= b.count() {
+		qsz = a.count - b.count() + 1
 		if e := m.reserve(q, qsz); e != nil {
 			return e
 		}
 	}
-	bn, e := m.read(b, b.count-1)
+	bn, e := m.readDivisor(b, b.count()-1)
 	if e != nil {
 		return e
 	}
@@ -120,15 +151,15 @@ func (m *UPolynomialManager) divRemCore(a, b UPolynomialView, d *uint32, q, r *u
 			return e
 		}
 		n := r.size
-		if n < b.count {
+		if n < b.count() {
 			return m.setSize(q, qsz)
 		}
-		delta := n - b.count
+		delta := n - b.count()
 		field, e := m.modular.Field()
 		if e != nil {
 			return e
 		}
-		bn, e = m.read(b, b.count-1)
+		bn, e = m.readDivisor(b, b.count()-1)
 		if e != nil {
 			return e
 		}
@@ -145,7 +176,7 @@ func (m *UPolynomialManager) divRemCore(a, b UPolynomialView, d *uint32, q, r *u
 				return e
 			}
 			for i := uint32(0); i < n-1; i++ {
-				bn, e = m.read(b, b.count-1)
+				bn, e = m.readDivisor(b, b.count()-1)
 				if e != nil {
 					return e
 				}
@@ -154,7 +185,7 @@ func (m *UPolynomialManager) divRemCore(a, b UPolynomialView, d *uint32, q, r *u
 				}
 			}
 			for i := uint32(0); i < qsz; i++ {
-				bn, e = m.read(b, b.count-1)
+				bn, e = m.readDivisor(b, b.count()-1)
 				if e != nil {
 					return e
 				}
@@ -166,8 +197,8 @@ func (m *UPolynomialManager) divRemCore(a, b UPolynomialView, d *uint32, q, r *u
 				return e
 			}
 		}
-		for i := uint32(0); i < b.count-1; i++ {
-			x, e := m.read(b, i)
+		for i := uint32(0); i < b.count()-1; i++ {
+			x, e := m.readDivisor(b, i)
 			if e != nil {
 				return e
 			}
@@ -209,8 +240,12 @@ func (m *UPolynomialManager) DivRem(a, b, q, r UPolynomial, d *uint32) error {
 	return m.DivRemViews(av, bv, q, r, d)
 }
 func (m *UPolynomialManager) divState(a, b UPolynomialView, q *upolyVectorState) error {
+	span := upolyDivisorSpan{view: b}
+	return m.divSpanState(a, &span, q)
+}
+func (m *UPolynomialManager) divSpanState(a UPolynomialView, b *upolyDivisorSpan, q *upolyVectorState) error {
 	var d uint32
-	if e := m.divRemCore(a, b, &d, &m.div2, &m.div1); e != nil {
+	if e := m.divRemCoreSpan(a, b, &d, &m.div2, &m.div1); e != nil {
 		return e
 	}
 	if e := m.reset(&m.div1); e != nil {
