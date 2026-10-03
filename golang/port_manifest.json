@@ -96961,7 +96961,8 @@
         "mpnum/mpz_parse.go",
         "mpnum/mp_format.go",
         "mpnum/mpz_bitwise.go",
-        "mpnum/mpz_root.go"
+        "mpnum/mpz_root.go",
+        "mpnum/mpz_misc.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -97044,7 +97045,12 @@
         "TestIntegerRootAndSquareFailureCleanup",
         "TestRationalRootSquareFailureCleanup",
         "TestRootWarmStorageAndClosedOutputs",
-        "TestRationalRootWarmStorage"
+        "TestRationalRootWarmStorage",
+        "TestIntegerScalarStrictConversions",
+        "TestIntegerScalarDecomposeParityAndMultiplicity",
+        "TestIntegerScalarFloatSourceRadix",
+        "TestIntegerScalarHashRepresentation",
+        "TestIntegerScalarWarmAndGuards"
       ],
       "conditionals": [
         {
@@ -98294,6 +98300,102 @@
             "TestRootWarmStorageAndClosedOutputs",
             "TestRationalRootWarmStorage"
           ]
+        },
+        {
+          "name": "precise/field",
+          "status": "ported",
+          "go_target": "mpnum/mpz_misc.go",
+          "tests": [
+            "TestIntegerScalarStrictConversions",
+            "TestIntegerScalarDecomposeParityAndMultiplicity",
+            "TestIntegerScalarFloatSourceRadix",
+            "TestIntegerScalarHashRepresentation",
+            "TestIntegerScalarWarmAndGuards"
+          ]
+        },
+        {
+          "name": "is_uint/get_uint and is_int/get_int strict 32-bit conversion",
+          "status": "ported",
+          "go_target": "mpnum/mpz_misc.go",
+          "tests": [
+            "TestIntegerScalarStrictConversions",
+            "TestIntegerScalarDecomposeParityAndMultiplicity",
+            "TestIntegerScalarFloatSourceRadix",
+            "TestIntegerScalarHashRepresentation",
+            "TestIntegerScalarWarmAndGuards"
+          ]
+        },
+        {
+          "name": "is_even/is_odd",
+          "status": "ported",
+          "go_target": "mpnum/mpz_misc.go",
+          "tests": [
+            "TestIntegerScalarStrictConversions",
+            "TestIntegerScalarDecomposeParityAndMultiplicity",
+            "TestIntegerScalarFloatSourceRadix",
+            "TestIntegerScalarHashRepresentation",
+            "TestIntegerScalarWarmAndGuards"
+          ]
+        },
+        {
+          "name": "size_info live-limb sorting weight",
+          "status": "ported",
+          "go_target": "mpnum/mpz_misc.go",
+          "tests": [
+            "TestIntegerScalarStrictConversions",
+            "TestIntegerScalarDecomposeParityAndMultiplicity",
+            "TestIntegerScalarFloatSourceRadix",
+            "TestIntegerScalarHashRepresentation",
+            "TestIntegerScalarWarmAndGuards"
+          ]
+        },
+        {
+          "name": "get_double internal 32-bit UINT_MAX floating radix",
+          "status": "ported",
+          "go_target": "mpnum/mpz_misc.go",
+          "tests": [
+            "TestIntegerScalarStrictConversions",
+            "TestIntegerScalarDecomposeParityAndMultiplicity",
+            "TestIntegerScalarFloatSourceRadix",
+            "TestIntegerScalarHashRepresentation",
+            "TestIntegerScalarWarmAndGuards"
+          ]
+        },
+        {
+          "name": "hash internal little-endian signed-char baseline",
+          "status": "ported",
+          "go_target": "mpnum/mpz_misc.go",
+          "tests": [
+            "TestIntegerScalarStrictConversions",
+            "TestIntegerScalarDecomposeParityAndMultiplicity",
+            "TestIntegerScalarFloatSourceRadix",
+            "TestIntegerScalarHashRepresentation",
+            "TestIntegerScalarWarmAndGuards"
+          ]
+        },
+        {
+          "name": "power_of_two_multiple",
+          "status": "ported",
+          "go_target": "mpnum/mpz_misc.go",
+          "tests": [
+            "TestIntegerScalarStrictConversions",
+            "TestIntegerScalarDecomposeParityAndMultiplicity",
+            "TestIntegerScalarFloatSourceRadix",
+            "TestIntegerScalarHashRepresentation",
+            "TestIntegerScalarWarmAndGuards"
+          ]
+        },
+        {
+          "name": "decompose caller-owned 32-bit magnitude digits",
+          "status": "ported",
+          "go_target": "mpnum/mpz_misc.go",
+          "tests": [
+            "TestIntegerScalarStrictConversions",
+            "TestIntegerScalarDecomposeParityAndMultiplicity",
+            "TestIntegerScalarFloatSourceRadix",
+            "TestIntegerScalarHashRepresentation",
+            "TestIntegerScalarWarmAndGuards"
+          ]
         }
       ],
       "ownership": [
@@ -98304,7 +98406,8 @@
         "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md.",
         "Numeric division and decimal formatting use child NaturalManager indexed scratch; all retained storage is budgeted, final host string is caller-owned. See mpnum/PORT_STATUS.md.",
         "Bitwise source local numerals use budgeted manager cells/Words; ordered64-bit arithmetic chunks and final actions are retained. Staged result preserves outputs on failure; see mpnum/BITWISE_PORT_STATUS.md.",
-        "Root/square locals use existing budgeted numeric cells/Words; source bound/Power/Swap/Copy actions preserved. Staged output includes real old+new peak; see ROOT_PORT_STATUS.md."
+        "Root/square locals use existing budgeted numeric cells/Words; source bound/Power/Swap/Copy actions preserved. Staged output includes real old+new peak; see ROOT_PORT_STATUS.md.",
+        "Scalar inspection borrows indexed manager cells/Words and allocates no owner storage. Decompose publishes caller-owned digits; sufficient caller capacity allocates nothing. See MPZ_MISC_PORT_STATUS.md."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -98313,7 +98416,8 @@
         "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits.",
         "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors.",
         "Unsigned low63-bit mask defines intended bitwise_not signed-shift boundary. Negative source operands produce ErrBitwiseDomain; source local cleanup/partial output on allocation failures become explicit cleanup/staged publication.",
-        "Typed root domain errors replace degree-zero division and negative-even/integer-only assertions. Nonnegative square output/input identity retains source reset-to-zero alias result; allocation errors preserve destination."
+        "Typed root domain errors replace degree-zero division and negative-even/integer-only assertions. Nonnegative square output/input identity retains source reset-to-zero alias result; allocation errors preserve destination.",
+        "32-bit accessor source assertions become ErrConversion; INT_MIN decomposition uses defined wider magnitude arithmetic. Floating UINT_MAX radix, unsigned length/count wrap and sign-free big hash remain source behavior."
       ]
     },
     {
@@ -98333,7 +98437,8 @@
         "mpnum/mpz_parse.go",
         "mpnum/mp_format.go",
         "mpnum/mpz_bitwise.go",
-        "mpnum/mpz_root.go"
+        "mpnum/mpz_root.go",
+        "mpnum/mpz_misc.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -98416,7 +98521,12 @@
         "TestIntegerRootAndSquareFailureCleanup",
         "TestRationalRootSquareFailureCleanup",
         "TestRootWarmStorageAndClosedOutputs",
-        "TestRationalRootWarmStorage"
+        "TestRationalRootWarmStorage",
+        "TestIntegerScalarStrictConversions",
+        "TestIntegerScalarDecomposeParityAndMultiplicity",
+        "TestIntegerScalarFloatSourceRadix",
+        "TestIntegerScalarHashRepresentation",
+        "TestIntegerScalarWarmAndGuards"
       ],
       "conditionals": [
         {
@@ -99178,6 +99288,102 @@
             "TestRootWarmStorageAndClosedOutputs",
             "TestRationalRootWarmStorage"
           ]
+        },
+        {
+          "name": "precise/field",
+          "status": "ported",
+          "go_target": "mpnum/mpz_misc.go",
+          "tests": [
+            "TestIntegerScalarStrictConversions",
+            "TestIntegerScalarDecomposeParityAndMultiplicity",
+            "TestIntegerScalarFloatSourceRadix",
+            "TestIntegerScalarHashRepresentation",
+            "TestIntegerScalarWarmAndGuards"
+          ]
+        },
+        {
+          "name": "is_uint/get_uint and is_int/get_int strict 32-bit conversion",
+          "status": "ported",
+          "go_target": "mpnum/mpz_misc.go",
+          "tests": [
+            "TestIntegerScalarStrictConversions",
+            "TestIntegerScalarDecomposeParityAndMultiplicity",
+            "TestIntegerScalarFloatSourceRadix",
+            "TestIntegerScalarHashRepresentation",
+            "TestIntegerScalarWarmAndGuards"
+          ]
+        },
+        {
+          "name": "is_even/is_odd",
+          "status": "ported",
+          "go_target": "mpnum/mpz_misc.go",
+          "tests": [
+            "TestIntegerScalarStrictConversions",
+            "TestIntegerScalarDecomposeParityAndMultiplicity",
+            "TestIntegerScalarFloatSourceRadix",
+            "TestIntegerScalarHashRepresentation",
+            "TestIntegerScalarWarmAndGuards"
+          ]
+        },
+        {
+          "name": "size_info live-limb sorting weight",
+          "status": "ported",
+          "go_target": "mpnum/mpz_misc.go",
+          "tests": [
+            "TestIntegerScalarStrictConversions",
+            "TestIntegerScalarDecomposeParityAndMultiplicity",
+            "TestIntegerScalarFloatSourceRadix",
+            "TestIntegerScalarHashRepresentation",
+            "TestIntegerScalarWarmAndGuards"
+          ]
+        },
+        {
+          "name": "get_double internal 32-bit UINT_MAX floating radix",
+          "status": "ported",
+          "go_target": "mpnum/mpz_misc.go",
+          "tests": [
+            "TestIntegerScalarStrictConversions",
+            "TestIntegerScalarDecomposeParityAndMultiplicity",
+            "TestIntegerScalarFloatSourceRadix",
+            "TestIntegerScalarHashRepresentation",
+            "TestIntegerScalarWarmAndGuards"
+          ]
+        },
+        {
+          "name": "hash internal little-endian signed-char baseline",
+          "status": "ported",
+          "go_target": "mpnum/mpz_misc.go",
+          "tests": [
+            "TestIntegerScalarStrictConversions",
+            "TestIntegerScalarDecomposeParityAndMultiplicity",
+            "TestIntegerScalarFloatSourceRadix",
+            "TestIntegerScalarHashRepresentation",
+            "TestIntegerScalarWarmAndGuards"
+          ]
+        },
+        {
+          "name": "power_of_two_multiple",
+          "status": "ported",
+          "go_target": "mpnum/mpz_misc.go",
+          "tests": [
+            "TestIntegerScalarStrictConversions",
+            "TestIntegerScalarDecomposeParityAndMultiplicity",
+            "TestIntegerScalarFloatSourceRadix",
+            "TestIntegerScalarHashRepresentation",
+            "TestIntegerScalarWarmAndGuards"
+          ]
+        },
+        {
+          "name": "decompose caller-owned 32-bit magnitude digits",
+          "status": "ported",
+          "go_target": "mpnum/mpz_misc.go",
+          "tests": [
+            "TestIntegerScalarStrictConversions",
+            "TestIntegerScalarDecomposeParityAndMultiplicity",
+            "TestIntegerScalarFloatSourceRadix",
+            "TestIntegerScalarHashRepresentation",
+            "TestIntegerScalarWarmAndGuards"
+          ]
         }
       ],
       "ownership": [
@@ -99188,7 +99394,8 @@
         "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md.",
         "Numeric division and decimal formatting use child NaturalManager indexed scratch; all retained storage is budgeted, final host string is caller-owned. See mpnum/PORT_STATUS.md.",
         "Bitwise source local numerals use budgeted manager cells/Words; ordered64-bit arithmetic chunks and final actions are retained. Staged result preserves outputs on failure; see mpnum/BITWISE_PORT_STATUS.md.",
-        "Root/square locals use existing budgeted numeric cells/Words; source bound/Power/Swap/Copy actions preserved. Staged output includes real old+new peak; see ROOT_PORT_STATUS.md."
+        "Root/square locals use existing budgeted numeric cells/Words; source bound/Power/Swap/Copy actions preserved. Staged output includes real old+new peak; see ROOT_PORT_STATUS.md.",
+        "Scalar inspection borrows indexed manager cells/Words and allocates no owner storage. Decompose publishes caller-owned digits; sufficient caller capacity allocates nothing. See MPZ_MISC_PORT_STATUS.md."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -99197,7 +99404,8 @@
         "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits.",
         "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors.",
         "Unsigned low63-bit mask defines intended bitwise_not signed-shift boundary. Negative source operands produce ErrBitwiseDomain; source local cleanup/partial output on allocation failures become explicit cleanup/staged publication.",
-        "Typed root domain errors replace degree-zero division and negative-even/integer-only assertions. Nonnegative square output/input identity retains source reset-to-zero alias result; allocation errors preserve destination."
+        "Typed root domain errors replace degree-zero division and negative-even/integer-only assertions. Nonnegative square output/input identity retains source reset-to-zero alias result; allocation errors preserve destination.",
+        "32-bit accessor source assertions become ErrConversion; INT_MIN decomposition uses defined wider magnitude arithmetic. Floating UINT_MAX radix, unsigned length/count wrap and sign-free big hash remain source behavior."
       ]
     },
     {

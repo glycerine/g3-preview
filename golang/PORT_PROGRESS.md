@@ -395,3 +395,14 @@ small/big output fault sweeps, immediate pre-teardown live-cell/Words accounting
 and warm-zero-allocation checks. Isolated full native/checked modules, checked
 race/actual checked JS registrations, vet, WASI and source/no-generics audit pass.
 Other numeric methods and full solver/AST/proof/interpolation remain open.
+
+## Integer scalar inspection
+
+Strict32-bit conversions, parity, source sorting weight, floating conversion,
+hashing, trailing-zero multiplicity and caller-buffer decomposition now preserve
+the selected internal32-bit source behavior. Five tests reached missing-API RED
+first, then GREEN, with bounded independent magnitude/parity oracles, source
+assignment-history assertions and warm allocation/budget checks. UINT_MAX floating
+radix and conversion boundary exclusions remain explicit source quirks. See
+MPZ_MISC_PORT_STATUS.md. Remaining numeric and complete AST/solver/proof/
+interpolation work stays open; no full-port gate is declared complete.
