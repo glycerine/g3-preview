@@ -36,3 +36,14 @@ cleaning the old reference; pooled pages remain physically charged until Close.
 Null C strings model the audited libstdc++ stream badbit prefix with a typed
 error. The source global empty value and debug print become explicit owner-local
 and diagnostic APIs. See PARAMS_REF_PORT_STATUS.md for remaining adaptations.
+
+### S-expression undefined display continuation and scalar wrappers
+
+The source atom display falls through to an invalid composite cast; Go returns
+the defined printed prefix plus ErrSexprDisplayContinuation. Empty composites
+retain the source closing-parenthesis-only rendering. Scalar handles/snapshots
+replace raw borrows; owner Close destroys outstanding owned numerals. Vector
+null callbacks become no-ops, nonempty self-append rejects unbounded source
+growth, and capacity preflight avoids leaked increments. BV source debug
+short-circuit temporaries and inline16/doubling temporary storage are preserved.
+See SEXPR_PORT_STATUS.md for detailed lifetimes, guards and source mappings.

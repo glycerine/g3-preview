@@ -649,3 +649,14 @@ self-copy rational identity also produced behavioral RED before correction.
 Failure sweeps audit live roots before display/teardown, and actual context
 arrays/text/scratch are budgeted. The complete params.h/.cpp utility surface
 is mapped; solver parameter consumers remain open. See PARAMS_REF_PORT_STATUS.md.
+
+## Concrete S-expressions and reference wrappers
+
+All sexpr.h/.cpp methods now have concrete pointer-free storage and owned
+reference/vector counterparts. Sixteen tests began RED and preserve deletion
+order, RC wrap, source rendering quirks, full byte strings and checked views.
+Review-driven RED corrected both the source BV debug expression and its local
+inline16/doubling digit buffer. Allocation sweeps audit roots before cleanup,
+and whole owner graphs and overlap peaks are charged. Five relevant escaped
+print inputs are covered without inventing source assertions; other escaped
+branches and non-sexpr wrapper specializations remain open. See SEXPR_PORT_STATUS.md.

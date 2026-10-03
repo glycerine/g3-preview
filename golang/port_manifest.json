@@ -76179,14 +76179,31 @@
       "sha256": "b6268fc7569c7003f4a925e88b97c559c94ab0293c813f582828f8fb83930c97",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_sexpr_test.go"
+      ],
+      "tests": [
+        "TestSexprRegisteredEscapedDefaultPrintInputs"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "five nonnull default escaped input fixtures through sexpr output; zero source ENSURE assertions",
+          "status": "partial",
+          "go_target": "util_sexpr_test.go",
+          "tests": [
+            "TestSexprRegisteredEscapedDefaultPrintInputs"
+          ]
+        }
+      ],
+      "ownership": [
+        "Sexpr string payload is owned; emitted output is caller-owned."
+      ],
+      "deviations": [
+        "Source thirteen print-only inputs are not thirteen assertions. Five relevant inputs covered; standalone print harness, null/trim and remaining output cases open."
+      ]
     },
     {
       "path": "src/test/ex.cpp",
@@ -84386,9 +84403,13 @@
       "sha256": "f5c876511a1fd5674ba5f9fa462d9206ffaad979ee90cc30e7d1b5fc9c4e07e1",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_sexpr.go"
+      ],
+      "tests": [
+        "TestSexprBVSourceInlineBufferAndTemporaryLifetime"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -84455,8 +84476,19 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "actual sexpr BV sbuffer<char,false,16> construction/push/doubling/reverse/terminator/destruction",
+          "status": "ported",
+          "go_target": "util_sexpr.go",
+          "tests": [
+            "TestSexprBVSourceInlineBufferAndTemporaryLifetime"
+          ]
+        }
+      ],
+      "ownership": [
+        "Function-local inline16 bytes and budgeted overflow arrays, old/new overlap and per-atom destruction. Other buffer methods/types remain separately inventoried."
+      ],
       "deviations": []
     },
     {
@@ -101725,9 +101757,26 @@
       "sha256": "4b3a791f8ca1f3233ef27e81b94c91e71e0c25e23b2e6c4b684261c8c2857459",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_sexpr.go"
+      ],
+      "tests": [
+        "TestSexprKindsFactoriesAndDefinedDisplay",
+        "TestSexprBVSourceWidthQuirks",
+        "TestSexprRCWrapAndDeletionLIFO",
+        "TestSexprConcreteRefAndVectorActions",
+        "TestSexprPointerFreeAndBoundedDAG",
+        "TestSexprStringBytesAndWrapperRemainingBranches",
+        "TestSexprFailurePrefixesImmediateOwnership",
+        "TestSexprWarmPlateauAndGenerationGuards",
+        "TestSexprFactoryRecordBeforeValueCopy",
+        "TestSexprFinalizationEpochAndZeroWidthBuffer",
+        "TestSexprConstructorAndWholePhysicalGraph",
+        "TestSexprRegisteredEscapedDefaultPrintInputs",
+        "TestSexprAccessorsAndScalarIterator",
+        "TestSexprBVSourceInlineBufferAndTemporaryLifetime"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -101746,9 +101795,35 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "actual sexpr concrete specialization constructors/copy/move/assignment, roots, projections and vector element/iterator adaptations",
+          "status": "ported",
+          "go_target": "util_sexpr.go",
+          "tests": [
+            "TestSexprKindsFactoriesAndDefinedDisplay",
+            "TestSexprBVSourceWidthQuirks",
+            "TestSexprRCWrapAndDeletionLIFO",
+            "TestSexprConcreteRefAndVectorActions",
+            "TestSexprPointerFreeAndBoundedDAG",
+            "TestSexprStringBytesAndWrapperRemainingBranches",
+            "TestSexprFailurePrefixesImmediateOwnership",
+            "TestSexprWarmPlateauAndGenerationGuards",
+            "TestSexprFactoryRecordBeforeValueCopy",
+            "TestSexprFinalizationEpochAndZeroWidthBuffer",
+            "TestSexprConstructorAndWholePhysicalGraph",
+            "TestSexprRegisteredEscapedDefaultPrintInputs",
+            "TestSexprAccessorsAndScalarIterator",
+            "TestSexprBVSourceInlineBufferAndTemporaryLifetime"
+          ]
+        }
+      ],
+      "ownership": [
+        "Scalar references/views and charged cold vector headers/backing; source reference action order and ownership transfer mapped for sexpr. See SEXPR_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "This concrete specialization does not implement all AST/other source specializations or remaining generic helper/hash surfaces. Ref-vector null callbacks and nonempty self-append have explicit checked Go adaptations."
+      ]
     },
     {
       "path": "src/util/obj_ref_hashtable.h",
@@ -103901,9 +103976,26 @@
       "sha256": "60bdb516c3df2130840407979d05022ed119a7dc17e93493298075a68df8c1a7",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_sexpr.go"
+      ],
+      "tests": [
+        "TestSexprKindsFactoriesAndDefinedDisplay",
+        "TestSexprBVSourceWidthQuirks",
+        "TestSexprRCWrapAndDeletionLIFO",
+        "TestSexprConcreteRefAndVectorActions",
+        "TestSexprPointerFreeAndBoundedDAG",
+        "TestSexprStringBytesAndWrapperRemainingBranches",
+        "TestSexprFailurePrefixesImmediateOwnership",
+        "TestSexprWarmPlateauAndGenerationGuards",
+        "TestSexprFactoryRecordBeforeValueCopy",
+        "TestSexprFinalizationEpochAndZeroWidthBuffer",
+        "TestSexprConstructorAndWholePhysicalGraph",
+        "TestSexprRegisteredEscapedDefaultPrintInputs",
+        "TestSexprAccessorsAndScalarIterator",
+        "TestSexprBVSourceInlineBufferAndTemporaryLifetime"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -103938,9 +104030,35 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "actual sexpr concrete specialization constructors/copy/move/assignment, roots, projections and vector element/iterator adaptations",
+          "status": "ported",
+          "go_target": "util_sexpr.go",
+          "tests": [
+            "TestSexprKindsFactoriesAndDefinedDisplay",
+            "TestSexprBVSourceWidthQuirks",
+            "TestSexprRCWrapAndDeletionLIFO",
+            "TestSexprConcreteRefAndVectorActions",
+            "TestSexprPointerFreeAndBoundedDAG",
+            "TestSexprStringBytesAndWrapperRemainingBranches",
+            "TestSexprFailurePrefixesImmediateOwnership",
+            "TestSexprWarmPlateauAndGenerationGuards",
+            "TestSexprFactoryRecordBeforeValueCopy",
+            "TestSexprFinalizationEpochAndZeroWidthBuffer",
+            "TestSexprConstructorAndWholePhysicalGraph",
+            "TestSexprRegisteredEscapedDefaultPrintInputs",
+            "TestSexprAccessorsAndScalarIterator",
+            "TestSexprBVSourceInlineBufferAndTemporaryLifetime"
+          ]
+        }
+      ],
+      "ownership": [
+        "Scalar references/views and charged cold vector headers/backing; source reference action order and ownership transfer mapped for sexpr. See SEXPR_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "This concrete specialization does not implement all AST/other source specializations or remaining generic helper/hash surfaces. Ref-vector null callbacks and nonempty self-append have explicit checked Go adaptations."
+      ]
     },
     {
       "path": "src/util/region.cpp",
@@ -105261,9 +105379,30 @@
       "sha256": "ff5cae862a4bb0c24546ba129a195f2fecd44492717dd791859f9aabb11961d0",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "util_sexpr.go",
+        "util_sexpr_debug.go",
+        "util_sexpr_nodebug.go"
+      ],
+      "tests": [
+        "TestSexprKindsFactoriesAndDefinedDisplay",
+        "TestSexprBVSourceWidthQuirks",
+        "TestSexprRCWrapAndDeletionLIFO",
+        "TestSexprConcreteRefAndVectorActions",
+        "TestSexprPointerFreeAndBoundedDAG",
+        "TestSexprStringBytesAndWrapperRemainingBranches",
+        "TestSexprFailurePrefixesImmediateOwnership",
+        "TestSexprWarmPlateauAndGenerationGuards",
+        "TestSexprFactoryRecordBeforeValueCopy",
+        "TestSexprFinalizationEpochAndZeroWidthBuffer",
+        "TestSexprConstructorAndWholePhysicalGraph",
+        "TestSexprRegisteredEscapedDefaultPrintInputs",
+        "TestSexprAccessorsAndScalarIterator",
+        "TestSexprBVSourceInlineBufferAndTemporaryLifetime",
+        "TestSexprDebugBVInvariantAndShortCircuit",
+        "TestSexprDebugBVComparisonFailureRoots"
+      ],
       "conditionals": [
         {
           "line": 23,
@@ -105316,20 +105455,160 @@
           "text": "SASSERT(child->m_ref_count > 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "all six kinds, constructors/factories and default source metadata",
+          "status": "ported",
+          "go_target": "util_sexpr.go",
+          "tests": [
+            "TestSexprKindsFactoriesAndDefinedDisplay",
+            "TestSexprBVSourceWidthQuirks",
+            "TestSexprRCWrapAndDeletionLIFO",
+            "TestSexprConcreteRefAndVectorActions",
+            "TestSexprPointerFreeAndBoundedDAG",
+            "TestSexprStringBytesAndWrapperRemainingBranches",
+            "TestSexprFailurePrefixesImmediateOwnership",
+            "TestSexprWarmPlateauAndGenerationGuards",
+            "TestSexprFactoryRecordBeforeValueCopy",
+            "TestSexprFinalizationEpochAndZeroWidthBuffer",
+            "TestSexprConstructorAndWholePhysicalGraph",
+            "TestSexprRegisteredEscapedDefaultPrintInputs",
+            "TestSexprAccessorsAndScalarIterator",
+            "TestSexprBVSourceInlineBufferAndTemporaryLifetime"
+          ]
+        },
+        {
+          "name": "all accessors/predicates and owned projections",
+          "status": "ported",
+          "go_target": "util_sexpr.go",
+          "tests": [
+            "TestSexprKindsFactoriesAndDefinedDisplay",
+            "TestSexprBVSourceWidthQuirks",
+            "TestSexprRCWrapAndDeletionLIFO",
+            "TestSexprConcreteRefAndVectorActions",
+            "TestSexprPointerFreeAndBoundedDAG",
+            "TestSexprStringBytesAndWrapperRemainingBranches",
+            "TestSexprFailurePrefixesImmediateOwnership",
+            "TestSexprWarmPlateauAndGenerationGuards",
+            "TestSexprFactoryRecordBeforeValueCopy",
+            "TestSexprFinalizationEpochAndZeroWidthBuffer",
+            "TestSexprConstructorAndWholePhysicalGraph",
+            "TestSexprRegisteredEscapedDefaultPrintInputs",
+            "TestSexprAccessorsAndScalarIterator",
+            "TestSexprBVSourceInlineBufferAndTemporaryLifetime"
+          ]
+        },
+        {
+          "name": "logical reference counts, ascending child decrements and LIFO deletion",
+          "status": "ported",
+          "go_target": "util_sexpr.go",
+          "tests": [
+            "TestSexprKindsFactoriesAndDefinedDisplay",
+            "TestSexprBVSourceWidthQuirks",
+            "TestSexprRCWrapAndDeletionLIFO",
+            "TestSexprConcreteRefAndVectorActions",
+            "TestSexprPointerFreeAndBoundedDAG",
+            "TestSexprStringBytesAndWrapperRemainingBranches",
+            "TestSexprFailurePrefixesImmediateOwnership",
+            "TestSexprWarmPlateauAndGenerationGuards",
+            "TestSexprFactoryRecordBeforeValueCopy",
+            "TestSexprFinalizationEpochAndZeroWidthBuffer",
+            "TestSexprConstructorAndWholePhysicalGraph",
+            "TestSexprRegisteredEscapedDefaultPrintInputs",
+            "TestSexprAccessorsAndScalarIterator",
+            "TestSexprBVSourceInlineBufferAndTemporaryLifetime"
+          ]
+        },
+        {
+          "name": "defined source atom/composite rendering, BV arithmetic and exact local inline16/doubling digit buffer",
+          "status": "ported",
+          "go_target": "util_sexpr.go",
+          "tests": [
+            "TestSexprKindsFactoriesAndDefinedDisplay",
+            "TestSexprBVSourceWidthQuirks",
+            "TestSexprRCWrapAndDeletionLIFO",
+            "TestSexprConcreteRefAndVectorActions",
+            "TestSexprPointerFreeAndBoundedDAG",
+            "TestSexprStringBytesAndWrapperRemainingBranches",
+            "TestSexprFailurePrefixesImmediateOwnership",
+            "TestSexprWarmPlateauAndGenerationGuards",
+            "TestSexprFactoryRecordBeforeValueCopy",
+            "TestSexprFinalizationEpochAndZeroWidthBuffer",
+            "TestSexprConstructorAndWholePhysicalGraph",
+            "TestSexprRegisteredEscapedDefaultPrintInputs",
+            "TestSexprAccessorsAndScalarIterator",
+            "TestSexprBVSourceInlineBufferAndTemporaryLifetime"
+          ]
+        },
+        {
+          "name": "concrete sexpr_ref and sexpr_ref_vector source specializations",
+          "status": "ported",
+          "go_target": "util_sexpr.go",
+          "tests": [
+            "TestSexprKindsFactoriesAndDefinedDisplay",
+            "TestSexprBVSourceWidthQuirks",
+            "TestSexprRCWrapAndDeletionLIFO",
+            "TestSexprConcreteRefAndVectorActions",
+            "TestSexprPointerFreeAndBoundedDAG",
+            "TestSexprStringBytesAndWrapperRemainingBranches",
+            "TestSexprFailurePrefixesImmediateOwnership",
+            "TestSexprWarmPlateauAndGenerationGuards",
+            "TestSexprFactoryRecordBeforeValueCopy",
+            "TestSexprFinalizationEpochAndZeroWidthBuffer",
+            "TestSexprConstructorAndWholePhysicalGraph",
+            "TestSexprRegisteredEscapedDefaultPrintInputs",
+            "TestSexprAccessorsAndScalarIterator",
+            "TestSexprBVSourceInlineBufferAndTemporaryLifetime"
+          ]
+        },
+        {
+          "name": "g3debug BV short-circuit remainder assertions and full-expression temporary lifetimes",
+          "status": "ported",
+          "go_target": "util_sexpr_debug.go",
+          "tests": [
+            "TestSexprDebugBVInvariantAndShortCircuit",
+            "TestSexprDebugBVComparisonFailureRoots"
+          ]
+        }
+      ],
+      "ownership": [
+        "Pointer-free paged records and scalar owned references/vector views; children Words and byte payloads pooled. Actual manager/vector headers, directories/pages/retained formatting scratch and old/new peaks charged. Per-atom BV local inline16/doubling overflow destroyed before numeral. Immediate failed-prefix roots tested. See SEXPR_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Source noncomposite display falls into an invalid composite cast; Go returns its defined printed prefix plus a typed continuation error. Empty composites still print only closing parenthesis. Checked scalar handles replace raw pointers and owner teardown cleans outstanding owned numerals. Ref-vector null callbacks are explicit no-op adapter; raw manager null calls reject. Nonempty self-append rejects source unbounded growth; allocation preflight avoids leaked reference increments. RC uint32 wrap preserved; generation/capacity limits checked. Compiler pragmas do not change Go semantic core."
+      ]
     },
     {
       "path": "src/util/sexpr.h",
       "sha256": "05e447ae6a6fd0cc0a91680007ae43cd36dbaaecf507e0d6ac677ac234e05d84",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "util_sexpr.go",
+        "util_sexpr_debug.go",
+        "util_sexpr_nodebug.go"
+      ],
+      "tests": [
+        "TestSexprKindsFactoriesAndDefinedDisplay",
+        "TestSexprBVSourceWidthQuirks",
+        "TestSexprRCWrapAndDeletionLIFO",
+        "TestSexprConcreteRefAndVectorActions",
+        "TestSexprPointerFreeAndBoundedDAG",
+        "TestSexprStringBytesAndWrapperRemainingBranches",
+        "TestSexprFailurePrefixesImmediateOwnership",
+        "TestSexprWarmPlateauAndGenerationGuards",
+        "TestSexprFactoryRecordBeforeValueCopy",
+        "TestSexprFinalizationEpochAndZeroWidthBuffer",
+        "TestSexprConstructorAndWholePhysicalGraph",
+        "TestSexprRegisteredEscapedDefaultPrintInputs",
+        "TestSexprAccessorsAndScalarIterator",
+        "TestSexprBVSourceInlineBufferAndTemporaryLifetime",
+        "TestSexprDebugBVInvariantAndShortCircuit",
+        "TestSexprDebugBVComparisonFailureRoots"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -105346,11 +105625,130 @@
           "text": "void dec_ref(sexpr * n) { SASSERT(n->m_ref_count > 0); n->m_ref_count--; if (n->m_ref_count == 0) del(n); }"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "all six kinds, constructors/factories and default source metadata",
+          "status": "ported",
+          "go_target": "util_sexpr.go",
+          "tests": [
+            "TestSexprKindsFactoriesAndDefinedDisplay",
+            "TestSexprBVSourceWidthQuirks",
+            "TestSexprRCWrapAndDeletionLIFO",
+            "TestSexprConcreteRefAndVectorActions",
+            "TestSexprPointerFreeAndBoundedDAG",
+            "TestSexprStringBytesAndWrapperRemainingBranches",
+            "TestSexprFailurePrefixesImmediateOwnership",
+            "TestSexprWarmPlateauAndGenerationGuards",
+            "TestSexprFactoryRecordBeforeValueCopy",
+            "TestSexprFinalizationEpochAndZeroWidthBuffer",
+            "TestSexprConstructorAndWholePhysicalGraph",
+            "TestSexprRegisteredEscapedDefaultPrintInputs",
+            "TestSexprAccessorsAndScalarIterator",
+            "TestSexprBVSourceInlineBufferAndTemporaryLifetime"
+          ]
+        },
+        {
+          "name": "all accessors/predicates and owned projections",
+          "status": "ported",
+          "go_target": "util_sexpr.go",
+          "tests": [
+            "TestSexprKindsFactoriesAndDefinedDisplay",
+            "TestSexprBVSourceWidthQuirks",
+            "TestSexprRCWrapAndDeletionLIFO",
+            "TestSexprConcreteRefAndVectorActions",
+            "TestSexprPointerFreeAndBoundedDAG",
+            "TestSexprStringBytesAndWrapperRemainingBranches",
+            "TestSexprFailurePrefixesImmediateOwnership",
+            "TestSexprWarmPlateauAndGenerationGuards",
+            "TestSexprFactoryRecordBeforeValueCopy",
+            "TestSexprFinalizationEpochAndZeroWidthBuffer",
+            "TestSexprConstructorAndWholePhysicalGraph",
+            "TestSexprRegisteredEscapedDefaultPrintInputs",
+            "TestSexprAccessorsAndScalarIterator",
+            "TestSexprBVSourceInlineBufferAndTemporaryLifetime"
+          ]
+        },
+        {
+          "name": "logical reference counts, ascending child decrements and LIFO deletion",
+          "status": "ported",
+          "go_target": "util_sexpr.go",
+          "tests": [
+            "TestSexprKindsFactoriesAndDefinedDisplay",
+            "TestSexprBVSourceWidthQuirks",
+            "TestSexprRCWrapAndDeletionLIFO",
+            "TestSexprConcreteRefAndVectorActions",
+            "TestSexprPointerFreeAndBoundedDAG",
+            "TestSexprStringBytesAndWrapperRemainingBranches",
+            "TestSexprFailurePrefixesImmediateOwnership",
+            "TestSexprWarmPlateauAndGenerationGuards",
+            "TestSexprFactoryRecordBeforeValueCopy",
+            "TestSexprFinalizationEpochAndZeroWidthBuffer",
+            "TestSexprConstructorAndWholePhysicalGraph",
+            "TestSexprRegisteredEscapedDefaultPrintInputs",
+            "TestSexprAccessorsAndScalarIterator",
+            "TestSexprBVSourceInlineBufferAndTemporaryLifetime"
+          ]
+        },
+        {
+          "name": "defined source atom/composite rendering, BV arithmetic and exact local inline16/doubling digit buffer",
+          "status": "ported",
+          "go_target": "util_sexpr.go",
+          "tests": [
+            "TestSexprKindsFactoriesAndDefinedDisplay",
+            "TestSexprBVSourceWidthQuirks",
+            "TestSexprRCWrapAndDeletionLIFO",
+            "TestSexprConcreteRefAndVectorActions",
+            "TestSexprPointerFreeAndBoundedDAG",
+            "TestSexprStringBytesAndWrapperRemainingBranches",
+            "TestSexprFailurePrefixesImmediateOwnership",
+            "TestSexprWarmPlateauAndGenerationGuards",
+            "TestSexprFactoryRecordBeforeValueCopy",
+            "TestSexprFinalizationEpochAndZeroWidthBuffer",
+            "TestSexprConstructorAndWholePhysicalGraph",
+            "TestSexprRegisteredEscapedDefaultPrintInputs",
+            "TestSexprAccessorsAndScalarIterator",
+            "TestSexprBVSourceInlineBufferAndTemporaryLifetime"
+          ]
+        },
+        {
+          "name": "concrete sexpr_ref and sexpr_ref_vector source specializations",
+          "status": "ported",
+          "go_target": "util_sexpr.go",
+          "tests": [
+            "TestSexprKindsFactoriesAndDefinedDisplay",
+            "TestSexprBVSourceWidthQuirks",
+            "TestSexprRCWrapAndDeletionLIFO",
+            "TestSexprConcreteRefAndVectorActions",
+            "TestSexprPointerFreeAndBoundedDAG",
+            "TestSexprStringBytesAndWrapperRemainingBranches",
+            "TestSexprFailurePrefixesImmediateOwnership",
+            "TestSexprWarmPlateauAndGenerationGuards",
+            "TestSexprFactoryRecordBeforeValueCopy",
+            "TestSexprFinalizationEpochAndZeroWidthBuffer",
+            "TestSexprConstructorAndWholePhysicalGraph",
+            "TestSexprRegisteredEscapedDefaultPrintInputs",
+            "TestSexprAccessorsAndScalarIterator",
+            "TestSexprBVSourceInlineBufferAndTemporaryLifetime"
+          ]
+        },
+        {
+          "name": "g3debug BV short-circuit remainder assertions and full-expression temporary lifetimes",
+          "status": "ported",
+          "go_target": "util_sexpr_debug.go",
+          "tests": [
+            "TestSexprDebugBVInvariantAndShortCircuit",
+            "TestSexprDebugBVComparisonFailureRoots"
+          ]
+        }
+      ],
+      "ownership": [
+        "Pointer-free paged records and scalar owned references/vector views; children Words and byte payloads pooled. Actual manager/vector headers, directories/pages/retained formatting scratch and old/new peaks charged. Per-atom BV local inline16/doubling overflow destroyed before numeral. Immediate failed-prefix roots tested. See SEXPR_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Source noncomposite display falls into an invalid composite cast; Go returns its defined printed prefix plus a typed continuation error. Empty composites still print only closing parenthesis. Checked scalar handles replace raw pointers and owner teardown cleans outstanding owned numerals. Ref-vector null callbacks are explicit no-op adapter; raw manager null calls reject. Nonempty self-append rejects source unbounded growth; allocation preflight avoids leaked reference increments. RC uint32 wrap preserved; generation/capacity limits checked. Compiler pragmas do not change Go semantic core."
+      ]
     },
     {
       "path": "src/util/small_object_allocator.cpp",
@@ -107753,7 +108151,8 @@
       "status": "partial",
       "go_targets": [
         "utilhash/random.go",
-        "mpnum/mpz_log.go"
+        "mpnum/mpz_log.go",
+        "util_sexpr.go"
       ],
       "tests": [
         "TestSourceRandomVectors",
@@ -107765,7 +108164,8 @@
         "TestRationalRoundIndependentAndAliases",
         "TestRationalRoundFailureCleanup",
         "TestRationalRoundInitializationAndClose",
-        "TestRationalRoundWarmZeroAllocations"
+        "TestRationalRoundWarmZeroAllocations",
+        "TestSexprRegisteredEscapedDefaultPrintInputs"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -107813,12 +108213,23 @@
             "TestRationalRoundInitializationAndClose",
             "TestRationalRoundWarmZeroAllocations"
           ]
+        },
+        {
+          "name": "escaped nonnull/trim=false/indent0 branch through actual sexpr string printer",
+          "status": "partial",
+          "go_target": "util_sexpr.go",
+          "tests": [
+            "TestSexprRegisteredEscapedDefaultPrintInputs",
+            "TestSexprStringBytesAndWrapperRemainingBranches"
+          ]
         }
       ],
       "ownership": [
         "Random state owner-local, shuffle borrows caller sequence. Other util methods unported."
       ],
-      "deviations": []
+      "deviations": [
+        "Only actual sexpr escaped specialization is translated; trim=true, null input and other indent routes remain open."
+      ]
     },
     {
       "path": "src/util/util.h",
@@ -107828,7 +108239,8 @@
       "status": "partial",
       "go_targets": [
         "utilhash/random.go",
-        "mpnum/mpz_log.go"
+        "mpnum/mpz_log.go",
+        "util_sexpr.go"
       ],
       "tests": [
         "TestSourceRandomVectors",
@@ -107840,7 +108252,8 @@
         "TestRationalRoundIndependentAndAliases",
         "TestRationalRoundFailureCleanup",
         "TestRationalRoundInitializationAndClose",
-        "TestRationalRoundWarmZeroAllocations"
+        "TestRationalRoundWarmZeroAllocations",
+        "TestSexprRegisteredEscapedDefaultPrintInputs"
       ],
       "conditionals": [
         {
@@ -108056,12 +108469,23 @@
             "TestRationalRoundInitializationAndClose",
             "TestRationalRoundWarmZeroAllocations"
           ]
+        },
+        {
+          "name": "escaped nonnull/trim=false/indent0 branch through actual sexpr string printer",
+          "status": "partial",
+          "go_target": "util_sexpr.go",
+          "tests": [
+            "TestSexprRegisteredEscapedDefaultPrintInputs",
+            "TestSexprStringBytesAndWrapperRemainingBranches"
+          ]
         }
       ],
       "ownership": [
         "Random state owner-local, shuffle borrows caller sequence. Other util methods unported."
       ],
-      "deviations": []
+      "deviations": [
+        "Only actual sexpr escaped specialization is translated; trim=true, null input and other indent routes remain open."
+      ]
     },
     {
       "path": "src/util/vector.h",
