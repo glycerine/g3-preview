@@ -1033,3 +1033,23 @@ ends. Twenty-one named groups and full native/debug, race/actual JS, vet/WASI,
 source/no-generics checks passed. Existing watched/vector units remain partial;
 full solver propagation, outer storage and std sorting backend remain open.
 See SAT_SOLVER_WATCH_STORE_PORT_STATUS.md for immutable evidence and adapters.
+
+
+## Actual sparse marks and shared occurrences
+
+Concrete expression identity tables and shared-occurrence collection now preserve
+source defaults, all eight traversal policies, current-node hashing, strict load
+thresholds, last tombstones and physical bucket order. Real shared-set publication
+precedes AST INC; reset releases references in ascending buckets. Separate node
+shared flags, inline visitation, scalar DFS frames and source failure prefixes
+use charged concrete storage throughout. Tests-first review corrected iterator
+lifetimes across in-place table changes, source frame byte bounds and expression
+domain guards.
+
+Six frozen Go files passed fresh full native and checked/debug tests alongside
+committed watch storage. Twenty-one exact race and actual JS groups, whole-module
+vet, WASI compilation and source/no-generics audits passed. See
+AST_SPARSE_SHARED_PORT_STATUS.md for exact source mappings, hashes and evidence.
+Shared-occurrence source units and obj_hashtable.h become partial; ledger counts
+are33ported/87partial/1982unported. Real SMT2 display, general table templates,
+implicit owning copies, full solver, proof checker and interpolation remain open.

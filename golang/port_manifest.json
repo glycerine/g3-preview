@@ -10545,7 +10545,8 @@
         "ast_ref_vector_ops.go",
         "ast_sort_size.go",
         "ast_table.go",
-        "ast_table_hash.go"
+        "ast_table_hash.go",
+        "ast_sparse_mark.go"
       ],
       "tests": [
         "TestASTAllEagerPluginBranches",
@@ -10688,7 +10689,28 @@
         "TestSortSizeIndependentModelPointerFreedomAndWarmAllocations",
         "TestSortSizeRationalActualUint64Classification",
         "TestSortSizeRationalBorrowedOwnerLifetime",
-        "TestSortSizeSourceDefaultFactoriesAndGuards"
+        "TestSortSizeSourceDefaultFactoriesAndGuards",
+        "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
+        "TestASTSharedOccurrencesAllTraversalPolicies",
+        "TestASTSharedOccurrencesExternalVisitedAndPlaneIndependence",
+        "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
+        "TestASTSharedOccurrencesFrameFailureCursorPrefix",
+        "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
+        "TestASTSharedOccurrencesIteratorActualBackingLifetime",
+        "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
+        "TestASTSharedOccurrencesMarkInlineFailurePrefix",
+        "TestASTSharedOccurrencesPhysicalBucketIterator",
+        "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+        "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
+        "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
+        "TestASTSparseMarkActualIdentityAndNoRetains",
+        "TestASTSparseMarkBoundedIdentityOracle",
+        "TestASTSparseMarkEraseFreeSuccessorSkipsCleanup",
+        "TestASTSparseMarkIteratorEpochExhaustionPreflight",
+        "TestASTSparseMarkLastTombstoneAndCurrentHashReads",
+        "TestASTSparseMarkPendingResetCanFinishAtFinalEpoch",
+        "TestASTSparseMarkResetAndFinalizeFreeBeforeReserve",
+        "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
       ],
       "conditionals": [
         {
@@ -11372,6 +11394,34 @@
             "TestASTDependencyScratchActualAndSourceByteBounds",
             "TestASTDependencyWarmDestructionNoReservationOrHeapAllocation"
           ]
+        },
+        {
+          "name": "expr_sparse_mark expression-only constructor/is_marked/mark overloads/reset/destructor",
+          "status": "ported",
+          "go_target": "ast_sparse_mark.go",
+          "tests": [
+            "TestASTSparseMarkActualIdentityAndNoRetains",
+            "TestASTSparseMarkResetAndFinalizeFreeBeforeReserve",
+            "TestASTSparseMarkBoundedIdentityOracle",
+            "TestASTSparseMarkEraseFreeSuccessorSkipsCleanup",
+            "TestASTSparseMarkIteratorEpochExhaustionPreflight",
+            "TestASTSparseMarkPendingResetCanFinishAtFinalEpoch",
+            "TestASTSparseMarkLastTombstoneAndCurrentHashReads",
+            "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
+            "TestASTSharedOccurrencesExternalVisitedAndPlaneIndependence",
+            "TestASTSharedOccurrencesMarkInlineFailurePrefix",
+            "TestASTSharedOccurrencesPhysicalBucketIterator",
+            "TestASTSharedOccurrencesAllTraversalPolicies",
+            "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
+            "TestASTSharedOccurrencesFrameFailureCursorPrefix",
+            "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
+            "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+            "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
+            "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
+            "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
+            "TestASTSharedOccurrencesIteratorActualBackingLifetime",
+            "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
+          ]
         }
       ],
       "ownership": [
@@ -11382,7 +11432,8 @@
         "Expression-array backing has real12-byte capacity/initialized header; copies full retained capacity on growth and only logical elements on copy_values. Source debug-only logical bounds preserve retained pointers and arbitrary-index nonroot SET. See AST_EXPR_ARRAY_RETAINED_STATUS.md.",
         "Real AST marks borrow manager with fully charged cold headers/inline16/backing/scope limits and source real ASTRefVector callbacks. Fast mark-before-push and ref INC-before-growth prefixes remain observable; ref reset clears all flags before ASC DEC. See AST_MARK_PORT_STATUS.md.",
         "Expression-array empty nonroot POP preserves the finite release unsigned size wrap; retained root SET increments the incoming AST before old physical access and never rolls it back at an invalid old pointer. See AST_EXPR_ARRAY_RETAINED_STATUS.md.",
-        "Actual AST manager embeds dependency and array owners eagerly; FIFO identity traversal, real AST retain/release and LIFO deletion callbacks. Source RC30 wrapping, leaf/join16/24 versus actual charged24/32 intrusive continuation records, cold manager/scratch/header/payload and old/new overlaps charged. Persistent arrays have12-byte capacity/initialized backing and preserve finite retained pointer/patch behavior; see AST_DEPENDENCY_PACKET.md."
+        "Actual AST manager embeds dependency and array owners eagerly; FIFO identity traversal, real AST retain/release and LIFO deletion callbacks. Source RC30 wrapping, leaf/join16/24 versus actual charged24/32 intrusive continuation records, cold manager/scratch/header/payload and old/new overlaps charged. Persistent arrays have12-byte capacity/initialized backing and preserve finite retained pointer/patch behavior; see AST_DEPENDENCY_PACKET.md.",
+        "Concrete AST expr identity-table and shared-occurrence owners preserve source bucket-order callbacks, borrowing, actual node shared flags and charged backing/header peaks. See AST_SPARSE_SHARED_PORT_STATUS.md."
       ],
       "deviations": [
         "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
@@ -11392,7 +11443,8 @@
         "Expression-array never-initialized physical slots are guarded using charged initialized high-water metadata; retained freed tokens can be read before actual AST dereference rejects their generation. No new whole-unit completion claim.",
         "Scalar owner identity replaces debug raw addresses. Typed physical/stale-owner guards and implicit owning-copy rejection are explicit Go adapters. Source ID marks survive deletion/reuse; sparse/shared-occurrence marks and other template specializations remain open. No generic Go code.",
         "Empty null/root POP is guarded at source physical undefined access. Debug empty POP assertion executes before From output copy. Invalid/uninitialized old root SET returns a typed guard with the incoming source INC retained and leaves backing unchanged.",
-        "Source-undefined allocation/lifetime domains have explicit Go continuation and typed guards. Temporary copied-prefix cleanup releases only successful ownership acquisitions; source write-before-INC and debug RC0 refusal consumption are distinct. Copy-only Get returns retained raw tokens; actual later dereference guards generation. Source internal parray/Reroot debug checkpoints, TRACE/address printing, owning aliases and scoped configurations remain open. No whole-unit audit or full solver claim; no generics."
+        "Source-undefined allocation/lifetime domains have explicit Go continuation and typed guards. Temporary copied-prefix cleanup releases only successful ownership acquisitions; source write-before-INC and debug RC0 refusal consumption are distinct. Copy-only Get returns retained raw tokens; actual later dereference guards generation. Source internal parray/Reroot debug checkpoints, TRACE/address printing, owning aliases and scoped configurations remain open. No whole-unit audit or full solver claim; no generics.",
+        "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See AST_SPARSE_SHARED_PORT_STATUS.md."
       ]
     },
     {
@@ -21382,9 +21434,36 @@
       "sha256": "0f362dfb0a3d7cd5eca36ee2decce439b75a1d5b3a2a7f520131247e0402fa39",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "ast_shared_occs.go",
+        "ast_shared_occs_iterator.go",
+        "ast_shared_occs_mark.go",
+        "ast_sparse_mark.go"
+      ],
+      "tests": [
+        "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
+        "TestASTSharedOccurrencesAllTraversalPolicies",
+        "TestASTSharedOccurrencesExternalVisitedAndPlaneIndependence",
+        "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
+        "TestASTSharedOccurrencesFrameFailureCursorPrefix",
+        "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
+        "TestASTSharedOccurrencesIteratorActualBackingLifetime",
+        "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
+        "TestASTSharedOccurrencesMarkInlineFailurePrefix",
+        "TestASTSharedOccurrencesPhysicalBucketIterator",
+        "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+        "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
+        "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
+        "TestASTSparseMarkActualIdentityAndNoRetains",
+        "TestASTSparseMarkBoundedIdentityOracle",
+        "TestASTSparseMarkEraseFreeSuccessorSkipsCleanup",
+        "TestASTSparseMarkIteratorEpochExhaustionPreflight",
+        "TestASTSparseMarkLastTombstoneAndCurrentHashReads",
+        "TestASTSparseMarkPendingResetCanFinishAtFinalEpoch",
+        "TestASTSparseMarkResetAndFinalizeFreeBeforeReserve",
+        "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
+      ],
       "assertions": [
         {
           "line": 87,
@@ -21405,18 +21484,140 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "shared_occs constructor/default configuration, insert/process and both traversal operators",
+          "status": "ported",
+          "go_target": "ast_shared_occs.go",
+          "tests": [
+            "TestASTSparseMarkActualIdentityAndNoRetains",
+            "TestASTSparseMarkResetAndFinalizeFreeBeforeReserve",
+            "TestASTSparseMarkBoundedIdentityOracle",
+            "TestASTSparseMarkEraseFreeSuccessorSkipsCleanup",
+            "TestASTSparseMarkIteratorEpochExhaustionPreflight",
+            "TestASTSparseMarkPendingResetCanFinishAtFinalEpoch",
+            "TestASTSparseMarkLastTombstoneAndCurrentHashReads",
+            "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
+            "TestASTSharedOccurrencesExternalVisitedAndPlaneIndependence",
+            "TestASTSharedOccurrencesMarkInlineFailurePrefix",
+            "TestASTSharedOccurrencesPhysicalBucketIterator",
+            "TestASTSharedOccurrencesAllTraversalPolicies",
+            "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
+            "TestASTSharedOccurrencesFrameFailureCursorPrefix",
+            "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
+            "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+            "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
+            "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
+            "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
+            "TestASTSharedOccurrencesIteratorActualBackingLifetime",
+            "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
+          ]
+        },
+        {
+          "name": "shared_occs reset/cleanup/destructor and is_shared/num_shared",
+          "status": "ported",
+          "go_target": "ast_shared_occs.go",
+          "tests": [
+            "TestASTSparseMarkActualIdentityAndNoRetains",
+            "TestASTSparseMarkResetAndFinalizeFreeBeforeReserve",
+            "TestASTSparseMarkBoundedIdentityOracle",
+            "TestASTSparseMarkEraseFreeSuccessorSkipsCleanup",
+            "TestASTSparseMarkIteratorEpochExhaustionPreflight",
+            "TestASTSparseMarkPendingResetCanFinishAtFinalEpoch",
+            "TestASTSparseMarkLastTombstoneAndCurrentHashReads",
+            "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
+            "TestASTSharedOccurrencesExternalVisitedAndPlaneIndependence",
+            "TestASTSharedOccurrencesMarkInlineFailurePrefix",
+            "TestASTSharedOccurrencesPhysicalBucketIterator",
+            "TestASTSharedOccurrencesAllTraversalPolicies",
+            "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
+            "TestASTSharedOccurrencesFrameFailureCursorPrefix",
+            "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
+            "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+            "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
+            "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
+            "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
+            "TestASTSharedOccurrencesIteratorActualBackingLifetime",
+            "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
+          ]
+        },
+        {
+          "name": "shared_occs begin/end physical-bucket iterators",
+          "status": "ported",
+          "go_target": "ast_shared_occs_iterator.go",
+          "tests": [
+            "TestASTSparseMarkActualIdentityAndNoRetains",
+            "TestASTSparseMarkResetAndFinalizeFreeBeforeReserve",
+            "TestASTSparseMarkBoundedIdentityOracle",
+            "TestASTSparseMarkEraseFreeSuccessorSkipsCleanup",
+            "TestASTSparseMarkIteratorEpochExhaustionPreflight",
+            "TestASTSparseMarkPendingResetCanFinishAtFinalEpoch",
+            "TestASTSparseMarkLastTombstoneAndCurrentHashReads",
+            "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
+            "TestASTSharedOccurrencesExternalVisitedAndPlaneIndependence",
+            "TestASTSharedOccurrencesMarkInlineFailurePrefix",
+            "TestASTSharedOccurrencesPhysicalBucketIterator",
+            "TestASTSharedOccurrencesAllTraversalPolicies",
+            "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
+            "TestASTSharedOccurrencesFrameFailureCursorPrefix",
+            "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
+            "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+            "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
+            "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
+            "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
+            "TestASTSharedOccurrencesIteratorActualBackingLifetime",
+            "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
+          ]
+        },
+        {
+          "name": "shared_occs::display via real mk_ismt2_pp",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Concrete AST expr identity-table and shared-occurrence owners preserve source bucket-order callbacks, borrowing, actual node shared flags and charged backing/header peaks. See AST_SPARSE_SHARED_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See AST_SPARSE_SHARED_PORT_STATUS.md."
+      ]
     },
     {
       "path": "src/ast/shared_occs.h",
       "sha256": "2c276c588b298ab6a4a1210f3cb0214939effafd5d52e53aff79aeafe7bee44d",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "ast_shared_occs.go",
+        "ast_shared_occs_iterator.go",
+        "ast_shared_occs_mark.go",
+        "ast_sparse_mark.go"
+      ],
+      "tests": [
+        "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
+        "TestASTSharedOccurrencesAllTraversalPolicies",
+        "TestASTSharedOccurrencesExternalVisitedAndPlaneIndependence",
+        "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
+        "TestASTSharedOccurrencesFrameFailureCursorPrefix",
+        "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
+        "TestASTSharedOccurrencesIteratorActualBackingLifetime",
+        "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
+        "TestASTSharedOccurrencesMarkInlineFailurePrefix",
+        "TestASTSharedOccurrencesPhysicalBucketIterator",
+        "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+        "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
+        "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
+        "TestASTSparseMarkActualIdentityAndNoRetains",
+        "TestASTSparseMarkBoundedIdentityOracle",
+        "TestASTSparseMarkEraseFreeSuccessorSkipsCleanup",
+        "TestASTSparseMarkIteratorEpochExhaustionPreflight",
+        "TestASTSparseMarkLastTombstoneAndCurrentHashReads",
+        "TestASTSparseMarkPendingResetCanFinishAtFinalEpoch",
+        "TestASTSparseMarkResetAndFinalizeFreeBeforeReserve",
+        "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -21429,9 +21630,132 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "shared_occs constructor/default configuration, insert/process and both traversal operators",
+          "status": "ported",
+          "go_target": "ast_shared_occs.go",
+          "tests": [
+            "TestASTSparseMarkActualIdentityAndNoRetains",
+            "TestASTSparseMarkResetAndFinalizeFreeBeforeReserve",
+            "TestASTSparseMarkBoundedIdentityOracle",
+            "TestASTSparseMarkEraseFreeSuccessorSkipsCleanup",
+            "TestASTSparseMarkIteratorEpochExhaustionPreflight",
+            "TestASTSparseMarkPendingResetCanFinishAtFinalEpoch",
+            "TestASTSparseMarkLastTombstoneAndCurrentHashReads",
+            "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
+            "TestASTSharedOccurrencesExternalVisitedAndPlaneIndependence",
+            "TestASTSharedOccurrencesMarkInlineFailurePrefix",
+            "TestASTSharedOccurrencesPhysicalBucketIterator",
+            "TestASTSharedOccurrencesAllTraversalPolicies",
+            "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
+            "TestASTSharedOccurrencesFrameFailureCursorPrefix",
+            "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
+            "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+            "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
+            "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
+            "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
+            "TestASTSharedOccurrencesIteratorActualBackingLifetime",
+            "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
+          ]
+        },
+        {
+          "name": "shared_occs reset/cleanup/destructor and is_shared/num_shared",
+          "status": "ported",
+          "go_target": "ast_shared_occs.go",
+          "tests": [
+            "TestASTSparseMarkActualIdentityAndNoRetains",
+            "TestASTSparseMarkResetAndFinalizeFreeBeforeReserve",
+            "TestASTSparseMarkBoundedIdentityOracle",
+            "TestASTSparseMarkEraseFreeSuccessorSkipsCleanup",
+            "TestASTSparseMarkIteratorEpochExhaustionPreflight",
+            "TestASTSparseMarkPendingResetCanFinishAtFinalEpoch",
+            "TestASTSparseMarkLastTombstoneAndCurrentHashReads",
+            "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
+            "TestASTSharedOccurrencesExternalVisitedAndPlaneIndependence",
+            "TestASTSharedOccurrencesMarkInlineFailurePrefix",
+            "TestASTSharedOccurrencesPhysicalBucketIterator",
+            "TestASTSharedOccurrencesAllTraversalPolicies",
+            "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
+            "TestASTSharedOccurrencesFrameFailureCursorPrefix",
+            "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
+            "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+            "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
+            "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
+            "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
+            "TestASTSharedOccurrencesIteratorActualBackingLifetime",
+            "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
+          ]
+        },
+        {
+          "name": "shared_occs begin/end physical-bucket iterators",
+          "status": "ported",
+          "go_target": "ast_shared_occs_iterator.go",
+          "tests": [
+            "TestASTSparseMarkActualIdentityAndNoRetains",
+            "TestASTSparseMarkResetAndFinalizeFreeBeforeReserve",
+            "TestASTSparseMarkBoundedIdentityOracle",
+            "TestASTSparseMarkEraseFreeSuccessorSkipsCleanup",
+            "TestASTSparseMarkIteratorEpochExhaustionPreflight",
+            "TestASTSparseMarkPendingResetCanFinishAtFinalEpoch",
+            "TestASTSparseMarkLastTombstoneAndCurrentHashReads",
+            "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
+            "TestASTSharedOccurrencesExternalVisitedAndPlaneIndependence",
+            "TestASTSharedOccurrencesMarkInlineFailurePrefix",
+            "TestASTSharedOccurrencesPhysicalBucketIterator",
+            "TestASTSharedOccurrencesAllTraversalPolicies",
+            "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
+            "TestASTSharedOccurrencesFrameFailureCursorPrefix",
+            "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
+            "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+            "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
+            "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
+            "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
+            "TestASTSharedOccurrencesIteratorActualBackingLifetime",
+            "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
+          ]
+        },
+        {
+          "name": "shared_occs::display via real mk_ismt2_pp",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        },
+        {
+          "name": "shared_occs_mark AST-wide bit/inline-list constructor, mark overloads, reset_mark/is_marked/reset/destructor",
+          "status": "ported",
+          "go_target": "ast_shared_occs_mark.go",
+          "tests": [
+            "TestASTSparseMarkActualIdentityAndNoRetains",
+            "TestASTSparseMarkResetAndFinalizeFreeBeforeReserve",
+            "TestASTSparseMarkBoundedIdentityOracle",
+            "TestASTSparseMarkEraseFreeSuccessorSkipsCleanup",
+            "TestASTSparseMarkIteratorEpochExhaustionPreflight",
+            "TestASTSparseMarkPendingResetCanFinishAtFinalEpoch",
+            "TestASTSparseMarkLastTombstoneAndCurrentHashReads",
+            "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
+            "TestASTSharedOccurrencesExternalVisitedAndPlaneIndependence",
+            "TestASTSharedOccurrencesMarkInlineFailurePrefix",
+            "TestASTSharedOccurrencesPhysicalBucketIterator",
+            "TestASTSharedOccurrencesAllTraversalPolicies",
+            "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
+            "TestASTSharedOccurrencesFrameFailureCursorPrefix",
+            "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
+            "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+            "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
+            "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
+            "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
+            "TestASTSharedOccurrencesIteratorActualBackingLifetime",
+            "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete AST expr identity-table and shared-occurrence owners preserve source bucket-order callbacks, borrowing, actual node shared flags and charged backing/header peaks. See AST_SPARSE_SHARED_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See AST_SPARSE_SHARED_PORT_STATUS.md."
+      ]
     },
     {
       "path": "src/ast/static_features.cpp",
@@ -87422,10 +87746,32 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "util_sexpr.go"
+        "util_sexpr.go",
+        "ast_shared_occs_mark.go"
       ],
       "tests": [
-        "TestSexprBVSourceInlineBufferAndTemporaryLifetime"
+        "TestSexprBVSourceInlineBufferAndTemporaryLifetime",
+        "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
+        "TestASTSharedOccurrencesAllTraversalPolicies",
+        "TestASTSharedOccurrencesExternalVisitedAndPlaneIndependence",
+        "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
+        "TestASTSharedOccurrencesFrameFailureCursorPrefix",
+        "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
+        "TestASTSharedOccurrencesIteratorActualBackingLifetime",
+        "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
+        "TestASTSharedOccurrencesMarkInlineFailurePrefix",
+        "TestASTSharedOccurrencesPhysicalBucketIterator",
+        "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+        "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
+        "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
+        "TestASTSparseMarkActualIdentityAndNoRetains",
+        "TestASTSparseMarkBoundedIdentityOracle",
+        "TestASTSparseMarkEraseFreeSuccessorSkipsCleanup",
+        "TestASTSparseMarkIteratorEpochExhaustionPreflight",
+        "TestASTSparseMarkLastTombstoneAndCurrentHashReads",
+        "TestASTSparseMarkPendingResetCanFinishAtFinalEpoch",
+        "TestASTSparseMarkResetAndFinalizeFreeBeforeReserve",
+        "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
       ],
       "conditionals": [
         {
@@ -87501,12 +87847,43 @@
           "tests": [
             "TestSexprBVSourceInlineBufferAndTemporaryLifetime"
           ]
+        },
+        {
+          "name": "Shared occurrence visited inline16 and doubled overflow with source bit-before-list publication",
+          "status": "ported",
+          "go_target": "ast_shared_occs_mark.go",
+          "tests": [
+            "TestASTSparseMarkActualIdentityAndNoRetains",
+            "TestASTSparseMarkResetAndFinalizeFreeBeforeReserve",
+            "TestASTSparseMarkBoundedIdentityOracle",
+            "TestASTSparseMarkEraseFreeSuccessorSkipsCleanup",
+            "TestASTSparseMarkIteratorEpochExhaustionPreflight",
+            "TestASTSparseMarkPendingResetCanFinishAtFinalEpoch",
+            "TestASTSparseMarkLastTombstoneAndCurrentHashReads",
+            "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
+            "TestASTSharedOccurrencesExternalVisitedAndPlaneIndependence",
+            "TestASTSharedOccurrencesMarkInlineFailurePrefix",
+            "TestASTSharedOccurrencesPhysicalBucketIterator",
+            "TestASTSharedOccurrencesAllTraversalPolicies",
+            "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
+            "TestASTSharedOccurrencesFrameFailureCursorPrefix",
+            "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
+            "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+            "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
+            "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
+            "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
+            "TestASTSharedOccurrencesIteratorActualBackingLifetime",
+            "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
+          ]
         }
       ],
       "ownership": [
-        "Function-local inline16 bytes and budgeted overflow arrays, old/new overlap and per-atom destruction. Other buffer methods/types remain separately inventoried."
+        "Function-local inline16 bytes and budgeted overflow arrays, old/new overlap and per-atom destruction. Other buffer methods/types remain separately inventoried.",
+        "Concrete AST expr identity-table and shared-occurrence owners preserve source bucket-order callbacks, borrowing, actual node shared flags and charged backing/header peaks. See AST_SPARSE_SHARED_PORT_STATUS.md."
       ],
-      "deviations": []
+      "deviations": [
+        "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See AST_SPARSE_SHARED_PORT_STATUS.md."
+      ]
     },
     {
       "path": "src/util/cancel_eh.h",
@@ -89969,7 +90346,9 @@
         "utilhash/str_hashtable.go",
         "util_symbol_table.go",
         "utilhash/str_int32_map.go",
-        "util_param_descrs.go"
+        "util_param_descrs.go",
+        "ast_shared_occs_iterator.go",
+        "ast_sparse_mark.go"
       ],
       "tests": [
         "TestUintMapSourceMapAssertions",
@@ -90057,7 +90436,28 @@
         "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
         "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
         "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
-        "TestParamDescrsCheckedCapacityBoundaries"
+        "TestParamDescrsCheckedCapacityBoundaries",
+        "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
+        "TestASTSharedOccurrencesAllTraversalPolicies",
+        "TestASTSharedOccurrencesExternalVisitedAndPlaneIndependence",
+        "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
+        "TestASTSharedOccurrencesFrameFailureCursorPrefix",
+        "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
+        "TestASTSharedOccurrencesIteratorActualBackingLifetime",
+        "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
+        "TestASTSharedOccurrencesMarkInlineFailurePrefix",
+        "TestASTSharedOccurrencesPhysicalBucketIterator",
+        "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+        "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
+        "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
+        "TestASTSparseMarkActualIdentityAndNoRetains",
+        "TestASTSparseMarkBoundedIdentityOracle",
+        "TestASTSparseMarkEraseFreeSuccessorSkipsCleanup",
+        "TestASTSparseMarkIteratorEpochExhaustionPreflight",
+        "TestASTSparseMarkLastTombstoneAndCurrentHashReads",
+        "TestASTSparseMarkPendingResetCanFinishAtFinalEpoch",
+        "TestASTSparseMarkResetAndFinalizeFreeBeforeReserve",
+        "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
       ],
       "conditionals": [
         {
@@ -90684,6 +91084,34 @@
             "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
             "TestParamDescrsCheckedCapacityBoundaries"
           ]
+        },
+        {
+          "name": "Concrete AST expr identity specialization with strict load threshold, last tombstone, current-hash relocation and backing-only iterator lifetime",
+          "status": "ported",
+          "go_target": "ast_sparse_mark.go",
+          "tests": [
+            "TestASTSparseMarkActualIdentityAndNoRetains",
+            "TestASTSparseMarkResetAndFinalizeFreeBeforeReserve",
+            "TestASTSparseMarkBoundedIdentityOracle",
+            "TestASTSparseMarkEraseFreeSuccessorSkipsCleanup",
+            "TestASTSparseMarkIteratorEpochExhaustionPreflight",
+            "TestASTSparseMarkPendingResetCanFinishAtFinalEpoch",
+            "TestASTSparseMarkLastTombstoneAndCurrentHashReads",
+            "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
+            "TestASTSharedOccurrencesExternalVisitedAndPlaneIndependence",
+            "TestASTSharedOccurrencesMarkInlineFailurePrefix",
+            "TestASTSharedOccurrencesPhysicalBucketIterator",
+            "TestASTSharedOccurrencesAllTraversalPolicies",
+            "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
+            "TestASTSharedOccurrencesFrameFailureCursorPrefix",
+            "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
+            "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+            "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
+            "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
+            "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
+            "TestASTSharedOccurrencesIteratorActualBackingLifetime",
+            "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
+          ]
         }
       ],
       "ownership": [
@@ -90691,7 +91119,8 @@
         "Scalar owned key refs preserve synthesized capacity-copy assignment and retained FREE/DELETED payloads. Rehash duplicates used keys before old table destruction; Swap moves owners without key-copy actions. See bitset/PORT_STATUS.md.",
         "StrHashtable borrows immutable region spellings through scalar origin/ref/offset/length records. Table lifecycle never copies/frees spellings; cold owner/table budgets and safe epochs are audited. Multi-origin Assign/Union/Intersect and foreign borrow/query/mutation paths are complete for this specialization; other entry types and optional enabled statistics remain open. See utilhash/PORT_STATUS.md.",
         "CString/int32 default entries retain complete borrowed key/value data on FREE/DELETED. Fixed40-byte scalar entries, budgeted header/table/directory, borrowed origins and source cached hash/bucket/action order; see utilhash/STR_INT32_MAP_PORT_STATUS.md.",
-        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md."
+        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md.",
+        "Concrete AST expr identity-table and shared-occurrence owners preserve source bucket-order callbacks, borrowing, actual node shared flags and charged backing/header peaks. See AST_SPARSE_SHARED_PORT_STATUS.md."
       ],
       "deviations": [
         "Checked cold owner/epoch snapshots replace borrowed entry pointers; structural mutation invalidates snapshots.",
@@ -90700,7 +91129,8 @@
         "C pointers/sentinels become scalar keys and FREE/DELETED/USED states with cold checked entry/iterator wrappers. Owner-local raw region refs must not be reinterpreted across regions; opaque keys diagnose origin mismatch.",
         "Predictable reset/finalize/rehash failures prepare replacements before publication. Epoch exhaustion preflights structural mutation; Close always releases even at max epoch. Preparation rejects exhausted-epoch misses before caller spelling allocation, while existing hits remain valid.",
         "Secondary region borrows live in a sorted budgeted cold directory, retained through reset until Close. Insert adopts an owner only on new publication or equal-pointer overwrite; queries and absent-insert duplicate hits adopt nothing. Swap transfers table and directory charges atomically without touching region budgets.",
-        "Explicit scalar padding keeps Go default entries40bytes across architectures. Checked key replacement preserves hash/equality; scalar values remain mutable. Other entry/key/value variants and enabled statistics remain unported."
+        "Explicit scalar padding keeps Go default entries40bytes across architectures. Checked key replacement preserves hash/equality; scalar values remain mutable. Other entry/key/value variants and enabled statistics remain unported.",
+        "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See AST_SPARSE_SHARED_PORT_STATUS.md."
       ]
     },
     {
@@ -106336,9 +106766,33 @@
       "sha256": "bd9dcc279b40413240d161c371a60eda7a8658e4c4493cd1e05c2dd60a7cfaaa",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "ast_sparse_mark.go"
+      ],
+      "tests": [
+        "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
+        "TestASTSharedOccurrencesAllTraversalPolicies",
+        "TestASTSharedOccurrencesExternalVisitedAndPlaneIndependence",
+        "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
+        "TestASTSharedOccurrencesFrameFailureCursorPrefix",
+        "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
+        "TestASTSharedOccurrencesIteratorActualBackingLifetime",
+        "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
+        "TestASTSharedOccurrencesMarkInlineFailurePrefix",
+        "TestASTSharedOccurrencesPhysicalBucketIterator",
+        "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+        "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
+        "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
+        "TestASTSparseMarkActualIdentityAndNoRetains",
+        "TestASTSparseMarkBoundedIdentityOracle",
+        "TestASTSparseMarkEraseFreeSuccessorSkipsCleanup",
+        "TestASTSparseMarkIteratorEpochExhaustionPreflight",
+        "TestASTSparseMarkLastTombstoneAndCurrentHashReads",
+        "TestASTSparseMarkPendingResetCanFinishAtFinalEpoch",
+        "TestASTSparseMarkResetAndFinalizeFreeBeforeReserve",
+        "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -106369,9 +106823,48 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "obj_hash_entry<expr> current hash and concrete identity-table lifecycle/probing/growth/erase/reset/finalize",
+          "status": "ported",
+          "go_target": "ast_sparse_mark.go",
+          "tests": [
+            "TestASTSparseMarkActualIdentityAndNoRetains",
+            "TestASTSparseMarkResetAndFinalizeFreeBeforeReserve",
+            "TestASTSparseMarkBoundedIdentityOracle",
+            "TestASTSparseMarkEraseFreeSuccessorSkipsCleanup",
+            "TestASTSparseMarkIteratorEpochExhaustionPreflight",
+            "TestASTSparseMarkPendingResetCanFinishAtFinalEpoch",
+            "TestASTSparseMarkLastTombstoneAndCurrentHashReads",
+            "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
+            "TestASTSharedOccurrencesExternalVisitedAndPlaneIndependence",
+            "TestASTSharedOccurrencesMarkInlineFailurePrefix",
+            "TestASTSharedOccurrencesPhysicalBucketIterator",
+            "TestASTSharedOccurrencesAllTraversalPolicies",
+            "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
+            "TestASTSharedOccurrencesFrameFailureCursorPrefix",
+            "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
+            "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+            "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
+            "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
+            "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
+            "TestASTSharedOccurrencesIteratorActualBackingLifetime",
+            "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
+          ]
+        },
+        {
+          "name": "Remaining object table templates, general inherited operations and optional enabled statistics",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Concrete AST expr identity-table and shared-occurrence owners preserve source bucket-order callbacks, borrowing, actual node shared flags and charged backing/header peaks. See AST_SPARSE_SHARED_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See AST_SPARSE_SHARED_PORT_STATUS.md."
+      ]
     },
     {
       "path": "src/util/obj_mark.h",
@@ -114554,7 +115047,8 @@
         "sat_solver_uint_set.go",
         "sat_solver_watch_store.go",
         "sat_storage_vector.go",
-        "util_param_descrs.go"
+        "util_param_descrs.go",
+        "ast_shared_occs.go"
       ],
       "tests": [
         "TestParamDescrsBudgetFailuresAndWarmDuplicate",
@@ -114631,7 +115125,28 @@
         "TestSATVectorCrossBudgetSwapAndMoveFailure",
         "TestSATVectorIteratorEpochRetiresWithoutWrap",
         "TestSATWatchEraseRetainedLifetimesAndGrowthPrefix",
-        "TestSATWatchLifetimeMetadataBudget"
+        "TestSATWatchLifetimeMetadataBudget",
+        "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
+        "TestASTSharedOccurrencesAllTraversalPolicies",
+        "TestASTSharedOccurrencesExternalVisitedAndPlaneIndependence",
+        "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
+        "TestASTSharedOccurrencesFrameFailureCursorPrefix",
+        "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
+        "TestASTSharedOccurrencesIteratorActualBackingLifetime",
+        "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
+        "TestASTSharedOccurrencesMarkInlineFailurePrefix",
+        "TestASTSharedOccurrencesPhysicalBucketIterator",
+        "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+        "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
+        "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
+        "TestASTSparseMarkActualIdentityAndNoRetains",
+        "TestASTSparseMarkBoundedIdentityOracle",
+        "TestASTSparseMarkEraseFreeSuccessorSkipsCleanup",
+        "TestASTSparseMarkIteratorEpochExhaustionPreflight",
+        "TestASTSparseMarkLastTombstoneAndCurrentHashReads",
+        "TestASTSparseMarkPendingResetCanFinishAtFinalEpoch",
+        "TestASTSparseMarkResetAndFinalizeFreeBeforeReserve",
+        "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
       ],
       "conditionals": [
         {
@@ -114837,18 +115352,48 @@
             "TestSATSolverWatchStoreIteratorsFollowMoveAndSwapBacking",
             "TestSATSolverWatchStoreFiniteBudgetRefusal"
           ]
+        },
+        {
+          "name": "Shared occurrence frame geometric capacity with source LP64 extent and actual Go host bounds",
+          "status": "ported",
+          "go_target": "ast_shared_occs.go",
+          "tests": [
+            "TestASTSparseMarkActualIdentityAndNoRetains",
+            "TestASTSparseMarkResetAndFinalizeFreeBeforeReserve",
+            "TestASTSparseMarkBoundedIdentityOracle",
+            "TestASTSparseMarkEraseFreeSuccessorSkipsCleanup",
+            "TestASTSparseMarkIteratorEpochExhaustionPreflight",
+            "TestASTSparseMarkPendingResetCanFinishAtFinalEpoch",
+            "TestASTSparseMarkLastTombstoneAndCurrentHashReads",
+            "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
+            "TestASTSharedOccurrencesExternalVisitedAndPlaneIndependence",
+            "TestASTSharedOccurrencesMarkInlineFailurePrefix",
+            "TestASTSharedOccurrencesPhysicalBucketIterator",
+            "TestASTSharedOccurrencesAllTraversalPolicies",
+            "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
+            "TestASTSharedOccurrencesFrameFailureCursorPrefix",
+            "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
+            "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+            "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
+            "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
+            "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
+            "TestASTSharedOccurrencesIteratorActualBackingLifetime",
+            "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
+          ]
         }
       ],
       "ownership": [
         "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md.",
         "SAT vector headers/backing/lifetime metadata use actual host widths, real 2-to-(3n+1)/2 growth and old/new peaks. Trivial reallocation copies retained capacity, watched erase/destroy lifetime is distinguished. Value iterators do not allocate cold wrappers. Source impossible constructors/equality overloads are not fabricated; aliases and raw pointer adapters are in SAT_STORAGE_PORT_STATUS.md.",
         "Selected concrete nested literal payload and nontrivial model entry copy adaptations preserve source logical capacities, full retained trivial backing, exact-capacity logical copy, and ascending clone/destruct prefixes. Local SAT char membership storage preserves source uint32 growth arithmetic. Physical pooled storage and all cold metadata remain charged.",
-        "Actual four-uint64 watch payloads preserve val1/val2 plus widened scalar clause provenance; separate charged lifetime bitmap tracks erased live tails and destroyed holes. Common cold owner/directories and all arena descriptor/page/free storage and old/new overlaps charged. Exact nested copies, destroy-before-assignment, backing-transferring move/swap and real display/erase routes; see SAT_SOLVER_WATCH_STORE_PORT_STATUS.md."
+        "Actual four-uint64 watch payloads preserve val1/val2 plus widened scalar clause provenance; separate charged lifetime bitmap tracks erased live tails and destroyed holes. Common cold owner/directories and all arena descriptor/page/free storage and old/new overlaps charged. Exact nested copies, destroy-before-assignment, backing-transferring move/swap and real display/erase routes; see SAT_SOLVER_WATCH_STORE_PORT_STATUS.md.",
+        "Concrete AST expr identity-table and shared-occurrence owners preserve source bucket-order callbacks, borrowing, actual node shared flags and charged backing/header peaks. See AST_SPARSE_SHARED_PORT_STATUS.md."
       ],
       "deviations": [
         "Concrete solver-specific storage, not complete generic vector template surface. Owning model Clone/Assign, other specializations and source-undefined continuation behavior remain explicitly separate.",
         "Literal storage guards physical capacity and stale tokens, but does not track construction of never-written spare slots. Source-defined initialized retained-slot behavior is verified; validation of every C++ initialized-lifetime domain is not claimed.",
-        "Composite payload/bitmap preparation is an explicit Go storage adapter; completed pool growth remains charged on refusal. Iterators follow actual scalar backing across moves/swaps, and guard only actual free/reallocation or ended-slot lifetime. Null-backing Shrink/SetEnd retains finite source release no-op. Outer solver watch vector and propagation remain open; quadratic SortByKind is an additional semantic-order convenience adapter, not completed std::stable_sort backend/complexity integration."
+        "Composite payload/bitmap preparation is an explicit Go storage adapter; completed pool growth remains charged on refusal. Iterators follow actual scalar backing across moves/swaps, and guard only actual free/reallocation or ended-slot lifetime. Null-backing Shrink/SetEnd retains finite source release no-op. Outer solver watch vector and propagation remain open; quadratic SortByKind is an additional semantic-order convenience adapter, not completed std::stable_sort backend/complexity integration.",
+        "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See AST_SPARSE_SHARED_PORT_STATUS.md."
       ]
     },
     {
