@@ -79326,7 +79326,8 @@
       "status": "partial",
       "go_targets": [
         "mpnum/mpq.go",
-        "mpnum/mpq_round.go"
+        "mpnum/mpq_round.go",
+        "mpnum/mpq_power.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -79347,7 +79348,11 @@
         "TestRationalRoundIndependentAndAliases",
         "TestRationalRoundFailureCleanup",
         "TestRationalRoundInitializationAndClose",
-        "TestRationalRoundWarmZeroAllocations"
+        "TestRationalRoundWarmZeroAllocations",
+        "TestRationalPowerIndependentAndDomains",
+        "TestPowerShiftFailureCleanup",
+        "TestPowerShiftWarmStorageAndLifetime",
+        "TestPowerDomainAliases"
       ],
       "conditionals": [
         {
@@ -79434,11 +79439,13 @@
       "methods": [],
       "ownership": [
         "Concrete numerator/denominator scalar Int pair, explicit NewRational 0/1; raw Go zero diagnosed. Base manager and scratch numerals owner-local, independently budgeted manager/header children. Partial source methods and formatting gaps remain. See mpnum/PORT_STATUS.md.",
-        "Source prev-power assertions and log bounds translated; test powers are independent fixture generation until production Power is implemented. See mpnum/PORT_STATUS.md."
+        "Source prev-power assertions and log bounds translated; test powers are independent fixture generation until production Power is implemented. See mpnum/PORT_STATUS.md.",
+        "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
-        "Undefined zero denominator/divisor/inverse classified ErrDivideByZero. Both source scratch modes operation-owner confined."
+        "Undefined zero denominator/divisor/inverse classified ErrDivideByZero. Both source scratch modes operation-owner confined.",
+        "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits."
       ]
     },
     {
@@ -79452,7 +79459,8 @@
         "mpnum/mpz_mul.go",
         "mpnum/mpz_div.go",
         "mpnum/mpz_gcd.go",
-        "mpnum/mpz_log.go"
+        "mpnum/mpz_log.go",
+        "mpnum/mpz_power_shift.go"
       ],
       "tests": [
         "TestSourceMPZMagnitudeProjections",
@@ -79481,7 +79489,14 @@
         "TestRationalRoundIndependentAndAliases",
         "TestRationalRoundFailureCleanup",
         "TestRationalRoundInitializationAndClose",
-        "TestRationalRoundWarmZeroAllocations"
+        "TestRationalRoundWarmZeroAllocations",
+        "TestIntegerSourceShiftTable",
+        "TestIntegerPowerAndShiftIndependent",
+        "TestSourceShiftDefectAndPowerDomains",
+        "TestPowerShiftFailureCleanup",
+        "TestPowerShiftWarmStorageAndLifetime",
+        "TestShiftUnsignedBoundsAndPromotions",
+        "TestPowerDomainAliases"
       ],
       "conditionals": [
         {
@@ -79622,9 +79637,12 @@
         "Magnitude projections only; signed manager assertions remain unported.",
         "Signed multiplication assertions and print-only square expectations strengthened. Remaining parser/GCD/root/bitwise/shift source assertions remain unported.",
         "Active 50-case GCD coherence uses bounded independent prime-product fixture generator. INT_MIN GCD print case strengthened to exact 2^31 expectation; see mpnum/PORT_STATUS.md.",
-        "Source prev-power assertions and log bounds translated; test powers are independent fixture generation until production Power is implemented. See mpnum/PORT_STATUS.md."
+        "Source prev-power assertions and log bounds translated; test powers are independent fixture generation until production Power is implemented. See mpnum/PORT_STATUS.md.",
+        "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending."
       ],
-      "deviations": []
+      "deviations": [
+        "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits."
+      ]
     },
     {
       "path": "src/test/nlarith_util.cpp",
@@ -94833,7 +94851,8 @@
       "status": "partial",
       "go_targets": [
         "mpnum/mpq.go",
-        "mpnum/mpq_round.go"
+        "mpnum/mpq_round.go",
+        "mpnum/mpq_power.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -94854,7 +94873,11 @@
         "TestRationalRoundIndependentAndAliases",
         "TestRationalRoundFailureCleanup",
         "TestRationalRoundInitializationAndClose",
-        "TestRationalRoundWarmZeroAllocations"
+        "TestRationalRoundWarmZeroAllocations",
+        "TestRationalPowerIndependentAndDomains",
+        "TestPowerShiftFailureCleanup",
+        "TestPowerShiftWarmStorageAndLifetime",
+        "TestPowerDomainAliases"
       ],
       "assertions": [
         {
@@ -95068,14 +95091,27 @@
             "TestRationalRoundInitializationAndClose",
             "TestRationalRoundWarmZeroAllocations"
           ]
+        },
+        {
+          "name": "power source repeated squaring",
+          "status": "ported",
+          "go_target": "mpnum/mpq_power.go",
+          "tests": [
+            "TestRationalPowerIndependentAndDomains",
+            "TestPowerShiftFailureCleanup",
+            "TestPowerShiftWarmStorageAndLifetime",
+            "TestPowerDomainAliases"
+          ]
         }
       ],
       "ownership": [
-        "Concrete numerator/denominator scalar Int pair, explicit NewRational 0/1; raw Go zero diagnosed. Base manager and scratch numerals owner-local, independently budgeted manager/header children. Partial source methods and formatting gaps remain. See mpnum/PORT_STATUS.md."
+        "Concrete numerator/denominator scalar Int pair, explicit NewRational 0/1; raw Go zero diagnosed. Base manager and scratch numerals owner-local, independently budgeted manager/header children. Partial source methods and formatting gaps remain. See mpnum/PORT_STATUS.md.",
+        "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
-        "Undefined zero denominator/divisor/inverse classified ErrDivideByZero. Both source scratch modes operation-owner confined."
+        "Undefined zero denominator/divisor/inverse classified ErrDivideByZero. Both source scratch modes operation-owner confined.",
+        "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits."
       ]
     },
     {
@@ -95086,7 +95122,8 @@
       "status": "partial",
       "go_targets": [
         "mpnum/mpq.go",
-        "mpnum/mpq_round.go"
+        "mpnum/mpq_round.go",
+        "mpnum/mpq_power.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -95107,7 +95144,11 @@
         "TestRationalRoundIndependentAndAliases",
         "TestRationalRoundFailureCleanup",
         "TestRationalRoundInitializationAndClose",
-        "TestRationalRoundWarmZeroAllocations"
+        "TestRationalRoundWarmZeroAllocations",
+        "TestRationalPowerIndependentAndDomains",
+        "TestPowerShiftFailureCleanup",
+        "TestPowerShiftWarmStorageAndLifetime",
+        "TestPowerDomainAliases"
       ],
       "conditionals": [
         {
@@ -95391,14 +95432,27 @@
             "TestRationalRoundInitializationAndClose",
             "TestRationalRoundWarmZeroAllocations"
           ]
+        },
+        {
+          "name": "power source repeated squaring",
+          "status": "ported",
+          "go_target": "mpnum/mpq_power.go",
+          "tests": [
+            "TestRationalPowerIndependentAndDomains",
+            "TestPowerShiftFailureCleanup",
+            "TestPowerShiftWarmStorageAndLifetime",
+            "TestPowerDomainAliases"
+          ]
         }
       ],
       "ownership": [
-        "Concrete numerator/denominator scalar Int pair, explicit NewRational 0/1; raw Go zero diagnosed. Base manager and scratch numerals owner-local, independently budgeted manager/header children. Partial source methods and formatting gaps remain. See mpnum/PORT_STATUS.md."
+        "Concrete numerator/denominator scalar Int pair, explicit NewRational 0/1; raw Go zero diagnosed. Base manager and scratch numerals owner-local, independently budgeted manager/header children. Partial source methods and formatting gaps remain. See mpnum/PORT_STATUS.md.",
+        "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
-        "Undefined zero denominator/divisor/inverse classified ErrDivideByZero. Both source scratch modes operation-owner confined."
+        "Undefined zero denominator/divisor/inverse classified ErrDivideByZero. Both source scratch modes operation-owner confined.",
+        "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits."
       ]
     },
     {
@@ -95451,7 +95505,8 @@
         "mpnum/mpz_div.go",
         "mpnum/mpz_gcd.go",
         "mpnum/mpz_slab.go",
-        "mpnum/mpz_log.go"
+        "mpnum/mpz_log.go",
+        "mpnum/mpz_power_shift.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -95489,7 +95544,14 @@
         "TestRationalRoundIndependentAndAliases",
         "TestRationalRoundFailureCleanup",
         "TestRationalRoundInitializationAndClose",
-        "TestRationalRoundWarmZeroAllocations"
+        "TestRationalRoundWarmZeroAllocations",
+        "TestIntegerSourceShiftTable",
+        "TestIntegerPowerAndShiftIndependent",
+        "TestSourceShiftDefectAndPowerDomains",
+        "TestPowerShiftFailureCleanup",
+        "TestPowerShiftWarmStorageAndLifetime",
+        "TestShiftUnsignedBoundsAndPromotions",
+        "TestPowerDomainAliases"
       ],
       "conditionals": [
         {
@@ -96575,17 +96637,61 @@
             "TestRationalRoundInitializationAndClose",
             "TestRationalRoundWarmZeroAllocations"
           ]
+        },
+        {
+          "name": "power/is_power_of_two selected internal fast paths and mask loop",
+          "status": "ported",
+          "go_target": "mpnum/mpz_power_shift.go",
+          "tests": [
+            "TestIntegerSourceShiftTable",
+            "TestIntegerPowerAndShiftIndependent",
+            "TestSourceShiftDefectAndPowerDomains",
+            "TestPowerShiftFailureCleanup",
+            "TestPowerShiftWarmStorageAndLifetime",
+            "TestShiftUnsignedBoundsAndPromotions",
+            "TestPowerDomainAliases"
+          ]
+        },
+        {
+          "name": "ensure_capacity/normalize selected internal cell storage",
+          "status": "ported",
+          "go_target": "mpnum/mpz_power_shift.go",
+          "tests": [
+            "TestIntegerSourceShiftTable",
+            "TestIntegerPowerAndShiftIndependent",
+            "TestSourceShiftDefectAndPowerDomains",
+            "TestPowerShiftFailureCleanup",
+            "TestPowerShiftWarmStorageAndLifetime",
+            "TestShiftUnsignedBoundsAndPromotions",
+            "TestPowerDomainAliases"
+          ]
+        },
+        {
+          "name": "machine_div2k/mul2k in-place and copy wrappers",
+          "status": "ported",
+          "go_target": "mpnum/mpz_power_shift.go",
+          "tests": [
+            "TestIntegerSourceShiftTable",
+            "TestIntegerPowerAndShiftIndependent",
+            "TestSourceShiftDefectAndPowerDomains",
+            "TestPowerShiftFailureCleanup",
+            "TestPowerShiftWarmStorageAndLifetime",
+            "TestShiftUnsignedBoundsAndPromotions",
+            "TestPowerDomainAliases"
+          ]
         }
       ],
       "ownership": [
         "Persistent cells and limbs in slabs/word pages. Copy/Move/Swap explicit; source scratch/cached constants retained. Owner identity caller contract; rendering/header budgets and remaining source operations unresolved. See mpnum/PORT_STATUS.md.",
         "Division scratch Words are budgeted and released. Div/Mod stage owner-local values for failure atomicity while preserving source output/divisor alias defects. Standalone MPN, formatting and header budgets remain unresolved. See mpnum/PORT_STATUS.md.",
-        "IntegerManager, numericCellSlab, Words and descriptor owner headers now individually budgeted without double charging. Constructor rollback and complete Close tested; standalone MPN/formatting still pending. See BUDGET_PORT_STATUS.md."
+        "IntegerManager, numericCellSlab, Words and descriptor owner headers now individually budgeted without double charging. Constructor rollback and complete Close tested; standalone MPN/formatting still pending. See BUDGET_PORT_STATUS.md.",
+        "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
         "Div/Mod use staged owner cells, increasing storage peak and changing physical allocation timing; source arithmetic and alias defects preserved.",
-        "GCD zero-case Copy+Abs staged before destination Move for failure atomicity. Array/extended GCD and LCM remain unported."
+        "GCD zero-case Copy+Abs staged before destination Move for failure atomicity. Array/extended GCD and LCM remain unported.",
+        "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits."
       ]
     },
     {
@@ -96600,7 +96706,8 @@
         "mpnum/mpz_div.go",
         "mpnum/mpz_gcd.go",
         "mpnum/mpz_slab.go",
-        "mpnum/mpz_log.go"
+        "mpnum/mpz_log.go",
+        "mpnum/mpz_power_shift.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -96638,7 +96745,14 @@
         "TestRationalRoundIndependentAndAliases",
         "TestRationalRoundFailureCleanup",
         "TestRationalRoundInitializationAndClose",
-        "TestRationalRoundWarmZeroAllocations"
+        "TestRationalRoundWarmZeroAllocations",
+        "TestIntegerSourceShiftTable",
+        "TestIntegerPowerAndShiftIndependent",
+        "TestSourceShiftDefectAndPowerDomains",
+        "TestPowerShiftFailureCleanup",
+        "TestPowerShiftWarmStorageAndLifetime",
+        "TestShiftUnsignedBoundsAndPromotions",
+        "TestPowerDomainAliases"
       ],
       "conditionals": [
         {
@@ -97236,17 +97350,61 @@
             "TestRationalRoundInitializationAndClose",
             "TestRationalRoundWarmZeroAllocations"
           ]
+        },
+        {
+          "name": "power/is_power_of_two selected internal fast paths and mask loop",
+          "status": "ported",
+          "go_target": "mpnum/mpz_power_shift.go",
+          "tests": [
+            "TestIntegerSourceShiftTable",
+            "TestIntegerPowerAndShiftIndependent",
+            "TestSourceShiftDefectAndPowerDomains",
+            "TestPowerShiftFailureCleanup",
+            "TestPowerShiftWarmStorageAndLifetime",
+            "TestShiftUnsignedBoundsAndPromotions",
+            "TestPowerDomainAliases"
+          ]
+        },
+        {
+          "name": "ensure_capacity/normalize selected internal cell storage",
+          "status": "ported",
+          "go_target": "mpnum/mpz_power_shift.go",
+          "tests": [
+            "TestIntegerSourceShiftTable",
+            "TestIntegerPowerAndShiftIndependent",
+            "TestSourceShiftDefectAndPowerDomains",
+            "TestPowerShiftFailureCleanup",
+            "TestPowerShiftWarmStorageAndLifetime",
+            "TestShiftUnsignedBoundsAndPromotions",
+            "TestPowerDomainAliases"
+          ]
+        },
+        {
+          "name": "machine_div2k/mul2k in-place and copy wrappers",
+          "status": "ported",
+          "go_target": "mpnum/mpz_power_shift.go",
+          "tests": [
+            "TestIntegerSourceShiftTable",
+            "TestIntegerPowerAndShiftIndependent",
+            "TestSourceShiftDefectAndPowerDomains",
+            "TestPowerShiftFailureCleanup",
+            "TestPowerShiftWarmStorageAndLifetime",
+            "TestShiftUnsignedBoundsAndPromotions",
+            "TestPowerDomainAliases"
+          ]
         }
       ],
       "ownership": [
         "Persistent cells and limbs in slabs/word pages. Copy/Move/Swap explicit; source scratch/cached constants retained. Owner identity caller contract; rendering/header budgets and remaining source operations unresolved. See mpnum/PORT_STATUS.md.",
         "Division scratch Words are budgeted and released. Div/Mod stage owner-local values for failure atomicity while preserving source output/divisor alias defects. Standalone MPN, formatting and header budgets remain unresolved. See mpnum/PORT_STATUS.md.",
-        "IntegerManager, numericCellSlab, Words and descriptor owner headers now individually budgeted without double charging. Constructor rollback and complete Close tested; standalone MPN/formatting still pending. See BUDGET_PORT_STATUS.md."
+        "IntegerManager, numericCellSlab, Words and descriptor owner headers now individually budgeted without double charging. Constructor rollback and complete Close tested; standalone MPN/formatting still pending. See BUDGET_PORT_STATUS.md.",
+        "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
         "Div/Mod use staged owner cells, increasing storage peak and changing physical allocation timing; source arithmetic and alias defects preserved.",
-        "GCD zero-case Copy+Abs staged before destination Move for failure atomicity. Array/extended GCD and LCM remain unported."
+        "GCD zero-case Copy+Abs staged before destination Move for failure atomicity. Array/extended GCD and LCM remain unported.",
+        "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits."
       ]
     },
     {

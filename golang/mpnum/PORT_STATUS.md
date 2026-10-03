@@ -370,11 +370,12 @@ integer fast paths and add/sub wrappers; rat_mul/mul; rat_lt and ordering throug
 Compare; equality; div with its divisor/output alias branch; both inv forms
 through Inv(a,out); integer/fraction display through String. Integers exposes
 the owned base manager for already translated inherited integer operations.
-Unimplemented MPQ methods include parsers/scientific notation, Power,
+Unimplemented MPQ methods include parsers/scientific notation,
 decimal/SMT2/display variants, getters and
 numerator-only swaps, scalar mixed arithmetic overloads, rational AddMul,
 GCD/LCM/divisibility, approximate conversions, and the separate rational wrapper.
-No partial parser is exposed. Source scientific parsing requires Power;
+No partial parser is exposed. Source scientific parsing requires Power,
+completed by the later power/shift packet;
 source prev_power_of_two dependencies are completed by the rounding/log packet below.
 
 RationalConfig.Synchronized selects the source SYNCH local-temporary branch;
@@ -491,11 +492,9 @@ alias forms x 48 budget reservation positions check failure publication,
 retry exact results and Close budget zero. Warmed rounding and PrevPowerOfTwo
 allocate zero Go objects on the bounded workload.
 
-Full Power, IsPowerOfTwo, Mul2k/MachineDiv2k, parsers, scalar mixed rational
-methods, decimal formatting and previously deferred higher arithmetic remain
-unimplemented. Pending Power must explicitly address the source general
-uint32 mask-loop nontermination at p>=2^31; pending shifts must preserve the
-source small INT_MIN/right-shift31 defect in a labeled regression. Standalone
+Parsers, scalar mixed rational methods, decimal formatting and previously
+deferred higher arithmetic remain unimplemented. Power and shifts are covered
+by the later packet, including source domain/defect handling. Standalone
 NaturalManager and String scratch/output ownership remains the separately
 approved next storage packet, not a closed gate here.
 
@@ -505,3 +504,99 @@ test binaries cross-build for js/wasm and wasip1/wasm. Combined mpnum coverage
 is 88.9%, not complete path coverage. Wasm cross-builds are compilation evidence,
 not runtime execution. All command cache/temp/output and project edits remain
 under golang. No manifest or git changes were made by this packet.
+
+
+## Selected internal integer Power/shifts and rational Power packet
+
+Status remains **partial MPZ and MPQ**. New mpz_power_shift.go,
+mpq_power.go and mpz_power_shift_test.go only; no shared helpers, allocator,
+ledger or git changes. Full selected method bodies and helper allocation actions
+were read before translation: mpz.cpp internal power, is_power_of_two,
+ensure_capacity, normalize, machine_div2k, mul2k; mpz.h copy wrappers and
+allocate_if_needed; mpq.cpp power; source tst_2k and related active test cases.
+
+Translated: IntegerManager.Power with actual source small 2/0/1 fast paths;
+IsPowerOfTwo with scalar and high-limb/lower-zero checks; MachineDiv2k and Mul2k
+with same-pointer in-place and separate-copy destinations; source requested
+capacity-six ensure/promotion/reallocation and normalization; RationalManager.Power.
+Both generic Power implementations retain the uint32 mask, bit selection,
+source temporary copy and final extra square even when unused. The base-two
+fast path builds exact limb bits directly and retains source allocated big
+representation at p=31. Shifts preserve source small int64 multiply, signed
+small division and indexed whole-limb/bit shift loops. Source cell requested
+capacity stays separate from Words pool geometry. No production math/big,
+generics, unsafe, alternate exponentiation algorithm or new retained scratch
+was introduced.
+
+Source domain/defect handling is explicit:
+
+- PowerDomainError carries the exact uint32 exponent and reason, and unwraps
+  to ErrInvalidPower or ErrNonterminatingPower. Generic uint32 mask Power loops
+  would never exit after mask wraps to zero when p>=2^31; these inputs fail
+  before any allocation/publication. Source integer small base 0/1/2 finite
+  fast paths are selected first, retaining behavior when storage is representable.
+- Integer small 0^0 violates the actual source assertion and returns the typed
+  invalid-domain error. Rational Power has no such assertion/fast path and
+  preserves its actual 0^0=1. The integer precondition is not silently added to
+  the rational method.
+- Source signed `1 << 31` has no portable C++ contract. The selected 32-bit
+  two's-complement baseline uses an explicit uint32 limb shift for base-two
+  Power and int32 narrowing for MachineDiv2k's signed divisor. Thus small inline
+  INT_MIN divided by 2^31 follows the inferred source control flow and produces
+  +1; a big-cell INT_MIN instead follows magnitude shifting and produces -1.
+  Permanent regressions label this as source-derived, not C++-observed. This
+  source defect is not silently repaired or generalized to other representations.
+- New limb-size additions are checked with uint64 before narrowing; predictable
+  namespace/budget failures leave output/input aliases unchanged. Huge finite
+  base-two powers and left shifts are not misclassified as mask nontermination.
+
+Storage adaptation: public Power and shift outputs are staged in explicit owned
+working numerals, preserving all successful source aliases and withholding
+publication until arithmetic completes. Working cells are cleaned on every
+failure. This changes peak budget and source destructor timing; the source final
+unused square can still fail and must not be omitted. Existing base-manager
+Words/cells and multiplication scratch account all numerical work, while the
+previous standalone MPN/String scratch/output ownership gaps remain open.
+
+Tests first failed for undefined production APIs (RED), then passed (GREEN).
+All 72 actual tst_2k calls are permanent fixtures, each with separate and input
+output aliases. The source ENSURE coherence uses real Power(2,k) plus Mul or
+MachineDiv; additional independent math/big limb expectations avoid mirrored
+arithmetic or million-bit decimal rendering. The actual -7 left shift by
+1,000,000 bits is finite and runs under the one-megabyte owner budget. Source
+print-only tst_pw2 values p=0..127 and tst_div2k_bug receive explicitly added
+mathematical expectations, not invented source assertions.
+
+Independent bounded coverage adds 200 signed multi-limb Power/left/right-shift
+triples and both destinations; 100 rational pairs with both destinations and
+scratch modes; scalar width/promotion boundaries at shifts 0/1/30/31/32/33/
+63/64/65; IsPowerOfTwo positive/nonpositive/multibit cases; UINT32_MAX shift
+and power-budget boundaries; typed zero/nontermination errors and same-output
+error aliases; physical small/big INT_MIN defect distinction. Two modes x four
+operations x two destinations x 64 reservation positions check untouched
+operands/output on failure, independent exact retries and Close budget zero.
+Warmed integer/rational Power and shifts allocate zero Go objects on the tested
+bounded workload; raw rational initialization and closed-owner errors are tested.
+
+Method inventory still excludes power_of_two_multiple, rational IsPowerOfTwo
+wrapper, parsers/scientific input, decimal rendering, scalar mixed rational
+methods and the previously recorded higher arithmetic/diagnostic source methods.
+Full parser remains unadvertised even though its rational Power prerequisite is
+now present. Standalone MPN scratch and caller-buffer FormatInto are approved
+as separate future storage work; escaped Go string output lifetime must not be
+claimed accounted through temporary budget reservations.
+
+Validation correction: earlier sub-agent commands used `-tags=checked`, which
+is not the checked-handle build tag. The actual tag is `g3checked`. This packet
+reruns the complete mpnum suite and all earlier arithmetic/lifetime regressions
+with the actual tag, alongside release, and cross-builds the actual two modes.
+Historical incorrectly tagged commands alone are not checked-mode evidence.
+
+Final Power/shift validation: full native release race (37.6s) and actual
+`-tags=g3checked` race (38.5s) suites pass, including all earlier numeric packets.
+Both native modes pass vet; the portcheck source-gate/no-generics audit passes.
+Test binaries cross-build for js/wasm and wasip1/wasm in release and g3checked
+modes; these are compilation evidence, not wasm runtime execution. Combined
+mpnum statement coverage is 89.5%, not complete path coverage. Every edit,
+cache, temp directory and artifact remains within golang. Earlier incorrectly
+tagged commands are supplemented by these actual checked-handle gates.

@@ -199,3 +199,18 @@ no production change or artificial RED was necessary. An isolated prospective
 commit passes full native tests, actual g3checked races, vet, checked js/wasm
 execution and WASI compilation. The public rational wrapper, production cell
 links, construct=false and full solver remain open.
+
+## Integer Power/shifts and rational Power
+
+Source repeated squaring, integer fast paths, power-of-two detection and whole
+limb/bit shifts now have concrete counterparts. All 72 source shift cases pass
+with separate and aliased outputs, including the million-bit case. Independent
+signed integer/rational oracles, typed source-domain errors, representation-specific
+INT_MIN division, failure cleanup and warm zero-allocation checks are retained.
+
+Tests were ported first and observed RED before implementation. Isolated full
+native tests, actual g3checked races and vet pass. Checked Nodejs/wasm execution
+explicitly registers and passes all eight new tests; both handle modes compile
+for JS and WASI. Earlier agent commands using the incorrect checked tag are
+superseded by actual g3checked gates. Parsers, remaining numerical methods,
+standalone MPN/formatting scratch ownership and full AST/solver gates remain open.
