@@ -89918,7 +89918,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "util_param_descrs.go"
+        "util_param_descrs.go",
+        "util_gparams_dictionary.go"
       ],
       "tests": [
         "TestParamDescrsSourceHistoryDefaultsAndDisplay",
@@ -89933,7 +89934,29 @@
         "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
         "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
         "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
-        "TestParamDescrsCheckedCapacityBoundaries"
+        "TestParamDescrsCheckedCapacityBoundaries",
+        "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
+        "TestGlobalParamsActualSATCollectorCurrentSharedRegistry",
+        "TestGlobalParamsBorrowedStringAndSharedSnapshotPublication",
+        "TestGlobalParamsCDoubleFilteredPrefixAndIEEEBoundary",
+        "TestGlobalParamsCDoubleNoHiddenOverflowErrorAllocation",
+        "TestGlobalParamsCLongFilteredSaturationAndNarrow",
+        "TestGlobalParamsConstructorUnwindAndColdOwnerGuards",
+        "TestGlobalParamsDefaultLookupAndSourceHistoricalMessages",
+        "TestGlobalParamsDescriptionBindingThenFailedTablePublication",
+        "TestGlobalParamsDescriptionNullAndClosedReadPrefixes",
+        "TestGlobalParamsDescriptorMergeFaultRetainsCallerOwner",
+        "TestGlobalParamsDictionariesSourceThresholdAndTombstoneProbe",
+        "TestGlobalParamsDictionaryResetReleaseBeforeFailedShrink",
+        "TestGlobalParamsDisplayParameterDiagnosticBeforeLookup",
+        "TestGlobalParamsModuleDescriptionBorrowAndDisplayBranches",
+        "TestGlobalParamsNilStreamActualActionPrefixes",
+        "TestGlobalParamsRealModuleSnapshotsAndReset",
+        "TestGlobalParamsRegistrationTrueBeforeFailureAndActualMerge",
+        "TestGlobalParamsResetOwnerDirectoryPlateauAndWarmSnapshots",
+        "TestGlobalParamsSetterFaultPrefixesImmediateOwnedGraph",
+        "TestGlobalParamsThreeDictionaryLayoutsAndPhysicalBucketOrder",
+        "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule"
       ],
       "conditionals": [
         {
@@ -89967,10 +89990,40 @@
             "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
             "TestParamDescrsCheckedCapacityBoundaries"
           ]
+        },
+        {
+          "name": "selected three concrete GlobalParams dictionary operations with cached Symbol hash, probing and reset",
+          "status": "ported",
+          "go_target": "util_gparams_dictionary.go",
+          "tests": [
+            "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
+            "TestGlobalParamsActualSATCollectorCurrentSharedRegistry",
+            "TestGlobalParamsBorrowedStringAndSharedSnapshotPublication",
+            "TestGlobalParamsCDoubleFilteredPrefixAndIEEEBoundary",
+            "TestGlobalParamsCDoubleNoHiddenOverflowErrorAllocation",
+            "TestGlobalParamsCLongFilteredSaturationAndNarrow",
+            "TestGlobalParamsConstructorUnwindAndColdOwnerGuards",
+            "TestGlobalParamsDefaultLookupAndSourceHistoricalMessages",
+            "TestGlobalParamsDescriptionBindingThenFailedTablePublication",
+            "TestGlobalParamsDescriptionNullAndClosedReadPrefixes",
+            "TestGlobalParamsDescriptorMergeFaultRetainsCallerOwner",
+            "TestGlobalParamsDictionariesSourceThresholdAndTombstoneProbe",
+            "TestGlobalParamsDictionaryResetReleaseBeforeFailedShrink",
+            "TestGlobalParamsDisplayParameterDiagnosticBeforeLookup",
+            "TestGlobalParamsModuleDescriptionBorrowAndDisplayBranches",
+            "TestGlobalParamsNilStreamActualActionPrefixes",
+            "TestGlobalParamsRealModuleSnapshotsAndReset",
+            "TestGlobalParamsRegistrationTrueBeforeFailureAndActualMerge",
+            "TestGlobalParamsResetOwnerDirectoryPlateauAndWarmSnapshots",
+            "TestGlobalParamsSetterFaultPrefixesImmediateOwnedGraph",
+            "TestGlobalParamsThreeDictionaryLayoutsAndPhysicalBucketOrder",
+            "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule"
+          ]
         }
       ],
       "ownership": [
-        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md."
+        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md.",
+        "Three independent charged scalar record arrays and cold root directories preserve source physical bucket/action order. See GPARAMS_REGISTRY_PORT_STATUS.md; other source map operations remain required."
       ],
       "deviations": []
     },
@@ -90674,9 +90727,41 @@
       "sha256": "e00c0c7574b5a4e49926b9fe13a0289854c5e0f7b0824b40a3ac8ed039a6e235",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_debug.go",
+        "util_gparams_dictionary.go",
+        "util_gparams_display.go",
+        "util_gparams_names.go",
+        "util_gparams_nodebug.go",
+        "util_gparams_parse.go",
+        "util_gparams_values.go"
+      ],
+      "tests": [
+        "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
+        "TestGlobalParamsActualSATCollectorCurrentSharedRegistry",
+        "TestGlobalParamsBorrowedStringAndSharedSnapshotPublication",
+        "TestGlobalParamsCDoubleFilteredPrefixAndIEEEBoundary",
+        "TestGlobalParamsCDoubleNoHiddenOverflowErrorAllocation",
+        "TestGlobalParamsCLongFilteredSaturationAndNarrow",
+        "TestGlobalParamsConstructorUnwindAndColdOwnerGuards",
+        "TestGlobalParamsDefaultLookupAndSourceHistoricalMessages",
+        "TestGlobalParamsDescriptionBindingThenFailedTablePublication",
+        "TestGlobalParamsDescriptionNullAndClosedReadPrefixes",
+        "TestGlobalParamsDescriptorMergeFaultRetainsCallerOwner",
+        "TestGlobalParamsDictionariesSourceThresholdAndTombstoneProbe",
+        "TestGlobalParamsDictionaryResetReleaseBeforeFailedShrink",
+        "TestGlobalParamsDisplayParameterDiagnosticBeforeLookup",
+        "TestGlobalParamsModuleDescriptionBorrowAndDisplayBranches",
+        "TestGlobalParamsNilStreamActualActionPrefixes",
+        "TestGlobalParamsRealModuleSnapshotsAndReset",
+        "TestGlobalParamsRegistrationTrueBeforeFailureAndActualMerge",
+        "TestGlobalParamsResetOwnerDirectoryPlateauAndWarmSnapshots",
+        "TestGlobalParamsSetterFaultPrefixesImmediateOwnedGraph",
+        "TestGlobalParamsThreeDictionaryLayoutsAndPhysicalBucketOrder",
+        "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule"
+      ],
       "assertions": [
         {
           "line": 195,
@@ -90741,18 +90826,84 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "explicit-owner registry registration, normalization, typed set/get, shared module snapshots, reset and byte-stream displays",
+          "status": "ported",
+          "go_target": "util_gparams.go",
+          "tests": [
+            "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
+            "TestGlobalParamsActualSATCollectorCurrentSharedRegistry",
+            "TestGlobalParamsBorrowedStringAndSharedSnapshotPublication",
+            "TestGlobalParamsCDoubleFilteredPrefixAndIEEEBoundary",
+            "TestGlobalParamsCDoubleNoHiddenOverflowErrorAllocation",
+            "TestGlobalParamsCLongFilteredSaturationAndNarrow",
+            "TestGlobalParamsConstructorUnwindAndColdOwnerGuards",
+            "TestGlobalParamsDefaultLookupAndSourceHistoricalMessages",
+            "TestGlobalParamsDescriptionBindingThenFailedTablePublication",
+            "TestGlobalParamsDescriptionNullAndClosedReadPrefixes",
+            "TestGlobalParamsDescriptorMergeFaultRetainsCallerOwner",
+            "TestGlobalParamsDictionariesSourceThresholdAndTombstoneProbe",
+            "TestGlobalParamsDictionaryResetReleaseBeforeFailedShrink",
+            "TestGlobalParamsDisplayParameterDiagnosticBeforeLookup",
+            "TestGlobalParamsModuleDescriptionBorrowAndDisplayBranches",
+            "TestGlobalParamsNilStreamActualActionPrefixes",
+            "TestGlobalParamsRealModuleSnapshotsAndReset",
+            "TestGlobalParamsRegistrationTrueBeforeFailureAndActualMerge",
+            "TestGlobalParamsResetOwnerDirectoryPlateauAndWarmSnapshots",
+            "TestGlobalParamsSetterFaultPrefixesImmediateOwnedGraph",
+            "TestGlobalParamsThreeDictionaryLayoutsAndPhysicalBucketOrder",
+            "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete charged registry header, three independent scalar dictionaries, owned descriptor roots and ParamsRef cells; canonical borrowed Symbol strings and deferred borrowed BytesRegion description reads. Immediate failure graph and source publication-prefix checks; see GPARAMS_REGISTRY_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Explicit runtime lifetime, C long32/64 and C-locale IEEE64 profiles, charged Go scratch/backings and two borrowed byte streams. Complete generated catalog, process singleton/stdout wiring, OpenMP and physical global allocation hooks remain open."
+      ]
     },
     {
       "path": "src/util/gparams.h",
       "sha256": "bf102cab1d1ad1bba0923daeec78d13ff9cbdb4bd305b7f311c33a3dc92546bc",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_gparams.go",
+        "util_gparams_debug.go",
+        "util_gparams_dictionary.go",
+        "util_gparams_display.go",
+        "util_gparams_names.go",
+        "util_gparams_nodebug.go",
+        "util_gparams_parse.go",
+        "util_gparams_values.go"
+      ],
+      "tests": [
+        "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
+        "TestGlobalParamsActualSATCollectorCurrentSharedRegistry",
+        "TestGlobalParamsBorrowedStringAndSharedSnapshotPublication",
+        "TestGlobalParamsCDoubleFilteredPrefixAndIEEEBoundary",
+        "TestGlobalParamsCDoubleNoHiddenOverflowErrorAllocation",
+        "TestGlobalParamsCLongFilteredSaturationAndNarrow",
+        "TestGlobalParamsConstructorUnwindAndColdOwnerGuards",
+        "TestGlobalParamsDefaultLookupAndSourceHistoricalMessages",
+        "TestGlobalParamsDescriptionBindingThenFailedTablePublication",
+        "TestGlobalParamsDescriptionNullAndClosedReadPrefixes",
+        "TestGlobalParamsDescriptorMergeFaultRetainsCallerOwner",
+        "TestGlobalParamsDictionariesSourceThresholdAndTombstoneProbe",
+        "TestGlobalParamsDictionaryResetReleaseBeforeFailedShrink",
+        "TestGlobalParamsDisplayParameterDiagnosticBeforeLookup",
+        "TestGlobalParamsModuleDescriptionBorrowAndDisplayBranches",
+        "TestGlobalParamsNilStreamActualActionPrefixes",
+        "TestGlobalParamsRealModuleSnapshotsAndReset",
+        "TestGlobalParamsRegistrationTrueBeforeFailureAndActualMerge",
+        "TestGlobalParamsResetOwnerDirectoryPlateauAndWarmSnapshots",
+        "TestGlobalParamsSetterFaultPrefixesImmediateOwnedGraph",
+        "TestGlobalParamsThreeDictionaryLayoutsAndPhysicalBucketOrder",
+        "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -90765,9 +90916,43 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "explicit-owner registry registration, normalization, typed set/get, shared module snapshots, reset and byte-stream displays",
+          "status": "ported",
+          "go_target": "util_gparams.go",
+          "tests": [
+            "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
+            "TestGlobalParamsActualSATCollectorCurrentSharedRegistry",
+            "TestGlobalParamsBorrowedStringAndSharedSnapshotPublication",
+            "TestGlobalParamsCDoubleFilteredPrefixAndIEEEBoundary",
+            "TestGlobalParamsCDoubleNoHiddenOverflowErrorAllocation",
+            "TestGlobalParamsCLongFilteredSaturationAndNarrow",
+            "TestGlobalParamsConstructorUnwindAndColdOwnerGuards",
+            "TestGlobalParamsDefaultLookupAndSourceHistoricalMessages",
+            "TestGlobalParamsDescriptionBindingThenFailedTablePublication",
+            "TestGlobalParamsDescriptionNullAndClosedReadPrefixes",
+            "TestGlobalParamsDescriptorMergeFaultRetainsCallerOwner",
+            "TestGlobalParamsDictionariesSourceThresholdAndTombstoneProbe",
+            "TestGlobalParamsDictionaryResetReleaseBeforeFailedShrink",
+            "TestGlobalParamsDisplayParameterDiagnosticBeforeLookup",
+            "TestGlobalParamsModuleDescriptionBorrowAndDisplayBranches",
+            "TestGlobalParamsNilStreamActualActionPrefixes",
+            "TestGlobalParamsRealModuleSnapshotsAndReset",
+            "TestGlobalParamsRegistrationTrueBeforeFailureAndActualMerge",
+            "TestGlobalParamsResetOwnerDirectoryPlateauAndWarmSnapshots",
+            "TestGlobalParamsSetterFaultPrefixesImmediateOwnedGraph",
+            "TestGlobalParamsThreeDictionaryLayoutsAndPhysicalBucketOrder",
+            "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete charged registry header, three independent scalar dictionaries, owned descriptor roots and ParamsRef cells; canonical borrowed Symbol strings and deferred borrowed BytesRegion description reads. Immediate failure graph and source publication-prefix checks; see GPARAMS_REGISTRY_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Explicit runtime lifetime, C long32/64 and C-locale IEEE64 profiles, charged Go scratch/backings and two borrowed byte streams. Complete generated catalog, process singleton/stdout wiring, OpenMP and physical global allocation hooks remain open."
+      ]
     },
     {
       "path": "src/util/hash.cpp",
@@ -99240,7 +99425,8 @@
         "utilhash/uint_map.go",
         "bitset/uint_set_map.go",
         "utilhash/str_int32_map.go",
-        "util_param_descrs.go"
+        "util_param_descrs.go",
+        "util_gparams_dictionary.go"
       ],
       "tests": [
         "TestUintMapSourceMapAssertions",
@@ -99291,7 +99477,29 @@
         "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
         "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
         "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
-        "TestParamDescrsCheckedCapacityBoundaries"
+        "TestParamDescrsCheckedCapacityBoundaries",
+        "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
+        "TestGlobalParamsActualSATCollectorCurrentSharedRegistry",
+        "TestGlobalParamsBorrowedStringAndSharedSnapshotPublication",
+        "TestGlobalParamsCDoubleFilteredPrefixAndIEEEBoundary",
+        "TestGlobalParamsCDoubleNoHiddenOverflowErrorAllocation",
+        "TestGlobalParamsCLongFilteredSaturationAndNarrow",
+        "TestGlobalParamsConstructorUnwindAndColdOwnerGuards",
+        "TestGlobalParamsDefaultLookupAndSourceHistoricalMessages",
+        "TestGlobalParamsDescriptionBindingThenFailedTablePublication",
+        "TestGlobalParamsDescriptionNullAndClosedReadPrefixes",
+        "TestGlobalParamsDescriptorMergeFaultRetainsCallerOwner",
+        "TestGlobalParamsDictionariesSourceThresholdAndTombstoneProbe",
+        "TestGlobalParamsDictionaryResetReleaseBeforeFailedShrink",
+        "TestGlobalParamsDisplayParameterDiagnosticBeforeLookup",
+        "TestGlobalParamsModuleDescriptionBorrowAndDisplayBranches",
+        "TestGlobalParamsNilStreamActualActionPrefixes",
+        "TestGlobalParamsRealModuleSnapshotsAndReset",
+        "TestGlobalParamsRegistrationTrueBeforeFailureAndActualMerge",
+        "TestGlobalParamsResetOwnerDirectoryPlateauAndWarmSnapshots",
+        "TestGlobalParamsSetterFaultPrefixesImmediateOwnedGraph",
+        "TestGlobalParamsThreeDictionaryLayoutsAndPhysicalBucketOrder",
+        "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule"
       ],
       "conditionals": [
         {
@@ -99683,13 +99891,43 @@
             "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
             "TestParamDescrsCheckedCapacityBoundaries"
           ]
+        },
+        {
+          "name": "selected three concrete GlobalParams dictionary operations with cached Symbol hash, probing and reset",
+          "status": "ported",
+          "go_target": "util_gparams_dictionary.go",
+          "tests": [
+            "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
+            "TestGlobalParamsActualSATCollectorCurrentSharedRegistry",
+            "TestGlobalParamsBorrowedStringAndSharedSnapshotPublication",
+            "TestGlobalParamsCDoubleFilteredPrefixAndIEEEBoundary",
+            "TestGlobalParamsCDoubleNoHiddenOverflowErrorAllocation",
+            "TestGlobalParamsCLongFilteredSaturationAndNarrow",
+            "TestGlobalParamsConstructorUnwindAndColdOwnerGuards",
+            "TestGlobalParamsDefaultLookupAndSourceHistoricalMessages",
+            "TestGlobalParamsDescriptionBindingThenFailedTablePublication",
+            "TestGlobalParamsDescriptionNullAndClosedReadPrefixes",
+            "TestGlobalParamsDescriptorMergeFaultRetainsCallerOwner",
+            "TestGlobalParamsDictionariesSourceThresholdAndTombstoneProbe",
+            "TestGlobalParamsDictionaryResetReleaseBeforeFailedShrink",
+            "TestGlobalParamsDisplayParameterDiagnosticBeforeLookup",
+            "TestGlobalParamsModuleDescriptionBorrowAndDisplayBranches",
+            "TestGlobalParamsNilStreamActualActionPrefixes",
+            "TestGlobalParamsRealModuleSnapshotsAndReset",
+            "TestGlobalParamsRegistrationTrueBeforeFailureAndActualMerge",
+            "TestGlobalParamsResetOwnerDirectoryPlateauAndWarmSnapshots",
+            "TestGlobalParamsSetterFaultPrefixesImmediateOwnedGraph",
+            "TestGlobalParamsThreeDictionaryLayoutsAndPhysicalBucketOrder",
+            "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule"
+          ]
         }
       ],
       "ownership": [
         "Concrete scalar u_map<uint32> specialization with budgeted cold header and pointer-free entries. Other key/entry variants and source string map or Windows sentinel set remain unported. See utilhash/PORT_STATUS.md.",
         "Scalar owned key refs preserve synthesized capacity-copy assignment and retained FREE/DELETED payloads. Rehash duplicates used keys before old table destruction; Swap moves owners without key-copy actions. See bitset/PORT_STATUS.md.",
         "CString/int32 default entries retain complete borrowed key/value data on FREE/DELETED. Fixed40-byte scalar entries, budgeted header/table/directory, borrowed origins and source cached hash/bucket/action order; see utilhash/STR_INT32_MAP_PORT_STATUS.md.",
-        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md."
+        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md.",
+        "Three independent charged scalar record arrays and cold root directories preserve source physical bucket/action order. See GPARAMS_REGISTRY_PORT_STATUS.md; other source map operations remain required."
       ],
       "deviations": [
         "Checked cold owner/epoch snapshots replace borrowed entry pointers; structural mutation invalidates snapshots.",

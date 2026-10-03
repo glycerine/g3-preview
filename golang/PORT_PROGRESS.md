@@ -1215,3 +1215,16 @@ display requires the real SMT pretty-printer and remains open. Source
 expr_substitution.cpp/h and selected ref_util.h map callback loops become
 partial; ledger33ported/97partial/1972unported. Full consumers and the complete
 solver/proof/interpolation objective remain required.
+
+
+## Actual global parameter registry
+
+Concrete registry operations now use the real Symbol/Params/descriptor owners,
+three independent scalar dictionaries and current shared module snapshots.
+Tests-first fixes preserve TRUE-before-registration failure, empty-cell set
+publication, borrowed descriptions, reset metadata plateau and nil-stream action
+prefixes. Fourteen frozen Go files passed full native/debug, twenty-two exact
+race/actual JS groups, vet, WASI build and source/no-generics verification.
+See GPARAMS_REGISTRY_PORT_STATUS.md. Full generated catalogs and process binding
+remain open; gparams.cpp/h become partial, ledger33ported/99partial/1970unported.
+SAT search, SMT/theories, proof/checker and interpolation remain required.
