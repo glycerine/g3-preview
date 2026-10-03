@@ -66,3 +66,17 @@ default Runtime ownership. Remove this test's tag as soon as those constructor
 APIs land; the larger transitive owner-integration campaign remains separately
 unfinished. The pending tag preserves this work without including unrelated
 allocator implementation drafts in a green checkpoint.
+
+
+Factors owning Close now freezes ordinary operations before Clear starts, and
+uses cleanup-only validation plus its completed-Clear cursor when retried.
+The explicit partial-Clear/member-destruction protocol fixtures use real
+constructed numeric/polynomial owners and callbacks that reject unexpected
+resource calls. They do not fabricate a numeric Del refusal. Tests first
+observed ordinary mutation allowed in the old completed-Clear state; native/
+debug protocol and real utility-bound lifecycle tests pass after the correction.
+The exact two Go files also pass full native/debug suites, vet and source/
+evidence/no-generics audit on 0c9d695; logs are
+`.cache/factors-close-parent-{native,debug,vet,source}.log`. Actual leaf cleanup
+refusal and retained lexical factorization contexts remain backend integration
+obligations. The independent allocator draft was excluded from these gates.

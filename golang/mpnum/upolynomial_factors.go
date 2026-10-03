@@ -18,6 +18,7 @@ type UPolynomialFactors struct {
 	totalFactors, totalDegree uint32
 	header                    uint64
 	closed                    bool
+	closing                   bool
 	closeCleared              bool
 }
 type UPolynomialFactorsStats struct {
@@ -46,11 +47,23 @@ func (m *UPolynomialManager) NewFactors() (*UPolynomialFactors, error) {
 	m.liveFactors++
 	return fs, nil
 }
-func (fs *UPolynomialFactors) check() error {
+func (fs *UPolynomialFactors) checkCleanup() error {
 	if fs == nil || fs.self != fs || fs.manager == nil {
 		return ErrUPolynomialOwner
 	}
 	if fs.closed {
+		return arena.ErrClosed
+	}
+	return fs.manager.check()
+}
+
+// Once owning destruction starts, only cleanup retry and ownership diagnostics
+// remain usable. This is a Go error-continuation guard, not a source mutation.
+func (fs *UPolynomialFactors) check() error {
+	if fs == nil || fs.self != fs || fs.manager == nil {
+		return ErrUPolynomialOwner
+	}
+	if fs.closed || fs.closing || fs.closeCleared {
 		return arena.ErrClosed
 	}
 	return fs.manager.check()
@@ -322,6 +335,9 @@ func (fs *UPolynomialFactors) Clear() error {
 	if e := fs.check(); e != nil {
 		return e
 	}
+	return fs.clearBody()
+}
+func (fs *UPolynomialFactors) clearBody() error {
 	m := fs.manager
 	for i := uint32(0); i < fs.count; i++ {
 		if e := m.reset(&fs.factors[i]); e != nil {
@@ -343,14 +359,15 @@ func (fs *UPolynomialFactors) Clear() error {
 }
 func (fs *UPolynomialFactors) Reset() error { return fs.Clear() }
 func (fs *UPolynomialFactors) Close() error {
-	if e := fs.check(); e != nil {
+	if e := fs.checkCleanup(); e != nil {
 		return e
 	}
 	m := fs.manager
+	fs.closing = true
 	// Clear must finish before raw member destruction. A leaf cleanup refusal
 	// leaves this actual owner, backing and liveFactors retain available to retry.
 	if !fs.closeCleared {
-		if e := fs.Clear(); e != nil {
+		if e := fs.clearBody(); e != nil {
 			return e
 		}
 		fs.closeCleared = true
