@@ -4,6 +4,7 @@
 package mpnum
 
 import (
+	"github.com/glycerine/g3/golang/arena"
 	"math/big"
 	"math/rand"
 	"reflect"
@@ -30,7 +31,7 @@ func wantLimbs(z *big.Int, n int) []uint32 {
 
 func TestSourceMPZMagnitudeProjections(t *testing.T) {
 	// tst2: UINT_MAX + 1, followed by squaring, projected onto mpn.
-	m := new(NaturalManager)
+	m := naturalManager(t)
 	sum := make([]uint32, 2)
 	if n := m.Add([]uint32{0xffffffff}, []uint32{1}, sum); n != 2 || !reflect.DeepEqual(sum, []uint32{0, 1}) {
 		t.Fatalf("carry: %v size %d", sum, n)
@@ -41,7 +42,7 @@ func TestSourceMPZMagnitudeProjections(t *testing.T) {
 		t.Fatal(square)
 	}
 	// bug1's exact positive input, then v-v == 0. Decimal parsing here is
-	// independent oracle setup; the integer manager's set operation is unported.
+	// independent oracle setup; signed source parser coverage lives separately.
 	z, _ := new(big.Int).SetString("1002043949858757875676767675747473", 10)
 	a := wantLimbs(z, 4)
 	c := make([]uint32, 4)
@@ -53,7 +54,7 @@ func TestSourceMPZMagnitudeProjections(t *testing.T) {
 func TestNaturalArithmeticOracle(t *testing.T) {
 	// Independent fixed-seed generator, 1000 finite cases, at most eight limbs.
 	r := rand.New(rand.NewSource(0x4d504e))
-	m := new(NaturalManager)
+	m := naturalManager(t)
 	for trial := 0; trial < 1000; trial++ {
 		a := make([]uint32, 1+r.Intn(8))
 		b := make([]uint32, 1+r.Intn(8))
@@ -107,7 +108,7 @@ func TestNaturalArithmeticOracle(t *testing.T) {
 }
 
 func TestNaturalExactAliases(t *testing.T) {
-	m := new(NaturalManager)
+	m := naturalManager(t)
 	if m.Compare(nil, nil) != 0 || m.Compare([]uint32{5}, []uint32{5, 0, 0}) != 0 {
 		t.Fatal("equal magnitudes with leading zero limbs")
 	}
@@ -133,7 +134,7 @@ func TestNaturalExactAliases(t *testing.T) {
 }
 
 func TestNaturalDivisionAndDecimal(t *testing.T) {
-	m := new(NaturalManager)
+	m := naturalManager(t)
 	r := rand.New(rand.NewSource(0x444956))
 	for trial := 0; trial < 2000; trial++ {
 		a := make([]uint32, 1+r.Intn(8))
@@ -153,29 +154,31 @@ func TestNaturalDivisionAndDecimal(t *testing.T) {
 		}
 		q, rem := make([]uint32, len(a)-len(b)+1), make([]uint32, len(b))
 		aa, bb := oracle(a), oracle(b)
-		m.Div(a, b, q, rem)
+		if _, e := m.Div(a, b, q, rem); e != nil {
+			t.Fatal(e)
+		}
 		wq, wr := new(big.Int), new(big.Int)
 		wq.QuoRem(aa, bb, wr)
 		if oracle(q).Cmp(wq) != 0 || oracle(rem).Cmp(wr) != 0 {
 			t.Fatalf("div trial %d: %x / %x = %x rem %x expected %s %s", trial, a, b, q, rem, wq, wr)
 		}
-		if got := m.String(a); got != aa.String() {
+		if got, e := m.String(a); e != nil || got != aa.String() {
 			t.Fatalf("decimal trial %d: %s != %s", trial, got, aa)
 		}
 	}
-	if got := m.String([]uint32{0}); got != "0" {
+	if got, e := m.String([]uint32{0}); e != nil || got != "0" {
 		t.Fatal(got)
 	}
 }
 
 func TestSourceDivisionReturnBranches(t *testing.T) {
-	m := new(NaturalManager)
+	m := naturalManager(t)
 	q, r := []uint32{99}, []uint32{99}
-	if m.Div([]uint32{7}, []uint32{3}, q, r) || q[0] != 2 || r[0] != 1 {
+	if branch, e := m.Div([]uint32{7}, []uint32{3}, q, r); e != nil || branch || q[0] != 2 || r[0] != 1 {
 		t.Fatal("source single-digit branch returns false")
 	}
 	q, r = []uint32{99}, make([]uint32, 2)
-	if m.Div([]uint32{1, 2}, []uint32{0, 3}, q, r) || q[0] != 0 || !reflect.DeepEqual(r, []uint32{1, 2}) {
+	if branch, e := m.Div([]uint32{1, 2}, []uint32{0, 3}, q, r); e != nil || branch || q[0] != 0 || !reflect.DeepEqual(r, []uint32{1, 2}) {
 		t.Fatal("source smaller branch")
 	}
 }
@@ -190,10 +193,12 @@ func TestNaturalDivisionCorrectionFixtures(t *testing.T) {
 		{[]uint32{0, 0, 0x80000000}, []uint32{0xffffffff, 0x80000000}},
 		{[]uint32{0xffffffff, 0xffffffff, 0xffffffff}, []uint32{0xffffffff, 0xffffffff}},
 	}
-	m := new(NaturalManager)
+	m := naturalManager(t)
 	for _, tc := range cases {
 		q, r := make([]uint32, len(tc.a)-len(tc.b)+1), make([]uint32, len(tc.b))
-		m.Div(tc.a, tc.b, q, r)
+		if _, e := m.Div(tc.a, tc.b, q, r); e != nil {
+			t.Fatal(e)
+		}
 		wq, wr := new(big.Int), new(big.Int)
 		wq.QuoRem(oracle(tc.a), oracle(tc.b), wr)
 		if oracle(q).Cmp(wq) != 0 || oracle(r).Cmp(wr) != 0 {
@@ -203,7 +208,7 @@ func TestNaturalDivisionCorrectionFixtures(t *testing.T) {
 }
 
 func TestNaturalInvalidPreconditions(t *testing.T) {
-	m := new(NaturalManager)
+	m := naturalManager(t)
 	cases := []func(){
 		func() { m.Add(nil, nil, []uint32{0}) },
 		func() { m.Add([]uint32{1}, nil, nil) },
@@ -224,4 +229,14 @@ func TestNaturalInvalidPreconditions(t *testing.T) {
 			call()
 		}()
 	}
+}
+
+func naturalManager(t *testing.T) *NaturalManager {
+	t.Helper()
+	m, e := NewNaturalManager(arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 8, Budget: arena.NewBudget(1 << 22)}})
+	if e != nil {
+		t.Fatal(e)
+	}
+	t.Cleanup(m.Close)
+	return m
 }

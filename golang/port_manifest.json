@@ -94631,13 +94631,28 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "mpnum/mpn.go"
+        "mpnum/mpn.go",
+        "mpnum/mpn_indexed.go",
+        "mpnum/mpn_storage.go",
+        "mpnum/mp_format.go"
       ],
       "tests": [
         "TestNaturalArithmeticOracle",
         "TestNaturalExactAliases",
         "TestNaturalDivisionAndDecimal",
-        "TestNaturalDivisionCorrectionFixtures"
+        "TestNaturalDivisionCorrectionFixtures",
+        "TestNaturalOwnedConstructorAndClose",
+        "TestOwnedDecimalFormatAndPublication",
+        "TestIntegerRationalCombinedFormat",
+        "TestNaturalBorrowedDivisionFailureAtomic",
+        "TestFormattingBudgetFailuresAndLifetime",
+        "TestIntegerSmallAndRawRationalFormatting",
+        "TestNaturalNestedOwnerAccounting",
+        "TestNaturalDivisionWarmNoAllocations",
+        "TestOwnedFormattingBudgetLimit",
+        "TestNaturalPreparedAddBackStorageAdaptation",
+        "TestOwnedTextGrowthPeakAndRefusal",
+        "TestNumericStringHostOwnershipBoundary"
       ],
       "conditionals": [
         {
@@ -94742,7 +94757,19 @@
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
-            "TestNaturalDivisionCorrectionFixtures"
+            "TestNaturalDivisionCorrectionFixtures",
+            "TestNaturalOwnedConstructorAndClose",
+            "TestOwnedDecimalFormatAndPublication",
+            "TestIntegerRationalCombinedFormat",
+            "TestNaturalBorrowedDivisionFailureAtomic",
+            "TestFormattingBudgetFailuresAndLifetime",
+            "TestIntegerSmallAndRawRationalFormatting",
+            "TestNaturalNestedOwnerAccounting",
+            "TestNaturalDivisionWarmNoAllocations",
+            "TestOwnedFormattingBudgetLimit",
+            "TestNaturalPreparedAddBackStorageAdaptation",
+            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestNumericStringHostOwnershipBoundary"
           ]
         },
         {
@@ -94753,7 +94780,19 @@
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
-            "TestNaturalDivisionCorrectionFixtures"
+            "TestNaturalDivisionCorrectionFixtures",
+            "TestNaturalOwnedConstructorAndClose",
+            "TestOwnedDecimalFormatAndPublication",
+            "TestIntegerRationalCombinedFormat",
+            "TestNaturalBorrowedDivisionFailureAtomic",
+            "TestFormattingBudgetFailuresAndLifetime",
+            "TestIntegerSmallAndRawRationalFormatting",
+            "TestNaturalNestedOwnerAccounting",
+            "TestNaturalDivisionWarmNoAllocations",
+            "TestOwnedFormattingBudgetLimit",
+            "TestNaturalPreparedAddBackStorageAdaptation",
+            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestNumericStringHostOwnershipBoundary"
           ]
         },
         {
@@ -94764,7 +94803,19 @@
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
-            "TestNaturalDivisionCorrectionFixtures"
+            "TestNaturalDivisionCorrectionFixtures",
+            "TestNaturalOwnedConstructorAndClose",
+            "TestOwnedDecimalFormatAndPublication",
+            "TestIntegerRationalCombinedFormat",
+            "TestNaturalBorrowedDivisionFailureAtomic",
+            "TestFormattingBudgetFailuresAndLifetime",
+            "TestIntegerSmallAndRawRationalFormatting",
+            "TestNaturalNestedOwnerAccounting",
+            "TestNaturalDivisionWarmNoAllocations",
+            "TestOwnedFormattingBudgetLimit",
+            "TestNaturalPreparedAddBackStorageAdaptation",
+            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestNumericStringHostOwnershipBoundary"
           ]
         },
         {
@@ -94775,80 +94826,201 @@
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
-            "TestNaturalDivisionCorrectionFixtures"
+            "TestNaturalDivisionCorrectionFixtures",
+            "TestNaturalOwnedConstructorAndClose",
+            "TestOwnedDecimalFormatAndPublication",
+            "TestIntegerRationalCombinedFormat",
+            "TestNaturalBorrowedDivisionFailureAtomic",
+            "TestFormattingBudgetFailuresAndLifetime",
+            "TestIntegerSmallAndRawRationalFormatting",
+            "TestNaturalNestedOwnerAccounting",
+            "TestNaturalDivisionWarmNoAllocations",
+            "TestOwnedFormattingBudgetLimit",
+            "TestNaturalPreparedAddBackStorageAdaptation",
+            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestNumericStringHostOwnershipBoundary"
           ]
         },
         {
           "name": "div",
           "status": "ported",
-          "go_target": "mpnum/mpn.go",
+          "go_target": "mpnum/mpn_indexed.go",
           "tests": [
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
-            "TestNaturalDivisionCorrectionFixtures"
+            "TestNaturalDivisionCorrectionFixtures",
+            "TestNaturalOwnedConstructorAndClose",
+            "TestOwnedDecimalFormatAndPublication",
+            "TestIntegerRationalCombinedFormat",
+            "TestNaturalBorrowedDivisionFailureAtomic",
+            "TestFormattingBudgetFailuresAndLifetime",
+            "TestIntegerSmallAndRawRationalFormatting",
+            "TestNaturalNestedOwnerAccounting",
+            "TestNaturalDivisionWarmNoAllocations",
+            "TestOwnedFormattingBudgetLimit",
+            "TestNaturalPreparedAddBackStorageAdaptation",
+            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestNumericStringHostOwnershipBoundary"
           ]
         },
         {
           "name": "div_normalize",
           "status": "ported",
-          "go_target": "mpnum/mpn.go",
+          "go_target": "mpnum/mpn_indexed.go",
           "tests": [
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
-            "TestNaturalDivisionCorrectionFixtures"
+            "TestNaturalDivisionCorrectionFixtures",
+            "TestNaturalOwnedConstructorAndClose",
+            "TestOwnedDecimalFormatAndPublication",
+            "TestIntegerRationalCombinedFormat",
+            "TestNaturalBorrowedDivisionFailureAtomic",
+            "TestFormattingBudgetFailuresAndLifetime",
+            "TestIntegerSmallAndRawRationalFormatting",
+            "TestNaturalNestedOwnerAccounting",
+            "TestNaturalDivisionWarmNoAllocations",
+            "TestOwnedFormattingBudgetLimit",
+            "TestNaturalPreparedAddBackStorageAdaptation",
+            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestNumericStringHostOwnershipBoundary"
           ]
         },
         {
           "name": "div_unnormalize",
           "status": "ported",
-          "go_target": "mpnum/mpn.go",
+          "go_target": "mpnum/mpn_indexed.go",
           "tests": [
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
-            "TestNaturalDivisionCorrectionFixtures"
+            "TestNaturalDivisionCorrectionFixtures",
+            "TestNaturalOwnedConstructorAndClose",
+            "TestOwnedDecimalFormatAndPublication",
+            "TestIntegerRationalCombinedFormat",
+            "TestNaturalBorrowedDivisionFailureAtomic",
+            "TestFormattingBudgetFailuresAndLifetime",
+            "TestIntegerSmallAndRawRationalFormatting",
+            "TestNaturalNestedOwnerAccounting",
+            "TestNaturalDivisionWarmNoAllocations",
+            "TestOwnedFormattingBudgetLimit",
+            "TestNaturalPreparedAddBackStorageAdaptation",
+            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestNumericStringHostOwnershipBoundary"
           ]
         },
         {
           "name": "div_1",
           "status": "ported",
-          "go_target": "mpnum/mpn.go",
+          "go_target": "mpnum/mpn_indexed.go",
           "tests": [
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
-            "TestNaturalDivisionCorrectionFixtures"
+            "TestNaturalDivisionCorrectionFixtures",
+            "TestNaturalOwnedConstructorAndClose",
+            "TestOwnedDecimalFormatAndPublication",
+            "TestIntegerRationalCombinedFormat",
+            "TestNaturalBorrowedDivisionFailureAtomic",
+            "TestFormattingBudgetFailuresAndLifetime",
+            "TestIntegerSmallAndRawRationalFormatting",
+            "TestNaturalNestedOwnerAccounting",
+            "TestNaturalDivisionWarmNoAllocations",
+            "TestOwnedFormattingBudgetLimit",
+            "TestNaturalPreparedAddBackStorageAdaptation",
+            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestNumericStringHostOwnershipBoundary"
           ]
         },
         {
           "name": "div_n",
           "status": "ported",
-          "go_target": "mpnum/mpn.go",
+          "go_target": "mpnum/mpn_indexed.go",
           "tests": [
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
-            "TestNaturalDivisionCorrectionFixtures"
+            "TestNaturalDivisionCorrectionFixtures",
+            "TestNaturalOwnedConstructorAndClose",
+            "TestOwnedDecimalFormatAndPublication",
+            "TestIntegerRationalCombinedFormat",
+            "TestNaturalBorrowedDivisionFailureAtomic",
+            "TestFormattingBudgetFailuresAndLifetime",
+            "TestIntegerSmallAndRawRationalFormatting",
+            "TestNaturalNestedOwnerAccounting",
+            "TestNaturalDivisionWarmNoAllocations",
+            "TestOwnedFormattingBudgetLimit",
+            "TestNaturalPreparedAddBackStorageAdaptation",
+            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestNumericStringHostOwnershipBoundary"
           ]
         },
         {
           "name": "to_string",
           "status": "ported",
-          "go_target": "mpnum/mpn.go",
+          "go_target": "mpnum/mp_format.go",
           "tests": [
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
-            "TestNaturalDivisionCorrectionFixtures"
+            "TestNaturalDivisionCorrectionFixtures",
+            "TestNaturalOwnedConstructorAndClose",
+            "TestOwnedDecimalFormatAndPublication",
+            "TestIntegerRationalCombinedFormat",
+            "TestNaturalBorrowedDivisionFailureAtomic",
+            "TestFormattingBudgetFailuresAndLifetime",
+            "TestIntegerSmallAndRawRationalFormatting",
+            "TestNaturalNestedOwnerAccounting",
+            "TestNaturalDivisionWarmNoAllocations",
+            "TestOwnedFormattingBudgetLimit",
+            "TestNaturalPreparedAddBackStorageAdaptation",
+            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestNumericStringHostOwnershipBoundary"
           ]
+        },
+        {
+          "name": "manager constructor/destructor and concrete scratch storage",
+          "status": "ported",
+          "go_target": "mpnum/mpn_storage.go",
+          "tests": [
+            "TestNaturalOwnedConstructorAndClose",
+            "TestOwnedDecimalFormatAndPublication",
+            "TestIntegerRationalCombinedFormat",
+            "TestNaturalBorrowedDivisionFailureAtomic",
+            "TestFormattingBudgetFailuresAndLifetime",
+            "TestIntegerSmallAndRawRationalFormatting",
+            "TestNaturalNestedOwnerAccounting",
+            "TestNaturalDivisionWarmNoAllocations",
+            "TestOwnedFormattingBudgetLimit",
+            "TestNaturalPreparedAddBackStorageAdaptation",
+            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestNumericStringHostOwnershipBoundary"
+          ]
+        },
+        {
+          "name": "display_raw",
+          "status": "unported"
+        },
+        {
+          "name": "trace(a,b,op)",
+          "status": "unported"
+        },
+        {
+          "name": "trace(a)",
+          "status": "unported"
+        },
+        {
+          "name": "trace_nl",
+          "status": "unported"
         }
       ],
       "ownership": [
-        "Borrowed input/output limbs; manager-owned scratch. No persistent mpz cells. Owner confinement replaces critical section. Diagnostics/lock lifecycle pending; see mpnum/PORT_STATUS.md."
+        "NaturalManager owns fully budgeted cold headers, four source division buffers, retained formatting limb buffers and ASCII workspace. Integer child borrows parent Words/Budget without double ownership. Borrowed operands and outputs are operation-local; owner confinement replaces OMP lock lifecycle. See mpnum/PORT_STATUS.md."
       ],
-      "deviations": []
+      "deviations": [
+        "Source inline scratch becomes arena Words refs with requested capacity16/doubling. Prepare ab before Algorithm D output publication, including paths with no add-back; arithmetic executes one source pass. Formatting retains source local workspace; final escaped Go String is caller-owned. Source diagnostics and OMP lock lifecycle remain separate gaps."
+      ]
     },
     {
       "path": "src/util/mpn.h",
@@ -94857,13 +95029,28 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "mpnum/mpn.go"
+        "mpnum/mpn.go",
+        "mpnum/mpn_indexed.go",
+        "mpnum/mpn_storage.go",
+        "mpnum/mp_format.go"
       ],
       "tests": [
         "TestNaturalArithmeticOracle",
         "TestNaturalExactAliases",
         "TestNaturalDivisionAndDecimal",
-        "TestNaturalDivisionCorrectionFixtures"
+        "TestNaturalDivisionCorrectionFixtures",
+        "TestNaturalOwnedConstructorAndClose",
+        "TestOwnedDecimalFormatAndPublication",
+        "TestIntegerRationalCombinedFormat",
+        "TestNaturalBorrowedDivisionFailureAtomic",
+        "TestFormattingBudgetFailuresAndLifetime",
+        "TestIntegerSmallAndRawRationalFormatting",
+        "TestNaturalNestedOwnerAccounting",
+        "TestNaturalDivisionWarmNoAllocations",
+        "TestOwnedFormattingBudgetLimit",
+        "TestNaturalPreparedAddBackStorageAdaptation",
+        "TestOwnedTextGrowthPeakAndRefusal",
+        "TestNumericStringHostOwnershipBoundary"
       ],
       "conditionals": [
         {
@@ -94906,7 +95093,19 @@
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
-            "TestNaturalDivisionCorrectionFixtures"
+            "TestNaturalDivisionCorrectionFixtures",
+            "TestNaturalOwnedConstructorAndClose",
+            "TestOwnedDecimalFormatAndPublication",
+            "TestIntegerRationalCombinedFormat",
+            "TestNaturalBorrowedDivisionFailureAtomic",
+            "TestFormattingBudgetFailuresAndLifetime",
+            "TestIntegerSmallAndRawRationalFormatting",
+            "TestNaturalNestedOwnerAccounting",
+            "TestNaturalDivisionWarmNoAllocations",
+            "TestOwnedFormattingBudgetLimit",
+            "TestNaturalPreparedAddBackStorageAdaptation",
+            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestNumericStringHostOwnershipBoundary"
           ]
         },
         {
@@ -94917,7 +95116,19 @@
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
-            "TestNaturalDivisionCorrectionFixtures"
+            "TestNaturalDivisionCorrectionFixtures",
+            "TestNaturalOwnedConstructorAndClose",
+            "TestOwnedDecimalFormatAndPublication",
+            "TestIntegerRationalCombinedFormat",
+            "TestNaturalBorrowedDivisionFailureAtomic",
+            "TestFormattingBudgetFailuresAndLifetime",
+            "TestIntegerSmallAndRawRationalFormatting",
+            "TestNaturalNestedOwnerAccounting",
+            "TestNaturalDivisionWarmNoAllocations",
+            "TestOwnedFormattingBudgetLimit",
+            "TestNaturalPreparedAddBackStorageAdaptation",
+            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestNumericStringHostOwnershipBoundary"
           ]
         },
         {
@@ -94928,7 +95139,19 @@
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
-            "TestNaturalDivisionCorrectionFixtures"
+            "TestNaturalDivisionCorrectionFixtures",
+            "TestNaturalOwnedConstructorAndClose",
+            "TestOwnedDecimalFormatAndPublication",
+            "TestIntegerRationalCombinedFormat",
+            "TestNaturalBorrowedDivisionFailureAtomic",
+            "TestFormattingBudgetFailuresAndLifetime",
+            "TestIntegerSmallAndRawRationalFormatting",
+            "TestNaturalNestedOwnerAccounting",
+            "TestNaturalDivisionWarmNoAllocations",
+            "TestOwnedFormattingBudgetLimit",
+            "TestNaturalPreparedAddBackStorageAdaptation",
+            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestNumericStringHostOwnershipBoundary"
           ]
         },
         {
@@ -94939,80 +95162,201 @@
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
-            "TestNaturalDivisionCorrectionFixtures"
+            "TestNaturalDivisionCorrectionFixtures",
+            "TestNaturalOwnedConstructorAndClose",
+            "TestOwnedDecimalFormatAndPublication",
+            "TestIntegerRationalCombinedFormat",
+            "TestNaturalBorrowedDivisionFailureAtomic",
+            "TestFormattingBudgetFailuresAndLifetime",
+            "TestIntegerSmallAndRawRationalFormatting",
+            "TestNaturalNestedOwnerAccounting",
+            "TestNaturalDivisionWarmNoAllocations",
+            "TestOwnedFormattingBudgetLimit",
+            "TestNaturalPreparedAddBackStorageAdaptation",
+            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestNumericStringHostOwnershipBoundary"
           ]
         },
         {
           "name": "div",
           "status": "ported",
-          "go_target": "mpnum/mpn.go",
+          "go_target": "mpnum/mpn_indexed.go",
           "tests": [
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
-            "TestNaturalDivisionCorrectionFixtures"
+            "TestNaturalDivisionCorrectionFixtures",
+            "TestNaturalOwnedConstructorAndClose",
+            "TestOwnedDecimalFormatAndPublication",
+            "TestIntegerRationalCombinedFormat",
+            "TestNaturalBorrowedDivisionFailureAtomic",
+            "TestFormattingBudgetFailuresAndLifetime",
+            "TestIntegerSmallAndRawRationalFormatting",
+            "TestNaturalNestedOwnerAccounting",
+            "TestNaturalDivisionWarmNoAllocations",
+            "TestOwnedFormattingBudgetLimit",
+            "TestNaturalPreparedAddBackStorageAdaptation",
+            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestNumericStringHostOwnershipBoundary"
           ]
         },
         {
           "name": "div_normalize",
           "status": "ported",
-          "go_target": "mpnum/mpn.go",
+          "go_target": "mpnum/mpn_indexed.go",
           "tests": [
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
-            "TestNaturalDivisionCorrectionFixtures"
+            "TestNaturalDivisionCorrectionFixtures",
+            "TestNaturalOwnedConstructorAndClose",
+            "TestOwnedDecimalFormatAndPublication",
+            "TestIntegerRationalCombinedFormat",
+            "TestNaturalBorrowedDivisionFailureAtomic",
+            "TestFormattingBudgetFailuresAndLifetime",
+            "TestIntegerSmallAndRawRationalFormatting",
+            "TestNaturalNestedOwnerAccounting",
+            "TestNaturalDivisionWarmNoAllocations",
+            "TestOwnedFormattingBudgetLimit",
+            "TestNaturalPreparedAddBackStorageAdaptation",
+            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestNumericStringHostOwnershipBoundary"
           ]
         },
         {
           "name": "div_unnormalize",
           "status": "ported",
-          "go_target": "mpnum/mpn.go",
+          "go_target": "mpnum/mpn_indexed.go",
           "tests": [
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
-            "TestNaturalDivisionCorrectionFixtures"
+            "TestNaturalDivisionCorrectionFixtures",
+            "TestNaturalOwnedConstructorAndClose",
+            "TestOwnedDecimalFormatAndPublication",
+            "TestIntegerRationalCombinedFormat",
+            "TestNaturalBorrowedDivisionFailureAtomic",
+            "TestFormattingBudgetFailuresAndLifetime",
+            "TestIntegerSmallAndRawRationalFormatting",
+            "TestNaturalNestedOwnerAccounting",
+            "TestNaturalDivisionWarmNoAllocations",
+            "TestOwnedFormattingBudgetLimit",
+            "TestNaturalPreparedAddBackStorageAdaptation",
+            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestNumericStringHostOwnershipBoundary"
           ]
         },
         {
           "name": "div_1",
           "status": "ported",
-          "go_target": "mpnum/mpn.go",
+          "go_target": "mpnum/mpn_indexed.go",
           "tests": [
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
-            "TestNaturalDivisionCorrectionFixtures"
+            "TestNaturalDivisionCorrectionFixtures",
+            "TestNaturalOwnedConstructorAndClose",
+            "TestOwnedDecimalFormatAndPublication",
+            "TestIntegerRationalCombinedFormat",
+            "TestNaturalBorrowedDivisionFailureAtomic",
+            "TestFormattingBudgetFailuresAndLifetime",
+            "TestIntegerSmallAndRawRationalFormatting",
+            "TestNaturalNestedOwnerAccounting",
+            "TestNaturalDivisionWarmNoAllocations",
+            "TestOwnedFormattingBudgetLimit",
+            "TestNaturalPreparedAddBackStorageAdaptation",
+            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestNumericStringHostOwnershipBoundary"
           ]
         },
         {
           "name": "div_n",
           "status": "ported",
-          "go_target": "mpnum/mpn.go",
+          "go_target": "mpnum/mpn_indexed.go",
           "tests": [
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
-            "TestNaturalDivisionCorrectionFixtures"
+            "TestNaturalDivisionCorrectionFixtures",
+            "TestNaturalOwnedConstructorAndClose",
+            "TestOwnedDecimalFormatAndPublication",
+            "TestIntegerRationalCombinedFormat",
+            "TestNaturalBorrowedDivisionFailureAtomic",
+            "TestFormattingBudgetFailuresAndLifetime",
+            "TestIntegerSmallAndRawRationalFormatting",
+            "TestNaturalNestedOwnerAccounting",
+            "TestNaturalDivisionWarmNoAllocations",
+            "TestOwnedFormattingBudgetLimit",
+            "TestNaturalPreparedAddBackStorageAdaptation",
+            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestNumericStringHostOwnershipBoundary"
           ]
         },
         {
           "name": "to_string",
           "status": "ported",
-          "go_target": "mpnum/mpn.go",
+          "go_target": "mpnum/mp_format.go",
           "tests": [
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
-            "TestNaturalDivisionCorrectionFixtures"
+            "TestNaturalDivisionCorrectionFixtures",
+            "TestNaturalOwnedConstructorAndClose",
+            "TestOwnedDecimalFormatAndPublication",
+            "TestIntegerRationalCombinedFormat",
+            "TestNaturalBorrowedDivisionFailureAtomic",
+            "TestFormattingBudgetFailuresAndLifetime",
+            "TestIntegerSmallAndRawRationalFormatting",
+            "TestNaturalNestedOwnerAccounting",
+            "TestNaturalDivisionWarmNoAllocations",
+            "TestOwnedFormattingBudgetLimit",
+            "TestNaturalPreparedAddBackStorageAdaptation",
+            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestNumericStringHostOwnershipBoundary"
           ]
+        },
+        {
+          "name": "manager constructor/destructor and concrete scratch storage",
+          "status": "ported",
+          "go_target": "mpnum/mpn_storage.go",
+          "tests": [
+            "TestNaturalOwnedConstructorAndClose",
+            "TestOwnedDecimalFormatAndPublication",
+            "TestIntegerRationalCombinedFormat",
+            "TestNaturalBorrowedDivisionFailureAtomic",
+            "TestFormattingBudgetFailuresAndLifetime",
+            "TestIntegerSmallAndRawRationalFormatting",
+            "TestNaturalNestedOwnerAccounting",
+            "TestNaturalDivisionWarmNoAllocations",
+            "TestOwnedFormattingBudgetLimit",
+            "TestNaturalPreparedAddBackStorageAdaptation",
+            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestNumericStringHostOwnershipBoundary"
+          ]
+        },
+        {
+          "name": "display_raw",
+          "status": "unported"
+        },
+        {
+          "name": "trace(a,b,op)",
+          "status": "unported"
+        },
+        {
+          "name": "trace(a)",
+          "status": "unported"
+        },
+        {
+          "name": "trace_nl",
+          "status": "unported"
         }
       ],
       "ownership": [
-        "Borrowed input/output limbs; manager-owned scratch. No persistent mpz cells. Owner confinement replaces critical section. Diagnostics/lock lifecycle pending; see mpnum/PORT_STATUS.md."
+        "NaturalManager owns fully budgeted cold headers, four source division buffers, retained formatting limb buffers and ASCII workspace. Integer child borrows parent Words/Budget without double ownership. Borrowed operands and outputs are operation-local; owner confinement replaces OMP lock lifecycle. See mpnum/PORT_STATUS.md."
       ],
-      "deviations": []
+      "deviations": [
+        "Source inline scratch becomes arena Words refs with requested capacity16/doubling. Prepare ab before Algorithm D output publication, including paths with no add-back; arithmetic executes one source pass. Formatting retains source local workspace; final escaped Go String is caller-owned. Source diagnostics and OMP lock lifecycle remain separate gaps."
+      ]
     },
     {
       "path": "src/util/mpq.cpp",
@@ -95024,7 +95368,8 @@
         "mpnum/mpq.go",
         "mpnum/mpq_round.go",
         "mpnum/mpq_power.go",
-        "mpnum/mpq_parse.go"
+        "mpnum/mpq_parse.go",
+        "mpnum/mp_format.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -95058,7 +95403,19 @@
         "TestParserBudgetFailureCleanup",
         "TestParserWarmLifetimeAndInitialization",
         "TestSourceParserLiteralInventory",
-        "TestParserSourceIntMinRepresentation"
+        "TestParserSourceIntMinRepresentation",
+        "TestNaturalOwnedConstructorAndClose",
+        "TestOwnedDecimalFormatAndPublication",
+        "TestIntegerRationalCombinedFormat",
+        "TestNaturalBorrowedDivisionFailureAtomic",
+        "TestFormattingBudgetFailuresAndLifetime",
+        "TestIntegerSmallAndRawRationalFormatting",
+        "TestNaturalNestedOwnerAccounting",
+        "TestNaturalDivisionWarmNoAllocations",
+        "TestOwnedFormattingBudgetLimit",
+        "TestNaturalPreparedAddBackStorageAdaptation",
+        "TestOwnedTextGrowthPeakAndRefusal",
+        "TestNumericStringHostOwnershipBoundary"
       ],
       "assertions": [
         {
@@ -95229,7 +95586,7 @@
         {
           "name": "integer and fraction display",
           "status": "ported",
-          "go_target": "mpnum/mpq.go",
+          "go_target": "mpnum/mp_format.go",
           "tests": [
             "TestRationalSourceDivAndInverseAliases",
             "TestRationalConstructorLifecycleAndBudget",
@@ -95304,7 +95661,8 @@
       "ownership": [
         "Concrete numerator/denominator scalar Int pair, explicit NewRational 0/1; raw Go zero diagnosed. Base manager and scratch numerals owner-local, independently budgeted manager/header children. Partial source methods and formatting gaps remain. See mpnum/PORT_STATUS.md.",
         "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending.",
-        "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md."
+        "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md.",
+        "Numeric division and decimal formatting use child NaturalManager indexed scratch; all retained storage is budgeted, final host string is caller-owned. See mpnum/PORT_STATUS.md."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -95323,7 +95681,8 @@
         "mpnum/mpq.go",
         "mpnum/mpq_round.go",
         "mpnum/mpq_power.go",
-        "mpnum/mpq_parse.go"
+        "mpnum/mpq_parse.go",
+        "mpnum/mp_format.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -95357,7 +95716,19 @@
         "TestParserBudgetFailureCleanup",
         "TestParserWarmLifetimeAndInitialization",
         "TestSourceParserLiteralInventory",
-        "TestParserSourceIntMinRepresentation"
+        "TestParserSourceIntMinRepresentation",
+        "TestNaturalOwnedConstructorAndClose",
+        "TestOwnedDecimalFormatAndPublication",
+        "TestIntegerRationalCombinedFormat",
+        "TestNaturalBorrowedDivisionFailureAtomic",
+        "TestFormattingBudgetFailuresAndLifetime",
+        "TestIntegerSmallAndRawRationalFormatting",
+        "TestNaturalNestedOwnerAccounting",
+        "TestNaturalDivisionWarmNoAllocations",
+        "TestOwnedFormattingBudgetLimit",
+        "TestNaturalPreparedAddBackStorageAdaptation",
+        "TestOwnedTextGrowthPeakAndRefusal",
+        "TestNumericStringHostOwnershipBoundary"
       ],
       "conditionals": [
         {
@@ -95598,7 +95969,7 @@
         {
           "name": "integer and fraction display",
           "status": "ported",
-          "go_target": "mpnum/mpq.go",
+          "go_target": "mpnum/mp_format.go",
           "tests": [
             "TestRationalSourceDivAndInverseAliases",
             "TestRationalConstructorLifecycleAndBudget",
@@ -95673,7 +96044,8 @@
       "ownership": [
         "Concrete numerator/denominator scalar Int pair, explicit NewRational 0/1; raw Go zero diagnosed. Base manager and scratch numerals owner-local, independently budgeted manager/header children. Partial source methods and formatting gaps remain. See mpnum/PORT_STATUS.md.",
         "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending.",
-        "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md."
+        "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md.",
+        "Numeric division and decimal formatting use child NaturalManager indexed scratch; all retained storage is budgeted, final host string is caller-owned. See mpnum/PORT_STATUS.md."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -95734,7 +96106,8 @@
         "mpnum/mpz_slab.go",
         "mpnum/mpz_log.go",
         "mpnum/mpz_power_shift.go",
-        "mpnum/mpz_parse.go"
+        "mpnum/mpz_parse.go",
+        "mpnum/mp_format.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -95788,7 +96161,19 @@
         "TestParserBudgetFailureCleanup",
         "TestParserWarmLifetimeAndInitialization",
         "TestSourceParserLiteralInventory",
-        "TestParserSourceIntMinRepresentation"
+        "TestParserSourceIntMinRepresentation",
+        "TestNaturalOwnedConstructorAndClose",
+        "TestOwnedDecimalFormatAndPublication",
+        "TestIntegerRationalCombinedFormat",
+        "TestNaturalBorrowedDivisionFailureAtomic",
+        "TestFormattingBudgetFailuresAndLifetime",
+        "TestIntegerSmallAndRawRationalFormatting",
+        "TestNaturalNestedOwnerAccounting",
+        "TestNaturalDivisionWarmNoAllocations",
+        "TestOwnedFormattingBudgetLimit",
+        "TestNaturalPreparedAddBackStorageAdaptation",
+        "TestOwnedTextGrowthPeakAndRefusal",
+        "TestNumericStringHostOwnershipBoundary"
       ],
       "conditionals": [
         {
@@ -96713,7 +97098,7 @@
         {
           "name": "display/to_string",
           "status": "ported",
-          "go_target": "mpnum/mpz.go",
+          "go_target": "mpnum/mp_format.go",
           "tests": [
             "TestIntegerSourceBug3",
             "TestIntegerSourceIntMinSubtraction",
@@ -96939,7 +97324,8 @@
         "Division scratch Words are budgeted and released. Div/Mod stage owner-local values for failure atomicity while preserving source output/divisor alias defects. Standalone MPN, formatting and header budgets remain unresolved. See mpnum/PORT_STATUS.md.",
         "IntegerManager, numericCellSlab, Words and descriptor owner headers now individually budgeted without double charging. Constructor rollback and complete Close tested; standalone MPN/formatting still pending. See BUDGET_PORT_STATUS.md.",
         "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending.",
-        "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md."
+        "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md.",
+        "Numeric division and decimal formatting use child NaturalManager indexed scratch; all retained storage is budgeted, final host string is caller-owned. See mpnum/PORT_STATUS.md."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -96963,7 +97349,8 @@
         "mpnum/mpz_slab.go",
         "mpnum/mpz_log.go",
         "mpnum/mpz_power_shift.go",
-        "mpnum/mpz_parse.go"
+        "mpnum/mpz_parse.go",
+        "mpnum/mp_format.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -97017,7 +97404,19 @@
         "TestParserBudgetFailureCleanup",
         "TestParserWarmLifetimeAndInitialization",
         "TestSourceParserLiteralInventory",
-        "TestParserSourceIntMinRepresentation"
+        "TestParserSourceIntMinRepresentation",
+        "TestNaturalOwnedConstructorAndClose",
+        "TestOwnedDecimalFormatAndPublication",
+        "TestIntegerRationalCombinedFormat",
+        "TestNaturalBorrowedDivisionFailureAtomic",
+        "TestFormattingBudgetFailuresAndLifetime",
+        "TestIntegerSmallAndRawRationalFormatting",
+        "TestNaturalNestedOwnerAccounting",
+        "TestNaturalDivisionWarmNoAllocations",
+        "TestOwnedFormattingBudgetLimit",
+        "TestNaturalPreparedAddBackStorageAdaptation",
+        "TestOwnedTextGrowthPeakAndRefusal",
+        "TestNumericStringHostOwnershipBoundary"
       ],
       "conditionals": [
         {
@@ -97454,7 +97853,7 @@
         {
           "name": "display/to_string",
           "status": "ported",
-          "go_target": "mpnum/mpz.go",
+          "go_target": "mpnum/mp_format.go",
           "tests": [
             "TestIntegerSourceBug3",
             "TestIntegerSourceIntMinSubtraction",
@@ -97680,7 +98079,8 @@
         "Division scratch Words are budgeted and released. Div/Mod stage owner-local values for failure atomicity while preserving source output/divisor alias defects. Standalone MPN, formatting and header budgets remain unresolved. See mpnum/PORT_STATUS.md.",
         "IntegerManager, numericCellSlab, Words and descriptor owner headers now individually budgeted without double charging. Constructor rollback and complete Close tested; standalone MPN/formatting still pending. See BUDGET_PORT_STATUS.md.",
         "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending.",
-        "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md."
+        "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md.",
+        "Numeric division and decimal formatting use child NaturalManager indexed scratch; all retained storage is budgeted, final host string is caller-owned. See mpnum/PORT_STATUS.md."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",

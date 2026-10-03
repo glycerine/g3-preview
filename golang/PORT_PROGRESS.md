@@ -273,3 +273,18 @@ all6 symbol tests execute under checked JS, and WASI compilation passes.
 Raw pointers/global cache become explicit owner/token adaptations per the plan;
 context integration, scoped symbol tables, other container/numeric gaps and all
 AST/solver/proof/interpolation milestones remain open.
+
+## Owned natural scratch and numeric formatting
+
+NaturalManager now owns budgeted source division buffers and retained decimal
+limb/text workspace. Integer division shares the concrete indexed Algorithm D;
+integer and rational rendering avoid unbudgeted numeral/digit copies and publish
+one caller-owned final Go string. FormatInto stages complete output before writing
+caller bytes. Earlier add-back reservation is an explicit storage adaptation;
+the arithmetic and source alias behavior remain unchanged.
+
+Tests went RED before these APIs/storage changes and reached GREEN with full
+fault-prefix, peak-budget, lifetime, independent arithmetic and warm-zero-allocation
+checks. Isolated full native and g3checked module tests, both races, vet, actual
+checked JS registrations and WASI builds pass. MPN diagnostics, further numeric
+methods and the full AST/solver objective remain open.

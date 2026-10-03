@@ -8,7 +8,6 @@ import (
 	"github.com/glycerine/g3/golang/arena"
 	"math"
 	"reflect"
-	"strconv"
 )
 
 var ErrConversion = errors.New("mpnum: integer conversion out of range")
@@ -42,7 +41,7 @@ type IntegerManager struct {
 	cells         *numericCellSlab
 	words         *arena.Words
 	tmp, arg      [2]numericCellRef
-	divScratch    [4]arena.VectorRef // mpn's u, v, multiply/subtract, add-back buffers
+	natural       *NaturalManager // child borrows this manager's Words and Budget
 	intMin, two64 Int
 	closed        bool
 	budget        *arena.Budget
@@ -70,6 +69,10 @@ func NewIntegerManager(config IntegerConfig) (*IntegerManager, error) {
 	}
 	m := &IntegerManager{cells: cells, words: words, budget: config.Cells.Budget, headerBytes: header}
 	fail := func(err error) (*IntegerManager, error) { m.Close(); return nil, err }
+	m.natural, e = newNaturalManager(config.Words, words, false)
+	if e != nil {
+		return fail(e)
+	}
 	for i := 0; i < 2; i++ {
 		m.tmp[i], e = m.allocate(6, 0)
 		if e != nil {
@@ -189,20 +192,19 @@ func (m *IntegerManager) Close() {
 			}
 		}
 	}
+	if m.natural != nil {
+		m.natural.Close()
+	}
 	if m.words != nil {
-		for _, ref := range m.divScratch {
-			if ref != (arena.VectorRef{}) {
-				m.words.Free(ref)
-			}
-		}
 		m.words.Close()
 	}
+
 	if m.cells != nil {
 		m.cells.Close()
 	}
 	m.tmp = [2]numericCellRef{}
 	m.arg = [2]numericCellRef{}
-	m.divScratch = [4]arena.VectorRef{}
+	m.natural = nil
 	m.intMin = Int{}
 	m.two64 = Int{}
 	m.budget.Release(m.headerBytes)
@@ -688,27 +690,4 @@ func (m *IntegerManager) Int64(a *Int) (int64, error) {
 		return -int64(v), nil
 	}
 	return int64(v), nil
-}
-func (m *IntegerManager) String(a *Int) (string, error) {
-	if e := m.check(a); e != nil {
-		return "", e
-	}
-	if a.IsSmall() {
-		return strconv.FormatInt(int64(a.val), 10), nil
-	}
-	size := m.cell(a.cell).size
-	if uint64(size) > uint64(^uint(0)>>1) {
-		return "", arena.ErrBounds
-	}
-	// Rendering's local temporary buffers remain the source's cold formatting
-	// adaptation. Their scratch budgeting is unresolved and tracked in status.
-	digits := make([]uint32, int(size))
-	for i := range digits {
-		digits[i] = m.digit(a.cell, uint32(i))
-	}
-	s := new(NaturalManager).String(digits)
-	if a.val < 0 {
-		s = "-" + s
-	}
-	return s, nil
 }

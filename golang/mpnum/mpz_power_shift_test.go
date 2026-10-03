@@ -520,6 +520,7 @@ func TestPowerDomainAliases(t *testing.T) {
 		rm, b := rationalManager(t, synch)
 		a := NewRational()
 		rm.SetFraction(&a, -17, 13)
+		_ = rationalString(t, rm, &a) // warm owner-budgeted formatting before method invariant
 		before := b.Used()
 		e := rm.Power(&a, math.MaxUint32, &a)
 		if !errors.Is(e, ErrNonterminatingPower) || rationalString(t, rm, &a) != "-17/13" || b.Used() != before {

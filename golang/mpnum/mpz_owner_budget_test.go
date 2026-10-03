@@ -34,7 +34,7 @@ func TestIntegerOwnerHeaderBudgets(t *testing.T) {
 		t.Fatal("integer owner missing")
 	}
 	cs, ws := m.cells.Stats(), m.words.Stats()
-	measured := m.headerBytes + cs.OwnerBytes + cs.RecordBytes + cs.MetadataBytes + cs.DirectoryBytes + ws.OwnerBytes + ws.PayloadBytes + ws.BlockMetadataBytes + ws.DirectoryBytes + ws.Descriptors.OwnerBytes + ws.Descriptors.RecordBytes + ws.Descriptors.MetadataBytes + ws.Descriptors.DirectoryBytes
+	measured := m.headerBytes + m.natural.headerBytes + cs.OwnerBytes + cs.RecordBytes + cs.MetadataBytes + cs.DirectoryBytes + ws.OwnerBytes + ws.PayloadBytes + ws.BlockMetadataBytes + ws.DirectoryBytes + ws.Descriptors.OwnerBytes + ws.Descriptors.RecordBytes + ws.Descriptors.MetadataBytes + ws.Descriptors.DirectoryBytes
 	if b.Used() != measured {
 		t.Fatal("nested storage counted incorrectly", b.Used(), measured)
 	}

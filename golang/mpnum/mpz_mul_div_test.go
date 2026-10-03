@@ -229,7 +229,7 @@ func TestIntegerDivisionZeroAndBudgetFailure(t *testing.T) {
 			t.Fatal("zero divisor", e)
 		}
 	}
-	m.SetUint64(&a, math.MaxUint64)
+	m.SetLimbs(&a, []uint32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17})
 	b = NewInt(7)
 	budget.FailAfter(0)
 	if e := m.MachineDivRem(&a, &b, &q, &r); !errors.Is(e, arena.ErrInjectedFailure) || q.val != 19 || r.val != 23 {
@@ -349,7 +349,7 @@ func TestIntegerMulDivisionWarmAllocations(t *testing.T) {
 	if operationError != nil || allocations != 0 {
 		t.Fatal("warmed arithmetic allocates", allocations, operationError)
 	}
-	for _, ref := range m.divScratch {
+	for _, ref := range m.natural.divScratch {
 		if ref == (arena.VectorRef{}) {
 			continue
 		}

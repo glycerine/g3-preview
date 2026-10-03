@@ -702,3 +702,117 @@ runtime execution. Combined mpnum coverage is 89.8%, not complete path coverage.
 All edits/cache/temp/output remain under golang. Source unit status remains
 partial; formatting ownership, getters/scalar wrappers, higher arithmetic and
 public rational-wrapper integration are not silently marked implemented.
+
+## Standalone MPN and numeric formatting ownership closure
+
+This packet supersedes the earlier MPN slice-scratch and cold-formatting ownership
+notes. It remains a **partial numerical source unit**: MPN diagnostics/trace,
+remaining MPZ/MPQ operations and public/context wrapper integration are not
+claimed complete. Production arithmetic still uses source 32-bit limb Algorithms
+A/S/M/D and repeated decimal division; no production math/big, generics, unsafe,
+per-limb interfaces, or exposed arena slices were introduced.
+
+`NewNaturalManager(arena.VectorConfig)` / `Close` replace raw Go construction for
+stateful MPN operations. The standalone owner charges its own scalar/pointer
+header, Words and descriptor headers/pages, and all four source division buffers
+with requested initial capacity16. Requested capacities double separately from
+arena physical classes. An IntegerManager child borrows its parent's existing
+Words and the same Budget: it owns only its header, scratch refs and formatting
+byte service, and never duplicates the Words owner charge. Integer construction
+creates this source MPN member before initializing four numeric scratch cells and
+constants. Constructor reservation-prefix tests and idempotent Close release
+complete owner graphs; child Close leaves borrowed Words usable by the parent.
+
+One concrete ephemeral `limbView` chooses borrowed caller buffers or scalar
+Words indexing, and is never retained or returned. Public Natural Div and MPZ
+`divideCells` now share one Algorithm D implementation, including source quotient
+estimate correction, source zero-limb multiplication, subtraction and add-back.
+Natural `Div` now returns `(bool,error)` and requires initialized/open ownership.
+Its original valid-buffer assertions and non-overlap contracts remain explicit.
+MPZ shorter-numerator handling, output publication order, q==r behavior, signed
+quotient/remainder conventions, and documented divisor-output alias defects are
+unchanged. Existing independent sign/limb/alias/failure suites still run.
+
+Predictable-failure preparation reserves potential add-back storage before any
+borrowed quotient/remainder publication. **This is a narrow storage-profile
+adaptation**: ab can grow earlier, and on non-add-back paths where the source
+would retain capacity16. Its retained requested capacity is bounded by source
+16/doubling, and the logical add-back branch still executes only when the source
+borrow test requires it. Arithmetic remains a single source Algorithm D pass;
+no replay or substitute algorithm is used. A deterministic wide power-of-two
+fixture requires no add-back, verifies this earlier ab growth separately from
+its independent quotient/remainder oracle, and verifies warm zero allocations.
+Other source division normalization/growth policies remain intact.
+
+Dedicated retained formatting Words refs replace the source three local
+`temp`, `t_numer`, `t_denom` sbuffers. Multi-limb conversion copies into owned
+scratch, normalizes divisor10 by28 bits, executes source div_1, unnormalizes the
+remainder, removes high zero quotient limbs and reverses the decimal segment.
+Small signed/unsigned formatting uses finite scalar decimal emission equivalent
+to source stream/snprintf output. There are no unbudgeted numeral copies, digit
+arrays, per-call Natural owners, or intermediate numerator/denominator strings.
+A lazy budgeted `arena.SmallBytes` DirectOnly owner retains the char workspace
+with initial requested capacity1024 and doubling. Cold storage headers/pages and
+old-plus-new growth peaks are charged; this allocator/timing profile deliberately
+adapts source stack/stream storage. Byte growth copies the entire existing prefix
+before freeing the old workspace, so rational denominator preparation cannot
+overwrite the already formatted numerator or slash.
+
+Natural/Integer/Rational `FormatInto` stage complete owned text then publish to a
+borrowed `[]byte`. Returned length **excludes the C terminator**; exactly n bytes
+are written, with no extra NUL required or written. `ErrShortBuffer` reports the
+needed length and preserves destination bytes. Budget/fault errors also preserve
+caller output; successfully retained scratch after failure remains charged until
+owner Close. All source inputs are unchanged. Closed managers and a raw-zero
+NaturalManager are diagnosed; raw-zero Rational retains its invalid-denominator
+diagnostic. Natural String now returns `(string,error)`; existing Integer and
+Rational String signatures are unchanged. Each wrapper builds exactly one final
+escaped Go string from indexed owned bytes. That string is caller-owned host
+output, explicitly outside the numeric owner's budget/lifetime: there is no
+transient reservation pretending to account its escaped lifetime. Full public
+context/output-service ownership remains a separate integration gate.
+
+TDD: the migrated existing MPN assertions/oracles and initial new format tests
+were written before implementation; the observed package build was RED with
+undefined constructor/FormatInto/ErrShortBuffer APIs. The implementation passed
+those tests and all prior source fixtures (including production parser, powers,
+rounding, signed aliases and known source defects). The first package invocation
+used the repository root and failed package resolution; it wrote only configured
+`golang/.cache` cache/temp paths. The intended RED was rerun from golang with
+GO111MODULE=on. Existing storage assertions now count four additional cold
+Natural refs, force real wide-buffer growth for allocation-failure fixtures, and
+warm formatting before a Power-domain budget-invariance baseline.
+
+New permanent tests include complete constructor fault prefixes, exact nested
+owner/header/payload/metadata accounting, child/parent Close isolation, finite
+independent math/big division/decimal expectations, >1024 rational-prefix growth,
+cold/warm three-service formatting failure sweeps, borrowed-output division
+failure sweeps, real budget-limit refusal, short buffers/exact trailing-byte
+preservation, small INT_MIN text, raw/closed diagnostics, returned string lifetime
+past workspace replacement and Close, warm FormatInto/Div zero allocations and
+exactly one warm String allocation for the final caller-owned result. Tests are
+hermetic and finite; original 1000 arithmetic/2000 division-and-decimal independent
+MPN cases and all exact Add/Sub aliases remain. Source arithmetic assertions are
+MPZ magnitude projections and existing signed/rational source tests; additional
+buffer/budget/ownership expectations are explicitly Go adaptations, not claimed
+new C++ observations.
+
+Current method mapping: `mpn::compare/add/sub/mul` keep their existing public
+methods; `div` is `(bool,error)` `NaturalManager.Div`; `div_normalize` and
+`div_unnormalize` are the indexed normalization/remainder blocks of `divide`
+(and decimal preparation); `div_1` is `divideViewOne`; `div_n` is `divideMany`;
+`to_string` is `prepareNatural` + `FormatInto`/`String`. MPZ numeric `display` /
+`to_string` are `prepareInteger` + `FormatInto`/`String`; MPQ numeric rendering
+uses `prepareRational` + its two public rendering methods. Ostream interfaces,
+source trace/diagnostic methods and unrelated remaining numeric methods are
+unimplemented; no source-unit completion is implied.
+
+Verification for this packet: native/actual `g3checked` package suites GREEN;
+native race74.308s and actual checked race73.986s GREEN; native/checked vet and
+no-generics `portcheck` GREEN; full native numerical coverage89.4%; release and
+actual checked JS/WASI test-binary builds GREEN. All12 new storage/format test
+registrations ran and passed under actual `g3checked` JS with the existing
+TMPDIR-preserving toolchain-matched wrapper. Cross-builds alone are compilation
+evidence; only those stated JS registrations are execution evidence. Every
+write/cache/temp/output in this packet stayed under golang/.cache or the listed
+mpnum source/test/status files; no source C++ compiler/external fixture was used.

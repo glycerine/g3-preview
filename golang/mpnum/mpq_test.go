@@ -341,7 +341,7 @@ func TestRationalSourceInheritedIntegerAssertionsAndSelfAliases(t *testing.T) {
 
 func TestRationalConstructorAllocationFailures(t *testing.T) {
 	successes, failures := 0, 0
-	for after := int64(0); after < 32; after++ {
+	for after := int64(0); after < 128; after++ {
 		budget := arena.NewBudget(1 << 20)
 		budget.FailAfter(after)
 		m, e := NewRationalManager(RationalConfig{Integers: IntegerConfig{Cells: arena.Config{PageSize: 1, Budget: budget}, Words: arena.VectorConfig{PageSize: 8, Descriptors: arena.Config{PageSize: 1, Budget: budget}}}})

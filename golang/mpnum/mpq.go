@@ -290,23 +290,6 @@ func (m *RationalManager) Inv(a, out *Rational) error {
 	return m.Move(out, &work)
 }
 
-func (m *RationalManager) String(a *Rational) (string, error) {
-	if e := m.check(a); e != nil {
-		return "", e
-	}
-	n, e := m.z.String(&a.num)
-	if e != nil {
-		return "", e
-	}
-	if isIntegerRational(a) {
-		return n, nil
-	}
-	d, e := m.z.String(&a.den)
-	if e != nil {
-		return "", e
-	}
-	return n + "/" + d, nil
-}
 func (m *RationalManager) Equal(a, b *Rational) (bool, error) {
 	if e := m.check(a); e != nil {
 		return false, e

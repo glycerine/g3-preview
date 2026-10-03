@@ -79,8 +79,8 @@ func TestIntegerSourceIntMinSubtraction(t *testing.T) {
 
 func TestIntegerConstructorOwnership(t *testing.T) {
 	m, _ := integerManager(t)
-	if m.cells.Stats().Live != 6 || m.words.Stats().Live != 6 {
-		t.Fatal("source four scratch cells and two constants")
+	if m.cells.Stats().Live != 6 || m.words.Stats().Live != 10 {
+		t.Fatal("source four scratch cells, two constants, four Natural buffers")
 	}
 	for _, ref := range []numericCellRef{m.tmp[0], m.tmp[1], m.arg[0], m.arg[1], m.intMin.cell, m.two64.cell} {
 		c := m.cell(ref)
@@ -276,13 +276,14 @@ func TestIntegerFailurePublication(t *testing.T) {
 		m, budget := integerManager(t)
 		a := NewInt(17)
 		before := m.cells.Stats().Live
+		beforeWords := m.words.Stats().Live
 		budget.FailAfter(after)
 		digits := make([]uint32, 33)
 		digits[len(digits)-1] = 1
 		err := m.SetLimbs(&a, digits)
 		budget.FailAfter(-1)
 		if err != nil {
-			if integerString(t, m, &a) != "17" || m.cells.Stats().Live != before || m.words.Stats().Live != before {
+			if integerString(t, m, &a) != "17" || m.cells.Stats().Live != before || m.words.Stats().Live != beforeWords {
 				t.Fatalf("allocation failure %d published or leaked", after)
 			}
 		}
