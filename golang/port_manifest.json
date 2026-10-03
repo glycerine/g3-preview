@@ -88468,10 +88468,15 @@
       "go_targets": [
         "arena/small_bytes.go",
         "util_small_object_allocator.go",
-        "util_small_object_allocator_consolidate.go",
-        "util_small_object_allocator_vectors.go",
+        "memory/small_allocator_consolidate.go",
+        "memory/small_allocator_vectors.go",
         "util_small_object_allocator_stream.go",
-        "util_small_object_allocator_test.go"
+        "util_small_object_allocator_test.go",
+        "memory/small_allocator.go",
+        "memory/allocator_io.go",
+        "memory/small_allocator_test.go",
+        "memory/shared_runtime_api_test.go",
+        "util_memory_bridge_test.go"
       ],
       "tests": [
         "TestSmallBytesSourceExercise",
@@ -88508,15 +88513,27 @@
         "TestSmallObjectAllocatorPooledDuplicateFreePrefix",
         "TestSmallObjectAllocatorColdFailureSweepAndResetLedger",
         "TestSmallObjectAllocatorLexicalFailedFreeRoots",
-        "TestSmallObjectAllocatorGenerationExhaustionLedger"
+        "TestSmallObjectAllocatorGenerationExhaustionLedger",
+        "TestMemorySharedRuntimeAllocatorIdentity",
+        "TestMemorySharedSourceProfiles",
+        "TestMemorySharedTLSLaneGetterAndCumulativeCount",
+        "TestMemorySharedRawRefusalRetainsSourcePrefix",
+        "TestMemoryBorrowedStaticErrorAndAllocatorIO",
+        "TestMemoryScalarLocationRecords",
+        "TestMemoryNilTransportCannotSuppressFailure",
+        "TestMemoryVectorOverflowRetainsActualRootAndClass",
+        "TestMemoryBridgeColdHeadersAndConstructorUnwind",
+        "TestMemoryBridgeNominalOOMAndCountErrors",
+        "TestMemoryBridgeDefaultExceptionAndCopiedOwner",
+        "TestMemoryBridgePendingFinalizationRetainsAllHeaders"
       ],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
         {
-          "name": "standalone source allocator profiles, intrusive chunks/free links, runtime-backed consolidation and borrowed diagnostics",
+          "name": "source allocator profiles, intrusive chunks/free links, runtime-backed consolidation and retained cleanup roots",
           "status": "partial",
-          "go_target": "util_small_object_allocator_test.go",
+          "go_target": "memory/small_allocator.go",
           "tests": [
             "TestSmallObjectAllocatorRegisteredPrintOnlyReplay",
             "TestSmallObjectAllocatorProfilesThresholdsAndHeaders",
@@ -88531,21 +88548,29 @@
             "TestSmallObjectAllocatorScalarRefAuditAndPlacementDeletes",
             "TestSmallObjectAllocatorConstructorAndMetadataFailurePrefixes",
             "TestSmallObjectAllocatorPendingCompletedRawRoots",
-            "TestSmallObjectAllocatorBorrowedIDMutationAndWholeCStringWidth",
-            "TestSmallObjectAllocatorNullStaleIDErrorPrefixes",
-            "TestSmallObjectAllocatorDiagnosticOutputFailureAfterFree",
-            "TestSmallObjectAllocatorVerboseUsesRealRuntimeAndLexicalLifetime",
             "TestSmallObjectAllocatorConsolidateLateFreeRetainedRoots",
             "TestSmallObjectAllocatorPooledDuplicateFreePrefix",
             "TestSmallObjectAllocatorColdFailureSweepAndResetLedger",
             "TestSmallObjectAllocatorLexicalFailedFreeRoots",
             "TestSmallObjectAllocatorGenerationExhaustionLedger"
           ]
+        },
+        {
+          "name": "source allocator borrowed CString diagnostics and real NumericTextStream verbosity",
+          "status": "partial",
+          "go_target": "util_small_object_allocator_stream.go",
+          "tests": [
+            "TestSmallObjectAllocatorBorrowedIDMutationAndWholeCStringWidth",
+            "TestSmallObjectAllocatorNullStaleIDErrorPrefixes",
+            "TestSmallObjectAllocatorDiagnosticOutputFailureAfterFree",
+            "TestSmallObjectAllocatorVerboseUsesRealRuntimeAndLexicalLifetime"
+          ]
         }
       ],
       "ownership": [
         "Concrete byte owner with scalar descriptors/generation ledger. Caller destroys logical objects before storage reset/free. Budgeted backing/metadata, cold header charged by arena. DirectOnly translates the diagnostic bypass with zero source counter and separate measured owned bytes. See arena/PORT_STATUS.md.",
-        "Standalone concrete source allocator uses actual utilMemoryRuntime blocks and intrusive payload links. Full cold locator capacity and owner headers are charged; explicit pending/chunk cleanup retains actual failed-free roots. Direct blocks remain caller-owned across Reset and Close. See SMALL_OBJECT_ALLOCATOR_PACKET.md; typed numerical/solver allocator integration remains open."
+        "Standalone concrete source allocator uses actual utilMemoryRuntime blocks and intrusive payload links. Full cold locator capacity and owner headers are charged; explicit pending/chunk cleanup retains actual failed-free roots. Direct blocks remain caller-owned across Reset and Close. See SMALL_OBJECT_ALLOCATOR_PACKET.md; typed numerical/solver allocator integration remains open.",
+        "The sole allocator core now lives in memory.SmallAllocator over one actual borrowed memory.Runtime. Main wrappers separately charge their real wrapper/IO headers and retain them until pending roots finalize; genuine borrowed CString/NumericTextStream formatting remains in main. All41 original accounting/runtime/allocator test names are retained across packages; no solver/numeric backend wiring is claimed. See MEMORY_PACKAGE_API_PACKET.md."
       ],
       "deviations": [
         "Reset/Close reclaim tracked live direct blocks as explicit typed owner cleanup extension; source only frees pooled chunks.",
@@ -102717,8 +102742,15 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "util_memory_accounting.go",
-        "util_memory_runtime.go"
+        "util_memory_runtime.go",
+        "memory/accounting.go",
+        "memory/runtime.go",
+        "memory/failure.go",
+        "memory/tokens.go",
+        "memory/accounting_test.go",
+        "memory/runtime_test.go",
+        "memory/shared_runtime_api_test.go",
+        "util_memory_bridge_test.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -102739,7 +102771,19 @@
         "TestMemoryRuntimeIndependentPhysicalAndCounterModel",
         "TestMemoryRuntimeImmediateFaultGraphAndOwnerDomains",
         "TestMemoryRuntimeWrappedHeaderActualPhysicalPrefix",
-        "TestMemoryRuntimeShrinkRegrowByteLifetime"
+        "TestMemoryRuntimeShrinkRegrowByteLifetime",
+        "TestMemorySharedRuntimeAllocatorIdentity",
+        "TestMemorySharedSourceProfiles",
+        "TestMemorySharedTLSLaneGetterAndCumulativeCount",
+        "TestMemorySharedRawRefusalRetainsSourcePrefix",
+        "TestMemoryBorrowedStaticErrorAndAllocatorIO",
+        "TestMemoryScalarLocationRecords",
+        "TestMemoryNilTransportCannotSuppressFailure",
+        "TestMemoryVectorOverflowRetainsActualRootAndClass",
+        "TestMemoryBridgeColdHeadersAndConstructorUnwind",
+        "TestMemoryBridgeNominalOOMAndCountErrors",
+        "TestMemoryBridgeDefaultExceptionAndCopiedOwner",
+        "TestMemoryBridgePendingFinalizationRetainsAllHeaders"
       ],
       "conditionals": [
         {
@@ -102797,7 +102841,7 @@
         {
           "name": "scalar global and lane counter transitions, synchronization and read predicates; allocator/runtime and transport open",
           "status": "partial",
-          "go_target": "util_memory_accounting.go",
+          "go_target": "memory/accounting.go",
           "tests": [
             "TestMemoryAccountingBoundedIndependentLaneModel",
             "TestMemoryAccountingDeallocationClampAndWatermark",
@@ -102812,7 +102856,7 @@
         {
           "name": "actual owned raw allocation/reallocation/deallocation and size/count/peak/watermark routes, both source counter profiles and size widths; explicit transport/checked-lifetime adapters",
           "status": "ported",
-          "go_target": "util_memory_runtime.go",
+          "go_target": "memory/runtime.go",
           "tests": [
             "TestMemoryRuntimeActualBlocksHeadersAndReallocate",
             "TestMemoryRuntimeTLSStrictThresholdAndRepeatedCounts",
@@ -102824,13 +102868,33 @@
             "TestMemoryRuntimeIndependentPhysicalAndCounterModel",
             "TestMemoryRuntimeImmediateFaultGraphAndOwnerDomains",
             "TestMemoryRuntimeWrappedHeaderActualPhysicalPrefix",
-            "TestMemoryRuntimeShrinkRegrowByteLifetime"
+            "TestMemoryRuntimeShrinkRegrowByteLifetime",
+            "TestMemorySharedRuntimeAllocatorIdentity",
+            "TestMemorySharedSourceProfiles",
+            "TestMemorySharedTLSLaneGetterAndCumulativeCount",
+            "TestMemorySharedRawRefusalRetainsSourcePrefix",
+            "TestMemoryBorrowedStaticErrorAndAllocatorIO",
+            "TestMemoryScalarLocationRecords",
+            "TestMemoryNilTransportCannotSuppressFailure",
+            "TestMemoryVectorOverflowRetainsActualRootAndClass"
+          ]
+        },
+        {
+          "name": "main nominal Z3/default-exception transport and charged allocator bridge ownership",
+          "status": "ported",
+          "go_target": "util_memory_runtime.go",
+          "tests": [
+            "TestMemoryBridgeColdHeadersAndConstructorUnwind",
+            "TestMemoryBridgeNominalOOMAndCountErrors",
+            "TestMemoryBridgeDefaultExceptionAndCopiedOwner",
+            "TestMemoryBridgePendingFinalizationRetainsAllHeaders"
           ]
         }
       ],
       "ownership": [
         "Pointer-free scalar accounting is intended for once-charged runtime embedding with explicit caller-confined lanes and source counter prefixes. No raw allocator/backend or process-global integration is claimed; see MEMORY_ACCOUNTING_PORT_STATUS.md.",
-        "Actual prefix-bearing byte backings plus charged initialized-byte bitmap and cold allocation directory; immediate physical roots, TLS allocated-error owner and bad-header cleanup retain source action/counter prefixes. Real runtime typed-owner hooks, generated lifetime and process transports remain open. See RAW_MEMORY_PORT_STATUS.md."
+        "Actual prefix-bearing byte backings plus charged initialized-byte bitmap and cold allocation directory; immediate physical roots, TLS allocated-error owner and bad-header cleanup retain source action/counter prefixes. Real runtime typed-owner hooks, generated lifetime and process transports remain open. See RAW_MEMORY_PORT_STATUS.md.",
+        "One concrete lower memory.Runtime owns source accounting, physical backings and charged directories; main g3 aliases use the real static nominal-error bridge. Borrowed static transport is cold; nil-returning transport cannot suppress source failure. See MEMORY_PACKAGE_API_PACKET.md. Numeric/default-backend and full process-global wiring remain required."
       ],
       "deviations": [
         "Source signed-overflow/invalid-lane domains use scalar typed outcomes after completed field prefixes. Containing allocator must execute real physical operations between counter phases. Physical hooks, headers, generated callbacks, OOM exits/streams, concurrent global service and consumer integration remain open.",
@@ -102844,8 +102908,15 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "util_memory_accounting.go",
-        "util_memory_runtime.go"
+        "util_memory_runtime.go",
+        "memory/accounting.go",
+        "memory/runtime.go",
+        "memory/failure.go",
+        "memory/tokens.go",
+        "memory/accounting_test.go",
+        "memory/runtime_test.go",
+        "memory/shared_runtime_api_test.go",
+        "util_memory_bridge_test.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -102866,7 +102937,19 @@
         "TestMemoryRuntimeIndependentPhysicalAndCounterModel",
         "TestMemoryRuntimeImmediateFaultGraphAndOwnerDomains",
         "TestMemoryRuntimeWrappedHeaderActualPhysicalPrefix",
-        "TestMemoryRuntimeShrinkRegrowByteLifetime"
+        "TestMemoryRuntimeShrinkRegrowByteLifetime",
+        "TestMemorySharedRuntimeAllocatorIdentity",
+        "TestMemorySharedSourceProfiles",
+        "TestMemorySharedTLSLaneGetterAndCumulativeCount",
+        "TestMemorySharedRawRefusalRetainsSourcePrefix",
+        "TestMemoryBorrowedStaticErrorAndAllocatorIO",
+        "TestMemoryScalarLocationRecords",
+        "TestMemoryNilTransportCannotSuppressFailure",
+        "TestMemoryVectorOverflowRetainsActualRootAndClass",
+        "TestMemoryBridgeColdHeadersAndConstructorUnwind",
+        "TestMemoryBridgeNominalOOMAndCountErrors",
+        "TestMemoryBridgeDefaultExceptionAndCopiedOwner",
+        "TestMemoryBridgePendingFinalizationRetainsAllHeaders"
       ],
       "conditionals": [
         {
@@ -102928,7 +103011,7 @@
         {
           "name": "scalar global and lane counter transitions, synchronization and read predicates; allocator/runtime and transport open",
           "status": "partial",
-          "go_target": "util_memory_accounting.go",
+          "go_target": "memory/accounting.go",
           "tests": [
             "TestMemoryAccountingBoundedIndependentLaneModel",
             "TestMemoryAccountingDeallocationClampAndWatermark",
@@ -102943,7 +103026,7 @@
         {
           "name": "actual owned raw allocation/reallocation/deallocation and size/count/peak/watermark routes, both source counter profiles and size widths; explicit transport/checked-lifetime adapters",
           "status": "ported",
-          "go_target": "util_memory_runtime.go",
+          "go_target": "memory/runtime.go",
           "tests": [
             "TestMemoryRuntimeActualBlocksHeadersAndReallocate",
             "TestMemoryRuntimeTLSStrictThresholdAndRepeatedCounts",
@@ -102955,13 +103038,33 @@
             "TestMemoryRuntimeIndependentPhysicalAndCounterModel",
             "TestMemoryRuntimeImmediateFaultGraphAndOwnerDomains",
             "TestMemoryRuntimeWrappedHeaderActualPhysicalPrefix",
-            "TestMemoryRuntimeShrinkRegrowByteLifetime"
+            "TestMemoryRuntimeShrinkRegrowByteLifetime",
+            "TestMemorySharedRuntimeAllocatorIdentity",
+            "TestMemorySharedSourceProfiles",
+            "TestMemorySharedTLSLaneGetterAndCumulativeCount",
+            "TestMemorySharedRawRefusalRetainsSourcePrefix",
+            "TestMemoryBorrowedStaticErrorAndAllocatorIO",
+            "TestMemoryScalarLocationRecords",
+            "TestMemoryNilTransportCannotSuppressFailure",
+            "TestMemoryVectorOverflowRetainsActualRootAndClass"
+          ]
+        },
+        {
+          "name": "main nominal Z3/default-exception transport and charged allocator bridge ownership",
+          "status": "ported",
+          "go_target": "util_memory_runtime.go",
+          "tests": [
+            "TestMemoryBridgeColdHeadersAndConstructorUnwind",
+            "TestMemoryBridgeNominalOOMAndCountErrors",
+            "TestMemoryBridgeDefaultExceptionAndCopiedOwner",
+            "TestMemoryBridgePendingFinalizationRetainsAllHeaders"
           ]
         }
       ],
       "ownership": [
         "Pointer-free scalar accounting is intended for once-charged runtime embedding with explicit caller-confined lanes and source counter prefixes. No raw allocator/backend or process-global integration is claimed; see MEMORY_ACCOUNTING_PORT_STATUS.md.",
-        "Actual prefix-bearing byte backings plus charged initialized-byte bitmap and cold allocation directory; immediate physical roots, TLS allocated-error owner and bad-header cleanup retain source action/counter prefixes. Real runtime typed-owner hooks, generated lifetime and process transports remain open. See RAW_MEMORY_PORT_STATUS.md."
+        "Actual prefix-bearing byte backings plus charged initialized-byte bitmap and cold allocation directory; immediate physical roots, TLS allocated-error owner and bad-header cleanup retain source action/counter prefixes. Real runtime typed-owner hooks, generated lifetime and process transports remain open. See RAW_MEMORY_PORT_STATUS.md.",
+        "One concrete lower memory.Runtime owns source accounting, physical backings and charged directories; main g3 aliases use the real static nominal-error bridge. Borrowed static transport is cold; nil-returning transport cannot suppress source failure. See MEMORY_PACKAGE_API_PACKET.md. Numeric/default-backend and full process-global wiring remain required."
       ],
       "deviations": [
         "Source signed-overflow/invalid-lane domains use scalar typed outcomes after completed field prefixes. Containing allocator must execute real physical operations between counter phases. Physical hooks, headers, generated callbacks, OOM exits/streams, concurrent global service and consumer integration remain open.",
@@ -116569,10 +116672,15 @@
       "go_targets": [
         "arena/small_bytes.go",
         "util_small_object_allocator.go",
-        "util_small_object_allocator_consolidate.go",
-        "util_small_object_allocator_vectors.go",
+        "memory/small_allocator_consolidate.go",
+        "memory/small_allocator_vectors.go",
         "util_small_object_allocator_stream.go",
-        "util_small_object_allocator_test.go"
+        "util_small_object_allocator_test.go",
+        "memory/small_allocator.go",
+        "memory/allocator_io.go",
+        "memory/small_allocator_test.go",
+        "memory/shared_runtime_api_test.go",
+        "util_memory_bridge_test.go"
       ],
       "tests": [
         "TestSmallBytesSourceExercise",
@@ -116609,7 +116717,19 @@
         "TestSmallObjectAllocatorPooledDuplicateFreePrefix",
         "TestSmallObjectAllocatorColdFailureSweepAndResetLedger",
         "TestSmallObjectAllocatorLexicalFailedFreeRoots",
-        "TestSmallObjectAllocatorGenerationExhaustionLedger"
+        "TestSmallObjectAllocatorGenerationExhaustionLedger",
+        "TestMemorySharedRuntimeAllocatorIdentity",
+        "TestMemorySharedSourceProfiles",
+        "TestMemorySharedTLSLaneGetterAndCumulativeCount",
+        "TestMemorySharedRawRefusalRetainsSourcePrefix",
+        "TestMemoryBorrowedStaticErrorAndAllocatorIO",
+        "TestMemoryScalarLocationRecords",
+        "TestMemoryNilTransportCannotSuppressFailure",
+        "TestMemoryVectorOverflowRetainsActualRootAndClass",
+        "TestMemoryBridgeColdHeadersAndConstructorUnwind",
+        "TestMemoryBridgeNominalOOMAndCountErrors",
+        "TestMemoryBridgeDefaultExceptionAndCopiedOwner",
+        "TestMemoryBridgePendingFinalizationRetainsAllHeaders"
       ],
       "conditionals": [
         {
@@ -116770,9 +116890,9 @@
           ]
         },
         {
-          "name": "standalone source allocator profiles, intrusive chunks/free links, runtime-backed consolidation and borrowed diagnostics",
+          "name": "source allocator profiles, intrusive chunks/free links, runtime-backed consolidation and retained cleanup roots",
           "status": "partial",
-          "go_target": "util_small_object_allocator_test.go",
+          "go_target": "memory/small_allocator.go",
           "tests": [
             "TestSmallObjectAllocatorRegisteredPrintOnlyReplay",
             "TestSmallObjectAllocatorProfilesThresholdsAndHeaders",
@@ -116787,21 +116907,29 @@
             "TestSmallObjectAllocatorScalarRefAuditAndPlacementDeletes",
             "TestSmallObjectAllocatorConstructorAndMetadataFailurePrefixes",
             "TestSmallObjectAllocatorPendingCompletedRawRoots",
-            "TestSmallObjectAllocatorBorrowedIDMutationAndWholeCStringWidth",
-            "TestSmallObjectAllocatorNullStaleIDErrorPrefixes",
-            "TestSmallObjectAllocatorDiagnosticOutputFailureAfterFree",
-            "TestSmallObjectAllocatorVerboseUsesRealRuntimeAndLexicalLifetime",
             "TestSmallObjectAllocatorConsolidateLateFreeRetainedRoots",
             "TestSmallObjectAllocatorPooledDuplicateFreePrefix",
             "TestSmallObjectAllocatorColdFailureSweepAndResetLedger",
             "TestSmallObjectAllocatorLexicalFailedFreeRoots",
             "TestSmallObjectAllocatorGenerationExhaustionLedger"
           ]
+        },
+        {
+          "name": "source allocator borrowed CString diagnostics and real NumericTextStream verbosity",
+          "status": "partial",
+          "go_target": "util_small_object_allocator_stream.go",
+          "tests": [
+            "TestSmallObjectAllocatorBorrowedIDMutationAndWholeCStringWidth",
+            "TestSmallObjectAllocatorNullStaleIDErrorPrefixes",
+            "TestSmallObjectAllocatorDiagnosticOutputFailureAfterFree",
+            "TestSmallObjectAllocatorVerboseUsesRealRuntimeAndLexicalLifetime"
+          ]
         }
       ],
       "ownership": [
         "Concrete byte owner with scalar descriptors/generation ledger. Caller destroys logical objects before storage reset/free. Budgeted backing/metadata, cold header charged by arena. DirectOnly translates the diagnostic bypass with zero source counter and separate measured owned bytes. See arena/PORT_STATUS.md.",
-        "Standalone concrete source allocator uses actual utilMemoryRuntime blocks and intrusive payload links. Full cold locator capacity and owner headers are charged; explicit pending/chunk cleanup retains actual failed-free roots. Direct blocks remain caller-owned across Reset and Close. See SMALL_OBJECT_ALLOCATOR_PACKET.md; typed numerical/solver allocator integration remains open."
+        "Standalone concrete source allocator uses actual utilMemoryRuntime blocks and intrusive payload links. Full cold locator capacity and owner headers are charged; explicit pending/chunk cleanup retains actual failed-free roots. Direct blocks remain caller-owned across Reset and Close. See SMALL_OBJECT_ALLOCATOR_PACKET.md; typed numerical/solver allocator integration remains open.",
+        "The sole allocator core now lives in memory.SmallAllocator over one actual borrowed memory.Runtime. Main wrappers separately charge their real wrapper/IO headers and retain them until pending roots finalize; genuine borrowed CString/NumericTextStream formatting remains in main. All41 original accounting/runtime/allocator test names are retained across packages; no solver/numeric backend wiring is claimed. See MEMORY_PACKAGE_API_PACKET.md."
       ],
       "deviations": [
         "Reset/Close reclaim tracked live direct blocks as explicit typed owner cleanup extension; source only frees pooled chunks.",
@@ -116819,10 +116947,15 @@
       "go_targets": [
         "arena/small_bytes.go",
         "util_small_object_allocator.go",
-        "util_small_object_allocator_consolidate.go",
-        "util_small_object_allocator_vectors.go",
+        "memory/small_allocator_consolidate.go",
+        "memory/small_allocator_vectors.go",
         "util_small_object_allocator_stream.go",
-        "util_small_object_allocator_test.go"
+        "util_small_object_allocator_test.go",
+        "memory/small_allocator.go",
+        "memory/allocator_io.go",
+        "memory/small_allocator_test.go",
+        "memory/shared_runtime_api_test.go",
+        "util_memory_bridge_test.go"
       ],
       "tests": [
         "TestSmallBytesSourceExercise",
@@ -116859,7 +116992,19 @@
         "TestSmallObjectAllocatorPooledDuplicateFreePrefix",
         "TestSmallObjectAllocatorColdFailureSweepAndResetLedger",
         "TestSmallObjectAllocatorLexicalFailedFreeRoots",
-        "TestSmallObjectAllocatorGenerationExhaustionLedger"
+        "TestSmallObjectAllocatorGenerationExhaustionLedger",
+        "TestMemorySharedRuntimeAllocatorIdentity",
+        "TestMemorySharedSourceProfiles",
+        "TestMemorySharedTLSLaneGetterAndCumulativeCount",
+        "TestMemorySharedRawRefusalRetainsSourcePrefix",
+        "TestMemoryBorrowedStaticErrorAndAllocatorIO",
+        "TestMemoryScalarLocationRecords",
+        "TestMemoryNilTransportCannotSuppressFailure",
+        "TestMemoryVectorOverflowRetainsActualRootAndClass",
+        "TestMemoryBridgeColdHeadersAndConstructorUnwind",
+        "TestMemoryBridgeNominalOOMAndCountErrors",
+        "TestMemoryBridgeDefaultExceptionAndCopiedOwner",
+        "TestMemoryBridgePendingFinalizationRetainsAllHeaders"
       ],
       "conditionals": [
         {
@@ -116978,9 +117123,9 @@
           ]
         },
         {
-          "name": "standalone source allocator profiles, intrusive chunks/free links, runtime-backed consolidation and borrowed diagnostics",
+          "name": "source allocator profiles, intrusive chunks/free links, runtime-backed consolidation and retained cleanup roots",
           "status": "partial",
-          "go_target": "util_small_object_allocator_test.go",
+          "go_target": "memory/small_allocator.go",
           "tests": [
             "TestSmallObjectAllocatorRegisteredPrintOnlyReplay",
             "TestSmallObjectAllocatorProfilesThresholdsAndHeaders",
@@ -116995,21 +117140,29 @@
             "TestSmallObjectAllocatorScalarRefAuditAndPlacementDeletes",
             "TestSmallObjectAllocatorConstructorAndMetadataFailurePrefixes",
             "TestSmallObjectAllocatorPendingCompletedRawRoots",
-            "TestSmallObjectAllocatorBorrowedIDMutationAndWholeCStringWidth",
-            "TestSmallObjectAllocatorNullStaleIDErrorPrefixes",
-            "TestSmallObjectAllocatorDiagnosticOutputFailureAfterFree",
-            "TestSmallObjectAllocatorVerboseUsesRealRuntimeAndLexicalLifetime",
             "TestSmallObjectAllocatorConsolidateLateFreeRetainedRoots",
             "TestSmallObjectAllocatorPooledDuplicateFreePrefix",
             "TestSmallObjectAllocatorColdFailureSweepAndResetLedger",
             "TestSmallObjectAllocatorLexicalFailedFreeRoots",
             "TestSmallObjectAllocatorGenerationExhaustionLedger"
           ]
+        },
+        {
+          "name": "source allocator borrowed CString diagnostics and real NumericTextStream verbosity",
+          "status": "partial",
+          "go_target": "util_small_object_allocator_stream.go",
+          "tests": [
+            "TestSmallObjectAllocatorBorrowedIDMutationAndWholeCStringWidth",
+            "TestSmallObjectAllocatorNullStaleIDErrorPrefixes",
+            "TestSmallObjectAllocatorDiagnosticOutputFailureAfterFree",
+            "TestSmallObjectAllocatorVerboseUsesRealRuntimeAndLexicalLifetime"
+          ]
         }
       ],
       "ownership": [
         "Concrete byte owner with scalar descriptors/generation ledger. Caller destroys logical objects before storage reset/free. Budgeted backing/metadata, cold header charged by arena. DirectOnly translates the diagnostic bypass with zero source counter and separate measured owned bytes. See arena/PORT_STATUS.md.",
-        "Standalone concrete source allocator uses actual utilMemoryRuntime blocks and intrusive payload links. Full cold locator capacity and owner headers are charged; explicit pending/chunk cleanup retains actual failed-free roots. Direct blocks remain caller-owned across Reset and Close. See SMALL_OBJECT_ALLOCATOR_PACKET.md; typed numerical/solver allocator integration remains open."
+        "Standalone concrete source allocator uses actual utilMemoryRuntime blocks and intrusive payload links. Full cold locator capacity and owner headers are charged; explicit pending/chunk cleanup retains actual failed-free roots. Direct blocks remain caller-owned across Reset and Close. See SMALL_OBJECT_ALLOCATOR_PACKET.md; typed numerical/solver allocator integration remains open.",
+        "The sole allocator core now lives in memory.SmallAllocator over one actual borrowed memory.Runtime. Main wrappers separately charge their real wrapper/IO headers and retain them until pending roots finalize; genuine borrowed CString/NumericTextStream formatting remains in main. All41 original accounting/runtime/allocator test names are retained across packages; no solver/numeric backend wiring is claimed. See MEMORY_PACKAGE_API_PACKET.md."
       ],
       "deviations": [
         "Reset/Close reclaim tracked live direct blocks as explicit typed owner cleanup extension; source only frees pooled chunks.",

@@ -4,6 +4,7 @@ package g3
 
 import (
 	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
 	"math"
 )
 
@@ -59,29 +60,30 @@ func smallObjectCStringInto(out *NumericTextStream, region *arena.BytesRegion, t
 	}
 	return nil
 }
-func (a *utilSmallObjectAllocator) diagnostic() error {
-	if !a.config.Profile.Debug || a.allocSize == 0 {
-		return nil
-	}
-	out := a.config.Diagnostics
+func (b *smallObjectIOBridge) diagnostic(a *memory.SmallAllocator) error {
+	out := b.config.Diagnostics
 	if e := out.AppendCString("Memory leak detected for small object allocator '"); e != nil {
 		return e
 	}
-	if a.config.BorrowedID != nil || a.config.IDRef.Present || a.config.IDNull {
-		id := a.config.IDRef
-		if a.config.IDNull {
+	if b.config.BorrowedID != nil || b.config.IDRef.Present || b.config.IDNull {
+		id := b.config.IDRef
+		if b.config.IDNull {
 			id.Present = false
 		}
-		if e := smallObjectCStringInto(out, a.config.BorrowedID, id); e != nil {
+		if e := smallObjectCStringInto(out, b.config.BorrowedID, id); e != nil {
 			return e
 		}
-	} else if e := out.AppendCString(a.config.ID); e != nil {
+	} else if e := out.AppendCString(b.config.ID); e != nil {
 		return e
 	}
 	if e := out.AppendCString("'. "); e != nil {
 		return e
 	}
-	if e := out.AppendUint64(a.allocSize); e != nil {
+	count, e := a.AllocationSize()
+	if e != nil {
+		return e
+	}
+	if e := out.AppendUint64(count); e != nil {
 		return e
 	}
 	if e := out.AppendCString(" bytes leaked"); e != nil {
@@ -89,11 +91,8 @@ func (a *utilSmallObjectAllocator) diagnostic() error {
 	}
 	return out.AppendByte('\n') // explicit byte sink; native stderr flush remains open
 }
-func (a *utilSmallObjectAllocator) verbose(end bool) error {
-	if a.config.Verbosity < 20 {
-		return nil
-	}
-	out := a.config.Verbose
+func (b *smallObjectIOBridge) verbose(a *memory.SmallAllocator, end bool) error {
+	out := b.config.Verbose
 	prefix := "(allocator-consolidate :wasted-size "
 	if end {
 		prefix = "(end-allocator-consolidate :wasted-size "
@@ -117,7 +116,7 @@ func (a *utilSmallObjectAllocator) verbose(end bool) error {
 	if e = out.SetPrecision(2); e != nil {
 		return e
 	}
-	n, e := a.config.Runtime.AllocationSize()
+	n, e := b.config.Runtime.AllocationSize()
 	if e != nil {
 		return e
 	}
@@ -128,4 +127,16 @@ func (a *utilSmallObjectAllocator) verbose(end bool) error {
 		return e
 	}
 	return out.AppendByte('\n')
+}
+
+func (b *smallObjectIOBridge) Emit(a *memory.SmallAllocator, event memory.AllocatorIOEvent) error {
+	switch event {
+	case memory.AllocatorIOLeak:
+		return b.diagnostic(a)
+	case memory.AllocatorIOVerboseStart:
+		return b.verbose(a, false)
+	case memory.AllocatorIOVerboseEnd:
+		return b.verbose(a, true)
+	}
+	return memory.ErrAllocatorIO
 }

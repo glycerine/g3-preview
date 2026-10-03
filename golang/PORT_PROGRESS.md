@@ -1422,3 +1422,17 @@ frozen gates and the explicit both-negative nontermination boundary. Other
 arithmetic staging, physical source allocator integration, nonselected backends
 and the full solver/proof/interpolation objective remain open. No whole source
 unit is promoted.
+
+
+## Shared concrete source memory implementation
+
+Raw source accounting, physical runtime storage and the small-object allocator
+now live in one concrete memory package. The main package uses that same core
+through aliases and charged diagnostic wrappers, preserving the actual borrowed
+CString and NumericTextStream operations. All41 original tests retain their
+names and source/failure assertions across the package move. Tests first expose
+missing shared APIs, cold-wrapper charge omissions and a transport that could
+suppress a source refusal. See MEMORY_PACKAGE_API_PACKET.md for frozen evidence.
+Actual default MPZ/natural storage integration, generated/global memory lifecycle
+and full solver/proof/interpolation remain required. No whole source unit is
+promoted.
