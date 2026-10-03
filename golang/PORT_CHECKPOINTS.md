@@ -213,3 +213,14 @@ vet and source/no-generics in the frozen isolated tree documented in
 passed the affected Natural, parser-publication and service-statistics groups
 in native and checked/debug profiles. Broader backend suites remain RED;
 SourceFinalize, lexical formatting and transitive outer cleanup are unfinished.
+
+
+Rational paired/scalar setter publication is preserved as a tests-first RED
+checkpoint. Three new executable tests expose crossed-reference branch/reread
+behavior, source-defined zero-denominator publication, and numerator publication
+before refused denominator allocation. Isolated HEAD e9f911f plus only the new
+test produced native/debug RED; production remains unchanged. Run
+`go test ./mpnum -run '^TestSetterPublication' -count=1` and repeat with
+`-tags g3checked,g3debug`. These tests are deliberately untagged and failing
+until direct source setter actions are implemented; no green package claim.
+`MPQ_SETTER_PUBLICATION_PACKET.md` contains source inventory and remaining scope.
