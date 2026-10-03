@@ -766,3 +766,18 @@ native/checked-debug, named race/actual JS, vet and WASI compilation are checked
 independently. Whole MPBQ units remain partial for source trace and full ostream
 integration; MPBQI, polynomial/algebraic managers
 and the full solver remain open. See MPBQ_PORT_STATUS.md.
+
+## Concrete external numeric text stream
+
+A concrete cold text stream now models the selected C-locale/libstdc++ AMD64
+precision ABI and nearest/even IEEE64 default/fixed/scientific output. Eight
+test groups cover independent exact binary-rational rounding, signs/specials,
+integer type widths/base, persistent flags and one-shot width, real old/new
+scratch peaks and allocation-failure byte prefixes. Initial missing-API RED
+preceded implementation; behavioral RED corrected a virtual width host cap and
+embedded-NUL String truncation. Independent frozen full native/checked-debug,
+named race/actual JS, vet/WASI/source-no-generics gates passed. This is an
+external num_put platform adaptation, not completed statistics production.
+The Statistics audit now records the real nonadvancing internal key loop;
+locales, process rounding, other stream runtimes, collectors and solver
+consumers remain open. See FLOAT_STREAM_PORT_STATUS.md.
