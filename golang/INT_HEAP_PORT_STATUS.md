@@ -19,8 +19,9 @@ Comparators must be strict, nonreentrant and nonpanicking.
   position assignments and comparator notification directions. No priority is
   copied into a heap record. Source mutable-priority callers update the borrowed
   priority environment then notify the appropriate direction.
-- reset/clear preserve both capacities and zero the complete logical inverse
-  vector. set_bounds/reserve retain source shrinking/resizing/no-op behavior;
+- reset/clear return immediately when empty, retaining any failed-insert inverse
+  entries. When nonempty they preserve both capacities and zero the complete
+  logical inverse vector. set_bounds/reserve retain source shrinking/resizing/no-op behavior;
   unsafe live-key shrink is refused before mutation. Newly exposed indices are
   zeroed, including regrowth of retained capacity. Negative Reserve is a no-op.
 - Source vector resize repeatedly expands 2,3,5,8,12,18,27,41,..., rather than
@@ -52,8 +53,9 @@ Comparators must be strict, nonreentrant and nonpanicking.
   successful scratch capacity prefixes remain charged. Returned output belongs
   to the caller; no internal backing escapes.
 - display preserves recursive preorder, indentation and decimal/newline spelling.
-  Its result is caller-owned diagnostic output. check_invariant checks the source
-  parent ordering and inverse mappings, plus the independent reverse mapping.
+  Its result is caller-owned diagnostic output. check_invariant visits live values
+  and checks their parent ordering and inverse mappings, as the source does.
+  Additional inverse entries after failed insertion do not fail this traversal.
 
 Every retained backing capacity and reflect-sized cold owner header is charged.
 Replacement allocation charges full old+new capacity. Close refunds the complete
@@ -90,3 +92,28 @@ its previously documented runtime startup gap remains open.
 
 This completes the integer heap utility, not its solver consumers or any
 AST/solver/proof/interpolation milestone. The full port goal remains active.
+
+## Insert allocation-failure statement order
+
+Source insert writes the inverse index before pushing into the value vector.
+Three additional regression groups first failed against the previous Go ordering.
+The implementation now retains this observable membership prefix when reservation
+fails, including finite old+new budget refusal. Checked iterators invalidate as
+soon as the inverse entry is published. Empty reset/clear preserve that entry;
+nonempty reset clears it. Close refunds the full physical graph in either state.
+
+Erase/Increased/Decreased return ErrHeapValue before the source's next
+out-of-bounds value access if the inverse entry lacks a slot; they retain the
+completed prefix. An in-range entry still follows source operations even when
+its slot contains a different value. A regression preserves priority notification
+and last-slot erase behavior after a later insertion occupies the failed index.
+This is not a repair of the source inverse entries or a stronger reverse invariant.
+
+Independent frozen HEAD-plus-heap snapshot gates passed: full native and full
+checked/debug module tests; all twelve heap test names RUN/PASS under checked/debug
+race and actual Node JS/WASM execution; checked/debug vet and WASI compilation;
+source fingerprint and no-generics audit. The source ledger remains 33 ported,
+65 partial and 2004 unported; this corrects existing heap coverage without adding
+source/API completion claims. The first three regression groups were observed
+behavioral RED before the ordering/invariant correction; the out-of-bounds
+continuation separately remained RED before adding its access guards.

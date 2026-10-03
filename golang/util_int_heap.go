@@ -132,6 +132,9 @@ func (h *IntHeap) Bounds() int32 {
 func (h *IntHeap) Contains(v int32) bool {
 	return h != nil && !h.closed && v >= 0 && int64(v) < int64(len(h.indices)) && h.indices[v] != 0
 }
+
+// CheckInvariant checks live values, as the source traversal does. Failed
+// insertion can leave additional inverse entries that this check does not visit.
 func (h *IntHeap) CheckInvariant() bool {
 	if h == nil || h.closed || len(h.values) == 0 || h.values[0] != -1 {
 		return false
@@ -142,11 +145,6 @@ func (h *IntHeap) CheckInvariant() bool {
 			return false
 		}
 		if i > 1 && h.lt(v, h.values[i/2]) {
-			return false
-		}
-	}
-	for v, i := range h.indices {
-		if i != 0 && (i < 1 || int64(i) >= int64(len(h.values)) || h.values[i] != int32(v)) {
 			return false
 		}
 	}
@@ -193,14 +191,16 @@ func (h *IntHeap) Insert(v int32) error {
 	if len(h.values) == 1<<31-1 {
 		return arena.ErrSlotLimit
 	}
+	i := int32(len(h.values))
+	// Source publishes membership before the fallible vector push. Preserve
+	// that inverse index even when the replacement backing cannot be reserved.
+	h.indices[v] = i
+	h.epoch++
 	if e := h.grow(&h.values, len(h.values)+1); e != nil {
 		return e
 	}
-	i := int32(len(h.values))
-	h.indices[v] = i
 	h.values = append(h.values, v)
 	h.up(i)
-	h.epoch++
 	return nil
 }
 func (h *IntHeap) Min() (int32, error) {
@@ -226,7 +226,10 @@ func (h *IntHeap) Erase(v int32) error {
 	if e := h.canChange(); e != nil {
 		return e
 	}
-	if !h.Contains(v) {
+	if !h.Contains(v) || h.indices[v] < 1 || int64(h.indices[v]) >= int64(len(h.values)) {
+		// A failed source insert can leave a nonzero inverse index without
+		// a value slot. Guard the source's next out-of-bounds access, retaining
+		// the completed prefix. In-range indices still follow source actions.
 		return ErrHeapValue
 	}
 	i := h.indices[v]
@@ -249,7 +252,10 @@ func (h *IntHeap) Increased(v int32) error {
 	if e := h.canChange(); e != nil {
 		return e
 	}
-	if !h.Contains(v) {
+	if !h.Contains(v) || h.indices[v] < 1 || int64(h.indices[v]) >= int64(len(h.values)) {
+		// A failed source insert can leave a nonzero inverse index without
+		// a value slot. Guard the source's next out-of-bounds access, retaining
+		// the completed prefix. In-range indices still follow source actions.
 		return ErrHeapValue
 	}
 	h.down(h.indices[v])
@@ -260,7 +266,10 @@ func (h *IntHeap) Decreased(v int32) error {
 	if e := h.canChange(); e != nil {
 		return e
 	}
-	if !h.Contains(v) {
+	if !h.Contains(v) || h.indices[v] < 1 || int64(h.indices[v]) >= int64(len(h.values)) {
+		// A failed source insert can leave a nonzero inverse index without
+		// a value slot. Guard the source's next out-of-bounds access, retaining
+		// the completed prefix. In-range indices still follow source actions.
 		return ErrHeapValue
 	}
 	h.up(h.indices[v])

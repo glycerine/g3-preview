@@ -87973,7 +87973,10 @@
         "TestIntHeapEpochBoundsIteratorAndComparatorSwap",
         "TestIntHeapSourceBoundsGrowth",
         "TestIntHeapCopyAndAllocationSizeBoundary",
-        "TestIntHeapSwapSecondReservationAndFinitePeak"
+        "TestIntHeapSwapSecondReservationAndFinitePeak",
+        "TestIntHeapSourceInsertFailurePrefix",
+        "TestIntHeapSourceEmptyResetAndGhostGuards",
+        "TestIntHeapSourceGhostInRangeContinuation"
       ],
       "conditionals": [
         {
@@ -88155,7 +88158,10 @@
             "TestIntHeapEpochBoundsIteratorAndComparatorSwap",
             "TestIntHeapSourceBoundsGrowth",
             "TestIntHeapCopyAndAllocationSizeBoundary",
-            "TestIntHeapSwapSecondReservationAndFinitePeak"
+            "TestIntHeapSwapSecondReservationAndFinitePeak",
+            "TestIntHeapSourceInsertFailurePrefix",
+            "TestIntHeapSourceEmptyResetAndGhostGuards",
+            "TestIntHeapSourceGhostInRangeContinuation"
           ]
         },
         {
@@ -88187,7 +88193,10 @@
             "TestIntHeapEpochBoundsIteratorAndComparatorSwap",
             "TestIntHeapSourceBoundsGrowth",
             "TestIntHeapCopyAndAllocationSizeBoundary",
-            "TestIntHeapSwapSecondReservationAndFinitePeak"
+            "TestIntHeapSwapSecondReservationAndFinitePeak",
+            "TestIntHeapSourceInsertFailurePrefix",
+            "TestIntHeapSourceEmptyResetAndGhostGuards",
+            "TestIntHeapSourceGhostInRangeContinuation"
           ]
         },
         {
@@ -88203,7 +88212,10 @@
             "TestIntHeapEpochBoundsIteratorAndComparatorSwap",
             "TestIntHeapSourceBoundsGrowth",
             "TestIntHeapCopyAndAllocationSizeBoundary",
-            "TestIntHeapSwapSecondReservationAndFinitePeak"
+            "TestIntHeapSwapSecondReservationAndFinitePeak",
+            "TestIntHeapSourceInsertFailurePrefix",
+            "TestIntHeapSourceEmptyResetAndGhostGuards",
+            "TestIntHeapSourceGhostInRangeContinuation"
           ]
         },
         {
@@ -88219,7 +88231,10 @@
             "TestIntHeapEpochBoundsIteratorAndComparatorSwap",
             "TestIntHeapSourceBoundsGrowth",
             "TestIntHeapCopyAndAllocationSizeBoundary",
-            "TestIntHeapSwapSecondReservationAndFinitePeak"
+            "TestIntHeapSwapSecondReservationAndFinitePeak",
+            "TestIntHeapSourceInsertFailurePrefix",
+            "TestIntHeapSourceEmptyResetAndGhostGuards",
+            "TestIntHeapSourceGhostInRangeContinuation"
           ]
         },
         {
@@ -88235,7 +88250,10 @@
             "TestIntHeapEpochBoundsIteratorAndComparatorSwap",
             "TestIntHeapSourceBoundsGrowth",
             "TestIntHeapCopyAndAllocationSizeBoundary",
-            "TestIntHeapSwapSecondReservationAndFinitePeak"
+            "TestIntHeapSwapSecondReservationAndFinitePeak",
+            "TestIntHeapSourceInsertFailurePrefix",
+            "TestIntHeapSourceEmptyResetAndGhostGuards",
+            "TestIntHeapSourceGhostInRangeContinuation"
           ]
         },
         {
@@ -88293,7 +88311,8 @@
       "deviations": [
         "Typed precondition/closed/overflow/epoch errors replace invalid source operations. Safe readonly iterators replace raw mutable backing pointers.",
         "Retained budgeted find_le workspace stages caller output; failed predictable preparation preserves caller result. Deep Assign stages a charged clone before publication.",
-        "Source signed-shift overflow children are discarded; all representable source child pushes and traversal order are preserved."
+        "Source signed-shift overflow children are discarded; all representable source child pushes and traversal order are preserved.",
+        "Insert publishes the inverse index before fallible value growth, preserving source failure membership. Its publication invalidates checked iterators even on failure. Empty reset retains this prefix; live-value invariant traversal ignores additional inverse entries. Subsequent out-of-bounds slot accesses return ErrHeapValue without repairing the source state; in-range source actions remain executable."
       ]
     },
     {

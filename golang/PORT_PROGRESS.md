@@ -816,3 +816,15 @@ long warm queries allocate no Go objects. Independent frozen full native/checked
 debug, named race/actual JS, vet/WASI/source-no-generics gates passed. Source/API
 coverage counts are unchanged; real AST name construction and the full manager
 remain in progress. See utilhash/PORT_STATUS.md.
+
+## Heap insertion failure prefixes
+
+Source review for the SAT activity queue found an existing heap ordering mismatch:
+insert publishes an inverse index before its value-vector push can fail. Three
+new regressions first failed, then passed after preserving that prefix and the
+source's forward-only invariant traversal. Empty reset keeps the inverse entry;
+nonempty reset clears it. Defined in-range continuations remain executable, while
+actual out-of-bounds continuations return a typed error before mutation. Frozen
+full native/checked-debug, twelve named race/actual JS, vet/WASI and source/no-
+generics checks passed. Coverage counts are unchanged. AST, MPFF and complete SAT
+storage packets continue in parallel; the full solver port remains incomplete.

@@ -262,10 +262,12 @@ func TestIntHeapBudgetsFailuresSwapAndWarm(t *testing.T) {
 	heapMust(t, h.Insert(1))
 	before := b.Used()
 	b.FailAfter(0)
-	if e := h.Insert(2); !errors.Is(e, arena.ErrInjectedFailure) || h.Size() != 1 || h.Contains(2) || b.Used() != before {
+	if e := h.Insert(2); !errors.Is(e, arena.ErrInjectedFailure) || h.Size() != 1 || !h.Contains(2) || b.Used() != before {
 		t.Fatal("growth publication", e)
 	}
 	b.FailAfter(-1)
+	heapMust(t, h.Reset())
+	heapMust(t, h.Insert(1))
 	heapMust(t, h.Insert(2))
 	for i := int32(3); i < 10; i++ {
 		heapMust(t, h.Insert(i))
@@ -550,7 +552,7 @@ func TestIntHeapSwapSecondReservationAndFinitePeak(t *testing.T) {
 	p := testIntHeap(t, 2, IntHeapConfig{Budget: peak})
 	heapMust(t, p.Insert(0))
 	used := peak.Used()
-	if e := p.Insert(1); !errors.Is(e, arena.ErrBudget) || peak.Used() != used || p.Contains(1) || !p.CheckInvariant() {
+	if e := p.Insert(1); !errors.Is(e, arena.ErrBudget) || peak.Used() != used || !p.Contains(1) || !p.CheckInvariant() {
 		t.Fatal("old plus new capacity refusal", e)
 	}
 }
