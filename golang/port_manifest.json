@@ -97281,7 +97281,8 @@
         "mpnum/mpq_ops.go",
         "mpnum/mp_copy.go",
         "mpnum/mpq_number_theory.go",
-        "mpnum/mpq_inspect.go"
+        "mpnum/mpq_inspect.go",
+        "mpnum/mpq_bitwise.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -97380,7 +97381,9 @@
         "TestRationalInspectionEveryFailurePrefix",
         "TestRationalInspectionWarmAllocationAndIndependentValues",
         "TestRationalInspectionRawActionsAndIndependentIncrement",
-        "TestRationalInspectionAliasedCopyFailureCleanup"
+        "TestRationalInspectionAliasedCopyFailureCleanup",
+        "TestRationalBitwiseForwardingIndependentAndAliases",
+        "TestRationalBitwiseFailureOwnershipAndDenominatorPublication"
       ],
       "conditionals": [
         {
@@ -98145,6 +98148,15 @@
             "TestRationalInspectionRawActionsAndIndependentIncrement",
             "TestRationalInspectionAliasedCopyFailureCleanup"
           ]
+        },
+        {
+          "name": "bitwise_or/and/xor/not integer-valued rational forwarding and denominator reset",
+          "status": "ported",
+          "go_target": "mpnum/mpq_bitwise.go",
+          "tests": [
+            "TestRationalBitwiseForwardingIndependentAndAliases",
+            "TestRationalBitwiseFailureOwnershipAndDenominatorPublication"
+          ]
         }
       ],
       "ownership": [
@@ -98157,7 +98169,8 @@
         "Mixed/fused locals use borrowed integer-manager storage; nonsynch reuses existing named caches, synch deletes all locals. Failed-prefix tests independently audit immediate live cells/Words before rendering or teardown. See mpnum/RATIONAL_OPS_PORT_STATUS.md.",
         "Explicit-owner CopyFrom uses source indexed limbs and destination-owned cells/Words. Source set/copy shapes are preserved; rational pair staging preserves raw signed/unreduced representation. Raw records require genuine caller-supplied owners; public provenance is a separate service. See NUMERAL_COPY_PORT_STATUS.md.",
         "Number theory locals use existing budgeted numerical cells/Words and are always deleted in source order. ExtendedGCD preserves coefficient publication/failure prefixes and rational denominator reset timing; immediate failed-prefix caller/cache roots audited. See NUMBER_THEORY_PORT_STATUS.md.",
-        "Inspection uses existing integer roots; extraction acquires deep independent limbs and thin setters/swap retain source component identity. Failed-prefix tests audit cells/Words and decoded values before rendering/teardown. See RATIONAL_INSPECTION_PORT_STATUS.md."
+        "Inspection uses existing integer roots; extraction acquires deep independent limbs and thin setters/swap retain source component identity. Failed-prefix tests audit cells/Words and decoded values before rendering/teardown. See RATIONAL_INSPECTION_PORT_STATUS.md.",
+        "Bitwise rational wrappers forward actual numerator aliases to existing budgeted integer manager, then reset denominator; fault roots and malformed integer domains checked. See RATIONAL_FACADE_EXTRA_PORT_STATUS.md."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -102433,11 +102446,12 @@
       "sha256": "a23db256b5025d27e9bc295e0aa3c0d2d3892baf7d5c6845f35cff3579ea4b9c",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "mpnum/mpq_inspect.go",
         "mpnum/rational_service.go",
-        "mpnum/rational_service_ops.go"
+        "mpnum/rational_service_ops.go",
+        "mpnum/rational_service_extra.go"
       ],
       "tests": [
         "TestSourceRationalConversionAssertions",
@@ -102476,7 +102490,19 @@
         "TestRationalFacadeProvenanceAndNoncanonicalSourceShapes",
         "TestRationalFacadeWarmZeroAllocations",
         "TestRationalFacadeInspectionForwardingAndSourceOutputAliases",
-        "TestRationalFacadeCompoundFailureAliases"
+        "TestRationalFacadeCompoundFailureAliases",
+        "TestRationalServiceExtraSourceTST8",
+        "TestRationalServiceExtraRootSourcePublicationAndAliases",
+        "TestRationalServiceExtraNumberTheoryAndBitwise",
+        "TestRationalServiceExtraDisplayAndProjection",
+        "TestRationalServiceExtraScopedIntegerBridge",
+        "TestRationalServiceExtraFailurePrefixesAndOwnership",
+        "TestRationalServiceExtraFormattingPublicationAndProvenance",
+        "TestRationalServiceExtraWarmReuse",
+        "TestRationalServiceExtraIndependentRootsAndCoefficients",
+        "TestRationalServiceExtraIntegerBridgeFailureCleanup",
+        "TestRationalServiceExtraScopedRationalConstructor",
+        "TestRationalServiceExtraToScopedRationalOwnershipAndFailures"
       ],
       "conditionals": [
         {
@@ -102514,8 +102540,8 @@
           "text": "SASSERT(!is_neg());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "is_unsigned/get_unsigned inclusive UINT_MAX projection through explicit manager",
@@ -102708,17 +102734,133 @@
             "TestRationalFacadeInspectionForwardingAndSourceOutputAliases",
             "TestRationalFacadeCompoundFailureAliases"
           ]
+        },
+        {
+          "name": "root/perfect-square direct output identities",
+          "status": "ported",
+          "go_target": "mpnum/rational_service_extra.go",
+          "tests": [
+            "TestRationalServiceExtraSourceTST8",
+            "TestRationalServiceExtraRootSourcePublicationAndAliases",
+            "TestRationalServiceExtraNumberTheoryAndBitwise",
+            "TestRationalServiceExtraDisplayAndProjection",
+            "TestRationalServiceExtraScopedIntegerBridge",
+            "TestRationalServiceExtraFailurePrefixesAndOwnership",
+            "TestRationalServiceExtraFormattingPublicationAndProvenance",
+            "TestRationalServiceExtraWarmReuse",
+            "TestRationalServiceExtraIndependentRootsAndCoefficients",
+            "TestRationalServiceExtraIntegerBridgeFailureCleanup",
+            "TestRationalServiceExtraScopedRationalConstructor",
+            "TestRationalServiceExtraToScopedRationalOwnershipAndFailures"
+          ]
+        },
+        {
+          "name": "LCM and manager GCD coefficient value overload with ordered direct outputs",
+          "status": "ported",
+          "go_target": "mpnum/rational_service_extra.go",
+          "tests": [
+            "TestRationalServiceExtraSourceTST8",
+            "TestRationalServiceExtraRootSourcePublicationAndAliases",
+            "TestRationalServiceExtraNumberTheoryAndBitwise",
+            "TestRationalServiceExtraDisplayAndProjection",
+            "TestRationalServiceExtraScopedIntegerBridge",
+            "TestRationalServiceExtraFailurePrefixesAndOwnership",
+            "TestRationalServiceExtraFormattingPublicationAndProvenance",
+            "TestRationalServiceExtraWarmReuse",
+            "TestRationalServiceExtraIndependentRootsAndCoefficients",
+            "TestRationalServiceExtraIntegerBridgeFailureCleanup",
+            "TestRationalServiceExtraScopedRationalConstructor",
+            "TestRationalServiceExtraToScopedRationalOwnershipAndFailures"
+          ]
+        },
+        {
+          "name": "bitwise value wrappers",
+          "status": "ported",
+          "go_target": "mpnum/rational_service_extra.go",
+          "tests": [
+            "TestRationalServiceExtraSourceTST8",
+            "TestRationalServiceExtraRootSourcePublicationAndAliases",
+            "TestRationalServiceExtraNumberTheoryAndBitwise",
+            "TestRationalServiceExtraDisplayAndProjection",
+            "TestRationalServiceExtraScopedIntegerBridge",
+            "TestRationalServiceExtraFailurePrefixesAndOwnership",
+            "TestRationalServiceExtraFormattingPublicationAndProvenance",
+            "TestRationalServiceExtraWarmReuse",
+            "TestRationalServiceExtraIndependentRootsAndCoefficients",
+            "TestRationalServiceExtraIntegerBridgeFailureCleanup",
+            "TestRationalServiceExtraScopedRationalConstructor",
+            "TestRationalServiceExtraToScopedRationalOwnershipAndFailures"
+          ]
+        },
+        {
+          "name": "checked mpz/mpq constructor and to_mpq scoped owning adapters",
+          "status": "ported",
+          "go_target": "mpnum/rational_service_extra.go",
+          "tests": [
+            "TestRationalServiceExtraSourceTST8",
+            "TestRationalServiceExtraRootSourcePublicationAndAliases",
+            "TestRationalServiceExtraNumberTheoryAndBitwise",
+            "TestRationalServiceExtraDisplayAndProjection",
+            "TestRationalServiceExtraScopedIntegerBridge",
+            "TestRationalServiceExtraFailurePrefixesAndOwnership",
+            "TestRationalServiceExtraFormattingPublicationAndProvenance",
+            "TestRationalServiceExtraWarmReuse",
+            "TestRationalServiceExtraIndependentRootsAndCoefficients",
+            "TestRationalServiceExtraIntegerBridgeFailureCleanup",
+            "TestRationalServiceExtraScopedRationalConstructor",
+            "TestRationalServiceExtraToScopedRationalOwnershipAndFailures"
+          ]
+        },
+        {
+          "name": "typed unreachable double constructor/assignment",
+          "status": "ported",
+          "go_target": "mpnum/rational_service_extra.go",
+          "tests": [
+            "TestRationalServiceExtraSourceTST8",
+            "TestRationalServiceExtraRootSourcePublicationAndAliases",
+            "TestRationalServiceExtraNumberTheoryAndBitwise",
+            "TestRationalServiceExtraDisplayAndProjection",
+            "TestRationalServiceExtraScopedIntegerBridge",
+            "TestRationalServiceExtraFailurePrefixesAndOwnership",
+            "TestRationalServiceExtraFormattingPublicationAndProvenance",
+            "TestRationalServiceExtraWarmReuse",
+            "TestRationalServiceExtraIndependentRootsAndCoefficients",
+            "TestRationalServiceExtraIntegerBridgeFailureCleanup",
+            "TestRationalServiceExtraScopedRationalConstructor",
+            "TestRationalServiceExtraToScopedRationalOwnershipAndFailures"
+          ]
+        },
+        {
+          "name": "owned self/zero projections and display/decimal forwarding",
+          "status": "ported",
+          "go_target": "mpnum/rational_service_extra.go",
+          "tests": [
+            "TestRationalServiceExtraSourceTST8",
+            "TestRationalServiceExtraRootSourcePublicationAndAliases",
+            "TestRationalServiceExtraNumberTheoryAndBitwise",
+            "TestRationalServiceExtraDisplayAndProjection",
+            "TestRationalServiceExtraScopedIntegerBridge",
+            "TestRationalServiceExtraFailurePrefixesAndOwnership",
+            "TestRationalServiceExtraFormattingPublicationAndProvenance",
+            "TestRationalServiceExtraWarmReuse",
+            "TestRationalServiceExtraIndependentRootsAndCoefficients",
+            "TestRationalServiceExtraIntegerBridgeFailureCleanup",
+            "TestRationalServiceExtraScopedRationalConstructor",
+            "TestRationalServiceExtraToScopedRationalOwnershipAndFailures"
+          ]
         }
       ],
       "ownership": [
         "Inspection uses existing integer roots; extraction acquires deep independent limbs and thin setters/swap retain source component identity. Failed-prefix tests audit cells/Words and decoded values before rendering/teardown. See RATIONAL_INSPECTION_PORT_STATUS.md.",
         "Owner-local RationalService owns synchronized numerical manager, constants and pointer-free cache; scalar provenance on OwnedRational validates all public operands. Cold mutexes ordered by immutable ownerID for CopyFrom; all headers/backing/old+new charged. See RATIONAL_SERVICE_PORT_STATUS.md.",
-        "Owner-local concrete facade validates all operand provenance before raw actions, locks the service once, and releases scoped temporaries in source order. Value arithmetic retains both source copies; named returns transfer ownership. See RATIONAL_FACADE_PORT_STATUS.md."
+        "Owner-local concrete facade validates all operand provenance before raw actions, locks the service once, and releases scoped temporaries in source order. Value arithmetic retains both source copies; named returns transfer ownership. See RATIONAL_FACADE_PORT_STATUS.md.",
+        "Complete facade uses existing budgeted service manager and checked scoped deep-copy bridges. Source const references become independent owning copies; root/coefficient outputs preserve actual identity, source failure/alias prefixes and g3debug assertion timing. See RATIONAL_FACADE_EXTRA_PORT_STATUS.md."
       ],
       "deviations": [
         "Explicit manager projects rational.h inclusive32-bit wrappers, distinct from strict MPZ boundaries; global wrapper remains incomplete. Float positive converted denominator SASSERT becomes typed ErrRationalFloatDomain. Source raw component alias publication can leave denominator zero; subsequent operations diagnose initialization.",
         "Global mutable manager/cache replaced with explicit owner-local service. Constants return independent deep values; owning token Del invalidates provenance, source move val history retained. Cache failed-prefix/retry actions preserved; INT_MIN signed-negation domain uses explicit wider magnitude adaptation. Broad facade and infinitesimal hooks remain incomplete.",
-        "Remaining wrapper roots/squares, LCM/extended-GCD, rational bitwise forwards, display conveniences and checked raw borrowing/interoperability are not completed by this selected facade packet; source double construction/assignment are unreachable domains."
+        "Remaining wrapper roots/squares, LCM/extended-GCD, rational bitwise forwards, display conveniences and checked raw borrowing/interoperability are not completed by this selected facade packet; source double construction/assignment are unreachable domains.",
+        "Native std::ostream operations use caller-owned strings/buffers; source UNREACHABLE doubles return RationalDoubleError. Safe scoped copies replace raw mpz/mpq borrows and constructors without serialization or canonicalization."
       ]
     },
     {

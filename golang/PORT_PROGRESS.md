@@ -578,3 +578,15 @@ under g3debug, independently of checked handles. Tests began missing-API RED
 and verify signed Bezout cases, source alias assertion/output prefixes, large
 arithmetic fault prefixes, immediate roots and complete owner refund. Release
 alias behavior remains unchanged. See EXTENDED_GCD_DEBUG_PORT_STATUS.md.
+
+## Complete owner-local rational facade
+
+The remaining rational.h root/square, manager coefficient GCD, LCM, bitwise,
+display, projection and checked scoped constructor/extraction routes are now
+translated. Four raw rational bitwise forwards retain numerator-before-denominator
+publication. Fourteen tests began missing-API RED and include all34 source tst8
+assertions, independent roots/coefficients, aliases, fault roots, scoped lifetimes
+and output allocation checks. Debug alias assertions are tested alongside the
+source release prefixes. See RATIONAL_FACADE_EXTRA_PORT_STATUS.md.
+The rational.h active unit is complete; raw-manager conditionals and full solver
+requirements are not inferred complete from this facade.
