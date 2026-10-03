@@ -693,3 +693,15 @@ source capacities, exact old/new overlap, immediate failure prefixes, OOM skip,
 reset retention and cleanup refunds. Eight total ID suites passed integrated
 native/checked-debug, race and actual JS gates; vet and WASI build passed. Full
 resource-service and AST registration/deletion remain open. See ID_PORT_STATUS.md.
+
+## Source chained integer tables and maps
+
+Concrete int32 table/map release algorithms now preserve bucket traversal,
+head displacement, cellar retry/free-list order, grow-before-duplicate and
+collision counters. Seventeen groups began missing-API RED. Review-driven RED
+also corrected incoming hash call order and the source by-reference UsedSlots
+update retained on failed copy. Registered source assertion loops keep their
+exact1000/10000/50000 bounds with an independent finite set oracle. Integrated
+full native/checked-debug, race, actual JS, vet and WASI build passed. Automatic
+debug diagnostic actions and AST specialization remain open; AST_CORE_PORT_STATUS.md
+records the real manager prerequisites. See CHAIN_TABLE_PORT_STATUS.md.

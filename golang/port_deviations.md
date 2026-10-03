@@ -83,3 +83,14 @@ and an explicit preflight method prepares physical capacity without changing
 logical IDs, retaining successful growth prefixes. Reset retains capacity and
 cleanup refunds it. This supports future explicit AST reclamation but does not
 implement the AST consumer or full process memory service. See ID_PORT_STATUS.md.
+
+### Concrete chained storage and quota transfer
+
+Scalar cell links replace source pointers; owner and complete backing arrays are
+charged with actual layout. Rehash retains the source attempted-copy UsedSlots
+prefix on later failure. Finalize charges old/new overlap and preserves old
+storage on predictable failure, adapting source delete-before-init. Swap retains
+hash functors and transfers only positive cross-budget capacity delta; it adds
+no fictitious same-budget reservation. Cold epoch-checked views replace raw
+borrows. Automatic Z3DEBUG visited-set diagnostics and AST structural/identity
+specializations remain open. See CHAIN_TABLE_PORT_STATUS.md.

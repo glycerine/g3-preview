@@ -75141,9 +75141,18 @@
       "sha256": "55f06ed79518d96a48164db5a0ce957e45475f7bfcd574a52d9e57f92a6e5051",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_chain_table_test.go"
+      ],
+      "tests": [
+        "TestChainSourceTst1",
+        "TestChainSourceTst2",
+        "TestChainSourceTst3",
+        "TestChainSourceTst4",
+        "TestChainSourceTst5",
+        "TestChainSourceTst6"
+      ],
       "assertions": [
         {
           "line": 40,
@@ -75318,11 +75327,68 @@
           "text": "ENSURE(m.find(10, r) && r == 4);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "active tst1 six ENSURE assertions",
+          "status": "ported",
+          "go_target": "util_chain_table_test.go",
+          "tests": [
+            "TestChainSourceTst1"
+          ]
+        },
+        {
+          "name": "active tst2 nineteen ENSURE assertions",
+          "status": "ported",
+          "go_target": "util_chain_table_test.go",
+          "tests": [
+            "TestChainSourceTst2"
+          ]
+        },
+        {
+          "name": "active tst3 nine ENSURE assertions",
+          "status": "ported",
+          "go_target": "util_chain_table_test.go",
+          "tests": [
+            "TestChainSourceTst3"
+          ]
+        },
+        {
+          "name": "active tst4 exact registered 1000/10000/50000 iterations and finite independent set oracle",
+          "status": "ported",
+          "go_target": "util_chain_table_test.go",
+          "tests": [
+            "TestChainSourceTst4"
+          ]
+        },
+        {
+          "name": "active tst5 operation sequence, zero ENSURE assertions",
+          "status": "ported",
+          "go_target": "util_chain_table_test.go",
+          "tests": [
+            "TestChainSourceTst5"
+          ]
+        },
+        {
+          "name": "active tst6 contains ENSURE and additional unconditional coverage of debug find assertion",
+          "status": "ported",
+          "go_target": "util_chain_table_test.go",
+          "tests": [
+            "TestChainSourceTst6"
+          ]
+        },
+        {
+          "name": "source DEBUG_CODE conditional routing and automatic table CASSERT diagnostics",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Local table/map lifetimes use explicit Close; fixed scalar bool-array oracle is independent of production hashing, with source registered loop bounds retained. Test-only values do not become production hot roots. See CHAIN_TABLE_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "A fixed source RNG seed replaces platform libc rand; source branch/assertion structure and three exact loop counts preserved. DEBUG_CODE find assertion is unconditional added coverage, not a claim of original conditional routing."
+      ]
     },
     {
       "path": "src/test/check_assumptions.cpp",
@@ -84616,9 +84682,29 @@
       "sha256": "1bfcec6687ca93d2896b44979de1d636e7e637878e23f5a122a7c472294e8024",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_chain_table.go"
+      ],
+      "tests": [
+        "TestChainSourceTst1",
+        "TestChainSourceTst2",
+        "TestChainSourceTst3",
+        "TestChainSourceTst4",
+        "TestChainSourceTst5",
+        "TestChainSourceTst6",
+        "TestChainOrderGrowthAndCounters",
+        "TestChainSignedAndMapEntryRoutes",
+        "TestChainLifecycleAndViews",
+        "TestChainBudgetsFailureAndSwap",
+        "TestChainSwapTransfersOnlyDeltaAndKeepsHash",
+        "TestChainEpochAndAllocationPlateau",
+        "TestChainHashActionOrderAndEndEquality",
+        "TestChainRepeatedCellarGrowthAndFailurePrefixes",
+        "TestChainMapIterationAndLifecycleSurface",
+        "TestChainConstructorAndEmptyResetFailureActions",
+        "TestChainFailedCopyPublishesUsedSlotsPrefix"
+      ],
       "conditionals": [
         {
           "line": 28,
@@ -84807,11 +84893,293 @@
           "text": "SASSERT(m_size == sz);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "int32 table/map construction, init, alloc/delete and destruction",
+          "status": "ported",
+          "go_target": "util_chain_table.go",
+          "tests": [
+            "TestChainSourceTst1",
+            "TestChainSourceTst2",
+            "TestChainSourceTst3",
+            "TestChainSourceTst4",
+            "TestChainSourceTst5",
+            "TestChainSourceTst6",
+            "TestChainOrderGrowthAndCounters",
+            "TestChainSignedAndMapEntryRoutes",
+            "TestChainLifecycleAndViews",
+            "TestChainBudgetsFailureAndSwap",
+            "TestChainSwapTransfersOnlyDeltaAndKeepsHash",
+            "TestChainEpochAndAllocationPlateau",
+            "TestChainHashActionOrderAndEndEquality",
+            "TestChainRepeatedCellarGrowthAndFailurePrefixes",
+            "TestChainMapIterationAndLifecycleSurface",
+            "TestChainConstructorAndEmptyResetFailureActions",
+            "TestChainFailedCopyPublishesUsedSlotsPrefix"
+          ]
+        },
+        {
+          "name": "copy_table and expand_table bucket/chain order, cellar retries and by-reference UsedSlots failure prefix",
+          "status": "ported",
+          "go_target": "util_chain_table.go",
+          "tests": [
+            "TestChainSourceTst1",
+            "TestChainSourceTst2",
+            "TestChainSourceTst3",
+            "TestChainSourceTst4",
+            "TestChainSourceTst5",
+            "TestChainSourceTst6",
+            "TestChainOrderGrowthAndCounters",
+            "TestChainSignedAndMapEntryRoutes",
+            "TestChainLifecycleAndViews",
+            "TestChainBudgetsFailureAndSwap",
+            "TestChainSwapTransfersOnlyDeltaAndKeepsHash",
+            "TestChainEpochAndAllocationPlateau",
+            "TestChainHashActionOrderAndEndEquality",
+            "TestChainRepeatedCellarGrowthAndFailurePrefixes",
+            "TestChainMapIterationAndLifecycleSurface",
+            "TestChainConstructorAndEmptyResetFailureActions",
+            "TestChainFailedCopyPublishesUsedSlotsPrefix"
+          ]
+        },
+        {
+          "name": "has_free_cells/get_free_cell/recycle_cell bump and LIFO cellar reuse",
+          "status": "ported",
+          "go_target": "util_chain_table.go",
+          "tests": [
+            "TestChainSourceTst1",
+            "TestChainSourceTst2",
+            "TestChainSourceTst3",
+            "TestChainSourceTst4",
+            "TestChainSourceTst5",
+            "TestChainSourceTst6",
+            "TestChainOrderGrowthAndCounters",
+            "TestChainSignedAndMapEntryRoutes",
+            "TestChainLifecycleAndViews",
+            "TestChainBudgetsFailureAndSwap",
+            "TestChainSwapTransfersOnlyDeltaAndKeepsHash",
+            "TestChainEpochAndAllocationPlateau",
+            "TestChainHashActionOrderAndEndEquality",
+            "TestChainRepeatedCellarGrowthAndFailurePrefixes",
+            "TestChainMapIterationAndLifecycleSurface",
+            "TestChainConstructorAndEmptyResetFailureActions",
+            "TestChainFailedCopyPublishesUsedSlotsPrefix"
+          ]
+        },
+        {
+          "name": "insert, insert_if_not_there, insert_if_not_there2 grow-before-duplicate and single incoming hash",
+          "status": "ported",
+          "go_target": "util_chain_table.go",
+          "tests": [
+            "TestChainSourceTst1",
+            "TestChainSourceTst2",
+            "TestChainSourceTst3",
+            "TestChainSourceTst4",
+            "TestChainSourceTst5",
+            "TestChainSourceTst6",
+            "TestChainOrderGrowthAndCounters",
+            "TestChainSignedAndMapEntryRoutes",
+            "TestChainLifecycleAndViews",
+            "TestChainBudgetsFailureAndSwap",
+            "TestChainSwapTransfersOnlyDeltaAndKeepsHash",
+            "TestChainEpochAndAllocationPlateau",
+            "TestChainHashActionOrderAndEndEquality",
+            "TestChainRepeatedCellarGrowthAndFailurePrefixes",
+            "TestChainMapIterationAndLifecycleSurface",
+            "TestChainConstructorAndEmptyResetFailureActions",
+            "TestChainFailedCopyPublishesUsedSlotsPrefix"
+          ]
+        },
+        {
+          "name": "contains/find/find_core and exact collision increments",
+          "status": "ported",
+          "go_target": "util_chain_table.go",
+          "tests": [
+            "TestChainSourceTst1",
+            "TestChainSourceTst2",
+            "TestChainSourceTst3",
+            "TestChainSourceTst4",
+            "TestChainSourceTst5",
+            "TestChainSourceTst6",
+            "TestChainOrderGrowthAndCounters",
+            "TestChainSignedAndMapEntryRoutes",
+            "TestChainLifecycleAndViews",
+            "TestChainBudgetsFailureAndSwap",
+            "TestChainSwapTransfersOnlyDeltaAndKeepsHash",
+            "TestChainEpochAndAllocationPlateau",
+            "TestChainHashActionOrderAndEndEquality",
+            "TestChainRepeatedCellarGrowthAndFailurePrefixes",
+            "TestChainMapIterationAndLifecycleSurface",
+            "TestChainConstructorAndEmptyResetFailureActions",
+            "TestChainFailedCopyPublishesUsedSlotsPrefix"
+          ]
+        },
+        {
+          "name": "erase head displacement and middle unlink/recycle",
+          "status": "ported",
+          "go_target": "util_chain_table.go",
+          "tests": [
+            "TestChainSourceTst1",
+            "TestChainSourceTst2",
+            "TestChainSourceTst3",
+            "TestChainSourceTst4",
+            "TestChainSourceTst5",
+            "TestChainSourceTst6",
+            "TestChainOrderGrowthAndCounters",
+            "TestChainSignedAndMapEntryRoutes",
+            "TestChainLifecycleAndViews",
+            "TestChainBudgetsFailureAndSwap",
+            "TestChainSwapTransfersOnlyDeltaAndKeepsHash",
+            "TestChainEpochAndAllocationPlateau",
+            "TestChainHashActionOrderAndEndEquality",
+            "TestChainRepeatedCellarGrowthAndFailurePrefixes",
+            "TestChainMapIterationAndLifecycleSurface",
+            "TestChainConstructorAndEmptyResetFailureActions",
+            "TestChainFailedCopyPublishesUsedSlotsPrefix"
+          ]
+        },
+        {
+          "name": "reset/finalize and empty reset no-op",
+          "status": "ported",
+          "go_target": "util_chain_table.go",
+          "tests": [
+            "TestChainSourceTst1",
+            "TestChainSourceTst2",
+            "TestChainSourceTst3",
+            "TestChainSourceTst4",
+            "TestChainSourceTst5",
+            "TestChainSourceTst6",
+            "TestChainOrderGrowthAndCounters",
+            "TestChainSignedAndMapEntryRoutes",
+            "TestChainLifecycleAndViews",
+            "TestChainBudgetsFailureAndSwap",
+            "TestChainSwapTransfersOnlyDeltaAndKeepsHash",
+            "TestChainEpochAndAllocationPlateau",
+            "TestChainHashActionOrderAndEndEquality",
+            "TestChainRepeatedCellarGrowthAndFailurePrefixes",
+            "TestChainMapIterationAndLifecycleSurface",
+            "TestChainConstructorAndEmptyResetFailureActions",
+            "TestChainFailedCopyPublishesUsedSlotsPrefix"
+          ]
+        },
+        {
+          "name": "empty/size/capacity/used_slots/collisions",
+          "status": "ported",
+          "go_target": "util_chain_table.go",
+          "tests": [
+            "TestChainSourceTst1",
+            "TestChainSourceTst2",
+            "TestChainSourceTst3",
+            "TestChainSourceTst4",
+            "TestChainSourceTst5",
+            "TestChainSourceTst6",
+            "TestChainOrderGrowthAndCounters",
+            "TestChainSignedAndMapEntryRoutes",
+            "TestChainLifecycleAndViews",
+            "TestChainBudgetsFailureAndSwap",
+            "TestChainSwapTransfersOnlyDeltaAndKeepsHash",
+            "TestChainEpochAndAllocationPlateau",
+            "TestChainHashActionOrderAndEndEquality",
+            "TestChainRepeatedCellarGrowthAndFailurePrefixes",
+            "TestChainMapIterationAndLifecycleSurface",
+            "TestChainConstructorAndEmptyResetFailureActions",
+            "TestChainFailedCopyPublishesUsedSlotsPrefix"
+          ]
+        },
+        {
+          "name": "begin/end and iterator dereference, arrow, pre/post increment, equality",
+          "status": "ported",
+          "go_target": "util_chain_table.go",
+          "tests": [
+            "TestChainSourceTst1",
+            "TestChainSourceTst2",
+            "TestChainSourceTst3",
+            "TestChainSourceTst4",
+            "TestChainSourceTst5",
+            "TestChainSourceTst6",
+            "TestChainOrderGrowthAndCounters",
+            "TestChainSignedAndMapEntryRoutes",
+            "TestChainLifecycleAndViews",
+            "TestChainBudgetsFailureAndSwap",
+            "TestChainSwapTransfersOnlyDeltaAndKeepsHash",
+            "TestChainEpochAndAllocationPlateau",
+            "TestChainHashActionOrderAndEndEquality",
+            "TestChainRepeatedCellarGrowthAndFailurePrefixes",
+            "TestChainMapIterationAndLifecycleSurface",
+            "TestChainConstructorAndEmptyResetFailureActions",
+            "TestChainFailedCopyPublishesUsedSlotsPrefix"
+          ]
+        },
+        {
+          "name": "swap storage and counters while retaining source hash functors",
+          "status": "ported",
+          "go_target": "util_chain_table.go",
+          "tests": [
+            "TestChainSourceTst1",
+            "TestChainSourceTst2",
+            "TestChainSourceTst3",
+            "TestChainSourceTst4",
+            "TestChainSourceTst5",
+            "TestChainSourceTst6",
+            "TestChainOrderGrowthAndCounters",
+            "TestChainSignedAndMapEntryRoutes",
+            "TestChainLifecycleAndViews",
+            "TestChainBudgetsFailureAndSwap",
+            "TestChainSwapTransfersOnlyDeltaAndKeepsHash",
+            "TestChainEpochAndAllocationPlateau",
+            "TestChainHashActionOrderAndEndEquality",
+            "TestChainRepeatedCellarGrowthAndFailurePrefixes",
+            "TestChainMapIterationAndLifecycleSurface",
+            "TestChainConstructorAndEmptyResetFailureActions",
+            "TestChainFailedCopyPublishesUsedSlotsPrefix"
+          ]
+        },
+        {
+          "name": "cmap int32 key/value forwarding, mutation and iteration",
+          "status": "ported",
+          "go_target": "util_chain_table.go",
+          "tests": [
+            "TestChainSourceTst1",
+            "TestChainSourceTst2",
+            "TestChainSourceTst3",
+            "TestChainSourceTst4",
+            "TestChainSourceTst5",
+            "TestChainSourceTst6",
+            "TestChainOrderGrowthAndCounters",
+            "TestChainSignedAndMapEntryRoutes",
+            "TestChainLifecycleAndViews",
+            "TestChainBudgetsFailureAndSwap",
+            "TestChainSwapTransfersOnlyDeltaAndKeepsHash",
+            "TestChainEpochAndAllocationPlateau",
+            "TestChainHashActionOrderAndEndEquality",
+            "TestChainRepeatedCellarGrowthAndFailurePrefixes",
+            "TestChainMapIterationAndLifecycleSurface",
+            "TestChainConstructorAndEmptyResetFailureActions",
+            "TestChainFailedCopyPublishesUsedSlotsPrefix"
+          ]
+        },
+        {
+          "name": "automatic Z3DEBUG CASSERT routing and pointer visited-set check_invariant actions",
+          "status": "unported"
+        },
+        {
+          "name": "other HashProc/EqProc/value/destructor specializations, AST structural/identity table",
+          "status": "unported"
+        },
+        {
+          "name": "disabled #if0 trace and destructor output",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Pointer-free key/value/link cell arrays; actual cold owner header and whole physical arrays budgeted, including growth overlap and refunds for failed retries. Source attempted copy updates UsedSlots even on later reservation failure. Borrowed stable hash callback is owner-confined; references/iterators are explicit cold caller values checked against owner epochs. See CHAIN_TABLE_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Finalize allocates before deleting old table and charges overlap, preserving the graph on predictable failure; source deletes before allocating. Same-budget swap reserves nothing; cross-budget swap transfers only positive final byte delta before field mutation.",
+        "Checked scalar link indices replace pointers; invalid config/bounds/epoch/lifetime return typed errors. Explicit CheckInvariant scans without the source debug visited allocation and does not claim automatic CASSERT behavior. Go map Swap is an ownership adapter; source cmap does not define swap. AST specialization remains open; see AST_CORE_PORT_STATUS.md."
+      ]
     },
     {
       "path": "src/util/checked_int64.h",
