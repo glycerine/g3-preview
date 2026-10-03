@@ -53419,7 +53419,8 @@
       "go_targets": [
         "sat_solver_watch_store.go",
         "sat_storage_vector.go",
-        "sat_watched.go"
+        "sat_watched.go",
+        "sat_solver_watch_sort.go"
       ],
       "tests": [
         "TestSATBinClauseVectorRealSpecialization",
@@ -53456,7 +53457,11 @@
         "TestSATVectorIteratorEpochRetiresWithoutWrap",
         "TestSATWatchEraseRetainedLifetimesAndGrowthPrefix",
         "TestSATWatchLifetimeMetadataBudget",
-        "TestSATWatchedSourceTagsWidthDefectAndErase"
+        "TestSATWatchedSourceTagsWidthDefectAndErase",
+        "TestSATSolverWatchSortLargeStableOrderAndWorkBound",
+        "TestSATSolverWatchSortThreeClassesAndActualLifetime",
+        "TestSATSolverWatchSortIndependentMixedOracleAndWarmAllocation",
+        "TestSATSolverWatchSortBoundaryAndGuardPrefixes"
       ],
       "conditionals": [
         {
@@ -53621,15 +53626,28 @@
             "TestSATSolverWatchStoreIteratorsFollowMoveAndSwapBacking",
             "TestSATSolverWatchStoreFiniteBudgetRefusal"
           ]
+        },
+        {
+          "name": "Concrete stable sorting backend for three watched_lt equivalence classes (actual solver outer loop remains open)",
+          "status": "ported",
+          "go_target": "sat_solver_watch_sort.go",
+          "tests": [
+            "TestSATSolverWatchSortLargeStableOrderAndWorkBound",
+            "TestSATSolverWatchSortThreeClassesAndActualLifetime",
+            "TestSATSolverWatchSortIndependentMixedOracleAndWarmAllocation",
+            "TestSATSolverWatchSortBoundaryAndGuardPrefixes"
+          ]
         }
       ],
       "ownership": [
         "Concrete scalar clause locators are distinct from source IDs. Actual cold headers/directories/backing and allocation overlap are budgeted; small versus wide physical clause storage uses real allocations. Activity queues borrow actual mutable vectors; sets/vectors retain source bindings and copy/move prefixes. Watched erase retains live tails while actual destruction ends per-slot lifetime tracked by fully charged metadata. All twelve iterator factories return scalar values with zero escaping-wrapper allocation. See SAT_STORAGE_PORT_STATUS.md for exact16-file/40-test evidence.",
-        "Actual four-uint64 watch payloads preserve val1/val2 plus widened scalar clause provenance; separate charged lifetime bitmap tracks erased live tails and destroyed holes. Common cold owner/directories and all arena descriptor/page/free storage and old/new overlaps charged. Exact nested copies, destroy-before-assignment, backing-transferring move/swap and real display/erase routes; see SAT_SOLVER_WATCH_STORE_PORT_STATUS.md."
+        "Actual four-uint64 watch payloads preserve val1/val2 plus widened scalar clause provenance; separate charged lifetime bitmap tracks erased live tails and destroyed holes. Common cold owner/directories and all arena descriptor/page/free storage and old/new overlaps charged. Exact nested copies, destroy-before-assignment, backing-transferring move/swap and real display/erase routes; see SAT_SOLVER_WATCH_STORE_PORT_STATUS.md.",
+        "In-place stable partition/rotation uses scalar stack records only; no heap scratch/header or generic sorting. Existing logical slot lifetime bits and erased live tails retained; actual work counters are caller-owned diagnostics. See SAT_WATCH_SORT_PORT_STATUS.md."
       ],
       "deviations": [
         "Pointer ABI becomes owner/kind/slot/generation locators and explicit typed invalid-domain guards. No fake address ordering, global OOM service, external extension callback, solver result or propagation/search algorithm is provided by this storage packet. Source OutOfMemory callback is borrowed; source global policy, conditional CASSERT tag control and TRACE/printer runtime remain open. Concrete vector aliases/invalid source instantiations and self-append/Fill nontermination adapters are recorded explicitly. No Go generics are used.",
-        "Composite payload/bitmap preparation is an explicit Go storage adapter; completed pool growth remains charged on refusal. Iterators follow actual scalar backing across moves/swaps, and guard only actual free/reallocation or ended-slot lifetime. Null-backing Shrink/SetEnd retains finite source release no-op. Outer solver watch vector and propagation remain open; quadratic SortByKind is an additional semantic-order convenience adapter, not completed std::stable_sort backend/complexity integration."
+        "Composite payload/bitmap preparation is an explicit Go storage adapter; completed pool growth remains charged on refusal. Iterators follow actual scalar backing across moves/swaps, and guard only actual free/reallocation or ended-slot lifetime. Null-backing Shrink/SetEnd retains finite source release no-op. Outer solver watch vector and propagation remain open; quadratic SortByKind is an additional semantic-order convenience adapter, not completed std::stable_sort backend/complexity integration.",
+        "Standard-library backend adaptation preserves stable ordering and O(NlogN) moves/O(N) comparisons for the exact three comparator classes; no claim exact libstdc++ allocation/comparison sequence or completed solver sort_watch_lits outer integration. See SAT_WATCH_SORT_PORT_STATUS.md."
       ]
     },
     {

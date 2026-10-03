@@ -957,37 +957,9 @@ func (v *satSolverWatchStore) DisplayInto(r satSolverWatchListRef, a *satClauseA
 	return nil
 }
 
-// Concrete stable insertion sort substitutes for external std::stable_sort;
-// comparator and observable ordering are source exact, with no scratch owner.
+// SortByKind stably orders the logical range with the source comparator.
 func (s *satSolverWatchStore) SortByKind(r satSolverWatchListRef) error {
-	x, e := s.record(r)
-	if e != nil {
-		return e
-	}
-	for i := uint32(1); i < x.length; i++ {
-		w, e := s.Read(r, i)
-		if e != nil {
-			return e
-		}
-		j := i
-		for j > 0 {
-			old, e := s.Read(r, j-1)
-			if e != nil {
-				return e
-			}
-			if !satWatchedLess(w, old) {
-				break
-			}
-			if e = s.Write(r, j, old); e != nil {
-				return e
-			}
-			j--
-		}
-		if e = s.Write(r, j, w); e != nil {
-			return e
-		}
-	}
-	return nil
+	return s.sortByKindWithWork(r, nil)
 }
 
 func satWatchPayloadExtent(capacity uint32) (uint32, uint32, error) {

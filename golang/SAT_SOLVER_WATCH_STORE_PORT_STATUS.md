@@ -106,3 +106,17 @@ unported. Full native/debug gates use committed HEADd4da375 plus only these
  two Go files, and all21 actual checked/debug race/JS events are verified.
 The convenience quadratic sorter does not complete the real solver's sorting
 backend or its complexity requirement; that work remains explicitly scheduled.
+
+
+## Subsequent efficient stable-sort backend
+
+The historical quadratic helper above is superseded by the integrated
+SAT_WATCH_SORT_PORT_STATUS.md packet. SortByKind now uses the actual source
+comparator's three equivalence classes with two stable partitions and scalar
+rotations. Four missing-API/work-bound-first groups join the original21;
+25 named race and actual JS groups and full integration suites passed.
+The new backend uses O(NlogN) slot assignments, O(N) comparisons and no heap
+scratch; it preserves clause/external interleaving and existing backing lifetimes.
+Old storage hashes/gates above describe their original snapshot; the new store
+hash and sorting source hashes are recorded in the new packet. Actual full
+solver sort_watch_lits outer iteration and solver algorithms remain open.

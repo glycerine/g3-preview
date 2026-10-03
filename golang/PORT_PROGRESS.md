@@ -1083,3 +1083,17 @@ faults, immediate graph accounting and retained scalar iterator lifetimes.
 Full native/debug, race, actual JS, vet, WASI compilation and source/no-generics
 gates passed on the committed sparse/shared and model-copy base. See
 SAT_LITERAL_SET_PORT_STATUS.md. Full solver and runtime integration remain open.
+
+
+## Efficient concrete stable watch sorting
+
+The former insertion helper is replaced by two stable partitions over the exact
+source comparator classes, with scalar rotations and logarithmic recursion.
+Independent work-bound tests first observed the quadratic helper fail, then
+verified at most2N comparisons and O(NlogN) assignments. Clause/external
+interleaving, retained erase tails, transferred backing iterators and zero warm
+allocations remain verified. Four new groups join21 watch-storage groups.
+Full native/debug integration,25 named race/actual JS groups, vet, WASI
+compilation and source/no-generics gates passed. SAT_WATCH_SORT_PORT_STATUS.md
+records the selected standard-library backend adaptation and exact hashes.
+The real solver's outer watch sorting call and full algorithms remain open.
