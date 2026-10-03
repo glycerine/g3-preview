@@ -10546,7 +10546,15 @@
         "ast_sort_size.go",
         "ast_table.go",
         "ast_table_hash.go",
-        "ast_sparse_mark.go"
+        "ast_sparse_mark.go",
+        "ast_dependency_ref_buffer_borrow.go",
+        "ast_dependency_ref_buffer.go",
+        "ast_dependency_ref_buffer_ops.go",
+        "ast_dependency_ref.go",
+        "ast_dependency_ref_vector_access.go",
+        "ast_dependency_ref_vector_borrow.go",
+        "ast_dependency_ref_vector.go",
+        "ast_dependency_ref_vector_ops.go"
       ],
       "tests": [
         "TestASTAllEagerPluginBranches",
@@ -10710,7 +10718,37 @@
         "TestASTSparseMarkLastTombstoneAndCurrentHashReads",
         "TestASTSparseMarkPendingResetCanFinishAtFinalEpoch",
         "TestASTSparseMarkResetAndFinalizeFreeBeforeReserve",
-        "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
+        "TestASTSparseSharedExpressionDomainsAndASTWideVisited",
+        "TestASTDependencyRefBufferInlineSourceRoutesAndCapturedAppend",
+        "TestASTDependencyRefBufferMutableBackUsesSourceAssertion",
+        "TestASTDependencyRefOwnersPointerFreeAndDistinctStorage",
+        "TestASTDependencyRefVectorAndBufferGrowthCopyDifferentTails",
+        "TestASTDependencyRefBufferCapturedDynamicSelfAppendPrefix",
+        "TestASTDependencyRefVectorVsBufferIncreasingShrinkSourceProfiles",
+        "TestASTDependencyRefSourcePushRefusalRetainsIncrement",
+        "TestASTDependencyRefRawBufferBorrowDoesNotInventCallbacks",
+        "TestASTDependencyRefBufferInlineBorrowSurvivesFinalizeAndGrowth",
+        "TestASTDependencyRefVectorDebugCounterRefusalKeepsOwnedBacking",
+        "TestASTDependencyRefVectorConsumedCallbackErrorReclaimsLexicalOwner",
+        "TestASTDependencyRefWarmCallbacksAndEscapingBorrowValuesAllocateZero",
+        "TestASTDependencyRefFiniteIndependentContainerCounterOracle",
+        "TestASTDependencyRefVectorConstructorFaultSweepImmediateOwnership",
+        "TestASTDependencyRefBufferScalarCapacityBoundaries",
+        "TestASTDependencyRefVectorPointerComparisonsDoNotDereferenceAbsentDeadValue",
+        "TestASTDependencyRefAssignmentDebugRefusalRetainsSourceIncomingIncrement",
+        "TestASTDependencyRefRetainedCopyOnlyGetAndPhysicalBorrowOrdering",
+        "TestASTDependencyRefBufferSetXWrappedResizeBeforeIncrement",
+        "TestASTDependencyRefVectorGrowingSelfAppendGuardAndEmptyFastPath",
+        "TestASTDependencyRefBufferRawPointerCreationHasNoLogicalAssertion",
+        "TestASTDependencyRefRangeRefusalResumesAfterConsumedPrefix",
+        "TestASTDependencyRefVectorResizeFillUnusedDeadValueIsNoAction",
+        "TestASTDependencyRefCleanupMetadataBoundAndProgressTransfer",
+        "TestASTDependencyRefPendingForceManagerCloseReclaimsPhysicalGraph",
+        "TestASTDependencyRefResumedConsumedErrorStillFinishesRequestedDestruction",
+        "TestASTDependencyRefConstructorRefusedCleanupPublishesOwner",
+        "TestASTDependencyRefCopyConstructorRefusedCleanupPublishesOwner",
+        "TestASTDependencyRefActualOwnerCopyMoveStealAndAssignment",
+        "TestASTDependencyRefVectorSourceCallbacksAndFullRoutes"
       ],
       "conditionals": [
         {
@@ -11422,6 +11460,43 @@
             "TestASTSharedOccurrencesIteratorActualBackingLifetime",
             "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
           ]
+        },
+        {
+          "name": "Actual expr_dependency_ref/ref_vector/ref_buffer aliases with real dependency callbacks",
+          "status": "partial",
+          "go_target": "ast_dependency_ref.go",
+          "tests": [
+            "TestASTDependencyRefBufferInlineSourceRoutesAndCapturedAppend",
+            "TestASTDependencyRefBufferMutableBackUsesSourceAssertion",
+            "TestASTDependencyRefOwnersPointerFreeAndDistinctStorage",
+            "TestASTDependencyRefVectorAndBufferGrowthCopyDifferentTails",
+            "TestASTDependencyRefBufferCapturedDynamicSelfAppendPrefix",
+            "TestASTDependencyRefVectorVsBufferIncreasingShrinkSourceProfiles",
+            "TestASTDependencyRefSourcePushRefusalRetainsIncrement",
+            "TestASTDependencyRefRawBufferBorrowDoesNotInventCallbacks",
+            "TestASTDependencyRefBufferInlineBorrowSurvivesFinalizeAndGrowth",
+            "TestASTDependencyRefVectorDebugCounterRefusalKeepsOwnedBacking",
+            "TestASTDependencyRefVectorConsumedCallbackErrorReclaimsLexicalOwner",
+            "TestASTDependencyRefWarmCallbacksAndEscapingBorrowValuesAllocateZero",
+            "TestASTDependencyRefFiniteIndependentContainerCounterOracle",
+            "TestASTDependencyRefVectorConstructorFaultSweepImmediateOwnership",
+            "TestASTDependencyRefBufferScalarCapacityBoundaries",
+            "TestASTDependencyRefVectorPointerComparisonsDoNotDereferenceAbsentDeadValue",
+            "TestASTDependencyRefAssignmentDebugRefusalRetainsSourceIncomingIncrement",
+            "TestASTDependencyRefRetainedCopyOnlyGetAndPhysicalBorrowOrdering",
+            "TestASTDependencyRefBufferSetXWrappedResizeBeforeIncrement",
+            "TestASTDependencyRefVectorGrowingSelfAppendGuardAndEmptyFastPath",
+            "TestASTDependencyRefBufferRawPointerCreationHasNoLogicalAssertion",
+            "TestASTDependencyRefRangeRefusalResumesAfterConsumedPrefix",
+            "TestASTDependencyRefVectorResizeFillUnusedDeadValueIsNoAction",
+            "TestASTDependencyRefCleanupMetadataBoundAndProgressTransfer",
+            "TestASTDependencyRefPendingForceManagerCloseReclaimsPhysicalGraph",
+            "TestASTDependencyRefResumedConsumedErrorStillFinishesRequestedDestruction",
+            "TestASTDependencyRefConstructorRefusedCleanupPublishesOwner",
+            "TestASTDependencyRefCopyConstructorRefusedCleanupPublishesOwner",
+            "TestASTDependencyRefActualOwnerCopyMoveStealAndAssignment",
+            "TestASTDependencyRefVectorSourceCallbacksAndFullRoutes"
+          ]
         }
       ],
       "ownership": [
@@ -11433,7 +11508,8 @@
         "Real AST marks borrow manager with fully charged cold headers/inline16/backing/scope limits and source real ASTRefVector callbacks. Fast mark-before-push and ref INC-before-growth prefixes remain observable; ref reset clears all flags before ASC DEC. See AST_MARK_PORT_STATUS.md.",
         "Expression-array empty nonroot POP preserves the finite release unsigned size wrap; retained root SET increments the incoming AST before old physical access and never rolls it back at an invalid old pointer. See AST_EXPR_ARRAY_RETAINED_STATUS.md.",
         "Actual AST manager embeds dependency and array owners eagerly; FIFO identity traversal, real AST retain/release and LIFO deletion callbacks. Source RC30 wrapping, leaf/join16/24 versus actual charged24/32 intrusive continuation records, cold manager/scratch/header/payload and old/new overlaps charged. Persistent arrays have12-byte capacity/initialized backing and preserve finite retained pointer/patch behavior; see AST_DEPENDENCY_PACKET.md.",
-        "Concrete AST expr identity-table and shared-occurrence owners preserve source bucket-order callbacks, borrowing, actual node shared flags and charged backing/header peaks. See AST_SPARSE_SHARED_PORT_STATUS.md."
+        "Concrete AST expr identity-table and shared-occurrence owners preserve source bucket-order callbacks, borrowing, actual node shared flags and charged backing/header peaks. See AST_SPARSE_SHARED_PORT_STATUS.md.",
+        "Actual dependency INC/DEC callbacks, raw scalar tokens and charged16-byte obj_ref/24-byte ref_vector/160-byte inline buffer records in existing real AST allocators. Source INC-before-growth, retained backing, captured-end append and consumed cleanup progress preserved. See AST_DEPENDENCY_REF_PACKET.md."
       ],
       "deviations": [
         "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
@@ -11444,7 +11520,8 @@
         "Scalar owner identity replaces debug raw addresses. Typed physical/stale-owner guards and implicit owning-copy rejection are explicit Go adapters. Source ID marks survive deletion/reuse; sparse/shared-occurrence marks and other template specializations remain open. No generic Go code.",
         "Empty null/root POP is guarded at source physical undefined access. Debug empty POP assertion executes before From output copy. Invalid/uninitialized old root SET returns a typed guard with the incoming source INC retained and leaves backing unchanged.",
         "Source-undefined allocation/lifetime domains have explicit Go continuation and typed guards. Temporary copied-prefix cleanup releases only successful ownership acquisitions; source write-before-INC and debug RC0 refusal consumption are distinct. Copy-only Get returns retained raw tokens; actual later dereference guards generation. Source internal parray/Reroot debug checkpoints, TRACE/address printing, owning aliases and scoped configurations remain open. No whole-unit audit or full solver claim; no generics.",
-        "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See AST_SPARSE_SHARED_PORT_STATUS.md."
+        "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See AST_SPARSE_SHARED_PORT_STATUS.md.",
+        "Owning construction cleanup refusal publishes a nonzero partial token with original error; scalar pending target/cursor tracks consumed callbacks without changing raw retained slots. Explicit Go retry/cleanup protects source-undefined interrupted destruction. Preserved ref_buffer copy ctor dependent-base lookup is uninstantiable; no repaired copy API. General templates, other owners/configs and full consumers remain open. See AST_DEPENDENCY_REF_PACKET.md."
       ]
     },
     {
@@ -107135,7 +107212,15 @@
         "ast_ref_vector_access.go",
         "ast_ref_vector_borrow.go",
         "ast_ref_vector_ops.go",
-        "util_sexpr.go"
+        "util_sexpr.go",
+        "ast_dependency_ref_buffer_borrow.go",
+        "ast_dependency_ref_buffer.go",
+        "ast_dependency_ref_buffer_ops.go",
+        "ast_dependency_ref.go",
+        "ast_dependency_ref_vector_access.go",
+        "ast_dependency_ref_vector_borrow.go",
+        "ast_dependency_ref_vector.go",
+        "ast_dependency_ref_vector_ops.go"
       ],
       "tests": [
         "TestASTRefVectorBorrowedInputDefaultEraseAndMove",
@@ -107162,7 +107247,37 @@
         "TestSexprRCWrapAndDeletionLIFO",
         "TestSexprRegisteredEscapedDefaultPrintInputs",
         "TestSexprStringBytesAndWrapperRemainingBranches",
-        "TestSexprWarmPlateauAndGenerationGuards"
+        "TestSexprWarmPlateauAndGenerationGuards",
+        "TestASTDependencyRefBufferInlineSourceRoutesAndCapturedAppend",
+        "TestASTDependencyRefBufferMutableBackUsesSourceAssertion",
+        "TestASTDependencyRefOwnersPointerFreeAndDistinctStorage",
+        "TestASTDependencyRefVectorAndBufferGrowthCopyDifferentTails",
+        "TestASTDependencyRefBufferCapturedDynamicSelfAppendPrefix",
+        "TestASTDependencyRefVectorVsBufferIncreasingShrinkSourceProfiles",
+        "TestASTDependencyRefSourcePushRefusalRetainsIncrement",
+        "TestASTDependencyRefRawBufferBorrowDoesNotInventCallbacks",
+        "TestASTDependencyRefBufferInlineBorrowSurvivesFinalizeAndGrowth",
+        "TestASTDependencyRefVectorDebugCounterRefusalKeepsOwnedBacking",
+        "TestASTDependencyRefVectorConsumedCallbackErrorReclaimsLexicalOwner",
+        "TestASTDependencyRefWarmCallbacksAndEscapingBorrowValuesAllocateZero",
+        "TestASTDependencyRefFiniteIndependentContainerCounterOracle",
+        "TestASTDependencyRefVectorConstructorFaultSweepImmediateOwnership",
+        "TestASTDependencyRefBufferScalarCapacityBoundaries",
+        "TestASTDependencyRefVectorPointerComparisonsDoNotDereferenceAbsentDeadValue",
+        "TestASTDependencyRefAssignmentDebugRefusalRetainsSourceIncomingIncrement",
+        "TestASTDependencyRefRetainedCopyOnlyGetAndPhysicalBorrowOrdering",
+        "TestASTDependencyRefBufferSetXWrappedResizeBeforeIncrement",
+        "TestASTDependencyRefVectorGrowingSelfAppendGuardAndEmptyFastPath",
+        "TestASTDependencyRefBufferRawPointerCreationHasNoLogicalAssertion",
+        "TestASTDependencyRefRangeRefusalResumesAfterConsumedPrefix",
+        "TestASTDependencyRefVectorResizeFillUnusedDeadValueIsNoAction",
+        "TestASTDependencyRefCleanupMetadataBoundAndProgressTransfer",
+        "TestASTDependencyRefPendingForceManagerCloseReclaimsPhysicalGraph",
+        "TestASTDependencyRefResumedConsumedErrorStillFinishesRequestedDestruction",
+        "TestASTDependencyRefConstructorRefusedCleanupPublishesOwner",
+        "TestASTDependencyRefCopyConstructorRefusedCleanupPublishesOwner",
+        "TestASTDependencyRefActualOwnerCopyMoveStealAndAssignment",
+        "TestASTDependencyRefVectorSourceCallbacksAndFullRoutes"
       ],
       "conditionals": [
         {
@@ -107221,15 +107336,54 @@
             "TestASTRefVectorCopyAppendResizeAndTransfer",
             "TestASTRefVectorSetIndexGuardAfterSourceIncrement"
           ]
+        },
+        {
+          "name": "Concrete dependency obj_ref constructor/copy/move/reset/steal/assignment/swap/raw scalar access",
+          "status": "partial",
+          "go_target": "ast_dependency_ref.go",
+          "tests": [
+            "TestASTDependencyRefBufferInlineSourceRoutesAndCapturedAppend",
+            "TestASTDependencyRefBufferMutableBackUsesSourceAssertion",
+            "TestASTDependencyRefOwnersPointerFreeAndDistinctStorage",
+            "TestASTDependencyRefVectorAndBufferGrowthCopyDifferentTails",
+            "TestASTDependencyRefBufferCapturedDynamicSelfAppendPrefix",
+            "TestASTDependencyRefVectorVsBufferIncreasingShrinkSourceProfiles",
+            "TestASTDependencyRefSourcePushRefusalRetainsIncrement",
+            "TestASTDependencyRefRawBufferBorrowDoesNotInventCallbacks",
+            "TestASTDependencyRefBufferInlineBorrowSurvivesFinalizeAndGrowth",
+            "TestASTDependencyRefVectorDebugCounterRefusalKeepsOwnedBacking",
+            "TestASTDependencyRefVectorConsumedCallbackErrorReclaimsLexicalOwner",
+            "TestASTDependencyRefWarmCallbacksAndEscapingBorrowValuesAllocateZero",
+            "TestASTDependencyRefFiniteIndependentContainerCounterOracle",
+            "TestASTDependencyRefVectorConstructorFaultSweepImmediateOwnership",
+            "TestASTDependencyRefBufferScalarCapacityBoundaries",
+            "TestASTDependencyRefVectorPointerComparisonsDoNotDereferenceAbsentDeadValue",
+            "TestASTDependencyRefAssignmentDebugRefusalRetainsSourceIncomingIncrement",
+            "TestASTDependencyRefRetainedCopyOnlyGetAndPhysicalBorrowOrdering",
+            "TestASTDependencyRefBufferSetXWrappedResizeBeforeIncrement",
+            "TestASTDependencyRefVectorGrowingSelfAppendGuardAndEmptyFastPath",
+            "TestASTDependencyRefBufferRawPointerCreationHasNoLogicalAssertion",
+            "TestASTDependencyRefRangeRefusalResumesAfterConsumedPrefix",
+            "TestASTDependencyRefVectorResizeFillUnusedDeadValueIsNoAction",
+            "TestASTDependencyRefCleanupMetadataBoundAndProgressTransfer",
+            "TestASTDependencyRefPendingForceManagerCloseReclaimsPhysicalGraph",
+            "TestASTDependencyRefResumedConsumedErrorStillFinishesRequestedDestruction",
+            "TestASTDependencyRefConstructorRefusedCleanupPublishesOwner",
+            "TestASTDependencyRefCopyConstructorRefusedCleanupPublishesOwner",
+            "TestASTDependencyRefActualOwnerCopyMoveStealAndAssignment",
+            "TestASTDependencyRefVectorSourceCallbacksAndFullRoutes"
+          ]
         }
       ],
       "ownership": [
         "Scalar references/views and charged cold vector headers/backing; source reference action order and ownership transfer mapped for sexpr. See SEXPR_PORT_STATUS.md.",
-        "Actual AST callbacks, source INC-before-growth/set-index ordering, ASC teardown, backing-bound views and charged initialized high-water metadata are recorded in AST_CORE_PACKET.md. No fake rollback consumes orphan INC prefixes; source manager teardown remains responsible for actual unowned nodes."
+        "Actual AST callbacks, source INC-before-growth/set-index ordering, ASC teardown, backing-bound views and charged initialized high-water metadata are recorded in AST_CORE_PACKET.md. No fake rollback consumes orphan INC prefixes; source manager teardown remains responsible for actual unowned nodes.",
+        "Actual dependency INC/DEC callbacks, raw scalar tokens and charged16-byte obj_ref/24-byte ref_vector/160-byte inline buffer records in existing real AST allocators. Source INC-before-growth, retained backing, captured-end append and consumed cleanup progress preserved. See AST_DEPENDENCY_REF_PACKET.md."
       ],
       "deviations": [
         "This concrete specialization does not implement all AST/other source specializations or remaining generic helper/hash surfaces. Ref-vector null callbacks and nonempty self-append have explicit checked Go adaptations.",
-        "Go scalar tokens replace addresses and encode copied/stale-owner/lifetime guards. Source initialized retained pointer slots remain readable in release and by physical borrows; never-initialized/OOB access is guarded. Other template specializations and pointer-hash/eq helpers remain open."
+        "Go scalar tokens replace addresses and encode copied/stale-owner/lifetime guards. Source initialized retained pointer slots remain readable in release and by physical borrows; never-initialized/OOB access is guarded. Other template specializations and pointer-hash/eq helpers remain open.",
+        "Owning construction cleanup refusal publishes a nonzero partial token with original error; scalar pending target/cursor tracks consumed callbacks without changing raw retained slots. Explicit Go retry/cleanup protects source-undefined interrupted destruction. Preserved ref_buffer copy ctor dependent-base lookup is uninstantiable; no repaired copy API. General templates, other owners/configs and full consumers remain open. See AST_DEPENDENCY_REF_PACKET.md."
       ]
     },
     {
@@ -109757,9 +109911,49 @@
       "sha256": "c617e23849390bd3d20d98e538bc5e4f53e62b2577dc97bbe10678590e33d4eb",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "ast_dependency_ref_buffer_borrow.go",
+        "ast_dependency_ref_buffer.go",
+        "ast_dependency_ref_buffer_ops.go",
+        "ast_dependency_ref.go",
+        "ast_dependency_ref_vector_access.go",
+        "ast_dependency_ref_vector_borrow.go",
+        "ast_dependency_ref_vector.go",
+        "ast_dependency_ref_vector_ops.go"
+      ],
+      "tests": [
+        "TestASTDependencyRefBufferInlineSourceRoutesAndCapturedAppend",
+        "TestASTDependencyRefBufferMutableBackUsesSourceAssertion",
+        "TestASTDependencyRefOwnersPointerFreeAndDistinctStorage",
+        "TestASTDependencyRefVectorAndBufferGrowthCopyDifferentTails",
+        "TestASTDependencyRefBufferCapturedDynamicSelfAppendPrefix",
+        "TestASTDependencyRefVectorVsBufferIncreasingShrinkSourceProfiles",
+        "TestASTDependencyRefSourcePushRefusalRetainsIncrement",
+        "TestASTDependencyRefRawBufferBorrowDoesNotInventCallbacks",
+        "TestASTDependencyRefBufferInlineBorrowSurvivesFinalizeAndGrowth",
+        "TestASTDependencyRefVectorDebugCounterRefusalKeepsOwnedBacking",
+        "TestASTDependencyRefVectorConsumedCallbackErrorReclaimsLexicalOwner",
+        "TestASTDependencyRefWarmCallbacksAndEscapingBorrowValuesAllocateZero",
+        "TestASTDependencyRefFiniteIndependentContainerCounterOracle",
+        "TestASTDependencyRefVectorConstructorFaultSweepImmediateOwnership",
+        "TestASTDependencyRefBufferScalarCapacityBoundaries",
+        "TestASTDependencyRefVectorPointerComparisonsDoNotDereferenceAbsentDeadValue",
+        "TestASTDependencyRefAssignmentDebugRefusalRetainsSourceIncomingIncrement",
+        "TestASTDependencyRefRetainedCopyOnlyGetAndPhysicalBorrowOrdering",
+        "TestASTDependencyRefBufferSetXWrappedResizeBeforeIncrement",
+        "TestASTDependencyRefVectorGrowingSelfAppendGuardAndEmptyFastPath",
+        "TestASTDependencyRefBufferRawPointerCreationHasNoLogicalAssertion",
+        "TestASTDependencyRefRangeRefusalResumesAfterConsumedPrefix",
+        "TestASTDependencyRefVectorResizeFillUnusedDeadValueIsNoAction",
+        "TestASTDependencyRefCleanupMetadataBoundAndProgressTransfer",
+        "TestASTDependencyRefPendingForceManagerCloseReclaimsPhysicalGraph",
+        "TestASTDependencyRefResumedConsumedErrorStillFinishesRequestedDestruction",
+        "TestASTDependencyRefConstructorRefusedCleanupPublishesOwner",
+        "TestASTDependencyRefCopyConstructorRefusedCleanupPublishesOwner",
+        "TestASTDependencyRefActualOwnerCopyMoveStealAndAssignment",
+        "TestASTDependencyRefVectorSourceCallbacksAndFullRoutes"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -109786,9 +109980,57 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete dependency inline16 ref_buffer source callbacks/growth/captured raw append/resize/lifecycle",
+          "status": "partial",
+          "go_target": "ast_dependency_ref_buffer.go",
+          "tests": [
+            "TestASTDependencyRefBufferInlineSourceRoutesAndCapturedAppend",
+            "TestASTDependencyRefBufferMutableBackUsesSourceAssertion",
+            "TestASTDependencyRefOwnersPointerFreeAndDistinctStorage",
+            "TestASTDependencyRefVectorAndBufferGrowthCopyDifferentTails",
+            "TestASTDependencyRefBufferCapturedDynamicSelfAppendPrefix",
+            "TestASTDependencyRefVectorVsBufferIncreasingShrinkSourceProfiles",
+            "TestASTDependencyRefSourcePushRefusalRetainsIncrement",
+            "TestASTDependencyRefRawBufferBorrowDoesNotInventCallbacks",
+            "TestASTDependencyRefBufferInlineBorrowSurvivesFinalizeAndGrowth",
+            "TestASTDependencyRefVectorDebugCounterRefusalKeepsOwnedBacking",
+            "TestASTDependencyRefVectorConsumedCallbackErrorReclaimsLexicalOwner",
+            "TestASTDependencyRefWarmCallbacksAndEscapingBorrowValuesAllocateZero",
+            "TestASTDependencyRefFiniteIndependentContainerCounterOracle",
+            "TestASTDependencyRefVectorConstructorFaultSweepImmediateOwnership",
+            "TestASTDependencyRefBufferScalarCapacityBoundaries",
+            "TestASTDependencyRefVectorPointerComparisonsDoNotDereferenceAbsentDeadValue",
+            "TestASTDependencyRefAssignmentDebugRefusalRetainsSourceIncomingIncrement",
+            "TestASTDependencyRefRetainedCopyOnlyGetAndPhysicalBorrowOrdering",
+            "TestASTDependencyRefBufferSetXWrappedResizeBeforeIncrement",
+            "TestASTDependencyRefVectorGrowingSelfAppendGuardAndEmptyFastPath",
+            "TestASTDependencyRefBufferRawPointerCreationHasNoLogicalAssertion",
+            "TestASTDependencyRefRangeRefusalResumesAfterConsumedPrefix",
+            "TestASTDependencyRefVectorResizeFillUnusedDeadValueIsNoAction",
+            "TestASTDependencyRefCleanupMetadataBoundAndProgressTransfer",
+            "TestASTDependencyRefPendingForceManagerCloseReclaimsPhysicalGraph",
+            "TestASTDependencyRefResumedConsumedErrorStillFinishesRequestedDestruction",
+            "TestASTDependencyRefConstructorRefusedCleanupPublishesOwner",
+            "TestASTDependencyRefCopyConstructorRefusedCleanupPublishesOwner",
+            "TestASTDependencyRefActualOwnerCopyMoveStealAndAssignment",
+            "TestASTDependencyRefVectorSourceCallbacksAndFullRoutes"
+          ]
+        },
+        {
+          "name": "Dependency ref_buffer copy constructor (preserved uninstantiable dependent-base append lookup), other sizes/configurations",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Actual dependency INC/DEC callbacks, raw scalar tokens and charged16-byte obj_ref/24-byte ref_vector/160-byte inline buffer records in existing real AST allocators. Source INC-before-growth, retained backing, captured-end append and consumed cleanup progress preserved. See AST_DEPENDENCY_REF_PACKET.md."
+      ],
+      "deviations": [
+        "Owning construction cleanup refusal publishes a nonzero partial token with original error; scalar pending target/cursor tracks consumed callbacks without changing raw retained slots. Explicit Go retry/cleanup protects source-undefined interrupted destruction. Preserved ref_buffer copy ctor dependent-base lookup is uninstantiable; no repaired copy API. General templates, other owners/configs and full consumers remain open. See AST_DEPENDENCY_REF_PACKET.md."
+      ]
     },
     {
       "path": "src/util/ref_util.h",
@@ -109826,7 +110068,15 @@
         "ast_ref_vector_access.go",
         "ast_ref_vector_borrow.go",
         "ast_ref_vector_ops.go",
-        "util_sexpr.go"
+        "util_sexpr.go",
+        "ast_dependency_ref_buffer_borrow.go",
+        "ast_dependency_ref_buffer.go",
+        "ast_dependency_ref_buffer_ops.go",
+        "ast_dependency_ref.go",
+        "ast_dependency_ref_vector_access.go",
+        "ast_dependency_ref_vector_borrow.go",
+        "ast_dependency_ref_vector.go",
+        "ast_dependency_ref_vector_ops.go"
       ],
       "tests": [
         "TestASTRefVectorBorrowedInputDefaultEraseAndMove",
@@ -109853,7 +110103,37 @@
         "TestSexprRCWrapAndDeletionLIFO",
         "TestSexprRegisteredEscapedDefaultPrintInputs",
         "TestSexprStringBytesAndWrapperRemainingBranches",
-        "TestSexprWarmPlateauAndGenerationGuards"
+        "TestSexprWarmPlateauAndGenerationGuards",
+        "TestASTDependencyRefBufferInlineSourceRoutesAndCapturedAppend",
+        "TestASTDependencyRefBufferMutableBackUsesSourceAssertion",
+        "TestASTDependencyRefOwnersPointerFreeAndDistinctStorage",
+        "TestASTDependencyRefVectorAndBufferGrowthCopyDifferentTails",
+        "TestASTDependencyRefBufferCapturedDynamicSelfAppendPrefix",
+        "TestASTDependencyRefVectorVsBufferIncreasingShrinkSourceProfiles",
+        "TestASTDependencyRefSourcePushRefusalRetainsIncrement",
+        "TestASTDependencyRefRawBufferBorrowDoesNotInventCallbacks",
+        "TestASTDependencyRefBufferInlineBorrowSurvivesFinalizeAndGrowth",
+        "TestASTDependencyRefVectorDebugCounterRefusalKeepsOwnedBacking",
+        "TestASTDependencyRefVectorConsumedCallbackErrorReclaimsLexicalOwner",
+        "TestASTDependencyRefWarmCallbacksAndEscapingBorrowValuesAllocateZero",
+        "TestASTDependencyRefFiniteIndependentContainerCounterOracle",
+        "TestASTDependencyRefVectorConstructorFaultSweepImmediateOwnership",
+        "TestASTDependencyRefBufferScalarCapacityBoundaries",
+        "TestASTDependencyRefVectorPointerComparisonsDoNotDereferenceAbsentDeadValue",
+        "TestASTDependencyRefAssignmentDebugRefusalRetainsSourceIncomingIncrement",
+        "TestASTDependencyRefRetainedCopyOnlyGetAndPhysicalBorrowOrdering",
+        "TestASTDependencyRefBufferSetXWrappedResizeBeforeIncrement",
+        "TestASTDependencyRefVectorGrowingSelfAppendGuardAndEmptyFastPath",
+        "TestASTDependencyRefBufferRawPointerCreationHasNoLogicalAssertion",
+        "TestASTDependencyRefRangeRefusalResumesAfterConsumedPrefix",
+        "TestASTDependencyRefVectorResizeFillUnusedDeadValueIsNoAction",
+        "TestASTDependencyRefCleanupMetadataBoundAndProgressTransfer",
+        "TestASTDependencyRefPendingForceManagerCloseReclaimsPhysicalGraph",
+        "TestASTDependencyRefResumedConsumedErrorStillFinishesRequestedDestruction",
+        "TestASTDependencyRefConstructorRefusedCleanupPublishesOwner",
+        "TestASTDependencyRefCopyConstructorRefusedCleanupPublishesOwner",
+        "TestASTDependencyRefActualOwnerCopyMoveStealAndAssignment",
+        "TestASTDependencyRefVectorSourceCallbacksAndFullRoutes"
       ],
       "conditionals": [
         {
@@ -109928,15 +110208,54 @@
             "TestASTRefVectorCopyAppendResizeAndTransfer",
             "TestASTRefVectorSetIndexGuardAfterSourceIncrement"
           ]
+        },
+        {
+          "name": "Concrete dependency ref_vector source callback/growth/copy/resize/borrow/lifecycle operations",
+          "status": "partial",
+          "go_target": "ast_dependency_ref_vector.go",
+          "tests": [
+            "TestASTDependencyRefBufferInlineSourceRoutesAndCapturedAppend",
+            "TestASTDependencyRefBufferMutableBackUsesSourceAssertion",
+            "TestASTDependencyRefOwnersPointerFreeAndDistinctStorage",
+            "TestASTDependencyRefVectorAndBufferGrowthCopyDifferentTails",
+            "TestASTDependencyRefBufferCapturedDynamicSelfAppendPrefix",
+            "TestASTDependencyRefVectorVsBufferIncreasingShrinkSourceProfiles",
+            "TestASTDependencyRefSourcePushRefusalRetainsIncrement",
+            "TestASTDependencyRefRawBufferBorrowDoesNotInventCallbacks",
+            "TestASTDependencyRefBufferInlineBorrowSurvivesFinalizeAndGrowth",
+            "TestASTDependencyRefVectorDebugCounterRefusalKeepsOwnedBacking",
+            "TestASTDependencyRefVectorConsumedCallbackErrorReclaimsLexicalOwner",
+            "TestASTDependencyRefWarmCallbacksAndEscapingBorrowValuesAllocateZero",
+            "TestASTDependencyRefFiniteIndependentContainerCounterOracle",
+            "TestASTDependencyRefVectorConstructorFaultSweepImmediateOwnership",
+            "TestASTDependencyRefBufferScalarCapacityBoundaries",
+            "TestASTDependencyRefVectorPointerComparisonsDoNotDereferenceAbsentDeadValue",
+            "TestASTDependencyRefAssignmentDebugRefusalRetainsSourceIncomingIncrement",
+            "TestASTDependencyRefRetainedCopyOnlyGetAndPhysicalBorrowOrdering",
+            "TestASTDependencyRefBufferSetXWrappedResizeBeforeIncrement",
+            "TestASTDependencyRefVectorGrowingSelfAppendGuardAndEmptyFastPath",
+            "TestASTDependencyRefBufferRawPointerCreationHasNoLogicalAssertion",
+            "TestASTDependencyRefRangeRefusalResumesAfterConsumedPrefix",
+            "TestASTDependencyRefVectorResizeFillUnusedDeadValueIsNoAction",
+            "TestASTDependencyRefCleanupMetadataBoundAndProgressTransfer",
+            "TestASTDependencyRefPendingForceManagerCloseReclaimsPhysicalGraph",
+            "TestASTDependencyRefResumedConsumedErrorStillFinishesRequestedDestruction",
+            "TestASTDependencyRefConstructorRefusedCleanupPublishesOwner",
+            "TestASTDependencyRefCopyConstructorRefusedCleanupPublishesOwner",
+            "TestASTDependencyRefActualOwnerCopyMoveStealAndAssignment",
+            "TestASTDependencyRefVectorSourceCallbacksAndFullRoutes"
+          ]
         }
       ],
       "ownership": [
         "Scalar references/views and charged cold vector headers/backing; source reference action order and ownership transfer mapped for sexpr. See SEXPR_PORT_STATUS.md.",
-        "Actual AST callbacks, source INC-before-growth/set-index ordering, ASC teardown, backing-bound views and charged initialized high-water metadata are recorded in AST_CORE_PACKET.md. No fake rollback consumes orphan INC prefixes; source manager teardown remains responsible for actual unowned nodes."
+        "Actual AST callbacks, source INC-before-growth/set-index ordering, ASC teardown, backing-bound views and charged initialized high-water metadata are recorded in AST_CORE_PACKET.md. No fake rollback consumes orphan INC prefixes; source manager teardown remains responsible for actual unowned nodes.",
+        "Actual dependency INC/DEC callbacks, raw scalar tokens and charged16-byte obj_ref/24-byte ref_vector/160-byte inline buffer records in existing real AST allocators. Source INC-before-growth, retained backing, captured-end append and consumed cleanup progress preserved. See AST_DEPENDENCY_REF_PACKET.md."
       ],
       "deviations": [
         "This concrete specialization does not implement all AST/other source specializations or remaining generic helper/hash surfaces. Ref-vector null callbacks and nonempty self-append have explicit checked Go adaptations.",
-        "Go scalar tokens replace addresses and encode copied/stale-owner/lifetime guards. Source initialized retained pointer slots remain readable in release and by physical borrows; never-initialized/OOB access is guarded. Other template specializations and pointer-hash/eq helpers remain open."
+        "Go scalar tokens replace addresses and encode copied/stale-owner/lifetime guards. Source initialized retained pointer slots remain readable in release and by physical borrows; never-initialized/OOB access is guarded. Other template specializations and pointer-hash/eq helpers remain open.",
+        "Owning construction cleanup refusal publishes a nonzero partial token with original error; scalar pending target/cursor tracks consumed callbacks without changing raw retained slots. Explicit Go retry/cleanup protects source-undefined interrupted destruction. Preserved ref_buffer copy ctor dependent-base lookup is uninstantiable; no repaired copy API. General templates, other owners/configs and full consumers remain open. See AST_DEPENDENCY_REF_PACKET.md."
       ]
     },
     {

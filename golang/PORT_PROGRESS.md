@@ -1097,3 +1097,24 @@ Full native/debug integration,25 named race/actual JS groups, vet, WASI
 compilation and source/no-generics gates passed. SAT_WATCH_SORT_PORT_STATUS.md
 records the selected standard-library backend adaptation and exact hashes.
 The real solver's outer watch sorting call and full algorithms remain open.
+
+
+## Real dependency owning aliases
+
+Actual dependency obj_ref, ref_vector and inline16 ref_buffer specializations
+now use source callbacks and scalar owned tokens in existing AST allocators.
+Tests first exposed missing APIs; independent review additionally corrected
+raw scalar comparisons, equal-size no-action resize, raw buffer back access,
+consumed cleanup progress and constructor cleanup refusal. An interrupted
+cleanup tracks its first unconsumed callback without clearing retained raw
+slots. A constructor that cannot release all roots returns a charged partial
+owner with its original error for explicit caller cleanup. These safe Go
+continuations are documented separately from source undefined failure domains.
+
+Twelve frozen Go files passed full native/debug,30 exact named race/actual JS
+groups, vet, WASI test/full compilation and source/no-generics verification.
+Actual24-byte vector metadata and160-byte inline buffer storage are charged.
+See AST_DEPENDENCY_REF_PACKET.md for source methods, hashes, prefixes and the
+preserved uninstantiable C++ buffer-copy constructor. ref_buffer.h becomes
+partial; ledger33ported/88partial/1981unported. Full consumers and the complete
+solver/proof/interpolation scope remain open.
