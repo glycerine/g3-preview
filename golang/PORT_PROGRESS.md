@@ -828,3 +828,14 @@ actual out-of-bounds continuations return a typed error before mutation. Frozen
 full native/checked-debug, twelve named race/actual JS, vet/WASI and source/no-
 generics checks passed. Coverage counts are unchanged. AST, MPFF and complete SAT
 storage packets continue in parallel; the full solver port remains incomplete.
+
+## Next proof-construction source contract
+
+The coordinator read all out-of-line AST proof builder/reader bodies and their
+inline inspection contracts, recording all 44 distinct method names and every
+overload as required next work in AST_PROOF_PACKET.md. The audit distinguishes
+per-method proof-disabled behavior, the legacy two-argument three-input helper,
+ignored NNF validation results, both actual unit-resolution bodies and append-only
+hyper-resolution output prefixes. The registered proof-checker test still needs
+the real checker and its one VERIFY; proof construction cannot stand in for it.
+This is a source contract artifact, with no source/API completion relabeling.
