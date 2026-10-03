@@ -64,18 +64,20 @@ func (c *satSolverAssignmentColumn) capacity() (uint32, error) {
 	}
 	return satAssignmentReadWord(c.runtime, c.block, 0)
 }
-func satAssignmentNext(old uint32) (uint32, uint32, error) {
+func satAssignmentNext(old uint32) (uint32, uint32, error) { return satScalarColumnNext(old, 1) }
+func satScalarColumnNext(old, stride uint32) (uint32, uint32, error) {
 	if old == 0 {
-		return 2, 10, nil
+		return 2, 2*stride + 8, nil
 	}
 	n := (3*old + 1) >> 1
-	before, after := old+8, n+8
+	before, after := old*stride+8, n*stride+8
 	if n <= old || after <= before {
 		return 0, 0, NewDefaultException("Overflow encountered when expanding vector")
 	}
 	return n, after, nil
 }
-func (c *satSolverAssignmentColumn) expand() error {
+func (c *satSolverAssignmentColumn) expand() error { return c.expandStride(1) }
+func (c *satSolverAssignmentColumn) expandStride(stride uint32) error {
 	old, e := c.capacity()
 	if e != nil {
 		return e
@@ -88,7 +90,7 @@ func (c *satSolverAssignmentColumn) expand() error {
 		}
 		return NewDefaultException("Overflow encountered when expanding vector")
 	}
-	n, request, e := satAssignmentNext(old)
+	n, request, e := satScalarColumnNext(old, stride)
 	if e != nil {
 		return e
 	}

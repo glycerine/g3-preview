@@ -57,10 +57,10 @@ func (s *RationalService) facadeRawBinaryLocked(a, b, out *Rational, op rational
 	}
 }
 func (s *RationalService) facadeValueLocked(a, b *OwnedRational, op rationalFacadeBinaryOp) (_lexOut OwnedRational, _lexErr error) {
-	if e := s.lexicalReady(); e != nil {
+	if e := s.beginLexical(); e != nil {
 		return OwnedRational{}, e
 	}
-	defer s.finishLexicalRational(&_lexOut, &_lexErr)
+	defer s.endLexicalRational(&_lexOut, &_lexErr)
 	if e := s.check(a); e != nil {
 		return OwnedRational{}, e
 	}
@@ -68,13 +68,15 @@ func (s *RationalService) facadeValueLocked(a, b *OwnedRational, op rationalFaca
 		return OwnedRational{}, e
 	}
 	work := NewRational()
-	defer s.destroyLexicalRational(&work)
+	workComplete := !(op >= rationalFacadeAdd && op <= rationalFacadeDiv)
+	defer s.endLexicalLocal(&work, &workComplete)
 	if op >= rationalFacadeAdd && op <= rationalFacadeDiv {
 		// return rational(a) op= b: copy before compound, then copy the returned
 		// lvalue into the value result. The second copy is intentionally observable.
 		if e := s.manager.Copy(&work, &a.raw); e != nil {
 			return OwnedRational{}, e
 		}
+		workComplete = true
 		if e := s.facadeRawBinaryLocked(&work, &b.raw, &work, op); e != nil {
 			return OwnedRational{}, e
 		}
@@ -185,18 +187,20 @@ func (s *RationalService) facadeScalar(a *OwnedRational, n int32, op rationalFac
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.lexicalReady(); e != nil {
+	if e := s.beginLexical(); e != nil {
 		return OwnedRational{}, e
 	}
-	defer s.finishLexicalRational(&_lexOut, &_lexErr)
+	defer s.endLexicalRational(&_lexOut, &_lexErr)
 	if e := s.check(a); e != nil {
 		return OwnedRational{}, e
 	}
 	v := OwnedRational{raw: NewRational(), ownerID: s.ownerID}
-	defer s.destroyLexicalRational(&v.raw)
+	vComplete := false
+	defer s.endLexicalLocal(&v.raw, &vComplete)
 	if e := s.manager.SetInt64(&v.raw, int64(n)); e != nil {
 		return OwnedRational{}, e
 	}
+	vComplete = true
 	if left {
 		return s.facadeValueLocked(&v, a, op)
 	}
@@ -231,18 +235,20 @@ func (s *RationalService) AddAssignInt(a *OwnedRational, n int32) (_lexErr error
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.lexicalReady(); e != nil {
+	if e := s.beginLexical(); e != nil {
 		return e
 	}
-	defer s.finishLexicalError(&_lexErr)
+	defer s.endLexicalError(&_lexErr)
 	if e := s.check(a); e != nil {
 		return e
 	}
 	v := OwnedRational{raw: NewRational(), ownerID: s.ownerID}
-	defer s.destroyLexicalRational(&v.raw)
+	vComplete := false
+	defer s.endLexicalLocal(&v.raw, &vComplete)
 	if e := s.manager.SetInt64(&v.raw, int64(n)); e != nil {
 		return e
 	}
+	vComplete = true
 	return s.facadeAssignLocked(a, &v, rationalFacadeAdd)
 }
 func (s *RationalService) AssignInt(a *OwnedRational, n int32) (_lexErr error) {
@@ -250,18 +256,20 @@ func (s *RationalService) AssignInt(a *OwnedRational, n int32) (_lexErr error) {
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.lexicalReady(); e != nil {
+	if e := s.beginLexical(); e != nil {
 		return e
 	}
-	defer s.finishLexicalError(&_lexErr)
+	defer s.endLexicalError(&_lexErr)
 	if e := s.check(a); e != nil {
 		return e
 	}
 	v := NewRational()
-	defer s.destroyLexicalRational(&v)
+	vComplete := false
+	defer s.endLexicalLocal(&v, &vComplete)
 	if e := s.manager.SetInt64(&v, int64(n)); e != nil {
 		return e
 	}
+	vComplete = true
 	return s.manager.Copy(&a.raw, &v)
 }
 func (s *RationalService) facadePrefixLocked(a *OwnedRational, dec bool) error {
@@ -290,18 +298,20 @@ func (s *RationalService) facadePostfix(a *OwnedRational, dec bool) (_lexOut Own
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.lexicalReady(); e != nil {
+	if e := s.beginLexical(); e != nil {
 		return OwnedRational{}, e
 	}
-	defer s.finishLexicalRational(&_lexOut, &_lexErr)
+	defer s.endLexicalRational(&_lexOut, &_lexErr)
 	if e := s.check(a); e != nil {
 		return OwnedRational{}, e
 	}
 	old := NewRational()
-	defer s.destroyLexicalRational(&old)
+	oldComplete := false
+	defer s.endLexicalLocal(&old, &oldComplete)
 	if e := s.manager.Copy(&old, &a.raw); e != nil {
 		return OwnedRational{}, e
 	}
+	oldComplete = true
 	if e := s.facadePrefixLocked(a, dec); e != nil {
 		return OwnedRational{}, e
 	}
@@ -331,10 +341,10 @@ func (s *RationalService) facadeUnary(a *OwnedRational, op rationalFacadeUnaryOp
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.lexicalReady(); e != nil {
+	if e := s.beginLexical(); e != nil {
 		return OwnedRational{}, e
 	}
-	defer s.finishLexicalRational(&_lexOut, &_lexErr)
+	defer s.endLexicalRational(&_lexOut, &_lexErr)
 	if op == facadeNumerator || op == facadeDenominator {
 		if e := s.rationalScalarOwner(a); e != nil {
 			return OwnedRational{}, e
@@ -345,12 +355,14 @@ func (s *RationalService) facadeUnary(a *OwnedRational, op rationalFacadeUnaryOp
 		}
 	}
 	work := NewRational()
-	defer s.destroyLexicalRational(&work)
+	workComplete := op != facadeNeg && op != facadeAbs
+	defer s.endLexicalLocal(&work, &workComplete)
 	var e error
 	switch op {
 	case facadeNeg, facadeAbs:
 		e = s.manager.Copy(&work, &a.raw)
 		if e == nil {
+			workComplete = true
 			if op == facadeNeg {
 				e = s.manager.Neg(&work)
 			} else {
@@ -468,18 +480,20 @@ func (s *RationalService) facadeCompareInt(a *OwnedRational, n int32, op uint8) 
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.lexicalReady(); e != nil {
+	if e := s.beginLexical(); e != nil {
 		return false, e
 	}
-	defer s.finishLexicalError(&_lexErr)
+	defer s.endLexicalError(&_lexErr)
 	if e := s.check(a); e != nil {
 		return false, e
 	}
 	v := OwnedRational{raw: NewRational(), ownerID: s.ownerID}
-	defer s.destroyLexicalRational(&v.raw)
+	vComplete := false
+	defer s.endLexicalLocal(&v.raw, &vComplete)
 	if e := s.manager.SetInt64(&v.raw, int64(n)); e != nil {
 		return false, e
 	}
+	vComplete = true
 	if op == 5 {
 		return s.manager.Equal(&a.raw, &v.raw)
 	}
@@ -756,10 +770,10 @@ func (s *RationalService) facadeAddMul(a, c, k *OwnedRational, subtract bool) (_
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.lexicalReady(); e != nil {
+	if e := s.beginLexical(); e != nil {
 		return e
 	}
-	defer s.finishLexicalError(&_lexErr)
+	defer s.endLexicalError(&_lexErr)
 	for _, v := range []*OwnedRational{a, c, k} {
 		if e := s.check(v); e != nil {
 			return e
@@ -789,10 +803,12 @@ func (s *RationalService) facadeAddMul(a, c, k *OwnedRational, subtract bool) (_
 		return s.facadeAssignLocked(a, k, op)
 	}
 	temp := OwnedRational{raw: NewRational(), ownerID: s.ownerID}
-	defer s.destroyLexicalRational(&temp.raw)
+	tempComplete := false
+	defer s.endLexicalLocal(&temp.raw, &tempComplete)
 	if e := s.manager.Copy(&temp.raw, &k.raw); e != nil {
 		return e
 	}
+	tempComplete = true
 	if e := s.facadeAssignLocked(&temp, c, rationalFacadeMul); e != nil {
 		return e
 	}
@@ -809,10 +825,10 @@ func (s *RationalService) ModHat(a, b *OwnedRational) (_lexOut OwnedRational, _l
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.lexicalReady(); e != nil {
+	if e := s.beginLexical(); e != nil {
 		return OwnedRational{}, e
 	}
-	defer s.finishLexicalRational(&_lexOut, &_lexErr)
+	defer s.endLexicalRational(&_lexOut, &_lexErr)
 	if e := s.check(a); e != nil {
 		return OwnedRational{}, e
 	}
@@ -839,15 +855,19 @@ func (s *RationalService) ModHat(a, b *OwnedRational) (_lexOut OwnedRational, _l
 		return OwnedRational{}, ErrRationalFacadeDomain
 	}
 	r2 := OwnedRational{raw: NewRational(), ownerID: s.ownerID}
-	defer s.destroyLexicalRational(&r2.raw)
+	r2Complete := false
+	defer s.endLexicalLocal(&r2.raw, &r2Complete)
 	if e := s.manager.Copy(&r2.raw, &r.raw); e != nil {
 		return OwnedRational{}, e
 	}
+	r2Complete = true
 	two := OwnedRational{raw: NewRational(), ownerID: s.ownerID}
-	defer s.destroyLexicalRational(&two.raw)
+	twoComplete := false
+	defer s.endLexicalLocal(&two.raw, &twoComplete)
 	if e := s.manager.SetInt64(&two.raw, 2); e != nil {
 		return OwnedRational{}, e
 	}
+	twoComplete = true
 	if e := s.facadeAssignLocked(&r2, &two, rationalFacadeMul); e != nil {
 		return OwnedRational{}, e
 	}
@@ -874,18 +894,20 @@ func (s *RationalService) NumBits(a *OwnedRational) (_lexValue uint32, _lexErr e
 		return 0, e
 	}
 	defer s.mu.Unlock()
-	if e := s.lexicalReady(); e != nil {
+	if e := s.beginLexical(); e != nil {
 		return 0, e
 	}
-	defer s.finishLexicalError(&_lexErr)
+	defer s.endLexicalError(&_lexErr)
 	if e := s.check(a); e != nil {
 		return 0, e
 	}
 	two := OwnedRational{raw: NewRational(), ownerID: s.ownerID}
-	defer s.destroyLexicalRational(&two.raw)
+	twoComplete := false
+	defer s.endLexicalLocal(&two.raw, &twoComplete)
 	if e := s.manager.SetInt64(&two.raw, 2); e != nil {
 		return 0, e
 	}
+	twoComplete = true
 	integer, e := s.manager.IsInt(&a.raw)
 	if e != nil {
 		return 0, e
@@ -901,10 +923,12 @@ func (s *RationalService) NumBits(a *OwnedRational) (_lexValue uint32, _lexErr e
 		return 0, ErrRationalFacadeDomain
 	}
 	n := OwnedRational{raw: NewRational(), ownerID: s.ownerID}
-	defer s.destroyLexicalRational(&n.raw)
+	nComplete := false
+	defer s.endLexicalLocal(&n.raw, &nComplete)
 	if e := s.manager.Copy(&n.raw, &a.raw); e != nil {
 		return 0, e
 	}
+	nComplete = true
 	count := uint32(1)
 	for {
 		quotient, e := s.facadeValueLocked(&n, &two, rationalFacadeIDiv)

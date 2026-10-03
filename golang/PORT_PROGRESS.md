@@ -21,7 +21,13 @@ passing suites do not satisfy this objective.
 - Source ledger: **2,102 units; 28 ported, 155 partial, 1,919 unported**. All **677
   API operations remain unported** in the machine inventory. Source fingerprint:
   `f8480997c14e2d6c414f40c60ce5095ef40a89ce6d1bcf1ed196c5d682d42d8f`.
-- Current corrected603-Go-file tree: both full suites are **GREEN**, terminal0 in
+- Current corrected611-Go-file tree: both full suites are **GREEN**, terminal0
+  in `.cache/scalar-phase-native.log` and `.cache/scalar-phase-debug.log`.
+  Main native13.504s/debug753.057s; numeric92.275s/197.999s. Both full vet
+  profiles pass; final source/no-generics audit passes with synchronized selected
+  method/test mappings. All611 files and hashes match
+  `.cache/scalar-phase-go-hashes.json`. Whole-source/API status totals are unchanged.
+- Committed `91f05d4` corrected603-Go-file baseline: both full suites are **GREEN**, terminal0 in
   `.cache/source-runtime-native.log` and `.cache/source-runtime-debug.log`.
   Main native12.800s/debug710.060s; numeric91.057s/193.434s. Both vet profiles
   ended0 in `.cache/source-runtime-vet-{native,debug}.log`; source/no-generics
@@ -586,40 +592,102 @@ Parallel source observations (draft implementation, not full-suite evidence):
   →inner limbs→C-string insertion→char destructor. Related consumer lifetimes and
   unsupported source architecture/stream profiles remain separate obligations.
 
+## Follow-up to 91f05d4 — scalar storage and constructor/display lifetimes
+
+Tests-first RED preceded implementation; the combined full native and
+checked/debug suites now pass on the frozen611-Go-file tree. No source-unit, API or assertion inventory promotion
+is claimed by these selected physical-storage/lifetime slices.
+
+- SAT: actual Runtime-backed storage now covers the eight remaining char columns
+  and uint32 level alongside assignment. The first MkVar independently requires
+  186 source-accounted bytes and ten actual blocks. Literal source unsigned32
+  request arithmetic, actual initialized/spare bytes, level TLS pending ownership,
+  reversed member release and the immediate once-only ownership graph are tested.
+  Genuine RED `.cache/sat-scalar-runtime/red.log` preceded implementation. Frozen
+  seven-file evidence `.cache/sat-scalar-runtime/final-sha256.txt`; native/debug
+  focused suites each pass128 groups/262 RUN-PASS; vet passes. Other SAT activity,
+  justification, pointers, watches, clauses and trail storage remain separate.
+- Root raw rational decimal display: mpq.cpp156–184 has raw `mpz` locals and an
+  explicit normal end-label Del order NUM→DEN→digit. Three actual Int records now
+  live in the charged IntegerManager header. Early body failure retains them;
+  successful return runs the exact Del cursor and propagates cleanup failure.
+  `CleanupRawDisplay` is explicit owning Go abort, and scope reuse alone is guarded.
+  Other reads and separate pending allocator cleanup retain their existing rules.
+  Integer Close drains these named roots before general cell cleanup; the test
+  physical census names each actual scope record. Genuine isolated91f05d4 RED
+  `.cache/display-local-red.log` observed live8 instead of the required9 after a
+  denominator-copy refusal. The original display/output family passes31.867s in
+  `.cache/display-local-impact.log`; the new immediate-root/reuse test passes
+  native/debug and observes ownership before disabling the fault. Binary rational
+  raw decimal/interval locals and negative SMT2 scoped locals remain open, as do
+  broader source assertions and ostream/locale profiles.
+- Numeric constructor phases: six independent tests reproduced COPY partial
+  abort before completed outer unwind and InfPower extra prvalue deep copy.
+  Concrete local completion bits and scalar nested depth now distinguish
+  COPY/VALUE completion from already-completed DEFAULT results. Completed source
+  locals unwind before partial owning abort; actual NUM/DEN cursors and done bits
+  retain refused cleanup. Selected facade expression/postfix/unary/fused/cache/
+  projection routes and Inf member constructors use these phases. InfDiv assigns
+  FIRST→EPS into the completed default result; its failed assignment destructor
+  runs EPS→FIRST. InfPower follows source C++11 prvalue move/elision. Existing8
+  service/1 raw bridge roots remain actual charged records. Frozen8 files:
+  `.cache/constructor-phase-frozen.json`; exact114 groups pass native4.430s and
+  checked/debug6.232s; both vet profiles pass. RED evidence is in
+  `.cache/constructor-phase-red.log`, `.cache/constructor-power-move-red.log`
+  and `.cache/constructor-expression-phase-red.log`. No existing
+  tests were weakened or changed and no registered ENSURE credit was added.
+- MPFF mpff.cpp1161–1382: source precision is retained despite leading zero limbs,
+  so precision96/value1 executes seven real allocation calls; warmed Go allocation
+  count is14 rather than a fabricated zero. Actual lexical character1024, three
+  unsigned1024 buffers and unsigned16 buffer replace retained decimal Words.
+  Completed-default buffers and failed character constructors retain distinct
+  unwind/abort behavior. Nine tests cover every actual constructor prefix,
+  precision1025 decimal prefixes to success, inline boundaries1023/1024/1025/2049,
+  immediate roots and warm inline Go0. Frozen9 files:
+  `.cache/mpff-format-frozen.sha256`; all35 relevant groups pass native31.240s
+  and checked/debug33.618s; vet passes. The combined native preflight reproduced
+  a new audit error that equated a shared Budget with the FF subtree alone.
+  The corrected common census independently compares named exclusive Runtime
+  roots with physical/initialization bytes; original standalone exact whole-Budget
+  assertions remain intact. Existing decimal shadow-capacity assertions were
+  precisely replaced with actual completed lexical buffer oracles after RED.
+- The user's named `TestUPolynomialFactorFullAlgorithmImmediateFailureRoots`
+  passes in `.cache/factor-immediate-{native,debug}.log`: native404 refusals then
+  one successful endpoint; checked/debug845 refusals then one successful endpoint.
+  Its immediate physical census and bounded success requirements are unchanged.
+
+Combined gate evidence for the frozen611-Go-file tree:
+`.cache/scalar-phase-go-hashes.json` names every file and SHA256. Full native
+`go test ./... -timeout=30m` ended0 in `.cache/scalar-phase-native.log`
+(main13.504s, numeric92.275s). Both full vet profiles ended0 in
+`.cache/scalar-phase-vet-{native,debug}.log`. Final source/no-generics verification
+with the synchronized method/test mappings ended0 in
+`.cache/scalar-phase-audit-final.log`; inventory statuses and source fingerprint
+are unchanged. Full checked/debug `go test -tags g3checked,g3debug ./... -timeout=30m`
+ended0 in `.cache/scalar-phase-debug.log` (main753.057s, numeric197.999s).
+The original refinement precision and every allocation prefix remain intact.
+All Go hashes/file sets and agent freezes were rechecked before committing;
+no JS/WASM/WASI/race gate was run.
+
 ## TODO — prioritized handoff
 
-- [ ] Next constructor-phase source family: use branch-specific concrete
-  completion bits for copy/value constructors; preserve completed default result
-  construction. In particular source inf_rational.cpp80–111 constructs default
-  result before branch assignment, whereas current infDiv final infClone treats
-  it as copy construction; source result destruction on late EPS assignment
-  refusal must be EPS→FIRST. Inventory includes facade expression/postfix/NegAbs/
-  AddMul/ModHat/NumBits, cache/power initial values, Inf expression/fused/round
-  and extraction helpers. Integer setter raw-domain/value ctor differences and
-  return move/elision remain separate work. Preserve actual8/1 retained-root bounds
-  and warm0 through source-order tests rather than applying blanket abort cleanup.
-  Inner partial copy roots can outlive a failed helper while outer completed
-  locals still need source unwinding; a concrete lexical depth/order boundary
-  must defer abort-only roots until that completed unwind ends. Immediate inner
-  owning abort is an adapter, not proof of full-stack C++ destruction timing.
-  Existing charged8/1 roots suffice with scalar phase/depth/order metadata;
-  source infDiv assignment must replace final clone without duplicating result.
-- [ ] Next SAT actual-memory family: eight remaining char columns and uint32
-  level into the same Runtime as assignment/checkpoints, source header/growth/
-  operators/shrink/destruction, all MkVar/refusal/assignment/backtracking consumers
-  and a once-only named raw census. Activity, justification/pointer/watch/clause/
-  literal storage require separate concrete storage/profile integrations; no
-  source8-vs-expanded-Go-handle accounting tickets.
-- [ ] Next MPFF display family: mpff.cpp1161–1382 all displays and delegates,
-  actual char1024 plus per-call unsigned1024 buffer1/2/pw and unsigned16 buffer3.
-  Current trim-high-zero path changes allocation actions despite equal output:
-  source precision96/value1 passes all96 limbs, requiring char1056→2048 plus
-  temp96/numer97, seven source allocations; current trim-to1 makes none. Test
-  original precision, exact source events, immediate roots/unwind and branch
-  output oracles before integration. A following distinct numeric display family
-  must separate scoped negative-SMT2 mpz.cpp1412 locals from raw explicit-end-Del
-  mpq.cpp156/mpbq.cpp426/460 locals, whose unconditional defers currently over-clean
-  on earlier failures and ignore refusal. Global streams/locale remain separate.
+- [ ] Remaining constructor/lifetime closure: unframed external ExtendedGCD/caller
+  stacks must delay partial owning abort until their completed source locals
+  unwind. Raw scalar-overload/value constructor domains, public standalone move
+  adapters, InfDiv zero-FIRST and InfRoot negativity guard profiles remain open.
+  Selected typed local completion and nested helper frames do not prove full-stack
+  C++ failure timing for external callers. Preserve charged8/1 root bounds and
+  zero warm allocations.
+- [ ] Remaining SAT memory families: activity, justification/pointer/watch/clause/
+  literal/trail storage, full solver and shared global Runtime integration.
+  Nine char columns and uint32 levels now use actual same-Runtime source storage;
+  other columns must not claim source8-byte pointers via expanded Go handle tickets.
+- [ ] Remaining numeric display families: negative scoped SMT2 mpz.cpp1412,
+  binary raw decimal/interval mpbq.cpp426/460 explicit end-label locals, broader
+  raw decimal assertions and stream/global/locale/architecture profiles. Rational
+  mpq.cpp156 raw locals now retain actual early-failure roots; MPFF full-precision
+  char1024/unsigned1024/16 scopes are integrated. MPFF borrowed/TLS Runtime config,
+  permanent mantissa/storage topology and unsupported profile closure remain open.
 - [ ] Maintain full native and checked/debug GREEN across implementation commits;
   commit each coherent green chunk promptly. Use the documented30-minute debug
   timeout for the exhaustive original-precision refinement campaign.
@@ -665,6 +733,15 @@ Parallel source observations (draft implementation, not full-suite evidence):
 
 ## FINISHED — committed subset, with explicit limits
 
+- [x] Remaining eight SAT char columns and unsigned level use assignment's actual
+  Runtime; selected numeric COPY/VALUE/DEFAULT constructor phases and nested
+  helper unwind are explicit; MPFF full precision uses real lexical char1024 and
+  unsigned1024/16 buffers; raw rational decimal locals retain early-failure roots
+  before their explicit end-label cleanup. Full native/debug, both vet profiles
+  and final source/no-generics audit pass on the frozen611-Go-file tree. External
+  caller stacks, remaining raw/scoped displays, other SAT storage profiles,
+  complete fork/API and unsupported runtime profiles remain TODO. No whole-unit,
+  API or original assertion-count promotion.
 - [x] Actual SAT assignment char-vector Runtime storage and shared checkpoint
   accounting; ordinary digit32 decimal char1024 and limb lexical lifetimes;
   charged service8/bridge1 retained Rational roots, observable cleanup refusal,

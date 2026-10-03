@@ -121,17 +121,20 @@ func (m *RationalManager) SMT2String(a *Rational, decimal bool) (string, error) 
 
 // prepareDecimal retains source Copy, sign/Neg, Div/display/Rem, then each
 // Mul/Div/display/Rem action. No rounding or zero padding is introduced.
-func (m *RationalManager) prepareDecimal(a *Rational, precision uint32, truncate bool) (uint32, error) {
+func (m *RationalManager) prepareDecimal(a *Rational, precision uint32, truncate bool) (length uint32, resultErr error) {
 	if e := m.check(a); e != nil {
 		return 0, e
 	}
-	var numerator, denominator, digit Int
-	ten := NewInt(10)
-	defer func() { m.z.Del(&ten); m.z.Del(&numerator); m.z.Del(&denominator); m.z.Del(&digit) }()
-	if e := m.z.Copy(&numerator, &a.num); e != nil {
+	if e := m.z.beginRawDisplay(3, [3]uint8{0, 1, 2}); e != nil {
 		return 0, e
 	}
-	if e := m.z.Copy(&denominator, &a.den); e != nil {
+	defer m.z.finishRawDisplay(&resultErr, &length)
+	numerator, denominator, digit := &m.z.rawDisplay.roots[0], &m.z.rawDisplay.roots[1], &m.z.rawDisplay.roots[2]
+	ten := NewInt(10)
+	if e := m.z.Copy(numerator, &a.num); e != nil {
+		return 0, e
+	}
+	if e := m.z.Copy(denominator, &a.den); e != nil {
 		return 0, e
 	}
 	var offset uint32
@@ -141,18 +144,18 @@ func (m *RationalManager) prepareDecimal(a *Rational, precision uint32, truncate
 		if e != nil {
 			return 0, e
 		}
-		if e = m.z.Neg(&numerator); e != nil {
+		if e = m.z.Neg(numerator); e != nil {
 			return 0, e
 		}
 	}
-	if e := m.z.Div(&numerator, &denominator, &digit); e != nil {
+	if e := m.z.Div(numerator, denominator, digit); e != nil {
 		return 0, e
 	}
-	offset, e := m.z.prepareInteger(&digit, offset)
+	offset, e := m.z.prepareInteger(digit, offset)
 	if e != nil {
 		return 0, e
 	}
-	if e = m.z.Rem(&numerator, &denominator, &numerator); e != nil {
+	if e = m.z.Rem(numerator, denominator, numerator); e != nil {
 		return 0, e
 	}
 	if numerator.val == 0 {
@@ -163,17 +166,17 @@ func (m *RationalManager) prepareDecimal(a *Rational, precision uint32, truncate
 		return 0, e
 	}
 	for i := uint32(0); i < precision; i++ {
-		if e = m.z.Mul(&numerator, &ten, &numerator); e != nil {
+		if e = m.z.Mul(numerator, &ten, numerator); e != nil {
 			return 0, e
 		}
-		if e = m.z.Div(&numerator, &denominator, &digit); e != nil {
+		if e = m.z.Div(numerator, denominator, digit); e != nil {
 			return 0, e
 		}
-		offset, e = m.z.prepareInteger(&digit, offset)
+		offset, e = m.z.prepareInteger(digit, offset)
 		if e != nil {
 			return 0, e
 		}
-		if e = m.z.Rem(&numerator, &denominator, &numerator); e != nil {
+		if e = m.z.Rem(numerator, denominator, numerator); e != nil {
 			return 0, e
 		}
 		if numerator.val == 0 {

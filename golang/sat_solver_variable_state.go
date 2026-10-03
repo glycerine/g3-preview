@@ -17,9 +17,9 @@ type satSolverVariableState struct {
 	watches                                                                                  *satSolverWatchLists
 	assignment                                                                               satSolverAssignmentColumn
 	memory                                                                                   *memory.Runtime
-	decision, mark, literalMark, eliminated, external, phase, previousPhase, assignedSinceGC satVariableCharColumn
+	decision, mark, literalMark, eliminated, external, phase, previousPhase, assignedSinceGC satSolverAssignmentColumn
 	justification                                                                            satVariableJustificationColumn
-	level                                                                                    satVariableUintColumn
+	level                                                                                    satSolverRuntimeUintColumn
 	activity                                                                                 *satActivityDomain
 	queue                                                                                    *satVarQueue
 	trail                                                                                    *satSolverLiteralStore
@@ -55,6 +55,10 @@ func newSATSolverVariableState(todo *satSolverUintSet, b *arena.Budget, c arena.
 	s.self = s
 	s.memory = raw
 	s.assignment.bind(raw)
+	for _, col := range []*satSolverAssignmentColumn{&s.decision, &s.mark, &s.literalMark, &s.eliminated, &s.external, &s.phase, &s.previousPhase, &s.assignedSinceGC} {
+		col.bind(raw)
+	}
+	s.level.bind(raw)
 	var e error
 	s.watches, e = newSATSolverWatchLists(b, c)
 	if e == nil {
@@ -86,7 +90,7 @@ func (s *satSolverVariableState) open() error {
 	}
 	return nil
 }
-func (s *satSolverVariableState) numVars() uint32 { return uint32(len(s.level.data)) }
+func (s *satSolverVariableState) numVars() uint32 { n, _ := s.level.size(); return n }
 func (s *satSolverVariableState) mkVar(ext, dvar bool) (satBoolVar, error) {
 	if e := s.open(); e != nil {
 		return 0, e
@@ -94,7 +98,11 @@ func (s *satSolverVariableState) mkVar(ext, dvar bool) (satBoolVar, error) {
 	s.modelIsCurrent = false
 	s.modelKnown = true
 	s.mkVarCount++
-	v := satBoolVar(s.numVars())
+	n, e := s.level.size()
+	if e != nil {
+		return 0, e
+	}
+	v := satBoolVar(n)
 	if e := s.watches.PushEmpty(); e != nil {
 		return v, e
 	}
@@ -114,41 +122,41 @@ func (s *satSolverVariableState) mkVar(ext, dvar bool) (satBoolVar, error) {
 	if dvar {
 		decision = 1
 	}
-	if e := s.decision.push(s.budget, decision); e != nil {
+	if e := s.decision.push(decision); e != nil {
 		return v, e
 	}
-	if e := s.eliminated.push(s.budget, 0); e != nil {
+	if e := s.eliminated.push(0); e != nil {
 		return v, e
 	}
 	external := int8(0)
 	if ext {
 		external = 1
 	}
-	if e := s.external.push(s.budget, external); e != nil {
+	if e := s.external.push(external); e != nil {
 		return v, e
 	}
 	if e := s.activity.Push(0); e != nil {
 		return v, e
 	}
-	if e := s.level.push(s.budget, ^uint32(0)); e != nil {
+	if e := s.level.push(^uint32(0)); e != nil {
 		return v, e
 	}
-	if e := s.mark.push(s.budget, 0); e != nil {
+	if e := s.mark.push(0); e != nil {
 		return v, e
 	}
-	if e := s.literalMark.push(s.budget, 0); e != nil {
+	if e := s.literalMark.push(0); e != nil {
 		return v, e
 	}
-	if e := s.literalMark.push(s.budget, 0); e != nil {
+	if e := s.literalMark.push(0); e != nil {
 		return v, e
 	}
-	if e := s.phase.push(s.budget, 2); e != nil {
+	if e := s.phase.push(2); e != nil {
 		return v, e
 	}
-	if e := s.previousPhase.push(s.budget, 2); e != nil {
+	if e := s.previousPhase.push(2); e != nil {
 		return v, e
 	}
-	if e := s.assignedSinceGC.push(s.budget, 0); e != nil {
+	if e := s.assignedSinceGC.push(0); e != nil {
 		return v, e
 	}
 	if e := s.queue.MkVar(v); e != nil {
@@ -221,10 +229,7 @@ func (s *satSolverVariableState) Stats() satSolverVariableStats {
 		return satSolverVariableStats{}
 	}
 	out := satSolverVariableStats{OwnerBytes: s.ownerBytes, NumVars: s.numVars(), MkVarCount: s.mkVarCount}
-	for _, c := range []*satVariableCharColumn{&s.decision, &s.mark, &s.literalMark, &s.eliminated, &s.external, &s.phase, &s.previousPhase, &s.assignedSinceGC} {
-		out.ColumnBytes += uint64(cap(c.data))
-	}
-	out.ColumnBytes += 4*uint64(cap(s.level.data)) + uint64(reflect.TypeOf(satJustification{}).Size())*uint64(cap(s.justification.data))
+	out.ColumnBytes += uint64(reflect.TypeOf(satJustification{}).Size()) * uint64(cap(s.justification.data))
 	if s.watches != nil {
 		out.WatchBytes = s.watches.Stats().TotalBytes
 	}
@@ -302,21 +307,39 @@ func (s *satSolverVariableState) Close() error {
 		}
 		s.queue = nil
 	}
-	s.assignedSinceGC.finalize(s.budget)
-	s.previousPhase.finalize(s.budget)
-	s.phase.finalize(s.budget)
+	if e := s.assignedSinceGC.finalize(); e != nil {
+		return e
+	}
+	if e := s.previousPhase.finalize(); e != nil {
+		return e
+	}
+	if e := s.phase.finalize(); e != nil {
+		return e
+	}
 	if s.activity != nil {
 		if e := s.activity.Close(); e != nil {
 			return e
 		}
 		s.activity = nil
 	}
-	s.level.finalize(s.budget)
-	s.external.finalize(s.budget)
-	s.eliminated.finalize(s.budget)
-	s.literalMark.finalize(s.budget)
-	s.mark.finalize(s.budget)
-	s.decision.finalize(s.budget)
+	if e := s.level.finalize(); e != nil {
+		return e
+	}
+	if e := s.external.finalize(); e != nil {
+		return e
+	}
+	if e := s.eliminated.finalize(); e != nil {
+		return e
+	}
+	if e := s.literalMark.finalize(); e != nil {
+		return e
+	}
+	if e := s.mark.finalize(); e != nil {
+		return e
+	}
+	if e := s.decision.finalize(); e != nil {
+		return e
+	}
 	s.justification.finalize(s.budget)
 	if e := s.assignment.finalize(); e != nil {
 		return e

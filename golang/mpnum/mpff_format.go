@@ -1,8 +1,6 @@
 // Copyright (c) 2012 Microsoft Corporation. Source all MPFF displays.
 package mpnum
 
-import "github.com/glycerine/g3/golang/arena"
-
 func (m *FastFloatManager) appendText(n uint32, s string) (uint32, error) {
 	return m.natural.appendDisplay(n, s)
 }
@@ -38,7 +36,7 @@ func (m *FastFloatManager) appendSigned(n uint32, v int64) (uint32, error) {
 	}
 	return m.appendUnsigned(n, mag)
 }
-func (m *FastFloatManager) prepareDisplay(a *FastFloat, raw, smt, decimal bool) (uint32, error) {
+func (m *FastFloatManager) prepareDisplay(a *FastFloat, raw, smt, decimal bool) (result uint32, err error) {
 	if e := m.check(a); e != nil {
 		return 0, e
 	}
@@ -105,7 +103,11 @@ func (m *FastFloatManager) prepareDisplay(a *FastFloat, raw, smt, decimal bool) 
 			return 0, e
 		}
 	}
-	n, e = m.prepareNatural(m.buffer(0, m.precision), n)
+	if e = m.beginFastFormatting(); e != nil {
+		return 0, e
+	}
+	defer func() { err = m.endFastFormatting(err) }()
+	n, e = m.beginFastCharacters(m.buffer(0, m.precision), n)
 	if e != nil {
 		return 0, e
 	}
@@ -175,52 +177,14 @@ func (m *FastFloatManager) prepareDisplay(a *FastFloat, raw, smt, decimal bool) 
 	}
 	return n, nil
 }
-func (m *FastFloatManager) decimalResize(i int, n uint32) error {
-	v := &m.decimal[i]
-	inline := uint32(1024)
-	if i == 2 {
-		inline = 16
-	}
-	if v.ref == (arena.VectorRef{}) {
-		r, e := m.words.Allocate(0, inline)
-		if e != nil {
-			return e
-		}
-		v.ref = r
-		v.capacity = inline
-	}
-	for v.capacity < n {
-		if v.capacity > ^uint32(0)/8 {
-			return arena.ErrBounds
-		}
-		c := v.capacity * 2
-		r, e := m.words.Reserve(v.ref, c)
-		if e != nil {
-			return e
-		}
-		v.ref = r
-		v.capacity = c
-	}
-	r, e := m.words.Resize(v.ref, n)
-	if e != nil {
-		return e
-	}
-	v.ref = r
-	v.size = n
-	return nil
-}
-func (m *FastFloatManager) dv(i int, n uint32) ffLimbView {
-	return ffLimbView{m: m, v: &m.decimal[i], size: n}
-}
 func (m *FastFloatManager) decimalDivide(a, b, q, r ffLimbView) error {
-	av := limbView{words: m.words, ref: a.v.ref, size: a.size}
-	bv := limbView{words: m.words, ref: b.v.ref, size: b.size}
-	qv := limbView{words: m.words, ref: q.v.ref, size: a.size - b.size + 1}
-	rv := limbView{words: m.words, ref: r.v.ref, size: b.size}
+	av, bv, qv, rv := fastNaturalView(a), fastNaturalView(b), fastNaturalView(q), fastNaturalView(r)
+	qv.size = a.size - b.size + 1
+	rv.size = b.size
 	_, e := m.natural.divide(av, bv, qv, rv)
 	return e
 }
-func (m *FastFloatManager) prepareDecimal(a *FastFloat, prec, maxPower uint32) (uint32, error) {
+func (m *FastFloatManager) prepareDecimal(a *FastFloat, prec, maxPower uint32) (result uint32, err error) {
 	if e := m.check(a); e != nil {
 		return 0, e
 	}
@@ -239,28 +203,67 @@ func (m *FastFloatManager) prepareDecimal(a *FastFloat, prec, maxPower uint32) (
 			return 0, e
 		}
 	}
+	if e = m.beginFastFormatting(); e != nil {
+		return 0, e
+	}
+	defer func() { err = m.endFastFormatting(err) }()
+	// Source positive branch: a completed default unsigned1024 buffer, followed
+	// by the parameterized character constructor. The is_int fast path above
+	// makes this branch unreachable for canonical public finite values.
+	if exp >= 0 {
+		m.formatting.completed = 1
+		buffer := &m.formatting.large[0]
+		extra := uint32(1 + exp/32)
+		shift := uint32(32 - exp%32)
+		for i := uint32(0); i < extra; i++ {
+			if e = buffer.push(m.natural.runtime, 0); e != nil {
+				return 0, e
+			}
+		}
+		sig := m.sig(a)
+		for i := uint32(0); i < m.precision; i++ {
+			if e = buffer.push(m.natural.runtime, sig.read(i)); e != nil {
+				return 0, e
+			}
+		}
+		v := m.formatView(0, buffer.pos)
+		ffShift(v, v, shift, false)
+		return m.beginFastCharacters(v, n)
+	}
+	// buffer1,buffer2,buffer3 are default-constructed before interleaved pushes.
+	m.formatting.completed = 7
 	exp = -exp
 	numWords := uint32(1 + exp/32)
 	extra := uint32(1)
 	if numWords > m.precision {
 		extra += numWords - m.precision
 	}
-	sz := m.precision + extra
-	for i := 0; i < 4; i++ {
-		count := sz
-		if i == 2 {
-			count = m.precision
-		}
-		if i == 3 {
-			count = numWords
-		}
-		if e = m.decimalResize(i, count); e != nil {
+	sig := m.sig(a)
+	for i := uint32(0); i < m.precision; i++ {
+		if e = m.formatting.large[0].push(m.natural.runtime, sig.read(i)); e != nil {
 			return 0, e
 		}
-		ffZero(m.dv(i, count))
+		if e = m.formatting.large[1].push(m.natural.runtime, 0); e != nil {
+			return 0, e
+		}
+		if e = m.formatting.small.push(m.natural.runtime, 0); e != nil {
+			return 0, e
+		}
 	}
-	b1, b2, b3, pw := m.dv(0, sz), m.dv(1, sz), m.dv(2, m.precision), m.dv(3, numWords)
-	ffCopy(m.sig(a), b1)
+	for i := uint32(0); i < extra; i++ {
+		if e = m.formatting.large[0].push(m.natural.runtime, 0); e != nil {
+			return 0, e
+		}
+		if e = m.formatting.large[1].push(m.natural.runtime, 0); e != nil {
+			return 0, e
+		}
+	}
+	m.formatting.completed |= 8 // pw default construction before its resize
+	if e = m.formatting.large[2].resize(m.natural.runtime, numWords); e != nil {
+		return 0, e
+	}
+	sz := m.formatting.large[0].pos
+	b1, b2, b3, pw := m.formatView(0, sz), m.formatView(1, sz), m.formatView(2, m.precision), m.formatView(3, numWords)
 	pw.write(0, 1)
 	ffShift(pw, pw, uint32(exp), true)
 	if numWords > m.precision {
@@ -271,7 +274,7 @@ func (m *FastFloatManager) prepareDecimal(a *FastFloat, prec, maxPower uint32) (
 		if e = m.decimalDivide(numer, pw, b3, b2); e != nil {
 			return 0, e
 		}
-		n, e = m.prepareNatural(b3, n)
+		n, e = m.beginFastCharacters(b3, n)
 		if e != nil {
 			return 0, e
 		}
@@ -279,6 +282,10 @@ func (m *FastFloatManager) prepareDecimal(a *FastFloat, prec, maxPower uint32) (
 			return 0, ErrFastFloatInvariant
 		}
 		ffCopy(b2, b1)
+		// Source nested char lifetime includes the remainder assertion/copy.
+		if e = m.natural.destroyIntegerCharacters(); e != nil {
+			return 0, e
+		}
 	}
 	if e != nil {
 		return 0, e
@@ -402,8 +409,5 @@ func (m *FastFloatManager) FormatDecimalInto(a *FastFloat, p, max uint32, dst []
 }
 
 func (m *FastFloatManager) prepareNatural(v ffLimbView, n uint32) (uint32, error) {
-	for v.size > 1 && v.read(v.size-1) == 0 {
-		v.size--
-	}
-	return m.natural.prepareNatural(limbView{words: m.words, ref: v.v.ref, size: v.size}, n)
+	return m.natural.prepareNatural(fastNaturalView(v), n)
 }

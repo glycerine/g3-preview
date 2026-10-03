@@ -314,10 +314,10 @@ func (s *RationalService) Equal(a, b *OwnedRational) (bool, error) {
 	return s.manager.Equal(&a.raw, &b.raw)
 }
 func (s *RationalService) copyOutput(raw *Rational) (_lexOut OwnedRational, _lexErr error) {
-	defer s.finishLexicalError(&_lexErr)
-	if e := s.lexicalReady(); e != nil {
+	if e := s.beginLexical(); e != nil {
 		return OwnedRational{}, e
 	}
+	defer s.endLexicalRational(&_lexOut, &_lexErr)
 	v := OwnedRational{raw: NewRational(), ownerID: s.ownerID}
 	if e := s.manager.Copy(&v.raw, raw); e != nil {
 		s.abortLexicalRational(&v.raw)
@@ -373,7 +373,11 @@ func (s *RationalService) growCache() error {
 	s.cacheBytes = bytes
 	return nil
 }
-func (s *RationalService) pushCache(v *Rational) error {
+func (s *RationalService) pushCache(v *Rational) (_lexErr error) {
+	if e := s.beginLexical(); e != nil {
+		return e
+	}
+	defer s.endLexicalError(&_lexErr)
 	if len(s.cache) == cap(s.cache) {
 		if e := s.growCache(); e != nil {
 			return e
@@ -389,10 +393,10 @@ func (s *RationalService) pushCache(v *Rational) error {
 	return nil
 }
 func (s *RationalService) fillPower(n uint32) (_lexErr error) {
-	if e := s.lexicalReady(); e != nil {
+	if e := s.beginLexical(); e != nil {
 		return e
 	}
-	defer s.finishLexicalError(&_lexErr)
+	defer s.endLexicalError(&_lexErr)
 	if len(s.cache) == 0 {
 		if e := s.pushCache(&s.one); e != nil {
 			return e
@@ -400,14 +404,18 @@ func (s *RationalService) fillPower(n uint32) (_lexErr error) {
 	}
 	size := uint32(len(s.cache))
 	curr, two := NewRational(), NewRational()
-	defer s.destroyLexicalRational(&curr)
-	defer s.destroyLexicalRational(&two)
+	currComplete := false
+	defer s.endLexicalLocal(&curr, &currComplete)
+	twoComplete := false
+	defer s.endLexicalLocal(&two, &twoComplete)
 	if e := s.manager.Copy(&curr, &s.cache[size-1]); e != nil {
 		return e
 	}
+	currComplete = true
 	if e := s.manager.SetInt64(&two, 2); e != nil {
 		return e
 	}
+	twoComplete = true
 	for i := size; i <= n; i++ {
 		if e := s.manager.Mul(&curr, &two, &curr); e != nil {
 			return e
@@ -418,11 +426,18 @@ func (s *RationalService) fillPower(n uint32) (_lexErr error) {
 	}
 	return nil
 }
-func (s *RationalService) PowerOfTwo(k uint32) (OwnedRational, error) {
+func (s *RationalService) PowerOfTwo(k uint32) (_lexOut OwnedRational, _lexErr error) {
 	if e := s.lock(); e != nil {
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
+	if e := s.beginLexical(); e != nil {
+		return OwnedRational{}, e
+	}
+	defer s.endLexicalRational(&_lexOut, &_lexErr)
+	// Source completes this default result before the cache fill/assignment.
+	result := NewRational()
+	defer s.destroyLexicalRational(&result)
 	// Checked adapter for source k+1/loop and k+2 length overflow. Host backing
 	// cardinality is checked before any numerical action or budget reservation.
 	if k > math.MaxUint32-2 || uint64(k+2)*uint64(reflect.TypeOf(Rational{}).Size()) > uint64(^uint(0)>>1) {
@@ -433,7 +448,10 @@ func (s *RationalService) PowerOfTwo(k uint32) (OwnedRational, error) {
 			return OwnedRational{}, e
 		}
 	}
-	return s.copyOutput(&s.cache[k])
+	if e := s.manager.Copy(&result, &s.cache[k]); e != nil {
+		return OwnedRational{}, e
+	}
+	return s.facadeTakeLocked(&result)
 }
 func (s *RationalService) Stats() (RationalServiceStats, error) {
 	if e := s.lock(); e != nil {

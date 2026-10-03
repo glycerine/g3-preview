@@ -4,6 +4,7 @@ package mpnum
 import (
 	"errors"
 	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
 	"math/big"
 	"reflect"
 	"testing"
@@ -52,9 +53,6 @@ func fastAudit(t *testing.T, m *FastFloatManager, values ...*FastFloat) {
 	for _, v := range m.buffers {
 		add(v.ref)
 	}
-	for _, v := range m.decimal {
-		add(v.ref)
-	}
 	for _, r := range m.natural.divScratch {
 		add(r)
 	}
@@ -79,6 +77,8 @@ func fastAudit(t *testing.T, m *FastFloatManager, values ...*FastFloat) {
 			t.Fatal("unrooted text workspace")
 		}
 	}
+	fastFormattingPhysicalAudit(t, m)
+
 }
 func fastExact(m *FastFloatManager, a *FastFloat) *big.Rat {
 	if a.index() == 0 {
@@ -513,9 +513,16 @@ func TestFastFloatActualWholeGraphCharges(t *testing.T) {
 	if budget.Used() != fastOwnedBytes(m) {
 		t.Fatal("formatter charge", budget.Used(), fastOwnedBytes(m))
 	}
-	if m.decimal[0].capacity != 1024 || m.decimal[1].capacity != 1024 || m.decimal[3].capacity != 1024 || m.decimal[2].capacity != 16 {
-		t.Fatal("source inline workspace histories", m.decimal)
+	if m.formatting.active || m.formatting.pending || m.formatting.completed != 0 || m.formatting.small.capacity() != 16 {
+		t.Fatal("completed source lexical locals", m.formatting.completed)
 	}
+	for i := range m.formatting.large {
+		v := &m.formatting.large[i]
+		if v.capacity() != 1024 || v.raw != (memory.Block{}) || v.pending != (memory.Block{}) {
+			t.Fatal("source local destructor", i)
+		}
+	}
+
 	fastAudit(t, m, &a)
 	serviceMust(t, m.Del(&a))
 	fastAudit(t, m)

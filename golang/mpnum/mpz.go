@@ -58,6 +58,7 @@ type IntegerManager struct {
 	failedRef                              numericCellRef  // permanently dead, charged auxiliary descriptor
 	natural                                *NaturalManager // child borrows this manager's Words and Budget
 	intMin, two64                          Int
+	rawDisplay                             rawDisplayScope
 	closed                                 bool
 	sourceFinalizing, sourceFinalized      bool
 	sourceGuard                            bool
@@ -373,6 +374,9 @@ func (m *IntegerManager) CloseChecked() error {
 		}
 	}
 
+	if e := m.CleanupRawDisplay(); e != nil {
+		return fail(e)
+	}
 	if m.cells != nil {
 		for n := uint64(1); n <= uint64(m.cells.Stats().Slots); n++ {
 			slot := arena.Slot(n)

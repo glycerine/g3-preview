@@ -2,9 +2,15 @@
 // Concrete indexed bit_util and source MPN Algorithms A/S/M, no borrowed slice.
 package mpnum
 
-import "math/bits"
+import (
+	"github.com/glycerine/g3/golang/memory"
+	"math/bits"
+)
 
 type ffLimbView struct {
+	runtime      *memory.Runtime
+	source1024   *sourceLimbBuffer1024
+	source16     *sourceLimbBuffer
 	m            *FastFloatManager
 	v            *ffVector
 	offset, size uint32
@@ -12,6 +18,20 @@ type ffLimbView struct {
 }
 
 func (v ffLimbView) read(i uint32) uint32 {
+	if v.source1024 != nil {
+		n, e := v.source1024.read(v.runtime, v.offset+i)
+		if e != nil {
+			panic(e)
+		}
+		return n
+	}
+	if v.source16 != nil {
+		n, e := v.source16.read(v.runtime, v.offset+i)
+		if e != nil {
+			panic(e)
+		}
+		return n
+	}
 	if v.v == nil {
 		if i == 0 {
 			return v.literal
@@ -20,8 +40,22 @@ func (v ffLimbView) read(i uint32) uint32 {
 	}
 	return v.m.read(v.v, v.offset+i)
 }
-func (v ffLimbView) write(i, n uint32) { v.m.write(v.v, v.offset+i, n) }
-func ffLeading(n uint32) uint32        { return uint32(bits.LeadingZeros32(n)) }
+func (v ffLimbView) write(i, n uint32) {
+	if v.source1024 != nil {
+		if e := v.source1024.write(v.runtime, v.offset+i, n); e != nil {
+			panic(e)
+		}
+		return
+	}
+	if v.source16 != nil {
+		if e := v.source16.write(v.runtime, v.offset+i, n); e != nil {
+			panic(e)
+		}
+		return
+	}
+	v.m.write(v.v, v.offset+i, n)
+}
+func ffLeading(n uint32) uint32 { return uint32(bits.LeadingZeros32(n)) }
 func ffNLZ(v ffLimbView) uint32 {
 	n := uint32(0)
 	for i := v.size; i > 0; {

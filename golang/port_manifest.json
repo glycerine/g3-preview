@@ -54893,7 +54893,9 @@
         "sat_solver_backtrack.go",
         "sat_solver_backtrack_test.go",
         "sat_solver_assignment_storage.go",
-        "sat_solver_assignment_storage_test.go"
+        "sat_solver_assignment_storage_test.go",
+        "sat_solver_scalar_runtime.go",
+        "sat_solver_scalar_runtime_test.go"
       ],
       "tests": [
         "TestSATSolverClauseCoreFiniteSimplification",
@@ -54954,7 +54956,12 @@
         "TestSATSolverAssignmentCurrentMemberBorrowAndOwnerGuards",
         "TestSATSolverAssignmentSourceUnsignedGrowthException",
         "TestSATSolverAssignmentNonNullZeroCapacityActualExpandRoute",
-        "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime"
+        "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime",
+        "TestSATSolverScalarColumnsReachSameRuntime",
+        "TestSATSolverScalarSourceBytesAndRetainedSlots",
+        "TestSATSolverScalarUnsignedGrowthLiteralWidths",
+        "TestSATSolverScalarLevelTLSFailureRetainsNamedPendingAndPrefix",
+        "TestSATSolverScalarReverseMemberRawDestruction"
       ],
       "conditionals": [
         {
@@ -55497,6 +55504,18 @@
             "TestSATSolverAssignmentNonNullZeroCapacityActualExpandRoute",
             "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime"
           ]
+        },
+        {
+          "name": "Selected actual Runtime-backed eight char columns and unsigned level share assignment Runtime; other solver storage profiles remain separate",
+          "status": "partial",
+          "go_target": "sat_solver_scalar_runtime.go",
+          "tests": [
+            "TestSATSolverScalarColumnsReachSameRuntime",
+            "TestSATSolverScalarSourceBytesAndRetainedSlots",
+            "TestSATSolverScalarUnsignedGrowthLiteralWidths",
+            "TestSATSolverScalarLevelTLSFailureRetainsNamedPendingAndPrefix",
+            "TestSATSolverScalarReverseMemberRawDestruction"
+          ]
         }
       ],
       "ownership": [
@@ -55541,7 +55560,9 @@
         "sat_solver_backtrack.go",
         "sat_solver_backtrack_test.go",
         "sat_solver_assignment_storage.go",
-        "sat_solver_assignment_storage_test.go"
+        "sat_solver_assignment_storage_test.go",
+        "sat_solver_scalar_runtime.go",
+        "sat_solver_scalar_runtime_test.go"
       ],
       "tests": [
         "TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots",
@@ -55602,7 +55623,12 @@
         "TestSATSolverAssignmentCurrentMemberBorrowAndOwnerGuards",
         "TestSATSolverAssignmentSourceUnsignedGrowthException",
         "TestSATSolverAssignmentNonNullZeroCapacityActualExpandRoute",
-        "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime"
+        "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime",
+        "TestSATSolverScalarColumnsReachSameRuntime",
+        "TestSATSolverScalarSourceBytesAndRetainedSlots",
+        "TestSATSolverScalarUnsignedGrowthLiteralWidths",
+        "TestSATSolverScalarLevelTLSFailureRetainsNamedPendingAndPrefix",
+        "TestSATSolverScalarReverseMemberRawDestruction"
       ],
       "conditionals": [
         {
@@ -55728,6 +55754,18 @@
             "TestSATSolverAssignmentSourceUnsignedGrowthException",
             "TestSATSolverAssignmentNonNullZeroCapacityActualExpandRoute",
             "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime"
+          ]
+        },
+        {
+          "name": "Selected actual Runtime-backed eight char columns and unsigned level share assignment Runtime; other solver storage profiles remain separate",
+          "status": "partial",
+          "go_target": "sat_solver_scalar_runtime.go",
+          "tests": [
+            "TestSATSolverScalarColumnsReachSameRuntime",
+            "TestSATSolverScalarSourceBytesAndRetainedSlots",
+            "TestSATSolverScalarUnsignedGrowthLiteralWidths",
+            "TestSATSolverScalarLevelTLSFailureRetainsNamedPendingAndPrefix",
+            "TestSATSolverScalarReverseMemberRawDestruction"
           ]
         }
       ],
@@ -91767,7 +91805,10 @@
         "ast_shared_occs_mark.go",
         "mpnum/mp_integer_output_scope.go",
         "mpnum/mp_integer_output_scope_test.go",
-        "mpnum/mpn_cstring.go"
+        "mpnum/mpn_cstring.go",
+        "mpnum/mpff_format_scope.go",
+        "mpnum/mpff_format_scope_test.go",
+        "mpnum/mpff_source_buffer.go"
       ],
       "tests": [
         "TestSexprBVSourceInlineBufferAndTemporaryLifetime",
@@ -91800,7 +91841,16 @@
         "TestIntegerCharacterFailedConstructorSurvivesSourceFinalize",
         "TestIntegerCharacterUsesActualInitializedSizeHeader",
         "TestIntegerCharacterRationalNumeratorBeforeDenominator",
-        "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots"
+        "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots",
+        "TestFastFloatFormattingRetainsSourcePrecision",
+        "TestFastFloatDecimalBuffersAreLexical",
+        "TestFastFloatFormattingEveryConstructorPrefix",
+        "TestFastFloatFormattingFailedCharCtorRetainedAndExplicitCleanup",
+        "TestFastFloatCompletedDefaultBuffersUnwindOnGrowthRefusal",
+        "TestFastFloatFormattingScopeGuardsAndInlineWarm",
+        "TestFastFloatUnsigned1024SourceBoundaries",
+        "TestFastFloatDecimalEveryLargeLocalPrefix",
+        "TestFastFloatFullPrecisionWarmSourceEvents"
       ],
       "conditionals": [
         {
@@ -91919,6 +91969,22 @@
             "TestIntegerCharacterUsesActualInitializedSizeHeader",
             "TestIntegerCharacterRationalNumeratorBeforeDenominator",
             "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots"
+          ]
+        },
+        {
+          "name": "Selected MPFF full-precision character and unsigned1024/16 lexical display buffers, completed-default unwind and explicit failed storage cleanup; broader storage/runtime profiles remain open",
+          "status": "partial",
+          "go_target": "mpnum/mpff_format_scope.go",
+          "tests": [
+            "TestFastFloatFormattingRetainsSourcePrecision",
+            "TestFastFloatDecimalBuffersAreLexical",
+            "TestFastFloatFormattingEveryConstructorPrefix",
+            "TestFastFloatFormattingFailedCharCtorRetainedAndExplicitCleanup",
+            "TestFastFloatCompletedDefaultBuffersUnwindOnGrowthRefusal",
+            "TestFastFloatFormattingScopeGuardsAndInlineWarm",
+            "TestFastFloatUnsigned1024SourceBoundaries",
+            "TestFastFloatDecimalEveryLargeLocalPrefix",
+            "TestFastFloatFullPrecisionWarmSourceEvents"
           ]
         }
       ],
@@ -96607,7 +96673,8 @@
         "mpnum/inf_scalar_projection_test.go",
         "mpnum/mp_raw_projection_test.go",
         "mpnum/rational_lexical_scope.go",
-        "mpnum/mp_lexical_scope_test.go"
+        "mpnum/mp_lexical_scope_test.go",
+        "mpnum/mp_lexical_constructor_test.go"
       ],
       "tests": [
         "TestInfEpsInfFiniteTripleOracles",
@@ -96646,7 +96713,13 @@
         "TestLexicalCloneFailedMemberReadUnwind",
         "TestLexicalCallerDestructorLateMemberRead",
         "TestLexicalOriginalFailureAndCleanupCause",
-        "TestLexicalRationalManagerOneRootContinuation"
+        "TestLexicalRationalManagerOneRootContinuation",
+        "TestConstructorPartialAbortWaitsForSourceUnwind",
+        "TestConstructorLexicalBoundaryAPI",
+        "TestConstructorInfPowerUsesPrvalueMove",
+        "TestConstructorCompletedUnwindPrecedesOwningAbort",
+        "TestConstructorEightRootsAndWarmBoundary",
+        "TestConstructorExpressionFailedCopyPhase"
       ],
       "conditionals": [
         {
@@ -96847,6 +96920,19 @@
             "TestLexicalOriginalFailureAndCleanupCause",
             "TestLexicalRationalManagerOneRootContinuation"
           ]
+        },
+        {
+          "name": "Selected COPY/VALUE/DEFAULT local completion phases, nested source frames, completed-before-partial cleanup, InfDiv result assignment and InfPower prvalue move; external unframed callers and raw domains remain open",
+          "status": "partial",
+          "go_target": "mpnum/rational_lexical_scope.go",
+          "tests": [
+            "TestConstructorPartialAbortWaitsForSourceUnwind",
+            "TestConstructorLexicalBoundaryAPI",
+            "TestConstructorInfPowerUsesPrvalueMove",
+            "TestConstructorCompletedUnwindPrecedesOwningAbort",
+            "TestConstructorEightRootsAndWarmBoundary",
+            "TestConstructorExpressionFailedCopyPhase"
+          ]
         }
       ],
       "ownership": [
@@ -96962,7 +97048,8 @@
         "mpnum/inf_scalar_projection_test.go",
         "mpnum/mp_raw_projection_test.go",
         "mpnum/rational_lexical_scope.go",
-        "mpnum/mp_lexical_scope_test.go"
+        "mpnum/mp_lexical_scope_test.go",
+        "mpnum/mp_lexical_constructor_test.go"
       ],
       "tests": [
         "TestInfIntRationalSourceConstructorsConstantsLifetime",
@@ -97003,7 +97090,13 @@
         "TestLexicalCloneFailedMemberReadUnwind",
         "TestLexicalCallerDestructorLateMemberRead",
         "TestLexicalOriginalFailureAndCleanupCause",
-        "TestLexicalRationalManagerOneRootContinuation"
+        "TestLexicalRationalManagerOneRootContinuation",
+        "TestConstructorPartialAbortWaitsForSourceUnwind",
+        "TestConstructorLexicalBoundaryAPI",
+        "TestConstructorInfPowerUsesPrvalueMove",
+        "TestConstructorCompletedUnwindPrecedesOwningAbort",
+        "TestConstructorEightRootsAndWarmBoundary",
+        "TestConstructorExpressionFailedCopyPhase"
       ],
       "conditionals": [
         {
@@ -97166,6 +97259,19 @@
             "TestLexicalOriginalFailureAndCleanupCause",
             "TestLexicalRationalManagerOneRootContinuation"
           ]
+        },
+        {
+          "name": "Selected COPY/VALUE/DEFAULT local completion phases, nested source frames, completed-before-partial cleanup, InfDiv result assignment and InfPower prvalue move; external unframed callers and raw domains remain open",
+          "status": "partial",
+          "go_target": "mpnum/rational_lexical_scope.go",
+          "tests": [
+            "TestConstructorPartialAbortWaitsForSourceUnwind",
+            "TestConstructorLexicalBoundaryAPI",
+            "TestConstructorInfPowerUsesPrvalueMove",
+            "TestConstructorCompletedUnwindPrecedesOwningAbort",
+            "TestConstructorEightRootsAndWarmBoundary",
+            "TestConstructorExpressionFailedCopyPhase"
+          ]
         }
       ],
       "ownership": [
@@ -97186,7 +97292,8 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "mpnum/inf_rational.go"
+        "mpnum/inf_rational.go",
+        "mpnum/mp_lexical_constructor_test.go"
       ],
       "tests": [
         "TestInfRationalSource80Assertions",
@@ -97203,7 +97310,13 @@
         "TestInfRationalIntegerConstructorCopyRoute",
         "TestRationalServiceInfinitesimalHeaderOwnership",
         "TestRationalServiceInfinitesimalConstructorFailureRefunds",
-        "TestRationalServiceInfinitesimalFinalizerTraversal"
+        "TestRationalServiceInfinitesimalFinalizerTraversal",
+        "TestConstructorPartialAbortWaitsForSourceUnwind",
+        "TestConstructorLexicalBoundaryAPI",
+        "TestConstructorInfPowerUsesPrvalueMove",
+        "TestConstructorCompletedUnwindPrecedesOwningAbort",
+        "TestConstructorEightRootsAndWarmBoundary",
+        "TestConstructorExpressionFailedCopyPhase"
       ],
       "assertions": [
         {
@@ -105410,7 +105523,10 @@
         "mpnum/mpff_ref.go",
         "mpnum/mpff_ref_checked.go",
         "mpnum/scoped_fast_float.go",
-        "mpnum/scoped_fast_float_vector.go"
+        "mpnum/scoped_fast_float_vector.go",
+        "mpnum/mpff_format_scope.go",
+        "mpnum/mpff_format_scope_test.go",
+        "mpnum/mpff_source_buffer.go"
       ],
       "tests": [
         "TestFastFloatIntegerConversionSource",
@@ -105434,7 +105550,16 @@
         "TestFastFloatVectorCheckedAllocationBounds",
         "TestFastFloatOwnerProvenanceAndVectorLifetime",
         "TestFastFloatNeighborAndThinRoutes",
-        "TestFastFloatVectorOldNewPeakBudget"
+        "TestFastFloatVectorOldNewPeakBudget",
+        "TestFastFloatFormattingRetainsSourcePrecision",
+        "TestFastFloatDecimalBuffersAreLexical",
+        "TestFastFloatFormattingEveryConstructorPrefix",
+        "TestFastFloatFormattingFailedCharCtorRetainedAndExplicitCleanup",
+        "TestFastFloatCompletedDefaultBuffersUnwindOnGrowthRefusal",
+        "TestFastFloatFormattingScopeGuardsAndInlineWarm",
+        "TestFastFloatUnsigned1024SourceBoundaries",
+        "TestFastFloatDecimalEveryLargeLocalPrefix",
+        "TestFastFloatFullPrecisionWarmSourceEvents"
       ],
       "conditionals": [
         {
@@ -106008,6 +106133,22 @@
         {
           "name": "persistent ostream state/transport, TRACE/STRACE actions, source exception transport and subpaving consumer integration",
           "status": "unported"
+        },
+        {
+          "name": "Selected MPFF full-precision character and unsigned1024/16 lexical display buffers, completed-default unwind and explicit failed storage cleanup; broader storage/runtime profiles remain open",
+          "status": "partial",
+          "go_target": "mpnum/mpff_format_scope.go",
+          "tests": [
+            "TestFastFloatFormattingRetainsSourcePrecision",
+            "TestFastFloatDecimalBuffersAreLexical",
+            "TestFastFloatFormattingEveryConstructorPrefix",
+            "TestFastFloatFormattingFailedCharCtorRetainedAndExplicitCleanup",
+            "TestFastFloatCompletedDefaultBuffersUnwindOnGrowthRefusal",
+            "TestFastFloatFormattingScopeGuardsAndInlineWarm",
+            "TestFastFloatUnsigned1024SourceBoundaries",
+            "TestFastFloatDecimalEveryLargeLocalPrefix",
+            "TestFastFloatFullPrecisionWarmSourceEvents"
+          ]
         }
       ],
       "ownership": [
@@ -106033,7 +106174,10 @@
         "mpnum/mpff_ref.go",
         "mpnum/mpff_ref_checked.go",
         "mpnum/scoped_fast_float.go",
-        "mpnum/scoped_fast_float_vector.go"
+        "mpnum/scoped_fast_float_vector.go",
+        "mpnum/mpff_format_scope.go",
+        "mpnum/mpff_format_scope_test.go",
+        "mpnum/mpff_source_buffer.go"
       ],
       "tests": [
         "TestFastFloatIntegerConversionSource",
@@ -106057,7 +106201,16 @@
         "TestFastFloatVectorCheckedAllocationBounds",
         "TestFastFloatOwnerProvenanceAndVectorLifetime",
         "TestFastFloatNeighborAndThinRoutes",
-        "TestFastFloatVectorOldNewPeakBudget"
+        "TestFastFloatVectorOldNewPeakBudget",
+        "TestFastFloatFormattingRetainsSourcePrecision",
+        "TestFastFloatDecimalBuffersAreLexical",
+        "TestFastFloatFormattingEveryConstructorPrefix",
+        "TestFastFloatFormattingFailedCharCtorRetainedAndExplicitCleanup",
+        "TestFastFloatCompletedDefaultBuffersUnwindOnGrowthRefusal",
+        "TestFastFloatFormattingScopeGuardsAndInlineWarm",
+        "TestFastFloatUnsigned1024SourceBoundaries",
+        "TestFastFloatDecimalEveryLargeLocalPrefix",
+        "TestFastFloatFullPrecisionWarmSourceEvents"
       ],
       "conditionals": [
         {
@@ -106255,6 +106408,22 @@
         {
           "name": "persistent ostream state/transport, TRACE/STRACE actions, source exception transport and subpaving consumer integration",
           "status": "unported"
+        },
+        {
+          "name": "Selected MPFF full-precision character and unsigned1024/16 lexical display buffers, completed-default unwind and explicit failed storage cleanup; broader storage/runtime profiles remain open",
+          "status": "partial",
+          "go_target": "mpnum/mpff_format_scope.go",
+          "tests": [
+            "TestFastFloatFormattingRetainsSourcePrecision",
+            "TestFastFloatDecimalBuffersAreLexical",
+            "TestFastFloatFormattingEveryConstructorPrefix",
+            "TestFastFloatFormattingFailedCharCtorRetainedAndExplicitCleanup",
+            "TestFastFloatCompletedDefaultBuffersUnwindOnGrowthRefusal",
+            "TestFastFloatFormattingScopeGuardsAndInlineWarm",
+            "TestFastFloatUnsigned1024SourceBoundaries",
+            "TestFastFloatDecimalEveryLargeLocalPrefix",
+            "TestFastFloatFullPrecisionWarmSourceEvents"
+          ]
         }
       ],
       "ownership": [
@@ -107474,7 +107643,9 @@
         "mpnum/mpq_owner_cleanup.go",
         "mpnum/construction_failure.go",
         "mpnum/mpq_source_finalize.go",
-        "mpnum/transitive_source_finalize_test.go"
+        "mpnum/transitive_source_finalize_test.go",
+        "mpnum/mp_display_scope.go",
+        "mpnum/mp_display_scope_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -107594,7 +107765,8 @@
         "TestServiceSourceFinalizeActualCacheDenominatorGuard",
         "TestTransitiveSourceFinalizeActualChildScratchHole",
         "TestTransitiveSourceFinalizeColdOwnerAndReadinessGuards",
-        "TestServiceSourceFinalizeActualHookAndConstantOrder"
+        "TestServiceSourceFinalizeActualHookAndConstantOrder",
+        "TestRawDecimalFailedDenominatorRetainsCopiedNumerator"
       ],
       "assertions": [
         {
@@ -108041,6 +108213,14 @@
             "TestTransitiveSourceFinalizeActualChildScratchHole",
             "TestTransitiveSourceFinalizeColdOwnerAndReadinessGuards",
             "TestServiceSourceFinalizeActualHookAndConstantOrder"
+          ]
+        },
+        {
+          "name": "Raw decimal locals retain actual cells before the explicit normal end-label Del sequence; source cleanup errors and owning Go abort remain observable, broader display families open",
+          "status": "partial",
+          "go_target": "mpnum/mp_display_scope.go",
+          "tests": [
+            "TestRawDecimalFailedDenominatorRetainsCopiedNumerator"
           ]
         }
       ],
@@ -115853,7 +116033,8 @@
         "mpnum/inf_scalar_projection_test.go",
         "mpnum/mp_raw_projection_test.go",
         "mpnum/rational_lexical_scope.go",
-        "mpnum/mp_lexical_scope_test.go"
+        "mpnum/mp_lexical_scope_test.go",
+        "mpnum/mp_lexical_constructor_test.go"
       ],
       "tests": [
         "TestSourceRationalConversionAssertions",
@@ -115930,7 +116111,13 @@
         "TestLexicalCloneFailedMemberReadUnwind",
         "TestLexicalCallerDestructorLateMemberRead",
         "TestLexicalOriginalFailureAndCleanupCause",
-        "TestLexicalRationalManagerOneRootContinuation"
+        "TestLexicalRationalManagerOneRootContinuation",
+        "TestConstructorPartialAbortWaitsForSourceUnwind",
+        "TestConstructorLexicalBoundaryAPI",
+        "TestConstructorInfPowerUsesPrvalueMove",
+        "TestConstructorCompletedUnwindPrecedesOwningAbort",
+        "TestConstructorEightRootsAndWarmBoundary",
+        "TestConstructorExpressionFailedCopyPhase"
       ],
       "conditionals": [
         {
@@ -116326,6 +116513,19 @@
             "TestLexicalCallerDestructorLateMemberRead",
             "TestLexicalOriginalFailureAndCleanupCause",
             "TestLexicalRationalManagerOneRootContinuation"
+          ]
+        },
+        {
+          "name": "Selected COPY/VALUE/DEFAULT local completion phases, nested source frames, completed-before-partial cleanup, InfDiv result assignment and InfPower prvalue move; external unframed callers and raw domains remain open",
+          "status": "partial",
+          "go_target": "mpnum/rational_lexical_scope.go",
+          "tests": [
+            "TestConstructorPartialAbortWaitsForSourceUnwind",
+            "TestConstructorLexicalBoundaryAPI",
+            "TestConstructorInfPowerUsesPrvalueMove",
+            "TestConstructorCompletedUnwindPrecedesOwningAbort",
+            "TestConstructorEightRootsAndWarmBoundary",
+            "TestConstructorExpressionFailedCopyPhase"
           ]
         }
       ],

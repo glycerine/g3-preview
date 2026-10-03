@@ -61,10 +61,10 @@ func (s *RationalService) GCDCoefficients(a, b, x, y *OwnedRational) (_lexOut Ow
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.lexicalReady(); e != nil {
+	if e := s.beginLexical(); e != nil {
 		return OwnedRational{}, e
 	}
-	defer s.finishLexicalRational(&_lexOut, &_lexErr)
+	defer s.endLexicalRational(&_lexOut, &_lexErr)
 	for _, v := range []*OwnedRational{a, b, x, y} {
 		if e := s.check(v); e != nil {
 			return OwnedRational{}, e
@@ -82,10 +82,10 @@ func (s *RationalService) extraBinary(a, b *OwnedRational, op uint8) (_lexOut Ow
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.lexicalReady(); e != nil {
+	if e := s.beginLexical(); e != nil {
 		return OwnedRational{}, e
 	}
-	defer s.finishLexicalRational(&_lexOut, &_lexErr)
+	defer s.endLexicalRational(&_lexOut, &_lexErr)
 	if e := s.check(a); e != nil {
 		return OwnedRational{}, e
 	}
@@ -127,10 +127,10 @@ func (s *RationalService) BitwiseNot(width uint32, a *OwnedRational) (_lexOut Ow
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.lexicalReady(); e != nil {
+	if e := s.beginLexical(); e != nil {
 		return OwnedRational{}, e
 	}
-	defer s.finishLexicalRational(&_lexOut, &_lexErr)
+	defer s.endLexicalRational(&_lexOut, &_lexErr)
 	if e := s.check(a); e != nil {
 		return OwnedRational{}, e
 	}
@@ -219,21 +219,23 @@ func (s *RationalService) NewFromScopedInt(source *ScopedInt) (_lexOut OwnedRati
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.lexicalReady(); e != nil {
+	if e := s.beginLexical(); e != nil {
 		return OwnedRational{}, e
 	}
-	defer s.finishLexicalRational(&_lexOut, &_lexErr)
+	defer s.endLexicalRational(&_lexOut, &_lexErr)
 	if _, e := source.Get(); e != nil {
 		return OwnedRational{}, e
 	}
 	result := NewRational()
-	defer s.destroyLexicalRational(&result)
+	resultComplete := false
+	defer s.endLexicalLocal(&result, &resultComplete)
 	if e := s.manager.z.CopyFrom(&result.num, source.manager, &source.num); e != nil {
 		return OwnedRational{}, e
 	}
 	if e := s.manager.resetDenominator(&result); e != nil {
 		return OwnedRational{}, e
 	}
+	resultComplete = true
 	return s.facadeTakeLocked(&result)
 }
 func (s *RationalService) componentToScopedInt(a *OwnedRational, dst *ScopedInt, denominator bool) error {
@@ -333,18 +335,20 @@ func (s *RationalService) NewFromScopedRational(source *ScopedRational) (_lexOut
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.lexicalReady(); e != nil {
+	if e := s.beginLexical(); e != nil {
 		return OwnedRational{}, e
 	}
-	defer s.finishLexicalRational(&_lexOut, &_lexErr)
+	defer s.endLexicalRational(&_lexOut, &_lexErr)
 	if _, e := source.Get(); e != nil {
 		return OwnedRational{}, e
 	}
 	result := NewRational()
-	defer s.destroyLexicalRational(&result)
+	resultComplete := false
+	defer s.endLexicalLocal(&result, &resultComplete)
 	if e := s.manager.CopyFrom(&result, source.manager, &source.num); e != nil {
 		return OwnedRational{}, e
 	}
+	resultComplete = true
 	return s.facadeTakeLocked(&result)
 }
 func (s *RationalService) SetFromScopedRational(dst *OwnedRational, source *ScopedRational) error {

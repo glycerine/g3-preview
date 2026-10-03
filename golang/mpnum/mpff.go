@@ -57,7 +57,8 @@ type FastFloatManager struct {
 	headerBytes                                uint64
 	significands, metadata, freeIDs, setBuffer ffVector
 	buffers                                    [4]ffVector
-	decimal                                    [4]ffVector
+	formatting                                 fastFormattingScope
+	closing                                    bool
 	one                                        FastFloat
 }
 
@@ -106,7 +107,7 @@ func (m *FastFloatManager) open() error {
 	if m == nil || m.self != m {
 		return ErrFastFloatOwner
 	}
-	if m.closed {
+	if m.closed || m.closing {
 		return arena.ErrClosed
 	}
 	return nil
@@ -285,23 +286,50 @@ func (m *FastFloatManager) Reset(a *FastFloat) error {
 	*a = FastFloat{}
 	return m.debugCheck(a)
 }
-func (m *FastFloatManager) Close() {
-	if m == nil || m.self != m || m.closed {
-		return
+func (m *FastFloatManager) CloseChecked() error {
+	if m == nil || m.self != m {
+		return ErrFastFloatOwner
+	}
+	if m.closed {
+		return nil
+	}
+	m.closing = true
+	if m.natural != nil {
+		if e := m.CleanupFormatting(); e != nil {
+			return e
+		}
 	}
 	if m.words != nil {
-		if m.one.index() != 0 {
-			m.Del(&m.one)
+		if m.one.index() != 0 { // Del needs the intact owner during this final action.
+			m.closing = false
+			e := m.Del(&m.one)
+			m.closing = true
+			if e != nil {
+				return e
+			}
+			m.one = FastFloat{}
 		}
 		if m.natural != nil {
-			m.natural.Close()
+			if e := m.natural.CloseChecked(); e != nil {
+				return e
+			}
 		}
 		m.words.Close()
 	}
 	m.config.Storage.Descriptors.Budget.Release(m.headerBytes)
 	m.headerBytes = 0
 	m.closed = true
+	return nil
 }
+func (m *FastFloatManager) Close() {
+	if m == nil || m.self != m {
+		return
+	}
+	if e := m.CloseChecked(); e != nil {
+		panic(m)
+	}
+}
+
 func (m *FastFloatManager) Precise() bool { return false }
 func (m *FastFloatManager) Field() bool   { return true }
 func (m *FastFloatManager) SetRounding(up bool) error {

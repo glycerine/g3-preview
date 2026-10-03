@@ -55,10 +55,10 @@ func (s *RationalService) infEpsInfCopy(dst, src *OwnedInfEpsInfRational) error 
 	return s.infCopy(&dst.numeral, &src.numeral)
 }
 func (s *RationalService) infEpsInfClone(src *OwnedInfEpsInfRational) (_lexOut OwnedInfEpsInfRational, _lexErr error) {
-	defer s.finishLexicalError(&_lexErr)
-	if e := s.lexicalReady(); e != nil {
+	if e := s.beginLexical(); e != nil {
 		return OwnedInfEpsInfRational{}, e
 	}
+	defer s.endLexicalEps(&_lexOut, &_lexErr)
 	v := s.infEpsInfEmpty()
 	if e := s.manager.Copy(&v.infinity, &src.infinity); e != nil {
 		s.abortLexicalRational(&v.infinity)
@@ -224,11 +224,15 @@ func (s *RationalService) InfEpsInfSetInt32(v *OwnedInfEpsInfRational, n int32) 
 	}
 	return s.manager.Reset(&v.numeral.second)
 }
-func (s *RationalService) infEpsInfConstant(which uint8) (OwnedInfEpsInfRational, error) {
+func (s *RationalService) infEpsInfConstant(which uint8) (_lexOut OwnedInfEpsInfRational, _lexErr error) {
 	if e := s.lock(); e != nil {
 		return OwnedInfEpsInfRational{}, e
 	}
 	defer s.mu.Unlock()
+	if e := s.beginLexical(); e != nil {
+		return OwnedInfEpsInfRational{}, e
+	}
+	defer s.endLexicalEps(&_lexOut, &_lexErr)
 	v := s.infEpsInfEmpty()
 	var e error
 	n := &s.infZero
@@ -316,10 +320,10 @@ func (s *RationalService) infEpsInfPrepareRational(v *Rational, offset uint32) (
 	return s.manager.z.prepareInteger(&v.den, n)
 }
 func (s *RationalService) infEpsInfPrepareNumeral(v *OwnedInfRational, offset uint32) (_lexValue uint32, _lexErr error) {
-	if e := s.lexicalReady(); e != nil {
+	if e := s.beginLexical(); e != nil {
 		return 0, e
 	}
-	defer s.finishLexicalError(&_lexErr)
+	defer s.endLexicalError(&_lexErr)
 	if v.second.num.val == 0 {
 		return s.infEpsInfPrepareRational(&v.first, offset)
 	}
@@ -340,10 +344,12 @@ func (s *RationalService) infEpsInfPrepareNumeral(v *OwnedInfRational, offset ui
 		return 0, e
 	}
 	abs := NewRational()
-	defer s.destroyLexicalRational(&abs)
+	absComplete := false
+	defer s.endLexicalLocal(&abs, &absComplete)
 	if e = s.manager.Copy(&abs, &v.second); e != nil {
 		return 0, e
 	}
+	absComplete = true
 	if e = s.manager.Abs(&abs); e != nil {
 		return 0, e
 	}
@@ -516,11 +522,15 @@ func (s *RationalService) InfEpsInfNeg(v *OwnedInfEpsInfRational) error {
 	}
 	return s.infEpsInfNeg(v)
 }
-func (s *RationalService) infEpsInfUnary(v *OwnedInfEpsInfRational, abs bool) (OwnedInfEpsInfRational, error) {
+func (s *RationalService) infEpsInfUnary(v *OwnedInfEpsInfRational, abs bool) (_lexOut OwnedInfEpsInfRational, _lexErr error) {
 	if e := s.lock(); e != nil {
 		return OwnedInfEpsInfRational{}, e
 	}
 	defer s.mu.Unlock()
+	if e := s.beginLexical(); e != nil {
+		return OwnedInfEpsInfRational{}, e
+	}
+	defer s.endLexicalEps(&_lexOut, &_lexErr)
 	if e := s.infEpsInfCheck(v); e != nil {
 		return OwnedInfEpsInfRational{}, e
 	}
@@ -570,11 +580,15 @@ func (s *RationalService) InfEpsInfAddMulAssign(v *OwnedInfEpsInfRational, c *Ow
 func (s *RationalService) InfEpsInfSubMulAssign(v *OwnedInfEpsInfRational, c *OwnedRational, k *OwnedInfEpsInfRational) error {
 	return s.infEpsInfFused(v, c, k, true)
 }
-func (s *RationalService) infEpsInfRound(v *OwnedInfEpsInfRational, ceil bool) (OwnedRational, error) {
+func (s *RationalService) infEpsInfRound(v *OwnedInfEpsInfRational, ceil bool) (_lexOut OwnedRational, _lexErr error) {
 	if e := s.lock(); e != nil {
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
+	if e := s.beginLexical(); e != nil {
+		return OwnedRational{}, e
+	}
+	defer s.endLexicalRational(&_lexOut, &_lexErr)
 	if e := s.infEpsInfCheck(v); e != nil {
 		return OwnedRational{}, e
 	}
@@ -601,7 +615,11 @@ func (s *RationalService) infEpsInfRound(v *OwnedInfEpsInfRational, ceil bool) (
 		e = s.manager.Floor(&n.first, &out.raw)
 	}
 	if e != nil {
-		s.abortLexicalRational(&out.raw)
+		if isIntegerRational(&n.first) {
+			s.abortLexicalRational(&out.raw)
+		} else {
+			s.destroyLexicalRational(&out.raw)
+		}
 		return OwnedRational{}, e
 	}
 	return out, nil
@@ -1152,10 +1170,10 @@ func (s *RationalService) InfEpsInfAdd(a, b *OwnedInfEpsInfRational) (_lexOut Ow
 		return OwnedInfEpsInfRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.lexicalReady(); e != nil {
+	if e := s.beginLexical(); e != nil {
 		return OwnedInfEpsInfRational{}, e
 	}
-	defer s.finishLexicalEps(&_lexOut, &_lexErr)
+	defer s.endLexicalEps(&_lexOut, &_lexErr)
 	if e := s.infEpsInfCheck(a); e != nil {
 		return OwnedInfEpsInfRational{}, e
 	}
@@ -1203,10 +1221,10 @@ func (s *RationalService) InfEpsInfSub(a, b *OwnedInfEpsInfRational) (_lexOut Ow
 		return OwnedInfEpsInfRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.lexicalReady(); e != nil {
+	if e := s.beginLexical(); e != nil {
 		return OwnedInfEpsInfRational{}, e
 	}
-	defer s.finishLexicalEps(&_lexOut, &_lexErr)
+	defer s.endLexicalEps(&_lexOut, &_lexErr)
 	if e := s.infEpsInfCheck(a); e != nil {
 		return OwnedInfEpsInfRational{}, e
 	}
@@ -1275,11 +1293,15 @@ func (s *RationalService) InfEpsInfMulRationalAssign(v *OwnedInfEpsInfRational, 
 	}
 	return s.infEpsInfScalar(v, &r.raw, '*')
 }
-func (s *RationalService) InfEpsInfMulRational(v *OwnedInfEpsInfRational, r *OwnedRational) (OwnedInfEpsInfRational, error) {
+func (s *RationalService) InfEpsInfMulRational(v *OwnedInfEpsInfRational, r *OwnedRational) (_lexOut OwnedInfEpsInfRational, _lexErr error) {
 	if e := s.lock(); e != nil {
 		return OwnedInfEpsInfRational{}, e
 	}
 	defer s.mu.Unlock()
+	if e := s.beginLexical(); e != nil {
+		return OwnedInfEpsInfRational{}, e
+	}
+	defer s.endLexicalEps(&_lexOut, &_lexErr)
 	if e := s.infEpsInfCheck(v); e != nil {
 		return OwnedInfEpsInfRational{}, e
 	}
@@ -1309,11 +1331,15 @@ func (s *RationalService) InfEpsInfDivRationalAssign(v *OwnedInfEpsInfRational, 
 	}
 	return s.infEpsInfScalar(v, &r.raw, '/')
 }
-func (s *RationalService) InfEpsInfDivRational(v *OwnedInfEpsInfRational, r *OwnedRational) (OwnedInfEpsInfRational, error) {
+func (s *RationalService) InfEpsInfDivRational(v *OwnedInfEpsInfRational, r *OwnedRational) (_lexOut OwnedInfEpsInfRational, _lexErr error) {
 	if e := s.lock(); e != nil {
 		return OwnedInfEpsInfRational{}, e
 	}
 	defer s.mu.Unlock()
+	if e := s.beginLexical(); e != nil {
+		return OwnedInfEpsInfRational{}, e
+	}
+	defer s.endLexicalEps(&_lexOut, &_lexErr)
 	if e := s.infEpsInfCheck(v); e != nil {
 		return OwnedInfEpsInfRational{}, e
 	}
@@ -1340,11 +1366,15 @@ func (s *RationalService) InfEpsInfInc(v *OwnedInfEpsInfRational) error {
 	}
 	return s.infRatStep(&v.numeral.first, false)
 }
-func (s *RationalService) InfEpsInfPostInc(v *OwnedInfEpsInfRational) (OwnedInfEpsInfRational, error) {
+func (s *RationalService) InfEpsInfPostInc(v *OwnedInfEpsInfRational) (_lexOut OwnedInfEpsInfRational, _lexErr error) {
 	if e := s.lock(); e != nil {
 		return OwnedInfEpsInfRational{}, e
 	}
 	defer s.mu.Unlock()
+	if e := s.beginLexical(); e != nil {
+		return OwnedInfEpsInfRational{}, e
+	}
+	defer s.endLexicalEps(&_lexOut, &_lexErr)
 	if e := s.infEpsInfCheck(v); e != nil {
 		return OwnedInfEpsInfRational{}, e
 	}
@@ -1368,11 +1398,15 @@ func (s *RationalService) InfEpsInfDec(v *OwnedInfEpsInfRational) error {
 	}
 	return s.infRatStep(&v.numeral.first, true)
 }
-func (s *RationalService) InfEpsInfPostDec(v *OwnedInfEpsInfRational) (OwnedInfEpsInfRational, error) {
+func (s *RationalService) InfEpsInfPostDec(v *OwnedInfEpsInfRational) (_lexOut OwnedInfEpsInfRational, _lexErr error) {
 	if e := s.lock(); e != nil {
 		return OwnedInfEpsInfRational{}, e
 	}
 	defer s.mu.Unlock()
+	if e := s.beginLexical(); e != nil {
+		return OwnedInfEpsInfRational{}, e
+	}
+	defer s.endLexicalEps(&_lexOut, &_lexErr)
 	if e := s.infEpsInfCheck(v); e != nil {
 		return OwnedInfEpsInfRational{}, e
 	}
