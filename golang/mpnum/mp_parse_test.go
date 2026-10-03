@@ -13,6 +13,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
 )
 
 func TestSourceStringAssertions(t *testing.T) {
@@ -110,50 +111,72 @@ func TestRationalParserByteQuirksAndState(t *testing.T) {
 }
 func TestParserExceptionCategoriesAndFailurePublication(t *testing.T) {
 	for _, synch := range []bool{false, true} {
-		m, budget := rationalManager(t, synch)
-		a := NewRational()
-		m.SetFraction(&a, -17, 13)
 		for _, f := range []struct {
 			text     string
 			reason   ParseErrorReason
 			sentinel error
-		}{{"1/2e0", ParseMixedNotation, ErrMixedNotation}, {"1/0e0", ParseMixedNotation, ErrMixedNotation}, {"1e999999999999/0", ParseMixedNotation, ErrMixedNotation}, {"1/2E", ParseMixedNotation, ErrMixedNotation}, {"1e2/3", ParseMixedNotation, ErrMixedNotation}, {"1e/3", ParseMixedNotation, ErrMixedNotation}, {"1/", ParseZeroDenominator, ErrDivideByZero}, {"1/00", ParseZeroDenominator, ErrDivideByZero}, {"/", ParseZeroDenominator, ErrDivideByZero}, {"1e4294967296", ParseExponentTooLarge, ErrExponentTooLarge}, {"1e18446744078004518912", ParseExponentTooLarge, ErrExponentTooLarge}} {
+			n, d     int64
+		}{
+			{"1/2e0", ParseMixedNotation, ErrMixedNotation, 1, 2}, {"1/0e0", ParseMixedNotation, ErrMixedNotation, 1, 0},
+			{"1e999999999999/0", ParseMixedNotation, ErrMixedNotation, 1, 13}, {"1/2E", ParseMixedNotation, ErrMixedNotation, 1, 2},
+			{"1e2/3", ParseMixedNotation, ErrMixedNotation, 1, 13}, {"1e/3", ParseMixedNotation, ErrMixedNotation, 1, 13},
+			{"1/", ParseZeroDenominator, ErrDivideByZero, 1, 0}, {"1/00", ParseZeroDenominator, ErrDivideByZero, 1, 0},
+			{"/", ParseZeroDenominator, ErrDivideByZero, 0, 0}, {"1e4294967296", ParseExponentTooLarge, ErrExponentTooLarge, 1, 13},
+			{"1e18446744078004518912", ParseExponentTooLarge, ErrExponentTooLarge, 1, 13},
+		} {
+			m, budget := rationalManager(t, synch)
+			a := NewRational()
+			qopsMust(t, m.SetFraction(&a, -17, 13))
 			e := m.SetString(&a, f.text)
+			parserPublicationAudit(t, m, &a.num, &a.den)
 			var parsed *ParseError
-			if !errors.As(e, &parsed) || parsed.Reason != f.reason || !errors.Is(e, f.sentinel) || rationalString(t, m, &a) != "-17/13" {
+			if !errors.As(e, &parsed) || parsed.Reason != f.reason || !errors.Is(e, f.sentinel) || roundPublicationDecode(t, m.z, &a.num).Cmp(big.NewInt(f.n)) != 0 || roundPublicationDecode(t, m.z, &a.den).Cmp(big.NewInt(f.d)) != 0 {
 				t.Fatal(synch, f, e)
 			}
+			qopsMust(t, m.Del(&a))
+			m.Close()
+			if budget.Used() != 0 {
+				t.Fatal(budget.Used())
+			}
 		}
-		for _, s := range []string{"1e2147483648", "1e4294967295"} {
-			budget.FailAfter(0)
-			e := m.SetString(&a, s)
-			qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den})
+		for _, text := range []string{"1e2147483648", "1e4294967295", "1e2147483647"} {
+			m, budget := rationalManager(t, synch)
+			a := NewRational()
+			qopsMust(t, m.SetFraction(&a, -17, 13))
+			var held uint64
+			if text == "1e2147483647" {
+				held = budget.Limit() - budget.Used() - 4096
+				qopsMust(t, budget.Reserve(held))
+			} else {
+				budget.FailAfter(0)
+			}
+			e := m.SetString(&a, text)
+			parserPublicationAudit(t, m, &a.num, &a.den)
+			if roundPublicationDecode(t, m.z, &a.num).Cmp(big.NewInt(1)) != 0 || roundPublicationDecode(t, m.z, &a.den).Cmp(big.NewInt(13)) != 0 {
+				t.Fatal("source caller prefix before private Power refusal", text)
+			}
 			var power *PowerDomainError
 			var parsed *ParseError
-			if !errors.Is(e, arena.ErrInjectedFailure) || errors.As(e, &power) || errors.As(e, &parsed) {
-				t.Fatal(s, e)
+			if text == "1e2147483647" {
+				var failure memory.Failure
+				if !errors.Is(e, arena.ErrBudget) && !errors.Is(e, arena.ErrBounds) && (!errors.As(e, &failure) || failure.Kind != memory.FailureMemout || !m.z.memory.State().OutOfMemory) {
+					t.Fatal(text, e)
+				}
+			} else {
+				var failure memory.Failure
+				if (!errors.Is(e, arena.ErrInjectedFailure) && (!errors.As(e, &failure) || failure.Kind != memory.FailureMemout || !m.z.memory.State().OutOfMemory)) || errors.As(e, &power) || errors.As(e, &parsed) {
+					t.Fatal(text, e)
+				}
 			}
 			budget.FailAfter(-1)
-			if rationalString(t, m, &a) != "-17/13" {
-				t.Fatal("parser separately staged output", s, a)
+			if held != 0 {
+				budget.Release(held)
 			}
-		}
-		// Leave only bounded growth room so a valid enormous exponent refuses storage promptly.
-		held := budget.Limit() - budget.Used() - 4096
-		if e := budget.Reserve(held); e != nil {
-			t.Fatal(e)
-		}
-		e := m.SetString(&a, "1e2147483647")
-		budget.Release(held)
-		if !errors.Is(e, arena.ErrBudget) && !errors.Is(e, arena.ErrBounds) {
-			t.Fatal("finite exponent bounded storage", e)
-		}
-		if rationalString(t, m, &a) != "-17/13" {
-			t.Fatal("oversized parser published")
-		}
-		m.Close()
-		if budget.Used() != 0 {
-			t.Fatal(budget.Used())
+			qopsMust(t, m.Del(&a))
+			m.Close()
+			if budget.Used() != 0 {
+				t.Fatal(budget.Used())
+			}
 		}
 	}
 }
@@ -211,7 +234,11 @@ func TestParserBudgetFailureCleanup(t *testing.T) {
 		for _, text := range []string{"-10020340400506060893838382881821234567890123456789012345678901234567890", "123456789012345678901234567890/987654321012345678901234567", "-123456789012345678901.1234567890123456789e-17", "123456789012345678901e17"} {
 			for integer := 0; integer < 2; integer++ {
 				failures, successes := 0, 0
-				for after := int64(0); after < 80; after++ {
+				ceiling := int64(80)
+				if integer == 0 {
+					ceiling = 1024
+				}
+				for after := int64(0); after < ceiling; after++ {
 					m, budget := rationalManager(t, synch)
 					a := NewRational()
 					m.SetFraction(&a, 17, 13)
@@ -225,11 +252,21 @@ func TestParserBudgetFailureCleanup(t *testing.T) {
 					budget.FailAfter(after)
 					e := call()
 					qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &out})
+					if e != nil && integer == 0 {
+						parserPublicationAudit(t, m, &a.num, &a.den, &out)
+						var failure memory.Failure
+						var parsed *ParseError
+						var power *PowerDomainError
+						if (!errors.Is(e, arena.ErrInjectedFailure) && (!errors.As(e, &failure) || failure.Kind != memory.FailureMemout || !m.z.memory.State().OutOfMemory)) || errors.As(e, &parsed) || errors.As(e, &power) || !parserPublicationSweepMatches(t, m, &a, text) || roundPublicationDecode(t, m.z, &out).Cmp(big.NewInt(17)) != 0 {
+							t.Fatal("source parser failure pair", synch, text, after, e, a)
+						}
+					}
 					budget.FailAfter(-1)
 					if e != nil {
 						failures++
-						if !errors.Is(e, arena.ErrInjectedFailure) || rationalString(t, m, &a) != "17/13" || integerString(t, m.z, &out) != "17" {
-							t.Fatal("parser failure published", synch, text, integer, after, e)
+						var failure memory.Failure
+						if integer == 1 && ((!errors.Is(e, arena.ErrInjectedFailure) && (!errors.As(e, &failure) || failure.Kind != memory.FailureMemout || !m.z.memory.State().OutOfMemory)) || rationalString(t, m, &a) != "17/13" || integerString(t, m.z, &out) != "17") {
+							t.Fatal("integer parser failure published", synch, text, integer, after, e)
 						}
 					} else {
 						successes++
@@ -266,6 +303,9 @@ func TestParserBudgetFailureCleanup(t *testing.T) {
 					if budget.Used() != 0 {
 						t.Fatal("parser leaked", budget.Used())
 					}
+					if integer == 0 && e == nil {
+						break
+					}
 				}
 				if successes == 0 || failures == 0 {
 					t.Fatal("parser sweep boundary", synch, text, integer, failures, successes)
@@ -292,12 +332,35 @@ func TestParserWarmLifetimeAndInitialization(t *testing.T) {
 			}
 		}
 		var e error
-		if got := testing.AllocsPerRun(20, func() { e = call() }); got != 0 || e != nil {
-			t.Fatal(synch, got, e)
+		used := m.budget.Used()
+		cells := m.z.cells.Stats().Live
+		physical, objects := m.z.memory.Stats(), m.z.allocator.Stats()
+		size, err := m.z.memory.AllocationSize()
+		qopsMust(t, err)
+		count, err := m.z.memory.AllocationCount()
+		qopsMust(t, err)
+		got := testing.AllocsPerRun(20, func() { e = call() })
+		parserPublicationAudit(t, m, &a.num, &a.den, &integer)
+		afterSize, err := m.z.memory.AllocationSize()
+		qopsMust(t, err)
+		afterCount, err := m.z.memory.AllocationCount()
+		qopsMust(t, err)
+		if e != nil || used != m.budget.Used() || cells != m.z.cells.Stats().Live || physical != m.z.memory.Stats() || objects != m.z.allocator.Stats() || size != afterSize || objects.PendingBlocks != 0 {
+			t.Fatal("warmed physical ownership changed", synch, e)
+		}
+		if objects.DirectObjects == 0 {
+			if objects.Chunks == 0 || got != 0 || afterCount != count {
+				t.Fatal("pooled warmed allocation", synch, got, count, afterCount)
+			}
+		} else if objects.Chunks != 0 || afterCount <= count {
+			t.Fatal("source Direct allocation events missing", count, afterCount)
 		}
 		var raw Rational
-		if e = m.SetString(&raw, "1"); !errors.Is(e, ErrUninitializedRational) {
+		if _, e = m.IsInt(&raw); !errors.Is(e, ErrUninitializedRational) {
 			t.Fatal(e)
+		}
+		if e = m.SetString(&raw, "1"); e != nil || rationalString(t, m, &raw) != "1" {
+			t.Fatal("explicit initializer", e)
 		}
 		// Input is borrowed: a replacement string does not become part of either numeral.
 		m.SetString(&a, strings.Repeat("0", 50)+"1/3")

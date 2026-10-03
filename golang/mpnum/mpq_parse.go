@@ -2,7 +2,11 @@
 // Source: src/util/mpq.cpp set(mpq &, char const *), all source branches.
 package mpnum
 
-import "errors"
+import (
+	"errors"
+	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
+)
 
 var ErrMixedNotation = errors.New("mpnum: mixing rational/scientific notation")
 var ErrExponentTooLarge = errors.New("mpnum: exponent is too big")
@@ -31,20 +35,30 @@ func (e *ParseError) Unwrap() error {
 }
 func (e *ParseError) Error() string { return e.Unwrap().Error() }
 
-// SetString is the complete permissive source integer/fraction/decimal/scientific
-// byte parser. In particular, scientific input without a dot retains the old
-// denominator. Work copies that source state, so output history is preserved.
-// Predicted storage and source exception failures leave the destination intact.
+// SetString explicitly initializes/reinitializes owned integer fields, including
+// a zero denominator. Ordinary arithmetic still rejects that raw state. The
+// source parser publishes numerator reset and each digit/component action into
+// the caller; errors retain those completed actions. Scientific input without
+// a dot keeps the actual old denominator until its later source arithmetic.
 func (m *RationalManager) SetString(out *Rational, text string) error {
-	if e := m.check(out); e != nil {
+	if m == nil {
+		return memory.ErrRuntimeOwner
+	}
+	if m.closed {
+		return arena.ErrClosed
+	}
+	if out == nil {
+		return arena.ErrInvalidSlot
+	}
+	// Ordinary checks reject stale/failed references before Reset. Cleanup-only
+	// acceptance must not authorize arithmetic on a failed owning descriptor.
+	if e := m.z.check(&out.num); e != nil {
 		return e
 	}
-	work := NewRational()
-	defer m.drop(&work)
-	if e := m.z.Copy(&work.den, &out.den); e != nil {
+	if e := m.z.check(&out.den); e != nil {
 		return e
 	}
-	if e := m.z.Reset(&work.num); e != nil {
+	if e := m.z.Reset(&out.num); e != nil {
 		return e
 	}
 	ten := NewInt(10)
@@ -62,10 +76,10 @@ func (m *RationalManager) SetString(out *Rational, text string) error {
 		}
 		if b >= '0' && b <= '9' {
 			digit := NewInt(int32(b - '0'))
-			if e := m.z.Mul(&work.num, &ten, &tmp); e != nil {
+			if e := m.z.Mul(&out.num, &ten, &tmp); e != nil {
 				return e
 			}
-			if e := m.z.Add(&tmp, &digit, &work.num); e != nil {
+			if e := m.z.Add(&tmp, &digit, &out.num); e != nil {
 				return e
 			}
 		}
@@ -73,23 +87,23 @@ func (m *RationalManager) SetString(out *Rational, text string) error {
 	}
 	marker := numeralByte(text, i)
 	if marker == '/' || marker == '.' || marker == 'e' || marker == 'E' {
-		if e := m.parseRationalSuffix(&work, text, i, &tmp, &ten); e != nil {
+		if e := m.parseRationalSuffix(out, text, i, &tmp, &ten); e != nil {
 			return e
 		}
 	} else {
-		if e := m.resetDenominator(&work); e != nil {
+		if e := m.resetDenominator(out); e != nil {
 			return e
 		}
 	}
 	if negative {
-		if e := m.z.Neg(&work.num); e != nil {
+		if e := m.z.Neg(&out.num); e != nil {
 			return e
 		}
 	}
-	if e := m.normalize(&work); e != nil {
+	if e := m.normalize(out); e != nil {
 		return e
 	}
-	return m.Move(out, &work)
+	return nil
 }
 
 // A separate lexical scope keeps source suffix temporaries alive exactly until

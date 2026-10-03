@@ -187,3 +187,17 @@ no-generics pass in `.cache/release/hensel-physical-8ade92d`; logs are
 `.cache/factors-owner/hensel-physical-{profile-final,vet,source}.log`.
 The older Words-per-cell family audits remain RED pending their exact physical
 root migration; source lexical vector ownership needs further qualification.
+
+
+Rational parsing now resets and publishes directly into the caller in source
+order, preserving exact completed fields on exceptions and allocation failure.
+SetString explicitly initializes/reinitializes zero-denominator destinations
+after ordinary integer-handle validation; ordinary rational reads remain
+guarded. Tests first exposed hidden publication and extra old-denominator copy.
+All twelve selected parser groups pass native and checked/debug, with exact
+paired-component failure models, independent success oracles and physical-root
+audits. Vet and source/evidence/no-generics pass on the three-file overlay
+`.cache/release/mpq-parser-final-de4d6a0`. Full native/debug module runs remain
+RED on documented backend dependencies. Frozen hashes/logs and remaining
+scientific-denominator/service/pair-setter contracts are recorded in
+`MPQ_PARSER_PUBLICATION_PACKET.md`; no whole-source completion is claimed.

@@ -1,8 +1,11 @@
-# Rational parser direct-publication proposal
+# Rational parser direct-publication checkpoint
 
-Read-only complete source audit based on committed `0c9d695`. Rounding is
-committed8b5dc06 and its three Go hashes are unchanged. Only this NEW packet
-is written now. Production/test/metadata/Git edits require parent scope review.
+Selected parser publication and explicit initializer changes are implemented
+and frozen based on committed `de4d6a0`. Exact12 parser tests pass native and
+checked/debug; full modules retain documented physical-backend baseline RED.
+The executed checkpoint and hashes below supersede the following historical
+proposal, originally audited on `0c9d695` and saved in `8ade92d`. Rounding
+remains unchanged. Parent owns commits and central metadata.
 Concrete Go only: no generics, unsafe, cgo, production math/big, numerical
 replay, scratch repair or private replacement parsing/arithmetic algorithms.
 Current user gates are native, checked/debug, vet and parent source/evidence
@@ -203,3 +206,124 @@ and fraction inputs. Raw Go-zero initialization is an explicit adaptation.
 Ordinary arithmetic guards remain unchanged. Any existing initialization
 expectation needs a named RED and source review before modification; scientific
 zero-denominator continuations and public arithmetic dependencies remain open.
+
+
+## Executed selected parser publication checkpoint
+
+The preceding sections preserve the reviewed proposal history. The selected
+implementation now uses the actual caller throughout `mpq_parse.go`; it removes
+only top-level private rational work, the early old-denominator Copy, and final
+Move. The suffix grammar, public arithmetic dependencies and lexical locals
+remain the single existing algorithms.
+
+Entry is now the approved explicit initializer/reinitializer: reject a nil or
+closed manager, nil destination, or an invalid ordinary Integer NUM then DEN
+handle before source Reset(NUM). Inline denominator0 is accepted for this
+explicit setter, including source-produced1/0 and0/0. Raw Go-zero acceptance
+is a Go API adaptation (source default mpq initializes denominator1), not lazy
+arithmetic initialization. Ordinary reads/arithmetic still reject den0.
+No checkCleanup, sidecar, record-layout or owner-backend change is used.
+
+Three NEW groups run both scratch policies and inspect actual cell ownership
+before rendering or cleanup. They expose accumulated raw exception fields,
+old BIG numerator disposal, unchanged physical old-denominator identity where
+source leaves it, absence of a fallible old-denominator copy, and plain/decimal/
+fraction reparsing of source-produced zero denominators and raw Go zero.
+The first behavioral RED was committed8ade92d plus only new tests: native27128
+and checked/debug52805, logs `.cache/parser-publication-red-native.log` and
+`parser-publication-red-debug.log`. Initial implementation GREEN51431/84217
+ran all three groups in native/checked-debug (0.007s each). Earlier unused-import
+and uninitialized scratch-size-read failures were test-harness corrections,
+not claimed numerical behavior REDs; actual source empty cells initialize
+capacity, not necessarily the size field.
+
+Named existing fixture REDs justified only three group-region corrections in
+`mp_parse_test.go`: exception categories now independently reseed each input
+and compare exact raw NUM/DEN at the source throw; the rational fault sweep
+uses a finite paired caller-action model; explicit raw-zero setter acceptance
+and physical allocator-profile warmth replace obsolete initialization/cache
+assumptions. Independent successful arithmetic, Integer-parser atomicity,
+permissive grammar, actual three source set_str_bug assertions and all other
+registered checks remain intact. New prefix fixtures add no source ENSURE
+credit.
+
+The four-fixture fault model enumerates complete paired actions rather than
+independent NUM/DEN combinations: source NUM Reset and every digit, DEN Reset
+and every digit only after complete NUM, decimal DEN1 then denominator product
+then cross-sum numerator, normalization NUM then DEN, scientific product after
+private Power, and delayed negative flag. A failedDEN owning descriptor is
+admitted only at the decimal public Add's actual Mul(1,BIGfractionDEN,DEN)
+Copy-growth action, paired with its unchanged numerator. Selected internal
+Integer Add(tmp,0,caller) has no zero-Copy shortcut: mpz.h349–359 and
+mpz.cpp357–413 use the actual big_add_sub scratch/publication algorithm.
+No fictitious failedNUM allowance is used. Cache-only independent checks of
+all four fixtures ×80 refusal positions ×two policies pass native78498 and
+debug63645 (`parser-pair-model-native.log`, `parser-pair-model-debug.log`);
+these temporary checks are not permanent source-test registration credit.
+
+Warmth checks preserve pooled release zero Go allocations and stable actual
+raw allocation count. Direct debug follows actual source malloc/free events:
+Runtime AllocationCount advances while AllocationSize, live physical objects,
+actual Runtime/allocator stats and Budget bytes stay fixed; no pending blocks.
+Named roots and real sourceCellBacking capacity/extent are audited, never a
+fictional Words payload per numeral. The default debug profile's original
+54 Go allocations was independently reproduced on unchanged8ade92d; direct
+parser measured52, but neither incidental count becomes a test contract.
+
+Scientific den0 remains a specific dependency boundary. Exp0 reaches actual
+normalize: nonzero numerator becomes ±1/0 through GCD and sequential integer
+Div actions; zero numerator reaches actual integer divide-by-zero after0/0
+publication. For exp>0 the parser completes private Power before existing
+public Rational Mul/Div rejects the caller's den0 via its ordinary arithmetic
+check. This latter boundary is not source-equivalent finite raw arithmetic and
+is NOT fixed or credited by this setter change. Service pre-entry checks,
+general pair setter publication, Integer parser publication, scalar getters,
+TRACE/true streams and full memory/runtime topology remain separately open.
+
+The held Integer branch also produced actual RED50806 solely because the
+committed physical backend emits `memory.FailureMemout` (code101), not the old
+arena injection sentinel, at its armed first refusal. Parent-approved correction
+changes only that category predicate: require either injected failure or typed
+Memout plus real Runtime.OutOfMemory. Caller a17/13 and Integer out17 remain
+unchanged; all Integer success models and its production staging remain held.
+The same precise transport check applies to rational growth failures and
+high-mask private Power before wrap, rejecting parser/Power-domain categories.
+
+Final frozen Go inventory, based on committed `de4d6a0` plus ONLY these files:
+
+| File | SHA256 |
+| --- | --- |
+| mpnum/mpq_parse.go | 1cfdaf7ace6133201ab68cfae78e72af8aef57d919493c7ef53633456c580ebc |
+| mpnum/mp_parse_test.go | 0d77d84c64a3efcb7aad7a8ed3db138f9e310cae9499f169039dd5a94189be5b |
+| mpnum/mp_parse_publication_test.go | 163827b44aeb7c86b8c1c3a7946a1c4ec735d4d1adc7b91aa81bb224369ecb21 |
+
+The final isolated tree `.cache/release/mpq-parser-final-de4d6a0` excludes all
+arena/backend and polynomial drafts and cache-only model/profiling tests.
+Full native41396 and checked/debug81799 modules are terminalRED on committed
+physical-backend consumer gaps unrelated to this parser checkpoint. Examples
+include polynomial factor/Sturm/sequence physical-failure ownership and debug
+numerical facade/CopyFrom allocation expectations. Full debug mpnum aborts in
+an earlier CopyFrom fixture before reaching parser registrations. Preserve
+these logs as visible baseline evidence; do not claim full-module GREEN.
+Initial checked/debug vet48834 and final frozen-byte vet both terminalPASS.
+The actual debug completion-only RED demonstrated that the decimal scientific
+fault fixture exceeds80 allocation reservations (first success90 unsynchronized,
+89 synchronized). Parent-approved rational-only ceiling1024 exits only after
+first independent mathematical success and complete cleanup/refund. Required
+prior failures remain; Integer ceiling80 and its full atomic/success checks
+are unchanged. The final exact12 tests pass native12436 (0.417s) and checked/
+debug (0.479s):12 RUN and12 PASS verified per profile. Exact names are saved
+in `.cache/parser-final-tests.json`; logs `parser-final-selected-native.log`
+and `parser-final-selected-debug.log`. No source arithmetic or allocation
+sequence is changed to accommodate the sweep. Logs are
+`.cache/parser-final-native.log`, `parser-final-debug.log`, `parser-final-vet.log`.
+No current race/JS/WASI checks: they remain user-deferred. Reference/source/no-generics/evidence audit85763 is terminalPASS on the
+committed manifest:2102 units,677 APIs,33 ported,148 partial,1921 unported;
+log `.cache/parser-final-source-audit.log`. Source inventory/fingerprints and
+runnable evidence declarations do not hash Go test bodies; final-byte evidence/
+no-generics audit41143 is terminalPASS on exact final bytes and supplements
+that same source result without repeating source inventory (same2102/677 and
+33/148/1921 counts, `.cache/parser-final-evidence-audit.log`). Parent owns any subsequent selected metadata integration.
+This remains a selected algorithm checkpoint with visible full-backend RED,
+not source-unit or whole-goal completion.
+
