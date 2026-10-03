@@ -705,3 +705,17 @@ exact1000/10000/50000 bounds with an independent finite set oracle. Integrated
 full native/checked-debug, race, actual JS, vet and WASI build passed. Automatic
 debug diagnostic actions and AST specialization remain open; AST_CORE_PORT_STATUS.md
 records the real manager prerequisites. See CHAIN_TABLE_PORT_STATUS.md.
+
+## SMT2 symbol utilities and complete escaping bytes
+
+All four real SMT2 utilities now preserve the ASCII whitelist, nullable C-string
+predicate, special outer-pipe scanning, symbol overload and bytewise quote
+constructor. Eight test groups began missing-API RED and cover the one source
+implementation precondition, exhaustive byte models, borrowed-owner lifetimes,
+exact old/new peaks and immediate failure cleanup. Escaped now covers all thirteen
+registered print-only inputs (zero ENSURE), plus null/trim/indent domains and
+published quote/space failure prefixes. Behavioral RED corrected an invented
+uint32 output bound; valid UINTMAX indent now stops at finite-budget growth
+failure after the source prefix. Full native/checked-debug, named race/actual JS,
+vet/WASI/no-generics gates passed. See SMT2_UTIL_PORT_STATUS.md. Full AST printers
+and external custom ostream state remain open; util.h/.cpp stay partial.

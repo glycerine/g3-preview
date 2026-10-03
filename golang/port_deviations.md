@@ -94,3 +94,20 @@ hash functors and transfers only positive cross-budget capacity delta; it adds
 no fictitious same-budget reservation. Cold epoch-checked views replace raw
 borrows. Automatic Z3DEBUG visited-set diagnostics and AST structural/identity
 specializations remain open. See CHAIN_TABLE_PORT_STATUS.md.
+
+### SMT2 symbol quoting and complete escaped byte output
+
+Nullable Go C-string inputs and checked scalar symbols replace raw borrows.
+Quoting reads symbol bytes directly while holding the manager lock around only
+an unpublished private buffer, avoiding inversion with shared-buffer symbol
+insertion. Complete temporary owner/inline/overflow and old/new storage is charged;
+only the one final immutable text is caller-owned. Source predicate quirks,
+char append order and CStr mutation remain unchanged.
+
+Escaped ostream byte emission becomes append into concrete StringBuffer64.
+Quote-prefix and indentation failure prefixes remain published; all uint32
+indent values are valid subject to actual host-int representability and budget.
+A convenience output wrapper cleans its temporary prefix on error. External
+custom ostream state, badbit and exception behavior remain open, separate from
+complete byte rendering. No AST printer scaffold is introduced.
+See SMT2_UTIL_PORT_STATUS.md.

@@ -76245,30 +76245,30 @@
       "sha256": "b6268fc7569c7003f4a925e88b97c559c94ab0293c813f582828f8fb83930c97",
       "component": "test",
       "role": "test",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "util_sexpr_test.go"
+        "util_escaped.go"
       ],
       "tests": [
-        "TestSexprRegisteredEscapedDefaultPrintInputs"
+        "TestEscapedThirteenSourcePrintedFixtures"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "five nonnull default escaped input fixtures through sexpr output; zero source ENSURE assertions",
-          "status": "partial",
-          "go_target": "util_sexpr_test.go",
+          "name": "tst_escaped all thirteen registered print-only fixtures (lines22-34), zero ENSURE assertions",
+          "status": "ported",
+          "go_target": "util_escaped.go",
           "tests": [
-            "TestSexprRegisteredEscapedDefaultPrintInputs"
+            "TestEscapedThirteenSourcePrintedFixtures"
           ]
         }
       ],
       "ownership": [
-        "Sexpr string payload is owned; emitted output is caller-owned."
+        "Fixtures borrow nullable immutable strings and close each temporary charged owner; exact final bytes are caller-owned. No reference source or external C runtime is required at test runtime."
       ],
       "deviations": [
-        "Source thirteen print-only inputs are not thirteen assertions. Five relevant inputs covered; standalone print harness, null/trim and remaining output cases open."
+        "Thirteen source printed inputs are tested as fixed byte expectations, not counted as thirteen source assertions. Go output fixtures preserve quote/LF/null/trim routes; general indentation uses independent byte oracle coverage."
       ]
     },
     {
@@ -106678,29 +106678,86 @@
       "sha256": "d833e788ffce835f7882c0e0f99b42efd0d3d1e9eea3030490fa2ea6a1373d69",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "util_smt2_util.go"
+      ],
+      "tests": [
+        "TestSMT2SimpleExhaustiveBytes",
+        "TestSMT2QuotedCStringSourceBranches",
+        "TestSMT2SymbolSourcePreconditionAndLifetime",
+        "TestSMT2QuoteFaultBudgetAndIndependentBytes",
+        "TestSMT2QuoteExactGrowthPeakAndNoBorrowCharges"
+      ],
       "assertions": [
         {
           "line": 60,
           "text": "SASSERT(is_smt2_quoted_symbol(s));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "is_smt2_simple_symbol_char exact ASCII whitelist (cpp21-29)",
+          "status": "ported",
+          "go_target": "util_smt2_util.go",
+          "tests": [
+            "TestSMT2SimpleExhaustiveBytes",
+            "TestSMT2QuotedCStringSourceBranches"
+          ]
+        },
+        {
+          "name": "is_smt2_quoted_symbol nullable CString first-NUL and outer-pipe scanner (cpp31-51)",
+          "status": "ported",
+          "go_target": "util_smt2_util.go",
+          "tests": [
+            "TestSMT2QuotedCStringSourceBranches"
+          ]
+        },
+        {
+          "name": "is_smt2_quoted_symbol borrowed scalar symbol overload (cpp53-57)",
+          "status": "ported",
+          "go_target": "util_smt2_util.go",
+          "tests": [
+            "TestSMT2SymbolSourcePreconditionAndLifetime",
+            "TestSMT2QuoteExactGrowthPeakAndNoBorrowCharges"
+          ]
+        },
+        {
+          "name": "mk_smt2_quoted_symbol precondition and bytewise escaping (cpp59-72)",
+          "status": "ported",
+          "go_target": "util_smt2_util.go",
+          "tests": [
+            "TestSMT2SymbolSourcePreconditionAndLifetime",
+            "TestSMT2QuoteFaultBudgetAndIndependentBytes",
+            "TestSMT2QuoteExactGrowthPeakAndNoBorrowCharges"
+          ]
+        }
+      ],
+      "ownership": [
+        "Synchronous checked symbol-owner byte borrow avoids intermediate BareString/String copies. Quoting holds manager lock around only an unpublished private StringBuffer64: no shared-buffer lock inversion. Complete temporary owner+inline/overflow and old/new peaks are charged to explicit borrowed Budget; cleanup releases them on all exits. The one final text is caller-owned and survives manager Close. See SMT2_UTIL_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Nullable Go CString argument and scalar checked Symbol replace raw C pointers. Mk precondition is a typed error before buffer allocation. Preserve source needs-quoting predicate, outer-pipe escape-boundary quirks, char append order, CStr mutation and successful allocation prefixes. No AST printer or standard grammar repair is claimed."
+      ]
     },
     {
       "path": "src/util/smt2_util.h",
       "sha256": "37dfbf93e3e69e5c328fc17f316687bf53e9642394d32cebeae5915de948a797",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "util_smt2_util.go"
+      ],
+      "tests": [
+        "TestSMT2SimpleExhaustiveBytes",
+        "TestSMT2QuotedCStringSourceBranches",
+        "TestSMT2SymbolSourcePreconditionAndLifetime",
+        "TestSMT2QuoteFaultBudgetAndIndependentBytes",
+        "TestSMT2QuoteExactGrowthPeakAndNoBorrowCharges"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -106711,11 +106768,52 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "is_smt2_simple_symbol_char exact ASCII whitelist (cpp21-29)",
+          "status": "ported",
+          "go_target": "util_smt2_util.go",
+          "tests": [
+            "TestSMT2SimpleExhaustiveBytes",
+            "TestSMT2QuotedCStringSourceBranches"
+          ]
+        },
+        {
+          "name": "is_smt2_quoted_symbol nullable CString first-NUL and outer-pipe scanner (cpp31-51)",
+          "status": "ported",
+          "go_target": "util_smt2_util.go",
+          "tests": [
+            "TestSMT2QuotedCStringSourceBranches"
+          ]
+        },
+        {
+          "name": "is_smt2_quoted_symbol borrowed scalar symbol overload (cpp53-57)",
+          "status": "ported",
+          "go_target": "util_smt2_util.go",
+          "tests": [
+            "TestSMT2SymbolSourcePreconditionAndLifetime",
+            "TestSMT2QuoteExactGrowthPeakAndNoBorrowCharges"
+          ]
+        },
+        {
+          "name": "mk_smt2_quoted_symbol precondition and bytewise escaping (cpp59-72)",
+          "status": "ported",
+          "go_target": "util_smt2_util.go",
+          "tests": [
+            "TestSMT2SymbolSourcePreconditionAndLifetime",
+            "TestSMT2QuoteFaultBudgetAndIndependentBytes",
+            "TestSMT2QuoteExactGrowthPeakAndNoBorrowCharges"
+          ]
+        }
+      ],
+      "ownership": [
+        "Synchronous checked symbol-owner byte borrow avoids intermediate BareString/String copies. Quoting holds manager lock around only an unpublished private StringBuffer64: no shared-buffer lock inversion. Complete temporary owner+inline/overflow and old/new peaks are charged to explicit borrowed Budget; cleanup releases them on all exits. The one final text is caller-owned and survives manager Close. See SMT2_UTIL_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Nullable Go CString argument and scalar checked Symbol replace raw C pointers. Mk precondition is a typed error before buffer allocation. Preserve source needs-quoting predicate, outer-pipe escape-boundary quirks, char append order, CStr mutation and successful allocation prefixes. No AST printer or standard grammar repair is claimed."
+      ]
     },
     {
       "path": "src/util/sorting_network.h",
@@ -108842,7 +108940,8 @@
       "go_targets": [
         "utilhash/random.go",
         "mpnum/mpz_log.go",
-        "util_sexpr.go"
+        "util_sexpr.go",
+        "util_escaped.go"
       ],
       "tests": [
         "TestSourceRandomVectors",
@@ -108855,7 +108954,10 @@
         "TestRationalRoundFailureCleanup",
         "TestRationalRoundInitializationAndClose",
         "TestRationalRoundWarmZeroAllocations",
-        "TestSexprRegisteredEscapedDefaultPrintInputs"
+        "TestSexprRegisteredEscapedDefaultPrintInputs",
+        "TestEscapedThirteenSourcePrintedFixtures",
+        "TestEscapedIndependentByteIndentAndTrim",
+        "TestEscapedPublishedFailurePrefixesAndBudgets"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -108905,20 +109007,36 @@
           ]
         },
         {
-          "name": "escaped nonnull/trim=false/indent0 branch through actual sexpr string printer",
-          "status": "partial",
-          "go_target": "util_sexpr.go",
+          "name": "escaped constructor and end nullable first-NUL/LF suffix selection (h379-389,cpp122-136)",
+          "status": "ported",
+          "go_target": "util_escaped.go",
           "tests": [
-            "TestSexprRegisteredEscapedDefaultPrintInputs",
-            "TestSexprStringBytesAndWrapperRemainingBranches"
+            "TestEscapedThirteenSourcePrintedFixtures",
+            "TestEscapedIndependentByteIndentAndTrim",
+            "TestEscapedPublishedFailurePrefixesAndBudgets"
           ]
+        },
+        {
+          "name": "escaped display and stream insertion complete owned-byte adapter (cpp138-152)",
+          "status": "ported",
+          "go_target": "util_escaped.go",
+          "tests": [
+            "TestEscapedThirteenSourcePrintedFixtures",
+            "TestEscapedIndependentByteIndentAndTrim",
+            "TestEscapedPublishedFailurePrefixesAndBudgets"
+          ]
+        },
+        {
+          "name": "escaped external custom ostream state/badbit/exception behavior",
+          "status": "unported"
         }
       ],
       "ownership": [
-        "Random state owner-local, shuffle borrows caller sequence. Other util methods unported."
+        "Random state owner-local, shuffle borrows caller sequence. Other util methods unported.",
+        "Complete escaped adapter borrows nullable input synchronously and appends into a physically charged concrete buffer. Byte/quote/indent successful prefixes remain live on budget failure. Convenience wrapper releases temporary storage on every exit and returns one caller-owned final text. Full uint32 indent domain is preserved; only actual host-int representability is guarded. See SMT2_UTIL_PORT_STATUS.md."
       ],
       "deviations": [
-        "Only actual sexpr escaped specialization is translated; trim=true, null input and other indent routes remain open."
+        "Concrete buffer output replaces source ostream emission; all null/trim/indent byte branches are translated, but external custom stream state/badbit/exceptions remain open. Other util algorithms remain separate. No generics, boxed hot records or source assertions are invented."
       ]
     },
     {
@@ -108930,7 +109048,8 @@
       "go_targets": [
         "utilhash/random.go",
         "mpnum/mpz_log.go",
-        "util_sexpr.go"
+        "util_sexpr.go",
+        "util_escaped.go"
       ],
       "tests": [
         "TestSourceRandomVectors",
@@ -108943,7 +109062,10 @@
         "TestRationalRoundFailureCleanup",
         "TestRationalRoundInitializationAndClose",
         "TestRationalRoundWarmZeroAllocations",
-        "TestSexprRegisteredEscapedDefaultPrintInputs"
+        "TestSexprRegisteredEscapedDefaultPrintInputs",
+        "TestEscapedThirteenSourcePrintedFixtures",
+        "TestEscapedIndependentByteIndentAndTrim",
+        "TestEscapedPublishedFailurePrefixesAndBudgets"
       ],
       "conditionals": [
         {
@@ -109161,20 +109283,36 @@
           ]
         },
         {
-          "name": "escaped nonnull/trim=false/indent0 branch through actual sexpr string printer",
-          "status": "partial",
-          "go_target": "util_sexpr.go",
+          "name": "escaped constructor and end nullable first-NUL/LF suffix selection (h379-389,cpp122-136)",
+          "status": "ported",
+          "go_target": "util_escaped.go",
           "tests": [
-            "TestSexprRegisteredEscapedDefaultPrintInputs",
-            "TestSexprStringBytesAndWrapperRemainingBranches"
+            "TestEscapedThirteenSourcePrintedFixtures",
+            "TestEscapedIndependentByteIndentAndTrim",
+            "TestEscapedPublishedFailurePrefixesAndBudgets"
           ]
+        },
+        {
+          "name": "escaped display and stream insertion complete owned-byte adapter (cpp138-152)",
+          "status": "ported",
+          "go_target": "util_escaped.go",
+          "tests": [
+            "TestEscapedThirteenSourcePrintedFixtures",
+            "TestEscapedIndependentByteIndentAndTrim",
+            "TestEscapedPublishedFailurePrefixesAndBudgets"
+          ]
+        },
+        {
+          "name": "escaped external custom ostream state/badbit/exception behavior",
+          "status": "unported"
         }
       ],
       "ownership": [
-        "Random state owner-local, shuffle borrows caller sequence. Other util methods unported."
+        "Random state owner-local, shuffle borrows caller sequence. Other util methods unported.",
+        "Complete escaped adapter borrows nullable input synchronously and appends into a physically charged concrete buffer. Byte/quote/indent successful prefixes remain live on budget failure. Convenience wrapper releases temporary storage on every exit and returns one caller-owned final text. Full uint32 indent domain is preserved; only actual host-int representability is guarded. See SMT2_UTIL_PORT_STATUS.md."
       ],
       "deviations": [
-        "Only actual sexpr escaped specialization is translated; trim=true, null input and other indent routes remain open."
+        "Concrete buffer output replaces source ostream emission; all null/trim/indent byte branches are translated, but external custom stream state/badbit/exceptions remain open. Other util algorithms remain separate. No generics, boxed hot records or source assertions are invented."
       ]
     },
     {
