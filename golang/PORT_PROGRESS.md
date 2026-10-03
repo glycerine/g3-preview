@@ -1182,3 +1182,16 @@ solver/proof/interpolation objective remain open.
 
 Root final-source/no-generics audit passed; ledger counts remain
 33ported/91partial/1978unported.
+
+
+## Actual generated SAT configuration descriptors
+
+The actual static SAT collector now publishes all24 source descriptors in
+declaration order with exact name/kind/description/default/module bytes. Five
+tests-first groups cover complete metadata, existing duplicate preservation,
+180 immediate fault graphs, lifetime guards and zero warmed duplicate allocations.
+Two frozen Go files passed full native/debug, exact five named race/actual JS
+groups, vet, WASI build and source/no-generics gates. See
+SAT_CONFIG_DESCRS_PORT_STATUS.md. config.cpp/h and sat_params.pyg become partial;
+ledger33ported/94partial/1975unported. Actual config updates, registry catalog and
+full solver algorithms remain required within the active objective.

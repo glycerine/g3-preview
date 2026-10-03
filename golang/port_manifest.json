@@ -50526,23 +50526,64 @@
       "sha256": "cfbc032cf10a16acb1f913a18286ef5d1fd846edd249081013d3f1b0ca58122f",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "partial",
+      "go_targets": [
+        "sat_main_config_descrs.go",
+        "sat_main_config_descrs_test.go"
+      ],
+      "tests": [
+        "TestSATMainConfigGeneratedDescriptorBytesAndOrder",
+        "TestSATMainConfigGeneratedDescriptorDuplicateSourceInsert",
+        "TestSATMainConfigGeneratedDescriptorFailurePrefixes",
+        "TestSATMainConfigGeneratedDescriptorLifetime",
+        "TestSATMainConfigGeneratedDescriptorWarmDuplicateAllocations"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "actual config collect_param_descrs and generated twenty-four sequential descriptor inserts",
+          "status": "ported",
+          "go_target": "sat_main_config_descrs.go",
+          "tests": [
+            "TestSATMainConfigGeneratedDescriptorBytesAndOrder",
+            "TestSATMainConfigGeneratedDescriptorDuplicateSourceInsert",
+            "TestSATMainConfigGeneratedDescriptorFailurePrefixes",
+            "TestSATMainConfigGeneratedDescriptorLifetime",
+            "TestSATMainConfigGeneratedDescriptorWarmDuplicateAllocations"
+          ]
+        },
+        {
+          "name": "constructor, sequential parameter updates, implicit config copies and generated accessors",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Static collector borrows ParamDescrs; exact literals are read immediately by existing charged dictionary/packed text owners. Caller retains partial source insertion prefix on errors. No intermediate metadata vector or scalar policy owner is introduced. See SAT_CONFIG_DESCRS_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Preserved source generated sat_params.hpp is absent: collector translated from authoritative sat_params.pyg and mk_genfile_common.py defaults/module/emit actions. Existing ParamDescrs owned-text adaptation and fault points apply; actual registry/config/full solver remain open."
+      ]
     },
     {
       "path": "src/sat/sat_config.h",
       "sha256": "4207a3caa3bc54a06e88064859db569b2f122d7a4c189e41bffe45175d8388ca",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_main_config_descrs.go",
+        "sat_main_config_descrs_test.go"
+      ],
+      "tests": [
+        "TestSATMainConfigGeneratedDescriptorBytesAndOrder",
+        "TestSATMainConfigGeneratedDescriptorDuplicateSourceInsert",
+        "TestSATMainConfigGeneratedDescriptorFailurePrefixes",
+        "TestSATMainConfigGeneratedDescriptorLifetime",
+        "TestSATMainConfigGeneratedDescriptorWarmDuplicateAllocations"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -50553,11 +50594,34 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "actual config collect_param_descrs and generated twenty-four sequential descriptor inserts",
+          "status": "ported",
+          "go_target": "sat_main_config_descrs.go",
+          "tests": [
+            "TestSATMainConfigGeneratedDescriptorBytesAndOrder",
+            "TestSATMainConfigGeneratedDescriptorDuplicateSourceInsert",
+            "TestSATMainConfigGeneratedDescriptorFailurePrefixes",
+            "TestSATMainConfigGeneratedDescriptorLifetime",
+            "TestSATMainConfigGeneratedDescriptorWarmDuplicateAllocations"
+          ]
+        },
+        {
+          "name": "constructor, sequential parameter updates, implicit config copies and generated accessors",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Static collector borrows ParamDescrs; exact literals are read immediately by existing charged dictionary/packed text owners. Caller retains partial source insertion prefix on errors. No intermediate metadata vector or scalar policy owner is introduced. See SAT_CONFIG_DESCRS_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Preserved source generated sat_params.hpp is absent: collector translated from authoritative sat_params.pyg and mk_genfile_common.py defaults/module/emit actions. Existing ParamDescrs owned-text adaptation and fault points apply; actual registry/config/full solver remain open."
+      ]
     },
     {
       "path": "src/sat/sat_elim_eqs.cpp",
@@ -51839,14 +51903,46 @@
       "sha256": "23c5c38b82c1184089a6e77dd8498a03b5607eb44f00ca972475fb18b5cf85df",
       "component": "sat",
       "role": "generated_input",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "partial",
+      "go_targets": [
+        "sat_main_config_descrs.go",
+        "sat_main_config_descrs_test.go"
+      ],
+      "tests": [
+        "TestSATMainConfigGeneratedDescriptorBytesAndOrder",
+        "TestSATMainConfigGeneratedDescriptorDuplicateSourceInsert",
+        "TestSATMainConfigGeneratedDescriptorFailurePrefixes",
+        "TestSATMainConfigGeneratedDescriptorLifetime",
+        "TestSATMainConfigGeneratedDescriptorWarmDuplicateAllocations"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "actual config collect_param_descrs and generated twenty-four sequential descriptor inserts",
+          "status": "ported",
+          "go_target": "sat_main_config_descrs.go",
+          "tests": [
+            "TestSATMainConfigGeneratedDescriptorBytesAndOrder",
+            "TestSATMainConfigGeneratedDescriptorDuplicateSourceInsert",
+            "TestSATMainConfigGeneratedDescriptorFailurePrefixes",
+            "TestSATMainConfigGeneratedDescriptorLifetime",
+            "TestSATMainConfigGeneratedDescriptorWarmDuplicateAllocations"
+          ]
+        },
+        {
+          "name": "constructor, sequential parameter updates, implicit config copies and generated accessors",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Static collector borrows ParamDescrs; exact literals are read immediately by existing charged dictionary/packed text owners. Caller retains partial source insertion prefix on errors. No intermediate metadata vector or scalar policy owner is introduced. See SAT_CONFIG_DESCRS_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Preserved source generated sat_params.hpp is absent: collector translated from authoritative sat_params.pyg and mk_genfile_common.py defaults/module/emit actions. Existing ParamDescrs owned-text adaptation and fault points apply; actual registry/config/full solver remain open."
+      ]
     },
     {
       "path": "src/sat/sat_probing.cpp",
