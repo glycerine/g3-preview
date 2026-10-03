@@ -122,7 +122,8 @@ func (m *IntegerManager) SubMul(a, b, c, d *Int) error {
 // GCD translates the internal backend's selected Lehmer algorithm, not the
 // inactive Euclid/binary alternatives. It returns the nonnegative gcd, including
 // gcd(0,0)=0. Destination may alias either input. All working Ints are explicit
-// owner-local copies and are deleted on error before any destination publication.
+// owner-local source copies. The zero fastpath Copies and Abs directly into the
+// caller; errors preserve completed actions rather than a staged destination.
 func (m *IntegerManager) GCD(a, b, c *Int) error {
 	for _, n := range []*Int{a, b, c} {
 		if e := m.check(n); e != nil {
@@ -139,22 +140,17 @@ func (m *IntegerManager) GCD(a, b, c *Int) error {
 		}
 		return m.SetInt64(c, int64(U32GCD(uint32(av), uint32(bv))))
 	}
-	if a.val == 0 || b.val == 0 {
-		// Staging the source Copy+Abs zero fastpath avoids publishing INT_MIN
-		// before a promotion allocation can fail; arithmetic is unchanged.
-		var work Int
-		defer m.Del(&work)
-		source := a
-		if a.val == 0 {
-			source = b
-		}
-		if e := m.Copy(&work, source); e != nil {
+	if a.val == 0 {
+		if e := m.Copy(c, b); e != nil {
 			return e
 		}
-		if e := m.Abs(&work); e != nil {
+		return m.Abs(c)
+	}
+	if b.val == 0 {
+		if e := m.Copy(c, a); e != nil {
 			return e
 		}
-		return m.Move(c, &work)
+		return m.Abs(c)
 	}
 	var a1, b1, t, r, tmp Int
 	defer func() { m.Del(&a1); m.Del(&b1); m.Del(&r); m.Del(&t); m.Del(&tmp) }()
@@ -180,11 +176,17 @@ func (m *IntegerManager) GCD(a, b, c *Int) error {
 		}
 	}
 	for {
+		if e = m.gcdSourceGreaterEqual(&a1, &b1); e != nil {
+			return e
+		}
 		if b1.IsSmall() {
 			if a1.IsSmall() {
 				return m.SetInt64(c, int64(U32GCD(uint32(a1.val), uint32(b1.val))))
 			}
 			for b1.val != 0 {
+				if e = m.gcdSourceGreaterEqual(&a1, &b1); e != nil {
+					return e
+				}
 				if e = m.Rem(&a1, &b1, &tmp); e != nil {
 					return e
 				}
@@ -197,7 +199,20 @@ func (m *IntegerManager) GCD(a, b, c *Int) error {
 			}
 			return m.Swap(c, &a1)
 		}
+		if sourceGCDDebug {
+			if e = gcdSourceRequire(!a1.IsSmall()); e != nil {
+				return e
+			}
+			if e = gcdSourceRequire(!b1.IsSmall()); e != nil {
+				return e
+			}
+		}
 		asize, bsize := m.cell(a1.cell).size, m.cell(b1.cell).size
+		if sourceGCDDebug {
+			if e = gcdSourceRequire(bsize <= asize); e != nil {
+				return e
+			}
+		}
 		ahat := int64(m.digit(a1.cell, asize-1))
 		bhat := int64(0)
 		if bsize == asize {
@@ -205,6 +220,21 @@ func (m *IntegerManager) GCD(a, b, c *Int) error {
 		}
 		A, B, C, D := int64(1), int64(0), int64(0), int64(1)
 		for {
+			if sourceGCDDebug {
+				limit := int64(math.MaxUint32) + 1
+				if e = gcdSourceRequire(ahat+A <= limit); e != nil {
+					return e
+				}
+				if e = gcdSourceRequire(ahat+B < limit); e != nil {
+					return e
+				}
+				if e = gcdSourceRequire(bhat+C < limit); e != nil {
+					return e
+				}
+				if e = gcdSourceRequire(bhat+D <= limit); e != nil {
+					return e
+				}
+			}
 			if bhat+C == 0 || bhat+D == 0 {
 				break
 			}
@@ -222,6 +252,9 @@ func (m *IntegerManager) GCD(a, b, c *Int) error {
 			ahat = bhat
 			bhat = T
 		}
+		if e = m.gcdSourceGreaterEqual(&a1, &b1); e != nil {
+			return e
+		}
 		if B == 0 {
 			if e = m.Rem(&a1, &b1, &t); e != nil {
 				return e
@@ -230,6 +263,9 @@ func (m *IntegerManager) GCD(a, b, c *Int) error {
 				return e
 			}
 			if e = m.Swap(&b1, &t); e != nil {
+				return e
+			}
+			if e = m.gcdSourceGreaterEqual(&a1, &b1); e != nil {
 				return e
 			}
 		} else {
@@ -261,6 +297,9 @@ func (m *IntegerManager) GCD(a, b, c *Int) error {
 				return e
 			}
 			if e = m.Swap(&b1, &r); e != nil {
+				return e
+			}
+			if e = m.gcdSourceGreaterEqual(&a1, &b1); e != nil {
 				return e
 			}
 		}

@@ -143,8 +143,13 @@ func TestNumberTheoryArraySourceOrderAndRationalSingleton(t *testing.T) {
 		}
 		qopsMust(t, q.SetFraction(&as[2], 1, 2))
 		e := q.GCDMany(as, &g)
-		if !errors.Is(e, ErrRationalNotInteger) || rationalString(t, q, &g) != "2" {
-			t.Fatal("array prefix before later invalid item", e)
+		qopsAuditLiveOwnership(t, q, []*Int{&as[0].num, &as[0].den, &as[1].num, &as[1].den, &as[2].num, &as[2].den, &g.num, &g.den})
+		if modularSourceDebug {
+			if !errors.Is(e, ErrRationalNotInteger) || rationalString(t, q, &g) != "2" {
+				t.Fatal("source debug visited integrality prefix", e)
+			}
+		} else if e != nil || g.num != NewInt(1) || g.den != NewInt(1) {
+			t.Fatal("source release visited numerator gcd", e, g)
 		}
 		qopsMust(t, q.GCDMany(nil, &g))
 		if rationalString(t, q, &g) != "0" {

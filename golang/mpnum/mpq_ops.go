@@ -230,7 +230,7 @@ func (m *RationalManager) integerOperands(a, b *Rational) error {
 	if e := m.check(b); e != nil {
 		return e
 	}
-	if !isIntegerRational(a) || !isIntegerRational(b) {
+	if modularSourceDebug && (!isIntegerRational(a) || !isIntegerRational(b)) {
 		return ErrRationalNotInteger
 	}
 	return nil

@@ -99,6 +99,9 @@ func (m *IntegerManager) ExtendedGCD(r1, r2, a, b, g *Int) error {
 		}
 	}
 	for tmp2.val > 0 {
+		if e = m.gcdSourceGreaterEqual(&tmp1, &tmp2); e != nil {
+			return e
+		}
 		if e = m.Copy(&aux, &tmp2); e != nil {
 			return e
 		}

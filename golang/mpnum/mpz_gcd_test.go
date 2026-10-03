@@ -306,17 +306,21 @@ func TestIntegerAddMulSubMulFailureCleanup(t *testing.T) {
 
 func TestIntegerGCDZeroPromotionFailure(t *testing.T) {
 	for _, reverse := range []bool{false, true} {
-		m, _ := integerManager(t)
+		owner, _ := rationalManager(t, false)
+		m := owner.z
 		zero, minimum, out := NewInt(0), NewInt(math.MinInt32), NewInt(17)
 		// The source Copy+Abs zero branch promotes INT_MIN. Exhaust cells so that
-		// failure occurs after the local copy but before any output publication.
+		// failure occurs after the actual caller Copy and before the promotion
+		// setter assigns a new pointer/sign. The caller remains valid inline MIN.
 		m.cells.config.SlotLimit = m.cells.Stats().Slots
 		a, b := &zero, &minimum
 		if reverse {
 			a, b = b, a
 		}
-		if e := m.GCD(a, b, &out); !errors.Is(e, arena.ErrSlotLimit) || out.val != 17 || zero.val != 0 || minimum.val != math.MinInt32 {
-			t.Fatal("zero branch published promotion", reverse, e)
+		e := m.GCD(a, b, &out)
+		qopsAuditLiveOwnership(t, owner, []*Int{&zero, &minimum, &out})
+		if !errors.Is(e, arena.ErrSlotLimit) || out != NewInt(math.MinInt32) || zero != NewInt(0) || minimum != NewInt(math.MinInt32) {
+			t.Fatal("source caller Copy before promotion refusal", reverse, e, out)
 		}
 	}
 }

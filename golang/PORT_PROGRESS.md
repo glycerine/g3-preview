@@ -1573,3 +1573,23 @@ unchanged. Fresh parent integration on committed coefficient adoption passed
 full native/debug suites, exact54 race/actual-JS RUN/PASS groups, vet, WASI
 build and root/mpnum test compilation, and source/evidence/no-generics audit.
 Allocator-backed numerical storage remains open; incomplete drafts excluded.
+
+
+## Selected GCD source publication and diagnostics
+
+The zero GCD path now Copies directly to the caller before Abs. Completed
+inline minimum copies and failed BIG-copy descriptors remain visible after
+real refusals. Twelve Lehmer checks and the intermediate ExtendedGCD ordering
+check execute at their source debug sites; the existing final Bezout actions
+remain unchanged. Rational GCD/LCM/Divides/ExtendedGCD integrality assertions
+now follow the source debug profile, preserving release raw numerator actions.
+Seven new groups include the complete registered 50-call/168-prime campaign,
+with literal source slow_gcd and an explicit hermetic RNG adapter. Two old
+expectations were corrected only after named native/debug RED. Source
+assertion counts and partial-unit statuses remain unchanged.
+
+The immutable eight Go files pass full native and checked/debug suites and
+vet. Source/evidence/no-generics integration audit passed on the same frozen
+Go files after metadata overlay; ledger counts are unchanged. WASM, WASI and
+race gates are deferred per the user's current single-goroutine workflow.
+Allocator-backed physical ownership and the complete solver remain open.

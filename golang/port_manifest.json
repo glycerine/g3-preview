@@ -85690,7 +85690,10 @@
         "mpnum/mp_root_test.go",
         "mpnum/scoped_numeral.go",
         "mpnum/mpz_facade_extra_test.go",
-        "mpnum/mp_power_publication_test.go"
+        "mpnum/mp_power_publication_test.go",
+        "mpnum/mp_gcd_publication_test.go",
+        "mpnum/mpz_gcd_diagnostics_debug.go",
+        "mpnum/mpz_gcd_diagnostics_release.go"
       ],
       "tests": [
         "TestSourceMPZMagnitudeProjections",
@@ -85778,7 +85781,14 @@
         "TestPowerPublicationLeftShiftCopyPrecedesPromotionRefusal",
         "TestPowerPublicationRightShiftCopyRefusalPrefix",
         "TestPowerPublicationRationalCopyComponentRefusal",
-        "TestPowerPublicationRationalMulComponentRefusal"
+        "TestPowerPublicationRationalMulComponentRefusal",
+        "TestGCDPublicationZeroCopyBeforeMinimumPromotion",
+        "TestGCDPublicationZeroBigCopyRefusal",
+        "TestGCDPublicationRationalIntegralityProfiles",
+        "TestGCDPublicationRationalArrayVisitedFraction",
+        "TestGCDPublicationSourceFull168PrimeCampaign",
+        "TestGCDPublicationPrimeTableAndPredicateBoundary",
+        "TestGCDPublicationFullFamilySignedAliases"
       ],
       "conditionals": [
         {
@@ -85977,6 +85987,29 @@
             "TestPowerPublicationRationalCopyComponentRefusal",
             "TestPowerPublicationRationalMulComponentRefusal"
           ]
+        },
+        {
+          "name": "Selected GCD caller Copy-before-Abs zero path, twelve Lehmer and intermediate ExtendedGCD debug sites, raw rational number-theory forwarding profiles",
+          "status": "partial",
+          "go_target": "mpnum/mpz_gcd.go",
+          "tests": [
+            "TestGCDPublicationZeroCopyBeforeMinimumPromotion",
+            "TestGCDPublicationZeroBigCopyRefusal",
+            "TestGCDPublicationRationalIntegralityProfiles",
+            "TestGCDPublicationRationalArrayVisitedFraction",
+            "TestGCDPublicationSourceFull168PrimeCampaign",
+            "TestGCDPublicationPrimeTableAndPredicateBoundary",
+            "TestGCDPublicationFullFamilySignedAliases"
+          ]
+        },
+        {
+          "name": "Registered rand_tst_gcd(50,3,2) full 168-prime generation and literal slow_gcd; hermetic nonnegative31-bit RNG adapter",
+          "status": "partial",
+          "go_target": "mpnum/mp_gcd_publication_test.go",
+          "tests": [
+            "TestGCDPublicationSourceFull168PrimeCampaign",
+            "TestGCDPublicationPrimeTableAndPredicateBoundary"
+          ]
         }
       ],
       "ownership": [
@@ -85988,13 +86021,15 @@
         "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md.",
         "Concrete scoped Int/Rational objects borrow managers; all cold headers and actual old+new pointer-free backing are charged. Deep copy owns independent limbs, source ascending truncation releases them, vector failure prefixes retained. See SCOPED_NUMERAL_PORT_STATUS.md.",
         "tst1 retains original numerical setup, lexical manager scope and explicit Del; 18 comparison assertions across MPZ/MPQ. Additional printed fixtures and independent tests are not source assertions. See MPZ_FACADE_EXTRA_PORT_STATUS.md.",
-        "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See MPZ_POWER_PUBLICATION_PACKET.md; source allocator/backend integration remains required."
+        "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See MPZ_POWER_PUBLICATION_PACKET.md; source allocator/backend integration remains required.",
+        "Zero GCD copies directly into caller before Abs; minimum-promotion allocation refusal retains the completed inline copy, while failed BIG Copy retains the actual published sign/dead descriptor. Existing general GCD locals and final publication remain source ordered; twelve Lehmer and one intermediate ExtendedGCD diagnostics execute only in g3debug. Named roots audited before fault disabling. See MPZ_GCD_PUBLICATION_PACKET.md."
       ],
       "deviations": [
         "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits.",
         "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors.",
         "Explicit Close substitutes RAII; self identity rejects shallow Go owner copies. Vectors expose deep Read/Set rather than escaping indexed element addresses. Source noncopyable vector remains noncopyable; other numeral manager specializations stay open.",
-        "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open."
+        "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open.",
+        "The registered randomized GCD campaign preserves all 168 primes, conditional Power/Mul and sign draw order using an explicit hermetic RNG adapter, not libc sequence identity. Independent table enumeration and arithmetic checks add no ENSURE credit; print-only minimum GCD expectation is additional verification. Actual allocator topology, cleanup exceptions, alternate backends and full source-unit completion remain open."
       ]
     },
     {
@@ -107023,7 +107058,10 @@
         "mpnum/mp_power_publication_test.go",
         "mpnum/mp_bitwise_publication_test.go",
         "mpnum/mp_div_publication_test.go",
-        "mpnum/mp_add_publication_test.go"
+        "mpnum/mp_add_publication_test.go",
+        "mpnum/mp_gcd_publication_test.go",
+        "mpnum/mpz_gcd_diagnostics_debug.go",
+        "mpnum/mpz_gcd_diagnostics_release.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -107176,7 +107214,14 @@
         "TestAdditivePublicationRawDenominatorsAndIdentity",
         "TestAdditivePublicationServiceValueAndRationalOneRoutes",
         "TestAdditivePublicationSynchronizedTemporaryDeleteOrder",
-        "TestAdditivePublicationWarmPlateau"
+        "TestAdditivePublicationWarmPlateau",
+        "TestGCDPublicationZeroCopyBeforeMinimumPromotion",
+        "TestGCDPublicationZeroBigCopyRefusal",
+        "TestGCDPublicationRationalIntegralityProfiles",
+        "TestGCDPublicationRationalArrayVisitedFraction",
+        "TestGCDPublicationSourceFull168PrimeCampaign",
+        "TestGCDPublicationPrimeTableAndPredicateBoundary",
+        "TestGCDPublicationFullFamilySignedAliases"
       ],
       "conditionals": [
         {
@@ -108030,6 +108075,20 @@
             "TestAdditivePublicationSynchronizedTemporaryDeleteOrder",
             "TestAdditivePublicationWarmPlateau"
           ]
+        },
+        {
+          "name": "Selected GCD caller Copy-before-Abs zero path, twelve Lehmer and intermediate ExtendedGCD debug sites, raw rational number-theory forwarding profiles",
+          "status": "partial",
+          "go_target": "mpnum/mpz_gcd.go",
+          "tests": [
+            "TestGCDPublicationZeroCopyBeforeMinimumPromotion",
+            "TestGCDPublicationZeroBigCopyRefusal",
+            "TestGCDPublicationRationalIntegralityProfiles",
+            "TestGCDPublicationRationalArrayVisitedFraction",
+            "TestGCDPublicationSourceFull168PrimeCampaign",
+            "TestGCDPublicationPrimeTableAndPredicateBoundary",
+            "TestGCDPublicationFullFamilySignedAliases"
+          ]
         }
       ],
       "ownership": [
@@ -108046,7 +108105,8 @@
         "Bitwise rational wrappers forward actual numerator aliases to existing budgeted integer manager, then reset denominator; fault roots and malformed integer domains checked. See RATIONAL_FACADE_EXTRA_PORT_STATUS.md.",
         "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See MPZ_POWER_PUBLICATION_PACKET.md; source allocator/backend integration remains required.",
         "Division writes actual caller numerator/denominator in source order, preserving divisor/output aliases and explicit local-tmp Del before normalization. Finite denominator-zero results remain owned; cleanup-only validation permits destruction/reset while ordinary reads remain guarded. See MPQ_DIVISION_PUBLICATION_PACKET.md.",
-        "Actual caller fields publish in source Add/Sub/AddInt/MulInt/MulInts order; general SYNCH Add/Sub explicitly delete tmp1 before tmp2. Existing fused helpers use public Mul then Add/Sub and the source unit shortcuts. Failure tests inspect named caller/temporary roots before disabling faults; physical allocator integration remains open. See MPQ_ADDITIVE_PUBLICATION_PACKET.md."
+        "Actual caller fields publish in source Add/Sub/AddInt/MulInt/MulInts order; general SYNCH Add/Sub explicitly delete tmp1 before tmp2. Existing fused helpers use public Mul then Add/Sub and the source unit shortcuts. Failure tests inspect named caller/temporary roots before disabling faults; physical allocator integration remains open. See MPQ_ADDITIVE_PUBLICATION_PACKET.md.",
+        "Zero GCD copies directly into caller before Abs; minimum-promotion allocation refusal retains the completed inline copy, while failed BIG Copy retains the actual published sign/dead descriptor. Existing general GCD locals and final publication remain source ordered; twelve Lehmer and one intermediate ExtendedGCD diagnostics execute only in g3debug. Named roots audited before fault disabling. See MPZ_GCD_PUBLICATION_PACKET.md."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -108062,7 +108122,8 @@
         "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open.",
         "Unsigned low63-bit mask defines the intended small bitwise_not signed-shift boundary. Negative and rational-integrality source assertions are debug-only. Selected internal32 bitwise methods publish directly in source order; Go error cleanup releases the actual lexical locals. Both-negative big binary loops stop at the first actual inline -1/-1 quotient continuation, after prior source actions; this typed boundary does not claim equivalence to a future source allocation refusal. Other arithmetic staging, source allocator topology, GMP and nonselected backends remain open.",
         "Finite release inverse/division zero results retain actual source raw fields; 0/0 fails at actual integer division after component publication. Service initialized Copy/Move boundary and explicit Go cleanup are adapters. Actual source allocator/global composition remains open; no whole unit promoted.",
-        "Interrupted Go local cleanup is an explicit ownership adapter, not C++ exception continuation. Nine independent math/alias/publication/lifetime groups add no registered source assertion credit. Source normalization/GCD and physical backend obligations remain separate; whole unit remains partial."
+        "Interrupted Go local cleanup is an explicit ownership adapter, not C++ exception continuation. Nine independent math/alias/publication/lifetime groups add no registered source assertion credit. Source normalization/GCD and physical backend obligations remain separate; whole unit remains partial.",
+        "The registered randomized GCD campaign preserves all 168 primes, conditional Power/Mul and sign draw order using an explicit hermetic RNG adapter, not libc sequence identity. Independent table enumeration and arithmetic checks add no ENSURE credit; print-only minimum GCD expectation is additional verification. Actual allocator topology, cleanup exceptions, alternate backends and full source-unit completion remain open."
       ]
     },
     {
@@ -108130,7 +108191,10 @@
         "mpnum/mpz_source_publication_test.go",
         "mpnum/mpz_setter_publication_test.go",
         "mpnum/mp_power_publication_test.go",
-        "mpnum/mp_bitwise_publication_test.go"
+        "mpnum/mp_bitwise_publication_test.go",
+        "mpnum/mp_gcd_publication_test.go",
+        "mpnum/mpz_gcd_diagnostics_debug.go",
+        "mpnum/mpz_gcd_diagnostics_release.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -108294,7 +108358,14 @@
         "TestBitwisePublicationServiceValueRoutes",
         "TestBitwisePublicationServiceFailureRoots",
         "TestBitwisePublicationBigNotZeroWidthCopyOrder",
-        "TestBitwisePublicationSignedSmallBoundaryAliases"
+        "TestBitwisePublicationSignedSmallBoundaryAliases",
+        "TestGCDPublicationZeroCopyBeforeMinimumPromotion",
+        "TestGCDPublicationZeroBigCopyRefusal",
+        "TestGCDPublicationRationalIntegralityProfiles",
+        "TestGCDPublicationRationalArrayVisitedFraction",
+        "TestGCDPublicationSourceFull168PrimeCampaign",
+        "TestGCDPublicationPrimeTableAndPredicateBoundary",
+        "TestGCDPublicationFullFamilySignedAliases"
       ],
       "conditionals": [
         {
@@ -109837,6 +109908,20 @@
             "TestPowerPublicationRationalCopyComponentRefusal",
             "TestPowerPublicationRationalMulComponentRefusal"
           ]
+        },
+        {
+          "name": "Selected GCD caller Copy-before-Abs zero path, twelve Lehmer and intermediate ExtendedGCD debug sites, raw rational number-theory forwarding profiles",
+          "status": "partial",
+          "go_target": "mpnum/mpz_gcd.go",
+          "tests": [
+            "TestGCDPublicationZeroCopyBeforeMinimumPromotion",
+            "TestGCDPublicationZeroBigCopyRefusal",
+            "TestGCDPublicationRationalIntegralityProfiles",
+            "TestGCDPublicationRationalArrayVisitedFraction",
+            "TestGCDPublicationSourceFull168PrimeCampaign",
+            "TestGCDPublicationPrimeTableAndPredicateBoundary",
+            "TestGCDPublicationFullFamilySignedAliases"
+          ]
         }
       ],
       "ownership": [
@@ -109855,7 +109940,8 @@
         "The g3debug extended-GCD diagnostic reuses the six existing locals in source mul/mul/add/equality order before final result publication. Caller-visible coefficients survive assertion/failure; immediate root accounting and unwind are tested. See EXTENDED_GCD_DEBUG_PORT_STATUS.md.",
         "Selected old-free/sign/result-transfer/paired-division action prefixes preserve source order; failed replacements use one charged retired descriptor, guarded reads and owner-qualified cleanup. Exact source allocator topology remains open; see MPZ_SOURCE_PUBLICATION_PORT_STATUS.md.",
         "Base-two Power mutates caller storage through actual destructive allocate_if_needed; other Power and shift wrappers remain staged fidelity work. Scalar debug capacity assertion precedes sign/digits; existing normalize branch tests confirm actual behavior. See MPZ_SETTER_PORT_STATUS.md.",
-        "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See MPZ_POWER_PUBLICATION_PACKET.md; source allocator/backend integration remains required."
+        "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See MPZ_POWER_PUBLICATION_PACKET.md; source allocator/backend integration remains required.",
+        "Zero GCD copies directly into caller before Abs; minimum-promotion allocation refusal retains the completed inline copy, while failed BIG Copy retains the actual published sign/dead descriptor. Existing general GCD locals and final publication remain source ordered; twelve Lehmer and one intermediate ExtendedGCD diagnostics execute only in g3debug. Named roots audited before fault disabling. See MPZ_GCD_PUBLICATION_PACKET.md."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -109869,7 +109955,8 @@
         "B12 replaces the one-global-manager ownership assumption with explicit cross-manager deep copy. No foreign handle or serialization is passed into destination arithmetic; destination outlives source Close. This is an ownership adaptation, not AST translation completion.",
         "Selected release ExtendedGCD preserves finite aliases and modified-input sign rereads. Source Z3DEBUG diagnostic arithmetic is selected by g3debug; g3checked selects reference validation independently. ext_gcd.h wrapper algorithm is translated separately; manager inverse properties alone do not credit that wrapper.",
         "Go continuation for source undefined allocation failure: permanently dead failed token and missing-scratch guards; finite unsigned wrapped allocations retained before actual span ErrBounds. Higher-level staged wrappers remain fidelity work, not completion evidence.",
-        "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open."
+        "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open.",
+        "The registered randomized GCD campaign preserves all 168 primes, conditional Power/Mul and sign draw order using an explicit hermetic RNG adapter, not libc sequence identity. Independent table enumeration and arithmetic checks add no ENSURE credit; print-only minimum GCD expectation is additional verification. Actual allocator topology, cleanup exceptions, alternate backends and full source-unit completion remain open."
       ]
     },
     {
@@ -109898,7 +109985,10 @@
         "mpnum/mpz_source_publication_test.go",
         "mpnum/mpz_setter_publication_test.go",
         "mpnum/mp_power_publication_test.go",
-        "mpnum/mp_bitwise_publication_test.go"
+        "mpnum/mp_bitwise_publication_test.go",
+        "mpnum/mp_gcd_publication_test.go",
+        "mpnum/mpz_gcd_diagnostics_debug.go",
+        "mpnum/mpz_gcd_diagnostics_release.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -110067,7 +110157,14 @@
         "TestBitwisePublicationServiceValueRoutes",
         "TestBitwisePublicationServiceFailureRoots",
         "TestBitwisePublicationBigNotZeroWidthCopyOrder",
-        "TestBitwisePublicationSignedSmallBoundaryAliases"
+        "TestBitwisePublicationSignedSmallBoundaryAliases",
+        "TestGCDPublicationZeroCopyBeforeMinimumPromotion",
+        "TestGCDPublicationZeroBigCopyRefusal",
+        "TestGCDPublicationRationalIntegralityProfiles",
+        "TestGCDPublicationRationalArrayVisitedFraction",
+        "TestGCDPublicationSourceFull168PrimeCampaign",
+        "TestGCDPublicationPrimeTableAndPredicateBoundary",
+        "TestGCDPublicationFullFamilySignedAliases"
       ],
       "conditionals": [
         {
@@ -111197,6 +111294,20 @@
             "TestPowerPublicationRationalCopyComponentRefusal",
             "TestPowerPublicationRationalMulComponentRefusal"
           ]
+        },
+        {
+          "name": "Selected GCD caller Copy-before-Abs zero path, twelve Lehmer and intermediate ExtendedGCD debug sites, raw rational number-theory forwarding profiles",
+          "status": "partial",
+          "go_target": "mpnum/mpz_gcd.go",
+          "tests": [
+            "TestGCDPublicationZeroCopyBeforeMinimumPromotion",
+            "TestGCDPublicationZeroBigCopyRefusal",
+            "TestGCDPublicationRationalIntegralityProfiles",
+            "TestGCDPublicationRationalArrayVisitedFraction",
+            "TestGCDPublicationSourceFull168PrimeCampaign",
+            "TestGCDPublicationPrimeTableAndPredicateBoundary",
+            "TestGCDPublicationFullFamilySignedAliases"
+          ]
         }
       ],
       "ownership": [
@@ -111215,7 +111326,8 @@
         "New scalar facade introduces no persistent storage. Dup owns an independent source-capacity copy; Inc/Dec reuse source Add, and failure roots are audited before formatting/cleanup. Raw Int remains caller-confined. See MPZ_FACADE_EXTRA_PORT_STATUS.md.",
         "Selected old-free/sign/result-transfer/paired-division action prefixes preserve source order; failed replacements use one charged retired descriptor, guarded reads and owner-qualified cleanup. Exact source allocator topology remains open; see MPZ_SOURCE_PUBLICATION_PORT_STATUS.md.",
         "Base-two Power mutates caller storage through actual destructive allocate_if_needed; other Power and shift wrappers remain staged fidelity work. Scalar debug capacity assertion precedes sign/digits; existing normalize branch tests confirm actual behavior. See MPZ_SETTER_PORT_STATUS.md.",
-        "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See MPZ_POWER_PUBLICATION_PACKET.md; source allocator/backend integration remains required."
+        "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See MPZ_POWER_PUBLICATION_PACKET.md; source allocator/backend integration remains required.",
+        "Zero GCD copies directly into caller before Abs; minimum-promotion allocation refusal retains the completed inline copy, while failed BIG Copy retains the actual published sign/dead descriptor. Existing general GCD locals and final publication remain source ordered; twelve Lehmer and one intermediate ExtendedGCD diagnostics execute only in g3debug. Named roots audited before fault disabling. See MPZ_GCD_PUBLICATION_PACKET.md."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -111230,7 +111342,8 @@
         "Selected release ExtendedGCD preserves finite aliases and modified-input sign rereads. Source Z3DEBUG diagnostic arithmetic remains unported; g3checked selects reference validation only. ext_gcd.h wrapper algorithm remains separate and is not credited from manager inverse properties.",
         "Inv source SASSERT(false) is always typed ErrIntegerInvUnsupported in Go, unlike release C++ no-op. Backend alternatives, disabled GCD variants and remaining diagnostics stay open; this public facade does not close the entire source unit.",
         "Go continuation for source undefined allocation failure: permanently dead failed token and missing-scratch guards; finite unsigned wrapped allocations retained before actual span ErrBounds. Higher-level staged wrappers remain fidelity work, not completion evidence.",
-        "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open."
+        "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open.",
+        "The registered randomized GCD campaign preserves all 168 primes, conditional Power/Mul and sign draw order using an explicit hermetic RNG adapter, not libc sequence identity. Independent table enumeration and arithmetic checks add no ENSURE credit; print-only minimum GCD expectation is additional verification. Actual allocator topology, cleanup exceptions, alternate backends and full source-unit completion remain open."
       ]
     },
     {
