@@ -98075,9 +98075,26 @@
       "sha256": "9f5cae6305874ae6ffc87d48bdf5eac3001049c92f32b1d84047f1bb3c2efb4e",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "arena/bytes_region.go"
+      ],
+      "tests": [
+        "TestBytesRegionSourceDisplayMemStats",
+        "TestBytesRegionSourceReleasePagePolicy",
+        "TestBytesRegionMarksConsumeSourceStorage",
+        "TestBytesRegionFreePageLIFOAndGenerationLedger",
+        "TestBytesRegionDebugDirectScopesAndZero",
+        "TestBytesRegionIndependentByteAndPageModel",
+        "TestBytesRegionPredictableFailureCleanup",
+        "TestBytesRegionMarksFailureAndValidation",
+        "TestBytesRegionPlateauAndWarmAllocation",
+        "TestBytesRegionBudgetPeaksAndResetNoReserve",
+        "TestBytesRegionBulkScopeLifetime",
+        "TestBytesRegionOwnerIDCollisionAndLifetime",
+        "TestBytesRegionOwnerIDExhaustion",
+        "TestBytesRegionSourceDefaultAndAlignmentConstants"
+      ],
       "assertions": [
         {
           "line": 25,
@@ -98090,18 +98107,61 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "region-owned allocate_default_page/allocate_page/recycle_page/del_pages and header/link geometry",
+          "status": "ported",
+          "go_target": "arena/bytes_region.go",
+          "tests": [
+            "TestBytesRegionSourceDisplayMemStats",
+            "TestBytesRegionSourceReleasePagePolicy",
+            "TestBytesRegionMarksConsumeSourceStorage",
+            "TestBytesRegionFreePageLIFOAndGenerationLedger",
+            "TestBytesRegionDebugDirectScopesAndZero",
+            "TestBytesRegionIndependentByteAndPageModel",
+            "TestBytesRegionPredictableFailureCleanup",
+            "TestBytesRegionMarksFailureAndValidation",
+            "TestBytesRegionPlateauAndWarmAllocation",
+            "TestBytesRegionBudgetPeaksAndResetNoReserve",
+            "TestBytesRegionBulkScopeLifetime",
+            "TestBytesRegionOwnerIDCollisionAndLifetime",
+            "TestBytesRegionOwnerIDExhaustion",
+            "TestBytesRegionSourceDefaultAndAlignmentConstants"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete region-owned page specialization preserves LIFO default reuse, big-page release and source header backing. Other direct page users/general standalone binding remain to audit. See arena/PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Tagged native addresses are scalar previous/default metadata; allocated source header padding and cold page-directory headers are both charged."
+      ]
     },
     {
       "path": "src/util/page.h",
       "sha256": "dc795874f31a21332aad1cbd44711866cade9e30b1c4f5976c135a7de4e8ee47",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "arena/bytes_region.go"
+      ],
+      "tests": [
+        "TestBytesRegionSourceDisplayMemStats",
+        "TestBytesRegionSourceReleasePagePolicy",
+        "TestBytesRegionMarksConsumeSourceStorage",
+        "TestBytesRegionFreePageLIFOAndGenerationLedger",
+        "TestBytesRegionDebugDirectScopesAndZero",
+        "TestBytesRegionIndependentByteAndPageModel",
+        "TestBytesRegionPredictableFailureCleanup",
+        "TestBytesRegionMarksFailureAndValidation",
+        "TestBytesRegionPlateauAndWarmAllocation",
+        "TestBytesRegionBudgetPeaksAndResetNoReserve",
+        "TestBytesRegionBulkScopeLifetime",
+        "TestBytesRegionOwnerIDCollisionAndLifetime",
+        "TestBytesRegionOwnerIDExhaustion",
+        "TestBytesRegionSourceDefaultAndAlignmentConstants"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -98114,9 +98174,35 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "region-owned allocate_default_page/allocate_page/recycle_page/del_pages and header/link geometry",
+          "status": "ported",
+          "go_target": "arena/bytes_region.go",
+          "tests": [
+            "TestBytesRegionSourceDisplayMemStats",
+            "TestBytesRegionSourceReleasePagePolicy",
+            "TestBytesRegionMarksConsumeSourceStorage",
+            "TestBytesRegionFreePageLIFOAndGenerationLedger",
+            "TestBytesRegionDebugDirectScopesAndZero",
+            "TestBytesRegionIndependentByteAndPageModel",
+            "TestBytesRegionPredictableFailureCleanup",
+            "TestBytesRegionMarksFailureAndValidation",
+            "TestBytesRegionPlateauAndWarmAllocation",
+            "TestBytesRegionBudgetPeaksAndResetNoReserve",
+            "TestBytesRegionBulkScopeLifetime",
+            "TestBytesRegionOwnerIDCollisionAndLifetime",
+            "TestBytesRegionOwnerIDExhaustion",
+            "TestBytesRegionSourceDefaultAndAlignmentConstants"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete region-owned page specialization preserves LIFO default reuse, big-page release and source header backing. Other direct page users/general standalone binding remain to audit. See arena/PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Tagged native addresses are scalar previous/default metadata; allocated source header padding and cold page-directory headers are both charged."
+      ]
     },
     {
       "path": "src/util/params.cpp",
@@ -98849,16 +98935,31 @@
       "sha256": "23908446c761dfb4e7b1165f2545f69f3e8726b7139f07b30133488559562eb3",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "arena/region.go"
+        "arena/region.go",
+        "arena/bytes_region.go"
       ],
       "tests": [
         "TestRegionNestedLifetime",
         "TestRegionCleanupBeforeRecycle",
         "TestRegionUndoStateMachine",
         "TestRegionBudgetFailure",
-        "TestRegionGenerationAcrossResetTrim"
+        "TestRegionGenerationAcrossResetTrim",
+        "TestBytesRegionSourceDisplayMemStats",
+        "TestBytesRegionSourceReleasePagePolicy",
+        "TestBytesRegionMarksConsumeSourceStorage",
+        "TestBytesRegionFreePageLIFOAndGenerationLedger",
+        "TestBytesRegionDebugDirectScopesAndZero",
+        "TestBytesRegionIndependentByteAndPageModel",
+        "TestBytesRegionPredictableFailureCleanup",
+        "TestBytesRegionMarksFailureAndValidation",
+        "TestBytesRegionPlateauAndWarmAllocation",
+        "TestBytesRegionBudgetPeaksAndResetNoReserve",
+        "TestBytesRegionBulkScopeLifetime",
+        "TestBytesRegionOwnerIDCollisionAndLifetime",
+        "TestBytesRegionOwnerIDExhaustion",
+        "TestBytesRegionSourceDefaultAndAlignmentConstants"
       ],
       "conditionals": [
         {
@@ -98892,8 +98993,8 @@
           "text": "SASSERT(is_default_page(m_curr_page));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "typed record allocation adaptation",
@@ -98942,28 +99043,151 @@
             "TestRegionBudgetFailure",
             "TestRegionGenerationAcrossResetTrim"
           ]
+        },
+        {
+          "name": "release/debug region constructor/destructor/allocate",
+          "status": "ported",
+          "go_target": "arena/bytes_region.go",
+          "tests": [
+            "TestBytesRegionSourceDisplayMemStats",
+            "TestBytesRegionSourceReleasePagePolicy",
+            "TestBytesRegionMarksConsumeSourceStorage",
+            "TestBytesRegionFreePageLIFOAndGenerationLedger",
+            "TestBytesRegionDebugDirectScopesAndZero",
+            "TestBytesRegionIndependentByteAndPageModel",
+            "TestBytesRegionPredictableFailureCleanup",
+            "TestBytesRegionMarksFailureAndValidation",
+            "TestBytesRegionPlateauAndWarmAllocation",
+            "TestBytesRegionBudgetPeaksAndResetNoReserve",
+            "TestBytesRegionBulkScopeLifetime",
+            "TestBytesRegionOwnerIDCollisionAndLifetime",
+            "TestBytesRegionOwnerIDExhaustion",
+            "TestBytesRegionSourceDefaultAndAlignmentConstants"
+          ]
+        },
+        {
+          "name": "release/debug push_scope/pop_scope/counted pop_scope",
+          "status": "ported",
+          "go_target": "arena/bytes_region.go",
+          "tests": [
+            "TestBytesRegionSourceDisplayMemStats",
+            "TestBytesRegionSourceReleasePagePolicy",
+            "TestBytesRegionMarksConsumeSourceStorage",
+            "TestBytesRegionFreePageLIFOAndGenerationLedger",
+            "TestBytesRegionDebugDirectScopesAndZero",
+            "TestBytesRegionIndependentByteAndPageModel",
+            "TestBytesRegionPredictableFailureCleanup",
+            "TestBytesRegionMarksFailureAndValidation",
+            "TestBytesRegionPlateauAndWarmAllocation",
+            "TestBytesRegionBudgetPeaksAndResetNoReserve",
+            "TestBytesRegionBulkScopeLifetime",
+            "TestBytesRegionOwnerIDCollisionAndLifetime",
+            "TestBytesRegionOwnerIDExhaustion",
+            "TestBytesRegionSourceDefaultAndAlignmentConstants"
+          ]
+        },
+        {
+          "name": "release/debug reset/default recycling/direct chunk cleanup",
+          "status": "ported",
+          "go_target": "arena/bytes_region.go",
+          "tests": [
+            "TestBytesRegionSourceDisplayMemStats",
+            "TestBytesRegionSourceReleasePagePolicy",
+            "TestBytesRegionMarksConsumeSourceStorage",
+            "TestBytesRegionFreePageLIFOAndGenerationLedger",
+            "TestBytesRegionDebugDirectScopesAndZero",
+            "TestBytesRegionIndependentByteAndPageModel",
+            "TestBytesRegionPredictableFailureCleanup",
+            "TestBytesRegionMarksFailureAndValidation",
+            "TestBytesRegionPlateauAndWarmAllocation",
+            "TestBytesRegionBudgetPeaksAndResetNoReserve",
+            "TestBytesRegionBulkScopeLifetime",
+            "TestBytesRegionOwnerIDCollisionAndLifetime",
+            "TestBytesRegionOwnerIDExhaustion",
+            "TestBytesRegionSourceDefaultAndAlignmentConstants"
+          ]
+        },
+        {
+          "name": "release/debug display_mem_stats",
+          "status": "ported",
+          "go_target": "arena/bytes_region.go",
+          "tests": [
+            "TestBytesRegionSourceDisplayMemStats",
+            "TestBytesRegionSourceReleasePagePolicy",
+            "TestBytesRegionMarksConsumeSourceStorage",
+            "TestBytesRegionFreePageLIFOAndGenerationLedger",
+            "TestBytesRegionDebugDirectScopesAndZero",
+            "TestBytesRegionIndependentByteAndPageModel",
+            "TestBytesRegionPredictableFailureCleanup",
+            "TestBytesRegionMarksFailureAndValidation",
+            "TestBytesRegionPlateauAndWarmAllocation",
+            "TestBytesRegionBudgetPeaksAndResetNoReserve",
+            "TestBytesRegionBulkScopeLifetime",
+            "TestBytesRegionOwnerIDCollisionAndLifetime",
+            "TestBytesRegionOwnerIDExhaustion",
+            "TestBytesRegionSourceDefaultAndAlignmentConstants"
+          ]
+        },
+        {
+          "name": "placement scalar/array allocation and no-op placement-delete storage adaptation",
+          "status": "ported",
+          "go_target": "arena/bytes_region.go",
+          "tests": [
+            "TestBytesRegionSourceDisplayMemStats",
+            "TestBytesRegionSourceReleasePagePolicy",
+            "TestBytesRegionMarksConsumeSourceStorage",
+            "TestBytesRegionFreePageLIFOAndGenerationLedger",
+            "TestBytesRegionDebugDirectScopesAndZero",
+            "TestBytesRegionIndependentByteAndPageModel",
+            "TestBytesRegionPredictableFailureCleanup",
+            "TestBytesRegionMarksFailureAndValidation",
+            "TestBytesRegionPlateauAndWarmAllocation",
+            "TestBytesRegionBudgetPeaksAndResetNoReserve",
+            "TestBytesRegionBulkScopeLifetime",
+            "TestBytesRegionOwnerIDCollisionAndLifetime",
+            "TestBytesRegionOwnerIDExhaustion",
+            "TestBytesRegionSourceDefaultAndAlignmentConstants"
+          ]
         }
       ],
       "ownership": [
-        "Typed marked storage adapts byte region allocation; reverse caller cleanup before storage recycle. Variable byte payload region and source trail subclass semantics remain open. See arena/PORT_STATUS.md."
+        "Complete selected release/debug byte-region lifetime and physical page/mark actions, with caller cleanup before rollback/reset/close. Cold headers, identity, descriptors, page backing/header/directory and log/scope capacities are charged. See arena/PORT_STATUS.md. Source trail subclasses are separate units."
       ],
-      "deviations": []
+      "deviations": [
+        "Raw pointers/tagged page headers become stable scalar refs and cold page metadata; logical pointer-width geometry selects4/8 independently of Go ABI. Distinct checked zero-size refs can represent the same source byte offset.",
+        "Predictable failures prepare storage before page-chain/cursor/ref publication; reusable metadata may remain charged. Generation/mark/owner namespaces never wrap; source runtime OOM is not recovered. DisplayMemStats outputs are caller-owned strings."
+      ]
     },
     {
       "path": "src/util/region.h",
       "sha256": "fab2ab6cdc6bdc067f38a8908c7591e9dc90bfea116823d2c744ead9238b32d1",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "arena/region.go"
+        "arena/region.go",
+        "arena/bytes_region.go"
       ],
       "tests": [
         "TestRegionNestedLifetime",
         "TestRegionCleanupBeforeRecycle",
         "TestRegionUndoStateMachine",
         "TestRegionBudgetFailure",
-        "TestRegionGenerationAcrossResetTrim"
+        "TestRegionGenerationAcrossResetTrim",
+        "TestBytesRegionSourceDisplayMemStats",
+        "TestBytesRegionSourceReleasePagePolicy",
+        "TestBytesRegionMarksConsumeSourceStorage",
+        "TestBytesRegionFreePageLIFOAndGenerationLedger",
+        "TestBytesRegionDebugDirectScopesAndZero",
+        "TestBytesRegionIndependentByteAndPageModel",
+        "TestBytesRegionPredictableFailureCleanup",
+        "TestBytesRegionMarksFailureAndValidation",
+        "TestBytesRegionPlateauAndWarmAllocation",
+        "TestBytesRegionBudgetPeaksAndResetNoReserve",
+        "TestBytesRegionBulkScopeLifetime",
+        "TestBytesRegionOwnerIDCollisionAndLifetime",
+        "TestBytesRegionOwnerIDExhaustion",
+        "TestBytesRegionSourceDefaultAndAlignmentConstants"
       ],
       "conditionals": [
         {
@@ -98987,8 +99211,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "typed record allocation adaptation",
@@ -99037,12 +99261,120 @@
             "TestRegionBudgetFailure",
             "TestRegionGenerationAcrossResetTrim"
           ]
+        },
+        {
+          "name": "release/debug region constructor/destructor/allocate",
+          "status": "ported",
+          "go_target": "arena/bytes_region.go",
+          "tests": [
+            "TestBytesRegionSourceDisplayMemStats",
+            "TestBytesRegionSourceReleasePagePolicy",
+            "TestBytesRegionMarksConsumeSourceStorage",
+            "TestBytesRegionFreePageLIFOAndGenerationLedger",
+            "TestBytesRegionDebugDirectScopesAndZero",
+            "TestBytesRegionIndependentByteAndPageModel",
+            "TestBytesRegionPredictableFailureCleanup",
+            "TestBytesRegionMarksFailureAndValidation",
+            "TestBytesRegionPlateauAndWarmAllocation",
+            "TestBytesRegionBudgetPeaksAndResetNoReserve",
+            "TestBytesRegionBulkScopeLifetime",
+            "TestBytesRegionOwnerIDCollisionAndLifetime",
+            "TestBytesRegionOwnerIDExhaustion",
+            "TestBytesRegionSourceDefaultAndAlignmentConstants"
+          ]
+        },
+        {
+          "name": "release/debug push_scope/pop_scope/counted pop_scope",
+          "status": "ported",
+          "go_target": "arena/bytes_region.go",
+          "tests": [
+            "TestBytesRegionSourceDisplayMemStats",
+            "TestBytesRegionSourceReleasePagePolicy",
+            "TestBytesRegionMarksConsumeSourceStorage",
+            "TestBytesRegionFreePageLIFOAndGenerationLedger",
+            "TestBytesRegionDebugDirectScopesAndZero",
+            "TestBytesRegionIndependentByteAndPageModel",
+            "TestBytesRegionPredictableFailureCleanup",
+            "TestBytesRegionMarksFailureAndValidation",
+            "TestBytesRegionPlateauAndWarmAllocation",
+            "TestBytesRegionBudgetPeaksAndResetNoReserve",
+            "TestBytesRegionBulkScopeLifetime",
+            "TestBytesRegionOwnerIDCollisionAndLifetime",
+            "TestBytesRegionOwnerIDExhaustion",
+            "TestBytesRegionSourceDefaultAndAlignmentConstants"
+          ]
+        },
+        {
+          "name": "release/debug reset/default recycling/direct chunk cleanup",
+          "status": "ported",
+          "go_target": "arena/bytes_region.go",
+          "tests": [
+            "TestBytesRegionSourceDisplayMemStats",
+            "TestBytesRegionSourceReleasePagePolicy",
+            "TestBytesRegionMarksConsumeSourceStorage",
+            "TestBytesRegionFreePageLIFOAndGenerationLedger",
+            "TestBytesRegionDebugDirectScopesAndZero",
+            "TestBytesRegionIndependentByteAndPageModel",
+            "TestBytesRegionPredictableFailureCleanup",
+            "TestBytesRegionMarksFailureAndValidation",
+            "TestBytesRegionPlateauAndWarmAllocation",
+            "TestBytesRegionBudgetPeaksAndResetNoReserve",
+            "TestBytesRegionBulkScopeLifetime",
+            "TestBytesRegionOwnerIDCollisionAndLifetime",
+            "TestBytesRegionOwnerIDExhaustion",
+            "TestBytesRegionSourceDefaultAndAlignmentConstants"
+          ]
+        },
+        {
+          "name": "release/debug display_mem_stats",
+          "status": "ported",
+          "go_target": "arena/bytes_region.go",
+          "tests": [
+            "TestBytesRegionSourceDisplayMemStats",
+            "TestBytesRegionSourceReleasePagePolicy",
+            "TestBytesRegionMarksConsumeSourceStorage",
+            "TestBytesRegionFreePageLIFOAndGenerationLedger",
+            "TestBytesRegionDebugDirectScopesAndZero",
+            "TestBytesRegionIndependentByteAndPageModel",
+            "TestBytesRegionPredictableFailureCleanup",
+            "TestBytesRegionMarksFailureAndValidation",
+            "TestBytesRegionPlateauAndWarmAllocation",
+            "TestBytesRegionBudgetPeaksAndResetNoReserve",
+            "TestBytesRegionBulkScopeLifetime",
+            "TestBytesRegionOwnerIDCollisionAndLifetime",
+            "TestBytesRegionOwnerIDExhaustion",
+            "TestBytesRegionSourceDefaultAndAlignmentConstants"
+          ]
+        },
+        {
+          "name": "placement scalar/array allocation and no-op placement-delete storage adaptation",
+          "status": "ported",
+          "go_target": "arena/bytes_region.go",
+          "tests": [
+            "TestBytesRegionSourceDisplayMemStats",
+            "TestBytesRegionSourceReleasePagePolicy",
+            "TestBytesRegionMarksConsumeSourceStorage",
+            "TestBytesRegionFreePageLIFOAndGenerationLedger",
+            "TestBytesRegionDebugDirectScopesAndZero",
+            "TestBytesRegionIndependentByteAndPageModel",
+            "TestBytesRegionPredictableFailureCleanup",
+            "TestBytesRegionMarksFailureAndValidation",
+            "TestBytesRegionPlateauAndWarmAllocation",
+            "TestBytesRegionBudgetPeaksAndResetNoReserve",
+            "TestBytesRegionBulkScopeLifetime",
+            "TestBytesRegionOwnerIDCollisionAndLifetime",
+            "TestBytesRegionOwnerIDExhaustion",
+            "TestBytesRegionSourceDefaultAndAlignmentConstants"
+          ]
         }
       ],
       "ownership": [
-        "Typed marked storage adapts byte region allocation; reverse caller cleanup before storage recycle. Variable byte payload region and source trail subclass semantics remain open. See arena/PORT_STATUS.md."
+        "Complete selected release/debug byte-region lifetime and physical page/mark actions, with caller cleanup before rollback/reset/close. Cold headers, identity, descriptors, page backing/header/directory and log/scope capacities are charged. See arena/PORT_STATUS.md. Source trail subclasses are separate units."
       ],
-      "deviations": []
+      "deviations": [
+        "Raw pointers/tagged page headers become stable scalar refs and cold page metadata; logical pointer-width geometry selects4/8 independently of Go ABI. Distinct checked zero-size refs can represent the same source byte offset.",
+        "Predictable failures prepare storage before page-chain/cursor/ref publication; reusable metadata may remain charged. Generation/mark/owner namespaces never wrap; source runtime OOM is not recovered. DisplayMemStats outputs are caller-owned strings."
+      ]
     },
     {
       "path": "src/util/resource_limit.h",

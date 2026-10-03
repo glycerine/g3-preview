@@ -214,3 +214,14 @@ explicitly registers and passes all eight new tests; both handle modes compile
 for JS and WASI. Earlier agent commands using the incorrect checked tag are
 superseded by actual g3checked gates. Parsers, remaining numerical methods,
 standalone MPN/formatting scratch ownership and full AST/solver gates remain open.
+
+## Source byte regions and page actions
+
+BytesRegion now translates both release and debug source region policies,
+including strict fit-before-alignment, eager defaults, big-page deletion,
+LIFO reuse, physical scope-mark bytes, exact diagnostic formatting, stable
+scalar owner IDs, generations and complete cold/payload budgets. Tests-first
+RED led to GREEN with independent byte/page models and failure/lifetime checks.
+Region methods/ownership are audited; general page-user bindings remain partial.
+Combined full native/checked races and vet pass; all14 new region cases execute
+under checked Nodejs/wasm, and WASI compilation passes. Full solver remains open.

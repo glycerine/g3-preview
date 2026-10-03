@@ -728,3 +728,127 @@ constructed=true Pool32. It does not port util/rational.h's public/global-manage
 wrapper, the production source cell type/links, construct=false, unrelated
 thread-safe numerical service semantics or the whole object allocator template.
 Ordinary fixtures require no reference source checkout or reference executable.
+
+# Concrete variable-byte source region/page foundation
+
+Owned files: `bytes_region.go`, `bytes_region_test.go`, this status append. No
+existing slab/vector contract, domain package, ledger or git changes. This is a
+new concrete BytesRegion for util/region and util/page allocation policy, not a
+SmallBytes substitution or an extension of typed trail callback semantics.
+
+`BytesRegionConfig` selects source pointer width Alignment4/8 (explicit default8),
+PageSize payload bytes (default8192-Alignment, positive aligned multiple), shared
+Descriptors Config/Budget, and DirectOnly diagnostic mode. Checked scalar
+BytesRegionRef contains Slot/Generation. API provides Allocate/Size/Read/Write/
+IsLive, PushScope/PopScope/PopScopes/top-only Rollback, Reset/Close/Stats. There is
+no individual Free, Trim or escaped slice. Caller completes logical-object
+cleanup before scope pop/reset/close; storage performs no domain destruction.
+
+| Method/policy | Source mapping and observable storage action |
+| --- | --- |
+| release constructor | region.cpp:40-46 eagerly creates first default page |
+| release Allocate fit | region.cpp:54-59 strict requested endpoint comparison BEFORE ALIGN; tptr.h:25-31 pointer-width round-up; cursor can land exactly at page end |
+| release small overflow | region.cpp:61-66 obtains new/recycled default, then aligns requested bytes |
+| release big request | region.cpp:68-73 dedicated big payload inserted, immediately followed by fresh/recycled default even without further request |
+| source page headers | page.h:24-35 header width/previous/tag/default end; page.cpp:22-31 allocates payload+pointer-width header; Go allocates those bytes and uses separately charged scalar directory links rather than tagged pointers |
+| default allocation/recycling | page.cpp:41-51 pops free-page head before allocating; :60-67 prepends default free pages, immediately deletes big pages |
+| release PushScope | region.cpp:94-98 snapshots current page/cursor BEFORE allocate(3*pointerWidth) for mark; actual byte/cursor/page action retained even though mark control fields live in scalar Go metadata |
+| release PopScope/PopScopes | region.cpp:100-110 restores saved cursor and recycles pages through saved default page; header counted-pop loop preserved with checked depth adaptation |
+| release Reset | region.cpp:83-91 recycles entire active chain then reuses an existing default page; no new Reserve after successful constructor, tested with FailAfter0 |
+| release Close | region.cpp:49-51 frees active and free pages; Go also closes descriptor/log/scope/identity ownership |
+| diagnostic Allocate/Reset/scopes | region.h:30-79 independent direct chunks without alignment/eager default/in-payload marks, scopes save object count, pop/delete suffix, reset/delete all; vector.h:215-222,389-405 retains scalar directory/log/scope capacity |
+| Read/Write/Size/IsLive/owner identity | Go checked-storage adaptation; no raw pointer ABI or borrowed source-address claim |
+
+Zero-byte release allocation may share the same physical byte offset as another
+allocation; Go returns a distinct live checked descriptor. At an exact endpoint,
+zero request triggers the source new-default branch. Diagnostic zero requests
+are counted live direct objects with zero payload bytes, matching the source
+allocation log rather than a distinguished empty token. Big/direct pages release
+immediately on scope pop/reset. Defaults stay in source LIFO free list, including
+through Reset, and are only finally released at Close.
+
+The private concrete descriptorSlab and scalar allocation log preserve generation
+history across page reuse/reset; exhaustion retires identities. Scalar scope
+metadata retains pre-mark log/page/cursor limits and monotonic serials. Opaque
+cold marks reject foreign/non-top/consumed tokens; stored marks are pointer-free.
+OwnerID() is a stable nonzero scalar origin for borrowed string keys, including
+after rollback/reset/close. A borrowed process-global atomic64 namespace never
+wraps/reuses IDs and rejects exhaustion before constructor publication; failed
+constructors can consume unpublished IDs. Its cold field is included in owner
+header budget; no per-record allocation or second symbol identity namespace.
+Tests that simulate namespace exhaustion restore the test controller serially.
+
+Budget includes cold owner+identity, nested descriptor header/records/generation
+metadata/directories, every byte payload plus its actual source-sized page header,
+full-capacity scalar page directory and allocation/scope logs. Old+new metadata
+arrays and both prepared big/default payloads coexist during growth and are
+charged before publication. MarkPayloadBytes is informational and already within
+page PayloadBytes; never double-count it. Dedicated-page failure cleanup releases
+prepared payloads; reusable prepared metadata/descriptor history can remain
+charged. No new ref/mark, active/free chain mutation or cursor change is published
+on predictable failure. Source C++ may link the big page before a subsequent
+allocation throws; preparing both pages first is an explicit Go failure-safety
+adaptation, not claimed identical exception-state behavior. Runtime OOM recovery
+and caller-held closed tokens/host heap rounding remain outside typed accounting.
+
+Tests first produced RED missing BytesRegion APIs then GREEN. OwnerID dependency
+added RED missing method/namespace then GREEN. Source test/region.cpp contains
+only TODO: no substantive source assertion was invented or claimed inherited.
+Independent release/debug cursor/page model executes 1200 operations per mode,
+with a copied-byte lifetime oracle, nested marks/reset and non-overlap checks.
+Other finite tests verify both pointer widths, default source constants, strict
+fit-before-alignment, zero at endpoint, eager big/default pages, in-region marks
+crossing small/default and tiny big pages, free-page LIFO, generation retirement,
+diagnostic zero objects/capacity retention, first/second page preparation failures,
+constructor/scope fault prefixes, budget graph balance/old+new page-directory peak,
+no-reservation Reset, bulk pop lifetime, invalid scopes/configs, scalar origin
+collisions/stability/exhaustion, bounded reuse plateau and zero warmed allocations.
+The zero-allocation promise is for retained default-page scope churn; source big
+pages and diagnostic payloads allocate fresh backing and are not covered by it.
+
+Validation:
+
+- Full native and g3checked CGO-disabled arena tests: PASS.
+- Native race checks of all TestBytesRegion cases: PASS.
+- go vet ./arena; js/wasm and wasip1/wasm package builds: PASS.
+- GOARCH386 test compilation: PASS; no claim of native386 execution.
+- Actual g3checked Nodejs wasm execution printed all13 TestBytesRegion case names
+  and pointer4/pointer8 subcases, all PASS. Normal compiler environment, minimal
+  Node runtime only, TMPDIR/cache/output all under golang/.cache.
+
+Read-only source SHA256 fingerprints:
+
+- page.h: dc795874f31a21332aad1cbd44711866cade9e30b1c4f5976c135a7de4e8ee47
+- page.cpp: 9f5cae6305874ae6ffc87d48bdf5eac3001049c92f32b1d84047f1bb3c2efb4e
+- region.h: fab2ab6cdc6bdc067f38a8908c7591e9dc90bfea116823d2c744ead9238b32d1
+- region.cpp: 23908446c761dfb4e7b1165f2545f69f3e8726b7139f07b30133488559562eb3
+- tptr.h: 9e2ed0bc7f5b32ba6656374795d5a3cde31a1fba0c241cfc5baa52c0aa9efa64
+- machine.h: dba7365724c1167ee4bced664de38169c02624eedd6059ebb0d3d66213e64abc
+- test/region.cpp: 09bc4beded6a1b360db26f37f2b3df70e0c525be0d586896acd0018cdda0243c
+
+This packet supplies scoped variable bytes needed by StrHashtable/symbol owners.
+It does not port those owners, source raw-address tags/ABI, source display text,
+or solver trail/domain cleanup algorithms, and does not complete the whole
+arena/memory/solver gate. Ordinary tests require no source checkout/reference run.
+
+### BytesRegion source memory diagnostic completion
+
+Owned bytes_region.go/bytes_region_test.go only, plus this status append.
+DisplayMemStats() string now translates src/util/region.cpp:23 (debug object
+count) and :113 (release active page-chain count) with exact source spacing and
+newline. Release includes dedicated big pages and pages used by scope marks;
+recycled default pages are excluded. DirectOnly includes zero-sized allocations
+and excludes scope bookkeeping. The returned Go string is caller-owned output,
+outside the owner's predictable storage budget. This closes the display-text
+exception recorded above; source trail subclasses/domain cleanup remain separate.
+
+Tests first: TestBytesRegionSourceDisplayMemStats failed compilation because the
+method was absent (RED). After implementation, the new test passed (GREEN),
+covering eager initial page, big mark, big user allocation and following defaults,
+rollback/free-page exclusion, default overflow/reset, and debug scopes/reset.
+Full native and g3checked arena tests, all BytesRegion native race tests, and
+go vet ./arena passed. js/wasm checked and wasip1/wasm package compilation passed.
+Actual checked Node wasm execution printed all 14 BytesRegion test names,
+including the new diagnostic test and both pointer-width subcases, all PASS.
+Normal workspace compiler environment was used; the Node-only minimal environment
+preserved TMPDIR. All scratch/cache/output stayed under golang/.cache.
