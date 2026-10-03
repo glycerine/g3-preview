@@ -170,3 +170,18 @@ js/wasm runs explicitly list and pass all new MPQ and owner-budget tests. The
 manifest/no-generics audit records 4 ported, 36 partial, 2,062 unported units.
 MPQ parsing/Power/rounding/getters, standalone MPN scratch and formatting budgets,
 set-key containers and all AST/solver milestones remain open.
+
+## Retained-key map and numeric rounding integration
+
+UintSetMap now executes the actual tst5 map demonstration in exact bucket order,
+closing the earlier omitted integration. Keys are scalar owned word refs with
+logical length/source capacity; FREE/DELETED payloads, wrapper temporary copies
+and synthesized-copy rehash lifetimes follow source. Atomic word-graph budget
+transfer permits cross-budget Swap without copying keys.
+
+Integer Log2/MLog2/Bitsize and rational Floor/Ceil/previous-power methods now
+preserve all 16 source rational assertions and 2,000 integer log bounds, with
+independent signed/alias/failure expectations. Combined release tests, checked
+races, vet, actual fresh-count js/wasm tests and WASI compilation pass. Source
+and no-generics audit passes. Power/shifts/parsers, numeric scratch/formatting,
+real rational-cell allocator assertions and all full AST/solver gates remain open.

@@ -93,3 +93,109 @@ Source tests: `src/test/main.cpp` registers TST(uint_set), `src/test/CMakeLists.
 A separate 3,000-step independent bool-array set oracle checks membership, cardinality, empty/equality/subset relations, union/intersection/reset/assignment/swap and complete ascending iteration. Additional deterministic cases cover all iterator operations (including equality across owners with equal index), wrapper functors, source union's extra logical zero word, retained capacity, cloning vs assignment, swap/reset/Close and weighted hash wraparound. Warmed bounded insert/remove/count/hash/union/intersection/iteration allocate zero Go objects. Ordinary tests embed permanent fixtures, never compile C++ or import the repository source, and use no testdata files.
 
 Final packet checks: CGO-disabled native tests, g3checked tests, vet, actual js/wasm execution with Node v22.22.2, and WASI cross-build pass. The installed custom Go runtime's previously documented WASI startup failure remains separate from package execution. Every method in the assigned uint_set header has a counterpart or explicit operator-expression equivalent. Generic source map integration and other unsigned_vector/container operations remain separate production coverage work; they are not claimed complete by this packet.
+
+## UintSet-key map integration packet
+
+Added `uint_set_map.go`/`uint_set_map_test.go`, the concrete specialization of
+`map<uint_set, unsigned, uint_set::hash, uint_set::eq>` in `src/util/map.h` and
+`src/util/hashtable.h`. This is the actual local `uint_map<unsigned>` subclass
+in **active** `src/test/uint_set.cpp::tst5`, also used as state-set to state-ID
+storage in `src/math/automata/symbolic_automata_def.h`. It supersedes the earlier
+**unported tst5 map integration** statement above. It is distinct from the
+identity-key `u_map<unsigned>` in utilhash and the still-unported direct-index
+`src/util/uint_map.h` pointer-value container. This specialization does not
+claim the complete general template family or the symbolic automata algorithm.
+
+| Concrete source operation | Go counterpart |
+| --- | --- |
+| table2map/map/core construction, copy construction, destructor | `NewUintSetMap`, `Clone`, `Close` |
+| alloc_table/delete_table, copy_table/move_table | `allocateTable`, `destroyTable`, `copyTable`, `rehash`; scalar table with distinct owned key copies |
+| default_hash_entry state/hash/data methods | scalar `setMapEntry` fields, key assignment helpers, ref `Key`/`Value`/`SetValue`; source FREE/DELETED retain key ownership |
+| key_data default/key/key-value construction | empty scalar key, `copySet`, wrapper temporary and scalar value |
+| hash/eq functors and cached hashes | `setMapHash`, `setMapEqual`; uint32 weighted source hash and trailing-zero equality |
+| insert rvalue/const data | `insertCore`/`insertConst`; concrete wrapper `Insert` |
+| insert_if_not_there_core / insert_if_not_there / insert_if_not_there2 | matching exported methods; one / two / two key-copy temporaries respectively |
+| find_core, find output, get default, required find/operator[] | `FindCore`, `FindInto`/`Find`, `Get`, `MustFind`/entry `SetValue` |
+| contains, find_iterator | `Contains`, `FindIterator` |
+| remove, erase, cleanup, growth | `Remove`, `Erase`, `removeCore`, `rehash`, `prepareInsert` |
+| empty, size, capacity, collision count | `Empty`, `Size`, `Capacity`, `CollisionCount`; statistics disabled in source baseline |
+| reset, finalize, swap | `Reset`, `Finalize`, `Swap` |
+| source copy assignment and core union/intersection | `Assign`, `Union`, `Intersect`; source self guards and ascending-bucket traversal |
+| begin/end, scan, dereference, prefix/postfix increment, equality | `Begin`/`End`, iterator `scan`, `Ref` and key/value accessors, `Next`/`PostNext`, `Equal` and its negation; ordinary cold iterator value assignment |
+| checked invariant | `CheckInvariant`, source state counts plus key/hash/ownership checks |
+
+`core_hashtable::dump` is not exposed by table2map, and cannot be instantiated
+for this source specialization: `_key_data<uint_set,unsigned>` has no ostream
+operator. No invented formatter is claimed as that method. The real source
+tst5 prints the key and value separately through iterator access, which is
+translated exactly. Mutable raw source key/pointer borrows become readonly
+`UintSetMapKeyView` and owner/epoch/slot refs; explicit `CopyKey` returns a
+caller-owned set. Structural mutations invalidate refs/cursors, while value or
+equal-key updates preserve the slot and its view resolves the current payload.
+Every callable method of this assigned concrete map is represented.
+
+Key storage contains no per-key objects, Go pointers, interfaces, unsafe, or
+Go maps: each 28-byte scalar entry holds state/hash/value plus arena slot,
+generation, **logical word length**, and **source capacity**. Arena payload
+length is the source capacity, so copy assignment at capacity 7/logical length 1
+allocates all seven source words even if the arena capacity class rounds to 8.
+Only active words are copied; source spare words are unspecified and Go supplies
+zero storage. Empty copy-constructed keys use the zero ref and are distinguished
+from FREE entries by the state tag. Weighted hash is h += (i+1)*word[i] modulo
+2^32; no endian or signed-char adaptation applies to this specialization.
+
+The source uint_set custom copy constructor pushes logical words and derives
+capacity; its user-defined copy constructor/destructor suppress move operations.
+Consequently synthesized `_key_data`/default_hash_entry move assignment calls
+uint_set **copy assignment**, preserving source capacity. An assembly-only audit
+using the original headers verified that call (artifacts under golang/.cache).
+Rehash/Clone allocate distinct USED key payloads while every old USED/FREE/
+DELETED payload remains owned until table destruction. Removal and nonshrinking
+Reset only mark states; even an empty-clean Reset retains FREE payloads.
+Overwriting a slot destroys its former key. Insert/lookup/remove wrappers create
+and destroy all source temporaries; insert-if-absent wrappers preserve both
+copies. Internal intersection uses cloned key_data directly rather than adding
+table2map temporary copies that the source does not make. Swap exchanges table
+and pool ownership without key copies or destruction.
+
+Budget accounting includes map root, scalar arrays, Words/descriptor cold
+headers, payload and all pool metadata/directories, with uint64 charges. This
+depends on the arena owner-header and atomic `Words.SwapBudgets` packets; their
+current implementations also supersede the older fixed-manager paragraph's
+substrate header-accounting limitation. Cross-budget Swap reserves both incoming
+table charges first, then uses the atomic complete-pool graph hook, refunds
+table reservations on pool failure, and exchanges pointers only after success.
+Owner root charges and cold callbacks stay with their owners. Tests exercise
+failure in each destination's table/pool preparation and nil/non-nil budgets.
+Physical arena free pages may cache storage, but descriptor liveness follows
+every source logical deletion. Explicit Close refunds all graph charges.
+
+Typed arena errors replace unchecked source allocation/size failures. Constructor,
+key-copy assignment, table rehash/Clone, and table replacement allocate before
+destroying old storage to preserve existing contents on failure; this adds a
+documented old+new replacement peak where source vector assignment/reset would
+destroy old data first and could leave unsafe state after allocation failure.
+Successful pre-insert rehash remains applied if a later stored-key copy fails;
+multi-entry Assign/Union and Remove with failing cleanup are source-ordered
+partial operations, not transactions. Pool growth may retain reusable physical
+pages after failed operations; tests require no surviving temporary descriptors
+or final budget leaks. uint32 iteration extents and table sizing diagnose overflow.
+
+Tests first obtained RED on the missing concrete API, then GREEN after source
+translation. Additional iterator postfix and cross-budget swap cases were RED
+before their implementations. tst5 has the complete independently computed
+finite stdout expectation: hashes 0/2/6/8198 and bucket-order lines
+`{1, 2, 44} : 1` then `{1, 2, 4, 44} : 3`. No source assertions are disabled in
+that test. A 700-operation independent eight-member mask oracle checks mappings
+and complete iteration; test-only Go maps serve as the mathematical oracle.
+Additional coverage checks strict 3/4 growth before lookup, last tombstone reuse,
+FREE/DELETED retained owners, strict cleanup thresholds and OOM callback, one-step
+reset shrinking and 64-entry finalize, source capacity vs logical/physical size,
+clone/assignment lifetimes, exact wrapper temporary counts, injected constructor/
+insert/lookup/rehash/swap failures, alias guards, stale borrows and caller copies.
+Warmed Find/Insert allocates zero Go objects in AllocsPerRun. Ordinary tests need
+no C++ tools, source headers, testdata, or platform addresses.
+
+Native, g3checked, vet, actual fresh-count js/wasm tests under Node v22.22.2,
+and wasip1/wasm cross-build pass. WASI execution retains the documented installed
+custom-Go runtime pre-main seed limitation; there is no WASI execution claim.
