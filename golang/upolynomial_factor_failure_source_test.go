@@ -3,14 +3,13 @@ package g3
 
 import (
 	"errors"
-	"github.com/glycerine/g3/golang/arena"
 	"github.com/glycerine/g3/golang/mpnum"
 	"testing"
 )
 
 func TestUPolynomialFactorFullAlgorithmImmediateFailureRoots(t *testing.T) {
 	failures, successes := 0, 0
-	for ordinal := int64(0); ordinal < 512; ordinal++ {
+	for ordinal := int64(0); ordinal < 2048; ordinal++ {
 		m, _, b := upolySourceOwner(t)
 		primes, e := mpnum.NewPrimeGenerator(b)
 		if e != nil {
@@ -40,18 +39,12 @@ func TestUPolynomialFactorFullAlgorithmImmediateFailureRoots(t *testing.T) {
 				t.Fatal(e)
 			}
 		}
-		before := m.Stats()
-		external := before.IntegerLiveCells - before.OwnedNumeralCells - before.IntegerCachedCells - fs.Stats().OwnedNumeralCells
 		b.FailAfter(ordinal)
 		_, err := service.Factor(mustUPolyView(t, m, p), fs, mpnum.DefaultUPolynomialFactorParams())
-		immediate := m.Stats()
-		owned := fs.Stats()
-		// Inspect the actual live numeral/Words graph BEFORE disabling faults,
-		// allocating formatting buffers, deleting results or closing any owner.
-		if immediate.IntegerLiveCells != external+immediate.OwnedNumeralCells+immediate.IntegerCachedCells+owned.OwnedNumeralCells || immediate.IntegerWordsRefs != immediate.IntegerLiveCells+immediate.IntegerNaturalWordsRefs {
-			t.Fatal("immediate whole graph", ordinal, err, immediate, owned)
-		}
-		if err != nil && !errors.Is(err, arena.ErrInjectedFailure) {
+		// Exact concrete vector/physical cell census precedes fault disabling,
+		// formatting, result deletion and any owning cleanup.
+		upolyHenselAuditPhysical(t, []*mpnum.UPolynomialManager{m}, []*mpnum.UPolynomialFactors{fs})
+		if err != nil && !upolyHenselAllocationRefusal(m.IntegerManager(), err) {
 			t.Fatal(ordinal, err)
 		}
 		b.FailAfter(-1)

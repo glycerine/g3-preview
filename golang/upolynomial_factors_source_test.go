@@ -96,17 +96,10 @@ func TestUPolynomialFactorsLexicalPowerFailureAndImmediateRoots(t *testing.T) {
 		if e = fs.PushCopy(mustUPolyView(t, m, p), 3); e != nil {
 			t.Fatal(e)
 		}
-		before := m.Stats()
-		fsBefore := fs.Stats()
-		external := before.IntegerLiveCells - before.IntegerCachedCells - before.OwnedNumeralCells - fsBefore.OwnedNumeralCells
 		b.FailAfter(ordinal)
 		err := fs.Multiply(out)
-		immediate := m.Stats()
-		owned := fs.Stats()
-		if immediate.IntegerLiveCells != external+immediate.IntegerCachedCells+immediate.OwnedNumeralCells+owned.OwnedNumeralCells || immediate.IntegerWordsRefs != immediate.IntegerLiveCells+immediate.IntegerNaturalWordsRefs {
-			t.Fatal("immediate actual roots before fault disable", ordinal, err, immediate, owned)
-		}
-		if err != nil && !errors.Is(err, arena.ErrInjectedFailure) {
+		upolyHenselAuditPhysical(t, []*mpnum.UPolynomialManager{m}, []*mpnum.UPolynomialFactors{fs})
+		if err != nil && !upolyHenselAllocationRefusal(m.IntegerManager(), err) {
 			t.Fatal(err)
 		}
 		b.FailAfter(-1)

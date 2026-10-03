@@ -197,22 +197,10 @@ func TestUPolynomialHenselImportedAlgorithmImmediateFailureRoots(t *testing.T) {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			m, prime, lift, donor, pf, lf, service, f, _, b := upolyHenselImportedFixture(t)
 			cores := []*mpnum.UPolynomialManager{m, prime, lift, donor}
-			owned := func() uint32 {
-				n := pf.Stats().OwnedNumeralCells + lf.Stats().OwnedNumeralCells
-				for _, core := range cores {
-					n += core.Stats().OwnedNumeralCells
-				}
-				return n
-			}
-			before := m.Stats()
-			external := before.IntegerLiveCells - before.IntegerCachedCells - owned()
 			b.FailAfter(ordinal)
 			err := service.HenselLiftFactors(f, pf, 3, lf)
-			immediate := m.Stats()
-			if immediate.IntegerLiveCells != external+immediate.IntegerCachedCells+owned() || immediate.IntegerWordsRefs != immediate.IntegerLiveCells+immediate.IntegerNaturalWordsRefs {
-				t.Fatal("immediate four-store numeric graph", ordinal, err, immediate, owned(), external)
-			}
-			if err != nil && !errors.Is(err, arena.ErrInjectedFailure) {
+			upolyHenselAuditPhysical(t, cores, []*mpnum.UPolynomialFactors{pf, lf})
+			if err != nil && !upolyHenselAllocationRefusal(m.IntegerManager(), err) {
 				t.Fatal(ordinal, err)
 			}
 			if err != nil {

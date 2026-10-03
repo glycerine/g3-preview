@@ -99,6 +99,9 @@ type upolyHenselPhysicalGraph struct{ Named, Unpublished, Cleanup, Pending, Obje
 // metadata; it neither borrows mutable payloads nor repairs failed numerals.
 func upolyHenselAuditPhysical(t *testing.T, cores []*mpnum.UPolynomialManager, factors []*mpnum.UPolynomialFactors) upolyHenselPhysicalGraph {
 	t.Helper()
+	if e := upolyHenselCheckVectorOwners(cores, factors); e != nil {
+		t.Fatal(e)
+	}
 	var graph upolyHenselPhysicalGraph
 	z := reflect.ValueOf(cores[0].IntegerManager()).Elem()
 	cells := z.FieldByName("cells").Elem()
@@ -502,4 +505,14 @@ func TestUPolynomialHenselDeadLowerGuardedCloseAndCallerSetZ(t *testing.T) {
 		t.Fatal("retry retained factor header")
 	}
 	upolyHenselAuditPhysical(t, cores, owners)
+}
+
+// Raw source allocation uses its actual memout transport, while typed Go
+// bookkeeping preserves arena refusal. No other error category is accepted.
+func upolyHenselAllocationRefusal(z *mpnum.IntegerManager, err error) bool {
+	if errors.Is(err, arena.ErrInjectedFailure) {
+		return true
+	}
+	var failure memory.Failure
+	return errors.As(err, &failure) && failure.Kind == memory.FailureMemout && z.RuntimeOwner().State().OutOfMemory
 }

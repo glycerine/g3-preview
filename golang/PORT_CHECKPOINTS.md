@@ -224,3 +224,27 @@ test produced native/debug RED; production remains unchanged. Run
 `-tags g3checked,g3debug`. These tests are deliberately untagged and failing
 until direct source setter actions are implemented; no green package claim.
 `MPQ_SETTER_PUBLICATION_PACKET.md` contains source inventory and remaining scope.
+
+
+Factorization ownership audits are preserved as a RED integration checkpoint.
+The independent census now requires named concrete vector states for every live
+coefficient buffer, validates physical origins/generations/capacities, and rejects
+omitting either imported factors or lifted output. Three older failure campaigns
+use actual physical numeric roots instead of obsolete Words-per-cell counts;
+mathematical and publication assertions remain. Native selected campaigns pass
+in the frozen agent tree. Extending the debug full-factor campaign to its first
+success instead exposes a genuine ownership loss: ordinal606 in that frozen
+tree leaves a failed modular lower bound, and ignored deferred lifted-factors
+and modular-core Close errors discard the actual owners of published upper
+bound/header storage. The immediate audit correctly fails before fault disable.
+The larger bound 2048 preserves stop-after-first-success.
+
+Evidence: `.cache/factors-owner/vector-owner-final-debug.log` and
+`.cache/factors-owner/ordinal606-close-diagnostic.log`. Reproduce with
+`go test -tags g3checked,g3debug . -run
+'^TestUPolynomialFactorFullAlgorithmImmediateFailureRoots$' -count=1`
+(on one shell line). Subsequent backend changes may shift the refusal ordinal.
+Required next work is actual charged lexical-owner retention and retryable
+reverse teardown; automatic mode repair or accepting anonymous storage is not
+a fix. This checkpoint contains tests only, preserves the real RED, and makes
+no factorization/source completion claim.
