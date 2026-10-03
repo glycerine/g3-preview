@@ -84793,7 +84793,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "util_param_descrs.go"
+        "util_param_descrs.go",
+        "util_cmd_exception.go"
       ],
       "tests": [
         "TestParamDescrsSourceHistoryDefaultsAndDisplay",
@@ -84808,7 +84809,10 @@
         "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
         "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
         "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
-        "TestParamDescrsCheckedCapacityBoundaries"
+        "TestParamDescrsCheckedCapacityBoundaries",
+        "TestCmdExceptionSourceConstructorRoutesAndLocationGuards",
+        "TestCmdExceptionSourceSymbolCompositionAndBorrowedLifetime",
+        "TestCmdExceptionIndependentByteDomainsAndOwnerAccounting"
       ],
       "conditionals": [
         {
@@ -84852,12 +84856,35 @@
             "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
             "TestParamDescrsCheckedCapacityBoundaries"
           ]
+        },
+        {
+          "name": "complete cmd_exception constructor/composition/location methods",
+          "status": "ported",
+          "go_target": "util_cmd_exception.go",
+          "tests": [
+            "TestCmdExceptionSourceConstructorRoutesAndLocationGuards",
+            "TestCmdExceptionSourceSymbolCompositionAndBorrowedLifetime",
+            "TestCmdExceptionIndependentByteDomainsAndOwnerAccounting"
+          ]
+        },
+        {
+          "name": "distinct stop_parser_exception signal",
+          "status": "ported",
+          "go_target": "util_cmd_exception.go",
+          "tests": [
+            "TestCmdExceptionSourceConstructorRoutesAndLocationGuards",
+            "TestCmdExceptionSourceSymbolCompositionAndBorrowedLifetime",
+            "TestCmdExceptionIndependentByteDomainsAndOwnerAccounting"
+          ]
         }
       ],
       "ownership": [
-        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md."
+        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md.",
+        "Cold caller-owned concrete exception values/messages; no retained hot interface or numeric/arena graph. Cmd symbol composition reads borrowed checked bytes directly into one final message and outlives the symbol owner. Source CString observations and signed positions preserved. See Z3_EXCEPTION_PORT_STATUS.md."
       ],
-      "deviations": []
+      "deviations": [
+        "Go cold error interfaces replace virtual throw transport; source nonzero/location assertions use classified guard errors. Generic printf constructor/platform domains remain explicitly open."
+      ]
     },
     {
       "path": "src/util/common_msgs.cpp",
@@ -85437,9 +85464,14 @@
       "sha256": "a9a944d327c1755b886d1f95a9ec0a1bdc48582c20e91b7c4bc576b038cedd3c",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "util_z3_exception.go"
+      ],
+      "tests": [
+        "TestZ3ExceptionSourceCodesAndLabels",
+        "TestDefaultExceptionSourceStringAndEmbeddedNUL"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -85450,11 +85482,25 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "all fourteen error-code macros as fixed uint32 constants",
+          "status": "ported",
+          "go_target": "util_z3_exception.go",
+          "tests": [
+            "TestZ3ExceptionSourceCodesAndLabels",
+            "TestDefaultExceptionSourceStringAndEmbeddedNUL"
+          ]
+        }
+      ],
+      "ownership": [
+        "Cold caller-owned concrete exception values/messages; no retained hot interface or numeric/arena graph. Cmd symbol composition reads borrowed checked bytes directly into one final message and outlives the symbol owner. Source CString observations and signed positions preserved. See Z3_EXCEPTION_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Go cold error interfaces replace virtual throw transport; source nonzero/location assertions use classified guard errors. Generic printf constructor/platform domains remain explicitly open."
+      ]
     },
     {
       "path": "src/util/event_handler.h",
@@ -107998,9 +108044,14 @@
       "sha256": "3fef3958a95b8020caeb2feddbc5bb7b3074dcb38c205b6af74b67c562b9a74d",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_z3_exception.go"
+      ],
+      "tests": [
+        "TestZ3ExceptionSourceCodesAndLabels",
+        "TestDefaultExceptionSourceStringAndEmbeddedNUL"
+      ],
       "assertions": [
         {
           "line": 36,
@@ -108009,18 +108060,52 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "exact error-code constants and z3_error labels/code/nonzero guard",
+          "status": "ported",
+          "go_target": "util_z3_exception.go",
+          "tests": [
+            "TestZ3ExceptionSourceCodesAndLabels",
+            "TestDefaultExceptionSourceStringAndEmbeddedNUL"
+          ]
+        },
+        {
+          "name": "base error_code/has_error_code and default_exception std::string constructor/msg",
+          "status": "ported",
+          "go_target": "util_z3_exception.go",
+          "tests": [
+            "TestZ3ExceptionSourceCodesAndLabels",
+            "TestDefaultExceptionSourceStringAndEmbeddedNUL"
+          ]
+        },
+        {
+          "name": "default_exception fmt/va_list constructor and source printf formatter dependency",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Cold caller-owned concrete exception values/messages; no retained hot interface or numeric/arena graph. Cmd symbol composition reads borrowed checked bytes directly into one final message and outlives the symbol owner. Source CString observations and signed positions preserved. See Z3_EXCEPTION_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Go cold error interfaces replace virtual throw transport; source nonzero/location assertions use classified guard errors. Generic printf constructor/platform domains remain explicitly open."
+      ]
     },
     {
       "path": "src/util/z3_exception.h",
       "sha256": "a73002ce776425cbd302e2aca030c18babae39ea754175b57ec49cf8d022ee5a",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_z3_exception.go"
+      ],
+      "tests": [
+        "TestZ3ExceptionSourceCodesAndLabels",
+        "TestDefaultExceptionSourceStringAndEmbeddedNUL"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -108033,9 +108118,38 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "exact error-code constants and z3_error labels/code/nonzero guard",
+          "status": "ported",
+          "go_target": "util_z3_exception.go",
+          "tests": [
+            "TestZ3ExceptionSourceCodesAndLabels",
+            "TestDefaultExceptionSourceStringAndEmbeddedNUL"
+          ]
+        },
+        {
+          "name": "base error_code/has_error_code and default_exception std::string constructor/msg",
+          "status": "ported",
+          "go_target": "util_z3_exception.go",
+          "tests": [
+            "TestZ3ExceptionSourceCodesAndLabels",
+            "TestDefaultExceptionSourceStringAndEmbeddedNUL"
+          ]
+        },
+        {
+          "name": "default_exception fmt/va_list constructor and source printf formatter dependency",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Cold caller-owned concrete exception values/messages; no retained hot interface or numeric/arena graph. Cmd symbol composition reads borrowed checked bytes directly into one final message and outlives the symbol owner. Source CString observations and signed positions preserved. See Z3_EXCEPTION_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Go cold error interfaces replace virtual throw transport; source nonzero/location assertions use classified guard errors. Generic printf constructor/platform domains remain explicitly open."
+      ]
     },
     {
       "path": "src/util/z3_omp.h",

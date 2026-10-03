@@ -618,3 +618,14 @@ budgeted formatter workspace and allocate only one final caller output.
 Four tests began behavioral RED at three warmed allocations, then passed with
 one; signed/domain cases, source abs lifetime, immediate failure roots and
 old/new workspace growth peaks are covered. See INF_FORMAT_PORT_STATUS.md.
+
+## Source exception classification and command error values
+
+All fourteen source error codes, fixed z3_error messages/code predicates,
+default_exception string values, CmdException constructors/locations and the
+distinct stop-parser signal now have concrete Go counterparts. Five tests began
+missing-API RED and cover source labels, embedded NUL, byte/position domains,
+checked symbol composition, lifetime and unchanged borrowed-owner budgets.
+See Z3_EXCEPTION_PORT_STATUS.md. The printf/va_list constructor remains open;
+its integer/string source formatter is a separate active packet, and command
+runtime/complete solver scope remains open.
