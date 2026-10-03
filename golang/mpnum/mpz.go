@@ -41,6 +41,7 @@ type IntegerManager struct {
 	cells         *numericCellSlab
 	words         *arena.Words
 	tmp, arg      [2]numericCellRef
+	divScratch    [4]arena.VectorRef // mpn's u, v, multiply/subtract, add-back buffers
 	intMin, two64 Int
 	closed        bool
 }
@@ -180,6 +181,11 @@ func (m *IntegerManager) Close() {
 		}
 	}
 	if m.words != nil {
+		for _, ref := range m.divScratch {
+			if ref != (arena.VectorRef{}) {
+				m.words.Free(ref)
+			}
+		}
 		m.words.Close()
 	}
 	if m.cells != nil {
@@ -187,6 +193,7 @@ func (m *IntegerManager) Close() {
 	}
 	m.tmp = [2]numericCellRef{}
 	m.arg = [2]numericCellRef{}
+	m.divScratch = [4]arena.VectorRef{}
 	m.intMin = Int{}
 	m.two64 = Int{}
 	m.closed = true
@@ -475,14 +482,26 @@ func (m *IntegerManager) ensureTmp(idx int, size uint32) error {
 	return nil
 }
 func (m *IntegerManager) publishTmp(dst *Int, sign int32, size uint32) error {
-	ref := m.tmp[0]
+	return m.publishTmpAt(0, dst, sign, size, 0)
+}
+
+// publishTmpAt consumes an optional preallocated replacement scratch cell.
+// This lets paired division prepare allocations before publishing either value.
+func (m *IntegerManager) publishTmpAt(idx int, dst *Int, sign int32, size uint32, replacement numericCellRef) error {
+	ref := m.tmp[idx]
 	for size > 0 && m.digit(ref, size-1) == 0 {
 		size--
 	}
 	if size == 0 {
+		if replacement != 0 {
+			m.free(replacement)
+		}
 		return m.Reset(dst)
 	}
 	if size == 1 && m.digit(ref, 0) <= math.MaxInt32 {
+		if replacement != 0 {
+			m.free(replacement)
+		}
 		v := int32(m.digit(ref, 0))
 		if sign < 0 {
 			v = -v
@@ -491,16 +510,22 @@ func (m *IntegerManager) publishTmp(dst *Int, sign int32, size uint32) error {
 	}
 	old := dst.cell
 	if old == 0 {
-		var e error
-		old, e = m.allocate(6, 0)
-		if e != nil {
-			return e
+		if replacement != 0 {
+			old = replacement
+		} else {
+			var e error
+			old, e = m.allocate(6, 0)
+			if e != nil {
+				return e
+			}
 		}
+	} else if replacement != 0 {
+		m.free(replacement)
 	}
 	m.resizeCell(ref, size)
 	dst.cell = ref
 	dst.val = sign
-	m.tmp[0] = old
+	m.tmp[idx] = old
 	return nil
 }
 func (m *IntegerManager) Add(a, b, c *Int) error { return m.addSub(a, b, c, false) }

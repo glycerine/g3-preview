@@ -114,7 +114,7 @@ the source requested capacity (6), preserving the source scratch growth policy.
 | `neg`, `abs` | `Neg`, `Abs`, including INT_MIN big promotion |
 | `get_sign_cell`, `big_compare` | `signCell`, `Compare`, `compareCells`; source special INT_MIN constant and one-limb argument buffers |
 | `add`, `sub`, `big_add`, `big_sub`, `big_add_sub` | `Add`, `Sub`, `addSub`; indexed source Algorithms A/S, sign selection, compare/subtract, normalized scratch publication |
-| private scratch `set<IDX>` | `publishTmp` implements currently used IDX0; IDX1 path not yet used/implemented |
+| private scratch `set<IDX>` | `publishTmp` / `publishTmpAt` implement IDX0 and IDX1 result-cell normalization/transfer |
 | `is_abs_uint64`, `big_abs_to_uint64` | `absUint64` with explicit oversized error |
 | `is_uint64`, `is_int64`, `get_uint64`, `get_int64` | `IsUint64`, `IsInt64`, `Uint64`, `Int64` |
 | `display`, `to_string` | `String` semantic decimal rendering; stream API replaced with string |
@@ -122,9 +122,8 @@ the source requested capacity (6), preserving the source scratch growth policy.
 Explicitly unimplemented source methods/overloads: `cell_size` (representation
 replaced by arena accounting), `allocate_if_needed`, `ensure_capacity`,
 `normalize` (standalone; publication normalization is translated), `size_info`,
-`sz_lt`, `precise`, `field`, `inc`, `dec`, `mul`, `big_mul`, `addmul`, `submul`,
-`machine_div_rem`, `machine_div`, `rem`, `div`, `mod`, `quot_rem_core`,
-`big_div_rem`, `big_div`, `big_rem`, `gcd` (all three overloads), `lcm`, `divides`,
+`sz_lt`, `precise`, `field`, `inc`, `dec`, `addmul`, `submul`,
+`gcd` (all three overloads), `lcm`, `divides`,
 `inv`, `bitwise_or`, `bitwise_and`, `bitwise_xor`, `bitwise_not`, decimal-string
 `set`, the named int32/uint32 setter overloads (their behavior is available through
 SetInt64/SetLimbs), `dup`, `is_pos`, `is_neg`, `is_zero`, `sign`, `is_nonpos`,
@@ -202,3 +201,92 @@ Native release and checked race suites, vet, and release/checked js/wasm and
 wasip1/wasm test-binary builds pass. Arithmetic behavior and previously documented
 budget/lifecycle limitations are unchanged. All writes/cache/artifacts remain
 inside golang; no later arithmetic packet is included in this conversion.
+
+## Internal MPZ multiplication and division packet
+
+Status remains **partial MPZ**. The earlier unimplemented-method inventory now
+excludes the translated methods below; remaining items there and all MPQ/GCD/
+rounding/higher numerical managers are still unimplemented. The source methods
+and actual tests were read before porting; no C++ reference experiments ran.
+
+| Source operation | Go counterpart |
+| --- | --- |
+| `mul`, `big_mul`, mpn `mul` | `Mul`, `multiplyCells`; inline int64 product and source Algorithm M |
+| `machine_div_rem`, `big_div_rem` | `MachineDivRem`, `quotRemCore` quotient+remainder mode |
+| `machine_div`, `big_div` | `MachineDiv`, `quotRemCore` quotient-only mode |
+| `rem`, `big_rem` | `Rem`, `quotRemCore` remainder-only mode |
+| `div` | `Div`; source negative-numerator Euclidean quotient adjustment |
+| `mod` | `Mod`; source negative-remainder adjustment to nonnegative modulus |
+| `quot_rem_core` | `quotRemCore`; source sign-cell extraction, smaller-numerator guard, both scratch capacities, sign application and source publication order |
+| mpn `div`, normalization, `div_1`, `div_n`, unnormalization | `divideCells`, `divideCellOne`, `divideCellMany`; indexed source Algorithm D over owned Words |
+
+No production arithmetic uses math/big, Go generics, raw limb slice borrowing,
+or unsafe. uint32 limbs and explicit uint64 intermediates are unchanged.
+Four lazy manager-owned Words refs replace mpn's u/v/ms/ab buffers. Their
+initial reserved capacity is 16 words, with geometric pool growth, corresponding
+to the source sbuffer's 16 inline words and doubling expansion. Logical lengths,
+normalization shifts, estimate correction, Algorithm M multiplication/Algorithm S
+subtraction, and add-back control flow are retained. Source scratch requested
+cell growth remains `(3*size+1)>>1`. Close frees division buffers explicitly
+before closing Words. Their descriptors, page payload, directory and free-list
+metadata share the manager's arena budget. This resolves MPZ division scratch
+budgeting; standalone NaturalManager scratch, String formatting, and cold header
+budgets remain unresolved as previously recorded.
+
+Storage failure adaptation: paired quot/rem preallocates replacement scratch
+before either result publication, and Mul publishes only after capacity is ready.
+Div/Mod stage owner-local numerals until all adjustment allocations succeed,
+then Move commits the result. Every staged numeral is explicitly deleted on
+failure. Staging increases peak owned cells/capacity and changes physical
+allocation/deletion timing from C++; no allocation-profile equivalence is claimed.
+The source divisor/output reread is emulated using staged work when c==b, so
+normal arithmetic and the source alias defects below remain exactly observable.
+Division by zero returns classified ErrDivideByZero and leaves destinations unchanged;
+source division by zero has no valid mathematical contract (native undefined
+arithmetic/unreachable paths). This explicit development error is not UNKNOWN.
+
+TDD: tests first failed for undefined Mul/MachineDivRem/MachineDiv/Rem/Div/Mod
+(RED); the exact algorithms made them pass (GREEN). Source tst1's active large
+integer arithmetic/comparison assertions are checked through Mul/Add/Neg/Compare;
+its decimal parsing is independent fixture setup, not a claimed setter port.
+Source tst2/tst2b only print: added exact expected 2^64 square and 2^256 after
+three input/output-alias squares. Added finite independent cases include 2352
+small signed nonzero-divisor pairs, 500 signed operands of 1..12 limbs with
+all single-output input aliases and swapped two-output input aliases,
+INT32/INT64 boundaries, Algorithm D quotient correction/base-estimate/add-back,
+and the source smaller-numerator length guard. Independent math/big uses distinct
+oracle values for truncating QuoRem versus Euclidean DivMod. Multiplication and
+paired division are checked for zero warmed Go allocations. Reserved division
+scratch capacity and complete Close budget release are explicitly asserted.
+
+Predictable failure sweeps: 32 paired-division reservation positions; 2 Euclidean
+operations x 3 destination shapes x 40 reservation positions; 3 multiplication
+destination shapes x 16 positions. Every failure preserves destinations and alias
+inputs, retains no extra live numeric cell, retries to the exact expected result,
+and releases its whole budget on Close. These are finite deterministic injected
+budget checks, not claims about arbitrary Go runtime OOM/cancellation recovery.
+
+Known preserved source alias defects (independently derived from executable
+source control flow, not C++ observed goldens):
+
+- `Div(-26,7,b)` with c==b yields -2; `Div(-26,-7,b)` yields 2. The source checks
+  the sign of the overwritten quotient as if it were the original divisor.
+- `Mod(-26,+/-7,b)` with c==b yields 0 because subtraction sees the remainder
+  as both operands. Mathematical Euclidean tests use unaffected destinations;
+  source-defect tests separately freeze these values, including large operands.
+- `MachineDivRem` with q==r ends in remainder on the small/general path, but
+  ends in zero when denominator limb length exceeds numerator length because
+  source writes remainder then resets quotient. No new alias restriction is
+  introduced. Mathematically independent paired tests use distinct outputs.
+
+Source numeric parser, named comparison convenience wrappers, power/two-shift,
+GCD/bitwise/root/log and other inventory entries remain unported. This packet
+does not complete the manager, full arithmetic gate, or full-fork port.
+
+Verified final packet gates: native release and checked race tests pass; vet
+passes; release/checked js/wasm and wasip1/wasm test binaries cross-build.
+Combined mpnum statement coverage is 90.7%; this includes unreachable guard and
+unexercised error branches and is not claimed complete path coverage. Cross-build
+results are compilation evidence, not wasm runtime execution. Files written:
+mpz_mul.go, mpz_div.go, mpz_mul_div_test.go, the approved mpz.go shared helper/
+scratch changes, and this status document. All artifacts/cache remain in golang.
