@@ -78512,27 +78512,21 @@
       "sha256": "665202d938921c91cbc3efdd54d8bb55554d2d3d3d72da62908c3a316b7cd621",
       "component": "test",
       "role": "test",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "utilhash/uint_map.go"
+        "utilhash/str_int32_map_test.go"
       ],
       "tests": [
-        "TestUintMapSourceMapAssertions",
-        "TestUintMapLastTombstoneAndWrap",
-        "TestUintMapStrictGrowthAndInsertIfAbsent",
-        "TestUintMapCleanupThresholdAndOutOfMemory",
-        "TestUintMapResetFinalizeAndClone",
-        "TestUintMapMethodsRefsAndIterators",
-        "TestUintMapAssignUnionIntersectionSwap",
-        "TestUintMapIndependentBoundedOracle",
-        "TestUintMapBudgetFailureAndPeakAccounting",
-        "TestUintMapCleanupFailurePreservesCompletedRemoval",
-        "TestUintMapSparseResetAndFinalizeFailureAtomic",
-        "TestUintMapSwapDifferentBudgetsAndRefs",
-        "TestUintMapWarmScalarOperationsNoAllocation",
-        "TestUintMapWindowsSourceMembershipAssertions",
-        "TestUintMapStrictDeletedVersusSizeThreshold",
-        "TestUintMapStrictResetFreeThreshold"
+        "TestStrInt32MapSourceMap14Assertions",
+        "TestStrInt32MapForeignBorrowAndMutableValues",
+        "TestStrInt32MapIndependentOracleAndBuckets",
+        "TestStrInt32MapCopyOperatorsAndBudget",
+        "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+        "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+        "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+        "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+        "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+        "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
       ],
       "assertions": [
         {
@@ -78592,15 +78586,23 @@
           "text": "ENSURE(str2int.contains(\"foo\"));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "tst1 all14 active CString-to-int ENSURE assertions",
+          "status": "ported",
+          "go_target": "utilhash/str_int32_map_test.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions"
+          ]
+        }
+      ],
       "ownership": [
-        "Concrete scalar u_map<uint32> specialization with budgeted cold header and pointer-free entries. Other key/entry variants and source string map or Windows sentinel set remain unported. See utilhash/PORT_STATUS.md."
+        "Test region owns borrowed source spellings; concrete default-entry map owns only header/table/directory. Fixtures explicitly close both owners."
       ],
       "deviations": [
-        "Checked cold owner/epoch snapshots replace borrowed entry pointers; structural mutation invalidates snapshots.",
-        "Budgeted reset/finalize/cross-owner swap reserve before publication. A failed post-removal tombstone cleanup preserves the completed removal."
+        "Original14 assertions are now represented using actual borrowed CString keys and int32 values rather than the earlier unsigned-key projection. Independent bounded models, lifetime/budget and architecture layout checks supplement them."
       ]
     },
     {
@@ -85818,7 +85820,8 @@
         "utilhash/uint_map.go",
         "bitset/uint_set_map.go",
         "utilhash/str_hashtable.go",
-        "util_symbol_table.go"
+        "util_symbol_table.go",
+        "utilhash/str_int32_map.go"
       ],
       "tests": [
         "TestUintMapSourceMapAssertions",
@@ -85883,7 +85886,17 @@
         "TestSymbolInt32TableSourceCloneScopedHistory",
         "TestSymbolInt32TableSourceAssignDestinationPolicy",
         "TestSymbolInt32TableCopyFailureSweeps",
-        "TestSymbolInt32TableCopyEmptyAndExactPeaks"
+        "TestSymbolInt32TableCopyEmptyAndExactPeaks",
+        "TestStrInt32MapSourceMap14Assertions",
+        "TestStrInt32MapForeignBorrowAndMutableValues",
+        "TestStrInt32MapIndependentOracleAndBuckets",
+        "TestStrInt32MapCopyOperatorsAndBudget",
+        "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+        "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+        "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+        "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+        "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+        "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
       ],
       "conditionals": [
         {
@@ -86337,12 +86350,166 @@
             "TestSymbolInt32TableCopyFailureSweeps",
             "TestSymbolInt32TableCopyEmptyAndExactPeaks"
           ]
+        },
+        {
+          "name": "CString/int32 key_data/default_map_entry constructors/state/hash/data access",
+          "status": "ported",
+          "go_target": "utilhash/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 map constructor/destructor/copy",
+          "status": "ported",
+          "go_target": "utilhash/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 reset/finalize/empty/size/capacity",
+          "status": "ported",
+          "go_target": "utilhash/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 insert/insert-if-absent/find-core/find-output/get/contains",
+          "status": "ported",
+          "go_target": "utilhash/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 reference find/operator[] through checked mutable scalar values",
+          "status": "ported",
+          "go_target": "utilhash/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 begin/end/find_iterator and checked entry access",
+          "status": "ported",
+          "go_target": "utilhash/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 remove/erase",
+          "status": "ported",
+          "go_target": "utilhash/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 cached hash rehash/growth/cleanup",
+          "status": "ported",
+          "go_target": "utilhash/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 implicit assignment/union/intersection/swap/invariant/disabled collision count",
+          "status": "ported",
+          "go_target": "utilhash/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
         }
       ],
       "ownership": [
         "Concrete scalar u_map<uint32> specialization with budgeted cold header and pointer-free entries. Other key/entry variants and source string map or Windows sentinel set remain unported. See utilhash/PORT_STATUS.md.",
         "Scalar owned key refs preserve synthesized capacity-copy assignment and retained FREE/DELETED payloads. Rehash duplicates used keys before old table destruction; Swap moves owners without key-copy actions. See bitset/PORT_STATUS.md.",
-        "StrHashtable borrows immutable region spellings through scalar origin/ref/offset/length records. Table lifecycle never copies/frees spellings; cold owner/table budgets and safe epochs are audited. Multi-origin Assign/Union/Intersect and foreign borrow/query/mutation paths are complete for this specialization; other entry types and optional enabled statistics remain open. See utilhash/PORT_STATUS.md."
+        "StrHashtable borrows immutable region spellings through scalar origin/ref/offset/length records. Table lifecycle never copies/frees spellings; cold owner/table budgets and safe epochs are audited. Multi-origin Assign/Union/Intersect and foreign borrow/query/mutation paths are complete for this specialization; other entry types and optional enabled statistics remain open. See utilhash/PORT_STATUS.md.",
+        "CString/int32 default entries retain complete borrowed key/value data on FREE/DELETED. Fixed40-byte scalar entries, budgeted header/table/directory, borrowed origins and source cached hash/bucket/action order; see utilhash/STR_INT32_MAP_PORT_STATUS.md."
       ],
       "deviations": [
         "Checked cold owner/epoch snapshots replace borrowed entry pointers; structural mutation invalidates snapshots.",
@@ -86350,7 +86517,8 @@
         "Readonly owner/epoch key views replace mutable raw borrows. Predictable replacement failure preserves old contents and adds documented peak storage; partial bulk operations remain source ordered.",
         "C pointers/sentinels become scalar keys and FREE/DELETED/USED states with cold checked entry/iterator wrappers. Owner-local raw region refs must not be reinterpreted across regions; opaque keys diagnose origin mismatch.",
         "Predictable reset/finalize/rehash failures prepare replacements before publication. Epoch exhaustion preflights structural mutation; Close always releases even at max epoch. Preparation rejects exhausted-epoch misses before caller spelling allocation, while existing hits remain valid.",
-        "Secondary region borrows live in a sorted budgeted cold directory, retained through reset until Close. Insert adopts an owner only on new publication or equal-pointer overwrite; queries and absent-insert duplicate hits adopt nothing. Swap transfers table and directory charges atomically without touching region budgets."
+        "Secondary region borrows live in a sorted budgeted cold directory, retained through reset until Close. Insert adopts an owner only on new publication or equal-pointer overwrite; queries and absent-insert duplicate hits adopt nothing. Swap transfers table and directory charges atomically without touching region budgets.",
+        "Explicit scalar padding keeps Go default entries40bytes across architectures. Checked key replacement preserves hash/equality; scalar values remain mutable. Other entry/key/value variants and enabled statistics remain unported."
       ]
     },
     {
@@ -93125,7 +93293,8 @@
       "status": "partial",
       "go_targets": [
         "utilhash/uint_map.go",
-        "bitset/uint_set_map.go"
+        "bitset/uint_set_map.go",
+        "utilhash/str_int32_map.go"
       ],
       "tests": [
         "TestUintMapSourceMapAssertions",
@@ -93153,7 +93322,17 @@
         "TestUintSetMapGrowthTombstonesAndReset",
         "TestUintSetMapCleanupAndOutOfMemory",
         "TestUintSetMapCopyAssignmentShapeAndIterator",
-        "TestUintSetMapRehashFailureAndTemporaryCopies"
+        "TestUintSetMapRehashFailureAndTemporaryCopies",
+        "TestStrInt32MapSourceMap14Assertions",
+        "TestStrInt32MapForeignBorrowAndMutableValues",
+        "TestStrInt32MapIndependentOracleAndBuckets",
+        "TestStrInt32MapCopyOperatorsAndBudget",
+        "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+        "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+        "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+        "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+        "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+        "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
       ],
       "conditionals": [
         {
@@ -93372,16 +93551,171 @@
             "TestUintSetMapCopyAssignmentShapeAndIterator",
             "TestUintSetMapRehashFailureAndTemporaryCopies"
           ]
+        },
+        {
+          "name": "CString/int32 key_data/default_map_entry constructors/state/hash/data access",
+          "status": "ported",
+          "go_target": "utilhash/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 map constructor/destructor/copy",
+          "status": "ported",
+          "go_target": "utilhash/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 reset/finalize/empty/size/capacity",
+          "status": "ported",
+          "go_target": "utilhash/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 insert/insert-if-absent/find-core/find-output/get/contains",
+          "status": "ported",
+          "go_target": "utilhash/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 reference find/operator[] through checked mutable scalar values",
+          "status": "ported",
+          "go_target": "utilhash/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 begin/end/find_iterator and checked entry access",
+          "status": "ported",
+          "go_target": "utilhash/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 remove/erase",
+          "status": "ported",
+          "go_target": "utilhash/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 cached hash rehash/growth/cleanup",
+          "status": "ported",
+          "go_target": "utilhash/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 implicit assignment/union/intersection/swap/invariant/disabled collision count",
+          "status": "ported",
+          "go_target": "utilhash/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
         }
       ],
       "ownership": [
         "Concrete scalar u_map<uint32> specialization with budgeted cold header and pointer-free entries. Other key/entry variants and source string map or Windows sentinel set remain unported. See utilhash/PORT_STATUS.md.",
-        "Scalar owned key refs preserve synthesized capacity-copy assignment and retained FREE/DELETED payloads. Rehash duplicates used keys before old table destruction; Swap moves owners without key-copy actions. See bitset/PORT_STATUS.md."
+        "Scalar owned key refs preserve synthesized capacity-copy assignment and retained FREE/DELETED payloads. Rehash duplicates used keys before old table destruction; Swap moves owners without key-copy actions. See bitset/PORT_STATUS.md.",
+        "CString/int32 default entries retain complete borrowed key/value data on FREE/DELETED. Fixed40-byte scalar entries, budgeted header/table/directory, borrowed origins and source cached hash/bucket/action order; see utilhash/STR_INT32_MAP_PORT_STATUS.md."
       ],
       "deviations": [
         "Checked cold owner/epoch snapshots replace borrowed entry pointers; structural mutation invalidates snapshots.",
         "Budgeted reset/finalize/cross-owner swap reserve before publication. A failed post-removal tombstone cleanup preserves the completed removal.",
-        "Readonly owner/epoch key views replace mutable raw borrows. Predictable replacement failure preserves old contents and adds documented peak storage; partial bulk operations remain source ordered."
+        "Readonly owner/epoch key views replace mutable raw borrows. Predictable replacement failure preserves old contents and adds documented peak storage; partial bulk operations remain source ordered.",
+        "Explicit scalar padding keeps Go default entries40bytes across architectures. Checked key replacement preserves hash/equality; scalar values remain mutable. Other entry/key/value variants and enabled statistics remain unported."
       ]
     },
     {
@@ -102194,9 +102528,10 @@
       "sha256": "e6bbfd47cff10b6def5cc1ab1ea5a4d3a47da70e39a9d51de2f063b59dca22a5",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "utilhash/str_hashtable.go"
+        "utilhash/str_hashtable.go",
+        "utilhash/str_int32_map.go"
       ],
       "tests": [
         "TestStrHashtableSourceHashCStringAndEquality",
@@ -102207,10 +102542,26 @@
         "TestStrHashtableBudgetsSwapAndStaleViews",
         "TestStrHashtableDumpCStringBytes",
         "TestStrHashtableKeyOwnerAndStats",
+        "TestStrHashtableMultiOriginQueriesAndAdoption",
+        "TestStrHashtableMultiOriginOperatorsCloneAndLifetime",
+        "TestStrHashtableMultiOriginFailureOrderAndAccounting",
+        "TestStrHashtableMultiOriginSwapGraphFailures",
+        "TestStrHashtableMultiOriginQueryMethodsAndCollisionOrder",
+        "TestStrHashtableMultiOriginIndependentOracleAndDirectoryPeak",
         "TestStrHashtableCleanupResetAndFailurePeaks",
         "TestStrHashtableSourceInitialCapacity",
         "TestStrHashtablePartialRemovalAndStrictReset",
-        "TestStrHashtableEpochExhaustion"
+        "TestStrHashtableEpochExhaustion",
+        "TestStrInt32MapSourceMap14Assertions",
+        "TestStrInt32MapForeignBorrowAndMutableValues",
+        "TestStrInt32MapIndependentOracleAndBuckets",
+        "TestStrInt32MapCopyOperatorsAndBudget",
+        "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+        "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+        "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+        "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+        "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+        "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
       ],
       "conditionals": [
         {
@@ -102222,11 +102573,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "single-region str_hash_proc/str_eq_proc NUL-prefix source hashing/equality",
+          "name": "str_hash_proc CString strlen/prefix seed17 hash",
           "status": "ported",
           "go_target": "utilhash/str_hashtable.go",
           "tests": [
@@ -102238,6 +102589,12 @@
             "TestStrHashtableBudgetsSwapAndStaleViews",
             "TestStrHashtableDumpCStringBytes",
             "TestStrHashtableKeyOwnerAndStats",
+            "TestStrHashtableMultiOriginQueriesAndAdoption",
+            "TestStrHashtableMultiOriginOperatorsCloneAndLifetime",
+            "TestStrHashtableMultiOriginFailureOrderAndAccounting",
+            "TestStrHashtableMultiOriginSwapGraphFailures",
+            "TestStrHashtableMultiOriginQueryMethodsAndCollisionOrder",
+            "TestStrHashtableMultiOriginIndependentOracleAndDirectoryPeak",
             "TestStrHashtableCleanupResetAndFailurePeaks",
             "TestStrHashtableSourceInitialCapacity",
             "TestStrHashtablePartialRemovalAndStrictReset",
@@ -102245,7 +102602,7 @@
           ]
         },
         {
-          "name": "single-region borrowed string insertion/find/remove/rehash/reset/finalize/clone/cached entry replacement",
+          "name": "str_eq_proc strcmp equality",
           "status": "ported",
           "go_target": "utilhash/str_hashtable.go",
           "tests": [
@@ -102257,6 +102614,12 @@
             "TestStrHashtableBudgetsSwapAndStaleViews",
             "TestStrHashtableDumpCStringBytes",
             "TestStrHashtableKeyOwnerAndStats",
+            "TestStrHashtableMultiOriginQueriesAndAdoption",
+            "TestStrHashtableMultiOriginOperatorsCloneAndLifetime",
+            "TestStrHashtableMultiOriginFailureOrderAndAccounting",
+            "TestStrHashtableMultiOriginSwapGraphFailures",
+            "TestStrHashtableMultiOriginQueryMethodsAndCollisionOrder",
+            "TestStrHashtableMultiOriginIndependentOracleAndDirectoryPeak",
             "TestStrHashtableCleanupResetAndFailurePeaks",
             "TestStrHashtableSourceInitialCapacity",
             "TestStrHashtablePartialRemovalAndStrictReset",
@@ -102264,7 +102627,7 @@
           ]
         },
         {
-          "name": "single-region borrowed table assignment/union/intersection",
+          "name": "str_hashtable concrete char-pointer alias methods/ownership/copy/operators",
           "status": "ported",
           "go_target": "utilhash/str_hashtable.go",
           "tests": [
@@ -102276,44 +102639,12 @@
             "TestStrHashtableBudgetsSwapAndStaleViews",
             "TestStrHashtableDumpCStringBytes",
             "TestStrHashtableKeyOwnerAndStats",
-            "TestStrHashtableCleanupResetAndFailurePeaks",
-            "TestStrHashtableSourceInitialCapacity",
-            "TestStrHashtablePartialRemovalAndStrictReset",
-            "TestStrHashtableEpochExhaustion"
-          ]
-        },
-        {
-          "name": "cross-region borrowed binding swap with atomic table budget transfer",
-          "status": "ported",
-          "go_target": "utilhash/str_hashtable.go",
-          "tests": [
-            "TestStrHashtableSourceHashCStringAndEquality",
-            "TestStrHashtableBorrowedLifetimeAndReplacement",
-            "TestStrHashtableSourceProbeThresholdAndTombstones",
-            "TestStrHashtableOperationsAndOutput",
-            "TestStrHashtableIndependentOracleAndCStringLookup",
-            "TestStrHashtableBudgetsSwapAndStaleViews",
-            "TestStrHashtableDumpCStringBytes",
-            "TestStrHashtableKeyOwnerAndStats",
-            "TestStrHashtableCleanupResetAndFailurePeaks",
-            "TestStrHashtableSourceInitialCapacity",
-            "TestStrHashtablePartialRemovalAndStrictReset",
-            "TestStrHashtableEpochExhaustion"
-          ]
-        },
-        {
-          "name": "source bucket-order string dump/iterator and disabled-statistics collision count",
-          "status": "ported",
-          "go_target": "utilhash/str_hashtable.go",
-          "tests": [
-            "TestStrHashtableSourceHashCStringAndEquality",
-            "TestStrHashtableBorrowedLifetimeAndReplacement",
-            "TestStrHashtableSourceProbeThresholdAndTombstones",
-            "TestStrHashtableOperationsAndOutput",
-            "TestStrHashtableIndependentOracleAndCStringLookup",
-            "TestStrHashtableBudgetsSwapAndStaleViews",
-            "TestStrHashtableDumpCStringBytes",
-            "TestStrHashtableKeyOwnerAndStats",
+            "TestStrHashtableMultiOriginQueriesAndAdoption",
+            "TestStrHashtableMultiOriginOperatorsCloneAndLifetime",
+            "TestStrHashtableMultiOriginFailureOrderAndAccounting",
+            "TestStrHashtableMultiOriginSwapGraphFailures",
+            "TestStrHashtableMultiOriginQueryMethodsAndCollisionOrder",
+            "TestStrHashtableMultiOriginIndependentOracleAndDirectoryPeak",
             "TestStrHashtableCleanupResetAndFailurePeaks",
             "TestStrHashtableSourceInitialCapacity",
             "TestStrHashtablePartialRemovalAndStrictReset",
@@ -102322,11 +102653,10 @@
         }
       ],
       "ownership": [
-        "StrHashtable borrows immutable region spellings through scalar origin/ref/offset/length records. Table lifecycle never copies/frees spellings; cold owner/table budgets and safe epochs are audited. Full multi-origin Assign/Union/Intersect/general pointer borrowing remain unported. See utilhash/PORT_STATUS.md."
+        "CString spellings are borrowed across explicit byte-region origins. Hot keys are scalar; cold sorted owner bindings and table/header capacities are budgeted. All normal concrete char-pointer table methods are represented, including multi-origin bulk operations. See utilhash/PORT_STATUS.md."
       ],
       "deviations": [
-        "C pointers/sentinels become scalar keys and FREE/DELETED/USED states with cold checked entry/iterator wrappers. Owner-local raw region refs must not be reinterpreted across regions; opaque keys diagnose origin mismatch.",
-        "Predictable reset/finalize/rehash failures prepare replacements before publication. Epoch exhaustion preflights structural mutation; Close always releases even at max epoch. Preparation rejects exhausted-epoch misses before caller spelling allocation, while existing hits remain valid."
+        "Raw C-pointer/sentinel mechanics become scalar origin/ref/offset/length and checked epochs. Equality-preserving entry key replacement guards hash invariants; multi-origin binding directory is retained through Reset until Close. Other generic core specializations and optional enabled statistics remain open in hashtable.h."
       ]
     },
     {

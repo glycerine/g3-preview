@@ -360,3 +360,20 @@ Four new tests went RED before implementation; all19 scoped-table tests pass
 with source bucket/capacity models, scope undo, exact peaks and failure prefixes.
 Isolated full native/checked/actual checked JS modules, race, vet, WASI compilation
 and source/no-generics audit pass. Other symbol payloads and full solver remain open.
+
+## Actual borrowed CString-to-int32 source map
+
+StrInt32Map now translates all14 source map.cpp assertions with actual CString
+keys and signed int32 values. Default entries retain complete dead/free payloads;
+source cached hashing, last tombstones, growth-before-duplicate, copy/reset/finalize
+and bulk action order remain intact. Multi-origin borrows use fully budgeted cold
+bindings, while values are mutable through checked entry references.
+
+Tests first reached missing-API RED, then GREEN. Central architecture review
+exposed a36-versus40-byte record mismatch on386; its RED test drove explicit
+scalar padding, now audited on386/ARM/AMD64/ARM64/WASM. All10 tests pass, including
+bounded independent models, lifetime, partial action failures, graph peaks and
+warm allocations. Isolated full native/actual checked JS modules, checked native,
+vet, WASI build and no-generics audit pass. Source map test and the concrete
+string-functor/table-alias header are complete; generic map/core variants and all
+AST/solver/proof/interpolation milestones remain open.
