@@ -47,3 +47,22 @@ null callbacks become no-ops, nonempty self-append rejects unbounded source
 growth, and capacity preflight avoids leaked increments. BV source debug
 short-circuit temporaries and inline16/doubling temporary storage are preserved.
 See SEXPR_PORT_STATUS.md for detailed lifetimes, guards and source mappings.
+
+
+### Concrete string-buffer ownership and numeric boundaries
+
+StringBuffer32/64/128 embed physically charged inline arrays and charge doubled
+overflow with old/new overlap. Scalar reads and caller-owned CStr text replace raw
+borrows; CStr still writes its terminator and grows at the exact source boundary.
+Bulk append preserves successful capacity prefixes before copying bytes or
+publishing position, and cross-buffer insertion completes source CStr first.
+The heap self-append path that would use freed source storage gets a typed guard;
+valid inline and full-heap paths retain source actions. Cold locking and owner
+identity checks are explicit Go lifetime adapters.
+
+Source sprintf("%d", unsigned) has a high-bit type-mismatch undefined domain.
+The approved adapter interprets uint32 bits as signed32, preserving observed
+AMD64 outputs; this is not claimed as portable C semantics. Stack24-byte numeric
+conversion avoids invented formatter allocations. LongBits32 rejects values
+outside source signed32 range. Arbitrary initial sizes and Windows secure-CRT
+runtime/error profiles remain open. See STRING_BUFFER_PORT_STATUS.md.

@@ -82679,9 +82679,13 @@
       "sha256": "e86a4980e1f170e7572fd29b89c820acb72f859bb3b3188a78b49654c0b43b40",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "util_string_buffer.go"
+      ],
+      "tests": [
+        "TestStringBufferSourceThreeAssertions"
+      ],
       "assertions": [
         {
           "line": 27,
@@ -82696,11 +82700,40 @@
           "text": "ENSURE(strcmp(b.c_str(), \"Hello World\") == 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "tst1 Testing10true ENSURE at line27",
+          "status": "ported",
+          "go_target": "util_string_buffer.go",
+          "tests": [
+            "TestStringBufferSourceThreeAssertions"
+          ]
+        },
+        {
+          "name": "tst2 length10000 ENSURE at line37",
+          "status": "ported",
+          "go_target": "util_string_buffer.go",
+          "tests": [
+            "TestStringBufferSourceThreeAssertions"
+          ]
+        },
+        {
+          "name": "tst3 32<-128 Hello World ENSURE at line45 and registered tst_string_buffer",
+          "status": "ported",
+          "go_target": "util_string_buffer.go",
+          "tests": [
+            "TestStringBufferSourceThreeAssertions"
+          ]
+        }
+      ],
+      "ownership": [
+        "Source local32/64/128 buffer lifetimes use concrete owners and deterministic Close; caller-owned CStr results are checked without reference-source runtime dependency."
+      ],
+      "deviations": [
+        "Finite LCG digits replace nondeterministic rand; the source assertion checks length only. TRACE text is diagnostic and does not add a fourth assertion."
+      ]
     },
     {
       "path": "src/test/substitution.cpp",
@@ -106743,9 +106776,22 @@
       "sha256": "dac7740d1679a51d8fce15a622850a42ef8fae82f4e80625fec02be2613d3b5b",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_string_buffer.go"
+      ],
+      "tests": [
+        "TestStringBufferSourceThreeAssertions",
+        "TestStringBufferInlineTerminatorResetAndBytes",
+        "TestStringBufferNumericUnsignedAdapterAndLongDomains",
+        "TestStringBufferFailureCapacityPrefixesAndImmediateBudgets",
+        "TestStringBufferNineRoutesSourceCStrFirstAndSelfCases",
+        "TestStringBufferSymbolBulkAndNumericPrefixFailure",
+        "TestStringBufferIndependentByteModelAndWarmAllocations",
+        "TestStringBufferPhysicalInlineOwnerChargesAndExactPeak",
+        "TestStringBufferSourceFailureBeforeDestAndReturnedTextLifetime",
+        "TestStringBufferOwnerConfigurationAndSymbolGuards"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -106792,11 +106838,89 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "INITIAL_SIZE32/64/128 fields, constructor, destructor and expand (lines31-58)",
+          "status": "ported",
+          "go_target": "util_string_buffer.go",
+          "tests": [
+            "TestStringBufferInlineTerminatorResetAndBytes",
+            "TestStringBufferFailureCapacityPrefixesAndImmediateBudgets",
+            "TestStringBufferPhysicalInlineOwnerChargesAndExactPeak",
+            "TestStringBufferOwnerConfigurationAndSymbolGuards"
+          ]
+        },
+        {
+          "name": "reset, char and CString append (lines60-80)",
+          "status": "ported",
+          "go_target": "util_string_buffer.go",
+          "tests": [
+            "TestStringBufferSourceThreeAssertions",
+            "TestStringBufferInlineTerminatorResetAndBytes",
+            "TestStringBufferFailureCapacityPrefixesAndImmediateBudgets",
+            "TestStringBufferIndependentByteModelAndWarmAllocations",
+            "TestStringBufferSourceFailureBeforeDestAndReturnedTextLifetime"
+          ]
+        },
+        {
+          "name": "int, unsigned, long and bool append (lines82-119)",
+          "status": "ported",
+          "go_target": "util_string_buffer.go",
+          "tests": [
+            "TestStringBufferSourceThreeAssertions",
+            "TestStringBufferNumericUnsignedAdapterAndLongDomains",
+            "TestStringBufferIndependentByteModelAndWarmAllocations"
+          ]
+        },
+        {
+          "name": "size, empty and mutating c_str (lines121-135)",
+          "status": "ported",
+          "go_target": "util_string_buffer.go",
+          "tests": [
+            "TestStringBufferInlineTerminatorResetAndBytes",
+            "TestStringBufferFailureCapacityPrefixesAndImmediateBudgets",
+            "TestStringBufferSourceFailureBeforeDestAndReturnedTextLifetime"
+          ]
+        },
+        {
+          "name": "six scalar insertion operators (lines139-173)",
+          "status": "ported",
+          "go_target": "util_string_buffer.go",
+          "tests": [
+            "TestStringBufferSourceThreeAssertions",
+            "TestStringBufferNumericUnsignedAdapterAndLongDomains",
+            "TestStringBufferIndependentByteModelAndWarmAllocations"
+          ]
+        },
+        {
+          "name": "nine concrete cross-buffer insertion routes (lines175-179)",
+          "status": "ported",
+          "go_target": "util_string_buffer.go",
+          "tests": [
+            "TestStringBufferSourceThreeAssertions",
+            "TestStringBufferNineRoutesSourceCStrFirstAndSelfCases",
+            "TestStringBufferSourceFailureBeforeDestAndReturnedTextLifetime"
+          ]
+        },
+        {
+          "name": "other INITIAL_SIZE template instantiations",
+          "status": "unported"
+        },
+        {
+          "name": "Windows secure-CRT sprintf_s runtime error/profile semantics",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Concrete cold owner physically embeds32/64/128 pointer-free inline bytes and charges the complete reflect-size once. Overflow bytes reserve full new doubled capacity while old capacity remains charged, then copy pos bytes and release old heap. Reset retains capacity; Close releases overflow and header. CStr exposes only one caller-owned immutable copy; no backing slice escapes. Bulk growth publishes successful capacity prefixes before copy/pos publication. See STRING_BUFFER_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Finite concrete sizes cover every actual fork instantiation; arbitrary template sizes remain open. No Go generics or implicit shallow ownership copy are exported.",
+        "Source unsigned sprintf(%d,unsigned) high-bit mismatch is an explicit observed AMD64 signed32-bit adaptation, not portable defined C semantics. LongBits32 rejects out-of-domain values; Windows secure-CRT error state is not claimed.",
+        "Typed bounds/owner/closed guards replace invalid arithmetic or pointer access. Nonfull heap self append that would free its source pointer is rejected before mutation; valid inline/full-heap self paths preserve source CStr-first actions. Cold locking is a Go synchronization adapter."
+      ]
     },
     {
       "path": "src/util/symbol.cpp",
@@ -106962,9 +107086,10 @@
       "sha256": "60ce765fb3b761ec178ceec7db59f7ddbce00dd0fad5148f6a8ec234f62b4fbf",
       "component": "util",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
-        "util_symbol.go"
+        "util_symbol.go",
+        "util_string_buffer.go"
       ],
       "tests": [
         "TestSymbolSourceAssertions",
@@ -106972,7 +107097,9 @@
         "TestSymbolOwnerFailureLifetimeAndWarmIntern",
         "TestSymbolConcurrentInternIdentity",
         "TestSymbolIndependentBytesAndPrefixOrder",
-        "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
+        "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens",
+        "TestStringBufferSymbolBulkAndNumericPrefixFailure",
+        "TestStringBufferOwnerConfigurationAndSymbolGuards"
       ],
       "conditionals": [
         {
@@ -107078,7 +107205,7 @@
           ]
         },
         {
-          "name": "str/ostream/string_buffer/bare_str nullable rendering",
+          "name": "str/ostream/bare_str nullable rendering",
           "status": "ported",
           "go_target": "util_symbol.go",
           "tests": [
@@ -107115,15 +107242,30 @@
             "TestSymbolIndependentBytesAndPrefixOrder",
             "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
           ]
+        },
+        {
+          "name": "string_buffer32/64/128 symbol insertion (lines113-129): plain/null bulk, numerical k! then signed UNBOXINT",
+          "status": "ported",
+          "go_target": "util_string_buffer.go",
+          "tests": [
+            "TestStringBufferSymbolBulkAndNumericPrefixFailure",
+            "TestStringBufferOwnerConfigurationAndSymbolGuards"
+          ]
+        },
+        {
+          "name": "string_buffer symbol insertion for other INITIAL_SIZE template instantiations",
+          "status": "unported"
         }
       ],
       "ownership": [
-        "Explicit owner-local SymbolManager (GO_PORT_PLAN.md B storage ownership) replaces mutable global cache. Manager owns region+table, strings live until Close, hot Symbol records contain only scalar origin/ref/generation/tag. Other managers are separate identity domains. Full nested cold/payload budget graph and mutex-protected canonical interning are audited. See SYMBOL_PORT_STATUS.md."
+        "Explicit owner-local SymbolManager (GO_PORT_PLAN.md B storage ownership) replaces mutable global cache. Manager owns region+table, strings live until Close, hot Symbol records contain only scalar origin/ref/generation/tag. Other managers are separate identity domains. Full nested cold/payload budget graph and mutex-protected canonical interning are audited. See SYMBOL_PORT_STATUS.md.",
+        "Selected buffer insertion borrows SymbolManager only during the call, reads checked spelling bytes directly, and charges destination growth without intermediate Symbol.String text. See STRING_BUFFER_PORT_STATUS.md."
       ],
       "deviations": [
         "Native tagged pointers become explicit scalar tags/refs and owner-bound opaque tokens; callers cannot reinterpret a foreign symbol or raw address. Source full uint32 AMD64 numerical baseline remains valid on every Go target, independently of configurable4/8 byte page geometry.",
         "Interner prepares source growth/probe, fills owned hash-prefix/spelling/NUL, then publishes; predictable failure never retains a caller query pointer. Earlier prepared storage may remain charged. Returned text is caller-owned, not temporarily budget-reserved.",
-        "Source null/marked/numeric-invalid data operations return typed precondition errors instead of invalid dereferences; identical marked/dummy Less still returnsfalse before dereference as source."
+        "Source null/marked/numeric-invalid data operations return typed precondition errors instead of invalid dereferences; identical marked/dummy Less still returnsfalse before dereference as source.",
+        "Selected numerical buffer insertion preserves source k! publication before signed integer suffix; other INITIAL_SIZE template insertion specializations remain open."
       ]
     },
     {

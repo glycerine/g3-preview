@@ -660,3 +660,16 @@ inline16/doubling digit buffer. Allocation sweeps audit roots before cleanup,
 and whole owner graphs and overlap peaks are charged. Five relevant escaped
 print inputs are covered without inventing source assertions; other escaped
 branches and non-sexpr wrapper specializations remain open. See SEXPR_PORT_STATUS.md.
+
+
+## Concrete string buffers
+
+All actual fork string_buffer sizes32/64/128 now have concrete owners and complete
+selected methods, including mutating CStr, nine cross-buffer routes and direct
+symbol insertion. Ten test groups began missing-API RED and port the three active
+source ENSURE assertions, plus independent byte models, lifetime guards, immediate
+failure-prefix roots and exact inline/overflow overlap budgets. Full native and
+checked/debug suites, targeted checked/debug race and actual JS, vet, WASI and
+no-generics/source audits passed. See STRING_BUFFER_PORT_STATUS.md. Arbitrary
+INITIAL_SIZE instantiations and Windows secure-CRT runtime profile remain open;
+string_buffer.h and the generic symbol insertion header remain partial.
