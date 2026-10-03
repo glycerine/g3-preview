@@ -560,3 +560,13 @@ extended-GCD diagnostics; AST parameters and ownership consumers remain open.
 Final source inventory:2102 units,677 APIs;21 ported,40 partial,2041 unported.
 The active rational.cpp service algorithms/hooks and both infinitesimal units
 are complete; rational.h and the full solver scope remain incomplete.
+
+## Parameter-name normalization
+
+Both source norm_param_name overloads now preserve nullable CString, single-colon,
+ASCII-only rewriting and exact non-ASCII bytes. Four tests began missing-API RED;
+byte fixtures caught and drove correction of a Go UTF-8 range iteration defect.
+Symbol normalization reads existing bytes without interning/intermediate strings,
+and produces one independent caller output with unchanged owner budget/storage.
+See PARAM_NAME_PORT_STATUS.md. Parameter descriptors and params_ref are separate
+active work; neither is claimed complete by normalization.

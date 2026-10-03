@@ -101708,9 +101708,16 @@
       "sha256": "adfec5df1efec4cd4d08844d06463b58096d1c91e0374e7e432a5f1d9bb70dd9",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_param_name.go"
+      ],
+      "tests": [
+        "TestParamNameNormalizationSourceBranches",
+        "TestParamNameNormalizationByteDomain",
+        "TestParamNameSymbolOwnershipAndSourceRoutes",
+        "TestParamNameSymbolSingleOutputAllocation"
+      ],
       "conditionals": [
         {
           "line": 1038,
@@ -101749,18 +101756,41 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "norm_param_name complete nullable C-string and symbol overloads",
+          "status": "ported",
+          "go_target": "util_param_name.go",
+          "tests": [
+            "TestParamNameNormalizationSourceBranches",
+            "TestParamNameNormalizationByteDomain",
+            "TestParamNameSymbolOwnershipAndSourceRoutes",
+            "TestParamNameSymbolSingleOutputAllocation"
+          ]
+        }
+      ],
+      "ownership": [
+        "Normalization reads borrowed symbol region under owner lock and produces one caller-owned output string without interning, retained workspace or intermediate symbol spelling. See PARAM_NAME_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "CString NUL/nullable boundary explicit; numerical/marked/foreign/closed symbols rejected as typed checked precondition/lifetime errors. Remaining descriptor and params_ref methods not claimed by normalizer packet."
+      ]
     },
     {
       "path": "src/util/params.h",
       "sha256": "50738b66c08a5d24f818eedf5fa4bafdaec8593b41408ae1173c78adc762c6fb",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_param_name.go"
+      ],
+      "tests": [
+        "TestParamNameNormalizationSourceBranches",
+        "TestParamNameNormalizationByteDomain",
+        "TestParamNameSymbolOwnershipAndSourceRoutes",
+        "TestParamNameSymbolSingleOutputAllocation"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -101773,9 +101803,25 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "norm_param_name complete nullable C-string and symbol overloads",
+          "status": "ported",
+          "go_target": "util_param_name.go",
+          "tests": [
+            "TestParamNameNormalizationSourceBranches",
+            "TestParamNameNormalizationByteDomain",
+            "TestParamNameSymbolOwnershipAndSourceRoutes",
+            "TestParamNameSymbolSingleOutputAllocation"
+          ]
+        }
+      ],
+      "ownership": [
+        "Normalization reads borrowed symbol region under owner lock and produces one caller-owned output string without interning, retained workspace or intermediate symbol spelling. See PARAM_NAME_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "CString NUL/nullable boundary explicit; numerical/marked/foreign/closed symbols rejected as typed checked precondition/lifetime errors. Remaining descriptor and params_ref methods not claimed by normalizer packet."
+      ]
     },
     {
       "path": "src/util/parray.h",
