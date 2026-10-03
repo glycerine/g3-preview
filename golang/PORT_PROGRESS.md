@@ -794,3 +794,15 @@ checks passed. Generic closed/other numerical configurations, field-only inverse
 and division, persistent ostream and real polynomial/algebraic consumers remain
 open. Three source units are partial; full solver scope is unchanged. See
 MPBQI_PORT_STATUS.md.
+
+## Concrete statistics and resource-limit collection
+
+Statistics now retains raw uint/double contributions, borrowed key identities,
+source vector/copy/move actions, real aggregation maps and source display quirks.
+Nineteen groups began missing-API RED; review-driven RED corrected host-byte
+binding limits and raw copying of closed borrowed key owners. Independent frozen
+full native/checked-debug, nineteen named race/actual JS, vet/WASI checks passed.
+The internal source loop never advances a nonempty key: its explicit typed guard
+preserves prior empty-key output. Real reslimit thresholds are implemented;
+process memory services and solver/API/timer producers remain open. Statistics
+source units remain partial. See STATISTICS_PORT_STATUS.md.
