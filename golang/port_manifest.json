@@ -76893,9 +76893,28 @@
       "sha256": "440fb4ea305c30f1a264e13f58ca71a03f757c8737aecb8d9622a51ec980a035",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "utilhash/uint_map.go"
+      ],
+      "tests": [
+        "TestUintMapSourceMapAssertions",
+        "TestUintMapLastTombstoneAndWrap",
+        "TestUintMapStrictGrowthAndInsertIfAbsent",
+        "TestUintMapCleanupThresholdAndOutOfMemory",
+        "TestUintMapResetFinalizeAndClone",
+        "TestUintMapMethodsRefsAndIterators",
+        "TestUintMapAssignUnionIntersectionSwap",
+        "TestUintMapIndependentBoundedOracle",
+        "TestUintMapBudgetFailureAndPeakAccounting",
+        "TestUintMapCleanupFailurePreservesCompletedRemoval",
+        "TestUintMapSparseResetAndFinalizeFailureAtomic",
+        "TestUintMapSwapDifferentBudgetsAndRefs",
+        "TestUintMapWarmScalarOperationsNoAllocation",
+        "TestUintMapWindowsSourceMembershipAssertions",
+        "TestUintMapStrictDeletedVersusSizeThreshold",
+        "TestUintMapStrictResetFreeThreshold"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -76983,8 +77002,13 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership": [
+        "Concrete scalar u_map<uint32> specialization with budgeted cold header and pointer-free entries. Other key/entry variants and source string map or Windows sentinel set remain unported. See utilhash/PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Checked cold owner/epoch snapshots replace borrowed entry pointers; structural mutation invalidates snapshots.",
+        "Budgeted reset/finalize/cross-owner swap reserve before publication. A failed post-removal tombstone cleanup preserves the completed removal."
+      ]
     },
     {
       "path": "src/test/heap.cpp",
@@ -78439,9 +78463,28 @@
       "sha256": "665202d938921c91cbc3efdd54d8bb55554d2d3d3d72da62908c3a316b7cd621",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "utilhash/uint_map.go"
+      ],
+      "tests": [
+        "TestUintMapSourceMapAssertions",
+        "TestUintMapLastTombstoneAndWrap",
+        "TestUintMapStrictGrowthAndInsertIfAbsent",
+        "TestUintMapCleanupThresholdAndOutOfMemory",
+        "TestUintMapResetFinalizeAndClone",
+        "TestUintMapMethodsRefsAndIterators",
+        "TestUintMapAssignUnionIntersectionSwap",
+        "TestUintMapIndependentBoundedOracle",
+        "TestUintMapBudgetFailureAndPeakAccounting",
+        "TestUintMapCleanupFailurePreservesCompletedRemoval",
+        "TestUintMapSparseResetAndFinalizeFailureAtomic",
+        "TestUintMapSwapDifferentBudgetsAndRefs",
+        "TestUintMapWarmScalarOperationsNoAllocation",
+        "TestUintMapWindowsSourceMembershipAssertions",
+        "TestUintMapStrictDeletedVersusSizeThreshold",
+        "TestUintMapStrictResetFreeThreshold"
+      ],
       "assertions": [
         {
           "line": 25,
@@ -78503,8 +78546,13 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership": [
+        "Concrete scalar u_map<uint32> specialization with budgeted cold header and pointer-free entries. Other key/entry variants and source string map or Windows sentinel set remain unported. See utilhash/PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Checked cold owner/epoch snapshots replace borrowed entry pointers; structural mutation invalidates snapshots.",
+        "Budgeted reset/finalize/cross-owner swap reserve before publication. A failed post-removal tombstone cleanup preserves the completed removal."
+      ]
     },
     {
       "path": "src/test/matcher.cpp",
@@ -85447,9 +85495,28 @@
       "sha256": "bdc562a7db2c0d914dd896577c43e0648f501538873460d2e1a6c2d0932f64f2",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "utilhash/uint_map.go"
+      ],
+      "tests": [
+        "TestUintMapSourceMapAssertions",
+        "TestUintMapLastTombstoneAndWrap",
+        "TestUintMapStrictGrowthAndInsertIfAbsent",
+        "TestUintMapCleanupThresholdAndOutOfMemory",
+        "TestUintMapResetFinalizeAndClone",
+        "TestUintMapMethodsRefsAndIterators",
+        "TestUintMapAssignUnionIntersectionSwap",
+        "TestUintMapIndependentBoundedOracle",
+        "TestUintMapBudgetFailureAndPeakAccounting",
+        "TestUintMapCleanupFailurePreservesCompletedRemoval",
+        "TestUintMapSparseResetAndFinalizeFailureAtomic",
+        "TestUintMapSwapDifferentBudgetsAndRefs",
+        "TestUintMapWarmScalarOperationsNoAllocation",
+        "TestUintMapWindowsSourceMembershipAssertions",
+        "TestUintMapStrictDeletedVersusSizeThreshold",
+        "TestUintMapStrictResetFreeThreshold"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -85568,9 +85635,130 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "u_map<uint32> construction/copy/destruction",
+          "status": "ported",
+          "go_target": "utilhash/uint_map.go",
+          "tests": [
+            "TestUintMapSourceMapAssertions",
+            "TestUintMapLastTombstoneAndWrap",
+            "TestUintMapStrictGrowthAndInsertIfAbsent",
+            "TestUintMapCleanupThresholdAndOutOfMemory",
+            "TestUintMapResetFinalizeAndClone",
+            "TestUintMapMethodsRefsAndIterators",
+            "TestUintMapAssignUnionIntersectionSwap",
+            "TestUintMapIndependentBoundedOracle",
+            "TestUintMapBudgetFailureAndPeakAccounting",
+            "TestUintMapCleanupFailurePreservesCompletedRemoval",
+            "TestUintMapSparseResetAndFinalizeFailureAtomic",
+            "TestUintMapSwapDifferentBudgetsAndRefs",
+            "TestUintMapWarmScalarOperationsNoAllocation",
+            "TestUintMapWindowsSourceMembershipAssertions",
+            "TestUintMapStrictDeletedVersusSizeThreshold",
+            "TestUintMapStrictResetFreeThreshold"
+          ]
+        },
+        {
+          "name": "u_map<uint32> growth/rehash/reset/finalize",
+          "status": "ported",
+          "go_target": "utilhash/uint_map.go",
+          "tests": [
+            "TestUintMapSourceMapAssertions",
+            "TestUintMapLastTombstoneAndWrap",
+            "TestUintMapStrictGrowthAndInsertIfAbsent",
+            "TestUintMapCleanupThresholdAndOutOfMemory",
+            "TestUintMapResetFinalizeAndClone",
+            "TestUintMapMethodsRefsAndIterators",
+            "TestUintMapAssignUnionIntersectionSwap",
+            "TestUintMapIndependentBoundedOracle",
+            "TestUintMapBudgetFailureAndPeakAccounting",
+            "TestUintMapCleanupFailurePreservesCompletedRemoval",
+            "TestUintMapSparseResetAndFinalizeFailureAtomic",
+            "TestUintMapSwapDifferentBudgetsAndRefs",
+            "TestUintMapWarmScalarOperationsNoAllocation",
+            "TestUintMapWindowsSourceMembershipAssertions",
+            "TestUintMapStrictDeletedVersusSizeThreshold",
+            "TestUintMapStrictResetFreeThreshold"
+          ]
+        },
+        {
+          "name": "u_map<uint32> insert/insert-if-absent/find/get/contains",
+          "status": "ported",
+          "go_target": "utilhash/uint_map.go",
+          "tests": [
+            "TestUintMapSourceMapAssertions",
+            "TestUintMapLastTombstoneAndWrap",
+            "TestUintMapStrictGrowthAndInsertIfAbsent",
+            "TestUintMapCleanupThresholdAndOutOfMemory",
+            "TestUintMapResetFinalizeAndClone",
+            "TestUintMapMethodsRefsAndIterators",
+            "TestUintMapAssignUnionIntersectionSwap",
+            "TestUintMapIndependentBoundedOracle",
+            "TestUintMapBudgetFailureAndPeakAccounting",
+            "TestUintMapCleanupFailurePreservesCompletedRemoval",
+            "TestUintMapSparseResetAndFinalizeFailureAtomic",
+            "TestUintMapSwapDifferentBudgetsAndRefs",
+            "TestUintMapWarmScalarOperationsNoAllocation",
+            "TestUintMapWindowsSourceMembershipAssertions",
+            "TestUintMapStrictDeletedVersusSizeThreshold",
+            "TestUintMapStrictResetFreeThreshold"
+          ]
+        },
+        {
+          "name": "u_map<uint32> remove/erase/iteration/entry value reference",
+          "status": "ported",
+          "go_target": "utilhash/uint_map.go",
+          "tests": [
+            "TestUintMapSourceMapAssertions",
+            "TestUintMapLastTombstoneAndWrap",
+            "TestUintMapStrictGrowthAndInsertIfAbsent",
+            "TestUintMapCleanupThresholdAndOutOfMemory",
+            "TestUintMapResetFinalizeAndClone",
+            "TestUintMapMethodsRefsAndIterators",
+            "TestUintMapAssignUnionIntersectionSwap",
+            "TestUintMapIndependentBoundedOracle",
+            "TestUintMapBudgetFailureAndPeakAccounting",
+            "TestUintMapCleanupFailurePreservesCompletedRemoval",
+            "TestUintMapSparseResetAndFinalizeFailureAtomic",
+            "TestUintMapSwapDifferentBudgetsAndRefs",
+            "TestUintMapWarmScalarOperationsNoAllocation",
+            "TestUintMapWindowsSourceMembershipAssertions",
+            "TestUintMapStrictDeletedVersusSizeThreshold",
+            "TestUintMapStrictResetFreeThreshold"
+          ]
+        },
+        {
+          "name": "u_map<uint32> assignment/union/intersection/swap/invariant/statistics",
+          "status": "ported",
+          "go_target": "utilhash/uint_map.go",
+          "tests": [
+            "TestUintMapSourceMapAssertions",
+            "TestUintMapLastTombstoneAndWrap",
+            "TestUintMapStrictGrowthAndInsertIfAbsent",
+            "TestUintMapCleanupThresholdAndOutOfMemory",
+            "TestUintMapResetFinalizeAndClone",
+            "TestUintMapMethodsRefsAndIterators",
+            "TestUintMapAssignUnionIntersectionSwap",
+            "TestUintMapIndependentBoundedOracle",
+            "TestUintMapBudgetFailureAndPeakAccounting",
+            "TestUintMapCleanupFailurePreservesCompletedRemoval",
+            "TestUintMapSparseResetAndFinalizeFailureAtomic",
+            "TestUintMapSwapDifferentBudgetsAndRefs",
+            "TestUintMapWarmScalarOperationsNoAllocation",
+            "TestUintMapWindowsSourceMembershipAssertions",
+            "TestUintMapStrictDeletedVersusSizeThreshold",
+            "TestUintMapStrictResetFreeThreshold"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete scalar u_map<uint32> specialization with budgeted cold header and pointer-free entries. Other key/entry variants and source string map or Windows sentinel set remain unported. See utilhash/PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Checked cold owner/epoch snapshots replace borrowed entry pointers; structural mutation invalidates snapshots.",
+        "Budgeted reset/finalize/cross-owner swap reserve before publication. A failed post-removal tombstone cleanup preserves the completed removal."
+      ]
     },
     {
       "path": "src/util/heap.h",
@@ -92162,9 +92350,28 @@
       "sha256": "62db3b3819aa71f67bababdb3d5583d14fecebbde6f2d22866c28a86215aa850",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "utilhash/uint_map.go"
+      ],
+      "tests": [
+        "TestUintMapSourceMapAssertions",
+        "TestUintMapLastTombstoneAndWrap",
+        "TestUintMapStrictGrowthAndInsertIfAbsent",
+        "TestUintMapCleanupThresholdAndOutOfMemory",
+        "TestUintMapResetFinalizeAndClone",
+        "TestUintMapMethodsRefsAndIterators",
+        "TestUintMapAssignUnionIntersectionSwap",
+        "TestUintMapIndependentBoundedOracle",
+        "TestUintMapBudgetFailureAndPeakAccounting",
+        "TestUintMapCleanupFailurePreservesCompletedRemoval",
+        "TestUintMapSparseResetAndFinalizeFailureAtomic",
+        "TestUintMapSwapDifferentBudgetsAndRefs",
+        "TestUintMapWarmScalarOperationsNoAllocation",
+        "TestUintMapWindowsSourceMembershipAssertions",
+        "TestUintMapStrictDeletedVersusSizeThreshold",
+        "TestUintMapStrictResetFreeThreshold"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -92199,9 +92406,130 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "u_map<uint32> construction/copy/destruction",
+          "status": "ported",
+          "go_target": "utilhash/uint_map.go",
+          "tests": [
+            "TestUintMapSourceMapAssertions",
+            "TestUintMapLastTombstoneAndWrap",
+            "TestUintMapStrictGrowthAndInsertIfAbsent",
+            "TestUintMapCleanupThresholdAndOutOfMemory",
+            "TestUintMapResetFinalizeAndClone",
+            "TestUintMapMethodsRefsAndIterators",
+            "TestUintMapAssignUnionIntersectionSwap",
+            "TestUintMapIndependentBoundedOracle",
+            "TestUintMapBudgetFailureAndPeakAccounting",
+            "TestUintMapCleanupFailurePreservesCompletedRemoval",
+            "TestUintMapSparseResetAndFinalizeFailureAtomic",
+            "TestUintMapSwapDifferentBudgetsAndRefs",
+            "TestUintMapWarmScalarOperationsNoAllocation",
+            "TestUintMapWindowsSourceMembershipAssertions",
+            "TestUintMapStrictDeletedVersusSizeThreshold",
+            "TestUintMapStrictResetFreeThreshold"
+          ]
+        },
+        {
+          "name": "u_map<uint32> growth/rehash/reset/finalize",
+          "status": "ported",
+          "go_target": "utilhash/uint_map.go",
+          "tests": [
+            "TestUintMapSourceMapAssertions",
+            "TestUintMapLastTombstoneAndWrap",
+            "TestUintMapStrictGrowthAndInsertIfAbsent",
+            "TestUintMapCleanupThresholdAndOutOfMemory",
+            "TestUintMapResetFinalizeAndClone",
+            "TestUintMapMethodsRefsAndIterators",
+            "TestUintMapAssignUnionIntersectionSwap",
+            "TestUintMapIndependentBoundedOracle",
+            "TestUintMapBudgetFailureAndPeakAccounting",
+            "TestUintMapCleanupFailurePreservesCompletedRemoval",
+            "TestUintMapSparseResetAndFinalizeFailureAtomic",
+            "TestUintMapSwapDifferentBudgetsAndRefs",
+            "TestUintMapWarmScalarOperationsNoAllocation",
+            "TestUintMapWindowsSourceMembershipAssertions",
+            "TestUintMapStrictDeletedVersusSizeThreshold",
+            "TestUintMapStrictResetFreeThreshold"
+          ]
+        },
+        {
+          "name": "u_map<uint32> insert/insert-if-absent/find/get/contains",
+          "status": "ported",
+          "go_target": "utilhash/uint_map.go",
+          "tests": [
+            "TestUintMapSourceMapAssertions",
+            "TestUintMapLastTombstoneAndWrap",
+            "TestUintMapStrictGrowthAndInsertIfAbsent",
+            "TestUintMapCleanupThresholdAndOutOfMemory",
+            "TestUintMapResetFinalizeAndClone",
+            "TestUintMapMethodsRefsAndIterators",
+            "TestUintMapAssignUnionIntersectionSwap",
+            "TestUintMapIndependentBoundedOracle",
+            "TestUintMapBudgetFailureAndPeakAccounting",
+            "TestUintMapCleanupFailurePreservesCompletedRemoval",
+            "TestUintMapSparseResetAndFinalizeFailureAtomic",
+            "TestUintMapSwapDifferentBudgetsAndRefs",
+            "TestUintMapWarmScalarOperationsNoAllocation",
+            "TestUintMapWindowsSourceMembershipAssertions",
+            "TestUintMapStrictDeletedVersusSizeThreshold",
+            "TestUintMapStrictResetFreeThreshold"
+          ]
+        },
+        {
+          "name": "u_map<uint32> remove/erase/iteration/entry value reference",
+          "status": "ported",
+          "go_target": "utilhash/uint_map.go",
+          "tests": [
+            "TestUintMapSourceMapAssertions",
+            "TestUintMapLastTombstoneAndWrap",
+            "TestUintMapStrictGrowthAndInsertIfAbsent",
+            "TestUintMapCleanupThresholdAndOutOfMemory",
+            "TestUintMapResetFinalizeAndClone",
+            "TestUintMapMethodsRefsAndIterators",
+            "TestUintMapAssignUnionIntersectionSwap",
+            "TestUintMapIndependentBoundedOracle",
+            "TestUintMapBudgetFailureAndPeakAccounting",
+            "TestUintMapCleanupFailurePreservesCompletedRemoval",
+            "TestUintMapSparseResetAndFinalizeFailureAtomic",
+            "TestUintMapSwapDifferentBudgetsAndRefs",
+            "TestUintMapWarmScalarOperationsNoAllocation",
+            "TestUintMapWindowsSourceMembershipAssertions",
+            "TestUintMapStrictDeletedVersusSizeThreshold",
+            "TestUintMapStrictResetFreeThreshold"
+          ]
+        },
+        {
+          "name": "u_map<uint32> assignment/union/intersection/swap/invariant/statistics",
+          "status": "ported",
+          "go_target": "utilhash/uint_map.go",
+          "tests": [
+            "TestUintMapSourceMapAssertions",
+            "TestUintMapLastTombstoneAndWrap",
+            "TestUintMapStrictGrowthAndInsertIfAbsent",
+            "TestUintMapCleanupThresholdAndOutOfMemory",
+            "TestUintMapResetFinalizeAndClone",
+            "TestUintMapMethodsRefsAndIterators",
+            "TestUintMapAssignUnionIntersectionSwap",
+            "TestUintMapIndependentBoundedOracle",
+            "TestUintMapBudgetFailureAndPeakAccounting",
+            "TestUintMapCleanupFailurePreservesCompletedRemoval",
+            "TestUintMapSparseResetAndFinalizeFailureAtomic",
+            "TestUintMapSwapDifferentBudgetsAndRefs",
+            "TestUintMapWarmScalarOperationsNoAllocation",
+            "TestUintMapWindowsSourceMembershipAssertions",
+            "TestUintMapStrictDeletedVersusSizeThreshold",
+            "TestUintMapStrictResetFreeThreshold"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete scalar u_map<uint32> specialization with budgeted cold header and pointer-free entries. Other key/entry variants and source string map or Windows sentinel set remain unported. See utilhash/PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Checked cold owner/epoch snapshots replace borrowed entry pointers; structural mutation invalidates snapshots.",
+        "Budgeted reset/finalize/cross-owner swap reserve before publication. A failed post-removal tombstone cleanup preserves the completed removal."
+      ]
     },
     {
       "path": "src/util/max_cliques.h",
