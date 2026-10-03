@@ -2,10 +2,7 @@
 package g3
 
 import (
-	"errors"
 	"testing"
-
-	"github.com/glycerine/g3/golang/arena"
 )
 
 func TestASTProofTheoryRationalFailureOwnership(t *testing.T) {
@@ -89,7 +86,7 @@ func TestASTProofTheoryRationalFailureOwnership(t *testing.T) {
 			succeeded = true
 			break
 		}
-		if !errors.Is(err, arena.ErrInjectedFailure) {
+		if !numericStorageReservationRefusal(err) {
 			t.Fatal("unexpected failure", after, err)
 		}
 		failures++

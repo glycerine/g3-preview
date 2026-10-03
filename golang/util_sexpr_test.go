@@ -364,6 +364,7 @@ func TestSexprFailurePrefixesImmediateOwnership(t *testing.T) {
 			}
 			before, e := q.Stats()
 			sxMust(t, e)
+			cachedBefore, _ := numericServiceScratchRoots(t, q)
 			records := m.Stats().Live
 			rca, _ := m.RefCount(a)
 			rcatom, _ := m.RefCount(atom)
@@ -401,10 +402,12 @@ func TestSexprFailurePrefixesImmediateOwnership(t *testing.T) {
 			if e == nil && op == 0 {
 				added = 2
 			}
-			if after.LiveCells != before.LiveCells+added || after.LivePayloads != before.LivePayloads+added {
+			cachedAfter, naturalAfter := numericServiceScratchRoots(t, q)
+			expectedCells := before.LiveCells - cachedBefore + cachedAfter + added
+			if after.LiveCells != expectedCells || after.LiveNumericObjects != expectedCells || after.RetainedCellDescriptors != 0 || after.NaturalPayloads != naturalAfter || after.LivePayloads != expectedCells+naturalAfter+after.PendingCellObjects {
 				t.Fatal("temporary numeric leak", op, prefix, before, after, added)
 			}
-			if e != nil && !errors.Is(e, arena.ErrInjectedFailure) {
+			if e != nil && !numericStorageReservationRefusal(e) {
 				t.Fatal(op, prefix, e)
 			}
 			if e != nil {

@@ -154,3 +154,18 @@ buffers and CloseChecked execute. These tests are not covered by ordinary
 green checks while tagged. `NATURAL_BACKEND_NEXT_PACKET.md` records the full
 source action order, conditional addback and post-output debug lexical scope;
 formatting and transitive cleanup remain required alongside this integration.
+
+
+AST proof, Params and S-expression numeric reservation sweeps now distinguish
+cold metadata refusal from exact source physical Memout101. Params copying
+fixtures use genuine direct-sized numerals for two previously entirely warm
+pool routes, so every required sweep observes a real reservation boundary.
+The S-expression audit independently enumerates persistent scratch roots and
+Natural buffers, validates live slots/checked generations and retains the
+public-root expectation when source free-before-allocation leaves a cache hole.
+It does not treat arbitrary lost cells as acceptable. Native, debug and
+checked/debug selected consumer groups pass; module vet and source/no-generics
+audit pass on the exact four-file overlay
+`.cache/release/numeric-consumers-8d9b20f`. Logs:
+`.cache/numeric-consumer-isolated-{native,debug,checked-debug,vet,source}.log`.
+The broader backend baseline remains unfinished and RED separately.

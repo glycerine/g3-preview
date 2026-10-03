@@ -532,7 +532,13 @@ func TestParamsReferenceReservationFailureSweeps(t *testing.T) {
 			name := "new-fault-intern-key"
 			wide, e := q.NewValue()
 			paramsMust(t, e)
-			paramsMust(t, q.SetString(&wide, "1"+strings.Repeat("0", 100)))
+			digits := 100
+			if op == 3 || op == 4 {
+				// Copy a genuine direct object (>256 bytes), so a warmed pool
+				// cannot bypass every physical allocation refusal in this sweep.
+				digits = 800
+			}
+			paramsMust(t, q.SetString(&wide, "1"+strings.Repeat("0", digits)))
 			var numberBank [16]mpnum.OwnedRational
 			for i := range numberBank {
 				numberBank[i], e = q.NewValue()
@@ -608,7 +614,7 @@ func TestParamsReferenceReservationFailureSweeps(t *testing.T) {
 					}
 				}
 			}
-			injected := errors.Is(e, arena.ErrInjectedFailure)
+			injected := numericStorageReservationRefusal(e)
 			if injected {
 				failures++
 				if op == 5 && string(dst) != before {
