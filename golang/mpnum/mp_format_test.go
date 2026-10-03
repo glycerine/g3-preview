@@ -102,19 +102,23 @@ func TestIntegerRationalCombinedFormat(t *testing.T) {
 		t.Fatal(e)
 	}
 	// Each source conversion freshly constructs temp(lng) and numer(lng+1).
-	// Independent buffer.h unsigned doubling gives 6+8 real allocations for
-	// these two operands. Runtime owns data and initialization backing for
+	// Independent buffer.h unsigned doubling gives 6+8 limb and one char
+	// allocation per operand. Runtime owns data and initialization backing for
 	// each call; the embedded scope adds no separate Go allocation.
 	var events uint64
 	for _, bits := range []int{numerator.BitLen(), denominator.BitLen()} {
 		limbs := (bits + 31) / 32
+		// mpz display constructs char1024 before entering mpn's three locals.
+		for capacity, requested := uint32(1024), uint32(11*uint32(limbs)); capacity < requested; capacity *= 2 {
+			events++
+		}
 		for _, size := range []int{limbs, limbs + 1} {
 			for capacity := 16; capacity < size; capacity *= 2 {
 				events++
 			}
 		}
 	}
-	if events != 14 {
+	if events != 16 {
 		t.Fatal("source constructor fixture changed", events)
 	}
 	beforeWarm := numericWarmProfileSnapshot(t, m.z, m.z.budget)

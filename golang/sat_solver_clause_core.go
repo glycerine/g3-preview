@@ -8,6 +8,7 @@ import "github.com/glycerine/g3/golang/arena"
 // level arrays. This cold view neither owns nor copies those arrays. The solver
 // supplies its actual scope level on each call; it is not a search implementation.
 type satSolverClauseState struct {
+	variables  *satSolverVariableState
 	assignment []int8
 	levels     []uint32
 }
@@ -15,6 +16,9 @@ type satSolverClauseState struct {
 func (s *satSolverClauseState) value(l satLiteral) (lbool, error) {
 	if s == nil {
 		return lUndef, ErrSATOwner
+	}
+	if s.variables != nil {
+		return s.variables.valueLiteral(l)
 	}
 	if uint64(l.index()) >= uint64(len(s.assignment)) {
 		return lUndef, arena.ErrBounds
@@ -24,6 +28,9 @@ func (s *satSolverClauseState) value(l satLiteral) (lbool, error) {
 func (s *satSolverClauseState) level(l satLiteral) (uint32, error) {
 	if s == nil {
 		return 0, ErrSATOwner
+	}
+	if s.variables != nil {
+		return s.variables.levelVar(l.variable())
 	}
 	if uint64(l.variable()) >= uint64(len(s.levels)) {
 		return 0, arena.ErrBounds

@@ -108,63 +108,15 @@ func (m *NaturalManager) prepareNatural(a limbView, offset uint32) (uint32, erro
 	if e = m.reserveText(end); e != nil {
 		return 0, e
 	}
-	j := offset
-	if a.size == 1 {
-		value := a.read(0)
-		for {
-			m.textWrite(j, '0'+byte(value%10))
-			j++
-			value /= 10
-			if value == 0 {
-				break
-			}
-		}
-		m.reverseText(offset, j)
-		return j, nil
-	}
-	if e = m.beginFormattingLocals(a.size); e != nil {
+	if e = m.sourceToCString(a, sourceDecimalDestination{assembly: m, offset: offset}, uint64(end-offset)); e != nil {
 		return 0, e
 	}
-	temp := limbView{runtime: m.runtime, source: &m.formatting.locals[0], size: a.size}
-	numer := limbView{runtime: m.runtime, source: &m.formatting.locals[1], size: a.size + 1}
-	denom := limbView{runtime: m.runtime, source: &m.formatting.locals[2], size: 1}
-	for i := uint32(0); i < a.size; i++ {
-		temp.write(i, a.read(i))
-	}
-	// Ten normalizes by28 bits in the source 32-bit limb path.
-	const d = 28
-	denom.write(0, uint32(10)<<d)
-	for temp.size > 0 && (temp.size > 1 || temp.read(0) != 0) {
-		numer.size = temp.size + 1
-		numer.source.pos = numer.size
-		numer.write(temp.size, temp.read(temp.size-1)>>(32-d))
-		for i := temp.size - 1; i > 0; i-- {
-			numer.write(i, temp.read(i)<<d|temp.read(i-1)>>(32-d))
-		}
-		numer.write(0, temp.read(0)<<d)
-		divideViewOne(numer, denom.read(0), temp)
-		remainder := numer.read(0) >> d
-		m.textWrite(j, '0'+byte(remainder))
-		j++
-		for temp.size > 0 && temp.read(temp.size-1) == 0 {
-			temp.size--
-			temp.source.pos = temp.size
+	for j := offset; j < end; j++ {
+		if m.textRead(j) == 0 {
+			return j, nil
 		}
 	}
-	// Source writes the terminator before its size_t j--. Empty input
-	// endangers the following reversal; retain earlier constructor/actions.
-	m.textWrite(j, 0)
-	if guard := formattingReversalGuard(j - offset); guard != nil {
-		if e = m.finishFormattingLocals(); e != nil {
-			return 0, e
-		}
-		return 0, guard
-	}
-	m.reverseText(offset, j)
-	if e = m.finishFormattingLocals(); e != nil {
-		return 0, e
-	}
-	return j, nil
+	return 0, arena.ErrBounds
 }
 func (m *NaturalManager) publishText(dst []byte, n uint32) (int, error) {
 	if uint64(n) > uint64(^uint(0)>>1) {
@@ -258,7 +210,37 @@ func (m *IntegerManager) prepareInteger(a *Int, offset uint32) (uint32, error) {
 		offset = end
 	}
 	c := m.cell(a.cell)
-	return m.natural.prepareNatural(limbView{allocator: m.allocator, backing: c.backing, size: c.size}, offset)
+	size, e := c.backing.readWord(m.allocator, 0)
+	if e != nil {
+		return 0, e
+	}
+	// Source unsigned multiplication precedes sbuffer construction. Its
+	// physical inline capacity remains independent of the wrapped POS.
+	if e = m.natural.beginIntegerCharacters(uint32(11 * size)); e != nil {
+		return 0, e
+	}
+	natural := m.natural
+	e = natural.sourceToCString(limbView{allocator: m.allocator, backing: c.backing, size: size}, sourceDecimalDestination{character: &natural.charFormatting.buffer, assembly: natural}, uint64(natural.charFormatting.buffer.pos))
+	var n uint32
+	if e == nil {
+		n, e = natural.appendIntegerCString(offset)
+	}
+	if e != nil {
+		natural.charFormatting.originalCause = e
+	}
+	// An interrupted inner destructor retains its cursor. The outer completed
+	// char object cannot be destroyed ahead of that actual source prefix.
+	if natural.formatting.completed != 0 {
+		return 0, e
+	}
+	cleanup := natural.destroyIntegerCharacters()
+	if e != nil {
+		return 0, e
+	}
+	if cleanup != nil {
+		return 0, cleanup
+	}
+	return n, nil
 }
 func (m *IntegerManager) FormatInto(a *Int, dst []byte) (int, error) {
 	n, e := m.prepareInteger(a, 0)

@@ -2,6 +2,8 @@
 // Source: src/util/mpn.cpp:206-217 and actual Algorithm M/A bodies.
 package mpnum
 
+import "github.com/glycerine/g3/golang/arena"
+
 // sourceVerifyDivision is the source Z3DEBUG lexical temp, after both outputs.
 // The embedded charged holder retains a failed lexical construction/destruction
 // only for explicit Go owning cleanup. Successful calls destroy it immediately;
@@ -9,6 +11,11 @@ package mpnum
 func (m *NaturalManager) sourceVerifyDivision(a, b, q, r limbView) error {
 	if !modularSourceDebug {
 		return nil
+	}
+	// Guard reuse of this retained lexical holder only when the source reaches
+	// its constructor, after the quotient and remainder have been published.
+	if m.verificationActive {
+		return arena.ErrInvalidSlot
 	}
 	m.verificationActive = true
 	temp := &m.verification

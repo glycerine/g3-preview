@@ -20,6 +20,7 @@ type NaturalManager struct {
 	division                          [4]sourceLimbBuffer
 	verification                      sourceLimbBuffer
 	formatting                        naturalFormattingScope
+	charFormatting                    integerCharacterScope
 	sourceFinalizing, sourceFinalized bool
 	sourceStage                       uint8
 	sourceCause                       error
@@ -119,9 +120,6 @@ func (m *NaturalManager) check() error {
 	if m.closed || m.closing || m.runtime == nil || m.sourceFinalizing || m.originalCause != nil {
 		return arena.ErrClosed
 	}
-	if m.verificationActive {
-		return arena.ErrInvalidSlot
-	}
 	return nil
 }
 func (m *NaturalManager) Close() {
@@ -147,12 +145,7 @@ func (m *NaturalManager) CloseChecked() error {
 		}
 	}
 	if m.runtime != nil {
-		if m.formatting.active {
-			if e := m.finishFormattingLocals(); e != nil {
-				return fail(e)
-			}
-		}
-		if e := m.CleanupFormatting(); e != nil {
+		if e := m.cleanupOutputFormatting(); e != nil {
 			return fail(e)
 		}
 		if m.verificationActive {
@@ -289,6 +282,12 @@ func (m *NaturalManager) overflowPayloads() uint32 {
 		if m.verification.pending != (memory.Block{}) {
 			count++
 		}
+	}
+	if m.charFormatting.buffer.raw != (memory.Block{}) {
+		count++
+	}
+	if m.charFormatting.buffer.pending != (memory.Block{}) {
+		count++
 	}
 	return count
 }

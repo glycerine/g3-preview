@@ -75,12 +75,12 @@ func TestSATSolverUnassignInvalidOldActualReadPrefix(t *testing.T) {
 	}
 	e = s.unassignVars(3)
 	if satStorageSourceDebug {
-		if !errors.Is(e, ErrSATAssertion) || v.assignment.data[0] != int8(lTrue) || v.assignment.data[2] != int8(lTrue) {
+		if !errors.Is(e, ErrSATAssertion) || satAssignmentTestValue(t, &v.assignment, 0) != int8(lTrue) || satAssignmentTestValue(t, &v.assignment, 2) != int8(lTrue) {
 			t.Fatal("actual source SASSERT before any mutation", e)
 		}
 	} else {
-		if e == nil || v.assignment.data[0] != int8(lUndef) || v.assignment.data[2] != int8(lUndef) || v.qhead != 2 {
-			t.Fatal("reverse prefix before unsigned invalid read", e, v.assignment.data)
+		if e == nil || satAssignmentTestValue(t, &v.assignment, 0) != int8(lUndef) || satAssignmentTestValue(t, &v.assignment, 2) != int8(lUndef) || v.qhead != 2 {
+			t.Fatal("reverse prefix before unsigned invalid read", e, satAssignmentTestSize(t, &v.assignment))
 		}
 	}
 }

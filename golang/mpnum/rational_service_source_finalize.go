@@ -33,6 +33,9 @@ func (s *RationalService) sourceFinalizeLocked() error {
 	if s.originalCause != nil || (s.closing && !s.sourceFinalizing) {
 		return arena.ErrClosed
 	}
+	if s.lexical.pending() {
+		return ErrRationalLexicalPending
+	}
 	s.sourceFinalizing = true
 	if s.sourceGuard {
 		return s.sourceCause

@@ -260,7 +260,7 @@ func TestSATSolverAttachNaryReorderAndWatchFaultPrefixes(t *testing.T) {
 				satOK(t, x)
 				z, x := p.clauses.Literal(c, 1)
 				satOK(t, x)
-				if a != 6 || z != 4 || p.clausePropagations != 1 || v.assignment.data[6] != int8(lTrue) {
+				if a != 6 || z != 4 || p.clausePropagations != 1 || satAssignmentTestValue(t, &v.assignment, 6) != int8(lTrue) {
 					t.Fatal("source swaps+assignment precede watches", a, z)
 				}
 				w, x := v.watches.Get(7)

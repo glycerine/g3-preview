@@ -11,7 +11,7 @@ func TestSATSolverAssignConflictStatusSourceOrder(t *testing.T) {
 	s, v, _ := satPropagationFixture(t, 3)
 	j := newSATBinaryJustification(satMakeLiteral(2, true))
 	satOK(t, s.assign(satMakeLiteral(0, true), j))
-	if v.assignment.data[0] != int8(lFalse) || v.assignment.data[1] != int8(lTrue) || !v.justification.data[0].None() || v.level.data[0] != 0 || v.phase.data[0] != 1 || v.assignedSinceGC.data[0] != 1 {
+	if satAssignmentTestValue(t, &v.assignment, 0) != int8(lFalse) || satAssignmentTestValue(t, &v.assignment, 1) != int8(lTrue) || !v.justification.data[0].None() || v.level.data[0] != 0 || v.phase.data[0] != 1 || v.assignedSinceGC.data[0] != 1 {
 		t.Fatal("base assignment")
 	}
 	v.scopeLevel = 3
@@ -49,7 +49,7 @@ func TestSATSolverAssignTrailRefusalAndMissingExtensionPrefix(t *testing.T) {
 	if !errors.Is(e, arena.ErrInjectedFailure) {
 		t.Fatal("actual initial trail refusal", e)
 	}
-	if v.assignment.data[0] != int8(lTrue) || v.level.data[0] != 1 || v.phase.data[0] != 0 || v.assignedSinceGC.data[0] != 1 {
+	if satAssignmentTestValue(t, &v.assignment, 0) != int8(lTrue) || v.level.data[0] != 1 || v.phase.data[0] != 0 || v.assignedSinceGC.data[0] != 1 {
 		t.Fatal("scalar prefix")
 	}
 	n, x := v.trail.Size(v.trailRef)

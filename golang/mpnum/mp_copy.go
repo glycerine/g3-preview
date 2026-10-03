@@ -65,7 +65,10 @@ func (m *IntegerManager) CopyFrom(dst *Int, source *IntegerManager, src *Int) er
 // It preserves unreduced fractions, negative denominators and small/big tags.
 // The pair is staged in fully charged destination cells so failure copying the
 // denominator cannot publish only the numerator. Source limbs never escape.
-func (m *RationalManager) CopyFrom(dst *Rational, source *RationalManager, src *Rational) error {
+func (m *RationalManager) CopyFrom(dst *Rational, source *RationalManager, src *Rational) (_lexErr error) {
+	if m != nil && m.lexical.pending() {
+		return ErrRationalLexicalPending
+	}
 	if m == nil || source == nil {
 		return arena.ErrConfig
 	}
@@ -82,7 +85,7 @@ func (m *RationalManager) CopyFrom(dst *Rational, source *RationalManager, src *
 		return e
 	}
 	work := NewRational()
-	defer m.drop(&work)
+	defer m.finishLexicalCopy(&work, &_lexErr)
 	if e := m.z.CopyFrom(&work.num, source.z, &src.num); e != nil {
 		return e
 	}

@@ -64,6 +64,9 @@ func (m *RationalManager) SourceFinalize() error {
 	if m.originalCause != nil || (m.closing && !m.sourceFinalizing) {
 		return arena.ErrClosed
 	}
+	if m.lexical.pending() {
+		return ErrRationalLexicalPending
+	}
 	m.sourceFinalizing = true
 	if m.sourceGuard {
 		return m.sourceCause

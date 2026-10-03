@@ -168,7 +168,7 @@ func TestSATSolverPropagationIndependentTruthTables(t *testing.T) {
 			for d := 0; d < 3; d++ {
 				want := lFalse
 				for i, x := range []int{a, b, d} {
-					v.assignment.data[2*i] = int8(vals[x])
+					satOK(t, v.assignment.write(uint32(2*i), int8(vals[x])))
 					if x == 2 {
 						want = lTrue
 					} else if x == 1 && want != lTrue {
@@ -321,8 +321,8 @@ func TestSATSolverPropagationWarmActualBackingPlateau(t *testing.T) {
 	satOK(t, e)
 	satPropagationPush(t, s, 0, w)
 	cycle := func() {
-		for i := range v.assignment.data {
-			v.assignment.data[i] = int8(lUndef)
+		for i := uint32(0); i < satAssignmentTestSize(t, &v.assignment); i++ {
+			satOK(t, v.assignment.write(i, int8(lUndef)))
 		}
 		satOK(t, v.trail.Shrink(v.trailRef, 0))
 		v.qhead = 0
@@ -359,7 +359,7 @@ func TestSATSolverPropagationLastSelfMoveRawLifetime(t *testing.T) {
 	satOK(t, e)
 	satPropagationPush(t, s, 0, w)
 	satOK(t, s.assign(0, satJustification{}))
-	v.assignment.data[1] = int8(lUndef)
+	satOK(t, v.assignment.write(1, int8(lUndef)))
 	_, e = s.propagateCore(false)
 	if satStorageSourceDebug {
 		if !errors.Is(e, ErrSATAssertion) || v.qhead != 1 || s.cleanerCounter != -1 || s.asymmCounter != 0 || s.probingCounter != 0 || s.numCheckpoints != 1 {

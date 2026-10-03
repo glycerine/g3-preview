@@ -41,6 +41,7 @@ type RationalServiceStats struct {
 // requires external owner confinement; independent service locks do not make
 // the Budget safe for concurrent use. Never shallow-copy this owner.
 type RationalService struct {
+	lexical                                        rationalLexicalScope
 	mu                                             sync.Mutex
 	manager                                        *RationalManager
 	self                                           *RationalService
@@ -312,10 +313,14 @@ func (s *RationalService) Equal(a, b *OwnedRational) (bool, error) {
 	}
 	return s.manager.Equal(&a.raw, &b.raw)
 }
-func (s *RationalService) copyOutput(raw *Rational) (OwnedRational, error) {
+func (s *RationalService) copyOutput(raw *Rational) (_lexOut OwnedRational, _lexErr error) {
+	defer s.finishLexicalError(&_lexErr)
+	if e := s.lexicalReady(); e != nil {
+		return OwnedRational{}, e
+	}
 	v := OwnedRational{raw: NewRational(), ownerID: s.ownerID}
 	if e := s.manager.Copy(&v.raw, raw); e != nil {
-		s.manager.Del(&v.raw)
+		s.abortLexicalRational(&v.raw)
 		return OwnedRational{}, e
 	}
 	return v, nil
@@ -376,14 +381,18 @@ func (s *RationalService) pushCache(v *Rational) error {
 	}
 	item := NewRational()
 	if e := s.manager.Copy(&item, v); e != nil {
-		s.manager.Del(&item)
+		s.abortLexicalRational(&item)
 		return e
 	}
 	// Placement-copy completes before source vector size is incremented.
 	s.cache = append(s.cache, item)
 	return nil
 }
-func (s *RationalService) fillPower(n uint32) error {
+func (s *RationalService) fillPower(n uint32) (_lexErr error) {
+	if e := s.lexicalReady(); e != nil {
+		return e
+	}
+	defer s.finishLexicalError(&_lexErr)
 	if len(s.cache) == 0 {
 		if e := s.pushCache(&s.one); e != nil {
 			return e
@@ -391,8 +400,8 @@ func (s *RationalService) fillPower(n uint32) error {
 	}
 	size := uint32(len(s.cache))
 	curr, two := NewRational(), NewRational()
-	defer s.manager.Del(&curr)
-	defer s.manager.Del(&two)
+	defer s.destroyLexicalRational(&curr)
+	defer s.destroyLexicalRational(&two)
 	if e := s.manager.Copy(&curr, &s.cache[size-1]); e != nil {
 		return e
 	}

@@ -30,6 +30,7 @@ type RationalConfig struct {
 // source reusable scratch algorithms. Both are owner-confined, not concurrent.
 // Manager header bytes include all retained scalar rational scratch members.
 type RationalManager struct {
+	lexical                                        rationalManagerLexicalScope
 	self                                           *RationalManager
 	originalCause, cleanupCause                    error
 	cleanupStage                                   uint8

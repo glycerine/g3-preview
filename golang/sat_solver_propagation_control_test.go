@@ -4,7 +4,6 @@ package g3
 import (
 	"errors"
 	"github.com/glycerine/g3/golang/arena"
-	"github.com/glycerine/g3/golang/memory"
 	"reflect"
 	"testing"
 )
@@ -22,8 +21,7 @@ func satPropagationFixture(t *testing.T, n uint32) (*satSolverPropagationState, 
 	satOK(t, e)
 	r, e := newUtilReslimit(b)
 	satOK(t, e)
-	mem, e := memory.NewRuntime(memory.RuntimeConfig{Budget: b})
-	satOK(t, e)
+	mem := v.memory
 	ctx, _, g, cb := satMainConfigTestRuntime(t)
 	p, e := ctx.NewValue()
 	satOK(t, e)
@@ -36,7 +34,6 @@ func satPropagationFixture(t *testing.T, n uint32) (*satSolverPropagationState, 
 		satOK(t, a.Close())
 		satOK(t, mc.Close())
 		r.close()
-		satOK(t, mem.Close())
 		satOK(t, cfg.Close())
 		satOK(t, ctx.Del(&p))
 	})

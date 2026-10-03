@@ -29,6 +29,10 @@ func (s *RationalService) CloseChecked() error {
 		s.cleanupCause = nil
 		return nil
 	}
+	if e := s.lexical.cleanup(s.manager.z); e != nil {
+		s.cleanupCause = e
+		return s
+	}
 	s.closing = true
 	fail := func(e error) error { s.cleanupCause = e; return s }
 	if s.sourceFinalizing && !s.sourceFinalized && !s.sourceGuard {

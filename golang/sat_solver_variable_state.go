@@ -4,6 +4,7 @@ package g3
 
 import (
 	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
 	"reflect"
 )
 
@@ -11,32 +12,40 @@ import (
 // actual columns/queue/trail directly to that owner. Elimination todo is the
 // simplifier's real borrowed set. No callback supplies missing solver behavior.
 type satSolverVariableState struct {
-	self                                                                                                 *satSolverVariableState
-	budget                                                                                               *arena.Budget
-	watches                                                                                              *satSolverWatchLists
-	assignment, decision, mark, literalMark, eliminated, external, phase, previousPhase, assignedSinceGC satVariableCharColumn
-	justification                                                                                        satVariableJustificationColumn
-	level                                                                                                satVariableUintColumn
-	activity                                                                                             *satActivityDomain
-	queue                                                                                                *satVarQueue
-	trail                                                                                                *satSolverLiteralStore
-	trailRef                                                                                             satSolverLiteralListRef
-	elimTodo                                                                                             *satSolverUintSet
-	ownerBytes                                                                                           uint64
-	mkVarCount, qhead, scopeLevel, activityInc                                                           uint32
-	modelIsCurrent, modelKnown, closed                                                                   bool
+	self                                                                                     *satSolverVariableState
+	budget                                                                                   *arena.Budget
+	watches                                                                                  *satSolverWatchLists
+	assignment                                                                               satSolverAssignmentColumn
+	memory                                                                                   *memory.Runtime
+	decision, mark, literalMark, eliminated, external, phase, previousPhase, assignedSinceGC satVariableCharColumn
+	justification                                                                            satVariableJustificationColumn
+	level                                                                                    satVariableUintColumn
+	activity                                                                                 *satActivityDomain
+	queue                                                                                    *satVarQueue
+	trail                                                                                    *satSolverLiteralStore
+	trailRef                                                                                 satSolverLiteralListRef
+	elimTodo                                                                                 *satSolverUintSet
+	ownerBytes                                                                               uint64
+	mkVarCount, qhead, scopeLevel, activityInc                                               uint32
+	modelIsCurrent, modelKnown, closed                                                       bool
 }
 type satSolverVariableStats struct {
 	OwnerBytes, ColumnBytes, WatchBytes, ActivityBytes, QueueBytes, TrailBytes, TotalBytes uint64
 	NumVars, MkVarCount                                                                    uint32
 }
 
-func newSATSolverVariableState(todo *satSolverUintSet, b *arena.Budget, c arena.VectorConfig) (*satSolverVariableState, error) {
+func newSATSolverVariableState(todo *satSolverUintSet, b *arena.Budget, c arena.VectorConfig, raw *memory.Runtime) (*satSolverVariableState, error) {
 	if e := todo.open(); e != nil {
 		return nil, e
 	}
 	if c.Descriptors.Budget != b {
 		return nil, arena.ErrConfig
+	}
+	if raw == nil {
+		return nil, ErrSATOwner
+	}
+	if _, e := raw.AllocationSize(); e != nil {
+		return nil, e
 	}
 	n := uint64(reflect.TypeOf(satSolverVariableState{}).Size())
 	if e := b.Reserve(n); e != nil {
@@ -44,6 +53,8 @@ func newSATSolverVariableState(todo *satSolverUintSet, b *arena.Budget, c arena.
 	}
 	s := &satSolverVariableState{budget: b, elimTodo: todo, ownerBytes: n, activityInc: 128}
 	s.self = s
+	s.memory = raw
+	s.assignment.bind(raw)
 	var e error
 	s.watches, e = newSATSolverWatchLists(b, c)
 	if e == nil {
@@ -90,10 +101,10 @@ func (s *satSolverVariableState) mkVar(ext, dvar bool) (satBoolVar, error) {
 	if e := s.watches.PushEmpty(); e != nil {
 		return v, e
 	}
-	if e := s.assignment.push(s.budget, int8(lUndef)); e != nil {
+	if e := s.assignment.push(int8(lUndef)); e != nil {
 		return v, e
 	}
-	if e := s.assignment.push(s.budget, int8(lUndef)); e != nil {
+	if e := s.assignment.push(int8(lUndef)); e != nil {
 		return v, e
 	}
 	if e := s.justification.push(s.budget, satJustification{}); e != nil {
@@ -161,7 +172,7 @@ func (s *satSolverVariableState) mkVar(ext, dvar bool) (satBoolVar, error) {
 // This view is an ephemeral borrow for a clause operation with no variable
 // creation during that call. It never copies source assignment/level storage.
 func (s *satSolverVariableState) clauseState() satSolverClauseState {
-	return satSolverClauseState{assignment: s.assignment.data, levels: s.level.data}
+	return satSolverClauseState{variables: s}
 }
 func (s *satSolverVariableState) valueLiteral(l satLiteral) (lbool, error) {
 	if e := s.open(); e != nil {
@@ -210,7 +221,7 @@ func (s *satSolverVariableState) Stats() satSolverVariableStats {
 		return satSolverVariableStats{}
 	}
 	out := satSolverVariableStats{OwnerBytes: s.ownerBytes, NumVars: s.numVars(), MkVarCount: s.mkVarCount}
-	for _, c := range []*satVariableCharColumn{&s.assignment, &s.decision, &s.mark, &s.literalMark, &s.eliminated, &s.external, &s.phase, &s.previousPhase, &s.assignedSinceGC} {
+	for _, c := range []*satVariableCharColumn{&s.decision, &s.mark, &s.literalMark, &s.eliminated, &s.external, &s.phase, &s.previousPhase, &s.assignedSinceGC} {
 		out.ColumnBytes += uint64(cap(c.data))
 	}
 	out.ColumnBytes += 4*uint64(cap(s.level.data)) + uint64(reflect.TypeOf(satJustification{}).Size())*uint64(cap(s.justification.data))
@@ -307,7 +318,9 @@ func (s *satSolverVariableState) Close() error {
 	s.mark.finalize(s.budget)
 	s.decision.finalize(s.budget)
 	s.justification.finalize(s.budget)
-	s.assignment.finalize(s.budget)
+	if e := s.assignment.finalize(); e != nil {
+		return e
+	}
 	if s.watches != nil {
 		if e := s.watches.Close(); e != nil {
 			return e

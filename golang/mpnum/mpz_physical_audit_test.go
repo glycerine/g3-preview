@@ -119,6 +119,18 @@ func integerPhysicalAudit(t *testing.T, m *IntegerManager, public ...*Int) {
 			}
 		}
 	}
+	for _, r := range []memory.Block{m.natural.charFormatting.buffer.raw, m.natural.charFormatting.buffer.pending} {
+		if r == (memory.Block{}) {
+			continue
+		}
+		if raw[r] {
+			t.Fatal("duplicate character raw root")
+		}
+		raw[r] = true
+		if _, e := m.memory.Read(r, 0); e != nil && !errors.Is(e, memory.ErrRuntimeUninitialized) {
+			t.Fatal("invalid character raw root", e)
+		}
+	}
 	allocator := m.allocator.Stats()
 	if m.memory.Stats().LiveBlocks != allocator.Chunks+allocator.DirectObjects+allocator.PendingBlocks+uint32(len(raw)) {
 		t.Fatal("unnamed physical runtime allocation", m.memory.Stats(), allocator, len(raw))

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/glycerine/g3/golang/arena"
-	"reflect"
+	"github.com/glycerine/g3/golang/memory"
 	"testing"
 )
 
@@ -14,11 +14,14 @@ func satVariableStateFixture(t *testing.T) (*satSolverVariableState, *satSolverU
 	b := arena.NewBudget(^uint64(0))
 	todo, e := newSATSolverUintSet(b)
 	satOK(t, e)
-	s, e := newSATSolverVariableState(todo, b, arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: b}})
+	mem, e := memory.NewRuntime(memory.RuntimeConfig{Budget: b})
+	satOK(t, e)
+	s, e := newSATSolverVariableState(todo, b, arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: b}}, mem)
 	satOK(t, e)
 	t.Cleanup(func() {
 		satOK(t, s.Close())
 		satOK(t, todo.Close())
+		satOK(t, mem.Close())
 		if b.Used() != 0 {
 			t.Fatal("variable graph", b.Used())
 		}
@@ -54,24 +57,24 @@ func TestSATSolverMkVarFullSourceEighteenActionsAndByteClauseView(t *testing.T) 
 		}
 	}
 	view := s.clauseState()
-	if reflect.TypeOf(view.assignment).Elem().Size() != 1 {
+	if view.variables != s {
 		t.Fatal("source char assignment")
 	}
-	s.assignment.data[0] = int8(lTrue)
+	satOK(t, s.assignment.write(0, int8(lTrue)))
 	value, e := view.value(0)
 	satOK(t, e)
 	if value != lTrue {
 		t.Fatal("no copied assignment view", value)
 	}
 	todoBytes := todo.Stats().OwnerBytes + todo.Stats().MembershipCapacity + 4*todo.Stats().ValuesCapacity
-	if s.Stats().TotalBytes+todoBytes != b.Used() {
+	if s.Stats().TotalBytes+todoBytes+s.memory.Stats().TotalBytes != b.Used() {
 		t.Fatal(s.Stats(), todo.Stats(), b.Used())
 	}
 }
 
 func satVariableAssertFirstPrefix(t *testing.T, s *satSolverVariableState) {
 	t.Helper()
-	sizes := []int{len(s.watches.lists), len(s.assignment.data), len(s.justification.data), len(s.decision.data), len(s.eliminated.data), len(s.external.data), int(s.activity.Size()), len(s.level.data), len(s.mark.data), len(s.literalMark.data), len(s.phase.data), len(s.previousPhase.data), len(s.assignedSinceGC.data)}
+	sizes := []int{len(s.watches.lists), int(satAssignmentTestSize(t, &s.assignment)), len(s.justification.data), len(s.decision.data), len(s.eliminated.data), len(s.external.data), int(s.activity.Size()), len(s.level.data), len(s.mark.data), len(s.literalMark.data), len(s.phase.data), len(s.previousPhase.data), len(s.assignedSinceGC.data)}
 	want := []int{2, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1}
 	unfinished := false
 	for i, n := range sizes {
@@ -120,7 +123,7 @@ func TestSATSolverMkVarAllActualReservationPrefixes(t *testing.T) {
 				if s.elimTodo.Contains(0) && s.elimTodo.Size() == 0 {
 					seenTodoBeforeValue = true
 				}
-				if !errors.Is(e, arena.ErrInjectedFailure) {
+				if !satAssignmentActualRefusal(s.memory, e) {
 					t.Fatal(fail, e)
 				}
 			} else {
@@ -155,7 +158,7 @@ func TestSATSolverMkVarLateHeapIndexPublicationBeforeRefusal(t *testing.T) {
 			if e2 := s.checkPhysicalOwners(); e2 != nil {
 				t.Fatal(e2)
 			}
-			if e != nil && !errors.Is(e, arena.ErrInjectedFailure) {
+			if e != nil && !satAssignmentActualRefusal(s.memory, e) {
 				t.Fatal(e)
 			}
 			if e != nil && s.queue.Contains(4) && s.queue.Size() == 4 {
@@ -210,9 +213,11 @@ func TestSATSolverVariableConstructorRefusalAndBorrowedTodo(t *testing.T) {
 		todo, e := newSATSolverUintSet(b)
 		satOK(t, e)
 		satOK(t, todo.Insert(19))
+		mem, e := memory.NewRuntime(memory.RuntimeConfig{Budget: b})
+		satOK(t, e)
 		base := b.Used()
 		b.FailAfter(fail)
-		s, e := newSATSolverVariableState(todo, b, arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: b}})
+		s, e := newSATSolverVariableState(todo, b, arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: b}}, mem)
 		if e != nil {
 			failures++
 			if !errors.Is(e, arena.ErrInjectedFailure) {
@@ -229,6 +234,7 @@ func TestSATSolverVariableConstructorRefusalAndBorrowedTodo(t *testing.T) {
 			t.Fatal("constructor cannot own todo", fail, b.Used(), base)
 		}
 		satOK(t, todo.Close())
+		satOK(t, mem.Close())
 		if successes != 0 {
 			break
 		}

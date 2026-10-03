@@ -56,7 +56,11 @@ func (s *RationalService) facadeRawBinaryLocked(a, b, out *Rational, op rational
 		return ErrRationalFacadeDomain
 	}
 }
-func (s *RationalService) facadeValueLocked(a, b *OwnedRational, op rationalFacadeBinaryOp) (OwnedRational, error) {
+func (s *RationalService) facadeValueLocked(a, b *OwnedRational, op rationalFacadeBinaryOp) (_lexOut OwnedRational, _lexErr error) {
+	if e := s.lexicalReady(); e != nil {
+		return OwnedRational{}, e
+	}
+	defer s.finishLexicalRational(&_lexOut, &_lexErr)
 	if e := s.check(a); e != nil {
 		return OwnedRational{}, e
 	}
@@ -64,7 +68,7 @@ func (s *RationalService) facadeValueLocked(a, b *OwnedRational, op rationalFaca
 		return OwnedRational{}, e
 	}
 	work := NewRational()
-	defer s.manager.drop(&work)
+	defer s.destroyLexicalRational(&work)
 	if op >= rationalFacadeAdd && op <= rationalFacadeDiv {
 		// return rational(a) op= b: copy before compound, then copy the returned
 		// lvalue into the value result. The second copy is intentionally observable.
@@ -84,6 +88,9 @@ func (s *RationalService) facadeValueLocked(a, b *OwnedRational, op rationalFaca
 
 // Named local return transfers ownership; it does not introduce a second copy.
 func (s *RationalService) facadeTakeLocked(work *Rational) (OwnedRational, error) {
+	if e := s.lexicalReady(); e != nil {
+		return OwnedRational{}, e
+	}
 	out := OwnedRational{raw: NewRational(), ownerID: s.ownerID}
 	if e := s.manager.Move(&out.raw, work); e != nil {
 		return OwnedRational{}, e
@@ -173,16 +180,20 @@ func (s *RationalService) ModInto(a, b, out *OwnedRational) error {
 
 // Scalar overloads construct an actual rational(int), rather than taking the
 // raw manager's mixed-integer arithmetic shortcut.
-func (s *RationalService) facadeScalar(a *OwnedRational, n int32, op rationalFacadeBinaryOp, left bool) (OwnedRational, error) {
+func (s *RationalService) facadeScalar(a *OwnedRational, n int32, op rationalFacadeBinaryOp, left bool) (_lexOut OwnedRational, _lexErr error) {
 	if e := s.lock(); e != nil {
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
+	if e := s.lexicalReady(); e != nil {
+		return OwnedRational{}, e
+	}
+	defer s.finishLexicalRational(&_lexOut, &_lexErr)
 	if e := s.check(a); e != nil {
 		return OwnedRational{}, e
 	}
 	v := OwnedRational{raw: NewRational(), ownerID: s.ownerID}
-	defer s.manager.drop(&v.raw)
+	defer s.destroyLexicalRational(&v.raw)
 	if e := s.manager.SetInt64(&v.raw, int64(n)); e != nil {
 		return OwnedRational{}, e
 	}
@@ -215,31 +226,39 @@ func (s *RationalService) DivInt(a *OwnedRational, n int32) (OwnedRational, erro
 func (s *RationalService) IntDiv(n int32, a *OwnedRational) (OwnedRational, error) {
 	return s.facadeScalar(a, n, rationalFacadeDiv, true)
 }
-func (s *RationalService) AddAssignInt(a *OwnedRational, n int32) error {
+func (s *RationalService) AddAssignInt(a *OwnedRational, n int32) (_lexErr error) {
 	if e := s.lock(); e != nil {
 		return e
 	}
 	defer s.mu.Unlock()
+	if e := s.lexicalReady(); e != nil {
+		return e
+	}
+	defer s.finishLexicalError(&_lexErr)
 	if e := s.check(a); e != nil {
 		return e
 	}
 	v := OwnedRational{raw: NewRational(), ownerID: s.ownerID}
-	defer s.manager.drop(&v.raw)
+	defer s.destroyLexicalRational(&v.raw)
 	if e := s.manager.SetInt64(&v.raw, int64(n)); e != nil {
 		return e
 	}
 	return s.facadeAssignLocked(a, &v, rationalFacadeAdd)
 }
-func (s *RationalService) AssignInt(a *OwnedRational, n int32) error {
+func (s *RationalService) AssignInt(a *OwnedRational, n int32) (_lexErr error) {
 	if e := s.lock(); e != nil {
 		return e
 	}
 	defer s.mu.Unlock()
+	if e := s.lexicalReady(); e != nil {
+		return e
+	}
+	defer s.finishLexicalError(&_lexErr)
 	if e := s.check(a); e != nil {
 		return e
 	}
 	v := NewRational()
-	defer s.manager.drop(&v)
+	defer s.destroyLexicalRational(&v)
 	if e := s.manager.SetInt64(&v, int64(n)); e != nil {
 		return e
 	}
@@ -266,16 +285,20 @@ func (s *RationalService) facadePrefix(a *OwnedRational, dec bool) error {
 }
 func (s *RationalService) PrefixInc(a *OwnedRational) error { return s.facadePrefix(a, false) }
 func (s *RationalService) PrefixDec(a *OwnedRational) error { return s.facadePrefix(a, true) }
-func (s *RationalService) facadePostfix(a *OwnedRational, dec bool) (OwnedRational, error) {
+func (s *RationalService) facadePostfix(a *OwnedRational, dec bool) (_lexOut OwnedRational, _lexErr error) {
 	if e := s.lock(); e != nil {
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
+	if e := s.lexicalReady(); e != nil {
+		return OwnedRational{}, e
+	}
+	defer s.finishLexicalRational(&_lexOut, &_lexErr)
 	if e := s.check(a); e != nil {
 		return OwnedRational{}, e
 	}
 	old := NewRational()
-	defer s.manager.drop(&old)
+	defer s.destroyLexicalRational(&old)
 	if e := s.manager.Copy(&old, &a.raw); e != nil {
 		return OwnedRational{}, e
 	}
@@ -303,11 +326,15 @@ const (
 	facadePower
 )
 
-func (s *RationalService) facadeUnary(a *OwnedRational, op rationalFacadeUnaryOp, p uint32) (OwnedRational, error) {
+func (s *RationalService) facadeUnary(a *OwnedRational, op rationalFacadeUnaryOp, p uint32) (_lexOut OwnedRational, _lexErr error) {
 	if e := s.lock(); e != nil {
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
+	if e := s.lexicalReady(); e != nil {
+		return OwnedRational{}, e
+	}
+	defer s.finishLexicalRational(&_lexOut, &_lexErr)
 	if op == facadeNumerator || op == facadeDenominator {
 		if e := s.rationalScalarOwner(a); e != nil {
 			return OwnedRational{}, e
@@ -318,7 +345,7 @@ func (s *RationalService) facadeUnary(a *OwnedRational, op rationalFacadeUnaryOp
 		}
 	}
 	work := NewRational()
-	defer s.manager.drop(&work)
+	defer s.destroyLexicalRational(&work)
 	var e error
 	switch op {
 	case facadeNeg, facadeAbs:
@@ -436,16 +463,20 @@ func (s *RationalService) LessEqual(a, b *OwnedRational) (bool, error) {
 func (s *RationalService) GreaterEqual(a, b *OwnedRational) (bool, error) {
 	return s.facadeCompare(a, b, 4)
 }
-func (s *RationalService) facadeCompareInt(a *OwnedRational, n int32, op uint8) (bool, error) {
+func (s *RationalService) facadeCompareInt(a *OwnedRational, n int32, op uint8) (_lexValue bool, _lexErr error) {
 	if e := s.lock(); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
+	if e := s.lexicalReady(); e != nil {
+		return false, e
+	}
+	defer s.finishLexicalError(&_lexErr)
 	if e := s.check(a); e != nil {
 		return false, e
 	}
 	v := OwnedRational{raw: NewRational(), ownerID: s.ownerID}
-	defer s.manager.drop(&v.raw)
+	defer s.destroyLexicalRational(&v.raw)
 	if e := s.manager.SetInt64(&v.raw, int64(n)); e != nil {
 		return false, e
 	}
@@ -720,11 +751,15 @@ func (s *RationalService) IsPowerOfTwo(a *OwnedRational) (bool, uint32, error) {
 	}
 	return s.manager.IsPowerOfTwo(&a.raw)
 }
-func (s *RationalService) facadeAddMul(a, c, k *OwnedRational, subtract bool) error {
+func (s *RationalService) facadeAddMul(a, c, k *OwnedRational, subtract bool) (_lexErr error) {
 	if e := s.lock(); e != nil {
 		return e
 	}
 	defer s.mu.Unlock()
+	if e := s.lexicalReady(); e != nil {
+		return e
+	}
+	defer s.finishLexicalError(&_lexErr)
 	for _, v := range []*OwnedRational{a, c, k} {
 		if e := s.check(v); e != nil {
 			return e
@@ -754,7 +789,7 @@ func (s *RationalService) facadeAddMul(a, c, k *OwnedRational, subtract bool) er
 		return s.facadeAssignLocked(a, k, op)
 	}
 	temp := OwnedRational{raw: NewRational(), ownerID: s.ownerID}
-	defer s.manager.drop(&temp.raw)
+	defer s.destroyLexicalRational(&temp.raw)
 	if e := s.manager.Copy(&temp.raw, &k.raw); e != nil {
 		return e
 	}
@@ -769,11 +804,15 @@ func (s *RationalService) AddMulAssign(a, c, k *OwnedRational) error {
 func (s *RationalService) SubMulAssign(a, c, k *OwnedRational) error {
 	return s.facadeAddMul(a, c, k, true)
 }
-func (s *RationalService) ModHat(a, b *OwnedRational) (OwnedRational, error) {
+func (s *RationalService) ModHat(a, b *OwnedRational) (_lexOut OwnedRational, _lexErr error) {
 	if e := s.lock(); e != nil {
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
+	if e := s.lexicalReady(); e != nil {
+		return OwnedRational{}, e
+	}
+	defer s.finishLexicalRational(&_lexOut, &_lexErr)
 	if e := s.check(a); e != nil {
 		return OwnedRational{}, e
 	}
@@ -791,7 +830,7 @@ func (s *RationalService) ModHat(a, b *OwnedRational) (OwnedRational, error) {
 	if e != nil {
 		return OwnedRational{}, e
 	}
-	defer s.manager.drop(&r.raw)
+	defer s.destroyLexicalRational(&r.raw)
 	nonneg, e := s.manager.IsNonNeg(&r.raw)
 	if e != nil {
 		return OwnedRational{}, e
@@ -800,12 +839,12 @@ func (s *RationalService) ModHat(a, b *OwnedRational) (OwnedRational, error) {
 		return OwnedRational{}, ErrRationalFacadeDomain
 	}
 	r2 := OwnedRational{raw: NewRational(), ownerID: s.ownerID}
-	defer s.manager.drop(&r2.raw)
+	defer s.destroyLexicalRational(&r2.raw)
 	if e := s.manager.Copy(&r2.raw, &r.raw); e != nil {
 		return OwnedRational{}, e
 	}
 	two := OwnedRational{raw: NewRational(), ownerID: s.ownerID}
-	defer s.manager.drop(&two.raw)
+	defer s.destroyLexicalRational(&two.raw)
 	if e := s.manager.SetInt64(&two.raw, 2); e != nil {
 		return OwnedRational{}, e
 	}
@@ -815,7 +854,7 @@ func (s *RationalService) ModHat(a, b *OwnedRational) (OwnedRational, error) {
 	// Source rational(2) is destroyed at this full-expression boundary, before
 	// the comparison and optional subtraction. Keep a valid empty value for
 	// deferred cleanup on every later error path.
-	if e := s.manager.Del(&two.raw); e != nil {
+	if e := s.destroyLexicalRational(&two.raw); e != nil {
 		return OwnedRational{}, e
 	}
 	two.raw = NewRational()
@@ -830,16 +869,20 @@ func (s *RationalService) ModHat(a, b *OwnedRational) (OwnedRational, error) {
 	}
 	return s.facadeTakeLocked(&r.raw)
 }
-func (s *RationalService) NumBits(a *OwnedRational) (uint32, error) {
+func (s *RationalService) NumBits(a *OwnedRational) (_lexValue uint32, _lexErr error) {
 	if e := s.lock(); e != nil {
 		return 0, e
 	}
 	defer s.mu.Unlock()
+	if e := s.lexicalReady(); e != nil {
+		return 0, e
+	}
+	defer s.finishLexicalError(&_lexErr)
 	if e := s.check(a); e != nil {
 		return 0, e
 	}
 	two := OwnedRational{raw: NewRational(), ownerID: s.ownerID}
-	defer s.manager.drop(&two.raw)
+	defer s.destroyLexicalRational(&two.raw)
 	if e := s.manager.SetInt64(&two.raw, 2); e != nil {
 		return 0, e
 	}
@@ -858,7 +901,7 @@ func (s *RationalService) NumBits(a *OwnedRational) (uint32, error) {
 		return 0, ErrRationalFacadeDomain
 	}
 	n := OwnedRational{raw: NewRational(), ownerID: s.ownerID}
-	defer s.manager.drop(&n.raw)
+	defer s.destroyLexicalRational(&n.raw)
 	if e := s.manager.Copy(&n.raw, &a.raw); e != nil {
 		return 0, e
 	}
@@ -869,7 +912,9 @@ func (s *RationalService) NumBits(a *OwnedRational) (uint32, error) {
 			return 0, e
 		}
 		e = s.manager.Copy(&n.raw, &quotient.raw)
-		s.manager.drop(&quotient.raw)
+		if cleanup := s.destroyLexicalRational(&quotient.raw); e == nil {
+			e = cleanup
+		}
 		if e != nil {
 			return 0, e
 		}

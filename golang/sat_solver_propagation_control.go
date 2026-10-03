@@ -54,7 +54,7 @@ func newSATSolverPropagationState(v *satSolverVariableState, a *satClauseAllocat
 	if e := cfg.open(); e != nil {
 		return nil, e
 	}
-	if r == nil || r.closed || mem == nil {
+	if r == nil || r.closed || mem == nil || v.memory != mem {
 		return nil, ErrSATOwner
 	}
 	if _, e := mem.AllocationSize(); e != nil {

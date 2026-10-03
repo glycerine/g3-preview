@@ -56,28 +56,36 @@ func (s *RationalService) IsIntPerfectSquare(a, out *OwnedRational) (bool, error
 // distinct from ExtendedGCD, the separate util/ext_gcd.h wrapper algorithm.
 // Source output denominators/coefficients publish in manager order, including
 // any successful prefixes on error; no extra staging silently erases them.
-func (s *RationalService) GCDCoefficients(a, b, x, y *OwnedRational) (OwnedRational, error) {
+func (s *RationalService) GCDCoefficients(a, b, x, y *OwnedRational) (_lexOut OwnedRational, _lexErr error) {
 	if e := s.lock(); e != nil {
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
+	if e := s.lexicalReady(); e != nil {
+		return OwnedRational{}, e
+	}
+	defer s.finishLexicalRational(&_lexOut, &_lexErr)
 	for _, v := range []*OwnedRational{a, b, x, y} {
 		if e := s.check(v); e != nil {
 			return OwnedRational{}, e
 		}
 	}
 	result := NewRational()
-	defer s.manager.drop(&result)
+	defer s.destroyLexicalRational(&result)
 	if e := s.manager.ExtendedGCD(&a.raw, &b.raw, &x.raw, &y.raw, &result); e != nil {
 		return OwnedRational{}, e
 	}
 	return s.facadeTakeLocked(&result)
 }
-func (s *RationalService) extraBinary(a, b *OwnedRational, op uint8) (OwnedRational, error) {
+func (s *RationalService) extraBinary(a, b *OwnedRational, op uint8) (_lexOut OwnedRational, _lexErr error) {
 	if e := s.lock(); e != nil {
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
+	if e := s.lexicalReady(); e != nil {
+		return OwnedRational{}, e
+	}
+	defer s.finishLexicalRational(&_lexOut, &_lexErr)
 	if e := s.check(a); e != nil {
 		return OwnedRational{}, e
 	}
@@ -85,7 +93,7 @@ func (s *RationalService) extraBinary(a, b *OwnedRational, op uint8) (OwnedRatio
 		return OwnedRational{}, e
 	}
 	result := NewRational()
-	defer s.manager.drop(&result)
+	defer s.destroyLexicalRational(&result)
 	var e error
 	switch op {
 	case 0:
@@ -114,16 +122,20 @@ func (s *RationalService) BitwiseAnd(a, b *OwnedRational) (OwnedRational, error)
 func (s *RationalService) BitwiseXor(a, b *OwnedRational) (OwnedRational, error) {
 	return s.extraBinary(a, b, 3)
 }
-func (s *RationalService) BitwiseNot(width uint32, a *OwnedRational) (OwnedRational, error) {
+func (s *RationalService) BitwiseNot(width uint32, a *OwnedRational) (_lexOut OwnedRational, _lexErr error) {
 	if e := s.lock(); e != nil {
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
+	if e := s.lexicalReady(); e != nil {
+		return OwnedRational{}, e
+	}
+	defer s.finishLexicalRational(&_lexOut, &_lexErr)
 	if e := s.check(a); e != nil {
 		return OwnedRational{}, e
 	}
 	result := NewRational()
-	defer s.manager.drop(&result)
+	defer s.destroyLexicalRational(&result)
 	if e := s.manager.BitwiseNot(width, &a.raw, &result); e != nil {
 		return OwnedRational{}, e
 	}
@@ -202,16 +214,20 @@ func (s *RationalService) SetFromScopedInt(dst *OwnedRational, source *ScopedInt
 	}
 	return s.manager.resetDenominator(&dst.raw)
 }
-func (s *RationalService) NewFromScopedInt(source *ScopedInt) (OwnedRational, error) {
+func (s *RationalService) NewFromScopedInt(source *ScopedInt) (_lexOut OwnedRational, _lexErr error) {
 	if e := s.lock(); e != nil {
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
+	if e := s.lexicalReady(); e != nil {
+		return OwnedRational{}, e
+	}
+	defer s.finishLexicalRational(&_lexOut, &_lexErr)
 	if _, e := source.Get(); e != nil {
 		return OwnedRational{}, e
 	}
 	result := NewRational()
-	defer s.manager.drop(&result)
+	defer s.destroyLexicalRational(&result)
 	if e := s.manager.z.CopyFrom(&result.num, source.manager, &source.num); e != nil {
 		return OwnedRational{}, e
 	}
@@ -312,16 +328,20 @@ func (s *RationalService) FormatSMT2Into(a *OwnedRational, decimal bool, dst []b
 // The source scoped manager is externally confined, exactly as for ScopedInt.
 // CopyFrom preserves noncanonical representation; no parser or normalization
 // substitutes for the source record-copy constructor.
-func (s *RationalService) NewFromScopedRational(source *ScopedRational) (OwnedRational, error) {
+func (s *RationalService) NewFromScopedRational(source *ScopedRational) (_lexOut OwnedRational, _lexErr error) {
 	if e := s.lock(); e != nil {
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
+	if e := s.lexicalReady(); e != nil {
+		return OwnedRational{}, e
+	}
+	defer s.finishLexicalRational(&_lexOut, &_lexErr)
 	if _, e := source.Get(); e != nil {
 		return OwnedRational{}, e
 	}
 	result := NewRational()
-	defer s.manager.drop(&result)
+	defer s.destroyLexicalRational(&result)
 	if e := s.manager.CopyFrom(&result, source.manager, &source.num); e != nil {
 		return OwnedRational{}, e
 	}

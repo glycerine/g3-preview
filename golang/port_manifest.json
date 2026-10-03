@@ -54891,7 +54891,9 @@
         "sat_solver_clause_attach.go",
         "sat_solver_clause_attach_test.go",
         "sat_solver_backtrack.go",
-        "sat_solver_backtrack_test.go"
+        "sat_solver_backtrack_test.go",
+        "sat_solver_assignment_storage.go",
+        "sat_solver_assignment_storage_test.go"
       ],
       "tests": [
         "TestSATSolverClauseCoreFiniteSimplification",
@@ -54942,7 +54944,17 @@
         "TestSATSolverBacktrackExtensionAndOwnerPrefixes",
         "TestSATSolverUnassignInvalidOldActualReadPrefix",
         "TestSATSolverReinitIncreasingShrinkRetainedSourceSlots",
-        "TestSATSolverPushActualStatementReadTiming"
+        "TestSATSolverPushActualStatementReadTiming",
+        "TestSATSolverAssignmentAllocationReachesActualCheckpoint",
+        "TestSATSolverAssignmentRuntimeHeadersRetainedBytesAndRealloc",
+        "TestSATSolverAssignmentReleaseWriteAndShrinkSourceRoutes",
+        "TestSATSolverAssignmentRawValueReadDoesNotPrefetchSize",
+        "TestSATSolverAssignmentTLSAllocationFailureRetainsUnpublishedRoot",
+        "TestSATSolverAssignmentReallocateRefusalKeepsActualOldBinding",
+        "TestSATSolverAssignmentCurrentMemberBorrowAndOwnerGuards",
+        "TestSATSolverAssignmentSourceUnsignedGrowthException",
+        "TestSATSolverAssignmentNonNullZeroCapacityActualExpandRoute",
+        "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime"
       ],
       "conditionals": [
         {
@@ -55468,17 +55480,36 @@
             "TestSATSolverReinitIncreasingShrinkRetainedSourceSlots",
             "TestSATSolverPushActualStatementReadTiming"
           ]
+        },
+        {
+          "name": "Selected actual solver m_assignment char_vector Runtime backing/header/growth/realloc/source operators/shrink and same-runtime checkpoint integration; other typed solver allocation hooks remain open",
+          "status": "ported",
+          "go_target": "sat_solver_assignment_storage.go",
+          "tests": [
+            "TestSATSolverAssignmentAllocationReachesActualCheckpoint",
+            "TestSATSolverAssignmentRuntimeHeadersRetainedBytesAndRealloc",
+            "TestSATSolverAssignmentReleaseWriteAndShrinkSourceRoutes",
+            "TestSATSolverAssignmentRawValueReadDoesNotPrefetchSize",
+            "TestSATSolverAssignmentTLSAllocationFailureRetainsUnpublishedRoot",
+            "TestSATSolverAssignmentReallocateRefusalKeepsActualOldBinding",
+            "TestSATSolverAssignmentCurrentMemberBorrowAndOwnerGuards",
+            "TestSATSolverAssignmentSourceUnsignedGrowthException",
+            "TestSATSolverAssignmentNonNullZeroCapacityActualExpandRoute",
+            "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime"
+          ]
         }
       ],
       "ownership": [
         "Borrowed actual assignment/level arrays and real clause allocator storage; no search owner or solver runtime.",
-        "Source-width char assignment and scalar columns; charged outer watch tokens/metadata own each actual child once; real activity/queue/trail, borrowed actual todo. No complete solver construction or search."
+        "Source-width char assignment and scalar columns; charged outer watch tokens/metadata own each actual child once; real activity/queue/trail, borrowed actual todo. No complete solver construction or search.",
+        "Assignment bytes and initialization state are owned solely by the borrowed real Runtime, with source vector capacity/size headers and explicit block/pending tokens; enclosing variable owner charges embedded metadata. Variable graph Stats exclude borrowed runtime, which physical audits add exactly once. Runtime must outlive variable/propagation owners, which require the same actual Runtime identity."
       ],
       "deviations": [
         "Concrete allocation-free heapsort replaces std::sort on scalar literals. TRACE, solver construction, BCP, conflicts, search, scopes and remaining methods are unported.",
         "Wrapped source allocations that cannot represent full typed capacity remain unported; host bounds are separate from exact source overflow DefaultException. Default child policies, full solver constructor, propagation, conflicts, scopes/search and TRACE remain open.",
         "Propagation state borrows actual variable/clause/model-converter/rlimit/Runtime/config owners and owns only its charged cold member grouping/diff-level backing. Cleaner/asymm/probing counters are real selected member state, not child Run implementations. No concrete extension subclass exists in this fork; dispatch fails explicitly at asserted/EXT call sites after completed source prefixes. Full solver constructor, UpdateParams/default policy children, propagation integrity/missed-propagation checks, literal-span num_diff_levels consumers, search/conflicts/scopes and user-scope campaign remain open.",
-        "Checkpoint reads the actual bound Runtime allocation counter. SAT arena-backed typed storage has not yet been integrated into that source runtime accounting domain; end-to-end solver memory-limit behavior remains open. No allocation events are fabricated from Budget usage."
+        "Checkpoint reads the actual bound Runtime allocation counter. SAT arena-backed typed storage has not yet been integrated into that source runtime accounting domain; end-to-end solver memory-limit behavior remains open. No allocation events are fabricated from Budget usage.",
+        "Only assignment char_vector source allocation accounting is integrated in this slice. Other SAT columns/watch/queue/clause/trail/vector allocations still require real global/runtime source hooks. Raw-state bounds/initialization guards act at endangered byte accesses; source DEBUG logical assertions remain distinct. No full solver construction/search or registered assertion completion is claimed."
       ]
     },
     {
@@ -55508,7 +55539,9 @@
         "sat_solver_clause_attach.go",
         "sat_solver_clause_attach_test.go",
         "sat_solver_backtrack.go",
-        "sat_solver_backtrack_test.go"
+        "sat_solver_backtrack_test.go",
+        "sat_solver_assignment_storage.go",
+        "sat_solver_assignment_storage_test.go"
       ],
       "tests": [
         "TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots",
@@ -55559,7 +55592,17 @@
         "TestSATSolverBacktrackExtensionAndOwnerPrefixes",
         "TestSATSolverUnassignInvalidOldActualReadPrefix",
         "TestSATSolverReinitIncreasingShrinkRetainedSourceSlots",
-        "TestSATSolverPushActualStatementReadTiming"
+        "TestSATSolverPushActualStatementReadTiming",
+        "TestSATSolverAssignmentAllocationReachesActualCheckpoint",
+        "TestSATSolverAssignmentRuntimeHeadersRetainedBytesAndRealloc",
+        "TestSATSolverAssignmentReleaseWriteAndShrinkSourceRoutes",
+        "TestSATSolverAssignmentRawValueReadDoesNotPrefetchSize",
+        "TestSATSolverAssignmentTLSAllocationFailureRetainsUnpublishedRoot",
+        "TestSATSolverAssignmentReallocateRefusalKeepsActualOldBinding",
+        "TestSATSolverAssignmentCurrentMemberBorrowAndOwnerGuards",
+        "TestSATSolverAssignmentSourceUnsignedGrowthException",
+        "TestSATSolverAssignmentNonNullZeroCapacityActualExpandRoute",
+        "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime"
       ],
       "conditionals": [
         {
@@ -55669,15 +55712,34 @@
             "TestSATSolverReinitIncreasingShrinkRetainedSourceSlots",
             "TestSATSolverPushActualStatementReadTiming"
           ]
+        },
+        {
+          "name": "Selected actual solver m_assignment char_vector Runtime backing/header/growth/realloc/source operators/shrink and same-runtime checkpoint integration; other typed solver allocation hooks remain open",
+          "status": "ported",
+          "go_target": "sat_solver_assignment_storage.go",
+          "tests": [
+            "TestSATSolverAssignmentAllocationReachesActualCheckpoint",
+            "TestSATSolverAssignmentRuntimeHeadersRetainedBytesAndRealloc",
+            "TestSATSolverAssignmentReleaseWriteAndShrinkSourceRoutes",
+            "TestSATSolverAssignmentRawValueReadDoesNotPrefetchSize",
+            "TestSATSolverAssignmentTLSAllocationFailureRetainsUnpublishedRoot",
+            "TestSATSolverAssignmentReallocateRefusalKeepsActualOldBinding",
+            "TestSATSolverAssignmentCurrentMemberBorrowAndOwnerGuards",
+            "TestSATSolverAssignmentSourceUnsignedGrowthException",
+            "TestSATSolverAssignmentNonNullZeroCapacityActualExpandRoute",
+            "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime"
+          ]
         }
       ],
       "ownership": [
-        "Source-width char assignment and scalar columns; charged outer watch tokens/metadata own each actual child once; real activity/queue/trail, borrowed actual todo. No complete solver construction or search."
+        "Source-width char assignment and scalar columns; charged outer watch tokens/metadata own each actual child once; real activity/queue/trail, borrowed actual todo. No complete solver construction or search.",
+        "Assignment bytes and initialization state are owned solely by the borrowed real Runtime, with source vector capacity/size headers and explicit block/pending tokens; enclosing variable owner charges embedded metadata. Variable graph Stats exclude borrowed runtime, which physical audits add exactly once. Runtime must outlive variable/propagation owners, which require the same actual Runtime identity."
       ],
       "deviations": [
         "Wrapped source allocations that cannot represent full typed capacity remain unported; host bounds are separate from exact source overflow DefaultException. Default child policies, full solver constructor, propagation, conflicts, scopes/search and TRACE remain open.",
         "Propagation state borrows actual variable/clause/model-converter/rlimit/Runtime/config owners and owns only its charged cold member grouping/diff-level backing. Cleaner/asymm/probing counters are real selected member state, not child Run implementations. No concrete extension subclass exists in this fork; dispatch fails explicitly at asserted/EXT call sites after completed source prefixes. Full solver constructor, UpdateParams/default policy children, propagation integrity/missed-propagation checks, literal-span num_diff_levels consumers, search/conflicts/scopes and user-scope campaign remain open.",
-        "Checkpoint reads the actual bound Runtime allocation counter. SAT arena-backed typed storage has not yet been integrated into that source runtime accounting domain; end-to-end solver memory-limit behavior remains open. No allocation events are fabricated from Budget usage."
+        "Checkpoint reads the actual bound Runtime allocation counter. SAT arena-backed typed storage has not yet been integrated into that source runtime accounting domain; end-to-end solver memory-limit behavior remains open. No allocation events are fabricated from Budget usage.",
+        "Only assignment char_vector source allocation accounting is integrated in this slice. Other SAT columns/watch/queue/clause/trail/vector allocations still require real global/runtime source hooks. Raw-state bounds/initialization guards act at endangered byte accesses; source DEBUG logical assertions remain distinct. No full solver construction/search or registered assertion completion is claimed."
       ]
     },
     {
@@ -91702,7 +91764,10 @@
       "status": "partial",
       "go_targets": [
         "util_sexpr.go",
-        "ast_shared_occs_mark.go"
+        "ast_shared_occs_mark.go",
+        "mpnum/mp_integer_output_scope.go",
+        "mpnum/mp_integer_output_scope_test.go",
+        "mpnum/mpn_cstring.go"
       ],
       "tests": [
         "TestSexprBVSourceInlineBufferAndTemporaryLifetime",
@@ -91726,7 +91791,16 @@
         "TestASTSparseMarkLastTombstoneAndCurrentHashReads",
         "TestASTSparseMarkPendingResetCanFinishAtFinalEpoch",
         "TestASTSparseMarkResetAndFinalizeFreeBeforeReserve",
-        "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
+        "TestASTSparseSharedExpressionDomainsAndASTWideVisited",
+        "TestIntegerCharacterConstructorBeforeLimbLocals",
+        "TestSourceCStringPhysicalBytesAndLbuf",
+        "TestIntegerCharacterScopeActualCapacityAndCleanup",
+        "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
+        "TestIntegerCharacterWrappedSizePhysicalCapacity",
+        "TestIntegerCharacterFailedConstructorSurvivesSourceFinalize",
+        "TestIntegerCharacterUsesActualInitializedSizeHeader",
+        "TestIntegerCharacterRationalNumeratorBeforeDenominator",
+        "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots"
       ],
       "conditionals": [
         {
@@ -91830,14 +91904,32 @@
             "TestASTSharedOccurrencesIteratorActualBackingLifetime",
             "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
           ]
+        },
+        {
+          "name": "Selected ordinary digit32 BIG Integer/Rational display char1024 lexical constructor/source unwinding and actual physical C-string kernel/insertion/destruction; full stream, Windows/GMP/digit64 profiles remain open",
+          "status": "ported",
+          "go_target": "mpnum/mp_integer_output_scope.go",
+          "tests": [
+            "TestIntegerCharacterConstructorBeforeLimbLocals",
+            "TestSourceCStringPhysicalBytesAndLbuf",
+            "TestIntegerCharacterScopeActualCapacityAndCleanup",
+            "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
+            "TestIntegerCharacterWrappedSizePhysicalCapacity",
+            "TestIntegerCharacterFailedConstructorSurvivesSourceFinalize",
+            "TestIntegerCharacterUsesActualInitializedSizeHeader",
+            "TestIntegerCharacterRationalNumeratorBeforeDenominator",
+            "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots"
+          ]
         }
       ],
       "ownership": [
         "Function-local inline16 bytes and budgeted overflow arrays, old/new overlap and per-atom destruction. Other buffer methods/types remain separately inventoried.",
-        "Concrete AST expr identity-table and shared-occurrence owners preserve source bucket-order callbacks, borrowing, actual node shared flags and charged backing/header peaks. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md."
+        "Concrete AST expr identity-table and shared-occurrence owners preserve source bucket-order callbacks, borrowing, actual node shared flags and charged backing/header peaks. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md.",
+        "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets."
       ],
       "deviations": [
-        "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md."
+        "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md.",
+        "Source char bytes use physical capacity/initialization independently of POS and unsigned11*size wrap. Selected non-Windows digit32 snprintf lbuf0/truncation and multi-limb ignored-lbuf behavior execute. Windows sprintf_s constraint handler, GMP/digit64, global/locale/ostream and literal std::string temporary allocation/evaluation remain open. No whole-unit or registered assertion completion is claimed."
       ]
     },
     {
@@ -96513,7 +96605,9 @@
       "go_targets": [
         "mpnum/inf_eps_rational.go",
         "mpnum/inf_scalar_projection_test.go",
-        "mpnum/mp_raw_projection_test.go"
+        "mpnum/mp_raw_projection_test.go",
+        "mpnum/rational_lexical_scope.go",
+        "mpnum/mp_lexical_scope_test.go"
       ],
       "tests": [
         "TestInfEpsInfFiniteTripleOracles",
@@ -96543,7 +96637,16 @@
         "TestRawProjectionOwningBigCopiesAndMemberFailureOrder",
         "TestRawProjectionWarmPhysicalGraphAndIdentity",
         "TestRawProjectionNestedOwnerAtActualBranch",
-        "TestRawProjectionBothPoliciesAllComponentAliases"
+        "TestRawProjectionBothPoliciesAllComponentAliases",
+        "TestLexicalInfDestructorRefusal",
+        "TestLexicalPendingOwnerAPI",
+        "TestLexicalReverseMemberProgressAndExplicitRecovery",
+        "TestLexicalFailedConstructorCompletedMemberOrder",
+        "TestLexicalUnpublishedResultAndEightChargedRoots",
+        "TestLexicalCloneFailedMemberReadUnwind",
+        "TestLexicalCallerDestructorLateMemberRead",
+        "TestLexicalOriginalFailureAndCleanupCause",
+        "TestLexicalRationalManagerOneRootContinuation"
       ],
       "conditionals": [
         {
@@ -96728,14 +96831,32 @@
             "TestRawProjectionNestedOwnerAtActualBranch",
             "TestRawProjectionBothPoliciesAllComponentAliases"
           ]
+        },
+        {
+          "name": "Selected owning clone/projection/output helper cleanup with charged retained8 service/1 bridge records, completed-vs-failed member construction, observable refused cleanup and reached public Inf component Del; broader constructor/arithmetic temporary domains remain open",
+          "status": "partial",
+          "go_target": "mpnum/rational_lexical_scope.go",
+          "tests": [
+            "TestLexicalInfDestructorRefusal",
+            "TestLexicalPendingOwnerAPI",
+            "TestLexicalReverseMemberProgressAndExplicitRecovery",
+            "TestLexicalFailedConstructorCompletedMemberOrder",
+            "TestLexicalUnpublishedResultAndEightChargedRoots",
+            "TestLexicalCloneFailedMemberReadUnwind",
+            "TestLexicalCallerDestructorLateMemberRead",
+            "TestLexicalOriginalFailureAndCleanupCause",
+            "TestLexicalRationalManagerOneRootContinuation"
+          ]
         }
       ],
       "ownership": [
-        "Concrete pointer-free triple and scalar service provenance. Infinity publishes first, nested members first then second; destructor reverses members. Existing manager budget accounts numeric cells/Words/text scratch; one final caller string. Actual only repository Numeral=inf_rational specialization, no Go generics. See PORT_PROGRESS.md#audit-inf-eps-rational-port-status-md."
+        "Concrete pointer-free triple and scalar service provenance. Infinity publishes first, nested members first then second; destructor reverses members. Existing manager budget accounts numeric cells/Words/text scratch; one final caller string. Actual only repository Numeral=inf_rational specialization, no Go generics. See PORT_PROGRESS.md#audit-inf-eps-rational-port-status-md.",
+        "Real remaining temporary Rational records are moved into charged embedded service8/manager1 storage before stack owners vanish; completed source destruction and partial-constructor owning abort are distinguished. Named-return finishers propagate refused cleanup and retain unpublished result roots. Public Inf Del retains caller suffix in actual source component order; pure queries and caller cleanup remain usable. Explicit CleanupLexical is Go owning recovery, not source destructor retry equivalence."
       ],
       "deviations": [
         "Source const references return owning copies; source scalar assertion domains are typed errors. Mixed equality defect and exact nonsaturating infinity coefficient retained. No actual registered direct source assertion counts invented.",
-        "Source h131\u2013147 selected component reference projections ignore unrelated infinity/numeral components; current owning forwards check all denominators and Copy rejects source-finite raw denominator0. NUM-only sign/hash routes retain separate raw-domain debt."
+        "Source h131\u2013147 selected component reference projections ignore unrelated infinity/numeral components; current owning forwards check all denominators and Copy rejects source-finite raw denominator0. NUM-only sign/hash routes retain separate raw-domain debt.",
+        "Malformed32-bit requested-byte layouts are labelled guarded Go boundary evidence, not ordinary valid C++ destructor allocation failure. Budget supplies actual allocation refusal/failed-copy token only, never simulated Del failure. Selected scope records preserve original vs cleanup causes; broader raw constructor/reset/alias/default-copy-constructor arithmetic temporaries, registry/global ownership and transport remain partial. Cross-owner staged CopyFrom is explicit Go ownership bridge, not a source alias transaction. No whole-unit/API/registered assertion promotion."
       ]
     },
     {
@@ -96839,7 +96960,9 @@
       "go_targets": [
         "mpnum/inf_int_rational.go",
         "mpnum/inf_scalar_projection_test.go",
-        "mpnum/mp_raw_projection_test.go"
+        "mpnum/mp_raw_projection_test.go",
+        "mpnum/rational_lexical_scope.go",
+        "mpnum/mp_lexical_scope_test.go"
       ],
       "tests": [
         "TestInfIntRationalSourceConstructorsConstantsLifetime",
@@ -96871,7 +96994,16 @@
         "TestRawProjectionOwningBigCopiesAndMemberFailureOrder",
         "TestRawProjectionWarmPhysicalGraphAndIdentity",
         "TestRawProjectionNestedOwnerAtActualBranch",
-        "TestRawProjectionBothPoliciesAllComponentAliases"
+        "TestRawProjectionBothPoliciesAllComponentAliases",
+        "TestLexicalInfDestructorRefusal",
+        "TestLexicalPendingOwnerAPI",
+        "TestLexicalReverseMemberProgressAndExplicitRecovery",
+        "TestLexicalFailedConstructorCompletedMemberOrder",
+        "TestLexicalUnpublishedResultAndEightChargedRoots",
+        "TestLexicalCloneFailedMemberReadUnwind",
+        "TestLexicalCallerDestructorLateMemberRead",
+        "TestLexicalOriginalFailureAndCleanupCause",
+        "TestLexicalRationalManagerOneRootContinuation"
       ],
       "conditionals": [
         {
@@ -97018,15 +97150,33 @@
             "TestRawProjectionNestedOwnerAtActualBranch",
             "TestRawProjectionBothPoliciesAllComponentAliases"
           ]
+        },
+        {
+          "name": "Selected owning clone/projection/output helper cleanup with charged retained8 service/1 bridge records, completed-vs-failed member construction, observable refused cleanup and reached public Inf component Del; broader constructor/arithmetic temporary domains remain open",
+          "status": "partial",
+          "go_target": "mpnum/rational_lexical_scope.go",
+          "tests": [
+            "TestLexicalInfDestructorRefusal",
+            "TestLexicalPendingOwnerAPI",
+            "TestLexicalReverseMemberProgressAndExplicitRecovery",
+            "TestLexicalFailedConstructorCompletedMemberOrder",
+            "TestLexicalUnpublishedResultAndEightChargedRoots",
+            "TestLexicalCloneFailedMemberReadUnwind",
+            "TestLexicalCallerDestructorLateMemberRead",
+            "TestLexicalOriginalFailureAndCleanupCause",
+            "TestLexicalRationalManagerOneRootContinuation"
+          ]
         }
       ],
       "ownership": [
-        "Concrete raw rational plus signed32 epsilon and scalar service provenance; existing service mutex/manager owns storage. Arithmetic publishes rational first then epsilon; scalar integer projection is reread after first multiplication. Explicit ownership and source temporary copies retained. See PORT_PROGRESS.md#audit-inf-int-rational-port-status-md."
+        "Concrete raw rational plus signed32 epsilon and scalar service provenance; existing service mutex/manager owns storage. Arithmetic publishes rational first then epsilon; scalar integer projection is reread after first multiplication. Explicit ownership and source temporary copies retained. See PORT_PROGRESS.md#audit-inf-int-rational-port-status-md.",
+        "Real remaining temporary Rational records are moved into charged embedded service8/manager1 storage before stack owners vanish; completed source destruction and partial-constructor owning abort are distinguished. Named-return finishers propagate refused cleanup and retain unpublished result roots. Public Inf Del retains caller suffix in actual source component order; pure queries and caller cleanup remain usable. Explicit CleanupLexical is Go owning recovery, not source destructor retry equivalence."
       ],
       "deviations": [
         "Global constants and borrowed rational accessors are owner-local/independent-copy adapters. Signed32 overflow, INT_MIN negation and formatting negation are explicit typed undefined-domain failures with source defined prefixes retained.",
         "No registered source inf_int_rational test exists; independent finite/fault/alias/ownership checks are supplied without inventing source assertion coverage.",
-        "Source h129\u2013137 returns FIRST without a denominator-domain assertion; InfIntFirst/Rational/Infinitesimal still enter ordinary checkInfInt and owning Copy, rejecting source-finite raw denominator0 and inspecting unrelated FIRST before constructing epsilon. Sign/hash NUM-only routes retain separate raw-domain debt."
+        "Source h129\u2013137 returns FIRST without a denominator-domain assertion; InfIntFirst/Rational/Infinitesimal still enter ordinary checkInfInt and owning Copy, rejecting source-finite raw denominator0 and inspecting unrelated FIRST before constructing epsilon. Sign/hash NUM-only routes retain separate raw-domain debt.",
+        "Malformed32-bit requested-byte layouts are labelled guarded Go boundary evidence, not ordinary valid C++ destructor allocation failure. Budget supplies actual allocation refusal/failed-copy token only, never simulated Del failure. Selected scope records preserve original vs cleanup causes; broader raw constructor/reset/alias/default-copy-constructor arithmetic temporaries, registry/global ownership and transport remain partial. Cross-owner staged CopyFrom is explicit Go ownership bridge, not a source alias transaction. No whole-unit/API/registered assertion promotion."
       ]
     },
     {
@@ -97138,7 +97288,9 @@
       "go_targets": [
         "mpnum/inf_rational.go",
         "mpnum/inf_scalar_projection_test.go",
-        "mpnum/mp_raw_projection_test.go"
+        "mpnum/mp_raw_projection_test.go",
+        "mpnum/rational_lexical_scope.go",
+        "mpnum/mp_lexical_scope_test.go"
       ],
       "tests": [
         "TestInfRationalSource80Assertions",
@@ -97176,7 +97328,16 @@
         "TestRawProjectionOwningBigCopiesAndMemberFailureOrder",
         "TestRawProjectionWarmPhysicalGraphAndIdentity",
         "TestRawProjectionNestedOwnerAtActualBranch",
-        "TestRawProjectionBothPoliciesAllComponentAliases"
+        "TestRawProjectionBothPoliciesAllComponentAliases",
+        "TestLexicalInfDestructorRefusal",
+        "TestLexicalPendingOwnerAPI",
+        "TestLexicalReverseMemberProgressAndExplicitRecovery",
+        "TestLexicalFailedConstructorCompletedMemberOrder",
+        "TestLexicalUnpublishedResultAndEightChargedRoots",
+        "TestLexicalCloneFailedMemberReadUnwind",
+        "TestLexicalCallerDestructorLateMemberRead",
+        "TestLexicalOriginalFailureAndCleanupCause",
+        "TestLexicalRationalManagerOneRootContinuation"
       ],
       "conditionals": [
         {
@@ -97372,16 +97533,34 @@
             "TestRawProjectionNestedOwnerAtActualBranch",
             "TestRawProjectionBothPoliciesAllComponentAliases"
           ]
+        },
+        {
+          "name": "Selected owning clone/projection/output helper cleanup with charged retained8 service/1 bridge records, completed-vs-failed member construction, observable refused cleanup and reached public Inf component Del; broader constructor/arithmetic temporary domains remain open",
+          "status": "partial",
+          "go_target": "mpnum/rational_lexical_scope.go",
+          "tests": [
+            "TestLexicalInfDestructorRefusal",
+            "TestLexicalPendingOwnerAPI",
+            "TestLexicalReverseMemberProgressAndExplicitRecovery",
+            "TestLexicalFailedConstructorCompletedMemberOrder",
+            "TestLexicalUnpublishedResultAndEightChargedRoots",
+            "TestLexicalCloneFailedMemberReadUnwind",
+            "TestLexicalCallerDestructorLateMemberRead",
+            "TestLexicalOriginalFailureAndCleanupCause",
+            "TestLexicalRationalManagerOneRootContinuation"
+          ]
         }
       ],
       "ownership": [
         "Two concrete pointer-free rational components plus scalar provenance, owned by existing service and synchronized raw manager. Assignment/arithmetic first then second; implicit member destruction second then first. Full-expression copies and cleanup, partial output roots and exact budgets tested. See PORT_PROGRESS.md#audit-inf-rational-port-status-md.",
-        "Formatting has no intermediate host strings: existing budgeted manager text workspace preserves first/epsilon formatting and source abs temporary full-expression cleanup. Caller receives exactly one final string. See PORT_PROGRESS.md#audit-inf-format-port-status-md."
+        "Formatting has no intermediate host strings: existing budgeted manager text workspace preserves first/epsilon formatting and source abs temporary full-expression cleanup. Caller receives exactly one final string. See PORT_PROGRESS.md#audit-inf-format-port-status-md.",
+        "Real remaining temporary Rational records are moved into charged embedded service8/manager1 storage before stack owners vanish; completed source destruction and partial-constructor owning abort are distinguished. Named-return finishers propagate refused cleanup and retain unpublished result roots. Public Inf Del retains caller suffix in actual source component order; pure queries and caller cleanup remain usable. Explicit CleanupLexical is Go owning recovery, not source destructor retry equivalence."
       ],
       "deviations": [
         "Global constants/borrowed accessors replaced by owner-local constants and explicit independent copies; typed checked source-assertion errors. Signed INT_MIN constructor-negation uses widened defined adapter. Source trace/assertion-message infrastructure remains separate.",
         "Inactive/commented general pair arithmetic and duplicate #if0 approximation declarations are not runtime implementations; all eight compiled approximation functions are ported, including coarse/defective roots/powers.",
-        "Source h135\u2013143 component reference projections read only the selected component; InfFirst/InfRational/Infinitesimal still check both denominators and owning Copy rejects source-finite raw denominator0. NUM-only sign/hash routes retain separate raw-domain debt."
+        "Source h135\u2013143 component reference projections read only the selected component; InfFirst/InfRational/Infinitesimal still check both denominators and owning Copy rejects source-finite raw denominator0. NUM-only sign/hash routes retain separate raw-domain debt.",
+        "Malformed32-bit requested-byte layouts are labelled guarded Go boundary evidence, not ordinary valid C++ destructor allocation failure. Budget supplies actual allocation refusal/failed-copy token only, never simulated Del failure. Selected scope records preserve original vs cleanup causes; broader raw constructor/reset/alias/default-copy-constructor arithmetic temporaries, registry/global ownership and transport remain partial. Cross-owner staged CopyFrom is explicit Go ownership bridge, not a source alias transaction. No whole-unit/API/registered assertion promotion."
       ]
     },
     {
@@ -106368,7 +106547,11 @@
         "mpnum/mp_format.go",
         "mpnum/mpn_format_scope.go",
         "mpnum/mpn_format_scope_test.go",
-        "mpnum/mpn_source_finalize.go"
+        "mpnum/mpn_source_finalize.go",
+        "mpnum/mpn_verification_scope_test.go",
+        "mpnum/mp_integer_output_scope.go",
+        "mpnum/mp_integer_output_scope_test.go",
+        "mpnum/mpn_cstring.go"
       ],
       "tests": [
         "TestNaturalArithmeticOracle",
@@ -106396,7 +106579,18 @@
         "TestNaturalSourceFinalizeRetainsFailedLexicalLocal",
         "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
         "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
-        "TestNaturalSourceFinalizeColdLifecycleGuards"
+        "TestNaturalSourceFinalizeColdLifecycleGuards",
+        "TestNaturalRetainedVerificationGuardsOnlyReachedLocal",
+        "TestNaturalEarlyReturnRetainsPhysicalVerificationRoot",
+        "TestIntegerCharacterConstructorBeforeLimbLocals",
+        "TestSourceCStringPhysicalBytesAndLbuf",
+        "TestIntegerCharacterScopeActualCapacityAndCleanup",
+        "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
+        "TestIntegerCharacterWrappedSizePhysicalCapacity",
+        "TestIntegerCharacterFailedConstructorSurvivesSourceFinalize",
+        "TestIntegerCharacterUsesActualInitializedSizeHeader",
+        "TestIntegerCharacterRationalNumeratorBeforeDenominator",
+        "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots"
       ],
       "conditionals": [
         {
@@ -106586,7 +106780,7 @@
           ]
         },
         {
-          "name": "div shared Algorithm D and source early-return bodies; unused pending-verification scope guard and public span domain remain open",
+          "name": "div shared Algorithm D and source early-return bodies with reached lexical verification guard; broader public span-domain/profile completion remains open",
           "status": "partial",
           "go_target": "mpnum/mpn_indexed.go",
           "tests": [
@@ -106605,7 +106799,9 @@
             "TestOwnedFormattingBudgetLimit",
             "TestNaturalPreparedAddBackStorageAdaptation",
             "TestOwnedTextGrowthPeakAndRefusal",
-            "TestNumericStringHostOwnershipBoundary"
+            "TestNumericStringHostOwnershipBoundary",
+            "TestNaturalRetainedVerificationGuardsOnlyReachedLocal",
+            "TestNaturalEarlyReturnRetainsPhysicalVerificationRoot"
           ]
         },
         {
@@ -106701,7 +106897,7 @@
           ]
         },
         {
-          "name": "to_string: decimal arithmetic and actual lexical limb locals; exact caller char-buffer bounds/lbuf/size_t output actions remain open",
+          "name": "to_string selected digit32 non-Windows physical caller-buffer/lbuf and size_t reversal kernel plus lexical limb scope; full profiles/transport remain open",
           "status": "partial",
           "go_target": "mpnum/mp_format.go",
           "tests": [
@@ -106776,7 +106972,7 @@
           ]
         },
         {
-          "name": "to_string multi-limb lexical temp/numerator/denominator construction, reverse destruction and failed-constructor retained roots in charged embedded scope; caller char/lbuf/full output lifetime remains open",
+          "name": "to_string multi-limb lexical temp/numerator/denominator scope and ordinary integer outer-char integration; broader stream/architecture profiles remain open",
           "status": "partial",
           "go_target": "mpnum/mpn_format_scope.go",
           "tests": [
@@ -106791,13 +106987,40 @@
             "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
             "TestNaturalSourceFinalizeColdLifecycleGuards"
           ]
+        },
+        {
+          "name": "Z3DEBUG verification retained-holder guard only at source lexical constructor after q/rem publication; earlier short-numerator return preserves retained actual backing",
+          "status": "ported",
+          "go_target": "mpnum/mpn_source_verify.go",
+          "tests": [
+            "TestNaturalRetainedVerificationGuardsOnlyReachedLocal",
+            "TestNaturalEarlyReturnRetainsPhysicalVerificationRoot"
+          ]
+        },
+        {
+          "name": "Selected ordinary digit32 BIG Integer/Rational display char1024 lexical constructor/source unwinding and actual physical C-string kernel/insertion/destruction; full stream, Windows/GMP/digit64 profiles remain open",
+          "status": "ported",
+          "go_target": "mpnum/mp_integer_output_scope.go",
+          "tests": [
+            "TestIntegerCharacterConstructorBeforeLimbLocals",
+            "TestSourceCStringPhysicalBytesAndLbuf",
+            "TestIntegerCharacterScopeActualCapacityAndCleanup",
+            "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
+            "TestIntegerCharacterWrappedSizePhysicalCapacity",
+            "TestIntegerCharacterFailedConstructorSurvivesSourceFinalize",
+            "TestIntegerCharacterUsesActualInitializedSizeHeader",
+            "TestIntegerCharacterRationalNumeratorBeforeDenominator",
+            "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots"
+          ]
         }
       ],
       "ownership": [
-        "NaturalManager owns fully budgeted cold headers, four source division buffers, retained formatting limb buffers and ASCII workspace. Integer child borrows parent Words/Budget without double ownership. Borrowed operands and outputs are operation-local; owner confinement replaces OMP lock lifecycle. See PORT_PROGRESS.md#audit-mpnum-port-status-md."
+        "NaturalManager owns a charged real cold header, four actual source inline16/doubling division buffers, a debug lexical verification holder, and embedded formatting lexical limb roots. Published member source destruction is distinct from failed-constructor/unpublished-block owning cleanup. Integer child borrows parent Words/Budget/runtime without double ownership. Retained SmallBytes text is an explicit output assembly adapter. Borrowed operands/outputs are operation-local; source OMP/global lifecycle remains open.",
+        "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets."
       ],
       "deviations": [
-        "Source inline scratch becomes arena Words refs with requested capacity16/doubling. Prepare ab before Algorithm D output publication, including paths with no add-back; arithmetic executes one source pass. Formatting retains source local workspace; final escaped Go String is caller-owned. Source diagnostics and OMP lock lifecycle remain separate gaps."
+        "Go guards actual endangered reads/writes and retained lexical-holder reuse without blocking source paths that never reach those holders. Algorithm D allocates add-back storage only at the source borrow branch. Runtime owns real source allocations and initialized-byte state; no Words shadows represent limb scratch. Final escaped Go strings are caller-owned. Exact character-buffer/output lifetime, broader public source span domains, diagnostic transport, architecture profiles and OMP/global integration remain separate obligations.",
+        "Source char bytes use physical capacity/initialization independently of POS and unsigned11*size wrap. Selected non-Windows digit32 snprintf lbuf0/truncation and multi-limb ignored-lbuf behavior execute. Windows sprintf_s constraint handler, GMP/digit64, global/locale/ostream and literal std::string temporary allocation/evaluation remain open. No whole-unit or registered assertion completion is claimed."
       ]
     },
     {
@@ -106813,7 +107036,11 @@
         "mpnum/mp_format.go",
         "mpnum/mpn_format_scope.go",
         "mpnum/mpn_format_scope_test.go",
-        "mpnum/mpn_source_finalize.go"
+        "mpnum/mpn_source_finalize.go",
+        "mpnum/mpn_verification_scope_test.go",
+        "mpnum/mp_integer_output_scope.go",
+        "mpnum/mp_integer_output_scope_test.go",
+        "mpnum/mpn_cstring.go"
       ],
       "tests": [
         "TestNaturalArithmeticOracle",
@@ -106841,7 +107068,18 @@
         "TestNaturalSourceFinalizeRetainsFailedLexicalLocal",
         "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
         "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
-        "TestNaturalSourceFinalizeColdLifecycleGuards"
+        "TestNaturalSourceFinalizeColdLifecycleGuards",
+        "TestNaturalRetainedVerificationGuardsOnlyReachedLocal",
+        "TestNaturalEarlyReturnRetainsPhysicalVerificationRoot",
+        "TestIntegerCharacterConstructorBeforeLimbLocals",
+        "TestSourceCStringPhysicalBytesAndLbuf",
+        "TestIntegerCharacterScopeActualCapacityAndCleanup",
+        "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
+        "TestIntegerCharacterWrappedSizePhysicalCapacity",
+        "TestIntegerCharacterFailedConstructorSurvivesSourceFinalize",
+        "TestIntegerCharacterUsesActualInitializedSizeHeader",
+        "TestIntegerCharacterRationalNumeratorBeforeDenominator",
+        "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots"
       ],
       "conditionals": [
         {
@@ -106969,7 +107207,7 @@
           ]
         },
         {
-          "name": "div shared Algorithm D and source early-return bodies; unused pending-verification scope guard and public span domain remain open",
+          "name": "div shared Algorithm D and source early-return bodies with reached lexical verification guard; broader public span-domain/profile completion remains open",
           "status": "partial",
           "go_target": "mpnum/mpn_indexed.go",
           "tests": [
@@ -106988,7 +107226,9 @@
             "TestOwnedFormattingBudgetLimit",
             "TestNaturalPreparedAddBackStorageAdaptation",
             "TestOwnedTextGrowthPeakAndRefusal",
-            "TestNumericStringHostOwnershipBoundary"
+            "TestNumericStringHostOwnershipBoundary",
+            "TestNaturalRetainedVerificationGuardsOnlyReachedLocal",
+            "TestNaturalEarlyReturnRetainsPhysicalVerificationRoot"
           ]
         },
         {
@@ -107084,7 +107324,7 @@
           ]
         },
         {
-          "name": "to_string: decimal arithmetic and actual lexical limb locals; exact caller char-buffer bounds/lbuf/size_t output actions remain open",
+          "name": "to_string selected digit32 non-Windows physical caller-buffer/lbuf and size_t reversal kernel plus lexical limb scope; full profiles/transport remain open",
           "status": "partial",
           "go_target": "mpnum/mp_format.go",
           "tests": [
@@ -107159,7 +107399,7 @@
           ]
         },
         {
-          "name": "to_string multi-limb lexical temp/numerator/denominator construction, reverse destruction and failed-constructor retained roots in charged embedded scope; caller char/lbuf/full output lifetime remains open",
+          "name": "to_string multi-limb lexical temp/numerator/denominator scope and ordinary integer outer-char integration; broader stream/architecture profiles remain open",
           "status": "partial",
           "go_target": "mpnum/mpn_format_scope.go",
           "tests": [
@@ -107174,13 +107414,40 @@
             "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
             "TestNaturalSourceFinalizeColdLifecycleGuards"
           ]
+        },
+        {
+          "name": "Z3DEBUG verification retained-holder guard only at source lexical constructor after q/rem publication; earlier short-numerator return preserves retained actual backing",
+          "status": "ported",
+          "go_target": "mpnum/mpn_source_verify.go",
+          "tests": [
+            "TestNaturalRetainedVerificationGuardsOnlyReachedLocal",
+            "TestNaturalEarlyReturnRetainsPhysicalVerificationRoot"
+          ]
+        },
+        {
+          "name": "Selected ordinary digit32 BIG Integer/Rational display char1024 lexical constructor/source unwinding and actual physical C-string kernel/insertion/destruction; full stream, Windows/GMP/digit64 profiles remain open",
+          "status": "ported",
+          "go_target": "mpnum/mp_integer_output_scope.go",
+          "tests": [
+            "TestIntegerCharacterConstructorBeforeLimbLocals",
+            "TestSourceCStringPhysicalBytesAndLbuf",
+            "TestIntegerCharacterScopeActualCapacityAndCleanup",
+            "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
+            "TestIntegerCharacterWrappedSizePhysicalCapacity",
+            "TestIntegerCharacterFailedConstructorSurvivesSourceFinalize",
+            "TestIntegerCharacterUsesActualInitializedSizeHeader",
+            "TestIntegerCharacterRationalNumeratorBeforeDenominator",
+            "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots"
+          ]
         }
       ],
       "ownership": [
-        "NaturalManager owns fully budgeted cold headers, four source division buffers, retained formatting limb buffers and ASCII workspace. Integer child borrows parent Words/Budget without double ownership. Borrowed operands and outputs are operation-local; owner confinement replaces OMP lock lifecycle. See PORT_PROGRESS.md#audit-mpnum-port-status-md."
+        "NaturalManager owns a charged real cold header, four actual source inline16/doubling division buffers, a debug lexical verification holder, and embedded formatting lexical limb roots. Published member source destruction is distinct from failed-constructor/unpublished-block owning cleanup. Integer child borrows parent Words/Budget/runtime without double ownership. Retained SmallBytes text is an explicit output assembly adapter. Borrowed operands/outputs are operation-local; source OMP/global lifecycle remains open.",
+        "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets."
       ],
       "deviations": [
-        "Source inline scratch becomes arena Words refs with requested capacity16/doubling. Prepare ab before Algorithm D output publication, including paths with no add-back; arithmetic executes one source pass. Formatting retains source local workspace; final escaped Go String is caller-owned. Source diagnostics and OMP lock lifecycle remain separate gaps."
+        "Go guards actual endangered reads/writes and retained lexical-holder reuse without blocking source paths that never reach those holders. Algorithm D allocates add-back storage only at the source borrow branch. Runtime owns real source allocations and initialized-byte state; no Words shadows represent limb scratch. Final escaped Go strings are caller-owned. Exact character-buffer/output lifetime, broader public source span domains, diagnostic transport, architecture profiles and OMP/global integration remain separate obligations.",
+        "Source char bytes use physical capacity/initialization independently of POS and unsigned11*size wrap. Selected non-Windows digit32 snprintf lbuf0/truncation and multi-limb ignored-lbuf behavior execute. Windows sprintf_s constraint handler, GMP/digit64, global/locale/ostream and literal std::string temporary allocation/evaluation remain open. No whole-unit or registered assertion completion is claimed."
       ]
     },
     {
@@ -107839,7 +108106,9 @@
         "mpnum/inf_scalar_projection_test.go",
         "mpnum/mpq_source_finalize.go",
         "mpnum/transitive_source_finalize_test.go",
-        "mpnum/mp_raw_projection_test.go"
+        "mpnum/mp_raw_projection_test.go",
+        "mpnum/rational_lexical_scope.go",
+        "mpnum/mp_lexical_scope_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -108031,7 +108300,16 @@
         "TestRawProjectionOwningBigCopiesAndMemberFailureOrder",
         "TestRawProjectionWarmPhysicalGraphAndIdentity",
         "TestRawProjectionNestedOwnerAtActualBranch",
-        "TestRawProjectionBothPoliciesAllComponentAliases"
+        "TestRawProjectionBothPoliciesAllComponentAliases",
+        "TestLexicalInfDestructorRefusal",
+        "TestLexicalPendingOwnerAPI",
+        "TestLexicalReverseMemberProgressAndExplicitRecovery",
+        "TestLexicalFailedConstructorCompletedMemberOrder",
+        "TestLexicalUnpublishedResultAndEightChargedRoots",
+        "TestLexicalCloneFailedMemberReadUnwind",
+        "TestLexicalCallerDestructorLateMemberRead",
+        "TestLexicalOriginalFailureAndCleanupCause",
+        "TestLexicalRationalManagerOneRootContinuation"
       ],
       "conditionals": [
         {
@@ -108968,6 +109246,22 @@
             "TestRawProjectionNestedOwnerAtActualBranch",
             "TestRawProjectionBothPoliciesAllComponentAliases"
           ]
+        },
+        {
+          "name": "Selected owning clone/projection/output helper cleanup with charged retained8 service/1 bridge records, completed-vs-failed member construction, observable refused cleanup and reached public Inf component Del; broader constructor/arithmetic temporary domains remain open",
+          "status": "partial",
+          "go_target": "mpnum/rational_lexical_scope.go",
+          "tests": [
+            "TestLexicalInfDestructorRefusal",
+            "TestLexicalPendingOwnerAPI",
+            "TestLexicalReverseMemberProgressAndExplicitRecovery",
+            "TestLexicalFailedConstructorCompletedMemberOrder",
+            "TestLexicalUnpublishedResultAndEightChargedRoots",
+            "TestLexicalCloneFailedMemberReadUnwind",
+            "TestLexicalCallerDestructorLateMemberRead",
+            "TestLexicalOriginalFailureAndCleanupCause",
+            "TestLexicalRationalManagerOneRootContinuation"
+          ]
         }
       ],
       "ownership": [
@@ -108987,7 +109281,8 @@
         "Actual caller fields publish in source Add/Sub/AddInt/MulInt/MulInts order; general SYNCH Add/Sub explicitly delete tmp1 before tmp2. Existing fused helpers use public Mul then Add/Sub and the source unit shortcuts. Failure tests inspect named caller/temporary roots before disabling faults; physical allocator integration remains open. See PORT_PROGRESS.md#audit-mpq-additive-publication-packet-md.",
         "Zero GCD copies directly into caller before Abs; minimum-promotion allocation refusal retains the completed inline copy, while failed BIG Copy retains the actual published sign/dead descriptor. Existing general GCD locals and final publication remain source ordered; twelve Lehmer and one intermediate ExtendedGCD diagnostics execute only in g3debug. Named roots audited before fault disabling. See PORT_PROGRESS.md#audit-mpz-gcd-publication-packet-md.",
         "All four rounding outputs use existing roundCore directly against the caller; source sign is captured before division and rational denominator resets only after successful integer rounding. Immediate fault roots, integral BIG Copy refusal, quotient-before-correction refusal and raw component aliases are tested. See PORT_PROGRESS.md#audit-mpq-rounding-publication-packet-md; physical allocator-backed cleanup remains separate unfinished work.",
-        "Checked owning cleanup retains a per-component source outer-field cursor and forwards real child failures. This is not full transitive source finalization."
+        "Checked owning cleanup retains a per-component source outer-field cursor and forwards real child failures. This is not full transitive source finalization.",
+        "Real remaining temporary Rational records are moved into charged embedded service8/manager1 storage before stack owners vanish; completed source destruction and partial-constructor owning abort are distinguished. Named-return finishers propagate refused cleanup and retain unpublished result roots. Public Inf Del retains caller suffix in actual source component order; pure queries and caller cleanup remain usable. Explicit CleanupLexical is Go owning recovery, not source destructor retry equivalence."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -109005,7 +109300,8 @@
         "Finite release inverse/division zero results retain actual source raw fields; 0/0 fails at actual integer division after component publication. Service initialized Copy/Move boundary and explicit Go cleanup are adapters. Actual source allocator/global composition remains open; no whole unit promoted.",
         "Interrupted Go local cleanup is an explicit ownership adapter, not C++ exception continuation. Nine independent math/alias/publication/lifetime groups add no registered source assertion credit. Source normalization/GCD and physical backend obligations remain separate; whole unit remains partial.",
         "The registered randomized GCD campaign preserves all 168 primes, conditional Power/Mul and sign draw order using an explicit hermetic RNG adapter, not libc sequence identity. Independent table enumeration and arithmetic checks add no ENSURE credit; print-only minimum GCD expectation is additional verification. Actual allocator topology, cleanup exceptions, alternate backends and full source-unit completion remain open.",
-        "Rational scalar getter predicates remain correct, but source getters assert rational range only in debug before inherited integer access. Current getters universally reject fractional numerals. Selected integer accessor/cast profiles require separate audit and implementation; see PORT_PROGRESS.md#audit-mpq-rounding-publication-packet-md."
+        "Rational scalar getter predicates remain correct, but source getters assert rational range only in debug before inherited integer access. Current getters universally reject fractional numerals. Selected integer accessor/cast profiles require separate audit and implementation; see PORT_PROGRESS.md#audit-mpq-rounding-publication-packet-md.",
+        "Malformed32-bit requested-byte layouts are labelled guarded Go boundary evidence, not ordinary valid C++ destructor allocation failure. Budget supplies actual allocation refusal/failed-copy token only, never simulated Del failure. Selected scope records preserve original vs cleanup causes; broader raw constructor/reset/alias/default-copy-constructor arithmetic temporaries, registry/global ownership and transport remain partial. Cross-owner staged CopyFrom is explicit Go ownership bridge, not a source alias transaction. No whole-unit/API/registered assertion promotion."
       ]
     },
     {
@@ -109086,7 +109382,10 @@
         "mpnum/mp_scalar_projection_test.go",
         "mpnum/mpn_format_scope.go",
         "mpnum/mpn_format_scope_test.go",
-        "mpnum/mpn_source_finalize.go"
+        "mpnum/mpn_source_finalize.go",
+        "mpnum/mp_integer_output_scope.go",
+        "mpnum/mp_integer_output_scope_test.go",
+        "mpnum/mpn_cstring.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -109284,7 +109583,16 @@
         "TestNaturalSourceFinalizeRetainsFailedLexicalLocal",
         "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
         "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
-        "TestNaturalSourceFinalizeColdLifecycleGuards"
+        "TestNaturalSourceFinalizeColdLifecycleGuards",
+        "TestIntegerCharacterConstructorBeforeLimbLocals",
+        "TestSourceCStringPhysicalBytesAndLbuf",
+        "TestIntegerCharacterScopeActualCapacityAndCleanup",
+        "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
+        "TestIntegerCharacterWrappedSizePhysicalCapacity",
+        "TestIntegerCharacterFailedConstructorSurvivesSourceFinalize",
+        "TestIntegerCharacterUsesActualInitializedSizeHeader",
+        "TestIntegerCharacterRationalNumeratorBeforeDenominator",
+        "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots"
       ],
       "conditionals": [
         {
@@ -110896,6 +111204,22 @@
             "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
             "TestNaturalSourceFinalizeColdLifecycleGuards"
           ]
+        },
+        {
+          "name": "Selected ordinary digit32 BIG Integer/Rational display char1024 lexical constructor/source unwinding and actual physical C-string kernel/insertion/destruction; full stream, Windows/GMP/digit64 profiles remain open",
+          "status": "ported",
+          "go_target": "mpnum/mp_integer_output_scope.go",
+          "tests": [
+            "TestIntegerCharacterConstructorBeforeLimbLocals",
+            "TestSourceCStringPhysicalBytesAndLbuf",
+            "TestIntegerCharacterScopeActualCapacityAndCleanup",
+            "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
+            "TestIntegerCharacterWrappedSizePhysicalCapacity",
+            "TestIntegerCharacterFailedConstructorSurvivesSourceFinalize",
+            "TestIntegerCharacterUsesActualInitializedSizeHeader",
+            "TestIntegerCharacterRationalNumeratorBeforeDenominator",
+            "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots"
+          ]
         }
       ],
       "ownership": [
@@ -110915,7 +111239,8 @@
         "Selected old-free/sign/result-transfer/paired-division action prefixes preserve source order; failed replacements use one charged retired descriptor, guarded reads and owner-qualified cleanup. Exact source allocator topology remains open; see PORT_PROGRESS.md#audit-mpz-source-publication-port-status-md.",
         "Base-two Power mutates caller storage through actual destructive allocate_if_needed; other Power and shift wrappers remain staged fidelity work. Scalar debug capacity assertion precedes sign/digits; existing normalize branch tests confirm actual behavior. See PORT_PROGRESS.md#audit-mpz-setter-port-status-md.",
         "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See PORT_PROGRESS.md#audit-mpz-power-publication-packet-md; source allocator/backend integration remains required.",
-        "Zero GCD copies directly into caller before Abs; minimum-promotion allocation refusal retains the completed inline copy, while failed BIG Copy retains the actual published sign/dead descriptor. Existing general GCD locals and final publication remain source ordered; twelve Lehmer and one intermediate ExtendedGCD diagnostics execute only in g3debug. Named roots audited before fault disabling. See PORT_PROGRESS.md#audit-mpz-gcd-publication-packet-md."
+        "Zero GCD copies directly into caller before Abs; minimum-promotion allocation refusal retains the completed inline copy, while failed BIG Copy retains the actual published sign/dead descriptor. Existing general GCD locals and final publication remain source ordered; twelve Lehmer and one intermediate ExtendedGCD diagnostics execute only in g3debug. Named roots audited before fault disabling. See PORT_PROGRESS.md#audit-mpz-gcd-publication-packet-md.",
+        "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -110932,7 +111257,8 @@
         "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open.",
         "The registered randomized GCD campaign preserves all 168 primes, conditional Power/Mul and sign draw order using an explicit hermetic RNG adapter, not libc sequence identity. Independent table enumeration and arithmetic checks add no ENSURE credit; print-only minimum GCD expectation is additional verification. Actual allocator topology, cleanup exceptions, alternate backends and full source-unit completion remain open.",
         "Explicit Go SourceFinalize retains a charged continuation cursor; source-undefined private-pointer guards permit separate owning-abort cleanup without claiming source completion. ConstructionFailure and transitive/global lifecycle remain open.",
-        "ConstructionFailure is the already charged owner. Successful member unwind can retain direct roots with no cleanup error; owning Cleanup is separate. Full transitive/global source lifetime and other source branches remain open."
+        "ConstructionFailure is the already charged owner. Successful member unwind can retain direct roots with no cleanup error; owning Cleanup is separate. Full transitive/global source lifetime and other source branches remain open.",
+        "Source char bytes use physical capacity/initialization independently of POS and unsigned11*size wrap. Selected non-Windows digit32 snprintf lbuf0/truncation and multi-limb ignored-lbuf behavior execute. Windows sprintf_s constraint handler, GMP/digit64, global/locale/ostream and literal std::string temporary allocation/evaluation remain open. No whole-unit or registered assertion completion is claimed."
       ]
     },
     {
@@ -110972,7 +111298,10 @@
         "mpnum/mp_scalar_projection_test.go",
         "mpnum/mpn_format_scope.go",
         "mpnum/mpn_format_scope_test.go",
-        "mpnum/mpn_source_finalize.go"
+        "mpnum/mpn_source_finalize.go",
+        "mpnum/mp_integer_output_scope.go",
+        "mpnum/mp_integer_output_scope_test.go",
+        "mpnum/mpn_cstring.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -111171,7 +111500,16 @@
         "TestNaturalSourceFinalizeRetainsFailedLexicalLocal",
         "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
         "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
-        "TestNaturalSourceFinalizeColdLifecycleGuards"
+        "TestNaturalSourceFinalizeColdLifecycleGuards",
+        "TestIntegerCharacterConstructorBeforeLimbLocals",
+        "TestSourceCStringPhysicalBytesAndLbuf",
+        "TestIntegerCharacterScopeActualCapacityAndCleanup",
+        "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
+        "TestIntegerCharacterWrappedSizePhysicalCapacity",
+        "TestIntegerCharacterFailedConstructorSurvivesSourceFinalize",
+        "TestIntegerCharacterUsesActualInitializedSizeHeader",
+        "TestIntegerCharacterRationalNumeratorBeforeDenominator",
+        "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots"
       ],
       "conditionals": [
         {
@@ -112359,6 +112697,22 @@
             "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
             "TestNaturalSourceFinalizeColdLifecycleGuards"
           ]
+        },
+        {
+          "name": "Selected ordinary digit32 BIG Integer/Rational display char1024 lexical constructor/source unwinding and actual physical C-string kernel/insertion/destruction; full stream, Windows/GMP/digit64 profiles remain open",
+          "status": "ported",
+          "go_target": "mpnum/mp_integer_output_scope.go",
+          "tests": [
+            "TestIntegerCharacterConstructorBeforeLimbLocals",
+            "TestSourceCStringPhysicalBytesAndLbuf",
+            "TestIntegerCharacterScopeActualCapacityAndCleanup",
+            "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
+            "TestIntegerCharacterWrappedSizePhysicalCapacity",
+            "TestIntegerCharacterFailedConstructorSurvivesSourceFinalize",
+            "TestIntegerCharacterUsesActualInitializedSizeHeader",
+            "TestIntegerCharacterRationalNumeratorBeforeDenominator",
+            "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots"
+          ]
         }
       ],
       "ownership": [
@@ -112378,7 +112732,8 @@
         "Selected old-free/sign/result-transfer/paired-division action prefixes preserve source order; failed replacements use one charged retired descriptor, guarded reads and owner-qualified cleanup. Exact source allocator topology remains open; see PORT_PROGRESS.md#audit-mpz-source-publication-port-status-md.",
         "Base-two Power mutates caller storage through actual destructive allocate_if_needed; other Power and shift wrappers remain staged fidelity work. Scalar debug capacity assertion precedes sign/digits; existing normalize branch tests confirm actual behavior. See PORT_PROGRESS.md#audit-mpz-setter-port-status-md.",
         "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See PORT_PROGRESS.md#audit-mpz-power-publication-packet-md; source allocator/backend integration remains required.",
-        "Zero GCD copies directly into caller before Abs; minimum-promotion allocation refusal retains the completed inline copy, while failed BIG Copy retains the actual published sign/dead descriptor. Existing general GCD locals and final publication remain source ordered; twelve Lehmer and one intermediate ExtendedGCD diagnostics execute only in g3debug. Named roots audited before fault disabling. See PORT_PROGRESS.md#audit-mpz-gcd-publication-packet-md."
+        "Zero GCD copies directly into caller before Abs; minimum-promotion allocation refusal retains the completed inline copy, while failed BIG Copy retains the actual published sign/dead descriptor. Existing general GCD locals and final publication remain source ordered; twelve Lehmer and one intermediate ExtendedGCD diagnostics execute only in g3debug. Named roots audited before fault disabling. See PORT_PROGRESS.md#audit-mpz-gcd-publication-packet-md.",
+        "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -112395,7 +112750,8 @@
         "Go continuation for source undefined allocation failure: permanently dead failed token and missing-scratch guards; finite unsigned wrapped allocations retained before actual span ErrBounds. Higher-level staged wrappers remain fidelity work, not completion evidence.",
         "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open.",
         "The registered randomized GCD campaign preserves all 168 primes, conditional Power/Mul and sign draw order using an explicit hermetic RNG adapter, not libc sequence identity. Independent table enumeration and arithmetic checks add no ENSURE credit; print-only minimum GCD expectation is additional verification. Actual allocator topology, cleanup exceptions, alternate backends and full source-unit completion remain open.",
-        "ConstructionFailure is the already charged owner. Successful member unwind can retain direct roots with no cleanup error; owning Cleanup is separate. Full transitive/global source lifetime and other source branches remain open."
+        "ConstructionFailure is the already charged owner. Successful member unwind can retain direct roots with no cleanup error; owning Cleanup is separate. Full transitive/global source lifetime and other source branches remain open.",
+        "Source char bytes use physical capacity/initialization independently of POS and unsigned11*size wrap. Selected non-Windows digit32 snprintf lbuf0/truncation and multi-limb ignored-lbuf behavior execute. Windows sprintf_s constraint handler, GMP/digit64, global/locale/ostream and literal std::string temporary allocation/evaluation remain open. No whole-unit or registered assertion completion is claimed."
       ]
     },
     {
@@ -115495,7 +115851,9 @@
         "mpnum/rational_service_ops.go",
         "mpnum/rational_service_extra.go",
         "mpnum/inf_scalar_projection_test.go",
-        "mpnum/mp_raw_projection_test.go"
+        "mpnum/mp_raw_projection_test.go",
+        "mpnum/rational_lexical_scope.go",
+        "mpnum/mp_lexical_scope_test.go"
       ],
       "tests": [
         "TestSourceRationalConversionAssertions",
@@ -115563,7 +115921,16 @@
         "TestRawProjectionOwningBigCopiesAndMemberFailureOrder",
         "TestRawProjectionWarmPhysicalGraphAndIdentity",
         "TestRawProjectionNestedOwnerAtActualBranch",
-        "TestRawProjectionBothPoliciesAllComponentAliases"
+        "TestRawProjectionBothPoliciesAllComponentAliases",
+        "TestLexicalInfDestructorRefusal",
+        "TestLexicalPendingOwnerAPI",
+        "TestLexicalReverseMemberProgressAndExplicitRecovery",
+        "TestLexicalFailedConstructorCompletedMemberOrder",
+        "TestLexicalUnpublishedResultAndEightChargedRoots",
+        "TestLexicalCloneFailedMemberReadUnwind",
+        "TestLexicalCallerDestructorLateMemberRead",
+        "TestLexicalOriginalFailureAndCleanupCause",
+        "TestLexicalRationalManagerOneRootContinuation"
       ],
       "conditionals": [
         {
@@ -115944,20 +116311,38 @@
             "TestRawProjectionNestedOwnerAtActualBranch",
             "TestRawProjectionBothPoliciesAllComponentAliases"
           ]
+        },
+        {
+          "name": "Selected owning clone/projection/output helper cleanup with charged retained8 service/1 bridge records, completed-vs-failed member construction, observable refused cleanup and reached public Inf component Del; broader constructor/arithmetic temporary domains remain open",
+          "status": "partial",
+          "go_target": "mpnum/rational_lexical_scope.go",
+          "tests": [
+            "TestLexicalInfDestructorRefusal",
+            "TestLexicalPendingOwnerAPI",
+            "TestLexicalReverseMemberProgressAndExplicitRecovery",
+            "TestLexicalFailedConstructorCompletedMemberOrder",
+            "TestLexicalUnpublishedResultAndEightChargedRoots",
+            "TestLexicalCloneFailedMemberReadUnwind",
+            "TestLexicalCallerDestructorLateMemberRead",
+            "TestLexicalOriginalFailureAndCleanupCause",
+            "TestLexicalRationalManagerOneRootContinuation"
+          ]
         }
       ],
       "ownership": [
         "Inspection uses existing integer roots; extraction acquires deep independent limbs and thin setters/swap retain source component identity. Failed-prefix tests audit cells/Words and decoded values before rendering/teardown. See PORT_PROGRESS.md#audit-rational-inspection-port-status-md.",
         "Owner-local RationalService owns synchronized numerical manager, constants and pointer-free cache; scalar provenance on OwnedRational validates all public operands. Cold mutexes ordered by immutable ownerID for CopyFrom; all headers/backing/old+new charged. See PORT_PROGRESS.md#audit-rational-service-port-status-md.",
         "Owner-local concrete facade validates all operand provenance before raw actions, locks the service once, and releases scoped temporaries in source order. Value arithmetic retains both source copies; named returns transfer ownership. See PORT_PROGRESS.md#audit-rational-facade-port-status-md.",
-        "Complete facade uses existing budgeted service manager and checked scoped deep-copy bridges. Source const references become independent owning copies; root/coefficient outputs preserve actual identity, source failure/alias prefixes and g3debug assertion timing. See PORT_PROGRESS.md#audit-rational-facade-extra-port-status-md."
+        "Complete facade uses existing budgeted service manager and checked scoped deep-copy bridges. Source const references become independent owning copies; root/coefficient outputs preserve actual identity, source failure/alias prefixes and g3debug assertion timing. See PORT_PROGRESS.md#audit-rational-facade-extra-port-status-md.",
+        "Real remaining temporary Rational records are moved into charged embedded service8/manager1 storage before stack owners vanish; completed source destruction and partial-constructor owning abort are distinguished. Named-return finishers propagate refused cleanup and retain unpublished result roots. Public Inf Del retains caller suffix in actual source component order; pure queries and caller cleanup remain usable. Explicit CleanupLexical is Go owning recovery, not source destructor retry equivalence."
       ],
       "deviations": [
         "Explicit manager projects rational.h inclusive32-bit wrappers, distinct from strict MPZ boundaries; global wrapper remains incomplete. Float positive converted denominator SASSERT becomes typed ErrRationalFloatDomain. Source raw component alias publication can leave denominator zero; subsequent operations diagnose initialization.",
         "Global mutable manager/cache replaced with explicit owner-local service. Constants return independent deep values; owning token Del invalidates provenance, source move val history retained. Cache failed-prefix/retry actions preserved; INT_MIN signed-negation domain uses explicit wider magnitude adaptation. Broad facade and infinitesimal hooks remain incomplete.",
         "Remaining wrapper roots/squares, LCM/extended-GCD, rational bitwise forwards, display conveniences and checked raw borrowing/interoperability are not completed by this selected facade packet; source double construction/assignment are unreachable domains.",
         "Native std::ostream operations use caller-owned strings/buffers; source UNREACHABLE doubles return RationalDoubleError. Safe scoped copies replace raw mpz/mpq borrows and constructors without serialization or canonicalization.",
-        "Whole-header completion is unproven: source NUM-only hash/sign and selected reference projections permit finite raw denominator0; current ordinary manager Hash/Sign/Copy guards reject that source state. The source inversion of zero can produce this state. Scalar projection closure does not close these separate families or generated global/TLS lifecycle."
+        "Whole-header completion is unproven: source NUM-only hash/sign and selected reference projections permit finite raw denominator0; current ordinary manager Hash/Sign/Copy guards reject that source state. The source inversion of zero can produce this state. Scalar projection closure does not close these separate families or generated global/TLS lifecycle.",
+        "Malformed32-bit requested-byte layouts are labelled guarded Go boundary evidence, not ordinary valid C++ destructor allocation failure. Budget supplies actual allocation refusal/failed-copy token only, never simulated Del failure. Selected scope records preserve original vs cleanup causes; broader raw constructor/reset/alias/default-copy-constructor arithmetic temporaries, registry/global ownership and transport remain partial. Cross-owner staged CopyFrom is explicit Go ownership bridge, not a source alias transaction. No whole-unit/API/registered assertion promotion."
       ]
     },
     {
@@ -121916,7 +122301,9 @@
         "util_param_descrs.go",
         "ast_shared_occs.go",
         "mpnum/upolynomial_binary_vector.go",
-        "mpnum/upolynomial_isolation_storage_test.go"
+        "mpnum/upolynomial_isolation_storage_test.go",
+        "sat_solver_assignment_storage.go",
+        "sat_solver_assignment_storage_test.go"
       ],
       "tests": [
         "TestParamDescrsBudgetFailuresAndWarmDuplicate",
@@ -122025,7 +122412,17 @@
         "TestSATSolverModelConverterImplicitAssignmentAscendingDestroyAndCopy",
         "TestUPolynomialIsolationPackedFrameAndScalarExtents",
         "TestUPolynomialBinaryVectorActualAscendingDestruction",
-        "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
+        "TestUPolynomialIsolationSSPopAndDestructorActualOrder",
+        "TestSATSolverAssignmentAllocationReachesActualCheckpoint",
+        "TestSATSolverAssignmentRuntimeHeadersRetainedBytesAndRealloc",
+        "TestSATSolverAssignmentReleaseWriteAndShrinkSourceRoutes",
+        "TestSATSolverAssignmentRawValueReadDoesNotPrefetchSize",
+        "TestSATSolverAssignmentTLSAllocationFailureRetainsUnpublishedRoot",
+        "TestSATSolverAssignmentReallocateRefusalKeepsActualOldBinding",
+        "TestSATSolverAssignmentCurrentMemberBorrowAndOwnerGuards",
+        "TestSATSolverAssignmentSourceUnsignedGrowthException",
+        "TestSATSolverAssignmentNonNullZeroCapacityActualExpandRoute",
+        "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime"
       ],
       "conditionals": [
         {
@@ -122284,6 +122681,23 @@
             "TestUPolynomialBinaryVectorActualAscendingDestruction",
             "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
           ]
+        },
+        {
+          "name": "Selected actual solver m_assignment char_vector Runtime backing/header/growth/realloc/source operators/shrink and same-runtime checkpoint integration; other typed solver allocation hooks remain open",
+          "status": "ported",
+          "go_target": "sat_solver_assignment_storage.go",
+          "tests": [
+            "TestSATSolverAssignmentAllocationReachesActualCheckpoint",
+            "TestSATSolverAssignmentRuntimeHeadersRetainedBytesAndRealloc",
+            "TestSATSolverAssignmentReleaseWriteAndShrinkSourceRoutes",
+            "TestSATSolverAssignmentRawValueReadDoesNotPrefetchSize",
+            "TestSATSolverAssignmentTLSAllocationFailureRetainsUnpublishedRoot",
+            "TestSATSolverAssignmentReallocateRefusalKeepsActualOldBinding",
+            "TestSATSolverAssignmentCurrentMemberBorrowAndOwnerGuards",
+            "TestSATSolverAssignmentSourceUnsignedGrowthException",
+            "TestSATSolverAssignmentNonNullZeroCapacityActualExpandRoute",
+            "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime"
+          ]
         }
       ],
       "ownership": [
@@ -122293,14 +122707,16 @@
         "Actual four-uint64 watch payloads preserve val1/val2 plus widened scalar clause provenance; separate charged lifetime bitmap tracks erased live tails and destroyed holes. Common cold owner/directories and all arena descriptor/page/free storage and old/new overlaps charged. Exact nested copies, destroy-before-assignment, backing-transferring move/swap and real display/erase routes; see PORT_PROGRESS.md#audit-sat-solver-watch-store-port-status-md.",
         "Concrete AST expr identity-table and shared-occurrence owners preserve source bucket-order callbacks, borrowing, actual node shared flags and charged backing/header peaks. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md.",
         "Model class-copy owns exact-capacity outer and deep nested literal vectors. Assignment destroys destination ascending before copy, publishes source size/capacity before constructors and retains completed prefixes; safe Go cleanup/restart tracks actual constructed roots. See PORT_PROGRESS.md#audit-sat-model-copy-port-status-md.",
-        "Isolation uses charged concrete binary output vectors and lexical coefficient/frame backings; actual initialized extents and source ascending/reverse destruction orders are retained. Refusal/cancellation tests audit real output and manager cells/Words before fault disabling. See PORT_PROGRESS.md#audit-upolynomial-root-isolation-packet-md; allocator/backend integration remains open."
+        "Isolation uses charged concrete binary output vectors and lexical coefficient/frame backings; actual initialized extents and source ascending/reverse destruction orders are retained. Refusal/cancellation tests audit real output and manager cells/Words before fault disabling. See PORT_PROGRESS.md#audit-upolynomial-root-isolation-packet-md; allocator/backend integration remains open.",
+        "Assignment bytes and initialization state are owned solely by the borrowed real Runtime, with source vector capacity/size headers and explicit block/pending tokens; enclosing variable owner charges embedded metadata. Variable graph Stats exclude borrowed runtime, which physical audits add exactly once. Runtime must outlive variable/propagation owners, which require the same actual Runtime identity."
       ],
       "deviations": [
         "Concrete solver-specific storage, not complete generic vector template surface. Owning model Clone/Assign, other specializations and source-undefined continuation behavior remain explicitly separate.",
         "Literal storage guards physical capacity and stale tokens, but does not track construction of never-written spare slots. Source-defined initialized retained-slot behavior is verified; validation of every C++ initialized-lifetime domain is not claimed.",
         "Composite payload/bitmap preparation is an explicit Go storage adapter; completed pool growth remains charged on refusal. Iterators follow actual scalar backing across moves/swaps, and guard only actual free/reallocation or ended-slot lifetime. Null-backing Shrink/SetEnd retains finite source release no-op. Outer solver watch vector and propagation remain open; quadratic SortByKind is an additional semantic-order convenience adapter, not completed std::stable_sort backend/complexity integration.",
         "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md.",
-        "Owning reads and checked scalar lifetimes are Go adapters. Full-capacity guard rejects undersized source wrapped allocations after separate literal uint32 growth checks; raw allocation/header publication for that undefined domain is not represented. Multivariate conversion, factorization, algebraic consumers, full printers/TRACE and nonselected alternatives remain open."
+        "Owning reads and checked scalar lifetimes are Go adapters. Full-capacity guard rejects undersized source wrapped allocations after separate literal uint32 growth checks; raw allocation/header publication for that undefined domain is not represented. Multivariate conversion, factorization, algebraic consumers, full printers/TRACE and nonselected alternatives remain open.",
+        "Only assignment char_vector source allocation accounting is integrated in this slice. Other SAT columns/watch/queue/clause/trail/vector allocations still require real global/runtime source hooks. Raw-state bounds/initialization guards act at endangered byte accesses; source DEBUG logical assertions remain distinct. No full solver construction/search or registered assertion completion is claimed."
       ]
     },
     {

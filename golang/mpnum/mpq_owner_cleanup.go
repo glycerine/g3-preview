@@ -33,6 +33,10 @@ func (m *RationalManager) CloseChecked() error {
 			return m
 		}
 	}
+	if e := m.lexical.cleanup(m.z); e != nil {
+		m.cleanupCause = e
+		return m
+	}
 	m.closing = true
 	if !m.sourceGuard {
 		if e := m.cleanupOuter(false); e != nil {

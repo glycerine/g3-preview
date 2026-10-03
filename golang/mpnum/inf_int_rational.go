@@ -48,10 +48,14 @@ func (s *RationalService) checkInfInt(v *OwnedInfIntRational) error {
 func (s *RationalService) newInfInt() OwnedInfIntRational {
 	return OwnedInfIntRational{first: NewRational(), ownerID: s.ownerID}
 }
-func (s *RationalService) copyInfInt(v *OwnedInfIntRational) (OwnedInfIntRational, error) {
+func (s *RationalService) copyInfInt(v *OwnedInfIntRational) (_lexOut OwnedInfIntRational, _lexErr error) {
+	defer s.finishLexicalError(&_lexErr)
+	if e := s.lexicalReady(); e != nil {
+		return OwnedInfIntRational{}, e
+	}
 	out := s.newInfInt()
 	if e := s.manager.Copy(&out.first, &v.first); e != nil {
-		s.manager.Del(&out.first)
+		s.abortLexicalRational(&out.first)
 		return OwnedInfIntRational{}, e
 	}
 	out.second = v.second
@@ -102,7 +106,7 @@ func (s *RationalService) InfIntFromInt(n int32) (OwnedInfIntRational, error) {
 	defer s.mu.Unlock()
 	out := s.newInfInt()
 	if e := s.manager.SetInt64(&out.first, int64(n)); e != nil {
-		s.manager.Del(&out.first)
+		s.abortLexicalRational(&out.first)
 		return OwnedInfIntRational{}, e
 	}
 	return out, nil
@@ -129,7 +133,7 @@ func (s *RationalService) InfIntFromFraction(n, d int32) (OwnedInfIntRational, e
 		e = s.manager.normalize(&out.first)
 	}
 	if e != nil {
-		s.manager.Del(&out.first)
+		s.abortLexicalRational(&out.first)
 		return OwnedInfIntRational{}, e
 	}
 	return out, nil
@@ -144,7 +148,7 @@ func (s *RationalService) InfIntFromRational(r *OwnedRational, epsilon int32) (O
 	}
 	out := s.newInfInt()
 	if e := s.manager.Copy(&out.first, &r.raw); e != nil {
-		s.manager.Del(&out.first)
+		s.abortLexicalRational(&out.first)
 		return OwnedInfIntRational{}, e
 	}
 	out.second = epsilon
@@ -186,10 +190,7 @@ func (s *RationalService) InfIntDel(v *OwnedInfIntRational) error {
 	if v == nil || v.ownerID == 0 || v.ownerID != s.ownerID {
 		return ErrRationalServiceOwner
 	}
-	if e := s.manager.checkCleanup(&v.first); e != nil {
-		return e
-	}
-	if e := s.manager.Del(&v.first); e != nil {
+	if e := callerDeleteRational(s.manager.z, &v.first); e != nil {
 		return e
 	}
 	*v = OwnedInfIntRational{}
@@ -364,7 +365,7 @@ func (s *RationalService) postInfInt(v *OwnedInfIntRational, dec bool) (OwnedInf
 	}
 	e = s.stepInfInt(&v.first, dec)
 	if e != nil {
-		s.manager.Del(&old.first)
+		s.destroyLexicalRational(&old.first)
 		return OwnedInfIntRational{}, e
 	}
 	return old, nil
@@ -396,14 +397,18 @@ func (s *RationalService) InfIntNeg(v *OwnedInfIntRational) error {
 	defer s.mu.Unlock()
 	return s.negInfInt(v)
 }
-func (s *RationalService) resultInfInt(a, b *OwnedInfIntRational, sub bool) (OwnedInfIntRational, error) {
+func (s *RationalService) resultInfInt(a, b *OwnedInfIntRational, sub bool) (_lexOut OwnedInfIntRational, _lexErr error) {
+	if e := s.lexicalReady(); e != nil {
+		return OwnedInfIntRational{}, e
+	}
+	defer s.finishLexicalInfInt(&_lexOut, &_lexErr)
 	// Source free binary returns a compound-operator lvalue: copy operand,
 	// mutate temporary, copy return, destroy temporary (no elision of that copy).
 	tmp, e := s.copyInfInt(a)
 	if e != nil {
 		return OwnedInfIntRational{}, e
 	}
-	defer s.manager.Del(&tmp.first)
+	defer s.destroyLexicalRational(&tmp.first)
 	if e = s.addSubInfInt(&tmp, b, sub); e != nil {
 		return OwnedInfIntRational{}, e
 	}
@@ -423,16 +428,20 @@ func (s *RationalService) InfIntSub(a, b *OwnedInfIntRational) (OwnedInfIntRatio
 	defer s.mu.Unlock()
 	return s.resultInfInt(a, b, true)
 }
-func (s *RationalService) InfIntMul(r *OwnedRational, a *OwnedInfIntRational) (OwnedInfIntRational, error) {
+func (s *RationalService) InfIntMul(r *OwnedRational, a *OwnedInfIntRational) (_lexOut OwnedInfIntRational, _lexErr error) {
 	if e := s.lockInfIntRat(a, r); e != nil {
 		return OwnedInfIntRational{}, e
 	}
 	defer s.mu.Unlock()
+	if e := s.lexicalReady(); e != nil {
+		return OwnedInfIntRational{}, e
+	}
+	defer s.finishLexicalInfInt(&_lexOut, &_lexErr)
 	tmp, e := s.copyInfInt(a)
 	if e != nil {
 		return OwnedInfIntRational{}, e
 	}
-	defer s.manager.Del(&tmp.first)
+	defer s.destroyLexicalRational(&tmp.first)
 	if e = s.mulInfInt(&tmp, &r.raw); e != nil {
 		return OwnedInfIntRational{}, e
 	}
@@ -448,7 +457,7 @@ func (s *RationalService) InfIntNegCopy(v *OwnedInfIntRational) (OwnedInfIntRati
 		return OwnedInfIntRational{}, e
 	}
 	if e = s.negInfInt(&out); e != nil {
-		s.manager.Del(&out.first)
+		s.abortLexicalRational(&out.first)
 		return OwnedInfIntRational{}, e
 	}
 	return out, nil
@@ -464,7 +473,7 @@ func (s *RationalService) InfIntAbs(v *OwnedInfIntRational) (OwnedInfIntRational
 	}
 	if out.first.num.val < 0 || (out.first.num.val == 0 && out.second < 0) {
 		if e = s.negInfInt(&out); e != nil {
-			s.manager.Del(&out.first)
+			s.destroyLexicalRational(&out.first)
 			return OwnedInfIntRational{}, e
 		}
 	}
@@ -548,17 +557,21 @@ func (s *RationalService) InfIntInfinitesimal(v *OwnedInfIntRational) (OwnedRati
 	}
 	out := OwnedRational{raw: NewRational(), ownerID: s.ownerID}
 	if e := s.manager.SetInt64(&out.raw, int64(v.second)); e != nil {
-		s.manager.Del(&out.raw)
+		s.abortLexicalRational(&out.raw)
 		return OwnedRational{}, e
 	}
 	return out, nil
 }
-func (s *RationalService) partInfInt(v *OwnedInfIntRational, den bool) (OwnedInfIntRational, error) {
+func (s *RationalService) partInfInt(v *OwnedInfIntRational, den bool) (_lexOut OwnedInfIntRational, _lexErr error) {
+	if e := s.lexicalReady(); e != nil {
+		return OwnedInfIntRational{}, e
+	}
+	defer s.finishLexicalInfInt(&_lexOut, &_lexErr)
 	if modularSourceDebug && v.second != 0 {
 		return OwnedInfIntRational{}, ErrInfIntNotRational
 	}
 	part := NewRational()
-	defer s.manager.Del(&part)
+	defer s.destroyLexicalRational(&part)
 	var e error
 	if den {
 		e = s.manager.DenominatorRational(&v.first, &part)
@@ -570,7 +583,7 @@ func (s *RationalService) partInfInt(v *OwnedInfIntRational, den bool) (OwnedInf
 	}
 	out := s.newInfInt()
 	if e = s.manager.Copy(&out.first, &part); e != nil {
-		s.manager.Del(&out.first)
+		s.abortLexicalRational(&out.first)
 		return OwnedInfIntRational{}, e
 	}
 	return out, nil
@@ -595,7 +608,11 @@ func (s *RationalService) InfIntDenominator(v *OwnedInfIntRational) (OwnedInfInt
 	}
 	return s.partInfInt(v, true)
 }
-func (s *RationalService) roundInfInt(v *OwnedInfIntRational, ceil bool) (OwnedRational, error) {
+func (s *RationalService) roundInfInt(v *OwnedInfIntRational, ceil bool) (_lexOut OwnedRational, _lexErr error) {
+	if e := s.lexicalReady(); e != nil {
+		return OwnedRational{}, e
+	}
+	defer s.finishLexicalRational(&_lexOut, &_lexErr)
 	out := OwnedRational{raw: NewRational(), ownerID: s.ownerID}
 	var e error
 	if isIntegerRational(&v.first) {
@@ -604,7 +621,7 @@ func (s *RationalService) roundInfInt(v *OwnedInfIntRational, ceil bool) (OwnedR
 		} else {
 			// Source rational free +/- also uses clone→compound→return copy.
 			tmp := NewRational()
-			defer s.manager.Del(&tmp)
+			defer s.destroyLexicalRational(&tmp)
 			e = s.manager.Copy(&tmp, &v.first)
 			if e == nil {
 				if ceil {
@@ -623,7 +640,7 @@ func (s *RationalService) roundInfInt(v *OwnedInfIntRational, ceil bool) (OwnedR
 		e = s.manager.Floor(&v.first, &out.raw)
 	}
 	if e != nil {
-		s.manager.Del(&out.raw)
+		s.abortLexicalRational(&out.raw)
 		return OwnedRational{}, e
 	}
 	return out, nil

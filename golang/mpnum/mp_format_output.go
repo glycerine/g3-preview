@@ -126,3 +126,24 @@ func (s *sourceCharBuffer) finalize(r *memory.Runtime) error {
 	s.initialized = [16]uint64{}
 	return nil
 }
+
+// Cptr access is bounded by actual physical storage, not logical constructor
+// size. Source mpn multi-limb conversion deliberately ignores lbuf.
+func (s *sourceCharBuffer) readPhysical(r *memory.Runtime, i uint64) (byte, error) {
+	if i >= uint64(s.capacity()) {
+		return 0, arena.ErrBounds
+	}
+	if s.cap == 0 {
+		if s.initialized[i/64]&(uint64(1)<<(i%64)) == 0 {
+			return 0, memory.ErrRuntimeUninitialized
+		}
+		return s.inline[int(i)], nil
+	}
+	return r.Read(s.raw, i)
+}
+func (s *sourceCharBuffer) writePhysical(r *memory.Runtime, i uint64, n byte) error {
+	if i >= uint64(s.capacity()) {
+		return arena.ErrBounds
+	}
+	return s.write(r, uint32(i), n)
+}
