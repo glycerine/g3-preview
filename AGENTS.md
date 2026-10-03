@@ -1,4 +1,4 @@
-git use: Do not ammend or rebase commits in git. Make a corrective additional commit instead. We push
+git use: Do not amend or rebase commits in git. Make a corrective additional commit instead. We push
 in the background and have seen an accidental git fork and we do not want to lose data.
 
 A rule for storing test vectors and associated test data: do not create a 
