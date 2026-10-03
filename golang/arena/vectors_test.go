@@ -3,11 +3,12 @@ package arena
 import (
 	"errors"
 	"math/rand"
+	"reflect"
 	"testing"
 )
 
 func TestVectorLifetime(t *testing.T) {
-	v, e := NewVectors[uint64](VectorConfig{PageSize: 8, Descriptors: Config{PageSize: 2}})
+	v, e := NewVectors64(VectorConfig{PageSize: 8, Descriptors: Config{PageSize: 2}})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -103,7 +104,7 @@ func TestVectorNonOverlapPlateau(t *testing.T) {
 
 func TestVectorGrowthFailure(t *testing.T) {
 	b := NewBudget(1 << 20)
-	v, _ := NewVectors[uint64](VectorConfig{PageSize: 4, Descriptors: Config{PageSize: 2, Budget: b}})
+	v, _ := NewVectors64(VectorConfig{PageSize: 4, Descriptors: Config{PageSize: 2, Budget: b}})
 	a, _ := v.Allocate(2, 2)
 	v.Write(a, 0, 55)
 	before := v.Stats()
@@ -130,7 +131,7 @@ func TestVectorGrowthFailure(t *testing.T) {
 }
 
 func TestVectorStateMachine(t *testing.T) {
-	v, _ := NewVectors[uint64](VectorConfig{PageSize: 4, Descriptors: Config{PageSize: 2}})
+	v, _ := NewVectors64(VectorConfig{PageSize: 4, Descriptors: Config{PageSize: 2}})
 	defer v.Close()
 	var refs [5]VectorRef
 	var model [5][]uint64
@@ -211,7 +212,7 @@ func TestVectorWarmAllocations(t *testing.T) {
 // Port of finite ENSURE assertions in src/test/vector.cpp::tst1. Indexed
 // traversal replaces a raw-pointer iterator; back/pop are Read/Resize.
 func TestSourceVectorTst1(t *testing.T) {
-	v, _ := NewVectors[int32](VectorConfig{})
+	v, _ := NewVectors32Signed(VectorConfig{})
 	defer v.Close()
 	ref := VectorRef{}
 	if n, _ := v.Len(ref); n != 0 {
@@ -286,7 +287,7 @@ func TestVectorEmptyReservedAndBounds(t *testing.T) {
 	if _, e = v.Len(a); !errors.Is(e, ErrClosed) {
 		t.Fatal(e)
 	}
-	if _, e = NewVectors[*int](VectorConfig{}); !errors.Is(e, ErrPointerful) {
+	if e = ValidateRecordType(reflect.TypeOf((*int)(nil))); !errors.Is(e, ErrPointerful) {
 		t.Fatal(e)
 	}
 	if _, e = NewWords(VectorConfig{PageSize: 3}); !errors.Is(e, ErrConfig) {

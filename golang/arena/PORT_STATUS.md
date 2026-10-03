@@ -25,7 +25,7 @@ to translate. Source region branches were read, and remain explicitly open:
 ## API and ownership
 
 - Slots/generations are uint32; slot zero and generation zero are invalid.
-- NewSlab audits T recursively. Pointers, strings, slices, maps, interfaces,
+- Concrete slab record audits use ValidateRecordType recursively. Pointers, strings, slices, maps, interfaces,
   funcs, chans, unsafe.Pointer, and uintptr are rejected, including nested
   fields and arrays. Arrays/structs of numeric scalars are accepted.
 - Config defaults PageSize to 1024, SlotLimit to MaxUint32; pages must have a
@@ -127,7 +127,7 @@ capacity when shrinking and clears discarded values; subsequent growth is zero
 initialized. Free always releases the original capacity extent, clears records,
 and invalidates/recycles its descriptor. No element constructors, callbacks,
 destructors, domain handle retains/releases, or ownership transfer are inferred
-from a scalar T. Domain cleanup must precede truncation/free/reset/close.
+from a scalar records. Domain cleanup must precede truncation/free/reset/close.
 
 Failed creation leaves no live descriptor or payload, but may retain newly
 allocated reusable descriptor capacity and generation metadata. Those bytes
@@ -192,12 +192,12 @@ manifest or previously agreed slab/budget interface was modified by this packet.
 to its absence describe preceding packets. This packet does not implement solver
 trail variants or the raw byte/address source allocator layout.
 
-Region[T] owns a Slab[T], a scalar RegionRef allocation log and scalar
+Region32/Region64 own Slab32/Slab64, a scalar RegionRef allocation log and scalar
 serial/length mark records. RegionRef carries Slot/Generation; RegionMark is an
 opaque cold owner identity pointer plus serial token. The mark's owner pointer
 is not stored in hot record or mark backing arrays. Marks are never reused:
 serial exhaustion permanently prevents new marks, even after Reset. Every
-Allocate explicitly writes its initial scalar T. Reads copy values; no raw
+Allocate explicitly writes its initial scalar records. Reads copy values; no raw
 pointer or slice borrow exists. Individual object free is deliberately absent.
 
 Mark/Rollback are strictly nested. Rollback rejects zero, foreign, consumed and
@@ -207,7 +207,7 @@ Close is idempotent and drops backing arrays and ledger. TrimFreePages returns
 an error so callback reentrancy can be rejected; it drops only fully dead record
 pages while retaining generation metadata and reusable scalar control arrays.
 
-The transient Cleanup[T] parameter is never stored as a trail closure. It runs
+The transient Cleanup32/Cleanup64 parameter is never stored as a trail closure. It runs
 in reverse allocation order; every target record stays live through *all*
 callbacks, after which a separate pass recycles records. This is a documented
 storage cleanup contract, not a claim that source trail objects individually
@@ -281,3 +281,61 @@ their destructor/reset behavior, SMT pop ordering, region-owned variable payload
 marks, cleanup-list integration, promotions into persistent owners, optional
 compaction, source diagnostic formatting and actual wasm execution. This packet
 does not close full memory-subsystem or full-fork acceptance.
+
+# Concrete arena conversion (user requirement: no Go generics)
+
+The current arena uses only concrete Go types. Earlier RED/GREEN constructor
+names in this report describe historical packets, superseded by the concrete
+API below. No type-parameter declaration, instantiated generic type/function,
+reflect.TypeFor, per-record interface storage, unsafe code, or reusable generic
+template remains in arena production or test source.
+
+| Concrete storage | Constructor / use |
+| --- | --- |
+| Slab32 | NewSlab32(Config), uint32 scalar records |
+| Slab64 | NewSlab64(Config), uint64 scalar records |
+| descriptorSlab | Private newDescriptorSlab(Config), vectorDescriptor records |
+| Words | NewWords(VectorConfig), uint32 payloads, previous public Words API preserved |
+| Vectors64 | NewVectors64(VectorConfig), widened scalar handles |
+| Vectors32Signed | NewVectors32Signed(VectorConfig), exact int32 source-vector fixture values |
+| Region32 / Region64 | NewRegion32/64(Config), Cleanup32/64 transient caller dispatch |
+| recordSlab | Test-only concrete rich record allocator, preserving fixed-array/uint64 record regression coverage |
+
+Config, Stats, VectorConfig, VectorStats, RegionStats, Slot, Generation,
+VectorRef, RegionRef, RegionMark and Budget contracts are unchanged.
+ValidateRecordType(reflect.Type) provides a nongeneric recursive audit; nil
+types and all previous pointerful/uintptr categories are rejected. Constructors
+use reflect.TypeOf only. Fixed pointer-free record pages remain one backing
+allocation per page; concrete duplication does not introduce per-record objects.
+
+Tests migrated first to missing concrete API names and produced RED compile
+failures, then GREEN after concrete implementations. All earlier lifetime,
+state-machine, failure injection, non-overlap, capacity plateau, generation
+retirement, budget peak, cleanup/reentrancy, source vector assertions, fuzz seed,
+and zero-allocation checks remain. The undo oracle stores its former single-field
+uint32 old-value payload directly in Region32; its independent checkpoint model
+and operation count are unchanged. Extra direct concrete slab tests verify
+32/64-bit maximum values, slot limits, failure-atomic page recovery, generation
+retirement, reset/trim and budget balance. Signed vector and Region64 checks
+verify negative/wide values survive relocation and callback dispatch.
+
+Conversion verification on the previously recorded host/toolchain:
+
+- CGO_ENABLED=0 native arena and g3checked arena tests: PASS.
+- go vet ./arena: PASS.
+- js/wasm and wasip1/wasm package builds: PASS.
+- GOARCH=386 test binary compilation: PASS; prior actual native 386 runner
+  limitation still applies.
+- Actual js/wasm arena tests under Node v22.22.2 with the toolchain-matched
+  go_js_wasm_exec: PASS. Initial inherited environment exceeded wasm argv/env
+  limits; retry with a minimal explicit environment passed.
+- FuzzArenaOps, 3 seconds/2 workers: PASS, 43693 executions.
+- FuzzRegionTrailOps, 3 seconds/2 workers: PASS, 162583 executions.
+- Warm benchmark remeasurement (200ms): record slab 25.00 ns/op, words
+  62.23 ns/op, region 42.71 ns/op; all 0 B/op and 0 allocs/op. These short
+  measurements establish no comparative performance claim.
+
+Temporary original generic snapshots and one-shot conversion scripts were
+removed after verification. Only concrete reviewed source is retained. No
+domain algorithms, source traversal policy, allocation class policy, cleanup
+ordering or previously listed incomplete subsystem features changed.

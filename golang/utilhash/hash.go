@@ -66,6 +66,9 @@ func Mix(a, b, c uint32) uint32 { _, _, c = mix(a, b, c); return c }
 // String preserves source baseline little-endian word loads and signed-char tails.
 // Embedded NULs participate in the hash.
 func String(s string, init uint32) uint32 {
+	if uint64(len(s)) > uint64(^uint32(0)) {
+		panic("utilhash: string length exceeds source uint32 range")
+	}
 	return hashBytes(uint32(len(s)), init,
 		func(i uint32) uint32 { return binary.LittleEndian.Uint32([]byte(s[i : i+4])) },
 		func(i uint32) uint32 { return uint32(int32(int8(s[i]))) })
@@ -147,4 +150,11 @@ func Composite(kind, n uint32, child func(uint32) uint32) uint32 {
 		c += child(0)
 	}
 	return Mix(a, b, c)
+}
+
+// WordReader hashes n little-endian bytes from a word accessor, without exposing
+// backing storage. The reader accepts word indices and must cover ceil(n/4)
+// words. Source signed-char tail semantics are preserved.
+func WordReader(n, init uint32, word func(uint32) uint32) uint32 {
+	return hashBytes(n, init, func(i uint32) uint32 { return word(i / 4) }, func(i uint32) uint32 { return uint32(int32(int8(byte(word(i/4) >> (8 * (i % 4)))))) })
 }

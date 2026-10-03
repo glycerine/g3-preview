@@ -27,7 +27,7 @@ func TestInternalRefRoundTrip(t *testing.T) {
 	}
 }
 func TestInternalAndPublicReuse(t *testing.T) {
-	s, err := arena.NewSlab[uint32](arena.Config{PageSize: 2})
+	s, err := arena.NewSlab32(arena.Config{PageSize: 2})
 	if err != nil {
 		t.Fatal(err)
 	}

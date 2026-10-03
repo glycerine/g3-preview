@@ -12,9 +12,9 @@ source algorithms, and test coverage when replacing generic infrastructure.
 Do not substitute unsafe storage or per-record interface boxing for generics.
 Shared scalar allocation metadata may be factored into ordinary concrete types.
 
-Existing generic slabs, vectors, regions, handle-validation helpers, shuffle,
-and related tests predate this instruction and require conversion. Their
-presence is outstanding work, not an exception to the rule.
+Slabs, vectors, regions, handle-validation helpers, shuffle and their tests
+use concrete types. Preserve this rule in later domain specializations.
+Run the no-generics syntax audit through `go run ./cmd/portcheck`.
 
 ## Workflow
 

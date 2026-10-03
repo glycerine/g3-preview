@@ -7,7 +7,7 @@ import (
 )
 
 func TestRegionNestedLifetime(t *testing.T) {
-	r, _ := NewRegion[uint32](Config{PageSize: 2})
+	r, _ := NewRegion32(Config{PageSize: 2})
 	defer r.Close(nil)
 	base, _ := r.Allocate(1)
 	outer, _ := r.Mark()
@@ -36,7 +36,7 @@ func TestRegionNestedLifetime(t *testing.T) {
 	if x, e := r.Read(base); e != nil || x != 1 {
 		t.Fatal(x, e)
 	}
-	foreign, _ := NewRegion[uint32](Config{})
+	foreign, _ := NewRegion32(Config{})
 	defer foreign.Close(nil)
 	fm, _ := foreign.Mark()
 	if e := r.Rollback(fm, nil); !errors.Is(e, ErrMark) {
@@ -45,7 +45,7 @@ func TestRegionNestedLifetime(t *testing.T) {
 }
 
 func TestRegionCleanupBeforeRecycle(t *testing.T) {
-	r, _ := NewRegion[uint32](Config{PageSize: 2})
+	r, _ := NewRegion32(Config{PageSize: 2})
 	defer r.Close(nil)
 	m, _ := r.Mark()
 	refs := make([]RegionRef, 4)
@@ -92,7 +92,7 @@ func TestRegionCleanupBeforeRecycle(t *testing.T) {
 }
 
 func TestRegionPanicPreservesStorage(t *testing.T) {
-	r, _ := NewRegion[uint32](Config{})
+	r, _ := NewRegion32(Config{})
 	defer r.Close(nil)
 	m, _ := r.Mark()
 	a, _ := r.Allocate(3)
@@ -116,7 +116,7 @@ func TestRegionPanicPreservesStorage(t *testing.T) {
 }
 
 func TestRegionMultipleScopesAndReset(t *testing.T) {
-	r, _ := NewRegion[uint32](Config{PageSize: 1})
+	r, _ := NewRegion32(Config{PageSize: 1})
 	base, _ := r.Allocate(1)
 	m, _ := r.Mark()
 	a, _ := r.Allocate(2)
@@ -156,7 +156,7 @@ func TestRegionMultipleScopesAndReset(t *testing.T) {
 
 func TestRegionBudgetFailure(t *testing.T) {
 	b := NewBudget(1 << 20)
-	r, _ := NewRegion[uint32](Config{PageSize: 1, Budget: b})
+	r, _ := NewRegion32(Config{PageSize: 1, Budget: b})
 	b.FailAfter(0)
 	before := r.Stats()
 	if _, e := r.Mark(); !errors.Is(e, ErrInjectedFailure) {
@@ -191,14 +191,14 @@ func TestRegionBudgetFailure(t *testing.T) {
 // Independent undo-state oracle for the executable reverse dispatch ordering
 // in util/trail.h::undo_trail_stack. Entries are scalars, never stored closures.
 func TestRegionUndoStateMachine(t *testing.T) {
-	type undo struct{ Old uint32 }
-	r, _ := NewRegion[undo](Config{PageSize: 2})
+
+	r, _ := NewRegion32(Config{PageSize: 2})
 	defer r.Close(nil)
 	var marks []RegionMark
 	var checkpoints []uint32
 	var state uint32
 	rng := rand.New(rand.NewSource(719))
-	cleanup := func(_ RegionRef, u undo) { state = u.Old }
+	cleanup := func(_ RegionRef, old uint32) { state = old }
 	for i := 0; i < 3000; i++ {
 		switch rng.Intn(4) {
 		case 0:
@@ -209,7 +209,7 @@ func TestRegionUndoStateMachine(t *testing.T) {
 			marks = append(marks, m)
 			checkpoints = append(checkpoints, state)
 		case 1:
-			_, e := r.Allocate(undo{state})
+			_, e := r.Allocate(state)
 			if e != nil {
 				t.Fatal(e)
 			}
@@ -236,7 +236,7 @@ func TestRegionUndoStateMachine(t *testing.T) {
 }
 
 func TestRegionWarmAllocations(t *testing.T) {
-	r, _ := NewRegion[uint32](Config{PageSize: 2})
+	r, _ := NewRegion32(Config{PageSize: 2})
 	m, _ := r.Mark()
 	r.Allocate(2)
 	r.Rollback(m, nil)
@@ -260,7 +260,7 @@ func TestRegionWarmAllocations(t *testing.T) {
 }
 
 func TestRegionGenerationAcrossResetTrim(t *testing.T) {
-	r, _ := NewRegion[uint64](Config{PageSize: 1, SlotLimit: 1})
+	r, _ := NewRegion64(Config{PageSize: 1, SlotLimit: 1})
 	defer r.Close(nil)
 	m, _ := r.Mark()
 	a, _ := r.Allocate(11)
@@ -282,7 +282,7 @@ func TestRegionGenerationAcrossResetTrim(t *testing.T) {
 }
 
 func TestRegionBudgetPeakLogs(t *testing.T) {
-	probe, _ := NewRegion[uint32](Config{PageSize: 2})
+	probe, _ := NewRegion32(Config{PageSize: 2})
 	probe.Allocate(1)
 	one := probe.Stats()
 	probe.Allocate(2)
@@ -290,7 +290,7 @@ func TestRegionBudgetPeakLogs(t *testing.T) {
 	probe.Close(nil)
 	total := two.Storage.RecordBytes + two.Storage.MetadataBytes + two.Storage.DirectoryBytes + two.LogBytes + two.MarkBytes
 	budget := NewBudget(total)
-	r, _ := NewRegion[uint32](Config{PageSize: 2, Budget: budget})
+	r, _ := NewRegion32(Config{PageSize: 2, Budget: budget})
 	defer r.Close(nil)
 	r.Allocate(1)
 	if _, e := r.Allocate(2); !errors.Is(e, ErrBudget) {
@@ -302,14 +302,14 @@ func TestRegionBudgetPeakLogs(t *testing.T) {
 }
 
 func TestRegionMarkPeakAndExhaustion(t *testing.T) {
-	probe, _ := NewRegion[uint32](Config{})
+	probe, _ := NewRegion32(Config{})
 	probe.Mark()
 	one := probe.Stats()
 	probe.Mark()
 	two := probe.Stats()
 	probe.Close(nil)
 	budget := NewBudget(two.MarkBytes)
-	r, _ := NewRegion[uint32](Config{Budget: budget})
+	r, _ := NewRegion32(Config{Budget: budget})
 	defer r.Close(nil)
 	r.Mark()
 	if _, e := r.Mark(); !errors.Is(e, ErrBudget) {
@@ -329,7 +329,7 @@ func TestRegionMarkPeakAndExhaustion(t *testing.T) {
 }
 
 func BenchmarkRegionWarm(b *testing.B) {
-	r, _ := NewRegion[uint32](Config{})
+	r, _ := NewRegion32(Config{})
 	m, _ := r.Mark()
 	r.Allocate(2)
 	r.Rollback(m, nil)
@@ -351,7 +351,7 @@ func FuzzRegionTrailOps(f *testing.F) {
 		if len(ops) > 512 {
 			ops = ops[:512]
 		}
-		r, _ := NewRegion[uint32](Config{PageSize: 2})
+		r, _ := NewRegion32(Config{PageSize: 2})
 		defer r.Close(nil)
 		var marks []RegionMark
 		var states []uint32

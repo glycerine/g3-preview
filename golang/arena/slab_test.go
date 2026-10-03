@@ -4,6 +4,7 @@ import (
 	"errors"
 	"math"
 	"math/rand"
+	"reflect"
 	"testing"
 )
 
@@ -13,7 +14,7 @@ type record struct {
 }
 
 func TestSlabLifetime(t *testing.T) {
-	s, err := NewSlab[record](Config{PageSize: 2, SlotLimit: 5})
+	s, err := newRecordSlab(Config{PageSize: 2, SlotLimit: 5})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -73,7 +74,7 @@ func TestSlabLifetime(t *testing.T) {
 
 func TestSlabFailureAtomic(t *testing.T) {
 	b := NewBudget(1 << 20)
-	s, err := NewSlab[record](Config{PageSize: 2, Budget: b})
+	s, err := newRecordSlab(Config{PageSize: 2, Budget: b})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -119,19 +120,18 @@ func TestSlabFailureAtomic(t *testing.T) {
 }
 
 func TestSlabPointerFreedom(t *testing.T) {
-	for _, err := range []error{newSlabError[*int](), newSlabError[string](), newSlabError[[]uint32](), newSlabError[struct{ X [2]*int }](), newSlabError[uintptr]()} {
+	for _, err := range []error{ValidateRecordType(reflect.TypeOf((*int)(nil))), ValidateRecordType(reflect.TypeOf("")), ValidateRecordType(reflect.TypeOf([]uint32(nil))), ValidateRecordType(reflect.TypeOf(struct{ X [2]*int }{})), ValidateRecordType(reflect.TypeOf(uintptr(0)))} {
 		if !errors.Is(err, ErrPointerful) {
 			t.Fatal(err)
 		}
 	}
-	if _, err := NewSlab[record](Config{PageSize: 3}); !errors.Is(err, ErrConfig) {
+	if _, err := newRecordSlab(Config{PageSize: 3}); !errors.Is(err, ErrConfig) {
 		t.Fatal(err)
 	}
 }
-func newSlabError[T any]() error { _, err := NewSlab[T](Config{}); return err }
 
 func TestSlabGenerationExhaustion(t *testing.T) {
-	s, _ := NewSlab[record](Config{PageSize: 1, SlotLimit: 1})
+	s, _ := newRecordSlab(Config{PageSize: 1, SlotLimit: 1})
 	a, _, _ := s.Allocate()
 	s.pages[0].meta[0].generation = Generation(math.MaxUint32)
 	if err := s.Recycle(a); err != nil {
@@ -148,7 +148,7 @@ func TestSlabGenerationExhaustion(t *testing.T) {
 }
 
 func TestSlabStateMachine(t *testing.T) {
-	s, _ := NewSlab[record](Config{PageSize: 2, SlotLimit: 17})
+	s, _ := newRecordSlab(Config{PageSize: 2, SlotLimit: 17})
 	defer s.Close()
 	live := map[Slot]Generation{}
 	values := map[Slot]record{}
@@ -215,7 +215,7 @@ func TestSlabStateMachine(t *testing.T) {
 }
 
 func TestSlabWarmedAllocations(t *testing.T) {
-	s, _ := NewSlab[record](Config{PageSize: 2})
+	s, _ := newRecordSlab(Config{PageSize: 2})
 	a, _, _ := s.Allocate()
 	s.Recycle(a)
 	n := testing.AllocsPerRun(1000, func() {
@@ -260,7 +260,7 @@ func TestBudget(t *testing.T) {
 }
 
 func TestSlabGrowthChargesPeakDirectory(t *testing.T) {
-	probe, _ := NewSlab[record](Config{PageSize: 1})
+	probe, _ := newRecordSlab(Config{PageSize: 1})
 	probe.Allocate()
 	one := probe.Stats()
 	probe.Allocate()
@@ -269,7 +269,7 @@ func TestSlabGrowthChargesPeakDirectory(t *testing.T) {
 	// allocation to remain live until publication of the replacement.
 	limit := two.RecordBytes + two.MetadataBytes + two.DirectoryBytes
 	b := NewBudget(limit)
-	s, _ := NewSlab[record](Config{PageSize: 1, Budget: b})
+	s, _ := newRecordSlab(Config{PageSize: 1, Budget: b})
 	s.Allocate()
 	if _, _, e := s.Allocate(); !errors.Is(e, ErrBudget) {
 		t.Fatal(e)
@@ -280,7 +280,7 @@ func TestSlabGrowthChargesPeakDirectory(t *testing.T) {
 }
 
 func TestSlabInvalidOperations(t *testing.T) {
-	s, _ := NewSlab[record](Config{PageSize: 1})
+	s, _ := newRecordSlab(Config{PageSize: 1})
 	a, g, _ := s.Allocate()
 	for _, slot := range []Slot{0, a + 1} {
 		if _, e := s.Read(slot); !errors.Is(e, ErrInvalidSlot) {
@@ -313,7 +313,7 @@ func TestSlabInvalidOperations(t *testing.T) {
 }
 
 func BenchmarkSlabWarm(b *testing.B) {
-	s, _ := NewSlab[record](Config{PageSize: 1024})
+	s, _ := newRecordSlab(Config{PageSize: 1024})
 	a, _, _ := s.Allocate()
 	s.Recycle(a)
 	b.ReportAllocs()
@@ -335,7 +335,7 @@ func FuzzArenaOps(f *testing.F) {
 		if len(ops) > 512 {
 			ops = ops[:512]
 		}
-		s, _ := NewSlab[record](Config{PageSize: 2, SlotLimit: 7})
+		s, _ := newRecordSlab(Config{PageSize: 2, SlotLimit: 7})
 		defer s.Close()
 		live := map[Slot]Generation{}
 		latest := map[Slot]Generation{}

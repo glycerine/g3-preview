@@ -19,6 +19,6 @@ type dependencyRef rawRef
 func makeToken(slot arena.Slot, generation arena.Generation) uint64 {
 	return uint64(generation)<<32 | uint64(slot)
 }
-func validToken[T any](s *arena.Slab[T], token uint64) bool {
+func validToken(s *arena.Slab32, token uint64) bool {
 	return s.IsLive(arena.Slot(uint32(token)), arena.Generation(token>>32))
 }

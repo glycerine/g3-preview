@@ -13,6 +13,6 @@ func makeRef(slot arena.Slot, generation arena.Generation) rawRef {
 }
 func refSlot(ref rawRef) arena.Slot             { return arena.Slot(uint32(ref)) }
 func refGeneration(ref rawRef) arena.Generation { return arena.Generation(uint64(ref) >> 32) }
-func validRef[T any](s *arena.Slab[T], ref rawRef) bool {
+func validRef(s *arena.Slab32, ref rawRef) bool {
 	return s.IsLive(refSlot(ref), refGeneration(ref))
 }

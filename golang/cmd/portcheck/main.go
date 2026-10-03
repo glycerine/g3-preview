@@ -39,6 +39,9 @@ func run(root, p string, generate bool) error {
 		fmt.Printf("inventoried %d source/tool units and %d API operations; fingerprint %s\n", len(m.Units), len(m.APIs), m.Fingerprint)
 		return nil
 	}
+	if err := portcheck.CheckNoGenerics(filepath.Dir(p)); err != nil {
+		return err
+	}
 	m, err := portcheck.Load(p)
 	if err != nil {
 		return err

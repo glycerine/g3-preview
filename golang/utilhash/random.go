@@ -14,7 +14,17 @@ func (r *Random) Next() uint32        { r.data = r.data*214013 + 2531011; return
 
 // Bounded requires a nonzero bound, like the source.
 func (r *Random) Bounded(u uint32) uint32 { return r.Next() % u }
-func Shuffle[T any](values []T, r *Random) {
+
+// ShuffleUint32 translates shuffle for unsigned 32-bit source-domain values.
+func ShuffleUint32(values []uint32, r *Random) {
+	for n := len(values) - 1; n > 0; n-- {
+		k := int(r.Next()) % (n + 1)
+		values[n], values[k] = values[k], values[n]
+	}
+}
+
+// ShuffleInt32 translates shuffle for signed 32-bit source-domain values.
+func ShuffleInt32(values []int32, r *Random) {
 	for n := len(values) - 1; n > 0; n-- {
 		k := int(r.Next()) % (n + 1)
 		values[n], values[k] = values[k], values[n]
