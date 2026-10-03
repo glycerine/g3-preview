@@ -96618,7 +96618,8 @@
         "mpnum/mp_format.go",
         "mpnum/mpq_root.go",
         "mpnum/mp_display.go",
-        "mpnum/mpq_ops.go"
+        "mpnum/mpq_ops.go",
+        "mpnum/mp_copy.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -96692,7 +96693,12 @@
         "TestRationalOpsIntegerProductsRatDivQuirksAndGuards",
         "TestRationalOpsSourceComponentAliasActionOrder",
         "TestRationalOpsLargeLimbScratchBranchesAndWarm",
-        "TestRationalOpsAllPredictableFailurePrefixes"
+        "TestRationalOpsAllPredictableFailurePrefixes",
+        "TestIntegerCopyFromSourceStorageContract",
+        "TestIntegerCopyFromIndependentOwnersAndSourceClose",
+        "TestRationalCopyFromRawStatesAndIndependentLifetime",
+        "TestNumeralCopyFromFailurePrefixesAndImmediateOwnership",
+        "TestNumeralCopyFromWarmGuardsAndSameOwner"
       ],
       "conditionals": [
         {
@@ -97294,7 +97300,8 @@
         "Numeric division and decimal formatting use child NaturalManager indexed scratch; all retained storage is budgeted, final host string is caller-owned. See mpnum/PORT_STATUS.md.",
         "Root/square stage prior output and source alias rereads with existing owner-budgeted numerals, preserving finite false-result parts and synchronized/unsynchronized normalization policy. See ROOT_PORT_STATUS.md.",
         "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md.",
-        "Mixed/fused locals use borrowed integer-manager storage; nonsynch reuses existing named caches, synch deletes all locals. Failed-prefix tests independently audit immediate live cells/Words before rendering or teardown. See mpnum/RATIONAL_OPS_PORT_STATUS.md."
+        "Mixed/fused locals use borrowed integer-manager storage; nonsynch reuses existing named caches, synch deletes all locals. Failed-prefix tests independently audit immediate live cells/Words before rendering or teardown. See mpnum/RATIONAL_OPS_PORT_STATUS.md.",
+        "Explicit-owner CopyFrom uses source indexed limbs and destination-owned cells/Words. Source set/copy shapes are preserved; rational pair staging preserves raw signed/unreduced representation. Raw records require genuine caller-supplied owners; public provenance is a separate service. See NUMERAL_COPY_PORT_STATUS.md."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -97303,7 +97310,8 @@
         "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors.",
         "Source fractional square identity alias reaches undefined zero/zero normalization; adapter reports ErrDivideByZero and preserves original caller fraction. Root false outputs remain deliberately unnormalized, and prior denominator survives inexact numerator.",
         "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text.",
-        "Staged mixed outputs adapt source allocation failure publication while emulating component-aliased source reads. Integer-only assertions and zero divisors become typed errors; negative-denominator RatDiv and direct integer output alias defects remain."
+        "Staged mixed outputs adapt source allocation failure publication while emulating component-aliased source reads. Integer-only assertions and zero divisors become typed errors; negative-denominator RatDiv and direct integer output alias defects remain.",
+        "B12 replaces the one-global-manager ownership assumption with explicit cross-manager deep copy. No foreign handle or serialization is passed into destination arithmetic; destination outlives source Close. This is an ownership adaptation, not AST translation completion."
       ]
     },
     {
@@ -97363,7 +97371,8 @@
         "mpnum/mpz_bitwise.go",
         "mpnum/mpz_root.go",
         "mpnum/mpz_misc.go",
-        "mpnum/mp_display.go"
+        "mpnum/mp_display.go",
+        "mpnum/mp_copy.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -97460,7 +97469,12 @@
         "TestNumericDisplayReservationFailureCleanup",
         "TestNumericDisplayWorkspaceGrowthAndBudget",
         "TestNumericDisplayWarmAllocationBoundaries",
-        "TestSourceNoncanonicalRationalDisplayActions"
+        "TestSourceNoncanonicalRationalDisplayActions",
+        "TestIntegerCopyFromSourceStorageContract",
+        "TestIntegerCopyFromIndependentOwnersAndSourceClose",
+        "TestRationalCopyFromRawStatesAndIndependentLifetime",
+        "TestNumeralCopyFromFailurePrefixesAndImmediateOwnership",
+        "TestNumeralCopyFromWarmGuardsAndSameOwner"
       ],
       "conditionals": [
         {
@@ -98835,7 +98849,8 @@
         "Root/square locals use existing budgeted numeric cells/Words; source bound/Power/Swap/Copy actions preserved. Staged output includes real old+new peak; see ROOT_PORT_STATUS.md.",
         "Scalar inspection borrows indexed manager cells/Words and allocates no owner storage. Decompose publishes caller-owned digits; sufficient caller capacity allocates nothing. See MPZ_MISC_PORT_STATUS.md.",
         "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md.",
-        "Earlier scratch IDX0-only inventory is superseded by publishTmpAt handling division IDX1 as well; see mpnum/mpz_div.go and source division tests."
+        "Earlier scratch IDX0-only inventory is superseded by publishTmpAt handling division IDX1 as well; see mpnum/mpz_div.go and source division tests.",
+        "Explicit-owner CopyFrom uses source indexed limbs and destination-owned cells/Words. Source set/copy shapes are preserved; rational pair staging preserves raw signed/unreduced representation. Raw records require genuine caller-supplied owners; public provenance is a separate service. See NUMERAL_COPY_PORT_STATUS.md."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -98846,7 +98861,8 @@
         "Unsigned low63-bit mask defines intended bitwise_not signed-shift boundary. Negative source operands produce ErrBitwiseDomain; source local cleanup/partial output on allocation failures become explicit cleanup/staged publication.",
         "Typed root domain errors replace degree-zero division and negative-even/integer-only assertions. Nonnegative square output/input identity retains source reset-to-zero alias result; allocation errors preserve destination.",
         "32-bit accessor source assertions become ErrConversion; INT_MIN decomposition uses defined wider magnitude arithmetic. Floating UINT_MAX radix, unsigned length/count wrap and sign-free big hash remain source behavior.",
-        "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text."
+        "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text.",
+        "B12 replaces the one-global-manager ownership assumption with explicit cross-manager deep copy. No foreign handle or serialization is passed into destination arithmetic; destination outlives source Close. This is an ownership adaptation, not AST translation completion."
       ]
     },
     {
@@ -98868,7 +98884,8 @@
         "mpnum/mpz_bitwise.go",
         "mpnum/mpz_root.go",
         "mpnum/mpz_misc.go",
-        "mpnum/mp_display.go"
+        "mpnum/mp_display.go",
+        "mpnum/mp_copy.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -98965,7 +98982,12 @@
         "TestNumericDisplayReservationFailureCleanup",
         "TestNumericDisplayWorkspaceGrowthAndBudget",
         "TestNumericDisplayWarmAllocationBoundaries",
-        "TestSourceNoncanonicalRationalDisplayActions"
+        "TestSourceNoncanonicalRationalDisplayActions",
+        "TestIntegerCopyFromSourceStorageContract",
+        "TestIntegerCopyFromIndependentOwnersAndSourceClose",
+        "TestRationalCopyFromRawStatesAndIndependentLifetime",
+        "TestNumeralCopyFromFailurePrefixesAndImmediateOwnership",
+        "TestNumeralCopyFromWarmGuardsAndSameOwner"
       ],
       "conditionals": [
         {
@@ -99852,7 +99874,8 @@
         "Root/square locals use existing budgeted numeric cells/Words; source bound/Power/Swap/Copy actions preserved. Staged output includes real old+new peak; see ROOT_PORT_STATUS.md.",
         "Scalar inspection borrows indexed manager cells/Words and allocates no owner storage. Decompose publishes caller-owned digits; sufficient caller capacity allocates nothing. See MPZ_MISC_PORT_STATUS.md.",
         "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md.",
-        "Earlier scratch IDX0-only inventory is superseded by publishTmpAt handling division IDX1 as well; see mpnum/mpz_div.go and source division tests."
+        "Earlier scratch IDX0-only inventory is superseded by publishTmpAt handling division IDX1 as well; see mpnum/mpz_div.go and source division tests.",
+        "Explicit-owner CopyFrom uses source indexed limbs and destination-owned cells/Words. Source set/copy shapes are preserved; rational pair staging preserves raw signed/unreduced representation. Raw records require genuine caller-supplied owners; public provenance is a separate service. See NUMERAL_COPY_PORT_STATUS.md."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -99863,7 +99886,8 @@
         "Unsigned low63-bit mask defines intended bitwise_not signed-shift boundary. Negative source operands produce ErrBitwiseDomain; source local cleanup/partial output on allocation failures become explicit cleanup/staged publication.",
         "Typed root domain errors replace degree-zero division and negative-even/integer-only assertions. Nonnegative square output/input identity retains source reset-to-zero alias result; allocation errors preserve destination.",
         "32-bit accessor source assertions become ErrConversion; INT_MIN decomposition uses defined wider magnitude arithmetic. Floating UINT_MAX radix, unsigned length/count wrap and sign-free big hash remain source behavior.",
-        "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text."
+        "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text.",
+        "B12 replaces the one-global-manager ownership assumption with explicit cross-manager deep copy. No foreign handle or serialization is passed into destination arithmetic; destination outlives source Close. This is an ownership adaptation, not AST translation completion."
       ]
     },
     {

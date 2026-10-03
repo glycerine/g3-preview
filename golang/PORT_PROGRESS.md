@@ -452,3 +452,14 @@ The next AST-numeral prerequisites are rational inspection/extraction, explicit
 cross-owner limb copying and the owner-local rational service/constants/cache;
 array/extended GCD, LCM and divisibility also remain open. No full foundation
 or solver completion is claimed.
+
+## Explicit cross-owner numerical copying
+
+Integer and rational CopyFrom now transfer owned limbs between explicitly
+supplied managers, preserving small/big shape, source allocation capacity and
+raw unreduced/signed-denominator representation. Rational outputs are staged
+with real destination-owned cells before pair publication. Five tests reached
+missing-API RED then GREEN, with independent source-close lifetimes, every
+reservation prefix, immediate live-cell/Words accounting and warm allocations.
+Raw managers retain their caller-supplied owner contract; public provenance and
+AST consumers remain separate work. See NUMERAL_COPY_PORT_STATUS.md.
