@@ -534,3 +534,43 @@ packet; its source m_alloc_size stays0 because its allocate/free branches return
 before counter updates. Whole AST allocator/domain ownership and real rational
 constructed-pool tests remain pending. This storage packet does not establish
 source raw-pointer ABI behavior or finish the full memory/solver gate.
+
+# SmallBytes diagnostic direct-only follow-up
+
+`SmallBytesConfig.DirectOnly` now translates the diagnostic allocation/free
+bypass at util/small_object_allocator.cpp:75-78 and100-102 (Z3DEBUG&&!WINDOWS).
+Every nonzero request gets a dedicated byte block regardless of small class;
+Deallocate releases its payload immediately. No pooled chunks/free objects/waste
+are created. Consolidate is consequently a storage no-op for direct blocks.
+Zero allocate/free semantics and generational liveness checks remain unchanged.
+
+`SmallBytesStats.SourceAllocationBytes` exposes the source m_alloc_size counter:
+release mode matches requested live bytes; diagnostic mode stays0 because source
+returns before the normal updates. `RequestedBytes`, `DirectBytes` and budget
+storage measurements still track actual owned diagnostic bytes, avoiding a false
+memory-use claim from the zero source diagnostic counter. Storage does not emit
+source debug leak diagnostics; specifically the diagnostic zero counter produces
+no leak message. Logical-object destruction remains the caller's responsibility,
+and tracked-owner Reset/Close cleanup also applies to diagnostic direct blocks.
+Cold owner header budget accounting still belongs to the caller and is an
+explicit pending integration responsibility, not included in backing-array stats.
+
+Tests first failed RED missing DirectOnly and SourceAllocationBytes fields, then
+GREEN. Three new tests cover mixed small/boundary direct payloads and contents,
+source zero counter versus measurable ownership, immediate release, no pooled
+waste, nonmoving consolidate, reset/stale generation, close budget balance,
+failure-before-publication with existing content preserved, and the unchanged
+release counter. Ordinary fixtures require no reference source/toolchain runtime.
+
+- Full native and g3checked CGO-disabled arena tests: PASS.
+- go vet ./arena, js/wasm and wasip1/wasm builds: PASS.
+- Actual Nodejs execution of current wasm binary printed all13 TestSmallBytes
+  names including DirectOnlyDiagnostics, ReleaseSourceCounter and
+  DirectOnlyFailureAtomic, each PASS. Compilation used normal workspace Go;
+  minimal environment applied only to runtime wrapper, with TMPDIR in .cache.
+
+This completes the finite concrete pooled/direct/diagnostic storage policy
+translation with the documented owner cleanup and conceptual-address adaptations.
+It does not establish raw-pointer ABI fidelity, AST-domain cleanup/integration,
+source reference execution, real rational-cell constructed pools or the complete
+arena/memory/solver gate.

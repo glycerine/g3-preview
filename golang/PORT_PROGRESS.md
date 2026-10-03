@@ -134,3 +134,21 @@ compilation pass at integration. The source/no-generics audit records 4 ported,
 24 partial and 2,074 unported units; this still leaves the full solver open.
 A Go-only archive of commit 5d01444 also passes its full hermetic test suite
 without reference C++ sources. All extraction/cache/temp paths stay in golang.
+
+## Lehmer GCD, scalar hash map and byte allocator integration
+
+Scalar GCD uses the selected source Lehmer algorithm, with concrete binary GCD
+helpers and AddMul/SubMul. The scalar uint32 map preserves source probing,
+tombstones, strict thresholds, bucket order and copy/swap behavior. SmallBytes
+implements pooled, direct and diagnostic direct-only byte policies, with stable
+generations and the source consolidation retention quirk. Source cleanup and
+conceptual-address adaptations are documented beside the method coverage.
+
+Integration release/checked tests, checked races, vet, actual release/checked
+js/wasm execution and WASI compilation pass. Verbose wasm runs explicitly
+confirmed new test registrations; the compiler uses the workspace environment,
+and the minimal environment is confined to the Node runtime wrapper. A prior
+minimal-environment compiler invocation omitted new registrations; no cache
+fault is established. The no-generics/source audit records 4 ported, 31 partial
+and 2,067 unported units. MPQ, remaining MPZ, other map variants, domain allocator
+ownership, cold substrate headers and the full solver remain incomplete.

@@ -18,7 +18,10 @@ type SmallBytesConfig struct {
 	// size-class policy, not a Go address alignment guarantee. ChunkSize defaults
 	// to8192-2*Alignment; smaller values exercise source boundaries in tests.
 	Alignment, ChunkSize uint32
-	Descriptors          Config
+	// DirectOnly selects the source Z3DEBUG && !WINDOWS diagnostic bypass:
+	// every nonzero payload is separately allocated and immediately freed.
+	DirectOnly  bool
+	Descriptors Config
 }
 type smallByteBlock struct {
 	next uint64
@@ -32,10 +35,13 @@ type smallByteChunk struct {
 type SmallBytesStats struct {
 	Live, Chunks, FreeObjects, DirectObjects                                              uint32
 	RequestedBytes, WastedBytes, PayloadBytes, MetadataBytes, DirectoryBytes, DirectBytes uint64
+	// SourceAllocationBytes matches source m_alloc_size, which remains zero in
+	// the diagnostic bypass. RequestedBytes measures owned live bytes in both modes.
+	SourceAllocationBytes uint64
 }
 
 // SmallBytes ports release-build small_object_allocator pooled/direct storage.
-// The diagnostic bypass remains pending. Each
+// DirectOnly selects the diagnostic direct-allocation bypass. Each
 // owner and Budget is single-threaded. Caller destroys logical objects before
 // Deallocate/Reset/Close; this storage invokes no domain callbacks.
 // Reset/Close also reclaim tracked live direct blocks: an explicit owner cleanup
@@ -191,7 +197,7 @@ func (a *SmallBytes) Allocate(size uint32) (SmallBytesRef, error) {
 	if size == 0 {
 		return SmallBytesRef{}, nil
 	}
-	if size >= 256-a.config.Alignment {
+	if a.config.DirectOnly || size >= 256-a.config.Alignment {
 		slot, g, e := a.descriptors.Allocate()
 		if e != nil {
 			return SmallBytesRef{}, e
@@ -357,6 +363,9 @@ func (a *SmallBytes) Close() {
 }
 func (a *SmallBytes) Stats() SmallBytesStats {
 	s := SmallBytesStats{RequestedBytes: a.requested, DirectoryBytes: a.directoryBytes}
+	if !a.config.DirectOnly {
+		s.SourceAllocationBytes = a.requested
+	}
 	d := a.descriptors.Stats()
 	s.Live = d.Live
 	s.MetadataBytes = d.RecordBytes + d.MetadataBytes

@@ -81943,13 +81943,16 @@
         "TestSmallBytesDirectOwnerLifetime",
         "TestSmallBytesDirectFailuresAndThresholds",
         "TestSmallBytesGenerationRetirementAndAccounting",
-        "TestSmallBytesDirectoryGrowthPeakBudget"
+        "TestSmallBytesDirectoryGrowthPeakBudget",
+        "TestSmallBytesDirectOnlyDiagnostics",
+        "TestSmallBytesReleaseSourceCounter",
+        "TestSmallBytesDirectOnlyFailureAtomic"
       ],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [],
       "ownership": [
-        "Concrete byte owner with scalar descriptors/generation ledger. Caller destroys logical objects before storage reset/free. Budgeted backing/metadata, caller budgets cold header. Diagnostic bypass pending. See arena/PORT_STATUS.md."
+        "Concrete byte owner with scalar descriptors/generation ledger. Caller destroys logical objects before storage reset/free. Budgeted backing/metadata, caller budgets cold header. DirectOnly translates the diagnostic bypass with zero source counter and separate measured owned bytes. See arena/PORT_STATUS.md."
       ],
       "deviations": [
         "Reset/Close reclaim tracked live direct blocks as explicit typed owner cleanup extension; source only frees pooled chunks.",
@@ -98947,7 +98950,10 @@
         "TestSmallBytesDirectOwnerLifetime",
         "TestSmallBytesDirectFailuresAndThresholds",
         "TestSmallBytesGenerationRetirementAndAccounting",
-        "TestSmallBytesDirectoryGrowthPeakBudget"
+        "TestSmallBytesDirectoryGrowthPeakBudget",
+        "TestSmallBytesDirectOnlyDiagnostics",
+        "TestSmallBytesReleaseSourceCounter",
+        "TestSmallBytesDirectOnlyFailureAtomic"
       ],
       "conditionals": [
         {
@@ -99096,10 +99102,20 @@
             "TestSmallBytesGenerationRetirementAndAccounting",
             "TestSmallBytesDirectoryGrowthPeakBudget"
           ]
+        },
+        {
+          "name": "Z3DEBUG non-Windows direct-only allocate/deallocate/counter",
+          "status": "ported",
+          "go_target": "arena/small_bytes.go",
+          "tests": [
+            "TestSmallBytesDirectOnlyDiagnostics",
+            "TestSmallBytesReleaseSourceCounter",
+            "TestSmallBytesDirectOnlyFailureAtomic"
+          ]
         }
       ],
       "ownership": [
-        "Concrete byte owner with scalar descriptors/generation ledger. Caller destroys logical objects before storage reset/free. Budgeted backing/metadata, caller budgets cold header. Diagnostic bypass pending. See arena/PORT_STATUS.md."
+        "Concrete byte owner with scalar descriptors/generation ledger. Caller destroys logical objects before storage reset/free. Budgeted backing/metadata, caller budgets cold header. DirectOnly translates the diagnostic bypass with zero source counter and separate measured owned bytes. See arena/PORT_STATUS.md."
       ],
       "deviations": [
         "Reset/Close reclaim tracked live direct blocks as explicit typed owner cleanup extension; source only frees pooled chunks.",
@@ -99126,7 +99142,10 @@
         "TestSmallBytesDirectOwnerLifetime",
         "TestSmallBytesDirectFailuresAndThresholds",
         "TestSmallBytesGenerationRetirementAndAccounting",
-        "TestSmallBytesDirectoryGrowthPeakBudget"
+        "TestSmallBytesDirectoryGrowthPeakBudget",
+        "TestSmallBytesDirectOnlyDiagnostics",
+        "TestSmallBytesReleaseSourceCounter",
+        "TestSmallBytesDirectOnlyFailureAtomic"
       ],
       "conditionals": [
         {
@@ -99233,10 +99252,20 @@
             "TestSmallBytesGenerationRetirementAndAccounting",
             "TestSmallBytesDirectoryGrowthPeakBudget"
           ]
+        },
+        {
+          "name": "Z3DEBUG non-Windows direct-only allocate/deallocate/counter",
+          "status": "ported",
+          "go_target": "arena/small_bytes.go",
+          "tests": [
+            "TestSmallBytesDirectOnlyDiagnostics",
+            "TestSmallBytesReleaseSourceCounter",
+            "TestSmallBytesDirectOnlyFailureAtomic"
+          ]
         }
       ],
       "ownership": [
-        "Concrete byte owner with scalar descriptors/generation ledger. Caller destroys logical objects before storage reset/free. Budgeted backing/metadata, caller budgets cold header. Diagnostic bypass pending. See arena/PORT_STATUS.md."
+        "Concrete byte owner with scalar descriptors/generation ledger. Caller destroys logical objects before storage reset/free. Budgeted backing/metadata, caller budgets cold header. DirectOnly translates the diagnostic bypass with zero source counter and separate measured owned bytes. See arena/PORT_STATUS.md."
       ],
       "deviations": [
         "Reset/Close reclaim tracked live direct blocks as explicit typed owner cleanup extension; source only frees pooled chunks.",

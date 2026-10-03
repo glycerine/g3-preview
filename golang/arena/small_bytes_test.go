@@ -483,3 +483,111 @@ func BenchmarkSmallBytesWarm(b *testing.B) {
 		}
 	}
 }
+
+func TestSmallBytesDirectOnlyDiagnostics(t *testing.T) {
+	budget := NewBudget(1 << 20)
+	a, e := NewSmallBytes(SmallBytesConfig{DirectOnly: true, Descriptors: Config{PageSize: 2, Budget: budget}})
+	if e != nil {
+		t.Fatal(e)
+	}
+	defer a.Close()
+	zero, e := a.Allocate(0)
+	if e != nil || zero != (SmallBytesRef{}) || budget.Used() != 0 {
+		t.Fatal("diagnostic zero allocation")
+	}
+	var refs [4]SmallBytesRef
+	sizes := [4]uint32{1, 13, 247, 248}
+	var requested uint64
+	for i, n := range sizes {
+		refs[i] = smallAlloc(t, a, n)
+		requested += uint64(n)
+		a.Write(refs[i], n-1, byte(i+31))
+	}
+	s := a.Stats()
+	if s.SourceAllocationBytes != 0 || s.RequestedBytes != requested || s.DirectBytes != requested || s.DirectObjects != 4 || s.Chunks != 0 || s.FreeObjects != 0 || s.WastedBytes != 0 {
+		t.Fatal("debug counters/pooling", s)
+	}
+	for i, r := range refs {
+		if got, e := a.Read(r, sizes[i]-1); e != nil || got != byte(i+31) {
+			t.Fatal("diagnostic payload content")
+		}
+	}
+	before := budget.Used()
+	smallFree(t, a, 13, refs[1])
+	if before-budget.Used() != 13 {
+		t.Fatal("debug small block not immediately released")
+	}
+	s = a.Stats()
+	if s.SourceAllocationBytes != 0 || s.FreeObjects != 0 || s.WastedBytes != 0 || s.RequestedBytes != requested-13 {
+		t.Fatal("debug free counter", s)
+	}
+	loc := smallLocation(t, a, refs[3])
+	if e = a.Consolidate(); e != nil {
+		t.Fatal(e)
+	}
+	if smallLocation(t, a, refs[3]) != loc {
+		t.Fatal("debug consolidate affected direct block")
+	}
+	a.Reset()
+	if a.IsLive(refs[3]) || a.Stats().SourceAllocationBytes != 0 || a.Stats().RequestedBytes != 0 {
+		t.Fatal("debug reset cleanup")
+	}
+	next := smallAlloc(t, a, 1)
+	if next == refs[0] {
+		t.Fatal("debug stale generation resurrected")
+	}
+	a.Close()
+	if budget.Used() != 0 {
+		t.Fatal("debug close leaked")
+	}
+}
+func TestSmallBytesReleaseSourceCounter(t *testing.T) {
+	a := newSmallTest(t, 70, nil)
+	small := smallAlloc(t, a, 13)
+	large := smallAlloc(t, a, 248)
+	if a.Stats().SourceAllocationBytes != 261 {
+		t.Fatal("release source counter", a.Stats())
+	}
+	smallFree(t, a, 13, small)
+	if a.Stats().SourceAllocationBytes != 248 {
+		t.Fatal("release source free counter")
+	}
+	smallFree(t, a, 248, large)
+	if a.Stats().SourceAllocationBytes != 0 {
+		t.Fatal("release direct free counter")
+	}
+}
+func TestSmallBytesDirectOnlyFailureAtomic(t *testing.T) {
+	for failure := int64(0); failure < 8; failure++ {
+		b := NewBudget(1 << 20)
+		a, e := NewSmallBytes(SmallBytesConfig{DirectOnly: true, Descriptors: Config{PageSize: 2, Budget: b}})
+		if e != nil {
+			t.Fatal(e)
+		}
+		old := smallAlloc(t, a, 13)
+		a.Write(old, 0, 117)
+		b.FailAfter(failure)
+		next, e := a.Allocate(1)
+		if e != nil {
+			if !errors.Is(e, ErrInjectedFailure) {
+				t.Fatal(e)
+			}
+			if a.Stats().Live != 1 || a.Stats().RequestedBytes != 13 {
+				t.Fatal("debug failure published")
+			}
+		} else {
+			smallFree(t, a, 1, next)
+		}
+		if v, e := a.Read(old, 0); e != nil || v != 117 {
+			t.Fatal("debug failure changed existing content")
+		}
+		if s := a.Stats(); s.SourceAllocationBytes != 0 || s.FreeObjects != 0 || s.WastedBytes != 0 {
+			t.Fatal("debug failure source counters", s)
+		}
+		b.FailAfter(-1)
+		a.Close()
+		if b.Used() != 0 {
+			t.Fatal("debug failure leaked")
+		}
+	}
+}
