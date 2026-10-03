@@ -18,10 +18,21 @@ passing suites do not satisfy this objective.
 
 ## Current facts and conflict resolution
 
-- Source ledger: **2,102 units; 33 ported, 148 partial, 1,921 unported**. All **677
+- Source ledger: **2,102 units; 33 ported, 149 partial, 1,920 unported**. All **677
   API operations remain unported** in the machine inventory. Source fingerprint:
   `f8480997c14e2d6c414f40c60ce5095ef40a89ce6d1bcf1ed196c5d682d42d8f`.
-- Both full suites are **GREEN** on the frozen71-file Go recovery tree:
+- Both full suites are **GREEN** on the frozen combined source-slice tree:
+  `go test ./... -timeout=30m` and
+  `go test -tags g3checked,g3debug ./... -timeout=30m`, terminal0 in
+  `.cache/green-commit-native.log` and `.cache/green-commit-debug.log`.
+  Native root/numeric13.903s/76.390s; checked/debug728.041s/184.817s.
+  Both vet profiles and the final source/no-generics audit are terminal0 in
+  `.cache/green-commit-vet-native.log`, `.cache/green-commit-vet-debug.log`, and
+  `.cache/green-commit-source-final.log`. All562 Go file hashes still match
+  `.cache/green-commit-go-hashes.json`. The explicitly named factorization
+  regression also passed fresh native/debug runs. No existing tests were weakened,
+  hidden or removed; constructor and solver pending campaigns remain open.
+- Previous full suites were **GREEN** on the frozen71-file Go recovery tree:
   `go test ./... -timeout=30m` and
   `go test -tags g3checked,g3debug ./... -timeout=30m`, terminal0 in
   `.cache/recovery-verified-0.log` and `.cache/recovery-verified-1.log`.
@@ -85,6 +96,38 @@ passing suites do not satisfy this objective.
   entries remain unported semantic/checker/interpolation obligations. Constructor
   presence or lexical evidence never establishes proof validity or Craig checks.
 
+## Green source slices in this checkpoint
+
+The prior full-suite GREEN baseline is `37854cf`. Each new slice observed
+tests-first RED before implementation; the final combined native and checked/debug
+suites now pass. No existing tests were weakened or hidden.
+
+- Scientific raw-denominator continuations: five new groups first observed three
+  behavioral failures on the baseline. A shared ordinary Integer-field ownership
+  check at public Mul/Div entry fixes these while retaining the source arithmetic,
+  parser, normalization and ordinary rational reader guards. The independent
+  alias table covers864 cases; Power and first-growth refusal prefixes also pass.
+- SAT clause methods: source solver.cpp367–465 simplification and both watch
+  selectors run on borrowed assignment/level views and real clause storage.
+  Independent finite simplification covers111888 calls; watch priorities/ties,
+  source debug assertions and warm zero-allocation behavior execute. Concrete
+  heapsort replaces scalar std::sort. The source unit is now partial; constructor,
+  propagation, conflicts, search, scopes and TRACE remain open.
+- SAT simplifier methods: real charged visited storage, source marks, minimum
+  occurrence selection, direct/self subsumption, collectors and resolution.
+  Thirteen groups exercise independent bounded checks, real list compression,
+  paired publications, counter wrapping, partial marks/output and warm physical
+  plateaus. BackSubsumption, Run, BCE, elimination and solver integration remain
+  open, including full simplifier finalize ordering; no registered source
+  ENSURE/VERIFY claims were added.
+- Explicit Integer SourceFinalize: source private-cell order then reverse Natural
+  buffers and allocator destruction. Caller direct raw blocks survive until
+  owning cleanup; pooled payloads die with actual chunks. Allocation limits apply
+  only to allocations. A real diagnostic refusal retains completed destruction
+  and caller roots; source-undefined scratch holes require explicit owning abort.
+  Constructor unwind, transitive/global lifetimes and the combined pending API
+  campaign remain open.
+
 ## TODO — prioritized handoff
 
 - [ ] Maintain full native and checked/debug GREEN across implementation commits;
@@ -95,8 +138,11 @@ passing suites do not satisfy this objective.
   but they do not establish exhaustive coverage of every input/exception path.
 - [ ] Mandatory owner/error/SourceFinalize missing-API campaign remains tagged
   `port_pending_mpz` in `mpnum/mpz_allocator_phase_b_test.go`; ConstructionFailure
-  and SourceFinalize are absent. Run `go test -tags port_pending_mpz ./mpnum`
-  when implementing this API and remove the tag when real methods execute. The
+  remains absent; explicit completed-owner SourceFinalize is now implemented with
+  bounded physical-lifetime tests. The combined pending campaign is still open.
+  Run `go test -tags port_pending_mpz ./mpnum`
+  when implementing the remaining APIs and remove the tag when all real methods
+  execute. The
   already integrated inline Natural constructor tests are untagged; do not
   confuse them with completion of this remaining campaign.
 - [ ] Mandatory Natural lifecycle: complete exact SourceFinalize, lexical format
@@ -104,8 +150,8 @@ passing suites do not satisfy this objective.
   retention, FF outer cleanup, global/TLS binding, generated init/finalize and
   cross-manager ownership. Actual division is integrated; this does not complete
   the output/owner proposal or the whole numeric source family.
-- [ ] Rational scientific invalid-denominator continuation, general Copy/public
-  read boundaries, scalar projection/getters, ostream/TRACE/diagnostic transport,
+- [ ] General rational Copy/public read boundaries, scalar projection/getters,
+  ostream/TRACE/diagnostic transport,
   source domain guards and remaining whole mpz/mpq methods/overloads.
 - [ ] Polynomial multivariate/algebraic construction, full registered tests,
   diagnostics/trace/printers/global primes/OpenMP and remaining source methods.
@@ -127,6 +173,14 @@ passing suites do not satisfy this objective.
   currently deferred checks while completing the single-goroutine port stage.
 
 ## FINISHED — committed subset, with explicit limits
+
+- [x] Explicit Integer source destruction and owning-abort boundaries; scientific
+  rational raw-denominator Mul/Div continuations; SAT clause simplification/watch
+  selection and selected simplifier subsumption/collector/resolution methods.
+  The combined full native/debug, both vet and final source/no-generics gates pass.
+  Only solver.cpp moved from unported to partial; no whole unit/API completion or
+  new registered source assertion claims. ConstructionFailure and full solver
+  integration remain TODO.
 
 - [x] Restored both full suites, native/debug vet and source/no-generics audit.
   This checkpoint saves source-ordered rational setters, charged factorization
@@ -183,7 +237,7 @@ passing suites do not satisfy this objective.
 | opt | 0 | 1 | 24 |
 | parsers | 0 | 1 | 17 |
 | qe | 0 | 0 | 32 |
-| sat | 0 | 22 | 37 |
+| sat | 0 | 23 | 36 |
 | scripts | 0 | 0 | 23 |
 | shell | 0 | 0 | 18 |
 | smt | 0 | 1 | 190 |

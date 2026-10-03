@@ -54496,7 +54496,13 @@
       "status": "partial",
       "go_targets": [
         "sat_solver_clause_use_lists.go",
-        "sat_solver_clause_use_lists_test.go"
+        "sat_solver_clause_use_lists_test.go",
+        "sat_solver_simplifier_kernel.go",
+        "sat_solver_simplifier_kernel_test.go",
+        "sat_solver_simplifier_subsumption.go",
+        "sat_solver_simplifier_subsumption_test.go",
+        "sat_solver_simplifier_resolution.go",
+        "sat_solver_simplifier_resolution_test.go"
       ],
       "tests": [
         "TestSATClauseUseListsLiteralRoutingAndEraseExcept",
@@ -54516,7 +54522,20 @@
         "TestSATClauseUseListsRawCurrentAndPayloadFailurePrefix",
         "TestSATClauseUseListsEraseNotRemovedAndReleaseMissing",
         "TestSATClauseUseListsExactOwnedGraphAndColdGuards",
-        "TestSATClauseUseListsDestructorBeyondCapturedEnd"
+        "TestSATClauseUseListsDestructorBeyondCapturedEnd",
+        "TestSATSimplifierVisitedSourceStorageAndPrefixes",
+        "TestSATSimplifierVisitedRawRetainedAndMarkFailure",
+        "TestSATSimplifierVisitedScalarExtent",
+        "TestSATSimplifierSubsumptionIndependentFiniteSets",
+        "TestSATSimplifierOccurrenceChoiceCollectorsAndCompression",
+        "TestSATSimplifierCollectorPairedPublicationAndUnsignedCost",
+        "TestSATSimplifierApproximateFilterAndFirstTie",
+        "TestSATSimplifierSubsumptionActualReadFailurePrefixes",
+        "TestSATSimplifierCollectorsWarmPhysicalPlateauAndWrappedOccurrence",
+        "TestSATSimplifierResolutionWrapperAndRawDuplicateActions",
+        "TestSATSimplifierResolutionIndependentBoundedTruth",
+        "TestSATSimplifierResolutionRefusalRetainsMarkAndOutputPrefix",
+        "TestSATSimplifierResolutionDebugPivotAndWarmZeroAllocation"
       ],
       "conditionals": [
         {
@@ -54633,13 +54652,35 @@
             "TestSATClauseUseListsExactOwnedGraphAndColdGuards",
             "TestSATClauseUseListsDestructorBeyondCapturedEnd"
           ]
+        },
+        {
+          "name": "visited state; mark_all_but/unmark_all; min-occurrence, subsumption and collectors; resolve (selected source123,319\u2013420,460\u2013531,1177\u20131215)",
+          "status": "ported",
+          "go_target": "sat_solver_simplifier_kernel.go",
+          "tests": [
+            "TestSATSimplifierVisitedSourceStorageAndPrefixes",
+            "TestSATSimplifierVisitedRawRetainedAndMarkFailure",
+            "TestSATSimplifierVisitedScalarExtent",
+            "TestSATSimplifierSubsumptionIndependentFiniteSets",
+            "TestSATSimplifierOccurrenceChoiceCollectorsAndCompression",
+            "TestSATSimplifierCollectorPairedPublicationAndUnsignedCost",
+            "TestSATSimplifierApproximateFilterAndFirstTie",
+            "TestSATSimplifierSubsumptionActualReadFailurePrefixes",
+            "TestSATSimplifierCollectorsWarmPhysicalPlateauAndWrappedOccurrence",
+            "TestSATSimplifierResolutionWrapperAndRawDuplicateActions",
+            "TestSATSimplifierResolutionIndependentBoundedTruth",
+            "TestSATSimplifierResolutionRefusalRetainsMarkAndOutputPrefix",
+            "TestSATSimplifierResolutionDebugPivotAndWarmZeroAllocation"
+          ]
         }
       ],
       "ownership": [
-        "Pointer-free32-byte inline records, one chargedWords pool, five-word clause tokens and cold borrowed allocator. Same-address reconstruction follows retained references; outer relocation/free invalidates at actual access. Source destruction, growth and literal action prefixes preserved. See PORT_PROGRESS.md#audit-sat-solver-clause-use-lists-port-status-md."
+        "Pointer-free32-byte inline records, one chargedWords pool, five-word clause tokens and cold borrowed allocator. Same-address reconstruction follows retained references; outer relocation/free invalidates at actual access. Source destruction, growth and literal action prefixes preserved. See PORT_PROGRESS.md#audit-sat-solver-clause-use-lists-port-status-md.",
+        "Charged concrete visited storage and cold borrowed allocator/use-list views; original collector and resolution publication/failure prefixes. Full simplifier owner integration remains open."
       ],
       "deviations": [
-        "Selected LP64 source extents are distinct from actual Go stride/pool graph. Inline storage and pooled metadata are fully charged. Implicit copy/move, nonlazy/TRACE and full simplifier/solver remain open; no source registered use_list assertions are claimed."
+        "Selected LP64 source extents are distinct from actual Go stride/pool graph. Inline storage and pooled metadata are fully charged. Implicit copy/move, nonlazy/TRACE and full simplifier/solver remain open; no source registered use_list assertions are claimed.",
+        "BackSubsumption, Run, BCE, elimination, TRACE and solver integration remain unported; no new registered source test assertions claimed."
       ]
     },
     {
@@ -54650,7 +54691,13 @@
       "status": "partial",
       "go_targets": [
         "sat_solver_clause_use_lists.go",
-        "sat_solver_clause_use_lists_test.go"
+        "sat_solver_clause_use_lists_test.go",
+        "sat_solver_simplifier_kernel.go",
+        "sat_solver_simplifier_kernel_test.go",
+        "sat_solver_simplifier_subsumption.go",
+        "sat_solver_simplifier_subsumption_test.go",
+        "sat_solver_simplifier_resolution.go",
+        "sat_solver_simplifier_resolution_test.go"
       ],
       "tests": [
         "TestSATClauseUseListsLiteralRoutingAndEraseExcept",
@@ -54670,7 +54717,20 @@
         "TestSATClauseUseListsRawCurrentAndPayloadFailurePrefix",
         "TestSATClauseUseListsEraseNotRemovedAndReleaseMissing",
         "TestSATClauseUseListsExactOwnedGraphAndColdGuards",
-        "TestSATClauseUseListsDestructorBeyondCapturedEnd"
+        "TestSATClauseUseListsDestructorBeyondCapturedEnd",
+        "TestSATSimplifierVisitedSourceStorageAndPrefixes",
+        "TestSATSimplifierVisitedRawRetainedAndMarkFailure",
+        "TestSATSimplifierVisitedScalarExtent",
+        "TestSATSimplifierSubsumptionIndependentFiniteSets",
+        "TestSATSimplifierOccurrenceChoiceCollectorsAndCompression",
+        "TestSATSimplifierCollectorPairedPublicationAndUnsignedCost",
+        "TestSATSimplifierApproximateFilterAndFirstTie",
+        "TestSATSimplifierSubsumptionActualReadFailurePrefixes",
+        "TestSATSimplifierCollectorsWarmPhysicalPlateauAndWrappedOccurrence",
+        "TestSATSimplifierResolutionWrapperAndRawDuplicateActions",
+        "TestSATSimplifierResolutionIndependentBoundedTruth",
+        "TestSATSimplifierResolutionRefusalRetainsMarkAndOutputPrefix",
+        "TestSATSimplifierResolutionDebugPivotAndWarmZeroAllocation"
       ],
       "conditionals": [
         {
@@ -54709,13 +54769,35 @@
             "TestSATClauseUseListsExactOwnedGraphAndColdGuards",
             "TestSATClauseUseListsDestructorBeyondCapturedEnd"
           ]
+        },
+        {
+          "name": "visited state; mark_all_but/unmark_all; min-occurrence, subsumption and collectors; resolve (selected source123,319\u2013420,460\u2013531,1177\u20131215)",
+          "status": "ported",
+          "go_target": "sat_solver_simplifier_kernel.go",
+          "tests": [
+            "TestSATSimplifierVisitedSourceStorageAndPrefixes",
+            "TestSATSimplifierVisitedRawRetainedAndMarkFailure",
+            "TestSATSimplifierVisitedScalarExtent",
+            "TestSATSimplifierSubsumptionIndependentFiniteSets",
+            "TestSATSimplifierOccurrenceChoiceCollectorsAndCompression",
+            "TestSATSimplifierCollectorPairedPublicationAndUnsignedCost",
+            "TestSATSimplifierApproximateFilterAndFirstTie",
+            "TestSATSimplifierSubsumptionActualReadFailurePrefixes",
+            "TestSATSimplifierCollectorsWarmPhysicalPlateauAndWrappedOccurrence",
+            "TestSATSimplifierResolutionWrapperAndRawDuplicateActions",
+            "TestSATSimplifierResolutionIndependentBoundedTruth",
+            "TestSATSimplifierResolutionRefusalRetainsMarkAndOutputPrefix",
+            "TestSATSimplifierResolutionDebugPivotAndWarmZeroAllocation"
+          ]
         }
       ],
       "ownership": [
-        "Pointer-free32-byte inline records, one chargedWords pool, five-word clause tokens and cold borrowed allocator. Same-address reconstruction follows retained references; outer relocation/free invalidates at actual access. Source destruction, growth and literal action prefixes preserved. See PORT_PROGRESS.md#audit-sat-solver-clause-use-lists-port-status-md."
+        "Pointer-free32-byte inline records, one chargedWords pool, five-word clause tokens and cold borrowed allocator. Same-address reconstruction follows retained references; outer relocation/free invalidates at actual access. Source destruction, growth and literal action prefixes preserved. See PORT_PROGRESS.md#audit-sat-solver-clause-use-lists-port-status-md.",
+        "Charged concrete visited storage and cold borrowed allocator/use-list views; original collector and resolution publication/failure prefixes. Full simplifier owner integration remains open."
       ],
       "deviations": [
-        "Selected LP64 source extents are distinct from actual Go stride/pool graph. Inline storage and pooled metadata are fully charged. Implicit copy/move, nonlazy/TRACE and full simplifier/solver remain open; no source registered use_list assertions are claimed."
+        "Selected LP64 source extents are distinct from actual Go stride/pool graph. Inline storage and pooled metadata are fully charged. Implicit copy/move, nonlazy/TRACE and full simplifier/solver remain open; no source registered use_list assertions are claimed.",
+        "BackSubsumption, Run, BCE, elimination, TRACE and solver integration remain unported; no new registered source test assertions claimed."
       ]
     },
     {
@@ -54787,9 +54869,18 @@
       "sha256": "ea35f45c69be4d179aec4e1af034b2295f2a026bb01c37a2d9f8c59abf519655",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_solver_clause_core.go",
+        "sat_solver_clause_core_test.go"
+      ],
+      "tests": [
+        "TestSATSolverClauseCoreFiniteSimplification",
+        "TestSATSolverClauseCoreWatchSelection",
+        "TestSATSolverClauseCoreSourcePrefixesAndGuards",
+        "TestSATSolverClauseCoreWarmNoAllocation",
+        "TestSATSolverClauseCoreWatchSourceAssertions"
+      ],
       "conditionals": [
         {
           "line": 675,
@@ -55224,9 +55315,26 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "simplify_clause_core and scope dispatch; select_watch_lit; select_learned_watch_lit (source367\u2013465)",
+          "status": "ported",
+          "go_target": "sat_solver_clause_core.go",
+          "tests": [
+            "TestSATSolverClauseCoreFiniteSimplification",
+            "TestSATSolverClauseCoreWatchSelection",
+            "TestSATSolverClauseCoreSourcePrefixesAndGuards",
+            "TestSATSolverClauseCoreWarmNoAllocation",
+            "TestSATSolverClauseCoreWatchSourceAssertions"
+          ]
+        }
+      ],
+      "ownership": [
+        "Borrowed actual assignment/level arrays and real clause allocator storage; no search owner or solver runtime."
+      ],
+      "deviations": [
+        "Concrete allocation-free heapsort replaces std::sort on scalar literals. TRACE, solver construction, BCP, conflicts, search, scopes and remaining methods are unported."
+      ]
     },
     {
       "path": "src/sat/sat_solver.h",
@@ -106532,7 +106640,8 @@
         "mpnum/mpq_inspect.go",
         "mpnum/mp_power_publication_test.go",
         "mpnum/mp_round_publication_test.go",
-        "mpnum/mpq_round_test.go"
+        "mpnum/mpq_round_test.go",
+        "mpnum/mpq_scientific_boundary_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -106635,7 +106744,12 @@
         "TestPowerPublicationRationalMulComponentRefusal",
         "TestRoundPublicationIntegralCopyRefusal",
         "TestRoundPublicationQuotientBeforeCeilCorrectionRefusal",
-        "TestRoundPublicationRawShapesAndAllComponentAliases"
+        "TestRoundPublicationRawShapesAndAllComponentAliases",
+        "TestScientificBoundaryZeroDenominatorContinuations",
+        "TestScientificBoundaryPowerRefusalPrecedesRawArithmetic",
+        "TestScientificBoundaryPublicMulDivRawAliases",
+        "TestScientificBoundaryFirstRawGrowthRefusal",
+        "TestScientificBoundaryPublicMulDivStillRejectsInvalidHandles"
       ],
       "assertions": [
         {
@@ -107045,6 +107159,18 @@
             "TestRationalRoundFailureCleanup",
             "TestRationalSourcePrevPowerOfTwo"
           ]
+        },
+        {
+          "name": "Scientific parser continuation through source public Mul/Div on ownership-valid raw DEN0 fields",
+          "status": "ported",
+          "go_target": "mpnum/mpq.go",
+          "tests": [
+            "TestScientificBoundaryZeroDenominatorContinuations",
+            "TestScientificBoundaryPowerRefusalPrecedesRawArithmetic",
+            "TestScientificBoundaryPublicMulDivRawAliases",
+            "TestScientificBoundaryFirstRawGrowthRefusal",
+            "TestScientificBoundaryPublicMulDivStillRejectsInvalidHandles"
+          ]
         }
       ],
       "ownership": [
@@ -107069,7 +107195,8 @@
         "Selected release ExtendedGCD preserves finite aliases and modified-input sign rereads. Source Z3DEBUG diagnostic arithmetic remains unported; g3checked selects reference validation only. ext_gcd.h wrapper algorithm remains separate and is not credited from manager inverse properties.",
         "Explicit manager projects rational.h inclusive32-bit wrappers, distinct from strict MPZ boundaries; global wrapper remains incomplete. Float positive converted denominator SASSERT becomes typed ErrRationalFloatDomain. Source raw component alias publication can leave denominator zero; subsequent operations diagnose initialization.",
         "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open.",
-        "Source get_double evaluates numerator then denominator and asserts d>0 only in debug; current Float64 rejects finite negative converted denominators in release too. Read-only source audit PORT_PROGRESS.md#audit-mpq-rounding-publication-packet-md records this remaining profile debt; no getter implementation change is claimed."
+        "Source get_double evaluates numerator then denominator and asserts d>0 only in debug; current Float64 rejects finite negative converted denominators in release too. Read-only source audit PORT_PROGRESS.md#audit-mpq-rounding-publication-packet-md records this remaining profile debt; no getter implementation change is claimed.",
+        "Selected Mul/Div entry boundaries validate ordinary Integer ownership without an ordinary rational-read DEN domain. Scalar projections, remaining raw-domain methods, TRACE and whole rational lifecycle stay open."
       ]
     },
     {
@@ -108250,7 +108377,9 @@
         "mpnum/mp_bitwise_publication_test.go",
         "mpnum/mp_gcd_publication_test.go",
         "mpnum/mpz_gcd_diagnostics_debug.go",
-        "mpnum/mpz_gcd_diagnostics_release.go"
+        "mpnum/mpz_gcd_diagnostics_release.go",
+        "mpnum/mpz_source_finalize.go",
+        "mpnum/mpz_source_finalize_test.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -108421,7 +108550,11 @@
         "TestGCDPublicationRationalArrayVisitedFraction",
         "TestGCDPublicationSourceFull168PrimeCampaign",
         "TestGCDPublicationPrimeTableAndPredicateBoundary",
-        "TestGCDPublicationFullFamilySignedAliases"
+        "TestGCDPublicationFullFamilySignedAliases",
+        "TestIntegerSourceFinalizeCallerPhysicalLifetimes",
+        "TestIntegerSourceFinalizeReverseNaturalUnderAllocationLimit",
+        "TestIntegerSourceFinalizeDiagnosticFailureRetainsCaller",
+        "TestIntegerSourceFinalizeMissingScratchOwningAbort"
       ],
       "conditionals": [
         {
@@ -109978,6 +110111,17 @@
             "TestGCDPublicationPrimeTableAndPredicateBoundary",
             "TestGCDPublicationFullFamilySignedAliases"
           ]
+        },
+        {
+          "name": "Explicit completed-owner destructor body and reverse members (mpz.cpp142\u2013161)",
+          "status": "ported",
+          "go_target": "mpnum/mpz_source_finalize.go",
+          "tests": [
+            "TestIntegerSourceFinalizeCallerPhysicalLifetimes",
+            "TestIntegerSourceFinalizeReverseNaturalUnderAllocationLimit",
+            "TestIntegerSourceFinalizeDiagnosticFailureRetainsCaller",
+            "TestIntegerSourceFinalizeMissingScratchOwningAbort"
+          ]
         }
       ],
       "ownership": [
@@ -110012,7 +110156,8 @@
         "Selected release ExtendedGCD preserves finite aliases and modified-input sign rereads. Source Z3DEBUG diagnostic arithmetic is selected by g3debug; g3checked selects reference validation independently. ext_gcd.h wrapper algorithm is translated separately; manager inverse properties alone do not credit that wrapper.",
         "Go continuation for source undefined allocation failure: permanently dead failed token and missing-scratch guards; finite unsigned wrapped allocations retained before actual span ErrBounds. Higher-level staged wrappers remain fidelity work, not completion evidence.",
         "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open.",
-        "The registered randomized GCD campaign preserves all 168 primes, conditional Power/Mul and sign draw order using an explicit hermetic RNG adapter, not libc sequence identity. Independent table enumeration and arithmetic checks add no ENSURE credit; print-only minimum GCD expectation is additional verification. Actual allocator topology, cleanup exceptions, alternate backends and full source-unit completion remain open."
+        "The registered randomized GCD campaign preserves all 168 primes, conditional Power/Mul and sign draw order using an explicit hermetic RNG adapter, not libc sequence identity. Independent table enumeration and arithmetic checks add no ENSURE credit; print-only minimum GCD expectation is additional verification. Actual allocator topology, cleanup exceptions, alternate backends and full source-unit completion remain open.",
+        "Explicit Go SourceFinalize retains a charged continuation cursor; source-undefined private-pointer guards permit separate owning-abort cleanup without claiming source completion. ConstructionFailure and transitive/global lifecycle remain open."
       ]
     },
     {

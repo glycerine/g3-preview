@@ -46,21 +46,24 @@ type IntegerConfig struct {
 // Cells, transitional Natural Words and the actual memory backend share one Budget.
 // Close invalidates every live numeral; a supplied Runtime is borrowed.
 type IntegerManager struct {
-	self                        *IntegerManager
-	memory                      *memory.Runtime
-	allocator                   *memory.SmallAllocator
-	ownsMemory                  bool
-	pendingCell                 sourceCellBacking
-	originalCause, cleanupCause error
-	cells                       *numericCellSlab
-	words                       *arena.Words
-	tmp, arg                    [2]numericCellRef
-	failedRef                   numericCellRef  // permanently dead, charged auxiliary descriptor
-	natural                     *NaturalManager // child borrows this manager's Words and Budget
-	intMin, two64               Int
-	closed                      bool
-	budget                      *arena.Budget
-	headerBytes                 uint64
+	self                              *IntegerManager
+	memory                            *memory.Runtime
+	allocator                         *memory.SmallAllocator
+	ownsMemory                        bool
+	pendingCell                       sourceCellBacking
+	originalCause, cleanupCause       error
+	cells                             *numericCellSlab
+	words                             *arena.Words
+	tmp, arg                          [2]numericCellRef
+	failedRef                         numericCellRef  // permanently dead, charged auxiliary descriptor
+	natural                           *NaturalManager // child borrows this manager's Words and Budget
+	intMin, two64                     Int
+	closed                            bool
+	sourceFinalizing, sourceFinalized bool
+	sourceGuard                       bool
+	sourceFinalizeStage               uint8
+	budget                            *arena.Budget
+	headerBytes                       uint64
 }
 
 func NewIntegerManager(config IntegerConfig) (*IntegerManager, error) {
@@ -189,7 +192,7 @@ func (m *IntegerManager) checkCleanup(a *Int) error {
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
 	}
-	if m.closed {
+	if m.closed || m.sourceFinalizing {
 		return arena.ErrClosed
 	}
 	if a == nil {
@@ -209,7 +212,7 @@ func (m *IntegerManager) check(a *Int) error {
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
 	}
-	if m.closed {
+	if m.closed || m.sourceFinalizing {
 		return arena.ErrClosed
 	}
 	if a == nil {
@@ -334,13 +337,29 @@ func (m *IntegerManager) CloseChecked() error {
 		return nil
 	}
 	fail := func(e error) error { m.cleanupCause = e; return e }
+	// Resume every explicitly begun source cursor before owning cleanup. A
+	// missing/stale private pointer stops the source body at an undefined access;
+	// owning cleanup then aborts that body without repairing it or advancing its
+	// history, and releases only known actual roots.
+	if m.sourceFinalizing && !m.sourceGuard && !m.sourceFinalized {
+		if e := m.SourceFinalize(); e != nil {
+			return fail(e)
+		}
+	}
+
 	if m.cells != nil {
 		for n := uint64(1); n <= uint64(m.cells.Stats().Slots); n++ {
 			slot := arena.Slot(n)
 			if _, e := m.cells.Read(slot); e == nil {
 				// Slab slots retain their actual generation. Only live records are read.
 				gen := m.cells.state(slot).generation
-				if e = m.free(makeNumericRef(slot, gen)); e != nil {
+				ref := makeNumericRef(slot, gen)
+				if m.sourceFinalized {
+					e = m.freeAfterSourceFinalize(ref)
+				} else {
+					e = m.free(ref)
+				}
+				if e != nil {
 					return fail(e)
 				}
 			}

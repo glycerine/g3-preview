@@ -195,6 +195,13 @@ func (m *RationalManager) Copy(dst, src *Rational) error {
 // inline denominator0. Failed/stale Integer handles remain ordinary errors;
 // arithmetic and source-read checks retain their separate denominator policy.
 func (m *RationalManager) checkSetter(a *Rational) error {
+	return m.checkIntegerFields(a)
+}
+
+// checkIntegerFields validates actual component ownership without imposing an
+// ordinary rational-read domain. Source Mul/Div can consume and publish zero
+// denominators; their arithmetic determines the first endangered operation.
+func (m *RationalManager) checkIntegerFields(a *Rational) error {
 	if m == nil {
 		return memory.ErrRuntimeOwner
 	}
@@ -489,7 +496,7 @@ func (m *RationalManager) addSub(a, b, out *Rational, subtract bool) error {
 }
 func (m *RationalManager) Mul(a, b, out *Rational) error {
 	for _, n := range []*Rational{a, b, out} {
-		if e := m.check(n); e != nil {
+		if e := m.checkIntegerFields(n); e != nil {
 			return e
 		}
 	}
@@ -511,7 +518,7 @@ func (m *RationalManager) Mul(a, b, out *Rational) error {
 // Errors retain completed caller fields; no staged pair masks normalization.
 func (m *RationalManager) Div(a, b, out *Rational) error {
 	for _, n := range []*Rational{a, b, out} {
-		if e := m.check(n); e != nil {
+		if e := m.checkIntegerFields(n); e != nil {
 			return e
 		}
 	}
