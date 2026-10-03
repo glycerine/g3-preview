@@ -1477,3 +1477,21 @@ Frozen ten-Go parent integration passed full native/debug suites, exact44
 race/actual-JS RUN/PASS groups, vet, WASI build/test compilation and integrated
 source/evidence/no-generics audit. Unrelated RED drafts were excluded; the
 complete live worktree is not claimed green.
+
+
+## Concrete source memory word views
+
+The shared runtime and allocator expose concrete little-endian uint32 views
+over their actual initialized byte backing. Word writes guard the complete
+span before publication; reads reject uninitialized bytes. Requested allocator
+bounds remain distinct from guarded real rounded object extent. Tests first
+expose missing APIs, then verify intrusive reuse, profiles, stale/foreign owners
+and warm zero allocation without source counter events. See
+MEMORY_UINT32_CODEC_PORT_STATUS.md. Actual MPZ/Natural storage, retained
+release progress and global solver memory composition remain required.
+No whole source unit is promoted.
+
+Independent frozen parent checks passed full native/debug suites, exact49
+lower-memory race/actual-JS RUN/PASS groups, vet, WASI build/test compilation
+and integrated source/evidence/no-generics audit on the rational-division base.
+Concurrent incomplete API drafts were excluded from this coherent chunk.

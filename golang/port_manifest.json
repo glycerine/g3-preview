@@ -102906,7 +102906,9 @@
         "memory/accounting_test.go",
         "memory/runtime_test.go",
         "memory/shared_runtime_api_test.go",
-        "util_memory_bridge_test.go"
+        "util_memory_bridge_test.go",
+        "memory/uint32_codec.go",
+        "memory/uint32_codec_test.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -102939,7 +102941,11 @@
         "TestMemoryBridgeColdHeadersAndConstructorUnwind",
         "TestMemoryBridgeNominalOOMAndCountErrors",
         "TestMemoryBridgeDefaultExceptionAndCopiedOwner",
-        "TestMemoryBridgePendingFinalizationRetainsAllHeaders"
+        "TestMemoryBridgePendingFinalizationRetainsAllHeaders",
+        "TestMemoryUint32CodecActualBackingAndInitializedBytes",
+        "TestMemoryAllocatorUint32CodecUsesIntrusivePayload",
+        "TestMemoryMPZRoundedPhysicalObjectExtent",
+        "TestMemoryUint32CodecGuardsAndZeroAlloc"
       ],
       "conditionals": [
         {
@@ -103045,16 +103051,29 @@
             "TestMemoryBridgeDefaultExceptionAndCopiedOwner",
             "TestMemoryBridgePendingFinalizationRetainsAllHeaders"
           ]
+        },
+        {
+          "name": "Concrete little-endian initialized uint32 byte-view adapter and guarded real rounded object extent",
+          "status": "partial",
+          "go_target": "memory/uint32_codec.go",
+          "tests": [
+            "TestMemoryUint32CodecActualBackingAndInitializedBytes",
+            "TestMemoryAllocatorUint32CodecUsesIntrusivePayload",
+            "TestMemoryMPZRoundedPhysicalObjectExtent",
+            "TestMemoryUint32CodecGuardsAndZeroAlloc"
+          ]
         }
       ],
       "ownership": [
         "Pointer-free scalar accounting is intended for once-charged runtime embedding with explicit caller-confined lanes and source counter prefixes. No raw allocator/backend or process-global integration is claimed; see MEMORY_ACCOUNTING_PORT_STATUS.md.",
         "Actual prefix-bearing byte backings plus charged initialized-byte bitmap and cold allocation directory; immediate physical roots, TLS allocated-error owner and bad-header cleanup retain source action/counter prefixes. Real runtime typed-owner hooks, generated lifetime and process transports remain open. See RAW_MEMORY_PORT_STATUS.md.",
-        "One concrete lower memory.Runtime owns source accounting, physical backings and charged directories; main g3 aliases use the real static nominal-error bridge. Borrowed static transport is cold; nil-returning transport cannot suppress source failure. See MEMORY_PACKAGE_API_PACKET.md. Numeric/default-backend and full process-global wiring remain required."
+        "One concrete lower memory.Runtime owns source accounting, physical backings and charged directories; main g3 aliases use the real static nominal-error bridge. Borrowed static transport is cold; nil-returning transport cannot suppress source failure. See MEMORY_PACKAGE_API_PACKET.md. Numeric/default-backend and full process-global wiring remain required.",
+        "Word codecs read/write the sole actual initialized backing with no allocations or counter events. Allocator word APIs retain requested bounds; ObjectExtent exposes actual rounded/direct physical span with live owner/generation guards. See MEMORY_UINT32_CODEC_PORT_STATUS.md."
       ],
       "deviations": [
         "Source signed-overflow/invalid-lane domains use scalar typed outcomes after completed field prefixes. Containing allocator must execute real physical operations between counter phases. Physical hooks, headers, generated callbacks, OOM exits/streams, concurrent global service and consumer integration remain open.",
-        "Size_t promotion is explicit32/64: LP64 updates use unsigned modular arithmetic; ILP32 shrink delta uses uint32 subtraction before LL64 promotion. Signed synchronization/count and ILP32 promoted overflow have typed boundaries after prior field prefixes."
+        "Size_t promotion is explicit32/64: LP64 updates use unsigned modular arithmetic; ILP32 shrink delta uses uint32 subtraction before LL64 promotion. Signed synchronization/count and ILP32 promoted overflow have typed boundaries after prior field prefixes.",
+        "Explicit LE word codecs are a Go source-storage adapter, not an additional C++ allocator algorithm. MPZ backend typed accesses must bound against actual object extent; this prerequisite does not complete MPZ/Natural backing or tracked release/global lifecycle."
       ]
     },
     {
@@ -116881,7 +116900,9 @@
         "memory/allocator_io.go",
         "memory/small_allocator_test.go",
         "memory/shared_runtime_api_test.go",
-        "util_memory_bridge_test.go"
+        "util_memory_bridge_test.go",
+        "memory/uint32_codec.go",
+        "memory/uint32_codec_test.go"
       ],
       "tests": [
         "TestSmallBytesSourceExercise",
@@ -116930,7 +116951,11 @@
         "TestMemoryBridgeColdHeadersAndConstructorUnwind",
         "TestMemoryBridgeNominalOOMAndCountErrors",
         "TestMemoryBridgeDefaultExceptionAndCopiedOwner",
-        "TestMemoryBridgePendingFinalizationRetainsAllHeaders"
+        "TestMemoryBridgePendingFinalizationRetainsAllHeaders",
+        "TestMemoryUint32CodecActualBackingAndInitializedBytes",
+        "TestMemoryAllocatorUint32CodecUsesIntrusivePayload",
+        "TestMemoryMPZRoundedPhysicalObjectExtent",
+        "TestMemoryUint32CodecGuardsAndZeroAlloc"
       ],
       "conditionals": [
         {
@@ -117125,18 +117150,31 @@
             "TestSmallObjectAllocatorDiagnosticOutputFailureAfterFree",
             "TestSmallObjectAllocatorVerboseUsesRealRuntimeAndLexicalLifetime"
           ]
+        },
+        {
+          "name": "Concrete little-endian initialized uint32 byte-view adapter and guarded real rounded object extent",
+          "status": "partial",
+          "go_target": "memory/uint32_codec.go",
+          "tests": [
+            "TestMemoryUint32CodecActualBackingAndInitializedBytes",
+            "TestMemoryAllocatorUint32CodecUsesIntrusivePayload",
+            "TestMemoryMPZRoundedPhysicalObjectExtent",
+            "TestMemoryUint32CodecGuardsAndZeroAlloc"
+          ]
         }
       ],
       "ownership": [
         "Concrete byte owner with scalar descriptors/generation ledger. Caller destroys logical objects before storage reset/free. Budgeted backing/metadata, cold header charged by arena. DirectOnly translates the diagnostic bypass with zero source counter and separate measured owned bytes. See arena/PORT_STATUS.md.",
         "Standalone concrete source allocator uses actual utilMemoryRuntime blocks and intrusive payload links. Full cold locator capacity and owner headers are charged; explicit pending/chunk cleanup retains actual failed-free roots. Direct blocks remain caller-owned across Reset and Close. See SMALL_OBJECT_ALLOCATOR_PACKET.md; typed numerical/solver allocator integration remains open.",
-        "The sole allocator core now lives in memory.SmallAllocator over one actual borrowed memory.Runtime. Main wrappers separately charge their real wrapper/IO headers and retain them until pending roots finalize; genuine borrowed CString/NumericTextStream formatting remains in main. All41 original accounting/runtime/allocator test names are retained across packages; no solver/numeric backend wiring is claimed. See MEMORY_PACKAGE_API_PACKET.md."
+        "The sole allocator core now lives in memory.SmallAllocator over one actual borrowed memory.Runtime. Main wrappers separately charge their real wrapper/IO headers and retain them until pending roots finalize; genuine borrowed CString/NumericTextStream formatting remains in main. All41 original accounting/runtime/allocator test names are retained across packages; no solver/numeric backend wiring is claimed. See MEMORY_PACKAGE_API_PACKET.md.",
+        "Word codecs read/write the sole actual initialized backing with no allocations or counter events. Allocator word APIs retain requested bounds; ObjectExtent exposes actual rounded/direct physical span with live owner/generation guards. See MEMORY_UINT32_CODEC_PORT_STATUS.md."
       ],
       "deviations": [
         "Reset/Close reclaim tracked live direct blocks as explicit typed owner cleanup extension; source only frees pooled chunks.",
         "Conceptual chunk/block indices replace machine addresses for sorting; source strict endpoint/floor-count retention quirk preserved.",
         "Storage limits checked before publication; invalid size/generation diagnosed.",
-        "Standalone deterministic scalar address codec and external sort adapter preserve source scan/relink order without claiming native pointer placements. Borrowed explicit diagnostic streams model selected bytes/state; global runtime/ostream wiring remains open. Legacy arena/small_bytes is a separate storage adapter with its recorded extensions."
+        "Standalone deterministic scalar address codec and external sort adapter preserve source scan/relink order without claiming native pointer placements. Borrowed explicit diagnostic streams model selected bytes/state; global runtime/ostream wiring remains open. Legacy arena/small_bytes is a separate storage adapter with its recorded extensions.",
+        "Explicit LE word codecs are a Go source-storage adapter, not an additional C++ allocator algorithm. MPZ backend typed accesses must bound against actual object extent; this prerequisite does not complete MPZ/Natural backing or tracked release/global lifecycle."
       ]
     },
     {
