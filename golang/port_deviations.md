@@ -26,3 +26,13 @@ adapters. Linux %I64u is width64 plus unsigned32; source uint64 mismatches
 receive a typed error. Other C conversion domains and Windows CRT state remain
 open, so the formatter and formatted exception constructor stay partial.
 See PRINTF_PORT_STATUS.md for source callsites, buffer actions and tests.
+
+### Parameter references storage and null stream behavior
+
+Parameters borrow explicit symbol/numeric owners and use scalar references,
+pooled concrete entries and owned nullable C text. Reset/Validate mutate shared
+backing as in the source. A failed detach retains its published prefix while
+cleaning the old reference; pooled pages remain physically charged until Close.
+Null C strings model the audited libstdc++ stream badbit prefix with a typed
+error. The source global empty value and debug print become explicit owner-local
+and diagnostic APIs. See PARAMS_REF_PORT_STATUS.md for remaining adaptations.

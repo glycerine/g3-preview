@@ -639,3 +639,13 @@ RED before its fix. Exact flags, byte/NUL domains, Linux I64 interpretation,
 actual budget peaks and immediate cleanup are covered. The formatted exception
 printed case is translated (zero source assertions). Broader C printf domains,
 Windows CRT state and warning I/O remain open. See PRINTF_PORT_STATUS.md.
+
+## Shared parameters references and values
+
+The remaining params_ref/private params methods now preserve shallow sharing,
+ordered detach/copy, shared reset and validation, typed getter/fallback scans,
+source signed casts and display routes. Eighteen tests began missing-API RED;
+self-copy rational identity also produced behavioral RED before correction.
+Failure sweeps audit live roots before display/teardown, and actual context
+arrays/text/scratch are budgeted. The complete params.h/.cpp utility surface
+is mapped; solver parameter consumers remain open. See PARAMS_REF_PORT_STATUS.md.

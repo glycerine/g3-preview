@@ -102156,10 +102156,11 @@
       "sha256": "adfec5df1efec4cd4d08844d06463b58096d1c91e0374e7e432a5f1d9bb70dd9",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "util_param_name.go",
-        "util_param_descrs.go"
+        "util_param_descrs.go",
+        "util_params_ref.go"
       ],
       "tests": [
         "TestParamNameNormalizationSourceBranches",
@@ -102178,7 +102179,25 @@
         "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
         "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
         "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
-        "TestParamDescrsCheckedCapacityBoundaries"
+        "TestParamDescrsCheckedCapacityBoundaries",
+        "TestParamsReferenceSourceSharingAndReset",
+        "TestParamsReferenceSourceCopyMergeAndSignedRat",
+        "TestParamsReferenceNameReadsNeverIntern",
+        "TestParamsReferenceValidationSharedPrefixAndDuplicates",
+        "TestParamsReferenceExactDisplayAndKinds",
+        "TestParamsReferenceNumericalSymbolValueGuard",
+        "TestParamsReferenceNullableStreamAndDisplayName",
+        "TestParamsReferenceFallbackAllKinds",
+        "TestParamsReferenceValidationUnknownExactOrdering",
+        "TestParamsReferenceSourceGrowthAndFailurePrefixes",
+        "TestParamsReferenceReservationFailureSweeps",
+        "TestParamsReferenceConstructorFaultAndRecordShape",
+        "TestParamsReferenceWarmOperationsAndGeneration",
+        "TestParamsReferenceSelfCopySourceRatIdentity",
+        "TestParamsReferenceExactContextAccountingAndGrowthPeak",
+        "TestParamsReferenceFiniteSignedRatAndNullDefaults",
+        "TestParamsReferenceProvenanceBeforeMutation",
+        "TestParamsReferenceCStringLengthBounds"
       ],
       "conditionals": [
         {
@@ -102216,8 +102235,8 @@
           "text": "SASSERT(empty());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "norm_param_name complete nullable C-string and symbol overloads",
@@ -102329,14 +102348,140 @@
             "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
             "TestParamDescrsCheckedCapacityBoundaries"
           ]
+        },
+        {
+          "name": "params_ref default/get_empty, owning copy/destructor/assignment and sharing Copy/Append",
+          "status": "ported",
+          "go_target": "util_params_ref.go",
+          "tests": [
+            "TestParamsReferenceSourceSharingAndReset",
+            "TestParamsReferenceSourceCopyMergeAndSignedRat",
+            "TestParamsReferenceNameReadsNeverIntern",
+            "TestParamsReferenceValidationSharedPrefixAndDuplicates",
+            "TestParamsReferenceExactDisplayAndKinds",
+            "TestParamsReferenceNumericalSymbolValueGuard",
+            "TestParamsReferenceNullableStreamAndDisplayName",
+            "TestParamsReferenceFallbackAllKinds",
+            "TestParamsReferenceValidationUnknownExactOrdering",
+            "TestParamsReferenceSourceGrowthAndFailurePrefixes",
+            "TestParamsReferenceReservationFailureSweeps",
+            "TestParamsReferenceConstructorFaultAndRecordShape",
+            "TestParamsReferenceWarmOperationsAndGeneration",
+            "TestParamsReferenceSelfCopySourceRatIdentity",
+            "TestParamsReferenceExactContextAccountingAndGrowthPeak",
+            "TestParamsReferenceFiniteSignedRatAndNullDefaults",
+            "TestParamsReferenceProvenanceBeforeMutation",
+            "TestParamsReferenceCStringLengthBounds"
+          ]
+        },
+        {
+          "name": "params_ref init/copy_core and private params ordered entries/refcounts/value destruction",
+          "status": "ported",
+          "go_target": "util_params_ref.go",
+          "tests": [
+            "TestParamsReferenceSourceSharingAndReset",
+            "TestParamsReferenceSourceCopyMergeAndSignedRat",
+            "TestParamsReferenceNameReadsNeverIntern",
+            "TestParamsReferenceValidationSharedPrefixAndDuplicates",
+            "TestParamsReferenceExactDisplayAndKinds",
+            "TestParamsReferenceNumericalSymbolValueGuard",
+            "TestParamsReferenceNullableStreamAndDisplayName",
+            "TestParamsReferenceFallbackAllKinds",
+            "TestParamsReferenceValidationUnknownExactOrdering",
+            "TestParamsReferenceSourceGrowthAndFailurePrefixes",
+            "TestParamsReferenceReservationFailureSweeps",
+            "TestParamsReferenceConstructorFaultAndRecordShape",
+            "TestParamsReferenceWarmOperationsAndGeneration",
+            "TestParamsReferenceSelfCopySourceRatIdentity",
+            "TestParamsReferenceExactContextAccountingAndGrowthPeak",
+            "TestParamsReferenceFiniteSignedRatAndNullDefaults",
+            "TestParamsReferenceProvenanceBeforeMutation",
+            "TestParamsReferenceCStringLengthBounds"
+          ]
+        },
+        {
+          "name": "all six getter/setter Symbol and nullable name routes plus five fallback families",
+          "status": "ported",
+          "go_target": "util_params_ref.go",
+          "tests": [
+            "TestParamsReferenceSourceSharingAndReset",
+            "TestParamsReferenceSourceCopyMergeAndSignedRat",
+            "TestParamsReferenceNameReadsNeverIntern",
+            "TestParamsReferenceValidationSharedPrefixAndDuplicates",
+            "TestParamsReferenceExactDisplayAndKinds",
+            "TestParamsReferenceNumericalSymbolValueGuard",
+            "TestParamsReferenceNullableStreamAndDisplayName",
+            "TestParamsReferenceFallbackAllKinds",
+            "TestParamsReferenceValidationUnknownExactOrdering",
+            "TestParamsReferenceSourceGrowthAndFailurePrefixes",
+            "TestParamsReferenceReservationFailureSweeps",
+            "TestParamsReferenceConstructorFaultAndRecordShape",
+            "TestParamsReferenceWarmOperationsAndGeneration",
+            "TestParamsReferenceSelfCopySourceRatIdentity",
+            "TestParamsReferenceExactContextAccountingAndGrowthPeak",
+            "TestParamsReferenceFiniteSignedRatAndNullDefaults",
+            "TestParamsReferenceProvenanceBeforeMutation",
+            "TestParamsReferenceCStringLengthBounds"
+          ]
+        },
+        {
+          "name": "shared reset/contains and validation module mutation, duplicate/key-kind scan and exact exception text",
+          "status": "ported",
+          "go_target": "util_params_ref.go",
+          "tests": [
+            "TestParamsReferenceSourceSharingAndReset",
+            "TestParamsReferenceSourceCopyMergeAndSignedRat",
+            "TestParamsReferenceNameReadsNeverIntern",
+            "TestParamsReferenceValidationSharedPrefixAndDuplicates",
+            "TestParamsReferenceExactDisplayAndKinds",
+            "TestParamsReferenceNumericalSymbolValueGuard",
+            "TestParamsReferenceNullableStreamAndDisplayName",
+            "TestParamsReferenceFallbackAllKinds",
+            "TestParamsReferenceValidationUnknownExactOrdering",
+            "TestParamsReferenceSourceGrowthAndFailurePrefixes",
+            "TestParamsReferenceReservationFailureSweeps",
+            "TestParamsReferenceConstructorFaultAndRecordShape",
+            "TestParamsReferenceWarmOperationsAndGeneration",
+            "TestParamsReferenceSelfCopySourceRatIdentity",
+            "TestParamsReferenceExactContextAccountingAndGrowthPeak",
+            "TestParamsReferenceFiniteSignedRatAndNullDefaults",
+            "TestParamsReferenceProvenanceBeforeMutation",
+            "TestParamsReferenceCStringLengthBounds"
+          ]
+        },
+        {
+          "name": "ostream display/full/key/SMT2 filtering and Z3DEBUG pp diagnostic boundary",
+          "status": "ported",
+          "go_target": "util_params_ref.go",
+          "tests": [
+            "TestParamsReferenceSourceSharingAndReset",
+            "TestParamsReferenceSourceCopyMergeAndSignedRat",
+            "TestParamsReferenceNameReadsNeverIntern",
+            "TestParamsReferenceValidationSharedPrefixAndDuplicates",
+            "TestParamsReferenceExactDisplayAndKinds",
+            "TestParamsReferenceNumericalSymbolValueGuard",
+            "TestParamsReferenceNullableStreamAndDisplayName",
+            "TestParamsReferenceFallbackAllKinds",
+            "TestParamsReferenceValidationUnknownExactOrdering",
+            "TestParamsReferenceSourceGrowthAndFailurePrefixes",
+            "TestParamsReferenceReservationFailureSweeps",
+            "TestParamsReferenceConstructorFaultAndRecordShape",
+            "TestParamsReferenceWarmOperationsAndGeneration",
+            "TestParamsReferenceSelfCopySourceRatIdentity",
+            "TestParamsReferenceExactContextAccountingAndGrowthPeak",
+            "TestParamsReferenceFiniteSignedRatAndNullDefaults",
+            "TestParamsReferenceProvenanceBeforeMutation",
+            "TestParamsReferenceCStringLengthBounds"
+          ]
         }
       ],
       "ownership": [
         "Normalization reads borrowed symbol region under owner lock and produces one caller-owned output string without interning, retained workspace or intermediate symbol spelling. See PARAM_NAME_PORT_STATUS.md.",
-        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md."
+        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md.",
+        "Scalar owner-local ParamsRef and backing blocks; typed pooled pointer-free entries retain concrete numeral tokens and owned packed C text. Context header, all arrays/directories/text/workspaces and old/new peaks charged; immediate fault roots tested. Source action publication and shared resets preserved. See PARAMS_REF_PORT_STATUS.md."
       ],
       "deviations": [
-        "CString NUL/nullable boundary explicit; numerical/marked/foreign/closed symbols rejected as typed checked precondition/lifetime errors. Remaining descriptor and params_ref methods not claimed by normalizer packet."
+        "Owner-local null replaces process-global empty reference. C strings become owned nullable first-NUL payloads; replacement stages new text. Detach error retains published partial block but cleans old reference. Pooled pages persist physically until Close; inline concrete numeric tokens replace separate heap objects. Provenance/overflow guards and libstdc++ null-C-string prefix error are explicit Go adapters; Z3DEBUG pp is explicit text API rather than global stdout."
       ]
     },
     {
@@ -102344,10 +102489,11 @@
       "sha256": "50738b66c08a5d24f818eedf5fa4bafdaec8593b41408ae1173c78adc762c6fb",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "util_param_name.go",
-        "util_param_descrs.go"
+        "util_param_descrs.go",
+        "util_params_ref.go"
       ],
       "tests": [
         "TestParamNameNormalizationSourceBranches",
@@ -102366,7 +102512,25 @@
         "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
         "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
         "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
-        "TestParamDescrsCheckedCapacityBoundaries"
+        "TestParamDescrsCheckedCapacityBoundaries",
+        "TestParamsReferenceSourceSharingAndReset",
+        "TestParamsReferenceSourceCopyMergeAndSignedRat",
+        "TestParamsReferenceNameReadsNeverIntern",
+        "TestParamsReferenceValidationSharedPrefixAndDuplicates",
+        "TestParamsReferenceExactDisplayAndKinds",
+        "TestParamsReferenceNumericalSymbolValueGuard",
+        "TestParamsReferenceNullableStreamAndDisplayName",
+        "TestParamsReferenceFallbackAllKinds",
+        "TestParamsReferenceValidationUnknownExactOrdering",
+        "TestParamsReferenceSourceGrowthAndFailurePrefixes",
+        "TestParamsReferenceReservationFailureSweeps",
+        "TestParamsReferenceConstructorFaultAndRecordShape",
+        "TestParamsReferenceWarmOperationsAndGeneration",
+        "TestParamsReferenceSelfCopySourceRatIdentity",
+        "TestParamsReferenceExactContextAccountingAndGrowthPeak",
+        "TestParamsReferenceFiniteSignedRatAndNullDefaults",
+        "TestParamsReferenceProvenanceBeforeMutation",
+        "TestParamsReferenceCStringLengthBounds"
       ],
       "conditionals": [
         {
@@ -102378,8 +102542,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "norm_param_name complete nullable C-string and symbol overloads",
@@ -102491,14 +102655,140 @@
             "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
             "TestParamDescrsCheckedCapacityBoundaries"
           ]
+        },
+        {
+          "name": "params_ref default/get_empty, owning copy/destructor/assignment and sharing Copy/Append",
+          "status": "ported",
+          "go_target": "util_params_ref.go",
+          "tests": [
+            "TestParamsReferenceSourceSharingAndReset",
+            "TestParamsReferenceSourceCopyMergeAndSignedRat",
+            "TestParamsReferenceNameReadsNeverIntern",
+            "TestParamsReferenceValidationSharedPrefixAndDuplicates",
+            "TestParamsReferenceExactDisplayAndKinds",
+            "TestParamsReferenceNumericalSymbolValueGuard",
+            "TestParamsReferenceNullableStreamAndDisplayName",
+            "TestParamsReferenceFallbackAllKinds",
+            "TestParamsReferenceValidationUnknownExactOrdering",
+            "TestParamsReferenceSourceGrowthAndFailurePrefixes",
+            "TestParamsReferenceReservationFailureSweeps",
+            "TestParamsReferenceConstructorFaultAndRecordShape",
+            "TestParamsReferenceWarmOperationsAndGeneration",
+            "TestParamsReferenceSelfCopySourceRatIdentity",
+            "TestParamsReferenceExactContextAccountingAndGrowthPeak",
+            "TestParamsReferenceFiniteSignedRatAndNullDefaults",
+            "TestParamsReferenceProvenanceBeforeMutation",
+            "TestParamsReferenceCStringLengthBounds"
+          ]
+        },
+        {
+          "name": "params_ref init/copy_core and private params ordered entries/refcounts/value destruction",
+          "status": "ported",
+          "go_target": "util_params_ref.go",
+          "tests": [
+            "TestParamsReferenceSourceSharingAndReset",
+            "TestParamsReferenceSourceCopyMergeAndSignedRat",
+            "TestParamsReferenceNameReadsNeverIntern",
+            "TestParamsReferenceValidationSharedPrefixAndDuplicates",
+            "TestParamsReferenceExactDisplayAndKinds",
+            "TestParamsReferenceNumericalSymbolValueGuard",
+            "TestParamsReferenceNullableStreamAndDisplayName",
+            "TestParamsReferenceFallbackAllKinds",
+            "TestParamsReferenceValidationUnknownExactOrdering",
+            "TestParamsReferenceSourceGrowthAndFailurePrefixes",
+            "TestParamsReferenceReservationFailureSweeps",
+            "TestParamsReferenceConstructorFaultAndRecordShape",
+            "TestParamsReferenceWarmOperationsAndGeneration",
+            "TestParamsReferenceSelfCopySourceRatIdentity",
+            "TestParamsReferenceExactContextAccountingAndGrowthPeak",
+            "TestParamsReferenceFiniteSignedRatAndNullDefaults",
+            "TestParamsReferenceProvenanceBeforeMutation",
+            "TestParamsReferenceCStringLengthBounds"
+          ]
+        },
+        {
+          "name": "all six getter/setter Symbol and nullable name routes plus five fallback families",
+          "status": "ported",
+          "go_target": "util_params_ref.go",
+          "tests": [
+            "TestParamsReferenceSourceSharingAndReset",
+            "TestParamsReferenceSourceCopyMergeAndSignedRat",
+            "TestParamsReferenceNameReadsNeverIntern",
+            "TestParamsReferenceValidationSharedPrefixAndDuplicates",
+            "TestParamsReferenceExactDisplayAndKinds",
+            "TestParamsReferenceNumericalSymbolValueGuard",
+            "TestParamsReferenceNullableStreamAndDisplayName",
+            "TestParamsReferenceFallbackAllKinds",
+            "TestParamsReferenceValidationUnknownExactOrdering",
+            "TestParamsReferenceSourceGrowthAndFailurePrefixes",
+            "TestParamsReferenceReservationFailureSweeps",
+            "TestParamsReferenceConstructorFaultAndRecordShape",
+            "TestParamsReferenceWarmOperationsAndGeneration",
+            "TestParamsReferenceSelfCopySourceRatIdentity",
+            "TestParamsReferenceExactContextAccountingAndGrowthPeak",
+            "TestParamsReferenceFiniteSignedRatAndNullDefaults",
+            "TestParamsReferenceProvenanceBeforeMutation",
+            "TestParamsReferenceCStringLengthBounds"
+          ]
+        },
+        {
+          "name": "shared reset/contains and validation module mutation, duplicate/key-kind scan and exact exception text",
+          "status": "ported",
+          "go_target": "util_params_ref.go",
+          "tests": [
+            "TestParamsReferenceSourceSharingAndReset",
+            "TestParamsReferenceSourceCopyMergeAndSignedRat",
+            "TestParamsReferenceNameReadsNeverIntern",
+            "TestParamsReferenceValidationSharedPrefixAndDuplicates",
+            "TestParamsReferenceExactDisplayAndKinds",
+            "TestParamsReferenceNumericalSymbolValueGuard",
+            "TestParamsReferenceNullableStreamAndDisplayName",
+            "TestParamsReferenceFallbackAllKinds",
+            "TestParamsReferenceValidationUnknownExactOrdering",
+            "TestParamsReferenceSourceGrowthAndFailurePrefixes",
+            "TestParamsReferenceReservationFailureSweeps",
+            "TestParamsReferenceConstructorFaultAndRecordShape",
+            "TestParamsReferenceWarmOperationsAndGeneration",
+            "TestParamsReferenceSelfCopySourceRatIdentity",
+            "TestParamsReferenceExactContextAccountingAndGrowthPeak",
+            "TestParamsReferenceFiniteSignedRatAndNullDefaults",
+            "TestParamsReferenceProvenanceBeforeMutation",
+            "TestParamsReferenceCStringLengthBounds"
+          ]
+        },
+        {
+          "name": "ostream display/full/key/SMT2 filtering and Z3DEBUG pp diagnostic boundary",
+          "status": "ported",
+          "go_target": "util_params_ref.go",
+          "tests": [
+            "TestParamsReferenceSourceSharingAndReset",
+            "TestParamsReferenceSourceCopyMergeAndSignedRat",
+            "TestParamsReferenceNameReadsNeverIntern",
+            "TestParamsReferenceValidationSharedPrefixAndDuplicates",
+            "TestParamsReferenceExactDisplayAndKinds",
+            "TestParamsReferenceNumericalSymbolValueGuard",
+            "TestParamsReferenceNullableStreamAndDisplayName",
+            "TestParamsReferenceFallbackAllKinds",
+            "TestParamsReferenceValidationUnknownExactOrdering",
+            "TestParamsReferenceSourceGrowthAndFailurePrefixes",
+            "TestParamsReferenceReservationFailureSweeps",
+            "TestParamsReferenceConstructorFaultAndRecordShape",
+            "TestParamsReferenceWarmOperationsAndGeneration",
+            "TestParamsReferenceSelfCopySourceRatIdentity",
+            "TestParamsReferenceExactContextAccountingAndGrowthPeak",
+            "TestParamsReferenceFiniteSignedRatAndNullDefaults",
+            "TestParamsReferenceProvenanceBeforeMutation",
+            "TestParamsReferenceCStringLengthBounds"
+          ]
         }
       ],
       "ownership": [
         "Normalization reads borrowed symbol region under owner lock and produces one caller-owned output string without interning, retained workspace or intermediate symbol spelling. See PARAM_NAME_PORT_STATUS.md.",
-        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md."
+        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md.",
+        "Scalar owner-local ParamsRef and backing blocks; typed pooled pointer-free entries retain concrete numeral tokens and owned packed C text. Context header, all arrays/directories/text/workspaces and old/new peaks charged; immediate fault roots tested. Source action publication and shared resets preserved. See PARAMS_REF_PORT_STATUS.md."
       ],
       "deviations": [
-        "CString NUL/nullable boundary explicit; numerical/marked/foreign/closed symbols rejected as typed checked precondition/lifetime errors. Remaining descriptor and params_ref methods not claimed by normalizer packet."
+        "Owner-local null replaces process-global empty reference. C strings become owned nullable first-NUL payloads; replacement stages new text. Detach error retains published partial block but cleans old reference. Pooled pages persist physically until Close; inline concrete numeric tokens replace separate heap objects. Provenance/overflow guards and libstdc++ null-C-string prefix error are explicit Go adapters; Z3DEBUG pp is explicit text API rather than global stdout."
       ]
     },
     {
