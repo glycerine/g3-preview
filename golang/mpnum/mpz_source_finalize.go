@@ -19,6 +19,9 @@ func (m *IntegerManager) SourceFinalize() error {
 	if m.closed || m.sourceFinalized {
 		return nil
 	}
+	if m.smt2Display.active {
+		return ErrSMT2DisplayPending
+	}
 	// Constructor failure is not a completed C++ object destructor invocation.
 	if m.originalCause != nil {
 		return arena.ErrClosed

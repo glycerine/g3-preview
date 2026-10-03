@@ -9,6 +9,7 @@ import (
 type satVarQueue struct {
 	self              *satVarQueue
 	activity          *satActivityDomain
+	runtimeActivity   *satSolverRuntimeActivity
 	values, indices   []int32
 	budget            *arena.Budget
 	ownerBytes, epoch uint64
@@ -24,15 +25,19 @@ func NewSATVarQueue(a *satActivityDomain, b *arena.Budget) (*satVarQueue, error)
 	if e != nil {
 		return nil, e
 	}
-	if e = q.grow(&q.values, 1); e == nil {
-		q.values = append(q.values, -1)
-		e = q.reserve(128)
-	}
-	if e != nil {
+	if e = q.initialize(); e != nil {
 		q.Close()
 		return nil, e
 	}
 	return q, nil
+}
+func (q *satVarQueue) initialize() error {
+	var e error
+	if e = q.grow(&q.values, 1); e == nil {
+		q.values = append(q.values, -1)
+		e = q.reserve(128)
+	}
+	return e
 }
 func newSATVarQueue(a *satActivityDomain, b *arena.Budget) (*satVarQueue, error) {
 	n := uint64(reflect.TypeOf(satVarQueue{}).Size())
@@ -109,11 +114,11 @@ func (q *satVarQueue) lt(a, b int32) (bool, error) {
 	if a < 0 || b < 0 {
 		return false, arena.ErrBounds
 	}
-	x, e := q.activity.Get(uint32(a))
+	x, e := q.getActivity(uint32(a))
 	if e != nil {
 		return false, e
 	}
-	y, e := q.activity.Get(uint32(b))
+	y, e := q.getActivity(uint32(b))
 	if e != nil {
 		return false, e
 	}
@@ -400,6 +405,7 @@ func (q *satVarQueue) Clone(b *arena.Budget) (*satVarQueue, error) {
 	if e != nil {
 		return nil, e
 	}
+	v.runtimeActivity = q.runtimeActivity
 	n := uint64(cap(q.values)) * 4
 	if e = b.Reserve(n); e != nil {
 		v.Close()
@@ -428,6 +434,7 @@ func (q *satVarQueue) MoveClone(b *arena.Budget) (*satVarQueue, error) {
 	if e != nil {
 		return nil, e
 	}
+	v.runtimeActivity = q.runtimeActivity
 	n := uint64(cap(q.values)+cap(q.indices)) * 4
 	if b != q.budget {
 		if e = b.Reserve(n); e != nil {
@@ -444,4 +451,26 @@ func (q *satVarQueue) MoveClone(b *arena.Budget) (*satVarQueue, error) {
 		q.epoch++
 	}
 	return v, nil
+}
+
+func (q *satVarQueue) getActivity(i uint32) (uint32, error) {
+	if q.runtimeActivity != nil {
+		return q.runtimeActivity.Get(i)
+	}
+	return q.activity.Get(i)
+}
+func newSATSolverRuntimeVarQueue(a *satSolverRuntimeActivity, b *arena.Budget) (*satVarQueue, error) {
+	if e := a.open(); e != nil {
+		return nil, e
+	}
+	q, e := newSATVarQueue(nil, b)
+	if e != nil {
+		return nil, e
+	}
+	q.runtimeActivity = a
+	if e = q.initialize(); e != nil {
+		q.Close()
+		return nil, e
+	}
+	return q, nil
 }

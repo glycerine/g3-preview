@@ -21,7 +21,15 @@ passing suites do not satisfy this objective.
 - Source ledger: **2,102 units; 28 ported, 155 partial, 1,919 unported**. All **677
   API operations remain unported** in the machine inventory. Source fingerprint:
   `f8480997c14e2d6c414f40c60ce5095ef40a89ce6d1bcf1ed196c5d682d42d8f`.
-- Current corrected611-Go-file tree: both full suites are **GREEN**, terminal0
+- Verified617-Go-file follow-up covers SAT activity/trail actual Runtime storage,
+  external ExtendedGCD constructor frames, shared/TLS FF Runtime and negative
+  SMT2 completed temporary lifetimes. Both full suites are GREEN: native terminal0
+  in `.cache/ownership-followup-native.log` (main13.402s/numeric95.009s), debug
+  terminal0 in `.cache/ownership-followup-debug.log` (main771.729s/numeric195.912s).
+  Both vet profiles and final synchronized source/no-generics audit pass. All617
+  Go hashes match `.cache/ownership-followup-go-hashes.json`; no failing test was
+  skipped, hidden or weakened. Whole-source/API counts remain unchanged.
+- Committed `48a5934` corrected611-Go-file baseline: both full suites are **GREEN**, terminal0
   in `.cache/scalar-phase-native.log` and `.cache/scalar-phase-debug.log`.
   Main native13.504s/debug753.057s; numeric92.275s/197.999s. Both full vet
   profiles pass; final source/no-generics audit passes with synchronized selected
@@ -669,25 +677,98 @@ The original refinement precision and every allocation prefix remain intact.
 All Go hashes/file sets and agent freezes were rechecked before committing;
 no JS/WASM/WASI/race gate was run.
 
+## Source lifetime and scalar storage follow-up after48a5934
+
+The frozen combined tree contains617 Go files, recorded in
+`.cache/ownership-followup-go-hashes.json`. Full native/debug, both vet profiles
+and source/no-generics gates finished GREEN before committing this follow-up.
+Whole-source/API status totals and registered assertion credit remain unchanged.
+Full native is terminal0 in `.cache/ownership-followup-native.log`
+(main13.402s, numeric95.009s). Both full vet profiles are terminal0 in
+`.cache/ownership-followup-vet-{native,debug}.log`; the synchronized source and
+no-generics audit is terminal0 in `.cache/ownership-followup-audit-synchronized.log`.
+Full checked/debug is terminal0 in `.cache/ownership-followup-debug.log`
+(main771.729s, numeric195.912s). Both profiles retain the original refinement
+precision and every actual failure prefix; no WASM/WASI/race gate was run.
+
+- SAT activity is actual uint32 Runtime backing, and the trail is one actual
+  literal32 Runtime vector. The queue comparator borrows current activity storage;
+  clone/move preserves that borrow. Source increment updates the queue before
+  rescaling, and decay/rescale preserve unsigned arithmetic and ascending writes.
+  Source maps: sat_solver.h109/119/517–528, sat_solver.cpp135–160/505–533/2804–2812,
+  sat_types.h47–57/108, sat_var_queue.h29–35 and vector.h43–101/303–308/350–405.
+  First MkVar now owns210 raw bytes/11 blocks; first trail push234/12. Actual
+  TLS unpublished roots, relocated token lifetimes and immediate fault-prefix
+  ownership are checked. The obsolete186-byte fixture was updated to the actual
+  activity allocation; all20 MkVar refusals and one success remain. All253 SAT
+  groups (415 RUN/PASS) pass both focused profiles, with vet GREEN. Evidence:
+  `.cache/sat-scalar-runtime/activity-trail-final-{native,debug}.log` and
+  `activity-trail-vet.log` in that directory. Heap/watch/justification and full
+  solver/global storage remain open.
+- ExtendedGCD now supplies the actual external COPY/VALUE/DEFAULT lexical frames.
+  Quotient, tmp, lastY, lastX, b and a unwind before queued partial adapter aborts;
+  coefficient difference precedes product destruction. Source maps: ext_gcd.h27–53,
+  rational.h selected constructors/free arithmetic and scoped_numeral.h31–33.
+  Genuine source-order RED is `.cache/ext-gcd-boundary-behavior-red.log`; actual
+  retained storage expands from eight to nine records because six outer locals,
+  coefficient product, completed inner work and a partial returned-copy adapter
+  can coexist at a guarded cleanup boundary. Actual owner size charges this
+  storage, and the done mask is uint16. No synthetic allocation event is added.
+  All123 focused RUN/PASS pass native4.486s/debug6.257s; both vets pass, in
+  `.cache/ext-gcd-boundary-{native,debug}-final.log` and related vet logs.
+  Original999 iterations/500 ENSURE actions and immediate pre-disable audits stay.
+- FastFloatConfig.Memory borrows the exact open same-Budget Runtime; nil retains
+  an owned default. Two managers and caller raw blocks share physical Runtime
+  accounting without double charging its header. Source maps: mpff.h119,
+  mpff.cpp1173–1217/1251–1284, buffer.h45–50/80–103 and
+  memory_manager.cpp236–306. Actual TLS allocation-limit failure retains the
+  unpublished char block; completed decimal buffers unwind before owning abort.
+  Oversized public reallocations also exercise a clearly labelled guarded signed
+  overflow/host-size boundary, where physical free completes before checked sync
+  refuses. This is not ordinary memory exhaustion. Exact cleanup cursor resumes
+  without counter rollback or repeated free/sync. Missing-API RED is
+  `.cache/mpff-runtime-isolated-api-red.log`; final relevant42 groups pass both
+  profiles in `.cache/mpff-runtime-final-{native,debug}.log`; strengthened shared
+  seven groups and vet pass in the corresponding final-shared/final-vet logs.
+  Permanent significand topology and generated/global binding remain open.
+- Negative SMT2 display owns its completed DEFAULT temporary in the charged
+  IntegerManager, preserving inner-before-outer destruction and cleanup errors.
+  Source maps: mpz.cpp1186 big_set and1409–1434, scoped_numeral.h31–33.
+  Fresh default pointer assignment remains null if allocation throws; Go failedRef
+  is a diagnostic abort token, not a dangling source pointer. The first test
+  incorrectly expected a capacity-read guard here; source review corrected that
+  oracle. `.cache/smt2-default-incorrect-oracle.log` records the mistaken draft
+  and is explicitly NOT source behavior RED evidence. Baseline plus new tests
+  observes missing scope APIs in `.cache/review/smt2-api-red/golang/.cache/`.
+  Real completed temporaries, refused output prefix and stopped inner destruction
+  use the same labelled public guarded TLS fixture. SourceFinalize waits for the
+  active scope; explicit cleanup acknowledges each completed physical release.
+  Immediate named-root audits precede cleanup/fault disabling, and actual owner
+  cleanup reaches Budget0. Other display/stream/backend profiles remain open.
+- The specifically reported factorization test freshly passes native404 actual
+  refusal prefixes plus one success, and checked/debug845 plus one success.
+  Evidence: `.cache/ownership-followup-factor-{native,debug}.log`. No prefix,
+  source assertion or immediate ownership check was removed.
+
+
 ## TODO — prioritized handoff
 
-- [ ] Remaining constructor/lifetime closure: unframed external ExtendedGCD/caller
-  stacks must delay partial owning abort until their completed source locals
-  unwind. Raw scalar-overload/value constructor domains, public standalone move
+- [ ] Remaining constructor/lifetime closure: raw scalar-overload/value constructor
+  domains, public standalone move
   adapters, InfDiv zero-FIRST and InfRoot negativity guard profiles remain open.
-  Selected typed local completion and nested helper frames do not prove full-stack
-  C++ failure timing for external callers. Preserve charged8/1 root bounds and
+  Selected external ExtendedGCD frames now unwind completed locals before partial
+  abort; broader caller stacks remain open. Preserve charged9/1 root bounds and
   zero warm allocations.
-- [ ] Remaining SAT memory families: activity, justification/pointer/watch/clause/
-  literal/trail storage, full solver and shared global Runtime integration.
-  Nine char columns and uint32 levels now use actual same-Runtime source storage;
+- [ ] Remaining SAT memory families: justification/pointer/watch/clause storage,
+  other literal domains, full solver and shared global Runtime integration.
+  Nine char columns, uint32 levels/activity and literal32 trail now use actual
+  same-Runtime source storage;
   other columns must not claim source8-byte pointers via expanded Go handle tickets.
-- [ ] Remaining numeric display families: negative scoped SMT2 mpz.cpp1412,
-  binary raw decimal/interval mpbq.cpp426/460 explicit end-label locals, broader
+- [ ] Remaining numeric display families: binary raw decimal/interval mpbq.cpp426/460 explicit end-label locals, broader
   raw decimal assertions and stream/global/locale/architecture profiles. Rational
   mpq.cpp156 raw locals now retain actual early-failure roots; MPFF full-precision
-  char1024/unsigned1024/16 scopes are integrated. MPFF borrowed/TLS Runtime config,
-  permanent mantissa/storage topology and unsupported profile closure remain open.
+  char1024/unsigned1024/16 scopes and borrowed/TLS Runtime config are integrated.
+  Permanent mantissa/storage topology and unsupported profile closure remain open.
 - [ ] Maintain full native and checked/debug GREEN across implementation commits;
   commit each coherent green chunk promptly. Use the documented30-minute debug
   timeout for the exhaustive original-precision refinement campaign.

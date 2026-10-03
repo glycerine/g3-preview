@@ -38,6 +38,7 @@ func integerPhysicalAudit(t *testing.T, m *IntegerManager, public ...*Int) {
 	for i := range m.rawDisplay.roots {
 		add(m.rawDisplay.roots[i].cell)
 	}
+	add(m.smt2Display.value.cell)
 	add(m.intMin.cell)
 	add(m.two64.cell)
 	for _, v := range public {

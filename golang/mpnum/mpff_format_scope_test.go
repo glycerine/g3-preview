@@ -69,6 +69,20 @@ func fastFormattingPhysicalAudit(t *testing.T, m *FastFloatManager) {
 		physical += extent
 		initialization += ((extent + 63) / 64) * 8
 	}
+	fastFormattingNamedRoots(m, add)
+	if uint32(len(raw)) != m.natural.runtime.Stats().LiveBlocks {
+		t.Fatal("unnamed actual runtime root", len(raw), m.natural.runtime.Stats())
+	}
+	stats := m.natural.runtime.Stats()
+	if stats.PhysicalBytes != physical || stats.InitializationBytes != initialization {
+		t.Fatal("actual named runtime backing bytes", physical, initialization, stats)
+	}
+
+}
+
+// Names only this owner's actual roots. Shared runtime censuses must add every
+// participant and explicitly retained caller block before comparing totals.
+func fastFormattingNamedRoots(m *FastFloatManager, add func(memory.Block)) {
 	for i := range m.natural.division {
 		add(m.natural.division[i].raw)
 		add(m.natural.division[i].pending)
@@ -87,14 +101,6 @@ func fastFormattingPhysicalAudit(t *testing.T, m *FastFloatManager) {
 	}
 	add(m.formatting.small.raw)
 	add(m.formatting.small.pending)
-	if uint32(len(raw)) != m.natural.runtime.Stats().LiveBlocks {
-		t.Fatal("unnamed actual runtime root", len(raw), m.natural.runtime.Stats())
-	}
-	stats := m.natural.runtime.Stats()
-	if stats.PhysicalBytes != physical || stats.InitializationBytes != initialization {
-		t.Fatal("actual named runtime backing bytes", physical, initialization, stats)
-	}
-
 }
 
 func TestFastFloatFormattingEveryConstructorPrefix(t *testing.T) {

@@ -4,6 +4,7 @@ package mpnum
 import (
 	"errors"
 	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
 	"reflect"
 )
 
@@ -29,9 +30,15 @@ func (a *FastFloat) sign(b bool) {
 type FastFloatConfig struct {
 	PrecisionWords, InitialCapacity uint32
 	Storage                         arena.VectorConfig
+	// Memory borrows the actual allocation runtime. Nil constructs an owned
+	// runtime. Caller confinement and the Budget ownership contract still apply;
+	// process-global source binding remains a separate integration.
+	Memory *memory.Runtime
 }
 
-func DefaultFastFloatConfig(c arena.VectorConfig) FastFloatConfig { return FastFloatConfig{2, 1024, c} }
+func DefaultFastFloatConfig(c arena.VectorConfig) FastFloatConfig {
+	return FastFloatConfig{PrecisionWords: 2, InitialCapacity: 1024, Storage: c}
+}
 
 var ErrFastFloatOverflow = errors.New("multi-precision floating point (mpff) overflow")
 var ErrFastFloatDivisionByZero = errors.New("multi-precision floating point (mpff) division by zero")
@@ -45,7 +52,7 @@ type ffVector struct {
 	size, capacity uint32
 }
 
-// Cold owner: owns every referenced service and buffer; caller numerical
+// Cold owner: owns its buffers and services, borrowing a configured Runtime; caller numerical
 // conversion managers are borrowed only for their individual operation.
 type FastFloatManager struct {
 	self                                       *FastFloatManager
@@ -66,6 +73,14 @@ func NewFastFloatManager(c FastFloatConfig) (*FastFloatManager, error) {
 	if c.PrecisionWords < 2 || c.PrecisionWords > uint32(0x7fffffff)/32 || c.InitialCapacity == 0 || uint64(c.InitialCapacity)*uint64(c.PrecisionWords) > uint64(^uint32(0))/4 || c.InitialCapacity > 0x7fffffff || c.Storage.Descriptors.Budget == nil {
 		return nil, ErrFastFloatDomain
 	}
+	if c.Memory != nil {
+		if e := c.Memory.CheckOpen(); e != nil {
+			return nil, e
+		}
+		if c.Memory.Budget() != c.Storage.Descriptors.Budget {
+			return nil, arena.ErrConfig
+		}
+	}
 	h := uint64(reflect.TypeOf(FastFloatManager{}).Size())
 	if e := c.Storage.Descriptors.Budget.Reserve(h); e != nil {
 		return nil, e
@@ -78,7 +93,7 @@ func NewFastFloatManager(c FastFloatConfig) (*FastFloatManager, error) {
 		m.Close()
 		return nil, e
 	}
-	m.natural, e = newNaturalManager(c.Storage, m.words, false)
+	m.natural, e = newNaturalManagerWithMemory(c.Storage, m.words, false, c.Memory)
 	if e != nil {
 		m.Close()
 		return nil, e
@@ -102,6 +117,14 @@ func NewFastFloatManager(c FastFloatConfig) (*FastFloatManager, error) {
 		return nil, e
 	}
 	return m, nil
+}
+
+// RuntimeOwner returns the actual runtime identity without transferring ownership.
+func (m *FastFloatManager) RuntimeOwner() *memory.Runtime {
+	if m == nil || m.self != m || m.natural == nil {
+		return nil
+	}
+	return m.natural.RuntimeOwner()
 }
 func (m *FastFloatManager) open() error {
 	if m == nil || m.self != m {

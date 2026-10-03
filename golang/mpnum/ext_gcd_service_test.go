@@ -4,9 +4,11 @@ package mpnum
 
 import (
 	"errors"
+	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
+	"math"
 	"math/big"
 	"testing"
-
 )
 
 func TestExtendedGCDWrapperSource999Cases(t *testing.T) {
@@ -110,7 +112,6 @@ func TestExtendedGCDWrapperImmediateFailureOwnership(t *testing.T) {
 		y := serviceValue(t, s, "23")
 		budget.FailAfter(prefix)
 		err := s.ExtendedGCD(&a, &b, &g, &x, &y)
-		budget.FailAfter(-1)
 		if err != nil {
 			failures++
 			if !numericPhysicalReservationRefusal(err) {
@@ -137,6 +138,7 @@ func TestExtendedGCDWrapperImmediateFailureOwnership(t *testing.T) {
 		// This independent graph includes the source manager's fixed argument,
 		// result and constant cells, plus legitimately retained natural scratch.
 		qopsAuditLiveOwnership(t, s.manager, roots)
+		budget.FailAfter(-1)
 		serviceText(t, s, &a, "123456789012345678901234567891")
 		serviceText(t, s, &b, "99887766554433221101")
 		serviceMust(t, s.Close())
@@ -203,4 +205,277 @@ func TestExtendedGCDWrapperProvenanceGuards(t *testing.T) {
 		serviceMust(t, s.Del(v))
 	}
 	serviceMust(t, other.Del(&foreign))
+}
+
+// The actual coefficient free operator must retain its failed COPY prefix
+// until the enclosing extended_gcd locals have run their source destructors.
+func TestExtendedGCDWrapperCoefficientOuterBoundary(t *testing.T) {
+	b := arena.NewBudget(1 << 24)
+	cfg := serviceConfig(b)
+	cfg.Integers.Profile = memory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+	s, err := NewRationalService(cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		if e := s.Close(); e != nil {
+			t.Error(e)
+		}
+		if b.Used() != 0 {
+			t.Error(b.Used())
+		}
+	}()
+	q := serviceValue(t, s, "18446744073709551617")
+	current := serviceValue(t, s, "7")
+	last := serviceValue(t, s, "18446744073709551619")
+	outer := NewRational()
+	if err = s.manager.Copy(&outer, &last.raw); err != nil {
+		t.Fatal(err)
+	}
+	if err = s.beginLexical(); err != nil {
+		t.Fatal(err)
+	}
+	b.FailAfter(0)
+	err = s.extendedGCDCoefficientLocked(&q, &current, &last)
+	st, _ := s.LexicalState()
+	if !numericPhysicalReservationRefusal(err) || st.Aborts != 1 || st.Completed != 0 {
+		t.Fatal(err, st)
+	}
+	serviceAuditRationalRoots(t, s, &q.raw, &current.raw, &last.raw, &outer, &s.lexical.roots[0])
+	b.FailAfter(-1)
+	if e := s.manager.z.CleanupPendingAllocation(); e != nil {
+		t.Fatal(e)
+	}
+	if e := s.destroyLexicalRational(&outer); e != nil {
+		t.Fatal(e)
+	}
+	st, _ = s.LexicalState()
+	if st.Aborts != 1 {
+		t.Fatal("source outer dtor consumed failed inner copy", st)
+	}
+	s.endLexicalError(&err)
+	st, _ = s.LexicalState()
+	if st.Pending {
+		t.Fatal(st)
+	}
+	serviceAuditRationalRoots(t, s, &q.raw, &current.raw, &last.raw)
+	for _, v := range []*OwnedRational{&q, &current, &last} {
+		serviceMust(t, s.Del(v))
+	}
+}
+
+// This bounded recipe models only ext_gcd.h's two initial COPY constructors.
+// A genuine second-component allocation refusal must unwind completed a before
+// owning-aborting partial b. The resulting real cell free-list order is observable.
+func TestExtendedGCDWrapperCopyConstructorUnwindOrder(t *testing.T) {
+	run := func(prefix int64, reference bool) (bool, [3]uint32) {
+		budget := arena.NewBudget(1 << 24)
+		cfg := serviceConfig(budget)
+		cfg.Integers.Profile = memory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
+		s, e := NewRationalService(cfg)
+		if e != nil {
+			t.Fatal(e)
+		}
+		defer func() {
+			if e := s.Close(); e != nil {
+				t.Error(e)
+			}
+			if budget.Used() != 0 {
+				t.Error(budget.Used())
+			}
+		}()
+		inA := serviceValue(t, s, "1208925819614629174706177")
+		inB := serviceValue(t, s, "1208925819614629174706183/1208925819614629174706185")
+		g, x, y := serviceValue(t, s, "17"), serviceValue(t, s, "19"), serviceValue(t, s, "23")
+		budget.FailAfter(prefix)
+		eligible := false
+		if reference {
+			a, b := NewRational(), NewRational()
+			e = s.manager.Copy(&a, &inA.raw)
+			if e == nil {
+				e = s.manager.Copy(&b, &inB.raw)
+				eligible = numericPhysicalReservationRefusal(e) && b.num.cell != 0 && b.num.cell != s.manager.z.failedRef && b.den.cell == s.manager.z.failedRef
+				if eligible {
+					serviceAuditRationalRoots(t, s, &inA.raw, &inB.raw, &g.raw, &x.raw, &y.raw, &a, &b)
+					// Source completed a dtor precedes separate owning abort of b.
+					if e := s.destroyLexicalRational(&a); e != nil {
+						t.Fatal(e)
+					}
+					if e := s.abortLexicalRational(&b); e != nil {
+						t.Fatal(e)
+					}
+				} else {
+					serviceMust(t, s.manager.Del(&b))
+					serviceMust(t, s.manager.Del(&a))
+				}
+			} else {
+				serviceMust(t, s.manager.Del(&a))
+			}
+		} else {
+			e = s.ExtendedGCD(&inA, &inB, &g, &x, &y)
+			eligible = numericPhysicalReservationRefusal(e)
+			if g.raw.num.val != 17 || x.raw.num.val != 19 || y.raw.num.val != 23 {
+				t.Fatal("unexpected later action", prefix, e)
+			}
+			serviceAuditRationalRoots(t, s, &inA.raw, &inB.raw, &g.raw, &x.raw, &y.raw)
+		}
+		budget.FailAfter(-1)
+		if e := s.manager.z.CleanupPendingAllocation(); e != nil {
+			t.Fatal(e)
+		}
+		if e := s.CleanupLexical(); e != nil {
+			t.Fatal(e)
+		}
+		probe := [3]Int{}
+		slots := [3]uint32{}
+		for i := range probe {
+			if e := s.manager.z.SetString(&probe[i], "18446744073709551617"); e != nil {
+				t.Fatal(e)
+			}
+			slots[i] = uint32(numericSlot(probe[i].cell))
+		}
+		serviceAuditRationalRoots(t, s, &inA.raw, &inB.raw, &g.raw, &x.raw, &y.raw, &Rational{num: probe[0], den: NewInt(1)}, &Rational{num: probe[1], den: NewInt(1)}, &Rational{num: probe[2], den: NewInt(1)})
+		for i := range probe {
+			if e := s.manager.z.Del(&probe[i]); e != nil {
+				t.Fatal(e)
+			}
+		}
+
+		for _, v := range []*OwnedRational{&inA, &inB, &g, &x, &y} {
+			serviceMust(t, s.Del(v))
+		}
+		return eligible, slots
+	}
+	found := 0
+	for prefix := int64(0); prefix < 40; prefix++ {
+		eligible, want := run(prefix, true)
+		if !eligible {
+			continue
+		}
+		found++
+		ok, got := run(prefix, false)
+		if !ok || got != want {
+			t.Fatalf("prefix %d actual ctor-unwind slots%v, source slots%v", prefix, got, want)
+		}
+	}
+	if found == 0 {
+		t.Fatal("no actual partial-B allocation refusal reached")
+	}
+}
+
+// A warmed all-inline Euclidean route makes no raw source allocation or Go
+// allocation. Caller inputs remain independent and outputs satisfy Bezout.
+func TestExtendedGCDWrapperWarmPhysicalBoundary(t *testing.T) {
+	s, budget := serviceNew(t)
+	a, b := serviceValue(t, s, "12"), serviceValue(t, s, "8")
+	g, x, y := serviceValue(t, s, "0"), serviceValue(t, s, "0"), serviceValue(t, s, "0")
+	serviceMust(t, s.ExtendedGCD(&a, &b, &g, &x, &y))
+	before := numericWarmProfileSnapshot(t, s.manager.z, budget)
+	budget.FailAfter(0)
+	allocs := testing.AllocsPerRun(100, func() {
+		if e := s.ExtendedGCD(&a, &b, &g, &x, &y); e != nil {
+			panic(e)
+		}
+	})
+	serviceAuditRationalRoots(t, s, &a.raw, &b.raw, &g.raw, &x.raw, &y.raw)
+	numericWarmProfileAudit(t, s.manager.z, budget, before, allocs, false)
+	budget.FailAfter(-1)
+	if g.raw.num.val != 4 || x.raw.num.val != 1 || y.raw.num.val != -1 {
+		t.Fatal(g, x, y)
+	}
+	for _, v := range []*OwnedRational{&a, &b, &g, &x, &y} {
+		serviceMust(t, s.Del(v))
+	}
+}
+
+// Six outer locals, one coefficient product, one completed inner work and an
+// actual failed-return-Copy adapter token form the nine-record continuation
+// envelope. The work refusal is explicitly malformed Go layout, not malloc.
+func TestExtendedGCDWrapperNineRetainedDiagnosticRecords(t *testing.T) {
+	if len((rationalLexicalScope{}).roots) != 9 {
+		t.Fatal("external source stack requires actual ninth charged record")
+	}
+	budget := arena.NewBudget(1 << 24)
+	r, e := memory.NewRuntime(memory.RuntimeConfig{Budget: budget, SizeTBits: 32})
+	if e != nil {
+		t.Fatal(e)
+	}
+	cfg := serviceConfig(budget)
+	cfg.Integers.Memory = r
+	cfg.Integers.Profile = memory.SmallAllocatorProfile{PointerBits: 32, Debug: true}
+	s, e := NewRationalService(cfg)
+	if e != nil {
+		t.Fatal(e)
+	}
+	z := s.manager.z
+	completed := [8]Rational{}
+	for i := range completed {
+		completed[i] = NewRational()
+		if e = s.manager.SetString(&completed[i], "18446744073709551617"); e != nil {
+			t.Fatal(e)
+		}
+	}
+	partial := NewRational()
+	if e = s.beginLexical(); e != nil {
+		t.Fatal(e)
+	}
+	budget.FailAfter(0)
+	e = z.Copy(&partial.num, &completed[0].num)
+	if !numericPhysicalReservationRefusal(e) || partial.num.cell != z.failedRef {
+		t.Fatal(e)
+	}
+	serviceAuditRationalRoots(t, s, &completed[0], &completed[1], &completed[2], &completed[3], &completed[4], &completed[5], &completed[6], &completed[7], &partial)
+	budget.FailAfter(-1)
+	workRef := completed[7].num.cell
+	workCell := z.cell(workRef)
+	bad := workCell
+	bad.backing.requested = uint64(math.MaxUint32) + 1
+	z.store(workRef, bad)
+	defer func() {
+		if validNumericRef(z.cells, workRef) {
+			c := z.cell(workRef)
+			c.backing.requested = workCell.backing.requested
+			z.store(workRef, c)
+		}
+		if e := s.CleanupLexical(); e != nil {
+			t.Error(e)
+		}
+		if e := s.Close(); e != nil {
+			t.Error(e)
+		}
+		if e := r.Close(); e != nil {
+			t.Error(e)
+		}
+		if budget.Used() != 0 {
+			t.Error(budget.Used())
+		}
+	}()
+	if next := s.abortLexicalRational(&partial); next != nil {
+		t.Fatal(next)
+	}
+	for i := 7; i >= 0; i-- {
+		if next := s.destroyLexicalRational(&completed[i]); !errors.Is(next, arena.ErrBounds) {
+			t.Fatal(i, next)
+		}
+	}
+	s.endLexicalError(&e)
+	st, _ := s.LexicalState()
+	if st.Roots != 9 || st.Completed != 8 || st.Aborts != 1 || !errors.Is(st.Cause, arena.ErrBounds) || !numericPhysicalReservationRefusal(st.OriginalCause) {
+		t.Fatal(st)
+	}
+	var roots []*Rational
+	for i := uint8(0); i < s.lexical.count; i++ {
+		roots = append(roots, &s.lexical.roots[i])
+	}
+	serviceAuditRationalRoots(t, s, roots...)
+	c := z.cell(workRef)
+	c.backing.requested = workCell.backing.requested
+	z.store(workRef, c)
+	if e = s.CleanupLexical(); e != nil {
+		t.Fatal(e)
+	}
+	if e = z.CleanupPendingAllocation(); e != nil {
+		t.Fatal(e)
+	}
+	serviceAuditRationalRoots(t, s)
 }

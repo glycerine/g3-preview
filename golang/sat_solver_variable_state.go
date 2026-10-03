@@ -20,9 +20,9 @@ type satSolverVariableState struct {
 	decision, mark, literalMark, eliminated, external, phase, previousPhase, assignedSinceGC satSolverAssignmentColumn
 	justification                                                                            satVariableJustificationColumn
 	level                                                                                    satSolverRuntimeUintColumn
-	activity                                                                                 *satActivityDomain
+	activity                                                                                 *satSolverRuntimeActivity
 	queue                                                                                    *satVarQueue
-	trail                                                                                    *satSolverLiteralStore
+	trail                                                                                    *satSolverRuntimeTrail
 	trailRef                                                                                 satSolverLiteralListRef
 	elimTodo                                                                                 *satSolverUintSet
 	ownerBytes                                                                               uint64
@@ -62,16 +62,13 @@ func newSATSolverVariableState(todo *satSolverUintSet, b *arena.Budget, c arena.
 	var e error
 	s.watches, e = newSATSolverWatchLists(b, c)
 	if e == nil {
-		s.activity, e = NewSATActivityDomain(b)
+		s.activity, e = newSATSolverRuntimeActivity(b, raw)
 	}
 	if e == nil {
-		s.queue, e = NewSATVarQueue(s.activity, b)
+		s.queue, e = newSATSolverRuntimeVarQueue(s.activity, b)
 	}
 	if e == nil {
-		s.trail, e = newSATSolverLiteralStore(c)
-	}
-	if e == nil {
-		s.trailRef, e = s.trail.NewList()
+		s.trail, s.trailRef, e = newSATSolverRuntimeTrail(b, raw)
 	}
 	if e != nil {
 		if cleanup := s.Close(); cleanup != nil {
@@ -242,7 +239,7 @@ func (s *satSolverVariableState) Stats() satSolverVariableStats {
 		out.QueueBytes = v.OwnerBytes + v.ValuesBytes + v.IndicesBytes
 	}
 	if s.trail != nil {
-		out.TrailBytes = s.trail.ownerBytes + s.trail.directoryBytes + satWatchGraphBytes(s.trail.words.Stats())
+		out.TrailBytes = s.trail.ownerBytes
 	}
 	out.TotalBytes = out.OwnerBytes + out.ColumnBytes + out.WatchBytes + out.ActivityBytes + out.QueueBytes + out.TrailBytes
 	return out
@@ -273,12 +270,6 @@ func (s *satSolverVariableState) checkPhysicalOwners() error {
 	for _, r := range s.watches.lists {
 		if !s.watches.store.IsLive(r) {
 			return arena.ErrInvalidSlot
-		}
-	}
-	for i := range s.trail.records {
-		r := &s.trail.records[i]
-		if r.live && (s.trailRef.owner != s.trail.origin || s.trailRef.slot != uint32(i) || s.trailRef.generation != r.generation) {
-			return ErrSATOwner
 		}
 	}
 	if !s.trail.IsLive(s.trailRef) {

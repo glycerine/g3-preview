@@ -16,26 +16,28 @@ type RationalLexicalState struct {
 	Cause, OriginalCause     error
 }
 
-// Eight is the audited maximum simultaneous local/result rational members:
-// infDiv's four scalar locals, two value members and two default result members.
-// InfPower's two default members plus five scalar temporaries and one inner work
-// member also fit eight. Partial aborts wait behind completed source unwind.
-// All backing/header bytes are included in the concrete cold owner's charge.
+// Nine includes the external ext_gcd source stack: six persistent locals,
+// coefficient product, completed inner expression work, and partial returned-
+// Copy adapter token. Destructor refusal can retain all nine records. Existing
+// Inf expression stacks fit eight. All fields are charged by actual owner size.
+const rationalLexicalRootLimit = 9
+
 type rationalLexicalScope struct {
-	roots                      [8]Rational
-	abort                      [8]bool
-	components                 [8]uint8
-	count, cursor, done, depth uint8
-	cause, originalCause       error
+	roots                [rationalLexicalRootLimit]Rational
+	abort                [rationalLexicalRootLimit]bool
+	components           [rationalLexicalRootLimit]uint8
+	count, cursor, depth uint8
+	done                 uint16
+	cause, originalCause error
 }
 
 func (l *rationalLexicalScope) pending() bool { return l.cursor < l.count }
 func (l *rationalLexicalScope) retain(a *Rational, abort bool) uint8 {
 	if a.num.cell == 0 && a.den.cell == 0 {
 		*a = Rational{}
-		return 8
+		return rationalLexicalRootLimit
 	}
-	if l.count == 8 {
+	if l.count == rationalLexicalRootLimit {
 		panic("mpnum: audited lexical root bound violated")
 	}
 	index := l.count
@@ -96,7 +98,7 @@ func (l *rationalLexicalScope) dispose(z *IntegerManager, a *Rational, abort boo
 	if e := lexicalDelete(z, a, false, &component); e != nil {
 		l.cause = e
 		index := l.retain(a, false)
-		if index < 8 {
+		if index < rationalLexicalRootLimit {
 			l.components[index] = component
 		}
 		return e
@@ -107,14 +109,14 @@ func (l *rationalLexicalScope) cleanup(z *IntegerManager) error {
 	// Completed source destructor order precedes separate partial-owning aborts,
 	// even when a partial inner copy was queued before the outer unwind began.
 	for l.pending() {
-		index := uint8(8)
+		index := uint8(rationalLexicalRootLimit)
 		for i := uint8(0); i < l.count; i++ {
 			if l.done&(1<<i) == 0 && !l.abort[i] {
 				index = i
 				break
 			}
 		}
-		if index == 8 {
+		if index == rationalLexicalRootLimit {
 			for i := uint8(0); i < l.count; i++ {
 				if l.done&(1<<i) == 0 {
 					index = i

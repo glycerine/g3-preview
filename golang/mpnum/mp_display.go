@@ -18,23 +18,26 @@ func (m *NaturalManager) appendDisplay(offset uint32, text string) (uint32, erro
 	}
 	return end, nil
 }
-func (m *IntegerManager) prepareSMT2(a *Int, decimal bool, offset uint32) (uint32, error) {
+func (m *IntegerManager) prepareSMT2(a *Int, decimal bool, offset uint32) (length uint32, result error) {
 	if e := m.check(a); e != nil {
 		return 0, e
 	}
 	input := a
-	var tmp Int
 	// Source scoped temporary is created only in the negative branch; Copy/Neg
 	// precede emission of the negative SMT2 prefix.
 	if a.val < 0 {
-		defer m.Del(&tmp)
-		if e := m.Copy(&tmp, a); e != nil {
+		if e := m.beginSMT2Display(); e != nil {
 			return 0, e
 		}
-		if e := m.Neg(&tmp); e != nil {
+		defer m.finishSMT2Display(&length, &result)
+		tmp := &m.smt2Display.value
+		if e := m.copySMT2Temporary(a); e != nil {
 			return 0, e
 		}
-		input = &tmp
+		if e := m.Neg(tmp); e != nil {
+			return 0, e
+		}
+		input = tmp
 		var e error
 		offset, e = m.natural.appendDisplay(offset, "(- ")
 		if e != nil {

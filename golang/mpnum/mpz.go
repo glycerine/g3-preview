@@ -59,6 +59,7 @@ type IntegerManager struct {
 	natural                                *NaturalManager // child borrows this manager's Words and Budget
 	intMin, two64                          Int
 	rawDisplay                             rawDisplayScope
+	smt2Display                            smt2DisplayScope
 	closed                                 bool
 	sourceFinalizing, sourceFinalized      bool
 	sourceGuard                            bool
@@ -363,6 +364,9 @@ func (m *IntegerManager) CloseChecked() error {
 		if e := m.unwindConstructorMembers(); e != nil {
 			return fail(e)
 		}
+	}
+	if e := m.CleanupSMT2Display(); e != nil {
+		return fail(e)
 	}
 	// Resume every explicitly begun source cursor before owning cleanup. A
 	// missing/stale private pointer stops the source body at an undefined access;

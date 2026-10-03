@@ -2,9 +2,7 @@
 package g3
 
 import (
-	"errors"
 	"fmt"
-	"github.com/glycerine/g3/golang/arena"
 	"testing"
 )
 
@@ -247,7 +245,7 @@ func TestSATSolverAttachNaryReorderAndWatchFaultPrefixes(t *testing.T) {
 			c, e := s.mkNaryClause(4, []satLiteral{0, 2, 4, 6}, false)
 			satLifecycleAssertOwned(t, s)
 			if e != nil {
-				if !errors.Is(e, arena.ErrInjectedFailure) {
+				if !satAssignmentActualRefusal(v.memory, e) {
 					t.Fatal(e)
 				}
 				failures++

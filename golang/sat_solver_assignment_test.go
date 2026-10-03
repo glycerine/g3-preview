@@ -3,7 +3,6 @@ package g3
 
 import (
 	"errors"
-	"github.com/glycerine/g3/golang/arena"
 	"testing"
 )
 
@@ -46,7 +45,7 @@ func TestSATSolverAssignTrailRefusalAndMissingExtensionPrefix(t *testing.T) {
 	v.scopeLevel = 1
 	b.FailAfter(0)
 	e := s.assignCore(0, satJustification{})
-	if !errors.Is(e, arena.ErrInjectedFailure) {
+	if !satAssignmentActualRefusal(v.memory, e) {
 		t.Fatal("actual initial trail refusal", e)
 	}
 	if satAssignmentTestValue(t, &v.assignment, 0) != int8(lTrue) || satScalarTestUint(t, &v.level, 0) != 1 || satAssignmentTestValue(t, &v.phase, 0) != 0 || satAssignmentTestValue(t, &v.assignedSinceGC, 0) != 1 {
