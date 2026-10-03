@@ -9310,7 +9310,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "ast_family.go"
+        "ast_family.go",
+        "ast_sort_size.go"
       ],
       "tests": [
         "TestFamilySourceRegistrationAndQueries",
@@ -9319,7 +9320,11 @@
         "TestFamilyMapFailureRetainsNextIDAndRetryGap",
         "TestFamilyBudgetConstructorAndNameGrowth",
         "TestFamilyWarmGuardsAndSignedCounterBound",
-        "TestFamilyExactNameGrowthOverlapAndBorrowedLifetime"
+        "TestFamilyExactNameGrowthOverlapAndBorrowedLifetime",
+        "TestSortSizeSourceDefaultFactoriesAndGuards",
+        "TestSortSizeRationalActualUint64Classification",
+        "TestSortSizeRationalBorrowedOwnerLifetime",
+        "TestSortSizeIndependentModelPointerFreedomAndWarmAllocations"
       ],
       "conditionals": [
         {
@@ -9947,15 +9952,26 @@
           ]
         },
         {
+          "name": "sort_size stream insertion exact infinite/very-big/finite decimal (ast.cpp235-239)",
+          "status": "ported",
+          "go_target": "ast_sort_size.go",
+          "tests": [
+            "TestSortSizeSourceDefaultFactoriesAndGuards",
+            "TestSortSizeIndependentModelPointerFreedomAndWarmAllocations"
+          ]
+        },
+        {
           "name": "complete AST nodes, declaration plugins, manager factories/ownership and higher algorithms",
           "status": "unported"
         }
       ],
       "ownership": [
-        "Concrete FamilyManager charges its real cold header, existing nested SymbolInt32Table and full names-vector capacities with old/new overlap. Borrows symbols; preserves counter/map/name failure prefixes; Close in reverse member order. Other AST ownership is unported. See FAMILY_PORT_STATUS.md."
+        "Concrete FamilyManager charges its real cold header, existing nested SymbolInt32Table and full names-vector capacities with old/new overlap. Borrows symbols; preserves counter/map/name failure prefixes; Close in reverse member order. Other AST ownership is unported. See FAMILY_PORT_STATUS.md.",
+        "Standalone SortSize is a freely copied pointer-free scalar with no separate owner/header allocation. Conversion borrows actual RationalService/OwnedRational for source IsUint64 then Uint64 actions without reservation, retained owner or numeral copy; resulting scalar outlives the owner. Caller confines operand mutation/deletion across both calls. Display uses local20 digits and one caller-owned final string. Other AST/plugin algorithms remain open. See SORT_SIZE_PORT_STATUS.md."
       ],
       "deviations": [
-        "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate."
+        "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
+        "Private sort_size enum is encoded Go0=infinite/1=finite/2=very-big to match source default with Go zero value. Nonfinite size is canonical0 rather than source unspecified default bits. Size checks finite precondition in every Go profile instead of reading irrelevant/unspecified release fields. No source ENSURE tests are invented; tests exercise implementation SASSERT and real borrowed rational provenance/lifetime."
       ]
     },
     {
@@ -9965,7 +9981,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "ast_family.go"
+        "ast_family.go",
+        "ast_sort_size.go"
       ],
       "tests": [
         "TestFamilySourceRegistrationAndQueries",
@@ -9974,7 +9991,11 @@
         "TestFamilyMapFailureRetainsNextIDAndRetryGap",
         "TestFamilyBudgetConstructorAndNameGrowth",
         "TestFamilyWarmGuardsAndSignedCounterBound",
-        "TestFamilyExactNameGrowthOverlapAndBorrowedLifetime"
+        "TestFamilyExactNameGrowthOverlapAndBorrowedLifetime",
+        "TestSortSizeSourceDefaultFactoriesAndGuards",
+        "TestSortSizeRationalActualUint64Classification",
+        "TestSortSizeRationalBorrowedOwnerLifetime",
+        "TestSortSizeIndependentModelPointerFreedomAndWarmAllocations"
       ],
       "conditionals": [
         {
@@ -10322,15 +10343,52 @@
           ]
         },
         {
+          "name": "sort_size private kind/storage, default/uint64/copy constructors and finite/very-big/infinite factories (ast.h291-319)",
+          "status": "ported",
+          "go_target": "ast_sort_size.go",
+          "tests": [
+            "TestSortSizeSourceDefaultFactoriesAndGuards",
+            "TestSortSizeIndependentModelPointerFreedomAndWarmAllocations"
+          ]
+        },
+        {
+          "name": "sort_size rational constructor actual IsUint64 then Uint64 or very-big (ast.h307-316)",
+          "status": "ported",
+          "go_target": "ast_sort_size.go",
+          "tests": [
+            "TestSortSizeRationalActualUint64Classification",
+            "TestSortSizeRationalBorrowedOwnerLifetime"
+          ]
+        },
+        {
+          "name": "sort_size predicates and inclusive base2 power>=64 threshold (ast.h321-325)",
+          "status": "ported",
+          "go_target": "ast_sort_size.go",
+          "tests": [
+            "TestSortSizeSourceDefaultFactoriesAndGuards",
+            "TestSortSizeIndependentModelPointerFreedomAndWarmAllocations"
+          ]
+        },
+        {
+          "name": "sort_size size finite SASSERT precondition (ast.h327)",
+          "status": "ported",
+          "go_target": "ast_sort_size.go",
+          "tests": [
+            "TestSortSizeSourceDefaultFactoriesAndGuards"
+          ]
+        },
+        {
           "name": "complete AST nodes, declaration plugins, manager factories/ownership and higher algorithms",
           "status": "unported"
         }
       ],
       "ownership": [
-        "Concrete FamilyManager charges its real cold header, existing nested SymbolInt32Table and full names-vector capacities with old/new overlap. Borrows symbols; preserves counter/map/name failure prefixes; Close in reverse member order. Other AST ownership is unported. See FAMILY_PORT_STATUS.md."
+        "Concrete FamilyManager charges its real cold header, existing nested SymbolInt32Table and full names-vector capacities with old/new overlap. Borrows symbols; preserves counter/map/name failure prefixes; Close in reverse member order. Other AST ownership is unported. See FAMILY_PORT_STATUS.md.",
+        "Standalone SortSize is a freely copied pointer-free scalar with no separate owner/header allocation. Conversion borrows actual RationalService/OwnedRational for source IsUint64 then Uint64 actions without reservation, retained owner or numeral copy; resulting scalar outlives the owner. Caller confines operand mutation/deletion across both calls. Display uses local20 digits and one caller-owned final string. Other AST/plugin algorithms remain open. See SORT_SIZE_PORT_STATUS.md."
       ],
       "deviations": [
-        "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate."
+        "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
+        "Private sort_size enum is encoded Go0=infinite/1=finite/2=very-big to match source default with Go zero value. Nonfinite size is canonical0 rather than source unspecified default bits. Size checks finite precondition in every Go profile instead of reading irrelevant/unspecified release fields. No source ENSURE tests are invented; tests exercise implementation SASSERT and real borrowed rational provenance/lifetime."
       ]
     },
     {

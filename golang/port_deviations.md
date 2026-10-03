@@ -121,3 +121,14 @@ Caller enumeration buffers and scalar Symbols replace source vector output/raw
 name references. Borrowed symbols outlive the registry; Close refunds owned
 storage independently. This helper supplies no simulated AST manager or plugins.
 See FAMILY_PORT_STATUS.md.
+
+### Standalone sort-size scalar default and finite guard
+
+Private sort-size kind encoding makes Go zero value infinite as the source
+constructor requires. Nonfinite size is canonical zero instead of copying source
+unspecified default bits. The finite Size precondition is checked in every Go
+profile, replacing invalid release reads with a typed error. Actual borrowed
+RationalService IsUint64 then Uint64 calls preserve source classification;
+negative, fractional and too-large inputs become very-big without an invented
+cardinality domain check. No mutable owner/header or fake AST manager is added.
+See SORT_SIZE_PORT_STATUS.md.

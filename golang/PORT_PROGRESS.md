@@ -730,3 +730,14 @@ allocations. Integrated full native/checked-debug, named race/actual JS, vet/WAS
 and source/no-generics gates passed. These are added fixtures (no source family
 ENSURE suite). ast.h/.cpp are partial; real nodes/plugins/AST manager and solver
 remain open. See FAMILY_PORT_STATUS.md.
+
+## Standalone sort cardinality scalar
+
+All standalone sort_size constructors, scalar copy, factories, predicates,
+inclusive64 threshold, finite-size guard and exact display now have a concrete
+pointer-free value. Four test groups began missing-API RED, exercise real rational
+IsUint64 then Uint64 classification (including UINT64_MAX and2^64), independent
+finite byte output, owner provenance/lifetime and unchanged borrowed budgets.
+No source ENSURE assertions are invented. Full native/checked-debug, named race
+and actual JS, vet/WASI/source-no-generics gates passed. See SORT_SIZE_PORT_STATUS.md.
+ast.h/.cpp remain partial for all other AST nodes, managers and plugins.
