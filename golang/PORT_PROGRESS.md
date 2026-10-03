@@ -1280,3 +1280,15 @@ passed full native/debug and twenty exact race/actual JS groups, vet, WASI
 and source/no-generics checks. See SAT_SOLVER_CLAUSE_USE_LIST_PORT_STATUS.md.
 Implicit moves/nonlazy/TRACE and complete solver remain open. Sourcecpp/h
 become partial; ledger33ported/142partial/1927unported.
+
+
+## Actual raw memory allocations and counters
+
+The selected raw allocator now owns real prefix-bearing byte backings and
+invokes actual source counters at malloc/realloc/free action positions in
+both profiles. Eleven tests-first/regression/model groups cover thresholds,
+actual failure roots, generation exhaustion, wrapped-header partial ownership
+and initialized-byte lifetimes. Source getters never substitute Budget.Used.
+See RAW_MEMORY_PORT_STATUS.md. Full runtime initialization, typed-owner hooks
+and process transports remain open; ledger remains33ported/142partial/1927unported.
+The complete solver/proof/interpolation objective remains required.

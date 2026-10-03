@@ -101423,7 +101423,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "util_memory_accounting.go"
+        "util_memory_accounting.go",
+        "util_memory_runtime.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -101433,7 +101434,18 @@
         "TestMemoryAccountingSignedBoundaryPrefixes",
         "TestMemoryAccountingSourceSizeTPromotions",
         "TestMemoryAccountingTLSRepeatedCountAndLimitOrder",
-        "TestMemoryAccountingTLSStrictThresholds"
+        "TestMemoryAccountingTLSStrictThresholds",
+        "TestMemoryRuntimeActualBlocksHeadersAndReallocate",
+        "TestMemoryRuntimeTLSStrictThresholdAndRepeatedCounts",
+        "TestMemoryRuntimeLimitBeforePhysicalAndTLSOwnedFailure",
+        "TestMemoryRuntimeFailedReallocateKeepsActualOldBlock",
+        "TestMemoryRuntimeSourceUnsignedDeltaWatermarkAndGuards",
+        "TestMemoryRuntimeReallocateGenerationRefusalPrefix",
+        "TestMemoryRuntimeActualGettersAndUninitializedBytes",
+        "TestMemoryRuntimeIndependentPhysicalAndCounterModel",
+        "TestMemoryRuntimeImmediateFaultGraphAndOwnerDomains",
+        "TestMemoryRuntimeWrappedHeaderActualPhysicalPrefix",
+        "TestMemoryRuntimeShrinkRegrowByteLifetime"
       ],
       "conditionals": [
         {
@@ -101502,10 +101514,29 @@
             "TestMemoryAccountingTLSRepeatedCountAndLimitOrder",
             "TestMemoryAccountingTLSStrictThresholds"
           ]
+        },
+        {
+          "name": "actual owned raw allocation/reallocation/deallocation and size/count/peak/watermark routes, both source counter profiles and size widths; explicit transport/checked-lifetime adapters",
+          "status": "ported",
+          "go_target": "util_memory_runtime.go",
+          "tests": [
+            "TestMemoryRuntimeActualBlocksHeadersAndReallocate",
+            "TestMemoryRuntimeTLSStrictThresholdAndRepeatedCounts",
+            "TestMemoryRuntimeLimitBeforePhysicalAndTLSOwnedFailure",
+            "TestMemoryRuntimeFailedReallocateKeepsActualOldBlock",
+            "TestMemoryRuntimeSourceUnsignedDeltaWatermarkAndGuards",
+            "TestMemoryRuntimeReallocateGenerationRefusalPrefix",
+            "TestMemoryRuntimeActualGettersAndUninitializedBytes",
+            "TestMemoryRuntimeIndependentPhysicalAndCounterModel",
+            "TestMemoryRuntimeImmediateFaultGraphAndOwnerDomains",
+            "TestMemoryRuntimeWrappedHeaderActualPhysicalPrefix",
+            "TestMemoryRuntimeShrinkRegrowByteLifetime"
+          ]
         }
       ],
       "ownership": [
-        "Pointer-free scalar accounting is intended for once-charged runtime embedding with explicit caller-confined lanes and source counter prefixes. No raw allocator/backend or process-global integration is claimed; see MEMORY_ACCOUNTING_PORT_STATUS.md."
+        "Pointer-free scalar accounting is intended for once-charged runtime embedding with explicit caller-confined lanes and source counter prefixes. No raw allocator/backend or process-global integration is claimed; see MEMORY_ACCOUNTING_PORT_STATUS.md.",
+        "Actual prefix-bearing byte backings plus charged initialized-byte bitmap and cold allocation directory; immediate physical roots, TLS allocated-error owner and bad-header cleanup retain source action/counter prefixes. Real runtime typed-owner hooks, generated lifetime and process transports remain open. See RAW_MEMORY_PORT_STATUS.md."
       ],
       "deviations": [
         "Source signed-overflow/invalid-lane domains use scalar typed outcomes after completed field prefixes. Containing allocator must execute real physical operations between counter phases. Physical hooks, headers, generated callbacks, OOM exits/streams, concurrent global service and consumer integration remain open.",
@@ -101519,7 +101550,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "util_memory_accounting.go"
+        "util_memory_accounting.go",
+        "util_memory_runtime.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -101529,7 +101561,18 @@
         "TestMemoryAccountingSignedBoundaryPrefixes",
         "TestMemoryAccountingSourceSizeTPromotions",
         "TestMemoryAccountingTLSRepeatedCountAndLimitOrder",
-        "TestMemoryAccountingTLSStrictThresholds"
+        "TestMemoryAccountingTLSStrictThresholds",
+        "TestMemoryRuntimeActualBlocksHeadersAndReallocate",
+        "TestMemoryRuntimeTLSStrictThresholdAndRepeatedCounts",
+        "TestMemoryRuntimeLimitBeforePhysicalAndTLSOwnedFailure",
+        "TestMemoryRuntimeFailedReallocateKeepsActualOldBlock",
+        "TestMemoryRuntimeSourceUnsignedDeltaWatermarkAndGuards",
+        "TestMemoryRuntimeReallocateGenerationRefusalPrefix",
+        "TestMemoryRuntimeActualGettersAndUninitializedBytes",
+        "TestMemoryRuntimeIndependentPhysicalAndCounterModel",
+        "TestMemoryRuntimeImmediateFaultGraphAndOwnerDomains",
+        "TestMemoryRuntimeWrappedHeaderActualPhysicalPrefix",
+        "TestMemoryRuntimeShrinkRegrowByteLifetime"
       ],
       "conditionals": [
         {
@@ -101602,10 +101645,29 @@
             "TestMemoryAccountingTLSRepeatedCountAndLimitOrder",
             "TestMemoryAccountingTLSStrictThresholds"
           ]
+        },
+        {
+          "name": "actual owned raw allocation/reallocation/deallocation and size/count/peak/watermark routes, both source counter profiles and size widths; explicit transport/checked-lifetime adapters",
+          "status": "ported",
+          "go_target": "util_memory_runtime.go",
+          "tests": [
+            "TestMemoryRuntimeActualBlocksHeadersAndReallocate",
+            "TestMemoryRuntimeTLSStrictThresholdAndRepeatedCounts",
+            "TestMemoryRuntimeLimitBeforePhysicalAndTLSOwnedFailure",
+            "TestMemoryRuntimeFailedReallocateKeepsActualOldBlock",
+            "TestMemoryRuntimeSourceUnsignedDeltaWatermarkAndGuards",
+            "TestMemoryRuntimeReallocateGenerationRefusalPrefix",
+            "TestMemoryRuntimeActualGettersAndUninitializedBytes",
+            "TestMemoryRuntimeIndependentPhysicalAndCounterModel",
+            "TestMemoryRuntimeImmediateFaultGraphAndOwnerDomains",
+            "TestMemoryRuntimeWrappedHeaderActualPhysicalPrefix",
+            "TestMemoryRuntimeShrinkRegrowByteLifetime"
+          ]
         }
       ],
       "ownership": [
-        "Pointer-free scalar accounting is intended for once-charged runtime embedding with explicit caller-confined lanes and source counter prefixes. No raw allocator/backend or process-global integration is claimed; see MEMORY_ACCOUNTING_PORT_STATUS.md."
+        "Pointer-free scalar accounting is intended for once-charged runtime embedding with explicit caller-confined lanes and source counter prefixes. No raw allocator/backend or process-global integration is claimed; see MEMORY_ACCOUNTING_PORT_STATUS.md.",
+        "Actual prefix-bearing byte backings plus charged initialized-byte bitmap and cold allocation directory; immediate physical roots, TLS allocated-error owner and bad-header cleanup retain source action/counter prefixes. Real runtime typed-owner hooks, generated lifetime and process transports remain open. See RAW_MEMORY_PORT_STATUS.md."
       ],
       "deviations": [
         "Source signed-overflow/invalid-lane domains use scalar typed outcomes after completed field prefixes. Containing allocator must execute real physical operations between counter phases. Physical hooks, headers, generated callbacks, OOM exits/streams, concurrent global service and consumer integration remain open.",
