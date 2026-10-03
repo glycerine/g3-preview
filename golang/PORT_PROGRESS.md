@@ -946,3 +946,15 @@ guard never-written storage without discarding source retained tails.
 Full frozen native/debug, six named race/actual JS groups, vet/WASI compile and
 source/no-generics checks passed; see AST_EXPR_ARRAY_RETAINED_STATUS.md.
 Coverage counts are unchanged; the full port remains active.
+
+## Concrete AST marking integration
+
+Concrete expression/declaration ID marks, both fast planes, both owning ref-fast
+planes, scoped marks and real debug mark-owner checks are implemented. Tests-first
+failures caught unsigned-wrap physical reads and allocation-before-reservation;
+all seven constructors now reject a refused header without allocating.
+The frozen six-file/sixteen-group packet passed native/debug, race, actual JS,
+vet/WASI and source/no-generics gates. Scoped marks use actual owning ref vectors;
+failed fast mark/INC prefixes remain source-visible. obj_mark.h becomes partial;
+other mark specializations and whole AST/plugin/solver work remain open.
+See AST_MARK_PORT_STATUS.md for exact source surface and coordinator integration.

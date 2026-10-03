@@ -9340,6 +9340,11 @@
         "ast_expr_array_values.go",
         "ast_family.go",
         "ast_info.go",
+        "ast_mark.go",
+        "ast_mark_doc.go",
+        "ast_mark_fast.go",
+        "ast_mark_node.go",
+        "ast_mark_scoped.go",
         "ast_parameter.go",
         "ast_parameter_access.go",
         "ast_proof_manager.go",
@@ -9382,6 +9387,22 @@
         "TestASTExprArrayUninitializedAndFreedRetainedSlots",
         "TestASTFamilyDeclarationDomainOverloadUsesActualPlugin",
         "TestASTFuncDeclInfoPointerOverloadKeepsNullMetadata",
+        "TestASTMarkAllNodeKindsIndependentBitOracleAndWarmPlateau",
+        "TestASTMarkConstructorsAllFailurePrefixesImmediatePhysicalOwnership",
+        "TestASTMarkCopiedOwnersAndNilLifetimeGuards",
+        "TestASTMarkFastBothPlanesLevelsAndNonRetention",
+        "TestASTMarkFastGrowthPrefixInlineAndOwners",
+        "TestASTMarkFastPhysicalGrowthStaleBorrowAndEscapedCleanup",
+        "TestASTMarkHeaderRefusalPrecedesGoAllocation",
+        "TestASTMarkIDDomainsReuseAndReset",
+        "TestASTMarkLockedTraversalHelpers",
+        "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
+        "TestASTMarkRefFastActualAscendingReleaseAndWarmOperations",
+        "TestASTMarkRefFastCallbacksAndFailurePrefix",
+        "TestASTMarkScopedLimitOrderAndPartialPop",
+        "TestASTMarkScopedMarkFailureOrderingAndRetry",
+        "TestASTMarkScopedNestedScopesAndFlagRoute",
+        "TestASTMarkUnsignedWrapPhysicalContinuationGuard",
         "TestASTMetadataIgnoredFields",
         "TestASTModelValueNameInlineAndOverflowAccounting",
         "TestASTNamedNodeFieldsAndSortNullInfoPredicates",
@@ -10275,6 +10296,29 @@
             "TestASTProofUnitResolutionCountShortCircuit",
             "TestASTProofUnitResolutionLexicalScratchPeak"
           ]
+        },
+        {
+          "name": "concrete expression/declaration ID marks and fast/ref-fast/scoped marking specializations; other generic and diagnostic surfaces open",
+          "status": "partial",
+          "go_target": "ast_mark.go",
+          "tests": [
+            "TestASTMarkAllNodeKindsIndependentBitOracleAndWarmPlateau",
+            "TestASTMarkConstructorsAllFailurePrefixesImmediatePhysicalOwnership",
+            "TestASTMarkCopiedOwnersAndNilLifetimeGuards",
+            "TestASTMarkFastBothPlanesLevelsAndNonRetention",
+            "TestASTMarkFastGrowthPrefixInlineAndOwners",
+            "TestASTMarkFastPhysicalGrowthStaleBorrowAndEscapedCleanup",
+            "TestASTMarkHeaderRefusalPrecedesGoAllocation",
+            "TestASTMarkIDDomainsReuseAndReset",
+            "TestASTMarkLockedTraversalHelpers",
+            "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
+            "TestASTMarkRefFastActualAscendingReleaseAndWarmOperations",
+            "TestASTMarkRefFastCallbacksAndFailurePrefix",
+            "TestASTMarkScopedLimitOrderAndPartialPop",
+            "TestASTMarkScopedMarkFailureOrderingAndRetry",
+            "TestASTMarkScopedNestedScopesAndFlagRoute",
+            "TestASTMarkUnsignedWrapPhysicalContinuationGuard"
+          ]
         }
       ],
       "ownership": [
@@ -10282,14 +10326,16 @@
         "Standalone SortSize is a freely copied pointer-free scalar with no separate owner/header allocation. Conversion borrows actual RationalService/OwnedRational for source IsUint64 then Uint64 actions without reservation, retained owner or numeral copy; resulting scalar outlives the owner. Caller confines operand mutation/deletion across both calls. Display uses local20 digits and one caller-owned final string. Other AST/plugin algorithms remain open. See SORT_SIZE_PORT_STATUS.md.",
         "First real core uses pointer-free kind/parameter/info/ref records, separately charged cold headers/pages/directories/payloads and concrete source IDs. Source registration retains actual AST and copied numeral graph; deletion and forced teardown preserve source order with charged emergency continuation adapters. Actual expression arrays retain/release live AST nodes. Ref-vector backing charges12-byte capacity/size/initialized header plus scalar entries and old/new peaks; source8-byte bound is checked separately. See AST_CORE_PACKET.md for the exact67-file/52-group frozen scope and open whole-manager obligations.",
         "Concrete lexical inline16 argument buffers and charged overflow, owned AST/rational parameter scratch, nonowning quantifier binding outputs and owning hyper-resolution composite outputs preserve source ordering and completed failure prefixes. Frozen21-file/31-group integration uses committed AST core; see AST_PROOF_PORT_STATUS.md. Actual registered proof_checker and solver/interpolation consumers remain open.",
-        "Expression-array backing has real12-byte capacity/initialized header; copies full retained capacity on growth and only logical elements on copy_values. Source debug-only logical bounds preserve retained pointers and arbitrary-index nonroot SET. See AST_EXPR_ARRAY_RETAINED_STATUS.md."
+        "Expression-array backing has real12-byte capacity/initialized header; copies full retained capacity on growth and only logical elements on copy_values. Source debug-only logical bounds preserve retained pointers and arbitrary-index nonroot SET. See AST_EXPR_ARRAY_RETAINED_STATUS.md.",
+        "Real AST marks borrow manager with fully charged cold headers/inline16/backing/scope limits and source real ASTRefVector callbacks. Fast mark-before-push and ref INC-before-growth prefixes remain observable; ref reset clears all flags before ASC DEC. See AST_MARK_PORT_STATUS.md."
       ],
       "deviations": [
         "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
         "Private sort_size enum is encoded Go0=infinite/1=finite/2=very-big to match source default with Go zero value. Nonfinite size is canonical0 rather than source unspecified default bits. Size checks finite precondition in every Go profile instead of reading irrelevant/unspecified release fields. No source ENSURE tests are invented; tests exercise implementation SASSERT and real borrowed rational provenance/lifetime.",
         "Source pointer identities become owner/slot/generation tokens; physical owner/page/payload accounting replaces C++ ABI sizes. Invalid/dangling domains use typed guards. Source-undefined construction/deletion allocation exceptions have explicit ownership continuation adapters. Runtime debug_ref_count, conditional debug tags, TRACE/printer-backed diagnostics, trace constructors, remaining manager/plug-in operations and complete proof/checker/solver consumers remain open. Six quantifier updates use direct retained payload copies without intermediate Go slices; update-weight TRACE remains open. No Go generics are used.",
         "Selected builtin-unreachable, malformed downcast/index and dangling-owner boundaries return typed errors after source-completed prefixes. Hyper substitution outer growth precedes stable Go record allocation, an explicit charged representation adapter. TRACE/printer diagnostics remain open; no generic types or functions are used. Whole-unit audit flags remain false.",
-        "Expression-array never-initialized physical slots are guarded using charged initialized high-water metadata; retained freed tokens can be read before actual AST dereference rejects their generation. No new whole-unit completion claim."
+        "Expression-array never-initialized physical slots are guarded using charged initialized high-water metadata; retained freed tokens can be read before actual AST dereference rejects their generation. No new whole-unit completion claim.",
+        "Scalar owner identity replaces debug raw addresses. Typed physical/stale-owner guards and implicit owning-copy rejection are explicit Go adapters. Source ID marks survive deletion/reuse; sparse/shared-occurrence marks and other template specializations remain open. No generic Go code."
       ]
     },
     {
@@ -10329,6 +10375,11 @@
         "ast_expr_array_values.go",
         "ast_family.go",
         "ast_info.go",
+        "ast_mark.go",
+        "ast_mark_doc.go",
+        "ast_mark_fast.go",
+        "ast_mark_node.go",
+        "ast_mark_scoped.go",
         "ast_parameter.go",
         "ast_parameter_access.go",
         "ast_proof_manager.go",
@@ -10371,6 +10422,22 @@
         "TestASTExprArrayUninitializedAndFreedRetainedSlots",
         "TestASTFamilyDeclarationDomainOverloadUsesActualPlugin",
         "TestASTFuncDeclInfoPointerOverloadKeepsNullMetadata",
+        "TestASTMarkAllNodeKindsIndependentBitOracleAndWarmPlateau",
+        "TestASTMarkConstructorsAllFailurePrefixesImmediatePhysicalOwnership",
+        "TestASTMarkCopiedOwnersAndNilLifetimeGuards",
+        "TestASTMarkFastBothPlanesLevelsAndNonRetention",
+        "TestASTMarkFastGrowthPrefixInlineAndOwners",
+        "TestASTMarkFastPhysicalGrowthStaleBorrowAndEscapedCleanup",
+        "TestASTMarkHeaderRefusalPrecedesGoAllocation",
+        "TestASTMarkIDDomainsReuseAndReset",
+        "TestASTMarkLockedTraversalHelpers",
+        "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
+        "TestASTMarkRefFastActualAscendingReleaseAndWarmOperations",
+        "TestASTMarkRefFastCallbacksAndFailurePrefix",
+        "TestASTMarkScopedLimitOrderAndPartialPop",
+        "TestASTMarkScopedMarkFailureOrderingAndRetry",
+        "TestASTMarkScopedNestedScopesAndFlagRoute",
+        "TestASTMarkUnsignedWrapPhysicalContinuationGuard",
         "TestASTMetadataIgnoredFields",
         "TestASTModelValueNameInlineAndOverflowAccounting",
         "TestASTNamedNodeFieldsAndSortNullInfoPredicates",
@@ -11010,6 +11077,29 @@
             "TestASTProofUnitResolutionCountShortCircuit",
             "TestASTProofUnitResolutionLexicalScratchPeak"
           ]
+        },
+        {
+          "name": "concrete expression/declaration ID marks and fast/ref-fast/scoped marking specializations; other generic and diagnostic surfaces open",
+          "status": "partial",
+          "go_target": "ast_mark.go",
+          "tests": [
+            "TestASTMarkAllNodeKindsIndependentBitOracleAndWarmPlateau",
+            "TestASTMarkConstructorsAllFailurePrefixesImmediatePhysicalOwnership",
+            "TestASTMarkCopiedOwnersAndNilLifetimeGuards",
+            "TestASTMarkFastBothPlanesLevelsAndNonRetention",
+            "TestASTMarkFastGrowthPrefixInlineAndOwners",
+            "TestASTMarkFastPhysicalGrowthStaleBorrowAndEscapedCleanup",
+            "TestASTMarkHeaderRefusalPrecedesGoAllocation",
+            "TestASTMarkIDDomainsReuseAndReset",
+            "TestASTMarkLockedTraversalHelpers",
+            "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
+            "TestASTMarkRefFastActualAscendingReleaseAndWarmOperations",
+            "TestASTMarkRefFastCallbacksAndFailurePrefix",
+            "TestASTMarkScopedLimitOrderAndPartialPop",
+            "TestASTMarkScopedMarkFailureOrderingAndRetry",
+            "TestASTMarkScopedNestedScopesAndFlagRoute",
+            "TestASTMarkUnsignedWrapPhysicalContinuationGuard"
+          ]
         }
       ],
       "ownership": [
@@ -11017,14 +11107,16 @@
         "Standalone SortSize is a freely copied pointer-free scalar with no separate owner/header allocation. Conversion borrows actual RationalService/OwnedRational for source IsUint64 then Uint64 actions without reservation, retained owner or numeral copy; resulting scalar outlives the owner. Caller confines operand mutation/deletion across both calls. Display uses local20 digits and one caller-owned final string. Other AST/plugin algorithms remain open. See SORT_SIZE_PORT_STATUS.md.",
         "First real core uses pointer-free kind/parameter/info/ref records, separately charged cold headers/pages/directories/payloads and concrete source IDs. Source registration retains actual AST and copied numeral graph; deletion and forced teardown preserve source order with charged emergency continuation adapters. Actual expression arrays retain/release live AST nodes. Ref-vector backing charges12-byte capacity/size/initialized header plus scalar entries and old/new peaks; source8-byte bound is checked separately. See AST_CORE_PACKET.md for the exact67-file/52-group frozen scope and open whole-manager obligations.",
         "Concrete lexical inline16 argument buffers and charged overflow, owned AST/rational parameter scratch, nonowning quantifier binding outputs and owning hyper-resolution composite outputs preserve source ordering and completed failure prefixes. Frozen21-file/31-group integration uses committed AST core; see AST_PROOF_PORT_STATUS.md. Actual registered proof_checker and solver/interpolation consumers remain open.",
-        "Expression-array backing has real12-byte capacity/initialized header; copies full retained capacity on growth and only logical elements on copy_values. Source debug-only logical bounds preserve retained pointers and arbitrary-index nonroot SET. See AST_EXPR_ARRAY_RETAINED_STATUS.md."
+        "Expression-array backing has real12-byte capacity/initialized header; copies full retained capacity on growth and only logical elements on copy_values. Source debug-only logical bounds preserve retained pointers and arbitrary-index nonroot SET. See AST_EXPR_ARRAY_RETAINED_STATUS.md.",
+        "Real AST marks borrow manager with fully charged cold headers/inline16/backing/scope limits and source real ASTRefVector callbacks. Fast mark-before-push and ref INC-before-growth prefixes remain observable; ref reset clears all flags before ASC DEC. See AST_MARK_PORT_STATUS.md."
       ],
       "deviations": [
         "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
         "Private sort_size enum is encoded Go0=infinite/1=finite/2=very-big to match source default with Go zero value. Nonfinite size is canonical0 rather than source unspecified default bits. Size checks finite precondition in every Go profile instead of reading irrelevant/unspecified release fields. No source ENSURE tests are invented; tests exercise implementation SASSERT and real borrowed rational provenance/lifetime.",
         "Source pointer identities become owner/slot/generation tokens; physical owner/page/payload accounting replaces C++ ABI sizes. Invalid/dangling domains use typed guards. Source-undefined construction/deletion allocation exceptions have explicit ownership continuation adapters. Runtime debug_ref_count, conditional debug tags, TRACE/printer-backed diagnostics, trace constructors, remaining manager/plug-in operations and complete proof/checker/solver consumers remain open. Six quantifier updates use direct retained payload copies without intermediate Go slices; update-weight TRACE remains open. No Go generics are used.",
         "Selected builtin-unreachable, malformed downcast/index and dangling-owner boundaries return typed errors after source-completed prefixes. Hyper substitution outer growth precedes stable Go record allocation, an explicit charged representation adapter. TRACE/printer diagnostics remain open; no generic types or functions are used. Whole-unit audit flags remain false.",
-        "Expression-array never-initialized physical slots are guarded using charged initialized high-water metadata; retained freed tokens can be read before actual AST dereference rejects their generation. No new whole-unit completion claim."
+        "Expression-array never-initialized physical slots are guarded using charged initialized high-water metadata; retained freed tokens can be read before actual AST dereference rejects their generation. No new whole-unit completion claim.",
+        "Scalar owner identity replaces debug raw addresses. Typed physical/stale-owner guards and implicit owning-copy rejection are explicit Go adapters. Source ID marks survive deletion/reuse; sparse/shared-occurrence marks and other template specializations remain open. No generic Go code."
       ]
     },
     {
@@ -85860,15 +85952,36 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "ast_mark.go",
+        "ast_mark_doc.go",
+        "ast_mark_fast.go",
+        "ast_mark_node.go",
+        "ast_mark_scoped.go",
         "bitset/bit_vector.go"
       ],
       "tests": [
-        "TestSourceResizeCrash",
-        "TestSourceOr",
+        "TestASTMarkAllNodeKindsIndependentBitOracleAndWarmPlateau",
+        "TestASTMarkConstructorsAllFailurePrefixesImmediatePhysicalOwnership",
+        "TestASTMarkCopiedOwnersAndNilLifetimeGuards",
+        "TestASTMarkFastBothPlanesLevelsAndNonRetention",
+        "TestASTMarkFastGrowthPrefixInlineAndOwners",
+        "TestASTMarkFastPhysicalGrowthStaleBorrowAndEscapedCleanup",
+        "TestASTMarkHeaderRefusalPrecedesGoAllocation",
+        "TestASTMarkIDDomainsReuseAndReset",
+        "TestASTMarkLockedTraversalHelpers",
+        "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
+        "TestASTMarkRefFastActualAscendingReleaseAndWarmOperations",
+        "TestASTMarkRefFastCallbacksAndFailurePrefix",
+        "TestASTMarkScopedLimitOrderAndPartialPop",
+        "TestASTMarkScopedMarkFailureOrderingAndRetry",
+        "TestASTMarkScopedNestedScopesAndFlagRoute",
+        "TestASTMarkUnsignedWrapPhysicalContinuationGuard",
+        "TestBoundedOperationOracle",
         "TestSourceAnd",
-        "TestSourceReset",
         "TestSourceEq",
-        "TestBoundedOperationOracle"
+        "TestSourceOr",
+        "TestSourceReset",
+        "TestSourceResizeCrash"
       ],
       "conditionals": [
         {
@@ -85900,11 +86013,38 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [
-        "Vector owns word storage; Clone/Assign copy, Swap transfers, source growth and stale bits retained. Full audit and test mapping pending package report."
+      "methods": [
+        {
+          "name": "concrete expression/declaration ID marks and fast/ref-fast/scoped marking specializations; other generic and diagnostic surfaces open",
+          "status": "partial",
+          "go_target": "ast_mark.go",
+          "tests": [
+            "TestASTMarkAllNodeKindsIndependentBitOracleAndWarmPlateau",
+            "TestASTMarkConstructorsAllFailurePrefixesImmediatePhysicalOwnership",
+            "TestASTMarkCopiedOwnersAndNilLifetimeGuards",
+            "TestASTMarkFastBothPlanesLevelsAndNonRetention",
+            "TestASTMarkFastGrowthPrefixInlineAndOwners",
+            "TestASTMarkFastPhysicalGrowthStaleBorrowAndEscapedCleanup",
+            "TestASTMarkHeaderRefusalPrecedesGoAllocation",
+            "TestASTMarkIDDomainsReuseAndReset",
+            "TestASTMarkLockedTraversalHelpers",
+            "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
+            "TestASTMarkRefFastActualAscendingReleaseAndWarmOperations",
+            "TestASTMarkRefFastCallbacksAndFailurePrefix",
+            "TestASTMarkScopedLimitOrderAndPartialPop",
+            "TestASTMarkScopedMarkFailureOrderingAndRetry",
+            "TestASTMarkScopedNestedScopesAndFlagRoute",
+            "TestASTMarkUnsignedWrapPhysicalContinuationGuard"
+          ]
+        }
       ],
-      "deviations": []
+      "ownership": [
+        "Vector owns word storage; Clone/Assign copy, Swap transfers, source growth and stale bits retained. Full audit and test mapping pending package report.",
+        "Real AST marks borrow manager with fully charged cold headers/inline16/backing/scope limits and source real ASTRefVector callbacks. Fast mark-before-push and ref INC-before-growth prefixes remain observable; ref reset clears all flags before ASC DEC. See AST_MARK_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Scalar owner identity replaces debug raw addresses. Typed physical/stale-owner guards and implicit owning-copy rejection are explicit Go adapters. Source ID marks survive deletion/reuse; sparse/shared-occurrence marks and other template specializations remain open. No generic Go code."
+      ]
     },
     {
       "path": "src/util/bit_vector.h",
@@ -85913,15 +86053,36 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "ast_mark.go",
+        "ast_mark_doc.go",
+        "ast_mark_fast.go",
+        "ast_mark_node.go",
+        "ast_mark_scoped.go",
         "bitset/bit_vector.go"
       ],
       "tests": [
-        "TestSourceResizeCrash",
-        "TestSourceOr",
+        "TestASTMarkAllNodeKindsIndependentBitOracleAndWarmPlateau",
+        "TestASTMarkConstructorsAllFailurePrefixesImmediatePhysicalOwnership",
+        "TestASTMarkCopiedOwnersAndNilLifetimeGuards",
+        "TestASTMarkFastBothPlanesLevelsAndNonRetention",
+        "TestASTMarkFastGrowthPrefixInlineAndOwners",
+        "TestASTMarkFastPhysicalGrowthStaleBorrowAndEscapedCleanup",
+        "TestASTMarkHeaderRefusalPrecedesGoAllocation",
+        "TestASTMarkIDDomainsReuseAndReset",
+        "TestASTMarkLockedTraversalHelpers",
+        "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
+        "TestASTMarkRefFastActualAscendingReleaseAndWarmOperations",
+        "TestASTMarkRefFastCallbacksAndFailurePrefix",
+        "TestASTMarkScopedLimitOrderAndPartialPop",
+        "TestASTMarkScopedMarkFailureOrderingAndRetry",
+        "TestASTMarkScopedNestedScopesAndFlagRoute",
+        "TestASTMarkUnsignedWrapPhysicalContinuationGuard",
+        "TestBoundedOperationOracle",
         "TestSourceAnd",
-        "TestSourceReset",
         "TestSourceEq",
-        "TestBoundedOperationOracle"
+        "TestSourceOr",
+        "TestSourceReset",
+        "TestSourceResizeCrash"
       ],
       "conditionals": [
         {
@@ -85973,11 +86134,38 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [
-        "Vector owns word storage; Clone/Assign copy, Swap transfers, source growth and stale bits retained. Full audit and test mapping pending package report."
+      "methods": [
+        {
+          "name": "concrete expression/declaration ID marks and fast/ref-fast/scoped marking specializations; other generic and diagnostic surfaces open",
+          "status": "partial",
+          "go_target": "ast_mark.go",
+          "tests": [
+            "TestASTMarkAllNodeKindsIndependentBitOracleAndWarmPlateau",
+            "TestASTMarkConstructorsAllFailurePrefixesImmediatePhysicalOwnership",
+            "TestASTMarkCopiedOwnersAndNilLifetimeGuards",
+            "TestASTMarkFastBothPlanesLevelsAndNonRetention",
+            "TestASTMarkFastGrowthPrefixInlineAndOwners",
+            "TestASTMarkFastPhysicalGrowthStaleBorrowAndEscapedCleanup",
+            "TestASTMarkHeaderRefusalPrecedesGoAllocation",
+            "TestASTMarkIDDomainsReuseAndReset",
+            "TestASTMarkLockedTraversalHelpers",
+            "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
+            "TestASTMarkRefFastActualAscendingReleaseAndWarmOperations",
+            "TestASTMarkRefFastCallbacksAndFailurePrefix",
+            "TestASTMarkScopedLimitOrderAndPartialPop",
+            "TestASTMarkScopedMarkFailureOrderingAndRetry",
+            "TestASTMarkScopedNestedScopesAndFlagRoute",
+            "TestASTMarkUnsignedWrapPhysicalContinuationGuard"
+          ]
+        }
       ],
-      "deviations": []
+      "ownership": [
+        "Vector owns word storage; Clone/Assign copy, Swap transfers, source growth and stale bits retained. Full audit and test mapping pending package report.",
+        "Real AST marks borrow manager with fully charged cold headers/inline16/backing/scope limits and source real ASTRefVector callbacks. Fast mark-before-push and ref INC-before-growth prefixes remain observable; ref reset clears all flags before ASC DEC. See AST_MARK_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Scalar owner identity replaces debug raw addresses. Typed physical/stale-owner guards and implicit owning-copy rejection are explicit Go adapters. Source ID marks survive deletion/reuse; sparse/shared-occurrence marks and other template specializations remain open. No generic Go code."
+      ]
     },
     {
       "path": "src/util/buffer.h",
@@ -104605,9 +104793,32 @@
       "sha256": "20e68e0ea32506068ac87ee817600d625a301d907b86fa7658003c87cb2a7464",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "ast_mark.go",
+        "ast_mark_doc.go",
+        "ast_mark_fast.go",
+        "ast_mark_node.go",
+        "ast_mark_scoped.go"
+      ],
+      "tests": [
+        "TestASTMarkAllNodeKindsIndependentBitOracleAndWarmPlateau",
+        "TestASTMarkConstructorsAllFailurePrefixesImmediatePhysicalOwnership",
+        "TestASTMarkCopiedOwnersAndNilLifetimeGuards",
+        "TestASTMarkFastBothPlanesLevelsAndNonRetention",
+        "TestASTMarkFastGrowthPrefixInlineAndOwners",
+        "TestASTMarkFastPhysicalGrowthStaleBorrowAndEscapedCleanup",
+        "TestASTMarkHeaderRefusalPrecedesGoAllocation",
+        "TestASTMarkIDDomainsReuseAndReset",
+        "TestASTMarkLockedTraversalHelpers",
+        "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
+        "TestASTMarkRefFastActualAscendingReleaseAndWarmOperations",
+        "TestASTMarkRefFastCallbacksAndFailurePrefix",
+        "TestASTMarkScopedLimitOrderAndPartialPop",
+        "TestASTMarkScopedMarkFailureOrderingAndRetry",
+        "TestASTMarkScopedNestedScopesAndFlagRoute",
+        "TestASTMarkUnsignedWrapPhysicalContinuationGuard"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -104620,9 +104831,37 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "concrete expression/declaration ID marks and fast/ref-fast/scoped marking specializations; other generic and diagnostic surfaces open",
+          "status": "partial",
+          "go_target": "ast_mark.go",
+          "tests": [
+            "TestASTMarkAllNodeKindsIndependentBitOracleAndWarmPlateau",
+            "TestASTMarkConstructorsAllFailurePrefixesImmediatePhysicalOwnership",
+            "TestASTMarkCopiedOwnersAndNilLifetimeGuards",
+            "TestASTMarkFastBothPlanesLevelsAndNonRetention",
+            "TestASTMarkFastGrowthPrefixInlineAndOwners",
+            "TestASTMarkFastPhysicalGrowthStaleBorrowAndEscapedCleanup",
+            "TestASTMarkHeaderRefusalPrecedesGoAllocation",
+            "TestASTMarkIDDomainsReuseAndReset",
+            "TestASTMarkLockedTraversalHelpers",
+            "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
+            "TestASTMarkRefFastActualAscendingReleaseAndWarmOperations",
+            "TestASTMarkRefFastCallbacksAndFailurePrefix",
+            "TestASTMarkScopedLimitOrderAndPartialPop",
+            "TestASTMarkScopedMarkFailureOrderingAndRetry",
+            "TestASTMarkScopedNestedScopesAndFlagRoute",
+            "TestASTMarkUnsignedWrapPhysicalContinuationGuard"
+          ]
+        }
+      ],
+      "ownership": [
+        "Real AST marks borrow manager with fully charged cold headers/inline16/backing/scope limits and source real ASTRefVector callbacks. Fast mark-before-push and ref INC-before-growth prefixes remain observable; ref reset clears all flags before ASC DEC. See AST_MARK_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Scalar owner identity replaces debug raw addresses. Typed physical/stale-owner guards and implicit owning-copy rejection are explicit Go adapters. Source ID marks survive deletion/reuse; sparse/shared-occurrence marks and other template specializations remain open. No generic Go code."
+      ]
     },
     {
       "path": "src/util/obj_pair_hashtable.h",
