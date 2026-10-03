@@ -88,21 +88,21 @@ func (m *UPolynomialManager) values(s *upolyVectorState) []Int {
 	if s.backing == 0 {
 		return nil
 	}
-	return m.backings[s.backing-1].values
+	return m.store.backings[s.backing-1].values
 }
 func (m *UPolynomialManager) backingSlot() (uint32, error) {
-	for i := range m.backings {
-		b := &m.backings[i]
+	for i := range m.store.backings {
+		b := &m.store.backings[i]
 		if !b.live && b.generation != math.MaxUint32 {
 			return uint32(i + 1), nil
 		}
 	}
-	if uint64(len(m.backings)) >= math.MaxUint32 {
+	if uint64(len(m.store.backings)) >= math.MaxUint32 {
 		return 0, arena.ErrSlotLimit
 	}
-	if len(m.backings) == cap(m.backings) {
+	if len(m.store.backings) == cap(m.store.backings) {
 		stride := uint64(reflect.TypeOf(upolyBacking{}).Size())
-		next, bytes, e := upolyDirectoryNext(uint64(cap(m.backings)), stride, uint64(int(^uint(0)>>1)))
+		next, bytes, e := upolyDirectoryNext(uint64(cap(m.store.backings)), stride, uint64(int(^uint(0)>>1)))
 		if e != nil {
 			return 0, e
 		}
@@ -110,13 +110,13 @@ func (m *UPolynomialManager) backingSlot() (uint32, error) {
 		if e := m.config.Integer.budget.Reserve(bytes); e != nil {
 			return 0, e
 		}
-		a := make([]upolyBacking, len(m.backings), n)
-		copy(a, m.backings)
-		m.config.Integer.budget.Release(uint64(cap(m.backings)) * stride)
-		m.backings = a
+		a := make([]upolyBacking, len(m.store.backings), n)
+		copy(a, m.store.backings)
+		m.config.Integer.budget.Release(uint64(cap(m.store.backings)) * stride)
+		m.store.backings = a
 	}
-	m.backings = append(m.backings, upolyBacking{generation: 1})
-	return uint32(len(m.backings)), nil
+	m.store.backings = append(m.store.backings, upolyBacking{generation: 1})
+	return uint32(len(m.store.backings)), nil
 }
 func (m *UPolynomialManager) grow(s *upolyVectorState) error {
 	n, bytes, e := upolyNextCapacity(uint64(s.capacity), uint64(reflect.TypeOf(Int{}).Size()), uint64(int(^uint(0)>>1)))
@@ -135,7 +135,7 @@ func (m *UPolynomialManager) grow(s *upolyVectorState) error {
 	// Source nontrivial growth publishes the new data binding before the
 	// ascending move loop; capacity publishes only after old storage deletion.
 	oldSlot, oldCap := s.backing, s.capacity
-	b := &m.backings[slot-1]
+	b := &m.store.backings[slot-1]
 	b.values = a
 	b.live = true
 	s.backing = slot
@@ -147,7 +147,7 @@ func (m *UPolynomialManager) grow(s *upolyVectorState) error {
 	s.initialized = s.size
 	b.initialized = s.size
 	if oldSlot != 0 {
-		oldB := &m.backings[oldSlot-1]
+		oldB := &m.store.backings[oldSlot-1]
 		oldB.values = nil
 		oldB.live = false
 		if oldB.generation != math.MaxUint32 {
@@ -172,8 +172,8 @@ func (m *UPolynomialManager) reserve(s *upolyVectorState, n uint32) error {
 	a := m.values(s)
 	for i := old; i < n; i++ {
 		a[i] = Int{}
-		if i+1 > m.backings[s.backing-1].initialized {
-			m.backings[s.backing-1].initialized = i + 1
+		if i+1 > m.store.backings[s.backing-1].initialized {
+			m.store.backings[s.backing-1].initialized = i + 1
 		}
 	}
 	if n > s.initialized {
@@ -183,7 +183,7 @@ func (m *UPolynomialManager) reserve(s *upolyVectorState, n uint32) error {
 }
 func (m *UPolynomialManager) freeBacking(s *upolyVectorState) {
 	if s.backing != 0 {
-		b := &m.backings[s.backing-1]
+		b := &m.store.backings[s.backing-1]
 		b.values = nil
 		b.live = false
 		if b.generation != math.MaxUint32 {
@@ -325,7 +325,7 @@ func (m *UPolynomialManager) View(p UPolynomial, start, count uint32) (UPolynomi
 	if uint64(start)+uint64(count) > uint64(s.size) {
 		return UPolynomialView{}, arena.ErrBounds
 	}
-	return UPolynomialView{m.origin, s.backing, s.generation, start, count}, nil
+	return UPolynomialView{m.store.origin, s.backing, s.generation, start, count}, nil
 }
 func (m *UPolynomialManager) ReadView(v UPolynomialView, index uint32, out *Int) error {
 	a, e := m.read(v, index)
@@ -387,19 +387,19 @@ func (m *UPolynomialManager) SetView(p UPolynomial, v UPolynomialView) error {
 	return m.setView(&d.state, v)
 }
 func (m *UPolynomialManager) alias(v UPolynomialView, s *upolyVectorState) bool {
-	return s.backing != 0 && v.backing == s.backing && v.generation == s.generation && v.start == 0 && v.origin == m.origin
+	return s.backing != 0 && v.backing == s.backing && v.generation == s.generation && v.start == 0 && v.origin == m.store.origin
 }
 func (m *UPolynomialManager) stateView(s *upolyVectorState) UPolynomialView {
-	return UPolynomialView{m.origin, s.backing, s.generation, 0, s.size}
+	return UPolynomialView{m.store.origin, s.backing, s.generation, 0, s.size}
 }
 func (m *UPolynomialManager) read(v UPolynomialView, index uint32) (*Int, error) {
 	if e := m.check(); e != nil {
 		return nil, e
 	}
-	if v.origin != m.origin || v.backing == 0 || uint64(v.backing) > uint64(len(m.backings)) {
+	if v.origin != m.store.origin || v.backing == 0 || uint64(v.backing) > uint64(len(m.store.backings)) {
 		return nil, ErrUPolynomialOwner
 	}
-	b := &m.backings[v.backing-1]
+	b := &m.store.backings[v.backing-1]
 	if !b.live || b.generation != v.generation {
 		return nil, ErrUPolynomialOwner
 	}

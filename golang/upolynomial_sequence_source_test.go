@@ -408,7 +408,7 @@ func TestUPolynomialSequenceSelfGrowthCloseAndAscendingBigReset(t *testing.T) {
 	// numeric ownership, call an implementation cleanup helper or mutate state.
 	state := reflect.ValueOf(seq).Elem().FieldByName("state").FieldByName("coefficients")
 	backing := state.FieldByName("backing").Uint()
-	values := reflect.ValueOf(m).Elem().FieldByName("backings").Index(int(backing - 1)).FieldByName("values")
+	values := reflect.ValueOf(m).Elem().FieldByName("store").Elem().FieldByName("backings").Index(int(backing - 1)).FieldByName("values")
 	slots := [3]uint32{}
 	for i := range slots {
 		slots[i] = uint32(values.Index(i).FieldByName("cell").Uint())

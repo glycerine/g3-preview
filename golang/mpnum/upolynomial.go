@@ -35,7 +35,7 @@ type UPolynomialManager struct {
 	sqf1, sqf2, pw                               upolyVectorState
 	db, dbab1, dbab2, tr, push                   upolyVectorState
 	pages                                        []*upolyDescriptorPage
-	backings                                     []upolyBacking
+	store                                        *UPolynomialCoefficientStore
 	live                                         uint32
 	liveSequences                                uint32
 	header                                       uint64
@@ -43,6 +43,9 @@ type UPolynomialManager struct {
 }
 
 func NewUPolynomialManager(c UPolynomialConfig) (*UPolynomialManager, error) {
+	return newUPolynomialManager(c, nil)
+}
+func newUPolynomialManager(c UPolynomialConfig, store *UPolynomialCoefficientStore) (*UPolynomialManager, error) {
 	if c.Integer == nil || c.Checkpoint == nil || c.Cooperation == nil {
 		return nil, arena.ErrConfig
 	}
@@ -71,7 +74,17 @@ func NewUPolynomialManager(c UPolynomialConfig) (*UPolynomialManager, error) {
 			break
 		}
 	}
-	m := &UPolynomialManager{origin: id, config: c, modular: z, header: n}
+	if store == nil {
+		store, e = newUPolynomialCoefficientStore(c.Integer, id)
+	} else {
+		e = store.retain()
+	}
+	if e != nil {
+		z.Close()
+		c.Integer.budget.Release(n)
+		return nil, e
+	}
+	m := &UPolynomialManager{origin: id, config: c, modular: z, header: n, store: store}
 	m.self = m
 	return m, nil
 }
@@ -209,10 +222,10 @@ func (m *UPolynomialManager) Close() error {
 	b := m.config.Integer.budget
 	b.Release(uint64(len(m.pages)) * uint64(reflect.TypeOf(upolyDescriptorPage{}).Size()))
 	b.Release(uint64(cap(m.pages)) * uint64(reflect.TypeOf((*upolyDescriptorPage)(nil)).Size()))
-	b.Release(uint64(cap(m.backings)) * uint64(reflect.TypeOf(upolyBacking{}).Size()))
+	m.store.release()
 	b.Release(m.header)
 	m.pages = nil
-	m.backings = nil
+
 	m.closed = true
 	return nil
 }

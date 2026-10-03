@@ -50,6 +50,8 @@ func (m *UPolynomialManager) borrowedModulus() (*Int, error) {
 }
 
 type UPolynomialStats struct {
+	StoreOwnerBytes                                                                                                                           uint64
+	ExclusiveBytes, SharedStoreBytes                                                                                                          uint64
 	OwnerBytes, DirectoryBytes, PageBytes, BackingBytes, ModularBytes, TotalBytes                                                             uint64
 	IntegerCellSlots, IntegerLiveCells, IntegerRetiredCells, IntegerWordsRefs, IntegerNaturalWordsRefs, IntegerCachedCells, OwnedNumeralCells uint32
 	LivePolynomials, LiveBackings                                                                                                             uint32
@@ -62,16 +64,19 @@ func (m *UPolynomialManager) Stats() UPolynomialStats {
 		return UPolynomialStats{}
 	}
 	s := UPolynomialStats{OwnerBytes: m.header, LivePolynomials: m.live, ModularBytes: m.modular.OwnerBytes()}
-	s.DirectoryBytes = uint64(cap(m.pages))*uint64(reflect.TypeOf((*upolyDescriptorPage)(nil)).Size()) + uint64(cap(m.backings))*uint64(reflect.TypeOf(upolyBacking{}).Size())
+	s.DirectoryBytes = uint64(cap(m.pages))*uint64(reflect.TypeOf((*upolyDescriptorPage)(nil)).Size()) + uint64(cap(m.store.backings))*uint64(reflect.TypeOf(upolyBacking{}).Size())
 	s.PageBytes = uint64(len(m.pages)) * uint64(reflect.TypeOf(upolyDescriptorPage{}).Size())
-	for i := range m.backings {
-		b := &m.backings[i]
+	for i := range m.store.backings {
+		b := &m.store.backings[i]
 		if b.live {
 			s.LiveBackings++
 			s.BackingBytes += uint64(cap(b.values)) * uint64(reflect.TypeOf(Int{}).Size())
 		}
 	}
-	s.TotalBytes = s.OwnerBytes + s.DirectoryBytes + s.PageBytes + s.BackingBytes + s.ModularBytes
+	s.StoreOwnerBytes = m.store.header
+	s.TotalBytes = s.OwnerBytes + s.StoreOwnerBytes + s.DirectoryBytes + s.PageBytes + s.BackingBytes + s.ModularBytes
+	s.SharedStoreBytes = m.store.header + uint64(cap(m.store.backings))*uint64(reflect.TypeOf(upolyBacking{}).Size()) + s.BackingBytes
+	s.ExclusiveBytes = s.TotalBytes - s.SharedStoreBytes
 	z := m.config.Integer
 	s.IntegerLiveCells = z.cells.Stats().Live
 	s.IntegerCellSlots = z.cells.Stats().Slots

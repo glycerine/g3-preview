@@ -343,7 +343,7 @@ func TestUPolynomialViewOverloadsAndModularShape(t *testing.T) {
 		t.Fatal(e)
 	}
 	stats := m.Stats()
-	if stats.LivePolynomials != 3 || stats.LiveBackings == 0 || stats.OwnerBytes == 0 || stats.TotalBytes != stats.OwnerBytes+stats.DirectoryBytes+stats.PageBytes+stats.BackingBytes+stats.ModularBytes {
+	if stats.LivePolynomials != 3 || stats.LiveBackings == 0 || stats.OwnerBytes == 0 || stats.TotalBytes != stats.OwnerBytes+stats.StoreOwnerBytes+stats.DirectoryBytes+stats.PageBytes+stats.BackingBytes+stats.ModularBytes {
 		t.Fatal(stats)
 	}
 }
@@ -837,7 +837,7 @@ func TestUPolynomialSourceLifecycleAndNumericDestructionOrder(t *testing.T) {
 	if pwBacking == 0 {
 		t.Fatal("source power scratch lost old output")
 	}
-	lastSlot := uint32(record.FieldByName("backings").Index(int(pwBacking - 1)).FieldByName("values").Index(0).FieldByName("cell").Uint())
+	lastSlot := uint32(record.FieldByName("store").Elem().FieldByName("backings").Index(int(pwBacking - 1)).FieldByName("values").Index(0).FieldByName("cell").Uint())
 	if lastSlot == 0 {
 		t.Fatal("power scratch must own actual big numeral")
 	}

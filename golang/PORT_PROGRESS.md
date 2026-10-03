@@ -1436,3 +1436,20 @@ suppress a source refusal. See MEMORY_PACKAGE_API_PACKET.md for frozen evidence.
 Actual default MPZ/natural storage integration, generated/global memory lifecycle
 and full solver/proof/interpolation remain required. No whole source unit is
 promoted.
+
+
+## Shared polynomial coefficient storage
+
+Related polynomial cores now retain one concrete charged coefficient store,
+while descriptors, modular state and scratch remain separately owned. Tests
+first expose missing cross-core views and extended-GCD provenance, then verify
+constructor refusal, parent/child cleanup, stale views and the once-only physical
+cohort graph. Existing source tests retain their assertions with the new cold
+store header included. See UPOLYNOMIAL_FACTORIZATION_PACKET.md for evidence.
+Prime generation, factorization, multivariate/algebraic consumers and the full
+solver/proof/interpolation objective remain required. No whole unit is promoted.
+
+Independent frozen parent verification passed full native/debug suites, exact86
+polynomial race/actual-JS RUN/PASS groups, vet, WASI build/test compilation and
+source/evidence/no-generics audit. Unrelated API-absence drafts were excluded
+from that snapshot; this does not claim the live draft worktree is green.

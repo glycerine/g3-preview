@@ -30680,7 +30680,11 @@
         "upolynomial_isolation_source_test.go",
         "upolynomial_refinement_source_test.go",
         "upolynomial_isolation_model_test.go",
-        "mpnum/upolynomial_isolation_storage_test.go"
+        "mpnum/upolynomial_isolation_storage_test.go",
+        "mpnum/upolynomial_coefficient_store.go",
+        "mpnum/upolynomial_coefficient_store_test.go",
+        "upolynomial_coefficient_store_source_test.go",
+        "upolynomial_coefficient_store_lifetime_test.go"
       ],
       "tests": [
         "TestUPolynomialScalarExtentAndLayout",
@@ -30759,7 +30763,16 @@
         "TestUPolynomialIsolationZeroResetPublicationBeforeRefusal",
         "TestUPolynomialIsolationPackedFrameAndScalarExtents",
         "TestUPolynomialBinaryVectorActualAscendingDestruction",
-        "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
+        "TestUPolynomialIsolationSSPopAndDestructorActualOrder",
+        "TestUPolynomialStoreRelatedConstructorFailureUnwinds",
+        "TestUPolynomialStoreCopiedClosedGuardsAndDistinctOrdinary",
+        "TestUPolynomialStoreGrowthGenerationAndRealCloseGuards",
+        "TestUPolynomialStoreSingleChargeCohortGraph",
+        "TestUPolynomialStoreRelatedExtendedGCDIntermediateProvenance",
+        "TestUPolynomialStoreBigChildRootsSurviveParentClose",
+        "TestUPolynomialRelatedCoreActualCrossCoreReadAndMode",
+        "TestUPolynomialRelatedCoreStoreLifetimeAndScalarBorrow",
+        "TestUPolynomialCoefficientStoreCounterAndColdLayout"
       ],
       "conditionals": [
         {
@@ -31679,20 +31692,45 @@
             "TestUPolynomialBinaryVectorActualAscendingDestruction",
             "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
           ]
+        },
+        {
+          "name": "Related polynomial cores share physical coefficient buffers; constructor refusal, lifetime and source EGCD view provenance",
+          "status": "partial",
+          "go_target": "upolynomial_coefficient_store_lifetime_test.go",
+          "tests": [
+            "TestUPolynomialStoreRelatedConstructorFailureUnwinds",
+            "TestUPolynomialStoreCopiedClosedGuardsAndDistinctOrdinary",
+            "TestUPolynomialStoreGrowthGenerationAndRealCloseGuards",
+            "TestUPolynomialStoreSingleChargeCohortGraph",
+            "TestUPolynomialStoreRelatedExtendedGCDIntermediateProvenance",
+            "TestUPolynomialStoreBigChildRootsSurviveParentClose",
+            "TestUPolynomialRelatedCoreActualCrossCoreReadAndMode",
+            "TestUPolynomialRelatedCoreStoreLifetimeAndScalarBorrow"
+          ]
+        },
+        {
+          "name": "Charged concrete shared coefficient store, retain bound and cold layout",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_coefficient_store.go",
+          "tests": [
+            "TestUPolynomialCoefficientStoreCounterAndColdLayout"
+          ]
         }
       ],
       "ownership": [
         "Actual Int coefficient arrays with concrete scalar descriptor pages/backing origins, all twenty-one scratch vectors and real modular child. Physical views guard at actual dereferences and follow swaps; old/new growth and immediate numeric roots are charged. See UPOLYNOMIAL_PORT_STATUS.md.",
         "Real source content/division/GCD scratch, lexical scoped numerals/vectors, modular restoration, retained failure prefixes and actual numeric-root checks; see UPOLYNOMIAL_GCD_PORT_STATUS.md.",
         "Actual flat coefficient storage plus two independent unsigned metadata vectors, partial row publication, source read timing, charged cold owner and manager Close guard. See UPOLYNOMIAL_STURM_PACKET.md; lexical numeral/vector cleanup is an explicit Go error adapter.",
-        "Isolation uses charged concrete binary output vectors and lexical coefficient/frame backings; actual initialized extents and source ascending/reverse destruction orders are retained. Refusal/cancellation tests audit real output and manager cells/Words before fault disabling. See UPOLYNOMIAL_ROOT_ISOLATION_PACKET.md; allocator/backend integration remains open."
+        "Isolation uses charged concrete binary output vectors and lexical coefficient/frame backings; actual initialized extents and source ascending/reverse destruction orders are retained. Refusal/cancellation tests audit real output and manager cells/Words before fault disabling. See UPOLYNOMIAL_ROOT_ISOLATION_PACKET.md; allocator/backend integration remains open.",
+        "Related cores retain one charged concrete coefficient store and borrowed IntegerManager. Descriptors and twenty-one scratch vectors remain core-owned; closing a parent releases its scratch without destroying child buffers. Sum core ExclusiveBytes and one store TotalBytes. See UPOLYNOMIAL_FACTORIZATION_PACKET.md."
       ],
       "deviations": [
         "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full isolation/refinement/conversion/factorization/algebraic and printers remain open; input conversion adapters do not establish complete registered tests.",
         "Registered tests retain explicit dense input conversion adapters. Unported multivariate conversion, root isolation/refinement/factorization and remaining registered test actions keep each complete source unit partial. Explicit cleanup on Go errors preserves rooted completed prefixes; it does not claim native C++ exception continuation.",
         "WithCount copies the raw source pointer/size binding without dereference; indexed array GCD preserves early-one skipping and later content-copy failure publication. Late CRA sweep exercises actual post-append reservations, not virtual fault callbacks.",
         "Selected sequence/Sturm/transform/Descartes/bounds algorithms translated. RowView binds source coeffs(i) plus size(i); source unsigned header8 is extent arithmetic while actual Go metadata arrays charge4*capacity and slice fields are in the charged cold owner. Source printers, full root isolation/refinement, multivariate conversion, factorization and algebraic consumers remain open; source units remain partial.",
-        "Owning reads and checked scalar lifetimes are Go adapters. Full-capacity guard rejects undersized source wrapped allocations after separate literal uint32 growth checks; raw allocation/header publication for that undefined domain is not represented. Multivariate conversion, factorization, algebraic consumers, full printers/TRACE and nonselected alternatives remain open."
+        "Owning reads and checked scalar lifetimes are Go adapters. Full-capacity guard rejects undersized source wrapped allocations after separate literal uint32 growth checks; raw allocation/header publication for that undefined domain is not represented. Multivariate conversion, factorization, algebraic consumers, full printers/TRACE and nonselected alternatives remain open.",
+        "Shared coefficient directory is a charged Go lifetime adapter for actual source buffers, without copying coefficients between related cores. Independent pools remain distinct. Prime/factor algorithms and multivariate conversion remain unported in this chunk."
       ]
     },
     {
@@ -31733,7 +31771,11 @@
         "upolynomial_isolation_source_test.go",
         "upolynomial_refinement_source_test.go",
         "upolynomial_isolation_model_test.go",
-        "mpnum/upolynomial_isolation_storage_test.go"
+        "mpnum/upolynomial_isolation_storage_test.go",
+        "mpnum/upolynomial_coefficient_store.go",
+        "mpnum/upolynomial_coefficient_store_test.go",
+        "upolynomial_coefficient_store_source_test.go",
+        "upolynomial_coefficient_store_lifetime_test.go"
       ],
       "tests": [
         "TestUPolynomialScalarExtentAndLayout",
@@ -31812,7 +31854,16 @@
         "TestUPolynomialIsolationZeroResetPublicationBeforeRefusal",
         "TestUPolynomialIsolationPackedFrameAndScalarExtents",
         "TestUPolynomialBinaryVectorActualAscendingDestruction",
-        "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
+        "TestUPolynomialIsolationSSPopAndDestructorActualOrder",
+        "TestUPolynomialStoreRelatedConstructorFailureUnwinds",
+        "TestUPolynomialStoreCopiedClosedGuardsAndDistinctOrdinary",
+        "TestUPolynomialStoreGrowthGenerationAndRealCloseGuards",
+        "TestUPolynomialStoreSingleChargeCohortGraph",
+        "TestUPolynomialStoreRelatedExtendedGCDIntermediateProvenance",
+        "TestUPolynomialStoreBigChildRootsSurviveParentClose",
+        "TestUPolynomialRelatedCoreActualCrossCoreReadAndMode",
+        "TestUPolynomialRelatedCoreStoreLifetimeAndScalarBorrow",
+        "TestUPolynomialCoefficientStoreCounterAndColdLayout"
       ],
       "conditionals": [
         {
@@ -32172,20 +32223,45 @@
             "TestUPolynomialBinaryVectorActualAscendingDestruction",
             "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
           ]
+        },
+        {
+          "name": "Related polynomial cores share physical coefficient buffers; constructor refusal, lifetime and source EGCD view provenance",
+          "status": "partial",
+          "go_target": "upolynomial_coefficient_store_lifetime_test.go",
+          "tests": [
+            "TestUPolynomialStoreRelatedConstructorFailureUnwinds",
+            "TestUPolynomialStoreCopiedClosedGuardsAndDistinctOrdinary",
+            "TestUPolynomialStoreGrowthGenerationAndRealCloseGuards",
+            "TestUPolynomialStoreSingleChargeCohortGraph",
+            "TestUPolynomialStoreRelatedExtendedGCDIntermediateProvenance",
+            "TestUPolynomialStoreBigChildRootsSurviveParentClose",
+            "TestUPolynomialRelatedCoreActualCrossCoreReadAndMode",
+            "TestUPolynomialRelatedCoreStoreLifetimeAndScalarBorrow"
+          ]
+        },
+        {
+          "name": "Charged concrete shared coefficient store, retain bound and cold layout",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_coefficient_store.go",
+          "tests": [
+            "TestUPolynomialCoefficientStoreCounterAndColdLayout"
+          ]
         }
       ],
       "ownership": [
         "Actual Int coefficient arrays with concrete scalar descriptor pages/backing origins, all twenty-one scratch vectors and real modular child. Physical views guard at actual dereferences and follow swaps; old/new growth and immediate numeric roots are charged. See UPOLYNOMIAL_PORT_STATUS.md.",
         "Real source content/division/GCD scratch, lexical scoped numerals/vectors, modular restoration, retained failure prefixes and actual numeric-root checks; see UPOLYNOMIAL_GCD_PORT_STATUS.md.",
         "Actual flat coefficient storage plus two independent unsigned metadata vectors, partial row publication, source read timing, charged cold owner and manager Close guard. See UPOLYNOMIAL_STURM_PACKET.md; lexical numeral/vector cleanup is an explicit Go error adapter.",
-        "Isolation uses charged concrete binary output vectors and lexical coefficient/frame backings; actual initialized extents and source ascending/reverse destruction orders are retained. Refusal/cancellation tests audit real output and manager cells/Words before fault disabling. See UPOLYNOMIAL_ROOT_ISOLATION_PACKET.md; allocator/backend integration remains open."
+        "Isolation uses charged concrete binary output vectors and lexical coefficient/frame backings; actual initialized extents and source ascending/reverse destruction orders are retained. Refusal/cancellation tests audit real output and manager cells/Words before fault disabling. See UPOLYNOMIAL_ROOT_ISOLATION_PACKET.md; allocator/backend integration remains open.",
+        "Related cores retain one charged concrete coefficient store and borrowed IntegerManager. Descriptors and twenty-one scratch vectors remain core-owned; closing a parent releases its scratch without destroying child buffers. Sum core ExclusiveBytes and one store TotalBytes. See UPOLYNOMIAL_FACTORIZATION_PACKET.md."
       ],
       "deviations": [
         "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full isolation/refinement/conversion/factorization/algebraic and printers remain open; input conversion adapters do not establish complete registered tests.",
         "Registered tests retain explicit dense input conversion adapters. Unported multivariate conversion, root isolation/refinement/factorization and remaining registered test actions keep each complete source unit partial. Explicit cleanup on Go errors preserves rooted completed prefixes; it does not claim native C++ exception continuation.",
         "WithCount copies the raw source pointer/size binding without dereference; indexed array GCD preserves early-one skipping and later content-copy failure publication. Late CRA sweep exercises actual post-append reservations, not virtual fault callbacks.",
         "Selected sequence/Sturm/transform/Descartes/bounds algorithms translated. RowView binds source coeffs(i) plus size(i); source unsigned header8 is extent arithmetic while actual Go metadata arrays charge4*capacity and slice fields are in the charged cold owner. Source printers, full root isolation/refinement, multivariate conversion, factorization and algebraic consumers remain open; source units remain partial.",
-        "Owning reads and checked scalar lifetimes are Go adapters. Full-capacity guard rejects undersized source wrapped allocations after separate literal uint32 growth checks; raw allocation/header publication for that undefined domain is not represented. Multivariate conversion, factorization, algebraic consumers, full printers/TRACE and nonselected alternatives remain open."
+        "Owning reads and checked scalar lifetimes are Go adapters. Full-capacity guard rejects undersized source wrapped allocations after separate literal uint32 growth checks; raw allocation/header publication for that undefined domain is not represented. Multivariate conversion, factorization, algebraic consumers, full printers/TRACE and nonselected alternatives remain open.",
+        "Shared coefficient directory is a charged Go lifetime adapter for actual source buffers, without copying coefficients between related cores. Independent pools remain distinct. Prime/factor algorithms and multivariate conversion remain unported in this chunk."
       ]
     },
     {
@@ -89681,7 +89757,11 @@
         "upolynomial_isolation_source_test.go",
         "upolynomial_refinement_source_test.go",
         "upolynomial_isolation_model_test.go",
-        "mpnum/upolynomial_isolation_storage_test.go"
+        "mpnum/upolynomial_isolation_storage_test.go",
+        "mpnum/upolynomial_coefficient_store.go",
+        "mpnum/upolynomial_coefficient_store_test.go",
+        "upolynomial_coefficient_store_source_test.go",
+        "upolynomial_coefficient_store_lifetime_test.go"
       ],
       "tests": [
         "TestUPolynomialScalarExtentAndLayout",
@@ -89760,7 +89840,16 @@
         "TestUPolynomialIsolationZeroResetPublicationBeforeRefusal",
         "TestUPolynomialIsolationPackedFrameAndScalarExtents",
         "TestUPolynomialBinaryVectorActualAscendingDestruction",
-        "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
+        "TestUPolynomialIsolationSSPopAndDestructorActualOrder",
+        "TestUPolynomialStoreRelatedConstructorFailureUnwinds",
+        "TestUPolynomialStoreCopiedClosedGuardsAndDistinctOrdinary",
+        "TestUPolynomialStoreGrowthGenerationAndRealCloseGuards",
+        "TestUPolynomialStoreSingleChargeCohortGraph",
+        "TestUPolynomialStoreRelatedExtendedGCDIntermediateProvenance",
+        "TestUPolynomialStoreBigChildRootsSurviveParentClose",
+        "TestUPolynomialRelatedCoreActualCrossCoreReadAndMode",
+        "TestUPolynomialRelatedCoreStoreLifetimeAndScalarBorrow",
+        "TestUPolynomialCoefficientStoreCounterAndColdLayout"
       ],
       "conditionals": [
         {
@@ -90096,20 +90185,45 @@
             "TestUPolynomialBinaryVectorActualAscendingDestruction",
             "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
           ]
+        },
+        {
+          "name": "Related polynomial cores share physical coefficient buffers; constructor refusal, lifetime and source EGCD view provenance",
+          "status": "partial",
+          "go_target": "upolynomial_coefficient_store_lifetime_test.go",
+          "tests": [
+            "TestUPolynomialStoreRelatedConstructorFailureUnwinds",
+            "TestUPolynomialStoreCopiedClosedGuardsAndDistinctOrdinary",
+            "TestUPolynomialStoreGrowthGenerationAndRealCloseGuards",
+            "TestUPolynomialStoreSingleChargeCohortGraph",
+            "TestUPolynomialStoreRelatedExtendedGCDIntermediateProvenance",
+            "TestUPolynomialStoreBigChildRootsSurviveParentClose",
+            "TestUPolynomialRelatedCoreActualCrossCoreReadAndMode",
+            "TestUPolynomialRelatedCoreStoreLifetimeAndScalarBorrow"
+          ]
+        },
+        {
+          "name": "Charged concrete shared coefficient store, retain bound and cold layout",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_coefficient_store.go",
+          "tests": [
+            "TestUPolynomialCoefficientStoreCounterAndColdLayout"
+          ]
         }
       ],
       "ownership": [
         "Actual Int coefficient arrays with concrete scalar descriptor pages/backing origins, all twenty-one scratch vectors and real modular child. Physical views guard at actual dereferences and follow swaps; old/new growth and immediate numeric roots are charged. See UPOLYNOMIAL_PORT_STATUS.md.",
         "Real source content/division/GCD scratch, lexical scoped numerals/vectors, modular restoration, retained failure prefixes and actual numeric-root checks; see UPOLYNOMIAL_GCD_PORT_STATUS.md.",
         "Actual flat coefficient storage plus two independent unsigned metadata vectors, partial row publication, source read timing, charged cold owner and manager Close guard. See UPOLYNOMIAL_STURM_PACKET.md; lexical numeral/vector cleanup is an explicit Go error adapter.",
-        "Isolation uses charged concrete binary output vectors and lexical coefficient/frame backings; actual initialized extents and source ascending/reverse destruction orders are retained. Refusal/cancellation tests audit real output and manager cells/Words before fault disabling. See UPOLYNOMIAL_ROOT_ISOLATION_PACKET.md; allocator/backend integration remains open."
+        "Isolation uses charged concrete binary output vectors and lexical coefficient/frame backings; actual initialized extents and source ascending/reverse destruction orders are retained. Refusal/cancellation tests audit real output and manager cells/Words before fault disabling. See UPOLYNOMIAL_ROOT_ISOLATION_PACKET.md; allocator/backend integration remains open.",
+        "Related cores retain one charged concrete coefficient store and borrowed IntegerManager. Descriptors and twenty-one scratch vectors remain core-owned; closing a parent releases its scratch without destroying child buffers. Sum core ExclusiveBytes and one store TotalBytes. See UPOLYNOMIAL_FACTORIZATION_PACKET.md."
       ],
       "deviations": [
         "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full isolation/refinement/conversion/factorization/algebraic and printers remain open; input conversion adapters do not establish complete registered tests.",
         "Registered tests retain explicit dense input conversion adapters. Unported multivariate conversion, root isolation/refinement/factorization and remaining registered test actions keep each complete source unit partial. Explicit cleanup on Go errors preserves rooted completed prefixes; it does not claim native C++ exception continuation.",
         "WithCount copies the raw source pointer/size binding without dereference; indexed array GCD preserves early-one skipping and later content-copy failure publication. Late CRA sweep exercises actual post-append reservations, not virtual fault callbacks.",
         "Selected sequence/Sturm/transform/Descartes/bounds algorithms translated. RowView binds source coeffs(i) plus size(i); source unsigned header8 is extent arithmetic while actual Go metadata arrays charge4*capacity and slice fields are in the charged cold owner. Source printers, full root isolation/refinement, multivariate conversion, factorization and algebraic consumers remain open; source units remain partial.",
-        "Owning reads and checked scalar lifetimes are Go adapters. Full-capacity guard rejects undersized source wrapped allocations after separate literal uint32 growth checks; raw allocation/header publication for that undefined domain is not represented. Multivariate conversion, factorization, algebraic consumers, full printers/TRACE and nonselected alternatives remain open."
+        "Owning reads and checked scalar lifetimes are Go adapters. Full-capacity guard rejects undersized source wrapped allocations after separate literal uint32 growth checks; raw allocation/header publication for that undefined domain is not represented. Multivariate conversion, factorization, algebraic consumers, full printers/TRACE and nonselected alternatives remain open.",
+        "Shared coefficient directory is a charged Go lifetime adapter for actual source buffers, without copying coefficients between related cores. Independent pools remain distinct. Prime/factor algorithms and multivariate conversion remain unported in this chunk."
       ]
     },
     {
