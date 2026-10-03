@@ -79555,7 +79555,8 @@
         "mpnum/mpz_power_shift.go",
         "mpnum/mpz_parse.go",
         "mpnum/mpz_bitwise_test.go",
-        "mpnum/mp_root_test.go"
+        "mpnum/mp_root_test.go",
+        "mpnum/scoped_numeral.go"
       ],
       "tests": [
         "TestSourceMPZMagnitudeProjections",
@@ -79617,7 +79618,18 @@
         "TestIntegerRootAndSquareFailureCleanup",
         "TestRationalRootSquareFailureCleanup",
         "TestRootWarmStorageAndClosedOutputs",
-        "TestRationalRootWarmStorage"
+        "TestRationalRootWarmStorage",
+        "TestScopedNumeralSourceTstScoped",
+        "TestScopedNumeralResizeFailurePrefixesAndBudget",
+        "TestScopedNumeralMoveAndAscendingCleanup",
+        "TestScopedNumeralScalarFailureAndAllThinOperations",
+        "TestScopedNumeralWarmReuseAndLifetimeGuards",
+        "TestScopedNumeralScalarOwnershipAndOperators",
+        "TestScopedNumeralVectorIndependentLifecycle",
+        "TestScopedRationalVectorAndScalarLifetimes",
+        "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
+        "TestScopedRationalVectorIndependentLifecycleAndFailures",
+        "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak"
       ],
       "conditionals": [
         {
@@ -79769,6 +79781,24 @@
           "tests": [
             "TestIntegerSourceRoots"
           ]
+        },
+        {
+          "name": "tst_scoped active three print lines, no executable ENSURE assertions",
+          "status": "ported",
+          "go_target": "mpnum/scoped_numeral.go",
+          "tests": [
+            "TestScopedNumeralSourceTstScoped",
+            "TestScopedNumeralResizeFailurePrefixesAndBudget",
+            "TestScopedNumeralMoveAndAscendingCleanup",
+            "TestScopedNumeralScalarFailureAndAllThinOperations",
+            "TestScopedNumeralWarmReuseAndLifetimeGuards",
+            "TestScopedNumeralScalarOwnershipAndOperators",
+            "TestScopedNumeralVectorIndependentLifecycle",
+            "TestScopedRationalVectorAndScalarLifetimes",
+            "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
+            "TestScopedRationalVectorIndependentLifecycleAndFailures",
+            "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak"
+          ]
         }
       ],
       "ownership": [
@@ -79777,11 +79807,13 @@
         "Active 50-case GCD coherence uses bounded independent prime-product fixture generator. INT_MIN GCD print case strengthened to exact 2^31 expectation; see mpnum/PORT_STATUS.md.",
         "Source prev-power assertions and log bounds translated; test powers are independent fixture generation until production Power is implemented. See mpnum/PORT_STATUS.md.",
         "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending.",
-        "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md."
+        "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md.",
+        "Concrete scoped Int/Rational objects borrow managers; all cold headers and actual old+new pointer-free backing are charged. Deep copy owns independent limbs, source ascending truncation releases them, vector failure prefixes retained. See SCOPED_NUMERAL_PORT_STATUS.md."
       ],
       "deviations": [
         "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits.",
-        "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors."
+        "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors.",
+        "Explicit Close substitutes RAII; self identity rejects shallow Go owner copies. Vectors expose deep Read/Set rather than escaping indexed element addresses. Source noncopyable vector remains noncopyable; other numeral manager specializations stay open."
       ]
     },
     {
@@ -98321,7 +98353,7 @@
           ]
         },
         {
-          "name": "scratch set IDX0 only",
+          "name": "source temporary set and indexed scratch publication",
           "status": "ported",
           "go_target": "mpnum/mpz.go",
           "tests": [
@@ -98802,7 +98834,8 @@
         "Bitwise source local numerals use budgeted manager cells/Words; ordered64-bit arithmetic chunks and final actions are retained. Staged result preserves outputs on failure; see mpnum/BITWISE_PORT_STATUS.md.",
         "Root/square locals use existing budgeted numeric cells/Words; source bound/Power/Swap/Copy actions preserved. Staged output includes real old+new peak; see ROOT_PORT_STATUS.md.",
         "Scalar inspection borrows indexed manager cells/Words and allocates no owner storage. Decompose publishes caller-owned digits; sufficient caller capacity allocates nothing. See MPZ_MISC_PORT_STATUS.md.",
-        "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md."
+        "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md.",
+        "Earlier scratch IDX0-only inventory is superseded by publishTmpAt handling division IDX1 as well; see mpnum/mpz_div.go and source division tests."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -99337,7 +99370,7 @@
           ]
         },
         {
-          "name": "scratch set IDX0 only",
+          "name": "source temporary set and indexed scratch publication",
           "status": "ported",
           "go_target": "mpnum/mpz.go",
           "tests": [
@@ -99818,7 +99851,8 @@
         "Bitwise source local numerals use budgeted manager cells/Words; ordered64-bit arithmetic chunks and final actions are retained. Staged result preserves outputs on failure; see mpnum/BITWISE_PORT_STATUS.md.",
         "Root/square locals use existing budgeted numeric cells/Words; source bound/Power/Swap/Copy actions preserved. Staged output includes real old+new peak; see ROOT_PORT_STATUS.md.",
         "Scalar inspection borrows indexed manager cells/Words and allocates no owner storage. Decompose publishes caller-owned digits; sufficient caller capacity allocates nothing. See MPZ_MISC_PORT_STATUS.md.",
-        "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md."
+        "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md.",
+        "Earlier scratch IDX0-only inventory is superseded by publishTmpAt handling division IDX1 as well; see mpnum/mpz_div.go and source division tests."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -102194,9 +102228,23 @@
       "sha256": "e36703e7acdf210c3246844a06f9a2e8515f4c377dce2b1d07258460c3e90867",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/scoped_numeral.go"
+      ],
+      "tests": [
+        "TestScopedNumeralSourceTstScoped",
+        "TestScopedNumeralResizeFailurePrefixesAndBudget",
+        "TestScopedNumeralMoveAndAscendingCleanup",
+        "TestScopedNumeralScalarFailureAndAllThinOperations",
+        "TestScopedNumeralWarmReuseAndLifetimeGuards",
+        "TestScopedNumeralScalarOwnershipAndOperators",
+        "TestScopedNumeralVectorIndependentLifecycle",
+        "TestScopedRationalVectorAndScalarLifetimes",
+        "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
+        "TestScopedRationalVectorIndependentLifecycleAndFailures",
+        "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -102209,9 +102257,86 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "selected Int/Rational constructor, destructor, get/m borrow and deep copy/assignment",
+          "status": "ported",
+          "go_target": "mpnum/scoped_numeral.go",
+          "tests": [
+            "TestScopedNumeralSourceTstScoped",
+            "TestScopedNumeralResizeFailurePrefixesAndBudget",
+            "TestScopedNumeralMoveAndAscendingCleanup",
+            "TestScopedNumeralScalarFailureAndAllThinOperations",
+            "TestScopedNumeralWarmReuseAndLifetimeGuards",
+            "TestScopedNumeralScalarOwnershipAndOperators",
+            "TestScopedNumeralVectorIndependentLifecycle",
+            "TestScopedRationalVectorAndScalarLifetimes",
+            "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
+            "TestScopedRationalVectorIndependentLifecycleAndFailures",
+            "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak"
+          ]
+        },
+        {
+          "name": "selected Int/Rational reset/swap/neg/abs-copy",
+          "status": "ported",
+          "go_target": "mpnum/scoped_numeral.go",
+          "tests": [
+            "TestScopedNumeralSourceTstScoped",
+            "TestScopedNumeralResizeFailurePrefixesAndBudget",
+            "TestScopedNumeralMoveAndAscendingCleanup",
+            "TestScopedNumeralScalarFailureAndAllThinOperations",
+            "TestScopedNumeralWarmReuseAndLifetimeGuards",
+            "TestScopedNumeralScalarOwnershipAndOperators",
+            "TestScopedNumeralVectorIndependentLifecycle",
+            "TestScopedRationalVectorAndScalarLifetimes",
+            "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
+            "TestScopedRationalVectorIndependentLifecycleAndFailures",
+            "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak"
+          ]
+        },
+        {
+          "name": "selected Int/Rational five compound operations and four arithmetic-copy operators",
+          "status": "ported",
+          "go_target": "mpnum/scoped_numeral.go",
+          "tests": [
+            "TestScopedNumeralSourceTstScoped",
+            "TestScopedNumeralResizeFailurePrefixesAndBudget",
+            "TestScopedNumeralMoveAndAscendingCleanup",
+            "TestScopedNumeralScalarFailureAndAllThinOperations",
+            "TestScopedNumeralWarmReuseAndLifetimeGuards",
+            "TestScopedNumeralScalarOwnershipAndOperators",
+            "TestScopedNumeralVectorIndependentLifecycle",
+            "TestScopedRationalVectorAndScalarLifetimes",
+            "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
+            "TestScopedRationalVectorIndependentLifecycleAndFailures",
+            "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak"
+          ]
+        },
+        {
+          "name": "selected Int/Rational six comparisons, five predicates and display",
+          "status": "ported",
+          "go_target": "mpnum/scoped_numeral.go",
+          "tests": [
+            "TestScopedNumeralSourceTstScoped",
+            "TestScopedNumeralResizeFailurePrefixesAndBudget",
+            "TestScopedNumeralMoveAndAscendingCleanup",
+            "TestScopedNumeralScalarFailureAndAllThinOperations",
+            "TestScopedNumeralWarmReuseAndLifetimeGuards",
+            "TestScopedNumeralScalarOwnershipAndOperators",
+            "TestScopedNumeralVectorIndependentLifecycle",
+            "TestScopedRationalVectorAndScalarLifetimes",
+            "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
+            "TestScopedRationalVectorIndependentLifecycleAndFailures",
+            "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete scoped Int/Rational objects borrow managers; all cold headers and actual old+new pointer-free backing are charged. Deep copy owns independent limbs, source ascending truncation releases them, vector failure prefixes retained. See SCOPED_NUMERAL_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Explicit Close substitutes RAII; self identity rejects shallow Go owner copies. Vectors expose deep Read/Set rather than escaping indexed element addresses. Source noncopyable vector remains noncopyable; other numeral manager specializations stay open."
+      ]
     },
     {
       "path": "src/util/scoped_numeral_buffer.h",
@@ -102242,9 +102367,23 @@
       "sha256": "b8b591945603b19e5d50dff21f92821f60bf866ff07f7ef3687f01a5cfd64a29",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/scoped_numeral.go"
+      ],
+      "tests": [
+        "TestScopedNumeralSourceTstScoped",
+        "TestScopedNumeralResizeFailurePrefixesAndBudget",
+        "TestScopedNumeralMoveAndAscendingCleanup",
+        "TestScopedNumeralScalarFailureAndAllThinOperations",
+        "TestScopedNumeralWarmReuseAndLifetimeGuards",
+        "TestScopedNumeralScalarOwnershipAndOperators",
+        "TestScopedNumeralVectorIndependentLifecycle",
+        "TestScopedRationalVectorAndScalarLifetimes",
+        "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
+        "TestScopedRationalVectorIndependentLifecycleAndFailures",
+        "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -102257,9 +102396,50 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "selected Int/Rational borrowed manager and noncopyable vector lifetime",
+          "status": "ported",
+          "go_target": "mpnum/scoped_numeral.go",
+          "tests": [
+            "TestScopedNumeralSourceTstScoped",
+            "TestScopedNumeralResizeFailurePrefixesAndBudget",
+            "TestScopedNumeralMoveAndAscendingCleanup",
+            "TestScopedNumeralScalarFailureAndAllThinOperations",
+            "TestScopedNumeralWarmReuseAndLifetimeGuards",
+            "TestScopedNumeralScalarOwnershipAndOperators",
+            "TestScopedNumeralVectorIndependentLifecycle",
+            "TestScopedRationalVectorAndScalarLifetimes",
+            "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
+            "TestScopedRationalVectorIndependentLifecycleAndFailures",
+            "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak"
+          ]
+        },
+        {
+          "name": "selected Int/Rational reset/push/pop/shrink/resize deep ownership",
+          "status": "ported",
+          "go_target": "mpnum/scoped_numeral.go",
+          "tests": [
+            "TestScopedNumeralSourceTstScoped",
+            "TestScopedNumeralResizeFailurePrefixesAndBudget",
+            "TestScopedNumeralMoveAndAscendingCleanup",
+            "TestScopedNumeralScalarFailureAndAllThinOperations",
+            "TestScopedNumeralWarmReuseAndLifetimeGuards",
+            "TestScopedNumeralScalarOwnershipAndOperators",
+            "TestScopedNumeralVectorIndependentLifecycle",
+            "TestScopedRationalVectorAndScalarLifetimes",
+            "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
+            "TestScopedRationalVectorIndependentLifecycleAndFailures",
+            "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete scoped Int/Rational objects borrow managers; all cold headers and actual old+new pointer-free backing are charged. Deep copy owns independent limbs, source ascending truncation releases them, vector failure prefixes retained. See SCOPED_NUMERAL_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Explicit Close substitutes RAII; self identity rejects shallow Go owner copies. Vectors expose deep Read/Set rather than escaping indexed element addresses. Source noncopyable vector remains noncopyable; other numeral manager specializations stay open."
+      ]
     },
     {
       "path": "src/util/scoped_ptr_vector.h",

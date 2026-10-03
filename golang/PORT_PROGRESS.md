@@ -430,3 +430,25 @@ paths and injected failures with immediate root-based cells/Words accounting.
 Missing APIs and a component alias fixture were observed RED before translation
 and correction. See mpnum/RATIONAL_OPS_PORT_STATUS.md. Remaining numerical methods,
 rational wrapper and full AST/solver/proof/interpolation scope stay open.
+
+## Scoped numeral owners and vectors
+
+Concrete Int/Rational scoped owners and noncopyable vectors now borrow their
+manager and retain explicit deep-copy/transfer/destruction semantics. Headers and
+old-plus-new backing are fully charged; source ascending truncation and failed
+push/resize action prefixes are preserved. Eleven test groups cover three active
+source print lines (no source ENSUREs), independent Int/Rational lifecycle models,
+slot reuse order, exact backing peaks, deep-clone faults, immediate Cells/Words
+ownership and warm allocations. Missing declarations were observed RED first.
+Other numeral-manager specializations stay partial; full numerics, rational
+service/wrapper and AST/solver/proof/interpolation milestones remain open.
+See SCOPED_NUMERAL_PORT_STATUS.md.
+
+The final combined module passed full native and nativechecked tests, full
+checked-race tests, full actual checked JS execution (all33 new named tests
+registered/passed), checked vet and WASI cross-build. Source/no-generics audit
+passed with14ported,39partial and2049unported units. WASI is build evidence only.
+The next AST-numeral prerequisites are rational inspection/extraction, explicit
+cross-owner limb copying and the owner-local rational service/constants/cache;
+array/extended GCD, LCM and divisibility also remain open. No full foundation
+or solver completion is claimed.
