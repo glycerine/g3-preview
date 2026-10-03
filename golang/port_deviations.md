@@ -74,3 +74,12 @@ leaves its operand unchanged. Go returns ErrIntegerInvUnsupported after its
 existing ownership checks, preserving the operand and budget. This explicitly
 checked unsupported domain is not an inverse algorithm or a release no-op
 equivalence claim. See MPZ_FACADE_EXTRA_PORT_STATUS.md.
+
+### Recycled source ID reservation
+
+The embedded cold ID generator charges its actual separate backing arrays; its
+header is charged by the enclosing owner. Recycle reports fallible reservation,
+and an explicit preflight method prepares physical capacity without changing
+logical IDs, retaining successful growth prefixes. Reset retains capacity and
+cleanup refunds it. This supports future explicit AST reclamation but does not
+implement the AST consumer or full process memory service. See ID_PORT_STATUS.md.

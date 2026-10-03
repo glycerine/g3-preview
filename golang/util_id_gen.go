@@ -3,7 +3,9 @@
 package g3
 
 import (
+	"github.com/glycerine/g3/golang/arena"
 	"github.com/glycerine/g3/golang/utilhash"
+	"math"
 	"strconv"
 	"strings"
 )
@@ -17,10 +19,54 @@ type utilIDGen struct {
 	next        uint32
 	free        []uint32
 	outOfMemory func() bool
+	budget      *arena.Budget
 }
 
 func newUtilIDGen(start uint32, outOfMemory func() bool) utilIDGen {
 	return utilIDGen{next: start, outOfMemory: outOfMemory}
+}
+
+// The generator is embedded cold metadata, charged in the enclosing owner's
+// actual header. Only its separate free-ID arrays are charged here. A nil
+// budget preserves the unlimited standalone source-helper contract.
+func newBudgetedUtilIDGen(start uint32, budget *arena.Budget, outOfMemory func() bool) utilIDGen {
+	return utilIDGen{next: start, budget: budget, outOfMemory: outOfMemory}
+}
+
+func idFreeGrowth(old uint32) (uint32, error) {
+	next := (uint64(old)*3 + 1) / 2
+	if old == 0 {
+		next = 2
+	}
+	if next > math.MaxUint32 || next*4 > uint64(^uint(0)>>1) {
+		return 0, arena.ErrBounds
+	}
+	return uint32(next), nil
+}
+
+// Preallocating this cold workspace lets an enclosing AST owner prepare for
+// fallible reclamation bookkeeping before publishing a new node. It changes
+// no logical IDs, uses the source vector's capacities and keeps any successful
+// growth prefix on failure. Reset retains it; cleanup refunds it.
+func (g *utilIDGen) reserveFreeIDs(needed uint32) error {
+	if uint64(cap(g.free)) > math.MaxUint32 {
+		return arena.ErrBounds
+	}
+	for uint64(cap(g.free)) < uint64(needed) {
+		capacity, e := idFreeGrowth(uint32(cap(g.free)))
+		if e != nil {
+			return e
+		}
+		if e = g.budget.Reserve(uint64(capacity) * 4); e != nil {
+			return e
+		}
+		next := make([]uint32, len(g.free), capacity)
+		copy(next, g.free)
+		old := uint64(cap(g.free)) * 4
+		g.free = next
+		g.budget.Release(old)
+	}
+	return nil
 }
 func (g *utilIDGen) mk() uint32 {
 	if len(g.free) == 0 {
@@ -32,15 +78,26 @@ func (g *utilIDGen) mk() uint32 {
 	g.free = g.free[:len(g.free)-1]
 	return id
 }
-func (g *utilIDGen) recycle(id uint32) {
+func (g *utilIDGen) recycle(id uint32) error {
 	if g.outOfMemory != nil && g.outOfMemory() {
-		return
+		return nil
+	}
+	if uint64(len(g.free)) >= math.MaxUint32 {
+		return arena.ErrBounds
+	}
+	if e := g.reserveFreeIDs(uint32(len(g.free)) + 1); e != nil {
+		return e
 	}
 	g.free = append(g.free, id)
+	return nil
 }
-func (g *utilIDGen) reset(start uint32)   { g.next = start; g.free = g.free[:0] }
-func (g *utilIDGen) cleanup(start uint32) { g.next = start; g.free = nil }
-func (g *utilIDGen) idRange() uint32      { return g.next }
+func (g *utilIDGen) reset(start uint32) { g.next = start; g.free = g.free[:0] }
+func (g *utilIDGen) cleanup(start uint32) {
+	g.next = start
+	g.budget.Release(uint64(cap(g.free)) * 4)
+	g.free = nil
+}
+func (g *utilIDGen) idRange() uint32 { return g.next }
 func (g *utilIDGen) setNextID(id uint32) uint32 {
 	g.next = id
 	for {

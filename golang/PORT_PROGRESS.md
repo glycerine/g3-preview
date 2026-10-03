@@ -684,3 +684,12 @@ failure roots, representation quirks and zero warmed allocations are covered.
 Full native/checked-debug, targeted race/actual JS, vet and WASI build passed.
 Backend/diagnostic alternatives and separate MPBQ/interval/modular managers
 remain open. See MPZ_FACADE_EXTRA_PORT_STATUS.md.
+
+## Budgeted recycled source IDs
+
+The source ID helper now supports charged free-ID backing and explicit preflight
+for future AST reclamation. Four added tests began missing-API RED, then verify
+source capacities, exact old/new overlap, immediate failure prefixes, OOM skip,
+reset retention and cleanup refunds. Eight total ID suites passed integrated
+native/checked-debug, race and actual JS gates; vet and WASI build passed. Full
+resource-service and AST registration/deletion remain open. See ID_PORT_STATUS.md.

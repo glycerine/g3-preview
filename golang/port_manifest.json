@@ -87948,7 +87948,11 @@
         "TestIDGeneratorSourceOrder",
         "TestIDGeneratorDebugAndWrap",
         "TestIDGeneratorHash",
-        "TestIDGeneratorFiniteUniqueness"
+        "TestIDGeneratorFiniteUniqueness",
+        "TestIDGeneratorBudgetSourceGrowthAndReset",
+        "TestIDGeneratorBudgetExactOverlapAndFailedPublication",
+        "TestIDGeneratorBudgetReservationPrefixesAndOOMSkip",
+        "TestIDGeneratorBudgetWarmEmbeddedValueAndCapacityBounds"
       ],
       "conditionals": [
         {
@@ -88061,12 +88065,62 @@
             "TestIDGeneratorHash",
             "TestIDGeneratorFiniteUniqueness"
           ]
+        },
+        {
+          "name": "budgeted embedded constructor and source free-list capacity growth",
+          "status": "ported",
+          "go_target": "util_id_gen.go",
+          "tests": [
+            "TestIDGeneratorBudgetSourceGrowthAndReset",
+            "TestIDGeneratorBudgetExactOverlapAndFailedPublication",
+            "TestIDGeneratorBudgetReservationPrefixesAndOOMSkip",
+            "TestIDGeneratorBudgetWarmEmbeddedValueAndCapacityBounds"
+          ]
+        },
+        {
+          "name": "recycle reservation error and source OOM skip before allocation",
+          "status": "ported",
+          "go_target": "util_id_gen.go",
+          "tests": [
+            "TestIDGeneratorBudgetSourceGrowthAndReset",
+            "TestIDGeneratorBudgetExactOverlapAndFailedPublication",
+            "TestIDGeneratorBudgetReservationPrefixesAndOOMSkip",
+            "TestIDGeneratorBudgetWarmEmbeddedValueAndCapacityBounds"
+          ]
+        },
+        {
+          "name": "reset retains charged capacity; cleanup refunds actual free-ID backing",
+          "status": "ported",
+          "go_target": "util_id_gen.go",
+          "tests": [
+            "TestIDGeneratorBudgetSourceGrowthAndReset",
+            "TestIDGeneratorBudgetExactOverlapAndFailedPublication",
+            "TestIDGeneratorBudgetReservationPrefixesAndOOMSkip",
+            "TestIDGeneratorBudgetWarmEmbeddedValueAndCapacityBounds"
+          ]
+        },
+        {
+          "name": "preflight reclamation workspace with retained physical failure prefix",
+          "status": "ported",
+          "go_target": "util_id_gen.go",
+          "tests": [
+            "TestIDGeneratorBudgetSourceGrowthAndReset",
+            "TestIDGeneratorBudgetExactOverlapAndFailedPublication",
+            "TestIDGeneratorBudgetReservationPrefixesAndOOMSkip",
+            "TestIDGeneratorBudgetWarmEmbeddedValueAndCapacityBounds"
+          ]
+        },
+        {
+          "name": "full process memory service and AST register/delete/compress consumers",
+          "status": "unported"
         }
       ],
       "ownership": [
-        "Owned scalar free IDs. Reset retains storage; cleanup drops references. Source memory check injected via cold owner callback; resource-service and budget integration pending. See ID_PORT_STATUS.md."
+        "Generator is embedded cold metadata, charged once in its enclosing owner. Free uint32 arrays reserve whole new capacity while old remains charged; successful prefixes retained, reset retains and cleanup refunds. Cold OOM callback is checked before reservation. Source resource-service and AST consumers remain open. See ID_PORT_STATUS.md."
       ],
-      "deviations": []
+      "deviations": [
+        "Budgeted recycle reports predictable allocation failure; reserveFreeIDs lets the future AST owner preflight reclamation before publication without changing logical IDs. The nil budget constructor remains unlimited. Host diagnostic free-ID rendering remains unbudgeted; actual AST printer is not credited."
+      ]
     },
     {
       "path": "src/util/inf_eps_rational.h",
