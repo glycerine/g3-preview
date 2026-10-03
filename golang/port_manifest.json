@@ -50238,9 +50238,38 @@
       "sha256": "57f99643ce2dc3eaf8866c01a9c4e621a64c84b496154e071cc8d819b79ab6e9",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_solver_nested_store.go",
+        "sat_solver_model_converter.go",
+        "sat_solver_uint_set.go"
+      ],
+      "tests": [
+        "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+        "TestSATSolverModelConverterActualCollectVars",
+        "TestSATSolverModelConverterConstructorAndInsertFaults",
+        "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+        "TestSATSolverModelConverterDebugAssertionBeforeLaterInvalidLiteral",
+        "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+        "TestSATSolverModelConverterIndependentChainModels",
+        "TestSATSolverModelConverterOuterGrowthDeepCopies",
+        "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+        "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+        "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+        "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+        "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+        "TestSATSolverNestedLiteralCapacityAndRetainedTail",
+        "TestSATSolverNestedLiteralDeepCopyAndLedger",
+        "TestSATSolverNestedLiteralFaultPrefixAndRoots",
+        "TestSATSolverNestedLiteralOwnersPointerFreedomWarmAllocation",
+        "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
+        "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
+        "TestSATSolverUintSetGhostDefinedSpareTailRelease",
+        "TestSATSolverUintSetSourceCharCapacityOverflowMath",
+        "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
+        "TestSATSolverUintSetSourceOrderAndOperations",
+        "TestSATSolverUintSetValueIteratorRetainedLifetime"
+      ],
       "assertions": [
         {
           "line": 41,
@@ -50313,18 +50342,320 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "model_converter::model_converter",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterActualCollectVars"
+          ]
+        },
+        {
+          "name": "model_converter::~model_converter",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterActualCollectVars"
+          ]
+        },
+        {
+          "name": "model_converter::reset",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterActualCollectVars"
+          ]
+        },
+        {
+          "name": "model_converter::operator()",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterDebugAssertionBeforeLaterInvalidLiteral",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay"
+          ]
+        },
+        {
+          "name": "model_converter::check_model",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterActualCollectVars"
+          ]
+        },
+        {
+          "name": "model_converter::mk",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterActualCollectVars"
+          ]
+        },
+        {
+          "name": "model_converter::insert(entry&,clause const&)",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterActualCollectVars"
+          ]
+        },
+        {
+          "name": "model_converter::insert(entry&,literal,literal)",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterActualCollectVars"
+          ]
+        },
+        {
+          "name": "model_converter::insert(entry&,clause_wrapper const&)",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterActualCollectVars"
+          ]
+        },
+        {
+          "name": "model_converter::check_invariant",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterActualCollectVars"
+          ]
+        },
+        {
+          "name": "model_converter::display",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterActualCollectVars"
+          ]
+        },
+        {
+          "name": "model_converter::copy",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterActualCollectVars"
+          ]
+        },
+        {
+          "name": "model_converter::collect_vars",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterActualCollectVars"
+          ]
+        },
+        {
+          "name": "model_converter::max_var",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterActualCollectVars"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete scalar entry/list records and fully charged cold owners, directories, Words payload/free-page graph. Nontrivial outer growth deep-copies ascending and destroys each old nested vector immediately, preserving actual source capacity/publication order. Exact-capacity nested copies and finite captured-end self-copy are tested. Real CollectVars inserts into charged sat::uint_set. See SAT_SOLVER_PACKET.md."
+      ],
+      "deviations": [
+        "Pointers become scalar owner/slot/generation identities. Charged pending old-directory/cursor permits explicit Go continuation after source-undefined interrupted construction; unconstructed/dangling accesses fail at their actual boundary. Source TRACE diagnostics, implicit class-level copy constructor/assignment, downstream actual solver integration remain open. Display uses actual NumericTextStream with caller-owned output. No generics; whole-unit audit flags remain false.",
+        "Literal storage guards physical capacity and stale tokens, but does not track construction of never-written spare slots. Source-defined initialized retained-slot behavior is verified; validation of every C++ initialized-lifetime domain is not claimed."
+      ]
     },
     {
       "path": "src/sat/sat_model_converter.h",
       "sha256": "760b847933f74903f81b19dcc5cd98a560f1d01407dabc8042638aaab9d01c9a",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_solver_nested_store.go",
+        "sat_solver_model_converter.go",
+        "sat_solver_uint_set.go"
+      ],
+      "tests": [
+        "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+        "TestSATSolverModelConverterActualCollectVars",
+        "TestSATSolverModelConverterConstructorAndInsertFaults",
+        "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+        "TestSATSolverModelConverterDebugAssertionBeforeLaterInvalidLiteral",
+        "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+        "TestSATSolverModelConverterIndependentChainModels",
+        "TestSATSolverModelConverterOuterGrowthDeepCopies",
+        "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+        "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+        "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+        "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+        "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+        "TestSATSolverNestedLiteralCapacityAndRetainedTail",
+        "TestSATSolverNestedLiteralDeepCopyAndLedger",
+        "TestSATSolverNestedLiteralFaultPrefixAndRoots",
+        "TestSATSolverNestedLiteralOwnersPointerFreedomWarmAllocation",
+        "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
+        "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
+        "TestSATSolverUintSetGhostDefinedSpareTailRelease",
+        "TestSATSolverUintSetSourceCharCapacityOverflowMath",
+        "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
+        "TestSATSolverUintSetSourceOrderAndOperations",
+        "TestSATSolverUintSetValueIteratorRetainedLifetime"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -50337,9 +50668,286 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "model_converter::model_converter",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterActualCollectVars"
+          ]
+        },
+        {
+          "name": "model_converter::~model_converter",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterActualCollectVars"
+          ]
+        },
+        {
+          "name": "model_converter::reset",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterActualCollectVars"
+          ]
+        },
+        {
+          "name": "model_converter::operator()",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterDebugAssertionBeforeLaterInvalidLiteral",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay"
+          ]
+        },
+        {
+          "name": "model_converter::check_model",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterActualCollectVars"
+          ]
+        },
+        {
+          "name": "model_converter::mk",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterActualCollectVars"
+          ]
+        },
+        {
+          "name": "model_converter::insert(entry&,clause const&)",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterActualCollectVars"
+          ]
+        },
+        {
+          "name": "model_converter::insert(entry&,literal,literal)",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterActualCollectVars"
+          ]
+        },
+        {
+          "name": "model_converter::insert(entry&,clause_wrapper const&)",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterActualCollectVars"
+          ]
+        },
+        {
+          "name": "model_converter::check_invariant",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterActualCollectVars"
+          ]
+        },
+        {
+          "name": "model_converter::display",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterActualCollectVars"
+          ]
+        },
+        {
+          "name": "model_converter::copy",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterActualCollectVars"
+          ]
+        },
+        {
+          "name": "model_converter::collect_vars",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterActualCollectVars"
+          ]
+        },
+        {
+          "name": "model_converter::max_var",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverModelConverterActualCollectVars"
+          ]
+        },
+        {
+          "name": "model_converter implicit copy constructor/assignment",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Concrete scalar entry/list records and fully charged cold owners, directories, Words payload/free-page graph. Nontrivial outer growth deep-copies ascending and destroys each old nested vector immediately, preserving actual source capacity/publication order. Exact-capacity nested copies and finite captured-end self-copy are tested. Real CollectVars inserts into charged sat::uint_set. See SAT_SOLVER_PACKET.md."
+      ],
+      "deviations": [
+        "Pointers become scalar owner/slot/generation identities. Charged pending old-directory/cursor permits explicit Go continuation after source-undefined interrupted construction; unconstructed/dangling accesses fail at their actual boundary. Source TRACE diagnostics, implicit class-level copy constructor/assignment, downstream actual solver integration remain open. Display uses actual NumericTextStream with caller-owned output. No generics; whole-unit audit flags remain false.",
+        "Literal storage guards physical capacity and stale tokens, but does not track construction of never-written spare slots. Source-defined initialized retained-slot behavior is verified; validation of every C++ initialized-lifetime domain is not claimed."
+      ]
     },
     {
       "path": "src/sat/sat_mus.cpp",
@@ -51410,15 +52018,24 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "sat_types.go",
-        "sat_sets.go"
+        "sat_sets.go",
+        "sat_solver_uint_set.go",
+        "sat_types.go"
       ],
       "tests": [
-        "TestSourceSATLiteralConstructors",
         "TestSATLiteralAndModelRendering",
-        "TestSATSetOrderAndOwnership",
         "TestSATLiteralSets",
-        "TestSATSetFiniteModel"
+        "TestSATSetFiniteModel",
+        "TestSATSetOrderAndOwnership",
+        "TestSATSolverModelConverterActualCollectVars",
+        "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
+        "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
+        "TestSATSolverUintSetGhostDefinedSpareTailRelease",
+        "TestSATSolverUintSetSourceCharCapacityOverflowMath",
+        "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
+        "TestSATSolverUintSetSourceOrderAndOperations",
+        "TestSATSolverUintSetValueIteratorRetainedLifetime",
+        "TestSourceSATLiteralConstructors"
       ],
       "conditionals": [
         {
@@ -51682,12 +52299,195 @@
             "TestSATLiteralSets",
             "TestSATSetFiniteModel"
           ]
+        },
+        {
+          "name": "sat::uint_set::insert",
+          "status": "partial",
+          "go_target": "sat_solver_uint_set.go",
+          "tests": [
+            "TestSATSolverUintSetSourceOrderAndOperations",
+            "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
+            "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
+            "TestSATSolverUintSetValueIteratorRetainedLifetime",
+            "TestSATSolverUintSetGhostDefinedSpareTailRelease",
+            "TestSATSolverUintSetSourceCharCapacityOverflowMath"
+          ]
+        },
+        {
+          "name": "sat::uint_set::remove",
+          "status": "partial",
+          "go_target": "sat_solver_uint_set.go",
+          "tests": [
+            "TestSATSolverUintSetSourceOrderAndOperations",
+            "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
+            "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
+            "TestSATSolverUintSetValueIteratorRetainedLifetime",
+            "TestSATSolverUintSetGhostDefinedSpareTailRelease",
+            "TestSATSolverUintSetSourceCharCapacityOverflowMath"
+          ]
+        },
+        {
+          "name": "sat::uint_set::operator=",
+          "status": "partial",
+          "go_target": "sat_solver_uint_set.go",
+          "tests": [
+            "TestSATSolverUintSetSourceOrderAndOperations",
+            "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
+            "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
+            "TestSATSolverUintSetValueIteratorRetainedLifetime",
+            "TestSATSolverUintSetGhostDefinedSpareTailRelease",
+            "TestSATSolverUintSetSourceCharCapacityOverflowMath"
+          ]
+        },
+        {
+          "name": "sat::uint_set::contains",
+          "status": "partial",
+          "go_target": "sat_solver_uint_set.go",
+          "tests": [
+            "TestSATSolverUintSetSourceOrderAndOperations",
+            "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
+            "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
+            "TestSATSolverUintSetValueIteratorRetainedLifetime",
+            "TestSATSolverUintSetGhostDefinedSpareTailRelease",
+            "TestSATSolverUintSetSourceCharCapacityOverflowMath"
+          ]
+        },
+        {
+          "name": "sat::uint_set::empty",
+          "status": "partial",
+          "go_target": "sat_solver_uint_set.go",
+          "tests": [
+            "TestSATSolverUintSetSourceOrderAndOperations",
+            "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
+            "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
+            "TestSATSolverUintSetValueIteratorRetainedLifetime",
+            "TestSATSolverUintSetGhostDefinedSpareTailRelease",
+            "TestSATSolverUintSetSourceCharCapacityOverflowMath"
+          ]
+        },
+        {
+          "name": "sat::uint_set::erase",
+          "status": "partial",
+          "go_target": "sat_solver_uint_set.go",
+          "tests": [
+            "TestSATSolverUintSetSourceOrderAndOperations",
+            "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
+            "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
+            "TestSATSolverUintSetValueIteratorRetainedLifetime",
+            "TestSATSolverUintSetGhostDefinedSpareTailRelease",
+            "TestSATSolverUintSetSourceCharCapacityOverflowMath"
+          ]
+        },
+        {
+          "name": "sat::uint_set::size",
+          "status": "partial",
+          "go_target": "sat_solver_uint_set.go",
+          "tests": [
+            "TestSATSolverUintSetSourceOrderAndOperations",
+            "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
+            "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
+            "TestSATSolverUintSetValueIteratorRetainedLifetime",
+            "TestSATSolverUintSetGhostDefinedSpareTailRelease",
+            "TestSATSolverUintSetSourceCharCapacityOverflowMath"
+          ]
+        },
+        {
+          "name": "sat::uint_set::begin/end",
+          "status": "partial",
+          "go_target": "sat_solver_uint_set.go",
+          "tests": [
+            "TestSATSolverUintSetSourceOrderAndOperations",
+            "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
+            "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
+            "TestSATSolverUintSetValueIteratorRetainedLifetime",
+            "TestSATSolverUintSetGhostDefinedSpareTailRelease",
+            "TestSATSolverUintSetSourceCharCapacityOverflowMath"
+          ]
+        },
+        {
+          "name": "sat::uint_set::reset",
+          "status": "partial",
+          "go_target": "sat_solver_uint_set.go",
+          "tests": [
+            "TestSATSolverUintSetSourceOrderAndOperations",
+            "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
+            "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
+            "TestSATSolverUintSetValueIteratorRetainedLifetime",
+            "TestSATSolverUintSetGhostDefinedSpareTailRelease",
+            "TestSATSolverUintSetSourceCharCapacityOverflowMath"
+          ]
+        },
+        {
+          "name": "sat::uint_set::finalize",
+          "status": "partial",
+          "go_target": "sat_solver_uint_set.go",
+          "tests": [
+            "TestSATSolverUintSetSourceOrderAndOperations",
+            "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
+            "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
+            "TestSATSolverUintSetValueIteratorRetainedLifetime",
+            "TestSATSolverUintSetGhostDefinedSpareTailRelease",
+            "TestSATSolverUintSetSourceCharCapacityOverflowMath"
+          ]
+        },
+        {
+          "name": "sat::uint_set::operator&=",
+          "status": "partial",
+          "go_target": "sat_solver_uint_set.go",
+          "tests": [
+            "TestSATSolverUintSetSourceOrderAndOperations",
+            "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
+            "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
+            "TestSATSolverUintSetValueIteratorRetainedLifetime",
+            "TestSATSolverUintSetGhostDefinedSpareTailRelease",
+            "TestSATSolverUintSetSourceCharCapacityOverflowMath"
+          ]
+        },
+        {
+          "name": "sat::uint_set::operator|=",
+          "status": "partial",
+          "go_target": "sat_solver_uint_set.go",
+          "tests": [
+            "TestSATSolverUintSetSourceOrderAndOperations",
+            "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
+            "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
+            "TestSATSolverUintSetValueIteratorRetainedLifetime",
+            "TestSATSolverUintSetGhostDefinedSpareTailRelease",
+            "TestSATSolverUintSetSourceCharCapacityOverflowMath"
+          ]
         }
       ],
       "ownership": [
-        "Owned scalar backing arrays. Reset retains capacity; finalize drops references. Explicit copies; source removal/iteration order preserved. Solver budgets/errors/diagnostics still pending; see SAT_PORT_STATUS.md."
+        "Owned scalar backing arrays. Reset retains capacity; finalize drops references. Explicit copies; source removal/iteration order preserved. Solver budgets/errors/diagnostics still pending; see SAT_PORT_STATUS.md.",
+        "Actual namespace sat::uint_set membership svector<char> and insertion svector<unsigned> retain exact source growth/copy/reset/finalize order, ghost flag publication before failed list push, and by-value captured-end iterators. Cold headers, backing and simultaneous old/new peaks charged; see SAT_SOLVER_PACKET.md."
       ],
-      "deviations": []
+      "deviations": [
+        "Release retained physical accesses preserve finite source effects; actual bounds/stale-owner domains are guarded. Source unsigned char-vector growth arithmetic is uint32 before host representability checks. Existing standalone set facades and full solver consumers remain separate; no whole-unit completion claim."
+      ]
     },
     {
       "path": "src/sat/sat_var_queue.h",
@@ -112869,6 +113669,9 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "sat_solver_model_converter.go",
+        "sat_solver_nested_store.go",
+        "sat_solver_uint_set.go",
         "sat_storage_vector.go",
         "util_param_descrs.go"
       ],
@@ -112896,6 +113699,30 @@
         "TestSATScalarExpansionRetainsBackingPrefix",
         "TestSATScalarSetEndSourcePublication",
         "TestSATScalarVectorReleaseRetainedBodies",
+        "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+        "TestSATSolverModelConverterActualCollectVars",
+        "TestSATSolverModelConverterConstructorAndInsertFaults",
+        "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+        "TestSATSolverModelConverterDebugAssertionBeforeLaterInvalidLiteral",
+        "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+        "TestSATSolverModelConverterIndependentChainModels",
+        "TestSATSolverModelConverterOuterGrowthDeepCopies",
+        "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+        "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+        "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+        "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+        "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+        "TestSATSolverNestedLiteralCapacityAndRetainedTail",
+        "TestSATSolverNestedLiteralDeepCopyAndLedger",
+        "TestSATSolverNestedLiteralFaultPrefixAndRoots",
+        "TestSATSolverNestedLiteralOwnersPointerFreedomWarmAllocation",
+        "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
+        "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
+        "TestSATSolverUintSetGhostDefinedSpareTailRelease",
+        "TestSATSolverUintSetSourceCharCapacityOverflowMath",
+        "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
+        "TestSATSolverUintSetSourceOrderAndOperations",
+        "TestSATSolverUintSetValueIteratorRetainedLifetime",
         "TestSATStoragePointerFreeOwnershipAndConstructorFailure",
         "TestSATStorageVectorFailurePrefixesAndBudgetPeaks",
         "TestSATVarQueueConstructorCloneFailureAndMovedReset",
@@ -113050,13 +113877,47 @@
             "TestSATWatchLifetimeMetadataBudget",
             "TestSATWatchedSourceTagsWidthDefectAndErase"
           ]
+        },
+        {
+          "name": "vector<sat::model_converter::entry> growth/deep copy and sat::uint_set member svector storage",
+          "status": "partial",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverNestedLiteralCapacityAndRetainedTail",
+            "TestSATSolverNestedLiteralDeepCopyAndLedger",
+            "TestSATSolverNestedLiteralFaultPrefixAndRoots",
+            "TestSATSolverNestedLiteralOwnersPointerFreedomWarmAllocation",
+            "TestSATSolverModelConverterReversePatchAndBlockedFlip",
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverModelConverterOuterGrowthDeepCopies",
+            "TestSATSolverModelConverterDeepCopyFailurePrefixAndResume",
+            "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
+            "TestSATSolverModelConverterIndependentChainModels",
+            "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
+            "TestSATSolverModelConverterConstructorAndInsertFaults",
+            "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
+            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
+            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
+            "TestSATSolverUintSetSourceOrderAndOperations",
+            "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
+            "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
+            "TestSATSolverUintSetValueIteratorRetainedLifetime",
+            "TestSATSolverUintSetGhostDefinedSpareTailRelease",
+            "TestSATSolverUintSetSourceCharCapacityOverflowMath"
+          ]
         }
       ],
       "ownership": [
         "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md.",
-        "SAT vector headers/backing/lifetime metadata use actual host widths, real 2-to-(3n+1)/2 growth and old/new peaks. Trivial reallocation copies retained capacity, watched erase/destroy lifetime is distinguished. Value iterators do not allocate cold wrappers. Source impossible constructors/equality overloads are not fabricated; aliases and raw pointer adapters are in SAT_STORAGE_PORT_STATUS.md."
+        "SAT vector headers/backing/lifetime metadata use actual host widths, real 2-to-(3n+1)/2 growth and old/new peaks. Trivial reallocation copies retained capacity, watched erase/destroy lifetime is distinguished. Value iterators do not allocate cold wrappers. Source impossible constructors/equality overloads are not fabricated; aliases and raw pointer adapters are in SAT_STORAGE_PORT_STATUS.md.",
+        "Selected concrete nested literal payload and nontrivial model entry copy adaptations preserve source logical capacities, full retained trivial backing, exact-capacity logical copy, and ascending clone/destruct prefixes. Local SAT char membership storage preserves source uint32 growth arithmetic. Physical pooled storage and all cold metadata remain charged."
       ],
-      "deviations": []
+      "deviations": [
+        "Concrete solver-specific storage, not complete generic vector template surface. Owning model Clone/Assign, other specializations and source-undefined continuation behavior remain explicitly separate.",
+        "Literal storage guards physical capacity and stale tokens, but does not track construction of never-written spare slots. Source-defined initialized retained-slot behavior is verified; validation of every C++ initialized-lifetime domain is not claimed."
+      ]
     },
     {
       "path": "src/util/version.h",

@@ -983,3 +983,22 @@ completed source effects. The existing AST/parray units remain partial.
 Full native/debug, nine named checked/debug race/actual JS groups, the three
 new actual release JS groups, vet/WASI compile and source/no-generics gates
 passed. See AST_EXPR_ARRAY_RETAINED_STATUS.md for frozen evidence.
+
+## Real standalone SAT model conversion prerequisites
+
+Concrete nested literal storage, model-converter builders/reconstruction and
+actual namespace sat::uint_set are integrated. Twenty-four tests-first finite
+groups cover real clause/wrapper insertion, reverse model patching, source
+CollectVars, exact capacity/deep-copy ownership and failure prefixes. Review
+caught and corrected finite captured-end self-copy and immediate debug clause
+assertion order, each with an observed behavioral RED before its correction.
+
+The final HEAD0ec768f plus six-file snapshot passed full native/debug, all24
+named checked/debug race and actual JavaScript groups, vet and WASI production
+build. Final coordinator source/declaration/no-generics audit passed at
+33 ported/82 partial/1987 unported; only model_converter.cpp/.h become partial.
+See SAT_SOLVER_PACKET.md for exact source maps, hashes and terminal evidence.
+Implicit converter owning Clone/Assign and TRACE diagnostics remain open.
+The real full SAT solver/default inprocessing/runtime source test remains RED
+and is excluded from this separately verified prerequisite commit. No complete
+SAT/SMT/interpolation solver claim is made; the original goal remains active.
