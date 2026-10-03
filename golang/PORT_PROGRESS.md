@@ -1363,3 +1363,17 @@ division core. See UPOLYNOMIAL_STURM_PACKET.md for final gates, lifetime and
 physical accounting evidence. Root isolation/refinement, multivariate conversion,
 factorization, algebraic consumers and printers remain required. No whole source
 unit is promoted; ledger remains33ported/145partial/1924unported.
+
+
+## Standalone source small-object allocator
+
+The standalone allocator now executes the source profile branches, requested
+counter publication, intrusive chunk/free links, strict cursor boundary and
+full consolidation scan using actual memory-runtime allocations. Tests first
+replay the registered print-only actions and exercise independent storage,
+lifetime, allocation-refusal and diagnostic-prefix checks. Explicit Go cleanup
+retains live roots after interrupted frees and keeps their owner charged until
+finalization. See SMALL_OBJECT_ALLOCATOR_PACKET.md for source boundaries and
+final verification. Numerical and solver allocator wiring, global diagnostics
+and the full solver/proof/interpolation objective remain required. All three
+allocator source units remain partial; no whole-unit status is promoted.

@@ -88266,7 +88266,12 @@
       "role": "test",
       "status": "partial",
       "go_targets": [
-        "arena/small_bytes.go"
+        "arena/small_bytes.go",
+        "util_small_object_allocator.go",
+        "util_small_object_allocator_consolidate.go",
+        "util_small_object_allocator_vectors.go",
+        "util_small_object_allocator_stream.go",
+        "util_small_object_allocator_test.go"
       ],
       "tests": [
         "TestSmallBytesSourceExercise",
@@ -88281,18 +88286,72 @@
         "TestSmallBytesDirectoryGrowthPeakBudget",
         "TestSmallBytesDirectOnlyDiagnostics",
         "TestSmallBytesReleaseSourceCounter",
-        "TestSmallBytesDirectOnlyFailureAtomic"
+        "TestSmallBytesDirectOnlyFailureAtomic",
+        "TestSmallObjectAllocatorRegisteredPrintOnlyReplay",
+        "TestSmallObjectAllocatorProfilesThresholdsAndHeaders",
+        "TestSmallObjectAllocatorIntrusiveLinksAndPreservedBytes",
+        "TestSmallObjectAllocatorStrictChunkEndpointConsolidateQuirk",
+        "TestSmallObjectAllocatorConsolidateReclaimsRemainderClass",
+        "TestSmallObjectAllocatorRequestedPrefixBeforeRealRawRefusal",
+        "TestSmallObjectAllocatorConsolidateLexicalScratchAndFailure",
+        "TestSmallObjectAllocatorDirectCallerLifetimeClose",
+        "TestSmallObjectAllocatorResetRetainsDirectThreeSourceProfiles",
+        "TestSmallObjectAllocatorIndependentModelWarmPlateau",
+        "TestSmallObjectAllocatorScalarRefAuditAndPlacementDeletes",
+        "TestSmallObjectAllocatorConstructorAndMetadataFailurePrefixes",
+        "TestSmallObjectAllocatorPendingCompletedRawRoots",
+        "TestSmallObjectAllocatorBorrowedIDMutationAndWholeCStringWidth",
+        "TestSmallObjectAllocatorNullStaleIDErrorPrefixes",
+        "TestSmallObjectAllocatorDiagnosticOutputFailureAfterFree",
+        "TestSmallObjectAllocatorVerboseUsesRealRuntimeAndLexicalLifetime",
+        "TestSmallObjectAllocatorConsolidateLateFreeRetainedRoots",
+        "TestSmallObjectAllocatorPooledDuplicateFreePrefix",
+        "TestSmallObjectAllocatorColdFailureSweepAndResetLedger",
+        "TestSmallObjectAllocatorLexicalFailedFreeRoots",
+        "TestSmallObjectAllocatorGenerationExhaustionLedger"
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "standalone source allocator profiles, intrusive chunks/free links, runtime-backed consolidation and borrowed diagnostics",
+          "status": "partial",
+          "go_target": "util_small_object_allocator_test.go",
+          "tests": [
+            "TestSmallObjectAllocatorRegisteredPrintOnlyReplay",
+            "TestSmallObjectAllocatorProfilesThresholdsAndHeaders",
+            "TestSmallObjectAllocatorIntrusiveLinksAndPreservedBytes",
+            "TestSmallObjectAllocatorStrictChunkEndpointConsolidateQuirk",
+            "TestSmallObjectAllocatorConsolidateReclaimsRemainderClass",
+            "TestSmallObjectAllocatorRequestedPrefixBeforeRealRawRefusal",
+            "TestSmallObjectAllocatorConsolidateLexicalScratchAndFailure",
+            "TestSmallObjectAllocatorDirectCallerLifetimeClose",
+            "TestSmallObjectAllocatorResetRetainsDirectThreeSourceProfiles",
+            "TestSmallObjectAllocatorIndependentModelWarmPlateau",
+            "TestSmallObjectAllocatorScalarRefAuditAndPlacementDeletes",
+            "TestSmallObjectAllocatorConstructorAndMetadataFailurePrefixes",
+            "TestSmallObjectAllocatorPendingCompletedRawRoots",
+            "TestSmallObjectAllocatorBorrowedIDMutationAndWholeCStringWidth",
+            "TestSmallObjectAllocatorNullStaleIDErrorPrefixes",
+            "TestSmallObjectAllocatorDiagnosticOutputFailureAfterFree",
+            "TestSmallObjectAllocatorVerboseUsesRealRuntimeAndLexicalLifetime",
+            "TestSmallObjectAllocatorConsolidateLateFreeRetainedRoots",
+            "TestSmallObjectAllocatorPooledDuplicateFreePrefix",
+            "TestSmallObjectAllocatorColdFailureSweepAndResetLedger",
+            "TestSmallObjectAllocatorLexicalFailedFreeRoots",
+            "TestSmallObjectAllocatorGenerationExhaustionLedger"
+          ]
+        }
+      ],
       "ownership": [
-        "Concrete byte owner with scalar descriptors/generation ledger. Caller destroys logical objects before storage reset/free. Budgeted backing/metadata, cold header charged by arena. DirectOnly translates the diagnostic bypass with zero source counter and separate measured owned bytes. See arena/PORT_STATUS.md."
+        "Concrete byte owner with scalar descriptors/generation ledger. Caller destroys logical objects before storage reset/free. Budgeted backing/metadata, cold header charged by arena. DirectOnly translates the diagnostic bypass with zero source counter and separate measured owned bytes. See arena/PORT_STATUS.md.",
+        "Standalone concrete source allocator uses actual utilMemoryRuntime blocks and intrusive payload links. Full cold locator capacity and owner headers are charged; explicit pending/chunk cleanup retains actual failed-free roots. Direct blocks remain caller-owned across Reset and Close. See SMALL_OBJECT_ALLOCATOR_PACKET.md; typed numerical/solver allocator integration remains open."
       ],
       "deviations": [
         "Reset/Close reclaim tracked live direct blocks as explicit typed owner cleanup extension; source only frees pooled chunks.",
         "Conceptual chunk/block indices replace machine addresses for sorting; source strict endpoint/floor-count retention quirk preserved.",
-        "Storage limits checked before publication; invalid size/generation diagnosed."
+        "Storage limits checked before publication; invalid size/generation diagnosed.",
+        "Standalone deterministic scalar address codec and external sort adapter preserve source scan/relink order without claiming native pointer placements. Borrowed explicit diagnostic streams model selected bytes/state; global runtime/ostream wiring remains open. Legacy arena/small_bytes is a separate storage adapter with its recorded extensions."
       ]
     },
     {
@@ -115912,7 +115971,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "arena/small_bytes.go"
+        "arena/small_bytes.go",
+        "util_small_object_allocator.go",
+        "util_small_object_allocator_consolidate.go",
+        "util_small_object_allocator_vectors.go",
+        "util_small_object_allocator_stream.go",
+        "util_small_object_allocator_test.go"
       ],
       "tests": [
         "TestSmallBytesSourceExercise",
@@ -115927,7 +115991,29 @@
         "TestSmallBytesDirectoryGrowthPeakBudget",
         "TestSmallBytesDirectOnlyDiagnostics",
         "TestSmallBytesReleaseSourceCounter",
-        "TestSmallBytesDirectOnlyFailureAtomic"
+        "TestSmallBytesDirectOnlyFailureAtomic",
+        "TestSmallObjectAllocatorRegisteredPrintOnlyReplay",
+        "TestSmallObjectAllocatorProfilesThresholdsAndHeaders",
+        "TestSmallObjectAllocatorIntrusiveLinksAndPreservedBytes",
+        "TestSmallObjectAllocatorStrictChunkEndpointConsolidateQuirk",
+        "TestSmallObjectAllocatorConsolidateReclaimsRemainderClass",
+        "TestSmallObjectAllocatorRequestedPrefixBeforeRealRawRefusal",
+        "TestSmallObjectAllocatorConsolidateLexicalScratchAndFailure",
+        "TestSmallObjectAllocatorDirectCallerLifetimeClose",
+        "TestSmallObjectAllocatorResetRetainsDirectThreeSourceProfiles",
+        "TestSmallObjectAllocatorIndependentModelWarmPlateau",
+        "TestSmallObjectAllocatorScalarRefAuditAndPlacementDeletes",
+        "TestSmallObjectAllocatorConstructorAndMetadataFailurePrefixes",
+        "TestSmallObjectAllocatorPendingCompletedRawRoots",
+        "TestSmallObjectAllocatorBorrowedIDMutationAndWholeCStringWidth",
+        "TestSmallObjectAllocatorNullStaleIDErrorPrefixes",
+        "TestSmallObjectAllocatorDiagnosticOutputFailureAfterFree",
+        "TestSmallObjectAllocatorVerboseUsesRealRuntimeAndLexicalLifetime",
+        "TestSmallObjectAllocatorConsolidateLateFreeRetainedRoots",
+        "TestSmallObjectAllocatorPooledDuplicateFreePrefix",
+        "TestSmallObjectAllocatorColdFailureSweepAndResetLedger",
+        "TestSmallObjectAllocatorLexicalFailedFreeRoots",
+        "TestSmallObjectAllocatorGenerationExhaustionLedger"
       ],
       "conditionals": [
         {
@@ -116086,15 +116172,46 @@
             "TestSmallBytesReleaseSourceCounter",
             "TestSmallBytesDirectOnlyFailureAtomic"
           ]
+        },
+        {
+          "name": "standalone source allocator profiles, intrusive chunks/free links, runtime-backed consolidation and borrowed diagnostics",
+          "status": "partial",
+          "go_target": "util_small_object_allocator_test.go",
+          "tests": [
+            "TestSmallObjectAllocatorRegisteredPrintOnlyReplay",
+            "TestSmallObjectAllocatorProfilesThresholdsAndHeaders",
+            "TestSmallObjectAllocatorIntrusiveLinksAndPreservedBytes",
+            "TestSmallObjectAllocatorStrictChunkEndpointConsolidateQuirk",
+            "TestSmallObjectAllocatorConsolidateReclaimsRemainderClass",
+            "TestSmallObjectAllocatorRequestedPrefixBeforeRealRawRefusal",
+            "TestSmallObjectAllocatorConsolidateLexicalScratchAndFailure",
+            "TestSmallObjectAllocatorDirectCallerLifetimeClose",
+            "TestSmallObjectAllocatorResetRetainsDirectThreeSourceProfiles",
+            "TestSmallObjectAllocatorIndependentModelWarmPlateau",
+            "TestSmallObjectAllocatorScalarRefAuditAndPlacementDeletes",
+            "TestSmallObjectAllocatorConstructorAndMetadataFailurePrefixes",
+            "TestSmallObjectAllocatorPendingCompletedRawRoots",
+            "TestSmallObjectAllocatorBorrowedIDMutationAndWholeCStringWidth",
+            "TestSmallObjectAllocatorNullStaleIDErrorPrefixes",
+            "TestSmallObjectAllocatorDiagnosticOutputFailureAfterFree",
+            "TestSmallObjectAllocatorVerboseUsesRealRuntimeAndLexicalLifetime",
+            "TestSmallObjectAllocatorConsolidateLateFreeRetainedRoots",
+            "TestSmallObjectAllocatorPooledDuplicateFreePrefix",
+            "TestSmallObjectAllocatorColdFailureSweepAndResetLedger",
+            "TestSmallObjectAllocatorLexicalFailedFreeRoots",
+            "TestSmallObjectAllocatorGenerationExhaustionLedger"
+          ]
         }
       ],
       "ownership": [
-        "Concrete byte owner with scalar descriptors/generation ledger. Caller destroys logical objects before storage reset/free. Budgeted backing/metadata, cold header charged by arena. DirectOnly translates the diagnostic bypass with zero source counter and separate measured owned bytes. See arena/PORT_STATUS.md."
+        "Concrete byte owner with scalar descriptors/generation ledger. Caller destroys logical objects before storage reset/free. Budgeted backing/metadata, cold header charged by arena. DirectOnly translates the diagnostic bypass with zero source counter and separate measured owned bytes. See arena/PORT_STATUS.md.",
+        "Standalone concrete source allocator uses actual utilMemoryRuntime blocks and intrusive payload links. Full cold locator capacity and owner headers are charged; explicit pending/chunk cleanup retains actual failed-free roots. Direct blocks remain caller-owned across Reset and Close. See SMALL_OBJECT_ALLOCATOR_PACKET.md; typed numerical/solver allocator integration remains open."
       ],
       "deviations": [
         "Reset/Close reclaim tracked live direct blocks as explicit typed owner cleanup extension; source only frees pooled chunks.",
         "Conceptual chunk/block indices replace machine addresses for sorting; source strict endpoint/floor-count retention quirk preserved.",
-        "Storage limits checked before publication; invalid size/generation diagnosed."
+        "Storage limits checked before publication; invalid size/generation diagnosed.",
+        "Standalone deterministic scalar address codec and external sort adapter preserve source scan/relink order without claiming native pointer placements. Borrowed explicit diagnostic streams model selected bytes/state; global runtime/ostream wiring remains open. Legacy arena/small_bytes is a separate storage adapter with its recorded extensions."
       ]
     },
     {
@@ -116104,7 +116221,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "arena/small_bytes.go"
+        "arena/small_bytes.go",
+        "util_small_object_allocator.go",
+        "util_small_object_allocator_consolidate.go",
+        "util_small_object_allocator_vectors.go",
+        "util_small_object_allocator_stream.go",
+        "util_small_object_allocator_test.go"
       ],
       "tests": [
         "TestSmallBytesSourceExercise",
@@ -116119,7 +116241,29 @@
         "TestSmallBytesDirectoryGrowthPeakBudget",
         "TestSmallBytesDirectOnlyDiagnostics",
         "TestSmallBytesReleaseSourceCounter",
-        "TestSmallBytesDirectOnlyFailureAtomic"
+        "TestSmallBytesDirectOnlyFailureAtomic",
+        "TestSmallObjectAllocatorRegisteredPrintOnlyReplay",
+        "TestSmallObjectAllocatorProfilesThresholdsAndHeaders",
+        "TestSmallObjectAllocatorIntrusiveLinksAndPreservedBytes",
+        "TestSmallObjectAllocatorStrictChunkEndpointConsolidateQuirk",
+        "TestSmallObjectAllocatorConsolidateReclaimsRemainderClass",
+        "TestSmallObjectAllocatorRequestedPrefixBeforeRealRawRefusal",
+        "TestSmallObjectAllocatorConsolidateLexicalScratchAndFailure",
+        "TestSmallObjectAllocatorDirectCallerLifetimeClose",
+        "TestSmallObjectAllocatorResetRetainsDirectThreeSourceProfiles",
+        "TestSmallObjectAllocatorIndependentModelWarmPlateau",
+        "TestSmallObjectAllocatorScalarRefAuditAndPlacementDeletes",
+        "TestSmallObjectAllocatorConstructorAndMetadataFailurePrefixes",
+        "TestSmallObjectAllocatorPendingCompletedRawRoots",
+        "TestSmallObjectAllocatorBorrowedIDMutationAndWholeCStringWidth",
+        "TestSmallObjectAllocatorNullStaleIDErrorPrefixes",
+        "TestSmallObjectAllocatorDiagnosticOutputFailureAfterFree",
+        "TestSmallObjectAllocatorVerboseUsesRealRuntimeAndLexicalLifetime",
+        "TestSmallObjectAllocatorConsolidateLateFreeRetainedRoots",
+        "TestSmallObjectAllocatorPooledDuplicateFreePrefix",
+        "TestSmallObjectAllocatorColdFailureSweepAndResetLedger",
+        "TestSmallObjectAllocatorLexicalFailedFreeRoots",
+        "TestSmallObjectAllocatorGenerationExhaustionLedger"
       ],
       "conditionals": [
         {
@@ -116236,15 +116380,46 @@
             "TestSmallBytesReleaseSourceCounter",
             "TestSmallBytesDirectOnlyFailureAtomic"
           ]
+        },
+        {
+          "name": "standalone source allocator profiles, intrusive chunks/free links, runtime-backed consolidation and borrowed diagnostics",
+          "status": "partial",
+          "go_target": "util_small_object_allocator_test.go",
+          "tests": [
+            "TestSmallObjectAllocatorRegisteredPrintOnlyReplay",
+            "TestSmallObjectAllocatorProfilesThresholdsAndHeaders",
+            "TestSmallObjectAllocatorIntrusiveLinksAndPreservedBytes",
+            "TestSmallObjectAllocatorStrictChunkEndpointConsolidateQuirk",
+            "TestSmallObjectAllocatorConsolidateReclaimsRemainderClass",
+            "TestSmallObjectAllocatorRequestedPrefixBeforeRealRawRefusal",
+            "TestSmallObjectAllocatorConsolidateLexicalScratchAndFailure",
+            "TestSmallObjectAllocatorDirectCallerLifetimeClose",
+            "TestSmallObjectAllocatorResetRetainsDirectThreeSourceProfiles",
+            "TestSmallObjectAllocatorIndependentModelWarmPlateau",
+            "TestSmallObjectAllocatorScalarRefAuditAndPlacementDeletes",
+            "TestSmallObjectAllocatorConstructorAndMetadataFailurePrefixes",
+            "TestSmallObjectAllocatorPendingCompletedRawRoots",
+            "TestSmallObjectAllocatorBorrowedIDMutationAndWholeCStringWidth",
+            "TestSmallObjectAllocatorNullStaleIDErrorPrefixes",
+            "TestSmallObjectAllocatorDiagnosticOutputFailureAfterFree",
+            "TestSmallObjectAllocatorVerboseUsesRealRuntimeAndLexicalLifetime",
+            "TestSmallObjectAllocatorConsolidateLateFreeRetainedRoots",
+            "TestSmallObjectAllocatorPooledDuplicateFreePrefix",
+            "TestSmallObjectAllocatorColdFailureSweepAndResetLedger",
+            "TestSmallObjectAllocatorLexicalFailedFreeRoots",
+            "TestSmallObjectAllocatorGenerationExhaustionLedger"
+          ]
         }
       ],
       "ownership": [
-        "Concrete byte owner with scalar descriptors/generation ledger. Caller destroys logical objects before storage reset/free. Budgeted backing/metadata, cold header charged by arena. DirectOnly translates the diagnostic bypass with zero source counter and separate measured owned bytes. See arena/PORT_STATUS.md."
+        "Concrete byte owner with scalar descriptors/generation ledger. Caller destroys logical objects before storage reset/free. Budgeted backing/metadata, cold header charged by arena. DirectOnly translates the diagnostic bypass with zero source counter and separate measured owned bytes. See arena/PORT_STATUS.md.",
+        "Standalone concrete source allocator uses actual utilMemoryRuntime blocks and intrusive payload links. Full cold locator capacity and owner headers are charged; explicit pending/chunk cleanup retains actual failed-free roots. Direct blocks remain caller-owned across Reset and Close. See SMALL_OBJECT_ALLOCATOR_PACKET.md; typed numerical/solver allocator integration remains open."
       ],
       "deviations": [
         "Reset/Close reclaim tracked live direct blocks as explicit typed owner cleanup extension; source only frees pooled chunks.",
         "Conceptual chunk/block indices replace machine addresses for sorting; source strict endpoint/floor-count retention quirk preserved.",
-        "Storage limits checked before publication; invalid size/generation diagnosed."
+        "Storage limits checked before publication; invalid size/generation diagnosed.",
+        "Standalone deterministic scalar address codec and external sort adapter preserve source scan/relink order without claiming native pointer placements. Borrowed explicit diagnostic streams model selected bytes/state; global runtime/ostream wiring remains open. Legacy arena/small_bytes is a separate storage adapter with its recorded extensions."
       ]
     },
     {
