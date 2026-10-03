@@ -485,3 +485,25 @@ assignment history, plus independent values, signed/unreduced/component states,
 floating NaN/Inf branches and immediate ownership/value failure audits. Missing
 APIs were observed RED before implementation. See RATIONAL_INSPECTION_PORT_STATUS.md.
 Owner-local wrapper service, complete operator facade and AST ownership remain open.
+
+## Owner-local rational service core
+
+RationalService now owns the synchronized numeric manager, constants and source
+powers cache; OwnedRational is a pointer-free value with checked scalar service
+provenance. Explicit copy/move/swap/delete and cross-owner copying preserve
+source lifetimes without a global mutable manager. Cache growth, extra k+1 entry,
+placement-copy failure prefixes, retries and ascending destruction remain exact.
+Fifteen tests began with missing APIs RED; signed/unsigned constructor boundary
+shape tests independently reached behavioral RED before fixing distinct signed32
+and typed64 setter paths. Five selected source ENSUREs and independent cache,
+provenance, ownership, concurrency and exact-budget tests pass.
+See RATIONAL_SERVICE_PORT_STATUS.md. Complete operator facade, infinitesimal
+initialization/finalization hooks and AST parameters remain open.
+
+Final combined verification after the signed-fraction correction: full uncached
+native and checked race suites, full actual checked JS/Wasm execution, checked
+vet and checked WASI cross-build all passed. Every one of the40 new tests across
+copy, number theory, inspection and service packets has explicit JS RUN/PASS
+evidence. WASI execution is not claimed. Source inventory/no-generics audit:
+2102 units,677 APIs;14 ported,41 partial,2047 unported. The complete solver,
+AST, proof and interpolation scope remains open.
