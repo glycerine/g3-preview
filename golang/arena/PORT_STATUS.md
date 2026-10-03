@@ -185,3 +185,99 @@ tables and domain raw-offset registration remain deferred together. Region
 marks/rollback, byte/string pools, domain cleanup, source container facades,
 actual wasm execution and full solver integration remain incomplete. No shared
 manifest or previously agreed slab/budget interface was modified by this packet.
+
+# Typed marked-region packet
+
+`region.go` now supplies independent typed marked storage. Earlier references
+to its absence describe preceding packets. This packet does not implement solver
+trail variants or the raw byte/address source allocator layout.
+
+Region[T] owns a Slab[T], a scalar RegionRef allocation log and scalar
+serial/length mark records. RegionRef carries Slot/Generation; RegionMark is an
+opaque cold owner identity pointer plus serial token. The mark's owner pointer
+is not stored in hot record or mark backing arrays. Marks are never reused:
+serial exhaustion permanently prevents new marks, even after Reset. Every
+Allocate explicitly writes its initial scalar T. Reads copy values; no raw
+pointer or slice borrow exists. Individual object free is deliberately absent.
+
+Mark/Rollback are strictly nested. Rollback rejects zero, foreign, consumed and
+non-top marks. PopScopes explicitly supports a validated counted pop. Reset
+cleans all records, including base-level allocations, and invalidates all marks.
+Close is idempotent and drops backing arrays and ledger. TrimFreePages returns
+an error so callback reentrancy can be rejected; it drops only fully dead record
+pages while retaining generation metadata and reusable scalar control arrays.
+
+The transient Cleanup[T] parameter is never stored as a trail closure. It runs
+in reverse allocation order; every target record stays live through *all*
+callbacks, after which a separate pass recycles records. This is a documented
+storage cleanup contract, not a claim that source trail objects individually
+remain live after source undo/destruction. Reads/Stats are allowed in callbacks;
+Allocate/Write/Mark/Rollback/PopScopes/Reset/Trim/Close reject reentrant mutation.
+A callback panic preserves allocator records/log/marks and clears the busy flag.
+External callback side effects cannot be rolled back; repeated cleanup after
+panic is not promised safe. A nil cleanup means caller cleanup already ran.
+
+Budget checks reserve peak old+new log/mark backing capacity before copying.
+An injected/limit failure during those growth steps leaves that array and budget
+unchanged. If subsequent slab allocation fails, already prepared reusable log
+capacity may remain retained/charged; no live region record is published.
+Stats separates log/mark bytes and slab capacity/metadata. Cold owner headers,
+caller scratch and source cleanup reserves remain explicit owner responsibilities.
+
+## Source mapping and inspection
+
+Read source region.h/.cpp/trail.h plus object_allocator.h,
+small_object_allocator.h and both allocator tests before implementation.
+`src/test/region.cpp::tst1` is still only TODO, and no dedicated source trail
+test file exists. `src/test/small_object_allocator.cpp` exercises allocation
+reuse but contains no ENSURE assertions. `src/test/object_allocator.cpp`
+asserts coefficient reset, worker capacity and constructed/destructed balance;
+those belong to its reset-only constructed pool. This region does not substitute
+zero/reconstruction for that pool's reset-only lifecycle or claim its port.
+
+| Executable source behavior | Typed counterpart / limit |
+| --- | --- |
+| region allocate/default pages and debug chunks | Region.Allocate uses stable typed slab records, not source address alignment/chunks |
+| region push_scope mark(page,cursor,previous) | Mark logs typed used length and serial, explicit nesting |
+| region pop_scope and counted pop | Rollback/PopScopes invalidate only suffix allocations, preserving prefix and generation ledger |
+| region reset/recycle/default-page reuse | Reset recycles all typed records while preserving reusable capacity; lazy typed allocation differs from source eagerly keeping one default page |
+| region destructor/display_mem_stats | Close releases all backing metadata; Stats reports typed capacity, not source textual pointer/chunk diagnostics |
+| region large allocation and placement operators | Variable payload extents are Words/Vectors; this Region is fixed-record typed storage, no source address API |
+| undo_trail_stack reverse loop/old_size assertion | Reverse transient cleanup followed by suffix truncation, checked mark lengths; independent scalar undo-state oracle |
+| trail_stack reset base-level undo | Reset includes records before the first scope |
+| trail_stack push_scope/pop_scope | Mark/PopScopes coordinate typed record reclamation only; real domain undo entries and subsystem callbacks remain open |
+| value/reset_flag/restore_size/vector/map/ref/new_obj trail subclasses | Not translated by generic storage; tagged domain dispatch and logical ownership remain higher-layer work |
+
+Read-only inspection checksums:
+
+- region.h: fab2ab6cdc6bdc067f38a8908c7591e9dc90bfea116823d2c744ead9238b32d1
+- region.cpp: 23908446c761dfb4e7b1165f2545f69f3e8726b7139f07b30133488559562eb3
+- trail.h: 453e4c187865dbf98893988f51152c67bf5ae98d0a69caf9c4640eea94136a6c
+- test/region.cpp: 09bc4beded6a1b360db26f37f2b3df70e0c525be0d586896acd0018cdda0243c
+
+## TDD and checks
+
+Observed initial RED: undefined NewRegion/RegionRef/ErrMark/ErrReentrant before
+implementation. GREEN tests cover nested prefix/suffix liveness, foreign and
+consumed marks, counted scopes, zero-level reset cleanup, cleanup before recycle,
+reverse dispatch, all mutation reentrancy, callback-panic storage preservation,
+generation persistence through reset/trim, mark serial exhaustion, injected mark
+and log growth failures, peak old+new mark/log budgets and Close budget balance.
+An independent scalar undo/checkpoint oracle runs 3000 finite operations. These
+tests do not require reading source or invoking a reference executable.
+
+- Native CGO-disabled arena tests: PASS.
+- g3checked arena tests, go vet, js/wasm and wasip1/wasm package builds: PASS.
+- GOARCH=386 test binary compilation: PASS; actual 32-bit execution still awaits
+  a compatible runner following the earlier bad-system-call failure.
+- FuzzRegionTrailOps: PASS, 3 seconds, 2 workers, 140338 executions,
+  33 new interesting cases; each input is capped at 512 operations.
+- BenchmarkRegionWarm: 37.02 ns/op, 0 B/op, 0 allocs/op for warm
+  mark/allocate/rollback on the previously recorded host/toolchain.
+- AllocsPerRun independently requires exact zero allocations for that warm cycle.
+
+Remaining: source typed/domain trail variants, constructed-object pools and
+their destructor/reset behavior, SMT pop ordering, region-owned variable payload
+marks, cleanup-list integration, promotions into persistent owners, optional
+compaction, source diagnostic formatting and actual wasm execution. This packet
+does not close full memory-subsystem or full-fork acceptance.
