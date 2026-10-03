@@ -33,6 +33,8 @@ type smallByteChunk struct {
 	class, cursor, free uint32
 }
 type SmallBytesStats struct {
+	// OwnerBytes includes this header and the private descriptor owner header.
+	OwnerBytes                                                                            uint64
 	Live, Chunks, FreeObjects, DirectObjects                                              uint32
 	RequestedBytes, WastedBytes, PayloadBytes, MetadataBytes, DirectoryBytes, DirectBytes uint64
 	// SourceAllocationBytes matches source m_alloc_size, which remains zero in
@@ -50,7 +52,7 @@ type SmallBytesStats struct {
 // No borrowed slice escapes. Pooled data after Deallocate is unspecified.
 // Chunk indices replace raw addresses for deterministic consolidation order;
 // released conceptual addresses are reusable, without moving live contents.
-// Budget charges all backing arrays; caller budgets this fixed cold header.
+// Budget charges all backing arrays and both cold owner headers.
 type SmallBytes struct {
 	descriptors               *descriptorSlab
 	chunks                    []smallByteChunk
@@ -82,6 +84,10 @@ func NewSmallBytes(c SmallBytesConfig) (*SmallBytes, error) {
 	}
 	d, e := newDescriptorSlab(c.Descriptors)
 	if e != nil {
+		return nil, e
+	}
+	if e := c.Descriptors.Budget.Reserve(uint64(reflect.TypeOf(SmallBytes{}).Size())); e != nil {
+		d.Close()
 		return nil, e
 	}
 	return &SmallBytes{descriptors: d, config: c}, nil
@@ -356,7 +362,7 @@ func (a *SmallBytes) Close() {
 	}
 	a.Reset()
 	a.descriptors.Close()
-	a.config.Descriptors.Budget.Release(a.directoryBytes)
+	a.config.Descriptors.Budget.Release(a.directoryBytes + uint64(reflect.TypeOf(SmallBytes{}).Size()))
 	a.directoryBytes = 0
 	a.chunks = nil
 	a.closed = true
@@ -367,6 +373,10 @@ func (a *SmallBytes) Stats() SmallBytesStats {
 		s.SourceAllocationBytes = a.requested
 	}
 	d := a.descriptors.Stats()
+	s.OwnerBytes = d.OwnerBytes
+	if !a.closed {
+		s.OwnerBytes += uint64(reflect.TypeOf(SmallBytes{}).Size())
+	}
 	s.Live = d.Live
 	s.MetadataBytes = d.RecordBytes + d.MetadataBytes
 	s.DirectoryBytes += d.DirectoryBytes

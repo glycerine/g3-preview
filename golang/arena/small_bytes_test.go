@@ -418,7 +418,7 @@ func TestSmallBytesGenerationRetirementAndAccounting(t *testing.T) {
 		t.Fatal("retired identity reused")
 	}
 	s := a.Stats()
-	if b.Used() != s.PayloadBytes+s.MetadataBytes+s.DirectoryBytes {
+	if b.Used() != s.PayloadBytes+s.MetadataBytes+s.DirectoryBytes+s.OwnerBytes {
 		t.Fatal("unaccounted retained backing", b.Used(), s)
 	}
 	a.Reset()
@@ -491,8 +491,9 @@ func TestSmallBytesDirectOnlyDiagnostics(t *testing.T) {
 		t.Fatal(e)
 	}
 	defer a.Close()
+	baseline := budget.Used()
 	zero, e := a.Allocate(0)
-	if e != nil || zero != (SmallBytesRef{}) || budget.Used() != 0 {
+	if e != nil || zero != (SmallBytesRef{}) || budget.Used() != baseline {
 		t.Fatal("diagnostic zero allocation")
 	}
 	var refs [4]SmallBytesRef

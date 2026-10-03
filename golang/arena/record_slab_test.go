@@ -47,6 +47,9 @@ func newRecordSlab(config Config) (*recordSlab, error) {
 	if uint64(config.PageSize) > maxInt/metaSize {
 		return nil, ErrConfig
 	}
+	if e := config.Budget.Reserve(uint64(reflect.TypeOf(recordSlab{}).Size())); e != nil {
+		return nil, e
+	}
 	return &recordSlab{config: config, recordPageBytes: uint64(config.PageSize) * uint64(t.Size()), metaPageBytes: uint64(config.PageSize) * metaSize}, nil
 }
 
@@ -216,7 +219,7 @@ func (s *recordSlab) Close() {
 		return
 	}
 	stats := s.Stats()
-	s.config.Budget.Release(stats.RecordBytes + stats.MetadataBytes + stats.DirectoryBytes)
+	s.config.Budget.Release(stats.RecordBytes + stats.MetadataBytes + stats.DirectoryBytes + stats.OwnerBytes)
 	s.pages = nil
 	s.free = 0
 	s.live = 0
@@ -227,6 +230,9 @@ func (s *recordSlab) Close() {
 }
 func (s *recordSlab) Stats() Stats {
 	stats := Stats{Live: s.live, Slots: s.slots, Retired: s.retired, MetadataBytes: uint64(len(s.pages)) * s.metaPageBytes, DirectoryBytes: s.directoryBytes}
+	if !s.closed {
+		stats.OwnerBytes = uint64(reflect.TypeOf(recordSlab{}).Size())
+	}
 	for i := range s.pages {
 		if s.pages[i].records != nil {
 			stats.Pages++

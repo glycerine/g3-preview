@@ -97,7 +97,7 @@ func TestNumericCellSlabFailureAndReuseAllocations(t *testing.T) {
 	}
 	defer s.Close()
 	budget.FailAfter(0)
-	if _, _, e = s.Allocate(); !errors.Is(e, arena.ErrInjectedFailure) || budget.Used() != 0 || s.Stats().Live != 0 {
+	if _, _, e = s.Allocate(); !errors.Is(e, arena.ErrInjectedFailure) || budget.Used() != s.Stats().OwnerBytes || s.Stats().Live != 0 {
 		t.Fatal(e, s.Stats())
 	}
 	budget.FailAfter(-1)
@@ -155,7 +155,7 @@ func TestNumericCellSlabDirectoryPeakBudget(t *testing.T) {
 	// directory arrays during growth. This preserves the original peak charge.
 	pageBytes := uint64(reflect.TypeOf(numericCell{}).Size() + reflect.TypeOf(numericCellSlotState{}).Size())
 	directoryEntry := uint64(reflect.TypeOf(numericCellPage{}).Size())
-	budget := arena.NewBudget(2*pageBytes + 2*directoryEntry)
+	budget := arena.NewBudget(uint64(reflect.TypeOf(numericCellSlab{}).Size()) + 2*pageBytes + 2*directoryEntry)
 	s, e := newNumericCellSlab(arena.Config{PageSize: 1, Budget: budget})
 	if e != nil {
 		t.Fatal(e)

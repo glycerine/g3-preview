@@ -20,6 +20,8 @@ type VectorConfig struct {
 }
 type vectorDescriptor struct{ page, offset, length, capacity uint32 }
 type VectorStats struct {
+	// OwnerBytes charges only this owner header; nested stats account their owners.
+	OwnerBytes                                       uint64
 	Descriptors                                      Stats
 	Live                                             uint32
 	PayloadBytes, BlockMetadataBytes, DirectoryBytes uint64

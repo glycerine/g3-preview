@@ -17,7 +17,7 @@ var (
 
 // SlotLimit limits physical slots per worker region. Zero uses MaxUint32.
 // A pool budget accounts backing pages, ledgers, free arrays and directories;
-// the owner separately accounts for cold owner/policy headers and callback work.
+// constructors account the cold owner/policy header; callback work stays external.
 type Pool32Config struct {
 	PageSize, Workers, SlotLimit uint32
 	Budget                       *Budget
@@ -58,6 +58,8 @@ type pool32Worker struct {
 	activePages uint32
 }
 type Pool32Stats struct {
+	// OwnerBytes charges only this owner header; nested stats account their owners.
+	OwnerBytes                                                uint64
 	Workers, Live, Constructed, Retired, Pages                uint32
 	RecordBytes, MetadataBytes, DirectoryBytes, FreeListBytes uint64
 }
@@ -96,8 +98,13 @@ func NewPool32(config Pool32Config, policy Pool32Policy) (*Pool32, error) {
 	if config.PageSize&(config.PageSize-1) != 0 || uint64(config.PageSize) > maxInt/uint64(reflect.TypeOf(pool32Meta{}).Size()) {
 		return nil, ErrConfig
 	}
+	header := uint64(reflect.TypeOf(Pool32{}).Size())
+	if e := config.Budget.Reserve(header); e != nil {
+		return nil, e
+	}
 	p := &Pool32{config: config, policy: policy}
 	if e := p.reserveWorkers(config.Workers); e != nil {
+		config.Budget.Release(header)
 		return nil, e
 	}
 	return p, nil
@@ -499,7 +506,7 @@ func (p *Pool32) Close() error {
 		p.destroyWorker(&p.workers[i])
 	}
 	s := p.stats()
-	p.config.Budget.Release(s.RecordBytes + s.MetadataBytes + s.DirectoryBytes + s.FreeListBytes)
+	p.config.Budget.Release(s.RecordBytes + s.MetadataBytes + s.DirectoryBytes + s.FreeListBytes + s.OwnerBytes)
 	p.workers = nil
 	p.closed = true
 	return nil
@@ -507,6 +514,9 @@ func (p *Pool32) Close() error {
 func (p *Pool32) Stats() Pool32Stats { p.mu.Lock(); defer p.mu.Unlock(); return p.stats() }
 func (p *Pool32) stats() Pool32Stats {
 	s := Pool32Stats{Workers: uint32(len(p.workers)), DirectoryBytes: uint64(cap(p.workers)) * uint64(reflect.TypeOf(pool32Worker{}).Size())}
+	if !p.closed {
+		s.OwnerBytes = uint64(reflect.TypeOf(Pool32{}).Size())
+	}
 	for i := range p.workers {
 		w := &p.workers[i]
 		s.DirectoryBytes += uint64(cap(w.pages)) * uint64(reflect.TypeOf(pool32Page{}).Size())

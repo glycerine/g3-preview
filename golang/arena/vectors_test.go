@@ -302,7 +302,7 @@ func TestVectorBudgetPeakDirectory(t *testing.T) {
 	probe.Reserve(a, 4)
 	after := probe.Stats()
 	probe.Close()
-	total := after.PayloadBytes + after.BlockMetadataBytes + after.DirectoryBytes + after.Descriptors.RecordBytes + after.Descriptors.MetadataBytes + after.Descriptors.DirectoryBytes
+	total := after.PayloadBytes + after.BlockMetadataBytes + after.DirectoryBytes + after.Descriptors.RecordBytes + after.Descriptors.MetadataBytes + after.Descriptors.DirectoryBytes + after.OwnerBytes + after.Descriptors.OwnerBytes
 	budget := NewBudget(total)
 	v, _ := NewWords(VectorConfig{PageSize: 2, Descriptors: Config{PageSize: 2, Budget: budget}})
 	defer v.Close()

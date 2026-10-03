@@ -26,6 +26,10 @@ func NewRegion32(config Config) (*Region32, error) {
 	if e != nil {
 		return nil, e
 	}
+	if e := config.Budget.Reserve(uint64(reflect.TypeOf(Region32{}).Size()) + uint64(reflect.TypeOf(regionIdentity{}).Size())); e != nil {
+		s.Close()
+		return nil, e
+	}
 	return &Region32{storage: s, budget: config.Budget, identity: &regionIdentity{1}}, nil
 }
 func (r *Region32) mutationError() error {
@@ -171,12 +175,16 @@ func (r *Region32) Close(cleanup Cleanup32) error {
 		return e
 	}
 	r.storage.Close()
-	r.budget.Release(uint64(cap(r.log))*uint64(reflect.TypeOf(RegionRef{}).Size()) + uint64(cap(r.marks))*uint64(reflect.TypeOf(regionMarkState{}).Size()))
+	r.budget.Release(uint64(reflect.TypeOf(Region32{}).Size()) + uint64(reflect.TypeOf(regionIdentity{}).Size()) + uint64(cap(r.log))*uint64(reflect.TypeOf(RegionRef{}).Size()) + uint64(cap(r.marks))*uint64(reflect.TypeOf(regionMarkState{}).Size()))
 	r.log = nil
 	r.marks = nil
 	r.closed = true
 	return nil
 }
 func (r *Region32) Stats() RegionStats {
-	return RegionStats{Storage: r.storage.Stats(), Live: uint32(len(r.log)), Scopes: uint32(len(r.marks)), LogBytes: uint64(cap(r.log)) * uint64(reflect.TypeOf(RegionRef{}).Size()), MarkBytes: uint64(cap(r.marks)) * uint64(reflect.TypeOf(regionMarkState{}).Size())}
+	owner := uint64(0)
+	if !r.closed {
+		owner = uint64(reflect.TypeOf(Region32{}).Size()) + uint64(reflect.TypeOf(regionIdentity{}).Size())
+	}
+	return RegionStats{OwnerBytes: owner, Storage: r.storage.Stats(), Live: uint32(len(r.log)), Scopes: uint32(len(r.marks)), LogBytes: uint64(cap(r.log)) * uint64(reflect.TypeOf(RegionRef{}).Size()), MarkBytes: uint64(cap(r.marks)) * uint64(reflect.TypeOf(regionMarkState{}).Size())}
 }

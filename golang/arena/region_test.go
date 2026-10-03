@@ -288,7 +288,7 @@ func TestRegionBudgetPeakLogs(t *testing.T) {
 	probe.Allocate(2)
 	two := probe.Stats()
 	probe.Close(nil)
-	total := two.Storage.RecordBytes + two.Storage.MetadataBytes + two.Storage.DirectoryBytes + two.LogBytes + two.MarkBytes
+	total := two.Storage.RecordBytes + two.Storage.MetadataBytes + two.Storage.DirectoryBytes + two.LogBytes + two.MarkBytes + two.OwnerBytes + two.Storage.OwnerBytes
 	budget := NewBudget(total)
 	r, _ := NewRegion32(Config{PageSize: 2, Budget: budget})
 	defer r.Close(nil)
@@ -308,7 +308,7 @@ func TestRegionMarkPeakAndExhaustion(t *testing.T) {
 	probe.Mark()
 	two := probe.Stats()
 	probe.Close(nil)
-	budget := NewBudget(two.MarkBytes)
+	budget := NewBudget(two.MarkBytes + two.OwnerBytes + two.Storage.OwnerBytes)
 	r, _ := NewRegion32(Config{Budget: budget})
 	defer r.Close(nil)
 	r.Mark()

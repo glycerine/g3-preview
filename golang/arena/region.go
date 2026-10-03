@@ -37,14 +37,17 @@ type regionMarkState struct {
 type Cleanup32 func(RegionRef, uint32)
 type Cleanup64 func(RegionRef, uint64)
 type RegionStats struct {
+	// OwnerBytes includes this header and its separately allocated identity;
+	// Storage.OwnerBytes accounts the nested slab owner.
+	OwnerBytes          uint64
 	Storage             Stats
 	Live, Scopes        uint32
 	LogBytes, MarkBytes uint64
 }
 
 // reserveRegionLog reserves old+new directory capacity before copying; on a
-// predictable failure it leaves the slice and budget untouched. Cold region
-// owner headers, caller scratch and cleanup reserves are budgeted by the owner.
+// predictable failure it leaves the slice and budget untouched. Region
+// constructors charge cold headers; caller scratch and cleanup reserves stay external.
 func reserveRegionRefs(data []RegionRef, budget *Budget) ([]RegionRef, error) {
 	if len(data) < cap(data) {
 		return data, nil
@@ -73,8 +76,8 @@ func reserveRegionRefs(data []RegionRef, budget *Budget) ([]RegionRef, error) {
 }
 
 // reserveRegionLog reserves old+new directory capacity before copying; on a
-// predictable failure it leaves the slice and budget untouched. Cold region
-// owner headers, caller scratch and cleanup reserves are budgeted by the owner.
+// predictable failure it leaves the slice and budget untouched. Region
+// constructors charge cold headers; caller scratch and cleanup reserves stay external.
 func reserveRegionMarks(data []regionMarkState, budget *Budget) ([]regionMarkState, error) {
 	if len(data) < cap(data) {
 		return data, nil

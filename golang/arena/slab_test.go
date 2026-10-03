@@ -83,7 +83,7 @@ func TestSlabFailureAtomic(t *testing.T) {
 	if _, _, err = s.Allocate(); !errors.Is(err, ErrInjectedFailure) {
 		t.Fatal(err)
 	}
-	if s.Stats() != before || b.Used() != 0 {
+	if s.Stats() != before || b.Used() != before.OwnerBytes {
 		t.Fatal("failed growth changed state", s.Stats(), b.Used())
 	}
 	b.FailAfter(-1)
@@ -267,14 +267,14 @@ func TestSlabGrowthChargesPeakDirectory(t *testing.T) {
 	two := probe.Stats()
 	// Final capacity fits, but copying the page directory also needs its old
 	// allocation to remain live until publication of the replacement.
-	limit := two.RecordBytes + two.MetadataBytes + two.DirectoryBytes
+	limit := two.RecordBytes + two.MetadataBytes + two.DirectoryBytes + two.OwnerBytes
 	b := NewBudget(limit)
 	s, _ := newRecordSlab(Config{PageSize: 1, Budget: b})
 	s.Allocate()
 	if _, _, e := s.Allocate(); !errors.Is(e, ErrBudget) {
 		t.Fatal(e)
 	}
-	if s.Stats() != one || b.Used() != one.RecordBytes+one.MetadataBytes+one.DirectoryBytes {
+	if s.Stats() != one || b.Used() != one.RecordBytes+one.MetadataBytes+one.DirectoryBytes+one.OwnerBytes {
 		t.Fatal("peak rejection changed state")
 	}
 }

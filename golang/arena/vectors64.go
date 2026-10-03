@@ -15,7 +15,7 @@ type vectorPage64 struct {
 
 // Vectors64 pools pointer-free payloads in geometric capacity classes. PageSize
 // is an element count (default 16384). Descriptors.Budget accounts all backing
-// arrays and metadata. Owners separately budget cold headers/scratch/cleanup.
+// arrays and metadata. Constructors account cold owner headers; caller scratch/cleanup stays external.
 // No backing slice escapes. Ownership is single-threaded and owner-local.
 type Vectors64 struct {
 	descriptors                  *descriptorSlab
@@ -39,6 +39,10 @@ func NewVectors64(config VectorConfig) (*Vectors64, error) {
 	}
 	d, e := newDescriptorSlab(config.Descriptors)
 	if e != nil {
+		return nil, e
+	}
+	if e := config.Descriptors.Budget.Reserve(uint64(reflect.TypeOf(Vectors64{}).Size())); e != nil {
+		d.Close()
 		return nil, e
 	}
 	return &Vectors64{descriptors: d, config: config, elementBytes: size}, nil
@@ -315,13 +319,16 @@ func (v *Vectors64) Close() {
 	}
 	v.Reset()
 	v.descriptors.Close()
-	v.config.Descriptors.Budget.Release(v.directoryBytes)
+	v.config.Descriptors.Budget.Release(v.directoryBytes + uint64(reflect.TypeOf(Vectors64{}).Size()))
 	v.pages = nil
 	v.directoryBytes = 0
 	v.closed = true
 }
 func (v *Vectors64) Stats() VectorStats {
 	s := VectorStats{Descriptors: v.descriptors.Stats(), DirectoryBytes: v.directoryBytes}
+	if !v.closed {
+		s.OwnerBytes = uint64(reflect.TypeOf(Vectors64{}).Size())
+	}
 	s.Live = s.Descriptors.Live
 	for i := range v.pages {
 		p := &v.pages[i]

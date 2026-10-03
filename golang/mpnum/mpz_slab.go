@@ -56,6 +56,9 @@ func newNumericCellSlab(config arena.Config) (*numericCellSlab, error) {
 	if uint64(config.PageSize) > maxInt/metaSize {
 		return nil, arena.ErrConfig
 	}
+	if e := config.Budget.Reserve(uint64(reflect.TypeOf(numericCellSlab{}).Size())); e != nil {
+		return nil, e
+	}
 	return &numericCellSlab{config: config, recordPageBytes: uint64(config.PageSize) * uint64(t.Size()), metaPageBytes: uint64(config.PageSize) * metaSize}, nil
 }
 
@@ -225,7 +228,7 @@ func (s *numericCellSlab) Close() {
 		return
 	}
 	stats := s.Stats()
-	s.config.Budget.Release(stats.RecordBytes + stats.MetadataBytes + stats.DirectoryBytes)
+	s.config.Budget.Release(stats.RecordBytes + stats.MetadataBytes + stats.DirectoryBytes + stats.OwnerBytes)
 	s.pages = nil
 	s.free = 0
 	s.live = 0
@@ -236,6 +239,9 @@ func (s *numericCellSlab) Close() {
 }
 func (s *numericCellSlab) Stats() arena.Stats {
 	stats := arena.Stats{Live: s.live, Slots: s.slots, Retired: s.retired, MetadataBytes: uint64(len(s.pages)) * s.metaPageBytes, DirectoryBytes: s.directoryBytes}
+	if !s.closed {
+		stats.OwnerBytes = uint64(reflect.TypeOf(numericCellSlab{}).Size())
+	}
 	for i := range s.pages {
 		if s.pages[i].records != nil {
 			stats.Pages++

@@ -574,3 +574,64 @@ translation with the documented owner cleanup and conceptual-address adaptations
 It does not establish raw-pointer ABI fidelity, AST-domain cleanup/integration,
 source reference execution, real rational-cell constructed pools or the complete
 arena/memory/solver gate.
+
+# Arena cold-owner header budget integration
+
+The pending arena header responsibility recorded above is now implemented inside
+constructors. Source storage/cleanup algorithms and existing backing directory
+charges are unchanged. `OwnerBytes` separately exposes cold owned bytes rather
+than hiding them in record metadata or counting directory slice headers twice.
+
+| Owner | Newly charged fixed allocation and unwind |
+| --- | --- |
+| Slab32/Slab64/private descriptorSlab | reflect.TypeOf(concreteOwner{}).Size after config validation, before owner allocation; Close refunds once |
+| test recordSlab | same concrete rule, preserving rich-record state-machine/fuzz/zero-allocation test coverage |
+| Words/Vectors64/Vectors32Signed | own header plus child descriptorSlab header; parent reserve failure closes child to refund constructor prefix |
+| Region32/Region64 | own header plus separately allocated nonzero regionIdentity, in addition to nested slab header; reserve failure closes child |
+| Pool32 | own header includes embedded mutex/config/policy; failed eager-worker construction refunds owner header; backing worker/page/free arrays remain separately charged |
+| SmallBytes | own header plus child descriptorSlab; parent reserve failure closes child; flattened Stats.OwnerBytes includes both |
+
+Stats.OwnerBytes is per owner; nested VectorStats.Descriptors.OwnerBytes and
+RegionStats.Storage.OwnerBytes are added separately. RegionStats.OwnerBytes
+includes its identity. Flattened SmallBytesStats includes private descriptor
+header exactly once. Close sets owner stats to0 and refunds fixed ownership once;
+Reset/Trim/Consolidate retain cold owner charges while still releasing eligible
+backing arrays. This uses predictable typed logical byte accounting consistent
+with existing FixedManager precedent, not a claim to measure Go runtime heap
+rounding or caller-retained closed handles/tokens.
+
+No owner separately charges embedded configs or per-page slice headers already
+included in charged directory entries. Returned Pool32Worker/RegionMark values,
+borrowed shared Budget, caller callback closure environments, domain cleanup and
+scratch remain external ownership rather than per-owner duplicate charges.
+FixedManager already charges only its own root (a Words pointer, no embedded
+Words object), so that root charge remains correct. IntegerManager and its private
+numericCellSlab headers are charged by mpnum after coordinator integration;
+arena does not precharge them.
+RationalManager's own new header charge likewise excludes referenced child owners.
+
+Finite tests first failed RED for missing OwnerBytes, then GREEN. Across11
+concrete owner variants, exact constructor charges (including eagerly owned pool
+backing) are compared with independent reflect sizes; Reset retains fixed owner
+ownership; repeated Close restores a preexisting external7-byte reservation.
+Zero budgets, one-byte-short nested budget limits, every constructor reservation
+fault prefix and invalid child configurations preserve external charges and
+fully unwind failed construction. Existing backing-only peak tests now include
+owner baselines intentionally; payload/free-list state-machine coverage remains.
+
+Validation:
+
+- Native and g3checked full arena tests, go vet: PASS.
+- js/wasm and wasip1/wasm package builds: PASS.
+- Actual Nodejs wasm execution printed all3 OwnerBudget test names and all11
+  constructor/lifetime/fault subcases (invalid-config test9 subcases), each PASS.
+- Native bitset dependency tests: PASS.
+- Native mpnum dependency initially exposed new rational fault-sweep
+  expectations requiring a failure even when warmed operations reserve nothing.
+  The numeric owner corrected that distinction and added cold setter/inverse
+  failure regressions. Full integrated release/checked races pass. No mpnum
+  edits were made by the arena agent.
+
+This closes the concrete arena cold-header accounting gap. It does not complete
+all domain-owned roots/callback resources, the real rational constructed-pool
+fixture, source raw ABI fidelity or the whole memory/solver gate.

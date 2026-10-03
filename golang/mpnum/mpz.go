@@ -7,6 +7,7 @@ import (
 	"errors"
 	"github.com/glycerine/g3/golang/arena"
 	"math"
+	"reflect"
 	"strconv"
 )
 
@@ -44,22 +45,30 @@ type IntegerManager struct {
 	divScratch    [4]arena.VectorRef // mpn's u, v, multiply/subtract, add-back buffers
 	intMin, two64 Int
 	closed        bool
+	budget        *arena.Budget
+	headerBytes   uint64
 }
 
 func NewIntegerManager(config IntegerConfig) (*IntegerManager, error) {
 	if config.Cells.Budget != config.Words.Descriptors.Budget {
 		return nil, arena.ErrConfig
 	}
+	header := uint64(reflect.TypeOf(IntegerManager{}).Size())
+	if e := config.Cells.Budget.Reserve(header); e != nil {
+		return nil, e
+	}
 	cells, e := newNumericCellSlab(config.Cells)
 	if e != nil {
+		config.Cells.Budget.Release(header)
 		return nil, e
 	}
 	words, e := arena.NewWords(config.Words)
 	if e != nil {
 		cells.Close()
+		config.Cells.Budget.Release(header)
 		return nil, e
 	}
-	m := &IntegerManager{cells: cells, words: words}
+	m := &IntegerManager{cells: cells, words: words, budget: config.Cells.Budget, headerBytes: header}
 	fail := func(err error) (*IntegerManager, error) { m.Close(); return nil, err }
 	for i := 0; i < 2; i++ {
 		m.tmp[i], e = m.allocate(6, 0)
@@ -196,6 +205,8 @@ func (m *IntegerManager) Close() {
 	m.divScratch = [4]arena.VectorRef{}
 	m.intMin = Int{}
 	m.two64 = Int{}
+	m.budget.Release(m.headerBytes)
+	m.headerBytes = 0
 	m.closed = true
 }
 

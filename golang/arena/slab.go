@@ -8,6 +8,8 @@ type Config struct {
 	Budget    *Budget
 }
 type Stats struct {
+	// OwnerBytes charges only this owner header; nested stats account their owners.
+	OwnerBytes                                 uint64
 	Live, Slots, Retired, Pages                uint32
 	RecordBytes, MetadataBytes, DirectoryBytes uint64
 }

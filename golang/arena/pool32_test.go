@@ -420,7 +420,7 @@ func TestPool32ResetPeakBudget(t *testing.T) {
 	probe, _ := NewPool32(Pool32Config{Workers: 1, PageSize: 2}, Pool32Policy{})
 	s := probe.Stats()
 	probe.Close()
-	limit := s.RecordBytes + s.MetadataBytes + s.DirectoryBytes + s.FreeListBytes
+	limit := s.RecordBytes + s.MetadataBytes + s.DirectoryBytes + s.FreeListBytes + s.OwnerBytes
 	b := NewBudget(limit)
 	destroyed := 0
 	p, e := NewPool32(Pool32Config{Workers: 1, PageSize: 2, Budget: b}, Pool32Policy{Destroy: func(uint32) { destroyed++ }})

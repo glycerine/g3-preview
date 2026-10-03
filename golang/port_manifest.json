@@ -81952,7 +81952,7 @@
       "ownership_audited": false,
       "methods": [],
       "ownership": [
-        "Concrete byte owner with scalar descriptors/generation ledger. Caller destroys logical objects before storage reset/free. Budgeted backing/metadata, caller budgets cold header. DirectOnly translates the diagnostic bypass with zero source counter and separate measured owned bytes. See arena/PORT_STATUS.md."
+        "Concrete byte owner with scalar descriptors/generation ledger. Caller destroys logical objects before storage reset/free. Budgeted backing/metadata, cold header charged by arena. DirectOnly translates the diagnostic bypass with zero source counter and separate measured owned bytes. See arena/PORT_STATUS.md."
       ],
       "deviations": [
         "Reset/Close reclaim tracked live direct blocks as explicit typed owner cleanup extension; source only frees pooled chunks.",
@@ -94814,7 +94814,8 @@
         "mpnum/mpz.go",
         "mpnum/mpz_mul.go",
         "mpnum/mpz_div.go",
-        "mpnum/mpz_gcd.go"
+        "mpnum/mpz_gcd.go",
+        "mpnum/mpz_slab.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -94843,7 +94844,9 @@
         "TestIntegerGCDFailureCleanup",
         "TestIntegerAddMulSubMulFailureCleanup",
         "TestIntegerGCDZeroPromotionFailure",
-        "TestIntegerGCDAndFusedWarmAllocations"
+        "TestIntegerGCDAndFusedWarmAllocations",
+        "TestIntegerOwnerHeaderBudgets",
+        "TestIntegerOwnerConstructorFailureUnwind"
       ],
       "conditionals": [
         {
@@ -95919,7 +95922,8 @@
       ],
       "ownership": [
         "Persistent cells and limbs in slabs/word pages. Copy/Move/Swap explicit; source scratch/cached constants retained. Owner identity caller contract; rendering/header budgets and remaining source operations unresolved. See mpnum/PORT_STATUS.md.",
-        "Division scratch Words are budgeted and released. Div/Mod stage owner-local values for failure atomicity while preserving source output/divisor alias defects. Standalone MPN, formatting and header budgets remain unresolved. See mpnum/PORT_STATUS.md."
+        "Division scratch Words are budgeted and released. Div/Mod stage owner-local values for failure atomicity while preserving source output/divisor alias defects. Standalone MPN, formatting and header budgets remain unresolved. See mpnum/PORT_STATUS.md.",
+        "IntegerManager, numericCellSlab, Words and descriptor owner headers now individually budgeted without double charging. Constructor rollback and complete Close tested; standalone MPN/formatting still pending. See BUDGET_PORT_STATUS.md."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -95937,7 +95941,8 @@
         "mpnum/mpz.go",
         "mpnum/mpz_mul.go",
         "mpnum/mpz_div.go",
-        "mpnum/mpz_gcd.go"
+        "mpnum/mpz_gcd.go",
+        "mpnum/mpz_slab.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -95966,7 +95971,9 @@
         "TestIntegerGCDFailureCleanup",
         "TestIntegerAddMulSubMulFailureCleanup",
         "TestIntegerGCDZeroPromotionFailure",
-        "TestIntegerGCDAndFusedWarmAllocations"
+        "TestIntegerGCDAndFusedWarmAllocations",
+        "TestIntegerOwnerHeaderBudgets",
+        "TestIntegerOwnerConstructorFailureUnwind"
       ],
       "conditionals": [
         {
@@ -96554,7 +96561,8 @@
       ],
       "ownership": [
         "Persistent cells and limbs in slabs/word pages. Copy/Move/Swap explicit; source scratch/cached constants retained. Owner identity caller contract; rendering/header budgets and remaining source operations unresolved. See mpnum/PORT_STATUS.md.",
-        "Division scratch Words are budgeted and released. Div/Mod stage owner-local values for failure atomicity while preserving source output/divisor alias defects. Standalone MPN, formatting and header budgets remain unresolved. See mpnum/PORT_STATUS.md."
+        "Division scratch Words are budgeted and released. Div/Mod stage owner-local values for failure atomicity while preserving source output/divisor alias defects. Standalone MPN, formatting and header budgets remain unresolved. See mpnum/PORT_STATUS.md.",
+        "IntegerManager, numericCellSlab, Words and descriptor owner headers now individually budgeted without double charging. Constructor rollback and complete Close tested; standalone MPN/formatting still pending. See BUDGET_PORT_STATUS.md."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -99197,7 +99205,7 @@
         }
       ],
       "ownership": [
-        "Concrete byte owner with scalar descriptors/generation ledger. Caller destroys logical objects before storage reset/free. Budgeted backing/metadata, caller budgets cold header. DirectOnly translates the diagnostic bypass with zero source counter and separate measured owned bytes. See arena/PORT_STATUS.md."
+        "Concrete byte owner with scalar descriptors/generation ledger. Caller destroys logical objects before storage reset/free. Budgeted backing/metadata, cold header charged by arena. DirectOnly translates the diagnostic bypass with zero source counter and separate measured owned bytes. See arena/PORT_STATUS.md."
       ],
       "deviations": [
         "Reset/Close reclaim tracked live direct blocks as explicit typed owner cleanup extension; source only frees pooled chunks.",
@@ -99347,7 +99355,7 @@
         }
       ],
       "ownership": [
-        "Concrete byte owner with scalar descriptors/generation ledger. Caller destroys logical objects before storage reset/free. Budgeted backing/metadata, caller budgets cold header. DirectOnly translates the diagnostic bypass with zero source counter and separate measured owned bytes. See arena/PORT_STATUS.md."
+        "Concrete byte owner with scalar descriptors/generation ledger. Caller destroys logical objects before storage reset/free. Budgeted backing/metadata, cold header charged by arena. DirectOnly translates the diagnostic bypass with zero source counter and separate measured owned bytes. See arena/PORT_STATUS.md."
       ],
       "deviations": [
         "Reset/Close reclaim tracked live direct blocks as explicit typed owner cleanup extension; source only frees pooled chunks.",
