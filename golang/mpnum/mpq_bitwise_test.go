@@ -62,12 +62,25 @@ func TestRationalBitwiseForwardingIndependentAndAliases(t *testing.T) {
 	a, b, out := NewRational(), NewRational(), NewRational()
 	m.SetFraction(&a, 1, 2)
 	m.SetInt64(&b, 3)
-	if e := m.BitwiseOr(&a, &b, &out); !errors.Is(e, ErrRationalNotInteger) {
-		t.Fatal(e)
+	e := m.BitwiseOr(&a, &b, &out)
+	if modularSourceDebug {
+		if !errors.Is(e, ErrRationalNotInteger) || out != NewRational() {
+			t.Fatal(e)
+		}
+	} else {
+		qopsMust(t, e)
+		qopsEqual(t, m, &out, new(big.Rat).SetInt64(3))
 	}
 	m.SetInt64(&a, -1)
-	if e := m.BitwiseNot(32, &a, &out); !errors.Is(e, ErrBitwiseDomain) {
-		t.Fatal(e)
+	beforeOut := out
+	e = m.BitwiseNot(32, &a, &out)
+	if modularSourceDebug {
+		if !errors.Is(e, ErrBitwiseDomain) || out != beforeOut {
+			t.Fatal(e)
+		}
+	} else {
+		qopsMust(t, e)
+		qopsEqual(t, m, &out, new(big.Rat))
 	}
 	m.Del(&a)
 	m.Del(&b)
@@ -85,7 +98,8 @@ func TestRationalBitwiseFailureOwnershipAndDenominatorPublication(t *testing.T) 
 				qopsMust(t, m.SetString(&b, strings.Repeat("9876543210", 20)+"9"))
 				qopsMust(t, m.SetFraction(&out, 3, 7))
 				dst := []*Rational{&out, &a, &b}[alias]
-				before := rationalString(t, m, dst)
+				before := integerString(t, m.z, &dst.num)
+				beforeDen := dst.den
 				budget.FailAfter(fault)
 				var e error
 				switch op {
@@ -98,22 +112,26 @@ func TestRationalBitwiseFailureOwnershipAndDenominatorPublication(t *testing.T) 
 				case 3:
 					e = m.BitwiseNot(193, &a, dst)
 				}
-				budget.FailAfter(-1)
 				qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &b.num, &b.den, &out.num, &out.den})
 				if e != nil {
 					failures++
 					if !errors.Is(e, arena.ErrInjectedFailure) {
 						t.Fatal(op, alias, fault, e)
 					}
-					if rationalString(t, m, dst) != before {
+					if dst.den != beforeDen {
 						t.Fatal("failed integer action reset denominator")
 					}
+					budget.FailAfter(-1)
+					aa, _ := new(big.Int).SetString(strings.Repeat("1234567890", 25)+"7", 10)
+					bb, _ := new(big.Int).SetString(strings.Repeat("9876543210", 20)+"9", 10)
+					bitPublicationPrefix(t, m.z, &dst.num, before, aa, bb, op, 193)
 				} else {
 					success = true
 					if !isOneInteger(&dst.den) {
 						t.Fatal("missing source denominator reset")
 					}
 				}
+				budget.FailAfter(-1)
 				for _, v := range []*Rational{&a, &b, &out} {
 					qopsMust(t, m.Del(v))
 				}

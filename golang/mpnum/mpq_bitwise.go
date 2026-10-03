@@ -13,8 +13,14 @@ func (m *RationalManager) BitwiseXor(a, b, out *Rational) error {
 	return m.rationalBitwise(a, b, out, 2)
 }
 func (m *RationalManager) rationalBitwise(a, b, out *Rational, op uint8) error {
-	if e := m.integerOperands(a, b); e != nil {
+	if e := m.check(a); e != nil {
 		return e
+	}
+	if e := m.check(b); e != nil {
+		return e
+	}
+	if modularSourceDebug && (!isIntegerRational(a) || !isIntegerRational(b)) {
+		return ErrRationalNotInteger
 	}
 	if e := m.check(out); e != nil {
 		return e
@@ -40,7 +46,7 @@ func (m *RationalManager) BitwiseNot(width uint32, a, out *Rational) error {
 	if e := m.check(out); e != nil {
 		return e
 	}
-	if !isIntegerRational(a) {
+	if modularSourceDebug && !isIntegerRational(a) {
 		return ErrRationalNotInteger
 	}
 	if e := m.z.BitwiseNot(width, &a.num, &out.num); e != nil {

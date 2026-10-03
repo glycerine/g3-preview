@@ -4,6 +4,22 @@ package mpnum
 
 import "errors"
 
+// BitwiseOperation identifies the source binary chunk loop.
+type BitwiseOperation uint8
+
+const (
+	BitwiseOrOperation BitwiseOperation = iota
+	BitwiseAndOperation
+	BitwiseXorOperation
+)
+
+var ErrNonterminatingBitwise = errors.New("mpnum: source bitwise quotient continuation does not terminate")
+
+type BitwiseNonterminationError struct{ Operation BitwiseOperation }
+
+func (e *BitwiseNonterminationError) Error() string { return ErrNonterminatingBitwise.Error() }
+func (e *BitwiseNonterminationError) Unwrap() error { return ErrNonterminatingBitwise }
+
 var ErrBitwiseDomain = errors.New("mpnum: bitwise source operand must be nonnegative")
 
 func (m *IntegerManager) BitwiseOr(a, b, out *Int) error  { return m.bitwiseBinary(a, b, out, 0) }
@@ -12,14 +28,14 @@ func (m *IntegerManager) BitwiseXor(a, b, out *Int) error { return m.bitwiseBina
 
 // bitwiseBinary preserves the source arithmetic chunk algorithm, including its
 // final multiplier/division actions. Work is owner-budgeted source temporaries;
-// predictable errors preserve the caller's output, including aliased operands.
+// errors retain completed caller publications, including aliased operands.
 func (m *IntegerManager) bitwiseBinary(a, b, out *Int, op uint8) error {
 	for _, v := range []*Int{a, b, out} {
 		if e := m.check(v); e != nil {
 			return e
 		}
 	}
-	if a.val < 0 || b.val < 0 {
+	if modularSourceDebug && (a.val < 0 || b.val < 0) {
 		return ErrBitwiseDomain
 	}
 	if a.IsSmall() && b.IsSmall() {
@@ -32,9 +48,16 @@ func (m *IntegerManager) bitwiseBinary(a, b, out *Int, op uint8) error {
 		case 2:
 			v = a.val ^ b.val
 		}
-		return m.SetInt64(out, int64(v))
+		if op == 2 {
+			return m.SetInt64(out, int64(v))
+		}
+		if e := m.Del(out); e != nil {
+			return e
+		}
+		out.val = v
+		return nil
 	}
-	var a1, b1, a2, b2, mult, tmp, work Int
+	var a1, b1, a2, b2, mult, tmp Int
 	defer func() {
 		m.Del(&a1)
 		m.Del(&b1)
@@ -42,7 +65,6 @@ func (m *IntegerManager) bitwiseBinary(a, b, out *Int, op uint8) error {
 		m.Del(&b2)
 		m.Del(&mult)
 		m.Del(&tmp)
-		m.Del(&work)
 	}()
 	if e := m.Copy(&a1, a); e != nil {
 		return e
@@ -53,10 +75,15 @@ func (m *IntegerManager) bitwiseBinary(a, b, out *Int, op uint8) error {
 	if e := m.SetInt64(&mult, 1); e != nil {
 		return e
 	}
-	if e := m.Reset(&work); e != nil {
+	if e := m.Reset(out); e != nil {
 		return e
 	}
 	for a1.val != 0 && b1.val != 0 {
+		// Both quotients remain -1 forever. Stop only at this actual next
+		// continuation, after all preceding source actions and their failures.
+		if a1.IsSmall() && b1.IsSmall() && a1.val == -1 && b1.val == -1 {
+			return &BitwiseNonterminationError{Operation: BitwiseOperation(op)}
+		}
 		if e := m.Mod(&a1, &m.two64, &a2); e != nil {
 			return e
 		}
@@ -85,7 +112,7 @@ func (m *IntegerManager) bitwiseBinary(a, b, out *Int, op uint8) error {
 		if e = m.Mul(&tmp, &mult, &tmp); e != nil {
 			return e
 		}
-		if e = m.Add(&work, &tmp, &work); e != nil {
+		if e = m.Add(out, &tmp, out); e != nil {
 			return e
 		}
 		if e = m.Mul(&mult, &m.two64, &mult); e != nil {
@@ -103,7 +130,7 @@ func (m *IntegerManager) bitwiseBinary(a, b, out *Int, op uint8) error {
 			if e := m.Mul(&a1, &mult, &a1); e != nil {
 				return e
 			}
-			if e := m.Add(&work, &a1, &work); e != nil {
+			if e := m.Add(out, &a1, out); e != nil {
 				return e
 			}
 		}
@@ -111,12 +138,12 @@ func (m *IntegerManager) bitwiseBinary(a, b, out *Int, op uint8) error {
 			if e := m.Mul(&b1, &mult, &b1); e != nil {
 				return e
 			}
-			if e := m.Add(&work, &b1, &work); e != nil {
+			if e := m.Add(out, &b1, out); e != nil {
 				return e
 			}
 		}
 	}
-	return m.Move(out, &work)
+	return nil
 }
 
 // BitwiseNot complements within the specified source unsigned bit width.
@@ -130,22 +157,22 @@ func (m *IntegerManager) BitwiseNot(width uint32, a, out *Int) error {
 	if e := m.check(out); e != nil {
 		return e
 	}
-	if a.val < 0 {
+	if modularSourceDebug && a.val < 0 {
 		return ErrBitwiseDomain
 	}
 	if a.IsSmall() && width <= 63 {
 		mask := (uint64(1) << width) - 1
 		return m.SetInt64(out, int64(^uint64(a.val)&mask))
 	}
-	var a1, a2, mult, tmp, work Int
-	defer func() { m.Del(&a1); m.Del(&a2); m.Del(&mult); m.Del(&tmp); m.Del(&work) }()
+	var a1, a2, mult, tmp Int
+	defer func() { m.Del(&a1); m.Del(&a2); m.Del(&mult); m.Del(&tmp) }()
 	if e := m.Copy(&a1, a); e != nil {
 		return e
 	}
 	if e := m.SetInt64(&mult, 1); e != nil {
 		return e
 	}
-	if e := m.SetInt64(&work, 0); e != nil {
+	if e := m.SetInt64(out, 0); e != nil {
 		return e
 	}
 	for width > 0 {
@@ -157,16 +184,28 @@ func (m *IntegerManager) BitwiseNot(width uint32, a, out *Int) error {
 			return e
 		}
 		v := ^n
+		if modularSourceDebug && ^v != n {
+			return ErrIntegerAssertion
+		}
 		if width < 64 {
 			v &= (uint64(1) << width) - 1
 		}
 		if e = m.SetUint64(&tmp, v); e != nil {
 			return e
 		}
+		if modularSourceDebug {
+			got, err := m.Uint64(&tmp)
+			if err != nil {
+				return err
+			}
+			if got != v {
+				return ErrIntegerAssertion
+			}
+		}
 		if e = m.Mul(&tmp, &mult, &tmp); e != nil {
 			return e
 		}
-		if e = m.Add(&work, &tmp, &work); e != nil {
+		if e = m.Add(out, &tmp, out); e != nil {
 			return e
 		}
 		if e = m.Mul(&mult, &m.two64, &mult); e != nil {
@@ -181,5 +220,5 @@ func (m *IntegerManager) BitwiseNot(width uint32, a, out *Int) error {
 			width -= 64
 		}
 	}
-	return m.Move(out, &work)
+	return nil
 }

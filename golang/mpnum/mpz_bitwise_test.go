@@ -190,9 +190,21 @@ func TestIntegerBitwiseFailurePublicationAndWarm(t *testing.T) {
 func TestIntegerBitwiseSourcePreconditions(t *testing.T) {
 	m, _ := integerManager(t)
 	a, b, out := NewInt(-1), NewInt(3), NewInt(77)
-	for _, f := range []func() error{func() error { return m.BitwiseOr(&a, &b, &out) }, func() error { return m.BitwiseAnd(&b, &a, &out) }, func() error { return m.BitwiseXor(&a, &a, &out) }, func() error { return m.BitwiseNot(32, &a, &out) }} {
-		if e := f(); !errors.Is(e, ErrBitwiseDomain) || out != NewInt(77) {
-			t.Fatal("negative source precondition", e)
+	for i, f := range []func() error{func() error { return m.BitwiseOr(&a, &b, &out) }, func() error { return m.BitwiseAnd(&b, &a, &out) }, func() error { return m.BitwiseXor(&a, &a, &out) }, func() error { return m.BitwiseNot(32, &a, &out) }} {
+		out = NewInt(77)
+		e := f()
+		mpzPublicationAudit(t, m, &a, &b, &out)
+		if modularSourceDebug {
+			if !errors.Is(e, ErrBitwiseDomain) || out != NewInt(77) {
+				t.Fatal("source debug precondition", e)
+			}
+		} else {
+			bitwiseMust(t, e)
+			got, err := m.Int64(&out)
+			bitwiseMust(t, err)
+			if got != []int64{-1, 3, 0, 0}[i] {
+				t.Fatal("finite source release path", i, got)
+			}
 		}
 	}
 	m.Close()

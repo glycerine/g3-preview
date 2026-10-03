@@ -1407,3 +1407,18 @@ assertions. See UPOLYNOMIAL_ROOT_ISOLATION_PACKET.md for frozen gates and
 representation boundaries. Factorization, multivariate/algebraic consumers,
 printers and full solver/proof/interpolation remain required. No whole source
 unit is promoted; the ledger remains33ported/145partial/1924unported.
+
+
+## Direct integer and rational bitwise publication
+
+The selected internal32 OR/AND/XOR/NOT source algorithms now publish caller
+results at the original reset, chunk-addition and tail actions. Negative and
+rational-integrality assertions follow the debug profile; finite release
+operations retain source arithmetic. Rational denominator reset follows integer
+success. Tests first expose the old staging and universal rejection, then check
+independent finite models, aliases, immediate failure roots, final unused actions
+and actual quotient continuation. See MPZ_BITWISE_PUBLICATION_PACKET.md for
+frozen gates and the explicit both-negative nontermination boundary. Other
+arithmetic staging, physical source allocator integration, nonselected backends
+and the full solver/proof/interpolation objective remain open. No whole source
+unit is promoted.

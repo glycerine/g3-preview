@@ -106599,7 +106599,8 @@
         "mpnum/mpq_inspect.go",
         "mpnum/mpq_bitwise.go",
         "mpnum/mpz_facade_extra.go",
-        "mpnum/mp_power_publication_test.go"
+        "mpnum/mp_power_publication_test.go",
+        "mpnum/mp_bitwise_publication_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -106715,7 +106716,19 @@
         "TestPowerPublicationLeftShiftCopyPrecedesPromotionRefusal",
         "TestPowerPublicationRightShiftCopyRefusalPrefix",
         "TestPowerPublicationRationalCopyComponentRefusal",
-        "TestPowerPublicationRationalMulComponentRefusal"
+        "TestPowerPublicationRationalMulComponentRefusal",
+        "TestBitwisePublicationNegativeInlineProfile",
+        "TestBitwisePublicationCallerPrefixes",
+        "TestBitwisePublicationRationalRawProfile",
+        "TestBitwisePublicationActualNonterminationBoundary",
+        "TestBitwisePublicationFiniteMixedSignsAndWidthAliases",
+        "TestBitwisePublicationFinalUnusedActions",
+        "TestBitwisePublicationRationalDenominatorFailureAliases",
+        "TestBitwisePublicationEarlyFailurePrecedesBoundary",
+        "TestBitwisePublicationServiceValueRoutes",
+        "TestBitwisePublicationServiceFailureRoots",
+        "TestBitwisePublicationBigNotZeroWidthCopyOrder",
+        "TestBitwisePublicationSignedSmallBoundaryAliases"
       ],
       "conditionals": [
         {
@@ -107487,7 +107500,19 @@
           "go_target": "mpnum/mpq_bitwise.go",
           "tests": [
             "TestRationalBitwiseForwardingIndependentAndAliases",
-            "TestRationalBitwiseFailureOwnershipAndDenominatorPublication"
+            "TestRationalBitwiseFailureOwnershipAndDenominatorPublication",
+            "TestBitwisePublicationNegativeInlineProfile",
+            "TestBitwisePublicationCallerPrefixes",
+            "TestBitwisePublicationRationalRawProfile",
+            "TestBitwisePublicationActualNonterminationBoundary",
+            "TestBitwisePublicationFiniteMixedSignsAndWidthAliases",
+            "TestBitwisePublicationFinalUnusedActions",
+            "TestBitwisePublicationRationalDenominatorFailureAliases",
+            "TestBitwisePublicationEarlyFailurePrecedesBoundary",
+            "TestBitwisePublicationServiceValueRoutes",
+            "TestBitwisePublicationServiceFailureRoots",
+            "TestBitwisePublicationBigNotZeroWidthCopyOrder",
+            "TestBitwisePublicationSignedSmallBoundaryAliases"
           ]
         },
         {
@@ -107545,7 +107570,8 @@
         "B12 replaces the one-global-manager ownership assumption with explicit cross-manager deep copy. No foreign handle or serialization is passed into destination arithmetic; destination outlives source Close. This is an ownership adaptation, not AST translation completion.",
         "Selected release ExtendedGCD preserves finite aliases and modified-input sign rereads. Source Z3DEBUG diagnostic arithmetic remains unported; g3checked selects reference validation only. ext_gcd.h wrapper algorithm remains separate and is not credited from manager inverse properties.",
         "Explicit manager projects rational.h inclusive32-bit wrappers, distinct from strict MPZ boundaries; global wrapper remains incomplete. Float positive converted denominator SASSERT becomes typed ErrRationalFloatDomain. Source raw component alias publication can leave denominator zero; subsequent operations diagnose initialization.",
-        "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open."
+        "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open.",
+        "Unsigned low63-bit mask defines the intended small bitwise_not signed-shift boundary. Negative and rational-integrality source assertions are debug-only. Selected internal32 bitwise methods publish directly in source order; Go error cleanup releases the actual lexical locals. Both-negative big binary loops stop at the first actual inline -1/-1 quotient continuation, after prior source actions; this typed boundary does not claim equivalence to a future source allocation refusal. Other arithmetic staging, source allocator topology, GMP and nonselected backends remain open."
       ]
     },
     {
@@ -107612,7 +107638,8 @@
         "mpnum/mpz_extended_gcd_release.go",
         "mpnum/mpz_source_publication_test.go",
         "mpnum/mpz_setter_publication_test.go",
-        "mpnum/mp_power_publication_test.go"
+        "mpnum/mp_power_publication_test.go",
+        "mpnum/mp_bitwise_publication_test.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -107764,7 +107791,19 @@
         "TestPowerPublicationLeftShiftCopyPrecedesPromotionRefusal",
         "TestPowerPublicationRightShiftCopyRefusalPrefix",
         "TestPowerPublicationRationalCopyComponentRefusal",
-        "TestPowerPublicationRationalMulComponentRefusal"
+        "TestPowerPublicationRationalMulComponentRefusal",
+        "TestBitwisePublicationNegativeInlineProfile",
+        "TestBitwisePublicationCallerPrefixes",
+        "TestBitwisePublicationRationalRawProfile",
+        "TestBitwisePublicationActualNonterminationBoundary",
+        "TestBitwisePublicationFiniteMixedSignsAndWidthAliases",
+        "TestBitwisePublicationFinalUnusedActions",
+        "TestBitwisePublicationRationalDenominatorFailureAliases",
+        "TestBitwisePublicationEarlyFailurePrecedesBoundary",
+        "TestBitwisePublicationServiceValueRoutes",
+        "TestBitwisePublicationServiceFailureRoots",
+        "TestBitwisePublicationBigNotZeroWidthCopyOrder",
+        "TestBitwisePublicationSignedSmallBoundaryAliases"
       ],
       "conditionals": [
         {
@@ -108919,7 +108958,19 @@
             "TestIntegerBitwiseFailurePublicationAndWarm",
             "TestIntegerBitwiseSourcePreconditions",
             "TestIntegerBitwiseAliasedFailurePublication",
-            "TestIntegerBitwiseSmallPathsReleaseBigOutput"
+            "TestIntegerBitwiseSmallPathsReleaseBigOutput",
+            "TestBitwisePublicationNegativeInlineProfile",
+            "TestBitwisePublicationCallerPrefixes",
+            "TestBitwisePublicationRationalRawProfile",
+            "TestBitwisePublicationActualNonterminationBoundary",
+            "TestBitwisePublicationFiniteMixedSignsAndWidthAliases",
+            "TestBitwisePublicationFinalUnusedActions",
+            "TestBitwisePublicationRationalDenominatorFailureAliases",
+            "TestBitwisePublicationEarlyFailurePrecedesBoundary",
+            "TestBitwisePublicationServiceValueRoutes",
+            "TestBitwisePublicationServiceFailureRoots",
+            "TestBitwisePublicationBigNotZeroWidthCopyOrder",
+            "TestBitwisePublicationSignedSmallBoundaryAliases"
           ]
         },
         {
@@ -108932,7 +108983,19 @@
             "TestIntegerBitwiseFailurePublicationAndWarm",
             "TestIntegerBitwiseSourcePreconditions",
             "TestIntegerBitwiseAliasedFailurePublication",
-            "TestIntegerBitwiseSmallPathsReleaseBigOutput"
+            "TestIntegerBitwiseSmallPathsReleaseBigOutput",
+            "TestBitwisePublicationNegativeInlineProfile",
+            "TestBitwisePublicationCallerPrefixes",
+            "TestBitwisePublicationRationalRawProfile",
+            "TestBitwisePublicationActualNonterminationBoundary",
+            "TestBitwisePublicationFiniteMixedSignsAndWidthAliases",
+            "TestBitwisePublicationFinalUnusedActions",
+            "TestBitwisePublicationRationalDenominatorFailureAliases",
+            "TestBitwisePublicationEarlyFailurePrecedesBoundary",
+            "TestBitwisePublicationServiceValueRoutes",
+            "TestBitwisePublicationServiceFailureRoots",
+            "TestBitwisePublicationBigNotZeroWidthCopyOrder",
+            "TestBitwisePublicationSignedSmallBoundaryAliases"
           ]
         },
         {
@@ -108945,7 +109008,19 @@
             "TestIntegerBitwiseFailurePublicationAndWarm",
             "TestIntegerBitwiseSourcePreconditions",
             "TestIntegerBitwiseAliasedFailurePublication",
-            "TestIntegerBitwiseSmallPathsReleaseBigOutput"
+            "TestIntegerBitwiseSmallPathsReleaseBigOutput",
+            "TestBitwisePublicationNegativeInlineProfile",
+            "TestBitwisePublicationCallerPrefixes",
+            "TestBitwisePublicationRationalRawProfile",
+            "TestBitwisePublicationActualNonterminationBoundary",
+            "TestBitwisePublicationFiniteMixedSignsAndWidthAliases",
+            "TestBitwisePublicationFinalUnusedActions",
+            "TestBitwisePublicationRationalDenominatorFailureAliases",
+            "TestBitwisePublicationEarlyFailurePrecedesBoundary",
+            "TestBitwisePublicationServiceValueRoutes",
+            "TestBitwisePublicationServiceFailureRoots",
+            "TestBitwisePublicationBigNotZeroWidthCopyOrder",
+            "TestBitwisePublicationSignedSmallBoundaryAliases"
           ]
         },
         {
@@ -108958,7 +109033,19 @@
             "TestIntegerBitwiseFailurePublicationAndWarm",
             "TestIntegerBitwiseSourcePreconditions",
             "TestIntegerBitwiseAliasedFailurePublication",
-            "TestIntegerBitwiseSmallPathsReleaseBigOutput"
+            "TestIntegerBitwiseSmallPathsReleaseBigOutput",
+            "TestBitwisePublicationNegativeInlineProfile",
+            "TestBitwisePublicationCallerPrefixes",
+            "TestBitwisePublicationRationalRawProfile",
+            "TestBitwisePublicationActualNonterminationBoundary",
+            "TestBitwisePublicationFiniteMixedSignsAndWidthAliases",
+            "TestBitwisePublicationFinalUnusedActions",
+            "TestBitwisePublicationRationalDenominatorFailureAliases",
+            "TestBitwisePublicationEarlyFailurePrecedesBoundary",
+            "TestBitwisePublicationServiceValueRoutes",
+            "TestBitwisePublicationServiceFailureRoots",
+            "TestBitwisePublicationBigNotZeroWidthCopyOrder",
+            "TestBitwisePublicationSignedSmallBoundaryAliases"
           ]
         },
         {
@@ -109284,7 +109371,7 @@
         "GCD zero-case Copy+Abs staged before destination Move for failure atomicity. Array/extended GCD and LCM remain unported.",
         "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits.",
         "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors.",
-        "Unsigned low63-bit mask defines intended bitwise_not signed-shift boundary. Negative source operands produce ErrBitwiseDomain; source local cleanup/partial output on allocation failures become explicit cleanup/staged publication.",
+        "Unsigned low63-bit mask defines the intended small bitwise_not signed-shift boundary. Negative and rational-integrality source assertions are debug-only. Selected internal32 bitwise methods publish directly in source order; Go error cleanup releases the actual lexical locals. Both-negative big binary loops stop at the first actual inline -1/-1 quotient continuation, after prior source actions; this typed boundary does not claim equivalence to a future source allocation refusal. Other arithmetic staging, source allocator topology, GMP and nonselected backends remain open.",
         "Typed root domain errors replace degree-zero division and negative-even/integer-only assertions. Nonnegative square output/input identity retains source reset-to-zero alias result; allocation errors preserve destination.",
         "32-bit accessor source assertions become ErrConversion; INT_MIN decomposition uses defined wider magnitude arithmetic. Floating UINT_MAX radix, unsigned length/count wrap and sign-free big hash remain source behavior.",
         "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text.",
@@ -109319,7 +109406,8 @@
         "mpnum/mpz_facade_extra.go",
         "mpnum/mpz_source_publication_test.go",
         "mpnum/mpz_setter_publication_test.go",
-        "mpnum/mp_power_publication_test.go"
+        "mpnum/mp_power_publication_test.go",
+        "mpnum/mp_bitwise_publication_test.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -109476,7 +109564,19 @@
         "TestPowerPublicationLeftShiftCopyPrecedesPromotionRefusal",
         "TestPowerPublicationRightShiftCopyRefusalPrefix",
         "TestPowerPublicationRationalCopyComponentRefusal",
-        "TestPowerPublicationRationalMulComponentRefusal"
+        "TestPowerPublicationRationalMulComponentRefusal",
+        "TestBitwisePublicationNegativeInlineProfile",
+        "TestBitwisePublicationCallerPrefixes",
+        "TestBitwisePublicationRationalRawProfile",
+        "TestBitwisePublicationActualNonterminationBoundary",
+        "TestBitwisePublicationFiniteMixedSignsAndWidthAliases",
+        "TestBitwisePublicationFinalUnusedActions",
+        "TestBitwisePublicationRationalDenominatorFailureAliases",
+        "TestBitwisePublicationEarlyFailurePrecedesBoundary",
+        "TestBitwisePublicationServiceValueRoutes",
+        "TestBitwisePublicationServiceFailureRoots",
+        "TestBitwisePublicationBigNotZeroWidthCopyOrder",
+        "TestBitwisePublicationSignedSmallBoundaryAliases"
       ],
       "conditionals": [
         {
@@ -110143,7 +110243,19 @@
             "TestIntegerBitwiseFailurePublicationAndWarm",
             "TestIntegerBitwiseSourcePreconditions",
             "TestIntegerBitwiseAliasedFailurePublication",
-            "TestIntegerBitwiseSmallPathsReleaseBigOutput"
+            "TestIntegerBitwiseSmallPathsReleaseBigOutput",
+            "TestBitwisePublicationNegativeInlineProfile",
+            "TestBitwisePublicationCallerPrefixes",
+            "TestBitwisePublicationRationalRawProfile",
+            "TestBitwisePublicationActualNonterminationBoundary",
+            "TestBitwisePublicationFiniteMixedSignsAndWidthAliases",
+            "TestBitwisePublicationFinalUnusedActions",
+            "TestBitwisePublicationRationalDenominatorFailureAliases",
+            "TestBitwisePublicationEarlyFailurePrecedesBoundary",
+            "TestBitwisePublicationServiceValueRoutes",
+            "TestBitwisePublicationServiceFailureRoots",
+            "TestBitwisePublicationBigNotZeroWidthCopyOrder",
+            "TestBitwisePublicationSignedSmallBoundaryAliases"
           ]
         },
         {
@@ -110156,7 +110268,19 @@
             "TestIntegerBitwiseFailurePublicationAndWarm",
             "TestIntegerBitwiseSourcePreconditions",
             "TestIntegerBitwiseAliasedFailurePublication",
-            "TestIntegerBitwiseSmallPathsReleaseBigOutput"
+            "TestIntegerBitwiseSmallPathsReleaseBigOutput",
+            "TestBitwisePublicationNegativeInlineProfile",
+            "TestBitwisePublicationCallerPrefixes",
+            "TestBitwisePublicationRationalRawProfile",
+            "TestBitwisePublicationActualNonterminationBoundary",
+            "TestBitwisePublicationFiniteMixedSignsAndWidthAliases",
+            "TestBitwisePublicationFinalUnusedActions",
+            "TestBitwisePublicationRationalDenominatorFailureAliases",
+            "TestBitwisePublicationEarlyFailurePrecedesBoundary",
+            "TestBitwisePublicationServiceValueRoutes",
+            "TestBitwisePublicationServiceFailureRoots",
+            "TestBitwisePublicationBigNotZeroWidthCopyOrder",
+            "TestBitwisePublicationSignedSmallBoundaryAliases"
           ]
         },
         {
@@ -110169,7 +110293,19 @@
             "TestIntegerBitwiseFailurePublicationAndWarm",
             "TestIntegerBitwiseSourcePreconditions",
             "TestIntegerBitwiseAliasedFailurePublication",
-            "TestIntegerBitwiseSmallPathsReleaseBigOutput"
+            "TestIntegerBitwiseSmallPathsReleaseBigOutput",
+            "TestBitwisePublicationNegativeInlineProfile",
+            "TestBitwisePublicationCallerPrefixes",
+            "TestBitwisePublicationRationalRawProfile",
+            "TestBitwisePublicationActualNonterminationBoundary",
+            "TestBitwisePublicationFiniteMixedSignsAndWidthAliases",
+            "TestBitwisePublicationFinalUnusedActions",
+            "TestBitwisePublicationRationalDenominatorFailureAliases",
+            "TestBitwisePublicationEarlyFailurePrecedesBoundary",
+            "TestBitwisePublicationServiceValueRoutes",
+            "TestBitwisePublicationServiceFailureRoots",
+            "TestBitwisePublicationBigNotZeroWidthCopyOrder",
+            "TestBitwisePublicationSignedSmallBoundaryAliases"
           ]
         },
         {
@@ -110182,7 +110318,19 @@
             "TestIntegerBitwiseFailurePublicationAndWarm",
             "TestIntegerBitwiseSourcePreconditions",
             "TestIntegerBitwiseAliasedFailurePublication",
-            "TestIntegerBitwiseSmallPathsReleaseBigOutput"
+            "TestIntegerBitwiseSmallPathsReleaseBigOutput",
+            "TestBitwisePublicationNegativeInlineProfile",
+            "TestBitwisePublicationCallerPrefixes",
+            "TestBitwisePublicationRationalRawProfile",
+            "TestBitwisePublicationActualNonterminationBoundary",
+            "TestBitwisePublicationFiniteMixedSignsAndWidthAliases",
+            "TestBitwisePublicationFinalUnusedActions",
+            "TestBitwisePublicationRationalDenominatorFailureAliases",
+            "TestBitwisePublicationEarlyFailurePrecedesBoundary",
+            "TestBitwisePublicationServiceValueRoutes",
+            "TestBitwisePublicationServiceFailureRoots",
+            "TestBitwisePublicationBigNotZeroWidthCopyOrder",
+            "TestBitwisePublicationSignedSmallBoundaryAliases"
           ]
         },
         {
@@ -110583,7 +110731,7 @@
         "GCD zero-case Copy+Abs staged before destination Move for failure atomicity. Array/extended GCD and LCM remain unported.",
         "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits.",
         "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors.",
-        "Unsigned low63-bit mask defines intended bitwise_not signed-shift boundary. Negative source operands produce ErrBitwiseDomain; source local cleanup/partial output on allocation failures become explicit cleanup/staged publication.",
+        "Unsigned low63-bit mask defines the intended small bitwise_not signed-shift boundary. Negative and rational-integrality source assertions are debug-only. Selected internal32 bitwise methods publish directly in source order; Go error cleanup releases the actual lexical locals. Both-negative big binary loops stop at the first actual inline -1/-1 quotient continuation, after prior source actions; this typed boundary does not claim equivalence to a future source allocation refusal. Other arithmetic staging, source allocator topology, GMP and nonselected backends remain open.",
         "Typed root domain errors replace degree-zero division and negative-even/integer-only assertions. Nonnegative square output/input identity retains source reset-to-zero alias result; allocation errors preserve destination.",
         "32-bit accessor source assertions become ErrConversion; INT_MIN decomposition uses defined wider magnitude arithmetic. Floating UINT_MAX radix, unsigned length/count wrap and sign-free big hash remain source behavior.",
         "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text.",
