@@ -143,3 +143,14 @@ groups, vet and source/no-generics audit pass on the exact two-file overlay
 `.cache/mpz-fixtures-eleven-{native,debug}.log` and
 `.cache/mpz-fixtures-final-{vet,source}.log`. No numerical algorithm changed;
 remaining broader backend failures remain separate integration work.
+
+
+Mandatory Natural inline-buffer tests are saved tests-first with temporary tag
+`port_pending_mpn`. The actual missing-API RED was observed on HEAD95a8236 plus
+only `mpnum/mpn_backend_test.go`; log `.cache/natural-missing-api-red.log`.
+Run `go test -tags port_pending_mpn ./mpnum` to expose the pending API campaign.
+Remove this tag as soon as RuntimeOwner, the actual four inline16 division
+buffers and CloseChecked execute. These tests are not covered by ordinary
+green checks while tagged. `NATURAL_BACKEND_NEXT_PACKET.md` records the full
+source action order, conditional addback and post-output debug lexical scope;
+formatting and transitive cleanup remain required alongside this integration.
