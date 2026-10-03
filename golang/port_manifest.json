@@ -54872,14 +54872,31 @@
       "status": "partial",
       "go_targets": [
         "sat_solver_clause_core.go",
-        "sat_solver_clause_core_test.go"
+        "sat_solver_clause_core_test.go",
+        "sat_solver_variable_vectors.go",
+        "sat_solver_variable_vectors_test.go",
+        "sat_solver_watch_lists.go",
+        "sat_solver_watch_lists_test.go",
+        "sat_solver_variable_state.go",
+        "sat_solver_variable_state_test.go"
       ],
       "tests": [
         "TestSATSolverClauseCoreFiniteSimplification",
         "TestSATSolverClauseCoreWatchSelection",
         "TestSATSolverClauseCoreSourcePrefixesAndGuards",
         "TestSATSolverClauseCoreWarmNoAllocation",
-        "TestSATSolverClauseCoreWatchSourceAssertions"
+        "TestSATSolverClauseCoreWatchSourceAssertions",
+        "TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots",
+        "TestSATSolverVariableColumnGrowthFailureAndScalarBounds",
+        "TestSATSolverWatchListsRealRelocationAndPayloadLifetime",
+        "TestSATSolverWatchListsPlacementRefusalAndConstructorUnwind",
+        "TestSATSolverMkVarFullSourceEighteenActionsAndByteClauseView",
+        "TestSATSolverMkVarAllActualReservationPrefixes",
+        "TestSATSolverMkVarLateHeapIndexPublicationBeforeRefusal",
+        "TestSATSolverVariableTrailAndConcretePhysicalOwnership",
+        "TestSATSolverVariableConstructorRefusalAndBorrowedTodo",
+        "TestSATSolverVariableRetainedSourceRetryAndColdGuards",
+        "TestSATSolverClauseStateSourceAssignmentWidth"
       ],
       "conditionals": [
         {
@@ -55327,13 +55344,32 @@
             "TestSATSolverClauseCoreWarmNoAllocation",
             "TestSATSolverClauseCoreWatchSourceAssertions"
           ]
+        },
+        {
+          "name": "Complete source135\u2013160 MkVar body on actual variable columns/watch lists/activity/queue and borrowed elimination todo",
+          "status": "ported",
+          "go_target": "sat_solver_variable_state.go",
+          "tests": [
+            "TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots",
+            "TestSATSolverVariableColumnGrowthFailureAndScalarBounds",
+            "TestSATSolverWatchListsRealRelocationAndPayloadLifetime",
+            "TestSATSolverWatchListsPlacementRefusalAndConstructorUnwind",
+            "TestSATSolverMkVarFullSourceEighteenActionsAndByteClauseView",
+            "TestSATSolverMkVarAllActualReservationPrefixes",
+            "TestSATSolverMkVarLateHeapIndexPublicationBeforeRefusal",
+            "TestSATSolverVariableTrailAndConcretePhysicalOwnership",
+            "TestSATSolverVariableConstructorRefusalAndBorrowedTodo",
+            "TestSATSolverVariableRetainedSourceRetryAndColdGuards"
+          ]
         }
       ],
       "ownership": [
-        "Borrowed actual assignment/level arrays and real clause allocator storage; no search owner or solver runtime."
+        "Borrowed actual assignment/level arrays and real clause allocator storage; no search owner or solver runtime.",
+        "Source-width char assignment and scalar columns; charged outer watch tokens/metadata own each actual child once; real activity/queue/trail, borrowed actual todo. No complete solver construction or search."
       ],
       "deviations": [
-        "Concrete allocation-free heapsort replaces std::sort on scalar literals. TRACE, solver construction, BCP, conflicts, search, scopes and remaining methods are unported."
+        "Concrete allocation-free heapsort replaces std::sort on scalar literals. TRACE, solver construction, BCP, conflicts, search, scopes and remaining methods are unported.",
+        "Wrapped source allocations that cannot represent full typed capacity remain unported; host bounds are separate from exact source overflow DefaultException. Default child policies, full solver constructor, propagation, conflicts, scopes/search and TRACE remain open."
       ]
     },
     {
@@ -55341,9 +55377,35 @@
       "sha256": "7ec8a9c01ca2757723192c3e1098891043a91c7e719695fd2c806f717233c1c4",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_solver_variable_vectors.go",
+        "sat_solver_variable_vectors_test.go",
+        "sat_solver_watch_lists.go",
+        "sat_solver_watch_lists_test.go",
+        "sat_solver_variable_state.go",
+        "sat_solver_variable_state_test.go",
+        "sat_solver_clause_core.go",
+        "sat_solver_clause_core_test.go"
+      ],
+      "tests": [
+        "TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots",
+        "TestSATSolverVariableColumnGrowthFailureAndScalarBounds",
+        "TestSATSolverWatchListsRealRelocationAndPayloadLifetime",
+        "TestSATSolverWatchListsPlacementRefusalAndConstructorUnwind",
+        "TestSATSolverMkVarFullSourceEighteenActionsAndByteClauseView",
+        "TestSATSolverMkVarAllActualReservationPrefixes",
+        "TestSATSolverMkVarLateHeapIndexPublicationBeforeRefusal",
+        "TestSATSolverVariableTrailAndConcretePhysicalOwnership",
+        "TestSATSolverVariableConstructorRefusalAndBorrowedTodo",
+        "TestSATSolverVariableRetainedSourceRetryAndColdGuards",
+        "TestSATSolverClauseCoreFiniteSimplification",
+        "TestSATSolverClauseCoreWatchSelection",
+        "TestSATSolverClauseCoreSourcePrefixesAndGuards",
+        "TestSATSolverClauseCoreWarmNoAllocation",
+        "TestSATSolverClauseCoreWatchSourceAssertions",
+        "TestSATSolverClauseStateSourceAssignmentWidth"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -55374,9 +55436,31 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Complete source135\u2013160 MkVar body on actual variable columns/watch lists/activity/queue and borrowed elimination todo",
+          "status": "ported",
+          "go_target": "sat_solver_variable_state.go",
+          "tests": [
+            "TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots",
+            "TestSATSolverVariableColumnGrowthFailureAndScalarBounds",
+            "TestSATSolverWatchListsRealRelocationAndPayloadLifetime",
+            "TestSATSolverWatchListsPlacementRefusalAndConstructorUnwind",
+            "TestSATSolverMkVarFullSourceEighteenActionsAndByteClauseView",
+            "TestSATSolverMkVarAllActualReservationPrefixes",
+            "TestSATSolverMkVarLateHeapIndexPublicationBeforeRefusal",
+            "TestSATSolverVariableTrailAndConcretePhysicalOwnership",
+            "TestSATSolverVariableConstructorRefusalAndBorrowedTodo",
+            "TestSATSolverVariableRetainedSourceRetryAndColdGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "Source-width char assignment and scalar columns; charged outer watch tokens/metadata own each actual child once; real activity/queue/trail, borrowed actual todo. No complete solver construction or search."
+      ],
+      "deviations": [
+        "Wrapped source allocations that cannot represent full typed capacity remain unported; host bounds are separate from exact source overflow DefaultException. Default child policies, full solver constructor, propagation, conflicts, scopes/search and TRACE remain open."
+      ]
     },
     {
       "path": "src/sat/sat_solver/CMakeLists.txt",
@@ -106641,7 +106725,10 @@
         "mpnum/mp_power_publication_test.go",
         "mpnum/mp_round_publication_test.go",
         "mpnum/mpq_round_test.go",
-        "mpnum/mpq_scientific_boundary_test.go"
+        "mpnum/mpq_scientific_boundary_test.go",
+        "mpnum/mp_scalar_projection_test.go",
+        "mpnum/mpq_owner_cleanup.go",
+        "mpnum/construction_failure.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -106749,7 +106836,12 @@
         "TestScientificBoundaryPowerRefusalPrecedesRawArithmetic",
         "TestScientificBoundaryPublicMulDivRawAliases",
         "TestScientificBoundaryFirstRawGrowthRefusal",
-        "TestScientificBoundaryPublicMulDivStillRejectsInvalidHandles"
+        "TestScientificBoundaryPublicMulDivStillRejectsInvalidHandles",
+        "TestScalarProjectionIntegerLowWordsAndDebugProfiles",
+        "TestScalarProjectionRetainedSizeHeaderReads",
+        "TestScalarProjectionRationalRawNumeratorsAndPredicates",
+        "TestScalarProjectionFloatRawIEEEAndDebugAssertion",
+        "TestScalarProjectionInvalidOwnershipAndWarmGraph"
       ],
       "assertions": [
         {
@@ -107171,6 +107263,18 @@
             "TestScientificBoundaryFirstRawGrowthRefusal",
             "TestScientificBoundaryPublicMulDivStillRejectsInvalidHandles"
           ]
+        },
+        {
+          "name": "Selected rational scalar projections and Float64 NUM-then-DEN DEBUG/release boundaries",
+          "status": "ported",
+          "go_target": "mpnum/mpq_inspect.go",
+          "tests": [
+            "TestScalarProjectionIntegerLowWordsAndDebugProfiles",
+            "TestScalarProjectionRetainedSizeHeaderReads",
+            "TestScalarProjectionRationalRawNumeratorsAndPredicates",
+            "TestScalarProjectionFloatRawIEEEAndDebugAssertion",
+            "TestScalarProjectionInvalidOwnershipAndWarmGraph"
+          ]
         }
       ],
       "ownership": [
@@ -107183,7 +107287,8 @@
         "Number theory locals use existing budgeted numerical cells/Words and are always deleted in source order. ExtendedGCD preserves coefficient publication/failure prefixes and rational denominator reset timing; immediate failed-prefix caller/cache roots audited. See PORT_PROGRESS.md#audit-number-theory-port-status-md.",
         "Inspection uses existing integer roots; extraction acquires deep independent limbs and thin setters/swap retain source component identity. Failed-prefix tests audit cells/Words and decoded values before rendering/teardown. See PORT_PROGRESS.md#audit-rational-inspection-port-status-md.",
         "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See PORT_PROGRESS.md#audit-mpz-power-publication-packet-md; source allocator/backend integration remains required.",
-        "All four rounding outputs use existing roundCore directly against the caller; source sign is captured before division and rational denominator resets only after successful integer rounding. Immediate fault roots, integral BIG Copy refusal, quotient-before-correction refusal and raw component aliases are tested. See PORT_PROGRESS.md#audit-mpq-rounding-publication-packet-md; physical allocator-backed cleanup remains separate unfinished work."
+        "All four rounding outputs use existing roundCore directly against the caller; source sign is captured before division and rational denominator resets only after successful integer rounding. Immediate fault roots, integral BIG Copy refusal, quotient-before-correction refusal and raw component aliases are tested. See PORT_PROGRESS.md#audit-mpq-rounding-publication-packet-md; physical allocator-backed cleanup remains separate unfinished work.",
+        "Checked owning cleanup retains a per-component source outer-field cursor and forwards real child failures. This is not full transitive source finalization."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -107227,7 +107332,10 @@
         "mpnum/mpz_gcd_diagnostics_debug.go",
         "mpnum/mpz_gcd_diagnostics_release.go",
         "mpnum/mp_round_publication_test.go",
-        "mpnum/mpq_round_test.go"
+        "mpnum/mpq_round_test.go",
+        "mpnum/mp_scalar_projection_test.go",
+        "mpnum/mpq_owner_cleanup.go",
+        "mpnum/construction_failure.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -107390,7 +107498,12 @@
         "TestGCDPublicationFullFamilySignedAliases",
         "TestRoundPublicationIntegralCopyRefusal",
         "TestRoundPublicationQuotientBeforeCeilCorrectionRefusal",
-        "TestRoundPublicationRawShapesAndAllComponentAliases"
+        "TestRoundPublicationRawShapesAndAllComponentAliases",
+        "TestScalarProjectionIntegerLowWordsAndDebugProfiles",
+        "TestScalarProjectionRetainedSizeHeaderReads",
+        "TestScalarProjectionRationalRawNumeratorsAndPredicates",
+        "TestScalarProjectionFloatRawIEEEAndDebugAssertion",
+        "TestScalarProjectionInvalidOwnershipAndWarmGraph"
       ],
       "conditionals": [
         {
@@ -108270,6 +108383,18 @@
             "TestRationalRoundFailureCleanup",
             "TestRationalSourcePrevPowerOfTwo"
           ]
+        },
+        {
+          "name": "Selected rational scalar projections and Float64 NUM-then-DEN DEBUG/release boundaries",
+          "status": "ported",
+          "go_target": "mpnum/mpq_inspect.go",
+          "tests": [
+            "TestScalarProjectionIntegerLowWordsAndDebugProfiles",
+            "TestScalarProjectionRetainedSizeHeaderReads",
+            "TestScalarProjectionRationalRawNumeratorsAndPredicates",
+            "TestScalarProjectionFloatRawIEEEAndDebugAssertion",
+            "TestScalarProjectionInvalidOwnershipAndWarmGraph"
+          ]
         }
       ],
       "ownership": [
@@ -108288,7 +108413,8 @@
         "Division writes actual caller numerator/denominator in source order, preserving divisor/output aliases and explicit local-tmp Del before normalization. Finite denominator-zero results remain owned; cleanup-only validation permits destruction/reset while ordinary reads remain guarded. See PORT_PROGRESS.md#audit-mpq-division-publication-packet-md.",
         "Actual caller fields publish in source Add/Sub/AddInt/MulInt/MulInts order; general SYNCH Add/Sub explicitly delete tmp1 before tmp2. Existing fused helpers use public Mul then Add/Sub and the source unit shortcuts. Failure tests inspect named caller/temporary roots before disabling faults; physical allocator integration remains open. See PORT_PROGRESS.md#audit-mpq-additive-publication-packet-md.",
         "Zero GCD copies directly into caller before Abs; minimum-promotion allocation refusal retains the completed inline copy, while failed BIG Copy retains the actual published sign/dead descriptor. Existing general GCD locals and final publication remain source ordered; twelve Lehmer and one intermediate ExtendedGCD diagnostics execute only in g3debug. Named roots audited before fault disabling. See PORT_PROGRESS.md#audit-mpz-gcd-publication-packet-md.",
-        "All four rounding outputs use existing roundCore directly against the caller; source sign is captured before division and rational denominator resets only after successful integer rounding. Immediate fault roots, integral BIG Copy refusal, quotient-before-correction refusal and raw component aliases are tested. See PORT_PROGRESS.md#audit-mpq-rounding-publication-packet-md; physical allocator-backed cleanup remains separate unfinished work."
+        "All four rounding outputs use existing roundCore directly against the caller; source sign is captured before division and rational denominator resets only after successful integer rounding. Immediate fault roots, integral BIG Copy refusal, quotient-before-correction refusal and raw component aliases are tested. See PORT_PROGRESS.md#audit-mpq-rounding-publication-packet-md; physical allocator-backed cleanup remains separate unfinished work.",
+        "Checked owning cleanup retains a per-component source outer-field cursor and forwards real child failures. This is not full transitive source finalization."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -108379,7 +108505,12 @@
         "mpnum/mpz_gcd_diagnostics_debug.go",
         "mpnum/mpz_gcd_diagnostics_release.go",
         "mpnum/mpz_source_finalize.go",
-        "mpnum/mpz_source_finalize_test.go"
+        "mpnum/mpz_source_finalize_test.go",
+        "mpnum/construction_failure.go",
+        "mpnum/mpz_constructor_unwind.go",
+        "mpnum/mpz_construction_failure_test.go",
+        "mpnum/mpz_allocator_phase_b_test.go",
+        "mpnum/mp_scalar_projection_test.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -108554,7 +108685,20 @@
         "TestIntegerSourceFinalizeCallerPhysicalLifetimes",
         "TestIntegerSourceFinalizeReverseNaturalUnderAllocationLimit",
         "TestIntegerSourceFinalizeDiagnosticFailureRetainsCaller",
-        "TestIntegerSourceFinalizeMissingScratchOwningAbort"
+        "TestIntegerSourceFinalizeMissingScratchOwningAbort",
+        "TestNumeralConstructionFailureOwnerMethodSets",
+        "TestIntegerFailedConstructorActualMemberUnwind",
+        "TestIntegerDefaultActualAllocatorConstructorTopology",
+        "TestIntegerDefaultRuntimeIsActuallyOwnedBackend",
+        "TestIntegerSourceFinalizeRetainsActualDirectCallerRoot",
+        "TestIntegerSourceCellSizeUnsignedDomain",
+        "TestIntegerConstructorRefusalRetainsTransitiveOwnership",
+        "TestIntegerScratchSpanDoesNotPublishPhysicalSize",
+        "TestScalarProjectionIntegerLowWordsAndDebugProfiles",
+        "TestScalarProjectionRetainedSizeHeaderReads",
+        "TestScalarProjectionRationalRawNumeratorsAndPredicates",
+        "TestScalarProjectionFloatRawIEEEAndDebugAssertion",
+        "TestScalarProjectionInvalidOwnershipAndWarmGraph"
       ],
       "conditionals": [
         {
@@ -110122,6 +110266,33 @@
             "TestIntegerSourceFinalizeDiagnosticFailureRetainsCaller",
             "TestIntegerSourceFinalizeMissingScratchOwningAbort"
           ]
+        },
+        {
+          "name": "Selected Integer scalar getters: source release low-word/cast behavior and DEBUG-only fit assertions; strict predicates",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestScalarProjectionIntegerLowWordsAndDebugProfiles",
+            "TestScalarProjectionRetainedSizeHeaderReads",
+            "TestScalarProjectionRationalRawNumeratorsAndPredicates",
+            "TestScalarProjectionFloatRawIEEEAndDebugAssertion",
+            "TestScalarProjectionInvalidOwnershipAndWarmGraph"
+          ]
+        },
+        {
+          "name": "Failed constructor reverse completed-member unwind and explicit retained-owner cleanup for selected non-GMP profiles",
+          "status": "ported",
+          "go_target": "mpnum/mpz_constructor_unwind.go",
+          "tests": [
+            "TestNumeralConstructionFailureOwnerMethodSets",
+            "TestIntegerFailedConstructorActualMemberUnwind",
+            "TestIntegerDefaultActualAllocatorConstructorTopology",
+            "TestIntegerDefaultRuntimeIsActuallyOwnedBackend",
+            "TestIntegerSourceFinalizeRetainsActualDirectCallerRoot",
+            "TestIntegerSourceCellSizeUnsignedDomain",
+            "TestIntegerConstructorRefusalRetainsTransitiveOwnership",
+            "TestIntegerScratchSpanDoesNotPublishPhysicalSize"
+          ]
         }
       ],
       "ownership": [
@@ -110157,7 +110328,8 @@
         "Go continuation for source undefined allocation failure: permanently dead failed token and missing-scratch guards; finite unsigned wrapped allocations retained before actual span ErrBounds. Higher-level staged wrappers remain fidelity work, not completion evidence.",
         "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open.",
         "The registered randomized GCD campaign preserves all 168 primes, conditional Power/Mul and sign draw order using an explicit hermetic RNG adapter, not libc sequence identity. Independent table enumeration and arithmetic checks add no ENSURE credit; print-only minimum GCD expectation is additional verification. Actual allocator topology, cleanup exceptions, alternate backends and full source-unit completion remain open.",
-        "Explicit Go SourceFinalize retains a charged continuation cursor; source-undefined private-pointer guards permit separate owning-abort cleanup without claiming source completion. ConstructionFailure and transitive/global lifecycle remain open."
+        "Explicit Go SourceFinalize retains a charged continuation cursor; source-undefined private-pointer guards permit separate owning-abort cleanup without claiming source completion. ConstructionFailure and transitive/global lifecycle remain open.",
+        "ConstructionFailure is the already charged owner. Successful member unwind can retain direct roots with no cleanup error; owning Cleanup is separate. Full transitive/global source lifetime and other source branches remain open."
       ]
     },
     {
@@ -110189,7 +110361,12 @@
         "mpnum/mp_bitwise_publication_test.go",
         "mpnum/mp_gcd_publication_test.go",
         "mpnum/mpz_gcd_diagnostics_debug.go",
-        "mpnum/mpz_gcd_diagnostics_release.go"
+        "mpnum/mpz_gcd_diagnostics_release.go",
+        "mpnum/construction_failure.go",
+        "mpnum/mpz_constructor_unwind.go",
+        "mpnum/mpz_construction_failure_test.go",
+        "mpnum/mpz_allocator_phase_b_test.go",
+        "mpnum/mp_scalar_projection_test.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -110365,7 +110542,20 @@
         "TestGCDPublicationRationalArrayVisitedFraction",
         "TestGCDPublicationSourceFull168PrimeCampaign",
         "TestGCDPublicationPrimeTableAndPredicateBoundary",
-        "TestGCDPublicationFullFamilySignedAliases"
+        "TestGCDPublicationFullFamilySignedAliases",
+        "TestNumeralConstructionFailureOwnerMethodSets",
+        "TestIntegerFailedConstructorActualMemberUnwind",
+        "TestIntegerDefaultActualAllocatorConstructorTopology",
+        "TestIntegerDefaultRuntimeIsActuallyOwnedBackend",
+        "TestIntegerSourceFinalizeRetainsActualDirectCallerRoot",
+        "TestIntegerSourceCellSizeUnsignedDomain",
+        "TestIntegerConstructorRefusalRetainsTransitiveOwnership",
+        "TestIntegerScratchSpanDoesNotPublishPhysicalSize",
+        "TestScalarProjectionIntegerLowWordsAndDebugProfiles",
+        "TestScalarProjectionRetainedSizeHeaderReads",
+        "TestScalarProjectionRationalRawNumeratorsAndPredicates",
+        "TestScalarProjectionFloatRawIEEEAndDebugAssertion",
+        "TestScalarProjectionInvalidOwnershipAndWarmGraph"
       ],
       "conditionals": [
         {
@@ -111509,6 +111699,33 @@
             "TestGCDPublicationPrimeTableAndPredicateBoundary",
             "TestGCDPublicationFullFamilySignedAliases"
           ]
+        },
+        {
+          "name": "Selected Integer scalar getters: source release low-word/cast behavior and DEBUG-only fit assertions; strict predicates",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestScalarProjectionIntegerLowWordsAndDebugProfiles",
+            "TestScalarProjectionRetainedSizeHeaderReads",
+            "TestScalarProjectionRationalRawNumeratorsAndPredicates",
+            "TestScalarProjectionFloatRawIEEEAndDebugAssertion",
+            "TestScalarProjectionInvalidOwnershipAndWarmGraph"
+          ]
+        },
+        {
+          "name": "Failed constructor reverse completed-member unwind and explicit retained-owner cleanup for selected non-GMP profiles",
+          "status": "ported",
+          "go_target": "mpnum/mpz_constructor_unwind.go",
+          "tests": [
+            "TestNumeralConstructionFailureOwnerMethodSets",
+            "TestIntegerFailedConstructorActualMemberUnwind",
+            "TestIntegerDefaultActualAllocatorConstructorTopology",
+            "TestIntegerDefaultRuntimeIsActuallyOwnedBackend",
+            "TestIntegerSourceFinalizeRetainsActualDirectCallerRoot",
+            "TestIntegerSourceCellSizeUnsignedDomain",
+            "TestIntegerConstructorRefusalRetainsTransitiveOwnership",
+            "TestIntegerScratchSpanDoesNotPublishPhysicalSize"
+          ]
         }
       ],
       "ownership": [
@@ -111544,7 +111761,8 @@
         "Inv source SASSERT(false) is always typed ErrIntegerInvUnsupported in Go, unlike release C++ no-op. Backend alternatives, disabled GCD variants and remaining diagnostics stay open; this public facade does not close the entire source unit.",
         "Go continuation for source undefined allocation failure: permanently dead failed token and missing-scratch guards; finite unsigned wrapped allocations retained before actual span ErrBounds. Higher-level staged wrappers remain fidelity work, not completion evidence.",
         "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open.",
-        "The registered randomized GCD campaign preserves all 168 primes, conditional Power/Mul and sign draw order using an explicit hermetic RNG adapter, not libc sequence identity. Independent table enumeration and arithmetic checks add no ENSURE credit; print-only minimum GCD expectation is additional verification. Actual allocator topology, cleanup exceptions, alternate backends and full source-unit completion remain open."
+        "The registered randomized GCD campaign preserves all 168 primes, conditional Power/Mul and sign draw order using an explicit hermetic RNG adapter, not libc sequence identity. Independent table enumeration and arithmetic checks add no ENSURE credit; print-only minimum GCD expectation is additional verification. Actual allocator topology, cleanup exceptions, alternate backends and full source-unit completion remain open.",
+        "ConstructionFailure is the already charged owner. Successful member unwind can retain direct roots with no cleanup error; owning Cleanup is separate. Full transitive/global source lifetime and other source branches remain open."
       ]
     },
     {
@@ -114453,11 +114671,14 @@
       "sha256": "4479ae33541ebd0481884deab48fabea327183d53e34ab3c6639246812adbd69",
       "component": "util",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "mpnum/rational_service.go",
         "mpnum/inf_rational.go",
-        "mpnum/inf_int_rational.go"
+        "mpnum/inf_int_rational.go",
+        "mpnum/rational_service_cleanup.go",
+        "mpnum/construction_failure.go",
+        "mpnum/mpz_allocator_phase_b_test.go"
       ],
       "tests": [
         "TestRationalServiceSourceConstructorAssertions",
@@ -114499,7 +114720,13 @@
         "TestInfIntRationalFaultPrefixesTemporaryCleanup",
         "TestInfIntRationalAliasReReadWarmReuseAndGuards",
         "TestInfIntRationalIncrementSourceRationalRoute",
-        "TestInfIntRationalPostFailureAndGetterIndependence"
+        "TestInfIntRationalPostFailureAndGetterIndependence",
+        "TestIntegerDefaultActualAllocatorConstructorTopology",
+        "TestIntegerDefaultRuntimeIsActuallyOwnedBackend",
+        "TestIntegerSourceFinalizeRetainsActualDirectCallerRoot",
+        "TestIntegerSourceCellSizeUnsignedDomain",
+        "TestIntegerConstructorRefusalRetainsTransitiveOwnership",
+        "TestIntegerScratchSpanDoesNotPublishPhysicalSize"
       ],
       "conditionals": [
         {
@@ -114511,12 +114738,12 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
+      "methods_audited": false,
+      "ownership_audited": false,
       "methods": [
         {
-          "name": "owner-local manager and zero/one/minus-one core initialization/finalization",
-          "status": "ported",
+          "name": "Owner-local core initialization and checked owning finalization; transitive source manager deallocation still missing",
+          "status": "partial",
           "go_target": "mpnum/rational_service.go",
           "tests": [
             "TestRationalServiceSourceConstructorAssertions",
@@ -114596,7 +114823,8 @@
         "All six infinitesimal constants are actual pointer-free service fields included in reflected header bytes. Constructor order rational/InfRat/InfInt; finalization InfRat/InfInt/cache/rational constants/manager. Production hook traversal observed via free-slot reuse before manager close. See PORT_PROGRESS.md#audit-rational-inf-lifecycle-port-status-md."
       ],
       "deviations": [
-        "Global mutable numerical manager/cache/constants become an explicit owner-local service; getters produce independent values and scalar provenance guards service domains. Full cpp algorithms and hooks are ported; header facade still partial. Windows compiler warning pragma has no Go runtime counterpart."
+        "Global mutable numerical manager/cache/constants become an explicit owner-local service; getters produce independent values and scalar provenance guards service domains. Cache algorithms and outer hooks have bounded evidence; transitive source finalization and header facade remain partial. Windows compiler warning pragma has no Go runtime counterpart.",
+        "rational.cpp82 dealloc(manager) is not complete: owning Integer.CloseChecked scans all descriptors and frees caller direct roots, unlike SourceFinalize private order and actual caller raw survival. A faithful Rational/Service source finalizer and generated global/TLS lifecycle remain open."
       ]
     },
     {

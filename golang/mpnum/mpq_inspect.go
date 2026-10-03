@@ -69,7 +69,7 @@ func (m *RationalManager) Hash(a *Rational) (uint32, error) {
 	return m.z.Hash(&a.num)
 }
 func (m *RationalManager) IsUint64(a *Rational) (bool, error) {
-	if e := m.check(a); e != nil {
+	if e := m.checkIntegerFields(a); e != nil {
 		return false, e
 	}
 	if !isIntegerRational(a) {
@@ -78,7 +78,7 @@ func (m *RationalManager) IsUint64(a *Rational) (bool, error) {
 	return m.z.IsUint64(&a.num)
 }
 func (m *RationalManager) IsInt64(a *Rational) (bool, error) {
-	if e := m.check(a); e != nil {
+	if e := m.checkIntegerFields(a); e != nil {
 		return false, e
 	}
 	if !isIntegerRational(a) {
@@ -87,22 +87,32 @@ func (m *RationalManager) IsInt64(a *Rational) (bool, error) {
 	return m.z.IsInt64(&a.num)
 }
 func (m *RationalManager) Uint64(a *Rational) (uint64, error) {
-	ok, e := m.IsUint64(a)
-	if e != nil {
+	if e := m.checkIntegerFields(a); e != nil {
 		return 0, e
 	}
-	if !ok {
-		return 0, ErrConversion
+	if modularSourceDebug {
+		ok, e := m.IsUint64(a)
+		if e != nil {
+			return 0, e
+		}
+		if !ok {
+			return 0, ErrIntegerAssertion
+		}
 	}
 	return m.z.Uint64(&a.num)
 }
 func (m *RationalManager) Int64(a *Rational) (int64, error) {
-	ok, e := m.IsInt64(a)
-	if e != nil {
+	if e := m.checkIntegerFields(a); e != nil {
 		return 0, e
 	}
-	if !ok {
-		return 0, ErrConversion
+	if modularSourceDebug {
+		ok, e := m.IsInt64(a)
+		if e != nil {
+			return 0, e
+		}
+		if !ok {
+			return 0, ErrIntegerAssertion
+		}
 	}
 	return m.z.Int64(&a.num)
 }
@@ -118,21 +128,26 @@ func (m *RationalManager) IsUnsigned(a *Rational) (bool, error) {
 	return v < uint64(1)<<32, e
 }
 func (m *RationalManager) Unsigned(a *Rational) (uint32, error) {
-	ok, e := m.IsUnsigned(a)
-	if e != nil {
+	if e := m.checkIntegerFields(a); e != nil {
 		return 0, e
 	}
-	if !ok {
-		return 0, ErrConversion
+	if modularSourceDebug {
+		ok, e := m.IsUnsigned(a)
+		if e != nil {
+			return 0, e
+		}
+		if !ok {
+			return 0, ErrIntegerAssertion
+		}
 	}
-	v, e := m.z.Uint64(&a.num)
+	v, e := m.Uint64(a)
 	return uint32(v), e
 }
 
 // IsInt32/Int32 preserve rational.h's inclusive signed boundaries, unlike the
 // source MPZ strict-bound variants. No global-manager wrapper is introduced.
 func (m *RationalManager) IsInt32(a *Rational) (bool, error) {
-	if e := m.check(a); e != nil {
+	if e := m.checkIntegerFields(a); e != nil {
 		return false, e
 	}
 	if a.IsSmall() && isIntegerRational(a) {
@@ -146,14 +161,19 @@ func (m *RationalManager) IsInt32(a *Rational) (bool, error) {
 	return v >= -2147483648 && v <= 2147483647, e
 }
 func (m *RationalManager) Int32(a *Rational) (int32, error) {
-	ok, e := m.IsInt32(a)
-	if e != nil {
+	if e := m.checkIntegerFields(a); e != nil {
 		return 0, e
 	}
-	if !ok {
-		return 0, ErrConversion
+	if modularSourceDebug {
+		ok, e := m.IsInt32(a)
+		if e != nil {
+			return 0, e
+		}
+		if !ok {
+			return 0, ErrIntegerAssertion
+		}
 	}
-	v, e := m.z.Int64(&a.num)
+	v, e := m.Int64(a)
 	return int32(v), e
 }
 func (m *RationalManager) IsEven(a *Rational) (bool, error) {
@@ -198,10 +218,10 @@ func (m *RationalManager) StorageSize(a *Rational) (uint32, error) {
 }
 
 // Float64 retains each underlying source UINT_MAX-radix conversion and n/d.
-// The source SASSERT(d>0) becomes an explicit development-domain error, including
-// negative or NaN denominators; numerator NaN and valid-denominator Inf remain.
+// SASSERT(d>0) is selected only in source-debug builds, after both conversions.
+// Release retains IEEE quotients for zero, negative and NaN denominators.
 func (m *RationalManager) Float64(a *Rational) (float64, error) {
-	if e := m.check(a); e != nil {
+	if e := m.checkIntegerFields(a); e != nil {
 		return 0, e
 	}
 	n, e := m.z.Float64(&a.num)
@@ -212,7 +232,7 @@ func (m *RationalManager) Float64(a *Rational) (float64, error) {
 	if e != nil {
 		return 0, e
 	}
-	if !(d > 0) {
+	if modularSourceDebug && !(d > 0) {
 		return 0, ErrRationalFloatDomain
 	}
 	return n / d, nil

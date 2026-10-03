@@ -53,6 +53,7 @@ func TestIntegerOwnerConstructorFailureUnwind(t *testing.T) {
 		cfg := IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}
 		m, err := NewIntegerManager(cfg)
 		if err != nil {
+			constructionFailureOwningCleanup(t, err, b)
 			if m != nil || b.Used() != 0 {
 				t.Fatal(fault, "constructor leak", b.Used())
 			}

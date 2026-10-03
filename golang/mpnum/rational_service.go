@@ -51,6 +51,11 @@ type RationalService struct {
 	cache                                 []Rational
 	cacheBytes, headerBytes               uint64
 	closed                                bool
+	originalCause, cleanupCause           error
+	cleanupStage                          uint8
+	cleanupCacheIndex                     uint32
+	cleanupComponent                      uint8
+	closing                               bool
 }
 
 func nextRationalServiceID() (uint64, error) {
@@ -77,13 +82,14 @@ func NewRationalService(c RationalServiceConfig) (*RationalService, error) {
 	if e = b.Reserve(header); e != nil {
 		return nil, e
 	}
+	s := &RationalService{ownerID: id, zero: NewRational(), one: NewRational(), minusOne: NewRational(), headerBytes: header}
+	s.self = s
 	m, e := NewRationalManager(RationalConfig{Integers: c.Integers, Synchronized: true})
 	if e != nil {
 		b.Release(header)
 		return nil, e
 	}
-	s := &RationalService{manager: m, ownerID: id, zero: NewRational(), one: NewRational(), minusOne: NewRational(), headerBytes: header}
-	s.self = s
+	s.manager = m
 	// Source initialization order: manager, zero, one, minus one.
 	if e = m.SetInt64(&s.zero, 0); e == nil {
 		e = m.SetInt64(&s.one, 1)
@@ -98,7 +104,10 @@ func NewRationalService(c RationalServiceConfig) (*RationalService, error) {
 		e = s.initInfIntRationalConstants()
 	}
 	if e != nil {
-		s.Close()
+		s.originalCause = e
+		if cleanup := s.CloseChecked(); cleanup != nil {
+			return nil, s
+		}
 		return nil, e
 	}
 	return s, nil
@@ -114,7 +123,7 @@ func (s *RationalService) lock() error {
 		return ErrRationalServiceCopy
 	}
 	s.mu.Lock()
-	if s.closed {
+	if s.closed || s.closing {
 		s.mu.Unlock()
 		return arena.ErrClosed
 	}
@@ -459,25 +468,4 @@ func (s *RationalService) destroyInfinitesimalConstants() {
 	s.destroyInfRationalConstants()
 	s.destroyInfIntRationalConstants()
 }
-func (s *RationalService) Close() error {
-	if s == nil || s.self != s {
-		return ErrRationalServiceCopy
-	}
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	if s.closed {
-		return nil
-	}
-	// Source finalization: rational infinitesimals, integer infinitesimals,
-	// ascending cache destructors, zero, one, minus one, manager.
-	s.destroyInfinitesimalConstants()
-	s.destroyCache()
-	s.manager.Del(&s.zero)
-	s.manager.Del(&s.one)
-	s.manager.Del(&s.minusOne)
-	s.manager.Close()
-	s.manager.budget.Release(s.headerBytes)
-	s.headerBytes = 0
-	s.closed = true
-	return nil
-}
+func (s *RationalService) Close() error { return s.CloseChecked() }

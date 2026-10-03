@@ -31,15 +31,29 @@ func TestIntegerScalarStrictConversions(t *testing.T) {
 			if ie != nil || iv != int32(v) {
 				t.Fatal(v, iv, ie)
 			}
-		} else if !errors.Is(ie, ErrConversion) {
-			t.Fatal(v, ie)
+		} else if modularSourceDebug {
+			if !errors.Is(ie, ErrIntegerAssertion) {
+				t.Fatal(v, ie)
+			}
+		} else if ie != nil || iv != int32(v) {
+			t.Fatal("release signed narrowing", v, iv, ie)
 		}
 		if wu {
 			if ue != nil || uv != uint32(v) {
 				t.Fatal(v, uv, ue)
 			}
-		} else if !errors.Is(ue, ErrConversion) {
-			t.Fatal(v, ue)
+		} else if modularSourceDebug {
+			if !errors.Is(ue, ErrIntegerAssertion) {
+				t.Fatal(v, ue)
+			}
+		} else {
+			want := uint32(v)
+			if !a.IsSmall() && v < 0 {
+				want = uint32(-v)
+			}
+			if ue != nil || uv != want {
+				t.Fatal("release unsigned source magnitude/inline cast", v, uv, want, ue)
+			}
 		}
 		m.Del(&a)
 	}

@@ -380,6 +380,7 @@ func TestRationalConstructorAllocationFailures(t *testing.T) {
 			if !numericPhysicalReservationRefusal(e) {
 				t.Fatal(e)
 			}
+			constructionFailureOwningCleanup(t, e, budget)
 		} else {
 			successes++
 			m.Close()

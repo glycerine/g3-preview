@@ -38,6 +38,7 @@ func TestRationalServiceInfinitesimalConstructorFailureRefunds(t *testing.T) {
 			if !numericPhysicalReservationRefusal(err) {
 				t.Fatalf("prefix %d: %v", prefix, err)
 			}
+			constructionFailureOwningCleanup(t, err, b)
 			if s != nil || b.Used() != 0 {
 				t.Fatalf("prefix %d: failed constructor retained owner=%p bytes=%d", prefix, s, b.Used())
 			}

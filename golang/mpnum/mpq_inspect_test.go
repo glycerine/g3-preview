@@ -159,8 +159,22 @@ func TestRationalInspectionPredicatesAndBoundaries(t *testing.T) {
 				if e != nil || uint64(v) != oracle.Uint64() {
 					t.Fatal(v, e)
 				}
-			} else if _, e := m.Unsigned(&a); !errors.Is(e, ErrConversion) {
-				t.Fatal(e)
+			} else {
+				v, e := m.Unsigned(&a)
+				if modularSourceDebug {
+					if !errors.Is(e, ErrIntegerAssertion) {
+						t.Fatal(e)
+					}
+				} else {
+					n := roundPublicationDecode(t, m.z, &a.num)
+					want := uint32(projectionLowMagnitude(n))
+					if a.num.IsSmall() {
+						want = uint32(a.num.val)
+					}
+					if e != nil || v != want {
+						t.Fatal("release numerator unsigned projection", f, v, want, e)
+					}
+				}
 			}
 			if s {
 				v, e := m.Int32(&a)
@@ -168,8 +182,19 @@ func TestRationalInspectionPredicatesAndBoundaries(t *testing.T) {
 				if e != nil || int64(v) != oracle.Int64() {
 					t.Fatal(v, e)
 				}
-			} else if _, e := m.Int32(&a); !errors.Is(e, ErrConversion) {
-				t.Fatal(e)
+			} else {
+				v, e := m.Int32(&a)
+				if modularSourceDebug {
+					if !errors.Is(e, ErrIntegerAssertion) {
+						t.Fatal(e)
+					}
+				} else {
+					n := roundPublicationDecode(t, m.z, &a.num)
+					want := int32(n.Int64()) // every bounded fixture NUM fits int64
+					if e != nil || v != want {
+						t.Fatal("release numerator signed narrowing", f, v, want, e)
+					}
+				}
 			}
 			m.drop(&a)
 		}
@@ -177,12 +202,20 @@ func TestRationalInspectionPredicatesAndBoundaries(t *testing.T) {
 		if ok, e := m.IsInt64(&unreduced); e != nil || ok {
 			t.Fatal("structural integer test", ok, e)
 		}
-		if _, e := m.Int64(&unreduced); !errors.Is(e, ErrConversion) {
-			t.Fatal(e)
+		if v, e := m.Int64(&unreduced); modularSourceDebug {
+			if !errors.Is(e, ErrIntegerAssertion) {
+				t.Fatal(e)
+			}
+		} else if e != nil || v != 2 {
+			t.Fatal("release unreduced numerator", v, e)
 		}
 		negative := Rational{num: NewInt(-1), den: NewInt(1)}
-		if _, e := m.Uint64(&negative); !errors.Is(e, ErrConversion) {
-			t.Fatal("rational accessor assertion differs from raw MPZ accessor", e)
+		if v, e := m.Uint64(&negative); modularSourceDebug {
+			if !errors.Is(e, ErrIntegerAssertion) {
+				t.Fatal("rational accessor debug assertion", e)
+			}
+		} else if e != nil || v != math.MaxUint64 {
+			t.Fatal("release inline negative unsigned cast", v, e)
 		}
 	}
 }
@@ -308,8 +341,12 @@ func TestRationalInspectionStatisticsFloatAndDomains(t *testing.T) {
 		t.Fatal(n, e)
 	}
 	a.den = NewInt(-2)
-	if _, e := m.Float64(&a); !errors.Is(e, ErrRationalFloatDomain) {
-		t.Fatal("source positive floating denominator assertion", e)
+	if v, e := m.Float64(&a); modularSourceDebug {
+		if !errors.Is(e, ErrRationalFloatDomain) {
+			t.Fatal("source positive floating denominator assertion", e)
+		}
+	} else if e != nil || v != -float64(math.MaxUint32)/2 {
+		t.Fatal("release source floating radix/negative divisor", v, e)
 	}
 	m.z.Del(&a.num)
 	var raw Rational
@@ -340,8 +377,12 @@ func TestRationalInspectionFloatExceptionalBranches(t *testing.T) {
 	if e := m.z.SetLimbs(&a.den, limbs); e != nil {
 		t.Fatal(e)
 	}
-	if _, e := m.Float64(&a); !errors.Is(e, ErrRationalFloatDomain) {
-		t.Fatal("converted denominator NaN assertion", e)
+	if v, e := m.Float64(&a); modularSourceDebug {
+		if !errors.Is(e, ErrRationalFloatDomain) {
+			t.Fatal("converted denominator NaN assertion", e)
+		}
+	} else if e != nil || !math.IsNaN(v) {
+		t.Fatal("release NaN denominator quotient", v, e)
 	}
 	for i := range limbs {
 		limbs[i] = 1
@@ -367,9 +408,14 @@ func TestRationalInspectionFloatExceptionalBranches(t *testing.T) {
 func TestRationalInspectionGuardResultAndBorrowLifetime(t *testing.T) {
 	m, _ := rationalManager(t, false)
 	var raw Rational
-	for _, call := range []func(*Rational) (bool, error){m.IsPos, m.IsNeg, m.IsZero, m.IsNonPos, m.IsNonNeg, m.IsOne, m.IsMinusOne, m.IsInt, m.IsEven, m.IsInt64, m.IsUint64, m.IsUnsigned, m.IsInt32} {
+	for _, call := range []func(*Rational) (bool, error){m.IsPos, m.IsNeg, m.IsZero, m.IsNonPos, m.IsNonNeg, m.IsOne, m.IsMinusOne, m.IsInt, m.IsEven} {
 		if got, e := call(&raw); !errors.Is(e, ErrUninitializedRational) || got {
 			t.Fatal("invalid bool result", got, e)
+		}
+	}
+	for _, call := range []func(*Rational) (bool, error){m.IsInt64, m.IsUint64, m.IsUnsigned, m.IsInt32} {
+		if got, e := call(&raw); e != nil || got {
+			t.Fatal("source scalar fit predicate short-circuits DEN0", got, e)
 		}
 	}
 	a := NewRational()
@@ -614,8 +660,18 @@ func TestRationalInspectionWarmAllocationAndIndependentValues(t *testing.T) {
 				if ue != nil || unsigned != uint64(v) {
 					t.Fatal(v, unsigned, ue)
 				}
-			} else if !errors.Is(ue, ErrConversion) {
-				t.Fatal(v, ue)
+			} else if modularSourceDebug {
+				if !errors.Is(ue, ErrIntegerAssertion) {
+					t.Fatal(v, ue)
+				}
+			} else {
+				want := uint64(v)
+				if !x.num.IsSmall() {
+					want = uint64(-v)
+				}
+				if ue != nil || unsigned != want {
+					t.Fatal("release numerator unsigned shape", v, unsigned, want, ue)
+				}
 			}
 			m.drop(&x)
 		}

@@ -177,11 +177,15 @@ func TestIntegerSetConversionBoundaries(t *testing.T) {
 	if ok, e := m.IsUint64(&n); e != nil || ok {
 		t.Fatal(ok, e)
 	}
-	if _, e := m.Int64(&n); e == nil {
-		t.Fatal("oversized signed conversion")
-	}
-	if _, e := m.Uint64(&n); e == nil {
-		t.Fatal("oversized unsigned conversion")
+	i, ie := m.Int64(&n)
+	u, ue := m.Uint64(&n)
+	integerPhysicalAudit(t, m, &n)
+	if modularSourceDebug {
+		if !errors.Is(ie, ErrIntegerAssertion) || !errors.Is(ue, ErrIntegerAssertion) {
+			t.Fatal("source oversized getter assertions", ie, ue)
+		}
+	} else if ie != nil || ue != nil || i != 0 || u != 0 {
+		t.Fatal("source low two words of 2^64", i, u, ie, ue)
 	}
 }
 func TestIntegerOwnership(t *testing.T) {
@@ -283,6 +287,10 @@ func TestIntegerFailureCleanup(t *testing.T) {
 		m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{PageSize: 1, Budget: budget}, Words: arena.VectorConfig{PageSize: 8, Descriptors: arena.Config{PageSize: 1, Budget: budget}}})
 		if e == nil {
 			m.Close()
+		} else {
+			// Audit the actual retained constructor owner before explicit cleanup.
+			// Source member unwind can leave direct allocations alive.
+			constructionFailureOwningCleanup(t, e, budget)
 		}
 		if budget.Used() != 0 {
 			t.Fatalf("constructor failure %d leaked %d", after, budget.Used())

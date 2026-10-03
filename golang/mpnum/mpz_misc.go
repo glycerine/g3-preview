@@ -17,12 +17,14 @@ func (m *IntegerManager) IsUint32(a *Int) (bool, error) {
 	return v < uint64(^uint32(0)), e
 }
 func (m *IntegerManager) Uint32(a *Int) (uint32, error) {
-	ok, e := m.IsUint32(a)
-	if e != nil {
-		return 0, e
-	}
-	if !ok {
-		return 0, ErrConversion
+	if modularSourceDebug {
+		ok, e := m.IsUint32(a)
+		if e != nil {
+			return 0, e
+		}
+		if !ok {
+			return 0, ErrIntegerAssertion
+		}
 	}
 	v, e := m.Uint64(a)
 	return uint32(v), e
@@ -38,12 +40,14 @@ func (m *IntegerManager) IsInt32(a *Int) (bool, error) {
 	return v > -2147483648 && v < 2147483647, e
 }
 func (m *IntegerManager) Int32(a *Int) (int32, error) {
-	ok, e := m.IsInt32(a)
-	if e != nil {
-		return 0, e
-	}
-	if !ok {
-		return 0, ErrConversion
+	if modularSourceDebug {
+		ok, e := m.IsInt32(a)
+		if e != nil {
+			return 0, e
+		}
+		if !ok {
+			return 0, ErrIntegerAssertion
+		}
 	}
 	v, e := m.Int64(a)
 	return int32(v), e

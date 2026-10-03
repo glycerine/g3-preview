@@ -46,24 +46,26 @@ type IntegerConfig struct {
 // Cells, transitional Natural Words and the actual memory backend share one Budget.
 // Close invalidates every live numeral; a supplied Runtime is borrowed.
 type IntegerManager struct {
-	self                              *IntegerManager
-	memory                            *memory.Runtime
-	allocator                         *memory.SmallAllocator
-	ownsMemory                        bool
-	pendingCell                       sourceCellBacking
-	originalCause, cleanupCause       error
-	cells                             *numericCellSlab
-	words                             *arena.Words
-	tmp, arg                          [2]numericCellRef
-	failedRef                         numericCellRef  // permanently dead, charged auxiliary descriptor
-	natural                           *NaturalManager // child borrows this manager's Words and Budget
-	intMin, two64                     Int
-	closed                            bool
-	sourceFinalizing, sourceFinalized bool
-	sourceGuard                       bool
-	sourceFinalizeStage               uint8
-	budget                            *arena.Budget
-	headerBytes                       uint64
+	self                                   *IntegerManager
+	memory                                 *memory.Runtime
+	allocator                              *memory.SmallAllocator
+	ownsMemory                             bool
+	pendingCell                            sourceCellBacking
+	originalCause, cleanupCause            error
+	cells                                  *numericCellSlab
+	words                                  *arena.Words
+	tmp, arg                               [2]numericCellRef
+	failedRef                              numericCellRef  // permanently dead, charged auxiliary descriptor
+	natural                                *NaturalManager // child borrows this manager's Words and Budget
+	intMin, two64                          Int
+	closed                                 bool
+	sourceFinalizing, sourceFinalized      bool
+	sourceGuard                            bool
+	sourceFinalizeStage                    uint8
+	constructionFailed, constructorUnwound bool
+	constructorUnwindStage                 uint8
+	budget                                 *arena.Budget
+	headerBytes                            uint64
 }
 
 func NewIntegerManager(config IntegerConfig) (*IntegerManager, error) {
@@ -86,8 +88,17 @@ func NewIntegerManager(config IntegerConfig) (*IntegerManager, error) {
 	m.self = m
 	fail := func(err error) (*IntegerManager, error) {
 		m.originalCause = err
-		if cleanup := m.CloseChecked(); cleanup != nil {
+		m.constructionFailed = true
+		if cleanup := m.unwindConstructorMembers(); cleanup != nil {
 			m.cleanupCause = cleanup
+			return nil, m
+		}
+		// Source member unwind never executes the completed manager's body.
+		// Direct physical cells remain an explicit owning cleanup obligation.
+		if m.hasConstructorPhysicalRoots() {
+			return nil, m
+		}
+		if cleanup := m.CloseChecked(); cleanup != nil {
 			return nil, m
 		}
 		return nil, err
@@ -181,7 +192,12 @@ func (m *IntegerManager) Error() string {
 	}
 	return "mpnum: retained integer owner"
 }
-func (m *IntegerManager) Unwrap() error        { return m.originalCause }
+func (m *IntegerManager) Unwrap() error {
+	if m.originalCause != nil {
+		return m.originalCause
+	}
+	return m.cleanupCause
+}
 func (m *IntegerManager) OriginalCause() error { return m.originalCause }
 func (m *IntegerManager) CleanupCause() error  { return m.cleanupCause }
 func (m *IntegerManager) Cleanup() error       { return m.CloseChecked() }
@@ -192,7 +208,7 @@ func (m *IntegerManager) checkCleanup(a *Int) error {
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
 	}
-	if m.closed || m.sourceFinalizing {
+	if m.closed || m.sourceFinalizing || m.constructionFailed {
 		return arena.ErrClosed
 	}
 	if a == nil {
@@ -212,7 +228,7 @@ func (m *IntegerManager) check(a *Int) error {
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
 	}
-	if m.closed || m.sourceFinalizing {
+	if m.closed || m.sourceFinalizing || m.constructionFailed {
 		return arena.ErrClosed
 	}
 	if a == nil {
@@ -336,7 +352,17 @@ func (m *IntegerManager) CloseChecked() error {
 		m.cleanupCause = nil
 		return nil
 	}
-	fail := func(e error) error { m.cleanupCause = e; return e }
+	fail := func(e error) error { m.cleanupCause = e; return m }
+	if m.constructionFailed && !m.constructorUnwound {
+		if m.allocator != nil {
+			if e := m.allocator.CleanupPending(); e != nil {
+				return fail(e)
+			}
+		}
+		if e := m.unwindConstructorMembers(); e != nil {
+			return fail(e)
+		}
+	}
 	// Resume every explicitly begun source cursor before owning cleanup. A
 	// missing/stale private pointer stops the source body at an undefined access;
 	// owning cleanup then aborts that body without repairing it or advancing its
@@ -354,7 +380,7 @@ func (m *IntegerManager) CloseChecked() error {
 				// Slab slots retain their actual generation. Only live records are read.
 				gen := m.cells.state(slot).generation
 				ref := makeNumericRef(slot, gen)
-				if m.sourceFinalized {
+				if m.sourceFinalized || m.constructorUnwound {
 					e = m.freeAfterSourceFinalize(ref)
 				} else {
 					e = m.free(ref)
@@ -863,14 +889,22 @@ func (m *IntegerManager) addSub(a, b, c *Int, subtract bool) error {
 
 func (m *IntegerManager) absUint64(a *Int) (uint64, error) {
 	c := m.cell(a.cell)
-	if c.size > 2 {
-		return 0, ErrConversion
+	if modularSourceDebug && c.size > 2 {
+		return 0, ErrIntegerAssertion
 	}
-	v := uint64(m.digit(a.cell, 0))
-	if c.size == 2 {
-		v |= uint64(m.digit(a.cell, 1)) << 32
+	// The source size==1 branch reads only D0; every other size reads D1/D0.
+	// These are physical reads, including retained words under a malformed
+	// size0/>2 header, rather than the arithmetic accessor's size padding.
+	if c.size == 1 {
+		v, e := c.backing.readWord(m.allocator, 8)
+		return uint64(v), e
 	}
-	return v, nil
+	hi, e := c.backing.readWord(m.allocator, 12)
+	if e != nil {
+		return 0, e
+	}
+	lo, e := c.backing.readWord(m.allocator, 8)
+	return uint64(hi)<<32 | uint64(lo), e
 }
 func (m *IntegerManager) IsUint64(a *Int) (bool, error) {
 	if e := m.check(a); e != nil {
@@ -888,9 +922,12 @@ func (m *IntegerManager) IsInt64(a *Int) (bool, error) {
 	if a.IsSmall() {
 		return true, nil
 	}
+	if m.cell(a.cell).size > 2 {
+		return false, nil
+	}
 	v, e := m.absUint64(a)
 	if e != nil {
-		return false, nil
+		return false, e
 	}
 	msb := v & (uint64(1) << 63)
 	if a.val >= 0 {
@@ -908,20 +945,31 @@ func (m *IntegerManager) Uint64(a *Int) (uint64, error) {
 	if a.IsSmall() {
 		return uint64(int64(a.val)), nil
 	}
+	if modularSourceDebug && m.cell(a.cell).size == 0 {
+		return 0, ErrIntegerAssertion
+	}
 	return m.absUint64(a)
 }
 func (m *IntegerManager) Int64(a *Int) (int64, error) {
-	ok, e := m.IsInt64(a)
-	if e != nil {
+	if e := m.check(a); e != nil {
 		return 0, e
-	}
-	if !ok {
-		return 0, ErrConversion
 	}
 	if a.IsSmall() {
 		return int64(a.val), nil
 	}
-	v, _ := m.absUint64(a)
+	if modularSourceDebug {
+		ok, e := m.IsInt64(a)
+		if e != nil {
+			return 0, e
+		}
+		if !ok {
+			return 0, ErrIntegerAssertion
+		}
+	}
+	v, e := m.absUint64(a)
+	if e != nil {
+		return 0, e
+	}
 	if a.val < 0 {
 		if v != 0 && v<<1 == 0 {
 			return math.MinInt64, nil

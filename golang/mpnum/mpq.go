@@ -30,12 +30,16 @@ type RationalConfig struct {
 // source reusable scratch algorithms. Both are owner-confined, not concurrent.
 // Manager header bytes include all retained scalar rational scratch members.
 type RationalManager struct {
-	z                         *IntegerManager
-	nTmp, addTmp1, addTmp2    Int
-	addMulTmp, ltTmp1, ltTmp2 Rational
-	synchronized, closed      bool
-	budget                    *arena.Budget
-	headerBytes               uint64
+	self                        *RationalManager
+	originalCause, cleanupCause error
+	cleanupStage                uint8
+	closing                     bool
+	z                           *IntegerManager
+	nTmp, addTmp1, addTmp2      Int
+	addMulTmp, ltTmp1, ltTmp2   Rational
+	synchronized, closed        bool
+	budget                      *arena.Budget
+	headerBytes                 uint64
 }
 
 func NewRationalManager(config RationalConfig) (*RationalManager, error) {
@@ -47,12 +51,15 @@ func NewRationalManager(config RationalConfig) (*RationalManager, error) {
 	if e := budget.Reserve(header); e != nil {
 		return nil, e
 	}
+	m := &RationalManager{synchronized: config.Synchronized, budget: budget, headerBytes: header, addMulTmp: NewRational(), ltTmp1: NewRational(), ltTmp2: NewRational()}
+	m.self = m
 	z, e := NewIntegerManager(config.Integers)
 	if e != nil {
 		budget.Release(header)
 		return nil, e
 	}
-	return &RationalManager{z: z, synchronized: config.Synchronized, budget: budget, headerBytes: header, addMulTmp: NewRational(), ltTmp1: NewRational(), ltTmp2: NewRational()}, nil
+	m.z = z
+	return m, nil
 }
 func (m *RationalManager) Integers() *IntegerManager { return m.z }
 func (m *RationalManager) check(a *Rational) error {
@@ -92,21 +99,9 @@ func (m *RationalManager) checkCleanup(a *Rational) error {
 }
 func (m *RationalManager) drop(a *Rational) { m.z.Del(&a.num); m.z.Del(&a.den) }
 func (m *RationalManager) Close() {
-	if m.closed {
-		return
+	if e := m.CloseChecked(); e != nil {
+		panic(m)
 	}
-	// Source destructor order, then base-manager cleanup. Caller numerals are
-	// invalidated with the source-owned numerical service at owner close.
-	m.z.Del(&m.nTmp)
-	m.z.Del(&m.addTmp1)
-	m.z.Del(&m.addTmp2)
-	m.drop(&m.ltTmp1)
-	m.drop(&m.ltTmp2)
-	m.drop(&m.addMulTmp)
-	m.z.Close()
-	m.budget.Release(m.headerBytes)
-	m.headerBytes = 0
-	m.closed = true
 }
 func (m *RationalManager) resetDenominator(a *Rational) error {
 	if e := m.z.Del(&a.den); e != nil {

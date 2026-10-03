@@ -236,7 +236,24 @@ func TestIntegerSourceFailedDescriptorConstructorAndUnwind(t *testing.T) {
 			Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: budget}},
 		})
 		if e != nil {
-			if owner != nil || budget.Used() != 0 {
+			if owner != nil {
+				t.Fatal("failed constructor published usable owner", fault)
+			}
+			var partial ConstructionFailure
+			if errors.As(e, &partial) {
+				if partial.OriginalCause() == nil || partial.Unwrap() != partial.OriginalCause() || !numericPhysicalReservationRefusal(partial.OriginalCause()) {
+					t.Fatal("retained constructor cause", fault, e)
+				}
+				retained := partial.(*IntegerManager)
+				if budget.Used() == 0 || retained.RuntimeOwner() == nil || (retained.RuntimeOwner().Stats().LiveBlocks == 0 && retained.CleanupCause() == nil) {
+					t.Fatal("retained owner has no actual cleanup roots", fault, e)
+				}
+				budget.FailAfter(-1)
+				if cleanup := partial.Cleanup(); cleanup != nil {
+					t.Fatal("explicit failed constructor cleanup", fault, cleanup)
+				}
+			}
+			if budget.Used() != 0 {
 				t.Fatal("constructor dead-ledger unwind", fault, e, budget.Used())
 			}
 			continue

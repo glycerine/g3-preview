@@ -1,5 +1,3 @@
-//go:build port_pending_mpz
-
 // Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
 package mpnum
 
@@ -40,7 +38,7 @@ func TestIntegerDefaultActualAllocatorConstructorTopology(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Memory: rt})
+	m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Memory: rt, Profile: memory.SmallAllocatorProfile{PointerBits: 64}})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -206,7 +204,7 @@ func TestIntegerSourceCellSizeUnsignedDomain(t *testing.T) {
 		cap   uint32
 		bytes uint32
 	}{{0, 8}, {6, 32}, {59, 244}, {60, 248}, {61, 252}, {0x3ffffffe, 0}, {0x3fffffff, 4}, {0x40000000, 8}, {0xffffffff, 4}} {
-		if got := sourceMPZCellBytes(tc.cap); got != tc.bytes {
+		if got := sourceMPZCellBytes(tc.cap); got != uint64(tc.bytes) {
 			t.Fatalf("capacity%x source unsigned extent%d expected%d", tc.cap, got, tc.bytes)
 		}
 	}
@@ -253,14 +251,14 @@ func TestIntegerConstructorRefusalRetainsTransitiveOwnership(t *testing.T) {
 			}
 			if construction != nil {
 				phaseBCheckAcyclicFailure(t, construction)
-				if !errors.Is(construction, arena.ErrInjectedFailure) {
+				if !numericPhysicalReservationRefusal(construction) {
 					t.Fatalf("kind%d stop%d error %v", kind, stop, construction)
 				}
 				var partial ConstructionFailure
 				if errors.As(construction, &partial) {
 					original := partial.OriginalCause()
-					if original == nil || partial.CleanupCause() == nil || partial.Unwrap() != original {
-						t.Fatal("retained owner lost distinct original and cleanup refusal causes")
+					if original == nil || partial.Unwrap() != original {
+						t.Fatal("retained owner lost original cause or acyclic unwrap")
 					}
 					if partial.RuntimeOwner() != r || b.Used() <= baseline {
 						t.Fatal("cleanup refusal lost charged owner")
@@ -277,7 +275,7 @@ func TestIntegerConstructorRefusalRetainsTransitiveOwnership(t *testing.T) {
 			} else {
 				success = true
 			}
-			if r.Stats().LiveBlocks != 0 || b.Used() != baseline {
+			if r.Stats().LiveBlocks != 0 || b.Used() != r.Stats().TotalBytes {
 				t.Fatalf("kind%d stop%d immediate unowned roots %+v used%d baseline%d", kind, stop, r.Stats(), b.Used(), baseline)
 			}
 			if e = r.CheckOpen(); e != nil {

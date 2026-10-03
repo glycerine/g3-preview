@@ -27,6 +27,25 @@ func (m *IntegerManager) CleanupPendingAllocation() error {
 
 func (m *IntegerManager) cleanupPendingAllocation() error {
 	if m.pendingCell.object != (memory.ObjectRef{}) {
+		if m.constructorUnwound {
+			if m.pendingCell.offset != 0 {
+				_, e := m.memory.ReadUint32(m.pendingCell.raw, m.pendingCell.offset+4)
+				if e != memory.ErrRuntimeOwner {
+					if e != nil {
+						return e
+					}
+					return arena.ErrInvalidSlot
+				}
+				m.pendingCell = sourceCellBacking{}
+				return nil
+			}
+			raw := m.pendingCell.raw
+			e := m.memory.Deallocate(&raw)
+			if raw == (memory.Block{}) {
+				m.pendingCell = sourceCellBacking{}
+			}
+			return e
+		}
 		progress, e := m.allocator.DeallocateTracked(m.pendingCell.requested, m.pendingCell.object)
 		if progress.PhysicalReleased || progress.PooledLinked {
 			m.pendingCell = sourceCellBacking{}

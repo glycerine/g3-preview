@@ -243,6 +243,7 @@ func TestRationalServiceConstructorBudgetUnwind(t *testing.T) {
 		s, e := NewRationalService(serviceConfig(b))
 		if e != nil {
 			failures++
+			constructionFailureOwningCleanup(t, e, b)
 			if !numericPhysicalReservationRefusal(e) || b.Used() != 0 {
 				t.Fatal(n, e, b.Used())
 			}
