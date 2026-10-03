@@ -519,8 +519,8 @@ func (m *astExprArrayManager) PopBackFrom(src, out *ASTExprArray) error {
 	if e != nil {
 		return e
 	}
-	if n == 0 {
-		return arena.ErrBounds
+	if astSourceDebug && n == 0 {
+		return ErrASTDomain
 	}
 	if src == out {
 		return m.PopBack(out)
@@ -686,7 +686,10 @@ func (m *astExprArrayManager) PopBack(ref *ASTExprArray) error {
 	if e != nil {
 		return e
 	}
-	if n == 0 {
+	if astSourceDebug && n == 0 {
+		return ErrASTDomain
+	}
+	if pArrayNull(ref.cell) {
 		return arena.ErrBounds
 	}
 	c, e := m.cell(ref.cell)
@@ -694,6 +697,9 @@ func (m *astExprArrayManager) PopBack(ref *ASTExprArray) error {
 		return e
 	}
 	if c.kind == pArrayRoot {
+		if n == 0 {
+			return arena.ErrBounds
+		}
 		if c.rc == 1 {
 			err := m.rootPop(&c)
 			if e = m.store(ref.cell, c); e != nil {

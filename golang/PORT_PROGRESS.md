@@ -973,3 +973,13 @@ memory_manager.h/.cpp become partial; the full solver remains incomplete.
 Memory size_t-width review preserves LP64 unsigned modular updates and ILP32
 unsigned realloc subtraction before LL64 promotion, confirmed by a compiled
 source-promotion probe and an additional tests-first width fixture.
+
+## Expression-array source failure-prefix follow-up
+
+Three tests-first regressions preserve finite release empty-nonroot POP
+unsigned size wrap and incoming INC before invalid/uninitialized old root SET
+access. Debug empty assertions precede output copying; typed guards preserve
+completed source effects. The existing AST/parray units remain partial.
+Full native/debug, nine named checked/debug race/actual JS groups, the three
+new actual release JS groups, vet/WASI compile and source/no-generics gates
+passed. See AST_EXPR_ARRAY_RETAINED_STATUS.md for frozen evidence.

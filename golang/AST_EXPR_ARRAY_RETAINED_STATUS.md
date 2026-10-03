@@ -40,3 +40,34 @@ Frozen Go SHA-256 values:
 - `ast_expr_array.go`: `ad77dc102ba92a9e77cc8f979cc82606efbfe6588c148f0e1ddce8fa4666f169`
 - `ast_expr_array_values.go`: `7c5879abf60ca71e8c715d34c20324f67f7c2f2395fab46ec972065773c2036f`
 - `ast_expr_array_retained_test.go`: `9e17689fa0b1e981e95ce6a47d09f44ed67f84efaeac9475971b26a9434b9355`
+
+## Empty nonroot POP and invalid old SET follow-up
+
+Three further regressions observed behavioral RED before changes. Release
+empty nonroot POP allocates a POP patch with index0, making its unsigned logical
+size UINT32_MAX without reading root backing. Both direct and From operations
+preserve that finite branch. Debug's source empty assertion returns
+ErrASTDomain before copying the From destination. Null/root empty POP remains
+an explicit guard at the source undefined physical-access boundary.
+
+Root rset performs INC(new) before reading or decrementing the old slot.
+An uninitialized old slot or a retained freed AST is a typed Go guard, with the
+completed incoming INC still visible. The backing slot remains unchanged; no
+invented DEC rollback occurs. Caller-owned incoming references can explicitly
+balance that prefix. Debug logical bounds reject before any INC.
+
+The final isolated .cache/review/expr-array-prefix-green tree contains
+HEAD2a68598 plus only the three expression-array Go files and final ledger.
+Full native (root2.486s/mpnum22.679s) and checked/debug
+(root3.026s/mpnum23.343s) passed. All nine expression-array groups passed
+checked/debug race (1.053s) and actual JavaScript (0.191s); the three new
+release-only failure-prefix regressions also ran and passed actual JavaScript
+(0.200s). Vet, WASI test compilation and final source/no-generics evidence
+checks passed. Coverage remains33 ported/80 partial/1989 unported.
+WASI runtime and full solver completion are not claimed.
+
+Final follow-up frozen Go SHA-256 values:
+
+- `ast_expr_array.go`: `16558e5010c23e9dddaf8456b13a0d769c1fac49c253fb5c513a39c2bad10a40`
+- `ast_expr_array_values.go`: `6322ec71b4acd18520e04cdce41da80f3afb6af40ad14448d512181a3961e269`
+- `ast_expr_array_retained_test.go`: `f4407926698b0139aa928363e6b07570e1a7bbb94451133a8fcc45ac8008170f`

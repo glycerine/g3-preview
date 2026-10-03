@@ -140,3 +140,116 @@ func TestASTExprArrayUninitializedAndFreedRetainedSlots(t *testing.T) {
 	}
 	astTestMust(t, m.ExprArrayDel(&a))
 }
+
+// Empty nonroot POP allocates a patch with index0 in release; its unsigned
+// logical size wraps. No backing access occurs on this finite source branch.
+func TestASTExprArrayEmptyNonrootPopSourcePrefix(t *testing.T) {
+	m := astTestManager(t)
+	b, e := m.MkBoolSort()
+	astTestMust(t, e)
+	h, e := m.MkVar(831, b)
+	astTestMust(t, e)
+	astTestMust(t, m.IncRef(h))
+	var current, saved, out ASTExprArray
+	astTestMust(t, m.ExprArrayPush(&current, h))
+	astTestMust(t, m.ExprArrayPop(&current))
+	astTestMust(t, m.ExprArrayCopy(&current, &saved))
+	astTestMust(t, m.ExprArrayPush(&current, h))
+	old := saved.cell
+	for _, from := range []bool{true, false} {
+		var err error
+		if from {
+			err = m.ExprArrayPopFrom(&saved, &out)
+		} else {
+			err = m.ExprArrayPop(&saved)
+		}
+		if astSourceDebug {
+			if !errors.Is(err, ErrASTDomain) {
+				t.Fatalf("source empty assertion: %v", err)
+			}
+			if saved.cell != old || out.cell != (arena.SmallBytesRef{}) {
+				t.Fatal("assertion changed owners")
+			}
+		} else {
+			astTestMust(t, err)
+			ref := &saved
+			if from {
+				ref = &out
+			}
+			n, e := m.ExprArraySize(ref)
+			astTestMust(t, e)
+			if n != ^uint32(0) {
+				t.Fatalf("source size wrap: %d", n)
+			}
+		}
+	}
+	astTestMust(t, m.ExprArrayDel(&out))
+	astTestMust(t, m.ExprArrayDel(&saved))
+	astTestMust(t, m.ExprArrayDel(&current))
+	astTestMust(t, m.DecRef(h))
+}
+
+func TestASTExprArrayRetainedSetInvalidOldPreservesIncomingIncrement(t *testing.T) {
+	m := astTestManager(t)
+	b, e := m.MkBoolSort()
+	astTestMust(t, e)
+	h, e := m.MkVar(841, b)
+	astTestMust(t, e)
+	v, e := m.MkVar(842, b)
+	astTestMust(t, e)
+	astTestMust(t, m.IncRef(v))
+	var a ASTExprArray
+	astTestMust(t, m.ExprArrayPush(&a, h))
+	astTestMust(t, m.ExprArrayPop(&a))
+	e = m.ExprArraySet(&a, 0, v)
+	want := ErrASTHandle
+	rcWant := uint32(2)
+	if astSourceDebug {
+		want = ErrASTDomain
+		rcWant = 1
+	}
+	if !errors.Is(e, want) {
+		t.Fatalf("invalid retained old: %v", e)
+	}
+	rc, e := m.GetRefCount(v)
+	astTestMust(t, e)
+	if rc != rcWant {
+		t.Fatalf("INC before invalid old access must survive: got%d want%d", rc, rcWant)
+	}
+	astTestMust(t, m.ExprArrayDel(&a))
+	for ; rcWant > 0; rcWant-- {
+		astTestMust(t, m.DecRef(v))
+	}
+}
+
+func TestASTExprArrayUninitializedSetPreservesIncomingIncrement(t *testing.T) {
+	m := astTestManager(t)
+	b, e := m.MkBoolSort()
+	astTestMust(t, e)
+	h, e := m.MkVar(851, b)
+	astTestMust(t, e)
+	v, e := m.MkVar(852, b)
+	astTestMust(t, e)
+	astTestMust(t, m.IncRef(v))
+	var a ASTExprArray
+	astTestMust(t, m.ExprArrayPush(&a, h)) // capacity2, slot1 was never initialized.
+	e = m.ExprArraySet(&a, 1, v)
+	want := arena.ErrBounds
+	rcWant := uint32(2)
+	if astSourceDebug {
+		want = ErrASTDomain
+		rcWant = 1
+	}
+	if !errors.Is(e, want) {
+		t.Fatalf("uninitialized old access: %v", e)
+	}
+	rc, e := m.GetRefCount(v)
+	astTestMust(t, e)
+	if rc != rcWant {
+		t.Fatalf("INC before uninitialized old read must survive: got%d want%d", rc, rcWant)
+	}
+	astTestMust(t, m.ExprArrayDel(&a))
+	for ; rcWant > 0; rcWant-- {
+		astTestMust(t, m.DecRef(v))
+	}
+}

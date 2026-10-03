@@ -14,16 +14,17 @@ func astExprArrayOffset(i uint32) (uint32, error) {
 	return uint32(n), nil
 }
 func (m *astExprArrayManager) rootSet(block arena.SmallBytesRef, i uint32, v astNodeRef) error {
+	if e := m.owner.incNode(v); e != nil {
+		return e
+	}
 	old, e := m.value(block, i)
 	if e != nil {
 		return e
 	}
-	if e = m.owner.incNode(v); e != nil {
-		return e
-	}
 	consumed, err := m.owner.decNode(old)
 	if !consumed {
-		m.owner.decNode(v)
+		// The source INC precedes its invalid old-value dereference. Preserve
+		// that prefix when the Go handle guard stops the undefined access.
 		return err
 	}
 	if e = m.setValue(block, i, v); e != nil {
