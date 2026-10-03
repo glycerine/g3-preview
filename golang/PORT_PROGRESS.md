@@ -474,3 +474,14 @@ fixtures, canonical large coefficients and immediate failure ownership audits.
 ExtendedGCD source Z3DEBUG diagnostic arithmetic remains explicitly unported;
 its complete conditional coverage and the separate ext_gcd.h wrapper are open.
 See NUMBER_THEORY_PORT_STATUS.md. Full numeric/AST/solver milestones stay open.
+
+## Rational inspection and extraction
+
+Explicit rational predicates, conversions, hash, getters, statistics, floating
+conversion and thin setters now retain exact source representation and alias
+semantics. Inclusive rational32-bit projections remain distinct from strict MPZ
+variants. Eleven tests port all18 source conversion checks and the10002-case hash
+assignment history, plus independent values, signed/unreduced/component states,
+floating NaN/Inf branches and immediate ownership/value failure audits. Missing
+APIs were observed RED before implementation. See RATIONAL_INSPECTION_PORT_STATUS.md.
+Owner-local wrapper service, complete operator facade and AST ownership remain open.
