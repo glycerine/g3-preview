@@ -152,3 +152,21 @@ minimal-environment compiler invocation omitted new registrations; no cache
 fault is established. The no-generics/source audit records 4 ported, 31 partial
 and 2,067 unported units. MPQ, remaining MPZ, other map variants, domain allocator
 ownership, cold substrate headers and the full solver remain incomplete.
+
+## Cancellation scope, complete cold-owner charges and basic MPQ
+
+Concrete resource cancellation scopes preserve first-caller identity and nested
+destructor counter behavior. Arena/integer owners now charge their cold headers
+and nested services exactly once, retain them across Reset and release them on
+Close; all constructor reservation prefixes and nested failure rollback are tested.
+Basic MPQ preserves source normalization, both scratch modes, arithmetic/order
+and reciprocal/divisor destination aliases. Explicit rational construction yields
+source 0/1; raw Go zero denominators are diagnosed.
+
+Source assertions were ported before implementation and observed RED, followed
+by GREEN with independent signed rational oracles, storage/failure/alias tests.
+Integrated release tests, checked races, vet and WASI compilation pass. Actual
+js/wasm runs explicitly list and pass all new MPQ and owner-budget tests. The
+manifest/no-generics audit records 4 ported, 36 partial, 2,062 unported units.
+MPQ parsing/Power/rounding/getters, standalone MPN scratch and formatting budgets,
+set-key containers and all AST/solver milestones remain open.

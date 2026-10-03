@@ -7,7 +7,7 @@ Wintersteiger). The full arithmetic algorithms were read before translation.
 `src/util/mpz.h`, the arithmetic call sites and `quot_rem_core` in `mpz.cpp`,
 and source assertions in `src/test/mpz.cpp`/`mpq.cpp` were inspected for
 preconditions. The later MPZ lifecycle packet below reads each translated method
-and preserves the internal 32-bit backend. No `mpq` operation is implemented.
+and preserves the internal 32-bit backend. Basic MPQ operation coverage is recorded in the later packet below.
 
 ## Operation coverage
 
@@ -26,8 +26,9 @@ and preserves the internal 32-bit backend. No `mpq` operation is implemented.
 | constructor/destructor OpenMP lock | owner confinement | platform adaptation; no lock lifecycle implemented |
 | `display_raw`, both `trace` overloads, `trace_nl` | none | unimplemented diagnostics |
 
-All `mpq`, `rational`, rounding/fixed-precision and higher arithmetic source
-methods remain unimplemented. MPZ method coverage is recorded below. No fallback
+MPQ remains partial, with basic operations recorded below; the rational wrapper,
+rounding/fixed-precision and higher arithmetic source methods remain incomplete.
+MPZ method coverage is recorded below. No fallback
 arithmetic or semantic stubs.
 
 ## Tests and TDD evidence
@@ -42,7 +43,7 @@ UINT_MAX carry/square values and `bug1`'s exact large self-subtraction input
 through the underlying limb methods. These are **projections**, not full ports of
 the signed manager assertions. Parsing fixture input uses the independent test
 oracle; the source decimal-string `set` operation is not implemented. Remaining active `mpz`
-and all `mpq` assertions require their real managers and must be ported later.
+and deferred `mpq` assertions are inventoried in later packets.
 
 Independent tests use `math/big` only in test code and a separate fixed-seed
 generator: 1,000 arithmetic cases with at most eight limbs; 2,000 division and
@@ -205,7 +206,7 @@ inside golang; no later arithmetic packet is included in this conversion.
 ## Internal MPZ multiplication and division packet
 
 Status remains **partial MPZ**. The earlier unimplemented-method inventory now
-excludes the translated methods below; remaining items there and all MPQ/
+excludes the translated methods below; remaining items there and deferred MPQ/
 rounding/higher numerical managers are still unimplemented. The source methods
 and actual tests were read before porting; no C++ reference experiments ran.
 
@@ -341,7 +342,7 @@ answers, and Close returns the budget to zero. Warmed GCD/AddMul/SubMul are
 verified to allocate zero Go objects on the tested bounded workload.
 
 Array GCD, extended GCD, LCM, divisibility, decimal parsing, power/shifts,
-bitwise/root/log, MPQ and other prior inventory entries remain unimplemented.
+bitwise/root/log, deferred MPQ and other prior inventory entries remain unimplemented.
 No new source defect was inferred for these selected methods; bounded passing
 tests do not establish correctness for all unbounded inputs or close the port.
 
@@ -350,3 +351,83 @@ release/checked test binaries cross-build for js/wasm and wasip1/wasm. Combined
 mpnum statement coverage is 90.4%, not complete path coverage. No wasm runtime
 execution is claimed from these builds. Every write/temp/cache/output is within
 golang, including command TMPDIR/GOTMPDIR/GOCACHE settings.
+
+
+## Basic MPQ lifecycle, normalization and arithmetic packet
+
+Status remains **partial MPQ and MPZ**. New files are mpq.go and mpq_test.go;
+no shared integer arithmetic helper was changed. Source mpq.h/mpq.cpp methods
+were read before translation. Rational is the concrete pointer-free pair of
+Int numerals; NewRational constructs the source 0/1. The raw Go zero value is
+diagnosed with ErrUninitializedRational, rather than silently changing its
+invalid denominator into source default storage. Owned big values prohibit
+shallow copies and cross-manager transfer; Copy, Move and Swap are explicit.
+
+Translated source methods: manager constructor/destructor; numeral default
+construction; is_small; reset/del; copy/set integer, unsigned-denominator
+fraction and integer parts; move/swap; neg/abs; normalize; rat_add/rat_sub,
+integer fast paths and add/sub wrappers; rat_mul/mul; rat_lt and ordering through
+Compare; equality; div with its divisor/output alias branch; both inv forms
+through Inv(a,out); integer/fraction display through String. Integers exposes
+the owned base manager for already translated inherited integer operations.
+Unimplemented MPQ methods include parsers/scientific notation, Power,
+floor/ceil, prev_power_of_two/log, decimal/SMT2/display variants, getters and
+numerator-only swaps, scalar mixed arithmetic overloads, rational AddMul,
+GCD/LCM/divisibility, approximate conversions, and the separate rational wrapper.
+No partial parser is exposed. Source scientific parsing requires Power;
+source prev_power_of_two tests also require Floor and integer Log2.
+
+RationalConfig.Synchronized selects the source SYNCH local-temporary branch;
+false uses retained nTmp/addTmp1/addTmp2/ltTmp1/ltTmp2. These retain the source
+GCD reduction, cross-products and positive-denominator normalization. Both modes
+are owner-confined; the option does not provide concurrent arithmetic. The
+RationalManager header, including scalar scratch, is charged by reflect.Size
+before base-manager construction and released after source destructor order.
+Persistent big scratch uses the existing budgeted concrete cells/Words. Referenced
+base/arena headers are charged by their own owners, never again by MPQ. Standalone
+MPN slice scratch and String formatting ownership remain separate open gaps.
+
+Storage adaptation: multi-component writes are staged in explicit owner-local
+working numerals and published only after normalization succeeds. This adds
+peak-budget working cells and changes allocation/destruction timing, while
+retaining source arithmetic branches and successful alias results. Undefined
+zero divisor/inverse/denominator use returns ErrDivideByZero. No new source
+arithmetic defect was inferred in these selected normalized-rational methods.
+
+TDD RED was the undefined Rational/RationalManager API in permanent tests;
+implementation then reached GREEN. Active source tst0 divides (2/3)/(4/3)
+into its divisor and asserts 1/2; bug1/bug2 assert in-place inverses of +/-2.
+Active tst1 inherited big-integer arithmetic and comparisons are retained with
+independent fixture setup instead of advertising the missing source parser.
+Parser, decimal print-only and prev_power_of_two source cases remain deferred.
+Independent math/big.Rat tests add 250 signed multi-limb fraction pairs, each
+Add/Sub/Mul/Div with separate/left/right destination, reciprocal, comparison and
+equality; zero/negative denominators, INT_MIN, reduction and all-self aliases.
+Lifecycle tests cover explicit default, raw-zero rejection, Copy isolation,
+Move/Swap, repeated Del/Reset, closed owners and pointer-free record shape.
+
+Failure sweeps test constructor rollback, 5 arithmetic operations x 3 aliases
+x 48 reservation positions, 3 copy/set paths x 40 positions, and separate
+cold small-fraction setter and INT_MIN inverse-promotion sweeps in both scratch modes. Inv and a small setter
+can reuse all storage warmed by fixture normalization, so those sweeps do not
+incorrectly require a new reservation failure. Other paths test both injected
+failures and success. Failures preserve public operands/output, retry to exact
+independent answers, and Close restores budget zero; unsynchronized scratch may
+legitimately retain owner-local cells after failure. Warmed Add/Sub/Mul/Div and
+Compare allocate zero Go objects on the tested bounded workload; tests separately
+verify retained cache use versus local-temp cleanup. Bounded evidence does not
+establish unbounded correctness or complete the numeric source unit.
+
+SetParts follows the exact mpq.h integer-parts overload: a negative source
+denominator is copied and both signs are flipped before normalize. This is
+not an extension beyond its source sign handling. The unsigned-denominator
+SetFraction overload retains its source nonzero-denominator precondition,
+classified as ErrDivideByZero instead of an unchecked assertion/undefined path.
+
+Final packet validation with integrated integer/arena owner headers: native
+release/checked race suites pass, as do the added cold inverse-promotion race
+regressions in both builds; vet passes; release/checked binaries cross-build
+for js/wasm and wasip1/wasm. Cross-builds are compilation evidence, not wasm
+runtime execution. All edits, build caches, temp directories and output artifacts
+remain under golang. No Go generics, unsafe, production math/big, source-file
+runtime fixtures or global manager were introduced.

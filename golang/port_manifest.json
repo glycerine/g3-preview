@@ -79323,9 +79323,24 @@
       "sha256": "41611d7ec2a0699b6d4783e6b1c698f6be5466dae7035b6418a83c256c2e7eee",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/mpq.go"
+      ],
+      "tests": [
+        "TestRationalSourceDivAndInverseAliases",
+        "TestRationalConstructorLifecycleAndBudget",
+        "TestRationalCheckedInitializationAndZero",
+        "TestRationalIndependentSignedArithmetic",
+        "TestRationalNormalizationAndIntegerBranches",
+        "TestRationalSourceInheritedIntegerAssertionsAndSelfAliases",
+        "TestRationalConstructorAllocationFailures",
+        "TestRationalArithmeticFailureCleanup",
+        "TestRationalCopySetterFailureCleanup",
+        "TestRationalWarmStorageAndScratchModes",
+        "TestRationalColdSetterFailureCleanup",
+        "TestRationalColdInverseFailureCleanup"
+      ],
       "conditionals": [
         {
           "line": 58,
@@ -79409,8 +79424,13 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership": [
+        "Concrete numerator/denominator scalar Int pair, explicit NewRational 0/1; raw Go zero diagnosed. Base manager and scratch numerals owner-local, independently budgeted manager/header children. Partial source methods and formatting gaps remain. See mpnum/PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
+        "Undefined zero denominator/divisor/inverse classified ErrDivideByZero. Both source scratch modes operation-owner confined."
+      ]
     },
     {
       "path": "src/test/mpz.cpp",
@@ -94613,9 +94633,24 @@
       "sha256": "85a08042dafbc9b99d611970e105ac3a755e113224c633f0c72216a6f645398d",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/mpq.go"
+      ],
+      "tests": [
+        "TestRationalSourceDivAndInverseAliases",
+        "TestRationalConstructorLifecycleAndBudget",
+        "TestRationalCheckedInitializationAndZero",
+        "TestRationalIndependentSignedArithmetic",
+        "TestRationalNormalizationAndIntegerBranches",
+        "TestRationalSourceInheritedIntegerAssertionsAndSelfAliases",
+        "TestRationalConstructorAllocationFailures",
+        "TestRationalArithmeticFailureCleanup",
+        "TestRationalCopySetterFailureCleanup",
+        "TestRationalWarmStorageAndScratchModes",
+        "TestRationalColdSetterFailureCleanup",
+        "TestRationalColdInverseFailureCleanup"
+      ],
       "assertions": [
         {
           "line": 49,
@@ -94648,18 +94683,191 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "mpq default construction/is_small",
+          "status": "ported",
+          "go_target": "mpnum/mpq.go",
+          "tests": [
+            "TestRationalSourceDivAndInverseAliases",
+            "TestRationalConstructorLifecycleAndBudget",
+            "TestRationalCheckedInitializationAndZero",
+            "TestRationalIndependentSignedArithmetic",
+            "TestRationalNormalizationAndIntegerBranches",
+            "TestRationalSourceInheritedIntegerAssertionsAndSelfAliases",
+            "TestRationalConstructorAllocationFailures",
+            "TestRationalArithmeticFailureCleanup",
+            "TestRationalCopySetterFailureCleanup",
+            "TestRationalWarmStorageAndScratchModes",
+            "TestRationalColdSetterFailureCleanup",
+            "TestRationalColdInverseFailureCleanup"
+          ]
+        },
+        {
+          "name": "mpq_manager constructor/destructor selected SYNCH modes",
+          "status": "ported",
+          "go_target": "mpnum/mpq.go",
+          "tests": [
+            "TestRationalSourceDivAndInverseAliases",
+            "TestRationalConstructorLifecycleAndBudget",
+            "TestRationalCheckedInitializationAndZero",
+            "TestRationalIndependentSignedArithmetic",
+            "TestRationalNormalizationAndIntegerBranches",
+            "TestRationalSourceInheritedIntegerAssertionsAndSelfAliases",
+            "TestRationalConstructorAllocationFailures",
+            "TestRationalArithmeticFailureCleanup",
+            "TestRationalCopySetterFailureCleanup",
+            "TestRationalWarmStorageAndScratchModes",
+            "TestRationalColdSetterFailureCleanup",
+            "TestRationalColdInverseFailureCleanup"
+          ]
+        },
+        {
+          "name": "reset/del/copy/set integer/fraction/integer parts/move/swap",
+          "status": "ported",
+          "go_target": "mpnum/mpq.go",
+          "tests": [
+            "TestRationalSourceDivAndInverseAliases",
+            "TestRationalConstructorLifecycleAndBudget",
+            "TestRationalCheckedInitializationAndZero",
+            "TestRationalIndependentSignedArithmetic",
+            "TestRationalNormalizationAndIntegerBranches",
+            "TestRationalSourceInheritedIntegerAssertionsAndSelfAliases",
+            "TestRationalConstructorAllocationFailures",
+            "TestRationalArithmeticFailureCleanup",
+            "TestRationalCopySetterFailureCleanup",
+            "TestRationalWarmStorageAndScratchModes",
+            "TestRationalColdSetterFailureCleanup",
+            "TestRationalColdInverseFailureCleanup"
+          ]
+        },
+        {
+          "name": "neg/abs/normalize",
+          "status": "ported",
+          "go_target": "mpnum/mpq.go",
+          "tests": [
+            "TestRationalSourceDivAndInverseAliases",
+            "TestRationalConstructorLifecycleAndBudget",
+            "TestRationalCheckedInitializationAndZero",
+            "TestRationalIndependentSignedArithmetic",
+            "TestRationalNormalizationAndIntegerBranches",
+            "TestRationalSourceInheritedIntegerAssertionsAndSelfAliases",
+            "TestRationalConstructorAllocationFailures",
+            "TestRationalArithmeticFailureCleanup",
+            "TestRationalCopySetterFailureCleanup",
+            "TestRationalWarmStorageAndScratchModes",
+            "TestRationalColdSetterFailureCleanup",
+            "TestRationalColdInverseFailureCleanup"
+          ]
+        },
+        {
+          "name": "rat_add/rat_sub/add/sub selected SYNCH modes",
+          "status": "ported",
+          "go_target": "mpnum/mpq.go",
+          "tests": [
+            "TestRationalSourceDivAndInverseAliases",
+            "TestRationalConstructorLifecycleAndBudget",
+            "TestRationalCheckedInitializationAndZero",
+            "TestRationalIndependentSignedArithmetic",
+            "TestRationalNormalizationAndIntegerBranches",
+            "TestRationalSourceInheritedIntegerAssertionsAndSelfAliases",
+            "TestRationalConstructorAllocationFailures",
+            "TestRationalArithmeticFailureCleanup",
+            "TestRationalCopySetterFailureCleanup",
+            "TestRationalWarmStorageAndScratchModes",
+            "TestRationalColdSetterFailureCleanup",
+            "TestRationalColdInverseFailureCleanup"
+          ]
+        },
+        {
+          "name": "rat_mul/mul/div/inv divisor aliases",
+          "status": "ported",
+          "go_target": "mpnum/mpq.go",
+          "tests": [
+            "TestRationalSourceDivAndInverseAliases",
+            "TestRationalConstructorLifecycleAndBudget",
+            "TestRationalCheckedInitializationAndZero",
+            "TestRationalIndependentSignedArithmetic",
+            "TestRationalNormalizationAndIntegerBranches",
+            "TestRationalSourceInheritedIntegerAssertionsAndSelfAliases",
+            "TestRationalConstructorAllocationFailures",
+            "TestRationalArithmeticFailureCleanup",
+            "TestRationalCopySetterFailureCleanup",
+            "TestRationalWarmStorageAndScratchModes",
+            "TestRationalColdSetterFailureCleanup",
+            "TestRationalColdInverseFailureCleanup"
+          ]
+        },
+        {
+          "name": "rat_lt/ordering/equality",
+          "status": "ported",
+          "go_target": "mpnum/mpq.go",
+          "tests": [
+            "TestRationalSourceDivAndInverseAliases",
+            "TestRationalConstructorLifecycleAndBudget",
+            "TestRationalCheckedInitializationAndZero",
+            "TestRationalIndependentSignedArithmetic",
+            "TestRationalNormalizationAndIntegerBranches",
+            "TestRationalSourceInheritedIntegerAssertionsAndSelfAliases",
+            "TestRationalConstructorAllocationFailures",
+            "TestRationalArithmeticFailureCleanup",
+            "TestRationalCopySetterFailureCleanup",
+            "TestRationalWarmStorageAndScratchModes",
+            "TestRationalColdSetterFailureCleanup",
+            "TestRationalColdInverseFailureCleanup"
+          ]
+        },
+        {
+          "name": "integer and fraction display",
+          "status": "ported",
+          "go_target": "mpnum/mpq.go",
+          "tests": [
+            "TestRationalSourceDivAndInverseAliases",
+            "TestRationalConstructorLifecycleAndBudget",
+            "TestRationalCheckedInitializationAndZero",
+            "TestRationalIndependentSignedArithmetic",
+            "TestRationalNormalizationAndIntegerBranches",
+            "TestRationalSourceInheritedIntegerAssertionsAndSelfAliases",
+            "TestRationalConstructorAllocationFailures",
+            "TestRationalArithmeticFailureCleanup",
+            "TestRationalCopySetterFailureCleanup",
+            "TestRationalWarmStorageAndScratchModes",
+            "TestRationalColdSetterFailureCleanup",
+            "TestRationalColdInverseFailureCleanup"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete numerator/denominator scalar Int pair, explicit NewRational 0/1; raw Go zero diagnosed. Base manager and scratch numerals owner-local, independently budgeted manager/header children. Partial source methods and formatting gaps remain. See mpnum/PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
+        "Undefined zero denominator/divisor/inverse classified ErrDivideByZero. Both source scratch modes operation-owner confined."
+      ]
     },
     {
       "path": "src/util/mpq.h",
       "sha256": "89498b6aced1bee1e7ec72e782bee3ae1549c47c0cc228a46d0d288a6353db58",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/mpq.go"
+      ],
+      "tests": [
+        "TestRationalSourceDivAndInverseAliases",
+        "TestRationalConstructorLifecycleAndBudget",
+        "TestRationalCheckedInitializationAndZero",
+        "TestRationalIndependentSignedArithmetic",
+        "TestRationalNormalizationAndIntegerBranches",
+        "TestRationalSourceInheritedIntegerAssertionsAndSelfAliases",
+        "TestRationalConstructorAllocationFailures",
+        "TestRationalArithmeticFailureCleanup",
+        "TestRationalCopySetterFailureCleanup",
+        "TestRationalWarmStorageAndScratchModes",
+        "TestRationalColdSetterFailureCleanup",
+        "TestRationalColdInverseFailureCleanup"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -94762,9 +94970,167 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "mpq default construction/is_small",
+          "status": "ported",
+          "go_target": "mpnum/mpq.go",
+          "tests": [
+            "TestRationalSourceDivAndInverseAliases",
+            "TestRationalConstructorLifecycleAndBudget",
+            "TestRationalCheckedInitializationAndZero",
+            "TestRationalIndependentSignedArithmetic",
+            "TestRationalNormalizationAndIntegerBranches",
+            "TestRationalSourceInheritedIntegerAssertionsAndSelfAliases",
+            "TestRationalConstructorAllocationFailures",
+            "TestRationalArithmeticFailureCleanup",
+            "TestRationalCopySetterFailureCleanup",
+            "TestRationalWarmStorageAndScratchModes",
+            "TestRationalColdSetterFailureCleanup",
+            "TestRationalColdInverseFailureCleanup"
+          ]
+        },
+        {
+          "name": "mpq_manager constructor/destructor selected SYNCH modes",
+          "status": "ported",
+          "go_target": "mpnum/mpq.go",
+          "tests": [
+            "TestRationalSourceDivAndInverseAliases",
+            "TestRationalConstructorLifecycleAndBudget",
+            "TestRationalCheckedInitializationAndZero",
+            "TestRationalIndependentSignedArithmetic",
+            "TestRationalNormalizationAndIntegerBranches",
+            "TestRationalSourceInheritedIntegerAssertionsAndSelfAliases",
+            "TestRationalConstructorAllocationFailures",
+            "TestRationalArithmeticFailureCleanup",
+            "TestRationalCopySetterFailureCleanup",
+            "TestRationalWarmStorageAndScratchModes",
+            "TestRationalColdSetterFailureCleanup",
+            "TestRationalColdInverseFailureCleanup"
+          ]
+        },
+        {
+          "name": "reset/del/copy/set integer/fraction/integer parts/move/swap",
+          "status": "ported",
+          "go_target": "mpnum/mpq.go",
+          "tests": [
+            "TestRationalSourceDivAndInverseAliases",
+            "TestRationalConstructorLifecycleAndBudget",
+            "TestRationalCheckedInitializationAndZero",
+            "TestRationalIndependentSignedArithmetic",
+            "TestRationalNormalizationAndIntegerBranches",
+            "TestRationalSourceInheritedIntegerAssertionsAndSelfAliases",
+            "TestRationalConstructorAllocationFailures",
+            "TestRationalArithmeticFailureCleanup",
+            "TestRationalCopySetterFailureCleanup",
+            "TestRationalWarmStorageAndScratchModes",
+            "TestRationalColdSetterFailureCleanup",
+            "TestRationalColdInverseFailureCleanup"
+          ]
+        },
+        {
+          "name": "neg/abs/normalize",
+          "status": "ported",
+          "go_target": "mpnum/mpq.go",
+          "tests": [
+            "TestRationalSourceDivAndInverseAliases",
+            "TestRationalConstructorLifecycleAndBudget",
+            "TestRationalCheckedInitializationAndZero",
+            "TestRationalIndependentSignedArithmetic",
+            "TestRationalNormalizationAndIntegerBranches",
+            "TestRationalSourceInheritedIntegerAssertionsAndSelfAliases",
+            "TestRationalConstructorAllocationFailures",
+            "TestRationalArithmeticFailureCleanup",
+            "TestRationalCopySetterFailureCleanup",
+            "TestRationalWarmStorageAndScratchModes",
+            "TestRationalColdSetterFailureCleanup",
+            "TestRationalColdInverseFailureCleanup"
+          ]
+        },
+        {
+          "name": "rat_add/rat_sub/add/sub selected SYNCH modes",
+          "status": "ported",
+          "go_target": "mpnum/mpq.go",
+          "tests": [
+            "TestRationalSourceDivAndInverseAliases",
+            "TestRationalConstructorLifecycleAndBudget",
+            "TestRationalCheckedInitializationAndZero",
+            "TestRationalIndependentSignedArithmetic",
+            "TestRationalNormalizationAndIntegerBranches",
+            "TestRationalSourceInheritedIntegerAssertionsAndSelfAliases",
+            "TestRationalConstructorAllocationFailures",
+            "TestRationalArithmeticFailureCleanup",
+            "TestRationalCopySetterFailureCleanup",
+            "TestRationalWarmStorageAndScratchModes",
+            "TestRationalColdSetterFailureCleanup",
+            "TestRationalColdInverseFailureCleanup"
+          ]
+        },
+        {
+          "name": "rat_mul/mul/div/inv divisor aliases",
+          "status": "ported",
+          "go_target": "mpnum/mpq.go",
+          "tests": [
+            "TestRationalSourceDivAndInverseAliases",
+            "TestRationalConstructorLifecycleAndBudget",
+            "TestRationalCheckedInitializationAndZero",
+            "TestRationalIndependentSignedArithmetic",
+            "TestRationalNormalizationAndIntegerBranches",
+            "TestRationalSourceInheritedIntegerAssertionsAndSelfAliases",
+            "TestRationalConstructorAllocationFailures",
+            "TestRationalArithmeticFailureCleanup",
+            "TestRationalCopySetterFailureCleanup",
+            "TestRationalWarmStorageAndScratchModes",
+            "TestRationalColdSetterFailureCleanup",
+            "TestRationalColdInverseFailureCleanup"
+          ]
+        },
+        {
+          "name": "rat_lt/ordering/equality",
+          "status": "ported",
+          "go_target": "mpnum/mpq.go",
+          "tests": [
+            "TestRationalSourceDivAndInverseAliases",
+            "TestRationalConstructorLifecycleAndBudget",
+            "TestRationalCheckedInitializationAndZero",
+            "TestRationalIndependentSignedArithmetic",
+            "TestRationalNormalizationAndIntegerBranches",
+            "TestRationalSourceInheritedIntegerAssertionsAndSelfAliases",
+            "TestRationalConstructorAllocationFailures",
+            "TestRationalArithmeticFailureCleanup",
+            "TestRationalCopySetterFailureCleanup",
+            "TestRationalWarmStorageAndScratchModes",
+            "TestRationalColdSetterFailureCleanup",
+            "TestRationalColdInverseFailureCleanup"
+          ]
+        },
+        {
+          "name": "integer and fraction display",
+          "status": "ported",
+          "go_target": "mpnum/mpq.go",
+          "tests": [
+            "TestRationalSourceDivAndInverseAliases",
+            "TestRationalConstructorLifecycleAndBudget",
+            "TestRationalCheckedInitializationAndZero",
+            "TestRationalIndependentSignedArithmetic",
+            "TestRationalNormalizationAndIntegerBranches",
+            "TestRationalSourceInheritedIntegerAssertionsAndSelfAliases",
+            "TestRationalConstructorAllocationFailures",
+            "TestRationalArithmeticFailureCleanup",
+            "TestRationalCopySetterFailureCleanup",
+            "TestRationalWarmStorageAndScratchModes",
+            "TestRationalColdSetterFailureCleanup",
+            "TestRationalColdInverseFailureCleanup"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete numerator/denominator scalar Int pair, explicit NewRational 0/1; raw Go zero diagnosed. Base manager and scratch numerals owner-local, independently budgeted manager/header children. Partial source methods and formatting gaps remain. See mpnum/PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
+        "Undefined zero denominator/divisor/inverse classified ErrDivideByZero. Both source scratch modes operation-owner confined."
+      ]
     },
     {
       "path": "src/util/mpq_inf.cpp",
