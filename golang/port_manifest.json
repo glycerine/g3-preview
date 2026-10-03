@@ -84738,13 +84738,52 @@
       "sha256": "3dd955e878614004a06cca24f82c0f1a24ca33892869300abcb82fc08d9bc64f",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "status": "ported",
+      "go_targets": [
+        "util_param_descrs.go"
+      ],
+      "tests": [
+        "TestParamDescrsSourceHistoryDefaultsAndDisplay",
+        "TestParamDescrsSourceModuleAndNullKinds",
+        "TestParamDescrsSourceKindLabelsAndHelpers",
+        "TestParamDescrsCopyBucketOrderLifetimeAndPrefix",
+        "TestParamDescrsIndependentDictionaryStateMachine",
+        "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+        "TestParamDescrsSourceProbeThresholdAndCleanup",
+        "TestParamDescrsOwnershipNullableMetadataAndGuards",
+        "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
+        "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
+        "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
+        "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
+        "TestParamDescrsCheckedCapacityBoundaries"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "cmd_arg_kind exact enum values and complete source label switch",
+          "status": "ported",
+          "go_target": "util_param_descrs.go",
+          "tests": [
+            "TestParamDescrsSourceHistoryDefaultsAndDisplay",
+            "TestParamDescrsSourceModuleAndNullKinds",
+            "TestParamDescrsSourceKindLabelsAndHelpers",
+            "TestParamDescrsCopyBucketOrderLifetimeAndPrefix",
+            "TestParamDescrsIndependentDictionaryStateMachine",
+            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsSourceProbeThresholdAndCleanup",
+            "TestParamDescrsOwnershipNullableMetadataAndGuards",
+            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
+            "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
+            "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
+            "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
+            "TestParamDescrsCheckedCapacityBoundaries"
+          ]
+        }
+      ],
+      "ownership": [
+        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md."
+      ],
       "deviations": []
     },
     {
@@ -84752,9 +84791,25 @@
       "sha256": "09356c28b4a280a7cf48d43e724396cbd3162db66949df033aebc5ad2bb5fbe9",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_param_descrs.go"
+      ],
+      "tests": [
+        "TestParamDescrsSourceHistoryDefaultsAndDisplay",
+        "TestParamDescrsSourceModuleAndNullKinds",
+        "TestParamDescrsSourceKindLabelsAndHelpers",
+        "TestParamDescrsCopyBucketOrderLifetimeAndPrefix",
+        "TestParamDescrsIndependentDictionaryStateMachine",
+        "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+        "TestParamDescrsSourceProbeThresholdAndCleanup",
+        "TestParamDescrsOwnershipNullableMetadataAndGuards",
+        "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
+        "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
+        "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
+        "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
+        "TestParamDescrsCheckedCapacityBoundaries"
+      ],
       "conditionals": [
         {
           "line": 17,
@@ -84777,8 +84832,31 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "cmd_arg_kind exact enum values and complete source label switch",
+          "status": "ported",
+          "go_target": "util_param_descrs.go",
+          "tests": [
+            "TestParamDescrsSourceHistoryDefaultsAndDisplay",
+            "TestParamDescrsSourceModuleAndNullKinds",
+            "TestParamDescrsSourceKindLabelsAndHelpers",
+            "TestParamDescrsCopyBucketOrderLifetimeAndPrefix",
+            "TestParamDescrsIndependentDictionaryStateMachine",
+            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsSourceProbeThresholdAndCleanup",
+            "TestParamDescrsOwnershipNullableMetadataAndGuards",
+            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
+            "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
+            "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
+            "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
+            "TestParamDescrsCheckedCapacityBoundaries"
+          ]
+        }
+      ],
+      "ownership": [
+        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md."
+      ],
       "deviations": []
     },
     {
@@ -85166,9 +85244,25 @@
       "sha256": "defa2be995dc90b70c12342c23374a55159ce9fabde29ac83c76ddf2661b6289",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_param_descrs.go"
+      ],
+      "tests": [
+        "TestParamDescrsSourceHistoryDefaultsAndDisplay",
+        "TestParamDescrsSourceModuleAndNullKinds",
+        "TestParamDescrsSourceKindLabelsAndHelpers",
+        "TestParamDescrsCopyBucketOrderLifetimeAndPrefix",
+        "TestParamDescrsIndependentDictionaryStateMachine",
+        "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+        "TestParamDescrsSourceProbeThresholdAndCleanup",
+        "TestParamDescrsOwnershipNullableMetadataAndGuards",
+        "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
+        "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
+        "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
+        "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
+        "TestParamDescrsCheckedCapacityBoundaries"
+      ],
       "conditionals": [
         {
           "line": 17,
@@ -85181,8 +85275,31 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "complete concrete dictionary<param_descrs::imp::info> specialization",
+          "status": "ported",
+          "go_target": "util_param_descrs.go",
+          "tests": [
+            "TestParamDescrsSourceHistoryDefaultsAndDisplay",
+            "TestParamDescrsSourceModuleAndNullKinds",
+            "TestParamDescrsSourceKindLabelsAndHelpers",
+            "TestParamDescrsCopyBucketOrderLifetimeAndPrefix",
+            "TestParamDescrsIndependentDictionaryStateMachine",
+            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsSourceProbeThresholdAndCleanup",
+            "TestParamDescrsOwnershipNullableMetadataAndGuards",
+            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
+            "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
+            "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
+            "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
+            "TestParamDescrsCheckedCapacityBoundaries"
+          ]
+        }
+      ],
+      "ownership": [
+        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md."
+      ],
       "deviations": []
     },
     {
@@ -86164,7 +86281,8 @@
         "bitset/uint_set_map.go",
         "utilhash/str_hashtable.go",
         "util_symbol_table.go",
-        "utilhash/str_int32_map.go"
+        "utilhash/str_int32_map.go",
+        "util_param_descrs.go"
       ],
       "tests": [
         "TestUintMapSourceMapAssertions",
@@ -86239,7 +86357,20 @@
         "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
         "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
         "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
-        "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+        "TestStrInt32MapConcreteArchitectureLayoutAndBudget",
+        "TestParamDescrsSourceHistoryDefaultsAndDisplay",
+        "TestParamDescrsSourceModuleAndNullKinds",
+        "TestParamDescrsSourceKindLabelsAndHelpers",
+        "TestParamDescrsCopyBucketOrderLifetimeAndPrefix",
+        "TestParamDescrsIndependentDictionaryStateMachine",
+        "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+        "TestParamDescrsSourceProbeThresholdAndCleanup",
+        "TestParamDescrsOwnershipNullableMetadataAndGuards",
+        "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
+        "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
+        "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
+        "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
+        "TestParamDescrsCheckedCapacityBoundaries"
       ],
       "conditionals": [
         {
@@ -86846,13 +86977,34 @@
             "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
             "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
           ]
+        },
+        {
+          "name": "descriptor dictionary physical probing/growth/removal/tombstone cleanup specialization",
+          "status": "ported",
+          "go_target": "util_param_descrs.go",
+          "tests": [
+            "TestParamDescrsSourceHistoryDefaultsAndDisplay",
+            "TestParamDescrsSourceModuleAndNullKinds",
+            "TestParamDescrsSourceKindLabelsAndHelpers",
+            "TestParamDescrsCopyBucketOrderLifetimeAndPrefix",
+            "TestParamDescrsIndependentDictionaryStateMachine",
+            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsSourceProbeThresholdAndCleanup",
+            "TestParamDescrsOwnershipNullableMetadataAndGuards",
+            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
+            "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
+            "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
+            "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
+            "TestParamDescrsCheckedCapacityBoundaries"
+          ]
         }
       ],
       "ownership": [
         "Concrete scalar u_map<uint32> specialization with budgeted cold header and pointer-free entries. Other key/entry variants and source string map or Windows sentinel set remain unported. See utilhash/PORT_STATUS.md.",
         "Scalar owned key refs preserve synthesized capacity-copy assignment and retained FREE/DELETED payloads. Rehash duplicates used keys before old table destruction; Swap moves owners without key-copy actions. See bitset/PORT_STATUS.md.",
         "StrHashtable borrows immutable region spellings through scalar origin/ref/offset/length records. Table lifecycle never copies/frees spellings; cold owner/table budgets and safe epochs are audited. Multi-origin Assign/Union/Intersect and foreign borrow/query/mutation paths are complete for this specialization; other entry types and optional enabled statistics remain open. See utilhash/PORT_STATUS.md.",
-        "CString/int32 default entries retain complete borrowed key/value data on FREE/DELETED. Fixed40-byte scalar entries, budgeted header/table/directory, borrowed origins and source cached hash/bucket/action order; see utilhash/STR_INT32_MAP_PORT_STATUS.md."
+        "CString/int32 default entries retain complete borrowed key/value data on FREE/DELETED. Fixed40-byte scalar entries, budgeted header/table/directory, borrowed origins and source cached hash/bucket/action order; see utilhash/STR_INT32_MAP_PORT_STATUS.md.",
+        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md."
       ],
       "deviations": [
         "Checked cold owner/epoch snapshots replace borrowed entry pointers; structural mutation invalidates snapshots.",
@@ -94148,7 +94300,8 @@
       "go_targets": [
         "utilhash/uint_map.go",
         "bitset/uint_set_map.go",
-        "utilhash/str_int32_map.go"
+        "utilhash/str_int32_map.go",
+        "util_param_descrs.go"
       ],
       "tests": [
         "TestUintMapSourceMapAssertions",
@@ -94186,7 +94339,20 @@
         "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
         "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
         "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
-        "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+        "TestStrInt32MapConcreteArchitectureLayoutAndBudget",
+        "TestParamDescrsSourceHistoryDefaultsAndDisplay",
+        "TestParamDescrsSourceModuleAndNullKinds",
+        "TestParamDescrsSourceKindLabelsAndHelpers",
+        "TestParamDescrsCopyBucketOrderLifetimeAndPrefix",
+        "TestParamDescrsIndependentDictionaryStateMachine",
+        "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+        "TestParamDescrsSourceProbeThresholdAndCleanup",
+        "TestParamDescrsOwnershipNullableMetadataAndGuards",
+        "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
+        "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
+        "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
+        "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
+        "TestParamDescrsCheckedCapacityBoundaries"
       ],
       "conditionals": [
         {
@@ -94558,12 +94724,33 @@
             "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
             "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
           ]
+        },
+        {
+          "name": "cached symbol/info default-map entry specialization",
+          "status": "ported",
+          "go_target": "util_param_descrs.go",
+          "tests": [
+            "TestParamDescrsSourceHistoryDefaultsAndDisplay",
+            "TestParamDescrsSourceModuleAndNullKinds",
+            "TestParamDescrsSourceKindLabelsAndHelpers",
+            "TestParamDescrsCopyBucketOrderLifetimeAndPrefix",
+            "TestParamDescrsIndependentDictionaryStateMachine",
+            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsSourceProbeThresholdAndCleanup",
+            "TestParamDescrsOwnershipNullableMetadataAndGuards",
+            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
+            "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
+            "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
+            "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
+            "TestParamDescrsCheckedCapacityBoundaries"
+          ]
         }
       ],
       "ownership": [
         "Concrete scalar u_map<uint32> specialization with budgeted cold header and pointer-free entries. Other key/entry variants and source string map or Windows sentinel set remain unported. See utilhash/PORT_STATUS.md.",
         "Scalar owned key refs preserve synthesized capacity-copy assignment and retained FREE/DELETED payloads. Rehash duplicates used keys before old table destruction; Swap moves owners without key-copy actions. See bitset/PORT_STATUS.md.",
-        "CString/int32 default entries retain complete borrowed key/value data on FREE/DELETED. Fixed40-byte scalar entries, budgeted header/table/directory, borrowed origins and source cached hash/bucket/action order; see utilhash/STR_INT32_MAP_PORT_STATUS.md."
+        "CString/int32 default entries retain complete borrowed key/value data on FREE/DELETED. Fixed40-byte scalar entries, budgeted header/table/directory, borrowed origins and source cached hash/bucket/action order; see utilhash/STR_INT32_MAP_PORT_STATUS.md.",
+        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md."
       ],
       "deviations": [
         "Checked cold owner/epoch snapshots replace borrowed entry pointers; structural mutation invalidates snapshots.",
@@ -101876,13 +102063,27 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "util_param_name.go"
+        "util_param_name.go",
+        "util_param_descrs.go"
       ],
       "tests": [
         "TestParamNameNormalizationSourceBranches",
         "TestParamNameNormalizationByteDomain",
         "TestParamNameSymbolOwnershipAndSourceRoutes",
-        "TestParamNameSymbolSingleOutputAllocation"
+        "TestParamNameSymbolSingleOutputAllocation",
+        "TestParamDescrsSourceHistoryDefaultsAndDisplay",
+        "TestParamDescrsSourceModuleAndNullKinds",
+        "TestParamDescrsSourceKindLabelsAndHelpers",
+        "TestParamDescrsCopyBucketOrderLifetimeAndPrefix",
+        "TestParamDescrsIndependentDictionaryStateMachine",
+        "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+        "TestParamDescrsSourceProbeThresholdAndCleanup",
+        "TestParamDescrsOwnershipNullableMetadataAndGuards",
+        "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
+        "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
+        "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
+        "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
+        "TestParamDescrsCheckedCapacityBoundaries"
       ],
       "conditionals": [
         {
@@ -101933,10 +102134,111 @@
             "TestParamNameSymbolOwnershipAndSourceRoutes",
             "TestParamNameSymbolSingleOutputAllocation"
           ]
+        },
+        {
+          "name": "param_descrs construction/destruction and exact nullable owned metadata",
+          "status": "ported",
+          "go_target": "util_param_descrs.go",
+          "tests": [
+            "TestParamDescrsSourceHistoryDefaultsAndDisplay",
+            "TestParamDescrsSourceModuleAndNullKinds",
+            "TestParamDescrsSourceKindLabelsAndHelpers",
+            "TestParamDescrsCopyBucketOrderLifetimeAndPrefix",
+            "TestParamDescrsIndependentDictionaryStateMachine",
+            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsSourceProbeThresholdAndCleanup",
+            "TestParamDescrsOwnershipNullableMetadataAndGuards",
+            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
+            "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
+            "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
+            "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
+            "TestParamDescrsCheckedCapacityBoundaries"
+          ]
+        },
+        {
+          "name": "param_descrs insertion/erasure/duplicate kind and persistent name history",
+          "status": "ported",
+          "go_target": "util_param_descrs.go",
+          "tests": [
+            "TestParamDescrsSourceHistoryDefaultsAndDisplay",
+            "TestParamDescrsSourceModuleAndNullKinds",
+            "TestParamDescrsSourceKindLabelsAndHelpers",
+            "TestParamDescrsCopyBucketOrderLifetimeAndPrefix",
+            "TestParamDescrsIndependentDictionaryStateMachine",
+            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsSourceProbeThresholdAndCleanup",
+            "TestParamDescrsOwnershipNullableMetadataAndGuards",
+            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
+            "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
+            "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
+            "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
+            "TestParamDescrsCheckedCapacityBoundaries"
+          ]
+        },
+        {
+          "name": "param_descrs kind/default/description/module queries and namespace rewrite",
+          "status": "ported",
+          "go_target": "util_param_descrs.go",
+          "tests": [
+            "TestParamDescrsSourceHistoryDefaultsAndDisplay",
+            "TestParamDescrsSourceModuleAndNullKinds",
+            "TestParamDescrsSourceKindLabelsAndHelpers",
+            "TestParamDescrsCopyBucketOrderLifetimeAndPrefix",
+            "TestParamDescrsIndependentDictionaryStateMachine",
+            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsSourceProbeThresholdAndCleanup",
+            "TestParamDescrsOwnershipNullableMetadataAndGuards",
+            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
+            "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
+            "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
+            "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
+            "TestParamDescrsCheckedCapacityBoundaries"
+          ]
+        },
+        {
+          "name": "param_descrs sorted display and physical dictionary bucket-order copy",
+          "status": "ported",
+          "go_target": "util_param_descrs.go",
+          "tests": [
+            "TestParamDescrsSourceHistoryDefaultsAndDisplay",
+            "TestParamDescrsSourceModuleAndNullKinds",
+            "TestParamDescrsSourceKindLabelsAndHelpers",
+            "TestParamDescrsCopyBucketOrderLifetimeAndPrefix",
+            "TestParamDescrsIndependentDictionaryStateMachine",
+            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsSourceProbeThresholdAndCleanup",
+            "TestParamDescrsOwnershipNullableMetadataAndGuards",
+            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
+            "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
+            "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
+            "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
+            "TestParamDescrsCheckedCapacityBoundaries"
+          ]
+        },
+        {
+          "name": "five parameter descriptor insertion helpers with exact descriptions",
+          "status": "ported",
+          "go_target": "util_param_descrs.go",
+          "tests": [
+            "TestParamDescrsSourceHistoryDefaultsAndDisplay",
+            "TestParamDescrsSourceModuleAndNullKinds",
+            "TestParamDescrsSourceKindLabelsAndHelpers",
+            "TestParamDescrsCopyBucketOrderLifetimeAndPrefix",
+            "TestParamDescrsIndependentDictionaryStateMachine",
+            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsSourceProbeThresholdAndCleanup",
+            "TestParamDescrsOwnershipNullableMetadataAndGuards",
+            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
+            "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
+            "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
+            "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
+            "TestParamDescrsCheckedCapacityBoundaries"
+          ]
         }
       ],
       "ownership": [
-        "Normalization reads borrowed symbol region under owner lock and produces one caller-owned output string without interning, retained workspace or intermediate symbol spelling. See PARAM_NAME_PORT_STATUS.md."
+        "Normalization reads borrowed symbol region under owner lock and produces one caller-owned output string without interning, retained workspace or intermediate symbol spelling. See PARAM_NAME_PORT_STATUS.md.",
+        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md."
       ],
       "deviations": [
         "CString NUL/nullable boundary explicit; numerical/marked/foreign/closed symbols rejected as typed checked precondition/lifetime errors. Remaining descriptor and params_ref methods not claimed by normalizer packet."
@@ -101949,13 +102251,27 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "util_param_name.go"
+        "util_param_name.go",
+        "util_param_descrs.go"
       ],
       "tests": [
         "TestParamNameNormalizationSourceBranches",
         "TestParamNameNormalizationByteDomain",
         "TestParamNameSymbolOwnershipAndSourceRoutes",
-        "TestParamNameSymbolSingleOutputAllocation"
+        "TestParamNameSymbolSingleOutputAllocation",
+        "TestParamDescrsSourceHistoryDefaultsAndDisplay",
+        "TestParamDescrsSourceModuleAndNullKinds",
+        "TestParamDescrsSourceKindLabelsAndHelpers",
+        "TestParamDescrsCopyBucketOrderLifetimeAndPrefix",
+        "TestParamDescrsIndependentDictionaryStateMachine",
+        "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+        "TestParamDescrsSourceProbeThresholdAndCleanup",
+        "TestParamDescrsOwnershipNullableMetadataAndGuards",
+        "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
+        "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
+        "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
+        "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
+        "TestParamDescrsCheckedCapacityBoundaries"
       ],
       "conditionals": [
         {
@@ -101980,10 +102296,111 @@
             "TestParamNameSymbolOwnershipAndSourceRoutes",
             "TestParamNameSymbolSingleOutputAllocation"
           ]
+        },
+        {
+          "name": "param_descrs construction/destruction and exact nullable owned metadata",
+          "status": "ported",
+          "go_target": "util_param_descrs.go",
+          "tests": [
+            "TestParamDescrsSourceHistoryDefaultsAndDisplay",
+            "TestParamDescrsSourceModuleAndNullKinds",
+            "TestParamDescrsSourceKindLabelsAndHelpers",
+            "TestParamDescrsCopyBucketOrderLifetimeAndPrefix",
+            "TestParamDescrsIndependentDictionaryStateMachine",
+            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsSourceProbeThresholdAndCleanup",
+            "TestParamDescrsOwnershipNullableMetadataAndGuards",
+            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
+            "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
+            "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
+            "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
+            "TestParamDescrsCheckedCapacityBoundaries"
+          ]
+        },
+        {
+          "name": "param_descrs insertion/erasure/duplicate kind and persistent name history",
+          "status": "ported",
+          "go_target": "util_param_descrs.go",
+          "tests": [
+            "TestParamDescrsSourceHistoryDefaultsAndDisplay",
+            "TestParamDescrsSourceModuleAndNullKinds",
+            "TestParamDescrsSourceKindLabelsAndHelpers",
+            "TestParamDescrsCopyBucketOrderLifetimeAndPrefix",
+            "TestParamDescrsIndependentDictionaryStateMachine",
+            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsSourceProbeThresholdAndCleanup",
+            "TestParamDescrsOwnershipNullableMetadataAndGuards",
+            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
+            "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
+            "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
+            "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
+            "TestParamDescrsCheckedCapacityBoundaries"
+          ]
+        },
+        {
+          "name": "param_descrs kind/default/description/module queries and namespace rewrite",
+          "status": "ported",
+          "go_target": "util_param_descrs.go",
+          "tests": [
+            "TestParamDescrsSourceHistoryDefaultsAndDisplay",
+            "TestParamDescrsSourceModuleAndNullKinds",
+            "TestParamDescrsSourceKindLabelsAndHelpers",
+            "TestParamDescrsCopyBucketOrderLifetimeAndPrefix",
+            "TestParamDescrsIndependentDictionaryStateMachine",
+            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsSourceProbeThresholdAndCleanup",
+            "TestParamDescrsOwnershipNullableMetadataAndGuards",
+            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
+            "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
+            "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
+            "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
+            "TestParamDescrsCheckedCapacityBoundaries"
+          ]
+        },
+        {
+          "name": "param_descrs sorted display and physical dictionary bucket-order copy",
+          "status": "ported",
+          "go_target": "util_param_descrs.go",
+          "tests": [
+            "TestParamDescrsSourceHistoryDefaultsAndDisplay",
+            "TestParamDescrsSourceModuleAndNullKinds",
+            "TestParamDescrsSourceKindLabelsAndHelpers",
+            "TestParamDescrsCopyBucketOrderLifetimeAndPrefix",
+            "TestParamDescrsIndependentDictionaryStateMachine",
+            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsSourceProbeThresholdAndCleanup",
+            "TestParamDescrsOwnershipNullableMetadataAndGuards",
+            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
+            "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
+            "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
+            "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
+            "TestParamDescrsCheckedCapacityBoundaries"
+          ]
+        },
+        {
+          "name": "five parameter descriptor insertion helpers with exact descriptions",
+          "status": "ported",
+          "go_target": "util_param_descrs.go",
+          "tests": [
+            "TestParamDescrsSourceHistoryDefaultsAndDisplay",
+            "TestParamDescrsSourceModuleAndNullKinds",
+            "TestParamDescrsSourceKindLabelsAndHelpers",
+            "TestParamDescrsCopyBucketOrderLifetimeAndPrefix",
+            "TestParamDescrsIndependentDictionaryStateMachine",
+            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsSourceProbeThresholdAndCleanup",
+            "TestParamDescrsOwnershipNullableMetadataAndGuards",
+            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
+            "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
+            "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
+            "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
+            "TestParamDescrsCheckedCapacityBoundaries"
+          ]
         }
       ],
       "ownership": [
-        "Normalization reads borrowed symbol region under owner lock and produces one caller-owned output string without interning, retained workspace or intermediate symbol spelling. See PARAM_NAME_PORT_STATUS.md."
+        "Normalization reads borrowed symbol region under owner lock and produces one caller-owned output string without interning, retained workspace or intermediate symbol spelling. See PARAM_NAME_PORT_STATUS.md.",
+        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md."
       ],
       "deviations": [
         "CString NUL/nullable boundary explicit; numerical/marked/foreign/closed symbols rejected as typed checked precondition/lifetime errors. Remaining descriptor and params_ref methods not claimed by normalizer packet."
@@ -107266,9 +107683,25 @@
       "sha256": "aafafc0fe6ca0afd7bafe0c781342da259f9c34c0b94b16732c415cf2733066e",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_param_descrs.go"
+      ],
+      "tests": [
+        "TestParamDescrsSourceHistoryDefaultsAndDisplay",
+        "TestParamDescrsSourceModuleAndNullKinds",
+        "TestParamDescrsSourceKindLabelsAndHelpers",
+        "TestParamDescrsCopyBucketOrderLifetimeAndPrefix",
+        "TestParamDescrsIndependentDictionaryStateMachine",
+        "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+        "TestParamDescrsSourceProbeThresholdAndCleanup",
+        "TestParamDescrsOwnershipNullableMetadataAndGuards",
+        "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
+        "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
+        "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
+        "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
+        "TestParamDescrsCheckedCapacityBoundaries"
+      ],
       "conditionals": [
         {
           "line": 24,
@@ -107375,8 +107808,31 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "descriptor names/sort/prefix concrete vectors with exact source push-growth capacities",
+          "status": "ported",
+          "go_target": "util_param_descrs.go",
+          "tests": [
+            "TestParamDescrsSourceHistoryDefaultsAndDisplay",
+            "TestParamDescrsSourceModuleAndNullKinds",
+            "TestParamDescrsSourceKindLabelsAndHelpers",
+            "TestParamDescrsCopyBucketOrderLifetimeAndPrefix",
+            "TestParamDescrsIndependentDictionaryStateMachine",
+            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsSourceProbeThresholdAndCleanup",
+            "TestParamDescrsOwnershipNullableMetadataAndGuards",
+            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
+            "TestParamDescrsSourceNamesFailureKeepsDictionaryPublication",
+            "TestParamDescrsModuleScratchFailuresAndMetadataPublication",
+            "TestParamDescrsSourcePrefixConstructorUsesPushGrowth",
+            "TestParamDescrsCheckedCapacityBoundaries"
+          ]
+        }
+      ],
+      "ownership": [
+        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md."
+      ],
       "deviations": []
     },
     {

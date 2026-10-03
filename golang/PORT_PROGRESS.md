@@ -599,3 +599,14 @@ and cover independent finite triple arithmetic, the mixed equality defect,
 nonsaturating infinity, component publication/destruction, source returned
 copies, fault roots and one final caller string allocation. No absent source
 numeric assertion registration is invented. See INF_EPS_RATIONAL_PORT_STATUS.md.
+
+## Parameter descriptions and kind labels
+
+All param_descrs methods and insertion helpers now preserve the source dictionary,
+nullable metadata, persistent name history, namespace rewriting, sorted display
+and physical-bucket copy order. Thirteen tests began missing-API RED; further
+behavioral RED drove dictionary-before-history publication and exact prefix-vector
+growth fixes. Owned metadata and temporary storage are physically budgeted,
+with immediate failed-prefix ownership audits. See PARAM_DESCRS_PORT_STATUS.md.
+cmd_context_types.cpp kind labels are complete; params_ref and command runtime
+methods remain open. Dictionary coverage records this concrete specialization.
