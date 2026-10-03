@@ -339,3 +339,126 @@ Temporary original generic snapshots and one-shot conversion scripts were
 removed after verification. Only concrete reviewed source is retained. No
 domain algorithms, source traversal policy, allocation class policy, cleanup
 ordering or previously listed incomplete subsystem features changed.
+
+# Concrete constructed scalar pool packet
+
+`pool32.go` supplies the approved **constructed=true scalar policy subset** of
+`src/util/object_allocator.h`. It is not a whole source-template port and does
+not complete `small_object_allocator` or the real rational-cell source tests.
+It introduces no generics, per-record interface/closure, intrusive free-list
+overwrite, unsafe operation, or edits to existing slabs/vectors/regions.
+
+## Source lifecycle and API
+
+Pool32Config defaults to 8 workers and 1024 scalar records/page, exactly the
+source constants (`object_allocator.h:26`). SlotLimit is a testable physical
+slot limit **per worker region**. Each worker eagerly owns an empty first page;
+filling a page immediately prepares another empty page, including at a configured
+slot limit. A fresh initialized slot invokes the one owner-level Construct
+dispatcher once. A recycled slot invokes neither Construct nor Destroy.
+
+Pool32Policy.Reset is called on Recycle before publishing the ref onto the
+chosen worker's separate LIFO free array. It returns the retained scalar state.
+Nil Reset is the source do-nothing reset policy, so recycled state survives
+unchanged. Nil Construct gives the concrete scalar zero initializer.
+Pool32Policy.Destroy runs once per initialized record on Reset/Close, including
+records on free lists and records retired after generation exhaustion.
+DisableDestructors suppresses Destroy only. No destructor runs on Recycle.
+Reset destroys old objects and creates fresh construction opportunities while
+preserving generations; Close is idempotent and releases all backing storage.
+
+Source destructor traversal is preserved: workers in order, last partially used
+page first, then earlier full pages in allocation order; an eager empty tail page
+has no initialized values to destroy (`object_allocator.h:78`). The source's
+header prose says destructors run only on allocator deletion, but its executable
+region::reset calls free_memory and therefore runs them during Reset too
+(`:118`). The implementation follows the executable path.
+
+Pool32Ref stores original RegionWorker, Slot and Generation. Cross-worker recycle
+puts that ref on the destination worker's free list without changing physical
+ownership. Reallocation increments its generation; old refs never revive after
+reuse or Reset. Exhaustion retires the slot permanently. Its constructed value
+survives retirement until the single applicable Reset/Close destructor.
+
+Allocate/Recycle use worker zero in nonconcurrent mode. AllocateWorker/
+RecycleWorker and the cold Pool32Worker wrapper require concurrent mode.
+ReserveWorkers and Reset reject concurrent mode, matching source assertions.
+Worker wrappers survive reserve and mode toggles. Close works in either mode,
+as the source destructor does. Read/Write/IsLive validate live generation;
+public context-owner validation remains the domain wrapper's responsibility.
+
+A cold owner mutex serializes metadata, dispatch and budget mutation. Worker
+partitions and destination semantics are preserved, but source parallel throughput
+is not claimed. Policy callbacks **must not call methods on the same pool**,
+because that mutex is held; doing so would deadlock. Callbacks must not panic.
+External callback effects are not transactional, and reuse/retry after a panic
+is not supported. This is an explicit caller invariant for the finite dispatcher
+policy. Shared budgets across other owners require external synchronization.
+
+Budget accounts record/ledger pages, worker/page directories, separate free
+arrays and Reset scratch. Page/directory and free-array growth charges old+new
+capacity. Reset preallocates replacement first pages and scratch while old pages
+still exist, failing before destructor effects. Page-boundary growth is checked
+before Construct, and free-array growth before Reset policy effects. This is a
+predictable-limit adaptation: the C++ source runs construction/reset before a
+subsequent vector/page allocation can fail. No exact recovery of host runtime OOM
+is claimed. Failed multi-step preparation may retain reusable charged capacity,
+but never publishes a new constructed record or invokes its Construct callback.
+Cold owner/policy headers and callback-owned allocations are separately budgeted
+by the caller. Generation/tombstone ledgers remain measurable after Reset.
+
+## Source method coverage and pending source assertions
+
+| Source | Concrete counterpart / pending behavior |
+| --- | --- |
+| object_allocator constructor/reserve/capacity (`:150`, `:172`, `:187`) | NewPool32/ReserveWorkers/Stats.Workers, eager first pages |
+| region allocate (`:108`) | Allocate fresh scalar construction, eager boundary page; construct=false remains pending |
+| allocate_core (`:136`) | Destination worker LIFO first, no reconstruction on reuse |
+| recycle_core (`:146`) | Reset-only policy, separate scalar free refs, no destructor |
+| worker access/mode/wrapper (`:164`, `:229`, `:252`) | Explicit mode errors, indexed operations and persistent cold wrapper |
+| region destructor/reset (`:103`, `:118`) | Pool Reset/Close perform exact initialized-value destructor traversal |
+| get_objects_count (`:276`) | Stats.Live tracks allocated-minus-free logical objects; generation retirement is an additional storage category |
+| do_nothing_reset_proc/simple_reset_proc (`:30`, `:36`) | Nil Reset / supplied scalar reset dispatcher; real cell reset implementation is not replaced with fake arithmetic |
+| source tst1 rational coefficient zero (`test/object_allocator.cpp:65`) | **Pending** actual rational-cell manager test; no integer stand-in claimed |
+| source tst2 default worker count (`:70`) | Finite default-capacity assertion ported |
+| source tst2 rational value zero/preservation (`:86`, `:96`) | **Pending** actual rational manager/cell integration |
+| source constructed/deallocated balance (`:121`) | Finite scalar-policy lifetime/counter projection, explicitly partial; real rational-cell source instance remains pending |
+| small_object_allocator source/tests | Read and inventoried only; byte alignment, chunk lists, debug Valgrind path, exact size accounting and consolidate algorithm remain unported |
+
+Read-only source fingerprints:
+
+- object_allocator.h: e2e1d6936945317d9e7af20cb1f564fb0ef384deb90360157b262ad50a7a291a
+- test/object_allocator.cpp: 03098e9577fb03cd306eb6302dc70570d6e8efafc9b6f59aab77e300bdff88d3
+- small_object_allocator.h: 57b0a3bbc2d9fd10f008f371e3b5b9bee5535d39ab5cfbcb4afd9324018a140b
+- small_object_allocator.cpp: 70cf910ed0a3871ea110ee01ff8d23a687f74af5972ab995dce32ba3e6e35994
+- test/small_object_allocator.cpp: 98d72b253f1b8bda2ef5e6c9ad460064ceaee571ae15a7016b37cbf55ea79618
+
+## TDD and verification
+
+Tests first produced RED undefined NewPool32/config/policy/mode errors, then
+GREEN after implementation. A subsequent RED regression detected generation
+wrap when Reset discarded a still-live MaxUint32-generation record; Reset now
+retires that slot without extra Reset-policy calls or duplicate destruction.
+
+Tests verify source defaults and eager pages, do-nothing retained state,
+constructor/reset/destructor timing, cross-worker destination, wrapper validity,
+source destructor order, generation reset/retirement, disabled destructors,
+failure-before-callback behavior, peak Reset budgets, budget balance, pointer-free
+record metadata and actual concurrent workers. The independent deterministic
+model executes 2000 bounded operations with retained scalar values and exact
+constructor/destructor counts; model selection does not depend on map order.
+All ordinary fixtures remain hermetic and require no source/reference process.
+
+- Native and g3checked CGO-disabled arena tests: PASS.
+- go vet ./arena: PASS.
+- Native race check of all TestPool32 cases: PASS, including concurrent workers.
+- js/wasm and wasip1/wasm package builds: PASS.
+- Actual js/wasm arena tests under Node v22.22.2, matched wrapper/minimal env: PASS.
+- GOARCH=386 test compilation: PASS; prior native 386 runner limitation persists.
+- BenchmarkPool32Warm, 200ms on the recorded host/toolchain: 30.06 ns/op,
+  0 B/op, 0 allocs/op for warm allocate/recycle. AllocsPerRun independently
+  requires exactly zero allocations. No source throughput comparison is claimed.
+
+Whole-template ownership, construct=false, real rational-cell assertions and
+small-object allocator behavior remain incomplete. This partial packet must not
+be used as evidence that those source components or the full memory gate are done.
