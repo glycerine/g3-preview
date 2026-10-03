@@ -6,8 +6,10 @@ package mpnum
 import (
 	"errors"
 	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
 	"math"
 	"reflect"
+	"runtime"
 )
 
 var ErrConversion = errors.New("mpnum: integer conversion out of range")
@@ -26,58 +28,99 @@ func NewInt(v int32) Int     { return Int{val: v} }
 func (a *Int) IsSmall() bool { return a.cell == 0 }
 
 type numericCell struct {
-	payload        arena.VectorRef
-	size, capacity uint32
+	payload                               arena.VectorRef // zero compatibility field; numerical bytes live only in backing
+	backing                               sourceCellBacking
+	size, capacity, span                  uint32
+	released, unpublished, cleanupPending bool
 }
 type IntegerConfig struct {
-	Cells arena.Config
-	Words arena.VectorConfig
+	Cells   arena.Config
+	Words   arena.VectorConfig
+	Memory  *memory.Runtime
+	Profile memory.SmallAllocatorProfile
 }
 
-// IntegerManager owns all persistent cells, limb payloads, two reusable result
+// IntegerManager owns all persistent source cells, two reusable result
 // cells, two one-limb argument cells, and the source intMin/two64 constants.
 // Single-owner confinement replaces the source synchronized OpenMP variant.
-// Cells and Words must share one Budget. Close invalidates every live numeral.
+// Cells, transitional Natural Words and the actual memory backend share one Budget.
+// Close invalidates every live numeral; a supplied Runtime is borrowed.
 type IntegerManager struct {
-	cells         *numericCellSlab
-	words         *arena.Words
-	tmp, arg      [2]numericCellRef
-	failedRef     numericCellRef  // permanently dead, charged auxiliary descriptor
-	natural       *NaturalManager // child borrows this manager's Words and Budget
-	intMin, two64 Int
-	closed        bool
-	budget        *arena.Budget
-	headerBytes   uint64
+	self                        *IntegerManager
+	memory                      *memory.Runtime
+	allocator                   *memory.SmallAllocator
+	ownsMemory                  bool
+	pendingCell                 sourceCellBacking
+	originalCause, cleanupCause error
+	cells                       *numericCellSlab
+	words                       *arena.Words
+	tmp, arg                    [2]numericCellRef
+	failedRef                   numericCellRef  // permanently dead, charged auxiliary descriptor
+	natural                     *NaturalManager // child borrows this manager's Words and Budget
+	intMin, two64               Int
+	closed                      bool
+	budget                      *arena.Budget
+	headerBytes                 uint64
 }
 
 func NewIntegerManager(config IntegerConfig) (*IntegerManager, error) {
 	if config.Cells.Budget != config.Words.Descriptors.Budget {
 		return nil, arena.ErrConfig
 	}
+	if config.Memory != nil {
+		if e := config.Memory.CheckOpen(); e != nil {
+			return nil, e
+		}
+		if config.Memory.Budget() != config.Cells.Budget {
+			return nil, arena.ErrConfig
+		}
+	}
 	header := uint64(reflect.TypeOf(IntegerManager{}).Size())
 	if e := config.Cells.Budget.Reserve(header); e != nil {
 		return nil, e
 	}
-	cells, e := newNumericCellSlab(config.Cells)
-	if e != nil {
-		config.Cells.Budget.Release(header)
-		return nil, e
+	m := &IntegerManager{budget: config.Cells.Budget, headerBytes: header, memory: config.Memory}
+	m.self = m
+	fail := func(err error) (*IntegerManager, error) {
+		m.originalCause = err
+		if cleanup := m.CloseChecked(); cleanup != nil {
+			m.cleanupCause = cleanup
+			return nil, m
+		}
+		return nil, err
 	}
-	failedSlot, failedGeneration, e := cells.reserveDead()
-	if e != nil {
-		cells.Close()
-		config.Cells.Budget.Release(header)
-		return nil, e
+	var e error
+	if m.memory == nil {
+		m.memory, e = memory.NewRuntime(memory.RuntimeConfig{Budget: m.budget, SizeTBits: uint8(32 << (^uint(0) >> 63))})
+		if e != nil {
+			return fail(e)
+		}
+		m.ownsMemory = true
 	}
-	words, e := arena.NewWords(config.Words)
-	if e != nil {
-		cells.Close()
-		config.Cells.Budget.Release(header)
-		return nil, e
+	profile := config.Profile
+	if profile.PointerBits == 0 {
+		profile = memory.SmallAllocatorProfile{PointerBits: m.memory.SizeTBits(), Debug: modularSourceDebug, Windows: runtime.GOOS == "windows"}
 	}
-	m := &IntegerManager{cells: cells, words: words, budget: config.Cells.Budget, headerBytes: header, failedRef: makeNumericRef(failedSlot, failedGeneration)}
-	fail := func(err error) (*IntegerManager, error) { m.Close(); return nil, err }
-	m.natural, e = newNaturalManager(config.Words, words, false)
+	m.allocator, e = memory.NewSmallAllocator(memory.SmallAllocatorConfig{Runtime: m.memory, Profile: profile})
+	if e != nil {
+		return fail(e)
+	}
+	m.cells, e = newNumericCellSlab(config.Cells)
+	if e != nil {
+		return fail(e)
+	}
+	slot, gen, e := m.cells.reserveDead()
+	if e != nil {
+		return fail(e)
+	}
+	m.failedRef = makeNumericRef(slot, gen)
+	// Actual Natural Words scratch is retained only during the staged backend
+	// migration. It does not hold numeric cells or duplicate physical digits.
+	m.words, e = arena.NewWords(config.Words)
+	if e != nil {
+		return fail(e)
+	}
+	m.natural, e = newNaturalManager(config.Words, m.words, false)
 	if e != nil {
 		return fail(e)
 	}
@@ -86,10 +129,13 @@ func NewIntegerManager(config IntegerConfig) (*IntegerManager, error) {
 		if e != nil {
 			return fail(e)
 		}
-		m.arg[i], e = m.allocate(6, 1)
+		m.publishCell(m.tmp[i])
+		m.arg[i], e = m.allocate(6, 0)
 		if e != nil {
 			return fail(e)
 		}
+		m.publishCell(m.arg[i])
+		m.resizeCell(m.arg[i], 1)
 	}
 	if e = m.SetInt64(&m.intMin, -int64(math.MinInt32)); e != nil {
 		return fail(e)
@@ -104,28 +150,72 @@ func NewIntegerManager(config IntegerConfig) (*IntegerManager, error) {
 	return m, nil
 }
 
+func (m *IntegerManager) RuntimeOwner() *memory.Runtime {
+	if m == nil || m.self != m {
+		return nil
+	}
+	return m.memory
+}
+func (m *IntegerManager) cellObject(ref numericCellRef) (memory.ObjectRef, error) {
+	if m == nil || m.self != m {
+		return memory.ObjectRef{}, memory.ErrRuntimeOwner
+	}
+	if !validNumericRef(m.cells, ref) {
+		return memory.ObjectRef{}, arena.ErrInvalidSlot
+	}
+	c := m.cell(ref)
+	if c.released {
+		return memory.ObjectRef{}, arena.ErrInvalidSlot
+	}
+	return c.backing.object, nil
+}
+func (m *IntegerManager) Error() string {
+	if m.originalCause != nil {
+		return m.originalCause.Error()
+	}
+	if m.cleanupCause != nil {
+		return m.cleanupCause.Error()
+	}
+	return "mpnum: retained integer owner"
+}
+func (m *IntegerManager) Unwrap() error        { return m.originalCause }
+func (m *IntegerManager) OriginalCause() error { return m.originalCause }
+func (m *IntegerManager) CleanupCause() error  { return m.cleanupCause }
+func (m *IntegerManager) Cleanup() error       { return m.CloseChecked() }
+
 // checkCleanup accepts the owner's permanently dead allocation token only for
 // release/reset after a source allocation prefix. Ordinary reads use check.
 func (m *IntegerManager) checkCleanup(a *Int) error {
+	if m == nil || m.self != m {
+		return memory.ErrRuntimeOwner
+	}
 	if m.closed {
 		return arena.ErrClosed
 	}
 	if a == nil {
 		return arena.ErrInvalidSlot
 	}
-	if m.failedRef != 0 && a.cell == m.failedRef {
+	if a.cell == 0 || (m.failedRef != 0 && a.cell == m.failedRef) {
 		return nil
 	}
-	return m.check(a)
+	// A retained descriptor whose physical release completed remains cleanup
+	// authority only; ordinary reads reject it until the descriptor is consumed.
+	if !validNumericRef(m.cells, a.cell) {
+		return arena.ErrInvalidSlot
+	}
+	return nil
 }
 func (m *IntegerManager) check(a *Int) error {
+	if m == nil || m.self != m {
+		return memory.ErrRuntimeOwner
+	}
 	if m.closed {
 		return arena.ErrClosed
 	}
 	if a == nil {
 		return arena.ErrInvalidSlot
 	}
-	if a.cell != 0 && !validNumericRef(m.cells, a.cell) {
+	if a.cell != 0 && (!validNumericRef(m.cells, a.cell) || m.cell(a.cell).released) {
 		return arena.ErrInvalidSlot
 	}
 	return nil
@@ -144,10 +234,10 @@ func (m *IntegerManager) store(ref numericCellRef, c numericCell) {
 }
 func (m *IntegerManager) digit(ref numericCellRef, i uint32) uint32 {
 	c := m.cell(ref)
-	if i >= c.size {
+	if i >= max(c.size, c.span) {
 		return 0
 	}
-	v, e := m.words.Read(c.payload, i)
+	v, e := c.backing.readWord(m.allocator, 8+4*uint64(i))
 	if e != nil {
 		panic(e)
 	}
@@ -155,111 +245,165 @@ func (m *IntegerManager) digit(ref numericCellRef, i uint32) uint32 {
 }
 func (m *IntegerManager) writeDigit(ref numericCellRef, i, v uint32) {
 	c := m.cell(ref)
-	if e := m.words.Write(c.payload, i, v); e != nil {
+	if e := c.backing.writeWord(m.allocator, 8+4*uint64(i), v); e != nil {
 		panic(e)
 	}
 }
 
-// prepareTmpSpan guards the actual scratch-span access after ensureTmp has
-// completed its source unsigned allocation/publication prefixes. It does not
-// reject the finite wrapped allocation itself or poison other live numerals.
+// A scratch access span is bookkeeping, never a source m_size publication.
 func (m *IntegerManager) prepareTmpSpan(idx int, size uint32) error {
 	if idx < 0 || idx >= len(m.tmp) || m.tmp[idx] == 0 {
 		return arena.ErrInvalidSlot
 	}
-	if size > m.cell(m.tmp[idx]).capacity {
+	c := m.cell(m.tmp[idx])
+	if size > c.capacity || uint64(size)*4+8 > c.backing.extent {
 		return arena.ErrBounds
 	}
-	m.resizeCell(m.tmp[idx], size)
+	c.span = size
+	m.store(m.tmp[idx], c)
 	return nil
 }
 func (m *IntegerManager) resizeCell(ref numericCellRef, size uint32) {
 	c := m.cell(ref)
 	if size > c.capacity {
-		panic("mpnum: cell capacity exceeded")
+		panic(arena.ErrBounds)
 	}
-	payload, e := m.words.Resize(c.payload, size)
-	if e != nil {
+	if e := c.backing.writeWord(m.allocator, 0, size); e != nil {
 		panic(e)
 	}
-	c.payload = payload
 	c.size = size
+	c.span = 0
 	m.store(ref, c)
 }
 func (m *IntegerManager) allocate(capacity, size uint32) (numericCellRef, error) {
 	if modularSourceDebug && capacity < 6 {
 		return 0, ErrIntegerAssertion
 	}
+	if m.pendingCell.object != (memory.ObjectRef{}) {
+		return 0, memory.ErrAllocatorPending
+	}
+	backing, e := allocateSourceCell(m.allocator, capacity)
+	// Capture the physical prefix before charged descriptor preparation.
+	m.pendingCell = backing
+	if e != nil {
+		return 0, e
+	}
 	slot, gen, e := m.cells.Allocate()
 	if e != nil {
 		return 0, e
 	}
-	payload, e := m.words.Allocate(size, capacity)
-	if e != nil {
-		m.cells.Recycle(slot)
-		return 0, e
-	}
 	ref := makeNumericRef(slot, gen)
-	m.store(ref, numericCell{payload: payload, size: size, capacity: capacity})
+	m.store(ref, numericCell{backing: backing, capacity: capacity, unpublished: true})
+	m.pendingCell = sourceCellBacking{}
 	return ref, nil
 }
-func (m *IntegerManager) free(ref numericCellRef) {
+
+// Publication is scalar ownership metadata, not a source allocation or write.
+func (m *IntegerManager) publishCell(ref numericCellRef) {
 	c := m.cell(ref)
-	if e := m.words.Free(c.payload); e != nil {
-		panic(e)
+	c.unpublished = false
+	m.store(ref, c)
+}
+func (m *IntegerManager) free(ref numericCellRef) error {
+	c := m.cell(ref)
+	if !c.released {
+		progress, e := m.allocator.DeallocateTracked(c.backing.requested, c.backing.object)
+		if progress.PhysicalReleased || progress.PooledLinked {
+			c.released = true
+			m.store(ref, c)
+		}
+		if e != nil {
+			c.cleanupPending = true
+			m.store(ref, c)
+			return e
+		}
 	}
-	if e := m.cells.Recycle(numericSlot(ref)); e != nil {
-		panic(e)
-	}
+	return m.cells.Recycle(numericSlot(ref))
 }
 func (m *IntegerManager) Close() {
-	if m.closed {
-		return
+	if e := m.CloseChecked(); e != nil {
+		panic(m)
 	}
-	// Domain cleanup precedes recycling. Also release caller-owned outstanding
-	// numerals, which cannot remain usable after this owner's close.
+}
+func (m *IntegerManager) CloseChecked() error {
+	if m == nil || m.self != m {
+		return memory.ErrRuntimeOwner
+	}
+	if m.closed {
+		m.cleanupCause = nil
+		return nil
+	}
+	fail := func(e error) error { m.cleanupCause = e; return e }
 	if m.cells != nil {
 		for n := uint64(1); n <= uint64(m.cells.Stats().Slots); n++ {
 			slot := arena.Slot(n)
-			c, e := m.cells.Read(slot)
-			if e == nil {
-				m.words.Free(c.payload)
-				m.cells.Recycle(slot)
+			if _, e := m.cells.Read(slot); e == nil {
+				// Slab slots retain their actual generation. Only live records are read.
+				gen := m.cells.state(slot).generation
+				if e = m.free(makeNumericRef(slot, gen)); e != nil {
+					return fail(e)
+				}
 			}
 		}
 	}
+	if m.pendingCell.object != (memory.ObjectRef{}) {
+		p, e := m.allocator.DeallocateTracked(m.pendingCell.requested, m.pendingCell.object)
+		if p.PhysicalReleased || p.PooledLinked {
+			m.pendingCell = sourceCellBacking{}
+		}
+		if e != nil {
+			return fail(e)
+		}
+		m.pendingCell = sourceCellBacking{}
+	}
 	if m.natural != nil {
 		m.natural.Close()
+		m.natural = nil
 	}
 	if m.words != nil {
 		m.words.Close()
 	}
-
+	if m.allocator != nil {
+		if e := m.allocator.CleanupPending(); e != nil {
+			return fail(e)
+		}
+		if e := m.allocator.Close(); e != nil {
+			return fail(e)
+		}
+	}
+	if m.ownsMemory && m.memory != nil {
+		if e := m.memory.Close(); e != nil {
+			return fail(e)
+		}
+	}
 	if m.cells != nil {
 		m.cells.Close()
 	}
 	m.tmp = [2]numericCellRef{}
 	m.arg = [2]numericCellRef{}
-	m.natural = nil
 	m.intMin = Int{}
 	m.two64 = Int{}
 	m.budget.Release(m.headerBytes)
 	m.headerBytes = 0
 	m.closed = true
+	m.cleanupCause = nil
+	return nil
 }
 
 // Del preserves the source's m_val after releasing a big cell. Thus deleting a
 // big positive/negative value leaves inline +1/-1. Reset additionally writes 0.
 func (m *IntegerManager) Del(a *Int) error {
-	if !m.closed && a != nil && m.failedRef != 0 && a.cell == m.failedRef {
+	if e := m.checkCleanup(a); e != nil {
+		return e
+	}
+	if m.failedRef != 0 && a.cell == m.failedRef {
 		a.cell = 0
 		return nil
 	}
-	if e := m.check(a); e != nil {
-		return e
-	}
 	if a.cell != 0 {
-		m.free(a.cell)
+		if e := m.free(a.cell); e != nil {
+			return e
+		}
 		a.cell = 0
 	}
 	return nil
@@ -284,7 +428,9 @@ func (m *IntegerManager) allocateIfNeeded(a *Int, capacity uint32) error {
 	}
 	if a.IsSmall() || m.cell(a.cell).capacity < capacity {
 		if a.cell != 0 {
-			m.free(a.cell)
+			if e := m.free(a.cell); e != nil {
+				return e
+			}
 		}
 		a.val = 1
 		a.cell = m.failedRef
@@ -293,6 +439,7 @@ func (m *IntegerManager) allocateIfNeeded(a *Int, capacity uint32) error {
 			return e
 		}
 		a.cell = ref
+		m.publishCell(ref)
 	}
 	return nil
 }
@@ -315,13 +462,12 @@ func (m *IntegerManager) setBig64(a *Int, v uint64, sign int32) error {
 	if v>>32 != 0 {
 		size = 2
 	}
-	m.resizeCell(ref, size)
-	m.writeDigit(ref, 0, uint32(v))
-	if size == 2 {
-		m.writeDigit(ref, 1, uint32(v>>32))
-	}
 	a.cell = ref
+	m.publishCell(ref)
 	a.val = sign
+	m.writeDigit(ref, 0, uint32(v))
+	m.writeDigit(ref, 1, uint32(v>>32))
+	m.resizeCell(ref, size)
 	return nil
 }
 func (m *IntegerManager) SetInt64(a *Int, v int64) error {
@@ -378,7 +524,9 @@ func (m *IntegerManager) SetLimbs(a *Int, digits []uint32) error {
 	ref := a.cell
 	if ref == 0 || m.cell(ref).capacity < size {
 		if ref != 0 {
-			m.free(ref)
+			if e := m.free(ref); e != nil {
+				return e
+			}
 		}
 		a.cell = m.failedRef
 		var e error
@@ -386,9 +534,10 @@ func (m *IntegerManager) SetLimbs(a *Int, digits []uint32) error {
 		if e != nil {
 			return e
 		}
-	} else {
-		m.resizeCell(ref, size)
 	}
+	a.cell = ref
+	m.publishCell(ref)
+	m.resizeCell(ref, size)
 	for i, v := range digits {
 		m.writeDigit(ref, uint32(i), v)
 	}
@@ -419,7 +568,9 @@ func (m *IntegerManager) Copy(dst, src *Int) error {
 	ref := dst.cell
 	if ref == 0 || m.cell(ref).capacity < source.size {
 		if ref != 0 {
-			m.free(ref)
+			if e := m.free(ref); e != nil {
+				return e
+			}
 		}
 		dst.cell = m.failedRef
 		var e error
@@ -427,9 +578,10 @@ func (m *IntegerManager) Copy(dst, src *Int) error {
 		if e != nil {
 			return e
 		}
-	} else {
-		m.resizeCell(ref, source.size)
 	}
+	dst.cell = ref
+	m.publishCell(ref)
+	m.resizeCell(ref, source.size)
 	for i := uint32(0); i < source.size; i++ {
 		m.writeDigit(ref, i, m.digit(src.cell, i))
 	}
@@ -557,7 +709,9 @@ func (m *IntegerManager) ensureTmp(idx int, size uint32) error {
 	if m.cell(m.tmp[idx]).capacity >= size {
 		return nil
 	}
-	m.free(m.tmp[idx])
+	if e := m.free(m.tmp[idx]); e != nil {
+		return e
+	}
 	m.tmp[idx] = 0                // source leaves a dangling pointer; Go keeps a guarded hole
 	capacity := (3*size + 1) >> 1 // actual unsigned32 source arithmetic
 	ref, e := m.allocate(capacity, 0)
@@ -565,6 +719,7 @@ func (m *IntegerManager) ensureTmp(idx int, size uint32) error {
 		return e
 	}
 	m.tmp[idx] = ref
+	m.publishCell(ref)
 	if modularSourceDebug && m.cell(ref).capacity < size {
 		return ErrIntegerAssertion
 	}
@@ -600,6 +755,9 @@ func (m *IntegerManager) publishTmpAt(idx int, dst *Int, sign int32, size uint32
 	if m.tmp[idx] == 0 {
 		var e error
 		m.tmp[idx], e = m.allocate(6, 0)
+		if e == nil {
+			m.publishCell(m.tmp[idx])
+		}
 		return e
 	}
 	return nil

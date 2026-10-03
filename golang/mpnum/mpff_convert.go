@@ -23,17 +23,19 @@ func ffSetInteger(z *IntegerManager, a *Int, v ffLimbView) error {
 		if e != nil {
 			return e
 		}
-	} else {
-		z.resizeCell(ref, v.size)
 	}
+	z.resizeCell(ref, v.size)
 	for i := uint32(0); i < v.size; i++ {
 		z.writeDigit(ref, i, v.read(i))
 	}
 	old := a.cell
 	a.cell = ref
+	z.publishCell(ref)
 	a.val = 1
 	if old != 0 && old != ref {
-		z.free(old)
+		if e := z.free(old); e != nil {
+			return e
+		}
 	}
 	return nil
 }

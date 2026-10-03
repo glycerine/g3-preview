@@ -4,19 +4,29 @@ package mpnum
 
 import (
 	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
 	"math"
 )
 
 // limbView is ephemeral: external buffers are borrowed; Words stays indexed.
 // No view is persisted in a manager or exposes an arena backing slice.
 type limbView struct {
-	external []uint32
-	words    *arena.Words
-	ref      arena.VectorRef
-	size     uint32
+	external  []uint32
+	allocator *memory.SmallAllocator
+	backing   sourceCellBacking
+	words     *arena.Words
+	ref       arena.VectorRef
+	size      uint32
 }
 
 func (v limbView) read(i uint32) uint32 {
+	if v.allocator != nil {
+		n, e := v.backing.readWord(v.allocator, 8+4*uint64(i))
+		if e != nil {
+			panic(e)
+		}
+		return n
+	}
 	if v.words == nil {
 		return v.external[i]
 	}
@@ -27,6 +37,12 @@ func (v limbView) read(i uint32) uint32 {
 	return n
 }
 func (v limbView) write(i, n uint32) {
+	if v.allocator != nil {
+		if e := v.backing.writeWord(v.allocator, 8+4*uint64(i), n); e != nil {
+			panic(e)
+		}
+		return
+	}
 	if v.words == nil {
 		v.external[i] = n
 		return

@@ -6,10 +6,12 @@ package mpnum
 import (
 	"errors"
 	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
 	"math"
 	"math/big"
 	"math/rand"
 	"reflect"
+	"runtime"
 	"testing"
 )
 
@@ -79,17 +81,51 @@ func TestIntegerSourceIntMinSubtraction(t *testing.T) {
 
 func TestIntegerConstructorOwnership(t *testing.T) {
 	m, _ := integerManager(t)
-	if m.cells.Stats().Live != 6 || m.words.Stats().Live != 10 {
-		t.Fatal("source four scratch cells, two constants, four Natural buffers")
+	if m.cells.Stats().Live != 6 || m.words.Stats().Live != 4 {
+		t.Fatal("six actual source objects plus four transitional Natural buffers")
 	}
-	for _, ref := range []numericCellRef{m.tmp[0], m.tmp[1], m.arg[0], m.arg[1], m.intMin.cell, m.two64.cell} {
+	var objects [6]memory.ObjectRef
+	for i, ref := range []numericCellRef{m.tmp[0], m.tmp[1], m.arg[0], m.arg[1], m.intMin.cell, m.two64.cell} {
 		c := m.cell(ref)
-		if c.capacity != 6 {
-			t.Fatal("geometric pool capacity changed source requested capacity")
+		if c.capacity != 6 || c.payload != (arena.VectorRef{}) {
+			t.Fatal("numeric payload duplicated or source capacity changed")
 		}
-		capacity, e := m.words.Cap(c.payload)
-		if e != nil || capacity != 8 {
-			t.Fatal(capacity, e)
+		object, e := m.cellObject(ref)
+		if e != nil {
+			t.Fatal(e)
+		}
+		objects[i] = object
+		for _, other := range objects[:i] {
+			if other == object {
+				t.Fatal("source object aliased")
+			}
+		}
+		extent, e := m.allocator.ObjectExtent(object)
+		if e != nil || extent != 32 {
+			t.Fatal("actual source extent", extent, e)
+		}
+		raw, offset, e := m.allocator.RawLocation(object)
+		if e != nil {
+			t.Fatal(e)
+		}
+		capacity, e := m.memory.ReadUint32(raw, offset+4)
+		if e != nil || capacity != 6 {
+			t.Fatal("source capacity header", capacity, e)
+		}
+	}
+	physical := m.memory.Stats()
+	count, e := m.memory.AllocationCount()
+	if e != nil {
+		t.Fatal(e)
+	}
+	header := uint64(m.memory.SizeTBits() / 8)
+	if modularSourceDebug && runtime.GOOS != "windows" {
+		if physical.LiveBlocks != 6 || physical.PhysicalBytes != 6*(32+header) || count != 6 {
+			t.Fatal("source debug direct topology", physical, count)
+		}
+	} else {
+		if physical.LiveBlocks != 1 || physical.PhysicalBytes != 8192+header || count != 1 {
+			t.Fatal("source pooled topology", physical, count)
 		}
 	}
 	if integerString(t, m, &m.intMin) != "2147483648" || integerString(t, m, &m.two64) != "18446744073709551616" {

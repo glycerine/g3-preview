@@ -91,3 +91,22 @@ success, including the actual-read binding reservation at ordinal 78/80.
 Logs: `.cache/factors-owner/hensel-read-binding-{native,debug}.log`.
 The separate unfinished physical-cell backend was excluded from these checks;
 its existing root-audit migrations remain required. No source-unit promotion.
+
+
+Unfinished mandatory physical-cell backend checkpoint: the constructor test's
+`port_pending_mpz` tag is removed because its actual APIs now execute. Numeric
+cells use real SmallAllocator objects; four genuine Natural Words buffers
+remain until the next integration step. Nine selected native/debug groups,
+module vet and source/no-generics audit pass on the frozen 11-file snapshot
+`.cache/release/mpz-cell-checkpoint-0c9d695`. Hash inventory:
+`.cache/mpz-cell-checkpoint-sha256.txt`.
+
+Broader 97-group runs remain RED; logs are
+`.cache/mpz-cell-checkpoint-97-{native,debug}.log`. Held fixtures still assume
+cell-backed Words, universal reservation refusal, or allocator-initialized size.
+These failures remain visible and require individual source-based correction.
+SourceFinalize, Natural inline storage, output lifetime, transitive cleanup,
+shared adoption and global runtime bindings remain unfinished. The separate
+`port_pending_mpz` phase-B campaign is still pending. This commit preserves
+implementation progress and does not claim full-suite success or source
+completion. Details: `MPZ_BACKEND_IMPLEMENTATION_STATUS.md`.

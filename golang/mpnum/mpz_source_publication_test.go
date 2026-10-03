@@ -6,7 +6,9 @@ package mpnum
 import (
 	"testing"
 
+	"errors"
 	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
 )
 
 // This fixture deliberately uses real manager storage and reservation faults.
@@ -34,10 +36,12 @@ func mpzPublicationOwner(t *testing.T) (*IntegerManager, *arena.Budget) {
 type mpzPublicationRoots struct {
 	cells, words uint32
 	bytes        uint64
+	physical     uint64
+	chunks       uint32
 }
 
 func mpzPublicationSnapshot(m *IntegerManager, b *arena.Budget) mpzPublicationRoots {
-	return mpzPublicationRoots{m.cells.Stats().Live, m.words.Stats().Live, b.Used()}
+	return mpzPublicationRoots{cells: m.cells.Stats().Live, words: m.words.Stats().Live, bytes: b.Used(), physical: m.memory.Stats().PhysicalBytes, chunks: m.allocator.Stats().Chunks}
 }
 
 func mpzPublicationExpectFreed(t *testing.T, m *IntegerManager, b *arena.Budget, old numericCellRef, before mpzPublicationRoots) {
@@ -46,14 +50,23 @@ func mpzPublicationExpectFreed(t *testing.T, m *IntegerManager, b *arena.Budget,
 	if validNumericRef(m.cells, old) {
 		t.Error("source old cell is still live after free-before-allocate failure")
 	}
-	if after.cells+1 != before.cells || after.words+1 != before.words {
+	if after.cells+1 != before.cells || after.words != before.words {
 		t.Errorf("source old ownership not released: before=%+v after=%+v", before, after)
 	}
-	// All old cells here have capacity6 and are pooled. Recycling retains
-	// physical pages/metadata; the rejected reservation adds no backing.
-	if after.bytes != before.bytes {
-		t.Errorf("unexpected physical-storage publication: before=%+v after=%+v", before, after)
+	// Release pooling retains the actual chunk. Debug NonWindows allocates
+	// these objects directly and refunds their real backing/initialized bits.
+	if before.chunks != 0 {
+		if after.bytes != before.bytes || after.physical != before.physical {
+			t.Errorf("pooled source chunk unexpectedly changed: before=%+v after=%+v", before, after)
+		}
+	} else {
+		extent := uint64(32) + uint64(m.memory.SizeTBits()/8)
+		initBytes := ((extent + 63) / 64) * 8
+		if after.physical+extent != before.physical || after.bytes+extent+initBytes != before.bytes {
+			t.Errorf("debug direct free prefix differs: before=%+v after=%+v", before, after)
+		}
 	}
+
 }
 
 func TestIntegerSourceTmpFreeBeforeReplacementFailure(t *testing.T) {
@@ -62,9 +75,15 @@ func TestIntegerSourceTmpFreeBeforeReplacementFailure(t *testing.T) {
 	before := mpzPublicationSnapshot(m, b)
 	b.FailAfter(0)
 	err := m.ensureTmp(0, 33)
-	if err != arena.ErrInjectedFailure {
-		t.Fatalf("expected replacement reservation refusal, got %v", err)
+	if before.chunks == 0 {
+		failure, ok := err.(memory.Failure)
+		if !ok || failure.Kind != memory.FailureMemout || failure.ErrorCode() != 101 {
+			t.Fatalf("expected source physical Memout101, got %v", err)
+		}
+	} else if err != arena.ErrInjectedFailure {
+		t.Fatalf("expected cold replacement locator reservation refusal, got %v", err)
 	}
+
 	// Source deallocate(m_tmp[0]) precedes the replacement request. Its stale
 	// pointer cannot be dereferenced after failure; a safe Go missing-root
 	// continuation may clear the field, but must not retain the old live cell.
@@ -559,8 +578,12 @@ func TestIntegerSourceScratchSpanGuardAfterFiniteWrappedAllocation(t *testing.T)
 	if e = m.prepareTmpSpan(0, 12); e != nil {
 		t.Fatal("valid replacement span", e)
 	}
-	if m.cell(ref).size != 12 {
-		t.Fatal("valid header resize omitted")
+	c := m.cell(ref)
+	if c.size != size || c.span != 12 || mpzPublicationSnapshot(m, b) != before {
+		t.Fatal("span borrowed without source size publication", c)
+	}
+	if _, err := c.backing.readWord(m.allocator, 0); !errors.Is(err, memory.ErrRuntimeUninitialized) {
+		t.Fatal("scratch borrow invented initialized m_size", err)
 	}
 }
 

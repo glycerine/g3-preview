@@ -44,17 +44,19 @@ func (m *IntegerManager) CopyFrom(dst *Int, source *IntegerManager, src *Int) er
 		if e != nil {
 			return e
 		}
-	} else {
-		m.resizeCell(ref, cell.size)
 	}
+	m.resizeCell(ref, cell.size)
 	// All fallible preparation is complete before changing an existing payload.
 	for i := uint32(0); i < cell.size; i++ {
 		m.writeDigit(ref, i, source.digit(src.cell, i))
 	}
 	old := dst.cell
 	dst.cell, dst.val = ref, src.val
+	m.publishCell(ref)
 	if old != 0 && old != ref {
-		m.free(old)
+		if e := m.free(old); e != nil {
+			return e
+		}
 	}
 	return nil
 }

@@ -57,10 +57,19 @@ func (m *IntegerManager) ensureOwnedCapacity(a *Int, capacity uint32) error {
 		return e
 	}
 	if modularSourceDebug && m.cell(ref).capacity != capacity {
-		m.free(ref)
+		if e := m.free(ref); e != nil {
+			return e
+		}
 		return ErrIntegerAssertion
 	}
 	sign := a.val
+	if old != 0 {
+		m.resizeCell(ref, size)
+	}
+	if old == 0 {
+		a.cell = ref
+		m.publishCell(ref)
+	} // source small pointer publication precedes digit writes
 	if old != 0 {
 		for i := uint32(0); i < size; i++ {
 			m.writeDigit(ref, i, m.digit(old, i))
@@ -78,10 +87,16 @@ func (m *IntegerManager) ensureOwnedCapacity(a *Int, capacity uint32) error {
 		}
 	}
 	if old != 0 {
-		m.free(old)
+		if e := m.free(old); e != nil {
+			return e
+		}
 	}
 	a.cell = ref
+	m.publishCell(ref)
 	a.val = sign
+	if old == 0 {
+		m.resizeCell(ref, size)
+	}
 	return nil
 }
 func (m *IntegerManager) normalizeOwned(a *Int) error {
@@ -318,17 +333,17 @@ func (m *IntegerManager) mul2kCore(a *Int, k uint32) error {
 	}
 	oldSize = m.cell(a.cell).size
 	cell := m.cell(a.cell)
-	// Prepare only the concrete Words access span. Retain the source cell size
+	// Prepare only the physical digit access span. Retain the source cell size
 	// through zero filling; publish newSize at the actual source statement.
 	span := newSize
 	if span > cell.capacity {
 		span = cell.capacity
 	}
-	payload, e := m.words.Resize(cell.payload, span)
-	if e != nil {
-		return e
+	// Physical object extent is checked at the actual borrowed span.
+	if uint64(span)*4+8 > cell.backing.extent {
+		return arena.ErrBounds
 	}
-	cell.payload = payload
+	cell.span = span
 	m.store(a.cell, cell)
 	for i := oldSize; i < newSize; i++ {
 		if i >= cell.capacity || i >= span {
@@ -336,8 +351,7 @@ func (m *IntegerManager) mul2kCore(a *Int, k uint32) error {
 		}
 		m.writeDigit(a.cell, i, 0)
 	}
-	cell.size = newSize
-	m.store(a.cell, cell)
+	m.resizeCell(a.cell, newSize)
 	if wordShift > 0 {
 		j, i := oldSize, oldSize+wordShift
 		for j > 0 {

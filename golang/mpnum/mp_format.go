@@ -247,7 +247,7 @@ func (m *IntegerManager) prepareInteger(a *Int, offset uint32) (uint32, error) {
 		offset = end
 	}
 	c := m.cell(a.cell)
-	return m.natural.prepareNatural(limbView{words: m.words, ref: c.payload, size: c.size}, offset)
+	return m.natural.prepareNatural(limbView{allocator: m.allocator, backing: c.backing, size: c.size}, offset)
 }
 func (m *IntegerManager) FormatInto(a *Int, dst []byte) (int, error) {
 	n, e := m.prepareInteger(a, 0)

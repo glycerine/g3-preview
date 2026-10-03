@@ -44,6 +44,7 @@ func (m *IntegerManager) MachineDivRem(a, b, q, r *Int) error {
 		}
 		if prepared != 0 {
 			q.cell = prepared
+			m.publishCell(prepared)
 		}
 		if e := m.SetInt64(q, qv); e != nil {
 			return e
@@ -186,6 +187,6 @@ func (m *IntegerManager) quotRemCore(a, b, q, r *Int, mode int) error {
 func (m *IntegerManager) divideCells(a, b numericCellRef) error {
 	ca, cb := m.cell(a), m.cell(b)
 	cq, cr := m.cell(m.tmp[0]), m.cell(m.tmp[1])
-	_, e := m.natural.divide(limbView{words: m.words, ref: ca.payload, size: ca.size}, limbView{words: m.words, ref: cb.payload, size: cb.size}, limbView{words: m.words, ref: cq.payload, size: cq.size}, limbView{words: m.words, ref: cr.payload, size: cr.size})
+	_, e := m.natural.divide(limbView{allocator: m.allocator, backing: ca.backing, size: ca.size}, limbView{allocator: m.allocator, backing: cb.backing, size: cb.size}, limbView{allocator: m.allocator, backing: cq.backing, size: cq.span}, limbView{allocator: m.allocator, backing: cr.backing, size: cr.span})
 	return e
 }

@@ -1,5 +1,3 @@
-//go:build port_pending_mpz
-
 // Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
 package mpnum
 
