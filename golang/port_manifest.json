@@ -9377,6 +9377,9 @@
         "TestASTExprArrayActualValueCallbacksAndReroot",
         "TestASTExprArrayDeletionFailureConsumesRefAndFinishesOwnedGraph",
         "TestASTExprArrayEscapedCloseReclaimsPhysicalGraph",
+        "TestASTExprArrayNonrootSetArbitraryIndex",
+        "TestASTExprArrayRetainedRootGetAndSet",
+        "TestASTExprArrayUninitializedAndFreedRetainedSlots",
         "TestASTFamilyDeclarationDomainOverloadUsesActualPlugin",
         "TestASTFuncDeclInfoPointerOverloadKeepsNullMetadata",
         "TestASTMetadataIgnoredFields",
@@ -10219,6 +10222,9 @@
             "TestASTExprArrayActualValueCallbacksAndReroot",
             "TestASTExprArrayDeletionFailureConsumesRefAndFinishesOwnedGraph",
             "TestASTExprArrayEscapedCloseReclaimsPhysicalGraph",
+            "TestASTExprArrayNonrootSetArbitraryIndex",
+            "TestASTExprArrayRetainedRootGetAndSet",
+            "TestASTExprArrayUninitializedAndFreedRetainedSlots",
             "TestASTSourceNineAssertions",
             "TestASTSourcePArrayMillionUpdates"
           ]
@@ -10275,13 +10281,15 @@
         "Concrete FamilyManager charges its real cold header, existing nested SymbolInt32Table and full names-vector capacities with old/new overlap. Borrows symbols; preserves counter/map/name failure prefixes; Close in reverse member order. Additional AST ownership is tracked in the later runtime-core entry. See FAMILY_PORT_STATUS.md.",
         "Standalone SortSize is a freely copied pointer-free scalar with no separate owner/header allocation. Conversion borrows actual RationalService/OwnedRational for source IsUint64 then Uint64 actions without reservation, retained owner or numeral copy; resulting scalar outlives the owner. Caller confines operand mutation/deletion across both calls. Display uses local20 digits and one caller-owned final string. Other AST/plugin algorithms remain open. See SORT_SIZE_PORT_STATUS.md.",
         "First real core uses pointer-free kind/parameter/info/ref records, separately charged cold headers/pages/directories/payloads and concrete source IDs. Source registration retains actual AST and copied numeral graph; deletion and forced teardown preserve source order with charged emergency continuation adapters. Actual expression arrays retain/release live AST nodes. Ref-vector backing charges12-byte capacity/size/initialized header plus scalar entries and old/new peaks; source8-byte bound is checked separately. See AST_CORE_PACKET.md for the exact67-file/52-group frozen scope and open whole-manager obligations.",
-        "Concrete lexical inline16 argument buffers and charged overflow, owned AST/rational parameter scratch, nonowning quantifier binding outputs and owning hyper-resolution composite outputs preserve source ordering and completed failure prefixes. Frozen21-file/31-group integration uses committed AST core; see AST_PROOF_PORT_STATUS.md. Actual registered proof_checker and solver/interpolation consumers remain open."
+        "Concrete lexical inline16 argument buffers and charged overflow, owned AST/rational parameter scratch, nonowning quantifier binding outputs and owning hyper-resolution composite outputs preserve source ordering and completed failure prefixes. Frozen21-file/31-group integration uses committed AST core; see AST_PROOF_PORT_STATUS.md. Actual registered proof_checker and solver/interpolation consumers remain open.",
+        "Expression-array backing has real12-byte capacity/initialized header; copies full retained capacity on growth and only logical elements on copy_values. Source debug-only logical bounds preserve retained pointers and arbitrary-index nonroot SET. See AST_EXPR_ARRAY_RETAINED_STATUS.md."
       ],
       "deviations": [
         "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
         "Private sort_size enum is encoded Go0=infinite/1=finite/2=very-big to match source default with Go zero value. Nonfinite size is canonical0 rather than source unspecified default bits. Size checks finite precondition in every Go profile instead of reading irrelevant/unspecified release fields. No source ENSURE tests are invented; tests exercise implementation SASSERT and real borrowed rational provenance/lifetime.",
         "Source pointer identities become owner/slot/generation tokens; physical owner/page/payload accounting replaces C++ ABI sizes. Invalid/dangling domains use typed guards. Source-undefined construction/deletion allocation exceptions have explicit ownership continuation adapters. Runtime debug_ref_count, conditional debug tags, TRACE/printer-backed diagnostics, trace constructors, remaining manager/plug-in operations and complete proof/checker/solver consumers remain open. Six quantifier updates use direct retained payload copies without intermediate Go slices; update-weight TRACE remains open. No Go generics are used.",
-        "Selected builtin-unreachable, malformed downcast/index and dangling-owner boundaries return typed errors after source-completed prefixes. Hyper substitution outer growth precedes stable Go record allocation, an explicit charged representation adapter. TRACE/printer diagnostics remain open; no generic types or functions are used. Whole-unit audit flags remain false."
+        "Selected builtin-unreachable, malformed downcast/index and dangling-owner boundaries return typed errors after source-completed prefixes. Hyper substitution outer growth precedes stable Go record allocation, an explicit charged representation adapter. TRACE/printer diagnostics remain open; no generic types or functions are used. Whole-unit audit flags remain false.",
+        "Expression-array never-initialized physical slots are guarded using charged initialized high-water metadata; retained freed tokens can be read before actual AST dereference rejects their generation. No new whole-unit completion claim."
       ]
     },
     {
@@ -10358,6 +10366,9 @@
         "TestASTExprArrayActualValueCallbacksAndReroot",
         "TestASTExprArrayDeletionFailureConsumesRefAndFinishesOwnedGraph",
         "TestASTExprArrayEscapedCloseReclaimsPhysicalGraph",
+        "TestASTExprArrayNonrootSetArbitraryIndex",
+        "TestASTExprArrayRetainedRootGetAndSet",
+        "TestASTExprArrayUninitializedAndFreedRetainedSlots",
         "TestASTFamilyDeclarationDomainOverloadUsesActualPlugin",
         "TestASTFuncDeclInfoPointerOverloadKeepsNullMetadata",
         "TestASTMetadataIgnoredFields",
@@ -10946,6 +10957,9 @@
             "TestASTExprArrayActualValueCallbacksAndReroot",
             "TestASTExprArrayDeletionFailureConsumesRefAndFinishesOwnedGraph",
             "TestASTExprArrayEscapedCloseReclaimsPhysicalGraph",
+            "TestASTExprArrayNonrootSetArbitraryIndex",
+            "TestASTExprArrayRetainedRootGetAndSet",
+            "TestASTExprArrayUninitializedAndFreedRetainedSlots",
             "TestASTSourceNineAssertions",
             "TestASTSourcePArrayMillionUpdates"
           ]
@@ -11002,13 +11016,15 @@
         "Concrete FamilyManager charges its real cold header, existing nested SymbolInt32Table and full names-vector capacities with old/new overlap. Borrows symbols; preserves counter/map/name failure prefixes; Close in reverse member order. Additional AST ownership is tracked in the later runtime-core entry. See FAMILY_PORT_STATUS.md.",
         "Standalone SortSize is a freely copied pointer-free scalar with no separate owner/header allocation. Conversion borrows actual RationalService/OwnedRational for source IsUint64 then Uint64 actions without reservation, retained owner or numeral copy; resulting scalar outlives the owner. Caller confines operand mutation/deletion across both calls. Display uses local20 digits and one caller-owned final string. Other AST/plugin algorithms remain open. See SORT_SIZE_PORT_STATUS.md.",
         "First real core uses pointer-free kind/parameter/info/ref records, separately charged cold headers/pages/directories/payloads and concrete source IDs. Source registration retains actual AST and copied numeral graph; deletion and forced teardown preserve source order with charged emergency continuation adapters. Actual expression arrays retain/release live AST nodes. Ref-vector backing charges12-byte capacity/size/initialized header plus scalar entries and old/new peaks; source8-byte bound is checked separately. See AST_CORE_PACKET.md for the exact67-file/52-group frozen scope and open whole-manager obligations.",
-        "Concrete lexical inline16 argument buffers and charged overflow, owned AST/rational parameter scratch, nonowning quantifier binding outputs and owning hyper-resolution composite outputs preserve source ordering and completed failure prefixes. Frozen21-file/31-group integration uses committed AST core; see AST_PROOF_PORT_STATUS.md. Actual registered proof_checker and solver/interpolation consumers remain open."
+        "Concrete lexical inline16 argument buffers and charged overflow, owned AST/rational parameter scratch, nonowning quantifier binding outputs and owning hyper-resolution composite outputs preserve source ordering and completed failure prefixes. Frozen21-file/31-group integration uses committed AST core; see AST_PROOF_PORT_STATUS.md. Actual registered proof_checker and solver/interpolation consumers remain open.",
+        "Expression-array backing has real12-byte capacity/initialized header; copies full retained capacity on growth and only logical elements on copy_values. Source debug-only logical bounds preserve retained pointers and arbitrary-index nonroot SET. See AST_EXPR_ARRAY_RETAINED_STATUS.md."
       ],
       "deviations": [
         "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
         "Private sort_size enum is encoded Go0=infinite/1=finite/2=very-big to match source default with Go zero value. Nonfinite size is canonical0 rather than source unspecified default bits. Size checks finite precondition in every Go profile instead of reading irrelevant/unspecified release fields. No source ENSURE tests are invented; tests exercise implementation SASSERT and real borrowed rational provenance/lifetime.",
         "Source pointer identities become owner/slot/generation tokens; physical owner/page/payload accounting replaces C++ ABI sizes. Invalid/dangling domains use typed guards. Source-undefined construction/deletion allocation exceptions have explicit ownership continuation adapters. Runtime debug_ref_count, conditional debug tags, TRACE/printer-backed diagnostics, trace constructors, remaining manager/plug-in operations and complete proof/checker/solver consumers remain open. Six quantifier updates use direct retained payload copies without intermediate Go slices; update-weight TRACE remains open. No Go generics are used.",
-        "Selected builtin-unreachable, malformed downcast/index and dangling-owner boundaries return typed errors after source-completed prefixes. Hyper substitution outer growth precedes stable Go record allocation, an explicit charged representation adapter. TRACE/printer diagnostics remain open; no generic types or functions are used. Whole-unit audit flags remain false."
+        "Selected builtin-unreachable, malformed downcast/index and dangling-owner boundaries return typed errors after source-completed prefixes. Hyper substitution outer growth precedes stable Go record allocation, an explicit charged representation adapter. TRACE/printer diagnostics remain open; no generic types or functions are used. Whole-unit audit flags remain false.",
+        "Expression-array never-initialized physical slots are guarded using charged initialized high-water metadata; retained freed tokens can be read before actual AST dereference rejects their generation. No new whole-unit completion claim."
       ]
     },
     {
@@ -105822,21 +105838,24 @@
         "util_parray.go"
       ],
       "tests": [
-        "TestPArraySource712Assertions",
-        "TestPArrayIndependentVersionOracle",
-        "TestPArrayRootTrailOwnershipAndWidths",
-        "TestPArrayLifetimeCapacityAndWarmPlateau",
-        "TestPArrayPredictableFailurePrefixes",
-        "TestPArrayInvalidAndDisplay",
-        "TestPArraySourcePushRerootOffByOne",
-        "TestPArrayUnaffectedRerootRoutesBothPolicies",
-        "TestPArraySourcePushRerootDefectPreservedWithRootPolicy",
-        "TestPArrayMaterializationAndRerootFailureGraphs",
-        "TestPArrayStrictThresholdsAndRetainedSlots",
-        "TestPArrayMkFailureClearsReleasedOutput",
+        "TestASTExprArrayNonrootSetArbitraryIndex",
+        "TestASTExprArrayRetainedRootGetAndSet",
+        "TestASTExprArrayUninitializedAndFreedRetainedSlots",
         "TestPArrayDisplayPrefixFaultAndBorrowedAllocationBounds",
+        "TestPArrayFormatHostBoundsWithoutAllocation",
+        "TestPArrayIndependentVersionOracle",
+        "TestPArrayInvalidAndDisplay",
+        "TestPArrayLifetimeCapacityAndWarmPlateau",
+        "TestPArrayMaterializationAndRerootFailureGraphs",
+        "TestPArrayMkFailureClearsReleasedOutput",
         "TestPArrayNilOutputChecks",
-        "TestPArrayFormatHostBoundsWithoutAllocation"
+        "TestPArrayPredictableFailurePrefixes",
+        "TestPArrayRootTrailOwnershipAndWidths",
+        "TestPArraySource712Assertions",
+        "TestPArraySourcePushRerootDefectPreservedWithRootPolicy",
+        "TestPArraySourcePushRerootOffByOne",
+        "TestPArrayStrictThresholdsAndRetainedSlots",
+        "TestPArrayUnaffectedRerootRoutesBothPolicies"
       ],
       "conditionals": [
         {
@@ -106279,12 +106298,14 @@
         }
       ],
       "ownership": [
-        "Borrowed real SmallBytes allocator plus explicit shared-budget lifetime contract. Fixed pointer-free encoded cells and full-capacity value blocks including actual source size_t header charged by allocator; cold manager/scratch charged once separately. RC30, source publication/destruction order and immediate unique graph/physical quota oracles preserved. Close requires liveCells0 and never closes allocator. See PARRAY_PORT_STATUS.md."
+        "Borrowed real SmallBytes allocator plus explicit shared-budget lifetime contract. Fixed pointer-free encoded cells and full-capacity value blocks including actual source size_t header charged by allocator; cold manager/scratch charged once separately. RC30, source publication/destruction order and immediate unique graph/physical quota oracles preserved. Close requires liveCells0 and never closes allocator. See PARRAY_PORT_STATUS.md.",
+        "Expression-array backing has real12-byte capacity/initialized header; copies full retained capacity on growth and only logical elements on copy_values. Source debug-only logical bounds preserve retained pointers and arbitrary-index nonroot SET. See AST_EXPR_ARRAY_RETAINED_STATUS.md."
       ],
       "deviations": [
         "Source invalid null/bounds/reference access has typed guards. Mk clears a destroyed output on failed replacement; PUSH reroot preflights payload growth before unsafe ROOT-to-POP retag. Defined update-counter/From/firstPush/sharedPush/scratch prefixes remain observable.",
         "Source finite PUSH reroot inverse index defect preserved with mathematical-vs-source fixtures in both policies; independent version oracle materializes before only that defective route. Scalar slot/generation replaces pointer display; temporary formatting bytes and overlap charged, actual host-int representability checked.",
-        "Int32 source configuration suppresses every value retain/release callback. No fake AST/value-manager callback service is provided; the source dummy-manager identity accessor is an explicit configuration adaptation, and real callback specializations remain open."
+        "Int32 source configuration suppresses every value retain/release callback. No fake AST/value-manager callback service is provided; the source dummy-manager identity accessor is an explicit configuration adaptation, and real callback specializations remain open.",
+        "Expression-array never-initialized physical slots are guarded using charged initialized high-water metadata; retained freed tokens can be read before actual AST dereference rejects their generation. No new whole-unit completion claim."
       ]
     },
     {

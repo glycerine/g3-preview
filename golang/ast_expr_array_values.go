@@ -7,7 +7,7 @@ import (
 )
 
 func astExprArrayOffset(i uint32) (uint32, error) {
-	n := uint64(pArrayCapacityHeader) + uint64(i)*8
+	n := uint64(astExprArrayHeaderBytes) + uint64(i)*8
 	if n+8 > math.MaxUint32 {
 		return 0, arena.ErrBounds
 	}

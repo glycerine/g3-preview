@@ -936,3 +936,13 @@ WASI compile and source/no-generics gates passed. An independent Boolean oracle
 checks1,116 cases across8 assignments; this does not replace the real checker.
 AST_PROOF_PORT_STATUS.md records scope and adapters. ast.h/.cpp remain partial;
 proof checking, complete solver, diagnostics and interpolation remain required.
+
+## Expression-array retained storage fidelity
+
+Three regressions first failed, then passed after matching source debug-only
+logical bounds for Get/Set/SetFrom. Release preserves retained root pointers and
+nonroot arbitrary-index SET cells. Charged12-byte capacity/initialized headers
+guard never-written storage without discarding source retained tails.
+Full frozen native/debug, six named race/actual JS groups, vet/WASI compile and
+source/no-generics checks passed; see AST_EXPR_ARRAY_RETAINED_STATUS.md.
+Coverage counts are unchanged; the full port remains active.

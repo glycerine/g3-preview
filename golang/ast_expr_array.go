@@ -7,6 +7,10 @@ import (
 	"math"
 )
 
+// Source capacity prefix is8 bytes. Go additionally charges a4-byte initialized
+// high-water mark to distinguish retained pointers from never-written storage.
+const astExprArrayHeaderBytes uint32 = 12
+
 type astExprArrayCell struct {
 	rc, kind, idx uint32
 	elem          astNodeRef
@@ -193,10 +197,10 @@ func (m *astExprArrayManager) capacity(r arena.SmallBytesRef) (uint64, error) {
 	return m.read(r, 0, pArrayCapacityHeader)
 }
 func (m *astExprArrayManager) allocateValues(capacity uint64) (arena.SmallBytesRef, error) {
-	if capacity > (math.MaxUint32-uint64(pArrayCapacityHeader))/8 {
+	if capacity > (math.MaxUint32-uint64(astExprArrayHeaderBytes))/8 {
 		return arena.SmallBytesRef{}, arena.ErrBounds
 	}
-	bytes := uint32(capacity*8) + pArrayCapacityHeader
+	bytes := uint32(capacity*8) + astExprArrayHeaderBytes
 	r, e := m.allocator.Allocate(bytes)
 	if e != nil {
 		return r, e
@@ -204,6 +208,9 @@ func (m *astExprArrayManager) allocateValues(capacity uint64) (arena.SmallBytesR
 	m.liveBlocks++
 	m.valueBytes += uint64(bytes)
 	if e = m.write(r, 0, pArrayCapacityHeader, capacity); e != nil {
+		panic(e)
+	}
+	if e = m.write(r, pArrayCapacityHeader, 4, 0); e != nil {
 		panic(e)
 	}
 	return r, nil
@@ -220,6 +227,13 @@ func (m *astExprArrayManager) freeValues(r arena.SmallBytesRef) {
 	m.valueBytes -= uint64(n)
 }
 func (m *astExprArrayManager) value(r arena.SmallBytesRef, i uint32) (astNodeRef, error) {
+	initialized, e := m.read(r, pArrayCapacityHeader, 4)
+	if e != nil {
+		return astNodeRef{}, e
+	}
+	if uint64(i) >= initialized {
+		return astNodeRef{}, arena.ErrBounds
+	}
 	off, e := astExprArrayOffset(i)
 	if e != nil {
 		return astNodeRef{}, e
@@ -239,7 +253,17 @@ func (m *astExprArrayManager) setValue(r arena.SmallBytesRef, i uint32, v astNod
 	if e = m.write(r, off, 4, uint64(v.slot)); e != nil {
 		return e
 	}
-	return m.write(r, off+4, 4, uint64(v.generation))
+	if e = m.write(r, off+4, 4, uint64(v.generation)); e != nil {
+		return e
+	}
+	initialized, e := m.read(r, pArrayCapacityHeader, 4)
+	if e != nil {
+		return e
+	}
+	if uint64(i) >= initialized {
+		return m.write(r, pArrayCapacityHeader, 4, uint64(i)+1)
+	}
+	return nil
 }
 func (m *astExprArrayManager) expand(r *arena.SmallBytesRef) error {
 	old, e := m.capacity(*r)
@@ -257,13 +281,26 @@ func (m *astExprArrayManager) expand(r *arena.SmallBytesRef) error {
 	if e != nil {
 		return e
 	}
-	for i := uint32(0); uint64(i) < old; i++ {
-		v, e := m.value(*r, i)
+	// Source copies the entire old capacity, including retained/uninitialized
+	// tail bytes. Copy raw encoding without inventing initialized pointers.
+	if !pArrayNull(*r) {
+		for offset := uint32(0); uint64(offset) < old*8; offset++ {
+			b, e := m.read(*r, astExprArrayHeaderBytes+offset, 1)
+			if e != nil {
+				m.freeValues(next)
+				return e
+			}
+			if e = m.write(next, astExprArrayHeaderBytes+offset, 1, b); e != nil {
+				m.freeValues(next)
+				return e
+			}
+		}
+		initialized, e := m.read(*r, pArrayCapacityHeader, 4)
 		if e != nil {
 			m.freeValues(next)
 			return e
 		}
-		if e = m.setValue(next, i, v); e != nil {
+		if e = m.write(next, pArrayCapacityHeader, 4, initialized); e != nil {
 			m.freeValues(next)
 			return e
 		}
@@ -407,13 +444,16 @@ func (m *astExprArrayManager) Get(ref *ASTExprArray, index uint32) (astNodeRef, 
 	if e := m.valid(ref); e != nil {
 		return astNodeRef{}, e
 	}
-	n, e := m.sizeCell(ref.cell)
-	if e != nil {
-		return astNodeRef{}, e
+	if astSourceDebug {
+		n, e := m.sizeCell(ref.cell)
+		if e != nil {
+			return astNodeRef{}, e
+		}
+		if index >= n {
+			return astNodeRef{}, ErrASTDomain
+		}
 	}
-	if index >= n {
-		return astNodeRef{}, arena.ErrBounds
-	}
+	var e error
 	r := ref.cell
 	var trail uint32
 	for {
@@ -445,17 +485,19 @@ func (m *astExprArrayManager) SetFrom(src *ASTExprArray, i uint32, v astNodeRef,
 	if e := m.valid(src); e != nil {
 		return e
 	}
-	n, e := m.Size(*src)
-	if e != nil {
-		return e
-	}
-	if i >= n {
-		return arena.ErrBounds
+	if astSourceDebug {
+		n, e := m.Size(*src)
+		if e != nil {
+			return e
+		}
+		if i >= n {
+			return ErrASTDomain
+		}
 	}
 	if src == out {
 		return m.Set(out, i, v)
 	}
-	if e = m.Copy(src, out); e != nil {
+	if e := m.Copy(src, out); e != nil {
 		return e
 	}
 	return m.Set(out, i, v)
@@ -535,12 +577,14 @@ func (m *astExprArrayManager) Set(ref *ASTExprArray, i uint32, v astNodeRef) err
 	if e := m.valid(ref); e != nil {
 		return e
 	}
-	n, e := m.sizeCell(ref.cell)
-	if e != nil {
-		return e
-	}
-	if i >= n {
-		return arena.ErrBounds
+	if astSourceDebug {
+		n, e := m.sizeCell(ref.cell)
+		if e != nil {
+			return e
+		}
+		if i >= n {
+			return ErrASTDomain
+		}
 	}
 	c, e := m.cell(ref.cell)
 	if e != nil {
@@ -551,7 +595,7 @@ func (m *astExprArrayManager) Set(ref *ASTExprArray, i uint32, v astNodeRef) err
 			return m.rootSet(c.link, i, v)
 		}
 		if m.preserve {
-			if ref.updates > n {
+			if ref.updates > c.idx {
 				if e = m.Unshare(ref); e != nil {
 					return e
 				}
