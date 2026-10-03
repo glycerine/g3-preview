@@ -50926,7 +50926,15 @@
         "TestSATSolverUintSetSourceCharCapacityOverflowMath",
         "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
         "TestSATSolverUintSetSourceOrderAndOperations",
-        "TestSATSolverUintSetValueIteratorRetainedLifetime"
+        "TestSATSolverUintSetValueIteratorRetainedLifetime",
+        "TestSATSolverModelConverterImplicitCloneExactCapacityAndLifetime",
+        "TestSATSolverModelConverterImplicitCopyEmptyRetainedCapacity",
+        "TestSATSolverModelConverterImplicitAssignmentFaultPrefixes",
+        "TestSATSolverModelConverterImplicitCloneFailureUnwindAndSelfAssign",
+        "TestSATSolverModelConverterImplicitInterruptedCopyAndRestart",
+        "TestSATSolverModelConverterImplicitCopyUninitializedCapacityGuard",
+        "TestSATSolverModelConverterImplicitCloneSharedBorrowedBudget",
+        "TestSATSolverModelConverterImplicitAssignmentAscendingDestroyAndCopy"
       ],
       "assertions": [
         {
@@ -51267,13 +51275,29 @@
             "TestSATSolverModelConverterSelfCopyRelocationBoundary",
             "TestSATSolverModelConverterActualCollectVars"
           ]
+        },
+        {
+          "name": "model_converter implicit copy constructor/assignment",
+          "status": "ported",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterImplicitCloneExactCapacityAndLifetime",
+            "TestSATSolverModelConverterImplicitCopyEmptyRetainedCapacity",
+            "TestSATSolverModelConverterImplicitAssignmentFaultPrefixes",
+            "TestSATSolverModelConverterImplicitCloneFailureUnwindAndSelfAssign",
+            "TestSATSolverModelConverterImplicitInterruptedCopyAndRestart",
+            "TestSATSolverModelConverterImplicitCopyUninitializedCapacityGuard",
+            "TestSATSolverModelConverterImplicitCloneSharedBorrowedBudget",
+            "TestSATSolverModelConverterImplicitAssignmentAscendingDestroyAndCopy"
+          ]
         }
       ],
       "ownership": [
-        "Concrete scalar entry/list records and fully charged cold owners, directories, Words payload/free-page graph. Nontrivial outer growth deep-copies ascending and destroys each old nested vector immediately, preserving actual source capacity/publication order. Exact-capacity nested copies and finite captured-end self-copy are tested. Real CollectVars inserts into charged sat::uint_set. See SAT_SOLVER_PACKET.md."
+        "Concrete scalar entry/list records and fully charged cold owners, directories, Words payload/free-page graph. Nontrivial outer growth deep-copies ascending and destroys each old nested vector immediately, preserving actual source capacity/publication order. Exact-capacity nested copies and finite captured-end self-copy are tested. Real CollectVars inserts into charged sat::uint_set. See SAT_SOLVER_PACKET.md.",
+        "Model class-copy owns exact-capacity outer and deep nested literal vectors. Assignment destroys destination ascending before copy, publishes source size/capacity before constructors and retains completed prefixes; safe Go cleanup/restart tracks actual constructed roots. See SAT_MODEL_COPY_PORT_STATUS.md."
       ],
       "deviations": [
-        "Pointers become scalar owner/slot/generation identities. Charged pending old-directory/cursor permits explicit Go continuation after source-undefined interrupted construction; unconstructed/dangling accesses fail at their actual boundary. Source TRACE diagnostics, implicit class-level copy constructor/assignment, downstream actual solver integration remain open. Display uses actual NumericTextStream with caller-owned output. No generics; whole-unit audit flags remain false.",
+        "Pointers become scalar owner/slot/generation identities. Charged pending old-directory/cursor permits explicit Go continuation after source-undefined interrupted construction; unconstructed/dangling accesses fail at their actual boundary. Source TRACE diagnostics and downstream actual solver integration remain open. Explicit Clone/Assign now preserve actual implicit class-copy actions; see SAT_MODEL_COPY_PORT_STATUS.md. Display uses actual NumericTextStream with caller-owned output. No generics; whole-unit audit flags remain false.",
         "Literal storage guards physical capacity and stale tokens, but does not track construction of never-written spare slots. Source-defined initialized retained-slot behavior is verified; validation of every C++ initialized-lifetime domain is not claimed."
       ]
     },
@@ -51312,7 +51336,15 @@
         "TestSATSolverUintSetSourceCharCapacityOverflowMath",
         "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
         "TestSATSolverUintSetSourceOrderAndOperations",
-        "TestSATSolverUintSetValueIteratorRetainedLifetime"
+        "TestSATSolverUintSetValueIteratorRetainedLifetime",
+        "TestSATSolverModelConverterImplicitCloneExactCapacityAndLifetime",
+        "TestSATSolverModelConverterImplicitCopyEmptyRetainedCapacity",
+        "TestSATSolverModelConverterImplicitAssignmentFaultPrefixes",
+        "TestSATSolverModelConverterImplicitCloneFailureUnwindAndSelfAssign",
+        "TestSATSolverModelConverterImplicitInterruptedCopyAndRestart",
+        "TestSATSolverModelConverterImplicitCopyUninitializedCapacityGuard",
+        "TestSATSolverModelConverterImplicitCloneSharedBorrowedBudget",
+        "TestSATSolverModelConverterImplicitAssignmentAscendingDestroyAndCopy"
       ],
       "conditionals": [
         {
@@ -51596,14 +51628,26 @@
         },
         {
           "name": "model_converter implicit copy constructor/assignment",
-          "status": "unported"
+          "status": "ported",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterImplicitCloneExactCapacityAndLifetime",
+            "TestSATSolverModelConverterImplicitCopyEmptyRetainedCapacity",
+            "TestSATSolverModelConverterImplicitAssignmentFaultPrefixes",
+            "TestSATSolverModelConverterImplicitCloneFailureUnwindAndSelfAssign",
+            "TestSATSolverModelConverterImplicitInterruptedCopyAndRestart",
+            "TestSATSolverModelConverterImplicitCopyUninitializedCapacityGuard",
+            "TestSATSolverModelConverterImplicitCloneSharedBorrowedBudget",
+            "TestSATSolverModelConverterImplicitAssignmentAscendingDestroyAndCopy"
+          ]
         }
       ],
       "ownership": [
-        "Concrete scalar entry/list records and fully charged cold owners, directories, Words payload/free-page graph. Nontrivial outer growth deep-copies ascending and destroys each old nested vector immediately, preserving actual source capacity/publication order. Exact-capacity nested copies and finite captured-end self-copy are tested. Real CollectVars inserts into charged sat::uint_set. See SAT_SOLVER_PACKET.md."
+        "Concrete scalar entry/list records and fully charged cold owners, directories, Words payload/free-page graph. Nontrivial outer growth deep-copies ascending and destroys each old nested vector immediately, preserving actual source capacity/publication order. Exact-capacity nested copies and finite captured-end self-copy are tested. Real CollectVars inserts into charged sat::uint_set. See SAT_SOLVER_PACKET.md.",
+        "Model class-copy owns exact-capacity outer and deep nested literal vectors. Assignment destroys destination ascending before copy, publishes source size/capacity before constructors and retains completed prefixes; safe Go cleanup/restart tracks actual constructed roots. See SAT_MODEL_COPY_PORT_STATUS.md."
       ],
       "deviations": [
-        "Pointers become scalar owner/slot/generation identities. Charged pending old-directory/cursor permits explicit Go continuation after source-undefined interrupted construction; unconstructed/dangling accesses fail at their actual boundary. Source TRACE diagnostics, implicit class-level copy constructor/assignment, downstream actual solver integration remain open. Display uses actual NumericTextStream with caller-owned output. No generics; whole-unit audit flags remain false.",
+        "Pointers become scalar owner/slot/generation identities. Charged pending old-directory/cursor permits explicit Go continuation after source-undefined interrupted construction; unconstructed/dangling accesses fail at their actual boundary. Source TRACE diagnostics and downstream actual solver integration remain open. Explicit Clone/Assign now preserve actual implicit class-copy actions; see SAT_MODEL_COPY_PORT_STATUS.md. Display uses actual NumericTextStream with caller-owned output. No generics; whole-unit audit flags remain false.",
         "Literal storage guards physical capacity and stale tokens, but does not track construction of never-written spare slots. Source-defined initialized retained-slot behavior is verified; validation of every C++ initialized-lifetime domain is not claimed."
       ]
     },
@@ -115146,7 +115190,15 @@
         "TestASTSparseMarkLastTombstoneAndCurrentHashReads",
         "TestASTSparseMarkPendingResetCanFinishAtFinalEpoch",
         "TestASTSparseMarkResetAndFinalizeFreeBeforeReserve",
-        "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
+        "TestASTSparseSharedExpressionDomainsAndASTWideVisited",
+        "TestSATSolverModelConverterImplicitCloneExactCapacityAndLifetime",
+        "TestSATSolverModelConverterImplicitCopyEmptyRetainedCapacity",
+        "TestSATSolverModelConverterImplicitAssignmentFaultPrefixes",
+        "TestSATSolverModelConverterImplicitCloneFailureUnwindAndSelfAssign",
+        "TestSATSolverModelConverterImplicitInterruptedCopyAndRestart",
+        "TestSATSolverModelConverterImplicitCopyUninitializedCapacityGuard",
+        "TestSATSolverModelConverterImplicitCloneSharedBorrowedBudget",
+        "TestSATSolverModelConverterImplicitAssignmentAscendingDestroyAndCopy"
       ],
       "conditionals": [
         {
@@ -115380,6 +115432,21 @@
             "TestASTSharedOccurrencesIteratorActualBackingLifetime",
             "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
           ]
+        },
+        {
+          "name": "Actual SAT model entry-vector implicit exact-capacity copy and destroy-before-copy assignment",
+          "status": "ported",
+          "go_target": "sat_solver_model_converter.go",
+          "tests": [
+            "TestSATSolverModelConverterImplicitCloneExactCapacityAndLifetime",
+            "TestSATSolverModelConverterImplicitCopyEmptyRetainedCapacity",
+            "TestSATSolverModelConverterImplicitAssignmentFaultPrefixes",
+            "TestSATSolverModelConverterImplicitCloneFailureUnwindAndSelfAssign",
+            "TestSATSolverModelConverterImplicitInterruptedCopyAndRestart",
+            "TestSATSolverModelConverterImplicitCopyUninitializedCapacityGuard",
+            "TestSATSolverModelConverterImplicitCloneSharedBorrowedBudget",
+            "TestSATSolverModelConverterImplicitAssignmentAscendingDestroyAndCopy"
+          ]
         }
       ],
       "ownership": [
@@ -115387,7 +115454,8 @@
         "SAT vector headers/backing/lifetime metadata use actual host widths, real 2-to-(3n+1)/2 growth and old/new peaks. Trivial reallocation copies retained capacity, watched erase/destroy lifetime is distinguished. Value iterators do not allocate cold wrappers. Source impossible constructors/equality overloads are not fabricated; aliases and raw pointer adapters are in SAT_STORAGE_PORT_STATUS.md.",
         "Selected concrete nested literal payload and nontrivial model entry copy adaptations preserve source logical capacities, full retained trivial backing, exact-capacity logical copy, and ascending clone/destruct prefixes. Local SAT char membership storage preserves source uint32 growth arithmetic. Physical pooled storage and all cold metadata remain charged.",
         "Actual four-uint64 watch payloads preserve val1/val2 plus widened scalar clause provenance; separate charged lifetime bitmap tracks erased live tails and destroyed holes. Common cold owner/directories and all arena descriptor/page/free storage and old/new overlaps charged. Exact nested copies, destroy-before-assignment, backing-transferring move/swap and real display/erase routes; see SAT_SOLVER_WATCH_STORE_PORT_STATUS.md.",
-        "Concrete AST expr identity-table and shared-occurrence owners preserve source bucket-order callbacks, borrowing, actual node shared flags and charged backing/header peaks. See AST_SPARSE_SHARED_PORT_STATUS.md."
+        "Concrete AST expr identity-table and shared-occurrence owners preserve source bucket-order callbacks, borrowing, actual node shared flags and charged backing/header peaks. See AST_SPARSE_SHARED_PORT_STATUS.md.",
+        "Model class-copy owns exact-capacity outer and deep nested literal vectors. Assignment destroys destination ascending before copy, publishes source size/capacity before constructors and retains completed prefixes; safe Go cleanup/restart tracks actual constructed roots. See SAT_MODEL_COPY_PORT_STATUS.md."
       ],
       "deviations": [
         "Concrete solver-specific storage, not complete generic vector template surface. Owning model Clone/Assign, other specializations and source-undefined continuation behavior remain explicitly separate.",

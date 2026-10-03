@@ -308,7 +308,7 @@ Model-converter mapping:
 | Source | Implemented concrete mapping |
 | --- | --- |
 | model_converter.cpp:25–34 | newSATModelConverter, Close, Reset: all actual cold headers, scalar directories, nested pages, ledger and retained-failure roots charged; Reset frees source outer capacity. |
-| model_converter.h:43–55 | Source packed var31/kind1, explicit deep entry copy constructor: scalar varKind + nested list token; source unsigned variable truncation preserved and Mk debug assertions occur AFTER entry publication. Implicit class-level owning copy/assignment remains separately OPEN below. |
+| model_converter.h:43–55 | Source packed var31/kind1, explicit deep entry copy constructor: scalar varKind + nested list token; source unsigned variable truncation preserved and Mk debug assertions occur AFTER entry publication. Implicit class-level owning copy/assignment was subsequently integrated; see SAT_MODEL_COPY_PORT_STATUS.md. |
 | cpp:36–91 | Apply exact reverse traversal, blocked flip, other undefined assignment, separator handling, eliminated-var/debug postcondition checks; no invented full assignment. |
 | 93–123 | CheckModel exact separator-based clause validation and source unterminated prefix behavior. |
 | 125–131 | Mk and checked EntryAt/KindAndVar adapter; source vector capacities and placement/publication. |
@@ -326,7 +326,7 @@ The13 groups test reverse patching/blocked flips/other-variable assignments, exa
 
 Frozen prerequisite snapshot: `.cache/release/sat-solver-model-final` = HEAD92c5d0a + ONLY these four Go files. Hashes are `.cache/sat-solver-model-frozen-hashes.txt`,13 actual named tests in `.cache/sat-solver-model-names.json`. Full native/checked-debug, named race/actual JS, vet/WASI and source/no-generics gates are running; terminal evidence will be appended without changing frozen code.
 
-Remaining required model/solver surface: implicit model_converter class-level copy constructor and assignment need explicit owning Clone/Assign exact-outer-capacity/destroy-before-copy tests, not shallow Go values; common owning WATCH store (four uint64 payload words/full scalar locator plus charged initialized-slot bitmap) remains separate from this literal store; all actual solver methods/default inprocessing/search/conflict/scopes remain unimplemented. Parent owns real global memory/runtime accounting and generated module fallback integration. Existing satUintSet/satLiteralSet use uncharged host make/append and cannot simply become retained fully-budgeted solver storage. New satSolverUintSet supplies the actual charged SAT namespace uint-set dependency; a literal-set facade over this concrete owner remains follow-on source scope. No fake memory getter, renderer, extension, resource collector or solver is introduced.
+Current model/solver surface: explicit owning Clone/Assign now implement the implicit model class-copy actions, and the concrete common WATCH store is committed (see SAT_MODEL_COPY_PORT_STATUS.md and SAT_SOLVER_WATCH_STORE_PORT_STATUS.md); all actual solver methods/default inprocessing/search/conflict/scopes remain unimplemented. Parent owns real global memory/runtime accounting and generated module fallback integration. Existing satUintSet/satLiteralSet use uncharged host make/append and cannot simply become retained fully-budgeted solver storage. New satSolverUintSet supplies the actual charged SAT namespace uint-set dependency; a literal-set facade over this concrete owner remains follow-on source scope. No fake memory getter, renderer, extension, resource collector or solver is introduced.
 
 ## Required source CollectVars correction and six-file freeze
 
@@ -423,3 +423,23 @@ further selected ordinary-method mismatch. Literal storage validates physical
 capacity/tokens but does not track never-written spare-slot construction; its
 verified retained paths use initialized source slots. It does not claim all
 C++ initialized-lifetime domains are checked.
+
+
+## Subsequent implicit model ownership integration
+
+The actual implicit class copy constructor and assignment now have concrete
+Clone/Assign operations. Outer copy uses exact source capacity and deep nested
+copies; assignment destroys destination entries ascending before allocating,
+then publishes the full header before ascending constructors. Interrupted
+source growth guards undefined capacity reads at that point; partial exact
+copies preserve constructed prefixes and explicit Go cleanup/restart. There is
+no invented implicit move for the source class with its user-declared destructor.
+
+Eight tests-first ownership groups join the original twenty-four. The immutable
+32-group packet passed full native/debug, named race and actual JS, vet, WASI
+compilation and source/no-generics checks; coordinator integration also passed
+fresh full suites against the committed sparse/shared packet. Exact hashes,
+source paths, assertions and failure-accounting limits are recorded in
+SAT_MODEL_COPY_PORT_STATUS.md. Historical open-copy notes and 24-group evidence
+above describe their earlier snapshots and are superseded by this packet.
+Full actual solver algorithms and runtime integration remain open.

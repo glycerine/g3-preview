@@ -33,7 +33,7 @@ type satModelConverter struct {
 	entries, pending                                    []satModelConversionEntry
 	origin, epoch, ownerBytes, entryBytes, pendingBytes uint64
 	copyCursor, sourceCapacity, pendingCapacity         uint32
-	closed                                              bool
+	copying, closed                                     bool
 }
 
 func newSATModelConverter(c arena.VectorConfig) (*satModelConverter, error) {
@@ -76,7 +76,7 @@ func (m *satModelConverter) entry(r satModelConversionEntryRef) (*satModelConver
 	if r.epoch != m.epoch || uint64(r.slot) >= uint64(len(m.entries)) {
 		return nil, arena.ErrInvalidSlot
 	}
-	if m.pending != nil && r.slot >= m.copyCursor {
+	if (m.pending != nil || m.copying) && r.slot >= m.copyCursor {
 		return nil, ErrSATIncompleteGrowth
 	}
 	return &m.entries[r.slot], nil
@@ -146,6 +146,9 @@ func (m *satModelConverter) finishGrowth() error {
 func (m *satModelConverter) grow() error {
 	if e := m.open(); e != nil {
 		return e
+	}
+	if m.copying {
+		return ErrSATIncompleteGrowth
 	}
 	if e := m.finishGrowth(); e != nil {
 		return e
@@ -677,7 +680,7 @@ func (m *satModelConverter) DisplayInto(out *NumericTextStream) error {
 }
 func (m *satModelConverter) clearStorage() error {
 	for i := range m.entries {
-		if m.pending != nil && uint32(i) >= m.copyCursor {
+		if (m.pending != nil || m.copying) && uint32(i) >= m.copyCursor {
 			break
 		}
 		if e := m.store.Free(m.entries[i].literals); e != nil {
@@ -698,6 +701,7 @@ func (m *satModelConverter) clearStorage() error {
 	m.pendingBytes = 0
 	m.sourceCapacity = 0
 	m.pendingCapacity = 0
+	m.copying = false
 	m.copyCursor = 0
 	return nil
 }
@@ -755,4 +759,93 @@ func (m *satModelConverter) CollectVars(dst *satSolverUintSet) error {
 		}
 	}
 	return nil
+}
+
+// implicitCopyCore is source vector<entry>::copy_core, distinct from Copy's
+// captured-end append. SIZE/CAPACITY publish before ascending constructors.
+// copying/copyCursor tracks the actually constructed prefix for safe Go
+// cleanup after source-unsafe interrupted construction, never atomic rollback.
+func (m *satModelConverter) implicitCopyCore(src *satModelConverter) error {
+	// Source nontrivial expansion publishes SIZE but does not write CAPACITY
+	// until construction ends. Reading that unfinished header is undefined.
+	if src.pending != nil {
+		return ErrSATIncompleteGrowth
+	}
+	capacity := src.sourceCapacity
+	if capacity == 0 {
+		return nil
+	}
+	stride := uint64(reflect.TypeOf(satModelConversionEntry{}).Size())
+	if uint64(capacity) > uint64(^uint(0)>>1)/stride {
+		return arena.ErrBounds
+	}
+	bytes := uint64(capacity) * stride
+	if e := m.budget.Reserve(bytes); e != nil {
+		return e
+	}
+	m.entries = make([]satModelConversionEntry, len(src.entries), int(capacity))
+	m.entryBytes = bytes
+	m.sourceCapacity = capacity
+	m.copying = true
+	m.copyCursor = 0
+	for i := uint32(0); i < uint32(len(src.entries)); i++ {
+		r, e := src.EntryAt(i)
+		if e != nil {
+			return e
+		}
+		x, e := src.entry(r)
+		if e != nil {
+			return e
+		}
+		m.entries[i].varKind = x.varKind
+		list, e := m.store.CopyList(src.store, x.literals)
+		if e != nil {
+			return e
+		}
+		m.entries[i].literals = list
+		m.copyCursor++
+	}
+	m.copying = false
+	m.copyCursor = 0
+	return nil
+}
+
+// Clone represents the source implicit class copy constructor. A user-declared
+// destructor suppresses implicit move, so source rvalue construction also copies.
+func (m *satModelConverter) Clone(c arena.VectorConfig) (*satModelConverter, error) {
+	if e := m.open(); e != nil {
+		return nil, e
+	}
+	out, e := newSATModelConverter(c)
+	if e != nil {
+		return nil, e
+	}
+	if e = out.implicitCopyCore(m); e != nil {
+		_ = out.Close()
+		return nil, e
+	}
+	return out, nil
+}
+
+// Assign is the implicit class copy assignment: destroy destination, then
+// source exact-capacity copy, retaining actual completed prefixes on failure.
+// Assigning an rvalue follows this same source copy route, not an invented move.
+func (m *satModelConverter) Assign(src *satModelConverter) error {
+	if e := m.open(); e != nil {
+		return e
+	}
+	if e := src.open(); e != nil {
+		return e
+	}
+	if src == m {
+		return nil
+	}
+	if m.epoch == ^uint64(0) {
+		return arena.ErrSlotLimit
+	}
+	if e := m.clearStorage(); e != nil {
+		return e
+	}
+	m.epoch++
+	return m.implicitCopyCore(src)
 }

@@ -1053,3 +1053,21 @@ AST_SPARSE_SHARED_PORT_STATUS.md for exact source mappings, hashes and evidence.
 Shared-occurrence source units and obj_hashtable.h become partial; ledger counts
 are33ported/87partial/1982unported. Real SMT2 display, general table templates,
 implicit owning copies, full solver, proof checker and interpolation remain open.
+
+
+## Real model converter implicit copies
+
+Explicit owning Clone/Assign now preserve the source class's actual implicit
+copy constructor and assignment: exact outer capacity, ascending deep nested
+copies and destination destruction before allocation. Source size/capacity
+publish before constructors; incomplete prefixes retain their real physical
+ownership and have safe Go cleanup/restart. No implicit move is invented.
+Eight missing-API-first ownership groups cover copy independence, exact spare
+capacity, constructor/assignment refusals, actual destruction order and late
+unconstructed/header guards.
+
+The frozen32-group packet passed native/debug, race, actual JS, vet, WASI
+compilation and source/no-generics gates; full integration suites also passed
+against HEAD81f1059. See SAT_MODEL_COPY_PORT_STATUS.md. Source inventory remains
+33ported/87partial/1982unported; the full solver and runtime dependencies remain
+open under the original complete-port goal.
