@@ -635,3 +635,46 @@ Validation:
 This closes the concrete arena cold-header accounting gap. It does not complete
 all domain-owned roots/callback resources, the real rational constructed-pool
 fixture, source raw ABI fidelity or the whole memory/solver gate.
+
+# Words cross-budget ownership transfer prerequisite
+
+Owned files: Words method/helper, `words_budget_swap_test.go`, this status append.
+`Words.SwapBudgets(other *Words) error` exchanges the two complete owner graphs'
+accounting destinations without moving records, changing refs/free lists or
+running domain cleanup. This is a Go typed-owner budget adaptation needed by
+UIntSetMap cross-budget source swap, not a new source allocator algorithm.
+
+Closed owners reject before actions. Equal Budget pointers (includingnil and
+self-swap) return without reservations. For distinct budgets, both graph sums are
+checked for uint64 overflow before any Reserve; overflow is ErrBounds. Each sum
+includes Words.OwnerBytes, payload, block metadata, payload directory and private
+descriptor OwnerBytes/record bytes/generation metadata/directory. The borrowed
+Budget object and caller/domain roots are not duplicated in the graph charge.
+
+The original outgoing graph stays charged while its destination reserves the
+entire incoming graph. First failure changes nothing. Second failure refunds the
+first prepared Used charge and leaves both owner/config/payload states unchanged.
+A successful Reserve attempt still consumes its ordinary FailAfter prefix even
+when later refunded; no Budget transaction bypass or injector restoration exists.
+After both reservations succeed, original graph charges are released and both
+Words.config.Descriptors.Budget and descriptorSlab.config.Budget are rebound.
+The caller must serialize all affected owners/budgets; an outer table transaction
+can prepare its own distinct charges and refund them if this method fails.
+
+Tests-first missing SwapBudgets RED then GREEN. A further explicit overflow
+regression produced RED ErrInjectedFailure instead of ErrBounds; checked graph
+addition now yields GREEN before reservations. Five tests cover first/second
+failures, external baseline charges, nested owner totals, original values/ref
+identity, growth routed to the new budget, Reset/Close after transfer, nil and
+same-budget behavior, closed rejection, destination old+incoming peak limits,
+overflow on either graph and exactly0 warmed Go allocations over paired swaps.
+
+- Native and g3checked full arena tests, go vet: PASS.
+- js/wasm and wasip1/wasm package builds: PASS.
+- Actual Nodejs execution printed all5 TestWordsSwapBudgets names and both
+  first/second failure subcases, each PASS. Compiler environment is the normal
+  workspace environment; only Node runtime is minimal, with TMPDIR under .cache.
+
+No map/table implementation, manifest or other agent files were modified. This
+prerequisite alone does not complete UIntSetMap's table/epoch transaction or the
+full memory/source ownership gate.

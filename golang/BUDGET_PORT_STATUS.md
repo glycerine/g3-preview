@@ -22,3 +22,20 @@ need their own complete budgets/lifetimes; this packet does not close P1 or the
 solver memory gate. The byte counts model predictable logical storage ownership,
 not Go allocator rounding, retained closed wrapper objects, GC metadata or host
 runtime OOM. The source ownership adaptations remain in each component status.
+
+## Word owner accounting transfer
+
+Words.SwapBudgets transfers complete word/descriptor graphs between accounting
+destinations while preserving storage, scalar refs and source ownership actions.
+Checked aggregate sums precede reservations; both destinations charge incoming
+storage while outgoing storage still exists. Failure refunds prepared Used bytes
+and changes no owner pointers. Successful reservation attempts still consume the
+ordinary FailAfter prefix. Success rebinds both owner and descriptor budgets and
+refunds old graph charges. Shared/nil budgets and closed owners are tested.
+
+This hook lets concrete key-owning maps swap table/pool ownership without
+inventing key copies or destructors. Map table charges are prepared separately
+before this atomic hook. Its prospective commit passes full native tests,
+checked races and vet; all five transfer tests execute under js/wasm, and WASI
+compilation passes. Experimental dependent packets are excluded from that
+isolated commit tree until they independently reach GREEN.

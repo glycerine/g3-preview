@@ -337,3 +337,55 @@ func (v *Words) Stats() VectorStats {
 	}
 	return s
 }
+
+// SwapBudgets exchanges the accounting destinations of two complete Words owner
+// graphs without moving storage or changing identities. Each destination reserves
+// incoming owned bytes while its outgoing graph is still charged. A failure
+// refunds prepared Used charges and leaves owners unchanged; successful Reserve
+// attempts still consume FailAfter prefixes under the ordinary Budget policy.
+// Both Words owners and all affected budgets require external synchronization.
+func (v *Words) SwapBudgets(other *Words) error {
+	if v != nil && v.closed || other != nil && other.closed {
+		return ErrClosed
+	}
+	if v == nil || other == nil {
+		return ErrConfig
+	}
+	a, b := v.config.Descriptors.Budget, other.config.Descriptors.Budget
+	if a == b {
+		return nil
+	}
+	own, e := v.ownedBudgetBytes()
+	if e != nil {
+		return e
+	}
+	opposite, e := other.ownedBudgetBytes()
+	if e != nil {
+		return e
+	}
+	if e := b.Reserve(own); e != nil {
+		return e
+	}
+	if e := a.Reserve(opposite); e != nil {
+		b.Release(own)
+		return e
+	}
+	a.Release(own)
+	b.Release(opposite)
+	v.config.Descriptors.Budget = b
+	v.descriptors.config.Budget = b
+	other.config.Descriptors.Budget = a
+	other.descriptors.config.Budget = a
+	return nil
+}
+func (v *Words) ownedBudgetBytes() (uint64, error) {
+	s := v.Stats()
+	total := uint64(0)
+	for _, bytes := range [...]uint64{s.OwnerBytes, s.PayloadBytes, s.BlockMetadataBytes, s.DirectoryBytes, s.Descriptors.OwnerBytes, s.Descriptors.RecordBytes, s.Descriptors.MetadataBytes, s.Descriptors.DirectoryBytes} {
+		if bytes > ^uint64(0)-total {
+			return 0, ErrBounds
+		}
+		total += bytes
+	}
+	return total, nil
+}
