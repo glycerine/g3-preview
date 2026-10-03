@@ -86,7 +86,7 @@ func (m *IntegerManager) Rem(a, b, c *Int) error {
 
 // Div implements the source Euclidean quotient adjustment for a negative
 // numerator. The source rereads b after output publication; when c==b this
-// preserves a known source alias defect (documented in PORT_STATUS.md).
+// preserves a known source alias defect (documented in ../PORT_PROGRESS.md#audit-mpnum-port-status-md).
 func (m *IntegerManager) Div(a, b, c *Int) error {
 	for _, n := range []*Int{a, b, c} {
 		if e := m.check(n); e != nil {

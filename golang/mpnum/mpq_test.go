@@ -1,6 +1,6 @@
 // Copyright (c) 2006 Microsoft Corporation
 // Source assertions: src/test/mpq.cpp tst0, bug1, bug2. Remaining source
-// parser/rounding/display tests are explicitly deferred in PORT_STATUS.md.
+// coverage and lifecycle obligations: ../PORT_PROGRESS.md#audit-mpnum-port-status-md.
 package mpnum
 
 import (

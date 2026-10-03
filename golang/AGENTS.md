@@ -25,13 +25,19 @@ subtree. Port source assertions to Go tests before translating the corresponding
 implementation, and retain independent bounded correctness checks. After each
 coherent green chunk, make a git commit with a pithy one-to-three-sentence
 message. Git metadata writes necessary for those requested commits are allowed.
-The user also requests frequent checkpoints: do not leave substantial completed
-or tests-first work uncommitted while waiting for an entire source family.
-Commit smaller coherent green changes promptly. When preserving unfinished
-work, label the commit as a checkpoint and document known RED tests and gaps;
-do not promote source completion. Tests referencing genuinely missing APIs may
-use explicit pending tags temporarily, with their commands and required removal
-documented in PORT_CHECKPOINTS.md.
+The user requests frequent small commits, but the latest instruction forbids
+leaving the suite RED across implementation commits. Keep tests-first RED in
+the working tree until the corresponding implementation and full native and
+checked/debug suites are GREEN. Do not hide failing tests with tags/skips or
+weaken their assertions. Existing genuinely missing-API pending campaigns
+remain explicit completion obligations, with commands and removal tracked in
+PORT_PROGRESS.md.
+
+Maintain ALL narrative port status, TODO/FINISHED lists, source maps, failure
+evidence and handoff in PORT_PROGRESS.md. Do not create separate PACKET, STATUS,
+CHECKPOINT or progress documents. Keep machine-readable inventories synchronized
+with justified evidence. A documentation-only audited consolidation commit is
+explicitly required before resuming the paused implementation work.
 
 ## Current verification scope
 
@@ -41,3 +47,12 @@ at this stage. Do not include them as gates for current port chunks. Use native
 tests, checked/debug tests, appropriate static checks, and the source/evidence
 and no-generics audit. Preserve the plan's portable architecture; deferred
 platform and concurrency verification remains a later completion obligation.
+
+## Green commit requirement
+
+The user's latest instruction supersedes the earlier permission for RED
+checkpoints: do not leave the test suite failing across commits. Keep tests-first
+RED observations in the working tree, implement the corresponding fix, and
+require passing full native and checked/debug suites before committing. Preserve
+meaningful assertions; do not hide existing failures with tags or skips. Continue
+committing small coherent changes frequently once these checks are green.
