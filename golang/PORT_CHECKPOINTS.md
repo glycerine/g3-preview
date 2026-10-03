@@ -55,3 +55,14 @@ RED preceded translation. Full native/debug suites, vet and source/evidence/
 no-generics audit pass in the exact four-file overlay on 5b414f9; logs are
 `.cache/pivot-parent-{native,debug,vet,source}.log`. The factors closing guard
 and genuine allocator-backed cleanup-refusal coverage remain separate work.
+
+
+`mpnum/mpz_backend_constructor_test.go` now also uses `port_pending_mpz` while
+mandatory physical-cell wiring is in progress. Before tagging, its isolated
+API-absence RED was observed on 5b414f9 with only this test overlay (log
+`.cache/mpz-backend-constructor-isolated-red.log`). It specifies the six actual
+source cell objects, constructor swap/order, initialized physical words and
+default Runtime ownership. Remove this test's tag as soon as those constructor
+APIs land; the larger transitive owner-integration campaign remains separately
+unfinished. The pending tag preserves this work without including unrelated
+allocator implementation drafts in a green checkpoint.
