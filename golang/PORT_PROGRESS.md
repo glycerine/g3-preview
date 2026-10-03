@@ -1137,3 +1137,16 @@ source/no-generics gates. MPZZP_PORT_STATUS.md records full selected methods,
 hashes and immediate allocation-prefix root audits. mpzzp.h becomes partial;
 ledger33ported/89partial/1980unported. Dense polynomial/GCD/Sturm/algebraic and
 actual arithmetic plugin algorithms remain within the full active goal.
+
+
+## Borrowed parameter string spelling
+
+Actual interned set_str spelling can now be retained as a canonical scalar Symbol
+without a second Words allocation. Copy preserves identity; replacement and deletion
+release only owned text. Four tests-first groups cover copy, empty spelling, lifetime
+guards, zero warm allocations and twelve immediate COW failure prefixes. The
+registry remains under implementation; see GPARAMS_PORT_STATUS.md.
+
+Full native/debug integration on HEAD1ccea0b, exact22 named race/actual JS
+results, vet, WASI compilation and source/no-generics audit passed. Ledger
+counts remain33ported/89partial/1980unported.

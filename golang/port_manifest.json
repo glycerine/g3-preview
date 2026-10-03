@@ -107880,7 +107880,8 @@
       "go_targets": [
         "util_param_name.go",
         "util_param_descrs.go",
-        "util_params_ref.go"
+        "util_params_ref.go",
+        "util_params_string_symbol_test.go"
       ],
       "tests": [
         "TestParamNameNormalizationSourceBranches",
@@ -107917,7 +107918,11 @@
         "TestParamsReferenceExactContextAccountingAndGrowthPeak",
         "TestParamsReferenceFiniteSignedRatAndNullDefaults",
         "TestParamsReferenceProvenanceBeforeMutation",
-        "TestParamsReferenceCStringLengthBounds"
+        "TestParamsReferenceCStringLengthBounds",
+        "TestParamsBorrowedStringSymbolCopyAndOwnership",
+        "TestParamsBorrowedStringSymbolReplacementAndWarmSet",
+        "TestParamsBorrowedStringSymbolProvenanceAndLifetimeGuards",
+        "TestParamsBorrowedStringSymbolSharedCopyFaultPrefixes"
       ],
       "conditionals": [
         {
@@ -108193,15 +108198,28 @@
             "TestParamsReferenceProvenanceBeforeMutation",
             "TestParamsReferenceCStringLengthBounds"
           ]
+        },
+        {
+          "name": "borrowed interned set_str spelling, copy, deletion and display through canonical scalar Symbol",
+          "status": "ported",
+          "go_target": "util_params_ref.go",
+          "tests": [
+            "TestParamsBorrowedStringSymbolCopyAndOwnership",
+            "TestParamsBorrowedStringSymbolReplacementAndWarmSet",
+            "TestParamsBorrowedStringSymbolProvenanceAndLifetimeGuards",
+            "TestParamsBorrowedStringSymbolSharedCopyFaultPrefixes"
+          ]
         }
       ],
       "ownership": [
         "Normalization reads borrowed symbol region under owner lock and produces one caller-owned output string without interning, retained workspace or intermediate symbol spelling. See PARAM_NAME_PORT_STATUS.md.",
         "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md.",
-        "Scalar owner-local ParamsRef and backing blocks; typed pooled pointer-free entries retain concrete numeral tokens and owned packed C text. Context header, all arrays/directories/text/workspaces and old/new peaks charged; immediate fault roots tested. Source action publication and shared resets preserved. See PARAMS_REF_PORT_STATUS.md."
+        "Scalar owner-local ParamsRef and backing blocks; typed pooled pointer-free entries retain concrete numeral tokens and owned packed C text. Context header, all arrays/directories/text/workspaces and old/new peaks charged; immediate fault roots tested. Source action publication and shared resets preserved. See PARAMS_REF_PORT_STATUS.md.",
+        "Borrowed canonical spelling occupies existing scalar symbol field with a paramsText tag; copy retains identity and deletion frees only owned text. SymbolManager outlives borrowers; physical record stride remains reflect-accounted. See GPARAMS_PORT_STATUS.md."
       ],
       "deviations": [
-        "Owner-local null replaces process-global empty reference. C strings become owned nullable first-NUL payloads; replacement stages new text. Detach error retains published partial block but cleans old reference. Pooled pages persist physically until Close; inline concrete numeric tokens replace separate heap objects. Provenance/overflow guards and libstdc++ null-C-string prefix error are explicit Go adapters; Z3DEBUG pp is explicit text API rather than global stdout."
+        "Owner-local null replaces process-global empty reference. C strings become owned nullable first-NUL payloads; replacement stages new text. Detach error retains published partial block but cleans old reference. Pooled pages persist physically until Close; inline concrete numeric tokens replace separate heap objects. Provenance/overflow guards and libstdc++ null-C-string prefix error are explicit Go adapters; Z3DEBUG pp is explicit text API rather than global stdout.",
+        "SetStringSymbol explicitly translates interned bare_str pointers without a second payload; original SetString remains the owned-string adapter. Registry and generated registration are still open."
       ]
     },
     {
@@ -108213,7 +108231,8 @@
       "go_targets": [
         "util_param_name.go",
         "util_param_descrs.go",
-        "util_params_ref.go"
+        "util_params_ref.go",
+        "util_params_string_symbol_test.go"
       ],
       "tests": [
         "TestParamNameNormalizationSourceBranches",
@@ -108250,7 +108269,11 @@
         "TestParamsReferenceExactContextAccountingAndGrowthPeak",
         "TestParamsReferenceFiniteSignedRatAndNullDefaults",
         "TestParamsReferenceProvenanceBeforeMutation",
-        "TestParamsReferenceCStringLengthBounds"
+        "TestParamsReferenceCStringLengthBounds",
+        "TestParamsBorrowedStringSymbolCopyAndOwnership",
+        "TestParamsBorrowedStringSymbolReplacementAndWarmSet",
+        "TestParamsBorrowedStringSymbolProvenanceAndLifetimeGuards",
+        "TestParamsBorrowedStringSymbolSharedCopyFaultPrefixes"
       ],
       "conditionals": [
         {
@@ -108500,15 +108523,28 @@
             "TestParamsReferenceProvenanceBeforeMutation",
             "TestParamsReferenceCStringLengthBounds"
           ]
+        },
+        {
+          "name": "borrowed interned set_str spelling, copy, deletion and display through canonical scalar Symbol",
+          "status": "ported",
+          "go_target": "util_params_ref.go",
+          "tests": [
+            "TestParamsBorrowedStringSymbolCopyAndOwnership",
+            "TestParamsBorrowedStringSymbolReplacementAndWarmSet",
+            "TestParamsBorrowedStringSymbolProvenanceAndLifetimeGuards",
+            "TestParamsBorrowedStringSymbolSharedCopyFaultPrefixes"
+          ]
         }
       ],
       "ownership": [
         "Normalization reads borrowed symbol region under owner lock and produces one caller-owned output string without interning, retained workspace or intermediate symbol spelling. See PARAM_NAME_PORT_STATUS.md.",
         "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PARAM_DESCRS_PORT_STATUS.md.",
-        "Scalar owner-local ParamsRef and backing blocks; typed pooled pointer-free entries retain concrete numeral tokens and owned packed C text. Context header, all arrays/directories/text/workspaces and old/new peaks charged; immediate fault roots tested. Source action publication and shared resets preserved. See PARAMS_REF_PORT_STATUS.md."
+        "Scalar owner-local ParamsRef and backing blocks; typed pooled pointer-free entries retain concrete numeral tokens and owned packed C text. Context header, all arrays/directories/text/workspaces and old/new peaks charged; immediate fault roots tested. Source action publication and shared resets preserved. See PARAMS_REF_PORT_STATUS.md.",
+        "Borrowed canonical spelling occupies existing scalar symbol field with a paramsText tag; copy retains identity and deletion frees only owned text. SymbolManager outlives borrowers; physical record stride remains reflect-accounted. See GPARAMS_PORT_STATUS.md."
       ],
       "deviations": [
-        "Owner-local null replaces process-global empty reference. C strings become owned nullable first-NUL payloads; replacement stages new text. Detach error retains published partial block but cleans old reference. Pooled pages persist physically until Close; inline concrete numeric tokens replace separate heap objects. Provenance/overflow guards and libstdc++ null-C-string prefix error are explicit Go adapters; Z3DEBUG pp is explicit text API rather than global stdout."
+        "Owner-local null replaces process-global empty reference. C strings become owned nullable first-NUL payloads; replacement stages new text. Detach error retains published partial block but cleans old reference. Pooled pages persist physically until Close; inline concrete numeric tokens replace separate heap objects. Provenance/overflow guards and libstdc++ null-C-string prefix error are explicit Go adapters; Z3DEBUG pp is explicit text API rather than global stdout.",
+        "SetStringSymbol explicitly translates interned bare_str pointers without a second payload; original SetString remains the owned-string adapter. Registry and generated registration are still open."
       ]
     },
     {

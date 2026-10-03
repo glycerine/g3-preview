@@ -40,6 +40,8 @@ type paramsText struct {
 	ref     arena.VectorRef
 	size    uint32
 	present bool
+	// Borrowed strings retain a canonical symbol instead of owning Words.
+	borrowed bool
 }
 type paramEntry struct {
 	key    Symbol
@@ -266,7 +268,7 @@ func (c *ParamsContext) delEntry(x *paramEntry) error {
 			return e
 		}
 	}
-	if x.text.present {
+	if x.text.present && !x.text.borrowed {
 		if e := c.texts.Free(x.text.ref); e != nil {
 			return e
 		}
@@ -538,7 +540,7 @@ func (c *ParamsContext) storeText(s *string, source *paramsText) (paramsText, er
 	if e != nil {
 		return paramsText{}, e
 	}
-	out := paramsText{r, n, true}
+	out := paramsText{ref: r, size: n, present: true}
 	for i := uint32(0); i < uint32(length); i++ {
 		var word uint32
 		for j := uint32(0); j < 4 && i*4+j < n; j++ {
@@ -589,11 +591,15 @@ func (c *ParamsContext) setCore(slot uint32, k Symbol, kind ParamKind, bits uint
 	// text to owned payload adds a failure point, without publishing a dangling tag.
 	next := paramEntry{key: k, kind: kind, bits: bits, symbol: sym}
 	if kind == ParamString {
-		t, e := c.storeText(str, text)
-		if e != nil {
-			return e
+		if text != nil && text.borrowed {
+			next.text = *text
+		} else {
+			t, e := c.storeText(str, text)
+			if e != nil {
+				return e
+			}
+			next.text = t
 		}
-		next.text = t
 	}
 	if kind == ParamNumeral {
 		r, e := c.numerals.NewValue()
@@ -690,6 +696,36 @@ func (c *ParamsContext) SetDoubleName(v *ParamsRef, k *string, n float64) error 
 func (c *ParamsContext) SetString(v *ParamsRef, k Symbol, s *string) error {
 	return c.set(v, k, nil, false, ParamString, 0, Symbol{}, s, nil)
 }
+
+// SetStringSymbol retains the source interned bare-str pointer as a canonical
+// scalar symbol. The borrowed SymbolManager must outlive every retained Ref.
+// It never allocates or owns a second spelling payload.
+func (c *ParamsContext) SetStringSymbol(v *ParamsRef, k, spelling Symbol) error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if e := c.check(v); e != nil {
+		return e
+	}
+	if e := c.keyCheck(k); e != nil {
+		return e
+	}
+	m := c.symbols
+	m.mu.Lock()
+	e := m.checkPlain(spelling)
+	if e == nil && (spelling.IsNumerical() || spelling.value == 0) {
+		e = ErrParamsPrecondition
+	}
+	m.mu.Unlock()
+	if e != nil {
+		return e
+	}
+	if e = c.init(v); e != nil {
+		return e
+	}
+	text := paramsText{present: true, borrowed: true}
+	return c.setCore(v.slot, k, ParamString, 0, spelling, nil, nil, &text)
+}
+
 func (c *ParamsContext) SetStringName(v *ParamsRef, k, s *string) error {
 	return c.set(v, Symbol{}, k, true, ParamString, 0, Symbol{}, s, nil)
 }
@@ -820,7 +856,7 @@ func (c *ParamsContext) getString(v *ParamsRef, k Symbol, name *string, byName b
 		return "", false, nil
 	}
 	c.workspace = c.workspace[:0]
-	if e = c.appendText(c.texts, x.text.ref, x.text.size); e != nil {
+	if e = c.appendEntryText(&x); e != nil {
 		return "", false, e
 	}
 	return string(c.workspace), true, nil
@@ -929,6 +965,19 @@ func (c *ParamsContext) appendText(w *arena.Words, r arena.VectorRef, n uint32) 
 	}
 	return nil
 }
+
+// appendEntryText copies actual bytes into the charged format workspace,
+// directly from either owned Words or the borrowed symbol's real backing.
+func (c *ParamsContext) appendEntryText(x *paramEntry) error {
+	if x.text.borrowed {
+		if !x.text.present || x.symbol.value == 0 || x.symbol.IsNumerical() {
+			return ErrParamsPrecondition
+		}
+		return c.appendSymbol(x.symbol, false, false)
+	}
+	return c.appendText(c.texts, x.text.ref, x.text.size)
+}
+
 func (c *ParamsContext) appendSymbol(k Symbol, strMode, normalize bool) error {
 	m := c.symbols
 	m.mu.Lock()
@@ -1010,7 +1059,7 @@ func (c *ParamsContext) appendValue(x *paramEntry) error {
 		if !x.text.present {
 			return ErrParamsStreamFailure
 		}
-		return c.appendText(c.texts, x.text.ref, x.text.size)
+		return c.appendEntryText(x)
 	case ParamNumeral:
 		for {
 			if e := c.reserveFormat(64); e != nil {
