@@ -52722,7 +52722,8 @@
       "go_targets": [
         "sat_sets.go",
         "sat_solver_uint_set.go",
-        "sat_types.go"
+        "sat_types.go",
+        "sat_solver_literal_set.go"
       ],
       "tests": [
         "TestSATLiteralAndModelRendering",
@@ -52737,7 +52738,14 @@
         "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
         "TestSATSolverUintSetSourceOrderAndOperations",
         "TestSATSolverUintSetValueIteratorRetainedLifetime",
-        "TestSourceSATLiteralConstructors"
+        "TestSourceSATLiteralConstructors",
+        "TestSATSolverLiteralSetSourceVectorRoutesAndIndependence",
+        "TestSATSolverLiteralSetIndependentOrderedOracle",
+        "TestSATSolverLiteralSetCopyUnionIntersectionAndRetainedIterator",
+        "TestSATSolverLiteralSetSourceFlagBeforeListRefusalAndResetBeforeInputRead",
+        "TestSATSolverLiteralSetConstructorAndResultFailureOwnership",
+        "TestSATSolverLiteralSetWarmOperationsAndColdOwnerGuards",
+        "TestSATSolverLiteralSetActualIteratorOperators"
       ],
       "conditionals": [
         {
@@ -53181,14 +53189,72 @@
             "TestSATSolverUintSetGhostDefinedSpareTailRelease",
             "TestSATSolverUintSetSourceCharCapacityOverflowMath"
           ]
+        },
+        {
+          "name": "Charged sat::literal_set default/vector/implicit-copy constructors and copy/vector assignments",
+          "status": "ported",
+          "go_target": "sat_solver_literal_set.go",
+          "tests": [
+            "TestSATSolverLiteralSetSourceVectorRoutesAndIndependence",
+            "TestSATSolverLiteralSetIndependentOrderedOracle",
+            "TestSATSolverLiteralSetCopyUnionIntersectionAndRetainedIterator",
+            "TestSATSolverLiteralSetSourceFlagBeforeListRefusalAndResetBeforeInputRead",
+            "TestSATSolverLiteralSetConstructorAndResultFailureOwnership",
+            "TestSATSolverLiteralSetWarmOperationsAndColdOwnerGuards",
+            "TestSATSolverLiteralSetActualIteratorOperators"
+          ]
+        },
+        {
+          "name": "Charged sat::literal_set insert/remove/pop/contains/empty/size/reset/finalize/intersection/union/destruction",
+          "status": "ported",
+          "go_target": "sat_solver_literal_set.go",
+          "tests": [
+            "TestSATSolverLiteralSetSourceVectorRoutesAndIndependence",
+            "TestSATSolverLiteralSetIndependentOrderedOracle",
+            "TestSATSolverLiteralSetCopyUnionIntersectionAndRetainedIterator",
+            "TestSATSolverLiteralSetSourceFlagBeforeListRefusalAndResetBeforeInputRead",
+            "TestSATSolverLiteralSetConstructorAndResultFailureOwnership",
+            "TestSATSolverLiteralSetWarmOperationsAndColdOwnerGuards",
+            "TestSATSolverLiteralSetActualIteratorOperators"
+          ]
+        },
+        {
+          "name": "sat::literal_set::to_vector actual geometric list and lexical unpublished failure cleanup",
+          "status": "ported",
+          "go_target": "sat_solver_literal_set.go",
+          "tests": [
+            "TestSATSolverLiteralSetSourceVectorRoutesAndIndependence",
+            "TestSATSolverLiteralSetIndependentOrderedOracle",
+            "TestSATSolverLiteralSetCopyUnionIntersectionAndRetainedIterator",
+            "TestSATSolverLiteralSetSourceFlagBeforeListRefusalAndResetBeforeInputRead",
+            "TestSATSolverLiteralSetConstructorAndResultFailureOwnership",
+            "TestSATSolverLiteralSetWarmOperationsAndColdOwnerGuards",
+            "TestSATSolverLiteralSetActualIteratorOperators"
+          ]
+        },
+        {
+          "name": "sat::literal_set::iterator begin/end/dereference/preincrement/postincrement/equality with captured backing",
+          "status": "ported",
+          "go_target": "sat_solver_literal_set.go",
+          "tests": [
+            "TestSATSolverLiteralSetSourceVectorRoutesAndIndependence",
+            "TestSATSolverLiteralSetIndependentOrderedOracle",
+            "TestSATSolverLiteralSetCopyUnionIntersectionAndRetainedIterator",
+            "TestSATSolverLiteralSetSourceFlagBeforeListRefusalAndResetBeforeInputRead",
+            "TestSATSolverLiteralSetConstructorAndResultFailureOwnership",
+            "TestSATSolverLiteralSetWarmOperationsAndColdOwnerGuards",
+            "TestSATSolverLiteralSetActualIteratorOperators"
+          ]
         }
       ],
       "ownership": [
         "Owned scalar backing arrays. Reset retains capacity; finalize drops references. Explicit copies; source removal/iteration order preserved. Solver budgets/errors/diagnostics still pending; see SAT_PORT_STATUS.md.",
-        "Actual namespace sat::uint_set membership svector<char> and insertion svector<unsigned> retain exact source growth/copy/reset/finalize order, ghost flag publication before failed list push, and by-value captured-end iterators. Cold headers, backing and simultaneous old/new peaks charged; see SAT_SOLVER_PACKET.md."
+        "Actual namespace sat::uint_set membership svector<char> and insertion svector<unsigned> retain exact source growth/copy/reset/finalize order, ghost flag publication before failed list push, and by-value captured-end iterators. Cold headers, backing and simultaneous old/new peaks charged; see SAT_SOLVER_PACKET.md.",
+        "LiteralSet owns actual charged wrapper and uint-set cold headers, byte membership and unsigned ordered vector. Source flag-before-list and reset-before-input-read prefixes preserved. Returned literal vector is scalar owned list in caller-owned real LiteralStore; its unpublished root is destroyed on failure. See SAT_LITERAL_SET_PORT_STATUS.md."
       ],
       "deviations": [
-        "Release retained physical accesses preserve finite source effects; actual bounds/stale-owner domains are guarded. Source unsigned char-vector growth arithmetic is uint32 before host representability checks. Existing standalone set facades and full solver consumers remain separate; no whole-unit completion claim."
+        "Release retained physical accesses preserve finite source effects; actual bounds/stale-owner domains are guarded. Source unsigned char-vector growth arithmetic is uint32 before host representability checks. Existing standalone set facades and full solver consumers remain separate; no whole-unit completion claim.",
+        "Explicit Clone/Assign represent implicit owning copies; caller owns ToVector store and receives a scalar root rather than a by-value C++ vector. Raw iterator equality only compares captured scalar backing identities; access uses actual lifetime guards. Existing uncharged convenience facades remain distinct and are not solver storage. See SAT_LITERAL_SET_PORT_STATUS.md."
       ]
     },
     {

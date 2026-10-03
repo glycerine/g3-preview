@@ -1071,3 +1071,15 @@ compilation and source/no-generics gates; full integration suites also passed
 against HEAD81f1059. See SAT_MODEL_COPY_PORT_STATUS.md. Source inventory remains
 33ported/87partial/1982unported; the full solver and runtime dependencies remain
 open under the original complete-port goal.
+
+
+## Actual charged SAT literal sets
+
+The real literal-set specialization now uses the charged SAT uint set,
+with geometric returned vectors, exact deep owning copies and explicit
+source iterator operators. Tests first observed missing APIs before code;
+seven finite groups check independent ordered membership, source publication
+faults, immediate graph accounting and retained scalar iterator lifetimes.
+Full native/debug, race, actual JS, vet, WASI compilation and source/no-generics
+gates passed on the committed sparse/shared and model-copy base. See
+SAT_LITERAL_SET_PORT_STATUS.md. Full solver and runtime integration remain open.
