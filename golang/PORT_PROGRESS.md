@@ -719,3 +719,14 @@ uint32 output bound; valid UINTMAX indent now stops at finite-budget growth
 failure after the source prefix. Full native/checked-debug, named race/actual JS,
 vet/WASI/no-generics gates passed. See SMT2_UTIL_PORT_STATUS.md. Full AST printers
 and external custom ostream state remain open; util.h/.cpp stay partial.
+
+## Real AST family registration
+
+The source family_manager now has concrete registration, lookup, both membership
+routes, name lookup and domain/range enumeration. Six added tests began missing-
+API RED; seven final groups cover real init-family order, source failure counter/
+map/name gaps, immediate nested budgets, exact old/new peaks and warm zero host
+allocations. Integrated full native/checked-debug, named race/actual JS, vet/WASI
+and source/no-generics gates passed. These are added fixtures (no source family
+ENSURE suite). ast.h/.cpp are partial; real nodes/plugins/AST manager and solver
+remain open. See FAMILY_PORT_STATUS.md.

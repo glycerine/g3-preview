@@ -9308,9 +9308,19 @@
       "sha256": "ac1de339a71c12fabaf951db2b0936bb1a84990b337ce268490633cb7bb5ff52",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "ast_family.go"
+      ],
+      "tests": [
+        "TestFamilySourceRegistrationAndQueries",
+        "TestFamilySourceEnumerationOrderAndPrefixes",
+        "TestFamilyNameFailureRetainsPublishedMap",
+        "TestFamilyMapFailureRetainsNextIDAndRetryGap",
+        "TestFamilyBudgetConstructorAndNameGrowth",
+        "TestFamilyWarmGuardsAndSignedCounterBound",
+        "TestFamilyExactNameGrowthOverlapAndBorrowedLifetime"
+      ],
       "conditionals": [
         {
           "line": 1645,
@@ -9893,18 +9903,79 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "family_manager constructor next0 and concrete symbol/name members",
+          "status": "ported",
+          "go_target": "ast_family.go",
+          "tests": [
+            "TestFamilySourceRegistrationAndQueries",
+            "TestFamilySourceEnumerationOrderAndPrefixes",
+            "TestFamilyNameFailureRetainsPublishedMap",
+            "TestFamilyMapFailureRetainsNextIDAndRetryGap",
+            "TestFamilyBudgetConstructorAndNameGrowth",
+            "TestFamilyWarmGuardsAndSignedCounterBound",
+            "TestFamilyExactNameGrowthOverlapAndBorrowedLifetime"
+          ]
+        },
+        {
+          "name": "family_manager mk_family_id source increment/insert/name-push publication",
+          "status": "ported",
+          "go_target": "ast_family.go",
+          "tests": [
+            "TestFamilySourceRegistrationAndQueries",
+            "TestFamilySourceEnumerationOrderAndPrefixes",
+            "TestFamilyNameFailureRetainsPublishedMap",
+            "TestFamilyMapFailureRetainsNextIDAndRetryGap",
+            "TestFamilyBudgetConstructorAndNameGrowth",
+            "TestFamilyWarmGuardsAndSignedCounterBound",
+            "TestFamilyExactNameGrowthOverlapAndBorrowedLifetime"
+          ]
+        },
+        {
+          "name": "family_manager get_family_id and has_family(symbol)",
+          "status": "ported",
+          "go_target": "ast_family.go",
+          "tests": [
+            "TestFamilySourceRegistrationAndQueries",
+            "TestFamilySourceEnumerationOrderAndPrefixes",
+            "TestFamilyNameFailureRetainsPublishedMap",
+            "TestFamilyMapFailureRetainsNextIDAndRetryGap",
+            "TestFamilyBudgetConstructorAndNameGrowth",
+            "TestFamilyWarmGuardsAndSignedCounterBound",
+            "TestFamilyExactNameGrowthOverlapAndBorrowedLifetime"
+          ]
+        },
+        {
+          "name": "complete AST nodes, declaration plugins, manager factories/ownership and higher algorithms",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Concrete FamilyManager charges its real cold header, existing nested SymbolInt32Table and full names-vector capacities with old/new overlap. Borrows symbols; preserves counter/map/name failure prefixes; Close in reverse member order. Other AST ownership is unported. See FAMILY_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate."
+      ]
     },
     {
       "path": "src/ast/ast.h",
       "sha256": "5d006f0ccd5f44f25bc8e0de9f629d49cd1df8fa1275bb121696cd922d0069fd",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "ast_family.go"
+      ],
+      "tests": [
+        "TestFamilySourceRegistrationAndQueries",
+        "TestFamilySourceEnumerationOrderAndPrefixes",
+        "TestFamilyNameFailureRetainsPublishedMap",
+        "TestFamilyMapFailureRetainsNextIDAndRetryGap",
+        "TestFamilyBudgetConstructorAndNameGrowth",
+        "TestFamilyWarmGuardsAndSignedCounterBound",
+        "TestFamilyExactNameGrowthOverlapAndBorrowedLifetime"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -10179,9 +10250,88 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "family_manager constructor next0 and concrete symbol/name members",
+          "status": "ported",
+          "go_target": "ast_family.go",
+          "tests": [
+            "TestFamilySourceRegistrationAndQueries",
+            "TestFamilySourceEnumerationOrderAndPrefixes",
+            "TestFamilyNameFailureRetainsPublishedMap",
+            "TestFamilyMapFailureRetainsNextIDAndRetryGap",
+            "TestFamilyBudgetConstructorAndNameGrowth",
+            "TestFamilyWarmGuardsAndSignedCounterBound",
+            "TestFamilyExactNameGrowthOverlapAndBorrowedLifetime"
+          ]
+        },
+        {
+          "name": "family_manager mk_family_id source increment/insert/name-push publication",
+          "status": "ported",
+          "go_target": "ast_family.go",
+          "tests": [
+            "TestFamilySourceRegistrationAndQueries",
+            "TestFamilySourceEnumerationOrderAndPrefixes",
+            "TestFamilyNameFailureRetainsPublishedMap",
+            "TestFamilyMapFailureRetainsNextIDAndRetryGap",
+            "TestFamilyBudgetConstructorAndNameGrowth",
+            "TestFamilyWarmGuardsAndSignedCounterBound",
+            "TestFamilyExactNameGrowthOverlapAndBorrowedLifetime"
+          ]
+        },
+        {
+          "name": "family_manager get_family_id and has_family(symbol)",
+          "status": "ported",
+          "go_target": "ast_family.go",
+          "tests": [
+            "TestFamilySourceRegistrationAndQueries",
+            "TestFamilySourceEnumerationOrderAndPrefixes",
+            "TestFamilyNameFailureRetainsPublishedMap",
+            "TestFamilyMapFailureRetainsNextIDAndRetryGap",
+            "TestFamilyBudgetConstructorAndNameGrowth",
+            "TestFamilyWarmGuardsAndSignedCounterBound",
+            "TestFamilyExactNameGrowthOverlapAndBorrowedLifetime"
+          ]
+        },
+        {
+          "name": "family_manager get_dom/get_range source table enumeration",
+          "status": "ported",
+          "go_target": "ast_family.go",
+          "tests": [
+            "TestFamilySourceRegistrationAndQueries",
+            "TestFamilySourceEnumerationOrderAndPrefixes",
+            "TestFamilyNameFailureRetainsPublishedMap",
+            "TestFamilyMapFailureRetainsNextIDAndRetryGap",
+            "TestFamilyBudgetConstructorAndNameGrowth",
+            "TestFamilyWarmGuardsAndSignedCounterBound",
+            "TestFamilyExactNameGrowthOverlapAndBorrowedLifetime"
+          ]
+        },
+        {
+          "name": "family_manager get_name and has_family(family_id) name-vector bounds",
+          "status": "ported",
+          "go_target": "ast_family.go",
+          "tests": [
+            "TestFamilySourceRegistrationAndQueries",
+            "TestFamilySourceEnumerationOrderAndPrefixes",
+            "TestFamilyNameFailureRetainsPublishedMap",
+            "TestFamilyMapFailureRetainsNextIDAndRetryGap",
+            "TestFamilyBudgetConstructorAndNameGrowth",
+            "TestFamilyWarmGuardsAndSignedCounterBound",
+            "TestFamilyExactNameGrowthOverlapAndBorrowedLifetime"
+          ]
+        },
+        {
+          "name": "complete AST nodes, declaration plugins, manager factories/ownership and higher algorithms",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Concrete FamilyManager charges its real cold header, existing nested SymbolInt32Table and full names-vector capacities with old/new overlap. Borrows symbols; preserves counter/map/name failure prefixes; Close in reverse member order. Other AST ownership is unported. See FAMILY_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate."
+      ]
     },
     {
       "path": "src/ast/ast_ll_pp.cpp",

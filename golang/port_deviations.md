@@ -111,3 +111,13 @@ A convenience output wrapper cleans its temporary prefix on error. External
 custom ostream state, badbit and exception behavior remain open, separate from
 complete byte rendering. No AST printer scaffold is introduced.
 See SMT2_UTIL_PORT_STATUS.md.
+
+### Concrete family registry ownership
+
+The source symbol table and names vector have real nested cold/storage charges.
+Counter increment, table insertion and names append keep their source publication
+order and defined failure gaps. Signed next++ overflow is a typed bounds domain.
+Caller enumeration buffers and scalar Symbols replace source vector output/raw
+name references. Borrowed symbols outlive the registry; Close refunds owned
+storage independently. This helper supplies no simulated AST manager or plugins.
+See FAMILY_PORT_STATUS.md.
