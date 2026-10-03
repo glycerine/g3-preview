@@ -406,3 +406,15 @@ assignment-history assertions and warm allocation/budget checks. UINT_MAX floati
 radix and conversion boundary exclusions remain explicit source quirks. See
 MPZ_MISC_PORT_STATUS.md. Remaining numeric and complete AST/solver/proof/
 interpolation work stays open; no full-port gate is declared complete.
+
+## SMT2 and decimal numeral display
+
+Integer/rational SMT2 printing and rational decimal precision/truncate printing
+now preserve source action order, including negative scoped temporaries, early
+exact termination, precision-zero punctuation and reachable raw negative-
+denominator quirks. Existing budgeted formatting workspace holds all intermediate
+text; only final caller output escapes. Nine tests cover source output lines,
+independent finite decimals, raw outputs, exact old-plus-new growth budgets,
+failure cleanup before teardown and allocation-free warm buffer formatting.
+Tests first reached missing-API RED, then GREEN. See NUMERIC_DISPLAY_PORT_STATUS.md.
+Other numeral/wrapper and all solver milestones remain open.

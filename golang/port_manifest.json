@@ -79379,7 +79379,8 @@
         "mpnum/mpq.go",
         "mpnum/mpq_round.go",
         "mpnum/mpq_power.go",
-        "mpnum/mpq_parse.go"
+        "mpnum/mpq_parse.go",
+        "mpnum/mp_display.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -79413,7 +79414,16 @@
         "TestParserBudgetFailureCleanup",
         "TestParserWarmLifetimeAndInitialization",
         "TestSourceParserLiteralInventory",
-        "TestParserSourceIntMinRepresentation"
+        "TestParserSourceIntMinRepresentation",
+        "TestSourceRationalDecimalDisplays",
+        "TestIntegerSMT2DisplayForms",
+        "TestRationalSMT2AndThinDisplays",
+        "TestDecimalIndependentFiniteAndPrecision",
+        "TestNumericDisplayShortBufferAndLifecycle",
+        "TestNumericDisplayReservationFailureCleanup",
+        "TestNumericDisplayWorkspaceGrowthAndBudget",
+        "TestNumericDisplayWarmAllocationBoundaries",
+        "TestSourceNoncanonicalRationalDisplayActions"
       ],
       "conditionals": [
         {
@@ -79497,18 +79507,37 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "tst2 active 1/3 and 1/4 decimal output lines at precision ten",
+          "status": "ported",
+          "go_target": "mpnum/mp_display.go",
+          "tests": [
+            "TestSourceRationalDecimalDisplays",
+            "TestIntegerSMT2DisplayForms",
+            "TestRationalSMT2AndThinDisplays",
+            "TestDecimalIndependentFiniteAndPrecision",
+            "TestNumericDisplayShortBufferAndLifecycle",
+            "TestNumericDisplayReservationFailureCleanup",
+            "TestNumericDisplayWorkspaceGrowthAndBudget",
+            "TestNumericDisplayWarmAllocationBoundaries",
+            "TestSourceNoncanonicalRationalDisplayActions"
+          ]
+        }
+      ],
       "ownership": [
         "Concrete numerator/denominator scalar Int pair, explicit NewRational 0/1; raw Go zero diagnosed. Base manager and scratch numerals owner-local, independently budgeted manager/header children. Partial source methods and formatting gaps remain. See mpnum/PORT_STATUS.md.",
         "Source prev-power assertions and log bounds translated; test powers are independent fixture generation until production Power is implemented. See mpnum/PORT_STATUS.md.",
         "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending.",
-        "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md."
+        "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md.",
+        "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
         "Undefined zero denominator/divisor/inverse classified ErrDivideByZero. Both source scratch modes operation-owner confined.",
         "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits.",
-        "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors."
+        "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors.",
+        "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text."
       ]
     },
     {
@@ -96086,7 +96115,8 @@
         "mpnum/mpq_power.go",
         "mpnum/mpq_parse.go",
         "mpnum/mp_format.go",
-        "mpnum/mpq_root.go"
+        "mpnum/mpq_root.go",
+        "mpnum/mp_display.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -96143,7 +96173,16 @@
         "TestIntegerRootAndSquareFailureCleanup",
         "TestRationalRootSquareFailureCleanup",
         "TestRootWarmStorageAndClosedOutputs",
-        "TestRationalRootWarmStorage"
+        "TestRationalRootWarmStorage",
+        "TestSourceRationalDecimalDisplays",
+        "TestIntegerSMT2DisplayForms",
+        "TestRationalSMT2AndThinDisplays",
+        "TestDecimalIndependentFiniteAndPrecision",
+        "TestNumericDisplayShortBufferAndLifecycle",
+        "TestNumericDisplayReservationFailureCleanup",
+        "TestNumericDisplayWorkspaceGrowthAndBudget",
+        "TestNumericDisplayWarmAllocationBoundaries",
+        "TestSourceNoncanonicalRationalDisplayActions"
       ],
       "assertions": [
         {
@@ -96438,6 +96477,54 @@
             "TestRootWarmStorageAndClosedOutputs",
             "TestRationalRootWarmStorage"
           ]
+        },
+        {
+          "name": "display_smt2(mpq,bool)",
+          "status": "ported",
+          "go_target": "mpnum/mp_display.go",
+          "tests": [
+            "TestSourceRationalDecimalDisplays",
+            "TestIntegerSMT2DisplayForms",
+            "TestRationalSMT2AndThinDisplays",
+            "TestDecimalIndependentFiniteAndPrecision",
+            "TestNumericDisplayShortBufferAndLifecycle",
+            "TestNumericDisplayReservationFailureCleanup",
+            "TestNumericDisplayWorkspaceGrowthAndBudget",
+            "TestNumericDisplayWarmAllocationBoundaries",
+            "TestSourceNoncanonicalRationalDisplayActions"
+          ]
+        },
+        {
+          "name": "display_decimal source precision/truncate/sign action sequence",
+          "status": "ported",
+          "go_target": "mpnum/mp_display.go",
+          "tests": [
+            "TestSourceRationalDecimalDisplays",
+            "TestIntegerSMT2DisplayForms",
+            "TestRationalSMT2AndThinDisplays",
+            "TestDecimalIndependentFiniteAndPrecision",
+            "TestNumericDisplayShortBufferAndLifecycle",
+            "TestNumericDisplayReservationFailureCleanup",
+            "TestNumericDisplayWorkspaceGrowthAndBudget",
+            "TestNumericDisplayWarmAllocationBoundaries",
+            "TestSourceNoncanonicalRationalDisplayActions"
+          ]
+        },
+        {
+          "name": "to_rational_string/display_pp thin forwarding",
+          "status": "ported",
+          "go_target": "mpnum/mp_display.go",
+          "tests": [
+            "TestSourceRationalDecimalDisplays",
+            "TestIntegerSMT2DisplayForms",
+            "TestRationalSMT2AndThinDisplays",
+            "TestDecimalIndependentFiniteAndPrecision",
+            "TestNumericDisplayShortBufferAndLifecycle",
+            "TestNumericDisplayReservationFailureCleanup",
+            "TestNumericDisplayWorkspaceGrowthAndBudget",
+            "TestNumericDisplayWarmAllocationBoundaries",
+            "TestSourceNoncanonicalRationalDisplayActions"
+          ]
         }
       ],
       "ownership": [
@@ -96445,14 +96532,16 @@
         "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending.",
         "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md.",
         "Numeric division and decimal formatting use child NaturalManager indexed scratch; all retained storage is budgeted, final host string is caller-owned. See mpnum/PORT_STATUS.md.",
-        "Root/square stage prior output and source alias rereads with existing owner-budgeted numerals, preserving finite false-result parts and synchronized/unsynchronized normalization policy. See ROOT_PORT_STATUS.md."
+        "Root/square stage prior output and source alias rereads with existing owner-budgeted numerals, preserving finite false-result parts and synchronized/unsynchronized normalization policy. See ROOT_PORT_STATUS.md.",
+        "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
         "Undefined zero denominator/divisor/inverse classified ErrDivideByZero. Both source scratch modes operation-owner confined.",
         "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits.",
         "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors.",
-        "Source fractional square identity alias reaches undefined zero/zero normalization; adapter reports ErrDivideByZero and preserves original caller fraction. Root false outputs remain deliberately unnormalized, and prior denominator survives inexact numerator."
+        "Source fractional square identity alias reaches undefined zero/zero normalization; adapter reports ErrDivideByZero and preserves original caller fraction. Root false outputs remain deliberately unnormalized, and prior denominator survives inexact numerator.",
+        "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text."
       ]
     },
     {
@@ -96467,7 +96556,8 @@
         "mpnum/mpq_power.go",
         "mpnum/mpq_parse.go",
         "mpnum/mp_format.go",
-        "mpnum/mpq_root.go"
+        "mpnum/mpq_root.go",
+        "mpnum/mp_display.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -96524,7 +96614,16 @@
         "TestIntegerRootAndSquareFailureCleanup",
         "TestRationalRootSquareFailureCleanup",
         "TestRootWarmStorageAndClosedOutputs",
-        "TestRationalRootWarmStorage"
+        "TestRationalRootWarmStorage",
+        "TestSourceRationalDecimalDisplays",
+        "TestIntegerSMT2DisplayForms",
+        "TestRationalSMT2AndThinDisplays",
+        "TestDecimalIndependentFiniteAndPrecision",
+        "TestNumericDisplayShortBufferAndLifecycle",
+        "TestNumericDisplayReservationFailureCleanup",
+        "TestNumericDisplayWorkspaceGrowthAndBudget",
+        "TestNumericDisplayWarmAllocationBoundaries",
+        "TestSourceNoncanonicalRationalDisplayActions"
       ],
       "conditionals": [
         {
@@ -96889,6 +96988,54 @@
             "TestRootWarmStorageAndClosedOutputs",
             "TestRationalRootWarmStorage"
           ]
+        },
+        {
+          "name": "display_smt2(mpq,bool)",
+          "status": "ported",
+          "go_target": "mpnum/mp_display.go",
+          "tests": [
+            "TestSourceRationalDecimalDisplays",
+            "TestIntegerSMT2DisplayForms",
+            "TestRationalSMT2AndThinDisplays",
+            "TestDecimalIndependentFiniteAndPrecision",
+            "TestNumericDisplayShortBufferAndLifecycle",
+            "TestNumericDisplayReservationFailureCleanup",
+            "TestNumericDisplayWorkspaceGrowthAndBudget",
+            "TestNumericDisplayWarmAllocationBoundaries",
+            "TestSourceNoncanonicalRationalDisplayActions"
+          ]
+        },
+        {
+          "name": "display_decimal source precision/truncate/sign action sequence",
+          "status": "ported",
+          "go_target": "mpnum/mp_display.go",
+          "tests": [
+            "TestSourceRationalDecimalDisplays",
+            "TestIntegerSMT2DisplayForms",
+            "TestRationalSMT2AndThinDisplays",
+            "TestDecimalIndependentFiniteAndPrecision",
+            "TestNumericDisplayShortBufferAndLifecycle",
+            "TestNumericDisplayReservationFailureCleanup",
+            "TestNumericDisplayWorkspaceGrowthAndBudget",
+            "TestNumericDisplayWarmAllocationBoundaries",
+            "TestSourceNoncanonicalRationalDisplayActions"
+          ]
+        },
+        {
+          "name": "to_rational_string/display_pp thin forwarding",
+          "status": "ported",
+          "go_target": "mpnum/mp_display.go",
+          "tests": [
+            "TestSourceRationalDecimalDisplays",
+            "TestIntegerSMT2DisplayForms",
+            "TestRationalSMT2AndThinDisplays",
+            "TestDecimalIndependentFiniteAndPrecision",
+            "TestNumericDisplayShortBufferAndLifecycle",
+            "TestNumericDisplayReservationFailureCleanup",
+            "TestNumericDisplayWorkspaceGrowthAndBudget",
+            "TestNumericDisplayWarmAllocationBoundaries",
+            "TestSourceNoncanonicalRationalDisplayActions"
+          ]
         }
       ],
       "ownership": [
@@ -96896,14 +97043,16 @@
         "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending.",
         "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md.",
         "Numeric division and decimal formatting use child NaturalManager indexed scratch; all retained storage is budgeted, final host string is caller-owned. See mpnum/PORT_STATUS.md.",
-        "Root/square stage prior output and source alias rereads with existing owner-budgeted numerals, preserving finite false-result parts and synchronized/unsynchronized normalization policy. See ROOT_PORT_STATUS.md."
+        "Root/square stage prior output and source alias rereads with existing owner-budgeted numerals, preserving finite false-result parts and synchronized/unsynchronized normalization policy. See ROOT_PORT_STATUS.md.",
+        "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
         "Undefined zero denominator/divisor/inverse classified ErrDivideByZero. Both source scratch modes operation-owner confined.",
         "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits.",
         "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors.",
-        "Source fractional square identity alias reaches undefined zero/zero normalization; adapter reports ErrDivideByZero and preserves original caller fraction. Root false outputs remain deliberately unnormalized, and prior denominator survives inexact numerator."
+        "Source fractional square identity alias reaches undefined zero/zero normalization; adapter reports ErrDivideByZero and preserves original caller fraction. Root false outputs remain deliberately unnormalized, and prior denominator survives inexact numerator.",
+        "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text."
       ]
     },
     {
@@ -96962,7 +97111,8 @@
         "mpnum/mp_format.go",
         "mpnum/mpz_bitwise.go",
         "mpnum/mpz_root.go",
-        "mpnum/mpz_misc.go"
+        "mpnum/mpz_misc.go",
+        "mpnum/mp_display.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -97050,7 +97200,16 @@
         "TestIntegerScalarDecomposeParityAndMultiplicity",
         "TestIntegerScalarFloatSourceRadix",
         "TestIntegerScalarHashRepresentation",
-        "TestIntegerScalarWarmAndGuards"
+        "TestIntegerScalarWarmAndGuards",
+        "TestSourceRationalDecimalDisplays",
+        "TestIntegerSMT2DisplayForms",
+        "TestRationalSMT2AndThinDisplays",
+        "TestDecimalIndependentFiniteAndPrecision",
+        "TestNumericDisplayShortBufferAndLifecycle",
+        "TestNumericDisplayReservationFailureCleanup",
+        "TestNumericDisplayWorkspaceGrowthAndBudget",
+        "TestNumericDisplayWarmAllocationBoundaries",
+        "TestSourceNoncanonicalRationalDisplayActions"
       ],
       "conditionals": [
         {
@@ -98396,6 +98555,22 @@
             "TestIntegerScalarHashRepresentation",
             "TestIntegerScalarWarmAndGuards"
           ]
+        },
+        {
+          "name": "display_smt2(mpz,bool) negative scoped temporary and decimal form",
+          "status": "ported",
+          "go_target": "mpnum/mp_display.go",
+          "tests": [
+            "TestSourceRationalDecimalDisplays",
+            "TestIntegerSMT2DisplayForms",
+            "TestRationalSMT2AndThinDisplays",
+            "TestDecimalIndependentFiniteAndPrecision",
+            "TestNumericDisplayShortBufferAndLifecycle",
+            "TestNumericDisplayReservationFailureCleanup",
+            "TestNumericDisplayWorkspaceGrowthAndBudget",
+            "TestNumericDisplayWarmAllocationBoundaries",
+            "TestSourceNoncanonicalRationalDisplayActions"
+          ]
         }
       ],
       "ownership": [
@@ -98407,7 +98582,8 @@
         "Numeric division and decimal formatting use child NaturalManager indexed scratch; all retained storage is budgeted, final host string is caller-owned. See mpnum/PORT_STATUS.md.",
         "Bitwise source local numerals use budgeted manager cells/Words; ordered64-bit arithmetic chunks and final actions are retained. Staged result preserves outputs on failure; see mpnum/BITWISE_PORT_STATUS.md.",
         "Root/square locals use existing budgeted numeric cells/Words; source bound/Power/Swap/Copy actions preserved. Staged output includes real old+new peak; see ROOT_PORT_STATUS.md.",
-        "Scalar inspection borrows indexed manager cells/Words and allocates no owner storage. Decompose publishes caller-owned digits; sufficient caller capacity allocates nothing. See MPZ_MISC_PORT_STATUS.md."
+        "Scalar inspection borrows indexed manager cells/Words and allocates no owner storage. Decompose publishes caller-owned digits; sufficient caller capacity allocates nothing. See MPZ_MISC_PORT_STATUS.md.",
+        "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -98417,7 +98593,8 @@
         "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors.",
         "Unsigned low63-bit mask defines intended bitwise_not signed-shift boundary. Negative source operands produce ErrBitwiseDomain; source local cleanup/partial output on allocation failures become explicit cleanup/staged publication.",
         "Typed root domain errors replace degree-zero division and negative-even/integer-only assertions. Nonnegative square output/input identity retains source reset-to-zero alias result; allocation errors preserve destination.",
-        "32-bit accessor source assertions become ErrConversion; INT_MIN decomposition uses defined wider magnitude arithmetic. Floating UINT_MAX radix, unsigned length/count wrap and sign-free big hash remain source behavior."
+        "32-bit accessor source assertions become ErrConversion; INT_MIN decomposition uses defined wider magnitude arithmetic. Floating UINT_MAX radix, unsigned length/count wrap and sign-free big hash remain source behavior.",
+        "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text."
       ]
     },
     {
@@ -98438,7 +98615,8 @@
         "mpnum/mp_format.go",
         "mpnum/mpz_bitwise.go",
         "mpnum/mpz_root.go",
-        "mpnum/mpz_misc.go"
+        "mpnum/mpz_misc.go",
+        "mpnum/mp_display.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -98526,7 +98704,16 @@
         "TestIntegerScalarDecomposeParityAndMultiplicity",
         "TestIntegerScalarFloatSourceRadix",
         "TestIntegerScalarHashRepresentation",
-        "TestIntegerScalarWarmAndGuards"
+        "TestIntegerScalarWarmAndGuards",
+        "TestSourceRationalDecimalDisplays",
+        "TestIntegerSMT2DisplayForms",
+        "TestRationalSMT2AndThinDisplays",
+        "TestDecimalIndependentFiniteAndPrecision",
+        "TestNumericDisplayShortBufferAndLifecycle",
+        "TestNumericDisplayReservationFailureCleanup",
+        "TestNumericDisplayWorkspaceGrowthAndBudget",
+        "TestNumericDisplayWarmAllocationBoundaries",
+        "TestSourceNoncanonicalRationalDisplayActions"
       ],
       "conditionals": [
         {
@@ -99384,6 +99571,22 @@
             "TestIntegerScalarHashRepresentation",
             "TestIntegerScalarWarmAndGuards"
           ]
+        },
+        {
+          "name": "display_smt2(mpz,bool) negative scoped temporary and decimal form",
+          "status": "ported",
+          "go_target": "mpnum/mp_display.go",
+          "tests": [
+            "TestSourceRationalDecimalDisplays",
+            "TestIntegerSMT2DisplayForms",
+            "TestRationalSMT2AndThinDisplays",
+            "TestDecimalIndependentFiniteAndPrecision",
+            "TestNumericDisplayShortBufferAndLifecycle",
+            "TestNumericDisplayReservationFailureCleanup",
+            "TestNumericDisplayWorkspaceGrowthAndBudget",
+            "TestNumericDisplayWarmAllocationBoundaries",
+            "TestSourceNoncanonicalRationalDisplayActions"
+          ]
         }
       ],
       "ownership": [
@@ -99395,7 +99598,8 @@
         "Numeric division and decimal formatting use child NaturalManager indexed scratch; all retained storage is budgeted, final host string is caller-owned. See mpnum/PORT_STATUS.md.",
         "Bitwise source local numerals use budgeted manager cells/Words; ordered64-bit arithmetic chunks and final actions are retained. Staged result preserves outputs on failure; see mpnum/BITWISE_PORT_STATUS.md.",
         "Root/square locals use existing budgeted numeric cells/Words; source bound/Power/Swap/Copy actions preserved. Staged output includes real old+new peak; see ROOT_PORT_STATUS.md.",
-        "Scalar inspection borrows indexed manager cells/Words and allocates no owner storage. Decompose publishes caller-owned digits; sufficient caller capacity allocates nothing. See MPZ_MISC_PORT_STATUS.md."
+        "Scalar inspection borrows indexed manager cells/Words and allocates no owner storage. Decompose publishes caller-owned digits; sufficient caller capacity allocates nothing. See MPZ_MISC_PORT_STATUS.md.",
+        "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -99405,7 +99609,8 @@
         "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors.",
         "Unsigned low63-bit mask defines intended bitwise_not signed-shift boundary. Negative source operands produce ErrBitwiseDomain; source local cleanup/partial output on allocation failures become explicit cleanup/staged publication.",
         "Typed root domain errors replace degree-zero division and negative-even/integer-only assertions. Nonnegative square output/input identity retains source reset-to-zero alias result; allocation errors preserve destination.",
-        "32-bit accessor source assertions become ErrConversion; INT_MIN decomposition uses defined wider magnitude arithmetic. Floating UINT_MAX radix, unsigned length/count wrap and sign-free big hash remain source behavior."
+        "32-bit accessor source assertions become ErrConversion; INT_MIN decomposition uses defined wider magnitude arithmetic. Floating UINT_MAX radix, unsigned length/count wrap and sign-free big hash remain source behavior.",
+        "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text."
       ]
     },
     {
