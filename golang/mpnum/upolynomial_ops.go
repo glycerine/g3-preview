@@ -369,17 +369,23 @@ func (m *UPolynomialManager) PowerView(v UPolynomialView, k uint32, out UPolynom
 	if e != nil {
 		return e
 	}
+	return m.powerState(v, k, &d.state)
+}
+
+// powerState preserves core_manager::pw on an actual lexical numeral vector.
+func (m *UPolynomialManager) powerState(v UPolynomialView, k uint32, out *upolyVectorState) error {
+	var e error
 	if k == 0 {
 		if modularSourceDebug && v.count == 0 {
 			return ErrUPolynomialAssertion
 		}
-		if e = m.reserve(&d.state, 1); e != nil {
+		if e = m.reserve(out, 1); e != nil {
 			return e
 		}
-		if e = m.modular.SetInt32(&m.values(&d.state)[0], 1); e != nil {
+		if e = m.modular.SetInt32(&m.values(out)[0], 1); e != nil {
 			return e
 		}
-		return m.setSize(&d.state, 1)
+		return m.setSize(out, 1)
 	}
 	shortcut := k == 1 || v.count == 0
 	if !shortcut && v.count == 1 {
@@ -393,7 +399,7 @@ func (m *UPolynomialManager) PowerView(v UPolynomialView, k uint32, out UPolynom
 		}
 	}
 	if shortcut {
-		return m.SetView(out, v)
+		return m.setView(out, v)
 	}
 	if e = m.setView(&m.pw, v); e != nil {
 		return e
@@ -403,7 +409,7 @@ func (m *UPolynomialManager) PowerView(v UPolynomialView, k uint32, out UPolynom
 			return e
 		}
 	}
-	d.state, m.pw = m.pw, d.state
+	*out, m.pw = m.pw, *out
 	return nil
 }
 func (m *UPolynomialManager) MulScalar(p UPolynomial, b *Int) error {

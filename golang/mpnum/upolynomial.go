@@ -39,6 +39,7 @@ type UPolynomialManager struct {
 	bindings                                     []upolyStoreBinding
 	live                                         uint32
 	liveSequences                                uint32
+	liveFactors                                  uint32
 	header                                       uint64
 	closed                                       bool
 }
@@ -195,7 +196,7 @@ func (m *UPolynomialManager) Close() error {
 	if e := m.check(); e != nil {
 		return e
 	}
-	if m.live != 0 || m.liveSequences != 0 {
+	if m.live != 0 || m.liveSequences != 0 || m.liveFactors != 0 {
 		return ErrUPolynomialLive
 	}
 	// Derived destructor reset order, followed by implicit reverse members.

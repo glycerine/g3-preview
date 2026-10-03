@@ -24,3 +24,25 @@ These campaigns must become ordinary tests when their implementations land.
 They remain required work; a default green run does not cover them. Proposal
 packets retain their historical review context and are not current completion
 claims. Source coverage and the full solver goal remain unchanged.
+
+The factorization checkpoint contains the source factors owner, finite-field
+factorization, Hensel lifting, degree/subset search and integer recombination.
+The registered 37 numeric recipes exercise 74 source numeric ENSURE executions;
+37 extra dense qualification checks do not port the missing multivariate
+construction/assertion. Earlier family runs and the corrected independent-core
+Hensel test pass. Cold-binding refusal, additional alias/lifetime coverage and
+allocator-backed cleanup-refusal retention remain unfinished review items.
+No whole factorization source unit or multivariate solver completion is claimed.
+
+The integrated factorization/helper tree passes `go test ./...`,
+`go test -tags g3debug ./...` and `go vet ./...`; logs are
+`.cache/checkpoint-{native,debug,vet}.log`. The explicitly tagged pending
+campaigns still fail compilation at their missing APIs, as expected; logs are
+`.cache/checkpoint-pending-{mpz,sat}-red.log`.
+
+Review found two concrete factorization corrections still required: Berlekamp
+pivot vectors currently allocate exact size instead of source geometric resize;
+and a factors owner whose Close has finished Clear but failed constant cleanup
+must reject ordinary mutation before retrying Close. The existing backend cannot
+yet inject that leaf cleanup refusal. These issues and deeper coverage are next
+work, not reasons to leave the implemented algorithms untracked.
