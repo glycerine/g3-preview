@@ -97067,9 +97067,20 @@
       "sha256": "3b884edd5463aa7ddfe68d6e0badc0695eff2b6b6fd90736850dd740f43e29d6",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_memory_accounting.go"
+      ],
+      "tests": [
+        "TestMemoryAccountingBoundedIndependentLaneModel",
+        "TestMemoryAccountingDeallocationClampAndWatermark",
+        "TestMemoryAccountingDeallocationPhysicalBoundary",
+        "TestMemoryAccountingGlobalCounterPrefixes",
+        "TestMemoryAccountingSignedBoundaryPrefixes",
+        "TestMemoryAccountingSourceSizeTPromotions",
+        "TestMemoryAccountingTLSRepeatedCountAndLimitOrder",
+        "TestMemoryAccountingTLSStrictThresholds"
+      ],
       "conditionals": [
         {
           "line": 75,
@@ -97122,18 +97133,50 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "scalar global and lane counter transitions, synchronization and read predicates; allocator/runtime and transport open",
+          "status": "partial",
+          "go_target": "util_memory_accounting.go",
+          "tests": [
+            "TestMemoryAccountingBoundedIndependentLaneModel",
+            "TestMemoryAccountingDeallocationClampAndWatermark",
+            "TestMemoryAccountingDeallocationPhysicalBoundary",
+            "TestMemoryAccountingGlobalCounterPrefixes",
+            "TestMemoryAccountingSignedBoundaryPrefixes",
+            "TestMemoryAccountingSourceSizeTPromotions",
+            "TestMemoryAccountingTLSRepeatedCountAndLimitOrder",
+            "TestMemoryAccountingTLSStrictThresholds"
+          ]
+        }
+      ],
+      "ownership": [
+        "Pointer-free scalar accounting is intended for once-charged runtime embedding with explicit caller-confined lanes and source counter prefixes. No raw allocator/backend or process-global integration is claimed; see MEMORY_ACCOUNTING_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Source signed-overflow/invalid-lane domains use scalar typed outcomes after completed field prefixes. Containing allocator must execute real physical operations between counter phases. Physical hooks, headers, generated callbacks, OOM exits/streams, concurrent global service and consumer integration remain open.",
+        "Size_t promotion is explicit32/64: LP64 updates use unsigned modular arithmetic; ILP32 shrink delta uses uint32 subtraction before LL64 promotion. Signed synchronization/count and ILP32 promoted overflow have typed boundaries after prior field prefixes."
+      ]
     },
     {
       "path": "src/util/memory_manager.h",
       "sha256": "78b004da89d38686fdf0ad34807ad77f844e9d7ac275834ef312adc2c7bc1839",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_memory_accounting.go"
+      ],
+      "tests": [
+        "TestMemoryAccountingBoundedIndependentLaneModel",
+        "TestMemoryAccountingDeallocationClampAndWatermark",
+        "TestMemoryAccountingDeallocationPhysicalBoundary",
+        "TestMemoryAccountingGlobalCounterPrefixes",
+        "TestMemoryAccountingSignedBoundaryPrefixes",
+        "TestMemoryAccountingSourceSizeTPromotions",
+        "TestMemoryAccountingTLSRepeatedCountAndLimitOrder",
+        "TestMemoryAccountingTLSStrictThresholds"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -97190,9 +97233,30 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "scalar global and lane counter transitions, synchronization and read predicates; allocator/runtime and transport open",
+          "status": "partial",
+          "go_target": "util_memory_accounting.go",
+          "tests": [
+            "TestMemoryAccountingBoundedIndependentLaneModel",
+            "TestMemoryAccountingDeallocationClampAndWatermark",
+            "TestMemoryAccountingDeallocationPhysicalBoundary",
+            "TestMemoryAccountingGlobalCounterPrefixes",
+            "TestMemoryAccountingSignedBoundaryPrefixes",
+            "TestMemoryAccountingSourceSizeTPromotions",
+            "TestMemoryAccountingTLSRepeatedCountAndLimitOrder",
+            "TestMemoryAccountingTLSStrictThresholds"
+          ]
+        }
+      ],
+      "ownership": [
+        "Pointer-free scalar accounting is intended for once-charged runtime embedding with explicit caller-confined lanes and source counter prefixes. No raw allocator/backend or process-global integration is claimed; see MEMORY_ACCOUNTING_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Source signed-overflow/invalid-lane domains use scalar typed outcomes after completed field prefixes. Containing allocator must execute real physical operations between counter phases. Physical hooks, headers, generated callbacks, OOM exits/streams, concurrent global service and consumer integration remain open.",
+        "Size_t promotion is explicit32/64: LP64 updates use unsigned modular arithmetic; ILP32 shrink delta uses uint32 subtraction before LL64 promotion. Signed synchronization/count and ILP32 promoted overflow have typed boundaries after prior field prefixes."
+      ]
     },
     {
       "path": "src/util/min_cut.cpp",

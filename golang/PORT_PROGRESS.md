@@ -958,3 +958,18 @@ vet/WASI and source/no-generics gates. Scoped marks use actual owning ref vector
 failed fast mark/INC prefixes remain source-visible. obj_mark.h becomes partial;
 other mark specializations and whole AST/plugin/solver work remain open.
 See AST_MARK_PORT_STATUS.md for exact source surface and coordinator integration.
+
+## Memory accounting transition component
+
+Tests-first scalar global/lane accounting preserves source strict thresholds,
+cumulative TLS count contributions, limit-failure counter prefixes and stored
+peak/watermark predicates. Deallocation separates subtraction before actual
+free from synchronization afterward. Eight frozen native/debug/race/actual JS
+groups, full native/debug, vet/WASI and source/no-generics checks passed.
+MEMORY_ACCOUNTING_PORT_STATUS.md distinguishes this component from the required
+physical allocator/global runtime, generated callbacks and failure transport.
+memory_manager.h/.cpp become partial; the full solver remains incomplete.
+
+Memory size_t-width review preserves LP64 unsigned modular updates and ILP32
+unsigned realloc subtraction before LL64 promotion, confirmed by a compiled
+source-promotion probe and an additional tests-first width fixture.
