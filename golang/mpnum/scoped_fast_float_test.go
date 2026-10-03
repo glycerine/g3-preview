@@ -168,3 +168,115 @@ func TestFastFloatVectorOldNewPeakBudget(t *testing.T) {
 		t.Fatal("peak refusal leak")
 	}
 }
+
+func TestFastFloatVectorSourceRetainedZeroShrink(t *testing.T) {
+	m := fastManager(t, 2)
+	v, e := NewScopedFastFloatVector(m)
+	serviceMust(t, e)
+	defer v.Close()
+	serviceMust(t, v.Resize(3))
+	serviceMust(t, v.Shrink(1))
+	used := m.config.Storage.Descriptors.Budget.Used()
+	m.config.Storage.Descriptors.Budget.FailAfter(0)
+	e = v.Shrink(2)
+	if sourceExtendedGCDDebug {
+		if !errors.Is(e, ErrFastFloatInvariant) || len(v.values) != 1 {
+			t.Fatal("source shrink assertion", e, len(v.values))
+		}
+	} else {
+		serviceMust(t, e)
+		if len(v.values) != 2 || v.values[1] != (FastFloat{}) {
+			t.Fatal("release retained initialized zeros", v.values)
+		}
+	}
+	if v.capacity != 3 || m.config.Storage.Descriptors.Budget.Used() != used {
+		t.Fatal("retained shrink reserved storage")
+	}
+	fastAudit(t, m)
+}
+func TestFastFloatVectorSourceRetainedZeroAt(t *testing.T) {
+	m := fastManager(t, 2)
+	v, e := NewScopedFastFloatVector(m)
+	serviceMust(t, e)
+	defer v.Close()
+	serviceMust(t, v.Resize(3))
+	serviceMust(t, v.Shrink(1))
+	used := m.config.Storage.Descriptors.Budget.Used()
+	m.config.Storage.Descriptors.Budget.FailAfter(0)
+	a, e := v.At(2)
+	if sourceExtendedGCDDebug {
+		if !errors.Is(e, ErrFastFloatInvariant) || a != nil {
+			t.Fatal("source subscript assertion", e, a)
+		}
+	} else {
+		serviceMust(t, e)
+		if a == nil || *a != (FastFloat{}) {
+			t.Fatal("release retained initialized zeros", a)
+		}
+	}
+	if len(v.values) != 1 || v.capacity != 3 || m.config.Storage.Descriptors.Budget.Used() != used {
+		t.Fatal("retained read changed owner")
+	}
+	fastAudit(t, m)
+}
+
+func TestFastFloatVectorRetainedInitializationAndGrowthPrefix(t *testing.T) {
+	m := fastManager(t, 2)
+	v, e := NewScopedFastFloatVector(m)
+	serviceMust(t, e)
+	defer v.Close()
+	serviceMust(t, v.Resize(4))
+	serviceMust(t, v.Shrink(1))
+	a, e := v.At(4)
+	if sourceExtendedGCDDebug {
+		if !errors.Is(e, ErrFastFloatInvariant) || a != nil {
+			t.Fatal(e, a)
+		}
+	} else if !errors.Is(e, ErrFastFloatDomain) || a != nil {
+		t.Fatal("never constructed slot is not a source zero", e, a)
+	}
+	w, e := NewScopedFastFloatVector(m)
+	serviceMust(t, e)
+	defer w.Close()
+	serviceMust(t, w.Resize(3))
+	serviceMust(t, w.Shrink(1))
+	// An initialized scalar record's exponent bytes are defined to read/copy;
+	// no arithmetic or canonical-zero claim is made about this private fixture.
+	w.values[:cap(w.values)][2].exponent = 17
+	m.config.Storage.Descriptors.Budget.FailAfter(1)
+	e = w.Resize(6)
+	if !errors.Is(e, arena.ErrInjectedFailure) || w.capacity != 5 || len(w.values) != 1 {
+		t.Fatal("completed source reallocation prefix", e, w.capacity, len(w.values))
+	}
+	if w.values[:cap(w.values)][2].exponent != 17 {
+		t.Fatal("trivial source realloc must retain entire old capacity")
+	}
+	a, e = w.At(2)
+	if sourceExtendedGCDDebug {
+		if !errors.Is(e, ErrFastFloatInvariant) || a != nil {
+			t.Fatal(e, a)
+		}
+	} else if e != nil || a == nil || a.exponent != 17 {
+		t.Fatal("initialized tail survives growth", e, a)
+	}
+	fastAudit(t, m)
+}
+
+func TestFastFloatVectorSourceTrivialCapacityCopy(t *testing.T) {
+	m := fastManager(t, 2)
+	v, e := NewScopedFastFloatVector(m)
+	serviceMust(t, e)
+	defer v.Close()
+	serviceMust(t, v.Resize(3))
+	serviceMust(t, v.Shrink(1))
+	v.values[:cap(v.values)][2].exponent = 17
+	m.config.Storage.Descriptors.Budget.FailAfter(1)
+	e = v.Resize(6)
+	if !errors.Is(e, arena.ErrInjectedFailure) || v.capacity != 5 || len(v.values) != 1 {
+		t.Fatal(e, v.capacity, len(v.values))
+	}
+	if v.values[:cap(v.values)][2].exponent != 17 {
+		t.Fatal("source trivially-copyable reallocate lost initialized tail")
+	}
+	fastAudit(t, m)
+}

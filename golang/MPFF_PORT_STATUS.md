@@ -99,3 +99,25 @@ e93c250bb5cd5c2de2da2ae0daf6fe81920a8da7b22aaf497668541bad231b6e mpnum/scoped_fa
 ```
 
 All16 Go files and this document are frozen for coordinator review/commit. No central metadata, existing owner or Git edits were made by this packet.
+
+Post-commit vector correction (base HEAD9f8974d): only scoped_fast_float_vector.go and scoped_fast_float_test.go change, with this status appendix. Four new regressions first observed RED: release retained-zero Shrink/At were rejected, and a successful first growth followed by injected failure discarded an initialized capacity-tail record. Release Shrink may now increase the logical length within retained, previously initialized storage, and release At may address that storage beyond the current length. g3debug reports ErrFastFloatInvariant at the respective source SASSERT; actual physical bounds remain checked in all profiles. A charged scalar initialized high-water mark rejects never-constructed source storage with ErrFastFloatDomain. Growth copies the entire old capacity, retaining initialized tail records and completed growth/failure prefixes.
+
+This follows mpff's trivially-copyable source representation: vector expansion uses reallocate rather than copying just live-size records. A real C++ syntax-only audit under golang/.cache confirmed std::is_trivially_copyable<mpff>; the executable base svector<mpff> default-construction resize and scoped Shrink/At compiled in release and Z3DEBUG. Conversely, invoking scoped_mpff_vector.resize(3) failed compilation at scoped_numeral_vector.h66/vector.h418: its resize(sz,0) requires a nonexistent mpff(int) constructor. Go Resize is therefore an explicit executable base-svector default-construction convenience adapter, not a claimed instantiation of that scoped overload. Source matrix capacity tests use Push; original908316ENSURE+2VERIFY counts remain unchanged. The four additional tests are independent regression fixtures, not added source assertion counts.
+
+The existing removal safety adapter remains explicit: after source-order Del, Go clears ended scalar records instead of retaining stale nonzero handles whose ownership has ended. Retained initialized zeros and live manually assigned scalar metadata survive real capacity growth; ended nonzero source bits are not reintroduced as owning numerals. Empty Back/Pop and never-initialized capacity accesses remain typed guards for source-invalid memory domains. These adaptations do not claim full unsafe C++ stale-record semantics. Whole source units remain partial for the scoped resize instantiation, persistent ostream/TRACE and existing external consumer obligations above.
+
+New test names: TestFastFloatVectorSourceRetainedZeroShrink, TestFastFloatVectorSourceRetainedZeroAt, TestFastFloatVectorRetainedInitializationAndGrowthPrefix and TestFastFloatVectorSourceTrivialCapacityCopy. Both release and g3checked+g3debug targeted vector suites passed43043 before the final isolated gates. Final prospective tree is golang/.cache/release/numeric-fast-float-vector-final, HEAD9f8974d plus only these two Go files; terminal gate evidence follows.
+
+| Corrected vector frozen-byte gate | Terminal result |
+| --- | --- |
+| Full native ./... | PASS74439, mpnum20.395s |
+| Full g3checked+g3debug ./... | PASS3275, mpnum20.920s |
+| Full g3checked+g3debug race ./... | PASS76875, mpnum242.281s |
+| Full actual checked/debug JS ./... | PASS88127, mpnum64.872s |
+| Named26 actual checked/debug JS MPFF tests | PASS54172,26 RUN/PASS,30.705s; full source matrix27.38s |
+| Actual release JS six vector tests | PASS74615,6 RUN/PASS,0.182s |
+| Full checked/debug vet | PASS22199 |
+| All-package checked/debug WASI cross-build | PASS23204, unique artifacts under golang/.cache/wasi-fast-float-vector |
+| Source inventory/no-generics | PASS63072,2102units677APIs33ported68partial2001unported |
+
+Final correction Go SHA256: scoped_fast_float_vector.go4850705e2932dee198f16cfc9a24504e0edf412bde22a0f48dcc6aa39bb4fef6; scoped_fast_float_test.go1b958c70fe532b39b74328da1509ace8b2ca9126eafb776cc935a12214325ffb. Both files are under mpnum; no other Go bytes changed. This appendix supersedes the corresponding two initial-packet hashes only for this correction. All checks are terminal; the two Go files and updated document are frozen for coordinator review. No Git or central metadata writes were made.

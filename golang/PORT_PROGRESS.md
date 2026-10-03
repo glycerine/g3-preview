@@ -865,3 +865,14 @@ ignored NNF validation results, both actual unit-resolution bodies and append-on
 hyper-resolution output prefixes. The registered proof-checker test still needs
 the real checker and its one VERIFY; proof construction cannot stand in for it.
 This is a source contract artifact, with no source/API completion relabeling.
+
+## Fast-float retained vector storage correction
+
+Four new regressions first failed, then passed after preserving initialized
+capacity tails through trivial-copy growth and release Shrink/At access. Debug
+assertions retain their source order. The source scoped resize overload cannot
+instantiate for mpff; Go Resize explicitly uses the executable base-vector
+default-construction adapter. Full isolated native, checked/debug, race, actual
+JS, vet, WASI compilation and source/no-generics gates passed on frozen bytes.
+MPFF_PORT_STATUS.md records precise limits and hashes; source coverage counts
+remain unchanged and the full solver port remains active.

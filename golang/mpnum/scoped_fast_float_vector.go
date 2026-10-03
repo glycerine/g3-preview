@@ -7,11 +7,11 @@ import (
 )
 
 type ScopedFastFloatVector struct {
-	manager  *FastFloatManager
-	values   []FastFloat
-	capacity uint32
-	self     *ScopedFastFloatVector
-	closed   bool
+	manager               *FastFloatManager
+	values                []FastFloat
+	capacity, initialized uint32
+	self                  *ScopedFastFloatVector
+	closed                bool
 }
 
 // Source vector's 32-bit sizeof(mpff)*capacity+8 header bound is separate
@@ -65,10 +65,16 @@ func (v *ScopedFastFloatVector) At(i uint32) (*FastFloat, error) {
 	if e := v.check(); e != nil {
 		return nil, e
 	}
-	if uint64(i) >= uint64(len(v.values)) {
+	if sourceExtendedGCDDebug && uint64(i) >= uint64(len(v.values)) {
+		return nil, ErrFastFloatInvariant
+	}
+	if i >= v.capacity {
 		return nil, arena.ErrBounds
 	}
-	return &v.values[i], nil
+	if i >= v.initialized {
+		return nil, ErrFastFloatDomain
+	}
+	return &v.values[:cap(v.values)][i], nil
 }
 func (v *ScopedFastFloatVector) Back() (*FastFloat, error) {
 	if e := v.check(); e != nil {
@@ -98,7 +104,9 @@ func (v *ScopedFastFloatVector) reserve(n uint32) error {
 			return e
 		}
 		data := make([]FastFloat, len(v.values), int(c))
-		copy(data, v.values)
+		// mpff is trivially copyable: source vector uses reallocate and
+		// preserves all old-capacity bytes, including an initialized tail.
+		copy(data[:v.capacity], v.values[:v.capacity])
 		old := uint64(v.capacity) * width
 		v.values = data
 		v.capacity = uint32(c)
@@ -106,6 +114,10 @@ func (v *ScopedFastFloatVector) reserve(n uint32) error {
 	}
 	return nil
 }
+
+// Resize uses the executable base svector<mpff> default-construction route.
+// Source scoped_numeral_vector::resize(sz, 0) cannot instantiate for mpff,
+// which has no integer constructor; this convenience API is an adapter.
 func (v *ScopedFastFloatVector) Resize(n uint32) error {
 	if e := v.check(); e != nil {
 		return e
@@ -120,6 +132,9 @@ func (v *ScopedFastFloatVector) Resize(n uint32) error {
 	v.values = v.values[:n]
 	for i := old; i < len(v.values); i++ {
 		v.values[i] = FastFloat{}
+	}
+	if n > v.initialized {
+		v.initialized = n
 	}
 	return nil
 }
@@ -143,8 +158,14 @@ func (v *ScopedFastFloatVector) Shrink(n uint32) error {
 	if e := v.check(); e != nil {
 		return e
 	}
-	if uint64(n) > uint64(len(v.values)) {
+	if sourceExtendedGCDDebug && uint64(n) > uint64(len(v.values)) {
+		return ErrFastFloatInvariant
+	}
+	if n > v.capacity {
 		return arena.ErrBounds
+	}
+	if n > v.initialized {
+		return ErrFastFloatDomain
 	}
 	for i := n; i < uint32(len(v.values)); i++ {
 		if e := v.manager.Del(&v.values[i]); e != nil {
@@ -180,6 +201,7 @@ func (v *ScopedFastFloatVector) Close() error {
 	b.Release(uint64(reflect.TypeOf(ScopedFastFloatVector{}).Size()))
 	v.values = nil
 	v.capacity = 0
+	v.initialized = 0
 	v.closed = true
 	return nil
 }
