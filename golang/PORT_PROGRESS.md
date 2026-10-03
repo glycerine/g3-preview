@@ -629,3 +629,13 @@ checked symbol composition, lifetime and unchanged borrowed-owner budgets.
 See Z3_EXCEPTION_PORT_STATUS.md. The printf/va_list constructor remains open;
 its integer/string source formatter is a separate active packet, and command
 runtime/complete solver scope remains open.
+
+## Integer and C-string source formatting
+
+The format2ostream integer/C-string routes now preserve source byte-vector
+growth, AMD64 one-call truncation/fallback and the other-profile retry sequence.
+Eleven groups began missing-API RED; count overflow also produced behavioral
+RED before its fix. Exact flags, byte/NUL domains, Linux I64 interpretation,
+actual budget peaks and immediate cleanup are covered. The formatted exception
+printed case is translated (zero source assertions). Broader C printf domains,
+Windows CRT state and warning I/O remain open. See PRINTF_PORT_STATUS.md.

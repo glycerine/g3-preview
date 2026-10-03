@@ -76193,14 +76193,31 @@
       "sha256": "d610cf65557aae3d4fbbc4963f3916694bb9ddf9661c6cb21083a68518e9d0b3",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_printf_test.go"
+      ],
+      "tests": [
+        "TestPrintfSourceExceptionConsumerAndCallsiteForms"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "tst_ex formatted default_exception printed case (zero ENSURE assertions)",
+          "status": "ported",
+          "go_target": "util_printf_test.go",
+          "tests": [
+            "TestPrintfSourceExceptionConsumerAndCallsiteForms"
+          ]
+        }
+      ],
+      "ownership": [
+        "Caller-owned exception value; formatter temporary ownership independently tested."
+      ],
+      "deviations": [
+        "One formatted printed consumer translated; custom ex/ex2 printed case remains open. No invented source assertion count."
+      ]
     },
     {
       "path": "src/test/expr_rand.cpp",
@@ -107960,9 +107977,23 @@
       "sha256": "6ef3f7c9d46d2d496f53f0d20ad5a66bc09b9df755997da2e0d9d53e2edc6db3",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_printf.go"
+      ],
+      "tests": [
+        "TestPrintfSourceExceptionConsumerAndCallsiteForms",
+        "TestPrintfIntegerFlagsWidthsPrecisionsAndDomains",
+        "TestPrintfCBytesNullPrecisionAndCharacterCount",
+        "TestPrintfSourceBufferCapacitiesTruncationAndGrowLoop",
+        "TestPrintfLinuxI64WidthAndExplicitMismatchBoundary",
+        "TestPrintfMalformedUnsupportedAndSignedCountOverflow",
+        "TestPrintfBudgetFailureEventsAndOwnerGuards",
+        "TestPrintfIndependentFiniteIntegerAndPaddingOracle",
+        "TestPrintfSignedCountOverflowOnEscapedPercent",
+        "TestPrintfBudgetPeakExactAndObserverPanicCleanup",
+        "TestPrintfByteBoundaryAndBackendEventClassification"
+      ],
       "conditionals": [
         {
           "line": 27,
@@ -108011,18 +108042,55 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "format2ostream selected Linux integer/C-string profiles, source vector growth, truncation/fallback and retry",
+          "status": "partial",
+          "go_target": "util_printf.go",
+          "tests": [
+            "TestPrintfSourceExceptionConsumerAndCallsiteForms",
+            "TestPrintfIntegerFlagsWidthsPrecisionsAndDomains",
+            "TestPrintfCBytesNullPrecisionAndCharacterCount",
+            "TestPrintfSourceBufferCapacitiesTruncationAndGrowLoop",
+            "TestPrintfLinuxI64WidthAndExplicitMismatchBoundary",
+            "TestPrintfMalformedUnsupportedAndSignedCountOverflow",
+            "TestPrintfBudgetFailureEventsAndOwnerGuards",
+            "TestPrintfIndependentFiniteIntegerAndPaddingOracle",
+            "TestPrintfSignedCountOverflowOnEscapedPercent",
+            "TestPrintfBudgetPeakExactAndObserverPanicCleanup",
+            "TestPrintfByteBoundaryAndBackendEventClassification"
+          ]
+        }
+      ],
+      "ownership": [
+        "Per-call concrete byte-vector scratch charges actual source capacities and old/new peaks; cold owner header charged, temporary arrays refunded on success/error/panic. Explicit arguments borrowed synchronously; only final caller string escapes. See PRINTF_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Go explicit tagged argument list replaces va_list; Linux/glibc C-locale integer/string subset implemented. Floating/wide/locale/positional/pointer/count-write formats, Windows CRT state and warning I/O/global behavior remain open. NonWindows32 persistent backend errors terminate with typed failure; original loop would retry forever."
+      ]
     },
     {
       "path": "src/util/warning.h",
       "sha256": "fe2dd5906178c5c4f5469e0dfff5cdf15ac3b993a65ceb4ff3ddd5eb1534c0e5",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_printf.go"
+      ],
+      "tests": [
+        "TestPrintfSourceExceptionConsumerAndCallsiteForms",
+        "TestPrintfIntegerFlagsWidthsPrecisionsAndDomains",
+        "TestPrintfCBytesNullPrecisionAndCharacterCount",
+        "TestPrintfSourceBufferCapacitiesTruncationAndGrowLoop",
+        "TestPrintfLinuxI64WidthAndExplicitMismatchBoundary",
+        "TestPrintfMalformedUnsupportedAndSignedCountOverflow",
+        "TestPrintfBudgetFailureEventsAndOwnerGuards",
+        "TestPrintfIndependentFiniteIntegerAndPaddingOracle",
+        "TestPrintfSignedCountOverflowOnEscapedPercent",
+        "TestPrintfBudgetPeakExactAndObserverPanicCleanup",
+        "TestPrintfByteBoundaryAndBackendEventClassification"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -108035,9 +108103,32 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "format2ostream selected Linux integer/C-string profiles, source vector growth, truncation/fallback and retry",
+          "status": "partial",
+          "go_target": "util_printf.go",
+          "tests": [
+            "TestPrintfSourceExceptionConsumerAndCallsiteForms",
+            "TestPrintfIntegerFlagsWidthsPrecisionsAndDomains",
+            "TestPrintfCBytesNullPrecisionAndCharacterCount",
+            "TestPrintfSourceBufferCapacitiesTruncationAndGrowLoop",
+            "TestPrintfLinuxI64WidthAndExplicitMismatchBoundary",
+            "TestPrintfMalformedUnsupportedAndSignedCountOverflow",
+            "TestPrintfBudgetFailureEventsAndOwnerGuards",
+            "TestPrintfIndependentFiniteIntegerAndPaddingOracle",
+            "TestPrintfSignedCountOverflowOnEscapedPercent",
+            "TestPrintfBudgetPeakExactAndObserverPanicCleanup",
+            "TestPrintfByteBoundaryAndBackendEventClassification"
+          ]
+        }
+      ],
+      "ownership": [
+        "Per-call concrete byte-vector scratch charges actual source capacities and old/new peaks; cold owner header charged, temporary arrays refunded on success/error/panic. Explicit arguments borrowed synchronously; only final caller string escapes. See PRINTF_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Go explicit tagged argument list replaces va_list; Linux/glibc C-locale integer/string subset implemented. Floating/wide/locale/positional/pointer/count-write formats, Windows CRT state and warning I/O/global behavior remain open. NonWindows32 persistent backend errors terminate with typed failure; original loop would retry forever."
+      ]
     },
     {
       "path": "src/util/z3_exception.cpp",
@@ -108046,11 +108137,23 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "util_z3_exception.go"
+        "util_z3_exception.go",
+        "util_printf.go"
       ],
       "tests": [
         "TestZ3ExceptionSourceCodesAndLabels",
-        "TestDefaultExceptionSourceStringAndEmbeddedNUL"
+        "TestDefaultExceptionSourceStringAndEmbeddedNUL",
+        "TestPrintfSourceExceptionConsumerAndCallsiteForms",
+        "TestPrintfIntegerFlagsWidthsPrecisionsAndDomains",
+        "TestPrintfCBytesNullPrecisionAndCharacterCount",
+        "TestPrintfSourceBufferCapacitiesTruncationAndGrowLoop",
+        "TestPrintfLinuxI64WidthAndExplicitMismatchBoundary",
+        "TestPrintfMalformedUnsupportedAndSignedCountOverflow",
+        "TestPrintfBudgetFailureEventsAndOwnerGuards",
+        "TestPrintfIndependentFiniteIntegerAndPaddingOracle",
+        "TestPrintfSignedCountOverflowOnEscapedPercent",
+        "TestPrintfBudgetPeakExactAndObserverPanicCleanup",
+        "TestPrintfByteBoundaryAndBackendEventClassification"
       ],
       "assertions": [
         {
@@ -108081,16 +108184,29 @@
         },
         {
           "name": "default_exception fmt/va_list constructor and source printf formatter dependency",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "status": "partial",
+          "go_target": "util_printf.go",
+          "tests": [
+            "TestPrintfSourceExceptionConsumerAndCallsiteForms",
+            "TestPrintfIntegerFlagsWidthsPrecisionsAndDomains",
+            "TestPrintfCBytesNullPrecisionAndCharacterCount",
+            "TestPrintfSourceBufferCapacitiesTruncationAndGrowLoop",
+            "TestPrintfLinuxI64WidthAndExplicitMismatchBoundary",
+            "TestPrintfMalformedUnsupportedAndSignedCountOverflow",
+            "TestPrintfBudgetFailureEventsAndOwnerGuards",
+            "TestPrintfIndependentFiniteIntegerAndPaddingOracle",
+            "TestPrintfSignedCountOverflowOnEscapedPercent",
+            "TestPrintfBudgetPeakExactAndObserverPanicCleanup",
+            "TestPrintfByteBoundaryAndBackendEventClassification"
+          ]
         }
       ],
       "ownership": [
-        "Cold caller-owned concrete exception values/messages; no retained hot interface or numeric/arena graph. Cmd symbol composition reads borrowed checked bytes directly into one final message and outlives the symbol owner. Source CString observations and signed positions preserved. See Z3_EXCEPTION_PORT_STATUS.md."
+        "Cold caller-owned concrete exception values/messages; no retained hot interface or numeric/arena graph. Cmd symbol composition reads borrowed checked bytes directly into one final message and outlives the symbol owner. Source CString observations and signed positions preserved. See Z3_EXCEPTION_PORT_STATUS.md.",
+        "Formatted values use the selected budgeted integer/C-string formatter before caller-owned immutable exception construction. See PRINTF_PORT_STATUS.md."
       ],
       "deviations": [
-        "Go cold error interfaces replace virtual throw transport; source nonzero/location assertions use classified guard errors. Generic printf constructor/platform domains remain explicitly open."
+        "Go cold error interfaces replace virtual throw transport; source nonzero/location assertions use classified guard errors. Formatted constructor selected integer/string profiles are implemented; broader C printf and Windows domains remain open."
       ]
     },
     {
@@ -108100,11 +108216,23 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "util_z3_exception.go"
+        "util_z3_exception.go",
+        "util_printf.go"
       ],
       "tests": [
         "TestZ3ExceptionSourceCodesAndLabels",
-        "TestDefaultExceptionSourceStringAndEmbeddedNUL"
+        "TestDefaultExceptionSourceStringAndEmbeddedNUL",
+        "TestPrintfSourceExceptionConsumerAndCallsiteForms",
+        "TestPrintfIntegerFlagsWidthsPrecisionsAndDomains",
+        "TestPrintfCBytesNullPrecisionAndCharacterCount",
+        "TestPrintfSourceBufferCapacitiesTruncationAndGrowLoop",
+        "TestPrintfLinuxI64WidthAndExplicitMismatchBoundary",
+        "TestPrintfMalformedUnsupportedAndSignedCountOverflow",
+        "TestPrintfBudgetFailureEventsAndOwnerGuards",
+        "TestPrintfIndependentFiniteIntegerAndPaddingOracle",
+        "TestPrintfSignedCountOverflowOnEscapedPercent",
+        "TestPrintfBudgetPeakExactAndObserverPanicCleanup",
+        "TestPrintfByteBoundaryAndBackendEventClassification"
       ],
       "conditionals": [
         {
@@ -108139,16 +108267,29 @@
         },
         {
           "name": "default_exception fmt/va_list constructor and source printf formatter dependency",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "status": "partial",
+          "go_target": "util_printf.go",
+          "tests": [
+            "TestPrintfSourceExceptionConsumerAndCallsiteForms",
+            "TestPrintfIntegerFlagsWidthsPrecisionsAndDomains",
+            "TestPrintfCBytesNullPrecisionAndCharacterCount",
+            "TestPrintfSourceBufferCapacitiesTruncationAndGrowLoop",
+            "TestPrintfLinuxI64WidthAndExplicitMismatchBoundary",
+            "TestPrintfMalformedUnsupportedAndSignedCountOverflow",
+            "TestPrintfBudgetFailureEventsAndOwnerGuards",
+            "TestPrintfIndependentFiniteIntegerAndPaddingOracle",
+            "TestPrintfSignedCountOverflowOnEscapedPercent",
+            "TestPrintfBudgetPeakExactAndObserverPanicCleanup",
+            "TestPrintfByteBoundaryAndBackendEventClassification"
+          ]
         }
       ],
       "ownership": [
-        "Cold caller-owned concrete exception values/messages; no retained hot interface or numeric/arena graph. Cmd symbol composition reads borrowed checked bytes directly into one final message and outlives the symbol owner. Source CString observations and signed positions preserved. See Z3_EXCEPTION_PORT_STATUS.md."
+        "Cold caller-owned concrete exception values/messages; no retained hot interface or numeric/arena graph. Cmd symbol composition reads borrowed checked bytes directly into one final message and outlives the symbol owner. Source CString observations and signed positions preserved. See Z3_EXCEPTION_PORT_STATUS.md.",
+        "Formatted values use the selected budgeted integer/C-string formatter before caller-owned immutable exception construction. See PRINTF_PORT_STATUS.md."
       ],
       "deviations": [
-        "Go cold error interfaces replace virtual throw transport; source nonzero/location assertions use classified guard errors. Generic printf constructor/platform domains remain explicitly open."
+        "Go cold error interfaces replace virtual throw transport; source nonzero/location assertions use classified guard errors. Formatted constructor selected integer/string profiles are implemented; broader C printf and Windows domains remain open."
       ]
     },
     {

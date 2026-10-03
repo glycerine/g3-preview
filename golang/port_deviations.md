@@ -16,3 +16,13 @@ See package status files for precise methods and test evidence.
   portability to other endianness/char signedness remains an audit item.
 * Diagnostic and platform replacements must be recorded individually before
   their source units can be marked complete.
+
+### Explicit source formatter arguments and profiles
+
+PrintfFormatter uses concrete borrowed arguments in place of C va_list and
+implements Linux C-locale integer/C-string profiles. The selected null-%s glibc
+policy and finite failure for the source persistent retry loop are explicit
+adapters. Linux %I64u is width64 plus unsigned32; source uint64 mismatches
+receive a typed error. Other C conversion domains and Windows CRT state remain
+open, so the formatter and formatted exception constructor stay partial.
+See PRINTF_PORT_STATUS.md for source callsites, buffer actions and tests.
