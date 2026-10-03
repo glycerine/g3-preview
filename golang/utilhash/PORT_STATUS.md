@@ -317,3 +317,31 @@ string→int map's14 assertions and scoped binding container are still separate
 variants and are not claimed by this packet; no string→int implementation was
 started here. WASI execution retains the previously documented installed-runtime
 startup limitation.
+
+## Borrowed CString byte query boundary
+
+`str_hashtable_bytes.go` adds concrete FindCStringBytes, PrepareFindCStringBytes
+and CStringBytesHash for operation-scoped caller byte buffers. No caller buffer
+or temporary Go string is retained. The existing source hash/probe/equality and
+prepare-before-duplicate algorithm remains unchanged: first NUL terminates input,
+full words are little-endian, residual bytes use signed-char semantics, stored
+spelling equality uses unsigned bytes, growth occurs before duplicate lookup,
+and a missing query preflights the membership epoch before spelling allocation.
+This boundary serves real AST model-value name construction; the AST manager
+and its SymbolManager.InternBytes consumer remain a separate in-progress packet.
+It does not complete a new source unit or API operation.
+
+Four groups began actual missing-API RED before implementation and cover
+empty/nil/NUL/high-byte queries, input mutation without stored-key mutation,
+strict75percent growth-before-duplicate refusal, exhausted-epoch hit/miss,
+permanent independent C++ seed123 hash vectors for every length0..25 and long
+warm lookup with zero Go allocations. Parent reviewed both frozen Go files
+against existing CString/prepare/Intern source actions. Independent snapshot
+`.cache/release/cstring-bytes-integrated` is committed HEAD27d7d92 plus only
+these two Go files: full native33750 (mpnum10.012s), full checked/debug80815
+(mpnum10.368s), exact four race80969 RUN/PASS1.020s and actual checked/debug
+JS RUN/PASS0.154s, full vet, WASI50715 and source/no-generics73461 all terminal
+PASS. Source ledger remains33 ported/65 partial/2004 unported,677 API operations.
+
+Frozen SHA256 production85a0a5c714e1d557f78374d22933a5208a5df152c78b3743f534c5f54d53d4e0;
+tests78443c63785222eb22725749e8d75e33553f9591658bcd2716a20d36eb3d6461.

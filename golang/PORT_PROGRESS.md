@@ -806,3 +806,13 @@ The internal source loop never advances a nonempty key: its explicit typed guard
 preserves prior empty-key output. Real reslimit thresholds are implemented;
 process memory services and solver/API/timer producers remain open. Statistics
 source units remain partial. See STATISTICS_PORT_STATUS.md.
+
+## Borrowed byte queries for AST name interning
+
+A concrete byte-input boundary now queries the existing CString table without
+a temporary Go string. Four tests began missing-API RED and preserve first-NUL,
+signed-tail hashes, probing, growth-before-duplicate and exhausted-epoch behavior;
+long warm queries allocate no Go objects. Independent frozen full native/checked
+debug, named race/actual JS, vet/WASI/source-no-generics gates passed. Source/API
+coverage counts are unchanged; real AST name construction and the full manager
+remain in progress. See utilhash/PORT_STATUS.md.
