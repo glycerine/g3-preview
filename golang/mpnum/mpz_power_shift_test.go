@@ -129,7 +129,9 @@ func TestIntegerSourceShiftTable(t *testing.T) {
 		}
 		for alias := 0; alias < 2; alias++ {
 			var a, out, pw, expected Int
-			setIntegerOracle(t, m, &a, n)
+			if e := m.SetString(&a, f.n); e != nil {
+				t.Fatal(e)
+			}
 			dst := &out
 			if alias == 1 {
 				dst = &a
@@ -149,7 +151,9 @@ func TestIntegerSourceShiftTable(t *testing.T) {
 			}
 			// The actual source ENSURE compares against multiply/machine-divide by Power(2,k).
 			var original Int
-			setIntegerOracle(t, m, &original, n)
+			if e := m.SetString(&original, f.n); e != nil {
+				t.Fatal(e)
+			}
 			if f.mul {
 				err = m.Mul(&original, &pw, &expected)
 			} else {

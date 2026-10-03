@@ -79327,7 +79327,8 @@
       "go_targets": [
         "mpnum/mpq.go",
         "mpnum/mpq_round.go",
-        "mpnum/mpq_power.go"
+        "mpnum/mpq_power.go",
+        "mpnum/mpq_parse.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -79352,7 +79353,16 @@
         "TestRationalPowerIndependentAndDomains",
         "TestPowerShiftFailureCleanup",
         "TestPowerShiftWarmStorageAndLifetime",
-        "TestPowerDomainAliases"
+        "TestPowerDomainAliases",
+        "TestSourceStringAssertions",
+        "TestIntegerParserByteQuirks",
+        "TestRationalParserByteQuirksAndState",
+        "TestParserExceptionCategoriesAndFailurePublication",
+        "TestParserIndependentFiniteValues",
+        "TestParserBudgetFailureCleanup",
+        "TestParserWarmLifetimeAndInitialization",
+        "TestSourceParserLiteralInventory",
+        "TestParserSourceIntMinRepresentation"
       ],
       "conditionals": [
         {
@@ -79440,12 +79450,14 @@
       "ownership": [
         "Concrete numerator/denominator scalar Int pair, explicit NewRational 0/1; raw Go zero diagnosed. Base manager and scratch numerals owner-local, independently budgeted manager/header children. Partial source methods and formatting gaps remain. See mpnum/PORT_STATUS.md.",
         "Source prev-power assertions and log bounds translated; test powers are independent fixture generation until production Power is implemented. See mpnum/PORT_STATUS.md.",
-        "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending."
+        "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending.",
+        "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
         "Undefined zero denominator/divisor/inverse classified ErrDivideByZero. Both source scratch modes operation-owner confined.",
-        "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits."
+        "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits.",
+        "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors."
       ]
     },
     {
@@ -79460,7 +79472,8 @@
         "mpnum/mpz_div.go",
         "mpnum/mpz_gcd.go",
         "mpnum/mpz_log.go",
-        "mpnum/mpz_power_shift.go"
+        "mpnum/mpz_power_shift.go",
+        "mpnum/mpz_parse.go"
       ],
       "tests": [
         "TestSourceMPZMagnitudeProjections",
@@ -79496,7 +79509,16 @@
         "TestPowerShiftFailureCleanup",
         "TestPowerShiftWarmStorageAndLifetime",
         "TestShiftUnsignedBoundsAndPromotions",
-        "TestPowerDomainAliases"
+        "TestPowerDomainAliases",
+        "TestSourceStringAssertions",
+        "TestIntegerParserByteQuirks",
+        "TestRationalParserByteQuirksAndState",
+        "TestParserExceptionCategoriesAndFailurePublication",
+        "TestParserIndependentFiniteValues",
+        "TestParserBudgetFailureCleanup",
+        "TestParserWarmLifetimeAndInitialization",
+        "TestSourceParserLiteralInventory",
+        "TestParserSourceIntMinRepresentation"
       ],
       "conditionals": [
         {
@@ -79638,10 +79660,12 @@
         "Signed multiplication assertions and print-only square expectations strengthened. Remaining parser/GCD/root/bitwise/shift source assertions remain unported.",
         "Active 50-case GCD coherence uses bounded independent prime-product fixture generator. INT_MIN GCD print case strengthened to exact 2^31 expectation; see mpnum/PORT_STATUS.md.",
         "Source prev-power assertions and log bounds translated; test powers are independent fixture generation until production Power is implemented. See mpnum/PORT_STATUS.md.",
-        "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending."
+        "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending.",
+        "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md."
       ],
       "deviations": [
-        "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits."
+        "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits.",
+        "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors."
       ]
     },
     {
@@ -81133,9 +81157,14 @@
       "sha256": "a6ef1049711361be794fcca1404de39d063f2f46f709aa8d3312461e15e1f8b6",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/mpq_parse.go"
+      ],
+      "tests": [
+        "TestSourceStringAssertions",
+        "TestSourceParserLiteralInventory"
+      ],
       "assertions": [
         {
           "line": 30,
@@ -81797,7 +81826,9 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [],
-      "ownership": [],
+      "ownership": [
+        "Selected active textual inputs/assertion projections execute through concrete MPQ manager; the full global rational wrapper/test algorithm suite remains unported. No public-wrapper completion claim. See mpnum/PORT_STATUS.md."
+      ],
       "deviations": []
     },
     {
@@ -94963,7 +94994,8 @@
       "go_targets": [
         "mpnum/mpq.go",
         "mpnum/mpq_round.go",
-        "mpnum/mpq_power.go"
+        "mpnum/mpq_power.go",
+        "mpnum/mpq_parse.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -94988,7 +95020,16 @@
         "TestRationalPowerIndependentAndDomains",
         "TestPowerShiftFailureCleanup",
         "TestPowerShiftWarmStorageAndLifetime",
-        "TestPowerDomainAliases"
+        "TestPowerDomainAliases",
+        "TestSourceStringAssertions",
+        "TestIntegerParserByteQuirks",
+        "TestRationalParserByteQuirksAndState",
+        "TestParserExceptionCategoriesAndFailurePublication",
+        "TestParserIndependentFiniteValues",
+        "TestParserBudgetFailureCleanup",
+        "TestParserWarmLifetimeAndInitialization",
+        "TestSourceParserLiteralInventory",
+        "TestParserSourceIntMinRepresentation"
       ],
       "assertions": [
         {
@@ -95213,16 +95254,34 @@
             "TestPowerShiftWarmStorageAndLifetime",
             "TestPowerDomainAliases"
           ]
+        },
+        {
+          "name": "set(char const*) complete permissive byte/text parser",
+          "status": "ported",
+          "go_target": "mpnum/mpq_parse.go",
+          "tests": [
+            "TestSourceStringAssertions",
+            "TestIntegerParserByteQuirks",
+            "TestRationalParserByteQuirksAndState",
+            "TestParserExceptionCategoriesAndFailurePublication",
+            "TestParserIndependentFiniteValues",
+            "TestParserBudgetFailureCleanup",
+            "TestParserWarmLifetimeAndInitialization",
+            "TestSourceParserLiteralInventory",
+            "TestParserSourceIntMinRepresentation"
+          ]
         }
       ],
       "ownership": [
         "Concrete numerator/denominator scalar Int pair, explicit NewRational 0/1; raw Go zero diagnosed. Base manager and scratch numerals owner-local, independently budgeted manager/header children. Partial source methods and formatting gaps remain. See mpnum/PORT_STATUS.md.",
-        "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending."
+        "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending.",
+        "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
         "Undefined zero denominator/divisor/inverse classified ErrDivideByZero. Both source scratch modes operation-owner confined.",
-        "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits."
+        "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits.",
+        "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors."
       ]
     },
     {
@@ -95234,7 +95293,8 @@
       "go_targets": [
         "mpnum/mpq.go",
         "mpnum/mpq_round.go",
-        "mpnum/mpq_power.go"
+        "mpnum/mpq_power.go",
+        "mpnum/mpq_parse.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -95259,7 +95319,16 @@
         "TestRationalPowerIndependentAndDomains",
         "TestPowerShiftFailureCleanup",
         "TestPowerShiftWarmStorageAndLifetime",
-        "TestPowerDomainAliases"
+        "TestPowerDomainAliases",
+        "TestSourceStringAssertions",
+        "TestIntegerParserByteQuirks",
+        "TestRationalParserByteQuirksAndState",
+        "TestParserExceptionCategoriesAndFailurePublication",
+        "TestParserIndependentFiniteValues",
+        "TestParserBudgetFailureCleanup",
+        "TestParserWarmLifetimeAndInitialization",
+        "TestSourceParserLiteralInventory",
+        "TestParserSourceIntMinRepresentation"
       ],
       "conditionals": [
         {
@@ -95554,16 +95623,34 @@
             "TestPowerShiftWarmStorageAndLifetime",
             "TestPowerDomainAliases"
           ]
+        },
+        {
+          "name": "set(char const*) complete permissive byte/text parser",
+          "status": "ported",
+          "go_target": "mpnum/mpq_parse.go",
+          "tests": [
+            "TestSourceStringAssertions",
+            "TestIntegerParserByteQuirks",
+            "TestRationalParserByteQuirksAndState",
+            "TestParserExceptionCategoriesAndFailurePublication",
+            "TestParserIndependentFiniteValues",
+            "TestParserBudgetFailureCleanup",
+            "TestParserWarmLifetimeAndInitialization",
+            "TestSourceParserLiteralInventory",
+            "TestParserSourceIntMinRepresentation"
+          ]
         }
       ],
       "ownership": [
         "Concrete numerator/denominator scalar Int pair, explicit NewRational 0/1; raw Go zero diagnosed. Base manager and scratch numerals owner-local, independently budgeted manager/header children. Partial source methods and formatting gaps remain. See mpnum/PORT_STATUS.md.",
-        "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending."
+        "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending.",
+        "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
         "Undefined zero denominator/divisor/inverse classified ErrDivideByZero. Both source scratch modes operation-owner confined.",
-        "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits."
+        "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits.",
+        "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors."
       ]
     },
     {
@@ -95617,7 +95704,8 @@
         "mpnum/mpz_gcd.go",
         "mpnum/mpz_slab.go",
         "mpnum/mpz_log.go",
-        "mpnum/mpz_power_shift.go"
+        "mpnum/mpz_power_shift.go",
+        "mpnum/mpz_parse.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -95662,7 +95750,16 @@
         "TestPowerShiftFailureCleanup",
         "TestPowerShiftWarmStorageAndLifetime",
         "TestShiftUnsignedBoundsAndPromotions",
-        "TestPowerDomainAliases"
+        "TestPowerDomainAliases",
+        "TestSourceStringAssertions",
+        "TestIntegerParserByteQuirks",
+        "TestRationalParserByteQuirksAndState",
+        "TestParserExceptionCategoriesAndFailurePublication",
+        "TestParserIndependentFiniteValues",
+        "TestParserBudgetFailureCleanup",
+        "TestParserWarmLifetimeAndInitialization",
+        "TestSourceParserLiteralInventory",
+        "TestParserSourceIntMinRepresentation"
       ],
       "conditionals": [
         {
@@ -96790,19 +96887,37 @@
             "TestShiftUnsignedBoundsAndPromotions",
             "TestPowerDomainAliases"
           ]
+        },
+        {
+          "name": "set(char const*) complete permissive byte/text parser",
+          "status": "ported",
+          "go_target": "mpnum/mpz_parse.go",
+          "tests": [
+            "TestSourceStringAssertions",
+            "TestIntegerParserByteQuirks",
+            "TestRationalParserByteQuirksAndState",
+            "TestParserExceptionCategoriesAndFailurePublication",
+            "TestParserIndependentFiniteValues",
+            "TestParserBudgetFailureCleanup",
+            "TestParserWarmLifetimeAndInitialization",
+            "TestSourceParserLiteralInventory",
+            "TestParserSourceIntMinRepresentation"
+          ]
         }
       ],
       "ownership": [
         "Persistent cells and limbs in slabs/word pages. Copy/Move/Swap explicit; source scratch/cached constants retained. Owner identity caller contract; rendering/header budgets and remaining source operations unresolved. See mpnum/PORT_STATUS.md.",
         "Division scratch Words are budgeted and released. Div/Mod stage owner-local values for failure atomicity while preserving source output/divisor alias defects. Standalone MPN, formatting and header budgets remain unresolved. See mpnum/PORT_STATUS.md.",
         "IntegerManager, numericCellSlab, Words and descriptor owner headers now individually budgeted without double charging. Constructor rollback and complete Close tested; standalone MPN/formatting still pending. See BUDGET_PORT_STATUS.md.",
-        "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending."
+        "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending.",
+        "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
         "Div/Mod use staged owner cells, increasing storage peak and changing physical allocation timing; source arithmetic and alias defects preserved.",
         "GCD zero-case Copy+Abs staged before destination Move for failure atomicity. Array/extended GCD and LCM remain unported.",
-        "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits."
+        "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits.",
+        "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors."
       ]
     },
     {
@@ -96818,7 +96933,8 @@
         "mpnum/mpz_gcd.go",
         "mpnum/mpz_slab.go",
         "mpnum/mpz_log.go",
-        "mpnum/mpz_power_shift.go"
+        "mpnum/mpz_power_shift.go",
+        "mpnum/mpz_parse.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -96863,7 +96979,16 @@
         "TestPowerShiftFailureCleanup",
         "TestPowerShiftWarmStorageAndLifetime",
         "TestShiftUnsignedBoundsAndPromotions",
-        "TestPowerDomainAliases"
+        "TestPowerDomainAliases",
+        "TestSourceStringAssertions",
+        "TestIntegerParserByteQuirks",
+        "TestRationalParserByteQuirksAndState",
+        "TestParserExceptionCategoriesAndFailurePublication",
+        "TestParserIndependentFiniteValues",
+        "TestParserBudgetFailureCleanup",
+        "TestParserWarmLifetimeAndInitialization",
+        "TestSourceParserLiteralInventory",
+        "TestParserSourceIntMinRepresentation"
       ],
       "conditionals": [
         {
@@ -97503,19 +97628,37 @@
             "TestShiftUnsignedBoundsAndPromotions",
             "TestPowerDomainAliases"
           ]
+        },
+        {
+          "name": "set(char const*) complete permissive byte/text parser",
+          "status": "ported",
+          "go_target": "mpnum/mpz_parse.go",
+          "tests": [
+            "TestSourceStringAssertions",
+            "TestIntegerParserByteQuirks",
+            "TestRationalParserByteQuirksAndState",
+            "TestParserExceptionCategoriesAndFailurePublication",
+            "TestParserIndependentFiniteValues",
+            "TestParserBudgetFailureCleanup",
+            "TestParserWarmLifetimeAndInitialization",
+            "TestSourceParserLiteralInventory",
+            "TestParserSourceIntMinRepresentation"
+          ]
         }
       ],
       "ownership": [
         "Persistent cells and limbs in slabs/word pages. Copy/Move/Swap explicit; source scratch/cached constants retained. Owner identity caller contract; rendering/header budgets and remaining source operations unresolved. See mpnum/PORT_STATUS.md.",
         "Division scratch Words are budgeted and released. Div/Mod stage owner-local values for failure atomicity while preserving source output/divisor alias defects. Standalone MPN, formatting and header budgets remain unresolved. See mpnum/PORT_STATUS.md.",
         "IntegerManager, numericCellSlab, Words and descriptor owner headers now individually budgeted without double charging. Constructor rollback and complete Close tested; standalone MPN/formatting still pending. See BUDGET_PORT_STATUS.md.",
-        "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending."
+        "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending.",
+        "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
         "Div/Mod use staged owner cells, increasing storage peak and changing physical allocation timing; source arithmetic and alias defects preserved.",
         "GCD zero-case Copy+Abs staged before destination Move for failure atomicity. Array/extended GCD and LCM remain unported.",
-        "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits."
+        "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits.",
+        "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors."
       ]
     },
     {

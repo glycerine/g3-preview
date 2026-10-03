@@ -238,3 +238,20 @@ Tests-first RED reached GREEN; central review added RED regressions for epoch
 exhaustion before mutation and before interner allocation. Complete combined
 native/checked races/vet, actual checked JS execution of all12 table tests and
 WASI compilation pass. Owner-local prepared lookup supports the symbol service.
+
+## Complete selected integer/rational text setters
+
+Both source text setters now retain the permissive byte grammar, initial-space
+sign detection, NUL termination, fractions/decimals/scientific notation, prior
+rational denominator history and uint64 exponent wrapping before source range
+checks. Distinct parser exception categories remain separate from budget/owner
+errors and nonterminating source Power domains. Staged output/failure behavior
+and source temporary cleanup order are documented.
+
+Source tests went RED before implementation; all3 active rational parser
+assertions, source integer setups, 27 rational textual inputs, independent finite
+oracles and fault-position checks pass. Existing72 shift/2000 log fixtures now
+use the production parser for source setup. Combined full native/checked races,
+vet, actual checked JS execution of all9 new parser tests and WASI builds pass.
+Public rational wrapper, remaining numerical methods and scratch ownership remain
+open; the full solver objective is unchanged.

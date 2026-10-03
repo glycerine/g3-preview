@@ -600,3 +600,105 @@ modes; these are compilation evidence, not wasm runtime execution. Combined
 mpnum statement coverage is 89.5%, not complete path coverage. Every edit,
 cache, temp directory and artifact remains within golang. Earlier incorrectly
 tagged commands are supplemented by these actual checked-handle gates.
+
+## Complete selected MPZ/MPQ text-setter packet
+
+Status remains **partial MPZ/MPQ source units**, with the full selected source
+text setters now implemented. This supersedes earlier unimplemented-parser
+inventory entries; it does not complete the separate public/global rational
+wrapper or numerical manager diagnostics. New files mpz_parse.go,
+mpq_parse.go and mp_parse_test.go; the approved source string setups in
+mpz_power_shift_test.go and mpq_round_test.go now call production SetString.
+Their fixture constants and independent expected values remain intact. No shared
+arithmetic/arena helper, manifest or git change was made.
+
+IntegerManager.SetString(out,text) translates all of mpz.cpp's actual
+set(mpz&,char const*) body. RationalManager.SetString(out,text) translates all
+of mpq.cpp's corresponding integer/fraction/decimal/scientific body, including
+source temporary scopes, final sign adjustment and normalization. There is no
+text buffer/length overload in these managers: the source length/payload setter
+is the limb setter, already covered by IntegerManager.SetLimbs. No invented
+text overload or partial parser is advertised. Complete arithmetic dependency
+closure uses existing Mul/Add/Neg/Reset/Copy/SetParts/Rational Add/Mul/Div/Power
+and normalize; no new getter or global-manager dependency was introduced.
+
+Input is borrowed string bytes, never retained/copied into numeral storage.
+Finite Go length supplies the safe boundary of the source C pointer; embedded
+NUL stops all phases and hides later characters. Only leading ASCII space is
+skipped for sign detection. The first remaining '-' determines the whole-value
+sign; all other nondigits are ignored where the source ignores them. The parser
+uses bytes, not Unicode digits/whitespace or a stricter replacement grammar.
+MPZ ignores punctuation throughout. MPQ stops its initial digit scan at the
+first slash/dot/e/E, then follows the exact suffix branches:
+
+- Fraction denominator digit scanning skips other punctuation/signs and stops
+  at e/E. Thus 1/-2 is 1/2 and 1/2/3 is 1/23. An e/E after a fraction marker
+  triggers the source mixed-notation exception, including exponent zero.
+- Decimal scanning similarly skips punctuation, so 1.2/3 is 123/100; each ASCII
+  fractional digit multiplies the denominator-of-the-fraction by ten. Whole
+  numerator plus that fraction is formed through the actual rational operations.
+- Scientific sign is recognized only when '-' immediately follows e/E.
+  Nondigits except slash are skipped during exponent accumulation. A slash in
+  the exponent triggers the source mixed-notation exception; a slash in the
+  decimal fractional scan is instead ignored, as above.
+- The exponent accumulator retains unsigned uint64 wrap before its final
+  UINT32_MAX comparison. Exponent 2^64 wraps to zero; 2^64+1 wraps to one.
+  Generic source mask nontermination remains a distinct PowerDomainError.
+
+The source history defect is preserved explicitly: entry resets numerator but
+retains prior denominator. Scientific input without a decimal/slash does not
+reset it. Parsing 1e2 into prior 1/3 produces 100/3; 1e0 produces 1/3. Staged
+work copies the original denominator, rather than silently substituting a fresh
+0/1 value. Plain integer and decimal forms still reset/rebuild denominator at
+the actual source points. Decimal digit arithmetic also retains the source big
+representation of parsed -2147483648; its subsequent right-shift31 uses the big
+magnitude path (-1), distinct from the source inline INT_MIN defect (+1).
+
+ParseError{Reason} distinguishes the three source exceptions: mixed notation,
+exponent too big, and zero fraction denominator. errors.Is unwraps to
+ErrMixedNotation, ErrExponentTooLarge or existing ErrDivideByZero; errors.As
+retains the structured category. Allocation/budget/closed-owner failures and
+PowerDomainError remain separately classified. Empty/junk input and incomplete
+scientific exponents do not gain invented syntax errors. Source original
+exceptions leave a partially changed target; the authorized storage adaptation
+stages all work and publishes only after success, so every error preserves the
+old destination. This adds temporary peak ownership/cleanup timing, explicitly
+not the source allocation profile. Source suffix temporaries leave scope before
+the final sign/normalize; MPZ temporary deletion precedes final sign as in source.
+All numeric work uses existing budgeted cells/Words/reusable scratch. Escaped
+String output and standalone MPN scratch gaps remain open, not covered through
+transient accounting or the parser's borrowed input.
+
+TDD tests first failed with undefined SetString APIs (RED), then passed (GREEN).
+All three active set_str_bug assertions are retained. Source parsed-big tst1
+arithmetic/order, bug1 self-subtraction and int_min_bug parsed expected value
+are exercised. All 72 source shifts and 2000 source log bounds rerun with
+production parser setup and unchanged independent expectations. Source bug2/
+scoped print-only literals receive labeled independent numerical expectations;
+27 embedded active rational.cpp text literals and parser identities are projected
+through concrete managers without claiming the global wrapper/hash/root methods.
+
+Independent tests add 200 signed multi-limb integers, fractions and four-place
+scientific decimals per scratch mode using math/big solely in tests, plus exact
+source-derived byte interruptions, signed/non-ASCII bytes, embedded NUL,
+stateful prior-denominator sequences, uint64-wrap, exception priority and typed
+mask-domain cases. A finite valid exponent near 2^31 is refused with only 4KB
+budget growth available, avoiding unnecessary enormous source squaring while
+retaining real source arithmetic and budget failure behavior. Two modes x four
+text forms x integer/rational setters x 80 reservation positions verify untouched
+old values, independent mathematical retry answers and Close budget zero.
+Warmed setters allocate zero Go objects on the tested bounded workload;
+initialized/reused small/big numerals, invalid raw rational and closed owners
+are checked. Fixtures are permanent and never read source/reference binaries
+at runtime. No production math/big, Go generics, unsafe or borrowed input
+persistence was introduced.
+
+Final text-setter validation: full native release race (39.7s) and actual
+`-tags=g3checked` race (39.4s) suites pass, including the production-parser
+source shift/log setup changes. Native release/g3checked vet and portcheck
+source-gate/no-generics audit pass. Test binaries cross-build for js/wasm and
+wasip1/wasm in both actual handle modes; this is compilation evidence, not wasm
+runtime execution. Combined mpnum coverage is 89.8%, not complete path coverage.
+All edits/cache/temp/output remain under golang. Source unit status remains
+partial; formatting ownership, getters/scalar wrappers, higher arithmetic and
+public rational-wrapper integration are not silently marked implemented.

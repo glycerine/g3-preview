@@ -74,7 +74,9 @@ func TestIntegerSourceLogBounds(t *testing.T) {
 	n, _ := new(big.Int).SetString("1029489380487098723984579237", 10)
 	for i := 0; i < 1000; i++ {
 		n.Add(n, big.NewInt(1))
-		setIntegerOracle(t, m, &a, n)
+		if e := m.SetString(&a, n.String()); e != nil {
+			t.Fatal(e)
+		}
 		checkSourceLogBounds(t, m, &a, n)
 	}
 }

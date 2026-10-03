@@ -1,0 +1,193 @@
+// Copyright (c) 2006 Microsoft Corporation
+// Source: src/util/mpq.cpp set(mpq &, char const *), all source branches.
+package mpnum
+
+import "errors"
+
+var ErrMixedNotation = errors.New("mpnum: mixing rational/scientific notation")
+var ErrExponentTooLarge = errors.New("mpnum: exponent is too big")
+
+type ParseErrorReason uint8
+
+const (
+	ParseMixedNotation ParseErrorReason = iota + 1
+	ParseExponentTooLarge
+	ParseZeroDenominator
+)
+
+// ParseError classifies the three actual source parser exceptions. Allocation,
+// owner and nonterminating-Power failures retain their distinct error types.
+type ParseError struct{ Reason ParseErrorReason }
+
+func (e *ParseError) Unwrap() error {
+	switch e.Reason {
+	case ParseMixedNotation:
+		return ErrMixedNotation
+	case ParseExponentTooLarge:
+		return ErrExponentTooLarge
+	default:
+		return ErrDivideByZero
+	}
+}
+func (e *ParseError) Error() string { return e.Unwrap().Error() }
+
+// SetString is the complete permissive source integer/fraction/decimal/scientific
+// byte parser. In particular, scientific input without a dot retains the old
+// denominator. Work copies that source state, so output history is preserved.
+// Predicted storage and source exception failures leave the destination intact.
+func (m *RationalManager) SetString(out *Rational, text string) error {
+	if e := m.check(out); e != nil {
+		return e
+	}
+	work := NewRational()
+	defer m.drop(&work)
+	if e := m.z.Copy(&work.den, &out.den); e != nil {
+		return e
+	}
+	if e := m.z.Reset(&work.num); e != nil {
+		return e
+	}
+	ten := NewInt(10)
+	var tmp Int
+	defer m.z.Del(&tmp)
+	i := 0
+	for numeralByte(text, i) == ' ' {
+		i++
+	}
+	negative := numeralByte(text, i) == '-'
+	for {
+		b := numeralByte(text, i)
+		if b == 0 || b == '/' || b == '.' || b == 'e' || b == 'E' {
+			break
+		}
+		if b >= '0' && b <= '9' {
+			digit := NewInt(int32(b - '0'))
+			if e := m.z.Mul(&work.num, &ten, &tmp); e != nil {
+				return e
+			}
+			if e := m.z.Add(&tmp, &digit, &work.num); e != nil {
+				return e
+			}
+		}
+		i++
+	}
+	marker := numeralByte(text, i)
+	if marker == '/' || marker == '.' || marker == 'e' || marker == 'E' {
+		if e := m.parseRationalSuffix(&work, text, i, &tmp, &ten); e != nil {
+			return e
+		}
+	} else {
+		if e := m.resetDenominator(&work); e != nil {
+			return e
+		}
+	}
+	if negative {
+		if e := m.z.Neg(&work.num); e != nil {
+			return e
+		}
+	}
+	if e := m.normalize(&work); e != nil {
+		return e
+	}
+	return m.Move(out, &work)
+}
+
+// A separate lexical scope keeps source suffix temporaries alive exactly until
+// the suffix branch exits, before the outer sign adjustment/normalization.
+func (m *RationalManager) parseRationalSuffix(work *Rational, text string, i int, tmp, ten *Int) error {
+	marker := numeralByte(text, i)
+
+	isRat := marker == '/'
+	tmp2 := NewInt(1)
+	defer m.z.Del(&tmp2)
+	hasDen := false
+	if marker == '/' || marker == '.' {
+		hasDen = true
+		i++
+		if e := m.z.Reset(&work.den); e != nil {
+			return e
+		}
+		for {
+			b := numeralByte(text, i)
+			if b == 0 || b == 'e' || b == 'E' {
+				break
+			}
+			if b >= '0' && b <= '9' {
+				digit := NewInt(int32(b - '0'))
+				if e := m.z.Mul(&work.den, ten, tmp); e != nil {
+					return e
+				}
+				if e := m.z.Add(tmp, &digit, &work.den); e != nil {
+					return e
+				}
+				if !isRat {
+					if e := m.z.Mul(&tmp2, ten, &tmp2); e != nil {
+						return e
+					}
+				}
+			}
+			i++
+		}
+	}
+	var exponent uint64
+	expNegative := false
+	if b := numeralByte(text, i); b == 'e' || b == 'E' {
+		if isRat {
+			return &ParseError{Reason: ParseMixedNotation}
+		}
+		i++
+		if numeralByte(text, i) == '-' {
+			expNegative = true
+			i++
+		}
+		for ; numeralByte(text, i) != 0; i++ {
+			b := numeralByte(text, i)
+			if b >= '0' && b <= '9' {
+				exponent = 10*exponent + uint64(b-'0')
+			} else if b == '/' {
+				return &ParseError{Reason: ParseMixedNotation}
+			}
+		}
+	}
+	if !isRat {
+		if exponent > uint64(^uint32(0)) {
+			return &ParseError{Reason: ParseExponentTooLarge}
+		}
+		b := NewRational()
+		defer m.drop(&b)
+		if hasDen {
+			if e := m.SetParts(&b, &work.den, &tmp2); e != nil {
+				return e
+			}
+			if e := m.z.SetInt64(&work.den, 1); e != nil {
+				return e
+			}
+			if e := m.Add(work, &b, work); e != nil {
+				return e
+			}
+		}
+		if exponent > 0 {
+			exp, tenRat := NewRational(), NewRational()
+			defer m.drop(&exp)
+			defer m.drop(&tenRat)
+			if e := m.SetInt64(&tenRat, 10); e != nil {
+				return e
+			}
+			if e := m.Power(&tenRat, uint32(exponent), &exp); e != nil {
+				return e
+			}
+			if expNegative {
+				if e := m.Div(work, &exp, work); e != nil {
+					return e
+				}
+			} else {
+				if e := m.Mul(work, &exp, work); e != nil {
+					return e
+				}
+			}
+		}
+	} else if work.den.val == 0 {
+		return &ParseError{Reason: ParseZeroDenominator}
+	}
+	return nil
+}
