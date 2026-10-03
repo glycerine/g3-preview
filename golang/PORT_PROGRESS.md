@@ -1,5 +1,31 @@
 # Port progress
 
+## Concrete internal32 fast-float integration
+
+The selected MPFF manager and its concrete scalar/vector scopes now implement
+the source internal32 arithmetic, directed rounding, conversions, predicates,
+limits/power and byte-formatting families. Tests observed missing-API RED before
+implementation. Review regressions separately observed RED before correcting
+release integer truncation/getters and source diagnostic ordering. No Go
+generics, unsafe storage or production math/big were introduced.
+
+The final isolated prospective tree passed full native, checked/debug, race,
+actual checked/debug JS, vet and WASI compilation. All 22 new named MPFF groups
+were explicitly observed RUN/PASS under JS; release JS also executes the two
+source conditional conversion/getter fixtures. Source tests retain all finite
+loop counts and execute 908,316 ENSURE plus two VERIFY actions, complemented by
+independent directed-arithmetic/alias models and immediate ownership/fault
+audits. Exact adapters, frozen hashes and gate evidence are in
+MPFF_PORT_STATUS.md. WASI remains compilation evidence only.
+
+The coordinator audited the final central manifest against the isolated packet:
+2,102 units and 677 APIs, with 33 ported, 68 partial and 2,001 unported. Three
+MPFF units moved from unported to partial; the existing scope source rows gained
+the concrete MPFF specialization. Persistent ostream state, TRACE/STRACE,
+external exception transport and the real subpaving consumers remain open, so
+whole MPFF units stay partial. Parallel AST, proof and SAT drafts are outside
+this commit; the full solver/AST/proof/interpolation objective remains active.
+
 The full fork remains the objective. This foundation work supplies no solver API,
 SAT result, theory, AST manager, proof, or interpolation implementation.
 

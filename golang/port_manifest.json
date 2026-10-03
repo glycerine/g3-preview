@@ -79230,9 +79230,43 @@
       "sha256": "a5d0e5d683a781fb423713e1de8627473813e204de385bd7f58a293608fbe23d",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/mpff.go",
+        "mpnum/mpff_arithmetic.go",
+        "mpnum/mpff_convert.go",
+        "mpnum/mpff_format.go",
+        "mpnum/mpff_limbs.go",
+        "mpnum/mpff_predicates.go",
+        "mpnum/mpff_ref.go",
+        "mpnum/mpff_ref_checked.go",
+        "mpnum/scoped_fast_float.go",
+        "mpnum/scoped_fast_float_vector.go"
+      ],
+      "tests": [
+        "TestFastFloatIntegerConversionSource",
+        "TestFastFloatRationalRawShapeAndConversionFailures",
+        "TestFastFloatIntegerSourceDiscardedLimbDefects",
+        "TestFastFloatToIntegerSourceReleaseTruncation",
+        "TestFastFloatGetterSourceReleaseActions",
+        "TestFastFloatSourcePrintedPaths",
+        "TestFastFloatIndependentDirectedAliases",
+        "TestFastFloatConstructorReservationPrefixes",
+        "TestFastFloatArithmeticFailureRoots",
+        "TestFastFloatPowerWrapPrefixes",
+        "TestFastFloatFormattingFailureAndWarmStorage",
+        "TestFastFloatIDRecyclingAndRetirement",
+        "TestFastFloatScopedFailureLifetimes",
+        "TestFastFloatDivisionSourceDiagnosticPrefix",
+        "TestFastFloatActualWholeGraphCharges",
+        "TestFastFloatSourceActiveMatrix",
+        "TestFastFloatSourceBasic",
+        "TestFastFloatSourceDecimal",
+        "TestFastFloatVectorCheckedAllocationBounds",
+        "TestFastFloatOwnerProvenanceAndVectorLifetime",
+        "TestFastFloatNeighborAndThinRoutes",
+        "TestFastFloatVectorOldNewPeakBudget"
+      ],
       "conditionals": [
         {
           "line": 534,
@@ -79725,11 +79759,49 @@
           "text": "ENSURE(m.prev_power_of_two(a) == expected);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "all finite registered arithmetic/capacity/limits/power/decimal routes: 908316 ENSURE +2 VERIFY; 146 isolated normal print events",
+          "status": "ported",
+          "go_target": "mpnum/mpff_source_matrix_test.go",
+          "tests": [
+            "TestFastFloatIntegerConversionSource",
+            "TestFastFloatRationalRawShapeAndConversionFailures",
+            "TestFastFloatIntegerSourceDiscardedLimbDefects",
+            "TestFastFloatToIntegerSourceReleaseTruncation",
+            "TestFastFloatGetterSourceReleaseActions",
+            "TestFastFloatSourcePrintedPaths",
+            "TestFastFloatIndependentDirectedAliases",
+            "TestFastFloatConstructorReservationPrefixes",
+            "TestFastFloatArithmeticFailureRoots",
+            "TestFastFloatPowerWrapPrefixes",
+            "TestFastFloatFormattingFailureAndWarmStorage",
+            "TestFastFloatIDRecyclingAndRetirement",
+            "TestFastFloatScopedFailureLifetimes",
+            "TestFastFloatDivisionSourceDiagnosticPrefix",
+            "TestFastFloatActualWholeGraphCharges",
+            "TestFastFloatSourceActiveMatrix",
+            "TestFastFloatSourceBasic",
+            "TestFastFloatSourceDecimal",
+            "TestFastFloatVectorCheckedAllocationBounds",
+            "TestFastFloatOwnerProvenanceAndVectorLifetime",
+            "TestFastFloatNeighborAndThinRoutes",
+            "TestFastFloatVectorOldNewPeakBudget"
+          ]
+        },
+        {
+          "name": "original global invocation/RNG/stdout transcript and persistent ostream/TRACE diagnostic integration",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Actual owner header, Words/Natural services, significand blocks, validity/generation metadata, recycle and eleven live vector roots plus retained text workspaces charged. Source statement and alias prefixes survive failure; lexical temporaries release with injector armed. Raw handles retain implicit manager provenance limits. See MPFF_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Concrete internal32 and explicit Close; accept finite odd precision >=2, replace alignment-dependent uint64 casts with little-endian limbs. Undefined signed negation/shift, power mask-wrap nontermination and physical storage overflow have documented typed adapters after completed prefixes. Persistent ostream flags/fail-state, TRACE/STRACE, external exception transport and real subpaving consumers remain open. Source tests preserve finite loop/draw shapes using an explicit hermetic nonnegative31bit RNG, not an ambient libc sequence."
+      ]
     },
     {
       "path": "src/test/mpfx.cpp",
@@ -97118,9 +97190,43 @@
       "sha256": "f4ba71c0cb220a64c7a2d7b5926c79df492e39e1e8037535a77c2b3191b5e565",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/mpff.go",
+        "mpnum/mpff_arithmetic.go",
+        "mpnum/mpff_convert.go",
+        "mpnum/mpff_format.go",
+        "mpnum/mpff_limbs.go",
+        "mpnum/mpff_predicates.go",
+        "mpnum/mpff_ref.go",
+        "mpnum/mpff_ref_checked.go",
+        "mpnum/scoped_fast_float.go",
+        "mpnum/scoped_fast_float_vector.go"
+      ],
+      "tests": [
+        "TestFastFloatIntegerConversionSource",
+        "TestFastFloatRationalRawShapeAndConversionFailures",
+        "TestFastFloatIntegerSourceDiscardedLimbDefects",
+        "TestFastFloatToIntegerSourceReleaseTruncation",
+        "TestFastFloatGetterSourceReleaseActions",
+        "TestFastFloatSourcePrintedPaths",
+        "TestFastFloatIndependentDirectedAliases",
+        "TestFastFloatConstructorReservationPrefixes",
+        "TestFastFloatArithmeticFailureRoots",
+        "TestFastFloatPowerWrapPrefixes",
+        "TestFastFloatFormattingFailureAndWarmStorage",
+        "TestFastFloatIDRecyclingAndRetirement",
+        "TestFastFloatScopedFailureLifetimes",
+        "TestFastFloatDivisionSourceDiagnosticPrefix",
+        "TestFastFloatActualWholeGraphCharges",
+        "TestFastFloatSourceActiveMatrix",
+        "TestFastFloatSourceBasic",
+        "TestFastFloatSourceDecimal",
+        "TestFastFloatVectorCheckedAllocationBounds",
+        "TestFastFloatOwnerProvenanceAndVectorLifetime",
+        "TestFastFloatNeighborAndThinRoutes",
+        "TestFastFloatVectorOldNewPeakBudget"
+      ],
       "conditionals": [
         {
           "line": 270,
@@ -97513,20 +97619,237 @@
           "text": "SASSERT(!is_zero(n) || n.m_exponent == 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "constructor/destructor, default precision/capacity, source VERIFY zero ID, owned one, expand/allocate/recycle/reset and scalar swap",
+          "status": "ported",
+          "go_target": "mpnum/mpff.go",
+          "tests": [
+            "TestFastFloatIntegerConversionSource",
+            "TestFastFloatRationalRawShapeAndConversionFailures",
+            "TestFastFloatIntegerSourceDiscardedLimbDefects",
+            "TestFastFloatToIntegerSourceReleaseTruncation",
+            "TestFastFloatGetterSourceReleaseActions",
+            "TestFastFloatSourcePrintedPaths",
+            "TestFastFloatIndependentDirectedAliases",
+            "TestFastFloatConstructorReservationPrefixes",
+            "TestFastFloatArithmeticFailureRoots",
+            "TestFastFloatPowerWrapPrefixes",
+            "TestFastFloatFormattingFailureAndWarmStorage",
+            "TestFastFloatIDRecyclingAndRetirement",
+            "TestFastFloatScopedFailureLifetimes",
+            "TestFastFloatDivisionSourceDiagnosticPrefix",
+            "TestFastFloatActualWholeGraphCharges",
+            "TestFastFloatSourceActiveMatrix",
+            "TestFastFloatSourceBasic",
+            "TestFastFloatSourceDecimal",
+            "TestFastFloatVectorCheckedAllocationBounds",
+            "TestFastFloatOwnerProvenanceAndVectorLifetime",
+            "TestFastFloatNeighborAndThinRoutes",
+            "TestFastFloatVectorOldNewPeakBudget"
+          ]
+        },
+        {
+          "name": "rounding, all sign/integer/one/epsilon/power predicates, comparisons, source-defined release integer getters and exponent access",
+          "status": "ported",
+          "go_target": "mpnum/mpff_predicates.go",
+          "tests": [
+            "TestFastFloatIntegerConversionSource",
+            "TestFastFloatRationalRawShapeAndConversionFailures",
+            "TestFastFloatIntegerSourceDiscardedLimbDefects",
+            "TestFastFloatToIntegerSourceReleaseTruncation",
+            "TestFastFloatGetterSourceReleaseActions",
+            "TestFastFloatSourcePrintedPaths",
+            "TestFastFloatIndependentDirectedAliases",
+            "TestFastFloatConstructorReservationPrefixes",
+            "TestFastFloatArithmeticFailureRoots",
+            "TestFastFloatPowerWrapPrefixes",
+            "TestFastFloatFormattingFailureAndWarmStorage",
+            "TestFastFloatIDRecyclingAndRetirement",
+            "TestFastFloatScopedFailureLifetimes",
+            "TestFastFloatDivisionSourceDiagnosticPrefix",
+            "TestFastFloatActualWholeGraphCharges",
+            "TestFastFloatSourceActiveMatrix",
+            "TestFastFloatSourceBasic",
+            "TestFastFloatSourceDecimal",
+            "TestFastFloatVectorCheckedAllocationBounds",
+            "TestFastFloatOwnerProvenanceAndVectorLifetime",
+            "TestFastFloatNeighborAndThinRoutes",
+            "TestFastFloatVectorOldNewPeakBudget"
+          ]
+        },
+        {
+          "name": "32/64 signed/unsigned/fraction setters, deep copy, sign/abs, next/prev, min/max/epsilon and saturation",
+          "status": "ported",
+          "go_target": "mpnum/mpff.go",
+          "tests": [
+            "TestFastFloatIntegerConversionSource",
+            "TestFastFloatRationalRawShapeAndConversionFailures",
+            "TestFastFloatIntegerSourceDiscardedLimbDefects",
+            "TestFastFloatToIntegerSourceReleaseTruncation",
+            "TestFastFloatGetterSourceReleaseActions",
+            "TestFastFloatSourcePrintedPaths",
+            "TestFastFloatIndependentDirectedAliases",
+            "TestFastFloatConstructorReservationPrefixes",
+            "TestFastFloatArithmeticFailureRoots",
+            "TestFastFloatPowerWrapPrefixes",
+            "TestFastFloatFormattingFailureAndWarmStorage",
+            "TestFastFloatIDRecyclingAndRetirement",
+            "TestFastFloatScopedFailureLifetimes",
+            "TestFastFloatDivisionSourceDiagnosticPrefix",
+            "TestFastFloatActualWholeGraphCharges",
+            "TestFastFloatSourceActiveMatrix",
+            "TestFastFloatSourceBasic",
+            "TestFastFloatSourceDecimal",
+            "TestFastFloatVectorCheckedAllocationBounds",
+            "TestFastFloatOwnerProvenanceAndVectorLifetime",
+            "TestFastFloatNeighborAndThinRoutes",
+            "TestFastFloatVectorOldNewPeakBudget"
+          ]
+        },
+        {
+          "name": "indexed shifts/normalization, source add_sub/Add/Sub/Inc/Dec, Algorithm M Mul, single Algorithm D Div, Inv, complete Power, Floor/Ceil",
+          "status": "ported",
+          "go_target": "mpnum/mpff_arithmetic.go",
+          "tests": [
+            "TestFastFloatIntegerConversionSource",
+            "TestFastFloatRationalRawShapeAndConversionFailures",
+            "TestFastFloatIntegerSourceDiscardedLimbDefects",
+            "TestFastFloatToIntegerSourceReleaseTruncation",
+            "TestFastFloatGetterSourceReleaseActions",
+            "TestFastFloatSourcePrintedPaths",
+            "TestFastFloatIndependentDirectedAliases",
+            "TestFastFloatConstructorReservationPrefixes",
+            "TestFastFloatArithmeticFailureRoots",
+            "TestFastFloatPowerWrapPrefixes",
+            "TestFastFloatFormattingFailureAndWarmStorage",
+            "TestFastFloatIDRecyclingAndRetirement",
+            "TestFastFloatScopedFailureLifetimes",
+            "TestFastFloatDivisionSourceDiagnosticPrefix",
+            "TestFastFloatActualWholeGraphCharges",
+            "TestFastFloatSourceActiveMatrix",
+            "TestFastFloatSourceBasic",
+            "TestFastFloatSourceDecimal",
+            "TestFastFloatVectorCheckedAllocationBounds",
+            "TestFastFloatOwnerProvenanceAndVectorLifetime",
+            "TestFastFloatNeighborAndThinRoutes",
+            "TestFastFloatVectorOldNewPeakBudget"
+          ]
+        },
+        {
+          "name": "both integer/rational manager policies: set/decompose/significand/to_mpz/to_mpq, source discarded-limb increment defect and rounding restoration",
+          "status": "ported",
+          "go_target": "mpnum/mpff_convert.go",
+          "tests": [
+            "TestFastFloatIntegerConversionSource",
+            "TestFastFloatRationalRawShapeAndConversionFailures",
+            "TestFastFloatIntegerSourceDiscardedLimbDefects",
+            "TestFastFloatToIntegerSourceReleaseTruncation",
+            "TestFastFloatGetterSourceReleaseActions",
+            "TestFastFloatSourcePrintedPaths",
+            "TestFastFloatIndependentDirectedAliases",
+            "TestFastFloatConstructorReservationPrefixes",
+            "TestFastFloatArithmeticFailureRoots",
+            "TestFastFloatPowerWrapPrefixes",
+            "TestFastFloatFormattingFailureAndWarmStorage",
+            "TestFastFloatIDRecyclingAndRetirement",
+            "TestFastFloatScopedFailureLifetimes",
+            "TestFastFloatDivisionSourceDiagnosticPrefix",
+            "TestFastFloatActualWholeGraphCharges",
+            "TestFastFloatSourceActiveMatrix",
+            "TestFastFloatSourceBasic",
+            "TestFastFloatSourceDecimal",
+            "TestFastFloatVectorCheckedAllocationBounds",
+            "TestFastFloatOwnerProvenanceAndVectorLifetime",
+            "TestFastFloatNeighborAndThinRoutes",
+            "TestFastFloatVectorOldNewPeakBudget"
+          ]
+        },
+        {
+          "name": "raw/ordinary/pretty/decimal/SMT2 default byte profiles, to_string/to_rational_string and prepared FormatInto",
+          "status": "ported",
+          "go_target": "mpnum/mpff_format.go",
+          "tests": [
+            "TestFastFloatIntegerConversionSource",
+            "TestFastFloatRationalRawShapeAndConversionFailures",
+            "TestFastFloatIntegerSourceDiscardedLimbDefects",
+            "TestFastFloatToIntegerSourceReleaseTruncation",
+            "TestFastFloatGetterSourceReleaseActions",
+            "TestFastFloatSourcePrintedPaths",
+            "TestFastFloatIndependentDirectedAliases",
+            "TestFastFloatConstructorReservationPrefixes",
+            "TestFastFloatArithmeticFailureRoots",
+            "TestFastFloatPowerWrapPrefixes",
+            "TestFastFloatFormattingFailureAndWarmStorage",
+            "TestFastFloatIDRecyclingAndRetirement",
+            "TestFastFloatScopedFailureLifetimes",
+            "TestFastFloatDivisionSourceDiagnosticPrefix",
+            "TestFastFloatActualWholeGraphCharges",
+            "TestFastFloatSourceActiveMatrix",
+            "TestFastFloatSourceBasic",
+            "TestFastFloatSourceDecimal",
+            "TestFastFloatVectorCheckedAllocationBounds",
+            "TestFastFloatOwnerProvenanceAndVectorLifetime",
+            "TestFastFloatNeighborAndThinRoutes",
+            "TestFastFloatVectorOldNewPeakBudget"
+          ]
+        },
+        {
+          "name": "persistent ostream state/transport, TRACE/STRACE actions, source exception transport and subpaving consumer integration",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Actual owner header, Words/Natural services, significand blocks, validity/generation metadata, recycle and eleven live vector roots plus retained text workspaces charged. Source statement and alias prefixes survive failure; lexical temporaries release with injector armed. Raw handles retain implicit manager provenance limits. See MPFF_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Concrete internal32 and explicit Close; accept finite odd precision >=2, replace alignment-dependent uint64 casts with little-endian limbs. Undefined signed negation/shift, power mask-wrap nontermination and physical storage overflow have documented typed adapters after completed prefixes. Persistent ostream flags/fail-state, TRACE/STRACE, external exception transport and real subpaving consumers remain open. Source tests preserve finite loop/draw shapes using an explicit hermetic nonnegative31bit RNG, not an ambient libc sequence."
+      ]
     },
     {
       "path": "src/util/mpff.h",
       "sha256": "acdd83f60c2cea651b626cf0163f8b1ccf765f9226a0a4599b0d6f85fc90cea1",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/mpff.go",
+        "mpnum/mpff_arithmetic.go",
+        "mpnum/mpff_convert.go",
+        "mpnum/mpff_format.go",
+        "mpnum/mpff_limbs.go",
+        "mpnum/mpff_predicates.go",
+        "mpnum/mpff_ref.go",
+        "mpnum/mpff_ref_checked.go",
+        "mpnum/scoped_fast_float.go",
+        "mpnum/scoped_fast_float_vector.go"
+      ],
+      "tests": [
+        "TestFastFloatIntegerConversionSource",
+        "TestFastFloatRationalRawShapeAndConversionFailures",
+        "TestFastFloatIntegerSourceDiscardedLimbDefects",
+        "TestFastFloatToIntegerSourceReleaseTruncation",
+        "TestFastFloatGetterSourceReleaseActions",
+        "TestFastFloatSourcePrintedPaths",
+        "TestFastFloatIndependentDirectedAliases",
+        "TestFastFloatConstructorReservationPrefixes",
+        "TestFastFloatArithmeticFailureRoots",
+        "TestFastFloatPowerWrapPrefixes",
+        "TestFastFloatFormattingFailureAndWarmStorage",
+        "TestFastFloatIDRecyclingAndRetirement",
+        "TestFastFloatScopedFailureLifetimes",
+        "TestFastFloatDivisionSourceDiagnosticPrefix",
+        "TestFastFloatActualWholeGraphCharges",
+        "TestFastFloatSourceActiveMatrix",
+        "TestFastFloatSourceBasic",
+        "TestFastFloatSourceDecimal",
+        "TestFastFloatVectorCheckedAllocationBounds",
+        "TestFastFloatOwnerProvenanceAndVectorLifetime",
+        "TestFastFloatNeighborAndThinRoutes",
+        "TestFastFloatVectorOldNewPeakBudget"
+      ],
       "conditionals": [
         {
           "line": 23,
@@ -97543,11 +97866,194 @@
           "text": "void set_exponent(mpff & n, int exp) { if (is_zero(n)) return; n.m_exponent = exp; SASSERT(check(n)); }"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "constructor/destructor, default precision/capacity, source VERIFY zero ID, owned one, expand/allocate/recycle/reset and scalar swap",
+          "status": "ported",
+          "go_target": "mpnum/mpff.go",
+          "tests": [
+            "TestFastFloatIntegerConversionSource",
+            "TestFastFloatRationalRawShapeAndConversionFailures",
+            "TestFastFloatIntegerSourceDiscardedLimbDefects",
+            "TestFastFloatToIntegerSourceReleaseTruncation",
+            "TestFastFloatGetterSourceReleaseActions",
+            "TestFastFloatSourcePrintedPaths",
+            "TestFastFloatIndependentDirectedAliases",
+            "TestFastFloatConstructorReservationPrefixes",
+            "TestFastFloatArithmeticFailureRoots",
+            "TestFastFloatPowerWrapPrefixes",
+            "TestFastFloatFormattingFailureAndWarmStorage",
+            "TestFastFloatIDRecyclingAndRetirement",
+            "TestFastFloatScopedFailureLifetimes",
+            "TestFastFloatDivisionSourceDiagnosticPrefix",
+            "TestFastFloatActualWholeGraphCharges",
+            "TestFastFloatSourceActiveMatrix",
+            "TestFastFloatSourceBasic",
+            "TestFastFloatSourceDecimal",
+            "TestFastFloatVectorCheckedAllocationBounds",
+            "TestFastFloatOwnerProvenanceAndVectorLifetime",
+            "TestFastFloatNeighborAndThinRoutes",
+            "TestFastFloatVectorOldNewPeakBudget"
+          ]
+        },
+        {
+          "name": "rounding, all sign/integer/one/epsilon/power predicates, comparisons, source-defined release integer getters and exponent access",
+          "status": "ported",
+          "go_target": "mpnum/mpff_predicates.go",
+          "tests": [
+            "TestFastFloatIntegerConversionSource",
+            "TestFastFloatRationalRawShapeAndConversionFailures",
+            "TestFastFloatIntegerSourceDiscardedLimbDefects",
+            "TestFastFloatToIntegerSourceReleaseTruncation",
+            "TestFastFloatGetterSourceReleaseActions",
+            "TestFastFloatSourcePrintedPaths",
+            "TestFastFloatIndependentDirectedAliases",
+            "TestFastFloatConstructorReservationPrefixes",
+            "TestFastFloatArithmeticFailureRoots",
+            "TestFastFloatPowerWrapPrefixes",
+            "TestFastFloatFormattingFailureAndWarmStorage",
+            "TestFastFloatIDRecyclingAndRetirement",
+            "TestFastFloatScopedFailureLifetimes",
+            "TestFastFloatDivisionSourceDiagnosticPrefix",
+            "TestFastFloatActualWholeGraphCharges",
+            "TestFastFloatSourceActiveMatrix",
+            "TestFastFloatSourceBasic",
+            "TestFastFloatSourceDecimal",
+            "TestFastFloatVectorCheckedAllocationBounds",
+            "TestFastFloatOwnerProvenanceAndVectorLifetime",
+            "TestFastFloatNeighborAndThinRoutes",
+            "TestFastFloatVectorOldNewPeakBudget"
+          ]
+        },
+        {
+          "name": "32/64 signed/unsigned/fraction setters, deep copy, sign/abs, next/prev, min/max/epsilon and saturation",
+          "status": "ported",
+          "go_target": "mpnum/mpff.go",
+          "tests": [
+            "TestFastFloatIntegerConversionSource",
+            "TestFastFloatRationalRawShapeAndConversionFailures",
+            "TestFastFloatIntegerSourceDiscardedLimbDefects",
+            "TestFastFloatToIntegerSourceReleaseTruncation",
+            "TestFastFloatGetterSourceReleaseActions",
+            "TestFastFloatSourcePrintedPaths",
+            "TestFastFloatIndependentDirectedAliases",
+            "TestFastFloatConstructorReservationPrefixes",
+            "TestFastFloatArithmeticFailureRoots",
+            "TestFastFloatPowerWrapPrefixes",
+            "TestFastFloatFormattingFailureAndWarmStorage",
+            "TestFastFloatIDRecyclingAndRetirement",
+            "TestFastFloatScopedFailureLifetimes",
+            "TestFastFloatDivisionSourceDiagnosticPrefix",
+            "TestFastFloatActualWholeGraphCharges",
+            "TestFastFloatSourceActiveMatrix",
+            "TestFastFloatSourceBasic",
+            "TestFastFloatSourceDecimal",
+            "TestFastFloatVectorCheckedAllocationBounds",
+            "TestFastFloatOwnerProvenanceAndVectorLifetime",
+            "TestFastFloatNeighborAndThinRoutes",
+            "TestFastFloatVectorOldNewPeakBudget"
+          ]
+        },
+        {
+          "name": "indexed shifts/normalization, source add_sub/Add/Sub/Inc/Dec, Algorithm M Mul, single Algorithm D Div, Inv, complete Power, Floor/Ceil",
+          "status": "ported",
+          "go_target": "mpnum/mpff_arithmetic.go",
+          "tests": [
+            "TestFastFloatIntegerConversionSource",
+            "TestFastFloatRationalRawShapeAndConversionFailures",
+            "TestFastFloatIntegerSourceDiscardedLimbDefects",
+            "TestFastFloatToIntegerSourceReleaseTruncation",
+            "TestFastFloatGetterSourceReleaseActions",
+            "TestFastFloatSourcePrintedPaths",
+            "TestFastFloatIndependentDirectedAliases",
+            "TestFastFloatConstructorReservationPrefixes",
+            "TestFastFloatArithmeticFailureRoots",
+            "TestFastFloatPowerWrapPrefixes",
+            "TestFastFloatFormattingFailureAndWarmStorage",
+            "TestFastFloatIDRecyclingAndRetirement",
+            "TestFastFloatScopedFailureLifetimes",
+            "TestFastFloatDivisionSourceDiagnosticPrefix",
+            "TestFastFloatActualWholeGraphCharges",
+            "TestFastFloatSourceActiveMatrix",
+            "TestFastFloatSourceBasic",
+            "TestFastFloatSourceDecimal",
+            "TestFastFloatVectorCheckedAllocationBounds",
+            "TestFastFloatOwnerProvenanceAndVectorLifetime",
+            "TestFastFloatNeighborAndThinRoutes",
+            "TestFastFloatVectorOldNewPeakBudget"
+          ]
+        },
+        {
+          "name": "both integer/rational manager policies: set/decompose/significand/to_mpz/to_mpq, source discarded-limb increment defect and rounding restoration",
+          "status": "ported",
+          "go_target": "mpnum/mpff_convert.go",
+          "tests": [
+            "TestFastFloatIntegerConversionSource",
+            "TestFastFloatRationalRawShapeAndConversionFailures",
+            "TestFastFloatIntegerSourceDiscardedLimbDefects",
+            "TestFastFloatToIntegerSourceReleaseTruncation",
+            "TestFastFloatGetterSourceReleaseActions",
+            "TestFastFloatSourcePrintedPaths",
+            "TestFastFloatIndependentDirectedAliases",
+            "TestFastFloatConstructorReservationPrefixes",
+            "TestFastFloatArithmeticFailureRoots",
+            "TestFastFloatPowerWrapPrefixes",
+            "TestFastFloatFormattingFailureAndWarmStorage",
+            "TestFastFloatIDRecyclingAndRetirement",
+            "TestFastFloatScopedFailureLifetimes",
+            "TestFastFloatDivisionSourceDiagnosticPrefix",
+            "TestFastFloatActualWholeGraphCharges",
+            "TestFastFloatSourceActiveMatrix",
+            "TestFastFloatSourceBasic",
+            "TestFastFloatSourceDecimal",
+            "TestFastFloatVectorCheckedAllocationBounds",
+            "TestFastFloatOwnerProvenanceAndVectorLifetime",
+            "TestFastFloatNeighborAndThinRoutes",
+            "TestFastFloatVectorOldNewPeakBudget"
+          ]
+        },
+        {
+          "name": "raw/ordinary/pretty/decimal/SMT2 default byte profiles, to_string/to_rational_string and prepared FormatInto",
+          "status": "ported",
+          "go_target": "mpnum/mpff_format.go",
+          "tests": [
+            "TestFastFloatIntegerConversionSource",
+            "TestFastFloatRationalRawShapeAndConversionFailures",
+            "TestFastFloatIntegerSourceDiscardedLimbDefects",
+            "TestFastFloatToIntegerSourceReleaseTruncation",
+            "TestFastFloatGetterSourceReleaseActions",
+            "TestFastFloatSourcePrintedPaths",
+            "TestFastFloatIndependentDirectedAliases",
+            "TestFastFloatConstructorReservationPrefixes",
+            "TestFastFloatArithmeticFailureRoots",
+            "TestFastFloatPowerWrapPrefixes",
+            "TestFastFloatFormattingFailureAndWarmStorage",
+            "TestFastFloatIDRecyclingAndRetirement",
+            "TestFastFloatScopedFailureLifetimes",
+            "TestFastFloatDivisionSourceDiagnosticPrefix",
+            "TestFastFloatActualWholeGraphCharges",
+            "TestFastFloatSourceActiveMatrix",
+            "TestFastFloatSourceBasic",
+            "TestFastFloatSourceDecimal",
+            "TestFastFloatVectorCheckedAllocationBounds",
+            "TestFastFloatOwnerProvenanceAndVectorLifetime",
+            "TestFastFloatNeighborAndThinRoutes",
+            "TestFastFloatVectorOldNewPeakBudget"
+          ]
+        },
+        {
+          "name": "persistent ostream state/transport, TRACE/STRACE actions, source exception transport and subpaving consumer integration",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Actual owner header, Words/Natural services, significand blocks, validity/generation metadata, recycle and eleven live vector roots plus retained text workspaces charged. Source statement and alias prefixes survive failure; lexical temporaries release with injector armed. Raw handles retain implicit manager provenance limits. See MPFF_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Concrete internal32 and explicit Close; accept finite odd precision >=2, replace alignment-dependent uint64 casts with little-endian limbs. Undefined signed negation/shift, power mask-wrap nontermination and physical storage overflow have documented typed adapters after completed prefixes. Persistent ostream flags/fail-state, TRACE/STRACE, external exception transport and real subpaving consumers remain open. Source tests preserve finite loop/draw shapes using an explicit hermetic nonnegative31bit RNG, not an ambient libc sequence."
+      ]
     },
     {
       "path": "src/util/mpfx.cpp",
@@ -106594,7 +107100,8 @@
       "status": "partial",
       "go_targets": [
         "mpnum/scoped_numeral.go",
-        "mpnum/scoped_binary.go"
+        "mpnum/scoped_binary.go",
+        "mpnum/scoped_fast_float.go"
       ],
       "tests": [
         "TestScopedNumeralSourceTstScoped",
@@ -106621,7 +107128,29 @@
         "TestBinaryFormattingBranchesAndFaultPublication",
         "TestBinaryOwnerConstructorAndScopedVector",
         "TestBinaryFailureImmediateRoots",
-        "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+        "TestBinaryVectorFailurePrefixesAndScopedRoutes",
+        "TestFastFloatIntegerConversionSource",
+        "TestFastFloatRationalRawShapeAndConversionFailures",
+        "TestFastFloatIntegerSourceDiscardedLimbDefects",
+        "TestFastFloatToIntegerSourceReleaseTruncation",
+        "TestFastFloatGetterSourceReleaseActions",
+        "TestFastFloatSourcePrintedPaths",
+        "TestFastFloatIndependentDirectedAliases",
+        "TestFastFloatConstructorReservationPrefixes",
+        "TestFastFloatArithmeticFailureRoots",
+        "TestFastFloatPowerWrapPrefixes",
+        "TestFastFloatFormattingFailureAndWarmStorage",
+        "TestFastFloatIDRecyclingAndRetirement",
+        "TestFastFloatScopedFailureLifetimes",
+        "TestFastFloatDivisionSourceDiagnosticPrefix",
+        "TestFastFloatActualWholeGraphCharges",
+        "TestFastFloatSourceActiveMatrix",
+        "TestFastFloatSourceBasic",
+        "TestFastFloatSourceDecimal",
+        "TestFastFloatVectorCheckedAllocationBounds",
+        "TestFastFloatOwnerProvenanceAndVectorLifetime",
+        "TestFastFloatNeighborAndThinRoutes",
+        "TestFastFloatVectorOldNewPeakBudget"
       ],
       "conditionals": [
         {
@@ -106749,15 +107278,46 @@
             "TestBinaryFailureImmediateRoots",
             "TestBinaryVectorFailurePrefixesAndScopedRoutes"
           ]
+        },
+        {
+          "name": "concrete MPFF scoped lifetime/assignment/copy/swap/reset/neg/abs, compound/value arithmetic, comparisons/predicates and display",
+          "status": "ported",
+          "go_target": "mpnum/scoped_fast_float.go",
+          "tests": [
+            "TestFastFloatIntegerConversionSource",
+            "TestFastFloatRationalRawShapeAndConversionFailures",
+            "TestFastFloatIntegerSourceDiscardedLimbDefects",
+            "TestFastFloatToIntegerSourceReleaseTruncation",
+            "TestFastFloatGetterSourceReleaseActions",
+            "TestFastFloatSourcePrintedPaths",
+            "TestFastFloatIndependentDirectedAliases",
+            "TestFastFloatConstructorReservationPrefixes",
+            "TestFastFloatArithmeticFailureRoots",
+            "TestFastFloatPowerWrapPrefixes",
+            "TestFastFloatFormattingFailureAndWarmStorage",
+            "TestFastFloatIDRecyclingAndRetirement",
+            "TestFastFloatScopedFailureLifetimes",
+            "TestFastFloatDivisionSourceDiagnosticPrefix",
+            "TestFastFloatActualWholeGraphCharges",
+            "TestFastFloatSourceActiveMatrix",
+            "TestFastFloatSourceBasic",
+            "TestFastFloatSourceDecimal",
+            "TestFastFloatVectorCheckedAllocationBounds",
+            "TestFastFloatOwnerProvenanceAndVectorLifetime",
+            "TestFastFloatNeighborAndThinRoutes",
+            "TestFastFloatVectorOldNewPeakBudget"
+          ]
         }
       ],
       "ownership": [
         "Concrete scoped Int/Rational objects borrow managers; all cold headers and actual old+new pointer-free backing are charged. Deep copy owns independent limbs, source ascending truncation releases them, vector failure prefixes retained. See SCOPED_NUMERAL_PORT_STATUS.md.",
-        "MPBQ specialization owns deep numerator values and real cold headers/backing; self identity/manager checks, borrowed owner lifetime, grow transfer and old/new peak audited. See MPBQ_PORT_STATUS.md."
+        "MPBQ specialization owns deep numerator values and real cold headers/backing; self identity/manager checks, borrowed owner lifetime, grow transfer and old/new peak audited. See MPBQ_PORT_STATUS.md.",
+        "MPFF specialization borrows its manager, owns deep significand blocks and charges actual headers/full old-new element backing. Failure retains default failed-push element; ascending cleanup preserves source actions. See MPFF_PORT_STATUS.md."
       ],
       "deviations": [
         "Explicit Close substitutes RAII; self identity rejects shallow Go owner copies. Vectors expose deep Read/Set rather than escaping indexed element addresses. Source noncopyable vector remains noncopyable; other numeral manager specializations stay open.",
-        "Concrete MPBQ specialization; unsupported source div/rem/abs template instantiations are not invented. Other manager specializations and full custom ostream integration remain open."
+        "Concrete MPBQ specialization; unsupported source div/rem/abs template instantiations are not invented. Other manager specializations and full custom ostream integration remain open.",
+        "Concrete MPFF types; explicit Close and provenance/self-copy checks. Borrowed indexed Go pointers have documented lifetime limits. Other manager specializations and persistent custom ostream integration remain open."
       ]
     },
     {
@@ -106792,7 +107352,8 @@
       "status": "partial",
       "go_targets": [
         "mpnum/scoped_numeral.go",
-        "mpnum/scoped_binary.go"
+        "mpnum/scoped_binary.go",
+        "mpnum/scoped_fast_float_vector.go"
       ],
       "tests": [
         "TestScopedNumeralSourceTstScoped",
@@ -106819,7 +107380,29 @@
         "TestBinaryFormattingBranchesAndFaultPublication",
         "TestBinaryOwnerConstructorAndScopedVector",
         "TestBinaryFailureImmediateRoots",
-        "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+        "TestBinaryVectorFailurePrefixesAndScopedRoutes",
+        "TestFastFloatIntegerConversionSource",
+        "TestFastFloatRationalRawShapeAndConversionFailures",
+        "TestFastFloatIntegerSourceDiscardedLimbDefects",
+        "TestFastFloatToIntegerSourceReleaseTruncation",
+        "TestFastFloatGetterSourceReleaseActions",
+        "TestFastFloatSourcePrintedPaths",
+        "TestFastFloatIndependentDirectedAliases",
+        "TestFastFloatConstructorReservationPrefixes",
+        "TestFastFloatArithmeticFailureRoots",
+        "TestFastFloatPowerWrapPrefixes",
+        "TestFastFloatFormattingFailureAndWarmStorage",
+        "TestFastFloatIDRecyclingAndRetirement",
+        "TestFastFloatScopedFailureLifetimes",
+        "TestFastFloatDivisionSourceDiagnosticPrefix",
+        "TestFastFloatActualWholeGraphCharges",
+        "TestFastFloatSourceActiveMatrix",
+        "TestFastFloatSourceBasic",
+        "TestFastFloatSourceDecimal",
+        "TestFastFloatVectorCheckedAllocationBounds",
+        "TestFastFloatOwnerProvenanceAndVectorLifetime",
+        "TestFastFloatNeighborAndThinRoutes",
+        "TestFastFloatVectorOldNewPeakBudget"
       ],
       "conditionals": [
         {
@@ -106911,15 +107494,46 @@
             "TestBinaryFailureImmediateRoots",
             "TestBinaryVectorFailurePrefixesAndScopedRoutes"
           ]
+        },
+        {
+          "name": "concrete MPFF owning vector resize/push/pop/shrink/reset/indexed borrow, source growth and ascending destruction",
+          "status": "ported",
+          "go_target": "mpnum/scoped_fast_float_vector.go",
+          "tests": [
+            "TestFastFloatIntegerConversionSource",
+            "TestFastFloatRationalRawShapeAndConversionFailures",
+            "TestFastFloatIntegerSourceDiscardedLimbDefects",
+            "TestFastFloatToIntegerSourceReleaseTruncation",
+            "TestFastFloatGetterSourceReleaseActions",
+            "TestFastFloatSourcePrintedPaths",
+            "TestFastFloatIndependentDirectedAliases",
+            "TestFastFloatConstructorReservationPrefixes",
+            "TestFastFloatArithmeticFailureRoots",
+            "TestFastFloatPowerWrapPrefixes",
+            "TestFastFloatFormattingFailureAndWarmStorage",
+            "TestFastFloatIDRecyclingAndRetirement",
+            "TestFastFloatScopedFailureLifetimes",
+            "TestFastFloatDivisionSourceDiagnosticPrefix",
+            "TestFastFloatActualWholeGraphCharges",
+            "TestFastFloatSourceActiveMatrix",
+            "TestFastFloatSourceBasic",
+            "TestFastFloatSourceDecimal",
+            "TestFastFloatVectorCheckedAllocationBounds",
+            "TestFastFloatOwnerProvenanceAndVectorLifetime",
+            "TestFastFloatNeighborAndThinRoutes",
+            "TestFastFloatVectorOldNewPeakBudget"
+          ]
         }
       ],
       "ownership": [
         "Concrete scoped Int/Rational objects borrow managers; all cold headers and actual old+new pointer-free backing are charged. Deep copy owns independent limbs, source ascending truncation releases them, vector failure prefixes retained. See SCOPED_NUMERAL_PORT_STATUS.md.",
-        "MPBQ specialization owns deep numerator values and real cold headers/backing; self identity/manager checks, borrowed owner lifetime, grow transfer and old/new peak audited. See MPBQ_PORT_STATUS.md."
+        "MPBQ specialization owns deep numerator values and real cold headers/backing; self identity/manager checks, borrowed owner lifetime, grow transfer and old/new peak audited. See MPBQ_PORT_STATUS.md.",
+        "MPFF specialization borrows its manager, owns deep significand blocks and charges actual headers/full old-new element backing. Failure retains default failed-push element; ascending cleanup preserves source actions. See MPFF_PORT_STATUS.md."
       ],
       "deviations": [
         "Explicit Close substitutes RAII; self identity rejects shallow Go owner copies. Vectors expose deep Read/Set rather than escaping indexed element addresses. Source noncopyable vector remains noncopyable; other numeral manager specializations stay open.",
-        "Concrete MPBQ specialization; unsupported source div/rem/abs template instantiations are not invented. Other manager specializations and full custom ostream integration remain open."
+        "Concrete MPBQ specialization; unsupported source div/rem/abs template instantiations are not invented. Other manager specializations and full custom ostream integration remain open.",
+        "Concrete MPFF types; explicit Close and provenance/self-copy checks. Borrowed indexed Go pointers have documented lifetime limits. Other manager specializations and persistent custom ostream integration remain open."
       ]
     },
     {
