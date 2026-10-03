@@ -25,6 +25,13 @@ subtree. Port source assertions to Go tests before translating the corresponding
 implementation, and retain independent bounded correctness checks. After each
 coherent green chunk, make a git commit with a pithy one-to-three-sentence
 message. Git metadata writes necessary for those requested commits are allowed.
+The user also requests frequent checkpoints: do not leave substantial completed
+or tests-first work uncommitted while waiting for an entire source family.
+Commit smaller coherent green changes promptly. When preserving unfinished
+work, label the commit as a checkpoint and document known RED tests and gaps;
+do not promote source completion. Tests referencing genuinely missing APIs may
+use explicit pending tags temporarily, with their commands and required removal
+documented in PORT_CHECKPOINTS.md.
 
 ## Current verification scope
 
