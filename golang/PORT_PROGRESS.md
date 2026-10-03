@@ -185,3 +185,17 @@ independent signed/alias/failure expectations. Combined release tests, checked
 races, vet, actual fresh-count js/wasm tests and WASI compilation pass. Source
 and no-generics audit passes. Power/shifts/parsers, numeric scratch/formatting,
 real rational-cell allocator assertions and all full AST/solver gates remain open.
+
+## Real rational coefficient allocator assertions
+
+Pool32 now executes both source object-allocator tests with actual MPQ numerals,
+including the original 100,000 operations and selected-index worker recycling.
+All source coefficient-zero/equality and constructor/destructor assertions pass.
+An added big-fraction fixture verifies allocation-free numerical reset/destruction,
+retained noncoefficient state, owner lifetime and complete budget release.
+
+These integration assertions were immediately GREEN against existing methods;
+no production change or artificial RED was necessary. An isolated prospective
+commit passes full native tests, actual g3checked races, vet, checked js/wasm
+execution and WASI compilation. The public rational wrapper, production cell
+links, construct=false and full solver remain open.

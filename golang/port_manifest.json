@@ -79805,7 +79805,10 @@
         "TestPool32ResetAtGenerationLimit",
         "TestPool32ConcurrentWorkerPartitions",
         "TestPool32SourceDefaultsAndRecordAudit",
-        "TestPool32ResetPeakBudget"
+        "TestPool32ResetPeakBudget",
+        "TestPool32SourceRationalTst1",
+        "TestPool32SourceRationalTst2",
+        "TestPool32RationalBigFractionLifetime"
       ],
       "assertions": [
         {
@@ -79833,11 +79836,12 @@
       "ownership_audited": false,
       "methods": [],
       "ownership": [
-        "Partial constructed=true scalar lifecycle specialization. Real rational-cell assertions, construct=false and whole-template ownership remain pending. See arena/PORT_STATUS.md."
+        "Constructed=true scalar lifecycle specialization now executes all finite source coefficient assertions using actual MPQ numerals and budgeted caller-owned scalar fixture cells. The public rational wrapper, production source cell/links, construct=false and whole-template ownership remain pending. See arena/PORT_STATUS.md."
       ],
       "deviations": [
         "Cold mutex serializes owner metadata; callbacks must not reenter owner or panic.",
-        "Predictable storage failure is checked before constructor/reset/destructor effects; storage peak charges and retained retry capacity are explicit."
+        "Predictable storage failure is checked before constructor/reset/destructor effects; storage peak charges and retained retry capacity are explicit.",
+        "Source100000-operation test uses a deterministic nonnegative generator in place of unspecified libc rand; selected pair index still controls the shadowed-index recycle branch. Actual RationalManager reset/destruction completes before numerical owner close."
       ]
     },
     {
@@ -97716,7 +97720,10 @@
         "TestPool32ResetAtGenerationLimit",
         "TestPool32ConcurrentWorkerPartitions",
         "TestPool32SourceDefaultsAndRecordAudit",
-        "TestPool32ResetPeakBudget"
+        "TestPool32ResetPeakBudget",
+        "TestPool32SourceRationalTst1",
+        "TestPool32SourceRationalTst2",
+        "TestPool32RationalBigFractionLifetime"
       ],
       "conditionals": [
         {
@@ -97855,11 +97862,12 @@
         }
       ],
       "ownership": [
-        "Partial constructed=true scalar lifecycle specialization. Real rational-cell assertions, construct=false and whole-template ownership remain pending. See arena/PORT_STATUS.md."
+        "Constructed=true scalar lifecycle specialization now executes all finite source coefficient assertions using actual MPQ numerals and budgeted caller-owned scalar fixture cells. The public rational wrapper, production source cell/links, construct=false and whole-template ownership remain pending. See arena/PORT_STATUS.md."
       ],
       "deviations": [
         "Cold mutex serializes owner metadata; callbacks must not reenter owner or panic.",
-        "Predictable storage failure is checked before constructor/reset/destructor effects; storage peak charges and retained retry capacity are explicit."
+        "Predictable storage failure is checked before constructor/reset/destructor effects; storage peak charges and retained retry capacity are explicit.",
+        "Source100000-operation test uses a deterministic nonnegative generator in place of unspecified libc rand; selected pair index still controls the shadowed-index recycle branch. Actual RationalManager reset/destruction completes before numerical owner close."
       ]
     },
     {

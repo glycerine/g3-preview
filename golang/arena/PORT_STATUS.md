@@ -678,3 +678,53 @@ overflow on either graph and exactly0 warmed Go allocations over paired swaps.
 No map/table implementation, manifest or other agent files were modified. This
 prerequisite alone does not complete UIntSetMap's table/epoch transaction or the
 full memory/source ownership gate.
+
+# Real rational-cell object allocator source assertions
+
+The real coefficient assertion dependency previously marked pending now has an
+external-package arena fixture in `pool32_rational_external_test.go`, importing
+the actual mpnum.RationalManager service. Its pointer-free scalar cell contains
+an actual mpnum.Rational, scalar row/column fields and index links. Pool32 stores
+only the cell's scalar array index; the caller owns bounded precharged cell/pair
+arrays, fixture header and one cold lifecycle dispatcher. No per-record closure,
+interface, generic template or integer substitute represents the coefficient.
+
+| Actual source assertion/action | Fixture mapping |
+| --- | --- |
+| test/object_allocator.cpp:57-65 tst1 allocates two cells, assigns rational10, recycles, asserts new coefficient zero | actual RationalManager.SetInt64/Reset/Equal(NewRational zero), source allocation sequence, checked stale recycled token |
+| :70 worker capacity>=2 | actual Pool32.Stats Workers check |
+| :78 original100000 operation count | unchanged finite count; deterministic nonnegative generator replaces unspecified C rand stream, not an identical libc random-sequence claim |
+| :82-89 both worker allocation paths, coefficient zero, actual rational(val) assignment | Pool32Worker Allocate, actual RationalManager.Equal and SetInt64 |
+| :93-101 exact original value before recycling | actual RationalManager.Equal against separately set expected rational, source vector-style ordered erase |
+| :93 inner selected idx shadows operation idx; :97 idx<5 recycle destination | preserved exactly: selected pair index controls worker0 versus worker1; no accidental operation-choice condition |
+| :105-110 mode toggle/reset/clear/re-enable | exact mode sequence, all old coefficients destroyed, caller pair log cleared; added stale-ref check |
+| :34-44 counters/reset | actual NewRational/Reset/Del callbacks; destructor-body counter increment precedes rational member cleanup |
+| :121 constructed/destructed equality | checked per fixture after actual pool teardown, including live and free constructed objects; each initialized cell destroyed exactly once |
+
+Integration assertions passed immediately against existing Pool32+MPQ methods;
+no RED was manufactured for fixture-only helper names and no production fix was
+needed. Deterministic100000-operation run:23 resets,669/32486 destination worker
+recycles,33293/33525 worker allocations,34306 constructed cells,33155 reset calls.
+Both workers, both shadowed-index recycle branches and reset paths are covered.
+Added final surviving-coefficient checks extend source's recycle-time checks.
+
+A separate independent big-fraction lifetime test uses the actual coefficient
+-9223372036854775808/18446744073709551615, verifies big numerical cells and exact
+string, then resets/recycles and destroys under FailAfter0. Reset and Del release
+existing valid numerals without Reserve; Construct initializes NewRational in
+already prepared bounded storage. Thus valid callbacks require neither allocation
+failure handling nor per-record policy data. Numeric manager stays live through
+pool destruction, then closes afterward. Invalid manager/handle misuse remains
+an invariant violation, not a supported callback error path. Reset preserves the
+cell's noncoefficient scalar fields and all budgets balance after fixture close.
+
+- Native and g3checked full arena tests, go vet: PASS.
+- js/wasm and wasip1/wasm package builds: PASS.
+- Actual Nodejs runtime printed both source rational tests and independent big
+  fraction lifetime test by name, all PASS; same deterministic counters as native.
+
+This completes the finite real-MPQ coefficient source assertion fixture for
+constructed=true Pool32. It does not port util/rational.h's public/global-manager
+wrapper, the production source cell type/links, construct=false, unrelated
+thread-safe numerical service semantics or the whole object allocator template.
+Ordinary fixtures require no reference source checkout or reference executable.
