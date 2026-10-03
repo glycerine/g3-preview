@@ -1241,3 +1241,16 @@ full native/debug against committed registrye59f032, twenty-one exact race/
 actual JS groups, vet, WASI and source/no-generics checks. See
 SAT_MAIN_CONFIG_PORT_STATUS.md. Ledger remains33ported/99partial/1970unported;
 complete SAT search and the full solver/proof/interpolation goal remain open.
+
+
+## Actual dense univariate polynomial core
+
+Concrete dense storage and core arithmetic now use the real modular integer
+manager, all twenty-one source scratch vectors and actual resource/cooperation
+callbacks. Tests first caught physical-view read timing, trim-mutating predicates
+and wrapped source extents; twenty-one named groups cover nine pretranslation
+assertions, arithmetic/evaluation oracles, aliases and immediate fault graphs.
+Eight frozen Go files passed full native/debug, exact race/actual JS, vet, WASI
+and source/no-generics gates. See UPOLYNOMIAL_PORT_STATUS.md. Full content,
+division, GCD, Sturm, isolation/refinement and algebraic consumers remain required.
+Ledger33ported/102partial/1967unported; the full solver/proof/interpolation objective remains open.

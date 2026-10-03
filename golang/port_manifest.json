@@ -30133,9 +30133,39 @@
       "sha256": "b49084e309a2a499a665bac7b9df9f9ec2c521b34180aa3223377fca85a15ec6",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/upolynomial.go",
+        "mpnum/upolynomial_eval.go",
+        "mpnum/upolynomial_modes.go",
+        "mpnum/upolynomial_ops.go",
+        "mpnum/upolynomial_storage.go",
+        "mpnum/upolynomial_vector.go",
+        "upolynomial_source_test.go"
+      ],
+      "tests": [
+        "TestUPolynomialScalarExtentAndLayout",
+        "TestUPolynomialSourceUnsignedExtent",
+        "TestUPolynomialColdDirectoryBounds",
+        "TestUPolynomialSourceNinePretranslationENSURE",
+        "TestUPolynomialSourceBasicCoefficientRoutes",
+        "TestUPolynomialStorageOwnershipAndPhysicalViews",
+        "TestUPolynomialFiniteArithmeticAndDirectDerivative",
+        "TestUPolynomialViewOverloadsAndModularShape",
+        "TestUPolynomialRawViewActualReadTiming",
+        "TestUPolynomialPredicatesTrimSourceStorage",
+        "TestUPolynomialIndependentScaledEvaluation",
+        "TestUPolynomialRealCheckpointCancellationPrefixes",
+        "TestUPolynomialImmediateNumericFailureAccounting",
+        "TestUPolynomialColdFailureAndWarmZeroAllocation",
+        "TestUPolynomialSourceCopyAndRationalPrefixes",
+        "TestUPolynomialConcreteScopedVectorActions",
+        "TestUPolynomialSourceLifecycleAndNumericDestructionOrder",
+        "TestUPolynomialAllSelectedOutputFailurePrefixes",
+        "TestUPolynomialIndependentConvolutionAllAliases",
+        "TestUPolynomialScalarModeAndDirectCheckpoint",
+        "TestUPolynomialRawMutableScalarOverloads"
+      ],
       "conditionals": [
         {
           "line": 381,
@@ -30722,18 +30752,88 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "selected complete dense storage/core arithmetic/sign evaluation and actual core/derived constructor/destructor/checkpoint actions",
+          "status": "ported",
+          "go_target": "mpnum/upolynomial.go",
+          "tests": [
+            "TestUPolynomialScalarExtentAndLayout",
+            "TestUPolynomialSourceUnsignedExtent",
+            "TestUPolynomialColdDirectoryBounds"
+          ]
+        },
+        {
+          "name": "selected arithmetic, physical ownership and real resource/cooperation integration fixtures",
+          "status": "ported",
+          "go_target": "upolynomial_source_test.go",
+          "tests": [
+            "TestUPolynomialSourceNinePretranslationENSURE",
+            "TestUPolynomialSourceBasicCoefficientRoutes",
+            "TestUPolynomialStorageOwnershipAndPhysicalViews",
+            "TestUPolynomialFiniteArithmeticAndDirectDerivative",
+            "TestUPolynomialViewOverloadsAndModularShape",
+            "TestUPolynomialRawViewActualReadTiming",
+            "TestUPolynomialPredicatesTrimSourceStorage",
+            "TestUPolynomialIndependentScaledEvaluation",
+            "TestUPolynomialRealCheckpointCancellationPrefixes",
+            "TestUPolynomialImmediateNumericFailureAccounting",
+            "TestUPolynomialColdFailureAndWarmZeroAllocation",
+            "TestUPolynomialSourceCopyAndRationalPrefixes",
+            "TestUPolynomialConcreteScopedVectorActions",
+            "TestUPolynomialSourceLifecycleAndNumericDestructionOrder",
+            "TestUPolynomialAllSelectedOutputFailurePrefixes",
+            "TestUPolynomialIndependentConvolutionAllAliases",
+            "TestUPolynomialScalarModeAndDirectCheckpoint",
+            "TestUPolynomialRawMutableScalarOverloads"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual Int coefficient arrays with concrete scalar descriptor pages/backing origins, all twenty-one scratch vectors and real modular child. Physical views guard at actual dereferences and follow swaps; old/new growth and immediate numeric roots are charged. See UPOLYNOMIAL_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full content/division/GCD/Sturm/isolation/refinement/conversion/algebraic and printers remain open; input conversion adapters do not establish complete registered tests."
+      ]
     },
     {
       "path": "src/math/polynomial/upolynomial.h",
       "sha256": "6fc010f3c78e1781cb55335dbda52284779bcec4287c4adff7b0286814d7671d",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/upolynomial.go",
+        "mpnum/upolynomial_eval.go",
+        "mpnum/upolynomial_modes.go",
+        "mpnum/upolynomial_ops.go",
+        "mpnum/upolynomial_storage.go",
+        "mpnum/upolynomial_vector.go",
+        "upolynomial_source_test.go"
+      ],
+      "tests": [
+        "TestUPolynomialScalarExtentAndLayout",
+        "TestUPolynomialSourceUnsignedExtent",
+        "TestUPolynomialColdDirectoryBounds",
+        "TestUPolynomialSourceNinePretranslationENSURE",
+        "TestUPolynomialSourceBasicCoefficientRoutes",
+        "TestUPolynomialStorageOwnershipAndPhysicalViews",
+        "TestUPolynomialFiniteArithmeticAndDirectDerivative",
+        "TestUPolynomialViewOverloadsAndModularShape",
+        "TestUPolynomialRawViewActualReadTiming",
+        "TestUPolynomialPredicatesTrimSourceStorage",
+        "TestUPolynomialIndependentScaledEvaluation",
+        "TestUPolynomialRealCheckpointCancellationPrefixes",
+        "TestUPolynomialImmediateNumericFailureAccounting",
+        "TestUPolynomialColdFailureAndWarmZeroAllocation",
+        "TestUPolynomialSourceCopyAndRationalPrefixes",
+        "TestUPolynomialConcreteScopedVectorActions",
+        "TestUPolynomialSourceLifecycleAndNumericDestructionOrder",
+        "TestUPolynomialAllSelectedOutputFailurePrefixes",
+        "TestUPolynomialIndependentConvolutionAllAliases",
+        "TestUPolynomialScalarModeAndDirectCheckpoint",
+        "TestUPolynomialRawMutableScalarOverloads"
+      ],
       "conditionals": [
         {
           "line": 24,
@@ -30760,9 +30860,49 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "selected complete dense storage/core arithmetic/sign evaluation and actual core/derived constructor/destructor/checkpoint actions",
+          "status": "ported",
+          "go_target": "mpnum/upolynomial.go",
+          "tests": [
+            "TestUPolynomialScalarExtentAndLayout",
+            "TestUPolynomialSourceUnsignedExtent",
+            "TestUPolynomialColdDirectoryBounds"
+          ]
+        },
+        {
+          "name": "selected arithmetic, physical ownership and real resource/cooperation integration fixtures",
+          "status": "ported",
+          "go_target": "upolynomial_source_test.go",
+          "tests": [
+            "TestUPolynomialSourceNinePretranslationENSURE",
+            "TestUPolynomialSourceBasicCoefficientRoutes",
+            "TestUPolynomialStorageOwnershipAndPhysicalViews",
+            "TestUPolynomialFiniteArithmeticAndDirectDerivative",
+            "TestUPolynomialViewOverloadsAndModularShape",
+            "TestUPolynomialRawViewActualReadTiming",
+            "TestUPolynomialPredicatesTrimSourceStorage",
+            "TestUPolynomialIndependentScaledEvaluation",
+            "TestUPolynomialRealCheckpointCancellationPrefixes",
+            "TestUPolynomialImmediateNumericFailureAccounting",
+            "TestUPolynomialColdFailureAndWarmZeroAllocation",
+            "TestUPolynomialSourceCopyAndRationalPrefixes",
+            "TestUPolynomialConcreteScopedVectorActions",
+            "TestUPolynomialSourceLifecycleAndNumericDestructionOrder",
+            "TestUPolynomialAllSelectedOutputFailurePrefixes",
+            "TestUPolynomialIndependentConvolutionAllAliases",
+            "TestUPolynomialScalarModeAndDirectCheckpoint",
+            "TestUPolynomialRawMutableScalarOverloads"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual Int coefficient arrays with concrete scalar descriptor pages/backing origins, all twenty-one scratch vectors and real modular child. Physical views guard at actual dereferences and follow swaps; old/new growth and immediate numeric roots are charged. See UPOLYNOMIAL_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full content/division/GCD/Sturm/isolation/refinement/conversion/algebraic and printers remain open; input conversion adapters do not establish complete registered tests."
+      ]
     },
     {
       "path": "src/math/polynomial/upolynomial_factorization.cpp",
@@ -87340,9 +87480,39 @@
       "sha256": "f305576b986ba77e5acec3a7734b74447f248ffe1dff9c3ece5d2fdbd44b98a3",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/upolynomial.go",
+        "mpnum/upolynomial_eval.go",
+        "mpnum/upolynomial_modes.go",
+        "mpnum/upolynomial_ops.go",
+        "mpnum/upolynomial_storage.go",
+        "mpnum/upolynomial_vector.go",
+        "upolynomial_source_test.go"
+      ],
+      "tests": [
+        "TestUPolynomialScalarExtentAndLayout",
+        "TestUPolynomialSourceUnsignedExtent",
+        "TestUPolynomialColdDirectoryBounds",
+        "TestUPolynomialSourceNinePretranslationENSURE",
+        "TestUPolynomialSourceBasicCoefficientRoutes",
+        "TestUPolynomialStorageOwnershipAndPhysicalViews",
+        "TestUPolynomialFiniteArithmeticAndDirectDerivative",
+        "TestUPolynomialViewOverloadsAndModularShape",
+        "TestUPolynomialRawViewActualReadTiming",
+        "TestUPolynomialPredicatesTrimSourceStorage",
+        "TestUPolynomialIndependentScaledEvaluation",
+        "TestUPolynomialRealCheckpointCancellationPrefixes",
+        "TestUPolynomialImmediateNumericFailureAccounting",
+        "TestUPolynomialColdFailureAndWarmZeroAllocation",
+        "TestUPolynomialSourceCopyAndRationalPrefixes",
+        "TestUPolynomialConcreteScopedVectorActions",
+        "TestUPolynomialSourceLifecycleAndNumericDestructionOrder",
+        "TestUPolynomialAllSelectedOutputFailurePrefixes",
+        "TestUPolynomialIndependentConvolutionAllAliases",
+        "TestUPolynomialScalarModeAndDirectCheckpoint",
+        "TestUPolynomialRawMutableScalarOverloads"
+      ],
       "conditionals": [
         {
           "line": 747,
@@ -87569,9 +87739,39 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "nine pretranslation ENSURE actions with explicitly adapted dense coefficient input; basic print-only coefficient paths",
+          "status": "ported",
+          "go_target": "upolynomial_source_test.go",
+          "tests": [
+            "TestUPolynomialSourceNinePretranslationENSURE",
+            "TestUPolynomialSourceBasicCoefficientRoutes",
+            "TestUPolynomialStorageOwnershipAndPhysicalViews",
+            "TestUPolynomialFiniteArithmeticAndDirectDerivative",
+            "TestUPolynomialViewOverloadsAndModularShape",
+            "TestUPolynomialRawViewActualReadTiming",
+            "TestUPolynomialPredicatesTrimSourceStorage",
+            "TestUPolynomialIndependentScaledEvaluation",
+            "TestUPolynomialRealCheckpointCancellationPrefixes",
+            "TestUPolynomialImmediateNumericFailureAccounting",
+            "TestUPolynomialColdFailureAndWarmZeroAllocation",
+            "TestUPolynomialSourceCopyAndRationalPrefixes",
+            "TestUPolynomialConcreteScopedVectorActions",
+            "TestUPolynomialSourceLifecycleAndNumericDestructionOrder",
+            "TestUPolynomialAllSelectedOutputFailurePrefixes",
+            "TestUPolynomialIndependentConvolutionAllAliases",
+            "TestUPolynomialScalarModeAndDirectCheckpoint",
+            "TestUPolynomialRawMutableScalarOverloads"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual Int coefficient arrays with concrete scalar descriptor pages/backing origins, all twenty-one scratch vectors and real modular child. Physical views guard at actual dereferences and follow swaps; old/new growth and immediate numeric roots are charged. See UPOLYNOMIAL_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full content/division/GCD/Sturm/isolation/refinement/conversion/algebraic and printers remain open; input conversion adapters do not establish complete registered tests."
+      ]
     },
     {
       "path": "src/test/var_subst.cpp",
@@ -112532,7 +112732,9 @@
       "go_targets": [
         "mpnum/scoped_numeral.go",
         "mpnum/scoped_binary.go",
-        "mpnum/scoped_fast_float_vector.go"
+        "mpnum/scoped_fast_float_vector.go",
+        "mpnum/upolynomial_vector.go",
+        "upolynomial_source_test.go"
       ],
       "tests": [
         "TestScopedNumeralSourceTstScoped",
@@ -112581,7 +112783,28 @@
         "TestFastFloatVectorCheckedAllocationBounds",
         "TestFastFloatOwnerProvenanceAndVectorLifetime",
         "TestFastFloatNeighborAndThinRoutes",
-        "TestFastFloatVectorOldNewPeakBudget"
+        "TestFastFloatVectorOldNewPeakBudget",
+        "TestUPolynomialScalarExtentAndLayout",
+        "TestUPolynomialSourceUnsignedExtent",
+        "TestUPolynomialColdDirectoryBounds",
+        "TestUPolynomialSourceNinePretranslationENSURE",
+        "TestUPolynomialSourceBasicCoefficientRoutes",
+        "TestUPolynomialStorageOwnershipAndPhysicalViews",
+        "TestUPolynomialFiniteArithmeticAndDirectDerivative",
+        "TestUPolynomialViewOverloadsAndModularShape",
+        "TestUPolynomialRawViewActualReadTiming",
+        "TestUPolynomialPredicatesTrimSourceStorage",
+        "TestUPolynomialIndependentScaledEvaluation",
+        "TestUPolynomialRealCheckpointCancellationPrefixes",
+        "TestUPolynomialImmediateNumericFailureAccounting",
+        "TestUPolynomialColdFailureAndWarmZeroAllocation",
+        "TestUPolynomialSourceCopyAndRationalPrefixes",
+        "TestUPolynomialConcreteScopedVectorActions",
+        "TestUPolynomialSourceLifecycleAndNumericDestructionOrder",
+        "TestUPolynomialAllSelectedOutputFailurePrefixes",
+        "TestUPolynomialIndependentConvolutionAllAliases",
+        "TestUPolynomialScalarModeAndDirectCheckpoint",
+        "TestUPolynomialRawMutableScalarOverloads"
       ],
       "conditionals": [
         {
@@ -112702,12 +112925,32 @@
             "TestFastFloatNeighborAndThinRoutes",
             "TestFastFloatVectorOldNewPeakBudget"
           ]
+        },
+        {
+          "name": "concrete mpzzp coefficient vector ownership, reset/shrink/resize/push/pop and destructor actions",
+          "status": "ported",
+          "go_target": "mpnum/upolynomial_vector.go",
+          "tests": [
+            "TestUPolynomialScalarExtentAndLayout",
+            "TestUPolynomialSourceUnsignedExtent",
+            "TestUPolynomialColdDirectoryBounds"
+          ]
+        },
+        {
+          "name": "real mpzzp scoped vector source action and failure integration fixtures",
+          "status": "ported",
+          "go_target": "upolynomial_source_test.go",
+          "tests": [
+            "TestUPolynomialConcreteScopedVectorActions",
+            "TestUPolynomialSourceLifecycleAndNumericDestructionOrder"
+          ]
         }
       ],
       "ownership": [
         "Concrete scoped Int/Rational objects borrow managers; all cold headers and actual old+new pointer-free backing are charged. Deep copy owns independent limbs, source ascending truncation releases them, vector failure prefixes retained. See SCOPED_NUMERAL_PORT_STATUS.md.",
         "MPBQ specialization owns deep numerator values and real cold headers/backing; self identity/manager checks, borrowed owner lifetime, grow transfer and old/new peak audited. See MPBQ_PORT_STATUS.md.",
-        "MPFF specialization borrows its manager, owns deep significand blocks and charges actual headers/full old-new element backing. Failure retains default failed-push element; ascending cleanup preserves source actions. See MPFF_PORT_STATUS.md."
+        "MPFF specialization borrows its manager, owns deep significand blocks and charges actual headers/full old-new element backing. Failure retains default failed-push element; ascending cleanup preserves source actions. See MPFF_PORT_STATUS.md.",
+        "Scalar external polynomial owners and actual Int arrays preserve source numeral callbacks and publication prefixes; other manager specializations remain open. See UPOLYNOMIAL_PORT_STATUS.md."
       ],
       "deviations": [
         "Explicit Close substitutes RAII; self identity rejects shallow Go owner copies. Vectors expose deep Read/Set rather than escaping indexed element addresses. Source noncopyable vector remains noncopyable; other numeral manager specializations stay open.",
