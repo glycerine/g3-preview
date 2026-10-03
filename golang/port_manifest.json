@@ -79371,10 +79371,23 @@
       "role": "test",
       "status": "partial",
       "go_targets": [
-        "mpnum/mpn.go"
+        "mpnum/mpn.go",
+        "mpnum/mpz_mul.go",
+        "mpnum/mpz_div.go"
       ],
       "tests": [
-        "TestSourceMPZMagnitudeProjections"
+        "TestSourceMPZMagnitudeProjections",
+        "TestIntegerSourceMultiplication",
+        "TestIntegerMulDivisionLimbOracle",
+        "TestIntegerMultiplicationFailurePointsAndAliases",
+        "TestIntegerMulDivisionWarmAllocations",
+        "TestIntegerSignedDivisionExhaustive",
+        "TestIntegerDivisionCorrectionFixtures",
+        "TestIntegerDivisionZeroAndBudgetFailure",
+        "TestIntegerSourceDivisionAliasDefects",
+        "TestIntegerDivisionAllAllocationFailurePoints",
+        "TestIntegerEuclideanStagedFailurePointsAndAliases",
+        "TestIntegerDivisionWidthBoundaries"
       ],
       "conditionals": [
         {
@@ -79512,7 +79525,8 @@
       "ownership_audited": false,
       "methods": [],
       "ownership": [
-        "Magnitude projections only; signed manager assertions remain unported."
+        "Magnitude projections only; signed manager assertions remain unported.",
+        "Signed multiplication assertions and print-only square expectations strengthened. Remaining parser/GCD/root/bitwise/shift source assertions remain unported."
       ],
       "deviations": []
     },
@@ -79679,9 +79693,24 @@
       "sha256": "03098e9577fb03cd306eb6302dc70570d6e8efafc9b6f59aab77e300bdff88d3",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "arena/pool32.go"
+      ],
+      "tests": [
+        "TestPool32SourceLifetimeProjection",
+        "TestPool32DoNothingReset",
+        "TestPool32WorkerDestinationAndModes",
+        "TestPool32DestructorOrderResetLedger",
+        "TestPool32RetirementAndDestructorPolicy",
+        "TestPool32PredictableFailuresPrecedeCallbacks",
+        "TestPool32IndependentStateMachine",
+        "TestPool32WarmReuse",
+        "TestPool32ResetAtGenerationLimit",
+        "TestPool32ConcurrentWorkerPartitions",
+        "TestPool32SourceDefaultsAndRecordAudit",
+        "TestPool32ResetPeakBudget"
+      ],
       "assertions": [
         {
           "line": 65,
@@ -79707,8 +79736,13 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership": [
+        "Partial constructed=true scalar lifecycle specialization. Real rational-cell assertions, construct=false and whole-template ownership remain pending. See arena/PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Cold mutex serializes owner metadata; callbacks must not reenter owner or panic.",
+        "Predictable storage failure is checked before constructor/reset/destructor effects; storage peak charges and retained retry capacity are explicit."
+      ]
     },
     {
       "path": "src/test/old_interval.cpp",
@@ -82583,9 +82617,23 @@
       "sha256": "873cc1d42198d45d52414f8f57bf6b9c145db2bd77966d464ebe23665418fea9",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "bitset/uint_set.go"
+      ],
+      "tests": [
+        "TestUintSetSourceTst1",
+        "TestUintSetSourceTst2",
+        "TestUintSetSourceTst3",
+        "TestUintSetSourceTst4",
+        "TestUintSetSourceTst5PrintedExpectations",
+        "TestUintSetSourcePaddingCapacityAndCopies",
+        "TestUintSetIteratorMethods",
+        "TestUintSetWeightedHashWrap",
+        "TestUintSetIndependentBoundedOracle",
+        "TestUintSetWarmOperationsNoAllocation",
+        "TestUintSetOverflowRejectedBeforeGrowth"
+      ],
       "assertions": [
         {
           "line": 47,
@@ -82779,8 +82827,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership": [
+        "Concrete owned uint32 words; source capacity, copy and ascending traversal preserved. UintSet-key map integration in tst5 remains unported. See bitset/PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Invalid extent/capacity overflow diagnosed before growth; source get_max_elem would wrap."
+      ]
     },
     {
       "path": "src/test/upolynomial.cpp",
@@ -86086,9 +86138,16 @@
       "sha256": "1708ba4b1bf14008c6e60e656b2b964cc3ab1dd7e0768f25242b347cd37da04f",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_id_gen.go"
+      ],
+      "tests": [
+        "TestIDGeneratorSourceOrder",
+        "TestIDGeneratorDebugAndWrap",
+        "TestIDGeneratorHash",
+        "TestIDGeneratorFiniteUniqueness"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -86101,8 +86160,110 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "id_gen constructor",
+          "status": "ported",
+          "go_target": "util_id_gen.go",
+          "tests": [
+            "TestIDGeneratorSourceOrder",
+            "TestIDGeneratorDebugAndWrap",
+            "TestIDGeneratorHash",
+            "TestIDGeneratorFiniteUniqueness"
+          ]
+        },
+        {
+          "name": "mk",
+          "status": "ported",
+          "go_target": "util_id_gen.go",
+          "tests": [
+            "TestIDGeneratorSourceOrder",
+            "TestIDGeneratorDebugAndWrap",
+            "TestIDGeneratorHash",
+            "TestIDGeneratorFiniteUniqueness"
+          ]
+        },
+        {
+          "name": "recycle",
+          "status": "ported",
+          "go_target": "util_id_gen.go",
+          "tests": [
+            "TestIDGeneratorSourceOrder",
+            "TestIDGeneratorDebugAndWrap",
+            "TestIDGeneratorHash",
+            "TestIDGeneratorFiniteUniqueness"
+          ]
+        },
+        {
+          "name": "reset",
+          "status": "ported",
+          "go_target": "util_id_gen.go",
+          "tests": [
+            "TestIDGeneratorSourceOrder",
+            "TestIDGeneratorDebugAndWrap",
+            "TestIDGeneratorHash",
+            "TestIDGeneratorFiniteUniqueness"
+          ]
+        },
+        {
+          "name": "cleanup",
+          "status": "ported",
+          "go_target": "util_id_gen.go",
+          "tests": [
+            "TestIDGeneratorSourceOrder",
+            "TestIDGeneratorDebugAndWrap",
+            "TestIDGeneratorHash",
+            "TestIDGeneratorFiniteUniqueness"
+          ]
+        },
+        {
+          "name": "show_hash",
+          "status": "ported",
+          "go_target": "util_id_gen.go",
+          "tests": [
+            "TestIDGeneratorSourceOrder",
+            "TestIDGeneratorDebugAndWrap",
+            "TestIDGeneratorHash",
+            "TestIDGeneratorFiniteUniqueness"
+          ]
+        },
+        {
+          "name": "get_id_range",
+          "status": "ported",
+          "go_target": "util_id_gen.go",
+          "tests": [
+            "TestIDGeneratorSourceOrder",
+            "TestIDGeneratorDebugAndWrap",
+            "TestIDGeneratorHash",
+            "TestIDGeneratorFiniteUniqueness"
+          ]
+        },
+        {
+          "name": "set_next_id",
+          "status": "ported",
+          "go_target": "util_id_gen.go",
+          "tests": [
+            "TestIDGeneratorSourceOrder",
+            "TestIDGeneratorDebugAndWrap",
+            "TestIDGeneratorHash",
+            "TestIDGeneratorFiniteUniqueness"
+          ]
+        },
+        {
+          "name": "display_free_ids",
+          "status": "ported",
+          "go_target": "util_id_gen.go",
+          "tests": [
+            "TestIDGeneratorSourceOrder",
+            "TestIDGeneratorDebugAndWrap",
+            "TestIDGeneratorHash",
+            "TestIDGeneratorFiniteUniqueness"
+          ]
+        }
+      ],
+      "ownership": [
+        "Owned scalar free IDs. Reset retains storage; cleanup drops references. Source memory check injected via cold owner callback; resource-service and budget integration pending. See ID_PORT_STATUS.md."
+      ],
       "deviations": []
     },
     {
@@ -94208,7 +94369,9 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "mpnum/mpz.go"
+        "mpnum/mpz.go",
+        "mpnum/mpz_mul.go",
+        "mpnum/mpz_div.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -94218,7 +94381,18 @@
         "TestIntegerOwnership",
         "TestIntegerArithmeticOracle",
         "TestIntegerFailureCleanup",
-        "TestIntegerMultiLimbOracleAndSourceBug1"
+        "TestIntegerMultiLimbOracleAndSourceBug1",
+        "TestIntegerSourceMultiplication",
+        "TestIntegerMulDivisionLimbOracle",
+        "TestIntegerMultiplicationFailurePointsAndAliases",
+        "TestIntegerMulDivisionWarmAllocations",
+        "TestIntegerSignedDivisionExhaustive",
+        "TestIntegerDivisionCorrectionFixtures",
+        "TestIntegerDivisionZeroAndBudgetFailure",
+        "TestIntegerSourceDivisionAliasDefects",
+        "TestIntegerDivisionAllAllocationFailurePoints",
+        "TestIntegerEuclideanStagedFailurePointsAndAliases",
+        "TestIntegerDivisionWidthBoundaries"
       ],
       "conditionals": [
         {
@@ -95154,12 +95328,107 @@
             "TestIntegerFailureCleanup",
             "TestIntegerMultiLimbOracleAndSourceBug1"
           ]
+        },
+        {
+          "name": "mul/big_mul/internal Algorithm M",
+          "status": "ported",
+          "go_target": "mpnum/mpz_mul.go",
+          "tests": [
+            "TestIntegerSourceMultiplication",
+            "TestIntegerMulDivisionLimbOracle",
+            "TestIntegerMultiplicationFailurePointsAndAliases",
+            "TestIntegerMulDivisionWarmAllocations"
+          ]
+        },
+        {
+          "name": "machine_div_rem/big_div_rem",
+          "status": "ported",
+          "go_target": "mpnum/mpz_div.go",
+          "tests": [
+            "TestIntegerSignedDivisionExhaustive",
+            "TestIntegerMulDivisionLimbOracle",
+            "TestIntegerDivisionCorrectionFixtures",
+            "TestIntegerDivisionZeroAndBudgetFailure",
+            "TestIntegerSourceDivisionAliasDefects",
+            "TestIntegerDivisionAllAllocationFailurePoints",
+            "TestIntegerEuclideanStagedFailurePointsAndAliases",
+            "TestIntegerDivisionWidthBoundaries",
+            "TestIntegerMulDivisionWarmAllocations"
+          ]
+        },
+        {
+          "name": "machine_div/big_div",
+          "status": "ported",
+          "go_target": "mpnum/mpz_div.go",
+          "tests": [
+            "TestIntegerSignedDivisionExhaustive",
+            "TestIntegerMulDivisionLimbOracle",
+            "TestIntegerDivisionCorrectionFixtures",
+            "TestIntegerDivisionZeroAndBudgetFailure",
+            "TestIntegerSourceDivisionAliasDefects",
+            "TestIntegerDivisionAllAllocationFailurePoints",
+            "TestIntegerEuclideanStagedFailurePointsAndAliases",
+            "TestIntegerDivisionWidthBoundaries",
+            "TestIntegerMulDivisionWarmAllocations"
+          ]
+        },
+        {
+          "name": "rem/big_rem",
+          "status": "ported",
+          "go_target": "mpnum/mpz_div.go",
+          "tests": [
+            "TestIntegerSignedDivisionExhaustive",
+            "TestIntegerMulDivisionLimbOracle",
+            "TestIntegerDivisionCorrectionFixtures",
+            "TestIntegerDivisionZeroAndBudgetFailure",
+            "TestIntegerSourceDivisionAliasDefects",
+            "TestIntegerDivisionAllAllocationFailurePoints",
+            "TestIntegerEuclideanStagedFailurePointsAndAliases",
+            "TestIntegerDivisionWidthBoundaries",
+            "TestIntegerMulDivisionWarmAllocations"
+          ]
+        },
+        {
+          "name": "div/mod Euclidean adjustment",
+          "status": "ported",
+          "go_target": "mpnum/mpz_div.go",
+          "tests": [
+            "TestIntegerSignedDivisionExhaustive",
+            "TestIntegerMulDivisionLimbOracle",
+            "TestIntegerDivisionCorrectionFixtures",
+            "TestIntegerDivisionZeroAndBudgetFailure",
+            "TestIntegerSourceDivisionAliasDefects",
+            "TestIntegerDivisionAllAllocationFailurePoints",
+            "TestIntegerEuclideanStagedFailurePointsAndAliases",
+            "TestIntegerDivisionWidthBoundaries",
+            "TestIntegerMulDivisionWarmAllocations"
+          ]
+        },
+        {
+          "name": "quot_rem_core/internal Algorithm D",
+          "status": "ported",
+          "go_target": "mpnum/mpz_div.go",
+          "tests": [
+            "TestIntegerSignedDivisionExhaustive",
+            "TestIntegerMulDivisionLimbOracle",
+            "TestIntegerDivisionCorrectionFixtures",
+            "TestIntegerDivisionZeroAndBudgetFailure",
+            "TestIntegerSourceDivisionAliasDefects",
+            "TestIntegerDivisionAllAllocationFailurePoints",
+            "TestIntegerEuclideanStagedFailurePointsAndAliases",
+            "TestIntegerDivisionWidthBoundaries",
+            "TestIntegerMulDivisionWarmAllocations"
+          ]
         }
       ],
       "ownership": [
-        "Persistent cells and limbs in slabs/word pages. Copy/Move/Swap explicit; source scratch/cached constants retained. Owner identity caller contract; rendering/header budgets and remaining source operations unresolved. See mpnum/PORT_STATUS.md."
+        "Persistent cells and limbs in slabs/word pages. Copy/Move/Swap explicit; source scratch/cached constants retained. Owner identity caller contract; rendering/header budgets and remaining source operations unresolved. See mpnum/PORT_STATUS.md.",
+        "Division scratch Words are budgeted and released. Div/Mod stage owner-local values for failure atomicity while preserving source output/divisor alias defects. Standalone MPN, formatting and header budgets remain unresolved. See mpnum/PORT_STATUS.md."
       ],
-      "deviations": []
+      "deviations": [
+        "Divide by zero is a classified development error preserving destinations.",
+        "Div/Mod use staged owner cells, increasing storage peak and changing physical allocation timing; source arithmetic and alias defects preserved."
+      ]
     },
     {
       "path": "src/util/mpz.h",
@@ -95168,7 +95437,9 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "mpnum/mpz.go"
+        "mpnum/mpz.go",
+        "mpnum/mpz_mul.go",
+        "mpnum/mpz_div.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -95178,7 +95449,18 @@
         "TestIntegerOwnership",
         "TestIntegerArithmeticOracle",
         "TestIntegerFailureCleanup",
-        "TestIntegerMultiLimbOracleAndSourceBug1"
+        "TestIntegerMultiLimbOracleAndSourceBug1",
+        "TestIntegerSourceMultiplication",
+        "TestIntegerMulDivisionLimbOracle",
+        "TestIntegerMultiplicationFailurePointsAndAliases",
+        "TestIntegerMulDivisionWarmAllocations",
+        "TestIntegerSignedDivisionExhaustive",
+        "TestIntegerDivisionCorrectionFixtures",
+        "TestIntegerDivisionZeroAndBudgetFailure",
+        "TestIntegerSourceDivisionAliasDefects",
+        "TestIntegerDivisionAllAllocationFailurePoints",
+        "TestIntegerEuclideanStagedFailurePointsAndAliases",
+        "TestIntegerDivisionWidthBoundaries"
       ],
       "conditionals": [
         {
@@ -95626,12 +95908,107 @@
             "TestIntegerFailureCleanup",
             "TestIntegerMultiLimbOracleAndSourceBug1"
           ]
+        },
+        {
+          "name": "mul/big_mul/internal Algorithm M",
+          "status": "ported",
+          "go_target": "mpnum/mpz_mul.go",
+          "tests": [
+            "TestIntegerSourceMultiplication",
+            "TestIntegerMulDivisionLimbOracle",
+            "TestIntegerMultiplicationFailurePointsAndAliases",
+            "TestIntegerMulDivisionWarmAllocations"
+          ]
+        },
+        {
+          "name": "machine_div_rem/big_div_rem",
+          "status": "ported",
+          "go_target": "mpnum/mpz_div.go",
+          "tests": [
+            "TestIntegerSignedDivisionExhaustive",
+            "TestIntegerMulDivisionLimbOracle",
+            "TestIntegerDivisionCorrectionFixtures",
+            "TestIntegerDivisionZeroAndBudgetFailure",
+            "TestIntegerSourceDivisionAliasDefects",
+            "TestIntegerDivisionAllAllocationFailurePoints",
+            "TestIntegerEuclideanStagedFailurePointsAndAliases",
+            "TestIntegerDivisionWidthBoundaries",
+            "TestIntegerMulDivisionWarmAllocations"
+          ]
+        },
+        {
+          "name": "machine_div/big_div",
+          "status": "ported",
+          "go_target": "mpnum/mpz_div.go",
+          "tests": [
+            "TestIntegerSignedDivisionExhaustive",
+            "TestIntegerMulDivisionLimbOracle",
+            "TestIntegerDivisionCorrectionFixtures",
+            "TestIntegerDivisionZeroAndBudgetFailure",
+            "TestIntegerSourceDivisionAliasDefects",
+            "TestIntegerDivisionAllAllocationFailurePoints",
+            "TestIntegerEuclideanStagedFailurePointsAndAliases",
+            "TestIntegerDivisionWidthBoundaries",
+            "TestIntegerMulDivisionWarmAllocations"
+          ]
+        },
+        {
+          "name": "rem/big_rem",
+          "status": "ported",
+          "go_target": "mpnum/mpz_div.go",
+          "tests": [
+            "TestIntegerSignedDivisionExhaustive",
+            "TestIntegerMulDivisionLimbOracle",
+            "TestIntegerDivisionCorrectionFixtures",
+            "TestIntegerDivisionZeroAndBudgetFailure",
+            "TestIntegerSourceDivisionAliasDefects",
+            "TestIntegerDivisionAllAllocationFailurePoints",
+            "TestIntegerEuclideanStagedFailurePointsAndAliases",
+            "TestIntegerDivisionWidthBoundaries",
+            "TestIntegerMulDivisionWarmAllocations"
+          ]
+        },
+        {
+          "name": "div/mod Euclidean adjustment",
+          "status": "ported",
+          "go_target": "mpnum/mpz_div.go",
+          "tests": [
+            "TestIntegerSignedDivisionExhaustive",
+            "TestIntegerMulDivisionLimbOracle",
+            "TestIntegerDivisionCorrectionFixtures",
+            "TestIntegerDivisionZeroAndBudgetFailure",
+            "TestIntegerSourceDivisionAliasDefects",
+            "TestIntegerDivisionAllAllocationFailurePoints",
+            "TestIntegerEuclideanStagedFailurePointsAndAliases",
+            "TestIntegerDivisionWidthBoundaries",
+            "TestIntegerMulDivisionWarmAllocations"
+          ]
+        },
+        {
+          "name": "quot_rem_core/internal Algorithm D",
+          "status": "ported",
+          "go_target": "mpnum/mpz_div.go",
+          "tests": [
+            "TestIntegerSignedDivisionExhaustive",
+            "TestIntegerMulDivisionLimbOracle",
+            "TestIntegerDivisionCorrectionFixtures",
+            "TestIntegerDivisionZeroAndBudgetFailure",
+            "TestIntegerSourceDivisionAliasDefects",
+            "TestIntegerDivisionAllAllocationFailurePoints",
+            "TestIntegerEuclideanStagedFailurePointsAndAliases",
+            "TestIntegerDivisionWidthBoundaries",
+            "TestIntegerMulDivisionWarmAllocations"
+          ]
         }
       ],
       "ownership": [
-        "Persistent cells and limbs in slabs/word pages. Copy/Move/Swap explicit; source scratch/cached constants retained. Owner identity caller contract; rendering/header budgets and remaining source operations unresolved. See mpnum/PORT_STATUS.md."
+        "Persistent cells and limbs in slabs/word pages. Copy/Move/Swap explicit; source scratch/cached constants retained. Owner identity caller contract; rendering/header budgets and remaining source operations unresolved. See mpnum/PORT_STATUS.md.",
+        "Division scratch Words are budgeted and released. Div/Mod stage owner-local values for failure atomicity while preserving source output/divisor alias defects. Standalone MPN, formatting and header budgets remain unresolved. See mpnum/PORT_STATUS.md."
       ],
-      "deviations": []
+      "deviations": [
+        "Divide by zero is a classified development error preserving destinations.",
+        "Div/Mod use staged owner cells, increasing storage peak and changing physical allocation timing; source arithmetic and alias defects preserved."
+      ]
     },
     {
       "path": "src/util/mpzzp.h",
@@ -96088,9 +96465,24 @@
       "sha256": "e2e1d6936945317d9e7af20cb1f564fb0ef384deb90360157b262ad50a7a291a",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "arena/pool32.go"
+      ],
+      "tests": [
+        "TestPool32SourceLifetimeProjection",
+        "TestPool32DoNothingReset",
+        "TestPool32WorkerDestinationAndModes",
+        "TestPool32DestructorOrderResetLedger",
+        "TestPool32RetirementAndDestructorPolicy",
+        "TestPool32PredictableFailuresPrecedeCallbacks",
+        "TestPool32IndependentStateMachine",
+        "TestPool32WarmReuse",
+        "TestPool32ResetAtGenerationLimit",
+        "TestPool32ConcurrentWorkerPartitions",
+        "TestPool32SourceDefaultsAndRecordAudit",
+        "TestPool32ResetPeakBudget"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -96149,9 +96541,91 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "constructed=true scalar constructor/reserve/capacity",
+          "status": "ported",
+          "go_target": "arena/pool32.go",
+          "tests": [
+            "TestPool32SourceLifetimeProjection",
+            "TestPool32DoNothingReset",
+            "TestPool32WorkerDestinationAndModes",
+            "TestPool32DestructorOrderResetLedger",
+            "TestPool32RetirementAndDestructorPolicy",
+            "TestPool32PredictableFailuresPrecedeCallbacks",
+            "TestPool32IndependentStateMachine",
+            "TestPool32WarmReuse",
+            "TestPool32ResetAtGenerationLimit",
+            "TestPool32ConcurrentWorkerPartitions",
+            "TestPool32SourceDefaultsAndRecordAudit",
+            "TestPool32ResetPeakBudget"
+          ]
+        },
+        {
+          "name": "constructed=true allocate_core/recycle_core",
+          "status": "ported",
+          "go_target": "arena/pool32.go",
+          "tests": [
+            "TestPool32SourceLifetimeProjection",
+            "TestPool32DoNothingReset",
+            "TestPool32WorkerDestinationAndModes",
+            "TestPool32DestructorOrderResetLedger",
+            "TestPool32RetirementAndDestructorPolicy",
+            "TestPool32PredictableFailuresPrecedeCallbacks",
+            "TestPool32IndependentStateMachine",
+            "TestPool32WarmReuse",
+            "TestPool32ResetAtGenerationLimit",
+            "TestPool32ConcurrentWorkerPartitions",
+            "TestPool32SourceDefaultsAndRecordAudit",
+            "TestPool32ResetPeakBudget"
+          ]
+        },
+        {
+          "name": "worker mode/indexed allocation/recycle/wrapper",
+          "status": "ported",
+          "go_target": "arena/pool32.go",
+          "tests": [
+            "TestPool32SourceLifetimeProjection",
+            "TestPool32DoNothingReset",
+            "TestPool32WorkerDestinationAndModes",
+            "TestPool32DestructorOrderResetLedger",
+            "TestPool32RetirementAndDestructorPolicy",
+            "TestPool32PredictableFailuresPrecedeCallbacks",
+            "TestPool32IndependentStateMachine",
+            "TestPool32WarmReuse",
+            "TestPool32ResetAtGenerationLimit",
+            "TestPool32ConcurrentWorkerPartitions",
+            "TestPool32SourceDefaultsAndRecordAudit",
+            "TestPool32ResetPeakBudget"
+          ]
+        },
+        {
+          "name": "constructed=true region reset/destructor/object count",
+          "status": "ported",
+          "go_target": "arena/pool32.go",
+          "tests": [
+            "TestPool32SourceLifetimeProjection",
+            "TestPool32DoNothingReset",
+            "TestPool32WorkerDestinationAndModes",
+            "TestPool32DestructorOrderResetLedger",
+            "TestPool32RetirementAndDestructorPolicy",
+            "TestPool32PredictableFailuresPrecedeCallbacks",
+            "TestPool32IndependentStateMachine",
+            "TestPool32WarmReuse",
+            "TestPool32ResetAtGenerationLimit",
+            "TestPool32ConcurrentWorkerPartitions",
+            "TestPool32SourceDefaultsAndRecordAudit",
+            "TestPool32ResetPeakBudget"
+          ]
+        }
+      ],
+      "ownership": [
+        "Partial constructed=true scalar lifecycle specialization. Real rational-cell assertions, construct=false and whole-template ownership remain pending. See arena/PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Cold mutex serializes owner metadata; callbacks must not reenter owner or panic.",
+        "Predictable storage failure is checked before constructor/reset/destructor effects; storage peak charges and retained retry capacity are explicit."
+      ]
     },
     {
       "path": "src/util/optional.h",
@@ -99102,9 +99576,23 @@
       "sha256": "c3ac75274a9f6c336ff5ac472044f8c70f70d2fb3104f791ce21fccc3fa19b1c",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "bitset/uint_set.go"
+      ],
+      "tests": [
+        "TestUintSetSourceTst1",
+        "TestUintSetSourceTst2",
+        "TestUintSetSourceTst3",
+        "TestUintSetSourceTst4",
+        "TestUintSetSourceTst5PrintedExpectations",
+        "TestUintSetSourcePaddingCapacityAndCopies",
+        "TestUintSetIteratorMethods",
+        "TestUintSetWeightedHashWrap",
+        "TestUintSetIndependentBoundedOracle",
+        "TestUintSetWarmOperationsNoAllocation",
+        "TestUintSetOverflowRejectedBeforeGrowth"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -99147,9 +99635,104 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "constructors/destructor/copy assignment/swap/reset",
+          "status": "ported",
+          "go_target": "bitset/uint_set.go",
+          "tests": [
+            "TestUintSetSourceTst1",
+            "TestUintSetSourceTst2",
+            "TestUintSetSourceTst3",
+            "TestUintSetSourceTst4",
+            "TestUintSetSourceTst5PrintedExpectations",
+            "TestUintSetSourcePaddingCapacityAndCopies",
+            "TestUintSetIteratorMethods",
+            "TestUintSetWeightedHashWrap",
+            "TestUintSetIndependentBoundedOracle",
+            "TestUintSetWarmOperationsNoAllocation",
+            "TestUintSetOverflowRejectedBeforeGrowth"
+          ]
+        },
+        {
+          "name": "get_max_elem/empty/insert/remove/contains/num_elems",
+          "status": "ported",
+          "go_target": "bitset/uint_set.go",
+          "tests": [
+            "TestUintSetSourceTst1",
+            "TestUintSetSourceTst2",
+            "TestUintSetSourceTst3",
+            "TestUintSetSourceTst4",
+            "TestUintSetSourceTst5PrintedExpectations",
+            "TestUintSetSourcePaddingCapacityAndCopies",
+            "TestUintSetIteratorMethods",
+            "TestUintSetWeightedHashWrap",
+            "TestUintSetIndependentBoundedOracle",
+            "TestUintSetWarmOperationsNoAllocation",
+            "TestUintSetOverflowRejectedBeforeGrowth"
+          ]
+        },
+        {
+          "name": "union/intersection/equality/subset_of",
+          "status": "ported",
+          "go_target": "bitset/uint_set.go",
+          "tests": [
+            "TestUintSetSourceTst1",
+            "TestUintSetSourceTst2",
+            "TestUintSetSourceTst3",
+            "TestUintSetSourceTst4",
+            "TestUintSetSourceTst5PrintedExpectations",
+            "TestUintSetSourcePaddingCapacityAndCopies",
+            "TestUintSetIteratorMethods",
+            "TestUintSetWeightedHashWrap",
+            "TestUintSetIndependentBoundedOracle",
+            "TestUintSetWarmOperationsNoAllocation",
+            "TestUintSetOverflowRejectedBeforeGrowth"
+          ]
+        },
+        {
+          "name": "iterator construction/scan/dereference/increments/comparison/assignment",
+          "status": "ported",
+          "go_target": "bitset/uint_set.go",
+          "tests": [
+            "TestUintSetSourceTst1",
+            "TestUintSetSourceTst2",
+            "TestUintSetSourceTst3",
+            "TestUintSetSourceTst4",
+            "TestUintSetSourceTst5PrintedExpectations",
+            "TestUintSetSourcePaddingCapacityAndCopies",
+            "TestUintSetIteratorMethods",
+            "TestUintSetWeightedHashWrap",
+            "TestUintSetIndependentBoundedOracle",
+            "TestUintSetWarmOperationsNoAllocation",
+            "TestUintSetOverflowRejectedBeforeGrowth"
+          ]
+        },
+        {
+          "name": "get_hash/hash functor/equality functor/display",
+          "status": "ported",
+          "go_target": "bitset/uint_set.go",
+          "tests": [
+            "TestUintSetSourceTst1",
+            "TestUintSetSourceTst2",
+            "TestUintSetSourceTst3",
+            "TestUintSetSourceTst4",
+            "TestUintSetSourceTst5PrintedExpectations",
+            "TestUintSetSourcePaddingCapacityAndCopies",
+            "TestUintSetIteratorMethods",
+            "TestUintSetWeightedHashWrap",
+            "TestUintSetIndependentBoundedOracle",
+            "TestUintSetWarmOperationsNoAllocation",
+            "TestUintSetOverflowRejectedBeforeGrowth"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete owned uint32 words; source capacity, copy and ascending traversal preserved. UintSet-key map integration in tst5 remains unported. See bitset/PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Invalid extent/capacity overflow diagnosed before growth; source get_max_elem would wrap."
+      ]
     },
     {
       "path": "src/util/union_find.h",

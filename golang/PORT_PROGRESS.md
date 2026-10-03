@@ -106,3 +106,20 @@ Full module release/checked tests, checked race tests, vet and actual js/wasm
 execution pass after integration. Warmed allocator and MPZ Add/Sub operations
 still assert zero Go allocations. The source coverage, budget and platform gaps
 recorded above remain open; no full foundation/solver milestone is asserted.
+
+## Concrete pool, dense set and multiplication/division integration
+
+Constructed scalar pools now preserve reset-only recycling, worker destinations,
+eager pages and destructor order. Dense UintSet preserves source word capacities,
+weighted hashing and ascending iteration. Signed MPZ multiplication and division
+use owned budgeted limb scratch and source Algorithms M/D; source output/divisor
+alias defects have explicit tests. The ID generator preserves LIFO reuse and
+source wrap/debug/hash behavior through concrete scalar storage.
+
+These packets were driven from RED source/assertion tests to GREEN, with bounded
+independent oracles and failure/alias checks. Full release/checked tests, checked
+race tests, vet, actual js/wasm execution and WASI compilation pass. The source
+manifest/no-generics audit passes with 2 ported, 24 partial and 2,076 unported units.
+Real rational allocator instances, unconstructed pools, full numeric methods,
+formatting/header budgets and UintSet-key map integration remain open. Compilation
+is still the only WASI evidence; no full foundation or solver gate is complete.
