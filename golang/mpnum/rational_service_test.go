@@ -308,8 +308,6 @@ func TestRationalServiceCopyFailureAndWarmReuse(t *testing.T) {
 	s, b := serviceNew(t)
 	src := serviceValue(t, s, "1234567890123456789012345678901234567890/99887766554433221100")
 	dst := serviceValue(t, s, "7")
-	baseCells := s.manager.z.cells.Stats().Live
-	baseWords := s.manager.z.words.Stats().Live
 	// Occupy every free numeric cell so deep Copy requires actual cold growth.
 	var fillers []OwnedRational
 	for s.manager.z.cells.free != 0 {
@@ -318,15 +316,25 @@ func TestRationalServiceCopyFailureAndWarmReuse(t *testing.T) {
 		serviceMust(t, s.SetUint64(&v, 4294967295))
 		fillers = append(fillers, v)
 	}
-	baseCells = s.manager.z.cells.Stats().Live
-	baseWords = s.manager.z.words.Stats().Live
 	b.FailAfter(0)
 	e := s.Copy(&dst, &src)
-	b.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) || s.manager.z.cells.Stats().Live != baseCells || s.manager.z.words.Stats().Live != baseWords {
-		t.Fatal(e)
+	roots := []*Rational{&src.raw, &dst.raw}
+	for i := range fillers {
+		roots = append(roots, &fillers[i].raw)
 	}
-	serviceText(t, s, &dst, "7")
+	serviceAuditRationalRoots(t, s, roots...)
+	if !errors.Is(e, arena.ErrInjectedFailure) || dst.raw.num.cell != s.manager.z.failedRef || dst.raw.den != NewInt(1) || !errors.Is(s.manager.z.check(&dst.raw.num), arena.ErrInvalidSlot) {
+		t.Fatal("sequential Copy numerator refusal", dst, e)
+	}
+	b.FailAfter(-1)
+	sourceWant, ok := new(big.Rat).SetString("1234567890123456789012345678901234567890/99887766554433221100")
+	if !ok {
+		t.Fatal("invalid independent source fixture")
+	}
+	serviceText(t, s, &src, sourceWant.RatString())
+	serviceMust(t, s.Del(&dst))
+	dst, e = s.NewValue()
+	serviceMust(t, e)
 	for i := range fillers {
 		serviceMust(t, s.Del(&fillers[i]))
 	}

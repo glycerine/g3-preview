@@ -3,6 +3,7 @@ package mpnum
 
 import (
 	"errors"
+	"github.com/glycerine/g3/golang/arena"
 	"math"
 	"math/big"
 	"testing"
@@ -193,7 +194,7 @@ func TestBinaryMixedConversionsAndIntervals(t *testing.T) {
 }
 
 func TestBinarySourceShapeDomainsAndPrefixes(t *testing.T) {
-	m, _ := binaryManager(t)
+	m, budget := binaryManager(t)
 	raw := NewBinaryIntPower(2, 1)
 	one := NewBinaryInt(1)
 	eq, e := m.Equal(&raw, &one)
@@ -228,10 +229,13 @@ func TestBinarySourceShapeDomainsAndPrefixes(t *testing.T) {
 		}
 	}
 	a = NewBinaryIntPower(3, 1)
+	budget.FailAfter(0)
 	e = m.PowerInPlace(&a, 1<<31)
-	if e == nil || a.k != 1<<31 {
-		t.Fatal("inherited PowerDomain prefix", a.k, e)
+	binaryAudit(t, m, &raw, &one, &a, &b)
+	if !errors.Is(e, arena.ErrInjectedFailure) || a.k != 1<<31 || a.num != NewInt(1) {
+		t.Fatal("inherited finite Power growth refusal after denominator and numerator publication", a, e)
 	}
+	budget.FailAfter(-1)
 	a = NewBinaryIntPower(math.MinInt32, 31)
 	e = m.normalize(&a)
 	if sourceExtendedGCDDebug {

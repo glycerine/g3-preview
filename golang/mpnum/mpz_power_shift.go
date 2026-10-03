@@ -20,8 +20,8 @@ const (
 	PowerMaskOverflow
 )
 
-// PowerDomainError classifies source undefined/nonterminating inputs without
-// executing their invalid arithmetic. Exponent is the source unsigned width.
+// PowerDomainError observes a source assertion or the actual mask-wrap boundary.
+// Completed arithmetic/publication before that boundary remains visible.
 type PowerDomainError struct {
 	Exponent uint32
 	Reason   PowerDomainReason
@@ -55,6 +55,10 @@ func (m *IntegerManager) ensureOwnedCapacity(a *Int, capacity uint32) error {
 	ref, e := m.allocate(capacity, size)
 	if e != nil {
 		return e
+	}
+	if modularSourceDebug && m.cell(ref).capacity != capacity {
+		m.free(ref)
+		return ErrIntegerAssertion
 	}
 	sign := a.val
 	if old != 0 {
@@ -109,25 +113,7 @@ func (m *IntegerManager) Power(a *Int, p uint32, out *Int) error {
 	if e := m.check(out); e != nil {
 		return e
 	}
-	if a.IsSmall() && a.val == 0 && p == 0 {
-		return &PowerDomainError{Exponent: p, Reason: PowerZeroToZero}
-	}
-	fast := a.IsSmall() && (a.val == 0 || a.val == 1 || a.val == 2)
-	if !fast && p >= 1<<31 {
-		return &PowerDomainError{Exponent: p, Reason: PowerMaskOverflow}
-	}
-	// The base-two fast path writes the caller directly. Its destructive
-	// allocate_if_needed branch is distinct from preserving ensure_capacity.
-	// Other Power routes retain their separately documented staged contract.
-	if a.IsSmall() && a.val == 2 {
-		return m.powerCore(a, p, out)
-	}
-	var work Int
-	defer m.Del(&work)
-	if e := m.powerCore(a, p, &work); e != nil {
-		return e
-	}
-	return m.Move(out, &work)
+	return m.powerCore(a, p, out)
 }
 func (m *IntegerManager) powerCore(a *Int, p uint32, out *Int) error {
 	if a.IsSmall() {
@@ -165,6 +151,9 @@ func (m *IntegerManager) powerCore(a *Int, p uint32, out *Int) error {
 			out.val = 1
 			return nil
 		case 0:
+			if modularSourceDebug && p == 0 {
+				return &PowerDomainError{Exponent: p, Reason: PowerZeroToZero}
+			}
 			return m.Reset(out)
 		case 1:
 			return m.SetInt64(out, 1)
@@ -179,6 +168,9 @@ func (m *IntegerManager) powerCore(a *Int, p uint32, out *Int) error {
 		return e
 	}
 	for mask := uint32(1); mask <= p; mask <<= 1 {
+		if mask == 0 {
+			return &PowerDomainError{Exponent: p, Reason: PowerMaskOverflow}
+		}
 		if mask&p != 0 {
 			if e := m.Mul(out, &power, out); e != nil {
 				return e
@@ -223,6 +215,18 @@ func (m *IntegerManager) MachineDiv2k(a *Int, k uint32, out *Int) error {
 	return m.shift(a, k, out, false)
 }
 func (m *IntegerManager) Mul2k(a *Int, k uint32, out *Int) error { return m.shift(a, k, out, true) }
+func (m *IntegerManager) MachineDiv2kInPlace(a *Int, k uint32) error {
+	if e := m.check(a); e != nil {
+		return e
+	}
+	return m.machineDiv2kCore(a, k)
+}
+func (m *IntegerManager) Mul2kInPlace(a *Int, k uint32) error {
+	if e := m.check(a); e != nil {
+		return e
+	}
+	return m.mul2kCore(a, k)
+}
 func (m *IntegerManager) shift(a *Int, k uint32, out *Int, left bool) error {
 	if e := m.check(a); e != nil {
 		return e
@@ -230,21 +234,13 @@ func (m *IntegerManager) shift(a *Int, k uint32, out *Int, left bool) error {
 	if e := m.check(out); e != nil {
 		return e
 	}
-	var work Int
-	defer m.Del(&work)
-	if e := m.Copy(&work, a); e != nil {
+	if e := m.Copy(out, a); e != nil {
 		return e
 	}
-	var e error
 	if left {
-		e = m.mul2kCore(&work, k)
-	} else {
-		e = m.machineDiv2kCore(&work, k)
+		return m.mul2kCore(out, k)
 	}
-	if e != nil {
-		return e
-	}
-	return m.Move(out, &work)
+	return m.machineDiv2kCore(out, k)
 }
 func (m *IntegerManager) machineDiv2kCore(a *Int, k uint32) error {
 	if k == 0 || a.val == 0 {
@@ -267,6 +263,9 @@ func (m *IntegerManager) machineDiv2kCore(a *Int, k uint32) error {
 	bitShift := k % 32
 	compShift := 32 - bitShift
 	newSize := size - digitShift
+	if modularSourceDebug && newSize < 1 {
+		return ErrIntegerAssertion
+	}
 	if newSize < size {
 		i, j := uint32(0), digitShift
 		if bitShift != 0 {
@@ -281,6 +280,9 @@ func (m *IntegerManager) machineDiv2kCore(a *Int, k uint32) error {
 			}
 		}
 	} else {
+		if modularSourceDebug && (newSize != size || bitShift == 0) {
+			return ErrIntegerAssertion
+		}
 		var i uint32
 		for ; i < newSize-1; i++ {
 			v := m.digit(a.cell, i)>>bitShift | m.digit(a.cell, i+1)<<compShift
@@ -303,35 +305,74 @@ func (m *IntegerManager) mul2kCore(a *Int, k uint32) error {
 	if !a.IsSmall() {
 		oldSize = m.cell(a.cell).size
 	}
-	wide := uint64(oldSize) + uint64(wordShift) + 1
-	if wide > math.MaxUint32 {
-		return arena.ErrBounds
-	}
-	newSize := uint32(wide)
+	newSize := oldSize + wordShift + 1 // source unsigned32 addition
 	if e := m.ensureOwnedCapacity(a, newSize); e != nil {
 		return e
 	}
+	if modularSourceDebug && a.IsSmall() {
+		return ErrIntegerAssertion
+	}
+	// Guard the actual encoded backing access after source capacity preparation.
+	if a.IsSmall() {
+		return arena.ErrBounds
+	}
 	oldSize = m.cell(a.cell).size
-	m.resizeCell(a.cell, newSize)
+	cell := m.cell(a.cell)
+	// Prepare only the concrete Words access span. Retain the source cell size
+	// through zero filling; publish newSize at the actual source statement.
+	span := newSize
+	if span > cell.capacity {
+		span = cell.capacity
+	}
+	payload, e := m.words.Resize(cell.payload, span)
+	if e != nil {
+		return e
+	}
+	cell.payload = payload
+	m.store(a.cell, cell)
 	for i := oldSize; i < newSize; i++ {
+		if i >= cell.capacity || i >= span {
+			return arena.ErrBounds
+		}
 		m.writeDigit(a.cell, i, 0)
 	}
+	cell.size = newSize
+	m.store(a.cell, cell)
 	if wordShift > 0 {
 		j, i := oldSize, oldSize+wordShift
 		for j > 0 {
 			j--
 			i--
+			if i >= cell.capacity || i >= span || j >= cell.capacity || j >= span {
+				return arena.ErrBounds
+			}
 			m.writeDigit(a.cell, i, m.digit(a.cell, j))
 		}
 		for i > 0 {
 			i--
+			if i >= cell.capacity || i >= span {
+				return arena.ErrBounds
+			}
 			m.writeDigit(a.cell, i, 0)
 		}
 	}
 	if bitShift > 0 {
+		if modularSourceDebug {
+			for i := uint32(0); i < wordShift; i++ {
+				if i >= cell.capacity || i >= span {
+					return arena.ErrBounds
+				}
+				if m.digit(a.cell, i) != 0 {
+					return ErrIntegerAssertion
+				}
+			}
+		}
 		compShift := 32 - bitShift
 		var previous uint32
 		for i := wordShift; i < newSize; i++ {
+			if i >= cell.capacity || i >= span {
+				return arena.ErrBounds
+			}
 			v := m.digit(a.cell, i)
 			next := v >> compShift
 			m.writeDigit(a.cell, i, v<<bitShift|previous)

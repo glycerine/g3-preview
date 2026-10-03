@@ -840,3 +840,17 @@ TMPDIR-preserving toolchain-matched wrapper. Cross-builds alone are compilation
 evidence; only those stated JS registrations are execution evidence. Every
 write/cache/temp/output in this packet stayed under golang/.cache or the listed
 mpnum source/test/status files; no source C++ compiler/external fixture was used.
+
+
+### Direct Power and source component publication
+
+The selected integer/rational Power, in-place and copy-output shifts, and public
+rational Copy/Mul now follow direct source publication. Repeated squaring
+retains the final unused square; high-bit exponents reach the actual mask-wrap
+guard after completed operations or return an earlier actual allocation error.
+Tests first expose component publication and bounded malformed-header guards,
+then verify finite independent arithmetic and aliases. Dependent failure tests
+audit actual named roots before disabling faults and clean exact owned failed
+descriptors. See ../MPZ_POWER_PUBLICATION_PACKET.md for final frozen evidence.
+Other staged arithmetic, source allocator/backend integration, nonselected
+backends and the complete solver remain required; no whole unit is complete.

@@ -872,14 +872,38 @@ func TestRationalFacadeCompoundFailureAliases(t *testing.T) {
 						e = s.ModInto(&a, &b, &b)
 					}
 				}
-				budget.FailAfter(-1)
 				facadeAudit(t, s, &a, &b)
+				budget.FailAfter(-1)
 				if e != nil {
 					failures++
 					if !errors.Is(e, arena.ErrInjectedFailure) {
 						t.Fatal(op, alias, fault, e)
 					}
-					serviceText(t, s, &a, before)
+					if op == 2 {
+						left, ok := new(big.Rat).SetString(before)
+						if !ok {
+							t.Fatal(before)
+						}
+						right, ok := new(big.Rat).SetString(bBefore)
+						if !ok {
+							t.Fatal(bBefore)
+						}
+						if alias == 1 {
+							right.Set(left)
+						}
+						product := new(big.Rat).Mul(left, right)
+						rawNum := new(big.Int).Mul(left.Num(), right.Num()).String()
+						rawDen := new(big.Int).Mul(left.Denom(), right.Denom()).String()
+						num := powerPublicationComponent(t, s.manager.z, &a.raw.num, left.Num().String(), rawNum, product.Num().String())
+						powerPublicationComponent(t, s.manager.z, &a.raw.den, left.Denom().String(), rawDen, product.Denom().String())
+						if num == "failed" || num == left.Num().String() {
+							if integerString(t, s.manager.z, &a.raw.den) != left.Denom().String() {
+								t.Fatal("denominator preceded numerator MulAssign", alias, fault)
+							}
+						}
+					} else {
+						serviceText(t, s, &a, before)
+					}
 					serviceText(t, s, &b, bBefore)
 				} else {
 					success = true

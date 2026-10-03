@@ -240,7 +240,7 @@ func TestIntegerPowerAndShiftIndependent(t *testing.T) {
 	}
 }
 func TestSourceShiftDefectAndPowerDomains(t *testing.T) {
-	m, budget := integerManager(t)
+	m, _ := integerManager(t)
 	a, out := NewInt(math.MinInt32), NewInt(17)
 	// Derived from source signed-int twok=1<<31; not observed via a C++ experiment.
 	if e := m.MachineDiv2k(&a, 31, &out); e != nil || integerString(t, m, &out) != "1" {
@@ -266,22 +266,43 @@ func TestSourceShiftDefectAndPowerDomains(t *testing.T) {
 	m.Del(&bigMin)
 	for _, base := range []int32{0, 1, 2, 3, -1, -2} {
 		for _, p := range []uint32{0, 1 << 31, math.MaxUint32} {
-			a = NewInt(base)
-			m.SetInt64(&out, 17)
-			before := budget.Used()
+			// Generic enormous bases exercise precedence at bit31; bounded
+			// -1 above/below covers the complete MaxUint32 wrap route.
+			if p == math.MaxUint32 && (base == 3 || base == -2) {
+				continue
+			}
+			// A source scratch transfer failure need not be retryable. Each
+			// independent domain case owns its complete fresh manager graph.
+			m, budget := integerManager(t)
+			a, out := NewInt(base), NewInt(17)
+			// Arm the first real growth for exponentially large generic bases.
+			large := p >= 1<<31 && (base == 3 || base == -2)
+			if large {
+				budget.FailAfter(0)
+			}
 			e := m.Power(&a, p, &out)
-			invalid := base == 0 && p == 0
-			nonterm := p >= 1<<31 && base != 0 && base != 1 && base != 2
-			if invalid || nonterm {
-				var typed *PowerDomainError
-				if !errors.As(e, &typed) || typed.Exponent != p || integerString(t, m, &out) != "17" || budget.Used() != before {
+			mpzPublicationAudit(t, m, &a, &out)
+			if large {
+				if !errors.Is(e, arena.ErrInjectedFailure) {
 					t.Fatal(base, p, e)
 				}
-				if invalid && !errors.Is(e, ErrInvalidPower) {
-					t.Fatal(e)
+				if out != NewInt(1) {
+					t.Fatal("first square refusal before mask31", base, out)
 				}
-				if nonterm && !errors.Is(e, ErrNonterminatingPower) {
-					t.Fatal(e)
+				budget.FailAfter(-1)
+				m.Del(&out)
+			} else if base == 0 && p == 0 && modularSourceDebug {
+				if !errors.Is(e, ErrInvalidPower) || out != NewInt(17) {
+					t.Fatal("source assertion before Reset", e, out)
+				}
+			} else if base == -1 && p >= 1<<31 {
+				want := int32(1)
+				if p&1 != 0 {
+					want = -1
+				}
+				var typed *PowerDomainError
+				if !errors.As(e, &typed) || typed.Exponent != p || !errors.Is(e, ErrNonterminatingPower) || out != NewInt(want) {
+					t.Fatal(base, p, out, e)
 				}
 			} else if base == 2 && p >= 1<<31 {
 				if !errors.Is(e, arena.ErrBudget) && !errors.Is(e, arena.ErrBounds) {
@@ -304,6 +325,9 @@ func TestSourceShiftDefectAndPowerDomains(t *testing.T) {
 					t.Fatal(base, p, e)
 				}
 				want := new(big.Int).Exp(big.NewInt(int64(base)), new(big.Int).SetUint64(uint64(p)), nil)
+				if base == 0 && p == 0 {
+					want.SetInt64(0) // release source fast path Reset, not mathematical 0^0
+				}
 				assertIntegerPowerOracle(t, m, &out, want)
 			}
 		}
@@ -344,11 +368,25 @@ func TestRationalPowerIndependentAndDomains(t *testing.T) {
 		for _, base := range []int64{0, 1, 2, -1} {
 			m.SetInt64(&a, base)
 			m.SetInt64(&out, 17)
-			before := budget.Used()
+			if base == 2 {
+				budget.FailAfter(0)
+			}
 			e := m.Power(&a, 1<<31, &out)
-			var typed *PowerDomainError
-			if !errors.As(e, &typed) || !errors.Is(e, ErrNonterminatingPower) || rationalString(t, m, &out) != "17" || budget.Used() != before {
-				t.Fatal(base, e)
+			qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &out.num, &out.den})
+			if base == 2 {
+				if !errors.Is(e, arena.ErrInjectedFailure) || out.num != NewInt(1) || out.den != NewInt(1) {
+					t.Fatal("first real square refusal", base, out, e)
+				}
+				budget.FailAfter(-1)
+			} else {
+				want := int32(1)
+				if base == 0 {
+					want = 0
+				}
+				var typed *PowerDomainError
+				if !errors.As(e, &typed) || !errors.Is(e, ErrNonterminatingPower) || out.num != NewInt(want) || out.den != NewInt(1) {
+					t.Fatal(base, out, e)
+				}
 			}
 		}
 	}
@@ -508,7 +546,9 @@ func TestShiftUnsignedBoundsAndPromotions(t *testing.T) {
 	var a, out Int
 	m.SetInt64(&a, math.MaxInt64)
 	m.SetInt64(&out, 17)
-	if e := m.Mul2k(&a, math.MaxUint32, &out); (!errors.Is(e, arena.ErrBudget) && !errors.Is(e, arena.ErrBounds)) || integerString(t, m, &out) != "17" || integerString(t, m, &a) != "9223372036854775807" {
+	e := m.Mul2k(&a, math.MaxUint32, &out)
+	mpzPublicationAudit(t, m, &a, &out)
+	if (!errors.Is(e, arena.ErrBudget) && !errors.Is(e, arena.ErrBounds)) || integerString(t, m, &out) != "9223372036854775807" || integerString(t, m, &a) != "9223372036854775807" {
 		t.Fatal(e)
 	}
 	if e := m.MachineDiv2k(&a, math.MaxUint32, &out); e != nil || integerString(t, m, &out) != "0" {
@@ -518,27 +558,48 @@ func TestShiftUnsignedBoundsAndPromotions(t *testing.T) {
 
 func TestPowerDomainAliases(t *testing.T) {
 	m, budget := integerManager(t)
-	for _, fixture := range []struct {
-		base     int32
-		p        uint32
-		sentinel error
-	}{{0, 0, ErrInvalidPower}, {3, 1 << 31, ErrNonterminatingPower}, {-1, math.MaxUint32, ErrNonterminatingPower}} {
-		a := NewInt(fixture.base)
-		before := budget.Used()
-		e := m.Power(&a, fixture.p, &a)
-		if !errors.Is(e, fixture.sentinel) || a.val != fixture.base || !a.IsSmall() || budget.Used() != before {
-			t.Fatal(fixture, e)
+	for _, base := range []int32{0, 3, -1} {
+		a := NewInt(base)
+		p := uint32(0)
+		if base == 3 {
+			p = 1 << 31
+			budget.FailAfter(0)
+		}
+		if base == -1 {
+			p = math.MaxUint32
+		}
+		e := m.Power(&a, p, &a)
+		mpzPublicationAudit(t, m, &a)
+		switch base {
+		case 0:
+			if modularSourceDebug {
+				if !errors.Is(e, ErrInvalidPower) || a != NewInt(0) {
+					t.Fatal(base, a, e)
+				}
+			} else if e != nil || a != NewInt(0) {
+				t.Fatal(base, a, e)
+			}
+		case 3:
+			if !errors.Is(e, arena.ErrInjectedFailure) || a != NewInt(1) {
+				t.Fatal(base, a, e)
+			}
+			budget.FailAfter(-1)
+		case -1:
+			if !errors.Is(e, ErrNonterminatingPower) || a != NewInt(-1) {
+				t.Fatal(base, a, e)
+			}
 		}
 	}
 	for _, synch := range []bool{false, true} {
 		rm, b := rationalManager(t, synch)
 		a := NewRational()
-		rm.SetFraction(&a, -17, 13)
-		_ = rationalString(t, rm, &a) // warm owner-budgeted formatting before method invariant
-		before := b.Used()
-		e := rm.Power(&a, math.MaxUint32, &a)
-		if !errors.Is(e, ErrNonterminatingPower) || rationalString(t, rm, &a) != "-17/13" || b.Used() != before {
-			t.Fatal(synch, e)
+		qopsMust(t, rm.SetFraction(&a, -17, 13))
+		b.FailAfter(0)
+		e := rm.Power(&a, 1<<31, &a)
+		qopsAuditLiveOwnership(t, rm, []*Int{&a.num, &a.den})
+		if !errors.Is(e, arena.ErrInjectedFailure) || a.num != NewInt(1) || a.den != NewInt(1) {
+			t.Fatal(synch, a, e)
 		}
+		b.FailAfter(-1)
 	}
 }

@@ -85160,7 +85160,8 @@
         "mpnum/mpq_power.go",
         "mpnum/mpq_parse.go",
         "mpnum/mp_display.go",
-        "mpnum/mpz_facade_extra_test.go"
+        "mpnum/mpz_facade_extra_test.go",
+        "mpnum/mp_power_publication_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -85204,7 +85205,21 @@
         "TestNumericDisplayWorkspaceGrowthAndBudget",
         "TestNumericDisplayWarmAllocationBoundaries",
         "TestSourceNoncanonicalRationalDisplayActions",
-        "TestIntegerFacadeSourceTst1ComparisonAssertions"
+        "TestIntegerFacadeSourceTst1ComparisonAssertions",
+        "TestPowerPublicationInPlaceShiftOverloads",
+        "TestPowerPublicationWrappedShiftHeaderAccessOrder",
+        "TestPowerPublicationIntegerZeroZeroProfile",
+        "TestPowerPublicationIntegerBudgetBeforeMaskWrap",
+        "TestPowerPublicationIntegerActualWrapPrefix",
+        "TestPowerPublicationRationalBudgetBeforeMaskWrap",
+        "TestPowerPublicationRationalActualWrapPrefix",
+        "TestPowerPublicationFinalUnusedSquareRefusal",
+        "TestPowerPublicationBigInputCopyPrecedesOutputOne",
+        "TestPowerPublicationRawRationalShapesAndMulAliases",
+        "TestPowerPublicationLeftShiftCopyPrecedesPromotionRefusal",
+        "TestPowerPublicationRightShiftCopyRefusalPrefix",
+        "TestPowerPublicationRationalCopyComponentRefusal",
+        "TestPowerPublicationRationalMulComponentRefusal"
       ],
       "conditionals": [
         {
@@ -85312,6 +85327,27 @@
           "tests": [
             "TestIntegerFacadeSourceTst1ComparisonAssertions"
           ]
+        },
+        {
+          "name": "direct Power and actual mask wrap, copy-before-in-place shifts, sequential public rational Copy and Mul selected source publication",
+          "status": "partial",
+          "go_target": "mpnum/mp_power_publication_test.go",
+          "tests": [
+            "TestPowerPublicationInPlaceShiftOverloads",
+            "TestPowerPublicationWrappedShiftHeaderAccessOrder",
+            "TestPowerPublicationIntegerZeroZeroProfile",
+            "TestPowerPublicationIntegerBudgetBeforeMaskWrap",
+            "TestPowerPublicationIntegerActualWrapPrefix",
+            "TestPowerPublicationRationalBudgetBeforeMaskWrap",
+            "TestPowerPublicationRationalActualWrapPrefix",
+            "TestPowerPublicationFinalUnusedSquareRefusal",
+            "TestPowerPublicationBigInputCopyPrecedesOutputOne",
+            "TestPowerPublicationRawRationalShapesAndMulAliases",
+            "TestPowerPublicationLeftShiftCopyPrecedesPromotionRefusal",
+            "TestPowerPublicationRightShiftCopyRefusalPrefix",
+            "TestPowerPublicationRationalCopyComponentRefusal",
+            "TestPowerPublicationRationalMulComponentRefusal"
+          ]
         }
       ],
       "ownership": [
@@ -85320,14 +85356,16 @@
         "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending.",
         "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md.",
         "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md.",
-        "tst1 retains original numerical setup, lexical manager scope and explicit Del; 18 comparison assertions across MPZ/MPQ. Additional printed fixtures and independent tests are not source assertions. See MPZ_FACADE_EXTRA_PORT_STATUS.md."
+        "tst1 retains original numerical setup, lexical manager scope and explicit Del; 18 comparison assertions across MPZ/MPQ. Additional printed fixtures and independent tests are not source assertions. See MPZ_FACADE_EXTRA_PORT_STATUS.md.",
+        "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See MPZ_POWER_PUBLICATION_PACKET.md; source allocator/backend integration remains required."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
         "Undefined zero denominator/divisor/inverse classified ErrDivideByZero. Both source scratch modes operation-owner confined.",
         "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits.",
         "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors.",
-        "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text."
+        "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text.",
+        "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open."
       ]
     },
     {
@@ -85347,7 +85385,8 @@
         "mpnum/mpz_bitwise_test.go",
         "mpnum/mp_root_test.go",
         "mpnum/scoped_numeral.go",
-        "mpnum/mpz_facade_extra_test.go"
+        "mpnum/mpz_facade_extra_test.go",
+        "mpnum/mp_power_publication_test.go"
       ],
       "tests": [
         "TestSourceMPZMagnitudeProjections",
@@ -85421,7 +85460,21 @@
         "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
         "TestScopedRationalVectorIndependentLifecycleAndFailures",
         "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak",
-        "TestIntegerFacadeSourceTst1ComparisonAssertions"
+        "TestIntegerFacadeSourceTst1ComparisonAssertions",
+        "TestPowerPublicationInPlaceShiftOverloads",
+        "TestPowerPublicationWrappedShiftHeaderAccessOrder",
+        "TestPowerPublicationIntegerZeroZeroProfile",
+        "TestPowerPublicationIntegerBudgetBeforeMaskWrap",
+        "TestPowerPublicationIntegerActualWrapPrefix",
+        "TestPowerPublicationRationalBudgetBeforeMaskWrap",
+        "TestPowerPublicationRationalActualWrapPrefix",
+        "TestPowerPublicationFinalUnusedSquareRefusal",
+        "TestPowerPublicationBigInputCopyPrecedesOutputOne",
+        "TestPowerPublicationRawRationalShapesAndMulAliases",
+        "TestPowerPublicationLeftShiftCopyPrecedesPromotionRefusal",
+        "TestPowerPublicationRightShiftCopyRefusalPrefix",
+        "TestPowerPublicationRationalCopyComponentRefusal",
+        "TestPowerPublicationRationalMulComponentRefusal"
       ],
       "conditionals": [
         {
@@ -85599,6 +85652,27 @@
           "tests": [
             "TestIntegerFacadeSourceTst1ComparisonAssertions"
           ]
+        },
+        {
+          "name": "direct Power and actual mask wrap, copy-before-in-place shifts, sequential public rational Copy and Mul selected source publication",
+          "status": "partial",
+          "go_target": "mpnum/mp_power_publication_test.go",
+          "tests": [
+            "TestPowerPublicationInPlaceShiftOverloads",
+            "TestPowerPublicationWrappedShiftHeaderAccessOrder",
+            "TestPowerPublicationIntegerZeroZeroProfile",
+            "TestPowerPublicationIntegerBudgetBeforeMaskWrap",
+            "TestPowerPublicationIntegerActualWrapPrefix",
+            "TestPowerPublicationRationalBudgetBeforeMaskWrap",
+            "TestPowerPublicationRationalActualWrapPrefix",
+            "TestPowerPublicationFinalUnusedSquareRefusal",
+            "TestPowerPublicationBigInputCopyPrecedesOutputOne",
+            "TestPowerPublicationRawRationalShapesAndMulAliases",
+            "TestPowerPublicationLeftShiftCopyPrecedesPromotionRefusal",
+            "TestPowerPublicationRightShiftCopyRefusalPrefix",
+            "TestPowerPublicationRationalCopyComponentRefusal",
+            "TestPowerPublicationRationalMulComponentRefusal"
+          ]
         }
       ],
       "ownership": [
@@ -85609,12 +85683,14 @@
         "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending.",
         "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md.",
         "Concrete scoped Int/Rational objects borrow managers; all cold headers and actual old+new pointer-free backing are charged. Deep copy owns independent limbs, source ascending truncation releases them, vector failure prefixes retained. See SCOPED_NUMERAL_PORT_STATUS.md.",
-        "tst1 retains original numerical setup, lexical manager scope and explicit Del; 18 comparison assertions across MPZ/MPQ. Additional printed fixtures and independent tests are not source assertions. See MPZ_FACADE_EXTRA_PORT_STATUS.md."
+        "tst1 retains original numerical setup, lexical manager scope and explicit Del; 18 comparison assertions across MPZ/MPQ. Additional printed fixtures and independent tests are not source assertions. See MPZ_FACADE_EXTRA_PORT_STATUS.md.",
+        "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See MPZ_POWER_PUBLICATION_PACKET.md; source allocator/backend integration remains required."
       ],
       "deviations": [
         "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits.",
         "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors.",
-        "Explicit Close substitutes RAII; self identity rejects shallow Go owner copies. Vectors expose deep Read/Set rather than escaping indexed element addresses. Source noncopyable vector remains noncopyable; other numeral manager specializations stay open."
+        "Explicit Close substitutes RAII; self identity rejects shallow Go owner copies. Vectors expose deep Read/Set rather than escaping indexed element addresses. Source noncopyable vector remains noncopyable; other numeral manager specializations stay open.",
+        "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open."
       ]
     },
     {
@@ -105759,7 +105835,8 @@
         "mpnum/mpq_root.go",
         "mpnum/mp_display.go",
         "mpnum/mpq_number_theory.go",
-        "mpnum/mpq_inspect.go"
+        "mpnum/mpq_inspect.go",
+        "mpnum/mp_power_publication_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -105845,7 +105922,21 @@
         "TestRationalInspectionEveryFailurePrefix",
         "TestRationalInspectionWarmAllocationAndIndependentValues",
         "TestRationalInspectionRawActionsAndIndependentIncrement",
-        "TestRationalInspectionAliasedCopyFailureCleanup"
+        "TestRationalInspectionAliasedCopyFailureCleanup",
+        "TestPowerPublicationInPlaceShiftOverloads",
+        "TestPowerPublicationWrappedShiftHeaderAccessOrder",
+        "TestPowerPublicationIntegerZeroZeroProfile",
+        "TestPowerPublicationIntegerBudgetBeforeMaskWrap",
+        "TestPowerPublicationIntegerActualWrapPrefix",
+        "TestPowerPublicationRationalBudgetBeforeMaskWrap",
+        "TestPowerPublicationRationalActualWrapPrefix",
+        "TestPowerPublicationFinalUnusedSquareRefusal",
+        "TestPowerPublicationBigInputCopyPrecedesOutputOne",
+        "TestPowerPublicationRawRationalShapesAndMulAliases",
+        "TestPowerPublicationLeftShiftCopyPrecedesPromotionRefusal",
+        "TestPowerPublicationRightShiftCopyRefusalPrefix",
+        "TestPowerPublicationRationalCopyComponentRefusal",
+        "TestPowerPublicationRationalMulComponentRefusal"
       ],
       "assertions": [
         {
@@ -106222,6 +106313,27 @@
             "TestRationalInspectionRawActionsAndIndependentIncrement",
             "TestRationalInspectionAliasedCopyFailureCleanup"
           ]
+        },
+        {
+          "name": "direct Power and actual mask wrap, copy-before-in-place shifts, sequential public rational Copy and Mul selected source publication",
+          "status": "partial",
+          "go_target": "mpnum/mp_power_publication_test.go",
+          "tests": [
+            "TestPowerPublicationInPlaceShiftOverloads",
+            "TestPowerPublicationWrappedShiftHeaderAccessOrder",
+            "TestPowerPublicationIntegerZeroZeroProfile",
+            "TestPowerPublicationIntegerBudgetBeforeMaskWrap",
+            "TestPowerPublicationIntegerActualWrapPrefix",
+            "TestPowerPublicationRationalBudgetBeforeMaskWrap",
+            "TestPowerPublicationRationalActualWrapPrefix",
+            "TestPowerPublicationFinalUnusedSquareRefusal",
+            "TestPowerPublicationBigInputCopyPrecedesOutputOne",
+            "TestPowerPublicationRawRationalShapesAndMulAliases",
+            "TestPowerPublicationLeftShiftCopyPrecedesPromotionRefusal",
+            "TestPowerPublicationRightShiftCopyRefusalPrefix",
+            "TestPowerPublicationRationalCopyComponentRefusal",
+            "TestPowerPublicationRationalMulComponentRefusal"
+          ]
         }
       ],
       "ownership": [
@@ -106232,7 +106344,8 @@
         "Root/square stage prior output and source alias rereads with existing owner-budgeted numerals, preserving finite false-result parts and synchronized/unsynchronized normalization policy. See ROOT_PORT_STATUS.md.",
         "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md.",
         "Number theory locals use existing budgeted numerical cells/Words and are always deleted in source order. ExtendedGCD preserves coefficient publication/failure prefixes and rational denominator reset timing; immediate failed-prefix caller/cache roots audited. See NUMBER_THEORY_PORT_STATUS.md.",
-        "Inspection uses existing integer roots; extraction acquires deep independent limbs and thin setters/swap retain source component identity. Failed-prefix tests audit cells/Words and decoded values before rendering/teardown. See RATIONAL_INSPECTION_PORT_STATUS.md."
+        "Inspection uses existing integer roots; extraction acquires deep independent limbs and thin setters/swap retain source component identity. Failed-prefix tests audit cells/Words and decoded values before rendering/teardown. See RATIONAL_INSPECTION_PORT_STATUS.md.",
+        "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See MPZ_POWER_PUBLICATION_PACKET.md; source allocator/backend integration remains required."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -106242,7 +106355,8 @@
         "Source fractional square identity alias reaches undefined zero/zero normalization; adapter reports ErrDivideByZero and preserves original caller fraction. Root false outputs remain deliberately unnormalized, and prior denominator survives inexact numerator.",
         "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text.",
         "Selected release ExtendedGCD preserves finite aliases and modified-input sign rereads. Source Z3DEBUG diagnostic arithmetic remains unported; g3checked selects reference validation only. ext_gcd.h wrapper algorithm remains separate and is not credited from manager inverse properties.",
-        "Explicit manager projects rational.h inclusive32-bit wrappers, distinct from strict MPZ boundaries; global wrapper remains incomplete. Float positive converted denominator SASSERT becomes typed ErrRationalFloatDomain. Source raw component alias publication can leave denominator zero; subsequent operations diagnose initialization."
+        "Explicit manager projects rational.h inclusive32-bit wrappers, distinct from strict MPZ boundaries; global wrapper remains incomplete. Float positive converted denominator SASSERT becomes typed ErrRationalFloatDomain. Source raw component alias publication can leave denominator zero; subsequent operations diagnose initialization.",
+        "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open."
       ]
     },
     {
@@ -106264,7 +106378,8 @@
         "mpnum/mpq_number_theory.go",
         "mpnum/mpq_inspect.go",
         "mpnum/mpq_bitwise.go",
-        "mpnum/mpz_facade_extra.go"
+        "mpnum/mpz_facade_extra.go",
+        "mpnum/mp_power_publication_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -106366,7 +106481,21 @@
         "TestRationalInspectionAliasedCopyFailureCleanup",
         "TestRationalBitwiseForwardingIndependentAndAliases",
         "TestRationalBitwiseFailureOwnershipAndDenominatorPublication",
-        "TestIntegerFacadeSourceTst1ComparisonAssertions"
+        "TestIntegerFacadeSourceTst1ComparisonAssertions",
+        "TestPowerPublicationInPlaceShiftOverloads",
+        "TestPowerPublicationWrappedShiftHeaderAccessOrder",
+        "TestPowerPublicationIntegerZeroZeroProfile",
+        "TestPowerPublicationIntegerBudgetBeforeMaskWrap",
+        "TestPowerPublicationIntegerActualWrapPrefix",
+        "TestPowerPublicationRationalBudgetBeforeMaskWrap",
+        "TestPowerPublicationRationalActualWrapPrefix",
+        "TestPowerPublicationFinalUnusedSquareRefusal",
+        "TestPowerPublicationBigInputCopyPrecedesOutputOne",
+        "TestPowerPublicationRawRationalShapesAndMulAliases",
+        "TestPowerPublicationLeftShiftCopyPrecedesPromotionRefusal",
+        "TestPowerPublicationRightShiftCopyRefusalPrefix",
+        "TestPowerPublicationRationalCopyComponentRefusal",
+        "TestPowerPublicationRationalMulComponentRefusal"
       ],
       "conditionals": [
         {
@@ -107148,6 +107277,27 @@
           "tests": [
             "TestIntegerFacadeSourceTst1ComparisonAssertions"
           ]
+        },
+        {
+          "name": "direct Power and actual mask wrap, copy-before-in-place shifts, sequential public rational Copy and Mul selected source publication",
+          "status": "partial",
+          "go_target": "mpnum/mp_power_publication_test.go",
+          "tests": [
+            "TestPowerPublicationInPlaceShiftOverloads",
+            "TestPowerPublicationWrappedShiftHeaderAccessOrder",
+            "TestPowerPublicationIntegerZeroZeroProfile",
+            "TestPowerPublicationIntegerBudgetBeforeMaskWrap",
+            "TestPowerPublicationIntegerActualWrapPrefix",
+            "TestPowerPublicationRationalBudgetBeforeMaskWrap",
+            "TestPowerPublicationRationalActualWrapPrefix",
+            "TestPowerPublicationFinalUnusedSquareRefusal",
+            "TestPowerPublicationBigInputCopyPrecedesOutputOne",
+            "TestPowerPublicationRawRationalShapesAndMulAliases",
+            "TestPowerPublicationLeftShiftCopyPrecedesPromotionRefusal",
+            "TestPowerPublicationRightShiftCopyRefusalPrefix",
+            "TestPowerPublicationRationalCopyComponentRefusal",
+            "TestPowerPublicationRationalMulComponentRefusal"
+          ]
         }
       ],
       "ownership": [
@@ -107161,7 +107311,8 @@
         "Explicit-owner CopyFrom uses source indexed limbs and destination-owned cells/Words. Source set/copy shapes are preserved; rational pair staging preserves raw signed/unreduced representation. Raw records require genuine caller-supplied owners; public provenance is a separate service. See NUMERAL_COPY_PORT_STATUS.md.",
         "Number theory locals use existing budgeted numerical cells/Words and are always deleted in source order. ExtendedGCD preserves coefficient publication/failure prefixes and rational denominator reset timing; immediate failed-prefix caller/cache roots audited. See NUMBER_THEORY_PORT_STATUS.md.",
         "Inspection uses existing integer roots; extraction acquires deep independent limbs and thin setters/swap retain source component identity. Failed-prefix tests audit cells/Words and decoded values before rendering/teardown. See RATIONAL_INSPECTION_PORT_STATUS.md.",
-        "Bitwise rational wrappers forward actual numerator aliases to existing budgeted integer manager, then reset denominator; fault roots and malformed integer domains checked. See RATIONAL_FACADE_EXTRA_PORT_STATUS.md."
+        "Bitwise rational wrappers forward actual numerator aliases to existing budgeted integer manager, then reset denominator; fault roots and malformed integer domains checked. See RATIONAL_FACADE_EXTRA_PORT_STATUS.md.",
+        "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See MPZ_POWER_PUBLICATION_PACKET.md; source allocator/backend integration remains required."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -107173,7 +107324,8 @@
         "Staged mixed outputs adapt source allocation failure publication while emulating component-aliased source reads. Integer-only assertions and zero divisors become typed errors; negative-denominator RatDiv and direct integer output alias defects remain.",
         "B12 replaces the one-global-manager ownership assumption with explicit cross-manager deep copy. No foreign handle or serialization is passed into destination arithmetic; destination outlives source Close. This is an ownership adaptation, not AST translation completion.",
         "Selected release ExtendedGCD preserves finite aliases and modified-input sign rereads. Source Z3DEBUG diagnostic arithmetic remains unported; g3checked selects reference validation only. ext_gcd.h wrapper algorithm remains separate and is not credited from manager inverse properties.",
-        "Explicit manager projects rational.h inclusive32-bit wrappers, distinct from strict MPZ boundaries; global wrapper remains incomplete. Float positive converted denominator SASSERT becomes typed ErrRationalFloatDomain. Source raw component alias publication can leave denominator zero; subsequent operations diagnose initialization."
+        "Explicit manager projects rational.h inclusive32-bit wrappers, distinct from strict MPZ boundaries; global wrapper remains incomplete. Float positive converted denominator SASSERT becomes typed ErrRationalFloatDomain. Source raw component alias publication can leave denominator zero; subsequent operations diagnose initialization.",
+        "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open."
       ]
     },
     {
@@ -107239,7 +107391,8 @@
         "mpnum/mpz_extended_gcd_debug.go",
         "mpnum/mpz_extended_gcd_release.go",
         "mpnum/mpz_source_publication_test.go",
-        "mpnum/mpz_setter_publication_test.go"
+        "mpnum/mpz_setter_publication_test.go",
+        "mpnum/mp_power_publication_test.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -107377,7 +107530,21 @@
         "TestIntegerScalarSetterBoundariesAndReuse",
         "TestIntegerNormalizeOwnedSourceBranches",
         "TestIntegerBaseTwoPowerExactValuesAndAliases",
-        "TestIntegerBaseTwoPowerReservationSweepAndRetainedCapacity"
+        "TestIntegerBaseTwoPowerReservationSweepAndRetainedCapacity",
+        "TestPowerPublicationInPlaceShiftOverloads",
+        "TestPowerPublicationWrappedShiftHeaderAccessOrder",
+        "TestPowerPublicationIntegerZeroZeroProfile",
+        "TestPowerPublicationIntegerBudgetBeforeMaskWrap",
+        "TestPowerPublicationIntegerActualWrapPrefix",
+        "TestPowerPublicationRationalBudgetBeforeMaskWrap",
+        "TestPowerPublicationRationalActualWrapPrefix",
+        "TestPowerPublicationFinalUnusedSquareRefusal",
+        "TestPowerPublicationBigInputCopyPrecedesOutputOne",
+        "TestPowerPublicationRawRationalShapesAndMulAliases",
+        "TestPowerPublicationLeftShiftCopyPrecedesPromotionRefusal",
+        "TestPowerPublicationRightShiftCopyRefusalPrefix",
+        "TestPowerPublicationRationalCopyComponentRefusal",
+        "TestPowerPublicationRationalMulComponentRefusal"
       ],
       "conditionals": [
         {
@@ -108851,6 +109018,27 @@
             "TestIntegerBaseTwoPowerExactValuesAndAliases",
             "TestIntegerBaseTwoPowerReservationSweepAndRetainedCapacity"
           ]
+        },
+        {
+          "name": "direct Power and actual mask wrap, copy-before-in-place shifts, sequential public rational Copy and Mul selected source publication",
+          "status": "partial",
+          "go_target": "mpnum/mp_power_publication_test.go",
+          "tests": [
+            "TestPowerPublicationInPlaceShiftOverloads",
+            "TestPowerPublicationWrappedShiftHeaderAccessOrder",
+            "TestPowerPublicationIntegerZeroZeroProfile",
+            "TestPowerPublicationIntegerBudgetBeforeMaskWrap",
+            "TestPowerPublicationIntegerActualWrapPrefix",
+            "TestPowerPublicationRationalBudgetBeforeMaskWrap",
+            "TestPowerPublicationRationalActualWrapPrefix",
+            "TestPowerPublicationFinalUnusedSquareRefusal",
+            "TestPowerPublicationBigInputCopyPrecedesOutputOne",
+            "TestPowerPublicationRawRationalShapesAndMulAliases",
+            "TestPowerPublicationLeftShiftCopyPrecedesPromotionRefusal",
+            "TestPowerPublicationRightShiftCopyRefusalPrefix",
+            "TestPowerPublicationRationalCopyComponentRefusal",
+            "TestPowerPublicationRationalMulComponentRefusal"
+          ]
         }
       ],
       "ownership": [
@@ -108868,7 +109056,8 @@
         "Number theory locals use existing budgeted numerical cells/Words and are always deleted in source order. ExtendedGCD preserves coefficient publication/failure prefixes and rational denominator reset timing; immediate failed-prefix caller/cache roots audited. See NUMBER_THEORY_PORT_STATUS.md.",
         "The g3debug extended-GCD diagnostic reuses the six existing locals in source mul/mul/add/equality order before final result publication. Caller-visible coefficients survive assertion/failure; immediate root accounting and unwind are tested. See EXTENDED_GCD_DEBUG_PORT_STATUS.md.",
         "Selected old-free/sign/result-transfer/paired-division action prefixes preserve source order; failed replacements use one charged retired descriptor, guarded reads and owner-qualified cleanup. Exact source allocator topology remains open; see MPZ_SOURCE_PUBLICATION_PORT_STATUS.md.",
-        "Base-two Power mutates caller storage through actual destructive allocate_if_needed; other Power and shift wrappers remain staged fidelity work. Scalar debug capacity assertion precedes sign/digits; existing normalize branch tests confirm actual behavior. See MPZ_SETTER_PORT_STATUS.md."
+        "Base-two Power mutates caller storage through actual destructive allocate_if_needed; other Power and shift wrappers remain staged fidelity work. Scalar debug capacity assertion precedes sign/digits; existing normalize branch tests confirm actual behavior. See MPZ_SETTER_PORT_STATUS.md.",
+        "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See MPZ_POWER_PUBLICATION_PACKET.md; source allocator/backend integration remains required."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -108881,7 +109070,8 @@
         "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text.",
         "B12 replaces the one-global-manager ownership assumption with explicit cross-manager deep copy. No foreign handle or serialization is passed into destination arithmetic; destination outlives source Close. This is an ownership adaptation, not AST translation completion.",
         "Selected release ExtendedGCD preserves finite aliases and modified-input sign rereads. Source Z3DEBUG diagnostic arithmetic is selected by g3debug; g3checked selects reference validation independently. ext_gcd.h wrapper algorithm is translated separately; manager inverse properties alone do not credit that wrapper.",
-        "Go continuation for source undefined allocation failure: permanently dead failed token and missing-scratch guards; finite unsigned wrapped allocations retained before actual span ErrBounds. Higher-level staged wrappers remain fidelity work, not completion evidence."
+        "Go continuation for source undefined allocation failure: permanently dead failed token and missing-scratch guards; finite unsigned wrapped allocations retained before actual span ErrBounds. Higher-level staged wrappers remain fidelity work, not completion evidence.",
+        "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open."
       ]
     },
     {
@@ -108908,7 +109098,8 @@
         "mpnum/mpz_number_theory.go",
         "mpnum/mpz_facade_extra.go",
         "mpnum/mpz_source_publication_test.go",
-        "mpnum/mpz_setter_publication_test.go"
+        "mpnum/mpz_setter_publication_test.go",
+        "mpnum/mp_power_publication_test.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -109051,7 +109242,21 @@
         "TestIntegerScalarSetterBoundariesAndReuse",
         "TestIntegerNormalizeOwnedSourceBranches",
         "TestIntegerBaseTwoPowerExactValuesAndAliases",
-        "TestIntegerBaseTwoPowerReservationSweepAndRetainedCapacity"
+        "TestIntegerBaseTwoPowerReservationSweepAndRetainedCapacity",
+        "TestPowerPublicationInPlaceShiftOverloads",
+        "TestPowerPublicationWrappedShiftHeaderAccessOrder",
+        "TestPowerPublicationIntegerZeroZeroProfile",
+        "TestPowerPublicationIntegerBudgetBeforeMaskWrap",
+        "TestPowerPublicationIntegerActualWrapPrefix",
+        "TestPowerPublicationRationalBudgetBeforeMaskWrap",
+        "TestPowerPublicationRationalActualWrapPrefix",
+        "TestPowerPublicationFinalUnusedSquareRefusal",
+        "TestPowerPublicationBigInputCopyPrecedesOutputOne",
+        "TestPowerPublicationRawRationalShapesAndMulAliases",
+        "TestPowerPublicationLeftShiftCopyPrecedesPromotionRefusal",
+        "TestPowerPublicationRightShiftCopyRefusalPrefix",
+        "TestPowerPublicationRationalCopyComponentRefusal",
+        "TestPowerPublicationRationalMulComponentRefusal"
       ],
       "conditionals": [
         {
@@ -110112,6 +110317,27 @@
             "TestIntegerBaseTwoPowerExactValuesAndAliases",
             "TestIntegerBaseTwoPowerReservationSweepAndRetainedCapacity"
           ]
+        },
+        {
+          "name": "direct Power and actual mask wrap, copy-before-in-place shifts, sequential public rational Copy and Mul selected source publication",
+          "status": "partial",
+          "go_target": "mpnum/mp_power_publication_test.go",
+          "tests": [
+            "TestPowerPublicationInPlaceShiftOverloads",
+            "TestPowerPublicationWrappedShiftHeaderAccessOrder",
+            "TestPowerPublicationIntegerZeroZeroProfile",
+            "TestPowerPublicationIntegerBudgetBeforeMaskWrap",
+            "TestPowerPublicationIntegerActualWrapPrefix",
+            "TestPowerPublicationRationalBudgetBeforeMaskWrap",
+            "TestPowerPublicationRationalActualWrapPrefix",
+            "TestPowerPublicationFinalUnusedSquareRefusal",
+            "TestPowerPublicationBigInputCopyPrecedesOutputOne",
+            "TestPowerPublicationRawRationalShapesAndMulAliases",
+            "TestPowerPublicationLeftShiftCopyPrecedesPromotionRefusal",
+            "TestPowerPublicationRightShiftCopyRefusalPrefix",
+            "TestPowerPublicationRationalCopyComponentRefusal",
+            "TestPowerPublicationRationalMulComponentRefusal"
+          ]
         }
       ],
       "ownership": [
@@ -110129,7 +110355,8 @@
         "Number theory locals use existing budgeted numerical cells/Words and are always deleted in source order. ExtendedGCD preserves coefficient publication/failure prefixes and rational denominator reset timing; immediate failed-prefix caller/cache roots audited. See NUMBER_THEORY_PORT_STATUS.md.",
         "New scalar facade introduces no persistent storage. Dup owns an independent source-capacity copy; Inc/Dec reuse source Add, and failure roots are audited before formatting/cleanup. Raw Int remains caller-confined. See MPZ_FACADE_EXTRA_PORT_STATUS.md.",
         "Selected old-free/sign/result-transfer/paired-division action prefixes preserve source order; failed replacements use one charged retired descriptor, guarded reads and owner-qualified cleanup. Exact source allocator topology remains open; see MPZ_SOURCE_PUBLICATION_PORT_STATUS.md.",
-        "Base-two Power mutates caller storage through actual destructive allocate_if_needed; other Power and shift wrappers remain staged fidelity work. Scalar debug capacity assertion precedes sign/digits; existing normalize branch tests confirm actual behavior. See MPZ_SETTER_PORT_STATUS.md."
+        "Base-two Power mutates caller storage through actual destructive allocate_if_needed; other Power and shift wrappers remain staged fidelity work. Scalar debug capacity assertion precedes sign/digits; existing normalize branch tests confirm actual behavior. See MPZ_SETTER_PORT_STATUS.md.",
+        "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See MPZ_POWER_PUBLICATION_PACKET.md; source allocator/backend integration remains required."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -110143,7 +110370,8 @@
         "B12 replaces the one-global-manager ownership assumption with explicit cross-manager deep copy. No foreign handle or serialization is passed into destination arithmetic; destination outlives source Close. This is an ownership adaptation, not AST translation completion.",
         "Selected release ExtendedGCD preserves finite aliases and modified-input sign rereads. Source Z3DEBUG diagnostic arithmetic remains unported; g3checked selects reference validation only. ext_gcd.h wrapper algorithm remains separate and is not credited from manager inverse properties.",
         "Inv source SASSERT(false) is always typed ErrIntegerInvUnsupported in Go, unlike release C++ no-op. Backend alternatives, disabled GCD variants and remaining diagnostics stay open; this public facade does not close the entire source unit.",
-        "Go continuation for source undefined allocation failure: permanently dead failed token and missing-scratch guards; finite unsigned wrapped allocations retained before actual span ErrBounds. Higher-level staged wrappers remain fidelity work, not completion evidence."
+        "Go continuation for source undefined allocation failure: permanently dead failed token and missing-scratch guards; finite unsigned wrapped allocations retained before actual span ErrBounds. Higher-level staged wrappers remain fidelity work, not completion evidence.",
+        "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open."
       ]
     },
     {

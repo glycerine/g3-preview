@@ -637,14 +637,26 @@ func TestScopedRationalVectorIndependentLifecycleAndFailures(t *testing.T) {
 		if e := v.Push(&big); !errors.Is(e, arena.ErrInjectedFailure) || v.Size() != 1 {
 			t.Fatal("rational source append prefix", e)
 		}
-		if m.z.cells.Stats().Live != live || m.z.words.Stats().Live != payloads || b.Used() != used || v.data[0].den != NewInt(1) || v.data[0].num != NewInt(0) {
-			t.Fatal("rational failed copy immediate cleanup/default denominator")
+		roots := []*Int{&small.num, &small.den, &big.num, &big.den, &v.data[0].num, &v.data[0].den}
+		for i := range fillers {
+			roots = append(roots, &fillers[i])
+		}
+		qopsAuditLiveOwnership(t, m, roots)
+		if m.z.cells.Stats().Live != live || m.z.words.Stats().Live != payloads || b.Used() != used || v.data[0].den != NewInt(1) || v.data[0].num.cell != m.z.failedRef || v.data[0].num.val != big.num.val || !errors.Is(m.z.check(&v.data[0].num), arena.ErrInvalidSlot) {
+			t.Fatal("rational failed Copy owns exact numerator failed descriptor before denominator action")
 		}
 		b.FailAfter(-1)
 		for i := range fillers {
 			m.z.Del(&fillers[i])
 		}
-		v.Close()
+		beforeClose := b.Used()
+		coldCharge := uint64(reflect.TypeOf(ScopedRationalVector{}).Size()) + uint64(cap(v.data))*uint64(reflect.TypeOf(Rational{}).Size())
+		if e := v.Close(); e != nil {
+			t.Fatal("actual failed-component vector Close", e)
+		}
+		if beforeClose-b.Used() != coldCharge {
+			t.Fatal("vector physical header/backing refund", beforeClose, b.Used(), coldCharge)
+		}
 		if m.z.cells.Stats().Live != baseCells || m.z.words.Stats().Live != baseWords {
 			t.Fatal("rational close live graph")
 		}

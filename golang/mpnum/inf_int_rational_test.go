@@ -496,14 +496,18 @@ func TestInfIntRationalFaultPrefixesTemporaryCleanup(t *testing.T) {
 		serviceMust(t, s.SetUint64(&x, math.MaxUint64))
 		fillers = append(fillers, x)
 	}
-	cells, words := s.manager.z.cells.Stats().Live, s.manager.z.words.Stats().Live
 	b.FailAfter(0)
 	e := s.InfIntCopy(&dst, &src)
-	b.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) || s.manager.z.cells.Stats().Live != cells || s.manager.z.words.Stats().Live != words {
-		t.Fatal(e)
+	roots := []*Rational{&src.first, &dst.first}
+	for i := range fillers {
+		roots = append(roots, &fillers[i].raw)
 	}
-	infIntCheck(t, s, &dst, "3", 7)
+	serviceAuditRationalRoots(t, s, roots...)
+	if !errors.Is(e, arena.ErrInjectedFailure) || dst.first.num.cell != s.manager.z.failedRef || dst.first.den != NewInt(1) || dst.second != 7 || !errors.Is(s.manager.z.check(&dst.first.num), arena.ErrInvalidSlot) {
+		t.Fatal("first component Copy refusal before epsilon publication", dst, e)
+	}
+	b.FailAfter(-1)
+	infIntCheck(t, s, &src, "123456789012345678901234567890/19", 99)
 	for i := range fillers {
 		serviceMust(t, s.Del(&fillers[i]))
 	}

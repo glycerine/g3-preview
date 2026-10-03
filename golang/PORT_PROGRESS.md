@@ -1377,3 +1377,18 @@ finalization. See SMALL_OBJECT_ALLOCATOR_PACKET.md for source boundaries and
 final verification. Numerical and solver allocator wiring, global diagnostics
 and the full solver/proof/interpolation objective remain required. All three
 allocator source units remain partial; no whole-unit status is promoted.
+
+
+## Direct Power, shift and rational component publication
+
+Integer and rational repeated squaring now publish directly to the caller,
+including the final unused square and the actual unsigned mask-wrap boundary.
+Copy-output shifts execute the source Copy before the in-place core. Public
+rational Copy and Mul publish components in source order using the existing
+arithmetic and normalization algorithms. Tests first reproduce allocation
+refusals and source prefixes, then verify independent finite arithmetic, aliases
+and immediate owned roots. Dependent parameter, interval, vector and service
+tests retain the completed source components on failures. See
+MPZ_POWER_PUBLICATION_PACKET.md for frozen gates and remaining boundaries.
+Source allocator/backend integration, other staged arithmetic and the complete
+solver/proof/interpolation goal remain open; no whole source unit is promoted.

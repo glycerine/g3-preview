@@ -125,11 +125,17 @@ func TestParserExceptionCategoriesAndFailurePublication(t *testing.T) {
 			}
 		}
 		for _, s := range []string{"1e2147483648", "1e4294967295"} {
+			budget.FailAfter(0)
 			e := m.SetString(&a, s)
+			qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den})
 			var power *PowerDomainError
 			var parsed *ParseError
-			if !errors.As(e, &power) || errors.As(e, &parsed) || !errors.Is(e, ErrNonterminatingPower) || rationalString(t, m, &a) != "-17/13" {
+			if !errors.Is(e, arena.ErrInjectedFailure) || errors.As(e, &power) || errors.As(e, &parsed) {
 				t.Fatal(s, e)
+			}
+			budget.FailAfter(-1)
+			if rationalString(t, m, &a) != "-17/13" {
+				t.Fatal("parser separately staged output", s, a)
 			}
 		}
 		// Leave only bounded growth room so a valid enormous exponent refuses storage promptly.

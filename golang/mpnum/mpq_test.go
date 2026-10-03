@@ -415,13 +415,33 @@ func TestRationalArithmeticFailureCleanup(t *testing.T) {
 							return m.Inv(&a, dst)
 						}
 					}
+					beforeNum, beforeDen := integerString(t, m.z, &dst.num), integerString(t, m.z, &dst.den)
 					budget.FailAfter(after)
 					err := call()
 					qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &b.num, &b.den, &out.num, &out.den})
 					budget.FailAfter(-1)
 					if err != nil {
 						failures++
-						if !errors.Is(err, arena.ErrInjectedFailure) || rationalString(t, m, &a) != ar.RatString() || rationalString(t, m, &b) != br.RatString() || rationalString(t, m, &out) != "17" {
+						if !errors.Is(err, arena.ErrInjectedFailure) {
+							t.Fatal("unexpected rational failure", synch, op, alias, after, err)
+						}
+						if op == 2 {
+							productNum := new(big.Int).Mul(ar.Num(), br.Num()).String()
+							productDen := new(big.Int).Mul(ar.Denom(), br.Denom()).String()
+							num := powerPublicationComponent(t, m.z, &dst.num, beforeNum, productNum, want.Num().String())
+							powerPublicationComponent(t, m.z, &dst.den, beforeDen, productDen, want.Denom().String())
+							if num == "failed" || num == beforeNum {
+								if integerString(t, m.z, &dst.den) != beforeDen {
+									t.Fatal("denominator acted before numerator Mul completed", synch, alias, after)
+								}
+							}
+							if dst != &a && rationalString(t, m, &a) != ar.RatString() {
+								t.Fatal("non-destination a changed", synch, alias, after)
+							}
+							if dst != &b && rationalString(t, m, &b) != br.RatString() {
+								t.Fatal("non-destination b changed", synch, alias, after)
+							}
+						} else if rationalString(t, m, &a) != ar.RatString() || rationalString(t, m, &b) != br.RatString() || rationalString(t, m, &out) != "17" {
 							t.Fatal("failed rational operation changed destination/input", synch, op, alias, after, err)
 						}
 						// Source TMP can be transferred before its replacement allocation
@@ -477,7 +497,21 @@ func TestRationalCopySetterFailureCleanup(t *testing.T) {
 				budget.FailAfter(-1)
 				if err != nil {
 					failures++
-					if !errors.Is(err, arena.ErrInjectedFailure) || rationalString(t, m, &out) != "17" {
+					if !errors.Is(err, arena.ErrInjectedFailure) {
+						t.Fatal("unexpected setter failure", synch, op, after, err)
+					}
+					if op == 0 {
+						num := powerPublicationComponent(t, m.z, &out.num, "17", n.String())
+						powerPublicationComponent(t, m.z, &out.den, "1", d.String())
+						if num == "failed" || num == "17" {
+							if out.den != NewInt(1) {
+								t.Fatal("denominator acted before numerator Copy", synch, after, out)
+							}
+						}
+						if rationalString(t, m, &a) != new(big.Rat).SetFrac(n, d).RatString() {
+							t.Fatal("Copy source changed", synch, after)
+						}
+					} else if rationalString(t, m, &out) != "17" {
 						t.Fatal("failed rational setter published", synch, op, after, err)
 					}
 				} else {

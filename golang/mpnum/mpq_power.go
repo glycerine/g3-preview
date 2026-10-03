@@ -4,7 +4,7 @@ package mpnum
 
 // Power preserves source rational repeated squaring, including zero^zero=1.
 // Unlike integer Power it has no 0/1/2 fast paths. Nonterminating source mask
-// inputs fail before allocations/publication; all other work is owner-staged.
+// inputs fail only at their actual mask wrap, retaining completed publications.
 func (m *RationalManager) Power(a *Rational, p uint32, out *Rational) error {
 	if e := m.check(a); e != nil {
 		return e
@@ -12,21 +12,20 @@ func (m *RationalManager) Power(a *Rational, p uint32, out *Rational) error {
 	if e := m.check(out); e != nil {
 		return e
 	}
-	if p >= 1<<31 {
-		return &PowerDomainError{Exponent: p, Reason: PowerMaskOverflow}
-	}
-	power, work := NewRational(), NewRational()
+	power := NewRational()
 	defer m.drop(&power)
-	defer m.drop(&work)
 	if e := m.Copy(&power, a); e != nil {
 		return e
 	}
-	if e := m.SetInt64(&work, 1); e != nil {
+	if e := m.SetInt64(out, 1); e != nil {
 		return e
 	}
 	for mask := uint32(1); mask <= p; mask <<= 1 {
+		if mask == 0 {
+			return &PowerDomainError{Exponent: p, Reason: PowerMaskOverflow}
+		}
 		if mask&p != 0 {
-			if e := m.Mul(&work, &power, &work); e != nil {
+			if e := m.Mul(out, &power, out); e != nil {
 				return e
 			}
 		}
@@ -34,5 +33,5 @@ func (m *RationalManager) Power(a *Rational, p uint32, out *Rational) error {
 			return e
 		}
 	}
-	return m.Move(out, &work)
+	return nil
 }

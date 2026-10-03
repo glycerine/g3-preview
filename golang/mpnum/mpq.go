@@ -185,15 +185,10 @@ func (m *RationalManager) Copy(dst, src *Rational) error {
 	if dst == src {
 		return nil
 	}
-	work := NewRational()
-	defer m.drop(&work)
-	if e := m.z.Copy(&work.num, &src.num); e != nil {
+	if e := m.z.Copy(&dst.num, &src.num); e != nil {
 		return e
 	}
-	if e := m.z.Copy(&work.den, &src.den); e != nil {
-		return e
-	}
-	return m.Move(dst, &work)
+	return m.z.Copy(&dst.den, &src.den)
 }
 func (m *RationalManager) SetInt64(a *Rational, n int64) error {
 	if e := m.check(a); e != nil {
@@ -436,24 +431,18 @@ func (m *RationalManager) Mul(a, b, out *Rational) error {
 			return e
 		}
 	}
-	work := NewRational()
-	defer m.drop(&work)
-	if e := m.z.Mul(&a.num, &b.num, &work.num); e != nil {
+	// Source chooses this branch before output aliases can mutate operands.
+	integers := isIntegerRational(a) && isIntegerRational(b)
+	if e := m.z.Mul(&a.num, &b.num, &out.num); e != nil {
 		return e
 	}
-	if isIntegerRational(a) && isIntegerRational(b) {
-		if e := m.resetDenominator(&work); e != nil {
-			return e
-		}
-	} else {
-		if e := m.z.Mul(&a.den, &b.den, &work.den); e != nil {
-			return e
-		}
-		if e := m.normalize(&work); e != nil {
-			return e
-		}
+	if integers {
+		return m.resetDenominator(out)
 	}
-	return m.Move(out, &work)
+	if e := m.z.Mul(&a.den, &b.den, &out.den); e != nil {
+		return e
+	}
+	return m.normalize(out)
 }
 
 // Div keeps the source divisor/destination alias branch, then fixes a negative

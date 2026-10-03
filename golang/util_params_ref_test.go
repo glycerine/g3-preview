@@ -449,7 +449,7 @@ func TestParamsReferenceSourceGrowthAndFailurePrefixes(t *testing.T) {
 // Audit live roots BEFORE rendering or teardown, so Close cannot hide leaked
 // unpublished numerals. In these sweeps every big rational is one big integer
 // numerator with an inline denominator, hence owns exactly one numeric cell.
-func paramsAuditRoots(t *testing.T, c *ParamsContext, q *mpnum.RationalService, base uint32, roots []ParamsRef) {
+func paramsAuditRoots(t *testing.T, c *ParamsContext, q *mpnum.RationalService, base, basePayloads uint32, roots []ParamsRef) {
 	t.Helper()
 	var strings, bigs uint32
 	for i := range c.blocks {
@@ -473,7 +473,20 @@ func paramsAuditRoots(t *testing.T, c *ParamsContext, q *mpnum.RationalService, 
 			}
 			if x.kind == ParamNumeral {
 				big, e := q.IsBig(&x.rat)
-				paramsMust(t, e)
+				if e != nil {
+					// Read-only test reflection checks the actual service-owned dead
+					// descriptor published by numerator Copy refusal. Other invalid
+					// roots remain errors; this fixture's denominator is inline one.
+					service := reflect.ValueOf(q).Elem()
+					z := service.FieldByName("manager").Elem().FieldByName("z").Elem()
+					owned := reflect.ValueOf(&x.rat).Elem()
+					raw := owned.FieldByName("raw")
+					num, den := raw.FieldByName("num"), raw.FieldByName("den")
+					if !errors.Is(e, arena.ErrInvalidSlot) || owned.FieldByName("ownerID").Uint() != service.FieldByName("ownerID").Uint() || num.FieldByName("val").Int() != 1 || num.FieldByName("cell").Uint() == 0 || num.FieldByName("cell").Uint() != z.FieldByName("failedRef").Uint() || den.FieldByName("cell").Uint() != 0 || den.FieldByName("val").Int() != 1 {
+						t.Fatal("unexpected invalid published parameter numeral", e)
+					}
+					continue
+				}
 				if big {
 					bigs++
 				}
@@ -485,8 +498,8 @@ func paramsAuditRoots(t *testing.T, c *ParamsContext, q *mpnum.RationalService, 
 	}
 	got, e := q.Stats()
 	paramsMust(t, e)
-	if got.LiveCells != base+bigs {
-		t.Fatal("lost numeric temporary", got.LiveCells, base+bigs)
+	if got.LiveCells != base+bigs || got.LivePayloads != basePayloads+bigs {
+		t.Fatal("lost numeric cell/payload temporary", got.LiveCells, got.LivePayloads, base+bigs, basePayloads+bigs)
 	}
 	for pi := range c.pages {
 		p := &c.pages[pi]
@@ -578,8 +591,8 @@ func TestParamsReferenceReservationFailureSweeps(t *testing.T) {
 			case 7:
 				e = c.SetBoolName(&a, &name, true)
 			}
+			paramsAuditRoots(t, c, q, base, qs.LivePayloads, []ParamsRef{a, b, bank})
 			c.budget.FailAfter(-1)
-			paramsAuditRoots(t, c, q, base, []ParamsRef{a, b, bank})
 			if (op == 0 || op == 1) && a.slot != b.slot {
 				if c.blocks[b.slot-1].refs != 1 {
 					t.Fatal("detach error retained old reference")
