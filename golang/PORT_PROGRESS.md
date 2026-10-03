@@ -377,3 +377,21 @@ warm allocations. Isolated full native/actual checked JS modules, checked native
 vet, WASI build and no-generics audit pass. Source map test and the concrete
 string-functor/table-alias header are complete; generic map/core variants and all
 AST/solver/proof/interpolation milestones remain open.
+
+## Integer and rational roots
+
+Integer Root/RootInPlace and perfect-square queries now retain the complete
+source bound setup, bisection, Power and Swap/Copy actions. Rational counterparts
+preserve short-circuit output history and source aliases, including finite false
+results and deliberately unreduced output. Classified assertion/degree domains
+and undefined fractional square alias division are separate from ordinary false
+results. All temporaries use existing budgeted numerical storage with explicit
+cleanup and staged failure publication.
+
+All10 active integer-root assertions and two output lines were ported first and
+observed RED; independent finite root/square and rational cases are added tests.
+All11 tests pass, including signed ceilings, aliases, both source rational modes,
+small/big output fault sweeps, immediate pre-teardown live-cell/Words accounting
+and warm-zero-allocation checks. Isolated full native/checked modules, checked
+race/actual checked JS registrations, vet, WASI and source/no-generics audit pass.
+Other numeric methods and full solver/AST/proof/interpolation remain open.
