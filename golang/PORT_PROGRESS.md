@@ -1515,3 +1515,23 @@ Independent frozen parent checks passed full native/debug suites, exact6prime
 race/actual-JS RUN/PASS groups, vet, WASI build/test compilation and integrated
 source/evidence/no-generics audit. Independent sieve/isqrt confirms actual
 registered endpoints and2073824 assertions. Concurrent RED drafts were excluded.
+
+
+## Retained source-memory release progress
+
+The sole runtime/allocator deallocation bodies retain charged scalar progress
+through actual beforefree and afterfree failure boundaries. Cleanup resumes
+only unfinished source actions and avoids repeated requested subtraction or
+physical free. Private owner/ref/serial binding supplies authority; visible
+flags cannot authorize skipped work. Tests first expose requested-counter
+replay, then verify retained roots, owner cleanup, duplicate pooled source
+free, token reuse and warm physical charges. This is an explicit Go cleanup
+adapter, not native C++ exception continuation. Actual MPZ/Natural and
+transitive numerical ownership integration remain required. No whole source
+unit is promoted.
+
+See MEMORY_RELEASE_AUTHORITY_PACKET.md for frozen source/action/ownership
+evidence. Independent parent checks passed full native/debug suites, exact57
+lower-memory race/actual-JS RUN/PASS groups, vet, WASI build/test compilation
+and integrated source/evidence/no-generics audit on the committed prime base.
+Concurrent incomplete drafts were excluded; numerical integration stays open.

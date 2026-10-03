@@ -32,16 +32,18 @@ type memoryRuntimeBlock struct {
 	initialized []uint64
 	generation  uint32
 	live        bool
+	release     runtimeReleaseState
 }
 type Runtime struct {
-	self           *Runtime
-	config         RuntimeConfig
-	origin, header uint64
-	accounting     utilMemoryAccounting
-	lane           utilMemoryLaneAccounting
-	blocks         []memoryRuntimeBlock
-	live           uint32
-	closed         bool
+	self              *Runtime
+	config            RuntimeConfig
+	origin, header    uint64
+	accounting        utilMemoryAccounting
+	lane              utilMemoryLaneAccounting
+	blocks            []memoryRuntimeBlock
+	live              uint32
+	closed            bool
+	nextReleaseSerial uint64
 }
 type RuntimeState struct {
 	GlobalSize, LocalSize, GlobalCount, LocalCount, Peak int64
@@ -220,6 +222,7 @@ func (m *Runtime) Allocate(n uint64) (Block, error) {
 	b.data = data
 	b.initialized = init
 	b.live = true
+	b.release = runtimeReleaseState{}
 	m.live++
 	h := Block{m.origin, slot, b.generation}
 	if e = m.headerWrite(b, extent); e != nil {
@@ -276,34 +279,13 @@ func (m *Runtime) Reallocate(h *Block, n uint64) error {
 	// The checked descriptor tracks malloc ownership, not a raw pointer address.
 	// A successful realloc invalidates old pointer tokens, including equal sizes.
 	b.generation++
+	b.release = runtimeReleaseState{}
 	h.generation = b.generation
 	return m.headerWrite(b, extent)
 }
 func (m *Runtime) Deallocate(h *Block) error {
-	if h == nil {
-		return ErrRuntimeOwner
-	}
-	b, e := m.block(*h)
-	if e != nil {
-		return e
-	}
-	n, e := m.headerRead(b)
-	if e != nil {
-		return e
-	}
-	if e = m.transport(m.accounting.beginExtentDeallocation(&m.lane, n, m.config.SizeTBits, m.config.ThreadLocal)); e != nil {
-		return e
-	}
-	m.config.Budget.Release(uint64(len(b.data)) + uint64(len(b.initialized))*8)
-	b.data = nil
-	b.initialized = nil
-	b.live = false
-	m.live--
-	if b.generation != math.MaxUint32 {
-		b.generation++
-	}
-	*h = Block{}
-	return m.transport(m.accounting.finishDeallocation(&m.lane, m.config.ThreadLocal))
+	_, e := m.deallocateTracked(h)
+	return e
 }
 func (m *Runtime) Size(h Block) (uint64, error) {
 	b, e := m.block(h)

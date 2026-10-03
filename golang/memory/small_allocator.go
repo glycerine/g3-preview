@@ -49,6 +49,7 @@ type smallObjectLocation struct {
 	offset, extent, chunk, generation uint32
 	kind                              uint8
 	live, free, retired               bool
+	release                           allocatorReleaseState
 }
 type SmallAllocator struct {
 	self                                *SmallAllocator
@@ -64,6 +65,7 @@ type SmallAllocator struct {
 	closed                              bool
 	destructorDone                      bool
 	cleanupChunksNeeded                 bool
+	nextReleaseSerial                   uint64
 }
 type AllocatorStats struct {
 	OwnerBytes, LocationBytes, TotalBytes uint64
@@ -305,6 +307,7 @@ func (a *SmallAllocator) Allocate(n uint64) (ObjectRef, error) {
 			return ObjectRef{}, arena.ErrSlotLimit
 		}
 		loc.generation++
+		loc.release = allocatorReleaseState{}
 		loc.free = false
 		loc.live = true
 		loc.requested = n
@@ -365,69 +368,8 @@ func (a *SmallAllocator) Allocate(n uint64) (ObjectRef, error) {
 	return a.ref(id), nil
 }
 func (a *SmallAllocator) Deallocate(n uint64, r ObjectRef) error {
-	if e := a.open(); e != nil {
-		return e
-	}
-	if n == 0 {
-		return nil
-	}
-	if e := a.requireSize(n); e != nil {
-		return e
-	}
-	if a.bypass() {
-		loc, e := a.object(r)
-		if e != nil {
-			return e
-		}
-		h := loc.raw
-		e = a.config.Runtime.Deallocate(&h)
-		loc.raw = h
-		if h == (Block{}) {
-			loc.live = false
-		}
-		return e
-	}
-	if a.config.Profile.Debug && (a.allocSize < n || r.slot == 0) {
-		return ErrAllocatorAssertion
-	}
-	a.allocSize = a.counter(a.allocSize - n)
-	// Pooled free does not destroy the stored scalar object. A same-generation
-	// duplicate retains the defined source subtraction/intrusive relink prefix.
-	loc, e := a.location(r.slot)
-	if e != nil {
-		return e
-	}
-	if r.owner != a.origin || loc.generation != r.generation ||
-		(!loc.live && !(loc.kind == smallObjectPooled && loc.free)) ||
-		(loc.kind != smallObjectPooled && loc.kind != smallObjectDirect) {
-		return ErrAllocatorOwner
-	}
-	if n >= 256-a.pointerBytes() {
-		if loc.offset != 0 {
-			return arena.ErrBounds
-		} // actual invalid interior raw header action
-		h := loc.raw
-		e = a.config.Runtime.Deallocate(&h)
-		loc.raw = h
-		if h == (Block{}) {
-			loc.live = false
-		}
-		return e
-	}
-	slot := uint32((n + a.pointerBytes() - 1) / a.pointerBytes())
-	if a.config.Profile.Debug && (slot == 0 || slot >= a.slots()) {
-		return ErrAllocatorAssertion
-	}
-	if slot == 0 || slot >= a.slots() {
-		return arena.ErrBounds
-	}
-	if e = smallObjectWriteWord(a.config.Runtime, loc.raw, uint64(loc.offset), a.pointerBytes(), uint64(a.free[slot])); e != nil {
-		return e
-	}
-	a.free[slot] = r.slot
-	loc.live = false
-	loc.free = true
-	return nil
+	_, e := a.DeallocateTracked(n, r)
+	return e
 }
 func (a *SmallAllocator) RawLocation(r ObjectRef) (Block, uint64, error) {
 	if e := a.open(); e != nil {
