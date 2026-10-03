@@ -5,6 +5,7 @@ package mpnum
 import (
 	"errors"
 	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
 	"math"
 	"reflect"
 	"sync"
@@ -30,6 +31,9 @@ type RationalServiceStats struct {
 	CacheLength, CacheCapacity uint32
 	HeaderBytes, CacheBytes    uint64
 	LiveCells, LivePayloads    uint32
+	// LivePayloads includes actual numeric objects (including a pending cell)
+	// and genuine Natural buffers. It is not a count of raw allocator blocks.
+	LiveNumericObjects, PendingCellObjects, RetainedCellDescriptors, NaturalPayloads uint32
 }
 
 // RationalService owns the source synchronized manager, constants and cache.
@@ -439,7 +443,25 @@ func (s *RationalService) Stats() (RationalServiceStats, error) {
 		return RationalServiceStats{}, e
 	}
 	defer s.mu.Unlock()
-	return RationalServiceStats{CacheLength: uint32(len(s.cache)), CacheCapacity: uint32(cap(s.cache)), HeaderBytes: s.headerBytes, CacheBytes: s.cacheBytes, LiveCells: s.manager.z.cells.Stats().Live, LivePayloads: s.manager.z.words.Stats().Live}, nil
+	z := s.manager.z
+	stats := RationalServiceStats{CacheLength: uint32(len(s.cache)), CacheCapacity: uint32(cap(s.cache)), HeaderBytes: s.headerBytes, CacheBytes: s.cacheBytes, LiveCells: z.cells.Stats().Live, NaturalPayloads: z.words.Stats().Live}
+	for n := uint64(1); n <= uint64(z.cells.Stats().Slots); n++ {
+		c, e := z.cells.Read(arena.Slot(n))
+		if e != nil {
+			continue
+		}
+		if !c.released {
+			stats.LiveNumericObjects++
+		}
+		if c.unpublished || c.cleanupPending {
+			stats.RetainedCellDescriptors++
+		}
+	}
+	if z.pendingCell.object != (memory.ObjectRef{}) {
+		stats.PendingCellObjects = 1
+	}
+	stats.LivePayloads = stats.LiveNumericObjects + stats.PendingCellObjects + stats.NaturalPayloads
+	return stats, nil
 }
 
 // destroyCache is the source vector::finalize traversal. Caller holds the owner

@@ -110,3 +110,22 @@ shared adoption and global runtime bindings remain unfinished. The separate
 `port_pending_mpz` phase-B campaign is still pending. This commit preserves
 implementation progress and does not claim full-suite success or source
 completion. Details: `MPZ_BACKEND_IMPLEMENTATION_STATUS.md`.
+
+
+RationalService payload statistics now count actual numeric allocator objects,
+retained pending-cell objects and genuine Natural buffers. Separate counters
+identify live numeric objects, pending cell objects, retained descriptors and
+Natural payloads; released descriptors are not live physical objects and flags
+do not duplicate an object. Tests first observed a successful two-cell copy
+absent from the old Words-only payload count. Two new tests pass native/debug,
+including actual allocation before descriptor exhaustion and complete cleanup.
+Vet and source/evidence/no-generics audit pass on the exact two-file overlay
+`.cache/release/service-stats-8ade92d`. Logs:
+`.cache/rational-service-stats-isolated-{native,debug}.log` and
+`.cache/rational-service-backend-stats-{red,vet,source}.log`.
+
+Native AST proof and S-expression ownership consumers also pass after this
+accounting correction. Debug consumers reach separately held Memout101 category
+expectations; the Params sweep reaches a separately held warm-pool no-reservation
+case. Full native baseline remains RED in `.cache/post-cell-native.log`; this
+statistics correction does not claim completion of backend integration.
