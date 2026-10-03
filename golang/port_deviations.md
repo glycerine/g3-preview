@@ -66,3 +66,11 @@ AMD64 outputs; this is not claimed as portable C semantics. Stack24-byte numeric
 conversion avoids invented formatter allocations. LongBits32 rejects values
 outside source signed32 range. Arbitrary initial sizes and Windows secure-CRT
 runtime/error profiles remain open. See STRING_BUFFER_PORT_STATUS.md.
+
+### Integer inverse domain adapter
+
+The source integer Inv body contains only SASSERT(false); release C++ otherwise
+leaves its operand unchanged. Go returns ErrIntegerInvUnsupported after its
+existing ownership checks, preserving the operand and budget. This explicitly
+checked unsupported domain is not an inverse algorithm or a release no-op
+equivalence claim. See MPZ_FACADE_EXTRA_PORT_STATUS.md.

@@ -79453,7 +79453,8 @@
         "mpnum/mpq_round.go",
         "mpnum/mpq_power.go",
         "mpnum/mpq_parse.go",
-        "mpnum/mp_display.go"
+        "mpnum/mp_display.go",
+        "mpnum/mpz_facade_extra_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -79496,7 +79497,8 @@
         "TestNumericDisplayReservationFailureCleanup",
         "TestNumericDisplayWorkspaceGrowthAndBudget",
         "TestNumericDisplayWarmAllocationBoundaries",
-        "TestSourceNoncanonicalRationalDisplayActions"
+        "TestSourceNoncanonicalRationalDisplayActions",
+        "TestIntegerFacadeSourceTst1ComparisonAssertions"
       ],
       "conditionals": [
         {
@@ -79596,6 +79598,14 @@
             "TestNumericDisplayWarmAllocationBoundaries",
             "TestSourceNoncanonicalRationalDisplayActions"
           ]
+        },
+        {
+          "name": "active tst1 nine comparison ENSURE executions in exact source order",
+          "status": "ported",
+          "go_target": "mpnum/mpz_facade_extra_test.go",
+          "tests": [
+            "TestIntegerFacadeSourceTst1ComparisonAssertions"
+          ]
         }
       ],
       "ownership": [
@@ -79603,7 +79613,8 @@
         "Source prev-power assertions and log bounds translated; test powers are independent fixture generation until production Power is implemented. See mpnum/PORT_STATUS.md.",
         "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending.",
         "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md.",
-        "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md."
+        "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md.",
+        "tst1 retains original numerical setup, lexical manager scope and explicit Del; 18 comparison assertions across MPZ/MPQ. Additional printed fixtures and independent tests are not source assertions. See MPZ_FACADE_EXTRA_PORT_STATUS.md."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -79629,7 +79640,8 @@
         "mpnum/mpz_parse.go",
         "mpnum/mpz_bitwise_test.go",
         "mpnum/mp_root_test.go",
-        "mpnum/scoped_numeral.go"
+        "mpnum/scoped_numeral.go",
+        "mpnum/mpz_facade_extra_test.go"
       ],
       "tests": [
         "TestSourceMPZMagnitudeProjections",
@@ -79702,7 +79714,8 @@
         "TestScopedRationalVectorAndScalarLifetimes",
         "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
         "TestScopedRationalVectorIndependentLifecycleAndFailures",
-        "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak"
+        "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak",
+        "TestIntegerFacadeSourceTst1ComparisonAssertions"
       ],
       "conditionals": [
         {
@@ -79872,6 +79885,14 @@
             "TestScopedRationalVectorIndependentLifecycleAndFailures",
             "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak"
           ]
+        },
+        {
+          "name": "active tst1 nine comparison ENSURE executions in exact source order",
+          "status": "ported",
+          "go_target": "mpnum/mpz_facade_extra_test.go",
+          "tests": [
+            "TestIntegerFacadeSourceTst1ComparisonAssertions"
+          ]
         }
       ],
       "ownership": [
@@ -79881,7 +79902,8 @@
         "Source prev-power assertions and log bounds translated; test powers are independent fixture generation until production Power is implemented. See mpnum/PORT_STATUS.md.",
         "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See mpnum/PORT_STATUS.md. Standalone MPN/String scratch ownership remains pending.",
         "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md.",
-        "Concrete scoped Int/Rational objects borrow managers; all cold headers and actual old+new pointer-free backing are charged. Deep copy owns independent limbs, source ascending truncation releases them, vector failure prefixes retained. See SCOPED_NUMERAL_PORT_STATUS.md."
+        "Concrete scoped Int/Rational objects borrow managers; all cold headers and actual old+new pointer-free backing are charged. Deep copy owns independent limbs, source ascending truncation releases them, vector failure prefixes retained. See SCOPED_NUMERAL_PORT_STATUS.md.",
+        "tst1 retains original numerical setup, lexical manager scope and explicit Del; 18 comparison assertions across MPZ/MPQ. Additional printed fixtures and independent tests are not source assertions. See MPZ_FACADE_EXTRA_PORT_STATUS.md."
       ],
       "deviations": [
         "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits.",
@@ -97774,7 +97796,8 @@
         "mpnum/mp_copy.go",
         "mpnum/mpq_number_theory.go",
         "mpnum/mpq_inspect.go",
-        "mpnum/mpq_bitwise.go"
+        "mpnum/mpq_bitwise.go",
+        "mpnum/mpz_facade_extra.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -97875,7 +97898,8 @@
         "TestRationalInspectionRawActionsAndIndependentIncrement",
         "TestRationalInspectionAliasedCopyFailureCleanup",
         "TestRationalBitwiseForwardingIndependentAndAliases",
-        "TestRationalBitwiseFailureOwnershipAndDenominatorPublication"
+        "TestRationalBitwiseFailureOwnershipAndDenominatorPublication",
+        "TestIntegerFacadeSourceTst1ComparisonAssertions"
       ],
       "conditionals": [
         {
@@ -98648,6 +98672,14 @@
           "tests": [
             "TestRationalBitwiseForwardingIndependentAndAliases",
             "TestRationalBitwiseFailureOwnershipAndDenominatorPublication"
+          ]
+        },
+        {
+          "name": "inherited MPZ scalar public routes through existing RationalManager.Integers composition",
+          "status": "ported",
+          "go_target": "mpnum/mpz_facade_extra.go",
+          "tests": [
+            "TestIntegerFacadeSourceTst1ComparisonAssertions"
           ]
         }
       ],
@@ -100339,7 +100371,8 @@
         "mpnum/mpz_misc.go",
         "mpnum/mp_display.go",
         "mpnum/mp_copy.go",
-        "mpnum/mpz_number_theory.go"
+        "mpnum/mpz_number_theory.go",
+        "mpnum/mpz_facade_extra.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -100450,7 +100483,14 @@
         "TestNumberTheoryCanonicalSourceCoefficients",
         "TestNumberTheoryFailurePrefixRootsBeforeFormatting",
         "TestNumberTheoryLargeCanonicalCoefficientsAndLCM",
-        "TestNumberTheoryRationalResetPrefixAndOutputAliasing"
+        "TestNumberTheoryRationalResetPrefixAndOutputAliasing",
+        "TestIntegerFacadeSourceTst1ComparisonAssertions",
+        "TestIntegerFacadeSignedPredicatesAndSetterShape",
+        "TestIntegerFacadeDupAndScalarComparison",
+        "TestIntegerFacadeFiniteMathAndIncDecAliases",
+        "TestIntegerFacadeDupIncDecFailureRoots",
+        "TestIntegerFacadeUnsupportedAndLifetime",
+        "TestIntegerFacadeRepresentationEqualityAndWarmReads"
       ],
       "conditionals": [
         {
@@ -101388,6 +101428,90 @@
             "TestNumberTheoryLargeCanonicalCoefficientsAndLCM",
             "TestNumberTheoryRationalResetPrefixAndOutputAliasing"
           ]
+        },
+        {
+          "name": "sign (full inline m_val), is_pos/is_neg/is_zero/is_nonpos/is_nonneg/is_one/is_minus_one",
+          "status": "ported",
+          "go_target": "mpnum/mpz_facade_extra.go",
+          "tests": [
+            "TestIntegerFacadeSourceTst1ComparisonAssertions",
+            "TestIntegerFacadeSignedPredicatesAndSetterShape",
+            "TestIntegerFacadeDupAndScalarComparison",
+            "TestIntegerFacadeFiniteMathAndIncDecAliases",
+            "TestIntegerFacadeDupIncDecFailureRoots",
+            "TestIntegerFacadeUnsupportedAndLifetime",
+            "TestIntegerFacadeRepresentationEqualityAndWarmReads"
+          ]
+        },
+        {
+          "name": "inc/dec through source Add inline +/-1",
+          "status": "ported",
+          "go_target": "mpnum/mpz_facade_extra.go",
+          "tests": [
+            "TestIntegerFacadeSourceTst1ComparisonAssertions",
+            "TestIntegerFacadeSignedPredicatesAndSetterShape",
+            "TestIntegerFacadeDupAndScalarComparison",
+            "TestIntegerFacadeFiniteMathAndIncDecAliases",
+            "TestIntegerFacadeDupIncDecFailureRoots",
+            "TestIntegerFacadeUnsupportedAndLifetime",
+            "TestIntegerFacadeRepresentationEqualityAndWarmReads"
+          ]
+        },
+        {
+          "name": "eq/neq/lt(mpz,int)/lt(mpz,mpz)/gt/ge/le source forwarding order",
+          "status": "ported",
+          "go_target": "mpnum/mpz_facade_extra.go",
+          "tests": [
+            "TestIntegerFacadeSourceTst1ComparisonAssertions",
+            "TestIntegerFacadeSignedPredicatesAndSetterShape",
+            "TestIntegerFacadeDupAndScalarComparison",
+            "TestIntegerFacadeFiniteMathAndIncDecAliases",
+            "TestIntegerFacadeDupIncDecFailureRoots",
+            "TestIntegerFacadeUnsupportedAndLifetime",
+            "TestIntegerFacadeRepresentationEqualityAndWarmReads"
+          ]
+        },
+        {
+          "name": "set(int32), set(uint32) inclusive INT_MAX",
+          "status": "ported",
+          "go_target": "mpnum/mpz_facade_extra.go",
+          "tests": [
+            "TestIntegerFacadeSourceTst1ComparisonAssertions",
+            "TestIntegerFacadeSignedPredicatesAndSetterShape",
+            "TestIntegerFacadeDupAndScalarComparison",
+            "TestIntegerFacadeFiniteMathAndIncDecAliases",
+            "TestIntegerFacadeDupIncDecFailureRoots",
+            "TestIntegerFacadeUnsupportedAndLifetime",
+            "TestIntegerFacadeRepresentationEqualityAndWarmReads"
+          ]
+        },
+        {
+          "name": "dup initialized zero and owning Copy",
+          "status": "ported",
+          "go_target": "mpnum/mpz_facade_extra.go",
+          "tests": [
+            "TestIntegerFacadeSourceTst1ComparisonAssertions",
+            "TestIntegerFacadeSignedPredicatesAndSetterShape",
+            "TestIntegerFacadeDupAndScalarComparison",
+            "TestIntegerFacadeFiniteMathAndIncDecAliases",
+            "TestIntegerFacadeDupIncDecFailureRoots",
+            "TestIntegerFacadeUnsupportedAndLifetime",
+            "TestIntegerFacadeRepresentationEqualityAndWarmReads"
+          ]
+        },
+        {
+          "name": "inv unsupported source assertion, explicit typed Go-domain adapter",
+          "status": "ported",
+          "go_target": "mpnum/mpz_facade_extra.go",
+          "tests": [
+            "TestIntegerFacadeSourceTst1ComparisonAssertions",
+            "TestIntegerFacadeSignedPredicatesAndSetterShape",
+            "TestIntegerFacadeDupAndScalarComparison",
+            "TestIntegerFacadeFiniteMathAndIncDecAliases",
+            "TestIntegerFacadeDupIncDecFailureRoots",
+            "TestIntegerFacadeUnsupportedAndLifetime",
+            "TestIntegerFacadeRepresentationEqualityAndWarmReads"
+          ]
         }
       ],
       "ownership": [
@@ -101403,7 +101527,8 @@
         "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md.",
         "Earlier scratch IDX0-only inventory is superseded by publishTmpAt handling division IDX1 as well; see mpnum/mpz_div.go and source division tests.",
         "Explicit-owner CopyFrom uses source indexed limbs and destination-owned cells/Words. Source set/copy shapes are preserved; rational pair staging preserves raw signed/unreduced representation. Raw records require genuine caller-supplied owners; public provenance is a separate service. See NUMERAL_COPY_PORT_STATUS.md.",
-        "Number theory locals use existing budgeted numerical cells/Words and are always deleted in source order. ExtendedGCD preserves coefficient publication/failure prefixes and rational denominator reset timing; immediate failed-prefix caller/cache roots audited. See NUMBER_THEORY_PORT_STATUS.md."
+        "Number theory locals use existing budgeted numerical cells/Words and are always deleted in source order. ExtendedGCD preserves coefficient publication/failure prefixes and rational denominator reset timing; immediate failed-prefix caller/cache roots audited. See NUMBER_THEORY_PORT_STATUS.md.",
+        "New scalar facade introduces no persistent storage. Dup owns an independent source-capacity copy; Inc/Dec reuse source Add, and failure roots are audited before formatting/cleanup. Raw Int remains caller-confined. See MPZ_FACADE_EXTRA_PORT_STATUS.md."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -101416,7 +101541,8 @@
         "32-bit accessor source assertions become ErrConversion; INT_MIN decomposition uses defined wider magnitude arithmetic. Floating UINT_MAX radix, unsigned length/count wrap and sign-free big hash remain source behavior.",
         "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text.",
         "B12 replaces the one-global-manager ownership assumption with explicit cross-manager deep copy. No foreign handle or serialization is passed into destination arithmetic; destination outlives source Close. This is an ownership adaptation, not AST translation completion.",
-        "Selected release ExtendedGCD preserves finite aliases and modified-input sign rereads. Source Z3DEBUG diagnostic arithmetic remains unported; g3checked selects reference validation only. ext_gcd.h wrapper algorithm remains separate and is not credited from manager inverse properties."
+        "Selected release ExtendedGCD preserves finite aliases and modified-input sign rereads. Source Z3DEBUG diagnostic arithmetic remains unported; g3checked selects reference validation only. ext_gcd.h wrapper algorithm remains separate and is not credited from manager inverse properties.",
+        "Inv source SASSERT(false) is always typed ErrIntegerInvUnsupported in Go, unlike release C++ no-op. Backend alternatives, disabled GCD variants and remaining diagnostics stay open; this public facade does not close the entire source unit."
       ]
     },
     {

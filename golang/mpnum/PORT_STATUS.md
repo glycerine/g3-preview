@@ -1,5 +1,15 @@
 # Numeric foundation packet
 
+This file is a chronological packet log: later entries and the current
+`../port_manifest.json` supersede early missing-method lists. The selected
+internal integer and rational algorithms now include parsing, powers, roots,
+bitwise operations, logarithms, GCD/LCM, rounding and owned rational facades.
+Current public integer routes are mapped in
+[MPZ_FACADE_EXTRA_PORT_STATUS.md](../MPZ_FACADE_EXTRA_PORT_STATUS.md);
+storage/formatting and number-theory packets have their own source audits.
+Remaining backend alternatives, trace/debug diagnostics, binary rationals,
+modular arithmetic and complete solver consumers are not inferred complete.
+
 Status: **partial source unit**, not completion of the numerical manager layer.
 
 Source: `src/util/mpn.h`, `src/util/mpn.cpp` (Microsoft 2011, Christoph

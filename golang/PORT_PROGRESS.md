@@ -673,3 +673,14 @@ checked/debug suites, targeted checked/debug race and actual JS, vet, WASI and
 no-generics/source audits passed. See STRING_BUFFER_PORT_STATUS.md. Arbitrary
 INITIAL_SIZE instantiations and Windows secure-CRT runtime profile remain open;
 string_buffer.h and the generic symbol insertion header remain partial.
+
+## Integer manager public routes
+
+Twenty-one concrete MPZ facade methods now expose source signed predicates,
+comparison forwarding, scalar setters, Inc/Dec, owning Dup and unsupported Inv.
+Seven groups began with six missing-API RED tests and retain eighteen exact
+source MPZ/MPQ comparison assertions. Independent bounded arithmetic, immediate
+failure roots, representation quirks and zero warmed allocations are covered.
+Full native/checked-debug, targeted race/actual JS, vet and WASI build passed.
+Backend/diagnostic alternatives and separate MPBQ/interval/modular managers
+remain open. See MPZ_FACADE_EXTRA_PORT_STATUS.md.
