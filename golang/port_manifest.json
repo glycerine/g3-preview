@@ -106887,7 +106887,8 @@
         "mpnum/mpz_number_theory.go",
         "mpnum/mpz_extended_gcd_debug.go",
         "mpnum/mpz_extended_gcd_release.go",
-        "mpnum/mpz_source_publication_test.go"
+        "mpnum/mpz_source_publication_test.go",
+        "mpnum/mpz_setter_publication_test.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -107016,7 +107017,16 @@
         "TestIntegerSourcePartialBinaryCleanup",
         "TestIntegerSourcePartialOwnedRationalCleanup",
         "TestIntegerSourceScratchSpanGuardAfterFiniteWrappedAllocation",
-        "TestIntegerSourcePartialInfCleanup"
+        "TestIntegerSourcePartialInfCleanup",
+        "TestIntegerBaseTwoPowerDestructiveCapacityPrefix",
+        "TestIntegerAllocateIfNeededAndPreservingCapacityDistinct",
+        "TestIntegerAllocateIfNeededSmallAndReuseBranches",
+        "TestIntegerBigScalarSetterAllocationBeforeSign",
+        "TestIntegerBigScalarSetterSourceCapacityAssertion",
+        "TestIntegerScalarSetterBoundariesAndReuse",
+        "TestIntegerNormalizeOwnedSourceBranches",
+        "TestIntegerBaseTwoPowerExactValuesAndAliases",
+        "TestIntegerBaseTwoPowerReservationSweepAndRetainedCapacity"
       ],
       "conditionals": [
         {
@@ -108105,7 +108115,7 @@
         },
         {
           "name": "power/is_power_of_two selected internal fast paths and mask loop",
-          "status": "ported",
+          "status": "partial",
           "go_target": "mpnum/mpz_power_shift.go",
           "tests": [
             "TestIntegerSourceShiftTable",
@@ -108474,6 +108484,22 @@
             "TestIntegerSourceScratchSpanGuardAfterFiniteWrappedAllocation",
             "TestIntegerSourcePartialInfCleanup"
           ]
+        },
+        {
+          "name": "allocate_if_needed destructive capacity and direct base-two Power fast path; scalar setter capacity assertions and normalize source routes",
+          "status": "partial",
+          "go_target": "mpnum/mpz_setter_publication_test.go",
+          "tests": [
+            "TestIntegerBaseTwoPowerDestructiveCapacityPrefix",
+            "TestIntegerAllocateIfNeededAndPreservingCapacityDistinct",
+            "TestIntegerAllocateIfNeededSmallAndReuseBranches",
+            "TestIntegerBigScalarSetterAllocationBeforeSign",
+            "TestIntegerBigScalarSetterSourceCapacityAssertion",
+            "TestIntegerScalarSetterBoundariesAndReuse",
+            "TestIntegerNormalizeOwnedSourceBranches",
+            "TestIntegerBaseTwoPowerExactValuesAndAliases",
+            "TestIntegerBaseTwoPowerReservationSweepAndRetainedCapacity"
+          ]
         }
       ],
       "ownership": [
@@ -108490,7 +108516,8 @@
         "Explicit-owner CopyFrom uses source indexed limbs and destination-owned cells/Words. Source set/copy shapes are preserved; rational pair staging preserves raw signed/unreduced representation. Raw records require genuine caller-supplied owners; public provenance is a separate service. See NUMERAL_COPY_PORT_STATUS.md.",
         "Number theory locals use existing budgeted numerical cells/Words and are always deleted in source order. ExtendedGCD preserves coefficient publication/failure prefixes and rational denominator reset timing; immediate failed-prefix caller/cache roots audited. See NUMBER_THEORY_PORT_STATUS.md.",
         "The g3debug extended-GCD diagnostic reuses the six existing locals in source mul/mul/add/equality order before final result publication. Caller-visible coefficients survive assertion/failure; immediate root accounting and unwind are tested. See EXTENDED_GCD_DEBUG_PORT_STATUS.md.",
-        "Selected old-free/sign/result-transfer/paired-division action prefixes preserve source order; failed replacements use one charged retired descriptor, guarded reads and owner-qualified cleanup. Exact source allocator topology remains open; see MPZ_SOURCE_PUBLICATION_PORT_STATUS.md."
+        "Selected old-free/sign/result-transfer/paired-division action prefixes preserve source order; failed replacements use one charged retired descriptor, guarded reads and owner-qualified cleanup. Exact source allocator topology remains open; see MPZ_SOURCE_PUBLICATION_PORT_STATUS.md.",
+        "Base-two Power mutates caller storage through actual destructive allocate_if_needed; other Power and shift wrappers remain staged fidelity work. Scalar debug capacity assertion precedes sign/digits; existing normalize branch tests confirm actual behavior. See MPZ_SETTER_PORT_STATUS.md."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -108529,7 +108556,8 @@
         "mpnum/mp_copy.go",
         "mpnum/mpz_number_theory.go",
         "mpnum/mpz_facade_extra.go",
-        "mpnum/mpz_source_publication_test.go"
+        "mpnum/mpz_source_publication_test.go",
+        "mpnum/mpz_setter_publication_test.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -108663,7 +108691,16 @@
         "TestIntegerSourcePartialBinaryCleanup",
         "TestIntegerSourcePartialOwnedRationalCleanup",
         "TestIntegerSourceScratchSpanGuardAfterFiniteWrappedAllocation",
-        "TestIntegerSourcePartialInfCleanup"
+        "TestIntegerSourcePartialInfCleanup",
+        "TestIntegerBaseTwoPowerDestructiveCapacityPrefix",
+        "TestIntegerAllocateIfNeededAndPreservingCapacityDistinct",
+        "TestIntegerAllocateIfNeededSmallAndReuseBranches",
+        "TestIntegerBigScalarSetterAllocationBeforeSign",
+        "TestIntegerBigScalarSetterSourceCapacityAssertion",
+        "TestIntegerScalarSetterBoundariesAndReuse",
+        "TestIntegerNormalizeOwnedSourceBranches",
+        "TestIntegerBaseTwoPowerExactValuesAndAliases",
+        "TestIntegerBaseTwoPowerReservationSweepAndRetainedCapacity"
       ],
       "conditionals": [
         {
@@ -109264,7 +109301,7 @@
         },
         {
           "name": "power/is_power_of_two selected internal fast paths and mask loop",
-          "status": "ported",
+          "status": "partial",
           "go_target": "mpnum/mpz_power_shift.go",
           "tests": [
             "TestIntegerSourceShiftTable",
@@ -109708,6 +109745,22 @@
             "TestIntegerSourceScratchSpanGuardAfterFiniteWrappedAllocation",
             "TestIntegerSourcePartialInfCleanup"
           ]
+        },
+        {
+          "name": "allocate_if_needed destructive capacity and direct base-two Power fast path; scalar setter capacity assertions and normalize source routes",
+          "status": "partial",
+          "go_target": "mpnum/mpz_setter_publication_test.go",
+          "tests": [
+            "TestIntegerBaseTwoPowerDestructiveCapacityPrefix",
+            "TestIntegerAllocateIfNeededAndPreservingCapacityDistinct",
+            "TestIntegerAllocateIfNeededSmallAndReuseBranches",
+            "TestIntegerBigScalarSetterAllocationBeforeSign",
+            "TestIntegerBigScalarSetterSourceCapacityAssertion",
+            "TestIntegerScalarSetterBoundariesAndReuse",
+            "TestIntegerNormalizeOwnedSourceBranches",
+            "TestIntegerBaseTwoPowerExactValuesAndAliases",
+            "TestIntegerBaseTwoPowerReservationSweepAndRetainedCapacity"
+          ]
         }
       ],
       "ownership": [
@@ -109724,7 +109777,8 @@
         "Explicit-owner CopyFrom uses source indexed limbs and destination-owned cells/Words. Source set/copy shapes are preserved; rational pair staging preserves raw signed/unreduced representation. Raw records require genuine caller-supplied owners; public provenance is a separate service. See NUMERAL_COPY_PORT_STATUS.md.",
         "Number theory locals use existing budgeted numerical cells/Words and are always deleted in source order. ExtendedGCD preserves coefficient publication/failure prefixes and rational denominator reset timing; immediate failed-prefix caller/cache roots audited. See NUMBER_THEORY_PORT_STATUS.md.",
         "New scalar facade introduces no persistent storage. Dup owns an independent source-capacity copy; Inc/Dec reuse source Add, and failure roots are audited before formatting/cleanup. Raw Int remains caller-confined. See MPZ_FACADE_EXTRA_PORT_STATUS.md.",
-        "Selected old-free/sign/result-transfer/paired-division action prefixes preserve source order; failed replacements use one charged retired descriptor, guarded reads and owner-qualified cleanup. Exact source allocator topology remains open; see MPZ_SOURCE_PUBLICATION_PORT_STATUS.md."
+        "Selected old-free/sign/result-transfer/paired-division action prefixes preserve source order; failed replacements use one charged retired descriptor, guarded reads and owner-qualified cleanup. Exact source allocator topology remains open; see MPZ_SOURCE_PUBLICATION_PORT_STATUS.md.",
+        "Base-two Power mutates caller storage through actual destructive allocate_if_needed; other Power and shift wrappers remain staged fidelity work. Scalar debug capacity assertion precedes sign/digits; existing normalize branch tests confirm actual behavior. See MPZ_SETTER_PORT_STATUS.md."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",

@@ -287,8 +287,17 @@ func TestSourceShiftDefectAndPowerDomains(t *testing.T) {
 				if !errors.Is(e, arena.ErrBudget) && !errors.Is(e, arena.ErrBounds) {
 					t.Fatal(base, p, e)
 				}
-				if integerString(t, m, &out) != "17" {
-					t.Fatal("oversized power published")
+				mpzPublicationAudit(t, m, &a, &out)
+				if out.val != 1 || out.cell != m.failedRef {
+					t.Fatal("source base-two allocation prefix", out)
+				}
+				if x := m.check(&out); !errors.Is(x, arena.ErrInvalidSlot) {
+					t.Fatal("failed base-two output read", x)
+				}
+				// Dispose only the failed caller token before the next
+				// independent domain fixture; no scratch repair or retry.
+				if x := m.Del(&out); x != nil {
+					t.Fatal(x)
 				}
 			} else {
 				if e != nil {

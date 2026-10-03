@@ -1,3 +1,6 @@
+Selected destructive capacity and base-two Power now preserve caller publication;
+see ../MPZ_SETTER_PORT_STATUS.md for current scope and remaining staging work.
+
 <!-- Historical packet evidence follows. The MPZ source-publication follow-up
      supersedes earlier fixed scratch-count and automatic retry claims.
      Higher-level staged wrappers remain explicit fidelity work. -->

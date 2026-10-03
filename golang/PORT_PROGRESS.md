@@ -1335,3 +1335,17 @@ See MPZ_SOURCE_PUBLICATION_PORT_STATUS.md. Frozen full native and checked/debug,
 gates pass. Source allocator topology, bitwise/GCD/Power/root/rational staging
 and the complete solver/proof/interpolation goal remain open. Ledger remains
 33ported/145partial/1924unported; selected allocation method evidence is partial.
+
+
+## Destructive numeric capacity and base-two Power
+
+The actual allocate_if_needed helper and base-two Power branch now mutate the
+caller in source order, preserving old-free/sign publication on replacement
+refusal and capacity reuse on success. Scalar setters execute their source
+capacity diagnostic before writes; existing normalize and ordinary scalar OOM
+routes have independent confirmation. Nine new tests plus eight existing
+power/shift groups pass named native/debug/race/actual JS; full isolated native
+and checked/debug pass. Vet, WASI compilation and no-generics/source gates pass.
+See MPZ_SETTER_PORT_STATUS.md. Scalar infallible write layout, generic Power,
+0^0 release/debug policy, shifts, other staged wrappers and true source allocator
+integration remain required. Neither whole MPZ unit becomes complete.

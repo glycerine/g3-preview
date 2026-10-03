@@ -272,6 +272,31 @@ func (m *IntegerManager) Reset(a *Int) error {
 	return nil
 }
 
+// allocateIfNeeded is the source destructive capacity helper. It never copies
+// old limbs. A failed replacement leaves the already-published positive sign
+// and the owner's dead allocation token; only cleanup may consume that token.
+func (m *IntegerManager) allocateIfNeeded(a *Int, capacity uint32) error {
+	if e := m.check(a); e != nil {
+		return e
+	}
+	if capacity < 6 {
+		capacity = 6
+	}
+	if a.IsSmall() || m.cell(a.cell).capacity < capacity {
+		if a.cell != 0 {
+			m.free(a.cell)
+		}
+		a.val = 1
+		a.cell = m.failedRef
+		ref, e := m.allocate(capacity, 0)
+		if e != nil {
+			return e
+		}
+		a.cell = ref
+	}
+	return nil
+}
+
 func (m *IntegerManager) setBig64(a *Int, v uint64, sign int32) error {
 	ref := a.cell
 	if ref == 0 {
@@ -280,6 +305,11 @@ func (m *IntegerManager) setBig64(a *Int, v uint64, sign int32) error {
 		if e != nil {
 			return e
 		}
+	}
+	// mpz.cpp set_big_i64/set_big_ui64 assert capacity after optional
+	// allocation and before any sign or limb publication.
+	if modularSourceDebug && m.cell(ref).capacity < 6 {
+		return ErrIntegerAssertion
 	}
 	size := uint32(1)
 	if v>>32 != 0 {

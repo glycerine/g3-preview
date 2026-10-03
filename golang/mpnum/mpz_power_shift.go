@@ -116,6 +116,12 @@ func (m *IntegerManager) Power(a *Int, p uint32, out *Int) error {
 	if !fast && p >= 1<<31 {
 		return &PowerDomainError{Exponent: p, Reason: PowerMaskOverflow}
 	}
+	// The base-two fast path writes the caller directly. Its destructive
+	// allocate_if_needed branch is distinct from preserving ensure_capacity.
+	// Other Power routes retain their separately documented staged contract.
+	if a.IsSmall() && a.val == 2 {
+		return m.powerCore(a, p, out)
+	}
 	var work Int
 	defer m.Del(&work)
 	if e := m.powerCore(a, p, &work); e != nil {
@@ -136,8 +142,19 @@ func (m *IntegerManager) powerCore(a *Int, p uint32, out *Int) error {
 			}
 			size := p/32 + 1
 			shift := p % 32
-			if e := m.ensureOwnedCapacity(out, max(uint32(6), size)); e != nil {
+			if modularSourceDebug && size == 0 {
+				return ErrIntegerAssertion
+			}
+			if e := m.allocateIfNeeded(out, size); e != nil {
 				return e
+			}
+			if modularSourceDebug && m.cell(out.cell).capacity < size {
+				return ErrIntegerAssertion
+			}
+			// The physical Go span is guarded at its actual access, after
+			// all source allocation and sign-publication actions.
+			if size > m.cell(out.cell).capacity {
+				return arena.ErrBounds
 			}
 			m.resizeCell(out.cell, size)
 			for i := uint32(0); i < size-1; i++ {
