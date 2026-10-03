@@ -507,3 +507,15 @@ copy, number theory, inspection and service packets has explicit JS RUN/PASS
 evidence. WASI execution is not claimed. Source inventory/no-generics audit:
 2102 units,677 APIs;14 ported,41 partial,2047 unported. The complete solver,
 AST, proof and interpolation scope remains open.
+
+## Owner-local rational operator facade
+
+RationalService now exposes source value/compound arithmetic, signed32 scalar
+overload directions, comparisons, inspection, integer-valued arithmetic, rounding,
+powers, fused wrapper expressions, ModHat and NumBits. Value arithmetic retains
+source copy-before-compound and returned-lvalue-copy steps; prefix/postfix uses
+rational-one arithmetic. Eleven test groups began with missing-API RED and cover
+all64 tst1 ENSUREs and all56 static tst2 ENSUREs plus its VERIFY, independent
+exact arithmetic, aliases, immediate failure roots and warmed allocation checks.
+See RATIONAL_FACADE_PORT_STATUS.md. Roots/squares, bitwise and remaining wrapper
+interoperability/display operations remain open; full solver scope is unchanged.

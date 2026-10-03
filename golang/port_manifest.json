@@ -81311,7 +81311,8 @@
         "mpnum/mpq_ops.go",
         "mpnum/mpq_number_theory.go",
         "mpnum/mpq_inspect.go",
-        "mpnum/rational_service.go"
+        "mpnum/rational_service.go",
+        "mpnum/rational_service_ops_test.go"
       ],
       "tests": [
         "TestSourceStringAssertions",
@@ -81358,7 +81359,18 @@
         "TestRationalServiceForeignSmallValuesAndInvalidGuards",
         "TestRationalServiceCacheRelocationMoveAndDestruction",
         "TestRationalServiceSourceUnsignedConstructorBoundary",
-        "TestRationalServiceSourceSignedFractionShape"
+        "TestRationalServiceSourceSignedFractionShape",
+        "TestRationalFacadeSourceTST1",
+        "TestRationalFacadeSourceTST2",
+        "TestRationalFacadeIndependentArithmeticAndAliases",
+        "TestRationalFacadeScalarOverloadsPostfixAndExtraction",
+        "TestRationalFacadeFusedSourceOperandRoutes",
+        "TestRationalFacadeModHatNumBitsAndPowerDomains",
+        "TestRationalFacadeAllocationFailureOwnership",
+        "TestRationalFacadeProvenanceAndNoncanonicalSourceShapes",
+        "TestRationalFacadeWarmZeroAllocations",
+        "TestRationalFacadeInspectionForwardingAndSourceOutputAliases",
+        "TestRationalFacadeCompoundFailureAliases"
       ],
       "assertions": [
         {
@@ -82125,6 +82137,15 @@
             "TestRationalServiceSourceUnsignedConstructorBoundary",
             "TestRationalServiceSourceSignedFractionShape"
           ]
+        },
+        {
+          "name": "tst1 all64 ENSURE and static tst2 all56 ENSURE plus one VERIFY through concrete owner facade",
+          "status": "ported",
+          "go_target": "mpnum/rational_service_ops_test.go",
+          "tests": [
+            "TestRationalFacadeSourceTST1",
+            "TestRationalFacadeSourceTST2"
+          ]
         }
       ],
       "ownership": [
@@ -82132,7 +82153,8 @@
         "Mixed/fused locals use borrowed integer-manager storage; nonsynch reuses existing named caches, synch deletes all locals. Failed-prefix tests independently audit immediate live cells/Words before rendering or teardown. See mpnum/RATIONAL_OPS_PORT_STATUS.md.",
         "Number theory locals use existing budgeted numerical cells/Words and are always deleted in source order. ExtendedGCD preserves coefficient publication/failure prefixes and rational denominator reset timing; immediate failed-prefix caller/cache roots audited. See NUMBER_THEORY_PORT_STATUS.md.",
         "Inspection uses existing integer roots; extraction acquires deep independent limbs and thin setters/swap retain source component identity. Failed-prefix tests audit cells/Words and decoded values before rendering/teardown. See RATIONAL_INSPECTION_PORT_STATUS.md.",
-        "Owner-local RationalService owns synchronized numerical manager, constants and pointer-free cache; scalar provenance on OwnedRational validates all public operands. Cold mutexes ordered by immutable ownerID for CopyFrom; all headers/backing/old+new charged. See RATIONAL_SERVICE_PORT_STATUS.md."
+        "Owner-local RationalService owns synchronized numerical manager, constants and pointer-free cache; scalar provenance on OwnedRational validates all public operands. Cold mutexes ordered by immutable ownerID for CopyFrom; all headers/backing/old+new charged. See RATIONAL_SERVICE_PORT_STATUS.md.",
+        "Service-owned facade assertion fixtures explicitly retain/deep-copy owning values and destroy them before closing the service; independent alias/failure/provenance/zero-allocation checks supplement121 source checks."
       ],
       "deviations": [
         "Staged mixed outputs adapt source allocation failure publication while emulating component-aliased source reads. Integer-only assertions and zero divisors become typed errors; negative-denominator RatDiv and direct integer output alias defects remain.",
@@ -101862,7 +101884,8 @@
       "status": "partial",
       "go_targets": [
         "mpnum/mpq_inspect.go",
-        "mpnum/rational_service.go"
+        "mpnum/rational_service.go",
+        "mpnum/rational_service_ops.go"
       ],
       "tests": [
         "TestSourceRationalConversionAssertions",
@@ -101890,7 +101913,18 @@
         "TestRationalServiceForeignSmallValuesAndInvalidGuards",
         "TestRationalServiceCacheRelocationMoveAndDestruction",
         "TestRationalServiceSourceUnsignedConstructorBoundary",
-        "TestRationalServiceSourceSignedFractionShape"
+        "TestRationalServiceSourceSignedFractionShape",
+        "TestRationalFacadeSourceTST1",
+        "TestRationalFacadeSourceTST2",
+        "TestRationalFacadeIndependentArithmeticAndAliases",
+        "TestRationalFacadeScalarOverloadsPostfixAndExtraction",
+        "TestRationalFacadeFusedSourceOperandRoutes",
+        "TestRationalFacadeModHatNumBitsAndPowerDomains",
+        "TestRationalFacadeAllocationFailureOwnership",
+        "TestRationalFacadeProvenanceAndNoncanonicalSourceShapes",
+        "TestRationalFacadeWarmZeroAllocations",
+        "TestRationalFacadeInspectionForwardingAndSourceOutputAliases",
+        "TestRationalFacadeCompoundFailureAliases"
       ],
       "conditionals": [
         {
@@ -102032,15 +102066,107 @@
             "TestRationalServiceSourceUnsignedConstructorBoundary",
             "TestRationalServiceSourceSignedFractionShape"
           ]
+        },
+        {
+          "name": "value arithmetic copy/compound/lvalue-return-copy and signed32 overload directions",
+          "status": "ported",
+          "go_target": "mpnum/rational_service_ops.go",
+          "tests": [
+            "TestRationalFacadeSourceTST1",
+            "TestRationalFacadeSourceTST2",
+            "TestRationalFacadeIndependentArithmeticAndAliases",
+            "TestRationalFacadeScalarOverloadsPostfixAndExtraction",
+            "TestRationalFacadeFusedSourceOperandRoutes",
+            "TestRationalFacadeModHatNumBitsAndPowerDomains",
+            "TestRationalFacadeAllocationFailureOwnership",
+            "TestRationalFacadeProvenanceAndNoncanonicalSourceShapes",
+            "TestRationalFacadeWarmZeroAllocations",
+            "TestRationalFacadeInspectionForwardingAndSourceOutputAliases",
+            "TestRationalFacadeCompoundFailureAliases"
+          ]
+        },
+        {
+          "name": "compound arithmetic, integer assignment, rational-one prefix/postfix and unary value routes",
+          "status": "ported",
+          "go_target": "mpnum/rational_service_ops.go",
+          "tests": [
+            "TestRationalFacadeSourceTST1",
+            "TestRationalFacadeSourceTST2",
+            "TestRationalFacadeIndependentArithmeticAndAliases",
+            "TestRationalFacadeScalarOverloadsPostfixAndExtraction",
+            "TestRationalFacadeFusedSourceOperandRoutes",
+            "TestRationalFacadeModHatNumBitsAndPowerDomains",
+            "TestRationalFacadeAllocationFailureOwnership",
+            "TestRationalFacadeProvenanceAndNoncanonicalSourceShapes",
+            "TestRationalFacadeWarmZeroAllocations",
+            "TestRationalFacadeInspectionForwardingAndSourceOutputAliases",
+            "TestRationalFacadeCompoundFailureAliases"
+          ]
+        },
+        {
+          "name": "pair comparisons and rational-left integer comparisons; inspection and inclusive projection facade",
+          "status": "ported",
+          "go_target": "mpnum/rational_service_ops.go",
+          "tests": [
+            "TestRationalFacadeSourceTST1",
+            "TestRationalFacadeSourceTST2",
+            "TestRationalFacadeIndependentArithmeticAndAliases",
+            "TestRationalFacadeScalarOverloadsPostfixAndExtraction",
+            "TestRationalFacadeFusedSourceOperandRoutes",
+            "TestRationalFacadeModHatNumBitsAndPowerDomains",
+            "TestRationalFacadeAllocationFailureOwnership",
+            "TestRationalFacadeProvenanceAndNoncanonicalSourceShapes",
+            "TestRationalFacadeWarmZeroAllocations",
+            "TestRationalFacadeInspectionForwardingAndSourceOutputAliases",
+            "TestRationalFacadeCompoundFailureAliases"
+          ]
+        },
+        {
+          "name": "fresh integer-valued div/rem/mod/GCD, numerator/denominator, rounding and power results",
+          "status": "ported",
+          "go_target": "mpnum/rational_service_ops.go",
+          "tests": [
+            "TestRationalFacadeSourceTST1",
+            "TestRationalFacadeSourceTST2",
+            "TestRationalFacadeIndependentArithmeticAndAliases",
+            "TestRationalFacadeScalarOverloadsPostfixAndExtraction",
+            "TestRationalFacadeFusedSourceOperandRoutes",
+            "TestRationalFacadeModHatNumBitsAndPowerDomains",
+            "TestRationalFacadeAllocationFailureOwnership",
+            "TestRationalFacadeProvenanceAndNoncanonicalSourceShapes",
+            "TestRationalFacadeWarmZeroAllocations",
+            "TestRationalFacadeInspectionForwardingAndSourceOutputAliases",
+            "TestRationalFacadeCompoundFailureAliases"
+          ]
+        },
+        {
+          "name": "addmul/submul scoped coefficient-copy routes, mod_hat and num_bits exact source loops",
+          "status": "ported",
+          "go_target": "mpnum/rational_service_ops.go",
+          "tests": [
+            "TestRationalFacadeSourceTST1",
+            "TestRationalFacadeSourceTST2",
+            "TestRationalFacadeIndependentArithmeticAndAliases",
+            "TestRationalFacadeScalarOverloadsPostfixAndExtraction",
+            "TestRationalFacadeFusedSourceOperandRoutes",
+            "TestRationalFacadeModHatNumBitsAndPowerDomains",
+            "TestRationalFacadeAllocationFailureOwnership",
+            "TestRationalFacadeProvenanceAndNoncanonicalSourceShapes",
+            "TestRationalFacadeWarmZeroAllocations",
+            "TestRationalFacadeInspectionForwardingAndSourceOutputAliases",
+            "TestRationalFacadeCompoundFailureAliases"
+          ]
         }
       ],
       "ownership": [
         "Inspection uses existing integer roots; extraction acquires deep independent limbs and thin setters/swap retain source component identity. Failed-prefix tests audit cells/Words and decoded values before rendering/teardown. See RATIONAL_INSPECTION_PORT_STATUS.md.",
-        "Owner-local RationalService owns synchronized numerical manager, constants and pointer-free cache; scalar provenance on OwnedRational validates all public operands. Cold mutexes ordered by immutable ownerID for CopyFrom; all headers/backing/old+new charged. See RATIONAL_SERVICE_PORT_STATUS.md."
+        "Owner-local RationalService owns synchronized numerical manager, constants and pointer-free cache; scalar provenance on OwnedRational validates all public operands. Cold mutexes ordered by immutable ownerID for CopyFrom; all headers/backing/old+new charged. See RATIONAL_SERVICE_PORT_STATUS.md.",
+        "Owner-local concrete facade validates all operand provenance before raw actions, locks the service once, and releases scoped temporaries in source order. Value arithmetic retains both source copies; named returns transfer ownership. See RATIONAL_FACADE_PORT_STATUS.md."
       ],
       "deviations": [
         "Explicit manager projects rational.h inclusive32-bit wrappers, distinct from strict MPZ boundaries; global wrapper remains incomplete. Float positive converted denominator SASSERT becomes typed ErrRationalFloatDomain. Source raw component alias publication can leave denominator zero; subsequent operations diagnose initialization.",
-        "Global mutable manager/cache replaced with explicit owner-local service. Constants return independent deep values; owning token Del invalidates provenance, source move val history retained. Cache failed-prefix/retry actions preserved; INT_MIN signed-negation domain uses explicit wider magnitude adaptation. Broad facade and infinitesimal hooks remain incomplete."
+        "Global mutable manager/cache replaced with explicit owner-local service. Constants return independent deep values; owning token Del invalidates provenance, source move val history retained. Cache failed-prefix/retry actions preserved; INT_MIN signed-negation domain uses explicit wider magnitude adaptation. Broad facade and infinitesimal hooks remain incomplete.",
+        "Remaining wrapper roots/squares, LCM/extended-GCD, rational bitwise forwards, display conveniences and checked raw borrowing/interoperability are not completed by this selected facade packet; source double construction/assignment are unreachable domains."
       ]
     },
     {
