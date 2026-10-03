@@ -1,8 +1,9 @@
 # AST proof construction and inspection: source contract packet
 
-Coordinator-owned audit for the next implementation packet. No proof builder,
-proof checker, solver proof production, or interpolation completion is claimed.
-Current AST core drafts are reviewed separately and are not a frozen prerequisite.
+Coordinator-owned source contract for the builder/reader implementation.
+AST core prerequisite is committed at 07a6182; see AST_PROOF_PORT_STATUS.md
+for the frozen implementation and validation scope. Complete proof checking,
+solver proof production and interpolation remain open.
 
 Read source: ast.h:2080–2212 and ast.cpp:2590–3224, including every executable
 proof construction/inspection body. Registered test/proof_checker.cpp has one

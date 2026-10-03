@@ -923,3 +923,16 @@ default-construction adapter. Full isolated native, checked/debug, race, actual
 JS, vet, WASI compilation and source/no-generics gates passed on frozen bytes.
 MPFF_PORT_STATUS.md records precise limits and hashes; source coverage counts
 remain unchanged and the full solver port remains active.
+
+## AST proof builder and reader integration
+
+All44 distinct out-of-line proof builder/reader names, their overloads and
+inline mode/fact/parent inspection now use the real AST manager. Tests-first
+behavioral corrections preserve source canonical constants, release short
+circuits, lexical destruction and allocation failure prefixes. Hyper-resolution
+uses real owning outputs and temporary vectors; quantifier bindings remain
+nonowning. Frozen21-file/31-group native, checked/debug, race, actual JS, vet,
+WASI compile and source/no-generics gates passed. An independent Boolean oracle
+checks1,116 cases across8 assignments; this does not replace the real checker.
+AST_PROOF_PORT_STATUS.md records scope and adapters. ast.h/.cpp remain partial;
+proof checking, complete solver, diagnostics and interpolation remain required.

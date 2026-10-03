@@ -6,6 +6,8 @@ The user explicitly requires no Go generics in this project. This overrides
 parameterized Go types and functions suggested in GO_PORT_PLAN.md, including
 its arena sketches. Apply this rule to production code, tests, tools, and
 generated Go code. Use concrete typed implementations instead.
+The user's reasons are performance and keeping code easy to read, debug,
+and profile. Apply this rule throughout the continuing port goal.
 
 Preserve pointer-free hot records, fixed-width handles, explicit ownership,
 source algorithms, and test coverage when replacing generic infrastructure.
