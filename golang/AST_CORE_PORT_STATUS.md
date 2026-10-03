@@ -1,9 +1,13 @@
-# AST core proposal — implementation not started
+# AST core original proposal
 
-Read-only audit of `src/ast/ast.h`, `src/ast/ast.cpp`, registered
+This historical proposal predates the implemented runtime packet. Current
+implementation, frozen tests, ownership adapters and remaining whole-manager
+work are recorded in AST_CORE_PACKET.md.
+
+The original read-only audit of `src/ast/ast.h`, `src/ast/ast.cpp`, registered
 `src/test/ast.cpp`, and concrete chaining/persistent-array dependencies proposed
-an owner-local pointer-free core covering all five node kinds. No AST manager,
-node factories, plugins or solving behavior is implemented by this proposal.
+an owner-local pointer-free core covering all five node kinds. This proposal itself was an audit artifact; the later runtime packet implements
+real managers, nodes and eager plugins. Solver behavior remains open.
 
 The source constructor eagerly initializes basic/label/pattern/model-value/
 user-sort plugins and retained roots, and creates a second real formatting

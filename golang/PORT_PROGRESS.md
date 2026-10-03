@@ -1,5 +1,30 @@
 # Port progress
 
+## Real AST runtime integration
+
+The first runtime packet now supplies all five node kinds, six parameter kinds,
+real declaration information and structural interning, source IDs and logical
+reference actions, normal/format managers with five eager plugins, owning
+references/vectors, and persistent expression arrays with actual AST callbacks.
+Tests were written before implementation; review regressions additionally
+observed RED before correcting source allocation prefixes and retained pointer
+storage. Six quantifier-update overloads also began missing-API RED, then passed
+with identity early returns and direct retained payload copying.
+
+The frozen67-file packet passed full native and checked/debug tests, 52 named
+checked/debug race and actual JS groups, five additional release JS branches,
+vet, WASI compilation, and source/no-generics verification. The source AST test
+executes all nine active ENSURE actions; the array stress test executes its
+full million updates with real Var handles. AST_CORE_PACKET.md records exact
+hashes, ownership adapters and limits. Source inventory remains2,102 units and
+677 APIs:33 ported,69 partial,2,000 unported. Registered AST test coverage moved
+to partial because its conditional sizeof TRACE output remains open.
+
+Remaining AST copy/translation, dependencies/marks, arithmetic coercions/plugins,
+trace/printers, runtime debug-refcount and global resources are explicit next
+work. The independently tested proof and SAT drafts are outside this commit.
+The complete solver, proof checker and interpolation goal remains active.
+
 ## Concrete internal32 fast-float integration
 
 The selected MPFF manager and its concrete scalar/vector scopes now implement

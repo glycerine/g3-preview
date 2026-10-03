@@ -9310,21 +9310,111 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "ast_basic_plugin.go",
+        "ast_basic_plugin_finalize.go",
+        "ast_basic_plugin_kinds.go",
+        "ast_basic_plugin_proof.go",
+        "ast_builtin_plugins.go",
+        "ast_builtin_plugins_dictionary.go",
+        "ast_builtin_plugins_user.go",
+        "ast_builtin_plugins_values.go",
+        "ast_core.go",
+        "ast_core_accessors.go",
+        "ast_core_allocate.go",
+        "ast_core_debug.go",
+        "ast_core_delete.go",
+        "ast_core_factories.go",
+        "ast_core_nodebug.go",
+        "ast_core_pages.go",
+        "ast_core_payload.go",
+        "ast_core_plugin_dispatch.go",
+        "ast_core_query.go",
+        "ast_core_register.go",
+        "ast_core_stats.go",
+        "ast_core_storage.go",
+        "ast_core_symbols.go",
+        "ast_core_teardown_pages.go",
+        "ast_core_update.go",
+        "ast_expr_array.go",
+        "ast_expr_array_api.go",
+        "ast_expr_array_values.go",
         "ast_family.go",
-        "ast_sort_size.go"
+        "ast_info.go",
+        "ast_parameter.go",
+        "ast_parameter_access.go",
+        "ast_ref.go",
+        "ast_ref_vector.go",
+        "ast_ref_vector_access.go",
+        "ast_ref_vector_borrow.go",
+        "ast_ref_vector_ops.go",
+        "ast_sort_size.go",
+        "ast_table.go",
+        "ast_table_hash.go"
       ],
       "tests": [
-        "TestFamilySourceRegistrationAndQueries",
-        "TestFamilySourceEnumerationOrderAndPrefixes",
-        "TestFamilyNameFailureRetainsPublishedMap",
-        "TestFamilyMapFailureRetainsNextIDAndRetryGap",
+        "TestASTAllEagerPluginBranches",
+        "TestASTAllFiveKindsAndQuantifierIdentity",
+        "TestASTArrayHashPermanentActualSourceVectors",
+        "TestASTBasicCacheResizeRetainsEachSourceExpansion",
+        "TestASTBuiltinValueAndDefaultPluginPolicies",
+        "TestASTConstructorEveryPredictablePrefixOwnsNoLostGraph",
+        "TestASTConstructorRejectsClosedBorrowedNumeralOwnerBeforeGrowth",
+        "TestASTDeletionActualIDRecycleLIFOAndEmergencyOrder",
+        "TestASTDeletionInlineWorklistWarmZeroAllocations",
+        "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
+        "TestASTEagerNormalAndFormatConstructors",
+        "TestASTExprArrayActualValueCallbacksAndReroot",
+        "TestASTExprArrayDeletionFailureConsumesRefAndFinishesOwnedGraph",
+        "TestASTExprArrayEscapedCloseReclaimsPhysicalGraph",
+        "TestASTFamilyDeclarationDomainOverloadUsesActualPlugin",
+        "TestASTFuncDeclInfoPointerOverloadKeepsNullMetadata",
+        "TestASTMetadataIgnoredFields",
+        "TestASTModelValueNameInlineAndOverflowAccounting",
+        "TestASTNamedNodeFieldsAndSortNullInfoPredicates",
+        "TestASTParameterDoubleHashSourceDomain",
+        "TestASTPayloadArithmeticFiniteBoundaries",
+        "TestASTQuantifierSourcePatternDiagnosticBeforeAllocation",
+        "TestASTQuantifierUpdateFailureAndEarlyIdentity",
+        "TestASTQuantifierUpdateSourceOverloads",
+        "TestASTRationalInfoFactoryFailureHasImmediateRootAccounting",
+        "TestASTRefVectorBorrowedInputDefaultEraseAndMove",
+        "TestASTRefVectorCopyAppendResizeAndTransfer",
+        "TestASTRefVectorElementBorrowRetainsAndInvalidatesOnGrowth",
+        "TestASTRefVectorFailedPushRetainsSourceIncrement",
+        "TestASTRefVectorInitializedGrowthFailurePrefix",
+        "TestASTRefVectorNeverInitializedPhysicalSlot",
+        "TestASTRefVectorRealOwnershipNullReserveAndSelfSet",
+        "TestASTRefVectorRetainedFreedHandleBoundary",
+        "TestASTRefVectorSetIndexGuardAfterSourceIncrement",
+        "TestASTRefVectorSourceRetainedNullShrink",
+        "TestASTRefVectorSourceRetainedPointerAndBorrow",
+        "TestASTSixParametersAndAttachmentOwnership",
+        "TestASTSourceNineAssertions",
+        "TestASTSourcePArrayMillionUpdates",
+        "TestASTSourceRefcountUint32ReleaseDebugDistinction",
+        "TestASTStructuralTableCollisionHeadCopyIdentityAndDuplicateGrowth",
+        "TestASTSymbolBytesGrowthBeforeDuplicateAndActualGraph",
+        "TestASTSymbolBytesInputOwnsSpellingAndWarmLongHit",
+        "TestASTSymbolCodecRejectsClosedSpellingOwner",
+        "TestASTSymbolPayloadCodecAndPhysicalCharges",
+        "TestASTUserDictionaryActualMapNullAndCachedEntries",
+        "TestASTUserDictionaryLastDeletedAndRetainedScalarPayload",
+        "TestASTUserDictionaryPrepareBeforeOverwriteFailure",
+        "TestASTUserDictionaryResetRetainsAndRehashUsesCachedHash",
+        "TestASTUserDictionaryResetShrinkRefusalKeepsCoherentClearedBacking",
+        "TestASTUserNameDictionaryFailureKeepsNamePrefixAndFreshReplay",
+        "TestASTZeroNodeCloseRetainedSourceRefVectorPushPrefixes",
         "TestFamilyBudgetConstructorAndNameGrowth",
-        "TestFamilyWarmGuardsAndSignedCounterBound",
         "TestFamilyExactNameGrowthOverlapAndBorrowedLifetime",
-        "TestSortSizeSourceDefaultFactoriesAndGuards",
+        "TestFamilyMapFailureRetainsNextIDAndRetryGap",
+        "TestFamilyNameFailureRetainsPublishedMap",
+        "TestFamilySourceEnumerationOrderAndPrefixes",
+        "TestFamilySourceRegistrationAndQueries",
+        "TestFamilyWarmGuardsAndSignedCounterBound",
+        "TestSortSizeIndependentModelPointerFreedomAndWarmAllocations",
         "TestSortSizeRationalActualUint64Classification",
         "TestSortSizeRationalBorrowedOwnerLifetime",
-        "TestSortSizeIndependentModelPointerFreedomAndWarmAllocations"
+        "TestSortSizeSourceDefaultFactoriesAndGuards"
       ],
       "conditionals": [
         {
@@ -9961,17 +10051,155 @@
           ]
         },
         {
-          "name": "complete AST nodes, declaration plugins, manager factories/ownership and higher algorithms",
+          "name": "remaining manager copy/translation, dependencies/marks/compaction, arithmetic coercions/plugins, proofs, printers/trace and global resource integration",
           "status": "unported"
+        },
+        {
+          "name": "six parameter kinds, concrete copy/move/destruction, equality/hash and scalar extraction",
+          "status": "partial",
+          "go_target": "ast_parameter.go",
+          "tests": [
+            "TestASTMetadataIgnoredFields",
+            "TestASTParameterDoubleHashSourceDomain",
+            "TestASTRationalInfoFactoryFailureHasImmediateRootAccounting",
+            "TestASTSixParametersAndAttachmentOwnership"
+          ]
+        },
+        {
+          "name": "sort_info/func_decl_info copy, parameters and source init/del reference actions",
+          "status": "partial",
+          "go_target": "ast_info.go",
+          "tests": [
+            "TestASTFamilyDeclarationDomainOverloadUsesActualPlugin",
+            "TestASTFuncDeclInfoPointerOverloadKeepsNullMetadata",
+            "TestASTMetadataIgnoredFields",
+            "TestASTRationalInfoFactoryFailureHasImmediateRootAccounting",
+            "TestASTSixParametersAndAttachmentOwnership"
+          ]
+        },
+        {
+          "name": "all five node records, kind-specific factories and scalar/indexed getters",
+          "status": "partial",
+          "go_target": "ast_core_factories.go",
+          "tests": [
+            "TestASTAllFiveKindsAndQuantifierIdentity",
+            "TestASTEagerNormalAndFormatConstructors",
+            "TestASTFamilyDeclarationDomainOverloadUsesActualPlugin",
+            "TestASTFuncDeclInfoPointerOverloadKeepsNullMetadata",
+            "TestASTNamedNodeFieldsAndSortNullInfoPredicates",
+            "TestASTPayloadArithmeticFiniteBoundaries",
+            "TestASTQuantifierSourcePatternDiagnosticBeforeAllocation",
+            "TestASTSymbolPayloadCodecAndPhysicalCharges"
+          ]
+        },
+        {
+          "name": "no-trace normal/format constructors, five eager plugins and retained pins",
+          "status": "partial",
+          "go_target": "ast_core.go",
+          "tests": [
+            "TestASTAllFiveKindsAndQuantifierIdentity",
+            "TestASTConstructorEveryPredictablePrefixOwnsNoLostGraph",
+            "TestASTConstructorRejectsClosedBorrowedNumeralOwnerBeforeGrowth",
+            "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
+            "TestASTEagerNormalAndFormatConstructors",
+            "TestASTSymbolCodecRejectsClosedSpellingOwner",
+            "TestASTZeroNodeCloseRetainedSourceRefVectorPushPrefixes"
+          ]
+        },
+        {
+          "name": "structural chaining interner hashing/equality, insert/duplicate and identity erase",
+          "status": "partial",
+          "go_target": "ast_table.go",
+          "tests": [
+            "TestASTAllFiveKindsAndQuantifierIdentity",
+            "TestASTArrayHashPermanentActualSourceVectors",
+            "TestASTEagerNormalAndFormatConstructors",
+            "TestASTStructuralTableCollisionHeadCopyIdentityAndDuplicateGrowth"
+          ]
+        },
+        {
+          "name": "default-mode registration and logical deletion with source IDs and reference order",
+          "status": "partial",
+          "go_target": "ast_core_register.go",
+          "tests": [
+            "TestASTConstructorEveryPredictablePrefixOwnsNoLostGraph",
+            "TestASTDeletionActualIDRecycleLIFOAndEmergencyOrder",
+            "TestASTDeletionInlineWorklistWarmZeroAllocations",
+            "TestASTMetadataIgnoredFields",
+            "TestASTRationalInfoFactoryFailureHasImmediateRootAccounting",
+            "TestASTSixParametersAndAttachmentOwnership",
+            "TestASTSourceRefcountUint32ReleaseDebugDistinction",
+            "TestASTZeroNodeCloseRetainedSourceRefVectorPushPrefixes"
+          ]
+        },
+        {
+          "name": "basic Boolean/proof declaration caches and label/pattern/model-value/user-sort plugins",
+          "status": "partial",
+          "go_target": "ast_builtin_plugins.go",
+          "tests": [
+            "TestASTAllEagerPluginBranches",
+            "TestASTBasicCacheResizeRetainsEachSourceExpansion",
+            "TestASTBuiltinValueAndDefaultPluginPolicies",
+            "TestASTModelValueNameInlineAndOverflowAccounting",
+            "TestASTSymbolBytesGrowthBeforeDuplicateAndActualGraph",
+            "TestASTSymbolBytesInputOwnsSpellingAndWarmLongHit",
+            "TestASTUserDictionaryActualMapNullAndCachedEntries",
+            "TestASTUserDictionaryLastDeletedAndRetainedScalarPayload",
+            "TestASTUserDictionaryPrepareBeforeOverwriteFailure",
+            "TestASTUserDictionaryResetRetainsAndRehashUsesCachedHash",
+            "TestASTUserDictionaryResetShrinkRefusalKeepsCoherentClearedBacking",
+            "TestASTUserNameDictionaryFailureKeepsNamePrefixAndFreshReplay"
+          ]
+        },
+        {
+          "name": "concrete AST owning reference scalar/vector constructors, assignment, retained storage and borrowed views",
+          "status": "partial",
+          "go_target": "ast_ref_vector.go",
+          "tests": [
+            "TestASTRefVectorBorrowedInputDefaultEraseAndMove",
+            "TestASTRefVectorCopyAppendResizeAndTransfer",
+            "TestASTRefVectorElementBorrowRetainsAndInvalidatesOnGrowth",
+            "TestASTRefVectorFailedPushRetainsSourceIncrement",
+            "TestASTRefVectorInitializedGrowthFailurePrefix",
+            "TestASTRefVectorNeverInitializedPhysicalSlot",
+            "TestASTRefVectorRealOwnershipNullReserveAndSelfSet",
+            "TestASTRefVectorRetainedFreedHandleBoundary",
+            "TestASTRefVectorSetIndexGuardAfterSourceIncrement",
+            "TestASTRefVectorSourceRetainedNullShrink",
+            "TestASTRefVectorSourceRetainedPointerAndBorrow"
+          ]
+        },
+        {
+          "name": "root-preserving expression arrays with real AST ownership and million-update workload",
+          "status": "partial",
+          "go_target": "ast_expr_array.go",
+          "tests": [
+            "TestASTExprArrayActualValueCallbacksAndReroot",
+            "TestASTExprArrayDeletionFailureConsumesRefAndFinishesOwnedGraph",
+            "TestASTExprArrayEscapedCloseReclaimsPhysicalGraph",
+            "TestASTSourceNineAssertions",
+            "TestASTSourcePArrayMillionUpdates"
+          ]
+        },
+        {
+          "name": "six quantifier update overloads, identity early returns and retained/replaced metadata",
+          "status": "partial",
+          "go_target": "ast_core_update.go",
+          "tests": [
+            "TestASTQuantifierUpdateFailureAndEarlyIdentity",
+            "TestASTQuantifierUpdateSourceOverloads"
+          ]
         }
       ],
       "ownership": [
-        "Concrete FamilyManager charges its real cold header, existing nested SymbolInt32Table and full names-vector capacities with old/new overlap. Borrows symbols; preserves counter/map/name failure prefixes; Close in reverse member order. Other AST ownership is unported. See FAMILY_PORT_STATUS.md.",
-        "Standalone SortSize is a freely copied pointer-free scalar with no separate owner/header allocation. Conversion borrows actual RationalService/OwnedRational for source IsUint64 then Uint64 actions without reservation, retained owner or numeral copy; resulting scalar outlives the owner. Caller confines operand mutation/deletion across both calls. Display uses local20 digits and one caller-owned final string. Other AST/plugin algorithms remain open. See SORT_SIZE_PORT_STATUS.md."
+        "Concrete FamilyManager charges its real cold header, existing nested SymbolInt32Table and full names-vector capacities with old/new overlap. Borrows symbols; preserves counter/map/name failure prefixes; Close in reverse member order. Additional AST ownership is tracked in the later runtime-core entry. See FAMILY_PORT_STATUS.md.",
+        "Standalone SortSize is a freely copied pointer-free scalar with no separate owner/header allocation. Conversion borrows actual RationalService/OwnedRational for source IsUint64 then Uint64 actions without reservation, retained owner or numeral copy; resulting scalar outlives the owner. Caller confines operand mutation/deletion across both calls. Display uses local20 digits and one caller-owned final string. Other AST/plugin algorithms remain open. See SORT_SIZE_PORT_STATUS.md.",
+        "First real core uses pointer-free kind/parameter/info/ref records, separately charged cold headers/pages/directories/payloads and concrete source IDs. Source registration retains actual AST and copied numeral graph; deletion and forced teardown preserve source order with charged emergency continuation adapters. Actual expression arrays retain/release live AST nodes. Ref-vector backing charges12-byte capacity/size/initialized header plus scalar entries and old/new peaks; source8-byte bound is checked separately. See AST_CORE_PACKET.md for the exact67-file/52-group frozen scope and open whole-manager obligations."
       ],
       "deviations": [
         "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
-        "Private sort_size enum is encoded Go0=infinite/1=finite/2=very-big to match source default with Go zero value. Nonfinite size is canonical0 rather than source unspecified default bits. Size checks finite precondition in every Go profile instead of reading irrelevant/unspecified release fields. No source ENSURE tests are invented; tests exercise implementation SASSERT and real borrowed rational provenance/lifetime."
+        "Private sort_size enum is encoded Go0=infinite/1=finite/2=very-big to match source default with Go zero value. Nonfinite size is canonical0 rather than source unspecified default bits. Size checks finite precondition in every Go profile instead of reading irrelevant/unspecified release fields. No source ENSURE tests are invented; tests exercise implementation SASSERT and real borrowed rational provenance/lifetime.",
+        "Source pointer identities become owner/slot/generation tokens; physical owner/page/payload accounting replaces C++ ABI sizes. Invalid/dangling domains use typed guards. Source-undefined construction/deletion allocation exceptions have explicit ownership continuation adapters. Runtime debug_ref_count, conditional debug tags, TRACE/printer-backed diagnostics, trace constructors, remaining manager/plug-in operations and complete proof/checker/solver consumers remain open. Six quantifier updates use direct retained payload copies without intermediate Go slices; update-weight TRACE remains open. No Go generics are used."
       ]
     },
     {
@@ -9981,21 +10209,111 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "ast_basic_plugin.go",
+        "ast_basic_plugin_finalize.go",
+        "ast_basic_plugin_kinds.go",
+        "ast_basic_plugin_proof.go",
+        "ast_builtin_plugins.go",
+        "ast_builtin_plugins_dictionary.go",
+        "ast_builtin_plugins_user.go",
+        "ast_builtin_plugins_values.go",
+        "ast_core.go",
+        "ast_core_accessors.go",
+        "ast_core_allocate.go",
+        "ast_core_debug.go",
+        "ast_core_delete.go",
+        "ast_core_factories.go",
+        "ast_core_nodebug.go",
+        "ast_core_pages.go",
+        "ast_core_payload.go",
+        "ast_core_plugin_dispatch.go",
+        "ast_core_query.go",
+        "ast_core_register.go",
+        "ast_core_stats.go",
+        "ast_core_storage.go",
+        "ast_core_symbols.go",
+        "ast_core_teardown_pages.go",
+        "ast_core_update.go",
+        "ast_expr_array.go",
+        "ast_expr_array_api.go",
+        "ast_expr_array_values.go",
         "ast_family.go",
-        "ast_sort_size.go"
+        "ast_info.go",
+        "ast_parameter.go",
+        "ast_parameter_access.go",
+        "ast_ref.go",
+        "ast_ref_vector.go",
+        "ast_ref_vector_access.go",
+        "ast_ref_vector_borrow.go",
+        "ast_ref_vector_ops.go",
+        "ast_sort_size.go",
+        "ast_table.go",
+        "ast_table_hash.go"
       ],
       "tests": [
-        "TestFamilySourceRegistrationAndQueries",
-        "TestFamilySourceEnumerationOrderAndPrefixes",
-        "TestFamilyNameFailureRetainsPublishedMap",
-        "TestFamilyMapFailureRetainsNextIDAndRetryGap",
+        "TestASTAllEagerPluginBranches",
+        "TestASTAllFiveKindsAndQuantifierIdentity",
+        "TestASTArrayHashPermanentActualSourceVectors",
+        "TestASTBasicCacheResizeRetainsEachSourceExpansion",
+        "TestASTBuiltinValueAndDefaultPluginPolicies",
+        "TestASTConstructorEveryPredictablePrefixOwnsNoLostGraph",
+        "TestASTConstructorRejectsClosedBorrowedNumeralOwnerBeforeGrowth",
+        "TestASTDeletionActualIDRecycleLIFOAndEmergencyOrder",
+        "TestASTDeletionInlineWorklistWarmZeroAllocations",
+        "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
+        "TestASTEagerNormalAndFormatConstructors",
+        "TestASTExprArrayActualValueCallbacksAndReroot",
+        "TestASTExprArrayDeletionFailureConsumesRefAndFinishesOwnedGraph",
+        "TestASTExprArrayEscapedCloseReclaimsPhysicalGraph",
+        "TestASTFamilyDeclarationDomainOverloadUsesActualPlugin",
+        "TestASTFuncDeclInfoPointerOverloadKeepsNullMetadata",
+        "TestASTMetadataIgnoredFields",
+        "TestASTModelValueNameInlineAndOverflowAccounting",
+        "TestASTNamedNodeFieldsAndSortNullInfoPredicates",
+        "TestASTParameterDoubleHashSourceDomain",
+        "TestASTPayloadArithmeticFiniteBoundaries",
+        "TestASTQuantifierSourcePatternDiagnosticBeforeAllocation",
+        "TestASTQuantifierUpdateFailureAndEarlyIdentity",
+        "TestASTQuantifierUpdateSourceOverloads",
+        "TestASTRationalInfoFactoryFailureHasImmediateRootAccounting",
+        "TestASTRefVectorBorrowedInputDefaultEraseAndMove",
+        "TestASTRefVectorCopyAppendResizeAndTransfer",
+        "TestASTRefVectorElementBorrowRetainsAndInvalidatesOnGrowth",
+        "TestASTRefVectorFailedPushRetainsSourceIncrement",
+        "TestASTRefVectorInitializedGrowthFailurePrefix",
+        "TestASTRefVectorNeverInitializedPhysicalSlot",
+        "TestASTRefVectorRealOwnershipNullReserveAndSelfSet",
+        "TestASTRefVectorRetainedFreedHandleBoundary",
+        "TestASTRefVectorSetIndexGuardAfterSourceIncrement",
+        "TestASTRefVectorSourceRetainedNullShrink",
+        "TestASTRefVectorSourceRetainedPointerAndBorrow",
+        "TestASTSixParametersAndAttachmentOwnership",
+        "TestASTSourceNineAssertions",
+        "TestASTSourcePArrayMillionUpdates",
+        "TestASTSourceRefcountUint32ReleaseDebugDistinction",
+        "TestASTStructuralTableCollisionHeadCopyIdentityAndDuplicateGrowth",
+        "TestASTSymbolBytesGrowthBeforeDuplicateAndActualGraph",
+        "TestASTSymbolBytesInputOwnsSpellingAndWarmLongHit",
+        "TestASTSymbolCodecRejectsClosedSpellingOwner",
+        "TestASTSymbolPayloadCodecAndPhysicalCharges",
+        "TestASTUserDictionaryActualMapNullAndCachedEntries",
+        "TestASTUserDictionaryLastDeletedAndRetainedScalarPayload",
+        "TestASTUserDictionaryPrepareBeforeOverwriteFailure",
+        "TestASTUserDictionaryResetRetainsAndRehashUsesCachedHash",
+        "TestASTUserDictionaryResetShrinkRefusalKeepsCoherentClearedBacking",
+        "TestASTUserNameDictionaryFailureKeepsNamePrefixAndFreshReplay",
+        "TestASTZeroNodeCloseRetainedSourceRefVectorPushPrefixes",
         "TestFamilyBudgetConstructorAndNameGrowth",
-        "TestFamilyWarmGuardsAndSignedCounterBound",
         "TestFamilyExactNameGrowthOverlapAndBorrowedLifetime",
-        "TestSortSizeSourceDefaultFactoriesAndGuards",
+        "TestFamilyMapFailureRetainsNextIDAndRetryGap",
+        "TestFamilyNameFailureRetainsPublishedMap",
+        "TestFamilySourceEnumerationOrderAndPrefixes",
+        "TestFamilySourceRegistrationAndQueries",
+        "TestFamilyWarmGuardsAndSignedCounterBound",
+        "TestSortSizeIndependentModelPointerFreedomAndWarmAllocations",
         "TestSortSizeRationalActualUint64Classification",
         "TestSortSizeRationalBorrowedOwnerLifetime",
-        "TestSortSizeIndependentModelPointerFreedomAndWarmAllocations"
+        "TestSortSizeSourceDefaultFactoriesAndGuards"
       ],
       "conditionals": [
         {
@@ -10378,17 +10696,155 @@
           ]
         },
         {
-          "name": "complete AST nodes, declaration plugins, manager factories/ownership and higher algorithms",
+          "name": "remaining manager copy/translation, dependencies/marks/compaction, arithmetic coercions/plugins, proofs, printers/trace and global resource integration",
           "status": "unported"
+        },
+        {
+          "name": "six parameter kinds, concrete copy/move/destruction, equality/hash and scalar extraction",
+          "status": "partial",
+          "go_target": "ast_parameter.go",
+          "tests": [
+            "TestASTMetadataIgnoredFields",
+            "TestASTParameterDoubleHashSourceDomain",
+            "TestASTRationalInfoFactoryFailureHasImmediateRootAccounting",
+            "TestASTSixParametersAndAttachmentOwnership"
+          ]
+        },
+        {
+          "name": "sort_info/func_decl_info copy, parameters and source init/del reference actions",
+          "status": "partial",
+          "go_target": "ast_info.go",
+          "tests": [
+            "TestASTFamilyDeclarationDomainOverloadUsesActualPlugin",
+            "TestASTFuncDeclInfoPointerOverloadKeepsNullMetadata",
+            "TestASTMetadataIgnoredFields",
+            "TestASTRationalInfoFactoryFailureHasImmediateRootAccounting",
+            "TestASTSixParametersAndAttachmentOwnership"
+          ]
+        },
+        {
+          "name": "all five node records, kind-specific factories and scalar/indexed getters",
+          "status": "partial",
+          "go_target": "ast_core_factories.go",
+          "tests": [
+            "TestASTAllFiveKindsAndQuantifierIdentity",
+            "TestASTEagerNormalAndFormatConstructors",
+            "TestASTFamilyDeclarationDomainOverloadUsesActualPlugin",
+            "TestASTFuncDeclInfoPointerOverloadKeepsNullMetadata",
+            "TestASTNamedNodeFieldsAndSortNullInfoPredicates",
+            "TestASTPayloadArithmeticFiniteBoundaries",
+            "TestASTQuantifierSourcePatternDiagnosticBeforeAllocation",
+            "TestASTSymbolPayloadCodecAndPhysicalCharges"
+          ]
+        },
+        {
+          "name": "no-trace normal/format constructors, five eager plugins and retained pins",
+          "status": "partial",
+          "go_target": "ast_core.go",
+          "tests": [
+            "TestASTAllFiveKindsAndQuantifierIdentity",
+            "TestASTConstructorEveryPredictablePrefixOwnsNoLostGraph",
+            "TestASTConstructorRejectsClosedBorrowedNumeralOwnerBeforeGrowth",
+            "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
+            "TestASTEagerNormalAndFormatConstructors",
+            "TestASTSymbolCodecRejectsClosedSpellingOwner",
+            "TestASTZeroNodeCloseRetainedSourceRefVectorPushPrefixes"
+          ]
+        },
+        {
+          "name": "structural chaining interner hashing/equality, insert/duplicate and identity erase",
+          "status": "partial",
+          "go_target": "ast_table.go",
+          "tests": [
+            "TestASTAllFiveKindsAndQuantifierIdentity",
+            "TestASTArrayHashPermanentActualSourceVectors",
+            "TestASTEagerNormalAndFormatConstructors",
+            "TestASTStructuralTableCollisionHeadCopyIdentityAndDuplicateGrowth"
+          ]
+        },
+        {
+          "name": "default-mode registration and logical deletion with source IDs and reference order",
+          "status": "partial",
+          "go_target": "ast_core_register.go",
+          "tests": [
+            "TestASTConstructorEveryPredictablePrefixOwnsNoLostGraph",
+            "TestASTDeletionActualIDRecycleLIFOAndEmergencyOrder",
+            "TestASTDeletionInlineWorklistWarmZeroAllocations",
+            "TestASTMetadataIgnoredFields",
+            "TestASTRationalInfoFactoryFailureHasImmediateRootAccounting",
+            "TestASTSixParametersAndAttachmentOwnership",
+            "TestASTSourceRefcountUint32ReleaseDebugDistinction",
+            "TestASTZeroNodeCloseRetainedSourceRefVectorPushPrefixes"
+          ]
+        },
+        {
+          "name": "basic Boolean/proof declaration caches and label/pattern/model-value/user-sort plugins",
+          "status": "partial",
+          "go_target": "ast_builtin_plugins.go",
+          "tests": [
+            "TestASTAllEagerPluginBranches",
+            "TestASTBasicCacheResizeRetainsEachSourceExpansion",
+            "TestASTBuiltinValueAndDefaultPluginPolicies",
+            "TestASTModelValueNameInlineAndOverflowAccounting",
+            "TestASTSymbolBytesGrowthBeforeDuplicateAndActualGraph",
+            "TestASTSymbolBytesInputOwnsSpellingAndWarmLongHit",
+            "TestASTUserDictionaryActualMapNullAndCachedEntries",
+            "TestASTUserDictionaryLastDeletedAndRetainedScalarPayload",
+            "TestASTUserDictionaryPrepareBeforeOverwriteFailure",
+            "TestASTUserDictionaryResetRetainsAndRehashUsesCachedHash",
+            "TestASTUserDictionaryResetShrinkRefusalKeepsCoherentClearedBacking",
+            "TestASTUserNameDictionaryFailureKeepsNamePrefixAndFreshReplay"
+          ]
+        },
+        {
+          "name": "concrete AST owning reference scalar/vector constructors, assignment, retained storage and borrowed views",
+          "status": "partial",
+          "go_target": "ast_ref_vector.go",
+          "tests": [
+            "TestASTRefVectorBorrowedInputDefaultEraseAndMove",
+            "TestASTRefVectorCopyAppendResizeAndTransfer",
+            "TestASTRefVectorElementBorrowRetainsAndInvalidatesOnGrowth",
+            "TestASTRefVectorFailedPushRetainsSourceIncrement",
+            "TestASTRefVectorInitializedGrowthFailurePrefix",
+            "TestASTRefVectorNeverInitializedPhysicalSlot",
+            "TestASTRefVectorRealOwnershipNullReserveAndSelfSet",
+            "TestASTRefVectorRetainedFreedHandleBoundary",
+            "TestASTRefVectorSetIndexGuardAfterSourceIncrement",
+            "TestASTRefVectorSourceRetainedNullShrink",
+            "TestASTRefVectorSourceRetainedPointerAndBorrow"
+          ]
+        },
+        {
+          "name": "root-preserving expression arrays with real AST ownership and million-update workload",
+          "status": "partial",
+          "go_target": "ast_expr_array.go",
+          "tests": [
+            "TestASTExprArrayActualValueCallbacksAndReroot",
+            "TestASTExprArrayDeletionFailureConsumesRefAndFinishesOwnedGraph",
+            "TestASTExprArrayEscapedCloseReclaimsPhysicalGraph",
+            "TestASTSourceNineAssertions",
+            "TestASTSourcePArrayMillionUpdates"
+          ]
+        },
+        {
+          "name": "six quantifier update overloads, identity early returns and retained/replaced metadata",
+          "status": "partial",
+          "go_target": "ast_core_update.go",
+          "tests": [
+            "TestASTQuantifierUpdateFailureAndEarlyIdentity",
+            "TestASTQuantifierUpdateSourceOverloads"
+          ]
         }
       ],
       "ownership": [
-        "Concrete FamilyManager charges its real cold header, existing nested SymbolInt32Table and full names-vector capacities with old/new overlap. Borrows symbols; preserves counter/map/name failure prefixes; Close in reverse member order. Other AST ownership is unported. See FAMILY_PORT_STATUS.md.",
-        "Standalone SortSize is a freely copied pointer-free scalar with no separate owner/header allocation. Conversion borrows actual RationalService/OwnedRational for source IsUint64 then Uint64 actions without reservation, retained owner or numeral copy; resulting scalar outlives the owner. Caller confines operand mutation/deletion across both calls. Display uses local20 digits and one caller-owned final string. Other AST/plugin algorithms remain open. See SORT_SIZE_PORT_STATUS.md."
+        "Concrete FamilyManager charges its real cold header, existing nested SymbolInt32Table and full names-vector capacities with old/new overlap. Borrows symbols; preserves counter/map/name failure prefixes; Close in reverse member order. Additional AST ownership is tracked in the later runtime-core entry. See FAMILY_PORT_STATUS.md.",
+        "Standalone SortSize is a freely copied pointer-free scalar with no separate owner/header allocation. Conversion borrows actual RationalService/OwnedRational for source IsUint64 then Uint64 actions without reservation, retained owner or numeral copy; resulting scalar outlives the owner. Caller confines operand mutation/deletion across both calls. Display uses local20 digits and one caller-owned final string. Other AST/plugin algorithms remain open. See SORT_SIZE_PORT_STATUS.md.",
+        "First real core uses pointer-free kind/parameter/info/ref records, separately charged cold headers/pages/directories/payloads and concrete source IDs. Source registration retains actual AST and copied numeral graph; deletion and forced teardown preserve source order with charged emergency continuation adapters. Actual expression arrays retain/release live AST nodes. Ref-vector backing charges12-byte capacity/size/initialized header plus scalar entries and old/new peaks; source8-byte bound is checked separately. See AST_CORE_PACKET.md for the exact67-file/52-group frozen scope and open whole-manager obligations."
       ],
       "deviations": [
         "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
-        "Private sort_size enum is encoded Go0=infinite/1=finite/2=very-big to match source default with Go zero value. Nonfinite size is canonical0 rather than source unspecified default bits. Size checks finite precondition in every Go profile instead of reading irrelevant/unspecified release fields. No source ENSURE tests are invented; tests exercise implementation SASSERT and real borrowed rational provenance/lifetime."
+        "Private sort_size enum is encoded Go0=infinite/1=finite/2=very-big to match source default with Go zero value. Nonfinite size is canonical0 rather than source unspecified default bits. Size checks finite precondition in every Go profile instead of reading irrelevant/unspecified release fields. No source ENSURE tests are invented; tests exercise implementation SASSERT and real borrowed rational provenance/lifetime.",
+        "Source pointer identities become owner/slot/generation tokens; physical owner/page/payload accounting replaces C++ ABI sizes. Invalid/dangling domains use typed guards. Source-undefined construction/deletion allocation exceptions have explicit ownership continuation adapters. Runtime debug_ref_count, conditional debug tags, TRACE/printer-backed diagnostics, trace constructors, remaining manager/plug-in operations and complete proof/checker/solver consumers remain open. Six quantifier updates use direct retained payload copies without intermediate Go slices; update-weight TRACE remains open. No Go generics are used."
       ]
     },
     {
@@ -74950,9 +75406,13 @@
       "sha256": "6cdbcc156f0745f0f806fcccd5aa427798ca6bd2ca668339e002987d6230be5f",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "ast_core_test.go"
+      ],
+      "tests": [
+        "TestASTSourceNineAssertions"
+      ],
       "assertions": [
         {
           "line": 32,
@@ -74993,9 +75453,26 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "registered tst_ast active tst1 and tst5: all nine ENSURE actions, actual Boolean interning and owned persistent arrays",
+          "status": "ported",
+          "go_target": "ast_core_test.go",
+          "tests": [
+            "TestASTSourceNineAssertions"
+          ]
+        },
+        {
+          "name": "conditional TRACE sizeof(ast/expr/app/foo) output",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Tests use real normal/format managers, actual owning AST refs and expression arrays; source array deletion order is retained. Tests2-4 and alternate old tst1 statements are commented out in this source."
+      ],
+      "deviations": [
+        "Test assertions use Go testing instead of ENSURE. C++ physical sizeof TRACE output is not implemented or claimed; production manager printer/debug streams remain open."
+      ]
     },
     {
       "path": "src/test/bit_blaster.cpp",
@@ -80964,24 +81441,26 @@
       "role": "test",
       "status": "partial",
       "go_targets": [
+        "ast_core_test.go",
         "util_parray_test.go"
       ],
       "tests": [
-        "TestPArraySource712Assertions",
-        "TestPArrayIndependentVersionOracle",
-        "TestPArrayRootTrailOwnershipAndWidths",
-        "TestPArrayLifetimeCapacityAndWarmPlateau",
-        "TestPArrayPredictableFailurePrefixes",
-        "TestPArrayInvalidAndDisplay",
-        "TestPArraySourcePushRerootOffByOne",
-        "TestPArrayUnaffectedRerootRoutesBothPolicies",
-        "TestPArraySourcePushRerootDefectPreservedWithRootPolicy",
-        "TestPArrayMaterializationAndRerootFailureGraphs",
-        "TestPArrayStrictThresholdsAndRetainedSlots",
-        "TestPArrayMkFailureClearsReleasedOutput",
+        "TestASTSourcePArrayMillionUpdates",
         "TestPArrayDisplayPrefixFaultAndBorrowedAllocationBounds",
+        "TestPArrayFormatHostBoundsWithoutAllocation",
+        "TestPArrayIndependentVersionOracle",
+        "TestPArrayInvalidAndDisplay",
+        "TestPArrayLifetimeCapacityAndWarmPlateau",
+        "TestPArrayMaterializationAndRerootFailureGraphs",
+        "TestPArrayMkFailureClearsReleasedOutput",
         "TestPArrayNilOutputChecks",
-        "TestPArrayFormatHostBoundsWithoutAllocation"
+        "TestPArrayPredictableFailurePrefixes",
+        "TestPArrayRootTrailOwnershipAndWidths",
+        "TestPArraySource712Assertions",
+        "TestPArraySourcePushRerootDefectPreservedWithRootPolicy",
+        "TestPArraySourcePushRerootOffByOne",
+        "TestPArrayStrictThresholdsAndRetainedSlots",
+        "TestPArrayUnaffectedRerootRoutesBothPolicies"
       ],
       "conditionals": [
         {
@@ -81161,13 +81640,22 @@
         {
           "name": "disabled #if0 old expression configuration/tst4 and diagnostic trace profiles",
           "status": "unported"
+        },
+        {
+          "name": "registered tst5 real100-slot AST Var array, exact1000000 updates and source factories with actual retained roots",
+          "status": "ported",
+          "go_target": "ast_core_test.go",
+          "tests": [
+            "TestASTSourcePArrayMillionUpdates"
+          ]
         }
       ],
       "ownership": [
         "Source refs use explicit Copy/Del and both int32 policies; 712 exact active ENSURE executions preserve short-circuit routes. Independent graph oracle counts caller refs+edges, unique cells/blocks and physical charges immediately before cleanup. Actual AST stress requires its genuine owner/callbacks. See PARRAY_PORT_STATUS.md."
       ],
       "deviations": [
-        "Independent mathematical version oracle excludes only the documented source defective PUSH reroot by materialization; exact source-defect and unaffected reroot regressions remain active in both policies. No AST million-update or machine-memory-output claim is inferred from int32 coverage."
+        "Independent mathematical version oracle excludes only the documented source defective PUSH reroot by materialization; exact source-defect and unaffected reroot regressions remain active in both policies. No AST million-update or machine-memory-output claim is inferred from int32 coverage.",
+        "AST stress inputs use deterministic source util random seed1 instead of ambient libc rand; every slot and update uses actual Var handles and source persistent-array ownership. The source route has zero ENSURE sites; independent version/root/accounting checks are additional tests. No full runtime print/TRACE claim is added."
       ]
     },
     {
@@ -103700,23 +104188,39 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "ast_ref.go",
+        "ast_ref_vector.go",
+        "ast_ref_vector_access.go",
+        "ast_ref_vector_borrow.go",
+        "ast_ref_vector_ops.go",
         "util_sexpr.go"
       ],
       "tests": [
-        "TestSexprKindsFactoriesAndDefinedDisplay",
-        "TestSexprBVSourceWidthQuirks",
-        "TestSexprRCWrapAndDeletionLIFO",
-        "TestSexprConcreteRefAndVectorActions",
-        "TestSexprPointerFreeAndBoundedDAG",
-        "TestSexprStringBytesAndWrapperRemainingBranches",
-        "TestSexprFailurePrefixesImmediateOwnership",
-        "TestSexprWarmPlateauAndGenerationGuards",
-        "TestSexprFactoryRecordBeforeValueCopy",
-        "TestSexprFinalizationEpochAndZeroWidthBuffer",
-        "TestSexprConstructorAndWholePhysicalGraph",
-        "TestSexprRegisteredEscapedDefaultPrintInputs",
+        "TestASTRefVectorBorrowedInputDefaultEraseAndMove",
+        "TestASTRefVectorCopyAppendResizeAndTransfer",
+        "TestASTRefVectorElementBorrowRetainsAndInvalidatesOnGrowth",
+        "TestASTRefVectorFailedPushRetainsSourceIncrement",
+        "TestASTRefVectorInitializedGrowthFailurePrefix",
+        "TestASTRefVectorNeverInitializedPhysicalSlot",
+        "TestASTRefVectorRealOwnershipNullReserveAndSelfSet",
+        "TestASTRefVectorRetainedFreedHandleBoundary",
+        "TestASTRefVectorSetIndexGuardAfterSourceIncrement",
+        "TestASTRefVectorSourceRetainedNullShrink",
+        "TestASTRefVectorSourceRetainedPointerAndBorrow",
         "TestSexprAccessorsAndScalarIterator",
-        "TestSexprBVSourceInlineBufferAndTemporaryLifetime"
+        "TestSexprBVSourceInlineBufferAndTemporaryLifetime",
+        "TestSexprBVSourceWidthQuirks",
+        "TestSexprConcreteRefAndVectorActions",
+        "TestSexprConstructorAndWholePhysicalGraph",
+        "TestSexprFactoryRecordBeforeValueCopy",
+        "TestSexprFailurePrefixesImmediateOwnership",
+        "TestSexprFinalizationEpochAndZeroWidthBuffer",
+        "TestSexprKindsFactoriesAndDefinedDisplay",
+        "TestSexprPointerFreeAndBoundedDAG",
+        "TestSexprRCWrapAndDeletionLIFO",
+        "TestSexprRegisteredEscapedDefaultPrintInputs",
+        "TestSexprStringBytesAndWrapperRemainingBranches",
+        "TestSexprWarmPlateauAndGenerationGuards"
       ],
       "conditionals": [
         {
@@ -103757,13 +104261,33 @@
             "TestSexprAccessorsAndScalarIterator",
             "TestSexprBVSourceInlineBufferAndTemporaryLifetime"
           ]
+        },
+        {
+          "name": "concrete AST manager-bound owning ref/ref-vector specialization, callback order, copy/move/assignment and physical borrows",
+          "status": "partial",
+          "go_target": "ast_ref_vector.go",
+          "tests": [
+            "TestASTRefVectorBorrowedInputDefaultEraseAndMove",
+            "TestASTRefVectorElementBorrowRetainsAndInvalidatesOnGrowth",
+            "TestASTRefVectorSourceRetainedNullShrink",
+            "TestASTRefVectorSourceRetainedPointerAndBorrow",
+            "TestASTRefVectorNeverInitializedPhysicalSlot",
+            "TestASTRefVectorInitializedGrowthFailurePrefix",
+            "TestASTRefVectorRetainedFreedHandleBoundary",
+            "TestASTRefVectorRealOwnershipNullReserveAndSelfSet",
+            "TestASTRefVectorFailedPushRetainsSourceIncrement",
+            "TestASTRefVectorCopyAppendResizeAndTransfer",
+            "TestASTRefVectorSetIndexGuardAfterSourceIncrement"
+          ]
         }
       ],
       "ownership": [
-        "Scalar references/views and charged cold vector headers/backing; source reference action order and ownership transfer mapped for sexpr. See SEXPR_PORT_STATUS.md."
+        "Scalar references/views and charged cold vector headers/backing; source reference action order and ownership transfer mapped for sexpr. See SEXPR_PORT_STATUS.md.",
+        "Actual AST callbacks, source INC-before-growth/set-index ordering, ASC teardown, backing-bound views and charged initialized high-water metadata are recorded in AST_CORE_PACKET.md. No fake rollback consumes orphan INC prefixes; source manager teardown remains responsible for actual unowned nodes."
       ],
       "deviations": [
-        "This concrete specialization does not implement all AST/other source specializations or remaining generic helper/hash surfaces. Ref-vector null callbacks and nonempty self-append have explicit checked Go adaptations."
+        "This concrete specialization does not implement all AST/other source specializations or remaining generic helper/hash surfaces. Ref-vector null callbacks and nonempty self-append have explicit checked Go adaptations.",
+        "Go scalar tokens replace addresses and encode copied/stale-owner/lifetime guards. Source initialized retained pointer slots remain readable in release and by physical borrows; never-initialized/OOB access is guarded. Other template specializations and pointer-hash/eq helpers remain open."
       ]
     },
     {
@@ -106176,23 +106700,39 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "ast_ref.go",
+        "ast_ref_vector.go",
+        "ast_ref_vector_access.go",
+        "ast_ref_vector_borrow.go",
+        "ast_ref_vector_ops.go",
         "util_sexpr.go"
       ],
       "tests": [
-        "TestSexprKindsFactoriesAndDefinedDisplay",
-        "TestSexprBVSourceWidthQuirks",
-        "TestSexprRCWrapAndDeletionLIFO",
-        "TestSexprConcreteRefAndVectorActions",
-        "TestSexprPointerFreeAndBoundedDAG",
-        "TestSexprStringBytesAndWrapperRemainingBranches",
-        "TestSexprFailurePrefixesImmediateOwnership",
-        "TestSexprWarmPlateauAndGenerationGuards",
-        "TestSexprFactoryRecordBeforeValueCopy",
-        "TestSexprFinalizationEpochAndZeroWidthBuffer",
-        "TestSexprConstructorAndWholePhysicalGraph",
-        "TestSexprRegisteredEscapedDefaultPrintInputs",
+        "TestASTRefVectorBorrowedInputDefaultEraseAndMove",
+        "TestASTRefVectorCopyAppendResizeAndTransfer",
+        "TestASTRefVectorElementBorrowRetainsAndInvalidatesOnGrowth",
+        "TestASTRefVectorFailedPushRetainsSourceIncrement",
+        "TestASTRefVectorInitializedGrowthFailurePrefix",
+        "TestASTRefVectorNeverInitializedPhysicalSlot",
+        "TestASTRefVectorRealOwnershipNullReserveAndSelfSet",
+        "TestASTRefVectorRetainedFreedHandleBoundary",
+        "TestASTRefVectorSetIndexGuardAfterSourceIncrement",
+        "TestASTRefVectorSourceRetainedNullShrink",
+        "TestASTRefVectorSourceRetainedPointerAndBorrow",
         "TestSexprAccessorsAndScalarIterator",
-        "TestSexprBVSourceInlineBufferAndTemporaryLifetime"
+        "TestSexprBVSourceInlineBufferAndTemporaryLifetime",
+        "TestSexprBVSourceWidthQuirks",
+        "TestSexprConcreteRefAndVectorActions",
+        "TestSexprConstructorAndWholePhysicalGraph",
+        "TestSexprFactoryRecordBeforeValueCopy",
+        "TestSexprFailurePrefixesImmediateOwnership",
+        "TestSexprFinalizationEpochAndZeroWidthBuffer",
+        "TestSexprKindsFactoriesAndDefinedDisplay",
+        "TestSexprPointerFreeAndBoundedDAG",
+        "TestSexprRCWrapAndDeletionLIFO",
+        "TestSexprRegisteredEscapedDefaultPrintInputs",
+        "TestSexprStringBytesAndWrapperRemainingBranches",
+        "TestSexprWarmPlateauAndGenerationGuards"
       ],
       "conditionals": [
         {
@@ -106249,13 +106789,33 @@
             "TestSexprAccessorsAndScalarIterator",
             "TestSexprBVSourceInlineBufferAndTemporaryLifetime"
           ]
+        },
+        {
+          "name": "concrete AST manager-bound owning ref/ref-vector specialization, callback order, copy/move/assignment and physical borrows",
+          "status": "partial",
+          "go_target": "ast_ref_vector.go",
+          "tests": [
+            "TestASTRefVectorBorrowedInputDefaultEraseAndMove",
+            "TestASTRefVectorElementBorrowRetainsAndInvalidatesOnGrowth",
+            "TestASTRefVectorSourceRetainedNullShrink",
+            "TestASTRefVectorSourceRetainedPointerAndBorrow",
+            "TestASTRefVectorNeverInitializedPhysicalSlot",
+            "TestASTRefVectorInitializedGrowthFailurePrefix",
+            "TestASTRefVectorRetainedFreedHandleBoundary",
+            "TestASTRefVectorRealOwnershipNullReserveAndSelfSet",
+            "TestASTRefVectorFailedPushRetainsSourceIncrement",
+            "TestASTRefVectorCopyAppendResizeAndTransfer",
+            "TestASTRefVectorSetIndexGuardAfterSourceIncrement"
+          ]
         }
       ],
       "ownership": [
-        "Scalar references/views and charged cold vector headers/backing; source reference action order and ownership transfer mapped for sexpr. See SEXPR_PORT_STATUS.md."
+        "Scalar references/views and charged cold vector headers/backing; source reference action order and ownership transfer mapped for sexpr. See SEXPR_PORT_STATUS.md.",
+        "Actual AST callbacks, source INC-before-growth/set-index ordering, ASC teardown, backing-bound views and charged initialized high-water metadata are recorded in AST_CORE_PACKET.md. No fake rollback consumes orphan INC prefixes; source manager teardown remains responsible for actual unowned nodes."
       ],
       "deviations": [
-        "This concrete specialization does not implement all AST/other source specializations or remaining generic helper/hash surfaces. Ref-vector null callbacks and nonempty self-append have explicit checked Go adaptations."
+        "This concrete specialization does not implement all AST/other source specializations or remaining generic helper/hash surfaces. Ref-vector null callbacks and nonempty self-append have explicit checked Go adaptations.",
+        "Go scalar tokens replace addresses and encode copied/stale-owner/lifetime guards. Source initialized retained pointer slots remain readable in release and by physical borrows; never-initialized/OOB access is guarded. Other template specializations and pointer-hash/eq helpers remain open."
       ]
     },
     {
