@@ -72,7 +72,7 @@ func (m *UPolynomialManager) PushCoefficient(p UPolynomial, n *Int) error {
 	if s.size > s.initialized {
 		s.initialized = s.size
 	}
-	b := &m.store.backings[s.backing-1]
+	b := &m.stateStore(s).backings[s.backing-1]
 	if s.size > b.initialized {
 		b.initialized = s.size
 	}

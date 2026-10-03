@@ -54,7 +54,7 @@ func (m *UPolynomialManager) extendedGCD(a, b UPolynomialView, u, v, d *upolyVec
 	if e = m.setView(d, a); e != nil {
 		return e
 	}
-	if e = m.monicLocal(UPolynomialView{m.store.origin, d.backing, d.generation, 0, a.count}); e != nil {
+	if e = m.monicLocal(m.stateView(d).WithCount(a.count)); e != nil {
 		return e
 	}
 	if e = m.reset(&v1); e != nil {

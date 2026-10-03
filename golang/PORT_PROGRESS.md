@@ -1535,3 +1535,23 @@ evidence. Independent parent checks passed full native/debug suites, exact57
 lower-memory race/actual-JS RUN/PASS groups, vet, WASI build/test compilation
 and integrated source/evidence/no-generics audit on the committed prime base.
 Concurrent incomplete drafts were excluded; numerical integration stays open.
+
+
+## Independent polynomial coefficient-store adoption
+
+Independent stores borrowing the same actual IntegerManager now transfer real
+scalar buffer states without coefficient copies or modulus switching. Charged
+cold bindings retain imported stores, preserve captured physical views through
+transfer and original-core close, and unwind related constructor refusals.
+Three new root-package tests inspect immediate retained-reference and budget
+prefixes before disabling faults. See UPOLYNOMIAL_STORE_ADOPTION_PORT_STATUS.md.
+
+The existing three upolynomial units remain partial. These are independent
+ownership fixtures, not new registered source assertions. Cross-IntegerManager
+storage requires the actual shared MPZ backend; full factorization and
+multivariate/algebraic integration remain required. Ledger counts are unchanged.
+
+Fresh integration gates on HEAD353952e passed full native/debug suites, exact89
+race and actual-JS RUN/PASS groups, vet, WASI build and root/mpnum test
+compilation, and the source/evidence/no-generics audit. Independent parent
+checks confirm matching immutable Go hashes and exact named execution sets.

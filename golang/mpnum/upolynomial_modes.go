@@ -64,18 +64,13 @@ func (m *UPolynomialManager) Stats() UPolynomialStats {
 		return UPolynomialStats{}
 	}
 	s := UPolynomialStats{OwnerBytes: m.header, LivePolynomials: m.live, ModularBytes: m.modular.OwnerBytes()}
-	s.DirectoryBytes = uint64(cap(m.pages))*uint64(reflect.TypeOf((*upolyDescriptorPage)(nil)).Size()) + uint64(cap(m.store.backings))*uint64(reflect.TypeOf(upolyBacking{}).Size())
+	s.DirectoryBytes = uint64(cap(m.pages))*uint64(reflect.TypeOf((*upolyDescriptorPage)(nil)).Size()) + uint64(cap(m.bindings))*uint64(reflect.TypeOf(upolyStoreBinding{}).Size())
 	s.PageBytes = uint64(len(m.pages)) * uint64(reflect.TypeOf(upolyDescriptorPage{}).Size())
-	for i := range m.store.backings {
-		b := &m.store.backings[i]
-		if b.live {
-			s.LiveBackings++
-			s.BackingBytes += uint64(cap(b.values)) * uint64(reflect.TypeOf(Int{}).Size())
-		}
+	m.addStoreStats(&s, m.store)
+	for _, binding := range m.bindings {
+		m.addStoreStats(&s, binding.store)
 	}
-	s.StoreOwnerBytes = m.store.header
 	s.TotalBytes = s.OwnerBytes + s.StoreOwnerBytes + s.DirectoryBytes + s.PageBytes + s.BackingBytes + s.ModularBytes
-	s.SharedStoreBytes = m.store.header + uint64(cap(m.store.backings))*uint64(reflect.TypeOf(upolyBacking{}).Size()) + s.BackingBytes
 	s.ExclusiveBytes = s.TotalBytes - s.SharedStoreBytes
 	z := m.config.Integer
 	s.IntegerLiveCells = z.cells.Stats().Live
@@ -152,4 +147,21 @@ func (m *UPolynomialManager) Modulus(out *Int) error {
 		return e
 	}
 	return m.modular.Modulus(out)
+}
+
+func (m *UPolynomialManager) addStoreStats(s *UPolynomialStats, store *UPolynomialCoefficientStore) {
+	dir := uint64(cap(store.backings)) * uint64(reflect.TypeOf(upolyBacking{}).Size())
+	s.StoreOwnerBytes += store.header
+	s.DirectoryBytes += dir
+	s.SharedStoreBytes += store.header + dir
+	for i := range store.backings {
+		b := &store.backings[i]
+		if !b.live {
+			continue
+		}
+		s.LiveBackings++
+		bytes := uint64(cap(b.values)) * uint64(reflect.TypeOf(Int{}).Size())
+		s.BackingBytes += bytes
+		s.SharedStoreBytes += bytes
+	}
 }

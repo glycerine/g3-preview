@@ -24,7 +24,10 @@ type UPolynomialView struct {
 
 // Every hot coefficient is the actual named Int record. Variable backing
 // slices stay exclusively in the charged cold physical-storage directory.
-type upolyVectorState struct{ backing, generation, size, capacity, initialized uint32 }
+type upolyVectorState struct {
+	origin                                           uint64
+	backing, generation, size, capacity, initialized uint32
+}
 type upolyDescriptor struct {
 	state      upolyVectorState
 	generation uint32
@@ -88,7 +91,7 @@ func (m *UPolynomialManager) values(s *upolyVectorState) []Int {
 	if s.backing == 0 {
 		return nil
 	}
-	return m.store.backings[s.backing-1].values
+	return m.stateStore(s).backings[s.backing-1].values
 }
 func (m *UPolynomialManager) backingSlot() (uint32, error) {
 	for i := range m.store.backings {
@@ -135,9 +138,11 @@ func (m *UPolynomialManager) grow(s *upolyVectorState) error {
 	// Source nontrivial growth publishes the new data binding before the
 	// ascending move loop; capacity publishes only after old storage deletion.
 	oldSlot, oldCap := s.backing, s.capacity
+	oldStore := m.stateStore(s)
 	b := &m.store.backings[slot-1]
 	b.values = a
 	b.live = true
+	s.origin = m.store.origin
 	s.backing = slot
 	s.generation = b.generation
 	for i := uint32(0); i < s.size; i++ {
@@ -147,7 +152,7 @@ func (m *UPolynomialManager) grow(s *upolyVectorState) error {
 	s.initialized = s.size
 	b.initialized = s.size
 	if oldSlot != 0 {
-		oldB := &m.store.backings[oldSlot-1]
+		oldB := &oldStore.backings[oldSlot-1]
 		oldB.values = nil
 		oldB.live = false
 		if oldB.generation != math.MaxUint32 {
@@ -172,8 +177,8 @@ func (m *UPolynomialManager) reserve(s *upolyVectorState, n uint32) error {
 	a := m.values(s)
 	for i := old; i < n; i++ {
 		a[i] = Int{}
-		if i+1 > m.store.backings[s.backing-1].initialized {
-			m.store.backings[s.backing-1].initialized = i + 1
+		if i+1 > m.stateStore(s).backings[s.backing-1].initialized {
+			m.stateStore(s).backings[s.backing-1].initialized = i + 1
 		}
 	}
 	if n > s.initialized {
@@ -183,7 +188,7 @@ func (m *UPolynomialManager) reserve(s *upolyVectorState, n uint32) error {
 }
 func (m *UPolynomialManager) freeBacking(s *upolyVectorState) {
 	if s.backing != 0 {
-		b := &m.store.backings[s.backing-1]
+		b := &m.stateStore(s).backings[s.backing-1]
 		b.values = nil
 		b.live = false
 		if b.generation != math.MaxUint32 {
@@ -325,7 +330,7 @@ func (m *UPolynomialManager) View(p UPolynomial, start, count uint32) (UPolynomi
 	if uint64(start)+uint64(count) > uint64(s.size) {
 		return UPolynomialView{}, arena.ErrBounds
 	}
-	return UPolynomialView{m.store.origin, s.backing, s.generation, start, count}, nil
+	return UPolynomialView{m.stateOrigin(s), s.backing, s.generation, start, count}, nil
 }
 func (m *UPolynomialManager) ReadView(v UPolynomialView, index uint32, out *Int) error {
 	a, e := m.read(v, index)
@@ -387,19 +392,20 @@ func (m *UPolynomialManager) SetView(p UPolynomial, v UPolynomialView) error {
 	return m.setView(&d.state, v)
 }
 func (m *UPolynomialManager) alias(v UPolynomialView, s *upolyVectorState) bool {
-	return s.backing != 0 && v.backing == s.backing && v.generation == s.generation && v.start == 0 && v.origin == m.store.origin
+	return s.backing != 0 && v.backing == s.backing && v.generation == s.generation && v.start == 0 && v.origin == m.stateOrigin(s)
 }
 func (m *UPolynomialManager) stateView(s *upolyVectorState) UPolynomialView {
-	return UPolynomialView{m.store.origin, s.backing, s.generation, 0, s.size}
+	return UPolynomialView{m.stateOrigin(s), s.backing, s.generation, 0, s.size}
 }
 func (m *UPolynomialManager) read(v UPolynomialView, index uint32) (*Int, error) {
 	if e := m.check(); e != nil {
 		return nil, e
 	}
-	if v.origin != m.store.origin || v.backing == 0 || uint64(v.backing) > uint64(len(m.store.backings)) {
+	store := m.boundStore(v.origin)
+	if store == nil || v.backing == 0 || uint64(v.backing) > uint64(len(store.backings)) {
 		return nil, ErrUPolynomialOwner
 	}
-	b := &m.store.backings[v.backing-1]
+	b := &store.backings[v.backing-1]
 	if !b.live || b.generation != v.generation {
 		return nil, ErrUPolynomialOwner
 	}

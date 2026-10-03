@@ -36,6 +36,7 @@ type UPolynomialManager struct {
 	db, dbab1, dbab2, tr, push                   upolyVectorState
 	pages                                        []*upolyDescriptorPage
 	store                                        *UPolynomialCoefficientStore
+	bindings                                     []upolyStoreBinding
 	live                                         uint32
 	liveSequences                                uint32
 	header                                       uint64
@@ -223,6 +224,11 @@ func (m *UPolynomialManager) Close() error {
 	b.Release(uint64(len(m.pages)) * uint64(reflect.TypeOf(upolyDescriptorPage{}).Size()))
 	b.Release(uint64(cap(m.pages)) * uint64(reflect.TypeOf((*upolyDescriptorPage)(nil)).Size()))
 	m.store.release()
+	for _, binding := range m.bindings {
+		binding.store.release()
+	}
+	b.Release(uint64(cap(m.bindings)) * uint64(reflect.TypeOf(upolyStoreBinding{}).Size()))
+	m.bindings = nil
 	b.Release(m.header)
 	m.pages = nil
 

@@ -67,7 +67,17 @@ func NewRelatedUPolynomialManager(parent *UPolynomialManager) (*UPolynomialManag
 	if e := parent.check(); e != nil {
 		return nil, e
 	}
-	return newUPolynomialManager(parent.config, parent.store)
+	child, e := newUPolynomialManager(parent.config, parent.store)
+	if e != nil {
+		return nil, e
+	}
+	for _, binding := range parent.bindings {
+		if e = child.BorrowCoefficientStore(binding.store); e != nil {
+			child.Close()
+			return nil, e
+		}
+	}
+	return child, nil
 }
 func (m *UPolynomialManager) CoefficientStore() (*UPolynomialCoefficientStore, error) {
 	if e := m.check(); e != nil {
