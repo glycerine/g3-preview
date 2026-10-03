@@ -97672,23 +97672,156 @@
       "sha256": "ff915049376e685f07058e89548c82dd10732a9596eb30abad2a412e52dc4607",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "util_rlimit.go"
+      ],
+      "tests": [
+        "TestResourceLimitSourceScopes",
+        "TestResourceLimitSourceCancellation",
+        "TestResourceLimitSourceRAII",
+        "TestResourceLimitIndependentStackOracle",
+        "TestResourceLimitBudgetsAndWarmScopes",
+        "TestResourceLimitConcurrentCancel",
+        "TestResourceLimitSuspensionAndLateChild",
+        "TestResourceLimitGrowthFailureAndPeak"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "constructor/destruction",
+          "status": "ported",
+          "go_target": "util_rlimit.go",
+          "tests": [
+            "TestResourceLimitSourceScopes",
+            "TestResourceLimitSourceCancellation",
+            "TestResourceLimitSourceRAII",
+            "TestResourceLimitIndependentStackOracle",
+            "TestResourceLimitBudgetsAndWarmScopes",
+            "TestResourceLimitConcurrentCancel",
+            "TestResourceLimitSuspensionAndLateChild",
+            "TestResourceLimitGrowthFailureAndPeak"
+          ]
+        },
+        {
+          "name": "inc()/inc(unsigned)/count",
+          "status": "ported",
+          "go_target": "util_rlimit.go",
+          "tests": [
+            "TestResourceLimitSourceScopes",
+            "TestResourceLimitSourceCancellation",
+            "TestResourceLimitSourceRAII",
+            "TestResourceLimitIndependentStackOracle",
+            "TestResourceLimitBudgetsAndWarmScopes",
+            "TestResourceLimitConcurrentCancel",
+            "TestResourceLimitSuspensionAndLateChild",
+            "TestResourceLimitGrowthFailureAndPeak"
+          ]
+        },
+        {
+          "name": "push/pop",
+          "status": "ported",
+          "go_target": "util_rlimit.go",
+          "tests": [
+            "TestResourceLimitSourceScopes",
+            "TestResourceLimitSourceCancellation",
+            "TestResourceLimitSourceRAII",
+            "TestResourceLimitIndependentStackOracle",
+            "TestResourceLimitBudgetsAndWarmScopes",
+            "TestResourceLimitConcurrentCancel",
+            "TestResourceLimitSuspensionAndLateChild",
+            "TestResourceLimitGrowthFailureAndPeak"
+          ]
+        },
+        {
+          "name": "push_child/pop_child",
+          "status": "ported",
+          "go_target": "util_rlimit.go",
+          "tests": [
+            "TestResourceLimitSourceScopes",
+            "TestResourceLimitSourceCancellation",
+            "TestResourceLimitSourceRAII",
+            "TestResourceLimitIndependentStackOracle",
+            "TestResourceLimitBudgetsAndWarmScopes",
+            "TestResourceLimitConcurrentCancel",
+            "TestResourceLimitSuspensionAndLateChild",
+            "TestResourceLimitGrowthFailureAndPeak"
+          ]
+        },
+        {
+          "name": "get_cancel_flag/get_cancel_msg",
+          "status": "ported",
+          "go_target": "util_rlimit.go",
+          "tests": [
+            "TestResourceLimitSourceScopes",
+            "TestResourceLimitSourceCancellation",
+            "TestResourceLimitSourceRAII",
+            "TestResourceLimitIndependentStackOracle",
+            "TestResourceLimitBudgetsAndWarmScopes",
+            "TestResourceLimitConcurrentCancel",
+            "TestResourceLimitSuspensionAndLateChild",
+            "TestResourceLimitGrowthFailureAndPeak"
+          ]
+        },
+        {
+          "name": "cancel/reset_cancel/inc_cancel/dec_cancel/set_cancel",
+          "status": "ported",
+          "go_target": "util_rlimit.go",
+          "tests": [
+            "TestResourceLimitSourceScopes",
+            "TestResourceLimitSourceCancellation",
+            "TestResourceLimitSourceRAII",
+            "TestResourceLimitIndependentStackOracle",
+            "TestResourceLimitBudgetsAndWarmScopes",
+            "TestResourceLimitConcurrentCancel",
+            "TestResourceLimitSuspensionAndLateChild",
+            "TestResourceLimitGrowthFailureAndPeak"
+          ]
+        },
+        {
+          "name": "scoped_rlimit/scoped_suspend_rlimit/scoped_limits",
+          "status": "ported",
+          "go_target": "util_rlimit.go",
+          "tests": [
+            "TestResourceLimitSourceScopes",
+            "TestResourceLimitSourceCancellation",
+            "TestResourceLimitSourceRAII",
+            "TestResourceLimitIndependentStackOracle",
+            "TestResourceLimitBudgetsAndWarmScopes",
+            "TestResourceLimitConcurrentCancel",
+            "TestResourceLimitSuspensionAndLateChild",
+            "TestResourceLimitGrowthFailureAndPeak"
+          ]
+        }
+      ],
+      "ownership": [
+        "Cold owner service; header and vectors budgeted. Count/scope/suspension owner confined; cancellation/child registration globally synchronized. Children borrowed acyclic and outlive registration. Explicit deferred scope closes replace RAII. See RLIMIT_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Atomic cancellation replaces volatile state; cold process-wide mutex replaces OpenMP critical section.",
+        "Predictable budget failures precede state publication. Popped child slots cleared for GC. Explicit close idempotent; invalid caller states diagnosed."
+      ]
     },
     {
       "path": "src/util/rlimit.h",
       "sha256": "07401da5544e9fa4f3faaff75d01c7e69ec03bb926d924e9a8d9cc8ad5b3d29c",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "util_rlimit.go"
+      ],
+      "tests": [
+        "TestResourceLimitSourceScopes",
+        "TestResourceLimitSourceCancellation",
+        "TestResourceLimitSourceRAII",
+        "TestResourceLimitIndependentStackOracle",
+        "TestResourceLimitBudgetsAndWarmScopes",
+        "TestResourceLimitConcurrentCancel",
+        "TestResourceLimitSuspensionAndLateChild",
+        "TestResourceLimitGrowthFailureAndPeak"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -97699,11 +97832,122 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "constructor/destruction",
+          "status": "ported",
+          "go_target": "util_rlimit.go",
+          "tests": [
+            "TestResourceLimitSourceScopes",
+            "TestResourceLimitSourceCancellation",
+            "TestResourceLimitSourceRAII",
+            "TestResourceLimitIndependentStackOracle",
+            "TestResourceLimitBudgetsAndWarmScopes",
+            "TestResourceLimitConcurrentCancel",
+            "TestResourceLimitSuspensionAndLateChild",
+            "TestResourceLimitGrowthFailureAndPeak"
+          ]
+        },
+        {
+          "name": "inc()/inc(unsigned)/count",
+          "status": "ported",
+          "go_target": "util_rlimit.go",
+          "tests": [
+            "TestResourceLimitSourceScopes",
+            "TestResourceLimitSourceCancellation",
+            "TestResourceLimitSourceRAII",
+            "TestResourceLimitIndependentStackOracle",
+            "TestResourceLimitBudgetsAndWarmScopes",
+            "TestResourceLimitConcurrentCancel",
+            "TestResourceLimitSuspensionAndLateChild",
+            "TestResourceLimitGrowthFailureAndPeak"
+          ]
+        },
+        {
+          "name": "push/pop",
+          "status": "ported",
+          "go_target": "util_rlimit.go",
+          "tests": [
+            "TestResourceLimitSourceScopes",
+            "TestResourceLimitSourceCancellation",
+            "TestResourceLimitSourceRAII",
+            "TestResourceLimitIndependentStackOracle",
+            "TestResourceLimitBudgetsAndWarmScopes",
+            "TestResourceLimitConcurrentCancel",
+            "TestResourceLimitSuspensionAndLateChild",
+            "TestResourceLimitGrowthFailureAndPeak"
+          ]
+        },
+        {
+          "name": "push_child/pop_child",
+          "status": "ported",
+          "go_target": "util_rlimit.go",
+          "tests": [
+            "TestResourceLimitSourceScopes",
+            "TestResourceLimitSourceCancellation",
+            "TestResourceLimitSourceRAII",
+            "TestResourceLimitIndependentStackOracle",
+            "TestResourceLimitBudgetsAndWarmScopes",
+            "TestResourceLimitConcurrentCancel",
+            "TestResourceLimitSuspensionAndLateChild",
+            "TestResourceLimitGrowthFailureAndPeak"
+          ]
+        },
+        {
+          "name": "get_cancel_flag/get_cancel_msg",
+          "status": "ported",
+          "go_target": "util_rlimit.go",
+          "tests": [
+            "TestResourceLimitSourceScopes",
+            "TestResourceLimitSourceCancellation",
+            "TestResourceLimitSourceRAII",
+            "TestResourceLimitIndependentStackOracle",
+            "TestResourceLimitBudgetsAndWarmScopes",
+            "TestResourceLimitConcurrentCancel",
+            "TestResourceLimitSuspensionAndLateChild",
+            "TestResourceLimitGrowthFailureAndPeak"
+          ]
+        },
+        {
+          "name": "cancel/reset_cancel/inc_cancel/dec_cancel/set_cancel",
+          "status": "ported",
+          "go_target": "util_rlimit.go",
+          "tests": [
+            "TestResourceLimitSourceScopes",
+            "TestResourceLimitSourceCancellation",
+            "TestResourceLimitSourceRAII",
+            "TestResourceLimitIndependentStackOracle",
+            "TestResourceLimitBudgetsAndWarmScopes",
+            "TestResourceLimitConcurrentCancel",
+            "TestResourceLimitSuspensionAndLateChild",
+            "TestResourceLimitGrowthFailureAndPeak"
+          ]
+        },
+        {
+          "name": "scoped_rlimit/scoped_suspend_rlimit/scoped_limits",
+          "status": "ported",
+          "go_target": "util_rlimit.go",
+          "tests": [
+            "TestResourceLimitSourceScopes",
+            "TestResourceLimitSourceCancellation",
+            "TestResourceLimitSourceRAII",
+            "TestResourceLimitIndependentStackOracle",
+            "TestResourceLimitBudgetsAndWarmScopes",
+            "TestResourceLimitConcurrentCancel",
+            "TestResourceLimitSuspensionAndLateChild",
+            "TestResourceLimitGrowthFailureAndPeak"
+          ]
+        }
+      ],
+      "ownership": [
+        "Cold owner service; header and vectors budgeted. Count/scope/suspension owner confined; cancellation/child registration globally synchronized. Children borrowed acyclic and outlive registration. Explicit deferred scope closes replace RAII. See RLIMIT_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Atomic cancellation replaces volatile state; cold process-wide mutex replaces OpenMP critical section.",
+        "Predictable budget failures precede state publication. Popped child slots cleared for GC. Explicit close idempotent; invalid caller states diagnosed."
+      ]
     },
     {
       "path": "src/util/s_integer.cpp",

@@ -123,3 +123,14 @@ manifest/no-generics audit passes with 2 ported, 24 partial and 2,076 unported u
 Real rational allocator instances, unconstructed pools, full numeric methods,
 formatting/header budgets and UintSet-key map integration remain open. Compilation
 is still the only WASI evidence; no full foundation or solver gate is complete.
+
+## Resource-limit service
+
+Source reslimit and its three scope wrappers now have concrete Go counterparts,
+including source nesting/cancellation quirks. Header/vector budgets, growth
+failure invariance, scope cleanup and asynchronous cancellation are tested.
+Full release/checked tests, checked race, vet, actual js/wasm tests and WASI
+compilation pass at integration. The source/no-generics audit records 4 ported,
+24 partial and 2,074 unported units; this still leaves the full solver open.
+A Go-only archive of commit 5d01444 also passes its full hermetic test suite
+without reference C++ sources. All extraction/cache/temp paths stay in golang.
