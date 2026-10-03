@@ -1593,3 +1593,36 @@ vet. Source/evidence/no-generics integration audit passed on the same frozen
 Go files after metadata overlay; ledger counts are unchanged. WASM, WASI and
 race gates are deferred per the user's current single-goroutine workflow.
 Allocator-backed physical ownership and the complete solver remain open.
+
+
+## Current scalar projection audit
+
+Read-only comparison of mpq.h776/778 and mpq.cpp297–305 with current Go
+getters found two remaining diagnostic-profile debts. Rational integer getters
+reject finite fractions universally, while source release forwards the raw
+numerator to the inherited integer getter. Float64 rejects a finite negative
+converted denominator universally, while source release performs the division.
+Their method entries now remain partial; unit statuses and counts are unchanged.
+Predicates themselves remain unchanged. MPQ_ROUNDING_PUBLICATION_PACKET.md
+records the source boundaries, including the required inherited accessor/cast
+audit. This correction makes no new implementation or test-coverage claim.
+
+
+## Source rounding caller publication
+
+Floor/Ceil integer outputs now invoke the existing source arithmetic directly
+against the caller; rational overloads reset the denominator after that succeeds.
+PrevPowerOfTwo retains its actual source integer local. Tests first exposed BIG
+Copy and quotient-before-correction failure prefixes; three new groups cover
+those real refusals and 1,080 raw-shape/alias combinations. One obsolete failure
+rollback expectation changed only after observed RED and source review. All
+registered PrevPower and facade assertion counts remain unchanged.
+
+The frozen three Go files pass full native/debug suites and vet on 5b414f9 plus
+their exact overlay. Source unit statuses remain partial; allocator-backed owner
+cleanup, pair setters, parser publication and scalar getter profiles remain open.
+
+Parent source/evidence/no-generics integration passed after metadata overlay
+on committed Berlekamp correction 28947aa and the frozen three Go files.
+Focused composition checks cover both rounding and factorization/Hensel in
+native/debug builds. Counts remain33ported/148partial/1921unported.

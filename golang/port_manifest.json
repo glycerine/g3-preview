@@ -85397,7 +85397,9 @@
         "mpnum/mpz_facade_extra_test.go",
         "mpnum/mp_power_publication_test.go",
         "mpnum/mp_div_publication_test.go",
-        "mpnum/mp_add_publication_test.go"
+        "mpnum/mp_add_publication_test.go",
+        "mpnum/mp_round_publication_test.go",
+        "mpnum/mpq_round_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -85480,7 +85482,10 @@
         "TestAdditivePublicationRawDenominatorsAndIdentity",
         "TestAdditivePublicationServiceValueAndRationalOneRoutes",
         "TestAdditivePublicationSynchronizedTemporaryDeleteOrder",
-        "TestAdditivePublicationWarmPlateau"
+        "TestAdditivePublicationWarmPlateau",
+        "TestRoundPublicationIntegralCopyRefusal",
+        "TestRoundPublicationQuotientBeforeCeilCorrectionRefusal",
+        "TestRoundPublicationRawShapesAndAllComponentAliases"
       ],
       "conditionals": [
         {
@@ -85648,6 +85653,18 @@
             "TestAdditivePublicationSynchronizedTemporaryDeleteOrder",
             "TestAdditivePublicationWarmPlateau"
           ]
+        },
+        {
+          "name": "Selected Floor/Ceil direct caller Copy or MachineDiv, sign correction and final rational denominator reset; PrevPowerOfTwo source local retained",
+          "status": "partial",
+          "go_target": "mpnum/mpq_round.go",
+          "tests": [
+            "TestRoundPublicationIntegralCopyRefusal",
+            "TestRoundPublicationQuotientBeforeCeilCorrectionRefusal",
+            "TestRoundPublicationRawShapesAndAllComponentAliases",
+            "TestRationalRoundFailureCleanup",
+            "TestRationalSourcePrevPowerOfTwo"
+          ]
         }
       ],
       "ownership": [
@@ -85659,7 +85676,8 @@
         "tst1 retains original numerical setup, lexical manager scope and explicit Del; 18 comparison assertions across MPZ/MPQ. Additional printed fixtures and independent tests are not source assertions. See MPZ_FACADE_EXTRA_PORT_STATUS.md.",
         "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See MPZ_POWER_PUBLICATION_PACKET.md; source allocator/backend integration remains required.",
         "Division writes actual caller numerator/denominator in source order, preserving divisor/output aliases and explicit local-tmp Del before normalization. Finite denominator-zero results remain owned; cleanup-only validation permits destruction/reset while ordinary reads remain guarded. See MPQ_DIVISION_PUBLICATION_PACKET.md.",
-        "Actual caller fields publish in source Add/Sub/AddInt/MulInt/MulInts order; general SYNCH Add/Sub explicitly delete tmp1 before tmp2. Existing fused helpers use public Mul then Add/Sub and the source unit shortcuts. Failure tests inspect named caller/temporary roots before disabling faults; physical allocator integration remains open. See MPQ_ADDITIVE_PUBLICATION_PACKET.md."
+        "Actual caller fields publish in source Add/Sub/AddInt/MulInt/MulInts order; general SYNCH Add/Sub explicitly delete tmp1 before tmp2. Existing fused helpers use public Mul then Add/Sub and the source unit shortcuts. Failure tests inspect named caller/temporary roots before disabling faults; physical allocator integration remains open. See MPQ_ADDITIVE_PUBLICATION_PACKET.md.",
+        "All four rounding outputs use existing roundCore directly against the caller; source sign is captured before division and rational denominator resets only after successful integer rounding. Immediate fault roots, integral BIG Copy refusal, quotient-before-correction refusal and raw component aliases are tested. See MPQ_ROUNDING_PUBLICATION_PACKET.md; physical allocator-backed cleanup remains separate unfinished work."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -106512,7 +106530,9 @@
         "mpnum/mp_display.go",
         "mpnum/mpq_number_theory.go",
         "mpnum/mpq_inspect.go",
-        "mpnum/mp_power_publication_test.go"
+        "mpnum/mp_power_publication_test.go",
+        "mpnum/mp_round_publication_test.go",
+        "mpnum/mpq_round_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -106612,7 +106632,10 @@
         "TestPowerPublicationLeftShiftCopyPrecedesPromotionRefusal",
         "TestPowerPublicationRightShiftCopyRefusalPrefix",
         "TestPowerPublicationRationalCopyComponentRefusal",
-        "TestPowerPublicationRationalMulComponentRefusal"
+        "TestPowerPublicationRationalMulComponentRefusal",
+        "TestRoundPublicationIntegralCopyRefusal",
+        "TestRoundPublicationQuotientBeforeCeilCorrectionRefusal",
+        "TestRoundPublicationRawShapesAndAllComponentAliases"
       ],
       "assertions": [
         {
@@ -106974,7 +106997,7 @@
         },
         {
           "name": "get_double numerator/denominator conversions and positive floating denominator assertion",
-          "status": "ported",
+          "status": "partial",
           "go_target": "mpnum/mpq_inspect.go",
           "tests": [
             "TestSourceRationalConversionAssertions",
@@ -107010,6 +107033,18 @@
             "TestPowerPublicationRationalCopyComponentRefusal",
             "TestPowerPublicationRationalMulComponentRefusal"
           ]
+        },
+        {
+          "name": "Selected Floor/Ceil direct caller Copy or MachineDiv, sign correction and final rational denominator reset; PrevPowerOfTwo source local retained",
+          "status": "partial",
+          "go_target": "mpnum/mpq_round.go",
+          "tests": [
+            "TestRoundPublicationIntegralCopyRefusal",
+            "TestRoundPublicationQuotientBeforeCeilCorrectionRefusal",
+            "TestRoundPublicationRawShapesAndAllComponentAliases",
+            "TestRationalRoundFailureCleanup",
+            "TestRationalSourcePrevPowerOfTwo"
+          ]
         }
       ],
       "ownership": [
@@ -107021,7 +107056,8 @@
         "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md.",
         "Number theory locals use existing budgeted numerical cells/Words and are always deleted in source order. ExtendedGCD preserves coefficient publication/failure prefixes and rational denominator reset timing; immediate failed-prefix caller/cache roots audited. See NUMBER_THEORY_PORT_STATUS.md.",
         "Inspection uses existing integer roots; extraction acquires deep independent limbs and thin setters/swap retain source component identity. Failed-prefix tests audit cells/Words and decoded values before rendering/teardown. See RATIONAL_INSPECTION_PORT_STATUS.md.",
-        "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See MPZ_POWER_PUBLICATION_PACKET.md; source allocator/backend integration remains required."
+        "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See MPZ_POWER_PUBLICATION_PACKET.md; source allocator/backend integration remains required.",
+        "All four rounding outputs use existing roundCore directly against the caller; source sign is captured before division and rational denominator resets only after successful integer rounding. Immediate fault roots, integral BIG Copy refusal, quotient-before-correction refusal and raw component aliases are tested. See MPQ_ROUNDING_PUBLICATION_PACKET.md; physical allocator-backed cleanup remains separate unfinished work."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -107032,7 +107068,8 @@
         "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text.",
         "Selected release ExtendedGCD preserves finite aliases and modified-input sign rereads. Source Z3DEBUG diagnostic arithmetic remains unported; g3checked selects reference validation only. ext_gcd.h wrapper algorithm remains separate and is not credited from manager inverse properties.",
         "Explicit manager projects rational.h inclusive32-bit wrappers, distinct from strict MPZ boundaries; global wrapper remains incomplete. Float positive converted denominator SASSERT becomes typed ErrRationalFloatDomain. Source raw component alias publication can leave denominator zero; subsequent operations diagnose initialization.",
-        "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open."
+        "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open.",
+        "Source get_double evaluates numerator then denominator and asserts d>0 only in debug; current Float64 rejects finite negative converted denominators in release too. Read-only source audit MPQ_ROUNDING_PUBLICATION_PACKET.md records this remaining profile debt; no getter implementation change is claimed."
       ]
     },
     {
@@ -107061,7 +107098,9 @@
         "mpnum/mp_add_publication_test.go",
         "mpnum/mp_gcd_publication_test.go",
         "mpnum/mpz_gcd_diagnostics_debug.go",
-        "mpnum/mpz_gcd_diagnostics_release.go"
+        "mpnum/mpz_gcd_diagnostics_release.go",
+        "mpnum/mp_round_publication_test.go",
+        "mpnum/mpq_round_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -107221,7 +107260,10 @@
         "TestGCDPublicationRationalArrayVisitedFraction",
         "TestGCDPublicationSourceFull168PrimeCampaign",
         "TestGCDPublicationPrimeTableAndPredicateBoundary",
-        "TestGCDPublicationFullFamilySignedAliases"
+        "TestGCDPublicationFullFamilySignedAliases",
+        "TestRoundPublicationIntegralCopyRefusal",
+        "TestRoundPublicationQuotientBeforeCeilCorrectionRefusal",
+        "TestRoundPublicationRawShapesAndAllComponentAliases"
       ],
       "conditionals": [
         {
@@ -107917,7 +107959,7 @@
         },
         {
           "name": "is/get uint64/int64 rational assertions",
-          "status": "ported",
+          "status": "partial",
           "go_target": "mpnum/mpq_inspect.go",
           "tests": [
             "TestSourceRationalConversionAssertions",
@@ -108089,6 +108131,18 @@
             "TestGCDPublicationPrimeTableAndPredicateBoundary",
             "TestGCDPublicationFullFamilySignedAliases"
           ]
+        },
+        {
+          "name": "Selected Floor/Ceil direct caller Copy or MachineDiv, sign correction and final rational denominator reset; PrevPowerOfTwo source local retained",
+          "status": "partial",
+          "go_target": "mpnum/mpq_round.go",
+          "tests": [
+            "TestRoundPublicationIntegralCopyRefusal",
+            "TestRoundPublicationQuotientBeforeCeilCorrectionRefusal",
+            "TestRoundPublicationRawShapesAndAllComponentAliases",
+            "TestRationalRoundFailureCleanup",
+            "TestRationalSourcePrevPowerOfTwo"
+          ]
         }
       ],
       "ownership": [
@@ -108106,7 +108160,8 @@
         "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See MPZ_POWER_PUBLICATION_PACKET.md; source allocator/backend integration remains required.",
         "Division writes actual caller numerator/denominator in source order, preserving divisor/output aliases and explicit local-tmp Del before normalization. Finite denominator-zero results remain owned; cleanup-only validation permits destruction/reset while ordinary reads remain guarded. See MPQ_DIVISION_PUBLICATION_PACKET.md.",
         "Actual caller fields publish in source Add/Sub/AddInt/MulInt/MulInts order; general SYNCH Add/Sub explicitly delete tmp1 before tmp2. Existing fused helpers use public Mul then Add/Sub and the source unit shortcuts. Failure tests inspect named caller/temporary roots before disabling faults; physical allocator integration remains open. See MPQ_ADDITIVE_PUBLICATION_PACKET.md.",
-        "Zero GCD copies directly into caller before Abs; minimum-promotion allocation refusal retains the completed inline copy, while failed BIG Copy retains the actual published sign/dead descriptor. Existing general GCD locals and final publication remain source ordered; twelve Lehmer and one intermediate ExtendedGCD diagnostics execute only in g3debug. Named roots audited before fault disabling. See MPZ_GCD_PUBLICATION_PACKET.md."
+        "Zero GCD copies directly into caller before Abs; minimum-promotion allocation refusal retains the completed inline copy, while failed BIG Copy retains the actual published sign/dead descriptor. Existing general GCD locals and final publication remain source ordered; twelve Lehmer and one intermediate ExtendedGCD diagnostics execute only in g3debug. Named roots audited before fault disabling. See MPZ_GCD_PUBLICATION_PACKET.md.",
+        "All four rounding outputs use existing roundCore directly against the caller; source sign is captured before division and rational denominator resets only after successful integer rounding. Immediate fault roots, integral BIG Copy refusal, quotient-before-correction refusal and raw component aliases are tested. See MPQ_ROUNDING_PUBLICATION_PACKET.md; physical allocator-backed cleanup remains separate unfinished work."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -108123,7 +108178,8 @@
         "Unsigned low63-bit mask defines the intended small bitwise_not signed-shift boundary. Negative and rational-integrality source assertions are debug-only. Selected internal32 bitwise methods publish directly in source order; Go error cleanup releases the actual lexical locals. Both-negative big binary loops stop at the first actual inline -1/-1 quotient continuation, after prior source actions; this typed boundary does not claim equivalence to a future source allocation refusal. Other arithmetic staging, source allocator topology, GMP and nonselected backends remain open.",
         "Finite release inverse/division zero results retain actual source raw fields; 0/0 fails at actual integer division after component publication. Service initialized Copy/Move boundary and explicit Go cleanup are adapters. Actual source allocator/global composition remains open; no whole unit promoted.",
         "Interrupted Go local cleanup is an explicit ownership adapter, not C++ exception continuation. Nine independent math/alias/publication/lifetime groups add no registered source assertion credit. Source normalization/GCD and physical backend obligations remain separate; whole unit remains partial.",
-        "The registered randomized GCD campaign preserves all 168 primes, conditional Power/Mul and sign draw order using an explicit hermetic RNG adapter, not libc sequence identity. Independent table enumeration and arithmetic checks add no ENSURE credit; print-only minimum GCD expectation is additional verification. Actual allocator topology, cleanup exceptions, alternate backends and full source-unit completion remain open."
+        "The registered randomized GCD campaign preserves all 168 primes, conditional Power/Mul and sign draw order using an explicit hermetic RNG adapter, not libc sequence identity. Independent table enumeration and arithmetic checks add no ENSURE credit; print-only minimum GCD expectation is additional verification. Actual allocator topology, cleanup exceptions, alternate backends and full source-unit completion remain open.",
+        "Rational scalar getter predicates remain correct, but source getters assert rational range only in debug before inherited integer access. Current getters universally reject fractional numerals. Selected integer accessor/cast profiles require separate audit and implementation; see MPQ_ROUNDING_PUBLICATION_PACKET.md."
       ]
     },
     {

@@ -2,9 +2,9 @@
 // Source: src/util/mpq.cpp floor/ceil/prev_power_of_two and mpq.h wrappers.
 package mpnum
 
-// roundCore retains the source normalized-fraction branch. A noninteger
-// normalized fraction has a nonzero remainder, so the source sign correction
-// suffices without an extra divisibility computation.
+// roundCore retains the source sign-only correction, including unreduced or
+// negative-denominator raw values. It captures numerator sign before division
+// publishes into a caller that may alias either input component.
 func (m *RationalManager) roundCore(a *Rational, out *Int, ceil bool) error {
 	if isIntegerRational(a) {
 		return m.z.Copy(out, &a.num)
@@ -32,16 +32,12 @@ func (m *RationalManager) roundToInt(a *Rational, out *Int, ceil bool) error {
 	if e := m.z.check(out); e != nil {
 		return e
 	}
-	var work Int
-	defer m.z.Del(&work)
-	if e := m.roundCore(a, &work, ceil); e != nil {
-		return e
-	}
-	return m.z.Move(out, &work)
+	return m.roundCore(a, out, ceil)
 }
 
-// FloorToInt and CeilToInt publish an owner-local integer after the complete
-// source truncation/sign correction succeeds. Output may alias the numerator.
+// FloorToInt and CeilToInt publish the source Copy/quotient into the caller
+// before sign correction. Output may alias either input component; errors
+// retain completed source actions rather than restoring the old caller.
 func (m *RationalManager) FloorToInt(a *Rational, out *Int) error { return m.roundToInt(a, out, false) }
 func (m *RationalManager) CeilToInt(a *Rational, out *Int) error  { return m.roundToInt(a, out, true) }
 func (m *RationalManager) round(a, out *Rational, ceil bool) error {
@@ -51,15 +47,10 @@ func (m *RationalManager) round(a, out *Rational, ceil bool) error {
 	if e := m.check(out); e != nil {
 		return e
 	}
-	work := NewRational()
-	defer m.drop(&work)
-	if e := m.roundCore(a, &work.num, ceil); e != nil {
+	if e := m.roundCore(a, &out.num, ceil); e != nil {
 		return e
 	}
-	if e := m.resetDenominator(&work); e != nil {
-		return e
-	}
-	return m.Move(out, &work)
+	return m.resetDenominator(out)
 }
 
 // Floor and Ceil are the source rational-output wrappers, with denominator 1.

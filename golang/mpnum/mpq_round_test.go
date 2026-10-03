@@ -229,6 +229,9 @@ func TestRationalRoundFailureCleanup(t *testing.T) {
 					var integer Int
 					m.z.SetInt64(&integer, 17)
 					original := rationalString(t, m, &a)
+					beforeA, beforeOut, beforeInteger := a, out, integer
+					sourceNum := roundPublicationDecode(t, m.z, &a.num)
+					sourceDen := roundPublicationDecode(t, m.z, &a.den)
 					dst := &out
 					intDst := &integer
 					if alias == 1 {
@@ -255,12 +258,49 @@ func TestRationalRoundFailureCleanup(t *testing.T) {
 					budget.FailAfter(after)
 					err := call()
 					qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &out.num, &out.den, &integer})
+					if err != nil {
+						if !errors.Is(err, arena.ErrInjectedFailure) {
+							t.Fatal("round source error", synch, op, alias, after, err)
+						}
+						if op == 4 {
+							if a != beforeA || out != beforeOut || integer != beforeInteger {
+								t.Fatal("source PrevPower local changed caller", synch, alias, after)
+							}
+						} else {
+							// Decode completed source actions BEFORE disabling faults or
+							// rendering. This wide quotient cannot publish failedRef:
+							// source TMP transfer may precede its replacement refusal.
+							target := intDst
+							if op >= 2 {
+								target = &dst.num
+							}
+							actual := roundPublicationDecode(t, m.z, target)
+							old := big.NewInt(17)
+							if alias == 1 {
+								old = sourceNum
+							}
+							quotient := new(big.Int).Quo(sourceNum, sourceDen)
+							corrected := independentRound(sourceNum, sourceDen, op == 1 || op == 3)
+							if actual.Cmp(old) != 0 && actual.Cmp(quotient) != 0 && actual.Cmp(corrected) != 0 {
+								t.Fatal("not a completed source round action", synch, op, alias, after, actual)
+							}
+							if a.den != beforeA.den || out.den != beforeOut.den {
+								t.Fatal("denominator reset before successful integer round", synch, op, alias, after)
+							}
+							if alias == 0 && a != beforeA {
+								t.Fatal("nonoutput input changed", synch, op, after)
+							}
+							if (op < 2 || alias == 1) && out != beforeOut {
+								t.Fatal("nonoutput rational changed", synch, op, alias, after)
+							}
+							if (op >= 2 || alias == 1) && integer != beforeInteger {
+								t.Fatal("nonoutput integer changed", synch, op, alias, after)
+							}
+						}
+					}
 					budget.FailAfter(-1)
 					if err != nil {
 						failures++
-						if !errors.Is(err, arena.ErrInjectedFailure) || rationalString(t, m, &a) != original || rationalString(t, m, &out) != "17" || integerString(t, m.z, &integer) != "17" {
-							t.Fatal("round failure publication", synch, op, alias, after, err)
-						}
 					} else {
 						successes++
 					}

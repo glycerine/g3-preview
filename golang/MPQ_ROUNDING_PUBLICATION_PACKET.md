@@ -1,6 +1,8 @@
 # Rational rounding and scalar-projection source audit
 
-Read-only proposal based on committed `c7bed52`. Only this new document is
+Historical read-only proposal based on committed `c7bed52`; the executed
+checkpoint and immutable evidence are appended below. At that proposal stage,
+only this new document was
 written; no production, tests, metadata or Git edits. The GCD packet is
 committed and its physical accessor regions now belong to the arena agent.
 All implementation remains concrete Go, with no generics, unsafe, cgo,
@@ -148,3 +150,107 @@ observed RED or GREEN. Production/test authorization and final isolated base
 come from parent review; parent owns central evidence/no-generics audit after
 metadata overlay. Full solver, AST polynomial consumers and proof obligations
 remain in the continuing goal.
+
+## Executed rounding checkpoint — based on 5b414f9
+
+The parent committed the source proposal as d98fb81 and released implementation
+against5b414f9. This complete selected rounding checkpoint is now READY:
+FloorToInt/CeilToInt call roundCore against the actual integer caller;
+Floor/Ceil call that same core against caller.num and reset caller.den only
+following success. The single existing arithmetic core, saved-sign order,
+raw/unreduced behavior and actual scoped integer local in PrevPowerOfTwo are
+unchanged. There are no new public APIs or record/owner/storage layouts.
+Service value-return locals remain actual source and their production is
+unchanged. Scalar getter/Float64, pair setter and parser production remain
+explicitly outside this checkpoint.
+
+Tests FIRST observed real behavioral RED against isolated committed5b414f9
+with only the new test overlay: native11907 and checked/debug45197 both exited1
+in the same two new groups. Logs `.cache/round-first-red-native.log` and
+`.cache/round-first-red-debug.log` show the old integer/rational output retained
+instead of actual Copy sign/free/failedRef, and old17 instead of the already
+published MAX_INT quotient at Ceil correction refusal. Immediate whole-root
+checks and cleanup refund succeeded even on that RED; the difference was
+source publication, not a lost-root allowance or imaginary algorithm defect.
+
+Only approved `mpq_round.go` changed to direct caller/final denominator reset.
+Initial native new-group GREEN and checked/debug69854 GREEN (the two new groups
+plus existing registered/source/math/init/warm routes) followed. The original
+native combined regex did not select the two new names; a separate explicit
+`^TestRoundPublication` native run verified both registrations and PASS. That
+omission is not credited as coverage. The added third raw-alias group and the
+approved existing failure sweep subsequently passed focused checked/debug93230.
+
+The three new groups exercise32 integral Copy-refusal combinations (both
+scratch policies, all4output overloads, old inline/BIG output, both source
+signs),4post-quotient correction-refusal combinations, and1080finite raw
+small-width/denominator/output-alias cases. Integer MIN/MAX, numerator and
+denominator aliases, in-place rational outputs, exact numerator-sign-only
+correction and unreduced/negative-denominator quirks are source-action models.
+Copy refusal preserves sign/free/failedRef and the original output denominator;
+Ceil promotion refusal preserves valid inlineMAX_INT, not failedRef. Root
+checks occur before fault disabling, output rendering or teardown. The
+independent numerical decoder reads actual validated scalar/limbs without
+formatting or changing owner storage; math/big is test-only.
+
+A named dependent RED was actually observed in the original
+TestRationalRoundFailureCleanup (native log
+`.cache/round-dependent-red-native.log`, op0/alias0/fault0). After parent review,
+only that group changed. The immediate complete qops audit remains before
+fault disable. It then decodes actual output and requires exactly the old
+value, truncation quotient, or sign-corrected source value; these wide output
+paths do not permit a blanket failedRef. Every error keeps both original
+denominators and untouched nondestination fields. PrevPowerOfTwo failures
+still require all callers unchanged because its integer temporary is actual
+source. All successful mathematical oracles,16original PrevPower assertions,
+11TST1/5TST2rounding assertions, closed/raw-zero and warm-zeroallocation checks
+are retained. Fresh owners are used for each fault; no arithmetic retry or
+scratch repair is performed. No other old fixture or common audit was edited.
+
+### Final immutable native/debug/vet evidence
+
+Snapshot `.cache/release/mpq-round-final-5b414f9` is committed
+5b414f9:golang plus exactly these3Go files; unrelated backend/format/output
+drafts are excluded. Single final full native88431 and checked/debug2922 both
+terminated0, with mpnum23.257s and24.396s respectively. Full checked/debug
+vet72797 terminated0. Logs are `.cache/round-final-native.log`,
+`.cache/round-final-debug.log`, `.cache/round-final-vet.log`. All ten selected
+names below have exact RUN/PASS registrations in both full suite logs.
+All three live/snapshot hashes remain identical to the freeze inventory.
+No duplicate full tests or race/JS/WASM/WASI checks were launched; parent owns
+the source/evidence/no-generics audit after metadata overlay. No warmed timing
+benchmark is claimed by this checkpoint; the retained existing warm fixture
+checks allocations, while measured timing remains a separate optional task.
+
+* `mpnum/mpq_round.go` — SHA256 `8e3712bafbcee039805e8178d033e802b9c747c954edfd96a896175ab1386568`
+* `mpnum/mp_round_publication_test.go` — SHA256 `d70584f60af8ffbc042a5864b4f175cffab38c4134d3c5200437cf3a852f5e45`
+* `mpnum/mpq_round_test.go` — SHA256 `b3e47dd63f8524dd9a7b433c42f0ce3605ec0b14bd656682fb6e1225046cae91`
+
+Exact selected ten names (`.cache/round-final-tests.json`):
+
+* `TestRoundPublicationIntegralCopyRefusal`
+* `TestRoundPublicationQuotientBeforeCeilCorrectionRefusal`
+* `TestRoundPublicationRawShapesAndAllComponentAliases`
+* `TestRationalSourcePrevPowerOfTwo`
+* `TestRationalRoundIndependentAndAliases`
+* `TestRationalRoundFailureCleanup`
+* `TestRationalRoundInitializationAndClose`
+* `TestRationalRoundWarmZeroAllocations`
+* `TestRationalFacadeSourceTST1`
+* `TestRationalFacadeSourceTST2`
+
+This closes the selected actual rounding publication methods, not whole mpq
+headers or numerical physical memory topology. The adjacent-source audit
+above remains real: pair setter/parser transactions and scalar getter/Float64
+diagnostic profiles await separately reviewed full contracts. No scalar guard
+was broadened and no full solver/AST/polynomial completion is claimed.
+
+
+Parent integration on committed Berlekamp correction 28947aa used the same
+three frozen Go hashes, with central metadata overlay. Focused composition
+native/debug checks passed for rounding and the factorization/Hensel families;
+source/evidence/no-generics audit exited0 with unchanged33/148/1921counts.
+Logs: `.cache/round-parent-composition-{native,debug}.log` and
+`.cache/round-parent-source.log`. Parent independently checked all ten exact
+RUN/PASS declarations in both full agent logs. Only documentation changed
+after those checks; unrelated allocator and closing-protocol drafts were excluded.
