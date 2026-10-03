@@ -519,3 +519,14 @@ all64 tst1 ENSUREs and all56 static tst2 ENSUREs plus its VERIFY, independent
 exact arithmetic, aliases, immediate failure roots and warmed allocation checks.
 See RATIONAL_FACADE_PORT_STATUS.md. Roots/squares, bitwise and remaining wrapper
 interoperability/display operations remain open; full solver scope is unchanged.
+
+## Concrete rational extended-GCD wrapper
+
+The separate ext_gcd.h Euclidean wrapper is now translated through the owned
+rational facade, preserving input copies, output publication prefixes, fresh
+div/mod assignments and coefficient expression return copies. Five test groups
+began with missing-API RED and cover all999 source inverse conditions (500 RHS),
+the actual power/assignment setup, independent signed Bezout checks, aliases,
+provenance and immediate failure ownership/prefixes. See
+EXT_GCD_WRAPPER_PORT_STATUS.md. The manager's distinct ExtendedGCD algorithm is
+not substituted; its Z3DEBUG diagnostic branch still remains open.

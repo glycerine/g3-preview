@@ -81312,7 +81312,8 @@
         "mpnum/mpq_number_theory.go",
         "mpnum/mpq_inspect.go",
         "mpnum/rational_service.go",
-        "mpnum/rational_service_ops_test.go"
+        "mpnum/rational_service_ops_test.go",
+        "mpnum/ext_gcd_service_test.go"
       ],
       "tests": [
         "TestSourceStringAssertions",
@@ -81370,7 +81371,12 @@
         "TestRationalFacadeProvenanceAndNoncanonicalSourceShapes",
         "TestRationalFacadeWarmZeroAllocations",
         "TestRationalFacadeInspectionForwardingAndSourceOutputAliases",
-        "TestRationalFacadeCompoundFailureAliases"
+        "TestRationalFacadeCompoundFailureAliases",
+        "TestExtendedGCDWrapperSource999Cases",
+        "TestExtendedGCDWrapperIndependentSignedBezout",
+        "TestExtendedGCDWrapperImmediateFailureOwnership",
+        "TestExtendedGCDWrapperSourceOutputAliases",
+        "TestExtendedGCDWrapperProvenanceGuards"
       ],
       "assertions": [
         {
@@ -82145,6 +82151,14 @@
           "tests": [
             "TestRationalFacadeSourceTST1",
             "TestRationalFacadeSourceTST2"
+          ]
+        },
+        {
+          "name": "tst7 all999 short-circuit inverse ENSUREs with500 inverse RHS through actual wrapper algorithm and facade power/mod/mul routes",
+          "status": "ported",
+          "go_target": "mpnum/ext_gcd_service_test.go",
+          "tests": [
+            "TestExtendedGCDWrapperSource999Cases"
           ]
         }
       ],
@@ -85356,9 +85370,17 @@
       "sha256": "8ac51f06b7f304b7d5e20ed5028c1a1c7d9f390d74ccc3e918a3a9d131982917",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "mpnum/ext_gcd_service.go"
+      ],
+      "tests": [
+        "TestExtendedGCDWrapperSource999Cases",
+        "TestExtendedGCDWrapperIndependentSignedBezout",
+        "TestExtendedGCDWrapperImmediateFailureOwnership",
+        "TestExtendedGCDWrapperSourceOutputAliases",
+        "TestExtendedGCDWrapperProvenanceGuards"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -85369,11 +85391,28 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "extended_gcd complete concrete rational specialization used by source tst7",
+          "status": "ported",
+          "go_target": "mpnum/ext_gcd_service.go",
+          "tests": [
+            "TestExtendedGCDWrapperSource999Cases",
+            "TestExtendedGCDWrapperIndependentSignedBezout",
+            "TestExtendedGCDWrapperImmediateFailureOwnership",
+            "TestExtendedGCDWrapperSourceOutputAliases",
+            "TestExtendedGCDWrapperProvenanceGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "Inputs deep-copy before output initialization; six local owning numerals destroy in reverse source construction order, nested expressions destroy difference then product. Direct output prefixes and aliases retained. See EXT_GCD_WRAPPER_PORT_STATUS.md."
+      ],
+      "deviations": [
+        "The only instantiated source numeral type is rational; Go specialization is concrete with service provenance and typed allocation failures, no generics. Raw manager extended GCD is not substituted."
+      ]
     },
     {
       "path": "src/util/ext_numeral.h",
