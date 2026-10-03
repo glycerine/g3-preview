@@ -98231,7 +98231,9 @@
         "mpnum/mpz_misc.go",
         "mpnum/mp_display.go",
         "mpnum/mp_copy.go",
-        "mpnum/mpz_number_theory.go"
+        "mpnum/mpz_number_theory.go",
+        "mpnum/mpz_extended_gcd_debug.go",
+        "mpnum/mpz_extended_gcd_release.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -98342,7 +98344,9 @@
         "TestNumberTheoryCanonicalSourceCoefficients",
         "TestNumberTheoryFailurePrefixRootsBeforeFormatting",
         "TestNumberTheoryLargeCanonicalCoefficientsAndLCM",
-        "TestNumberTheoryRationalResetPrefixAndOutputAliasing"
+        "TestNumberTheoryRationalResetPrefixAndOutputAliasing",
+        "TestExtendedGCDDebugSourceAssertion",
+        "TestExtendedGCDDebugDiagnosticOrderAndFailures"
       ],
       "conditionals": [
         {
@@ -99771,9 +99775,12 @@
         },
         {
           "name": "extended gcd Z3DEBUG diagnostic mul/mul/add/equality sequence",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "status": "ported",
+          "go_target": "mpnum/mpz_extended_gcd_debug.go",
+          "tests": [
+            "TestExtendedGCDDebugSourceAssertion",
+            "TestExtendedGCDDebugDiagnosticOrderAndFailures"
+          ]
         }
       ],
       "ownership": [
@@ -99789,7 +99796,8 @@
         "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md.",
         "Earlier scratch IDX0-only inventory is superseded by publishTmpAt handling division IDX1 as well; see mpnum/mpz_div.go and source division tests.",
         "Explicit-owner CopyFrom uses source indexed limbs and destination-owned cells/Words. Source set/copy shapes are preserved; rational pair staging preserves raw signed/unreduced representation. Raw records require genuine caller-supplied owners; public provenance is a separate service. See NUMERAL_COPY_PORT_STATUS.md.",
-        "Number theory locals use existing budgeted numerical cells/Words and are always deleted in source order. ExtendedGCD preserves coefficient publication/failure prefixes and rational denominator reset timing; immediate failed-prefix caller/cache roots audited. See NUMBER_THEORY_PORT_STATUS.md."
+        "Number theory locals use existing budgeted numerical cells/Words and are always deleted in source order. ExtendedGCD preserves coefficient publication/failure prefixes and rational denominator reset timing; immediate failed-prefix caller/cache roots audited. See NUMBER_THEORY_PORT_STATUS.md.",
+        "The g3debug extended-GCD diagnostic reuses the six existing locals in source mul/mul/add/equality order before final result publication. Caller-visible coefficients survive assertion/failure; immediate root accounting and unwind are tested. See EXTENDED_GCD_DEBUG_PORT_STATUS.md."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -99802,7 +99810,7 @@
         "32-bit accessor source assertions become ErrConversion; INT_MIN decomposition uses defined wider magnitude arithmetic. Floating UINT_MAX radix, unsigned length/count wrap and sign-free big hash remain source behavior.",
         "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text.",
         "B12 replaces the one-global-manager ownership assumption with explicit cross-manager deep copy. No foreign handle or serialization is passed into destination arithmetic; destination outlives source Close. This is an ownership adaptation, not AST translation completion.",
-        "Selected release ExtendedGCD preserves finite aliases and modified-input sign rereads. Source Z3DEBUG diagnostic arithmetic remains unported; g3checked selects reference validation only. ext_gcd.h wrapper algorithm remains separate and is not credited from manager inverse properties."
+        "Selected release ExtendedGCD preserves finite aliases and modified-input sign rereads. Source Z3DEBUG diagnostic arithmetic is selected by g3debug; g3checked selects reference validation independently. ext_gcd.h wrapper algorithm is translated separately; manager inverse properties alone do not credit that wrapper."
       ]
     },
     {

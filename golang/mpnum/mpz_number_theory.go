@@ -2,7 +2,12 @@
 // Source: src/util/mpz.cpp array gcd, extended Euclid, lcm, divides.
 package mpnum
 
-import "github.com/glycerine/g3/golang/arena"
+import (
+	"errors"
+	"github.com/glycerine/g3/golang/arena"
+)
+
+var errExtendedGCDInvariant = errors.New("mpnum: source extended gcd Bezout assertion failed")
 
 // GCDMany preserves active source sequential order, including destination
 // aliases to future array elements and early-one skipping of remaining inputs.
@@ -140,6 +145,9 @@ func (m *IntegerManager) ExtendedGCD(r1, r2, a, b, g *Int) error {
 		if e = m.Neg(b); e != nil {
 			return e
 		}
+	}
+	if e = m.extendedGCDDiagnostic(r1, r2, a, b, &tmp1, &nexta, &nextb); e != nil {
+		return e
 	}
 	return m.Copy(g, &tmp1)
 }

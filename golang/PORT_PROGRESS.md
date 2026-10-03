@@ -570,3 +570,11 @@ Symbol normalization reads existing bytes without interning/intermediate strings
 and produces one independent caller output with unchanged owner budget/storage.
 See PARAM_NAME_PORT_STATUS.md. Parameter descriptors and params_ref are separate
 active work; neither is claimed complete by normalization.
+
+## Extended-GCD conditional diagnostic
+
+The remaining source extended-GCD Z3DEBUG mul/mul/add/equality branch now runs
+under g3debug, independently of checked handles. Tests began missing-API RED
+and verify signed Bezout cases, source alias assertion/output prefixes, large
+arithmetic fault prefixes, immediate roots and complete owner refund. Release
+alias behavior remains unchanged. See EXTENDED_GCD_DEBUG_PORT_STATUS.md.

@@ -165,7 +165,18 @@ func TestNumberTheoryFrozenExtendedGCDAliases(t *testing.T) {
 		want    [5]int64
 	}{{2, 3, 4, [5]int64{-26, 7, -3, -11, 1}}, {0, 3, 4, [5]int64{3, 7, 0, -11, 1}}, {2, 1, 4, [5]int64{-26, 11, -3, 0, 1}}, {2, 2, 4, [5]int64{-26, 7, 5, 0, 1}}, {2, 3, 2, [5]int64{-26, 7, 1, -11, 0}}, {2, 3, 0, [5]int64{1, 7, -3, -11, 0}}} {
 		values := [5]Int{NewInt(-26), NewInt(7), NewInt(0), NewInt(0), NewInt(0)}
-		qopsMust(t, m.ExtendedGCD(&values[0], &values[1], &values[tc.a], &values[tc.b], &values[tc.g]))
+		e := m.ExtendedGCD(&values[0], &values[1], &values[tc.a], &values[tc.b], &values[tc.g])
+		// These three aliases fail the source debug Bezout assertion before
+		// the final gcd copy. The other identities still reach publication.
+		debugFailure := sourceExtendedGCDDebug && (tc.a == 0 || tc.b == 1 || tc.a == tc.b)
+		if debugFailure {
+			if !errors.Is(e, errExtendedGCDInvariant) {
+				t.Fatal("source debug assertion", tc, e)
+			}
+			tc.want[tc.g] = 0
+		} else {
+			qopsMust(t, e)
+		}
 		for i := range values {
 			if integerString(t, m, &values[i]) != big.NewInt(tc.want[i]).String() {
 				t.Fatal("source alias fixture", tc, i, integerString(t, m, &values[i]))
@@ -299,8 +310,17 @@ func TestNumberTheoryRationalResetPrefixAndOutputAliasing(t *testing.T) {
 	}
 	qopsMust(t, m.SetInt64(&r1, -26))
 	qopsMust(t, m.SetInt64(&r2, 7))
-	qopsMust(t, m.ExtendedGCD(&r1, &r2, &r1, &b, &g))
-	if rationalString(t, m, &r1) != "3" || rationalString(t, m, &b) != "-11" || rationalString(t, m, &g) != "1" {
+	e = m.ExtendedGCD(&r1, &r2, &r1, &b, &g)
+	wantG := "1"
+	if sourceExtendedGCDDebug {
+		if !errors.Is(e, errExtendedGCDInvariant) {
+			t.Fatal("source debug assertion", e)
+		}
+		wantG = "23"
+	} else {
+		qopsMust(t, e)
+	}
+	if rationalString(t, m, &r1) != "3" || rationalString(t, m, &b) != "-11" || rationalString(t, m, &g) != wantG {
 		t.Fatal("rational input-sign reread")
 	}
 	qopsMust(t, m.SetInt64(&r1, -6))

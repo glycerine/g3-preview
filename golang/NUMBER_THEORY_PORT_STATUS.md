@@ -68,12 +68,14 @@ failure, before formatting, deletion, or Close, an independent live-root audit
 checks numeric cells and Words references, allowing only published caller roots
 and actual manager-owned scratch. Budget refunds after Close are checked too.
 
-**Conditional source gap:** `mpz.cpp` Extended GCD's `#ifdef Z3DEBUG` sequence
-`mul(a,r1,nexta)`, `mul(b,r2,nextb)`, `add(nexta,nextb,nexta)`, and equality
-assertion remains unported. Thus the selected release method is ported, while
-whole conditional-method coverage is partial. `g3checked` checks Go handle
-validation; it does not select these source debug arithmetic actions. No blanket
-alias restriction was added to suppress finite release cases.
+**Conditional coverage update:** `mpz.cpp` Extended GCD's `#ifdef Z3DEBUG`
+mul/mul/add/equality sequence is now selected by the separate `g3debug` build
+tag. `g3checked` still selects Go handle validation independently. The diagnostic
+reuses the actual coefficient locals and rereads modified input aliases before
+the final gcd assignment; a failed source assertion becomes a classified error
+with source output prefixes intact. See EXTENDED_GCD_DEBUG_PORT_STATUS.md.
+No blanket alias restriction suppresses finite release cases. The separate
+ext_gcd.h wrapper has also since been translated; see EXT_GCD_WRAPPER_PORT_STATUS.md.
 
 ## Verification
 
