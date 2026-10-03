@@ -100,43 +100,24 @@ func (m *RationalManager) DivInt(a *Rational, b *Int, out *Rational) error {
 	if e := m.check(out); e != nil {
 		return e
 	}
-	if b.val == 0 {
-		return ErrDivideByZero
-	}
-	work := NewRational()
-	defer m.drop(&work)
-	if e := m.z.Copy(&work.num, &a.num); e != nil {
+	if e := m.z.Copy(&out.num, &a.num); e != nil {
 		return e
 	}
-	// Source set(out.num,a.num) happens before the divisor is read.
-	divisor := b
-	if b == &out.num {
-		divisor = &work.num
-	}
-	if e := m.z.Mul(&a.den, divisor, &work.den); e != nil {
+	if e := m.z.Mul(&a.den, b, &out.den); e != nil {
 		return e
 	}
-	// Source tests divisor sign after denominator publication.
-	signValue := divisor
-	if b == &out.den {
-		signValue = &work.den
-	}
-	if signValue.val < 0 {
-		if e := m.z.Neg(&work.num); e != nil {
+	if b.val < 0 {
+		if e := m.z.Neg(&out.num); e != nil {
 			return e
 		}
-		if e := m.z.Neg(&work.den); e != nil {
+		if e := m.z.Neg(&out.den); e != nil {
 			return e
 		}
 	}
-	if e := m.normalize(&work); e != nil {
-		return e
-	}
-	return m.Move(out, &work)
+	return m.normalize(out)
 }
 
-// AccDiv follows acc_div's denominator multiplication, sign repair, then gcd
-// reduction. A staged pair protects the old value on predictable failures.
+// AccDiv publishes denominator multiplication before rereading the divisor.
 func (m *RationalManager) AccDiv(a *Rational, b *Int) error {
 	if e := m.check(a); e != nil {
 		return e
@@ -144,37 +125,21 @@ func (m *RationalManager) AccDiv(a *Rational, b *Int) error {
 	if e := m.z.check(b); e != nil {
 		return e
 	}
-	if b.val == 0 {
-		return ErrDivideByZero
-	}
-	work := NewRational()
-	defer m.drop(&work)
-	if e := m.z.Mul(&a.den, b, &work.den); e != nil {
+	if e := m.z.Mul(&a.den, b, &a.den); e != nil {
 		return e
 	}
-	if e := m.z.Copy(&work.num, &a.num); e != nil {
-		return e
-	}
-	signValue := b
-	if b == &a.den {
-		signValue = &work.den
-	}
-	if signValue.val < 0 {
-		if e := m.z.Neg(&work.num); e != nil {
+	if b.val < 0 {
+		if e := m.z.Neg(&a.num); e != nil {
 			return e
 		}
-		if e := m.z.Neg(&work.den); e != nil {
+		if e := m.z.Neg(&a.den); e != nil {
 			return e
 		}
 	}
-	if e := m.normalize(&work); e != nil {
-		return e
-	}
-	return m.Move(a, &work)
+	return m.normalize(a)
 }
 
-// RatDiv preserves rat_div's deliberate lack of denominator sign repair;
-// this differs from SetParts and DivInt for a negative divisor.
+// RatDiv deliberately retains raw denominator sign and actual Copy aliases.
 func (m *RationalManager) RatDiv(a, b *Int, out *Rational) error {
 	if e := m.z.check(a); e != nil {
 		return e
@@ -185,26 +150,13 @@ func (m *RationalManager) RatDiv(a, b *Int, out *Rational) error {
 	if e := m.check(out); e != nil {
 		return e
 	}
-	if b.val == 0 {
-		return ErrDivideByZero
-	}
-	work := NewRational()
-	defer m.drop(&work)
-	if e := m.z.Copy(&work.num, a); e != nil {
+	if e := m.z.Copy(&out.num, a); e != nil {
 		return e
 	}
-	// Source copies numerator first and then rereads a component-aliased b.
-	divisor := b
-	if b == &out.num {
-		divisor = &work.num
-	}
-	if e := m.z.Copy(&work.den, divisor); e != nil {
+	if e := m.z.Copy(&out.den, b); e != nil {
 		return e
 	}
-	if e := m.normalize(&work); e != nil {
-		return e
-	}
-	return m.Move(out, &work)
+	return m.normalize(out)
 }
 func (m *RationalManager) AddMul(a, b, c, out *Rational) error { return m.fused(a, b, c, out, false) }
 func (m *RationalManager) SubMul(a, b, c, out *Rational) error { return m.fused(a, b, c, out, true) }
@@ -290,8 +242,14 @@ func (m *RationalManager) integerOperands(a, b *Rational) error {
 	return nil
 }
 func (m *RationalManager) integerOp(a, b *Rational, out *Int, operation uint8) error {
-	if e := m.integerOperands(a, b); e != nil {
+	if e := m.check(a); e != nil {
 		return e
+	}
+	if e := m.check(b); e != nil {
+		return e
+	}
+	if modularSourceDebug && (!isIntegerRational(a) || !isIntegerRational(b)) {
+		return ErrRationalNotInteger
 	}
 	// Direct output identity preserves the source base-manager's divisor/output
 	// alias quirks for Euclidean division and modulus.

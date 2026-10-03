@@ -136,7 +136,7 @@ func TestRationalCheckedInitializationAndZero(t *testing.T) {
 	var raw Rational
 	valid := NewRational()
 	if _, e := m.String(&raw); !errors.Is(e, ErrUninitializedRational) {
-		t.Fatal("raw zero accepted", e)
+		t.Fatal("raw zero read", e)
 	}
 	if e := m.SetInt64(&raw, 1); !errors.Is(e, ErrUninitializedRational) {
 		t.Fatal("raw destination accepted", e)
@@ -144,14 +144,36 @@ func TestRationalCheckedInitializationAndZero(t *testing.T) {
 	if e := m.SetFraction(&valid, 1, 0); !errors.Is(e, ErrDivideByZero) || rationalString(t, m, &valid) != "0" {
 		t.Fatal(e)
 	}
-	if e := m.Inv(&valid, &valid); !errors.Is(e, ErrDivideByZero) {
-		t.Fatal(e)
+	e := m.Inv(&valid, &valid)
+	divPublicationAudit(t, m, &valid)
+	if modularSourceDebug {
+		if !errors.Is(e, ErrIntegerAssertion) || valid != NewRational() {
+			t.Fatal(e)
+		}
+	} else {
+		qopsMust(t, e)
+		if valid.num != NewInt(1) || valid.den != NewInt(0) {
+			t.Fatal(valid)
+		}
+		if _, e = m.String(&valid); !errors.Is(e, ErrUninitializedRational) {
+			t.Fatal(e)
+		}
 	}
+	// Explicit Reset owns the invalid finite result; it is not arithmetic retry.
+	qopsMust(t, m.Reset(&valid))
 	one := NewRational()
-	m.SetInt64(&one, 1)
-	if e := m.Div(&one, &valid, &one); !errors.Is(e, ErrDivideByZero) || rationalString(t, m, &one) != "1" {
+	qopsMust(t, m.SetInt64(&one, 1))
+	qopsMust(t, m.Div(&one, &valid, &one))
+	divPublicationAudit(t, m, &valid, &one)
+	if one.num != NewInt(1) || one.den != NewInt(0) {
+		t.Fatal(one)
+	}
+	if _, e = m.String(&one); !errors.Is(e, ErrUninitializedRational) {
 		t.Fatal(e)
 	}
+	qopsMust(t, m.Del(&one))
+	qopsMust(t, m.Del(&valid))
+	qopsMust(t, m.Del(&raw))
 }
 
 func TestRationalIndependentSignedArithmetic(t *testing.T) {
@@ -440,6 +462,24 @@ func TestRationalArithmeticFailureCleanup(t *testing.T) {
 							}
 							if dst != &b && rationalString(t, m, &b) != br.RatString() {
 								t.Fatal("non-destination b changed", synch, alias, after)
+							}
+						} else if op == 3 || op == 4 {
+							if op == 3 {
+								rawNum := new(big.Int).Mul(ar.Num(), br.Denom()).String()
+								rawDen := new(big.Int).Mul(ar.Denom(), br.Num()).String()
+								powerPublicationComponent(t, m.z, &dst.num, beforeNum, rawNum, want.Num().String())
+								powerPublicationComponent(t, m.z, &dst.den, beforeDen, rawDen, want.Denom().String())
+							} else {
+								absNum := new(big.Int).Abs(new(big.Int).Set(ar.Num())).String()
+								negDen := new(big.Int).Neg(new(big.Int).Set(ar.Denom())).String()
+								powerPublicationComponent(t, m.z, &dst.num, beforeNum, ar.Num().String(), absNum, negDen)
+								powerPublicationComponent(t, m.z, &dst.den, beforeDen, ar.Denom().String(), negDen, absNum)
+							}
+							if dst != &a && rationalString(t, m, &a) != ar.RatString() {
+								t.Fatal("non-destination a changed", op, alias, after)
+							}
+							if dst != &b && rationalString(t, m, &b) != br.RatString() {
+								t.Fatal("non-destination b changed", op, alias, after)
 							}
 						} else if rationalString(t, m, &a) != ar.RatString() || rationalString(t, m, &b) != br.RatString() || rationalString(t, m, &out) != "17" {
 							t.Fatal("failed rational operation changed destination/input", synch, op, alias, after, err)

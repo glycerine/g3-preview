@@ -1453,3 +1453,27 @@ Independent frozen parent verification passed full native/debug suites, exact86
 polynomial race/actual-JS RUN/PASS groups, vet, WASI build/test compilation and
 source/evidence/no-generics audit. Unrelated API-absence drafts were excluded
 from that snapshot; this does not claim the live draft worktree is green.
+
+
+## Direct rational division and inverse publication
+
+Rational inverse, division, mixed division, acc_div and rat_div now execute
+actual caller component actions and preserve source output aliases. Eight
+integer division/rem/mod forwards enforce integrality in the source debug
+profile. Tests first expose early zero guards and staged failure output, then
+verify independent arithmetic, raw signs, finite zero denominators and immediate
+owned roots. Cleanup-only validation permits explicit destruction/reset of raw
+finite results; ordinary initialized reads retain their guard. See
+MPQ_DIVISION_PUBLICATION_PACKET.md for evidence and service boundary adapters.
+Other staging, actual source allocator/global integration and the full solver,
+proof and interpolation objective remain required. No whole unit is promoted.
+
+The dependent fractional BV display fixture now expects source release prefix
+#x1 before the existing atom continuation guard and debug prefix#x before
+integrality rejection. Actual full native RED preceded this test-only change;
+source sexpr.cpp Rem/IDiv actions and production formatter remain unchanged.
+
+Frozen ten-Go parent integration passed full native/debug suites, exact44
+race/actual-JS RUN/PASS groups, vet, WASI build/test compilation and integrated
+source/evidence/no-generics audit. Unrelated RED drafts were excluded; the
+complete live worktree is not claimed green.

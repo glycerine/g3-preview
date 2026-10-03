@@ -201,8 +201,20 @@ func TestScopedNumeralScalarFailureAndAllThinOperations(t *testing.T) {
 		b.FailAfter(-1)
 		fraction := NewRational()
 		m.SetFraction(&fraction, 1, 2)
-		if e := s.RemAssign(&fraction); !errors.Is(e, ErrRationalNotInteger) {
-			t.Fatal(e)
+		e = s.RemAssign(&fraction)
+		divPublicationAudit(t, m, &s.num, &fraction)
+		if modularSourceDebug {
+			if !errors.Is(e, ErrRationalNotInteger) {
+				t.Fatal(e)
+			}
+			if text, _ := s.Display(); text != "3" {
+				t.Fatal("source debug leaves scope unchanged", text)
+			}
+		} else {
+			qopsMust(t, e)
+			if text, _ := s.Display(); text != "0" {
+				t.Fatal("release rem3 by raw numerator1", text)
+			}
 		}
 		m.Del(&fraction)
 		s.Close()

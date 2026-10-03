@@ -12,6 +12,11 @@ import (
 	"testing"
 )
 
+func sxFractionalBVSourceProfile(t *testing.T, m *SexprManager, h SexprHandle) {
+	// Source Rem asserts integrality before computing the first digit.
+	sxRender(t, m, h, "#x", mpnum.ErrRationalNotInteger)
+}
+
 func TestSexprDebugBVInvariantAndShortCircuit(t *testing.T) {
 	m, _, q := sxOwner(t, arena.NewBudget(1<<24))
 	for _, tc := range []struct {

@@ -901,6 +901,29 @@ func TestRationalFacadeCompoundFailureAliases(t *testing.T) {
 								t.Fatal("denominator preceded numerator MulAssign", alias, fault)
 							}
 						}
+					} else if op == 3 {
+						left, ok := new(big.Rat).SetString(before)
+						if !ok {
+							t.Fatal(before)
+						}
+						right, ok := new(big.Rat).SetString(bBefore)
+						if !ok {
+							t.Fatal(bBefore)
+						}
+						if alias == 1 {
+							right.Set(left)
+						}
+						quotient := new(big.Rat).Quo(left, right)
+						rawNum := new(big.Int).Mul(left.Num(), right.Denom())
+						rawDen := new(big.Int).Mul(left.Denom(), right.Num())
+						numCandidates := []string{left.Num().String(), rawNum.String(), quotient.Num().String()}
+						denCandidates := []string{left.Denom().String(), rawDen.String(), quotient.Denom().String()}
+						if rawDen.Sign() < 0 {
+							numCandidates = append(numCandidates, new(big.Int).Neg(rawNum).String())
+							denCandidates = append(denCandidates, new(big.Int).Neg(rawDen).String())
+						}
+						powerPublicationComponent(t, s.manager.z, &a.raw.num, numCandidates...)
+						powerPublicationComponent(t, s.manager.z, &a.raw.den, denCandidates...)
 					} else {
 						serviceText(t, s, &a, before)
 					}

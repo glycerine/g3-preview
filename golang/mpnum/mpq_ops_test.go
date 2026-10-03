@@ -197,19 +197,32 @@ func TestRationalOpsIntegerProductsRatDivQuirksAndGuards(t *testing.T) {
 			t.Fatal("rat_div must not repair source negative denominator")
 		}
 		zero := NewInt(0)
-		before := rationalString(t, m, &q)
-		if e := m.DivInt(&q, &zero, &q); !errors.Is(e, ErrDivideByZero) || rationalString(t, m, &q) != before {
-			t.Fatal("division zero")
+		qopsMust(t, m.DivInt(&q, &zero, &q))
+		divPublicationAudit(t, m, &q)
+		if q.num != NewInt(1) || q.den != NewInt(0) {
+			t.Fatal("source finite division zero", q)
 		}
-		if e := m.RatDiv(&a, &zero, &q); !errors.Is(e, ErrDivideByZero) {
-			t.Fatal("rat_div zero")
+		qopsMust(t, m.Reset(&q))
+		qopsMust(t, m.RatDiv(&a, &zero, &q))
+		divPublicationAudit(t, m, &q)
+		if q.num != NewInt(1) || q.den != NewInt(0) {
+			t.Fatal("source finite rat_div zero", q)
 		}
+		qopsMust(t, m.Reset(&q))
 		x, y := NewRational(), NewRational()
 		qopsMust(t, m.SetFraction(&x, 1, 2))
 		qopsMust(t, m.SetInt64(&y, 2))
-		if e := m.IDiv(&x, &y, &q); !errors.Is(e, ErrRationalNotInteger) {
-			t.Fatal("integer precondition", e)
+		e := m.IDiv(&x, &y, &q)
+		divPublicationAudit(t, m, &q, &x, &y)
+		if modularSourceDebug {
+			if !errors.Is(e, ErrRationalNotInteger) || q != NewRational() {
+				t.Fatal(e)
+			}
+		} else {
+			qopsMust(t, e)
+			qopsEqual(t, m, &q, new(big.Rat))
 		}
+
 		for _, n := range []*Rational{&q, &x, &y} {
 			qopsMust(t, m.Del(n))
 		}
@@ -423,7 +436,24 @@ func TestRationalOpsAllPredictableFailurePrefixes(t *testing.T) {
 					if !errors.Is(e, arena.ErrInjectedFailure) {
 						t.Fatal("unexpected failure", operation, prefix, e)
 					}
-					if rationalString(t, m, &out) != originalOutput {
+					if operation == 2 || operation == 3 || operation == 7 {
+						old, _ := new(big.Rat).SetString(originalOutput)
+						var pn, pd *big.Int
+						switch operation {
+						case 2:
+							pn = new(big.Int).Set(new(big.Rat).SetFrac(n, d).Num())
+							pd = new(big.Int).Mul(new(big.Rat).SetFrac(n, d).Denom(), n)
+						case 3:
+							pn = new(big.Int).Set(n)
+							pd = new(big.Int).Set(n)
+						case 7:
+							pn = new(big.Int).Set(old.Num())
+							pd = new(big.Int).Mul(old.Denom(), n)
+						}
+						reduced := new(big.Rat).SetFrac(pn, pd)
+						powerPublicationComponent(t, m.z, &out.num, old.Num().String(), pn.String(), reduced.Num().String())
+						powerPublicationComponent(t, m.z, &out.den, old.Denom().String(), pd.String(), reduced.Denom().String())
+					} else if rationalString(t, m, &out) != originalOutput {
 						t.Fatal("partial output", operation, prefix)
 					}
 				} else {

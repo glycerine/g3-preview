@@ -136,7 +136,7 @@ func TestSexprBVSourceWidthQuirks(t *testing.T) {
 	h, e := m.MkBVNumeral(&v, 4, 0, 0)
 	sxMust(t, e)
 	sxMust(t, q.Del(&v))
-	sxRender(t, m, h, "#x", mpnum.ErrRationalNotInteger)
+	sxFractionalBVSourceProfile(t, m, h)
 }
 func TestSexprRCWrapAndDeletionLIFO(t *testing.T) {
 	m, _, _ := sxOwner(t, arena.NewBudget(1<<24))

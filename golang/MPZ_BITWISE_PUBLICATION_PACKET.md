@@ -207,9 +207,11 @@ callbacks or Budget.Used-as-global-memory substitution is proposed.
 
 Actual bitwise calls use the existing single Copy, SetUint64, Add, Mul, Mod,
 Div and Uint64 methods. Copy/Mul caller publication is now reconciled.
-Mod/Div's separately documented staged branches, omitted generic getter/
-arithmetic diagnostics, source scalar infallible field ordering and Words
-tail-clearing remain inherited source/representation boundaries. Do not
+Integer Mod/Div and quotRemCore have been direct since fdf6f3c: current
+mpz_div.go89–183 follows mpz.h466–496/mpz.cpp474–507, including actual
+overwritten-divisor rereads and quotient-before-remainder publication. Remaining
+boundaries include omitted generic getter/arithmetic diagnostics, source scalar
+infallible field ordering and Words tail clearing. Do not
 silently bypass these public algorithms with private bitwise duplicates.
 Selected chunk residues/SetUint64 values fit the actual Uint64 accessor;
 this packet does not claim a complete unrelated raw getter-domain rewrite.
@@ -336,8 +338,8 @@ service groups; broader service groups retain their other source checks):
 - `TestRationalServiceExtraWarmReuse`
 
 
-Remaining boundaries are the inherited real Mod/Div staged branches and
-other arithmetic/getter diagnostics, infallible scalar/header field ordering,
+Remaining boundaries include other arithmetic/getter diagnostics, infallible
+scalar/header field ordering,
 Words clearing, concrete allocator/backend/global memory composition, GMP/
 64-bit-limb profiles, TRACE, persistent ostream state and real solver consumers.
 This packet adds no allocator/backend API or service production changes,

@@ -85,9 +85,8 @@ func (m *RationalManager) checkCleanup(a *Rational) error {
 	if e := m.z.checkCleanup(&a.den); e != nil {
 		return e
 	}
-	if a.den.val == 0 {
-		return ErrUninitializedRational
-	}
+	// Cleanup/reset acts on owned components, including finite source results
+	// with denominator zero. This does not authorize ordinary numeral reads.
 	return nil
 }
 func (m *RationalManager) drop(a *Rational) { m.z.Del(&a.num); m.z.Del(&a.den) }
@@ -271,36 +270,34 @@ func (m *RationalManager) normalize(a *Rational) error {
 	}
 	return m.z.Div(&a.den, tmp, &a.den)
 }
+
+// Inv copies into the actual destination before the source in-place action.
 func (m *RationalManager) Inv(a, out *Rational) error {
+	if e := m.Copy(out, a); e != nil {
+		return e
+	}
+	return m.InvInPlace(out)
+}
+
+// InvInPlace retains the source debug assertion and release finite zero Swap.
+// A resulting denominator0 is invalid for ordinary reads but remains owned and
+// can be destroyed or explicitly Reset using cleanup-only validation.
+func (m *RationalManager) InvInPlace(a *Rational) error {
 	if e := m.check(a); e != nil {
 		return e
 	}
-	if e := m.check(out); e != nil {
-		return e
+	if modularSourceDebug && a.num.val == 0 {
+		return ErrIntegerAssertion
 	}
-	if a.num.val == 0 {
-		return ErrDivideByZero
-	}
-	work := NewRational()
-	defer m.drop(&work)
-	if e := m.z.Copy(&work.num, &a.num); e != nil {
-		return e
-	}
-	if e := m.z.Copy(&work.den, &a.den); e != nil {
-		return e
-	}
-	if work.num.val < 0 {
-		if e := m.z.Neg(&work.num); e != nil {
+	if a.num.val < 0 {
+		if e := m.z.Neg(&a.num); e != nil {
 			return e
 		}
-		if e := m.z.Neg(&work.den); e != nil {
+		if e := m.z.Neg(&a.den); e != nil {
 			return e
 		}
 	}
-	if e := m.z.Swap(&work.num, &work.den); e != nil {
-		return e
-	}
-	return m.Move(out, &work)
+	return m.z.Swap(&a.num, &a.den)
 }
 
 func (m *RationalManager) Equal(a, b *Rational) (bool, error) {
@@ -445,50 +442,50 @@ func (m *RationalManager) Mul(a, b, out *Rational) error {
 	return m.normalize(out)
 }
 
-// Div keeps the source divisor/destination alias branch, then fixes a negative
-// result denominator and normalizes. Work is staged until both components and
-// normalization succeed; source arithmetic and branch selection are retained.
+// Div preserves the actual divisor/destination branch and component order.
+// Errors retain completed caller fields; no staged pair masks normalization.
 func (m *RationalManager) Div(a, b, out *Rational) error {
 	for _, n := range []*Rational{a, b, out} {
 		if e := m.check(n); e != nil {
 			return e
 		}
 	}
-	if b.num.val == 0 {
-		return ErrDivideByZero
-	}
-	work := NewRational()
-	defer m.drop(&work)
 	if b == out {
 		var tmp Int
-		defer m.z.Del(&tmp)
+		cleanup := true
+		defer func() {
+			if cleanup {
+				m.z.Del(&tmp)
+			}
+		}()
 		if e := m.z.Mul(&a.num, &b.den, &tmp); e != nil {
 			return e
 		}
-		if e := m.z.Mul(&a.den, &b.num, &work.den); e != nil {
+		if e := m.z.Mul(&a.den, &b.num, &out.den); e != nil {
 			return e
 		}
-		if e := m.z.Copy(&work.num, &tmp); e != nil {
+		if e := m.z.Copy(&out.num, &tmp); e != nil {
 			return e
 		}
+		if e := m.z.Del(&tmp); e != nil {
+			return e
+		}
+		cleanup = false // source Del statement precedes sign repair and normalization
 	} else {
-		if e := m.z.Mul(&a.num, &b.den, &work.num); e != nil {
+		if e := m.z.Mul(&a.num, &b.den, &out.num); e != nil {
 			return e
 		}
-		if e := m.z.Mul(&a.den, &b.num, &work.den); e != nil {
-			return e
-		}
-	}
-	if work.den.val < 0 {
-		if e := m.z.Neg(&work.num); e != nil {
-			return e
-		}
-		if e := m.z.Neg(&work.den); e != nil {
+		if e := m.z.Mul(&a.den, &b.num, &out.den); e != nil {
 			return e
 		}
 	}
-	if e := m.normalize(&work); e != nil {
-		return e
+	if out.den.val < 0 {
+		if e := m.z.Neg(&out.num); e != nil {
+			return e
+		}
+		if e := m.z.Neg(&out.den); e != nil {
+			return e
+		}
 	}
-	return m.Move(out, &work)
+	return m.normalize(out)
 }

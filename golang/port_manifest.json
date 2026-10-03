@@ -85361,7 +85361,8 @@
         "mpnum/mpq_parse.go",
         "mpnum/mp_display.go",
         "mpnum/mpz_facade_extra_test.go",
-        "mpnum/mp_power_publication_test.go"
+        "mpnum/mp_power_publication_test.go",
+        "mpnum/mp_div_publication_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -85419,7 +85420,23 @@
         "TestPowerPublicationLeftShiftCopyPrecedesPromotionRefusal",
         "TestPowerPublicationRightShiftCopyRefusalPrefix",
         "TestPowerPublicationRationalCopyComponentRefusal",
-        "TestPowerPublicationRationalMulComponentRefusal"
+        "TestPowerPublicationRationalMulComponentRefusal",
+        "TestDivisionPublicationInverseZeroProfileAndCleanup",
+        "TestDivisionPublicationZeroDivisorFiniteActions",
+        "TestDivisionPublicationCallerFailurePrefixes",
+        "TestDivisionPublicationSourceThreeAssertions",
+        "TestDivisionPublicationFractionalIntegerForwardProfiles",
+        "TestDivisionPublicationInverseInPlaceOverload",
+        "TestDivisionPublicationInverseMinNegFailureOrder",
+        "TestDivisionPublicationEarlierAllocationPrecedesZeroDomain",
+        "TestDivisionPublicationComponentAliasSourceActions",
+        "TestDivisionPublicationRawUnreducedAndDenominatorSigns",
+        "TestDivisionPublicationServiceInvalidResultCopyAndCleanup",
+        "TestDivisionPublicationIntegerForwardRawSignsAliases",
+        "TestDivisionPublicationWarmStorage",
+        "TestDivisionPublicationZeroDivisorOutputAliases",
+        "TestDivisionPublicationInverseCopyFailureBeforeDebugAssertion",
+        "TestDivisionPublicationInverseTwoMinNegActions"
       ],
       "conditionals": [
         {
@@ -85548,6 +85565,29 @@
             "TestPowerPublicationRationalCopyComponentRefusal",
             "TestPowerPublicationRationalMulComponentRefusal"
           ]
+        },
+        {
+          "name": "Direct rational inverse, rational/mixed division, acc_div and rat_div component publication; debug-only integrality on eight integer division/rem/mod forwards",
+          "status": "partial",
+          "go_target": "mpnum/mp_div_publication_test.go",
+          "tests": [
+            "TestDivisionPublicationInverseZeroProfileAndCleanup",
+            "TestDivisionPublicationZeroDivisorFiniteActions",
+            "TestDivisionPublicationCallerFailurePrefixes",
+            "TestDivisionPublicationSourceThreeAssertions",
+            "TestDivisionPublicationFractionalIntegerForwardProfiles",
+            "TestDivisionPublicationInverseInPlaceOverload",
+            "TestDivisionPublicationInverseMinNegFailureOrder",
+            "TestDivisionPublicationEarlierAllocationPrecedesZeroDomain",
+            "TestDivisionPublicationComponentAliasSourceActions",
+            "TestDivisionPublicationRawUnreducedAndDenominatorSigns",
+            "TestDivisionPublicationServiceInvalidResultCopyAndCleanup",
+            "TestDivisionPublicationIntegerForwardRawSignsAliases",
+            "TestDivisionPublicationWarmStorage",
+            "TestDivisionPublicationZeroDivisorOutputAliases",
+            "TestDivisionPublicationInverseCopyFailureBeforeDebugAssertion",
+            "TestDivisionPublicationInverseTwoMinNegActions"
+          ]
         }
       ],
       "ownership": [
@@ -85557,7 +85597,8 @@
         "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See mpnum/PORT_STATUS.md.",
         "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md.",
         "tst1 retains original numerical setup, lexical manager scope and explicit Del; 18 comparison assertions across MPZ/MPQ. Additional printed fixtures and independent tests are not source assertions. See MPZ_FACADE_EXTRA_PORT_STATUS.md.",
-        "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See MPZ_POWER_PUBLICATION_PACKET.md; source allocator/backend integration remains required."
+        "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See MPZ_POWER_PUBLICATION_PACKET.md; source allocator/backend integration remains required.",
+        "Division writes actual caller numerator/denominator in source order, preserving divisor/output aliases and explicit local-tmp Del before normalization. Finite denominator-zero results remain owned; cleanup-only validation permits destruction/reset while ordinary reads remain guarded. See MPQ_DIVISION_PUBLICATION_PACKET.md."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -85565,7 +85606,8 @@
         "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits.",
         "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors.",
         "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text.",
-        "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open."
+        "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open.",
+        "Finite release inverse/division zero results retain actual source raw fields; 0/0 fails at actual integer division after component publication. Service initialized Copy/Move boundary and explicit Go cleanup are adapters. Actual source allocator/global composition remains open; no whole unit promoted."
       ]
     },
     {
@@ -106817,7 +106859,8 @@
         "mpnum/mpq_bitwise.go",
         "mpnum/mpz_facade_extra.go",
         "mpnum/mp_power_publication_test.go",
-        "mpnum/mp_bitwise_publication_test.go"
+        "mpnum/mp_bitwise_publication_test.go",
+        "mpnum/mp_div_publication_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -106945,7 +106988,23 @@
         "TestBitwisePublicationServiceValueRoutes",
         "TestBitwisePublicationServiceFailureRoots",
         "TestBitwisePublicationBigNotZeroWidthCopyOrder",
-        "TestBitwisePublicationSignedSmallBoundaryAliases"
+        "TestBitwisePublicationSignedSmallBoundaryAliases",
+        "TestDivisionPublicationInverseZeroProfileAndCleanup",
+        "TestDivisionPublicationZeroDivisorFiniteActions",
+        "TestDivisionPublicationCallerFailurePrefixes",
+        "TestDivisionPublicationSourceThreeAssertions",
+        "TestDivisionPublicationFractionalIntegerForwardProfiles",
+        "TestDivisionPublicationInverseInPlaceOverload",
+        "TestDivisionPublicationInverseMinNegFailureOrder",
+        "TestDivisionPublicationEarlierAllocationPrecedesZeroDomain",
+        "TestDivisionPublicationComponentAliasSourceActions",
+        "TestDivisionPublicationRawUnreducedAndDenominatorSigns",
+        "TestDivisionPublicationServiceInvalidResultCopyAndCleanup",
+        "TestDivisionPublicationIntegerForwardRawSignsAliases",
+        "TestDivisionPublicationWarmStorage",
+        "TestDivisionPublicationZeroDivisorOutputAliases",
+        "TestDivisionPublicationInverseCopyFailureBeforeDebugAssertion",
+        "TestDivisionPublicationInverseTwoMinNegActions"
       ],
       "conditionals": [
         {
@@ -107760,6 +107819,29 @@
             "TestPowerPublicationRationalCopyComponentRefusal",
             "TestPowerPublicationRationalMulComponentRefusal"
           ]
+        },
+        {
+          "name": "Direct rational inverse, rational/mixed division, acc_div and rat_div component publication; debug-only integrality on eight integer division/rem/mod forwards",
+          "status": "partial",
+          "go_target": "mpnum/mp_div_publication_test.go",
+          "tests": [
+            "TestDivisionPublicationInverseZeroProfileAndCleanup",
+            "TestDivisionPublicationZeroDivisorFiniteActions",
+            "TestDivisionPublicationCallerFailurePrefixes",
+            "TestDivisionPublicationSourceThreeAssertions",
+            "TestDivisionPublicationFractionalIntegerForwardProfiles",
+            "TestDivisionPublicationInverseInPlaceOverload",
+            "TestDivisionPublicationInverseMinNegFailureOrder",
+            "TestDivisionPublicationEarlierAllocationPrecedesZeroDomain",
+            "TestDivisionPublicationComponentAliasSourceActions",
+            "TestDivisionPublicationRawUnreducedAndDenominatorSigns",
+            "TestDivisionPublicationServiceInvalidResultCopyAndCleanup",
+            "TestDivisionPublicationIntegerForwardRawSignsAliases",
+            "TestDivisionPublicationWarmStorage",
+            "TestDivisionPublicationZeroDivisorOutputAliases",
+            "TestDivisionPublicationInverseCopyFailureBeforeDebugAssertion",
+            "TestDivisionPublicationInverseTwoMinNegActions"
+          ]
         }
       ],
       "ownership": [
@@ -107774,7 +107856,8 @@
         "Number theory locals use existing budgeted numerical cells/Words and are always deleted in source order. ExtendedGCD preserves coefficient publication/failure prefixes and rational denominator reset timing; immediate failed-prefix caller/cache roots audited. See NUMBER_THEORY_PORT_STATUS.md.",
         "Inspection uses existing integer roots; extraction acquires deep independent limbs and thin setters/swap retain source component identity. Failed-prefix tests audit cells/Words and decoded values before rendering/teardown. See RATIONAL_INSPECTION_PORT_STATUS.md.",
         "Bitwise rational wrappers forward actual numerator aliases to existing budgeted integer manager, then reset denominator; fault roots and malformed integer domains checked. See RATIONAL_FACADE_EXTRA_PORT_STATUS.md.",
-        "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See MPZ_POWER_PUBLICATION_PACKET.md; source allocator/backend integration remains required."
+        "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See MPZ_POWER_PUBLICATION_PACKET.md; source allocator/backend integration remains required.",
+        "Division writes actual caller numerator/denominator in source order, preserving divisor/output aliases and explicit local-tmp Del before normalization. Finite denominator-zero results remain owned; cleanup-only validation permits destruction/reset while ordinary reads remain guarded. See MPQ_DIVISION_PUBLICATION_PACKET.md."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -107788,7 +107871,8 @@
         "Selected release ExtendedGCD preserves finite aliases and modified-input sign rereads. Source Z3DEBUG diagnostic arithmetic remains unported; g3checked selects reference validation only. ext_gcd.h wrapper algorithm remains separate and is not credited from manager inverse properties.",
         "Explicit manager projects rational.h inclusive32-bit wrappers, distinct from strict MPZ boundaries; global wrapper remains incomplete. Float positive converted denominator SASSERT becomes typed ErrRationalFloatDomain. Source raw component alias publication can leave denominator zero; subsequent operations diagnose initialization.",
         "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open.",
-        "Unsigned low63-bit mask defines the intended small bitwise_not signed-shift boundary. Negative and rational-integrality source assertions are debug-only. Selected internal32 bitwise methods publish directly in source order; Go error cleanup releases the actual lexical locals. Both-negative big binary loops stop at the first actual inline -1/-1 quotient continuation, after prior source actions; this typed boundary does not claim equivalence to a future source allocation refusal. Other arithmetic staging, source allocator topology, GMP and nonselected backends remain open."
+        "Unsigned low63-bit mask defines the intended small bitwise_not signed-shift boundary. Negative and rational-integrality source assertions are debug-only. Selected internal32 bitwise methods publish directly in source order; Go error cleanup releases the actual lexical locals. Both-negative big binary loops stop at the first actual inline -1/-1 quotient continuation, after prior source actions; this typed boundary does not claim equivalence to a future source allocation refusal. Other arithmetic staging, source allocator topology, GMP and nonselected backends remain open.",
+        "Finite release inverse/division zero results retain actual source raw fields; 0/0 fails at actual integer division after component publication. Service initialized Copy/Move boundary and explicit Go cleanup are adapters. Actual source allocator/global composition remains open; no whole unit promoted."
       ]
     },
     {
@@ -116410,7 +116494,9 @@
       "go_targets": [
         "util_sexpr.go",
         "util_sexpr_debug.go",
-        "util_sexpr_nodebug.go"
+        "util_sexpr_nodebug.go",
+        "util_sexpr_debug_test.go",
+        "util_sexpr_nodebug_test.go"
       ],
       "tests": [
         "TestSexprKindsFactoriesAndDefinedDisplay",
@@ -116601,7 +116687,8 @@
         }
       ],
       "ownership": [
-        "Pointer-free paged records and scalar owned references/vector views; children Words and byte payloads pooled. Actual manager/vector headers, directories/pages/retained formatting scratch and old/new peaks charged. Per-atom BV local inline16/doubling overflow destroyed before numeral. Immediate failed-prefix roots tested. See SEXPR_PORT_STATUS.md."
+        "Pointer-free paged records and scalar owned references/vector views; children Words and byte payloads pooled. Actual manager/vector headers, directories/pages/retained formatting scratch and old/new peaks charged. Per-atom BV local inline16/doubling overflow destroyed before numeral. Immediate failed-prefix roots tested. See SEXPR_PORT_STATUS.md.",
+        "Fractional BV display follows raw numerator Rem/IDiv in release and integrality assertion in debug; exact output prefixes remain #x1 versus #x before the existing boundaries. TestSexprBVSourceWidthQuirks retains all original finite width checks."
       ],
       "deviations": [
         "Source noncomposite display falls into an invalid composite cast; Go returns its defined printed prefix plus a typed continuation error. Empty composites still print only closing parenthesis. Checked scalar handles replace raw pointers and owner teardown cleans outstanding owned numerals. Ref-vector null callbacks are explicit no-op adapter; raw manager null calls reject. Nonempty self-append rejects source unbounded growth; allocation preflight avoids leaked reference increments. RC uint32 wrap preserved; generation/capacity limits checked. Compiler pragmas do not change Go semantic core."
