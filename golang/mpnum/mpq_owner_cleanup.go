@@ -27,19 +27,31 @@ func (m *RationalManager) CloseChecked() error {
 		m.cleanupCause = nil
 		return nil
 	}
-	m.closing = true
-	// mpq.cpp destructor del order; each mpq releases NUM then DEN.
-	roots := [9]*Int{&m.nTmp, &m.addTmp1, &m.addTmp2, &m.ltTmp1.num, &m.ltTmp1.den, &m.ltTmp2.num, &m.ltTmp2.den, &m.addMulTmp.num, &m.addMulTmp.den}
-	for m.cleanupStage < uint8(len(roots)) {
-		if e := m.z.Del(roots[m.cleanupStage]); e != nil {
+	if m.sourceFinalizing && !m.sourceFinalized && !m.sourceGuard {
+		if e := m.SourceFinalize(); e != nil {
 			m.cleanupCause = e
 			return m
 		}
-		m.cleanupStage++
+	}
+	m.closing = true
+	if !m.sourceGuard {
+		if e := m.cleanupOuter(false); e != nil {
+			m.cleanupCause = e
+			return m
+		}
 	}
 	if e := m.z.CloseChecked(); e != nil {
 		m.cleanupCause = e
 		return m
+	}
+	// Owning abort releases only child-known roots; stopped source history stays.
+	if m.sourceGuard {
+		m.nTmp = Int{}
+		m.addTmp1 = Int{}
+		m.addTmp2 = Int{}
+		m.ltTmp1 = Rational{}
+		m.ltTmp2 = Rational{}
+		m.addMulTmp = Rational{}
 	}
 	m.budget.Release(m.headerBytes)
 	m.headerBytes = 0

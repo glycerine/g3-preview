@@ -31,6 +31,41 @@ func (s *RationalService) CloseChecked() error {
 	}
 	s.closing = true
 	fail := func(e error) error { s.cleanupCause = e; return s }
+	if s.sourceFinalizing && !s.sourceFinalized && !s.sourceGuard {
+		if e := s.sourceFinalizeLocked(); e != nil {
+			return fail(e)
+		}
+	}
+	if !s.sourceGuard {
+		if e := s.cleanupOuter(false); e != nil {
+			return fail(e)
+		}
+	}
+	if e := s.manager.CloseChecked(); e != nil {
+		return fail(e)
+	}
+	if s.sourceGuard {
+		s.cache = nil
+		s.manager.budget.Release(s.cacheBytes)
+		s.cacheBytes = 0
+		s.infZero = OwnedInfRational{}
+		s.infOne = OwnedInfRational{}
+		s.infMinusOne = OwnedInfRational{}
+		s.infIntZero = OwnedInfIntRational{}
+		s.infIntOne = OwnedInfIntRational{}
+		s.infIntMinusOne = OwnedInfIntRational{}
+		s.zero = Rational{}
+		s.one = Rational{}
+		s.minusOne = Rational{}
+	}
+	s.manager.budget.Release(s.headerBytes)
+	s.headerBytes = 0
+	s.closed = true
+	s.cleanupCause = nil
+	return nil
+}
+
+func (s *RationalService) cleanupOuter(source bool) error {
 	// rational.cpp finalization hooks, then ascending cache and constants.
 	// inf_rational members destroy SECOND before FIRST, each NUM before DEN.
 	infRoots := [18]*Int{
@@ -39,8 +74,8 @@ func (s *RationalService) CloseChecked() error {
 		&s.infMinusOne.second.num, &s.infMinusOne.second.den, &s.infMinusOne.first.num, &s.infMinusOne.first.den,
 		&s.infIntZero.first.num, &s.infIntZero.first.den, &s.infIntOne.first.num, &s.infIntOne.first.den, &s.infIntMinusOne.first.num, &s.infIntMinusOne.first.den}
 	for s.cleanupStage < 18 {
-		if e := s.manager.z.Del(infRoots[s.cleanupStage]); e != nil {
-			return fail(e)
+		if e := s.releaseOuterLeaf(infRoots[s.cleanupStage], source); e != nil {
+			return e
 		}
 		s.cleanupStage++
 		switch s.cleanupStage {
@@ -65,8 +100,8 @@ func (s *RationalService) CloseChecked() error {
 			if s.cleanupComponent == 1 {
 				p = &r.den
 			}
-			if e := s.manager.z.Del(p); e != nil {
-				return fail(e)
+			if e := s.releaseOuterLeaf(p, source); e != nil {
+				return e
 			}
 			s.cleanupComponent++
 			if s.cleanupComponent == 2 {
@@ -81,17 +116,11 @@ func (s *RationalService) CloseChecked() error {
 	}
 	constants := [6]*Int{&s.zero.num, &s.zero.den, &s.one.num, &s.one.den, &s.minusOne.num, &s.minusOne.den}
 	for s.cleanupStage < 25 {
-		if e := s.manager.z.Del(constants[s.cleanupStage-19]); e != nil {
-			return fail(e)
+		if e := s.releaseOuterLeaf(constants[s.cleanupStage-19], source); e != nil {
+			return e
 		}
 		s.cleanupStage++
 	}
-	if e := s.manager.CloseChecked(); e != nil {
-		return fail(e)
-	}
-	s.manager.budget.Release(s.headerBytes)
-	s.headerBytes = 0
-	s.closed = true
-	s.cleanupCause = nil
+
 	return nil
 }

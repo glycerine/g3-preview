@@ -41,21 +41,23 @@ type RationalServiceStats struct {
 // requires external owner confinement; independent service locks do not make
 // the Budget safe for concurrent use. Never shallow-copy this owner.
 type RationalService struct {
-	mu                                    sync.Mutex
-	manager                               *RationalManager
-	self                                  *RationalService
-	ownerID                               uint64
-	zero, one, minusOne                   Rational
-	infZero, infOne, infMinusOne          OwnedInfRational
-	infIntZero, infIntOne, infIntMinusOne OwnedInfIntRational
-	cache                                 []Rational
-	cacheBytes, headerBytes               uint64
-	closed                                bool
-	originalCause, cleanupCause           error
-	cleanupStage                          uint8
-	cleanupCacheIndex                     uint32
-	cleanupComponent                      uint8
-	closing                               bool
+	mu                                             sync.Mutex
+	manager                                        *RationalManager
+	self                                           *RationalService
+	ownerID                                        uint64
+	zero, one, minusOne                            Rational
+	infZero, infOne, infMinusOne                   OwnedInfRational
+	infIntZero, infIntOne, infIntMinusOne          OwnedInfIntRational
+	cache                                          []Rational
+	cacheBytes, headerBytes                        uint64
+	closed                                         bool
+	originalCause, cleanupCause                    error
+	cleanupStage                                   uint8
+	cleanupCacheIndex                              uint32
+	cleanupComponent                               uint8
+	closing                                        bool
+	sourceFinalizing, sourceFinalized, sourceGuard bool
+	sourceCause                                    error
 }
 
 func nextRationalServiceID() (uint64, error) {
@@ -123,7 +125,7 @@ func (s *RationalService) lock() error {
 		return ErrRationalServiceCopy
 	}
 	s.mu.Lock()
-	if s.closed || s.closing {
+	if s.closed || s.closing || s.sourceFinalizing {
 		s.mu.Unlock()
 		return arena.ErrClosed
 	}

@@ -54878,7 +54878,13 @@
         "sat_solver_watch_lists.go",
         "sat_solver_watch_lists_test.go",
         "sat_solver_variable_state.go",
-        "sat_solver_variable_state_test.go"
+        "sat_solver_variable_state_test.go",
+        "sat_solver_assignment.go",
+        "sat_solver_assignment_test.go",
+        "sat_solver_propagation.go",
+        "sat_solver_propagation_control.go",
+        "sat_solver_propagation_control_test.go",
+        "sat_solver_propagation_test.go"
       ],
       "tests": [
         "TestSATSolverClauseCoreFiniteSimplification",
@@ -54896,7 +54902,21 @@
         "TestSATSolverVariableTrailAndConcretePhysicalOwnership",
         "TestSATSolverVariableConstructorRefusalAndBorrowedTodo",
         "TestSATSolverVariableRetainedSourceRetryAndColdGuards",
-        "TestSATSolverClauseStateSourceAssignmentWidth"
+        "TestSATSolverClauseStateSourceAssignmentWidth",
+        "TestSATSolverAssignConflictStatusSourceOrder",
+        "TestSATSolverAssignTrailRefusalAndMissingExtensionPrefix",
+        "TestSATSolverAssignMissingExtensionAfterActualTrail",
+        "TestSATSolverCheckpointActualResourceAndMemoryOrder",
+        "TestSATSolverPropagationConcreteExceptionAndResizePrefix",
+        "TestSATSolverPropagationOwnerBudgetAndCounterBoundaries",
+        "TestSATSolverPropagateBinaryTernaryAndConflictCleanup",
+        "TestSATSolverPropagateClauseMoveUnitGlueAndConflict",
+        "TestSATSolverPropagateExternalActualDispatchBoundary",
+        "TestSATSolverPropagationIndependentTruthTables",
+        "TestSATSolverPropagationClauseBranchCompactionAndMoveRefusal",
+        "TestSATSolverPropagationCapturedBackingAtEnd",
+        "TestSATSolverPropagationWarmActualBackingPlateau",
+        "TestSATSolverPropagationLastSelfMoveRawLifetime"
       ],
       "conditionals": [
         {
@@ -55361,6 +55381,34 @@
             "TestSATSolverVariableConstructorRefusalAndBorrowedTodo",
             "TestSATSolverVariableRetainedSourceRetryAndColdGuards"
           ]
+        },
+        {
+          "name": "set_conflict/status and source assign dispatch/core scalar-before-trail publication; extension asserted call remains an explicit missing-binding boundary",
+          "status": "partial",
+          "go_target": "sat_solver_assignment.go",
+          "tests": [
+            "TestSATSolverAssignConflictStatusSourceOrder",
+            "TestSATSolverAssignTrailRefusalAndMissingExtensionPrefix",
+            "TestSATSolverAssignMissingExtensionAfterActualTrail"
+          ]
+        },
+        {
+          "name": "Source propagate_core null-extension binary/ternary/clause branches with captured physical watch lifetimes, exact checkpoint/counter/glue actions and clause-backed num_diff_levels; external dispatch remains unported",
+          "status": "partial",
+          "go_target": "sat_solver_propagation.go",
+          "tests": [
+            "TestSATSolverCheckpointActualResourceAndMemoryOrder",
+            "TestSATSolverPropagationConcreteExceptionAndResizePrefix",
+            "TestSATSolverPropagationOwnerBudgetAndCounterBoundaries",
+            "TestSATSolverPropagateBinaryTernaryAndConflictCleanup",
+            "TestSATSolverPropagateClauseMoveUnitGlueAndConflict",
+            "TestSATSolverPropagateExternalActualDispatchBoundary",
+            "TestSATSolverPropagationIndependentTruthTables",
+            "TestSATSolverPropagationClauseBranchCompactionAndMoveRefusal",
+            "TestSATSolverPropagationCapturedBackingAtEnd",
+            "TestSATSolverPropagationWarmActualBackingPlateau",
+            "TestSATSolverPropagationLastSelfMoveRawLifetime"
+          ]
         }
       ],
       "ownership": [
@@ -55369,7 +55417,9 @@
       ],
       "deviations": [
         "Concrete allocation-free heapsort replaces std::sort on scalar literals. TRACE, solver construction, BCP, conflicts, search, scopes and remaining methods are unported.",
-        "Wrapped source allocations that cannot represent full typed capacity remain unported; host bounds are separate from exact source overflow DefaultException. Default child policies, full solver constructor, propagation, conflicts, scopes/search and TRACE remain open."
+        "Wrapped source allocations that cannot represent full typed capacity remain unported; host bounds are separate from exact source overflow DefaultException. Default child policies, full solver constructor, propagation, conflicts, scopes/search and TRACE remain open.",
+        "Propagation state borrows actual variable/clause/model-converter/rlimit/Runtime/config owners and owns only its charged cold member grouping/diff-level backing. Cleaner/asymm/probing counters are real selected member state, not child Run implementations. No concrete extension subclass exists in this fork; dispatch fails explicitly at asserted/EXT call sites after completed source prefixes. Full solver constructor, UpdateParams/default policy children, propagation integrity/missed-propagation checks, literal-span num_diff_levels consumers, search/conflicts/scopes and user-scope campaign remain open.",
+        "Checkpoint reads the actual bound Runtime allocation counter. SAT arena-backed typed storage has not yet been integrated into that source runtime accounting domain; end-to-end solver memory-limit behavior remains open. No allocation events are fabricated from Budget usage."
       ]
     },
     {
@@ -55386,7 +55436,13 @@
         "sat_solver_variable_state.go",
         "sat_solver_variable_state_test.go",
         "sat_solver_clause_core.go",
-        "sat_solver_clause_core_test.go"
+        "sat_solver_clause_core_test.go",
+        "sat_solver_assignment.go",
+        "sat_solver_assignment_test.go",
+        "sat_solver_propagation.go",
+        "sat_solver_propagation_control.go",
+        "sat_solver_propagation_control_test.go",
+        "sat_solver_propagation_test.go"
       ],
       "tests": [
         "TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots",
@@ -55404,7 +55460,21 @@
         "TestSATSolverClauseCoreSourcePrefixesAndGuards",
         "TestSATSolverClauseCoreWarmNoAllocation",
         "TestSATSolverClauseCoreWatchSourceAssertions",
-        "TestSATSolverClauseStateSourceAssignmentWidth"
+        "TestSATSolverClauseStateSourceAssignmentWidth",
+        "TestSATSolverAssignConflictStatusSourceOrder",
+        "TestSATSolverAssignTrailRefusalAndMissingExtensionPrefix",
+        "TestSATSolverAssignMissingExtensionAfterActualTrail",
+        "TestSATSolverCheckpointActualResourceAndMemoryOrder",
+        "TestSATSolverPropagationConcreteExceptionAndResizePrefix",
+        "TestSATSolverPropagationOwnerBudgetAndCounterBoundaries",
+        "TestSATSolverPropagateBinaryTernaryAndConflictCleanup",
+        "TestSATSolverPropagateClauseMoveUnitGlueAndConflict",
+        "TestSATSolverPropagateExternalActualDispatchBoundary",
+        "TestSATSolverPropagationIndependentTruthTables",
+        "TestSATSolverPropagationClauseBranchCompactionAndMoveRefusal",
+        "TestSATSolverPropagationCapturedBackingAtEnd",
+        "TestSATSolverPropagationWarmActualBackingPlateau",
+        "TestSATSolverPropagationLastSelfMoveRawLifetime"
       ],
       "conditionals": [
         {
@@ -55453,13 +55523,43 @@
             "TestSATSolverVariableConstructorRefusalAndBorrowedTodo",
             "TestSATSolverVariableRetainedSourceRetryAndColdGuards"
           ]
+        },
+        {
+          "name": "set_conflict/status and source assign dispatch/core scalar-before-trail publication; extension asserted call remains an explicit missing-binding boundary",
+          "status": "partial",
+          "go_target": "sat_solver_assignment.go",
+          "tests": [
+            "TestSATSolverAssignConflictStatusSourceOrder",
+            "TestSATSolverAssignTrailRefusalAndMissingExtensionPrefix",
+            "TestSATSolverAssignMissingExtensionAfterActualTrail"
+          ]
+        },
+        {
+          "name": "Source propagate_core null-extension binary/ternary/clause branches with captured physical watch lifetimes, exact checkpoint/counter/glue actions and clause-backed num_diff_levels; external dispatch remains unported",
+          "status": "partial",
+          "go_target": "sat_solver_propagation.go",
+          "tests": [
+            "TestSATSolverCheckpointActualResourceAndMemoryOrder",
+            "TestSATSolverPropagationConcreteExceptionAndResizePrefix",
+            "TestSATSolverPropagationOwnerBudgetAndCounterBoundaries",
+            "TestSATSolverPropagateBinaryTernaryAndConflictCleanup",
+            "TestSATSolverPropagateClauseMoveUnitGlueAndConflict",
+            "TestSATSolverPropagateExternalActualDispatchBoundary",
+            "TestSATSolverPropagationIndependentTruthTables",
+            "TestSATSolverPropagationClauseBranchCompactionAndMoveRefusal",
+            "TestSATSolverPropagationCapturedBackingAtEnd",
+            "TestSATSolverPropagationWarmActualBackingPlateau",
+            "TestSATSolverPropagationLastSelfMoveRawLifetime"
+          ]
         }
       ],
       "ownership": [
         "Source-width char assignment and scalar columns; charged outer watch tokens/metadata own each actual child once; real activity/queue/trail, borrowed actual todo. No complete solver construction or search."
       ],
       "deviations": [
-        "Wrapped source allocations that cannot represent full typed capacity remain unported; host bounds are separate from exact source overflow DefaultException. Default child policies, full solver constructor, propagation, conflicts, scopes/search and TRACE remain open."
+        "Wrapped source allocations that cannot represent full typed capacity remain unported; host bounds are separate from exact source overflow DefaultException. Default child policies, full solver constructor, propagation, conflicts, scopes/search and TRACE remain open.",
+        "Propagation state borrows actual variable/clause/model-converter/rlimit/Runtime/config owners and owns only its charged cold member grouping/diff-level backing. Cleaner/asymm/probing counters are real selected member state, not child Run implementations. No concrete extension subclass exists in this fork; dispatch fails explicitly at asserted/EXT call sites after completed source prefixes. Full solver constructor, UpdateParams/default policy children, propagation integrity/missed-propagation checks, literal-span num_diff_levels consumers, search/conflicts/scopes and user-scope campaign remain open.",
+        "Checkpoint reads the actual bound Runtime allocation counter. SAT arena-backed typed storage has not yet been integrated into that source runtime accounting domain; end-to-end solver memory-limit behavior remains open. No allocation events are fabricated from Budget usage."
       ]
     },
     {
@@ -96291,9 +96391,10 @@
       "sha256": "820b5ed5288b4154315abc8b858fd9d198749d0dd0e8ed416b155f4e39e19998",
       "component": "util",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
-        "mpnum/inf_eps_rational.go"
+        "mpnum/inf_eps_rational.go",
+        "mpnum/inf_scalar_projection_test.go"
       ],
       "tests": [
         "TestInfEpsInfFiniteTripleOracles",
@@ -96306,7 +96407,13 @@
         "TestInfEpsInfStructuralEqualityAndReturnCopy",
         "TestInfEpsInfPointerFreeWarmPaths",
         "TestInfEpsInfFormattingOneFinalAllocation",
-        "TestInfEpsInfConstructorSignedScalarShapes"
+        "TestInfEpsInfConstructorSignedScalarShapes",
+        "TestInfScalarProjectionAllGetterProfilesAndRawPredicates",
+        "TestInfScalarProjectionUnreadFieldsAndNestedShortCircuit",
+        "TestInfScalarProjectionFacadeRawFieldsAndNarrowing",
+        "TestInfScalarProjectionOwnershipAndWarmGraph",
+        "TestInfScalarProjectionRegisteredDefaultGetter",
+        "TestInfScalarProjectionRawManagerEndangeredReads"
       ],
       "conditionals": [
         {
@@ -96328,8 +96435,8 @@
           "text": "SASSERT(is_uint64());"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
+      "methods_audited": false,
+      "ownership_audited": false,
       "methods": [
         {
           "name": "actual inf_rational specialization constructors/copy/destruction/reset/swap",
@@ -96351,7 +96458,7 @@
         },
         {
           "name": "hash/display and owned component projections",
-          "status": "ported",
+          "status": "partial",
           "go_target": "mpnum/inf_eps_rational.go",
           "tests": [
             "TestInfEpsInfFiniteTripleOracles",
@@ -96456,13 +96563,31 @@
             "TestInfEpsInfFormattingOneFinalAllocation",
             "TestInfEpsInfConstructorSignedScalarShapes"
           ]
+        },
+        {
+          "name": "Remaining source-defined raw component projection, sign/hash and owning-copy domains",
+          "status": "unported"
+        },
+        {
+          "name": "Source scalar IsInt/IsRational and signed/unsigned64 fit/getter family, DEBUG assertions and release FIRST projection with actual component short circuit",
+          "status": "ported",
+          "go_target": "mpnum/inf_eps_rational.go",
+          "tests": [
+            "TestInfScalarProjectionAllGetterProfilesAndRawPredicates",
+            "TestInfScalarProjectionUnreadFieldsAndNestedShortCircuit",
+            "TestInfScalarProjectionFacadeRawFieldsAndNarrowing",
+            "TestInfScalarProjectionOwnershipAndWarmGraph",
+            "TestInfScalarProjectionRegisteredDefaultGetter",
+            "TestInfScalarProjectionRawManagerEndangeredReads"
+          ]
         }
       ],
       "ownership": [
         "Concrete pointer-free triple and scalar service provenance. Infinity publishes first, nested members first then second; destructor reverses members. Existing manager budget accounts numeric cells/Words/text scratch; one final caller string. Actual only repository Numeral=inf_rational specialization, no Go generics. See PORT_PROGRESS.md#audit-inf-eps-rational-port-status-md."
       ],
       "deviations": [
-        "Source const references return owning copies; source scalar assertion domains are typed errors. Mixed equality defect and exact nonsaturating infinity coefficient retained. No actual registered direct source assertion counts invented."
+        "Source const references return owning copies; source scalar assertion domains are typed errors. Mixed equality defect and exact nonsaturating infinity coefficient retained. No actual registered direct source assertion counts invented.",
+        "Source h131\u2013147 selected component reference projections ignore unrelated infinity/numeral components; current owning forwards check all denominators and Copy rejects source-finite raw denominator0. NUM-only sign/hash routes retain separate raw-domain debt."
       ]
     },
     {
@@ -96562,9 +96687,10 @@
       "sha256": "6f2ce95052ff18cc2e6fd7103741c1959c6004a4207fa9b366492d4e94ba95c8",
       "component": "util",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
-        "mpnum/inf_int_rational.go"
+        "mpnum/inf_int_rational.go",
+        "mpnum/inf_scalar_projection_test.go"
       ],
       "tests": [
         "TestInfIntRationalSourceConstructorsConstantsLifetime",
@@ -96579,7 +96705,13 @@
         "TestInfIntRationalPostFailureAndGetterIndependence",
         "TestRationalServiceInfinitesimalHeaderOwnership",
         "TestRationalServiceInfinitesimalConstructorFailureRefunds",
-        "TestRationalServiceInfinitesimalFinalizerTraversal"
+        "TestRationalServiceInfinitesimalFinalizerTraversal",
+        "TestInfScalarProjectionAllGetterProfilesAndRawPredicates",
+        "TestInfScalarProjectionUnreadFieldsAndNestedShortCircuit",
+        "TestInfScalarProjectionFacadeRawFieldsAndNarrowing",
+        "TestInfScalarProjectionOwnershipAndWarmGraph",
+        "TestInfScalarProjectionRegisteredDefaultGetter",
+        "TestInfScalarProjectionRawManagerEndangeredReads"
       ],
       "conditionals": [
         {
@@ -96609,8 +96741,8 @@
           "text": "SASSERT(r.m_second == 0);"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
+      "methods_audited": false,
+      "ownership_audited": false,
       "methods": [
         {
           "name": "all active constructors, copy/assignment, reset/swap/destruction and constants",
@@ -96634,7 +96766,7 @@
         },
         {
           "name": "hash/eq functors, full inspection/conversion and owned component/numerator/denominator access",
-          "status": "ported",
+          "status": "partial",
           "go_target": "mpnum/inf_int_rational.go",
           "tests": [
             "TestInfIntRationalSourceConstructorsConstantsLifetime",
@@ -96691,6 +96823,23 @@
             "TestRationalServiceInfinitesimalConstructorFailureRefunds",
             "TestRationalServiceInfinitesimalFinalizerTraversal"
           ]
+        },
+        {
+          "name": "Remaining source-defined raw component projection, sign/hash and owning-copy domains",
+          "status": "unported"
+        },
+        {
+          "name": "Source scalar IsInt/IsRational and signed/unsigned64 fit/getter family, DEBUG assertions and release FIRST projection with actual component short circuit",
+          "status": "ported",
+          "go_target": "mpnum/inf_int_rational.go",
+          "tests": [
+            "TestInfScalarProjectionAllGetterProfilesAndRawPredicates",
+            "TestInfScalarProjectionUnreadFieldsAndNestedShortCircuit",
+            "TestInfScalarProjectionFacadeRawFieldsAndNarrowing",
+            "TestInfScalarProjectionOwnershipAndWarmGraph",
+            "TestInfScalarProjectionRegisteredDefaultGetter",
+            "TestInfScalarProjectionRawManagerEndangeredReads"
+          ]
         }
       ],
       "ownership": [
@@ -96698,7 +96847,8 @@
       ],
       "deviations": [
         "Global constants and borrowed rational accessors are owner-local/independent-copy adapters. Signed32 overflow, INT_MIN negation and formatting negation are explicit typed undefined-domain failures with source defined prefixes retained.",
-        "No registered source inf_int_rational test exists; independent finite/fault/alias/ownership checks are supplied without inventing source assertion coverage."
+        "No registered source inf_int_rational test exists; independent finite/fault/alias/ownership checks are supplied without inventing source assertion coverage.",
+        "Source h129\u2013137 returns FIRST without a denominator-domain assertion; InfIntFirst/Rational/Infinitesimal still enter ordinary checkInfInt and owning Copy, rejecting source-finite raw denominator0 and inspecting unrelated FIRST before constructing epsilon. Sign/hash NUM-only routes retain separate raw-domain debt."
       ]
     },
     {
@@ -96806,9 +96956,10 @@
       "sha256": "bb3b33c5eca9ab63baf24202070f9cb717331ce9d6b81a651f2abdee28823591",
       "component": "util",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
-        "mpnum/inf_rational.go"
+        "mpnum/inf_rational.go",
+        "mpnum/inf_scalar_projection_test.go"
       ],
       "tests": [
         "TestInfRationalSource80Assertions",
@@ -96829,7 +96980,13 @@
         "TestInfFormatOneFinalAllocation",
         "TestInfFormatSignedZeroAndDomain",
         "TestInfFormatFailurePrefixesImmediateRoots",
-        "TestInfFormatWorkspaceGrowthPeak"
+        "TestInfFormatWorkspaceGrowthPeak",
+        "TestInfScalarProjectionAllGetterProfilesAndRawPredicates",
+        "TestInfScalarProjectionUnreadFieldsAndNestedShortCircuit",
+        "TestInfScalarProjectionFacadeRawFieldsAndNarrowing",
+        "TestInfScalarProjectionOwnershipAndWarmGraph",
+        "TestInfScalarProjectionRegisteredDefaultGetter",
+        "TestInfScalarProjectionRawManagerEndangeredReads"
       ],
       "conditionals": [
         {
@@ -96867,8 +97024,8 @@
           "text": "SASSERT(r.m_second.is_zero());"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
+      "methods_audited": false,
+      "ownership_audited": false,
       "methods": [
         {
           "name": "all active constructors, assignment, reset, swap, destruction and constants",
@@ -96894,7 +97051,7 @@
         },
         {
           "name": "hash/eq functors, string/stream value, inspection, extraction and owned accessors",
-          "status": "ported",
+          "status": "partial",
           "go_target": "mpnum/inf_rational.go",
           "tests": [
             "TestInfRationalSource80Assertions",
@@ -96990,6 +97147,23 @@
             "TestInfFormatFailurePrefixesImmediateRoots",
             "TestInfFormatWorkspaceGrowthPeak"
           ]
+        },
+        {
+          "name": "Remaining source-defined raw component projection, sign/hash and owning-copy domains",
+          "status": "unported"
+        },
+        {
+          "name": "Source scalar IsInt/IsRational and signed/unsigned64 fit/getter family, DEBUG assertions and release FIRST projection with actual component short circuit",
+          "status": "ported",
+          "go_target": "mpnum/inf_rational.go",
+          "tests": [
+            "TestInfScalarProjectionAllGetterProfilesAndRawPredicates",
+            "TestInfScalarProjectionUnreadFieldsAndNestedShortCircuit",
+            "TestInfScalarProjectionFacadeRawFieldsAndNarrowing",
+            "TestInfScalarProjectionOwnershipAndWarmGraph",
+            "TestInfScalarProjectionRegisteredDefaultGetter",
+            "TestInfScalarProjectionRawManagerEndangeredReads"
+          ]
         }
       ],
       "ownership": [
@@ -96998,7 +97172,8 @@
       ],
       "deviations": [
         "Global constants/borrowed accessors replaced by owner-local constants and explicit independent copies; typed checked source-assertion errors. Signed INT_MIN constructor-negation uses widened defined adapter. Source trace/assertion-message infrastructure remains separate.",
-        "Inactive/commented general pair arithmetic and duplicate #if0 approximation declarations are not runtime implementations; all eight compiled approximation functions are ported, including coarse/defective roots/powers."
+        "Inactive/commented general pair arithmetic and duplicate #if0 approximation declarations are not runtime implementations; all eight compiled approximation functions are ported, including coarse/defective roots/powers.",
+        "Source h135\u2013143 component reference projections read only the selected component; InfFirst/InfRational/Infinitesimal still check both denominators and owning Copy rejects source-finite raw denominator0. NUM-only sign/hash routes retain separate raw-domain debt."
       ]
     },
     {
@@ -106728,7 +106903,9 @@
         "mpnum/mpq_scientific_boundary_test.go",
         "mpnum/mp_scalar_projection_test.go",
         "mpnum/mpq_owner_cleanup.go",
-        "mpnum/construction_failure.go"
+        "mpnum/construction_failure.go",
+        "mpnum/mpq_source_finalize.go",
+        "mpnum/transitive_source_finalize_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -106841,7 +107018,14 @@
         "TestScalarProjectionRetainedSizeHeaderReads",
         "TestScalarProjectionRationalRawNumeratorsAndPredicates",
         "TestScalarProjectionFloatRawIEEEAndDebugAssertion",
-        "TestScalarProjectionInvalidOwnershipAndWarmGraph"
+        "TestScalarProjectionInvalidOwnershipAndWarmGraph",
+        "TestTransitiveSourceFinalizeCallerPhysicalLifetimes",
+        "TestTransitiveSourceFinalizeActualDiagnosticPrefix",
+        "TestRationalSourceFinalizeActualPrivateGuardOrder",
+        "TestServiceSourceFinalizeActualCacheDenominatorGuard",
+        "TestTransitiveSourceFinalizeActualChildScratchHole",
+        "TestTransitiveSourceFinalizeColdOwnerAndReadinessGuards",
+        "TestServiceSourceFinalizeActualHookAndConstantOrder"
       ],
       "assertions": [
         {
@@ -107275,6 +107459,20 @@
             "TestScalarProjectionFloatRawIEEEAndDebugAssertion",
             "TestScalarProjectionInvalidOwnershipAndWarmGraph"
           ]
+        },
+        {
+          "name": "Source destructor nine private leaf releases in source order then actual Integer.SourceFinalize; stopped source guard history and separate owning continuation",
+          "status": "ported",
+          "go_target": "mpnum/mpq_source_finalize.go",
+          "tests": [
+            "TestTransitiveSourceFinalizeCallerPhysicalLifetimes",
+            "TestTransitiveSourceFinalizeActualDiagnosticPrefix",
+            "TestRationalSourceFinalizeActualPrivateGuardOrder",
+            "TestServiceSourceFinalizeActualCacheDenominatorGuard",
+            "TestTransitiveSourceFinalizeActualChildScratchHole",
+            "TestTransitiveSourceFinalizeColdOwnerAndReadinessGuards",
+            "TestServiceSourceFinalizeActualHookAndConstantOrder"
+          ]
         }
       ],
       "ownership": [
@@ -107335,7 +107533,10 @@
         "mpnum/mpq_round_test.go",
         "mpnum/mp_scalar_projection_test.go",
         "mpnum/mpq_owner_cleanup.go",
-        "mpnum/construction_failure.go"
+        "mpnum/construction_failure.go",
+        "mpnum/inf_scalar_projection_test.go",
+        "mpnum/mpq_source_finalize.go",
+        "mpnum/transitive_source_finalize_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -107503,7 +107704,20 @@
         "TestScalarProjectionRetainedSizeHeaderReads",
         "TestScalarProjectionRationalRawNumeratorsAndPredicates",
         "TestScalarProjectionFloatRawIEEEAndDebugAssertion",
-        "TestScalarProjectionInvalidOwnershipAndWarmGraph"
+        "TestScalarProjectionInvalidOwnershipAndWarmGraph",
+        "TestInfScalarProjectionAllGetterProfilesAndRawPredicates",
+        "TestInfScalarProjectionUnreadFieldsAndNestedShortCircuit",
+        "TestInfScalarProjectionFacadeRawFieldsAndNarrowing",
+        "TestInfScalarProjectionOwnershipAndWarmGraph",
+        "TestInfScalarProjectionRegisteredDefaultGetter",
+        "TestInfScalarProjectionRawManagerEndangeredReads",
+        "TestTransitiveSourceFinalizeCallerPhysicalLifetimes",
+        "TestTransitiveSourceFinalizeActualDiagnosticPrefix",
+        "TestRationalSourceFinalizeActualPrivateGuardOrder",
+        "TestServiceSourceFinalizeActualCacheDenominatorGuard",
+        "TestTransitiveSourceFinalizeActualChildScratchHole",
+        "TestTransitiveSourceFinalizeColdOwnerAndReadinessGuards",
+        "TestServiceSourceFinalizeActualHookAndConstantOrder"
       ],
       "conditionals": [
         {
@@ -108394,6 +108608,33 @@
             "TestScalarProjectionRationalRawNumeratorsAndPredicates",
             "TestScalarProjectionFloatRawIEEEAndDebugAssertion",
             "TestScalarProjectionInvalidOwnershipAndWarmGraph"
+          ]
+        },
+        {
+          "name": "Structural IsInt; scalar fit/projections and NUM-then-DEN Float64 with actual endangered reads and no unread-field preflight",
+          "status": "ported",
+          "go_target": "mpnum/mpq_inspect.go",
+          "tests": [
+            "TestInfScalarProjectionAllGetterProfilesAndRawPredicates",
+            "TestInfScalarProjectionUnreadFieldsAndNestedShortCircuit",
+            "TestInfScalarProjectionFacadeRawFieldsAndNarrowing",
+            "TestInfScalarProjectionOwnershipAndWarmGraph",
+            "TestInfScalarProjectionRegisteredDefaultGetter",
+            "TestInfScalarProjectionRawManagerEndangeredReads"
+          ]
+        },
+        {
+          "name": "Source destructor nine private leaf releases in source order then actual Integer.SourceFinalize; stopped source guard history and separate owning continuation",
+          "status": "ported",
+          "go_target": "mpnum/mpq_source_finalize.go",
+          "tests": [
+            "TestTransitiveSourceFinalizeCallerPhysicalLifetimes",
+            "TestTransitiveSourceFinalizeActualDiagnosticPrefix",
+            "TestRationalSourceFinalizeActualPrivateGuardOrder",
+            "TestServiceSourceFinalizeActualCacheDenominatorGuard",
+            "TestTransitiveSourceFinalizeActualChildScratchHole",
+            "TestTransitiveSourceFinalizeColdOwnerAndReadinessGuards",
+            "TestServiceSourceFinalizeActualHookAndConstantOrder"
           ]
         }
       ],
@@ -114678,7 +114919,9 @@
         "mpnum/inf_int_rational.go",
         "mpnum/rational_service_cleanup.go",
         "mpnum/construction_failure.go",
-        "mpnum/mpz_allocator_phase_b_test.go"
+        "mpnum/mpz_allocator_phase_b_test.go",
+        "mpnum/rational_service_source_finalize.go",
+        "mpnum/transitive_source_finalize_test.go"
       ],
       "tests": [
         "TestRationalServiceSourceConstructorAssertions",
@@ -114726,7 +114969,14 @@
         "TestIntegerSourceFinalizeRetainsActualDirectCallerRoot",
         "TestIntegerSourceCellSizeUnsignedDomain",
         "TestIntegerConstructorRefusalRetainsTransitiveOwnership",
-        "TestIntegerScratchSpanDoesNotPublishPhysicalSize"
+        "TestIntegerScratchSpanDoesNotPublishPhysicalSize",
+        "TestTransitiveSourceFinalizeCallerPhysicalLifetimes",
+        "TestTransitiveSourceFinalizeActualDiagnosticPrefix",
+        "TestRationalSourceFinalizeActualPrivateGuardOrder",
+        "TestServiceSourceFinalizeActualCacheDenominatorGuard",
+        "TestTransitiveSourceFinalizeActualChildScratchHole",
+        "TestTransitiveSourceFinalizeColdOwnerAndReadinessGuards",
+        "TestServiceSourceFinalizeActualHookAndConstantOrder"
       ],
       "conditionals": [
         {
@@ -114742,7 +114992,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Owner-local core initialization and checked owning finalization; transitive source manager deallocation still missing",
+          "name": "Owner-local core initialization and source-ordered finalization; generated global/TLS lifecycle and typed runtime object allocation/deallocation remain open",
           "status": "partial",
           "go_target": "mpnum/rational_service.go",
           "tests": [
@@ -114816,6 +115066,20 @@
             "TestInfIntRationalIncrementSourceRationalRoute",
             "TestInfIntRationalPostFailureAndGetterIndependence"
           ]
+        },
+        {
+          "name": "Owner-local source finalization hooks/cache/constants then actual Rational.SourceFinalize; source direct caller lifetime and separate owning cleanup",
+          "status": "ported",
+          "go_target": "mpnum/rational_service_source_finalize.go",
+          "tests": [
+            "TestTransitiveSourceFinalizeCallerPhysicalLifetimes",
+            "TestTransitiveSourceFinalizeActualDiagnosticPrefix",
+            "TestRationalSourceFinalizeActualPrivateGuardOrder",
+            "TestServiceSourceFinalizeActualCacheDenominatorGuard",
+            "TestTransitiveSourceFinalizeActualChildScratchHole",
+            "TestTransitiveSourceFinalizeColdOwnerAndReadinessGuards",
+            "TestServiceSourceFinalizeActualHookAndConstantOrder"
+          ]
         }
       ],
       "ownership": [
@@ -114824,7 +115088,7 @@
       ],
       "deviations": [
         "Global mutable numerical manager/cache/constants become an explicit owner-local service; getters produce independent values and scalar provenance guards service domains. Cache algorithms and outer hooks have bounded evidence; transitive source finalization and header facade remain partial. Windows compiler warning pragma has no Go runtime counterpart.",
-        "rational.cpp82 dealloc(manager) is not complete: owning Integer.CloseChecked scans all descriptors and frees caller direct roots, unlike SourceFinalize private order and actual caller raw survival. A faithful Rational/Service source finalizer and generated global/TLS lifecycle remain open."
+        "The transitive destructor body now reaches actual source finalizers instead of scanning caller descriptors. Charged Go ownership metadata and surviving direct caller raw blocks remain until explicit owning cleanup. Generated global/TLS bindings, typed source object allocation/deallocation hooks and full Natural lexical/output lifetime remain open; no whole-unit promotion."
       ]
     },
     {
@@ -114832,12 +115096,13 @@
       "sha256": "a23db256b5025d27e9bc295e0aa3c0d2d3892baf7d5c6845f35cff3579ea4b9c",
       "component": "util",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "mpnum/mpq_inspect.go",
         "mpnum/rational_service.go",
         "mpnum/rational_service_ops.go",
-        "mpnum/rational_service_extra.go"
+        "mpnum/rational_service_extra.go",
+        "mpnum/inf_scalar_projection_test.go"
       ],
       "tests": [
         "TestSourceRationalConversionAssertions",
@@ -114888,7 +115153,13 @@
         "TestRationalServiceExtraIndependentRootsAndCoefficients",
         "TestRationalServiceExtraIntegerBridgeFailureCleanup",
         "TestRationalServiceExtraScopedRationalConstructor",
-        "TestRationalServiceExtraToScopedRationalOwnershipAndFailures"
+        "TestRationalServiceExtraToScopedRationalOwnershipAndFailures",
+        "TestInfScalarProjectionAllGetterProfilesAndRawPredicates",
+        "TestInfScalarProjectionUnreadFieldsAndNestedShortCircuit",
+        "TestInfScalarProjectionFacadeRawFieldsAndNarrowing",
+        "TestInfScalarProjectionOwnershipAndWarmGraph",
+        "TestInfScalarProjectionRegisteredDefaultGetter",
+        "TestInfScalarProjectionRawManagerEndangeredReads"
       ],
       "conditionals": [
         {
@@ -114926,8 +115197,8 @@
           "text": "SASSERT(!is_neg());"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
+      "methods_audited": false,
+      "ownership_audited": false,
       "methods": [
         {
           "name": "is_unsigned/get_unsigned inclusive UINT_MAX projection through explicit manager",
@@ -115011,7 +115282,7 @@
         },
         {
           "name": "constant getters, string and equality selected facade",
-          "status": "ported",
+          "status": "partial",
           "go_target": "mpnum/rational_service.go",
           "tests": [
             "TestRationalServiceSourceConstructorAssertions",
@@ -115069,7 +115340,7 @@
         },
         {
           "name": "pair comparisons and rational-left integer comparisons; inspection and inclusive projection facade",
-          "status": "ported",
+          "status": "partial",
           "go_target": "mpnum/rational_service_ops.go",
           "tests": [
             "TestRationalFacadeSourceTST1",
@@ -115234,6 +115505,23 @@
             "TestRationalServiceExtraScopedRationalConstructor",
             "TestRationalServiceExtraToScopedRationalOwnershipAndFailures"
           ]
+        },
+        {
+          "name": "Remaining source-defined raw component projection, sign/hash and owning-copy domains",
+          "status": "unported"
+        },
+        {
+          "name": "Actual owner-local facade scalar queries/getters/Float64 preserve source raw-domain, narrowing and DEBUG-only fit behavior",
+          "status": "ported",
+          "go_target": "mpnum/rational_service_ops.go",
+          "tests": [
+            "TestInfScalarProjectionAllGetterProfilesAndRawPredicates",
+            "TestInfScalarProjectionUnreadFieldsAndNestedShortCircuit",
+            "TestInfScalarProjectionFacadeRawFieldsAndNarrowing",
+            "TestInfScalarProjectionOwnershipAndWarmGraph",
+            "TestInfScalarProjectionRegisteredDefaultGetter",
+            "TestInfScalarProjectionRawManagerEndangeredReads"
+          ]
         }
       ],
       "ownership": [
@@ -115246,7 +115534,8 @@
         "Explicit manager projects rational.h inclusive32-bit wrappers, distinct from strict MPZ boundaries; global wrapper remains incomplete. Float positive converted denominator SASSERT becomes typed ErrRationalFloatDomain. Source raw component alias publication can leave denominator zero; subsequent operations diagnose initialization.",
         "Global mutable manager/cache replaced with explicit owner-local service. Constants return independent deep values; owning token Del invalidates provenance, source move val history retained. Cache failed-prefix/retry actions preserved; INT_MIN signed-negation domain uses explicit wider magnitude adaptation. Broad facade and infinitesimal hooks remain incomplete.",
         "Remaining wrapper roots/squares, LCM/extended-GCD, rational bitwise forwards, display conveniences and checked raw borrowing/interoperability are not completed by this selected facade packet; source double construction/assignment are unreachable domains.",
-        "Native std::ostream operations use caller-owned strings/buffers; source UNREACHABLE doubles return RationalDoubleError. Safe scoped copies replace raw mpz/mpq borrows and constructors without serialization or canonicalization."
+        "Native std::ostream operations use caller-owned strings/buffers; source UNREACHABLE doubles return RationalDoubleError. Safe scoped copies replace raw mpz/mpq borrows and constructors without serialization or canonicalization.",
+        "Whole-header completion is unproven: source NUM-only hash/sign and selected reference projections permit finite raw denominator0; current ordinary manager Hash/Sign/Copy guards reject that source state. The source inversion of zero can produce this state. Scalar projection closure does not close these separate families or generated global/TLS lifecycle."
       ]
     },
     {

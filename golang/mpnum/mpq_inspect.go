@@ -3,7 +3,10 @@
 // explicit inclusive 32-bit projections come from src/util/rational.h.
 package mpnum
 
-import "errors"
+import (
+	"errors"
+	"github.com/glycerine/g3/golang/arena"
+)
 
 var ErrRationalFloatDomain = errors.New("mpnum: rational converted floating denominator must be positive")
 
@@ -41,8 +44,20 @@ func (m *RationalManager) IsNonNeg(a *Rational) (bool, error) {
 	}
 	return v >= 0, nil
 }
+
+// Scalar inspection validates the owner before the source's actual component
+// reads. It does not preflight pointees that a structural branch never reads.
+func (m *RationalManager) checkScalarValue(a *Rational) error {
+	if e := m.checkOwnerReady(); e != nil {
+		return e
+	}
+	if a == nil {
+		return arena.ErrInvalidSlot
+	}
+	return nil
+}
 func (m *RationalManager) IsInt(a *Rational) (bool, error) {
-	if e := m.check(a); e != nil {
+	if e := m.checkScalarValue(a); e != nil {
 		return false, e
 	}
 	return isIntegerRational(a), nil
@@ -69,7 +84,7 @@ func (m *RationalManager) Hash(a *Rational) (uint32, error) {
 	return m.z.Hash(&a.num)
 }
 func (m *RationalManager) IsUint64(a *Rational) (bool, error) {
-	if e := m.checkIntegerFields(a); e != nil {
+	if e := m.checkScalarValue(a); e != nil {
 		return false, e
 	}
 	if !isIntegerRational(a) {
@@ -78,7 +93,7 @@ func (m *RationalManager) IsUint64(a *Rational) (bool, error) {
 	return m.z.IsUint64(&a.num)
 }
 func (m *RationalManager) IsInt64(a *Rational) (bool, error) {
-	if e := m.checkIntegerFields(a); e != nil {
+	if e := m.checkScalarValue(a); e != nil {
 		return false, e
 	}
 	if !isIntegerRational(a) {
@@ -87,7 +102,7 @@ func (m *RationalManager) IsInt64(a *Rational) (bool, error) {
 	return m.z.IsInt64(&a.num)
 }
 func (m *RationalManager) Uint64(a *Rational) (uint64, error) {
-	if e := m.checkIntegerFields(a); e != nil {
+	if e := m.checkScalarValue(a); e != nil {
 		return 0, e
 	}
 	if modularSourceDebug {
@@ -102,7 +117,7 @@ func (m *RationalManager) Uint64(a *Rational) (uint64, error) {
 	return m.z.Uint64(&a.num)
 }
 func (m *RationalManager) Int64(a *Rational) (int64, error) {
-	if e := m.checkIntegerFields(a); e != nil {
+	if e := m.checkScalarValue(a); e != nil {
 		return 0, e
 	}
 	if modularSourceDebug {
@@ -128,7 +143,7 @@ func (m *RationalManager) IsUnsigned(a *Rational) (bool, error) {
 	return v < uint64(1)<<32, e
 }
 func (m *RationalManager) Unsigned(a *Rational) (uint32, error) {
-	if e := m.checkIntegerFields(a); e != nil {
+	if e := m.checkScalarValue(a); e != nil {
 		return 0, e
 	}
 	if modularSourceDebug {
@@ -147,7 +162,7 @@ func (m *RationalManager) Unsigned(a *Rational) (uint32, error) {
 // IsInt32/Int32 preserve rational.h's inclusive signed boundaries, unlike the
 // source MPZ strict-bound variants. No global-manager wrapper is introduced.
 func (m *RationalManager) IsInt32(a *Rational) (bool, error) {
-	if e := m.checkIntegerFields(a); e != nil {
+	if e := m.checkScalarValue(a); e != nil {
 		return false, e
 	}
 	if a.IsSmall() && isIntegerRational(a) {
@@ -161,7 +176,7 @@ func (m *RationalManager) IsInt32(a *Rational) (bool, error) {
 	return v >= -2147483648 && v <= 2147483647, e
 }
 func (m *RationalManager) Int32(a *Rational) (int32, error) {
-	if e := m.checkIntegerFields(a); e != nil {
+	if e := m.checkScalarValue(a); e != nil {
 		return 0, e
 	}
 	if modularSourceDebug {
@@ -221,7 +236,7 @@ func (m *RationalManager) StorageSize(a *Rational) (uint32, error) {
 // SASSERT(d>0) is selected only in source-debug builds, after both conversions.
 // Release retains IEEE quotients for zero, negative and NaN denominators.
 func (m *RationalManager) Float64(a *Rational) (float64, error) {
-	if e := m.checkIntegerFields(a); e != nil {
+	if e := m.checkScalarValue(a); e != nil {
 		return 0, e
 	}
 	n, e := m.z.Float64(&a.num)

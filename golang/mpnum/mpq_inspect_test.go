@@ -408,12 +408,12 @@ func TestRationalInspectionFloatExceptionalBranches(t *testing.T) {
 func TestRationalInspectionGuardResultAndBorrowLifetime(t *testing.T) {
 	m, _ := rationalManager(t, false)
 	var raw Rational
-	for _, call := range []func(*Rational) (bool, error){m.IsPos, m.IsNeg, m.IsZero, m.IsNonPos, m.IsNonNeg, m.IsOne, m.IsMinusOne, m.IsInt, m.IsEven} {
+	for _, call := range []func(*Rational) (bool, error){m.IsPos, m.IsNeg, m.IsZero, m.IsNonPos, m.IsNonNeg, m.IsOne, m.IsMinusOne, m.IsEven} {
 		if got, e := call(&raw); !errors.Is(e, ErrUninitializedRational) || got {
 			t.Fatal("invalid bool result", got, e)
 		}
 	}
-	for _, call := range []func(*Rational) (bool, error){m.IsInt64, m.IsUint64, m.IsUnsigned, m.IsInt32} {
+	for _, call := range []func(*Rational) (bool, error){m.IsInt, m.IsInt64, m.IsUint64, m.IsUnsigned, m.IsInt32} {
 		if got, e := call(&raw); e != nil || got {
 			t.Fatal("source scalar fit predicate short-circuits DEN0", got, e)
 		}
@@ -706,8 +706,8 @@ func TestRationalInspectionRawActionsAndIndependentIncrement(t *testing.T) {
 		if e := m.Numerator(&a, &a.den); e != nil || a.den.val != 0 {
 			t.Fatal("source zero-denominator component alias", e)
 		}
-		if _, e := m.IsInt(&a); !errors.Is(e, ErrUninitializedRational) {
-			t.Fatal("subsequent invalid numeral diagnostic", e)
+		if got, e := m.IsInt(&a); e != nil || got {
+			t.Fatal("source structural denominator-zero predicate", got, e)
 		}
 		a = NewRational()
 		for n := int64(-9); n <= 9; n++ {

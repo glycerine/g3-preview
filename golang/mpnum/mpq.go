@@ -30,16 +30,18 @@ type RationalConfig struct {
 // source reusable scratch algorithms. Both are owner-confined, not concurrent.
 // Manager header bytes include all retained scalar rational scratch members.
 type RationalManager struct {
-	self                        *RationalManager
-	originalCause, cleanupCause error
-	cleanupStage                uint8
-	closing                     bool
-	z                           *IntegerManager
-	nTmp, addTmp1, addTmp2      Int
-	addMulTmp, ltTmp1, ltTmp2   Rational
-	synchronized, closed        bool
-	budget                      *arena.Budget
-	headerBytes                 uint64
+	self                                           *RationalManager
+	originalCause, cleanupCause                    error
+	cleanupStage                                   uint8
+	closing                                        bool
+	sourceFinalizing, sourceFinalized, sourceGuard bool
+	sourceCause                                    error
+	z                                              *IntegerManager
+	nTmp, addTmp1, addTmp2                         Int
+	addMulTmp, ltTmp1, ltTmp2                      Rational
+	synchronized, closed                           bool
+	budget                                         *arena.Budget
+	headerBytes                                    uint64
 }
 
 func NewRationalManager(config RationalConfig) (*RationalManager, error) {
@@ -62,9 +64,20 @@ func NewRationalManager(config RationalConfig) (*RationalManager, error) {
 	return m, nil
 }
 func (m *RationalManager) Integers() *IntegerManager { return m.z }
-func (m *RationalManager) check(a *Rational) error {
-	if m.closed {
+
+// checkOwnerReady guards the cold owner without reading either numeral field.
+func (m *RationalManager) checkOwnerReady() error {
+	if m == nil || m.self != m || m.z == nil || m.z.self != m.z {
+		return memory.ErrRuntimeOwner
+	}
+	if m.closed || m.closing || m.sourceFinalizing || m.sourceFinalized || m.z.closed || m.z.sourceFinalizing || m.z.constructionFailed {
 		return arena.ErrClosed
+	}
+	return nil
+}
+func (m *RationalManager) check(a *Rational) error {
+	if e := m.checkOwnerReady(); e != nil {
+		return e
 	}
 	if a == nil {
 		return arena.ErrInvalidSlot
@@ -81,8 +94,8 @@ func (m *RationalManager) check(a *Rational) error {
 	return nil
 }
 func (m *RationalManager) checkCleanup(a *Rational) error {
-	if m.closed {
-		return arena.ErrClosed
+	if e := m.checkOwnerReady(); e != nil {
+		return e
 	}
 	if a == nil {
 		return arena.ErrInvalidSlot

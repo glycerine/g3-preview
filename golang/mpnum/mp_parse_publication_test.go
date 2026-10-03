@@ -154,8 +154,8 @@ func TestParserPublicationExplicitInitializerAndReparser(t *testing.T) {
 				// Explicit parsing initializes/reinitializes fields; ordinary arithmetic
 				// remains guarded, without an initialization sidecar or lazy arithmetic.
 				if a.den.val == 0 {
-					if _, e := m.IsInt(&a); !errors.Is(e, ErrUninitializedRational) {
-						t.Fatal("ordinary read accepted zero denominator", e)
+					if got, e := m.IsInt(&a); e != nil || got {
+						t.Fatal("source is_int tests DEN structural one", got, e)
 					}
 				}
 				e := m.SetString(&a, fixture.text)

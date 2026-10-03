@@ -1,0 +1,203 @@
+// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+package g3
+
+import (
+	"errors"
+	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
+	"reflect"
+)
+
+var ErrSATMissingSourceExtBinding = errors.New("g3: missing source SAT extension binding")
+
+// Promoted Z3Exception methods preserve the source base behavior; Unwrap
+// supplies the existing Go errors.As adapter for a base-class catch.
+type SATSolverException struct{ DefaultException }
+
+func (e SATSolverException) Unwrap() error { return e.DefaultException }
+
+var ErrSATSolverCanceled = SATSolverException{NewDefaultException("canceled")}
+var ErrSATSolverMaxMemory = SATSolverException{NewDefaultException("max. memory exceeded")}
+var ErrSATSignedCounterDomain = errors.New("g3: undefined source signed SAT counter decrement")
+
+// This actual member-state grouping does not construct the full solver or child
+// policy engines. All bound services are borrowed and must outlive it. Counters
+// are the source members touched by dec(), not stand-in Run implementations.
+type satSolverPropagationState struct {
+	self                                                                        *satSolverPropagationState
+	variables                                                                   *satSolverVariableState
+	clauses                                                                     *satClauseAllocator
+	converter                                                                   *satModelConverter
+	limit                                                                       *utilReslimit
+	memory                                                                      *memory.Runtime
+	config                                                                      *satMainConfig
+	budget                                                                      *arena.Budget
+	diffLevels                                                                  satVariableCharColumn
+	conflict                                                                    satJustification
+	notLiteral                                                                  satLiteral
+	cleanerCounter, asymmCounter, probingCounter                                int32
+	numCheckpoints, binaryPropagations, ternaryPropagations, clausePropagations uint32
+	ownerBytes                                                                  uint64
+	inconsistent, checkpointEnabled, extensionPresent, closed                   bool
+}
+
+func newSATSolverPropagationState(v *satSolverVariableState, a *satClauseAllocator, mc *satModelConverter, r *utilReslimit, mem *memory.Runtime, cfg *satMainConfig, b *arena.Budget) (*satSolverPropagationState, error) {
+	if e := v.open(); e != nil {
+		return nil, e
+	}
+	if e := a.open(); e != nil {
+		return nil, e
+	}
+	if e := mc.open(); e != nil {
+		return nil, e
+	}
+	if e := cfg.open(); e != nil {
+		return nil, e
+	}
+	if r == nil || r.closed || mem == nil {
+		return nil, ErrSATOwner
+	}
+	if _, e := mem.AllocationSize(); e != nil {
+		return nil, e
+	}
+	n := uint64(reflect.TypeOf(satSolverPropagationState{}).Size())
+	if e := b.Reserve(n); e != nil {
+		return nil, e
+	}
+	s := &satSolverPropagationState{variables: v, clauses: a, converter: mc, limit: r, memory: mem, config: cfg, budget: b, ownerBytes: n, checkpointEnabled: true, notLiteral: satDefaultLiteral()}
+	s.self = s
+	return s, nil
+}
+func (s *satSolverPropagationState) open() error {
+	if s == nil || s.self != s {
+		return ErrSATOwner
+	}
+	if s.closed {
+		return arena.ErrClosed
+	}
+	return s.variables.open()
+}
+func (s *satSolverPropagationState) Close() error {
+	if s == nil || s.self != s {
+		return ErrSATOwner
+	}
+	if s.closed {
+		return nil
+	}
+	s.diffLevels.finalize(s.budget)
+	s.budget.Release(s.ownerBytes)
+	s.ownerBytes = 0
+	s.closed = true
+	return nil
+}
+func (s *satSolverPropagationState) checkpoint() error {
+	if e := s.open(); e != nil {
+		return e
+	}
+	if !s.checkpointEnabled {
+		return nil
+	}
+	if s.limit.closed {
+		return arena.ErrClosed
+	}
+	if !s.limit.inc() {
+		if e := s.converter.Reset(); e != nil {
+			return e
+		}
+		s.variables.modelIsCurrent = false
+		s.variables.modelKnown = true
+		return ErrSATSolverCanceled
+	}
+	s.numCheckpoints++
+	if s.numCheckpoints < 10 {
+		return nil
+	}
+	s.numCheckpoints = 0
+	cfg, e := s.config.State()
+	if e != nil {
+		return e
+	}
+	n, e := s.memory.AllocationSize()
+	if e != nil {
+		return e
+	}
+	if n > cfg.MaxMemory {
+		return ErrSATSolverMaxMemory
+	}
+	return nil
+}
+func (s *satSolverPropagationState) numDiffLevels(c satStoredClauseRef) (uint32, error) {
+	n, e := s.clauses.Size(c)
+	if e != nil {
+		return 0, e
+	}
+	need := s.variables.scopeLevel + 1
+	// Literal reserve(sz,false) grows logical size and default-fills new entries.
+	if need > uint32(len(s.diffLevels.data)) {
+		for need > uint32(cap(s.diffLevels.data)) {
+			n, bytes, e := satVariableNextCapacity(uint32(cap(s.diffLevels.data)), 1, 1, uint64(^uint(0)>>1))
+			if e != nil {
+				return 0, e
+			}
+			if e = s.budget.Reserve(bytes); e != nil {
+				return 0, e
+			}
+			next := make([]int8, len(s.diffLevels.data), int(n))
+			copy(next[:cap(s.diffLevels.data)], s.diffLevels.data[:cap(s.diffLevels.data)])
+			s.budget.Release(uint64(cap(s.diffLevels.data)))
+			s.diffLevels.data = next
+		}
+		old := len(s.diffLevels.data)
+		s.diffLevels.data = s.diffLevels.data[:need]
+		for i := old; i < len(s.diffLevels.data); i++ {
+			s.diffLevels.data[i] = 0
+		}
+		if need > s.diffLevels.initialized {
+			s.diffLevels.initialized = need
+		}
+	}
+	var count uint32
+	for i := uint32(0); i < n; i++ {
+		l, e := s.clauses.Literal(c, i)
+		if e != nil {
+			return count, e
+		}
+		if satStorageSourceDebug {
+			v, e := s.variables.valueLiteral(l)
+			if e != nil {
+				return count, e
+			}
+			if v == lUndef {
+				return count, ErrSATAssertion
+			}
+		}
+		level, e := s.variables.levelVar(l.variable())
+		if e != nil {
+			return count, e
+		}
+		m, e := s.diffLevels.read(level)
+		if e != nil {
+			return count, e
+		}
+		if m == 0 {
+			if e = s.diffLevels.write(level, 1); e != nil {
+				return count, e
+			}
+			count++
+		}
+	}
+	for i := uint32(0); i < n; i++ {
+		l, e := s.clauses.Literal(c, i)
+		if e != nil {
+			return count, e
+		}
+		level, e := s.variables.levelVar(l.variable())
+		if e != nil {
+			return count, e
+		}
+		if e = s.diffLevels.write(level, 0); e != nil {
+			return count, e
+		}
+	}
+	return count, nil
+}

@@ -1,0 +1,76 @@
+// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+package g3
+
+import (
+	"errors"
+	"github.com/glycerine/g3/golang/arena"
+	"testing"
+)
+
+func TestSATSolverAssignConflictStatusSourceOrder(t *testing.T) {
+	s, v, _ := satPropagationFixture(t, 3)
+	j := newSATBinaryJustification(satMakeLiteral(2, true))
+	satOK(t, s.assign(satMakeLiteral(0, true), j))
+	if v.assignment.data[0] != int8(lFalse) || v.assignment.data[1] != int8(lTrue) || !v.justification.data[0].None() || v.level.data[0] != 0 || v.phase.data[0] != 1 || v.assignedSinceGC.data[0] != 1 {
+		t.Fatal("base assignment")
+	}
+	v.scopeLevel = 3
+	satOK(t, s.assign(satMakeLiteral(1, false), j))
+	if v.justification.data[1] != j || v.level.data[1] != 3 || v.phase.data[1] != 0 {
+		t.Fatal("scoped assignment")
+	}
+	c, e := s.clauses.MkClause([]satLiteral{satMakeLiteral(0, false), satMakeLiteral(2, false)}, false)
+	satOK(t, e)
+	z, e := s.status(c)
+	satOK(t, e)
+	if z != lUndef {
+		t.Fatal(z)
+	}
+	satOK(t, s.assign(satMakeLiteral(2, true), j))
+	z, e = s.status(c)
+	satOK(t, e)
+	if z != lFalse {
+		t.Fatal(z)
+	}
+	satOK(t, s.assign(satMakeLiteral(0, false), j))
+	if !s.inconsistent || s.conflict != j || s.notLiteral != satMakeLiteral(0, true) {
+		t.Fatal("conflict")
+	}
+	s.setConflict(satJustification{}, satMakeLiteral(2, false))
+	if s.conflict != j {
+		t.Fatal("first conflict retained")
+	}
+}
+func TestSATSolverAssignTrailRefusalAndMissingExtensionPrefix(t *testing.T) {
+	s, v, b := satPropagationFixture(t, 1)
+	v.scopeLevel = 1
+	b.FailAfter(0)
+	e := s.assignCore(0, satJustification{})
+	if !errors.Is(e, arena.ErrInjectedFailure) {
+		t.Fatal("actual initial trail refusal", e)
+	}
+	if v.assignment.data[0] != int8(lTrue) || v.level.data[0] != 1 || v.phase.data[0] != 0 || v.assignedSinceGC.data[0] != 1 {
+		t.Fatal("scalar prefix")
+	}
+	n, x := v.trail.Size(v.trailRef)
+	satOK(t, x)
+	if n != 0 {
+		t.Fatal(n)
+	}
+	satPropagationAssertGraph(t, s)
+	b.FailAfter(-1)
+}
+func TestSATSolverAssignMissingExtensionAfterActualTrail(t *testing.T) {
+	s, v, _ := satPropagationFixture(t, 1)
+	v.external.data[0] = 1
+	s.extensionPresent = true
+	e := s.assignCore(0, satJustification{})
+	if !errors.Is(e, ErrSATMissingSourceExtBinding) {
+		t.Fatal(e)
+	}
+	n, x := v.trail.Size(v.trailRef)
+	satOK(t, x)
+	if n != 1 {
+		t.Fatal(n)
+	}
+}

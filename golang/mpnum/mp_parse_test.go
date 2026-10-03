@@ -356,8 +356,8 @@ func TestParserWarmLifetimeAndInitialization(t *testing.T) {
 			t.Fatal("source Direct allocation events missing", count, afterCount)
 		}
 		var raw Rational
-		if _, e = m.IsInt(&raw); !errors.Is(e, ErrUninitializedRational) {
-			t.Fatal(e)
+		if got, e := m.IsInt(&raw); e != nil || got {
+			t.Fatal("source is_int raw-zero denominator is not one", got, e)
 		}
 		if e = m.SetString(&raw, "1"); e != nil || rationalString(t, m, &raw) != "1" {
 			t.Fatal("explicit initializer", e)

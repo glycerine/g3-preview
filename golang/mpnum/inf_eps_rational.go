@@ -1,5 +1,6 @@
 // Copyright (c) 2013 Microsoft Corporation. Licensed under the MIT license.
-// Complete actual src/util/inf_eps_rational.h<inf_rational> specialization.
+// Translation of src/util/inf_eps_rational.h<inf_rational>; raw-domain
+// owning projections and sign/hash entry adapters remain separate obligations.
 package mpnum
 
 // OwnedInfEpsInfRational represents infinity*i + (first + epsilon*second).
@@ -596,53 +597,75 @@ func (s *RationalService) InfEpsInfIsFinite(v *OwnedInfEpsInfRational) (bool, er
 	}
 	return v.infinity.num.val == 0, nil
 }
+
+// Source nested predicates short-circuit infinity before the numeral owner.
+func (s *RationalService) infEpsScalarOwner(v *OwnedInfEpsInfRational) error {
+	if v == nil {
+		return ErrRationalServiceOwner
+	}
+	return s.scalarProjectionOwner(v.ownerID)
+}
+func (s *RationalService) infEpsScalarFits(v *OwnedInfEpsInfRational, unsigned bool) (bool, error) {
+	if v.infinity.num.val != 0 {
+		return false, nil
+	}
+	if e := s.infScalarOwner(&v.numeral); e != nil {
+		return false, e
+	}
+	return s.infScalarFits(&v.numeral, unsigned)
+}
 func (s *RationalService) InfEpsInfIsRational(v *OwnedInfEpsInfRational) (bool, error) {
 	if e := s.lock(); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return false, e
 	}
-	return v.infinity.num.val == 0 && v.numeral.second.num.val == 0, nil
+	if v.infinity.num.val != 0 {
+		return false, nil
+	}
+	if e := s.infScalarOwner(&v.numeral); e != nil {
+		return false, e
+	}
+	return v.numeral.second.num.val == 0, nil
 }
 func (s *RationalService) InfEpsInfIsInt(v *OwnedInfEpsInfRational) (bool, error) {
 	if e := s.lock(); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return false, e
 	}
-	return v.infinity.num.val == 0 && isIntegerRational(&v.numeral.first) && v.numeral.second.num.val == 0, nil
+	if v.infinity.num.val != 0 {
+		return false, nil
+	}
+	if e := s.infScalarOwner(&v.numeral); e != nil {
+		return false, e
+	}
+	ok, e := s.manager.IsInt(&v.numeral.first)
+	return ok && v.numeral.second.num.val == 0, e
 }
 func (s *RationalService) InfEpsInfIsInt64(v *OwnedInfEpsInfRational) (bool, error) {
 	if e := s.lock(); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return false, e
 	}
-	if v.infinity.num.val != 0 {
-		return false, nil
-	}
-	ok, e := s.manager.IsInt64(&v.numeral.first)
-	return ok && v.numeral.second.num.val == 0, e
+	return s.infEpsScalarFits(v, false)
 }
 func (s *RationalService) InfEpsInfIsUint64(v *OwnedInfEpsInfRational) (bool, error) {
 	if e := s.lock(); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return false, e
 	}
-	if v.infinity.num.val != 0 {
-		return false, nil
-	}
-	ok, e := s.manager.IsUint64(&v.numeral.first)
-	return ok && v.numeral.second.num.val == 0, e
+	return s.infEpsScalarFits(v, true)
 }
 func (s *RationalService) InfEpsInfIsZero(v *OwnedInfEpsInfRational) (bool, error) {
 	if e := s.lock(); e != nil {
@@ -727,26 +750,44 @@ func (s *RationalService) InfEpsInfInt64(v *OwnedInfEpsInfRational) (int64, erro
 		return 0, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return 0, e
 	}
-	if v.infinity.num.val != 0 || v.numeral.second.num.val != 0 {
-		return 0, ErrConversion
+	if modularSourceDebug {
+		ok, e := s.infEpsScalarFits(v, false)
+		if e != nil {
+			return 0, e
+		}
+		if !ok {
+			return 0, ErrIntegerAssertion
+		}
 	}
-	return s.manager.Int64(&v.numeral.first)
+	if e := s.infScalarOwner(&v.numeral); e != nil {
+		return 0, e
+	}
+	return s.infSignedProjectionLocked(&v.numeral)
 }
 func (s *RationalService) InfEpsInfUint64(v *OwnedInfEpsInfRational) (uint64, error) {
 	if e := s.lock(); e != nil {
 		return 0, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return 0, e
 	}
-	if v.infinity.num.val != 0 || v.numeral.second.num.val != 0 {
-		return 0, ErrConversion
+	if modularSourceDebug {
+		ok, e := s.infEpsScalarFits(v, true)
+		if e != nil {
+			return 0, e
+		}
+		if !ok {
+			return 0, ErrIntegerAssertion
+		}
 	}
-	return s.manager.Uint64(&v.numeral.first)
+	if e := s.infScalarOwner(&v.numeral); e != nil {
+		return 0, e
+	}
+	return s.infUnsignedProjectionLocked(&v.numeral)
 }
 func (s *RationalService) InfEpsInfEqual(a, b *OwnedInfEpsInfRational) (bool, error) {
 	if e := s.lock(); e != nil {

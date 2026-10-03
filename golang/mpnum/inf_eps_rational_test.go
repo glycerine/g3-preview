@@ -312,11 +312,19 @@ func TestInfEpsInfLifetimeAndDomain(t *testing.T) {
 	if e := s.InfEpsInfCopy(&v, &foreign); !errors.Is(e, ErrRationalServiceOwner) {
 		t.Fatal(e)
 	}
-	if _, e := s.InfEpsInfInt64(&v); !errors.Is(e, ErrConversion) {
-		t.Fatal(e)
+	if got, e := s.InfEpsInfInt64(&v); modularSourceDebug {
+		if !errors.Is(e, ErrIntegerAssertion) {
+			t.Fatal(e)
+		}
+	} else if e != nil || got != 0 {
+		t.Fatal("release nested FIRST ignores infinity", got, e)
 	}
-	if _, e := s.InfEpsInfUint64(&v); !errors.Is(e, ErrConversion) {
-		t.Fatal(e)
+	if got, e := s.InfEpsInfUint64(&v); modularSourceDebug {
+		if !errors.Is(e, ErrIntegerAssertion) {
+			t.Fatal(e)
+		}
+	} else if e != nil || got != 0 {
+		t.Fatal("release nested FIRST unsigned ignores infinity", got, e)
 	}
 	serviceMust(t, s.Close())
 	if _, e := s.InfEpsInfHash(&v); !errors.Is(e, arena.ErrClosed) {

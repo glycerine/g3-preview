@@ -530,12 +530,26 @@ func (s *RationalService) IsNonPos(a *OwnedRational) (bool, error) {
 	}
 	return s.manager.IsNonPos(&a.raw)
 }
+
+// Projection provenance guards do not inspect unread numeral components.
+func (s *RationalService) scalarProjectionOwner(ownerID uint64) error {
+	if ownerID == 0 || ownerID != s.ownerID {
+		return ErrRationalServiceOwner
+	}
+	return s.manager.checkOwnerReady()
+}
+func (s *RationalService) rationalScalarOwner(a *OwnedRational) error {
+	if a == nil {
+		return ErrRationalServiceOwner
+	}
+	return s.scalarProjectionOwner(a.ownerID)
+}
 func (s *RationalService) IsInt(a *OwnedRational) (bool, error) {
 	if e := s.lock(); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return false, e
 	}
 	return s.manager.IsInt(&a.raw)
@@ -545,7 +559,7 @@ func (s *RationalService) IsUint64(a *OwnedRational) (bool, error) {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return false, e
 	}
 	return s.manager.IsUint64(&a.raw)
@@ -555,7 +569,7 @@ func (s *RationalService) IsInt64(a *OwnedRational) (bool, error) {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return false, e
 	}
 	return s.manager.IsInt64(&a.raw)
@@ -565,7 +579,7 @@ func (s *RationalService) IsUnsigned(a *OwnedRational) (bool, error) {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return false, e
 	}
 	return s.manager.IsUnsigned(&a.raw)
@@ -575,7 +589,7 @@ func (s *RationalService) IsInt32(a *OwnedRational) (bool, error) {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return false, e
 	}
 	return s.manager.IsInt32(&a.raw)
@@ -595,7 +609,7 @@ func (s *RationalService) Uint64(a *OwnedRational) (uint64, error) {
 		return 0, e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return 0, e
 	}
 	return s.manager.Uint64(&a.raw)
@@ -605,7 +619,7 @@ func (s *RationalService) Int64(a *OwnedRational) (int64, error) {
 		return 0, e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return 0, e
 	}
 	return s.manager.Int64(&a.raw)
@@ -615,7 +629,7 @@ func (s *RationalService) Unsigned(a *OwnedRational) (uint32, error) {
 		return 0, e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return 0, e
 	}
 	return s.manager.Unsigned(&a.raw)
@@ -625,7 +639,7 @@ func (s *RationalService) Int32(a *OwnedRational) (int32, error) {
 		return 0, e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return 0, e
 	}
 	return s.manager.Int32(&a.raw)
@@ -665,7 +679,7 @@ func (s *RationalService) Float64(a *OwnedRational) (float64, error) {
 		return 0, e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return 0, e
 	}
 	return s.manager.Float64(&a.raw)

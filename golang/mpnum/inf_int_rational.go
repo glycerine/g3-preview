@@ -643,33 +643,67 @@ func (s *RationalService) equalInfInt(a *Rational, ae int32, b *Rational, be int
 	}
 	return ae == be, nil
 }
-func (s *RationalService) InfIntInt64(v *OwnedInfIntRational) (int64, error) {
-	if e := s.lockInfInt(v); e != nil {
-		return 0, e
+
+// Scalar projections validate provenance, then follow source component reads.
+func (s *RationalService) infIntScalarOwner(v *OwnedInfIntRational) error {
+	if v == nil {
+		return ErrRationalServiceOwner
 	}
-	defer s.mu.Unlock()
-	ok, e := s.manager.IsInt64(&v.first)
-	if e != nil {
-		return 0, e
+	return s.scalarProjectionOwner(v.ownerID)
+}
+func (s *RationalService) infIntScalarFits(v *OwnedInfIntRational, unsigned bool) (bool, error) {
+	var ok bool
+	var e error
+	if unsigned {
+		ok, e = s.manager.IsUint64(&v.first)
+	} else {
+		ok, e = s.manager.IsInt64(&v.first)
 	}
-	if !ok || v.second != 0 {
-		return 0, ErrConversion
+	return ok && v.second == 0, e
+}
+func (s *RationalService) infIntSignedProjectionLocked(v *OwnedInfIntRational) (int64, error) {
+	if modularSourceDebug {
+		ok, e := s.infIntScalarFits(v, false)
+		if e != nil {
+			return 0, e
+		}
+		if !ok {
+			return 0, ErrIntegerAssertion
+		}
 	}
 	return s.manager.Int64(&v.first)
 }
-func (s *RationalService) InfIntUint64(v *OwnedInfIntRational) (uint64, error) {
-	if e := s.lockInfInt(v); e != nil {
+func (s *RationalService) infIntUnsignedProjectionLocked(v *OwnedInfIntRational) (uint64, error) {
+	if modularSourceDebug {
+		ok, e := s.infIntScalarFits(v, true)
+		if e != nil {
+			return 0, e
+		}
+		if !ok {
+			return 0, ErrIntegerAssertion
+		}
+	}
+	return s.manager.Uint64(&v.first)
+}
+func (s *RationalService) InfIntInt64(v *OwnedInfIntRational) (int64, error) {
+	if e := s.lock(); e != nil {
 		return 0, e
 	}
 	defer s.mu.Unlock()
-	ok, e := s.manager.IsUint64(&v.first)
-	if e != nil {
+	if e := s.infIntScalarOwner(v); e != nil {
 		return 0, e
 	}
-	if !ok || v.second != 0 {
-		return 0, ErrConversion
+	return s.infIntSignedProjectionLocked(v)
+}
+func (s *RationalService) InfIntUint64(v *OwnedInfIntRational) (uint64, error) {
+	if e := s.lock(); e != nil {
+		return 0, e
 	}
-	return s.manager.Uint64(&v.first)
+	defer s.mu.Unlock()
+	if e := s.infIntScalarOwner(v); e != nil {
+		return 0, e
+	}
+	return s.infIntUnsignedProjectionLocked(v)
 }
 func (s *RationalService) InfIntIsZero(v *OwnedInfIntRational) (bool, error) {
 	if e := s.lockInfInt(v); e != nil {
@@ -721,35 +755,45 @@ func (s *RationalService) InfIntIsNonPos(v *OwnedInfIntRational) (bool, error) {
 	return v.first.num.val < 0 || (v.first.num.val == 0 && v.second <= 0), nil
 }
 func (s *RationalService) InfIntIsRational(v *OwnedInfIntRational) (bool, error) {
-	if e := s.lockInfInt(v); e != nil {
+	if e := s.lock(); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
+	if e := s.infIntScalarOwner(v); e != nil {
+		return false, e
+	}
 	return v.second == 0, nil
 }
 func (s *RationalService) InfIntIsInt(v *OwnedInfIntRational) (bool, error) {
-	if e := s.lockInfInt(v); e != nil {
+	if e := s.lock(); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
+	if e := s.infIntScalarOwner(v); e != nil {
+		return false, e
+	}
 	ok, e := s.manager.IsInt(&v.first)
 	return ok && v.second == 0, e
 }
 func (s *RationalService) InfIntIsInt64(v *OwnedInfIntRational) (bool, error) {
-	if e := s.lockInfInt(v); e != nil {
+	if e := s.lock(); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	ok, e := s.manager.IsInt64(&v.first)
-	return ok && v.second == 0, e
+	if e := s.infIntScalarOwner(v); e != nil {
+		return false, e
+	}
+	return s.infIntScalarFits(v, false)
 }
 func (s *RationalService) InfIntIsUint64(v *OwnedInfIntRational) (bool, error) {
-	if e := s.lockInfInt(v); e != nil {
+	if e := s.lock(); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	ok, e := s.manager.IsUint64(&v.first)
-	return ok && v.second == 0, e
+	if e := s.infIntScalarOwner(v); e != nil {
+		return false, e
+	}
+	return s.infIntScalarFits(v, true)
 }
 func (s *RationalService) InfIntEqual(a, b *OwnedInfIntRational) (bool, error) {
 	if e := s.lockInfInt2(a, b); e != nil {

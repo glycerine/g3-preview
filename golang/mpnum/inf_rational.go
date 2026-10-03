@@ -629,22 +629,65 @@ func (s *RationalService) InfAddMulAssign(v *OwnedInfRational, c *OwnedRational,
 func (s *RationalService) InfSubMulAssign(v *OwnedInfRational, c *OwnedRational, k *OwnedInfRational) error {
 	return s.infFused(v, c, k, true)
 }
+
+// Scalar projections validate provenance, then follow source component reads.
+func (s *RationalService) infScalarOwner(v *OwnedInfRational) error {
+	if v == nil {
+		return ErrRationalServiceOwner
+	}
+	return s.scalarProjectionOwner(v.ownerID)
+}
+func (s *RationalService) infScalarFits(v *OwnedInfRational, unsigned bool) (bool, error) {
+	var ok bool
+	var e error
+	if unsigned {
+		ok, e = s.manager.IsUint64(&v.first)
+	} else {
+		ok, e = s.manager.IsInt64(&v.first)
+	}
+	return ok && v.second.num.val == 0, e
+}
+func (s *RationalService) infSignedProjectionLocked(v *OwnedInfRational) (int64, error) {
+	if modularSourceDebug {
+		ok, e := s.infScalarFits(v, false)
+		if e != nil {
+			return 0, e
+		}
+		if !ok {
+			return 0, ErrIntegerAssertion
+		}
+	}
+	return s.manager.Int64(&v.first)
+}
+func (s *RationalService) infUnsignedProjectionLocked(v *OwnedInfRational) (uint64, error) {
+	if modularSourceDebug {
+		ok, e := s.infScalarFits(v, true)
+		if e != nil {
+			return 0, e
+		}
+		if !ok {
+			return 0, ErrIntegerAssertion
+		}
+	}
+	return s.manager.Uint64(&v.first)
+}
 func (s *RationalService) InfIsInt(v *OwnedInfRational) (bool, error) {
 	if e := s.lock(); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return false, e
 	}
-	return isIntegerRational(&v.first) && v.second.num.val == 0, nil
+	ok, e := s.manager.IsInt(&v.first)
+	return ok && v.second.num.val == 0, e
 }
 func (s *RationalService) InfIsRational(v *OwnedInfRational) (bool, error) {
 	if e := s.lock(); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return false, e
 	}
 	return v.second.num.val == 0, nil
@@ -726,48 +769,40 @@ func (s *RationalService) InfIsInt64(v *OwnedInfRational) (bool, error) {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return false, e
 	}
-	ok, e := s.manager.IsInt64(&v.first)
-	return ok && v.second.num.val == 0, e
+	return s.infScalarFits(v, false)
 }
 func (s *RationalService) InfIsUint64(v *OwnedInfRational) (bool, error) {
 	if e := s.lock(); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return false, e
 	}
-	ok, e := s.manager.IsUint64(&v.first)
-	return ok && v.second.num.val == 0, e
+	return s.infScalarFits(v, true)
 }
 func (s *RationalService) InfInt64(v *OwnedInfRational) (int64, error) {
 	if e := s.lock(); e != nil {
 		return 0, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return 0, e
 	}
-	if v.second.num.val != 0 {
-		return 0, ErrConversion
-	}
-	return s.manager.Int64(&v.first)
+	return s.infSignedProjectionLocked(v)
 }
 func (s *RationalService) InfUint64(v *OwnedInfRational) (uint64, error) {
 	if e := s.lock(); e != nil {
 		return 0, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return 0, e
 	}
-	if v.second.num.val != 0 {
-		return 0, ErrConversion
-	}
-	return s.manager.Uint64(&v.first)
+	return s.infUnsignedProjectionLocked(v)
 }
 func (s *RationalService) InfAddAssign(a, b *OwnedInfRational) error {
 	if e := s.lock(); e != nil {

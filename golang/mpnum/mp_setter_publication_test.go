@@ -55,8 +55,8 @@ func TestSetterPublicationPartsZeroDenominator(t *testing.T) {
 			if roundPublicationDecode(t, m.z, &a.num).Cmp(big.NewInt(want)) != 0 || a.den != NewInt(0) {
 				t.Errorf("source actual normalize publication: n=%d raw=%+v", n, a)
 			}
-			if _, e = m.IsInt(&a); !errors.Is(e, ErrUninitializedRational) {
-				t.Errorf("ordinary invalid read remains guarded: %v", e)
+			if got, e := m.IsInt(&a); e != nil || got {
+				t.Errorf("source is_int structural denominator test: got=%v err=%v", got, e)
 			}
 			qopsMust(t, m.Del(&a))
 			m.Close()

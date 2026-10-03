@@ -408,23 +408,64 @@ func TestInfIntRationalConversionsAndMixedComparisons(t *testing.T) {
 			if e != nil || iv != q.Num().Int64() {
 				t.Fatal(iv, e)
 			}
-		} else if !errors.Is(e, ErrConversion) {
-			t.Fatal(e)
+		} else if modularSourceDebug {
+			if !errors.Is(e, ErrIntegerAssertion) {
+				t.Fatal(e)
+			}
+		} else {
+			want := int64(projectionLowMagnitude(q.Num()))
+			if q.Sign() < 0 {
+				want = -want
+			}
+			if e != nil || iv != want {
+				t.Fatal("release FIRST signed lowword", text, iv, want, e)
+			}
 		}
 		uv, e := s.InfIntUint64(&a)
 		if wantU {
 			if e != nil || uv != q.Num().Uint64() {
 				t.Fatal(uv, e)
 			}
-		} else if !errors.Is(e, ErrConversion) {
-			t.Fatal(e)
+		} else if modularSourceDebug {
+			if !errors.Is(e, ErrIntegerAssertion) {
+				t.Fatal(e)
+			}
+		} else {
+			want := projectionLowMagnitude(q.Num())
+			if a.first.num.IsSmall() {
+				want = uint64(int64(a.first.num.val))
+			}
+			if e != nil || uv != want {
+				t.Fatal("release FIRST unsigned scalar/magnitude", text, uv, want, e)
+			}
 		}
+		serviceAuditRationalRoots(t, s, &a.first, &r.raw)
 		a.second = 1
-		if _, e = s.InfIntInt64(&a); !errors.Is(e, ErrConversion) {
-			t.Fatal(e)
+		if got, e := s.InfIntInt64(&a); modularSourceDebug {
+			if !errors.Is(e, ErrIntegerAssertion) {
+				t.Fatal(e)
+			}
+		} else {
+			want := int64(projectionLowMagnitude(q.Num()))
+			if q.Sign() < 0 {
+				want = -want
+			}
+			if e != nil || got != want {
+				t.Fatal("release ignores epsilon signed", text, got, want, e)
+			}
 		}
-		if _, e = s.InfIntUint64(&a); !errors.Is(e, ErrConversion) {
-			t.Fatal(e)
+		if got, e := s.InfIntUint64(&a); modularSourceDebug {
+			if !errors.Is(e, ErrIntegerAssertion) {
+				t.Fatal(e)
+			}
+		} else {
+			want := projectionLowMagnitude(q.Num())
+			if a.first.num.IsSmall() {
+				want = uint64(int64(a.first.num.val))
+			}
+			if e != nil || got != want {
+				t.Fatal("release ignores epsilon unsigned", text, got, want, e)
+			}
 		}
 		b := infIntValue(t, s, text, 1)
 		ok, e = s.InfIntEqual(&a, &b)
