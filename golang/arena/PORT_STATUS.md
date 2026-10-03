@@ -462,3 +462,75 @@ All ordinary fixtures remain hermetic and require no source/reference process.
 Whole-template ownership, construct=false, real rational-cell assertions and
 small-object allocator behavior remain incomplete. This partial packet must not
 be used as evidence that those source components or the full memory gate are done.
+
+# Concrete SmallBytes release pooled + direct storage packet
+
+Owned files: `small_bytes.go`, `small_bytes_test.go`, this status append. No
+shared slab/vector contract, other package, manifest or git changes. No generics,
+unsafe, per-record interface or escaped byte slices.
+
+`SmallBytesConfig` selects source pointer-width size policy (Alignment4/8,
+explicit default8), source default ChunkSize8192-2*Alignment, and Descriptors
+Config for slot/page/budget controls. Alignment is a size-class policy, not a
+physical Go pointer-alignment promise. Tiny chunks exercise exact boundaries.
+`SmallBytesRef` is a checked pointer-free Slot/Generation descriptor identity;
+internal existing concrete descriptorSlab stores chunk/offset/size/capacity.
+
+| Method/behavior | Source mapping and adaptation |
+| --- | --- |
+| construction | util/small_object_allocator.h:27-38 constants/lists/counters; cpp:28-36 empty initialization |
+| Allocate(0) | cpp:97-98 null; distinguished zero ref, no backing allocation |
+| pooled Allocate | cpp:111-137 ceil(size/Alignment) class, LIFO free list, strict new_curr<end, fresh chunk; fixed scalar links replace intrusive pointer writes |
+| direct Allocate | cpp:104-106 size>=256-Alignment; dedicated pointer-free byte block, no pooled free-list entry |
+| Deallocate(0) | cpp:72-73 no-op; closed Go owner still rejects operations |
+| nonzero Deallocate | cpp:80-93 requested-byte decrement, immediate direct release or class free-list prepend; Go additionally validates exact original requested size and generation |
+| Stats.RequestedBytes | header:48 m_alloc_size / cpp:82,104 requested logical bytes, distinct from aligned free waste and owned backing |
+| Stats.FreeObjects/WastedBytes | cpp:140-166 free list count and aligned class-byte sum; dedicated blocks never counted as pooled waste |
+| Consolidate | cpp:174-245 floor(CHUNK_SIZE/classSize) count gate and per-chunk reclaim/relink; does not move live allocations |
+| Reset/Close pooled | cpp:39-67 pooled chunk traversal and counter/list clearing; generation ledger survives reset |
+| Reset/Close direct | explicit tracked-owner cleanup extension: source direct blocks are separately caller-owned and not traversed by reset/destructor; Go releases all owned direct backing and invalidates refs, after caller logical-object cleanup |
+| Size/Read/Write/IsLive | Go storage access/checked lifetime adaptation; no source public borrow or C++ raw-address alias claim |
+
+Consolidation preserves an awkward exact source behavior: strict endpoint
+allocation usually provides one fewer object for exact-dividing classes, but
+consolidate still requires floor(chunk/class) free objects. Those wholly dead
+chunks remain retained. Likewise incompletely filled free chunks remain retained.
+The new tests deliberately verify this rather than silently improve reclamation.
+Raw-address sorting adapts to deterministic chunk/block conceptual addresses;
+reclaimed chunk indices can be reused, bounding repeated reclaim/grow metadata.
+Reconstructed free-list order follows descending conceptual addresses. Original
+machine address order is not reproducible or asserted. Free byte values are
+unspecified; separate scalar metadata does not promise retained contents.
+
+Budget includes descriptor records/generation metadata/directories, byte payload,
+scalar block metadata, and full actual-capacity chunk directory. Growth reserves
+old+new directory backing and new chunk arrays simultaneously before publication.
+Consolidation uses no allocated scratch. Failed allocate can retain reusable
+charged descriptor capacity/generation history but publishes no live allocation
+and leaves existing content intact. Runtime OOM is not recoverable. Caller
+separately budgets the fixed cold owner header and performs domain destruction.
+
+Tests-first RED: missing SmallBytes/config/ref APIs. Pooled GREEN then direct
+RED missing direct stats; pooled+direct GREEN. Source test/small_object_allocator
+has no ENSURE assertions, only traces: the finite13/14/1-byte source script is
+preserved, with independently added counts/LIFO checks. An independent3000-step
+copied-byte model checks values, live/dead identities, non-overlap, reset and
+consolidation; other tests cover tiny exact/nondividing chunks, class thresholds
+for both pointer-width policies, release of live direct blocks at owner teardown,
+failure injection, budget peak growth, generation retirement, budget balance,
+reclaim/grow plateau, and0 warmed Go allocations.
+
+Validation at pooled+direct GREEN:
+
+- CGO-disabled native and g3checked full arena tests, go vet: PASS.
+- js/wasm and wasip1/wasm package builds: PASS.
+- Actual Nodejs wasm execution of compiled current test binary printed all10
+  TestSmallBytes case names and PASS. Compilation uses workspace Go wrapper;
+  only Node execution has minimal env, preserving TMPDIR under golang/.cache.
+- Warm benchmark100ms:55.11ns/op,0B/op,0allocs/op on recorded host/toolchain.
+
+Diagnostic Z3DEBUG&&!WINDOWS direct-only bypass remains inventoried pending next
+packet; its source m_alloc_size stays0 because its allocate/free branches return
+before counter updates. Whole AST allocator/domain ownership and real rational
+constructed-pool tests remain pending. This storage packet does not establish
+source raw-pointer ABI behavior or finish the full memory/solver gate.

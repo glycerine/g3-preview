@@ -81881,14 +81881,33 @@
       "sha256": "98d72b253f1b8bda2ef5e6c9ad460064ceaee571ae15a7016b37cbf55ea79618",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "arena/small_bytes.go"
+      ],
+      "tests": [
+        "TestSmallBytesSourceExercise",
+        "TestSmallBytesBoundaryConsolidation",
+        "TestSmallBytesStateMachine",
+        "TestSmallBytesFailureCleanup",
+        "TestSmallBytesValidationAndLedger",
+        "TestSmallBytesPlateauAndWarmAllocation",
+        "TestSmallBytesDirectOwnerLifetime",
+        "TestSmallBytesDirectFailuresAndThresholds",
+        "TestSmallBytesGenerationRetirementAndAccounting",
+        "TestSmallBytesDirectoryGrowthPeakBudget"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership": [
+        "Concrete byte owner with scalar descriptors/generation ledger. Caller destroys logical objects before storage reset/free. Budgeted backing/metadata, caller budgets cold header. Diagnostic bypass pending. See arena/PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Reset/Close reclaim tracked live direct blocks as explicit typed owner cleanup extension; source only frees pooled chunks.",
+        "Conceptual chunk/block indices replace machine addresses for sorting; source strict endpoint/floor-count retention quirk preserved.",
+        "Storage limits checked before publication; invalid size/generation diagnosed."
+      ]
     },
     {
       "path": "src/test/smt2print_parse.cpp",
@@ -98586,9 +98605,22 @@
       "sha256": "70cf910ed0a3871ea110ee01ff8d23a687f74af5972ab995dce32ba3e6e35994",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "arena/small_bytes.go"
+      ],
+      "tests": [
+        "TestSmallBytesSourceExercise",
+        "TestSmallBytesBoundaryConsolidation",
+        "TestSmallBytesStateMachine",
+        "TestSmallBytesFailureCleanup",
+        "TestSmallBytesValidationAndLedger",
+        "TestSmallBytesPlateauAndWarmAllocation",
+        "TestSmallBytesDirectOwnerLifetime",
+        "TestSmallBytesDirectFailuresAndThresholds",
+        "TestSmallBytesGenerationRetirementAndAccounting",
+        "TestSmallBytesDirectoryGrowthPeakBudget"
+      ],
       "conditionals": [
         {
           "line": 75,
@@ -98651,18 +98683,123 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "release constructor/destructor/reset",
+          "status": "ported",
+          "go_target": "arena/small_bytes.go",
+          "tests": [
+            "TestSmallBytesSourceExercise",
+            "TestSmallBytesBoundaryConsolidation",
+            "TestSmallBytesStateMachine",
+            "TestSmallBytesFailureCleanup",
+            "TestSmallBytesValidationAndLedger",
+            "TestSmallBytesPlateauAndWarmAllocation",
+            "TestSmallBytesDirectOwnerLifetime",
+            "TestSmallBytesDirectFailuresAndThresholds",
+            "TestSmallBytesGenerationRetirementAndAccounting",
+            "TestSmallBytesDirectoryGrowthPeakBudget"
+          ]
+        },
+        {
+          "name": "release pooled allocate/deallocate",
+          "status": "ported",
+          "go_target": "arena/small_bytes.go",
+          "tests": [
+            "TestSmallBytesSourceExercise",
+            "TestSmallBytesBoundaryConsolidation",
+            "TestSmallBytesStateMachine",
+            "TestSmallBytesFailureCleanup",
+            "TestSmallBytesValidationAndLedger",
+            "TestSmallBytesPlateauAndWarmAllocation",
+            "TestSmallBytesDirectOwnerLifetime",
+            "TestSmallBytesDirectFailuresAndThresholds",
+            "TestSmallBytesGenerationRetirementAndAccounting",
+            "TestSmallBytesDirectoryGrowthPeakBudget"
+          ]
+        },
+        {
+          "name": "release direct allocate/deallocate",
+          "status": "ported",
+          "go_target": "arena/small_bytes.go",
+          "tests": [
+            "TestSmallBytesSourceExercise",
+            "TestSmallBytesBoundaryConsolidation",
+            "TestSmallBytesStateMachine",
+            "TestSmallBytesFailureCleanup",
+            "TestSmallBytesValidationAndLedger",
+            "TestSmallBytesPlateauAndWarmAllocation",
+            "TestSmallBytesDirectOwnerLifetime",
+            "TestSmallBytesDirectFailuresAndThresholds",
+            "TestSmallBytesGenerationRetirementAndAccounting",
+            "TestSmallBytesDirectoryGrowthPeakBudget"
+          ]
+        },
+        {
+          "name": "get_allocation_size/get_wasted_size/get_num_free_objs",
+          "status": "ported",
+          "go_target": "arena/small_bytes.go",
+          "tests": [
+            "TestSmallBytesSourceExercise",
+            "TestSmallBytesBoundaryConsolidation",
+            "TestSmallBytesStateMachine",
+            "TestSmallBytesFailureCleanup",
+            "TestSmallBytesValidationAndLedger",
+            "TestSmallBytesPlateauAndWarmAllocation",
+            "TestSmallBytesDirectOwnerLifetime",
+            "TestSmallBytesDirectFailuresAndThresholds",
+            "TestSmallBytesGenerationRetirementAndAccounting",
+            "TestSmallBytesDirectoryGrowthPeakBudget"
+          ]
+        },
+        {
+          "name": "consolidate conceptual address ordering",
+          "status": "ported",
+          "go_target": "arena/small_bytes.go",
+          "tests": [
+            "TestSmallBytesSourceExercise",
+            "TestSmallBytesBoundaryConsolidation",
+            "TestSmallBytesStateMachine",
+            "TestSmallBytesFailureCleanup",
+            "TestSmallBytesValidationAndLedger",
+            "TestSmallBytesPlateauAndWarmAllocation",
+            "TestSmallBytesDirectOwnerLifetime",
+            "TestSmallBytesDirectFailuresAndThresholds",
+            "TestSmallBytesGenerationRetirementAndAccounting",
+            "TestSmallBytesDirectoryGrowthPeakBudget"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete byte owner with scalar descriptors/generation ledger. Caller destroys logical objects before storage reset/free. Budgeted backing/metadata, caller budgets cold header. Diagnostic bypass pending. See arena/PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Reset/Close reclaim tracked live direct blocks as explicit typed owner cleanup extension; source only frees pooled chunks.",
+        "Conceptual chunk/block indices replace machine addresses for sorting; source strict endpoint/floor-count retention quirk preserved.",
+        "Storage limits checked before publication; invalid size/generation diagnosed."
+      ]
     },
     {
       "path": "src/util/small_object_allocator.h",
       "sha256": "57b0a3bbc2d9fd10f008f371e3b5b9bee5535d39ab5cfbcb4afd9324018a140b",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "arena/small_bytes.go"
+      ],
+      "tests": [
+        "TestSmallBytesSourceExercise",
+        "TestSmallBytesBoundaryConsolidation",
+        "TestSmallBytesStateMachine",
+        "TestSmallBytesFailureCleanup",
+        "TestSmallBytesValidationAndLedger",
+        "TestSmallBytesPlateauAndWarmAllocation",
+        "TestSmallBytesDirectOwnerLifetime",
+        "TestSmallBytesDirectFailuresAndThresholds",
+        "TestSmallBytesGenerationRetirementAndAccounting",
+        "TestSmallBytesDirectoryGrowthPeakBudget"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -98683,9 +98820,101 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "release constructor/destructor/reset",
+          "status": "ported",
+          "go_target": "arena/small_bytes.go",
+          "tests": [
+            "TestSmallBytesSourceExercise",
+            "TestSmallBytesBoundaryConsolidation",
+            "TestSmallBytesStateMachine",
+            "TestSmallBytesFailureCleanup",
+            "TestSmallBytesValidationAndLedger",
+            "TestSmallBytesPlateauAndWarmAllocation",
+            "TestSmallBytesDirectOwnerLifetime",
+            "TestSmallBytesDirectFailuresAndThresholds",
+            "TestSmallBytesGenerationRetirementAndAccounting",
+            "TestSmallBytesDirectoryGrowthPeakBudget"
+          ]
+        },
+        {
+          "name": "release pooled allocate/deallocate",
+          "status": "ported",
+          "go_target": "arena/small_bytes.go",
+          "tests": [
+            "TestSmallBytesSourceExercise",
+            "TestSmallBytesBoundaryConsolidation",
+            "TestSmallBytesStateMachine",
+            "TestSmallBytesFailureCleanup",
+            "TestSmallBytesValidationAndLedger",
+            "TestSmallBytesPlateauAndWarmAllocation",
+            "TestSmallBytesDirectOwnerLifetime",
+            "TestSmallBytesDirectFailuresAndThresholds",
+            "TestSmallBytesGenerationRetirementAndAccounting",
+            "TestSmallBytesDirectoryGrowthPeakBudget"
+          ]
+        },
+        {
+          "name": "release direct allocate/deallocate",
+          "status": "ported",
+          "go_target": "arena/small_bytes.go",
+          "tests": [
+            "TestSmallBytesSourceExercise",
+            "TestSmallBytesBoundaryConsolidation",
+            "TestSmallBytesStateMachine",
+            "TestSmallBytesFailureCleanup",
+            "TestSmallBytesValidationAndLedger",
+            "TestSmallBytesPlateauAndWarmAllocation",
+            "TestSmallBytesDirectOwnerLifetime",
+            "TestSmallBytesDirectFailuresAndThresholds",
+            "TestSmallBytesGenerationRetirementAndAccounting",
+            "TestSmallBytesDirectoryGrowthPeakBudget"
+          ]
+        },
+        {
+          "name": "get_allocation_size/get_wasted_size/get_num_free_objs",
+          "status": "ported",
+          "go_target": "arena/small_bytes.go",
+          "tests": [
+            "TestSmallBytesSourceExercise",
+            "TestSmallBytesBoundaryConsolidation",
+            "TestSmallBytesStateMachine",
+            "TestSmallBytesFailureCleanup",
+            "TestSmallBytesValidationAndLedger",
+            "TestSmallBytesPlateauAndWarmAllocation",
+            "TestSmallBytesDirectOwnerLifetime",
+            "TestSmallBytesDirectFailuresAndThresholds",
+            "TestSmallBytesGenerationRetirementAndAccounting",
+            "TestSmallBytesDirectoryGrowthPeakBudget"
+          ]
+        },
+        {
+          "name": "consolidate conceptual address ordering",
+          "status": "ported",
+          "go_target": "arena/small_bytes.go",
+          "tests": [
+            "TestSmallBytesSourceExercise",
+            "TestSmallBytesBoundaryConsolidation",
+            "TestSmallBytesStateMachine",
+            "TestSmallBytesFailureCleanup",
+            "TestSmallBytesValidationAndLedger",
+            "TestSmallBytesPlateauAndWarmAllocation",
+            "TestSmallBytesDirectOwnerLifetime",
+            "TestSmallBytesDirectFailuresAndThresholds",
+            "TestSmallBytesGenerationRetirementAndAccounting",
+            "TestSmallBytesDirectoryGrowthPeakBudget"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete byte owner with scalar descriptors/generation ledger. Caller destroys logical objects before storage reset/free. Budgeted backing/metadata, caller budgets cold header. Diagnostic bypass pending. See arena/PORT_STATUS.md."
+      ],
+      "deviations": [
+        "Reset/Close reclaim tracked live direct blocks as explicit typed owner cleanup extension; source only frees pooled chunks.",
+        "Conceptual chunk/block indices replace machine addresses for sorting; source strict endpoint/floor-count retention quirk preserved.",
+        "Storage limits checked before publication; invalid size/generation diagnosed."
+      ]
     },
     {
       "path": "src/util/smt2_util.cpp",
