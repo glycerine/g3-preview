@@ -85396,7 +85396,8 @@
         "mpnum/mp_display.go",
         "mpnum/mpz_facade_extra_test.go",
         "mpnum/mp_power_publication_test.go",
-        "mpnum/mp_div_publication_test.go"
+        "mpnum/mp_div_publication_test.go",
+        "mpnum/mp_add_publication_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -85470,7 +85471,16 @@
         "TestDivisionPublicationWarmStorage",
         "TestDivisionPublicationZeroDivisorOutputAliases",
         "TestDivisionPublicationInverseCopyFailureBeforeDebugAssertion",
-        "TestDivisionPublicationInverseTwoMinNegActions"
+        "TestDivisionPublicationInverseTwoMinNegActions",
+        "TestAdditivePublicationBoundedModelsAndAliases",
+        "TestAdditivePublicationCallerFailurePrefixes",
+        "TestAdditivePublicationFusedUnitDispatch",
+        "TestAdditivePublicationIntegerFastpathOldDenominator",
+        "TestAdditivePublicationMixedScalarComponentAliases",
+        "TestAdditivePublicationRawDenominatorsAndIdentity",
+        "TestAdditivePublicationServiceValueAndRationalOneRoutes",
+        "TestAdditivePublicationSynchronizedTemporaryDeleteOrder",
+        "TestAdditivePublicationWarmPlateau"
       ],
       "conditionals": [
         {
@@ -85622,6 +85632,22 @@
             "TestDivisionPublicationInverseCopyFailureBeforeDebugAssertion",
             "TestDivisionPublicationInverseTwoMinNegActions"
           ]
+        },
+        {
+          "name": "Direct additive and mixed-product caller publication; source fused/unit and Inc/Dec dependency routes",
+          "status": "partial",
+          "go_target": "mpnum/mpq.go",
+          "tests": [
+            "TestAdditivePublicationBoundedModelsAndAliases",
+            "TestAdditivePublicationCallerFailurePrefixes",
+            "TestAdditivePublicationFusedUnitDispatch",
+            "TestAdditivePublicationIntegerFastpathOldDenominator",
+            "TestAdditivePublicationMixedScalarComponentAliases",
+            "TestAdditivePublicationRawDenominatorsAndIdentity",
+            "TestAdditivePublicationServiceValueAndRationalOneRoutes",
+            "TestAdditivePublicationSynchronizedTemporaryDeleteOrder",
+            "TestAdditivePublicationWarmPlateau"
+          ]
         }
       ],
       "ownership": [
@@ -85632,7 +85658,8 @@
         "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See NUMERIC_DISPLAY_PORT_STATUS.md.",
         "tst1 retains original numerical setup, lexical manager scope and explicit Del; 18 comparison assertions across MPZ/MPQ. Additional printed fixtures and independent tests are not source assertions. See MPZ_FACADE_EXTRA_PORT_STATUS.md.",
         "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See MPZ_POWER_PUBLICATION_PACKET.md; source allocator/backend integration remains required.",
-        "Division writes actual caller numerator/denominator in source order, preserving divisor/output aliases and explicit local-tmp Del before normalization. Finite denominator-zero results remain owned; cleanup-only validation permits destruction/reset while ordinary reads remain guarded. See MPQ_DIVISION_PUBLICATION_PACKET.md."
+        "Division writes actual caller numerator/denominator in source order, preserving divisor/output aliases and explicit local-tmp Del before normalization. Finite denominator-zero results remain owned; cleanup-only validation permits destruction/reset while ordinary reads remain guarded. See MPQ_DIVISION_PUBLICATION_PACKET.md.",
+        "Actual caller fields publish in source Add/Sub/AddInt/MulInt/MulInts order; general SYNCH Add/Sub explicitly delete tmp1 before tmp2. Existing fused helpers use public Mul then Add/Sub and the source unit shortcuts. Failure tests inspect named caller/temporary roots before disabling faults; physical allocator integration remains open. See MPQ_ADDITIVE_PUBLICATION_PACKET.md."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -85641,7 +85668,8 @@
         "Finite Go string bounds replace C pointer traversal with first-NUL termination. Source parser exceptions have distinct ParseError categories; failures preserve prior destination instead of source partial mutation. uint64 exponent wraps before UINT_MAX check; inherited nonterminating Power masks remain typed domain errors.",
         "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text.",
         "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open.",
-        "Finite release inverse/division zero results retain actual source raw fields; 0/0 fails at actual integer division after component publication. Service initialized Copy/Move boundary and explicit Go cleanup are adapters. Actual source allocator/global composition remains open; no whole unit promoted."
+        "Finite release inverse/division zero results retain actual source raw fields; 0/0 fails at actual integer division after component publication. Service initialized Copy/Move boundary and explicit Go cleanup are adapters. Actual source allocator/global composition remains open; no whole unit promoted.",
+        "Interrupted Go local cleanup is an explicit ownership adapter, not C++ exception continuation. Nine independent math/alias/publication/lifetime groups add no registered source assertion credit. Source normalization/GCD and physical backend obligations remain separate; whole unit remains partial."
       ]
     },
     {
@@ -106994,7 +107022,8 @@
         "mpnum/mpz_facade_extra.go",
         "mpnum/mp_power_publication_test.go",
         "mpnum/mp_bitwise_publication_test.go",
-        "mpnum/mp_div_publication_test.go"
+        "mpnum/mp_div_publication_test.go",
+        "mpnum/mp_add_publication_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -107138,7 +107167,16 @@
         "TestDivisionPublicationWarmStorage",
         "TestDivisionPublicationZeroDivisorOutputAliases",
         "TestDivisionPublicationInverseCopyFailureBeforeDebugAssertion",
-        "TestDivisionPublicationInverseTwoMinNegActions"
+        "TestDivisionPublicationInverseTwoMinNegActions",
+        "TestAdditivePublicationBoundedModelsAndAliases",
+        "TestAdditivePublicationCallerFailurePrefixes",
+        "TestAdditivePublicationFusedUnitDispatch",
+        "TestAdditivePublicationIntegerFastpathOldDenominator",
+        "TestAdditivePublicationMixedScalarComponentAliases",
+        "TestAdditivePublicationRawDenominatorsAndIdentity",
+        "TestAdditivePublicationServiceValueAndRationalOneRoutes",
+        "TestAdditivePublicationSynchronizedTemporaryDeleteOrder",
+        "TestAdditivePublicationWarmPlateau"
       ],
       "conditionals": [
         {
@@ -107976,6 +108014,22 @@
             "TestDivisionPublicationInverseCopyFailureBeforeDebugAssertion",
             "TestDivisionPublicationInverseTwoMinNegActions"
           ]
+        },
+        {
+          "name": "Direct additive and mixed-product caller publication; source fused/unit and Inc/Dec dependency routes",
+          "status": "partial",
+          "go_target": "mpnum/mpq.go",
+          "tests": [
+            "TestAdditivePublicationBoundedModelsAndAliases",
+            "TestAdditivePublicationCallerFailurePrefixes",
+            "TestAdditivePublicationFusedUnitDispatch",
+            "TestAdditivePublicationIntegerFastpathOldDenominator",
+            "TestAdditivePublicationMixedScalarComponentAliases",
+            "TestAdditivePublicationRawDenominatorsAndIdentity",
+            "TestAdditivePublicationServiceValueAndRationalOneRoutes",
+            "TestAdditivePublicationSynchronizedTemporaryDeleteOrder",
+            "TestAdditivePublicationWarmPlateau"
+          ]
         }
       ],
       "ownership": [
@@ -107991,7 +108045,8 @@
         "Inspection uses existing integer roots; extraction acquires deep independent limbs and thin setters/swap retain source component identity. Failed-prefix tests audit cells/Words and decoded values before rendering/teardown. See RATIONAL_INSPECTION_PORT_STATUS.md.",
         "Bitwise rational wrappers forward actual numerator aliases to existing budgeted integer manager, then reset denominator; fault roots and malformed integer domains checked. See RATIONAL_FACADE_EXTRA_PORT_STATUS.md.",
         "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See MPZ_POWER_PUBLICATION_PACKET.md; source allocator/backend integration remains required.",
-        "Division writes actual caller numerator/denominator in source order, preserving divisor/output aliases and explicit local-tmp Del before normalization. Finite denominator-zero results remain owned; cleanup-only validation permits destruction/reset while ordinary reads remain guarded. See MPQ_DIVISION_PUBLICATION_PACKET.md."
+        "Division writes actual caller numerator/denominator in source order, preserving divisor/output aliases and explicit local-tmp Del before normalization. Finite denominator-zero results remain owned; cleanup-only validation permits destruction/reset while ordinary reads remain guarded. See MPQ_DIVISION_PUBLICATION_PACKET.md.",
+        "Actual caller fields publish in source Add/Sub/AddInt/MulInt/MulInts order; general SYNCH Add/Sub explicitly delete tmp1 before tmp2. Existing fused helpers use public Mul then Add/Sub and the source unit shortcuts. Failure tests inspect named caller/temporary roots before disabling faults; physical allocator integration remains open. See MPQ_ADDITIVE_PUBLICATION_PACKET.md."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -108006,7 +108061,8 @@
         "Explicit manager projects rational.h inclusive32-bit wrappers, distinct from strict MPZ boundaries; global wrapper remains incomplete. Float positive converted denominator SASSERT becomes typed ErrRationalFloatDomain. Source raw component alias publication can leave denominator zero; subsequent operations diagnose initialization.",
         "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open.",
         "Unsigned low63-bit mask defines the intended small bitwise_not signed-shift boundary. Negative and rational-integrality source assertions are debug-only. Selected internal32 bitwise methods publish directly in source order; Go error cleanup releases the actual lexical locals. Both-negative big binary loops stop at the first actual inline -1/-1 quotient continuation, after prior source actions; this typed boundary does not claim equivalence to a future source allocation refusal. Other arithmetic staging, source allocator topology, GMP and nonselected backends remain open.",
-        "Finite release inverse/division zero results retain actual source raw fields; 0/0 fails at actual integer division after component publication. Service initialized Copy/Move boundary and explicit Go cleanup are adapters. Actual source allocator/global composition remains open; no whole unit promoted."
+        "Finite release inverse/division zero results retain actual source raw fields; 0/0 fails at actual integer division after component publication. Service initialized Copy/Move boundary and explicit Go cleanup are adapters. Actual source allocator/global composition remains open; no whole unit promoted.",
+        "Interrupted Go local cleanup is an explicit ownership adapter, not C++ exception continuation. Nine independent math/alias/publication/lifetime groups add no registered source assertion credit. Source normalization/GCD and physical backend obligations remain separate; whole unit remains partial."
       ]
     },
     {

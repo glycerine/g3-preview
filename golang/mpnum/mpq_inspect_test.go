@@ -455,7 +455,7 @@ func TestRationalInspectionEveryFailurePrefix(t *testing.T) {
 				b.FailAfter(-1)
 				if e != nil {
 					failures++
-					if !errors.Is(e, arena.ErrInjectedFailure) || a != beforeA || z != beforeZ {
+					if !errors.Is(e, arena.ErrInjectedFailure) || (operation < 7 && a != beforeA) || z != beforeZ {
 						t.Fatal("failure changed source", synch, operation, fault, e)
 					}
 					// big_set publishes sign and a failed owning descriptor before
@@ -475,8 +475,27 @@ func TestRationalInspectionEveryFailurePrefix(t *testing.T) {
 							t.Fatal("failed descriptor readable", readError)
 						}
 					}
-					inspectionAssertMagnitude(t, m.z, &a.num, limbs)
-					inspectionAssertMagnitude(t, m.z, &a.den, limbs[:129])
+					if operation == 7 || operation == 8 {
+						an, ad := new(big.Int), new(big.Int)
+						for i := len(limbs) - 1; i >= 0; i-- {
+							an.Lsh(an, 32)
+							an.Add(an, new(big.Int).SetUint64(uint64(limbs[i])))
+						}
+						for i := 128; i >= 0; i-- {
+							ad.Lsh(ad, 32)
+							ad.Add(ad, new(big.Int).SetUint64(uint64(limbs[i])))
+						}
+						pn := new(big.Int).Set(an)
+						if operation == 7 {
+							pn.Add(pn, ad)
+						} else {
+							pn.Sub(pn, ad)
+						}
+						addPublicationExpectRaw(t, m, &a, an.String(), ad.String(), pn, ad)
+					} else {
+						inspectionAssertMagnitude(t, m.z, &a.num, limbs)
+						inspectionAssertMagnitude(t, m.z, &a.den, limbs[:129])
+					}
 					inspectionAssertMagnitude(t, m.z, &z, limbs)
 				} else {
 					completed = true

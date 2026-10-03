@@ -481,6 +481,22 @@ func TestRationalArithmeticFailureCleanup(t *testing.T) {
 							if dst != &b && rationalString(t, m, &b) != br.RatString() {
 								t.Fatal("non-destination b changed", op, alias, after)
 							}
+						} else if op == 0 || op == 1 {
+							pn := new(big.Int).Mul(ar.Num(), br.Denom())
+							cross := new(big.Int).Mul(br.Num(), ar.Denom())
+							if op == 0 {
+								pn.Add(pn, cross)
+							} else {
+								pn.Sub(pn, cross)
+							}
+							pd := new(big.Int).Mul(ar.Denom(), br.Denom())
+							addPublicationExpectRaw(t, m, dst, beforeNum, beforeDen, pn, pd)
+							if dst != &a && rationalString(t, m, &a) != ar.RatString() {
+								t.Fatal("non-destination a changed", op, alias, after)
+							}
+							if dst != &b && rationalString(t, m, &b) != br.RatString() {
+								t.Fatal("non-destination b changed", op, alias, after)
+							}
 						} else if rationalString(t, m, &a) != ar.RatString() || rationalString(t, m, &b) != br.RatString() || rationalString(t, m, &out) != "17" {
 							t.Fatal("failed rational operation changed destination/input", synch, op, alias, after, err)
 						}

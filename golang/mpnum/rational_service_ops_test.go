@@ -619,14 +619,36 @@ func TestRationalFacadeAllocationFailureOwnership(t *testing.T) {
 			case 19:
 				out, e = s.Numerator(&a)
 			}
-			budget.FailAfter(-1)
 			facadeAudit(t, s, &a, &b, &c, &out) // immediately, before rendering or Del/Close
+			budget.FailAfter(-1)
 			if e != nil {
 				failures++
 				if !errors.Is(e, arena.ErrInjectedFailure) || out.ownerID != 0 {
 					t.Fatal(op, fault, out, e)
 				}
-				serviceText(t, s, &a, before)
+				if op == 14 || op == 15 || op == 16 {
+					left, _ := new(big.Rat).SetString(before)
+					var pn, pd *big.Int
+					if op == 14 {
+						pn = new(big.Int).Add(left.Num(), left.Denom())
+						pd = new(big.Int).Set(left.Denom())
+					} else {
+						right, _ := new(big.Rat).SetString(bBefore)
+						third, _ := new(big.Rat).SetString("314159265358979323846264338327/17")
+						tmp := new(big.Rat).Mul(right, third)
+						pn = new(big.Int).Mul(left.Num(), tmp.Denom())
+						cross := new(big.Int).Mul(tmp.Num(), left.Denom())
+						if op == 15 {
+							pn.Add(pn, cross)
+						} else {
+							pn.Sub(pn, cross)
+						}
+						pd = new(big.Int).Mul(left.Denom(), tmp.Denom())
+					}
+					addPublicationExpectRaw(t, s.manager, &a.raw, left.Num().String(), left.Denom().String(), pn, pd)
+				} else {
+					serviceText(t, s, &a, before)
+				}
 			} else {
 				success = true
 			}
@@ -924,6 +946,24 @@ func TestRationalFacadeCompoundFailureAliases(t *testing.T) {
 						}
 						powerPublicationComponent(t, s.manager.z, &a.raw.num, numCandidates...)
 						powerPublicationComponent(t, s.manager.z, &a.raw.den, denCandidates...)
+					} else if op == 0 || op == 1 || op == 5 || op == 6 {
+						left, _ := new(big.Rat).SetString(before)
+						right, _ := new(big.Rat).SetString(bBefore)
+						if alias == 1 && op < 5 {
+							right.Set(left)
+						}
+						if op == 5 || op == 6 {
+							right.Mul(left, right)
+						}
+						pn := new(big.Int).Mul(left.Num(), right.Denom())
+						cross := new(big.Int).Mul(right.Num(), left.Denom())
+						if op == 0 || op == 5 {
+							pn.Add(pn, cross)
+						} else {
+							pn.Sub(pn, cross)
+						}
+						pd := new(big.Int).Mul(left.Denom(), right.Denom())
+						addPublicationExpectRaw(t, s.manager, &a.raw, left.Num().String(), left.Denom().String(), pn, pd)
 					} else {
 						serviceText(t, s, &a, before)
 					}

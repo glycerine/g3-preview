@@ -1555,3 +1555,21 @@ Fresh integration gates on HEAD353952e passed full native/debug suites, exact89
 race and actual-JS RUN/PASS groups, vet, WASI build and root/mpnum test
 compilation, and the source/evidence/no-generics audit. Independent parent
 checks confirm matching immutable Go hashes and exact named execution sets.
+
+
+## Rational additive and mixed-product source publication
+
+Add/Sub, AddInt, MulInt and MulInts now write actual caller components in
+source order, using the existing integer algorithms and one normalization.
+Synchronized general Add/Sub delete tmp1 before tmp2. Existing fused methods
+retain public Mul then Add/Sub and the +/-1 shortcuts. Nine new groups cover
+independent arithmetic, aliases, immediate refusal roots, raw signed fields,
+physical cleanup order and warm allocation plateaus. Six dependent groups in
+five test files now enumerate observed source prefixes after genuine RED.
+See MPQ_ADDITIVE_PUBLICATION_PACKET.md for source and tests-first evidence.
+
+The two source units remain partial and registered assertion counts are
+unchanged. Fresh parent integration on committed coefficient adoption passed
+full native/debug suites, exact54 race/actual-JS RUN/PASS groups, vet, WASI
+build and root/mpnum test compilation, and source/evidence/no-generics audit.
+Allocator-backed numerical storage remains open; incomplete drafts excluded.

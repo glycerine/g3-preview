@@ -645,7 +645,20 @@ func TestInfIntRationalPostFailureAndGetterIndependence(t *testing.T) {
 					want.Add(want, big.NewRat(1, 1))
 				}
 			}
-			infIntCheck(t, s, &a, want.RatString(), -4)
+			if e != nil {
+				pn := new(big.Int).Set(want.Num())
+				if dec {
+					pn.Sub(pn, want.Denom())
+				} else {
+					pn.Add(pn, want.Denom())
+				}
+				addPublicationExpectRaw(t, s.manager, &a.first, want.Num().String(), want.Denom().String(), pn, want.Denom())
+				if a.second != -4 {
+					t.Fatal("integer infinitesimal changed before first-component action completed", n, a.second)
+				}
+			} else {
+				infIntCheck(t, s, &a, want.RatString(), -4)
+			}
 			serviceMust(t, s.InfIntDel(&a))
 			serviceMust(t, s.Close())
 			if b.Used() != 0 {

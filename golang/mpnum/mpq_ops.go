@@ -18,12 +18,11 @@ func (m *RationalManager) AddInt(a *Rational, b *Int, out *Rational) error {
 	if e := m.check(out); e != nil {
 		return e
 	}
-	work := NewRational()
-	defer m.drop(&work)
 	if isIntegerRational(a) {
-		if e := m.z.Add(&a.num, b, &work.num); e != nil {
+		if e := m.z.Add(&a.num, b, &out.num); e != nil {
 			return e
 		}
+		return m.resetDenominator(out)
 	} else {
 		var local Int
 		tmp := &m.addTmp1
@@ -34,17 +33,17 @@ func (m *RationalManager) AddInt(a *Rational, b *Int, out *Rational) error {
 		if e := m.z.Mul(b, &a.den, tmp); e != nil {
 			return e
 		}
-		if e := m.z.Copy(&work.den, &a.den); e != nil {
+		if e := m.z.Copy(&out.den, &a.den); e != nil {
 			return e
 		}
-		if e := m.z.Add(&a.num, tmp, &work.num); e != nil {
+		if e := m.z.Add(&a.num, tmp, &out.num); e != nil {
 			return e
 		}
-		if e := m.normalize(&work); e != nil {
+		if e := m.normalize(out); e != nil {
 			return e
 		}
 	}
-	return m.Move(out, &work)
+	return nil
 }
 
 // MulInts implements the inherited integer-product rational-result overload.
@@ -58,12 +57,10 @@ func (m *RationalManager) MulInts(a, b *Int, out *Rational) error {
 	if e := m.check(out); e != nil {
 		return e
 	}
-	work := NewRational()
-	defer m.drop(&work)
-	if e := m.z.Mul(a, b, &work.num); e != nil {
+	if e := m.z.Mul(a, b, &out.num); e != nil {
 		return e
 	}
-	return m.Move(out, &work)
+	return m.resetDenominator(out)
 }
 func (m *RationalManager) MulInt(a *Int, b, out *Rational) error {
 	if e := m.z.check(a); e != nil {
@@ -75,20 +72,17 @@ func (m *RationalManager) MulInt(a *Int, b, out *Rational) error {
 	if e := m.check(out); e != nil {
 		return e
 	}
-	work := NewRational()
-	defer m.drop(&work)
-	if e := m.z.Mul(a, &b.num, &work.num); e != nil {
+	integer := isIntegerRational(b)
+	if e := m.z.Mul(a, &b.num, &out.num); e != nil {
 		return e
 	}
-	if !isIntegerRational(b) {
-		if e := m.z.Copy(&work.den, &b.den); e != nil {
-			return e
-		}
-		if e := m.normalize(&work); e != nil {
-			return e
-		}
+	if integer {
+		return m.resetDenominator(out)
 	}
-	return m.Move(out, &work)
+	if e := m.z.Copy(&out.den, &b.den); e != nil {
+		return e
+	}
+	return m.normalize(out)
 }
 func (m *RationalManager) DivInt(a *Rational, b *Int, out *Rational) error {
 	if e := m.check(a); e != nil {

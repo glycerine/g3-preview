@@ -453,6 +453,39 @@ func TestRationalOpsAllPredictableFailurePrefixes(t *testing.T) {
 						reduced := new(big.Rat).SetFrac(pn, pd)
 						powerPublicationComponent(t, m.z, &out.num, old.Num().String(), pn.String(), reduced.Num().String())
 						powerPublicationComponent(t, m.z, &out.den, old.Denom().String(), pd.String(), reduced.Denom().String())
+					} else if operation == 0 || operation == 1 || operation == 4 || operation == 5 || operation == 6 {
+						ar, _ := new(big.Rat).SetString(sa)
+						br, _ := new(big.Rat).SetString(sb)
+						cr, _ := new(big.Rat).SetString(sc)
+						old, _ := new(big.Rat).SetString(originalOutput)
+						var pn, pd *big.Int
+						switch operation {
+						case 0:
+							pn = new(big.Int).Add(ar.Num(), new(big.Int).Mul(n, ar.Denom()))
+							pd = new(big.Int).Set(ar.Denom())
+						case 1:
+							pn = new(big.Int).Mul(n, ar.Num())
+							pd = new(big.Int).Set(ar.Denom())
+						case 6:
+							pn = new(big.Int).Mul(n, n)
+							pd = big.NewInt(1)
+						default:
+							tmp := new(big.Rat)
+							if operation == 4 {
+								tmp.Mul(br, cr)
+							} else {
+								tmp.Mul(new(big.Rat).SetInt(n), cr)
+							}
+							pn = new(big.Int).Mul(ar.Num(), tmp.Denom())
+							cross := new(big.Int).Mul(tmp.Num(), ar.Denom())
+							if operation == 4 {
+								pn.Add(pn, cross)
+							} else {
+								pn.Sub(pn, cross)
+							}
+							pd = new(big.Int).Mul(ar.Denom(), tmp.Denom())
+						}
+						addPublicationExpectRaw(t, m, &out, old.Num().String(), old.Denom().String(), pn, pd)
 					} else if rationalString(t, m, &out) != originalOutput {
 						t.Fatal("partial output", operation, prefix)
 					}

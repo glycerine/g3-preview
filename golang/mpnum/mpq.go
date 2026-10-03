@@ -375,29 +375,35 @@ func (m *RationalManager) addSub(a, b, out *Rational, subtract bool) error {
 			return e
 		}
 	}
-	work := NewRational()
-	defer m.drop(&work)
 	if isIntegerRational(a) && isIntegerRational(b) {
 		var e error
 		if subtract {
-			e = m.z.Sub(&a.num, &b.num, &work.num)
+			e = m.z.Sub(&a.num, &b.num, &out.num)
 		} else {
-			e = m.z.Add(&a.num, &b.num, &work.num)
+			e = m.z.Add(&a.num, &b.num, &out.num)
 		}
 		if e != nil {
 			return e
 		}
-		if e = m.resetDenominator(&work); e != nil {
+		if e = m.resetDenominator(out); e != nil {
 			return e
 		}
-		return m.Move(out, &work)
+		return nil
 	}
 	var localOne, localTwo Int
+	cleanupOne, cleanupTwo := false, false
 	one, two := &m.addTmp1, &m.addTmp2
 	if m.synchronized {
 		one, two = &localOne, &localTwo
-		defer m.z.Del(one)
-		defer m.z.Del(two)
+		cleanupOne, cleanupTwo = true, true
+		defer func() {
+			if cleanupOne {
+				m.z.Del(one)
+			}
+			if cleanupTwo {
+				m.z.Del(two)
+			}
+		}()
 	}
 	if e := m.z.Mul(&a.num, &b.den, one); e != nil {
 		return e
@@ -405,22 +411,34 @@ func (m *RationalManager) addSub(a, b, out *Rational, subtract bool) error {
 	if e := m.z.Mul(&b.num, &a.den, two); e != nil {
 		return e
 	}
-	if e := m.z.Mul(&a.den, &b.den, &work.den); e != nil {
+	if e := m.z.Mul(&a.den, &b.den, &out.den); e != nil {
 		return e
 	}
 	var e error
 	if subtract {
-		e = m.z.Sub(one, two, &work.num)
+		e = m.z.Sub(one, two, &out.num)
 	} else {
-		e = m.z.Add(one, two, &work.num)
+		e = m.z.Add(one, two, &out.num)
 	}
 	if e != nil {
 		return e
 	}
-	if e = m.normalize(&work); e != nil {
+	if e = m.normalize(out); e != nil {
 		return e
 	}
-	return m.Move(out, &work)
+	if m.synchronized {
+		// Source ordinary completion deletes tmp1 before tmp2. Deferred
+		// ownership cleanup applies only to an interrupted Go action.
+		if e = m.z.Del(one); e != nil {
+			return e
+		}
+		cleanupOne = false
+		if e = m.z.Del(two); e != nil {
+			return e
+		}
+		cleanupTwo = false
+	}
+	return nil
 }
 func (m *RationalManager) Mul(a, b, out *Rational) error {
 	for _, n := range []*Rational{a, b, out} {
