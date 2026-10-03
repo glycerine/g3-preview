@@ -40,9 +40,18 @@ The integrated factorization/helper tree passes `go test ./...`,
 campaigns still fail compilation at their missing APIs, as expected; logs are
 `.cache/checkpoint-pending-{mpz,sat}-red.log`.
 
-Review found two concrete factorization corrections still required: Berlekamp
+Review found two concrete factorization corrections at the checkpoint: Berlekamp
 pivot vectors currently allocate exact size instead of source geometric resize;
 and a factors owner whose Close has finished Clear but failed constant cleanup
 must reject ordinary mutation before retrying Close. The existing backend cannot
 yet inject that leaf cleanup refusal. These issues and deeper coverage are next
 work, not reasons to leave the implemented algorithms untracked.
+
+The Berlekamp pivot correction now follows source geometric resize, including
+retained capacity with logical size still zero after an interrupted expansion.
+The finite empty-input release path appends its empty factor; checked/debug
+rejects at the source entry assertion. Tests-first missing-helper and behavior
+RED preceded translation. Full native/debug suites, vet and source/evidence/
+no-generics audit pass in the exact four-file overlay on 5b414f9; logs are
+`.cache/pivot-parent-{native,debug,vet,source}.log`. The factors closing guard
+and genuine allocator-backed cleanup-refusal coverage remain separate work.

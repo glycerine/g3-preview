@@ -2,6 +2,8 @@
 package g3
 
 import (
+	"errors"
+	"github.com/glycerine/g3/golang/mpnum"
 	"testing"
 )
 
@@ -98,5 +100,38 @@ func TestUPolynomialFactorBerlekampAppendAndIrreducibleReturn(t *testing.T) {
 	n, e = fs.DistinctFactors()
 	if e != nil || n != 6 {
 		t.Fatal(n, e)
+	}
+}
+
+func TestUPolynomialFactorBerlekampEmptyReleaseAndDebug(t *testing.T) {
+	m, _, _ := upolySourceOwner(t)
+	if e := m.SetZPUint64(5); e != nil {
+		t.Fatal(e)
+	}
+	fs, e := m.NewFactors()
+	if e != nil {
+		t.Fatal(e)
+	}
+	defer func() {
+		if e := fs.Close(); e != nil {
+			t.Error(e)
+		}
+	}()
+	empty := upolySourceNew(t, m, nil)
+	yes, err := m.FactorZPSquareFree(mustUPolyView(t, m, empty), fs)
+	if astSourceDebug {
+		if !errors.Is(err, mpnum.ErrUPolynomialAssertion) {
+			t.Fatal("actual source entry assertion", yes, err)
+		}
+		if n, e := fs.DistinctFactors(); e != nil || n != 0 {
+			t.Fatal("preassertion prefix", n, e)
+		}
+	} else {
+		if err != nil || !yes {
+			t.Fatal("finite source release empty continuation", yes, err)
+		}
+		if n, e := fs.DistinctFactors(); e != nil || n != 1 {
+			t.Fatal("source appends empty factor before final disabled assertion", n, e)
+		}
 	}
 }

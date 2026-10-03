@@ -54,7 +54,7 @@ func (m *UPolynomialManager) scopedPush(s *upolyVectorState, value *Int) error {
 }
 
 // The source matrix is lexical: its slice headers stay on the caller stack;
-// both exact-size pivot arrays and the numeral backing are individually charged.
+// both geometrically grown pivot arrays and the numeral backing are individually charged.
 type upolyBerlekampMatrix struct {
 	m             *UPolynomialManager
 	values        upolyVectorState
@@ -89,31 +89,17 @@ func (q *upolyBerlekampMatrix) init(m *UPolynomialManager, f UPolynomialView) er
 	q.size = upolyViewDegree(f)
 	q.nullRow = 1
 	n := q.size
-	if uint64(n)*4+8 > math.MaxUint32 || uint64(n) > uint64(int(^uint(0)>>1))/4 {
-		return arena.ErrBounds
-	}
-	bytes := uint64(n) * 4
-	if e := m.config.Integer.budget.Reserve(bytes); e != nil {
+	if e := upolyFactorInt32Resize(&q.column, n, -1, m.config.Integer.budget); e != nil {
 		return e
 	}
-	q.column = make([]int32, n)
-	for i := range q.column {
-		q.column[i] = -1
-	}
-	if e := m.config.Integer.budget.Reserve(bytes); e != nil {
+	if e := upolyFactorInt32Resize(&q.row, n, -1, m.config.Integer.budget); e != nil {
 		return e
-	}
-	q.row = make([]int32, n)
-	for i := range q.row {
-		q.row[i] = -1
 	}
 	p, e := m.factorPrime()
 	if e != nil {
 		return e
 	}
-	if p == 0 || n == 0 {
-		return ErrUPolynomialDomain
-	}
+
 	v, e := m.pushDefault(&q.values)
 	if e != nil {
 		return e
@@ -128,6 +114,9 @@ func (q *upolyBerlekampMatrix) init(m *UPolynomialManager, f UPolynomialView) er
 	defer m.modular.Del(&tmp)
 	row, previous := uint32(0), uint32(0)
 	for k := uint32(1); ; k++ {
+		if p == 0 {
+			return ErrUPolynomialDomain
+		} // actual undefined modulo read site
 		if k%p == 1 {
 			row++
 			if row >= n {
