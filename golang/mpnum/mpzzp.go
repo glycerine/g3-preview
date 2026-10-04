@@ -1,4 +1,4 @@
-// Licensed under the MIT license.
+// Source: src/util/mpzzp.h. Licensed under the MIT license.
 // Concrete source util/mpzzp.h manager; borrows one actual IntegerManager.
 package mpnum
 

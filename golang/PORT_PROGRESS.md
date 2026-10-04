@@ -25572,3 +25572,104 @@ authorize explicit owning abort of that named creation root; existing foreign
 pending is borrowed and must remain untouched. Sole-retain tests-first RED and
 immediate whole-graph/cause checks are required before private implementation
 and freeze. This is an open next-family issue, not part of master simplifier.
+
+### Post-simplifier full-family source review
+
+Previous goal turn was progress:9c90112 committed the complete selected SAT
+simplifier with all five full gates GREEN and clean master. This turn root
+revalidated clean authoritative state and continued existing three authorized
+private lanes; whole patched solver objective remains active.
+
+Root Newton review found a further actual source/owning boundary issue before
+freeze. obj_ref.h operator= increments incoming, decrements old, then publishes;
+its destructor only decrements the completed m_obj. ref_vector.h96–99 increments
+before m_nodes.push_back; its destructor traverses only completed m_nodes.
+Private scopeCleanup(false) still called reference.abort in its terminal phase,
+and sourceClose delegated to owning Close, which aborted the unjoined vector
+incoming. Thus ordinary lexical destruction could silently refund an extra INC
+that the literal source destructor never owns. Root sent exact source evidence
+and required genuine whole-method failed-push/assignment RED, separate source
+completed destruction from explicit owning abort, and retain newtonLocal/cold
+adapter while unjoined roots remain. Existing stopped-DEC TLS regression alone
+does not establish this distinction. Numeric final freeze is held until this
+and the precise arena prerequisite03 compose successfully.
+
+Arena sole-retain callee test genuine RED5923 terminal1:
+.cache/polynomial-sole-retain-callee-red.log. Actual immediate named numeric/raw/
+monomial graph audited before injection disable; at ordinals0/1 owning core
+Close reaches the last manager source DEC while its own factory construction
+remains pending. Approved only same-engine explicit callee-start outcome set
+at actual creation-stage1, distinct from successful new-publication outcome.
+Core may retain this root on error for explicit owning abort before its retain
+release; foreign/preexisting pending stays borrowed. Literal source prefix
+never repairs callee construction. Prior broader monomial/modular/core focus
+was native34136(.066s)/debug81119(.100s) GREEN, not final corrected snapshot.
+
+Container nested map focused native/debug GREEN after genuine API RED. Actual
+outer8x40 Runtime bytes plus eight8x12 inner tables, ascending placement and
+completed entry destruction;14 failing reservation ordinals then first success
+with immediate named-block bijection before injection disable. Full solver
+façade still API RED; actual staged constructor/model/default Check/user scopes
+remain implementation obligations and private work continues.
+
+### Selected multivariate core integration (full gates pending)
+
+Root verified final31 Go SHA values and reviewed all five existing-file diffs
+before copying26 new and5 scoped existing files. Cold codec/accessor/SOM/vector/
+constructor/overload/arithmetic/callback/ownership owners are integrated; actual
+Integer array GCD uses shared concrete indexed loop with self-identity and early
+one unread-tail assertions. Existing modular file change is source header only.
+Monomial lifetime source-deletion progress avoids dereferencing already freed
+unit raw; factory engines retain created/started outcomes without duplicate
+algorithms or foreign pending ownership. All headers passed full originating
+path/MIT/no-Microsoft audit. Private exact files/method limits remain
+.cache/polynomial-core-final-inventory.json; immutable18 production dependency
+snapshot03 is .cache/work/polynomial-core-prerequisite-03.
+
+Private focused final native/debug each198 RUN/PASS (0.083s/0.117s), both vets
+and no-generics parser exit0. Root master ^TestPolynomial native0(.034s)/
+debug0(.051s) after composition with current738-file master. Full gates will
+freeze764 Go files. Partial source units stay partial; selected source ranges
+are not a claim of every method in each range. Full actual imp m_upm, remaining
+members, Newton/skeleton source destructor suffix at2354+, lexsort/printing,
+PSC/Lazard/subresultant/resultant and active full source driver remain OPEN.
+No determinant or univariate replacement; no registered active PSC completion
+credit. Arena next source-first task is full imp constructor/destructor/member
+hierarchy, coordinating concrete Newton source/owning-boundary corrections.
+
+Full core master gates terminal GREEN; all764 Go files unchanged verified:
+.cache/polynomial-core-complete-go-hashes.json and
+.cache/polynomial-core-complete-gates.json. Native exit0 in98.073s; complete
+checked/debug exit0 in750.109s with original100-bit/every-prefix campaign.
+Both vets exit0 (3.829s/4.007s); source/no-generics audit exit0 in139.005s.
+Logs .cache/polynomial-core-complete-{native,debug,vet-native,vet-debug,source}.log.
+Header full originating paths/MIT/no-Microsoft and git diff --check passed.
+Coherent selected multivariate core ready for green commit; inventory remains
+30ported/181partial/1891unported,2102units/677APIs. Whole goal remains active.
+
+Private Newton source-boundary regressions genuine RED then GREEN:
+.cache/polynomial-newton-whole-push-red.log,
+.cache/polynomial-newton-source-reset-flush-red.log and
+.cache/polynomial-newton-source-flush-red.log.17 selected groups native/debug
+GREEN(.029s), both vets0; adjacent exact-prerequisite03/helper-refresh59 RUN/PASS
+in both profiles(.067s/.071s). Final5 files and approved core field/preguard
+merge inventory .cache/polynomial-newton-final-inventory.json; core merge
+.cache/polynomial-newton-core-merge.diff. Source member destruction retains
+unjoined INC for explicit owning abort, source Reset preserves actual stopped
+cause, source Flush retains actual child orphan/cold directory. Whole-method
+clears newtonLocal only when adapter closed. Persistent-vector SourceFinalize
+is still an explicit next full-imp obligation, never alias to owning Close.
+
+Root started complete bit_util family privately while master gates ran:
+.cache/work/util-bits-9c90112. Source test bits.cpp registered at main.cpp217;
+fixed nine shift tables, zero right-shift and full100000-case randomized driver
+ported before production. Actual missing-API RED exit1 is
+.cache/util-bits-api-red.log. Source libc rand replaced by explicit deterministic
+31-bit draw adapter retaining draw order/modulo/zero corrections; test-only
+math/big independently provides expected words, no production bigint. First
+native registered campaign GREEN1.726s; finite full shift matrix/native overlap
+and reached-access guards GREEN1.750s, both private vets0. Source CPP unsigned
+32 wrap and actual write-before-next-read overlap preserved; source undefined
+shift domains have reached typed guards, not claimed native UB continuation.
+Debug globals/non-GNU fallback/diagnostic binding and further arithmetic finite
+coverage remain audit obligations before root freeze/master integration.

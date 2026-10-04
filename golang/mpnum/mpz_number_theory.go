@@ -1,4 +1,4 @@
-// Licensed under the MIT license.
+// Source: src/util/mpz.cpp. Licensed under the MIT license.
 // Source: src/util/mpz.cpp array gcd, extended Euclid, lcm, divides.
 package mpnum
 
@@ -15,30 +15,7 @@ func (m *IntegerManager) GCDMany(as []Int, g *Int) error {
 	if uint64(len(as)) > uint64(^uint32(0)) {
 		return arena.ErrBounds
 	}
-	if e := m.check(g); e != nil {
-		return e
-	}
-	switch len(as) {
-	case 0:
-		return m.Reset(g)
-	case 1:
-		if e := m.Copy(g, &as[0]); e != nil {
-			return e
-		}
-		return m.Abs(g)
-	}
-	if e := m.GCD(&as[0], &as[1], g); e != nil {
-		return e
-	}
-	for i := 2; i < len(as); i++ {
-		if isOneInteger(g) {
-			return nil
-		}
-		if e := m.GCD(g, &as[i], g); e != nil {
-			return e
-		}
-	}
-	return nil
+	return m.GCDManyIndexed(integerArrayView{values: as, count: uint32(len(as))}, g)
 }
 
 // ExtendedGCD preserves source coefficient publication at every action. Outputs

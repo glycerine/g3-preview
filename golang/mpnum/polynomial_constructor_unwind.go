@@ -1,0 +1,59 @@
+// Source: src/math/polynomial/polynomial.cpp:1821-1850,2324-2344;
+// src/util/mpzzp.h:97-105; src/util/vector.h. Licensed under the MIT license.
+package mpnum
+
+import "github.com/glycerine/g3/golang/memory"
+
+// Only completed selected members unwind. No imp destructor body executes:
+// body-created cells and the body monomial-manager retain remain named roots
+// for explicit owning abort. The missing m_upm is not synthesized here.
+func (m *MultivariatePolynomialCore) unwindConstructorMembers() error {
+	m.constructorUnwinding = true
+	if m.constructorUnwindStage == 0 {
+		if m.idsInitialized {
+			m.idsSourceDestroyed = true
+			if e := m.ids.SourceFinalize(); e != nil {
+				return e
+			}
+			m.idsInitialized = false
+		}
+		m.constructorUnwindStage++
+	}
+	if m.constructorUnwindStage == 1 {
+		m.directorySourceDestroyed = m.directoryInitialized
+		// The published pointer-vector backing belongs to the completed
+		// member. A failed initial lexical allocation remains pending and
+		// belongs only to explicit owning cleanup, not this destructor.
+		if m.directoryInitialized && m.polynomials.raw != (memory.Block{}) {
+			if e := m.memory.Deallocate(&m.polynomials.raw); e != nil {
+				return e
+			}
+		}
+		m.constructorUnwindStage++
+	}
+	if m.constructorUnwindStage == 2 {
+		if m.modular != nil {
+			m.modularSourceDestroyed = true
+			fields := [7]*Int{&m.modular.p, &m.modular.lower, &m.modular.upper, &m.modular.invTmp1, &m.modular.invTmp2, &m.modular.invTmp3, &m.modular.divTmp}
+			for m.constructorModularIndex < uint8(len(fields)) {
+				if e := m.integer.Del(fields[m.constructorModularIndex]); e != nil {
+					return e
+				}
+				m.constructorModularIndex++
+			}
+		}
+		m.constructorUnwindStage++
+	}
+	m.constructorUnwinding = false
+	return nil
+}
+
+// After source member destruction, owning abort still has genuine numeral
+// fields. It uses the borrowed Integer owner directly, never a destroyed
+// modular source object or a repaired ID/directory member.
+func (m *MultivariatePolynomialCore) deleteNumeral(a *Int) error {
+	if m.modularSourceDestroyed {
+		return m.integer.Del(a)
+	}
+	return m.modular.Del(a)
+}

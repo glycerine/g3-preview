@@ -79,6 +79,12 @@ func (in monomialInput) degreeSum() (uint32, error) {
 	return n, nil
 }
 func (m *MonomialManager) Mul(a, b Monomial) (Monomial, error) {
+	return m.mulCreated(a, b, nil)
+}
+func (m *MonomialManager) mulCreated(a, b Monomial, outcome *monomialFactoryOutcome) (Monomial, error) {
+	if outcome != nil {
+		*outcome = monomialFactoryOutcome{}
+	}
 	if e := m.check(); e != nil {
 		return Monomial{}, e
 	}
@@ -96,7 +102,7 @@ func (m *MonomialManager) Mul(a, b Monomial) (Monomial, error) {
 	if e != nil {
 		return Monomial{}, e
 	}
-	return m.mulInputs(monomialInput{manager: m, value: a, count: n}, monomialInput{manager: m, value: b, count: k})
+	return m.mulInputsCreated(monomialInput{manager: m, value: a, count: n}, monomialInput{manager: m, value: b, count: k}, outcome)
 }
 func (m *MonomialManager) MulPowers(a, b []MonomialPower) (Monomial, error) {
 	if e := m.check(); e != nil {
@@ -108,6 +114,17 @@ func (m *MonomialManager) MulPowers(a, b []MonomialPower) (Monomial, error) {
 	return m.mulInputs(monomialInput{powers: a, count: uint32(len(a))}, monomialInput{powers: b, count: uint32(len(b))})
 }
 func (m *MonomialManager) mulInputs(left, right monomialInput) (Monomial, error) {
+	return m.mulInputsCreated(left, right, nil)
+}
+func (m *MonomialManager) mulInputsCreated(left, right monomialInput, outcome *monomialFactoryOutcome) (result Monomial, cause error) {
+	if outcome != nil {
+		*outcome = monomialFactoryOutcome{}
+	}
+	defer func() {
+		if cause == nil {
+			m.creation = monomialCreation{}
+		}
+	}()
 	x, y := MonomialInfo{Size: left.count}, MonomialInfo{Size: right.count}
 	var e error
 	if modularSourceDebug {
@@ -198,7 +215,7 @@ func (m *MonomialManager) mulInputs(left, right monomialInput) (Monomial, error)
 	if e = m.tempSetSize(t, k); e != nil {
 		return Monomial{}, e
 	}
-	r, e := m.internTemp(1)
+	r, e := m.internTempCreated(1, outcome)
 	if e != nil {
 		return r, e
 	}

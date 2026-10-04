@@ -42,7 +42,23 @@ func validMonomialPowers(p []MonomialPower) bool {
 	}
 	return true
 }
+
+// Ephemeral outcome of one actual factory call, not persistent ownership.
+// Existing interned/unit results do not start a creation, irrespective of RC.
+type monomialFactoryOutcome struct{ created, started bool }
+
 func (m *MonomialManager) MkMonomial(p []MonomialPower) (Monomial, error) {
+	return m.mkMonomialCreated(p, nil)
+}
+func (m *MonomialManager) mkMonomialCreated(p []MonomialPower, outcome *monomialFactoryOutcome) (result Monomial, cause error) {
+	if outcome != nil {
+		*outcome = monomialFactoryOutcome{}
+	}
+	defer func() {
+		if cause == nil {
+			m.creation = monomialCreation{}
+		}
+	}()
 	if e := m.check(); e != nil {
 		return Monomial{}, e
 	}
@@ -55,9 +71,22 @@ func (m *MonomialManager) MkMonomial(p []MonomialPower) (Monomial, error) {
 	if e := m.tempInit(&m.temps[0], p); e != nil {
 		return Monomial{}, e
 	}
-	return m.internTemp(0)
+	return m.internTempCreated(0, outcome)
 }
-func (m *MonomialManager) internTemp(index uint32) (Monomial, error) {
+func (m *MonomialManager) internTemp(index uint32) (result Monomial, cause error) {
+	result, cause = m.internTempCreated(index, nil)
+	if cause == nil {
+		m.creation = monomialCreation{}
+	}
+	return
+}
+
+// created reports the actual new intern publication. On a reached callee
+// postcondition guard, creation remains the callee's real retained owner.
+func (m *MonomialManager) internTempCreated(index uint32, outcome *monomialFactoryOutcome) (Monomial, error) {
+	if outcome != nil {
+		*outcome = monomialFactoryOutcome{}
+	}
 	if m.creation.stage != 0 {
 		return Monomial{}, ErrMonomialPending
 	}
@@ -81,6 +110,9 @@ func (m *MonomialManager) internTemp(index uint32) (Monomial, error) {
 		return Monomial{m.origin, old.slot, l.generation}, nil
 	}
 	m.creation = monomialCreation{tableIndex: pos, stage: 1}
+	if outcome != nil {
+		outcome.started = true
+	}
 	slot, e := m.prepareLocation()
 	if e != nil {
 		return Monomial{}, e
@@ -153,7 +185,9 @@ func (m *MonomialManager) internTemp(index uint32) (Monomial, error) {
 	}
 	l.published = true
 	m.publishedObjects++
-	m.creation = monomialCreation{}
+	if outcome != nil {
+		outcome.created = true
+	}
 	if modularSourceDebug {
 		key := monomialKey{monomialObjectKey, slot}
 		_, found, e := m.table.find(m, key)
@@ -181,6 +215,12 @@ func (m *MonomialManager) internTemp(index uint32) (Monomial, error) {
 	return Monomial{m.origin, slot, l.generation}, nil
 }
 func (m *MonomialManager) MkVariable(v, k uint32) (Monomial, error) {
+	return m.mkVariableCreated(v, k, nil)
+}
+func (m *MonomialManager) mkVariableCreated(v, k uint32, outcome *monomialFactoryOutcome) (Monomial, error) {
+	if outcome != nil {
+		*outcome = monomialFactoryOutcome{}
+	}
 	if e := m.check(); e != nil {
 		return Monomial{}, e
 	}
@@ -191,7 +231,7 @@ func (m *MonomialManager) MkVariable(v, k uint32) (Monomial, error) {
 		return Monomial{}, ErrMonomialAssertion
 	}
 	one := [1]MonomialPower{{v, k}}
-	return m.MkMonomial(one[:])
+	return m.mkMonomialCreated(one[:], outcome)
 }
 func (m *MonomialManager) Convert(source *MonomialManager, a Monomial) (Monomial, error) {
 	if e := m.check(); e != nil {
@@ -274,6 +314,10 @@ func (m *MonomialManager) CleanupCreation() error {
 			if e != nil {
 				return e
 			}
+		}
+		if l.published {
+			m.publishedObjects--
+			l.published = false
 		}
 		l.live = false
 	}

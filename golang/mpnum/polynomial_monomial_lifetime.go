@@ -187,12 +187,20 @@ func (m *MonomialManager) CloseChecked() error {
 		return nil
 	}
 	if !m.closing && m.unit != (Monomial{}) {
-		h, e := m.headerCore(m.unit)
+		l, e := m.location(m.unit)
 		if e != nil {
 			return e
 		}
-		if h.RefCount > 1 {
-			return ErrMonomialLive
+		// A real stopped deletion has consumed its logical references. Its
+		// retained progress is authoritative; the old raw may already be free.
+		if l.stage == 0 {
+			h, e := m.headerCore(m.unit)
+			if e != nil {
+				return e
+			}
+			if h.RefCount > 1 {
+				return ErrMonomialLive
+			}
 		}
 	}
 	if !m.closing && m.externalEntries() {
