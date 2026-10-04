@@ -60398,7 +60398,10 @@
         "sat_solver_display.go",
         "sat_solver_inspection_test.go",
         "sat_solver_inspection_model_test.go",
-        "sat_solver_inspection_fault_test.go"
+        "sat_solver_inspection_fault_test.go",
+        "sat_solver_views.go",
+        "sat_solver_clause_iterator.go",
+        "sat_solver_views_test.go"
       ],
       "tests": [
         "TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots",
@@ -60675,7 +60678,15 @@
         "TestSATSolverInspectionExactSourceWatchDisplay",
         "TestSATSolverInspectionEveryActualStreamRefusalPrefix",
         "TestSATSolverInspectionWarmOutputAndOwnerGuards",
-        "TestSATSolverInspectionBinaryOutputEveryActualReservation"
+        "TestSATSolverInspectionBinaryOutputEveryActualReservation",
+        "TestSATSolverBorrowedModelCoreCurrentMembers",
+        "TestSATSolverBorrowedScalarSourceAuthorities",
+        "TestSATSolverClauseIteratorSameBackingMutationsAndRelocation",
+        "TestSATSolverBorrowedIndependentAssignmentAndScopeViews",
+        "TestSATSolverBorrowedCanceledActualResourcePrefix",
+        "TestSATSolverBorrowedZeroAllocAndCopiedClosedGuards",
+        "TestSATSolverBorrowedReachedCurrentHeaderReadGuards",
+        "TestSATSolverClauseIteratorLearnedEmptyAndOwnerLifetime"
       ],
       "conditionals": [
         {
@@ -61228,6 +61239,36 @@
           "tests": [
             "TestSATSolverInspectionDIMACSActualCheckBindingAndAssumptions"
           ]
+        },
+        {
+          "name": "Selected inline source views245-286/318-323: current named model/core member, scalar/level/external/scope/initTrail/config/MC, real resource canceled increment",
+          "status": "partial",
+          "go_target": "sat_solver_views.go",
+          "tests": [
+            "TestSATSolverBorrowedModelCoreCurrentMembers",
+            "TestSATSolverBorrowedScalarSourceAuthorities",
+            "TestSATSolverClauseIteratorSameBackingMutationsAndRelocation",
+            "TestSATSolverBorrowedIndependentAssignmentAndScopeViews",
+            "TestSATSolverBorrowedCanceledActualResourcePrefix",
+            "TestSATSolverBorrowedZeroAllocAndCopiedClosedGuards",
+            "TestSATSolverBorrowedReachedCurrentHeaderReadGuards",
+            "TestSATSolverClauseIteratorLearnedEmptyAndOwnerLifetime"
+          ]
+        },
+        {
+          "name": "Source clause begin/end539-542 captured backing and end, same-cap mutations visible, monotone replacement invalidation at actual dereference",
+          "status": "partial",
+          "go_target": "sat_solver_clause_iterator.go",
+          "tests": [
+            "TestSATSolverBorrowedModelCoreCurrentMembers",
+            "TestSATSolverBorrowedScalarSourceAuthorities",
+            "TestSATSolverClauseIteratorSameBackingMutationsAndRelocation",
+            "TestSATSolverBorrowedIndependentAssignmentAndScopeViews",
+            "TestSATSolverBorrowedCanceledActualResourcePrefix",
+            "TestSATSolverBorrowedZeroAllocAndCopiedClosedGuards",
+            "TestSATSolverBorrowedReachedCurrentHeaderReadGuards",
+            "TestSATSolverClauseIteratorLearnedEmptyAndOwnerLifetime"
+          ]
         }
       ],
       "ownership": [
@@ -61248,7 +61289,8 @@
         "Selected enabled integrity and missed-propagation sites now call actual members, including Asymm entry/exit and propagation. Global debug-tag/assertions-enabled registry, TRACE/verbose, complete constructor/parameter updates/search and registered user-scope campaign remain open. Undefined floating-to-int conversion is guarded at reached source expression; not a C++ malformed-input guarantee.",
         "Selected real finite src/test/sat_user_scope.cpp campaign executes42 original ENSURE comparisons/168 clauses and independent original-CNF oracle after pending tag removal. Whole solver remains partial: extension/parallel/MUS/clone/consequence methods, global debug tags, TRACE/printer and remaining actual source Runtime allocation accounting are open. Clause_offset physical pointer32 contract remains distinct from charged checked locator metadata. Std library sort schedule and explicit cold constructor contexts are Go adapters.",
         "Selected concrete consequences and mutex family source mapping supersedes older missing-method notes only for listed sites. Source AST/BV/datatype registered6 assertions, TRACE/verbose, extension dispatch, dormant core_chunking/static helpers, general template variants and full source units remain OPEN. Scalar slot/generation encodes selected8-byte pointer ABI; actual named cold/raw/pending roots charged; no registry-derived ownership. See PORT_PROGRESS.md.",
-        "Complete selected source copy75-127, across actual source/destination Runtime and Budget. Captured source vector cap detects actual proven monotone backing replacement only at reached dereference; same-cap self-copy source behavior preserved. Packed full-word88 predicate retained. Clone macro is disabled and its cpp739 two-arg constructor is illformed against actual3-arg declaration; no inferred runnable constructor or clone success stub. Parallel/global storage/TRACE/full source unit remain OPEN. No directly registered copy source assertions credited. See PORT_PROGRESS.md."
+        "Complete selected source copy75-127, across actual source/destination Runtime and Budget. Captured source vector cap detects actual proven monotone backing replacement only at reached dereference; same-cap self-copy source behavior preserved. Packed full-word88 predicate retained. Clone macro is disabled and its cpp739 two-arg constructor is illformed against actual3-arg declaration; no inferred runnable constructor or clone success stub. Parallel/global storage/TRACE/full source unit remain OPEN. No directly registered copy source assertions credited. See PORT_PROGRESS.md.",
+        "Current named-member borrows introduce no owning arrays or retains. Clause pointer/backing guards are proven by actual current strict-cap growth route, preserving captured end and same-cap mutations; future same-cap backing replacement requires revisiting this binding. Pointer8 source versus Go24 reference storage ABI/global allocator/optional full solver services remain OPEN. No registered source assertion credit. See PORT_PROGRESS.md."
       ]
     },
     {
