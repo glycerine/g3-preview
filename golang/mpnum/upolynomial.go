@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.h; src/math/polynomial/upolynomial.cpp.
 // Licensed under the MIT license.
 package mpnum
 
@@ -30,18 +31,22 @@ type UPolynomialManager struct {
 	config  UPolynomialConfig
 	modular *IntegerModularManager
 	// Actual source members: 16 core and five derived numeral vectors.
-	basic, div1, div2, exactDiv, gcd1, gcd2, cra upolyVectorState
-	mgcd                                         [6]upolyVectorState
-	sqf1, sqf2, pw                               upolyVectorState
-	db, dbab1, dbab2, tr, push                   upolyVectorState
-	pages                                        []*upolyDescriptorPage
-	store                                        *UPolynomialCoefficientStore
-	bindings                                     []upolyStoreBinding
-	live                                         uint32
-	liveSequences                                uint32
-	liveFactors                                  uint32
-	header                                       uint64
-	closed                                       bool
+	basic, div1, div2, exactDiv, gcd1, gcd2, cra   upolyVectorState
+	mgcd                                           [6]upolyVectorState
+	sqf1, sqf2, pw                                 upolyVectorState
+	db, dbab1, dbab2, tr, push                     upolyVectorState
+	pages                                          []*upolyDescriptorPage
+	store                                          *UPolynomialCoefficientStore
+	bindings                                       []upolyStoreBinding
+	live                                           uint32
+	liveSequences                                  uint32
+	liveFactors                                    uint32
+	header                                         uint64
+	closed, closing                                bool
+	sourceFinalizing, sourceFinalized, sourceGuard bool
+	sourceStage                                    uint8
+	sourceIndex                                    uint32
+	sourceCause                                    error
 }
 
 func NewUPolynomialManager(c UPolynomialConfig) (*UPolynomialManager, error) {
@@ -94,7 +99,7 @@ func (m *UPolynomialManager) check() error {
 	if m == nil || m.self != m || m.config.Integer == nil {
 		return ErrUPolynomialOwner
 	}
-	if m.closed || m.config.Integer.closed {
+	if m.closed || m.closing || m.sourceFinalizing || m.config.Integer.closed {
 		return arena.ErrClosed
 	}
 	return nil
@@ -193,12 +198,23 @@ func (m *UPolynomialManager) DelPolynomial(p *UPolynomial) error {
 	return nil
 }
 func (m *UPolynomialManager) Close() error {
-	if e := m.check(); e != nil {
-		return e
+	if m == nil || m.self != m || m.config.Integer == nil {
+		return ErrUPolynomialOwner
+	}
+	if m.closed || m.config.Integer.closed {
+		return arena.ErrClosed
 	}
 	if m.live != 0 || m.liveSequences != 0 || m.liveFactors != 0 {
 		return ErrUPolynomialLive
 	}
+	m.closing = true
+	if m.sourceFinalizing && !m.sourceFinalized && m.sourceCause == nil {
+		if e := m.SourceFinalize(); e != nil {
+			return e
+		}
+	}
+	// Owning cleanup acknowledges actual retained release cursors separately;
+	// stopped literal source cause/stage/history are never repaired or advanced.
 	// Derived destructor reset order, followed by implicit reverse members.
 	derived := [5]*upolyVectorState{&m.db, &m.dbab1, &m.dbab2, &m.tr, &m.push}
 	for _, s := range derived {

@@ -28437,7 +28437,8 @@
         "mpnum/polynomial_mod_d.go",
         "mpnum/polynomial_variable_degrees.go",
         "mpnum/polynomial_variable_degrees_copy.go",
-        "polynomial_var_degree_stream_test.go"
+        "polynomial_var_degree_stream_test.go",
+        "mpnum/polynomial_member_constructor_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -28607,7 +28608,10 @@
         "TestPolynomialVariableDegreesFailedConstructorCarrierRejectsSourceAPI",
         "TestPolynomialVariableDegreesActualNumericStreamFlags",
         "TestPolynomialModDBigCoefficientEveryActualRefusal",
-        "TestPolynomialModDConstantWithStoppedMapAssignmentKeepsActualRoots"
+        "TestPolynomialModDConstantWithStoppedMapAssignmentKeepsActualRoots",
+        "TestPolynomialMemberPreparationBeforeBody",
+        "TestPolynomialRuntimeTempDefaultAndFailure",
+        "TestPolynomialRuntimeTempReachedPlacementGuard"
       ],
       "conditionals": [
         {
@@ -30868,6 +30872,16 @@
             "TestPolynomialModDBigCoefficientEveryActualRefusal",
             "TestPolynomialModDConstantWithStoppedMapAssignmentKeepsActualRoots"
           ]
+        },
+        {
+          "name": "Selected concrete preparation/default/body constructor stages and tmp_monomial Runtime placement cpp193/507\u2013544/2308\u20132344; full imp composition remains open",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_manager.go",
+          "tests": [
+            "TestPolynomialMemberPreparationBeforeBody",
+            "TestPolynomialRuntimeTempDefaultAndFailure",
+            "TestPolynomialRuntimeTempReachedPlacementGuard"
+          ]
         }
       ],
       "ownership": [
@@ -30890,7 +30904,8 @@
         "source monomial_ref then completed default scoped numeral at actual declaration; reverse NUM then reference; actual partial incoming INC retained separately; C.mk evaluated fresh output retained if local cleanup refuses",
         "actual positions Set, ms push, INC, default coefficient push, numeric Copy; borrowedAppend/index exclude guarded uncompleted INC from owning DEC",
         "Actual embedded pseudo continuation references, NUM and monomial fields with scalar lexical construction/destruction order. Same-engine Power accepts a completed source reference; completed destructors precede separate owning abort of actual unjoined INCs. Shared physical census names all actual scope fields and active nested Power directly, with immediate before-fault-disable evidence.",
-        "One actual Runtime cap/size/unsigned degree vector with reflected charged cold owner and precise constructed/rawDestroyed/pending states. Failed ctor carrier rejects ordinary APIs, has no completed member destructor. Copy assignment frees old before replacement, stale pointer history is nonowning; actual returned pending blocks remain owning. Cold maps and their actual live/pending raw blocks are independently censused, including true BIG fresh-NULL reservation and stopped assignment constant branch."
+        "One actual Runtime cap/size/unsigned degree vector with reflected charged cold owner and precise constructed/rawDestroyed/pending states. Failed ctor carrier rejects ordinary APIs, has no completed member destructor. Copy assignment frees old before replacement, stale pointer history is nonowning; actual returned pending blocks remain owning. Cold maps and their actual live/pending raw blocks are independently censused, including true BIG fresh-NULL reservation and stopped assignment constant branch.",
+        "Selected constructor helper split preserves existing actual modular/default/body order; Runtime temporary placement records real returned raw blocks and reached header writes. No full imp constructor/destructor credit or fabricated sizeof allocation event."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -30983,7 +30998,8 @@
         "mpnum/polynomial_mod_d.go",
         "mpnum/polynomial_variable_degrees.go",
         "mpnum/polynomial_variable_degrees_copy.go",
-        "polynomial_var_degree_stream_test.go"
+        "polynomial_var_degree_stream_test.go",
+        "mpnum/polynomial_member_constructor_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -31153,7 +31169,10 @@
         "TestPolynomialVariableDegreesFailedConstructorCarrierRejectsSourceAPI",
         "TestPolynomialVariableDegreesActualNumericStreamFlags",
         "TestPolynomialModDBigCoefficientEveryActualRefusal",
-        "TestPolynomialModDConstantWithStoppedMapAssignmentKeepsActualRoots"
+        "TestPolynomialModDConstantWithStoppedMapAssignmentKeepsActualRoots",
+        "TestPolynomialMemberPreparationBeforeBody",
+        "TestPolynomialRuntimeTempDefaultAndFailure",
+        "TestPolynomialRuntimeTempReachedPlacementGuard"
       ],
       "conditionals": [
         {
@@ -32186,6 +32205,16 @@
             "TestPolynomialModDBigCoefficientEveryActualRefusal",
             "TestPolynomialModDConstantWithStoppedMapAssignmentKeepsActualRoots"
           ]
+        },
+        {
+          "name": "Selected concrete preparation/default/body constructor stages and tmp_monomial Runtime placement cpp193/507\u2013544/2308\u20132344; full imp composition remains open",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_manager.go",
+          "tests": [
+            "TestPolynomialMemberPreparationBeforeBody",
+            "TestPolynomialRuntimeTempDefaultAndFailure",
+            "TestPolynomialRuntimeTempReachedPlacementGuard"
+          ]
         }
       ],
       "ownership": [
@@ -32208,7 +32237,8 @@
         "source monomial_ref then completed default scoped numeral at actual declaration; reverse NUM then reference; actual partial incoming INC retained separately; C.mk evaluated fresh output retained if local cleanup refuses",
         "actual positions Set, ms push, INC, default coefficient push, numeric Copy; borrowedAppend/index exclude guarded uncompleted INC from owning DEC",
         "Actual embedded pseudo continuation references, NUM and monomial fields with scalar lexical construction/destruction order. Same-engine Power accepts a completed source reference; completed destructors precede separate owning abort of actual unjoined INCs. Shared physical census names all actual scope fields and active nested Power directly, with immediate before-fault-disable evidence.",
-        "One actual Runtime cap/size/unsigned degree vector with reflected charged cold owner and precise constructed/rawDestroyed/pending states. Failed ctor carrier rejects ordinary APIs, has no completed member destructor. Copy assignment frees old before replacement, stale pointer history is nonowning; actual returned pending blocks remain owning. Cold maps and their actual live/pending raw blocks are independently censused, including true BIG fresh-NULL reservation and stopped assignment constant branch."
+        "One actual Runtime cap/size/unsigned degree vector with reflected charged cold owner and precise constructed/rawDestroyed/pending states. Failed ctor carrier rejects ordinary APIs, has no completed member destructor. Copy assignment frees old before replacement, stale pointer history is nonowning; actual returned pending blocks remain owning. Cold maps and their actual live/pending raw blocks are independently censused, including true BIG fresh-NULL reservation and stopped assignment constant branch.",
+        "Selected constructor helper split preserves existing actual modular/default/body order; Runtime temporary placement records real returned raw blocks and reached header writes. No full imp constructor/destructor credit or fabricated sizeof allocation event."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -32775,7 +32805,9 @@
         "upolynomial_coefficient_store_source_test.go",
         "upolynomial_coefficient_store_lifetime_test.go",
         "mpnum/upolynomial_store_adoption.go",
-        "upolynomial_coefficient_store_adoption_test.go"
+        "upolynomial_coefficient_store_adoption_test.go",
+        "mpnum/upolynomial_source_finalize.go",
+        "mpnum/upolynomial_source_finalize_test.go"
       ],
       "tests": [
         "TestUPolynomialScalarExtentAndLayout",
@@ -32866,7 +32898,15 @@
         "TestUPolynomialCoefficientStoreCounterAndColdLayout",
         "TestUPolynomialStoreIndependentAdoptionTransferAndOldPhysicalViews",
         "TestUPolynomialStoreAdoptionFailurePrefixAndCohortGraph",
-        "TestUPolynomialStoreRelatedInheritsImportedBindingsAndUnwinds"
+        "TestUPolynomialStoreRelatedInheritsImportedBindingsAndUnwinds",
+        "TestUPolynomialSourceFinalizePrivateMembersAndCaller",
+        "TestUPolynomialSourceFinalizeStoppedPrivateGuard",
+        "TestUPolynomialSourceFinalizeDerivedBackingBeforeCoreBody",
+        "TestUPolynomialSourceFinalizeOwnerGuards",
+        "TestUPolynomialSourceFinalizeDoesNotOwnReleasedLeafRetry",
+        "TestUPolynomialSourceFinalizeUnconstructedTailPrefix",
+        "TestUPolynomialSourceFinalizeFirstEntryConsumedLeafGuard",
+        "TestUPolynomialSourceFinalizeFreshNullMember"
       ],
       "conditionals": [
         {
@@ -33819,6 +33859,21 @@
             "TestUPolynomialStoreAdoptionFailurePrefixAndCohortGraph",
             "TestUPolynomialStoreRelatedInheritsImportedBindingsAndUnwinds"
           ]
+        },
+        {
+          "name": "core_manager and manager destructor bodies cpp138\u2013155/1259\u20131265, reverse numeral-vector members, then mpzzp.h97\u2013105 actual source Del; explicit caller CleanupPolynomial and separate owning abort",
+          "status": "ported",
+          "go_target": "mpnum/upolynomial_source_finalize.go",
+          "tests": [
+            "TestUPolynomialSourceFinalizePrivateMembersAndCaller",
+            "TestUPolynomialSourceFinalizeStoppedPrivateGuard",
+            "TestUPolynomialSourceFinalizeDerivedBackingBeforeCoreBody",
+            "TestUPolynomialSourceFinalizeOwnerGuards",
+            "TestUPolynomialSourceFinalizeDoesNotOwnReleasedLeafRetry",
+            "TestUPolynomialSourceFinalizeUnconstructedTailPrefix",
+            "TestUPolynomialSourceFinalizeFirstEntryConsumedLeafGuard",
+            "TestUPolynomialSourceFinalizeFreshNullMember"
+          ]
         }
       ],
       "ownership": [
@@ -33827,7 +33882,8 @@
         "Actual flat coefficient storage plus two independent unsigned metadata vectors, partial row publication, source read timing, charged cold owner and manager Close guard. See PORT_PROGRESS.md#audit-upolynomial-sturm-packet-md; lexical numeral/vector cleanup is an explicit Go error adapter.",
         "Isolation uses charged concrete binary output vectors and lexical coefficient/frame backings; actual initialized extents and source ascending/reverse destruction orders are retained. Refusal/cancellation tests audit real output and manager cells/Words before fault disabling. See PORT_PROGRESS.md#audit-upolynomial-root-isolation-packet-md; allocator/backend integration remains open.",
         "Related cores retain one charged concrete coefficient store and borrowed IntegerManager. Descriptors and twenty-one scratch vectors remain core-owned; closing a parent releases its scratch without destroying child buffers. Sum core ExclusiveBytes and one store TotalBytes. See PORT_PROGRESS.md#audit-upolynomial-factorization-packet-md.",
-        "Independent stores borrowing the same actual IntegerManager transfer scalar buffer states without coefficient copies. Charged cold bindings retain each distinct imported store once; captured physical views survive transfer and original-core close until actual backing growth/free. Related constructors inherit bindings and unwind retained refs on refusal. Sum core ExclusiveBytes plus each distinct store TotalBytes once; numeral cells belong to the shared IntegerManager. See PORT_PROGRESS.md#audit-upolynomial-store-adoption-port-status-md."
+        "Independent stores borrowing the same actual IntegerManager transfer scalar buffer states without coefficient copies. Charged cold bindings retain each distinct imported store once; captured physical views survive transfer and original-core close until actual backing growth/free. Related constructors inherit bindings and unwind retained refs on refusal. Sum core ExclusiveBytes plus each distinct store TotalBytes once; numeral cells belong to the shared IntegerManager. See PORT_PROGRESS.md#audit-upolynomial-store-adoption-port-status-md.",
+        "Literal ascending private numeral deletion and reverse backing destruction retain exact stopped cause/cursor. Caller descriptors survive source finalization and require explicit caller-field cleanup. No registry-derived ownership or acknowledgement of consumed physical release on source retry. Whole imp/global bindings remain open."
       ],
       "deviations": [
         "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full isolation/refinement/conversion/factorization/algebraic and printers remain open; input conversion adapters do not establish complete registered tests.",
@@ -33882,7 +33938,9 @@
         "upolynomial_coefficient_store_source_test.go",
         "upolynomial_coefficient_store_lifetime_test.go",
         "mpnum/upolynomial_store_adoption.go",
-        "upolynomial_coefficient_store_adoption_test.go"
+        "upolynomial_coefficient_store_adoption_test.go",
+        "mpnum/upolynomial_source_finalize.go",
+        "mpnum/upolynomial_source_finalize_test.go"
       ],
       "tests": [
         "TestUPolynomialScalarExtentAndLayout",
@@ -33973,7 +34031,15 @@
         "TestUPolynomialCoefficientStoreCounterAndColdLayout",
         "TestUPolynomialStoreIndependentAdoptionTransferAndOldPhysicalViews",
         "TestUPolynomialStoreAdoptionFailurePrefixAndCohortGraph",
-        "TestUPolynomialStoreRelatedInheritsImportedBindingsAndUnwinds"
+        "TestUPolynomialStoreRelatedInheritsImportedBindingsAndUnwinds",
+        "TestUPolynomialSourceFinalizePrivateMembersAndCaller",
+        "TestUPolynomialSourceFinalizeStoppedPrivateGuard",
+        "TestUPolynomialSourceFinalizeDerivedBackingBeforeCoreBody",
+        "TestUPolynomialSourceFinalizeOwnerGuards",
+        "TestUPolynomialSourceFinalizeDoesNotOwnReleasedLeafRetry",
+        "TestUPolynomialSourceFinalizeUnconstructedTailPrefix",
+        "TestUPolynomialSourceFinalizeFirstEntryConsumedLeafGuard",
+        "TestUPolynomialSourceFinalizeFreshNullMember"
       ],
       "conditionals": [
         {
@@ -34366,6 +34432,21 @@
             "TestUPolynomialStoreAdoptionFailurePrefixAndCohortGraph",
             "TestUPolynomialStoreRelatedInheritsImportedBindingsAndUnwinds"
           ]
+        },
+        {
+          "name": "core_manager and manager destructor bodies cpp138\u2013155/1259\u20131265, reverse numeral-vector members, then mpzzp.h97\u2013105 actual source Del; explicit caller CleanupPolynomial and separate owning abort",
+          "status": "ported",
+          "go_target": "mpnum/upolynomial_source_finalize.go",
+          "tests": [
+            "TestUPolynomialSourceFinalizePrivateMembersAndCaller",
+            "TestUPolynomialSourceFinalizeStoppedPrivateGuard",
+            "TestUPolynomialSourceFinalizeDerivedBackingBeforeCoreBody",
+            "TestUPolynomialSourceFinalizeOwnerGuards",
+            "TestUPolynomialSourceFinalizeDoesNotOwnReleasedLeafRetry",
+            "TestUPolynomialSourceFinalizeUnconstructedTailPrefix",
+            "TestUPolynomialSourceFinalizeFirstEntryConsumedLeafGuard",
+            "TestUPolynomialSourceFinalizeFreshNullMember"
+          ]
         }
       ],
       "ownership": [
@@ -34374,7 +34455,8 @@
         "Actual flat coefficient storage plus two independent unsigned metadata vectors, partial row publication, source read timing, charged cold owner and manager Close guard. See PORT_PROGRESS.md#audit-upolynomial-sturm-packet-md; lexical numeral/vector cleanup is an explicit Go error adapter.",
         "Isolation uses charged concrete binary output vectors and lexical coefficient/frame backings; actual initialized extents and source ascending/reverse destruction orders are retained. Refusal/cancellation tests audit real output and manager cells/Words before fault disabling. See PORT_PROGRESS.md#audit-upolynomial-root-isolation-packet-md; allocator/backend integration remains open.",
         "Related cores retain one charged concrete coefficient store and borrowed IntegerManager. Descriptors and twenty-one scratch vectors remain core-owned; closing a parent releases its scratch without destroying child buffers. Sum core ExclusiveBytes and one store TotalBytes. See PORT_PROGRESS.md#audit-upolynomial-factorization-packet-md.",
-        "Independent stores borrowing the same actual IntegerManager transfer scalar buffer states without coefficient copies. Charged cold bindings retain each distinct imported store once; captured physical views survive transfer and original-core close until actual backing growth/free. Related constructors inherit bindings and unwind retained refs on refusal. Sum core ExclusiveBytes plus each distinct store TotalBytes once; numeral cells belong to the shared IntegerManager. See PORT_PROGRESS.md#audit-upolynomial-store-adoption-port-status-md."
+        "Independent stores borrowing the same actual IntegerManager transfer scalar buffer states without coefficient copies. Charged cold bindings retain each distinct imported store once; captured physical views survive transfer and original-core close until actual backing growth/free. Related constructors inherit bindings and unwind retained refs on refusal. Sum core ExclusiveBytes plus each distinct store TotalBytes once; numeral cells belong to the shared IntegerManager. See PORT_PROGRESS.md#audit-upolynomial-store-adoption-port-status-md.",
+        "Literal ascending private numeral deletion and reverse backing destruction retain exact stopped cause/cursor. Caller descriptors survive source finalization and require explicit caller-field cleanup. No registry-derived ownership or acknowledgement of consumed physical release on source retry. Whole imp/global bindings remain open."
       ],
       "deviations": [
         "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full isolation/refinement/conversion/factorization/algebraic and printers remain open; input conversion adapters do not establish complete registered tests.",

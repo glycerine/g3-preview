@@ -21,10 +21,13 @@ type monomialTemp struct {
 }
 
 func (m *MonomialManager) tempAllocate(t *monomialTemp, capacity uint32) error {
+	return monomialTempAllocate(m.memory, t, capacity)
+}
+func monomialTempAllocate(r *memory.Runtime, t *monomialTemp, capacity uint32) error {
 	if t.pending != (memory.Block{}) {
 		return ErrMonomialPending
 	}
-	raw, e := m.memory.Allocate(uint64(monomialObjectSize(capacity)))
+	raw, e := r.Allocate(uint64(monomialObjectSize(capacity)))
 	if raw != (memory.Block{}) {
 		t.pending = raw
 	}
@@ -33,14 +36,17 @@ func (m *MonomialManager) tempAllocate(t *monomialTemp, capacity uint32) error {
 	}
 	// Placement monomial(UINT_MAX,0,nullptr,0) initializes exactly its header.
 	for i, v := range [5]uint32{0, ^uint32(0), 0, 0, 0} {
-		if e = m.memory.WriteUint32(raw, uint64(i)*4, v); e != nil {
+		if e = r.WriteUint32(raw, uint64(i)*4, v); e != nil {
 			return e
 		}
 	}
 	return nil
 }
 func (m *MonomialManager) tempConstruct(t *monomialTemp) error {
-	if e := m.tempAllocate(t, 128); e != nil {
+	return monomialTempConstruct(m.memory, t)
+}
+func monomialTempConstruct(r *memory.Runtime, t *monomialTemp) error {
+	if e := monomialTempAllocate(r, t, 128); e != nil {
 		return e
 	}
 	t.raw = t.pending

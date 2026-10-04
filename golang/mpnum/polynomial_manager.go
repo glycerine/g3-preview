@@ -90,17 +90,40 @@ type MultivariatePolynomialCore struct {
 }
 
 func NewMultivariatePolynomialCore(c MultivariatePolynomialConfig) (*MultivariatePolynomialCore, error) {
-	if c.Integer == nil || c.Monomials == nil || c.Checkpoint == nil || c.Cooperation == nil {
+	m, e := preparePolynomialCore(c, true)
+	if e != nil {
+		return m, e
+	}
+	fail := func(e error) (*MultivariatePolynomialCore, error) {
+		m.originalCause = e
+		m.cleanupCause = m.unwindConstructorMembers()
+		return m, m
+	}
+	if e = m.constructPolynomialCoreDefaults(); e != nil {
+		return fail(e)
+	}
+	if e = m.initializePolynomialCoreBody(); e != nil {
+		return fail(e)
+	}
+	return m, nil
+}
+
+// Preparation is a concrete member stage, not a completed polynomial::imp.
+// The full source hierarchy must insert its distinct UP member before defaults.
+func preparePolynomialCore(c MultivariatePolynomialConfig, requireMonomials bool) (*MultivariatePolynomialCore, error) {
+	if c.Integer == nil || (requireMonomials && c.Monomials == nil) || c.Checkpoint == nil || c.Cooperation == nil {
 		return nil, arena.ErrConfig
 	}
 	if e := polynomialIntegerReady(c.Integer); e != nil {
 		return nil, e
 	}
-	if e := c.Monomials.check(); e != nil {
-		return nil, e
-	}
-	if c.Monomials.memory != c.Integer.memory || c.Monomials.config.Budget != c.Integer.budget {
-		return nil, arena.ErrConfig
+	if c.Monomials != nil {
+		if e := c.Monomials.check(); e != nil {
+			return nil, e
+		}
+		if c.Monomials.memory != c.Integer.memory || c.Monomials.config.Budget != c.Integer.budget {
+			return nil, arena.ErrConfig
+		}
 	}
 	if c.Rationals != nil {
 		if e := c.Rationals.checkOwnerReady(); e != nil {
@@ -127,24 +150,28 @@ func NewMultivariatePolynomialCore(c MultivariatePolynomialConfig) (*Multivariat
 			break
 		}
 	}
-	fail := func(e error) (*MultivariatePolynomialCore, error) {
+	var e error
+	m.modular, e = NewIntegerModularManager(c.Integer)
+	if e != nil {
 		m.originalCause = e
 		m.cleanupCause = m.unwindConstructorMembers()
 		return m, m
 	}
-	var e error
-	m.modular, e = NewIntegerModularManager(c.Integer)
-	if e != nil {
-		return fail(e)
-	}
+	return m, nil
+}
+func (m *MultivariatePolynomialCore) constructPolynomialCoreDefaults() error {
 	m.polynomials.width = 16
 	m.directoryInitialized = true
-	if e = m.ids.Init(0, m.memory); e != nil {
-		return fail(e)
+	if e := m.ids.Init(0, m.memory); e != nil {
+		return e
 	}
 	m.idsInitialized = true
+	return nil
+}
+func (m *MultivariatePolynomialCore) initializePolynomialCoreBody() error {
+	var e error
 	if e = m.monomials.IncManagerRef(); e != nil {
-		return fail(e)
+		return e
 	}
 	m.monomialRetained = true
 	m.polynomials.width = 16
@@ -157,24 +184,24 @@ func NewMultivariatePolynomialCore(c MultivariatePolynomialConfig) (*Multivariat
 	m.cheap2.init(m, true)
 	m.zero, e = m.mkCell(0, nil, nil, nil, nil)
 	if e != nil {
-		return fail(e)
+		return e
 	}
 	if e = m.modular.SetInt64(&m.zeroNumeral, 0); e != nil {
-		return fail(e)
+		return e
 	}
 	if e = m.incRefCore(m.zero); e != nil {
-		return fail(e)
+		return e
 	}
 	one := NewInt(1)
 	m.unit, e = m.mkConstCore(&one)
 	if e != nil {
-		return fail(e)
+		return e
 	}
 	if e = m.incRefCore(m.unit); e != nil {
-		return fail(e)
+		return e
 	}
 	m.completed = true
-	return m, nil
+	return nil
 }
 func (m *MultivariatePolynomialCore) Error() string {
 	if m.originalCause != nil {
