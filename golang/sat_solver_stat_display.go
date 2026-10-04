@@ -1,0 +1,63 @@
+// Source: src/sat/sat_solver.cpp:3753-3768; src/sat/sat_types.h:289-293.
+// Licensed under the MIT license. Source author: Leonardo de Moura, 2011-05-21.
+package g3
+
+// The source mem_stat reads the process allocation owner before emitting text.
+// This specialization binds that read to the solver's actual shared Runtime.
+// Global verbose dispatch and external stream flushing remain separate bindings.
+func (s *satSolver) displayMemoryStat(out *NumericTextStream) error {
+	if e := s.open(); e != nil {
+		return e
+	}
+	bytes, e := s.runtime.memory.AllocationSize()
+	if e != nil {
+		return e
+	}
+	mem := float64(bytes) / float64(1024*1024)
+	if e = out.AppendCString(" :memory "); e != nil {
+		return e
+	}
+	if e = out.SetFloatMode(NumericFixedFloat); e != nil {
+		return e
+	}
+	if e = out.SetPrecision(2); e != nil {
+		return e
+	}
+	return out.AppendFloat64(mem)
+}
+func (s *satSolver) displayCompactStat(out *NumericTextStream) error {
+	if e := s.open(); e != nil {
+		return e
+	}
+	if len(s.lifecycle.original) != 0 {
+		if e := out.AppendCString(" :clauses "); e != nil {
+			return e
+		}
+		if e := out.AppendUint32(uint32(len(s.lifecycle.original))); e != nil {
+			return e
+		}
+	}
+	if len(s.lifecycle.learned) != 0 {
+		if e := out.AppendCString(" :learned "); e != nil {
+			return e
+		}
+		if e := out.AppendUint32(uint32(len(s.lifecycle.learned)) - s.gc.numFrozen); e != nil {
+			return e
+		}
+		if s.gc.numFrozen > 0 {
+			if e := out.AppendCString(" :frozen "); e != nil {
+				return e
+			}
+			if e := out.AppendUint32(s.gc.numFrozen); e != nil {
+				return e
+			}
+		}
+	}
+	if e := out.AppendCString(" :gc-clause "); e != nil {
+		return e
+	}
+	if e := out.AppendUint32(s.gc.gcClauseStat); e != nil {
+		return e
+	}
+	return s.displayMemoryStat(out)
+}

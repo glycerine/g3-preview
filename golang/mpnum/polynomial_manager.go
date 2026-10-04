@@ -35,6 +35,7 @@ type polynomialCreation struct {
 	buffer            *polynomialSOM
 }
 type MultivariatePolynomialCore struct {
+	translateBuffers                                                                           PolynomialSOMVector
 	substitution                                                                               polynomialSubstitutionState
 	tmp1                                                                                       monomialTemp
 	tmp1SourceConsumed                                                                         bool
