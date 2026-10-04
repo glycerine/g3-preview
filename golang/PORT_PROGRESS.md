@@ -26303,3 +26303,48 @@ Full original100-bit/everyactualreservation debug campaign retained; git diff
 --check clean. Coherent pseudo division/remainder chunk green for commit. Full
 port goal remains ACTIVE; reviewed future ModD9/member6/skeleton8 continue
 separately, and full imp/PSC/resultant/general GCD and whole solver remain OPEN.
+
+## ModD/var2degree root integration after pseudo677b981
+
+Previous turn made authoritative progress: pseudo7 committed677b981 after
+full825 five gates0/clean tree. Root revalidated all nine immutable future
+files and existing pseudo dependency before integration. All five shared
+ModD sites4931/4976/4980/5027/5038 and literal SOM2117-2139/public6898-6927
+implemented; var2degree h62-69/cpp66-82 full concrete class/implicit special
+members, source svector overload resolution and actual ostream sink retained.
+Corrected03 rejects unconstructed copy carrier before source reads/actions;
+constructed assignment-stopped NULL sources remain legal to move/query.
+Source copy SIZE/cap→size_t allocation→headers/pointer→ascending elements;
+assignment old destroy precedes source branch/replacement; true move ctor vs
+rvalue assignment copy source distinction confirmed by actual C++ probes.
+No source fingerprints. Root NumericTextStream flag/width golden fixture and
+ModD true BIG everyprefix5native/8debug including1/3freshNULL roots retained.
+
+Extra root TDD lifetime audit after integration: actual target.CopyFrom frees
+old vector before real replacement refusal, leaves rawDestroyed stale pointer
+history, and source constant ModD returns unit without reading/reparing map.
+NEW TestPolynomialModDConstantWithStoppedMapAssignmentKeepsActualRoots fails
+strong census (old stale token counted as owned Runtime block) in
+.cache/polynomial-modd-stale-map-census-red.log. Exact test-only helper fix
+excludes raw ONLY when actual recorded rawDestroyed proves completed free;
+source map cold header/source live backing/pending roots still named, all
+validation/count equations retained. Owning Close drains cold target without
+double free; source/body cause and pointer history untouched by constant path.
+Ten-file .cache/polynomial-modd-root-integrated-inventory.json records actual
+root integration; original nine freeze unchanged. Whole source units partial,
+no source-driver assertion credit. Source paths/MIT/other authors retained,
+Microsoft copyright omitted, no generics/production math-big/unsafe/cgo.
+Full native/debug/vets/source required before commit; original100-bit/allactual
+reservation campaign retains30m timeout.
+
+First full834 source audit failed on metadata-only cross-package test mapping:
+TestPolynomialVariableDegreesActualNumericStreamFlags is real root g3 test,
+while mpnum-target method evidence accepts only mpnum package tests. Corrected
+ONLY method test lists to their real target package; actual root stream fixture
+remains in polynomial unit go_targets/tests and unchanged Go code. Unit and
+method evidence retain actual runnable coverage, no test deleted/skipped.
+Initial .cache/polynomial-modd-full-complete-source.log exit1 retained; exact
+source/evidence/no-generics gate is rerun after this metadata correction, with
+all834 tested Go files still frozen and same full debug handle31020 live.
+
+Full authoritative834 Go checks are terminal GREEN: native99.751s, checked/debug745.268s, vet native4.457s/debug4.483s. Corrected source/evidence/no-generics audit session94897 terminal0; initial metadata-only source failure remains preserved in original gates JSON/log, with corrected evidence in .cache/polynomial-modd-full-complete-effective-gates.json. Root independently verified all834 frozen Go files and all ten integrated hashes. Original100-bit/everyactualreservation refinement remains intact. Header source/MIT/no-Microsoft checks passed. This green ModD/var2degree chunk is ready for commit; full port goal and remaining partial units stay ACTIVE.

@@ -182,7 +182,7 @@ func (m *MultivariatePolynomialCore) PseudoDivide(p, q Polynomial, x uint32, d *
 		return e
 	}
 	defer m.pseudoFinish(&err)
-	return m.pseudoCore(p, q, x, d, &Q.root, &R.root, false, true)
+	return m.pseudoCore(p, q, x, d, &Q.root, &R.root, false, true, false, nil)
 }
 func (m *MultivariatePolynomialCore) ExactPseudoDivide(p, q Polynomial, x uint32, Q, R *PolynomialRef) (err error) {
 	if Q == nil {
@@ -193,7 +193,7 @@ func (m *MultivariatePolynomialCore) ExactPseudoDivide(p, q Polynomial, x uint32
 	}
 	defer m.pseudoFinish(&err)
 	var d uint32
-	return m.pseudoCore(p, q, x, &d, &Q.root, &R.root, true, true)
+	return m.pseudoCore(p, q, x, &d, &Q.root, &R.root, true, true, false, nil)
 }
 func (m *MultivariatePolynomialCore) ExactPseudoRemainder(p, q Polynomial, x uint32, R *PolynomialRef) (err error) {
 	if e := m.pseudoEntry(nil, R); e != nil {
@@ -203,7 +203,7 @@ func (m *MultivariatePolynomialCore) ExactPseudoRemainder(p, q Polynomial, x uin
 	s := &m.pseudoDivision
 	s.construct(pseudoQuotient)
 	var d uint32
-	return m.pseudoCore(p, q, x, &d, &s.refs[pseudoQuotient], &R.root, true, false)
+	return m.pseudoCore(p, q, x, &d, &s.refs[pseudoQuotient], &R.root, true, false, false, nil)
 }
 func (m *MultivariatePolynomialCore) PseudoRemainder(p, q Polynomial, x uint32, d *uint32, R *PolynomialRef) (err error) {
 	if d == nil {
@@ -225,7 +225,7 @@ func (m *MultivariatePolynomialCore) PseudoRemainder(p, q Polynomial, x uint32, 
 		}
 	}
 	s.construct(pseudoQuotient)
-	if e := m.pseudoCore(p, q, x, d, &s.refs[pseudoQuotient], &R.root, false, modularSourceDebug); e != nil {
+	if e := m.pseudoCore(p, q, x, d, &s.refs[pseudoQuotient], &R.root, false, modularSourceDebug, false, nil); e != nil {
 		return e
 	}
 	if !modularSourceDebug {
@@ -279,7 +279,7 @@ func (m *MultivariatePolynomialCore) PseudoRemainder(p, q Polynomial, x uint32, 
 	}
 	return nil
 }
-func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *uint32, Q, R *polynomialReference, exact, quotient bool) (err error) {
+func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *uint32, Q, R *polynomialReference, exact, quotient, modulo bool, bounds *PolynomialVariableDegrees) (err error) {
 	s := &m.pseudoDivision
 	baseDepth := s.depth
 	defer func() {
@@ -307,6 +307,9 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 			return ErrPolynomialAssertion
 		}
 	}
+	if modularSourceDebug && modulo && bounds == nil {
+		return ErrPolynomialAssertion
+	}
 	degA, e := m.Degree(p, x)
 	if e != nil {
 		return e
@@ -333,7 +336,17 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 				if e != nil {
 					return e
 				}
-				return Q.assign(m, product)
+				if e = Q.assign(m, product); e != nil {
+					return e
+				}
+				if modulo {
+					product, e = m.ModD(Q.value, bounds)
+					if e != nil {
+						return e
+					}
+					return Q.assign(m, product)
+				}
+				return nil
 			}
 			*d = 1
 			return Q.assign(m, p)
@@ -393,6 +406,15 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 						if e = Q.assign(m, product); e != nil {
 							return e
 						}
+						if modulo {
+							product, e = m.ModD(Q.value, bounds)
+							if e != nil {
+								return e
+							}
+							if e = Q.assign(m, product); e != nil {
+								return e
+							}
+						}
 					}
 					product, e := m.Mul(s.refs[pseudoAdjusted].value, R.value)
 					if e != nil {
@@ -400,6 +422,15 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 					}
 					if e = R.assign(m, product); e != nil {
 						return e
+					}
+					if modulo {
+						product, e = m.ModD(R.value, bounds)
+						if e != nil {
+							return e
+						}
+						if e = R.assign(m, product); e != nil {
+							return e
+						}
 					}
 				}
 			}
@@ -477,6 +508,11 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 				}
 			}
 		}
+		if modulo {
+			if e = m.som.modD(bounds); e != nil {
+				return e
+			}
+		}
 		remainder, e := m.som.mk(false)
 		if e != nil {
 			return e
@@ -499,6 +535,11 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 					return e
 				}
 				if e = m.som2.addMul(&a, term, s.refs[pseudoLeadB].value); e != nil {
+					return e
+				}
+			}
+			if modulo {
+				if e = m.som2.modD(bounds); e != nil {
 					return e
 				}
 			}
