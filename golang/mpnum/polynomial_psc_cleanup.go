@@ -13,7 +13,7 @@ type polynomialPSCReceipts struct {
 }
 
 func (m *MultivariatePolynomialCore) pscExecutingOwner() uint64 {
-	if m.pscReceipts.depth == 0 {
+	if m.pscReceipts.depth == 0 || m.callbackDepth != 0 {
 		return 0
 	}
 	return m.pscReceipts.generation
@@ -38,6 +38,9 @@ func (m *MultivariatePolynomialCore) pscSourceStopped() error {
 	g := m.pscReceipts.generation
 	if g == 0 {
 		return nil
+	}
+	if m.contentLocal.active && m.contentLocal.generation == g && m.contentLocal.cleanupCause != nil {
+		return m.contentLocal.cleanupCause
 	}
 	if m.powerLocal.pscOwner == g && m.powerLocal.cleanupCause != nil {
 		return m.powerLocal.cleanupCause

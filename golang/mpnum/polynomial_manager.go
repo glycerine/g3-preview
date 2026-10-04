@@ -40,6 +40,7 @@ type polynomialCreation struct {
 	buffer            *polynomialSOM
 }
 type MultivariatePolynomialCore struct {
+	contentLocal                                                                               polynomialContentScope
 	pscReceipts                                                                                polynomialPSCReceipts
 	generatedPSC                                                                               uint64
 	pscLocal                                                                                   polynomialPSCScope
@@ -286,7 +287,7 @@ func (m *MultivariatePolynomialCore) mkConstCore(a *Int) (Polynomial, error) {
 		s.singleton = m.singletonMonomial
 		s.singletonGeneration = m.singletonGeneration
 	}
-	if m.pscReceipts.depth != 0 {
+	if m.pscExecutingOwner() != 0 {
 		m.pscReceipts.singleton = u
 	}
 	return m.mkCell(1, nil, []Monomial{u}, nil, a)
@@ -338,7 +339,7 @@ func (m *MultivariatePolynomialCore) MkVariable(v, k uint32) (Polynomial, error)
 		s.singleton = m.singletonMonomial
 		s.singletonGeneration = m.singletonGeneration
 	}
-	if m.pscReceipts.depth != 0 {
+	if m.pscExecutingOwner() != 0 {
 		m.pscReceipts.singleton = b
 	}
 	m.transferGeneratedMonomial()
@@ -363,6 +364,9 @@ func (m *MultivariatePolynomialCore) MkTerms(as []Int, ms []Monomial) (Polynomia
 	return m.som.mk(false)
 }
 func (m *MultivariatePolynomialCore) CloseChecked() error {
+	if m != nil && m.self == m && m.contentLocal.active {
+		return ErrPolynomialPending
+	}
 	if m != nil && m.self == m && m.pscPending() {
 		return ErrPolynomialPending
 	}

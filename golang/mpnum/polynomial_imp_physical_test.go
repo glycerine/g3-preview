@@ -34,6 +34,12 @@ func polynomialImpPhysicalAuditNamed(t *testing.T, full *MultivariatePolynomialM
 	}
 	adapterBytes := full.header + uint64(cap(full.lexBuckets.children))*uint64(reflect.TypeOf(polynomialVector{}).Size())
 	public := []*Int{&full.derivative.n, &full.derivative.a, &full.composition.a}
+	if m.contentLocal.active {
+		public = append(public, &m.contentLocal.ai)
+	}
+	if full.monic.active {
+		public = append(public, &full.monic.inv, &full.monic.newA)
+	}
 	for i := range full.composition.raw {
 		public = append(public, &full.composition.raw[i])
 	}

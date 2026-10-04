@@ -272,7 +272,7 @@ func (m *MultivariatePolynomialCore) recordGeneratedCallee(outcome monomialFacto
 		m.translation.factoryGeneration = outcome.generation
 	}
 	c.parent = m
-	if m.pscReceipts.depth != 0 {
+	if m.pscExecutingOwner() != 0 {
 		m.pscReceipts.factory = outcome.generation
 	}
 	if m.substitution.scope.executing {

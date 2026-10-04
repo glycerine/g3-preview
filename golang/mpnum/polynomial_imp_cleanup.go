@@ -178,6 +178,12 @@ func (m *MultivariatePolynomialManager) CloseChecked() error {
 		return ErrPolynomialPending
 	}
 
+	if m != nil && m.self == m && m.core != nil && m.core.contentLocal.active {
+		return ErrPolynomialPending
+	}
+	if m != nil && m.self == m && m.monic.active {
+		return ErrPolynomialPending
+	}
 	if m != nil && m.self == m && m.evaluation.active {
 		return ErrPolynomialPending
 	}

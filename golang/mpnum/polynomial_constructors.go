@@ -62,6 +62,9 @@ func (m *MultivariatePolynomialCore) resetRationalTerms() error {
 	return m.rationalTerms.reset(m)
 }
 func (m *MultivariatePolynomialCore) mkTermsVector(as *polynomialVector, ms []Monomial, mv *polynomialVector) (Polynomial, error) {
+	return m.mkTermsIndexed(as, monomialArrayView{values: ms, count: uint32(len(ms)), vector: mv})
+}
+func (m *MultivariatePolynomialCore) mkTermsIndexed(as *polynomialVector, ms monomialArrayView) (Polynomial, error) {
 	if e := m.som.reset(); e != nil {
 		return Polynomial{}, e
 	}
@@ -74,21 +77,13 @@ func (m *MultivariatePolynomialCore) mkTermsVector(as *polynomialVector, ms []Mo
 		if e != nil {
 			return Polynomial{}, e
 		}
-		var term Monomial
-		if mv != nil {
-			term, e = mv.monomial(m, i)
-			if e != nil {
-				return Polynomial{}, e
-			}
-		} else {
-			if uint64(i) >= uint64(len(ms)) {
-				return Polynomial{}, arena.ErrBounds
-			}
-			term = ms[i]
+		term, e := ms.at(m, i)
+		if e != nil {
+			return Polynomial{}, e
 		}
 		consumed := false
 		e = m.som.addConsumed(&a, term, false, &consumed)
-		if mv == &m.linearMonomials && consumed && uint64(i) < uint64(len(m.linearGenerated)) {
+		if ms.vector == &m.linearMonomials && consumed && uint64(i) < uint64(len(m.linearGenerated)) {
 			m.linearGenerated[i] = false
 		}
 		if e != nil {

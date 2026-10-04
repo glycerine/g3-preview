@@ -15,25 +15,42 @@ type ModularLinearSolver struct {
 	linearStorage
 }
 
-func NewModularLinearSolver(m *IntegerModularManager) (*ModularLinearSolver, error) {
+func modularLinearConstructorGuard(m *IntegerModularManager) error {
 	if e := m.check(); e != nil {
-		return nil, e
+		return e
 	}
 	if modularSourceDebug {
 		field, e := m.Field()
 		if e != nil {
-			return nil, e
+			return e
 		}
 		if !field {
-			return nil, ErrPolynomialAssertion
+			return ErrPolynomialAssertion
 		}
 	}
-	h := uint64(reflect.TypeOf(ModularLinearSolver{}).Size())
-	if e := m.manager.budget.Reserve(h); e != nil {
+	return nil
+}
+func (s *ModularLinearSolver) initializeDefault(m *IntegerModularManager, header uint64) {
+	*s = ModularLinearSolver{manager: m, linearStorage: linearStorage{runtime: m.manager.memory, integer: m.manager, header: header, A: linearNumeralVector{width: 4}, b: linearNumeralVector{width: 12}}}
+	s.self = s
+}
+func (s *ModularLinearSolver) constructDefault(m *IntegerModularManager) error {
+	if e := modularLinearConstructorGuard(m); e != nil {
+		return e
+	}
+	s.initializeDefault(m, 0)
+	return nil
+}
+func NewModularLinearSolver(m *IntegerModularManager) (*ModularLinearSolver, error) {
+	if e := modularLinearConstructorGuard(m); e != nil {
 		return nil, e
 	}
-	s := &ModularLinearSolver{manager: m, linearStorage: linearStorage{runtime: m.manager.memory, integer: m.manager, header: h, A: linearNumeralVector{width: 4}, b: linearNumeralVector{width: 12}}}
-	s.self = s
+	header := uint64(reflect.TypeOf(ModularLinearSolver{}).Size())
+	if e := m.manager.budget.Reserve(header); e != nil {
+		return nil, e
+	}
+	s := &ModularLinearSolver{}
+	s.initializeDefault(m, header)
 	return s, nil
 }
 func (s *ModularLinearSolver) identity() error {
@@ -176,6 +193,9 @@ func (s *ModularLinearSolver) Reset() error {
 	return nil
 }
 func (s *ModularLinearSolver) Add(i uint32, as []Int, b *Int) error {
+	return s.AddIndexed(i, integerArrayView{values: as, count: uint32(len(as))}, b)
+}
+func (s *ModularLinearSolver) AddIndexed(i uint32, as integerArrayView, b *Int) error {
 	if e := s.open(); e != nil {
 		return e
 	}
@@ -190,16 +210,25 @@ func (s *ModularLinearSolver) Add(i uint32, as []Int, b *Int) error {
 		return e
 	}
 	for j := uint32(0); j < s.n; j++ {
-		if uint64(j) >= uint64(len(as)) {
-			return arena.ErrBounds
+		a, readErr := as.checkedAt(s.runtime, j)
+		if readErr != nil {
+			return readErr
 		}
-		if e = s.copyInto(r, j, &as[j]); e != nil {
+		if as.sameRuntimeElement(s.runtime, r.raw, 8+uint64(j)*12, j) {
+			e = s.manager.Copy(&a, &a)
+		} else {
+			e = s.copyInto(r, j, &a)
+		}
+		if e != nil {
 			return e
 		}
 	}
 	return nil
 }
 func (s *ModularLinearSolver) Solve(xs []Int) (bool, error) {
+	return s.SolveIndexed(integerArrayView{values: xs, count: uint32(len(xs))})
+}
+func (s *ModularLinearSolver) SolveIndexed(xs integerArrayView) (bool, error) {
 	if e := s.open(); e != nil {
 		return false, e
 	}
@@ -326,10 +355,17 @@ func (s *ModularLinearSolver) Solve(xs []Int) (bool, error) {
 		if e != nil {
 			return false, e
 		}
-		if uint64(k) >= uint64(len(xs)) {
-			return false, arena.ErrBounds
+		x, e := xs.checkedAt(s.runtime, k)
+		if e != nil {
+			return false, e
 		}
-		if e = s.manager.Copy(&xs[k], &b); e != nil {
+		if xs.sameRuntimeElement(s.runtime, s.b.raw, 8+uint64(k)*12, k) {
+			e = s.manager.Copy(&b, &b)
+		} else {
+			e = s.manager.Copy(&x, &b)
+			e = polynomialNewtonJoin(e, xs.store(k, x))
+		}
+		if e != nil {
 			return false, e
 		}
 		i := k
@@ -340,6 +376,10 @@ func (s *ModularLinearSolver) Solve(xs []Int) (bool, error) {
 				return false, e
 			}
 			a, e := s.load(ri, k)
+			if e != nil {
+				return false, e
+			}
+			b, e = s.load(&s.b, k)
 			if e != nil {
 				return false, e
 			}
