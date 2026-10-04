@@ -1,4 +1,5 @@
 // Source: src/math/polynomial/polynomial.cpp:2481-2495; src/util/vector.h. Licensed under the MIT license.
+// Source author: Leonardo de Moura (leonardo), 2011-11-15.
 package mpnum
 
 import (
@@ -284,6 +285,10 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 		m.pending.squareRootParent = owner
 		owner.factoryGeneration = m.creationGeneration
 	}
+	if s := m.toPolynomialOwner; s != nil && s.executing && m.callbackDepth == 0 {
+		m.pending.toPolynomialParent = s
+		s.factoryGeneration = m.creationGeneration
+	}
 	if m.compositionOwner != nil && m.compositionOwner.executing {
 		m.pending.compositionParent = m.compositionOwner
 		m.compositionOwner.factoryGeneration = m.creationGeneration
@@ -299,7 +304,7 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 	observer := m.pending.compositionParent
 	squareObserver := m.pending.squareRootParent
 	var before [3]memory.Block
-	if observer != nil || squareObserver != nil {
+	if observer != nil || squareObserver != nil || m.pending.toPolynomialParent != nil {
 		var e error
 		before, e = m.monomials.allocator.PendingRoots()
 		if e != nil {
@@ -320,6 +325,15 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 			if squareObserver != nil {
 				squareObserver.monomialRaw = after
 			}
+		}
+		if probe != nil {
+			return Polynomial{}, errors.Join(e, probe)
+		}
+	}
+	if owner := m.pending.toPolynomialParent; owner != nil && before == ([3]memory.Block{}) {
+		after, probe := m.monomials.allocator.PendingRoots()
+		if after != ([3]memory.Block{}) {
+			owner.monomialRaw = after
 		}
 		if probe != nil {
 			return Polynomial{}, errors.Join(e, probe)
@@ -438,6 +452,11 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 		return Polynomial{}, e
 	}
 	l.published = true
+	if owner := m.pending.toPolynomialParent; owner != nil && owner.factoryGeneration == m.pending.generation {
+		owner.factoryGeneration = 0
+		owner.result = p
+		owner.ownsResult = true
+	}
 	if m.translation.executing {
 		m.translation.freshResult = p
 	}

@@ -1,5 +1,6 @@
 // Source: src/math/polynomial/polynomial.cpp:2308-2370,2481-2633. Licensed under the MIT license.
 // Selected multivariate cell/SOM prerequisite owner, not manager::imp.
+// Source author: Leonardo de Moura (leonardo), 2011-11-15.
 package mpnum
 
 import (
@@ -27,20 +28,22 @@ type MultivariatePolynomialConfig struct {
 	Cooperation func() error
 }
 type polynomialCreation struct {
-	compositionParent *polynomialCompositionScope
-	pscOwner          uint64
-	substitutionOwned bool
-	translationOwned  bool
-	generation        uint64
-	squareRootParent  *polynomialSquareRootScope
-	derivativeParent  *polynomialDerivativeScope
-	raw               memory.ObjectRef
-	value             Polynomial
-	requested, id     uint32
-	idConsumed        bool
-	buffer            *polynomialSOM
+	toPolynomialParent *polynomialToPolynomialScope
+	compositionParent  *polynomialCompositionScope
+	pscOwner           uint64
+	substitutionOwned  bool
+	translationOwned   bool
+	generation         uint64
+	squareRootParent   *polynomialSquareRootScope
+	derivativeParent   *polynomialDerivativeScope
+	raw                memory.ObjectRef
+	value              Polynomial
+	requested, id      uint32
+	idConsumed         bool
+	buffer             *polynomialSOM
 }
 type MultivariatePolynomialCore struct {
+	toPolynomialOwner                                                                          *polynomialToPolynomialScope
 	contentLocal                                                                               polynomialContentScope
 	pscReceipts                                                                                polynomialPSCReceipts
 	generatedPSC                                                                               uint64

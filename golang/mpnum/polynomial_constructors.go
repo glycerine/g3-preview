@@ -1,4 +1,5 @@
 // Source: src/math/polynomial/polynomial.cpp:2558-2633. Licensed under the MIT license.
+// Source author: Leonardo de Moura (leonardo), 2011-11-15.
 package mpnum
 
 import "github.com/glycerine/g3/golang/arena"
@@ -117,47 +118,7 @@ func (m *MultivariatePolynomialCore) MkRationalTerms(as []Rational, ms []Monomia
 	return p, nil
 }
 func (m *MultivariatePolynomialCore) mkUnivariateVector(v, n uint32, as *polynomialVector) (Polynomial, error) {
-	size, e := m.cheap.ms.size(m)
-	if e != nil {
-		return Polynomial{}, e
-	}
-	if modularSourceDebug && size != 0 {
-		return Polynomial{}, ErrPolynomialAssertion
-	}
-	k := n + 1
-	for k > 0 {
-		k--
-		a, e := as.coefficient(m, k)
-		if e != nil {
-			return Polynomial{}, e
-		}
-		zero, e := m.modular.IsZero(&a)
-		if e != nil {
-			return Polynomial{}, e
-		}
-		if zero {
-			e = m.deleteNumeral(&a)
-			if w := as.putCoefficient(m, k, a); w != nil {
-				return Polynomial{}, w
-			}
-			if e != nil {
-				return Polynomial{}, e
-			}
-			continue
-		}
-		term, e := m.generatedVariable(v, k)
-		if e != nil {
-			return Polynomial{}, e
-		}
-		e = m.cheap.add(&a, term, true)
-		if w := as.putCoefficient(m, k, a); w != nil {
-			return Polynomial{}, w
-		}
-		if e != nil {
-			return Polynomial{}, e
-		}
-	}
-	return m.cheap.mk(false)
+	return m.mkUnivariateSource(v, n, polynomialUnivariateCoefficients{vector: as})
 }
 func (m *MultivariatePolynomialCore) MkRationalUnivariate(v, n uint32, as []Rational) (Polynomial, error) {
 	if e := m.check(); e != nil {

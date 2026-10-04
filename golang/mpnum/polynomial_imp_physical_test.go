@@ -34,6 +34,14 @@ func polynomialImpPhysicalAuditNamed(t *testing.T, full *MultivariatePolynomialM
 	}
 	adapterBytes := full.header + uint64(cap(full.lexBuckets.children))*uint64(reflect.TypeOf(polynomialVector{}).Size())
 	public := []*Int{&full.derivative.n, &full.derivative.a, &full.composition.a}
+	if b := &full.toPolynomial.buffer; b.constructed {
+		external = append(external, b.raw, b.pending)
+		for i := uint32(0); i < b.count; i++ {
+			a, e := b.physical(i)
+			serviceMust(t, e)
+			public = append(public, &a)
+		}
+	}
 	if m.contentLocal.active {
 		public = append(public, &m.contentLocal.ai)
 	}
@@ -194,6 +202,9 @@ func polynomialImpPhysicalAuditNamed(t *testing.T, full *MultivariatePolynomialM
 	addPolynomial(full.composition.local.value)
 	addPolynomial(full.composition.local.incoming)
 	addPolynomial(full.composition.freshResult)
+	if full.toPolynomial.ownsResult {
+		addPolynomial(full.toPolynomial.result)
+	}
 	addPolynomial(m.exactDivision.returned)
 	addPolynomial(m.translation.freshResult)
 	for i := range m.pseudoDivision.refs {

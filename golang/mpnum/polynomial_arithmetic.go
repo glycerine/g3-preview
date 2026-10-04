@@ -1,7 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:2665-2778,5940-5951. Licensed under the MIT license.
+// Source: src/math/polynomial/polynomial.cpp:2582-2594,2665-2778,5940-5951. Licensed under the MIT license.
+// Source author: Leonardo de Moura (leonardo), 2011-11-15.
 package mpnum
-
-import "github.com/glycerine/g3/golang/arena"
 
 func (m *MultivariatePolynomialCore) checkpoint() error {
 	if s := m.compositionOwner; s != nil && s.executing {
@@ -202,36 +201,5 @@ func (m *MultivariatePolynomialCore) MkUnivariateTake(v, n uint32, as []Int) (Po
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
-	count, e := m.cheap.ms.size(m)
-	if e != nil {
-		return Polynomial{}, e
-	}
-	if modularSourceDebug && count != 0 {
-		return Polynomial{}, ErrPolynomialAssertion
-	}
-	k := n + 1
-	for k > 0 {
-		k--
-		if uint64(k) >= uint64(len(as)) {
-			return Polynomial{}, arena.ErrBounds
-		}
-		zero, e := m.modular.IsZero(&as[k])
-		if e != nil {
-			return Polynomial{}, e
-		}
-		if zero {
-			if e = m.deleteNumeral(&as[k]); e != nil {
-				return Polynomial{}, e
-			}
-			continue
-		}
-		term, e := m.generatedVariable(v, k)
-		if e != nil {
-			return Polynomial{}, e
-		}
-		if e = m.cheap.add(&as[k], term, true); e != nil {
-			return Polynomial{}, e
-		}
-	}
-	return m.cheap.mk(false)
+	return m.mkUnivariateSource(v, n, polynomialUnivariateCoefficients{values: as})
 }

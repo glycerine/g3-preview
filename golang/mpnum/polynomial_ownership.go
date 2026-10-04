@@ -1,6 +1,7 @@
 // Source: src/math/polynomial/polynomial.cpp:1392-1423,2481-2495. Licensed under the MIT license.
 // Explicit owning abort for retained incomplete placement; not a C++ destructor
 // of an object whose constructor did not complete.
+// Source author: Leonardo de Moura (leonardo), 2011-11-15.
 package mpnum
 
 import (
@@ -156,6 +157,9 @@ func (m *MultivariatePolynomialCore) generatedVariable(v, k uint32) (Monomial, e
 	}
 	if e == nil && outcome.created {
 		m.generatedMonomial = a
+		if s := m.toPolynomialOwner; s != nil && s.executing && m.callbackDepth == 0 {
+			s.generated = a
+		}
 		if s := m.compositionOwner; s != nil && s.executing {
 			s.coreGenerated = a
 		}
@@ -196,6 +200,9 @@ func (m *MultivariatePolynomialCore) generatedProduct(a, b Monomial) (Monomial, 
 	return r, e
 }
 func (m *MultivariatePolynomialCore) transferGeneratedMonomial() {
+	if s := m.toPolynomialOwner; s != nil && s.generated == m.generatedMonomial {
+		s.generated = Monomial{}
+	}
 	if s := m.compositionOwner; s != nil && s.coreGenerated == m.generatedMonomial {
 		s.coreGenerated = Monomial{}
 	}
@@ -265,6 +272,9 @@ func (m *MultivariatePolynomialCore) recordGeneratedCallee(outcome monomialFacto
 	}
 	m.generatedCalleePending = true
 	m.generatedCalleeGeneration = outcome.generation
+	if s := m.toPolynomialOwner; s != nil && s.executing && m.callbackDepth == 0 {
+		s.calleeGeneration = outcome.generation
+	}
 	if s := m.compositionOwner; s != nil && s.executing {
 		s.calleeGeneration = outcome.generation
 	}

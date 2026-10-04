@@ -28560,7 +28560,10 @@
         "clibrand/rand.go",
         "clibrand/rand_test.go",
         "mpnum/polynomial_sqrt.go",
-        "mpnum/polynomial_sqrt_test.go"
+        "mpnum/polynomial_sqrt_test.go",
+        "mpnum/polynomial_to_polynomial.go",
+        "mpnum/polynomial_to_polynomial_test.go",
+        "mpnum/polynomial_univariate_indexed.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -28954,7 +28957,14 @@
         "TestPolynomialSqrtFinalFactoryPostphysicalRaw",
         "TestPolynomialSqrtEveryCheckpointFrontier",
         "TestPolynomialSqrtSourceAuxStopKeepsOlderFields",
-        "TestPolynomialSqrtDeletionCallbackForeignRootsStayCallerOwned"
+        "TestPolynomialSqrtDeletionCallbackForeignRootsStayCallerOwned",
+        "TestPolynomialToPolynomialZeroBeforeLocal",
+        "TestPolynomialToPolynomialIndependentAscendingCoefficients",
+        "TestPolynomialToPolynomialEveryActualPrefix",
+        "TestPolynomialToPolynomialZeroKeepsOlderStoppedLocal",
+        "TestPolynomialToPolynomialModularSourceSets",
+        "TestPolynomialToPolynomialExactNumericForeignReplacement",
+        "TestPolynomialToPolynomialReturnedResultBeforeRawDestructorStop"
       ],
       "conditionals": [
         {
@@ -31618,6 +31628,20 @@
             "TestPolynomialSqrtSourceAuxStopKeepsOlderFields",
             "TestPolynomialSqrtDeletionCallbackForeignRootsStayCallerOwned"
           ]
+        },
+        {
+          "name": "to_polynomial cpp6832-6841 and same-engine indexed mk_univariate cpp2582-2594",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_to_polynomial.go",
+          "tests": [
+            "TestPolynomialToPolynomialZeroBeforeLocal",
+            "TestPolynomialToPolynomialIndependentAscendingCoefficients",
+            "TestPolynomialToPolynomialEveryActualPrefix",
+            "TestPolynomialToPolynomialZeroKeepsOlderStoppedLocal",
+            "TestPolynomialToPolynomialModularSourceSets",
+            "TestPolynomialToPolynomialExactNumericForeignReplacement",
+            "TestPolynomialToPolynomialReturnedResultBeforeRawDestructorStop"
+          ]
         }
       ],
       "ownership": [
@@ -31652,7 +31676,8 @@
         "Content ai and monic inv/newA are actual named cold fields; the three actual retained BIG fixture detects missing root enumeration, without claiming simultaneous mathematical reachability. Direct caller output SET/ref-assignment roots remain caller-owned.",
         "Real source deletion callbacks do not grant outer PSC factory/singleton ownership; actual callback execution excludes receipt acquisition without changing source callback/depth order.",
         "Selected C rand state is process-static fixed31 scalar words; all Rand aliases borrow the same synchronized stream and observe Srand, without per-manager reseeding or per-draw allocation. Explicit GLibc31 instances are independent profile fixtures, not GCD-owned RNGs.",
-        "Charged concrete scope owns actual four scoped NUMs, RAW two, monomial_ref, exact created-only cohort and matched callee/factory/physical receipts. Successful incoming INC transfers output before older DEC callback; source destruction is reverse lexical and stops before older fields, separate from explicit owning CleanupSqrt."
+        "Charged concrete scope owns actual four scoped NUMs, RAW two, monomial_ref, exact created-only cohort and matched callee/factory/physical receipts. Successful incoming INC transfers output before older DEC callback; source destruction is reverse lexical and stops before older fields, separate from explicit owning CleanupSqrt.",
+        "Actual lexical coefficient buffer receives zero SET then coefficient SET; borrowed c_ptr view runs the same descending mk_univariate engine with writeback at each mutation. Source buffer destruction precedes successful return; owning cleanup only captures exact executing factory/NUM/MM receipts and genuinely fresh output."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -31687,7 +31712,8 @@
         "ICCP recursive scopes, default modular GCD, CRA and Resultant bodies remain open; these selected prerequisites do not substitute for those algorithms.",
         "Global TRACE/diagnostic binding, high-level PSC callback reentrancy and complete polynomial family audit remain open. Sparse successful calls perform fresh source lexical allocations; no zero-Go-allocation claim.",
         "C library rand/srand binding independently implements the selected Linux/glibc31 mathematical recurrence; captured glibc2.39 test oracle covers default and262 seeds. Other libc profiles and source test-driver migration remain open; no GNU implementation code is copied and no LP source-unit completion is credited.",
-        "Selected source algorithms and explicit Runtime profile only. Signed TLS stops and large factory/auxiliary receipts are guarded owner-primitive proofs, not ordinary mathematical exhaustion. Non-Z perfect-square remains the source unsupported operation. Registered polynomial driver returns before sqrt; dormant assertions give no active driver completion credit. Global diagnostics/native ABI and remaining source methods stay partial."
+        "Selected source algorithms and explicit Runtime profile only. Signed TLS stops and large factory/auxiliary receipts are guarded owner-primitive proofs, not ordinary mathematical exhaustion. Non-Z perfect-square remains the source unsupported operation. Registered polynomial driver returns before sqrt; dormant assertions give no active driver completion credit. Global diagnostics/native ABI and remaining source methods stay partial.",
+        "sz0 skips lexical buffer and source coefficient/x reads. Native8/debug11 real refusal prefixes, scoped pending foreign replacement, guarded raw destructor result proof. Full convert/GCD/other source methods still open; no whole source driver credit."
       ]
     },
     {
@@ -127141,9 +127167,26 @@
       "path": "src/util/scoped_numeral_buffer.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/scoped_numeral_buffer.go",
+        "mpnum/scoped_numeral_buffer_source_test.go",
+        "mpnum/scoped_numeral_buffer_review_test.go"
+      ],
+      "tests": [
+        "TestScopedNumeralBufferInlineGrowthResetAndResize",
+        "TestScopedNumeralBufferBigCopiesAndFieldNormalization",
+        "TestScopedNumeralBufferEveryActualReservationPrefix",
+        "TestScopedNumeralBufferSourceStopBeforeOlderNumeral",
+        "TestScopedNumeralBufferReturnedGrowthAllocationSourceAndAbort",
+        "TestScopedNumeralBufferDescriptorRefusalAndForeignReplacement",
+        "TestScopedNumeralBufferPhysicalDestructorSignedGuardAndOwningRetry",
+        "TestScopedNumeralBufferSecondGrowthEveryActualPrefix",
+        "TestScopedNumeralBufferBorrowedActualInlineAndRuntimeViews",
+        "TestScopedBufferReviewDestructiveCopyBeforeSourceDestructor",
+        "TestScopedBufferReviewStoppedSourceBlocksMutation",
+        "TestScopedBufferReviewReleaseShrinkAboveSize"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -127156,9 +127199,33 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete mpzzp128 ctor/manager/reset/push/shrink/resize/dtor with actual inline and Runtime-expanded backing",
+          "status": "partial",
+          "go_target": "mpnum/scoped_numeral_buffer.go",
+          "tests": [
+            "TestScopedNumeralBufferInlineGrowthResetAndResize",
+            "TestScopedNumeralBufferBigCopiesAndFieldNormalization",
+            "TestScopedNumeralBufferEveryActualReservationPrefix",
+            "TestScopedNumeralBufferSourceStopBeforeOlderNumeral",
+            "TestScopedNumeralBufferReturnedGrowthAllocationSourceAndAbort",
+            "TestScopedNumeralBufferDescriptorRefusalAndForeignReplacement",
+            "TestScopedNumeralBufferPhysicalDestructorSignedGuardAndOwningRetry",
+            "TestScopedNumeralBufferSecondGrowthEveryActualPrefix",
+            "TestScopedNumeralBufferBorrowedActualInlineAndRuntimeViews",
+            "TestScopedBufferReviewDestructiveCopyBeforeSourceDestructor",
+            "TestScopedBufferReviewStoppedSourceBlocksMutation",
+            "TestScopedBufferReviewReleaseShrinkAboveSize"
+          ]
+        }
+      ],
+      "ownership": [
+        "The concrete inline128 NUM fields reside once in the reflected enclosing header; expanded12-byte scalar codec relocates owning references without NUM Copy. Ascending source Del stops before older elements and pending backing; own abort matches exact physical receipts. Borrowed views are actual source fields, not a clone."
+      ],
+      "deviations": [
+        "Only polynomial mpzzp128 specialization selected. Other Manager/size specializations, native ABI/global allocators and defined higher-level alias domains remain open. Expanded const-reference alias after source old-buffer destruction is undefined and not promoted as supported."
+      ]
     },
     {
       "path": "src/util/scoped_numeral_vector.h",

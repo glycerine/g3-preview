@@ -174,6 +174,9 @@ func (m *MultivariatePolynomialManager) callerGuard() error {
 	return nil
 }
 func (m *MultivariatePolynomialManager) CloseChecked() error {
+	if m != nil && m.self == m && m.toPolynomial.active {
+		return ErrPolynomialPending
+	}
 	if m != nil && m.self == m && (m.composition.active || m.compositionHasOrphans()) {
 		return ErrPolynomialPending
 	}
