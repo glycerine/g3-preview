@@ -25281,3 +25281,85 @@ using assignment size. Actual sat_solver.h246 reads m_level.size(); three
 private sites were corrected before full orchestration compiled GREEN. Partial
 MkVar and reached malformed-level fixtures remain required. Full default
 simplifier still compiles honestly missing its remaining actual algorithm bodies.
+
+
+### Decision and integrity master integration (full gates running)
+
+Root integrated the three independently reviewed decision files and the complete
+selected integrity-checker member family. Source maps: sat_solver.cpp933–988
+(next_var/decide),2770(seed),711–716(propagation),2845–2850(check_invariant),
+3053–3075(missed propagation); sat_solver.h246 actual num_vars=m_level.size.
+Integrity cpp method starts:26 constructor;31/36 contains;52 clause;105/112
+clause range/noarg;116 learned;128 assignment;132 boolean columns;155 watches;
+199 reinit;210 disjoint;228 operator. Origin headers retain source paths and
+license/authors, omit Microsoft copyright. No source content hashes.
+
+Nine decision and eight integrity groups exercise actual source members, owners,
+RNG/phase order, scope/statistic/assignment publication, release/debug erased
+read masks, active release VERIFY, original-clause frozen-count quirk and ID
+disjointness. Fresh disjoint set refuses actual reservations0/1/2 before success3;
+whole graph census precedes disabling faults. Decision refusals0/1 precede
+success2. Private source reviews and exact Go-only inventories remain in
+.cache/sat-decision-final-* and .cache/sat-integrity-final-inventory.json.
+
+Root added a ninth integrity integration group at actual Asymm enabled sites.
+Genuine API RED .cache/sat-integrity-asymm-api-red.log lacked diagnostic fields;
+then behavioral RED .cache/sat-integrity-asymm-binding-red.log reached the real
+missing checker error. Fixed actual Asymm entry/exit delegates and propagation
+wrapper. Test requires exactly three resource increments in debug and zero in
+release. Full focused ^TestSAT now terminal0 both profiles in
+.cache/sat-control-final-{native,debug}.log. GC automatically binds its actual
+sibling; lifecycle pointer is borrowed, never an ownership registry. Manual
+lifecycle merge preserves all previous stopped-cleaner/GC/eq/asymm drains.
+
+Manifest now2102 units/677 APIs:30ported/178partial/1894unported. Integrity
+cpp/h remain PARTIAL: global debug-tag/assertions-enabled registry and real
+TRACE/verbose output are not complete. Full solver construction/Check/search,
+shared seed parameter updates, extension calls, source storage migration and
+registered user-scope campaign remain explicit obligations. Simplifier privately
+borrows the same actual decision RNG; no independent substitute RNG is allowed.
+Full native/debug/vets/source gates are running against frozen715 Go files;
+.cache/sat-decision-integrity-complete-go-hashes.json verifies Go bytes only.
+The full port goal stays active.
+
+Numeric full imp audit identified m_upm as a separate modular manager sharing
+Integer/resource binding, constructed before monomial retention/body; source
+SetZ/SetZP modifies only imp.m_manager, not this child modulus. Newton persistent
+vector and owning skeleton vector remain genuine missing members. Arena's
+SourceFinalizePrefix diagnostic may execute only actual destructor2347–2353,
+retain each completed action, and return explicit missing binding at2354; it
+never claims full imp finalization. Complete constructor/member hierarchy and
+full reverse member destruction remain obligations. Numeric now ports the full
+Newton2807–2952 family privately from an immutable arena dependency snapshot.
+Genuine API RED .cache/polynomial-newton-api-red.log lacks actual Newton/ref/vector
+APIs; dormant source interpolation ENSURE gets no registered active credit.
+
+Container's captured arena.Words resolvent span prerequisite has genuine API
+RED then both-profile GREEN in isolated reader module; logs
+.cache/sat-simplifier-span-{red,green-native,green-debug}.log. Actual allocator
+header/ID publishes before a reached stale-span refusal, with real owned clause
+returned and deleted; no host literal clone. Full default simplifier, including
+variable elimination, remains private and incomplete; no source unit completion
+is credited from prerequisite GREEN.
+
+
+### Decision/integrity terminal GREEN and remaining header cleanup
+
+All full gates terminal0; .cache/sat-decision-integrity-complete-gates.json
+and its native/debug/vet-native/vet-debug/source logs record exact results.
+Native elapsed14.076s, checked/debug708.988s;715 frozen Go files verified
+unchanged across these gates. Updated manifest audit separately terminal0
+(.cache/sat-decision-integrity-manifest-source.log),30/178/1894 inventory.
+
+Final scan found one historical split Microsoft copyright notice in
+mpnum/mpz_div.go missed by the earlier header cleanup. Removed that notice,
+retained Christoph Wintersteiger and MIT notice, expanded full mpz.cpp origin.
+mp_format.go now has full source paths without residual copyright wording;
+probing checker comment reflects actual integrated binding. These are the only
+three Go files changed after the full frozen gates, and only comments changed.
+Both complete test suites reran terminal0 after cleanup, including cached
+mpnum results (.cache/sat-decision-integrity-header-{native,debug}.log), and
+both vets terminal0. Final715 Go bytes recorded in
+.cache/sat-decision-integrity-header-go-hashes.json. No Microsoft references
+remain in current tracked/new Go sources outside private cache snapshots.
+No C++ hashes/generics introduced. Entire port goal remains active.

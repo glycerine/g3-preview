@@ -250,27 +250,11 @@ func (s *satSolverProbing) Close() error {
 }
 
 // Source check_invariant consumes real resource before constructing checker.
-// The actual missing checker is diagnosed only when its tag is enabled.
-func (s *satSolverProbing) checkInvariant() error {
-	if !s.propagation().limit.inc() {
-		return nil
-	}
-	return ErrSATMissingIntegrityBinding
-}
+// Enabled diagnostic sites delegate to the actual shared lifecycle checker.
+func (s *satSolverProbing) checkInvariant() error { return s.lifecycle.checkInvariant() }
 func (s *satSolverProbing) propagate() error {
-	_, e := s.propagation().propagateCore(false)
-	if e != nil {
-		return e
-	}
-	if satStorageSourceDebug && s.debugPropagate {
-		if e = s.checkInvariant(); e != nil {
-			return e
-		}
-	}
-	if satStorageSourceDebug && s.debugMissed {
-		return s.checkMissedPropagation()
-	}
-	return nil
+	_, e := s.lifecycle.propagate(false, s.debugPropagate, s.debugMissed)
+	return e
 }
 func (s *satSolverProbing) assertReady(l satLiteral) error {
 	if !satStorageSourceDebug {

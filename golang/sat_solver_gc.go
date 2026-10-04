@@ -48,6 +48,10 @@ func newSATSolverGC(s *satSolverConflictResolution, c *satCleaner) (*satSolverGC
 	}
 	g := &satSolverGC{conflict: s, cleaner: c, ownerBytes: n}
 	g.self = g
+	if e := g.lifecycle().bindIntegrity(g); e != nil {
+		s.analysis.budget.Release(n)
+		return nil, e
+	}
 	return g, nil
 }
 func (g *satSolverGC) lifecycle() *satSolverClauseLifecycle {
@@ -68,7 +72,7 @@ func (g *satSolverGC) open() error {
 }
 func (g *satSolverGC) invariant() error {
 	if satStorageSourceDebug && g.debugInvariant {
-		return ErrSATMissingIntegrityBinding
+		return g.lifecycle().checkInvariant()
 	}
 	return nil
 }

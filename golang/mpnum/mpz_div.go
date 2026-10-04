@@ -1,7 +1,7 @@
 // Licensed under the MIT license.
-// Source: src/util/mpz.h and mpz.cpp internal signed division wrappers/core.
-// Knuth division translated from src/util/mpn.cpp (Copyright (c) 2011
-// Microsoft Corporation; Christoph Wintersteiger).
+// Source: src/util/mpz.h and src/util/mpz.cpp internal signed division wrappers/core.
+// Knuth division translated from src/util/mpn.cpp.
+// Source author: Christoph Wintersteiger.
 package mpnum
 
 import (

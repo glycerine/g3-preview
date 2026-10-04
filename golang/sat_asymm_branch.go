@@ -18,6 +18,7 @@ type satAsymmBranch struct {
 	rounds, limit, elimLiterals                                                           uint32
 	savedPhase                                                                            satSolverAssignmentColumn
 	report                                                                                utiltime.Stopwatch
+	debugPropagate, debugMissed                                                           bool
 	phaseRestoreStopped, savedConstructed                                                 bool
 	reportActive, closing, closed, debugInvariant, running, interrupted                   bool
 	cursor, out, end, drainPrefix, drainSuffix                                            uint32
@@ -126,7 +127,7 @@ func (a *satAsymmBranch) negateCounter() error {
 }
 func (a *satAsymmBranch) invariant() error {
 	if satStorageSourceDebug && a.debugInvariant {
-		return ErrSATMissingIntegrityBinding
+		return a.lifecycle.checkInvariant()
 	}
 	return nil
 }
@@ -151,7 +152,7 @@ func (a *satAsymmBranch) run(force bool) (err error) {
 	if !a.enabled {
 		return nil
 	}
-	if _, e := p.propagateCore(false); e != nil {
+	if _, e := a.lifecycle.propagate(false, a.debugPropagate, a.debugMissed); e != nil {
 		return e
 	}
 	if p.inconsistent {

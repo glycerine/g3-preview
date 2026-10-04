@@ -3,8 +3,8 @@ package g3
 
 // Actual source cpp3022-3074 conditional check producers, backed by real clause
 // owners and assignment columns. They do not replace integrity_checker.
-func (s *satSolverProbing) clauseUnit(c satStoredClauseRef) (bool, error) {
-	p := s.propagation()
+func (s *satSolverClauseLifecycle) clauseUnit(c satStoredClauseRef) (bool, error) {
+	p := s.propagation
 	n, e := p.clauses.Size(c)
 	if e != nil {
 		return false, e
@@ -32,8 +32,8 @@ func (s *satSolverProbing) clauseUnit(c satStoredClauseRef) (bool, error) {
 	}
 	return found, nil
 }
-func (s *satSolverProbing) clauseEmpty(c satStoredClauseRef) (bool, error) {
-	p := s.propagation()
+func (s *satSolverClauseLifecycle) clauseEmpty(c satStoredClauseRef) (bool, error) {
+	p := s.propagation
 	n, e := p.clauses.Size(c)
 	if e != nil {
 		return false, e
@@ -53,11 +53,11 @@ func (s *satSolverProbing) clauseEmpty(c satStoredClauseRef) (bool, error) {
 	}
 	return true, nil
 }
-func (s *satSolverProbing) checkMissedClauseVector(cs []satStoredClauseRef) error {
+func (s *satSolverClauseLifecycle) checkMissedClauseVector(cs []satStoredClauseRef) error {
 	// Source captures begin/end; concrete source calls have no owner mutation.
 	for i := 0; i < len(cs); i++ {
 		c := cs[i]
-		frozen, e := s.propagation().clauses.Frozen(c)
+		frozen, e := s.propagation.clauses.Frozen(c)
 		if e != nil {
 			return e
 		}
@@ -97,15 +97,28 @@ func (s *satSolverProbing) checkMissedClauseVector(cs []satStoredClauseRef) erro
 	}
 	return nil
 }
-func (s *satSolverProbing) checkMissedPropagation() error {
+func (s *satSolverClauseLifecycle) checkMissedPropagation() error {
 	if e := s.open(); e != nil {
 		return e
 	}
-	if s.propagation().inconsistent {
+	if s.propagation.inconsistent {
 		return nil
 	}
-	if e := s.checkMissedClauseVector(s.lifecycle.original); e != nil {
+	if e := s.checkMissedClauseVector(s.original); e != nil {
 		return e
 	}
-	return s.checkMissedClauseVector(s.lifecycle.learned)
+	return s.checkMissedClauseVector(s.learned)
+}
+
+func (s *satSolverProbing) clauseUnit(c satStoredClauseRef) (bool, error) {
+	return s.lifecycle.clauseUnit(c)
+}
+func (s *satSolverProbing) clauseEmpty(c satStoredClauseRef) (bool, error) {
+	return s.lifecycle.clauseEmpty(c)
+}
+func (s *satSolverProbing) checkMissedClauseVector(cs []satStoredClauseRef) error {
+	return s.lifecycle.checkMissedClauseVector(cs)
+}
+func (s *satSolverProbing) checkMissedPropagation() error {
+	return s.lifecycle.checkMissedPropagation()
 }

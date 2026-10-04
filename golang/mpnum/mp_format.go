@@ -1,5 +1,5 @@
 // Licensed under the MIT license.
-// Source: mpn.cpp to_string and mpz.cpp/mpq.cpp display (2006 copyright).
+// Source: src/util/mpn.cpp to_string and src/util/mpz.cpp/src/util/mpq.cpp display.
 package mpnum
 
 import (

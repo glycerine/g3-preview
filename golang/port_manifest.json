@@ -52212,7 +52212,11 @@
         "sat_asymm_branch_storage.go",
         "sat_asymm_branch_test.go",
         "sat_asymm_branch_audit_test.go",
-        "sat_solver_clause_lifecycle.go"
+        "sat_solver_clause_lifecycle.go",
+        "sat_integrity_checker.go",
+        "sat_integrity_checker_test.go",
+        "sat_solver_integrity.go",
+        "sat_integrity_asymm_test.go"
       ],
       "tests": [
         "TestSATAsymmDefaultAndSourceEarlyExits",
@@ -52226,7 +52230,16 @@
         "TestSATAsymmFailedPhaseConstructorUnwindsReportBeforeOwningAbort",
         "TestSATAsymmDebugScopeAssertionPrecedesTrailRead",
         "TestSATAsymmCompletedLocalDestructionStopsBeforeOlderReport",
-        "TestSATAsymmPostphysicalLocalFreeRetainsOlderReport"
+        "TestSATAsymmPostphysicalLocalFreeRetainsOlderReport",
+        "TestSATIntegrityCompleteSourceMethodsAndResourceOrder",
+        "TestSATIntegrityOriginalFrozenCountSourceQuirk",
+        "TestSATIntegrityClauseVerifyAndErasedVectorCall",
+        "TestSATIntegrityDisjointComparesIDsNotPointers",
+        "TestSATIntegrityWatchesAndBoolFieldsReleaseReadMask",
+        "TestSATIntegrityActualEnabledConsumerBindings",
+        "TestSATIntegrityDisjointFreshSetEveryRefusal",
+        "TestSATIntegrityNaryBlockedAndReinitProfiles",
+        "TestSATIntegrityAsymmActualEnabledWrapperSites"
       ],
       "conditionals": [
         {
@@ -52336,6 +52349,22 @@
             "TestSATAsymmDebugScopeAssertionPrecedesTrailRead",
             "TestSATAsymmCompletedLocalDestructionStopsBeforeOlderReport",
             "TestSATAsymmPostphysicalLocalFreeRetainsOlderReport"
+          ]
+        },
+        {
+          "name": "Enabled source integrity call sites delegate to actual lifecycle checker; Asymm propagation, entry and exit resource increments covered",
+          "status": "partial",
+          "go_target": "sat_solver_integrity.go",
+          "tests": [
+            "TestSATIntegrityCompleteSourceMethodsAndResourceOrder",
+            "TestSATIntegrityOriginalFrozenCountSourceQuirk",
+            "TestSATIntegrityClauseVerifyAndErasedVectorCall",
+            "TestSATIntegrityDisjointComparesIDsNotPointers",
+            "TestSATIntegrityWatchesAndBoolFieldsReleaseReadMask",
+            "TestSATIntegrityActualEnabledConsumerBindings",
+            "TestSATIntegrityDisjointFreshSetEveryRefusal",
+            "TestSATIntegrityNaryBlockedAndReinitProfiles",
+            "TestSATIntegrityAsymmActualEnabledWrapperSites"
           ]
         }
       ],
@@ -53437,7 +53466,11 @@
         "sat_cleaner_clauses.go",
         "sat_cleaner_test.go",
         "sat_cleaner_model_test.go",
-        "sat_solver_clause_lifecycle.go"
+        "sat_solver_clause_lifecycle.go",
+        "sat_integrity_checker.go",
+        "sat_integrity_checker_test.go",
+        "sat_solver_integrity.go",
+        "sat_integrity_asymm_test.go"
       ],
       "tests": [
         "TestSATCleanerSourceExitsAndSoleCost",
@@ -53450,7 +53483,16 @@
         "TestSATCleanerWrapperSourceGuards",
         "TestSATCleanerCapturedTrailBeforePropagationAndWarm",
         "TestSATCleanerFiniteFormulaOracle",
-        "TestSATCleanerStoppedLedgerRejectsNewOwningPublication"
+        "TestSATCleanerStoppedLedgerRejectsNewOwningPublication",
+        "TestSATIntegrityCompleteSourceMethodsAndResourceOrder",
+        "TestSATIntegrityOriginalFrozenCountSourceQuirk",
+        "TestSATIntegrityClauseVerifyAndErasedVectorCall",
+        "TestSATIntegrityDisjointComparesIDsNotPointers",
+        "TestSATIntegrityWatchesAndBoolFieldsReleaseReadMask",
+        "TestSATIntegrityActualEnabledConsumerBindings",
+        "TestSATIntegrityDisjointFreshSetEveryRefusal",
+        "TestSATIntegrityNaryBlockedAndReinitProfiles",
+        "TestSATIntegrityAsymmActualEnabledWrapperSites"
       ],
       "assertions": [
         {
@@ -53505,6 +53547,22 @@
             "TestSATCleanerCapturedTrailBeforePropagationAndWarm",
             "TestSATCleanerFiniteFormulaOracle",
             "TestSATCleanerStoppedLedgerRejectsNewOwningPublication"
+          ]
+        },
+        {
+          "name": "Enabled source integrity call sites delegate to actual lifecycle checker; Asymm propagation, entry and exit resource increments covered",
+          "status": "partial",
+          "go_target": "sat_solver_integrity.go",
+          "tests": [
+            "TestSATIntegrityCompleteSourceMethodsAndResourceOrder",
+            "TestSATIntegrityOriginalFrozenCountSourceQuirk",
+            "TestSATIntegrityClauseVerifyAndErasedVectorCall",
+            "TestSATIntegrityDisjointComparesIDsNotPointers",
+            "TestSATIntegrityWatchesAndBoolFieldsReleaseReadMask",
+            "TestSATIntegrityActualEnabledConsumerBindings",
+            "TestSATIntegrityDisjointFreshSetEveryRefusal",
+            "TestSATIntegrityNaryBlockedAndReinitProfiles",
+            "TestSATIntegrityAsymmActualEnabledWrapperSites"
           ]
         }
       ],
@@ -54004,9 +54062,24 @@
       "path": "src/sat/sat_integrity_checker.cpp",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_integrity_checker.go",
+        "sat_integrity_checker_test.go",
+        "sat_solver_integrity.go",
+        "sat_integrity_asymm_test.go"
+      ],
+      "tests": [
+        "TestSATIntegrityCompleteSourceMethodsAndResourceOrder",
+        "TestSATIntegrityOriginalFrozenCountSourceQuirk",
+        "TestSATIntegrityClauseVerifyAndErasedVectorCall",
+        "TestSATIntegrityDisjointComparesIDsNotPointers",
+        "TestSATIntegrityWatchesAndBoolFieldsReleaseReadMask",
+        "TestSATIntegrityActualEnabledConsumerBindings",
+        "TestSATIntegrityDisjointFreshSetEveryRefusal",
+        "TestSATIntegrityNaryBlockedAndReinitProfiles",
+        "TestSATIntegrityAsymmActualEnabledWrapperSites"
+      ],
       "assertions": [
         {
           "line": 43,
@@ -54179,17 +54252,53 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Constructor26; contains31/36; check_clause52; range105/noarg112; learned116; assignment128; boolvars132; watches155; reinit199; disjoint210; operator228. Actual release/debug macro read masks and original frozen-clause count preserved.",
+          "status": "partial",
+          "go_target": "sat_integrity_checker.go",
+          "tests": [
+            "TestSATIntegrityCompleteSourceMethodsAndResourceOrder",
+            "TestSATIntegrityOriginalFrozenCountSourceQuirk",
+            "TestSATIntegrityClauseVerifyAndErasedVectorCall",
+            "TestSATIntegrityDisjointComparesIDsNotPointers",
+            "TestSATIntegrityWatchesAndBoolFieldsReleaseReadMask",
+            "TestSATIntegrityActualEnabledConsumerBindings",
+            "TestSATIntegrityDisjointFreshSetEveryRefusal",
+            "TestSATIntegrityNaryBlockedAndReinitProfiles",
+            "TestSATIntegrityAsymmActualEnabledWrapperSites"
+          ]
+        }
+      ],
+      "ownership": [
+        "By-value checker borrows actual lifecycle and same-lifecycle GC; no extra header allocation. Disjoint check uses fresh actual uint set, inserts original clause IDs then tests learned IDs, and closes on every reached return. Every refusal prefix audited before fault disable."
+      ],
+      "deviations": [
+        "Concrete selected diagnostic controls are bound; global source tag/assertions-enabled registry and TRACE/verbose output remain open. Actual uint_set Go backing/accounting follows existing adapter, not claimed identical C++ Runtime storage geometry. Source VERIFY remains active in release; SASSERT calls are erased. No whole solver or registered source assertion completion credit."
+      ]
     },
     {
       "path": "src/sat/sat_integrity_checker.h",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_integrity_checker.go",
+        "sat_integrity_checker_test.go",
+        "sat_solver_integrity.go",
+        "sat_integrity_asymm_test.go"
+      ],
+      "tests": [
+        "TestSATIntegrityCompleteSourceMethodsAndResourceOrder",
+        "TestSATIntegrityOriginalFrozenCountSourceQuirk",
+        "TestSATIntegrityClauseVerifyAndErasedVectorCall",
+        "TestSATIntegrityDisjointComparesIDsNotPointers",
+        "TestSATIntegrityWatchesAndBoolFieldsReleaseReadMask",
+        "TestSATIntegrityActualEnabledConsumerBindings",
+        "TestSATIntegrityDisjointFreshSetEveryRefusal",
+        "TestSATIntegrityNaryBlockedAndReinitProfiles",
+        "TestSATIntegrityAsymmActualEnabledWrapperSites"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -54202,9 +54311,30 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Constructor26; contains31/36; check_clause52; range105/noarg112; learned116; assignment128; boolvars132; watches155; reinit199; disjoint210; operator228. Actual release/debug macro read masks and original frozen-clause count preserved.",
+          "status": "partial",
+          "go_target": "sat_integrity_checker.go",
+          "tests": [
+            "TestSATIntegrityCompleteSourceMethodsAndResourceOrder",
+            "TestSATIntegrityOriginalFrozenCountSourceQuirk",
+            "TestSATIntegrityClauseVerifyAndErasedVectorCall",
+            "TestSATIntegrityDisjointComparesIDsNotPointers",
+            "TestSATIntegrityWatchesAndBoolFieldsReleaseReadMask",
+            "TestSATIntegrityActualEnabledConsumerBindings",
+            "TestSATIntegrityDisjointFreshSetEveryRefusal",
+            "TestSATIntegrityNaryBlockedAndReinitProfiles",
+            "TestSATIntegrityAsymmActualEnabledWrapperSites"
+          ]
+        }
+      ],
+      "ownership": [
+        "By-value checker borrows actual lifecycle and same-lifecycle GC; no extra header allocation. Disjoint check uses fresh actual uint set, inserts original clause IDs then tests learned IDs, and closes on every reached return. Every refusal prefix audited before fault disable."
+      ],
+      "deviations": [
+        "Concrete selected diagnostic controls are bound; global source tag/assertions-enabled registry and TRACE/verbose output remain open. Actual uint_set Go backing/accounting follows existing adapter, not claimed identical C++ Runtime storage geometry. Source VERIFY remains active in release; SASSERT calls are erased. No whole solver or registered source assertion completion credit."
+      ]
     },
     {
       "path": "src/sat/sat_justification.h",
@@ -55591,7 +55721,11 @@
         "sat_scc_storage.go",
         "sat_elim_eqs.go",
         "sat_scc_test.go",
-        "sat_solver_clause_lifecycle.go"
+        "sat_solver_clause_lifecycle.go",
+        "sat_integrity_checker.go",
+        "sat_integrity_checker_test.go",
+        "sat_solver_integrity.go",
+        "sat_integrity_asymm_test.go"
       ],
       "tests": [
         "TestSATSCCDefaultEquivalenceAndActualConverter",
@@ -55609,7 +55743,16 @@
         "TestSATSCCResizeWholeReservationBeforeSizeAndShrink",
         "TestSATElimEqsOwningIdentityGuard",
         "TestSATSCCResizePublishesBeforeReachedConstructorGuard",
-        "TestSATElimEqsSortActualLargeBacking"
+        "TestSATElimEqsSortActualLargeBacking",
+        "TestSATIntegrityCompleteSourceMethodsAndResourceOrder",
+        "TestSATIntegrityOriginalFrozenCountSourceQuirk",
+        "TestSATIntegrityClauseVerifyAndErasedVectorCall",
+        "TestSATIntegrityDisjointComparesIDsNotPointers",
+        "TestSATIntegrityWatchesAndBoolFieldsReleaseReadMask",
+        "TestSATIntegrityActualEnabledConsumerBindings",
+        "TestSATIntegrityDisjointFreshSetEveryRefusal",
+        "TestSATIntegrityNaryBlockedAndReinitProfiles",
+        "TestSATIntegrityAsymmActualEnabledWrapperSites"
       ],
       "assertions": [
         {
@@ -55657,6 +55800,22 @@
             "TestSATElimEqsOwningIdentityGuard",
             "TestSATSCCResizePublishesBeforeReachedConstructorGuard",
             "TestSATElimEqsSortActualLargeBacking"
+          ]
+        },
+        {
+          "name": "Enabled source integrity call sites delegate to actual lifecycle checker; Asymm propagation, entry and exit resource increments covered",
+          "status": "partial",
+          "go_target": "sat_solver_integrity.go",
+          "tests": [
+            "TestSATIntegrityCompleteSourceMethodsAndResourceOrder",
+            "TestSATIntegrityOriginalFrozenCountSourceQuirk",
+            "TestSATIntegrityClauseVerifyAndErasedVectorCall",
+            "TestSATIntegrityDisjointComparesIDsNotPointers",
+            "TestSATIntegrityWatchesAndBoolFieldsReleaseReadMask",
+            "TestSATIntegrityActualEnabledConsumerBindings",
+            "TestSATIntegrityDisjointFreshSetEveryRefusal",
+            "TestSATIntegrityNaryBlockedAndReinitProfiles",
+            "TestSATIntegrityAsymmActualEnabledWrapperSites"
           ]
         }
       ],
@@ -56283,7 +56442,14 @@
         "sat_solver_gc_sort.go",
         "sat_solver_gc_test.go",
         "sat_solver_gc_model_test.go",
-        "sat_solver_gc_audit_test.go"
+        "sat_solver_gc_audit_test.go",
+        "sat_solver_decision.go",
+        "sat_solver_decision_test.go",
+        "sat_solver_decision_audit_test.go",
+        "sat_integrity_checker.go",
+        "sat_integrity_checker_test.go",
+        "sat_solver_integrity.go",
+        "sat_integrity_asymm_test.go"
       ],
       "tests": [
         "TestSATSolverClauseCoreFiniteSimplification",
@@ -56442,7 +56608,25 @@
         "TestSATSolverGCLearnedModelPreservation",
         "TestSATSolverGCSortWorkspaceRefusalAndWarmThreshold",
         "TestSATSolverGCFrozenTrueAndInactiveDelete",
-        "TestSATSolverGCMergeOwnershipProtocol"
+        "TestSATSolverGCMergeOwnershipProtocol",
+        "TestSATSolverDecisionActualNumVarsReadGuard",
+        "TestSATSolverDecisionEveryActualAllocationPrefix",
+        "TestSATSolverDecisionThresholdCastBoundariesAndOwner",
+        "TestSATSolverDecisionEmptyAndRandomDrawOrder",
+        "TestSATSolverDecisionRandomLeavesQueueAndFallbackSkips",
+        "TestSATSolverDecisionRejectedRandomCandidateUsesQueue",
+        "TestSATSolverDecisionColdConstructionAndCounterWrap",
+        "TestSATSolverDecisionAllPhasePolicies",
+        "TestSATSolverDecisionRandomPhaseAndInvalidCastPrefix",
+        "TestSATIntegrityCompleteSourceMethodsAndResourceOrder",
+        "TestSATIntegrityOriginalFrozenCountSourceQuirk",
+        "TestSATIntegrityClauseVerifyAndErasedVectorCall",
+        "TestSATIntegrityDisjointComparesIDsNotPointers",
+        "TestSATIntegrityWatchesAndBoolFieldsReleaseReadMask",
+        "TestSATIntegrityActualEnabledConsumerBindings",
+        "TestSATIntegrityDisjointFreshSetEveryRefusal",
+        "TestSATIntegrityNaryBlockedAndReinitProfiles",
+        "TestSATIntegrityAsymmActualEnabledWrapperSites"
       ],
       "conditionals": [
         {
@@ -57229,6 +57413,38 @@
             "TestSATSolverGCFrozenTrueAndInactiveDelete",
             "TestSATSolverGCMergeOwnershipProtocol"
           ]
+        },
+        {
+          "name": "Selected next_var and decide cpp933\u2013988: actual shared RNG draw order, queue fallback, all phase policies, scope/statistic/assignment publication; full search and extension remain open",
+          "status": "partial",
+          "go_target": "sat_solver_decision.go",
+          "tests": [
+            "TestSATSolverDecisionActualNumVarsReadGuard",
+            "TestSATSolverDecisionEveryActualAllocationPrefix",
+            "TestSATSolverDecisionThresholdCastBoundariesAndOwner",
+            "TestSATSolverDecisionEmptyAndRandomDrawOrder",
+            "TestSATSolverDecisionRandomLeavesQueueAndFallbackSkips",
+            "TestSATSolverDecisionRejectedRandomCandidateUsesQueue",
+            "TestSATSolverDecisionColdConstructionAndCounterWrap",
+            "TestSATSolverDecisionAllPhasePolicies",
+            "TestSATSolverDecisionRandomPhaseAndInvalidCastPrefix"
+          ]
+        },
+        {
+          "name": "Selected check_invariant cpp2845\u20132850, propagate wrapper711\u2013716 and missed propagation3053\u20133075 with actual lifecycle/GC bindings",
+          "status": "partial",
+          "go_target": "sat_solver_integrity.go",
+          "tests": [
+            "TestSATIntegrityCompleteSourceMethodsAndResourceOrder",
+            "TestSATIntegrityOriginalFrozenCountSourceQuirk",
+            "TestSATIntegrityClauseVerifyAndErasedVectorCall",
+            "TestSATIntegrityDisjointComparesIDsNotPointers",
+            "TestSATIntegrityWatchesAndBoolFieldsReleaseReadMask",
+            "TestSATIntegrityActualEnabledConsumerBindings",
+            "TestSATIntegrityDisjointFreshSetEveryRefusal",
+            "TestSATIntegrityNaryBlockedAndReinitProfiles",
+            "TestSATIntegrityAsymmActualEnabledWrapperSites"
+          ]
         }
       ],
       "ownership": [
@@ -57238,7 +57454,8 @@
         "Selected probing/dynamic bodies borrow real propagation/lifecycle owners and separate literalMark. Source assigned-set size publication precedes default false writes; membership mark precedes list push; values precede membership reset/finalize, and successful explicit finalize permits next round without counter repair. Failed ordinal roots and marks are inspected before faults are disabled. No independent solver counter or assignment mirror is created.",
         "Selected conflict owner charges actual cold fields once and borrows existing analysis/dynamic/probing/lifecycle/Runtime; owns actual Runtime assumption/core/literal-set members. Glue and clause consumers read captured lemma blocks directly. Constructor-read errors retain the actually allocated clause/ID in lifecycle pendingCandidate before return. Every real refusal prefix is rooted before fault disable; no host lemma copy or directory-derived owner roots.",
         "Cleaner interruption continuation is charged in the lifecycle header; owning Close drains only retained prefix and unread suffix with actual cursors. Source callbacks run while active; stopped lifecycle and direct pushClause reject later owning publication.",
-        "Borrow sole conflict/phase counters and actual lifecycle/Runtime. Real cold GC owner, stable merge workspace and stopped compaction cursors are charged. Owning continuation drains only disjoint actual moved prefix/source ranges, not registry snapshots; lifecycle Close drains reached GC before ordinary vectors."
+        "Borrow sole conflict/phase counters and actual lifecycle/Runtime. Real cold GC owner, stable merge workspace and stopped compaction cursors are charged. Owning continuation drains only disjoint actual moved prefix/source ranges, not registry snapshots; lifecycle Close drains reached GC before ordinary vectors.",
+        "Decision cold owner charges actual RNG/statistic header and borrows conflict/lifecycle. Integrity checker is a by-value nonowning stack grouping; lifecycle borrows matching GC with its sole frozen count. Fresh disjoint ID set is constructed and closed on each reached call."
       ],
       "deviations": [
         "Concrete allocation-free heapsort replaces std::sort on scalar literals. TRACE, solver construction, BCP, conflicts, search, scopes and remaining methods are unported.",
@@ -57247,7 +57464,8 @@
         "Checkpoint reads the actual bound Runtime allocation counter. SAT arena-backed typed storage has not yet been integrated into that source runtime accounting domain; end-to-end solver memory-limit behavior remains open. No allocation events are fabricated from Budget usage.",
         "Only assignment char_vector source allocation accounting is integrated in this slice. Other SAT columns/watch/queue/clause/trail/vector allocations still require real global/runtime source hooks. Raw-state bounds/initialization guards act at endangered byte accesses; source DEBUG logical assertions remain distinct. No full solver construction/search or registered assertion completion is claimed.",
         "Selected FIRST-UIP and real assumption/init helpers are implemented with default minimization/dynamic subsumption. Full solver construction/Check/search, source extension calls, nonnull parallel exchange, optional MUS/model and global diagnostics remain explicit obligations. Constructor-error candidate retention is a typed owning adapter, not claimed C++ implicit unwinding; no registered user-scope assertion completion is credited.",
-        "Complete selected ordinary GC/restart/init_search member algorithms executed; enabled integrity tags, verbose/TRACE and full constructor/search/Check remain open. Source comparator expressions/tie order preserved through explicitly charged concrete Go stable merge workspace; C++ standard library allocation/comparison schedule is not claimed identical. No new registered source assertion completion credit."
+        "Complete selected ordinary GC/restart/init_search member algorithms executed; enabled integrity tags, verbose/TRACE and full constructor/search/Check remain open. Source comparator expressions/tie order preserved through explicitly charged concrete Go stable merge workspace; C++ standard library allocation/comparison schedule is not claimed identical. No new registered source assertion completion credit.",
+        "Selected enabled integrity and missed-propagation sites now call actual members, including Asymm entry/exit and propagation. Global debug-tag/assertions-enabled registry, TRACE/verbose, complete constructor/parameter updates/search and registered user-scope campaign remain open. Undefined floating-to-int conversion is guarded at reached source expression; not a C++ malformed-input guarantee."
       ]
     },
     {
@@ -57301,7 +57519,14 @@
         "sat_solver_gc_sort.go",
         "sat_solver_gc_test.go",
         "sat_solver_gc_model_test.go",
-        "sat_solver_gc_audit_test.go"
+        "sat_solver_gc_audit_test.go",
+        "sat_solver_decision.go",
+        "sat_solver_decision_test.go",
+        "sat_solver_decision_audit_test.go",
+        "sat_integrity_checker.go",
+        "sat_integrity_checker_test.go",
+        "sat_solver_integrity.go",
+        "sat_integrity_asymm_test.go"
       ],
       "tests": [
         "TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots",
@@ -57417,7 +57642,25 @@
         "TestSATSolverGCLearnedModelPreservation",
         "TestSATSolverGCSortWorkspaceRefusalAndWarmThreshold",
         "TestSATSolverGCFrozenTrueAndInactiveDelete",
-        "TestSATSolverGCMergeOwnershipProtocol"
+        "TestSATSolverGCMergeOwnershipProtocol",
+        "TestSATSolverDecisionActualNumVarsReadGuard",
+        "TestSATSolverDecisionEveryActualAllocationPrefix",
+        "TestSATSolverDecisionThresholdCastBoundariesAndOwner",
+        "TestSATSolverDecisionEmptyAndRandomDrawOrder",
+        "TestSATSolverDecisionRandomLeavesQueueAndFallbackSkips",
+        "TestSATSolverDecisionRejectedRandomCandidateUsesQueue",
+        "TestSATSolverDecisionColdConstructionAndCounterWrap",
+        "TestSATSolverDecisionAllPhasePolicies",
+        "TestSATSolverDecisionRandomPhaseAndInvalidCastPrefix",
+        "TestSATIntegrityCompleteSourceMethodsAndResourceOrder",
+        "TestSATIntegrityOriginalFrozenCountSourceQuirk",
+        "TestSATIntegrityClauseVerifyAndErasedVectorCall",
+        "TestSATIntegrityDisjointComparesIDsNotPointers",
+        "TestSATIntegrityWatchesAndBoolFieldsReleaseReadMask",
+        "TestSATIntegrityActualEnabledConsumerBindings",
+        "TestSATIntegrityDisjointFreshSetEveryRefusal",
+        "TestSATIntegrityNaryBlockedAndReinitProfiles",
+        "TestSATIntegrityAsymmActualEnabledWrapperSites"
       ],
       "conditionals": [
         {
@@ -57692,13 +57935,46 @@
             "TestSATSolverGCFrozenTrueAndInactiveDelete",
             "TestSATSolverGCMergeOwnershipProtocol"
           ]
+        },
+        {
+          "name": "Selected next_var and decide cpp933\u2013988: actual shared RNG draw order, queue fallback, all phase policies, scope/statistic/assignment publication; full search and extension remain open",
+          "status": "partial",
+          "go_target": "sat_solver_decision.go",
+          "tests": [
+            "TestSATSolverDecisionActualNumVarsReadGuard",
+            "TestSATSolverDecisionEveryActualAllocationPrefix",
+            "TestSATSolverDecisionThresholdCastBoundariesAndOwner",
+            "TestSATSolverDecisionEmptyAndRandomDrawOrder",
+            "TestSATSolverDecisionRandomLeavesQueueAndFallbackSkips",
+            "TestSATSolverDecisionRejectedRandomCandidateUsesQueue",
+            "TestSATSolverDecisionColdConstructionAndCounterWrap",
+            "TestSATSolverDecisionAllPhasePolicies",
+            "TestSATSolverDecisionRandomPhaseAndInvalidCastPrefix"
+          ]
+        },
+        {
+          "name": "Selected check_invariant cpp2845\u20132850, propagate wrapper711\u2013716 and missed propagation3053\u20133075 with actual lifecycle/GC bindings",
+          "status": "partial",
+          "go_target": "sat_solver_integrity.go",
+          "tests": [
+            "TestSATIntegrityCompleteSourceMethodsAndResourceOrder",
+            "TestSATIntegrityOriginalFrozenCountSourceQuirk",
+            "TestSATIntegrityClauseVerifyAndErasedVectorCall",
+            "TestSATIntegrityDisjointComparesIDsNotPointers",
+            "TestSATIntegrityWatchesAndBoolFieldsReleaseReadMask",
+            "TestSATIntegrityActualEnabledConsumerBindings",
+            "TestSATIntegrityDisjointFreshSetEveryRefusal",
+            "TestSATIntegrityNaryBlockedAndReinitProfiles",
+            "TestSATIntegrityAsymmActualEnabledWrapperSites"
+          ]
         }
       ],
       "ownership": [
         "Source-width char assignment and scalar columns; charged outer watch tokens/metadata own each actual child once; real activity/queue/trail, borrowed actual todo. No complete solver construction or search.",
         "Assignment bytes and initialization state are owned solely by the borrowed real Runtime, with source vector capacity/size headers and explicit block/pending tokens; enclosing variable owner charges embedded metadata. Variable graph Stats exclude borrowed runtime, which physical audits add exactly once. Runtime must outlive variable/propagation owners, which require the same actual Runtime identity.",
         "Selected conflict owner charges actual cold fields once and borrows existing analysis/dynamic/probing/lifecycle/Runtime; owns actual Runtime assumption/core/literal-set members. Glue and clause consumers read captured lemma blocks directly. Constructor-read errors retain the actually allocated clause/ID in lifecycle pendingCandidate before return. Every real refusal prefix is rooted before fault disable; no host lemma copy or directory-derived owner roots.",
-        "Borrow sole conflict/phase counters and actual lifecycle/Runtime. Real cold GC owner, stable merge workspace and stopped compaction cursors are charged. Owning continuation drains only disjoint actual moved prefix/source ranges, not registry snapshots; lifecycle Close drains reached GC before ordinary vectors."
+        "Borrow sole conflict/phase counters and actual lifecycle/Runtime. Real cold GC owner, stable merge workspace and stopped compaction cursors are charged. Owning continuation drains only disjoint actual moved prefix/source ranges, not registry snapshots; lifecycle Close drains reached GC before ordinary vectors.",
+        "Decision cold owner charges actual RNG/statistic header and borrows conflict/lifecycle. Integrity checker is a by-value nonowning stack grouping; lifecycle borrows matching GC with its sole frozen count. Fresh disjoint ID set is constructed and closed on each reached call."
       ],
       "deviations": [
         "Wrapped source allocations that cannot represent full typed capacity remain unported; host bounds are separate from exact source overflow DefaultException. Default child policies, full solver constructor, propagation, conflicts, scopes/search and TRACE remain open.",
@@ -57706,7 +57982,8 @@
         "Checkpoint reads the actual bound Runtime allocation counter. SAT arena-backed typed storage has not yet been integrated into that source runtime accounting domain; end-to-end solver memory-limit behavior remains open. No allocation events are fabricated from Budget usage.",
         "Only assignment char_vector source allocation accounting is integrated in this slice. Other SAT columns/watch/queue/clause/trail/vector allocations still require real global/runtime source hooks. Raw-state bounds/initialization guards act at endangered byte accesses; source DEBUG logical assertions remain distinct. No full solver construction/search or registered assertion completion is claimed.",
         "Selected FIRST-UIP and real assumption/init helpers are implemented with default minimization/dynamic subsumption. Full solver construction/Check/search, source extension calls, nonnull parallel exchange, optional MUS/model and global diagnostics remain explicit obligations. Constructor-error candidate retention is a typed owning adapter, not claimed C++ implicit unwinding; no registered user-scope assertion completion is credited.",
-        "Complete selected ordinary GC/restart/init_search member algorithms executed; enabled integrity tags, verbose/TRACE and full constructor/search/Check remain open. Source comparator expressions/tie order preserved through explicitly charged concrete Go stable merge workspace; C++ standard library allocation/comparison schedule is not claimed identical. No new registered source assertion completion credit."
+        "Complete selected ordinary GC/restart/init_search member algorithms executed; enabled integrity tags, verbose/TRACE and full constructor/search/Check remain open. Source comparator expressions/tie order preserved through explicitly charged concrete Go stable merge workspace; C++ standard library allocation/comparison schedule is not claimed identical. No new registered source assertion completion credit.",
+        "Selected enabled integrity and missed-propagation sites now call actual members, including Asymm entry/exit and propagation. Global debug-tag/assertions-enabled registry, TRACE/verbose, complete constructor/parameter updates/search and registered user-scope campaign remain open. Undefined floating-to-int conversion is guarded at reached source expression; not a C++ malformed-input guarantee."
       ]
     },
     {

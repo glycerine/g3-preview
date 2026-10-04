@@ -199,7 +199,9 @@ func (c *satSCC) run() (count uint32, err error) {
 		return 0, arena.ErrClosed
 	}
 	if satStorageSourceDebug && c.debugInvariant {
-		return 0, ErrSATMissingIntegrityBinding
+		if e := c.lifecycle.checkInvariant(); e != nil {
+			return 0, e
+		}
 	}
 	c.report = utiltime.Stopwatch{}
 	if e := c.report.Start(); e != nil {
@@ -387,7 +389,9 @@ func (c *satSCC) run() (count uint32, err error) {
 		return 0, e
 	}
 	if satStorageSourceDebug && c.debugInvariant {
-		return 0, ErrSATMissingIntegrityBinding
+		if e := c.lifecycle.checkInvariant(); e != nil {
+			return 0, e
+		}
 	}
 	return n, nil
 }

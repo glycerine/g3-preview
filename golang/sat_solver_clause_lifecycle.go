@@ -10,6 +10,7 @@ import (
 // raw-candidate root. Reinit/watch states are actual nonowning source borrowers.
 // This owner is not a complete solver constructor or source debug destructor.
 type satSolverClauseLifecycle struct {
+	integrityGC                                                *satSolverGC
 	self                                                       *satSolverClauseLifecycle
 	propagation                                                *satSolverPropagationState
 	budget                                                     *arena.Budget

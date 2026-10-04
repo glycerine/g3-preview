@@ -69,7 +69,7 @@ func (c *satCleaner) collectStatistics(s *Statistics, clauses, literals Statisti
 }
 func (c *satCleaner) invariant() error {
 	if satStorageSourceDebug && c.debugInvariant {
-		return ErrSATMissingIntegrityBinding
+		return c.lifecycle.checkInvariant()
 	}
 	return nil
 }
