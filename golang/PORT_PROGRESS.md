@@ -24754,3 +24754,141 @@ repair was introduced to obtain GREEN. This coherent chunk ports selected
 source-order and default FIRST-UIP families, while the full patched fork,
 complete source tests, default solver/search, APIs and active PSC algorithms
 remain required. The active full-port goal is not complete.
+
+
+### Cleaner, multivariate storage and scalar Mul/Div continuation
+
+Baseline is clean green commit `0452978`; the previous goal turn made
+authoritative progress by committing28 files after both full suites, both
+vets and the source/no-generics audit passed. The full-fork goal stays active.
+
+Three parallel tests-first lanes now follow the reviewed source maps. SAT
+cleaner/cleanup preserves the sole existing signed32 cost, force/last-trail
+conditions, frozen/active clauses and watch→original→learned→propagate order.
+Its genuinely interrupted compaction needs a charged cursor over the actual
+retained prefix/unread suffix, with one scoped lifecycle Close hook; no vector
+rebuilding or source counter repair. Initial isolated missing-API RED is
+`.cache/cleaner-api-red.log`. Full ctor/search/Check and extension/global
+diagnostics remain open.
+
+The selected multivariate cell/construction/SOM owner must use actual modular
+coefficient arithmetic, four buffers and source mutable swaps and maximal
+monomial invariant. It has an explicit meaningful codec for the scalar header,
+contiguous coefficient array and contiguous monomial array, with cold scalar
+provenance/publication/deletion progress. Source constructor consumes a
+coefficient before the associated monomial ref assertion/publication. Initial
+missing-API RED is `.cache/polynomial-cell-api-red.log`; full imp topology and
+optimized PSC/resultant algorithms are not represented as complete.
+
+Remaining facade/Inf/InfEps scalar Mul/Div and InfInt coefficient-entry tests
+expose five source-order defects in
+`.cache/inf-muldiv-entry-{red,debug-red}.log`; coefficient alias reread already
+passes and is honestly a confirmation. The approved scope changes only four
+entry/lock files and new tests, preserving raw MPQ bodies, the ten raw Int
+fields, nine facade lexical bound and approximate Mult/Power algorithms.
+
+All code/cache/temp writes remain below golang. Source paths/MIT notices are
+retained and Microsoft copyright lines omitted; no generics, C++ content
+hashing, wasm/wasi or race gates are introduced. Both complete native and
+checked/debug suites are required again before the next implementation commit.
+
+
+### Frozen scalar Mul/Div and SAT cleaner evidence
+
+The five numeric files are frozen with nineteen selected entry substitutions
+and eleven new regression groups. Five original source-order defects were
+recorded before implementation; the existing alias reread was already green.
+The isolated exact-file snapshot `.cache/review/inf-muldiv-final` passes251
+focused tests in each profile, both vets, independent63 bounded Mul/Div cases,
+raw denominator/zero routes, scalar member aliases, foreign/closed ownership
+and zero-allocation warm paths. Full mpnum native and checked/debug logs
+`.cache/cleaner-muldiv-mpnum-{native,debug}.log` are terminal green at88.241s
+and196.451s. Raw MPQ10/facade lexical9 bounds and approximate algorithms remain
+unchanged. Sources: rational.h160–169/480–481/491–493;
+inf_rational.h189–192/218–221/422–435;
+inf_eps_rational.h211–222/409–426;
+inf_int_rational.h160–167/360–362, under src/util.
+
+The cleaner five-file inventory `.cache/cleaner-final-inventory.json` records
+eleven groups and59 new RUN/PASS cases in each profile; focused SAT integration
+passes388 native and390 checked/debug cases, with both vets green. Source maps
+cover src/sat/sat_cleaner.cpp26–229, sat_cleaner.h and
+sat_solver.cpp3082–3087. The cold owner borrows the actual lifecycle; source
+cleanup uses the sole signed32 cost, captured pre-propagation trail size,
+watch/original/learned order, frozen clause branches and actual front compaction.
+All five actual allocation refusals precede success5 in each profile, with
+named physical roots audited before disabling failure. Independent formula
+and watch matrices, statistics and warm allocation checks remain intact.
+
+Tests-first `.cache/cleaner-stopped-publication-red.log` exposed a real owning
+root loss: publishing another clause after interrupted compaction escaped the
+captured end and would be lost by owning teardown. Both lifecycle open and
+direct pushClause now reject stopped publication, while active source callbacks
+remain permitted. `.cache/cleaner-old-close-red.log` separately shows the prior
+Close route reading deleted/duplicated slots; this is owning integration
+evidence. The explicit ledger drains only retained prefix/unread suffix with
+actual cursors. No snapshots, registry ownership, counter repair or fabricated
+release refusal are used. The earlier filesystem-full compile failure was
+nonbehavioral and gives no test evidence.
+
+Enabled cleaner_bug and propagation-wrapper sat_propagate/sat_missed_prop
+checks, real EXT notification, verbose/TRACE and complete solver ctor/Check
+remain open. No full registered source assertion campaign is newly credited.
+
+The substantial multivariate cell/SOM/arithmetic family continues privately in
+`.cache/work/polynomial-core-0452978`. The two untracked initial drafts were
+copied, Go-byte verified and preserved before removal from master; inventory
+is `.cache/polynomial-core-draft-preservation.json`. Initial missing-API RED
+is retained. No implementation credit is assigned to private drafts and the
+full selected family plus actual optimized PSC fixtures remain obligations.
+
+The master693-Go-file tree is frozen in
+`.cache/cleaner-muldiv-final-go-hashes.json`. Complete native and checked/debug
+30-minute gates, both vets and hash-free source/no-generics audit are running.
+The original100-bit/all-prefix campaign is retained. Final terminal evidence
+must replace this running observation before commit.
+
+
+### Next source families under independent review
+
+Private multivariate review identified nontrivial mpz coefficient vector
+Allocate/publish/move-logical/deallocate/cap publication rather than trivial
+full-capacity Reallocate, cheap duplicate DEBUG assertion before zero exclusion,
+cheap reset Del rather than Reset, zero-left MulAdd short circuit and IsOne
+Scale short circuit. The private lane is correcting these with tests-first
+behavioral evidence; no unvalidated draft is in master. Its coefficient GCD
+must reuse the actual concrete modular/integer array-GCD path. Source rational
+array construction copies coefficients and DEBUG-asserts original temporary
+entries zero; unlike univariate add_reset this is a source quirk, with retained
+initialized tails requiring explicit actual owning roots. Whole constructor,
+callbacks/finalization and complete failure campaigns remain open privately.
+
+Read-only SAT follow-on map selects cpp1169–1190/1347–1670 GC/restart/search
+initialization with all five strategies and real learned/reinit/reason/phase
+owners. Default is glue_psm, caching phase and burst_search100. A private
+GC lane begins under `.cache/work/sat-gc-0452978`; no master publication or
+completion credit is granted yet. Full simplify_problem1191–1253 still needs
+SCC plus actual equivalence elimination, simplifier orchestration and asymmetric
+branching. No default algorithm may be disabled or replaced by a successful
+missing-dependency stub. The full42-assertion/168-clause registered user-scope
+campaign remains explicitly pending until genuine solver Check calls exist.
+
+
+### Cleaner and scalar Mul/Div final GREEN evidence
+
+All five final gates are terminal0: full native and checked/debug suites,
+both complete vet profiles and fixed-source/no-generics audit. Logs are
+`.cache/cleaner-muldiv-final-{native,debug,vet-native,vet-debug,source}.log`;
+exact states are `.cache/cleaner-muldiv-final-gates.json`. All693 Go files and
+bytes were verified unchanged after every gate completed. Native main package
+is13.238s; checked/debug main is710.779s. Numeric full
+suites are also independently terminal green as recorded above. The audit
+reports2102 units/677 APIs,28ported/168partial/1906unported. Cleaner cpp/h
+are partial with explicit remaining bindings, not full solver completion.
+
+Earlier running observations are superseded by these terminal results. Original
+100-bit precision and every actual fault prefix remain intact. No failing test
+was hidden, weakened, skipped or truncated. No C++ content hashes were computed;
+originating paths and license notices are retained without Microsoft copyright
+lines in touched ported files. Private polynomial/GC drafts remain isolated
+and give no premature implementation credit. The full-fork goal remains active.

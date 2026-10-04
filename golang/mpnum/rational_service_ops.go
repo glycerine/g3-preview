@@ -24,7 +24,7 @@ const (
 // These helpers require the caller to hold s.mu. All input provenance is
 // checked before numeric actions; no foreign raw numeral is admitted.
 func (s *RationalService) facadeEntry(v *OwnedRational, op rationalFacadeBinaryOp) error {
-	if op == rationalFacadeAdd || op == rationalFacadeSub {
+	if op >= rationalFacadeAdd && op <= rationalFacadeDiv {
 		return s.rationalScalarOwner(v)
 	}
 	return s.check(v)

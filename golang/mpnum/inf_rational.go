@@ -956,10 +956,10 @@ func (s *RationalService) InfMulRationalAssign(v *OwnedInfRational, r *OwnedRati
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return e
 	}
-	if e := s.check(r); e != nil {
+	if e := s.rationalScalarOwner(r); e != nil {
 		return e
 	}
 	return s.infScalar(v, &r.raw, '*')
@@ -969,10 +969,10 @@ func (s *RationalService) InfMulRational(v *OwnedInfRational, r *OwnedRational) 
 		return OwnedInfRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return OwnedInfRational{}, e
 	}
-	if e := s.check(r); e != nil {
+	if e := s.rationalScalarOwner(r); e != nil {
 		return OwnedInfRational{}, e
 	}
 	return s.infScalarResult(v, &r.raw, '*')
@@ -982,10 +982,10 @@ func (s *RationalService) InfDivRationalAssign(v *OwnedInfRational, r *OwnedRati
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return e
 	}
-	if e := s.check(r); e != nil {
+	if e := s.rationalScalarOwner(r); e != nil {
 		return e
 	}
 	return s.infScalar(v, &r.raw, '/')
@@ -995,10 +995,10 @@ func (s *RationalService) InfDivRational(v *OwnedInfRational, r *OwnedRational) 
 		return OwnedInfRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return OwnedInfRational{}, e
 	}
-	if e := s.check(r); e != nil {
+	if e := s.rationalScalarOwner(r); e != nil {
 		return OwnedInfRational{}, e
 	}
 	return s.infScalarResult(v, &r.raw, '/')

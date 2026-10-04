@@ -17,6 +17,7 @@ type satSolverClauseLifecycle struct {
 	reinit                                                     []satClauseWrapper
 	scopes                                                     []satSolverScope
 	pendingCandidate                                           satStoredClauseRef
+	cleanerContinuation                                        *satCleaner
 	ownerBytes                                                 uint64
 	mkBinary, mkTernary, mkNary, deleted, nonLearnedGeneration uint32
 	reinitInitialized, scopesInitialized                       uint32
@@ -47,9 +48,15 @@ func (s *satSolverClauseLifecycle) open() error {
 	if s.closed || s.closing {
 		return arena.ErrClosed
 	}
+	if s.cleanerContinuation != nil && !s.cleanerContinuation.running {
+		return arena.ErrClosed
+	}
 	return s.propagation.open()
 }
 func (s *satSolverClauseLifecycle) pushClause(learned bool, c satStoredClauseRef) error {
+	if e := s.open(); e != nil {
+		return e
+	}
 	if learned {
 		if len(s.learned) == cap(s.learned) {
 			n, bytes, e := satVariableNextCapacity(uint32(cap(s.learned)), uint64(reflect.TypeOf(satStoredClauseRef{}).Size()), 8, uint64(^uint(0)>>1))
@@ -278,6 +285,11 @@ func (s *satSolverClauseLifecycle) Close() error {
 		return nil
 	}
 	s.closing = true
+	if s.cleanerContinuation != nil {
+		if e := s.cleanerContinuation.cleanupInterrupted(); e != nil {
+			return e
+		}
+	}
 	a := s.propagation.clauses
 	for s.closeOriginal < uint32(len(s.original)) {
 		if e := a.Delete(s.original[s.closeOriginal]); e != nil {

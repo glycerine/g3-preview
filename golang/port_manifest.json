@@ -28020,7 +28020,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "selected cell construction/copy/source destruction cpp180–218/360–539; unfinished construction guards and distinct owning abort",
+          "name": "selected cell construction/copy/source destruction cpp180\u2013218/360\u2013539; unfinished construction guards and distinct owning abort",
           "status": "partial",
           "go_target": "mpnum/algebraic_root.go",
           "tests": [
@@ -28033,7 +28033,7 @@
           ]
         },
         {
-          "name": "univariate factor/isolate/sort/index selection cpp541–684; selected dense-input prerequisite, full multivariate constructor and wrappers OPEN",
+          "name": "univariate factor/isolate/sort/index selection cpp541\u2013684; selected dense-input prerequisite, full multivariate constructor and wrappers OPEN",
           "status": "partial",
           "go_target": "mpnum/algebraic_isolation.go",
           "tests": [
@@ -28042,7 +28042,7 @@
           ]
         },
         {
-          "name": "predicates cpp243–335, magnitude/refinement cpp703–781 and saved interval cpp897–929; IsRational temporary-reference lifetime is explicitly adapted",
+          "name": "predicates cpp243\u2013335, magnitude/refinement cpp703\u2013781 and saved interval cpp897\u2013929; IsRational temporary-reference lifetime is explicitly adapted",
           "status": "partial",
           "go_target": "mpnum/algebraic_refinement.go",
           "tests": [
@@ -28051,7 +28051,7 @@
           ]
         },
         {
-          "name": "basic/root/rational dispatch and interval/minimal/refinement/Sturm–Tarski comparison cpp1669–1821/1867–1885",
+          "name": "basic/root/rational dispatch and interval/minimal/refinement/Sturm\u2013Tarski comparison cpp1669\u20131821/1867\u20131885",
           "status": "partial",
           "go_target": "mpnum/algebraic_compare.go",
           "tests": [
@@ -28062,14 +28062,14 @@
         }
       ],
       "ownership": [
-        "RootCore is an explicit prerequisite borrowing actual same-cohort rational/polynomial/factor/binary/interval/runtime allocator services; it does not implement source imp constructor cpp65–126 or fabricate multivariate x/y.",
+        "RootCore is an explicit prerequisite borrowing actual same-cohort rational/polynomial/factor/binary/interval/runtime allocator services; it does not implement source imp constructor cpp65\u2013126 or fabricate multivariate x/y.",
         "Actual scalar cell fields are encoded in real SmallAllocator payloads; pointer-free locator metadata contains no duplicate owning numerals. Coefficients use actual owning typed UPolynomial backing with declared storage extent/initialization adaptation. Caller/vector values, pending construction, lexical rational/predicate intervals, private factor/isolation vectors and comparison sequence remain distinct named roots.",
         "Source Del guards endangered partial construction reads; explicit owning abort drains genuine fields and retains physical cleanup progress. Owning close rejects caller roots instead of sweeping the locator registry."
       ],
       "deviations": [
         "Basic24/root56 byte scalar codec and typed UPolynomial coefficient backing are Go storage adaptations, not claims about C++ sizeof or raw coefficient allocator extents.",
         "External std::sort is adapted to concrete heap sort; comparison/refinement/checkpoint order can differ by backend. Source comparison bodies and errors remain actual.",
-        "IsRational cpp292 passes algebraic_cell* through temporary anum (header366–371) into save_intervals numeral const& (cpp897–929); source reference dangles after construction. The Go lifetime adaptation binds the actual current caller and refreshes its handle after conversion; independent tests cover adapted behavior, not a source-defined dangling-reference result.",
+        "IsRational cpp292 passes algebraic_cell* through temporary anum (header366\u2013371) into save_intervals numeral const& (cpp897\u2013929); source reference dangles after construction. The Go lifetime adaptation binds the actual current caller and refreshes its handle after conversion; independent tests cover adapted behavior, not a source-defined dangling-reference result.",
         "Selected uint32 arithmetic/conversion profile is explicit; full manager construction, multivariate/resultant arithmetic, plugins, printers, and complete header/registered test surfaces remain OPEN."
       ]
     },
@@ -28130,7 +28130,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "selected cell construction/copy/source destruction cpp180–218/360–539; unfinished construction guards and distinct owning abort",
+          "name": "selected cell construction/copy/source destruction cpp180\u2013218/360\u2013539; unfinished construction guards and distinct owning abort",
           "status": "partial",
           "go_target": "mpnum/algebraic_root.go",
           "tests": [
@@ -28143,7 +28143,7 @@
           ]
         },
         {
-          "name": "univariate factor/isolate/sort/index selection cpp541–684; selected dense-input prerequisite, full multivariate constructor and wrappers OPEN",
+          "name": "univariate factor/isolate/sort/index selection cpp541\u2013684; selected dense-input prerequisite, full multivariate constructor and wrappers OPEN",
           "status": "partial",
           "go_target": "mpnum/algebraic_isolation.go",
           "tests": [
@@ -28152,7 +28152,7 @@
           ]
         },
         {
-          "name": "predicates cpp243–335, magnitude/refinement cpp703–781 and saved interval cpp897–929; IsRational temporary-reference lifetime is explicitly adapted",
+          "name": "predicates cpp243\u2013335, magnitude/refinement cpp703\u2013781 and saved interval cpp897\u2013929; IsRational temporary-reference lifetime is explicitly adapted",
           "status": "partial",
           "go_target": "mpnum/algebraic_refinement.go",
           "tests": [
@@ -28161,7 +28161,7 @@
           ]
         },
         {
-          "name": "basic/root/rational dispatch and interval/minimal/refinement/Sturm–Tarski comparison cpp1669–1821/1867–1885",
+          "name": "basic/root/rational dispatch and interval/minimal/refinement/Sturm\u2013Tarski comparison cpp1669\u20131821/1867\u20131885",
           "status": "partial",
           "go_target": "mpnum/algebraic_compare.go",
           "tests": [
@@ -28172,14 +28172,14 @@
         }
       ],
       "ownership": [
-        "RootCore is an explicit prerequisite borrowing actual same-cohort rational/polynomial/factor/binary/interval/runtime allocator services; it does not implement source imp constructor cpp65–126 or fabricate multivariate x/y.",
+        "RootCore is an explicit prerequisite borrowing actual same-cohort rational/polynomial/factor/binary/interval/runtime allocator services; it does not implement source imp constructor cpp65\u2013126 or fabricate multivariate x/y.",
         "Actual scalar cell fields are encoded in real SmallAllocator payloads; pointer-free locator metadata contains no duplicate owning numerals. Coefficients use actual owning typed UPolynomial backing with declared storage extent/initialization adaptation. Caller/vector values, pending construction, lexical rational/predicate intervals, private factor/isolation vectors and comparison sequence remain distinct named roots.",
         "Source Del guards endangered partial construction reads; explicit owning abort drains genuine fields and retains physical cleanup progress. Owning close rejects caller roots instead of sweeping the locator registry."
       ],
       "deviations": [
         "Basic24/root56 byte scalar codec and typed UPolynomial coefficient backing are Go storage adaptations, not claims about C++ sizeof or raw coefficient allocator extents.",
         "External std::sort is adapted to concrete heap sort; comparison/refinement/checkpoint order can differ by backend. Source comparison bodies and errors remain actual.",
-        "IsRational cpp292 passes algebraic_cell* through temporary anum (header366–371) into save_intervals numeral const& (cpp897–929); source reference dangles after construction. The Go lifetime adaptation binds the actual current caller and refreshes its handle after conversion; independent tests cover adapted behavior, not a source-defined dangling-reference result.",
+        "IsRational cpp292 passes algebraic_cell* through temporary anum (header366\u2013371) into save_intervals numeral const& (cpp897\u2013929); source reference dangles after construction. The Go lifetime adaptation binds the actual current caller and refreshes its handle after conversion; independent tests cover adapted behavior, not a source-defined dangling-reference result.",
         "Selected uint32 arithmetic/conversion profile is explicit; full manager construction, multivariate/resultant arithmetic, plugins, printers, and complete header/registered test surfaces remain OPEN."
       ]
     },
@@ -29639,7 +29639,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Standalone monomial Lex, LexWithMinimum, GradedLex, ReverseLexRange, ReverseLex, GradedReverseLex source algorithms (cpp609–764), source reference guards, size/variable reads and reached-only degree reads",
+          "name": "Standalone monomial Lex, LexWithMinimum, GradedLex, ReverseLexRange, ReverseLex, GradedReverseLex source algorithms (cpp609\u2013764), source reference guards, size/variable reads and reached-only degree reads",
           "status": "ported",
           "go_target": "mpnum/polynomial_monomial_order.go",
           "tests": [
@@ -29656,7 +29656,7 @@
           "status": "unported"
         },
         {
-          "name": "monomial2pos cpp456–499 Get/Reset/Set and concrete borrowed monomial-array template loops, actual unsigned Runtime vector member",
+          "name": "monomial2pos cpp456\u2013499 Get/Reset/Set and concrete borrowed monomial-array template loops, actual unsigned Runtime vector member",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_positions.go",
           "tests": [
@@ -29671,7 +29671,7 @@
           ]
         },
         {
-          "name": "power product scalar fields and algorithms cpp92–154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
+          "name": "power product scalar fields and algorithms cpp92\u2013154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_tmp.go",
           "tests": [
@@ -29707,7 +29707,7 @@
           ]
         },
         {
-          "name": "power product scalar fields and algorithms cpp92–154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
+          "name": "power product scalar fields and algorithms cpp92\u2013154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_query.go",
           "tests": [
@@ -29743,7 +29743,7 @@
           ]
         },
         {
-          "name": "power product scalar fields and algorithms cpp92–154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
+          "name": "power product scalar fields and algorithms cpp92\u2013154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_ops.go",
           "tests": [
@@ -29779,7 +29779,7 @@
           ]
         },
         {
-          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156–234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
+          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156\u2013234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial.go",
           "tests": [
@@ -29815,7 +29815,7 @@
           ]
         },
         {
-          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156–234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
+          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156\u2013234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_factory.go",
           "tests": [
@@ -29851,7 +29851,7 @@
           ]
         },
         {
-          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156–234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
+          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156\u2013234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_table.go",
           "tests": [
@@ -29887,7 +29887,7 @@
           ]
         },
         {
-          "name": "max/search/is_valid/square queries cpp236–375: PARTIAL precise malformed-field reads: several queries read whole header eagerly. IsValid raw sorted-vars then degree-sum then stored-degree read corrected; source source small-vs-large search branch/results preserved.",
+          "name": "max/search/is_valid/square queries cpp236\u2013375: PARTIAL precise malformed-field reads: several queries read whole header eagerly. IsValid raw sorted-vars then degree-sum then stored-degree read corrected; source source small-vs-large search branch/results preserved.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_query.go",
           "tests": [
@@ -29923,7 +29923,7 @@
           ]
         },
         {
-          "name": "ordinary/SMT2 displays and rename cpp378–445: PARTIAL cold borrowed output sink substitutes external ostream/display_var_proc. Exact canonical text includes unconditional SMT2 final parenthesis. Eager header/field reads on partial malformed records remain open. In-place heapsort is external std::sort backend adaptation, canonical unique-variable result order only.",
+          "name": "ordinary/SMT2 displays and rename cpp378\u2013445: PARTIAL cold borrowed output sink substitutes external ostream/display_var_proc. Exact canonical text includes unconditional SMT2 final parenthesis. Eager header/field reads on partial malformed records remain open. In-place heapsort is external std::sort backend adaptation, canonical unique-variable result order only.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_display.go",
           "tests": [
@@ -29959,7 +29959,7 @@
           ]
         },
         {
-          "name": "ordinary/SMT2 displays and rename cpp378–445: PARTIAL cold borrowed output sink substitutes external ostream/display_var_proc. Exact canonical text includes unconditional SMT2 final parenthesis. Eager header/field reads on partial malformed records remain open. In-place heapsort is external std::sort backend adaptation, canonical unique-variable result order only.",
+          "name": "ordinary/SMT2 displays and rename cpp378\u2013445: PARTIAL cold borrowed output sink substitutes external ostream/display_var_proc. Exact canonical text includes unconditional SMT2 final parenthesis. Eager header/field reads on partial malformed records remain open. In-place heapsort is external std::sort backend adaptation, canonical unique-variable result order only.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_rename.go",
           "tests": [
@@ -29995,7 +29995,7 @@
           ]
         },
         {
-          "name": "tmp_monomial cpp507–604: Real raw capacity128 source constructor and free-before-grow/copy-before-free paths. Source-only destructor versus explicit pending cleanup distinct; completed postphysical free acknowledged separately from genuine missing pointer hole.",
+          "name": "tmp_monomial cpp507\u2013604: Real raw capacity128 source constructor and free-before-grow/copy-before-free paths. Source-only destructor versus explicit pending cleanup distinct; completed postphysical free acknowledged separately from genuine missing pointer hole.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_tmp.go",
           "tests": [
@@ -30031,7 +30031,7 @@
           ]
         },
         {
-          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765–918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
+          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765\u2013918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial.go",
           "tests": [
@@ -30067,7 +30067,7 @@
           ]
         },
         {
-          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765–918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
+          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765\u2013918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_factory.go",
           "tests": [
@@ -30103,7 +30103,7 @@
           ]
         },
         {
-          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765–918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
+          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765\u2013918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_lifetime.go",
           "tests": [
@@ -30139,7 +30139,7 @@
           ]
         },
         {
-          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765–918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
+          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765\u2013918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_vector.go",
           "tests": [
@@ -30175,7 +30175,7 @@
           ]
         },
         {
-          "name": "mul, divides/divide, gcd, unify, power/sqrt/variable division/derivative cpp919–1268: Actual temp merge and source reversed GCD remainder reserve quirks preserved. Cached/power degree source assertions preserved on canonical inputs; some partial-record field-read profiles beyond corrected validity/degree helpers remain OPEN. No independent multivariate polynomial substitute.",
+          "name": "mul, divides/divide, gcd, unify, power/sqrt/variable division/derivative cpp919\u20131268: Actual temp merge and source reversed GCD remainder reserve quirks preserved. Cached/power degree source assertions preserved on canonical inputs; some partial-record field-read profiles beyond corrected validity/degree helpers remain OPEN. No independent multivariate polynomial substitute.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_ops.go",
           "tests": [
@@ -30211,7 +30211,7 @@
           ]
         },
         {
-          "name": "manager Rename cpp1270–1292: Actual DEBUG permutation vector lexical destruction then new chashtable, old bucket/list traversal, each monomial mutation/hash before source preinsert DEBUG contains and insert; swap only at actual end. Heap-sort backend adapter does not claim C++ comparator call sequence. Stopped physical/table roots retain explicit owning cleanup without restoring hashes.",
+          "name": "manager Rename cpp1270\u20131292: Actual DEBUG permutation vector lexical destruction then new chashtable, old bucket/list traversal, each monomial mutation/hash before source preinsert DEBUG contains and insert; swap only at actual end. Heap-sort backend adapter does not claim C++ comparator call sequence. Stopped physical/table roots retain explicit owning cleanup without restoring hashes.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_rename.go",
           "tests": [
@@ -30247,7 +30247,7 @@
           ]
         },
         {
-          "name": "Selected monomial SIZE/VAR/DEG-only reached queries cpp236–375,423–437 with actual get_power DEBUG reference guards",
+          "name": "Selected monomial SIZE/VAR/DEG-only reached queries cpp236\u2013375,423\u2013437 with actual get_power DEBUG reference guards",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_query.go",
           "tests": [
@@ -30268,7 +30268,7 @@
           ]
         },
         {
-          "name": "Selected ordinary and SMT2 display field/callback publication and repeated loop SIZE lifetime guards cpp378–416",
+          "name": "Selected ordinary and SMT2 display field/callback publication and repeated loop SIZE lifetime guards cpp378\u2013416",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_display.go",
           "tests": [
@@ -30289,7 +30289,7 @@
           ]
         },
         {
-          "name": "Selected monomial rename VAR-only mutation before sort/hash cpp439–445; declared concrete heapsort adaptation preserved",
+          "name": "Selected monomial rename VAR-only mutation before sort/hash cpp439\u2013445; declared concrete heapsort adaptation preserved",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_rename.go",
           "tests": [
@@ -30310,7 +30310,7 @@
           ]
         },
         {
-          "name": "Selected raw monomial merge/division/GCD copy branches and sqrt/remove/derivative reached-field reads cpp919–1268",
+          "name": "Selected raw monomial merge/division/GCD copy branches and sqrt/remove/derivative reached-field reads cpp919\u20131268",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_ops.go",
           "tests": [
@@ -30456,7 +30456,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Standalone monomial Lex, LexWithMinimum, GradedLex, ReverseLexRange, ReverseLex, GradedReverseLex source algorithms (cpp609–764), source reference guards, size/variable reads and reached-only degree reads",
+          "name": "Standalone monomial Lex, LexWithMinimum, GradedLex, ReverseLexRange, ReverseLex, GradedReverseLex source algorithms (cpp609\u2013764), source reference guards, size/variable reads and reached-only degree reads",
           "status": "ported",
           "go_target": "mpnum/polynomial_monomial_order.go",
           "tests": [
@@ -30473,7 +30473,7 @@
           "status": "unported"
         },
         {
-          "name": "monomial2pos cpp456–499 Get/Reset/Set and concrete borrowed monomial-array template loops, actual unsigned Runtime vector member",
+          "name": "monomial2pos cpp456\u2013499 Get/Reset/Set and concrete borrowed monomial-array template loops, actual unsigned Runtime vector member",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_positions.go",
           "tests": [
@@ -30488,7 +30488,7 @@
           ]
         },
         {
-          "name": "power product scalar fields and algorithms cpp92–154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
+          "name": "power product scalar fields and algorithms cpp92\u2013154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_tmp.go",
           "tests": [
@@ -30524,7 +30524,7 @@
           ]
         },
         {
-          "name": "power product scalar fields and algorithms cpp92–154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
+          "name": "power product scalar fields and algorithms cpp92\u2013154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_query.go",
           "tests": [
@@ -30560,7 +30560,7 @@
           ]
         },
         {
-          "name": "power product scalar fields and algorithms cpp92–154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
+          "name": "power product scalar fields and algorithms cpp92\u2013154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_ops.go",
           "tests": [
@@ -30596,7 +30596,7 @@
           ]
         },
         {
-          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156–234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
+          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156\u2013234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial.go",
           "tests": [
@@ -30632,7 +30632,7 @@
           ]
         },
         {
-          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156–234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
+          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156\u2013234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_factory.go",
           "tests": [
@@ -30668,7 +30668,7 @@
           ]
         },
         {
-          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156–234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
+          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156\u2013234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_table.go",
           "tests": [
@@ -30704,7 +30704,7 @@
           ]
         },
         {
-          "name": "max/search/is_valid/square queries cpp236–375: PARTIAL precise malformed-field reads: several queries read whole header eagerly. IsValid raw sorted-vars then degree-sum then stored-degree read corrected; source source small-vs-large search branch/results preserved.",
+          "name": "max/search/is_valid/square queries cpp236\u2013375: PARTIAL precise malformed-field reads: several queries read whole header eagerly. IsValid raw sorted-vars then degree-sum then stored-degree read corrected; source source small-vs-large search branch/results preserved.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_query.go",
           "tests": [
@@ -30740,7 +30740,7 @@
           ]
         },
         {
-          "name": "ordinary/SMT2 displays and rename cpp378–445: PARTIAL cold borrowed output sink substitutes external ostream/display_var_proc. Exact canonical text includes unconditional SMT2 final parenthesis. Eager header/field reads on partial malformed records remain open. In-place heapsort is external std::sort backend adaptation, canonical unique-variable result order only.",
+          "name": "ordinary/SMT2 displays and rename cpp378\u2013445: PARTIAL cold borrowed output sink substitutes external ostream/display_var_proc. Exact canonical text includes unconditional SMT2 final parenthesis. Eager header/field reads on partial malformed records remain open. In-place heapsort is external std::sort backend adaptation, canonical unique-variable result order only.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_display.go",
           "tests": [
@@ -30776,7 +30776,7 @@
           ]
         },
         {
-          "name": "ordinary/SMT2 displays and rename cpp378–445: PARTIAL cold borrowed output sink substitutes external ostream/display_var_proc. Exact canonical text includes unconditional SMT2 final parenthesis. Eager header/field reads on partial malformed records remain open. In-place heapsort is external std::sort backend adaptation, canonical unique-variable result order only.",
+          "name": "ordinary/SMT2 displays and rename cpp378\u2013445: PARTIAL cold borrowed output sink substitutes external ostream/display_var_proc. Exact canonical text includes unconditional SMT2 final parenthesis. Eager header/field reads on partial malformed records remain open. In-place heapsort is external std::sort backend adaptation, canonical unique-variable result order only.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_rename.go",
           "tests": [
@@ -30812,7 +30812,7 @@
           ]
         },
         {
-          "name": "tmp_monomial cpp507–604: Real raw capacity128 source constructor and free-before-grow/copy-before-free paths. Source-only destructor versus explicit pending cleanup distinct; completed postphysical free acknowledged separately from genuine missing pointer hole.",
+          "name": "tmp_monomial cpp507\u2013604: Real raw capacity128 source constructor and free-before-grow/copy-before-free paths. Source-only destructor versus explicit pending cleanup distinct; completed postphysical free acknowledged separately from genuine missing pointer hole.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_tmp.go",
           "tests": [
@@ -30848,7 +30848,7 @@
           ]
         },
         {
-          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765–918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
+          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765\u2013918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial.go",
           "tests": [
@@ -30884,7 +30884,7 @@
           ]
         },
         {
-          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765–918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
+          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765\u2013918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_factory.go",
           "tests": [
@@ -30920,7 +30920,7 @@
           ]
         },
         {
-          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765–918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
+          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765\u2013918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_lifetime.go",
           "tests": [
@@ -30956,7 +30956,7 @@
           ]
         },
         {
-          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765–918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
+          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765\u2013918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_vector.go",
           "tests": [
@@ -30992,7 +30992,7 @@
           ]
         },
         {
-          "name": "mul, divides/divide, gcd, unify, power/sqrt/variable division/derivative cpp919–1268: Actual temp merge and source reversed GCD remainder reserve quirks preserved. Cached/power degree source assertions preserved on canonical inputs; some partial-record field-read profiles beyond corrected validity/degree helpers remain OPEN. No independent multivariate polynomial substitute.",
+          "name": "mul, divides/divide, gcd, unify, power/sqrt/variable division/derivative cpp919\u20131268: Actual temp merge and source reversed GCD remainder reserve quirks preserved. Cached/power degree source assertions preserved on canonical inputs; some partial-record field-read profiles beyond corrected validity/degree helpers remain OPEN. No independent multivariate polynomial substitute.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_ops.go",
           "tests": [
@@ -31028,7 +31028,7 @@
           ]
         },
         {
-          "name": "manager Rename cpp1270–1292: Actual DEBUG permutation vector lexical destruction then new chashtable, old bucket/list traversal, each monomial mutation/hash before source preinsert DEBUG contains and insert; swap only at actual end. Heap-sort backend adapter does not claim C++ comparator call sequence. Stopped physical/table roots retain explicit owning cleanup without restoring hashes.",
+          "name": "manager Rename cpp1270\u20131292: Actual DEBUG permutation vector lexical destruction then new chashtable, old bucket/list traversal, each monomial mutation/hash before source preinsert DEBUG contains and insert; swap only at actual end. Heap-sort backend adapter does not claim C++ comparator call sequence. Stopped physical/table roots retain explicit owning cleanup without restoring hashes.",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_rename.go",
           "tests": [
@@ -31064,7 +31064,7 @@
           ]
         },
         {
-          "name": "Selected monomial SIZE/VAR/DEG-only reached queries cpp236–375,423–437 with actual get_power DEBUG reference guards",
+          "name": "Selected monomial SIZE/VAR/DEG-only reached queries cpp236\u2013375,423\u2013437 with actual get_power DEBUG reference guards",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_query.go",
           "tests": [
@@ -31085,7 +31085,7 @@
           ]
         },
         {
-          "name": "Selected ordinary and SMT2 display field/callback publication and repeated loop SIZE lifetime guards cpp378–416",
+          "name": "Selected ordinary and SMT2 display field/callback publication and repeated loop SIZE lifetime guards cpp378\u2013416",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_display.go",
           "tests": [
@@ -31106,7 +31106,7 @@
           ]
         },
         {
-          "name": "Selected monomial rename VAR-only mutation before sort/hash cpp439–445; declared concrete heapsort adaptation preserved",
+          "name": "Selected monomial rename VAR-only mutation before sort/hash cpp439\u2013445; declared concrete heapsort adaptation preserved",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_rename.go",
           "tests": [
@@ -31127,7 +31127,7 @@
           ]
         },
         {
-          "name": "Selected raw monomial merge/division/GCD copy branches and sqrt/remove/derivative reached-field reads cpp919–1268",
+          "name": "Selected raw monomial merge/division/GCD copy branches and sqrt/remove/derivative reached-field reads cpp919\u20131268",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_ops.go",
           "tests": [
@@ -53299,9 +53299,27 @@
       "path": "src/sat/sat_cleaner.cpp",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_cleaner.go",
+        "sat_cleaner_clauses.go",
+        "sat_cleaner_test.go",
+        "sat_cleaner_model_test.go",
+        "sat_solver_clause_lifecycle.go"
+      ],
+      "tests": [
+        "TestSATCleanerSourceExitsAndSoleCost",
+        "TestSATCleanerFrozenAndActiveClauseRoutes",
+        "TestSATCleanerSatisfiedOrderingAndCostWrap",
+        "TestSATCleanerConstructorAndStatistics",
+        "TestSATCleanerDeletionThenAttachRefusalRetainsRanges",
+        "TestSATCleanerEveryAllocationPrefixAndOutputs",
+        "TestSATCleanerFiniteWatchMatrix",
+        "TestSATCleanerWrapperSourceGuards",
+        "TestSATCleanerCapturedTrailBeforePropagationAndWarm",
+        "TestSATCleanerFiniteFormulaOracle",
+        "TestSATCleanerStoppedLedgerRejectsNewOwningPublication"
+      ],
       "assertions": [
         {
           "line": 45,
@@ -53338,17 +53356,58 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Selected constructor, statistics, watch/clause cleanup and force/cost/trail operator source routes",
+          "status": "partial",
+          "go_target": "sat_cleaner.go",
+          "tests": [
+            "TestSATCleanerSourceExitsAndSoleCost",
+            "TestSATCleanerFrozenAndActiveClauseRoutes",
+            "TestSATCleanerSatisfiedOrderingAndCostWrap",
+            "TestSATCleanerConstructorAndStatistics",
+            "TestSATCleanerDeletionThenAttachRefusalRetainsRanges",
+            "TestSATCleanerEveryAllocationPrefixAndOutputs",
+            "TestSATCleanerFiniteWatchMatrix",
+            "TestSATCleanerWrapperSourceGuards",
+            "TestSATCleanerCapturedTrailBeforePropagationAndWarm",
+            "TestSATCleanerFiniteFormulaOracle",
+            "TestSATCleanerStoppedLedgerRejectsNewOwningPublication"
+          ]
+        }
+      ],
+      "ownership": [
+        "Caller abort/Close is distinct from source set_end. Actual graph names prefix[drainPrefix:out] plus unread[max(cursor,drainSuffix):end], unaffected other vector and raw candidate. No backing/counter repairs. Physical census compares named references to live allocator descriptors, full cold/vector/arena/Runtime bytes exactly once before fault disable."
+      ],
+      "deviations": [
+        "Actual enabled cleaner_bug and propagation-wrapper sat_propagate/sat_missed_prop diagnostics, EXT dispatch and verbose/TRACE remain open. Explicit owning interruption ledger retains actual prefix/unread suffix; stopped publication guard prevents new roots outside the captured range. No whole solver or registered assertion completion credit."
+      ]
     },
     {
       "path": "src/sat/sat_cleaner.h",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_cleaner.go",
+        "sat_cleaner_clauses.go",
+        "sat_cleaner_test.go",
+        "sat_cleaner_model_test.go",
+        "sat_solver_clause_lifecycle.go"
+      ],
+      "tests": [
+        "TestSATCleanerSourceExitsAndSoleCost",
+        "TestSATCleanerFrozenAndActiveClauseRoutes",
+        "TestSATCleanerSatisfiedOrderingAndCostWrap",
+        "TestSATCleanerConstructorAndStatistics",
+        "TestSATCleanerDeletionThenAttachRefusalRetainsRanges",
+        "TestSATCleanerEveryAllocationPrefixAndOutputs",
+        "TestSATCleanerFiniteWatchMatrix",
+        "TestSATCleanerWrapperSourceGuards",
+        "TestSATCleanerCapturedTrailBeforePropagationAndWarm",
+        "TestSATCleanerFiniteFormulaOracle",
+        "TestSATCleanerStoppedLedgerRejectsNewOwningPublication"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -53361,9 +53420,32 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Selected constructor, statistics, watch/clause cleanup and force/cost/trail operator source routes",
+          "status": "partial",
+          "go_target": "sat_cleaner.go",
+          "tests": [
+            "TestSATCleanerSourceExitsAndSoleCost",
+            "TestSATCleanerFrozenAndActiveClauseRoutes",
+            "TestSATCleanerSatisfiedOrderingAndCostWrap",
+            "TestSATCleanerConstructorAndStatistics",
+            "TestSATCleanerDeletionThenAttachRefusalRetainsRanges",
+            "TestSATCleanerEveryAllocationPrefixAndOutputs",
+            "TestSATCleanerFiniteWatchMatrix",
+            "TestSATCleanerWrapperSourceGuards",
+            "TestSATCleanerCapturedTrailBeforePropagationAndWarm",
+            "TestSATCleanerFiniteFormulaOracle",
+            "TestSATCleanerStoppedLedgerRejectsNewOwningPublication"
+          ]
+        }
+      ],
+      "ownership": [
+        "Caller abort/Close is distinct from source set_end. Actual graph names prefix[drainPrefix:out] plus unread[max(cursor,drainSuffix):end], unaffected other vector and raw candidate. No backing/counter repairs. Physical census compares named references to live allocator descriptors, full cold/vector/arena/Runtime bytes exactly once before fault disable."
+      ],
+      "deviations": [
+        "Actual enabled cleaner_bug and propagation-wrapper sat_propagate/sat_missed_prop diagnostics, EXT dispatch and verbose/TRACE remain open. Explicit owning interruption ledger retains actual prefix/unread suffix; stopped publication guard prevents new roots outside the captured range. No whole solver or registered assertion completion credit."
+      ]
     },
     {
       "path": "src/sat/sat_config.cpp",
@@ -55550,7 +55632,7 @@
           ]
         },
         {
-          "name": "visited state; mark_all_but/unmark_all; min-occurrence, subsumption and collectors; resolve (selected source123,319–420,460–531,1177–1215)",
+          "name": "visited state; mark_all_but/unmark_all; min-occurrence, subsumption and collectors; resolve (selected source123,319\u2013420,460\u2013531,1177\u20131215)",
           "status": "ported",
           "go_target": "sat_solver_simplifier_kernel.go",
           "tests": [
@@ -55666,7 +55748,7 @@
           ]
         },
         {
-          "name": "visited state; mark_all_but/unmark_all; min-occurrence, subsumption and collectors; resolve (selected source123,319–420,460–531,1177–1215)",
+          "name": "visited state; mark_all_but/unmark_all; min-occurrence, subsumption and collectors; resolve (selected source123,319\u2013420,460\u2013531,1177\u20131215)",
           "status": "ported",
           "go_target": "sat_solver_simplifier_kernel.go",
           "tests": [
@@ -55804,7 +55886,11 @@
         "sat_solver_conflict_assumptions.go",
         "sat_solver_conflict_span.go",
         "sat_solver_conflict_resolution_test.go",
-        "sat_solver_conflict_model_test.go"
+        "sat_solver_conflict_model_test.go",
+        "sat_cleaner.go",
+        "sat_cleaner_clauses.go",
+        "sat_cleaner_test.go",
+        "sat_cleaner_model_test.go"
       ],
       "tests": [
         "TestSATSolverClauseCoreFiniteSimplification",
@@ -55940,7 +56026,18 @@
         "TestSATSolverConflictClauseReasonBothWatchedPositions",
         "TestSATSolverConflictFiniteImplicationOracle",
         "TestSATSolverConflictInitAndOptionalDispatchPrefixes",
-        "TestSATSolverConflictStaleSpanRetainsAllocatedCandidate"
+        "TestSATSolverConflictStaleSpanRetainsAllocatedCandidate",
+        "TestSATCleanerSourceExitsAndSoleCost",
+        "TestSATCleanerFrozenAndActiveClauseRoutes",
+        "TestSATCleanerSatisfiedOrderingAndCostWrap",
+        "TestSATCleanerConstructorAndStatistics",
+        "TestSATCleanerDeletionThenAttachRefusalRetainsRanges",
+        "TestSATCleanerEveryAllocationPrefixAndOutputs",
+        "TestSATCleanerFiniteWatchMatrix",
+        "TestSATCleanerWrapperSourceGuards",
+        "TestSATCleanerCapturedTrailBeforePropagationAndWarm",
+        "TestSATCleanerFiniteFormulaOracle",
+        "TestSATCleanerStoppedLedgerRejectsNewOwningPublication"
       ],
       "conditionals": [
         {
@@ -56378,7 +56475,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "simplify_clause_core and scope dispatch; select_watch_lit; select_learned_watch_lit (source367–465)",
+          "name": "simplify_clause_core and scope dispatch; select_watch_lit; select_learned_watch_lit (source367\u2013465)",
           "status": "ported",
           "go_target": "sat_solver_clause_core.go",
           "tests": [
@@ -56390,7 +56487,7 @@
           ]
         },
         {
-          "name": "Complete source135–160 MkVar body on actual variable columns/watch lists/activity/queue and borrowed elimination todo",
+          "name": "Complete source135\u2013160 MkVar body on actual variable columns/watch lists/activity/queue and borrowed elimination todo",
           "status": "ported",
           "go_target": "sat_solver_variable_state.go",
           "tests": [
@@ -56435,7 +56532,7 @@
           ]
         },
         {
-          "name": "num_diff_levels source2218–2238 on borrowed literal spans and actual clause storage; same reserve/mark/reset body and source DEBUG assignment assertion",
+          "name": "num_diff_levels source2218\u20132238 on borrowed literal spans and actual clause storage; same reserve/mark/reset body and source DEBUG assignment assertion",
           "status": "ported",
           "go_target": "sat_solver_propagation_control.go",
           "tests": [
@@ -56446,7 +56543,7 @@
           ]
         },
         {
-          "name": "Source185–345/463–493 null-extension clause creation/attach/detach with actual candidate ownership, then2531–2616 push/pop/unassign/reinit; extension, PopReinit and full solver remain open",
+          "name": "Source185\u2013345/463\u2013493 null-extension clause creation/attach/detach with actual candidate ownership, then2531\u20132616 push/pop/unassign/reinit; extension, PopReinit and full solver remain open",
           "status": "partial",
           "go_target": "sat_solver_clause_lifecycle.go",
           "tests": [
@@ -56546,7 +56643,7 @@
           ]
         },
         {
-          "name": "dyn_sub_res cpp2408–2522 captured watch/cache iteration, binary/ternary short circuits, FUIP/ascending compaction/stat publication",
+          "name": "dyn_sub_res cpp2408\u20132522 captured watch/cache iteration, binary/ternary short circuits, FUIP/ascending compaction/stat publication",
           "status": "ported",
           "go_target": "sat_solver_dynamic_subsumption.go",
           "tests": [
@@ -56585,7 +56682,7 @@
           ]
         },
         {
-          "name": "Actual conditional is_unit/is_empty/check_missed_propagation cpp3022–3074 with original/learned clause roots and27 lbool states",
+          "name": "Actual conditional is_unit/is_empty/check_missed_propagation cpp3022\u20133074 with original/learned clause roots and27 lbool states",
           "status": "ported",
           "go_target": "sat_solver_probing_diagnostics.go",
           "tests": [
@@ -56624,7 +56721,7 @@
           ]
         },
         {
-          "name": "Selected FIRST-UIP resolve_conflict/core cpp1675–1820: actual mark/trail/lemma/minimize/dyn-sub pipeline, glue before pop, counters and phase publication; real EXT and complete search remain open",
+          "name": "Selected FIRST-UIP resolve_conflict/core cpp1675\u20131820: actual mark/trail/lemma/minimize/dyn-sub pipeline, glue before pop, counters and phase publication; real EXT and complete search remain open",
           "status": "partial",
           "go_target": "sat_solver_conflict_resolution.go",
           "tests": [
@@ -56641,7 +56738,7 @@
           ]
         },
         {
-          "name": "Selected max-level, antecedent, trail, phase and init/core reason helpers cpp2091–2219: reached clause c0/c1 and source mark/activity-before-push order; EXT dispatch remains explicit missing binding",
+          "name": "Selected max-level, antecedent, trail, phase and init/core reason helpers cpp2091\u20132219: reached clause c0/c1 and source mark/activity-before-push order; EXT dispatch remains explicit missing binding",
           "status": "partial",
           "go_target": "sat_solver_conflict_helpers.go",
           "tests": [
@@ -56658,7 +56755,7 @@
           ]
         },
         {
-          "name": "Selected actual assumption/core/init/reinit helpers cpp1822–2087 and pop→exchange→reinit cpp2545–2549; nonnull parallel/MUS dispatch explicitly unported",
+          "name": "Selected actual assumption/core/init/reinit helpers cpp1822\u20132087 and pop\u2192exchange\u2192reinit cpp2545\u20132549; nonnull parallel/MUS dispatch explicitly unported",
           "status": "partial",
           "go_target": "sat_solver_conflict_assumptions.go",
           "tests": [
@@ -56690,6 +56787,24 @@
             "TestSATSolverConflictInitAndOptionalDispatchPrefixes",
             "TestSATSolverConflictStaleSpanRetainsAllocatedCandidate"
           ]
+        },
+        {
+          "name": "cleanup scope/inconsistent guards and default cleaner dispatch; EXT notification remains explicit missing binding",
+          "status": "partial",
+          "go_target": "sat_cleaner.go",
+          "tests": [
+            "TestSATCleanerSourceExitsAndSoleCost",
+            "TestSATCleanerFrozenAndActiveClauseRoutes",
+            "TestSATCleanerSatisfiedOrderingAndCostWrap",
+            "TestSATCleanerConstructorAndStatistics",
+            "TestSATCleanerDeletionThenAttachRefusalRetainsRanges",
+            "TestSATCleanerEveryAllocationPrefixAndOutputs",
+            "TestSATCleanerFiniteWatchMatrix",
+            "TestSATCleanerWrapperSourceGuards",
+            "TestSATCleanerCapturedTrailBeforePropagationAndWarm",
+            "TestSATCleanerFiniteFormulaOracle",
+            "TestSATCleanerStoppedLedgerRejectsNewOwningPublication"
+          ]
         }
       ],
       "ownership": [
@@ -56697,7 +56812,8 @@
         "Source-width char assignment and scalar columns; charged outer watch tokens/metadata own each actual child once; real activity/queue/trail, borrowed actual todo. No complete solver construction or search.",
         "Assignment bytes and initialization state are owned solely by the borrowed real Runtime, with source vector capacity/size headers and explicit block/pending tokens; enclosing variable owner charges embedded metadata. Variable graph Stats exclude borrowed runtime, which physical audits add exactly once. Runtime must outlive variable/propagation owners, which require the same actual Runtime identity.",
         "Selected probing/dynamic bodies borrow real propagation/lifecycle owners and separate literalMark. Source assigned-set size publication precedes default false writes; membership mark precedes list push; values precede membership reset/finalize, and successful explicit finalize permits next round without counter repair. Failed ordinal roots and marks are inspected before faults are disabled. No independent solver counter or assignment mirror is created.",
-        "Selected conflict owner charges actual cold fields once and borrows existing analysis/dynamic/probing/lifecycle/Runtime; owns actual Runtime assumption/core/literal-set members. Glue and clause consumers read captured lemma blocks directly. Constructor-read errors retain the actually allocated clause/ID in lifecycle pendingCandidate before return. Every real refusal prefix is rooted before fault disable; no host lemma copy or directory-derived owner roots."
+        "Selected conflict owner charges actual cold fields once and borrows existing analysis/dynamic/probing/lifecycle/Runtime; owns actual Runtime assumption/core/literal-set members. Glue and clause consumers read captured lemma blocks directly. Constructor-read errors retain the actually allocated clause/ID in lifecycle pendingCandidate before return. Every real refusal prefix is rooted before fault disable; no host lemma copy or directory-derived owner roots.",
+        "Cleaner interruption continuation is charged in the lifecycle header; owning Close drains only retained prefix and unread suffix with actual cursors. Source callbacks run while active; stopped lifecycle and direct pushClause reject later owning publication."
       ],
       "deviations": [
         "Concrete allocation-free heapsort replaces std::sort on scalar literals. TRACE, solver construction, BCP, conflicts, search, scopes and remaining methods are unported.",
@@ -56891,7 +57007,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Complete source135–160 MkVar body on actual variable columns/watch lists/activity/queue and borrowed elimination todo",
+          "name": "Complete source135\u2013160 MkVar body on actual variable columns/watch lists/activity/queue and borrowed elimination todo",
           "status": "ported",
           "go_target": "sat_solver_variable_state.go",
           "tests": [
@@ -56936,7 +57052,7 @@
           ]
         },
         {
-          "name": "num_diff_levels source2218–2238 on borrowed literal spans and actual clause storage; same reserve/mark/reset body and source DEBUG assignment assertion",
+          "name": "num_diff_levels source2218\u20132238 on borrowed literal spans and actual clause storage; same reserve/mark/reset body and source DEBUG assignment assertion",
           "status": "ported",
           "go_target": "sat_solver_propagation_control.go",
           "tests": [
@@ -56947,7 +57063,7 @@
           ]
         },
         {
-          "name": "Source185–345/463–493 null-extension clause creation/attach/detach with actual candidate ownership, then2531–2616 push/pop/unassign/reinit; extension, PopReinit and full solver remain open",
+          "name": "Source185\u2013345/463\u2013493 null-extension clause creation/attach/detach with actual candidate ownership, then2531\u20132616 push/pop/unassign/reinit; extension, PopReinit and full solver remain open",
           "status": "partial",
           "go_target": "sat_solver_clause_lifecycle.go",
           "tests": [
@@ -57047,7 +57163,7 @@
           ]
         },
         {
-          "name": "Selected FIRST-UIP resolve_conflict/core cpp1675–1820: actual mark/trail/lemma/minimize/dyn-sub pipeline, glue before pop, counters and phase publication; real EXT and complete search remain open",
+          "name": "Selected FIRST-UIP resolve_conflict/core cpp1675\u20131820: actual mark/trail/lemma/minimize/dyn-sub pipeline, glue before pop, counters and phase publication; real EXT and complete search remain open",
           "status": "partial",
           "go_target": "sat_solver_conflict_resolution.go",
           "tests": [
@@ -57064,7 +57180,7 @@
           ]
         },
         {
-          "name": "Selected max-level, antecedent, trail, phase and init/core reason helpers cpp2091–2219: reached clause c0/c1 and source mark/activity-before-push order; EXT dispatch remains explicit missing binding",
+          "name": "Selected max-level, antecedent, trail, phase and init/core reason helpers cpp2091\u20132219: reached clause c0/c1 and source mark/activity-before-push order; EXT dispatch remains explicit missing binding",
           "status": "partial",
           "go_target": "sat_solver_conflict_helpers.go",
           "tests": [
@@ -57081,7 +57197,7 @@
           ]
         },
         {
-          "name": "Selected actual assumption/core/init/reinit helpers cpp1822–2087 and pop→exchange→reinit cpp2545–2549; nonnull parallel/MUS dispatch explicitly unported",
+          "name": "Selected actual assumption/core/init/reinit helpers cpp1822\u20132087 and pop\u2192exchange\u2192reinit cpp2545\u20132549; nonnull parallel/MUS dispatch explicitly unported",
           "status": "partial",
           "go_target": "sat_solver_conflict_assumptions.go",
           "tests": [
@@ -81827,7 +81943,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "registered tst1 selected root-count inputs cpp57/65/91/107 and tst_wilkinson cpp224–248 count/twenty IsInt actions; dense polynomial construction adapter; remaining arithmetic/print/driver actions OPEN",
+          "name": "registered tst1 selected root-count inputs cpp57/65/91/107 and tst_wilkinson cpp224\u2013248 count/twenty IsInt actions; dense polynomial construction adapter; remaining arithmetic/print/driver actions OPEN",
           "status": "partial",
           "go_target": "algebraic_root_source_test.go",
           "tests": [
@@ -88817,7 +88933,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Dormant tst_lex source21cases84 adapted monomial comparator conditions (cpp1740–1790); source registered driver returns before tst_lex",
+          "name": "Dormant tst_lex source21cases84 adapted monomial comparator conditions (cpp1740\u20131790); source registered driver returns before tst_lex",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_order_test.go",
           "tests": [
@@ -97711,7 +97827,8 @@
         "mpnum/mp_lexical_scope_test.go",
         "mpnum/mp_raw_projection_test.go",
         "mpnum/rational_lexical_scope.go",
-        "mpnum/inf_arithmetic_entry_source_test.go"
+        "mpnum/inf_arithmetic_entry_source_test.go",
+        "mpnum/inf_muldiv_entry_source_test.go"
       ],
       "tests": [
         "TestInfEpsInfFiniteTripleOracles",
@@ -97790,7 +97907,18 @@
         "TestInfArithmeticEntryValueCopyBeforeRightRead",
         "TestInfArithmeticEntryBoundedValuesAndAliases",
         "TestInfArithmeticEntryRawValueMemberRoutes",
-        "TestInfArithmeticEntryInlineWarmNoAllocation"
+        "TestInfArithmeticEntryInlineWarmNoAllocation",
+        "TestInfMulDivEntryFacadeNUMBeforeDEN",
+        "TestInfMulDivEntryFIRSTBeforeEPS",
+        "TestInfMulDivEntryInfinityBeforeNestedFIRST",
+        "TestInfMulDivEntryInfIntCoefficientBeforeFIRST",
+        "TestInfMulDivEntryValueCOPYRefusalBeforeRight",
+        "TestInfMulDivEntryCoefficientAliasReread",
+        "TestInfMulDivEntryBoundedNumericValueAndCompound",
+        "TestInfMulDivEntryScalarMemberAliasRereads",
+        "TestInfMulDivEntryRawDenominatorAndZero",
+        "TestInfMulDivEntryInlineWarmZero",
+        "TestInfMulDivEntryForeignAndClosedBeforeActions"
       ],
       "conditionals": [
         {
@@ -98052,6 +98180,24 @@
             "TestInfArithmeticEntryRawValueMemberRoutes",
             "TestInfArithmeticEntryInlineWarmNoAllocation"
           ]
+        },
+        {
+          "name": "Selected scalar Mul/Div cold provenance, reached member/coefficient reads and value COPY-before-right entry",
+          "status": "ported",
+          "go_target": "mpnum/inf_eps_rational.go",
+          "tests": [
+            "TestInfMulDivEntryFacadeNUMBeforeDEN",
+            "TestInfMulDivEntryFIRSTBeforeEPS",
+            "TestInfMulDivEntryInfinityBeforeNestedFIRST",
+            "TestInfMulDivEntryInfIntCoefficientBeforeFIRST",
+            "TestInfMulDivEntryValueCOPYRefusalBeforeRight",
+            "TestInfMulDivEntryCoefficientAliasReread",
+            "TestInfMulDivEntryBoundedNumericValueAndCompound",
+            "TestInfMulDivEntryScalarMemberAliasRereads",
+            "TestInfMulDivEntryRawDenominatorAndZero",
+            "TestInfMulDivEntryInlineWarmZero",
+            "TestInfMulDivEntryForeignAndClosedBeforeActions"
+          ]
         }
       ],
       "ownership": [
@@ -98061,9 +98207,10 @@
       ],
       "deviations": [
         "Source const references return owning copies; source scalar assertion domains are typed errors. Mixed equality defect and exact nonsaturating infinity coefficient retained. No actual registered direct source assertion counts invented.",
-        "Source h131–147 selected component reference projections ignore unrelated infinity/numeral components; current owning forwards check all denominators and Copy rejects source-finite raw denominator0. NUM-only sign/hash routes retain separate raw-domain debt.",
+        "Source h131\u2013147 selected component reference projections ignore unrelated infinity/numeral components; current owning forwards check all denominators and Copy rejects source-finite raw denominator0. NUM-only sign/hash routes retain separate raw-domain debt.",
         "Malformed32-bit requested-byte layouts are labelled guarded Go boundary evidence, not ordinary valid C++ destructor allocation failure. Budget supplies actual allocation refusal/failed-copy token only, never simulated Del failure. Selected scope records preserve original vs cleanup causes; broader raw constructor/reset/alias/default-copy-constructor arithmetic temporaries, registry/global ownership and transport remain partial. Cross-owner staged CopyFrom is explicit Go ownership bridge, not a source alias transaction. No whole-unit/API/registered assertion promotion.",
-        "No newly registered source assertion credit: sixteen added source-profile regressions complement existing active assertions. Selected ordinary whole-value preflights are replaced only where they precede actual source reads/mutations. Malformed ILP32 second temporary end-cursor test diagnoses physical requested-size guard after actual source first destruction, with no guard relabeling or allocator repair. Whole header and global service binding remain partial."
+        "No newly registered source assertion credit: sixteen added source-profile regressions complement existing active assertions. Selected ordinary whole-value preflights are replaced only where they precede actual source reads/mutations. Malformed ILP32 second temporary end-cursor test diagnoses physical requested-size guard after actual source first destruction, with no guard relabeling or allocator repair. Whole header and global service binding remain partial.",
+        "Eleven Mul/Div regression groups include five tests-first source-order defects plus honest existing-behavior confirmations, independent bounded rational oracle, alias rereads and warm ownership checks. No additional registered source assertions or whole-header completion credited; raw MPQ10 and facade lexical9 bounds unchanged."
       ]
     },
     {
@@ -98170,7 +98317,8 @@
         "mpnum/mp_lexical_scope_test.go",
         "mpnum/mp_raw_projection_test.go",
         "mpnum/rational_lexical_scope.go",
-        "mpnum/inf_arithmetic_entry_source_test.go"
+        "mpnum/inf_arithmetic_entry_source_test.go",
+        "mpnum/inf_muldiv_entry_source_test.go"
       ],
       "tests": [
         "TestInfIntRationalSourceConstructorsConstantsLifetime",
@@ -98251,7 +98399,18 @@
         "TestInfArithmeticEntryValueCopyBeforeRightRead",
         "TestInfArithmeticEntryBoundedValuesAndAliases",
         "TestInfArithmeticEntryRawValueMemberRoutes",
-        "TestInfArithmeticEntryInlineWarmNoAllocation"
+        "TestInfArithmeticEntryInlineWarmNoAllocation",
+        "TestInfMulDivEntryFacadeNUMBeforeDEN",
+        "TestInfMulDivEntryFIRSTBeforeEPS",
+        "TestInfMulDivEntryInfinityBeforeNestedFIRST",
+        "TestInfMulDivEntryInfIntCoefficientBeforeFIRST",
+        "TestInfMulDivEntryValueCOPYRefusalBeforeRight",
+        "TestInfMulDivEntryCoefficientAliasReread",
+        "TestInfMulDivEntryBoundedNumericValueAndCompound",
+        "TestInfMulDivEntryScalarMemberAliasRereads",
+        "TestInfMulDivEntryRawDenominatorAndZero",
+        "TestInfMulDivEntryInlineWarmZero",
+        "TestInfMulDivEntryForeignAndClosedBeforeActions"
       ],
       "conditionals": [
         {
@@ -98475,6 +98634,24 @@
             "TestInfArithmeticEntryRawValueMemberRoutes",
             "TestInfArithmeticEntryInlineWarmNoAllocation"
           ]
+        },
+        {
+          "name": "Selected scalar Mul/Div cold provenance, reached member/coefficient reads and value COPY-before-right entry",
+          "status": "ported",
+          "go_target": "mpnum/inf_int_rational.go",
+          "tests": [
+            "TestInfMulDivEntryFacadeNUMBeforeDEN",
+            "TestInfMulDivEntryFIRSTBeforeEPS",
+            "TestInfMulDivEntryInfinityBeforeNestedFIRST",
+            "TestInfMulDivEntryInfIntCoefficientBeforeFIRST",
+            "TestInfMulDivEntryValueCOPYRefusalBeforeRight",
+            "TestInfMulDivEntryCoefficientAliasReread",
+            "TestInfMulDivEntryBoundedNumericValueAndCompound",
+            "TestInfMulDivEntryScalarMemberAliasRereads",
+            "TestInfMulDivEntryRawDenominatorAndZero",
+            "TestInfMulDivEntryInlineWarmZero",
+            "TestInfMulDivEntryForeignAndClosedBeforeActions"
+          ]
         }
       ],
       "ownership": [
@@ -98485,9 +98662,10 @@
       "deviations": [
         "Global constants and borrowed rational accessors are owner-local/independent-copy adapters. Signed32 overflow, INT_MIN negation and formatting negation are explicit typed undefined-domain failures with source defined prefixes retained.",
         "No registered source inf_int_rational test exists; independent finite/fault/alias/ownership checks are supplied without inventing source assertion coverage.",
-        "Source h129–137 returns FIRST without a denominator-domain assertion; InfIntFirst/Rational/Infinitesimal still enter ordinary checkInfInt and owning Copy, rejecting source-finite raw denominator0 and inspecting unrelated FIRST before constructing epsilon. Sign/hash NUM-only routes retain separate raw-domain debt.",
+        "Source h129\u2013137 returns FIRST without a denominator-domain assertion; InfIntFirst/Rational/Infinitesimal still enter ordinary checkInfInt and owning Copy, rejecting source-finite raw denominator0 and inspecting unrelated FIRST before constructing epsilon. Sign/hash NUM-only routes retain separate raw-domain debt.",
         "Malformed32-bit requested-byte layouts are labelled guarded Go boundary evidence, not ordinary valid C++ destructor allocation failure. Budget supplies actual allocation refusal/failed-copy token only, never simulated Del failure. Selected scope records preserve original vs cleanup causes; broader raw constructor/reset/alias/default-copy-constructor arithmetic temporaries, registry/global ownership and transport remain partial. Cross-owner staged CopyFrom is explicit Go ownership bridge, not a source alias transaction. No whole-unit/API/registered assertion promotion.",
-        "No newly registered source assertion credit: sixteen added source-profile regressions complement existing active assertions. Selected ordinary whole-value preflights are replaced only where they precede actual source reads/mutations. Malformed ILP32 second temporary end-cursor test diagnoses physical requested-size guard after actual source first destruction, with no guard relabeling or allocator repair. Whole header and global service binding remain partial."
+        "No newly registered source assertion credit: sixteen added source-profile regressions complement existing active assertions. Selected ordinary whole-value preflights are replaced only where they precede actual source reads/mutations. Malformed ILP32 second temporary end-cursor test diagnoses physical requested-size guard after actual source first destruction, with no guard relabeling or allocator repair. Whole header and global service binding remain partial.",
+        "Eleven Mul/Div regression groups include five tests-first source-order defects plus honest existing-behavior confirmations, independent bounded rational oracle, alias rereads and warm ownership checks. No additional registered source assertions or whole-header completion credited; raw MPQ10 and facade lexical9 bounds unchanged."
       ]
     },
     {
@@ -98648,7 +98826,8 @@
         "mpnum/mp_lexical_scope_test.go",
         "mpnum/mp_raw_projection_test.go",
         "mpnum/rational_lexical_scope.go",
-        "mpnum/inf_arithmetic_entry_source_test.go"
+        "mpnum/inf_arithmetic_entry_source_test.go",
+        "mpnum/inf_muldiv_entry_source_test.go"
       ],
       "tests": [
         "TestInfRationalSource80Assertions",
@@ -98733,7 +98912,18 @@
         "TestInfArithmeticEntryValueCopyBeforeRightRead",
         "TestInfArithmeticEntryBoundedValuesAndAliases",
         "TestInfArithmeticEntryRawValueMemberRoutes",
-        "TestInfArithmeticEntryInlineWarmNoAllocation"
+        "TestInfArithmeticEntryInlineWarmNoAllocation",
+        "TestInfMulDivEntryFacadeNUMBeforeDEN",
+        "TestInfMulDivEntryFIRSTBeforeEPS",
+        "TestInfMulDivEntryInfinityBeforeNestedFIRST",
+        "TestInfMulDivEntryInfIntCoefficientBeforeFIRST",
+        "TestInfMulDivEntryValueCOPYRefusalBeforeRight",
+        "TestInfMulDivEntryCoefficientAliasReread",
+        "TestInfMulDivEntryBoundedNumericValueAndCompound",
+        "TestInfMulDivEntryScalarMemberAliasRereads",
+        "TestInfMulDivEntryRawDenominatorAndZero",
+        "TestInfMulDivEntryInlineWarmZero",
+        "TestInfMulDivEntryForeignAndClosedBeforeActions"
       ],
       "conditionals": [
         {
@@ -99004,6 +99194,24 @@
             "TestInfArithmeticEntryRawValueMemberRoutes",
             "TestInfArithmeticEntryInlineWarmNoAllocation"
           ]
+        },
+        {
+          "name": "Selected scalar Mul/Div cold provenance, reached member/coefficient reads and value COPY-before-right entry",
+          "status": "ported",
+          "go_target": "mpnum/inf_rational.go",
+          "tests": [
+            "TestInfMulDivEntryFacadeNUMBeforeDEN",
+            "TestInfMulDivEntryFIRSTBeforeEPS",
+            "TestInfMulDivEntryInfinityBeforeNestedFIRST",
+            "TestInfMulDivEntryInfIntCoefficientBeforeFIRST",
+            "TestInfMulDivEntryValueCOPYRefusalBeforeRight",
+            "TestInfMulDivEntryCoefficientAliasReread",
+            "TestInfMulDivEntryBoundedNumericValueAndCompound",
+            "TestInfMulDivEntryScalarMemberAliasRereads",
+            "TestInfMulDivEntryRawDenominatorAndZero",
+            "TestInfMulDivEntryInlineWarmZero",
+            "TestInfMulDivEntryForeignAndClosedBeforeActions"
+          ]
         }
       ],
       "ownership": [
@@ -99015,9 +99223,10 @@
       "deviations": [
         "Global constants/borrowed accessors replaced by owner-local constants and explicit independent copies; typed checked source-assertion errors. Signed INT_MIN constructor-negation uses widened defined adapter. Source trace/assertion-message infrastructure remains separate.",
         "Inactive/commented general pair arithmetic and duplicate #if0 approximation declarations are not runtime implementations; all eight compiled approximation functions are ported, including coarse/defective roots/powers.",
-        "Source h135–143 component reference projections read only the selected component; InfFirst/InfRational/Infinitesimal still check both denominators and owning Copy rejects source-finite raw denominator0. NUM-only sign/hash routes retain separate raw-domain debt.",
+        "Source h135\u2013143 component reference projections read only the selected component; InfFirst/InfRational/Infinitesimal still check both denominators and owning Copy rejects source-finite raw denominator0. NUM-only sign/hash routes retain separate raw-domain debt.",
         "Malformed32-bit requested-byte layouts are labelled guarded Go boundary evidence, not ordinary valid C++ destructor allocation failure. Budget supplies actual allocation refusal/failed-copy token only, never simulated Del failure. Selected scope records preserve original vs cleanup causes; broader raw constructor/reset/alias/default-copy-constructor arithmetic temporaries, registry/global ownership and transport remain partial. Cross-owner staged CopyFrom is explicit Go ownership bridge, not a source alias transaction. No whole-unit/API/registered assertion promotion.",
-        "No newly registered source assertion credit: sixteen added source-profile regressions complement existing active assertions. Selected ordinary whole-value preflights are replaced only where they precede actual source reads/mutations. Malformed ILP32 second temporary end-cursor test diagnoses physical requested-size guard after actual source first destruction, with no guard relabeling or allocator repair. Whole header and global service binding remain partial."
+        "No newly registered source assertion credit: sixteen added source-profile regressions complement existing active assertions. Selected ordinary whole-value preflights are replaced only where they precede actual source reads/mutations. Malformed ILP32 second temporary end-cursor test diagnoses physical requested-size guard after actual source first destruction, with no guard relabeling or allocator repair. Whole header and global service binding remain partial.",
+        "Eleven Mul/Div regression groups include five tests-first source-order defects plus honest existing-behavior confirmations, independent bounded rational oracle, alias rereads and warm ownership checks. No additional registered source assertions or whole-header completion credited; raw MPQ10 and facade lexical9 bounds unchanged."
       ]
     },
     {
@@ -110787,7 +110996,7 @@
           ]
         },
         {
-          "name": "Source mpq.h191–237,562,666–669 same-owner receiver Copy, scalar sign/structural predicates/NUM hash and selected direct component extraction; no whole-pair raw-denominator preflight",
+          "name": "Source mpq.h191\u2013237,562,666\u2013669 same-owner receiver Copy, scalar sign/structural predicates/NUM hash and selected direct component extraction; no whole-pair raw-denominator preflight",
           "status": "ported",
           "go_target": "mpnum/mpq_inspect.go",
           "tests": [
@@ -112769,7 +112978,7 @@
           ]
         },
         {
-          "name": "Explicit completed-owner destructor body and reverse members (mpz.cpp142–161)",
+          "name": "Explicit completed-owner destructor body and reverse members (mpz.cpp142\u2013161)",
           "status": "ported",
           "go_target": "mpnum/mpz_source_finalize.go",
           "tests": [
@@ -117456,7 +117665,8 @@
         "mpnum/rational_service_ops.go",
         "mpnum/upolynomial_rational_context.go",
         "mpnum/upolynomial_rational_context_test.go",
-        "mpnum/inf_arithmetic_entry_source_test.go"
+        "mpnum/inf_arithmetic_entry_source_test.go",
+        "mpnum/inf_muldiv_entry_source_test.go"
       ],
       "tests": [
         "TestSourceRationalConversionAssertions",
@@ -117575,7 +117785,18 @@
         "TestInfArithmeticEntryValueCopyBeforeRightRead",
         "TestInfArithmeticEntryBoundedValuesAndAliases",
         "TestInfArithmeticEntryRawValueMemberRoutes",
-        "TestInfArithmeticEntryInlineWarmNoAllocation"
+        "TestInfArithmeticEntryInlineWarmNoAllocation",
+        "TestInfMulDivEntryFacadeNUMBeforeDEN",
+        "TestInfMulDivEntryFIRSTBeforeEPS",
+        "TestInfMulDivEntryInfinityBeforeNestedFIRST",
+        "TestInfMulDivEntryInfIntCoefficientBeforeFIRST",
+        "TestInfMulDivEntryValueCOPYRefusalBeforeRight",
+        "TestInfMulDivEntryCoefficientAliasReread",
+        "TestInfMulDivEntryBoundedNumericValueAndCompound",
+        "TestInfMulDivEntryScalarMemberAliasRereads",
+        "TestInfMulDivEntryRawDenominatorAndZero",
+        "TestInfMulDivEntryInlineWarmZero",
+        "TestInfMulDivEntryForeignAndClosedBeforeActions"
       ],
       "conditionals": [
         {
@@ -118049,6 +118270,24 @@
             "TestInfArithmeticEntryRawValueMemberRoutes",
             "TestInfArithmeticEntryInlineWarmNoAllocation"
           ]
+        },
+        {
+          "name": "Selected scalar Mul/Div cold provenance, reached member/coefficient reads and value COPY-before-right entry",
+          "status": "ported",
+          "go_target": "mpnum/rational_service_ops.go",
+          "tests": [
+            "TestInfMulDivEntryFacadeNUMBeforeDEN",
+            "TestInfMulDivEntryFIRSTBeforeEPS",
+            "TestInfMulDivEntryInfinityBeforeNestedFIRST",
+            "TestInfMulDivEntryInfIntCoefficientBeforeFIRST",
+            "TestInfMulDivEntryValueCOPYRefusalBeforeRight",
+            "TestInfMulDivEntryCoefficientAliasReread",
+            "TestInfMulDivEntryBoundedNumericValueAndCompound",
+            "TestInfMulDivEntryScalarMemberAliasRereads",
+            "TestInfMulDivEntryRawDenominatorAndZero",
+            "TestInfMulDivEntryInlineWarmZero",
+            "TestInfMulDivEntryForeignAndClosedBeforeActions"
+          ]
         }
       ],
       "ownership": [
@@ -118067,7 +118306,8 @@
         "Native std::ostream operations use caller-owned strings/buffers; source UNREACHABLE doubles return RationalDoubleError. Safe scoped copies replace raw mpz/mpq borrows and constructors without serialization or canonicalization.",
         "Whole-header completion is unproven: source NUM-only hash/sign and selected reference projections permit finite raw denominator0; current ordinary manager Hash/Sign/Copy guards reject that source state. The source inversion of zero can produce this state. Scalar projection closure does not close these separate families or generated global/TLS lifecycle.",
         "Malformed32-bit requested-byte layouts are labelled guarded Go boundary evidence, not ordinary valid C++ destructor allocation failure. Budget supplies actual allocation refusal/failed-copy token only, never simulated Del failure. Selected scope records preserve original vs cleanup causes; broader raw constructor/reset/alias/default-copy-constructor arithmetic temporaries, registry/global ownership and transport remain partial. Cross-owner staged CopyFrom is explicit Go ownership bridge, not a source alias transaction. No whole-unit/API/registered assertion promotion.",
-        "No newly registered source assertion credit: sixteen added source-profile regressions complement existing active assertions. Selected ordinary whole-value preflights are replaced only where they precede actual source reads/mutations. Malformed ILP32 second temporary end-cursor test diagnoses physical requested-size guard after actual source first destruction, with no guard relabeling or allocator repair. Whole header and global service binding remain partial."
+        "No newly registered source assertion credit: sixteen added source-profile regressions complement existing active assertions. Selected ordinary whole-value preflights are replaced only where they precede actual source reads/mutations. Malformed ILP32 second temporary end-cursor test diagnoses physical requested-size guard after actual source first destruction, with no guard relabeling or allocator repair. Whole header and global service binding remain partial.",
+        "Eleven Mul/Div regression groups include five tests-first source-order defects plus honest existing-behavior confirmations, independent bounded rational oracle, alias rereads and warm ownership checks. No additional registered source assertions or whole-header completion credited; raw MPQ10 and facade lexical9 bounds unchanged."
       ]
     },
     {
@@ -124418,7 +124658,7 @@
           ]
         },
         {
-          "name": "monomial2pos cpp456–499 Get/Reset/Set and concrete borrowed monomial-array template loops, actual unsigned Runtime vector member",
+          "name": "monomial2pos cpp456\u2013499 Get/Reset/Set and concrete borrowed monomial-array template loops, actual unsigned Runtime vector member",
           "status": "partial",
           "go_target": "mpnum/polynomial_monomial_positions.go",
           "tests": [

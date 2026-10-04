@@ -323,7 +323,7 @@ func (s *RationalService) mulInfInt(a *OwnedInfIntRational, r *Rational) error {
 	return infIntPublishSecond(a, int64(a.second)*int64(coefficient))
 }
 func (s *RationalService) InfIntMulAssign(a *OwnedInfIntRational, r *OwnedRational) error {
-	if e := s.lockInfIntRat(a, r); e != nil {
+	if e := s.lockInfIntSourceRat(a, r); e != nil {
 		return e
 	}
 	defer s.mu.Unlock()
@@ -439,7 +439,7 @@ func (s *RationalService) InfIntSub(a, b *OwnedInfIntRational) (OwnedInfIntRatio
 	return s.resultInfInt(a, b, true)
 }
 func (s *RationalService) InfIntMul(r *OwnedRational, a *OwnedInfIntRational) (_lexOut OwnedInfIntRational, _lexErr error) {
-	if e := s.lockInfIntRat(a, r); e != nil {
+	if e := s.lockInfIntSourceRat(a, r); e != nil {
 		return OwnedInfIntRational{}, e
 	}
 	defer s.mu.Unlock()
