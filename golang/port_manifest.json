@@ -58303,7 +58303,12 @@
         "sat_solver_copy_test.go",
         "sat_solver_statistics.go",
         "sat_solver_statistics_test.go",
-        "sat_solver_statistics_fault_test.go"
+        "sat_solver_statistics_fault_test.go",
+        "sat_solver_inspection.go",
+        "sat_solver_display.go",
+        "sat_solver_inspection_test.go",
+        "sat_solver_inspection_model_test.go",
+        "sat_solver_inspection_fault_test.go"
       ],
       "tests": [
         "TestSATSolverClauseCoreFiniteSimplification",
@@ -58619,7 +58624,19 @@
         "TestSATSolverStatisticsPreservesUint32AndDuplicateKeyContributions",
         "TestSATSolverStatisticsCopiedClosedAndHeaderCharge",
         "TestSATSolverStatisticsIndependentSparseCounterMasks",
-        "TestSATSolverStatisticsEveryActualOutputReservationPrefix"
+        "TestSATSolverStatisticsEveryActualOutputReservationPrefix",
+        "TestSATSolverInspectionExactSourceDisplays",
+        "TestSATSolverInspectionExternalModelIndependentTruthTable",
+        "TestSATSolverInspectionWCNFUnsignedWrapAndPartialSoftSpan",
+        "TestSATSolverInspectionDIMACSActualCheckBindingAndAssumptions",
+        "TestSATSolverInspectionIndependentDIMACSFiniteModels",
+        "TestSATSolverInspectionBaseUnitsVsAllTrailAndMarkProfiles",
+        "TestSATSolverInspectionSoftReadAndClauseJustificationPrefixes",
+        "TestSATSolverInspectionBinaryCollectionAppendsOriginalAndLearned",
+        "TestSATSolverInspectionExactSourceWatchDisplay",
+        "TestSATSolverInspectionEveryActualStreamRefusalPrefix",
+        "TestSATSolverInspectionWarmOutputAndOwnerGuards",
+        "TestSATSolverInspectionBinaryOutputEveryActualReservation"
       ],
       "conditionals": [
         {
@@ -59821,6 +59838,58 @@
             "TestSATSolverStatisticsIndependentSparseCounterMasks",
             "TestSATSolverStatisticsEveryActualOutputReservationPrefix"
           ]
+        },
+        {
+          "name": "Actual borrowed model check_model1289-1346 concrete span; original solver-model delegate retains all source checks",
+          "status": "ported",
+          "go_target": "sat_solver_model.go",
+          "tests": [
+            "TestSATSolverInspectionExternalModelIndependentTruthTable"
+          ]
+        },
+        {
+          "name": "collect_bin_clauses2818-2838 learned predicate and exact nested solver std::pair literal words",
+          "status": "ported",
+          "go_target": "sat_solver_inspection.go",
+          "tests": [
+            "TestSATSolverInspectionBinaryCollectionAppendsOriginalAndLearned",
+            "TestSATSolverInspectionBinaryOutputEveryActualReservation"
+          ]
+        },
+        {
+          "name": "check_marks2852-2857 source DEBUG-only actual marked reads",
+          "status": "ported",
+          "go_target": "sat_solver_inspection.go",
+          "tests": [
+            "TestSATSolverInspectionBaseUnitsVsAllTrailAndMarkProfiles"
+          ]
+        },
+        {
+          "name": "Concrete source display2859-3017 and num_clauses2901-2924; exact punctuation, base/all trail, strict binary predicate, unsigned WCNF source spelling; memory-only transport adapter",
+          "status": "partial",
+          "go_target": "sat_solver_display.go",
+          "tests": [
+            "TestSATSolverInspectionExactSourceDisplays",
+            "TestSATSolverInspectionExternalModelIndependentTruthTable",
+            "TestSATSolverInspectionWCNFUnsignedWrapAndPartialSoftSpan",
+            "TestSATSolverInspectionDIMACSActualCheckBindingAndAssumptions",
+            "TestSATSolverInspectionIndependentDIMACSFiniteModels",
+            "TestSATSolverInspectionBaseUnitsVsAllTrailAndMarkProfiles",
+            "TestSATSolverInspectionSoftReadAndClauseJustificationPrefixes",
+            "TestSATSolverInspectionBinaryCollectionAppendsOriginalAndLearned",
+            "TestSATSolverInspectionExactSourceWatchDisplay",
+            "TestSATSolverInspectionEveryActualStreamRefusalPrefix",
+            "TestSATSolverInspectionWarmOutputAndOwnerGuards",
+            "TestSATSolverInspectionBinaryOutputEveryActualReservation"
+          ]
+        },
+        {
+          "name": "Actual reached Check DIMACS723-735 dispatch plus input units to borrowed stream; unbound external transport remains explicit",
+          "status": "partial",
+          "go_target": "sat_solver_search.go",
+          "tests": [
+            "TestSATSolverInspectionDIMACSActualCheckBindingAndAssumptions"
+          ]
         }
       ],
       "ownership": [
@@ -59997,7 +60066,12 @@
         "sat_solver_copy_test.go",
         "sat_solver_statistics.go",
         "sat_solver_statistics_test.go",
-        "sat_solver_statistics_fault_test.go"
+        "sat_solver_statistics_fault_test.go",
+        "sat_solver_inspection.go",
+        "sat_solver_display.go",
+        "sat_solver_inspection_test.go",
+        "sat_solver_inspection_model_test.go",
+        "sat_solver_inspection_fault_test.go"
       ],
       "tests": [
         "TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots",
@@ -60262,7 +60336,19 @@
         "TestSATSolverStatisticsPreservesUint32AndDuplicateKeyContributions",
         "TestSATSolverStatisticsCopiedClosedAndHeaderCharge",
         "TestSATSolverStatisticsIndependentSparseCounterMasks",
-        "TestSATSolverStatisticsEveryActualOutputReservationPrefix"
+        "TestSATSolverStatisticsEveryActualOutputReservationPrefix",
+        "TestSATSolverInspectionExactSourceDisplays",
+        "TestSATSolverInspectionExternalModelIndependentTruthTable",
+        "TestSATSolverInspectionWCNFUnsignedWrapAndPartialSoftSpan",
+        "TestSATSolverInspectionDIMACSActualCheckBindingAndAssumptions",
+        "TestSATSolverInspectionIndependentDIMACSFiniteModels",
+        "TestSATSolverInspectionBaseUnitsVsAllTrailAndMarkProfiles",
+        "TestSATSolverInspectionSoftReadAndClauseJustificationPrefixes",
+        "TestSATSolverInspectionBinaryCollectionAppendsOriginalAndLearned",
+        "TestSATSolverInspectionExactSourceWatchDisplay",
+        "TestSATSolverInspectionEveryActualStreamRefusalPrefix",
+        "TestSATSolverInspectionWarmOutputAndOwnerGuards",
+        "TestSATSolverInspectionBinaryOutputEveryActualReservation"
       ],
       "conditionals": [
         {
@@ -60762,6 +60848,58 @@
             "TestSATSolverStatisticsCopiedClosedAndHeaderCharge",
             "TestSATSolverStatisticsIndependentSparseCounterMasks",
             "TestSATSolverStatisticsEveryActualOutputReservationPrefix"
+          ]
+        },
+        {
+          "name": "Actual borrowed model check_model1289-1346 concrete span; original solver-model delegate retains all source checks",
+          "status": "ported",
+          "go_target": "sat_solver_model.go",
+          "tests": [
+            "TestSATSolverInspectionExternalModelIndependentTruthTable"
+          ]
+        },
+        {
+          "name": "collect_bin_clauses2818-2838 learned predicate and exact nested solver std::pair literal words",
+          "status": "ported",
+          "go_target": "sat_solver_inspection.go",
+          "tests": [
+            "TestSATSolverInspectionBinaryCollectionAppendsOriginalAndLearned",
+            "TestSATSolverInspectionBinaryOutputEveryActualReservation"
+          ]
+        },
+        {
+          "name": "check_marks2852-2857 source DEBUG-only actual marked reads",
+          "status": "ported",
+          "go_target": "sat_solver_inspection.go",
+          "tests": [
+            "TestSATSolverInspectionBaseUnitsVsAllTrailAndMarkProfiles"
+          ]
+        },
+        {
+          "name": "Concrete source display2859-3017 and num_clauses2901-2924; exact punctuation, base/all trail, strict binary predicate, unsigned WCNF source spelling; memory-only transport adapter",
+          "status": "partial",
+          "go_target": "sat_solver_display.go",
+          "tests": [
+            "TestSATSolverInspectionExactSourceDisplays",
+            "TestSATSolverInspectionExternalModelIndependentTruthTable",
+            "TestSATSolverInspectionWCNFUnsignedWrapAndPartialSoftSpan",
+            "TestSATSolverInspectionDIMACSActualCheckBindingAndAssumptions",
+            "TestSATSolverInspectionIndependentDIMACSFiniteModels",
+            "TestSATSolverInspectionBaseUnitsVsAllTrailAndMarkProfiles",
+            "TestSATSolverInspectionSoftReadAndClauseJustificationPrefixes",
+            "TestSATSolverInspectionBinaryCollectionAppendsOriginalAndLearned",
+            "TestSATSolverInspectionExactSourceWatchDisplay",
+            "TestSATSolverInspectionEveryActualStreamRefusalPrefix",
+            "TestSATSolverInspectionWarmOutputAndOwnerGuards",
+            "TestSATSolverInspectionBinaryOutputEveryActualReservation"
+          ]
+        },
+        {
+          "name": "Actual reached Check DIMACS723-735 dispatch plus input units to borrowed stream; unbound external transport remains explicit",
+          "status": "partial",
+          "go_target": "sat_solver_search.go",
+          "tests": [
+            "TestSATSolverInspectionDIMACSActualCheckBindingAndAssumptions"
           ]
         }
       ],

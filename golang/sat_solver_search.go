@@ -302,7 +302,25 @@ func (s *satSolver) checkSpan(count uint32, span satSolverLiteralSpan) (lbool, e
 		return lUndef, e
 	}
 	if cfg.DimacsDisplay {
-		return lUndef, ErrSATMissingDimacsBinding
+		if s.dimacsOutput == nil {
+			return lUndef, ErrSATMissingDimacsBinding
+		}
+		if e = s.displayDIMACS(s.dimacsOutput); e != nil {
+			return lUndef, e
+		}
+		for i := uint32(0); i < count; i++ {
+			l, err := span.literal(i)
+			if err != nil {
+				return lUndef, err
+			}
+			if err = satDIMACSLiteralInto(s.dimacsOutput, l); err != nil {
+				return lUndef, err
+			}
+			if err = s.dimacsOutput.AppendCString(" 0\n"); err != nil {
+				return lUndef, err
+			}
+		}
+		return lUndef, nil
 	}
 	if cfg.NumParallel > 1 && !s.conflict.parallelPresent {
 		return lUndef, ErrSATMissingParallelBinding

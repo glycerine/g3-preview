@@ -48,10 +48,14 @@ func (s *satSolver) mkModel() error {
 	return nil
 }
 func (s *satSolver) checkModel() (bool, error) {
+	return s.checkModelSpan(satSolverModelSpan{column: &s.model})
+}
+
+// Source check_model accepts a borrowed model, independently of m_model.
+func (s *satSolver) checkModelSpan(model satSolverModelSpan) (bool, error) {
 	if e := s.open(); e != nil {
 		return false, e
 	}
-	model := satSolverModelSpan{column: &s.model}
 	ok := true
 	for _, cs := range [2][]satStoredClauseRef{s.lifecycle.original, s.lifecycle.learned} {
 		for _, c := range cs {

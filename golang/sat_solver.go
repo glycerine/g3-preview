@@ -20,7 +20,8 @@ type satSolverConfig struct {
 // graph. Cold contexts break constructor cycles without supplying completed
 // source members, duplicated counters, or an alternative solver.
 type satSolver struct {
-	blockedCorrectionSets        uint32 // actual m_stats field; source has only reset/read sites.
+	dimacsOutput                 *NumericTextStream // explicit borrowed stdout transport counterpart.
+	blockedCorrectionSets        uint32             // actual m_stats field; source has only reset/read sites.
 	self                         *satSolver
 	runtime                      *satRuntime
 	context                      *ParamsContext
