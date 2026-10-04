@@ -55942,9 +55942,27 @@
       "path": "src/sat/sat_mus.cpp",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_solver_mus.go"
+      ],
+      "tests": [
+        "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
+        "TestSATMUSCopyCoreRequestUsesSourceSizeTPromotion",
+        "TestSATMUSEmptyRecursionGuardPreservesFirstSplitPublication",
+        "TestSATMUSInnerCoreReleaseGuardRetainsOlderScopedAppend",
+        "TestSATMUSLiteralSetActualCopyIntersectionUnionAndCapturedIteration",
+        "TestSATMUSScopedAppendDestructorValueInitializesGrownSuffix",
+        "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
+        "TestSATSolverMUSActualQXSixtyFiveNecessaryAssumptions",
+        "TestSATSolverMUSActualThreeNecessaryAssumptions",
+        "TestSATSolverMUSCapturedRuntimeAssumptionsUseActualPointer",
+        "TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots",
+        "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
+        "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
+        "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
+        "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix"
+      ],
       "assertions": [
         {
           "line": 109,
@@ -55953,17 +55971,64 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "MUS reset/set_core/update_model/operator/mus1/mus2/qx/split/unsplit/get_core and verify_core Check body; literal source scopes, dynamic recursive local owners, cancellation and bounded restart policy; diagnostics remain open",
+          "status": "partial",
+          "go_target": "sat_solver_mus.go",
+          "tests": [
+            "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
+            "TestSATMUSCopyCoreRequestUsesSourceSizeTPromotion",
+            "TestSATMUSEmptyRecursionGuardPreservesFirstSplitPublication",
+            "TestSATMUSInnerCoreReleaseGuardRetainsOlderScopedAppend",
+            "TestSATMUSLiteralSetActualCopyIntersectionUnionAndCapturedIteration",
+            "TestSATMUSScopedAppendDestructorValueInitializesGrownSuffix",
+            "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
+            "TestSATSolverMUSActualQXSixtyFiveNecessaryAssumptions",
+            "TestSATSolverMUSActualThreeNecessaryAssumptions",
+            "TestSATSolverMUSCapturedRuntimeAssumptionsUseActualPointer",
+            "TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots",
+            "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
+            "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
+            "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
+            "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete Runtime char membership/unsigned literal and model vectors, header cap0/size4/payload8. Actual reached dynamic lexical frames have reflected charged cold headers and separately named physical blocks; borrowed recursion inputs do not duplicate ownership.",
+        "Source full-expression result vector is destroyed before nested Check; completed inner core before older scoped_append, reverse flet restoration, exact stopped cleanup roots retained for explicit owning abort."
+      ],
+      "deviations": [
+        "TRACE/verbose/verify_core diagnostic output and global source assertion bindings remain open. Empty qx native nontermination retains first split/union prefix before typed repeated-recursion guard, never success.",
+        "Named vector return move is a Go ABI adapter; optional C++ copy elision allocation schedule is not claimed. No additional registered source-test assertion credit; independent CNF and actual refusal campaigns only."
+      ]
     },
     {
       "path": "src/sat/sat_mus.h",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_solver_mus.go"
+      ],
+      "tests": [
+        "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
+        "TestSATMUSCopyCoreRequestUsesSourceSizeTPromotion",
+        "TestSATMUSEmptyRecursionGuardPreservesFirstSplitPublication",
+        "TestSATMUSInnerCoreReleaseGuardRetainsOlderScopedAppend",
+        "TestSATMUSLiteralSetActualCopyIntersectionUnionAndCapturedIteration",
+        "TestSATMUSScopedAppendDestructorValueInitializesGrownSuffix",
+        "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
+        "TestSATSolverMUSActualQXSixtyFiveNecessaryAssumptions",
+        "TestSATSolverMUSActualThreeNecessaryAssumptions",
+        "TestSATSolverMUSCapturedRuntimeAssumptionsUseActualPointer",
+        "TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots",
+        "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
+        "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
+        "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
+        "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -55976,9 +56041,38 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete embedded MUS members, is_active/get_model and full scoped_append append/resize lifetime; header-only intersect declaration has no source definition",
+          "status": "partial",
+          "go_target": "sat_solver_mus.go",
+          "tests": [
+            "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
+            "TestSATMUSCopyCoreRequestUsesSourceSizeTPromotion",
+            "TestSATMUSEmptyRecursionGuardPreservesFirstSplitPublication",
+            "TestSATMUSInnerCoreReleaseGuardRetainsOlderScopedAppend",
+            "TestSATMUSLiteralSetActualCopyIntersectionUnionAndCapturedIteration",
+            "TestSATMUSScopedAppendDestructorValueInitializesGrownSuffix",
+            "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
+            "TestSATSolverMUSActualQXSixtyFiveNecessaryAssumptions",
+            "TestSATSolverMUSActualThreeNecessaryAssumptions",
+            "TestSATSolverMUSCapturedRuntimeAssumptionsUseActualPointer",
+            "TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots",
+            "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
+            "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
+            "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
+            "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete Runtime char membership/unsigned literal and model vectors, header cap0/size4/payload8. Actual reached dynamic lexical frames have reflected charged cold headers and separately named physical blocks; borrowed recursion inputs do not duplicate ownership.",
+        "Source full-expression result vector is destroyed before nested Check; completed inner core before older scoped_append, reverse flet restoration, exact stopped cleanup roots retained for explicit owning abort."
+      ],
+      "deviations": [
+        "TRACE/verbose/verify_core diagnostic output and global source assertion bindings remain open. Empty qx native nontermination retains first split/union prefix before typed repeated-recursion guard, never success.",
+        "Named vector return move is a Go ABI adapter; optional C++ copy elision allocation schedule is not claimed. No additional registered source-test assertion credit; independent CNF and actual refusal campaigns only."
+      ]
     },
     {
       "path": "src/sat/sat_par.cpp",
@@ -57503,7 +57597,8 @@
         "sat_solver_user_scope_fault_test.go",
         "sat_solver_user_scope_model_test.go",
         "sat_solver_user_scope_test.go",
-        "sat_solver_warm_test.go"
+        "sat_solver_warm_test.go",
+        "sat_solver_mus.go"
       ],
       "tests": [
         "TestSATSolverClauseCoreFiniteSimplification",
@@ -57742,7 +57837,22 @@
         "TestSATSolverUserScopeSourcePushPopPreservesOriginalFormula",
         "TestSATSolverOwningWatchShrinkRetainsOuterCapacity",
         "TestSATSolverSourceUserScopeFiniteCycle",
-        "TestSATSolverWarmRepeatedCheckHasBoundedActualPhysicalGraph"
+        "TestSATSolverWarmRepeatedCheckHasBoundedActualPhysicalGraph",
+        "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
+        "TestSATMUSCopyCoreRequestUsesSourceSizeTPromotion",
+        "TestSATMUSEmptyRecursionGuardPreservesFirstSplitPublication",
+        "TestSATMUSInnerCoreReleaseGuardRetainsOlderScopedAppend",
+        "TestSATMUSLiteralSetActualCopyIntersectionUnionAndCapturedIteration",
+        "TestSATMUSScopedAppendDestructorValueInitializesGrownSuffix",
+        "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
+        "TestSATSolverMUSActualQXSixtyFiveNecessaryAssumptions",
+        "TestSATSolverMUSActualThreeNecessaryAssumptions",
+        "TestSATSolverMUSCapturedRuntimeAssumptionsUseActualPointer",
+        "TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots",
+        "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
+        "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
+        "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
+        "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix"
       ],
       "conditionals": [
         {
@@ -58678,6 +58788,28 @@
             "TestSATSolverUserGCDeletionRefusalOwnsExactCompactionRanges",
             "TestSATSolverSourceModelPublishesCurrentBeforeNumVarsRead"
           ]
+        },
+        {
+          "name": "Actual MUS dispatch and set_model; Check/checkCore/initAssumptions concrete captured Runtime literal spans",
+          "status": "ported",
+          "go_target": "sat_solver_mus.go",
+          "tests": [
+            "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
+            "TestSATMUSCopyCoreRequestUsesSourceSizeTPromotion",
+            "TestSATMUSEmptyRecursionGuardPreservesFirstSplitPublication",
+            "TestSATMUSInnerCoreReleaseGuardRetainsOlderScopedAppend",
+            "TestSATMUSLiteralSetActualCopyIntersectionUnionAndCapturedIteration",
+            "TestSATMUSScopedAppendDestructorValueInitializesGrownSuffix",
+            "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
+            "TestSATSolverMUSActualQXSixtyFiveNecessaryAssumptions",
+            "TestSATSolverMUSActualThreeNecessaryAssumptions",
+            "TestSATSolverMUSCapturedRuntimeAssumptionsUseActualPointer",
+            "TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots",
+            "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
+            "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
+            "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
+            "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix"
+          ]
         }
       ],
       "ownership": [
@@ -59013,7 +59145,22 @@
         "TestSATSolverUserScopeSourcePushPopPreservesOriginalFormula",
         "TestSATSolverOwningWatchShrinkRetainsOuterCapacity",
         "TestSATSolverSourceUserScopeFiniteCycle",
-        "TestSATSolverWarmRepeatedCheckHasBoundedActualPhysicalGraph"
+        "TestSATSolverWarmRepeatedCheckHasBoundedActualPhysicalGraph",
+        "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
+        "TestSATMUSCopyCoreRequestUsesSourceSizeTPromotion",
+        "TestSATMUSEmptyRecursionGuardPreservesFirstSplitPublication",
+        "TestSATMUSInnerCoreReleaseGuardRetainsOlderScopedAppend",
+        "TestSATMUSLiteralSetActualCopyIntersectionUnionAndCapturedIteration",
+        "TestSATMUSScopedAppendDestructorValueInitializesGrownSuffix",
+        "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
+        "TestSATSolverMUSActualQXSixtyFiveNecessaryAssumptions",
+        "TestSATSolverMUSActualThreeNecessaryAssumptions",
+        "TestSATSolverMUSCapturedRuntimeAssumptionsUseActualPointer",
+        "TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots",
+        "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
+        "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
+        "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
+        "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix"
       ],
       "conditionals": [
         {
@@ -59437,6 +59584,28 @@
             "TestSATSolverUserGCDeletionRefusalOwnsExactCompactionRanges",
             "TestSATSolverSourceModelPublishesCurrentBeforeNumVarsRead"
           ]
+        },
+        {
+          "name": "Embedded MUS owning roots and explicit interrupted recursive lexical cleanup before member destruction",
+          "status": "ported",
+          "go_target": "sat_solver.go",
+          "tests": [
+            "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
+            "TestSATMUSCopyCoreRequestUsesSourceSizeTPromotion",
+            "TestSATMUSEmptyRecursionGuardPreservesFirstSplitPublication",
+            "TestSATMUSInnerCoreReleaseGuardRetainsOlderScopedAppend",
+            "TestSATMUSLiteralSetActualCopyIntersectionUnionAndCapturedIteration",
+            "TestSATMUSScopedAppendDestructorValueInitializesGrownSuffix",
+            "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
+            "TestSATSolverMUSActualQXSixtyFiveNecessaryAssumptions",
+            "TestSATSolverMUSActualThreeNecessaryAssumptions",
+            "TestSATSolverMUSCapturedRuntimeAssumptionsUseActualPointer",
+            "TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots",
+            "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
+            "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
+            "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
+            "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix"
+          ]
         }
       ],
       "ownership": [
@@ -59589,7 +59758,8 @@
         "sat_solver_uint_set.go",
         "sat_types.go",
         "sat_solver_literal_set.go",
-        "sat_solver_probing_assigned.go"
+        "sat_solver_probing_assigned.go",
+        "sat_solver_mus_set.go"
       ],
       "tests": [
         "TestSATLiteralAndModelRendering",
@@ -59643,7 +59813,22 @@
         "TestSATSolverProbingTLSPostAllocationPendingCache",
         "TestSATSolverProbingUnavailableLevelHeaderAtSourceRead",
         "TestSATSolverProbingWarmProcessAndUnsignedDec",
-        "TestSATSolverProbingZeroQuotaAndActualCancellation"
+        "TestSATSolverProbingZeroQuotaAndActualCancellation",
+        "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
+        "TestSATMUSCopyCoreRequestUsesSourceSizeTPromotion",
+        "TestSATMUSEmptyRecursionGuardPreservesFirstSplitPublication",
+        "TestSATMUSInnerCoreReleaseGuardRetainsOlderScopedAppend",
+        "TestSATMUSLiteralSetActualCopyIntersectionUnionAndCapturedIteration",
+        "TestSATMUSScopedAppendDestructorValueInitializesGrownSuffix",
+        "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
+        "TestSATSolverMUSActualQXSixtyFiveNecessaryAssumptions",
+        "TestSATSolverMUSActualThreeNecessaryAssumptions",
+        "TestSATSolverMUSCapturedRuntimeAssumptionsUseActualPointer",
+        "TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots",
+        "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
+        "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
+        "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
+        "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix"
       ],
       "conditionals": [
         {
@@ -60181,6 +60366,28 @@
             "TestSATSolverProbingUnavailableLevelHeaderAtSourceRead",
             "TestSATSolverProbingWarmProcessAndUnsignedDec",
             "TestSATSolverProbingZeroQuotaAndActualCancellation"
+          ]
+        },
+        {
+          "name": "Same-Runtime MUS literal_set insert/reset/size/contains/intersection/union/copy assignment and captured iteration; named to_vector ABI move adapter",
+          "status": "ported",
+          "go_target": "sat_solver_mus_set.go",
+          "tests": [
+            "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
+            "TestSATMUSCopyCoreRequestUsesSourceSizeTPromotion",
+            "TestSATMUSEmptyRecursionGuardPreservesFirstSplitPublication",
+            "TestSATMUSInnerCoreReleaseGuardRetainsOlderScopedAppend",
+            "TestSATMUSLiteralSetActualCopyIntersectionUnionAndCapturedIteration",
+            "TestSATMUSScopedAppendDestructorValueInitializesGrownSuffix",
+            "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
+            "TestSATSolverMUSActualQXSixtyFiveNecessaryAssumptions",
+            "TestSATSolverMUSActualThreeNecessaryAssumptions",
+            "TestSATSolverMUSCapturedRuntimeAssumptionsUseActualPointer",
+            "TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots",
+            "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
+            "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
+            "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
+            "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix"
           ]
         }
       ],
@@ -127494,7 +127701,8 @@
         "mpnum/upolynomial_isolation_storage_test.go",
         "sat_solver_assignment_storage.go",
         "sat_solver_assignment_storage_test.go",
-        "mpnum/polynomial_monomial_positions.go"
+        "mpnum/polynomial_monomial_positions.go",
+        "sat_solver_mus_set.go"
       ],
       "tests": [
         "TestParamDescrsBudgetFailuresAndWarmDuplicate",
@@ -127621,7 +127829,22 @@
         "TestMonomialPositionsScalarIDOnlyAndWrap",
         "TestMonomialPositionsTLSUnpublishedOwnership",
         "TestMonomialPositionsNullCapacitySourceOverflow",
-        "TestMonomialPositionsWrappedHeaderSourceAndOwningCleanup"
+        "TestMonomialPositionsWrappedHeaderSourceAndOwningCleanup",
+        "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
+        "TestSATMUSCopyCoreRequestUsesSourceSizeTPromotion",
+        "TestSATMUSEmptyRecursionGuardPreservesFirstSplitPublication",
+        "TestSATMUSInnerCoreReleaseGuardRetainsOlderScopedAppend",
+        "TestSATMUSLiteralSetActualCopyIntersectionUnionAndCapturedIteration",
+        "TestSATMUSScopedAppendDestructorValueInitializesGrownSuffix",
+        "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
+        "TestSATSolverMUSActualQXSixtyFiveNecessaryAssumptions",
+        "TestSATSolverMUSActualThreeNecessaryAssumptions",
+        "TestSATSolverMUSCapturedRuntimeAssumptionsUseActualPointer",
+        "TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots",
+        "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
+        "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
+        "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
+        "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix"
       ],
       "conditionals": [
         {
@@ -127912,6 +128135,28 @@
             "TestMonomialPositionsNullCapacitySourceOverflow",
             "TestMonomialPositionsWrappedHeaderSourceAndOwningCleanup"
           ]
+        },
+        {
+          "name": "MUS source copy_core size-before-capacity reads, actual size_t32/64 request conversion, header publication and ascending payload copy; full scoped unsigned-vector resize",
+          "status": "ported",
+          "go_target": "sat_solver_mus_set.go",
+          "tests": [
+            "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
+            "TestSATMUSCopyCoreRequestUsesSourceSizeTPromotion",
+            "TestSATMUSEmptyRecursionGuardPreservesFirstSplitPublication",
+            "TestSATMUSInnerCoreReleaseGuardRetainsOlderScopedAppend",
+            "TestSATMUSLiteralSetActualCopyIntersectionUnionAndCapturedIteration",
+            "TestSATMUSScopedAppendDestructorValueInitializesGrownSuffix",
+            "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
+            "TestSATSolverMUSActualQXSixtyFiveNecessaryAssumptions",
+            "TestSATSolverMUSActualThreeNecessaryAssumptions",
+            "TestSATSolverMUSCapturedRuntimeAssumptionsUseActualPointer",
+            "TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots",
+            "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
+            "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
+            "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
+            "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix"
+          ]
         }
       ],
       "ownership": [
@@ -127932,7 +128177,8 @@
         "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md.",
         "Owning reads and checked scalar lifetimes are Go adapters. Full-capacity guard rejects undersized source wrapped allocations after separate literal uint32 growth checks; raw allocation/header publication for that undefined domain is not represented. Multivariate conversion, factorization, algebraic consumers, full printers/TRACE and nonselected alternatives remain open.",
         "Only assignment char_vector source allocation accounting is integrated in this slice. Other SAT columns/watch/queue/clause/trail/vector allocations still require real global/runtime source hooks. Raw-state bounds/initialization guards act at endangered byte accesses; source DEBUG logical assertions remain distinct. No full solver construction/search or registered assertion completion is claimed.",
-        "Actual polynomial imp template overload consumers remain open; concrete borrowed array loops preserve only the template iteration body. Runtime handles replace raw pointer ABI. Source invalid-memory continuation is guarded explicitly. No registered source assertion completion credit."
+        "Actual polynomial imp template overload consumers remain open; concrete borrowed array loops preserve only the template iteration body. Runtime handles replace raw pointer ABI. Source invalid-memory continuation is guarded explicitly. No registered source assertion completion credit.",
+        "copy_core sizeof(T) uses actual source size_t width before Runtime call, while expansion retains unsigned32 source extent arithmetic. Oversized capacity/zero-size Runtime32 proof is a malformed source-domain prefix, not valid OOM or a large vector claim."
       ]
     },
     {

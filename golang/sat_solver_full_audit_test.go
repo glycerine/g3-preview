@@ -37,6 +37,15 @@ func satFullSolverRuntimeAudit(t *testing.T, s *satSolver) {
 	for _, v := range []*satSolverRuntimeUintColumn{&p.toAssert, &p.cacheWork, &p.assigned.values, &c.assumptions, &c.userScopeLiterals, &c.core, &c.minCore, &c.assumptionSet.values, &a.lemma, &a.extAntecedents, &a.minStack, &a.unmark, &s.auxLiterals, &s.todoAntecedents, &s.model, &s.mus.core, &s.mus.mus, &s.mus.model, &s.simplifier.elimination.vars} {
 		col(v)
 	}
+	for f := s.mus.frames; f != nil; f = f.next {
+		if f.vectorUsed {
+			col(&f.vector)
+		}
+		for i := uint32(0); i < f.setsUsed; i++ {
+			raw(&f.sets[i].membership)
+			col(&f.sets[i].values)
+		}
+	}
 	raw(&p.assigned.membership)
 	raw(&c.assumptionSet.membership)
 	raw(&s.asymm.savedPhase)

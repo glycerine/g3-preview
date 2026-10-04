@@ -263,7 +263,13 @@ func (s *satSolverConflictResolution) resolveConflictForUnsatCore() error {
 				}
 			}
 		}
-		return ErrSATMissingMUSBinding
+		if s.solver == nil {
+			return ErrSATMissingMUSBinding
+		}
+		if _, e := s.solver.mus.run(); e != nil {
+			return e
+		}
+		return s.solver.setModel(&s.solver.mus.model)
 	}
 	return nil
 }

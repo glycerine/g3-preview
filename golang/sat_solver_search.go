@@ -77,11 +77,14 @@ func (s *satSolver) popToBase() error {
 	return s.lifecycle.pop(s.variables.scopeLevel)
 }
 func (s *satSolver) initAssumptions(lits []satLiteral) error {
+	return s.initAssumptionsSpan(uint32(len(lits)), satSolverLiteralSpan{literals: lits})
+}
+func (s *satSolver) initAssumptionsSpan(count uint32, span satSolverLiteralSpan) error {
 	n, e := s.conflict.userScopeLiterals.size()
 	if e != nil {
 		return e
 	}
-	if len(lits) == 0 && n == 0 {
+	if count == 0 && n == 0 {
 		return nil
 	}
 	if e = s.resetAssumptions(); e != nil {
@@ -112,9 +115,10 @@ func (s *satSolver) initAssumptions(lits []satLiteral) error {
 			return e
 		}
 	}
-	for _, l := range lits {
-		if s.propagation.inconsistent {
-			break
+	for i := uint32(0); i < count && !s.propagation.inconsistent; i++ {
+		l, e := span.literal(i)
+		if e != nil {
+			return e
 		}
 		if satStorageSourceDebug {
 			yes, e := s.variables.isExternal(l.variable())
@@ -281,6 +285,9 @@ func (s *satSolver) boundedSearch() (lbool, error) {
 	}
 }
 func (s *satSolver) Check(lits []satLiteral) (lbool, error) {
+	return s.checkSpan(uint32(len(lits)), satSolverLiteralSpan{literals: lits})
+}
+func (s *satSolver) checkSpan(count uint32, span satSolverLiteralSpan) (lbool, error) {
 	if e := s.open(); e != nil {
 		return lUndef, e
 	}
@@ -300,7 +307,7 @@ func (s *satSolver) Check(lits []satLiteral) (lbool, error) {
 	if cfg.NumParallel > 1 && !s.conflict.parallelPresent {
 		return lUndef, ErrSATMissingParallelBinding
 	}
-	r, e := s.checkCore(lits)
+	r, e := s.checkCoreSpan(count, span)
 	var abort satSolverAbort
 	if errors.As(e, &abort) {
 		return lUndef, nil
@@ -308,6 +315,9 @@ func (s *satSolver) Check(lits []satLiteral) (lbool, error) {
 	return r, e
 }
 func (s *satSolver) checkCore(lits []satLiteral) (lbool, error) {
+	return s.checkCoreSpan(uint32(len(lits)), satSolverLiteralSpan{literals: lits})
+}
+func (s *satSolver) checkCoreSpan(count uint32, span satSolverLiteralSpan) (lbool, error) {
 	if s.propagation.inconsistent {
 		return lFalse, nil
 	}
@@ -320,7 +330,7 @@ func (s *satSolver) checkCore(lits []satLiteral) (lbool, error) {
 	if s.propagation.inconsistent {
 		return lFalse, nil
 	}
-	if e := s.initAssumptions(lits); e != nil {
+	if e := s.initAssumptionsSpan(count, span); e != nil {
 		return lUndef, e
 	}
 	if _, e := s.lifecycle.propagate(false, false, false); e != nil {

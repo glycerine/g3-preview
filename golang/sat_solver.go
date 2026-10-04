@@ -58,12 +58,12 @@ type satSolver struct {
 	constructed, closing, closed bool
 }
 
-// These are the actual source MUS value members and constructor fields. Its
-// optional recursive minimization algorithms remain a separate obligation;
-// existing reached MUS dispatch returns the explicit missing-binding error.
-// No successful MUS callback or default-policy change is installed here.
+// Actual source MUS value members and constructor fields. Algorithms and
+// named interrupted lexical ownership live in sat_solver_mus.go; optional
+// report/TRACE producers remain separate source obligations.
 type satSolverMUSMembers struct {
 	solver           *satSolver
+	frames           *satMUSFrame
 	core, mus, model satSolverRuntimeUintColumn
 	isActive         bool
 	maxNumRestarts   uint32
@@ -169,6 +169,7 @@ func NewSATSolver(c satSolverConfig) (s *satSolver, err error) {
 	s.mus.core.bind(c.Runtime.memory)
 	s.mus.mus.bind(c.Runtime.memory)
 	s.mus.model.bind(c.Runtime.memory)
+	s.conflict.solver = s
 	s.mus.solver = s
 	s.mus.isActive = false
 	s.mus.maxNumRestarts = ^uint32(0)
@@ -235,7 +236,7 @@ func (s *satSolver) open() error {
 	if e := s.identity(); e != nil {
 		return e
 	}
-	if s.closing || !s.constructed {
+	if s.closing || !s.constructed || (s.mus.frames != nil && !s.mus.isActive) {
 		return arena.ErrClosed
 	}
 	if e := s.runtime.open(); e != nil {
@@ -333,6 +334,9 @@ func (s *satSolver) closeMembers() error {
 		var e error
 		switch s.closeStage {
 		case 0:
+			if e = s.mus.cleanup(); e != nil {
+				break
+			}
 			if s.lifecycle != nil {
 				e = s.lifecycle.cleanupOwningContinuations()
 			}

@@ -15,6 +15,7 @@ var ErrSATMissingMUSBinding = errors.New("g3: missing source SAT MUS/model bindi
 // Source search initialization of the phase/restart fields remains a separate
 // entry action; the constructor supplies its documented explicit initial state.
 type satSolverConflictResolution struct {
+	solver                                                                          *satSolver // actual optional full-owner MUS binding, never a successful callback
 	self                                                                            *satSolverConflictResolution
 	analysis                                                                        *satSolverConflictAnalysis
 	dynamic                                                                         *satSolverDynamicSubsumption

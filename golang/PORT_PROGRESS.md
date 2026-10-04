@@ -26146,3 +26146,82 @@ No C++ content hashes computed; Go-only tested-tree evidence preserved.
 Original exhaustive100-bit/everyactualreservation campaign retained. Concrete
 linear solver chunk is green for commit; whole port goal remains ACTIVE and
 full stream formatting/global bindings/full imp obligations remain OPEN.
+
+## SAT MUS integration after linear commit145fdec
+
+Previous goal turn made authoritative progress: linear solver commit145fdec,
+all five full814 gates terminal0 and clean worktree. Root reviewed actual
+src/sat/sat_mus.cpp:28-236, sat_mus.h, sat_types.h:153-289 and solver
+MUS/set_model/captured Check source routes before exact14-file integration.
+Five existing files match actual committed4d32f0b bytes; all14 lane hashes
+rechecked. Private tests-first missing-MUS dispatch/API RED, empty-recursion
+completed-prefix, copied-owner, full scoped resize and copy size_t RED preserved
+in .cache/sat-mus-final-source-map.json. Fifteen new groups include actual
+65 necessary assumptions with independent drop-each witnesses, redundant core,
+partial restart window/cancel, source swap-pop user guards, captured input,
+scoped source cleanup, every actual linear23 and recursive243 refusal prefix
+before first success with immediate named physical census before lifting fault.
+Warm linear zero Go allocations; recursive429 actual source lexical frames
+retain exact physical plateau, no pooling rewrite.
+
+Review found real SIZE_T32 caller conversion missing from initial LP64-correct
+copy helper. Genuine .cache/sat-mus-size32-behavior-red.log precedes exact
+uint32(size_t request) conversion before Runtime.Allocate. Real small Runtime32
+source cap0x40000000/size0 copy allocates8+4mallocheader and publishes actual
+headers without reading huge payload; explicit malformed source-domain fixture,
+not valid OOM. Original LP64 wide promotion regressions retained. Final3 native
+514 top PASS/1564 RUN1.131s, debug514/1566 RUN1.107s, both vets/source terminal0;
+all other12 immutable files verified. Exact root integration inventory
+.cache/sat-mus-integrated-inventory.json.
+
+MUS cpp/h status unported-to-partial only; full TRACE/verbose output, global
+assertion bindings, native empty recursion/optional return copy-elision schedule
+and whole SAT solver remaining EXT/parallel/clone/DIMACS remain OPEN. No source
+registered assertion credit added. Headers preserve full source paths/MIT/other
+authors without Microsoft copyright; no C++ content hashes or generics. Root
+selected checks and full native/debug/vets/source must pass before commit.
+
+Root integrated complete selected SAT/sourceSAT families native0.819s and
+checked/debug0.875s terminal0 (.cache/sat-mus-integrated-{native,debug}.log),
+git diff --check0. Full authoritative823 Go snapshot now frozen for
+.cache/sat-mus-full-complete-{gates,go-hashes}.json and five logs; same original
+100-bit/everyactualreservation debug campaign,30m timeout. No tested Go edits
+while these gates run. Next MUS commit only after all five terminal0.
+
+Private root pseudo4/common-census review while full823 MUS gates live: archive
+145fdec, exact four lane files verified; manager differs only actual pseudo
+scope and pending guard, Power uses the same actual engine with completed
+reference argument. Initial archive command used module-relative pathspec
+wrongly, failed before extraction/test execution, then corrected repository
+working directory; no behavioral RED credit. Removed manual scope/Power/NUM
+annotations from pseudo physical wrapper while keeping external caller outputs
+and actual queryPositions raw inputs. Existing small-coefficient native failure
+campaign and all nine debug groups stayed GREEN; initial log named census-red
+actually passes and is explicitly not RED evidence.
+
+Strengthened actual reverse-destruction fixture with existing caller BIG as
+leading p coefficient and required retained NUM physically BIG at checkpoint2.
+Younger reductB guard remains the same explicit malformed SIZE_T32 metadata
+fixture; older genuine NUM must remain before fault repair. Independent shared
+census now genuineRED12named vs13live in
+.cache/polynomial-pseudo-retained-num-census-red.log. Fixed three common helpers
+to enumerate actual embedded pseudo NUM/reference/monomial fields and active
+same-engine Power records directly; no manual caller annotations, inferred
+registry owners or relaxed count equations. Broader Polynomial/Monomial native
+0.132s/debug0.170s terminal0. Seven files immutable in
+.cache/review/polynomial-pseudo-integrated-final-145fdec and
+.cache/polynomial-pseudo-integrated-final-inventory.json. All four production
+bytes remain exact lane files; test-only strengthening/common census added.
+Root823 tested Go untouched. Future pseudo commit still requires authoritative
+full checks and additive source ledger after MUS commit.
+
+Full authoritative MUS823 gates all terminal0 on same runner45501: native
+15.172s, checked/debug727.170s, vet native1.530s/debug1.524s, source/no-generics
+147.205s. Runner verified immutable823 Go files; root independently rechecked
+all823 and exact14 integration hashes, header source/MIT/no-Microsoft and
+git diff --check. Full exhaustive original100-bit/allactualprefix debug
+campaign retained; native numerical package caches reused unchanged tests.
+SAT MUS coherent chunk is green for commit; full port goal stays ACTIVE.
+Future frozen pseudo7 meaningful retained-NUM census improvement still requires
+its own authoritative integration/gates; variable-degree failed-constructor
+read audit is private, no held candidate integrated.
