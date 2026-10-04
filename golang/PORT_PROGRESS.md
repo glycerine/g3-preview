@@ -25149,3 +25149,135 @@ description, default and module match. Full generated registration/default-empty
 binding audit remains a separate explicit completion obligation; current SCC
 parameter source status stays partial. Source paths and license notices remain,
 Microsoft copyright headers are absent, and no C++ content hashes were used.
+
+
+### Asymmetric branching source review and master integration
+
+Verified all six frozen Go files from
+`.cache/work/sat-asymm-f7f77bd/sat-asymm-final-inventory.json`, then integrated
+five new files and manually merged the actual lifecycle continuation. Existing
+SCC/equivalence, cleaner and GC ownership/Close hooks are preserved. The full
+source header paths were expanded without changing implementation bodies.
+An inventory schema mismatch stopped the first copy before any mutation; it was
+corrected before the actual focused integration, not source-algorithm RED.
+
+Source map: src/sat/sat_asymm_branch.cpp26–32 constructor,34–36 descending size
+comparison,38–58 report,61–120 complete operator,123–204 process,207–235
+parameters/descriptors/statistics; sat_asymm_branch.h61 counter narrowing;
+sat_solver.h199–218 lexical scoped detach. The sole cost is actual
+propagation.asymmCounter, and phases use actual Runtime source-style copies.
+Source cancellation catches only actual SATSolverException: suffix compaction
+and cost negation occur in that catch, phase is not restored, and the pushed
+scope is retained on process exception until an explicit caller pop.
+
+Independent bounded checks enumerate all32 assignments for implied redundant
+clauses and all unit/binary/nary reduction routes. Twelve top-level Asymm groups
+produce25 RUN/PASS per profile. Actual allocation refusals0 through7 precede
+first success8, with exact whole named Runtime/Budget/clause graph audit BEFORE
+fault disable. Warm lexical saved/restore copies allocate four actual Go objects
+while retaining exact physical plateau; no fabricated zero-allocation claim.
+
+Tests-first RED logs include `.cache/sat-asymm-api-red.log`,
+`.cache/sat-asymm-lexical-reuse-red.log`,
+`.cache/sat-asymm-phase-interrupted-red.log` and
+`.cache/sat-asymm-review-red.log`. Independent numeric/root review additionally
+required failed-copy constructor versus completed-local destructor ordering and
+DEBUG scope assertion before trail reads. Corrections retain a partial failed
+copy for separate owning abort after report unwind, keep the older report pending
+when completed-local destruction fails, and reject reuse while report/cursor is
+active. Genuine malformed copy and DEBUG read-order RED precede fixes. Stale
+completed-local and public TLS postphysical raw-zero tests are explicitly
+protocol/undefined-domain fixtures; they use real frees and actual source
+signed-overflow guards, with no private Runtime counter writes or fake failures.
+Source GNU release UNREACHABLE maps to __builtin_unreachable, so the lTrue
+reduction guard is a typed undefined-domain adaptation rather than a claimed
+finite source branch. Earlier review's fallback no-op inference was corrected.
+
+Private final combined native144/144 and checked/debug146/146 RUN/PASS, both
+vets terminal0; exact logs `.cache/sat-asymm-review-final-{native,debug,
+vet-native,vet-debug}.log`. Master combined Asymm/SCC/equivalence/cleaner/GC/
+conflict focused tests pass both profiles. Full gates run on frozen708 Go files
+in `.cache/sat-asymm-complete-go-hashes.json`; logs are
+`.cache/sat-asymm-complete-{native,debug,vet-native,vet-debug,source}.log`.
+These full gates are live; no commit before every terminal result is GREEN.
+
+Full solver/default simplifier/MUS/EXT and enabled diagnostic/global rendering
+bindings remain open. The three source units receive partial credit, and no
+registered UserScope42/168 assertion campaign is completed. No original
+100-bit/all-prefix refinement is truncated, no generics or C++ hashes are added,
+and native/checked-debug remain the gates without WASM/WASI/race.
+
+### Current private tests-first follow-on lanes
+
+Root decision-selection snapshot `.cache/work/sat-decision-334de9d` reads actual
+sat_solver.cpp933–988 next_var/decide, constructor/update seed sites and
+sat_solver.h337–338 before new tests. `.cache/sat-decision-api-red.log` is genuine
+missing-API RED. It binds existing actual variable queue/scopes/assignment/
+conflict phase-cache fields and a separate sole source RNG/decision-stat owner;
+full search and actual EXT phase/push service remain explicit obligations.
+
+Numeric lane starts `.cache/work/sat-integrity-334de9d` for complete actual
+sat_integrity_checker.cpp/h, real solver check_invariant resource-before-checker
+and shared check_missed_propagation/wrapper bindings. Preserve release/debug
+macro erasure and source learned-check counting frozen ORIGINAL clauses. The
+sole frozen counter is borrowed from actual GC, never synthesized from scans.
+
+Container lane read the full default simplifier source before bodies: cpp29–254
+construction/use-list/run/scoped finalization;254–747 cleanup, propagation and
+back-subsumption;747–880 duplicate/binary/todo;880–1083 blocked heap/elimination;
+1085–1480 weighted ordering/two-pass resolution and MC;1482–1522 all17 defaults/
+statistics/descriptors. Actual binary todo spans, blocked heap comparator, sort
+continuations and separate dummy tmp-clause reader binding need tests-first
+prerequisites. Do not default-disable resolution/subsumption/blocked elimination.
+
+Arena polynomial core remains private and incomplete. Actual rational/linear
+overloads, source SOM compaction/reset and stopped-unit ownership have further
+RED/green evidence; callbacks and full construction/finalization/unwind failure
+family must finish before freeze. A concrete charged cold caller-owned deletion
+handler bridge is authorized: core borrows linked head; named static dispatcher
+receives actual handler/core/polynomial; callbacks precede SIZE and current.next
+is read only after successful invocation. Preserve source list mutation and
+source failure prefix; separate owning abort never replays completed callbacks
+or invents exception recovery. Full multivariate/PSC and full patched solver
+goal remain active without narrowing.
+
+
+### Asymmetric branching master terminal GREEN evidence
+
+Full native and checked/debug tests, both complete vet profiles and source/
+no-generics audit are terminal0. Exact results are
+`.cache/sat-asymm-complete-gates.json`; logs
+`.cache/sat-asymm-complete-{native,debug,vet-native,vet-debug,source}.log`.
+All708 Go files/bytes were verified unchanged after all gates. Native main is
+12.929s; checked/debug main is806.525s. Original100-bit refinement and every
+actual reservation prefix are preserved. Inventory:2102 units/677 APIs,
+30ported/176partial/1896unported. Earlier live observations are superseded by
+these terminal results. No whole solver/API/source assertion campaign is newly
+completed. Headers retain full originating paths/license/authors without
+Microsoft copyright lines; no C++ content hashes or generics were introduced.
+
+Root private decision-selection family now has nine focused source groups
+GREEN in both profiles plus both vets. Genuine access-guard RED
+`.cache/sat-decision-numvars-red.log` showed the old helper silently ignored a
+failed actual level.size read, treating malformed backing as empty success.
+Corrections read actual source num_vars header at each reached expression and
+propagate the guard; unsafe fixture restores the original named caller field
+after observation, not a physical header/counter repair. Initial fixture treated
+Runtime failure101 as generic Budget ErrInjectedFailure; classification was
+corrected to the actual existing source transport helper, not algorithm RED.
+Actual decision reservations refuse0/1 before success2: queue candidate already
+consumed, scope refusal precedes statistic; trail refusal follows scope/statistic
+and actual assignment publication. Full named graph audit runs BEFORE faults
+are disabled. Independent source review approves RNG/queue/phase/order/owners
+within selected methods; cached phase is reread at the second source expression.
+All three private files are frozen in
+`.cache/work/sat-decision-334de9d/sat-decision-final-inventory.json`, with exact
+Go-only hashes and final `.cache/sat-decision-final-{native,debug,vet-native,
+vet-debug}.log` evidence. Master decision integration and full gates remain
+pending; full construction/update/shared RNG/search/EXT remain obligations.
+
+Container's initial simplifier draft incorrectly interpreted source num_vars
+using assignment size. Actual sat_solver.h246 reads m_level.size(); three
+private sites were corrected before full orchestration compiled GREEN. Partial
+MkVar and reached malformed-level fixtures remain required. Full default
+simplifier still compiles honestly missing its remaining actual algorithm bodies.

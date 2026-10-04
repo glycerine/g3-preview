@@ -20,6 +20,7 @@ type satSolverClauseLifecycle struct {
 	cleanerContinuation                                        *satCleaner
 	gcContinuation                                             *satSolverGC
 	eqContinuation                                             *satElimEqs
+	asymmContinuation                                          *satAsymmBranch
 	ownerBytes                                                 uint64
 	mkBinary, mkTernary, mkNary, deleted, nonLearnedGeneration uint32
 	reinitInitialized, scopesInitialized                       uint32
@@ -57,6 +58,9 @@ func (s *satSolverClauseLifecycle) open() error {
 		return arena.ErrClosed
 	}
 	if s.eqContinuation != nil && !s.eqContinuation.running {
+		return arena.ErrClosed
+	}
+	if s.asymmContinuation != nil && !s.asymmContinuation.running {
 		return arena.ErrClosed
 	}
 	return s.propagation.open()
@@ -293,6 +297,11 @@ func (s *satSolverClauseLifecycle) Close() error {
 		return nil
 	}
 	s.closing = true
+	if s.asymmContinuation != nil {
+		if e := s.asymmContinuation.cleanupInterrupted(); e != nil {
+			return e
+		}
+	}
 	if s.eqContinuation != nil {
 		if e := s.eqContinuation.cleanupInterrupted(); e != nil {
 			return e

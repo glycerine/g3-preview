@@ -52205,9 +52205,29 @@
       "path": "src/sat/sat_asymm_branch.cpp",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_asymm_branch.go",
+        "sat_asymm_branch_process.go",
+        "sat_asymm_branch_storage.go",
+        "sat_asymm_branch_test.go",
+        "sat_asymm_branch_audit_test.go",
+        "sat_solver_clause_lifecycle.go"
+      ],
+      "tests": [
+        "TestSATAsymmDefaultAndSourceEarlyExits",
+        "TestSATAsymmProcessActualBinaryReduction",
+        "TestSATAsymmSatisfiedAndNoReduction",
+        "TestSATAsymmCompleteFiniteModelAndAllReductionArities",
+        "TestSATAsymmSourceSolverCatchAndNoPhaseRestoration",
+        "TestSATAsymmEveryActualRefusalPrefix",
+        "TestSATAsymmActualNewUnitAndCounterLimit",
+        "TestSATAsymmParametersStatsAndColdRefusal",
+        "TestSATAsymmFailedPhaseConstructorUnwindsReportBeforeOwningAbort",
+        "TestSATAsymmDebugScopeAssertionPrecedesTrailRead",
+        "TestSATAsymmCompletedLocalDestructionStopsBeforeOlderReport",
+        "TestSATAsymmPostphysicalLocalFreeRetainsOlderReport"
+      ],
       "conditionals": [
         {
           "line": 121,
@@ -52298,17 +52318,61 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Selected constructor, parameters/statistics, complete asymmetric run/process and scoped-detach routes",
+          "status": "partial",
+          "go_target": "sat_asymm_branch.go",
+          "tests": [
+            "TestSATAsymmDefaultAndSourceEarlyExits",
+            "TestSATAsymmProcessActualBinaryReduction",
+            "TestSATAsymmSatisfiedAndNoReduction",
+            "TestSATAsymmCompleteFiniteModelAndAllReductionArities",
+            "TestSATAsymmSourceSolverCatchAndNoPhaseRestoration",
+            "TestSATAsymmEveryActualRefusalPrefix",
+            "TestSATAsymmActualNewUnitAndCounterLimit",
+            "TestSATAsymmParametersStatsAndColdRefusal",
+            "TestSATAsymmFailedPhaseConstructorUnwindsReportBeforeOwningAbort",
+            "TestSATAsymmDebugScopeAssertionPrecedesTrailRead",
+            "TestSATAsymmCompletedLocalDestructionStopsBeforeOlderReport",
+            "TestSATAsymmPostphysicalLocalFreeRetainsOlderReport"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual sole propagation.asymmCounter; real Runtime saved phase clone and restore; source scoped detach before push; disjoint stable merge and clause compaction owners. Saved copy constructor completion and lexical destructor progress are distinct from separate failed-constructor owning abort. Every allocation refusal 0 through 7 audited immediately before fault disable; first success 8."
+      ],
+      "deviations": [
+        "Full solver scheduler/constructor/search, enabled integrity and propagation-wrapper diagnostic bindings, TRACE/verbose and complete generated registration/default-empty parameter binding remain open. Concrete stable merge preserves descending size and equal ties, not C++ standard-library allocation topology or invocation schedule. Source exceptional scope is not popped automatically; only actual solver_exception triggers source suffix compaction and counter negation. Protocol stale-token and signed-overflow TLS fixtures do not claim ordinary valid-domain allocation failures. No whole solver/API/registered assertion completion credit."
+      ]
     },
     {
       "path": "src/sat/sat_asymm_branch.h",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_asymm_branch.go",
+        "sat_asymm_branch_process.go",
+        "sat_asymm_branch_storage.go",
+        "sat_asymm_branch_test.go",
+        "sat_asymm_branch_audit_test.go",
+        "sat_solver_clause_lifecycle.go"
+      ],
+      "tests": [
+        "TestSATAsymmDefaultAndSourceEarlyExits",
+        "TestSATAsymmProcessActualBinaryReduction",
+        "TestSATAsymmSatisfiedAndNoReduction",
+        "TestSATAsymmCompleteFiniteModelAndAllReductionArities",
+        "TestSATAsymmSourceSolverCatchAndNoPhaseRestoration",
+        "TestSATAsymmEveryActualRefusalPrefix",
+        "TestSATAsymmActualNewUnitAndCounterLimit",
+        "TestSATAsymmParametersStatsAndColdRefusal",
+        "TestSATAsymmFailedPhaseConstructorUnwindsReportBeforeOwningAbort",
+        "TestSATAsymmDebugScopeAssertionPrecedesTrailRead",
+        "TestSATAsymmCompletedLocalDestructionStopsBeforeOlderReport",
+        "TestSATAsymmPostphysicalLocalFreeRetainsOlderReport"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -52321,9 +52385,33 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Selected constructor, parameters/statistics, complete asymmetric run/process and scoped-detach routes",
+          "status": "partial",
+          "go_target": "sat_asymm_branch.go",
+          "tests": [
+            "TestSATAsymmDefaultAndSourceEarlyExits",
+            "TestSATAsymmProcessActualBinaryReduction",
+            "TestSATAsymmSatisfiedAndNoReduction",
+            "TestSATAsymmCompleteFiniteModelAndAllReductionArities",
+            "TestSATAsymmSourceSolverCatchAndNoPhaseRestoration",
+            "TestSATAsymmEveryActualRefusalPrefix",
+            "TestSATAsymmActualNewUnitAndCounterLimit",
+            "TestSATAsymmParametersStatsAndColdRefusal",
+            "TestSATAsymmFailedPhaseConstructorUnwindsReportBeforeOwningAbort",
+            "TestSATAsymmDebugScopeAssertionPrecedesTrailRead",
+            "TestSATAsymmCompletedLocalDestructionStopsBeforeOlderReport",
+            "TestSATAsymmPostphysicalLocalFreeRetainsOlderReport"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual sole propagation.asymmCounter; real Runtime saved phase clone and restore; source scoped detach before push; disjoint stable merge and clause compaction owners. Saved copy constructor completion and lexical destructor progress are distinct from separate failed-constructor owning abort. Every allocation refusal 0 through 7 audited immediately before fault disable; first success 8."
+      ],
+      "deviations": [
+        "Full solver scheduler/constructor/search, enabled integrity and propagation-wrapper diagnostic bindings, TRACE/verbose and complete generated registration/default-empty parameter binding remain open. Concrete stable merge preserves descending size and equal ties, not C++ standard-library allocation topology or invocation schedule. Source exceptional scope is not popped automatically; only actual solver_exception triggers source suffix compaction and counter negation. Protocol stale-token and signed-overflow TLS fixtures do not claim ordinary valid-domain allocation failures. No whole solver/API/registered assertion completion credit."
+      ]
     },
     {
       "path": "src/sat/sat_asymm_branch_params.hpp",
@@ -52378,14 +52466,58 @@
       "path": "src/sat/sat_asymm_branch_params.pyg",
       "component": "sat",
       "role": "generated_input",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_asymm_branch.go",
+        "sat_asymm_branch_process.go",
+        "sat_asymm_branch_storage.go",
+        "sat_asymm_branch_test.go",
+        "sat_asymm_branch_audit_test.go",
+        "sat_solver_clause_lifecycle.go"
+      ],
+      "tests": [
+        "TestSATAsymmDefaultAndSourceEarlyExits",
+        "TestSATAsymmProcessActualBinaryReduction",
+        "TestSATAsymmSatisfiedAndNoReduction",
+        "TestSATAsymmCompleteFiniteModelAndAllReductionArities",
+        "TestSATAsymmSourceSolverCatchAndNoPhaseRestoration",
+        "TestSATAsymmEveryActualRefusalPrefix",
+        "TestSATAsymmActualNewUnitAndCounterLimit",
+        "TestSATAsymmParametersStatsAndColdRefusal",
+        "TestSATAsymmFailedPhaseConstructorUnwindsReportBeforeOwningAbort",
+        "TestSATAsymmDebugScopeAssertionPrecedesTrailRead",
+        "TestSATAsymmCompletedLocalDestructionStopsBeforeOlderReport",
+        "TestSATAsymmPostphysicalLocalFreeRetainsOlderReport"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Selected constructor, parameters/statistics, complete asymmetric run/process and scoped-detach routes",
+          "status": "partial",
+          "go_target": "sat_asymm_branch.go",
+          "tests": [
+            "TestSATAsymmDefaultAndSourceEarlyExits",
+            "TestSATAsymmProcessActualBinaryReduction",
+            "TestSATAsymmSatisfiedAndNoReduction",
+            "TestSATAsymmCompleteFiniteModelAndAllReductionArities",
+            "TestSATAsymmSourceSolverCatchAndNoPhaseRestoration",
+            "TestSATAsymmEveryActualRefusalPrefix",
+            "TestSATAsymmActualNewUnitAndCounterLimit",
+            "TestSATAsymmParametersStatsAndColdRefusal",
+            "TestSATAsymmFailedPhaseConstructorUnwindsReportBeforeOwningAbort",
+            "TestSATAsymmDebugScopeAssertionPrecedesTrailRead",
+            "TestSATAsymmCompletedLocalDestructionStopsBeforeOlderReport",
+            "TestSATAsymmPostphysicalLocalFreeRetainsOlderReport"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual sole propagation.asymmCounter; real Runtime saved phase clone and restore; source scoped detach before push; disjoint stable merge and clause compaction owners. Saved copy constructor completion and lexical destructor progress are distinct from separate failed-constructor owning abort. Every allocation refusal 0 through 7 audited immediately before fault disable; first success 8."
+      ],
+      "deviations": [
+        "Full solver scheduler/constructor/search, enabled integrity and propagation-wrapper diagnostic bindings, TRACE/verbose and complete generated registration/default-empty parameter binding remain open. Concrete stable merge preserves descending size and equal ties, not C++ standard-library allocation topology or invocation schedule. Source exceptional scope is not popped automatically; only actual solver_exception triggers source suffix compaction and counter negation. Protocol stale-token and signed-overflow TLS fixtures do not claim ordinary valid-domain allocation failures. No whole solver/API/registered assertion completion credit."
+      ]
     },
     {
       "path": "src/sat/sat_clause.cpp",
