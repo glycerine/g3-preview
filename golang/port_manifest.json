@@ -28556,7 +28556,9 @@
         "mpnum/polynomial_sparse_physical_test.go",
         "mpnum/polynomial_sparse_interpolator_add_source_test.go",
         "mpnum/polynomial_sparse_interpolator_source_test.go",
-        "mpnum/polynomial_content_lifetime_source_test.go"
+        "mpnum/polynomial_content_lifetime_source_test.go",
+        "clibrand/rand.go",
+        "clibrand/rand_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -28931,7 +28933,13 @@
         "TestPolynomialIntegerContentCompletedLocalActualDanglingGuard",
         "TestPolynomialIntegerContentEveryActualReservationPrefix",
         "TestPolynomialIntegerContentIndependentSignedBranches",
-        "TestPolynomialScalarIntegerContentSignedFirstAndEarlyOne"
+        "TestPolynomialScalarIntegerContentSignedFirstAndEarlyOne",
+        "TestGLibc31CapturedLibrarySeeds",
+        "TestGLibc31ZeroValueAndSeedZero",
+        "TestGLibc31ReseedAndIndependentState",
+        "TestProcessRandDefaultWithoutSrand",
+        "TestProcessRandBorrowedDrawsShareSrand",
+        "TestGLibc31DrawsAllocateNoStorage"
       ],
       "conditionals": [
         {
@@ -31562,6 +31570,19 @@
             "TestPolynomialIntegerContentIndependentSignedBranches",
             "TestPolynomialScalarIntegerContentSignedFirstAndEarlyOne"
           ]
+        },
+        {
+          "name": "Shared rand/srand dependency of peek_fresh cpp4053-4068; selected Linux/glibc31 mathematical recurrence, process default/reseed and borrowed draws (peek_fresh/GCD body still open)",
+          "status": "partial",
+          "go_target": "clibrand/rand.go",
+          "tests": [
+            "TestGLibc31CapturedLibrarySeeds",
+            "TestGLibc31ZeroValueAndSeedZero",
+            "TestGLibc31ReseedAndIndependentState",
+            "TestProcessRandDefaultWithoutSrand",
+            "TestProcessRandBorrowedDrawsShareSrand",
+            "TestGLibc31DrawsAllocateNoStorage"
+          ]
         }
       ],
       "ownership": [
@@ -31594,7 +31615,8 @@
         "Concrete reflected composition scope borrows source degree2pos member, owns actual completed numeral/poly locals and exact created-outcome orphan cohort. Source auxiliary then degree then local destruction; matching younger constant numeral\u2192rational NUM/DEN stop preserves older locals and sticky causes. Explicit owning cleanup resumes matching callee first and acknowledges only its exact consumed returned result; physical pending ObjectRef/triples and borrowed callbacks remain separate, no registry-derived authority.",
         "Actual Runtime numeral arrays, inline128 monomial buffer, auxiliary numeral and embedded concrete linear solver; reflected enclosing cold fields charged once, no mirror arrays or per-call solver heap header. Source destruction retains its first cause and stops before older locals; owning abort uses exact generation/numeric ObjectRef/raw receipts.",
         "Content ai and monic inv/newA are actual named cold fields; the three actual retained BIG fixture detects missing root enumeration, without claiming simultaneous mathematical reachability. Direct caller output SET/ref-assignment roots remain caller-owned.",
-        "Real source deletion callbacks do not grant outer PSC factory/singleton ownership; actual callback execution excludes receipt acquisition without changing source callback/depth order."
+        "Real source deletion callbacks do not grant outer PSC factory/singleton ownership; actual callback execution excludes receipt acquisition without changing source callback/depth order.",
+        "Selected C rand state is process-static fixed31 scalar words; all Rand aliases borrow the same synchronized stream and observe Srand, without per-manager reseeding or per-draw allocation. Explicit GLibc31 instances are independent profile fixtures, not GCD-owned RNGs."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -31627,7 +31649,8 @@
         "Source lexical stack represented by charged cached concrete Go owners and actual pointer directory; no Runtime reservation ticket. Algebraic evaluation, cross-Integer transfer, global TRACE and complete registered polynomial driver remain open.",
         "Selected source composition bodies complete for explicit same-Integer rational binding and actual Runtime profile. Dormant cpp573-574 ENSURE adapted via dense term construction; registered driver returns before tst_compose, active original driver credit zero. TLS/dangling-pointer proofs are actual owner-primitive guarded-domain tests, not ordinary mathematical OOM reachability. Global TRACE/assertions/native ABI, same-frame high-level callback reentry and full polynomial family remain open; persistent source class members are not implicitly reset by owning lexical abort.",
         "ICCP recursive scopes, default modular GCD, CRA and Resultant bodies remain open; these selected prerequisites do not substitute for those algorithms.",
-        "Global TRACE/diagnostic binding, high-level PSC callback reentrancy and complete polynomial family audit remain open. Sparse successful calls perform fresh source lexical allocations; no zero-Go-allocation claim."
+        "Global TRACE/diagnostic binding, high-level PSC callback reentrancy and complete polynomial family audit remain open. Sparse successful calls perform fresh source lexical allocations; no zero-Go-allocation claim.",
+        "C library rand/srand binding independently implements the selected Linux/glibc31 mathematical recurrence; captured glibc2.39 test oracle covers default and262 seeds. Other libc profiles and source test-driver migration remain open; no GNU implementation code is copied and no LP source-unit completion is credited."
       ]
     },
     {
