@@ -32,6 +32,7 @@ type polynomialCreation struct {
 	substitutionOwned bool
 	translationOwned  bool
 	generation        uint64
+	squareRootParent  *polynomialSquareRootScope
 	derivativeParent  *polynomialDerivativeScope
 	raw               memory.ObjectRef
 	value             Polynomial
@@ -95,6 +96,7 @@ type MultivariatePolynomialCore struct {
 	ids                                                                                        utilid.Generator
 	polynomials                                                                                polynomialVector
 	locations                                                                                  []polynomialLocation
+	squareRootOwner                                                                            *polynomialSquareRootScope
 	derivativeOwner                                                                            *polynomialDerivativeScope
 	compositionOwner                                                                           *polynomialCompositionScope
 	creationGeneration                                                                         uint64

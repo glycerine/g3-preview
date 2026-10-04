@@ -50,6 +50,10 @@ func (r *polynomialReference) assign(m *MultivariatePolynomialCore, p Polynomial
 	}
 	r.incoming = p
 	r.assigning = true
+	// Actual INC has completed and this real caller reference now owns incoming.
+	if owner := m.squareRootOwner; owner != nil && owner.executing && m.callbackDepth == 0 && owner.freshResult == p {
+		owner.freshResult = Polynomial{}
+	}
 	if e := polynomialReferenceDrop(m, &r.value, &r.decremented); e != nil {
 		r.cleanupCause = e
 		return e

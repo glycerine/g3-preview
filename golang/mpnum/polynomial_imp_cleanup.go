@@ -193,6 +193,9 @@ func (m *MultivariatePolynomialManager) CloseChecked() error {
 	if e := m.identity(); e != nil {
 		return e
 	}
+	if m.squareRoot.active {
+		return ErrPolynomialPending
+	}
 	if m.core != nil && (m.core.translation.active || m.core.pscPending()) {
 		return ErrPolynomialPending
 	}
@@ -210,6 +213,9 @@ func (m *MultivariatePolynomialManager) CloseChecked() error {
 		m.closing = true
 	}
 	if e := m.closeEvaluationFrames(); e != nil {
+		return e
+	}
+	if e := m.closeSquareRootMetadata(); e != nil {
 		return e
 	}
 	if e := m.closeCompositionMetadata(); e != nil {

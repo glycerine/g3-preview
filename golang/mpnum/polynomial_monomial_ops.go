@@ -613,6 +613,13 @@ func (m *MonomialManager) Power(a Monomial, k uint32) (Monomial, error) {
 	return m.internTemp(1)
 }
 func (m *MonomialManager) Sqrt(a Monomial) (Monomial, bool, error) {
+	return m.sqrtCreated(a, nil)
+}
+func (m *MonomialManager) sqrtCreated(a Monomial, outcome *monomialFactoryOutcome) (result Monomial, ok bool, cause error) {
+
+	if outcome != nil {
+		*outcome = monomialFactoryOutcome{}
+	}
 	if e := m.check(); e != nil {
 		return Monomial{}, false, e
 	}
@@ -651,7 +658,10 @@ func (m *MonomialManager) Sqrt(a Monomial) (Monomial, bool, error) {
 	if e = m.tempSetSize(t, x.Size); e != nil {
 		return Monomial{}, false, e
 	}
-	r, e := m.internTemp(1)
+	r, e := m.internTempCreated(1, outcome)
+	if e == nil {
+		m.creation = monomialCreation{}
+	}
 	return r, true, e
 }
 func (m *MonomialManager) variableTransform(a Monomial, v, k uint32, operation uint8) (Monomial, error) {

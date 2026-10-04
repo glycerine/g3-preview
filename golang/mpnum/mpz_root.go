@@ -1,5 +1,6 @@
 // Licensed under the MIT license.
-// Source: src/util/mpz.cpp root/is_perfect_square and mpz.h copy wrapper.
+// Source: src/util/mpz.cpp; src/util/mpz.h (root/is_perfect_square and copy wrapper).
+// Source author: Leonardo de Moura.
 package mpnum
 
 import "errors"
@@ -185,21 +186,10 @@ func (m *IntegerManager) IsPerfectSquare(a, out *Int) (bool, error) {
 	if a.val < 0 {
 		return false, nil
 	}
-	if a == out {
-		return true, m.Reset(out)
-	}
-	var work Int
-	defer m.Del(&work)
-	exact, e := m.squareCore(a, &work)
-	if e != nil {
-		return false, e
-	}
-	if e = m.Move(out, &work); e != nil {
-		return false, e
-	}
-	return exact, nil
+	return m.squareCore(a, out)
 }
-func (m *IntegerManager) squareCore(a, out *Int) (bool, error) {
+
+func (m *IntegerManager) squareCore(a, out *Int) (exact bool, cause error) {
 	if e := m.Reset(out); e != nil {
 		return false, e
 	}
@@ -207,80 +197,136 @@ func (m *IntegerManager) squareCore(a, out *Int) (bool, error) {
 		return true, nil
 	}
 	one := NewInt(1)
-	compare, e := m.Compare(a, &one)
+	same, e := m.IsOne(a)
 	if e != nil {
 		return false, e
 	}
-	if compare == 0 {
+	if same {
 		return true, m.SetInt64(out, 1)
 	}
-	var lo, hi, mid, sqLo, sqHi, sqMid Int
+	if e = m.beginPerfectSquareRawScope(); e != nil {
+		return false, e
+	}
+	s := &m.perfectSquare
 	defer func() {
-		m.Del(&lo)
-		m.Del(&hi)
-		m.Del(&mid)
-		m.Del(&sqLo)
-		m.Del(&sqHi)
-		m.Del(&sqMid)
+		if cause != nil && !s.endEntered && s.bodyCause == nil {
+			s.bodyCause = cause
+		}
 	}()
-	if e = m.SetInt64(&lo, 1); e != nil {
+	lo, hi, mid, sqLo, sqHi, sqMid := &s.values[0], &s.values[1], &s.values[2], &s.values[3], &s.values[4], &s.values[5]
+	if e = m.SetInt64(lo, 1); e != nil {
 		return false, e
 	}
-	if e = m.Copy(&hi, a); e != nil {
+	if e = m.perfectSquareCall(0, a, nil, hi); e != nil {
 		return false, e
 	}
-	if e = m.SetInt64(&sqLo, 1); e != nil {
+	if e = m.SetInt64(sqLo, 1); e != nil {
 		return false, e
 	}
-	if e = m.Mul(&hi, &hi, &sqHi); e != nil {
+	if e = m.perfectSquareCall(2, hi, hi, sqHi); e != nil {
 		return false, e
 	}
 	two := NewInt(2)
 	for {
-		compare, e = m.Compare(&sqLo, a)
+		if modularSourceDebug {
+			cmp, x := m.Compare(lo, hi)
+			if x != nil {
+				return false, x
+			}
+			if cmp >= 0 {
+				return false, ErrIntegerAssertion
+			}
+			cmp, x = m.Compare(sqLo, a)
+			if x != nil {
+				return false, x
+			}
+			if cmp > 0 {
+				return false, ErrIntegerAssertion
+			}
+			cmp, x = m.Compare(a, sqHi)
+			if x != nil {
+				return false, x
+			}
+			if cmp >= 0 {
+				return false, ErrIntegerAssertion
+			}
+		}
+		same, e = m.Equal(sqLo, a)
 		if e != nil {
 			return false, e
 		}
-		if compare == 0 {
-			return true, m.Copy(out, &lo)
-		}
-		if e = m.Add(&lo, &one, &mid); e != nil {
-			return false, e
-		}
-		compare, e = m.Compare(&mid, &hi)
-		if e != nil {
-			return false, e
-		}
-		if compare == 0 {
-			return false, m.Copy(out, &hi)
-		}
-		if e = m.Add(&hi, &lo, &mid); e != nil {
-			return false, e
-		}
-		if e = m.Div(&mid, &two, &mid); e != nil {
-			return false, e
-		}
-		if e = m.Mul(&mid, &mid, &sqMid); e != nil {
-			return false, e
-		}
-		compare, e = m.Compare(&sqMid, a)
-		if e != nil {
-			return false, e
-		}
-		if compare > 0 {
-			if e = m.Copy(&hi, &mid); e != nil {
+		if same {
+			s.outputStarted = true
+			s.outputChoice = 0
+			if e = m.Copy(out, lo); e != nil {
 				return false, e
 			}
-			if e = m.Copy(&sqHi, &sqMid); e != nil {
+			exact = true
+			break
+		}
+		if e = m.perfectSquareCall(1, lo, &one, mid); e != nil {
+			return false, e
+		}
+		same, e = m.Equal(mid, hi)
+		if e != nil {
+			return false, e
+		}
+		if same {
+			s.outputStarted = true
+			s.outputChoice = 1
+			if e = m.Copy(out, hi); e != nil {
+				return false, e
+			}
+			exact = false
+			break
+		}
+		if e = m.perfectSquareCall(1, hi, lo, mid); e != nil {
+			return false, e
+		}
+		if e = m.perfectSquareCall(3, mid, &two, mid); e != nil {
+			return false, e
+		}
+		if modularSourceDebug {
+			cmp, x := m.Compare(lo, mid)
+			if x != nil {
+				return false, x
+			}
+			if cmp >= 0 {
+				return false, ErrIntegerAssertion
+			}
+			cmp, x = m.Compare(mid, hi)
+			if x != nil {
+				return false, x
+			}
+			if cmp >= 0 {
+				return false, ErrIntegerAssertion
+			}
+		}
+		if e = m.perfectSquareCall(2, mid, mid, sqMid); e != nil {
+			return false, e
+		}
+		cmp, x := m.Compare(sqMid, a)
+		if x != nil {
+			return false, x
+		}
+		if cmp > 0 {
+			if e = m.perfectSquareCall(0, mid, nil, hi); e != nil {
+				return false, e
+			}
+			if e = m.perfectSquareCall(0, sqMid, nil, sqHi); e != nil {
 				return false, e
 			}
 		} else {
-			if e = m.Copy(&lo, &mid); e != nil {
+			if e = m.perfectSquareCall(0, mid, nil, lo); e != nil {
 				return false, e
 			}
-			if e = m.Copy(&sqLo, &sqMid); e != nil {
+			if e = m.perfectSquareCall(0, sqMid, nil, sqLo); e != nil {
 				return false, e
 			}
 		}
 	}
+	if e = m.endPerfectSquareRawScope(); e != nil {
+		return false, e
+	}
+	return exact, nil
 }

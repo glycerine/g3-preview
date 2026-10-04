@@ -39,6 +39,7 @@ type MultivariatePolynomialManager struct {
 	useSparseGCD, usePRSGCD                                    bool
 	completed, sourceStarted, sourceFinalized, closing, closed bool
 	originalCause, sourceCause, cleanupCause, unwindCause      error
+	squareRoot                                                 polynomialSquareRootScope
 	derivative                                                 polynomialDerivativeScope
 	evaluation                                                 polynomialEvaluationScope
 	composition                                                polynomialCompositionScope

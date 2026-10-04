@@ -43,7 +43,12 @@ func polynomialImpPhysicalAuditNamed(t *testing.T, full *MultivariatePolynomialM
 	for i := range full.composition.raw {
 		public = append(public, &full.composition.raw[i])
 	}
+	for i := range full.squareRoot.values {
+		public = append(public, &full.squareRoot.values[i])
+	}
+	public = append(public, &full.squareRoot.two)
 	public = append(public, input...)
+	adapterBytes += uint64(cap(full.squareRoot.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size())
 	adapterBytes += externalHeaders
 	es := &full.evaluation
 	adapterBytes += uint64(cap(es.rationalFrames))*uint64(reflect.TypeOf((*polynomialEvalRationalFrame)(nil)).Size()) + uint64(len(es.rationalFrames))*uint64(reflect.TypeOf(polynomialEvalRationalFrame{}).Size())
@@ -109,6 +114,9 @@ func polynomialImpPhysicalAuditNamed(t *testing.T, full *MultivariatePolynomialM
 	}
 	for _, r := range z.arg {
 		add(Int{cell: r})
+	}
+	for i := range z.perfectSquare.values {
+		add(z.perfectSquare.values[i])
 	}
 	for i := range z.rawDisplay.roots {
 		add(z.rawDisplay.roots[i])
@@ -182,6 +190,7 @@ func polynomialImpPhysicalAuditNamed(t *testing.T, full *MultivariatePolynomialM
 		}
 		cell(p, l.initializedCoefficients)
 	}
+	addPolynomial(full.squareRoot.freshResult)
 	addPolynomial(full.composition.local.value)
 	addPolynomial(full.composition.local.incoming)
 	addPolynomial(full.composition.freshResult)

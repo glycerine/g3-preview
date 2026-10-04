@@ -280,6 +280,10 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 	}
 	m.creationGeneration++
 	m.pending = polynomialCreation{generation: m.creationGeneration}
+	if owner := m.squareRootOwner; owner != nil && owner.executing && m.callbackDepth == 0 {
+		m.pending.squareRootParent = owner
+		owner.factoryGeneration = m.creationGeneration
+	}
 	if m.compositionOwner != nil && m.compositionOwner.executing {
 		m.pending.compositionParent = m.compositionOwner
 		m.compositionOwner.factoryGeneration = m.creationGeneration
@@ -293,8 +297,9 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 	m.pending.translationOwned = m.translation.executing
 	requested := polynomialCodecBytes(n)
 	observer := m.pending.compositionParent
+	squareObserver := m.pending.squareRootParent
 	var before [3]memory.Block
-	if observer != nil {
+	if observer != nil || squareObserver != nil {
 		var e error
 		before, e = m.monomials.allocator.PendingRoots()
 		if e != nil {
@@ -306,10 +311,15 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 		m.pending.raw = raw
 		m.pending.requested = requested
 	}
-	if observer != nil && before == ([3]memory.Block{}) {
+	if (observer != nil || squareObserver != nil) && before == ([3]memory.Block{}) {
 		after, probe := m.monomials.allocator.PendingRoots()
 		if after != ([3]memory.Block{}) {
-			observer.monomialRaw = after
+			if observer != nil {
+				observer.monomialRaw = after
+			}
+			if squareObserver != nil {
+				squareObserver.monomialRaw = after
+			}
 		}
 		if probe != nil {
 			return Polynomial{}, errors.Join(e, probe)
@@ -435,6 +445,10 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 		m.pending.derivativeParent.factoryGeneration = 0
 	}
 	if owner := m.pending.compositionParent; owner != nil && owner.factoryGeneration == m.pending.generation {
+		owner.factoryGeneration = 0
+		owner.freshResult = p
+	}
+	if owner := m.pending.squareRootParent; owner != nil && owner.factoryGeneration == m.pending.generation {
 		owner.factoryGeneration = 0
 		owner.freshResult = p
 	}

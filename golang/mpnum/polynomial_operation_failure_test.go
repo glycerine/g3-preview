@@ -206,6 +206,16 @@ func polynomialOperationMonomialAudit(t *testing.T, m *MultivariatePolynomialCor
 		}
 		refs[a] = true
 	}
+	if owner := m.squareRootOwner; owner != nil {
+		add(owner.reference.value)
+		add(owner.reference.incoming)
+		for _, a := range owner.orphans {
+			add(a)
+		}
+		if owner.freshResult != (Polynomial{}) {
+			callers = append(callers, owner.freshResult)
+		}
+	}
 	add(m.monomials.unit)
 	if m.translation.constructed {
 		add(m.translation.xk.value)

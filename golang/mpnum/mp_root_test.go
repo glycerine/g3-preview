@@ -6,6 +6,7 @@ package mpnum
 import (
 	"errors"
 	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
 	"math"
 	"math/big"
 	"math/rand"
@@ -358,9 +359,50 @@ func TestIntegerRootAndSquareFailureCleanup(t *testing.T) {
 						if !numericPhysicalReservationRefusal(e) {
 							t.Fatal(operation, alias, fault, e)
 						}
-						// Every method call preserves both inputs and destination on error.
-						if integerString(t, m, &a) != inputBefore || integerString(t, m, dst) != outputBefore {
-							t.Fatal("root publication/temporary leak", operation, alias, fault)
+						if operation != 2 {
+							// Existing Root/RootInPlace owning adapters preserve
+							// their original input/destination behavior.
+							if integerString(t, m, &a) != inputBefore || integerString(t, m, dst) != outputBefore {
+								t.Fatal("root publication/temporary leak", operation, alias, fault)
+							}
+						} else {
+							scope := &m.perfectSquare
+							if scope.active && !scope.outputStarted {
+								if dst.cell != 0 || dst.val != 0 {
+									t.Fatal("square source reset before raw body failure", alias, fault, *dst)
+								}
+							} else if scope.outputStarted {
+								if m.isFailureRef(dst.cell) {
+									if dst.cell != m.failedNullRef || dst.val != 1 {
+										t.Fatal("fresh caller final SET refusal", fault, *dst)
+									}
+									if x := m.check(dst); !errors.Is(x, arena.ErrInvalidSlot) {
+										t.Fatal("caller source pointer guard", x)
+									}
+								} else {
+									want, _ := rootOracle(large, 2)
+									if integerString(t, m, dst) != want.String() {
+										t.Fatal("source output published before raw end Del", fault)
+									}
+								}
+							} else if x := m.check(dst); x == nil {
+								// Reset itself stopped before scalar zero publication.
+								if integerString(t, m, dst) != outputBefore {
+									t.Fatal("square stopped Reset prefix", fault)
+								}
+							} else if !errors.Is(x, arena.ErrInvalidSlot) {
+								t.Fatal("stopped Reset caller guard", x)
+							}
+							// Operation abort drains only its six actual RAW
+							// locals. Final SET's unpublished caller block is
+							// an explicitly separate caller cleanup obligation.
+							serviceMust(t, m.CleanupPerfectSquare())
+							if scope.outputStarted && m.pendingCell.object != (memory.ObjectRef{}) {
+								serviceMust(t, m.CleanupPendingAllocation())
+							}
+							if !alias && integerString(t, m, &a) != inputBefore {
+								t.Fatal("source square input changed", fault)
+							}
 						}
 					} else {
 						b.FailAfter(-1)

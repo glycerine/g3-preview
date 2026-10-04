@@ -28558,7 +28558,9 @@
         "mpnum/polynomial_sparse_interpolator_source_test.go",
         "mpnum/polynomial_content_lifetime_source_test.go",
         "clibrand/rand.go",
-        "clibrand/rand_test.go"
+        "clibrand/rand_test.go",
+        "mpnum/polynomial_sqrt.go",
+        "mpnum/polynomial_sqrt_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -28939,7 +28941,20 @@
         "TestGLibc31ReseedAndIndependentState",
         "TestProcessRandDefaultWithoutSrand",
         "TestProcessRandBorrowedDrawsShareSrand",
-        "TestGLibc31DrawsAllocateNoStorage"
+        "TestGLibc31DrawsAllocateNoStorage",
+        "TestPolynomialSqrtDormantOriginal",
+        "TestPolynomialSqrtIndependentSmallSquares",
+        "TestPolynomialSqrtEveryReservation",
+        "TestPolynomialSqrtQuickBranchesAndCancel",
+        "TestPolynomialSqrtBigNumeralEveryReservation",
+        "TestPolynomialSqrtResultTransferredBeforeOldCallbackRefusal",
+        "TestPolynomialSqrtCreatedOnlyFalseQuotientCohort",
+        "TestPolynomialSqrtLeavesOlderPerfectSquareInvocation",
+        "TestPolynomialSqrtPostphysicalIntegerRawReceipt",
+        "TestPolynomialSqrtFinalFactoryPostphysicalRaw",
+        "TestPolynomialSqrtEveryCheckpointFrontier",
+        "TestPolynomialSqrtSourceAuxStopKeepsOlderFields",
+        "TestPolynomialSqrtDeletionCallbackForeignRootsStayCallerOwned"
       ],
       "conditionals": [
         {
@@ -31583,6 +31598,26 @@
             "TestProcessRandBorrowedDrawsShareSrand",
             "TestGLibc31DrawsAllocateNoStorage"
           ]
+        },
+        {
+          "name": "Selected sqrt cpp5954-6068/7284-7286 quick checks, persistent R/C SOM loop, checkpoints, exact result transfer and scoped destruction; dormant source assertions",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_sqrt.go",
+          "tests": [
+            "TestPolynomialSqrtDormantOriginal",
+            "TestPolynomialSqrtIndependentSmallSquares",
+            "TestPolynomialSqrtEveryReservation",
+            "TestPolynomialSqrtQuickBranchesAndCancel",
+            "TestPolynomialSqrtBigNumeralEveryReservation",
+            "TestPolynomialSqrtResultTransferredBeforeOldCallbackRefusal",
+            "TestPolynomialSqrtCreatedOnlyFalseQuotientCohort",
+            "TestPolynomialSqrtLeavesOlderPerfectSquareInvocation",
+            "TestPolynomialSqrtPostphysicalIntegerRawReceipt",
+            "TestPolynomialSqrtFinalFactoryPostphysicalRaw",
+            "TestPolynomialSqrtEveryCheckpointFrontier",
+            "TestPolynomialSqrtSourceAuxStopKeepsOlderFields",
+            "TestPolynomialSqrtDeletionCallbackForeignRootsStayCallerOwned"
+          ]
         }
       ],
       "ownership": [
@@ -31616,7 +31651,8 @@
         "Actual Runtime numeral arrays, inline128 monomial buffer, auxiliary numeral and embedded concrete linear solver; reflected enclosing cold fields charged once, no mirror arrays or per-call solver heap header. Source destruction retains its first cause and stops before older locals; owning abort uses exact generation/numeric ObjectRef/raw receipts.",
         "Content ai and monic inv/newA are actual named cold fields; the three actual retained BIG fixture detects missing root enumeration, without claiming simultaneous mathematical reachability. Direct caller output SET/ref-assignment roots remain caller-owned.",
         "Real source deletion callbacks do not grant outer PSC factory/singleton ownership; actual callback execution excludes receipt acquisition without changing source callback/depth order.",
-        "Selected C rand state is process-static fixed31 scalar words; all Rand aliases borrow the same synchronized stream and observe Srand, without per-manager reseeding or per-draw allocation. Explicit GLibc31 instances are independent profile fixtures, not GCD-owned RNGs."
+        "Selected C rand state is process-static fixed31 scalar words; all Rand aliases borrow the same synchronized stream and observe Srand, without per-manager reseeding or per-draw allocation. Explicit GLibc31 instances are independent profile fixtures, not GCD-owned RNGs.",
+        "Charged concrete scope owns actual four scoped NUMs, RAW two, monomial_ref, exact created-only cohort and matched callee/factory/physical receipts. Successful incoming INC transfers output before older DEC callback; source destruction is reverse lexical and stops before older fields, separate from explicit owning CleanupSqrt."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -31650,7 +31686,8 @@
         "Selected source composition bodies complete for explicit same-Integer rational binding and actual Runtime profile. Dormant cpp573-574 ENSURE adapted via dense term construction; registered driver returns before tst_compose, active original driver credit zero. TLS/dangling-pointer proofs are actual owner-primitive guarded-domain tests, not ordinary mathematical OOM reachability. Global TRACE/assertions/native ABI, same-frame high-level callback reentry and full polynomial family remain open; persistent source class members are not implicitly reset by owning lexical abort.",
         "ICCP recursive scopes, default modular GCD, CRA and Resultant bodies remain open; these selected prerequisites do not substitute for those algorithms.",
         "Global TRACE/diagnostic binding, high-level PSC callback reentrancy and complete polynomial family audit remain open. Sparse successful calls perform fresh source lexical allocations; no zero-Go-allocation claim.",
-        "C library rand/srand binding independently implements the selected Linux/glibc31 mathematical recurrence; captured glibc2.39 test oracle covers default and262 seeds. Other libc profiles and source test-driver migration remain open; no GNU implementation code is copied and no LP source-unit completion is credited."
+        "C library rand/srand binding independently implements the selected Linux/glibc31 mathematical recurrence; captured glibc2.39 test oracle covers default and262 seeds. Other libc profiles and source test-driver migration remain open; no GNU implementation code is copied and no LP source-unit completion is credited.",
+        "Selected source algorithms and explicit Runtime profile only. Signed TLS stops and large factory/auxiliary receipts are guarded owner-primitive proofs, not ordinary mathematical exhaustion. Non-Z perfect-square remains the source unsupported operation. Registered polynomial driver returns before sqrt; dormant assertions give no active driver completion credit. Global diagnostics/native ABI and remaining source methods stay partial."
       ]
     },
     {
@@ -93810,7 +93847,9 @@
         "mpnum/polynomial_imp_physical_test.go",
         "mpnum/polynomial_composition.go",
         "mpnum/polynomial_composition_receipt_test.go",
-        "mpnum/polynomial_composition_test.go"
+        "mpnum/polynomial_composition_test.go",
+        "mpnum/polynomial_sqrt.go",
+        "mpnum/polynomial_sqrt_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -93909,7 +93948,20 @@
         "TestPolynomialCompositionStoppedConstantResultHasSingleOwningCleanup",
         "TestPolynomialCompositionDormantOriginal",
         "TestPolynomialCompositionReciprocalAndVariableOrders",
-        "TestPolynomialCompositionIndependentFiniteAndAliases"
+        "TestPolynomialCompositionIndependentFiniteAndAliases",
+        "TestPolynomialSqrtDormantOriginal",
+        "TestPolynomialSqrtIndependentSmallSquares",
+        "TestPolynomialSqrtEveryReservation",
+        "TestPolynomialSqrtQuickBranchesAndCancel",
+        "TestPolynomialSqrtBigNumeralEveryReservation",
+        "TestPolynomialSqrtResultTransferredBeforeOldCallbackRefusal",
+        "TestPolynomialSqrtCreatedOnlyFalseQuotientCohort",
+        "TestPolynomialSqrtLeavesOlderPerfectSquareInvocation",
+        "TestPolynomialSqrtPostphysicalIntegerRawReceipt",
+        "TestPolynomialSqrtFinalFactoryPostphysicalRaw",
+        "TestPolynomialSqrtEveryCheckpointFrontier",
+        "TestPolynomialSqrtSourceAuxStopKeepsOlderFields",
+        "TestPolynomialSqrtDeletionCallbackForeignRootsStayCallerOwned"
       ],
       "conditionals": [
         {
@@ -94359,10 +94411,31 @@
             "TestPolynomialCompositionReciprocalAndVariableOrders",
             "TestPolynomialCompositionIndependentFiniteAndAliases"
           ]
+        },
+        {
+          "name": "Selected sqrt cpp5954-6068/7284-7286 quick checks, persistent R/C SOM loop, checkpoints, exact result transfer and scoped destruction; dormant source assertions",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_sqrt.go",
+          "tests": [
+            "TestPolynomialSqrtDormantOriginal",
+            "TestPolynomialSqrtIndependentSmallSquares",
+            "TestPolynomialSqrtEveryReservation",
+            "TestPolynomialSqrtQuickBranchesAndCancel",
+            "TestPolynomialSqrtBigNumeralEveryReservation",
+            "TestPolynomialSqrtResultTransferredBeforeOldCallbackRefusal",
+            "TestPolynomialSqrtCreatedOnlyFalseQuotientCohort",
+            "TestPolynomialSqrtLeavesOlderPerfectSquareInvocation",
+            "TestPolynomialSqrtPostphysicalIntegerRawReceipt",
+            "TestPolynomialSqrtFinalFactoryPostphysicalRaw",
+            "TestPolynomialSqrtEveryCheckpointFrontier",
+            "TestPolynomialSqrtSourceAuxStopKeepsOlderFields",
+            "TestPolynomialSqrtDeletionCallbackForeignRootsStayCallerOwned"
+          ]
         }
       ],
       "ownership": [
-        "Concrete reflected composition scope borrows source degree2pos member, owns actual completed numeral/poly locals and exact created-outcome orphan cohort. Source auxiliary then degree then local destruction; matching younger constant numeral\u2192rational NUM/DEN stop preserves older locals and sticky causes. Explicit owning cleanup resumes matching callee first and acknowledges only its exact consumed returned result; physical pending ObjectRef/triples and borrowed callbacks remain separate, no registry-derived authority."
+        "Concrete reflected composition scope borrows source degree2pos member, owns actual completed numeral/poly locals and exact created-outcome orphan cohort. Source auxiliary then degree then local destruction; matching younger constant numeral\u2192rational NUM/DEN stop preserves older locals and sticky causes. Explicit owning cleanup resumes matching callee first and acknowledges only its exact consumed returned result; physical pending ObjectRef/triples and borrowed callbacks remain separate, no registry-derived authority.",
+        "Charged concrete scope owns actual four scoped NUMs, RAW two, monomial_ref, exact created-only cohort and matched callee/factory/physical receipts. Successful incoming INC transfers output before older DEC callback; source destruction is reverse lexical and stops before older fields, separate from explicit owning CleanupSqrt."
       ],
       "deviations": [
         "No active source ENSURE credit: tst_polynomial1815ff invokes tst_psc and returns before tst_lex. Added comparator models are independent bounded regressions, not evidence of active PSC/resultant completion.",
@@ -94370,7 +94443,8 @@
         "Newton source campaign is dormant after early return: one ENSURE adapted, no registered active ENSURE completion credit. Full active optimized PSC8 campaign remains required and source-first private work has begun.",
         "Selected active PSC coefficient inputs and first/second static ENSURE sites now executed. Third static ENSURE calls Resultant and remains unported; complete original expression-constructor/lifetime/TRACE driver credit is not claimed.",
         "Dense coefficient construction adapts unavailable expression builder; registered driver returns at cpp1825 before these eval cases. Active original-driver assertion credit is zero.",
-        "Selected source composition bodies complete for explicit same-Integer rational binding and actual Runtime profile. Dormant cpp573-574 ENSURE adapted via dense term construction; registered driver returns before tst_compose, active original driver credit zero. TLS/dangling-pointer proofs are actual owner-primitive guarded-domain tests, not ordinary mathematical OOM reachability. Global TRACE/assertions/native ABI, same-frame high-level callback reentry and full polynomial family remain open; persistent source class members are not implicitly reset by owning lexical abort."
+        "Selected source composition bodies complete for explicit same-Integer rational binding and actual Runtime profile. Dormant cpp573-574 ENSURE adapted via dense term construction; registered driver returns before tst_compose, active original driver credit zero. TLS/dangling-pointer proofs are actual owner-primitive guarded-domain tests, not ordinary mathematical OOM reachability. Global TRACE/assertions/native ABI, same-frame high-level callback reentry and full polynomial family remain open; persistent source class members are not implicitly reset by owning lexical abort.",
+        "Selected source algorithms and explicit Runtime profile only. Signed TLS stops and large factory/auxiliary receipts are guarded owner-primitive proofs, not ordinary mathematical exhaustion. Non-Z perfect-square remains the source unsupported operation. Registered polynomial driver returns before sqrt; dormant assertions give no active driver completion credit. Global diagnostics/native ABI and remaining source methods stay partial."
       ]
     },
     {
@@ -118187,7 +118261,9 @@
         "mpnum/mp_smt2_scope_test.go",
         "mpnum/mp_integer_array.go",
         "mpnum/polynomial_gcd_indexed_test.go",
-        "mpnum/polynomial_integer_array_source_test.go"
+        "mpnum/polynomial_integer_array_source_test.go",
+        "mpnum/mpz_square_scope.go",
+        "mpnum/mpz_square_source_scope_test.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -118405,7 +118481,13 @@
         "TestIntegerSourceSentinelSlotLimitReachedAllocation",
         "TestPolynomialIntegerArrayActualObjectAndEarlyOne",
         "TestPolynomialIntegerArrayReachedRuntimeCohortAndUnreadZero",
-        "TestPolynomialIntegerArrayZeroLeavesForeignAllocatorUnread"
+        "TestPolynomialIntegerArrayZeroLeavesForeignAllocatorUnread",
+        "TestIntegerPerfectSquareResetsCallerBeforeRawCopyRefusal",
+        "TestIntegerPerfectSquareOwnsActualFailedRawFields",
+        "TestIntegerPerfectSquareRawEndStopsBeforeLaterDeletion",
+        "TestIntegerPerfectSquarePendingReceiptLeavesForeignReplacement",
+        "TestIntegerPerfectSquareEarlyRoutesKeepOlderRawInvocation",
+        "TestIntegerPerfectSquareBigOneReachesRawCopy"
       ],
       "conditionals": [
         {
@@ -120072,6 +120154,19 @@
             "TestPolynomialIntegerArrayReachedRuntimeCohortAndUnreadZero",
             "TestPolynomialIntegerArrayZeroLeavesForeignAllocatorUnread"
           ]
+        },
+        {
+          "name": "is_perfect_square cpp1871-1929 literal binary search, RESET/direct output SET, six RAW locals and end-only ascending deletion",
+          "status": "partial",
+          "go_target": "mpnum/mpz_root.go",
+          "tests": [
+            "TestIntegerPerfectSquareResetsCallerBeforeRawCopyRefusal",
+            "TestIntegerPerfectSquareOwnsActualFailedRawFields",
+            "TestIntegerPerfectSquareRawEndStopsBeforeLaterDeletion",
+            "TestIntegerPerfectSquarePendingReceiptLeavesForeignReplacement",
+            "TestIntegerPerfectSquareEarlyRoutesKeepOlderRawInvocation",
+            "TestIntegerPerfectSquareBigOneReachesRawCopy"
+          ]
         }
       ],
       "ownership": [
@@ -120094,7 +120189,8 @@
         "Zero GCD copies directly into caller before Abs; minimum-promotion allocation refusal retains the completed inline copy, while failed BIG Copy retains the actual published sign/dead descriptor. Existing general GCD locals and final publication remain source ordered; twelve Lehmer and one intermediate ExtendedGCD diagnostics execute only in g3debug. Named roots audited before fault disabling. See PORT_PROGRESS.md#audit-mpz-gcd-publication-packet-md.",
         "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets.",
         "Two actual permanently dead charged Go descriptors precede Words/Natural construction. Actual six source numeric cells unchanged. Source fresh NULL comes only from exact setter branch, never registry/scope inference; reserve failure retains charged constructor owner. No source allocator event invented for Go metadata.",
-        "Actual real foreign Runtime coefficient RED89453 led to reached-only owner check; empty borrowed view is unread. No owning numeral-array copy or generic storage introduced."
+        "Actual real foreign Runtime coefficient RED89453 led to reached-only owner check; empty borrowed view is unread. No owning numeral-array copy or generic storage introduced.",
+        "Six actual RAW Int fields live in the charged IntegerManager header. Literal source end deletion stops at its first cause; explicit CleanupPerfectSquare resumes only owned fields and exact pending ObjectRef/physical roots. Direct final output SET remains caller-owned."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -120114,7 +120210,8 @@
         "ConstructionFailure is the already charged owner. Successful member unwind can retain direct roots with no cleanup error; owning Cleanup is separate. Full transitive/global source lifetime and other source branches remain open.",
         "Source char bytes use physical capacity/initialization independently of POS and unsigned11*size wrap. Selected non-Windows digit32 snprintf lbuf0/truncation and multi-limb ignored-lbuf behavior execute. Windows sprintf_s constraint handler, GMP/digit64, global/locale/ostream and literal std::string temporary allocation/evaluation remain open. No whole-unit or registered assertion completion is claimed.",
         "Public failed-value reads still reject both dead Go descriptors; defined source-only NULL deletion is modeled independently. Postexception source small-scalar continuation, staged CopyFrom/ffSetInteger topology, process/TLS binding and complete source lifecycle remain separate obligations. Existing cleanupPending retry acknowledges Go owning continuation, not another literal source destructor. See PORT_PROGRESS.md.",
-        "Selected array-view prerequisite; broader integer/modular source audits remain partial."
+        "Selected array-view prerequisite; broader integer/modular source audits remain partial.",
+        "Selected source algorithms and explicit Runtime profile only. Signed TLS stops and large factory/auxiliary receipts are guarded owner-primitive proofs, not ordinary mathematical exhaustion. Non-Z perfect-square remains the source unsupported operation. Registered polynomial driver returns before sqrt; dormant assertions give no active driver completion credit. Global diagnostics/native ABI and remaining source methods stay partial."
       ]
     },
     {
