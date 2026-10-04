@@ -176,16 +176,19 @@ func (s *satSolver) maxVarBins(learned bool, v uint32) (uint32, error) {
 			if l.index() > l2.index() {
 				continue
 			}
-			yes, e := w.Learned()
-			if e != nil {
-				return v, e
-			}
-			if e = s.userBinClauses.Push(newSATBinClause(l, l2, yes)); e != nil {
+			if e = s.userBinClauses.Push(newSATSolverBinPair(l, l2)); e != nil {
 				return v, e
 			}
 		}
 	}
-	for i := uint32(0); i < s.userBinClauses.Size(); i++ {
+	for i := uint32(0); ; i++ {
+		n, e := s.userBinClauses.Size()
+		if e != nil {
+			return v, e
+		}
+		if i >= n {
+			break
+		}
 		c, e := s.userBinClauses.Get(i)
 		if e != nil {
 			return v, e

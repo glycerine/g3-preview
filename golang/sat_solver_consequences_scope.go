@@ -1,0 +1,222 @@
+// Source: src/sat/sat_solver.cpp:3252–3636; src/util/vector.h; src/util/hashtable.h.
+// Licensed under the MIT license. Source author: Nikolaj Bjorner.
+package g3
+
+import (
+	"github.com/glycerine/g3/golang/arena"
+	"reflect"
+)
+
+// A source vector borrow: a real member uses current size/operator[] each time,
+// while c_ptr() captures its actual payload only at the source call site. The
+// caller-array forms are explicit concrete input-boundary adapters, not owners.
+type satConsequenceInput struct {
+	column    *satSolverRuntimeUintColumn
+	literals  []satLiteral
+	variables []satBoolVar
+	raw       satSolverLiteralSpan
+	count     uint32
+}
+
+func (v satConsequenceInput) size() (uint32, error) {
+	if v.column != nil {
+		return v.column.size()
+	}
+	return v.count, nil
+}
+func (v satConsequenceInput) read(i uint32) (uint32, error) {
+	if v.column != nil {
+		return v.column.read(i)
+	}
+	if v.variables != nil {
+		if uint64(i) >= uint64(cap(v.variables)) {
+			return 0, arena.ErrBounds
+		}
+		return uint32(v.variables[:cap(v.variables)][i]), nil
+	}
+	span := v.raw
+	if v.literals != nil {
+		span = satSolverLiteralSpan{literals: v.literals}
+	}
+	l, e := span.literal(i)
+	return l.index(), e
+}
+func (v satConsequenceInput) cPtr() satSolverLiteralSpan {
+	if v.column != nil {
+		return satConflictRuntimeSpan(v.column)
+	}
+	if v.literals != nil {
+		return satSolverLiteralSpan{literals: v.literals}
+	}
+	return v.raw
+}
+func satConsequenceLiterals(v []satLiteral) satConsequenceInput {
+	return satConsequenceInput{literals: v, count: uint32(len(v))}
+}
+func satConsequenceColumn(v *satSolverRuntimeUintColumn) satConsequenceInput {
+	return satConsequenceInput{column: v}
+}
+
+type satConsequenceFrame struct {
+	next                *satConsequenceFrame
+	sets                [3]satMUSLiteralSet
+	vectors             [3]satSolverRuntimeUintColumn
+	index               satSolverIndexSet
+	order               [7]uint8
+	completed           [7]bool
+	used, phase, cursor uint32
+	bytes               uint64
+}
+
+func (s *satSolver) consequenceFrame() (*satConsequenceFrame, error) {
+	bytes := uint64(reflect.TypeOf(satConsequenceFrame{}).Size())
+	if e := s.budget.Reserve(bytes); e != nil {
+		return nil, e
+	}
+	f := &satConsequenceFrame{next: s.consequenceFrames, bytes: bytes}
+	s.consequenceFrames = f
+	return f, nil
+}
+func (s *satSolver) consequenceDrop(f *satConsequenceFrame, cause error) error {
+	if s.consequenceFrames != f {
+		if cause != nil {
+			return cause
+		}
+		return ErrSATOwner
+	}
+	// First actual completed source local destructors in reverse declaration
+	// order. Only afterwards drain failed constructor buffers as owning abort.
+	for f.phase < 2 {
+		for f.cursor < f.used {
+			i := f.used - 1 - f.cursor
+			if f.completed[i] != (f.phase == 0) {
+				f.cursor++
+				continue
+			}
+			tag := f.order[i]
+			var e error
+			if tag < 3 {
+				e = f.sets[tag].close()
+			} else if tag < 6 {
+				e = f.vectors[tag-3].finalize()
+			} else {
+				e = f.index.close()
+			}
+			if e != nil {
+				if cause != nil {
+					return cause
+				}
+				return e
+			}
+			f.cursor++
+		}
+		f.phase++
+		f.cursor = 0
+	}
+	s.consequenceFrames = f.next
+	s.budget.Release(f.bytes)
+	return cause
+}
+func (s *satSolver) cleanupConsequences() error {
+	for s.consequenceFrames != nil {
+		if e := s.consequenceDrop(s.consequenceFrames, nil); e != nil {
+			return e
+		}
+	}
+	return nil
+}
+func (f *satConsequenceFrame) set(s *satSolver, i uint8, input *satConsequenceInput) error {
+	f.order[f.used] = i
+	f.completed[f.used] = true
+	f.used++
+	set := &f.sets[i]
+	set.bind(s.runtime.memory)
+	if input == nil {
+		return nil
+	}
+	for j := uint32(0); ; j++ {
+		n, e := input.size()
+		if e != nil {
+			return e
+		}
+		if j >= n {
+			return nil
+		}
+		v, e := input.read(j)
+		if e != nil {
+			return e
+		}
+		if e = set.insert(satLiteral(v)); e != nil {
+			return e
+		}
+	}
+}
+func (f *satConsequenceFrame) vector(s *satSolver, i uint8, copy *satSolverRuntimeUintColumn) error {
+	k := f.used
+	f.order[k] = i + 3
+	f.completed[k] = copy == nil
+	f.used++
+	f.vectors[i].bind(s.runtime.memory)
+	if copy != nil {
+		if e := satMUSCopyColumn(&f.vectors[i].raw, &copy.raw, 4); e != nil {
+			return e
+		}
+		f.completed[k] = true
+	}
+	return nil
+}
+func (f *satConsequenceFrame) indexSet(s *satSolver) error {
+	k := f.used
+	f.order[k] = 6
+	f.used++
+	if e := f.index.init(s.runtime.memory); e != nil {
+		return e
+	}
+	f.completed[k] = true
+	return nil
+}
+func satConsequenceSetRemove(s *satMUSLiteralSet, v uint32) error {
+	yes, e := s.contains(satLiteral(v))
+	if e != nil || !yes {
+		return e
+	}
+	if e = s.membership.write(v, 0); e != nil {
+		return e
+	}
+	i := uint32(0)
+	for {
+		n, e := s.values.size()
+		if e != nil {
+			return e
+		}
+		if i >= n {
+			break
+		}
+		x, e := s.values.read(i)
+		if e != nil {
+			return e
+		}
+		if x == v {
+			break
+		}
+		i++
+	}
+	n, e := s.values.size()
+	if e != nil {
+		return e
+	}
+	if satStorageSourceDebug && i >= n {
+		return ErrSATAssertion
+	}
+	if n == 0 {
+		return arena.ErrBounds
+	}
+	back, e := s.values.read(n - 1)
+	if e != nil {
+		return e
+	}
+	if e = s.values.write(i, back); e != nil {
+		return e
+	}
+	return s.values.shrink(n - 1)
+}

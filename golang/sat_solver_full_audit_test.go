@@ -7,8 +7,11 @@ import (
 	"testing"
 )
 
-func satFullSolverRuntimeAudit(t *testing.T, s *satSolver) {
+func satFullSolverRuntimeAudit(t *testing.T, s *satSolver, outputs ...*satSolverLiteralRows) {
 	t.Helper()
+	satScalarAuditRoots(t, s.variables, satFullSolverRuntimeRoots(s, outputs...)...)
+}
+func satFullSolverRuntimeRoots(s *satSolver, outputs ...*satSolverLiteralRows) []memory.Block {
 	roots := []memory.Block{}
 	add := func(b memory.Block) {
 		if b != (memory.Block{}) {
@@ -25,6 +28,9 @@ func satFullSolverRuntimeAudit(t *testing.T, s *satSolver) {
 	p := s.probing
 	c := s.conflict
 	a := s.analysis
+	if s.userBinClauses != nil {
+		raw(&s.userBinClauses.raw)
+	}
 	add(p.cache.block)
 	add(p.cache.pending)
 	add(p.cache.retired)
@@ -53,20 +59,66 @@ func satFullSolverRuntimeAudit(t *testing.T, s *satSolver) {
 		add(v.raw)
 		add(v.pending)
 	}
-	if s.antecedents != nil {
-		add(s.antecedents.raw)
-		add(s.antecedents.pending)
-		for _, entry := range s.antecedents.entries {
-			add(entry.raw)
+	for f := s.consequenceFrames; f != nil; f = f.next {
+		for i := uint32(0); i < f.used; i++ {
+			tag := f.order[i]
+			if tag < 3 {
+				raw(&f.sets[tag].membership)
+				col(&f.sets[tag].values)
+			} else if tag < 6 {
+				col(&f.vectors[tag-3])
+			} else {
+				add(f.index.raw)
+				add(f.index.pending)
+			}
 		}
 	}
+	if m := s.antecedents; m != nil {
+		add(m.raw)
+		add(m.pending)
+		for _, entry := range m.entries {
+			add(entry.raw)
+			add(entry.pending)
+		}
+		for _, entry := range m.extraEntries {
+			add(entry.raw)
+			add(entry.pending)
+		}
+		for _, entry := range m.pendingEntries {
+			add(entry.raw)
+			add(entry.pending)
+		}
+		for i := uint32(0); i < m.tempUsed; i++ {
+			add(m.temps[i].raw)
+			add(m.temps[i].pending)
+		}
+	}
+	for _, out := range outputs {
+		add(out.raw)
+		add(out.pending)
+		add(out.oldRaw)
+		for i := range out.rows {
+			col(&out.rows[i])
+		}
+		for i := range out.oldRows {
+			col(&out.oldRows[i])
+		}
+		if out.temporaryActive {
+			col(&out.temporary)
+		}
+	}
+
+	for f := s.mutexFrames; f != nil; f = f.next {
+		roots = append(roots, satMutexFrameRoots(f)...)
+	}
+
 	for _, b := range s.clauses.runtimeIDs.RawRoots() {
 		add(b)
 	}
 	for i := range s.binaryClauseGraph {
 		col(&s.binaryClauseGraph[i])
 	}
-	satScalarAuditRoots(t, s.variables, roots...)
+	return roots
 }
 func satFullSolverUserClauseAudit(t *testing.T, s *satSolver) {
 	t.Helper()

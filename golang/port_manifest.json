@@ -58180,7 +58180,34 @@
         "sat_solver_user_scope_model_test.go",
         "sat_solver_user_scope_test.go",
         "sat_solver_warm_test.go",
-        "sat_solver_mus.go"
+        "sat_solver_mus.go",
+        "sat_solver_consequences.go",
+        "sat_solver_consequences_helpers.go",
+        "sat_solver_consequences_scope.go",
+        "sat_solver_index_set.go",
+        "sat_solver_index_map.go",
+        "sat_solver_literal_rows.go",
+        "sat_solver_consequences_test.go",
+        "sat_solver_consequences_model_test.go",
+        "sat_solver_consequences_fault_test.go",
+        "sat_solver_consequences_branch_test.go",
+        "sat_solver_index_set_test.go",
+        "sat_solver_literal_rows_test.go",
+        "sat_solver_literal_rows_move_source_test.go",
+        "sat_solver_index_iterator_source_test.go",
+        "sat_solver_find_mutexes.go",
+        "sat_solver_max_cliques.go",
+        "sat_solver_max_cliques_model_test.go",
+        "sat_solver_max_cliques_rows.go",
+        "sat_solver_max_cliques_rows_test.go",
+        "sat_solver_max_cliques_set.go",
+        "sat_solver_max_cliques_test.go",
+        "sat_solver_mutex_audit_test.go",
+        "sat_solver_mutex_fault_test.go",
+        "sat_solver_mutex_pair_set.go",
+        "sat_solver_mutex_pair_set_test.go",
+        "sat_solver_mutex_pair_vector.go",
+        "sat_solver_mutex_pair_vector_test.go"
       ],
       "tests": [
         "TestSATSolverClauseCoreFiniteSimplification",
@@ -58434,7 +58461,43 @@
         "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
         "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
         "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
-        "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix"
+        "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix",
+        "TestSATSolverConsequencesSourceBooleanImplicationsAppendToOwnedOutput",
+        "TestSATSolverConsequencesIndependentAllTwoVariableBinaryCNFs",
+        "TestSATSolverConsequencesEveryActualRefusalPreservesNamedOwners",
+        "TestSATSolverConsequenceReasonShortCircuitAndClauseDomainTodoPrefix",
+        "TestSATSolverConsequenceCopiedOutputAndCurrentModelQueryLifetime",
+        "TestSATSolverConsequenceRealCancellationRetainsCallerOutputPrefix",
+        "TestSATSolverConsequencesWarmedActualGraphPlateau",
+        "TestSATSolverConsequenceIndexSetActualPhysicalIterationAndDeepMapCopy",
+        "TestSATSolverConsequenceNestedIndexSetReadsActualHeaderAtReachedSite",
+        "TestSATSolverConsequenceMapFailedSecondTemporaryUnwindsCompletedFirst",
+        "TestSATSolverConsequenceIndexSetAndMapGrowBeforeDuplicate",
+        "TestSATSolverConsequenceMapGrowthEveryActualRefusalRetainsNestedOwners",
+        "TestSATSolverConsequenceMapResetShrinksAfterFreeBeforeAllocation",
+        "TestSATSolverConsequenceNestedIndexSetReachedPointerWordsGuard",
+        "TestSATConsequenceRowsCapturedInnerPayloadSurvivesOuterMoveAndDiesAtClose",
+        "TestSATConsequenceRowsCloseDestroysSourceOuterBeforeFailedCopyAbort",
+        "TestSATConsequenceRowsSourceFinalizeThenReuseOwnsNewSourceVector",
+        "TestSATConsequenceRowsStoppedSourceFinalizePreservesCauseAndNamedAbort",
+        "TestSATConsequenceRowsExpansionReadsActualOldPointer",
+        "TestSATConsequenceIndexIteratorCaptureReadsActualNestedPointer",
+        "TestSATMaxCliquesIndependentAllThreeVertexMutexGraphs",
+        "TestSATMaxCliquesNestedResizeRefusalRetainsOldLogicalSize",
+        "TestSATMaxCliquesNegatedLiteralPartitionAndSourceCache",
+        "TestSATSolverFindMutexesActualBinaryWatchesAppendOutput",
+        "TestSATMaxCliquesUintSetResizeRefusalKeepsOriginalLogicalSize",
+        "TestSATMaxCliquesRetainsGoalSpecificSourceCacheAcrossCalls",
+        "TestSATMaxCliquesWarmedSameQueryPhysicalPlateauAndScalarExtent",
+        "TestSATMaxCliquesWrappedExtentReachesSecondReserveBeforeSourceRead",
+        "TestSATSolverFindMutexesHasNoCheckpointOrConsistencyPreflight",
+        "TestSATMaxCliquesStoppedLexicalContextRejectsOverwrite",
+        "TestSATSolverFindMutexesEveryActualRefusalPreservesNamedOwners",
+        "TestSATMutexPairSetGrowBeforeDuplicateAndEveryPhysicalRefusal",
+        "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
+        "TestSATMutexPairSetWrappedCopyGuardAtActualDestination",
+        "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
+        "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor"
       ],
       "conditionals": [
         {
@@ -59392,6 +59455,149 @@
             "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
             "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix"
           ]
+        },
+        {
+          "name": "Selected concrete get_consequences(bool_var_vector) source3252-3283; external antecedents/TRACE/high-level AST binding remain open",
+          "status": "partial",
+          "go_target": "sat_solver_consequences_test.go",
+          "tests": [
+            "TestSATSolverConsequencesSourceBooleanImplicationsAppendToOwnedOutput",
+            "TestSATSolverConsequencesIndependentAllTwoVariableBinaryCNFs",
+            "TestSATSolverConsequencesEveryActualRefusalPreservesNamedOwners"
+          ]
+        },
+        {
+          "name": "Selected concrete fixup_consequence_core source3285-3299; external antecedents/TRACE/high-level AST binding remain open",
+          "status": "partial",
+          "go_target": "sat_solver_consequences_test.go",
+          "tests": [
+            "TestSATSolverConsequencesSourceBooleanImplicationsAppendToOwnedOutput",
+            "TestSATSolverConsequencesIndependentAllTwoVariableBinaryCNFs",
+            "TestSATSolverConsequencesEveryActualRefusalPreservesNamedOwners"
+          ]
+        },
+        {
+          "name": "Selected concrete get_bounded_consequences source3301-3363; external antecedents/TRACE/high-level AST binding remain open",
+          "status": "partial",
+          "go_target": "sat_solver_consequences_test.go",
+          "tests": [
+            "TestSATSolverConsequencesSourceBooleanImplicationsAppendToOwnedOutput",
+            "TestSATSolverConsequencesIndependentAllTwoVariableBinaryCNFs",
+            "TestSATSolverConsequencesEveryActualRefusalPreservesNamedOwners"
+          ]
+        },
+        {
+          "name": "Selected concrete get_consequences(literal_vector) source3365-3471; external antecedents/TRACE/high-level AST binding remain open",
+          "status": "partial",
+          "go_target": "sat_solver_consequences_test.go",
+          "tests": [
+            "TestSATSolverConsequencesSourceBooleanImplicationsAppendToOwnedOutput",
+            "TestSATSolverConsequencesIndependentAllTwoVariableBinaryCNFs",
+            "TestSATSolverConsequencesEveryActualRefusalPreservesNamedOwners"
+          ]
+        },
+        {
+          "name": "Selected concrete delete_unfixed source3473-3486; external antecedents/TRACE/high-level AST binding remain open",
+          "status": "partial",
+          "go_target": "sat_solver_consequences_test.go",
+          "tests": [
+            "TestSATSolverConsequencesSourceBooleanImplicationsAppendToOwnedOutput",
+            "TestSATSolverConsequencesIndependentAllTwoVariableBinaryCNFs",
+            "TestSATSolverConsequencesEveryActualRefusalPreservesNamedOwners"
+          ]
+        },
+        {
+          "name": "Selected concrete update_unfixed_literals source3488-3501; external antecedents/TRACE/high-level AST binding remain open",
+          "status": "partial",
+          "go_target": "sat_solver_consequences_test.go",
+          "tests": [
+            "TestSATSolverConsequencesSourceBooleanImplicationsAppendToOwnedOutput",
+            "TestSATSolverConsequencesIndependentAllTwoVariableBinaryCNFs",
+            "TestSATSolverConsequencesEveryActualRefusalPreservesNamedOwners"
+          ]
+        },
+        {
+          "name": "Selected concrete extract_fixed_consequences(start) source3503-3510; external antecedents/TRACE/high-level AST binding remain open",
+          "status": "partial",
+          "go_target": "sat_solver_consequences_test.go",
+          "tests": [
+            "TestSATSolverConsequencesSourceBooleanImplicationsAppendToOwnedOutput",
+            "TestSATSolverConsequencesIndependentAllTwoVariableBinaryCNFs",
+            "TestSATSolverConsequencesEveryActualRefusalPreservesNamedOwners"
+          ]
+        },
+        {
+          "name": "Selected concrete extract_fixed_consequences(literal_set) source3512-3522; external antecedents/TRACE/high-level AST binding remain open",
+          "status": "partial",
+          "go_target": "sat_solver_consequences_test.go",
+          "tests": [
+            "TestSATSolverConsequencesSourceBooleanImplicationsAppendToOwnedOutput",
+            "TestSATSolverConsequencesIndependentAllTwoVariableBinaryCNFs",
+            "TestSATSolverConsequencesEveryActualRefusalPreservesNamedOwners"
+          ]
+        },
+        {
+          "name": "Selected concrete check_domain source3524-3534; external antecedents/TRACE/high-level AST binding remain open",
+          "status": "partial",
+          "go_target": "sat_solver_consequences_test.go",
+          "tests": [
+            "TestSATSolverConsequencesSourceBooleanImplicationsAppendToOwnedOutput",
+            "TestSATSolverConsequencesIndependentAllTwoVariableBinaryCNFs",
+            "TestSATSolverConsequencesEveryActualRefusalPreservesNamedOwners"
+          ]
+        },
+        {
+          "name": "Selected concrete extract_assumptions source3536-3587; external antecedents/TRACE/high-level AST binding remain open",
+          "status": "partial",
+          "go_target": "sat_solver_consequences_test.go",
+          "tests": [
+            "TestSATSolverConsequencesSourceBooleanImplicationsAppendToOwnedOutput",
+            "TestSATSolverConsequencesIndependentAllTwoVariableBinaryCNFs",
+            "TestSATSolverConsequencesEveryActualRefusalPreservesNamedOwners"
+          ]
+        },
+        {
+          "name": "Selected concrete extract_fixed_consequences1 source3599-3626; external antecedents/TRACE/high-level AST binding remain open",
+          "status": "partial",
+          "go_target": "sat_solver_consequences_test.go",
+          "tests": [
+            "TestSATSolverConsequencesSourceBooleanImplicationsAppendToOwnedOutput",
+            "TestSATSolverConsequencesIndependentAllTwoVariableBinaryCNFs",
+            "TestSATSolverConsequencesEveryActualRefusalPreservesNamedOwners"
+          ]
+        },
+        {
+          "name": "Selected concrete extract_fixed_consequences(literal) source3628-3636; external antecedents/TRACE/high-level AST binding remain open",
+          "status": "partial",
+          "go_target": "sat_solver_consequences_test.go",
+          "tests": [
+            "TestSATSolverConsequencesSourceBooleanImplicationsAppendToOwnedOutput",
+            "TestSATSolverConsequencesIndependentAllTwoVariableBinaryCNFs",
+            "TestSATSolverConsequencesEveryActualRefusalPreservesNamedOwners"
+          ]
+        },
+        {
+          "name": "collect_bin_clauses2818-2838 and find_mutexes3119-3150 actual same-Runtime literal pairs/max_cliques partition; high-level AST facade and TRACE open",
+          "status": "partial",
+          "go_target": "sat_solver_find_mutexes.go",
+          "tests": [
+            "TestSATMaxCliquesIndependentAllThreeVertexMutexGraphs",
+            "TestSATMaxCliquesNestedResizeRefusalRetainsOldLogicalSize",
+            "TestSATMaxCliquesNegatedLiteralPartitionAndSourceCache",
+            "TestSATSolverFindMutexesActualBinaryWatchesAppendOutput",
+            "TestSATMaxCliquesUintSetResizeRefusalKeepsOriginalLogicalSize",
+            "TestSATMaxCliquesRetainsGoalSpecificSourceCacheAcrossCalls",
+            "TestSATMaxCliquesWarmedSameQueryPhysicalPlateauAndScalarExtent",
+            "TestSATMaxCliquesWrappedExtentReachesSecondReserveBeforeSourceRead",
+            "TestSATSolverFindMutexesHasNoCheckpointOrConsistencyPreflight",
+            "TestSATMaxCliquesStoppedLexicalContextRejectsOverwrite",
+            "TestSATSolverFindMutexesEveryActualRefusalPreservesNamedOwners",
+            "TestSATMutexPairSetGrowBeforeDuplicateAndEveryPhysicalRefusal",
+            "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
+            "TestSATMutexPairSetWrappedCopyGuardAtActualDestination",
+            "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
+            "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor"
+          ]
         }
       ],
       "ownership": [
@@ -59414,7 +59620,8 @@
         "Selected FIRST-UIP and real assumption/init helpers are implemented with default minimization/dynamic subsumption. Full solver construction/Check/search, source extension calls, nonnull parallel exchange, optional MUS/model and global diagnostics remain explicit obligations. Constructor-error candidate retention is a typed owning adapter, not claimed C++ implicit unwinding; no registered user-scope assertion completion is credited.",
         "Complete selected ordinary GC/restart/init_search member algorithms executed; enabled integrity tags, verbose/TRACE and full constructor/search/Check remain open. Source comparator expressions/tie order preserved through explicitly charged concrete Go stable merge workspace; C++ standard library allocation/comparison schedule is not claimed identical. No new registered source assertion completion credit.",
         "Selected enabled integrity and missed-propagation sites now call actual members, including Asymm entry/exit and propagation. Global debug-tag/assertions-enabled registry, TRACE/verbose, complete constructor/parameter updates/search and registered user-scope campaign remain open. Undefined floating-to-int conversion is guarded at reached source expression; not a C++ malformed-input guarantee.",
-        "Selected real finite src/test/sat_user_scope.cpp campaign executes42 original ENSURE comparisons/168 clauses and independent original-CNF oracle after pending tag removal. Whole solver remains partial: extension/parallel/MUS/clone/consequence methods, global debug tags, TRACE/printer and remaining actual source Runtime allocation accounting are open. Clause_offset physical pointer32 contract remains distinct from charged checked locator metadata. Std library sort schedule and explicit cold constructor contexts are Go adapters."
+        "Selected real finite src/test/sat_user_scope.cpp campaign executes42 original ENSURE comparisons/168 clauses and independent original-CNF oracle after pending tag removal. Whole solver remains partial: extension/parallel/MUS/clone/consequence methods, global debug tags, TRACE/printer and remaining actual source Runtime allocation accounting are open. Clause_offset physical pointer32 contract remains distinct from charged checked locator metadata. Std library sort schedule and explicit cold constructor contexts are Go adapters.",
+        "Selected concrete consequences and mutex family source mapping supersedes older missing-method notes only for listed sites. Source AST/BV/datatype registered6 assertions, TRACE/verbose, extension dispatch, dormant core_chunking/static helpers, general template variants and full source units remain OPEN. Scalar slot/generation encodes selected8-byte pointer ABI; actual named cold/raw/pending roots charged; no registry-derived ownership. See PORT_PROGRESS.md."
       ]
     },
     {
@@ -59531,7 +59738,34 @@
         "sat_solver_user_scope_fault_test.go",
         "sat_solver_user_scope_model_test.go",
         "sat_solver_user_scope_test.go",
-        "sat_solver_warm_test.go"
+        "sat_solver_warm_test.go",
+        "sat_solver_consequences.go",
+        "sat_solver_consequences_helpers.go",
+        "sat_solver_consequences_scope.go",
+        "sat_solver_index_set.go",
+        "sat_solver_index_map.go",
+        "sat_solver_literal_rows.go",
+        "sat_solver_consequences_test.go",
+        "sat_solver_consequences_model_test.go",
+        "sat_solver_consequences_fault_test.go",
+        "sat_solver_consequences_branch_test.go",
+        "sat_solver_index_set_test.go",
+        "sat_solver_literal_rows_test.go",
+        "sat_solver_literal_rows_move_source_test.go",
+        "sat_solver_index_iterator_source_test.go",
+        "sat_solver_find_mutexes.go",
+        "sat_solver_max_cliques.go",
+        "sat_solver_max_cliques_model_test.go",
+        "sat_solver_max_cliques_rows.go",
+        "sat_solver_max_cliques_rows_test.go",
+        "sat_solver_max_cliques_set.go",
+        "sat_solver_max_cliques_test.go",
+        "sat_solver_mutex_audit_test.go",
+        "sat_solver_mutex_fault_test.go",
+        "sat_solver_mutex_pair_set.go",
+        "sat_solver_mutex_pair_set_test.go",
+        "sat_solver_mutex_pair_vector.go",
+        "sat_solver_mutex_pair_vector_test.go"
       ],
       "tests": [
         "TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots",
@@ -59742,7 +59976,43 @@
         "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
         "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
         "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
-        "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix"
+        "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix",
+        "TestSATSolverConsequencesSourceBooleanImplicationsAppendToOwnedOutput",
+        "TestSATSolverConsequencesIndependentAllTwoVariableBinaryCNFs",
+        "TestSATSolverConsequencesEveryActualRefusalPreservesNamedOwners",
+        "TestSATSolverConsequenceReasonShortCircuitAndClauseDomainTodoPrefix",
+        "TestSATSolverConsequenceCopiedOutputAndCurrentModelQueryLifetime",
+        "TestSATSolverConsequenceRealCancellationRetainsCallerOutputPrefix",
+        "TestSATSolverConsequencesWarmedActualGraphPlateau",
+        "TestSATSolverConsequenceIndexSetActualPhysicalIterationAndDeepMapCopy",
+        "TestSATSolverConsequenceNestedIndexSetReadsActualHeaderAtReachedSite",
+        "TestSATSolverConsequenceMapFailedSecondTemporaryUnwindsCompletedFirst",
+        "TestSATSolverConsequenceIndexSetAndMapGrowBeforeDuplicate",
+        "TestSATSolverConsequenceMapGrowthEveryActualRefusalRetainsNestedOwners",
+        "TestSATSolverConsequenceMapResetShrinksAfterFreeBeforeAllocation",
+        "TestSATSolverConsequenceNestedIndexSetReachedPointerWordsGuard",
+        "TestSATConsequenceRowsCapturedInnerPayloadSurvivesOuterMoveAndDiesAtClose",
+        "TestSATConsequenceRowsCloseDestroysSourceOuterBeforeFailedCopyAbort",
+        "TestSATConsequenceRowsSourceFinalizeThenReuseOwnsNewSourceVector",
+        "TestSATConsequenceRowsStoppedSourceFinalizePreservesCauseAndNamedAbort",
+        "TestSATConsequenceRowsExpansionReadsActualOldPointer",
+        "TestSATConsequenceIndexIteratorCaptureReadsActualNestedPointer",
+        "TestSATMaxCliquesIndependentAllThreeVertexMutexGraphs",
+        "TestSATMaxCliquesNestedResizeRefusalRetainsOldLogicalSize",
+        "TestSATMaxCliquesNegatedLiteralPartitionAndSourceCache",
+        "TestSATSolverFindMutexesActualBinaryWatchesAppendOutput",
+        "TestSATMaxCliquesUintSetResizeRefusalKeepsOriginalLogicalSize",
+        "TestSATMaxCliquesRetainsGoalSpecificSourceCacheAcrossCalls",
+        "TestSATMaxCliquesWarmedSameQueryPhysicalPlateauAndScalarExtent",
+        "TestSATMaxCliquesWrappedExtentReachesSecondReserveBeforeSourceRead",
+        "TestSATSolverFindMutexesHasNoCheckpointOrConsistencyPreflight",
+        "TestSATMaxCliquesStoppedLexicalContextRejectsOverwrite",
+        "TestSATSolverFindMutexesEveryActualRefusalPreservesNamedOwners",
+        "TestSATMutexPairSetGrowBeforeDuplicateAndEveryPhysicalRefusal",
+        "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
+        "TestSATMutexPairSetWrappedCopyGuardAtActualDestination",
+        "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
+        "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor"
       ],
       "conditionals": [
         {
@@ -60188,6 +60458,29 @@
             "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
             "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix"
           ]
+        },
+        {
+          "name": "Concrete consequence/mutex query owner members and exact full-literal std::pair member with separate source stopped destruction and owning abort",
+          "status": "partial",
+          "go_target": "sat_solver_mutex_pair_vector.go",
+          "tests": [
+            "TestSATMaxCliquesIndependentAllThreeVertexMutexGraphs",
+            "TestSATMaxCliquesNestedResizeRefusalRetainsOldLogicalSize",
+            "TestSATMaxCliquesNegatedLiteralPartitionAndSourceCache",
+            "TestSATSolverFindMutexesActualBinaryWatchesAppendOutput",
+            "TestSATMaxCliquesUintSetResizeRefusalKeepsOriginalLogicalSize",
+            "TestSATMaxCliquesRetainsGoalSpecificSourceCacheAcrossCalls",
+            "TestSATMaxCliquesWarmedSameQueryPhysicalPlateauAndScalarExtent",
+            "TestSATMaxCliquesWrappedExtentReachesSecondReserveBeforeSourceRead",
+            "TestSATSolverFindMutexesHasNoCheckpointOrConsistencyPreflight",
+            "TestSATMaxCliquesStoppedLexicalContextRejectsOverwrite",
+            "TestSATSolverFindMutexesEveryActualRefusalPreservesNamedOwners",
+            "TestSATMutexPairSetGrowBeforeDuplicateAndEveryPhysicalRefusal",
+            "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
+            "TestSATMutexPairSetWrappedCopyGuardAtActualDestination",
+            "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
+            "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor"
+          ]
         }
       ],
       "ownership": [
@@ -60206,7 +60499,8 @@
         "Selected FIRST-UIP and real assumption/init helpers are implemented with default minimization/dynamic subsumption. Full solver construction/Check/search, source extension calls, nonnull parallel exchange, optional MUS/model and global diagnostics remain explicit obligations. Constructor-error candidate retention is a typed owning adapter, not claimed C++ implicit unwinding; no registered user-scope assertion completion is credited.",
         "Complete selected ordinary GC/restart/init_search member algorithms executed; enabled integrity tags, verbose/TRACE and full constructor/search/Check remain open. Source comparator expressions/tie order preserved through explicitly charged concrete Go stable merge workspace; C++ standard library allocation/comparison schedule is not claimed identical. No new registered source assertion completion credit.",
         "Selected enabled integrity and missed-propagation sites now call actual members, including Asymm entry/exit and propagation. Global debug-tag/assertions-enabled registry, TRACE/verbose, complete constructor/parameter updates/search and registered user-scope campaign remain open. Undefined floating-to-int conversion is guarded at reached source expression; not a C++ malformed-input guarantee.",
-        "Selected real finite src/test/sat_user_scope.cpp campaign executes42 original ENSURE comparisons/168 clauses and independent original-CNF oracle after pending tag removal. Whole solver remains partial: extension/parallel/MUS/clone/consequence methods, global debug tags, TRACE/printer and remaining actual source Runtime allocation accounting are open. Clause_offset physical pointer32 contract remains distinct from charged checked locator metadata. Std library sort schedule and explicit cold constructor contexts are Go adapters."
+        "Selected real finite src/test/sat_user_scope.cpp campaign executes42 original ENSURE comparisons/168 clauses and independent original-CNF oracle after pending tag removal. Whole solver remains partial: extension/parallel/MUS/clone/consequence methods, global debug tags, TRACE/printer and remaining actual source Runtime allocation accounting are open. Clause_offset physical pointer32 contract remains distinct from charged checked locator metadata. Std library sort schedule and explicit cold constructor contexts are Go adapters.",
+        "Selected concrete consequences and mutex family source mapping supersedes older missing-method notes only for listed sites. Source AST/BV/datatype registered6 assertions, TRACE/verbose, extension dispatch, dormant core_chunking/static helpers, general template variants and full source units remain OPEN. Scalar slot/generation encodes selected8-byte pointer ABI; actual named cold/raw/pending roots charged; no registry-derived ownership. See PORT_PROGRESS.md."
       ]
     },
     {
@@ -60341,7 +60635,9 @@
         "sat_types.go",
         "sat_solver_literal_set.go",
         "sat_solver_probing_assigned.go",
-        "sat_solver_mus_set.go"
+        "sat_solver_mus_set.go",
+        "sat_solver_mutex_pair_vector.go",
+        "sat_solver_mutex_pair_vector_test.go"
       ],
       "tests": [
         "TestSATLiteralAndModelRendering",
@@ -60410,7 +60706,9 @@
         "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
         "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
         "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
-        "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix"
+        "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix",
+        "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
+        "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor"
       ],
       "conditionals": [
         {
@@ -60970,6 +61268,15 @@
             "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
             "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
             "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix"
+          ]
+        },
+        {
+          "name": "Selected full-width literal members of solver std::pair, distinct learned-bit bin_clause specialization preserved",
+          "status": "ported",
+          "go_target": "sat_solver_mutex_pair_vector.go",
+          "tests": [
+            "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
+            "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor"
           ]
         }
       ],
@@ -99636,11 +99943,16 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "utilhash/hash.go"
+        "utilhash/hash.go",
+        "sat_solver_mutex_pair_set.go",
+        "sat_solver_mutex_pair_set_test.go"
       ],
       "tests": [
         "TestSourceHashVectors",
-        "TestCompositeVisitOrder"
+        "TestCompositeVisitOrder",
+        "TestSATMutexPairSetGrowBeforeDuplicateAndEveryPhysicalRefusal",
+        "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
+        "TestSATMutexPairSetWrappedCopyGuardAtActualDestination"
       ],
       "conditionals": [
         {
@@ -99723,6 +100035,16 @@
             "TestSourceHashVectors",
             "TestCompositeVisitOrder"
           ]
+        },
+        {
+          "name": "Selected combine_hash58-63/pair_hash217-229 literal pair consumer",
+          "status": "ported",
+          "go_target": "sat_solver_mutex_pair_set.go",
+          "tests": [
+            "TestSATMutexPairSetGrowBeforeDuplicateAndEveryPhysicalRefusal",
+            "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
+            "TestSATMutexPairSetWrappedCopyGuardAtActualDestination"
+          ]
         }
       ],
       "ownership": [
@@ -99745,7 +100067,14 @@
         "ast_shared_occs_iterator.go",
         "ast_sparse_mark.go",
         "ast_expr_substitution_table.go",
-        "ast_expr_substitution_ops.go"
+        "ast_expr_substitution_ops.go",
+        "sat_solver_index_sets.go",
+        "sat_solver_index_set.go",
+        "sat_solver_index_map.go",
+        "sat_solver_index_set_test.go",
+        "sat_solver_index_iterator_source_test.go",
+        "sat_solver_mutex_pair_set.go",
+        "sat_solver_mutex_pair_set_test.go"
       ],
       "tests": [
         "TestUintMapSourceMapAssertions",
@@ -99885,7 +100214,18 @@
         "TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding",
         "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
         "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
-        "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths"
+        "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths",
+        "TestSATSolverConsequenceIndexSetActualPhysicalIterationAndDeepMapCopy",
+        "TestSATSolverConsequenceNestedIndexSetReadsActualHeaderAtReachedSite",
+        "TestSATSolverConsequenceMapFailedSecondTemporaryUnwindsCompletedFirst",
+        "TestSATSolverConsequenceIndexSetAndMapGrowBeforeDuplicate",
+        "TestSATSolverConsequenceMapGrowthEveryActualRefusalRetainsNestedOwners",
+        "TestSATSolverConsequenceMapResetShrinksAfterFreeBeforeAllocation",
+        "TestSATSolverConsequenceNestedIndexSetReachedPointerWordsGuard",
+        "TestSATConsequenceIndexIteratorCaptureReadsActualNestedPointer",
+        "TestSATMutexPairSetGrowBeforeDuplicateAndEveryPhysicalRefusal",
+        "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
+        "TestSATMutexPairSetWrappedCopyGuardAtActualDestination"
       ],
       "conditionals": [
         {
@@ -100578,6 +100918,31 @@
             "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
             "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths"
           ]
+        },
+        {
+          "name": "Selected consequence index_set/index_set_map actual cached hash/state/value, nested deep copies and reached captured pointer reads",
+          "status": "ported",
+          "go_target": "sat_solver_index_map.go",
+          "tests": [
+            "TestSATSolverConsequenceIndexSetActualPhysicalIterationAndDeepMapCopy",
+            "TestSATSolverConsequenceNestedIndexSetReadsActualHeaderAtReachedSite",
+            "TestSATSolverConsequenceMapFailedSecondTemporaryUnwindsCompletedFirst",
+            "TestSATSolverConsequenceIndexSetAndMapGrowBeforeDuplicate",
+            "TestSATSolverConsequenceMapGrowthEveryActualRefusalRetainsNestedOwners",
+            "TestSATSolverConsequenceMapResetShrinksAfterFreeBeforeAllocation",
+            "TestSATSolverConsequenceNestedIndexSetReachedPointerWordsGuard",
+            "TestSATConsequenceIndexIteratorCaptureReadsActualNestedPointer"
+          ]
+        },
+        {
+          "name": "Selected literal-pair table actual FREE NULL member construction, grow-before-duplicate, cached pair hash and wrapped copy guard",
+          "status": "ported",
+          "go_target": "sat_solver_mutex_pair_set.go",
+          "tests": [
+            "TestSATMutexPairSetGrowBeforeDuplicateAndEveryPhysicalRefusal",
+            "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
+            "TestSATMutexPairSetWrappedCopyGuardAtActualDestination"
+          ]
         }
       ],
       "ownership": [
@@ -100597,7 +100962,8 @@
         "Predictable reset/finalize/rehash failures prepare replacements before publication. Epoch exhaustion preflights structural mutation; Close always releases even at max epoch. Preparation rejects exhausted-epoch misses before caller spelling allocation, while existing hits remain valid.",
         "Secondary region borrows live in a sorted budgeted cold directory, retained through reset until Close. Insert adopts an owner only on new publication or equal-pointer overwrite; queries and absent-insert duplicate hits adopt nothing. Swap transfers table and directory charges atomically without touching region budgets.",
         "Explicit scalar padding keeps Go default entries40bytes across architectures. Checked key replacement preserves hash/equality; scalar values remain mutable. Other entry/key/value variants and enabled statistics remain unported.",
-        "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md."
+        "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md.",
+        "Selected concrete consequences and mutex family source mapping supersedes older missing-method notes only for listed sites. Source AST/BV/datatype registered6 assertions, TRACE/verbose, extension dispatch, dormant core_chunking/static helpers, general template variants and full source units remain OPEN. Scalar slot/generation encodes selected8-byte pointer ABI; actual named cold/raw/pending roots charged; no registry-derived ownership. See PORT_PROGRESS.md."
       ]
     },
     {
@@ -108713,7 +109079,12 @@
         "bitset/uint_set_map.go",
         "utilhash/str_int32_map.go",
         "util_param_descrs.go",
-        "util_gparams_dictionary.go"
+        "util_gparams_dictionary.go",
+        "sat_solver_index_sets.go",
+        "sat_solver_index_set.go",
+        "sat_solver_index_map.go",
+        "sat_solver_index_set_test.go",
+        "sat_solver_index_iterator_source_test.go"
       ],
       "tests": [
         "TestUintMapSourceMapAssertions",
@@ -108786,7 +109157,15 @@
         "TestGlobalParamsResetOwnerDirectoryPlateauAndWarmSnapshots",
         "TestGlobalParamsSetterFaultPrefixesImmediateOwnedGraph",
         "TestGlobalParamsThreeDictionaryLayoutsAndPhysicalBucketOrder",
-        "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule"
+        "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule",
+        "TestSATSolverConsequenceIndexSetActualPhysicalIterationAndDeepMapCopy",
+        "TestSATSolverConsequenceNestedIndexSetReadsActualHeaderAtReachedSite",
+        "TestSATSolverConsequenceMapFailedSecondTemporaryUnwindsCompletedFirst",
+        "TestSATSolverConsequenceIndexSetAndMapGrowBeforeDuplicate",
+        "TestSATSolverConsequenceMapGrowthEveryActualRefusalRetainsNestedOwners",
+        "TestSATSolverConsequenceMapResetShrinksAfterFreeBeforeAllocation",
+        "TestSATSolverConsequenceNestedIndexSetReachedPointerWordsGuard",
+        "TestSATConsequenceIndexIteratorCaptureReadsActualNestedPointer"
       ],
       "conditionals": [
         {
@@ -109207,6 +109586,21 @@
             "TestGlobalParamsThreeDictionaryLayoutsAndPhysicalBucketOrder",
             "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule"
           ]
+        },
+        {
+          "name": "Selected consequence index_set/index_set_map actual cached hash/state/value, nested deep copies and reached captured pointer reads",
+          "status": "ported",
+          "go_target": "sat_solver_index_map.go",
+          "tests": [
+            "TestSATSolverConsequenceIndexSetActualPhysicalIterationAndDeepMapCopy",
+            "TestSATSolverConsequenceNestedIndexSetReadsActualHeaderAtReachedSite",
+            "TestSATSolverConsequenceMapFailedSecondTemporaryUnwindsCompletedFirst",
+            "TestSATSolverConsequenceIndexSetAndMapGrowBeforeDuplicate",
+            "TestSATSolverConsequenceMapGrowthEveryActualRefusalRetainsNestedOwners",
+            "TestSATSolverConsequenceMapResetShrinksAfterFreeBeforeAllocation",
+            "TestSATSolverConsequenceNestedIndexSetReachedPointerWordsGuard",
+            "TestSATConsequenceIndexIteratorCaptureReadsActualNestedPointer"
+          ]
         }
       ],
       "ownership": [
@@ -109227,14 +109621,52 @@
       "path": "src/util/max_cliques.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_solver_max_cliques.go",
+        "sat_solver_max_cliques_model_test.go",
+        "sat_solver_max_cliques_rows.go",
+        "sat_solver_max_cliques_rows_test.go",
+        "sat_solver_max_cliques_set.go",
+        "sat_solver_max_cliques_test.go"
+      ],
+      "tests": [
+        "TestSATMaxCliquesIndependentAllThreeVertexMutexGraphs",
+        "TestSATMaxCliquesNestedResizeRefusalRetainsOldLogicalSize",
+        "TestSATMaxCliquesNegatedLiteralPartitionAndSourceCache",
+        "TestSATSolverFindMutexesActualBinaryWatchesAppendOutput",
+        "TestSATMaxCliquesUintSetResizeRefusalKeepsOriginalLogicalSize",
+        "TestSATMaxCliquesRetainsGoalSpecificSourceCacheAcrossCalls",
+        "TestSATMaxCliquesWarmedSameQueryPhysicalPlateauAndScalarExtent",
+        "TestSATMaxCliquesWrappedExtentReachesSecondReserveBeforeSourceRead",
+        "TestSATSolverFindMutexesHasNoCheckpointOrConsistencyPreflight",
+        "TestSATMaxCliquesStoppedLexicalContextRejectsOverwrite"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Selected concrete neg_literal getReachable34-80/addEdge91-96/cliques98-134 preserve source goal-specific retained cache and greedy partition",
+          "status": "ported",
+          "go_target": "sat_solver_max_cliques.go",
+          "tests": [
+            "TestSATMaxCliquesIndependentAllThreeVertexMutexGraphs",
+            "TestSATMaxCliquesNestedResizeRefusalRetainsOldLogicalSize",
+            "TestSATMaxCliquesNegatedLiteralPartitionAndSourceCache",
+            "TestSATSolverFindMutexesActualBinaryWatchesAppendOutput",
+            "TestSATMaxCliquesUintSetResizeRefusalKeepsOriginalLogicalSize",
+            "TestSATMaxCliquesRetainsGoalSpecificSourceCacheAcrossCalls",
+            "TestSATMaxCliquesWarmedSameQueryPhysicalPlateauAndScalarExtent",
+            "TestSATMaxCliquesWrappedExtentReachesSecondReserveBeforeSourceRead",
+            "TestSATSolverFindMutexesHasNoCheckpointOrConsistencyPreflight",
+            "TestSATMaxCliquesStoppedLexicalContextRejectsOverwrite"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Selected concrete consequences and mutex family source mapping supersedes older missing-method notes only for listed sites. Source AST/BV/datatype registered6 assertions, TRACE/verbose, extension dispatch, dormant core_chunking/static helpers, general template variants and full source units remain OPEN. Scalar slot/generation encodes selected8-byte pointer ABI; actual named cold/raw/pending roots charged; no registry-derived ownership. See PORT_PROGRESS.md."
+      ]
     },
     {
       "path": "src/util/memory_manager.cpp",
@@ -127715,7 +128147,9 @@
       "status": "partial",
       "go_targets": [
         "bitset/uint_set.go",
-        "bitset/uint_set_map.go"
+        "bitset/uint_set_map.go",
+        "sat_solver_max_cliques_set.go",
+        "sat_solver_max_cliques_test.go"
       ],
       "tests": [
         "TestUintSetSourceTst1",
@@ -127738,7 +128172,17 @@
         "TestUintSetMapGrowthTombstonesAndReset",
         "TestUintSetMapCleanupAndOutOfMemory",
         "TestUintSetMapCopyAssignmentShapeAndIterator",
-        "TestUintSetMapRehashFailureAndTemporaryCopies"
+        "TestUintSetMapRehashFailureAndTemporaryCopies",
+        "TestSATMaxCliquesIndependentAllThreeVertexMutexGraphs",
+        "TestSATMaxCliquesNestedResizeRefusalRetainsOldLogicalSize",
+        "TestSATMaxCliquesNegatedLiteralPartitionAndSourceCache",
+        "TestSATSolverFindMutexesActualBinaryWatchesAppendOutput",
+        "TestSATMaxCliquesUintSetResizeRefusalKeepsOriginalLogicalSize",
+        "TestSATMaxCliquesRetainsGoalSpecificSourceCacheAcrossCalls",
+        "TestSATMaxCliquesWarmedSameQueryPhysicalPlateauAndScalarExtent",
+        "TestSATMaxCliquesWrappedExtentReachesSecondReserveBeforeSourceRead",
+        "TestSATSolverFindMutexesHasNoCheckpointOrConsistencyPreflight",
+        "TestSATMaxCliquesStoppedLexicalContextRejectsOverwrite"
       ],
       "conditionals": [
         {
@@ -127871,6 +128315,23 @@
             "TestUintSetIndependentBoundedOracle",
             "TestUintSetWarmOperationsNoAllocation",
             "TestUintSetOverflowRejectedBeforeGrowth"
+          ]
+        },
+        {
+          "name": "Selected same-Runtime max_cliques uint_set bit-word insert/remove/reset/first/intersection/iteration source24-225",
+          "status": "ported",
+          "go_target": "sat_solver_max_cliques_set.go",
+          "tests": [
+            "TestSATMaxCliquesIndependentAllThreeVertexMutexGraphs",
+            "TestSATMaxCliquesNestedResizeRefusalRetainsOldLogicalSize",
+            "TestSATMaxCliquesNegatedLiteralPartitionAndSourceCache",
+            "TestSATSolverFindMutexesActualBinaryWatchesAppendOutput",
+            "TestSATMaxCliquesUintSetResizeRefusalKeepsOriginalLogicalSize",
+            "TestSATMaxCliquesRetainsGoalSpecificSourceCacheAcrossCalls",
+            "TestSATMaxCliquesWarmedSameQueryPhysicalPlateauAndScalarExtent",
+            "TestSATMaxCliquesWrappedExtentReachesSecondReserveBeforeSourceRead",
+            "TestSATSolverFindMutexesHasNoCheckpointOrConsistencyPreflight",
+            "TestSATMaxCliquesStoppedLexicalContextRejectsOverwrite"
           ]
         }
       ],
@@ -128355,7 +128816,14 @@
         "mpnum/polynomial_variable_helpers_lifetime.go",
         "mpnum/polynomial_variable_helpers_scoped.go",
         "mpnum/polynomial_variable_helpers_source_test.go",
-        "mpnum/polynomial_variable_helpers_physical_test.go"
+        "mpnum/polynomial_variable_helpers_physical_test.go",
+        "sat_solver_literal_rows.go",
+        "sat_solver_literal_rows_test.go",
+        "sat_solver_literal_rows_move_source_test.go",
+        "sat_solver_max_cliques_rows.go",
+        "sat_solver_max_cliques_rows_test.go",
+        "sat_solver_mutex_pair_vector.go",
+        "sat_solver_mutex_pair_vector_test.go"
       ],
       "tests": [
         "TestParamDescrsBudgetFailuresAndWarmDuplicate",
@@ -128550,7 +129018,15 @@
         "TestPolynomialMaxDegreesCopyConstructorCompletedMemberUnwind",
         "TestPolynomialMaxDegreesCopyConstructorTLSIncompleteSecondRoot",
         "TestPolynomialVariableHelperWarmAndColdOwnerGuards",
-        "TestPolynomialMaxDegreesStoppedSourceDestructorAndOwningAbort"
+        "TestPolynomialMaxDegreesStoppedSourceDestructorAndOwningAbort",
+        "TestSATConsequenceRowsCapturedInnerPayloadSurvivesOuterMoveAndDiesAtClose",
+        "TestSATConsequenceRowsCloseDestroysSourceOuterBeforeFailedCopyAbort",
+        "TestSATConsequenceRowsSourceFinalizeThenReuseOwnsNewSourceVector",
+        "TestSATConsequenceRowsStoppedSourceFinalizePreservesCauseAndNamedAbort",
+        "TestSATConsequenceRowsExpansionReadsActualOldPointer",
+        "TestSATMaxCliquesNestedResizeRefusalRetainsOldLogicalSize",
+        "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
+        "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor"
       ],
       "conditionals": [
         {
@@ -128936,6 +129412,21 @@
             "TestPolynomialVariableHelperWarmAndColdOwnerGuards",
             "TestPolynomialMaxDegreesStoppedSourceDestructorAndOwningAbort"
           ]
+        },
+        {
+          "name": "Selected nested literal/unsigned rows source move reads actual old element pointer, resize retains old SIZE during every reserve then one publication/defaults; full-width scalar pair vector",
+          "status": "ported",
+          "go_target": "sat_solver_literal_rows.go",
+          "tests": [
+            "TestSATConsequenceRowsCapturedInnerPayloadSurvivesOuterMoveAndDiesAtClose",
+            "TestSATConsequenceRowsCloseDestroysSourceOuterBeforeFailedCopyAbort",
+            "TestSATConsequenceRowsSourceFinalizeThenReuseOwnsNewSourceVector",
+            "TestSATConsequenceRowsStoppedSourceFinalizePreservesCauseAndNamedAbort",
+            "TestSATConsequenceRowsExpansionReadsActualOldPointer",
+            "TestSATMaxCliquesNestedResizeRefusalRetainsOldLogicalSize",
+            "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
+            "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor"
+          ]
         }
       ],
       "ownership": [
@@ -128959,7 +129450,8 @@
         "Only assignment char_vector source allocation accounting is integrated in this slice. Other SAT columns/watch/queue/clause/trail/vector allocations still require real global/runtime source hooks. Raw-state bounds/initialization guards act at endangered byte accesses; source DEBUG logical assertions remain distinct. No full solver construction/search or registered assertion completion is claimed.",
         "Actual polynomial imp template overload consumers remain open; concrete borrowed array loops preserve only the template iteration body. Runtime handles replace raw pointer ABI. Source invalid-memory continuation is guarded explicitly. No registered source assertion completion credit.",
         "copy_core sizeof(T) uses actual source size_t width before Runtime call, while expansion retains unsigned32 source extent arithmetic. Oversized capacity/zero-size Runtime32 proof is a malformed source-domain prefix, not valid OOM or a large vector claim.",
-        "Selected concrete skeleton canonical order uses heap sort; platform std::sort comparator dispatch order is not claimed. Scalar child IDs encode actual cold object provenance under a fixed Runtime. Cold ownership metadata fully charged and distinct from source malloc events. Whole imp and registered-driver/global diagnostic integration remain open."
+        "Selected concrete skeleton canonical order uses heap sort; platform std::sort comparator dispatch order is not claimed. Scalar child IDs encode actual cold object provenance under a fixed Runtime. Cold ownership metadata fully charged and distinct from source malloc events. Whole imp and registered-driver/global diagnostic integration remain open.",
+        "Selected concrete consequences and mutex family source mapping supersedes older missing-method notes only for listed sites. Source AST/BV/datatype registered6 assertions, TRACE/verbose, extension dispatch, dormant core_chunking/static helpers, general template variants and full source units remain OPEN. Scalar slot/generation encodes selected8-byte pointer ABI; actual named cold/raw/pending roots charged; no registry-derived ownership. See PORT_PROGRESS.md."
       ]
     },
     {

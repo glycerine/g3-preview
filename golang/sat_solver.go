@@ -47,12 +47,16 @@ type satSolver struct {
 	elimTodo                     *satSolverUintSet
 	antecedents                  *satSolverIndexMap
 	auxLiterals, todoAntecedents satSolverRuntimeUintColumn
-	userBinClauses               *satBinClauseVector
+	userBinClauses               *satSolverBinPairVector
 	binaryClauseGraph            []satSolverRuntimeUintColumn
 	closeSourceCause             error
 	closeGuardAcknowledged       bool
 	userGC                       satSolverUserGC
 	nextSimplify                 uint32
+	mutexFrames                  *satMutexFrame
+	mutexRunning                 bool
+	consequenceFrames            *satConsequenceFrame
+	consequenceRunning           bool
 	ownerBytes                   uint64
 	closeStage                   uint32
 	constructed, closing, closed bool
@@ -201,7 +205,7 @@ func NewSATSolver(c satSolverConfig) (s *satSolver, err error) {
 	// Remaining declared vectors are empty until reached by their algorithms.
 	// The consequence antecedent map is nevertheless eagerly constructed.
 	s.auxLiterals.bind(c.Runtime.memory)
-	if s.userBinClauses, err = NewSATBinClauseVector(c.Budget); err != nil {
+	if s.userBinClauses, err = newSATSolverBinPairVector(s.runtime.memory, c.Budget); err != nil {
 		return s, err
 	}
 	if s.antecedents, err = newSATSolverIndexMap(c.Runtime.memory, c.Budget); err != nil {
@@ -236,7 +240,7 @@ func (s *satSolver) open() error {
 	if e := s.identity(); e != nil {
 		return e
 	}
-	if s.closing || !s.constructed || (s.mus.frames != nil && !s.mus.isActive) {
+	if s.closing || !s.constructed || (s.mus.frames != nil && !s.mus.isActive) || (s.consequenceFrames != nil && !s.consequenceRunning) || (s.mutexFrames != nil && !s.mutexRunning) {
 		return arena.ErrClosed
 	}
 	if e := s.runtime.open(); e != nil {
@@ -334,6 +338,12 @@ func (s *satSolver) closeMembers() error {
 		var e error
 		switch s.closeStage {
 		case 0:
+			if e = s.cleanupMutexes(); e != nil {
+				break
+			}
+			if e = s.cleanupConsequences(); e != nil {
+				break
+			}
 			if e = s.mus.cleanup(); e != nil {
 				break
 			}

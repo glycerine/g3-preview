@@ -15,16 +15,29 @@ import (
 // The pointer word encodes that block's slot/generation under this fixed borrowed
 // Runtime. It is an explicit scalar pointer adaptation, not a physical C++ address.
 // Consequence/map operations remain a separate source algorithm dependency.
-type satSolverIndexSet struct{ raw memory.Block }
+type satSolverIndexSet struct {
+	runtime                 *memory.Runtime
+	raw, pending            memory.Block
+	capacity, size, deleted uint32
+	// A nested value's source core fields live in its enclosing40-byte entry.
+	parent memory.Block
+	base   uint64
+}
 type satSolverIndexMap struct {
-	self                            *satSolverIndexMap
-	runtime                         *memory.Runtime
-	budget                          *arena.Budget
-	raw, pending                    memory.Block
-	entries                         [8]satSolverIndexSet
-	ownerBytes                      uint64
-	constructedEntries, closeCursor uint32
-	constructed, closing, closed    bool
+	self                                *satSolverIndexMap
+	runtime                             *memory.Runtime
+	budget                              *arena.Budget
+	raw, pending                        memory.Block
+	entries                             [8]satSolverIndexSet
+	ownerBytes                          uint64
+	constructedEntries, closeCursor     uint32
+	constructed, closing, closed        bool
+	capacity, size, deleted             uint32
+	extraEntries, pendingEntries        []satSolverIndexSet
+	metadataBytes, pendingMetadataBytes uint64
+	pendingCapacity                     uint32
+	temps                               [2]satSolverIndexSet
+	tempUsed                            uint32
 }
 
 func newSATSolverIndexMap(r *memory.Runtime, b *arena.Budget) (*satSolverIndexMap, error) {
@@ -40,6 +53,7 @@ func newSATSolverIndexMap(r *memory.Runtime, b *arena.Budget) (*satSolverIndexMa
 	}
 	m := &satSolverIndexMap{runtime: r, budget: b, ownerBytes: bytes}
 	m.self = m
+	m.capacity = 8
 	// alloc_vect returns only after every ascending placement constructor. A
 	// reached raw allocation is retained in pending until that return/publish.
 	var e error
@@ -54,6 +68,9 @@ func newSATSolverIndexMap(r *memory.Runtime, b *arena.Budget) (*satSolverIndexMa
 			return m, e
 		}
 		row := &m.entries[i]
+		row.runtime = r
+		row.parent, row.base = m.pending, base+16
+		row.capacity = 8
 		row.raw, e = r.Allocate(8 * 12)
 		if e != nil {
 			return m, e
@@ -100,11 +117,10 @@ func (m *satSolverIndexMap) Close() error {
 		return nil
 	}
 	m.closing = true
-	for m.closeCursor < 8 {
-		if m.entries[m.closeCursor].raw != (memory.Block{}) {
-			if e := m.runtime.Deallocate(&m.entries[m.closeCursor].raw); e != nil {
-				return e
-			}
+	for m.closeCursor < m.capacity {
+		row := m.entry(m.closeCursor)
+		if e := row.close(); e != nil {
+			return e
 		}
 		m.closeCursor++
 	}
@@ -113,10 +129,35 @@ func (m *satSolverIndexMap) Close() error {
 			return e
 		}
 	}
+	for m.tempUsed > 0 {
+		i := m.tempUsed - 1
+		if e := m.temps[i].close(); e != nil {
+			return e
+		}
+		m.temps[i] = satSolverIndexSet{}
+		m.tempUsed--
+	}
+	// Successful source arrays destroy ascending. An uncompleted replacement
+	// cohort is an explicit owning-abort prefix, kept separate from the old one.
+	for i := range m.pendingEntries {
+		if e := m.pendingEntries[i].close(); e != nil {
+			return e
+		}
+	}
 	if m.pending != (memory.Block{}) {
 		if e := m.runtime.Deallocate(&m.pending); e != nil {
 			return e
 		}
+	}
+	if m.pendingMetadataBytes != 0 {
+		m.budget.Release(m.pendingMetadataBytes)
+		m.pendingMetadataBytes = 0
+		m.pendingEntries = nil
+	}
+	if m.metadataBytes != 0 {
+		m.budget.Release(m.metadataBytes)
+		m.metadataBytes = 0
+		m.extraEntries = nil
 	}
 	m.budget.Release(m.ownerBytes)
 	m.ownerBytes = 0
