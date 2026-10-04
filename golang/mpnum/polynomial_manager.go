@@ -27,6 +27,7 @@ type MultivariatePolynomialConfig struct {
 	Cooperation func() error
 }
 type polynomialCreation struct {
+	pscOwner          uint64
 	substitutionOwned bool
 	translationOwned  bool
 	generation        uint64
@@ -38,6 +39,12 @@ type polynomialCreation struct {
 	buffer            *polynomialSOM
 }
 type MultivariatePolynomialCore struct {
+	pscReceipts                                                                                polynomialPSCReceipts
+	generatedPSC                                                                               uint64
+	pscLocal                                                                                   polynomialPSCScope
+	pscNext                                                                                    polynomialPSCNextScope
+	lazardLocal                                                                                polynomialLazardScope
+	pscBuffer                                                                                  polynomialPSCRefBuffer
 	translateBuffers                                                                           PolynomialSOMVector
 	translation                                                                                polynomialTranslationScope
 	substitution                                                                               polynomialSubstitutionState
@@ -271,6 +278,9 @@ func (m *MultivariatePolynomialCore) mkConstCore(a *Int) (Polynomial, error) {
 	}
 	m.singletonMonomial = u
 	m.singletonReference = true
+	if m.pscReceipts.depth != 0 {
+		m.pscReceipts.singleton = u
+	}
 	return m.mkCell(1, nil, []Monomial{u}, nil, a)
 }
 func (m *MultivariatePolynomialCore) MkConstantTake(a *Int) (Polynomial, error) {
@@ -315,6 +325,9 @@ func (m *MultivariatePolynomialCore) MkVariable(v, k uint32) (Polynomial, error)
 	}
 	m.singletonMonomial = b
 	m.singletonReference = true
+	if m.pscReceipts.depth != 0 {
+		m.pscReceipts.singleton = b
+	}
 	m.transferGeneratedMonomial()
 	as := [1]Int{NewInt(1)}
 	return m.mkCell(1, as[:], []Monomial{b}, nil, nil)
@@ -337,6 +350,9 @@ func (m *MultivariatePolynomialCore) MkTerms(as []Int, ms []Monomial) (Polynomia
 	return m.som.mk(false)
 }
 func (m *MultivariatePolynomialCore) CloseChecked() error {
+	if m != nil && m.self == m && m.pscPending() {
+		return ErrPolynomialPending
+	}
 	if m != nil && m.self == m && m.translation.active {
 		return ErrPolynomialPending
 	}

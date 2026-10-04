@@ -7,6 +7,7 @@ import "errors"
 // Embedded actual result record is charged by the core's reflected header.
 // It retains stopped source destruction and unjoined INC separately; no ticket.
 type polynomialPowerScope struct {
+	pscOwner                uint64
 	substitutionOwned       bool
 	result                  polynomialReference
 	active                  bool
@@ -38,7 +39,7 @@ func (m *MultivariatePolynomialCore) powerInto(p Polynomial, k uint32, r *polyno
 	if local.active {
 		return ErrPolynomialPending
 	}
-	*local = polynomialPowerScope{active: true, substitutionOwned: m.substitution.scope.executing}
+	*local = polynomialPowerScope{active: true, substitutionOwned: m.substitution.scope.executing, pscOwner: m.pscExecutingOwner()}
 	defer func() {
 		local.bodyCause = err
 		c := local.result.closeValue(m, false)
@@ -68,15 +69,27 @@ func (m *MultivariatePolynomialCore) powerInto(p Polynomial, k uint32, r *polyno
 // Explicit owning abort follows all completed source destruction. Source
 // Power never silently retries a stopped destructor or consumes unjoined INC.
 func (m *MultivariatePolynomialCore) CleanupPolynomialPower() error {
+	return m.cleanupPolynomialPowerPhase(true, true)
+}
+func (m *MultivariatePolynomialCore) cleanupPolynomialPowerPhase(owning, abort bool) error {
 	if m == nil || m.self != m {
 		return ErrPolynomialOwner
 	}
 	if !m.powerLocal.active {
 		return nil
 	}
-	if e := m.powerLocal.result.close(m); e != nil {
+	if e := m.powerLocal.result.closeValue(m, owning); e != nil {
 		m.powerLocal.cleanupCause = e
 		return e
+	}
+	if abort {
+		if e := m.powerLocal.result.abort(m); e != nil {
+			m.powerLocal.cleanupCause = e
+			return e
+		}
+	}
+	if m.powerLocal.result.assigning || m.powerLocal.result.incoming != (Polynomial{}) {
+		return nil
 	}
 	m.powerLocal = polynomialPowerScope{}
 	return nil

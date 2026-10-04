@@ -284,6 +284,7 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 		m.derivativeOwner.factoryGeneration = m.creationGeneration
 	}
 	m.pending.substitutionOwned = m.substitution.scope.executing
+	m.pending.pscOwner = m.pscExecutingOwner()
 	m.pending.translationOwned = m.translation.executing
 	requested := polynomialCodecBytes(n)
 	raw, e := m.monomials.allocator.Allocate(uint64(requested))
@@ -374,6 +375,9 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 		}
 		l.initializedMonomials = i + 1
 		if buffer == nil && i == 0 && m.singletonReference && term == m.singletonMonomial {
+			if m.pscReceipts.singleton == term {
+				m.pscReceipts.singleton = Monomial{}
+			}
 			m.singletonReference = false
 			m.singletonMonomial = Monomial{}
 		}

@@ -28479,7 +28479,23 @@
         "mpnum/polynomial_derivative.go",
         "mpnum/polynomial_rename.go",
         "mpnum/polynomial_derivative_rename_test.go",
-        "mpnum/polynomial_unit_source_stop_test.go"
+        "mpnum/polynomial_unit_source_stop_test.go",
+        "mpnum/polynomial_lazard.go",
+        "mpnum/polynomial_lazard_source_test.go",
+        "mpnum/polynomial_psc.go",
+        "mpnum/polynomial_psc_buffer.go",
+        "mpnum/polynomial_psc_buffer_test.go",
+        "mpnum/polynomial_psc_cleanup.go",
+        "mpnum/polynomial_psc_failure_test.go",
+        "mpnum/polynomial_psc_next.go",
+        "mpnum/polynomial_psc_next_source_test.go",
+        "mpnum/polynomial_psc_original_cases_test.go",
+        "mpnum/polynomial_psc_original_test.go",
+        "mpnum/polynomial_psc_pending_foreign_root_test.go",
+        "mpnum/polynomial_psc_physical_test.go",
+        "mpnum/polynomial_psc_profiles_test.go",
+        "mpnum/polynomial_psc_source_test.go",
+        "mpnum/polynomial_psc_unwind_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -28767,7 +28783,29 @@
         "TestPolynomialDerivativeNumericPendingIdentity",
         "TestPolynomialDerivativeStoppedNumeralDestructorKeepsSourceCause",
         "TestPolynomialDerivativePostphysicalAllocatorRootOwnedByOperation",
-        "TestMonomialUnitSourceStoppedCauseDoesNotRepeatDEC"
+        "TestMonomialUnitSourceStoppedCauseDoesNotRepeatDEC",
+        "TestPolynomialLazardDichotomousIndependentCoefficients",
+        "TestPolynomialLazardZeroExponentAvoidsUnreadLeadingCoefficient",
+        "TestPolynomialPSCBufferInlineAndUnjoinedPush",
+        "TestPolynomialPSCBufferHeapAndCapturedInitializedRange",
+        "TestPolynomialPSCBufferReturnedAllocationBeforeSourceDestruction",
+        "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
+        "TestPolynomialPSCComposedEveryReservationPrefix",
+        "TestPolynomialPSCOptimizedAndHeapEveryReservationPrefix",
+        "TestPolynomialPSCNextIndependentQuadraticLinearIdentity",
+        "TestPolynomialPSCNextHeapBufferIndependentRemainder",
+        "TestPolynomialPSCAllEightOriginalCoefficientFixtures",
+        "TestPolynomialPSCMatchingPlacementPreservesLaterSingleton",
+        "TestPolynomialPSCActualSingletonINCReceiptAndAbort",
+        "TestPolynomialPSCSameInputsResetSwapAndRepeatedOutput",
+        "TestPolynomialPSCEveryCheckpointCancellationFrontier",
+        "TestPolynomialPSCWarmActualSourceProfile",
+        "TestPolynomialPSCFullOwnerPendingLocalClosePrefix",
+        "TestPolynomialPSCSourceAssertionBeforeOutputReset",
+        "TestPolynomialPSCOutputColdGuardBeforeOperandRead",
+        "TestPolynomialPSCRegisteredFirstFixture",
+        "TestPolynomialPSCBufferDestructorStopsOlderSourceLocals",
+        "TestPolynomialPSCExpiredFactoryReceiptPreservesForeignReplacement"
       ],
       "conditionals": [
         {
@@ -31283,6 +31321,35 @@
             "TestPolynomialDerivativePostphysicalAllocatorRootOwnedByOperation",
             "TestMonomialUnitSourceStoppedCauseDoesNotRepeatDEC"
           ]
+        },
+        {
+          "name": "Selected active optimized PSC dispatch, optimized core, Se_Lazard and optimized_S_e_1 (cpp5654-5810,5873-5901), full manager forward; classic alternatives and Resultant remain open",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_psc.go",
+          "tests": [
+            "TestPolynomialLazardDichotomousIndependentCoefficients",
+            "TestPolynomialLazardZeroExponentAvoidsUnreadLeadingCoefficient",
+            "TestPolynomialPSCBufferInlineAndUnjoinedPush",
+            "TestPolynomialPSCBufferHeapAndCapturedInitializedRange",
+            "TestPolynomialPSCBufferReturnedAllocationBeforeSourceDestruction",
+            "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
+            "TestPolynomialPSCComposedEveryReservationPrefix",
+            "TestPolynomialPSCOptimizedAndHeapEveryReservationPrefix",
+            "TestPolynomialPSCNextIndependentQuadraticLinearIdentity",
+            "TestPolynomialPSCNextHeapBufferIndependentRemainder",
+            "TestPolynomialPSCAllEightOriginalCoefficientFixtures",
+            "TestPolynomialPSCMatchingPlacementPreservesLaterSingleton",
+            "TestPolynomialPSCActualSingletonINCReceiptAndAbort",
+            "TestPolynomialPSCSameInputsResetSwapAndRepeatedOutput",
+            "TestPolynomialPSCEveryCheckpointCancellationFrontier",
+            "TestPolynomialPSCWarmActualSourceProfile",
+            "TestPolynomialPSCFullOwnerPendingLocalClosePrefix",
+            "TestPolynomialPSCSourceAssertionBeforeOutputReset",
+            "TestPolynomialPSCOutputColdGuardBeforeOperandRead",
+            "TestPolynomialPSCRegisteredFirstFixture",
+            "TestPolynomialPSCBufferDestructorStopsOlderSourceLocals",
+            "TestPolynomialPSCExpiredFactoryReceiptPreservesForeignReplacement"
+          ]
         }
       ],
       "ownership": [
@@ -31309,7 +31376,8 @@
         "Selected constructor helper split preserves existing actual modular/default/body order; Runtime temporary placement records real returned raw blocks and reached header writes. No full imp constructor/destructor credit or fabricated sizeof allocation event.",
         "Skeleton entries/powers/originals use actual Runtime storage; failed constructor transfers actual unconsumed INC fields into charged cold owning-abort records before source backing free. Scoped pointer publications alone own concrete children; stopped source cause retained, separate owning cleanup. Variable helpers own two/one actual embedded uint vectors in one charged stable cold header, views/scopes borrow actual backing and references. Strong shared physical census names pseudo/Power/ExactDiv plus supplied headers/blocks without registry-derived ownership.",
         "Translation uses the existing actual imp coefficient-buffer member. Named roots include actual child/raw/pending/old storage, retained NUM and exact generated monomial/factory generation; ordinary scope unwind precedes owning abort. Full owning Close rejects retained translation locals before child or caller teardown. Lex sort owns real Runtime bucket bindings and cold child directory plus permutation member; failed lower recursion preserves prior published term permutations. No registry-derived owning authority or native class allocation equivalence.",
-        "Actual derivative n/a embedded full-manager scope and reverse source destruction; charged created-only monomial cohort never owns borrowed RC0. Exact executing factory generation/parent, numeric ObjectRef and allzero-before allocator pending triple receipts identify only reached failed callees. Source causes stay sticky, consumed drops/frees never replay, and owning cleanup leaves later caller replacements untouched. See PORT_PROGRESS.md."
+        "Actual derivative n/a embedded full-manager scope and reverse source destruction; charged created-only monomial cohort never owns borrowed RC0. Exact executing factory generation/parent, numeric ObjectRef and allzero-before allocator pending triple receipts identify only reached failed callees. Source causes stay sticky, consumed drops/frees never replay, and owning cleanup leaves later caller replacements untouched. See PORT_PROGRESS.md.",
+        "Actual lexical polynomial references and H inline16/ref_buffer heap handles; successful source INC precedes fallible push/placement. Reverse lexical destruction and source first-cause stops precede explicit operation-owned abort. Actual invocation/factory/singleton and pending-cell receipts exclude later caller continuations. See PORT_PROGRESS.md."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -31337,7 +31405,8 @@
         "Selected concrete skeleton canonical order uses heap sort; platform std::sort comparator dispatch order is not claimed. Scalar child IDs encode actual cold object provenance under a fixed Runtime. Cold ownership metadata fully charged and distinct from source malloc events. Whole imp and registered-driver/global diagnostic integration remain open.",
         "Standalone SOM buffers/vectors and selected fresh sorting scope added. Authoritative reflected Go class header and charged real retained fields; scalar child ID cold provenance adaptation, no unread native-size ticket or full global malloc/header geometry claim. Heap sort final-order contract only, native comparator schedule/global ostream/full imp remain OPEN. Original source implicit dtor has no Reset/DEC/NUM Del; separate own-abort drains actual named records. See PORT_PROGRESS.md.",
         "Concrete imp wrapper owns the actual core arithmetic object, independent UP and remaining source members. Current core constructor/default/guard/cleanup helpers are preserved; only actual translateBuffers field added. Literal body/MM DEC and completed-member unwind remain separate from owning abort. Enabled TRACE/global allocator/wrapper/control/native class header binding and full arithmetic facade remain OPEN. Reflected Go headers are charged; explicit named retirement copies acquire numeral ownership only after actual source vector raw is consumed. No registry-derived owning roots or registered PSC driver credit. See PORT_PROGRESS.md.",
-        "Selected translation/lex methods remain partial source-family evidence, without registered polynomial driver completion. CTRACE poly_bug stream, global diagnostics/control and native class ABI remain open. Coefficient/div_x expressions use permitted coefficient-first evaluation. Runtime bucket bindings and charged cold children are Go storage adaptations; unsigned wrapped degree reaches a typed physical boundary. Broader GCD/PSC/resultants/printing remain open. See PORT_PROGRESS.md."
+        "Selected translation/lex methods remain partial source-family evidence, without registered polynomial driver completion. CTRACE poly_bug stream, global diagnostics/control and native class ABI remain open. Coefficient/div_x expressions use permitted coefficient-first evaluation. Runtime bucket bindings and charged cold children are Go storage adaptations; unsigned wrapped degree reaches a typed physical boundary. Broader GCD/PSC/resultants/printing remain open. See PORT_PROGRESS.md.",
+        "Selected optimized PSC only. IC/ICCP/default general GCD/Resultant, classic alternatives, complete original driver constructors/lifetimes and enabled TRACE/global tags remain OPEN. H uses actual scalar handle16 storage rather than native pointer8 ABI. Original eight coefficient fixtures execute first/second of three static ENSURE sites; the Resultant site remains outstanding."
       ]
     },
     {
@@ -31442,7 +31511,23 @@
         "mpnum/polynomial_derivative.go",
         "mpnum/polynomial_rename.go",
         "mpnum/polynomial_derivative_rename_test.go",
-        "mpnum/polynomial_unit_source_stop_test.go"
+        "mpnum/polynomial_unit_source_stop_test.go",
+        "mpnum/polynomial_lazard.go",
+        "mpnum/polynomial_lazard_source_test.go",
+        "mpnum/polynomial_psc.go",
+        "mpnum/polynomial_psc_buffer.go",
+        "mpnum/polynomial_psc_buffer_test.go",
+        "mpnum/polynomial_psc_cleanup.go",
+        "mpnum/polynomial_psc_failure_test.go",
+        "mpnum/polynomial_psc_next.go",
+        "mpnum/polynomial_psc_next_source_test.go",
+        "mpnum/polynomial_psc_original_cases_test.go",
+        "mpnum/polynomial_psc_original_test.go",
+        "mpnum/polynomial_psc_pending_foreign_root_test.go",
+        "mpnum/polynomial_psc_physical_test.go",
+        "mpnum/polynomial_psc_profiles_test.go",
+        "mpnum/polynomial_psc_source_test.go",
+        "mpnum/polynomial_psc_unwind_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -31712,7 +31797,29 @@
         "TestPolynomialDerivativeNumericPendingIdentity",
         "TestPolynomialDerivativeStoppedNumeralDestructorKeepsSourceCause",
         "TestPolynomialDerivativePostphysicalAllocatorRootOwnedByOperation",
-        "TestMonomialUnitSourceStoppedCauseDoesNotRepeatDEC"
+        "TestMonomialUnitSourceStoppedCauseDoesNotRepeatDEC",
+        "TestPolynomialLazardDichotomousIndependentCoefficients",
+        "TestPolynomialLazardZeroExponentAvoidsUnreadLeadingCoefficient",
+        "TestPolynomialPSCBufferInlineAndUnjoinedPush",
+        "TestPolynomialPSCBufferHeapAndCapturedInitializedRange",
+        "TestPolynomialPSCBufferReturnedAllocationBeforeSourceDestruction",
+        "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
+        "TestPolynomialPSCComposedEveryReservationPrefix",
+        "TestPolynomialPSCOptimizedAndHeapEveryReservationPrefix",
+        "TestPolynomialPSCNextIndependentQuadraticLinearIdentity",
+        "TestPolynomialPSCNextHeapBufferIndependentRemainder",
+        "TestPolynomialPSCAllEightOriginalCoefficientFixtures",
+        "TestPolynomialPSCMatchingPlacementPreservesLaterSingleton",
+        "TestPolynomialPSCActualSingletonINCReceiptAndAbort",
+        "TestPolynomialPSCSameInputsResetSwapAndRepeatedOutput",
+        "TestPolynomialPSCEveryCheckpointCancellationFrontier",
+        "TestPolynomialPSCWarmActualSourceProfile",
+        "TestPolynomialPSCFullOwnerPendingLocalClosePrefix",
+        "TestPolynomialPSCSourceAssertionBeforeOutputReset",
+        "TestPolynomialPSCOutputColdGuardBeforeOperandRead",
+        "TestPolynomialPSCRegisteredFirstFixture",
+        "TestPolynomialPSCBufferDestructorStopsOlderSourceLocals",
+        "TestPolynomialPSCExpiredFactoryReceiptPreservesForeignReplacement"
       ],
       "conditionals": [
         {
@@ -32940,6 +33047,35 @@
             "TestPolynomialDerivativePostphysicalAllocatorRootOwnedByOperation",
             "TestMonomialUnitSourceStoppedCauseDoesNotRepeatDEC"
           ]
+        },
+        {
+          "name": "Selected active optimized PSC dispatch, optimized core, Se_Lazard and optimized_S_e_1 (cpp5654-5810,5873-5901), full manager forward; classic alternatives and Resultant remain open",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_psc.go",
+          "tests": [
+            "TestPolynomialLazardDichotomousIndependentCoefficients",
+            "TestPolynomialLazardZeroExponentAvoidsUnreadLeadingCoefficient",
+            "TestPolynomialPSCBufferInlineAndUnjoinedPush",
+            "TestPolynomialPSCBufferHeapAndCapturedInitializedRange",
+            "TestPolynomialPSCBufferReturnedAllocationBeforeSourceDestruction",
+            "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
+            "TestPolynomialPSCComposedEveryReservationPrefix",
+            "TestPolynomialPSCOptimizedAndHeapEveryReservationPrefix",
+            "TestPolynomialPSCNextIndependentQuadraticLinearIdentity",
+            "TestPolynomialPSCNextHeapBufferIndependentRemainder",
+            "TestPolynomialPSCAllEightOriginalCoefficientFixtures",
+            "TestPolynomialPSCMatchingPlacementPreservesLaterSingleton",
+            "TestPolynomialPSCActualSingletonINCReceiptAndAbort",
+            "TestPolynomialPSCSameInputsResetSwapAndRepeatedOutput",
+            "TestPolynomialPSCEveryCheckpointCancellationFrontier",
+            "TestPolynomialPSCWarmActualSourceProfile",
+            "TestPolynomialPSCFullOwnerPendingLocalClosePrefix",
+            "TestPolynomialPSCSourceAssertionBeforeOutputReset",
+            "TestPolynomialPSCOutputColdGuardBeforeOperandRead",
+            "TestPolynomialPSCRegisteredFirstFixture",
+            "TestPolynomialPSCBufferDestructorStopsOlderSourceLocals",
+            "TestPolynomialPSCExpiredFactoryReceiptPreservesForeignReplacement"
+          ]
         }
       ],
       "ownership": [
@@ -32966,7 +33102,8 @@
         "Selected constructor helper split preserves existing actual modular/default/body order; Runtime temporary placement records real returned raw blocks and reached header writes. No full imp constructor/destructor credit or fabricated sizeof allocation event.",
         "Skeleton entries/powers/originals use actual Runtime storage; failed constructor transfers actual unconsumed INC fields into charged cold owning-abort records before source backing free. Scoped pointer publications alone own concrete children; stopped source cause retained, separate owning cleanup. Variable helpers own two/one actual embedded uint vectors in one charged stable cold header, views/scopes borrow actual backing and references. Strong shared physical census names pseudo/Power/ExactDiv plus supplied headers/blocks without registry-derived ownership.",
         "Translation uses the existing actual imp coefficient-buffer member. Named roots include actual child/raw/pending/old storage, retained NUM and exact generated monomial/factory generation; ordinary scope unwind precedes owning abort. Full owning Close rejects retained translation locals before child or caller teardown. Lex sort owns real Runtime bucket bindings and cold child directory plus permutation member; failed lower recursion preserves prior published term permutations. No registry-derived owning authority or native class allocation equivalence.",
-        "Actual derivative n/a embedded full-manager scope and reverse source destruction; charged created-only monomial cohort never owns borrowed RC0. Exact executing factory generation/parent, numeric ObjectRef and allzero-before allocator pending triple receipts identify only reached failed callees. Source causes stay sticky, consumed drops/frees never replay, and owning cleanup leaves later caller replacements untouched. See PORT_PROGRESS.md."
+        "Actual derivative n/a embedded full-manager scope and reverse source destruction; charged created-only monomial cohort never owns borrowed RC0. Exact executing factory generation/parent, numeric ObjectRef and allzero-before allocator pending triple receipts identify only reached failed callees. Source causes stay sticky, consumed drops/frees never replay, and owning cleanup leaves later caller replacements untouched. See PORT_PROGRESS.md.",
+        "Actual lexical polynomial references and H inline16/ref_buffer heap handles; successful source INC precedes fallible push/placement. Reverse lexical destruction and source first-cause stops precede explicit operation-owned abort. Actual invocation/factory/singleton and pending-cell receipts exclude later caller continuations. See PORT_PROGRESS.md."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -32993,7 +33130,8 @@
         "Selected concrete class and ModD methods only: whole polynomial hierarchy, PSC/Lazard/resultants/GCD/global diagnostic and source-driver assertion bindings remain OPEN. Borrowed cold stream interface binds actual NumericTextStream formatting state, no hot per-variable interface fields or decimal-only surrogate. No additional registered source assertion credit; malformed/wrapped source-undefined vector profiles are typed guards, not native recovery claims.",
         "Selected concrete skeleton canonical order uses heap sort; platform std::sort comparator dispatch order is not claimed. Scalar child IDs encode actual cold object provenance under a fixed Runtime. Cold ownership metadata fully charged and distinct from source malloc events. Whole imp and registered-driver/global diagnostic integration remain open.",
         "Concrete imp wrapper owns the actual core arithmetic object, independent UP and remaining source members. Current core constructor/default/guard/cleanup helpers are preserved; only actual translateBuffers field added. Literal body/MM DEC and completed-member unwind remain separate from owning abort. Enabled TRACE/global allocator/wrapper/control/native class header binding and full arithmetic facade remain OPEN. Reflected Go headers are charged; explicit named retirement copies acquire numeral ownership only after actual source vector raw is consumed. No registry-derived owning roots or registered PSC driver credit. See PORT_PROGRESS.md.",
-        "Selected translation/lex methods remain partial source-family evidence, without registered polynomial driver completion. CTRACE poly_bug stream, global diagnostics/control and native class ABI remain open. Coefficient/div_x expressions use permitted coefficient-first evaluation. Runtime bucket bindings and charged cold children are Go storage adaptations; unsigned wrapped degree reaches a typed physical boundary. Broader GCD/PSC/resultants/printing remain open. See PORT_PROGRESS.md."
+        "Selected translation/lex methods remain partial source-family evidence, without registered polynomial driver completion. CTRACE poly_bug stream, global diagnostics/control and native class ABI remain open. Coefficient/div_x expressions use permitted coefficient-first evaluation. Runtime bucket bindings and charged cold children are Go storage adaptations; unsigned wrapped degree reaches a typed physical boundary. Broader GCD/PSC/resultants/printing remain open. See PORT_PROGRESS.md.",
+        "Selected optimized PSC only. IC/ICCP/default general GCD/Resultant, classic alternatives, complete original driver constructors/lifetimes and enabled TRACE/global tags remain OPEN. H uses actual scalar handle16 storage rather than native pointer8 ABI. Original eight coefficient fixtures execute first/second of three static ENSURE sites; the Resultant site remains outstanding."
       ]
     },
     {
@@ -93124,7 +93262,9 @@
         "mpnum/polynomial_monomial_order_test.go",
         "mpnum/polynomial_monomial_test.go",
         "mpnum/polynomial_newton_test.go",
-        "mpnum/polynomial_newton_physical_test.go"
+        "mpnum/polynomial_newton_physical_test.go",
+        "mpnum/polynomial_psc_original_cases_test.go",
+        "mpnum/polynomial_psc_original_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -93178,7 +93318,9 @@
         "TestPolynomialNewtonWholeSourcePushBeforeOwningAbort",
         "TestPolynomialNewtonRefVectorSourceResetStop",
         "TestPolynomialNewtonLazySourceFlushBeforeOwningAbort",
-        "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock"
+        "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock",
+        "TestPolynomialPSCAllEightOriginalCoefficientFixtures",
+        "TestPolynomialPSCRegisteredFirstFixture"
       ],
       "conditionals": [
         {
@@ -93562,13 +93704,23 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit"
           ]
+        },
+        {
+          "name": "Eight original PSC coefficient fixtures (cpp702-723,741-821), selected coefficient ENSURE sites only; Resultant ENSURE and complete registered driver remain open",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_psc_original_test.go",
+          "tests": [
+            "TestPolynomialPSCAllEightOriginalCoefficientFixtures",
+            "TestPolynomialPSCRegisteredFirstFixture"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
         "No active source ENSURE credit: tst_polynomial1815ff invokes tst_psc and returns before tst_lex. Added comparator models are independent bounded regressions, not evidence of active PSC/resultant completion.",
         "tst_polynomial at1814 has early return1825 after PSC; monomial/lex routines below are dormant in selected !__clang__ profile. No active registered driver assertion credit.",
-        "Newton source campaign is dormant after early return: one ENSURE adapted, no registered active ENSURE completion credit. Full active optimized PSC8 campaign remains required and source-first private work has begun."
+        "Newton source campaign is dormant after early return: one ENSURE adapted, no registered active ENSURE completion credit. Full active optimized PSC8 campaign remains required and source-first private work has begun.",
+        "Selected active PSC coefficient inputs and first/second static ENSURE sites now executed. Third static ENSURE calls Resultant and remains unported; complete original expression-constructor/lifetime/TRACE driver credit is not claimed."
       ]
     },
     {
@@ -98112,7 +98264,10 @@
         "mpnum/mpn_cstring.go",
         "mpnum/mpff_format_scope.go",
         "mpnum/mpff_format_scope_test.go",
-        "mpnum/mpff_source_buffer.go"
+        "mpnum/mpff_source_buffer.go",
+        "mpnum/polynomial_psc_buffer.go",
+        "mpnum/polynomial_psc_buffer_test.go",
+        "mpnum/polynomial_psc_unwind_test.go"
       ],
       "tests": [
         "TestSexprBVSourceInlineBufferAndTemporaryLifetime",
@@ -98154,7 +98309,13 @@
         "TestFastFloatFormattingScopeGuardsAndInlineWarm",
         "TestFastFloatUnsigned1024SourceBoundaries",
         "TestFastFloatDecimalEveryLargeLocalPrefix",
-        "TestFastFloatFullPrecisionWarmSourceEvents"
+        "TestFastFloatFullPrecisionWarmSourceEvents",
+        "TestPolynomialPSCBufferInlineAndUnjoinedPush",
+        "TestPolynomialPSCBufferHeapAndCapturedInitializedRange",
+        "TestPolynomialPSCBufferReturnedAllocationBeforeSourceDestruction",
+        "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
+        "TestPolynomialPSCNextHeapBufferIndependentRemainder",
+        "TestPolynomialPSCBufferDestructorStopsOlderSourceLocals"
       ],
       "conditionals": [
         {
@@ -98290,12 +98451,26 @@
             "TestFastFloatDecimalEveryLargeLocalPrefix",
             "TestFastFloatFullPrecisionWarmSourceEvents"
           ]
+        },
+        {
+          "name": "Selected concrete polynomial PSC lexical reference buffer/reference lifetime; inline16, source callbacks and heap growth",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_psc_buffer.go",
+          "tests": [
+            "TestPolynomialPSCBufferInlineAndUnjoinedPush",
+            "TestPolynomialPSCBufferHeapAndCapturedInitializedRange",
+            "TestPolynomialPSCBufferReturnedAllocationBeforeSourceDestruction",
+            "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
+            "TestPolynomialPSCNextHeapBufferIndependentRemainder",
+            "TestPolynomialPSCBufferDestructorStopsOlderSourceLocals"
+          ]
         }
       ],
       "ownership": [
         "Function-local inline16 bytes and budgeted overflow arrays, old/new overlap and per-atom destruction. Other buffer methods/types remain separately inventoried.",
         "Concrete AST expr identity-table and shared-occurrence owners preserve source bucket-order callbacks, borrowing, actual node shared flags and charged backing/header peaks. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md.",
-        "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets."
+        "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets.",
+        "Actual completed lexical references and source INC-before-push incoming token, charged inline16/cold header and Runtime scalar-handle backing. Named failed allocation/consumed destructor state retained until owning abort. See PORT_PROGRESS.md."
       ],
       "deviations": [
         "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md.",
@@ -120827,7 +121002,10 @@
         "ast_dependency_ref_vector_ops.go",
         "mpnum/polynomial_ref.go",
         "mpnum/polynomial_newton_test.go",
-        "mpnum/polynomial_newton_physical_test.go"
+        "mpnum/polynomial_newton_physical_test.go",
+        "mpnum/polynomial_psc_buffer.go",
+        "mpnum/polynomial_psc_buffer_test.go",
+        "mpnum/polynomial_psc_unwind_test.go"
       ],
       "tests": [
         "TestASTRefVectorBorrowedInputDefaultEraseAndMove",
@@ -120902,7 +121080,13 @@
         "TestPolynomialNewtonWholeSourcePushBeforeOwningAbort",
         "TestPolynomialNewtonRefVectorSourceResetStop",
         "TestPolynomialNewtonLazySourceFlushBeforeOwningAbort",
-        "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock"
+        "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock",
+        "TestPolynomialPSCBufferInlineAndUnjoinedPush",
+        "TestPolynomialPSCBufferHeapAndCapturedInitializedRange",
+        "TestPolynomialPSCBufferReturnedAllocationBeforeSourceDestruction",
+        "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
+        "TestPolynomialPSCNextHeapBufferIndependentRemainder",
+        "TestPolynomialPSCBufferDestructorStopsOlderSourceLocals"
       ],
       "conditionals": [
         {
@@ -121023,12 +121207,26 @@
             "TestPolynomialNewtonLazySourceFlushBeforeOwningAbort",
             "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock"
           ]
+        },
+        {
+          "name": "Selected concrete polynomial PSC lexical reference buffer/reference lifetime; inline16, source callbacks and heap growth",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_psc_buffer.go",
+          "tests": [
+            "TestPolynomialPSCBufferInlineAndUnjoinedPush",
+            "TestPolynomialPSCBufferHeapAndCapturedInitializedRange",
+            "TestPolynomialPSCBufferReturnedAllocationBeforeSourceDestruction",
+            "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
+            "TestPolynomialPSCNextHeapBufferIndependentRemainder",
+            "TestPolynomialPSCBufferDestructorStopsOlderSourceLocals"
+          ]
         }
       ],
       "ownership": [
         "Scalar references/views and charged cold vector headers/backing; source reference action order and ownership transfer mapped for sexpr. See PORT_PROGRESS.md#audit-sexpr-port-status-md.",
         "Actual AST callbacks, source INC-before-growth/set-index ordering, ASC teardown, backing-bound views and charged initialized high-water metadata are recorded in PORT_PROGRESS.md#audit-ast-core-packet-md. No fake rollback consumes orphan INC prefixes; source manager teardown remains responsible for actual unowned nodes.",
-        "Actual dependency INC/DEC callbacks, raw scalar tokens and charged16-byte obj_ref/24-byte ref_vector/160-byte inline buffer records in existing real AST allocators. Source INC-before-growth, retained backing, captured-end append and consumed cleanup progress preserved. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md."
+        "Actual dependency INC/DEC callbacks, raw scalar tokens and charged16-byte obj_ref/24-byte ref_vector/160-byte inline buffer records in existing real AST allocators. Source INC-before-growth, retained backing, captured-end append and consumed cleanup progress preserved. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
+        "Actual completed lexical references and source INC-before-push incoming token, charged inline16/cold header and Runtime scalar-handle backing. Named failed allocation/consumed destructor state retained until owning abort. See PORT_PROGRESS.md."
       ],
       "deviations": [
         "This concrete specialization does not implement all AST/other source specializations or remaining generic helper/hash surfaces. Ref-vector null callbacks and nonempty self-append have explicit checked Go adaptations.",
@@ -123980,7 +124178,10 @@
         "ast_dependency_ref_vector_access.go",
         "ast_dependency_ref_vector_borrow.go",
         "ast_dependency_ref_vector.go",
-        "ast_dependency_ref_vector_ops.go"
+        "ast_dependency_ref_vector_ops.go",
+        "mpnum/polynomial_psc_buffer.go",
+        "mpnum/polynomial_psc_buffer_test.go",
+        "mpnum/polynomial_psc_unwind_test.go"
       ],
       "tests": [
         "TestASTDependencyRefBufferInlineSourceRoutesAndCapturedAppend",
@@ -124012,7 +124213,13 @@
         "TestASTDependencyRefConstructorRefusedCleanupPublishesOwner",
         "TestASTDependencyRefCopyConstructorRefusedCleanupPublishesOwner",
         "TestASTDependencyRefActualOwnerCopyMoveStealAndAssignment",
-        "TestASTDependencyRefVectorSourceCallbacksAndFullRoutes"
+        "TestASTDependencyRefVectorSourceCallbacksAndFullRoutes",
+        "TestPolynomialPSCBufferInlineAndUnjoinedPush",
+        "TestPolynomialPSCBufferHeapAndCapturedInitializedRange",
+        "TestPolynomialPSCBufferReturnedAllocationBeforeSourceDestruction",
+        "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
+        "TestPolynomialPSCNextHeapBufferIndependentRemainder",
+        "TestPolynomialPSCBufferDestructorStopsOlderSourceLocals"
       ],
       "conditionals": [
         {
@@ -124083,10 +124290,24 @@
           "status": "unported",
           "go_target": "",
           "tests": []
+        },
+        {
+          "name": "Selected concrete polynomial PSC lexical reference buffer/reference lifetime; inline16, source callbacks and heap growth",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_psc_buffer.go",
+          "tests": [
+            "TestPolynomialPSCBufferInlineAndUnjoinedPush",
+            "TestPolynomialPSCBufferHeapAndCapturedInitializedRange",
+            "TestPolynomialPSCBufferReturnedAllocationBeforeSourceDestruction",
+            "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
+            "TestPolynomialPSCNextHeapBufferIndependentRemainder",
+            "TestPolynomialPSCBufferDestructorStopsOlderSourceLocals"
+          ]
         }
       ],
       "ownership": [
-        "Actual dependency INC/DEC callbacks, raw scalar tokens and charged16-byte obj_ref/24-byte ref_vector/160-byte inline buffer records in existing real AST allocators. Source INC-before-growth, retained backing, captured-end append and consumed cleanup progress preserved. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md."
+        "Actual dependency INC/DEC callbacks, raw scalar tokens and charged16-byte obj_ref/24-byte ref_vector/160-byte inline buffer records in existing real AST allocators. Source INC-before-growth, retained backing, captured-end append and consumed cleanup progress preserved. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
+        "Actual completed lexical references and source INC-before-push incoming token, charged inline16/cold header and Runtime scalar-handle backing. Named failed allocation/consumed destructor state retained until owning abort. See PORT_PROGRESS.md."
       ],
       "deviations": [
         "Owning construction cleanup refusal publishes a nonzero partial token with original error; scalar pending target/cursor tracks consumed callbacks without changing raw retained slots. Explicit Go retry/cleanup protects source-undefined interrupted destruction. Preserved ref_buffer copy ctor dependent-base lookup is uninstantiable; no repaired copy API. General templates, other owners/configs and full consumers remain open. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md."

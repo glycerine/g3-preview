@@ -40,6 +40,9 @@ func (m *MultivariatePolynomialCore) cleanupCreation() error {
 		if e := m.monomials.DecRef(m.singletonMonomial); e != nil {
 			return e
 		}
+		if m.pscReceipts.singleton == m.singletonMonomial {
+			m.pscReceipts.singleton = Monomial{}
+		}
 		m.singletonReference = false
 		m.singletonMonomial = Monomial{}
 	}
@@ -138,6 +141,7 @@ func (m *MultivariatePolynomialCore) cleanupGeneratedMonomial() error {
 		return e
 	}
 	m.generatedActive = false
+	m.generatedPSC = 0
 	m.generatedBuffer = nil
 	return nil
 }
@@ -153,6 +157,7 @@ func (m *MultivariatePolynomialCore) generatedVariable(v, k uint32) (Monomial, e
 	if e == nil && outcome.created {
 		m.generatedMonomial = a
 		m.generatedActive = true
+		m.generatedPSC = m.pscExecutingOwner()
 		if m.translation.executing {
 			m.translation.generated = a
 		}
@@ -174,6 +179,7 @@ func (m *MultivariatePolynomialCore) generatedProduct(a, b Monomial) (Monomial, 
 	if e == nil && outcome.created {
 		m.generatedMonomial = r
 		m.generatedActive = true
+		m.generatedPSC = m.pscExecutingOwner()
 		if m.translation.executing {
 			m.translation.generated = r
 		}
@@ -192,6 +198,7 @@ func (m *MultivariatePolynomialCore) transferGeneratedMonomial() {
 	}
 	m.generatedMonomial = Monomial{}
 	m.generatedActive = false
+	m.generatedPSC = 0
 	m.generatedBuffer = nil
 }
 
@@ -253,6 +260,9 @@ func (m *MultivariatePolynomialCore) recordGeneratedCallee(outcome monomialFacto
 		m.translation.factoryGeneration = outcome.generation
 	}
 	c.parent = m
+	if m.pscReceipts.depth != 0 {
+		m.pscReceipts.factory = outcome.generation
+	}
 	if m.substitution.scope.executing {
 		m.substitution.generatedCalleeReceipt = outcome.generation
 	}

@@ -63,6 +63,7 @@ func (r *polynomialDivisionReference) assign(m *MultivariatePolynomialCore, p Mo
 // Both records are actual method locals embedded in the charged core header.
 // Scalar exact_div's numeral is RAW: no source Del on pre-end exceptions.
 type polynomialExactDivisionScope struct {
+	pscOwner                uint64
 	monomial                polynomialDivisionReference
 	numeral                 Int
 	returned                Polynomial
@@ -83,15 +84,19 @@ func (m *MultivariatePolynomialCore) generatedQuotient(a, b Monomial) (Monomial,
 	if e == nil && outcome.created {
 		m.generatedMonomial = r
 		m.generatedActive = true
+		m.generatedPSC = m.pscExecutingOwner()
 	}
 	return r, ok, e
 }
 func (m *MultivariatePolynomialCore) exactDivisionCleanup(owning bool) error {
+	return m.exactDivisionCleanupPhase(owning, owning)
+}
+func (m *MultivariatePolynomialCore) exactDivisionCleanupPhase(owning, abort bool) error {
 	s := &m.exactDivision
 	if !s.active {
 		return nil
 	}
-	if s.kind == 2 && !owning && !s.endEntered {
+	if s.kind == 2 && !abort && !s.endEntered {
 		return nil
 	}
 	if s.stage == 0 {
@@ -106,10 +111,10 @@ func (m *MultivariatePolynomialCore) exactDivisionCleanup(owning bool) error {
 		}
 		s.stage = 2
 	}
-	if !owning && s.monomial.assigning {
+	if !abort && s.monomial.assigning {
 		return nil
 	}
-	if owning {
+	if abort {
 		if e := s.monomial.drop(m, &s.monomial.incoming, &s.monomial.incomingStarted, true); e != nil {
 			return e
 		}
@@ -120,7 +125,7 @@ func (m *MultivariatePolynomialCore) exactDivisionCleanup(owning bool) error {
 			}
 		}
 	}
-	if s.returned != (Polynomial{}) && !owning {
+	if s.returned != (Polynomial{}) && !abort {
 		return nil
 	}
 	*s = polynomialExactDivisionScope{}
@@ -156,7 +161,7 @@ func (m *MultivariatePolynomialCore) ExactDivScalar(p Polynomial, c *Int) (resul
 		return Polynomial{}, e
 	}
 	s := &m.exactDivision
-	*s = polynomialExactDivisionScope{active: true, kind: 2}
+	*s = polynomialExactDivisionScope{active: true, kind: 2, pscOwner: m.pscExecutingOwner()}
 	defer func() {
 		if !s.active {
 			return
@@ -258,7 +263,7 @@ func (m *MultivariatePolynomialCore) ExactDiv(p, q Polynomial) (result Polynomia
 		return Polynomial{}, e
 	}
 	s := &m.exactDivision
-	*s = polynomialExactDivisionScope{active: true, kind: 1}
+	*s = polynomialExactDivisionScope{active: true, kind: 1, pscOwner: m.pscExecutingOwner()}
 	defer func() {
 		s.bodyCause = err
 		cleanup := m.exactDivisionCleanup(false)

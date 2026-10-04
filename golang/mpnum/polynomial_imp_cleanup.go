@@ -180,7 +180,7 @@ func (m *MultivariatePolynomialManager) CloseChecked() error {
 	if e := m.identity(); e != nil {
 		return e
 	}
-	if m.core != nil && m.core.translation.active {
+	if m.core != nil && (m.core.translation.active || m.core.pscPending()) {
 		return ErrPolynomialPending
 	}
 	if cap(m.derivative.orphans) > 0 {

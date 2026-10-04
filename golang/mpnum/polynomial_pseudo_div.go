@@ -28,6 +28,7 @@ const (
 // Nested Power has its own existing result record. The candidate slots are a
 // charged Go continuation representation, not the C++ stack allocation geometry.
 type polynomialPseudoDivisionScope struct {
+	pscOwner                              uint64
 	refs                                  [11]polynomialReference
 	numeral                               Int
 	monomial                              polynomialDivisionReference
@@ -72,6 +73,9 @@ func (m *MultivariatePolynomialCore) pseudoPop(owning bool) error {
 	return nil
 }
 func (m *MultivariatePolynomialCore) pseudoCleanup(owning bool) error {
+	return m.pseudoCleanupPhase(owning, owning)
+}
+func (m *MultivariatePolynomialCore) pseudoCleanupPhase(owning, abort bool) error {
 	s := &m.pseudoDivision
 	if !s.active {
 		return nil
@@ -80,7 +84,7 @@ func (m *MultivariatePolynomialCore) pseudoCleanup(owning bool) error {
 		if !owning {
 			return m.powerLocal.cleanupCause
 		}
-		if e := m.CleanupPolynomialPower(); e != nil {
+		if e := m.cleanupPolynomialPowerPhase(true, abort); e != nil {
 			return e
 		}
 	}
@@ -90,7 +94,7 @@ func (m *MultivariatePolynomialCore) pseudoCleanup(owning bool) error {
 		}
 	}
 	// Unjoined INCs are absent from ordinary source destructors.
-	if owning {
+	if abort {
 		for i := len(s.refs) - 1; i >= 0; i-- {
 			if e := s.refs[i].abort(m); e != nil {
 				return e
@@ -134,6 +138,7 @@ func (m *MultivariatePolynomialCore) generatedDivideVariablePower(a Monomial, x,
 	if e == nil && outcome.created {
 		m.generatedMonomial = p
 		m.generatedActive = true
+		m.generatedPSC = m.pscExecutingOwner()
 	}
 	return p, e
 }
@@ -158,7 +163,7 @@ func (m *MultivariatePolynomialCore) pseudoEntry(q, r *PolynomialRef) error {
 	if m.pseudoDivision.active || m.powerLocal.active {
 		return ErrPolynomialPending
 	}
-	m.pseudoDivision = polynomialPseudoDivisionScope{active: true}
+	m.pseudoDivision = polynomialPseudoDivisionScope{active: true, pscOwner: m.pscExecutingOwner()}
 	return nil
 }
 func (m *MultivariatePolynomialCore) pseudoFinish(err *error) {
