@@ -28470,7 +28470,12 @@
         "mpnum/polynomial_imp_lifetime.go",
         "mpnum/polynomial_imp_cleanup.go",
         "mpnum/polynomial_imp_constructor_test.go",
-        "mpnum/polynomial_imp_physical_test.go"
+        "mpnum/polynomial_imp_physical_test.go",
+        "mpnum/polynomial_translate.go",
+        "mpnum/polynomial_translate_source_test.go",
+        "mpnum/polynomial_translate_imp_test.go",
+        "mpnum/polynomial_lex_sort.go",
+        "mpnum/polynomial_lex_sort_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -28723,7 +28728,30 @@
         "TestPolynomialImpSourceTmpPostPhysicalStopRemainsSticky",
         "TestPolynomialImpOwningCloseRejectsActualCallerBeforeDestruction",
         "TestPolynomialImpChildMonomialStopPrecedesReverseMembers",
-        "TestPolynomialImpUPStoppedLeafPreservesParentSuffix"
+        "TestPolynomialImpUPStoppedLeafPreservesParentSuffix",
+        "TestPolynomialTranslateIndependentMultivariableIdentity",
+        "TestPolynomialTranslateArraySourceAssignment",
+        "TestPolynomialCoefficientsActualSOMVector",
+        "TestPolynomialTranslateSourceShortCircuits",
+        "TestPolynomialTranslateCheckpointPrefixes",
+        "TestPolynomialTranslateEveryReservationPrefix",
+        "TestPolynomialTranslateManyEveryReservationPrefix",
+        "TestPolynomialTranslateCapturedVariablesAndWrapperProfiles",
+        "TestPolynomialTranslateWarmAbsentSourceStorage",
+        "TestPolynomialCoefficientsEveryReservationPrefix",
+        "TestPolynomialTranslateBigCoefficientEveryReservationPrefix",
+        "TestPolynomialTranslateIndependentFiniteGrid",
+        "TestPolynomialTranslateWrapperColdOwnerBeforeReads",
+        "TestPolynomialLexSortIndependentRecursiveOrder",
+        "TestPolynomialLexSortEveryReservationPreservesTermPairs",
+        "TestPolynomialLexSortFreshNullCoefficientRawPermutation",
+        "TestPolynomialLexSortRetainedScratchOnlyGuardsReachedReuse",
+        "TestPolynomialLexSortNestedGrowthIndependentFiniteModel",
+        "TestPolynomialLexSortNestedGrowthEveryReservation",
+        "TestPolynomialLexSortWrappedDegreeReachedBucket",
+        "TestPolynomialLexSortActualBigCoefficientOwnership",
+        "TestPolynomialTranslateImpEveryReservationAndLexSort",
+        "TestPolynomialTranslateImpArrayAndVectorFacade"
       ],
       "conditionals": [
         {
@@ -31182,6 +31210,44 @@
             "TestPolynomialImpChildMonomialStopPrecedesReverseMembers",
             "TestPolynomialImpUPStoppedLeafPreservesParentSuffix"
           ]
+        },
+        {
+          "name": "Selected coeffs3282-3291 and scalar/array translate6865-6895, vector wrapper h998-1000: actual persistent coefficient vector, lexical monomial_ref, completed source cleanup and exact owning continuation; actual public forwarding cpp7392-7398",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_translate.go",
+          "tests": [
+            "TestPolynomialTranslateIndependentMultivariableIdentity",
+            "TestPolynomialTranslateArraySourceAssignment",
+            "TestPolynomialCoefficientsActualSOMVector",
+            "TestPolynomialTranslateSourceShortCircuits",
+            "TestPolynomialTranslateCheckpointPrefixes",
+            "TestPolynomialTranslateEveryReservationPrefix",
+            "TestPolynomialTranslateManyEveryReservationPrefix",
+            "TestPolynomialTranslateCapturedVariablesAndWrapperProfiles",
+            "TestPolynomialTranslateWarmAbsentSourceStorage",
+            "TestPolynomialCoefficientsEveryReservationPrefix",
+            "TestPolynomialTranslateBigCoefficientEveryReservationPrefix",
+            "TestPolynomialTranslateIndependentFiniteGrid",
+            "TestPolynomialTranslateWrapperColdOwnerBeforeReads",
+            "TestPolynomialTranslateImpEveryReservationAndLexSort",
+            "TestPolynomialTranslateImpArrayAndVectorFacade"
+          ]
+        },
+        {
+          "name": "Selected recursive lex_sort1315-1366 and1440-1460, public7022-7024: actual unsigned buckets and raw numeral/monomial permutation cycles",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_lex_sort.go",
+          "tests": [
+            "TestPolynomialLexSortIndependentRecursiveOrder",
+            "TestPolynomialLexSortEveryReservationPreservesTermPairs",
+            "TestPolynomialLexSortFreshNullCoefficientRawPermutation",
+            "TestPolynomialLexSortRetainedScratchOnlyGuardsReachedReuse",
+            "TestPolynomialLexSortNestedGrowthIndependentFiniteModel",
+            "TestPolynomialLexSortNestedGrowthEveryReservation",
+            "TestPolynomialLexSortWrappedDegreeReachedBucket",
+            "TestPolynomialLexSortActualBigCoefficientOwnership",
+            "TestPolynomialTranslateImpEveryReservationAndLexSort"
+          ]
         }
       ],
       "ownership": [
@@ -31206,7 +31272,8 @@
         "Actual embedded pseudo continuation references, NUM and monomial fields with scalar lexical construction/destruction order. Same-engine Power accepts a completed source reference; completed destructors precede separate owning abort of actual unjoined INCs. Shared physical census names all actual scope fields and active nested Power directly, with immediate before-fault-disable evidence.",
         "One actual Runtime cap/size/unsigned degree vector with reflected charged cold owner and precise constructed/rawDestroyed/pending states. Failed ctor carrier rejects ordinary APIs, has no completed member destructor. Copy assignment frees old before replacement, stale pointer history is nonowning; actual returned pending blocks remain owning. Cold maps and their actual live/pending raw blocks are independently censused, including true BIG fresh-NULL reservation and stopped assignment constant branch.",
         "Selected constructor helper split preserves existing actual modular/default/body order; Runtime temporary placement records real returned raw blocks and reached header writes. No full imp constructor/destructor credit or fabricated sizeof allocation event.",
-        "Skeleton entries/powers/originals use actual Runtime storage; failed constructor transfers actual unconsumed INC fields into charged cold owning-abort records before source backing free. Scoped pointer publications alone own concrete children; stopped source cause retained, separate owning cleanup. Variable helpers own two/one actual embedded uint vectors in one charged stable cold header, views/scopes borrow actual backing and references. Strong shared physical census names pseudo/Power/ExactDiv plus supplied headers/blocks without registry-derived ownership."
+        "Skeleton entries/powers/originals use actual Runtime storage; failed constructor transfers actual unconsumed INC fields into charged cold owning-abort records before source backing free. Scoped pointer publications alone own concrete children; stopped source cause retained, separate owning cleanup. Variable helpers own two/one actual embedded uint vectors in one charged stable cold header, views/scopes borrow actual backing and references. Strong shared physical census names pseudo/Power/ExactDiv plus supplied headers/blocks without registry-derived ownership.",
+        "Translation uses the existing actual imp coefficient-buffer member. Named roots include actual child/raw/pending/old storage, retained NUM and exact generated monomial/factory generation; ordinary scope unwind precedes owning abort. Full owning Close rejects retained translation locals before child or caller teardown. Lex sort owns real Runtime bucket bindings and cold child directory plus permutation member; failed lower recursion preserves prior published term permutations. No registry-derived owning authority or native class allocation equivalence."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -31218,7 +31285,6 @@
         "Full destructor missing m_mgcd_iterpolators.flush and m_mgcd_skeletons.reset at2354/2355 and remaining body/member suffix.",
         "Newton/reference owners supplied by numeric separate lane; no newtonLocal field or integration hook in this frozen core.",
         "PSC/Lazard/pseudo-remainder/subresultant/resultant and full driver remain absent; no determinant/univariate surrogate.",
-        "Polynomial lex_sort bucket/permutation and full polynomial printing/class query family not claimed by selected Info accessor adapter.",
         "No bounded canonical factory-postpublication DEBUG-refusal recipe exercised; retained callee branch is implemented but no fabricated failure claim.",
         "Process-wide global rational/runtime/TLS binding and source native pointer ABI remain separate.",
         "Full imp construction, distinct m_upm and skeleton remain separate obligations.",
@@ -31234,7 +31300,8 @@
         "Selected concrete class and ModD methods only: whole polynomial hierarchy, PSC/Lazard/resultants/GCD/global diagnostic and source-driver assertion bindings remain OPEN. Borrowed cold stream interface binds actual NumericTextStream formatting state, no hot per-variable interface fields or decimal-only surrogate. No additional registered source assertion credit; malformed/wrapped source-undefined vector profiles are typed guards, not native recovery claims.",
         "Selected concrete skeleton canonical order uses heap sort; platform std::sort comparator dispatch order is not claimed. Scalar child IDs encode actual cold object provenance under a fixed Runtime. Cold ownership metadata fully charged and distinct from source malloc events. Whole imp and registered-driver/global diagnostic integration remain open.",
         "Standalone SOM buffers/vectors and selected fresh sorting scope added. Authoritative reflected Go class header and charged real retained fields; scalar child ID cold provenance adaptation, no unread native-size ticket or full global malloc/header geometry claim. Heap sort final-order contract only, native comparator schedule/global ostream/full imp remain OPEN. Original source implicit dtor has no Reset/DEC/NUM Del; separate own-abort drains actual named records. See PORT_PROGRESS.md.",
-        "Concrete imp wrapper owns the actual core arithmetic object, independent UP and remaining source members. Current core constructor/default/guard/cleanup helpers are preserved; only actual translateBuffers field added. Literal body/MM DEC and completed-member unwind remain separate from owning abort. Enabled TRACE/global allocator/wrapper/control/native class header binding and full arithmetic facade remain OPEN. Reflected Go headers are charged; explicit named retirement copies acquire numeral ownership only after actual source vector raw is consumed. No registry-derived owning roots or registered PSC driver credit. See PORT_PROGRESS.md."
+        "Concrete imp wrapper owns the actual core arithmetic object, independent UP and remaining source members. Current core constructor/default/guard/cleanup helpers are preserved; only actual translateBuffers field added. Literal body/MM DEC and completed-member unwind remain separate from owning abort. Enabled TRACE/global allocator/wrapper/control/native class header binding and full arithmetic facade remain OPEN. Reflected Go headers are charged; explicit named retirement copies acquire numeral ownership only after actual source vector raw is consumed. No registry-derived owning roots or registered PSC driver credit. See PORT_PROGRESS.md.",
+        "Selected translation/lex methods remain partial source-family evidence, without registered polynomial driver completion. CTRACE poly_bug stream, global diagnostics/control and native class ABI remain open. Coefficient/div_x expressions use permitted coefficient-first evaluation. Runtime bucket bindings and charged cold children are Go storage adaptations; unsigned wrapped degree reaches a typed physical boundary. Broader GCD/PSC/resultants/printing remain open. See PORT_PROGRESS.md."
       ]
     },
     {
@@ -31330,7 +31397,12 @@
         "mpnum/polynomial_imp_lifetime.go",
         "mpnum/polynomial_imp_cleanup.go",
         "mpnum/polynomial_imp_constructor_test.go",
-        "mpnum/polynomial_imp_physical_test.go"
+        "mpnum/polynomial_imp_physical_test.go",
+        "mpnum/polynomial_translate.go",
+        "mpnum/polynomial_translate_source_test.go",
+        "mpnum/polynomial_translate_imp_test.go",
+        "mpnum/polynomial_lex_sort.go",
+        "mpnum/polynomial_lex_sort_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -31565,7 +31637,30 @@
         "TestPolynomialImpSourceTmpPostPhysicalStopRemainsSticky",
         "TestPolynomialImpOwningCloseRejectsActualCallerBeforeDestruction",
         "TestPolynomialImpChildMonomialStopPrecedesReverseMembers",
-        "TestPolynomialImpUPStoppedLeafPreservesParentSuffix"
+        "TestPolynomialImpUPStoppedLeafPreservesParentSuffix",
+        "TestPolynomialTranslateIndependentMultivariableIdentity",
+        "TestPolynomialTranslateArraySourceAssignment",
+        "TestPolynomialCoefficientsActualSOMVector",
+        "TestPolynomialTranslateSourceShortCircuits",
+        "TestPolynomialTranslateCheckpointPrefixes",
+        "TestPolynomialTranslateEveryReservationPrefix",
+        "TestPolynomialTranslateManyEveryReservationPrefix",
+        "TestPolynomialTranslateCapturedVariablesAndWrapperProfiles",
+        "TestPolynomialTranslateWarmAbsentSourceStorage",
+        "TestPolynomialCoefficientsEveryReservationPrefix",
+        "TestPolynomialTranslateBigCoefficientEveryReservationPrefix",
+        "TestPolynomialTranslateIndependentFiniteGrid",
+        "TestPolynomialTranslateWrapperColdOwnerBeforeReads",
+        "TestPolynomialLexSortIndependentRecursiveOrder",
+        "TestPolynomialLexSortEveryReservationPreservesTermPairs",
+        "TestPolynomialLexSortFreshNullCoefficientRawPermutation",
+        "TestPolynomialLexSortRetainedScratchOnlyGuardsReachedReuse",
+        "TestPolynomialLexSortNestedGrowthIndependentFiniteModel",
+        "TestPolynomialLexSortNestedGrowthEveryReservation",
+        "TestPolynomialLexSortWrappedDegreeReachedBucket",
+        "TestPolynomialLexSortActualBigCoefficientOwnership",
+        "TestPolynomialTranslateImpEveryReservationAndLexSort",
+        "TestPolynomialTranslateImpArrayAndVectorFacade"
       ],
       "conditionals": [
         {
@@ -32736,6 +32831,44 @@
             "TestPolynomialImpChildMonomialStopPrecedesReverseMembers",
             "TestPolynomialImpUPStoppedLeafPreservesParentSuffix"
           ]
+        },
+        {
+          "name": "Selected coeffs3282-3291 and scalar/array translate6865-6895, vector wrapper h998-1000: actual persistent coefficient vector, lexical monomial_ref, completed source cleanup and exact owning continuation; actual public forwarding cpp7392-7398",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_translate.go",
+          "tests": [
+            "TestPolynomialTranslateIndependentMultivariableIdentity",
+            "TestPolynomialTranslateArraySourceAssignment",
+            "TestPolynomialCoefficientsActualSOMVector",
+            "TestPolynomialTranslateSourceShortCircuits",
+            "TestPolynomialTranslateCheckpointPrefixes",
+            "TestPolynomialTranslateEveryReservationPrefix",
+            "TestPolynomialTranslateManyEveryReservationPrefix",
+            "TestPolynomialTranslateCapturedVariablesAndWrapperProfiles",
+            "TestPolynomialTranslateWarmAbsentSourceStorage",
+            "TestPolynomialCoefficientsEveryReservationPrefix",
+            "TestPolynomialTranslateBigCoefficientEveryReservationPrefix",
+            "TestPolynomialTranslateIndependentFiniteGrid",
+            "TestPolynomialTranslateWrapperColdOwnerBeforeReads",
+            "TestPolynomialTranslateImpEveryReservationAndLexSort",
+            "TestPolynomialTranslateImpArrayAndVectorFacade"
+          ]
+        },
+        {
+          "name": "Selected recursive lex_sort1315-1366 and1440-1460, public7022-7024: actual unsigned buckets and raw numeral/monomial permutation cycles",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_lex_sort.go",
+          "tests": [
+            "TestPolynomialLexSortIndependentRecursiveOrder",
+            "TestPolynomialLexSortEveryReservationPreservesTermPairs",
+            "TestPolynomialLexSortFreshNullCoefficientRawPermutation",
+            "TestPolynomialLexSortRetainedScratchOnlyGuardsReachedReuse",
+            "TestPolynomialLexSortNestedGrowthIndependentFiniteModel",
+            "TestPolynomialLexSortNestedGrowthEveryReservation",
+            "TestPolynomialLexSortWrappedDegreeReachedBucket",
+            "TestPolynomialLexSortActualBigCoefficientOwnership",
+            "TestPolynomialTranslateImpEveryReservationAndLexSort"
+          ]
         }
       ],
       "ownership": [
@@ -32760,7 +32893,8 @@
         "Actual embedded pseudo continuation references, NUM and monomial fields with scalar lexical construction/destruction order. Same-engine Power accepts a completed source reference; completed destructors precede separate owning abort of actual unjoined INCs. Shared physical census names all actual scope fields and active nested Power directly, with immediate before-fault-disable evidence.",
         "One actual Runtime cap/size/unsigned degree vector with reflected charged cold owner and precise constructed/rawDestroyed/pending states. Failed ctor carrier rejects ordinary APIs, has no completed member destructor. Copy assignment frees old before replacement, stale pointer history is nonowning; actual returned pending blocks remain owning. Cold maps and their actual live/pending raw blocks are independently censused, including true BIG fresh-NULL reservation and stopped assignment constant branch.",
         "Selected constructor helper split preserves existing actual modular/default/body order; Runtime temporary placement records real returned raw blocks and reached header writes. No full imp constructor/destructor credit or fabricated sizeof allocation event.",
-        "Skeleton entries/powers/originals use actual Runtime storage; failed constructor transfers actual unconsumed INC fields into charged cold owning-abort records before source backing free. Scoped pointer publications alone own concrete children; stopped source cause retained, separate owning cleanup. Variable helpers own two/one actual embedded uint vectors in one charged stable cold header, views/scopes borrow actual backing and references. Strong shared physical census names pseudo/Power/ExactDiv plus supplied headers/blocks without registry-derived ownership."
+        "Skeleton entries/powers/originals use actual Runtime storage; failed constructor transfers actual unconsumed INC fields into charged cold owning-abort records before source backing free. Scoped pointer publications alone own concrete children; stopped source cause retained, separate owning cleanup. Variable helpers own two/one actual embedded uint vectors in one charged stable cold header, views/scopes borrow actual backing and references. Strong shared physical census names pseudo/Power/ExactDiv plus supplied headers/blocks without registry-derived ownership.",
+        "Translation uses the existing actual imp coefficient-buffer member. Named roots include actual child/raw/pending/old storage, retained NUM and exact generated monomial/factory generation; ordinary scope unwind precedes owning abort. Full owning Close rejects retained translation locals before child or caller teardown. Lex sort owns real Runtime bucket bindings and cold child directory plus permutation member; failed lower recursion preserves prior published term permutations. No registry-derived owning authority or native class allocation equivalence."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -32772,7 +32906,6 @@
         "Full destructor missing m_mgcd_iterpolators.flush and m_mgcd_skeletons.reset at2354/2355 and remaining body/member suffix.",
         "Newton/reference owners supplied by numeric separate lane; no newtonLocal field or integration hook in this frozen core.",
         "PSC/Lazard/pseudo-remainder/subresultant/resultant and full driver remain absent; no determinant/univariate surrogate.",
-        "Polynomial lex_sort bucket/permutation and full polynomial printing/class query family not claimed by selected Info accessor adapter.",
         "No bounded canonical factory-postpublication DEBUG-refusal recipe exercised; retained callee branch is implemented but no fabricated failure claim.",
         "Process-wide global rational/runtime/TLS binding and source native pointer ABI remain separate.",
         "Full imp construction, distinct m_upm and skeleton remain separate obligations.",
@@ -32787,7 +32920,8 @@
         "This selected source core omits only separately inventoried ModD specialization; full imp hierarchy, PSC/Lazard/subresultants/resultants/general GCD and registered driver credit remain open. TRACE/CTRACE/printers/global assertion bindings remain separate obligations. Malformed SIZE_T32 release metadata fixture is explicitly source undefined and uses caller restoration only after immediate physical census; no native recovery claim.",
         "Selected concrete class and ModD methods only: whole polynomial hierarchy, PSC/Lazard/resultants/GCD/global diagnostic and source-driver assertion bindings remain OPEN. Borrowed cold stream interface binds actual NumericTextStream formatting state, no hot per-variable interface fields or decimal-only surrogate. No additional registered source assertion credit; malformed/wrapped source-undefined vector profiles are typed guards, not native recovery claims.",
         "Selected concrete skeleton canonical order uses heap sort; platform std::sort comparator dispatch order is not claimed. Scalar child IDs encode actual cold object provenance under a fixed Runtime. Cold ownership metadata fully charged and distinct from source malloc events. Whole imp and registered-driver/global diagnostic integration remain open.",
-        "Concrete imp wrapper owns the actual core arithmetic object, independent UP and remaining source members. Current core constructor/default/guard/cleanup helpers are preserved; only actual translateBuffers field added. Literal body/MM DEC and completed-member unwind remain separate from owning abort. Enabled TRACE/global allocator/wrapper/control/native class header binding and full arithmetic facade remain OPEN. Reflected Go headers are charged; explicit named retirement copies acquire numeral ownership only after actual source vector raw is consumed. No registry-derived owning roots or registered PSC driver credit. See PORT_PROGRESS.md."
+        "Concrete imp wrapper owns the actual core arithmetic object, independent UP and remaining source members. Current core constructor/default/guard/cleanup helpers are preserved; only actual translateBuffers field added. Literal body/MM DEC and completed-member unwind remain separate from owning abort. Enabled TRACE/global allocator/wrapper/control/native class header binding and full arithmetic facade remain OPEN. Reflected Go headers are charged; explicit named retirement copies acquire numeral ownership only after actual source vector raw is consumed. No registry-derived owning roots or registered PSC driver credit. See PORT_PROGRESS.md.",
+        "Selected translation/lex methods remain partial source-family evidence, without registered polynomial driver completion. CTRACE poly_bug stream, global diagnostics/control and native class ABI remain open. Coefficient/div_x expressions use permitted coefficient-first evaluation. Runtime bucket bindings and charged cold children are Go storage adaptations; unsigned wrapped degree reaches a typed physical boundary. Broader GCD/PSC/resultants/printing remain open. See PORT_PROGRESS.md."
       ]
     },
     {

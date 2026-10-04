@@ -6,6 +6,7 @@ package mpnum
 import (
 	"github.com/glycerine/g3/golang/arena"
 	"github.com/glycerine/g3/golang/memory"
+	"reflect"
 )
 
 // The actual lex-bucket member is a vector of unsigned-vector objects. Its
@@ -19,8 +20,16 @@ type polynomialImpBuckets struct {
 }
 
 func (b *polynomialImpBuckets) sourceFinalize() error {
-	for b.cursor < uint32(len(b.children)) {
-		if e := polynomialImpRawSource(b.owner, &b.children[b.cursor]); e != nil {
+	n, e := b.data.size(b.owner)
+	if e != nil {
+		return e
+	}
+	for b.cursor < n {
+		child, e := b.at(b.cursor)
+		if e != nil {
+			return e
+		}
+		if e := polynomialImpRawSource(b.owner, child); e != nil {
 			return e
 		}
 		b.cursor++
@@ -33,7 +42,19 @@ func (b *polynomialImpBuckets) close() error {
 			return e
 		}
 	}
-	return b.data.close(b.owner)
+	if b.data.old != (memory.Block{}) {
+		if e := b.owner.memory.Deallocate(&b.data.old); e != nil {
+			return e
+		}
+	}
+	if e := b.data.close(b.owner); e != nil {
+		return e
+	}
+	if cap(b.children) > 0 {
+		b.owner.integer.budget.Release(uint64(cap(b.children)) * uint64(reflect.TypeOf(polynomialVector{}).Size()))
+	}
+	b.children = nil
+	return nil
 }
 func polynomialImpRawSource(m *MultivariatePolynomialCore, v *polynomialVector) error {
 	if v.raw != (memory.Block{}) {

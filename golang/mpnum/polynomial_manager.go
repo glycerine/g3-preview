@@ -28,6 +28,7 @@ type MultivariatePolynomialConfig struct {
 }
 type polynomialCreation struct {
 	substitutionOwned bool
+	translationOwned  bool
 	raw               memory.ObjectRef
 	value             Polynomial
 	requested, id     uint32
@@ -36,6 +37,7 @@ type polynomialCreation struct {
 }
 type MultivariatePolynomialCore struct {
 	translateBuffers                                                                           PolynomialSOMVector
+	translation                                                                                polynomialTranslationScope
 	substitution                                                                               polynomialSubstitutionState
 	tmp1                                                                                       monomialTemp
 	tmp1SourceConsumed                                                                         bool
@@ -149,6 +151,7 @@ func preparePolynomialCore(c MultivariatePolynomialConfig, requireMonomials bool
 	m := &MultivariatePolynomialCore{config: c, integer: c.Integer, monomials: c.Monomials, memory: c.Integer.memory, header: h}
 	m.self = m
 	m.initSubstitutionMembers()
+	m.initTranslationMember()
 	for {
 		old := polynomialOrigins.Load()
 		if old == math.MaxUint64 {
@@ -330,6 +333,9 @@ func (m *MultivariatePolynomialCore) MkTerms(as []Int, ms []Monomial) (Polynomia
 	return m.som.mk(false)
 }
 func (m *MultivariatePolynomialCore) CloseChecked() error {
+	if m != nil && m.self == m && m.translation.active {
+		return ErrPolynomialPending
+	}
 	if m != nil && m.self == m && m.substitution.scope.active {
 		return ErrPolynomialPending
 	}
@@ -495,6 +501,9 @@ func (m *MultivariatePolynomialCore) CloseChecked() error {
 			return e
 		}
 		m.idsInitialized = false
+	}
+	if e := m.translateBuffers.CloseChecked(); e != nil {
+		return e
 	}
 	if m.modular != nil && !m.modular.closed {
 		for _, a := range [3]*Int{&m.minusOne, &m.negativeCoefficient, &m.constantCopy} {

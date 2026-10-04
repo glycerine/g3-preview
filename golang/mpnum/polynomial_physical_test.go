@@ -66,6 +66,7 @@ func polynomialPhysicalAuditWithHandlers(t *testing.T, m *MultivariatePolynomial
 		}
 	}
 	privatePolys := polynomialSubstitutionNamedPolynomials(m)
+	privatePolys = append(privatePolys, m.translation.freshResult)
 	for i := range m.pseudoDivision.refs {
 		privatePolys = append(privatePolys, m.pseudoDivision.refs[i].value, m.pseudoDivision.refs[i].incoming)
 	}

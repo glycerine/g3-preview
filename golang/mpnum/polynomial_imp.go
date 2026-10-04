@@ -38,6 +38,8 @@ type MultivariatePolynomialManager struct {
 	useSparseGCD, usePRSGCD                                    bool
 	completed, sourceStarted, sourceFinalized, closing, closed bool
 	originalCause, sourceCause, cleanupCause, unwindCause      error
+	lexPending                                                 bool
+	lexCause                                                   error
 	modularIndex                                               uint8
 	mmConstructed, mmDropDone                                  bool
 }

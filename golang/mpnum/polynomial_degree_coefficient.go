@@ -125,6 +125,9 @@ func (m *MultivariatePolynomialCore) generatedRemoveVariable(term Monomial, x ui
 	if e == nil && outcome.created {
 		m.generatedMonomial = a
 		m.generatedActive = true
+		if m.translation.executing {
+			m.translation.generated = a
+		}
 	}
 	return a, e
 }

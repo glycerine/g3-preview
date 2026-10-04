@@ -275,6 +275,7 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 	}
 	// Actual constructor start receipt, after the foreign pending guard.
 	m.pending.substitutionOwned = m.substitution.scope.executing
+	m.pending.translationOwned = m.translation.executing
 	requested := polynomialCodecBytes(n)
 	raw, e := m.monomials.allocator.Allocate(uint64(requested))
 	if raw != (memory.ObjectRef{}) {
@@ -391,6 +392,9 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 		return Polynomial{}, e
 	}
 	l.published = true
+	if m.translation.executing {
+		m.translation.freshResult = p
+	}
 	m.pending = polynomialCreation{}
 	m.live++
 	return p, nil

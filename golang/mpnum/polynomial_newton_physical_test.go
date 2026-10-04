@@ -96,6 +96,7 @@ func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCo
 		addPolynomial(m.powerLocal.result.incoming)
 	}
 	polys = append(polys, polynomialSubstitutionNamedPolynomials(m)...)
+	polys = append(polys, m.translation.freshResult)
 	for _, p := range polys {
 		addPolynomial(p)
 	}

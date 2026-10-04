@@ -23,7 +23,12 @@ func polynomialImpPhysicalAuditValues(t *testing.T, full *MultivariatePolynomial
 	lazy := []*PolynomialNewtonVector{&full.newton}
 	handlers := []*PolynomialDeletionHandler{}
 	external := []memory.Block{m.tmp1.raw, m.tmp1.pending, full.degree2pos.raw, full.degree2pos.pending, full.lexPermutation.raw, full.lexPermutation.pending, full.varDegrees.raw, full.varDegrees.pending, m.substitution.found.raw, m.substitution.found.pending, m.substitution.max.maxDegree.raw, m.substitution.max.maxDegree.pending, m.substitution.max.variables.raw, m.substitution.max.variables.pending, m.substitution.positions.positions.raw, m.substitution.positions.positions.pending}
-	adapterBytes := full.header
+	external = append(external, full.lexBuckets.data.raw, full.lexBuckets.data.pending, full.lexBuckets.data.old)
+	for i := range full.lexBuckets.children {
+		v := &full.lexBuckets.children[i]
+		external = append(external, v.raw, v.pending, v.old)
+	}
+	adapterBytes := full.header + uint64(cap(full.lexBuckets.children))*uint64(reflect.TypeOf(polynomialVector{}).Size())
 	public := []*Int{}
 	if full.upm != nil {
 		u := full.upm
@@ -115,7 +120,12 @@ func polynomialImpPhysicalAuditValues(t *testing.T, full *MultivariatePolynomial
 		cell(m.pending.value, l.initializedCoefficients)
 	}
 	vectors := []*polynomialVector{&m.rationalTerms, &m.linearTerms, &m.linearMonomials, &m.polynomials}
-	extraBytes := adapterBytes
+	somRaw, _, somNumerals, somBytes := polynomialSOMNamedRoots(t, m, []*PolynomialSOMVector{&full.iccp})
+	external = append(external, somRaw...)
+	for _, a := range somNumerals {
+		add(a)
+	}
+	extraBytes := adapterBytes + somBytes
 	addPolynomial := func(p Polynomial) {
 		if p == (Polynomial{}) {
 			return
@@ -128,6 +138,7 @@ func polynomialImpPhysicalAuditValues(t *testing.T, full *MultivariatePolynomial
 		cell(p, l.initializedCoefficients)
 	}
 	addPolynomial(m.exactDivision.returned)
+	addPolynomial(m.translation.freshResult)
 	for i := range m.pseudoDivision.refs {
 		addPolynomial(m.pseudoDivision.refs[i].value)
 		addPolynomial(m.pseudoDivision.refs[i].incoming)

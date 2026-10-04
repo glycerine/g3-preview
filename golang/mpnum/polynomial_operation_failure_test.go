@@ -207,6 +207,10 @@ func polynomialOperationMonomialAudit(t *testing.T, m *MultivariatePolynomialCor
 		refs[a] = true
 	}
 	add(m.monomials.unit)
+	if m.translation.constructed {
+		add(m.translation.xk.value)
+		add(m.translation.xk.incoming)
+	}
 	add(m.exactDivision.monomial.value)
 	add(m.exactDivision.monomial.incoming)
 	add(m.pseudoDivision.monomial.value)
@@ -227,7 +231,7 @@ func polynomialOperationMonomialAudit(t *testing.T, m *MultivariatePolynomialCor
 			add(a)
 		}
 	}
-	cells := append([]Polynomial{m.zero, m.unit, m.overloadResult, m.negativeResult, m.constantScope.result, m.exactDivision.returned}, callers...)
+	cells := append([]Polynomial{m.zero, m.unit, m.overloadResult, m.negativeResult, m.constantScope.result, m.exactDivision.returned, m.translation.freshResult}, callers...)
 	for i := range m.pseudoDivision.refs {
 		cells = append(cells, m.pseudoDivision.refs[i].value, m.pseudoDivision.refs[i].incoming)
 	}

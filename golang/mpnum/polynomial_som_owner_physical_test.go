@@ -14,35 +14,68 @@ func polynomialSOMPhysicalAudit(t *testing.T, m *MultivariatePolynomialCore, v *
 }
 func polynomialSOMPhysicalWithExternal(t *testing.T, m *MultivariatePolynomialCore, v *PolynomialSOMVector, callerMonos []Monomial, external []memory.Block, public ...*Int) {
 	t.Helper()
-	raw := append([]memory.Block{}, external...)
-	var mono []Monomial
-	var values []Int
-	extra := uint64(0)
+	polynomialSOMPhysicalWithVectors(t, m, []*PolynomialSOMVector{v}, callerMonos, external, public...)
+}
+func polynomialSOMPhysicalWithVectors(t *testing.T, m *MultivariatePolynomialCore, vectors []*PolynomialSOMVector, callerMonos []Monomial, external []memory.Block, public ...*Int) {
+	polynomialSOMPhysicalWithPolynomials(t, m, vectors, callerMonos, external, nil, public...)
+}
+func polynomialSOMPhysicalWithPolynomials(t *testing.T, m *MultivariatePolynomialCore, vectors []*PolynomialSOMVector, callerMonos []Monomial, external []memory.Block, polys []Polynomial, public ...*Int) {
+	polynomialSOMPhysicalWithOwners(t, m, vectors, callerMonos, external, polys, nil, public...)
+}
+func polynomialSOMPhysicalWithOwners(t *testing.T, m *MultivariatePolynomialCore, vectors []*PolynomialSOMVector, callerMonos []Monomial, external []memory.Block, polys []Polynomial, references []*PolynomialRef, public ...*Int) {
+	t.Helper()
+	raw, mono, values, extra := polynomialSOMNamedRoots(t, m, vectors)
+	raw = append(raw, external...)
+	roots := append([]*Int{}, public...)
+	for i := range values {
+		roots = append(roots, &values[i])
+	}
+	polynomialNewtonPhysicalWithExtra(t, m, nil, references, nil, nil, polys, nil, raw, extra, roots...)
+	if m.translation.constructed {
+		mono = append(mono, m.translation.xk.value, m.translation.xk.incoming)
+	}
+	mono = append(mono, callerMonos...)
+	for _, r := range references {
+		if r != nil {
+			polys = append(polys, r.root.value, r.root.incoming)
+		}
+	}
+	polynomialOperationMonomialAudit(t, m, polys, mono)
+}
+
+// Collect only the actual named vector owners and their retained children.
+func polynomialSOMNamedRoots(t *testing.T, m *MultivariatePolynomialCore, vectors []*PolynomialSOMVector) (raw []memory.Block, mono []Monomial, values []Int, extra uint64) {
+	t.Helper()
+	vectors = append(vectors, &m.translateBuffers)
+	seenVectors := map[*PolynomialSOMVector]bool{}
 	var buffers []*PolynomialSOMBuffer
 	addRaw := func(a memory.Block) {
 		if a != (memory.Block{}) {
 			raw = append(raw, a)
 		}
 	}
-	if v != nil {
-		extra += v.header + uint64(cap(v.children))*uint64(reflect.TypeOf((*PolynomialSOMBuffer)(nil)).Size())
-		addRaw(v.data.raw)
-		addRaw(v.data.pending)
-		addRaw(v.data.old)
-		for _, b := range v.children {
-			if b != nil {
-				buffers = append(buffers, b)
-			}
-		}
-		if v.pending != nil {
-			found := false
-			for _, b := range buffers {
-				if b == v.pending {
-					found = true
+	for _, v := range vectors {
+		if v != nil && !seenVectors[v] {
+			seenVectors[v] = true
+			extra += v.header + uint64(cap(v.children))*uint64(reflect.TypeOf((*PolynomialSOMBuffer)(nil)).Size())
+			addRaw(v.data.raw)
+			addRaw(v.data.pending)
+			addRaw(v.data.old)
+			for _, b := range v.children {
+				if b != nil {
+					buffers = append(buffers, b)
 				}
 			}
-			if !found {
-				buffers = append(buffers, v.pending)
+			if v.pending != nil {
+				found := false
+				for _, b := range buffers {
+					if b == v.pending {
+						found = true
+					}
+				}
+				if !found {
+					buffers = append(buffers, v.pending)
+				}
 			}
 		}
 	}
@@ -116,11 +149,5 @@ func polynomialSOMPhysicalWithExternal(t *testing.T, m *MultivariatePolynomialCo
 			mono = append(mono, b.retiredMonomials[i].value)
 		}
 	}
-	roots := append([]*Int{}, public...)
-	for i := range values {
-		roots = append(roots, &values[i])
-	}
-	polynomialNewtonPhysicalWithExtra(t, m, nil, nil, nil, nil, nil, nil, raw, extra, roots...)
-	mono = append(mono, callerMonos...)
-	polynomialOperationMonomialAudit(t, m, nil, mono)
+	return
 }

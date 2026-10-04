@@ -145,6 +145,9 @@ func (m *MultivariatePolynomialCore) generatedVariable(v, k uint32) (Monomial, e
 	if e == nil && outcome.created {
 		m.generatedMonomial = a
 		m.generatedActive = true
+		if m.translation.executing {
+			m.translation.generated = a
+		}
 		if m.substitution.scope.executing {
 			m.substitution.generatedReceipt = a
 		}
@@ -163,6 +166,9 @@ func (m *MultivariatePolynomialCore) generatedProduct(a, b Monomial) (Monomial, 
 	if e == nil && outcome.created {
 		m.generatedMonomial = r
 		m.generatedActive = true
+		if m.translation.executing {
+			m.translation.generated = r
+		}
 		if m.substitution.scope.executing {
 			m.substitution.generatedReceipt = r
 		}
@@ -170,6 +176,9 @@ func (m *MultivariatePolynomialCore) generatedProduct(a, b Monomial) (Monomial, 
 	return r, e
 }
 func (m *MultivariatePolynomialCore) transferGeneratedMonomial() {
+	if m.translation.generated == m.generatedMonomial {
+		m.translation.generated = Monomial{}
+	}
 	if m.substitution.generatedReceipt == m.generatedMonomial {
 		m.substitution.generatedReceipt = Monomial{}
 	}
@@ -232,6 +241,9 @@ func (m *MultivariatePolynomialCore) recordGeneratedCallee(outcome monomialFacto
 	}
 	m.generatedCalleePending = true
 	m.generatedCalleeGeneration = outcome.generation
+	if m.translation.executing {
+		m.translation.factoryGeneration = outcome.generation
+	}
 	c.parent = m
 	if m.substitution.scope.executing {
 		m.substitution.generatedCalleeReceipt = outcome.generation

@@ -177,6 +177,9 @@ func (m *MultivariatePolynomialManager) CloseChecked() error {
 	if e := m.identity(); e != nil {
 		return e
 	}
+	if m.core != nil && m.core.translation.active {
+		return ErrPolynomialPending
+	}
 	if !m.closing {
 		if m.core != nil {
 			if e := m.callerGuard(); e != nil {
