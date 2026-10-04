@@ -522,12 +522,21 @@ func (m *RationalManager) addSub(a, b, out *Rational, subtract bool) (_rawErr er
 }
 func (m *RationalManager) Mul(a, b, out *Rational) error {
 	for _, n := range []*Rational{a, b, out} {
-		if e := m.checkIntegerFields(n); e != nil {
+		if e := m.checkScalarValue(n); e != nil {
 			return e
 		}
 	}
 	// Source chooses this branch before output aliases can mutate operands.
-	integers := isIntegerRational(a) && isIntegerRational(b)
+	integers, e := m.IsInt(a)
+	if e != nil {
+		return e
+	}
+	if integers {
+		integers, e = m.IsInt(b)
+		if e != nil {
+			return e
+		}
+	}
 	if e := m.z.Mul(&a.num, &b.num, &out.num); e != nil {
 		return e
 	}
@@ -542,33 +551,33 @@ func (m *RationalManager) Mul(a, b, out *Rational) error {
 
 // Div preserves the actual divisor/destination branch and component order.
 // Errors retain completed caller fields; no staged pair masks normalization.
-func (m *RationalManager) Div(a, b, out *Rational) error {
+func (m *RationalManager) Div(a, b, out *Rational) (_rawErr error) {
 	for _, n := range []*Rational{a, b, out} {
-		if e := m.checkIntegerFields(n); e != nil {
+		if e := m.checkScalarValue(n); e != nil {
 			return e
 		}
 	}
 	if b == out {
-		var tmp Int
-		cleanup := true
-		defer func() {
-			if cleanup {
-				m.z.Del(&tmp)
-			}
-		}()
-		if e := m.z.Mul(&a.num, &b.den, &tmp); e != nil {
+		r := &m.rawArithmetic
+		if r.divActive {
+			return ErrRationalRawArithmeticPending
+		}
+		r.div = Int{}
+		r.divActive, r.divEnd, r.divGuard = true, false, false
+		r.divCursor, r.divCause = 0, nil
+		defer m.finishRawDiv(&_rawErr)
+		if e := m.z.Mul(&a.num, &b.den, &r.div); e != nil {
 			return e
 		}
 		if e := m.z.Mul(&a.den, &b.num, &out.den); e != nil {
 			return e
 		}
-		if e := m.z.Copy(&out.num, &tmp); e != nil {
+		if e := m.z.Copy(&out.num, &r.div); e != nil {
 			return e
 		}
-		if e := m.z.Del(&tmp); e != nil {
+		if e := m.rawDivEnd(); e != nil {
 			return e
 		}
-		cleanup = false // source Del statement precedes sign repair and normalization
 	} else {
 		if e := m.z.Mul(&a.num, &b.den, &out.num); e != nil {
 			return e

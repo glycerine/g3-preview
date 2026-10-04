@@ -290,14 +290,14 @@ func (s *RationalService) addSubInfInt(a, b *OwnedInfIntRational, sub bool) erro
 	return infIntPublishSecond(a, int64(a.second)+int64(b.second))
 }
 func (s *RationalService) InfIntAddAssign(a, b *OwnedInfIntRational) error {
-	if e := s.lockInfInt2(a, b); e != nil {
+	if e := s.lockInfIntSource2(a, b); e != nil {
 		return e
 	}
 	defer s.mu.Unlock()
 	return s.addSubInfInt(a, b, false)
 }
 func (s *RationalService) InfIntSubAssign(a, b *OwnedInfIntRational) error {
-	if e := s.lockInfInt2(a, b); e != nil {
+	if e := s.lockInfIntSource2(a, b); e != nil {
 		return e
 	}
 	defer s.mu.Unlock()
@@ -330,14 +330,14 @@ func (s *RationalService) InfIntMulAssign(a *OwnedInfIntRational, r *OwnedRation
 	return s.mulInfInt(a, &r.raw)
 }
 func (s *RationalService) InfIntAddRationalAssign(a *OwnedInfIntRational, r *OwnedRational) error {
-	if e := s.lockInfIntRat(a, r); e != nil {
+	if e := s.lockInfIntSourceRat(a, r); e != nil {
 		return e
 	}
 	defer s.mu.Unlock()
 	return s.manager.Add(&a.first, &r.raw, &a.first)
 }
 func (s *RationalService) InfIntSubRationalAssign(a *OwnedInfIntRational, r *OwnedRational) error {
-	if e := s.lockInfIntRat(a, r); e != nil {
+	if e := s.lockInfIntSourceRat(a, r); e != nil {
 		return e
 	}
 	defer s.mu.Unlock()
@@ -425,14 +425,14 @@ func (s *RationalService) resultInfInt(a, b *OwnedInfIntRational, sub bool) (_le
 	return s.copyInfInt(&tmp)
 }
 func (s *RationalService) InfIntAdd(a, b *OwnedInfIntRational) (OwnedInfIntRational, error) {
-	if e := s.lockInfInt2(a, b); e != nil {
+	if e := s.lockInfIntSource2(a, b); e != nil {
 		return OwnedInfIntRational{}, e
 	}
 	defer s.mu.Unlock()
 	return s.resultInfInt(a, b, false)
 }
 func (s *RationalService) InfIntSub(a, b *OwnedInfIntRational) (OwnedInfIntRational, error) {
-	if e := s.lockInfInt2(a, b); e != nil {
+	if e := s.lockInfIntSource2(a, b); e != nil {
 		return OwnedInfIntRational{}, e
 	}
 	defer s.mu.Unlock()

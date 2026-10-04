@@ -6,11 +6,16 @@ import "errors"
 var ErrRationalRawArithmeticPending = errors.New("mpnum: raw arithmetic local cleanup pending")
 
 // Actual cold owner-local storage for source RAW locals: Power's rational,
-// SYNCH add's two mpz, normalize's mpz, and SYNCH comparison's two mpq.
-// The nine stored Int fields are charged once in the manager header. Comparison
+// SYNCH add's two mpz, normalize's mpz, divisor-alias division's mpz, and
+// SYNCH comparison's two mpq.
+// The ten stored Int fields are charged once in the manager header. Comparison
 // denominators are normally inline1; stopped independent source calls may retain
 // separate cohorts. No source exception implicitly destroys these raw objects.
 type rationalRawArithmeticScope struct {
+	div                                     Int
+	divActive, divEnd, divGuard             bool
+	divCursor                               uint8
+	divCause                                error
 	power                                   Rational
 	compareOne, compareTwo                  Rational
 	compareActive, compareEnd, compareGuard bool
@@ -25,6 +30,9 @@ type rationalRawArithmeticScope struct {
 }
 
 type RationalRawArithmeticState struct {
+	Division, DivisionEnd, DivisionGuard          bool
+	DivisionCursor                                uint8
+	DivisionCause                                 error
 	Power, Addition, Normalization                bool
 	Comparison, ComparisonEnd, ComparisonGuard    bool
 	ComparisonCursor                              uint8
@@ -36,14 +44,41 @@ type RationalRawArithmeticState struct {
 }
 
 func (r *rationalRawArithmeticScope) pending() bool {
-	return r.powerActive || r.addActive || r.normActive || r.compareActive
+	return r.powerActive || r.addActive || r.normActive || r.compareActive || r.divActive
 }
 func (m *RationalManager) RawArithmeticState() (RationalRawArithmeticState, error) {
 	if e := m.checkOwnerReady(); e != nil {
 		return RationalRawArithmeticState{}, e
 	}
 	r := &m.rawArithmetic
-	return RationalRawArithmeticState{Comparison: r.compareActive, ComparisonEnd: r.compareEnd, ComparisonGuard: r.compareGuard, ComparisonCursor: r.compareCursor, ComparisonCause: r.compareCause, Power: r.powerActive, Addition: r.addActive, Normalization: r.normActive, PowerEnd: r.powerEnd, AdditionEnd: r.addEnd, NormalizationEnd: r.normEnd, PowerGuard: r.powerGuard, AdditionGuard: r.addGuard, NormalizationGuard: r.normGuard, PowerCursor: r.powerCursor, AdditionCursor: r.addCursor, PowerCause: r.powerCause, AdditionCause: r.addCause, NormalizationCause: r.normCause}, nil
+	return RationalRawArithmeticState{Division: r.divActive, DivisionEnd: r.divEnd, DivisionGuard: r.divGuard, DivisionCursor: r.divCursor, DivisionCause: r.divCause, Comparison: r.compareActive, ComparisonEnd: r.compareEnd, ComparisonGuard: r.compareGuard, ComparisonCursor: r.compareCursor, ComparisonCause: r.compareCause, Power: r.powerActive, Addition: r.addActive, Normalization: r.normActive, PowerEnd: r.powerEnd, AdditionEnd: r.addEnd, NormalizationEnd: r.normEnd, PowerGuard: r.powerGuard, AdditionGuard: r.addGuard, NormalizationGuard: r.normGuard, PowerCursor: r.powerCursor, AdditionCursor: r.addCursor, PowerCause: r.powerCause, AdditionCause: r.addCause, NormalizationCause: r.normCause}, nil
+}
+
+// Div's raw local has no C++ exception destructor. The explicit source
+// end-label occurs after NUM Copy and before denominator sign repair.
+func (m *RationalManager) finishRawDiv(e *error) {
+	r := &m.rawArithmetic
+	if *e != nil && r.divActive {
+		r.divCause = *e
+		if r.div.cell == 0 {
+			r.divActive = false
+			r.div = Int{}
+		}
+	}
+}
+func (m *RationalManager) rawDivEnd() error {
+	r := &m.rawArithmetic
+	r.divEnd = true
+	guard, e := sourceNumeralDel(m.z, &r.div)
+	r.divGuard = guard
+	if e != nil {
+		return e
+	}
+	r.divCursor = 1
+	r.div = Int{}
+	r.divActive = false
+	r.divCause = nil
+	return nil
 }
 
 // Comparison owns actual RAW mpq tmp1/tmp2. Body exceptions skip source del;
@@ -185,6 +220,15 @@ func (m *RationalManager) cleanupRawArithmetic() error {
 		}
 		r.normActive = false
 	}
+	if r.divActive {
+		if e := m.z.Del(&r.div); e != nil {
+			r.divCause = e
+			return e
+		}
+		r.divCursor = 1
+		r.divActive = false
+	}
+
 	if r.compareActive {
 		for r.compareCursor < 4 {
 			if e := m.z.Del(r.compareField()); e != nil {

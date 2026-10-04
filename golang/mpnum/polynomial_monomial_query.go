@@ -7,32 +7,32 @@ func (m *MonomialManager) IndexOf(a Monomial, x uint32) (uint32, error) {
 	if e := m.check(); e != nil {
 		return 0, e
 	}
-	h, e := m.headerCore(a)
+	n, e := m.sizeCore(a)
 	if e != nil {
 		return 0, e
 	}
-	return m.indexCore(a, h.Size, x)
+	return m.indexCore(a, n, x)
 }
 func (m *MonomialManager) indexCore(a Monomial, n, x uint32) (uint32, error) {
 	if n == 0 {
 		return math.MaxUint32, nil
 	}
 	last := n - 1
-	p, e := m.powerCore(a, last)
+	v, e := m.varCore(a, last)
 	if e != nil {
 		return 0, e
 	}
-	if p.Var == x {
+	if v == x {
 		return last, nil
 	}
 	if n < 8 {
 		for i := last; i > 0; {
 			i--
-			p, e = m.powerCore(a, i)
+			v, e = m.varCore(a, i)
 			if e != nil {
 				return 0, e
 			}
-			if p.Var == x {
+			if v == x {
 				return i, nil
 			}
 		}
@@ -41,13 +41,13 @@ func (m *MonomialManager) indexCore(a Monomial, n, x uint32) (uint32, error) {
 	low, high := int32(0), int32(last)
 	for {
 		mid := low + (high-low)/2
-		p, e = m.powerCore(a, uint32(mid))
+		v, e = m.varCore(a, uint32(mid))
 		if e != nil {
 			return 0, e
 		}
-		if x > p.Var {
+		if x > v {
 			low = mid + 1
-		} else if x < p.Var {
+		} else if x < v {
 			high = mid - 1
 		} else {
 			return uint32(mid), nil
@@ -65,95 +65,161 @@ func (m *MonomialManager) DegreeOf(a Monomial, x uint32) (uint32, error) {
 	if i == math.MaxUint32 {
 		return 0, nil
 	}
-	p, e := m.powerCore(a, i)
-	return p.Degree, e
+	return m.degreeAtCore(a, i)
 }
 func (m *MonomialManager) MaxVariable(a Monomial) (uint32, error) {
 	if e := m.check(); e != nil {
 		return 0, e
 	}
-	h, e := m.headerCore(a)
+	n, e := m.sizeCore(a)
 	if e != nil {
 		return 0, e
 	}
-	if h.Size == 0 {
+	if n == 0 {
 		return math.MaxUint32, nil
 	}
-	p, e := m.powerCore(a, h.Size-1)
-	return p.Var, e
+	return m.varCore(a, n-1)
 }
 func (m *MonomialManager) MaxVariableDegree(a Monomial) (uint32, error) {
 	if e := m.check(); e != nil {
 		return 0, e
 	}
-	h, e := m.headerCore(a)
-	if e != nil || h.Size == 0 {
+	n, e := m.sizeCore(a)
+	if e != nil || n == 0 {
 		return 0, e
 	}
-	p, e := m.powerCore(a, h.Size-1)
-	return p.Degree, e
+	return m.degreeAtCore(a, n-1)
 }
 func (m *MonomialManager) maxSmallerCore(a Monomial, x uint32) (uint32, error) {
 	if e := m.check(); e != nil {
 		return 0, e
 	}
-	h, e := m.headerCore(a)
+	n, e := m.sizeCore(a)
 	if e != nil {
 		return 0, e
 	}
-	n := h.Size
 	if n == 0 {
 		return math.MaxUint32, nil
 	}
 	if n < 8 {
 		for i := n; i > 0; {
 			i--
-			p, e := m.powerCore(a, i)
+			v, e := m.varCore(a, i)
 			if e != nil {
 				return 0, e
 			}
-			if p.Var < x {
-				return p.Var, nil
+			if v < x {
+				return m.varCore(a, i)
 			}
 		}
 		return math.MaxUint32, nil
 	}
 	low, high := int32(0), int32(n-1)
-	lp, e := m.powerCore(a, 0)
+	v, e := m.varCore(a, uint32(low))
 	if e != nil {
 		return 0, e
 	}
-	if x <= lp.Var {
+	if x <= v {
 		return math.MaxUint32, nil
 	}
-	hp, e := m.powerCore(a, uint32(high))
+	v, e = m.varCore(a, uint32(high))
 	if e != nil {
 		return 0, e
 	}
-	if x > hp.Var {
-		return hp.Var, nil
+	if x > v {
+		return m.varCore(a, uint32(high))
 	}
-	if x == hp.Var {
-		p, e := m.powerCore(a, uint32(high-1))
-		return p.Var, e
+	v, e = m.varCore(a, uint32(high))
+	if e != nil {
+		return 0, e
+	}
+	if x == v {
+		if modularSourceDebug && high <= 0 {
+			return 0, ErrMonomialAssertion
+		}
+		return m.varCore(a, uint32(high-1))
 	}
 	for {
+		if modularSourceDebug {
+			if low < 0 || high >= int32(n) {
+				return 0, ErrMonomialAssertion
+			}
+			v, e = m.varCore(a, uint32(low))
+			if e != nil {
+				return 0, e
+			}
+			if v >= x {
+				return 0, ErrMonomialAssertion
+			}
+			v, e = m.varCore(a, uint32(high))
+			if e != nil {
+				return 0, e
+			}
+			if x >= v {
+				return 0, ErrMonomialAssertion
+			}
+			if low >= high {
+				return 0, ErrMonomialAssertion
+			}
+		}
 		if high == low+1 {
-			p, e := m.powerCore(a, uint32(low))
-			return p.Var, e
+			if modularSourceDebug {
+				v, e = m.varCore(a, uint32(low))
+				if e != nil {
+					return 0, e
+				}
+				if v >= x {
+					return 0, ErrMonomialAssertion
+				}
+				v, e = m.varCore(a, uint32(low+1))
+				if e != nil {
+					return 0, e
+				}
+				if x >= v {
+					return 0, ErrMonomialAssertion
+				}
+			}
+			return m.varCore(a, uint32(low))
+		}
+		if modularSourceDebug && high <= low+1 {
+			return 0, ErrMonomialAssertion
 		}
 		mid := low + (high-low)/2
-		p, e := m.powerCore(a, uint32(mid))
+		if modularSourceDebug && !(low < mid && mid < high) {
+			return 0, ErrMonomialAssertion
+		}
+		v, e = m.varCore(a, uint32(mid))
 		if e != nil {
 			return 0, e
 		}
-		if x == p.Var {
-			p, e = m.powerCore(a, uint32(mid-1))
-			return p.Var, e
+		if v == x {
+			if modularSourceDebug {
+				if !(low < mid && mid < high && high < int32(n)) {
+					return 0, ErrMonomialAssertion
+				}
+				previous, e := m.varCore(a, uint32(mid-1))
+				if e != nil {
+					return 0, e
+				}
+				if previous >= x {
+					return 0, ErrMonomialAssertion
+				}
+				v, e = m.varCore(a, uint32(mid))
+				if e != nil {
+					return 0, e
+				}
+				if v != x {
+					return 0, ErrMonomialAssertion
+				}
+			}
+			return m.varCore(a, uint32(mid-1))
 		}
-		if x < p.Var {
+		if x < v {
 			high = mid
 		} else {
+			if modularSourceDebug && v >= x {
+				return 0, ErrMonomialAssertion
+			}
 			low = mid
 		}
 	}
@@ -185,16 +251,16 @@ func (m *MonomialManager) IsSquare(a Monomial) (bool, error) {
 	if e := m.check(); e != nil {
 		return false, e
 	}
-	h, e := m.headerCore(a)
+	n, e := m.sizeCore(a)
 	if e != nil {
 		return false, e
 	}
-	for i := uint32(0); i < h.Size; i++ {
-		p, e := m.powerCore(a, i)
+	for i := uint32(0); i < n; i++ {
+		d, e := m.degreeAtCore(a, i)
 		if e != nil {
 			return false, e
 		}
-		if p.Degree%2 != 0 {
+		if d%2 != 0 {
 			return false, nil
 		}
 	}
@@ -231,6 +297,25 @@ func (m *MonomialManager) varCore(a Monomial, i uint32) (uint32, error) {
 		}
 	}
 	return m.allocator.ReadUint32(l.raw, 20+uint64(i)*8)
+}
+
+// degreeAtCore implements degree(idx): source get_power forms its reference
+// (and DEBUG index assertion) before reading only the degree member.
+func (m *MonomialManager) degreeAtCore(a Monomial, i uint32) (uint32, error) {
+	l, e := m.location(a)
+	if e != nil {
+		return 0, e
+	}
+	if modularSourceDebug {
+		n, e := m.sizeCore(a)
+		if e != nil {
+			return 0, e
+		}
+		if i >= n {
+			return 0, ErrMonomialAssertion
+		}
+	}
+	return m.allocator.ReadUint32(l.raw, 24+uint64(i)*8)
 }
 func (m *MonomialManager) sizeInfoCore(a Monomial) (MonomialInfo, error) {
 	n, e := m.sizeCore(a)
@@ -300,8 +385,21 @@ func (m *MonomialManager) MaxSmallerThan(a Monomial, x uint32) (uint32, error) {
 			if e != nil {
 				return 0, e
 			}
-			if q < x && (v == math.MaxUint32 || q > v) {
-				return 0, ErrMonomialAssertion
+			if q < x {
+				if v == math.MaxUint32 {
+					return 0, ErrMonomialAssertion
+				}
+				q, e = m.varCore(a, i)
+				if e != nil {
+					return 0, e
+				}
+				if q > v {
+					return 0, ErrMonomialAssertion
+				}
+			}
+			q, e = m.varCore(a, i)
+			if e != nil {
+				return 0, e
 			}
 			if q == v {
 				found = true

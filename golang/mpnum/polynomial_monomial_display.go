@@ -10,42 +10,72 @@ type MonomialTextSink interface {
 	WriteVariable(uint32) error
 }
 
+func monomialSinkLiteral(out MonomialTextSink, v string) error {
+	if out == nil {
+		return arena.ErrConfig
+	}
+	return out.WriteLiteral(v)
+}
+func monomialSinkVariable(out MonomialTextSink, v uint32) error {
+	if out == nil {
+		return arena.ErrConfig
+	}
+	return out.WriteVariable(v)
+}
+func monomialSinkUnsigned(out MonomialTextSink, v uint32) error {
+	if out == nil {
+		return arena.ErrConfig
+	}
+	return out.WriteUnsigned(v)
+}
 func (m *MonomialManager) DisplayInto(a Monomial, out MonomialTextSink, star bool) error {
 	if e := m.check(); e != nil {
 		return e
 	}
-	h, e := m.headerCore(a)
+	n, e := m.sizeCore(a)
 	if e != nil {
 		return e
 	}
-	if out == nil {
-		return arena.ErrConfig
+	if n == 0 {
+		return monomialSinkLiteral(out, "1")
 	}
-	if h.Size == 0 {
-		return out.WriteLiteral("1")
-	}
-	for i := uint32(0); i < h.Size; i++ {
+	for i := uint32(0); ; i++ {
+		n, e = m.sizeCore(a)
+		if e != nil {
+			return e
+		}
+		if i >= n {
+			break
+		}
 		if i > 0 {
 			s := " "
 			if star {
 				s = "*"
 			}
-			if e = out.WriteLiteral(s); e != nil {
+			if e = monomialSinkLiteral(out, s); e != nil {
 				return e
 			}
 		}
-		p, e := m.powerCore(a, i)
+		v, e := m.varCore(a, i)
 		if e != nil {
 			return e
 		}
-		if e = out.WriteVariable(p.Var); e != nil {
+		if e = monomialSinkVariable(out, v); e != nil {
 			return e
 		}
-		if p.Degree > 1 {
-			if e = out.WriteLiteral("^"); e != nil {
+		d, e := m.degreeAtCore(a, i)
+		if e != nil {
+			return e
+		}
+		if d > 1 {
+			if e = monomialSinkLiteral(out, "^"); e != nil {
 				return e
 			}
-			if e = out.WriteUnsigned(p.Degree); e != nil {
+			d, e = m.degreeAtCore(a, i)
+			if e != nil {
+				return e
+			}
+			if e = monomialSinkUnsigned(out, d); e != nil {
 				return e
 			}
 		}
@@ -56,55 +86,67 @@ func (m *MonomialManager) DisplaySMT2Into(a Monomial, out MonomialTextSink) erro
 	if e := m.check(); e != nil {
 		return e
 	}
-	h, e := m.headerCore(a)
+	n, e := m.sizeCore(a)
 	if e != nil {
 		return e
 	}
-	if out == nil {
-		return arena.ErrConfig
-	}
-	if h.Size == 0 {
-		if e = out.WriteLiteral("1"); e != nil {
+	if n == 0 {
+		if e = monomialSinkLiteral(out, "1"); e != nil {
 			return e
 		}
-	} else if h.Size == 1 {
-		p, e := m.powerCore(a, 0)
-		if e != nil {
-			return e
+	} else {
+		single := false
+		if n == 1 {
+			d, e := m.degreeAtCore(a, 0)
+			if e != nil {
+				return e
+			}
+			single = d == 1
 		}
-		if p.Degree == 1 {
-			if e = out.WriteVariable(p.Var); e != nil {
+		if single {
+			v, e := m.varCore(a, 0)
+			if e != nil {
+				return e
+			}
+			if e = monomialSinkVariable(out, v); e != nil {
 				return e
 			}
 		} else {
-			if e = m.displaySMT2Product(a, h.Size, out); e != nil {
+			if e = m.displaySMT2Product(a, out); e != nil {
 				return e
 			}
 		}
-	} else {
-		if e = m.displaySMT2Product(a, h.Size, out); e != nil {
-			return e
-		}
 	}
-	return out.WriteLiteral(")")
+	return monomialSinkLiteral(out, ")")
 }
-func (m *MonomialManager) displaySMT2Product(a Monomial, n uint32, out MonomialTextSink) error {
-	if e := out.WriteLiteral("(*"); e != nil {
+func (m *MonomialManager) displaySMT2Product(a Monomial, out MonomialTextSink) error {
+	if e := monomialSinkLiteral(out, "(*"); e != nil {
 		return e
 	}
-	for i := uint32(0); i < n; i++ {
-		p, e := m.powerCore(a, i)
+	for i := uint32(0); ; i++ {
+		n, e := m.sizeCore(a)
 		if e != nil {
 			return e
 		}
-		if modularSourceDebug && p.Degree == 0 {
+		if i >= n {
+			break
+		}
+		v, e := m.varCore(a, i)
+		if e != nil {
+			return e
+		}
+		d, e := m.degreeAtCore(a, i)
+		if e != nil {
+			return e
+		}
+		if modularSourceDebug && d == 0 {
 			return ErrMonomialAssertion
 		}
-		for j := uint32(0); j < p.Degree; j++ {
-			if e = out.WriteLiteral(" "); e != nil {
+		for j := uint32(0); j < d; j++ {
+			if e = monomialSinkLiteral(out, " "); e != nil {
 				return e
 			}
-			if e = out.WriteVariable(p.Var); e != nil {
+			if e = monomialSinkVariable(out, v); e != nil {
 				return e
 			}
 		}

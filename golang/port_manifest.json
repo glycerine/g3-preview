@@ -28308,20 +28308,21 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "mpnum/polynomial_monomial_order.go",
-        "mpnum/polynomial_monomial_positions.go",
         "mpnum/polynomial_monomial.go",
         "mpnum/polynomial_monomial_display.go",
         "mpnum/polynomial_monomial_factory.go",
         "mpnum/polynomial_monomial_lifetime.go",
         "mpnum/polynomial_monomial_ops.go",
+        "mpnum/polynomial_monomial_order.go",
         "mpnum/polynomial_monomial_physical_test.go",
+        "mpnum/polynomial_monomial_positions.go",
         "mpnum/polynomial_monomial_query.go",
         "mpnum/polynomial_monomial_rename.go",
         "mpnum/polynomial_monomial_table.go",
         "mpnum/polynomial_monomial_test.go",
         "mpnum/polynomial_monomial_tmp.go",
-        "mpnum/polynomial_monomial_vector.go"
+        "mpnum/polynomial_monomial_vector.go",
+        "mpnum/polynomial_monomial_read_order_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -28366,7 +28367,21 @@
         "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
         "TestMonomialSourceSingletonValidityDoesNotReadPower",
         "TestMonomialSourceDegreeSumDoesNotReadVariable",
-        "TestMonomialSourceValidityFieldShortCircuit"
+        "TestMonomialSourceValidityFieldShortCircuit",
+        "TestMonomialReadOrderEmptyQueries",
+        "TestMonomialReadOrderVariableOnlySearch",
+        "TestMonomialReadOrderSeparateMaximumFields",
+        "TestMonomialReadOrderMaxSmallerVariableOnly",
+        "TestMonomialReadOrderParityOnly",
+        "TestMonomialReadOrderDisplayReachedPrefix",
+        "TestMonomialReadOrderSMT2DegreeBeforeVariable",
+        "TestMonomialReadOrderRenameVariablePublication",
+        "TestMonomialReadOrderProductChosenCopyPrefix",
+        "TestMonomialReadOrderDivisionUnreachedDegrees",
+        "TestMonomialReadOrderGCDNoCommonUnchosenDegree",
+        "TestMonomialReadOrderSqrtOddBeforeVariable",
+        "TestMonomialReadOrderRemovedVariableIgnoresDegree",
+        "TestMonomialReadOrderFinalCallbackReleaseReachedLoop"
       ],
       "conditionals": [
         {
@@ -30230,6 +30245,90 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit"
           ]
+        },
+        {
+          "name": "Selected monomial SIZE/VAR/DEG-only reached queries cpp236–375,423–437 with actual get_power DEBUG reference guards",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_monomial_query.go",
+          "tests": [
+            "TestMonomialReadOrderEmptyQueries",
+            "TestMonomialReadOrderVariableOnlySearch",
+            "TestMonomialReadOrderSeparateMaximumFields",
+            "TestMonomialReadOrderMaxSmallerVariableOnly",
+            "TestMonomialReadOrderParityOnly",
+            "TestMonomialReadOrderDisplayReachedPrefix",
+            "TestMonomialReadOrderSMT2DegreeBeforeVariable",
+            "TestMonomialReadOrderRenameVariablePublication",
+            "TestMonomialReadOrderProductChosenCopyPrefix",
+            "TestMonomialReadOrderDivisionUnreachedDegrees",
+            "TestMonomialReadOrderGCDNoCommonUnchosenDegree",
+            "TestMonomialReadOrderSqrtOddBeforeVariable",
+            "TestMonomialReadOrderRemovedVariableIgnoresDegree",
+            "TestMonomialReadOrderFinalCallbackReleaseReachedLoop"
+          ]
+        },
+        {
+          "name": "Selected ordinary and SMT2 display field/callback publication and repeated loop SIZE lifetime guards cpp378–416",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_monomial_display.go",
+          "tests": [
+            "TestMonomialReadOrderEmptyQueries",
+            "TestMonomialReadOrderVariableOnlySearch",
+            "TestMonomialReadOrderSeparateMaximumFields",
+            "TestMonomialReadOrderMaxSmallerVariableOnly",
+            "TestMonomialReadOrderParityOnly",
+            "TestMonomialReadOrderDisplayReachedPrefix",
+            "TestMonomialReadOrderSMT2DegreeBeforeVariable",
+            "TestMonomialReadOrderRenameVariablePublication",
+            "TestMonomialReadOrderProductChosenCopyPrefix",
+            "TestMonomialReadOrderDivisionUnreachedDegrees",
+            "TestMonomialReadOrderGCDNoCommonUnchosenDegree",
+            "TestMonomialReadOrderSqrtOddBeforeVariable",
+            "TestMonomialReadOrderRemovedVariableIgnoresDegree",
+            "TestMonomialReadOrderFinalCallbackReleaseReachedLoop"
+          ]
+        },
+        {
+          "name": "Selected monomial rename VAR-only mutation before sort/hash cpp439–445; declared concrete heapsort adaptation preserved",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_monomial_rename.go",
+          "tests": [
+            "TestMonomialReadOrderEmptyQueries",
+            "TestMonomialReadOrderVariableOnlySearch",
+            "TestMonomialReadOrderSeparateMaximumFields",
+            "TestMonomialReadOrderMaxSmallerVariableOnly",
+            "TestMonomialReadOrderParityOnly",
+            "TestMonomialReadOrderDisplayReachedPrefix",
+            "TestMonomialReadOrderSMT2DegreeBeforeVariable",
+            "TestMonomialReadOrderRenameVariablePublication",
+            "TestMonomialReadOrderProductChosenCopyPrefix",
+            "TestMonomialReadOrderDivisionUnreachedDegrees",
+            "TestMonomialReadOrderGCDNoCommonUnchosenDegree",
+            "TestMonomialReadOrderSqrtOddBeforeVariable",
+            "TestMonomialReadOrderRemovedVariableIgnoresDegree",
+            "TestMonomialReadOrderFinalCallbackReleaseReachedLoop"
+          ]
+        },
+        {
+          "name": "Selected raw monomial merge/division/GCD copy branches and sqrt/remove/derivative reached-field reads cpp919–1268",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_monomial_ops.go",
+          "tests": [
+            "TestMonomialReadOrderEmptyQueries",
+            "TestMonomialReadOrderVariableOnlySearch",
+            "TestMonomialReadOrderSeparateMaximumFields",
+            "TestMonomialReadOrderMaxSmallerVariableOnly",
+            "TestMonomialReadOrderParityOnly",
+            "TestMonomialReadOrderDisplayReachedPrefix",
+            "TestMonomialReadOrderSMT2DegreeBeforeVariable",
+            "TestMonomialReadOrderRenameVariablePublication",
+            "TestMonomialReadOrderProductChosenCopyPrefix",
+            "TestMonomialReadOrderDivisionUnreachedDegrees",
+            "TestMonomialReadOrderGCDNoCommonUnchosenDegree",
+            "TestMonomialReadOrderSqrtOddBeforeVariable",
+            "TestMonomialReadOrderRemovedVariableIgnoresDegree",
+            "TestMonomialReadOrderFinalCallbackReleaseReachedLoop"
+          ]
         }
       ],
       "ownership": [
@@ -30254,20 +30353,21 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "mpnum/polynomial_monomial_order.go",
-        "mpnum/polynomial_monomial_positions.go",
         "mpnum/polynomial_monomial.go",
         "mpnum/polynomial_monomial_display.go",
         "mpnum/polynomial_monomial_factory.go",
         "mpnum/polynomial_monomial_lifetime.go",
         "mpnum/polynomial_monomial_ops.go",
+        "mpnum/polynomial_monomial_order.go",
         "mpnum/polynomial_monomial_physical_test.go",
+        "mpnum/polynomial_monomial_positions.go",
         "mpnum/polynomial_monomial_query.go",
         "mpnum/polynomial_monomial_rename.go",
         "mpnum/polynomial_monomial_table.go",
         "mpnum/polynomial_monomial_test.go",
         "mpnum/polynomial_monomial_tmp.go",
-        "mpnum/polynomial_monomial_vector.go"
+        "mpnum/polynomial_monomial_vector.go",
+        "mpnum/polynomial_monomial_read_order_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -30312,7 +30412,21 @@
         "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
         "TestMonomialSourceSingletonValidityDoesNotReadPower",
         "TestMonomialSourceDegreeSumDoesNotReadVariable",
-        "TestMonomialSourceValidityFieldShortCircuit"
+        "TestMonomialSourceValidityFieldShortCircuit",
+        "TestMonomialReadOrderEmptyQueries",
+        "TestMonomialReadOrderVariableOnlySearch",
+        "TestMonomialReadOrderSeparateMaximumFields",
+        "TestMonomialReadOrderMaxSmallerVariableOnly",
+        "TestMonomialReadOrderParityOnly",
+        "TestMonomialReadOrderDisplayReachedPrefix",
+        "TestMonomialReadOrderSMT2DegreeBeforeVariable",
+        "TestMonomialReadOrderRenameVariablePublication",
+        "TestMonomialReadOrderProductChosenCopyPrefix",
+        "TestMonomialReadOrderDivisionUnreachedDegrees",
+        "TestMonomialReadOrderGCDNoCommonUnchosenDegree",
+        "TestMonomialReadOrderSqrtOddBeforeVariable",
+        "TestMonomialReadOrderRemovedVariableIgnoresDegree",
+        "TestMonomialReadOrderFinalCallbackReleaseReachedLoop"
       ],
       "conditionals": [
         {
@@ -30947,6 +31061,90 @@
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit"
+          ]
+        },
+        {
+          "name": "Selected monomial SIZE/VAR/DEG-only reached queries cpp236–375,423–437 with actual get_power DEBUG reference guards",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_monomial_query.go",
+          "tests": [
+            "TestMonomialReadOrderEmptyQueries",
+            "TestMonomialReadOrderVariableOnlySearch",
+            "TestMonomialReadOrderSeparateMaximumFields",
+            "TestMonomialReadOrderMaxSmallerVariableOnly",
+            "TestMonomialReadOrderParityOnly",
+            "TestMonomialReadOrderDisplayReachedPrefix",
+            "TestMonomialReadOrderSMT2DegreeBeforeVariable",
+            "TestMonomialReadOrderRenameVariablePublication",
+            "TestMonomialReadOrderProductChosenCopyPrefix",
+            "TestMonomialReadOrderDivisionUnreachedDegrees",
+            "TestMonomialReadOrderGCDNoCommonUnchosenDegree",
+            "TestMonomialReadOrderSqrtOddBeforeVariable",
+            "TestMonomialReadOrderRemovedVariableIgnoresDegree",
+            "TestMonomialReadOrderFinalCallbackReleaseReachedLoop"
+          ]
+        },
+        {
+          "name": "Selected ordinary and SMT2 display field/callback publication and repeated loop SIZE lifetime guards cpp378–416",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_monomial_display.go",
+          "tests": [
+            "TestMonomialReadOrderEmptyQueries",
+            "TestMonomialReadOrderVariableOnlySearch",
+            "TestMonomialReadOrderSeparateMaximumFields",
+            "TestMonomialReadOrderMaxSmallerVariableOnly",
+            "TestMonomialReadOrderParityOnly",
+            "TestMonomialReadOrderDisplayReachedPrefix",
+            "TestMonomialReadOrderSMT2DegreeBeforeVariable",
+            "TestMonomialReadOrderRenameVariablePublication",
+            "TestMonomialReadOrderProductChosenCopyPrefix",
+            "TestMonomialReadOrderDivisionUnreachedDegrees",
+            "TestMonomialReadOrderGCDNoCommonUnchosenDegree",
+            "TestMonomialReadOrderSqrtOddBeforeVariable",
+            "TestMonomialReadOrderRemovedVariableIgnoresDegree",
+            "TestMonomialReadOrderFinalCallbackReleaseReachedLoop"
+          ]
+        },
+        {
+          "name": "Selected monomial rename VAR-only mutation before sort/hash cpp439–445; declared concrete heapsort adaptation preserved",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_monomial_rename.go",
+          "tests": [
+            "TestMonomialReadOrderEmptyQueries",
+            "TestMonomialReadOrderVariableOnlySearch",
+            "TestMonomialReadOrderSeparateMaximumFields",
+            "TestMonomialReadOrderMaxSmallerVariableOnly",
+            "TestMonomialReadOrderParityOnly",
+            "TestMonomialReadOrderDisplayReachedPrefix",
+            "TestMonomialReadOrderSMT2DegreeBeforeVariable",
+            "TestMonomialReadOrderRenameVariablePublication",
+            "TestMonomialReadOrderProductChosenCopyPrefix",
+            "TestMonomialReadOrderDivisionUnreachedDegrees",
+            "TestMonomialReadOrderGCDNoCommonUnchosenDegree",
+            "TestMonomialReadOrderSqrtOddBeforeVariable",
+            "TestMonomialReadOrderRemovedVariableIgnoresDegree",
+            "TestMonomialReadOrderFinalCallbackReleaseReachedLoop"
+          ]
+        },
+        {
+          "name": "Selected raw monomial merge/division/GCD copy branches and sqrt/remove/derivative reached-field reads cpp919–1268",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_monomial_ops.go",
+          "tests": [
+            "TestMonomialReadOrderEmptyQueries",
+            "TestMonomialReadOrderVariableOnlySearch",
+            "TestMonomialReadOrderSeparateMaximumFields",
+            "TestMonomialReadOrderMaxSmallerVariableOnly",
+            "TestMonomialReadOrderParityOnly",
+            "TestMonomialReadOrderDisplayReachedPrefix",
+            "TestMonomialReadOrderSMT2DegreeBeforeVariable",
+            "TestMonomialReadOrderRenameVariablePublication",
+            "TestMonomialReadOrderProductChosenCopyPrefix",
+            "TestMonomialReadOrderDivisionUnreachedDegrees",
+            "TestMonomialReadOrderGCDNoCommonUnchosenDegree",
+            "TestMonomialReadOrderSqrtOddBeforeVariable",
+            "TestMonomialReadOrderRemovedVariableIgnoresDegree",
+            "TestMonomialReadOrderFinalCallbackReleaseReachedLoop"
           ]
         }
       ],
@@ -52429,7 +52627,17 @@
         "TestSATClauseVectorBorrowedForeignCopyLifetime",
         "TestSATScalarVectorReleaseRetainedBodies",
         "TestSATScalarSetEndSourcePublication",
-        "TestSATScalarExpansionRetainsBackingPrefix"
+        "TestSATScalarExpansionRetainsBackingPrefix",
+        "TestSATSolverConflictFirstUIPDefaultPipeline",
+        "TestSATSolverConflictLevelZeroCountersAndOwners",
+        "TestSATSolverConflictAssumptionCoreAndReinit",
+        "TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix",
+        "TestSATSolverConflictRuntimeLemmaSpanLifetimeAndGlue",
+        "TestSATSolverConflictWholeOperationAllocationPrefixes",
+        "TestSATSolverConflictClauseReasonBothWatchedPositions",
+        "TestSATSolverConflictFiniteImplicationOracle",
+        "TestSATSolverConflictInitAndOptionalDispatchPrefixes",
+        "TestSATSolverConflictStaleSpanRetainsAllocatedCandidate"
       ],
       "conditionals": [
         {
@@ -52533,6 +52741,23 @@
         {
           "name": "whole runtime conditional debug-tag/TRACE policy and remaining consumer integration",
           "status": "unported"
+        },
+        {
+          "name": "Selected actual Runtime literal-span placement construction preserves header/ID before reached literal copy and retained constructor-read failure candidate",
+          "status": "ported",
+          "go_target": "sat_clause_storage.go",
+          "tests": [
+            "TestSATSolverConflictFirstUIPDefaultPipeline",
+            "TestSATSolverConflictLevelZeroCountersAndOwners",
+            "TestSATSolverConflictAssumptionCoreAndReinit",
+            "TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix",
+            "TestSATSolverConflictRuntimeLemmaSpanLifetimeAndGlue",
+            "TestSATSolverConflictWholeOperationAllocationPrefixes",
+            "TestSATSolverConflictClauseReasonBothWatchedPositions",
+            "TestSATSolverConflictFiniteImplicationOracle",
+            "TestSATSolverConflictInitAndOptionalDispatchPrefixes",
+            "TestSATSolverConflictStaleSpanRetainsAllocatedCandidate"
+          ]
         }
       ],
       "ownership": [
@@ -55573,7 +55798,13 @@
         "sat_solver_lemma_minimization.go",
         "sat_solver_lemma_minimization_test.go",
         "sat_solver_dynamic_subsumption.go",
-        "sat_solver_probing_diagnostics.go"
+        "sat_solver_probing_diagnostics.go",
+        "sat_solver_conflict_resolution.go",
+        "sat_solver_conflict_helpers.go",
+        "sat_solver_conflict_assumptions.go",
+        "sat_solver_conflict_span.go",
+        "sat_solver_conflict_resolution_test.go",
+        "sat_solver_conflict_model_test.go"
       ],
       "tests": [
         "TestSATSolverClauseCoreFiniteSimplification",
@@ -55699,7 +55930,17 @@
         "TestSATSolverProbingTLSPostAllocationPendingCache",
         "TestSATSolverProbingUnavailableLevelHeaderAtSourceRead",
         "TestSATSolverProbingWarmProcessAndUnsignedDec",
-        "TestSATSolverProbingZeroQuotaAndActualCancellation"
+        "TestSATSolverProbingZeroQuotaAndActualCancellation",
+        "TestSATSolverConflictFirstUIPDefaultPipeline",
+        "TestSATSolverConflictLevelZeroCountersAndOwners",
+        "TestSATSolverConflictAssumptionCoreAndReinit",
+        "TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix",
+        "TestSATSolverConflictRuntimeLemmaSpanLifetimeAndGlue",
+        "TestSATSolverConflictWholeOperationAllocationPrefixes",
+        "TestSATSolverConflictClauseReasonBothWatchedPositions",
+        "TestSATSolverConflictFiniteImplicationOracle",
+        "TestSATSolverConflictInitAndOptionalDispatchPrefixes",
+        "TestSATSolverConflictStaleSpanRetainsAllocatedCandidate"
       ],
       "conditionals": [
         {
@@ -56286,7 +56527,7 @@
           ]
         },
         {
-          "name": "Source lemma minimization and actual conflict-analysis Runtime vectors; first-UIP, default search and real extension dispatch remain open",
+          "name": "Source lemma minimization and actual conflict-analysis Runtime vectors; selected FIRST-UIP family recorded separately, complete default search and real extension dispatch remain open",
           "status": "partial",
           "go_target": "sat_solver_lemma_minimization.go",
           "tests": [
@@ -56381,20 +56622,90 @@
             "TestSATSolverProbingWarmProcessAndUnsignedDec",
             "TestSATSolverProbingZeroQuotaAndActualCancellation"
           ]
+        },
+        {
+          "name": "Selected FIRST-UIP resolve_conflict/core cpp1675–1820: actual mark/trail/lemma/minimize/dyn-sub pipeline, glue before pop, counters and phase publication; real EXT and complete search remain open",
+          "status": "partial",
+          "go_target": "sat_solver_conflict_resolution.go",
+          "tests": [
+            "TestSATSolverConflictFirstUIPDefaultPipeline",
+            "TestSATSolverConflictLevelZeroCountersAndOwners",
+            "TestSATSolverConflictAssumptionCoreAndReinit",
+            "TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix",
+            "TestSATSolverConflictRuntimeLemmaSpanLifetimeAndGlue",
+            "TestSATSolverConflictWholeOperationAllocationPrefixes",
+            "TestSATSolverConflictClauseReasonBothWatchedPositions",
+            "TestSATSolverConflictFiniteImplicationOracle",
+            "TestSATSolverConflictInitAndOptionalDispatchPrefixes",
+            "TestSATSolverConflictStaleSpanRetainsAllocatedCandidate"
+          ]
+        },
+        {
+          "name": "Selected max-level, antecedent, trail, phase and init/core reason helpers cpp2091–2219: reached clause c0/c1 and source mark/activity-before-push order; EXT dispatch remains explicit missing binding",
+          "status": "partial",
+          "go_target": "sat_solver_conflict_helpers.go",
+          "tests": [
+            "TestSATSolverConflictFirstUIPDefaultPipeline",
+            "TestSATSolverConflictLevelZeroCountersAndOwners",
+            "TestSATSolverConflictAssumptionCoreAndReinit",
+            "TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix",
+            "TestSATSolverConflictRuntimeLemmaSpanLifetimeAndGlue",
+            "TestSATSolverConflictWholeOperationAllocationPrefixes",
+            "TestSATSolverConflictClauseReasonBothWatchedPositions",
+            "TestSATSolverConflictFiniteImplicationOracle",
+            "TestSATSolverConflictInitAndOptionalDispatchPrefixes",
+            "TestSATSolverConflictStaleSpanRetainsAllocatedCandidate"
+          ]
+        },
+        {
+          "name": "Selected actual assumption/core/init/reinit helpers cpp1822–2087 and pop→exchange→reinit cpp2545–2549; nonnull parallel/MUS dispatch explicitly unported",
+          "status": "partial",
+          "go_target": "sat_solver_conflict_assumptions.go",
+          "tests": [
+            "TestSATSolverConflictFirstUIPDefaultPipeline",
+            "TestSATSolverConflictLevelZeroCountersAndOwners",
+            "TestSATSolverConflictAssumptionCoreAndReinit",
+            "TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix",
+            "TestSATSolverConflictRuntimeLemmaSpanLifetimeAndGlue",
+            "TestSATSolverConflictWholeOperationAllocationPrefixes",
+            "TestSATSolverConflictClauseReasonBothWatchedPositions",
+            "TestSATSolverConflictFiniteImplicationOracle",
+            "TestSATSolverConflictInitAndOptionalDispatchPrefixes",
+            "TestSATSolverConflictStaleSpanRetainsAllocatedCandidate"
+          ]
+        },
+        {
+          "name": "Concrete borrowed Runtime lemma span without copied or boxed literals; captured block lifetime checked at actual source dereferences",
+          "status": "ported",
+          "go_target": "sat_solver_conflict_span.go",
+          "tests": [
+            "TestSATSolverConflictFirstUIPDefaultPipeline",
+            "TestSATSolverConflictLevelZeroCountersAndOwners",
+            "TestSATSolverConflictAssumptionCoreAndReinit",
+            "TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix",
+            "TestSATSolverConflictRuntimeLemmaSpanLifetimeAndGlue",
+            "TestSATSolverConflictWholeOperationAllocationPrefixes",
+            "TestSATSolverConflictClauseReasonBothWatchedPositions",
+            "TestSATSolverConflictFiniteImplicationOracle",
+            "TestSATSolverConflictInitAndOptionalDispatchPrefixes",
+            "TestSATSolverConflictStaleSpanRetainsAllocatedCandidate"
+          ]
         }
       ],
       "ownership": [
         "Borrowed actual assignment/level arrays and real clause allocator storage; no search owner or solver runtime.",
         "Source-width char assignment and scalar columns; charged outer watch tokens/metadata own each actual child once; real activity/queue/trail, borrowed actual todo. No complete solver construction or search.",
         "Assignment bytes and initialization state are owned solely by the borrowed real Runtime, with source vector capacity/size headers and explicit block/pending tokens; enclosing variable owner charges embedded metadata. Variable graph Stats exclude borrowed runtime, which physical audits add exactly once. Runtime must outlive variable/propagation owners, which require the same actual Runtime identity.",
-        "Selected probing/dynamic bodies borrow real propagation/lifecycle owners and separate literalMark. Source assigned-set size publication precedes default false writes; membership mark precedes list push; values precede membership reset/finalize, and successful explicit finalize permits next round without counter repair. Failed ordinal roots and marks are inspected before faults are disabled. No independent solver counter or assignment mirror is created."
+        "Selected probing/dynamic bodies borrow real propagation/lifecycle owners and separate literalMark. Source assigned-set size publication precedes default false writes; membership mark precedes list push; values precede membership reset/finalize, and successful explicit finalize permits next round without counter repair. Failed ordinal roots and marks are inspected before faults are disabled. No independent solver counter or assignment mirror is created.",
+        "Selected conflict owner charges actual cold fields once and borrows existing analysis/dynamic/probing/lifecycle/Runtime; owns actual Runtime assumption/core/literal-set members. Glue and clause consumers read captured lemma blocks directly. Constructor-read errors retain the actually allocated clause/ID in lifecycle pendingCandidate before return. Every real refusal prefix is rooted before fault disable; no host lemma copy or directory-derived owner roots."
       ],
       "deviations": [
         "Concrete allocation-free heapsort replaces std::sort on scalar literals. TRACE, solver construction, BCP, conflicts, search, scopes and remaining methods are unported.",
         "Wrapped source allocations that cannot represent full typed capacity remain unported; host bounds are separate from exact source overflow DefaultException. Default child policies, full solver constructor, propagation, conflicts, scopes/search and TRACE remain open.",
         "Propagation state borrows actual variable/clause/model-converter/rlimit/Runtime/config owners and owns only its charged cold member grouping/diff-level backing. Cleaner/asymm/probing counters are real selected member state, not child Run implementations. No concrete extension subclass exists in this fork; dispatch fails explicitly at asserted/EXT call sites after completed source prefixes. Full solver constructor, UpdateParams/default policy children, propagation integrity/missed-propagation checks, literal-span num_diff_levels consumers, search/conflicts/scopes and user-scope campaign remain open.",
         "Checkpoint reads the actual bound Runtime allocation counter. SAT arena-backed typed storage has not yet been integrated into that source runtime accounting domain; end-to-end solver memory-limit behavior remains open. No allocation events are fabricated from Budget usage.",
-        "Only assignment char_vector source allocation accounting is integrated in this slice. Other SAT columns/watch/queue/clause/trail/vector allocations still require real global/runtime source hooks. Raw-state bounds/initialization guards act at endangered byte accesses; source DEBUG logical assertions remain distinct. No full solver construction/search or registered assertion completion is claimed."
+        "Only assignment char_vector source allocation accounting is integrated in this slice. Other SAT columns/watch/queue/clause/trail/vector allocations still require real global/runtime source hooks. Raw-state bounds/initialization guards act at endangered byte accesses; source DEBUG logical assertions remain distinct. No full solver construction/search or registered assertion completion is claimed.",
+        "Selected FIRST-UIP and real assumption/init helpers are implemented with default minimization/dynamic subsumption. Full solver construction/Check/search, source extension calls, nonnull parallel exchange, optional MUS/model and global diagnostics remain explicit obligations. Constructor-error candidate retention is a typed owning adapter, not claimed C++ implicit unwinding; no registered user-scope assertion completion is credited."
       ]
     },
     {
@@ -56436,7 +56747,13 @@
         "sat_solver_conflict_analysis.go",
         "sat_solver_conflict_analysis_test.go",
         "sat_solver_lemma_minimization.go",
-        "sat_solver_lemma_minimization_test.go"
+        "sat_solver_lemma_minimization_test.go",
+        "sat_solver_conflict_resolution.go",
+        "sat_solver_conflict_helpers.go",
+        "sat_solver_conflict_assumptions.go",
+        "sat_solver_conflict_span.go",
+        "sat_solver_conflict_resolution_test.go",
+        "sat_solver_conflict_model_test.go"
       ],
       "tests": [
         "TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots",
@@ -56530,7 +56847,17 @@
         "TestSATSolverLemmaMinimizationTernaryShortCircuitAndExternalGuard",
         "TestSATSolverLemmaMinimizationWarmPhysicalPlateau",
         "TestSATSolverLemmaMinimizationClauseDebugSiteAndStaleBorrow",
-        "TestSATSolverLemmaMinimizationEmptyAndFirstUIPDebugRoutes"
+        "TestSATSolverLemmaMinimizationEmptyAndFirstUIPDebugRoutes",
+        "TestSATSolverConflictFirstUIPDefaultPipeline",
+        "TestSATSolverConflictLevelZeroCountersAndOwners",
+        "TestSATSolverConflictAssumptionCoreAndReinit",
+        "TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix",
+        "TestSATSolverConflictRuntimeLemmaSpanLifetimeAndGlue",
+        "TestSATSolverConflictWholeOperationAllocationPrefixes",
+        "TestSATSolverConflictClauseReasonBothWatchedPositions",
+        "TestSATSolverConflictFiniteImplicationOracle",
+        "TestSATSolverConflictInitAndOptionalDispatchPrefixes",
+        "TestSATSolverConflictStaleSpanRetainsAllocatedCandidate"
       ],
       "conditionals": [
         {
@@ -56701,7 +57028,7 @@
           ]
         },
         {
-          "name": "Source lemma minimization and actual conflict-analysis Runtime vectors; first-UIP, default search and real extension dispatch remain open",
+          "name": "Source lemma minimization and actual conflict-analysis Runtime vectors; selected FIRST-UIP family recorded separately, complete default search and real extension dispatch remain open",
           "status": "partial",
           "go_target": "sat_solver_lemma_minimization.go",
           "tests": [
@@ -56718,17 +57045,87 @@
             "TestSATSolverLemmaMinimizationClauseDebugSiteAndStaleBorrow",
             "TestSATSolverLemmaMinimizationEmptyAndFirstUIPDebugRoutes"
           ]
+        },
+        {
+          "name": "Selected FIRST-UIP resolve_conflict/core cpp1675–1820: actual mark/trail/lemma/minimize/dyn-sub pipeline, glue before pop, counters and phase publication; real EXT and complete search remain open",
+          "status": "partial",
+          "go_target": "sat_solver_conflict_resolution.go",
+          "tests": [
+            "TestSATSolverConflictFirstUIPDefaultPipeline",
+            "TestSATSolverConflictLevelZeroCountersAndOwners",
+            "TestSATSolverConflictAssumptionCoreAndReinit",
+            "TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix",
+            "TestSATSolverConflictRuntimeLemmaSpanLifetimeAndGlue",
+            "TestSATSolverConflictWholeOperationAllocationPrefixes",
+            "TestSATSolverConflictClauseReasonBothWatchedPositions",
+            "TestSATSolverConflictFiniteImplicationOracle",
+            "TestSATSolverConflictInitAndOptionalDispatchPrefixes",
+            "TestSATSolverConflictStaleSpanRetainsAllocatedCandidate"
+          ]
+        },
+        {
+          "name": "Selected max-level, antecedent, trail, phase and init/core reason helpers cpp2091–2219: reached clause c0/c1 and source mark/activity-before-push order; EXT dispatch remains explicit missing binding",
+          "status": "partial",
+          "go_target": "sat_solver_conflict_helpers.go",
+          "tests": [
+            "TestSATSolverConflictFirstUIPDefaultPipeline",
+            "TestSATSolverConflictLevelZeroCountersAndOwners",
+            "TestSATSolverConflictAssumptionCoreAndReinit",
+            "TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix",
+            "TestSATSolverConflictRuntimeLemmaSpanLifetimeAndGlue",
+            "TestSATSolverConflictWholeOperationAllocationPrefixes",
+            "TestSATSolverConflictClauseReasonBothWatchedPositions",
+            "TestSATSolverConflictFiniteImplicationOracle",
+            "TestSATSolverConflictInitAndOptionalDispatchPrefixes",
+            "TestSATSolverConflictStaleSpanRetainsAllocatedCandidate"
+          ]
+        },
+        {
+          "name": "Selected actual assumption/core/init/reinit helpers cpp1822–2087 and pop→exchange→reinit cpp2545–2549; nonnull parallel/MUS dispatch explicitly unported",
+          "status": "partial",
+          "go_target": "sat_solver_conflict_assumptions.go",
+          "tests": [
+            "TestSATSolverConflictFirstUIPDefaultPipeline",
+            "TestSATSolverConflictLevelZeroCountersAndOwners",
+            "TestSATSolverConflictAssumptionCoreAndReinit",
+            "TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix",
+            "TestSATSolverConflictRuntimeLemmaSpanLifetimeAndGlue",
+            "TestSATSolverConflictWholeOperationAllocationPrefixes",
+            "TestSATSolverConflictClauseReasonBothWatchedPositions",
+            "TestSATSolverConflictFiniteImplicationOracle",
+            "TestSATSolverConflictInitAndOptionalDispatchPrefixes",
+            "TestSATSolverConflictStaleSpanRetainsAllocatedCandidate"
+          ]
+        },
+        {
+          "name": "Concrete borrowed Runtime lemma span without copied or boxed literals; captured block lifetime checked at actual source dereferences",
+          "status": "ported",
+          "go_target": "sat_solver_conflict_span.go",
+          "tests": [
+            "TestSATSolverConflictFirstUIPDefaultPipeline",
+            "TestSATSolverConflictLevelZeroCountersAndOwners",
+            "TestSATSolverConflictAssumptionCoreAndReinit",
+            "TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix",
+            "TestSATSolverConflictRuntimeLemmaSpanLifetimeAndGlue",
+            "TestSATSolverConflictWholeOperationAllocationPrefixes",
+            "TestSATSolverConflictClauseReasonBothWatchedPositions",
+            "TestSATSolverConflictFiniteImplicationOracle",
+            "TestSATSolverConflictInitAndOptionalDispatchPrefixes",
+            "TestSATSolverConflictStaleSpanRetainsAllocatedCandidate"
+          ]
         }
       ],
       "ownership": [
         "Source-width char assignment and scalar columns; charged outer watch tokens/metadata own each actual child once; real activity/queue/trail, borrowed actual todo. No complete solver construction or search.",
-        "Assignment bytes and initialization state are owned solely by the borrowed real Runtime, with source vector capacity/size headers and explicit block/pending tokens; enclosing variable owner charges embedded metadata. Variable graph Stats exclude borrowed runtime, which physical audits add exactly once. Runtime must outlive variable/propagation owners, which require the same actual Runtime identity."
+        "Assignment bytes and initialization state are owned solely by the borrowed real Runtime, with source vector capacity/size headers and explicit block/pending tokens; enclosing variable owner charges embedded metadata. Variable graph Stats exclude borrowed runtime, which physical audits add exactly once. Runtime must outlive variable/propagation owners, which require the same actual Runtime identity.",
+        "Selected conflict owner charges actual cold fields once and borrows existing analysis/dynamic/probing/lifecycle/Runtime; owns actual Runtime assumption/core/literal-set members. Glue and clause consumers read captured lemma blocks directly. Constructor-read errors retain the actually allocated clause/ID in lifecycle pendingCandidate before return. Every real refusal prefix is rooted before fault disable; no host lemma copy or directory-derived owner roots."
       ],
       "deviations": [
         "Wrapped source allocations that cannot represent full typed capacity remain unported; host bounds are separate from exact source overflow DefaultException. Default child policies, full solver constructor, propagation, conflicts, scopes/search and TRACE remain open.",
         "Propagation state borrows actual variable/clause/model-converter/rlimit/Runtime/config owners and owns only its charged cold member grouping/diff-level backing. Cleaner/asymm/probing counters are real selected member state, not child Run implementations. No concrete extension subclass exists in this fork; dispatch fails explicitly at asserted/EXT call sites after completed source prefixes. Full solver constructor, UpdateParams/default policy children, propagation integrity/missed-propagation checks, literal-span num_diff_levels consumers, search/conflicts/scopes and user-scope campaign remain open.",
         "Checkpoint reads the actual bound Runtime allocation counter. SAT arena-backed typed storage has not yet been integrated into that source runtime accounting domain; end-to-end solver memory-limit behavior remains open. No allocation events are fabricated from Budget usage.",
-        "Only assignment char_vector source allocation accounting is integrated in this slice. Other SAT columns/watch/queue/clause/trail/vector allocations still require real global/runtime source hooks. Raw-state bounds/initialization guards act at endangered byte accesses; source DEBUG logical assertions remain distinct. No full solver construction/search or registered assertion completion is claimed."
+        "Only assignment char_vector source allocation accounting is integrated in this slice. Other SAT columns/watch/queue/clause/trail/vector allocations still require real global/runtime source hooks. Raw-state bounds/initialization guards act at endangered byte accesses; source DEBUG logical assertions remain distinct. No full solver construction/search or registered assertion completion is claimed.",
+        "Selected FIRST-UIP and real assumption/init helpers are implemented with default minimization/dynamic subsumption. Full solver construction/Check/search, source extension calls, nonnull parallel exchange, optional MUS/model and global diagnostics remain explicit obligations. Constructor-error candidate retention is a typed owning adapter, not claimed C++ implicit unwinding; no registered user-scope assertion completion is credited."
       ]
     },
     {
@@ -97307,13 +97704,14 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "mpnum/inf_approx_raw_test.go",
         "mpnum/inf_eps_rational.go",
         "mpnum/inf_scalar_projection_test.go",
+        "mpnum/mp_lexical_constructor_test.go",
+        "mpnum/mp_lexical_scope_test.go",
         "mpnum/mp_raw_projection_test.go",
         "mpnum/rational_lexical_scope.go",
-        "mpnum/mp_lexical_scope_test.go",
-        "mpnum/mp_lexical_constructor_test.go",
-        "mpnum/inf_approx_raw_test.go"
+        "mpnum/inf_arithmetic_entry_source_test.go"
       ],
       "tests": [
         "TestInfEpsInfFiniteTripleOracles",
@@ -97382,7 +97780,17 @@
         "TestInfCompareSourceEndGuardRetainsCursor",
         "TestInfCompareSourceReservationPrefixes",
         "TestInfCompareSourceServiceSwap",
-        "TestInfCompareSourceMixedUnreadMasks"
+        "TestInfCompareSourceMixedUnreadMasks",
+        "TestInfArithmeticEntryFirstBeforeEPS",
+        "TestInfArithmeticEntryMixedSkipsEPS",
+        "TestInfArithmeticEntryInfinityBeforeNumeral",
+        "TestInfArithmeticEntryInfIntRawAndOverflow",
+        "TestInfArithmeticEntryMixedSkipsInfinity",
+        "TestInfArithmeticEntryFacadeRawDenominator",
+        "TestInfArithmeticEntryValueCopyBeforeRightRead",
+        "TestInfArithmeticEntryBoundedValuesAndAliases",
+        "TestInfArithmeticEntryRawValueMemberRoutes",
+        "TestInfArithmeticEntryInlineWarmNoAllocation"
       ],
       "conditionals": [
         {
@@ -97627,6 +98035,23 @@
             "TestInfCompareSourceServiceSwap",
             "TestInfCompareSourceMixedUnreadMasks"
           ]
+        },
+        {
+          "name": "Selected InfEps Add/Sub infinity-before-nested-numeral publication and mixed paths that do not read infinity",
+          "status": "ported",
+          "go_target": "mpnum/inf_eps_rational.go",
+          "tests": [
+            "TestInfArithmeticEntryFirstBeforeEPS",
+            "TestInfArithmeticEntryMixedSkipsEPS",
+            "TestInfArithmeticEntryInfinityBeforeNumeral",
+            "TestInfArithmeticEntryInfIntRawAndOverflow",
+            "TestInfArithmeticEntryMixedSkipsInfinity",
+            "TestInfArithmeticEntryFacadeRawDenominator",
+            "TestInfArithmeticEntryValueCopyBeforeRightRead",
+            "TestInfArithmeticEntryBoundedValuesAndAliases",
+            "TestInfArithmeticEntryRawValueMemberRoutes",
+            "TestInfArithmeticEntryInlineWarmNoAllocation"
+          ]
         }
       ],
       "ownership": [
@@ -97738,13 +98163,14 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "mpnum/inf_approx_raw_test.go",
         "mpnum/inf_int_rational.go",
         "mpnum/inf_scalar_projection_test.go",
+        "mpnum/mp_lexical_constructor_test.go",
+        "mpnum/mp_lexical_scope_test.go",
         "mpnum/mp_raw_projection_test.go",
         "mpnum/rational_lexical_scope.go",
-        "mpnum/mp_lexical_scope_test.go",
-        "mpnum/mp_lexical_constructor_test.go",
-        "mpnum/inf_approx_raw_test.go"
+        "mpnum/inf_arithmetic_entry_source_test.go"
       ],
       "tests": [
         "TestInfIntRationalSourceConstructorsConstantsLifetime",
@@ -97815,7 +98241,17 @@
         "TestInfCompareSourceEndGuardRetainsCursor",
         "TestInfCompareSourceReservationPrefixes",
         "TestInfCompareSourceServiceSwap",
-        "TestInfCompareSourceMixedUnreadMasks"
+        "TestInfCompareSourceMixedUnreadMasks",
+        "TestInfArithmeticEntryFirstBeforeEPS",
+        "TestInfArithmeticEntryMixedSkipsEPS",
+        "TestInfArithmeticEntryInfinityBeforeNumeral",
+        "TestInfArithmeticEntryInfIntRawAndOverflow",
+        "TestInfArithmeticEntryMixedSkipsInfinity",
+        "TestInfArithmeticEntryFacadeRawDenominator",
+        "TestInfArithmeticEntryValueCopyBeforeRightRead",
+        "TestInfArithmeticEntryBoundedValuesAndAliases",
+        "TestInfArithmeticEntryRawValueMemberRoutes",
+        "TestInfArithmeticEntryInlineWarmNoAllocation"
       ],
       "conditionals": [
         {
@@ -98022,6 +98458,23 @@
             "TestInfCompareSourceServiceSwap",
             "TestInfCompareSourceMixedUnreadMasks"
           ]
+        },
+        {
+          "name": "Selected same/mixed InfInt Add/Sub cold-owner entry, literal FIRST publication and source machine epsilon overflow guard",
+          "status": "ported",
+          "go_target": "mpnum/inf_int_rational.go",
+          "tests": [
+            "TestInfArithmeticEntryFirstBeforeEPS",
+            "TestInfArithmeticEntryMixedSkipsEPS",
+            "TestInfArithmeticEntryInfinityBeforeNumeral",
+            "TestInfArithmeticEntryInfIntRawAndOverflow",
+            "TestInfArithmeticEntryMixedSkipsInfinity",
+            "TestInfArithmeticEntryFacadeRawDenominator",
+            "TestInfArithmeticEntryValueCopyBeforeRightRead",
+            "TestInfArithmeticEntryBoundedValuesAndAliases",
+            "TestInfArithmeticEntryRawValueMemberRoutes",
+            "TestInfArithmeticEntryInlineWarmNoAllocation"
+          ]
         }
       ],
       "ownership": [
@@ -98188,13 +98641,14 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "mpnum/inf_approx_raw_test.go",
+        "mpnum/inf_guard_profile_test.go",
         "mpnum/inf_rational.go",
         "mpnum/inf_scalar_projection_test.go",
+        "mpnum/mp_lexical_scope_test.go",
         "mpnum/mp_raw_projection_test.go",
         "mpnum/rational_lexical_scope.go",
-        "mpnum/mp_lexical_scope_test.go",
-        "mpnum/inf_guard_profile_test.go",
-        "mpnum/inf_approx_raw_test.go"
+        "mpnum/inf_arithmetic_entry_source_test.go"
       ],
       "tests": [
         "TestInfRationalSource80Assertions",
@@ -98269,7 +98723,17 @@
         "TestInfCompareSourceEndGuardRetainsCursor",
         "TestInfCompareSourceReservationPrefixes",
         "TestInfCompareSourceServiceSwap",
-        "TestInfCompareSourceMixedUnreadMasks"
+        "TestInfCompareSourceMixedUnreadMasks",
+        "TestInfArithmeticEntryFirstBeforeEPS",
+        "TestInfArithmeticEntryMixedSkipsEPS",
+        "TestInfArithmeticEntryInfinityBeforeNumeral",
+        "TestInfArithmeticEntryInfIntRawAndOverflow",
+        "TestInfArithmeticEntryMixedSkipsInfinity",
+        "TestInfArithmeticEntryFacadeRawDenominator",
+        "TestInfArithmeticEntryValueCopyBeforeRightRead",
+        "TestInfArithmeticEntryBoundedValuesAndAliases",
+        "TestInfArithmeticEntryRawValueMemberRoutes",
+        "TestInfArithmeticEntryInlineWarmNoAllocation"
       ],
       "conditionals": [
         {
@@ -98522,6 +98986,23 @@
             "TestInfCompareSourceReservationPrefixes",
             "TestInfCompareSourceServiceSwap",
             "TestInfCompareSourceMixedUnreadMasks"
+          ]
+        },
+        {
+          "name": "Selected same/mixed Add/Sub cold-owner entry and actual FIRST-before-EPS publication; other arithmetic entry profiles remain open",
+          "status": "ported",
+          "go_target": "mpnum/inf_rational.go",
+          "tests": [
+            "TestInfArithmeticEntryFirstBeforeEPS",
+            "TestInfArithmeticEntryMixedSkipsEPS",
+            "TestInfArithmeticEntryInfinityBeforeNumeral",
+            "TestInfArithmeticEntryInfIntRawAndOverflow",
+            "TestInfArithmeticEntryMixedSkipsInfinity",
+            "TestInfArithmeticEntryFacadeRawDenominator",
+            "TestInfArithmeticEntryValueCopyBeforeRightRead",
+            "TestInfArithmeticEntryBoundedValuesAndAliases",
+            "TestInfArithmeticEntryRawValueMemberRoutes",
+            "TestInfArithmeticEntryInlineWarmNoAllocation"
           ]
         }
       ],
@@ -109126,39 +109607,40 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "mpnum/mpq.go",
-        "mpnum/mpq_round.go",
-        "mpnum/mpq_power.go",
-        "mpnum/mpq_parse.go",
-        "mpnum/mp_format.go",
-        "mpnum/mpq_root.go",
-        "mpnum/mp_display.go",
-        "mpnum/mpq_ops.go",
-        "mpnum/mp_copy.go",
-        "mpnum/mpq_number_theory.go",
-        "mpnum/mpq_inspect.go",
-        "mpnum/mpq_bitwise.go",
-        "mpnum/mpz_facade_extra.go",
-        "mpnum/mp_power_publication_test.go",
-        "mpnum/mp_bitwise_publication_test.go",
-        "mpnum/mp_div_publication_test.go",
-        "mpnum/mp_add_publication_test.go",
-        "mpnum/mp_gcd_publication_test.go",
-        "mpnum/mpz_gcd_diagnostics_debug.go",
-        "mpnum/mpz_gcd_diagnostics_release.go",
-        "mpnum/mp_round_publication_test.go",
-        "mpnum/mpq_round_test.go",
-        "mpnum/mp_scalar_projection_test.go",
-        "mpnum/mpq_owner_cleanup.go",
         "mpnum/construction_failure.go",
         "mpnum/inf_scalar_projection_test.go",
-        "mpnum/mpq_source_finalize.go",
-        "mpnum/transitive_source_finalize_test.go",
-        "mpnum/mp_raw_projection_test.go",
-        "mpnum/rational_lexical_scope.go",
+        "mpnum/mp_add_publication_test.go",
+        "mpnum/mp_bitwise_publication_test.go",
+        "mpnum/mp_copy.go",
+        "mpnum/mp_display.go",
+        "mpnum/mp_div_publication_test.go",
+        "mpnum/mp_format.go",
+        "mpnum/mp_gcd_publication_test.go",
         "mpnum/mp_lexical_scope_test.go",
+        "mpnum/mp_power_publication_test.go",
+        "mpnum/mp_raw_projection_test.go",
+        "mpnum/mp_round_publication_test.go",
+        "mpnum/mp_scalar_projection_test.go",
+        "mpnum/mpq.go",
+        "mpnum/mpq_bitwise.go",
+        "mpnum/mpq_inspect.go",
+        "mpnum/mpq_number_theory.go",
+        "mpnum/mpq_ops.go",
+        "mpnum/mpq_owner_cleanup.go",
+        "mpnum/mpq_parse.go",
+        "mpnum/mpq_power.go",
         "mpnum/mpq_raw_arithmetic_scope.go",
-        "mpnum/mpq_raw_arithmetic_scope_test.go"
+        "mpnum/mpq_raw_arithmetic_scope_test.go",
+        "mpnum/mpq_root.go",
+        "mpnum/mpq_round.go",
+        "mpnum/mpq_round_test.go",
+        "mpnum/mpq_source_finalize.go",
+        "mpnum/mpz_facade_extra.go",
+        "mpnum/mpz_gcd_diagnostics_debug.go",
+        "mpnum/mpz_gcd_diagnostics_release.go",
+        "mpnum/rational_lexical_scope.go",
+        "mpnum/transitive_source_finalize_test.go",
+        "mpnum/mpq_arithmetic_entry_source_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -109380,7 +109862,11 @@
         "TestInfCompareSourceEndGuardRetainsCursor",
         "TestInfCompareSourceReservationPrefixes",
         "TestInfCompareSourceServiceSwap",
-        "TestInfCompareSourceMixedUnreadMasks"
+        "TestInfCompareSourceMixedUnreadMasks",
+        "TestRationalArithmeticEntryMulNUMBeforeDEN",
+        "TestRationalArithmeticEntryDivNUMBeforeDEN",
+        "TestRationalArithmeticEntryDivAliasRetainsRawLocal",
+        "TestRationalArithmeticEntryDivEndGuardAndOwningRetry"
       ],
       "conditionals": [
         {
@@ -110368,6 +110854,28 @@
             "TestInfCompareSourceServiceSwap",
             "TestInfCompareSourceMixedUnreadMasks"
           ]
+        },
+        {
+          "name": "Selected raw two-rational Mul/Div cold entry, structural IsInt short circuit and direct NUM/DEN source action order",
+          "status": "ported",
+          "go_target": "mpnum/mpq.go",
+          "tests": [
+            "TestRationalArithmeticEntryMulNUMBeforeDEN",
+            "TestRationalArithmeticEntryDivNUMBeforeDEN",
+            "TestRationalArithmeticEntryDivAliasRetainsRawLocal",
+            "TestRationalArithmeticEntryDivEndGuardAndOwningRetry"
+          ]
+        },
+        {
+          "name": "Actual divisor-output alias raw Int, source Del end cursor, body-error retained roots and separate owning cleanup; charged raw header ten Int fields",
+          "status": "ported",
+          "go_target": "mpnum/mpq_raw_arithmetic_scope.go",
+          "tests": [
+            "TestRationalArithmeticEntryMulNUMBeforeDEN",
+            "TestRationalArithmeticEntryDivNUMBeforeDEN",
+            "TestRationalArithmeticEntryDivAliasRetainsRawLocal",
+            "TestRationalArithmeticEntryDivEndGuardAndOwningRetry"
+          ]
         }
       ],
       "ownership": [
@@ -110389,7 +110897,8 @@
         "All four rounding outputs use existing roundCore directly against the caller; source sign is captured before division and rational denominator resets only after successful integer rounding. Immediate fault roots, integral BIG Copy refusal, quotient-before-correction refusal and raw component aliases are tested. See PORT_PROGRESS.md#audit-mpq-rounding-publication-packet-md; physical allocator-backed cleanup remains separate unfinished work.",
         "Checked owning cleanup retains a per-component source outer-field cursor and forwards real child failures. This is not full transitive source finalization.",
         "Real remaining temporary Rational records are moved into charged embedded service9/manager1 storage before stack owners vanish; completed source destruction and partial-constructor owning abort are distinguished. Named-return finishers propagate refused cleanup and retain unpublished result roots. Public Inf Del retains caller suffix in actual source component order; pure queries and caller cleanup remain usable. Explicit CleanupLexical is Go owning recovery, not source destructor retry equivalence.",
-        "Selected source comparison/unary/reset/swap paths check cold ownership then each reached component action, preserving unread invalid fields and partial publication. Actual SYNCH RAW comparison locals are charged distinct manager fields, normal deletion cursor follows source, body failure retains real limbs for explicit owning cleanup. Service lexical bound9 unchanged; copied unary results use existing literal constructor/temporary machinery. Immediate caller-named physical censuses, cold reservation sweeps and warm allocation checks cover selected routes. Unrelated arithmetic and Go-extension Move preflights remain open."
+        "Selected source comparison/unary/reset/swap paths check cold ownership then each reached component action, preserving unread invalid fields and partial publication. Actual SYNCH RAW comparison locals are charged distinct manager fields, normal deletion cursor follows source, body failure retains real limbs for explicit owning cleanup. Service lexical bound9 unchanged; copied unary results use existing literal constructor/temporary machinery. Immediate caller-named physical censuses, cold reservation sweeps and warm allocation checks cover selected routes. Unrelated arithmetic and Go-extension Move preflights remain open.",
+        "Selected alias division owns a real retained raw Int; source body failure skips explicit Del, source end precedes sign/normalize, and owning cleanup is separate. The raw scope is ten Int fields charged by the manager header; facade lexical bound remains nine. Named physical audits include active div and retain exact equality."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -116936,17 +117445,18 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "mpnum/mpq_inspect.go",
-        "mpnum/rational_service.go",
-        "mpnum/rational_service_ops.go",
-        "mpnum/rational_service_extra.go",
         "mpnum/inf_scalar_projection_test.go",
-        "mpnum/mp_raw_projection_test.go",
-        "mpnum/rational_lexical_scope.go",
-        "mpnum/mp_lexical_scope_test.go",
         "mpnum/mp_lexical_constructor_test.go",
+        "mpnum/mp_lexical_scope_test.go",
+        "mpnum/mp_raw_projection_test.go",
+        "mpnum/mpq_inspect.go",
+        "mpnum/rational_lexical_scope.go",
+        "mpnum/rational_service.go",
+        "mpnum/rational_service_extra.go",
+        "mpnum/rational_service_ops.go",
         "mpnum/upolynomial_rational_context.go",
-        "mpnum/upolynomial_rational_context_test.go"
+        "mpnum/upolynomial_rational_context_test.go",
+        "mpnum/inf_arithmetic_entry_source_test.go"
       ],
       "tests": [
         "TestSourceRationalConversionAssertions",
@@ -117055,7 +117565,17 @@
         "TestInfCompareSourceEndGuardRetainsCursor",
         "TestInfCompareSourceReservationPrefixes",
         "TestInfCompareSourceServiceSwap",
-        "TestInfCompareSourceMixedUnreadMasks"
+        "TestInfCompareSourceMixedUnreadMasks",
+        "TestInfArithmeticEntryFirstBeforeEPS",
+        "TestInfArithmeticEntryMixedSkipsEPS",
+        "TestInfArithmeticEntryInfinityBeforeNumeral",
+        "TestInfArithmeticEntryInfIntRawAndOverflow",
+        "TestInfArithmeticEntryMixedSkipsInfinity",
+        "TestInfArithmeticEntryFacadeRawDenominator",
+        "TestInfArithmeticEntryValueCopyBeforeRightRead",
+        "TestInfArithmeticEntryBoundedValuesAndAliases",
+        "TestInfArithmeticEntryRawValueMemberRoutes",
+        "TestInfArithmeticEntryInlineWarmNoAllocation"
       ],
       "conditionals": [
         {
@@ -117512,6 +118032,23 @@
             "TestInfCompareSourceServiceSwap",
             "TestInfCompareSourceMixedUnreadMasks"
           ]
+        },
+        {
+          "name": "Selected facade Add/Sub cold provenance and left copy before reached right numeral, including literal zero-denominator shapes",
+          "status": "ported",
+          "go_target": "mpnum/rational_service_ops.go",
+          "tests": [
+            "TestInfArithmeticEntryFirstBeforeEPS",
+            "TestInfArithmeticEntryMixedSkipsEPS",
+            "TestInfArithmeticEntryInfinityBeforeNumeral",
+            "TestInfArithmeticEntryInfIntRawAndOverflow",
+            "TestInfArithmeticEntryMixedSkipsInfinity",
+            "TestInfArithmeticEntryFacadeRawDenominator",
+            "TestInfArithmeticEntryValueCopyBeforeRightRead",
+            "TestInfArithmeticEntryBoundedValuesAndAliases",
+            "TestInfArithmeticEntryRawValueMemberRoutes",
+            "TestInfArithmeticEntryInlineWarmNoAllocation"
+          ]
         }
       ],
       "ownership": [
@@ -117520,7 +118057,8 @@
         "Owner-local concrete facade validates all operand provenance before raw actions, locks the service once, and releases scoped temporaries in source order. Value arithmetic retains both source copies; named returns transfer ownership. See PORT_PROGRESS.md#audit-rational-facade-port-status-md.",
         "Complete facade uses existing budgeted service manager and checked scoped deep-copy bridges. Source const references become independent owning copies; root/coefficient outputs preserve actual identity, source failure/alias prefixes and g3debug assertion timing. See PORT_PROGRESS.md#audit-rational-facade-extra-port-status-md.",
         "Real remaining temporary Rational records are moved into charged embedded service9/manager1 storage before stack owners vanish; completed source destruction and partial-constructor owning abort are distinguished. Named-return finishers propagate refused cleanup and retain unpublished result roots. Public Inf Del retains caller suffix in actual source component order; pure queries and caller cleanup remain usable. Explicit CleanupLexical is Go owning recovery, not source destructor retry equivalence.",
-        "Selected source comparison/unary/reset/swap paths check cold ownership then each reached component action, preserving unread invalid fields and partial publication. Actual SYNCH RAW comparison locals are charged distinct manager fields, normal deletion cursor follows source, body failure retains real limbs for explicit owning cleanup. Service lexical bound9 unchanged; copied unary results use existing literal constructor/temporary machinery. Immediate caller-named physical censuses, cold reservation sweeps and warm allocation checks cover selected routes. Unrelated arithmetic and Go-extension Move preflights remain open."
+        "Selected source comparison/unary/reset/swap paths check cold ownership then each reached component action, preserving unread invalid fields and partial publication. Actual SYNCH RAW comparison locals are charged distinct manager fields, normal deletion cursor follows source, body failure retains real limbs for explicit owning cleanup. Service lexical bound9 unchanged; copied unary results use existing literal constructor/temporary machinery. Immediate caller-named physical censuses, cold reservation sweeps and warm allocation checks cover selected routes. Unrelated arithmetic and Go-extension Move preflights remain open.",
+        "Selected alias division owns a real retained raw Int; source body failure skips explicit Del, source end precedes sign/normalize, and owning cleanup is separate. The raw scope is ten Int fields charged by the manager header; facade lexical bound remains nine. Named physical audits include active div and retain exact equality."
       ],
       "deviations": [
         "Explicit manager projects rational.h inclusive32-bit wrappers, distinct from strict MPZ boundaries; global wrapper remains incomplete. Float positive converted denominator SASSERT becomes typed ErrRationalFloatDomain. Source raw component alias publication can leave denominator zero; subsequent operations diagnose initialization.",

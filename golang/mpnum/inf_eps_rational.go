@@ -1178,10 +1178,10 @@ func (s *RationalService) InfEpsInfAddAssign(a, b *OwnedInfEpsInfRational) error
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(a); e != nil {
+	if e := s.infEpsScalarOwner(a); e != nil {
 		return e
 	}
-	if e := s.infEpsInfCheck(b); e != nil {
+	if e := s.infEpsScalarOwner(b); e != nil {
 		return e
 	}
 	return s.infEpsInfCompound(a, b, false)
@@ -1195,10 +1195,10 @@ func (s *RationalService) InfEpsInfAdd(a, b *OwnedInfEpsInfRational) (_lexOut Ow
 		return OwnedInfEpsInfRational{}, e
 	}
 	defer s.endLexicalEps(&_lexOut, &_lexErr)
-	if e := s.infEpsInfCheck(a); e != nil {
+	if e := s.infEpsScalarOwner(a); e != nil {
 		return OwnedInfEpsInfRational{}, e
 	}
-	if e := s.infEpsInfCheck(b); e != nil {
+	if e := s.infEpsScalarOwner(b); e != nil {
 		return OwnedInfEpsInfRational{}, e
 	}
 	work, e := s.infEpsInfClone(a)
@@ -1216,10 +1216,10 @@ func (s *RationalService) InfEpsInfAddInfAssign(v *OwnedInfEpsInfRational, n *Ow
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return e
 	}
-	if e := s.infCheck(n); e != nil {
+	if e := s.infScalarOwner(n); e != nil {
 		return e
 	}
 	return s.infCompound(&v.numeral, n, false)
@@ -1229,10 +1229,10 @@ func (s *RationalService) InfEpsInfSubAssign(a, b *OwnedInfEpsInfRational) error
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(a); e != nil {
+	if e := s.infEpsScalarOwner(a); e != nil {
 		return e
 	}
-	if e := s.infEpsInfCheck(b); e != nil {
+	if e := s.infEpsScalarOwner(b); e != nil {
 		return e
 	}
 	return s.infEpsInfCompound(a, b, true)
@@ -1246,10 +1246,10 @@ func (s *RationalService) InfEpsInfSub(a, b *OwnedInfEpsInfRational) (_lexOut Ow
 		return OwnedInfEpsInfRational{}, e
 	}
 	defer s.endLexicalEps(&_lexOut, &_lexErr)
-	if e := s.infEpsInfCheck(a); e != nil {
+	if e := s.infEpsScalarOwner(a); e != nil {
 		return OwnedInfEpsInfRational{}, e
 	}
-	if e := s.infEpsInfCheck(b); e != nil {
+	if e := s.infEpsScalarOwner(b); e != nil {
 		return OwnedInfEpsInfRational{}, e
 	}
 	work, e := s.infEpsInfClone(a)
@@ -1267,10 +1267,10 @@ func (s *RationalService) InfEpsInfSubInfAssign(v *OwnedInfEpsInfRational, n *Ow
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return e
 	}
-	if e := s.infCheck(n); e != nil {
+	if e := s.infScalarOwner(n); e != nil {
 		return e
 	}
 	return s.infCompound(&v.numeral, n, true)
@@ -1280,10 +1280,10 @@ func (s *RationalService) InfEpsInfAddRationalAssign(v *OwnedInfEpsInfRational, 
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return e
 	}
-	if e := s.check(r); e != nil {
+	if e := s.rationalScalarOwner(r); e != nil {
 		return e
 	}
 	return s.infEpsInfScalar(v, &r.raw, '+')
@@ -1293,10 +1293,10 @@ func (s *RationalService) InfEpsInfSubRationalAssign(v *OwnedInfEpsInfRational, 
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return e
 	}
-	if e := s.check(r); e != nil {
+	if e := s.rationalScalarOwner(r); e != nil {
 		return e
 	}
 	return s.infEpsInfScalar(v, &r.raw, '-')

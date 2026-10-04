@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Source: src/util/mpq.h; src/util/rational.h (ownership audit adaptation). Licensed under the MIT license.
 package g3
 
 import (
@@ -59,6 +59,16 @@ func numericServiceScratchRoots(t *testing.T, q *mpnum.RationalService) (uint32,
 	}
 	for _, name := range []string{"nTmp", "addTmp1", "addTmp2", "addMulTmp", "ltTmp1", "ltTmp2"} {
 		number(manager.FieldByName(name))
+	}
+	arithmetic := manager.FieldByName("rawArithmetic")
+	for _, local := range []struct{ active, field string }{
+		{"powerActive", "power"}, {"addActive", "addOne"}, {"addActive", "addTwo"},
+		{"normActive", "norm"}, {"compareActive", "compareOne"}, {"compareActive", "compareTwo"},
+		{"divActive", "div"},
+	} {
+		if arithmetic.FieldByName(local.active).Bool() {
+			number(arithmetic.FieldByName(local.field))
+		}
 	}
 	for _, name := range []string{"zero", "one", "minusOne", "infZero", "infOne", "infMinusOne", "infIntZero", "infIntOne", "infIntMinusOne"} {
 		number(service.FieldByName(name))

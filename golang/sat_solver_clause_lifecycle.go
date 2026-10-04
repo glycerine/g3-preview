@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Source: src/sat/sat_solver.cpp and .h. Licensed under the MIT license.
 package g3
 
 import (
@@ -158,6 +158,9 @@ func (s *satSolverClauseLifecycle) cleanupCandidate() error {
 	return nil
 }
 func (s *satSolverClauseLifecycle) mkClauseCore(n uint32, lits []satLiteral, learned bool) (satStoredClauseRef, error) {
+	return s.mkClauseCoreSpan(n, satSolverLiteralSpan{literals: lits}, learned)
+}
+func (s *satSolverClauseLifecycle) mkClauseCoreSpan(n uint32, span satSolverLiteralSpan, learned bool) (satStoredClauseRef, error) {
 	if e := s.open(); e != nil {
 		return satStoredClauseRef{}, e
 	}
@@ -166,6 +169,10 @@ func (s *satSolverClauseLifecycle) mkClauseCore(n uint32, lits []satLiteral, lea
 	}
 	p := s.propagation
 	if !learned {
+		if span.runtime != nil {
+			return satStoredClauseRef{}, ErrSATOwner
+		} // private Runtime bridge is the actual learned-lemma consumer
+		lits := span.literals
 		v := p.variables.clauseState()
 		keep, e := v.simplifyClause(p.variables.scopeLevel, &n, lits)
 		if e != nil {
@@ -181,28 +188,45 @@ func (s *satSolverClauseLifecycle) mkClauseCore(n uint32, lits []satLiteral, lea
 		p.setConflict(satJustification{}, satDefaultLiteral())
 		return satStoredClauseRef{}, nil
 	case 1:
-		if len(lits) == 0 {
+		if span.runtime == nil && len(span.literals) == 0 {
 			return satStoredClauseRef{}, arena.ErrBounds
 		}
-		return satStoredClauseRef{}, p.assign(lits[0], satJustification{})
+		lit, e := span.literal(0)
+		if e != nil {
+			return satStoredClauseRef{}, e
+		}
+		return satStoredClauseRef{}, p.assign(lit, satJustification{})
 	case 2:
-		if len(lits) < 2 {
+		if span.runtime == nil && len(span.literals) < 2 {
 			return satStoredClauseRef{}, arena.ErrBounds
 		}
-		return satStoredClauseRef{}, s.mkBinClause(lits[0], lits[1], learned)
+		a, e := span.literal(0)
+		if e != nil {
+			return satStoredClauseRef{}, e
+		}
+		b, e := span.literal(1)
+		if e != nil {
+			return satStoredClauseRef{}, e
+		}
+		return satStoredClauseRef{}, s.mkBinClause(a, b, learned)
 	case 3:
-		return s.mkTerClause(lits, learned)
+		return s.mkTerClauseSpan(span, learned)
 	default:
-		return s.mkNaryClause(n, lits, learned)
+		return s.mkNaryClauseSpan(n, span, learned)
 	}
 }
 func (s *satSolverClauseLifecycle) mkTerClause(lits []satLiteral, learned bool) (satStoredClauseRef, error) {
+	return s.mkTerClauseSpan(satSolverLiteralSpan{literals: lits}, learned)
+}
+func (s *satSolverClauseLifecycle) mkTerClauseSpan(span satSolverLiteralSpan, learned bool) (satStoredClauseRef, error) {
 	s.mkTernary++
-	c, e := s.propagation.clauses.MkClauseN(3, lits, learned)
+	c, e := s.propagation.clauses.mkClauseSpan(3, span, learned)
+	// Retain the actual allocated candidate even if a guarded constructor read
+	// fails. This is owning error continuation, not source exception rollback.
+	s.pendingCandidate = c
 	if e != nil {
 		return c, e
 	}
-	s.pendingCandidate = c
 	reinit, e := s.attachTerClause(c)
 	if e != nil {
 		return c, e
@@ -215,12 +239,17 @@ func (s *satSolverClauseLifecycle) mkTerClause(lits []satLiteral, learned bool) 
 	return c, s.publishCandidate(learned)
 }
 func (s *satSolverClauseLifecycle) mkNaryClause(n uint32, lits []satLiteral, learned bool) (satStoredClauseRef, error) {
+	return s.mkNaryClauseSpan(n, satSolverLiteralSpan{literals: lits}, learned)
+}
+func (s *satSolverClauseLifecycle) mkNaryClauseSpan(n uint32, span satSolverLiteralSpan, learned bool) (satStoredClauseRef, error) {
 	s.mkNary++
-	c, e := s.propagation.clauses.MkClauseN(n, lits, learned)
+	c, e := s.propagation.clauses.mkClauseSpan(n, span, learned)
+	// Retain the actual allocated candidate even if a guarded constructor read
+	// fails. This is owning error continuation, not source exception rollback.
+	s.pendingCandidate = c
 	if e != nil {
 		return c, e
 	}
-	s.pendingCandidate = c
 	if satStorageSourceDebug && learned {
 		flag, e := s.propagation.clauses.Learned(c)
 		if e != nil {

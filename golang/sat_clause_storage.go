@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Source: src/sat/sat_solver.cpp; src/sat/sat_clause.h. Licensed under the MIT license.
 // Concrete standalone storage translation of sat_clause.h/.cpp.
 package g3
 
@@ -178,6 +178,9 @@ func (a *satClauseAllocator) allocate(n uint32) (satStoredClauseRef, error) {
 	return satStoredClauseRef{a.origin, uint32(r.Slot), uint32(r.Generation), 0}, nil
 }
 func (a *satClauseAllocator) construct(r satStoredClauseRef, id, n uint32, lits []satLiteral, learned bool) error {
+	return a.constructSpan(r, id, n, satSolverLiteralSpan{literals: lits}, learned)
+}
+func (a *satClauseAllocator) constructSpan(r satStoredClauseRef, id, n uint32, span satSolverLiteralSpan, learned bool) error {
 	flags := uint32(0)
 	if learned {
 		flags = 4
@@ -187,11 +190,15 @@ func (a *satClauseAllocator) construct(r satStoredClauseRef, id, n uint32, lits 
 			return e
 		}
 	}
-	if uint64(len(lits)) < uint64(n) {
+	if span.runtime == nil && uint64(len(span.literals)) < uint64(n) {
 		return arena.ErrBounds
 	}
 	for i := uint32(0); i < n; i++ {
-		if e := a.writeWord(r, uint64(i)+5, uint32(lits[i])); e != nil {
+		lit, e := span.literal(i)
+		if e != nil {
+			return e
+		}
+		if e := a.writeWord(r, uint64(i)+5, uint32(lit)); e != nil {
 			return e
 		}
 	}
@@ -218,6 +225,9 @@ func (a *satClauseAllocator) MkClause(lits []satLiteral, learned bool) (satStore
 // A constructor error after storage/ID publication returns its owned ref so the
 // caller can inspect/reclaim the completed prefix; no hidden rollback of IDs.
 func (a *satClauseAllocator) MkClauseN(n uint32, lits []satLiteral, learned bool) (satStoredClauseRef, error) {
+	return a.mkClauseSpan(n, satSolverLiteralSpan{literals: lits}, learned)
+}
+func (a *satClauseAllocator) mkClauseSpan(n uint32, span satSolverLiteralSpan, learned bool) (satStoredClauseRef, error) {
 	if e := a.open(); e != nil {
 		return satStoredClauseRef{}, e
 	}
@@ -229,7 +239,7 @@ func (a *satClauseAllocator) MkClauseN(n uint32, lits []satLiteral, learned bool
 	if !a.temporary {
 		id = a.ids.mk()
 	}
-	return r, a.construct(r, id, n, lits, learned)
+	return r, a.constructSpan(r, id, n, span, learned)
 }
 func (a *satClauseAllocator) release(r satStoredClauseRef) error {
 	if e := a.validate(r); e != nil {

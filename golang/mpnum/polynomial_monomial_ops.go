@@ -14,7 +14,7 @@ type monomialInput struct {
 
 func (in monomialInput) read(i uint32) (MonomialPower, error) {
 	if in.manager != nil {
-		return in.manager.powerCore(in.value, i)
+		return in.manager.rawPowerCore(in.value, i)
 	}
 	if uint64(i) >= uint64(len(in.powers)) {
 		return MonomialPower{}, arena.ErrBounds
@@ -29,6 +29,25 @@ func (in monomialInput) variable(i uint32) (uint32, error) {
 		return 0, arena.ErrBounds
 	}
 	return in.powers[i].Var, nil
+}
+func (in monomialInput) degree(i uint32) (uint32, error) {
+	if in.manager != nil {
+		return in.manager.powerFieldCore(in.value, i, 4)
+	}
+	if uint64(i) >= uint64(len(in.powers)) {
+		return 0, arena.ErrBounds
+	}
+	return in.powers[i].Degree, nil
+}
+
+// Whole raw-array copies fetch both members only when the source copy is reached.
+func (m *MonomialManager) rawPowerCore(a Monomial, i uint32) (MonomialPower, error) {
+	v, e := m.powerFieldCore(a, i, 0)
+	if e != nil {
+		return MonomialPower{}, e
+	}
+	d, e := m.powerFieldCore(a, i, 4)
+	return MonomialPower{v, d}, e
 }
 func (in monomialInput) valid() (bool, error) {
 	for i := uint32(1); i < in.count; i++ {
@@ -134,22 +153,41 @@ func (m *MonomialManager) mulInputs(left, right monomialInput) (Monomial, error)
 			}
 			break
 		}
-		p, e := left.read(i)
+		v1, e := left.variable(i)
 		if e != nil {
 			return Monomial{}, e
 		}
-		q, e := right.read(j)
+		v2, e := right.variable(j)
 		if e != nil {
 			return Monomial{}, e
 		}
-		if p.Var == q.Var {
-			p.Degree += q.Degree
+		var p MonomialPower
+		if v1 == v2 {
+			d1, e := left.degree(i)
+			if e != nil {
+				return Monomial{}, e
+			}
+			d2, e := right.degree(j)
+			if e != nil {
+				return Monomial{}, e
+			}
+			p = MonomialPower{v1, d1 + d2}
 			i++
 			j++
-		} else if p.Var < q.Var {
+		} else if v1 < v2 {
+			p, e = left.read(i)
+			if e != nil {
+				return Monomial{}, e
+			}
 			i++
 		} else {
-			p = q
+			if modularSourceDebug && v1 <= v2 {
+				return Monomial{}, ErrMonomialAssertion
+			}
+			p, e = right.read(j)
+			if e != nil {
+				return Monomial{}, e
+			}
 			j++
 		}
 		if e = m.tempSetPower(t, k, p); e != nil {
@@ -165,16 +203,16 @@ func (m *MonomialManager) mulInputs(left, right monomialInput) (Monomial, error)
 		return r, e
 	}
 	if modularSourceDebug {
-		z, e := m.headerCore(r)
-		if e != nil {
-			return r, e
-		}
 		ok, e := m.IsValid(r)
 		if e != nil {
 			return r, e
 		}
 		if !ok {
 			return r, ErrMonomialAssertion
+		}
+		total, e := m.degreeCore(r)
+		if e != nil {
+			return r, e
 		}
 		dx, e := left.degreeSum()
 		if e != nil {
@@ -184,36 +222,36 @@ func (m *MonomialManager) mulInputs(left, right monomialInput) (Monomial, error)
 		if e != nil {
 			return r, e
 		}
-		if z.TotalDegree != dx+dy {
+		if total != dx+dy {
 			return r, ErrMonomialAssertion
 		}
 	}
 	return r, nil
 }
 func (m *MonomialManager) divCore(a, b Monomial, store bool) (bool, error) {
-	x, e := m.sizeInfoCore(a)
+	n, e := m.sizeCore(a)
 	if e != nil {
 		return false, e
 	}
-	y, e := m.sizeInfoCore(b)
+	k2, e := m.sizeCore(b)
 	if e != nil {
 		return false, e
 	}
 	t := &m.temps[1]
 	if store {
-		if e = m.tempReserve(t, x.Size); e != nil {
+		if e = m.tempReserve(t, n); e != nil {
 			return false, e
 		}
 	}
 	i, j, k := uint32(0), uint32(0), uint32(0)
-	if x.Size < y.Size {
+	if n < k2 {
 		return false, nil
 	}
 	for {
-		if j == y.Size {
+		if j == k2 {
 			if store {
-				for ; i < x.Size; i++ {
-					p, e := m.powerCore(a, i)
+				for ; i < n; i++ {
+					p, e := m.rawPowerCore(a, i)
 					if e != nil {
 						return false, e
 					}
@@ -228,32 +266,43 @@ func (m *MonomialManager) divCore(a, b Monomial, store bool) (bool, error) {
 			}
 			return true, nil
 		}
-		if i == x.Size {
+		if i == n {
 			return false, nil
 		}
-		p, e := m.powerCore(a, i)
+		v1, e := m.powerFieldCore(a, i, 0)
 		if e != nil {
 			return false, e
 		}
-		q, e := m.powerCore(b, j)
+		v2, e := m.powerFieldCore(b, j, 0)
 		if e != nil {
 			return false, e
 		}
-		if p.Var == q.Var {
-			if p.Degree < q.Degree {
+		if v1 == v2 {
+			d1, e := m.powerFieldCore(a, i, 4)
+			if e != nil {
+				return false, e
+			}
+			d2, e := m.powerFieldCore(b, j, 4)
+			if e != nil {
+				return false, e
+			}
+			if d1 < d2 {
 				return false, nil
 			}
-			if store && p.Degree > q.Degree {
-				p.Degree -= q.Degree
-				if e = m.tempSetPower(t, k, p); e != nil {
+			if store && d1 > d2 {
+				if e = m.tempSetPower(t, k, MonomialPower{v1, d1 - d2}); e != nil {
 					return false, e
 				}
 				k++
 			}
 			i++
 			j++
-		} else if p.Var < q.Var {
+		} else if v1 < v2 {
 			if store {
+				p, e := m.rawPowerCore(a, i)
+				if e != nil {
+					return false, e
+				}
 				if e = m.tempSetPower(t, k, p); e != nil {
 					return false, e
 				}
@@ -261,6 +310,9 @@ func (m *MonomialManager) divCore(a, b Monomial, store bool) (bool, error) {
 			}
 			i++
 		} else {
+			if modularSourceDebug && v1 <= v2 {
+				return false, ErrMonomialAssertion
+			}
 			return false, nil
 		}
 	}
@@ -311,39 +363,38 @@ func (m *MonomialManager) Divide(a, b Monomial) (Monomial, bool, error) {
 	return r, true, e
 }
 func (m *MonomialManager) gcdCore(a, b Monomial) (bool, error) {
-	x, e := m.sizeInfoCore(a)
+	n1, e := m.sizeCore(a)
 	if e != nil {
 		return false, e
 	}
-	y, e := m.sizeInfoCore(b)
+	n2, e := m.sizeCore(b)
 	if e != nil {
 		return false, e
 	}
 	g, r1, r2 := &m.temps[1], &m.temps[2], &m.temps[3]
-	n := x.Size
-	if y.Size < n {
-		n = y.Size
+	n := n1
+	if n2 < n {
+		n = n2
 	}
 	if e = m.tempReserve(g, n); e != nil {
 		return false, e
 	}
-	// These source reserve arguments are deliberately opposite to the eventual
-	// quotient lengths. Do not silently correct its endangered wide-size case.
-	if e = m.tempReserve(r1, y.Size); e != nil {
+	// Preserve the source's opposite remainder reserve arguments.
+	if e = m.tempReserve(r1, n2); e != nil {
 		return false, e
 	}
-	if e = m.tempReserve(r2, x.Size); e != nil {
+	if e = m.tempReserve(r2, n1); e != nil {
 		return false, e
 	}
 	found := false
 	i, j, u, v, w := uint32(0), uint32(0), uint32(0), uint32(0), uint32(0)
 	for {
-		if i == x.Size {
+		if i == n1 {
 			if !found {
 				return false, nil
 			}
-			for ; j < y.Size; j++ {
-				p, e := m.powerCore(b, j)
+			for ; j < n2; j++ {
+				p, e := m.rawPowerCore(b, j)
 				if e != nil {
 					return false, e
 				}
@@ -354,12 +405,12 @@ func (m *MonomialManager) gcdCore(a, b Monomial) (bool, error) {
 			}
 			break
 		}
-		if j == y.Size {
+		if j == n2 {
 			if !found {
 				return false, nil
 			}
-			for ; i < x.Size; i++ {
-				p, e := m.powerCore(a, i)
+			for ; i < n1; i++ {
+				p, e := m.rawPowerCore(a, i)
 				if e != nil {
 					return false, e
 				}
@@ -370,37 +421,58 @@ func (m *MonomialManager) gcdCore(a, b Monomial) (bool, error) {
 			}
 			break
 		}
-		p, e := m.powerCore(a, i)
+		v1, e := m.powerFieldCore(a, i, 0)
 		if e != nil {
 			return false, e
 		}
-		q, e := m.powerCore(b, j)
+		v2, e := m.powerFieldCore(b, j, 0)
 		if e != nil {
 			return false, e
 		}
-		if p.Var == q.Var {
+		if v1 == v2 {
 			found = true
-			if p.Degree > q.Degree {
-				p.Degree -= q.Degree
-				if e = m.tempSetPower(r1, u, p); e != nil {
+			d1, e := m.powerFieldCore(a, i, 4)
+			if e != nil {
+				return false, e
+			}
+			d2, e := m.powerFieldCore(b, j, 4)
+			if e != nil {
+				return false, e
+			}
+			if d1 > d2 {
+				if e = m.tempSetPower(r1, u, MonomialPower{v1, d1 - d2}); e != nil {
 					return false, e
 				}
-				u++
-				if e = m.tempSetPower(g, w, q); e != nil {
+				p, e := m.rawPowerCore(b, j)
+				if e != nil {
 					return false, e
 				}
-				w++
-			} else if q.Degree > p.Degree {
-				q.Degree -= p.Degree
-				if e = m.tempSetPower(r2, v, q); e != nil {
-					return false, e
-				}
-				v++
 				if e = m.tempSetPower(g, w, p); e != nil {
 					return false, e
 				}
+				u++
+				w++
+			} else if d2 > d1 {
+				if e = m.tempSetPower(r2, v, MonomialPower{v2, d2 - d1}); e != nil {
+					return false, e
+				}
+				p, e := m.rawPowerCore(a, i)
+				if e != nil {
+					return false, e
+				}
+				if e = m.tempSetPower(g, w, p); e != nil {
+					return false, e
+				}
+				v++
 				w++
 			} else {
+				if modularSourceDebug && d1 != d2 {
+					return false, ErrMonomialAssertion
+				}
+				p, e := m.rawPowerCore(a, i)
+				if e != nil {
+					return false, e
+				}
 				if e = m.tempSetPower(g, w, p); e != nil {
 					return false, e
 				}
@@ -408,14 +480,25 @@ func (m *MonomialManager) gcdCore(a, b Monomial) (bool, error) {
 			}
 			i++
 			j++
-		} else if p.Var < q.Var {
+		} else if v1 < v2 {
+			p, e := m.rawPowerCore(a, i)
+			if e != nil {
+				return false, e
+			}
 			if e = m.tempSetPower(r1, u, p); e != nil {
 				return false, e
 			}
 			u++
 			i++
 		} else {
-			if e = m.tempSetPower(r2, v, q); e != nil {
+			if modularSourceDebug && v1 <= v2 {
+				return false, ErrMonomialAssertion
+			}
+			p, e := m.rawPowerCore(b, j)
+			if e != nil {
+				return false, e
+			}
+			if e = m.tempSetPower(r2, v, p); e != nil {
 				return false, e
 			}
 			v++
@@ -519,14 +602,22 @@ func (m *MonomialManager) Sqrt(a Monomial) (Monomial, bool, error) {
 		return Monomial{}, false, e
 	}
 	for i := uint32(0); i < x.Size; i++ {
-		p, e := m.powerCore(a, i)
+		d, e := m.degreeAtCore(a, i)
 		if e != nil {
 			return Monomial{}, false, e
 		}
-		if p.Degree%2 == 1 {
+		if d%2 == 1 {
 			return Monomial{}, false, nil
 		}
-		p.Degree /= 2
+		v, e := m.varCore(a, i)
+		if e != nil {
+			return Monomial{}, false, e
+		}
+		d, e = m.degreeAtCore(a, i)
+		if e != nil {
+			return Monomial{}, false, e
+		}
+		p := MonomialPower{v, d / 2}
 		if e = m.tempSetPower(t, i, p); e != nil {
 			return Monomial{}, false, e
 		}
@@ -554,28 +645,48 @@ func (m *MonomialManager) variableTransform(a Monomial, v, k uint32, operation u
 	}
 	n := uint32(0)
 	for i := uint32(0); i < info.Size; i++ {
-		p, e := m.powerCore(a, i)
+		y, e := m.varCore(a, i)
 		if e != nil {
 			return Monomial{}, e
 		}
-		if p.Var == v {
+		if y == v && operation == 1 {
+			continue
+		}
+		var p MonomialPower
+		if y == v {
 			if operation == 0 {
-				if modularSourceDebug && k > p.Degree {
-					return Monomial{}, ErrMonomialAssertion
+				if modularSourceDebug {
+					d, e := m.powerFieldCore(a, i, 4)
+					if e != nil {
+						return Monomial{}, e
+					}
+					if k > d {
+						return Monomial{}, ErrMonomialAssertion
+					}
 				}
-				if k >= p.Degree {
+				d, e := m.powerFieldCore(a, i, 4)
+				if e != nil {
+					return Monomial{}, e
+				}
+				if k >= d {
 					continue
 				}
-				p.Degree -= k
-			}
-			if operation == 1 {
-				continue
-			}
-			if operation == 2 {
-				if p.Degree <= 1 {
+				p = MonomialPower{y, d - k}
+			} else {
+				d, e := m.powerFieldCore(a, i, 4)
+				if e != nil {
+					return Monomial{}, e
+				}
+				if d <= 1 {
 					continue
 				}
-				p.Degree--
+				p = MonomialPower{y, d - 1}
+			}
+
+		} else {
+			p, e = m.rawPowerCore(a, i)
+			if e != nil {
+				return Monomial{}, e
 			}
 		}
 		if e = m.tempSetPower(t, n, p); e != nil {

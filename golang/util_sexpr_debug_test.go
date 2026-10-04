@@ -134,9 +134,14 @@ func sexprAuditNumericRoots(t *testing.T, q *mpnum.RationalService, value *mpnum
 		numeral(manager.FieldByName(name))
 	}
 	arithmetic := manager.FieldByName("rawArithmetic")
-	if arithmetic.FieldByName("compareActive").Bool() {
-		numeral(arithmetic.FieldByName("compareOne"))
-		numeral(arithmetic.FieldByName("compareTwo"))
+	for _, local := range []struct{ active, field string }{
+		{"powerActive", "power"}, {"addActive", "addOne"}, {"addActive", "addTwo"},
+		{"normActive", "norm"}, {"compareActive", "compareOne"}, {"compareActive", "compareTwo"},
+		{"divActive", "div"},
+	} {
+		if arithmetic.FieldByName(local.active).Bool() {
+			numeral(arithmetic.FieldByName(local.field))
+		}
 	}
 	for _, name := range []string{"zero", "one", "minusOne", "infZero", "infOne", "infMinusOne", "infIntZero", "infIntOne", "infIntMinusOne"} {
 		numeral(service.FieldByName(name))

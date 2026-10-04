@@ -39,25 +39,25 @@ func (m *MonomialManager) siftPowers(a Monomial, root, end uint32) error {
 			return nil
 		}
 		i := uint32(child)
-		p, e := m.powerCore(a, i)
+		v, e := m.varCore(a, i)
 		if e != nil {
 			return e
 		}
 		if i+1 < end {
-			q, e := m.powerCore(a, i+1)
+			w, e := m.varCore(a, i+1)
 			if e != nil {
 				return e
 			}
-			if p.Var < q.Var {
+			if v < w {
 				i++
-				p = q
+				v = w
 			}
 		}
-		r, e := m.powerCore(a, root)
+		r, e := m.varCore(a, root)
 		if e != nil {
 			return e
 		}
-		if r.Var >= p.Var {
+		if r >= v {
 			return nil
 		}
 		if e = m.swapPowers(a, root, i); e != nil {
@@ -67,30 +67,33 @@ func (m *MonomialManager) siftPowers(a Monomial, root, end uint32) error {
 	}
 }
 func (m *MonomialManager) renameObject(a Monomial, xs []uint32) error {
-	h, e := m.headerCore(a)
+	n, e := m.sizeCore(a)
 	if e != nil {
 		return e
 	}
-	for i := uint32(0); i < h.Size; i++ {
-		p, e := m.powerCore(a, i)
+	for i := uint32(0); i < n; i++ {
+		v, e := m.powerFieldCore(a, i, 0)
 		if e != nil {
 			return e
 		}
-		if uint64(p.Var) >= uint64(len(xs)) {
+		if uint64(v) >= uint64(len(xs)) {
 			return arena.ErrBounds
 		}
-		p.Var = xs[p.Var]
-		if e = m.writePower(a, i, p); e != nil {
+		l, e := m.location(a)
+		if e != nil {
+			return e
+		}
+		if e = m.allocator.WriteUint32(l.raw, 20+uint64(i)*8, xs[v]); e != nil {
 			return e
 		}
 	}
-	for i := h.Size / 2; i > 0; {
+	for i := n / 2; i > 0; {
 		i--
-		if e = m.siftPowers(a, i, h.Size); e != nil {
+		if e = m.siftPowers(a, i, n); e != nil {
 			return e
 		}
 	}
-	for end := h.Size; end > 1; {
+	for end := n; end > 1; {
 		end--
 		if e = m.swapPowers(a, 0, end); e != nil {
 			return e
@@ -100,7 +103,7 @@ func (m *MonomialManager) renameObject(a Monomial, xs []uint32) error {
 		}
 	}
 	var problem error
-	hash := utilhash.WordReader(h.Size*8, 11, func(i uint32) uint32 {
+	hash := utilhash.WordReader(n*8, 11, func(i uint32) uint32 {
 		l, e := m.location(a)
 		if e != nil {
 			problem = e

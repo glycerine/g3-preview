@@ -24615,3 +24615,142 @@ these final full suites. No test was hidden, skipped, deleted, weakened or
 truncated; no algorithm or physical accounting was repaired to obtain GREEN.
 The complete fork, APIs, actual solver/search and remaining source tests remain
 required; this selected port chunk does not satisfy full goal completion.
+
+
+### Source read ordering and conflict-resolution continuation
+
+Baseline is green commit `60ef6d7`. The latest header rule is recorded in
+AGENTS.md: retain originating repository-relative C++ paths and MIT/license
+notices, omit Microsoft copyright lines. No C++ content hashes are needed.
+
+Tests FIRST reproduced thirteen monomial reached-field defects against the
+committed baseline in `.cache/monomial-read-order-{native,debug}-red.log`.
+The selected queries now read SIZE/VAR or SIZE/DEG only when reached; sink
+publication precedes later DEG access, and raw merge/division/GCD/rename/removal
+reads follow actual source branches. Existing source algorithms and reversed
+GCD reserve/no-common quirks are preserved. The original43 plus new13 groups
+passed focused native/debug before additional callback-lifetime review.
+
+Inf arithmetic baseline RED evidence is
+`.cache/inf-arithmetic-entry-baseline-red.log`: seven entry/publication groups
+fail while the independent bounded-value group already passes. Raw MPQ
+multiplication/division baseline RED evidence is
+`.cache/mpq-arithmetic-entry-red.log`: earlier NUM actions and a real alias
+local are blocked by eager all-field checks. The corrected source entry guards
+retain cold owner/cohort checks and defer numeric field reads until reached.
+The divisor-output alias now uses an actual retained owner-local Int, explicit
+source Del end cursor and separate owning cleanup. This extends the charged
+raw arithmetic header from nine to ten Int fields; the facade lexical bound
+remains nine. Physical root audits name actual active locals, including div;
+exact root equality is retained. Fault and cleanup behavior is still being
+validated on this working tree.
+
+SAT work ports FIRST-UIP/core1675–1820 and actual antecedent/trail/phase
+helpers2091–2219, with Runtime-backed lemma spans bridging existing glue and
+clause consumers. Default minimization/dynamic subsumption remain enabled.
+Pop/reinitialize must execute pop, parallel exchange and real assumption
+reinitialization in source order. Full solver construction/Check, extension,
+nonnull parallel exchange, optional MUS and remaining global diagnostics remain
+completion obligations; no registered user-scope assertion credit is added.
+
+No implementation commit is allowed until both complete native and
+checked/debug suites pass, preserving original100-bit/every16146-prefix
+refinement. Focused successes alone do not prove full-fork completion.
+
+
+Numeric/monomial freeze evidence: all57 monomial groups (43 existing,14 new)
+pass final focused native/debug and both focused vets in
+`.cache/monomial-read-order-final-{native,debug,vet-native,vet-debug}.log`.
+An additional genuine callback-lifetime RED is
+`.cache/monomial-display-loop-red.log`: the final successful output callback
+releases the actual caller cell, and the next source loop condition must
+read SIZE and guard that dead location. Both looped display routes now do so;
+singleton SMT2 has no later cell read and retains its source success behavior.
+
+All240 focused numeric groups pass on the exact nine-file numeric freeze in
+`.cache/inf-arithmetic-entry-final-{native,debug}.log` (15.732s/27.209s), and
+both focused vets are terminal0. Fourteen new independent groups cover source
+entry/action/root behavior, including98 bounded value/alias scenarios and warm
+Go-zero allocation checks in both profiles. Existing active assertion credit
+is unchanged. The complete mpnum native/debug suites are terminal GREEN in
+`.cache/source-order-mpnum-{native,debug}.log` (86.604s/187.838s).
+
+Main checked/debug focused named factor and sexpr-root regressions pass fresh
+in `.cache/source-order-main-root-focus.log` (1.865s). Preliminary source/path/
+method/no-generics audit is terminal0 in
+`.cache/source-order-initial-source.log`; metadata and final full suites still
+require final validation after SAT freezes. This preliminary audit does not
+verify later metadata changes or prove full completion.
+
+
+SAT freeze is nine Go files with ten new conflict groups. Final focused native
+329 RUN/PASS and checked/debug331 RUN/PASS plus checked/debug vet are terminal
+GREEN in `.cache/sat-conflict-final-{native,debug,vet}.log`. Inventory/source
+spans and exact Go-byte snapshot are
+`.cache/sat-conflict-final-inventory.json`. Whole-operation allocation sweeps
+visit every real refusal ordinal through actual first success12 native/14
+debug; named once-only Runtime/cold-header/clause graph checks run before
+disabling refusal. Independent16-assignment implication and both watched
+clause-reason positions supplement the source traversal tests. Initial DAG
+expected-lemma correction was a fixture mistake, not an algorithm RED.
+
+The new genuine ownership RED in `.cache/sat-conflict-candidate-red.log`
+creates a captured stale Runtime span, publishes actual clause storage and ID,
+and then fails its reached literal copy. The lifecycle now retains that real
+candidate before returning the constructor-read error. This is a typed owning
+retention adapter for endangered raw lifetime, not ordinary CDCL input or
+claimed C++ automatic exception destruction. Independent review confirms no
+further material deviation in the selected executable conflict paths.
+
+Full source limits remain: actual EXT enumeration cpp1777–1783/1861–1867/
+1981–1987/2137–2143 resets the real antecedent buffer then reaches an explicit
+missing binding; enabled MUS/model cpp2082–2085 and nonnull parallel exchange
+cpp898–926 are also explicit missing bindings. Real solver ctor, init_search,
+restart/gc/decide/Check and source global diagnostics still require translation.
+The private Runtime clause bridge is the learned-lemma consumer only; existing
+concrete Go slice adapters retain their prior checked behavior.
+
+Final tree freezes all688 Go files in
+`.cache/source-order-final-go-hashes.json`. Final complete native suite and
+both complete vet profiles are terminal GREEN; source audit and full checked/
+debug remain on their original live handles. Remaining review is read-only,
+with no new Go files while these gates execute.
+
+
+Next source-backed work is mapped read-only in
+`.cache/sat-constructor-search-next-source-map.json`,
+`.cache/polynomial-manager-prerequisite-audit.json` and
+`.cache/inf-next-arithmetic-source-map.json`. The SAT cleaner/cleanup family
+is a real default Check dependency and must reuse the sole existing signed32
+cleaner cost, capture trail size before propagation, and preserve watches→
+originals→learned→propagate order and interrupted compaction ownership.
+Multivariate polynomial construction needs actual cells and SOM/cheap-SOM
+owners before optimized PSC can run; eight active PSC fixtures additionally
+require real pseudo-remainder/Lazard/subresultant/resultant algorithms.
+Remaining facade and scalar Mul/Div cold-entry corrections must preserve
+coefficient evaluation, member copy and read order; approximate Mult/Power
+source algorithms already remain intact. No next-family implementation was
+added while this tree is under final verification.
+
+
+### Source-order/FIRST-UIP final GREEN commit evidence
+
+Both complete final suites are terminal GREEN on the same688-Go-file tree:
+`.cache/source-order-final-native.log` and
+`.cache/source-order-final-debug.log`. Both full vet profiles are terminal0 in
+`.cache/source-order-final-vet-{native,debug}.log`. The final hash-free source/
+method/test/no-generics audit is terminal0 in
+`.cache/source-order-final-source.log`, reporting2102 units/677 APIs and
+28ported/166partial/1908unported. Exact command/result state is
+`.cache/source-order-final-gates.json`. All688 Go files and bytes were verified
+unchanged after every gate reached terminal status. Touched headers retain
+originating source paths and omit Microsoft copyright lines. No C++ content
+hashes were computed.
+
+The original100-bit refinement and every actual fault prefix remain intact.
+Earlier live/pending observations above are superseded by these final results.
+No tests were skipped, hidden, weakened or truncated; no physical/accounting
+repair was introduced to obtain GREEN. This coherent chunk ports selected
+source-order and default FIRST-UIP families, while the full patched fork,
+complete source tests, default solver/search, APIs and active PSC algorithms
+remain required. The active full-port goal is not complete.

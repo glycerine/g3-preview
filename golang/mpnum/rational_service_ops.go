@@ -23,11 +23,17 @@ const (
 
 // These helpers require the caller to hold s.mu. All input provenance is
 // checked before numeric actions; no foreign raw numeral is admitted.
+func (s *RationalService) facadeEntry(v *OwnedRational, op rationalFacadeBinaryOp) error {
+	if op == rationalFacadeAdd || op == rationalFacadeSub {
+		return s.rationalScalarOwner(v)
+	}
+	return s.check(v)
+}
 func (s *RationalService) facadeAssignLocked(a, b *OwnedRational, op rationalFacadeBinaryOp) error {
-	if e := s.check(a); e != nil {
+	if e := s.facadeEntry(a, op); e != nil {
 		return e
 	}
-	if e := s.check(b); e != nil {
+	if e := s.facadeEntry(b, op); e != nil {
 		return e
 	}
 	return s.facadeRawBinaryLocked(&a.raw, &b.raw, &a.raw, op)
@@ -61,10 +67,10 @@ func (s *RationalService) facadeValueLocked(a, b *OwnedRational, op rationalFaca
 		return OwnedRational{}, e
 	}
 	defer s.endLexicalRational(&_lexOut, &_lexErr)
-	if e := s.check(a); e != nil {
+	if e := s.facadeEntry(a, op); e != nil {
 		return OwnedRational{}, e
 	}
-	if e := s.check(b); e != nil {
+	if e := s.facadeEntry(b, op); e != nil {
 		return OwnedRational{}, e
 	}
 	work := NewRational()

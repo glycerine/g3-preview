@@ -560,6 +560,10 @@ func qopsAuditLiveOwnership(t *testing.T, m *RationalManager, public []*Int) {
 	if raw.normActive {
 		roots = append(roots, &raw.norm)
 	}
+	if raw.divActive {
+		roots = append(roots, &raw.div)
+	}
+
 	if raw.compareActive {
 		roots = append(roots, &raw.compareOne.num, &raw.compareOne.den, &raw.compareTwo.num, &raw.compareTwo.den)
 	}

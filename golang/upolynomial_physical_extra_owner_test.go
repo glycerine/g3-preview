@@ -38,6 +38,9 @@ func upolyPhysicalExtraNumerals(extras []upolyPhysicalExtraOwners, addInt func(r
 				addRat(scope.FieldByName("roots").Index(i))
 			}
 			raw := v.FieldByName("rawArithmetic")
+			if raw.FieldByName("divActive").Bool() {
+				addInt(raw.FieldByName("div"))
+			}
 			if raw.FieldByName("powerActive").Bool() {
 				addRat(raw.FieldByName("power"))
 			}

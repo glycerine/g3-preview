@@ -878,10 +878,10 @@ func (s *RationalService) InfAddAssign(a, b *OwnedInfRational) error {
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(a); e != nil {
+	if e := s.infScalarOwner(a); e != nil {
 		return e
 	}
-	if e := s.infCheck(b); e != nil {
+	if e := s.infScalarOwner(b); e != nil {
 		return e
 	}
 	return s.infCompound(a, b, false)
@@ -891,10 +891,10 @@ func (s *RationalService) InfAdd(a, b *OwnedInfRational) (OwnedInfRational, erro
 		return OwnedInfRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(a); e != nil {
+	if e := s.infScalarOwner(a); e != nil {
 		return OwnedInfRational{}, e
 	}
-	if e := s.infCheck(b); e != nil {
+	if e := s.infScalarOwner(b); e != nil {
 		return OwnedInfRational{}, e
 	}
 	return s.infBinary(a, b, false)
@@ -904,10 +904,10 @@ func (s *RationalService) InfSubAssign(a, b *OwnedInfRational) error {
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(a); e != nil {
+	if e := s.infScalarOwner(a); e != nil {
 		return e
 	}
-	if e := s.infCheck(b); e != nil {
+	if e := s.infScalarOwner(b); e != nil {
 		return e
 	}
 	return s.infCompound(a, b, true)
@@ -917,10 +917,10 @@ func (s *RationalService) InfSub(a, b *OwnedInfRational) (OwnedInfRational, erro
 		return OwnedInfRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(a); e != nil {
+	if e := s.infScalarOwner(a); e != nil {
 		return OwnedInfRational{}, e
 	}
-	if e := s.infCheck(b); e != nil {
+	if e := s.infScalarOwner(b); e != nil {
 		return OwnedInfRational{}, e
 	}
 	return s.infBinary(a, b, true)
@@ -930,10 +930,10 @@ func (s *RationalService) InfAddRationalAssign(v *OwnedInfRational, r *OwnedRati
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return e
 	}
-	if e := s.check(r); e != nil {
+	if e := s.rationalScalarOwner(r); e != nil {
 		return e
 	}
 	return s.infScalar(v, &r.raw, '+')
@@ -943,10 +943,10 @@ func (s *RationalService) InfSubRationalAssign(v *OwnedInfRational, r *OwnedRati
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return e
 	}
-	if e := s.check(r); e != nil {
+	if e := s.rationalScalarOwner(r); e != nil {
 		return e
 	}
 	return s.infScalar(v, &r.raw, '-')

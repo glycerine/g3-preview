@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Source: src/sat/sat_solver.cpp; src/sat/sat_clause.h. Licensed under the MIT license.
 package g3
 
 import (
@@ -162,6 +162,15 @@ func (s *satSolverPropagationState) diffLevelLiteral(i uint32, lits []satLiteral
 
 // Both concrete storage routes execute the same source reserve/mark/reset body.
 func (s *satSolverPropagationState) numDiffLevelsCore(n uint32, lits []satLiteral, c satStoredClauseRef, clause bool) (uint32, error) {
+	return s.numDiffLevelsSpanCore(n, satSolverLiteralSpan{literals: lits}, c, clause)
+}
+func (s *satSolverPropagationState) numDiffLevelsSpan(n uint32, span satSolverLiteralSpan) (uint32, error) {
+	if e := s.open(); e != nil {
+		return 0, e
+	}
+	return s.numDiffLevelsSpanCore(n, span, satStoredClauseRef{}, false)
+}
+func (s *satSolverPropagationState) numDiffLevelsSpanCore(n uint32, span satSolverLiteralSpan, c satStoredClauseRef, clause bool) (uint32, error) {
 	need := s.variables.scopeLevel + 1
 	// Literal reserve(sz,false) grows logical size and default-fills new entries.
 	if need > uint32(len(s.diffLevels.data)) {
@@ -189,7 +198,13 @@ func (s *satSolverPropagationState) numDiffLevelsCore(n uint32, lits []satLitera
 	}
 	var count uint32
 	for i := uint32(0); i < n; i++ {
-		l, e := s.diffLevelLiteral(i, lits, c, clause)
+		var l satLiteral
+		var e error
+		if clause {
+			l, e = s.clauses.Literal(c, i)
+		} else {
+			l, e = span.literal(i)
+		}
 		if e != nil {
 			return count, e
 		}
@@ -218,7 +233,13 @@ func (s *satSolverPropagationState) numDiffLevelsCore(n uint32, lits []satLitera
 		}
 	}
 	for i := uint32(0); i < n; i++ {
-		l, e := s.diffLevelLiteral(i, lits, c, clause)
+		var l satLiteral
+		var e error
+		if clause {
+			l, e = s.clauses.Literal(c, i)
+		} else {
+			l, e = span.literal(i)
+		}
 		if e != nil {
 			return count, e
 		}
