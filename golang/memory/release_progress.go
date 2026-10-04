@@ -120,8 +120,11 @@ func (a *SmallAllocator) DeallocateTracked(n uint64, r ObjectRef) (ReleaseProgre
 		loc.release = allocatorReleaseState{serial: serial, requested: n, raw: loc.raw, generation: r.generation, active: true}
 		return a.resumeRelease(r, loc)
 	}
-	if a.config.Profile.Debug && (a.allocSize < n || r.slot == 0) {
-		return ReleaseProgress{}, ErrAllocatorAssertion
+	if e := a.sourceAssert(a.allocSize >= n); e != nil {
+		return ReleaseProgress{}, e
+	}
+	if e := a.sourceAssert(r.slot != 0); e != nil {
+		return ReleaseProgress{}, e
 	}
 	a.allocSize = a.counter(a.allocSize - n)
 	// Source performs requested subtraction before validating pointer provenance.
@@ -158,8 +161,11 @@ func (a *SmallAllocator) resumeRelease(r ObjectRef, loc *smallObjectLocation) (R
 		return a.releaseSnapshot(r, p), e
 	}
 	slot := uint32((p.requested + a.pointerBytes() - 1) / a.pointerBytes())
-	if a.config.Profile.Debug && (slot == 0 || slot >= a.slots()) {
-		return a.releaseSnapshot(r, p), ErrAllocatorAssertion
+	if e := a.sourceAssert(slot > 0); e != nil {
+		return a.releaseSnapshot(r, p), e
+	}
+	if e := a.sourceAssert(slot < a.slots()); e != nil {
+		return a.releaseSnapshot(r, p), e
 	}
 	if slot == 0 || slot >= a.slots() {
 		return a.releaseSnapshot(r, p), arena.ErrBounds

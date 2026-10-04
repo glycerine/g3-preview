@@ -1,5 +1,6 @@
 // Licensed under the MIT license.
-// Source: small_object_allocator.cpp:172–242, original scan/relink algorithm.
+// Source authors: Nikolaj bjorner (nbjorner), 2007-08-06; Leonardo de Moura (leonardo), 2006/2011.
+// Source: src/util/small_object_allocator.cpp:172–242; src/util/debug.h:63.
 package memory
 
 import "math"
@@ -87,8 +88,8 @@ func (a *SmallAllocator) Consolidate() (err error) {
 		if freeObjs.size < perChunk {
 			continue
 		}
-		if a.config.Profile.Debug && chunks.size == 0 {
-			return ErrAllocatorAssertion
+		if e := a.sourceAssert(chunks.size != 0); e != nil {
+			return e
 		}
 		if e := chunks.sort(); e != nil {
 			return e

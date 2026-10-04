@@ -1,4 +1,5 @@
 // Licensed under the MIT license.
+// Source authors: Nikolaj bjorner (nbjorner), 2007-08-06; Leonardo de Moura (leonardo), 2011-04-27.
 // Source: src/util/small_object_allocator.h; src/util/small_object_allocator.cpp; explicit scalar pointer codec.
 package memory
 
@@ -23,10 +24,11 @@ type SmallAllocatorProfile struct {
 	Debug, Windows bool
 }
 type SmallAllocatorConfig struct {
-	Runtime   *Runtime
-	Profile   SmallAllocatorProfile
-	IO        AllocatorIO
-	Verbosity uint32
+	Assertions AllocatorAssertionControl
+	Runtime    *Runtime
+	Profile    SmallAllocatorProfile
+	IO         AllocatorIO
+	Verbosity  uint32
 }
 type ObjectRef struct {
 	owner, address   uint64
@@ -139,12 +141,6 @@ func (a *SmallAllocator) counter(n uint64) uint64 {
 		return uint64(uint32(n))
 	}
 	return n
-}
-func (a *SmallAllocator) requireSize(n uint64) error {
-	if a.config.Profile.PointerBits == 32 && n > math.MaxUint32 {
-		return arena.ErrBounds
-	}
-	return nil
 }
 func (a *SmallAllocator) reserveLocations(extra uint32) error {
 	available := uint64(cap(a.locations) - len(a.locations))
@@ -293,8 +289,11 @@ func (a *SmallAllocator) Allocate(n uint64) (ObjectRef, error) {
 		return a.ref(id), nil
 	}
 	slot := uint32((n + width - 1) / width)
-	if a.config.Profile.Debug && (slot == 0 || slot >= a.slots()) {
-		return ObjectRef{}, ErrAllocatorAssertion
+	if e := a.sourceAssert(slot < a.slots()); e != nil {
+		return ObjectRef{}, e
+	}
+	if e := a.sourceAssert(slot > 0); e != nil {
+		return ObjectRef{}, e
 	}
 	if slot >= a.slots() {
 		return ObjectRef{}, arena.ErrBounds
@@ -330,6 +329,9 @@ func (a *SmallAllocator) Allocate(n uint64) (ObjectRef, error) {
 		return ObjectRef{}, e
 	}
 	size := uint64(slot) * width
+	if e := a.sourceAssert(size >= n); e != nil {
+		return ObjectRef{}, e
+	}
 	if a.chunks[slot] != 0 {
 		chunk, e := a.location(a.chunks[slot])
 		if e != nil {

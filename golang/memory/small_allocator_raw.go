@@ -62,8 +62,11 @@ func (a *SmallAllocator) DeallocateRawTracked(n uint64, p RawObjectPointer) (Rel
 	}
 	a.nextReleaseSerial++
 	if !a.bypass() {
-		if a.config.Profile.Debug && (a.allocSize < n || p.Block == (Block{})) {
-			return ReleaseProgress{}, ErrAllocatorAssertion
+		if e := a.sourceAssert(a.allocSize >= n); e != nil {
+			return ReleaseProgress{}, e
+		}
+		if e := a.sourceAssert(p.Block != (Block{})); e != nil {
+			return ReleaseProgress{}, e
 		}
 		a.allocSize = a.counter(a.allocSize - n)
 	}
@@ -94,8 +97,11 @@ func (a *SmallAllocator) resumeRawRelease() (ReleaseProgress, error) {
 		return a.rawReleaseSnapshot(), e
 	}
 	slot := uint32((s.requested + a.pointerBytes() - 1) / a.pointerBytes())
-	if a.config.Profile.Debug && (slot == 0 || slot >= a.slots()) {
-		return a.rawReleaseSnapshot(), ErrAllocatorAssertion
+	if e := a.sourceAssert(slot > 0); e != nil {
+		return a.rawReleaseSnapshot(), e
+	}
+	if e := a.sourceAssert(slot < a.slots()); e != nil {
+		return a.rawReleaseSnapshot(), e
 	}
 	if slot == 0 || slot >= a.slots() {
 		return a.rawReleaseSnapshot(), arena.ErrBounds

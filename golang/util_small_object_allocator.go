@@ -1,4 +1,6 @@
+// Source: src/util/small_object_allocator.h; src/util/small_object_allocator.cpp; src/util/debug.h:63.
 // Licensed under the MIT license.
+// Source authors: Nikolaj bjorner (nbjorner), 2007-08-06; Leonardo de Moura (leonardo), 2006/2011.
 // Charged main adapter; all allocation algorithms live solely in memory.
 package g3
 
@@ -18,6 +20,7 @@ type utilSmallObjectProfile = memory.SmallAllocatorProfile
 type utilSmallObjectRef = memory.ObjectRef
 type smallObjectStats = memory.AllocatorStats
 type utilSmallObjectConfig struct {
+	Debug                *DebugContext
 	Runtime              *utilMemoryRuntime
 	Profile              utilSmallObjectProfile
 	ID                   string
@@ -63,7 +66,11 @@ func newUtilSmallObjectAllocator(c utilSmallObjectConfig) (*utilSmallObjectAlloc
 		c.ID = "unknown"
 	}
 	io := &smallObjectIOBridge{config: c}
-	core, e := memory.NewSmallAllocator(memory.SmallAllocatorConfig{Runtime: c.Runtime, Profile: c.Profile, IO: io, Verbosity: c.Verbosity})
+	mc := memory.SmallAllocatorConfig{Runtime: c.Runtime, Profile: c.Profile, IO: io, Verbosity: c.Verbosity}
+	if c.Debug != nil {
+		mc.Assertions = c.Debug
+	}
+	core, e := memory.NewSmallAllocator(mc)
 	if e != nil {
 		b.Release(i + h)
 		return nil, e
