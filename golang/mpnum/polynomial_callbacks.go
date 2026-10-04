@@ -152,7 +152,15 @@ func (m *MultivariatePolynomialCore) deletionCallbacks(p Polynomial) error {
 			m.callbackDepth++
 			old := m.callbackValue
 			m.callbackValue = p
+			s := m.compositionOwner
+			executing := s != nil && s.executing
+			if executing {
+				s.executing = false
+			}
 			e = h.call(h, m, p)
+			if executing {
+				s.executing = true
+			}
 			m.callbackValue = old
 			m.callbackDepth--
 			var lookup error

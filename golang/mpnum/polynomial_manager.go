@@ -27,6 +27,7 @@ type MultivariatePolynomialConfig struct {
 	Cooperation func() error
 }
 type polynomialCreation struct {
+	compositionParent *polynomialCompositionScope
 	pscOwner          uint64
 	substitutionOwned bool
 	translationOwned  bool
@@ -83,6 +84,7 @@ type MultivariatePolynomialCore struct {
 	constantScope                                                                              polynomialConstantScope
 	singletonMonomial                                                                          Monomial
 	singletonReference                                                                         bool
+	singletonGeneration, constantGeneration                                                    uint64
 	self                                                                                       *MultivariatePolynomialCore
 	config                                                                                     MultivariatePolynomialConfig
 	integer                                                                                    *IntegerManager
@@ -93,6 +95,7 @@ type MultivariatePolynomialCore struct {
 	polynomials                                                                                polynomialVector
 	locations                                                                                  []polynomialLocation
 	derivativeOwner                                                                            *polynomialDerivativeScope
+	compositionOwner                                                                           *polynomialCompositionScope
 	creationGeneration                                                                         uint64
 	pending                                                                                    polynomialCreation
 	som, som2, cheap, cheap2                                                                   polynomialSOM
@@ -278,6 +281,11 @@ func (m *MultivariatePolynomialCore) mkConstCore(a *Int) (Polynomial, error) {
 	}
 	m.singletonMonomial = u
 	m.singletonReference = true
+	m.singletonGeneration++
+	if s := m.compositionOwner; s != nil && s.executing {
+		s.singleton = m.singletonMonomial
+		s.singletonGeneration = m.singletonGeneration
+	}
 	if m.pscReceipts.depth != 0 {
 		m.pscReceipts.singleton = u
 	}
@@ -325,6 +333,11 @@ func (m *MultivariatePolynomialCore) MkVariable(v, k uint32) (Polynomial, error)
 	}
 	m.singletonMonomial = b
 	m.singletonReference = true
+	m.singletonGeneration++
+	if s := m.compositionOwner; s != nil && s.executing {
+		s.singleton = m.singletonMonomial
+		s.singletonGeneration = m.singletonGeneration
+	}
 	if m.pscReceipts.depth != 0 {
 		m.pscReceipts.singleton = b
 	}

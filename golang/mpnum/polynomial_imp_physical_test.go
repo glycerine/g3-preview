@@ -33,7 +33,10 @@ func polynomialImpPhysicalAuditNamed(t *testing.T, full *MultivariatePolynomialM
 		external = append(external, v.raw, v.pending, v.old)
 	}
 	adapterBytes := full.header + uint64(cap(full.lexBuckets.children))*uint64(reflect.TypeOf(polynomialVector{}).Size())
-	public := []*Int{&full.derivative.n, &full.derivative.a}
+	public := []*Int{&full.derivative.n, &full.derivative.a, &full.composition.a}
+	for i := range full.composition.raw {
+		public = append(public, &full.composition.raw[i])
+	}
 	public = append(public, input...)
 	adapterBytes += externalHeaders
 	es := &full.evaluation
@@ -49,6 +52,7 @@ func polynomialImpPhysicalAuditNamed(t *testing.T, full *MultivariatePolynomialM
 	for _, f := range es.intervalFrames {
 		public = append(public, &f.aux.lower.num, &f.aux.upper.num)
 	}
+	adapterBytes += uint64(cap(full.composition.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size())
 	adapterBytes += uint64(cap(full.derivative.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size())
 	if full.upm != nil {
 		u := full.upm
@@ -172,6 +176,9 @@ func polynomialImpPhysicalAuditNamed(t *testing.T, full *MultivariatePolynomialM
 		}
 		cell(p, l.initializedCoefficients)
 	}
+	addPolynomial(full.composition.local.value)
+	addPolynomial(full.composition.local.incoming)
+	addPolynomial(full.composition.freshResult)
 	addPolynomial(m.exactDivision.returned)
 	addPolynomial(m.translation.freshResult)
 	for i := range m.pseudoDivision.refs {

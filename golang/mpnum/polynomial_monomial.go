@@ -32,6 +32,8 @@ type MonomialManagerConfig struct {
 	Profile   memory.SmallAllocatorProfile
 }
 type monomialLocation struct {
+	compositionCohort                  *polynomialCompositionScope
+	compositionSlot                    uint32
 	derivativeCohort                   *polynomialDerivativeScope
 	derivativeSlot                     uint32
 	unreferencedCohort                 *polynomialSubstitutionState
@@ -367,6 +369,11 @@ func (m *MonomialManager) incRefCore(a Monomial) error {
 	}
 	if e = m.allocator.WriteUint32(l.raw, 0, n+1); e != nil {
 		return e
+	}
+	if d := l.compositionCohort; d != nil && uint64(l.compositionSlot) < uint64(len(d.orphans)) && d.orphans[l.compositionSlot] == a {
+		d.orphans[l.compositionSlot] = Monomial{}
+		l.compositionCohort = nil
+		l.compositionSlot = 0
 	}
 	// Source INC is complete. The actual cohort slot alone grants ownership;
 	// the cold location tag only routes this infallible, allocation-free transfer.

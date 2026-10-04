@@ -40,6 +40,7 @@ type MultivariatePolynomialManager struct {
 	originalCause, sourceCause, cleanupCause, unwindCause      error
 	derivative                                                 polynomialDerivativeScope
 	evaluation                                                 polynomialEvaluationScope
+	composition                                                polynomialCompositionScope
 	lexPending                                                 bool
 	lexGeneration                                              uint64
 	lexCause                                                   error

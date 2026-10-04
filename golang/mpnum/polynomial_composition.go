@@ -1,0 +1,1256 @@
+// Source: src/math/polynomial/polynomial.cpp:4653-4890,7248-7284;
+// src/util/scoped_numeral.h; src/util/obj_ref.h. Licensed under the MIT license.
+// Author: Leonardo de Moura.
+package mpnum
+
+import (
+	"errors"
+	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
+	"reflect"
+)
+
+type polynomialCompositionScope struct {
+	a                                       Int
+	raw                                     [4]Int
+	rawMask                                 uint8
+	aCompleted                              bool
+	active, executing, stopped              bool
+	local                                   polynomialReference
+	localCompleted                          bool
+	degreeInput                             Polynomial
+	degreeCompleted                         bool
+	degreeStored                            uint32
+	generated                               Monomial
+	coreGenerated                           Monomial
+	freshResult                             Polynomial
+	orphans                                 []Monomial
+	drain                                   uint32
+	calleeGeneration, factoryGeneration     uint64
+	singleton                               Monomial
+	singletonGeneration, constantGeneration uint64
+	numericPending                          memory.ObjectRef
+	integerRaw, monomialRaw                 [3]memory.Block
+	bodyCause, sourceCause, cleanupCause    error
+}
+
+func (m *MultivariatePolynomialManager) beginComposition() error {
+	s := &m.composition
+	if s.active {
+		return ErrPolynomialPending
+	}
+	orphans, drain := s.orphans, s.drain
+	*s = polynomialCompositionScope{active: true, executing: true, orphans: orphans, drain: drain}
+	m.core.compositionOwner = s
+	return nil
+}
+func (m *MultivariatePolynomialManager) finishComposition(cause error) error {
+	s := &m.composition
+	s.executing = false
+	if s.bodyCause == nil {
+		s.bodyCause = cause
+	}
+	if s.constantGeneration != 0 && m.core.constantGeneration == s.constantGeneration && m.core.constantScope.stopped {
+		s.stopped = true
+		if s.sourceCause == nil {
+			s.sourceCause = m.core.constantScope.sourceCause
+		}
+	}
+	if s.stopped {
+		return errors.Join(cause, s.sourceCause)
+	}
+	if s.aCompleted {
+		_, e := upolynomialSourceNumeralDel(m.core.integer, &s.a)
+		if e != nil {
+			s.stopped = true
+			s.sourceCause = e
+			return errors.Join(cause, e)
+		}
+		s.aCompleted = false
+	}
+	if s.degreeCompleted {
+		if e := m.resetCompositionDegrees(s.degreeInput); e != nil {
+			s.stopped = true
+			s.sourceCause = e
+			return errors.Join(cause, e)
+		}
+		s.degreeCompleted = false
+	}
+	if s.localCompleted {
+		if e := s.local.closeValue(m.core, false); e != nil {
+			s.stopped = true
+			s.sourceCause = e
+			return errors.Join(cause, e)
+		}
+		s.localCompleted = false
+	}
+	if cause == nil && s.freshResult == (Polynomial{}) && s.generated == (Monomial{}) && s.factoryGeneration == 0 && s.calleeGeneration == 0 && s.numericPending == (memory.ObjectRef{}) && s.integerRaw == ([3]memory.Block{}) && s.monomialRaw == ([3]memory.Block{}) && s.rawMask == 0 {
+		s.active = false
+	}
+	return cause
+}
+func (m *MultivariatePolynomialManager) compositionNumeral(op uint8, n *Int, k uint32, out *Int) error {
+	z := m.core.integer
+	cell := z.pendingCell.object
+	roots, e := z.allocator.PendingRoots()
+	if e != nil {
+		return e
+	}
+	switch op {
+	case 0:
+		e = m.core.modular.Copy(out, n)
+	case 1:
+		e = m.core.modular.Neg(out)
+	case 2:
+		e = m.core.modular.Reset(out)
+	case 3:
+		e = m.core.modular.SetUint64(out, uint64(k))
+	default:
+		return arena.ErrBounds
+	}
+	s := &m.composition
+	if s.executing {
+		if cell == (memory.ObjectRef{}) && z.pendingCell.object != (memory.ObjectRef{}) {
+			s.numericPending = z.pendingCell.object
+		}
+		if roots == ([3]memory.Block{}) {
+			after, x := z.allocator.PendingRoots()
+			if x != nil {
+				return errors.Join(e, x)
+			}
+			if after != ([3]memory.Block{}) {
+				s.integerRaw = after
+			}
+		}
+	}
+	return e
+}
+func (m *MultivariatePolynomialManager) prepareCompositionOrphan() error {
+	s := &m.composition
+	if len(s.orphans) == cap(s.orphans) {
+		n := cap(s.orphans)*2 + 1
+		bytes := uint64(n) * uint64(reflect.TypeOf(Monomial{}).Size())
+		if e := m.originalBudget.Reserve(bytes); e != nil {
+			return e
+		}
+		a := make([]Monomial, len(s.orphans), n)
+		copy(a, s.orphans)
+		m.originalBudget.Release(uint64(cap(s.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size()))
+		s.orphans = a
+	}
+	return nil
+}
+func (m *MultivariatePolynomialManager) compositionVariable(x, d uint32, powers []MonomialPower, product bool) (Monomial, error) {
+	s := &m.composition
+	c := m.core
+	if s.generated != (Monomial{}) {
+		return Monomial{}, ErrPolynomialPending
+	}
+	if e := m.prepareCompositionOrphan(); e != nil {
+		return Monomial{}, e
+	}
+	before, e := c.monomials.allocator.PendingRoots()
+	if e != nil {
+		return Monomial{}, e
+	}
+	outcome := monomialFactoryOutcome{}
+	var a Monomial
+	if product {
+		a, e = c.monomials.mkMonomialCreated(powers, &outcome)
+	} else {
+		a, e = c.monomials.mkVariableCreated(x, d, &outcome)
+	}
+	if outcome.started {
+		c.recordGeneratedCallee(outcome)
+		if c.monomials.creation.generation == outcome.generation && c.monomials.creation.parent == c {
+			s.calleeGeneration = outcome.generation
+		}
+	}
+	if before == ([3]memory.Block{}) {
+		after, x := c.monomials.allocator.PendingRoots()
+		if x != nil {
+			return Monomial{}, errors.Join(e, x)
+		}
+		if after != ([3]memory.Block{}) {
+			s.monomialRaw = after
+		}
+	}
+	if e == nil && outcome.created {
+		s.generated = a
+	}
+	return a, e
+}
+func (m *MultivariatePolynomialManager) compositionAdd(a *Int, t Monomial) error {
+	s := &m.composition
+	consumed := false
+	e := m.core.cheap.addConsumed(a, t, false, &consumed)
+	if s.generated == t {
+		if consumed {
+			s.generated = Monomial{}
+		} else if e == nil {
+			i := uint32(len(s.orphans))
+			s.orphans = append(s.orphans, t)
+			l, x := m.core.monomials.location(t)
+			if x != nil {
+				return x
+			}
+			l.compositionCohort = s
+			l.compositionSlot = i
+			s.generated = Monomial{}
+		}
+	}
+	return e
+}
+func (m *MultivariatePolynomialManager) compositionCheapReady() error {
+	if modularSourceDebug {
+		n, e := m.core.cheap.ms.size(m.core)
+		if e != nil {
+			return e
+		}
+		if n != 0 {
+			return ErrPolynomialAssertion
+		}
+	}
+	return nil
+}
+func (m *MultivariatePolynomialManager) compositionUnivariate(p Polynomial) error {
+	if modularSourceDebug {
+		yes, e := m.core.IsUnivariate(p)
+		if e != nil {
+			return e
+		}
+		if !yes {
+			return ErrPolynomialAssertion
+		}
+	}
+	return nil
+}
+func (m *MultivariatePolynomialManager) compositionCheapResult() (Polynomial, error) {
+	p, e := m.core.cheap.mk(false)
+	if e == nil {
+		m.composition.factoryGeneration = 0
+	}
+	return p, e
+}
+
+func (m *MultivariatePolynomialManager) ComposeReciprocal(p Polynomial) (result Polynomial, cause error) {
+	if e := m.ready(); e != nil {
+		return Polynomial{}, e
+	}
+	if e := m.compositionUnivariate(p); e != nil {
+		return Polynomial{}, e
+	}
+	constant, e := m.core.IsConstant(p)
+	if e != nil {
+		return Polynomial{}, e
+	}
+	if constant {
+		return p, nil
+	}
+	if e = m.compositionCheapReady(); e != nil {
+		return Polynomial{}, e
+	}
+	x, e := m.core.MaxVariable(p)
+	if e != nil {
+		return Polynomial{}, e
+	}
+	n, e := m.core.Degree(p, x)
+	if e != nil {
+		return Polynomial{}, e
+	}
+	size, e := m.core.readWord(p, 8)
+	if e != nil {
+		return Polynomial{}, e
+	}
+	if e = m.beginComposition(); e != nil {
+		return Polynomial{}, e
+	}
+	defer func() { result, cause = m.finishCompositionResult(result, cause) }()
+	for i := uint32(0); i < size; i++ {
+		t, e := m.core.monomialCore(p, i)
+		if e != nil {
+			return Polynomial{}, e
+		}
+		if modularSourceDebug {
+			sz, e := m.core.monomials.sizeCore(t)
+			if e != nil {
+				return Polynomial{}, e
+			}
+			if sz > 1 {
+				return Polynomial{}, ErrPolynomialAssertion
+			}
+		}
+		k, e := m.core.monomials.DegreeOf(t, x)
+		if e != nil {
+			return Polynomial{}, e
+		}
+		next, e := m.compositionVariable(x, n-k, nil, false)
+		if e != nil {
+			return Polynomial{}, e
+		}
+		a, e := m.core.coefficientCore(p, i)
+		if e != nil {
+			return Polynomial{}, e
+		}
+		if e = m.compositionAdd(&a, next); e != nil {
+			return Polynomial{}, e
+		}
+	}
+	return m.compositionCheapResult()
+}
+func (m *MultivariatePolynomialManager) ComposeXDivY(p Polynomial, y uint32) (result Polynomial, cause error) {
+	if e := m.ready(); e != nil {
+		return Polynomial{}, e
+	}
+	if e := m.compositionUnivariate(p); e != nil {
+		return Polynomial{}, e
+	}
+	if modularSourceDebug {
+		x, e := m.core.MaxVariable(p)
+		if e != nil {
+			return Polynomial{}, e
+		}
+		if x == y {
+			return Polynomial{}, ErrPolynomialAssertion
+		}
+	}
+	constant, e := m.core.IsConstant(p)
+	if e != nil {
+		return Polynomial{}, e
+	}
+	if constant {
+		return p, nil
+	}
+	if e = m.compositionCheapReady(); e != nil {
+		return Polynomial{}, e
+	}
+	x, e := m.core.MaxVariable(p)
+	if e != nil {
+		return Polynomial{}, e
+	}
+	n, e := m.core.Degree(p, x)
+	if e != nil {
+		return Polynomial{}, e
+	}
+	size, e := m.core.readWord(p, 8)
+	if e != nil {
+		return Polynomial{}, e
+	}
+	if e = m.beginComposition(); e != nil {
+		return Polynomial{}, e
+	}
+	defer func() { result, cause = m.finishCompositionResult(result, cause) }()
+	// source sbuffer<power> is lexical inline storage; at most two actual powers
+	// are initialized on this path. No Runtime allocation ticket is introduced.
+	var powers [16]MonomialPower
+	for i := uint32(0); i < size; i++ {
+		t, e := m.core.monomialCore(p, i)
+		if e != nil {
+			return Polynomial{}, e
+		}
+		k, e := m.core.monomials.DegreeOf(t, x)
+		if e != nil {
+			return Polynomial{}, e
+		}
+		count := 0
+		if x < y {
+			if k > 0 {
+				powers[count] = MonomialPower{Var: x, Degree: k}
+				count++
+			}
+			if n-k > 0 {
+				powers[count] = MonomialPower{Var: y, Degree: n - k}
+				count++
+			}
+		} else {
+			if n-k > 0 {
+				powers[count] = MonomialPower{Var: y, Degree: n - k}
+				count++
+			}
+			if k > 0 {
+				powers[count] = MonomialPower{Var: x, Degree: k}
+				count++
+			}
+		}
+		next, e := m.compositionVariable(0, 0, powers[:count], true)
+		if e != nil {
+			return Polynomial{}, e
+		}
+		a, e := m.core.coefficientCore(p, i)
+		if e != nil {
+			return Polynomial{}, e
+		}
+		if e = m.compositionAdd(&a, next); e != nil {
+			return Polynomial{}, e
+		}
+	}
+	return m.compositionCheapResult()
+}
+func (m *MultivariatePolynomialManager) ComposeVariable(p Polynomial, y uint32) (result Polynomial, cause error) {
+	if e := m.ready(); e != nil {
+		return Polynomial{}, e
+	}
+	if modularSourceDebug && y >= m.core.monomials.nextVar {
+		return Polynomial{}, ErrPolynomialAssertion
+	}
+	if e := m.compositionUnivariate(p); e != nil {
+		return Polynomial{}, e
+	}
+	x, e := m.core.MaxVariable(p)
+	if e != nil {
+		return Polynomial{}, e
+	}
+	if y == x {
+		return p, nil
+	}
+	constant, e := m.core.IsConstant(p)
+	if e != nil {
+		return Polynomial{}, e
+	}
+	if constant {
+		return p, nil
+	}
+	if e = m.compositionCheapReady(); e != nil {
+		return Polynomial{}, e
+	}
+	size, e := m.core.readWord(p, 8)
+	if e != nil {
+		return Polynomial{}, e
+	}
+	if e = m.beginComposition(); e != nil {
+		return Polynomial{}, e
+	}
+	defer func() { result, cause = m.finishCompositionResult(result, cause) }()
+	for i := uint32(0); i < size; i++ {
+		t, e := m.core.monomialCore(p, i)
+		if e != nil {
+			return Polynomial{}, e
+		}
+		if modularSourceDebug {
+			n, e := m.core.monomials.sizeCore(t)
+			if e != nil {
+				return Polynomial{}, e
+			}
+			if n > 1 {
+				return Polynomial{}, ErrPolynomialAssertion
+			}
+		}
+		sz, e := m.core.monomials.sizeCore(t)
+		if e != nil {
+			return Polynomial{}, e
+		}
+		next := t
+		if sz != 0 {
+			d, e := m.core.monomials.degreeAtCore(t, 0)
+			if e != nil {
+				return Polynomial{}, e
+			}
+			next, e = m.compositionVariable(y, d, nil, false)
+			if e != nil {
+				return Polynomial{}, e
+			}
+		}
+		a, e := m.core.coefficientCore(p, i)
+		if e != nil {
+			return Polynomial{}, e
+		}
+		if e = m.compositionAdd(&a, next); e != nil {
+			return Polynomial{}, e
+		}
+	}
+	return m.compositionCheapResult()
+}
+func (m *MultivariatePolynomialManager) ComposeMinusX(p Polynomial) (result Polynomial, cause error) {
+	if e := m.ready(); e != nil {
+		return Polynomial{}, e
+	}
+	if e := m.compositionUnivariate(p); e != nil {
+		return Polynomial{}, e
+	}
+	constant, e := m.core.IsConstant(p)
+	if e != nil {
+		return Polynomial{}, e
+	}
+	if constant {
+		return p, nil
+	}
+	if e = m.compositionCheapReady(); e != nil {
+		return Polynomial{}, e
+	}
+	if e = m.beginComposition(); e != nil {
+		return Polynomial{}, e
+	}
+	defer func() { result, cause = m.finishCompositionResult(result, cause) }()
+	s := &m.composition
+	s.aCompleted = true
+	size, e := m.core.readWord(p, 8)
+	if e != nil {
+		return Polynomial{}, e
+	}
+	for i := uint32(0); i < size; i++ {
+		t, e := m.core.monomialCore(p, i)
+		if e != nil {
+			return Polynomial{}, e
+		}
+		d, e := m.core.monomials.degreeCore(t)
+		if e != nil {
+			return Polynomial{}, e
+		}
+		a, e := m.core.coefficientCore(p, i)
+		if e != nil {
+			return Polynomial{}, e
+		}
+		if d%2 == 0 {
+			if e = m.compositionAdd(&a, t); e != nil {
+				return Polynomial{}, e
+			}
+		} else {
+			if e = m.compositionNumeral(0, &a, 0, &s.a); e != nil {
+				return Polynomial{}, e
+			}
+			if e = m.compositionNumeral(1, nil, 0, &s.a); e != nil {
+				return Polynomial{}, e
+			}
+			if e = m.compositionAdd(&s.a, t); e != nil {
+				return Polynomial{}, e
+			}
+		}
+	}
+	return m.compositionCheapResult()
+}
+
+func (m *MultivariatePolynomialManager) reserveCompositionDegrees(n uint32) error {
+	v := &m.degree2pos
+	c := m.core
+	old, e := v.size(c)
+	if e != nil {
+		return e
+	}
+	if n <= old {
+		return nil
+	}
+	for {
+		cap, e := v.capacity(c)
+		if e != nil {
+			return e
+		}
+		if n <= cap {
+			break
+		}
+		if e = v.expand(c); e != nil {
+			return e
+		}
+	}
+	if e = v.publishSize(c, n); e != nil {
+		return e
+	}
+	for i := old; i < n; i++ {
+		if e = c.memory.WriteUint32(v.raw, 8+uint64(i)*4, ^uint32(0)); e != nil {
+			v.interrupted = true
+			return e
+		}
+		v.initialized = i + 1
+	}
+	return nil
+}
+func (m *MultivariatePolynomialManager) compositionDegreePosition(i uint32) (uint32, error) {
+	if modularSourceDebug {
+		n, e := m.degree2pos.size(m.core)
+		if e != nil {
+			return 0, e
+		}
+		if i >= n {
+			return 0, ErrPolynomialAssertion
+		}
+	}
+	return m.core.memory.ReadUint32(m.degree2pos.raw, 8+uint64(i)*4)
+}
+func (m *MultivariatePolynomialManager) saveCompositionDegrees(p Polynomial) error {
+	if e := m.compositionUnivariate(p); e != nil {
+		return e
+	}
+	x, e := m.core.MaxVariable(p)
+	if e != nil {
+		return e
+	}
+	n, e := m.core.Degree(p, x)
+	if e != nil {
+		return e
+	}
+	if e = m.reserveCompositionDegrees(n + 1); e != nil {
+		return e
+	}
+	size, e := m.core.readWord(p, 8)
+	if e != nil {
+		return e
+	}
+	for i := uint32(0); i < size; i++ {
+		t, e := m.core.monomialCore(p, i)
+		if e != nil {
+			return e
+		}
+		if modularSourceDebug {
+			sz, e := m.core.monomials.sizeCore(t)
+			if e != nil {
+				return e
+			}
+			if sz > 1 {
+				return ErrPolynomialAssertion
+			}
+			d, e := m.core.monomials.degreeCore(t)
+			if e != nil {
+				return e
+			}
+			pos, e := m.compositionDegreePosition(d)
+			if e != nil {
+				return e
+			}
+			if pos != ^uint32(0) {
+				return ErrPolynomialAssertion
+			}
+		}
+		d, e := m.core.monomials.degreeCore(t)
+		if e != nil {
+			return e
+		}
+		if e = m.core.memory.WriteUint32(m.degree2pos.raw, 8+uint64(d)*4, i); e != nil {
+			return e
+		}
+		m.composition.degreeStored = i + 1
+	}
+	return nil
+}
+func (m *MultivariatePolynomialManager) resetCompositionDegrees(p Polynomial) error {
+	if e := m.compositionUnivariate(p); e != nil {
+		return e
+	}
+	size, e := m.core.readWord(p, 8)
+	if e != nil {
+		return e
+	}
+	for i := uint32(0); i < size; i++ {
+		t, e := m.core.monomialCore(p, i)
+		if e != nil {
+			return e
+		}
+		if modularSourceDebug {
+			sz, e := m.core.monomials.sizeCore(t)
+			if e != nil {
+				return e
+			}
+			if sz > 1 {
+				return ErrPolynomialAssertion
+			}
+			d, e := m.core.monomials.degreeCore(t)
+			if e != nil {
+				return e
+			}
+			pos, e := m.compositionDegreePosition(d)
+			if e != nil {
+				return e
+			}
+			if pos != i {
+				return ErrPolynomialAssertion
+			}
+		}
+		d, e := m.core.monomials.degreeCore(t)
+		if e != nil {
+			return e
+		}
+		if e = m.core.memory.WriteUint32(m.degree2pos.raw, 8+uint64(d)*4, ^uint32(0)); e != nil {
+			return e
+		}
+	}
+	m.composition.degreeStored = 0
+	return nil
+}
+func (m *MultivariatePolynomialManager) compositionAssign(r *PolynomialRef, p Polynomial) error {
+	s := &m.composition
+	executing := s.executing
+	s.executing = false
+	e := r.Assign(p)
+	s.executing = executing
+	if s.freshResult == p && (r.root.value == p || r.root.incoming == p) {
+		s.freshResult = Polynomial{}
+	}
+	return e
+}
+func (m *MultivariatePolynomialManager) compositionAssignLocal(p Polynomial) error {
+	s := &m.composition
+	executing := s.executing
+	s.executing = false
+	e := s.local.assign(m.core, p)
+	s.executing = executing
+	if s.freshResult == p && (s.local.value == p || s.local.incoming == p) {
+		s.freshResult = Polynomial{}
+	}
+	return e
+}
+func (m *MultivariatePolynomialManager) composeBody(p, q Polynomial, r *PolynomialRef) error {
+	if e := m.compositionUnivariate(p); e != nil {
+		return e
+	}
+	constant, e := m.core.IsConstant(p)
+	if e != nil {
+		return e
+	}
+	if constant {
+		return m.compositionAssign(r, p)
+	}
+	x, e := m.core.MaxVariable(p)
+	if e != nil {
+		return e
+	}
+	d, e := m.core.Degree(p, x)
+	if e != nil {
+		return e
+	}
+	s := &m.composition
+	s.degreeInput = p
+	if e = m.saveCompositionDegrees(p); e != nil {
+		return e
+	}
+	s.degreeCompleted = true
+	s.a = Int{}
+	s.aCompleted = true
+	pos, e := m.compositionDegreePosition(d)
+	if e != nil {
+		return e
+	}
+	coefficient, e := m.core.coefficientCore(p, pos)
+	if e != nil {
+		return e
+	}
+	if e = m.compositionNumeral(0, &coefficient, 0, &s.a); e != nil {
+		return e
+	}
+	first, e := m.core.MkConstantTake(&s.a)
+	if e != nil {
+		return e
+	}
+	if e = m.compositionAssign(r, first); e != nil {
+		return e
+	}
+	for i := uint32(1); i <= d; i++ {
+		pos, e = m.compositionDegreePosition(d - i)
+		if e != nil {
+			return e
+		}
+		if pos != ^uint32(0) {
+			coefficient, e = m.core.coefficientCore(p, pos)
+			if e != nil {
+				return e
+			}
+			if e = m.compositionNumeral(0, &coefficient, 0, &s.a); e != nil {
+				return e
+			}
+		} else if e = m.compositionNumeral(2, nil, 0, &s.a); e != nil {
+			return e
+		}
+		next, e := m.core.MulAdd(q, r.root.value, &s.a)
+		if e != nil {
+			return e
+		}
+		if e = m.compositionAssign(r, next); e != nil {
+			return e
+		}
+	}
+	return nil
+}
+func (m *MultivariatePolynomialManager) compositionOutput(r *PolynomialRef) error {
+	if r == nil {
+		return arena.ErrConfig
+	}
+	if e := r.open(); e != nil {
+		return e
+	}
+	if r.owner != m.core {
+		return arena.ErrConfig
+	}
+	return nil
+}
+func (m *MultivariatePolynomialManager) Compose(p, q Polynomial, r *PolynomialRef) (cause error) {
+	if e := m.ready(); e != nil {
+		return e
+	}
+	if e := m.compositionOutput(r); e != nil {
+		return e
+	}
+	if e := m.compositionUnivariate(p); e != nil {
+		return e
+	}
+	constant, e := m.core.IsConstant(p)
+	if e != nil {
+		return e
+	}
+	if constant {
+		return r.Assign(p)
+	}
+	if e = m.beginComposition(); e != nil {
+		return e
+	}
+	defer func() { cause = m.finishComposition(cause) }()
+	return m.composeBody(p, q, r)
+}
+func (m *MultivariatePolynomialManager) compositionLinear(x, y uint32, minus bool) (Polynomial, error) {
+	s := &m.composition
+	s.raw[0] = Int{}
+	s.rawMask |= 1
+	if minus {
+		s.raw[1] = Int{}
+		s.rawMask |= 2
+		// Source explicitly uses modular SET(-1), not the unsafe GF2 literal -1.
+		before := m.core.integer.pendingCell.object
+		raw, e := m.core.integer.allocator.PendingRoots()
+		if e != nil {
+			return Polynomial{}, e
+		}
+		e = m.core.modular.SetInt32(&s.raw[1], -1)
+		if before == (memory.ObjectRef{}) && m.core.integer.pendingCell.object != (memory.ObjectRef{}) {
+			s.numericPending = m.core.integer.pendingCell.object
+		}
+		if raw == ([3]memory.Block{}) {
+			after, x := m.core.integer.allocator.PendingRoots()
+			if x != nil {
+				return Polynomial{}, errors.Join(e, x)
+			}
+			if after != ([3]memory.Block{}) {
+				s.integerRaw = after
+			}
+		}
+		if e != nil {
+			return Polynomial{}, e
+		}
+		s.raw[2] = NewInt(1)
+		s.raw[3] = s.raw[1]
+		s.raw[1].cell = 0
+		s.rawMask |= 12
+	} else {
+		s.raw[2], s.raw[3] = NewInt(1), NewInt(1)
+		s.rawMask |= 12
+	}
+	p, e := m.core.MkLinearTake(s.raw[2:4], []uint32{x, y}, &s.raw[0])
+	if e == nil {
+		// RAW source numerals have no destructor. These reached source fields were
+		// consumed by mutable mk_linear or are inline scalar remnants.
+		for i := range s.raw {
+			if s.raw[i].cell != 0 {
+				return Polynomial{}, ErrPolynomialPending
+			}
+		}
+		s.rawMask = 0
+	}
+	return p, e
+}
+func (m *MultivariatePolynomialManager) ComposeXMinusY(p Polynomial, y uint32, r *PolynomialRef) (cause error) {
+	if e := m.ready(); e != nil {
+		return e
+	}
+	if e := m.compositionOutput(r); e != nil {
+		return e
+	}
+	if modularSourceDebug && y >= m.core.monomials.nextVar {
+		return ErrPolynomialAssertion
+	}
+	if e := m.compositionUnivariate(p); e != nil {
+		return e
+	}
+	x, e := m.core.MaxVariable(p)
+	if e != nil {
+		return e
+	}
+	if y == x {
+		// This source early branch has no scoped_degree2pos or numeral
+		// constructor. An older stopped lexical context is not read here.
+		s := &m.composition
+		if s.executing {
+			return ErrPolynomialPending
+		}
+		m.core.compositionOwner = s
+		s.executing = true
+		defer func() {
+			s.executing = false
+			if cause != nil {
+				s.active = true
+				if s.bodyCause == nil {
+					s.bodyCause = cause
+				}
+			}
+		}()
+		q, e := m.core.Coeff(p, x, 0)
+		if e != nil {
+			return e
+		}
+		return m.compositionAssign(r, q)
+	}
+	if e = m.beginComposition(); e != nil {
+		return e
+	}
+	defer func() { cause = m.finishComposition(cause) }()
+	m.composition.localCompleted = true
+	q, e := m.compositionLinear(x, y, true)
+	if e != nil {
+		return e
+	}
+	if e = m.compositionAssignLocal(q); e != nil {
+		return e
+	}
+	return m.composeBody(p, m.composition.local.value, r)
+}
+func (m *MultivariatePolynomialManager) ComposeXPlusY(p Polynomial, y uint32, r *PolynomialRef) (cause error) {
+	if e := m.ready(); e != nil {
+		return e
+	}
+	if e := m.compositionOutput(r); e != nil {
+		return e
+	}
+	if modularSourceDebug && y >= m.core.monomials.nextVar {
+		return ErrPolynomialAssertion
+	}
+	if e := m.compositionUnivariate(p); e != nil {
+		return e
+	}
+	x, e := m.core.MaxVariable(p)
+	if e != nil {
+		return e
+	}
+	if e = m.beginComposition(); e != nil {
+		return e
+	}
+	defer func() { cause = m.finishComposition(cause) }()
+	m.composition.localCompleted = true
+	q, e := m.compositionLinear(x, y, false)
+	if e != nil {
+		return e
+	}
+	if e = m.compositionAssignLocal(q); e != nil {
+		return e
+	}
+	return m.composeBody(p, m.composition.local.value, r)
+}
+func (m *MultivariatePolynomialManager) ComposeXMinusConstant(p Polynomial, a *Int, r *PolynomialRef) (cause error) {
+	if e := m.ready(); e != nil {
+		return e
+	}
+	if e := m.compositionOutput(r); e != nil {
+		return e
+	}
+	if e := m.compositionUnivariate(p); e != nil {
+		return e
+	}
+	zero, e := m.core.modular.IsZero(a)
+	if e != nil {
+		return e
+	}
+	if zero {
+		return r.Assign(p)
+	}
+	x, e := m.core.MaxVariable(p)
+	if e != nil {
+		return e
+	}
+	if e = m.beginComposition(); e != nil {
+		return e
+	}
+	defer func() { cause = m.finishComposition(cause) }()
+	s := &m.composition
+	s.localCompleted = true
+	s.rawMask = 3
+	if e = m.compositionNumeral(0, a, 0, &s.raw[0]); e != nil {
+		return e
+	}
+	if e = m.compositionNumeral(3, nil, 1, &s.raw[1]); e != nil {
+		return e
+	}
+	if e = m.compositionNumeral(1, nil, 0, &s.raw[0]); e != nil {
+		return e
+	}
+	q, e := m.core.MkUnivariateTake(x, 1, s.raw[:2])
+	if e != nil {
+		return e
+	}
+	// Explicit RAW source Del actions occur before returning x-c to its ref.
+	if _, e = upolynomialSourceNumeralDel(m.core.integer, &s.raw[0]); e != nil {
+		s.stopped = true
+		s.sourceCause = e
+		return e
+	}
+	s.rawMask &^= 1
+	if _, e = upolynomialSourceNumeralDel(m.core.integer, &s.raw[1]); e != nil {
+		s.stopped = true
+		s.sourceCause = e
+		return e
+	}
+	s.rawMask &^= 2
+	if e = m.compositionAssignLocal(q); e != nil {
+		return e
+	}
+	return m.composeBody(p, s.local.value, r)
+}
+
+func (m *MultivariatePolynomialManager) compositionHasOrphans() bool {
+	for _, a := range m.composition.orphans {
+		if a != (Monomial{}) {
+			return true
+		}
+	}
+	return false
+}
+func (m *MultivariatePolynomialManager) CleanupComposition() error {
+	if e := m.identity(); e != nil {
+		return e
+	}
+	s := &m.composition
+	c := m.core
+	if s.executing {
+		return ErrPolynomialPending
+	}
+	if s.constantGeneration != 0 {
+		if c.constantGeneration == s.constantGeneration && c.constantScope.active {
+			if e := c.cleanupConstantScope(); e != nil {
+				s.cleanupCause = e
+				return e
+			}
+		}
+		s.constantGeneration = 0
+	}
+	// Owning abort never replays a stopped source leaf or asserts completion of
+	// an incomplete scoped_degree2pos constructor.
+	if s.aCompleted {
+		if e := c.integer.Del(&s.a); e != nil {
+			s.cleanupCause = e
+			return e
+		}
+		s.aCompleted = false
+	}
+	for i := len(s.raw) - 1; i >= 0; i-- {
+		mask := uint8(1) << uint(i)
+		if s.rawMask&mask != 0 {
+			if e := c.integer.Del(&s.raw[i]); e != nil {
+				s.cleanupCause = e
+				return e
+			}
+			s.rawMask &^= mask
+		}
+	}
+	if s.degreeCompleted {
+		if e := m.resetCompositionDegrees(s.degreeInput); e != nil {
+			s.cleanupCause = e
+			return e
+		}
+		s.degreeCompleted = false
+	} else if s.degreeStored != 0 {
+		for s.degreeStored > 0 {
+			i := s.degreeStored - 1
+			a, e := c.monomialCore(s.degreeInput, i)
+			if e != nil {
+				return e
+			}
+			d, e := c.monomials.degreeCore(a)
+			if e != nil {
+				return e
+			}
+			current, e := m.compositionDegreePosition(d)
+			if e != nil {
+				return e
+			}
+			if current != i {
+				return ErrPolynomialPending
+			}
+			if e = c.memory.WriteUint32(m.degree2pos.raw, 8+uint64(d)*4, ^uint32(0)); e != nil {
+				return e
+			}
+			s.degreeStored--
+		}
+	}
+	if s.localCompleted {
+		if e := s.local.close(c); e != nil {
+			s.cleanupCause = e
+			return e
+		}
+		s.localCompleted = false
+	}
+	if s.freshResult != (Polynomial{}) {
+		if e := c.CleanupValue(&s.freshResult); e != nil {
+			s.cleanupCause = e
+			return e
+		}
+	}
+	if s.coreGenerated != (Monomial{}) {
+		if c.generatedActive && c.generatedMonomial == s.coreGenerated {
+			if e := c.cleanupGeneratedMonomial(); e != nil {
+				s.cleanupCause = e
+				return e
+			}
+		}
+		s.coreGenerated = Monomial{}
+	}
+	if s.generated != (Monomial{}) {
+		if e := c.monomials.CleanupValue(&s.generated); e != nil {
+			s.cleanupCause = e
+			return e
+		}
+	}
+	for s.drain < uint32(len(s.orphans)) {
+		a := &s.orphans[s.drain]
+		if *a != (Monomial{}) {
+			if e := c.monomials.CleanupValue(a); e != nil {
+				s.cleanupCause = e
+				return e
+			}
+		}
+		s.drain++
+	}
+	if s.calleeGeneration != 0 {
+		creation := &c.monomials.creation
+		if creation.generation == s.calleeGeneration && creation.parent == c {
+			if e := c.monomials.CleanupCreation(); e != nil {
+				s.cleanupCause = e
+				return e
+			}
+		}
+		if c.generatedCalleeGeneration == s.calleeGeneration {
+			c.generatedCalleePending = false
+		}
+		s.calleeGeneration = 0
+	}
+	if s.factoryGeneration != 0 {
+		if c.pending.generation == s.factoryGeneration && c.pending.compositionParent == s {
+			if e := c.cleanupPendingCreation(); e != nil {
+				s.cleanupCause = e
+				return e
+			}
+		}
+		s.factoryGeneration = 0
+	}
+	if s.singleton != (Monomial{}) {
+		if c.singletonReference && c.singletonMonomial == s.singleton && c.singletonGeneration == s.singletonGeneration {
+			if e := c.monomials.DecRef(s.singleton); e != nil {
+				s.cleanupCause = e
+				return e
+			}
+			c.singletonReference = false
+			c.singletonMonomial = Monomial{}
+		}
+		s.singleton = Monomial{}
+	}
+	if s.numericPending != (memory.ObjectRef{}) {
+		if c.integer.pendingCell.object == s.numericPending {
+			if e := c.integer.cleanupPendingAllocation(); e != nil {
+				s.cleanupCause = e
+				return e
+			}
+		}
+		s.numericPending = memory.ObjectRef{}
+	}
+	for i := 0; i < 2; i++ {
+		roots := &s.integerRaw
+		allocator := c.integer.allocator
+		if i == 1 {
+			roots = &s.monomialRaw
+			allocator = c.monomials.allocator
+		}
+		if *roots != ([3]memory.Block{}) {
+			current, e := allocator.PendingRoots()
+			if e != nil {
+				return e
+			}
+			if current == *roots {
+				e = allocator.CleanupPending()
+				after, x := allocator.PendingRoots()
+				*roots = after
+				if e != nil {
+					s.cleanupCause = e
+					return errors.Join(e, x)
+				}
+				if x != nil {
+					return x
+				}
+			}
+			*roots = [3]memory.Block{}
+		}
+	}
+	s.active = false
+	s.cleanupCause = nil
+	return nil
+}
+func (m *MultivariatePolynomialManager) closeCompositionMetadata() error {
+	if m.composition.active || m.compositionHasOrphans() {
+		return ErrPolynomialPending
+	}
+	m.originalBudget.Release(uint64(cap(m.composition.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size()))
+	m.composition.orphans = nil
+	m.composition.drain = 0
+	return nil
+}
+func (m *MultivariatePolynomialManager) finishCompositionResult(p Polynomial, e error) (Polynomial, error) {
+	e = m.finishComposition(e)
+	s := &m.composition
+	if e != nil {
+		return Polynomial{}, e
+	}
+	if s.freshResult == p {
+		s.freshResult = Polynomial{}
+	}
+	if s.generated == (Monomial{}) && s.factoryGeneration == 0 && s.calleeGeneration == 0 && s.numericPending == (memory.ObjectRef{}) && s.integerRaw == ([3]memory.Block{}) && s.monomialRaw == ([3]memory.Block{}) && s.rawMask == 0 {
+		s.active = false
+	}
+	return p, nil
+}
+
+// Observe only around an actually reached numeric manager call, without
+// converting the allocator's retained directory into operation ownership.
+type polynomialCompositionNumericSnapshot struct {
+	scope  *polynomialCompositionScope
+	object memory.ObjectRef
+	raw    [3]memory.Block
+}
+
+func (c *MultivariatePolynomialCore) compositionNumericBefore() (polynomialCompositionNumericSnapshot, error) {
+	s := c.compositionOwner
+	if s == nil || !s.executing {
+		return polynomialCompositionNumericSnapshot{}, nil
+	}
+	raw, e := c.integer.allocator.PendingRoots()
+	return polynomialCompositionNumericSnapshot{scope: s, object: c.integer.pendingCell.object, raw: raw}, e
+}
+func (c *MultivariatePolynomialCore) compositionNumericAfter(before polynomialCompositionNumericSnapshot, cause error) error {
+	s := before.scope
+	if s == nil || !s.executing {
+		return cause
+	}
+	if before.object == (memory.ObjectRef{}) && c.integer.pendingCell.object != (memory.ObjectRef{}) {
+		s.numericPending = c.integer.pendingCell.object
+	}
+	if before.raw == ([3]memory.Block{}) {
+		after, e := c.integer.allocator.PendingRoots()
+		if e != nil {
+			return errors.Join(cause, e)
+		}
+		if after != ([3]memory.Block{}) {
+			s.integerRaw = after
+		}
+	}
+	return cause
+}
+func (c *MultivariatePolynomialCore) compositionNumericCall(op uint8, a, b, d, out *Int) error {
+	before, e := c.compositionNumericBefore()
+	if e != nil {
+		return e
+	}
+	switch op {
+	case 0:
+		e = c.modular.Copy(out, a)
+	case 1:
+		e = c.modular.Add(a, b, out)
+	case 2:
+		e = c.modular.Mul(a, b, out)
+	case 3:
+		e = c.modular.AddMul(a, b, d, out)
+	case 4:
+		e = c.modular.Div(a, b, out)
+	default:
+		return arena.ErrBounds
+	}
+	return c.compositionNumericAfter(before, e)
+}

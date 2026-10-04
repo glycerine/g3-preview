@@ -4,6 +4,11 @@ package mpnum
 import "github.com/glycerine/g3/golang/arena"
 
 func (m *MultivariatePolynomialCore) checkpoint() error {
+	if s := m.compositionOwner; s != nil && s.executing {
+		s.executing = false
+		defer func() { s.executing = true }()
+	}
+
 	if !m.config.Checkpoint() {
 		return ErrUPolynomialCanceled
 	}

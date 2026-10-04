@@ -124,6 +124,9 @@ func (m *MultivariatePolynomialCore) generatedRemoveVariable(term Monomial, x ui
 	}
 	if e == nil && outcome.created {
 		m.generatedMonomial = a
+		if s := m.compositionOwner; s != nil && s.executing {
+			s.coreGenerated = a
+		}
 		m.generatedActive = true
 		m.generatedPSC = m.pscExecutingOwner()
 		if m.translation.executing {

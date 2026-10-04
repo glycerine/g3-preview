@@ -73,7 +73,7 @@ func (b *polynomialSOM) addConsumed(a *Int, term Monomial, take bool, consumed *
 		if e != nil {
 			return e
 		}
-		e = m.modular.Add(&old, a, &old)
+		e = m.compositionNumericCall(1, &old, a, nil, &old)
 		w := b.as.putCoefficient(m, pos, old)
 		if e != nil {
 			return e
@@ -106,7 +106,7 @@ func (b *polynomialSOM) addConsumed(a *Int, term Monomial, take bool, consumed *
 		if take {
 			e = m.modular.Swap(&value, a)
 		} else {
-			e = m.modular.Copy(&value, a)
+			e = m.compositionNumericCall(0, a, nil, nil, &value)
 		}
 		if w := b.as.putCoefficient(m, n, value); w != nil {
 			return w
@@ -142,7 +142,7 @@ func (b *polynomialSOM) addConsumed(a *Int, term Monomial, take bool, consumed *
 		if take {
 			e = m.modular.Swap(&value, a)
 		} else {
-			e = m.modular.Copy(&value, a)
+			e = m.compositionNumericCall(0, a, nil, nil, &value)
 		}
 		if w := b.as.putCoefficient(m, n, value); w != nil {
 			return w
@@ -304,9 +304,9 @@ func (b *polynomialSOM) addSourceInput(a *Int, term Monomial, p polynomialSOMInp
 				return e
 			}
 			if multiply {
-				e = m.modular.Mul(a, &source, &out)
+				e = m.compositionNumericCall(2, a, &source, nil, &out)
 			} else {
-				e = m.modular.Copy(&out, &source)
+				e = m.compositionNumericCall(0, &source, nil, nil, &out)
 			}
 			if w := b.as.putCoefficient(m, n, out); w != nil {
 				return w
@@ -327,9 +327,9 @@ func (b *polynomialSOM) addSourceInput(a *Int, term Monomial, p polynomialSOMInp
 				return e
 			}
 			if multiply {
-				e = m.modular.AddMul(&out, a, &source, &out)
+				e = m.compositionNumericCall(3, &out, a, &source, &out)
 			} else {
-				e = m.modular.Add(&out, &source, &out)
+				e = m.compositionNumericCall(1, &out, &source, nil, &out)
 			}
 			if w := b.as.putCoefficient(m, pos, out); w != nil {
 				return w
@@ -584,7 +584,7 @@ func (b *polynomialSOM) normalize() (result error) {
 			if e != nil {
 				return e
 			}
-			e = m.modular.Div(&a, &b.gcd, &a)
+			e = m.compositionNumericCall(4, &a, &b.gcd, nil, &a)
 			if w := b.as.putCoefficient(m, i, a); w != nil {
 				return w
 			}

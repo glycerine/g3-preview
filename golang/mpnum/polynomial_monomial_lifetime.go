@@ -184,6 +184,11 @@ func (m *MonomialManager) CleanupValue(a *Monomial) error {
 	if d := l.derivativeCohort; d != nil && uint64(l.derivativeSlot) < uint64(len(d.orphans)) && d.orphans[l.derivativeSlot] == *a {
 		d.orphans[l.derivativeSlot] = Monomial{}
 	}
+	if d := l.compositionCohort; d != nil && uint64(l.compositionSlot) < uint64(len(d.orphans)) && d.orphans[l.compositionSlot] == *a {
+		d.orphans[l.compositionSlot] = Monomial{}
+	}
+	l.compositionCohort = nil
+	l.compositionSlot = 0
 	l.derivativeCohort = nil
 	l.derivativeSlot = 0
 	l.live = false

@@ -174,6 +174,10 @@ func (m *MultivariatePolynomialManager) callerGuard() error {
 	return nil
 }
 func (m *MultivariatePolynomialManager) CloseChecked() error {
+	if m != nil && m.self == m && (m.composition.active || m.compositionHasOrphans()) {
+		return ErrPolynomialPending
+	}
+
 	if m != nil && m.self == m && m.evaluation.active {
 		return ErrPolynomialPending
 	}
@@ -200,6 +204,9 @@ func (m *MultivariatePolynomialManager) CloseChecked() error {
 		m.closing = true
 	}
 	if e := m.closeEvaluationFrames(); e != nil {
+		return e
+	}
+	if e := m.closeCompositionMetadata(); e != nil {
 		return e
 	}
 	if m.core == nil {

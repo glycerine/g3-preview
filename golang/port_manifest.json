@@ -28510,7 +28510,10 @@
         "mpnum/polynomial_evaluation_raw_test.go",
         "mpnum/polynomial_evaluation_read_test.go",
         "mpnum/polynomial_evaluation_test.go",
-        "mpnum/polynomial_evaluation_tls_test.go"
+        "mpnum/polynomial_evaluation_tls_test.go",
+        "mpnum/polynomial_composition.go",
+        "mpnum/polynomial_composition_receipt_test.go",
+        "mpnum/polynomial_composition_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -28842,7 +28845,28 @@
         "TestPolynomialEvaluationReachedDegreeAfterVariableBreak",
         "TestPolynomialEvaluationModularEarlyCopyCapturesPhysicalRoots",
         "TestPolynomialEvaluationLiveCallerClosePreservesCachedFrames",
-        "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary"
+        "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary",
+        "TestPolynomialCompositionOwnsActualSingletonAcquisition",
+        "TestPolynomialCompositionEveryReservation",
+        "TestPolynomialCompositionBigScalarOverloadEveryReservation",
+        "TestPolynomialCompositionSingletonForeignReplacement",
+        "TestPolynomialCompositionRawZeroCohortAndBorrowedExisting",
+        "TestPolynomialCompositionCancellationRestoresActualDegreeMap",
+        "TestPolynomialCompositionSameVariableBigCopyEveryReservation",
+        "TestPolynomialCompositionStoppedAuxiliaryPreservesDegreeScope",
+        "TestPolynomialCompositionEarlyRoutesPreserveOlderContext",
+        "TestPolynomialCompositionScalarForeignReplacement",
+        "TestPolynomialCompositionPostphysicalCellRawReceipt",
+        "TestPolynomialCompositionDeletionCallbackOwnsForeignContinuation",
+        "TestPolynomialCompositionNumericPendingForeignReplacement",
+        "TestPolynomialCompositionUnsignedDegreeConstructorStop",
+        "TestPolynomialCompositionStoppedConstantPrecedesOuterLocals",
+        "TestPolynomialCompositionStoppedConstantPhysicalReleasePrecedesOuter",
+        "TestPolynomialCompositionForeignStoppedConstantDoesNotPoisonOuter",
+        "TestPolynomialCompositionStoppedConstantResultHasSingleOwningCleanup",
+        "TestPolynomialCompositionDormantOriginal",
+        "TestPolynomialCompositionReciprocalAndVariableOrders",
+        "TestPolynomialCompositionIndependentFiniteAndAliases"
       ],
       "conditionals": [
         {
@@ -31416,6 +31440,34 @@
             "TestPolynomialEvaluationLiveCallerClosePreservesCachedFrames",
             "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary"
           ]
+        },
+        {
+          "name": "Selected reciprocal/homogenization/variable/parity/general Horner/x\u00b1y/x-c composition and matched younger constant destructor/source-owning result cleanup",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_composition.go",
+          "tests": [
+            "TestPolynomialCompositionOwnsActualSingletonAcquisition",
+            "TestPolynomialCompositionEveryReservation",
+            "TestPolynomialCompositionBigScalarOverloadEveryReservation",
+            "TestPolynomialCompositionSingletonForeignReplacement",
+            "TestPolynomialCompositionRawZeroCohortAndBorrowedExisting",
+            "TestPolynomialCompositionCancellationRestoresActualDegreeMap",
+            "TestPolynomialCompositionSameVariableBigCopyEveryReservation",
+            "TestPolynomialCompositionStoppedAuxiliaryPreservesDegreeScope",
+            "TestPolynomialCompositionEarlyRoutesPreserveOlderContext",
+            "TestPolynomialCompositionScalarForeignReplacement",
+            "TestPolynomialCompositionPostphysicalCellRawReceipt",
+            "TestPolynomialCompositionDeletionCallbackOwnsForeignContinuation",
+            "TestPolynomialCompositionNumericPendingForeignReplacement",
+            "TestPolynomialCompositionUnsignedDegreeConstructorStop",
+            "TestPolynomialCompositionStoppedConstantPrecedesOuterLocals",
+            "TestPolynomialCompositionStoppedConstantPhysicalReleasePrecedesOuter",
+            "TestPolynomialCompositionForeignStoppedConstantDoesNotPoisonOuter",
+            "TestPolynomialCompositionStoppedConstantResultHasSingleOwningCleanup",
+            "TestPolynomialCompositionDormantOriginal",
+            "TestPolynomialCompositionReciprocalAndVariableOrders",
+            "TestPolynomialCompositionIndependentFiniteAndAliases"
+          ]
         }
       ],
       "ownership": [
@@ -31444,7 +31496,8 @@
         "Translation uses the existing actual imp coefficient-buffer member. Named roots include actual child/raw/pending/old storage, retained NUM and exact generated monomial/factory generation; ordinary scope unwind precedes owning abort. Full owning Close rejects retained translation locals before child or caller teardown. Lex sort owns real Runtime bucket bindings and cold child directory plus permutation member; failed lower recursion preserves prior published term permutations. No registry-derived owning authority or native class allocation equivalence.",
         "Actual derivative n/a embedded full-manager scope and reverse source destruction; charged created-only monomial cohort never owns borrowed RC0. Exact executing factory generation/parent, numeric ObjectRef and allzero-before allocator pending triple receipts identify only reached failed callees. Source causes stay sticky, consumed drops/frees never replay, and owning cleanup leaves later caller replacements untouched. See PORT_PROGRESS.md.",
         "Actual lexical polynomial references and H inline16/ref_buffer heap handles; successful source INC precedes fallible push/placement. Reverse lexical destruction and source first-cause stops precede explicit operation-owned abort. Actual invocation/factory/singleton and pending-cell receipts exclude later caller continuations. See PORT_PROGRESS.md.",
-        "Every recursive invocation constructs its real auxiliary; charged concrete cached frame owners preserve exact lexical destruction, first stopped source cause and explicit owning abort. Matching actual LexSort/RAW generation and newly reached Integer ObjectRef/allocator roots are cleaned without sweeping later foreign calls. Rejected live-caller Close preserves cached frames."
+        "Every recursive invocation constructs its real auxiliary; charged concrete cached frame owners preserve exact lexical destruction, first stopped source cause and explicit owning abort. Matching actual LexSort/RAW generation and newly reached Integer ObjectRef/allocator roots are cleaned without sweeping later foreign calls. Rejected live-caller Close preserves cached frames.",
+        "Concrete reflected composition scope borrows source degree2pos member, owns actual completed numeral/poly locals and exact created-outcome orphan cohort. Source auxiliary then degree then local destruction; matching younger constant numeral\u2192rational NUM/DEN stop preserves older locals and sticky causes. Explicit owning cleanup resumes matching callee first and acknowledges only its exact consumed returned result; physical pending ObjectRef/triples and borrowed callbacks remain separate, no registry-derived authority."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -31474,7 +31527,8 @@
         "Concrete imp wrapper owns the actual core arithmetic object, independent UP and remaining source members. Current core constructor/default/guard/cleanup helpers are preserved; only actual translateBuffers field added. Literal body/MM DEC and completed-member unwind remain separate from owning abort. Enabled TRACE/global allocator/wrapper/control/native class header binding and full arithmetic facade remain OPEN. Reflected Go headers are charged; explicit named retirement copies acquire numeral ownership only after actual source vector raw is consumed. No registry-derived owning roots or registered PSC driver credit. See PORT_PROGRESS.md.",
         "Selected translation/lex methods remain partial source-family evidence, without registered polynomial driver completion. CTRACE poly_bug stream, global diagnostics/control and native class ABI remain open. Coefficient/div_x expressions use permitted coefficient-first evaluation. Runtime bucket bindings and charged cold children are Go storage adaptations; unsigned wrapped degree reaches a typed physical boundary. Broader GCD/PSC/resultants/printing remain open. See PORT_PROGRESS.md.",
         "Selected optimized PSC only. IC/ICCP/default general GCD/Resultant, classic alternatives, complete original driver constructors/lifetimes and enabled TRACE/global tags remain OPEN. H uses actual scalar handle16 storage rather than native pointer8 ABI. Original eight coefficient fixtures execute first/second of three static ENSURE sites; the Resultant site remains outstanding.",
-        "Source lexical stack represented by charged cached concrete Go owners and actual pointer directory; no Runtime reservation ticket. Algebraic evaluation, cross-Integer transfer, global TRACE and complete registered polynomial driver remain open."
+        "Source lexical stack represented by charged cached concrete Go owners and actual pointer directory; no Runtime reservation ticket. Algebraic evaluation, cross-Integer transfer, global TRACE and complete registered polynomial driver remain open.",
+        "Selected source composition bodies complete for explicit same-Integer rational binding and actual Runtime profile. Dormant cpp573-574 ENSURE adapted via dense term construction; registered driver returns before tst_compose, active original driver credit zero. TLS/dangling-pointer proofs are actual owner-primitive guarded-domain tests, not ordinary mathematical OOM reachability. Global TRACE/assertions/native ABI, same-frame high-level callback reentry and full polynomial family remain open; persistent source class members are not implicitly reset by owning lexical abort."
       ]
     },
     {
@@ -31596,7 +31650,10 @@
         "mpnum/polynomial_psc_profiles_test.go",
         "mpnum/polynomial_psc_source_test.go",
         "mpnum/polynomial_psc_unwind_test.go",
-        "mpnum/polynomial_evaluation.go"
+        "mpnum/polynomial_evaluation.go",
+        "mpnum/polynomial_composition.go",
+        "mpnum/polynomial_composition_receipt_test.go",
+        "mpnum/polynomial_composition_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -31910,7 +31967,28 @@
         "TestPolynomialEvaluationReachedDegreeAfterVariableBreak",
         "TestPolynomialEvaluationModularEarlyCopyCapturesPhysicalRoots",
         "TestPolynomialEvaluationLiveCallerClosePreservesCachedFrames",
-        "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary"
+        "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary",
+        "TestPolynomialCompositionOwnsActualSingletonAcquisition",
+        "TestPolynomialCompositionEveryReservation",
+        "TestPolynomialCompositionBigScalarOverloadEveryReservation",
+        "TestPolynomialCompositionSingletonForeignReplacement",
+        "TestPolynomialCompositionRawZeroCohortAndBorrowedExisting",
+        "TestPolynomialCompositionCancellationRestoresActualDegreeMap",
+        "TestPolynomialCompositionSameVariableBigCopyEveryReservation",
+        "TestPolynomialCompositionStoppedAuxiliaryPreservesDegreeScope",
+        "TestPolynomialCompositionEarlyRoutesPreserveOlderContext",
+        "TestPolynomialCompositionScalarForeignReplacement",
+        "TestPolynomialCompositionPostphysicalCellRawReceipt",
+        "TestPolynomialCompositionDeletionCallbackOwnsForeignContinuation",
+        "TestPolynomialCompositionNumericPendingForeignReplacement",
+        "TestPolynomialCompositionUnsignedDegreeConstructorStop",
+        "TestPolynomialCompositionStoppedConstantPrecedesOuterLocals",
+        "TestPolynomialCompositionStoppedConstantPhysicalReleasePrecedesOuter",
+        "TestPolynomialCompositionForeignStoppedConstantDoesNotPoisonOuter",
+        "TestPolynomialCompositionStoppedConstantResultHasSingleOwningCleanup",
+        "TestPolynomialCompositionDormantOriginal",
+        "TestPolynomialCompositionReciprocalAndVariableOrders",
+        "TestPolynomialCompositionIndependentFiniteAndAliases"
       ],
       "conditionals": [
         {
@@ -33196,6 +33274,34 @@
             "TestPolynomialEvaluationLiveCallerClosePreservesCachedFrames",
             "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary"
           ]
+        },
+        {
+          "name": "Selected reciprocal/homogenization/variable/parity/general Horner/x\u00b1y/x-c composition and matched younger constant destructor/source-owning result cleanup",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_composition.go",
+          "tests": [
+            "TestPolynomialCompositionOwnsActualSingletonAcquisition",
+            "TestPolynomialCompositionEveryReservation",
+            "TestPolynomialCompositionBigScalarOverloadEveryReservation",
+            "TestPolynomialCompositionSingletonForeignReplacement",
+            "TestPolynomialCompositionRawZeroCohortAndBorrowedExisting",
+            "TestPolynomialCompositionCancellationRestoresActualDegreeMap",
+            "TestPolynomialCompositionSameVariableBigCopyEveryReservation",
+            "TestPolynomialCompositionStoppedAuxiliaryPreservesDegreeScope",
+            "TestPolynomialCompositionEarlyRoutesPreserveOlderContext",
+            "TestPolynomialCompositionScalarForeignReplacement",
+            "TestPolynomialCompositionPostphysicalCellRawReceipt",
+            "TestPolynomialCompositionDeletionCallbackOwnsForeignContinuation",
+            "TestPolynomialCompositionNumericPendingForeignReplacement",
+            "TestPolynomialCompositionUnsignedDegreeConstructorStop",
+            "TestPolynomialCompositionStoppedConstantPrecedesOuterLocals",
+            "TestPolynomialCompositionStoppedConstantPhysicalReleasePrecedesOuter",
+            "TestPolynomialCompositionForeignStoppedConstantDoesNotPoisonOuter",
+            "TestPolynomialCompositionStoppedConstantResultHasSingleOwningCleanup",
+            "TestPolynomialCompositionDormantOriginal",
+            "TestPolynomialCompositionReciprocalAndVariableOrders",
+            "TestPolynomialCompositionIndependentFiniteAndAliases"
+          ]
         }
       ],
       "ownership": [
@@ -33223,7 +33329,8 @@
         "Skeleton entries/powers/originals use actual Runtime storage; failed constructor transfers actual unconsumed INC fields into charged cold owning-abort records before source backing free. Scoped pointer publications alone own concrete children; stopped source cause retained, separate owning cleanup. Variable helpers own two/one actual embedded uint vectors in one charged stable cold header, views/scopes borrow actual backing and references. Strong shared physical census names pseudo/Power/ExactDiv plus supplied headers/blocks without registry-derived ownership.",
         "Translation uses the existing actual imp coefficient-buffer member. Named roots include actual child/raw/pending/old storage, retained NUM and exact generated monomial/factory generation; ordinary scope unwind precedes owning abort. Full owning Close rejects retained translation locals before child or caller teardown. Lex sort owns real Runtime bucket bindings and cold child directory plus permutation member; failed lower recursion preserves prior published term permutations. No registry-derived owning authority or native class allocation equivalence.",
         "Actual derivative n/a embedded full-manager scope and reverse source destruction; charged created-only monomial cohort never owns borrowed RC0. Exact executing factory generation/parent, numeric ObjectRef and allzero-before allocator pending triple receipts identify only reached failed callees. Source causes stay sticky, consumed drops/frees never replay, and owning cleanup leaves later caller replacements untouched. See PORT_PROGRESS.md.",
-        "Actual lexical polynomial references and H inline16/ref_buffer heap handles; successful source INC precedes fallible push/placement. Reverse lexical destruction and source first-cause stops precede explicit operation-owned abort. Actual invocation/factory/singleton and pending-cell receipts exclude later caller continuations. See PORT_PROGRESS.md."
+        "Actual lexical polynomial references and H inline16/ref_buffer heap handles; successful source INC precedes fallible push/placement. Reverse lexical destruction and source first-cause stops precede explicit operation-owned abort. Actual invocation/factory/singleton and pending-cell receipts exclude later caller continuations. See PORT_PROGRESS.md.",
+        "Concrete reflected composition scope borrows source degree2pos member, owns actual completed numeral/poly locals and exact created-outcome orphan cohort. Source auxiliary then degree then local destruction; matching younger constant numeral\u2192rational NUM/DEN stop preserves older locals and sticky causes. Explicit owning cleanup resumes matching callee first and acknowledges only its exact consumed returned result; physical pending ObjectRef/triples and borrowed callbacks remain separate, no registry-derived authority."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -33252,7 +33359,8 @@
         "Concrete imp wrapper owns the actual core arithmetic object, independent UP and remaining source members. Current core constructor/default/guard/cleanup helpers are preserved; only actual translateBuffers field added. Literal body/MM DEC and completed-member unwind remain separate from owning abort. Enabled TRACE/global allocator/wrapper/control/native class header binding and full arithmetic facade remain OPEN. Reflected Go headers are charged; explicit named retirement copies acquire numeral ownership only after actual source vector raw is consumed. No registry-derived owning roots or registered PSC driver credit. See PORT_PROGRESS.md.",
         "Selected translation/lex methods remain partial source-family evidence, without registered polynomial driver completion. CTRACE poly_bug stream, global diagnostics/control and native class ABI remain open. Coefficient/div_x expressions use permitted coefficient-first evaluation. Runtime bucket bindings and charged cold children are Go storage adaptations; unsigned wrapped degree reaches a typed physical boundary. Broader GCD/PSC/resultants/printing remain open. See PORT_PROGRESS.md.",
         "Selected optimized PSC only. IC/ICCP/default general GCD/Resultant, classic alternatives, complete original driver constructors/lifetimes and enabled TRACE/global tags remain OPEN. H uses actual scalar handle16 storage rather than native pointer8 ABI. Original eight coefficient fixtures execute first/second of three static ENSURE sites; the Resultant site remains outstanding.",
-        "Cold concrete callback interfaces preserve live borrowed values; supported managers require the same actual Integer cohort. Algebraic specialization remains open."
+        "Cold concrete callback interfaces preserve live borrowed values; supported managers require the same actual Integer cohort. Algebraic specialization remains open.",
+        "Selected source composition bodies complete for explicit same-Integer rational binding and actual Runtime profile. Dormant cpp573-574 ENSURE adapted via dense term construction; registered driver returns before tst_compose, active original driver credit zero. TLS/dangling-pointer proofs are actual owner-primitive guarded-domain tests, not ordinary mathematical OOM reachability. Global TRACE/assertions/native ABI, same-frame high-level callback reentry and full polynomial family remain open; persistent source class members are not implicitly reset by owning lexical abort."
       ]
     },
     {
@@ -93422,7 +93530,10 @@
         "mpnum/polynomial_evaluation_read_test.go",
         "mpnum/polynomial_evaluation_test.go",
         "mpnum/polynomial_evaluation_tls_test.go",
-        "mpnum/polynomial_imp_physical_test.go"
+        "mpnum/polynomial_imp_physical_test.go",
+        "mpnum/polynomial_composition.go",
+        "mpnum/polynomial_composition_receipt_test.go",
+        "mpnum/polynomial_composition_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -93500,7 +93611,28 @@
         "TestPolynomialEvaluationReachedDegreeAfterVariableBreak",
         "TestPolynomialEvaluationModularEarlyCopyCapturesPhysicalRoots",
         "TestPolynomialEvaluationLiveCallerClosePreservesCachedFrames",
-        "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary"
+        "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary",
+        "TestPolynomialCompositionOwnsActualSingletonAcquisition",
+        "TestPolynomialCompositionEveryReservation",
+        "TestPolynomialCompositionBigScalarOverloadEveryReservation",
+        "TestPolynomialCompositionSingletonForeignReplacement",
+        "TestPolynomialCompositionRawZeroCohortAndBorrowedExisting",
+        "TestPolynomialCompositionCancellationRestoresActualDegreeMap",
+        "TestPolynomialCompositionSameVariableBigCopyEveryReservation",
+        "TestPolynomialCompositionStoppedAuxiliaryPreservesDegreeScope",
+        "TestPolynomialCompositionEarlyRoutesPreserveOlderContext",
+        "TestPolynomialCompositionScalarForeignReplacement",
+        "TestPolynomialCompositionPostphysicalCellRawReceipt",
+        "TestPolynomialCompositionDeletionCallbackOwnsForeignContinuation",
+        "TestPolynomialCompositionNumericPendingForeignReplacement",
+        "TestPolynomialCompositionUnsignedDegreeConstructorStop",
+        "TestPolynomialCompositionStoppedConstantPrecedesOuterLocals",
+        "TestPolynomialCompositionStoppedConstantPhysicalReleasePrecedesOuter",
+        "TestPolynomialCompositionForeignStoppedConstantDoesNotPoisonOuter",
+        "TestPolynomialCompositionStoppedConstantResultHasSingleOwningCleanup",
+        "TestPolynomialCompositionDormantOriginal",
+        "TestPolynomialCompositionReciprocalAndVariableOrders",
+        "TestPolynomialCompositionIndependentFiniteAndAliases"
       ],
       "conditionals": [
         {
@@ -93922,15 +94054,46 @@
             "TestPolynomialEvaluationLiveCallerClosePreservesCachedFrames",
             "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary"
           ]
+        },
+        {
+          "name": "Selected reciprocal/homogenization/variable/parity/general Horner/x\u00b1y/x-c composition and matched younger constant destructor/source-owning result cleanup",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_composition.go",
+          "tests": [
+            "TestPolynomialCompositionOwnsActualSingletonAcquisition",
+            "TestPolynomialCompositionEveryReservation",
+            "TestPolynomialCompositionBigScalarOverloadEveryReservation",
+            "TestPolynomialCompositionSingletonForeignReplacement",
+            "TestPolynomialCompositionRawZeroCohortAndBorrowedExisting",
+            "TestPolynomialCompositionCancellationRestoresActualDegreeMap",
+            "TestPolynomialCompositionSameVariableBigCopyEveryReservation",
+            "TestPolynomialCompositionStoppedAuxiliaryPreservesDegreeScope",
+            "TestPolynomialCompositionEarlyRoutesPreserveOlderContext",
+            "TestPolynomialCompositionScalarForeignReplacement",
+            "TestPolynomialCompositionPostphysicalCellRawReceipt",
+            "TestPolynomialCompositionDeletionCallbackOwnsForeignContinuation",
+            "TestPolynomialCompositionNumericPendingForeignReplacement",
+            "TestPolynomialCompositionUnsignedDegreeConstructorStop",
+            "TestPolynomialCompositionStoppedConstantPrecedesOuterLocals",
+            "TestPolynomialCompositionStoppedConstantPhysicalReleasePrecedesOuter",
+            "TestPolynomialCompositionForeignStoppedConstantDoesNotPoisonOuter",
+            "TestPolynomialCompositionStoppedConstantResultHasSingleOwningCleanup",
+            "TestPolynomialCompositionDormantOriginal",
+            "TestPolynomialCompositionReciprocalAndVariableOrders",
+            "TestPolynomialCompositionIndependentFiniteAndAliases"
+          ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Concrete reflected composition scope borrows source degree2pos member, owns actual completed numeral/poly locals and exact created-outcome orphan cohort. Source auxiliary then degree then local destruction; matching younger constant numeral\u2192rational NUM/DEN stop preserves older locals and sticky causes. Explicit owning cleanup resumes matching callee first and acknowledges only its exact consumed returned result; physical pending ObjectRef/triples and borrowed callbacks remain separate, no registry-derived authority."
+      ],
       "deviations": [
         "No active source ENSURE credit: tst_polynomial1815ff invokes tst_psc and returns before tst_lex. Added comparator models are independent bounded regressions, not evidence of active PSC/resultant completion.",
         "tst_polynomial at1814 has early return1825 after PSC; monomial/lex routines below are dormant in selected !__clang__ profile. No active registered driver assertion credit.",
         "Newton source campaign is dormant after early return: one ENSURE adapted, no registered active ENSURE completion credit. Full active optimized PSC8 campaign remains required and source-first private work has begun.",
         "Selected active PSC coefficient inputs and first/second static ENSURE sites now executed. Third static ENSURE calls Resultant and remains unported; complete original expression-constructor/lifetime/TRACE driver credit is not claimed.",
-        "Dense coefficient construction adapts unavailable expression builder; registered driver returns at cpp1825 before these eval cases. Active original-driver assertion credit is zero."
+        "Dense coefficient construction adapts unavailable expression builder; registered driver returns at cpp1825 before these eval cases. Active original-driver assertion credit is zero.",
+        "Selected source composition bodies complete for explicit same-Integer rational binding and actual Runtime profile. Dormant cpp573-574 ENSURE adapted via dense term construction; registered driver returns before tst_compose, active original driver credit zero. TLS/dangling-pointer proofs are actual owner-primitive guarded-domain tests, not ordinary mathematical OOM reachability. Global TRACE/assertions/native ABI, same-frame high-level callback reentry and full polynomial family remain open; persistent source class members are not implicitly reset by owning lexical abort."
       ]
     },
     {

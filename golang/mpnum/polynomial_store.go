@@ -2,6 +2,7 @@
 package mpnum
 
 import (
+	"errors"
 	"github.com/glycerine/g3/golang/arena"
 	"github.com/glycerine/g3/golang/memory"
 	"math"
@@ -279,6 +280,10 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 	}
 	m.creationGeneration++
 	m.pending = polynomialCreation{generation: m.creationGeneration}
+	if m.compositionOwner != nil && m.compositionOwner.executing {
+		m.pending.compositionParent = m.compositionOwner
+		m.compositionOwner.factoryGeneration = m.creationGeneration
+	}
 	if m.derivativeOwner != nil && m.derivativeOwner.executing {
 		m.pending.derivativeParent = m.derivativeOwner
 		m.derivativeOwner.factoryGeneration = m.creationGeneration
@@ -287,10 +292,28 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 	m.pending.pscOwner = m.pscExecutingOwner()
 	m.pending.translationOwned = m.translation.executing
 	requested := polynomialCodecBytes(n)
+	observer := m.pending.compositionParent
+	var before [3]memory.Block
+	if observer != nil {
+		var e error
+		before, e = m.monomials.allocator.PendingRoots()
+		if e != nil {
+			return Polynomial{}, e
+		}
+	}
 	raw, e := m.monomials.allocator.Allocate(uint64(requested))
 	if raw != (memory.ObjectRef{}) {
 		m.pending.raw = raw
 		m.pending.requested = requested
+	}
+	if observer != nil && before == ([3]memory.Block{}) {
+		after, probe := m.monomials.allocator.PendingRoots()
+		if after != ([3]memory.Block{}) {
+			observer.monomialRaw = after
+		}
+		if probe != nil {
+			return Polynomial{}, errors.Join(e, probe)
+		}
 	}
 	if e != nil {
 		return Polynomial{}, e
@@ -410,6 +433,10 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 	}
 	if m.pending.derivativeParent != nil && m.pending.derivativeParent.factoryGeneration == m.pending.generation {
 		m.pending.derivativeParent.factoryGeneration = 0
+	}
+	if owner := m.pending.compositionParent; owner != nil && owner.factoryGeneration == m.pending.generation {
+		owner.factoryGeneration = 0
+		owner.freshResult = p
 	}
 	m.pending = polynomialCreation{}
 	m.live++
