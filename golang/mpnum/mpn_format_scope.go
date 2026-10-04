@@ -1,5 +1,6 @@
 // Licensed under the MIT license.
-// Source mpn.cpp:371-399; constructor unwind from util/buffer.h:84-95.
+// Source: src/util/mpn.cpp:371-399; src/util/buffer.h:84-95.
+// Source author: Leonardo de Moura.
 package mpnum
 
 import (
@@ -20,10 +21,12 @@ type naturalFormattingScope struct {
 }
 
 func (m *NaturalManager) beginFormattingLocals(n uint32) error {
+	return m.beginFormattingScope(&m.formatting, n)
+}
+func (m *NaturalManager) beginFormattingScope(s *naturalFormattingScope, n uint32) error {
 	if e := m.check(); e != nil {
 		return e
 	}
-	s := &m.formatting
 	if s.active || s.pending {
 		return arena.ErrInvalidSlot
 	}
@@ -36,7 +39,7 @@ func (m *NaturalManager) beginFormattingLocals(n uint32) error {
 			s.active = false
 			s.pending = true
 			// Only previously completed local objects have source destructors.
-			if cleanup := m.unwindFormattingLocals(); cleanup != nil {
+			if cleanup := m.unwindFormattingScope(s); cleanup != nil {
 				s.cleanupCause = cleanup
 			}
 			return e
@@ -47,7 +50,9 @@ func (m *NaturalManager) beginFormattingLocals(n uint32) error {
 }
 
 func (m *NaturalManager) unwindFormattingLocals() error {
-	s := &m.formatting
+	return m.unwindFormattingScope(&m.formatting)
+}
+func (m *NaturalManager) unwindFormattingScope(s *naturalFormattingScope) error {
 	for i := 2; i >= 0; i-- {
 		bit := uint8(1) << uint(i)
 		if s.completed&bit == 0 {
@@ -69,22 +74,25 @@ func (m *NaturalManager) unwindFormattingLocals() error {
 	return nil
 }
 func (m *NaturalManager) finishFormattingLocals() error {
-	if e := m.unwindFormattingLocals(); e != nil {
-		m.formatting.active = false
-		m.formatting.pending = true
-		m.formatting.originalCause = e
+	return m.finishFormattingScope(&m.formatting)
+}
+func (m *NaturalManager) finishFormattingScope(s *naturalFormattingScope) error {
+	if e := m.unwindFormattingScope(s); e != nil {
+		s.active = false
+		s.pending = true
+		s.originalCause = e
 		return e
 	}
-	for i := range m.formatting.locals {
-		if m.formatting.locals[i].pending != (memory.Block{}) {
+	for i := range s.locals {
+		if s.locals[i].pending != (memory.Block{}) {
 			// The source destructor frees its published buffer, not an
 			// unpublished allocation retained by the Go continuation.
-			m.formatting.active = false
-			m.formatting.pending = true
+			s.active = false
+			s.pending = true
 			return arena.ErrInvalidSlot
 		}
 	}
-	m.formatting = naturalFormattingScope{}
+	*s = naturalFormattingScope{}
 	return nil
 }
 
@@ -97,14 +105,16 @@ func (m *NaturalManager) CleanupFormatting() error {
 	if m.closed || m.runtime == nil {
 		return arena.ErrClosed
 	}
-	s := &m.formatting
+	return m.cleanupFormattingScope(&m.formatting)
+}
+func (m *NaturalManager) cleanupFormattingScope(s *naturalFormattingScope) error {
 	if s.active {
 		return arena.ErrInvalidSlot
 	}
 	if !s.pending {
 		return nil
 	}
-	if e := m.unwindFormattingLocals(); e != nil {
+	if e := m.unwindFormattingScope(s); e != nil {
 		s.cleanupCause = e
 		return e
 	}

@@ -68,6 +68,14 @@ func polynomialImpPhysicalAuditNamed(t *testing.T, full *MultivariatePolynomialM
 	public = append(public, input...)
 	adapterBytes += uint64(cap(full.squareRoot.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size())
 	adapterBytes += externalHeaders
+	adapterBytes += uint64(cap(m.display.frames))*uint64(reflect.TypeOf((*polynomialDisplayFrame)(nil)).Size()) + uint64(len(m.display.frames))*uint64(reflect.TypeOf(polynomialDisplayFrame{}).Size())
+	for _, f := range m.display.frames {
+		public = append(public, &f.numeral)
+		external = append(external, f.characters.raw, f.characters.pending)
+		for _, b := range f.limbs.locals {
+			external = append(external, b.raw, b.pending)
+		}
+	}
 	es := &full.evaluation
 	adapterBytes += uint64(cap(es.rationalFrames))*uint64(reflect.TypeOf((*polynomialEvalRationalFrame)(nil)).Size()) + uint64(len(es.rationalFrames))*uint64(reflect.TypeOf(polynomialEvalRationalFrame{}).Size())
 	adapterBytes += uint64(cap(es.integerFrames))*uint64(reflect.TypeOf((*polynomialEvalIntegerFrame)(nil)).Size()) + uint64(len(es.integerFrames))*uint64(reflect.TypeOf(polynomialEvalIntegerFrame{}).Size())

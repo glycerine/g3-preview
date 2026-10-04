@@ -1,5 +1,6 @@
 // Licensed under the MIT license.
-// Source mpn.cpp:360-399. Selected non-Windows snprintf unsigned conversion.
+// Source: src/util/mpn.cpp:360-399; src/util/buffer.h.
+// Source author: Leonardo de Moura. Selected non-Windows snprintf conversion.
 package mpnum
 
 import "github.com/glycerine/g3/golang/arena"
@@ -66,6 +67,9 @@ func readDecimalLimb(v limbView, i uint32) (uint32, error) {
 	return v.external[i], nil
 }
 func (m *NaturalManager) sourceToCString(a limbView, dst sourceDecimalDestination, lbuf uint64) error {
+	return m.sourceToCStringScoped(a, dst, lbuf, &m.formatting)
+}
+func (m *NaturalManager) sourceToCStringScoped(a limbView, dst sourceDecimalDestination, lbuf uint64, scope *naturalFormattingScope) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -103,24 +107,27 @@ func (m *NaturalManager) sourceToCString(a limbView, dst sourceDecimalDestinatio
 		}
 		return dst.write(count, 0)
 	}
-	if e := m.beginFormattingLocals(a.size); e != nil {
+	if e := m.beginFormattingScope(scope, a.size); e != nil {
 		return e
 	}
-	e := m.sourceCStringBody(a, dst)
-	cleanup := m.finishFormattingLocals()
+	e := m.sourceCStringBodyScoped(a, dst, scope)
+	cleanup := m.finishFormattingScope(scope)
 	if e != nil {
 		if cleanup != nil {
-			m.formatting.originalCause = e
-			m.formatting.cleanupCause = cleanup
+			scope.originalCause = e
+			scope.cleanupCause = cleanup
 		}
 		return e
 	}
 	return cleanup
 }
 func (m *NaturalManager) sourceCStringBody(a limbView, dst sourceDecimalDestination) error {
-	temp := limbView{runtime: m.runtime, source: &m.formatting.locals[0], size: a.size}
-	numer := limbView{runtime: m.runtime, source: &m.formatting.locals[1], size: a.size + 1}
-	denom := limbView{runtime: m.runtime, source: &m.formatting.locals[2], size: 1}
+	return m.sourceCStringBodyScoped(a, dst, &m.formatting)
+}
+func (m *NaturalManager) sourceCStringBodyScoped(a limbView, dst sourceDecimalDestination, scope *naturalFormattingScope) error {
+	temp := limbView{runtime: m.runtime, source: &scope.locals[0], size: a.size}
+	numer := limbView{runtime: m.runtime, source: &scope.locals[1], size: a.size + 1}
+	denom := limbView{runtime: m.runtime, source: &scope.locals[2], size: 1}
 	for i := uint32(0); i < a.size; i++ {
 		v, e := readDecimalLimb(a, i)
 		if e != nil {

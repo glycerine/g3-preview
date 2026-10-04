@@ -44,6 +44,7 @@ type polynomialCreation struct {
 	buffer             *polynomialSOM
 }
 type MultivariatePolynomialCore struct {
+	display                                                                                    polynomialDisplayState
 	conversionOwner                                                                            *polynomialGlobalConversionScope
 	toPolynomialOwner                                                                          *polynomialToPolynomialScope
 	contentLocal                                                                               polynomialContentScope
@@ -371,6 +372,9 @@ func (m *MultivariatePolynomialCore) MkTerms(as []Int, ms []Monomial) (Polynomia
 	return m.som.mk(false)
 }
 func (m *MultivariatePolynomialCore) CloseChecked() error {
+	if m != nil && m.self == m && m.displayPending() {
+		return ErrPolynomialPending
+	}
 	if m != nil && m.self == m && m.contentLocal.active {
 		return ErrPolynomialPending
 	}
@@ -449,6 +453,9 @@ func (m *MultivariatePolynomialCore) CloseChecked() error {
 			return ErrPolynomialLive
 		}
 		m.closing = true
+	}
+	if e := m.closeDisplayMetadata(); e != nil {
+		return e
 	}
 	if e := m.cleanupCreation(); e != nil {
 		m.cleanupCause = e

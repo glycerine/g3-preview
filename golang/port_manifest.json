@@ -28565,7 +28565,12 @@
         "mpnum/polynomial_to_polynomial_test.go",
         "mpnum/polynomial_univariate_indexed.go",
         "mpnum/polynomial_global_convert.go",
-        "mpnum/polynomial_global_convert_test.go"
+        "mpnum/polynomial_global_convert_test.go",
+        "mpnum/mpn_cstring.go",
+        "mpnum/mpn_format_scope.go",
+        "mpnum/polynomial_display.go",
+        "mpnum/polynomial_display_source_test.go",
+        "mpnum/polynomial_display_tls_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -28966,7 +28971,21 @@
         "TestPolynomialToPolynomialZeroKeepsOlderStoppedLocal",
         "TestPolynomialToPolynomialModularSourceSets",
         "TestPolynomialToPolynomialExactNumericForeignReplacement",
-        "TestPolynomialToPolynomialReturnedResultBeforeRawDestructorStop"
+        "TestPolynomialToPolynomialReturnedResultBeforeRawDestructorStop",
+        "TestPolynomialDisplayLiteralSourceQuirks",
+        "TestPolynomialDisplayZeroAndRefVectorSuffix",
+        "TestPolynomialDisplayScalarCStringAliveAndNested",
+        "TestPolynomialDisplayLastCallbackLifetime",
+        "TestPolynomialDisplayBorrowEndsAfterInsertion",
+        "TestPolynomialDisplayEveryReservation",
+        "TestPolynomialDisplayCloseRefusalPreservesCache",
+        "TestPolynomialDisplayRefVectorCachedCount",
+        "TestPolynomialDisplayWarmInlineFrames",
+        "TestPolynomialDisplayOwnerGuards",
+        "TestPolynomialDisplayMonomialWrapperAndFiniteField",
+        "TestPolynomialDisplayYoungerStoppedDestructor",
+        "TestPolynomialDisplayExactNumericReceiptAndReplacement",
+        "TestPolynomialDisplaySinkCreatesForeignPending"
       ],
       "conditionals": [
         {
@@ -31661,6 +31680,27 @@
             "TestPolynomialGlobalConvertSharedMonomialManager",
             "TestPolynomialGlobalConvertFactoryForeignReplacement"
           ]
+        },
+        {
+          "name": "Selected literal ordinary/SMT2 polynomial and monomial display, cached ref-vector stream loop, nested lexical NUM/char/MPN destruction and exact owning cleanup; native/global ostream remains open",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_display.go",
+          "tests": [
+            "TestPolynomialDisplayLiteralSourceQuirks",
+            "TestPolynomialDisplayZeroAndRefVectorSuffix",
+            "TestPolynomialDisplayScalarCStringAliveAndNested",
+            "TestPolynomialDisplayLastCallbackLifetime",
+            "TestPolynomialDisplayBorrowEndsAfterInsertion",
+            "TestPolynomialDisplayEveryReservation",
+            "TestPolynomialDisplayCloseRefusalPreservesCache",
+            "TestPolynomialDisplayRefVectorCachedCount",
+            "TestPolynomialDisplayWarmInlineFrames",
+            "TestPolynomialDisplayOwnerGuards",
+            "TestPolynomialDisplayMonomialWrapperAndFiniteField",
+            "TestPolynomialDisplayYoungerStoppedDestructor",
+            "TestPolynomialDisplayExactNumericReceiptAndReplacement",
+            "TestPolynomialDisplaySinkCreatesForeignPending"
+          ]
         }
       ],
       "ownership": [
@@ -31697,7 +31737,8 @@
         "Selected C rand state is process-static fixed31 scalar words; all Rand aliases borrow the same synchronized stream and observe Srand, without per-manager reseeding or per-draw allocation. Explicit GLibc31 instances are independent profile fixtures, not GCD-owned RNGs.",
         "Charged concrete scope owns actual four scoped NUMs, RAW two, monomial_ref, exact created-only cohort and matched callee/factory/physical receipts. Successful incoming INC transfers output before older DEC callback; source destruction is reverse lexical and stops before older fields, separate from explicit owning CleanupSqrt.",
         "Actual lexical coefficient buffer receives zero SET then coefficient SET; borrowed c_ptr view runs the same descending mk_univariate engine with writeback at each mutation. Source buffer destruction precedes successful return; owning cleanup only captures exact executing factory/NUM/MM receipts and genuinely fresh output.",
-        "Target inline128 lexical buffers live in its once-charged enclosing header; NUM buffer source destructor precedes pointer buffer. Fresh result, actual started factory generation and created-only zero-reference monomial slots carry exact owning abort authority. Source body/destructor first causes remain sticky; CleanupConversion is explicit, excludes replacement caller roots and never infers ownership from zero RC."
+        "Target inline128 lexical buffers live in its once-charged enclosing header; NUM buffer source destructor precedes pointer buffer. Fresh result, actual started factory generation and created-only zero-reference monomial slots carry exact owning abort authority. Source body/destructor first causes remain sticky; CleanupConversion is explicit, excludes replacement caller roots and never infers ownership from zero RC.",
+        "Stable charged recursive display frames own actual numeral, character and MPN locals; actual sink callbacks borrow decimal views only during insertion. Younger stopped destructor preserves older locals; CleanupDisplay uses exact physical tokens and leaves foreign/replacement roots intact."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -31880,7 +31921,12 @@
         "mpnum/polynomial_sparse_interpolator_source_test.go",
         "mpnum/polynomial_content_lifetime_source_test.go",
         "mpnum/polynomial_global_convert.go",
-        "mpnum/polynomial_global_convert_test.go"
+        "mpnum/polynomial_global_convert_test.go",
+        "mpnum/mpn_cstring.go",
+        "mpnum/mpn_format_scope.go",
+        "mpnum/polynomial_display.go",
+        "mpnum/polynomial_display_source_test.go",
+        "mpnum/polynomial_display_tls_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -32237,7 +32283,21 @@
         "TestPolynomialIntegerContentCompletedLocalActualDanglingGuard",
         "TestPolynomialIntegerContentEveryActualReservationPrefix",
         "TestPolynomialIntegerContentIndependentSignedBranches",
-        "TestPolynomialScalarIntegerContentSignedFirstAndEarlyOne"
+        "TestPolynomialScalarIntegerContentSignedFirstAndEarlyOne",
+        "TestPolynomialDisplayLiteralSourceQuirks",
+        "TestPolynomialDisplayZeroAndRefVectorSuffix",
+        "TestPolynomialDisplayScalarCStringAliveAndNested",
+        "TestPolynomialDisplayLastCallbackLifetime",
+        "TestPolynomialDisplayBorrowEndsAfterInsertion",
+        "TestPolynomialDisplayEveryReservation",
+        "TestPolynomialDisplayCloseRefusalPreservesCache",
+        "TestPolynomialDisplayRefVectorCachedCount",
+        "TestPolynomialDisplayWarmInlineFrames",
+        "TestPolynomialDisplayOwnerGuards",
+        "TestPolynomialDisplayMonomialWrapperAndFiniteField",
+        "TestPolynomialDisplayYoungerStoppedDestructor",
+        "TestPolynomialDisplayExactNumericReceiptAndReplacement",
+        "TestPolynomialDisplaySinkCreatesForeignPending"
       ],
       "conditionals": [
         {
@@ -33597,6 +33657,27 @@
             "TestPolynomialGlobalConvertSharedMonomialManager",
             "TestPolynomialGlobalConvertFactoryForeignReplacement"
           ]
+        },
+        {
+          "name": "Selected literal ordinary/SMT2 polynomial and monomial display, cached ref-vector stream loop, nested lexical NUM/char/MPN destruction and exact owning cleanup; native/global ostream remains open",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_display.go",
+          "tests": [
+            "TestPolynomialDisplayLiteralSourceQuirks",
+            "TestPolynomialDisplayZeroAndRefVectorSuffix",
+            "TestPolynomialDisplayScalarCStringAliveAndNested",
+            "TestPolynomialDisplayLastCallbackLifetime",
+            "TestPolynomialDisplayBorrowEndsAfterInsertion",
+            "TestPolynomialDisplayEveryReservation",
+            "TestPolynomialDisplayCloseRefusalPreservesCache",
+            "TestPolynomialDisplayRefVectorCachedCount",
+            "TestPolynomialDisplayWarmInlineFrames",
+            "TestPolynomialDisplayOwnerGuards",
+            "TestPolynomialDisplayMonomialWrapperAndFiniteField",
+            "TestPolynomialDisplayYoungerStoppedDestructor",
+            "TestPolynomialDisplayExactNumericReceiptAndReplacement",
+            "TestPolynomialDisplaySinkCreatesForeignPending"
+          ]
         }
       ],
       "ownership": [
@@ -33629,7 +33710,8 @@
         "Actual Runtime numeral arrays, inline128 monomial buffer, auxiliary numeral and embedded concrete linear solver; reflected enclosing cold fields charged once, no mirror arrays or per-call solver heap header. Source destruction retains its first cause and stops before older locals; owning abort uses exact generation/numeric ObjectRef/raw receipts.",
         "Content ai and monic inv/newA are actual named cold fields; the three actual retained BIG fixture detects missing root enumeration, without claiming simultaneous mathematical reachability. Direct caller output SET/ref-assignment roots remain caller-owned.",
         "Real source deletion callbacks do not grant outer PSC factory/singleton ownership; actual callback execution excludes receipt acquisition without changing source callback/depth order.",
-        "Target inline128 lexical buffers live in its once-charged enclosing header; NUM buffer source destructor precedes pointer buffer. Fresh result, actual started factory generation and created-only zero-reference monomial slots carry exact owning abort authority. Source body/destructor first causes remain sticky; CleanupConversion is explicit, excludes replacement caller roots and never infers ownership from zero RC."
+        "Target inline128 lexical buffers live in its once-charged enclosing header; NUM buffer source destructor precedes pointer buffer. Fresh result, actual started factory generation and created-only zero-reference monomial slots carry exact owning abort authority. Source body/destructor first causes remain sticky; CleanupConversion is explicit, excludes replacement caller roots and never infers ownership from zero RC.",
+        "Stable charged recursive display frames own actual numeral, character and MPN locals; actual sink callbacks borrow decimal views only during insertion. Younger stopped destructor preserves older locals; CleanupDisplay uses exact physical tokens and leaves foreign/replacement roots intact."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -115366,7 +115448,13 @@
         "mpnum/mpn_verification_scope_test.go",
         "mpnum/mp_integer_output_scope.go",
         "mpnum/mp_integer_output_scope_test.go",
-        "mpnum/mpn_cstring.go"
+        "mpnum/mpn_cstring.go",
+        "mpnum/polynomial_display.go",
+        "mpnum/polynomial_display_source_test.go",
+        "mpnum/polynomial_display_tls_test.go",
+        "mpnum/polynomial_imp_cleanup.go",
+        "mpnum/polynomial_imp_physical_test.go",
+        "mpnum/polynomial_manager.go"
       ],
       "tests": [
         "TestNaturalArithmeticOracle",
@@ -115405,7 +115493,21 @@
         "TestIntegerCharacterFailedConstructorSurvivesSourceFinalize",
         "TestIntegerCharacterUsesActualInitializedSizeHeader",
         "TestIntegerCharacterRationalNumeratorBeforeDenominator",
-        "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots"
+        "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots",
+        "TestPolynomialDisplayLiteralSourceQuirks",
+        "TestPolynomialDisplayZeroAndRefVectorSuffix",
+        "TestPolynomialDisplayScalarCStringAliveAndNested",
+        "TestPolynomialDisplayLastCallbackLifetime",
+        "TestPolynomialDisplayBorrowEndsAfterInsertion",
+        "TestPolynomialDisplayEveryReservation",
+        "TestPolynomialDisplayCloseRefusalPreservesCache",
+        "TestPolynomialDisplayRefVectorCachedCount",
+        "TestPolynomialDisplayWarmInlineFrames",
+        "TestPolynomialDisplayOwnerGuards",
+        "TestPolynomialDisplayMonomialWrapperAndFiniteField",
+        "TestPolynomialDisplayYoungerStoppedDestructor",
+        "TestPolynomialDisplayExactNumericReceiptAndReplacement",
+        "TestPolynomialDisplaySinkCreatesForeignPending"
       ],
       "conditionals": [
         {
@@ -115827,11 +115929,33 @@
             "TestIntegerCharacterRationalNumeratorBeforeDenominator",
             "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots"
           ]
+        },
+        {
+          "name": "Selected literal ordinary/SMT2 polynomial and monomial display, cached ref-vector stream loop, nested lexical NUM/char/MPN destruction and exact owning cleanup; native/global ostream remains open",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_display.go",
+          "tests": [
+            "TestPolynomialDisplayLiteralSourceQuirks",
+            "TestPolynomialDisplayZeroAndRefVectorSuffix",
+            "TestPolynomialDisplayScalarCStringAliveAndNested",
+            "TestPolynomialDisplayLastCallbackLifetime",
+            "TestPolynomialDisplayBorrowEndsAfterInsertion",
+            "TestPolynomialDisplayEveryReservation",
+            "TestPolynomialDisplayCloseRefusalPreservesCache",
+            "TestPolynomialDisplayRefVectorCachedCount",
+            "TestPolynomialDisplayWarmInlineFrames",
+            "TestPolynomialDisplayOwnerGuards",
+            "TestPolynomialDisplayMonomialWrapperAndFiniteField",
+            "TestPolynomialDisplayYoungerStoppedDestructor",
+            "TestPolynomialDisplayExactNumericReceiptAndReplacement",
+            "TestPolynomialDisplaySinkCreatesForeignPending"
+          ]
         }
       ],
       "ownership": [
         "NaturalManager owns a charged real cold header, four actual source inline16/doubling division buffers, a debug lexical verification holder, and embedded formatting lexical limb roots. Published member source destruction is distinct from failed-constructor/unpublished-block owning cleanup. Integer child borrows parent Words/Budget/runtime without double ownership. Retained SmallBytes text is an explicit output assembly adapter. Borrowed operands/outputs are operation-local; source OMP/global lifecycle remains open.",
-        "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets."
+        "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets.",
+        "Stable charged recursive display frames own actual numeral, character and MPN locals; actual sink callbacks borrow decimal views only during insertion. Younger stopped destructor preserves older locals; CleanupDisplay uses exact physical tokens and leaves foreign/replacement roots intact."
       ],
       "deviations": [
         "Go guards actual endangered reads/writes and retained lexical-holder reuse without blocking source paths that never reach those holders. Algorithm D allocates add-back storage only at the source borrow branch. Runtime owns real source allocations and initialized-byte state; no Words shadows represent limb scratch. Final escaped Go strings are caller-owned. Exact character-buffer/output lifetime, broader public source span domains, diagnostic transport, architecture profiles and OMP/global integration remain separate obligations.",
