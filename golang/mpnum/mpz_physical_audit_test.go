@@ -19,6 +19,10 @@ func numericPhysicalReservationRefusal(e error) bool {
 }
 
 func integerPhysicalAudit(t *testing.T, m *IntegerManager, public ...*Int) {
+	integerPhysicalAuditWithRaw(t, m, nil, public...)
+}
+
+func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []memory.Block, public ...*Int) {
 	t.Helper()
 	cells := map[numericCellRef]bool{}
 	add := func(r numericCellRef) {
@@ -135,6 +139,15 @@ func integerPhysicalAudit(t *testing.T, m *IntegerManager, public ...*Int) {
 		if _, e := m.memory.Read(r, 0); e != nil && !errors.Is(e, memory.ErrRuntimeUninitialized) {
 			t.Fatal("invalid character raw root", e)
 		}
+	}
+	for _, block := range external {
+		if block == (memory.Block{}) || raw[block] {
+			t.Fatal("duplicate or empty named external block", block)
+		}
+		if _, e := m.memory.Size(block); e != nil {
+			t.Fatal("invalid actual external raw root", block, e)
+		}
+		raw[block] = true
 	}
 	allocator := m.allocator.Stats()
 	if m.memory.Stats().LiveBlocks != allocator.Chunks+allocator.DirectObjects+allocator.PendingBlocks+uint32(len(raw)) {

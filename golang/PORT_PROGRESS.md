@@ -26112,3 +26112,37 @@ unread old suffix before releasing either real block. No numeric mirror or
 registry-derived authority. Native18groups now GREEN
 .cache/polynomial-linear-partial-final-native.log; checked/debug/vets of latest
 private bytes next. This remains separate from tested authoritative paired806.
+
+
+After paired-state green commit9cd3d57 and clean status, integrated exactly nine
+reviewed frozen linear files: eight new Go source/tests plus test-only shared
+physical census named external Runtime blocks. Each frozen Go hash verified;
+existing helper exactly matched9cd3d57 before narrow extension. No historical
+module overlay. Freeze .cache/review/polynomial-linear-final-9cd3d57 and
+.cache/polynomial-linear-final-inventory.json; all18groups native/debug, both
+vets and source/no-generics terminal0 before integration. Latest private NUM
+partial-move ownership fix is now checked/debug GREEN too. Metadata records
+actual source A-only pivot swap, default-decimal output context and remaining
+full stream/TRACE/global binding. Linear source unit unported→partial only;
+selected complete concrete solver methods named, no whole hierarchy promotion.
+Original dormant VERIFY+threeENSURE fixture plus independent bounded systems
+retained; no active registered credit.
+
+Full authoritative814 Go gates start with immutable Go-only snapshot and
+.cache/polynomial-linear-full-complete-{gates,go-hashes}.json plus five logs.
+Original100-bit/everyreservation checked/debug uses30m timeout. No tested Go
+edits while live; next coherent linear commit only after all five full gates
+terminal0. Private MUS14 corrected size_t copy request boundary and refrozen;
+pseudo4/ModD5/member6 remain separately reviewed future integration candidates.
+Full imp skeleton/default-member hierarchy, actual consequences closure and
+var-degree stream/copy/move source methods continue on three private lanes.
+
+Full authoritative linear814 gates completed terminal0: native98.547s,
+checked/debug760.258s, vet native4.191s/debug4.285s, source/no-generics148.758s.
+Same live runner52918 finished and verified unchanged814 Go snapshot; root
+independently rechecked every tested Go file and exact nine integration files.
+Full originating paths/MIT/other authors retained, Microsoft copyright absent.
+No C++ content hashes computed; Go-only tested-tree evidence preserved.
+Original exhaustive100-bit/everyactualreservation campaign retained. Concrete
+linear solver chunk is green for commit; whole port goal remains ACTIVE and
+full stream formatting/global bindings/full imp obligations remain OPEN.

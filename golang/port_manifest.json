@@ -28249,9 +28249,34 @@
       "path": "src/math/polynomial/linear_eq_solver.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/polynomial_linear_rational.go",
+        "mpnum/polynomial_linear_modular.go",
+        "mpnum/polynomial_linear_storage.go",
+        "mpnum/polynomial_linear_source_delete.go",
+        "mpnum/polynomial_linear_display.go"
+      ],
+      "tests": [
+        "TestLinearRationalSourceDisplaySpacingAndOrder",
+        "TestLinearModularSourceDisplayUsesUnderlyingInteger",
+        "TestLinearSourceDisplayStoppedWriterBeforeRHSRead",
+        "TestLinearSourceDisplayShortWriterGuard",
+        "TestLinearRationalResizeEveryPhysicalReservationPrefix",
+        "TestLinearRationalIndependentFiniteTwoByTwo",
+        "TestLinearRationalSourceBackSubstitutionOutputGuard",
+        "TestLinearModularIndependentFiniteTwoByTwo",
+        "TestLinearSourceNonNullZeroCapacityReachedAssertion",
+        "TestLinearResizePostphysicalTLSRefusalRetainsUnpublishedVector",
+        "TestLinearRationalOriginalPolynomialFixture",
+        "TestLinearRationalSourcePivotAndSingularPublication",
+        "TestLinearRationalSourceAddReachedInput",
+        "TestLinearModularWholeSourceSolve",
+        "TestLinearSourceOuterRowReachedIndexAssertion",
+        "TestLinearRationalFreshNullRHSFlush",
+        "TestLinearRationalArithmeticEveryReservationPrefix",
+        "TestLinearStoppedNumeratorMoveRetainsActualOwner"
+      ],
       "conditionals": [
         {
           "line": 22,
@@ -28298,9 +28323,54 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete rational/modular constructor, resize/reset/add/solve/flush and literal reverse member destruction; actual same-runtime numeral/row vectors and separate owning abort",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_linear_rational.go",
+          "tests": [
+            "TestLinearRationalSourceDisplaySpacingAndOrder",
+            "TestLinearModularSourceDisplayUsesUnderlyingInteger",
+            "TestLinearSourceDisplayStoppedWriterBeforeRHSRead",
+            "TestLinearSourceDisplayShortWriterGuard",
+            "TestLinearRationalResizeEveryPhysicalReservationPrefix",
+            "TestLinearRationalIndependentFiniteTwoByTwo",
+            "TestLinearRationalSourceBackSubstitutionOutputGuard",
+            "TestLinearModularIndependentFiniteTwoByTwo",
+            "TestLinearSourceNonNullZeroCapacityReachedAssertion",
+            "TestLinearResizePostphysicalTLSRefusalRetainsUnpublishedVector",
+            "TestLinearRationalOriginalPolynomialFixture",
+            "TestLinearRationalSourcePivotAndSingularPublication",
+            "TestLinearRationalSourceAddReachedInput",
+            "TestLinearModularWholeSourceSolve",
+            "TestLinearSourceOuterRowReachedIndexAssertion",
+            "TestLinearRationalFreshNullRHSFlush",
+            "TestLinearRationalArithmeticEveryReservationPrefix",
+            "TestLinearStoppedNumeratorMoveRetainsActualOwner"
+          ]
+        },
+        {
+          "name": "Literal default-decimal field read/output order through borrowed cold io.Writer; complete stream formatting state remains open",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_linear_display.go",
+          "tests": [
+            "TestLinearRationalSourceDisplaySpacingAndOrder",
+            "TestLinearModularSourceDisplayUsesUnderlyingInteger",
+            "TestLinearSourceDisplayStoppedWriterBeforeRHSRead",
+            "TestLinearSourceDisplayShortWriterGuard"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual Runtime contiguous12-byte Int/24-byte Rational fields and4-byte cold row locators; no numeric mirror. Row metadata charged real reflected storage. Partial relocation records completed components and actual old initialized suffix. Failed actual allocation preserves exact pending/raw/header roots; source destruction stops sticky, own abort separately drains actual named fields, never locator-derived authority.",
+        "Source pivot swaps matrix rows only, never RHS; source behavior preserved. Add publishes RHS before reached caller coefficient read. Singular return precedes output writes; back substitution reads caller outputs at source index after actual earlier matrix work. Literal Flush deletes RHS then row entries, ascending child vectors, resets A/b, then source member destruction b before A."
+      ],
+      "deviations": [
+        "No Go generics: concrete rational and integer-modular specializations cover selected required source clients. Native pointer/vector ABI and source global manager/assertion/TRACE binding remain open.",
+        "Display maps default decimal context to borrowed io.Writer; full NumericTextStream/ostream flag-state integration remains open. Actual modular display uses integer manager without normalization assertion.",
+        "Original polynomial linear fixture contains VERIFY plus three ENSURE sites but source driver returns before it; no active registered-source assertion credit. Independent finite rational determinant and modular inverse checks retained.",
+        "Explicit malformed physically truncated source-undefined vector fixture requires caller span repair before Go owning abort; no native undefined-domain recovery claim. Unrelated arbitrary source-undefined accounting/release continuation is not promoted."
+      ]
     },
     {
       "path": "src/math/polynomial/polynomial.cpp",
