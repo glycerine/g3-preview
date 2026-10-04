@@ -96244,7 +96244,9 @@
         "bitset/uint_set_map.go",
         "util_uint_set_runtime.go",
         "util_uint_set_runtime_test.go",
-        "util_uint_set_runtime_constructor_source_test.go"
+        "util_uint_set_runtime_constructor_source_test.go",
+        "util_uint_set_runtime_swap_source_test.go",
+        "util_uint_set_runtime_distinct_budget_source_test.go"
       ],
       "tests": [
         "TestUintSetSourceTst1",
@@ -96277,7 +96279,17 @@
         "TestUintSetRuntimeSourceRandomCampaign",
         "TestUintSetRuntimeHashDisplayAndStreamPrefixes",
         "TestUintSetRuntimeIteratorResetAndEndSourceProfiles",
-        "TestUintSetRuntimeCopyConstructorUnwindsCompletedBase"
+        "TestUintSetRuntimeCopyConstructorUnwindsCompletedBase",
+        "TestUintSetRuntimeSwapActualProviderProvenance",
+        "TestUintSetRuntimeSwapEmptyProviderLifetime",
+        "TestUintSetRuntimeSwappedGrowthEveryActualRefusal",
+        "TestUintSetRuntimeSwapWarmNoEvents",
+        "TestUintSetRuntimeSwapDistinctBudgetsEveryEmptyCombination",
+        "TestUintSetRuntimeAdoptedGrowthRefusesPhysicalBudgetOnly",
+        "TestUintSetRuntimeAdoptedAssignAndCloneEveryActualRefusal",
+        "TestUintSetRuntimeSwapDistinctBudgetsWarmAndEmptyLifetime",
+        "TestUintSetRuntimeIteratorCachedValueDoesNotReadDeadOwner",
+        "TestUintSetRuntimeIteratorIncrementAssertionBeforeDeadOwnerRead"
       ],
       "assertions": [
         {
@@ -96488,17 +96500,35 @@
             "TestUintSetRuntimeIteratorResetAndEndSourceProfiles",
             "TestUintSetRuntimeCopyConstructorUnwindsCompletedBase"
           ]
+        },
+        {
+          "name": "Selected Runtime uint_set pointer Swap across actual providers and distinct Budgets; cached iterator dereference and source assertion-before-owner-read order",
+          "status": "partial",
+          "go_target": "util_uint_set_runtime.go",
+          "tests": [
+            "TestUintSetRuntimeSwapActualProviderProvenance",
+            "TestUintSetRuntimeSwapEmptyProviderLifetime",
+            "TestUintSetRuntimeSwappedGrowthEveryActualRefusal",
+            "TestUintSetRuntimeSwapWarmNoEvents",
+            "TestUintSetRuntimeSwapDistinctBudgetsEveryEmptyCombination",
+            "TestUintSetRuntimeAdoptedGrowthRefusesPhysicalBudgetOnly",
+            "TestUintSetRuntimeAdoptedAssignAndCloneEveryActualRefusal",
+            "TestUintSetRuntimeSwapDistinctBudgetsWarmAndEmptyLifetime",
+            "TestUintSetRuntimeIteratorCachedValueDoesNotReadDeadOwner",
+            "TestUintSetRuntimeIteratorIncrementAssertionBeforeDeadOwnerRead"
+          ]
         }
       ],
       "ownership": [
         "Concrete owned uint32 words; source capacity, copy and ascending traversal preserved. UintSet-key map tst5 integration is now translated by bitset.UintSetMap. See PORT_PROGRESS.md#audit-bitset-port-status-md.",
         "Scalar owned key refs preserve synthesized capacity-copy assignment and retained FREE/DELETED payloads. Rehash duplicates used keys before old table destruction; Swap moves owners without key-copy actions. See PORT_PROGRESS.md#audit-bitset-port-status-md.",
-        "One actual Runtime unsigned svector plus its named pending token; reflected cold owner is separately charged. Exact consumed field receipt preserves source dangling assignment after physical destroy. Copy constructor automatically runs the completed base destructor before failure return, retaining cold/pending abort context only. Ordinary destructor stop/cause is sticky; CleanupStopped separately acknowledges actual consumed storage. Immediate named graph accounts blocks, initialization bitmap and once-only cold charges."
+        "One actual Runtime unsigned svector plus its named pending token; reflected cold owner is separately charged. Exact consumed field receipt preserves source dangling assignment after physical destroy. Copy constructor automatically runs the completed base destructor before failure return, retaining cold/pending abort context only. Ordinary destructor stop/cause is sticky; CleanupStopped separately acknowledges actual consumed storage. Immediate named graph accounts blocks, initialization bitmap and once-only cold charges.",
+        "Swap exchanges actual block and concrete physical-provider provenance without allocation, copy or charge transfer; cold wrappers retain original Budgets, moved raw growth/free use the adopted provider. Cached iterator Value reads no owner; scan_idx debug invariant precedes reached membership/word reads. Both providers must outlive exchanged backing."
       ],
       "deviations": [
         "Invalid extent/capacity overflow diagnosed before growth; source get_max_elem would wrap.",
         "Readonly owner/epoch key views replace mutable raw borrows. Predictable replacement failure preserves old contents and adds documented peak storage; partial bulk operations remain source ordered.",
-        "Selected same-Runtime/default-enabled assertion profile; distinct-Runtime Swap adoption, process-global assertion binding, endangered wrapped extents, native ostream failbit/libc rand profile and legacy bitset allocation topology remain open. New random campaign executes source assertion expressions with an independent deterministic stream, not the exact libc sequence; broad test driver remains partial."
+        "Selected explicit-provider/default-enabled assertion profile; process-global assertion binding, endangered wrapped extents, native ostream failbit/libc rand profile and legacy bitset allocation topology remain open. New random campaign executes source assertion expressions with an independent deterministic stream, not the exact libc sequence; broad test driver remains partial."
       ]
     },
     {
@@ -130081,7 +130111,9 @@
         "sat_solver_max_cliques_test.go",
         "util_uint_set_runtime.go",
         "util_uint_set_runtime_test.go",
-        "util_uint_set_runtime_constructor_source_test.go"
+        "util_uint_set_runtime_constructor_source_test.go",
+        "util_uint_set_runtime_swap_source_test.go",
+        "util_uint_set_runtime_distinct_budget_source_test.go"
       ],
       "tests": [
         "TestUintSetSourceTst1",
@@ -130124,7 +130156,17 @@
         "TestUintSetRuntimeSourceRandomCampaign",
         "TestUintSetRuntimeHashDisplayAndStreamPrefixes",
         "TestUintSetRuntimeIteratorResetAndEndSourceProfiles",
-        "TestUintSetRuntimeCopyConstructorUnwindsCompletedBase"
+        "TestUintSetRuntimeCopyConstructorUnwindsCompletedBase",
+        "TestUintSetRuntimeSwapActualProviderProvenance",
+        "TestUintSetRuntimeSwapEmptyProviderLifetime",
+        "TestUintSetRuntimeSwappedGrowthEveryActualRefusal",
+        "TestUintSetRuntimeSwapWarmNoEvents",
+        "TestUintSetRuntimeSwapDistinctBudgetsEveryEmptyCombination",
+        "TestUintSetRuntimeAdoptedGrowthRefusesPhysicalBudgetOnly",
+        "TestUintSetRuntimeAdoptedAssignAndCloneEveryActualRefusal",
+        "TestUintSetRuntimeSwapDistinctBudgetsWarmAndEmptyLifetime",
+        "TestUintSetRuntimeIteratorCachedValueDoesNotReadDeadOwner",
+        "TestUintSetRuntimeIteratorIncrementAssertionBeforeDeadOwnerRead"
       ],
       "conditionals": [
         {
@@ -130292,17 +130334,35 @@
             "TestUintSetRuntimeIteratorResetAndEndSourceProfiles",
             "TestUintSetRuntimeCopyConstructorUnwindsCompletedBase"
           ]
+        },
+        {
+          "name": "Selected Runtime uint_set pointer Swap across actual providers and distinct Budgets; cached iterator dereference and source assertion-before-owner-read order",
+          "status": "partial",
+          "go_target": "util_uint_set_runtime.go",
+          "tests": [
+            "TestUintSetRuntimeSwapActualProviderProvenance",
+            "TestUintSetRuntimeSwapEmptyProviderLifetime",
+            "TestUintSetRuntimeSwappedGrowthEveryActualRefusal",
+            "TestUintSetRuntimeSwapWarmNoEvents",
+            "TestUintSetRuntimeSwapDistinctBudgetsEveryEmptyCombination",
+            "TestUintSetRuntimeAdoptedGrowthRefusesPhysicalBudgetOnly",
+            "TestUintSetRuntimeAdoptedAssignAndCloneEveryActualRefusal",
+            "TestUintSetRuntimeSwapDistinctBudgetsWarmAndEmptyLifetime",
+            "TestUintSetRuntimeIteratorCachedValueDoesNotReadDeadOwner",
+            "TestUintSetRuntimeIteratorIncrementAssertionBeforeDeadOwnerRead"
+          ]
         }
       ],
       "ownership": [
         "Concrete owned uint32 words; source capacity, copy and ascending traversal preserved. UintSet-key map tst5 integration is now translated by bitset.UintSetMap. See PORT_PROGRESS.md#audit-bitset-port-status-md.",
         "Scalar owned key refs preserve synthesized capacity-copy assignment and retained FREE/DELETED payloads. Rehash duplicates used keys before old table destruction; Swap moves owners without key-copy actions. See PORT_PROGRESS.md#audit-bitset-port-status-md.",
-        "One actual Runtime unsigned svector plus its named pending token; reflected cold owner is separately charged. Exact consumed field receipt preserves source dangling assignment after physical destroy. Copy constructor automatically runs the completed base destructor before failure return, retaining cold/pending abort context only. Ordinary destructor stop/cause is sticky; CleanupStopped separately acknowledges actual consumed storage. Immediate named graph accounts blocks, initialization bitmap and once-only cold charges."
+        "One actual Runtime unsigned svector plus its named pending token; reflected cold owner is separately charged. Exact consumed field receipt preserves source dangling assignment after physical destroy. Copy constructor automatically runs the completed base destructor before failure return, retaining cold/pending abort context only. Ordinary destructor stop/cause is sticky; CleanupStopped separately acknowledges actual consumed storage. Immediate named graph accounts blocks, initialization bitmap and once-only cold charges.",
+        "Swap exchanges actual block and concrete physical-provider provenance without allocation, copy or charge transfer; cold wrappers retain original Budgets, moved raw growth/free use the adopted provider. Cached iterator Value reads no owner; scan_idx debug invariant precedes reached membership/word reads. Both providers must outlive exchanged backing."
       ],
       "deviations": [
         "Invalid extent/capacity overflow diagnosed before growth; source get_max_elem would wrap.",
         "Readonly owner/epoch key views replace mutable raw borrows. Predictable replacement failure preserves old contents and adds documented peak storage; partial bulk operations remain source ordered.",
-        "Selected same-Runtime/default-enabled assertion profile; distinct-Runtime Swap adoption, process-global assertion binding, endangered wrapped extents, native ostream failbit/libc rand profile and legacy bitset allocation topology remain open. New random campaign executes source assertion expressions with an independent deterministic stream, not the exact libc sequence; broad test driver remains partial.",
+        "Selected explicit-provider/default-enabled assertion profile; process-global assertion binding, endangered wrapped extents, native ostream failbit/libc rand profile and legacy bitset allocation topology remain open. New random campaign executes source assertion expressions with an independent deterministic stream, not the exact libc sequence; broad test driver remains partial.",
         "Legacy bitset.Assign allocates/copies before replacing old Go backing, and resize rejects wrapped endpoints before source growth. Those legacy method groups remain partial; new Runtime specialization supplies literal destruction/publication for its selected physical profile without silently promoting the legacy algorithm."
       ]
     },
@@ -130807,7 +130867,9 @@
         "util_int_heap_debug_source_test.go",
         "util_uint_set_runtime.go",
         "util_uint_set_runtime_test.go",
-        "util_uint_set_runtime_constructor_source_test.go"
+        "util_uint_set_runtime_constructor_source_test.go",
+        "util_uint_set_runtime_swap_source_test.go",
+        "util_uint_set_runtime_distinct_budget_source_test.go"
       ],
       "tests": [
         "TestParamDescrsBudgetFailuresAndWarmDuplicate",
@@ -131092,7 +131154,17 @@
         "TestUintSetRuntimeSourceRandomCampaign",
         "TestUintSetRuntimeHashDisplayAndStreamPrefixes",
         "TestUintSetRuntimeIteratorResetAndEndSourceProfiles",
-        "TestUintSetRuntimeCopyConstructorUnwindsCompletedBase"
+        "TestUintSetRuntimeCopyConstructorUnwindsCompletedBase",
+        "TestUintSetRuntimeSwapActualProviderProvenance",
+        "TestUintSetRuntimeSwapEmptyProviderLifetime",
+        "TestUintSetRuntimeSwappedGrowthEveryActualRefusal",
+        "TestUintSetRuntimeSwapWarmNoEvents",
+        "TestUintSetRuntimeSwapDistinctBudgetsEveryEmptyCombination",
+        "TestUintSetRuntimeAdoptedGrowthRefusesPhysicalBudgetOnly",
+        "TestUintSetRuntimeAdoptedAssignAndCloneEveryActualRefusal",
+        "TestUintSetRuntimeSwapDistinctBudgetsWarmAndEmptyLifetime",
+        "TestUintSetRuntimeIteratorCachedValueDoesNotReadDeadOwner",
+        "TestUintSetRuntimeIteratorIncrementAssertionBeforeDeadOwnerRead"
       ],
       "conditionals": [
         {
@@ -131610,6 +131682,23 @@
             "TestUintSetRuntimeIteratorResetAndEndSourceProfiles",
             "TestUintSetRuntimeCopyConstructorUnwindsCompletedBase"
           ]
+        },
+        {
+          "name": "Selected Runtime uint_set pointer Swap across actual providers and distinct Budgets; cached iterator dereference and source assertion-before-owner-read order",
+          "status": "partial",
+          "go_target": "util_uint_set_runtime.go",
+          "tests": [
+            "TestUintSetRuntimeSwapActualProviderProvenance",
+            "TestUintSetRuntimeSwapEmptyProviderLifetime",
+            "TestUintSetRuntimeSwappedGrowthEveryActualRefusal",
+            "TestUintSetRuntimeSwapWarmNoEvents",
+            "TestUintSetRuntimeSwapDistinctBudgetsEveryEmptyCombination",
+            "TestUintSetRuntimeAdoptedGrowthRefusesPhysicalBudgetOnly",
+            "TestUintSetRuntimeAdoptedAssignAndCloneEveryActualRefusal",
+            "TestUintSetRuntimeSwapDistinctBudgetsWarmAndEmptyLifetime",
+            "TestUintSetRuntimeIteratorCachedValueDoesNotReadDeadOwner",
+            "TestUintSetRuntimeIteratorIncrementAssertionBeforeDeadOwnerRead"
+          ]
         }
       ],
       "ownership": [
@@ -131625,7 +131714,8 @@
         "Skeleton entries/powers/originals use actual Runtime storage; failed constructor transfers actual unconsumed INC fields into charged cold owning-abort records before source backing free. Scoped pointer publications alone own concrete children; stopped source cause retained, separate owning cleanup. Variable helpers own two/one actual embedded uint vectors in one charged stable cold header, views/scopes borrow actual backing and references. Strong shared physical census names pseudo/Power/ExactDiv plus supplied headers/blocks without registry-derived ownership.",
         "Actual two Runtime int columns; cold IntHeap header embeds queue and borrows comparator, independent destination Runtime owns copies. Source completed-member unwind/indices-before-values destruction, raw allocation and consumed-field receipts, and fresh lexical todo precede distinct explicit owning abort. Caller IntHeapVector owns real Runtime output; []int32 is borrowed Go output adapter. Exact named-block/bitmap/cold-header census, no registry-derived owners. See PORT_PROGRESS.md.",
         "Runtime heap borrows an explicit DebugContext; context/table/region remain caller-owned and may use a separate Budget. Actual heap fields/lexical todo and real cold header charges remain explicit; source lookup table Budget reservations are never fabricated Runtime allocations.",
-        "One actual Runtime unsigned svector plus its named pending token; reflected cold owner is separately charged. Exact consumed field receipt preserves source dangling assignment after physical destroy. Copy constructor automatically runs the completed base destructor before failure return, retaining cold/pending abort context only. Ordinary destructor stop/cause is sticky; CleanupStopped separately acknowledges actual consumed storage. Immediate named graph accounts blocks, initialization bitmap and once-only cold charges."
+        "One actual Runtime unsigned svector plus its named pending token; reflected cold owner is separately charged. Exact consumed field receipt preserves source dangling assignment after physical destroy. Copy constructor automatically runs the completed base destructor before failure return, retaining cold/pending abort context only. Ordinary destructor stop/cause is sticky; CleanupStopped separately acknowledges actual consumed storage. Immediate named graph accounts blocks, initialization bitmap and once-only cold charges.",
+        "Swap exchanges actual block and concrete physical-provider provenance without allocation, copy or charge transfer; cold wrappers retain original Budgets, moved raw growth/free use the adopted provider. Cached iterator Value reads no owner; scan_idx debug invariant precedes reached membership/word reads. Both providers must outlive exchanged backing."
       ],
       "deviations": [
         "Concrete solver-specific storage, not complete generic vector template surface. Owning model Clone/Assign, other specializations and source-undefined continuation behavior remain explicitly separate.",
@@ -131641,7 +131731,7 @@
         "Standalone SOM buffers/vectors and selected fresh sorting scope added. Authoritative reflected Go class header and charged real retained fields; scalar child ID cold provenance adaptation, no unread native-size ticket or full global malloc/header geometry claim. Heap sort final-order contract only, native comparator schedule/global ostream/full imp remain OPEN. Original source implicit dtor has no Reset/DEC/NUM Del; separate own-abort drains actual named records. See PORT_PROGRESS.md.",
         "Selected concrete Runtime general heap source closure only: full process-global CASSERT/assertion-switch bindings, wrapped physical extents, legacy slice storage/iterator profile, full ostream transport and other template instantiations remain OPEN. Explicit signed TLS/partially initialized source fixtures prove ownership/physical guards in undefined source domains, not ordinary OOM or native recovery. No whole source-unit promotion.",
         "Explicit borrowed context specializes source assertion/tag gates at actual call sites; process-global binding, notify/debugger/TRACE, source global allocation geometry, legacy heap and wrapped extent profiles remain open. Original tst_heap enable_debug(\"heap\") is commented out; new enabled-tag worlds are independent fixtures and do not add registered enabled-tag credit.",
-        "Selected same-Runtime/default-enabled assertion profile; distinct-Runtime Swap adoption, process-global assertion binding, endangered wrapped extents, native ostream failbit/libc rand profile and legacy bitset allocation topology remain open. New random campaign executes source assertion expressions with an independent deterministic stream, not the exact libc sequence; broad test driver remains partial."
+        "Selected explicit-provider/default-enabled assertion profile; process-global assertion binding, endangered wrapped extents, native ostream failbit/libc rand profile and legacy bitset allocation topology remain open. New random campaign executes source assertion expressions with an independent deterministic stream, not the exact libc sequence; broad test driver remains partial."
       ]
     },
     {

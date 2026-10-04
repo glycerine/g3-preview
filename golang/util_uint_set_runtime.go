@@ -366,6 +366,11 @@ func (s *RuntimeUintSet) compare(o *RuntimeUintSet, subset bool) (bool, error) {
 }
 func (s *RuntimeUintSet) Equal(o *RuntimeUintSet) (bool, error)    { return s.compare(o, false) }
 func (s *RuntimeUintSet) SubsetOf(o *RuntimeUintSet) (bool, error) { return s.compare(o, true) }
+
+// Source has one global allocator. This split-provider adapter moves physical
+// block provenance with the pointer; both caller-owned providers must outlive
+// either wrapper after exchange. Cold wrapper storage and refunds remain on each original Budget; raw
+// allocation/refunds follow the moved provider.
 func (s *RuntimeUintSet) Swap(o *RuntimeUintSet) error {
 	if e := s.open(); e != nil {
 		return e
@@ -373,10 +378,8 @@ func (s *RuntimeUintSet) Swap(o *RuntimeUintSet) error {
 	if e := o.open(); e != nil {
 		return e
 	}
-	if s.words.raw.runtime != o.words.raw.runtime {
-		return arena.ErrConfig
-	}
 	s.words.raw.block, o.words.raw.block = o.words.raw.block, s.words.raw.block
+	s.words.raw.runtime, o.words.raw.runtime = o.words.raw.runtime, s.words.raw.runtime
 	return nil
 }
 func (s *RuntimeUintSet) Clone(r *memory.Runtime, b *arena.Budget) (*RuntimeUintSet, error) {
@@ -552,16 +555,23 @@ type RuntimeUintSetIterator struct {
 }
 
 func (s *RuntimeUintSet) iterator(end bool) (RuntimeUintSetIterator, error) {
+	i := RuntimeUintSetIterator{owner: s}
+	if end {
+		n, e := s.MaxElem()
+		if e != nil {
+			return RuntimeUintSetIterator{}, e
+		}
+		i.index = n
+	}
 	n, e := s.MaxElem()
 	if e != nil {
 		return RuntimeUintSetIterator{}, e
 	}
-	i := RuntimeUintSetIterator{owner: s, last: n}
-	if end {
-		i.index = n
+	i.last = n
+	if e = i.scan(); e != nil {
+		return i, e
 	}
-	e = i.scan()
-	return i, e
+	return i, i.invariant()
 }
 func (s *RuntimeUintSet) Begin() (RuntimeUintSetIterator, error) { return s.iterator(false) }
 func (s *RuntimeUintSet) End() (RuntimeUintSetIterator, error)   { return s.iterator(true) }
@@ -590,9 +600,6 @@ func (i *RuntimeUintSetIterator) scanIndex() error {
 func (i *RuntimeUintSetIterator) scan() error {
 	if i == nil || i.owner == nil {
 		return ErrSATOwner
-	}
-	if e := i.owner.open(); e != nil {
-		return e
 	}
 	if e := i.scanIndex(); e != nil {
 		return e
@@ -639,12 +646,12 @@ func (i *RuntimeUintSetIterator) scan() error {
 	}
 	return i.invariant()
 }
+
+// Source operator* reads only the cached scalar, even after its borrowed
+// set has been destroyed. Actual owner reads remain at Contains/word sites.
 func (i RuntimeUintSetIterator) Value() (uint32, error) {
 	if i.owner == nil {
 		return 0, ErrSATOwner
-	}
-	if e := i.owner.open(); e != nil {
-		return 0, e
 	}
 	return i.index, nil
 }

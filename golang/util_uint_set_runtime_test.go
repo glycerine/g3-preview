@@ -516,8 +516,10 @@ func TestUintSetRuntimeIteratorResetAndEndSourceProfiles(t *testing.T) {
 		}
 	}
 	heapMust(t, s.Close())
-	if _, e = old.Value(); e != arena.ErrClosed {
-		t.Fatal(e)
+	value, e := old.Value()
+	heapMust(t, e)
+	if value != 1 {
+		t.Fatal("cached source value after owner close", value)
 	}
 	heapMust(t, r.Close())
 }
