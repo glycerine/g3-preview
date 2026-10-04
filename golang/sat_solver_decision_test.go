@@ -149,10 +149,10 @@ func TestSATSolverDecisionRandomLeavesQueueAndFallbackSkips(t *testing.T) {
 	oracle := utilhash.NewRandom(17)
 	oracle.Next()
 	want := satBoolVar(oracle.Next() % 4)
-	before := len(v.queue.values)
+	before := satScalarTestUintSize(t, &v.queue.runtimeValues)
 	x, e := d.nextVar()
 	satOK(t, e)
-	if x != want || len(v.queue.values) != before || d.rng.Next() != oracle.Next() {
+	if x != want || satScalarTestUintSize(t, &v.queue.runtimeValues) != before || d.rng.Next() != oracle.Next() {
 		t.Fatal("selected random candidate must not consume case-split queue", x, want)
 	}
 	// Highest-activity assigned and eliminated entries are really removed by
@@ -168,8 +168,8 @@ func TestSATSolverDecisionRandomLeavesQueueAndFallbackSkips(t *testing.T) {
 	satOK(t, v.eliminated.write(1, 1))
 	x, e = d.nextVar()
 	satOK(t, e)
-	if x != 2 || v.queue.indices[0] != 0 || v.queue.indices[1] != 0 || v.queue.indices[2] != 0 {
-		t.Fatal("queue skips source assigned/eliminated candidates", x, v.queue.indices)
+	if x != 2 || satScalarTestUint(t, &v.queue.runtimeIndices, 0) != 0 || satScalarTestUint(t, &v.queue.runtimeIndices, 1) != 0 || satScalarTestUint(t, &v.queue.runtimeIndices, 2) != 0 {
+		t.Fatal("queue skips source assigned/eliminated candidates", x)
 	}
 }
 
@@ -281,7 +281,7 @@ func TestSATSolverDecisionRandomPhaseAndInvalidCastPrefix(t *testing.T) {
 		oracle := utilhash.NewRandom(21)
 		oracle.Next()
 		_, e := d.nextVar()
-		if !errors.Is(e, arena.ErrBounds) || d.rng.Next() != oracle.Next() || len(g.lifecycle().propagation.variables.queue.values) != 2 {
+		if !errors.Is(e, arena.ErrBounds) || d.rng.Next() != oracle.Next() || satScalarTestUintSize(t, &g.lifecycle().propagation.variables.queue.runtimeValues) != 2 {
 			t.Fatal("guard only at reached undefined int cast; preserve first RNG draw", f, e)
 		}
 	}

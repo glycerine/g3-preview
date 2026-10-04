@@ -335,7 +335,7 @@ func TestSATSolverProbingTLSPostAllocationPendingCache(t *testing.T) {
 	satOK(t, e)
 	probe, e := newSATSolverProbing(life, ctx, &params, b)
 	satOK(t, e)
-	prefix, e := raw.Allocate(99960)
+	prefix, e := raw.Allocate(99360)
 	satOK(t, e)
 	satOK(t, raw.SetMaxSize(1))
 	e = probe.cacheBins(0, 0)

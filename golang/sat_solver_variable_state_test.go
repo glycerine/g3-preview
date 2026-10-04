@@ -1,11 +1,12 @@
+// Source: src/sat/sat_solver.h; src/sat/sat_solver.cpp; src/sat/sat_var_queue.h; src/util/vector.h.
 // Licensed under the MIT license.
 package g3
 
 import (
-	"errors"
 	"fmt"
 	"github.com/glycerine/g3/golang/arena"
 	"github.com/glycerine/g3/golang/memory"
+	"reflect"
 	"testing"
 )
 
@@ -169,8 +170,8 @@ func TestSATSolverMkVarLateHeapIndexPublicationBeforeRefusal(t *testing.T) {
 			}
 			if e != nil && s.queue.Contains(4) && s.queue.Size() == 4 {
 				found = true
-				if v != 4 || s.numVars() != 5 || s.queue.indices[4] != 5 || len(s.queue.values) != 5 || todo.Contains(4) {
-					t.Fatal(v, s.Stats(), s.queue.indices, todo.Stats())
+				if v != 4 || s.numVars() != 5 || satScalarTestUint(t, &s.queue.runtimeIndices, 4) != 5 || satScalarTestUintSize(t, &s.queue.runtimeValues) != 5 || todo.Contains(4) {
+					t.Fatal(v, s.Stats(), todo.Stats())
 				}
 			}
 			b.FailAfter(-1)
@@ -222,21 +223,30 @@ func TestSATSolverVariableConstructorRefusalAndBorrowedTodo(t *testing.T) {
 		mem, e := memory.NewRuntime(memory.RuntimeConfig{Budget: b})
 		satOK(t, e)
 		base := b.Used()
+
 		b.FailAfter(fail)
 		s, e := newSATSolverVariableState(todo, b, arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: b}}, mem)
 		if e != nil {
 			failures++
-			if !errors.Is(e, arena.ErrInjectedFailure) {
+			if !satAssignmentActualRefusal(mem, e) {
 				t.Fatal(fail, e)
 			}
 		} else {
 			successes++
 		}
+		if s != nil {
+			satScalarAuditOwner(t, s)
+		} else {
+			reader := satSolverAssignmentColumn{runtime: mem}
+			satAssignmentAuditBlocks(t, &reader)
+		}
 		b.FailAfter(-1)
 		if s != nil {
 			satOK(t, s.Close())
 		}
-		if b.Used() != base || !todo.Contains(19) {
+		records := reflect.ValueOf(mem).Elem().FieldByName("blocks")
+		retainedDirectory := uint64(records.Cap()) * uint64(records.Type().Elem().Size())
+		if b.Used() != base+retainedDirectory || mem.Stats().LiveBlocks != 0 || mem.Stats().PhysicalBytes != 0 || mem.Stats().InitializationBytes != 0 || !todo.Contains(19) {
 			t.Fatal("constructor cannot own todo", fail, b.Used(), base)
 		}
 		satOK(t, todo.Close())

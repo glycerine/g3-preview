@@ -1,21 +1,26 @@
-// Source: src/util/heap.h; src/sat/sat_simplifier.cpp:875–919 and src/sat/sat_solver.h case_split_queue.
+// Source: src/sat/sat_var_queue.h:31-67; src/util/heap.h; src/sat/sat_simplifier.cpp:875–919 and src/sat/sat_solver.h case_split_queue.
 // Licensed under the MIT license.
 package g3
 
 import (
+	"errors"
 	"github.com/glycerine/g3/golang/arena"
 	"reflect"
 )
 
 type satVarQueue struct {
-	literalSource     *satSimplifier
-	self              *satVarQueue
-	activity          *satActivityDomain
-	runtimeActivity   *satSolverRuntimeActivity
-	values, indices   []int32
-	budget            *arena.Budget
-	ownerBytes, epoch uint64
-	closed            bool
+	literalSource                                             *satSimplifier
+	runtimeValues, runtimeIndices                             satSolverRuntimeUintColumn
+	runtimeSourceStop                                         error
+	runtimeSourceCursor, runtimeAbortCursor, runtimeCompleted uint8
+	runtimeClosing                                            bool
+	self                                                      *satVarQueue
+	activity                                                  *satActivityDomain
+	runtimeActivity                                           *satSolverRuntimeActivity
+	values, indices                                           []int32
+	budget                                                    *arena.Budget
+	ownerBytes, epoch                                         uint64
+	closed                                                    bool
 }
 type satVarQueueStats struct{ OwnerBytes, ValuesBytes, IndicesBytes uint64 }
 
@@ -28,12 +33,17 @@ func NewSATVarQueue(a *satActivityDomain, b *arena.Budget) (*satVarQueue, error)
 		return nil, e
 	}
 	if e = q.initialize(); e != nil {
-		q.Close()
+		if cleanup := q.Close(); cleanup != nil {
+			return q, errors.Join(e, cleanup)
+		}
 		return nil, e
 	}
 	return q, nil
 }
 func (q *satVarQueue) initialize() error {
+	if q.runtimeBacked() {
+		return q.initializeRuntime()
+	}
 	var e error
 	if e = q.grow(&q.values, 1); e == nil {
 		q.values = append(q.values, -1)
@@ -54,12 +64,15 @@ func (q *satVarQueue) open() error {
 	if q == nil || q.self != q {
 		return ErrSATOwner
 	}
-	if q.closed {
+	if q.closed || q.runtimeClosing {
 		return arena.ErrClosed
 	}
 	return nil
 }
 func (q *satVarQueue) change() error {
+	if q.runtimeBacked() {
+		return q.open()
+	}
 	if e := q.open(); e != nil {
 		return e
 	}
@@ -88,6 +101,9 @@ func (q *satVarQueue) grow(v *[]int32, need uint64) error {
 	return nil
 }
 func (q *satVarQueue) reserve(n uint32) error {
+	if q.runtimeBacked() {
+		return q.reserveRuntime(n)
+	}
 	if uint64(n) > uint64(^uint32(0)>>1) {
 		return arena.ErrBounds
 	}
@@ -102,14 +118,40 @@ func (q *satVarQueue) reserve(n uint32) error {
 	clear(q.indices[old:])
 	return nil
 }
+
+// Compatibility signatures transport a Runtime guard as its actual typed panic.
+// Solver algorithms use the checked error-returning methods instead.
 func (q *satVarQueue) Size() uint32 {
+	if q != nil && q.runtimeBacked() {
+		n, e := q.sizeChecked()
+		if e != nil {
+			panic(e)
+		}
+		return n
+	}
 	if q == nil || q.closed || len(q.values) == 0 {
 		return 0
 	}
 	return uint32(len(q.values) - 1)
 }
-func (q *satVarQueue) Empty() bool { return q != nil && !q.closed && len(q.values) == 1 }
+func (q *satVarQueue) Empty() bool {
+	if q != nil && q.runtimeBacked() {
+		yes, e := q.emptyChecked()
+		if e != nil {
+			panic(e)
+		}
+		return yes
+	}
+	return q != nil && !q.closed && len(q.values) == 1
+}
 func (q *satVarQueue) Contains(v satBoolVar) bool {
+	if q != nil && q.runtimeBacked() {
+		yes, e := q.containsChecked(v)
+		if e != nil {
+			panic(e)
+		}
+		return yes
+	}
 	return q != nil && !q.closed && uint64(v) < uint64(len(q.indices)) && q.indices[v] != 0
 }
 func (q *satVarQueue) lt(a, b int32) (bool, error) {
@@ -207,6 +249,9 @@ func (q *satVarQueue) down(i int32) error {
 	return q.put(i, v)
 }
 func (q *satVarQueue) insert(v satBoolVar) error {
+	if q != nil && q.runtimeBacked() {
+		return q.insertRuntime(v)
+	}
 	if e := q.change(); e != nil {
 		return e
 	}
@@ -240,6 +285,16 @@ func (q *satVarQueue) MkVar(v satBoolVar) error {
 	return q.insert(v)
 }
 func (q *satVarQueue) UnassignVar(v satBoolVar) error {
+	if q.runtimeBacked() {
+		yes, e := q.containsChecked(v)
+		if e != nil {
+			return e
+		}
+		if !yes {
+			return q.insertRuntime(v)
+		}
+		return nil
+	}
 	if e := q.open(); e != nil {
 		return e
 	}
@@ -252,6 +307,29 @@ func (q *satVarQueue) UnassignVar(v satBoolVar) error {
 	return nil
 }
 func (q *satVarQueue) ActivityIncreased(v satBoolVar) error {
+	if q.runtimeBacked() {
+		yes, e := q.containsChecked(v)
+		if e != nil {
+			return e
+		}
+		if yes {
+			if satStorageSourceDebug {
+				present, e := q.containsChecked(v)
+				if e != nil {
+					return e
+				}
+				if !present {
+					return ErrSATAssertion
+				}
+			}
+			i, e := q.indexRuntime(int32(v))
+			if e != nil {
+				return e
+			}
+			return q.upRuntime(i)
+		}
+		return nil
+	}
 	if e := q.change(); e != nil {
 		return e
 	}
@@ -267,6 +345,16 @@ func (q *satVarQueue) ActivityIncreased(v satBoolVar) error {
 	return nil
 }
 func (q *satVarQueue) DelVar(v satBoolVar) error {
+	if q != nil && q.runtimeBacked() {
+		present, e := q.containsChecked(v)
+		if e != nil {
+			return e
+		}
+		if !present {
+			return nil
+		}
+		return q.eraseRuntime(v)
+	}
 	if e := q.change(); e != nil {
 		return e
 	}
@@ -314,6 +402,9 @@ func (q *satVarQueue) DelVar(v satBoolVar) error {
 	return nil
 }
 func (q *satVarQueue) NextVar() (satBoolVar, error) {
+	if q != nil && q.runtimeBacked() {
+		return q.nextRuntime()
+	}
 	if e := q.change(); e != nil {
 		return 0, e
 	}
@@ -347,6 +438,9 @@ func (q *satVarQueue) NextVar() (satBoolVar, error) {
 	return satBoolVar(v), nil
 }
 func (q *satVarQueue) Reset() error {
+	if q != nil && q.runtimeBacked() {
+		return q.resetRuntime()
+	}
 	if e := q.open(); e != nil {
 		return e
 	}
@@ -370,6 +464,9 @@ func (q *satVarQueue) Reset() error {
 	return nil
 }
 func (q *satVarQueue) CheckInvariant() (bool, error) {
+	if q != nil && q.runtimeBacked() {
+		return q.invariantRuntime()
+	}
 	if e := q.open(); e != nil {
 		return false, e
 	}
@@ -394,9 +491,15 @@ func (q *satVarQueue) CheckInvariant() (bool, error) {
 	return true, nil
 }
 func (q *satVarQueue) Stats() satVarQueueStats {
+	if q != nil && q.runtimeBacked() {
+		return satVarQueueStats{OwnerBytes: q.ownerBytes}
+	}
 	return satVarQueueStats{q.ownerBytes, uint64(cap(q.values)) * 4, uint64(cap(q.indices)) * 4}
 }
 func (q *satVarQueue) Close() error {
+	if q != nil && q.runtimeBacked() {
+		return q.closeRuntime()
+	}
 	if q == nil || q.self != q {
 		return ErrSATOwner
 	}
@@ -411,6 +514,9 @@ func (q *satVarQueue) Close() error {
 	return nil
 }
 func (q *satVarQueue) Clone(b *arena.Budget) (*satVarQueue, error) {
+	if q != nil && q.runtimeBacked() {
+		return q.cloneRuntime(b)
+	}
 	if e := q.open(); e != nil {
 		return nil, e
 	}
@@ -441,6 +547,9 @@ func (q *satVarQueue) Clone(b *arena.Budget) (*satVarQueue, error) {
 	return v, nil
 }
 func (q *satVarQueue) MoveClone(b *arena.Budget) (*satVarQueue, error) {
+	if q != nil && q.runtimeBacked() {
+		return q.moveRuntime(b)
+	}
 	if e := q.change(); e != nil {
 		return nil, e
 	}
@@ -478,13 +587,19 @@ func newSATSolverRuntimeVarQueue(a *satSolverRuntimeActivity, b *arena.Budget) (
 	if e := a.open(); e != nil {
 		return nil, e
 	}
+	if b == nil || a.budget != b || a.values.raw.runtime.Budget() != b {
+		return nil, ErrSATOwner
+	}
 	q, e := newSATVarQueue(nil, b)
 	if e != nil {
 		return nil, e
 	}
 	q.runtimeActivity = a
+	q.bindRuntime(a.values.raw.runtime)
 	if e = q.initialize(); e != nil {
-		q.Close()
+		if cleanup := q.Close(); cleanup != nil {
+			return q, errors.Join(e, cleanup)
+		}
 		return nil, e
 	}
 	return q, nil

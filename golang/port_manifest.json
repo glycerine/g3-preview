@@ -57974,7 +57974,8 @@
         "sat_clause_storage.go",
         "sat_solver_clause_lifecycle.go",
         "sat_solver_conflict_span.go",
-        "sat_var_queue.go"
+        "sat_var_queue.go",
+        "sat_var_queue_runtime_test.go"
       ],
       "tests": [
         "TestSATClauseUseListsLiteralRoutingAndEraseExcept",
@@ -58029,7 +58030,25 @@
         "TestSATSimplifierActualSeparateDummyAllocator",
         "TestSATSimplifierCapturedResolventPayload",
         "TestSATSimplifierCleanupAll27AssignmentsAndUseCounts",
-        "TestSATSimplifierActualNumVarsUsesLevelAtRead"
+        "TestSATSimplifierActualNumVarsUsesLevelAtRead",
+        "TestSATCaseSplitHeapConstructorRealRuntimeAccounting",
+        "TestSATCaseSplitHeapSourceHeadersAndNoShadow",
+        "TestSATCaseSplitHeapIndependentFiniteActivityOracle",
+        "TestSATCaseSplitHeapReverseIndexBeforeValueRefusal",
+        "TestSATCaseSplitHeapCloneMoveRealBackingLifetime",
+        "TestSATCaseSplitHeapSourceDestructorPostPhysicalTLSCursor",
+        "TestSATCaseSplitHeapConstructorEveryActualRefusal",
+        "TestSATCaseSplitHeapLargeReserveTriggersSameRuntimeCheckpoint",
+        "TestSATCaseSplitHeapReserveAllCapacitiesBeforeSizePublication",
+        "TestSATCaseSplitHeapWarmPhysicalPlateauAndOwnerGuards",
+        "TestSATCaseSplitHeapReachedRawHeaderGuards",
+        "TestSATCaseSplitHeapCopyEveryActualRefusal",
+        "TestSATCaseSplitHeapFailedCopyCompletedMemberBeforeOwningAbort",
+        "TestSATCaseSplitHeapNullPopReachedSourceDereference",
+        "TestSATCaseSplitHeapDirectEraseSourcePreconditionAndWrapperGuard",
+        "TestSATCaseSplitHeapForeignBudgetRejectedBeforeColdReserve",
+        "TestSATCaseSplitHeapLegacySignaturesExposeActualTypedReadFailure",
+        "TestSATCaseSplitHeapBorrowedRuntimeBlockedUntilAllCopiedBackingsReleased"
       ],
       "conditionals": [
         {
@@ -58194,6 +58213,31 @@
             "TestSATSimplifierCapturedResolventPayload",
             "TestSATSimplifierCleanupAll27AssignmentsAndUseCounts",
             "TestSATSimplifierActualNumVarsUsesLevelAtRead"
+          ]
+        },
+        {
+          "name": "Selected actual Runtime blocked literal-weight heap construction and checked consumers; whole simplifier remains open",
+          "status": "partial",
+          "go_target": "sat_simplifier_blocked_queue.go",
+          "tests": [
+            "TestSATCaseSplitHeapConstructorRealRuntimeAccounting",
+            "TestSATCaseSplitHeapSourceHeadersAndNoShadow",
+            "TestSATCaseSplitHeapIndependentFiniteActivityOracle",
+            "TestSATCaseSplitHeapReverseIndexBeforeValueRefusal",
+            "TestSATCaseSplitHeapCloneMoveRealBackingLifetime",
+            "TestSATCaseSplitHeapSourceDestructorPostPhysicalTLSCursor",
+            "TestSATCaseSplitHeapConstructorEveryActualRefusal",
+            "TestSATCaseSplitHeapLargeReserveTriggersSameRuntimeCheckpoint",
+            "TestSATCaseSplitHeapReserveAllCapacitiesBeforeSizePublication",
+            "TestSATCaseSplitHeapWarmPhysicalPlateauAndOwnerGuards",
+            "TestSATCaseSplitHeapReachedRawHeaderGuards",
+            "TestSATCaseSplitHeapCopyEveryActualRefusal",
+            "TestSATCaseSplitHeapFailedCopyCompletedMemberBeforeOwningAbort",
+            "TestSATCaseSplitHeapNullPopReachedSourceDereference",
+            "TestSATCaseSplitHeapDirectEraseSourcePreconditionAndWrapperGuard",
+            "TestSATCaseSplitHeapForeignBudgetRejectedBeforeColdReserve",
+            "TestSATCaseSplitHeapLegacySignaturesExposeActualTypedReadFailure",
+            "TestSATCaseSplitHeapBorrowedRuntimeBlockedUntilAllCopiedBackingsReleased"
           ]
         }
       ],
@@ -58717,7 +58761,9 @@
         "sat_solver_report_params_model_test.go",
         "sat_solver_report_params_test.go",
         "sat_solver_stat_display.go",
-        "sat_solver_stat_display_test.go"
+        "sat_solver_stat_display_test.go",
+        "sat_var_queue_runtime.go",
+        "sat_var_queue_runtime_test.go"
       ],
       "tests": [
         "TestSATSolverClauseCoreFiniteSimplification",
@@ -59059,7 +59105,25 @@
         "TestSATSolverStatDisplaySourceConditionalFields",
         "TestSATSolverStatDisplayEmptySourceMembers",
         "TestSATSolverStatDisplayEveryReservationPrefix",
-        "TestSATSolverStatDisplayWarmAndOwnerGuards"
+        "TestSATSolverStatDisplayWarmAndOwnerGuards",
+        "TestSATCaseSplitHeapConstructorRealRuntimeAccounting",
+        "TestSATCaseSplitHeapSourceHeadersAndNoShadow",
+        "TestSATCaseSplitHeapIndependentFiniteActivityOracle",
+        "TestSATCaseSplitHeapReverseIndexBeforeValueRefusal",
+        "TestSATCaseSplitHeapCloneMoveRealBackingLifetime",
+        "TestSATCaseSplitHeapSourceDestructorPostPhysicalTLSCursor",
+        "TestSATCaseSplitHeapConstructorEveryActualRefusal",
+        "TestSATCaseSplitHeapLargeReserveTriggersSameRuntimeCheckpoint",
+        "TestSATCaseSplitHeapReserveAllCapacitiesBeforeSizePublication",
+        "TestSATCaseSplitHeapWarmPhysicalPlateauAndOwnerGuards",
+        "TestSATCaseSplitHeapReachedRawHeaderGuards",
+        "TestSATCaseSplitHeapCopyEveryActualRefusal",
+        "TestSATCaseSplitHeapFailedCopyCompletedMemberBeforeOwningAbort",
+        "TestSATCaseSplitHeapNullPopReachedSourceDereference",
+        "TestSATCaseSplitHeapDirectEraseSourcePreconditionAndWrapperGuard",
+        "TestSATCaseSplitHeapForeignBudgetRejectedBeforeColdReserve",
+        "TestSATCaseSplitHeapLegacySignaturesExposeActualTypedReadFailure",
+        "TestSATCaseSplitHeapBorrowedRuntimeBlockedUntilAllCopiedBackingsReleased"
       ],
       "conditionals": [
         {
@@ -60349,6 +60413,31 @@
             "TestSATSolverStatDisplayEmptySourceMembers",
             "TestSATSolverStatDisplayEveryReservationPrefix",
             "TestSATSolverStatDisplayWarmAndOwnerGuards"
+          ]
+        },
+        {
+          "name": "Selected actual case-split queue constructor stage, checked decision consumption and reverse member destruction with reached child owning acknowledgment; whole solver remains open",
+          "status": "partial",
+          "go_target": "sat_solver.go",
+          "tests": [
+            "TestSATCaseSplitHeapConstructorRealRuntimeAccounting",
+            "TestSATCaseSplitHeapSourceHeadersAndNoShadow",
+            "TestSATCaseSplitHeapIndependentFiniteActivityOracle",
+            "TestSATCaseSplitHeapReverseIndexBeforeValueRefusal",
+            "TestSATCaseSplitHeapCloneMoveRealBackingLifetime",
+            "TestSATCaseSplitHeapSourceDestructorPostPhysicalTLSCursor",
+            "TestSATCaseSplitHeapConstructorEveryActualRefusal",
+            "TestSATCaseSplitHeapLargeReserveTriggersSameRuntimeCheckpoint",
+            "TestSATCaseSplitHeapReserveAllCapacitiesBeforeSizePublication",
+            "TestSATCaseSplitHeapWarmPhysicalPlateauAndOwnerGuards",
+            "TestSATCaseSplitHeapReachedRawHeaderGuards",
+            "TestSATCaseSplitHeapCopyEveryActualRefusal",
+            "TestSATCaseSplitHeapFailedCopyCompletedMemberBeforeOwningAbort",
+            "TestSATCaseSplitHeapNullPopReachedSourceDereference",
+            "TestSATCaseSplitHeapDirectEraseSourcePreconditionAndWrapperGuard",
+            "TestSATCaseSplitHeapForeignBudgetRejectedBeforeColdReserve",
+            "TestSATCaseSplitHeapLegacySignaturesExposeActualTypedReadFailure",
+            "TestSATCaseSplitHeapBorrowedRuntimeBlockedUntilAllCopiedBackingsReleased"
           ]
         }
       ],
@@ -62242,7 +62331,9 @@
         "sat_var_queue.go",
         "sat_solver_runtime_activity.go",
         "sat_solver_runtime_trail.go",
-        "sat_solver_runtime_activity_trail_test.go"
+        "sat_solver_runtime_activity_trail_test.go",
+        "sat_var_queue_runtime.go",
+        "sat_var_queue_runtime_test.go"
       ],
       "tests": [
         "TestSATVarQueueIndependentMutableActivityModel",
@@ -62257,7 +62348,25 @@
         "TestSATSolverRuntimeTrailAllActualRefusalPrefixes",
         "TestSATSolverRuntimeActivityTLSFailurePendingSourcePrefix",
         "TestSATSolverRuntimeTrailTLSPendingPreservesVectorPrefix",
-        "TestSATSolverRuntimeActivityCurrentBorrowAfterGrowthAndColdGuards"
+        "TestSATSolverRuntimeActivityCurrentBorrowAfterGrowthAndColdGuards",
+        "TestSATCaseSplitHeapConstructorRealRuntimeAccounting",
+        "TestSATCaseSplitHeapSourceHeadersAndNoShadow",
+        "TestSATCaseSplitHeapIndependentFiniteActivityOracle",
+        "TestSATCaseSplitHeapReverseIndexBeforeValueRefusal",
+        "TestSATCaseSplitHeapCloneMoveRealBackingLifetime",
+        "TestSATCaseSplitHeapSourceDestructorPostPhysicalTLSCursor",
+        "TestSATCaseSplitHeapConstructorEveryActualRefusal",
+        "TestSATCaseSplitHeapLargeReserveTriggersSameRuntimeCheckpoint",
+        "TestSATCaseSplitHeapReserveAllCapacitiesBeforeSizePublication",
+        "TestSATCaseSplitHeapWarmPhysicalPlateauAndOwnerGuards",
+        "TestSATCaseSplitHeapReachedRawHeaderGuards",
+        "TestSATCaseSplitHeapCopyEveryActualRefusal",
+        "TestSATCaseSplitHeapFailedCopyCompletedMemberBeforeOwningAbort",
+        "TestSATCaseSplitHeapNullPopReachedSourceDereference",
+        "TestSATCaseSplitHeapDirectEraseSourcePreconditionAndWrapperGuard",
+        "TestSATCaseSplitHeapForeignBudgetRejectedBeforeColdReserve",
+        "TestSATCaseSplitHeapLegacySignaturesExposeActualTypedReadFailure",
+        "TestSATCaseSplitHeapBorrowedRuntimeBlockedUntilAllCopiedBackingsReleased"
       ],
       "conditionals": [
         {
@@ -62307,6 +62416,31 @@
             "TestSATSolverRuntimeActivityTLSFailurePendingSourcePrefix",
             "TestSATSolverRuntimeTrailTLSPendingPreservesVectorPrefix",
             "TestSATSolverRuntimeActivityCurrentBorrowAfterGrowthAndColdGuards"
+          ]
+        },
+        {
+          "name": "Selected SAME Runtime activity queue constructor and reached methods, wrapper contains guard versus direct heap erase, checked source reads and exact source/owning cleanup cursors",
+          "status": "partial",
+          "go_target": "sat_var_queue.go",
+          "tests": [
+            "TestSATCaseSplitHeapConstructorRealRuntimeAccounting",
+            "TestSATCaseSplitHeapSourceHeadersAndNoShadow",
+            "TestSATCaseSplitHeapIndependentFiniteActivityOracle",
+            "TestSATCaseSplitHeapReverseIndexBeforeValueRefusal",
+            "TestSATCaseSplitHeapCloneMoveRealBackingLifetime",
+            "TestSATCaseSplitHeapSourceDestructorPostPhysicalTLSCursor",
+            "TestSATCaseSplitHeapConstructorEveryActualRefusal",
+            "TestSATCaseSplitHeapLargeReserveTriggersSameRuntimeCheckpoint",
+            "TestSATCaseSplitHeapReserveAllCapacitiesBeforeSizePublication",
+            "TestSATCaseSplitHeapWarmPhysicalPlateauAndOwnerGuards",
+            "TestSATCaseSplitHeapReachedRawHeaderGuards",
+            "TestSATCaseSplitHeapCopyEveryActualRefusal",
+            "TestSATCaseSplitHeapFailedCopyCompletedMemberBeforeOwningAbort",
+            "TestSATCaseSplitHeapNullPopReachedSourceDereference",
+            "TestSATCaseSplitHeapDirectEraseSourcePreconditionAndWrapperGuard",
+            "TestSATCaseSplitHeapForeignBudgetRejectedBeforeColdReserve",
+            "TestSATCaseSplitHeapLegacySignaturesExposeActualTypedReadFailure",
+            "TestSATCaseSplitHeapBorrowedRuntimeBlockedUntilAllCopiedBackingsReleased"
           ]
         }
       ],
@@ -101936,10 +102070,12 @@
       "path": "src/util/heap.h",
       "component": "util",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "sat_var_queue.go",
-        "util_int_heap.go"
+        "util_int_heap.go",
+        "sat_var_queue_runtime.go",
+        "sat_var_queue_runtime_test.go"
       ],
       "tests": [
         "TestIntHeapBudgetsFailuresSwapAndWarm",
@@ -101958,7 +102094,25 @@
         "TestSATVarQueueIndependentMutableActivityModel",
         "TestSATVarQueueRealActivityPriorityEventsAndLifecycle",
         "TestSATVarQueueSourceGhostAndEmptyReset",
-        "TestSATVarQueueUnsignedNegativeIndexBoundary"
+        "TestSATVarQueueUnsignedNegativeIndexBoundary",
+        "TestSATCaseSplitHeapConstructorRealRuntimeAccounting",
+        "TestSATCaseSplitHeapSourceHeadersAndNoShadow",
+        "TestSATCaseSplitHeapIndependentFiniteActivityOracle",
+        "TestSATCaseSplitHeapReverseIndexBeforeValueRefusal",
+        "TestSATCaseSplitHeapCloneMoveRealBackingLifetime",
+        "TestSATCaseSplitHeapSourceDestructorPostPhysicalTLSCursor",
+        "TestSATCaseSplitHeapConstructorEveryActualRefusal",
+        "TestSATCaseSplitHeapLargeReserveTriggersSameRuntimeCheckpoint",
+        "TestSATCaseSplitHeapReserveAllCapacitiesBeforeSizePublication",
+        "TestSATCaseSplitHeapWarmPhysicalPlateauAndOwnerGuards",
+        "TestSATCaseSplitHeapReachedRawHeaderGuards",
+        "TestSATCaseSplitHeapCopyEveryActualRefusal",
+        "TestSATCaseSplitHeapFailedCopyCompletedMemberBeforeOwningAbort",
+        "TestSATCaseSplitHeapNullPopReachedSourceDereference",
+        "TestSATCaseSplitHeapDirectEraseSourcePreconditionAndWrapperGuard",
+        "TestSATCaseSplitHeapForeignBudgetRejectedBeforeColdReserve",
+        "TestSATCaseSplitHeapLegacySignaturesExposeActualTypedReadFailure",
+        "TestSATCaseSplitHeapBorrowedRuntimeBlockedUntilAllCopiedBackingsReleased"
       ],
       "conditionals": [
         {
@@ -102108,12 +102262,12 @@
           "text": "CASSERT(\"heap\", check_invariant());"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
+      "methods_audited": false,
+      "ownership_audited": false,
       "methods": [
         {
           "name": "constructor/destructor and implicit deep copy/assignment",
-          "status": "ported",
+          "status": "partial",
           "go_target": "util_int_heap.go",
           "tests": [
             "TestIntHeapSourceAssertions",
@@ -102256,7 +102410,7 @@
         },
         {
           "name": "find_le",
-          "status": "ported",
+          "status": "partial",
           "go_target": "util_int_heap.go",
           "tests": [
             "TestIntHeapSourceAssertions",
@@ -102297,6 +102451,31 @@
             "TestSATVarQueueSourceGhostAndEmptyReset",
             "TestSATVarQueueUnsignedNegativeIndexBoundary"
           ]
+        },
+        {
+          "name": "Selected SAME Runtime signed32 SAT heap members, sentinel/resize publication, move_up/down, erase/erase_min/insert/decreased; general assignment/find_le, other instantiations and enabled CASSERT remain open",
+          "status": "partial",
+          "go_target": "sat_var_queue_runtime.go",
+          "tests": [
+            "TestSATCaseSplitHeapConstructorRealRuntimeAccounting",
+            "TestSATCaseSplitHeapSourceHeadersAndNoShadow",
+            "TestSATCaseSplitHeapIndependentFiniteActivityOracle",
+            "TestSATCaseSplitHeapReverseIndexBeforeValueRefusal",
+            "TestSATCaseSplitHeapCloneMoveRealBackingLifetime",
+            "TestSATCaseSplitHeapSourceDestructorPostPhysicalTLSCursor",
+            "TestSATCaseSplitHeapConstructorEveryActualRefusal",
+            "TestSATCaseSplitHeapLargeReserveTriggersSameRuntimeCheckpoint",
+            "TestSATCaseSplitHeapReserveAllCapacitiesBeforeSizePublication",
+            "TestSATCaseSplitHeapWarmPhysicalPlateauAndOwnerGuards",
+            "TestSATCaseSplitHeapReachedRawHeaderGuards",
+            "TestSATCaseSplitHeapCopyEveryActualRefusal",
+            "TestSATCaseSplitHeapFailedCopyCompletedMemberBeforeOwningAbort",
+            "TestSATCaseSplitHeapNullPopReachedSourceDereference",
+            "TestSATCaseSplitHeapDirectEraseSourcePreconditionAndWrapperGuard",
+            "TestSATCaseSplitHeapForeignBudgetRejectedBeforeColdReserve",
+            "TestSATCaseSplitHeapLegacySignaturesExposeActualTypedReadFailure",
+            "TestSATCaseSplitHeapBorrowedRuntimeBlockedUntilAllCopiedBackingsReleased"
+          ]
         }
       ],
       "ownership": [
@@ -102306,7 +102485,9 @@
         "Typed precondition/closed/overflow/epoch errors replace invalid source operations. Safe readonly iterators replace raw mutable backing pointers.",
         "Retained budgeted find_le workspace stages caller output; failed predictable preparation preserves caller result. Deep Assign stages a charged clone before publication.",
         "Source signed-shift overflow children are discarded; all representable source child pushes and traversal order are preserved.",
-        "Insert publishes the inverse index before fallible value growth, preserving source failure membership. Its publication invalidates checked iterators even on failure. Empty reset retains this prefix; live-value invariant traversal ignores additional inverse entries. Subsequent out-of-bounds slot accesses return ErrHeapValue without repairing the source state; in-range source actions remain executable."
+        "Insert publishes the inverse index before fallible value growth, preserving source failure membership. Its publication invalidates checked iterators even on failure. Empty reset retains this prefix; live-value invariant traversal ignores additional inverse entries. Subsequent out-of-bounds slot accesses return ErrHeapValue without repairing the source state; in-range source actions remain executable.",
+        "Completion audit correction: legacy IntHeap.Assign stages a complete clone and FindLE stages retained found/todo workspaces, while source implicit member assignment and find_le272-290 publish live partial destination/result prefixes and distinct child pushes. These behaviors, Runtime/non-SAT concrete families and enabled heap CASSERT binding remain required completion obligations; whole unit is PARTIAL. Existing registered driver and independent tests remain evidence for their actually exercised scopes, not whole allocation/exception completion. See PORT_PROGRESS.md.",
+        "Source vector assignment src/util/vector.h:191-202 destroys and frees old storage before exact-capacity copy_core, with null source publishing null. Legacy staged Assign and staged FindLE are partial adapters pending literal publication/failure closure. The new SAT Runtime family does not complete those general methods or enabled heap CASSERT dispatch."
       ]
     },
     {
@@ -129796,7 +129977,9 @@
         "mpnum/polynomial_som_sort.go",
         "mpnum/polynomial_som_vector_test.go",
         "mpnum/polynomial_som_owner_physical_test.go",
-        "mpnum/polynomial_som_vector_bounds_source_test.go"
+        "mpnum/polynomial_som_vector_bounds_source_test.go",
+        "sat_var_queue_runtime.go",
+        "sat_var_queue_runtime_test.go"
       ],
       "tests": [
         "TestParamDescrsBudgetFailuresAndWarmDuplicate",
@@ -130017,7 +130200,25 @@
         "TestPolynomialSOMBufferNeverAbortsBorrowedCalleeCreation",
         "TestPolynomialSOMBufferSourceSelfAliasReadsChangedFutureCoefficient",
         "TestPolynomialSOMBufferStoppedSortRejectsOrdinaryMutation",
-        "TestPolynomialSOMVectorWrappedIndexReachesChildWithoutReservation"
+        "TestPolynomialSOMVectorWrappedIndexReachesChildWithoutReservation",
+        "TestSATCaseSplitHeapConstructorRealRuntimeAccounting",
+        "TestSATCaseSplitHeapSourceHeadersAndNoShadow",
+        "TestSATCaseSplitHeapIndependentFiniteActivityOracle",
+        "TestSATCaseSplitHeapReverseIndexBeforeValueRefusal",
+        "TestSATCaseSplitHeapCloneMoveRealBackingLifetime",
+        "TestSATCaseSplitHeapSourceDestructorPostPhysicalTLSCursor",
+        "TestSATCaseSplitHeapConstructorEveryActualRefusal",
+        "TestSATCaseSplitHeapLargeReserveTriggersSameRuntimeCheckpoint",
+        "TestSATCaseSplitHeapReserveAllCapacitiesBeforeSizePublication",
+        "TestSATCaseSplitHeapWarmPhysicalPlateauAndOwnerGuards",
+        "TestSATCaseSplitHeapReachedRawHeaderGuards",
+        "TestSATCaseSplitHeapCopyEveryActualRefusal",
+        "TestSATCaseSplitHeapFailedCopyCompletedMemberBeforeOwningAbort",
+        "TestSATCaseSplitHeapNullPopReachedSourceDereference",
+        "TestSATCaseSplitHeapDirectEraseSourcePreconditionAndWrapperGuard",
+        "TestSATCaseSplitHeapForeignBudgetRejectedBeforeColdReserve",
+        "TestSATCaseSplitHeapLegacySignaturesExposeActualTypedReadFailure",
+        "TestSATCaseSplitHeapBorrowedRuntimeBlockedUntilAllCopiedBackingsReleased"
       ],
       "conditionals": [
         {
@@ -130442,6 +130643,31 @@
             "TestPolynomialSOMBufferSourceSelfAliasReadsChangedFutureCoefficient",
             "TestPolynomialSOMBufferStoppedSortRejectsOrdinaryMutation",
             "TestPolynomialSOMVectorWrappedIndexReachesChildWithoutReservation"
+          ]
+        },
+        {
+          "name": "Selected source int_vector actual SAME Runtime capacity/size/payload, exact copy, resize-all-growth-before-size/defaults, direct pop and reverse member destruction; broader template and wrapped extent domains remain open",
+          "status": "partial",
+          "go_target": "sat_var_queue_runtime.go",
+          "tests": [
+            "TestSATCaseSplitHeapConstructorRealRuntimeAccounting",
+            "TestSATCaseSplitHeapSourceHeadersAndNoShadow",
+            "TestSATCaseSplitHeapIndependentFiniteActivityOracle",
+            "TestSATCaseSplitHeapReverseIndexBeforeValueRefusal",
+            "TestSATCaseSplitHeapCloneMoveRealBackingLifetime",
+            "TestSATCaseSplitHeapSourceDestructorPostPhysicalTLSCursor",
+            "TestSATCaseSplitHeapConstructorEveryActualRefusal",
+            "TestSATCaseSplitHeapLargeReserveTriggersSameRuntimeCheckpoint",
+            "TestSATCaseSplitHeapReserveAllCapacitiesBeforeSizePublication",
+            "TestSATCaseSplitHeapWarmPhysicalPlateauAndOwnerGuards",
+            "TestSATCaseSplitHeapReachedRawHeaderGuards",
+            "TestSATCaseSplitHeapCopyEveryActualRefusal",
+            "TestSATCaseSplitHeapFailedCopyCompletedMemberBeforeOwningAbort",
+            "TestSATCaseSplitHeapNullPopReachedSourceDereference",
+            "TestSATCaseSplitHeapDirectEraseSourcePreconditionAndWrapperGuard",
+            "TestSATCaseSplitHeapForeignBudgetRejectedBeforeColdReserve",
+            "TestSATCaseSplitHeapLegacySignaturesExposeActualTypedReadFailure",
+            "TestSATCaseSplitHeapBorrowedRuntimeBlockedUntilAllCopiedBackingsReleased"
           ]
         }
       ],

@@ -315,6 +315,13 @@ func (s *satSolver) CleanupStopped() error {
 	if s == nil || s.self != s {
 		return ErrSATOwner
 	}
+	if s.closeStage == 22 && s.variables != nil && s.variables.queue != nil && s.variables.queue.runtimeSourceStop != nil {
+		if e := s.variables.queue.CleanupStopped(); e != nil {
+			return e
+		}
+		s.closeGuardAcknowledged = true
+		return s.closeMembers()
+	}
 	if s.closeSourceCause == nil {
 		return ErrSATOwner
 	}
@@ -449,6 +456,10 @@ func (s *satSolver) closeMembers() error {
 		case 22:
 			if s.variables != nil {
 				e = s.variables.finalizeQueue()
+				if e != nil && s.variables.queue != nil && s.variables.queue.runtimeSourceStop != nil && s.closeSourceCause == nil {
+					s.closeSourceCause = e
+					s.closeGuardAcknowledged = false
+				}
 			}
 		case 23:
 			if s.variables != nil {

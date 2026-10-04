@@ -122,7 +122,14 @@ func (d *satSolverDecision) nextVar() (satBoolVar, error) {
 			}
 		}
 	}
-	for !v.queue.Empty() {
+	for {
+		empty, e := v.queue.emptyChecked()
+		if e != nil {
+			return satNullBoolVar, e
+		}
+		if empty {
+			break
+		}
 		next, e := v.queue.NextVar()
 		if e != nil {
 			return satNullBoolVar, e

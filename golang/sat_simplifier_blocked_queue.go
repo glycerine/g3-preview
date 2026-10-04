@@ -2,8 +2,13 @@
 // Source author: Leonardo de Moura, 2011.
 package g3
 
+import "errors"
+
 func newSATSimplifierBlockedQueue(s *satSimplifier) (*satVarQueue, error) {
 	if s == nil || s.self != s {
+		return nil, ErrSATOwner
+	}
+	if s.lifecycle == nil || s.lifecycle.propagation == nil || s.lifecycle.propagation.memory == nil || s.lifecycle.budget != s.lifecycle.propagation.memory.Budget() {
 		return nil, ErrSATOwner
 	}
 	q, e := newSATVarQueue(nil, s.lifecycle.budget)
@@ -11,9 +16,10 @@ func newSATSimplifierBlockedQueue(s *satSimplifier) (*satVarQueue, error) {
 		return nil, e
 	}
 	q.literalSource = s
+	q.bindRuntime(s.lifecycle.propagation.memory)
 	if e = q.initialize(); e != nil {
 		if cleanup := q.Close(); cleanup != nil {
-			return q, cleanup
+			return q, errors.Join(e, cleanup)
 		}
 		return nil, e
 	}
@@ -40,7 +46,11 @@ func (s *satSimplifier) literalWeight(idx uint32) (uint32, error) {
 }
 func (s *satSimplifier) blockedDecreased(q *satVarQueue, l satLiteral) error {
 	v := satBoolVar(uint32(l))
-	if q.Contains(v) {
+	yes, e := q.containsChecked(v)
+	if e != nil {
+		return e
+	}
+	if yes {
 		return q.ActivityIncreased(v)
 	}
 	return q.insert(v)

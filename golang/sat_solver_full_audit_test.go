@@ -25,6 +25,10 @@ func satFullSolverRuntimeRoots(s *satSolver, outputs ...*satSolverLiteralRows) [
 		add(c.pending)
 	}
 	col := func(c *satSolverRuntimeUintColumn) { raw(&c.raw) }
+	if q := s.simplifier.blocked.queue; q != nil && q.runtimeBacked() {
+		raw(&q.runtimeValues.raw)
+		raw(&q.runtimeIndices.raw)
+	}
 	p := s.probing
 	c := s.conflict
 	a := s.analysis

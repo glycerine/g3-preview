@@ -1,3 +1,4 @@
+// Source: src/sat/sat_solver.h; src/sat/sat_solver.cpp; src/sat/sat_justification.h; src/util/vector.h; src/util/memory_manager.cpp.
 // Licensed under the MIT license.
 package g3
 
@@ -14,7 +15,7 @@ func TestSATSolverJustificationActualEightByteSourceAllocation(t *testing.T) {
 	satOK(t, e)
 	n, e := v.memory.AllocationSize()
 	satOK(t, e)
-	if n != 242 || v.memory.Stats().LiveBlocks != 12 {
+	if n != 242+600 || v.memory.Stats().LiveBlocks != 14 {
 		t.Fatal("actual source justification allocation absent", n, v.memory.Stats())
 	}
 }
@@ -246,9 +247,9 @@ func TestSATSolverJustificationTLSPendingAtActualSourceAllocation(t *testing.T) 
 	satOK(t, e)
 	v, e := newSATSolverVariableState(todo, b, arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: b}}, r)
 	satOK(t, e)
-	// Source malloc accounting: external request+8 =99980, assignment18
+	// Source malloc accounting: heap600 + external request+8 =99980, assignment18
 	// completes below100000, then actual justification32 crosses the TLS check.
-	prefix, e := r.Allocate(99972)
+	prefix, e := r.Allocate(99372)
 	satOK(t, e)
 	satOK(t, r.SetMaxSize(1))
 	_, e = v.mkVar(true, true)

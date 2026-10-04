@@ -1,3 +1,4 @@
+// Source: src/sat/sat_solver.h; src/sat/sat_solver.cpp; src/sat/sat_var_queue.h; src/util/vector.h; src/util/memory_manager.cpp.
 // Licensed under the MIT license.
 package g3
 
@@ -15,13 +16,13 @@ func TestSATSolverActivityAndLiteralTrailUseActualRuntime(t *testing.T) {
 	satOK(t, e)
 	n, e := v.memory.AllocationSize()
 	satOK(t, e)
-	if n != 242 || v.memory.Stats().LiveBlocks != 12 {
+	if n != 242+600 || v.memory.Stats().LiveBlocks != 14 {
 		t.Fatal("actual activity source allocation missing", n, v.memory.Stats())
 	}
 	satOK(t, v.trailPush(satMakeLiteral(0, true)))
 	n, e = v.memory.AllocationSize()
 	satOK(t, e)
-	if n != 266 || v.memory.Stats().LiveBlocks != 13 {
+	if n != 266+600 || v.memory.Stats().LiveBlocks != 15 {
 		t.Fatal("actual literal32 trail allocation missing", n, v.memory.Stats())
 	}
 }
@@ -202,7 +203,7 @@ func TestSATSolverRuntimeActivityTLSFailurePendingSourcePrefix(t *testing.T) {
 	satOK(t, e)
 	v, e := newSATSolverVariableState(todo, b, arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: b}}, r)
 	satOK(t, e)
-	prefix, e := r.Allocate(99880)
+	prefix, e := r.Allocate(99280)
 	satOK(t, e)
 	satOK(t, r.SetMaxSize(1))
 	_, e = v.mkVar(true, true)
@@ -234,9 +235,9 @@ func TestSATSolverRuntimeTrailTLSPendingPreservesVectorPrefix(t *testing.T) {
 	satOK(t, e)
 	_, e = v.mkVar(false, true)
 	satOK(t, e)
-	// Real prior extents242 + this block99758 reach100000 exactly; trail24
+	// Real prior extents842 + this block99158 reach100000 exactly; trail24
 	// crosses the actual TLS threshold after owned physical publication.
-	prefix, e := r.Allocate(99750)
+	prefix, e := r.Allocate(99150)
 	satOK(t, e)
 	satOK(t, r.SetMaxSize(1))
 	e = v.trailPush(satMakeLiteral(0, true))

@@ -1,0 +1,652 @@
+// Source: src/util/heap.h:24-257; src/sat/sat_var_queue.h:31-67; src/util/vector.h.
+// Licensed under the MIT license. Source author: Leonardo de Moura, 2011-05-21.
+package g3
+
+import (
+	"errors"
+	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
+)
+
+var ErrSATSignedHeapIndexDomain = errors.New("sat: undefined source signed heap child shift")
+
+func (q *satVarQueue) runtimeBacked() bool { return q.runtimeValues.raw.self != nil }
+func (q *satVarQueue) bindRuntime(r *memory.Runtime) {
+	q.runtimeValues.bind(r)
+	q.runtimeIndices.bind(r)
+	q.runtimeCompleted = 3
+}
+func (q *satVarQueue) initializeRuntime() error {
+	if e := q.runtimeValues.push(^uint32(0)); e != nil {
+		return e
+	}
+	return q.reserveRuntime(128)
+}
+func (q *satVarQueue) sizeChecked() (uint32, error) {
+	if e := q.open(); e != nil {
+		return 0, e
+	}
+	if !q.runtimeBacked() {
+		return q.Size(), nil
+	}
+	n, e := q.runtimeValues.size()
+	if e != nil {
+		return 0, e
+	}
+	if n == 0 {
+		return 0, nil
+	}
+	return n - 1, nil
+}
+func (q *satVarQueue) emptyChecked() (bool, error) {
+	if e := q.open(); e != nil {
+		return false, e
+	}
+	if !q.runtimeBacked() {
+		return q.Empty(), nil
+	}
+	n, e := q.runtimeValues.size()
+	return n == 1, e
+}
+func (q *satVarQueue) containsChecked(v satBoolVar) (bool, error) {
+	if e := q.open(); e != nil {
+		return false, e
+	}
+	if !q.runtimeBacked() {
+		return q.Contains(v), nil
+	}
+	n, e := q.runtimeIndices.size()
+	if e != nil {
+		return false, e
+	}
+	if int32(v) >= int32(n) {
+		return false, nil
+	}
+	x, e := q.runtimeIndices.read(uint32(v))
+	return x != 0, e
+}
+func (q *satVarQueue) reserveRuntime(n uint32) error {
+	old, e := q.runtimeIndices.size()
+	if e != nil {
+		return e
+	}
+	// Source heap::reserve takes int; conversion precedes its signed comparison.
+	if int32(n) <= int32(old) {
+		return nil
+	}
+	for {
+		cap, e := q.runtimeIndices.capacity()
+		if e != nil {
+			return e
+		}
+		if n <= cap {
+			break
+		}
+		if e = q.runtimeIndices.raw.expandStride(4); e != nil {
+			return e
+		}
+	}
+	if e = satAssignmentWriteWord(q.runtimeIndices.raw.runtime, q.runtimeIndices.raw.block, 4, n); e != nil {
+		return e
+	}
+	for i := old; i < n; i++ {
+		if e = q.runtimeIndices.write(i, 0); e != nil {
+			return e
+		}
+	}
+	return nil
+}
+func (q *satVarQueue) valueRuntime(i int32) (int32, error) {
+	x, e := q.runtimeValues.read(uint32(i))
+	return int32(x), e
+}
+func (q *satVarQueue) indexRuntime(v int32) (int32, error) {
+	x, e := q.runtimeIndices.read(uint32(v))
+	return int32(x), e
+}
+func (q *satVarQueue) putRuntime(i, v int32) error {
+	if e := q.runtimeValues.write(uint32(i), uint32(v)); e != nil {
+		return e
+	}
+	return q.runtimeIndices.write(uint32(v), uint32(i))
+}
+func (q *satVarQueue) lessRuntime(a, b int32) (bool, error) {
+	if q.literalSource != nil {
+		x, e := q.literalSource.literalWeight(uint32(a))
+		if e != nil {
+			return false, e
+		}
+		y, e := q.literalSource.literalWeight(uint32(b))
+		return x < y, e
+	}
+	x, e := q.runtimeActivity.Get(uint32(a))
+	if e != nil {
+		return false, e
+	}
+	y, e := q.runtimeActivity.Get(uint32(b))
+	return x > y, e
+}
+func (q *satVarQueue) upRuntime(i int32) error {
+	v, e := q.valueRuntime(i)
+	if e != nil {
+		return e
+	}
+	for {
+		parent := i >> 1
+		if parent == 0 {
+			break
+		}
+		p, e := q.valueRuntime(parent)
+		if e != nil {
+			return e
+		}
+		less, e := q.lessRuntime(v, p)
+		if e != nil {
+			return e
+		}
+		if !less {
+			break
+		}
+		p, e = q.valueRuntime(parent)
+		if e != nil {
+			return e
+		}
+		if e = q.putRuntime(i, p); e != nil {
+			return e
+		}
+		i = parent
+	}
+	return q.putRuntime(i, v)
+}
+func satHeapLeft(i int32) (int32, error) {
+	if i < 0 || i > int32(^uint32(0)>>2) {
+		return 0, ErrSATSignedHeapIndexDomain
+	}
+	return i << 1, nil
+}
+func (q *satVarQueue) downRuntime(i int32) error {
+	v, e := q.valueRuntime(i)
+	if e != nil {
+		return e
+	}
+	n, e := q.runtimeValues.size()
+	if e != nil {
+		return e
+	}
+	sz := int32(n)
+	for {
+		left, e := satHeapLeft(i)
+		if e != nil {
+			return e
+		}
+		if left >= sz {
+			break
+		}
+		right := left + 1
+		c := left
+		if right < sz {
+			a, e := q.valueRuntime(right)
+			if e != nil {
+				return e
+			}
+			b, e := q.valueRuntime(left)
+			if e != nil {
+				return e
+			}
+			less, e := q.lessRuntime(a, b)
+			if e != nil {
+				return e
+			}
+			if less {
+				c = right
+			}
+		}
+		if satStorageSourceDebug && c>>1 != i {
+			return ErrSATAssertion
+		}
+		child, e := q.valueRuntime(c)
+		if e != nil {
+			return e
+		}
+		less, e := q.lessRuntime(child, v)
+		if e != nil {
+			return e
+		}
+		if !less {
+			break
+		}
+		if e = q.putRuntime(i, child); e != nil {
+			return e
+		}
+		i = c
+	}
+	return q.putRuntime(i, v)
+}
+func (q *satVarQueue) insertRuntime(v satBoolVar) error {
+	if e := q.change(); e != nil {
+		return e
+	}
+	if satStorageSourceDebug {
+		if int32(v) < 0 {
+			return ErrSATAssertion
+		}
+		n, e := q.runtimeIndices.size()
+		if e != nil {
+			return e
+		}
+		if int32(v) >= int32(n) {
+			return ErrSATAssertion
+		}
+	}
+	n, e := q.runtimeValues.size()
+	if e != nil {
+		return e
+	}
+	i := int32(n)
+	// Source publishes the reverse index BEFORE push can grow/refuse.
+	if e = q.runtimeIndices.write(uint32(v), uint32(i)); e != nil {
+		return e
+	}
+	if e = q.runtimeValues.push(uint32(v)); e != nil {
+		return e
+	}
+	if satStorageSourceDebug {
+		n, e = q.runtimeValues.size()
+		if e != nil {
+			return e
+		}
+		if i != int32(n)-1 {
+			return ErrSATAssertion
+		}
+	}
+	return q.upRuntime(i)
+}
+func (q *satVarQueue) popRuntime() error {
+	if satStorageSourceDebug {
+		n, e := q.runtimeValues.size()
+		if e != nil {
+			return e
+		}
+		if n == 0 {
+			return ErrSATAssertion
+		}
+	}
+	// vector.h343–348 decrements the actual size word directly. shrink's
+	// null no-op and logical-size assertion are not the pop_back body.
+	c := &q.runtimeValues.raw
+	n, e := satAssignmentReadWord(c.runtime, c.block, 4)
+	if e != nil {
+		return e
+	}
+	return satAssignmentWriteWord(c.runtime, c.block, 4, n-1)
+}
+func (q *satVarQueue) nextRuntime() (satBoolVar, error) {
+	if e := q.change(); e != nil {
+		return 0, e
+	}
+	if satStorageSourceDebug {
+		if q.literalSource == nil {
+			empty, e := q.emptyChecked()
+			if e != nil {
+				return 0, e
+			}
+			if empty {
+				return 0, ErrSATAssertion
+			}
+		}
+		empty, e := q.emptyChecked()
+		if e != nil {
+			return 0, e
+		}
+		if empty {
+			return 0, ErrSATAssertion
+		}
+		n, e := q.runtimeValues.size()
+		if e != nil {
+			return 0, e
+		}
+		if n < 2 {
+			return 0, ErrSATAssertion
+		}
+	}
+	result, e := q.valueRuntime(1)
+	if e != nil {
+		return 0, e
+	}
+	n, e := q.runtimeValues.size()
+	if e != nil {
+		return 0, e
+	}
+	if n == 2 {
+		if e = q.runtimeIndices.write(uint32(result), 0); e != nil {
+			return 0, e
+		}
+		if e = q.popRuntime(); e != nil {
+			return 0, e
+		}
+		if satStorageSourceDebug {
+			empty, e := q.emptyChecked()
+			if e != nil {
+				return 0, e
+			}
+			if !empty {
+				return 0, ErrSATAssertion
+			}
+		}
+	} else {
+		n, e = q.runtimeValues.size()
+		if e != nil {
+			return 0, e
+		}
+		last, e := q.valueRuntime(int32(n) - 1)
+		if e != nil {
+			return 0, e
+		}
+		if e = q.putRuntime(1, last); e != nil {
+			return 0, e
+		}
+		if e = q.runtimeIndices.write(uint32(result), 0); e != nil {
+			return 0, e
+		}
+		if e = q.popRuntime(); e != nil {
+			return 0, e
+		}
+		if e = q.downRuntime(1); e != nil {
+			return satBoolVar(result), e
+		}
+	}
+	return satBoolVar(result), nil
+}
+func (q *satVarQueue) eraseRuntime(v satBoolVar) error {
+	if e := q.change(); e != nil {
+		return e
+	}
+	if satStorageSourceDebug {
+		present, e := q.containsChecked(v)
+		if e != nil {
+			return e
+		}
+		if !present {
+			return ErrSATAssertion
+		}
+	}
+	i, e := q.indexRuntime(int32(v))
+	if e != nil {
+		return e
+	}
+	n, e := q.runtimeValues.size()
+	if e != nil {
+		return e
+	}
+	if i == int32(n)-1 {
+		if e = q.runtimeIndices.write(uint32(v), 0); e != nil {
+			return e
+		}
+		return q.popRuntime()
+	}
+	n, e = q.runtimeValues.size()
+	if e != nil {
+		return e
+	}
+	last, e := q.valueRuntime(int32(n) - 1)
+	if e != nil {
+		return e
+	}
+	if e = q.putRuntime(i, last); e != nil {
+		return e
+	}
+	if e = q.runtimeIndices.write(uint32(v), 0); e != nil {
+		return e
+	}
+	if e = q.popRuntime(); e != nil {
+		return e
+	}
+	parent := i >> 1
+	if parent != 0 {
+		p, e := q.valueRuntime(i >> 1)
+		if e != nil {
+			return e
+		}
+		less, e := q.lessRuntime(last, p)
+		if e != nil {
+			return e
+		}
+		if less {
+			return q.upRuntime(i)
+		}
+	}
+	return q.downRuntime(i)
+}
+func (q *satVarQueue) resetRuntime() error {
+	if e := q.open(); e != nil {
+		return e
+	}
+	empty, e := q.emptyChecked()
+	if e != nil {
+		return e
+	}
+	if empty {
+		return nil
+	}
+	n, e := q.runtimeIndices.size()
+	if e != nil {
+		return e
+	}
+	for i := uint32(0); i < n; i++ {
+		if e = q.runtimeIndices.write(i, 0); e != nil {
+			return e
+		}
+	}
+	if e = q.runtimeValues.shrink(0); e != nil {
+		return e
+	}
+	return q.runtimeValues.push(^uint32(0))
+}
+func (q *satVarQueue) invariantRuntime() (bool, error) {
+	if e := q.open(); e != nil {
+		return false, e
+	}
+	// Existing selected check_invariant adapter executes source DEBUG assertions;
+	// source release body has no recursive SASSERT actions.
+	if !satStorageSourceDebug {
+		return true, nil
+	}
+	return q.invariantRuntimeAt(1)
+}
+func (q *satVarQueue) invariantRuntimeAt(i int32) (bool, error) {
+	n, e := q.runtimeValues.size()
+	if e != nil {
+		return false, e
+	}
+	if i >= int32(n) {
+		return true, nil
+	}
+	v, e := q.valueRuntime(i)
+	if e != nil {
+		return false, e
+	}
+	index, e := q.indexRuntime(v)
+	if e != nil {
+		return false, e
+	}
+	if index != i {
+		return false, ErrSATAssertion
+	}
+	if i>>1 != 0 {
+		p, e := q.valueRuntime(i >> 1)
+		if e != nil {
+			return false, e
+		}
+		less, e := q.lessRuntime(v, p)
+		if e != nil {
+			return false, e
+		}
+		if less {
+			return false, ErrSATAssertion
+		}
+	}
+	left, e := satHeapLeft(i)
+	if e != nil {
+		return false, e
+	}
+	ok, e := q.invariantRuntimeAt(left)
+	if e != nil || !ok {
+		return ok, e
+	}
+	return q.invariantRuntimeAt(left + 1)
+}
+
+// Ordinary source member destruction never acknowledges a failed raw header.
+// Cursor and immutable cause survive, including postphysical TLS failures.
+func (q *satVarQueue) sourceFinalize() error {
+	if q == nil || q.self != q {
+		return ErrSATOwner
+	}
+	if q.runtimeSourceStop != nil {
+		return q.runtimeSourceStop
+	}
+	return q.finishSourceRuntime()
+}
+func (q *satVarQueue) finishSourceRuntime() error {
+	for q.runtimeSourceCursor < 2 {
+		c := &q.runtimeIndices.raw
+		mask := uint8(2)
+		if q.runtimeSourceCursor == 1 {
+			c = &q.runtimeValues.raw
+			mask = 1
+		}
+		if q.runtimeCompleted&mask != 0 && c.block != (memory.Block{}) {
+			if e := c.runtime.Deallocate(&c.block); e != nil {
+				if q.runtimeSourceStop == nil {
+					q.runtimeSourceStop = e
+				}
+				return e
+			}
+		}
+		q.runtimeSourceCursor++
+	}
+	return nil
+}
+func (q *satVarQueue) closeRuntime() error {
+	if q == nil || q.self != q {
+		return ErrSATOwner
+	}
+	if q.closed {
+		return nil
+	}
+	q.runtimeClosing = true
+	if e := q.sourceFinalize(); e != nil {
+		return e
+	}
+	return q.abortRuntimePending()
+}
+func (q *satVarQueue) abortRuntimePending() error {
+	for q.runtimeAbortCursor < 2 {
+		c := &q.runtimeIndices.raw
+		if q.runtimeAbortCursor == 1 {
+			c = &q.runtimeValues.raw
+		}
+		// An incomplete copy constructor's published raw prefix has no source
+		// destructor; this reachable buffer belongs solely to owning abort.
+		if c.block != (memory.Block{}) {
+			if e := c.release(&c.block); e != nil {
+				return e
+			}
+		}
+		if c.pending != (memory.Block{}) {
+			if e := c.release(&c.pending); e != nil {
+				return e
+			}
+			c.pendingReplaces = false
+		}
+		c.closed = true
+		q.runtimeAbortCursor++
+	}
+	q.budget.Release(q.ownerBytes)
+	q.ownerBytes = 0
+	q.closed = true
+	return nil
+}
+func (q *satVarQueue) CleanupStopped() error {
+	if q == nil || q.self != q {
+		return ErrSATOwner
+	}
+	if q.closed {
+		return nil
+	}
+	if q.runtimeSourceStop == nil {
+		return ErrSATOwner
+	}
+	c := &q.runtimeIndices.raw
+	if q.runtimeSourceCursor == 1 {
+		c = &q.runtimeValues.raw
+	}
+	// Only actual consumed-token progress or the recorded successful physical
+	// realloc transfer is acknowledged. No arbitrary source guard is repaired.
+	if c.block != (memory.Block{}) {
+		if !c.pendingReplaces {
+			return q.runtimeSourceStop
+		}
+		c.block = memory.Block{}
+	}
+	q.runtimeSourceCursor++
+	if e := q.finishSourceRuntime(); e != nil {
+		return e
+	}
+	return q.abortRuntimePending()
+}
+
+func (q *satVarQueue) cloneRuntime(b *arena.Budget) (*satVarQueue, error) {
+	if e := q.open(); e != nil {
+		return nil, e
+	}
+	if b == nil || b != q.budget || b != q.runtimeValues.raw.runtime.Budget() {
+		return nil, ErrSATOwner
+	}
+	v, e := newSATVarQueue(nil, b)
+	if e != nil {
+		return nil, e
+	}
+	v.runtimeActivity = q.runtimeActivity
+	v.literalSource = q.literalSource
+	v.bindRuntime(q.runtimeValues.raw.runtime)
+	v.runtimeCompleted = 0
+	if e = satMUSCopyColumn(&v.runtimeValues.raw, &q.runtimeValues.raw, 4); e == nil {
+		v.runtimeCompleted = 1
+		e = satMUSCopyColumn(&v.runtimeIndices.raw, &q.runtimeIndices.raw, 4)
+		if e == nil {
+			v.runtimeCompleted = 3
+		}
+	}
+	if e != nil {
+		if cleanup := v.Close(); cleanup != nil {
+			return v, errors.Join(e, cleanup)
+		}
+		return nil, e
+	}
+	return v, nil
+}
+func (q *satVarQueue) moveRuntime(b *arena.Budget) (*satVarQueue, error) {
+	if e := q.change(); e != nil {
+		return nil, e
+	}
+	if b == nil || b != q.budget || b != q.runtimeValues.raw.runtime.Budget() {
+		return nil, ErrSATOwner
+	}
+	v, e := newSATVarQueue(nil, b)
+	if e != nil {
+		return nil, e
+	}
+	v.runtimeActivity = q.runtimeActivity
+	v.literalSource = q.literalSource
+	v.runtimeValues = q.runtimeValues
+	v.runtimeValues.raw.self = &v.runtimeValues.raw
+	v.runtimeIndices = q.runtimeIndices
+	v.runtimeIndices.raw.self = &v.runtimeIndices.raw
+	v.runtimeCompleted = q.runtimeCompleted
+	r := q.runtimeValues.raw.runtime
+	q.runtimeValues = satSolverRuntimeUintColumn{}
+	q.runtimeIndices = satSolverRuntimeUintColumn{}
+	q.bindRuntime(r)
+	return v, nil
+}

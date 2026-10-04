@@ -1,3 +1,4 @@
+// Source: src/sat/sat_solver.h; src/sat/sat_solver.cpp; src/util/vector.h; src/util/memory_manager.cpp.
 // Licensed under the MIT license.
 package g3
 
@@ -39,7 +40,7 @@ func TestSATSolverAssignmentRuntimeHeadersRetainedBytesAndRealloc(t *testing.T) 
 	}
 	amount, e := v.memory.AllocationSize()
 	satOK(t, e)
-	if amount != 18 {
+	if amount != 18+24+576 {
 		t.Fatal("actual malloc size_t header accounting", amount)
 	}
 	for i, want := range []byte{2, 0, 0, 0, 2, 0, 0, 0, 1, 255} {
@@ -220,14 +221,14 @@ func TestSATSolverAssignmentTLSAllocationFailureRetainsUnpublishedRoot(t *testin
 	satOK(t, e)
 	v, e := newSATSolverVariableState(todo, b, arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: b}}, r)
 	satOK(t, e)
-	prefix, e := r.Allocate(99990)
+	prefix, e := r.Allocate(99390)
 	satOK(t, e)
 	satOK(t, r.SetMaxSize(1))
 	_, e = v.mkVar(false, true)
 	if !satAssignmentActualRefusal(r, e) || v.assignment.block != (memory.Block{}) || v.assignment.pending == (memory.Block{}) {
 		t.Fatal("post-malloc/pre-m_data prefix", e, r.State())
 	}
-	satAssignmentAuditBlocks(t, &v.assignment, prefix)
+	satScalarAuditRoots(t, v, prefix)
 	if _, e = r.Read(v.assignment.pending, 0); !errors.Is(e, memory.ErrRuntimeUninitialized) {
 		t.Fatal("source header must not publish", e)
 	}
@@ -256,7 +257,7 @@ func TestSATSolverAssignmentReallocateRefusalKeepsActualOldBinding(t *testing.T)
 	if !satAssignmentActualRefusal(v.memory, e) || c.block != old || c.pending != (memory.Block{}) {
 		t.Fatal(e, c, v.memory.State())
 	}
-	satAssignmentAuditBlocks(t, c)
+	satScalarAuditRoots(t, v)
 	if b.Used() != used || satAssignmentTestSize(t, c) != 2 || satAssignmentTestValue(t, c, 0) != 7 || satAssignmentTestValue(t, c, 1) != -3 {
 		t.Fatal("physical old graph changed")
 	}
@@ -286,7 +287,7 @@ func TestSATSolverAssignmentCurrentMemberBorrowAndOwnerGuards(t *testing.T) {
 	if _, e = copied.read(0); !errors.Is(e, ErrSATOwner) {
 		t.Fatal(e)
 	}
-	satAssignmentAuditBlocks(t, &v.assignment)
+	satScalarAuditRoots(t, v)
 }
 func TestSATSolverAssignmentSourceUnsignedGrowthException(t *testing.T) {
 	for _, test := range []struct{ old, next, bytes uint32 }{{0, 2, 10}, {2, 3, 11}, {3, 5, 13}, {5, 8, 16}, {8, 12, 20}} {

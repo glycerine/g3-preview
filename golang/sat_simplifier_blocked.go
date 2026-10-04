@@ -87,7 +87,14 @@ func (s *satSimplifier) eliminateBlocked() (err error) {
 			}
 		}
 	}
-	for !b.queue.Empty() {
+	for {
+		empty, e := b.queue.emptyChecked()
+		if e != nil {
+			return e
+		}
+		if empty {
+			break
+		}
 		if e = s.lifecycle.propagation.checkpoint(); e != nil {
 			return e
 		}
