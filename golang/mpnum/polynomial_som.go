@@ -1,9 +1,11 @@
 // Source: src/math/polynomial/polynomial.cpp:1885-2156,2217-2300. Licensed under the MIT license.
+// Source author: Leonardo de Moura (leonardo), 2011-11-15.
 package mpnum
 
 import "github.com/glycerine/g3/golang/arena"
 
 type polynomialSOM struct {
+	retirementOwner               *PolynomialSOMBuffer
 	borrowedAppend                bool
 	borrowedAppendIndex           uint32
 	unreferencedConsumed          bool
@@ -82,6 +84,12 @@ func (b *polynomialSOM) addConsumed(a *Int, term Monomial, take bool, consumed *
 	if e != nil {
 		return e
 	}
+	if b.retirementOwner != nil {
+		if e = b.retirementOwner.prepareRetirement(n + 1); e != nil {
+			return e
+		}
+	}
+
 	if !b.cheap {
 		if e = b.positions.Set(term, n); e != nil {
 			return e
@@ -143,24 +151,81 @@ func (b *polynomialSOM) addConsumed(a *Int, term Monomial, take bool, consumed *
 	}
 	return nil
 }
-func (b *polynomialSOM) addMul(a *Int, term Monomial, p Polynomial) error {
-	m := b.owner
-	z, e := m.modular.IsZero(a)
-	if e != nil || z {
-		return e
+
+type polynomialSOMInput struct {
+	polynomial Polynomial
+	buffer     *PolynomialSOMBuffer
+	fromBuffer bool
+}
+
+func (p polynomialSOMInput) size(m *MultivariatePolynomialCore) (uint32, error) {
+	if !p.fromBuffer {
+		return m.readWord(p.polynomial, 8)
 	}
-	n, e := m.readWord(p, 8)
+	if p.buffer == nil || p.buffer.self != p.buffer || p.buffer.storage != m {
+		return 0, ErrPolynomialOwner
+	}
+	if p.buffer.closed || p.buffer.closing || p.buffer.sourceStarted {
+		return 0, arena.ErrClosed
+	}
+	return p.buffer.buffer.ms.size(m)
+}
+func (p polynomialSOMInput) monomial(m *MultivariatePolynomialCore, i uint32) (Monomial, error) {
+	if !p.fromBuffer {
+		return m.monomialCore(p.polynomial, i)
+	}
+	if modularSourceDebug {
+		n, e := p.buffer.buffer.ms.size(m)
+		if e != nil {
+			return Monomial{}, e
+		}
+		if i >= n {
+			return Monomial{}, ErrPolynomialAssertion
+		}
+	}
+	return p.buffer.buffer.ms.monomial(m, i)
+}
+func (p polynomialSOMInput) coefficient(m *MultivariatePolynomialCore, i uint32) (Int, error) {
+	if !p.fromBuffer {
+		return m.coefficientCore(p.polynomial, i)
+	}
+	if modularSourceDebug {
+		n, e := p.buffer.buffer.as.size(m)
+		if e != nil {
+			return Int{}, e
+		}
+		if i >= n {
+			return Int{}, ErrPolynomialAssertion
+		}
+	}
+	return p.buffer.buffer.as.coefficient(m, i)
+}
+func (b *polynomialSOM) addMul(a *Int, term Monomial, p Polynomial) error {
+	return b.addSourceInput(a, term, polynomialSOMInput{polynomial: p}, true)
+}
+func (b *polynomialSOM) addSourceInput(a *Int, term Monomial, p polynomialSOMInput, multiply bool) error {
+	m := b.owner
+	if multiply {
+		z, e := m.modular.IsZero(a)
+		if e != nil || z {
+			return e
+		}
+	}
+	n, e := p.size(m)
 	if e != nil {
 		return e
 	}
 	for i := uint32(0); i < n; i++ {
-		other, e := m.monomialCore(p, i)
+		other, e := p.monomial(m, i)
 		if e != nil {
 			return e
 		}
-		prod, e := m.generatedProduct(term, other)
-		if e != nil {
-			return e
+		prod := other
+		if multiply {
+			prod, e = m.generatedProduct(term, other)
+			if e != nil {
+				return e
+			}
 		}
 		pos := ^uint32(0)
 		if !b.cheap {
@@ -185,6 +250,11 @@ func (b *polynomialSOM) addMul(a *Int, term Monomial, p Polynomial) error {
 					}
 				}
 			}
+			if b.retirementOwner != nil {
+				if e = b.retirementOwner.prepareRetirement(n + 1); e != nil {
+					return e
+				}
+			}
 			if !b.cheap {
 				if e = b.positions.Set(prod, n); e != nil {
 					return e
@@ -192,7 +262,9 @@ func (b *polynomialSOM) addMul(a *Int, term Monomial, p Polynomial) error {
 				if e = b.ms.appendMonomial(m, prod); e != nil {
 					return e
 				}
-				if m.generatedActive {
+				b.borrowedAppend = true
+				b.borrowedAppendIndex = n
+				if multiply && m.generatedActive {
 					m.generatedBuffer = b
 					m.generatedIndex = n
 				}
@@ -200,10 +272,15 @@ func (b *polynomialSOM) addMul(a *Int, term Monomial, p Polynomial) error {
 			if e = m.monomials.IncRef(prod); e != nil {
 				return e
 			}
+			if !b.cheap {
+				b.borrowedAppend = false
+			}
 			if b.cheap {
 				b.pendingMonomial = prod
 				b.hasPendingReference = true
-				m.transferGeneratedMonomial()
+				if multiply {
+					m.transferGeneratedMonomial()
+				}
 				if e = b.ms.appendMonomial(m, prod); e != nil {
 					return e
 				}
@@ -211,7 +288,9 @@ func (b *polynomialSOM) addMul(a *Int, term Monomial, p Polynomial) error {
 				b.pendingMonomial = Monomial{}
 			}
 			if !b.cheap {
-				m.transferGeneratedMonomial()
+				if multiply {
+					m.transferGeneratedMonomial()
+				}
 			}
 			if e = b.as.appendCoefficient(m, Int{}); e != nil {
 				return e
@@ -220,11 +299,15 @@ func (b *polynomialSOM) addMul(a *Int, term Monomial, p Polynomial) error {
 			if e != nil {
 				return e
 			}
-			source, e := m.coefficientCore(p, i)
+			source, e := p.coefficient(m, i)
 			if e != nil {
 				return e
 			}
-			e = m.modular.Mul(a, &source, &out)
+			if multiply {
+				e = m.modular.Mul(a, &source, &out)
+			} else {
+				e = m.modular.Copy(&out, &source)
+			}
 			if w := b.as.putCoefficient(m, n, out); w != nil {
 				return w
 			}
@@ -232,16 +315,22 @@ func (b *polynomialSOM) addMul(a *Int, term Monomial, p Polynomial) error {
 				return e
 			}
 		} else {
-			m.transferGeneratedMonomial()
+			if multiply {
+				m.transferGeneratedMonomial()
+			}
 			out, e := b.as.coefficient(m, pos)
 			if e != nil {
 				return e
 			}
-			source, e := m.coefficientCore(p, i)
+			source, e := p.coefficient(m, i)
 			if e != nil {
 				return e
 			}
-			e = m.modular.AddMul(&out, a, &source, &out)
+			if multiply {
+				e = m.modular.AddMul(&out, a, &source, &out)
+			} else {
+				e = m.modular.Add(&out, &source, &out)
+			}
 			if w := b.as.putCoefficient(m, pos, out); w != nil {
 				return w
 			}

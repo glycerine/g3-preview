@@ -28449,7 +28449,13 @@
         "mpnum/polynomial_variable_helpers_lifetime.go",
         "mpnum/polynomial_variable_helpers_scoped.go",
         "mpnum/polynomial_variable_helpers_source_test.go",
-        "mpnum/polynomial_variable_helpers_physical_test.go"
+        "mpnum/polynomial_variable_helpers_physical_test.go",
+        "mpnum/polynomial_som_owner.go",
+        "mpnum/polynomial_som_vector.go",
+        "mpnum/polynomial_som_sort.go",
+        "mpnum/polynomial_som_vector_test.go",
+        "mpnum/polynomial_som_owner_physical_test.go",
+        "mpnum/polynomial_som_vector_bounds_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -28651,7 +28657,25 @@
         "TestPolynomialMaxDegreesCopyConstructorCompletedMemberUnwind",
         "TestPolynomialMaxDegreesCopyConstructorTLSIncompleteSecondRoot",
         "TestPolynomialVariableHelperWarmAndColdOwnerGuards",
-        "TestPolynomialMaxDegreesStoppedSourceDestructorAndOwningAbort"
+        "TestPolynomialMaxDegreesStoppedSourceDestructorAndOwningAbort",
+        "TestPolynomialSOMVectorDefaultOwnerAndSourceMembers",
+        "TestPolynomialSOMVectorActualColdChildRefusal",
+        "TestPolynomialSOMVectorAtEveryReservation",
+        "TestPolynomialSOMBufferAddEveryReservation",
+        "TestPolynomialSOMVectorActualModularAndResetPrefix",
+        "TestPolynomialSOMBufferZeroAndDuplicateNoColdReservation",
+        "TestPolynomialSOMBufferAddMulIndependentFiniteModel",
+        "TestPolynomialSOMBufferAddMulEveryReservation",
+        "TestPolynomialSOMBufferActualOverloadsAndUnreadZero",
+        "TestPolynomialSOMBufferSourceMaxAndDisplay",
+        "TestPolynomialSOMVectorSourceFinalizeStickyPostPhysicalSuffix",
+        "TestPolynomialSOMBufferSourceSortMovesCoefficients",
+        "TestPolynomialSOMBufferSourceSortEveryReservation",
+        "TestPolynomialSOMBufferActualModDAndScalarOverloads",
+        "TestPolynomialSOMBufferNeverAbortsBorrowedCalleeCreation",
+        "TestPolynomialSOMBufferSourceSelfAliasReadsChangedFutureCoefficient",
+        "TestPolynomialSOMBufferStoppedSortRejectsOrdinaryMutation",
+        "TestPolynomialSOMVectorWrappedIndexReachesChildWithoutReservation"
       ],
       "conditionals": [
         {
@@ -30965,6 +30989,66 @@
             "TestPolynomialVariableHelperWarmAndColdOwnerGuards",
             "TestPolynomialMaxDegreesStoppedSourceDestructorAndOwningAbort"
           ]
+        },
+        {
+          "name": "Standalone som_buffer1885-2156 actual nullable owner, queries/reset/add/addmul concrete overloads, ModD and mk; implicit source reverse raw-only members and distinct retained-owning abort",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_som_owner.go",
+          "tests": [
+            "TestPolynomialSOMVectorDefaultOwnerAndSourceMembers",
+            "TestPolynomialSOMVectorActualColdChildRefusal",
+            "TestPolynomialSOMVectorAtEveryReservation",
+            "TestPolynomialSOMBufferAddEveryReservation",
+            "TestPolynomialSOMVectorActualModularAndResetPrefix",
+            "TestPolynomialSOMBufferZeroAndDuplicateNoColdReservation",
+            "TestPolynomialSOMBufferAddMulIndependentFiniteModel",
+            "TestPolynomialSOMBufferAddMulEveryReservation",
+            "TestPolynomialSOMBufferActualOverloadsAndUnreadZero",
+            "TestPolynomialSOMBufferSourceMaxAndDisplay",
+            "TestPolynomialSOMVectorSourceFinalizeStickyPostPhysicalSuffix",
+            "TestPolynomialSOMBufferSourceSortMovesCoefficients",
+            "TestPolynomialSOMBufferSourceSortEveryReservation",
+            "TestPolynomialSOMBufferActualModDAndScalarOverloads",
+            "TestPolynomialSOMBufferNeverAbortsBorrowedCalleeCreation",
+            "TestPolynomialSOMBufferSourceSelfAliasReadsChangedFutureCoefficient",
+            "TestPolynomialSOMBufferStoppedSortRejectsOrdinaryMutation",
+            "TestPolynomialSOMVectorWrappedIndexReachesChildWithoutReservation"
+          ]
+        },
+        {
+          "name": "som_buffer_vector2159-2214 actual allocated-before-push children, ascending source child destruction, reset/set_owner and wrapped unsigned ensure_capacity(idx+1) before reached child read",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_som_vector.go",
+          "tests": [
+            "TestPolynomialSOMVectorDefaultOwnerAndSourceMembers",
+            "TestPolynomialSOMVectorActualColdChildRefusal",
+            "TestPolynomialSOMVectorAtEveryReservation",
+            "TestPolynomialSOMBufferAddEveryReservation",
+            "TestPolynomialSOMVectorActualModularAndResetPrefix",
+            "TestPolynomialSOMBufferZeroAndDuplicateNoColdReservation",
+            "TestPolynomialSOMBufferAddMulIndependentFiniteModel",
+            "TestPolynomialSOMBufferAddMulEveryReservation",
+            "TestPolynomialSOMBufferActualOverloadsAndUnreadZero",
+            "TestPolynomialSOMBufferSourceMaxAndDisplay",
+            "TestPolynomialSOMVectorSourceFinalizeStickyPostPhysicalSuffix",
+            "TestPolynomialSOMBufferSourceSortMovesCoefficients",
+            "TestPolynomialSOMBufferSourceSortEveryReservation",
+            "TestPolynomialSOMBufferActualModDAndScalarOverloads",
+            "TestPolynomialSOMBufferNeverAbortsBorrowedCalleeCreation",
+            "TestPolynomialSOMBufferSourceSelfAliasReadsChangedFutureCoefficient",
+            "TestPolynomialSOMBufferStoppedSortRejectsOrdinaryMutation",
+            "TestPolynomialSOMVectorWrappedIndexReachesChildWithoutReservation"
+          ]
+        },
+        {
+          "name": "sort_graded_lex2104-2119 actual fresh local numeral vector, swaps/map updates/vector swap/source raw destructor; std::sort final-order heap contract adapter, stopped local owner rejects overwrite",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_som_sort.go",
+          "tests": [
+            "TestPolynomialSOMBufferSourceSortMovesCoefficients",
+            "TestPolynomialSOMBufferSourceSortEveryReservation",
+            "TestPolynomialSOMBufferStoppedSortRejectsOrdinaryMutation"
+          ]
         }
       ],
       "ownership": [
@@ -31015,7 +31099,8 @@
         "Selected exact division and graded maxima only: full imp construction, PSC/GCD, source TRACE/global diagnostics and undefined dangling/fresh-NULL source destruction remain open. False GNU release VERIFY reaches a typed unreachable-domain guard; no registered original assertion completion credit. See PORT_PROGRESS.md.",
         "This selected source core omits only separately inventoried ModD specialization; full imp hierarchy, PSC/Lazard/subresultants/resultants/general GCD and registered driver credit remain open. TRACE/CTRACE/printers/global assertion bindings remain separate obligations. Malformed SIZE_T32 release metadata fixture is explicitly source undefined and uses caller restoration only after immediate physical census; no native recovery claim.",
         "Selected concrete class and ModD methods only: whole polynomial hierarchy, PSC/Lazard/resultants/GCD/global diagnostic and source-driver assertion bindings remain OPEN. Borrowed cold stream interface binds actual NumericTextStream formatting state, no hot per-variable interface fields or decimal-only surrogate. No additional registered source assertion credit; malformed/wrapped source-undefined vector profiles are typed guards, not native recovery claims.",
-        "Selected concrete skeleton canonical order uses heap sort; platform std::sort comparator dispatch order is not claimed. Scalar child IDs encode actual cold object provenance under a fixed Runtime. Cold ownership metadata fully charged and distinct from source malloc events. Whole imp and registered-driver/global diagnostic integration remain open."
+        "Selected concrete skeleton canonical order uses heap sort; platform std::sort comparator dispatch order is not claimed. Scalar child IDs encode actual cold object provenance under a fixed Runtime. Cold ownership metadata fully charged and distinct from source malloc events. Whole imp and registered-driver/global diagnostic integration remain open.",
+        "Standalone SOM buffers/vectors and selected fresh sorting scope added. Authoritative reflected Go class header and charged real retained fields; scalar child ID cold provenance adaptation, no unread native-size ticket or full global malloc/header geometry claim. Heap sort final-order contract only, native comparator schedule/global ostream/full imp remain OPEN. Original source implicit dtor has no Reset/DEC/NUM Del; separate own-abort drains actual named records. See PORT_PROGRESS.md."
       ]
     },
     {
@@ -58211,7 +58296,11 @@
         "sat_solver_consequences_chunking.go",
         "sat_solver_consequences_chunking_fault_test.go",
         "sat_solver_consequences_chunking_model_test.go",
-        "sat_solver_consequences_chunking_test.go"
+        "sat_solver_consequences_chunking_test.go",
+        "sat_solver_copy.go",
+        "sat_solver_copy_fault_test.go",
+        "sat_solver_copy_model_test.go",
+        "sat_solver_copy_test.go"
       ],
       "tests": [
         "TestSATSolverClauseCoreFiniteSimplification",
@@ -58509,7 +58598,19 @@
         "TestSATConsequenceChunkPruneAndLastDuplicateRemoval",
         "TestSATConsequenceChunkUsesActualCheckAndAppendsCore",
         "TestSATConsequenceChunkPruneReachedGuardPreservesSwapPrefix",
-        "TestSATConsequenceChunkWarmedPhysicalPlateau"
+        "TestSATConsequenceChunkWarmedPhysicalPlateau",
+        "TestSATSolverCopyEveryActualDestinationRefusalRetainsPublishedGraph",
+        "TestSATSolverCopyIndependentBinaryCNFsAndDestinationUnion",
+        "TestSATSolverCopyIndependentNaryAssignmentModels",
+        "TestSATSolverCopyActualFlagsTrailClausesAndUserScope",
+        "TestSATSolverCopySelfRelocationGuardsReachedOriginalIterator",
+        "TestSATSolverCopySelfWithinCapacityPreservesDefinedAppend",
+        "TestSATSolverCopyUsesOnlySourceBaseTrailAndPopsDestination",
+        "TestSATSolverCopySourceClosedGuard",
+        "TestSATSolverCopyDebugEliminatedSourceAssertionAfterEarlierVariable",
+        "TestSATSolverCopyDebugConverterAssertionAfterDestinationPop",
+        "TestSATSolverCopyWarmUnitOnlyPhysicalPlateau",
+        "TestSATSolverCopyReadsExactBinaryNonLearnedPackedWord"
       ],
       "conditionals": [
         {
@@ -59647,6 +59748,57 @@
             "TestSATConsequenceChunkUsesActualCheckAndAppendsCore",
             "TestSATConsequenceChunkWarmedPhysicalPlateau"
           ]
+        },
+        {
+          "name": "Selected actual solver.copy 75-81 copyFrom popToBase then source DEBUG MC/scope assertions",
+          "status": "ported",
+          "go_target": "sat_solver_copy.go",
+          "tests": [
+            "TestSATSolverCopyDebugConverterAssertionAfterDestinationPop"
+          ]
+        },
+        {
+          "name": "Selected actual solver.copy 81-88 actual MkVar flags/VERIFY",
+          "status": "ported",
+          "go_target": "sat_solver_copy.go",
+          "tests": [
+            "TestSATSolverCopyActualFlagsTrailClausesAndUserScope",
+            "TestSATSolverCopyDebugEliminatedSourceAssertionAfterEarlierVariable"
+          ]
+        },
+        {
+          "name": "Selected actual solver.copy 89-92 scope0 trail size or actual first scope trailLimit then assign NONE",
+          "status": "ported",
+          "go_target": "sat_solver_copy.go",
+          "tests": [
+            "TestSATSolverCopyUsesOnlySourceBaseTrailAndPopsDestination"
+          ]
+        },
+        {
+          "name": "Selected actual solver.copy 94-111 captured actual watched iterators, full packed word original-binary predicate",
+          "status": "ported",
+          "go_target": "sat_solver_copy.go",
+          "tests": [
+            "TestSATSolverCopyReadsExactBinaryNonLearnedPackedWord"
+          ]
+        },
+        {
+          "name": "Selected actual solver.copy 113-123 lexical Runtime buffer, captured original vector end and each source clause read",
+          "status": "ported",
+          "go_target": "sat_solver_copy.go",
+          "tests": [
+            "TestSATSolverCopySelfRelocationGuardsReachedOriginalIterator",
+            "TestSATSolverCopySelfWithinCapacityPreservesDefinedAppend"
+          ]
+        },
+        {
+          "name": "Selected actual solver.copy 125-127 userScope reset then live-size append",
+          "status": "ported",
+          "go_target": "sat_solver_copy.go",
+          "tests": [
+            "TestSATSolverCopyActualFlagsTrailClausesAndUserScope",
+            "TestSATSolverCopySelfWithinCapacityPreservesDefinedAppend"
+          ]
         }
       ],
       "ownership": [
@@ -59671,7 +59823,8 @@
         "Selected enabled integrity and missed-propagation sites now call actual members, including Asymm entry/exit and propagation. Global debug-tag/assertions-enabled registry, TRACE/verbose, complete constructor/parameter updates/search and registered user-scope campaign remain open. Undefined floating-to-int conversion is guarded at reached source expression; not a C++ malformed-input guarantee.",
         "Selected real finite src/test/sat_user_scope.cpp campaign executes42 original ENSURE comparisons/168 clauses and independent original-CNF oracle after pending tag removal. Whole solver remains partial: extension/parallel/MUS/clone/consequence methods, global debug tags, TRACE/printer and remaining actual source Runtime allocation accounting are open. Clause_offset physical pointer32 contract remains distinct from charged checked locator metadata. Std library sort schedule and explicit cold constructor contexts are Go adapters.",
         "Selected concrete consequences and mutex family source mapping supersedes older missing-method notes only for listed sites. Source AST/BV/datatype registered6 assertions, TRACE/verbose, extension dispatch, dormant core_chunking/static helpers, general template variants and full source units remain OPEN. Scalar slot/generation encodes selected8-byte pointer ABI; actual named cold/raw/pending roots charged; no registry-derived ownership. See PORT_PROGRESS.md.",
-        "Listed static consequences3157-3249 now implemented and directly tested: source undef falls through existing core, last-duplicate swap removal and real Check/clause effects. Hardcoded false dispatch unchanged. K0/repeatedundef nontermination is source behavior, not repaired; verbose/AST registered6/global bindings remain OPEN. Actual named charged nested scopes with reverse completed destruction and separate owning abort. Supersedes earlier static-helper-open notes only for listed methods. See PORT_PROGRESS.md."
+        "Listed static consequences3157-3249 now implemented and directly tested: source undef falls through existing core, last-duplicate swap removal and real Check/clause effects. Hardcoded false dispatch unchanged. K0/repeatedundef nontermination is source behavior, not repaired; verbose/AST registered6/global bindings remain OPEN. Actual named charged nested scopes with reverse completed destruction and separate owning abort. Supersedes earlier static-helper-open notes only for listed methods. See PORT_PROGRESS.md.",
+        "Complete selected source copy75-127, across actual source/destination Runtime and Budget. Captured source vector cap detects actual proven monotone backing replacement only at reached dereference; same-cap self-copy source behavior preserved. Packed full-word88 predicate retained. Clone macro is disabled and its cpp739 two-arg constructor is illformed against actual3-arg declaration; no inferred runnable constructor or clone success stub. Parallel/global storage/TRACE/full source unit remain OPEN. No directly registered copy source assertions credited. See PORT_PROGRESS.md."
       ]
     },
     {
@@ -59815,7 +59968,11 @@
         "sat_solver_mutex_pair_set.go",
         "sat_solver_mutex_pair_set_test.go",
         "sat_solver_mutex_pair_vector.go",
-        "sat_solver_mutex_pair_vector_test.go"
+        "sat_solver_mutex_pair_vector_test.go",
+        "sat_solver_copy.go",
+        "sat_solver_copy_fault_test.go",
+        "sat_solver_copy_model_test.go",
+        "sat_solver_copy_test.go"
       ],
       "tests": [
         "TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots",
@@ -60062,7 +60219,19 @@
         "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
         "TestSATMutexPairSetWrappedCopyGuardAtActualDestination",
         "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
-        "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor"
+        "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor",
+        "TestSATSolverCopyEveryActualDestinationRefusalRetainsPublishedGraph",
+        "TestSATSolverCopyIndependentBinaryCNFsAndDestinationUnion",
+        "TestSATSolverCopyIndependentNaryAssignmentModels",
+        "TestSATSolverCopyActualFlagsTrailClausesAndUserScope",
+        "TestSATSolverCopySelfRelocationGuardsReachedOriginalIterator",
+        "TestSATSolverCopySelfWithinCapacityPreservesDefinedAppend",
+        "TestSATSolverCopyUsesOnlySourceBaseTrailAndPopsDestination",
+        "TestSATSolverCopySourceClosedGuard",
+        "TestSATSolverCopyDebugEliminatedSourceAssertionAfterEarlierVariable",
+        "TestSATSolverCopyDebugConverterAssertionAfterDestinationPop",
+        "TestSATSolverCopyWarmUnitOnlyPhysicalPlateau",
+        "TestSATSolverCopyReadsExactBinaryNonLearnedPackedWord"
       ],
       "conditionals": [
         {
@@ -60531,6 +60700,25 @@
             "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
             "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor"
           ]
+        },
+        {
+          "name": "copy declaration and init_trail_size257 actual scope0 trail or first actual scope trail limit; destination pop precedes source reads",
+          "status": "ported",
+          "go_target": "sat_solver_copy.go",
+          "tests": [
+            "TestSATSolverCopyEveryActualDestinationRefusalRetainsPublishedGraph",
+            "TestSATSolverCopyIndependentBinaryCNFsAndDestinationUnion",
+            "TestSATSolverCopyIndependentNaryAssignmentModels",
+            "TestSATSolverCopyActualFlagsTrailClausesAndUserScope",
+            "TestSATSolverCopySelfRelocationGuardsReachedOriginalIterator",
+            "TestSATSolverCopySelfWithinCapacityPreservesDefinedAppend",
+            "TestSATSolverCopyUsesOnlySourceBaseTrailAndPopsDestination",
+            "TestSATSolverCopySourceClosedGuard",
+            "TestSATSolverCopyDebugEliminatedSourceAssertionAfterEarlierVariable",
+            "TestSATSolverCopyDebugConverterAssertionAfterDestinationPop",
+            "TestSATSolverCopyWarmUnitOnlyPhysicalPlateau",
+            "TestSATSolverCopyReadsExactBinaryNonLearnedPackedWord"
+          ]
         }
       ],
       "ownership": [
@@ -60550,7 +60738,8 @@
         "Complete selected ordinary GC/restart/init_search member algorithms executed; enabled integrity tags, verbose/TRACE and full constructor/search/Check remain open. Source comparator expressions/tie order preserved through explicitly charged concrete Go stable merge workspace; C++ standard library allocation/comparison schedule is not claimed identical. No new registered source assertion completion credit.",
         "Selected enabled integrity and missed-propagation sites now call actual members, including Asymm entry/exit and propagation. Global debug-tag/assertions-enabled registry, TRACE/verbose, complete constructor/parameter updates/search and registered user-scope campaign remain open. Undefined floating-to-int conversion is guarded at reached source expression; not a C++ malformed-input guarantee.",
         "Selected real finite src/test/sat_user_scope.cpp campaign executes42 original ENSURE comparisons/168 clauses and independent original-CNF oracle after pending tag removal. Whole solver remains partial: extension/parallel/MUS/clone/consequence methods, global debug tags, TRACE/printer and remaining actual source Runtime allocation accounting are open. Clause_offset physical pointer32 contract remains distinct from charged checked locator metadata. Std library sort schedule and explicit cold constructor contexts are Go adapters.",
-        "Selected concrete consequences and mutex family source mapping supersedes older missing-method notes only for listed sites. Source AST/BV/datatype registered6 assertions, TRACE/verbose, extension dispatch, dormant core_chunking/static helpers, general template variants and full source units remain OPEN. Scalar slot/generation encodes selected8-byte pointer ABI; actual named cold/raw/pending roots charged; no registry-derived ownership. See PORT_PROGRESS.md."
+        "Selected concrete consequences and mutex family source mapping supersedes older missing-method notes only for listed sites. Source AST/BV/datatype registered6 assertions, TRACE/verbose, extension dispatch, dormant core_chunking/static helpers, general template variants and full source units remain OPEN. Scalar slot/generation encodes selected8-byte pointer ABI; actual named cold/raw/pending roots charged; no registry-derived ownership. See PORT_PROGRESS.md.",
+        "Complete selected source copy75-127, across actual source/destination Runtime and Budget. Captured source vector cap detects actual proven monotone backing replacement only at reached dereference; same-cap self-copy source behavior preserved. Packed full-word88 predicate retained. Clone macro is disabled and its cpp739 two-arg constructor is illformed against actual3-arg declaration; no inferred runnable constructor or clone success stub. Parallel/global storage/TRACE/full source unit remain OPEN. No directly registered copy source assertions credited. See PORT_PROGRESS.md."
       ]
     },
     {
@@ -61527,7 +61716,11 @@
         "sat_solver_watch_store.go",
         "sat_storage_vector.go",
         "sat_watched.go",
-        "sat_solver_watch_sort.go"
+        "sat_solver_watch_sort.go",
+        "sat_solver_copy.go",
+        "sat_solver_copy_fault_test.go",
+        "sat_solver_copy_model_test.go",
+        "sat_solver_copy_test.go"
       ],
       "tests": [
         "TestSATBinClauseVectorRealSpecialization",
@@ -61568,7 +61761,19 @@
         "TestSATSolverWatchSortLargeStableOrderAndWorkBound",
         "TestSATSolverWatchSortThreeClassesAndActualLifetime",
         "TestSATSolverWatchSortIndependentMixedOracleAndWarmAllocation",
-        "TestSATSolverWatchSortBoundaryAndGuardPrefixes"
+        "TestSATSolverWatchSortBoundaryAndGuardPrefixes",
+        "TestSATSolverCopyEveryActualDestinationRefusalRetainsPublishedGraph",
+        "TestSATSolverCopyIndependentBinaryCNFsAndDestinationUnion",
+        "TestSATSolverCopyIndependentNaryAssignmentModels",
+        "TestSATSolverCopyActualFlagsTrailClausesAndUserScope",
+        "TestSATSolverCopySelfRelocationGuardsReachedOriginalIterator",
+        "TestSATSolverCopySelfWithinCapacityPreservesDefinedAppend",
+        "TestSATSolverCopyUsesOnlySourceBaseTrailAndPopsDestination",
+        "TestSATSolverCopySourceClosedGuard",
+        "TestSATSolverCopyDebugEliminatedSourceAssertionAfterEarlierVariable",
+        "TestSATSolverCopyDebugConverterAssertionAfterDestinationPop",
+        "TestSATSolverCopyWarmUnitOnlyPhysicalPlateau",
+        "TestSATSolverCopyReadsExactBinaryNonLearnedPackedWord"
       ],
       "conditionals": [
         {
@@ -61743,6 +61948,14 @@
             "TestSATSolverWatchSortThreeClassesAndActualLifetime",
             "TestSATSolverWatchSortIndependentMixedOracleAndWarmAllocation",
             "TestSATSolverWatchSortBoundaryAndGuardPrefixes"
+          ]
+        },
+        {
+          "name": "Selected copy consumer is_binary_non_learned_clause88 full packed m_val2==0, not kind+learned bit approximation",
+          "status": "ported",
+          "go_target": "sat_solver_copy.go",
+          "tests": [
+            "TestSATSolverCopyReadsExactBinaryNonLearnedPackedWord"
           ]
         }
       ],
@@ -128873,7 +129086,14 @@
         "sat_solver_max_cliques_rows.go",
         "sat_solver_max_cliques_rows_test.go",
         "sat_solver_mutex_pair_vector.go",
-        "sat_solver_mutex_pair_vector_test.go"
+        "sat_solver_mutex_pair_vector_test.go",
+        "mpnum/polynomial_som.go",
+        "mpnum/polynomial_som_owner.go",
+        "mpnum/polynomial_som_vector.go",
+        "mpnum/polynomial_som_sort.go",
+        "mpnum/polynomial_som_vector_test.go",
+        "mpnum/polynomial_som_owner_physical_test.go",
+        "mpnum/polynomial_som_vector_bounds_source_test.go"
       ],
       "tests": [
         "TestParamDescrsBudgetFailuresAndWarmDuplicate",
@@ -129076,7 +129296,25 @@
         "TestSATConsequenceRowsExpansionReadsActualOldPointer",
         "TestSATMaxCliquesNestedResizeRefusalRetainsOldLogicalSize",
         "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
-        "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor"
+        "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor",
+        "TestPolynomialSOMVectorDefaultOwnerAndSourceMembers",
+        "TestPolynomialSOMVectorActualColdChildRefusal",
+        "TestPolynomialSOMVectorAtEveryReservation",
+        "TestPolynomialSOMBufferAddEveryReservation",
+        "TestPolynomialSOMVectorActualModularAndResetPrefix",
+        "TestPolynomialSOMBufferZeroAndDuplicateNoColdReservation",
+        "TestPolynomialSOMBufferAddMulIndependentFiniteModel",
+        "TestPolynomialSOMBufferAddMulEveryReservation",
+        "TestPolynomialSOMBufferActualOverloadsAndUnreadZero",
+        "TestPolynomialSOMBufferSourceMaxAndDisplay",
+        "TestPolynomialSOMVectorSourceFinalizeStickyPostPhysicalSuffix",
+        "TestPolynomialSOMBufferSourceSortMovesCoefficients",
+        "TestPolynomialSOMBufferSourceSortEveryReservation",
+        "TestPolynomialSOMBufferActualModDAndScalarOverloads",
+        "TestPolynomialSOMBufferNeverAbortsBorrowedCalleeCreation",
+        "TestPolynomialSOMBufferSourceSelfAliasReadsChangedFutureCoefficient",
+        "TestPolynomialSOMBufferStoppedSortRejectsOrdinaryMutation",
+        "TestPolynomialSOMVectorWrappedIndexReachesChildWithoutReservation"
       ],
       "conditionals": [
         {
@@ -129477,6 +129715,31 @@
             "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
             "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor"
           ]
+        },
+        {
+          "name": "Selected actual scalar child pointer and fresh nontrivial numeral vector allocation/move/source raw destruction, with unsigned caller extent and actual retained fields",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_som_vector.go",
+          "tests": [
+            "TestPolynomialSOMVectorDefaultOwnerAndSourceMembers",
+            "TestPolynomialSOMVectorActualColdChildRefusal",
+            "TestPolynomialSOMVectorAtEveryReservation",
+            "TestPolynomialSOMBufferAddEveryReservation",
+            "TestPolynomialSOMVectorActualModularAndResetPrefix",
+            "TestPolynomialSOMBufferZeroAndDuplicateNoColdReservation",
+            "TestPolynomialSOMBufferAddMulIndependentFiniteModel",
+            "TestPolynomialSOMBufferAddMulEveryReservation",
+            "TestPolynomialSOMBufferActualOverloadsAndUnreadZero",
+            "TestPolynomialSOMBufferSourceMaxAndDisplay",
+            "TestPolynomialSOMVectorSourceFinalizeStickyPostPhysicalSuffix",
+            "TestPolynomialSOMBufferSourceSortMovesCoefficients",
+            "TestPolynomialSOMBufferSourceSortEveryReservation",
+            "TestPolynomialSOMBufferActualModDAndScalarOverloads",
+            "TestPolynomialSOMBufferNeverAbortsBorrowedCalleeCreation",
+            "TestPolynomialSOMBufferSourceSelfAliasReadsChangedFutureCoefficient",
+            "TestPolynomialSOMBufferStoppedSortRejectsOrdinaryMutation",
+            "TestPolynomialSOMVectorWrappedIndexReachesChildWithoutReservation"
+          ]
         }
       ],
       "ownership": [
@@ -129501,7 +129764,8 @@
         "Actual polynomial imp template overload consumers remain open; concrete borrowed array loops preserve only the template iteration body. Runtime handles replace raw pointer ABI. Source invalid-memory continuation is guarded explicitly. No registered source assertion completion credit.",
         "copy_core sizeof(T) uses actual source size_t width before Runtime call, while expansion retains unsigned32 source extent arithmetic. Oversized capacity/zero-size Runtime32 proof is a malformed source-domain prefix, not valid OOM or a large vector claim.",
         "Selected concrete skeleton canonical order uses heap sort; platform std::sort comparator dispatch order is not claimed. Scalar child IDs encode actual cold object provenance under a fixed Runtime. Cold ownership metadata fully charged and distinct from source malloc events. Whole imp and registered-driver/global diagnostic integration remain open.",
-        "Selected concrete consequences and mutex family source mapping supersedes older missing-method notes only for listed sites. Source AST/BV/datatype registered6 assertions, TRACE/verbose, extension dispatch, dormant core_chunking/static helpers, general template variants and full source units remain OPEN. Scalar slot/generation encodes selected8-byte pointer ABI; actual named cold/raw/pending roots charged; no registry-derived ownership. See PORT_PROGRESS.md."
+        "Selected concrete consequences and mutex family source mapping supersedes older missing-method notes only for listed sites. Source AST/BV/datatype registered6 assertions, TRACE/verbose, extension dispatch, dormant core_chunking/static helpers, general template variants and full source units remain OPEN. Scalar slot/generation encodes selected8-byte pointer ABI; actual named cold/raw/pending roots charged; no registry-derived ownership. See PORT_PROGRESS.md.",
+        "Standalone SOM buffers/vectors and selected fresh sorting scope added. Authoritative reflected Go class header and charged real retained fields; scalar child ID cold provenance adaptation, no unread native-size ticket or full global malloc/header geometry claim. Heap sort final-order contract only, native comparator schedule/global ostream/full imp remain OPEN. Original source implicit dtor has no Reset/DEC/NUM Del; separate own-abort drains actual named records. See PORT_PROGRESS.md."
       ]
     },
     {
