@@ -22,11 +22,16 @@ func (m *MultivariatePolynomialCore) Power(p Polynomial, k uint32, r *Polynomial
 	if e := r.open(); e != nil {
 		return e
 	}
+	return m.powerInto(p, k, &r.root)
+}
+
+// The same source engine accepts a completed default source reference.
+func (m *MultivariatePolynomialCore) powerInto(p Polynomial, k uint32, r *polynomialReference) (err error) {
 	if k == 0 {
-		return r.root.assign(m, m.unit)
+		return r.assign(m, m.unit)
 	}
 	if k == 1 {
-		return r.root.assign(m, p)
+		return r.assign(m, p)
 	}
 	local := &m.powerLocal
 	if local.active {
@@ -56,7 +61,7 @@ func (m *MultivariatePolynomialCore) Power(p Polynomial, k uint32, r *Polynomial
 			return e
 		}
 	}
-	return r.root.assign(m, local.result.value)
+	return r.assign(m, local.result.value)
 }
 
 // Explicit owning abort follows all completed source destruction. Source

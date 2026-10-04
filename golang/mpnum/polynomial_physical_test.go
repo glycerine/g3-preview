@@ -47,7 +47,7 @@ func polynomialPhysicalAuditWithHandlers(t *testing.T, m *MultivariatePolynomial
 			add(a)
 		}
 	}
-	for _, a := range []Int{m.modular.p, m.modular.lower, m.modular.upper, m.modular.invTmp1, m.modular.invTmp2, m.modular.invTmp3, m.modular.divTmp, m.zeroNumeral, m.minusOne, m.negativeCoefficient, m.constantCopy, m.linearConstant, m.constantScope.numeral, m.constantScope.rational.num, m.constantScope.rational.den, m.exactDivision.numeral} {
+	for _, a := range []Int{m.modular.p, m.modular.lower, m.modular.upper, m.modular.invTmp1, m.modular.invTmp2, m.modular.invTmp3, m.modular.divTmp, m.zeroNumeral, m.minusOne, m.negativeCoefficient, m.constantCopy, m.linearConstant, m.constantScope.numeral, m.constantScope.rational.num, m.constantScope.rational.den, m.exactDivision.numeral, m.pseudoDivision.numeral} {
 		add(a)
 	}
 	cell := func(p Polynomial, n uint32) {
@@ -62,6 +62,23 @@ func polynomialPhysicalAuditWithHandlers(t *testing.T, m *MultivariatePolynomial
 			n, e := m.readWord(p, 8)
 			serviceMust(t, e)
 			cell(p, n)
+		}
+	}
+	privatePolys := []Polynomial{}
+	for i := range m.pseudoDivision.refs {
+		privatePolys = append(privatePolys, m.pseudoDivision.refs[i].value, m.pseudoDivision.refs[i].incoming)
+	}
+	if m.powerLocal.active {
+		privatePolys = append(privatePolys, m.powerLocal.result.value, m.powerLocal.result.incoming)
+	}
+	for _, p := range privatePolys {
+		if p == (Polynomial{}) {
+			continue
+		}
+		l, e := m.polynomialLocation(p)
+		serviceMust(t, e)
+		if !l.released {
+			cell(p, l.initializedCoefficients)
 		}
 	}
 	if m.pending.value != (Polynomial{}) {

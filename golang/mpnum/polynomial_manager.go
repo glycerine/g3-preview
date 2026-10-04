@@ -34,6 +34,7 @@ type polynomialCreation struct {
 	buffer        *polynomialSOM
 }
 type MultivariatePolynomialCore struct {
+	pseudoDivision                                                                             polynomialPseudoDivisionScope
 	exactDivision                                                                              polynomialExactDivisionScope
 	queryPositions                                                                             MonomialPositions
 	powerLocal                                                                                 polynomialPowerScope
@@ -292,6 +293,9 @@ func (m *MultivariatePolynomialCore) MkTerms(as []Int, ms []Monomial) (Polynomia
 	return m.som.mk(false)
 }
 func (m *MultivariatePolynomialCore) CloseChecked() error {
+	if m != nil && m.self == m && m.pseudoDivision.active {
+		return ErrPolynomialPending
+	}
 	if m != nil && m.self == m && m.exactDivision.active {
 		return ErrPolynomialPending
 	}

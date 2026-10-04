@@ -26225,3 +26225,81 @@ SAT MUS coherent chunk is green for commit; full port goal stays ACTIVE.
 Future frozen pseudo7 meaningful retained-NUM census improvement still requires
 its own authoritative integration/gates; variable-degree failed-constructor
 read audit is private, no held candidate integrated.
+
+## Polynomial pseudo division integration after MUS9edf179
+
+Previous goal turn made authoritative progress with green MUS9edf179/clean
+worktree. Root rechecked current five existing dependency hashes and all seven
+reviewed candidate hashes before exact integration. Actual selected source
+polynomial.cpp4905-5091 and same-engine Power4600-4630 remain literal algorithms;
+no low-degree shortcut, constant-divisor correction/unsigned exponent updates,
+Q/R alias identity and source DEBUG verification retained. Nine independent
+/source/failure groups include27 signed bounded systems and every true route
+reservation prefix: native16/16/11/11, debug22/22/33/14 then first success.
+Original missing-API and introduced Copy-direction RED plus genuine strengthened
+retained BIG NUM common-census12vs13 RED are recorded separately from fixture
+corrections and preexisting green endpoint observations.
+
+Four production files exact lane bytes. Shared three helper/test changes name
+actual embedded NUM/references/monomial and nested Power; stronger reverse
+destruction fixture retains actual BIG NUM after younger reductB guard. No
+registry ownership discovery/manual scope annotations/count relaxation.
+Machine .cache/polynomial-pseudo-root-integrated-inventory.json tracks exact
+seven root files. Additive source methods only, whole polynomial units stay
+partial; ModD/full imp/PSC/Lazard/resultants/GCD and source driver credit OPEN.
+Root full native/checked-debug/vets/source gates required before commit; full
+100-bit/everyactualreservation debug campaign and30m timeout retained.
+
+Private root future ModD/var2degree closure review while pseudo825 gates live:
+verified immutable ModD5 and corrected var-degree03 (failed-constructor carrier
+open guard) into same private145fdec+reviewed pseudo7, no main Go edits. Actual
+polynomial.cpp66-82 and vector101-116/191-216/529-550 compared: move constructor
+steals, implicit svector assignment deep-copies; actual SIZE_T32/64 conversion,
+size/cap/header/elements sequence, nonowning dangling pointer history, failed
+constructor abort/token guard and separate source member destruction retained.
+Independent root actual NumericTextStream fixture first compileRED missing
+NewPolynomialVariableDegrees (.cache/polynomial-var-degree-stream-api-red.log),
+then native/debug GREEN: uppercase HEX/showbase/unsigned showpos/one-shot width
+produce independently literal golden text, map physical Runtime stats unchanged,
+all real stream/map headers and payload fully refund. No display decimal-only
+proxy used and no extra registered source assertion credit.
+
+All Polynomial/Monomial/Linear private families native0.243s/debug0.350s,
+actual stream native/debug0.004s and both vets terminal0; source/no-generics
+audit live on actual repo absolute source path. Immutable future8
+.cache/polynomial-modd-var-degree-integrated-final-inventory.json and
+.cache/review/polynomial-modd-var-degree-integrated-final retain exact production
+bytes plus root stream fixture. Original scope and ModD five actual shared core
+filter sites preserved. Existing ModD physical census still uses old dangling
+failure marker alone; current adjacent actual routes pass but future BIG fresh
+NULL route requires exact paired-state predicate audit, not broadvalidityskip.
+Full imp/PSC/general GCD obligations remain OPEN.
+
+Future ModD actual BIG paired-state census review now closed meaningfully:
+NEW direct ModD surviving BIG coefficient every-prefix fixture reached genuine
+fresh NULL at ordinal1; old helper reports invalid named numeral{1,2} in
+.cache/polynomial-modd-fresh-null-census-red.log. Exact helper change recognizes
+only z.isFailureRef two permanently dead explicit failure descriptors, preserving
+all other validation/count equations. Separate initial first-success Equal call
+ran while fault budget exhausted and failed; corrected test verification after
+immediate named census and fault disable, no algorithm RED claim for fixture.
+Complete native0-4refusals→success5 (one freshNULL prefix), debug0-7→success8
+(three freshNULL prefixes), actual NUM/private/caller/raw/cold graphs audited
+BEFORE lifting fault, successful surviving term independently Equal afterward.
+Broader Polynomial/Monomial/Linear native0.294s/debug0.288s and refreshed both
+vets terminal0. Private source audit45782 terminal0 on prior production bytes;
+new BIG test has no production changes and next authoritative full source gate
+still required. Nine-file immutable future candidate supersedes prior8, with
+original8 snapshot preserved; final inventory points to
+.cache/review/polynomial-modd-var-degree-integrated-final-02. No current main Go
+changes beyond already frozen pseudo7; full825 gates remain live/unchanged.
+
+Full authoritative pseudo825 gates all terminal0 on same runner61787:
+native99.248s, checked/debug756.467s, vet native4.351s/debug4.260s,
+source/no-generics153.609s. Runner verified immutable825 Go files; root
+independently verified all825 and exact seven integrated files. Source path/MIT
+headers retained, Microsoft copyright absent, no C++ content hashes or generics.
+Full original100-bit/everyactualreservation debug campaign retained; git diff
+--check clean. Coherent pseudo division/remainder chunk green for commit. Full
+port goal remains ACTIVE; reviewed future ModD9/member6/skeleton8 continue
+separately, and full imp/PSC/resultant/general GCD and whole solver remain OPEN.

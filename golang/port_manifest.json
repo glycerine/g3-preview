@@ -28431,7 +28431,9 @@
         "mpnum/polynomial_equal.go",
         "mpnum/polynomial_query_source_test.go",
         "mpnum/polynomial_exact_div.go",
-        "mpnum/polynomial_source_maxima.go"
+        "mpnum/polynomial_source_maxima.go",
+        "mpnum/polynomial_pseudo_div.go",
+        "mpnum/polynomial_pseudo_div_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -28568,7 +28570,16 @@
         "TestPolynomialExactDivVerifySourceBoundary",
         "TestPolynomialExactDivWarmSourceProfileAndCounts",
         "TestPolynomialExactDivActualModularChild",
-        "TestPolynomialExactDivReverseDestructionRefusal"
+        "TestPolynomialExactDivReverseDestructionRefusal",
+        "TestPolynomialPseudoDivisionIndependentIdentity",
+        "TestPolynomialPseudoDivisionLowDegreeStillVisitsCheckpoint",
+        "TestPolynomialPseudoDivisionConstantDivisorAndExactCorrection",
+        "TestPolynomialPseudoRemainderSourceDebugIdentityAndOutputAlias",
+        "TestPolynomialPseudoDivisionPhysicalFailurePrefixes",
+        "TestPolynomialPseudoDivisionOutputIdentityAndSourceAssertions",
+        "TestPolynomialPseudoDivisionWarmSourceProfileAndCounts",
+        "TestPolynomialPseudoDivisionReverseDestructionRefusal",
+        "TestPolynomialPseudoDivisionIndependentSignedTable"
       ],
       "conditionals": [
         {
@@ -30707,6 +30718,38 @@
             "TestPolynomialExactDivCheckpointAfterActualInputCopy",
             "TestPolynomialExactDivPhysicalPrefixes"
           ]
+        },
+        {
+          "name": "Pseudo/ExactPseudo division core arithmetic and checkpoint loop (without ModD); source degree correction and actual Q/R publications",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_pseudo_div.go",
+          "tests": [
+            "TestPolynomialPseudoDivisionIndependentIdentity",
+            "TestPolynomialPseudoDivisionLowDegreeStillVisitsCheckpoint",
+            "TestPolynomialPseudoDivisionConstantDivisorAndExactCorrection",
+            "TestPolynomialPseudoRemainderSourceDebugIdentityAndOutputAlias",
+            "TestPolynomialPseudoDivisionPhysicalFailurePrefixes",
+            "TestPolynomialPseudoDivisionOutputIdentityAndSourceAssertions",
+            "TestPolynomialPseudoDivisionWarmSourceProfileAndCounts",
+            "TestPolynomialPseudoDivisionReverseDestructionRefusal",
+            "TestPolynomialPseudoDivisionIndependentSignedTable"
+          ]
+        },
+        {
+          "name": "PseudoDivide/ExactPseudoDivide/PseudoRemainder/ExactPseudoRemainder wrappers, debug verification, output identity and literal reverse local cleanup",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_pseudo_div.go",
+          "tests": [
+            "TestPolynomialPseudoDivisionIndependentIdentity",
+            "TestPolynomialPseudoDivisionLowDegreeStillVisitsCheckpoint",
+            "TestPolynomialPseudoDivisionConstantDivisorAndExactCorrection",
+            "TestPolynomialPseudoRemainderSourceDebugIdentityAndOutputAlias",
+            "TestPolynomialPseudoDivisionPhysicalFailurePrefixes",
+            "TestPolynomialPseudoDivisionOutputIdentityAndSourceAssertions",
+            "TestPolynomialPseudoDivisionWarmSourceProfileAndCounts",
+            "TestPolynomialPseudoDivisionReverseDestructionRefusal",
+            "TestPolynomialPseudoDivisionIndependentSignedTable"
+          ]
         }
       ],
       "ownership": [
@@ -30727,7 +30770,8 @@
         "Query prerequisite uses one embedded actual m_m2pos scratch member and source Power local reference. Generated div_x monomial ownership records actual factory created/started outcome before coefficient copy/INC; no registry/RC0 inference. Stopped local destruction and unjoined INC remain for explicit owning cleanup.",
         "literal raw numeral; no pre-end source Del on exception; active scalar record retains actual NUM/failed adapter until explicit CleanupExactDivision; end entered recorded before source Del",
         "source monomial_ref then completed default scoped numeral at actual declaration; reverse NUM then reference; actual partial incoming INC retained separately; C.mk evaluated fresh output retained if local cleanup refuses",
-        "actual positions Set, ms push, INC, default coefficient push, numeric Copy; borrowedAppend/index exclude guarded uncompleted INC from owning DEC"
+        "actual positions Set, ms push, INC, default coefficient push, numeric Copy; borrowedAppend/index exclude guarded uncompleted INC from owning DEC",
+        "Actual embedded pseudo continuation references, NUM and monomial fields with scalar lexical construction/destruction order. Same-engine Power accepts a completed source reference; completed destructors precede separate owning abort of actual unjoined INCs. Shared physical census names all actual scope fields and active nested Power directly, with immediate before-fault-disable evidence."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -30750,7 +30794,8 @@
         "Public source-finalization API for persistent Newton vector remains a next coherent member-lifecycle extension; current Flush source body and Close owning protocol are distinct.",
         "Go cold child directory and reference owner fields are charged actual representation. External manager lifetime is borrowed.",
         "Source coeff argument evaluation chooses coefficient read before RemoveVariable within allowed C++11 evaluation order. Source active linear Power preserved; #if0 alternative remains unported inventory. Full imp/GCD/PSC and global assertion/TRACE bindings remain open. See PORT_PROGRESS.md.",
-        "Selected exact division and graded maxima only: full imp construction, PSC/GCD, source TRACE/global diagnostics and undefined dangling/fresh-NULL source destruction remain open. False GNU release VERIFY reaches a typed unreachable-domain guard; no registered original assertion completion credit. See PORT_PROGRESS.md."
+        "Selected exact division and graded maxima only: full imp construction, PSC/GCD, source TRACE/global diagnostics and undefined dangling/fresh-NULL source destruction remain open. False GNU release VERIFY reaches a typed unreachable-domain guard; no registered original assertion completion credit. See PORT_PROGRESS.md.",
+        "This selected source core omits only separately inventoried ModD specialization; full imp hierarchy, PSC/Lazard/subresultants/resultants/general GCD and registered driver credit remain open. TRACE/CTRACE/printers/global assertion bindings remain separate obligations. Malformed SIZE_T32 release metadata fixture is explicitly source undefined and uses caller restoration only after immediate physical census; no native recovery claim."
       ]
     },
     {
@@ -30812,7 +30857,9 @@
         "mpnum/polynomial_equal.go",
         "mpnum/polynomial_query_source_test.go",
         "mpnum/polynomial_exact_div.go",
-        "mpnum/polynomial_source_maxima.go"
+        "mpnum/polynomial_source_maxima.go",
+        "mpnum/polynomial_pseudo_div.go",
+        "mpnum/polynomial_pseudo_div_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -30949,7 +30996,16 @@
         "TestPolynomialExactDivVerifySourceBoundary",
         "TestPolynomialExactDivWarmSourceProfileAndCounts",
         "TestPolynomialExactDivActualModularChild",
-        "TestPolynomialExactDivReverseDestructionRefusal"
+        "TestPolynomialExactDivReverseDestructionRefusal",
+        "TestPolynomialPseudoDivisionIndependentIdentity",
+        "TestPolynomialPseudoDivisionLowDegreeStillVisitsCheckpoint",
+        "TestPolynomialPseudoDivisionConstantDivisorAndExactCorrection",
+        "TestPolynomialPseudoRemainderSourceDebugIdentityAndOutputAlias",
+        "TestPolynomialPseudoDivisionPhysicalFailurePrefixes",
+        "TestPolynomialPseudoDivisionOutputIdentityAndSourceAssertions",
+        "TestPolynomialPseudoDivisionWarmSourceProfileAndCounts",
+        "TestPolynomialPseudoDivisionReverseDestructionRefusal",
+        "TestPolynomialPseudoDivisionIndependentSignedTable"
       ],
       "conditionals": [
         {
@@ -31860,6 +31916,38 @@
             "TestPolynomialExactDivCheckpointAfterActualInputCopy",
             "TestPolynomialExactDivPhysicalPrefixes"
           ]
+        },
+        {
+          "name": "Pseudo/ExactPseudo division core arithmetic and checkpoint loop (without ModD); source degree correction and actual Q/R publications",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_pseudo_div.go",
+          "tests": [
+            "TestPolynomialPseudoDivisionIndependentIdentity",
+            "TestPolynomialPseudoDivisionLowDegreeStillVisitsCheckpoint",
+            "TestPolynomialPseudoDivisionConstantDivisorAndExactCorrection",
+            "TestPolynomialPseudoRemainderSourceDebugIdentityAndOutputAlias",
+            "TestPolynomialPseudoDivisionPhysicalFailurePrefixes",
+            "TestPolynomialPseudoDivisionOutputIdentityAndSourceAssertions",
+            "TestPolynomialPseudoDivisionWarmSourceProfileAndCounts",
+            "TestPolynomialPseudoDivisionReverseDestructionRefusal",
+            "TestPolynomialPseudoDivisionIndependentSignedTable"
+          ]
+        },
+        {
+          "name": "PseudoDivide/ExactPseudoDivide/PseudoRemainder/ExactPseudoRemainder wrappers, debug verification, output identity and literal reverse local cleanup",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_pseudo_div.go",
+          "tests": [
+            "TestPolynomialPseudoDivisionIndependentIdentity",
+            "TestPolynomialPseudoDivisionLowDegreeStillVisitsCheckpoint",
+            "TestPolynomialPseudoDivisionConstantDivisorAndExactCorrection",
+            "TestPolynomialPseudoRemainderSourceDebugIdentityAndOutputAlias",
+            "TestPolynomialPseudoDivisionPhysicalFailurePrefixes",
+            "TestPolynomialPseudoDivisionOutputIdentityAndSourceAssertions",
+            "TestPolynomialPseudoDivisionWarmSourceProfileAndCounts",
+            "TestPolynomialPseudoDivisionReverseDestructionRefusal",
+            "TestPolynomialPseudoDivisionIndependentSignedTable"
+          ]
         }
       ],
       "ownership": [
@@ -31880,7 +31968,8 @@
         "Query prerequisite uses one embedded actual m_m2pos scratch member and source Power local reference. Generated div_x monomial ownership records actual factory created/started outcome before coefficient copy/INC; no registry/RC0 inference. Stopped local destruction and unjoined INC remain for explicit owning cleanup.",
         "literal raw numeral; no pre-end source Del on exception; active scalar record retains actual NUM/failed adapter until explicit CleanupExactDivision; end entered recorded before source Del",
         "source monomial_ref then completed default scoped numeral at actual declaration; reverse NUM then reference; actual partial incoming INC retained separately; C.mk evaluated fresh output retained if local cleanup refuses",
-        "actual positions Set, ms push, INC, default coefficient push, numeric Copy; borrowedAppend/index exclude guarded uncompleted INC from owning DEC"
+        "actual positions Set, ms push, INC, default coefficient push, numeric Copy; borrowedAppend/index exclude guarded uncompleted INC from owning DEC",
+        "Actual embedded pseudo continuation references, NUM and monomial fields with scalar lexical construction/destruction order. Same-engine Power accepts a completed source reference; completed destructors precede separate owning abort of actual unjoined INCs. Shared physical census names all actual scope fields and active nested Power directly, with immediate before-fault-disable evidence."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -31903,7 +31992,8 @@
         "Public source-finalization API for persistent Newton vector remains a next coherent member-lifecycle extension; current Flush source body and Close owning protocol are distinct.",
         "Go cold child directory and reference owner fields are charged actual representation. External manager lifetime is borrowed.",
         "Source coeff argument evaluation chooses coefficient read before RemoveVariable within allowed C++11 evaluation order. Source active linear Power preserved; #if0 alternative remains unported inventory. Full imp/GCD/PSC and global assertion/TRACE bindings remain open. See PORT_PROGRESS.md.",
-        "Selected exact division and graded maxima only: full imp construction, PSC/GCD, source TRACE/global diagnostics and undefined dangling/fresh-NULL source destruction remain open. False GNU release VERIFY reaches a typed unreachable-domain guard; no registered original assertion completion credit. See PORT_PROGRESS.md."
+        "Selected exact division and graded maxima only: full imp construction, PSC/GCD, source TRACE/global diagnostics and undefined dangling/fresh-NULL source destruction remain open. False GNU release VERIFY reaches a typed unreachable-domain guard; no registered original assertion completion credit. See PORT_PROGRESS.md.",
+        "This selected source core omits only separately inventoried ModD specialization; full imp hierarchy, PSC/Lazard/subresultants/resultants/general GCD and registered driver credit remain open. TRACE/CTRACE/printers/global assertion bindings remain separate obligations. Malformed SIZE_T32 release metadata fixture is explicitly source undefined and uses caller restoration only after immediate physical census; no native recovery claim."
       ]
     },
     {
