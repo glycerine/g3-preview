@@ -66,3 +66,12 @@ to fit the default timeout. Native full validation remains `go test ./...`.
 ## Fixed source provenance
 
 Keep originating repository-relative source paths in ported files. The C++ reference is fixed: do not compute, store, or verify its content hashes, checksums, or fingerprints. Omit Microsoft copyright lines from current and new ported headers; retain license notices and `LICENSE.txt`, and preserve other authors’ notices. This policy does not change solver algorithm hashing/fingerprints or Go working-tree SHA verification.
+
+## Pure Go port
+
+The port, tests, tools, and fixture generators must use Go: no C/C++ sources,
+cgo, or external C compiler dependency under golang. Keep recorded JSON test
+expectations and originating reference paths; the fixed original C++ source
+outside golang remains read-only reference material. Preserve source-compatible
+algorithms implemented in Go, including the shared random stream. Run current
+verification gates with CGO_ENABLED=0.
