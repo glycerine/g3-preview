@@ -32,6 +32,7 @@ type RationalConfig struct {
 type RationalManager struct {
 	lexical                                        rationalManagerLexicalScope
 	rawArithmetic                                  rationalRawArithmeticScope
+	rawGeneration                                  uint64
 	self                                           *RationalManager
 	originalCause, cleanupCause                    error
 	cleanupStage                                   uint8
@@ -317,6 +318,11 @@ func (m *RationalManager) normalize(a *Rational) (_rawErr error) {
 		if r.normActive {
 			return ErrRationalRawArithmeticPending
 		}
+		generation, e := m.beginRawGeneration()
+		if e != nil {
+			return e
+		}
+		r.normGeneration = generation
 		r.norm = Int{}
 		r.normActive = true
 		r.normEnd = false
@@ -484,6 +490,11 @@ func (m *RationalManager) addSub(a, b, out *Rational, subtract bool) (_rawErr er
 		if r.addActive {
 			return ErrRationalRawArithmeticPending
 		}
+		generation, e := m.beginRawGeneration()
+		if e != nil {
+			return e
+		}
+		r.addGeneration = generation
 		r.addOne = Int{}
 		r.addTwo = Int{}
 		r.addActive = true

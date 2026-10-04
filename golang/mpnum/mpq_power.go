@@ -16,6 +16,11 @@ func (m *RationalManager) Power(a *Rational, p uint32, out *Rational) (_rawErr e
 	if r.powerActive {
 		return ErrRationalRawArithmeticPending
 	}
+	generation, e := m.beginRawGeneration()
+	if e != nil {
+		return e
+	}
+	r.powerGeneration = generation
 	r.power = NewRational()
 	r.powerActive = true
 	r.powerEnd = false

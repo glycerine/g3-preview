@@ -28495,7 +28495,22 @@
         "mpnum/polynomial_psc_physical_test.go",
         "mpnum/polynomial_psc_profiles_test.go",
         "mpnum/polynomial_psc_source_test.go",
-        "mpnum/polynomial_psc_unwind_test.go"
+        "mpnum/polynomial_psc_unwind_test.go",
+        "mpnum/mpq.go",
+        "mpnum/mpq_power.go",
+        "mpnum/mpq_raw_arithmetic_scope.go",
+        "mpnum/polynomial_evaluation.go",
+        "mpnum/polynomial_evaluation_domains_test.go",
+        "mpnum/polynomial_evaluation_early_test.go",
+        "mpnum/polynomial_evaluation_frontier_test.go",
+        "mpnum/polynomial_evaluation_interval_fault_test.go",
+        "mpnum/polynomial_evaluation_lifetime_test.go",
+        "mpnum/polynomial_evaluation_modular_early_test.go",
+        "mpnum/polynomial_evaluation_oracle_test.go",
+        "mpnum/polynomial_evaluation_raw_test.go",
+        "mpnum/polynomial_evaluation_read_test.go",
+        "mpnum/polynomial_evaluation_test.go",
+        "mpnum/polynomial_evaluation_tls_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -28805,7 +28820,29 @@
         "TestPolynomialPSCOutputColdGuardBeforeOperandRead",
         "TestPolynomialPSCRegisteredFirstFixture",
         "TestPolynomialPSCBufferDestructorStopsOlderSourceLocals",
-        "TestPolynomialPSCExpiredFactoryReceiptPreservesForeignReplacement"
+        "TestPolynomialPSCExpiredFactoryReceiptPreservesForeignReplacement",
+        "TestPolynomialEvaluationLiveAliasSource",
+        "TestPolynomialEvaluationCancellationAndCachedFrames",
+        "TestPolynomialEvaluationEveryReservationOwnedRaw",
+        "TestPolynomialEvaluationManagerGuardBeforeFrames",
+        "TestPolynomialEvaluationRawReceiptForeignReplacement",
+        "TestPolynomialEvaluationWarmInlineSourceLocals",
+        "TestPolynomialEvaluationLexReceiptForeignReplacement",
+        "TestPolynomialEvaluationStoppedPhysicalLeafAndReuse",
+        "TestPolynomialEvaluationRawGroupIdentity",
+        "TestPolynomialEvaluationDormantTwentySourceRationals",
+        "TestPolynomialEvaluationIndependentRationalGrid",
+        "TestPolynomialEvaluationIndependentModularGrid",
+        "TestPolynomialEvaluationModularEveryReservation",
+        "TestPolynomialEvaluationModularDomain",
+        "TestPolynomialEvaluationIntervalDomain",
+        "TestPolynomialEvaluationEarlyRoutesLeaveRetainedInvocationUntouched",
+        "TestPolynomialEvaluationEarlyCopyCapturesOnlyNewPhysicalRoots",
+        "TestPolynomialEvaluationIntervalEveryReservation",
+        "TestPolynomialEvaluationReachedDegreeAfterVariableBreak",
+        "TestPolynomialEvaluationModularEarlyCopyCapturesPhysicalRoots",
+        "TestPolynomialEvaluationLiveCallerClosePreservesCachedFrames",
+        "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary"
       ],
       "conditionals": [
         {
@@ -31350,6 +31387,35 @@
             "TestPolynomialPSCBufferDestructorStopsOlderSourceLocals",
             "TestPolynomialPSCExpiredFactoryReceiptPreservesForeignReplacement"
           ]
+        },
+        {
+          "name": "Selected cpp1425-1433/6436-6550/7409-7414 recursive evaluation: concrete Rational, IntegerModular and BinaryInterval domains; source short-circuit reads, live alias and Horner publication",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_evaluation.go",
+          "tests": [
+            "TestPolynomialEvaluationLiveAliasSource",
+            "TestPolynomialEvaluationCancellationAndCachedFrames",
+            "TestPolynomialEvaluationEveryReservationOwnedRaw",
+            "TestPolynomialEvaluationManagerGuardBeforeFrames",
+            "TestPolynomialEvaluationRawReceiptForeignReplacement",
+            "TestPolynomialEvaluationWarmInlineSourceLocals",
+            "TestPolynomialEvaluationLexReceiptForeignReplacement",
+            "TestPolynomialEvaluationStoppedPhysicalLeafAndReuse",
+            "TestPolynomialEvaluationRawGroupIdentity",
+            "TestPolynomialEvaluationDormantTwentySourceRationals",
+            "TestPolynomialEvaluationIndependentRationalGrid",
+            "TestPolynomialEvaluationIndependentModularGrid",
+            "TestPolynomialEvaluationModularEveryReservation",
+            "TestPolynomialEvaluationModularDomain",
+            "TestPolynomialEvaluationIntervalDomain",
+            "TestPolynomialEvaluationEarlyRoutesLeaveRetainedInvocationUntouched",
+            "TestPolynomialEvaluationEarlyCopyCapturesOnlyNewPhysicalRoots",
+            "TestPolynomialEvaluationIntervalEveryReservation",
+            "TestPolynomialEvaluationReachedDegreeAfterVariableBreak",
+            "TestPolynomialEvaluationModularEarlyCopyCapturesPhysicalRoots",
+            "TestPolynomialEvaluationLiveCallerClosePreservesCachedFrames",
+            "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary"
+          ]
         }
       ],
       "ownership": [
@@ -31377,7 +31443,8 @@
         "Skeleton entries/powers/originals use actual Runtime storage; failed constructor transfers actual unconsumed INC fields into charged cold owning-abort records before source backing free. Scoped pointer publications alone own concrete children; stopped source cause retained, separate owning cleanup. Variable helpers own two/one actual embedded uint vectors in one charged stable cold header, views/scopes borrow actual backing and references. Strong shared physical census names pseudo/Power/ExactDiv plus supplied headers/blocks without registry-derived ownership.",
         "Translation uses the existing actual imp coefficient-buffer member. Named roots include actual child/raw/pending/old storage, retained NUM and exact generated monomial/factory generation; ordinary scope unwind precedes owning abort. Full owning Close rejects retained translation locals before child or caller teardown. Lex sort owns real Runtime bucket bindings and cold child directory plus permutation member; failed lower recursion preserves prior published term permutations. No registry-derived owning authority or native class allocation equivalence.",
         "Actual derivative n/a embedded full-manager scope and reverse source destruction; charged created-only monomial cohort never owns borrowed RC0. Exact executing factory generation/parent, numeric ObjectRef and allzero-before allocator pending triple receipts identify only reached failed callees. Source causes stay sticky, consumed drops/frees never replay, and owning cleanup leaves later caller replacements untouched. See PORT_PROGRESS.md.",
-        "Actual lexical polynomial references and H inline16/ref_buffer heap handles; successful source INC precedes fallible push/placement. Reverse lexical destruction and source first-cause stops precede explicit operation-owned abort. Actual invocation/factory/singleton and pending-cell receipts exclude later caller continuations. See PORT_PROGRESS.md."
+        "Actual lexical polynomial references and H inline16/ref_buffer heap handles; successful source INC precedes fallible push/placement. Reverse lexical destruction and source first-cause stops precede explicit operation-owned abort. Actual invocation/factory/singleton and pending-cell receipts exclude later caller continuations. See PORT_PROGRESS.md.",
+        "Every recursive invocation constructs its real auxiliary; charged concrete cached frame owners preserve exact lexical destruction, first stopped source cause and explicit owning abort. Matching actual LexSort/RAW generation and newly reached Integer ObjectRef/allocator roots are cleaned without sweeping later foreign calls. Rejected live-caller Close preserves cached frames."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -31406,7 +31473,8 @@
         "Standalone SOM buffers/vectors and selected fresh sorting scope added. Authoritative reflected Go class header and charged real retained fields; scalar child ID cold provenance adaptation, no unread native-size ticket or full global malloc/header geometry claim. Heap sort final-order contract only, native comparator schedule/global ostream/full imp remain OPEN. Original source implicit dtor has no Reset/DEC/NUM Del; separate own-abort drains actual named records. See PORT_PROGRESS.md.",
         "Concrete imp wrapper owns the actual core arithmetic object, independent UP and remaining source members. Current core constructor/default/guard/cleanup helpers are preserved; only actual translateBuffers field added. Literal body/MM DEC and completed-member unwind remain separate from owning abort. Enabled TRACE/global allocator/wrapper/control/native class header binding and full arithmetic facade remain OPEN. Reflected Go headers are charged; explicit named retirement copies acquire numeral ownership only after actual source vector raw is consumed. No registry-derived owning roots or registered PSC driver credit. See PORT_PROGRESS.md.",
         "Selected translation/lex methods remain partial source-family evidence, without registered polynomial driver completion. CTRACE poly_bug stream, global diagnostics/control and native class ABI remain open. Coefficient/div_x expressions use permitted coefficient-first evaluation. Runtime bucket bindings and charged cold children are Go storage adaptations; unsigned wrapped degree reaches a typed physical boundary. Broader GCD/PSC/resultants/printing remain open. See PORT_PROGRESS.md.",
-        "Selected optimized PSC only. IC/ICCP/default general GCD/Resultant, classic alternatives, complete original driver constructors/lifetimes and enabled TRACE/global tags remain OPEN. H uses actual scalar handle16 storage rather than native pointer8 ABI. Original eight coefficient fixtures execute first/second of three static ENSURE sites; the Resultant site remains outstanding."
+        "Selected optimized PSC only. IC/ICCP/default general GCD/Resultant, classic alternatives, complete original driver constructors/lifetimes and enabled TRACE/global tags remain OPEN. H uses actual scalar handle16 storage rather than native pointer8 ABI. Original eight coefficient fixtures execute first/second of three static ENSURE sites; the Resultant site remains outstanding.",
+        "Source lexical stack represented by charged cached concrete Go owners and actual pointer directory; no Runtime reservation ticket. Algebraic evaluation, cross-Integer transfer, global TRACE and complete registered polynomial driver remain open."
       ]
     },
     {
@@ -31527,7 +31595,8 @@
         "mpnum/polynomial_psc_physical_test.go",
         "mpnum/polynomial_psc_profiles_test.go",
         "mpnum/polynomial_psc_source_test.go",
-        "mpnum/polynomial_psc_unwind_test.go"
+        "mpnum/polynomial_psc_unwind_test.go",
+        "mpnum/polynomial_evaluation.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -31819,7 +31888,29 @@
         "TestPolynomialPSCOutputColdGuardBeforeOperandRead",
         "TestPolynomialPSCRegisteredFirstFixture",
         "TestPolynomialPSCBufferDestructorStopsOlderSourceLocals",
-        "TestPolynomialPSCExpiredFactoryReceiptPreservesForeignReplacement"
+        "TestPolynomialPSCExpiredFactoryReceiptPreservesForeignReplacement",
+        "TestPolynomialEvaluationLiveAliasSource",
+        "TestPolynomialEvaluationCancellationAndCachedFrames",
+        "TestPolynomialEvaluationEveryReservationOwnedRaw",
+        "TestPolynomialEvaluationManagerGuardBeforeFrames",
+        "TestPolynomialEvaluationRawReceiptForeignReplacement",
+        "TestPolynomialEvaluationWarmInlineSourceLocals",
+        "TestPolynomialEvaluationLexReceiptForeignReplacement",
+        "TestPolynomialEvaluationStoppedPhysicalLeafAndReuse",
+        "TestPolynomialEvaluationRawGroupIdentity",
+        "TestPolynomialEvaluationDormantTwentySourceRationals",
+        "TestPolynomialEvaluationIndependentRationalGrid",
+        "TestPolynomialEvaluationIndependentModularGrid",
+        "TestPolynomialEvaluationModularEveryReservation",
+        "TestPolynomialEvaluationModularDomain",
+        "TestPolynomialEvaluationIntervalDomain",
+        "TestPolynomialEvaluationEarlyRoutesLeaveRetainedInvocationUntouched",
+        "TestPolynomialEvaluationEarlyCopyCapturesOnlyNewPhysicalRoots",
+        "TestPolynomialEvaluationIntervalEveryReservation",
+        "TestPolynomialEvaluationReachedDegreeAfterVariableBreak",
+        "TestPolynomialEvaluationModularEarlyCopyCapturesPhysicalRoots",
+        "TestPolynomialEvaluationLiveCallerClosePreservesCachedFrames",
+        "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary"
       ],
       "conditionals": [
         {
@@ -33076,6 +33167,35 @@
             "TestPolynomialPSCBufferDestructorStopsOlderSourceLocals",
             "TestPolynomialPSCExpiredFactoryReceiptPreservesForeignReplacement"
           ]
+        },
+        {
+          "name": "Selected h931-932 concrete borrowed Rational/BinaryInterval var2value callbacks and univariate modular adapter",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_evaluation.go",
+          "tests": [
+            "TestPolynomialEvaluationLiveAliasSource",
+            "TestPolynomialEvaluationCancellationAndCachedFrames",
+            "TestPolynomialEvaluationEveryReservationOwnedRaw",
+            "TestPolynomialEvaluationManagerGuardBeforeFrames",
+            "TestPolynomialEvaluationRawReceiptForeignReplacement",
+            "TestPolynomialEvaluationWarmInlineSourceLocals",
+            "TestPolynomialEvaluationLexReceiptForeignReplacement",
+            "TestPolynomialEvaluationStoppedPhysicalLeafAndReuse",
+            "TestPolynomialEvaluationRawGroupIdentity",
+            "TestPolynomialEvaluationDormantTwentySourceRationals",
+            "TestPolynomialEvaluationIndependentRationalGrid",
+            "TestPolynomialEvaluationIndependentModularGrid",
+            "TestPolynomialEvaluationModularEveryReservation",
+            "TestPolynomialEvaluationModularDomain",
+            "TestPolynomialEvaluationIntervalDomain",
+            "TestPolynomialEvaluationEarlyRoutesLeaveRetainedInvocationUntouched",
+            "TestPolynomialEvaluationEarlyCopyCapturesOnlyNewPhysicalRoots",
+            "TestPolynomialEvaluationIntervalEveryReservation",
+            "TestPolynomialEvaluationReachedDegreeAfterVariableBreak",
+            "TestPolynomialEvaluationModularEarlyCopyCapturesPhysicalRoots",
+            "TestPolynomialEvaluationLiveCallerClosePreservesCachedFrames",
+            "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary"
+          ]
         }
       ],
       "ownership": [
@@ -33131,7 +33251,8 @@
         "Selected concrete skeleton canonical order uses heap sort; platform std::sort comparator dispatch order is not claimed. Scalar child IDs encode actual cold object provenance under a fixed Runtime. Cold ownership metadata fully charged and distinct from source malloc events. Whole imp and registered-driver/global diagnostic integration remain open.",
         "Concrete imp wrapper owns the actual core arithmetic object, independent UP and remaining source members. Current core constructor/default/guard/cleanup helpers are preserved; only actual translateBuffers field added. Literal body/MM DEC and completed-member unwind remain separate from owning abort. Enabled TRACE/global allocator/wrapper/control/native class header binding and full arithmetic facade remain OPEN. Reflected Go headers are charged; explicit named retirement copies acquire numeral ownership only after actual source vector raw is consumed. No registry-derived owning roots or registered PSC driver credit. See PORT_PROGRESS.md.",
         "Selected translation/lex methods remain partial source-family evidence, without registered polynomial driver completion. CTRACE poly_bug stream, global diagnostics/control and native class ABI remain open. Coefficient/div_x expressions use permitted coefficient-first evaluation. Runtime bucket bindings and charged cold children are Go storage adaptations; unsigned wrapped degree reaches a typed physical boundary. Broader GCD/PSC/resultants/printing remain open. See PORT_PROGRESS.md.",
-        "Selected optimized PSC only. IC/ICCP/default general GCD/Resultant, classic alternatives, complete original driver constructors/lifetimes and enabled TRACE/global tags remain OPEN. H uses actual scalar handle16 storage rather than native pointer8 ABI. Original eight coefficient fixtures execute first/second of three static ENSURE sites; the Resultant site remains outstanding."
+        "Selected optimized PSC only. IC/ICCP/default general GCD/Resultant, classic alternatives, complete original driver constructors/lifetimes and enabled TRACE/global tags remain OPEN. H uses actual scalar handle16 storage rather than native pointer8 ABI. Original eight coefficient fixtures execute first/second of three static ENSURE sites; the Resultant site remains outstanding.",
+        "Cold concrete callback interfaces preserve live borrowed values; supported managers require the same actual Integer cohort. Algebraic specialization remains open."
       ]
     },
     {
@@ -93264,7 +93385,19 @@
         "mpnum/polynomial_newton_test.go",
         "mpnum/polynomial_newton_physical_test.go",
         "mpnum/polynomial_psc_original_cases_test.go",
-        "mpnum/polynomial_psc_original_test.go"
+        "mpnum/polynomial_psc_original_test.go",
+        "mpnum/polynomial_evaluation_domains_test.go",
+        "mpnum/polynomial_evaluation_early_test.go",
+        "mpnum/polynomial_evaluation_frontier_test.go",
+        "mpnum/polynomial_evaluation_interval_fault_test.go",
+        "mpnum/polynomial_evaluation_lifetime_test.go",
+        "mpnum/polynomial_evaluation_modular_early_test.go",
+        "mpnum/polynomial_evaluation_oracle_test.go",
+        "mpnum/polynomial_evaluation_raw_test.go",
+        "mpnum/polynomial_evaluation_read_test.go",
+        "mpnum/polynomial_evaluation_test.go",
+        "mpnum/polynomial_evaluation_tls_test.go",
+        "mpnum/polynomial_imp_physical_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -93320,7 +93453,29 @@
         "TestPolynomialNewtonLazySourceFlushBeforeOwningAbort",
         "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock",
         "TestPolynomialPSCAllEightOriginalCoefficientFixtures",
-        "TestPolynomialPSCRegisteredFirstFixture"
+        "TestPolynomialPSCRegisteredFirstFixture",
+        "TestPolynomialEvaluationLiveAliasSource",
+        "TestPolynomialEvaluationCancellationAndCachedFrames",
+        "TestPolynomialEvaluationEveryReservationOwnedRaw",
+        "TestPolynomialEvaluationManagerGuardBeforeFrames",
+        "TestPolynomialEvaluationRawReceiptForeignReplacement",
+        "TestPolynomialEvaluationWarmInlineSourceLocals",
+        "TestPolynomialEvaluationLexReceiptForeignReplacement",
+        "TestPolynomialEvaluationStoppedPhysicalLeafAndReuse",
+        "TestPolynomialEvaluationRawGroupIdentity",
+        "TestPolynomialEvaluationDormantTwentySourceRationals",
+        "TestPolynomialEvaluationIndependentRationalGrid",
+        "TestPolynomialEvaluationIndependentModularGrid",
+        "TestPolynomialEvaluationModularEveryReservation",
+        "TestPolynomialEvaluationModularDomain",
+        "TestPolynomialEvaluationIntervalDomain",
+        "TestPolynomialEvaluationEarlyRoutesLeaveRetainedInvocationUntouched",
+        "TestPolynomialEvaluationEarlyCopyCapturesOnlyNewPhysicalRoots",
+        "TestPolynomialEvaluationIntervalEveryReservation",
+        "TestPolynomialEvaluationReachedDegreeAfterVariableBreak",
+        "TestPolynomialEvaluationModularEarlyCopyCapturesPhysicalRoots",
+        "TestPolynomialEvaluationLiveCallerClosePreservesCachedFrames",
+        "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary"
       ],
       "conditionals": [
         {
@@ -93713,6 +93868,35 @@
             "TestPolynomialPSCAllEightOriginalCoefficientFixtures",
             "TestPolynomialPSCRegisteredFirstFixture"
           ]
+        },
+        {
+          "name": "Dormant cpp1340-1387 twenty rational evaluation expectations and independent domain/read/lifetime/failure tests",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_evaluation_oracle_test.go",
+          "tests": [
+            "TestPolynomialEvaluationLiveAliasSource",
+            "TestPolynomialEvaluationCancellationAndCachedFrames",
+            "TestPolynomialEvaluationEveryReservationOwnedRaw",
+            "TestPolynomialEvaluationManagerGuardBeforeFrames",
+            "TestPolynomialEvaluationRawReceiptForeignReplacement",
+            "TestPolynomialEvaluationWarmInlineSourceLocals",
+            "TestPolynomialEvaluationLexReceiptForeignReplacement",
+            "TestPolynomialEvaluationStoppedPhysicalLeafAndReuse",
+            "TestPolynomialEvaluationRawGroupIdentity",
+            "TestPolynomialEvaluationDormantTwentySourceRationals",
+            "TestPolynomialEvaluationIndependentRationalGrid",
+            "TestPolynomialEvaluationIndependentModularGrid",
+            "TestPolynomialEvaluationModularEveryReservation",
+            "TestPolynomialEvaluationModularDomain",
+            "TestPolynomialEvaluationIntervalDomain",
+            "TestPolynomialEvaluationEarlyRoutesLeaveRetainedInvocationUntouched",
+            "TestPolynomialEvaluationEarlyCopyCapturesOnlyNewPhysicalRoots",
+            "TestPolynomialEvaluationIntervalEveryReservation",
+            "TestPolynomialEvaluationReachedDegreeAfterVariableBreak",
+            "TestPolynomialEvaluationModularEarlyCopyCapturesPhysicalRoots",
+            "TestPolynomialEvaluationLiveCallerClosePreservesCachedFrames",
+            "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary"
+          ]
         }
       ],
       "ownership": [],
@@ -93720,7 +93904,8 @@
         "No active source ENSURE credit: tst_polynomial1815ff invokes tst_psc and returns before tst_lex. Added comparator models are independent bounded regressions, not evidence of active PSC/resultant completion.",
         "tst_polynomial at1814 has early return1825 after PSC; monomial/lex routines below are dormant in selected !__clang__ profile. No active registered driver assertion credit.",
         "Newton source campaign is dormant after early return: one ENSURE adapted, no registered active ENSURE completion credit. Full active optimized PSC8 campaign remains required and source-first private work has begun.",
-        "Selected active PSC coefficient inputs and first/second static ENSURE sites now executed. Third static ENSURE calls Resultant and remains unported; complete original expression-constructor/lifetime/TRACE driver credit is not claimed."
+        "Selected active PSC coefficient inputs and first/second static ENSURE sites now executed. Third static ENSURE calls Resultant and remains unported; complete original expression-constructor/lifetime/TRACE driver credit is not claimed.",
+        "Dense coefficient construction adapts unavailable expression builder; registered driver returns at cpp1825 before these eval cases. Active original-driver assertion credit is zero."
       ]
     },
     {
@@ -115041,7 +115226,10 @@
         "TestInfCompareSourceServiceSwap",
         "TestInfCompareSourceMixedUnreadMasks",
         "TestServiceSourceFinalizeFreshCacheDenominatorNull",
-        "TestIntegerSourceFreshNullAndDestructiveDangling"
+        "TestIntegerSourceFreshNullAndDestructiveDangling",
+        "TestPolynomialEvaluationRawReceiptForeignReplacement",
+        "TestPolynomialEvaluationRawGroupIdentity",
+        "TestPolynomialEvaluationEveryReservationOwnedRaw"
       ],
       "assertions": [
         {
@@ -115541,6 +115729,16 @@
             "TestServiceSourceFinalizeFreshCacheDenominatorNull",
             "TestIntegerSourceFreshNullAndDestructiveDangling"
           ]
+        },
+        {
+          "name": "Selected actual normalize/add/power RAW invocation receipts and exact group owning cleanup extraction",
+          "status": "partial",
+          "go_target": "mpnum/mpq_raw_arithmetic_scope.go",
+          "tests": [
+            "TestPolynomialEvaluationRawReceiptForeignReplacement",
+            "TestPolynomialEvaluationRawGroupIdentity",
+            "TestPolynomialEvaluationEveryReservationOwnedRaw"
+          ]
         }
       ],
       "ownership": [
@@ -115556,7 +115754,8 @@
         "All four rounding outputs use existing roundCore directly against the caller; source sign is captured before division and rational denominator resets only after successful integer rounding. Immediate fault roots, integral BIG Copy refusal, quotient-before-correction refusal and raw component aliases are tested. See PORT_PROGRESS.md#audit-mpq-rounding-publication-packet-md; physical allocator-backed cleanup remains separate unfinished work.",
         "Checked owning cleanup retains a per-component source outer-field cursor and forwards real child failures. This is not full transitive source finalization.",
         "Selected source comparison/unary/reset/swap paths check cold ownership then each reached component action, preserving unread invalid fields and partial publication. Actual SYNCH RAW comparison locals are charged distinct manager fields, normal deletion cursor follows source, body failure retains real limbs for explicit owning cleanup. Service lexical bound9 unchanged; copied unary results use existing literal constructor/temporary machinery. Immediate caller-named physical censuses, cold reservation sweeps and warm allocation checks cover selected routes. Unrelated arithmetic and Go-extension Move preflights remain open.",
-        "Two actual permanently dead charged Go descriptors precede Words/Natural construction. Actual six source numeric cells unchanged. Source fresh NULL comes only from exact setter branch, never registry/scope inference; reserve failure retains charged constructor owner. No source allocator event invented for Go metadata."
+        "Two actual permanently dead charged Go descriptors precede Words/Natural construction. Actual six source numeric cells unchanged. Source fresh NULL comes only from exact setter branch, never registry/scope inference; reserve failure retains charged constructor owner. No source allocator event invented for Go metadata.",
+        "Concrete generation identity starts at real guarded RAW group entry and survives scope reset; generic cleanup retains its existing group order. Evaluation cleans only matching actual invocations."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -115571,7 +115770,8 @@
         "Source get_double evaluates numerator then denominator and asserts d>0 only in debug; current Float64 rejects finite negative converted denominators in release too. Read-only source audit PORT_PROGRESS.md#audit-mpq-rounding-publication-packet-md records this remaining profile debt; no getter implementation change is claimed.",
         "Selected Mul/Div entry boundaries validate ordinary Integer ownership without an ordinary rational-read DEN domain. Scalar projections, remaining raw-domain methods, TRACE and whole rational lifecycle stay open.",
         "No newly registered source assertion credit: sixteen added source-profile regressions complement existing active assertions. Selected ordinary whole-value preflights are replaced only where they precede actual source reads/mutations. Malformed ILP32 second temporary end-cursor test diagnoses physical requested-size guard after actual source first destruction, with no guard relabeling or allocator repair. Whole header and global service binding remain partial.",
-        "Public failed-value reads still reject both dead Go descriptors; defined source-only NULL deletion is modeled independently. Postexception source small-scalar continuation, staged CopyFrom/ffSetInteger topology, process/TLS binding and complete source lifecycle remain separate obligations. Existing cleanupPending retry acknowledges Go owning continuation, not another literal source destructor. See PORT_PROGRESS.md."
+        "Public failed-value reads still reject both dead Go descriptors; defined source-only NULL deletion is modeled independently. Postexception source small-scalar continuation, staged CopyFrom/ffSetInteger topology, process/TLS binding and complete source lifecycle remain separate obligations. Existing cleanupPending retry acknowledges Go owning continuation, not another literal source destructor. See PORT_PROGRESS.md.",
+        "Cold adapter generation metadata adds no source allocator event; no arithmetic algorithm changes."
       ]
     },
     {
@@ -125551,7 +125751,8 @@
         "mpnum/scoped_binary.go",
         "mpnum/scoped_fast_float.go",
         "mpnum/mp_smt2_scope.go",
-        "mpnum/mp_smt2_scope_test.go"
+        "mpnum/mp_smt2_scope_test.go",
+        "mpnum/polynomial_evaluation.go"
       ],
       "tests": [
         "TestScopedNumeralSourceTstScoped",
@@ -125602,7 +125803,10 @@
         "TestFastFloatNeighborAndThinRoutes",
         "TestFastFloatVectorOldNewPeakBudget",
         "TestSMT2FreshDefaultCopyFailureNullDestructor",
-        "TestSMT2CompletedTemporaryGuardedLateFree"
+        "TestSMT2CompletedTemporaryGuardedLateFree",
+        "TestPolynomialEvaluationStoppedPhysicalLeafAndReuse",
+        "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary",
+        "TestPolynomialEvaluationWarmInlineSourceLocals"
       ],
       "conditionals": [
         {
@@ -125768,17 +125972,29 @@
             "TestSMT2FreshDefaultCopyFailureNullDestructor",
             "TestSMT2CompletedTemporaryGuardedLateFree"
           ]
+        },
+        {
+          "name": "Selected evaluator auxiliary default construction and source reverse lexical destruction across three concrete domains",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_evaluation.go",
+          "tests": [
+            "TestPolynomialEvaluationStoppedPhysicalLeafAndReuse",
+            "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary",
+            "TestPolynomialEvaluationWarmInlineSourceLocals"
+          ]
         }
       ],
       "ownership": [
         "Concrete scoped Int/Rational objects borrow managers; all cold headers and actual old+new pointer-free backing are charged. Deep copy owns independent limbs, source ascending truncation releases them, vector failure prefixes retained. See PORT_PROGRESS.md#audit-scoped-numeral-port-status-md.",
         "MPBQ specialization owns deep numerator values and real cold headers/backing; self identity/manager checks, borrowed owner lifetime, grow transfer and old/new peak audited. See PORT_PROGRESS.md#audit-mpbq-port-status-md.",
-        "MPFF specialization borrows its manager, owns deep significand blocks and charges actual headers/full old-new element backing. Failure retains default failed-push element; ascending cleanup preserves source actions. See PORT_PROGRESS.md#audit-mpff-port-status-md."
+        "MPFF specialization borrows its manager, owns deep significand blocks and charges actual headers/full old-new element backing. Failure retains default failed-push element; ascending cleanup preserves source actions. See PORT_PROGRESS.md#audit-mpff-port-status-md.",
+        "Source destructor stops retain the first cause and older auxiliary roots; separate owning cleanup completes exact retained owners before cache reuse."
       ],
       "deviations": [
         "Explicit Close substitutes RAII; self identity rejects shallow Go owner copies. Vectors expose deep Read/Set rather than escaping indexed element addresses. Source noncopyable vector remains noncopyable; other numeral manager specializations stay open.",
         "Concrete MPBQ specialization; unsupported source div/rem/abs template instantiations are not invented. Other manager specializations and full custom ostream integration remain open.",
-        "Concrete MPFF types; explicit Close and provenance/self-copy checks. Borrowed indexed Go pointers have documented lifetime limits. Other manager specializations and persistent custom ostream integration remain open."
+        "Concrete MPFF types; explicit Close and provenance/self-copy checks. Borrowed indexed Go pointers have documented lifetime limits. Other manager specializations and persistent custom ostream integration remain open.",
+        "TLS signed-host overflow fixtures test an explicitly guarded source-undefined domain, not ordinary exhaustion or an end-to-end recursive arithmetic claim."
       ]
     },
     {

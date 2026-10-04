@@ -427,6 +427,10 @@ func (m *MultivariatePolynomialManager) LexSort(p Polynomial) error {
 	if m.lexPending {
 		return ErrPolynomialPending
 	}
+	if m.lexGeneration == ^uint64(0) {
+		return ErrPolynomialPending
+	}
+	m.lexGeneration++
 	if e = m.lexRange(p, 0, n, x); e != nil {
 		m.lexPending = true
 		m.lexCause = e
@@ -463,6 +467,9 @@ func (m *MultivariatePolynomialManager) CleanupLexSort() error {
 	if e := m.ready(); e != nil {
 		return e
 	}
+	return m.cleanupLexSort()
+}
+func (m *MultivariatePolynomialManager) cleanupLexSort() error {
 	if !m.lexPending {
 		return nil
 	}

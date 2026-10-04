@@ -16,6 +16,10 @@ func polynomialImpPhysicalAudit(t *testing.T, full *MultivariatePolynomialManage
 
 func polynomialImpPhysicalAuditValues(t *testing.T, full *MultivariatePolynomialManager, polys []Polynomial, supplied ...*memory.SmallAllocator) {
 	t.Helper()
+	polynomialImpPhysicalAuditNamed(t, full, polys, nil, 0, supplied...)
+}
+func polynomialImpPhysicalAuditNamed(t *testing.T, full *MultivariatePolynomialManager, polys []Polynomial, input []*Int, externalHeaders uint64, supplied ...*memory.SmallAllocator) {
+	t.Helper()
 	m := full.core
 	owners := []*PolynomialNewtonInterpolator{}
 	references := []*PolynomialRef{}
@@ -30,6 +34,21 @@ func polynomialImpPhysicalAuditValues(t *testing.T, full *MultivariatePolynomial
 	}
 	adapterBytes := full.header + uint64(cap(full.lexBuckets.children))*uint64(reflect.TypeOf(polynomialVector{}).Size())
 	public := []*Int{&full.derivative.n, &full.derivative.a}
+	public = append(public, input...)
+	adapterBytes += externalHeaders
+	es := &full.evaluation
+	adapterBytes += uint64(cap(es.rationalFrames))*uint64(reflect.TypeOf((*polynomialEvalRationalFrame)(nil)).Size()) + uint64(len(es.rationalFrames))*uint64(reflect.TypeOf(polynomialEvalRationalFrame{}).Size())
+	adapterBytes += uint64(cap(es.integerFrames))*uint64(reflect.TypeOf((*polynomialEvalIntegerFrame)(nil)).Size()) + uint64(len(es.integerFrames))*uint64(reflect.TypeOf(polynomialEvalIntegerFrame{}).Size())
+	adapterBytes += uint64(cap(es.intervalFrames))*uint64(reflect.TypeOf((*polynomialEvalIntervalFrame)(nil)).Size()) + uint64(len(es.intervalFrames))*uint64(reflect.TypeOf(polynomialEvalIntervalFrame{}).Size())
+	for _, f := range es.rationalFrames {
+		public = append(public, &f.aux.num, &f.aux.den)
+	}
+	for _, f := range es.integerFrames {
+		public = append(public, &f.aux)
+	}
+	for _, f := range es.intervalFrames {
+		public = append(public, &f.aux.lower.num, &f.aux.upper.num)
+	}
 	adapterBytes += uint64(cap(full.derivative.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size())
 	if full.upm != nil {
 		u := full.upm
@@ -100,6 +119,13 @@ func polynomialImpPhysicalAuditValues(t *testing.T, full *MultivariatePolynomial
 	}
 	q := m.config.Rationals
 	if q != nil {
+		r := &q.rawArithmetic
+		public = append(public, &r.div, &r.power.num, &r.power.den, &r.compareOne.num, &r.compareOne.den, &r.compareTwo.num, &r.compareTwo.den, &r.addOne, &r.addTwo, &r.norm)
+		for _, a := range public {
+			if a != nil {
+				add(*a)
+			}
+		}
 		for _, a := range []Int{q.nTmp, q.addTmp1, q.addTmp2, q.addMulTmp.num, q.addMulTmp.den, q.ltTmp1.num, q.ltTmp1.den, q.ltTmp2.num, q.ltTmp2.den} {
 			add(a)
 		}

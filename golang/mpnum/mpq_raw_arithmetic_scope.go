@@ -12,21 +12,22 @@ var ErrRationalRawArithmeticPending = errors.New("mpnum: raw arithmetic local cl
 // denominators are normally inline1; stopped independent source calls may retain
 // separate cohorts. No source exception implicitly destroys these raw objects.
 type rationalRawArithmeticScope struct {
-	div                                     Int
-	divActive, divEnd, divGuard             bool
-	divCursor                               uint8
-	divCause                                error
-	power                                   Rational
-	compareOne, compareTwo                  Rational
-	compareActive, compareEnd, compareGuard bool
-	compareCursor                           uint8
-	compareCause                            error
-	addOne, addTwo, norm                    Int
-	powerActive, addActive, normActive      bool
-	powerEnd, addEnd, normEnd               bool
-	powerGuard, addGuard, normGuard         bool
-	powerCursor, addCursor                  uint8
-	powerCause, addCause, normCause         error
+	div                                            Int
+	divActive, divEnd, divGuard                    bool
+	divCursor                                      uint8
+	divCause                                       error
+	power                                          Rational
+	compareOne, compareTwo                         Rational
+	compareActive, compareEnd, compareGuard        bool
+	compareCursor                                  uint8
+	compareCause                                   error
+	addOne, addTwo, norm                           Int
+	powerActive, addActive, normActive             bool
+	powerEnd, addEnd, normEnd                      bool
+	powerGuard, addGuard, normGuard                bool
+	powerCursor, addCursor                         uint8
+	powerCause, addCause, normCause                error
+	powerGeneration, addGeneration, normGeneration uint64
 }
 
 type RationalRawArithmeticState struct {
@@ -211,16 +212,36 @@ func (m *RationalManager) rawNormalizeEnd() error {
 
 // Explicit owning cleanup acknowledges reached numeric release progress. This
 // is not source exception unwinding: RAW mpq/mpz have no destructors.
-func (m *RationalManager) cleanupRawArithmetic() error {
+// Concrete identities belong to actual started RAW groups, not numeral values.
+// The counter lives outside the resettable raw scope so a later foreign call
+// cannot reuse a completed continuation's identity. No source allocator event.
+type rationalRawGroup uint8
+
+const (
+	rationalRawNormalize rationalRawGroup = iota
+	rationalRawDivision
+	rationalRawComparison
+	rationalRawAddition
+	rationalRawPower
+)
+
+func (m *RationalManager) beginRawGeneration() (uint64, error) {
+	if m.rawGeneration == ^uint64(0) {
+		return 0, ErrRationalRawArithmeticPending
+	}
+	m.rawGeneration++
+	return m.rawGeneration, nil
+}
+func (m *RationalManager) cleanupRawGroup(group rationalRawGroup) error {
 	r := &m.rawArithmetic
-	if r.normActive {
+	if group == rationalRawNormalize && r.normActive {
 		if e := m.z.Del(&r.norm); e != nil {
 			r.normCause = e
 			return e
 		}
 		r.normActive = false
 	}
-	if r.divActive {
+	if group == rationalRawDivision && r.divActive {
 		if e := m.z.Del(&r.div); e != nil {
 			r.divCause = e
 			return e
@@ -229,7 +250,7 @@ func (m *RationalManager) cleanupRawArithmetic() error {
 		r.divActive = false
 	}
 
-	if r.compareActive {
+	if group == rationalRawComparison && r.compareActive {
 		for r.compareCursor < 4 {
 			if e := m.z.Del(r.compareField()); e != nil {
 				r.compareCause = e
@@ -239,7 +260,7 @@ func (m *RationalManager) cleanupRawArithmetic() error {
 		}
 		r.compareActive = false
 	}
-	if r.addActive {
+	if group == rationalRawAddition && r.addActive {
 		for r.addCursor < 2 {
 			p := &r.addOne
 			if r.addCursor == 1 {
@@ -253,7 +274,7 @@ func (m *RationalManager) cleanupRawArithmetic() error {
 		}
 		r.addActive = false
 	}
-	if r.powerActive {
+	if group == rationalRawPower && r.powerActive {
 		for r.powerCursor < 2 {
 			p := &r.power.num
 			if r.powerCursor == 1 {
@@ -267,7 +288,16 @@ func (m *RationalManager) cleanupRawArithmetic() error {
 		}
 		r.powerActive = false
 	}
-	*r = rationalRawArithmeticScope{}
+	return nil
+}
+func (m *RationalManager) cleanupRawArithmetic() error {
+	// Preserve the preexisting generic owning adapter's exact group order.
+	for _, group := range [...]rationalRawGroup{rationalRawNormalize, rationalRawDivision, rationalRawComparison, rationalRawAddition, rationalRawPower} {
+		if e := m.cleanupRawGroup(group); e != nil {
+			return e
+		}
+	}
+	m.rawArithmetic = rationalRawArithmeticScope{}
 	return nil
 }
 func (m *RationalManager) CleanupRawArithmetic() error {

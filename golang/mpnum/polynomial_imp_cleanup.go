@@ -174,6 +174,9 @@ func (m *MultivariatePolynomialManager) callerGuard() error {
 	return nil
 }
 func (m *MultivariatePolynomialManager) CloseChecked() error {
+	if m != nil && m.self == m && m.evaluation.active {
+		return ErrPolynomialPending
+	}
 	if m != nil && m.self == m && (m.derivative.active || m.derivativeHasOrphans()) {
 		return ErrPolynomialPending
 	}
@@ -195,6 +198,9 @@ func (m *MultivariatePolynomialManager) CloseChecked() error {
 			}
 		}
 		m.closing = true
+	}
+	if e := m.closeEvaluationFrames(); e != nil {
+		return e
 	}
 	if m.core == nil {
 		m.originalBudget.Release(m.header)

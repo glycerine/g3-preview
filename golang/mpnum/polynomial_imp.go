@@ -39,7 +39,9 @@ type MultivariatePolynomialManager struct {
 	completed, sourceStarted, sourceFinalized, closing, closed bool
 	originalCause, sourceCause, cleanupCause, unwindCause      error
 	derivative                                                 polynomialDerivativeScope
+	evaluation                                                 polynomialEvaluationScope
 	lexPending                                                 bool
+	lexGeneration                                              uint64
 	lexCause                                                   error
 	modularIndex                                               uint8
 	mmConstructed, mmDropDone                                  bool
