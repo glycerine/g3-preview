@@ -83906,9 +83906,26 @@
       "path": "src/test/bits.cpp",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "utilbits/bit_util.go",
+        "utilbits/bit_util_finite_test.go",
+        "utilbits/bit_util_test.go",
+        "utilbits/debug_off.go",
+        "utilbits/debug_on.go"
+      ],
+      "tests": [
+        "TestBitsFiniteScalarAndCarryOracle",
+        "TestBitsFiniteWholeShiftMatrix",
+        "TestBitsRegisteredFixedSourceAssertions",
+        "TestBitsRegisteredFullRandomCampaign",
+        "TestBitsSourceNonGNUScalarBranches",
+        "TestBitsSourceOverlapAndReachedAccess",
+        "TestBitsSourceZeroShiftBoundary",
+        "TestBitsWholeUtilityArithmeticAndBitPositions",
+        "TestBitsSourceLeftZeroShiftReachedOperand",
+        "TestBitsSourceRightZeroShiftReachedOperand"
+      ],
       "assertions": [
         {
           "line": 30,
@@ -83941,9 +83958,69 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "tst_shl fixed/helper",
+          "status": "ported",
+          "go_target": "utilbits/bit_util_test.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "tst_shr fixed/helper",
+          "status": "ported",
+          "go_target": "utilbits/bit_util_test.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "tst_shl_rand: all100000 trials and original assertion sites",
+          "status": "ported",
+          "go_target": "utilbits/bit_util_test.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "Global assertion-switch binding and source test diagnostic/dispatch integration",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Utility methods borrow actual caller-owned uint32 words with explicit source uint32 counts; no allocation or overlapping-range clone. Reached reads/writes preserve source successful prefixes and unread-tail short circuits."
+      ],
+      "deviations": [
+        "Host libc rand uses explicit deterministic31-bit test adapter retaining every draw site/modulo/zero correction; independent test-only math/big supplies expected words. Console and source runner dispatch remain open."
+      ]
     },
     {
       "path": "src/test/buffer.cpp",
@@ -94042,9 +94119,26 @@
       "path": "src/util/bit_util.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "utilbits/bit_util.go",
+        "utilbits/bit_util_finite_test.go",
+        "utilbits/bit_util_test.go",
+        "utilbits/debug_off.go",
+        "utilbits/debug_on.go"
+      ],
+      "tests": [
+        "TestBitsFiniteScalarAndCarryOracle",
+        "TestBitsFiniteWholeShiftMatrix",
+        "TestBitsRegisteredFixedSourceAssertions",
+        "TestBitsRegisteredFullRandomCampaign",
+        "TestBitsSourceNonGNUScalarBranches",
+        "TestBitsSourceOverlapAndReachedAccess",
+        "TestBitsSourceZeroShiftBoundary",
+        "TestBitsWholeUtilityArithmeticAndBitPositions",
+        "TestBitsSourceLeftZeroShiftReachedOperand",
+        "TestBitsSourceRightZeroShiftReachedOperand"
+      ],
       "conditionals": [
         {
           "line": 28,
@@ -94151,17 +94245,336 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "slow_msb_pos",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "msb_pos",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "nlz_core GNU and non-GNU",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "nlz",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "ntz_core GNU and non-GNU",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "ntz",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "copy",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "is_zero",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "reset",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "shl",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "shr same-size",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "shr differing-size",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "has_one_at_first_k_bits",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "inc",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "dec",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "lt",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "add",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "Global assertion-switch binding and source test diagnostic/dispatch integration",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Utility methods borrow actual caller-owned uint32 words with explicit source uint32 counts; no allocation or overlapping-range clone. Reached reads/writes preserve source successful prefixes and unread-tail short circuits."
+      ],
+      "deviations": [
+        "Global automatic SASSERT assertion-switch binding remains open; sourceDebug controls selected profile with assertions enabled.",
+        "TRACE/console and source test runner timing/registration dispatch are not implemented by mathematical helper tests.",
+        "libc rand replaced by explicit hermetic31-bit adapter, all100000 trials/call order/zero corrections retained.",
+        "Slices are actual borrowed caller-owned uint32 words; no source allocation occurs in utility methods. Runtime byte-codec caller adapters may be needed at future consumers.",
+        "Fixed32-bit arithmetic and signed-cast profile; reached native undefined shifts/INT_MIN negation guarded, no native undefined-memory continuation claim."
+      ]
     },
     {
       "path": "src/util/bit_util.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "utilbits/bit_util.go",
+        "utilbits/bit_util_finite_test.go",
+        "utilbits/bit_util_test.go",
+        "utilbits/debug_off.go",
+        "utilbits/debug_on.go"
+      ],
+      "tests": [
+        "TestBitsFiniteScalarAndCarryOracle",
+        "TestBitsFiniteWholeShiftMatrix",
+        "TestBitsRegisteredFixedSourceAssertions",
+        "TestBitsRegisteredFullRandomCampaign",
+        "TestBitsSourceNonGNUScalarBranches",
+        "TestBitsSourceOverlapAndReachedAccess",
+        "TestBitsSourceZeroShiftBoundary",
+        "TestBitsWholeUtilityArithmeticAndBitPositions",
+        "TestBitsSourceLeftZeroShiftReachedOperand",
+        "TestBitsSourceRightZeroShiftReachedOperand"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -94174,9 +94587,311 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "slow_msb_pos",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "msb_pos",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "nlz_core GNU and non-GNU",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "nlz",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "ntz_core GNU and non-GNU",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "ntz",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "copy",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "is_zero",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "reset",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "shl",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "shr same-size",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "shr differing-size",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "has_one_at_first_k_bits",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "inc",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "dec",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "lt",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "add",
+          "status": "ported",
+          "go_target": "utilbits/bit_util.go",
+          "tests": [
+            "TestBitsFiniteScalarAndCarryOracle",
+            "TestBitsFiniteWholeShiftMatrix",
+            "TestBitsRegisteredFixedSourceAssertions",
+            "TestBitsRegisteredFullRandomCampaign",
+            "TestBitsSourceNonGNUScalarBranches",
+            "TestBitsSourceOverlapAndReachedAccess",
+            "TestBitsSourceZeroShiftBoundary",
+            "TestBitsWholeUtilityArithmeticAndBitPositions",
+            "TestBitsSourceLeftZeroShiftReachedOperand",
+            "TestBitsSourceRightZeroShiftReachedOperand"
+          ]
+        },
+        {
+          "name": "Global assertion-switch binding and source test diagnostic/dispatch integration",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Utility methods borrow actual caller-owned uint32 words with explicit source uint32 counts; no allocation or overlapping-range clone. Reached reads/writes preserve source successful prefixes and unread-tail short circuits."
+      ],
+      "deviations": [
+        "Global automatic SASSERT assertion-switch binding remains open; sourceDebug controls selected profile with assertions enabled.",
+        "TRACE/console and source test runner timing/registration dispatch are not implemented by mathematical helper tests.",
+        "libc rand replaced by explicit hermetic31-bit adapter, all100000 trials/call order/zero corrections retained.",
+        "Slices are actual borrowed caller-owned uint32 words; no source allocation occurs in utility methods. Runtime byte-codec caller adapters may be needed at future consumers.",
+        "Fixed32-bit arithmetic and signed-cast profile; reached native undefined shifts/INT_MIN negation guarded, no native undefined-memory continuation claim."
+      ]
     },
     {
       "path": "src/util/bit_vector.cpp",

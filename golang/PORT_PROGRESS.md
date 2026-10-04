@@ -25743,3 +25743,69 @@ failure coverage. Container real Runtime clause-ID backend private tests are
 GREEN with embedded utilid.Generator and no method-value closure; full SAT
 Check/search and user-scope remain pending. Numeric resumes source prerequisite
 query/coefficient/Power/Equal bodies while full owner composition remains open.
+
+### Complete bit utility bodies integrated (full gates GREEN)
+
+Previous goal turn made progress: a8a0a16 committed Newton after full GREEN
+gates and verified clean tree. Root reviewed src/util/bit_util.cpp/h and the
+actual registered src/test/bits.cpp driver against the private five-file port.
+All source mathematical helper bodies, GNU and separate concrete non-GNU
+branches are translated; global assertion switch and test console/dispatch
+integration remain open, so all three units stay partial. Source paths and
+MIT/Leonardo notices retained; Microsoft copyright omitted. Source files were
+not content-hashed. Inventory tracks Go file bytes only.
+
+Tests-first missing APIs: .cache/util-bits-api-red.log and
+.cache/util-bits-fallback-api-red.log. Review found an over-eager release-mode
+zero-shift guard before an empty source left-shift loop. New regression
+.cache/util-bits-zero-left-red.log genuinely failed before moving the guard
+to the reached operand, after its actual source read and before destination
+write. Empty source loops now execute defined zero fills; debug source
+preconditions remain at entry. Nine groups include original fixed fixtures,
+every original driver assertion site, full100000 random trials retaining draw
+order, independent shift matrix, scalar/carry oracle, forward copy overlap,
+right-shift write-before-next-read overlap, actual late access guards and
+non-GNU signed/float branches. Test-only math/big is the independent oracle;
+production uses no bigint, generics, unsafe or allocation.
+
+Refrozen .cache/util-bits-final-inventory.json five files verified before copy.
+Reviewed private native2.071s/debug2.034s and both vets0(.105s/.104s).
+Root integrated only those files plus this evidence and manifest entries.
+All three new partial units preserve explicit global/test runner obligations;
+counts now2102units/677APIs30ported184partial1888unported. Full master gates
+freeze774 Go files under .cache/util-bits-complete-*; no Go edits until terminal
+verification. Fixed32-bit profile diagnoses reached undefined native operations
+without claiming native UB continuation; host libc rand sequence identity is
+not claimed by its explicit hermetic test draw adapter.
+
+First immutable774 full gates all0: native2.298s/debug2.314s, bothvets0,
+source139.018s. Continued private review added a second genuine regression:
+.cache/util-bits-zero-right-red.log. Release right-shift reads the next source
+operand before its undefined 32-bit shift; the old adapter guarded before that
+read. Moved guard after the actual read, retaining the earlier destination
+write and its reached bounds category. Checked source precondition still stops
+before those actions. Ten groups refrozen; private native2.189s/debug2.108s,
+bothvets0. After first runner terminal and immutable verification, root copied
+the revised production/test bytes and added manifest test evidence. Final full
+gates run against the new unchanged774 snapshot under
+.cache/util-bits-final-complete-*. The first snapshot is not commit evidence
+for the revised bytes.
+
+Final unchanged774 full gates all0: native2.345s, checked/debug2.315s,
+vet-native.353s, vet-debug.347s, source/no-generics147.046s. Evidence is
+.cache/util-bits-final-complete-go-hashes.json and
+.cache/util-bits-final-complete-gates.json with matching five logs. Frozen
+five Go hashes, full origin paths/MIT/author notices, omission of Microsoft
+copyright and ten declared test groups independently rechecked. No additional
+Go edits during final verification; runner confirmed immutable complete tree.
+Chunk is ready for coherent green commit; full solver goal remains active.
+
+Parallel source review continues: coefficient div_x requires actual factory
+outcome retention for a newly created RC0 monomial if coefficient copy fails
+before INC. Numeric and arena coordinate one existing engine extraction,
+without registry/RC0 inference. UP source lifecycle review also requires stopped
+physical-release cause preservation, avoiding an owning acknowledgement on
+repeated source finalize. The shared fresh-null/dangling Integer publication
+issue reaches Rational/local sourceNumeralDel users too; UP-only observer
+binding cannot establish whole Integer lifecycle completion. These are private
+source obligations, not included in this utility commit.
