@@ -58300,7 +58300,10 @@
         "sat_solver_copy.go",
         "sat_solver_copy_fault_test.go",
         "sat_solver_copy_model_test.go",
-        "sat_solver_copy_test.go"
+        "sat_solver_copy_test.go",
+        "sat_solver_statistics.go",
+        "sat_solver_statistics_test.go",
+        "sat_solver_statistics_fault_test.go"
       ],
       "tests": [
         "TestSATSolverClauseCoreFiniteSimplification",
@@ -58610,7 +58613,13 @@
         "TestSATSolverCopyDebugEliminatedSourceAssertionAfterEarlierVariable",
         "TestSATSolverCopyDebugConverterAssertionAfterDestinationPop",
         "TestSATSolverCopyWarmUnitOnlyPhysicalPlateau",
-        "TestSATSolverCopyReadsExactBinaryNonLearnedPackedWord"
+        "TestSATSolverCopyReadsExactBinaryNonLearnedPackedWord",
+        "TestSATSolverStatisticsActualSourceOrderAndResetKeepsSCC",
+        "TestSATSolverStatisticsZeroSkipAndWarmPhysicalPlateau",
+        "TestSATSolverStatisticsPreservesUint32AndDuplicateKeyContributions",
+        "TestSATSolverStatisticsCopiedClosedAndHeaderCharge",
+        "TestSATSolverStatisticsIndependentSparseCounterMasks",
+        "TestSATSolverStatisticsEveryActualOutputReservationPrefix"
       ],
       "conditionals": [
         {
@@ -59799,6 +59808,19 @@
             "TestSATSolverCopyActualFlagsTrailClausesAndUserScope",
             "TestSATSolverCopySelfWithinCapacityPreservesDefinedAppend"
           ]
+        },
+        {
+          "name": "Actual solver statistics six-child dispatch2781-2801 and main15 reads/16 resets3716-3751; actual child counters; SCC reset omission preserved",
+          "status": "ported",
+          "go_target": "sat_solver_statistics.go",
+          "tests": [
+            "TestSATSolverStatisticsActualSourceOrderAndResetKeepsSCC",
+            "TestSATSolverStatisticsZeroSkipAndWarmPhysicalPlateau",
+            "TestSATSolverStatisticsPreservesUint32AndDuplicateKeyContributions",
+            "TestSATSolverStatisticsCopiedClosedAndHeaderCharge",
+            "TestSATSolverStatisticsIndependentSparseCounterMasks",
+            "TestSATSolverStatisticsEveryActualOutputReservationPrefix"
+          ]
         }
       ],
       "ownership": [
@@ -59972,7 +59994,10 @@
         "sat_solver_copy.go",
         "sat_solver_copy_fault_test.go",
         "sat_solver_copy_model_test.go",
-        "sat_solver_copy_test.go"
+        "sat_solver_copy_test.go",
+        "sat_solver_statistics.go",
+        "sat_solver_statistics_test.go",
+        "sat_solver_statistics_fault_test.go"
       ],
       "tests": [
         "TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots",
@@ -60231,7 +60256,13 @@
         "TestSATSolverCopyDebugEliminatedSourceAssertionAfterEarlierVariable",
         "TestSATSolverCopyDebugConverterAssertionAfterDestinationPop",
         "TestSATSolverCopyWarmUnitOnlyPhysicalPlateau",
-        "TestSATSolverCopyReadsExactBinaryNonLearnedPackedWord"
+        "TestSATSolverCopyReadsExactBinaryNonLearnedPackedWord",
+        "TestSATSolverStatisticsActualSourceOrderAndResetKeepsSCC",
+        "TestSATSolverStatisticsZeroSkipAndWarmPhysicalPlateau",
+        "TestSATSolverStatisticsPreservesUint32AndDuplicateKeyContributions",
+        "TestSATSolverStatisticsCopiedClosedAndHeaderCharge",
+        "TestSATSolverStatisticsIndependentSparseCounterMasks",
+        "TestSATSolverStatisticsEveryActualOutputReservationPrefix"
       ],
       "conditionals": [
         {
@@ -60718,6 +60749,19 @@
             "TestSATSolverCopyDebugConverterAssertionAfterDestinationPop",
             "TestSATSolverCopyWarmUnitOnlyPhysicalPlateau",
             "TestSATSolverCopyReadsExactBinaryNonLearnedPackedWord"
+          ]
+        },
+        {
+          "name": "Actual solver statistics six-child dispatch2781-2801 and main15 reads/16 resets3716-3751; actual child counters; SCC reset omission preserved",
+          "status": "ported",
+          "go_target": "sat_solver_statistics.go",
+          "tests": [
+            "TestSATSolverStatisticsActualSourceOrderAndResetKeepsSCC",
+            "TestSATSolverStatisticsZeroSkipAndWarmPhysicalPlateau",
+            "TestSATSolverStatisticsPreservesUint32AndDuplicateKeyContributions",
+            "TestSATSolverStatisticsCopiedClosedAndHeaderCharge",
+            "TestSATSolverStatisticsIndependentSparseCounterMasks",
+            "TestSATSolverStatisticsEveryActualOutputReservationPrefix"
           ]
         }
       ],
