@@ -58207,7 +58207,11 @@
         "sat_solver_mutex_pair_set.go",
         "sat_solver_mutex_pair_set_test.go",
         "sat_solver_mutex_pair_vector.go",
-        "sat_solver_mutex_pair_vector_test.go"
+        "sat_solver_mutex_pair_vector_test.go",
+        "sat_solver_consequences_chunking.go",
+        "sat_solver_consequences_chunking_fault_test.go",
+        "sat_solver_consequences_chunking_model_test.go",
+        "sat_solver_consequences_chunking_test.go"
       ],
       "tests": [
         "TestSATSolverClauseCoreFiniteSimplification",
@@ -58497,7 +58501,15 @@
         "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
         "TestSATMutexPairSetWrappedCopyGuardAtActualDestination",
         "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
-        "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor"
+        "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor",
+        "TestSATConsequenceChunkEveryActualRefusalRetainsLocalAndOutputRoots",
+        "TestSATConsequenceBruteForceRealCancellationPreservesPrefix",
+        "TestSATConsequenceChunkIndependentBinaryCNFs",
+        "TestSATConsequenceChunkMultipleCoreUsesBruteForce",
+        "TestSATConsequenceChunkPruneAndLastDuplicateRemoval",
+        "TestSATConsequenceChunkUsesActualCheckAndAppendsCore",
+        "TestSATConsequenceChunkPruneReachedGuardPreservesSwapPrefix",
+        "TestSATConsequenceChunkWarmedPhysicalPlateau"
       ],
       "conditionals": [
         {
@@ -59598,6 +59610,43 @@
             "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
             "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor"
           ]
+        },
+        {
+          "name": "Concrete static satConsequencePruneUnfixed source3157-3165 preserving literal false production dispatch; source nontermination domains/verbose retained as disclosed",
+          "status": "ported",
+          "go_target": "sat_solver_consequences_chunking.go",
+          "tests": [
+            "TestSATConsequenceChunkPruneAndLastDuplicateRemoval",
+            "TestSATConsequenceChunkPruneReachedGuardPreservesSwapPrefix"
+          ]
+        },
+        {
+          "name": "Concrete static satConsequenceBackRemove source3169-3179 preserving literal false production dispatch; source nontermination domains/verbose retained as disclosed",
+          "status": "ported",
+          "go_target": "sat_solver_consequences_chunking.go",
+          "tests": [
+            "TestSATConsequenceChunkPruneAndLastDuplicateRemoval"
+          ]
+        },
+        {
+          "name": "Concrete static bruteForceConsequences source3181-3191 preserving literal false production dispatch; source nontermination domains/verbose retained as disclosed",
+          "status": "ported",
+          "go_target": "sat_solver_consequences_chunking.go",
+          "tests": [
+            "TestSATConsequenceBruteForceRealCancellationPreservesPrefix",
+            "TestSATConsequenceChunkMultipleCoreUsesBruteForce"
+          ]
+        },
+        {
+          "name": "Concrete static coreChunking/coreChunk/coreChunkCheck source3193-3249 preserving literal false production dispatch; source nontermination domains/verbose retained as disclosed",
+          "status": "partial",
+          "go_target": "sat_solver_consequences_chunking.go",
+          "tests": [
+            "TestSATConsequenceChunkIndependentBinaryCNFs",
+            "TestSATConsequenceChunkEveryActualRefusalRetainsLocalAndOutputRoots",
+            "TestSATConsequenceChunkUsesActualCheckAndAppendsCore",
+            "TestSATConsequenceChunkWarmedPhysicalPlateau"
+          ]
         }
       ],
       "ownership": [
@@ -59621,7 +59670,8 @@
         "Complete selected ordinary GC/restart/init_search member algorithms executed; enabled integrity tags, verbose/TRACE and full constructor/search/Check remain open. Source comparator expressions/tie order preserved through explicitly charged concrete Go stable merge workspace; C++ standard library allocation/comparison schedule is not claimed identical. No new registered source assertion completion credit.",
         "Selected enabled integrity and missed-propagation sites now call actual members, including Asymm entry/exit and propagation. Global debug-tag/assertions-enabled registry, TRACE/verbose, complete constructor/parameter updates/search and registered user-scope campaign remain open. Undefined floating-to-int conversion is guarded at reached source expression; not a C++ malformed-input guarantee.",
         "Selected real finite src/test/sat_user_scope.cpp campaign executes42 original ENSURE comparisons/168 clauses and independent original-CNF oracle after pending tag removal. Whole solver remains partial: extension/parallel/MUS/clone/consequence methods, global debug tags, TRACE/printer and remaining actual source Runtime allocation accounting are open. Clause_offset physical pointer32 contract remains distinct from charged checked locator metadata. Std library sort schedule and explicit cold constructor contexts are Go adapters.",
-        "Selected concrete consequences and mutex family source mapping supersedes older missing-method notes only for listed sites. Source AST/BV/datatype registered6 assertions, TRACE/verbose, extension dispatch, dormant core_chunking/static helpers, general template variants and full source units remain OPEN. Scalar slot/generation encodes selected8-byte pointer ABI; actual named cold/raw/pending roots charged; no registry-derived ownership. See PORT_PROGRESS.md."
+        "Selected concrete consequences and mutex family source mapping supersedes older missing-method notes only for listed sites. Source AST/BV/datatype registered6 assertions, TRACE/verbose, extension dispatch, dormant core_chunking/static helpers, general template variants and full source units remain OPEN. Scalar slot/generation encodes selected8-byte pointer ABI; actual named cold/raw/pending roots charged; no registry-derived ownership. See PORT_PROGRESS.md.",
+        "Listed static consequences3157-3249 now implemented and directly tested: source undef falls through existing core, last-duplicate swap removal and real Check/clause effects. Hardcoded false dispatch unchanged. K0/repeatedundef nontermination is source behavior, not repaired; verbose/AST registered6/global bindings remain OPEN. Actual named charged nested scopes with reverse completed destruction and separate owning abort. Supersedes earlier static-helper-open notes only for listed methods. See PORT_PROGRESS.md."
       ]
     },
     {
