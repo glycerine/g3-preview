@@ -34,6 +34,7 @@ type polynomialCreation struct {
 	buffer        *polynomialSOM
 }
 type MultivariatePolynomialCore struct {
+	newtonLocal                                                                                *PolynomialNewtonInterpolator
 	generatedCalleePending                                                                     bool
 	directoryInitialized                                                                       bool
 	linearGenerated                                                                            []bool
@@ -288,6 +289,11 @@ func (m *MultivariatePolynomialCore) MkTerms(as []Int, ms []Monomial) (Polynomia
 	return m.som.mk(false)
 }
 func (m *MultivariatePolynomialCore) CloseChecked() error {
+	// The stopped source method-local must be explicitly resumed before the
+	// separate imp owning-close protocol begins. It is not cached scratch.
+	if m != nil && m.self == m && m.newtonLocal != nil {
+		return ErrPolynomialPending
+	}
 	if m == nil || m.self != m {
 		return ErrPolynomialOwner
 	}

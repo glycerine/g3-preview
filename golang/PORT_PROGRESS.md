@@ -25673,3 +25673,73 @@ and reached-access guards GREEN1.750s, both private vets0. Source CPP unsigned
 shift domains have reached typed guards, not claimed native UB continuation.
 Debug globals/non-GNU fallback/diagnostic binding and further arithmetic finite
 coverage remain audit obligations before root freeze/master integration.
+
+### Selected Newton integration (full gates GREEN)
+
+Previous turn was progress:3ccad37 green multivariate-core commit and clean
+authoritative master. Root reviewed refreshed Newton five-file source/owning
+separation, exact18-group tests-first evidence and two-hunk parent core merge.
+Further whole-method constructor failure audit found real TLS Runtime Allocate
+returns a block with error at a reached max-size check. Numeric actual new
+regression .cache/polynomial-newton-ctor-tls-red.log exit1 exposed automatic
+owning abort clearing method-local. One branch now runs only completed source
+member closeMode(false,false) and clears newtonLocal only when adapter closed.
+Exact pending block/header +1LiveBlock/+40physical named census occurs BEFORE
+fixture limit restoration; later explicit CleanupNewtonInterpolation drains it.
+
+Refrozen exact five Go SHA entries in
+.cache/polynomial-newton-final-inventory.json verified; root integrated only
+five new files plus actual newtonLocal/CloseChecked preguard parent merge.
+Private selected18 RUN/PASS per profile, adjacent60/60 (48top-level), bothvets0;
+root composed master ^TestPolynomial native/debug0(.075s/.075s). Original source
+Newton ctor/reset/const input/count/Add/Mk/whole method and persistent vector
+At/SetOwner/Flush source bodies, signed32 loop/UB guards, actual modular
+normalization assertion sites and all reached real allocation prefixes retained.
+Explicit failed constructor/local/source destructor and unjoined INC owning
+abort remain separate; stopped Reset cause never owns cleanup on retry.
+Full imp/m_upm/skeleton, persistent-vector public SourceFinalize, full generic
+Ref method equivalents and TRACE/global binding still OPEN. Dormant original
+Newton ENSURE adapted1, registered active credit0. All source units remain
+partial;2102units/677APIs30ported181partial1891unported. Full master gates freeze
+769 Go files; no Go edits until terminal verification.
+
+Parallel full-source work continues: container actual SAT ctor/member order
+helpers separate source clause body from reverse scope/reinit/trail/watches/
+clause backing and preserve standalone adapters. Arena literal UP source
+lifecycle tests plus exact Runtime tmp helper extraction are private; full
+imp constructor/destructor still missing API, never selected Close surrogate.
+Numeric PSC tests-first RED .cache/polynomial-psc-api-red.log calls actual
+Degree/CoeffWithReduct/PseudoDivision/PSCChain/Resultant. Source Power is active
+linear repetition (#if0 binary alternative), lower-degree pseudo-division branch
+has no return, exact correction does not rewrite d. Full resultant ICCP can
+reach general polynomial GCD; preserve that dependency, no determinant/
+univariate/primitive-assumption substitution. Actual8 driver assertions will
+only receive execution credit after true full manager ctor composition.
+
+Terminal full gates for the unchanged 769-Go-file snapshot all passed:
+native97.001s, checked/debug754.639s, vet-native4.029s, vet-debug4.043s,
+source/no-generics140.976s. Runner verified every frozen Go file unchanged.
+Evidence: .cache/polynomial-newton-complete-go-hashes.json,
+.cache/polynomial-newton-complete-gates.json and matching native/debug/vet/
+source logs. Headers retain full originating source paths and MIT notices,
+without Microsoft copyright. Coherent Newton chunk ready for green commit;
+full solver goal and the remaining source obligations above remain active.
+
+Root private bit_util family is now frozen in
+.cache/util-bits-final-inventory.json: five integration files, complete source
+shift/scalar arithmetic families, full100000-case registered randomized test,
+independent finite arithmetic/shift checks and concrete non-GNU fallbacks.
+Tests-first API and fallback RED evidence precedes implementation. Final private
+native1.809s/debug1.788s, both vets and no-generics audit GREEN. Global assertion
+switch/diagnostic binding remains OPEN; deterministic rand adapter does not
+claim host libc sequence identity. No bit_util files entered this Newton tree.
+
+Arena UP failed-value source lifecycle audit found shared failedRef cannot
+distinguish fresh source-null allocation failure from a dangling old pointer
+after destructive replacement. Full setter/source publication inventory and
+narrow actual primitive state proposal are required before further production
+changes; current malformed-token guard tests do not claim fresh-allocation
+failure coverage. Container real Runtime clause-ID backend private tests are
+GREEN with embedded utilid.Generator and no method-value closure; full SAT
+Check/search and user-scope remain pending. Numeric resumes source prerequisite
+query/coefficient/Power/Equal bodies while full owner composition remains open.

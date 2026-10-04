@@ -28350,7 +28350,12 @@
         "mpnum/polynomial_scoped_source_test.go",
         "mpnum/polynomial_source_prefix_test.go",
         "mpnum/polynomial_constructor_failure_test.go",
-        "mpnum/polynomial_operation_failure_test.go"
+        "mpnum/polynomial_operation_failure_test.go",
+        "mpnum/polynomial_ref.go",
+        "mpnum/polynomial_newton.go",
+        "mpnum/polynomial_newton_vector.go",
+        "mpnum/polynomial_newton_test.go",
+        "mpnum/polynomial_newton_physical_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -28452,7 +28457,25 @@
         "TestPolynomialLinearMixedGeneratedFailurePrefixes",
         "TestPolynomialUnivariateGeneratedFailurePrefixes",
         "TestPolynomialSoleRetainCalleeConstructionCleanup",
-        "TestPolynomialPreexistingCalleeCreationRemainsBorrowed"
+        "TestPolynomialPreexistingCalleeCreationRemainsBorrowed",
+        "TestPolynomialNewtonSourceInterpolation",
+        "TestPolynomialNewtonReferenceCallbacksAndLazyVector",
+        "TestPolynomialNewtonWholeMethodAndWarmSingleSample",
+        "TestPolynomialNewtonRealAddGrowthRefusalPrefixes",
+        "TestPolynomialNewtonRefVectorSourceConsumedPrefix",
+        "TestPolynomialNewtonConstructionAndLazyRefusals",
+        "TestPolynomialNewtonSourceModularAndDuplicateProfiles",
+        "TestPolynomialNewtonLazyDirectoryPlateau",
+        "TestPolynomialNewtonStoppedReferenceBeforeOwningAbort",
+        "TestPolynomialNewtonMkGrowthAndCancellationPrefixes",
+        "TestPolynomialNewtonSignedSourceCountGuardBeforeUnreadVector",
+        "TestPolynomialNewtonVectorSourceOwnerBinding",
+        "TestPolynomialNewtonRefVectorPendingAbortRetry",
+        "TestPolynomialNewtonIndependentBoundedInterpolants",
+        "TestPolynomialNewtonWholeSourcePushBeforeOwningAbort",
+        "TestPolynomialNewtonRefVectorSourceResetStop",
+        "TestPolynomialNewtonLazySourceFlushBeforeOwningAbort",
+        "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock"
       ],
       "conditionals": [
         {
@@ -30450,6 +30473,31 @@
             "TestPolynomialSoleRetainCalleeConstructionCleanup",
             "TestPolynomialPreexistingCalleeCreationRemainsBorrowed"
           ]
+        },
+        {
+          "name": "Selected complete incremental Newton ctor/reset/const-input/count/Add/Mk and whole-method lexical owner; persistent owner-vector lazy At/SetOwner/Flush; explicit owning cleanup distinct from source destruction; vector SourceFinalize/full imp/TRACE remain open",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_newton.go",
+          "tests": [
+            "TestPolynomialNewtonSourceInterpolation",
+            "TestPolynomialNewtonReferenceCallbacksAndLazyVector",
+            "TestPolynomialNewtonWholeMethodAndWarmSingleSample",
+            "TestPolynomialNewtonRealAddGrowthRefusalPrefixes",
+            "TestPolynomialNewtonRefVectorSourceConsumedPrefix",
+            "TestPolynomialNewtonConstructionAndLazyRefusals",
+            "TestPolynomialNewtonSourceModularAndDuplicateProfiles",
+            "TestPolynomialNewtonLazyDirectoryPlateau",
+            "TestPolynomialNewtonStoppedReferenceBeforeOwningAbort",
+            "TestPolynomialNewtonMkGrowthAndCancellationPrefixes",
+            "TestPolynomialNewtonSignedSourceCountGuardBeforeUnreadVector",
+            "TestPolynomialNewtonVectorSourceOwnerBinding",
+            "TestPolynomialNewtonRefVectorPendingAbortRetry",
+            "TestPolynomialNewtonIndependentBoundedInterpolants",
+            "TestPolynomialNewtonWholeSourcePushBeforeOwningAbort",
+            "TestPolynomialNewtonRefVectorSourceResetStop",
+            "TestPolynomialNewtonLazySourceFlushBeforeOwningAbort",
+            "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock"
+          ]
         }
       ],
       "ownership": [
@@ -30465,7 +30513,8 @@
         "Charged linearGenerated bool backing retains only actual callee-new branch source locals; existing unreferenced results stay borrowed.",
         "Same actual factory engines report created/started outcome; source callee creation is retained on guard and only originating core owns explicit abort authority.",
         "Separate owning Close/CleanupConstruction/CleanupValue aborts versus literal SourceFinalizePrefix; no completed imp destructor on failed construction.",
-        "Static charged borrowed deletion handlers preserve next-read after callback; process/global handler binding not provided."
+        "Static charged borrowed deletion handlers preserve next-read after callback; process/global handler binding not provided.",
+        "INC-before-push/assign roots retained separately; source completed local/member destruction precedes explicit owning abort. Real TLS constructor error returns allocated pending block: source-only implicit member unwind retains method-local cold owner until CleanupNewtonInterpolation. Existing foreign callee pending roots remain borrowed."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -30479,7 +30528,14 @@
         "PSC/Lazard/pseudo-remainder/subresultant/resultant and full driver remain absent; no determinant/univariate surrogate.",
         "Polynomial lex_sort bucket/permutation and full polynomial printing/class query family not claimed by selected Info accessor adapter.",
         "No bounded canonical factory-postpublication DEBUG-refusal recipe exercised; retained callee branch is implemented but no fabricated failure claim.",
-        "Process-wide global rational/runtime/TLS binding and source native pointer ABI remain separate."
+        "Process-wide global rational/runtime/TLS binding and source native pointer ABI remain separate.",
+        "Full imp construction, distinct m_upm and skeleton remain separate obligations.",
+        "Source TRACE/ostream diagnostics remain open.",
+        "Full generic obj_ref/ref_vector method inventory beyond selected needed methods remains open.",
+        "No source registered ENSURE credit: original Newton driver is dormant after early return.",
+        "Signed int32 loop/count conversion uses explicit reached UB guard; actual vector pointer/numeral codecs are storage adapters, not native sizeof equivalence.",
+        "Public source-finalization API for persistent Newton vector remains a next coherent member-lifecycle extension; current Flush source body and Close owning protocol are distinct.",
+        "Go cold child directory and reference owner fields are charged actual representation. External manager lifetime is borrowed."
       ]
     },
     {
@@ -30530,7 +30586,12 @@
         "mpnum/polynomial_scoped_source_test.go",
         "mpnum/polynomial_source_prefix_test.go",
         "mpnum/polynomial_constructor_failure_test.go",
-        "mpnum/polynomial_operation_failure_test.go"
+        "mpnum/polynomial_operation_failure_test.go",
+        "mpnum/polynomial_ref.go",
+        "mpnum/polynomial_newton.go",
+        "mpnum/polynomial_newton_vector.go",
+        "mpnum/polynomial_newton_test.go",
+        "mpnum/polynomial_newton_physical_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -30632,7 +30693,25 @@
         "TestPolynomialLinearMixedGeneratedFailurePrefixes",
         "TestPolynomialUnivariateGeneratedFailurePrefixes",
         "TestPolynomialSoleRetainCalleeConstructionCleanup",
-        "TestPolynomialPreexistingCalleeCreationRemainsBorrowed"
+        "TestPolynomialPreexistingCalleeCreationRemainsBorrowed",
+        "TestPolynomialNewtonSourceInterpolation",
+        "TestPolynomialNewtonReferenceCallbacksAndLazyVector",
+        "TestPolynomialNewtonWholeMethodAndWarmSingleSample",
+        "TestPolynomialNewtonRealAddGrowthRefusalPrefixes",
+        "TestPolynomialNewtonRefVectorSourceConsumedPrefix",
+        "TestPolynomialNewtonConstructionAndLazyRefusals",
+        "TestPolynomialNewtonSourceModularAndDuplicateProfiles",
+        "TestPolynomialNewtonLazyDirectoryPlateau",
+        "TestPolynomialNewtonStoppedReferenceBeforeOwningAbort",
+        "TestPolynomialNewtonMkGrowthAndCancellationPrefixes",
+        "TestPolynomialNewtonSignedSourceCountGuardBeforeUnreadVector",
+        "TestPolynomialNewtonVectorSourceOwnerBinding",
+        "TestPolynomialNewtonRefVectorPendingAbortRetry",
+        "TestPolynomialNewtonIndependentBoundedInterpolants",
+        "TestPolynomialNewtonWholeSourcePushBeforeOwningAbort",
+        "TestPolynomialNewtonRefVectorSourceResetStop",
+        "TestPolynomialNewtonLazySourceFlushBeforeOwningAbort",
+        "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock"
       ],
       "conditionals": [
         {
@@ -31402,6 +31481,31 @@
             "TestPolynomialSoleRetainCalleeConstructionCleanup",
             "TestPolynomialPreexistingCalleeCreationRemainsBorrowed"
           ]
+        },
+        {
+          "name": "Selected complete incremental Newton ctor/reset/const-input/count/Add/Mk and whole-method lexical owner; persistent owner-vector lazy At/SetOwner/Flush; explicit owning cleanup distinct from source destruction; vector SourceFinalize/full imp/TRACE remain open",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_newton.go",
+          "tests": [
+            "TestPolynomialNewtonSourceInterpolation",
+            "TestPolynomialNewtonReferenceCallbacksAndLazyVector",
+            "TestPolynomialNewtonWholeMethodAndWarmSingleSample",
+            "TestPolynomialNewtonRealAddGrowthRefusalPrefixes",
+            "TestPolynomialNewtonRefVectorSourceConsumedPrefix",
+            "TestPolynomialNewtonConstructionAndLazyRefusals",
+            "TestPolynomialNewtonSourceModularAndDuplicateProfiles",
+            "TestPolynomialNewtonLazyDirectoryPlateau",
+            "TestPolynomialNewtonStoppedReferenceBeforeOwningAbort",
+            "TestPolynomialNewtonMkGrowthAndCancellationPrefixes",
+            "TestPolynomialNewtonSignedSourceCountGuardBeforeUnreadVector",
+            "TestPolynomialNewtonVectorSourceOwnerBinding",
+            "TestPolynomialNewtonRefVectorPendingAbortRetry",
+            "TestPolynomialNewtonIndependentBoundedInterpolants",
+            "TestPolynomialNewtonWholeSourcePushBeforeOwningAbort",
+            "TestPolynomialNewtonRefVectorSourceResetStop",
+            "TestPolynomialNewtonLazySourceFlushBeforeOwningAbort",
+            "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock"
+          ]
         }
       ],
       "ownership": [
@@ -31417,7 +31521,8 @@
         "Charged linearGenerated bool backing retains only actual callee-new branch source locals; existing unreferenced results stay borrowed.",
         "Same actual factory engines report created/started outcome; source callee creation is retained on guard and only originating core owns explicit abort authority.",
         "Separate owning Close/CleanupConstruction/CleanupValue aborts versus literal SourceFinalizePrefix; no completed imp destructor on failed construction.",
-        "Static charged borrowed deletion handlers preserve next-read after callback; process/global handler binding not provided."
+        "Static charged borrowed deletion handlers preserve next-read after callback; process/global handler binding not provided.",
+        "INC-before-push/assign roots retained separately; source completed local/member destruction precedes explicit owning abort. Real TLS constructor error returns allocated pending block: source-only implicit member unwind retains method-local cold owner until CleanupNewtonInterpolation. Existing foreign callee pending roots remain borrowed."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -31431,7 +31536,14 @@
         "PSC/Lazard/pseudo-remainder/subresultant/resultant and full driver remain absent; no determinant/univariate surrogate.",
         "Polynomial lex_sort bucket/permutation and full polynomial printing/class query family not claimed by selected Info accessor adapter.",
         "No bounded canonical factory-postpublication DEBUG-refusal recipe exercised; retained callee branch is implemented but no fabricated failure claim.",
-        "Process-wide global rational/runtime/TLS binding and source native pointer ABI remain separate."
+        "Process-wide global rational/runtime/TLS binding and source native pointer ABI remain separate.",
+        "Full imp construction, distinct m_upm and skeleton remain separate obligations.",
+        "Source TRACE/ostream diagnostics remain open.",
+        "Full generic obj_ref/ref_vector method inventory beyond selected needed methods remains open.",
+        "No source registered ENSURE credit: original Newton driver is dormant after early return.",
+        "Signed int32 loop/count conversion uses explicit reached UB guard; actual vector pointer/numeral codecs are storage adapters, not native sizeof equivalence.",
+        "Public source-finalization API for persistent Newton vector remains a next coherent member-lifecycle extension; current Flush source body and Close owning protocol are distinct.",
+        "Go cold child directory and reference owner fields are charged actual representation. External manager lifetime is borrowed."
       ]
     },
     {
@@ -89968,7 +90080,9 @@
       "status": "partial",
       "go_targets": [
         "mpnum/polynomial_monomial_order_test.go",
-        "mpnum/polynomial_monomial_test.go"
+        "mpnum/polynomial_monomial_test.go",
+        "mpnum/polynomial_newton_test.go",
+        "mpnum/polynomial_newton_physical_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -90004,7 +90118,25 @@
         "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
         "TestMonomialSourceSingletonValidityDoesNotReadPower",
         "TestMonomialSourceDegreeSumDoesNotReadVariable",
-        "TestMonomialSourceValidityFieldShortCircuit"
+        "TestMonomialSourceValidityFieldShortCircuit",
+        "TestPolynomialNewtonSourceInterpolation",
+        "TestPolynomialNewtonReferenceCallbacksAndLazyVector",
+        "TestPolynomialNewtonWholeMethodAndWarmSingleSample",
+        "TestPolynomialNewtonRealAddGrowthRefusalPrefixes",
+        "TestPolynomialNewtonRefVectorSourceConsumedPrefix",
+        "TestPolynomialNewtonConstructionAndLazyRefusals",
+        "TestPolynomialNewtonSourceModularAndDuplicateProfiles",
+        "TestPolynomialNewtonLazyDirectoryPlateau",
+        "TestPolynomialNewtonStoppedReferenceBeforeOwningAbort",
+        "TestPolynomialNewtonMkGrowthAndCancellationPrefixes",
+        "TestPolynomialNewtonSignedSourceCountGuardBeforeUnreadVector",
+        "TestPolynomialNewtonVectorSourceOwnerBinding",
+        "TestPolynomialNewtonRefVectorPendingAbortRetry",
+        "TestPolynomialNewtonIndependentBoundedInterpolants",
+        "TestPolynomialNewtonWholeSourcePushBeforeOwningAbort",
+        "TestPolynomialNewtonRefVectorSourceResetStop",
+        "TestPolynomialNewtonLazySourceFlushBeforeOwningAbort",
+        "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock"
       ],
       "conditionals": [
         {
@@ -90393,7 +90525,8 @@
       "ownership": [],
       "deviations": [
         "No active source ENSURE credit: tst_polynomial1815ff invokes tst_psc and returns before tst_lex. Added comparator models are independent bounded regressions, not evidence of active PSC/resultant completion.",
-        "tst_polynomial at1814 has early return1825 after PSC; monomial/lex routines below are dormant in selected !__clang__ profile. No active registered driver assertion credit."
+        "tst_polynomial at1814 has early return1825 after PSC; monomial/lex routines below are dormant in selected !__clang__ profile. No active registered driver assertion credit.",
+        "Newton source campaign is dormant after early return: one ENSURE adapted, no registered active ENSURE completion credit. Full active optimized PSC8 campaign remains required and source-first private work has begun."
       ]
     },
     {
@@ -116753,7 +116886,10 @@
         "ast_dependency_ref_vector_access.go",
         "ast_dependency_ref_vector_borrow.go",
         "ast_dependency_ref_vector.go",
-        "ast_dependency_ref_vector_ops.go"
+        "ast_dependency_ref_vector_ops.go",
+        "mpnum/polynomial_ref.go",
+        "mpnum/polynomial_newton_test.go",
+        "mpnum/polynomial_newton_physical_test.go"
       ],
       "tests": [
         "TestASTRefVectorBorrowedInputDefaultEraseAndMove",
@@ -116810,7 +116946,25 @@
         "TestASTDependencyRefConstructorRefusedCleanupPublishesOwner",
         "TestASTDependencyRefCopyConstructorRefusedCleanupPublishesOwner",
         "TestASTDependencyRefActualOwnerCopyMoveStealAndAssignment",
-        "TestASTDependencyRefVectorSourceCallbacksAndFullRoutes"
+        "TestASTDependencyRefVectorSourceCallbacksAndFullRoutes",
+        "TestPolynomialNewtonSourceInterpolation",
+        "TestPolynomialNewtonReferenceCallbacksAndLazyVector",
+        "TestPolynomialNewtonWholeMethodAndWarmSingleSample",
+        "TestPolynomialNewtonRealAddGrowthRefusalPrefixes",
+        "TestPolynomialNewtonRefVectorSourceConsumedPrefix",
+        "TestPolynomialNewtonConstructionAndLazyRefusals",
+        "TestPolynomialNewtonSourceModularAndDuplicateProfiles",
+        "TestPolynomialNewtonLazyDirectoryPlateau",
+        "TestPolynomialNewtonStoppedReferenceBeforeOwningAbort",
+        "TestPolynomialNewtonMkGrowthAndCancellationPrefixes",
+        "TestPolynomialNewtonSignedSourceCountGuardBeforeUnreadVector",
+        "TestPolynomialNewtonVectorSourceOwnerBinding",
+        "TestPolynomialNewtonRefVectorPendingAbortRetry",
+        "TestPolynomialNewtonIndependentBoundedInterpolants",
+        "TestPolynomialNewtonWholeSourcePushBeforeOwningAbort",
+        "TestPolynomialNewtonRefVectorSourceResetStop",
+        "TestPolynomialNewtonLazySourceFlushBeforeOwningAbort",
+        "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock"
       ],
       "conditionals": [
         {
@@ -116906,6 +117060,31 @@
             "TestASTDependencyRefActualOwnerCopyMoveStealAndAssignment",
             "TestASTDependencyRefVectorSourceCallbacksAndFullRoutes"
           ]
+        },
+        {
+          "name": "Concrete selected polynomial owning ref/reference-vector methods for actual Newton consumers; completed DEC and unjoined INC retain separate source versus owning phases",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_ref.go",
+          "tests": [
+            "TestPolynomialNewtonSourceInterpolation",
+            "TestPolynomialNewtonReferenceCallbacksAndLazyVector",
+            "TestPolynomialNewtonWholeMethodAndWarmSingleSample",
+            "TestPolynomialNewtonRealAddGrowthRefusalPrefixes",
+            "TestPolynomialNewtonRefVectorSourceConsumedPrefix",
+            "TestPolynomialNewtonConstructionAndLazyRefusals",
+            "TestPolynomialNewtonSourceModularAndDuplicateProfiles",
+            "TestPolynomialNewtonLazyDirectoryPlateau",
+            "TestPolynomialNewtonStoppedReferenceBeforeOwningAbort",
+            "TestPolynomialNewtonMkGrowthAndCancellationPrefixes",
+            "TestPolynomialNewtonSignedSourceCountGuardBeforeUnreadVector",
+            "TestPolynomialNewtonVectorSourceOwnerBinding",
+            "TestPolynomialNewtonRefVectorPendingAbortRetry",
+            "TestPolynomialNewtonIndependentBoundedInterpolants",
+            "TestPolynomialNewtonWholeSourcePushBeforeOwningAbort",
+            "TestPolynomialNewtonRefVectorSourceResetStop",
+            "TestPolynomialNewtonLazySourceFlushBeforeOwningAbort",
+            "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock"
+          ]
         }
       ],
       "ownership": [
@@ -116916,7 +117095,8 @@
       "deviations": [
         "This concrete specialization does not implement all AST/other source specializations or remaining generic helper/hash surfaces. Ref-vector null callbacks and nonempty self-append have explicit checked Go adaptations.",
         "Go scalar tokens replace addresses and encode copied/stale-owner/lifetime guards. Source initialized retained pointer slots remain readable in release and by physical borrows; never-initialized/OOB access is guarded. Other template specializations and pointer-hash/eq helpers remain open.",
-        "Owning construction cleanup refusal publishes a nonzero partial token with original error; scalar pending target/cursor tracks consumed callbacks without changing raw retained slots. Explicit Go retry/cleanup protects source-undefined interrupted destruction. Preserved ref_buffer copy ctor dependent-base lookup is uninstantiable; no repaired copy API. General templates, other owners/configs and full consumers remain open. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md."
+        "Owning construction cleanup refusal publishes a nonzero partial token with original error; scalar pending target/cursor tracks consumed callbacks without changing raw retained slots. Explicit Go retry/cleanup protects source-undefined interrupted destruction. Preserved ref_buffer copy ctor dependent-base lookup is uninstantiable; no repaired copy API. General templates, other owners/configs and full consumers remain open. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
+        "Only selected default/INC-before-push/get/size/reset/assignment/destructor methods; full concrete equivalents of all source generic Ref/vector methods and global lifetime bindings remain open."
       ]
     },
     {
@@ -120099,7 +120279,10 @@
         "ast_dependency_ref_vector_access.go",
         "ast_dependency_ref_vector_borrow.go",
         "ast_dependency_ref_vector.go",
-        "ast_dependency_ref_vector_ops.go"
+        "ast_dependency_ref_vector_ops.go",
+        "mpnum/polynomial_ref.go",
+        "mpnum/polynomial_newton_test.go",
+        "mpnum/polynomial_newton_physical_test.go"
       ],
       "tests": [
         "TestASTRefVectorBorrowedInputDefaultEraseAndMove",
@@ -120156,7 +120339,25 @@
         "TestASTDependencyRefConstructorRefusedCleanupPublishesOwner",
         "TestASTDependencyRefCopyConstructorRefusedCleanupPublishesOwner",
         "TestASTDependencyRefActualOwnerCopyMoveStealAndAssignment",
-        "TestASTDependencyRefVectorSourceCallbacksAndFullRoutes"
+        "TestASTDependencyRefVectorSourceCallbacksAndFullRoutes",
+        "TestPolynomialNewtonSourceInterpolation",
+        "TestPolynomialNewtonReferenceCallbacksAndLazyVector",
+        "TestPolynomialNewtonWholeMethodAndWarmSingleSample",
+        "TestPolynomialNewtonRealAddGrowthRefusalPrefixes",
+        "TestPolynomialNewtonRefVectorSourceConsumedPrefix",
+        "TestPolynomialNewtonConstructionAndLazyRefusals",
+        "TestPolynomialNewtonSourceModularAndDuplicateProfiles",
+        "TestPolynomialNewtonLazyDirectoryPlateau",
+        "TestPolynomialNewtonStoppedReferenceBeforeOwningAbort",
+        "TestPolynomialNewtonMkGrowthAndCancellationPrefixes",
+        "TestPolynomialNewtonSignedSourceCountGuardBeforeUnreadVector",
+        "TestPolynomialNewtonVectorSourceOwnerBinding",
+        "TestPolynomialNewtonRefVectorPendingAbortRetry",
+        "TestPolynomialNewtonIndependentBoundedInterpolants",
+        "TestPolynomialNewtonWholeSourcePushBeforeOwningAbort",
+        "TestPolynomialNewtonRefVectorSourceResetStop",
+        "TestPolynomialNewtonLazySourceFlushBeforeOwningAbort",
+        "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock"
       ],
       "conditionals": [
         {
@@ -120268,6 +120469,31 @@
             "TestASTDependencyRefActualOwnerCopyMoveStealAndAssignment",
             "TestASTDependencyRefVectorSourceCallbacksAndFullRoutes"
           ]
+        },
+        {
+          "name": "Concrete selected polynomial owning ref/reference-vector methods for actual Newton consumers; completed DEC and unjoined INC retain separate source versus owning phases",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_ref.go",
+          "tests": [
+            "TestPolynomialNewtonSourceInterpolation",
+            "TestPolynomialNewtonReferenceCallbacksAndLazyVector",
+            "TestPolynomialNewtonWholeMethodAndWarmSingleSample",
+            "TestPolynomialNewtonRealAddGrowthRefusalPrefixes",
+            "TestPolynomialNewtonRefVectorSourceConsumedPrefix",
+            "TestPolynomialNewtonConstructionAndLazyRefusals",
+            "TestPolynomialNewtonSourceModularAndDuplicateProfiles",
+            "TestPolynomialNewtonLazyDirectoryPlateau",
+            "TestPolynomialNewtonStoppedReferenceBeforeOwningAbort",
+            "TestPolynomialNewtonMkGrowthAndCancellationPrefixes",
+            "TestPolynomialNewtonSignedSourceCountGuardBeforeUnreadVector",
+            "TestPolynomialNewtonVectorSourceOwnerBinding",
+            "TestPolynomialNewtonRefVectorPendingAbortRetry",
+            "TestPolynomialNewtonIndependentBoundedInterpolants",
+            "TestPolynomialNewtonWholeSourcePushBeforeOwningAbort",
+            "TestPolynomialNewtonRefVectorSourceResetStop",
+            "TestPolynomialNewtonLazySourceFlushBeforeOwningAbort",
+            "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock"
+          ]
         }
       ],
       "ownership": [
@@ -120278,7 +120504,8 @@
       "deviations": [
         "This concrete specialization does not implement all AST/other source specializations or remaining generic helper/hash surfaces. Ref-vector null callbacks and nonempty self-append have explicit checked Go adaptations.",
         "Go scalar tokens replace addresses and encode copied/stale-owner/lifetime guards. Source initialized retained pointer slots remain readable in release and by physical borrows; never-initialized/OOB access is guarded. Other template specializations and pointer-hash/eq helpers remain open.",
-        "Owning construction cleanup refusal publishes a nonzero partial token with original error; scalar pending target/cursor tracks consumed callbacks without changing raw retained slots. Explicit Go retry/cleanup protects source-undefined interrupted destruction. Preserved ref_buffer copy ctor dependent-base lookup is uninstantiable; no repaired copy API. General templates, other owners/configs and full consumers remain open. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md."
+        "Owning construction cleanup refusal publishes a nonzero partial token with original error; scalar pending target/cursor tracks consumed callbacks without changing raw retained slots. Explicit Go retry/cleanup protects source-undefined interrupted destruction. Preserved ref_buffer copy ctor dependent-base lookup is uninstantiable; no repaired copy API. General templates, other owners/configs and full consumers remain open. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
+        "Only selected default/INC-before-push/get/size/reset/assignment/destructor methods; full concrete equivalents of all source generic Ref/vector methods and global lifetime bindings remain open."
       ]
     },
     {
