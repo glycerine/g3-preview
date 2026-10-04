@@ -1,3 +1,4 @@
+// Source: src/sat/sat_simplifier.cpp; src/sat/sat_simplifier.h.
 // Licensed under the MIT license.
 // Concrete extracted state for sat::simplifier's solver-independent algorithms.
 package g3
@@ -14,6 +15,7 @@ import (
 type satSimplifierKernel struct {
 	self                     *satSimplifierKernel
 	allocator                *satClauseAllocator
+	dummy                    *satClauseAllocator
 	useList                  *satClauseUseLists
 	budget                   *arena.Budget
 	visited                  []uint8
@@ -138,12 +140,12 @@ func (k *satSimplifierKernel) markAllBut(c satStoredClauseRef, except satLiteral
 	if e := k.open(); e != nil {
 		return e
 	}
-	n, e := k.allocator.Size(c)
+	n, e := k.clauseSize(c)
 	if e != nil {
 		return e
 	}
 	for i := uint32(0); i < n; i++ {
-		l, e := k.allocator.Literal(c, i)
+		l, e := k.clauseLiteral(c, i)
 		if e != nil {
 			return e
 		}
@@ -160,12 +162,12 @@ func (k *satSimplifierKernel) unmarkAll(c satStoredClauseRef) error {
 	if e := k.open(); e != nil {
 		return e
 	}
-	n, e := k.allocator.Size(c)
+	n, e := k.clauseSize(c)
 	if e != nil {
 		return e
 	}
 	for i := uint32(0); i < n; i++ {
-		l, e := k.allocator.Literal(c, i)
+		l, e := k.clauseLiteral(c, i)
 		if e != nil {
 			return e
 		}

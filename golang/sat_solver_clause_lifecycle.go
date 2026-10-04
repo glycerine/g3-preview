@@ -11,6 +11,7 @@ import (
 // This owner is not a complete solver constructor or source debug destructor.
 type satSolverClauseLifecycle struct {
 	integrityGC                                                *satSolverGC
+	simplifierContinuation                                     *satSimplifier
 	self                                                       *satSolverClauseLifecycle
 	propagation                                                *satSolverPropagationState
 	budget                                                     *arena.Budget
@@ -62,6 +63,9 @@ func (s *satSolverClauseLifecycle) open() error {
 		return arena.ErrClosed
 	}
 	if s.asymmContinuation != nil && !s.asymmContinuation.running {
+		return arena.ErrClosed
+	}
+	if s.simplifierContinuation != nil && !s.simplifierContinuation.running {
 		return arena.ErrClosed
 	}
 	return s.propagation.open()
@@ -208,7 +212,7 @@ func (s *satSolverClauseLifecycle) mkClauseCoreSpan(n uint32, span satSolverLite
 		p.setConflict(satJustification{}, satDefaultLiteral())
 		return satStoredClauseRef{}, nil
 	case 1:
-		if span.runtime == nil && len(span.literals) == 0 {
+		if span.runtime == nil && span.words == nil && len(span.literals) == 0 {
 			return satStoredClauseRef{}, arena.ErrBounds
 		}
 		lit, e := span.literal(0)
@@ -217,7 +221,7 @@ func (s *satSolverClauseLifecycle) mkClauseCoreSpan(n uint32, span satSolverLite
 		}
 		return satStoredClauseRef{}, p.assign(lit, satJustification{})
 	case 2:
-		if span.runtime == nil && len(span.literals) < 2 {
+		if span.runtime == nil && span.words == nil && len(span.literals) < 2 {
 			return satStoredClauseRef{}, arena.ErrBounds
 		}
 		a, e := span.literal(0)
@@ -298,6 +302,11 @@ func (s *satSolverClauseLifecycle) Close() error {
 		return nil
 	}
 	s.closing = true
+	if s.simplifierContinuation != nil {
+		if e := s.simplifierContinuation.cleanupStopped(); e != nil {
+			return e
+		}
+	}
 	if s.asymmContinuation != nil {
 		if e := s.asymmContinuation.cleanupInterrupted(); e != nil {
 			return e

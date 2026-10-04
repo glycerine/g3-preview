@@ -1,3 +1,4 @@
+// Source: src/sat/sat_simplifier.cpp; src/sat/sat_simplifier.h.
 // Licensed under the MIT license.
 package g3
 
@@ -12,7 +13,7 @@ func (k *satSimplifierKernel) minOccurrenceVar(c satStoredClauseRef) (satBoolVar
 	if e := k.open(); e != nil {
 		return 0, e
 	}
-	bestLit, e := k.allocator.Literal(c, 0)
+	bestLit, e := k.clauseLiteral(c, 0)
 	if e != nil {
 		return 0, e
 	}
@@ -25,12 +26,12 @@ func (k *satSimplifierKernel) minOccurrenceVar(c satStoredClauseRef) (satBoolVar
 		return 0, e
 	}
 	best := p + q
-	n, e := k.allocator.Size(c)
+	n, e := k.clauseSize(c)
 	if e != nil {
 		return 0, e
 	}
 	for i := uint32(1); i < n; i++ {
-		l, e := k.allocator.Literal(c, i)
+		l, e := k.clauseLiteral(c, i)
 		if e != nil {
 			return 0, e
 		}
@@ -54,7 +55,7 @@ func (k *satSimplifierKernel) minOccurrenceLiteral(c satStoredClauseRef) (satLit
 	if e := k.open(); e != nil {
 		return 0, e
 	}
-	bestLit, e := k.allocator.Literal(c, 0)
+	bestLit, e := k.clauseLiteral(c, 0)
 	if e != nil {
 		return 0, e
 	}
@@ -62,12 +63,12 @@ func (k *satSimplifierKernel) minOccurrenceLiteral(c satStoredClauseRef) (satLit
 	if e != nil {
 		return 0, e
 	}
-	n, e := k.allocator.Size(c)
+	n, e := k.clauseSize(c)
 	if e != nil {
 		return 0, e
 	}
 	for i := uint32(1); i < n; i++ {
-		l, e := k.allocator.Literal(c, i)
+		l, e := k.clauseLiteral(c, i)
 		if e != nil {
 			return 0, e
 		}
@@ -90,12 +91,12 @@ func (k *satSimplifierKernel) subsumes1(c1, c2 satStoredClauseRef, out *satLiter
 	if out == nil {
 		return false, ErrSATOwner
 	}
-	n2, e := k.allocator.Size(c2)
+	n2, e := k.clauseSize(c2)
 	if e != nil {
 		return false, e
 	}
 	for i := uint32(0); i < n2; i++ {
-		l, e := k.allocator.Literal(c2, i)
+		l, e := k.clauseLiteral(c2, i)
 		if e != nil {
 			return false, e
 		}
@@ -105,12 +106,12 @@ func (k *satSimplifierKernel) subsumes1(c1, c2 satStoredClauseRef, out *satLiter
 	}
 	r := true
 	*out = satDefaultLiteral()
-	n1, e := k.allocator.Size(c1)
+	n1, e := k.clauseSize(c1)
 	if e != nil {
 		return false, e
 	}
 	for i := uint32(0); i < n1; i++ {
-		l, e := k.allocator.Literal(c1, i)
+		l, e := k.clauseLiteral(c1, i)
 		if e != nil {
 			return false, e
 		}
@@ -135,7 +136,7 @@ func (k *satSimplifierKernel) subsumes1(c1, c2 satStoredClauseRef, out *satLiter
 		}
 	}
 	for i := uint32(0); i < n2; i++ {
-		l, e := k.allocator.Literal(c2, i)
+		l, e := k.clauseLiteral(c2, i)
 		if e != nil {
 			return false, e
 		}
@@ -149,12 +150,12 @@ func (k *satSimplifierKernel) subsumes0(c1, c2 satStoredClauseRef) (bool, error)
 	if e := k.open(); e != nil {
 		return false, e
 	}
-	n2, e := k.allocator.Size(c2)
+	n2, e := k.clauseSize(c2)
 	if e != nil {
 		return false, e
 	}
 	for i := uint32(0); i < n2; i++ {
-		l, e := k.allocator.Literal(c2, i)
+		l, e := k.clauseLiteral(c2, i)
 		if e != nil {
 			return false, e
 		}
@@ -163,12 +164,12 @@ func (k *satSimplifierKernel) subsumes0(c1, c2 satStoredClauseRef) (bool, error)
 		}
 	}
 	r := true
-	n1, e := k.allocator.Size(c1)
+	n1, e := k.clauseSize(c1)
 	if e != nil {
 		return false, e
 	}
 	for i := uint32(0); i < n1; i++ {
-		l, e := k.allocator.Literal(c1, i)
+		l, e := k.clauseLiteral(c1, i)
 		if e != nil {
 			return false, e
 		}
@@ -182,7 +183,7 @@ func (k *satSimplifierKernel) subsumes0(c1, c2 satStoredClauseRef) (bool, error)
 		}
 	}
 	for i := uint32(0); i < n2; i++ {
-		l, e := k.allocator.Literal(c2, i)
+		l, e := k.clauseLiteral(c2, i)
 		if e != nil {
 			return false, e
 		}
@@ -196,22 +197,22 @@ func (k *satSimplifierKernel) candidate(c1, c2 satStoredClauseRef) (bool, error)
 	if c2 == c1 {
 		return false, nil
 	}
-	n1, e := k.allocator.Size(c1)
+	n1, e := k.clauseSize(c1)
 	if e != nil {
 		return false, e
 	}
-	n2, e := k.allocator.Size(c2)
+	n2, e := k.clauseSize(c2)
 	if e != nil {
 		return false, e
 	}
 	if n1 > n2 {
 		return false, nil
 	}
-	a1, e := k.allocator.Approx(c1)
+	a1, e := k.clauseApprox(c1)
 	if e != nil {
 		return false, e
 	}
-	a2, e := k.allocator.Approx(c2)
+	a2, e := k.clauseApprox(c2)
 	if e != nil {
 		return false, e
 	}
@@ -247,7 +248,7 @@ func (k *satSimplifierKernel) collectSubsumed1Core(c satStoredClauseRef, out *sa
 			return e
 		}
 		if satStorageSourceDebug {
-			dead, e := k.allocator.Removed(c2)
+			dead, e := k.clauseRemoved(c2)
 			if e != nil {
 				return e
 			}
@@ -313,7 +314,7 @@ func (k *satSimplifierKernel) collectSubsumed0Core(c satStoredClauseRef, out *sa
 			return e
 		}
 		if satStorageSourceDebug {
-			dead, e := k.allocator.Removed(c2)
+			dead, e := k.clauseRemoved(c2)
 			if e != nil {
 				return e
 			}

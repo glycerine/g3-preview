@@ -25472,3 +25472,103 @@ overload cpp2732 correctly performs its initial mk_unit call unconditionally.
 Arena ctor completed-member ID→directory→numeral unwind genuine RED now GREEN
 .cache/polynomial-constructor-unwind-first-native.log; full family still private,
 not frozen or whole imp construction complete. Entire port goal stays active.
+
+
+### Complete selected simplifier master integration (full gates running)
+
+Previous goal turn made authoritative progress: green07033fe debug-registry
+commit. Root inspected clean master and frozen private inventory, verified all
+27 Go SHA values, reviewed six existing-file diffs, then integrated21 new Go
+files and six scoped SAT dependencies. Manual lifecycle merge retains original
+asymm field placement and integrityGC/cleaner/GC/eq/asymm continuations, adds
+actual simplifier stopped owner and drain. Expanded shorthand originating
+paths in integrated headers before full freeze; license/authors remain and
+Microsoft copyright is omitted. No C++ content hashes.
+
+Complete selected ordinary source family: cpp29–56 use-list;58–229 full
+construction/update/default Run/scoped finalizer;230–318 watches and clauses;
+319–681 kernel/dummy dispatch/subsumption/propagation;682–879 binary scan/learned
+conversion/duplicates/todo scheduling;880–1083 blocked heap/elimination/report;
+1085–1480 weighted cost/stable sort/two-pass resolution/MC/full variable
+elimination/report;1482–1522 all17 parameters/5stats/reset/descriptors.
+Original resolution/subsumption defaults and third-call blocked policy remain
+active. Actual shared decision RNG is used even on empty binary scans. Source
+num_vars reads actual level.size, not assignment shape or a mirrored counter.
+
+Private tests-first/terminal evidence remains frozen inventory
+.cache/work/sat-simplifier-334de9d/sat-simplifier-final-inventory.json:22 new
+top-level groups,202 simplifier RUN/PASS each profile, full SAT1061 native/
+1063 debug, both vets and source audit0. Root master ^TestSAT native0(.475s),
+debug0(.503s), .cache/sat-simplifier-master-{native,debug}.log. Real three-route
+refusal sweeps inspect named Runtime/arena/cold owner + clause-owner bijection
+BEFORE disabling injection (debug41/52/31 refusals). No registry ownership,
+cloned resolvent, fake allocation ticket/free refusal or suppressed test.
+
+Completed source destructor Finalize precedes reverse member teardown; failed
+constructor unwinds only actual completed members. Source scoped cleanup and
+member finalization phase cursors preserve completed reads/actions after late
+guard refusal. Fresh and stopped lexical sort/report owners drain once; actual
+captured arena Words payload lifetime is checked at dereference. Dummy is
+explicit single borrowed actual tmp-clause allocator, not foreign registry
+discovery. All earlier copied child/default Run missing claims are superseded
+by these actual ordinary method bindings; global automatic diagnostic controls,
+TRACE/verbose, full solver construction/Check/search, real remaining storage
+accounting/offset topology and registered user-scope campaign remain OPEN.
+Inventory2102 units/677 APIs:30ported/181partial/1891unported. Params pyg kept
+partial alongside full broader consumer/global pipeline obligations.
+
+Container next source-first map corrected parent guessed test path: this
+checkout's registered SAT driver is src/test/sat_user_scope.cpp, not sat.cpp.
+Full42 ENSURE executions/168 generated clauses still require actual solver
+construction and Check/search; no credit from independent bounded fixtures.
+Default path can compose real existing owners, but owned model, watched_lt
+sort, user-scope GC/shrink and constructor/update/destructor remain genuine
+missing prerequisites. Optional MUS/parallel/extension are separate required
+source paths, never defaults to disable or fabricated success. Full patched
+solver/API/interpolation/numeric/PSC objective stays active unchanged.
+
+Root renewed the user's header policy: all27 changed Go files retain full
+repository-relative originating paths and MIT notices; current Go scan has no
+Microsoft copyright lines. All referenced header source paths exist. Fixed
+reference source content was not hashed. The full gate snapshot covers738 Go
+files, and a repeated byte comparison confirms no Go mutation during gates.
+
+Private next-family progress: arena generated-monomial provenance now follows
+the actual new-intern branch, preserving existing zero-reference caller-owned
+values. Charged pointer-free linear tags transfer authority only beside actual
+named raw slots;23 mixed linear refusal prefixes reach first success. Numeric
+received immutable18-file prerequisite02, not a master integration. Its genuine
+reference-vector retry RED exposed consumed DEC replay after a late Size guard;
+separate phase scalars now retain that source prefix. Runtime directory growth
+is audited by exact DirectoryBytes delta after all children refund, never an
+arbitrary budget tolerance. Whole Newton source destructor stops and explicit
+owning cleanup remain distinct; full family is not frozen yet.
+
+Container full-solver source-first API REDs exited1 in both registered-driver
+and independent16-clause-subset fixtures. Source ctor audit identified mandatory
+eager u_map<index_set>: outer capacity8 entries each placement-construct a real
+capacity8 nested table. memory_manager.h112–120 dealloc_vect destroys entries
+ascending; member destruction within each entry follows reverse declaration
+order. Failed alloc_vect has no completed wrapper destructor, so any Go owning
+abort must retain its actual construction prefix separately. These are private
+next-chunk prerequisites, not completed solver construction claims.
+
+Full simplifier master gates terminal GREEN, unchanged738 Go files verified:
+.cache/sat-simplifier-complete-go-hashes.json and
+.cache/sat-simplifier-complete-gates.json. Native exit0 in13.932s; complete
+g3checked,g3debug exit0 in753.006s, preserving original100-bit refinement and
+every reservation prefix. Both vets exit0 (1.471s/1.508s); source/no-generics
+audit exit0 in135.332s. Logs share
+.cache/sat-simplifier-complete-{native,debug,vet-native,vet-debug,source}.log.
+Header source paths/license/no-Microsoft scan and git diff --check passed.
+This coherent selected simplifier family is ready for a green commit; whole
+solver/API/interpolation/numeric/PSC obligations and unlimited goal remain open.
+
+Latest private Newton/arena handoff: prerequisite02 yields14 Newton native
+groups GREEN; sole-retain checked cleanup exposes genuine callee creation
+pending before last monomial-manager source DEC. Source finalization must stay
+literal. Only a concrete outcome from this core's actual callee invocation may
+authorize explicit owning abort of that named creation root; existing foreign
+pending is borrowed and must remain untouched. Sole-retain tests-first RED and
+immediate whole-graph/cause checks are required before private implementation
+and freeze. This is an open next-family issue, not part of master simplifier.

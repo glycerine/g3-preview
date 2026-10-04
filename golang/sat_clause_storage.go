@@ -190,7 +190,7 @@ func (a *satClauseAllocator) constructSpan(r satStoredClauseRef, id, n uint32, s
 			return e
 		}
 	}
-	if span.runtime == nil && uint64(len(span.literals)) < uint64(n) {
+	if span.runtime == nil && span.words == nil && uint64(len(span.literals)) < uint64(n) {
 		return arena.ErrBounds
 	}
 	for i := uint32(0); i < n; i++ {

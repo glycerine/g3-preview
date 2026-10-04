@@ -1,3 +1,4 @@
+// Source: src/util/heap.h; src/sat/sat_simplifier.cpp:875–919 and src/sat/sat_solver.h case_split_queue.
 // Licensed under the MIT license.
 package g3
 
@@ -7,6 +8,7 @@ import (
 )
 
 type satVarQueue struct {
+	literalSource     *satSimplifier
 	self              *satVarQueue
 	activity          *satActivityDomain
 	runtimeActivity   *satSolverRuntimeActivity
@@ -113,6 +115,17 @@ func (q *satVarQueue) Contains(v satBoolVar) bool {
 func (q *satVarQueue) lt(a, b int32) (bool, error) {
 	if a < 0 || b < 0 {
 		return false, arena.ErrBounds
+	}
+	if q.literalSource != nil {
+		x, e := q.literalSource.literalWeight(uint32(a))
+		if e != nil {
+			return false, e
+		}
+		y, e := q.literalSource.literalWeight(uint32(b))
+		if e != nil {
+			return false, e
+		}
+		return x < y, nil
 	}
 	x, e := q.getActivity(uint32(a))
 	if e != nil {
@@ -406,6 +419,7 @@ func (q *satVarQueue) Clone(b *arena.Budget) (*satVarQueue, error) {
 		return nil, e
 	}
 	v.runtimeActivity = q.runtimeActivity
+	v.literalSource = q.literalSource
 	n := uint64(cap(q.values)) * 4
 	if e = b.Reserve(n); e != nil {
 		v.Close()
@@ -435,6 +449,7 @@ func (q *satVarQueue) MoveClone(b *arena.Budget) (*satVarQueue, error) {
 		return nil, e
 	}
 	v.runtimeActivity = q.runtimeActivity
+	v.literalSource = q.literalSource
 	n := uint64(cap(q.values)+cap(q.indices)) * 4
 	if b != q.budget {
 		if e = b.Reserve(n); e != nil {

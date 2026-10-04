@@ -12,14 +12,29 @@ type satSolverLiteralSpan struct {
 	literals []satLiteral
 	runtime  *memory.Runtime
 	block    memory.Block
+	words    *arena.Words
+	payload  arena.VectorRef
 }
 
 func satConflictRuntimeSpan(c *satSolverRuntimeUintColumn) satSolverLiteralSpan {
 	return satSolverLiteralSpan{runtime: c.raw.runtime, block: c.raw.block}
 }
+
+// Captures the actual c_ptr payload; later growth never silently rebinds it.
+func satSimplifierCapturedSpan(s *satSolverLiteralStore, r satSolverLiteralListRef) (satSolverLiteralSpan, error) {
+	rec, e := s.record(r)
+	if e != nil {
+		return satSolverLiteralSpan{}, e
+	}
+	return satSolverLiteralSpan{words: s.words, payload: rec.payload}, nil
+}
 func (s satSolverLiteralSpan) literal(i uint32) (satLiteral, error) {
 	if s.runtime != nil {
 		v, e := satAssignmentReadWord(s.runtime, s.block, 8+4*uint64(i))
+		return satLiteral(v), e
+	}
+	if s.words != nil {
+		v, e := s.words.Read(s.payload, i)
 		return satLiteral(v), e
 	}
 	if uint64(i) >= uint64(cap(s.literals)) {
