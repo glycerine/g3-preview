@@ -205,7 +205,7 @@ func (m *MultivariatePolynomialCore) CleanupValue(p *Polynomial) error {
 	if l.deleteStage == 0 {
 		l.deleteStage = 1
 	}
-	e = m.deleteCore(*p)
+	e = m.deleteCoreMode(*p, true)
 	if !l.live {
 		*p = Polynomial{}
 	}

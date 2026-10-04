@@ -31,6 +31,23 @@ func (m *MultivariatePolynomialCore) cleanupCreation() error {
 			return e
 		}
 	}
+	if e := m.cleanupPendingCreation(); e != nil {
+		return e
+	}
+	// The actual singleton local acquired a reference before placement. Its
+	// unconsumed reference is a named owning-abort root, not a source destructor.
+	if m.singletonReference {
+		if e := m.monomials.DecRef(m.singletonMonomial); e != nil {
+			return e
+		}
+		m.singletonReference = false
+		m.singletonMonomial = Monomial{}
+	}
+	return nil
+}
+
+// Drain only the actual pending placement, excluding other lexical owners.
+func (m *MultivariatePolynomialCore) cleanupPendingCreation() error {
 	p := &m.pending
 	if p.value != (Polynomial{}) {
 		l, e := m.polynomialLocation(p.value)
@@ -97,15 +114,6 @@ func (m *MultivariatePolynomialCore) cleanupCreation() error {
 		}
 	}
 	*p = polynomialCreation{}
-	// The actual singleton local acquired a reference before placement. Its
-	// unconsumed reference is a named owning-abort root, not a source destructor.
-	if m.singletonReference {
-		if e := m.monomials.DecRef(m.singletonMonomial); e != nil {
-			return e
-		}
-		m.singletonReference = false
-		m.singletonMonomial = Monomial{}
-	}
 	return nil
 }
 func (m *MultivariatePolynomialCore) CleanupConstruction() error {

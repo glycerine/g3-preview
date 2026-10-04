@@ -16,6 +16,8 @@ type PolynomialInfo struct {
 	LexSorted          bool
 }
 type polynomialLocation struct {
+	monomialDropConsumed, monomialDropLast                               bool
+	monomialDropCause                                                    error
 	callback                                                             *PolynomialDeletionHandler
 	callbackCause                                                        error
 	callbackStarted, callbackInvoked                                     bool
@@ -265,9 +267,15 @@ func (m *MultivariatePolynomialCore) firstGreater(a, b Monomial) (bool, error) {
 	return ad > bd, e
 }
 func (m *MultivariatePolynomialCore) deleteCore(p Polynomial) error {
+	return m.deleteCoreMode(p, false)
+}
+func (m *MultivariatePolynomialCore) deleteCoreMode(p Polynomial, owning bool) error {
 	l, e := m.polynomialLocation(p)
 	if e != nil {
 		return e
+	}
+	if !owning && l.monomialDropCause != nil {
+		return l.monomialDropCause
 	}
 	if l.deleteStage == 0 {
 		if e = m.deletionCallbacks(p); e != nil {
@@ -301,9 +309,33 @@ func (m *MultivariatePolynomialCore) deleteCore(p Polynomial) error {
 			if e != nil {
 				return e
 			}
-			if e = m.monomials.DecRef(b); e != nil {
-				return e
+
+			if owning && l.monomialDropConsumed && l.monomialDropLast {
+				e = m.monomials.CleanupValue(&b)
+				if w := m.writeMonomial(p, i, b); w != nil {
+					return w
+				}
+				if e != nil {
+					return e
+				}
+			} else if !l.monomialDropConsumed {
+				outcome := monomialDecrementOutcome{}
+				if e = m.monomials.check(); e == nil {
+					e = m.monomials.decRefCoreOutcome(b, &outcome)
+				}
+				if outcome.written {
+					l.monomialDropConsumed = true
+					l.monomialDropLast = outcome.last
+				}
+				if e != nil {
+					if l.monomialDropCause == nil {
+						l.monomialDropCause = e
+					}
+					return e
+				}
 			}
+			l.monomialDropConsumed = false
+			l.monomialDropLast = false
 			l.deleteIndex++
 		}
 		l.deleteStage = 2

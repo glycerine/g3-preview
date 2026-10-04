@@ -174,11 +174,19 @@ func (m *MultivariatePolynomialManager) callerGuard() error {
 	return nil
 }
 func (m *MultivariatePolynomialManager) CloseChecked() error {
+	if m != nil && m.self == m && (m.derivative.active || m.derivativeHasOrphans()) {
+		return ErrPolynomialPending
+	}
 	if e := m.identity(); e != nil {
 		return e
 	}
 	if m.core != nil && m.core.translation.active {
 		return ErrPolynomialPending
+	}
+	if cap(m.derivative.orphans) > 0 {
+		if e := m.CleanupDerivative(); e != nil {
+			return e
+		}
 	}
 	if !m.closing {
 		if m.core != nil {

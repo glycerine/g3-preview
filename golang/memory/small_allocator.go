@@ -1,5 +1,5 @@
 // Licensed under the MIT license.
-// Source: src/util/small_object_allocator.h/.cpp; explicit scalar pointer codec.
+// Source: src/util/small_object_allocator.h; src/util/small_object_allocator.cpp; explicit scalar pointer codec.
 package memory
 
 import (

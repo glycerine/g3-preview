@@ -274,6 +274,15 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 		return Polynomial{}, ErrPolynomialPending
 	}
 	// Actual constructor start receipt, after the foreign pending guard.
+	if m.creationGeneration == ^uint64(0) {
+		return Polynomial{}, arena.ErrBounds
+	}
+	m.creationGeneration++
+	m.pending = polynomialCreation{generation: m.creationGeneration}
+	if m.derivativeOwner != nil && m.derivativeOwner.executing {
+		m.pending.derivativeParent = m.derivativeOwner
+		m.derivativeOwner.factoryGeneration = m.creationGeneration
+	}
 	m.pending.substitutionOwned = m.substitution.scope.executing
 	m.pending.translationOwned = m.translation.executing
 	requested := polynomialCodecBytes(n)
@@ -394,6 +403,9 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 	l.published = true
 	if m.translation.executing {
 		m.translation.freshResult = p
+	}
+	if m.pending.derivativeParent != nil && m.pending.derivativeParent.factoryGeneration == m.pending.generation {
+		m.pending.derivativeParent.factoryGeneration = 0
 	}
 	m.pending = polynomialCreation{}
 	m.live++

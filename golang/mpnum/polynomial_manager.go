@@ -29,6 +29,8 @@ type MultivariatePolynomialConfig struct {
 type polynomialCreation struct {
 	substitutionOwned bool
 	translationOwned  bool
+	generation        uint64
+	derivativeParent  *polynomialDerivativeScope
 	raw               memory.ObjectRef
 	value             Polynomial
 	requested, id     uint32
@@ -83,6 +85,8 @@ type MultivariatePolynomialCore struct {
 	ids                                                                                        utilid.Generator
 	polynomials                                                                                polynomialVector
 	locations                                                                                  []polynomialLocation
+	derivativeOwner                                                                            *polynomialDerivativeScope
+	creationGeneration                                                                         uint64
 	pending                                                                                    polynomialCreation
 	som, som2, cheap, cheap2                                                                   polynomialSOM
 	zero, unit                                                                                 Polynomial
@@ -530,10 +534,14 @@ func (m *MultivariatePolynomialCore) CloseChecked() error {
 		}
 	}
 	if m.monomialRetained {
-		if e := m.monomials.DecManagerRef(); e != nil {
+		before := m.monomials.managerRefs
+		e := m.monomials.DecManagerRef()
+		if m.monomials.managerRefs != before {
+			m.monomialRetained = false
+		}
+		if e != nil {
 			return e
 		}
-		m.monomialRetained = false
 	}
 	m.integer.budget.Release(uint64(cap(m.linearGenerated)))
 	m.linearGenerated = nil

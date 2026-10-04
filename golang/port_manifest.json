@@ -28475,7 +28475,11 @@
         "mpnum/polynomial_translate_source_test.go",
         "mpnum/polynomial_translate_imp_test.go",
         "mpnum/polynomial_lex_sort.go",
-        "mpnum/polynomial_lex_sort_test.go"
+        "mpnum/polynomial_lex_sort_test.go",
+        "mpnum/polynomial_derivative.go",
+        "mpnum/polynomial_rename.go",
+        "mpnum/polynomial_derivative_rename_test.go",
+        "mpnum/polynomial_unit_source_stop_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -28751,7 +28755,19 @@
         "TestPolynomialLexSortWrappedDegreeReachedBucket",
         "TestPolynomialLexSortActualBigCoefficientOwnership",
         "TestPolynomialTranslateImpEveryReservationAndLexSort",
-        "TestPolynomialTranslateImpArrayAndVectorFacade"
+        "TestPolynomialTranslateImpArrayAndVectorFacade",
+        "TestPolynomialDerivativeIndependentFiniteValue",
+        "TestPolynomialRenameAllDirectoryCellsAndFirstMaximum",
+        "TestPolynomialDerivativeModularZerosCreatedOnlyCohort",
+        "TestPolynomialDerivativeBorrowedZeroAndLaterActualINC",
+        "TestPolynomialDerivativeEveryReservationNamedPrefix",
+        "TestPolynomialRenameEveryReservationKeepsActualAllCells",
+        "TestPolynomialDerivativeFactoryReceiptPreservesLaterCaller",
+        "TestMonomialUnitConsumedDropSourceStopAndOwningAbort",
+        "TestPolynomialDerivativeNumericPendingIdentity",
+        "TestPolynomialDerivativeStoppedNumeralDestructorKeepsSourceCause",
+        "TestPolynomialDerivativePostphysicalAllocatorRootOwnedByOperation",
+        "TestMonomialUnitSourceStoppedCauseDoesNotRepeatDEC"
       ],
       "conditionals": [
         {
@@ -31248,6 +31264,25 @@
             "TestPolynomialLexSortActualBigCoefficientOwnership",
             "TestPolynomialTranslateImpEveryReservationAndLexSort"
           ]
+        },
+        {
+          "name": "Selected literal Derivative cpp4507-4528/7228-7229 and Rename cpp1464-1475/6070-6097/7356-7357, source numeral destruction and actual directory/maximal terms; exact operation-owned pending receipts and consumed DEC owning recovery, zero registered display-only driver assertion credit",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_derivative.go",
+          "tests": [
+            "TestPolynomialDerivativeIndependentFiniteValue",
+            "TestPolynomialRenameAllDirectoryCellsAndFirstMaximum",
+            "TestPolynomialDerivativeModularZerosCreatedOnlyCohort",
+            "TestPolynomialDerivativeBorrowedZeroAndLaterActualINC",
+            "TestPolynomialDerivativeEveryReservationNamedPrefix",
+            "TestPolynomialRenameEveryReservationKeepsActualAllCells",
+            "TestPolynomialDerivativeFactoryReceiptPreservesLaterCaller",
+            "TestMonomialUnitConsumedDropSourceStopAndOwningAbort",
+            "TestPolynomialDerivativeNumericPendingIdentity",
+            "TestPolynomialDerivativeStoppedNumeralDestructorKeepsSourceCause",
+            "TestPolynomialDerivativePostphysicalAllocatorRootOwnedByOperation",
+            "TestMonomialUnitSourceStoppedCauseDoesNotRepeatDEC"
+          ]
         }
       ],
       "ownership": [
@@ -31273,7 +31308,8 @@
         "One actual Runtime cap/size/unsigned degree vector with reflected charged cold owner and precise constructed/rawDestroyed/pending states. Failed ctor carrier rejects ordinary APIs, has no completed member destructor. Copy assignment frees old before replacement, stale pointer history is nonowning; actual returned pending blocks remain owning. Cold maps and their actual live/pending raw blocks are independently censused, including true BIG fresh-NULL reservation and stopped assignment constant branch.",
         "Selected constructor helper split preserves existing actual modular/default/body order; Runtime temporary placement records real returned raw blocks and reached header writes. No full imp constructor/destructor credit or fabricated sizeof allocation event.",
         "Skeleton entries/powers/originals use actual Runtime storage; failed constructor transfers actual unconsumed INC fields into charged cold owning-abort records before source backing free. Scoped pointer publications alone own concrete children; stopped source cause retained, separate owning cleanup. Variable helpers own two/one actual embedded uint vectors in one charged stable cold header, views/scopes borrow actual backing and references. Strong shared physical census names pseudo/Power/ExactDiv plus supplied headers/blocks without registry-derived ownership.",
-        "Translation uses the existing actual imp coefficient-buffer member. Named roots include actual child/raw/pending/old storage, retained NUM and exact generated monomial/factory generation; ordinary scope unwind precedes owning abort. Full owning Close rejects retained translation locals before child or caller teardown. Lex sort owns real Runtime bucket bindings and cold child directory plus permutation member; failed lower recursion preserves prior published term permutations. No registry-derived owning authority or native class allocation equivalence."
+        "Translation uses the existing actual imp coefficient-buffer member. Named roots include actual child/raw/pending/old storage, retained NUM and exact generated monomial/factory generation; ordinary scope unwind precedes owning abort. Full owning Close rejects retained translation locals before child or caller teardown. Lex sort owns real Runtime bucket bindings and cold child directory plus permutation member; failed lower recursion preserves prior published term permutations. No registry-derived owning authority or native class allocation equivalence.",
+        "Actual derivative n/a embedded full-manager scope and reverse source destruction; charged created-only monomial cohort never owns borrowed RC0. Exact executing factory generation/parent, numeric ObjectRef and allzero-before allocator pending triple receipts identify only reached failed callees. Source causes stay sticky, consumed drops/frees never replay, and owning cleanup leaves later caller replacements untouched. See PORT_PROGRESS.md."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -31402,7 +31438,11 @@
         "mpnum/polynomial_translate_source_test.go",
         "mpnum/polynomial_translate_imp_test.go",
         "mpnum/polynomial_lex_sort.go",
-        "mpnum/polynomial_lex_sort_test.go"
+        "mpnum/polynomial_lex_sort_test.go",
+        "mpnum/polynomial_derivative.go",
+        "mpnum/polynomial_rename.go",
+        "mpnum/polynomial_derivative_rename_test.go",
+        "mpnum/polynomial_unit_source_stop_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -31660,7 +31700,19 @@
         "TestPolynomialLexSortWrappedDegreeReachedBucket",
         "TestPolynomialLexSortActualBigCoefficientOwnership",
         "TestPolynomialTranslateImpEveryReservationAndLexSort",
-        "TestPolynomialTranslateImpArrayAndVectorFacade"
+        "TestPolynomialTranslateImpArrayAndVectorFacade",
+        "TestPolynomialDerivativeIndependentFiniteValue",
+        "TestPolynomialRenameAllDirectoryCellsAndFirstMaximum",
+        "TestPolynomialDerivativeModularZerosCreatedOnlyCohort",
+        "TestPolynomialDerivativeBorrowedZeroAndLaterActualINC",
+        "TestPolynomialDerivativeEveryReservationNamedPrefix",
+        "TestPolynomialRenameEveryReservationKeepsActualAllCells",
+        "TestPolynomialDerivativeFactoryReceiptPreservesLaterCaller",
+        "TestMonomialUnitConsumedDropSourceStopAndOwningAbort",
+        "TestPolynomialDerivativeNumericPendingIdentity",
+        "TestPolynomialDerivativeStoppedNumeralDestructorKeepsSourceCause",
+        "TestPolynomialDerivativePostphysicalAllocatorRootOwnedByOperation",
+        "TestMonomialUnitSourceStoppedCauseDoesNotRepeatDEC"
       ],
       "conditionals": [
         {
@@ -32869,6 +32921,25 @@
             "TestPolynomialLexSortActualBigCoefficientOwnership",
             "TestPolynomialTranslateImpEveryReservationAndLexSort"
           ]
+        },
+        {
+          "name": "Selected literal Derivative cpp4507-4528/7228-7229 and Rename cpp1464-1475/6070-6097/7356-7357, source numeral destruction and actual directory/maximal terms; exact operation-owned pending receipts and consumed DEC owning recovery, zero registered display-only driver assertion credit",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_derivative.go",
+          "tests": [
+            "TestPolynomialDerivativeIndependentFiniteValue",
+            "TestPolynomialRenameAllDirectoryCellsAndFirstMaximum",
+            "TestPolynomialDerivativeModularZerosCreatedOnlyCohort",
+            "TestPolynomialDerivativeBorrowedZeroAndLaterActualINC",
+            "TestPolynomialDerivativeEveryReservationNamedPrefix",
+            "TestPolynomialRenameEveryReservationKeepsActualAllCells",
+            "TestPolynomialDerivativeFactoryReceiptPreservesLaterCaller",
+            "TestMonomialUnitConsumedDropSourceStopAndOwningAbort",
+            "TestPolynomialDerivativeNumericPendingIdentity",
+            "TestPolynomialDerivativeStoppedNumeralDestructorKeepsSourceCause",
+            "TestPolynomialDerivativePostphysicalAllocatorRootOwnedByOperation",
+            "TestMonomialUnitSourceStoppedCauseDoesNotRepeatDEC"
+          ]
         }
       ],
       "ownership": [
@@ -32894,7 +32965,8 @@
         "One actual Runtime cap/size/unsigned degree vector with reflected charged cold owner and precise constructed/rawDestroyed/pending states. Failed ctor carrier rejects ordinary APIs, has no completed member destructor. Copy assignment frees old before replacement, stale pointer history is nonowning; actual returned pending blocks remain owning. Cold maps and their actual live/pending raw blocks are independently censused, including true BIG fresh-NULL reservation and stopped assignment constant branch.",
         "Selected constructor helper split preserves existing actual modular/default/body order; Runtime temporary placement records real returned raw blocks and reached header writes. No full imp constructor/destructor credit or fabricated sizeof allocation event.",
         "Skeleton entries/powers/originals use actual Runtime storage; failed constructor transfers actual unconsumed INC fields into charged cold owning-abort records before source backing free. Scoped pointer publications alone own concrete children; stopped source cause retained, separate owning cleanup. Variable helpers own two/one actual embedded uint vectors in one charged stable cold header, views/scopes borrow actual backing and references. Strong shared physical census names pseudo/Power/ExactDiv plus supplied headers/blocks without registry-derived ownership.",
-        "Translation uses the existing actual imp coefficient-buffer member. Named roots include actual child/raw/pending/old storage, retained NUM and exact generated monomial/factory generation; ordinary scope unwind precedes owning abort. Full owning Close rejects retained translation locals before child or caller teardown. Lex sort owns real Runtime bucket bindings and cold child directory plus permutation member; failed lower recursion preserves prior published term permutations. No registry-derived owning authority or native class allocation equivalence."
+        "Translation uses the existing actual imp coefficient-buffer member. Named roots include actual child/raw/pending/old storage, retained NUM and exact generated monomial/factory generation; ordinary scope unwind precedes owning abort. Full owning Close rejects retained translation locals before child or caller teardown. Lex sort owns real Runtime bucket bindings and cold child directory plus permutation member; failed lower recursion preserves prior published term permutations. No registry-derived owning authority or native class allocation equivalence.",
+        "Actual derivative n/a embedded full-manager scope and reverse source destruction; charged created-only monomial cohort never owns borrowed RC0. Exact executing factory generation/parent, numeric ObjectRef and allzero-before allocator pending triple receipts identify only reached failed callees. Source causes stay sticky, consumed drops/frees never replay, and owning cleanup leaves later caller replacements untouched. See PORT_PROGRESS.md."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -126407,7 +126479,9 @@
         "memory/uint32_codec.go",
         "memory/uint32_codec_test.go",
         "memory/release_progress.go",
-        "memory/release_progress_test.go"
+        "memory/release_progress_test.go",
+        "memory/small_allocator_pending_roots.go",
+        "memory/small_allocator_pending_roots_test.go"
       ],
       "tests": [
         "TestSmallBytesSourceExercise",
@@ -126468,7 +126542,8 @@
         "TestMemoryReleaseAuthorityPreservesDuplicatePoolAndCharges",
         "TestMemoryReleaseAuthorityRejectsForeignAndTamperedBinding",
         "TestMemoryOwningCleanupResumesBeforePhysicalFree",
-        "TestMemoryReleaseAuthorityPhysicalChargesWarmAndNamespace"
+        "TestMemoryReleaseAuthorityPhysicalChargesWarmAndNamespace",
+        "TestSmallAllocatorActualPendingRootsIdentityOnly"
       ],
       "conditionals": [
         {
@@ -126689,6 +126764,14 @@
             "TestMemoryOwningCleanupResumesBeforePhysicalFree",
             "TestMemoryReleaseAuthorityPhysicalChargesWarmAndNamespace"
           ]
+        },
+        {
+          "name": "Read-only checked Go PendingRoots diagnostic exposes actual pending allocation/two lexical roots during stopped cleanup; no source action/allocation/directory sweep or new source method completion",
+          "status": "partial",
+          "go_target": "memory/small_allocator_pending_roots.go",
+          "tests": [
+            "TestSmallAllocatorActualPendingRootsIdentityOnly"
+          ]
         }
       ],
       "ownership": [
@@ -126723,7 +126806,9 @@
         "memory/allocator_io.go",
         "memory/small_allocator_test.go",
         "memory/shared_runtime_api_test.go",
-        "util_memory_bridge_test.go"
+        "util_memory_bridge_test.go",
+        "memory/small_allocator_pending_roots.go",
+        "memory/small_allocator_pending_roots_test.go"
       ],
       "tests": [
         "TestSmallBytesSourceExercise",
@@ -126772,7 +126857,8 @@
         "TestMemoryBridgeColdHeadersAndConstructorUnwind",
         "TestMemoryBridgeNominalOOMAndCountErrors",
         "TestMemoryBridgeDefaultExceptionAndCopiedOwner",
-        "TestMemoryBridgePendingFinalizationRetainsAllHeaders"
+        "TestMemoryBridgePendingFinalizationRetainsAllHeaders",
+        "TestSmallAllocatorActualPendingRootsIdentityOnly"
       ],
       "conditionals": [
         {
@@ -126924,6 +127010,14 @@
             "TestSmallObjectAllocatorNullStaleIDErrorPrefixes",
             "TestSmallObjectAllocatorDiagnosticOutputFailureAfterFree",
             "TestSmallObjectAllocatorVerboseUsesRealRuntimeAndLexicalLifetime"
+          ]
+        },
+        {
+          "name": "Read-only checked Go PendingRoots diagnostic exposes actual pending allocation/two lexical roots during stopped cleanup; no source action/allocation/directory sweep or new source method completion",
+          "status": "partial",
+          "go_target": "memory/small_allocator_pending_roots.go",
+          "tests": [
+            "TestSmallAllocatorActualPendingRootsIdentityOnly"
           ]
         }
       ],

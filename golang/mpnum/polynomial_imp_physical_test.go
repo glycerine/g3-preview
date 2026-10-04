@@ -29,13 +29,22 @@ func polynomialImpPhysicalAuditValues(t *testing.T, full *MultivariatePolynomial
 		external = append(external, v.raw, v.pending, v.old)
 	}
 	adapterBytes := full.header + uint64(cap(full.lexBuckets.children))*uint64(reflect.TypeOf(polynomialVector{}).Size())
-	public := []*Int{}
+	public := []*Int{&full.derivative.n, &full.derivative.a}
+	adapterBytes += uint64(cap(full.derivative.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size())
 	if full.upm != nil {
 		u := full.upm
 		if len(u.store.backings) != 0 || len(u.pages) != 0 {
 			t.Fatal("constructor census requires fresh actual UP member")
 		}
-		adapterBytes += u.header + u.modular.header + u.store.header
+		if !u.closed {
+			adapterBytes += u.header
+		}
+		if !u.modular.closed {
+			adapterBytes += u.modular.header
+		}
+		if !u.store.closed {
+			adapterBytes += u.store.header
+		}
 	}
 	for i := range full.retirements {
 		r := &full.retirements[i]
@@ -351,6 +360,6 @@ func polynomialImpPhysicalAuditValues(t *testing.T, full *MultivariatePolynomial
 	}
 	bytes += extraBytes
 	if bytes != z.budget.Used() {
-		t.Fatal("actual charged headers and backings", bytes, z.budget.Used())
+		t.Fatalf("actual charged headers and backings %d/%d full%d core%d mm%d up%d/%d/%d extra%d mmbytes%d runtime%d qa%d monoalloc%d", bytes, z.budget.Used(), full.header, m.header, mm.header, full.upm.header, full.upm.modular.header, full.upm.store.header, extraBytes, mmBytes, m.memory.Stats().TotalBytes, q.headerBytes, ma.TotalBytes)
 	}
 }

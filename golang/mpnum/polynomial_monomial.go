@@ -32,6 +32,8 @@ type MonomialManagerConfig struct {
 	Profile   memory.SmallAllocatorProfile
 }
 type monomialLocation struct {
+	derivativeCohort                   *polynomialDerivativeScope
+	derivativeSlot                     uint32
 	unreferencedCohort                 *polynomialSubstitutionState
 	unreferencedSlot                   uint32
 	raw                                memory.ObjectRef
@@ -50,6 +52,8 @@ type monomialCreation struct {
 }
 type monomialPowerVector struct{ raw, pending memory.Block }
 type MonomialManager struct {
+	unitDropConsumed                                                          bool
+	unitDropCause                                                             error
 	continuationGeneration                                                    uint64
 	borrowedGeneration                                                        uint64
 	borrowedParent                                                            *MultivariatePolynomialCore
@@ -371,6 +375,12 @@ func (m *MonomialManager) incRefCore(a Monomial) error {
 		l.unreferencedCohort = nil
 		l.unreferencedSlot = 0
 	}
+
+	if d := l.derivativeCohort; d != nil && uint64(l.derivativeSlot) < uint64(len(d.orphans)) && d.orphans[l.derivativeSlot] == a {
+		d.orphans[l.derivativeSlot] = Monomial{}
+		l.derivativeCohort = nil
+		l.derivativeSlot = 0
+	}
 	return nil
 }
 func (m *MonomialManager) IncRef(a Monomial) error {
@@ -385,7 +395,11 @@ func (m *MonomialManager) DecRef(a Monomial) error {
 	}
 	return m.decRefCore(a)
 }
-func (m *MonomialManager) decRefCore(a Monomial) error {
+
+type monomialDecrementOutcome struct{ written, last bool }
+
+func (m *MonomialManager) decRefCore(a Monomial) error { return m.decRefCoreOutcome(a, nil) }
+func (m *MonomialManager) decRefCoreOutcome(a Monomial, out *monomialDecrementOutcome) error {
 	l, e := m.location(a)
 	if e != nil {
 		return e
@@ -403,6 +417,10 @@ func (m *MonomialManager) decRefCore(a Monomial) error {
 	n--
 	if e = m.allocator.WriteUint32(l.raw, 0, n); e != nil {
 		return e
+	}
+	if out != nil {
+		out.written = true
+		out.last = n == 0
 	}
 	if n == 0 {
 		return m.deleteCore(a, l)

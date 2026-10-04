@@ -60,7 +60,16 @@ func (m *MonomialManager) SourceFinalize() error {
 	}
 	m.sourceFinalizing = true
 	if m.sourceStage == 0 {
-		if e := m.decRefCore(m.unit); e != nil {
+		if m.unitDropCause != nil {
+			return m.unitDropCause
+		}
+		out := monomialDecrementOutcome{}
+		e := m.decRefCoreOutcome(m.unit, &out)
+		if out.written && out.last {
+			m.unitDropConsumed = true
+		}
+		if e != nil {
+			m.unitDropCause = e
 			return e
 		}
 		m.unit = Monomial{}
@@ -172,6 +181,11 @@ func (m *MonomialManager) CleanupValue(a *Monomial) error {
 		m.publishedObjects--
 		l.published = false
 	}
+	if d := l.derivativeCohort; d != nil && uint64(l.derivativeSlot) < uint64(len(d.orphans)) && d.orphans[l.derivativeSlot] == *a {
+		d.orphans[l.derivativeSlot] = Monomial{}
+	}
+	l.derivativeCohort = nil
+	l.derivativeSlot = 0
 	l.live = false
 	*a = Monomial{}
 	return nil
@@ -219,7 +233,7 @@ func (m *MonomialManager) CloseChecked() error {
 		if e != nil {
 			return e
 		}
-		if l.stage != 0 || m.originalCause != nil {
+		if l.stage != 0 || m.unitDropConsumed || m.originalCause != nil {
 			if e = m.CleanupValue(&m.unit); e != nil {
 				return e
 			}
