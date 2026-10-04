@@ -66,6 +66,7 @@ type SmallAllocator struct {
 	destructorDone                      bool
 	cleanupChunksNeeded                 bool
 	nextReleaseSerial                   uint64
+	rawRelease                          rawAllocatorReleaseState
 }
 type AllocatorStats struct {
 	OwnerBytes, LocationBytes, TotalBytes uint64
@@ -114,6 +115,9 @@ func (a *SmallAllocator) open() error {
 	}
 	if a.closed || a.destructorDone {
 		return arena.ErrClosed
+	}
+	if a.rawRelease.active {
+		return ErrAllocatorPending
 	}
 	return a.config.Runtime.open()
 }
@@ -570,6 +574,9 @@ func (a *SmallAllocator) Close() error {
 	}
 	if e := a.config.Runtime.open(); e != nil {
 		return e
+	}
+	if a.rawRelease.active {
+		return ErrAllocatorPending
 	}
 	var e error
 	if !a.destructorDone {

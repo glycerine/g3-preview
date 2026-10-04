@@ -101771,7 +101771,9 @@
         "util_fixed_bit_vector_runtime_registered_test.go",
         "util_fixed_bit_vector_runtime_source_test.go",
         "util_fixed_bit_vector_runtime_lifetime_test.go",
-        "util_fixed_bit_vector_runtime_view_test.go"
+        "util_fixed_bit_vector_runtime_view_test.go",
+        "util_fixed_bit_vector_runtime_deallocation.go",
+        "util_fixed_bit_vector_runtime_deallocation_test.go"
       ],
       "tests": [
         "TestFixedSourceTst1",
@@ -101803,7 +101805,12 @@
         "TestFixedBitVectorRuntimeForeignInlineFillInitializesActualBytes",
         "TestFixedBitVectorRuntimeForeignInlinePartialCopyByteInitialization",
         "TestFixedBitVectorRuntimeCapturedDirectViewAfterDonorClose",
-        "TestFixedBitVectorRuntimeRawAddressIdentityBeforePayloadReads"
+        "TestFixedBitVectorRuntimeRawAddressIdentityBeforePayloadReads",
+        "TestFixedBitVectorRuntimeForeignDirectReceiverDeallocation",
+        "TestFixedBitVectorRuntimeForeignPostPhysicalReleaseReceipt",
+        "TestFixedBitVectorRuntimeForeignDirectDeallocationAfterDonorClose",
+        "TestFixedBitVectorRuntimeStoppedRawInvocationExplicitOwningAbort",
+        "TestFixedBitVectorRuntimeHeaderlessRawAbortRetainsCallerAllocation"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -101899,7 +101906,7 @@
           ]
         },
         {
-          "name": "Concrete Runtime fixed-bit-vector selected source bodies, reached receiver word/byte loops, raw address equality, actual cold m0 and source allocator destruction; foreign raw-pointer deallocation still OPEN",
+          "name": "Concrete Runtime fixed-bit-vector selected source bodies, reached receiver word/byte loops, raw address equality, actual cold m0 and source allocator destruction; foreign raw-pointer deallocation covered by subsequent DeallocateView evidence",
           "status": "partial",
           "go_target": "util_fixed_bit_vector_runtime.go",
           "tests": [
@@ -101926,14 +101933,28 @@
             "TestFixedBitVectorRuntimeCapturedDirectViewAfterDonorClose",
             "TestFixedBitVectorRuntimeRawAddressIdentityBeforePayloadReads"
           ]
+        },
+        {
+          "name": "Source deallocate cpp78-80 concrete receiver-count/raw-pointer DeallocateView and explicit stopped own cleanup",
+          "status": "partial",
+          "go_target": "util_fixed_bit_vector_runtime_deallocation.go",
+          "tests": [
+            "TestFixedBitVectorRuntimeForeignDirectReceiverDeallocation",
+            "TestFixedBitVectorRuntimeForeignPostPhysicalReleaseReceipt",
+            "TestFixedBitVectorRuntimeForeignDirectDeallocationAfterDonorClose",
+            "TestFixedBitVectorRuntimeStoppedRawInvocationExplicitOwningAbort",
+            "TestFixedBitVectorRuntimeHeaderlessRawAbortRetainsCallerAllocation"
+          ]
         }
       ],
       "ownership": [
         "Manager owns pooled fixed-width word descriptors and embedded zero root. Explicit Clone/Assign/Deallocate/Reset/Close. Source allocator replaced by arena; full named method ledger is in PORT_PROGRESS.md#audit-bitset-port-status-md.",
-        "Actual Runtime unsigned payload; scalar checked location/provenance acquired on allocation, concrete nonowning operand views and raw captured Runtime/block/offset lifetime. Inline cold m0 has actual per-byte initialization mask; no shadow arrays. Explicit direct caller allocations outlive allocator destruction, pooled chunks do not. Source destructor keeps first stop; explicit owning abort uses actual child pending/cursor/completed receipt, not statistics or registry-derived authority."
+        "Actual Runtime unsigned payload; scalar checked location/provenance acquired on allocation, concrete nonowning operand views and raw captured Runtime/block/offset lifetime. Inline cold m0 has actual per-byte initialization mask; no shadow arrays. Explicit direct caller allocations outlive allocator destruction, pooled chunks do not. Source destructor keeps first stop; explicit owning abort uses actual child pending/cursor/completed receipt, not statistics or registry-derived authority.",
+        "Supplied Runtime/block/offset is a borrowed source address; receiver counter/class/freelist selects actions, no donor chunk adoption. Actual pointer codec sidecars belong to receiver, donor payload/page remains caller-owned. Exact raw invocation serial/stage/count and matching active ObjectRef release guard prevent duplicate owning continuation. SourceFinalize stays sticky; only explicit CleanupStopped discards the current stopped invocation via AbortRawInvocation, preserving source count/history and all donor/provider data."
       ],
       "deviations": [
-        "Registered62 dynamic assertions and24 new total Runtime/hash groups cover selected profiles and every real reservation prefix. Existing checked Deallocate handles originating manager only. Source-defined foreign direct and pooled pointer deallocation, receiver counter/borrowed freelist behavior require an actual allocator raw facade and remain OPEN; ReleaseDirect is caller raw Runtime action, not a replacement for manager deallocate. Native pointer/ABI/global assertions/TRACE/ostream and remaining lifetime domains remain partial."
+        "Registered62 dynamic assertions and24 new total Runtime/hash groups cover selected profiles and every real reservation prefix. Existing checked Deallocate handles originating manager only. Source-defined foreign direct and pooled pointer deallocation and receiver counter/borrowed freelist behavior are covered by the subsequent raw facade evidence for its selected Runtime profiles; ReleaseDirect is caller raw Runtime action, not a replacement for manager deallocate. Native pointer/ABI/global assertions/TRACE/ostream and remaining lifetime domains remain partial.",
+        "Same Runtime provider/profile only; source global allocator and native pointer ABI remain open. SizeT32 truncation beforezero/bypass fixed in raw overload; existing generic ObjectRef size preflight remains partial. Raw retry is an explicit Go continuation, not native exception resumption. Actual public pool metadata refusal/ownabort proof preserves donor/caller roots; headerless wrapped realloc is guarded source-undefined domain only. Direct release stage2-to-physical has no fallible point, no fabricated failure credit. Whole units remain partial."
       ]
     },
     {
@@ -101949,7 +101970,9 @@
         "util_fixed_bit_vector_runtime_registered_test.go",
         "util_fixed_bit_vector_runtime_source_test.go",
         "util_fixed_bit_vector_runtime_lifetime_test.go",
-        "util_fixed_bit_vector_runtime_view_test.go"
+        "util_fixed_bit_vector_runtime_view_test.go",
+        "util_fixed_bit_vector_runtime_deallocation.go",
+        "util_fixed_bit_vector_runtime_deallocation_test.go"
       ],
       "tests": [
         "TestFixedSourceTst1",
@@ -101981,7 +102004,12 @@
         "TestFixedBitVectorRuntimeForeignInlineFillInitializesActualBytes",
         "TestFixedBitVectorRuntimeForeignInlinePartialCopyByteInitialization",
         "TestFixedBitVectorRuntimeCapturedDirectViewAfterDonorClose",
-        "TestFixedBitVectorRuntimeRawAddressIdentityBeforePayloadReads"
+        "TestFixedBitVectorRuntimeRawAddressIdentityBeforePayloadReads",
+        "TestFixedBitVectorRuntimeForeignDirectReceiverDeallocation",
+        "TestFixedBitVectorRuntimeForeignPostPhysicalReleaseReceipt",
+        "TestFixedBitVectorRuntimeForeignDirectDeallocationAfterDonorClose",
+        "TestFixedBitVectorRuntimeStoppedRawInvocationExplicitOwningAbort",
+        "TestFixedBitVectorRuntimeHeaderlessRawAbortRetainsCallerAllocation"
       ],
       "conditionals": [
         {
@@ -102105,7 +102133,7 @@
           ]
         },
         {
-          "name": "Concrete Runtime fixed-bit-vector selected source bodies, reached receiver word/byte loops, raw address equality, actual cold m0 and source allocator destruction; foreign raw-pointer deallocation still OPEN",
+          "name": "Concrete Runtime fixed-bit-vector selected source bodies, reached receiver word/byte loops, raw address equality, actual cold m0 and source allocator destruction; foreign raw-pointer deallocation covered by subsequent DeallocateView evidence",
           "status": "partial",
           "go_target": "util_fixed_bit_vector_runtime.go",
           "tests": [
@@ -102132,14 +102160,28 @@
             "TestFixedBitVectorRuntimeCapturedDirectViewAfterDonorClose",
             "TestFixedBitVectorRuntimeRawAddressIdentityBeforePayloadReads"
           ]
+        },
+        {
+          "name": "Source deallocate cpp78-80 concrete receiver-count/raw-pointer DeallocateView and explicit stopped own cleanup",
+          "status": "partial",
+          "go_target": "util_fixed_bit_vector_runtime_deallocation.go",
+          "tests": [
+            "TestFixedBitVectorRuntimeForeignDirectReceiverDeallocation",
+            "TestFixedBitVectorRuntimeForeignPostPhysicalReleaseReceipt",
+            "TestFixedBitVectorRuntimeForeignDirectDeallocationAfterDonorClose",
+            "TestFixedBitVectorRuntimeStoppedRawInvocationExplicitOwningAbort",
+            "TestFixedBitVectorRuntimeHeaderlessRawAbortRetainsCallerAllocation"
+          ]
         }
       ],
       "ownership": [
         "Manager owns pooled fixed-width word descriptors and embedded zero root. Explicit Clone/Assign/Deallocate/Reset/Close. Source allocator replaced by arena; full named method ledger is in PORT_PROGRESS.md#audit-bitset-port-status-md.",
-        "Actual Runtime unsigned payload; scalar checked location/provenance acquired on allocation, concrete nonowning operand views and raw captured Runtime/block/offset lifetime. Inline cold m0 has actual per-byte initialization mask; no shadow arrays. Explicit direct caller allocations outlive allocator destruction, pooled chunks do not. Source destructor keeps first stop; explicit owning abort uses actual child pending/cursor/completed receipt, not statistics or registry-derived authority."
+        "Actual Runtime unsigned payload; scalar checked location/provenance acquired on allocation, concrete nonowning operand views and raw captured Runtime/block/offset lifetime. Inline cold m0 has actual per-byte initialization mask; no shadow arrays. Explicit direct caller allocations outlive allocator destruction, pooled chunks do not. Source destructor keeps first stop; explicit owning abort uses actual child pending/cursor/completed receipt, not statistics or registry-derived authority.",
+        "Supplied Runtime/block/offset is a borrowed source address; receiver counter/class/freelist selects actions, no donor chunk adoption. Actual pointer codec sidecars belong to receiver, donor payload/page remains caller-owned. Exact raw invocation serial/stage/count and matching active ObjectRef release guard prevent duplicate owning continuation. SourceFinalize stays sticky; only explicit CleanupStopped discards the current stopped invocation via AbortRawInvocation, preserving source count/history and all donor/provider data."
       ],
       "deviations": [
-        "Registered62 dynamic assertions and24 new total Runtime/hash groups cover selected profiles and every real reservation prefix. Existing checked Deallocate handles originating manager only. Source-defined foreign direct and pooled pointer deallocation, receiver counter/borrowed freelist behavior require an actual allocator raw facade and remain OPEN; ReleaseDirect is caller raw Runtime action, not a replacement for manager deallocate. Native pointer/ABI/global assertions/TRACE/ostream and remaining lifetime domains remain partial."
+        "Registered62 dynamic assertions and24 new total Runtime/hash groups cover selected profiles and every real reservation prefix. Existing checked Deallocate handles originating manager only. Source-defined foreign direct and pooled pointer deallocation and receiver counter/borrowed freelist behavior are covered by the subsequent raw facade evidence for its selected Runtime profiles; ReleaseDirect is caller raw Runtime action, not a replacement for manager deallocate. Native pointer/ABI/global assertions/TRACE/ostream and remaining lifetime domains remain partial.",
+        "Same Runtime provider/profile only; source global allocator and native pointer ABI remain open. SizeT32 truncation beforezero/bypass fixed in raw overload; existing generic ObjectRef size preflight remains partial. Raw retry is an explicit Go continuation, not native exception resumption. Actual public pool metadata refusal/ownabort proof preserves donor/caller roots; headerless wrapped realloc is guarded source-undefined domain only. Direct release stage2-to-physical has no fallible point, no fabricated failure credit. Whole units remain partial."
       ]
     },
     {
@@ -128174,7 +128216,9 @@
         "memory/release_progress.go",
         "memory/release_progress_test.go",
         "memory/small_allocator_pending_roots.go",
-        "memory/small_allocator_pending_roots_test.go"
+        "memory/small_allocator_pending_roots_test.go",
+        "memory/small_allocator_raw.go",
+        "memory/small_allocator_raw_test.go"
       ],
       "tests": [
         "TestSmallBytesSourceExercise",
@@ -128236,7 +128280,15 @@
         "TestMemoryReleaseAuthorityRejectsForeignAndTamperedBinding",
         "TestMemoryOwningCleanupResumesBeforePhysicalFree",
         "TestMemoryReleaseAuthorityPhysicalChargesWarmAndNamespace",
-        "TestSmallAllocatorActualPendingRootsIdentityOnly"
+        "TestSmallAllocatorActualPendingRootsIdentityOnly",
+        "TestSmallAllocatorRawForeignDirectSourceCounters",
+        "TestSmallAllocatorRawReceiverAssertionAndReleaseWrap",
+        "TestSmallAllocatorRawForeignPooledReuseAndResetLifetime",
+        "TestSmallAllocatorRawForeignPooledEverySidecarRefusal",
+        "TestSmallAllocatorRawForeignPooledWarmPointerCodec",
+        "TestSmallAllocatorRawActualSizeTEntryBeforeZeroAndBypass",
+        "TestSmallAllocatorRawUnrelatedReleasePreservesPendingAllocation",
+        "TestSmallAllocatorRawSamePendingReleaseReceiptBeforeSubtraction"
       ],
       "conditionals": [
         {
@@ -128465,6 +128517,21 @@
           "tests": [
             "TestSmallAllocatorActualPendingRootsIdentityOnly"
           ]
+        },
+        {
+          "name": "Selected raw deallocate cpp72-96 size_t entry/zero/debug bypass/receiver subtraction/direct free/foreign pooled nextword-head publication and actual owning invocation abort",
+          "status": "partial",
+          "go_target": "memory/small_allocator_raw.go",
+          "tests": [
+            "TestSmallAllocatorRawForeignDirectSourceCounters",
+            "TestSmallAllocatorRawReceiverAssertionAndReleaseWrap",
+            "TestSmallAllocatorRawForeignPooledReuseAndResetLifetime",
+            "TestSmallAllocatorRawForeignPooledEverySidecarRefusal",
+            "TestSmallAllocatorRawForeignPooledWarmPointerCodec",
+            "TestSmallAllocatorRawActualSizeTEntryBeforeZeroAndBypass",
+            "TestSmallAllocatorRawUnrelatedReleasePreservesPendingAllocation",
+            "TestSmallAllocatorRawSamePendingReleaseReceiptBeforeSubtraction"
+          ]
         }
       ],
       "ownership": [
@@ -128472,7 +128539,8 @@
         "Standalone concrete source allocator uses actual utilMemoryRuntime blocks and intrusive payload links. Full cold locator capacity and owner headers are charged; explicit pending/chunk cleanup retains actual failed-free roots. Direct blocks remain caller-owned across Reset and Close. See PORT_PROGRESS.md#audit-small-object-allocator-packet-md; typed numerical/solver allocator integration remains open.",
         "The sole allocator core now lives in memory.SmallAllocator over one actual borrowed memory.Runtime. Main wrappers separately charge their real wrapper/IO headers and retain them until pending roots finalize; genuine borrowed CString/NumericTextStream formatting remains in main. All41 original accounting/runtime/allocator test names are retained across packages; no solver/numeric backend wiring is claimed. See PORT_PROGRESS.md#audit-memory-package-api-packet-md.",
         "Word codecs read/write the sole actual initialized backing with no allocations or counter events. Allocator word APIs retain requested bounds; ObjectExtent exposes actual rounded/direct physical span with live owner/generation guards. See PORT_PROGRESS.md#audit-memory-uint32-codec-port-status-md.",
-        "Persistent pointer-free release stages/serials are part of the charged actual runtime/location directories. Public flags are observational; bound private owner/ref/serial resolves the retained stage. Physical-completed frees are never replayed. Original successful pooled duplicate free retains source requested subtraction/self-link."
+        "Persistent pointer-free release stages/serials are part of the charged actual runtime/location directories. Public flags are observational; bound private owner/ref/serial resolves the retained stage. Physical-completed frees are never replayed. Original successful pooled duplicate free retains source requested subtraction/self-link.",
+        "Supplied Runtime/block/offset is a borrowed source address; receiver counter/class/freelist selects actions, no donor chunk adoption. Actual pointer codec sidecars belong to receiver, donor payload/page remains caller-owned. Exact raw invocation serial/stage/count and matching active ObjectRef release guard prevent duplicate owning continuation. SourceFinalize stays sticky; only explicit CleanupStopped discards the current stopped invocation via AbortRawInvocation, preserving source count/history and all donor/provider data."
       ],
       "deviations": [
         "Reset/Close reclaim tracked live direct blocks as explicit typed owner cleanup extension; source only frees pooled chunks.",
@@ -128480,7 +128548,8 @@
         "Storage limits checked before publication; invalid size/generation diagnosed.",
         "Standalone deterministic scalar address codec and external sort adapter preserve source scan/relink order without claiming native pointer placements. Borrowed explicit diagnostic streams model selected bytes/state; global runtime/ostream wiring remains open. Legacy arena/small_bytes is a separate storage adapter with its recorded extensions.",
         "Explicit LE word codecs are a Go source-storage adapter, not an additional C++ allocator algorithm. MPZ backend typed accesses must bound against actual object extent; this prerequisite does not complete MPZ/Natural backing or tracked release/global lifecycle.",
-        "Ordinary retry of an interrupted beforefree invocation resumes its real retained phase; explicit CompleteRelease can acknowledge afterfree failure without counter repair. This is a Go owning cleanup adapter to bounded source-undefined signed-overflow domains, not a C++ exception recovery claim. Actual MPZ/Natural and transitive numerical failure owners remain required."
+        "Ordinary retry of an interrupted beforefree invocation resumes its real retained phase; explicit CompleteRelease can acknowledge afterfree failure without counter repair. This is a Go owning cleanup adapter to bounded source-undefined signed-overflow domains, not a C++ exception recovery claim. Actual MPZ/Natural and transitive numerical failure owners remain required.",
+        "Same Runtime provider/profile only; source global allocator and native pointer ABI remain open. SizeT32 truncation beforezero/bypass fixed in raw overload; existing generic ObjectRef size preflight remains partial. Raw retry is an explicit Go continuation, not native exception resumption. Actual public pool metadata refusal/ownabort proof preserves donor/caller roots; headerless wrapped realloc is guarded source-undefined domain only. Direct release stage2-to-physical has no fallible point, no fabricated failure credit. Whole units remain partial."
       ]
     },
     {
@@ -128501,7 +128570,9 @@
         "memory/shared_runtime_api_test.go",
         "util_memory_bridge_test.go",
         "memory/small_allocator_pending_roots.go",
-        "memory/small_allocator_pending_roots_test.go"
+        "memory/small_allocator_pending_roots_test.go",
+        "memory/small_allocator_raw.go",
+        "memory/small_allocator_raw_test.go"
       ],
       "tests": [
         "TestSmallBytesSourceExercise",
@@ -128551,7 +128622,15 @@
         "TestMemoryBridgeNominalOOMAndCountErrors",
         "TestMemoryBridgeDefaultExceptionAndCopiedOwner",
         "TestMemoryBridgePendingFinalizationRetainsAllHeaders",
-        "TestSmallAllocatorActualPendingRootsIdentityOnly"
+        "TestSmallAllocatorActualPendingRootsIdentityOnly",
+        "TestSmallAllocatorRawForeignDirectSourceCounters",
+        "TestSmallAllocatorRawReceiverAssertionAndReleaseWrap",
+        "TestSmallAllocatorRawForeignPooledReuseAndResetLifetime",
+        "TestSmallAllocatorRawForeignPooledEverySidecarRefusal",
+        "TestSmallAllocatorRawForeignPooledWarmPointerCodec",
+        "TestSmallAllocatorRawActualSizeTEntryBeforeZeroAndBypass",
+        "TestSmallAllocatorRawUnrelatedReleasePreservesPendingAllocation",
+        "TestSmallAllocatorRawSamePendingReleaseReceiptBeforeSubtraction"
       ],
       "conditionals": [
         {
@@ -128712,18 +128791,35 @@
           "tests": [
             "TestSmallAllocatorActualPendingRootsIdentityOnly"
           ]
+        },
+        {
+          "name": "Selected raw deallocate cpp72-96 size_t entry/zero/debug bypass/receiver subtraction/direct free/foreign pooled nextword-head publication and actual owning invocation abort",
+          "status": "partial",
+          "go_target": "memory/small_allocator_raw.go",
+          "tests": [
+            "TestSmallAllocatorRawForeignDirectSourceCounters",
+            "TestSmallAllocatorRawReceiverAssertionAndReleaseWrap",
+            "TestSmallAllocatorRawForeignPooledReuseAndResetLifetime",
+            "TestSmallAllocatorRawForeignPooledEverySidecarRefusal",
+            "TestSmallAllocatorRawForeignPooledWarmPointerCodec",
+            "TestSmallAllocatorRawActualSizeTEntryBeforeZeroAndBypass",
+            "TestSmallAllocatorRawUnrelatedReleasePreservesPendingAllocation",
+            "TestSmallAllocatorRawSamePendingReleaseReceiptBeforeSubtraction"
+          ]
         }
       ],
       "ownership": [
         "Concrete byte owner with scalar descriptors/generation ledger. Caller destroys logical objects before storage reset/free. Budgeted backing/metadata, cold header charged by arena. DirectOnly translates the diagnostic bypass with zero source counter and separate measured owned bytes. See PORT_PROGRESS.md#audit-arena-port-status-md.",
         "Standalone concrete source allocator uses actual utilMemoryRuntime blocks and intrusive payload links. Full cold locator capacity and owner headers are charged; explicit pending/chunk cleanup retains actual failed-free roots. Direct blocks remain caller-owned across Reset and Close. See PORT_PROGRESS.md#audit-small-object-allocator-packet-md; typed numerical/solver allocator integration remains open.",
-        "The sole allocator core now lives in memory.SmallAllocator over one actual borrowed memory.Runtime. Main wrappers separately charge their real wrapper/IO headers and retain them until pending roots finalize; genuine borrowed CString/NumericTextStream formatting remains in main. All41 original accounting/runtime/allocator test names are retained across packages; no solver/numeric backend wiring is claimed. See PORT_PROGRESS.md#audit-memory-package-api-packet-md."
+        "The sole allocator core now lives in memory.SmallAllocator over one actual borrowed memory.Runtime. Main wrappers separately charge their real wrapper/IO headers and retain them until pending roots finalize; genuine borrowed CString/NumericTextStream formatting remains in main. All41 original accounting/runtime/allocator test names are retained across packages; no solver/numeric backend wiring is claimed. See PORT_PROGRESS.md#audit-memory-package-api-packet-md.",
+        "Supplied Runtime/block/offset is a borrowed source address; receiver counter/class/freelist selects actions, no donor chunk adoption. Actual pointer codec sidecars belong to receiver, donor payload/page remains caller-owned. Exact raw invocation serial/stage/count and matching active ObjectRef release guard prevent duplicate owning continuation. SourceFinalize stays sticky; only explicit CleanupStopped discards the current stopped invocation via AbortRawInvocation, preserving source count/history and all donor/provider data."
       ],
       "deviations": [
         "Reset/Close reclaim tracked live direct blocks as explicit typed owner cleanup extension; source only frees pooled chunks.",
         "Conceptual chunk/block indices replace machine addresses for sorting; source strict endpoint/floor-count retention quirk preserved.",
         "Storage limits checked before publication; invalid size/generation diagnosed.",
-        "Standalone deterministic scalar address codec and external sort adapter preserve source scan/relink order without claiming native pointer placements. Borrowed explicit diagnostic streams model selected bytes/state; global runtime/ostream wiring remains open. Legacy arena/small_bytes is a separate storage adapter with its recorded extensions."
+        "Standalone deterministic scalar address codec and external sort adapter preserve source scan/relink order without claiming native pointer placements. Borrowed explicit diagnostic streams model selected bytes/state; global runtime/ostream wiring remains open. Legacy arena/small_bytes is a separate storage adapter with its recorded extensions.",
+        "Same Runtime provider/profile only; source global allocator and native pointer ABI remain open. SizeT32 truncation beforezero/bypass fixed in raw overload; existing generic ObjectRef size preflight remains partial. Raw retry is an explicit Go continuation, not native exception resumption. Actual public pool metadata refusal/ownabort proof preserves donor/caller roots; headerless wrapped realloc is guarded source-undefined domain only. Direct release stage2-to-physical has no fallible point, no fabricated failure credit. Whole units remain partial."
       ]
     },
     {

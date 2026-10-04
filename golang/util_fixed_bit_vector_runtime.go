@@ -337,6 +337,11 @@ func (m *RuntimeFixedBitVectorManager) CleanupStopped() error {
 	if m.closed {
 		return nil
 	}
+	// A stopped raw invocation borrows its caller's pointer. Acknowledge only
+	// this receiver's metadata, preserving source count/stage/cause and donor.
+	if _, _, e := m.allocator.AbortRawInvocation(); e != nil {
+		return errors.Join(m.sourceStop, e)
+	}
 	// Abort only the actual retained pending fields before asking the child for
 	// its idempotent completed destructor receipt. CleanupPending is identity-only
 	// and remains defined after source destructorDone; CleanupChunks is not.
