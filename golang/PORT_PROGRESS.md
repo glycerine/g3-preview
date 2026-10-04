@@ -24978,3 +24978,100 @@ skipped or truncated. Source completion counts are unchanged at28ported,
 Earlier running observations are superseded by these final results. The ready
 seven-file GC family stays private until this coherent header commit completes;
 polynomial/SCC implementation and the full-fork objective remain active.
+
+
+### GC/restart/init_search exact integration and final gates
+
+After clean green header commit `f7f77bd`, the frozen seven-file family was
+Go-byte verified and copied exactly from `.cache/work/sat-gc-0452978`.
+Only existing Go edit is the lifecycle's charged gcContinuation pointer,
+stopped-publication guard and owning Close drain; six source/test files are new.
+The master focused combined GC/cleaner/conflict suites are terminal0 in
+`.cache/sat-gc-master-{native,debug}.log`, with main0.040s/0.043s. Native full
+and both complete vet profiles are terminal0; checked/debug and source audit
+are running on the frozen699-Go-file tree recorded in
+`.cache/sat-gc-final-go-hashes.json`. Exact final result files are
+`.cache/sat-gc-final-{native,debug,vet-native,vet-debug,source}.log`.
+
+Source maps: src/sat/sat_solver.cpp1169–1190 init_search,
+1347–1373 restart,1378–1509 GC dispatch/all four stable sort policies/half-delete,
+1481–1487 save_psm,1518–1670 dynamic GC/reactivation/PSM;
+sat_solver.h380–389 can_delete; src/util/luby.cpp21–31 complete get_luby
+and luby.h declaration. The Luby utility has no owning fields or payload;
+actual float log/floor/equality/pow and uint32 wrapping are translated, with
+undefined unsigned-conversion guards at the reached cast. Literal UINT_MAX
+wraps i+1 to zero, reaches log0/equality/pow(-Inf), and returns0. Both source
+utility units have complete selected method/ownership audit; SAT remains
+partial with full constructor/search/Check and enabled diagnostics open.
+
+Twelve new groups produce35 GC RUN/PASS in both focused private profiles.
+Independent enumeration covers all16 truth assignments across all five GC
+strategies using genuinely implied learned clauses; each preserves model mask
+0xaaaa. Frozen satisfied/zero/unit/binary/ternary/nary, phase changes, used and
+inactivity counters, protected reasons/reinit, strict thresholds, higher-scope
+return, Luby/geometric restarts and actual init/reset are exercised.
+
+Real source-operation refusal campaigns cover unit trail growth failure0 then
+success1, and stable workspace/half-delete ID free-list failures0/1/2 then
+success3 in both profiles. Exact named Runtime/Budget/clause roots are audited
+before disabling fault injection. Protocol-only mid-merge fixtures use actual
+charged arrays and independent disjoint range/once-only release checks in both
+source directions; valid comparator reads cannot Budget-fail, so these are
+explicitly not fabricated comparator failures or source algorithm RED.
+
+The charged concrete Go merge workspace preserves stable output/comparator
+expressions, not a claim of C++ standard-library malloc topology or comparison
+invocation schedule. Enabled sat_gc_bug/sat_restart checker binding, TRACE and
+verbose reporting remain open. Owning abort never resumes original GC, rebuilds
+clause snapshots or repairs source counters. No new registered source assertion
+campaign completion is claimed. Original100-bit/all-prefix refinement and
+Microsoft-free source/license headers remain required for the final commit.
+
+
+### GC/restart/init_search terminal GREEN commit evidence
+
+Both full native and checked/debug suites, both complete vet profiles and
+source/no-generics audit are terminal0. Exact results:
+`.cache/sat-gc-final-gates.json`; logs
+`.cache/sat-gc-final-{native,debug,vet-native,vet-debug,source}.log`.
+All699 Go files and bytes were verified unchanged after all gates; current
+headers remain Microsoft-copyright-free and preserve MIT/source provenance.
+Native main is13.035s; checked/debug terminal main is ok  	github.com/glycerine/g3/golang	709.160s.
+Audit reports2102 units/677 APIs,30ported/168partial/1904unported. Complete
+Luby cpp/h scalar helper evidence accounts for the two newly ported utility
+units; full SAT solver cpp/h remain partial. No registered source assertion
+campaign is newly completed by these method/oracle/failure tests.
+
+Original100-bit/all-prefix refinement is unchanged, with no skipping,
+weakening or truncation. No C++ hashes or physical/accounting repair were
+introduced. Earlier live observations are superseded by these terminal results.
+
+Private SCC independent review exposed genuine resize source-publication and
+standalone copied-owner defects. Tests-first RED logs are
+`.cache/sat-scc-resize-red.log` and `.cache/sat-scc-elim-owner-red.log`.
+The lane corrected reserve-all-before-size/ascending construction/shrink and
+actual self/closing ownership guards, rereads final frozen state at its source
+site, and declares frame codec36 versus native LP64 frame24. Its private sweep
+covers31 actual refusals before first success31 with immediate named roots;
+latest native15 groups pass, but final library-sort scalability/guard fixtures
+and final review/freeze remain required before integration. A concrete in-place
+O(n log n) heap adapter for raw scalar std::sort is explicitly a library
+replacement: it preserves unsigned literal order and identical-value ties,
+not libstdc++ comparator/swap invocation schedules or malformed-domain prefix
+equivalence. No Tarjan or equivalence-elimination algorithm is substituted.
+
+Private polynomial tests-first constant-close and singleton-local failures are
+being corrected with real named lexical/singleton ownership. The accepted
+wrapped coefficient-vector move safety profile is honestly green on the
+already-corrected body, not additional RED credit. Full source reset/zero-removal
+consumed actions, callbacks, rational/linear overloads and complete failure
+campaigns remain required before freeze.
+
+Default asymmetric branching starts privately at
+`.cache/work/sat-asymm-f7f77bd` from archive plus the exact699 frozen Go overlay.
+It must preserve actual sole asymm cost, char phase Runtime copy, descending
+stable clause sort and real scoped reattachment/catch routes. Source exceptional
+assign/propagate does not pop its scope; preserve that prefix. Only actual
+SATSolverException is caught at the source loop; other failures retain true
+owning roots without fake success or invented phase/counter restoration.
+All private families and the complete patched fork remain active obligations.

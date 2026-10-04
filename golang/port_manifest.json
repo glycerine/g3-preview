@@ -55890,7 +55890,13 @@
         "sat_cleaner.go",
         "sat_cleaner_clauses.go",
         "sat_cleaner_test.go",
-        "sat_cleaner_model_test.go"
+        "sat_cleaner_model_test.go",
+        "sat_solver_gc.go",
+        "sat_solver_gc_dynamic.go",
+        "sat_solver_gc_sort.go",
+        "sat_solver_gc_test.go",
+        "sat_solver_gc_model_test.go",
+        "sat_solver_gc_audit_test.go"
       ],
       "tests": [
         "TestSATSolverClauseCoreFiniteSimplification",
@@ -56037,7 +56043,19 @@
         "TestSATCleanerWrapperSourceGuards",
         "TestSATCleanerCapturedTrailBeforePropagationAndWarm",
         "TestSATCleanerFiniteFormulaOracle",
-        "TestSATCleanerStoppedLedgerRejectsNewOwningPublication"
+        "TestSATCleanerStoppedLedgerRejectsNewOwningPublication",
+        "TestSATSolverGCSearchInitAndRestartPolicies",
+        "TestSATSolverGCAllSortStrategiesStableAndProtected",
+        "TestSATSolverGCDynamicFreezeActivateAndInactivity",
+        "TestSATSolverGCThresholdScopeAndOwners",
+        "TestSATSolverGCFrozenAllReactivationArities",
+        "TestSATSolverGCDynamicUsedResetAndDeletion",
+        "TestSATSolverGCRefusalRootsAndReactivationPrefix",
+        "TestSATSolverGCFloatDomainsAndLubyEdges",
+        "TestSATSolverGCLearnedModelPreservation",
+        "TestSATSolverGCSortWorkspaceRefusalAndWarmThreshold",
+        "TestSATSolverGCFrozenTrueAndInactiveDelete",
+        "TestSATSolverGCMergeOwnershipProtocol"
       ],
       "conditionals": [
         {
@@ -56805,6 +56823,25 @@
             "TestSATCleanerFiniteFormulaOracle",
             "TestSATCleanerStoppedLedgerRejectsNewOwningPublication"
           ]
+        },
+        {
+          "name": "Source init_search, restart, all five GC strategies, comparator policies, phase-saving measure, frozen activation and can_delete",
+          "status": "partial",
+          "go_target": "sat_solver_gc.go",
+          "tests": [
+            "TestSATSolverGCSearchInitAndRestartPolicies",
+            "TestSATSolverGCAllSortStrategiesStableAndProtected",
+            "TestSATSolverGCDynamicFreezeActivateAndInactivity",
+            "TestSATSolverGCThresholdScopeAndOwners",
+            "TestSATSolverGCFrozenAllReactivationArities",
+            "TestSATSolverGCDynamicUsedResetAndDeletion",
+            "TestSATSolverGCRefusalRootsAndReactivationPrefix",
+            "TestSATSolverGCFloatDomainsAndLubyEdges",
+            "TestSATSolverGCLearnedModelPreservation",
+            "TestSATSolverGCSortWorkspaceRefusalAndWarmThreshold",
+            "TestSATSolverGCFrozenTrueAndInactiveDelete",
+            "TestSATSolverGCMergeOwnershipProtocol"
+          ]
         }
       ],
       "ownership": [
@@ -56813,7 +56850,8 @@
         "Assignment bytes and initialization state are owned solely by the borrowed real Runtime, with source vector capacity/size headers and explicit block/pending tokens; enclosing variable owner charges embedded metadata. Variable graph Stats exclude borrowed runtime, which physical audits add exactly once. Runtime must outlive variable/propagation owners, which require the same actual Runtime identity.",
         "Selected probing/dynamic bodies borrow real propagation/lifecycle owners and separate literalMark. Source assigned-set size publication precedes default false writes; membership mark precedes list push; values precede membership reset/finalize, and successful explicit finalize permits next round without counter repair. Failed ordinal roots and marks are inspected before faults are disabled. No independent solver counter or assignment mirror is created.",
         "Selected conflict owner charges actual cold fields once and borrows existing analysis/dynamic/probing/lifecycle/Runtime; owns actual Runtime assumption/core/literal-set members. Glue and clause consumers read captured lemma blocks directly. Constructor-read errors retain the actually allocated clause/ID in lifecycle pendingCandidate before return. Every real refusal prefix is rooted before fault disable; no host lemma copy or directory-derived owner roots.",
-        "Cleaner interruption continuation is charged in the lifecycle header; owning Close drains only retained prefix and unread suffix with actual cursors. Source callbacks run while active; stopped lifecycle and direct pushClause reject later owning publication."
+        "Cleaner interruption continuation is charged in the lifecycle header; owning Close drains only retained prefix and unread suffix with actual cursors. Source callbacks run while active; stopped lifecycle and direct pushClause reject later owning publication.",
+        "Borrow sole conflict/phase counters and actual lifecycle/Runtime. Real cold GC owner, stable merge workspace and stopped compaction cursors are charged. Owning continuation drains only disjoint actual moved prefix/source ranges, not registry snapshots; lifecycle Close drains reached GC before ordinary vectors."
       ],
       "deviations": [
         "Concrete allocation-free heapsort replaces std::sort on scalar literals. TRACE, solver construction, BCP, conflicts, search, scopes and remaining methods are unported.",
@@ -56821,7 +56859,8 @@
         "Propagation state borrows actual variable/clause/model-converter/rlimit/Runtime/config owners and owns only its charged cold member grouping/diff-level backing. Cleaner/asymm/probing counters are real selected member state, not child Run implementations. No concrete extension subclass exists in this fork; dispatch fails explicitly at asserted/EXT call sites after completed source prefixes. Full solver constructor, UpdateParams/default policy children, propagation integrity/missed-propagation checks, literal-span num_diff_levels consumers, search/conflicts/scopes and user-scope campaign remain open.",
         "Checkpoint reads the actual bound Runtime allocation counter. SAT arena-backed typed storage has not yet been integrated into that source runtime accounting domain; end-to-end solver memory-limit behavior remains open. No allocation events are fabricated from Budget usage.",
         "Only assignment char_vector source allocation accounting is integrated in this slice. Other SAT columns/watch/queue/clause/trail/vector allocations still require real global/runtime source hooks. Raw-state bounds/initialization guards act at endangered byte accesses; source DEBUG logical assertions remain distinct. No full solver construction/search or registered assertion completion is claimed.",
-        "Selected FIRST-UIP and real assumption/init helpers are implemented with default minimization/dynamic subsumption. Full solver construction/Check/search, source extension calls, nonnull parallel exchange, optional MUS/model and global diagnostics remain explicit obligations. Constructor-error candidate retention is a typed owning adapter, not claimed C++ implicit unwinding; no registered user-scope assertion completion is credited."
+        "Selected FIRST-UIP and real assumption/init helpers are implemented with default minimization/dynamic subsumption. Full solver construction/Check/search, source extension calls, nonnull parallel exchange, optional MUS/model and global diagnostics remain explicit obligations. Constructor-error candidate retention is a typed owning adapter, not claimed C++ implicit unwinding; no registered user-scope assertion completion is credited.",
+        "Complete selected ordinary GC/restart/init_search member algorithms executed; enabled integrity tags, verbose/TRACE and full constructor/search/Check remain open. Source comparator expressions/tie order preserved through explicitly charged concrete Go stable merge workspace; C++ standard library allocation/comparison schedule is not claimed identical. No new registered source assertion completion credit."
       ]
     },
     {
@@ -56869,7 +56908,13 @@
         "sat_solver_conflict_assumptions.go",
         "sat_solver_conflict_span.go",
         "sat_solver_conflict_resolution_test.go",
-        "sat_solver_conflict_model_test.go"
+        "sat_solver_conflict_model_test.go",
+        "sat_solver_gc.go",
+        "sat_solver_gc_dynamic.go",
+        "sat_solver_gc_sort.go",
+        "sat_solver_gc_test.go",
+        "sat_solver_gc_model_test.go",
+        "sat_solver_gc_audit_test.go"
       ],
       "tests": [
         "TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots",
@@ -56973,7 +57018,19 @@
         "TestSATSolverConflictClauseReasonBothWatchedPositions",
         "TestSATSolverConflictFiniteImplicationOracle",
         "TestSATSolverConflictInitAndOptionalDispatchPrefixes",
-        "TestSATSolverConflictStaleSpanRetainsAllocatedCandidate"
+        "TestSATSolverConflictStaleSpanRetainsAllocatedCandidate",
+        "TestSATSolverGCSearchInitAndRestartPolicies",
+        "TestSATSolverGCAllSortStrategiesStableAndProtected",
+        "TestSATSolverGCDynamicFreezeActivateAndInactivity",
+        "TestSATSolverGCThresholdScopeAndOwners",
+        "TestSATSolverGCFrozenAllReactivationArities",
+        "TestSATSolverGCDynamicUsedResetAndDeletion",
+        "TestSATSolverGCRefusalRootsAndReactivationPrefix",
+        "TestSATSolverGCFloatDomainsAndLubyEdges",
+        "TestSATSolverGCLearnedModelPreservation",
+        "TestSATSolverGCSortWorkspaceRefusalAndWarmThreshold",
+        "TestSATSolverGCFrozenTrueAndInactiveDelete",
+        "TestSATSolverGCMergeOwnershipProtocol"
       ],
       "conditionals": [
         {
@@ -57229,19 +57286,40 @@
             "TestSATSolverConflictInitAndOptionalDispatchPrefixes",
             "TestSATSolverConflictStaleSpanRetainsAllocatedCandidate"
           ]
+        },
+        {
+          "name": "Source init_search, restart, all five GC strategies, comparator policies, phase-saving measure, frozen activation and can_delete",
+          "status": "partial",
+          "go_target": "sat_solver_gc.go",
+          "tests": [
+            "TestSATSolverGCSearchInitAndRestartPolicies",
+            "TestSATSolverGCAllSortStrategiesStableAndProtected",
+            "TestSATSolverGCDynamicFreezeActivateAndInactivity",
+            "TestSATSolverGCThresholdScopeAndOwners",
+            "TestSATSolverGCFrozenAllReactivationArities",
+            "TestSATSolverGCDynamicUsedResetAndDeletion",
+            "TestSATSolverGCRefusalRootsAndReactivationPrefix",
+            "TestSATSolverGCFloatDomainsAndLubyEdges",
+            "TestSATSolverGCLearnedModelPreservation",
+            "TestSATSolverGCSortWorkspaceRefusalAndWarmThreshold",
+            "TestSATSolverGCFrozenTrueAndInactiveDelete",
+            "TestSATSolverGCMergeOwnershipProtocol"
+          ]
         }
       ],
       "ownership": [
         "Source-width char assignment and scalar columns; charged outer watch tokens/metadata own each actual child once; real activity/queue/trail, borrowed actual todo. No complete solver construction or search.",
         "Assignment bytes and initialization state are owned solely by the borrowed real Runtime, with source vector capacity/size headers and explicit block/pending tokens; enclosing variable owner charges embedded metadata. Variable graph Stats exclude borrowed runtime, which physical audits add exactly once. Runtime must outlive variable/propagation owners, which require the same actual Runtime identity.",
-        "Selected conflict owner charges actual cold fields once and borrows existing analysis/dynamic/probing/lifecycle/Runtime; owns actual Runtime assumption/core/literal-set members. Glue and clause consumers read captured lemma blocks directly. Constructor-read errors retain the actually allocated clause/ID in lifecycle pendingCandidate before return. Every real refusal prefix is rooted before fault disable; no host lemma copy or directory-derived owner roots."
+        "Selected conflict owner charges actual cold fields once and borrows existing analysis/dynamic/probing/lifecycle/Runtime; owns actual Runtime assumption/core/literal-set members. Glue and clause consumers read captured lemma blocks directly. Constructor-read errors retain the actually allocated clause/ID in lifecycle pendingCandidate before return. Every real refusal prefix is rooted before fault disable; no host lemma copy or directory-derived owner roots.",
+        "Borrow sole conflict/phase counters and actual lifecycle/Runtime. Real cold GC owner, stable merge workspace and stopped compaction cursors are charged. Owning continuation drains only disjoint actual moved prefix/source ranges, not registry snapshots; lifecycle Close drains reached GC before ordinary vectors."
       ],
       "deviations": [
         "Wrapped source allocations that cannot represent full typed capacity remain unported; host bounds are separate from exact source overflow DefaultException. Default child policies, full solver constructor, propagation, conflicts, scopes/search and TRACE remain open.",
         "Propagation state borrows actual variable/clause/model-converter/rlimit/Runtime/config owners and owns only its charged cold member grouping/diff-level backing. Cleaner/asymm/probing counters are real selected member state, not child Run implementations. No concrete extension subclass exists in this fork; dispatch fails explicitly at asserted/EXT call sites after completed source prefixes. Full solver constructor, UpdateParams/default policy children, propagation integrity/missed-propagation checks, literal-span num_diff_levels consumers, search/conflicts/scopes and user-scope campaign remain open.",
         "Checkpoint reads the actual bound Runtime allocation counter. SAT arena-backed typed storage has not yet been integrated into that source runtime accounting domain; end-to-end solver memory-limit behavior remains open. No allocation events are fabricated from Budget usage.",
         "Only assignment char_vector source allocation accounting is integrated in this slice. Other SAT columns/watch/queue/clause/trail/vector allocations still require real global/runtime source hooks. Raw-state bounds/initialization guards act at endangered byte accesses; source DEBUG logical assertions remain distinct. No full solver construction/search or registered assertion completion is claimed.",
-        "Selected FIRST-UIP and real assumption/init helpers are implemented with default minimization/dynamic subsumption. Full solver construction/Check/search, source extension calls, nonnull parallel exchange, optional MUS/model and global diagnostics remain explicit obligations. Constructor-error candidate retention is a typed owning adapter, not claimed C++ implicit unwinding; no registered user-scope assertion completion is credited."
+        "Selected FIRST-UIP and real assumption/init helpers are implemented with default minimization/dynamic subsumption. Full solver construction/Check/search, source extension calls, nonnull parallel exchange, optional MUS/model and global diagnostics remain explicit obligations. Constructor-error candidate retention is a typed owning adapter, not claimed C++ implicit unwinding; no registered user-scope assertion completion is credited.",
+        "Complete selected ordinary GC/restart/init_search member algorithms executed; enabled integrity tags, verbose/TRACE and full constructor/search/Check remain open. Source comparator expressions/tie order preserved through explicitly charged concrete Go stable merge workspace; C++ standard library allocation/comparison schedule is not claimed identical. No new registered source assertion completion credit."
       ]
     },
     {
@@ -104760,22 +104838,50 @@
       "path": "src/util/luby.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "sat_solver_gc.go",
+        "sat_solver_gc_model_test.go",
+        "sat_solver_gc_test.go"
+      ],
+      "tests": [
+        "TestSATSolverGCFloatDomainsAndLubyEdges",
+        "TestSATSolverGCSearchInitAndRestartPolicies"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "get_luby complete scalar recursive log/floor/equality/pow algorithm with uint32 source wrap",
+          "status": "ported",
+          "go_target": "sat_solver_gc.go",
+          "tests": [
+            "TestSATSolverGCFloatDomainsAndLubyEdges",
+            "TestSATSolverGCSearchInitAndRestartPolicies"
+          ]
+        }
+      ],
+      "ownership": [
+        "No allocated payload or owning fields; recursive scalar arithmetic only. Actual restart owns its own threshold/index/counters separately."
+      ],
+      "deviations": [
+        "Source unsigned i+1 wraps; UINT_MAX reaches literal log(0)/equality/pow(-Inf) result0. Go float64 math translates actual source floating algorithm; out-of-range or NaN unsigned conversion is guarded at reached cast. No bit-identical platform libm or diagnostic claim."
+      ]
     },
     {
       "path": "src/util/luby.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "sat_solver_gc.go",
+        "sat_solver_gc_model_test.go",
+        "sat_solver_gc_test.go"
+      ],
+      "tests": [
+        "TestSATSolverGCFloatDomainsAndLubyEdges",
+        "TestSATSolverGCSearchInitAndRestartPolicies"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -104786,11 +104892,25 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "get_luby complete scalar recursive log/floor/equality/pow algorithm with uint32 source wrap",
+          "status": "ported",
+          "go_target": "sat_solver_gc.go",
+          "tests": [
+            "TestSATSolverGCFloatDomainsAndLubyEdges",
+            "TestSATSolverGCSearchInitAndRestartPolicies"
+          ]
+        }
+      ],
+      "ownership": [
+        "No allocated payload or owning fields; recursive scalar arithmetic only. Actual restart owns its own threshold/index/counters separately."
+      ],
+      "deviations": [
+        "Source unsigned i+1 wraps; UINT_MAX reaches literal log(0)/equality/pow(-Inf) result0. Go float64 math translates actual source floating algorithm; out-of-range or NaN unsigned conversion is guarded at reached cast. No bit-identical platform libm or diagnostic claim."
+      ]
     },
     {
       "path": "src/util/machine.h",
