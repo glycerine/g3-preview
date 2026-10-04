@@ -174,6 +174,9 @@ func (m *MultivariatePolynomialManager) callerGuard() error {
 	return nil
 }
 func (m *MultivariatePolynomialManager) CloseChecked() error {
+	if m != nil && m.self == m && (m.conversion.active || m.conversionHasOrphans()) {
+		return ErrPolynomialPending
+	}
 	if m != nil && m.self == m && m.toPolynomial.active {
 		return ErrPolynomialPending
 	}
@@ -214,6 +217,11 @@ func (m *MultivariatePolynomialManager) CloseChecked() error {
 			}
 		}
 		m.closing = true
+	}
+	if cap(m.conversion.orphans) > 0 {
+		if e := m.CleanupConversion(); e != nil {
+			return e
+		}
 	}
 	if e := m.closeEvaluationFrames(); e != nil {
 		return e

@@ -28563,7 +28563,9 @@
         "mpnum/polynomial_sqrt_test.go",
         "mpnum/polynomial_to_polynomial.go",
         "mpnum/polynomial_to_polynomial_test.go",
-        "mpnum/polynomial_univariate_indexed.go"
+        "mpnum/polynomial_univariate_indexed.go",
+        "mpnum/polynomial_global_convert.go",
+        "mpnum/polynomial_global_convert_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -31642,6 +31644,23 @@
             "TestPolynomialToPolynomialExactNumericForeignReplacement",
             "TestPolynomialToPolynomialReturnedResultBeforeRawDestructorStop"
           ]
+        },
+        {
+          "name": "global convert cpp7439-7476 literal source/target identity, shared monomial-manager branch, degree filter, inline128 lexical monomial/numeral buffers and same indexed SOM engine",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_global_convert.go",
+          "tests": [
+            "TestPolynomialGlobalConvertSelfBorrow",
+            "TestPolynomialGlobalConvertDistinctOwnerFilter",
+            "TestPolynomialGlobalConvertEveryActualPrefix",
+            "TestPolynomialGlobalConvertOverflowingBuffersEveryPrefix",
+            "TestPolynomialGlobalConvertBigCoefficientDistinctInteger",
+            "TestPolynomialGlobalConvertExactNumericForeignReplacement",
+            "TestPolynomialGlobalConvertReturnedResultSourceStop",
+            "TestPolynomialGlobalConvertRingZeroNewVersusBorrowedMonomial",
+            "TestPolynomialGlobalConvertSharedMonomialManager",
+            "TestPolynomialGlobalConvertFactoryForeignReplacement"
+          ]
         }
       ],
       "ownership": [
@@ -31677,7 +31696,8 @@
         "Real source deletion callbacks do not grant outer PSC factory/singleton ownership; actual callback execution excludes receipt acquisition without changing source callback/depth order.",
         "Selected C rand state is process-static fixed31 scalar words; all Rand aliases borrow the same synchronized stream and observe Srand, without per-manager reseeding or per-draw allocation. Explicit GLibc31 instances are independent profile fixtures, not GCD-owned RNGs.",
         "Charged concrete scope owns actual four scoped NUMs, RAW two, monomial_ref, exact created-only cohort and matched callee/factory/physical receipts. Successful incoming INC transfers output before older DEC callback; source destruction is reverse lexical and stops before older fields, separate from explicit owning CleanupSqrt.",
-        "Actual lexical coefficient buffer receives zero SET then coefficient SET; borrowed c_ptr view runs the same descending mk_univariate engine with writeback at each mutation. Source buffer destruction precedes successful return; owning cleanup only captures exact executing factory/NUM/MM receipts and genuinely fresh output."
+        "Actual lexical coefficient buffer receives zero SET then coefficient SET; borrowed c_ptr view runs the same descending mk_univariate engine with writeback at each mutation. Source buffer destruction precedes successful return; owning cleanup only captures exact executing factory/NUM/MM receipts and genuinely fresh output.",
+        "Target inline128 lexical buffers live in its once-charged enclosing header; NUM buffer source destructor precedes pointer buffer. Fresh result, actual started factory generation and created-only zero-reference monomial slots carry exact owning abort authority. Source body/destructor first causes remain sticky; CleanupConversion is explicit, excludes replacement caller roots and never infers ownership from zero RC."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -31713,7 +31733,8 @@
         "Global TRACE/diagnostic binding, high-level PSC callback reentrancy and complete polynomial family audit remain open. Sparse successful calls perform fresh source lexical allocations; no zero-Go-allocation claim.",
         "C library rand/srand binding independently implements the selected Linux/glibc31 mathematical recurrence; captured glibc2.39 test oracle covers default and262 seeds. Other libc profiles and source test-driver migration remain open; no GNU implementation code is copied and no LP source-unit completion is credited.",
         "Selected source algorithms and explicit Runtime profile only. Signed TLS stops and large factory/auxiliary receipts are guarded owner-primitive proofs, not ordinary mathematical exhaustion. Non-Z perfect-square remains the source unsupported operation. Registered polynomial driver returns before sqrt; dormant assertions give no active driver completion credit. Global diagnostics/native ABI and remaining source methods stay partial.",
-        "sz0 skips lexical buffer and source coefficient/x reads. Native8/debug11 real refusal prefixes, scoped pending foreign replacement, guarded raw destructor result proof. Full convert/GCD/other source methods still open; no whole source driver credit."
+        "sz0 skips lexical buffer and source coefficient/x reads. Native8/debug11 real refusal prefixes, scoped pending foreign replacement, guarded raw destructor result proof. Full convert/GCD/other source methods still open; no whole source driver credit.",
+        "Global conversion retains existing guarded monomial class adapter and unsupported high-level same-frame reentry. Shared-MM ordinary values/identity have evidence; simultaneous shared-budget exhaustive graph proof and full polynomial/GCD/global manager completion remain open. No registered-driver assertion credit for independent conversion tests."
       ]
     },
     {
@@ -31857,7 +31878,9 @@
         "mpnum/polynomial_sparse_physical_test.go",
         "mpnum/polynomial_sparse_interpolator_add_source_test.go",
         "mpnum/polynomial_sparse_interpolator_source_test.go",
-        "mpnum/polynomial_content_lifetime_source_test.go"
+        "mpnum/polynomial_content_lifetime_source_test.go",
+        "mpnum/polynomial_global_convert.go",
+        "mpnum/polynomial_global_convert_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -33557,6 +33580,23 @@
             "TestPolynomialIntegerContentIndependentSignedBranches",
             "TestPolynomialScalarIntegerContentSignedFirstAndEarlyOne"
           ]
+        },
+        {
+          "name": "global convert cpp7439-7476 literal source/target identity, shared monomial-manager branch, degree filter, inline128 lexical monomial/numeral buffers and same indexed SOM engine",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_global_convert.go",
+          "tests": [
+            "TestPolynomialGlobalConvertSelfBorrow",
+            "TestPolynomialGlobalConvertDistinctOwnerFilter",
+            "TestPolynomialGlobalConvertEveryActualPrefix",
+            "TestPolynomialGlobalConvertOverflowingBuffersEveryPrefix",
+            "TestPolynomialGlobalConvertBigCoefficientDistinctInteger",
+            "TestPolynomialGlobalConvertExactNumericForeignReplacement",
+            "TestPolynomialGlobalConvertReturnedResultSourceStop",
+            "TestPolynomialGlobalConvertRingZeroNewVersusBorrowedMonomial",
+            "TestPolynomialGlobalConvertSharedMonomialManager",
+            "TestPolynomialGlobalConvertFactoryForeignReplacement"
+          ]
         }
       ],
       "ownership": [
@@ -33588,7 +33628,8 @@
         "Concrete reflected composition scope borrows source degree2pos member, owns actual completed numeral/poly locals and exact created-outcome orphan cohort. Source auxiliary then degree then local destruction; matching younger constant numeral\u2192rational NUM/DEN stop preserves older locals and sticky causes. Explicit owning cleanup resumes matching callee first and acknowledges only its exact consumed returned result; physical pending ObjectRef/triples and borrowed callbacks remain separate, no registry-derived authority.",
         "Actual Runtime numeral arrays, inline128 monomial buffer, auxiliary numeral and embedded concrete linear solver; reflected enclosing cold fields charged once, no mirror arrays or per-call solver heap header. Source destruction retains its first cause and stops before older locals; owning abort uses exact generation/numeric ObjectRef/raw receipts.",
         "Content ai and monic inv/newA are actual named cold fields; the three actual retained BIG fixture detects missing root enumeration, without claiming simultaneous mathematical reachability. Direct caller output SET/ref-assignment roots remain caller-owned.",
-        "Real source deletion callbacks do not grant outer PSC factory/singleton ownership; actual callback execution excludes receipt acquisition without changing source callback/depth order."
+        "Real source deletion callbacks do not grant outer PSC factory/singleton ownership; actual callback execution excludes receipt acquisition without changing source callback/depth order.",
+        "Target inline128 lexical buffers live in its once-charged enclosing header; NUM buffer source destructor precedes pointer buffer. Fresh result, actual started factory generation and created-only zero-reference monomial slots carry exact owning abort authority. Source body/destructor first causes remain sticky; CleanupConversion is explicit, excludes replacement caller roots and never infers ownership from zero RC."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -33620,7 +33661,8 @@
         "Cold concrete callback interfaces preserve live borrowed values; supported managers require the same actual Integer cohort. Algebraic specialization remains open.",
         "Selected source composition bodies complete for explicit same-Integer rational binding and actual Runtime profile. Dormant cpp573-574 ENSURE adapted via dense term construction; registered driver returns before tst_compose, active original driver credit zero. TLS/dangling-pointer proofs are actual owner-primitive guarded-domain tests, not ordinary mathematical OOM reachability. Global TRACE/assertions/native ABI, same-frame high-level callback reentry and full polynomial family remain open; persistent source class members are not implicitly reset by owning lexical abort.",
         "ICCP recursive scopes, default modular GCD, CRA and Resultant bodies remain open; these selected prerequisites do not substitute for those algorithms.",
-        "Global TRACE/diagnostic binding, high-level PSC callback reentrancy and complete polynomial family audit remain open. Sparse successful calls perform fresh source lexical allocations; no zero-Go-allocation claim."
+        "Global TRACE/diagnostic binding, high-level PSC callback reentrancy and complete polynomial family audit remain open. Sparse successful calls perform fresh source lexical allocations; no zero-Go-allocation claim.",
+        "Global conversion retains existing guarded monomial class adapter and unsupported high-level same-frame reentry. Shared-MM ordinary values/identity have evidence; simultaneous shared-budget exhaustive graph proof and full polynomial/GCD/global manager completion remain open. No registered-driver assertion credit for independent conversion tests."
       ]
     },
     {
@@ -118332,6 +118374,8 @@
         "mpnum/polynomial_integer_array_source_test.go",
         "mpnum/mpz_square_scope.go",
         "mpnum/mpz_square_source_scope_test.go",
+        "mpnum/mpz_source_copy_owner_test.go",
+        "mpnum/mpzzp_ops.go",
         "mpnum/mpz_allocator_backend.go",
         "mpnum/mpz_pending_allocation.go"
       ],
@@ -120239,6 +120283,15 @@
           ]
         },
         {
+          "name": "Same literal SET engine with borrowed explicit source IntegerManager, destructive sign/old-free/capacity allocation/digit copy order; modular target normalizes only after successful SET",
+          "status": "partial",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceCopyFromOwnerEveryDestructivePrefix",
+            "TestIntegerSourceCopyFromOwnerPendingReplacement"
+          ]
+        },
+        {
           "name": "Retained digit32 cell-byte request metadata guard before allocator size_t entry conversion; same published/unpublished deallocation engine preserves source stops and actual roots",
           "status": "partial",
           "go_target": "mpnum/mpz_allocator_backend.go",
@@ -120336,6 +120389,8 @@
         "mpnum/mp_integer_output_scope.go",
         "mpnum/mp_integer_output_scope_test.go",
         "mpnum/mpn_cstring.go",
+        "mpnum/mpz_source_copy_owner_test.go",
+        "mpnum/mpzzp_ops.go",
         "mpnum/mpz_allocator_backend.go",
         "mpnum/mpz_pending_allocation.go"
       ],
@@ -121766,6 +121821,15 @@
           ]
         },
         {
+          "name": "Same literal SET engine with borrowed explicit source IntegerManager, destructive sign/old-free/capacity allocation/digit copy order; modular target normalizes only after successful SET",
+          "status": "partial",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceCopyFromOwnerEveryDestructivePrefix",
+            "TestIntegerSourceCopyFromOwnerPendingReplacement"
+          ]
+        },
+        {
           "name": "Retained digit32 cell-byte request metadata guard before allocator size_t entry conversion; same published/unpublished deallocation engine preserves source stops and actual roots",
           "status": "partial",
           "go_target": "mpnum/mpz_allocator_backend.go",
@@ -121830,7 +121894,8 @@
         "mpnum/mpzzp_nodebug.go",
         "mpnum/mpzzp_ops.go",
         "mpnum/mp_integer_array.go",
-        "mpnum/polynomial_integer_array_source_test.go"
+        "mpnum/polynomial_integer_array_source_test.go",
+        "mpnum/mpz_source_copy_owner_test.go"
       ],
       "tests": [
         "TestIntegerModularCenteredOracle",
@@ -122105,6 +122170,15 @@
             "TestPolynomialIntegerArrayActualObjectAndEarlyOne",
             "TestPolynomialIntegerArrayReachedRuntimeCohortAndUnreadZero",
             "TestPolynomialIntegerArrayZeroLeavesForeignAllocatorUnread"
+          ]
+        },
+        {
+          "name": "Same literal SET engine with borrowed explicit source IntegerManager, destructive sign/old-free/capacity allocation/digit copy order; modular target normalizes only after successful SET",
+          "status": "partial",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceCopyFromOwnerEveryDestructivePrefix",
+            "TestIntegerSourceCopyFromOwnerPendingReplacement"
           ]
         }
       ],

@@ -73,8 +73,12 @@ func (m *MultivariatePolynomialCore) mkTermsIndexed(as *polynomialVector, ms mon
 	if e != nil {
 		return Polynomial{}, e
 	}
+	return m.mkTermsSource(n, polynomialUnivariateCoefficients{vector: as}, ms)
+}
+func (m *MultivariatePolynomialCore) mkTermsSource(n uint32, as polynomialUnivariateCoefficients, ms monomialArrayView) (Polynomial, error) {
 	for i := uint32(0); i < n; i++ {
-		a, e := as.coefficient(m, i)
+		var local Int
+		a, e := as.reference(m, i, &local)
 		if e != nil {
 			return Polynomial{}, e
 		}
@@ -83,7 +87,7 @@ func (m *MultivariatePolynomialCore) mkTermsIndexed(as *polynomialVector, ms mon
 			return Polynomial{}, e
 		}
 		consumed := false
-		e = m.som.addConsumed(&a, term, false, &consumed)
+		e = m.som.addConsumed(a, term, false, &consumed)
 		if ms.vector == &m.linearMonomials && consumed && uint64(i) < uint64(len(m.linearGenerated)) {
 			m.linearGenerated[i] = false
 		}

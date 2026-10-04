@@ -280,6 +280,17 @@ func (m *MonomialManager) mkVariableCreated(v, k uint32, outcome *monomialFactor
 	return m.mkMonomialCreated(one[:], outcome)
 }
 func (m *MonomialManager) Convert(source *MonomialManager, a Monomial) (Monomial, error) {
+	return m.convertCreated(source, a, nil)
+}
+func (m *MonomialManager) convertCreated(source *MonomialManager, a Monomial, outcome *monomialFactoryOutcome) (result Monomial, cause error) {
+	if outcome != nil {
+		*outcome = monomialFactoryOutcome{}
+	}
+	defer func() {
+		if cause == nil {
+			m.creation = monomialCreation{}
+		}
+	}()
 	if e := m.check(); e != nil {
 		return Monomial{}, e
 	}
@@ -326,7 +337,7 @@ func (m *MonomialManager) Convert(source *MonomialManager, a Monomial) (Monomial
 			return Monomial{}, e
 		}
 	}
-	return m.internTemp(0)
+	return m.internTempCreated(0, outcome)
 }
 
 // CleanupCreation is an owning Go abort of the actual named unpublished object

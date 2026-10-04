@@ -1,3 +1,5 @@
+// Source: src/util/mpzzp.h; src/util/mpzzp.cpp.
+// Source author: Leonardo de Moura.
 // Licensed under the MIT license.
 package mpnum
 
@@ -326,7 +328,19 @@ func (m *IntegerModularManager) Copy(a, b *Int) error {
 	if e := m.check(); e != nil {
 		return e
 	}
-	if e := m.manager.Copy(a, b); e != nil {
+	return m.copyFromOwnerCore(a, m.manager, b)
+}
+
+// Exact target SET followed by source p_normalize, using the actual operand
+// owner instead of a serializer or a temporary mirrored numeral backing.
+func (m *IntegerModularManager) CopyFromOwner(a *Int, source *IntegerManager, b *Int) error {
+	if e := m.check(); e != nil {
+		return e
+	}
+	return m.copyFromOwnerCore(a, source, b)
+}
+func (m *IntegerModularManager) copyFromOwnerCore(a *Int, source *IntegerManager, b *Int) error {
+	if e := m.manager.CopyFromOwner(a, source, b); e != nil {
 		return e
 	}
 	return m.PNormalize(a)

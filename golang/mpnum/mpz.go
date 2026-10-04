@@ -615,11 +615,19 @@ func (m *IntegerManager) SetLimbs(a *Int, digits []uint32) error {
 	a.val = 1
 	return nil
 }
-func (m *IntegerManager) Copy(dst, src *Int) error {
+func (m *IntegerManager) Copy(dst, src *Int) error { return m.CopyFromOwner(dst, m, src) }
+
+// CopyFromOwner is the same literal SET engine with the actual borrowed source
+// cell owner. It differs from the staged ergonomic CopyFrom adapter: growth
+// publishes sign and destroys the old destination BEFORE allocation.
+func (m *IntegerManager) CopyFromOwner(dst *Int, sourceManager *IntegerManager, src *Int) error {
 	if e := m.check(dst); e != nil {
 		return e
 	}
-	if e := m.check(src); e != nil {
+	if sourceManager == nil {
+		return arena.ErrConfig
+	}
+	if e := sourceManager.check(src); e != nil {
 		return e
 	}
 	if dst == src {
@@ -633,7 +641,7 @@ func (m *IntegerManager) Copy(dst, src *Int) error {
 		dst.val = v
 		return nil
 	}
-	source := m.cell(src.cell)
+	source := sourceManager.cell(src.cell)
 	dst.val = src.val // big_set publishes sign before allocation/free
 	ref := dst.cell
 	if ref == 0 || m.cell(ref).capacity < source.size {
@@ -656,7 +664,7 @@ func (m *IntegerManager) Copy(dst, src *Int) error {
 	m.publishCell(ref)
 	m.resizeCell(ref, source.size)
 	for i := uint32(0); i < source.size; i++ {
-		m.writeDigit(ref, i, m.digit(src.cell, i))
+		m.writeDigit(ref, i, sourceManager.digit(src.cell, i))
 	}
 	dst.cell = ref
 	dst.val = src.val

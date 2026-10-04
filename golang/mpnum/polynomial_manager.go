@@ -28,6 +28,7 @@ type MultivariatePolynomialConfig struct {
 	Cooperation func() error
 }
 type polynomialCreation struct {
+	conversionParent   *polynomialGlobalConversionScope
 	toPolynomialParent *polynomialToPolynomialScope
 	compositionParent  *polynomialCompositionScope
 	pscOwner           uint64
@@ -43,6 +44,7 @@ type polynomialCreation struct {
 	buffer             *polynomialSOM
 }
 type MultivariatePolynomialCore struct {
+	conversionOwner                                                                            *polynomialGlobalConversionScope
 	toPolynomialOwner                                                                          *polynomialToPolynomialScope
 	contentLocal                                                                               polynomialContentScope
 	pscReceipts                                                                                polynomialPSCReceipts
