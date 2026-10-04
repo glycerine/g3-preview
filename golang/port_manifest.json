@@ -102322,7 +102322,13 @@
         "sat_var_queue.go",
         "util_int_heap.go",
         "sat_var_queue_runtime.go",
-        "sat_var_queue_runtime_test.go"
+        "sat_var_queue_runtime_test.go",
+        "util_int_heap_test.go",
+        "util_int_heap_runtime.go",
+        "util_int_heap_runtime_test.go",
+        "util_int_heap_source_frontier_test.go",
+        "util_int_heap_owner_source_test.go",
+        "util_int_heap_bounds_source_test.go"
       ],
       "tests": [
         "TestIntHeapBudgetsFailuresSwapAndWarm",
@@ -102359,7 +102365,26 @@
         "TestSATCaseSplitHeapDirectEraseSourcePreconditionAndWrapperGuard",
         "TestSATCaseSplitHeapForeignBudgetRejectedBeforeColdReserve",
         "TestSATCaseSplitHeapLegacySignaturesExposeActualTypedReadFailure",
-        "TestSATCaseSplitHeapBorrowedRuntimeBlockedUntilAllCopiedBackingsReleased"
+        "TestSATCaseSplitHeapBorrowedRuntimeBlockedUntilAllCopiedBackingsReleased",
+        "TestIntHeapRuntimeRealOwnersAndFindLE",
+        "TestIntHeapRuntimeAssignmentEveryPhysicalRefusal",
+        "TestIntHeapRuntimeFindLEEveryPhysicalRefusal",
+        "TestIntHeapRuntimeFullPublicConsumersAndCapturedViews",
+        "TestIntHeapRuntimePartialPublishedCopyOwningReceipt",
+        "TestIntHeapRuntimeIndependentMutableComparator",
+        "TestIntHeapRuntimeAssignmentIndependentDestinationDomain",
+        "TestIntHeapRuntimeFreshTodoEveryCallAndCallerGuards",
+        "TestIntHeapLexicalContextActualPostPhysicalStopAcknowledgment",
+        "TestIntHeapOutputOwnerStopsMutationAfterActualConsumedFree",
+        "TestIntHeapFindLEReachedValueRereadAfterComparator",
+        "TestIntHeapInvariantReachedSizeReadAllProfiles",
+        "TestIntHeapAssignmentSourceDestroyedFirstMember",
+        "TestIntHeapFindLESourceOutputBeforeChildGrowth",
+        "TestIntHeapLegacyCopiedCloseRejectsBeforeRefund",
+        "TestIntHeapSourceScalarPlacementReadsWholeIntBeforeWrite",
+        "TestIntHeapEmptySourceZeroSizeSentinelPop",
+        "TestIntHeapSetBoundsSignedConversionBeforeGrowthRefusal",
+        "TestIntHeapConstructorSignedBoundsReachedAfterSentinel"
       ],
       "conditionals": [
         {
@@ -102723,18 +102748,42 @@
             "TestSATCaseSplitHeapLegacySignaturesExposeActualTypedReadFailure",
             "TestSATCaseSplitHeapBorrowedRuntimeBlockedUntilAllCopiedBackingsReleased"
           ]
+        },
+        {
+          "name": "Selected concrete general IntHeap Runtime members, literal destroy-before-copy assignment, fresh lexical FindLE with immediate output and distinct child pushes, captured physical iterators and exact owning cleanup; default tag-disabled profile",
+          "status": "partial",
+          "go_target": "util_int_heap_runtime.go",
+          "tests": [
+            "TestIntHeapRuntimeRealOwnersAndFindLE",
+            "TestIntHeapRuntimeAssignmentEveryPhysicalRefusal",
+            "TestIntHeapRuntimeFindLEEveryPhysicalRefusal",
+            "TestIntHeapRuntimeFullPublicConsumersAndCapturedViews",
+            "TestIntHeapRuntimePartialPublishedCopyOwningReceipt",
+            "TestIntHeapRuntimeIndependentMutableComparator",
+            "TestIntHeapRuntimeAssignmentIndependentDestinationDomain",
+            "TestIntHeapRuntimeFreshTodoEveryCallAndCallerGuards",
+            "TestIntHeapLexicalContextActualPostPhysicalStopAcknowledgment",
+            "TestIntHeapOutputOwnerStopsMutationAfterActualConsumedFree",
+            "TestIntHeapFindLEReachedValueRereadAfterComparator",
+            "TestIntHeapInvariantReachedSizeReadAllProfiles",
+            "TestIntHeapAssignmentSourceDestroyedFirstMember",
+            "TestIntHeapFindLESourceOutputBeforeChildGrowth",
+            "TestIntHeapLegacyCopiedCloseRejectsBeforeRefund",
+            "TestIntHeapSourceScalarPlacementReadsWholeIntBeforeWrite",
+            "TestIntHeapEmptySourceZeroSizeSentinelPop",
+            "TestIntHeapSetBoundsSignedConversionBeforeGrowthRefusal",
+            "TestIntHeapConstructorSignedBoundsReachedAfterSentinel"
+          ]
         }
       ],
       "ownership": [
-        "Owner-local concrete signed-int32 value/inverse vectors; borrowed strict comparator environment; retained budgeted query vectors; cold checked iterators; complete header/backing and old+new charges. See PORT_PROGRESS.md#audit-int-heap-port-status-md."
+        "Actual two Runtime int columns; cold IntHeap header embeds queue and borrows comparator, independent destination Runtime owns copies. Source completed-member unwind/indices-before-values destruction, raw allocation and consumed-field receipts, and fresh lexical todo precede distinct explicit owning abort. Caller IntHeapVector owns real Runtime output; []int32 is borrowed Go output adapter. Exact named-block/bitmap/cold-header census, no registry-derived owners. See PORT_PROGRESS.md."
       ],
       "deviations": [
         "Typed precondition/closed/overflow/epoch errors replace invalid source operations. Safe readonly iterators replace raw mutable backing pointers.",
-        "Retained budgeted find_le workspace stages caller output; failed predictable preparation preserves caller result. Deep Assign stages a charged clone before publication.",
-        "Source signed-shift overflow children are discarded; all representable source child pushes and traversal order are preserved.",
         "Insert publishes the inverse index before fallible value growth, preserving source failure membership. Its publication invalidates checked iterators even on failure. Empty reset retains this prefix; live-value invariant traversal ignores additional inverse entries. Subsequent out-of-bounds slot accesses return ErrHeapValue without repairing the source state; in-range source actions remain executable.",
-        "Completion audit correction: legacy IntHeap.Assign stages a complete clone and FindLE stages retained found/todo workspaces, while source implicit member assignment and find_le272-290 publish live partial destination/result prefixes and distinct child pushes. These behaviors, Runtime/non-SAT concrete families and enabled heap CASSERT binding remain required completion obligations; whole unit is PARTIAL. Existing registered driver and independent tests remain evidence for their actually exercised scopes, not whole allocation/exception completion. See PORT_PROGRESS.md.",
-        "Source vector assignment src/util/vector.h:191-202 destroys and frees old storage before exact-capacity copy_core, with null source publishing null. Legacy staged Assign and staged FindLE are partial adapters pending literal publication/failure closure. The new SAT Runtime family does not complete those general methods or enabled heap CASSERT dispatch."
+        "Selected concrete Runtime general heap source closure only: enabled CASSERT/assertion-switch bindings, wrapped physical extents, legacy slice storage/iterator profile, full ostream transport and other template instantiations remain OPEN. Explicit signed TLS/partially initialized source fixtures prove ownership/physical guards in undefined source domains, not ordinary OOM or native recovery. No whole source-unit promotion.",
+        "Previous staged Assign/FindLE source gaps are now corrected: LT base assignment precedes values destruction/exact copy then indices; each FindLE result is immediately appended before separate left/right pushes, using fresh lexical todo. Legacy Go slices retain adapter allocation and iterator semantics; Runtime specialization binds actual backing. Source signed child-index overflow reaches an explicit typed guard after the actual output prefix."
       ]
     },
     {
@@ -130294,7 +130343,15 @@
         "mpnum/polynomial_som_owner_physical_test.go",
         "mpnum/polynomial_som_vector_bounds_source_test.go",
         "sat_var_queue_runtime.go",
-        "sat_var_queue_runtime_test.go"
+        "sat_var_queue_runtime_test.go",
+        "util_int_heap.go",
+        "util_int_heap_test.go",
+        "util_int_heap_runtime.go",
+        "util_int_heap_runtime_test.go",
+        "util_int_heap_source_frontier_test.go",
+        "sat_var_queue.go",
+        "util_int_heap_owner_source_test.go",
+        "util_int_heap_bounds_source_test.go"
       ],
       "tests": [
         "TestParamDescrsBudgetFailuresAndWarmDuplicate",
@@ -130533,7 +130590,26 @@
         "TestSATCaseSplitHeapDirectEraseSourcePreconditionAndWrapperGuard",
         "TestSATCaseSplitHeapForeignBudgetRejectedBeforeColdReserve",
         "TestSATCaseSplitHeapLegacySignaturesExposeActualTypedReadFailure",
-        "TestSATCaseSplitHeapBorrowedRuntimeBlockedUntilAllCopiedBackingsReleased"
+        "TestSATCaseSplitHeapBorrowedRuntimeBlockedUntilAllCopiedBackingsReleased",
+        "TestIntHeapRuntimeRealOwnersAndFindLE",
+        "TestIntHeapRuntimeAssignmentEveryPhysicalRefusal",
+        "TestIntHeapRuntimeFindLEEveryPhysicalRefusal",
+        "TestIntHeapRuntimeFullPublicConsumersAndCapturedViews",
+        "TestIntHeapRuntimePartialPublishedCopyOwningReceipt",
+        "TestIntHeapRuntimeIndependentMutableComparator",
+        "TestIntHeapRuntimeAssignmentIndependentDestinationDomain",
+        "TestIntHeapRuntimeFreshTodoEveryCallAndCallerGuards",
+        "TestIntHeapLexicalContextActualPostPhysicalStopAcknowledgment",
+        "TestIntHeapOutputOwnerStopsMutationAfterActualConsumedFree",
+        "TestIntHeapFindLEReachedValueRereadAfterComparator",
+        "TestIntHeapInvariantReachedSizeReadAllProfiles",
+        "TestIntHeapAssignmentSourceDestroyedFirstMember",
+        "TestIntHeapFindLESourceOutputBeforeChildGrowth",
+        "TestIntHeapLegacyCopiedCloseRejectsBeforeRefund",
+        "TestIntHeapSourceScalarPlacementReadsWholeIntBeforeWrite",
+        "TestIntHeapEmptySourceZeroSizeSentinelPop",
+        "TestIntHeapSetBoundsSignedConversionBeforeGrowthRefusal",
+        "TestIntHeapConstructorSignedBoundsReachedAfterSentinel"
       ],
       "conditionals": [
         {
@@ -130984,6 +131060,32 @@
             "TestSATCaseSplitHeapLegacySignaturesExposeActualTypedReadFailure",
             "TestSATCaseSplitHeapBorrowedRuntimeBlockedUntilAllCopiedBackingsReleased"
           ]
+        },
+        {
+          "name": "Selected concrete general IntHeap Runtime members, literal destroy-before-copy assignment, fresh lexical FindLE with immediate output and distinct child pushes, captured physical iterators and exact owning cleanup; default tag-disabled profile",
+          "status": "partial",
+          "go_target": "util_int_heap_runtime.go",
+          "tests": [
+            "TestIntHeapRuntimeRealOwnersAndFindLE",
+            "TestIntHeapRuntimeAssignmentEveryPhysicalRefusal",
+            "TestIntHeapRuntimeFindLEEveryPhysicalRefusal",
+            "TestIntHeapRuntimeFullPublicConsumersAndCapturedViews",
+            "TestIntHeapRuntimePartialPublishedCopyOwningReceipt",
+            "TestIntHeapRuntimeIndependentMutableComparator",
+            "TestIntHeapRuntimeAssignmentIndependentDestinationDomain",
+            "TestIntHeapRuntimeFreshTodoEveryCallAndCallerGuards",
+            "TestIntHeapLexicalContextActualPostPhysicalStopAcknowledgment",
+            "TestIntHeapOutputOwnerStopsMutationAfterActualConsumedFree",
+            "TestIntHeapFindLEReachedValueRereadAfterComparator",
+            "TestIntHeapInvariantReachedSizeReadAllProfiles",
+            "TestIntHeapAssignmentSourceDestroyedFirstMember",
+            "TestIntHeapFindLESourceOutputBeforeChildGrowth",
+            "TestIntHeapLegacyCopiedCloseRejectsBeforeRefund",
+            "TestIntHeapSourceScalarPlacementReadsWholeIntBeforeWrite",
+            "TestIntHeapEmptySourceZeroSizeSentinelPop",
+            "TestIntHeapSetBoundsSignedConversionBeforeGrowthRefusal",
+            "TestIntHeapConstructorSignedBoundsReachedAfterSentinel"
+          ]
         }
       ],
       "ownership": [
@@ -130996,7 +131098,8 @@
         "Isolation uses charged concrete binary output vectors and lexical coefficient/frame backings; actual initialized extents and source ascending/reverse destruction orders are retained. Refusal/cancellation tests audit real output and manager cells/Words before fault disabling. See PORT_PROGRESS.md#audit-upolynomial-root-isolation-packet-md; allocator/backend integration remains open.",
         "Assignment bytes and initialization state are owned solely by the borrowed real Runtime, with source vector capacity/size headers and explicit block/pending tokens; enclosing variable owner charges embedded metadata. Variable graph Stats exclude borrowed runtime, which physical audits add exactly once. Runtime must outlive variable/propagation owners, which require the same actual Runtime identity.",
         "MonomialPositions charges its actual cold header once and owns one real unsigned32 Runtime vector. Manager/monomials are borrowed. SourceFinalize frees only published member bytes; owning CloseChecked additionally drains actual unreturned pending malloc and physically short ILP32 changed-token blocks without counter repair.",
-        "Skeleton entries/powers/originals use actual Runtime storage; failed constructor transfers actual unconsumed INC fields into charged cold owning-abort records before source backing free. Scoped pointer publications alone own concrete children; stopped source cause retained, separate owning cleanup. Variable helpers own two/one actual embedded uint vectors in one charged stable cold header, views/scopes borrow actual backing and references. Strong shared physical census names pseudo/Power/ExactDiv plus supplied headers/blocks without registry-derived ownership."
+        "Skeleton entries/powers/originals use actual Runtime storage; failed constructor transfers actual unconsumed INC fields into charged cold owning-abort records before source backing free. Scoped pointer publications alone own concrete children; stopped source cause retained, separate owning cleanup. Variable helpers own two/one actual embedded uint vectors in one charged stable cold header, views/scopes borrow actual backing and references. Strong shared physical census names pseudo/Power/ExactDiv plus supplied headers/blocks without registry-derived ownership.",
+        "Actual two Runtime int columns; cold IntHeap header embeds queue and borrows comparator, independent destination Runtime owns copies. Source completed-member unwind/indices-before-values destruction, raw allocation and consumed-field receipts, and fresh lexical todo precede distinct explicit owning abort. Caller IntHeapVector owns real Runtime output; []int32 is borrowed Go output adapter. Exact named-block/bitmap/cold-header census, no registry-derived owners. See PORT_PROGRESS.md."
       ],
       "deviations": [
         "Concrete solver-specific storage, not complete generic vector template surface. Owning model Clone/Assign, other specializations and source-undefined continuation behavior remain explicitly separate.",
@@ -131009,7 +131112,8 @@
         "copy_core sizeof(T) uses actual source size_t width before Runtime call, while expansion retains unsigned32 source extent arithmetic. Oversized capacity/zero-size Runtime32 proof is a malformed source-domain prefix, not valid OOM or a large vector claim.",
         "Selected concrete skeleton canonical order uses heap sort; platform std::sort comparator dispatch order is not claimed. Scalar child IDs encode actual cold object provenance under a fixed Runtime. Cold ownership metadata fully charged and distinct from source malloc events. Whole imp and registered-driver/global diagnostic integration remain open.",
         "Selected concrete consequences and mutex family source mapping supersedes older missing-method notes only for listed sites. Source AST/BV/datatype registered6 assertions, TRACE/verbose, extension dispatch, dormant core_chunking/static helpers, general template variants and full source units remain OPEN. Scalar slot/generation encodes selected8-byte pointer ABI; actual named cold/raw/pending roots charged; no registry-derived ownership. See PORT_PROGRESS.md.",
-        "Standalone SOM buffers/vectors and selected fresh sorting scope added. Authoritative reflected Go class header and charged real retained fields; scalar child ID cold provenance adaptation, no unread native-size ticket or full global malloc/header geometry claim. Heap sort final-order contract only, native comparator schedule/global ostream/full imp remain OPEN. Original source implicit dtor has no Reset/DEC/NUM Del; separate own-abort drains actual named records. See PORT_PROGRESS.md."
+        "Standalone SOM buffers/vectors and selected fresh sorting scope added. Authoritative reflected Go class header and charged real retained fields; scalar child ID cold provenance adaptation, no unread native-size ticket or full global malloc/header geometry claim. Heap sort final-order contract only, native comparator schedule/global ostream/full imp remain OPEN. Original source implicit dtor has no Reset/DEC/NUM Del; separate own-abort drains actual named records. See PORT_PROGRESS.md.",
+        "Selected concrete Runtime general heap source closure only: enabled CASSERT/assertion-switch bindings, wrapped physical extents, legacy slice storage/iterator profile, full ostream transport and other template instantiations remain OPEN. Explicit signed TLS/partially initialized source fixtures prove ownership/physical guards in undefined source domains, not ordinary OOM or native recovery. No whole source-unit promotion."
       ]
     },
     {

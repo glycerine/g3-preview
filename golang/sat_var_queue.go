@@ -9,6 +9,7 @@ import (
 )
 
 type satVarQueue struct {
+	generalSource                                             *IntHeap
 	literalSource                                             *satSimplifier
 	runtimeValues, runtimeIndices                             satSolverRuntimeUintColumn
 	runtimeSourceStop                                         error
@@ -63,6 +64,11 @@ func newSATVarQueue(a *satActivityDomain, b *arena.Budget) (*satVarQueue, error)
 func (q *satVarQueue) open() error {
 	if q == nil || q.self != q {
 		return ErrSATOwner
+	}
+	if q.generalSource != nil {
+		if e := q.generalSource.alive(); e != nil {
+			return e
+		}
 	}
 	if q.closed || q.runtimeClosing {
 		return arena.ErrClosed

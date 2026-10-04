@@ -325,28 +325,30 @@ func TestIntHeapFindLEFailureAndSourceCapacity(t *testing.T) {
 		b.FailAfter(fail)
 		got, e := h.FindLE(7, dst)
 		b.FailAfter(-1)
-		if e != nil {
-			if !errors.Is(e, arena.ErrInjectedFailure) || len(got) != 1 {
-				t.Fatal("staged publication", got, e)
-			}
-			for i, x := range whole {
-				want := int32(88)
-				if i == 0 {
-					want = 99
-				}
-				if x != want {
-					t.Fatal("failed query wrote caller storage")
-				}
-			}
-		} else {
-			want := []int32{99, 1, 3, 7, 6, 2, 5, 4}
-			if fmt.Sprint(got) != fmt.Sprint(want) {
-				t.Fatal("source traversal", got)
-			}
-			if h.Stats().TodoBytes != 5*4 || h.Stats().FoundBytes != 8*4 {
-				t.Fatal("source vector growth", h.Stats())
+		want := []int32{99, 1, 3, 7, 6, 2, 5, 4}
+		if e != nil && !errors.Is(e, arena.ErrInjectedFailure) {
+			t.Fatal(e)
+		}
+		if len(got) > len(want) {
+			t.Fatal("excess query output", got)
+		}
+		for i, x := range got {
+			if x != want[i] {
+				t.Fatal("immediate source traversal prefix", fail, got)
 			}
 		}
+		for i := len(got); i < len(whole); i++ {
+			if whole[i] != 88 {
+				t.Fatal("query wrote beyond published prefix", i)
+			}
+		}
+		if e == nil && len(got) != len(want) {
+			t.Fatal("source traversal", got)
+		}
+		if h.Stats().TodoBytes != 0 || h.Stats().FoundBytes != 0 {
+			t.Fatal("lexical todo retained", h.Stats())
+		}
+
 		if !h.CheckInvariant() || h.Size() != 7 {
 			t.Fatal("query altered heap")
 		}
@@ -365,16 +367,24 @@ func TestIntHeapFindLEFailureAndSourceCapacity(t *testing.T) {
 	dst, e = h.FindLE(100, dst)
 	heapMust(t, e)
 	b.FailAfter(0)
+	if got, e := h.FindLE(100, dst[:0]); !errors.Is(e, arena.ErrInjectedFailure) || len(got) != 0 {
+		t.Fatal("fresh lexical todo must reserve", got, e)
+	}
+	b.FailAfter(-1)
+	before := b.Used()
 	if n := testing.AllocsPerRun(100, func() {
 		var err error
 		dst, err = h.FindLE(100, dst[:0])
 		if err != nil {
 			panic(err)
 		}
-	}); n != 0 {
-		t.Fatal("warm traversal allocations", n)
+	}); n == 0 {
+		t.Fatal("source fresh lexical todo allocation omitted")
 	}
-	b.FailAfter(-1)
+	if b.Used() != before || h.Stats().TodoBytes != 0 || h.Stats().FoundBytes != 0 {
+		t.Fatal("lexical query storage leak")
+	}
+
 }
 
 func TestIntHeapEpochBoundsIteratorAndComparatorSwap(t *testing.T) {
@@ -503,16 +513,24 @@ func TestIntHeapCopyAndAllocationSizeBoundary(t *testing.T) {
 		}
 	}
 	copyBudget.FailAfter(-1)
-	before := copyBudget.Used()
-	values := fmt.Sprint(c.values)
 	it := c.Begin()
-	for prefix := int64(0); prefix < 3; prefix++ {
+	for prefix := int64(0); prefix < 2; prefix++ {
+		candidate := testIntHeap(t, 4, IntHeapConfig{Budget: copyBudget})
+		heapMust(t, candidate.Insert(1))
+		before := copyBudget.Used()
+		oldValues, oldIndices := uint64(cap(candidate.values))*4, uint64(cap(candidate.indices))*4
 		copyBudget.FailAfter(prefix)
-		if err := c.Assign(h); !errors.Is(err, arena.ErrInjectedFailure) || fmt.Sprint(c.values) != values || copyBudget.Used() != before {
-			t.Fatal("staged assignment", prefix, err)
+		err := candidate.Assign(h)
+		want := before - oldValues
+		if prefix == 1 {
+			want += uint64(cap(h.values))*4 - oldIndices
 		}
+		if !errors.Is(err, arena.ErrInjectedFailure) || copyBudget.Used() != want {
+			t.Fatal("source destructive member frontier", prefix, err, copyBudget.Used(), want)
+		}
+		copyBudget.FailAfter(-1)
+		heapMust(t, candidate.CleanupStopped())
 	}
-	copyBudget.FailAfter(-1)
 	heapMust(t, c.Assign(h))
 	if !c.Contains(2) || !c.CheckInvariant() {
 		t.Fatal("assignment")

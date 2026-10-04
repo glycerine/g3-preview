@@ -111,6 +111,9 @@ func (q *satVarQueue) putRuntime(i, v int32) error {
 	return q.runtimeIndices.write(uint32(v), uint32(i))
 }
 func (q *satVarQueue) lessRuntime(a, b int32) (bool, error) {
+	if q.generalSource != nil {
+		return q.generalSource.lt(a, b), nil
+	}
 	if q.literalSource != nil {
 		x, e := q.literalSource.literalWeight(uint32(a))
 		if e != nil {

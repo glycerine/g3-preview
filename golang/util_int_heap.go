@@ -1,5 +1,5 @@
 // Licensed under the MIT license.
-// Concrete port of src/util/heap.h.
+// Concrete port of src/util/heap.h; src/util/vector.h:102-129,191-202.
 package g3
 
 import (
@@ -9,7 +9,10 @@ import (
 	"strings"
 
 	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
 )
+
+var ErrHeapStopped = errors.New("g3: heap source assignment stopped after destruction")
 
 var ErrHeapValue = errors.New("g3: invalid, absent, or duplicate heap value")
 
@@ -18,14 +21,21 @@ var ErrHeapValue = errors.New("g3: invalid, absent, or duplicate heap value")
 // change a present value's priority only together with Increased/Decreased.
 // A nil Less compares the integer values themselves.
 type IntHeapConfig struct {
-	Budget *arena.Budget
-	Less   func(int32, int32) bool
+	Budget  *arena.Budget
+	Less    func(int32, int32) bool
+	Runtime *memory.Runtime
 }
 
 // IntHeap stores source integer values and inverse positions in pointer-free
 // arrays. It is owner-local; callers serialize operations and borrowed priorities.
 // Do not copy an owning IntHeap value; use Clone or Assign for source deep copies.
 type IntHeap struct {
+	self            *IntHeap
+	runtimeQueue    satVarQueue
+	findFrame       *intHeapFindFrame
+	destroyed       uint8
+	sourceStop      error
+	closing         bool
 	values, indices []int32
 	todo, found     []int32
 	budget          *arena.Budget
@@ -57,6 +67,9 @@ type IntHeapStats struct {
 }
 
 func NewIntHeap(bounds int32, c IntHeapConfig) (*IntHeap, error) {
+	if c.Runtime != nil {
+		return newIntHeapRuntime(bounds, c)
+	}
 	if bounds < 0 {
 		return nil, arena.ErrBounds
 	}
@@ -64,6 +77,7 @@ func NewIntHeap(bounds int32, c IntHeapConfig) (*IntHeap, error) {
 		return nil, e
 	}
 	h := &IntHeap{budget: c.Budget, less: c.Less, epoch: 1}
+	h.self = h
 	if e := h.grow(&h.values, 1); e != nil {
 		h.Close()
 		return nil, e
@@ -96,8 +110,14 @@ func (h *IntHeap) grow(v *[]int32, need int) error {
 	return nil
 }
 func (h *IntHeap) alive() error {
-	if h == nil || h.closed {
+	if h == nil || h.self != h {
+		return ErrSATOwner
+	}
+	if h.closed || h.closing {
 		return arena.ErrClosed
+	}
+	if h.sourceStop != nil {
+		return h.sourceStop
 	}
 	return nil
 }
@@ -116,26 +136,66 @@ func (h *IntHeap) lt(a, b int32) bool {
 	}
 	return h.less(a, b)
 }
-func (h *IntHeap) Empty() bool { return h.Size() == 0 }
+func (h *IntHeap) Empty() bool {
+	if h != nil && h.runtimeBacked() {
+		if e := h.alive(); e != nil {
+			panic(e)
+		}
+		empty, e := h.runtimeQueue.emptyChecked()
+		if e != nil {
+			panic(e)
+		}
+		return empty
+	}
+	return h.Size() == 0
+}
 func (h *IntHeap) Size() uint32 {
+	if h != nil && h.runtimeBacked() {
+		n, e := h.runtimeQueue.sizeChecked()
+		if e != nil {
+			panic(e)
+		}
+		return n
+	}
 	if h == nil || h.closed {
 		return 0
 	}
 	return uint32(len(h.values) - 1)
 }
 func (h *IntHeap) Bounds() int32 {
+	if h != nil && h.runtimeBacked() {
+		n, e := h.runtimeQueue.runtimeIndices.size()
+		if e != nil {
+			panic(e)
+		}
+		return int32(n)
+	}
 	if h == nil || h.closed {
 		return 0
 	}
 	return int32(len(h.indices))
 }
 func (h *IntHeap) Contains(v int32) bool {
+	if h != nil && h.runtimeBacked() {
+		yes, e := h.runtimeQueue.containsChecked(satBoolVar(v))
+		if e != nil {
+			panic(e)
+		}
+		return yes
+	}
 	return h != nil && !h.closed && v >= 0 && int64(v) < int64(len(h.indices)) && h.indices[v] != 0
 }
 
 // CheckInvariant checks live values, as the source traversal does. Failed
 // insertion can leave additional inverse entries that this check does not visit.
 func (h *IntHeap) CheckInvariant() bool {
+	if h != nil && h.runtimeBacked() {
+		yes, e := h.invariantRuntime()
+		if e != nil {
+			panic(e)
+		}
+		return yes
+	}
 	if h == nil || h.closed || len(h.values) == 0 || h.values[0] != -1 {
 		return false
 	}
@@ -182,6 +242,12 @@ func (h *IntHeap) down(i int32) {
 	h.indices[v] = i
 }
 func (h *IntHeap) Insert(v int32) error {
+	if h.runtimeBacked() {
+		if e := h.alive(); e != nil {
+			return e
+		}
+		return h.runtimeQueue.insertRuntime(satBoolVar(v))
+	}
 	if e := h.canChange(); e != nil {
 		return e
 	}
@@ -204,6 +270,21 @@ func (h *IntHeap) Insert(v int32) error {
 	return nil
 }
 func (h *IntHeap) Min() (int32, error) {
+	if h.runtimeBacked() {
+		if e := h.alive(); e != nil {
+			return 0, e
+		}
+		if satStorageSourceDebug {
+			yes, e := h.runtimeQueue.emptyChecked()
+			if e != nil {
+				return 0, e
+			}
+			if yes {
+				return 0, ErrSATAssertion
+			}
+		}
+		return h.runtimeQueue.valueRuntime(1)
+	}
 	if e := h.alive(); e != nil {
 		return 0, e
 	}
@@ -213,6 +294,13 @@ func (h *IntHeap) Min() (int32, error) {
 	return h.values[1], nil
 }
 func (h *IntHeap) EraseMin() (int32, error) {
+	if h.runtimeBacked() {
+		if e := h.alive(); e != nil {
+			return 0, e
+		}
+		v, e := h.runtimeQueue.nextRuntime()
+		return int32(v), e
+	}
 	v, e := h.Min()
 	if e != nil {
 		return 0, e
@@ -223,6 +311,12 @@ func (h *IntHeap) EraseMin() (int32, error) {
 	return v, nil
 }
 func (h *IntHeap) Erase(v int32) error {
+	if h.runtimeBacked() {
+		if e := h.alive(); e != nil {
+			return e
+		}
+		return h.runtimeQueue.eraseRuntime(satBoolVar(v))
+	}
 	if e := h.canChange(); e != nil {
 		return e
 	}
@@ -249,6 +343,25 @@ func (h *IntHeap) Erase(v int32) error {
 	return nil
 }
 func (h *IntHeap) Increased(v int32) error {
+	if h.runtimeBacked() {
+		if e := h.alive(); e != nil {
+			return e
+		}
+		if satStorageSourceDebug {
+			yes, e := h.runtimeQueue.containsChecked(satBoolVar(v))
+			if e != nil {
+				return e
+			}
+			if !yes {
+				return ErrSATAssertion
+			}
+		}
+		i, e := h.runtimeQueue.indexRuntime(v)
+		if e != nil {
+			return e
+		}
+		return h.runtimeQueue.downRuntime(i)
+	}
 	if e := h.canChange(); e != nil {
 		return e
 	}
@@ -263,6 +376,25 @@ func (h *IntHeap) Increased(v int32) error {
 	return nil
 }
 func (h *IntHeap) Decreased(v int32) error {
+	if h.runtimeBacked() {
+		if e := h.alive(); e != nil {
+			return e
+		}
+		if satStorageSourceDebug {
+			yes, e := h.runtimeQueue.containsChecked(satBoolVar(v))
+			if e != nil {
+				return e
+			}
+			if !yes {
+				return ErrSATAssertion
+			}
+		}
+		i, e := h.runtimeQueue.indexRuntime(v)
+		if e != nil {
+			return e
+		}
+		return h.runtimeQueue.upRuntime(i)
+	}
 	if e := h.canChange(); e != nil {
 		return e
 	}
@@ -277,6 +409,12 @@ func (h *IntHeap) Decreased(v int32) error {
 	return nil
 }
 func (h *IntHeap) SetBounds(n int32) error {
+	if h.runtimeBacked() {
+		if e := h.alive(); e != nil {
+			return e
+		}
+		return h.setBoundsRuntime(uint32(n))
+	}
 	if e := h.alive(); e != nil {
 		return e
 	}
@@ -317,6 +455,12 @@ func (h *IntHeap) Reserve(n int32) error {
 	return nil
 }
 func (h *IntHeap) Reset() error {
+	if h.runtimeBacked() {
+		if e := h.alive(); e != nil {
+			return e
+		}
+		return h.runtimeQueue.resetRuntime()
+	}
 	if e := h.alive(); e != nil {
 		return e
 	}
@@ -334,69 +478,101 @@ func (h *IntHeap) Reset() error {
 }
 func (h *IntHeap) Clear() error { return h.Reset() }
 func (h *IntHeap) AppendValues(dst []int32) ([]int32, error) {
+	if h.runtimeBacked() {
+		if e := h.alive(); e != nil {
+			return dst, e
+		}
+		return h.appendRuntime(dst)
+	}
 	if e := h.alive(); e != nil {
 		return dst, e
 	}
 	return append(dst, h.values[1:]...), nil
 }
 
-// FindLE retains budgeted temporary workspaces and publishes only after all
-// reservations succeed. The source pushes left then right, visiting right first.
+// FindLE appends each visited value before its separate left/right todo pushes.
+// The slice result is a borrowed Go adapter; it is never counted as Runtime
+// storage. The actual source todo is lexical and destroyed at return.
 func (h *IntHeap) FindLE(v int32, dst []int32) ([]int32, error) {
 	if e := h.alive(); e != nil {
 		return dst, e
 	}
-	h.todo = h.todo[:0]
-	h.found = h.found[:0]
-	if e := h.grow(&h.todo, 1); e != nil {
+	if h.runtimeBacked() {
+		return h.findLESlice(v, dst)
+	}
+	var todo []int32
+	defer func() { h.budget.Release(uint64(cap(todo)) * 4) }()
+	if e := h.grow(&todo, 1); e != nil {
 		return dst, e
 	}
-	h.todo = append(h.todo, 1)
-	for len(h.todo) > 0 {
-		i := h.todo[len(h.todo)-1]
-		h.todo = h.todo[:len(h.todo)-1]
-		if uint64(i) >= uint64(len(h.values)) || h.lt(v, h.values[i]) {
+	todo = append(todo, 1)
+	for len(todo) > 0 {
+		i := todo[len(todo)-1]
+		todo = todo[:len(todo)-1]
+		if i >= int32(len(h.values)) || h.lt(v, h.values[i]) {
 			continue
 		}
-		if e := h.grow(&h.found, len(h.found)+1); e != nil {
+		dst = append(dst, h.values[i])
+		if i < 0 || i > int32(^uint32(0)>>2) {
+			return dst, ErrSATSignedHeapIndexDomain
+		}
+		if e := h.grow(&todo, len(todo)+1); e != nil {
 			return dst, e
 		}
-		h.found = append(h.found, h.values[i])
-		if e := h.grow(&h.todo, len(h.todo)+2); e != nil {
+		todo = append(todo, i<<1)
+		if e := h.grow(&todo, len(todo)+1); e != nil {
 			return dst, e
 		}
-		// Preserve the source's pushes even for beyond-heap children. Only
-		// unrepresentable indices (source signed-shift UB) are discarded.
-		left := uint64(i) * 2
-		if left <= 1<<31-1 {
-			h.todo = append(h.todo, int32(left))
-		}
-		if left+1 <= 1<<31-1 {
-			h.todo = append(h.todo, int32(left+1))
-		}
+		todo = append(todo, (i<<1)+1)
 	}
-	return append(dst, h.found...), nil
+	return dst, nil
 }
 func (h *IntHeap) Display() (string, error) {
 	if e := h.alive(); e != nil {
 		return "", e
 	}
-	var b strings.Builder
-	var walk func(uint64, int)
-	walk = func(i uint64, indent int) {
-		if i >= uint64(len(h.values)) {
-			return
+	var out strings.Builder
+	var walk func(int32, uint32) error
+	walk = func(i int32, indent uint32) error {
+		n := uint32(len(h.values))
+		if h.runtimeBacked() {
+			var e error
+			n, e = h.runtimeQueue.runtimeValues.size()
+			if e != nil {
+				return e
+			}
 		}
-		for j := 0; j < indent; j++ {
-			b.WriteByte(' ')
+		if i >= int32(n) {
+			return nil
 		}
-		b.WriteString(strconv.FormatInt(int64(h.values[i]), 10))
-		b.WriteByte('\n')
-		walk(i*2, indent+1)
-		walk(i*2+1, indent+1)
+		var value int32
+		if h.runtimeBacked() {
+			var e error
+			value, e = h.runtimeQueue.valueRuntime(i)
+			if e != nil {
+				return e
+			}
+		} else {
+			if i < 0 {
+				return arena.ErrBounds
+			}
+			value = h.values[i]
+		}
+		for j := uint32(0); j < indent; j++ {
+			out.WriteByte(' ')
+		}
+		out.WriteString(strconv.FormatInt(int64(value), 10))
+		out.WriteByte('\n')
+		if i < 0 || i > int32(^uint32(0)>>2) {
+			return ErrSATSignedHeapIndexDomain
+		}
+		if e := walk(i<<1, indent+1); e != nil {
+			return e
+		}
+		return walk((i<<1)+1, indent+1)
 	}
-	walk(1, 0)
-	return b.String(), nil
+	e := walk(1, 0)
+	return out.String(), e
 }
 
 // Swap exchanges only the source value and inverse-index vectors, leaving
@@ -417,6 +593,9 @@ func (h *IntHeap) Swap(other *IntHeap) error {
 	}
 	if e := other.canChange(); e != nil {
 		return e
+	}
+	if h.runtimeBacked() || other.runtimeBacked() {
+		return h.swapRuntime(other)
 	}
 	a := uint64(cap(h.values)+cap(h.indices)) * 4
 	b := uint64(cap(other.values)+cap(other.indices)) * 4
@@ -441,6 +620,12 @@ func (h *IntHeap) Swap(other *IntHeap) error {
 // Clone implements the source implicit heap copy constructor. Vector capacities
 // are copied exactly; the source's local FindLE workspaces are not copied.
 func (h *IntHeap) Clone(budget *arena.Budget) (*IntHeap, error) {
+	if h != nil && h.runtimeBacked() {
+		if e := h.alive(); e != nil {
+			return nil, e
+		}
+		return h.cloneRuntime(budget)
+	}
 	if e := h.alive(); e != nil {
 		return nil, e
 	}
@@ -448,6 +633,7 @@ func (h *IntHeap) Clone(budget *arena.Budget) (*IntHeap, error) {
 		return nil, e
 	}
 	c := &IntHeap{budget: budget, less: h.less, epoch: 1}
+	c.self = c
 	for _, p := range []struct {
 		src []int32
 		dst *[]int32
@@ -465,9 +651,9 @@ func (h *IntHeap) Clone(budget *arena.Budget) (*IntHeap, error) {
 	return c, nil
 }
 
-// Assign implements source deep assignment with a charged temporary owner.
-// Predictable failures preserve the destination rather than the source's
-// partially destroyed vectors. The comparator is copied with its environment.
+// Assign executes implicit base assignment followed by vector members in
+// declaration order. A refused copy retains the destroyed source field and
+// an actual consumed-ownership receipt; only CleanupStopped acknowledges it.
 func (h *IntHeap) Assign(other *IntHeap) error {
 	if e := h.alive(); e != nil {
 		return e
@@ -481,15 +667,31 @@ func (h *IntHeap) Assign(other *IntHeap) error {
 	if e := h.canChange(); e != nil {
 		return e
 	}
-	c, e := other.Clone(h.budget)
-	if e != nil {
-		return e
+	if h.runtimeBacked() || other.runtimeBacked() {
+		return h.assignRuntime(other)
 	}
-	h.budget.Release(uint64(cap(h.values))*4 + uint64(cap(h.indices))*4)
-	h.values, h.indices, h.less = c.values, c.indices, c.less
-	c.values = nil
-	c.indices = nil
-	c.Close()
+	h.less = other.less
+	for i := uint8(0); i < 2; i++ {
+		dst, src := &h.values, other.values
+		if i == 1 {
+			dst, src = &h.indices, other.indices
+		}
+		h.budget.Release(uint64(cap(*dst)) * 4)
+		h.destroyed |= 1 << i
+		if cap(src) == 0 {
+			*dst = nil
+			h.destroyed &^= 1 << i
+			continue
+		}
+		if e := h.budget.Reserve(uint64(cap(src)) * 4); e != nil {
+			h.sourceStop = e
+			return e
+		}
+		next := make([]int32, len(src), cap(src))
+		copy(next, src)
+		*dst = next
+		h.destroyed &^= 1 << i
+	}
 	h.epoch++
 	return nil
 }
@@ -497,9 +699,25 @@ func (h *IntHeap) Stats() IntHeapStats {
 	if h == nil || h.closed {
 		return IntHeapStats{}
 	}
-	return IntHeapStats{intHeapOwnerBytes, uint64(cap(h.values)) * 4, uint64(cap(h.indices)) * 4, uint64(cap(h.todo)) * 4, uint64(cap(h.found)) * 4}
+	v, i := uint64(cap(h.values))*4, uint64(cap(h.indices))*4
+	if h.destroyed&1 != 0 {
+		v = 0
+	}
+	if h.destroyed&2 != 0 {
+		i = 0
+	}
+	return IntHeapStats{intHeapOwnerBytes, v, i, uint64(cap(h.todo)) * 4, uint64(cap(h.found)) * 4}
 }
 func (h *IntHeap) Close() error {
+	if h != nil && h.self != h {
+		return ErrSATOwner
+	}
+	if h != nil && h.runtimeBacked() {
+		return h.closeRuntime()
+	}
+	if h != nil && h.sourceStop != nil {
+		return h.sourceStop
+	}
 	if h == nil || h.closed {
 		return nil
 	}
@@ -516,22 +734,40 @@ func (h *IntHeap) Close() error {
 
 // IntHeapIterator is cold checked metadata, never a raw internal slice.
 type IntHeapIterator struct {
-	owner *IntHeap
-	epoch uint64
-	index int
+	owner   *IntHeap
+	epoch   uint64
+	index   int
+	runtime *memory.Runtime
+	block   memory.Block
 }
 
 func (h *IntHeap) Begin() IntHeapIterator {
+	if h != nil && h.runtimeBacked() {
+		if e := h.alive(); e != nil {
+			panic(e)
+		}
+		return IntHeapIterator{runtime: h.runtimeQueue.runtimeValues.raw.runtime, block: h.runtimeQueue.runtimeValues.raw.block, index: 1}
+	}
 	if h == nil {
 		return IntHeapIterator{}
 	}
-	return IntHeapIterator{h, h.epoch, 1}
+	return IntHeapIterator{owner: h, epoch: h.epoch, index: 1}
 }
 func (h *IntHeap) End() IntHeapIterator {
+	if h != nil && h.runtimeBacked() {
+		if e := h.alive(); e != nil {
+			panic(e)
+		}
+		n, e := h.runtimeQueue.runtimeValues.size()
+		if e != nil {
+			panic(e)
+		}
+		return IntHeapIterator{runtime: h.runtimeQueue.runtimeValues.raw.runtime, block: h.runtimeQueue.runtimeValues.raw.block, index: int(n)}
+	}
 	if h == nil {
 		return IntHeapIterator{}
 	}
-	return IntHeapIterator{h, h.epoch, len(h.values)}
+	return IntHeapIterator{owner: h, epoch: h.epoch, index: len(h.values)}
 }
 func (it IntHeapIterator) valid() error {
 	if e := it.owner.alive(); e != nil {
@@ -543,6 +779,10 @@ func (it IntHeapIterator) valid() error {
 	return nil
 }
 func (it IntHeapIterator) Value() (int32, error) {
+	if it.runtime != nil {
+		x, e := it.runtime.ReadUint32(it.block, 8+4*uint64(it.index))
+		return int32(x), e
+	}
 	if e := it.valid(); e != nil {
 		return 0, e
 	}
@@ -552,6 +792,17 @@ func (it IntHeapIterator) Value() (int32, error) {
 	return it.owner.values[it.index], nil
 }
 func (it *IntHeapIterator) Next() error {
+	if it != nil && it.runtime != nil {
+		n, e := it.runtime.Size(it.block)
+		if e != nil {
+			return e
+		}
+		if uint64(it.index+1) > (n-8)/4 {
+			return arena.ErrBounds
+		}
+		it.index++
+		return nil
+	}
 	if it == nil {
 		return arena.ErrInvalidSlot
 	}
