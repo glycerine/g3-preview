@@ -1,5 +1,5 @@
 // Licensed under the MIT license.
-// Source: mpq.cpp156-184 raw locals do not have numeral destructors.
+// Source: src/util/mpq.cpp156-184 raw locals do not have numeral destructors.
 package mpnum
 
 import (
@@ -7,12 +7,16 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
 )
 
 func rawDisplayFixture(t *testing.T) (*RationalManager, *arena.Budget, Rational) {
+	return rawDisplayFixtureProfile(t, memory.SmallAllocatorProfile{})
+}
+func rawDisplayFixtureProfile(t *testing.T, profile memory.SmallAllocatorProfile) (*RationalManager, *arena.Budget, Rational) {
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
-	cfg := IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{PageSize: 2, Budget: b}}}
+	cfg := IntegerConfig{Profile: profile, Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{PageSize: 2, Budget: b}}}
 	m, e := NewRationalManager(RationalConfig{Integers: cfg})
 	if e != nil {
 		t.Fatal(e)
@@ -31,7 +35,7 @@ func TestRawDecimalFailedDenominatorRetainsCopiedNumerator(t *testing.T) {
 	// Independently locate the real allocation prefix between the two source
 	// Copy calls, rather than relying on an allocator ordinal constant.
 	for fault := int64(0); fault < 40; fault++ {
-		control, cb, ca := rawDisplayFixture(t)
+		control, cb, ca := rawDisplayFixtureProfile(t, memory.SmallAllocatorProfile{PointerBits: 64, Debug: true})
 		var num, den Int
 		cb.FailAfter(fault)
 		e1 := control.z.Copy(&num, &ca.num)
@@ -48,7 +52,7 @@ func TestRawDecimalFailedDenominatorRetainsCopiedNumerator(t *testing.T) {
 		if !selected {
 			continue
 		}
-		m, b, a := rawDisplayFixture(t)
+		m, b, a := rawDisplayFixtureProfile(t, memory.SmallAllocatorProfile{PointerBits: 64, Debug: true})
 		before := m.z.cells.Stats().Live
 		b.FailAfter(fault)
 		_, e := m.prepareDecimal(&a, 0, false)

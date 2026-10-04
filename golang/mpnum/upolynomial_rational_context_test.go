@@ -1,4 +1,5 @@
 // Licensed under the MIT license.
+// Source: src/math/polynomial/upolynomial.cpp, src/util/scoped_numeral_vector.h.
 package mpnum
 
 import (
@@ -235,7 +236,7 @@ func TestUPolynomialContextPartialCopyWaitsForStoppedVector(t *testing.T) {
 	if state.Aborts != 1 || state.Completed != 0 || !errors.Is(state.Cause, stopped) || !errors.Is(state.OriginalCause, original) {
 		t.Fatal(state)
 	}
-	if s.lexical.roots[0].num.cell != s.manager.z.failedRef {
+	if s.lexical.roots[0].num.cell != s.manager.z.failedNullRef {
 		t.Fatal("partial copy adapter drained before older vector")
 	}
 	contextAudit(t, s, &a, m, p)

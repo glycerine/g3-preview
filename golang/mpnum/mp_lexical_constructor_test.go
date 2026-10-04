@@ -1,4 +1,5 @@
 // Licensed under the MIT license.
+// Source: src/util/scoped_numeral.h, src/util/inf_rational.h.
 package mpnum
 
 import (
@@ -322,7 +323,7 @@ func TestConstructorExpressionFailedCopyPhase(t *testing.T) {
 	b.FailAfter(0)
 	e = s.infRatExpr(&src, &one, &out, '+')
 	state, _ := s.LexicalState()
-	if !numericPhysicalReservationRefusal(e) || state.Aborts != 1 || state.Completed != 0 || s.lexical.roots[0].num.cell != s.manager.z.failedRef {
+	if !numericPhysicalReservationRefusal(e) || state.Aborts != 1 || state.Completed != 0 || s.lexical.roots[0].num.cell != s.manager.z.failedNullRef {
 		t.Fatal("failed copy destructor phase", e, state)
 	}
 	serviceAuditRationalRoots(t, s, &src, &out, &s.lexical.roots[0])

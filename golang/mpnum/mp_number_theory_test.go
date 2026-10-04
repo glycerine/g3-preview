@@ -1,4 +1,5 @@
 // Licensed under the MIT license.
+// Source: src/util/mpz.cpp, src/util/mpq.h.
 package mpnum
 
 import (
@@ -298,7 +299,7 @@ func TestNumberTheoryLargeCanonicalCoefficientsAndLCM(t *testing.T) {
 	}
 }
 func TestNumberTheoryRationalResetPrefixAndOutputAliasing(t *testing.T) {
-	m, budget := rationalManager(t, true)
+	m, budget := rationalPublicationDirectOwner(t, true)
 	r1, r2, a, b, g := NewRational(), NewRational(), NewRational(), NewRational(), NewRational()
 	huge := new(big.Int).Lsh(big.NewInt(1), 300)
 	setRationalOracle(t, m, &r1, huge, big.NewInt(1))
@@ -315,17 +316,24 @@ func TestNumberTheoryRationalResetPrefixAndOutputAliasing(t *testing.T) {
 	}
 	qopsMust(t, m.SetInt64(&r1, -26))
 	qopsMust(t, m.SetInt64(&r2, 7))
-	// The pooled metadata-refusal prefix reaches an invalid source scratch
-	// access during this aliased continuation. The direct debug refusal occurs
-	// earlier, leaving that path intact through the source Bezout assertion.
+	// The selected actual direct refusal precedes source scratch use. The
+	// intact-scratch alias repeats cpp962 sign rereads; DEBUG cpp968-975 stops
+	// before publishing g, while native cpp977 publishes gcd1.
 	e = m.ExtendedGCD(&r1, &r2, &r1, &b, &g)
 	qopsAuditLiveOwnership(t, m, []*Int{&r1.num, &r1.den, &r2.num, &r2.den, &a.num, &a.den, &b.num, &b.den, &g.num, &g.den})
-	wantContinuation := error(arena.ErrInvalidSlot)
+	var wantContinuation error
 	if sourceExtendedGCDDebug {
 		wantContinuation = errExtendedGCDInvariant
 	}
 	if !errors.Is(e, wantContinuation) {
 		t.Fatal("source-profile completed prefix continuation", e)
+	}
+	wantContinuedG := "1"
+	if sourceExtendedGCDDebug {
+		wantContinuedG = "23"
+	}
+	if rationalString(t, m, &r1) != "3" || rationalString(t, m, &b) != "-11" || rationalString(t, m, &g) != wantContinuedG {
+		t.Fatal("source sign reread and final gcd publication")
 	}
 
 	for _, q := range []*Rational{&r1, &r2, &a, &b, &g} {
@@ -361,6 +369,36 @@ func TestNumberTheoryRationalResetPrefixAndOutputAliasing(t *testing.T) {
 	qopsMust(t, e)
 	if !ok {
 		t.Fatal("rational divides")
+	}
+	for _, q := range []*Rational{&r1, &r2, &a, &b, &g} {
+		qopsMust(t, m.Del(q))
+	}
+}
+
+// A separate actual ensure_tmp replacement failure creates the missing scratch
+// access. It is not inserted into the intact-scratch GCD COPY refusal sequence.
+// Source: src/util/mpz.cpp ensure_tmp and gcd's reached machine_div action.
+func TestNumberTheoryStoppedScratchReplacementSourceGuard(t *testing.T) {
+	m, budget := rationalManager(t, true)
+	r1, r2, a, b, g := NewRational(), NewRational(), NewRational(), NewRational(), NewRational()
+	setRationalOracle(t, m, &r1, new(big.Int).Lsh(big.NewInt(1), 300), big.NewInt(1))
+	qopsMust(t, m.SetInt64(&r2, 7))
+	qopsMust(t, m.SetFraction(&a, 17, 3))
+	qopsMust(t, m.SetFraction(&b, 19, 5))
+	qopsMust(t, m.SetFraction(&g, 23, 7))
+	old := m.z.tmp[0]
+	budget.FailAfter(0)
+	e := m.z.ensureTmp(0, 1024)
+	if !numericPhysicalReservationRefusal(e) || m.z.tmp[0] != 0 || validNumericRef(m.z.cells, old) {
+		t.Fatal("actual free-before-replacement source hole", e)
+	}
+	roots := []*Int{&r1.num, &r1.den, &r2.num, &r2.den, &a.num, &a.den, &b.num, &b.den, &g.num, &g.den}
+	qopsAuditLiveOwnership(t, m, roots)
+	budget.FailAfter(-1)
+	e = m.ExtendedGCD(&r1, &r2, &a, &b, &g)
+	qopsAuditLiveOwnership(t, m, roots)
+	if !errors.Is(e, arena.ErrInvalidSlot) || m.z.tmp[0] != 0 {
+		t.Fatal("source reached missing scratch access without repair", e)
 	}
 	for _, q := range []*Rational{&r1, &r2, &a, &b, &g} {
 		qopsMust(t, m.Del(q))

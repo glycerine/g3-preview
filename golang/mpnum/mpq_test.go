@@ -726,7 +726,7 @@ func TestRationalColdInverseFailureCleanup(t *testing.T) {
 func setterPairPrefix(t *testing.T, m *RationalManager, out *Rational, oldN, oldD string, n, d *big.Int, copyGrowth bool) {
 	t.Helper()
 	component := func(v *Int) string {
-		if v.cell == m.z.failedRef {
+		if m.z.isFailureRef(v.cell) {
 			if !copyGrowth {
 				t.Fatal("scalar initial allocation cannot publish failed Copy token")
 			}

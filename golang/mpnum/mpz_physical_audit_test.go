@@ -1,5 +1,6 @@
 // Licensed under the MIT license.
 // Independent test-only physical roots for the source-backed Integer owner.
+// Source: src/util/mpz.h, src/util/mpz.cpp, src/util/mpq.h.
 package mpnum
 
 import (
@@ -21,7 +22,7 @@ func integerPhysicalAudit(t *testing.T, m *IntegerManager, public ...*Int) {
 	t.Helper()
 	cells := map[numericCellRef]bool{}
 	add := func(r numericCellRef) {
-		if r == 0 || r == m.failedRef {
+		if r == 0 || m.isFailureRef(r) {
 			return
 		}
 		if !validNumericRef(m.cells, r) {

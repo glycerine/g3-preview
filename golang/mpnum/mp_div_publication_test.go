@@ -1,5 +1,6 @@
 // Licensed under the MIT license.
 // Added source-action/profile tests for mpq.h division/reciprocal methods.
+// Source: src/util/mpz.h, src/util/mpz.cpp, src/util/mpq.h.
 package mpnum
 
 import (
@@ -175,7 +176,7 @@ func TestDivisionPublicationCallerFailurePrefixes(t *testing.T) {
 						powerPublicationComponent(t, m.z, &dst.num, ns...)
 						powerPublicationComponent(t, m.z, &dst.den, ds...)
 					}
-					if e != nil && (dst.num.cell == m.z.failedRef || dst.den.cell == m.z.failedRef || integerString(t, m.z, &dst.num) != beforeNum || integerString(t, m.z, &dst.den) != beforeDen) {
+					if e != nil && (m.z.isFailureRef(dst.num.cell) || m.z.isFailureRef(dst.den.cell) || integerString(t, m.z, &dst.num) != beforeNum || integerString(t, m.z, &dst.den) != beforeDen) {
 						changed = true
 					}
 					qopsMust(t, m.Del(&a))
@@ -701,7 +702,7 @@ func TestDivisionPublicationInverseCopyFailureBeforeDebugAssertion(t *testing.T)
 		budget.FailAfter(0)
 		e := m.Inv(&a, &out)
 		qopsAuditLiveOwnership(t, m, roots)
-		if !numericPhysicalReservationRefusal(e) || out.num != NewInt(0) || out.den.cell != m.z.failedRef {
+		if !numericPhysicalReservationRefusal(e) || out.num != NewInt(0) || out.den.cell != m.z.failedNullRef {
 			t.Fatal("real denominator Copy precedes zero assertion/Swap", e, out)
 		}
 		budget.FailAfter(-1)

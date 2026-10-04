@@ -517,9 +517,17 @@ func TestRationalInspectionEveryFailurePrefix(t *testing.T) {
 					wantOut, wantInteger := beforeOut, beforeInt
 					switch operation {
 					case 0, 1:
-						wantInteger = Int{val: 1, cell: m.z.failedRef}
+						wantRef := m.z.failedNullRef
+						if beforeInt.cell != 0 {
+							wantRef = m.z.failedRef
+						}
+						wantInteger = Int{val: 1, cell: wantRef}
 					case 2, 3, 5, 6:
-						wantOut.num = Int{val: 1, cell: m.z.failedRef}
+						wantRef := m.z.failedNullRef
+						if beforeOut.num.cell != 0 {
+							wantRef = m.z.failedRef
+						}
+						wantOut.num = Int{val: 1, cell: wantRef}
 					}
 					if out != wantOut || integerOut != wantInteger {
 						t.Fatal("source allocation prefix", synch, operation, fault, out, integerOut)

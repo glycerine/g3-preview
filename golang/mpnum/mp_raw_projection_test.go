@@ -1,5 +1,6 @@
 // Licensed under the MIT license.
 // Source-action/domain tests for mpq.h191-237,562,666-669 and Inf reference adapters.
+// Source: src/util/mpz.h, src/util/mpz.cpp, src/util/mpq.h.
 package mpnum
 
 import (
@@ -177,7 +178,7 @@ func TestRawProjectionCopyLateReadAndFailurePrefixes(t *testing.T) {
 			if !errors.Is(err, arena.ErrInjectedFailure) && !ss.manager.z.memory.State().OutOfMemory {
 				t.Fatal("physical Memout requires real OOM state", fail, err)
 			}
-			if d.den.val != 1 || d.den.cell != ss.manager.z.failedRef {
+			if d.den.val != 1 || d.den.cell != ss.manager.z.failedNullRef {
 				t.Fatal("source sign/failed allocation prefix", fail, d.den)
 			}
 		} else {

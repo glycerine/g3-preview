@@ -346,6 +346,18 @@ func TestIntegerGCDAndFusedWarmAllocations(t *testing.T) {
 	if e := m.SubMul(&a, &b, &c, &out); e != nil {
 		t.Fatal(e)
 	}
+	// Prime the same complete measured cycle with out's big root now live.
+	// The first GCD ran before AddMul created it; paired dead metadata can make
+	// the later, genuinely larger descriptor peak require another real page.
+	if e := m.GCD(&a, &b, &g); e != nil {
+		t.Fatal(e)
+	}
+	if e := m.AddMul(&a, &b, &c, &out); e != nil {
+		t.Fatal(e)
+	}
+	if e := m.SubMul(&a, &b, &c, &out); e != nil {
+		t.Fatal(e)
+	}
 	beforeWarm := numericWarmProfileSnapshot(t, m, budget)
 	var operationError error
 	allocations := testing.AllocsPerRun(100, func() {

@@ -7,7 +7,6 @@ import (
 	"math"
 	"math/big"
 	"testing"
-
 )
 
 func roundPublicationFillCells(t *testing.T, m *IntegerManager) []*Int {
@@ -65,7 +64,11 @@ func TestRoundPublicationIntegralCopyRefusal(t *testing.T) {
 					if !numericPhysicalReservationRefusal(e) {
 						t.Fatal(sync, op, oldBig, negative, e)
 					}
-					if dst.val != a.num.val || dst.cell != q.z.failedRef {
+					wantRef := q.z.failedNullRef
+					if oldBig {
+						wantRef = q.z.failedRef
+					}
+					if dst.val != a.num.val || dst.cell != wantRef {
 						t.Errorf("actual caller Copy prefix hidden: sync=%v op=%d oldBig=%v negative=%v dst=%+v", sync, op, oldBig, negative, *dst)
 					}
 					if old != 0 && validNumericRef(q.z.cells, old) {

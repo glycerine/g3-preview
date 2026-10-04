@@ -20,7 +20,7 @@ func polynomialPhysicalAuditWithHandlers(t *testing.T, m *MultivariatePolynomial
 	z := m.integer
 	refs := map[numericCellRef]bool{}
 	add := func(a Int) {
-		if a.cell == 0 || a.cell == z.failedRef {
+		if a.cell == 0 || z.isFailureRef(a.cell) {
 			return
 		}
 		if !validNumericRef(z.cells, a.cell) {

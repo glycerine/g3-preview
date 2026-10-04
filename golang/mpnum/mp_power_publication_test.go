@@ -1,5 +1,6 @@
 // Licensed under the MIT license.
 // Added source-action regressions for mpz.cpp/mpq.cpp Power and mpz.h shifts.
+// Source: src/util/mpz.h, src/util/mpz.cpp, src/util/mpq.h.
 package mpnum
 
 import (
@@ -14,7 +15,7 @@ import (
 // Only the owner's exact failed descriptor is a permitted unreadable prefix.
 func powerPublicationComponent(t *testing.T, m *IntegerManager, a *Int, allowed ...string) string {
 	t.Helper()
-	if a.cell == m.failedRef {
+	if m.isFailureRef(a.cell) {
 		if !errors.Is(m.check(a), arena.ErrInvalidSlot) {
 			t.Fatal("failed component unexpectedly readable", *a)
 		}
@@ -194,7 +195,7 @@ func TestPowerPublicationBigInputCopyPrecedesOutputOne(t *testing.T) {
 	var words [33]uint32
 	words[0], words[32] = 7, 1
 	for _, alias := range []bool{false, true} {
-		m, budget := mpzPublicationOwner(t)
+		m, budget := mpzPublicationDirectOwner(t)
 		var a Int
 		qopsMust(t, m.SetLimbs(&a, words[:]))
 		out := NewInt(17)
@@ -211,7 +212,7 @@ func TestPowerPublicationBigInputCopyPrecedesOutputOne(t *testing.T) {
 		}
 	}
 	for _, synch := range []bool{false, true} {
-		m, budget := rationalManager(t, synch)
+		m, budget := rationalPublicationDirectOwner(t, synch)
 		a, out := NewRational(), NewRational()
 		qopsMust(t, m.z.SetLimbs(&a.num, words[:]))
 		qopsMust(t, m.SetFraction(&out, 17, 5))
@@ -284,7 +285,7 @@ func TestPowerPublicationLeftShiftCopyPrecedesPromotionRefusal(t *testing.T) {
 }
 
 func TestPowerPublicationRightShiftCopyRefusalPrefix(t *testing.T) {
-	m, b := mpzPublicationOwner(t)
+	m, b := mpzPublicationDirectOwner(t)
 	var a Int
 	var words [33]uint32
 	words[0], words[32] = 7, 1
@@ -293,7 +294,7 @@ func TestPowerPublicationRightShiftCopyRefusalPrefix(t *testing.T) {
 	b.FailAfter(0)
 	e := m.MachineDiv2k(&a, 0, &out)
 	mpzPublicationAudit(t, m, &a, &out)
-	if !numericPhysicalReservationRefusal(e) || out.val != a.val || out.cell != m.failedRef {
+	if !numericPhysicalReservationRefusal(e) || out.val != a.val || out.cell != m.failedNullRef {
 		t.Fatal("copy-output setter failure prefix precedes k0 shortcut", out, e)
 	}
 	qopsMust(t, m.Del(&out))
@@ -302,7 +303,7 @@ func TestPowerPublicationRightShiftCopyRefusalPrefix(t *testing.T) {
 
 func TestPowerPublicationRationalCopyComponentRefusal(t *testing.T) {
 	for _, synch := range []bool{false, true} {
-		m, b := rationalManager(t, synch)
+		m, b := rationalPublicationDirectOwner(t, synch)
 		a, out := NewRational(), NewRational()
 		a.num = NewInt(3)
 		var words [33]uint32
@@ -312,7 +313,7 @@ func TestPowerPublicationRationalCopyComponentRefusal(t *testing.T) {
 		b.FailAfter(0)
 		e := m.Copy(&out, &a)
 		qopsAuditLiveOwnership(t, m, []*Int{&a.num, &a.den, &out.num, &out.den})
-		if !numericPhysicalReservationRefusal(e) || out.num != NewInt(3) || out.den.val != a.den.val || out.den.cell != m.z.failedRef {
+		if !numericPhysicalReservationRefusal(e) || out.num != NewInt(3) || out.den.val != a.den.val || out.den.cell != m.z.failedNullRef {
 			t.Fatal("numerator Copy completes before denominator destructive allocation refusal", synch, out, e)
 		}
 		qopsMust(t, m.Del(&out))

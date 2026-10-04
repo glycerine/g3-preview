@@ -1,4 +1,5 @@
 // Licensed under the MIT license.
+// Source: src/util/scoped_numeral.h, src/util/inf_eps_rational.h.
 package mpnum
 
 import (
@@ -336,7 +337,7 @@ func TestLexicalCloneFailedMemberReadUnwind(t *testing.T) {
 	failed := NewRational()
 	b.FailAfter(0)
 	e = z.Copy(&failed.num, &src.first.num)
-	if !numericPhysicalReservationRefusal(e) || failed.num.cell != z.failedRef {
+	if !numericPhysicalReservationRefusal(e) || failed.num.cell != z.failedNullRef {
 		t.Fatal("real failed-copy token not published", e)
 	}
 	serviceAuditRationalRoots(t, s, &src.first, &src.second, &failed)

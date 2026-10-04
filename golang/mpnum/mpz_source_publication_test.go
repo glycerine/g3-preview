@@ -1,6 +1,6 @@
 // Licensed under the MIT license.
-// Source action-prefix regressions: mpz.h:156–163 and
-// mpz.cpp:274–279, 315–334, 1183–1207, 1556–1594.
+// Source action-prefix regressions: src/util/mpz.h:156–163 and
+// src/util/mpz.cpp:274–279, 315–334, 1183–1207, 1556–1594.
 package mpnum
 
 import (
@@ -208,7 +208,7 @@ func TestIntegerSourceFailedDescriptorConstructorAndUnwind(t *testing.T) {
 	if m.failedRef == 0 || validNumericRef(m.cells, m.failedRef) {
 		t.Fatal("missing permanently dead source-failure descriptor")
 	}
-	if m.cells.Stats().Retired != 1 || m.cells.Stats().Live != 6 {
+	if m.cells.Stats().Retired != 2 || m.cells.Stats().Live != 6 {
 		t.Fatal("failed descriptor was counted as a source live cell", m.cells.Stats())
 	}
 	before := mpzPublicationSnapshot(m, b)
@@ -275,7 +275,8 @@ func TestIntegerSourceFailedDescriptorConstructorAndUnwind(t *testing.T) {
 
 func TestIntegerSourceSmallDestinationFailureKeepsSignAndInvalidToken(t *testing.T) {
 	for _, copyRoute := range []bool{false, true} {
-		m, b := mpzPublicationOwner(t)
+		// Actual supported direct profile pins each source allocation action.
+		m, b := mpzPublicationDirectOwner(t)
 		var digits [33]uint32
 		digits[0], digits[32] = 3, 1
 		var src Int
@@ -299,11 +300,13 @@ func TestIntegerSourceSmallDestinationFailureKeepsSignAndInvalidToken(t *testing
 		if !numericPhysicalReservationRefusal(e) {
 			t.Fatal(copyRoute, e)
 		}
+		// Observe the entire named physical graph while the refusal is active.
+		integerPhysicalAudit(t, m, &src)
 		wantSign := int32(1)
 		if copyRoute {
 			wantSign = -1
 		}
-		if dst.val != wantSign || dst.cell != m.failedRef {
+		if dst.val != wantSign || dst.cell != m.failedNullRef {
 			t.Fatal("small destination source sign/token prefix", copyRoute, dst)
 		}
 		if _, e = m.Int64(&dst); e != arena.ErrInvalidSlot {

@@ -1,5 +1,6 @@
 // Licensed under the MIT license.
 // Concrete owner/lifetime tests.
+// Source: src/util/mpbq.h, src/util/scoped_numeral_vector.h.
 package mpnum
 
 import (
@@ -191,7 +192,7 @@ func TestBinaryVectorFailurePrefixesAndScopedRoutes(t *testing.T) {
 		if v.Size() == 3 && e != nil {
 			// The vector publishes its default element before integer Copy;
 			// Copy publishes sign and failed allocation identity before k.
-			if v.data[2].num.cell != m.z.failedRef || v.data[2].num.val != a.num.val || v.data[2].k != 0 {
+			if v.data[2].num.cell != m.z.failedNullRef || v.data[2].num.val != a.num.val || v.data[2].k != 0 {
 				t.Fatal("source integer-copy publication", prefix, v.data[2])
 			}
 			if x := m.z.check(&v.data[2].num); !errors.Is(x, arena.ErrInvalidSlot) {

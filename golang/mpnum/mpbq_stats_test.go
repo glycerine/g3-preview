@@ -1,3 +1,5 @@
+// Licensed under the MIT license.
+// Source: src/util/mpbq.cpp, src/util/mpbq.h.
 package mpnum
 
 import (
@@ -21,7 +23,7 @@ func TestBinaryStatsFailedScratchNotLive(t *testing.T) {
 	integerPhysicalAudit(t, z, &src, &m.tmp)
 	stats, statsErr := m.Stats()
 	budget.FailAfter(-1)
-	if !numericPhysicalReservationRefusal(e) || m.tmp.cell != z.failedRef {
+	if !numericPhysicalReservationRefusal(e) || m.tmp.cell != z.failedNullRef {
 		t.Fatal("real scratch copy refusal", e, m.tmp)
 	}
 	if statsErr != nil || stats.LiveScratchNumerators != 0 {

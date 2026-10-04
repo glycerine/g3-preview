@@ -1,4 +1,5 @@
 // Licensed under the MIT license.
+// Source: src/util/mpq.cpp; src/util/scoped_numeral.h.
 package mpnum
 
 import (
@@ -68,7 +69,7 @@ func lexicalDelete(z *IntegerManager, a *Rational, abort bool, component *uint8)
 		if *component == 1 {
 			p = &a.den
 		}
-		if abort || p.cell == z.failedRef { // explicit Go abort of an invalid failed-copy pointer
+		if abort { // explicitly requested Go owning abort; source pointer state is not guessed
 			if e := z.Del(p); e != nil {
 				return e
 			}

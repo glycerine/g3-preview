@@ -1,3 +1,5 @@
+// Licensed under the MIT license.
+// Source: src/util/mpz.h, src/util/mpz.cpp, src/util/mpq.h.
 package mpnum
 
 import (
@@ -10,7 +12,7 @@ import (
 func TestIntegerPendingAllocationExplicitCleanup(t *testing.T) {
 	for _, direct := range []bool{false, true} {
 		b := arena.NewBudget(1 << 24)
-		m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 7, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: memory.SmallAllocatorProfile{PointerBits: 64, Debug: direct}})
+		m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: memory.SmallAllocatorProfile{PointerBits: 64, Debug: direct}})
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -27,7 +29,7 @@ func TestIntegerPendingAllocationExplicitCleanup(t *testing.T) {
 		if e = m.CleanupPendingAllocation(); e != nil {
 			t.Fatal(e)
 		}
-		if m.pendingCell.object != (memory.ObjectRef{}) || m.cells.Stats() != before || old != NewInt(17) || out.cell != m.failedRef {
+		if m.pendingCell.object != (memory.ObjectRef{}) || m.cells.Stats() != before || old != NewInt(17) || out.cell != m.failedNullRef {
 			t.Fatal("cleanup changed source numeral publication", old, out, m.cells.Stats(), before)
 		}
 		if _, e = m.allocator.ObjectExtent(pending); e == nil {

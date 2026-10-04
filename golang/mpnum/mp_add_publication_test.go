@@ -1,8 +1,10 @@
 // Licensed under the MIT license.
 // Added action-order tests for the additive and mixed-product mpq.h family.
+// Source: src/util/mpz.h, src/util/mpz.cpp, src/util/mpq.h.
 package mpnum
 
 import (
+	"github.com/glycerine/g3/golang/arena"
 	"math/big"
 	"testing"
 )
@@ -143,7 +145,13 @@ func TestAdditivePublicationCallerFailurePrefixes(t *testing.T) {
 		for op := 0; op < 9; op++ {
 			changed, completed := false, false
 			for fault := int64(0); fault < 256; fault++ {
-				m, budget := rationalManager(t, sync)
+				var m *RationalManager
+				var budget *arena.Budget
+				if op == 4 {
+					m, budget = rationalPublicationDirectOwner(t, sync)
+				} else {
+					m, budget = rationalManager(t, sync)
+				}
 				a, b, c, out := NewRational(), NewRational(), NewRational(), NewRational()
 				texts := []string{"1461501637330902918203684832716283019655932542981/1180591620717411303427", "18446744073709551617/4294967297", "4294967297/65537"}
 				vals := []*Rational{&a, &b, &c}
@@ -239,7 +247,7 @@ func TestAdditivePublicationIntegerFastpathOldDenominator(t *testing.T) {
 		for op := 0; op < 5; op++ {
 			changed, completed := false, false
 			for fault := int64(0); fault < 128; fault++ {
-				m, budget := rationalManager(t, sync)
+				m, budget := rationalPublicationDirectOwner(t, sync)
 				a, b, c, out := NewRational(), NewRational(), NewRational(), NewRational()
 				qopsMust(t, m.SetString(&a, "1461501637330902918203684832716283019655932542981"))
 				qopsMust(t, m.SetString(&b, "18446744073709551617"))

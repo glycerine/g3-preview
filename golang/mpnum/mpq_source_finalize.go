@@ -1,5 +1,5 @@
 // Licensed under the MIT license.
-// mpq.cpp28-34 destructor body followed by mpz_manager base destruction.
+// Source: src/util/mpq.cpp:28-34 destructor body followed by mpz_manager base destruction.
 package mpnum
 
 import (
@@ -10,6 +10,12 @@ import (
 // sourceNumeralDel checks the actual capacity access. The permanently dead
 // failure token is accepted by owning cleanup, not by literal source destruction.
 func sourceNumeralDel(z *IntegerManager, a *Int) (bool, error) {
+	// Only the exact setter-recorded token denotes the source NULL pointer.
+	// Its guarded Go metadata disappears without any capacity read or free.
+	if z.failedNullRef != 0 && a.cell == z.failedNullRef {
+		a.cell = 0
+		return false, nil
+	}
 	if a.cell != 0 {
 		if !validNumericRef(z.cells, a.cell) {
 			return true, arena.ErrInvalidSlot

@@ -26062,3 +26062,53 @@ reservation campaign unchanged. Evidence
 .cache/polynomial-exact-div-full-complete-{gates,go-hashes}.json and five logs.
 Whitespace audit green. Selected exact-division prerequisite ready for coherent
 green commit; whole port/full imp/PSC/GCD remains open.
+
+
+After green exact-division commit e39609d and clean status, integrated reviewed
+paired integer source state as separate45-Go path chunk (six production,38 lane
+tests, one current Newton census extension). Root verified all44 immutable Go
+hashes. Every existing path matched committed7c4af64 parent except current
+polynomial_physical_test.go; merged paired identity predicate there and Newton
+helper only, preserving exactDivision named numeral/evaluated return roots.
+No historical overlay. Corrected machine source-pointer map Copy1186-1212,
+SetLimbs306-349, Del336-344 after direct source read; no code change.
+Additive selected manifest evidence preserves prior unit methods/status and
+registered assertions. Public postexception scalar continuation and existing
+cleanupPending owning retry remain explicit deviations; no whole source unit
+promotion. Real constructor second metadata refusal/SlotLimit7 and six new
+source action tests retain native pointer publication and owning abort order.
+
+Authoritative806 full Go gates starting with immutable Go-only snapshot at
+.cache/integer-source-state-full-complete-{gates,go-hashes}.json plus five logs,
+30m original checked/debug100-bit/everyprefix campaign. No tested Go edit while
+live; next commit only when every complete gate is terminal0. Private future
+linear source/null+actual arithmetic campaigns and MUS/pseudo/imp lanes remain
+separate unintegrated work.
+
+Paired806 full gates terminal GREEN: runner29488 terminal0 verified immutable
+all806 Go files; root independently rechecked entire snapshot and45 integrated
+Go hashes. Native99.882s, checked/debug751.063s, vet-native4.166s,
+vet-debug4.198s, source143.392s. Original100-bit/everyactual reservation
+campaign retained. Evidence .cache/integer-source-state-full-complete-
+{gates,go-hashes}.json plus five logs. No Go edits during complete gates.
+Whitespace audit green. Coherent shared source-state chunk ready for commit.
+
+Private linear Add/Solve independent big-coefficient system proves output2/3
+and all physical refusal prefixes: Add2refusals→ordinal2success, Solve34→34,
+both native/debug. Shared integer test-only census extended to accept only
+explicitly named external real Runtime blocks (never owning locator roots),
+so numeric descriptors, vectors and entire cold graph checked before lifting
+fault. Private arithmetic logs .cache/polynomial-linear-arithmetic-final-*.log
+all17groups/bothvets terminal0; no source counter repairs or event tickets.
+
+Genuine private malformed relocation RED
+.cache/polynomial-linear-partial-num-red.log confirmed actual moved numerator
+was lost by owning abort after next DEN read guard. Fixture uses real Runtime
+shrink/resize of caller-malformed physical span (source-undefined diagnostic,
+not exhaustion). Audits exact current/old NUM root split before restoring
+only malformed DEN span. Added actual old initialized count and moved component
+cursor to charged vector metadata; own abort drains completed new fields and
+unread old suffix before releasing either real block. No numeric mirror or
+registry-derived authority. Native18groups now GREEN
+.cache/polynomial-linear-partial-final-native.log; checked/debug/vets of latest
+private bytes next. This remains separate from tested authoritative paired806.

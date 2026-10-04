@@ -1,4 +1,5 @@
 // Licensed under the MIT license.
+// Source: src/math/polynomial/upolynomial.cpp.
 package g3
 
 import (
@@ -114,9 +115,10 @@ func upolyHenselAuditPhysical(t *testing.T, cores []*mpnum.UPolynomialManager, f
 	pageSize := cells.FieldByName("config").FieldByName("PageSize").Uint()
 	slots := cells.FieldByName("slots").Uint()
 	failed := z.FieldByName("failedRef").Uint()
+	failedNull := z.FieldByName("failedNullRef").Uint()
 	named := map[uint64]bool{}
 	add := func(ref uint64) {
-		if ref == 0 || ref == failed {
+		if ref == 0 || ref == failed || ref == failedNull {
 			return
 		}
 		slot, gen := uint64(uint32(ref)), ref>>32
@@ -436,7 +438,9 @@ func upolyHenselCallerSetZForDeadBounds(t *testing.T, cores []*mpnum.UPolynomial
 		t.Fatal(e)
 	}
 	t.Helper()
-	failed := reflect.ValueOf(cores[0].IntegerManager()).Elem().FieldByName("failedRef").Uint()
+	integer := reflect.ValueOf(cores[0].IntegerManager()).Elem()
+	failed := integer.FieldByName("failedRef").Uint()
+	failedNull := integer.FieldByName("failedNullRef").Uint()
 	transitions := uint32(0)
 	for _, core := range cores {
 		modular := reflect.ValueOf(core).Elem().FieldByName("modular").Elem()
@@ -445,7 +449,7 @@ func upolyHenselCallerSetZForDeadBounds(t *testing.T, cores []*mpnum.UPolynomial
 		for i, field := range []string{"p", "lower", "upper"} {
 			v := modular.FieldByName(field)
 			beforeValues[i] = [2]uint64{uint64(v.FieldByName("val").Int()), v.FieldByName("cell").Uint()}
-			dead = dead || beforeValues[i][1] == failed
+			dead = dead || beforeValues[i][1] == failed || beforeValues[i][1] == failedNull
 		}
 		if !dead {
 			continue
@@ -505,7 +509,7 @@ func TestUPolynomialHenselDeadLowerGuardedCloseAndCallerSetZ(t *testing.T) {
 	}
 	upolyHenselAuditPhysical(t, cores, owners)
 	z := reflect.ValueOf(m.IntegerManager()).Elem()
-	failed := z.FieldByName("failedRef").Uint()
+	failed := z.FieldByName("failedNullRef").Uint()
 	modular := reflect.ValueOf(lift).Elem().FieldByName("modular").Elem()
 	if modular.FieldByName("lower").FieldByName("cell").Uint() != failed || modular.FieldByName("p").FieldByName("cell").Uint() == failed || modular.FieldByName("upper").FieldByName("cell").Uint() == failed {
 		t.Fatal("exact setup_p lower-copy failure")

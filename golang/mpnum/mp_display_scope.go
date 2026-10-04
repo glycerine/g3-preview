@@ -1,5 +1,5 @@
 // Licensed under the MIT license.
-// Source: mpq.cpp156-184 raw decimal-display locals.
+// Source: src/util/mpq.cpp:156-184 raw decimal-display locals.
 package mpnum
 
 import (
@@ -71,7 +71,7 @@ func (m *IntegerManager) CleanupRawDisplay() error {
 		}
 		var e error
 		if m.sourceFinalized || m.constructorUnwound {
-			if p.cell != m.failedRef {
+			if !m.isFailureRef(p.cell) {
 				e = m.freeAfterSourceFinalize(p.cell)
 			}
 			if e == nil {

@@ -80,7 +80,7 @@ func TestIntegerAllocateIfNeededSmallAndReuseBranches(t *testing.T) {
 	b.FailAfter(0)
 	e := m.allocateIfNeeded(&out, 33)
 	mpzPublicationAudit(t, m, &out)
-	if !numericPhysicalReservationRefusal(e) || out.val != 1 || out.cell != m.failedRef {
+	if !numericPhysicalReservationRefusal(e) || out.val != 1 || out.cell != m.failedNullRef {
 		t.Fatal("small sign before allocation", out, e)
 	}
 	if e = m.Reset(&out); e != nil {

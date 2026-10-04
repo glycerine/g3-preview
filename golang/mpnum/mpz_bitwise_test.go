@@ -221,7 +221,7 @@ func TestIntegerBitwiseAliasedFailurePublication(t *testing.T) {
 		for alias := 0; alias < 2; alias++ {
 			failed, success := false, false
 			for prefix := int64(0); prefix < 80; prefix++ {
-				m, budget := integerManager(t)
+				m, budget := mpzPublicationDirectOwner(t)
 				var a, b Int
 				const left = "1461501637330902918203684832716283019655932542981"
 				const right = "18446744073709551617"

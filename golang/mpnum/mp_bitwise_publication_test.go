@@ -1,5 +1,6 @@
 // Licensed under the MIT license.
 // Added action-prefix/profile tests for mpz.cpp bitwise and mpq.h forwards.
+// Source: src/util/mpz.h, src/util/mpz.cpp, src/util/mpq.h.
 package mpnum
 
 import (
@@ -409,7 +410,7 @@ func TestBitwisePublicationEarlyFailurePrecedesBoundary(t *testing.T) {
 		return
 	} // source assertion precedes copies in debug
 	for op := 0; op < 3; op++ {
-		m, budget := mpzPublicationOwner(t)
+		m, budget := mpzPublicationDirectOwner(t)
 		var a, b, out Int
 		qopsMust(t, m.SetString(&a, "-18446744073709551617"))
 		qopsMust(t, m.SetString(&b, "-18446744073709551618"))

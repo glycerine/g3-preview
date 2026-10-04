@@ -1,5 +1,5 @@
 // Licensed under the MIT license.
-// Translated from src/util/mpz.h and mpz.cpp (_MP_INTERNAL, 32-bit digits).
+// Translated from src/util/mpz.h and src/util/mpz.cpp (_MP_INTERNAL, 32-bit digits).
 // Original author: Leonardo de Moura, 2010-06-17.
 package mpnum
 
@@ -55,7 +55,7 @@ type IntegerManager struct {
 	cells                                  *numericCellSlab
 	words                                  *arena.Words
 	tmp, arg                               [2]numericCellRef
-	failedRef                              numericCellRef  // permanently dead, charged auxiliary descriptor
+	failedRef, failedNullRef               numericCellRef  // permanently dead, charged auxiliary descriptor
 	natural                                *NaturalManager // child borrows this manager's Words and Budget
 	intMin, two64                          Int
 	rawDisplay                             rawDisplayScope
@@ -130,6 +130,16 @@ func NewIntegerManager(config IntegerConfig) (*IntegerManager, error) {
 		return fail(e)
 	}
 	m.failedRef = makeNumericRef(slot, gen)
+	// Both source pointer failure states use real permanently dead Go metadata
+	// descriptors. They never contribute source cells or allocator counters.
+	slot, gen, e = m.cells.reserveDead()
+	if e != nil {
+		m.originalCause = e
+		m.constructionFailed = true
+		m.cleanupCause = m.unwindConstructorMembers()
+		return nil, m // the already charged owner retains the actual cold roots
+	}
+	m.failedNullRef = makeNumericRef(slot, gen)
 	// Actual Natural Words scratch is retained only during the staged backend
 	// migration. It does not hold numeric cells or duplicate physical digits.
 	m.words, e = arena.NewWords(config.Words)
@@ -216,7 +226,7 @@ func (m *IntegerManager) checkCleanup(a *Int) error {
 	if a == nil {
 		return arena.ErrInvalidSlot
 	}
-	if a.cell == 0 || (m.failedRef != 0 && a.cell == m.failedRef) {
+	if a.cell == 0 || (m.failedRef != 0 && (a.cell == m.failedRef || a.cell == m.failedNullRef)) {
 		return nil
 	}
 	// A retained descriptor whose physical release completed remains cleanup
@@ -444,7 +454,7 @@ func (m *IntegerManager) Del(a *Int) error {
 	if e := m.checkCleanup(a); e != nil {
 		return e
 	}
-	if m.failedRef != 0 && a.cell == m.failedRef {
+	if m.failedRef != 0 && (a.cell == m.failedRef || a.cell == m.failedNullRef) {
 		a.cell = 0
 		return nil
 	}
@@ -474,7 +484,8 @@ func (m *IntegerManager) allocateIfNeeded(a *Int, capacity uint32) error {
 	if capacity < 6 {
 		capacity = 6
 	}
-	if a.IsSmall() || m.cell(a.cell).capacity < capacity {
+	aWasSmall := a.IsSmall()
+	if aWasSmall || m.cell(a.cell).capacity < capacity {
 		if a.cell != 0 {
 			if e := m.free(a.cell); e != nil {
 				return e
@@ -482,6 +493,9 @@ func (m *IntegerManager) allocateIfNeeded(a *Int, capacity uint32) error {
 		}
 		a.val = 1
 		a.cell = m.failedRef
+		if aWasSmall {
+			a.cell = m.failedNullRef
+		}
 		ref, e := m.allocate(capacity, 0)
 		if e != nil {
 			return e
@@ -577,6 +591,9 @@ func (m *IntegerManager) SetLimbs(a *Int, digits []uint32) error {
 			}
 		}
 		a.cell = m.failedRef
+		if ref == 0 {
+			a.cell = m.failedNullRef
+		}
 		var e error
 		ref, e = m.allocate(max(size, 6), size)
 		if e != nil {
@@ -621,6 +638,9 @@ func (m *IntegerManager) Copy(dst, src *Int) error {
 			}
 		}
 		dst.cell = m.failedRef
+		if ref == 0 {
+			dst.cell = m.failedNullRef
+		}
 		var e error
 		ref, e = m.allocate(source.capacity, source.size)
 		if e != nil {
@@ -985,4 +1005,10 @@ func (m *IntegerManager) Int64(a *Int) (int64, error) {
 		return -int64(v), nil
 	}
 	return int64(v), nil
+}
+
+// isFailureRef recognizes only this owner's two permanently dead, charged
+// descriptors. Ordinary reads still reject both through the normal live guard.
+func (m *IntegerManager) isFailureRef(ref numericCellRef) bool {
+	return ref != 0 && m.failedRef != 0 && (ref == m.failedRef || ref == m.failedNullRef)
 }

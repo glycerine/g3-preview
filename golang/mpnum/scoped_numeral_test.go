@@ -1,3 +1,5 @@
+// Licensed under the MIT license.
+// Source: src/util/scoped_numeral.h, src/util/scoped_numeral_vector.h.
 package mpnum
 
 import (
@@ -663,7 +665,7 @@ func TestScopedRationalVectorIndependentLifecycleAndFailures(t *testing.T) {
 		setterPairPrefix(t, m, &v.data[0], "0", "1", roundPublicationDecode(t, m.z, &big.num), roundPublicationDecode(t, m.z, &big.den), true)
 		published := uint32(0)
 		for _, n := range []*Int{&v.data[0].num, &v.data[0].den} {
-			if n.cell != 0 && n.cell != m.z.failedRef {
+			if n.cell != 0 && !m.z.isFailureRef(n.cell) {
 				published++
 			}
 		}

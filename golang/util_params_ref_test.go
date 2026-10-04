@@ -1,5 +1,5 @@
 // Licensed under the MIT license.
-// Source util/params.cpp action traces; added bounded ownership expectations.
+// Source: src/util/params.cpp action traces; added bounded ownership expectations.
 package g3
 
 import (
@@ -482,7 +482,7 @@ func paramsAuditRoots(t *testing.T, c *ParamsContext, q *mpnum.RationalService, 
 					owned := reflect.ValueOf(&x.rat).Elem()
 					raw := owned.FieldByName("raw")
 					num, den := raw.FieldByName("num"), raw.FieldByName("den")
-					if !errors.Is(e, arena.ErrInvalidSlot) || owned.FieldByName("ownerID").Uint() != service.FieldByName("ownerID").Uint() || num.FieldByName("val").Int() != 1 || num.FieldByName("cell").Uint() == 0 || num.FieldByName("cell").Uint() != z.FieldByName("failedRef").Uint() || den.FieldByName("cell").Uint() != 0 || den.FieldByName("val").Int() != 1 {
+					if !errors.Is(e, arena.ErrInvalidSlot) || owned.FieldByName("ownerID").Uint() != service.FieldByName("ownerID").Uint() || num.FieldByName("val").Int() != 1 || num.FieldByName("cell").Uint() == 0 || (num.FieldByName("cell").Uint() != z.FieldByName("failedRef").Uint() && num.FieldByName("cell").Uint() != z.FieldByName("failedNullRef").Uint()) || den.FieldByName("cell").Uint() != 0 || den.FieldByName("val").Int() != 1 {
 						t.Fatal("unexpected invalid published parameter numeral", e)
 					}
 					continue
@@ -498,7 +498,11 @@ func paramsAuditRoots(t *testing.T, c *ParamsContext, q *mpnum.RationalService, 
 	}
 	got, e := q.Stats()
 	paramsMust(t, e)
-	if got.LiveCells != base+bigs || got.LivePayloads != basePayloads+bigs {
+	pending := paramsPendingNumericObject(t, q)
+	if got.PendingCellObjects != pending {
+		t.Fatal("pending payload stats disagree with real named raw root", got.PendingCellObjects, pending)
+	}
+	if got.LiveCells != base+bigs || got.LivePayloads != basePayloads+bigs+pending {
 		t.Fatal("lost numeric cell/payload temporary", got.LiveCells, got.LivePayloads, base+bigs, basePayloads+bigs)
 	}
 	for pi := range c.pages {
@@ -514,6 +518,72 @@ func paramsAuditRoots(t *testing.T, c *ParamsContext, q *mpnum.RationalService, 
 			}
 		}
 	}
+}
+
+// The actual unassigned physical root is separate from numeric descriptors.
+// This census reads its exact allocator location and Runtime backing, never
+// reconstructs a token or treats cold locator entries as owning numerals.
+func paramsPendingNumericObject(t *testing.T, q *mpnum.RationalService) uint32 {
+	t.Helper()
+	z := reflect.ValueOf(q).Elem().FieldByName("manager").Elem().FieldByName("z").Elem()
+	pending := z.FieldByName("pendingCell")
+	object := pending.FieldByName("object")
+	if object.FieldByName("owner").Uint() == 0 {
+		return 0
+	}
+	allocator := z.FieldByName("allocator").Elem()
+	slot := object.FieldByName("slot").Uint()
+	locations := allocator.FieldByName("locations")
+	if object.FieldByName("owner").Uint() != allocator.FieldByName("origin").Uint() || slot == 0 || slot > uint64(locations.Len()) {
+		t.Fatal("foreign pending physical object")
+	}
+	loc := locations.Index(int(slot - 1))
+	if !loc.FieldByName("live").Bool() || loc.FieldByName("free").Bool() || loc.FieldByName("generation").Uint() != object.FieldByName("generation").Uint() || loc.FieldByName("address").Uint() != object.FieldByName("address").Uint() {
+		t.Fatal("stale pending physical object")
+	}
+	raw := pending.FieldByName("raw")
+	mapped := loc.FieldByName("raw")
+	for _, name := range []string{"origin", "slot", "generation"} {
+		if raw.FieldByName(name).Uint() != mapped.FieldByName(name).Uint() {
+			t.Fatal("pending object/raw mismatch", name)
+		}
+	}
+	offset, extent, requested := pending.FieldByName("offset").Uint(), pending.FieldByName("extent").Uint(), pending.FieldByName("requested").Uint()
+	if offset != loc.FieldByName("offset").Uint() || (loc.FieldByName("kind").Uint() != 3 && extent != loc.FieldByName("extent").Uint()) || requested != loc.FieldByName("requested").Uint() || extent < requested || requested < 8 {
+		t.Fatal("pending object physical extent")
+	}
+	runtime := reflect.ValueOf(q.RuntimeOwner()).Elem()
+	rslot := raw.FieldByName("slot").Uint()
+	blocks := runtime.FieldByName("blocks")
+	if raw.FieldByName("origin").Uint() != runtime.FieldByName("origin").Uint() || rslot == 0 || rslot > uint64(blocks.Len()) {
+		t.Fatal("pending raw Runtime identity")
+	}
+	block := blocks.Index(int(rslot - 1))
+	if !block.FieldByName("live").Bool() || block.FieldByName("generation").Uint() != raw.FieldByName("generation").Uint() {
+		t.Fatal("pending raw consumed")
+	}
+	header := runtime.FieldByName("config").FieldByName("SizeTBits").Uint() / 8
+	data := block.FieldByName("data")
+	if loc.FieldByName("kind").Uint() == 3 && (offset != 0 || uint64(data.Len()) != header+extent) {
+		t.Fatal("direct pending actual malloc extent")
+	}
+	at := header + offset + 4
+	if header+offset+extent > uint64(data.Len()) || at+4 > uint64(data.Len()) {
+		t.Fatal("pending raw physical span")
+	}
+	initialized := block.FieldByName("initialized")
+	var capacity uint32
+	for i := uint64(0); i < 4; i++ {
+		pos := at + i
+		if initialized.Index(int(pos/64)).Uint()&(uint64(1)<<(pos%64)) == 0 {
+			t.Fatal("pending capacity uninitialized")
+		}
+		capacity |= uint32(data.Index(int(pos)).Uint()) << uint(8*i)
+	}
+	if requested != uint64(uint32(8)+4*capacity) {
+		t.Fatal("pending source requested extent", requested, capacity)
+	}
+	return 1
 }
 
 func TestParamsReferenceReservationFailureSweeps(t *testing.T) {

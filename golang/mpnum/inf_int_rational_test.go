@@ -1,3 +1,5 @@
+// Licensed under the MIT license.
+// Source: src/util/inf_int_rational.h, src/util/inf_int_rational.cpp.
 package mpnum
 
 import (
@@ -552,7 +554,7 @@ func TestInfIntRationalFaultPrefixesTemporaryCleanup(t *testing.T) {
 		roots = append(roots, &fillers[i].raw)
 	}
 	serviceAuditRationalRoots(t, s, roots...)
-	if !numericPhysicalReservationRefusal(e) || dst.first.num.cell != s.manager.z.failedRef || dst.first.den != NewInt(1) || dst.second != 7 || !errors.Is(s.manager.z.check(&dst.first.num), arena.ErrInvalidSlot) {
+	if !numericPhysicalReservationRefusal(e) || dst.first.num.cell != s.manager.z.failedNullRef || dst.first.den != NewInt(1) || dst.second != 7 || !errors.Is(s.manager.z.check(&dst.first.num), arena.ErrInvalidSlot) {
 		t.Fatal("first component Copy refusal before epsilon publication", dst, e)
 	}
 	b.FailAfter(-1)

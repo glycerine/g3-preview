@@ -1,5 +1,6 @@
 // Licensed under the MIT license.
-// mpq.cpp28-34, rational.cpp75-83 and infinitesimal reverse member destruction.
+// Source: src/util/mpq.cpp, src/util/rational.cpp, and infinitesimal headers.
+// Reverse member destruction and separate owning cleanup.
 package mpnum
 
 import (
@@ -210,11 +211,19 @@ func TestServiceSourceFinalizeActualCacheDenominatorGuard(t *testing.T) {
 		}
 		raws[i] = m.z.cell(p.cell).backing.raw
 	}
+	if e := m.z.SetLimbs(&s.cache[1].den, transitiveSourceDigits(6)); e != nil {
+		t.Fatal(e)
+	}
+	caller := Int{}
+	if e := m.z.SetLimbs(&caller, transitiveSourceDigits(65)); e != nil {
+		t.Fatal(e)
+	}
 	b.FailAfter(0)
-	e := m.z.Copy(&s.cache[1].den, &m.z.two64)
+	e := m.z.Copy(&s.cache[1].den, &caller)
 	if !numericPhysicalReservationRefusal(e) || s.cache[1].den.cell != m.z.failedRef {
 		t.Fatal(e)
 	}
+	transitiveSourceAudit(t, m, s, b, &caller)
 	b.FailAfter(-1)
 	if e = s.SourceFinalize(); !errors.Is(e, arena.ErrInvalidSlot) {
 		t.Fatal(e)
@@ -227,14 +236,42 @@ func TestServiceSourceFinalizeActualCacheDenominatorGuard(t *testing.T) {
 			t.Fatal("prior cache source release", e)
 		}
 	}
-	transitiveSourceAudit(t, m, s, b)
+	transitiveSourceAudit(t, m, s, b, &caller)
 	if _, e = s.NewValue(); !errors.Is(e, arena.ErrClosed) {
 		t.Fatal("service read at cache guard", e)
+	}
+	if e = m.z.Del(&caller); e != nil {
+		t.Fatal(e)
 	}
 	transitiveSourceClose(t, m, s, rt, b)
 	if !s.sourceGuard || s.cleanupStage != 18 || s.cleanupCacheIndex != 1 || s.cleanupComponent != 1 || s.sourceFinalized {
 		t.Fatal("owning cache abort rewrote source history")
 	}
+}
+
+func TestServiceSourceFinalizeFreshCacheDenominatorNull(t *testing.T) {
+	m, s, rt, b := transitiveSourceOwner(t, true, memory.SmallAllocatorProfile{PointerBits: 64, Debug: true})
+	if _, e := s.PowerOfTwo(1); e != nil {
+		t.Fatal(e)
+	}
+	if s.cache[1].den.cell != 0 {
+		t.Fatal("source destination is not fresh")
+	}
+	b.FailAfter(0)
+	e := m.z.Copy(&s.cache[1].den, &m.z.two64)
+	if !numericPhysicalReservationRefusal(e) || s.cache[1].den.cell != m.z.failedNullRef {
+		t.Fatal("actual fresh NULL publication", e, s.cache[1].den)
+	}
+	transitiveSourceAudit(t, m, s, b)
+	b.FailAfter(-1)
+	if e = s.SourceFinalize(); e != nil {
+		t.Fatal("defined source NULL destructor", e)
+	}
+	if !s.sourceFinalized || !m.sourceFinalized || !m.z.sourceFinalized || s.sourceGuard {
+		t.Fatal("defined source continuation did not finish")
+	}
+	transitiveSourceAudit(t, m, s, b)
+	transitiveSourceClose(t, m, s, rt, b)
 }
 
 func TestTransitiveSourceFinalizeActualChildScratchHole(t *testing.T) {
@@ -271,7 +308,7 @@ func transitiveSourceAudit(t *testing.T, m *RationalManager, s *RationalService,
 	z := m.z
 	refs := map[numericCellRef]bool{}
 	add := func(p *Int) {
-		if p == nil || p.cell == 0 || p.cell == z.failedRef {
+		if p == nil || p.cell == 0 || z.isFailureRef(p.cell) {
 			return
 		}
 		if !validNumericRef(z.cells, p.cell) {

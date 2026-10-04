@@ -553,8 +553,8 @@ func TestIntegerDivisionWidthBoundaries(t *testing.T) {
 	m.Reset(&r)
 	r.val = 23
 	// Force cell exhaustion without relying on already retained free capacity:
-	// this separate initialized owner has its slot limit at the six source cells plus one dead adapter token.
-	tight, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{PageSize: 1, SlotLimit: 7}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 1}}})
+	// this separate initialized owner has its slot limit at the six source cells plus two real dead adapter descriptors.
+	tight, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{PageSize: 1, SlotLimit: 8}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 1}}})
 	if e != nil {
 		t.Fatal(e)
 	}

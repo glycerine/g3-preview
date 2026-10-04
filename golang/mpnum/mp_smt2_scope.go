@@ -1,5 +1,5 @@
 // Licensed under the MIT license.
-// Source mpz.cpp1412 and scoped_numeral.h31-33.
+// Source: src/util/mpz.cpp:1412 and src/util/scoped_numeral.h:31-33.
 package mpnum
 
 import (
@@ -39,7 +39,7 @@ func (m *IntegerManager) beginSMT2Display() error {
 }
 
 // Fresh source target.m_ptr stays null if allocate's RHS throws. The Go
-// failedRef is diagnostic adapter metadata, not a dangling source pointer.
+// The exact failedNullRef records that action, rather than inferring from scope state.
 func (m *IntegerManager) copySMT2Temporary(a *Int) error {
 	e := m.Copy(&m.smt2Display.value, a)
 	m.smt2Display.assigned = e == nil
@@ -64,7 +64,7 @@ func (m *IntegerManager) finishSMT2Display(length *uint32, result *error) {
 		if cleanup == nil {
 			cleanup = ErrSMT2DisplayPending
 		}
-	} else if !s.assigned && s.value.cell == m.failedRef {
+	} else if s.value.cell == m.failedNullRef {
 		cleanup = m.Del(&s.value) // source DEFAULT destructor sees null; abort Go token only
 	} else {
 		s.guard, cleanup = sourceNumeralDel(m, &s.value)

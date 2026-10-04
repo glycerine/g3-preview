@@ -309,7 +309,7 @@ func TestSourceShiftDefectAndPowerDomains(t *testing.T) {
 					t.Fatal(base, p, e)
 				}
 				mpzPublicationAudit(t, m, &a, &out)
-				if out.val != 1 || out.cell != m.failedRef {
+				if out.val != 1 || out.cell != m.failedNullRef {
 					t.Fatal("source base-two allocation prefix", out)
 				}
 				if x := m.check(&out); !errors.Is(x, arena.ErrInvalidSlot) {

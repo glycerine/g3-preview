@@ -1,5 +1,5 @@
 // Licensed under the MIT license.
-// Source: mpz.cpp142–161 and reverse member destruction in mpz.h/mpn.h.
+// Source: src/util/mpz.cpp:142–161 and reverse member destruction in src/util/mpz.h and src/util/mpn.h.
 package mpnum
 
 import (
@@ -34,6 +34,9 @@ func (m *IntegerManager) SourceFinalize() error {
 			value := &m.two64
 			if m.sourceFinalizeStage == 1 {
 				value = &m.intMin
+			}
+			if value.cell == m.failedNullRef {
+				value.cell = 0
 			}
 			if value.cell != 0 {
 				if !validNumericRef(m.cells, value.cell) {
@@ -109,6 +112,10 @@ func (m *IntegerManager) markSourceFreedPools() error {
 // Each charged descriptor retains the real raw allocation token; owning cleanup
 // frees direct blocks through Runtime, without an invented allocator event.
 func (m *IntegerManager) freeAfterSourceFinalize(ref numericCellRef) error {
+	if m.isFailureRef(ref) {
+		return nil
+	} // actual owning metadata, never a raw source free
+
 	c := m.cell(ref)
 	if !c.released {
 		if c.backing.offset != 0 {

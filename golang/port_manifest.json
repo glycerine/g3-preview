@@ -112305,7 +112305,9 @@
         "TestInfCompareSourceEndGuardRetainsCursor",
         "TestInfCompareSourceReservationPrefixes",
         "TestInfCompareSourceServiceSwap",
-        "TestInfCompareSourceMixedUnreadMasks"
+        "TestInfCompareSourceMixedUnreadMasks",
+        "TestServiceSourceFinalizeFreshCacheDenominatorNull",
+        "TestIntegerSourceFreshNullAndDestructiveDangling"
       ],
       "assertions": [
         {
@@ -112796,6 +112798,15 @@
             "TestInfCompareSourceServiceSwap",
             "TestInfCompareSourceMixedUnreadMasks"
           ]
+        },
+        {
+          "name": "Defined source NULL deletion in retained actual fields without capacity/free action; dangling remains guarded",
+          "status": "ported",
+          "go_target": "mpnum/mpq_source_finalize.go",
+          "tests": [
+            "TestServiceSourceFinalizeFreshCacheDenominatorNull",
+            "TestIntegerSourceFreshNullAndDestructiveDangling"
+          ]
         }
       ],
       "ownership": [
@@ -112810,7 +112821,8 @@
         "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See PORT_PROGRESS.md#audit-mpz-power-publication-packet-md; source allocator/backend integration remains required.",
         "All four rounding outputs use existing roundCore directly against the caller; source sign is captured before division and rational denominator resets only after successful integer rounding. Immediate fault roots, integral BIG Copy refusal, quotient-before-correction refusal and raw component aliases are tested. See PORT_PROGRESS.md#audit-mpq-rounding-publication-packet-md; physical allocator-backed cleanup remains separate unfinished work.",
         "Checked owning cleanup retains a per-component source outer-field cursor and forwards real child failures. This is not full transitive source finalization.",
-        "Selected source comparison/unary/reset/swap paths check cold ownership then each reached component action, preserving unread invalid fields and partial publication. Actual SYNCH RAW comparison locals are charged distinct manager fields, normal deletion cursor follows source, body failure retains real limbs for explicit owning cleanup. Service lexical bound9 unchanged; copied unary results use existing literal constructor/temporary machinery. Immediate caller-named physical censuses, cold reservation sweeps and warm allocation checks cover selected routes. Unrelated arithmetic and Go-extension Move preflights remain open."
+        "Selected source comparison/unary/reset/swap paths check cold ownership then each reached component action, preserving unread invalid fields and partial publication. Actual SYNCH RAW comparison locals are charged distinct manager fields, normal deletion cursor follows source, body failure retains real limbs for explicit owning cleanup. Service lexical bound9 unchanged; copied unary results use existing literal constructor/temporary machinery. Immediate caller-named physical censuses, cold reservation sweeps and warm allocation checks cover selected routes. Unrelated arithmetic and Go-extension Move preflights remain open.",
+        "Two actual permanently dead charged Go descriptors precede Words/Natural construction. Actual six source numeric cells unchanged. Source fresh NULL comes only from exact setter branch, never registry/scope inference; reserve failure retains charged constructor owner. No source allocator event invented for Go metadata."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -112824,7 +112836,8 @@
         "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open.",
         "Source get_double evaluates numerator then denominator and asserts d>0 only in debug; current Float64 rejects finite negative converted denominators in release too. Read-only source audit PORT_PROGRESS.md#audit-mpq-rounding-publication-packet-md records this remaining profile debt; no getter implementation change is claimed.",
         "Selected Mul/Div entry boundaries validate ordinary Integer ownership without an ordinary rational-read DEN domain. Scalar projections, remaining raw-domain methods, TRACE and whole rational lifecycle stay open.",
-        "No newly registered source assertion credit: sixteen added source-profile regressions complement existing active assertions. Selected ordinary whole-value preflights are replaced only where they precede actual source reads/mutations. Malformed ILP32 second temporary end-cursor test diagnoses physical requested-size guard after actual source first destruction, with no guard relabeling or allocator repair. Whole header and global service binding remain partial."
+        "No newly registered source assertion credit: sixteen added source-profile regressions complement existing active assertions. Selected ordinary whole-value preflights are replaced only where they precede actual source reads/mutations. Malformed ILP32 second temporary end-cursor test diagnoses physical requested-size guard after actual source first destruction, with no guard relabeling or allocator repair. Whole header and global service binding remain partial.",
+        "Public failed-value reads still reject both dead Go descriptors; defined source-only NULL deletion is modeled independently. Postexception source small-scalar continuation, staged CopyFrom/ffSetInteger topology, process/TLS binding and complete source lifecycle remain separate obligations. Existing cleanupPending retry acknowledges Go owning continuation, not another literal source destructor. See PORT_PROGRESS.md."
       ]
     },
     {
@@ -114440,7 +114453,11 @@
         "TestSMT2FreshDefaultCopyFailureNullDestructor",
         "TestSMT2CompletedTemporaryGuardedLateFree",
         "TestPolynomialIndexedArrayGCDEarlyOneLeavesTailUnread",
-        "TestPolynomialIndexedArrayGCDPreservesSliceSelfIdentity"
+        "TestPolynomialIndexedArrayGCDPreservesSliceSelfIdentity",
+        "TestIntegerSourceFailureTwoChargedSentinels",
+        "TestIntegerSourceFreshNullAndDestructiveDangling",
+        "TestIntegerSourceFailureSentinelPreparationPrefixes",
+        "TestIntegerSourceSentinelSlotLimitReachedAllocation"
       ],
       "conditionals": [
         {
@@ -116086,6 +116103,17 @@
             "TestPolynomialIndexedArrayGCDEarlyOneLeavesTailUnread",
             "TestPolynomialIndexedArrayGCDPreservesSliceSelfIdentity"
           ]
+        },
+        {
+          "name": "big_set1186-1212 and digit setter306-349 source pointer publication state; same shared concrete engines",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceFailureTwoChargedSentinels",
+            "TestIntegerSourceFreshNullAndDestructiveDangling",
+            "TestIntegerSourceFailureSentinelPreparationPrefixes",
+            "TestIntegerSourceSentinelSlotLimitReachedAllocation"
+          ]
         }
       ],
       "ownership": [
@@ -116106,7 +116134,8 @@
         "Base-two Power mutates caller storage through actual destructive allocate_if_needed; other Power and shift wrappers remain staged fidelity work. Scalar debug capacity assertion precedes sign/digits; existing normalize branch tests confirm actual behavior. See PORT_PROGRESS.md#audit-mpz-setter-port-status-md.",
         "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See PORT_PROGRESS.md#audit-mpz-power-publication-packet-md; source allocator/backend integration remains required.",
         "Zero GCD copies directly into caller before Abs; minimum-promotion allocation refusal retains the completed inline copy, while failed BIG Copy retains the actual published sign/dead descriptor. Existing general GCD locals and final publication remain source ordered; twelve Lehmer and one intermediate ExtendedGCD diagnostics execute only in g3debug. Named roots audited before fault disabling. See PORT_PROGRESS.md#audit-mpz-gcd-publication-packet-md.",
-        "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets."
+        "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets.",
+        "Two actual permanently dead charged Go descriptors precede Words/Natural construction. Actual six source numeric cells unchanged. Source fresh NULL comes only from exact setter branch, never registry/scope inference; reserve failure retains charged constructor owner. No source allocator event invented for Go metadata."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -116124,7 +116153,8 @@
         "The registered randomized GCD campaign preserves all 168 primes, conditional Power/Mul and sign draw order using an explicit hermetic RNG adapter, not libc sequence identity. Independent table enumeration and arithmetic checks add no ENSURE credit; print-only minimum GCD expectation is additional verification. Actual allocator topology, cleanup exceptions, alternate backends and full source-unit completion remain open.",
         "Explicit Go SourceFinalize retains a charged continuation cursor; source-undefined private-pointer guards permit separate owning-abort cleanup without claiming source completion. ConstructionFailure and transitive/global lifecycle remain open.",
         "ConstructionFailure is the already charged owner. Successful member unwind can retain direct roots with no cleanup error; owning Cleanup is separate. Full transitive/global source lifetime and other source branches remain open.",
-        "Source char bytes use physical capacity/initialization independently of POS and unsigned11*size wrap. Selected non-Windows digit32 snprintf lbuf0/truncation and multi-limb ignored-lbuf behavior execute. Windows sprintf_s constraint handler, GMP/digit64, global/locale/ostream and literal std::string temporary allocation/evaluation remain open. No whole-unit or registered assertion completion is claimed."
+        "Source char bytes use physical capacity/initialization independently of POS and unsigned11*size wrap. Selected non-Windows digit32 snprintf lbuf0/truncation and multi-limb ignored-lbuf behavior execute. Windows sprintf_s constraint handler, GMP/digit64, global/locale/ostream and literal std::string temporary allocation/evaluation remain open. No whole-unit or registered assertion completion is claimed.",
+        "Public failed-value reads still reject both dead Go descriptors; defined source-only NULL deletion is modeled independently. Postexception source small-scalar continuation, staged CopyFrom/ffSetInteger topology, process/TLS binding and complete source lifecycle remain separate obligations. Existing cleanupPending retry acknowledges Go owning continuation, not another literal source destructor. See PORT_PROGRESS.md."
       ]
     },
     {
@@ -116374,7 +116404,11 @@
         "TestIntegerCharacterFailedConstructorSurvivesSourceFinalize",
         "TestIntegerCharacterUsesActualInitializedSizeHeader",
         "TestIntegerCharacterRationalNumeratorBeforeDenominator",
-        "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots"
+        "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots",
+        "TestIntegerSourceFailureTwoChargedSentinels",
+        "TestIntegerSourceFreshNullAndDestructiveDangling",
+        "TestIntegerSourceFailureSentinelPreparationPrefixes",
+        "TestIntegerSourceSentinelSlotLimitReachedAllocation"
       ],
       "conditionals": [
         {
@@ -117578,6 +117612,17 @@
             "TestIntegerCharacterRationalNumeratorBeforeDenominator",
             "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots"
           ]
+        },
+        {
+          "name": "Exact setter-recorded fresh NULL vs dangling source pointer state for allocate_if_needed132-150 and del336-344; owning failed-token cleanup distinct",
+          "status": "ported",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerSourceFailureTwoChargedSentinels",
+            "TestIntegerSourceFreshNullAndDestructiveDangling",
+            "TestIntegerSourceFailureSentinelPreparationPrefixes",
+            "TestIntegerSourceSentinelSlotLimitReachedAllocation"
+          ]
         }
       ],
       "ownership": [
@@ -117598,7 +117643,8 @@
         "Base-two Power mutates caller storage through actual destructive allocate_if_needed; other Power and shift wrappers remain staged fidelity work. Scalar debug capacity assertion precedes sign/digits; existing normalize branch tests confirm actual behavior. See PORT_PROGRESS.md#audit-mpz-setter-port-status-md.",
         "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See PORT_PROGRESS.md#audit-mpz-power-publication-packet-md; source allocator/backend integration remains required.",
         "Zero GCD copies directly into caller before Abs; minimum-promotion allocation refusal retains the completed inline copy, while failed BIG Copy retains the actual published sign/dead descriptor. Existing general GCD locals and final publication remain source ordered; twelve Lehmer and one intermediate ExtendedGCD diagnostics execute only in g3debug. Named roots audited before fault disabling. See PORT_PROGRESS.md#audit-mpz-gcd-publication-packet-md.",
-        "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets."
+        "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets.",
+        "Two actual permanently dead charged Go descriptors precede Words/Natural construction. Actual six source numeric cells unchanged. Source fresh NULL comes only from exact setter branch, never registry/scope inference; reserve failure retains charged constructor owner. No source allocator event invented for Go metadata."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -117616,7 +117662,8 @@
         "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing Words access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open.",
         "The registered randomized GCD campaign preserves all 168 primes, conditional Power/Mul and sign draw order using an explicit hermetic RNG adapter, not libc sequence identity. Independent table enumeration and arithmetic checks add no ENSURE credit; print-only minimum GCD expectation is additional verification. Actual allocator topology, cleanup exceptions, alternate backends and full source-unit completion remain open.",
         "ConstructionFailure is the already charged owner. Successful member unwind can retain direct roots with no cleanup error; owning Cleanup is separate. Full transitive/global source lifetime and other source branches remain open.",
-        "Source char bytes use physical capacity/initialization independently of POS and unsigned11*size wrap. Selected non-Windows digit32 snprintf lbuf0/truncation and multi-limb ignored-lbuf behavior execute. Windows sprintf_s constraint handler, GMP/digit64, global/locale/ostream and literal std::string temporary allocation/evaluation remain open. No whole-unit or registered assertion completion is claimed."
+        "Source char bytes use physical capacity/initialization independently of POS and unsigned11*size wrap. Selected non-Windows digit32 snprintf lbuf0/truncation and multi-limb ignored-lbuf behavior execute. Windows sprintf_s constraint handler, GMP/digit64, global/locale/ostream and literal std::string temporary allocation/evaluation remain open. No whole-unit or registered assertion completion is claimed.",
+        "Public failed-value reads still reject both dead Go descriptors; defined source-only NULL deletion is modeled independently. Postexception source small-scalar continuation, staged CopyFrom/ffSetInteger topology, process/TLS binding and complete source lifecycle remain separate obligations. Existing cleanupPending retry acknowledges Go owning continuation, not another literal source destructor. See PORT_PROGRESS.md."
       ]
     },
     {

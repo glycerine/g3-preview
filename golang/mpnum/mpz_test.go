@@ -306,7 +306,7 @@ func TestIntegerFailureCleanup(t *testing.T) {
 		t.Fatal(err)
 	}
 	budget.FailAfter(-1)
-	if a.val != 1 || a.cell != m.failedRef || m.cells.Stats().Live != before {
+	if a.val != 1 || a.cell != m.failedNullRef || m.cells.Stats().Live != before {
 		t.Fatal("source digit setter sign/failure token or roots", a)
 	}
 	if _, e := m.Int64(&a); e != arena.ErrInvalidSlot {
@@ -330,7 +330,7 @@ func TestIntegerFailurePublication(t *testing.T) {
 		err := m.SetLimbs(&a, digits)
 		budget.FailAfter(-1)
 		if err != nil {
-			if a.val != 1 || a.cell != m.failedRef || m.cells.Stats().Live != before || m.words.Stats().Live != beforeWords {
+			if a.val != 1 || a.cell != m.failedNullRef || m.cells.Stats().Live != before || m.words.Stats().Live != beforeWords {
 				t.Fatalf("source allocation failure %d sign/token/roots", after)
 			}
 			if _, e := m.Int64(&a); e != arena.ErrInvalidSlot {

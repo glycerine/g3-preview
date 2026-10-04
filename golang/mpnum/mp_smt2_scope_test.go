@@ -1,5 +1,6 @@
 // Licensed under the MIT license.
 // Source mpz.cpp1412 and scoped_numeral.h31-33: DEFAULT before assignment.
+// Source: src/util/mpz.cpp, src/util/scoped_numeral.h.
 package mpnum
 
 import (
@@ -41,7 +42,7 @@ func TestSMT2FreshDefaultCopyFailureNullDestructor(t *testing.T) {
 		var tmp Int
 		cb.FailAfter(fault)
 		e := control.Copy(&tmp, &ca)
-		selected := numericPhysicalReservationRefusal(e) && tmp.cell == control.failedRef
+		selected := numericPhysicalReservationRefusal(e) && tmp.cell == control.failedNullRef
 		cb.FailAfter(-1)
 		if e = control.CloseChecked(); e != nil || cb.Used() != 0 {
 			t.Fatal(e, cb.Used())

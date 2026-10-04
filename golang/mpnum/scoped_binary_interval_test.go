@@ -1,5 +1,6 @@
 // Licensed under the MIT license.
 // Concrete lexical-owner tests.
+// Source: src/util/mpbq.cpp, src/util/scoped_numeral.h.
 package mpnum
 
 import (
@@ -73,7 +74,7 @@ func TestBinaryIntervalFailurePrefixes(t *testing.T) {
 					if op == 2 {
 						wanted = &large
 					}
-					if c.lower.num.cell == z.failedRef {
+					if c.lower.num.cell == z.failedNullRef {
 						if c.lower.num.val != wanted.val || c.lower.k != 0 || c.upper.num != NewInt(9) {
 							t.Fatal("lower allocation publication precedes upper copy", op, prefix, c)
 						}
@@ -83,7 +84,7 @@ func TestBinaryIntervalFailurePrefixes(t *testing.T) {
 					} else {
 						lowerNew, x := z.Equal(&c.lower.num, wanted)
 						serviceMust(t, x)
-						if !lowerNew || c.upper.num.cell != z.failedRef || c.upper.num.val != wanted.val || c.upper.k != 0 {
+						if !lowerNew || c.upper.num.cell != z.failedNullRef || c.upper.num.val != wanted.val || c.upper.k != 0 {
 							t.Fatal("completed lower precedes upper allocation publication", op, prefix, c)
 						}
 						if x := z.check(&c.upper.num); !errors.Is(x, arena.ErrInvalidSlot) {

@@ -294,7 +294,7 @@ func TestExtendedGCDWrapperCopyConstructorUnwindOrder(t *testing.T) {
 			e = s.manager.Copy(&a, &inA.raw)
 			if e == nil {
 				e = s.manager.Copy(&b, &inB.raw)
-				eligible = numericPhysicalReservationRefusal(e) && b.num.cell != 0 && b.num.cell != s.manager.z.failedRef && b.den.cell == s.manager.z.failedRef
+				eligible = numericPhysicalReservationRefusal(e) && b.num.cell != 0 && !s.manager.z.isFailureRef(b.num.cell) && b.den.cell == s.manager.z.failedNullRef
 				if eligible {
 					serviceAuditRationalRoots(t, s, &inA.raw, &inB.raw, &g.raw, &x.raw, &y.raw, &a, &b)
 					// Source completed a dtor precedes separate owning abort of b.
@@ -421,7 +421,7 @@ func TestExtendedGCDWrapperNineRetainedDiagnosticRecords(t *testing.T) {
 	}
 	budget.FailAfter(0)
 	e = z.Copy(&partial.num, &completed[0].num)
-	if !numericPhysicalReservationRefusal(e) || partial.num.cell != z.failedRef {
+	if !numericPhysicalReservationRefusal(e) || partial.num.cell != z.failedNullRef {
 		t.Fatal(e)
 	}
 	serviceAuditRationalRoots(t, s, &completed[0], &completed[1], &completed[2], &completed[3], &completed[4], &completed[5], &completed[6], &completed[7], &partial)

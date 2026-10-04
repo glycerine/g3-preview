@@ -1,5 +1,6 @@
 // Licensed under the MIT license.
 // Source: mpz.h public methods; test/mpz.cpp and test/mpq.cpp tst1.
+// Source: src/util/mpz.h, src/util/mpz.cpp, src/util/mpq.h.
 package mpnum
 
 import (
@@ -241,7 +242,7 @@ func TestIntegerFacadeDupIncDecFailureRoots(t *testing.T) {
 		complete := false
 		failures := 0
 		for prefix := int64(0); prefix < 32; prefix++ {
-			m, b := integerManager(t)
+			m, b := mpzPublicationDirectOwner(t)
 			limbs := make([]uint32, 40)
 			for i := range limbs {
 				limbs[i] = math.MaxUint32

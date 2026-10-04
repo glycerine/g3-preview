@@ -1,4 +1,5 @@
 // Licensed under the MIT license.
+// Source: src/util/rational.cpp, src/util/mpz.h.
 package mpnum
 
 import (
@@ -53,7 +54,7 @@ func TestRationalServiceStatsIncludesUnpublishedPhysicalCell(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
 	config := serviceConfig(b)
 	config.Integers.Cells.PageSize = 8
-	config.Integers.Cells.SlotLimit = 7
+	config.Integers.Cells.SlotLimit = 8 // six source cells plus two charged dead descriptors
 	config.Integers.Profile = memory.SmallAllocatorProfile{PointerBits: 64}
 	s, e := NewRationalService(config)
 	serviceMust(t, e)

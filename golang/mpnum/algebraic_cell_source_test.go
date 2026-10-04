@@ -97,7 +97,7 @@ func algebraicCellSourcePhysical(t *testing.T, c *AlgebraicRootCore, polys []UPo
 	z, p := c.config.Rationals.z, c.config.Polynomials
 	refs := map[numericCellRef]bool{}
 	addRef := func(ref numericCellRef) {
-		if ref == 0 || ref == z.failedRef {
+		if ref == 0 || z.isFailureRef(ref) {
 			return
 		}
 		if !validNumericRef(z.cells, ref) {
