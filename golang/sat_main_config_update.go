@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 package g3
 
 // These are the concrete generated sat_params accessors. Each uses the real

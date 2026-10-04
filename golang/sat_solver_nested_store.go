@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Concrete pointer-free payload adapter for source nested literal vectors.
 package g3
 

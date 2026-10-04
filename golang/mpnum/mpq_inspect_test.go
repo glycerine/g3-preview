@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation
+// Licensed under the MIT license.
 // Active source assertions: src/test/rational.cpp tst2 conversion block and
 // rational_tester::tst_hash. The global rational wrapper remains unported.
 package mpnum

@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Translation of src/util/smt2_util.h/.cpp, Leonardo de Moura.
 package g3
 

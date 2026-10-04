@@ -1,4 +1,4 @@
-// Copyright (c) 2006, 2007 Microsoft Corporation.
+// Licensed under the MIT license.
 // Source-owner extraction bridge charges and nominal errors, tests first.
 package g3
 

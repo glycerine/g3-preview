@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Translation of random_gen and shuffle in src/util/util.h.
 package utilhash
 

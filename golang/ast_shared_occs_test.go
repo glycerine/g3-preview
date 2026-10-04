@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // No registered shared_occs test exists; these are additional finite source models.
 package g3
 

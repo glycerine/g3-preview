@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation
+// Licensed under the MIT license.
 // Source: mpn.cpp to_string and mpz.cpp/mpq.cpp display (2006 copyright).
 package mpnum
 

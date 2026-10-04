@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Actual mpz.h cell allocation and object-bounded initialized-byte access.
 package mpnum
 

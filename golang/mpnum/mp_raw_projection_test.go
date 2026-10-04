@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation.
+// Licensed under the MIT license.
 // Source-action/domain tests for mpq.h191-237,562,666-669 and Inf reference adapters.
 package mpnum
 

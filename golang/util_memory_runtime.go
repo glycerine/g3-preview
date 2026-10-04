@@ -1,4 +1,4 @@
-// Copyright (c) 2006, 2015 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Main compatibility/error bridge to the single concrete lower runtime.
 package g3
 

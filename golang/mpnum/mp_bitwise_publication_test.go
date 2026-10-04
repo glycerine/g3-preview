@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Added action-prefix/profile tests for mpz.cpp bitwise and mpq.h forwards.
 package mpnum
 

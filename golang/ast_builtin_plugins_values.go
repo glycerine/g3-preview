@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 package g3
 
 func (m *ASTManager) pluginValue(fid FamilyID, r astNodeRef) (bool, error) {

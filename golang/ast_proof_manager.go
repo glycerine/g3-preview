@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Concrete ast_manager proof construction/inspection from ast.h and ast.cpp.
 package g3
 

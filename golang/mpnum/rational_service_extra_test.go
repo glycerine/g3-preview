@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation
+// Licensed under the MIT license.
 // Remaining source rational.h wrappers; tst_rational.cpp::tst8 assertions.
 package mpnum
 

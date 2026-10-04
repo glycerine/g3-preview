@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // mpq.cpp28-34, rational.cpp75-83 and infinitesimal reverse member destruction.
 package mpnum
 

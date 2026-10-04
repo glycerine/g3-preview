@@ -1,4 +1,4 @@
-// Copyright (c) 2012 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 package mpnum
 
 func (m *IntegerModularManager) Reset(a *Int) error {

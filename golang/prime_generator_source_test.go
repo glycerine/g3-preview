@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Tests FIRST: complete registered source prime campaign, no substitute generator.
 package g3
 

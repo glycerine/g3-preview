@@ -1,4 +1,4 @@
-// Copyright (c) 2006, 2007, 2015 Microsoft Corporation.
+// Licensed under the MIT license.
 // Tests-first concrete shared memory owner contract; no duplicate implementation.
 package memory
 

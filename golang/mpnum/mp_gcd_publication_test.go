@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Added source-action/profile tests for selected internal32 GCD methods.
 package mpnum
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Regression fixtures follow the statement order in src/util/heap.h.
 package g3
 

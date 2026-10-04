@@ -1,4 +1,5 @@
-// Copyright (c) 2012 Microsoft Corporation. Source mpff.cpp display locals.
+// Licensed under the MIT license.
+// Source mpff.cpp display locals.
 package mpnum
 
 import (

@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source delete_node ascending pushes/LIFO pops. Intrusive emergency metadata
 // is a Go continuation adapter only when source worklist allocation would throw.
 package g3

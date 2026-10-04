@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Concrete str_hashtable/ptr_hashtable<char> from util/str_hashtable.h and
 // util/hashtable.h, Leonardo de Moura (2006-09-13 / 2006-09-11).
 package utilhash

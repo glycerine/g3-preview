@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Owner-accounted formatting adaptation of inf_rational / inf_int_rational.
 package mpnum
 

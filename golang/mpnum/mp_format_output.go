@@ -1,4 +1,4 @@
-// Copyright (c) 2006, 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source lexical sbuffer<char,1024> from util/buffer.h and mpz.cpp display.
 package mpnum
 

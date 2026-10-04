@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation
+// Licensed under the MIT license.
 // Translated from src/util/mpn.h and src/util/mpn.cpp.
 // Original author: Christoph Wintersteiger, 2011-11-16.
 

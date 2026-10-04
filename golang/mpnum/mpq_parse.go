@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation
+// Licensed under the MIT license.
 // Source: src/util/mpq.cpp set(mpq &, char const *), all source branches.
 package mpnum
 

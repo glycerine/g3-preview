@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation
+// Licensed under the MIT license.
 // Translated from src/util/mpz.h and mpz.cpp (_MP_INTERNAL, 32-bit digits).
 // Original author: Leonardo de Moura, 2010-06-17.
 package mpnum

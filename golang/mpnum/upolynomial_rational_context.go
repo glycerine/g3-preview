@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source sexpr2upolynomial.cpp: owning rational constant and borrowed exponent.
 package mpnum
 

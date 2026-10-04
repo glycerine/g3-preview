@@ -1,4 +1,5 @@
-// Copyright (c) 2011 Microsoft Corporation. Source mpbq.cpp426–515 raw mpz locals.
+// Licensed under the MIT license.
+// Source mpbq.cpp426–515 raw mpz locals.
 package mpnum
 
 import (

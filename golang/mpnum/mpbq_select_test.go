@@ -1,4 +1,5 @@
-// Copyright (c) 2011 Microsoft Corporation. Added independent MPBQ tests.
+// Licensed under the MIT license.
+// Added independent MPBQ tests.
 package mpnum
 
 import (

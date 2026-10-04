@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source mpn.cpp:371-399; constructor unwind from util/buffer.h:84-95.
 package mpnum
 

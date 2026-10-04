@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Actual label, pattern, model-value, and user-sort decl plugins in ast.cpp.
 package g3
 

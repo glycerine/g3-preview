@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 package mpnum
 
 // modularImage implements the lexical scoped_set_zp body. The old modulus

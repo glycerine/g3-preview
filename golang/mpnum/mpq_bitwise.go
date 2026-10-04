@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation
+// Licensed under the MIT license.
 // Source: src/util/mpq.h bitwise forwards, preserving numerator action before
 // output-denominator reset. Arithmetic remains the concrete integer algorithm.
 package mpnum

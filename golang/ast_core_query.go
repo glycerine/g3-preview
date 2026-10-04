@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Checked scalar replacements for borrowed ast.h field accessors.
 package g3
 

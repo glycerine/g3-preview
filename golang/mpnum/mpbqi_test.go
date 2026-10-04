@@ -1,4 +1,5 @@
-// Copyright (c) 2011 Microsoft Corporation. Source: old_interval.cpp tst2.
+// Licensed under the MIT license.
+// Source: old_interval.cpp tst2.
 package mpnum
 
 import (

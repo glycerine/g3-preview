@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation
+// Licensed under the MIT license.
 // Source assertions: src/test/mpz.cpp tst_2k; print-only cases receive labeled
 // independent expectations. Fixtures are embedded and never read source at runtime.
 package mpnum

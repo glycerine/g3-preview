@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Concrete expr_substitution: scalar owners and actual encoded backing.
 package g3
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // sexpr has no direct registered source tests; these freeze defined source
 // branches and explicit undefined-behavior adaptations with independent oracles.
 package g3

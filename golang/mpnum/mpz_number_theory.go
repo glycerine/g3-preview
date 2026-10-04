@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source: src/util/mpz.cpp array gcd, extended Euclid, lcm, divides.
 package mpnum
 

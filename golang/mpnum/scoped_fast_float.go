@@ -1,4 +1,5 @@
-// Copyright (c) 2011 Microsoft Corporation. Concrete scoped_numeral<mpff>.
+// Licensed under the MIT license.
+// Concrete scoped_numeral<mpff>.
 package mpnum
 
 import (

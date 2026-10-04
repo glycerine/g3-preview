@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation
+// Licensed under the MIT license.
 // Source: remaining src/util/rational.h wrappers; concrete owner-local facade.
 package mpnum
 

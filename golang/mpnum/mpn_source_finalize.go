@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source mpn.h manager member destruction: t_ab,t_ms,v,u.
 package mpnum
 

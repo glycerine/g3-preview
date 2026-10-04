@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Concrete map<char const*, int, str_hash_proc, str_eq_proc> from util/map.h
 // and core_hashtable default entries, Leonardo de Moura (2006-10-14).
 package utilhash

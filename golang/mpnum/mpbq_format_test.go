@@ -1,4 +1,5 @@
-// Copyright (c) 2011 Microsoft Corporation. Added exact format expectations.
+// Licensed under the MIT license.
+// Added exact format expectations.
 package mpnum
 
 import (

@@ -1,4 +1,5 @@
-// Copyright (c) 2011 Microsoft Corporation. Source: src/util/mpbq.h/.cpp.
+// Licensed under the MIT license.
+// Source: src/util/mpbq.h/.cpp.
 package mpnum
 
 func (m *BinaryRationalManager) RootLower(a *BinaryRational, n uint32, out *BinaryRational) (bool, error) {

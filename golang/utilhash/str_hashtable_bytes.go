@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Borrowed byte-input adapter for the source CString query. No byte slice is
 // retained; the hash/probe/equality and prepare/publication actions are those
 // of the existing concrete source string table.

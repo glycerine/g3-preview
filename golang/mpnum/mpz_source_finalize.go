@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source: mpz.cpp142–161 and reverse member destruction in mpz.h/mpn.h.
 package mpnum
 

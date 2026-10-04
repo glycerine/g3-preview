@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation
+// Licensed under the MIT license.
 // Source: src/util/mpq.h/.cpp inspection and thin extraction/setter branches;
 // explicit inclusive 32-bit projections come from src/util/rational.h.
 package mpnum

@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // rational.cpp75-83: hooks, cache, constants, actual manager destruction.
 package mpnum
 

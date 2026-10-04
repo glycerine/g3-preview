@@ -1,4 +1,5 @@
-// Copyright (c) 2011 Microsoft Corporation. Source: MPBQ display methods.
+// Licensed under the MIT license.
+// Source: MPBQ display methods.
 package mpnum
 
 func (m *BinaryRationalManager) appendUnsigned(offset, n uint32) (uint32, error) {

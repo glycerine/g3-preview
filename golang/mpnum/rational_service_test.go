@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation
+// Licensed under the MIT license.
 // Selected assertions translated from src/test/rational.cpp.
 package mpnum
 

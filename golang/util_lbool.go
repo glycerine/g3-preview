@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Translation of src/util/lbool.h and lbool.cpp, Leonardo de Moura.
 package g3
 

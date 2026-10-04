@@ -1,6 +1,7 @@
+// Licensed under the MIT license.
 //go:build !g3debug
 
-// Copyright (c) 2011 Microsoft Corporation. Source MPBQ_DEBUG absent.
+// Source MPBQ_DEBUG absent.
 package mpnum
 
 func (m *BinaryRationalManager) debugSelected(l, u, r *BinaryRational) error { return nil }

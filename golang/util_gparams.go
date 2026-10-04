@@ -1,4 +1,4 @@
-// Copyright (c) 2012 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Explicit runtime-owned gparams::imp; source catalog dispatch is borrowed.
 package g3
 

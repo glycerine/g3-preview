@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
 // Licensed under the MIT license; see LICENSE.txt.
 
 // Package g3 is the in-progress Go translation of this repository's patched

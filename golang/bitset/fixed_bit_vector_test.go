@@ -1,4 +1,4 @@
-// Copyright (c) 2014 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Tests translated from src/test/fixed_bit_vector.cpp, Nikolaj Bjorner.
 package bitset
 

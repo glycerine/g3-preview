@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 package g3
 
 // Source sat_solver.cpp:2238-2253. In particular mark precedes BOTH vector

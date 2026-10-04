@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source: mpz.h public methods; test/mpz.cpp and test/mpq.cpp tst1.
 package mpnum
 

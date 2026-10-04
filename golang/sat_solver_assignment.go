@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 package g3
 
 func (s *satSolverPropagationState) setConflict(c satJustification, l satLiteral) {

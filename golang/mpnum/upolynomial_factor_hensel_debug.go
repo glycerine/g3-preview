@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source runtime CASSERT tag helpers, independent of g3debug build selection.
 package mpnum
 

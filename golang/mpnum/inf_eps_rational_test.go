@@ -1,4 +1,4 @@
-// Copyright (c) 2013 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // No registered source inf_eps_rational tests exist; these are additional tests.
 package mpnum
 

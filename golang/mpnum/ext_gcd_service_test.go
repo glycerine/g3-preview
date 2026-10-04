@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation
+// Licensed under the MIT license.
 // Source: src/util/ext_gcd.h and src/test/rational.cpp::tst7.
 package mpnum
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source tst5 in src/test/uint_set.cpp and finite container/lifetime coverage.
 package bitset
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Concrete ast_ref specialization of src/util/obj_ref.h.
 package g3
 

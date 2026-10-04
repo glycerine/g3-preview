@@ -1,4 +1,4 @@
-// Copyright (c) 2006, 2007 Microsoft Corporation.
+// Licensed under the MIT license.
 // Actual source diagnostic byte streams stay in main; core tests moved to memory.
 package g3
 

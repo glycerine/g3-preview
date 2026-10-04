@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation
+// Licensed under the MIT license.
 // Source: src/util/mpz.cpp root/is_perfect_square and mpz.h copy wrapper.
 package mpnum
 

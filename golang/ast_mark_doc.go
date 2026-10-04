@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Selected source surface and ownership adapters:
 //
 // util/obj_mark.h default expr specialization: constructor/default get_id,

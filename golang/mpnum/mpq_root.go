@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation
+// Licensed under the MIT license.
 // Source: src/util/mpq.cpp root and mpq.h square predicates/output wrappers.
 package mpnum
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source: src/util/mpq.cpp set(char const*) caller actions and lexical scopes.
 package mpnum
 

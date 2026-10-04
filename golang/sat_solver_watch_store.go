@@ -1,4 +1,4 @@
-// Copyright (c) 2006, 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Concrete pointer-free payload adapter for source nested watch vectors.
 package g3
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Independent test-only physical roots for the source-backed Integer owner.
 package mpnum
 

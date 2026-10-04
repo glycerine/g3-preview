@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source parameter constructors, copy/move, destruction, equality and hash.
 package g3
 

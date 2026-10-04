@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Selected algebraic_numbers.cpp cell/univariate bodies. This prerequisite
 // borrows real services; it is NOT the missing multivariate manager constructor.
 package mpnum

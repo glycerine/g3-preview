@@ -24892,3 +24892,89 @@ was hidden, weakened, skipped or truncated. No C++ content hashes were computed;
 originating paths and license notices are retained without Microsoft copyright
 lines in touched ported files. Private polynomial/GC drafts remain isolated
 and give no premature implementation credit. The full-fork goal remains active.
+
+
+### Header policy and continuing default solver families
+
+The previous goal turn made authoritative progress with clean green commit
+`aa535da`. This continuation rechecked that actual baseline and the full-fork
+plan. All algorithms, APIs, source campaigns and interpolation remain required.
+
+A header audit found555 older Go files still carrying Microsoft copyright
+lines, contrary to the recorded current/new-header policy. Those comment-only
+lines were removed throughout the master module, preserving existing source
+paths, other authors and MIT license notices. Exact unchanged originating path
+occurrences and build directives were verified. A Go scanner comparison of all
+555 before/after files confirms identical executable tokens in
+`.cache/header-policy-token-check.log`. Machine Go-only inventory/backups are
+`.cache/header-policy-go-inventory.json` and `.cache/header-policy-original`.
+No C++ source content hashes were computed and no solver hashing was removed.
+All693 master Go files are frozen in
+`.cache/header-policy-final-go-hashes.json`; full native and checked/debug
+suites, both vets and the source/no-generics audit are now running. A green
+commit still requires all terminal results and byte verification.
+
+Three substantive private source families continue independently. Polynomial
+cell/SOM/arithmetic preserves actual nontrivial coefficient vector growth;
+review demanded source-reachable stopped-transfer/root roles and consumed
+callback progress, with no fabricated low-level write failure. The indexed
+modular GCD backend, rational/linear copy publication, callbacks, source
+finalization and complete physical refusal campaigns remain unfinished.
+
+SAT GC/restart/init_search has tests-first missing-API evidence in
+`.cache/work/sat-gc-api-red.log` and covers all five strategy routes. Its actual
+stable-sort workspace is an explicitly charged Go adaptation, never a Runtime
+allocation ticket or registry-derived owning snapshot. Source comparator ties,
+current clause/reinit/reason/phase roots and dynamic0/1/2/nary routes are required.
+
+The third lane starts the complete selected SCC plus equivalence-elimination
+family in `.cache/work/sat-scc-aa535da`, reading src/sat/sat_scc.cpp/h,
+sat_elim_eqs.cpp/h and sat_scc_params.pyg before tests and bodies. It borrows
+the actual solver-owned model converter, uses iterative Tarjan with captured
+watch frames, preserves external-root selection/conflict exits and full binary,
+original/learned clause normalization, model entries/eliminated columns and
+propagation. Tarjan-only or disabled-default substitutes are not completion.
+Private drafts have no master implementation or whole-unit completion credit.
+
+
+Private follow-on evidence received during the header gates: SCC missing-API
+RED is terminal1 in `.cache/sat-scc-api-red.log`, with only the selected new
+SCC/equivalence APIs undefined and existing baseline fixtures compiled. The
+implementation retains fresh per-call Runtime locals, reverse destruction and
+report-stop ordering; no warm scratch substitutes source allocation topology.
+
+GC first eight groups pass both profiles; complete five-strategy independent
+truth-table coverage and actual workspace/ID free-list refusal prefixes are
+being added before freeze. An initial unit-reactivation ownership expectation
+was corrected to the actual source deletion, and invalid binary frozen inputs
+were replaced by valid ternary inputs for DEBUG detach routes. These fixture
+corrections are not source algorithm RED evidence. Mid-merge owning protocol
+checks must be explicitly labelled when valid comparator reads cannot Budget
+fail, with independently named disjoint ranges rather than backup snapshots.
+
+Polynomial const muladd zero-left route reaches implicit const mpz→rational
+conversion before rational mk_const, requiring two source copies and reverse
+actual Int/Rational temporary cleanup. The private config may borrow a real
+same-Integer RationalManager to bind that source-global dependency; no fake
+imp-owned manager or one-copy fallback is permitted. Source-reachable malformed
+vector growth and ordinary valid-world failure domains remain distinguished.
+
+
+### Historical Go header cleanup terminal GREEN
+
+The full native and checked/debug suites, both complete vet profiles and
+source/no-generics audit are terminal0 on the frozen693-file Go tree. Logs:
+`.cache/header-policy-final-{native,debug,vet-native,vet-debug,source}.log`;
+exact states: `.cache/header-policy-final-gates.json`. The independent Go
+scanner confirms executable tokens unchanged in all555 comment-only modified
+files; source-path occurrences/build directives and every final Go byte were
+verified. No Microsoft copyright lines remain in current master Go headers;
+MIT notices, other authors and LICENSE.txt are retained. Native main is12.973s.
+Checked/debug terminal main result: ok  	github.com/glycerine/g3/golang	729.093s.
+
+Original100-bit/all-prefix refinement remains intact; no tests hidden, weakened,
+skipped or truncated. Source completion counts are unchanged at28ported,
+168partial,1906unported with2102 units/677 APIs. No C++ hashes were computed.
+Earlier running observations are superseded by these final results. The ready
+seven-file GC family stays private until this coherent header commit completes;
+polynomial/SCC implementation and the full-fork objective remain active.

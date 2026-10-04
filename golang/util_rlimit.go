@@ -1,4 +1,4 @@
-// Copyright (c) 2015 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Translation of src/util/rlimit.h/.cpp, Nikolaj Bjorner, 2015-09-28.
 package g3
 

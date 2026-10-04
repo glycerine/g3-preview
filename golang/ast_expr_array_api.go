@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 package g3
 
 func (m *ASTManager) ExprArrayMk(out *ASTExprArray) error {

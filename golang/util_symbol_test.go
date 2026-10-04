@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source: src/test/symbol.cpp, with finite ownership and byte-policy extensions.
 package g3
 

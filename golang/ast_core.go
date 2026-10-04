@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Owner-confined ast_manager default no-trace normal and format constructors.
 package g3
 

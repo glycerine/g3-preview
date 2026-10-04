@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // algebraic_numbers.cpp:541–684, real univariate factor/isolation pipeline.
 package mpnum
 

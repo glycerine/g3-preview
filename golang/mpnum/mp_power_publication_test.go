@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Added source-action regressions for mpz.cpp/mpq.cpp Power and mpz.h shifts.
 package mpnum
 

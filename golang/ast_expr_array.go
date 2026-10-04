@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Concrete actual ast_manager::expr_array_cfg specialization of parray.h.
 package g3
 

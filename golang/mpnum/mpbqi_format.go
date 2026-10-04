@@ -1,4 +1,5 @@
-// Copyright (c) 2011 Microsoft Corporation. Source basic_interval display.
+// Licensed under the MIT license.
+// Source basic_interval display.
 package mpnum
 
 func (m *BinaryIntervalManager) appendBound(a *BinaryRational, offset uint32) (uint32, error) {

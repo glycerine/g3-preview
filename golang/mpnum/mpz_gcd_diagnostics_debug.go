@@ -1,6 +1,6 @@
 //go:build g3debug
 
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source: src/util/mpz.cpp selected Lehmer and ExtendedGCD SASSERT sites.
 package mpnum
 

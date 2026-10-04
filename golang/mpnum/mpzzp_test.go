@@ -1,4 +1,4 @@
-// Copyright (c) 2012 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Added finite source-action fixtures: no registered direct mpzzp test exists.
 package mpnum
 

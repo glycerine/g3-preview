@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation.
+// Licensed under the MIT license.
 // Concrete MPBQ instantiation of scoped_numeral[_vector].h and MPBQ macros.
 package mpnum
 

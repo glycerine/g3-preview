@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Additional finite specialized identity-table tests; no registered sparse-mark test.
 package g3
 

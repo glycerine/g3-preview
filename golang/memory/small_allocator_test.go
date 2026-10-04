@@ -1,4 +1,4 @@
-// Copyright (c) 2006, 2007, 2015 Microsoft Corporation.
+// Licensed under the MIT license.
 // Original source allocator tests; source actions and names preserved.
 package memory
 

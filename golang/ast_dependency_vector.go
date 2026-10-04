@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Actual non-owning ptr_vector<expr> output; codecs are shared with the concrete
 // ref vector, but these methods never invoke its reference-count callbacks.
 package g3

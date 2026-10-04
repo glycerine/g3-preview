@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source: src/sat/sat_solver.cpp:367–465; sat_solver.h value/lvl accessors.
 package g3
 

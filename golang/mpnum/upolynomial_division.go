@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source core_manager polynomial division; outputs keep completed prefixes.
 package mpnum
 

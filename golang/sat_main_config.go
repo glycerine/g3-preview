@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Translation of src/sat/sat_config.h/.cpp, Leonardo de Moura, 2011-05-21.
 package g3
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source: algebraic_numbers.cpp comparison, including Sturm–Tarski fallback.
 package mpnum
 

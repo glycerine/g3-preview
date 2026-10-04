@@ -1,6 +1,6 @@
 //go:build port_pending_sat
 
-// Copyright (c) 2015 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Finite translation of src/test/sat_user_scope.cpp; exact oracle is Go-only.
 package g3
 

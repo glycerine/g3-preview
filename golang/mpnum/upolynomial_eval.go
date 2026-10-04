@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 package mpnum
 
 func (m *UPolynomialManager) sign(a *Int) (int, error) {

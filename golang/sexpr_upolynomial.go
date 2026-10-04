@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source math/polynomial/sexpr2upolynomial.cpp, recursive source parser.
 package g3
 

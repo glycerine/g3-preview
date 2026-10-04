@@ -1,4 +1,5 @@
-// Copyright (c) 2011 Microsoft Corporation. Concrete lexical-owner tests.
+// Licensed under the MIT license.
+// Concrete lexical-owner tests.
 package mpnum
 
 import (

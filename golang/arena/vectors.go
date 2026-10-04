@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
 // Licensed under the MIT license; see LICENSE.txt in the source distribution.
 // Scalar payload storage adaptation for util/vector.h and util/buffer.h.
 package arena

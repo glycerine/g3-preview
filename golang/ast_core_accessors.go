@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source AST scalar/indexed readers. All public borrows remain handle values.
 package g3
 

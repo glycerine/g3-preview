@@ -1,4 +1,4 @@
-// Copyright (c) 2006, 2007 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source: src/util/small_object_allocator.h/.cpp; explicit scalar pointer codec.
 package memory
 

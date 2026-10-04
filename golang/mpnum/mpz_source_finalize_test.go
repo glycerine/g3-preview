@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source destructor: mpz.cpp142–161; member order mpz.h108–119 and
 // mpn.h99 (t_ab,t_ms,v,u), small_object_allocator.cpp39–53.
 package mpnum

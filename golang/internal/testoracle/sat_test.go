@@ -1,4 +1,4 @@
-// Copyright (c) 2015 Microsoft Corporation
+// Licensed under the MIT license.
 // Source scenarios: src/test/check_assumptions.cpp and sat_user_scope.cpp.
 package testoracle
 

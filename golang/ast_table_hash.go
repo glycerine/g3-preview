@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Exact source AST array hash and compare_nodes/get_node_hash branches.
 package g3
 

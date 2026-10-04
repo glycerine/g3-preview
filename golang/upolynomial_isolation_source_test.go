@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Tests FIRST: actual registered root-isolation inputs and assertion routes.
 package g3
 

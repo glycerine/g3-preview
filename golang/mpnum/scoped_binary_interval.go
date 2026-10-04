@@ -1,4 +1,5 @@
-// Copyright (c) 2011 Microsoft Corporation. Concrete scoped_interval.
+// Licensed under the MIT license.
+// Concrete scoped_interval.
 package mpnum
 
 import (

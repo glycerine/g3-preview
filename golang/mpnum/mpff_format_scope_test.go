@@ -1,4 +1,5 @@
-// Copyright (c) 2012 Microsoft Corporation. Source mpff.cpp1173–1378.
+// Licensed under the MIT license.
+// Source mpff.cpp1173–1378.
 package mpnum
 
 import (

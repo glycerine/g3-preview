@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation
+// Licensed under the MIT license.
 // Source: src/util/rational.cpp infinitesimal initialization/finalization.
 package mpnum
 

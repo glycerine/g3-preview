@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Actual flat upolynomial_sequence and svector<unsigned> specialization.
 package mpnum
 

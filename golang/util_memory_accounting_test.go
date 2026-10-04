@@ -1,3 +1,3 @@
-// Copyright (c) 2006, 2015 Microsoft Corporation.
+// Licensed under the MIT license.
 // Core source tests moved, with original names, to memory/accounting_test.go.
 package g3

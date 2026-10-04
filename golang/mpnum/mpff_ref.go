@@ -1,6 +1,7 @@
+// Licensed under the MIT license.
 //go:build !g3checked
 
-// Copyright (c) 2012 Microsoft Corporation. Concrete MPFF scalar packing.
+// Concrete MPFF scalar packing.
 package mpnum
 
 type ffRef uint32

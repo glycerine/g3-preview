@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Concrete u_map<uint32> coverage for util/map.h and hashtable.h.
 package utilhash
 

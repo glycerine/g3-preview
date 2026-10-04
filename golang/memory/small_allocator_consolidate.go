@@ -1,4 +1,4 @@
-// Copyright (c) 2007 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source: small_object_allocator.cpp:172–242, original scan/relink algorithm.
 package memory
 

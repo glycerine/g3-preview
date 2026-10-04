@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Additional finite tests; no registered hyper-resolution source test exists.
 package g3
 

@@ -1,4 +1,5 @@
-// Copyright (c) 2012 Microsoft Corporation. Owned-storage regressions for MPFF.
+// Licensed under the MIT license.
+// Owned-storage regressions for MPFF.
 package mpnum
 
 import (

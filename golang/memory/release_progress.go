@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Explicit Go cleanup authority for completed source deallocation prefixes.
 package memory
 

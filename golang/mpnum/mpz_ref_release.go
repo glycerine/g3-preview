@@ -1,6 +1,6 @@
+// Licensed under the MIT license.
 //go:build !g3checked
 
-// Copyright (c) 2006 Microsoft Corporation
 package mpnum
 
 import "github.com/glycerine/g3/golang/arena"

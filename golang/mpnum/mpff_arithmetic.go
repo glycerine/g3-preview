@@ -1,4 +1,5 @@
-// Copyright (c) 2012 Microsoft Corporation. Source MPFF arithmetic/control.
+// Licensed under the MIT license.
+// Source MPFF arithmetic/control.
 package mpnum
 
 import "github.com/glycerine/g3/golang/arena"

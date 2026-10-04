@@ -1,4 +1,5 @@
-// Copyright (c) 2012 Microsoft Corporation. Source MPFF conversions, internal32.
+// Licensed under the MIT license.
+// Source MPFF conversions, internal32.
 package mpnum
 
 // Selected source MPZ digit setter over a concrete ephemeral owner-indexed view.

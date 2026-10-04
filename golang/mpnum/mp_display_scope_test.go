@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source: mpq.cpp156-184 raw locals do not have numeral destructors.
 package mpnum
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source vector.h pointer specializations: actual runtime-backed lexical values.
 package memory
 

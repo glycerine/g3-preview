@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation.
+// Licensed under the MIT license.
 // Added profile/ownership tests for inf_int_rational.h98-119,
 // inf_rational.h111-132, inf_eps_rational.h107-128 and rational.h101-125.
 package mpnum

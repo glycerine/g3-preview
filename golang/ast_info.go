@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Concrete decl_info, sort_info and func_decl_info storage/action translation.
 package g3
 

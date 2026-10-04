@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 package mpnum
 
 // Exact active source constant table; never mutated. The #if 0 table is not selected.

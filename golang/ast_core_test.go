@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Active src/test/ast.cpp assertions and src/test/parray.cpp::tst5.
 package g3
 

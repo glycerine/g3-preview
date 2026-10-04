@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation
+// Licensed under the MIT license.
 // Source assertions from src/test/rational.cpp; test helpers own every returned token.
 package mpnum
 

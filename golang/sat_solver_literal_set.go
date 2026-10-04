@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Concrete sat::literal_set specialization of src/sat/sat_types.h.
 package g3
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Concrete ast_fast_mark<1/2> and ast_ref_fast_mark<1/2> specializations.
 package g3
 

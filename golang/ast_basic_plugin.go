@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Actual basic_decl_plugin constructor, lazy declaration caches, and dispatch.
 package g3
 

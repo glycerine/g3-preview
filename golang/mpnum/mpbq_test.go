@@ -1,4 +1,5 @@
-// Copyright (c) 2012 Microsoft Corporation. Source: src/test/mpbq.cpp.
+// Licensed under the MIT license.
+// Source: src/test/mpbq.cpp.
 package mpnum
 
 import (

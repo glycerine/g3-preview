@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Exact src/ast/ast.h basic_op_kind enumeration (including sentinel gap).
 package g3
 

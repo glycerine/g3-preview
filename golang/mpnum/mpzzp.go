@@ -1,4 +1,4 @@
-// Copyright (c) 2012 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Concrete source util/mpzzp.h manager; borrows one actual IntegerManager.
 package mpnum
 

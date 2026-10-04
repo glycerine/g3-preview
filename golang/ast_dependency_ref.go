@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Concrete expr_dependency_ref specialization of util/obj_ref.h.
 package g3
 

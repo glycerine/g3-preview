@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Tests FIRST: real sibling cores share physical storage, not arithmetic modes.
 package g3
 

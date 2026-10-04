@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
 // Licensed under the MIT license; see LICENSE.txt in the source distribution.
 // Concrete translation of util/params.cpp param_descrs and dictionary<info>.
 package g3

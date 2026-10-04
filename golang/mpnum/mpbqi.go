@@ -1,4 +1,4 @@
-// Copyright (c) 2011, 2012 Microsoft Corporation.
+// Licensed under the MIT license.
 // Concrete executable basic_interval<mpbq,false> and mpbqi.h specialization.
 package mpnum
 

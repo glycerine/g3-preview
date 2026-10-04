@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation
+// Licensed under the MIT license.
 // Concrete numeric-cell storage adaptation tests.
 package mpnum
 

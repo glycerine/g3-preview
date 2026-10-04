@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
 // Licensed under the MIT license; see LICENSE.txt in the source distribution.
 // Concrete INITIAL_SIZE32/64/128 translations of util/string_buffer.h.
 package g3

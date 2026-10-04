@@ -1,4 +1,4 @@
-// Copyright (c) 2006, 2007 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source allocator diagnostics through an explicit borrowed ostream adapter.
 package g3
 

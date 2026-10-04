@@ -1,4 +1,5 @@
-// Copyright (c) 2012 Microsoft Corporation. Source MPFF predicates/getters.
+// Licensed under the MIT license.
+// Source MPFF predicates/getters.
 package mpnum
 
 func (m *FastFloatManager) Sign(a *FastFloat) (bool, error) {

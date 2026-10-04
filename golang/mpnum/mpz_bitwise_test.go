@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source: src/test/mpz.cpp::bug4 and src/util/mpz.cpp bitwise preconditions.
 package mpnum
 

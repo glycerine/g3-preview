@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source ast_manager proof bodies; these tests do not replace proof_checker.
 package g3
 

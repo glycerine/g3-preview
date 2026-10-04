@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Concrete reslimit specialization of src/util/event_handler.h/cancel_eh.h.
 // Original author: Leonardo de Moura.
 package g3

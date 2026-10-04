@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Tests FIRST:37 registered numeric factor inputs; dense external-input adapter.
 package g3
 

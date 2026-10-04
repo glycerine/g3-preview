@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Concrete translation of util/sexpr.h/.cpp and the sexpr smart-reference
 // specializations. Physical storage replaces raw addresses, not source RC.
 package g3

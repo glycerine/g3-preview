@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Real mpn.h member sbuffers and mpn.cpp division storage action ordering.
 package mpnum
 

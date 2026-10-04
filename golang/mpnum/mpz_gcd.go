@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation
+// Licensed under the MIT license.
 // Source: src/util/mpz.cpp gcd_core and gcd(_MP_INTERNAL / LEHMER_GCD),
 // src/util/mpz.h addmul/submul. Original author: Leonardo de Moura.
 package mpnum

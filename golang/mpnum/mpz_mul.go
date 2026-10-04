@@ -1,6 +1,6 @@
-// Copyright (c) 2006 Microsoft Corporation
+// Licensed under the MIT license.
 // Source: src/util/mpz.h::mul, src/util/mpz.cpp::big_mul,
-// src/util/mpn.cpp::mul (Copyright (c) 2011 Microsoft Corporation).
+// src/util/mpn.cpp::mul
 package mpnum
 
 import (

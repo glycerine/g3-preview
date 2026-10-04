@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Translation of sat::uint_set and literal_set in src/sat/sat_types.h.
 package g3
 

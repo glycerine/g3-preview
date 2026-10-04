@@ -1,4 +1,5 @@
-// Copyright (c) 2011 Microsoft Corporation. Concrete owner/lifetime tests.
+// Licensed under the MIT license.
+// Concrete owner/lifetime tests.
 package mpnum
 
 import (

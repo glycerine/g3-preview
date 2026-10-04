@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // src/ast/ast.h::ast_table specialization of src/util/chashtable.h.
 package g3
 

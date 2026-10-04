@@ -1,6 +1,6 @@
-// Copyright (c) 2011 Microsoft Corporation
+// Licensed under the MIT license.
 // Source arithmetic: src/util/mpn.cpp. Source regression projections:
-// src/test/mpz.cpp tst2 and bug1 (Copyright (c) 2006 Microsoft Corporation).
+// src/test/mpz.cpp tst2 and bug1
 package mpnum
 
 import (

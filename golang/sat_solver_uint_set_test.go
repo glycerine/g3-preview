@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // sat::uint_set is local char-membership/insertion vectors, not global bitmap.
 package g3
 

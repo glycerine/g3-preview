@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Concrete default obj_mark<expr> and ast_mark; IDs deliberately outlive nodes.
 package g3
 

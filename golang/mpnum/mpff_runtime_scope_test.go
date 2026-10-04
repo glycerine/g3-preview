@@ -1,4 +1,5 @@
-// Copyright (c) 2012 Microsoft Corporation. Source mpff.cpp display and memory_manager.cpp TLS paths.
+// Licensed under the MIT license.
+// Source mpff.cpp display and memory_manager.cpp TLS paths.
 package mpnum
 
 import (

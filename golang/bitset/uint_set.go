@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Translation of src/util/uint_set.h, Leonardo de Moura, 2006-12-07.
 package bitset
 

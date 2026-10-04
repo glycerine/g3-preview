@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Actual sat::uint_set at src/sat/sat_types.h155-226, not global bitmap uint_set.
 package g3
 

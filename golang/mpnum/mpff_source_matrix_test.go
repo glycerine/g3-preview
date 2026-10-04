@@ -1,4 +1,5 @@
-// Copyright (c) 2012 Microsoft Corporation. Active src/test/mpff.cpp routes.
+// Licensed under the MIT license.
+// Active src/test/mpff.cpp routes.
 package mpnum
 
 import (

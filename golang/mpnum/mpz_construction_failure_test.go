@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // mpz.cpp87-140 constructor; mpz.h member order; implicit failed-constructor
 // member unwind excludes the completed mpz_manager destructor body.
 package mpnum

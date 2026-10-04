@@ -1,4 +1,4 @@
-// Copyright (c) 2006, 2007 Microsoft Corporation.
+// Licensed under the MIT license.
 // One borrowed cold dispatcher. Byte formatting remains in the caller package.
 package memory
 

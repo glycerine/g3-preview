@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Translation of ast.h/ast.cpp::family_manager, Leonardo de Moura.
 package g3
 

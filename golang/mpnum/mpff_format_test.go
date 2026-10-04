@@ -1,4 +1,5 @@
-// Copyright (c) 2012 Microsoft Corporation. Actual registered print routes.
+// Licensed under the MIT license.
+// Actual registered print routes.
 package mpnum
 
 import (

@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
 // Licensed under the MIT license; see LICENSE.txt in the source distribution.
 // Concrete cmd_context_types.h exception values; no command runtime scaffold.
 package g3

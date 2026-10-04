@@ -1,4 +1,4 @@
-// Copyright (c) 2006, 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source mpz.cpp1412 and scoped_numeral.h31-33: DEFAULT before assignment.
 package mpnum
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2006, 2007 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Charged main adapter; all allocation algorithms live solely in memory.
 package g3
 

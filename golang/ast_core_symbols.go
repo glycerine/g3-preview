@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source symbol interning byte-input boundary used by actual AST name buffers.
 package g3
 

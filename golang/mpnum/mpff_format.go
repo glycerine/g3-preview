@@ -1,4 +1,5 @@
-// Copyright (c) 2012 Microsoft Corporation. Source all MPFF displays.
+// Licensed under the MIT license.
+// Source all MPFF displays.
 package mpnum
 
 func (m *FastFloatManager) appendText(n uint32, s string) (uint32, error) {

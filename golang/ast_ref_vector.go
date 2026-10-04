@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Concrete ast_ref_vector specialization; encoded cold owners, scalar entries.
 package g3
 

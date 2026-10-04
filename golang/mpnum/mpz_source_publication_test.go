@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source action-prefix regressions: mpz.h:156–163 and
 // mpz.cpp:274–279, 315–334, 1183–1207, 1556–1594.
 package mpnum

@@ -1,4 +1,5 @@
-// Copyright (c) 2011 Microsoft Corporation. Source: src/util/mpbq.cpp.
+// Licensed under the MIT license.
+// Source: src/util/mpbq.cpp.
 package mpnum
 
 func (m *BinaryRationalManager) selectInteger(lower, upper *BinaryRational, r *Int) (bool, error) {

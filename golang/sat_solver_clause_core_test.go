@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source: sat_solver.cpp:367–465. Independent finite clause/watch oracles.
 package g3
 

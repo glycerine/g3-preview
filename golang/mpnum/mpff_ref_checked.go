@@ -1,6 +1,7 @@
+// Licensed under the MIT license.
 //go:build g3checked
 
-// Copyright (c) 2012 Microsoft Corporation. Checked generation adaptation.
+// Checked generation adaptation.
 package mpnum
 
 type ffRef uint64

@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation.
+// Licensed under the MIT license.
 // Source: mpz.h231-242,736-742; mpz.cpp1262-1382; mpq.h772-778;
 // mpq.cpp297-303; rational.h101-125. New bounded profile/ownership tests.
 package mpnum

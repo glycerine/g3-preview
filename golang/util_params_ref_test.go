@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Source util/params.cpp action traces; added bounded ownership expectations.
 package g3
 

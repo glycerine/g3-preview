@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Added action-order tests for the additive and mixed-product mpq.h family.
 package mpnum
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Concrete core_manager::factors, actual scoped coefficient ownership.
 package mpnum
 

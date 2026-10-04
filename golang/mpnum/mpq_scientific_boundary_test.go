@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation.
+// Licensed under the MIT license.
 // Added source-action coverage: mpq.cpp186-276 and mpq.h140-145,324-332,443-480.
 package mpnum
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Scalar payload encoding. No unsafe or borrowed slice escapes.
 package g3
 

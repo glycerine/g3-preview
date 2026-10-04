@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Concrete source util/prime_generator.{h,cpp}, caller-confined owner profile.
 package mpnum
 

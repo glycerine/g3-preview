@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Licensed under the MIT license.
 // Concrete pointer-free storage for src/ast/ast.h. Domain destruction is
 // performed by ast_manager action translations, never by page reclamation.
 package g3

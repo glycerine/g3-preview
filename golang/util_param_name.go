@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation
+// Licensed under the MIT license.
 // Source: src/util/params.cpp norm_param_name overloads.
 package g3
 

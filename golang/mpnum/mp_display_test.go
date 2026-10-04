@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation
+// Licensed under the MIT license.
 // Active source outputs: src/test/mpq.cpp tst2. Other exact expectations are
 // independent finite projections of mpz/mpq printing branches, not C++ runs.
 package mpnum

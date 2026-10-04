@@ -1,4 +1,5 @@
-// Copyright (c) 2012 Microsoft Corporation. Source MPFF conversion fixtures.
+// Licensed under the MIT license.
+// Source MPFF conversion fixtures.
 package mpnum
 
 import (
