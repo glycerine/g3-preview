@@ -1,5 +1,6 @@
 // Licensed under the MIT license.
 // Concrete port of src/util/heap.h; src/util/vector.h:102-129,191-202.
+// Source author: Leonardo de Moura, 2006-09-14.
 package g3
 
 import (
@@ -24,6 +25,10 @@ type IntHeapConfig struct {
 	Budget  *arena.Budget
 	Less    func(int32, int32) bool
 	Runtime *memory.Runtime
+	// DebugContext borrows the actual source assertion switch and lazy tag table.
+	// This selected diagnostic binding requires the actual Runtime profile.
+	// The external owner/table may use its own Budget and are never heap-owned.
+	DebugContext *DebugContext
 }
 
 // IntHeap stores source integer values and inverse positions in pointer-free
@@ -31,6 +36,7 @@ type IntHeapConfig struct {
 // Do not copy an owning IntHeap value; use Clone or Assign for source deep copies.
 type IntHeap struct {
 	self            *IntHeap
+	debugContext    *DebugContext
 	runtimeQueue    satVarQueue
 	findFrame       *intHeapFindFrame
 	destroyed       uint8
@@ -69,6 +75,9 @@ type IntHeapStats struct {
 func NewIntHeap(bounds int32, c IntHeapConfig) (*IntHeap, error) {
 	if c.Runtime != nil {
 		return newIntHeapRuntime(bounds, c)
+	}
+	if c.DebugContext != nil {
+		return nil, ErrSATOwner
 	}
 	if bounds < 0 {
 		return nil, arena.ErrBounds
@@ -274,7 +283,9 @@ func (h *IntHeap) Min() (int32, error) {
 		if e := h.alive(); e != nil {
 			return 0, e
 		}
-		if satStorageSourceDebug {
+		if enabled, e := h.assertionsRuntime(); e != nil {
+			return 0, e
+		} else if enabled {
 			yes, e := h.runtimeQueue.emptyChecked()
 			if e != nil {
 				return 0, e
@@ -347,7 +358,9 @@ func (h *IntHeap) Increased(v int32) error {
 		if e := h.alive(); e != nil {
 			return e
 		}
-		if satStorageSourceDebug {
+		if enabled, e := h.assertionsRuntime(); e != nil {
+			return e
+		} else if enabled {
 			yes, e := h.runtimeQueue.containsChecked(satBoolVar(v))
 			if e != nil {
 				return e
@@ -380,7 +393,9 @@ func (h *IntHeap) Decreased(v int32) error {
 		if e := h.alive(); e != nil {
 			return e
 		}
-		if satStorageSourceDebug {
+		if enabled, e := h.assertionsRuntime(); e != nil {
+			return e
+		} else if enabled {
 			yes, e := h.runtimeQueue.containsChecked(satBoolVar(v))
 			if e != nil {
 				return e
@@ -449,11 +464,22 @@ func (h *IntHeap) Reserve(n int32) error {
 	if e := h.alive(); e != nil {
 		return e
 	}
+	if h.runtimeBacked() {
+		if e := h.cassertRuntime(); e != nil {
+			return e
+		}
+	}
 	if n > h.Bounds() {
-		return h.SetBounds(n)
+		if e := h.SetBounds(n); e != nil {
+			return e
+		}
+	}
+	if h.runtimeBacked() {
+		return h.cassertRuntime()
 	}
 	return nil
 }
+
 func (h *IntHeap) Reset() error {
 	if h.runtimeBacked() {
 		if e := h.alive(); e != nil {

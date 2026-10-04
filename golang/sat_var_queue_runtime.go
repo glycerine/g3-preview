@@ -17,7 +17,7 @@ func (q *satVarQueue) bindRuntime(r *memory.Runtime) {
 	q.runtimeCompleted = 3
 }
 func (q *satVarQueue) initializeRuntime() error {
-	if e := q.runtimeValues.push(^uint32(0)); e != nil {
+	if e := q.pushValuesRuntime(^uint32(0)); e != nil {
 		return e
 	}
 	return q.reserveRuntime(128)
@@ -62,7 +62,7 @@ func (q *satVarQueue) containsChecked(v satBoolVar) (bool, error) {
 	if int32(v) >= int32(n) {
 		return false, nil
 	}
-	x, e := q.runtimeIndices.read(uint32(v))
+	x, e := q.readUintRuntime(&q.runtimeIndices, uint32(v))
 	return x != 0, e
 }
 func (q *satVarQueue) reserveRuntime(n uint32) error {
@@ -90,25 +90,25 @@ func (q *satVarQueue) reserveRuntime(n uint32) error {
 		return e
 	}
 	for i := old; i < n; i++ {
-		if e = q.runtimeIndices.write(i, 0); e != nil {
+		if e = q.writeUintRuntime(&q.runtimeIndices, i, 0); e != nil {
 			return e
 		}
 	}
 	return nil
 }
 func (q *satVarQueue) valueRuntime(i int32) (int32, error) {
-	x, e := q.runtimeValues.read(uint32(i))
+	x, e := q.readUintRuntime(&q.runtimeValues, uint32(i))
 	return int32(x), e
 }
 func (q *satVarQueue) indexRuntime(v int32) (int32, error) {
-	x, e := q.runtimeIndices.read(uint32(v))
+	x, e := q.readUintRuntime(&q.runtimeIndices, uint32(v))
 	return int32(x), e
 }
 func (q *satVarQueue) putRuntime(i, v int32) error {
-	if e := q.runtimeValues.write(uint32(i), uint32(v)); e != nil {
+	if e := q.writeUintRuntime(&q.runtimeValues, uint32(i), uint32(v)); e != nil {
 		return e
 	}
-	return q.runtimeIndices.write(uint32(v), uint32(i))
+	return q.writeUintRuntime(&q.runtimeIndices, uint32(v), uint32(i))
 }
 func (q *satVarQueue) lessRuntime(a, b int32) (bool, error) {
 	if q.generalSource != nil {
@@ -159,7 +159,10 @@ func (q *satVarQueue) upRuntime(i int32) error {
 		}
 		i = parent
 	}
-	return q.putRuntime(i, v)
+	if e := q.putRuntime(i, v); e != nil {
+		return e
+	}
+	return q.cassertRuntime()
 }
 func satHeapLeft(i int32) (int32, error) {
 	if i < 0 || i > int32(^uint32(0)>>2) {
@@ -204,7 +207,9 @@ func (q *satVarQueue) downRuntime(i int32) error {
 				c = right
 			}
 		}
-		if satStorageSourceDebug && c>>1 != i {
+		if enabled, gateErr := q.assertionsRuntime(); gateErr != nil {
+			return gateErr
+		} else if enabled && c>>1 != i {
 			return ErrSATAssertion
 		}
 		child, e := q.valueRuntime(c)
@@ -223,13 +228,37 @@ func (q *satVarQueue) downRuntime(i int32) error {
 		}
 		i = c
 	}
-	return q.putRuntime(i, v)
+	if e := q.putRuntime(i, v); e != nil {
+		return e
+	}
+	return q.cassertRuntime()
 }
 func (q *satVarQueue) insertRuntime(v satBoolVar) error {
 	if e := q.change(); e != nil {
 		return e
 	}
-	if satStorageSourceDebug {
+	if e := q.cassertRuntime(); e != nil {
+		return e
+	}
+	if q.generalSource != nil && satStorageSourceDebug && q.generalSource.debugContext != nil {
+		on, e := q.generalSource.debugContext.ConditionalAssertionEnabled("heap")
+		if e != nil {
+			return e
+		}
+		if on {
+			yes, e := q.containsChecked(v)
+			if e != nil {
+				return e
+			}
+			if yes {
+				return ErrSATAssertion
+			}
+		}
+	}
+
+	if enabled, gateErr := q.assertionsRuntime(); gateErr != nil {
+		return gateErr
+	} else if enabled {
 		if int32(v) < 0 {
 			return ErrSATAssertion
 		}
@@ -247,13 +276,15 @@ func (q *satVarQueue) insertRuntime(v satBoolVar) error {
 	}
 	i := int32(n)
 	// Source publishes the reverse index BEFORE push can grow/refuse.
-	if e = q.runtimeIndices.write(uint32(v), uint32(i)); e != nil {
+	if e = q.writeUintRuntime(&q.runtimeIndices, uint32(v), uint32(i)); e != nil {
 		return e
 	}
-	if e = q.runtimeValues.push(uint32(v)); e != nil {
+	if e = q.pushValuesRuntime(uint32(v)); e != nil {
 		return e
 	}
-	if satStorageSourceDebug {
+	if enabled, gateErr := q.assertionsRuntime(); gateErr != nil {
+		return gateErr
+	} else if enabled {
 		n, e = q.runtimeValues.size()
 		if e != nil {
 			return e
@@ -262,10 +293,15 @@ func (q *satVarQueue) insertRuntime(v satBoolVar) error {
 			return ErrSATAssertion
 		}
 	}
-	return q.upRuntime(i)
+	if e := q.upRuntime(i); e != nil {
+		return e
+	}
+	return q.cassertRuntime()
 }
 func (q *satVarQueue) popRuntime() error {
-	if satStorageSourceDebug {
+	if enabled, gateErr := q.assertionsRuntime(); gateErr != nil {
+		return gateErr
+	} else if enabled {
 		n, e := q.runtimeValues.size()
 		if e != nil {
 			return e
@@ -287,8 +323,13 @@ func (q *satVarQueue) nextRuntime() (satBoolVar, error) {
 	if e := q.change(); e != nil {
 		return 0, e
 	}
-	if satStorageSourceDebug {
-		if q.literalSource == nil {
+	if e := q.cassertRuntime(); e != nil {
+		return 0, e
+	}
+	if enabled, gateErr := q.assertionsRuntime(); gateErr != nil {
+		return 0, gateErr
+	} else if enabled {
+		if q.generalSource == nil && q.literalSource == nil {
 			empty, e := q.emptyChecked()
 			if e != nil {
 				return 0, e
@@ -321,13 +362,15 @@ func (q *satVarQueue) nextRuntime() (satBoolVar, error) {
 		return 0, e
 	}
 	if n == 2 {
-		if e = q.runtimeIndices.write(uint32(result), 0); e != nil {
+		if e = q.writeUintRuntime(&q.runtimeIndices, uint32(result), 0); e != nil {
 			return 0, e
 		}
 		if e = q.popRuntime(); e != nil {
 			return 0, e
 		}
-		if satStorageSourceDebug {
+		if enabled, gateErr := q.assertionsRuntime(); gateErr != nil {
+			return 0, gateErr
+		} else if enabled {
 			empty, e := q.emptyChecked()
 			if e != nil {
 				return 0, e
@@ -348,7 +391,7 @@ func (q *satVarQueue) nextRuntime() (satBoolVar, error) {
 		if e = q.putRuntime(1, last); e != nil {
 			return 0, e
 		}
-		if e = q.runtimeIndices.write(uint32(result), 0); e != nil {
+		if e = q.writeUintRuntime(&q.runtimeIndices, uint32(result), 0); e != nil {
 			return 0, e
 		}
 		if e = q.popRuntime(); e != nil {
@@ -358,13 +401,21 @@ func (q *satVarQueue) nextRuntime() (satBoolVar, error) {
 			return satBoolVar(result), e
 		}
 	}
+	if e := q.cassertRuntime(); e != nil {
+		return 0, e
+	}
 	return satBoolVar(result), nil
 }
 func (q *satVarQueue) eraseRuntime(v satBoolVar) error {
 	if e := q.change(); e != nil {
 		return e
 	}
-	if satStorageSourceDebug {
+	if e := q.cassertRuntime(); e != nil {
+		return e
+	}
+	if enabled, gateErr := q.assertionsRuntime(); gateErr != nil {
+		return gateErr
+	} else if enabled {
 		present, e := q.containsChecked(v)
 		if e != nil {
 			return e
@@ -382,10 +433,13 @@ func (q *satVarQueue) eraseRuntime(v satBoolVar) error {
 		return e
 	}
 	if i == int32(n)-1 {
-		if e = q.runtimeIndices.write(uint32(v), 0); e != nil {
+		if e = q.writeUintRuntime(&q.runtimeIndices, uint32(v), 0); e != nil {
 			return e
 		}
-		return q.popRuntime()
+		if e := q.popRuntime(); e != nil {
+			return e
+		}
+		return q.cassertRuntime()
 	}
 	n, e = q.runtimeValues.size()
 	if e != nil {
@@ -398,7 +452,7 @@ func (q *satVarQueue) eraseRuntime(v satBoolVar) error {
 	if e = q.putRuntime(i, last); e != nil {
 		return e
 	}
-	if e = q.runtimeIndices.write(uint32(v), 0); e != nil {
+	if e = q.writeUintRuntime(&q.runtimeIndices, uint32(v), 0); e != nil {
 		return e
 	}
 	if e = q.popRuntime(); e != nil {
@@ -415,13 +469,22 @@ func (q *satVarQueue) eraseRuntime(v satBoolVar) error {
 			return e
 		}
 		if less {
-			return q.upRuntime(i)
+			if e := q.upRuntime(i); e != nil {
+				return e
+			}
+			return q.cassertRuntime()
 		}
 	}
-	return q.downRuntime(i)
+	if e := q.downRuntime(i); e != nil {
+		return e
+	}
+	return q.cassertRuntime()
 }
 func (q *satVarQueue) resetRuntime() error {
 	if e := q.open(); e != nil {
+		return e
+	}
+	if e := q.cassertRuntime(); e != nil {
 		return e
 	}
 	empty, e := q.emptyChecked()
@@ -436,14 +499,17 @@ func (q *satVarQueue) resetRuntime() error {
 		return e
 	}
 	for i := uint32(0); i < n; i++ {
-		if e = q.runtimeIndices.write(i, 0); e != nil {
+		if e = q.resetIndexRuntime(i); e != nil {
 			return e
 		}
 	}
-	if e = q.runtimeValues.shrink(0); e != nil {
+	if e = q.resetValuesRuntime(); e != nil {
 		return e
 	}
-	return q.runtimeValues.push(^uint32(0))
+	if e := q.pushValuesRuntime(^uint32(0)); e != nil {
+		return e
+	}
+	return q.cassertRuntime()
 }
 func (q *satVarQueue) invariantRuntime() (bool, error) {
 	if e := q.open(); e != nil {

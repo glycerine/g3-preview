@@ -1,3 +1,4 @@
+// Source: src/util/vector.h:59-100,303-310,389-405.
 // Licensed under the MIT license.
 package g3
 
@@ -78,6 +79,31 @@ func satScalarColumnNext(old, stride uint32) (uint32, uint32, error) {
 }
 func (c *satSolverAssignmentColumn) expand() error { return c.expandStride(1) }
 func (c *satSolverAssignmentColumn) expandStride(stride uint32) error {
+	return c.expandStrideDebug(stride, nil)
+}
+
+// The default SAT adapter remains assertion-enabled. The concrete general heap
+// may borrow the actual global switch at this one reached source SASSERT site.
+func (c *satSolverAssignmentColumn) expandStrideDebug(stride uint32, debug *DebugContext) error {
+	if c.block != (memory.Block{}) && satStorageSourceDebug {
+		enabled := true
+		if debug != nil {
+			var e error
+			enabled, e = debug.AssertionsEnabled()
+			if e != nil {
+				return e
+			}
+		}
+		if enabled {
+			capacity, e := c.capacity()
+			if e != nil {
+				return e
+			}
+			if capacity == 0 {
+				return ErrSATAssertion
+			}
+		}
+	}
 	old, e := c.capacity()
 	if e != nil {
 		return e
@@ -85,9 +111,6 @@ func (c *satSolverAssignmentColumn) expandStride(stride uint32) error {
 	// Non-null source m_data takes the geometric branch even when a raw
 	// corrupted capacity is zero: DEBUG assertion, otherwise literal overflow.
 	if c.block != (memory.Block{}) && old == 0 {
-		if satStorageSourceDebug {
-			return ErrSATAssertion
-		}
 		return NewDefaultException("Overflow encountered when expanding vector")
 	}
 	n, request, e := satScalarColumnNext(old, stride)

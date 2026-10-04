@@ -17,16 +17,19 @@ func newIntHeapRuntime(bounds int32, c IntHeapConfig) (*IntHeap, error) {
 	if e := c.Budget.Reserve(intHeapOwnerBytes); e != nil {
 		return nil, e
 	}
-	h := &IntHeap{budget: c.Budget, less: c.Less, epoch: 1}
+	h := &IntHeap{budget: c.Budget, less: c.Less, debugContext: c.DebugContext, epoch: 1}
 	h.self = h
 	q := &h.runtimeQueue
 	q.self = q
 	q.budget = c.Budget
 	q.generalSource = h
 	q.bindRuntime(c.Runtime)
-	e := q.runtimeValues.push(^uint32(0))
+	e := h.pushUintRuntime(&q.runtimeValues, ^uint32(0))
 	if e == nil {
 		e = h.setBoundsRuntime(uint32(bounds))
+	}
+	if e == nil {
+		e = h.cassertRuntime()
 	}
 	if e != nil {
 		if cleanup := h.Close(); cleanup != nil {
@@ -299,7 +302,7 @@ func (h *IntHeap) findLESlice(v int32, dst []int32) (result []int32, err error) 
 }
 func (h *IntHeap) findRuntime(v int32, out *IntHeapVector, dst *[]int32) error {
 	todo := &h.findFrame.todo
-	if e := todo.push(1); e != nil {
+	if e := h.pushUintRuntime(todo, 1); e != nil {
 		return e
 	}
 	for {
@@ -310,11 +313,11 @@ func (h *IntHeap) findRuntime(v int32, out *IntHeapVector, dst *[]int32) error {
 		if n == 0 {
 			return nil
 		}
-		x, e := todo.read(n - 1)
+		x, e := h.backUintRuntime(todo)
 		if e != nil {
 			return e
 		}
-		if e = satAssignmentWriteWord(todo.raw.runtime, todo.raw.block, 4, n-1); e != nil {
+		if e = h.popUintRuntime(todo); e != nil {
 			return e
 		}
 		i := int32(x)
@@ -337,7 +340,10 @@ func (h *IntHeap) findRuntime(v int32, out *IntHeapVector, dst *[]int32) error {
 			return e
 		}
 		if out != nil {
-			if e = out.Push(value); e != nil {
+			if e = out.open(); e != nil {
+				return e
+			}
+			if e = h.pushUintRuntime(&out.column, uint32(value)); e != nil {
 				return e
 			}
 		} else {
@@ -346,10 +352,10 @@ func (h *IntHeap) findRuntime(v int32, out *IntHeapVector, dst *[]int32) error {
 		if i < 0 || i > int32(^uint32(0)>>2) {
 			return ErrSATSignedHeapIndexDomain
 		}
-		if e = todo.push(uint32(i << 1)); e != nil {
+		if e = h.pushUintRuntime(todo, uint32(i<<1)); e != nil {
 			return e
 		}
-		if e = todo.push(uint32((i << 1) + 1)); e != nil {
+		if e = h.pushUintRuntime(todo, uint32((i<<1)+1)); e != nil {
 			return e
 		}
 	}
@@ -403,7 +409,10 @@ func (h *IntHeap) setBoundsRuntime(n uint32) error {
 		return e
 	}
 	if n <= old {
-		return c.shrink(n)
+		if e = h.shrinkUintRuntime(c, n); e != nil {
+			return e
+		}
+		return h.cassertRuntime()
 	}
 	// set_bounds invokes unsigned vector resize directly; heap::reserve's
 	// separate signed comparison must not suppress this actual growth loop.
@@ -415,7 +424,7 @@ func (h *IntHeap) setBoundsRuntime(n uint32) error {
 		if capacity >= n {
 			break
 		}
-		if e = c.raw.expandStride(4); e != nil {
+		if e = c.raw.expandStrideDebug(4, h.debugContext); e != nil {
 			return e
 		}
 	}
@@ -423,11 +432,11 @@ func (h *IntHeap) setBoundsRuntime(n uint32) error {
 		return e
 	}
 	for i := old; i < n; i++ {
-		if e = c.write(i, 0); e != nil {
+		if e = satAssignmentWriteWord(c.raw.runtime, c.raw.block, 8+4*uint64(i), 0); e != nil {
 			return e
 		}
 	}
-	return nil
+	return h.cassertRuntime()
 }
 
 func (h *IntHeap) cloneRuntime(b *arena.Budget) (*IntHeap, error) {
@@ -437,7 +446,7 @@ func (h *IntHeap) cloneRuntime(b *arena.Budget) (*IntHeap, error) {
 	if e := b.Reserve(intHeapOwnerBytes); e != nil {
 		return nil, e
 	}
-	clone := &IntHeap{budget: b, less: h.less, epoch: 1}
+	clone := &IntHeap{budget: b, less: h.less, debugContext: h.debugContext, epoch: 1}
 	clone.self = clone
 	q := &clone.runtimeQueue
 	q.self = q
@@ -465,6 +474,12 @@ func (h *IntHeap) swapRuntime(other *IntHeap) error {
 	if !h.runtimeBacked() || !other.runtimeBacked() {
 		return ErrSATOwner
 	}
+	if e := other.cassertRuntime(); e != nil {
+		return e
+	}
+	if e := h.cassertRuntime(); e != nil {
+		return e
+	}
 	a, b := &h.runtimeQueue, &other.runtimeQueue
 	a.runtimeValues, b.runtimeValues = b.runtimeValues, a.runtimeValues
 	a.runtimeIndices, b.runtimeIndices = b.runtimeIndices, a.runtimeIndices
@@ -472,8 +487,12 @@ func (h *IntHeap) swapRuntime(other *IntHeap) error {
 	b.runtimeValues.raw.self = &b.runtimeValues.raw
 	a.runtimeIndices.raw.self = &a.runtimeIndices.raw
 	b.runtimeIndices.raw.self = &b.runtimeIndices.raw
-	return nil
+	if e := other.cassertRuntime(); e != nil {
+		return e
+	}
+	return h.cassertRuntime()
 }
+
 func (h *IntHeap) appendRuntime(dst []int32) ([]int32, error) {
 	n, e := h.runtimeQueue.runtimeValues.size()
 	if e != nil {
@@ -487,20 +506,4 @@ func (h *IntHeap) appendRuntime(dst []int32) ([]int32, error) {
 		dst = append(dst, v)
 	}
 	return dst, nil
-}
-
-func (h *IntHeap) invariantRuntime() (bool, error) {
-	if e := h.alive(); e != nil {
-		return false, e
-	}
-	// The conditional m_values.size read is not inside DEBUG_CODE. Only the
-	// three SASSERT expressions (including recursive calls) are debug actions.
-	n, e := h.runtimeQueue.runtimeValues.size()
-	if e != nil {
-		return false, e
-	}
-	if int32(n) <= 1 || !satStorageSourceDebug {
-		return true, nil
-	}
-	return h.runtimeQueue.invariantRuntimeAt(1)
 }
