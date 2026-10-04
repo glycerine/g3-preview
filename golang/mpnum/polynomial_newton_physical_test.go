@@ -47,7 +47,7 @@ func polynomialNewtonPhysicalWithRaw(t *testing.T, m *MultivariatePolynomialCore
 			add(a)
 		}
 	}
-	for _, a := range []Int{m.modular.p, m.modular.lower, m.modular.upper, m.modular.invTmp1, m.modular.invTmp2, m.modular.invTmp3, m.modular.divTmp, m.zeroNumeral, m.minusOne, m.negativeCoefficient, m.constantCopy, m.linearConstant, m.constantScope.numeral, m.constantScope.rational.num, m.constantScope.rational.den} {
+	for _, a := range []Int{m.modular.p, m.modular.lower, m.modular.upper, m.modular.invTmp1, m.modular.invTmp2, m.modular.invTmp3, m.modular.divTmp, m.zeroNumeral, m.minusOne, m.negativeCoefficient, m.constantCopy, m.linearConstant, m.constantScope.numeral, m.constantScope.rational.num, m.constantScope.rational.den, m.exactDivision.numeral} {
 		add(a)
 	}
 	cell := func(p Polynomial, n uint32) {
@@ -82,6 +82,7 @@ func polynomialNewtonPhysicalWithRaw(t *testing.T, m *MultivariatePolynomialCore
 		}
 		cell(p, l.initializedCoefficients)
 	}
+	addPolynomial(m.exactDivision.returned)
 	for _, p := range polys {
 		addPolynomial(p)
 	}

@@ -28359,7 +28359,9 @@
         "mpnum/polynomial_degree_coefficient.go",
         "mpnum/polynomial_power.go",
         "mpnum/polynomial_equal.go",
-        "mpnum/polynomial_query_source_test.go"
+        "mpnum/polynomial_query_source_test.go",
+        "mpnum/polynomial_exact_div.go",
+        "mpnum/polynomial_source_maxima.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -28487,7 +28489,16 @@
         "TestPolynomialQueryUnivariateLinearAndScalarCoefficient",
         "TestPolynomialQueryReachedFieldReadProfiles",
         "TestPolynomialQueryCoefficientPhysicalFailurePrefixes",
-        "TestPolynomialQueryEqualScratchPhysicalFailures"
+        "TestPolynomialQueryEqualScratchPhysicalFailures",
+        "TestPolynomialExactDivIndependentProductAndScalar",
+        "TestPolynomialExactDivScalarRawLocalFailurePrefixes",
+        "TestPolynomialExactDivScalarDiagnosticsAndTruncation",
+        "TestPolynomialExactDivCheckpointAfterActualInputCopy",
+        "TestPolynomialExactDivPhysicalPrefixes",
+        "TestPolynomialExactDivVerifySourceBoundary",
+        "TestPolynomialExactDivWarmSourceProfileAndCounts",
+        "TestPolynomialExactDivActualModularChild",
+        "TestPolynomialExactDivReverseDestructionRefusal"
       ],
       "conditionals": [
         {
@@ -30570,6 +30581,62 @@
             "TestPolynomialQueryCoefficientPhysicalFailurePrefixes",
             "TestPolynomialQueryEqualScratchPhysicalFailures"
           ]
+        },
+        {
+          "name": "imp::exact_div(polynomial const*,numeral const&) (cpp5094-5114)",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_exact_div.go",
+          "tests": [
+            "TestPolynomialExactDivIndependentProductAndScalar",
+            "TestPolynomialExactDivScalarRawLocalFailurePrefixes",
+            "TestPolynomialExactDivScalarDiagnosticsAndTruncation"
+          ]
+        },
+        {
+          "name": "imp::exact_div(polynomial const*,polynomial const*) (cpp5116-5156)",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_exact_div.go",
+          "tests": [
+            "TestPolynomialExactDivIndependentProductAndScalar",
+            "TestPolynomialExactDivCheckpointAfterActualInputCopy",
+            "TestPolynomialExactDivPhysicalPrefixes",
+            "TestPolynomialExactDivVerifySourceBoundary",
+            "TestPolynomialExactDivScalarRawLocalFailurePrefixes",
+            "TestPolynomialExactDivScalarDiagnosticsAndTruncation",
+            "TestPolynomialExactDivWarmSourceProfileAndCounts",
+            "TestPolynomialExactDivActualModularChild",
+            "TestPolynomialExactDivReverseDestructionRefusal"
+          ]
+        },
+        {
+          "name": "polynomial::graded_lex_max_pos (cpp1479-1491)",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_source_maxima.go",
+          "tests": [
+            "TestPolynomialExactDivIndependentProductAndScalar",
+            "TestPolynomialExactDivPhysicalPrefixes",
+            "TestPolynomialExactDivActualModularChild"
+          ]
+        },
+        {
+          "name": "som_buffer::graded_lex_max_pos (cpp1964-1981)",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_source_maxima.go",
+          "tests": [
+            "TestPolynomialExactDivIndependentProductAndScalar",
+            "TestPolynomialExactDivCheckpointAfterActualInputCopy",
+            "TestPolynomialExactDivWarmSourceProfileAndCounts",
+            "TestPolynomialExactDivActualModularChild"
+          ]
+        },
+        {
+          "name": "som_buffer::add(polynomial const*) (cpp2048-2068)",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_source_maxima.go",
+          "tests": [
+            "TestPolynomialExactDivCheckpointAfterActualInputCopy",
+            "TestPolynomialExactDivPhysicalPrefixes"
+          ]
         }
       ],
       "ownership": [
@@ -30587,7 +30654,10 @@
         "Separate owning Close/CleanupConstruction/CleanupValue aborts versus literal SourceFinalizePrefix; no completed imp destructor on failed construction.",
         "Static charged borrowed deletion handlers preserve next-read after callback; process/global handler binding not provided.",
         "INC-before-push/assign roots retained separately; source completed local/member destruction precedes explicit owning abort. Real TLS constructor error returns allocated pending block: source-only implicit member unwind retains method-local cold owner until CleanupNewtonInterpolation. Existing foreign callee pending roots remain borrowed.",
-        "Query prerequisite uses one embedded actual m_m2pos scratch member and source Power local reference. Generated div_x monomial ownership records actual factory created/started outcome before coefficient copy/INC; no registry/RC0 inference. Stopped local destruction and unjoined INC remain for explicit owning cleanup."
+        "Query prerequisite uses one embedded actual m_m2pos scratch member and source Power local reference. Generated div_x monomial ownership records actual factory created/started outcome before coefficient copy/INC; no registry/RC0 inference. Stopped local destruction and unjoined INC remain for explicit owning cleanup.",
+        "literal raw numeral; no pre-end source Del on exception; active scalar record retains actual NUM/failed adapter until explicit CleanupExactDivision; end entered recorded before source Del",
+        "source monomial_ref then completed default scoped numeral at actual declaration; reverse NUM then reference; actual partial incoming INC retained separately; C.mk evaluated fresh output retained if local cleanup refuses",
+        "actual positions Set, ms push, INC, default coefficient push, numeric Copy; borrowedAppend/index exclude guarded uncompleted INC from owning DEC"
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -30609,7 +30679,8 @@
         "Signed int32 loop/count conversion uses explicit reached UB guard; actual vector pointer/numeral codecs are storage adapters, not native sizeof equivalence.",
         "Public source-finalization API for persistent Newton vector remains a next coherent member-lifecycle extension; current Flush source body and Close owning protocol are distinct.",
         "Go cold child directory and reference owner fields are charged actual representation. External manager lifetime is borrowed.",
-        "Source coeff argument evaluation chooses coefficient read before RemoveVariable within allowed C++11 evaluation order. Source active linear Power preserved; #if0 alternative remains unported inventory. Full imp/GCD/PSC and global assertion/TRACE bindings remain open. See PORT_PROGRESS.md."
+        "Source coeff argument evaluation chooses coefficient read before RemoveVariable within allowed C++11 evaluation order. Source active linear Power preserved; #if0 alternative remains unported inventory. Full imp/GCD/PSC and global assertion/TRACE bindings remain open. See PORT_PROGRESS.md.",
+        "Selected exact division and graded maxima only: full imp construction, PSC/GCD, source TRACE/global diagnostics and undefined dangling/fresh-NULL source destruction remain open. False GNU release VERIFY reaches a typed unreachable-domain guard; no registered original assertion completion credit. See PORT_PROGRESS.md."
       ]
     },
     {
@@ -30669,7 +30740,9 @@
         "mpnum/polynomial_degree_coefficient.go",
         "mpnum/polynomial_power.go",
         "mpnum/polynomial_equal.go",
-        "mpnum/polynomial_query_source_test.go"
+        "mpnum/polynomial_query_source_test.go",
+        "mpnum/polynomial_exact_div.go",
+        "mpnum/polynomial_source_maxima.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -30797,7 +30870,16 @@
         "TestPolynomialQueryUnivariateLinearAndScalarCoefficient",
         "TestPolynomialQueryReachedFieldReadProfiles",
         "TestPolynomialQueryCoefficientPhysicalFailurePrefixes",
-        "TestPolynomialQueryEqualScratchPhysicalFailures"
+        "TestPolynomialQueryEqualScratchPhysicalFailures",
+        "TestPolynomialExactDivIndependentProductAndScalar",
+        "TestPolynomialExactDivScalarRawLocalFailurePrefixes",
+        "TestPolynomialExactDivScalarDiagnosticsAndTruncation",
+        "TestPolynomialExactDivCheckpointAfterActualInputCopy",
+        "TestPolynomialExactDivPhysicalPrefixes",
+        "TestPolynomialExactDivVerifySourceBoundary",
+        "TestPolynomialExactDivWarmSourceProfileAndCounts",
+        "TestPolynomialExactDivActualModularChild",
+        "TestPolynomialExactDivReverseDestructionRefusal"
       ],
       "conditionals": [
         {
@@ -31652,6 +31734,62 @@
             "TestPolynomialQueryCoefficientPhysicalFailurePrefixes",
             "TestPolynomialQueryEqualScratchPhysicalFailures"
           ]
+        },
+        {
+          "name": "imp::exact_div(polynomial const*,numeral const&) (cpp5094-5114)",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_exact_div.go",
+          "tests": [
+            "TestPolynomialExactDivIndependentProductAndScalar",
+            "TestPolynomialExactDivScalarRawLocalFailurePrefixes",
+            "TestPolynomialExactDivScalarDiagnosticsAndTruncation"
+          ]
+        },
+        {
+          "name": "imp::exact_div(polynomial const*,polynomial const*) (cpp5116-5156)",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_exact_div.go",
+          "tests": [
+            "TestPolynomialExactDivIndependentProductAndScalar",
+            "TestPolynomialExactDivCheckpointAfterActualInputCopy",
+            "TestPolynomialExactDivPhysicalPrefixes",
+            "TestPolynomialExactDivVerifySourceBoundary",
+            "TestPolynomialExactDivScalarRawLocalFailurePrefixes",
+            "TestPolynomialExactDivScalarDiagnosticsAndTruncation",
+            "TestPolynomialExactDivWarmSourceProfileAndCounts",
+            "TestPolynomialExactDivActualModularChild",
+            "TestPolynomialExactDivReverseDestructionRefusal"
+          ]
+        },
+        {
+          "name": "polynomial::graded_lex_max_pos (cpp1479-1491)",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_source_maxima.go",
+          "tests": [
+            "TestPolynomialExactDivIndependentProductAndScalar",
+            "TestPolynomialExactDivPhysicalPrefixes",
+            "TestPolynomialExactDivActualModularChild"
+          ]
+        },
+        {
+          "name": "som_buffer::graded_lex_max_pos (cpp1964-1981)",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_source_maxima.go",
+          "tests": [
+            "TestPolynomialExactDivIndependentProductAndScalar",
+            "TestPolynomialExactDivCheckpointAfterActualInputCopy",
+            "TestPolynomialExactDivWarmSourceProfileAndCounts",
+            "TestPolynomialExactDivActualModularChild"
+          ]
+        },
+        {
+          "name": "som_buffer::add(polynomial const*) (cpp2048-2068)",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_source_maxima.go",
+          "tests": [
+            "TestPolynomialExactDivCheckpointAfterActualInputCopy",
+            "TestPolynomialExactDivPhysicalPrefixes"
+          ]
         }
       ],
       "ownership": [
@@ -31669,7 +31807,10 @@
         "Separate owning Close/CleanupConstruction/CleanupValue aborts versus literal SourceFinalizePrefix; no completed imp destructor on failed construction.",
         "Static charged borrowed deletion handlers preserve next-read after callback; process/global handler binding not provided.",
         "INC-before-push/assign roots retained separately; source completed local/member destruction precedes explicit owning abort. Real TLS constructor error returns allocated pending block: source-only implicit member unwind retains method-local cold owner until CleanupNewtonInterpolation. Existing foreign callee pending roots remain borrowed.",
-        "Query prerequisite uses one embedded actual m_m2pos scratch member and source Power local reference. Generated div_x monomial ownership records actual factory created/started outcome before coefficient copy/INC; no registry/RC0 inference. Stopped local destruction and unjoined INC remain for explicit owning cleanup."
+        "Query prerequisite uses one embedded actual m_m2pos scratch member and source Power local reference. Generated div_x monomial ownership records actual factory created/started outcome before coefficient copy/INC; no registry/RC0 inference. Stopped local destruction and unjoined INC remain for explicit owning cleanup.",
+        "literal raw numeral; no pre-end source Del on exception; active scalar record retains actual NUM/failed adapter until explicit CleanupExactDivision; end entered recorded before source Del",
+        "source monomial_ref then completed default scoped numeral at actual declaration; reverse NUM then reference; actual partial incoming INC retained separately; C.mk evaluated fresh output retained if local cleanup refuses",
+        "actual positions Set, ms push, INC, default coefficient push, numeric Copy; borrowedAppend/index exclude guarded uncompleted INC from owning DEC"
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -31691,7 +31832,8 @@
         "Signed int32 loop/count conversion uses explicit reached UB guard; actual vector pointer/numeral codecs are storage adapters, not native sizeof equivalence.",
         "Public source-finalization API for persistent Newton vector remains a next coherent member-lifecycle extension; current Flush source body and Close owning protocol are distinct.",
         "Go cold child directory and reference owner fields are charged actual representation. External manager lifetime is borrowed.",
-        "Source coeff argument evaluation chooses coefficient read before RemoveVariable within allowed C++11 evaluation order. Source active linear Power preserved; #if0 alternative remains unported inventory. Full imp/GCD/PSC and global assertion/TRACE bindings remain open. See PORT_PROGRESS.md."
+        "Source coeff argument evaluation chooses coefficient read before RemoveVariable within allowed C++11 evaluation order. Source active linear Power preserved; #if0 alternative remains unported inventory. Full imp/GCD/PSC and global assertion/TRACE bindings remain open. See PORT_PROGRESS.md.",
+        "Selected exact division and graded maxima only: full imp construction, PSC/GCD, source TRACE/global diagnostics and undefined dangling/fresh-NULL source destruction remain open. False GNU release VERIFY reaches a typed unreachable-domain guard; no registered original assertion completion credit. See PORT_PROGRESS.md."
       ]
     },
     {

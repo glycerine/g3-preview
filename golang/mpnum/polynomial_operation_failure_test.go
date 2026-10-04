@@ -207,6 +207,8 @@ func polynomialOperationMonomialAudit(t *testing.T, m *MultivariatePolynomialCor
 		refs[a] = true
 	}
 	add(m.monomials.unit)
+	add(m.exactDivision.monomial.value)
+	add(m.exactDivision.monomial.incoming)
 	for _, a := range callerMonomials {
 		add(a)
 	}
@@ -223,7 +225,7 @@ func polynomialOperationMonomialAudit(t *testing.T, m *MultivariatePolynomialCor
 			add(a)
 		}
 	}
-	cells := append([]Polynomial{m.zero, m.unit, m.overloadResult, m.negativeResult, m.constantScope.result}, callers...)
+	cells := append([]Polynomial{m.zero, m.unit, m.overloadResult, m.negativeResult, m.constantScope.result, m.exactDivision.returned}, callers...)
 	for _, p := range cells {
 		if p == (Polynomial{}) {
 			continue
@@ -252,6 +254,9 @@ func polynomialOperationMonomialAudit(t *testing.T, m *MultivariatePolynomialCor
 		n, e := b.ms.size(m)
 		serviceMust(t, e)
 		for i := b.transferred; i < n; i++ {
+			if b.borrowedAppend && i == b.borrowedAppendIndex {
+				continue // INC did not complete; this slot is still borrowed.
+			}
 			a, e := b.ms.monomial(m, i)
 			serviceMust(t, e)
 			add(a)

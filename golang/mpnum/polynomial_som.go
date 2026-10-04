@@ -4,6 +4,8 @@ package mpnum
 import "github.com/glycerine/g3/golang/arena"
 
 type polynomialSOM struct {
+	borrowedAppend                bool
+	borrowedAppendIndex           uint32
 	unreferencedConsumed          bool
 	unreferencedIndex             uint32
 	removeActive, removeStopped   bool
@@ -570,7 +572,7 @@ func (b *polynomialSOM) close() error {
 				return e
 			}
 		}
-		if i < n && !(b.unreferencedConsumed && i == b.unreferencedIndex) && i >= b.transferred && (!b.removeActive || i < b.removePrefix || i >= b.removeSuffix) {
+		if i < n && !(b.borrowedAppend && i == b.borrowedAppendIndex) && !(b.unreferencedConsumed && i == b.unreferencedIndex) && i >= b.transferred && (!b.removeActive || i < b.removePrefix || i >= b.removeSuffix) {
 			x, e := b.ms.monomial(m, i)
 			if e != nil {
 				return e

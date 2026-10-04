@@ -355,6 +355,12 @@ func (m *MonomialManager) Divides(a, b Monomial) (bool, error) {
 	return m.divCore(a, b, false)
 }
 func (m *MonomialManager) Divide(a, b Monomial) (Monomial, bool, error) {
+	return m.divideCreated(a, b, nil)
+}
+func (m *MonomialManager) divideCreated(a, b Monomial, outcome *monomialFactoryOutcome) (Monomial, bool, error) {
+	if outcome != nil {
+		*outcome = monomialFactoryOutcome{}
+	}
 	if e := m.check(); e != nil {
 		return Monomial{}, false, e
 	}
@@ -376,7 +382,10 @@ func (m *MonomialManager) Divide(a, b Monomial) (Monomial, bool, error) {
 	if e != nil || !ok {
 		return Monomial{}, ok, e
 	}
-	r, e := m.internTemp(1)
+	r, e := m.internTempCreated(1, outcome)
+	if e == nil {
+		m.creation = monomialCreation{}
+	}
 	return r, true, e
 }
 func (m *MonomialManager) gcdCore(a, b Monomial) (bool, error) {

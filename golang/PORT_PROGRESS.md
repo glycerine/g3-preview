@@ -25978,3 +25978,87 @@ oracle was corrected to actual source synchronization semantics (no production
 change or semantic RED credit). Fifteen groups pass both profiles in
 .cache/polynomial-linear-tls-final-*.log; draft stays unintegrated pending shared
 Integer source NULL state and broader arithmetic failure/partial-move review.
+
+
+Exact division integration after 4d32f0b: reviewed immutable six-file lane
+against literal cpp5094-5156, maxima1479-1491/1964-1981 and SOM add2048-2068.
+Three parent changes preserve existing methods: actual embedded local scope,
+same Divide factory outcome engine, guarded pre-INC borrowed SOM slot.
+Integrated explicit nine paths only; no historical module overlay. Root added
+shared census support for actual scope numeral, incoming/value monomials and
+evaluated fresh return. Existing nine-test helper now supplies caller roots
+only. Genuine common-census RED .cache/polynomial-exact-div-common-census-red.log
+found unnamed numeric descriptor8/9 at scalar reservation prefix0; root helper
+extension fixes it without weakening ownership assertions. First launch used
+missing private cache directories and exited before tests; corrected to actual
+module cache before genuine RED run. Both full selected Polynomial families
+now green in .cache/polynomial-exact-div-integrated-{native,debug}.log.
+
+Scalar raw numeral has no pre-end source destructor; polynomial scoped NUM
+destructs before monomial reference. Actual C.mk result remains named if later
+NUM destruction refuses. VERIFY evaluates in both profiles, typed GNU release
+unreachable guard distinct from checked assertion. Allocation campaigns retain
+every actual reservation prefix and independent integer/modular identities.
+Whole cpp/header remain partial; full imp, PSC/GCD, TRACE/global diagnostics,
+shared undefined source NULL/dangling destructor continuation still open.
+Additive five selected method entries preserve previous manifest evidence.
+No C++ hashes; headers preserve full source paths/MIT and omit Microsoft notice.
+
+Full authoritative805 Go gates starting using
+.cache/polynomial-exact-div-full-complete-run.py: native, original100-bit
+checked/debug/everyprefix with30m timeout, both vets, source/no-generics.
+Go-only immutable tree snapshot and explicit nine-file inventory retained.
+No tested Go edits until terminal full gates; commit only after all green.
+
+Root parallel review while exact805 gates run: read all six paired integer
+source-state production diffs and38 test diffs against current master. Shared
+setter engines distinguish actual fresh NULL from freed dangling pointer at
+source publication, no consumer scope guess or public scalar layout change.
+New real second reserve failure and SlotLimit7 reached sixth allocation census
+preserve physical constructor prefix; ordinary postconstructor limit is8.
+Approved narrow actual direct allocator fixtures where pooled call makes no
+reservation, preserving pooled campaigns elsewhere; full repeated warm cycle
+precedes unchanged100-cycle plateau. GCD alias fixture preserves source3/-11
+and debug pre-g1 assertion, separate actual ensure_tmp hole proof remains.
+Params pending payload counted only from exact named object/location/Runtime
+identity and initialized capacity, not synthetic inferred ownership.
+Diff evidence .cache/integer-source-state-root-{production,tests}.diff.
+Integer44 remains private/frozen while its original checked/debug89249 runs.
+Subsequent integration must merge only paired identity predicate into current
+polynomial physical helper, preserve new exactDivision roots, and extend
+Newton census exact paired identity exclusion; no historical helper overlay.
+
+Exact805 runner44465 confirmed live, native96.808s, both vets4.062/4.194s
+and source143.665s all terminal0. Checked/debug still live on same runner,
+original exhaustive campaign; no test edits or restarted processes.
+
+Paired44 final full checked/debug89249 terminal0 per owning agent: main795.087s
+mpnum197.885s; final native50311 main14.092s/mpnum89.780s, both vets and
+source audit terminal0. All44 frozen hashes unchanged. Root source/test diff
+review completed; READY candidate held for separate postExact805 commit.
+
+Private linear draft rebased isolated onto current805 plus frozen paired44 in
+.cache/work/polynomial-linear-source-state-4d32f0b, without master edits.
+New actual first RHS Copy refusal leaves exact freshNULL token, input untouched,
+vector default denominator1; literal flush must continue before member release.
+First private preparation missed new ExactDiv files and failed build; fixed
+explicit dependency copy. Initial fixture incorrectly expected default den0,
+corrected to actual constructed den1 (not production RED credit). Genuine
+.cache/polynomial-linear-null-leaf-red.log then found old private leaf still
+returns invalid-slot at actual source flush. Fixed only exact shared freshNULL
+branch through sourceNumeralDel, retaining dangling/interrupted release guard.
+All16 selected Linear groups GREEN native/debug, both vets GREEN in
+.cache/polynomial-linear-null-final-*.log. Draft inventory updated actual8files
+and prerequisites; broader arithmetic failure and partial-move diagnostics
+remain required before READY. No full source registration or global binding
+claim. Paired-state lane now proceeds independently with full imp member/lifetime
+prerequisites; frozen paired44 untouched.
+
+Exact805 full gates terminal GREEN: runner44465 terminal0 explicitly verified
+immutable all805 Go files; root independently rechecked complete snapshot and
+all nine integrated path hashes. Native96.808s, checked/debug738.498s,
+vet-native4.062s, vet-debug4.194s, source143.665s. Original100-bit/everyactual
+reservation campaign unchanged. Evidence
+.cache/polynomial-exact-div-full-complete-{gates,go-hashes}.json and five logs.
+Whitespace audit green. Selected exact-division prerequisite ready for coherent
+green commit; whole port/full imp/PSC/GCD remains open.
