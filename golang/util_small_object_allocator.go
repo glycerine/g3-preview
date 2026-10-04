@@ -29,6 +29,7 @@ type utilSmallObjectConfig struct {
 	IDRef                GlobalParamCString
 	Diagnostics, Verbose *NumericTextStream
 	Verbosity            uint32
+	VerboseContext       *VerboseContext
 }
 type smallObjectIOBridge struct{ config utilSmallObjectConfig }
 type utilSmallObjectAllocator struct {
@@ -69,6 +70,9 @@ func newUtilSmallObjectAllocator(c utilSmallObjectConfig) (*utilSmallObjectAlloc
 	mc := memory.SmallAllocatorConfig{Runtime: c.Runtime, Profile: c.Profile, IO: io, Verbosity: c.Verbosity}
 	if c.Debug != nil {
 		mc.Assertions = c.Debug
+	}
+	if c.VerboseContext != nil {
+		mc.VerboseControl = c.VerboseContext
 	}
 	core, e := memory.NewSmallAllocator(mc)
 	if e != nil {

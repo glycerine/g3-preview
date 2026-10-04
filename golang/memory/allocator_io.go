@@ -1,3 +1,5 @@
+// Source: src/util/util.h:181; src/util/small_object_allocator.cpp:172-242.
+// Source authors: Leonardo de Moura; Nikolaj bjorner.
 // Licensed under the MIT license.
 // One borrowed cold dispatcher. Byte formatting remains in the caller package.
 package memory
@@ -11,6 +13,9 @@ const (
 	AllocatorIOVerboseStart
 	AllocatorIOVerboseEnd
 )
+
+// AllocatorVerboseControl is a borrowed cold source-level getter.
+type AllocatorVerboseControl interface{ VerbosityLevel() (uint32, error) }
 
 type AllocatorIO interface {
 	Emit(*SmallAllocator, AllocatorIOEvent) error
@@ -31,7 +36,15 @@ func (a *SmallAllocator) diagnostic() error {
 	return a.emit(AllocatorIOLeak)
 }
 func (a *SmallAllocator) verbose(end bool) error {
-	if a.config.Verbosity < 20 {
+	level := a.config.Verbosity
+	if a.config.VerboseControl != nil {
+		var e error
+		level, e = a.config.VerboseControl.VerbosityLevel()
+		if e != nil {
+			return e
+		}
+	}
+	if level < 20 {
 		return nil
 	}
 	if end {

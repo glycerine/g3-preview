@@ -1,3 +1,5 @@
+// Source: src/util/small_object_allocator.cpp:172-242; src/util/util.cpp:22-40.
+// Source authors: Nikolaj bjorner (nbjorner), 2007-08-06; Leonardo de Moura (leonardo), 2006.
 // Licensed under the MIT license.
 // Source allocator diagnostics through an explicit borrowed ostream adapter.
 package g3
@@ -93,6 +95,14 @@ func (b *smallObjectIOBridge) diagnostic(a *memory.SmallAllocator) error {
 }
 func (b *smallObjectIOBridge) verbose(a *memory.SmallAllocator, end bool) error {
 	out := b.config.Verbose
+	if b.config.VerboseContext != nil {
+		var e error
+		out, e = b.config.VerboseContext.VerboseStream()
+		if e != nil {
+			return e
+		}
+	}
+	// Source selects the stream once for this entire insertion chain.
 	prefix := "(allocator-consolidate :wasted-size "
 	if end {
 		prefix = "(end-allocator-consolidate :wasted-size "

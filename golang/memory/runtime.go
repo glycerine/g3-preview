@@ -1,4 +1,6 @@
-// Licensed under the MIT license.
+// Source: src/util/memory_manager.cpp:124-149,274-305,326-377; src/util/memory_manager.h:49-71.
+// Licensed under the MIT license. See LICENSE.txt.
+// Source author: Nikolaj Bjorner (nbjorner), 2007-07-24.
 package memory
 
 import (
@@ -109,9 +111,7 @@ func (m *Runtime) block(h Block) (*memoryRuntimeBlock, error) {
 }
 func (m *Runtime) extent(n uint64) (uint64, error) {
 	if m.config.SizeTBits == 32 {
-		if n > math.MaxUint32 {
-			return 0, arena.ErrBounds
-		}
+		// Convert the actual size_t argument before adding the SIZE_T header.
 		return uint64(uint32(n) + 4), nil
 	}
 	return n + 8, nil
@@ -339,8 +339,8 @@ func (m *Runtime) SetMaxSize(n uint64) error {
 	if e := m.open(); e != nil {
 		return e
 	}
-	if m.config.SizeTBits == 32 && n > math.MaxUint32 {
-		return arena.ErrBounds
+	if m.config.SizeTBits == 32 {
+		n = uint64(uint32(n))
 	}
 	m.accounting.maxSize = int64(n)
 	return nil
@@ -349,8 +349,8 @@ func (m *Runtime) SetMaxCount(n uint64) error {
 	if e := m.open(); e != nil {
 		return e
 	}
-	if m.config.SizeTBits == 32 && n > math.MaxUint32 {
-		return arena.ErrBounds
+	if m.config.SizeTBits == 32 {
+		n = uint64(uint32(n))
 	}
 	m.accounting.maxCount = int64(n)
 	return nil
@@ -359,8 +359,8 @@ func (m *Runtime) SetWatermark(n uint64) error {
 	if e := m.open(); e != nil {
 		return e
 	}
-	if m.config.SizeTBits == 32 && n > math.MaxUint32 {
-		return arena.ErrBounds
+	if m.config.SizeTBits == 32 {
+		n = uint64(uint32(n))
 	}
 	m.accounting.watermark = int64(n)
 	return nil

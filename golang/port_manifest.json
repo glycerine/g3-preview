@@ -112605,7 +112605,8 @@
         "memory/uint32_codec.go",
         "memory/uint32_codec_test.go",
         "memory/release_progress.go",
-        "memory/release_progress_test.go"
+        "memory/release_progress_test.go",
+        "memory/runtime_size_t_entry_test.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -112650,7 +112651,14 @@
         "TestMemoryReleaseAuthorityPreservesDuplicatePoolAndCharges",
         "TestMemoryReleaseAuthorityRejectsForeignAndTamperedBinding",
         "TestMemoryOwningCleanupResumesBeforePhysicalFree",
-        "TestMemoryReleaseAuthorityPhysicalChargesWarmAndNamespace"
+        "TestMemoryReleaseAuthorityPhysicalChargesWarmAndNamespace",
+        "TestMemoryRuntimeActualSizeT32AllocateReallocateEntry",
+        "TestMemoryRuntimeActualSizeT32LimitSetters",
+        "TestMemoryRuntimeSizeT32WrappedHeaderlessNamedRoot",
+        "TestMemoryRuntimeSizeT32EveryActualPhysicalRefusal",
+        "TestMemoryRuntimeSizeTEntryRetainsOwnerAndLP64Domains",
+        "TestMemoryRuntimeSizeT32EveryReallocatePhysicalRefusal",
+        "TestMemoryRuntimeSizeT32TLSLimitAfterPhysicalPublication"
       ],
       "conditionals": [
         {
@@ -112782,6 +112790,20 @@
             "TestMemoryOwningCleanupResumesBeforePhysicalFree",
             "TestMemoryReleaseAuthorityPhysicalChargesWarmAndNamespace"
           ]
+        },
+        {
+          "name": "Actual size_t32 parameter conversion before allocation/reallocation header addition and source max-size/max-count/watermark setters; LP64 order preserved",
+          "status": "partial",
+          "go_target": "memory/runtime.go",
+          "tests": [
+            "TestMemoryRuntimeActualSizeT32AllocateReallocateEntry",
+            "TestMemoryRuntimeActualSizeT32LimitSetters",
+            "TestMemoryRuntimeSizeT32WrappedHeaderlessNamedRoot",
+            "TestMemoryRuntimeSizeT32EveryActualPhysicalRefusal",
+            "TestMemoryRuntimeSizeTEntryRetainsOwnerAndLP64Domains",
+            "TestMemoryRuntimeSizeT32EveryReallocatePhysicalRefusal",
+            "TestMemoryRuntimeSizeT32TLSLimitAfterPhysicalPublication"
+          ]
         }
       ],
       "ownership": [
@@ -112789,7 +112811,8 @@
         "Actual prefix-bearing byte backings plus charged initialized-byte bitmap and cold allocation directory; immediate physical roots, TLS allocated-error owner and bad-header cleanup retain source action/counter prefixes. Real runtime typed-owner hooks, generated lifetime and process transports remain open. See PORT_PROGRESS.md#audit-raw-memory-port-status-md.",
         "One concrete lower memory.Runtime owns source accounting, physical backings and charged directories; main g3 aliases use the real static nominal-error bridge. Borrowed static transport is cold; nil-returning transport cannot suppress source failure. See PORT_PROGRESS.md#audit-memory-package-api-packet-md. Numeric/default-backend and full process-global wiring remain required.",
         "Word codecs read/write the sole actual initialized backing with no allocations or counter events. Allocator word APIs retain requested bounds; ObjectExtent exposes actual rounded/direct physical span with live owner/generation guards. See PORT_PROGRESS.md#audit-memory-uint32-codec-port-status-md.",
-        "Persistent pointer-free release stages/serials are part of the charged actual runtime/location directories. Public flags are observational; bound private owner/ref/serial resolves the retained stage. Physical-completed frees are never replayed. Original successful pooled duplicate free retains source requested subtraction/self-link."
+        "Persistent pointer-free release stages/serials are part of the charged actual runtime/location directories. Public flags are observational; bound private owner/ref/serial resolves the retained stage. Physical-completed frees are never replayed. Original successful pooled duplicate free retains source requested subtraction/self-link.",
+        "Actual Runtime header/data and TLS/global counter publication preserved, including zero-request header allocation and postphysical TLS limit errors. Wrapped headerless allocation is a guarded source-undefined domain with explicit CleanupPartial, not normal allocation exhaustion credit."
       ],
       "deviations": [
         "Source signed-overflow/invalid-lane domains use scalar typed outcomes after completed field prefixes. Containing allocator must execute real physical operations between counter phases. Physical hooks, headers, generated callbacks, OOM exits/streams, concurrent global service and consumer integration remain open.",
@@ -112812,7 +112835,8 @@
         "memory/accounting_test.go",
         "memory/runtime_test.go",
         "memory/shared_runtime_api_test.go",
-        "util_memory_bridge_test.go"
+        "util_memory_bridge_test.go",
+        "memory/runtime_size_t_entry_test.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -112845,7 +112869,14 @@
         "TestMemoryBridgeColdHeadersAndConstructorUnwind",
         "TestMemoryBridgeNominalOOMAndCountErrors",
         "TestMemoryBridgeDefaultExceptionAndCopiedOwner",
-        "TestMemoryBridgePendingFinalizationRetainsAllHeaders"
+        "TestMemoryBridgePendingFinalizationRetainsAllHeaders",
+        "TestMemoryRuntimeActualSizeT32AllocateReallocateEntry",
+        "TestMemoryRuntimeActualSizeT32LimitSetters",
+        "TestMemoryRuntimeSizeT32WrappedHeaderlessNamedRoot",
+        "TestMemoryRuntimeSizeT32EveryActualPhysicalRefusal",
+        "TestMemoryRuntimeSizeTEntryRetainsOwnerAndLP64Domains",
+        "TestMemoryRuntimeSizeT32EveryReallocatePhysicalRefusal",
+        "TestMemoryRuntimeSizeT32TLSLimitAfterPhysicalPublication"
       ],
       "conditionals": [
         {
@@ -112955,12 +112986,27 @@
             "TestMemoryBridgeDefaultExceptionAndCopiedOwner",
             "TestMemoryBridgePendingFinalizationRetainsAllHeaders"
           ]
+        },
+        {
+          "name": "Actual size_t32 parameter conversion before allocation/reallocation header addition and source max-size/max-count/watermark setters; LP64 order preserved",
+          "status": "partial",
+          "go_target": "memory/runtime.go",
+          "tests": [
+            "TestMemoryRuntimeActualSizeT32AllocateReallocateEntry",
+            "TestMemoryRuntimeActualSizeT32LimitSetters",
+            "TestMemoryRuntimeSizeT32WrappedHeaderlessNamedRoot",
+            "TestMemoryRuntimeSizeT32EveryActualPhysicalRefusal",
+            "TestMemoryRuntimeSizeTEntryRetainsOwnerAndLP64Domains",
+            "TestMemoryRuntimeSizeT32EveryReallocatePhysicalRefusal",
+            "TestMemoryRuntimeSizeT32TLSLimitAfterPhysicalPublication"
+          ]
         }
       ],
       "ownership": [
         "Pointer-free scalar accounting is intended for once-charged runtime embedding with explicit caller-confined lanes and source counter prefixes. No raw allocator/backend or process-global integration is claimed; see PORT_PROGRESS.md#audit-memory-accounting-port-status-md.",
         "Actual prefix-bearing byte backings plus charged initialized-byte bitmap and cold allocation directory; immediate physical roots, TLS allocated-error owner and bad-header cleanup retain source action/counter prefixes. Real runtime typed-owner hooks, generated lifetime and process transports remain open. See PORT_PROGRESS.md#audit-raw-memory-port-status-md.",
-        "One concrete lower memory.Runtime owns source accounting, physical backings and charged directories; main g3 aliases use the real static nominal-error bridge. Borrowed static transport is cold; nil-returning transport cannot suppress source failure. See PORT_PROGRESS.md#audit-memory-package-api-packet-md. Numeric/default-backend and full process-global wiring remain required."
+        "One concrete lower memory.Runtime owns source accounting, physical backings and charged directories; main g3 aliases use the real static nominal-error bridge. Borrowed static transport is cold; nil-returning transport cannot suppress source failure. See PORT_PROGRESS.md#audit-memory-package-api-packet-md. Numeric/default-backend and full process-global wiring remain required.",
+        "Actual Runtime header/data and TLS/global counter publication preserved, including zero-request header allocation and postphysical TLS limit errors. Wrapped headerless allocation is a guarded source-undefined domain with explicit CleanupPartial, not normal allocation exhaustion credit."
       ],
       "deviations": [
         "Source signed-overflow/invalid-lane domains use scalar typed outcomes after completed field prefixes. Containing allocator must execute real physical operations between counter phases. Physical hooks, headers, generated callbacks, OOM exits/streams, concurrent global service and consumer integration remain open.",
@@ -128463,7 +128509,9 @@
         "memory/small_allocator_size_t_entry_test.go",
         "memory/small_allocator_query_prefix_test.go",
         "memory/small_allocator_assertions.go",
-        "util_small_object_allocator_assertions_test.go"
+        "util_small_object_allocator_assertions_test.go",
+        "util_verbose_context.go",
+        "util_verbose_context_test.go"
       ],
       "tests": [
         "TestSmallBytesSourceExercise",
@@ -128533,7 +128581,13 @@
         "TestSmallAllocatorRawForeignPooledWarmPointerCodec",
         "TestSmallAllocatorRawActualSizeTEntryBeforeZeroAndBypass",
         "TestSmallAllocatorRawUnrelatedReleasePreservesPendingAllocation",
-        "TestSmallAllocatorRawSamePendingReleaseReceiptBeforeSubtraction"
+        "TestSmallAllocatorRawSamePendingReleaseReceiptBeforeSubtraction",
+        "TestVerboseContextMutableAllocatorSelection",
+        "TestVerboseContextBorrowedPointerAndLifetime",
+        "TestVerboseContextColdRefusalAndExactCharge",
+        "TestVerboseContextAllocatorEveryOutputRefusal",
+        "TestVerboseContextClosedLevelReachedBeforeOutput",
+        "TestVerboseContextWarmOutputAndNullAdapter"
       ],
       "conditionals": [
         {
@@ -128809,6 +128863,19 @@
             "TestSmallObjectAllocatorClosedAssertionOwnerDirectFreePrefix",
             "TestSmallObjectAllocatorAssertionControlColdEveryRefusal"
           ]
+        },
+        {
+          "name": "Selected actual verbosity scalar and borrowed stream getters/setters with reached allocator IF_VERBOSE level rereads and once-per-chain stream selection; native stderr/global binding remains open",
+          "status": "partial",
+          "go_target": "util_verbose_context.go",
+          "tests": [
+            "TestVerboseContextMutableAllocatorSelection",
+            "TestVerboseContextBorrowedPointerAndLifetime",
+            "TestVerboseContextColdRefusalAndExactCharge",
+            "TestVerboseContextAllocatorEveryOutputRefusal",
+            "TestVerboseContextClosedLevelReachedBeforeOutput",
+            "TestVerboseContextWarmOutputAndNullAdapter"
+          ]
         }
       ],
       "ownership": [
@@ -128818,7 +128885,8 @@
         "Word codecs read/write the sole actual initialized backing with no allocations or counter events. Allocator word APIs retain requested bounds; ObjectExtent exposes actual rounded/direct physical span with live owner/generation guards. See PORT_PROGRESS.md#audit-memory-uint32-codec-port-status-md.",
         "Persistent pointer-free release stages/serials are part of the charged actual runtime/location directories. Public flags are observational; bound private owner/ref/serial resolves the retained stage. Physical-completed frees are never replayed. Original successful pooled duplicate free retains source requested subtraction/self-link.",
         "Supplied Runtime/block/offset is a borrowed source address; receiver counter/class/freelist selects actions, no donor chunk adoption. Actual pointer codec sidecars belong to receiver, donor payload/page remains caller-owned. Exact raw invocation serial/stage/count and matching active ObjectRef release guard prevent duplicate owning continuation. SourceFinalize stays sticky; only explicit CleanupStopped discards the current stopped invocation via AbortRawInvocation, preserving source count/history and all donor/provider data.",
-        "Optional cold borrowed assertion-control interface binds directly to actual DebugContext, without closure/per-record interface/shadow bool or new Runtime events. Reflected allocator/IO headers charge actual fields once. Source DEBUG leak warning is independent of assertions enable switch. Native/global assertion wiring remains partial."
+        "Optional cold borrowed assertion-control interface binds directly to actual DebugContext, without closure/per-record interface/shadow bool or new Runtime events. Reflected allocator/IO headers charge actual fields once. Source DEBUG leak warning is independent of assertions enable switch. Native/global assertion wiring remains partial.",
+        "Actual cold charged VerboseContext owns the unsigned level and borrows selected NumericTextStream pointer. Get/set stream does not touch borrowed stream lifetime; reached insertion performs its existing guards. Allocator borrows optional getter interface, no shadow mutable scalar or source allocation events."
       ],
       "deviations": [
         "Reset/Close reclaim tracked live direct blocks as explicit typed owner cleanup extension; source only frees pooled chunks.",
@@ -128855,7 +128923,9 @@
         "memory/small_allocator_size_t_entry_test.go",
         "memory/small_allocator_query_prefix_test.go",
         "memory/small_allocator_assertions.go",
-        "util_small_object_allocator_assertions_test.go"
+        "util_small_object_allocator_assertions_test.go",
+        "util_verbose_context.go",
+        "util_verbose_context_test.go"
       ],
       "tests": [
         "TestSmallBytesSourceExercise",
@@ -128913,7 +128983,13 @@
         "TestSmallAllocatorRawForeignPooledWarmPointerCodec",
         "TestSmallAllocatorRawActualSizeTEntryBeforeZeroAndBypass",
         "TestSmallAllocatorRawUnrelatedReleasePreservesPendingAllocation",
-        "TestSmallAllocatorRawSamePendingReleaseReceiptBeforeSubtraction"
+        "TestSmallAllocatorRawSamePendingReleaseReceiptBeforeSubtraction",
+        "TestVerboseContextMutableAllocatorSelection",
+        "TestVerboseContextBorrowedPointerAndLifetime",
+        "TestVerboseContextColdRefusalAndExactCharge",
+        "TestVerboseContextAllocatorEveryOutputRefusal",
+        "TestVerboseContextClosedLevelReachedBeforeOutput",
+        "TestVerboseContextWarmOutputAndNullAdapter"
       ],
       "conditionals": [
         {
@@ -129121,6 +129197,19 @@
             "TestSmallObjectAllocatorClosedAssertionOwnerDirectFreePrefix",
             "TestSmallObjectAllocatorAssertionControlColdEveryRefusal"
           ]
+        },
+        {
+          "name": "Selected actual verbosity scalar and borrowed stream getters/setters with reached allocator IF_VERBOSE level rereads and once-per-chain stream selection; native stderr/global binding remains open",
+          "status": "partial",
+          "go_target": "util_verbose_context.go",
+          "tests": [
+            "TestVerboseContextMutableAllocatorSelection",
+            "TestVerboseContextBorrowedPointerAndLifetime",
+            "TestVerboseContextColdRefusalAndExactCharge",
+            "TestVerboseContextAllocatorEveryOutputRefusal",
+            "TestVerboseContextClosedLevelReachedBeforeOutput",
+            "TestVerboseContextWarmOutputAndNullAdapter"
+          ]
         }
       ],
       "ownership": [
@@ -129128,7 +129217,8 @@
         "Standalone concrete source allocator uses actual utilMemoryRuntime blocks and intrusive payload links. Full cold locator capacity and owner headers are charged; explicit pending/chunk cleanup retains actual failed-free roots. Direct blocks remain caller-owned across Reset and Close. See PORT_PROGRESS.md#audit-small-object-allocator-packet-md; typed numerical/solver allocator integration remains open.",
         "The sole allocator core now lives in memory.SmallAllocator over one actual borrowed memory.Runtime. Main wrappers separately charge their real wrapper/IO headers and retain them until pending roots finalize; genuine borrowed CString/NumericTextStream formatting remains in main. All41 original accounting/runtime/allocator test names are retained across packages; no solver/numeric backend wiring is claimed. See PORT_PROGRESS.md#audit-memory-package-api-packet-md.",
         "Supplied Runtime/block/offset is a borrowed source address; receiver counter/class/freelist selects actions, no donor chunk adoption. Actual pointer codec sidecars belong to receiver, donor payload/page remains caller-owned. Exact raw invocation serial/stage/count and matching active ObjectRef release guard prevent duplicate owning continuation. SourceFinalize stays sticky; only explicit CleanupStopped discards the current stopped invocation via AbortRawInvocation, preserving source count/history and all donor/provider data.",
-        "Optional cold borrowed assertion-control interface binds directly to actual DebugContext, without closure/per-record interface/shadow bool or new Runtime events. Reflected allocator/IO headers charge actual fields once. Source DEBUG leak warning is independent of assertions enable switch. Native/global assertion wiring remains partial."
+        "Optional cold borrowed assertion-control interface binds directly to actual DebugContext, without closure/per-record interface/shadow bool or new Runtime events. Reflected allocator/IO headers charge actual fields once. Source DEBUG leak warning is independent of assertions enable switch. Native/global assertion wiring remains partial.",
+        "Actual cold charged VerboseContext owns the unsigned level and borrows selected NumericTextStream pointer. Get/set stream does not touch borrowed stream lifetime; reached insertion performs its existing guards. Allocator borrows optional getter interface, no shadow mutable scalar or source allocation events."
       ],
       "deviations": [
         "Reset/Close reclaim tracked live direct blocks as explicit typed owner cleanup extension; source only frees pooled chunks.",
@@ -131819,7 +131909,13 @@
         "utilhash/random.go",
         "mpnum/mpz_log.go",
         "util_sexpr.go",
-        "util_escaped.go"
+        "util_escaped.go",
+        "util_verbose_context.go",
+        "util_verbose_context_test.go",
+        "memory/small_allocator.go",
+        "memory/allocator_io.go",
+        "util_small_object_allocator.go",
+        "util_small_object_allocator_stream.go"
       ],
       "tests": [
         "TestSourceRandomVectors",
@@ -131835,7 +131931,13 @@
         "TestSexprRegisteredEscapedDefaultPrintInputs",
         "TestEscapedThirteenSourcePrintedFixtures",
         "TestEscapedIndependentByteIndentAndTrim",
-        "TestEscapedPublishedFailurePrefixesAndBudgets"
+        "TestEscapedPublishedFailurePrefixesAndBudgets",
+        "TestVerboseContextMutableAllocatorSelection",
+        "TestVerboseContextBorrowedPointerAndLifetime",
+        "TestVerboseContextColdRefusalAndExactCharge",
+        "TestVerboseContextAllocatorEveryOutputRefusal",
+        "TestVerboseContextClosedLevelReachedBeforeOutput",
+        "TestVerboseContextWarmOutputAndNullAdapter"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -131907,11 +132009,25 @@
         {
           "name": "escaped external custom ostream state/badbit/exception behavior",
           "status": "unported"
+        },
+        {
+          "name": "Selected actual verbosity scalar and borrowed stream getters/setters with reached allocator IF_VERBOSE level rereads and once-per-chain stream selection; native stderr/global binding remains open",
+          "status": "partial",
+          "go_target": "util_verbose_context.go",
+          "tests": [
+            "TestVerboseContextMutableAllocatorSelection",
+            "TestVerboseContextBorrowedPointerAndLifetime",
+            "TestVerboseContextColdRefusalAndExactCharge",
+            "TestVerboseContextAllocatorEveryOutputRefusal",
+            "TestVerboseContextClosedLevelReachedBeforeOutput",
+            "TestVerboseContextWarmOutputAndNullAdapter"
+          ]
         }
       ],
       "ownership": [
         "Random state owner-local, shuffle borrows caller sequence. Other util methods unported.",
-        "Complete escaped adapter borrows nullable input synchronously and appends into a physically charged concrete buffer. Byte/quote/indent successful prefixes remain live on budget failure. Convenience wrapper releases temporary storage on every exit and returns one caller-owned final text. Full uint32 indent domain is preserved; only actual host-int representability is guarded. See PORT_PROGRESS.md#audit-smt2-util-port-status-md."
+        "Complete escaped adapter borrows nullable input synchronously and appends into a physically charged concrete buffer. Byte/quote/indent successful prefixes remain live on budget failure. Convenience wrapper releases temporary storage on every exit and returns one caller-owned final text. Full uint32 indent domain is preserved; only actual host-int representability is guarded. See PORT_PROGRESS.md#audit-smt2-util-port-status-md.",
+        "Actual cold charged VerboseContext owns the unsigned level and borrows selected NumericTextStream pointer. Get/set stream does not touch borrowed stream lifetime; reached insertion performs its existing guards. Allocator borrows optional getter interface, no shadow mutable scalar or source allocation events."
       ],
       "deviations": [
         "Concrete buffer output replaces source ostream emission; all null/trim/indent byte branches are translated, but external custom stream state/badbit/exceptions remain open. Other util algorithms remain separate. No generics, boxed hot records or source assertions are invented."
@@ -131926,7 +132042,13 @@
         "utilhash/random.go",
         "mpnum/mpz_log.go",
         "util_sexpr.go",
-        "util_escaped.go"
+        "util_escaped.go",
+        "util_verbose_context.go",
+        "util_verbose_context_test.go",
+        "memory/small_allocator.go",
+        "memory/allocator_io.go",
+        "util_small_object_allocator.go",
+        "util_small_object_allocator_stream.go"
       ],
       "tests": [
         "TestSourceRandomVectors",
@@ -131942,7 +132064,13 @@
         "TestSexprRegisteredEscapedDefaultPrintInputs",
         "TestEscapedThirteenSourcePrintedFixtures",
         "TestEscapedIndependentByteIndentAndTrim",
-        "TestEscapedPublishedFailurePrefixesAndBudgets"
+        "TestEscapedPublishedFailurePrefixesAndBudgets",
+        "TestVerboseContextMutableAllocatorSelection",
+        "TestVerboseContextBorrowedPointerAndLifetime",
+        "TestVerboseContextColdRefusalAndExactCharge",
+        "TestVerboseContextAllocatorEveryOutputRefusal",
+        "TestVerboseContextClosedLevelReachedBeforeOutput",
+        "TestVerboseContextWarmOutputAndNullAdapter"
       ],
       "conditionals": [
         {
@@ -132182,11 +132310,25 @@
         {
           "name": "escaped external custom ostream state/badbit/exception behavior",
           "status": "unported"
+        },
+        {
+          "name": "Selected actual verbosity scalar and borrowed stream getters/setters with reached allocator IF_VERBOSE level rereads and once-per-chain stream selection; native stderr/global binding remains open",
+          "status": "partial",
+          "go_target": "util_verbose_context.go",
+          "tests": [
+            "TestVerboseContextMutableAllocatorSelection",
+            "TestVerboseContextBorrowedPointerAndLifetime",
+            "TestVerboseContextColdRefusalAndExactCharge",
+            "TestVerboseContextAllocatorEveryOutputRefusal",
+            "TestVerboseContextClosedLevelReachedBeforeOutput",
+            "TestVerboseContextWarmOutputAndNullAdapter"
+          ]
         }
       ],
       "ownership": [
         "Random state owner-local, shuffle borrows caller sequence. Other util methods unported.",
-        "Complete escaped adapter borrows nullable input synchronously and appends into a physically charged concrete buffer. Byte/quote/indent successful prefixes remain live on budget failure. Convenience wrapper releases temporary storage on every exit and returns one caller-owned final text. Full uint32 indent domain is preserved; only actual host-int representability is guarded. See PORT_PROGRESS.md#audit-smt2-util-port-status-md."
+        "Complete escaped adapter borrows nullable input synchronously and appends into a physically charged concrete buffer. Byte/quote/indent successful prefixes remain live on budget failure. Convenience wrapper releases temporary storage on every exit and returns one caller-owned final text. Full uint32 indent domain is preserved; only actual host-int representability is guarded. See PORT_PROGRESS.md#audit-smt2-util-port-status-md.",
+        "Actual cold charged VerboseContext owns the unsigned level and borrows selected NumericTextStream pointer. Get/set stream does not touch borrowed stream lifetime; reached insertion performs its existing guards. Allocator borrows optional getter interface, no shadow mutable scalar or source allocation events."
       ],
       "deviations": [
         "Concrete buffer output replaces source ostream emission; all null/trim/indent byte branches are translated, but external custom stream state/badbit/exceptions remain open. Other util algorithms remain separate. No generics, boxed hot records or source assertions are invented."

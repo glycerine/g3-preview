@@ -24,11 +24,12 @@ type SmallAllocatorProfile struct {
 	Debug, Windows bool
 }
 type SmallAllocatorConfig struct {
-	Assertions AllocatorAssertionControl
-	Runtime    *Runtime
-	Profile    SmallAllocatorProfile
-	IO         AllocatorIO
-	Verbosity  uint32
+	Assertions     AllocatorAssertionControl
+	VerboseControl AllocatorVerboseControl
+	Runtime        *Runtime
+	Profile        SmallAllocatorProfile
+	IO             AllocatorIO
+	Verbosity      uint32
 }
 type ObjectRef struct {
 	owner, address   uint64
