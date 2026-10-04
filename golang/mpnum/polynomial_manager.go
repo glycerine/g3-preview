@@ -27,18 +27,23 @@ type MultivariatePolynomialConfig struct {
 	Cooperation func() error
 }
 type polynomialCreation struct {
-	raw           memory.ObjectRef
-	value         Polynomial
-	requested, id uint32
-	idConsumed    bool
-	buffer        *polynomialSOM
+	substitutionOwned bool
+	raw               memory.ObjectRef
+	value             Polynomial
+	requested, id     uint32
+	idConsumed        bool
+	buffer            *polynomialSOM
 }
 type MultivariatePolynomialCore struct {
+	substitution                                                                               polynomialSubstitutionState
+	tmp1                                                                                       monomialTemp
+	tmp1SourceConsumed                                                                         bool
 	pseudoDivision                                                                             polynomialPseudoDivisionScope
 	exactDivision                                                                              polynomialExactDivisionScope
 	queryPositions                                                                             MonomialPositions
 	powerLocal                                                                                 polynomialPowerScope
 	newtonLocal                                                                                *PolynomialNewtonInterpolator
+	generatedCalleeGeneration                                                                  uint64
 	generatedCalleePending                                                                     bool
 	directoryInitialized                                                                       bool
 	linearGenerated                                                                            []bool
@@ -102,6 +107,9 @@ func NewMultivariatePolynomialCore(c MultivariatePolynomialConfig) (*Multivariat
 	if e = m.constructPolynomialCoreDefaults(); e != nil {
 		return fail(e)
 	}
+	if e = m.monomials.tempConstruct(&m.tmp1); e != nil {
+		return fail(e)
+	}
 	if e = m.initializePolynomialCoreBody(); e != nil {
 		return fail(e)
 	}
@@ -139,6 +147,7 @@ func preparePolynomialCore(c MultivariatePolynomialConfig, requireMonomials bool
 	}
 	m := &MultivariatePolynomialCore{config: c, integer: c.Integer, monomials: c.Monomials, memory: c.Integer.memory, header: h}
 	m.self = m
+	m.initSubstitutionMembers()
 	for {
 		old := polynomialOrigins.Load()
 		if old == math.MaxUint64 {
@@ -320,6 +329,9 @@ func (m *MultivariatePolynomialCore) MkTerms(as []Int, ms []Monomial) (Polynomia
 	return m.som.mk(false)
 }
 func (m *MultivariatePolynomialCore) CloseChecked() error {
+	if m != nil && m.self == m && m.substitution.scope.active {
+		return ErrPolynomialPending
+	}
 	if m != nil && m.self == m && m.pseudoDivision.active {
 		return ErrPolynomialPending
 	}
@@ -498,6 +510,9 @@ func (m *MultivariatePolynomialCore) CloseChecked() error {
 		} else if e := m.modular.Close(); e != nil {
 			return e
 		}
+	}
+	if e := m.closeSubstitutionMembers(); e != nil {
+		return e
 	}
 	if m.queryPositions.self != nil {
 		if e := m.queryPositions.CloseChecked(); e != nil {

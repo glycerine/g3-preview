@@ -36,6 +36,7 @@ func polynomialPhysicalAuditWithHandlers(t *testing.T, m *MultivariatePolynomial
 	}
 	add(z.intMin)
 	add(z.two64)
+	public = append(public, &m.substitution.scope.newA, &m.substitution.scope.tmp)
 	for _, a := range public {
 		if a != nil {
 			add(*a)
@@ -64,7 +65,7 @@ func polynomialPhysicalAuditWithHandlers(t *testing.T, m *MultivariatePolynomial
 			cell(p, n)
 		}
 	}
-	privatePolys := []Polynomial{}
+	privatePolys := polynomialSubstitutionNamedPolynomials(m)
 	for i := range m.pseudoDivision.refs {
 		privatePolys = append(privatePolys, m.pseudoDivision.refs[i].value, m.pseudoDivision.refs[i].incoming)
 	}
@@ -150,6 +151,9 @@ func polynomialPhysicalAuditWithHandlers(t *testing.T, m *MultivariatePolynomial
 		}
 		raw[b] = true
 	}
+	for _, b := range polynomialSubstitutionNamedRaw(m) {
+		put(b)
+	}
 	mm := m.monomials
 	for _, r := range []memory.Block{mm.table.raw, mm.table.pending, mm.renameTable.raw, mm.renameTable.pending, mm.renameFound, mm.powers.raw, mm.powers.pending} {
 		put(r)
@@ -193,7 +197,7 @@ func polynomialPhysicalAuditWithHandlers(t *testing.T, m *MultivariatePolynomial
 	if uint32(len(raw))+za.Chunks+za.DirectObjects+za.PendingBlocks+ma.Chunks+ma.DirectObjects+ma.PendingBlocks != m.memory.Stats().LiveBlocks {
 		t.Fatal("unnamed Runtime root", len(raw), za, ma, m.memory.Stats())
 	}
-	bytes := uint64(cap(m.linearGenerated)) + integerActualOwnedBytes(z) + m.header + mm.header + uint64(cap(mm.locations))*uint64(reflect.TypeOf(monomialLocation{}).Size()) + ma.TotalBytes + uint64(cap(m.locations))*uint64(reflect.TypeOf(polynomialLocation{}).Size())
+	bytes := uint64(cap(m.substitution.orphans))*16 + uint64(cap(m.linearGenerated)) + integerActualOwnedBytes(z) + m.header + mm.header + uint64(cap(mm.locations))*uint64(reflect.TypeOf(monomialLocation{}).Size()) + ma.TotalBytes + uint64(cap(m.locations))*uint64(reflect.TypeOf(polynomialLocation{}).Size())
 	if !m.modular.closed {
 		bytes += m.modular.header
 	}

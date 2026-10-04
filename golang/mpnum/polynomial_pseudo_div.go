@@ -129,7 +129,7 @@ func (m *MultivariatePolynomialCore) generatedDivideVariablePower(a Monomial, x,
 	outcome := monomialFactoryOutcome{}
 	p, e := m.monomials.variableTransformCreated(a, x, k, 0, &outcome)
 	if e != nil && outcome.started {
-		m.generatedCalleePending = true
+		m.recordGeneratedCallee(outcome)
 	}
 	if e == nil && outcome.created {
 		m.generatedMonomial = p

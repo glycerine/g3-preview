@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	monomialTemporaryKey uint32 = 1
-	monomialObjectKey    uint32 = 2
+	monomialTemporaryKey         uint32 = 1
+	monomialObjectKey            uint32 = 2
+	monomialBorrowedTemporaryKey uint32 = 3
 )
 
 type monomialKey struct{ kind, slot uint32 }

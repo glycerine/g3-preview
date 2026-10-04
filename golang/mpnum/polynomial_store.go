@@ -273,6 +273,8 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 	if m.pending.raw != (memory.ObjectRef{}) || m.pending.value != (Polynomial{}) {
 		return Polynomial{}, ErrPolynomialPending
 	}
+	// Actual constructor start receipt, after the foreign pending guard.
+	m.pending.substitutionOwned = m.substitution.scope.executing
 	requested := polynomialCodecBytes(n)
 	raw, e := m.monomials.allocator.Allocate(uint64(requested))
 	if raw != (memory.ObjectRef{}) {

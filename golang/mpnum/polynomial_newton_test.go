@@ -225,6 +225,7 @@ func TestPolynomialNewtonConstructionAndLazyRefusals(t *testing.T) {
 			m := polynomialCellFixture(t)
 			base := m.integer.budget.Used()
 			if route == 0 {
+				runtimeBefore := m.memory.Stats()
 				m.integer.budget.FailAfter(ordinal)
 				n, e := NewPolynomialNewtonInterpolator(m)
 				polynomialNewtonPhysicalAudit(t, m, []*PolynomialNewtonInterpolator{n}, nil, nil, nil, nil, nil)
@@ -239,8 +240,13 @@ func TestPolynomialNewtonConstructionAndLazyRefusals(t *testing.T) {
 					serviceMust(t, n.Close())
 				}
 				serviceMust(t, m.integer.CleanupPendingAllocation())
-				if m.integer.budget.Used() != base {
-					t.Fatal("constructor refund", ordinal, base, m.integer.budget.Used())
+				// Actual Runtime block-directory capacity survives child destruction.
+				// Only its measured charged metadata may remain; every source root
+				// and physical byte must return to the prior independently named graph.
+				runtimeAfter := m.memory.Stats()
+				polynomialNewtonPhysicalAudit(t, m, nil, nil, nil, nil, nil, nil)
+				if runtimeAfter.OwnerBytes != runtimeBefore.OwnerBytes || runtimeAfter.PhysicalBytes != runtimeBefore.PhysicalBytes || runtimeAfter.InitializationBytes != runtimeBefore.InitializationBytes || runtimeAfter.LiveBlocks != runtimeBefore.LiveBlocks || runtimeAfter.DirectoryBytes < runtimeBefore.DirectoryBytes || m.integer.budget.Used() != base+runtimeAfter.DirectoryBytes-runtimeBefore.DirectoryBytes {
+					t.Fatal("constructor refund", ordinal, base, m.integer.budget.Used(), runtimeBefore, runtimeAfter)
 				}
 				if e == nil {
 					if failures == 0 {

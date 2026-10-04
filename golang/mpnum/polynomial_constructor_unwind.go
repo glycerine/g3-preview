@@ -9,6 +9,14 @@ import "github.com/glycerine/g3/golang/memory"
 // for explicit owning abort. The missing m_upm is not synthesized here.
 func (m *MultivariatePolynomialCore) unwindConstructorMembers() error {
 	m.constructorUnwinding = true
+	if m.tmp1.completed && !m.tmp1SourceConsumed {
+		if m.tmp1.raw != (memory.Block{}) {
+			if e := m.memory.Deallocate(&m.tmp1.raw); e != nil {
+				return e
+			}
+		}
+		m.tmp1SourceConsumed = true
+	}
 	if m.constructorUnwindStage == 0 {
 		if m.idsInitialized {
 			m.idsSourceDestroyed = true

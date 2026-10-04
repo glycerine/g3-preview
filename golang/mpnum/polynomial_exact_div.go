@@ -78,7 +78,7 @@ func (m *MultivariatePolynomialCore) generatedQuotient(a, b Monomial) (Monomial,
 	outcome := monomialFactoryOutcome{}
 	r, ok, e := m.monomials.divideCreated(a, b, &outcome)
 	if e != nil && outcome.started {
-		m.generatedCalleePending = true
+		m.recordGeneratedCallee(outcome)
 	}
 	if e == nil && outcome.created {
 		m.generatedMonomial = r

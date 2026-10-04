@@ -32,6 +32,8 @@ type MonomialManagerConfig struct {
 	Profile   memory.SmallAllocatorProfile
 }
 type monomialLocation struct {
+	unreferencedCohort                 *polynomialSubstitutionState
+	unreferencedSlot                   uint32
 	raw                                memory.ObjectRef
 	sourceRaw                          memory.Block
 	sourceOffset                       uint64
@@ -40,12 +42,18 @@ type monomialLocation struct {
 	live, headerInitialized, published bool
 }
 type monomialCreation struct {
+	generation               uint64
+	parent                   *MultivariatePolynomialCore
 	tableIndex, slot, id     uint32
 	stage                    uint8
 	idConsumed, tableRemoved bool
 }
 type monomialPowerVector struct{ raw, pending memory.Block }
 type MonomialManager struct {
+	continuationGeneration                                                    uint64
+	borrowedGeneration                                                        uint64
+	borrowedParent                                                            *MultivariatePolynomialCore
+	borrowedTemp                                                              *monomialTemp // actual borrowed imp temporary pointer; no ownership
 	self                                                                      *MonomialManager
 	config                                                                    MonomialManagerConfig
 	memory                                                                    *memory.Runtime
@@ -353,7 +361,17 @@ func (m *MonomialManager) incRefCore(a Monomial) error {
 	if e != nil {
 		return e
 	}
-	return m.allocator.WriteUint32(l.raw, 0, n+1)
+	if e = m.allocator.WriteUint32(l.raw, 0, n+1); e != nil {
+		return e
+	}
+	// Source INC is complete. The actual cohort slot alone grants ownership;
+	// the cold location tag only routes this infallible, allocation-free transfer.
+	if d := l.unreferencedCohort; d != nil && uint64(l.unreferencedSlot) < uint64(len(d.orphans)) && d.orphans[l.unreferencedSlot] == a {
+		d.orphans[l.unreferencedSlot] = Monomial{}
+		l.unreferencedCohort = nil
+		l.unreferencedSlot = 0
+	}
+	return nil
 }
 func (m *MonomialManager) IncRef(a Monomial) error {
 	if e := m.check(); e != nil {

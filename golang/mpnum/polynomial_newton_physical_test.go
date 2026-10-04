@@ -39,6 +39,7 @@ func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCo
 	}
 	add(z.intMin)
 	add(z.two64)
+	public = append(public, &m.substitution.scope.newA, &m.substitution.scope.tmp)
 	for _, a := range public {
 		if a != nil {
 			add(*a)
@@ -94,6 +95,7 @@ func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCo
 		addPolynomial(m.powerLocal.result.value)
 		addPolynomial(m.powerLocal.result.incoming)
 	}
+	polys = append(polys, polynomialSubstitutionNamedPolynomials(m)...)
 	for _, p := range polys {
 		addPolynomial(p)
 	}
@@ -222,6 +224,7 @@ func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCo
 		}
 		raw[b] = true
 	}
+	external = append(external, polynomialSubstitutionNamedRaw(m)...)
 	for _, b := range external {
 		put(b)
 	}
@@ -268,7 +271,7 @@ func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCo
 	if uint32(len(raw))+za.Chunks+za.DirectObjects+za.PendingBlocks+ma.Chunks+ma.DirectObjects+ma.PendingBlocks != m.memory.Stats().LiveBlocks {
 		t.Fatal("unnamed Runtime root", len(raw), za, ma, m.memory.Stats())
 	}
-	bytes := uint64(cap(m.linearGenerated)) + integerActualOwnedBytes(z) + m.header + mm.header + uint64(cap(mm.locations))*uint64(reflect.TypeOf(monomialLocation{}).Size()) + ma.TotalBytes + uint64(cap(m.locations))*uint64(reflect.TypeOf(polynomialLocation{}).Size())
+	bytes := uint64(cap(m.substitution.orphans))*16 + uint64(cap(m.linearGenerated)) + integerActualOwnedBytes(z) + m.header + mm.header + uint64(cap(mm.locations))*uint64(reflect.TypeOf(monomialLocation{}).Size()) + ma.TotalBytes + uint64(cap(m.locations))*uint64(reflect.TypeOf(polynomialLocation{}).Size())
 	if !m.modular.closed {
 		bytes += m.modular.header
 	}

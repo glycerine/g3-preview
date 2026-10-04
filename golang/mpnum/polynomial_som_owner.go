@@ -34,6 +34,8 @@ type PolynomialSOMBuffer struct {
 	sortTransferred, sortCleanupIndex               uint32
 	sortOriginalCause, sortSourceCause              error
 	generatedCall, calleeCall                       bool
+	calleeGeneration                                uint64
+	generatedValue                                  Monomial
 }
 
 func NewPolynomialSOMBuffer(m *MultivariatePolynomialCore) (*PolynomialSOMBuffer, error) {
@@ -153,9 +155,11 @@ func (b *PolynomialSOMBuffer) addInput(a *Int, t Monomial, p polynomialSOMInput,
 	defer func() {
 		if !oldGenerated && m.generatedActive {
 			b.generatedCall = true
+			b.generatedValue = m.generatedMonomial
 		}
 		if !oldCallee && m.generatedCalleePending {
 			b.calleeCall = true
+			b.calleeGeneration = m.generatedCalleeGeneration
 		}
 	}()
 	return b.buffer.addSourceInput(a, t, p, multiply)
@@ -163,20 +167,26 @@ func (b *PolynomialSOMBuffer) addInput(a *Int, t Monomial, p polynomialSOMInput,
 func (b *PolynomialSOMBuffer) cleanupGeneratedCall() error {
 	m := b.storage
 	if b.generatedCall {
-		if e := m.cleanupGeneratedMonomial(); e != nil {
-			return e
+		if m.generatedActive && m.generatedMonomial == b.generatedValue {
+			if e := m.cleanupGeneratedMonomial(); e != nil {
+				return e
+			}
 		}
 		b.generatedCall = false
+		b.generatedValue = Monomial{}
 	}
 	if b.calleeCall {
-		e := m.monomials.CleanupCreation()
-		if m.monomials.creation.stage == 0 {
-			m.generatedCalleePending = false
-			b.calleeCall = false
+		// The receipt names the actual factory continuation this body started.
+		// Explicit callee completion may have relinquished it before a new,
+		// unrelated construction reused the same monomial-manager owner.
+		c := &m.monomials.creation
+		if b.calleeGeneration != 0 && m.generatedCalleeGeneration == b.calleeGeneration && c.generation == b.calleeGeneration && c.parent == m {
+			if e := m.monomials.CleanupCreation(); e != nil {
+				return e
+			}
 		}
-		if e != nil {
-			return e
-		}
+		b.calleeCall = false
+		b.calleeGeneration = 0
 	}
 	return nil
 }

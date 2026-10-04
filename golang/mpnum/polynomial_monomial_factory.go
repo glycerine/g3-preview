@@ -7,6 +7,12 @@ import (
 )
 
 func (m *MonomialManager) keyWord(k monomialKey, word uint32) (uint32, error) {
+	if k.kind == monomialBorrowedTemporaryKey {
+		if m.borrowedTemp == nil || k.slot != 0 {
+			return 0, ErrMonomialPending
+		}
+		return m.memory.ReadUint32(m.borrowedTemp.raw, uint64(word)*4)
+	}
 	if k.kind == monomialTemporaryKey {
 		if k.slot >= uint32(len(m.temps)) {
 			return 0, arena.ErrBounds
@@ -23,6 +29,12 @@ func (m *MonomialManager) keyWord(k monomialKey, word uint32) (uint32, error) {
 	return m.allocator.ReadUint32(l.raw, uint64(word)*4)
 }
 func (m *MonomialManager) keyPower(k monomialKey, index uint32) (MonomialPower, error) {
+	if k.kind == monomialBorrowedTemporaryKey {
+		if m.borrowedTemp == nil || k.slot != 0 {
+			return MonomialPower{}, ErrMonomialPending
+		}
+		return m.tempPower(m.borrowedTemp, index)
+	}
 	if k.kind == monomialTemporaryKey {
 		if k.slot >= uint32(len(m.temps)) {
 			return MonomialPower{}, arena.ErrBounds
@@ -45,7 +57,10 @@ func validMonomialPowers(p []MonomialPower) bool {
 
 // Ephemeral outcome of one actual factory call, not persistent ownership.
 // Existing interned/unit results do not start a creation, irrespective of RC.
-type monomialFactoryOutcome struct{ created, started bool }
+type monomialFactoryOutcome struct {
+	created, started bool
+	generation       uint64
+}
 
 func (m *MonomialManager) MkMonomial(p []MonomialPower) (Monomial, error) {
 	return m.mkMonomialCreated(p, nil)
@@ -84,16 +99,45 @@ func (m *MonomialManager) internTemp(index uint32) (result Monomial, cause error
 // created reports the actual new intern publication. On a reached callee
 // postcondition guard, creation remains the callee's real retained owner.
 func (m *MonomialManager) internTempCreated(index uint32, outcome *monomialFactoryOutcome) (Monomial, error) {
+	if m.borrowedTemp != nil {
+		return Monomial{}, ErrMonomialPending
+	}
+	if index >= uint32(len(m.temps)) {
+		return Monomial{}, arena.ErrBounds
+	}
+	return m.internSourceTempCreated(&m.temps[index], monomialKey{monomialTemporaryKey, index}, outcome)
+}
+
+// The same source factory accepts the actual imp-owned temporary. The table
+// key carries a scalar provenance tag; the sole cold borrow remains live at a
+// stopped insertion until its real callee owning abort removes that binding.
+func (m *MonomialManager) internBorrowedTempCreated(t *monomialTemp, outcome *monomialFactoryOutcome) (Monomial, error) {
+	if e := m.check(); e != nil {
+		return Monomial{}, e
+	}
+	if m.borrowedTemp != nil || m.creation.stage != 0 {
+		return Monomial{}, ErrMonomialPending
+	}
+	g := m.nextContinuationGeneration()
+	m.borrowedTemp = t
+	m.borrowedGeneration = g
+	r, e := m.internSourceTempCreated(t, monomialKey{monomialBorrowedTemporaryKey, 0}, outcome)
+	if e == nil {
+		m.creation = monomialCreation{}
+		m.borrowedTemp = nil
+	}
+	return r, e
+}
+func (m *MonomialManager) internSourceTempCreated(t *monomialTemp, key monomialKey, outcome *monomialFactoryOutcome) (Monomial, error) {
 	if outcome != nil {
 		*outcome = monomialFactoryOutcome{}
 	}
 	if m.creation.stage != 0 {
 		return Monomial{}, ErrMonomialPending
 	}
-	if _, e := m.tempHash(&m.temps[index]); e != nil {
+	if _, e := m.tempHash(t); e != nil {
 		return Monomial{}, e
 	}
-	key := monomialKey{monomialTemporaryKey, index}
 	pos, inserted, e := m.table.insert(m, key, false)
 	if e != nil {
 		return Monomial{}, e
@@ -109,9 +153,11 @@ func (m *MonomialManager) internTempCreated(index uint32, outcome *monomialFacto
 		l := &m.locations[old.slot-1]
 		return Monomial{m.origin, old.slot, l.generation}, nil
 	}
-	m.creation = monomialCreation{tableIndex: pos, stage: 1}
+	generation := m.nextContinuationGeneration()
+	m.creation = monomialCreation{tableIndex: pos, stage: 1, generation: generation}
 	if outcome != nil {
 		outcome.started = true
+		outcome.generation = generation
 	}
 	slot, e := m.prepareLocation()
 	if e != nil {
@@ -120,7 +166,7 @@ func (m *MonomialManager) internTempCreated(index uint32, outcome *monomialFacto
 	m.creation.slot = slot
 	m.creation.stage = 2
 	l := &m.locations[slot-1]
-	n, e := m.tempSize(&m.temps[index])
+	n, e := m.tempSize(t)
 	if e != nil {
 		return Monomial{}, e
 	}
@@ -147,7 +193,7 @@ func (m *MonomialManager) internTempCreated(index uint32, outcome *monomialFacto
 	m.creation.idConsumed = true
 	l.id = id
 	m.creation.stage = 4
-	h, e := m.memory.ReadUint32(m.temps[index].raw, 16)
+	h, e := m.memory.ReadUint32(t.raw, 16)
 	if e != nil {
 		return Monomial{}, e
 	}
@@ -161,7 +207,7 @@ func (m *MonomialManager) internTempCreated(index uint32, outcome *monomialFacto
 	total := uint32(0)
 	var previous uint32
 	for i := uint32(0); i < n; i++ {
-		p, e := m.tempPower(&m.temps[index], i)
+		p, e := m.tempPower(t, i)
 		if e != nil {
 			return Monomial{}, e
 		}
@@ -291,6 +337,7 @@ func (m *MonomialManager) CleanupCreation() error {
 	}
 	c := &m.creation
 	if c.stage == 0 {
+		m.completeBorrowedContinuation()
 		return nil
 	}
 	if !c.tableRemoved && m.table.raw != (memory.Block{}) {
@@ -321,6 +368,39 @@ func (m *MonomialManager) CleanupCreation() error {
 		}
 		l.live = false
 	}
+	m.completeCreationContinuation()
 	*c = monomialCreation{}
+	m.completeBorrowedContinuation()
 	return nil
+}
+
+// Cold continuation identity is distinct from source uint32 IDs/statistics.
+// It is charged within the actual owner; no per-call allocation or ticket.
+func (m *MonomialManager) nextContinuationGeneration() uint64 {
+	// A new creation is possible only after the sole prior continuation is
+	// completed, which clears its exact parent receipt. No completed generation
+	// remains an authority. Skip zero when wrapping this cold adapter sequence.
+	m.continuationGeneration++
+	if m.continuationGeneration == 0 {
+		m.continuationGeneration = 1
+	}
+	return m.continuationGeneration
+}
+func (m *MonomialManager) completeCreationContinuation() {
+	c := &m.creation
+	if p := c.parent; p != nil && p.generatedCalleeGeneration == c.generation {
+		p.generatedCalleePending = false
+		p.generatedCalleeGeneration = 0
+		if p.substitution.generatedCalleeReceipt == c.generation {
+			p.substitution.generatedCalleeReceipt = 0
+		}
+	}
+	c.parent = nil
+}
+func (m *MonomialManager) completeBorrowedContinuation() {
+	if p := m.borrowedParent; p != nil && p.substitution.borrowedReceipt == m.borrowedGeneration {
+		p.substitution.borrowedReceipt = 0
+	}
+	m.borrowedParent = nil
+	m.borrowedTemp = nil
 }

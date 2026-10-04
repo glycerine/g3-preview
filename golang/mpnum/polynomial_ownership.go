@@ -140,11 +140,14 @@ func (m *MultivariatePolynomialCore) generatedVariable(v, k uint32) (Monomial, e
 	outcome := monomialFactoryOutcome{}
 	a, e := m.monomials.mkVariableCreated(v, k, &outcome)
 	if e != nil && outcome.started {
-		m.generatedCalleePending = true
+		m.recordGeneratedCallee(outcome)
 	}
 	if e == nil && outcome.created {
 		m.generatedMonomial = a
 		m.generatedActive = true
+		if m.substitution.scope.executing {
+			m.substitution.generatedReceipt = a
+		}
 	}
 	return a, e
 }
@@ -155,15 +158,21 @@ func (m *MultivariatePolynomialCore) generatedProduct(a, b Monomial) (Monomial, 
 	outcome := monomialFactoryOutcome{}
 	r, e := m.monomials.mulCreated(a, b, &outcome)
 	if e != nil && outcome.started {
-		m.generatedCalleePending = true
+		m.recordGeneratedCallee(outcome)
 	}
 	if e == nil && outcome.created {
 		m.generatedMonomial = r
 		m.generatedActive = true
+		if m.substitution.scope.executing {
+			m.substitution.generatedReceipt = r
+		}
 	}
 	return r, e
 }
 func (m *MultivariatePolynomialCore) transferGeneratedMonomial() {
+	if m.substitution.generatedReceipt == m.generatedMonomial {
+		m.substitution.generatedReceipt = Monomial{}
+	}
 	m.generatedMonomial = Monomial{}
 	m.generatedActive = false
 	m.generatedBuffer = nil
@@ -213,4 +222,18 @@ func (m *MultivariatePolynomialCore) cleanupLinearGenerated() error {
 		m.linearGeneratedCleanup++
 	}
 	return nil
+}
+
+// Record only the current actual factory constructor's callee authority.
+func (m *MultivariatePolynomialCore) recordGeneratedCallee(outcome monomialFactoryOutcome) {
+	c := &m.monomials.creation
+	if !outcome.started || outcome.generation == 0 || c.generation != outcome.generation {
+		return
+	}
+	m.generatedCalleePending = true
+	m.generatedCalleeGeneration = outcome.generation
+	c.parent = m
+	if m.substitution.scope.executing {
+		m.substitution.generatedCalleeReceipt = outcome.generation
+	}
 }

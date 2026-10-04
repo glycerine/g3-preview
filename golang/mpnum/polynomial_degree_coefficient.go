@@ -120,7 +120,7 @@ func (m *MultivariatePolynomialCore) generatedRemoveVariable(term Monomial, x ui
 	outcome := monomialFactoryOutcome{}
 	a, e := m.monomials.removeVariableCreated(term, x, &outcome)
 	if e != nil && outcome.started {
-		m.generatedCalleePending = true
+		m.recordGeneratedCallee(outcome)
 	}
 	if e == nil && outcome.created {
 		m.generatedMonomial = a

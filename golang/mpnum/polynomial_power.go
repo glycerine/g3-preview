@@ -7,6 +7,7 @@ import "errors"
 // Embedded actual result record is charged by the core's reflected header.
 // It retains stopped source destruction and unjoined INC separately; no ticket.
 type polynomialPowerScope struct {
+	substitutionOwned       bool
 	result                  polynomialReference
 	active                  bool
 	bodyCause, cleanupCause error
@@ -37,7 +38,7 @@ func (m *MultivariatePolynomialCore) powerInto(p Polynomial, k uint32, r *polyno
 	if local.active {
 		return ErrPolynomialPending
 	}
-	*local = polynomialPowerScope{active: true}
+	*local = polynomialPowerScope{active: true, substitutionOwned: m.substitution.scope.executing}
 	defer func() {
 		local.bodyCause = err
 		c := local.result.closeValue(m, false)

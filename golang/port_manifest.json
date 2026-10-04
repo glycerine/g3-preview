@@ -28455,7 +28455,17 @@
         "mpnum/polynomial_som_sort.go",
         "mpnum/polynomial_som_vector_test.go",
         "mpnum/polynomial_som_owner_physical_test.go",
-        "mpnum/polynomial_som_vector_bounds_source_test.go"
+        "mpnum/polynomial_som_vector_bounds_source_test.go",
+        "mpnum/polynomial_substitution.go",
+        "mpnum/polynomial_substitution_state.go",
+        "mpnum/polynomial_substitution_found.go",
+        "mpnum/polynomial_substitution_found_test.go",
+        "mpnum/polynomial_substitution_temp_test.go",
+        "mpnum/polynomial_substitution_source_test.go",
+        "mpnum/polynomial_substitution_physical_test.go",
+        "mpnum/polynomial_mod_d_physical_test.go",
+        "mpnum/polynomial_som_receipt_source_test.go",
+        "mpnum/polynomial_substitution_execution_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -28675,7 +28685,30 @@
         "TestPolynomialSOMBufferNeverAbortsBorrowedCalleeCreation",
         "TestPolynomialSOMBufferSourceSelfAliasReadsChangedFutureCoefficient",
         "TestPolynomialSOMBufferStoppedSortRejectsOrdinaryMutation",
-        "TestPolynomialSOMVectorWrappedIndexReachesChildWithoutReservation"
+        "TestPolynomialSOMVectorWrappedIndexReachesChildWithoutReservation",
+        "TestPolynomialFoundVariablesGrowthAndRetainedBits",
+        "TestPolynomialFoundVariablesEveryGrowthOldSize",
+        "TestPolynomialBorrowedTemporaryActualFactoryIdentity",
+        "TestPolynomialBorrowedTemporaryStoppedInsertionLifetime",
+        "TestPolynomialSubstitutionIntegerIndependentIdentity",
+        "TestPolynomialSubstitutionRationalDenominatorClearing",
+        "TestPolynomialSubstitutionPolynomialFractionIndependentIdentity",
+        "TestPolynomialSubstitutionAbsentAndReachedRawFields",
+        "TestPolynomialSubstitutionIntegerBoundedGridAndScalarForward",
+        "TestPolynomialSubstitutionFractionZeroAndAliasProfiles",
+        "TestPolynomialSubstitutionWarmAbsentBranchActualStorage",
+        "TestPolynomialSubstitutionColdOwnersAndSourceInputLifetime",
+        "TestPolynomialSubstitutionZeroTermsRepeatAndLaterSourceINC",
+        "TestPolynomialSubstitutionEveryReservationNamedPrefixes",
+        "TestPolynomialSubstitutionCleanupLeavesForeignFactoryContinuation",
+        "TestPolynomialSubstitutionCompletedLocalStopsOlderSourceUnwind",
+        "TestPolynomialSubstitutionZeroTermWarmPhysicalCohort",
+        "TestPolynomialSubstitutionCohortReservationPrecedesFactory",
+        "TestPolynomialSubstitutionReceiptRejectsReplacementFactory",
+        "TestPolynomialSubstitutionBorrowedReceiptRejectsReplacement",
+        "TestPolynomialSOMStoppedCalleeReplacementIdentity",
+        "TestPolynomialSOMStoppedGeneratedResultReplacement",
+        "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower"
       ],
       "conditionals": [
         {
@@ -30249,7 +30282,8 @@
             "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower"
           ]
         },
         {
@@ -30285,7 +30319,8 @@
             "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower"
           ]
         },
         {
@@ -30501,7 +30536,8 @@
             "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower"
           ]
         },
         {
@@ -31049,6 +31085,54 @@
             "TestPolynomialSOMBufferSourceSortEveryReservation",
             "TestPolynomialSOMBufferStoppedSortRejectsOrdinaryMutation"
           ]
+        },
+        {
+          "name": "Selected rational map/array6237-6304,6347-6361 and integer array6363-6399/scalar7364-7377 substitution source bodies; literal persistent tmp1/found/max/positions, full imp binding separate",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_substitution.go",
+          "tests": [
+            "TestPolynomialFoundVariablesGrowthAndRetainedBits",
+            "TestPolynomialFoundVariablesEveryGrowthOldSize",
+            "TestPolynomialBorrowedTemporaryActualFactoryIdentity",
+            "TestPolynomialBorrowedTemporaryStoppedInsertionLifetime",
+            "TestPolynomialSubstitutionIntegerIndependentIdentity",
+            "TestPolynomialSubstitutionRationalDenominatorClearing",
+            "TestPolynomialSubstitutionPolynomialFractionIndependentIdentity",
+            "TestPolynomialSubstitutionAbsentAndReachedRawFields",
+            "TestPolynomialSubstitutionIntegerBoundedGridAndScalarForward",
+            "TestPolynomialSubstitutionFractionZeroAndAliasProfiles",
+            "TestPolynomialSubstitutionWarmAbsentBranchActualStorage",
+            "TestPolynomialSubstitutionColdOwnersAndSourceInputLifetime",
+            "TestPolynomialSubstitutionZeroTermsRepeatAndLaterSourceINC",
+            "TestPolynomialSubstitutionEveryReservationNamedPrefixes",
+            "TestPolynomialSubstitutionCleanupLeavesForeignFactoryContinuation",
+            "TestPolynomialSubstitutionCompletedLocalStopsOlderSourceUnwind",
+            "TestPolynomialSubstitutionZeroTermWarmPhysicalCohort",
+            "TestPolynomialSubstitutionCohortReservationPrecedesFactory",
+            "TestPolynomialSubstitutionReceiptRejectsReplacementFactory",
+            "TestPolynomialSubstitutionBorrowedReceiptRejectsReplacement",
+            "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower"
+          ]
+        },
+        {
+          "name": "Selected polynomial fraction6401-6425 result ref/full-expression owning copy and exact constructed lexical reverse cleanup; full imp binding separate",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_substitution.go",
+          "tests": [
+            "TestPolynomialSubstitutionPolynomialFractionIndependentIdentity",
+            "TestPolynomialSubstitutionFractionZeroAndAliasProfiles",
+            "TestPolynomialSubstitutionEveryReservationNamedPrefixes",
+            "TestPolynomialSubstitutionCompletedLocalStopsOlderSourceUnwind"
+          ]
+        },
+        {
+          "name": "Explicit owning continuation distinguishes exact actual factory generation/parent and generated source token from stale replaced invocations; no source dtor repair",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_som_owner.go",
+          "tests": [
+            "TestPolynomialSOMStoppedCalleeReplacementIdentity",
+            "TestPolynomialSOMStoppedGeneratedResultReplacement"
+          ]
         }
       ],
       "ownership": [
@@ -31180,7 +31264,18 @@
         "mpnum/polynomial_variable_helpers_lifetime.go",
         "mpnum/polynomial_variable_helpers_scoped.go",
         "mpnum/polynomial_variable_helpers_source_test.go",
-        "mpnum/polynomial_variable_helpers_physical_test.go"
+        "mpnum/polynomial_variable_helpers_physical_test.go",
+        "mpnum/polynomial_substitution.go",
+        "mpnum/polynomial_substitution_state.go",
+        "mpnum/polynomial_substitution_found.go",
+        "mpnum/polynomial_substitution_found_test.go",
+        "mpnum/polynomial_substitution_temp_test.go",
+        "mpnum/polynomial_substitution_source_test.go",
+        "mpnum/polynomial_substitution_physical_test.go",
+        "mpnum/polynomial_mod_d_physical_test.go",
+        "mpnum/polynomial_som_owner.go",
+        "mpnum/polynomial_som_receipt_source_test.go",
+        "mpnum/polynomial_substitution_execution_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -31382,7 +31477,30 @@
         "TestPolynomialMaxDegreesCopyConstructorCompletedMemberUnwind",
         "TestPolynomialMaxDegreesCopyConstructorTLSIncompleteSecondRoot",
         "TestPolynomialVariableHelperWarmAndColdOwnerGuards",
-        "TestPolynomialMaxDegreesStoppedSourceDestructorAndOwningAbort"
+        "TestPolynomialMaxDegreesStoppedSourceDestructorAndOwningAbort",
+        "TestPolynomialFoundVariablesGrowthAndRetainedBits",
+        "TestPolynomialFoundVariablesEveryGrowthOldSize",
+        "TestPolynomialBorrowedTemporaryActualFactoryIdentity",
+        "TestPolynomialBorrowedTemporaryStoppedInsertionLifetime",
+        "TestPolynomialSubstitutionIntegerIndependentIdentity",
+        "TestPolynomialSubstitutionRationalDenominatorClearing",
+        "TestPolynomialSubstitutionPolynomialFractionIndependentIdentity",
+        "TestPolynomialSubstitutionAbsentAndReachedRawFields",
+        "TestPolynomialSubstitutionIntegerBoundedGridAndScalarForward",
+        "TestPolynomialSubstitutionFractionZeroAndAliasProfiles",
+        "TestPolynomialSubstitutionWarmAbsentBranchActualStorage",
+        "TestPolynomialSubstitutionColdOwnersAndSourceInputLifetime",
+        "TestPolynomialSubstitutionZeroTermsRepeatAndLaterSourceINC",
+        "TestPolynomialSubstitutionEveryReservationNamedPrefixes",
+        "TestPolynomialSubstitutionCleanupLeavesForeignFactoryContinuation",
+        "TestPolynomialSubstitutionCompletedLocalStopsOlderSourceUnwind",
+        "TestPolynomialSubstitutionZeroTermWarmPhysicalCohort",
+        "TestPolynomialSubstitutionCohortReservationPrecedesFactory",
+        "TestPolynomialSubstitutionReceiptRejectsReplacementFactory",
+        "TestPolynomialSubstitutionBorrowedReceiptRejectsReplacement",
+        "TestPolynomialSOMStoppedCalleeReplacementIdentity",
+        "TestPolynomialSOMStoppedGeneratedResultReplacement",
+        "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower"
       ],
       "conditionals": [
         {
@@ -31728,7 +31846,8 @@
             "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower"
           ]
         },
         {
@@ -31764,7 +31883,8 @@
             "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower"
           ]
         },
         {
@@ -31980,7 +32100,8 @@
             "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower"
           ]
         },
         {
@@ -32467,6 +32588,54 @@
             "TestPolynomialMaxDegreesCopyConstructorTLSIncompleteSecondRoot",
             "TestPolynomialVariableHelperWarmAndColdOwnerGuards",
             "TestPolynomialMaxDegreesStoppedSourceDestructorAndOwningAbort"
+          ]
+        },
+        {
+          "name": "Selected rational map/array6237-6304,6347-6361 and integer array6363-6399/scalar7364-7377 substitution source bodies; literal persistent tmp1/found/max/positions, full imp binding separate",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_substitution.go",
+          "tests": [
+            "TestPolynomialFoundVariablesGrowthAndRetainedBits",
+            "TestPolynomialFoundVariablesEveryGrowthOldSize",
+            "TestPolynomialBorrowedTemporaryActualFactoryIdentity",
+            "TestPolynomialBorrowedTemporaryStoppedInsertionLifetime",
+            "TestPolynomialSubstitutionIntegerIndependentIdentity",
+            "TestPolynomialSubstitutionRationalDenominatorClearing",
+            "TestPolynomialSubstitutionPolynomialFractionIndependentIdentity",
+            "TestPolynomialSubstitutionAbsentAndReachedRawFields",
+            "TestPolynomialSubstitutionIntegerBoundedGridAndScalarForward",
+            "TestPolynomialSubstitutionFractionZeroAndAliasProfiles",
+            "TestPolynomialSubstitutionWarmAbsentBranchActualStorage",
+            "TestPolynomialSubstitutionColdOwnersAndSourceInputLifetime",
+            "TestPolynomialSubstitutionZeroTermsRepeatAndLaterSourceINC",
+            "TestPolynomialSubstitutionEveryReservationNamedPrefixes",
+            "TestPolynomialSubstitutionCleanupLeavesForeignFactoryContinuation",
+            "TestPolynomialSubstitutionCompletedLocalStopsOlderSourceUnwind",
+            "TestPolynomialSubstitutionZeroTermWarmPhysicalCohort",
+            "TestPolynomialSubstitutionCohortReservationPrecedesFactory",
+            "TestPolynomialSubstitutionReceiptRejectsReplacementFactory",
+            "TestPolynomialSubstitutionBorrowedReceiptRejectsReplacement",
+            "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower"
+          ]
+        },
+        {
+          "name": "Selected polynomial fraction6401-6425 result ref/full-expression owning copy and exact constructed lexical reverse cleanup; full imp binding separate",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_substitution.go",
+          "tests": [
+            "TestPolynomialSubstitutionPolynomialFractionIndependentIdentity",
+            "TestPolynomialSubstitutionFractionZeroAndAliasProfiles",
+            "TestPolynomialSubstitutionEveryReservationNamedPrefixes",
+            "TestPolynomialSubstitutionCompletedLocalStopsOlderSourceUnwind"
+          ]
+        },
+        {
+          "name": "Explicit owning continuation distinguishes exact actual factory generation/parent and generated source token from stale replaced invocations; no source dtor repair",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_som_owner.go",
+          "tests": [
+            "TestPolynomialSOMStoppedCalleeReplacementIdentity",
+            "TestPolynomialSOMStoppedGeneratedResultReplacement"
           ]
         }
       ],
