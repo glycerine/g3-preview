@@ -25809,3 +25809,96 @@ repeated source finalize. The shared fresh-null/dangling Integer publication
 issue reaches Rational/local sourceNumeralDel users too; UP-only observer
 binding cannot establish whole Integer lifecycle completion. These are private
 source obligations, not included in this utility commit.
+
+### Polynomial query prerequisite integrated; complete gates pending
+
+The preceding implementation goal turn made progress by freezing and integrating
+six reviewed query files. The intervening provenance-note turn made no code
+progress; the rule was already authoritative in AGENTS.md. Current worktree
+rechecked before continuation. Root corrected two manifest method target paths:
+coeff belongs to polynomial_degree_coefficient.go and active linear Power to
+polynomial_power.go, in both polynomial.cpp/h entries. A first metadata-edit
+command used the wrong working-directory prefix and failed without edits;
+corrected here. The 778-Go full runner started in the same invocation. Source
+mapping audit will be rerun after terminal to cover final manifest bytes.
+
+Frozen prerequisite inventory: .cache/polynomial-query-prerequisite-inventory.json;
+immutable six-file source .cache/review/polynomial-query-frozen-3ccad37.
+Four new Go files and two narrow existing-file changes preserve current Newton
+members. Embedded queryPositions is the actual m_m2pos scratch; source Power
+owns its actual local reference; div_x creation reports actual factory outcome
+before coefficient copy/INC. No registry-derived RC0 ownership. Source origins
+src/math/polynomial/polynomial.cpp/h retained with MIT notices;
+reference author Leonardo de Moura (2011-11-15) recorded here;
+Microsoft copyright omitted. No C++ content hashes.
+
+Eight source/independent groups cover degree/univariate/linear/scalar queries,
+coeff/reduct maps, active repeated-multiplication Power, equality permutation
+and scratch reset order, reached field reads, stopped assignment callbacks,
+and every selected physical coefficient/equality allocation prefix. Tests-first
+missing-API evidence includes .cache/polynomial-query-univariate-api-red.log.
+Private sixth and adjacent native/debug logs plus both vets are green under
+.cache/polynomial-query-*. Coefficient first success11 native/12 debug; equality
+first success1 both, named physical census observed before fault disable.
+Source argument evaluation selects coefficient read before div_x, one allowed
+C++11 order. Disabled binary Power, full imp/GCD/PSC, source TRACE and global
+assertion wiring remain open; units remain partial.
+
+Full authoritative gates use .cache/polynomial-query-complete-run.py and
+matching Go snapshot, results JSON and five logs. Live runner handle5893;
+no master Go edits until it terminates and verifies immutable bytes. No commit
+is justified by focused private tests alone.
+
+Parallel work stays private: arena paired dead descriptors preserve fresh NULL
+versus dangling failure source state; container full SAT Check/UserScope and
+constructor prefixes; numeric exact division and default PSC/GCD dependency
+closure. Root linear_eq_solver.h draft has seven native/debug groups green,
+including dormant original fixture, source A-only pivot swap, independent
+finite rational oracle and every default-storage physical reservation prefix.
+Its arithmetic failures, shared NULL source deletion and partial-move ownership
+remain under review; no full linear header completion credit yet.
+
+Private linear continuation evidence (not integrated): genuine new row-index
+regression .cache/polynomial-linear-row-index-red.log observed missing source
+vector.h operator[] SASSERT. Added reached debug size check to row/swap reads;
+eight groups then pass both profiles. Independent finite modular determinant/
+brute inverse oracle subsequently passed (prime7, nonzero first pivot), with
+separate source A-only row-swap fixture preserved. Display tests-first API RED
+.cache/polynomial-linear-display-api-red.log; literal display selected row order,
+space after every coefficient and newline after RHS translated with concrete
+Rational/Modular methods and cold io.Writer host adapter. Modular display calls
+underlying integer formatting without modular String normalization assertion.
+Writer error before RHS read and short write guards tested. Thirteen groups
+pass native/debug in .cache/polynomial-linear-display-expanded-*.log.
+Draft eight-file Go inventory .cache/polynomial-linear-draft-inventory.json
+records actual origins, Go-only hashes and remaining obligations; no C++ hashes.
+This draft is not complete-header/source-driver credit and is excluded from
+the polynomial query commit.
+
+Container private READY update: .cache/sat-solver-check-final-inventory.json
+freezes42 Go files (24new/18existing) narrowly compared to committed7c4af64;
+.cache/sat-solver-check-final-source-map.json records exact selected methods,
+adaptations and remaining full-solver obligations. Focused498 top-level SAT/
+Params/Resource tests green both profiles (1276/1278 RUN), both vets and source/
+no-generics audit green. Original registered UserScope campaign now actually
+executes42checks/168clauses privately, with pending tag removed only after
+implementation. Real constructor73refusals then success, bounded Check5 then
+success, UserGC2 then success; named physical graph before lifting fault, warm
+Check0 Go alloc/23blocks plateau. No master integration or full master gate
+credit yet. Agent preparing machine manifest proposal and separate next-source
+workspace, retaining exact frozen bytes.
+
+Query final-manifest source/no-generics rerun terminal0:
+.cache/polynomial-query-final-manifest-source.log reports2102units/677APIs,
+30ported/184partial/1888unported. Master778 Go SHA snapshot independently
+reverified during live checked/debug gate; no edits to tested Go bytes.
+
+Polynomial query full authoritative gates terminal GREEN: native98.094s,
+checked/debug767.578s, vet-native4.155s, vet-debug4.244s, source139.097s.
+.cache/polynomial-query-complete-gates.json and Go snapshot prove unchanged778
+files across all five gates; runner5893 terminal0 with explicit immutable check.
+Final corrected-manifest source/no-generics rerun66610 also terminal0. Frozen
+six-file bytes rechecked against immutable private prerequisite, no Microsoft
+copyright in new headers, full repo-relative source paths retained. Diff
+whitespace audit green. Coherent query chunk ready for commit; full objective
+remains active with full imp/GCD/PSC and remaining solver families open.

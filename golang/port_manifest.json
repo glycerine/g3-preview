@@ -28355,7 +28355,11 @@
         "mpnum/polynomial_newton.go",
         "mpnum/polynomial_newton_vector.go",
         "mpnum/polynomial_newton_test.go",
-        "mpnum/polynomial_newton_physical_test.go"
+        "mpnum/polynomial_newton_physical_test.go",
+        "mpnum/polynomial_degree_coefficient.go",
+        "mpnum/polynomial_power.go",
+        "mpnum/polynomial_equal.go",
+        "mpnum/polynomial_query_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -28475,7 +28479,15 @@
         "TestPolynomialNewtonWholeSourcePushBeforeOwningAbort",
         "TestPolynomialNewtonRefVectorSourceResetStop",
         "TestPolynomialNewtonLazySourceFlushBeforeOwningAbort",
-        "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock"
+        "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock",
+        "TestPolynomialQueryCoefficientIndependentMaps",
+        "TestPolynomialQueryPowerLinearIndependentOracle",
+        "TestPolynomialQueryEqualSourceOrderAndPermutation",
+        "TestPolynomialQueryPowerAssignmentStoppedCallback",
+        "TestPolynomialQueryUnivariateLinearAndScalarCoefficient",
+        "TestPolynomialQueryReachedFieldReadProfiles",
+        "TestPolynomialQueryCoefficientPhysicalFailurePrefixes",
+        "TestPolynomialQueryEqualScratchPhysicalFailures"
       ],
       "conditionals": [
         {
@@ -30498,6 +30510,66 @@
             "TestPolynomialNewtonLazySourceFlushBeforeOwningAbort",
             "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock"
           ]
+        },
+        {
+          "name": "is_zero/is_const/max_var/degree/is_univariate/is_linear/total_degree/univariate coeff queries (cpp1697-1818)",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_degree_coefficient.go",
+          "tests": [
+            "TestPolynomialQueryCoefficientIndependentMaps",
+            "TestPolynomialQueryPowerLinearIndependentOracle",
+            "TestPolynomialQueryEqualSourceOrderAndPermutation",
+            "TestPolynomialQueryPowerAssignmentStoppedCallback",
+            "TestPolynomialQueryUnivariateLinearAndScalarCoefficient",
+            "TestPolynomialQueryReachedFieldReadProfiles",
+            "TestPolynomialQueryCoefficientPhysicalFailurePrefixes",
+            "TestPolynomialQueryEqualScratchPhysicalFailures"
+          ]
+        },
+        {
+          "name": "coeff and coeff with reduct, constant_coeff, lc (cpp3264-3338,3551-3553)",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_degree_coefficient.go",
+          "tests": [
+            "TestPolynomialQueryCoefficientIndependentMaps",
+            "TestPolynomialQueryPowerLinearIndependentOracle",
+            "TestPolynomialQueryEqualSourceOrderAndPermutation",
+            "TestPolynomialQueryPowerAssignmentStoppedCallback",
+            "TestPolynomialQueryUnivariateLinearAndScalarCoefficient",
+            "TestPolynomialQueryReachedFieldReadProfiles",
+            "TestPolynomialQueryCoefficientPhysicalFailurePrefixes",
+            "TestPolynomialQueryEqualScratchPhysicalFailures"
+          ]
+        },
+        {
+          "name": "active linear repeated-multiplication power with source result scope (cpp4600-4623)",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_power.go",
+          "tests": [
+            "TestPolynomialQueryCoefficientIndependentMaps",
+            "TestPolynomialQueryPowerLinearIndependentOracle",
+            "TestPolynomialQueryEqualSourceOrderAndPermutation",
+            "TestPolynomialQueryPowerAssignmentStoppedCallback",
+            "TestPolynomialQueryUnivariateLinearAndScalarCoefficient",
+            "TestPolynomialQueryReachedFieldReadProfiles",
+            "TestPolynomialQueryCoefficientPhysicalFailurePrefixes",
+            "TestPolynomialQueryEqualScratchPhysicalFailures"
+          ]
+        },
+        {
+          "name": "eq and source m_m2pos set/reset order (cpp449-505,4631-4655)",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_equal.go",
+          "tests": [
+            "TestPolynomialQueryCoefficientIndependentMaps",
+            "TestPolynomialQueryPowerLinearIndependentOracle",
+            "TestPolynomialQueryEqualSourceOrderAndPermutation",
+            "TestPolynomialQueryPowerAssignmentStoppedCallback",
+            "TestPolynomialQueryUnivariateLinearAndScalarCoefficient",
+            "TestPolynomialQueryReachedFieldReadProfiles",
+            "TestPolynomialQueryCoefficientPhysicalFailurePrefixes",
+            "TestPolynomialQueryEqualScratchPhysicalFailures"
+          ]
         }
       ],
       "ownership": [
@@ -30514,7 +30586,8 @@
         "Same actual factory engines report created/started outcome; source callee creation is retained on guard and only originating core owns explicit abort authority.",
         "Separate owning Close/CleanupConstruction/CleanupValue aborts versus literal SourceFinalizePrefix; no completed imp destructor on failed construction.",
         "Static charged borrowed deletion handlers preserve next-read after callback; process/global handler binding not provided.",
-        "INC-before-push/assign roots retained separately; source completed local/member destruction precedes explicit owning abort. Real TLS constructor error returns allocated pending block: source-only implicit member unwind retains method-local cold owner until CleanupNewtonInterpolation. Existing foreign callee pending roots remain borrowed."
+        "INC-before-push/assign roots retained separately; source completed local/member destruction precedes explicit owning abort. Real TLS constructor error returns allocated pending block: source-only implicit member unwind retains method-local cold owner until CleanupNewtonInterpolation. Existing foreign callee pending roots remain borrowed.",
+        "Query prerequisite uses one embedded actual m_m2pos scratch member and source Power local reference. Generated div_x monomial ownership records actual factory created/started outcome before coefficient copy/INC; no registry/RC0 inference. Stopped local destruction and unjoined INC remain for explicit owning cleanup."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -30535,7 +30608,8 @@
         "No source registered ENSURE credit: original Newton driver is dormant after early return.",
         "Signed int32 loop/count conversion uses explicit reached UB guard; actual vector pointer/numeral codecs are storage adapters, not native sizeof equivalence.",
         "Public source-finalization API for persistent Newton vector remains a next coherent member-lifecycle extension; current Flush source body and Close owning protocol are distinct.",
-        "Go cold child directory and reference owner fields are charged actual representation. External manager lifetime is borrowed."
+        "Go cold child directory and reference owner fields are charged actual representation. External manager lifetime is borrowed.",
+        "Source coeff argument evaluation chooses coefficient read before RemoveVariable within allowed C++11 evaluation order. Source active linear Power preserved; #if0 alternative remains unported inventory. Full imp/GCD/PSC and global assertion/TRACE bindings remain open. See PORT_PROGRESS.md."
       ]
     },
     {
@@ -30591,7 +30665,11 @@
         "mpnum/polynomial_newton.go",
         "mpnum/polynomial_newton_vector.go",
         "mpnum/polynomial_newton_test.go",
-        "mpnum/polynomial_newton_physical_test.go"
+        "mpnum/polynomial_newton_physical_test.go",
+        "mpnum/polynomial_degree_coefficient.go",
+        "mpnum/polynomial_power.go",
+        "mpnum/polynomial_equal.go",
+        "mpnum/polynomial_query_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -30711,7 +30789,15 @@
         "TestPolynomialNewtonWholeSourcePushBeforeOwningAbort",
         "TestPolynomialNewtonRefVectorSourceResetStop",
         "TestPolynomialNewtonLazySourceFlushBeforeOwningAbort",
-        "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock"
+        "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock",
+        "TestPolynomialQueryCoefficientIndependentMaps",
+        "TestPolynomialQueryPowerLinearIndependentOracle",
+        "TestPolynomialQueryEqualSourceOrderAndPermutation",
+        "TestPolynomialQueryPowerAssignmentStoppedCallback",
+        "TestPolynomialQueryUnivariateLinearAndScalarCoefficient",
+        "TestPolynomialQueryReachedFieldReadProfiles",
+        "TestPolynomialQueryCoefficientPhysicalFailurePrefixes",
+        "TestPolynomialQueryEqualScratchPhysicalFailures"
       ],
       "conditionals": [
         {
@@ -31506,6 +31592,66 @@
             "TestPolynomialNewtonLazySourceFlushBeforeOwningAbort",
             "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock"
           ]
+        },
+        {
+          "name": "is_zero/is_const/max_var/degree/is_univariate/is_linear/total_degree/univariate coeff queries (cpp1697-1818)",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_degree_coefficient.go",
+          "tests": [
+            "TestPolynomialQueryCoefficientIndependentMaps",
+            "TestPolynomialQueryPowerLinearIndependentOracle",
+            "TestPolynomialQueryEqualSourceOrderAndPermutation",
+            "TestPolynomialQueryPowerAssignmentStoppedCallback",
+            "TestPolynomialQueryUnivariateLinearAndScalarCoefficient",
+            "TestPolynomialQueryReachedFieldReadProfiles",
+            "TestPolynomialQueryCoefficientPhysicalFailurePrefixes",
+            "TestPolynomialQueryEqualScratchPhysicalFailures"
+          ]
+        },
+        {
+          "name": "coeff and coeff with reduct, constant_coeff, lc (cpp3264-3338,3551-3553)",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_degree_coefficient.go",
+          "tests": [
+            "TestPolynomialQueryCoefficientIndependentMaps",
+            "TestPolynomialQueryPowerLinearIndependentOracle",
+            "TestPolynomialQueryEqualSourceOrderAndPermutation",
+            "TestPolynomialQueryPowerAssignmentStoppedCallback",
+            "TestPolynomialQueryUnivariateLinearAndScalarCoefficient",
+            "TestPolynomialQueryReachedFieldReadProfiles",
+            "TestPolynomialQueryCoefficientPhysicalFailurePrefixes",
+            "TestPolynomialQueryEqualScratchPhysicalFailures"
+          ]
+        },
+        {
+          "name": "active linear repeated-multiplication power with source result scope (cpp4600-4623)",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_power.go",
+          "tests": [
+            "TestPolynomialQueryCoefficientIndependentMaps",
+            "TestPolynomialQueryPowerLinearIndependentOracle",
+            "TestPolynomialQueryEqualSourceOrderAndPermutation",
+            "TestPolynomialQueryPowerAssignmentStoppedCallback",
+            "TestPolynomialQueryUnivariateLinearAndScalarCoefficient",
+            "TestPolynomialQueryReachedFieldReadProfiles",
+            "TestPolynomialQueryCoefficientPhysicalFailurePrefixes",
+            "TestPolynomialQueryEqualScratchPhysicalFailures"
+          ]
+        },
+        {
+          "name": "eq and source m_m2pos set/reset order (cpp449-505,4631-4655)",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_equal.go",
+          "tests": [
+            "TestPolynomialQueryCoefficientIndependentMaps",
+            "TestPolynomialQueryPowerLinearIndependentOracle",
+            "TestPolynomialQueryEqualSourceOrderAndPermutation",
+            "TestPolynomialQueryPowerAssignmentStoppedCallback",
+            "TestPolynomialQueryUnivariateLinearAndScalarCoefficient",
+            "TestPolynomialQueryReachedFieldReadProfiles",
+            "TestPolynomialQueryCoefficientPhysicalFailurePrefixes",
+            "TestPolynomialQueryEqualScratchPhysicalFailures"
+          ]
         }
       ],
       "ownership": [
@@ -31522,7 +31668,8 @@
         "Same actual factory engines report created/started outcome; source callee creation is retained on guard and only originating core owns explicit abort authority.",
         "Separate owning Close/CleanupConstruction/CleanupValue aborts versus literal SourceFinalizePrefix; no completed imp destructor on failed construction.",
         "Static charged borrowed deletion handlers preserve next-read after callback; process/global handler binding not provided.",
-        "INC-before-push/assign roots retained separately; source completed local/member destruction precedes explicit owning abort. Real TLS constructor error returns allocated pending block: source-only implicit member unwind retains method-local cold owner until CleanupNewtonInterpolation. Existing foreign callee pending roots remain borrowed."
+        "INC-before-push/assign roots retained separately; source completed local/member destruction precedes explicit owning abort. Real TLS constructor error returns allocated pending block: source-only implicit member unwind retains method-local cold owner until CleanupNewtonInterpolation. Existing foreign callee pending roots remain borrowed.",
+        "Query prerequisite uses one embedded actual m_m2pos scratch member and source Power local reference. Generated div_x monomial ownership records actual factory created/started outcome before coefficient copy/INC; no registry/RC0 inference. Stopped local destruction and unjoined INC remain for explicit owning cleanup."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -31543,7 +31690,8 @@
         "No source registered ENSURE credit: original Newton driver is dormant after early return.",
         "Signed int32 loop/count conversion uses explicit reached UB guard; actual vector pointer/numeral codecs are storage adapters, not native sizeof equivalence.",
         "Public source-finalization API for persistent Newton vector remains a next coherent member-lifecycle extension; current Flush source body and Close owning protocol are distinct.",
-        "Go cold child directory and reference owner fields are charged actual representation. External manager lifetime is borrowed."
+        "Go cold child directory and reference owner fields are charged actual representation. External manager lifetime is borrowed.",
+        "Source coeff argument evaluation chooses coefficient read before RemoveVariable within allowed C++11 evaluation order. Source active linear Power preserved; #if0 alternative remains unported inventory. Full imp/GCD/PSC and global assertion/TRACE bindings remain open. See PORT_PROGRESS.md."
       ]
     },
     {

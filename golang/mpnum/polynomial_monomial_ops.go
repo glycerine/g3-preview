@@ -646,6 +646,18 @@ func (m *MonomialManager) Sqrt(a Monomial) (Monomial, bool, error) {
 	return r, true, e
 }
 func (m *MonomialManager) variableTransform(a Monomial, v, k uint32, operation uint8) (Monomial, error) {
+	return m.variableTransformCreated(a, v, k, operation, nil)
+}
+
+func (m *MonomialManager) variableTransformCreated(a Monomial, v, k uint32, operation uint8, outcome *monomialFactoryOutcome) (result Monomial, cause error) {
+	defer func() {
+		if cause == nil {
+			m.creation = monomialCreation{}
+		}
+	}()
+	if outcome != nil {
+		*outcome = monomialFactoryOutcome{}
+	}
 	if e := m.check(); e != nil {
 		return Monomial{}, e
 	}
@@ -714,7 +726,7 @@ func (m *MonomialManager) variableTransform(a Monomial, v, k uint32, operation u
 	if e = m.tempSetSize(t, n); e != nil {
 		return Monomial{}, e
 	}
-	return m.internTemp(1)
+	return m.internTempCreated(1, outcome)
 }
 func (m *MonomialManager) DivideVariablePower(a Monomial, v, k uint32) (Monomial, error) {
 	return m.variableTransform(a, v, k, 0)
@@ -727,3 +739,7 @@ func (m *MonomialManager) Derivative(a Monomial, v uint32) (Monomial, error) {
 }
 
 var _ = arena.ErrBounds
+
+func (m *MonomialManager) removeVariableCreated(a Monomial, v uint32, outcome *monomialFactoryOutcome) (Monomial, error) {
+	return m.variableTransformCreated(a, v, 0, 1, outcome)
+}
