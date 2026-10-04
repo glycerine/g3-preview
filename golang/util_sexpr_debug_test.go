@@ -1,6 +1,6 @@
 //go:build g3debug
 
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Source: src/util/sexpr.cpp; src/util/mpq.h (debug ownership audit adaptation). Licensed under the MIT license.
 package g3
 
 import (
@@ -132,6 +132,11 @@ func sexprAuditNumericRoots(t *testing.T, q *mpnum.RationalService, value *mpnum
 	}
 	for _, name := range []string{"nTmp", "addTmp1", "addTmp2", "addMulTmp", "ltTmp1", "ltTmp2"} {
 		numeral(manager.FieldByName(name))
+	}
+	arithmetic := manager.FieldByName("rawArithmetic")
+	if arithmetic.FieldByName("compareActive").Bool() {
+		numeral(arithmetic.FieldByName("compareOne"))
+		numeral(arithmetic.FieldByName("compareTwo"))
 	}
 	for _, name := range []string{"zero", "one", "minusOne", "infZero", "infOne", "infMinusOne", "infIntZero", "infIntOne", "infIntMinusOne"} {
 		numeral(service.FieldByName(name))

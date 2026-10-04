@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation
+// Source: src/util/rational.h; src/util/rational.cpp. Licensed under the MIT license.
 // Concrete owner-local core of src/util/rational.h/.cpp and vector.h.
 package mpnum
 
@@ -220,10 +220,10 @@ func (s *RationalService) Swap(a, b *OwnedRational) error {
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return e
 	}
-	if e := s.check(b); e != nil {
+	if e := s.rationalScalarOwner(b); e != nil {
 		return e
 	}
 	return s.manager.Swap(&a.raw, &b.raw)
@@ -306,10 +306,10 @@ func (s *RationalService) Equal(a, b *OwnedRational) (bool, error) {
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return false, e
 	}
-	if e := s.check(b); e != nil {
+	if e := s.rationalScalarOwner(b); e != nil {
 		return false, e
 	}
 	return s.manager.Equal(&a.raw, &b.raw)

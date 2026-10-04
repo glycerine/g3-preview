@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation
+// Source: src/util/mpq.h; src/util/mpq.cpp. Licensed under the MIT license.
 // Source: src/util/mpq.h and src/util/mpq.cpp, Leonardo de Moura (2010-06-21).
 package mpnum
 
@@ -138,7 +138,7 @@ func (m *RationalManager) Del(a *Rational) error {
 	return m.z.Del(&a.den)
 }
 func (m *RationalManager) Reset(a *Rational) error {
-	if e := m.checkCleanup(a); e != nil {
+	if e := m.checkScalarValue(a); e != nil {
 		return e
 	}
 	if e := m.z.Reset(&a.num); e != nil {
@@ -147,22 +147,22 @@ func (m *RationalManager) Reset(a *Rational) error {
 	return m.resetDenominator(a)
 }
 func (m *RationalManager) Neg(a *Rational) error {
-	if e := m.check(a); e != nil {
+	if e := m.checkScalarValue(a); e != nil {
 		return e
 	}
 	return m.z.Neg(&a.num)
 }
 func (m *RationalManager) Abs(a *Rational) error {
-	if e := m.check(a); e != nil {
+	if e := m.checkScalarValue(a); e != nil {
 		return e
 	}
 	return m.z.Abs(&a.num)
 }
 func (m *RationalManager) Move(dst, src *Rational) error {
-	if e := m.check(dst); e != nil {
+	if e := m.checkScalarValue(dst); e != nil {
 		return e
 	}
-	if e := m.check(src); e != nil {
+	if e := m.checkScalarValue(src); e != nil {
 		return e
 	}
 	if dst == src {
@@ -174,10 +174,10 @@ func (m *RationalManager) Move(dst, src *Rational) error {
 	return m.z.Move(&dst.den, &src.den)
 }
 func (m *RationalManager) Swap(a, b *Rational) error {
-	if e := m.check(a); e != nil {
+	if e := m.checkScalarValue(a); e != nil {
 		return e
 	}
-	if e := m.check(b); e != nil {
+	if e := m.checkScalarValue(b); e != nil {
 		return e
 	}
 	if e := m.z.Swap(&a.num, &b.num); e != nil {
@@ -372,10 +372,10 @@ func (m *RationalManager) InvInPlace(a *Rational) error {
 }
 
 func (m *RationalManager) Equal(a, b *Rational) (bool, error) {
-	if e := m.check(a); e != nil {
+	if e := m.checkScalarValue(a); e != nil {
 		return false, e
 	}
-	if e := m.check(b); e != nil {
+	if e := m.checkScalarValue(b); e != nil {
 		return false, e
 	}
 	n, e := m.z.Compare(&a.num, &b.num)
@@ -387,11 +387,11 @@ func (m *RationalManager) Equal(a, b *Rational) (bool, error) {
 }
 
 // Compare preserves source rat_lt's sign shortcuts and exact cross-products.
-func (m *RationalManager) Compare(a, b *Rational) (int, error) {
-	if e := m.check(a); e != nil {
+func (m *RationalManager) Compare(a, b *Rational) (_rawValue int, _rawErr error) {
+	if e := m.checkScalarValue(a); e != nil {
 		return 0, e
 	}
-	if e := m.check(b); e != nil {
+	if e := m.checkScalarValue(b); e != nil {
 		return 0, e
 	}
 	if isIntegerRational(a) && isIntegerRational(b) {
@@ -418,10 +418,18 @@ func (m *RationalManager) Compare(a, b *Rational) (int, error) {
 	}
 	one, two := &m.ltTmp1, &m.ltTmp2
 	if m.synchronized {
-		localOne, localTwo := NewRational(), NewRational()
-		one, two = &localOne, &localTwo
-		defer m.drop(one)
-		defer m.drop(two)
+		r := &m.rawArithmetic
+		if r.compareActive {
+			return 0, ErrRationalRawArithmeticPending
+		}
+		r.compareOne, r.compareTwo = NewRational(), NewRational()
+		r.compareActive = true
+		r.compareEnd = false
+		r.compareGuard = false
+		r.compareCursor = 0
+		r.compareCause = nil
+		one, two = &r.compareOne, &r.compareTwo
+		defer m.finishRawCompare(&_rawErr)
 	}
 	if e := m.z.Mul(&a.num, &b.den, &one.num); e != nil {
 		return 0, e
@@ -435,7 +443,16 @@ func (m *RationalManager) Compare(a, b *Rational) (int, error) {
 	if e := m.resetDenominator(two); e != nil {
 		return 0, e
 	}
-	return m.z.Compare(&one.num, &two.num)
+	value, e := m.z.Compare(&one.num, &two.num)
+	if e != nil {
+		return 0, e
+	}
+	if m.synchronized {
+		if e := m.rawCompareEnd(); e != nil {
+			return 0, e
+		}
+	}
+	return value, nil
 }
 
 func (m *RationalManager) Add(a, b, out *Rational) error { return m.addSub(a, b, out, false) }

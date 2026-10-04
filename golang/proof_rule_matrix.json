@@ -8617,424 +8617,319 @@
   },
   "sources": [
     {
-      "path": "src/api/api_ast.cpp",
-      "sha256": "1a45e5f5016061f6005e0fd4ad2f15df16bb78f6f7b92992ca76b0954e998bc7"
+      "path": "src/api/api_ast.cpp"
     },
     {
-      "path": "src/ast/ast.cpp",
-      "sha256": "ac1de339a71c12fabaf951db2b0936bb1a84990b337ce268490633cb7bb5ff52"
+      "path": "src/ast/ast.cpp"
     },
     {
-      "path": "src/ast/ast.h",
-      "sha256": "5d006f0ccd5f44f25bc8e0de9f629d49cd1df8fa1275bb121696cd922d0069fd"
+      "path": "src/ast/ast.h"
     },
     {
-      "path": "src/ast/macros/macro_finder.cpp",
-      "sha256": "2fe016331242f3bb815af842ad144b16e9a3d368a26d868f09063bd2f358b990"
+      "path": "src/ast/macros/macro_finder.cpp"
     },
     {
-      "path": "src/ast/macros/macro_manager.cpp",
-      "sha256": "598ee68757c86d75952d2e7ff7ee65c470c69e1257a8f43b9fdefc4d8bd351de"
+      "path": "src/ast/macros/macro_manager.cpp"
     },
     {
-      "path": "src/ast/macros/quasi_macros.cpp",
-      "sha256": "8d80e99fb0c28408ee81e4e6b43fea7726a6dc0dcc5aeeadd0c5d491602d1b47"
+      "path": "src/ast/macros/quasi_macros.cpp"
     },
     {
-      "path": "src/ast/normal_forms/defined_names.cpp",
-      "sha256": "0418f16a07740e8f879a8e15bc04200c52f30243ba532ff0bd9241ec0d35f74c"
+      "path": "src/ast/normal_forms/defined_names.cpp"
     },
     {
-      "path": "src/ast/normal_forms/nnf.cpp",
-      "sha256": "560de5b04fa04bb4304e696d12198c42ac91c3d8bbd47a03b74f007bb4645acc"
+      "path": "src/ast/normal_forms/nnf.cpp"
     },
     {
-      "path": "src/ast/normal_forms/pull_quant.cpp",
-      "sha256": "6dcf26773146936ff073d12a7f736721a0207d649e7feedb678f257e0ad4cccb"
+      "path": "src/ast/normal_forms/pull_quant.cpp"
     },
     {
-      "path": "src/ast/pattern/pattern_inference.cpp",
-      "sha256": "939f1ffa19d70e089607833b6d9159aacd4aae94434f986d64d1f7c5b7db5a53"
+      "path": "src/ast/pattern/pattern_inference.cpp"
     },
     {
-      "path": "src/ast/proofs/proof_checker.cpp",
-      "sha256": "bcf2143e5d836373b99869b03e611d3a9ec8baa9f22f31949e9b452abfd03f43"
+      "path": "src/ast/proofs/proof_checker.cpp"
     },
     {
-      "path": "src/ast/proofs/proof_checker.h",
-      "sha256": "0d230e3cfbd6188b3ed6df7f4fe113b21b28b13c444aea2de7aeb4ca8cbbbea7"
+      "path": "src/ast/proofs/proof_checker.h"
     },
     {
-      "path": "src/ast/proofs/proof_utils.cpp",
-      "sha256": "a60902c72ecf047ba934b76c419b3ed42a7120d5e30c8b5aa08b678542db56c0"
+      "path": "src/ast/proofs/proof_utils.cpp"
     },
     {
-      "path": "src/ast/proofs/proof_utils.h",
-      "sha256": "aa635cb6a0ac1e9fd30f6c913cecabdf03012bb0d38f10dbc75f701751289f98"
+      "path": "src/ast/proofs/proof_utils.h"
     },
     {
-      "path": "src/ast/rewriter/bit2int.cpp",
-      "sha256": "017ac47537539d214fc9934cda527e7dda0379ae975c8ce620dda6204e9a2db3"
+      "path": "src/ast/rewriter/bit2int.cpp"
     },
     {
-      "path": "src/ast/rewriter/bv_elim.cpp",
-      "sha256": "a8af813f021e6086f99bb4f14530f1ae6a975e0daecafb744a7506f3a5cde72b"
+      "path": "src/ast/rewriter/bv_elim.cpp"
     },
     {
-      "path": "src/ast/rewriter/der.cpp",
-      "sha256": "b5be4a0dc0355eb8044612d5501b397ae901d36a5345e541645d5bbe73d2bb9b"
+      "path": "src/ast/rewriter/der.cpp"
     },
     {
-      "path": "src/ast/rewriter/elim_bounds.cpp",
-      "sha256": "c6bde495c4bf820c43fa5ab0d71ddc5b8b546db4c35cc755711b9109eef9436c"
+      "path": "src/ast/rewriter/elim_bounds.cpp"
     },
     {
-      "path": "src/ast/rewriter/label_rewriter.cpp",
-      "sha256": "d71fffb803dbd648390fc6b8982ca367ef62cf7418fe584183152c1cd92cc9d5"
+      "path": "src/ast/rewriter/label_rewriter.cpp"
     },
     {
-      "path": "src/ast/rewriter/push_app_ite.cpp",
-      "sha256": "913aa7e79746dfdf04bcea0447656e4daecbbe34d038a499a04a45ebcf41aadb"
+      "path": "src/ast/rewriter/push_app_ite.cpp"
     },
     {
-      "path": "src/ast/rewriter/rewriter_def.h",
-      "sha256": "902d8edae2424ee53c10b115ab5e78cbe05981ffaefc6ae6e9c8d8a91187a7e6"
+      "path": "src/ast/rewriter/rewriter_def.h"
     },
     {
-      "path": "src/ast/rewriter/th_rewriter.cpp",
-      "sha256": "8a901d462780a19dcf5b4e68addcfbaecea413d24378ac4cbd28fa2481143436"
+      "path": "src/ast/rewriter/th_rewriter.cpp"
     },
     {
-      "path": "src/cmd_context/cmd_context_to_goal.cpp",
-      "sha256": "06c37300030e961947596f37370dd843ffc151e09f4b1d74deb5dcfb5a4e14c9"
+      "path": "src/cmd_context/cmd_context_to_goal.cpp"
     },
     {
-      "path": "src/duality/duality_wrapper.cpp",
-      "sha256": "dccb88d9c960558de5f470ac11012bf33358fcfda66884434ac8b435a46ce3e8"
+      "path": "src/duality/duality_wrapper.cpp"
     },
     {
-      "path": "src/interp/iz3interp.cpp",
-      "sha256": "a5b307009b5ba65c8b2022dde7d7fe20c2487fd8d7df868a2a454f1ec13ce8b3"
+      "path": "src/interp/iz3interp.cpp"
     },
     {
-      "path": "src/interp/iz3mgr.cpp",
-      "sha256": "5a34617080b060a56684075215f77688f9431dadecd1255f74444be4f7eb10db"
+      "path": "src/interp/iz3mgr.cpp"
     },
     {
-      "path": "src/interp/iz3mgr.h",
-      "sha256": "fa87ae73c86cf7510c310b292e5244be7f5cbeb22d87f178978d3f149c21fdc2"
+      "path": "src/interp/iz3mgr.h"
     },
     {
-      "path": "src/interp/iz3proof_itp.cpp",
-      "sha256": "98ccffb81edd33a2b42575c25a18bf2d5e54d04419e22a7a735791161fb1010f"
+      "path": "src/interp/iz3proof_itp.cpp"
     },
     {
-      "path": "src/interp/iz3proof_itp.h",
-      "sha256": "a8ed708ebebe04dd8f819c7583ab1a2065090f93351b257feff7117ac4d68ba6"
+      "path": "src/interp/iz3proof_itp.h"
     },
     {
-      "path": "src/interp/iz3translate.cpp",
-      "sha256": "efe580fdcd3de1fcd7f46eeb724d75fcd92fa59af49333fc7e6cb6460a208256"
+      "path": "src/interp/iz3translate.cpp"
     },
     {
-      "path": "src/interp/iz3translate.h",
-      "sha256": "2ae64fbee825268f7cc1b8c6e2a4aa5e813de7c188e8df3805220c9b8f6f9784"
+      "path": "src/interp/iz3translate.h"
     },
     {
-      "path": "src/interp/iz3translate_direct.cpp",
-      "sha256": "b9bf6a5f9c5ce3282652643de43a616285720ecd726230beebc66f2aeb88934b"
+      "path": "src/interp/iz3translate_direct.cpp"
     },
     {
-      "path": "src/muz/base/dl_boogie_proof.cpp",
-      "sha256": "bb0c4e38c987fd02c83fa40219a2b7f1386a5ad37b805950c6c10df736c55862"
+      "path": "src/muz/base/dl_boogie_proof.cpp"
     },
     {
-      "path": "src/muz/base/dl_context.cpp",
-      "sha256": "1340178dee6ed912b69e57bf0ccbbec33224908419edc6c307bbee3cf28c3afd"
+      "path": "src/muz/base/dl_context.cpp"
     },
     {
-      "path": "src/muz/base/dl_engine_base.h",
-      "sha256": "470d365c12237a3ccc8ec95497cb661127ee7d6ac12387cdd68cc9da1fdef9c6"
+      "path": "src/muz/base/dl_engine_base.h"
     },
     {
-      "path": "src/muz/base/dl_rule.cpp",
-      "sha256": "d75c30fcbc19ad53b3e7393a52381455abdaaf2acd157b67149f2b731e9801de"
+      "path": "src/muz/base/dl_rule.cpp"
     },
     {
-      "path": "src/muz/base/dl_util.cpp",
-      "sha256": "73eda16d6083cb8fe11e74333568cbbf1e68abf72808c3cf40fa80dd41543d66"
+      "path": "src/muz/base/dl_util.cpp"
     },
     {
-      "path": "src/muz/base/hnf.cpp",
-      "sha256": "2de44b5ab5a27faec7824a221bd1870f1e559554c94800800ef08dd273b5cfe2"
+      "path": "src/muz/base/hnf.cpp"
     },
     {
-      "path": "src/muz/bmc/dl_bmc_engine.cpp",
-      "sha256": "3a5faa930cd08ccd6a03f9a6a4e6375ec1ea4246be017e26623f536937d2cdd6"
+      "path": "src/muz/bmc/dl_bmc_engine.cpp"
     },
     {
-      "path": "src/muz/duality/duality_dl_interface.cpp",
-      "sha256": "051e010adc8dd8626e2cddc2f366ec2d5322940dd33e80b295407ae2e265d129"
+      "path": "src/muz/duality/duality_dl_interface.cpp"
     },
     {
-      "path": "src/muz/pdr/pdr_context.cpp",
-      "sha256": "8409e7e76d838decadf4f1079f1de7f30152f00ee83372e2849000f2da7bc92b"
+      "path": "src/muz/pdr/pdr_context.cpp"
     },
     {
-      "path": "src/muz/pdr/pdr_farkas_learner.cpp",
-      "sha256": "136da60be608e1aa68c24eae06464ecf0e00f9a05abf580906dc5d013ac85123"
+      "path": "src/muz/pdr/pdr_farkas_learner.cpp"
     },
     {
-      "path": "src/muz/pdr/pdr_prop_solver.cpp",
-      "sha256": "9c82bb071d575f28bcd5e0325305bd63637e3613cc605f5bc1ab249eb6da9654"
+      "path": "src/muz/pdr/pdr_prop_solver.cpp"
     },
     {
-      "path": "src/muz/pdr/pdr_util.cpp",
-      "sha256": "9dd0a81ed0a71a9eeffbbe10deb700d87f750a2863699db75928db567a200dbb"
+      "path": "src/muz/pdr/pdr_util.cpp"
     },
     {
-      "path": "src/muz/spacer/spacer_context.cpp",
-      "sha256": "8058ea63e563a214ed75c64573d2d8856549940cf95db7eb0445b4d5142e7e2f"
+      "path": "src/muz/spacer/spacer_context.cpp"
     },
     {
-      "path": "src/muz/spacer/spacer_farkas_learner.cpp",
-      "sha256": "2358210770ed7a3675da38ff82d2752056ed5375e4738b18c7023e94788f4478"
+      "path": "src/muz/spacer/spacer_farkas_learner.cpp"
     },
     {
-      "path": "src/muz/spacer/spacer_itp_solver.cpp",
-      "sha256": "6a9d8efae54fcf52fa9ed095a4865078142916070b2e6e27e81846ed514917f0"
+      "path": "src/muz/spacer/spacer_itp_solver.cpp"
     },
     {
-      "path": "src/muz/spacer/spacer_legacy_mbp.cpp",
-      "sha256": "51cd4ae148f73ea5069fd0a2f3f1814c361a495d5de4a6fc319cc5868c89f0f1"
+      "path": "src/muz/spacer/spacer_legacy_mbp.cpp"
     },
     {
-      "path": "src/muz/spacer/spacer_unsat_core_learner.cpp",
-      "sha256": "eefad79f42a0b33d6ba0e12501c838bbe9ce03f62f77362d3eead297130fb8fb"
+      "path": "src/muz/spacer/spacer_unsat_core_learner.cpp"
     },
     {
-      "path": "src/muz/spacer/spacer_unsat_core_plugin.cpp",
-      "sha256": "2023ad36c33085753dd1f97a7354088ea55e0eed32c53540631b68bb360924f7"
+      "path": "src/muz/spacer/spacer_unsat_core_plugin.cpp"
     },
     {
-      "path": "src/muz/spacer/spacer_util.cpp",
-      "sha256": "b9531e2a4a2a89474bf4acb8019f61f71cc40c830995dca2fe593855110d4a80"
+      "path": "src/muz/spacer/spacer_util.cpp"
     },
     {
-      "path": "src/muz/tab/tab_context.cpp",
-      "sha256": "e6e2f7dc19350c210bfb77dda39455257aa4df256e583bd4d74a6b380ce474e5"
+      "path": "src/muz/tab/tab_context.cpp"
     },
     {
-      "path": "src/muz/transforms/dl_mk_array_blast.cpp",
-      "sha256": "3d3d7cfffc3521b5edd7d880725289cd89e8af29fb01aa465306f22ff32ad186"
+      "path": "src/muz/transforms/dl_mk_array_blast.cpp"
     },
     {
-      "path": "src/muz/transforms/dl_mk_bit_blast.cpp",
-      "sha256": "70d74a9dbeedadd99e5f71638f9bccad68d2c6fb0e920c99389ddb1d09f968dd"
+      "path": "src/muz/transforms/dl_mk_bit_blast.cpp"
     },
     {
-      "path": "src/muz/transforms/dl_mk_coalesce.cpp",
-      "sha256": "41f36e2b073235bbe95fdf01cb4d886f546963d6a21a0330f21dd860677adc65"
+      "path": "src/muz/transforms/dl_mk_coalesce.cpp"
     },
     {
-      "path": "src/muz/transforms/dl_mk_quantifier_instantiation.cpp",
-      "sha256": "80996f920a91a807af4563e77ca50b28c57359099f65f8381055a2747a043343"
+      "path": "src/muz/transforms/dl_mk_quantifier_instantiation.cpp"
     },
     {
-      "path": "src/muz/transforms/dl_mk_slice.cpp",
-      "sha256": "97f54d75085aba003e9ab034cbfe0fda82980f122f3fe4bd0c961c068deb226f"
+      "path": "src/muz/transforms/dl_mk_slice.cpp"
     },
     {
-      "path": "src/qe/qe.cpp",
-      "sha256": "2bd50d5cb278099a1e9a7359a8578182a9964a079ff1e67b240c5c97128f0018"
+      "path": "src/qe/qe.cpp"
     },
     {
-      "path": "src/qe/qe_lite.cpp",
-      "sha256": "01324a0af4a63ca7fc25a990c0bc10950ace27419eafe774724b9e97c1485bc7"
+      "path": "src/qe/qe_lite.cpp"
     },
     {
-      "path": "src/qe/qe_tactic.cpp",
-      "sha256": "74f3528db2adcda42d71b863c680acd9dfe4f8b6d8916d20ef8f1288f9fb9c9c"
+      "path": "src/qe/qe_tactic.cpp"
     },
     {
-      "path": "src/smt/asserted_formulas.cpp",
-      "sha256": "104b9dbe5c43b53a34163c3351eb3019d18f7fa98159d45863f4a33315103525"
+      "path": "src/smt/asserted_formulas.cpp"
     },
     {
-      "path": "src/smt/dyn_ack.cpp",
-      "sha256": "32569801e213fde0fc5f1218a43705c9b208a75f01c1408a4d882c52dcbdd2c8"
+      "path": "src/smt/dyn_ack.cpp"
     },
     {
-      "path": "src/smt/qi_queue.cpp",
-      "sha256": "8f37c2c08a0eff451289deac30c4484c25b07b87802c9de3ecc18f20042d9aa3"
+      "path": "src/smt/qi_queue.cpp"
     },
     {
-      "path": "src/smt/smt_conflict_resolution.cpp",
-      "sha256": "ce6df74cbcccac57a7748817d6b4f0480f8cff42001901b1eb08e6ae0589ae8a"
+      "path": "src/smt/smt_conflict_resolution.cpp"
     },
     {
-      "path": "src/smt/smt_context.cpp",
-      "sha256": "f41e7f4d9d46c32bcc78455bc324d7c6a1e3a01f57907d00bfd451028aba1a91"
+      "path": "src/smt/smt_context.cpp"
     },
     {
-      "path": "src/smt/smt_internalizer.cpp",
-      "sha256": "155eb979bb8701e55e5efe37629622b0020e0f6bf20323038827b712ee2d2de6"
+      "path": "src/smt/smt_internalizer.cpp"
     },
     {
-      "path": "src/smt/smt_justification.cpp",
-      "sha256": "c6d65a6cb6f08b7da175be1b20038b77e0303aaa1998787247d499e95655bc5c"
+      "path": "src/smt/smt_justification.cpp"
     },
     {
-      "path": "src/smt/theory_bv.cpp",
-      "sha256": "aa2a4c258b082e8a8be15386dfcb568163109e263e59fa6c388063180e0b48f2"
+      "path": "src/smt/theory_bv.cpp"
     },
     {
-      "path": "src/solver/tactic2solver.cpp",
-      "sha256": "71bd8e0b0b154d6c71818c2f33c14d46c0130ecb5c49a5c967fc71f7f5dbf4ea"
+      "path": "src/solver/tactic2solver.cpp"
     },
     {
-      "path": "src/tactic/arith/arith_bounds_tactic.cpp",
-      "sha256": "643cabe9253c39edd0dd164daec7d54797359955a12b230f49e2ba10b0b932c5"
+      "path": "src/tactic/arith/arith_bounds_tactic.cpp"
     },
     {
-      "path": "src/tactic/arith/card2bv_tactic.cpp",
-      "sha256": "53c69a5cf5a5e23bd0036f1415756258964c37a9ac13f49a7a1625495024438b"
+      "path": "src/tactic/arith/card2bv_tactic.cpp"
     },
     {
-      "path": "src/tactic/arith/degree_shift_tactic.cpp",
-      "sha256": "6ef881c5e436df68b7a015bf10988da70aeecb13037d14ce665284220ad9e953"
+      "path": "src/tactic/arith/degree_shift_tactic.cpp"
     },
     {
-      "path": "src/tactic/arith/elim01_tactic.cpp",
-      "sha256": "63f1535790800d8f481ab1feade5df539bc9e44cf74287e2aa5b92268bc3fd14"
+      "path": "src/tactic/arith/elim01_tactic.cpp"
     },
     {
-      "path": "src/tactic/arith/eq2bv_tactic.cpp",
-      "sha256": "baac2dc4044fea8b37d07c821dff4afefa272190dbc44e323a4d9b89215b9dbc"
+      "path": "src/tactic/arith/eq2bv_tactic.cpp"
     },
     {
-      "path": "src/tactic/arith/factor_tactic.cpp",
-      "sha256": "2db325273ef61605b90a53f78606a85f0821be5c25cb9f3427b78aabd0ebacbd"
+      "path": "src/tactic/arith/factor_tactic.cpp"
     },
     {
-      "path": "src/tactic/arith/fix_dl_var_tactic.cpp",
-      "sha256": "da10aa6fe8e7545a4e9dca11709b2eb8daa0a6ed5ce4ed506739b86d7e6465a0"
+      "path": "src/tactic/arith/fix_dl_var_tactic.cpp"
     },
     {
-      "path": "src/tactic/arith/lia2card_tactic.cpp",
-      "sha256": "deec6418fe18ec100b88736bab61618260755a39e1e797faad0c3e3819424cf7"
+      "path": "src/tactic/arith/lia2card_tactic.cpp"
     },
     {
-      "path": "src/tactic/arith/lia2pb_tactic.cpp",
-      "sha256": "8516961acce2ee5b4a147c2aabf0d02129b043592059d63384d3bdcc0bb6a1cf"
+      "path": "src/tactic/arith/lia2pb_tactic.cpp"
     },
     {
-      "path": "src/tactic/arith/normalize_bounds_tactic.cpp",
-      "sha256": "178047ef3920780cb77f2ddd156c319eee25d4981c4bac8928836a8874eaf80f"
+      "path": "src/tactic/arith/normalize_bounds_tactic.cpp"
     },
     {
-      "path": "src/tactic/arith/purify_arith_tactic.cpp",
-      "sha256": "757839335be0bf3a5caef4752dd19cf89c666e73db63e0513517363820285386"
+      "path": "src/tactic/arith/purify_arith_tactic.cpp"
     },
     {
-      "path": "src/tactic/bv/bit_blaster_tactic.cpp",
-      "sha256": "b81926abddb7496aa13392e098441bb0563ee872e96940605c7b145e0d1bc9bf"
+      "path": "src/tactic/bv/bit_blaster_tactic.cpp"
     },
     {
-      "path": "src/tactic/bv/bv1_blaster_tactic.cpp",
-      "sha256": "8112d9880611d4ce024ffdfec6034743bc7e0303e8c8c32ba86228e599fdceec"
+      "path": "src/tactic/bv/bv1_blaster_tactic.cpp"
     },
     {
-      "path": "src/tactic/bv/bvarray2uf_tactic.cpp",
-      "sha256": "6ca350348f772662353085cc083f0a13f2159cf7c35346f405aff301d017fca4"
+      "path": "src/tactic/bv/bvarray2uf_tactic.cpp"
     },
     {
-      "path": "src/tactic/bv/dt2bv_tactic.cpp",
-      "sha256": "a90ea66fa09aa126a1b37c55b94dff091113dcef39437c16ad2683a2b065bee5"
+      "path": "src/tactic/bv/dt2bv_tactic.cpp"
     },
     {
-      "path": "src/tactic/bv/elim_small_bv_tactic.cpp",
-      "sha256": "90dc579cc7578600e9a1cc6f31856b25442f527f63a706ff7006a78ef54ba05d"
+      "path": "src/tactic/bv/elim_small_bv_tactic.cpp"
     },
     {
-      "path": "src/tactic/bv/max_bv_sharing_tactic.cpp",
-      "sha256": "3d92d3b4bd92c23110b77fc8ed7ec9fa3d8e17b00a400b0073db8a0b37a1a6cb"
+      "path": "src/tactic/bv/max_bv_sharing_tactic.cpp"
     },
     {
-      "path": "src/tactic/core/blast_term_ite_tactic.cpp",
-      "sha256": "f2b252ca1cdfc90051fe01318664dbaf5c11ff2e57b600f98660e218ab0fd204"
+      "path": "src/tactic/core/blast_term_ite_tactic.cpp"
     },
     {
-      "path": "src/tactic/core/ctx_simplify_tactic.cpp",
-      "sha256": "272063d34536a84bfd56434d844c9da466d818bd1f85a4e23a50ae207b52c58c"
+      "path": "src/tactic/core/ctx_simplify_tactic.cpp"
     },
     {
-      "path": "src/tactic/core/der_tactic.cpp",
-      "sha256": "1ade1b14786de63b0a5d0fc65317a58eaae2e9be58c1398330c6bcba607550cf"
+      "path": "src/tactic/core/der_tactic.cpp"
     },
     {
-      "path": "src/tactic/core/distribute_forall_tactic.cpp",
-      "sha256": "a28631dcdce1b2aad9e98225ca8b27c5fa8f3c8d99e12a7a26aac78ba64f8024"
+      "path": "src/tactic/core/distribute_forall_tactic.cpp"
     },
     {
-      "path": "src/tactic/core/dom_simplify_tactic.cpp",
-      "sha256": "36810731e74b14e34b5093fbab657dba1300e38145e96ef7095d72acafdd806f"
+      "path": "src/tactic/core/dom_simplify_tactic.cpp"
     },
     {
-      "path": "src/tactic/core/elim_term_ite_tactic.cpp",
-      "sha256": "0ce5fc07599ac4a8b872db695188ee4b5f762f3efc8b420b8d5f9390d0a825ad"
+      "path": "src/tactic/core/elim_term_ite_tactic.cpp"
     },
     {
-      "path": "src/tactic/core/elim_uncnstr_tactic.cpp",
-      "sha256": "8713b269335b9a7917b6dd5fc18b65ad1944fbe1cd9abab55fe16883b269f8bd"
+      "path": "src/tactic/core/elim_uncnstr_tactic.cpp"
     },
     {
-      "path": "src/tactic/core/nnf_tactic.cpp",
-      "sha256": "daae200d0f770ecaf0d7b432185642dcbb5150d04e7d8fa1b8323420ea313124"
+      "path": "src/tactic/core/nnf_tactic.cpp"
     },
     {
-      "path": "src/tactic/core/pb_preprocess_tactic.cpp",
-      "sha256": "b6fb5b60d0b8caa79324c9dac828d8beb406577ee62b5124e088b1f0e59283b3"
+      "path": "src/tactic/core/pb_preprocess_tactic.cpp"
     },
     {
-      "path": "src/tactic/core/propagate_values_tactic.cpp",
-      "sha256": "3b2a0b191d5495e0103011df2099a1b2dc33df4e0423504701bb6e87d38caeff"
+      "path": "src/tactic/core/propagate_values_tactic.cpp"
     },
     {
-      "path": "src/tactic/core/simplify_tactic.cpp",
-      "sha256": "dbc2aa5b1f18180645521e5bf7421ada41cf825f69e0a052365b7e268c118da1"
+      "path": "src/tactic/core/simplify_tactic.cpp"
     },
     {
-      "path": "src/tactic/core/solve_eqs_tactic.cpp",
-      "sha256": "d0d3721fba88967e9bb1e077ce0fa38e885c44241e116614a6470a12d0428c31"
+      "path": "src/tactic/core/solve_eqs_tactic.cpp"
     },
     {
-      "path": "src/tactic/core/split_clause_tactic.cpp",
-      "sha256": "4b663d8eeb0a47bac293ff2e12dfb549324b355c754c46ad2113336c4d138cc7"
+      "path": "src/tactic/core/split_clause_tactic.cpp"
     },
     {
-      "path": "src/tactic/equiv_proof_converter.cpp",
-      "sha256": "1e94c3df7b26d6e6ba76229fa05d4a6c8e16fe0f1c683f5ece5caa14bcd03c76"
+      "path": "src/tactic/equiv_proof_converter.cpp"
     },
     {
-      "path": "src/tactic/fpa/fpa2bv_tactic.cpp",
-      "sha256": "27ad0d4e6c4284b542582da591516e84146947df757ff98a45278fb1e8170d02"
+      "path": "src/tactic/fpa/fpa2bv_tactic.cpp"
     },
     {
-      "path": "src/tactic/goal.cpp",
-      "sha256": "19b1bd24d95efbf1979a6d29dce944fa3dc757f63528af5a93b2bbe7bbcba642"
+      "path": "src/tactic/goal.cpp"
     },
     {
-      "path": "src/tactic/nlsat_smt/nl_purify_tactic.cpp",
-      "sha256": "ac218c04ccdb96df8e25c52a22340a9ce04c5772fadcdcdbaf4c4b2db23ae407"
+      "path": "src/tactic/nlsat_smt/nl_purify_tactic.cpp"
     },
     {
-      "path": "src/tactic/replace_proof_converter.cpp",
-      "sha256": "c4258ef1bfb10655859b2602f8466551b3014a509cd4f86b0ac0576d16cd11fb"
+      "path": "src/tactic/replace_proof_converter.cpp"
     },
     {
-      "path": "src/test/proof_checker.cpp",
-      "sha256": "2ae06c3cecd842fe5d3034cdda5125dc345ab012efe99941ffcc8ec41fa1e450"
+      "path": "src/test/proof_checker.cpp"
     }
   ],
   "theory_enums": [

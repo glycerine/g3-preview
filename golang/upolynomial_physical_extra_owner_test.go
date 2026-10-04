@@ -1,4 +1,4 @@
-// Copyright (c) 2011 Microsoft Corporation. Licensed under the MIT license.
+// Source: src/math/polynomial/upolynomial.cpp; src/util/mpq.h (ownership audit adaptation). Licensed under the MIT license.
 package g3
 
 import (
@@ -44,6 +44,10 @@ func upolyPhysicalExtraNumerals(extras []upolyPhysicalExtraOwners, addInt func(r
 			if raw.FieldByName("addActive").Bool() {
 				addInt(raw.FieldByName("addOne"))
 				addInt(raw.FieldByName("addTwo"))
+			}
+			if raw.FieldByName("compareActive").Bool() {
+				addRat(raw.FieldByName("compareOne"))
+				addRat(raw.FieldByName("compareTwo"))
 			}
 			if raw.FieldByName("normActive").Bool() {
 				addInt(raw.FieldByName("norm"))

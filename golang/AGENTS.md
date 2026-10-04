@@ -62,3 +62,7 @@ The exhaustive checked/debug refinement fault sweep retains the original
 default ten-minute timeout. Use `go test -tags g3checked,g3debug ./... -timeout=30m` for the full
 checked/debug gate; do not truncate that campaign
 to fit the default timeout. Native full validation remains `go test ./...`.
+
+## Fixed source provenance
+
+Keep originating repository-relative source paths in ported files. The C++ reference is fixed: do not compute, store, or verify its content hashes, checksums, or fingerprints. Omit Microsoft copyright lines from current and new ported headers; retain license notices and `LICENSE.txt`, and preserve other authors’ notices. This policy does not change solver algorithm hashing/fingerprints or Go working-tree SHA verification.

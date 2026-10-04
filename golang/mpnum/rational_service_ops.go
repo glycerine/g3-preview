@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation
+// Source: src/util/rational.h; src/util/rational.cpp. Licensed under the MIT license.
 // Source: src/util/rational.h owner-local operator facade.
 package mpnum
 
@@ -345,7 +345,7 @@ func (s *RationalService) facadeUnary(a *OwnedRational, op rationalFacadeUnaryOp
 		return OwnedRational{}, e
 	}
 	defer s.endLexicalRational(&_lexOut, &_lexErr)
-	if op == facadeNumerator || op == facadeDenominator {
+	if op == facadeNumerator || op == facadeDenominator || op == facadeNeg || op == facadeAbs {
 		if e := s.rationalScalarOwner(a); e != nil {
 			return OwnedRational{}, e
 		}
@@ -418,7 +418,7 @@ func (s *RationalService) NegAssign(a *OwnedRational) error {
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return e
 	}
 	return s.manager.Neg(&a.raw)
@@ -428,7 +428,7 @@ func (s *RationalService) Reset(a *OwnedRational) error {
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return e
 	}
 	return s.manager.Reset(&a.raw)
@@ -437,10 +437,10 @@ func (s *RationalService) Reset(a *OwnedRational) error {
 // Comparison routes retain operand reversal, structural equality, and source
 // sign shortcuts even for noncanonical raw denominators.
 func (s *RationalService) facadeCompareLocked(a, b *OwnedRational, op uint8) (bool, error) {
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return false, e
 	}
-	if e := s.check(b); e != nil {
+	if e := s.rationalScalarOwner(b); e != nil {
 		return false, e
 	}
 	if op == 0 {
@@ -484,7 +484,7 @@ func (s *RationalService) facadeCompareInt(a *OwnedRational, n int32, op uint8) 
 		return false, e
 	}
 	defer s.endLexicalError(&_lexErr)
-	if e := s.check(a); e != nil {
+	if e := s.rationalScalarOwner(a); e != nil {
 		return false, e
 	}
 	v := OwnedRational{raw: NewRational(), ownerID: s.ownerID}

@@ -3,8 +3,6 @@
 package portcheck
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io/fs"
@@ -19,11 +17,10 @@ import (
 const SchemaVersion = 1
 
 type Manifest struct {
-	Schema      int    `json:"schema"`
-	Baseline    string `json:"baseline"`
-	Fingerprint string `json:"source_fingerprint"`
-	Units       []Unit `json:"units"`
-	APIs        []API  `json:"api_operations"`
+	Schema   int    `json:"schema"`
+	Baseline string `json:"baseline"`
+	Units    []Unit `json:"units"`
+	APIs     []API  `json:"api_operations"`
 }
 type Method struct {
 	Name     string   `json:"name"`
@@ -37,7 +34,6 @@ type Line struct {
 }
 type Unit struct {
 	Path             string   `json:"path"`
-	Hash             string   `json:"sha256"`
 	Component        string   `json:"component"`
 	Role             string   `json:"role"`
 	Status           string   `json:"status"`
@@ -162,18 +158,11 @@ func Inventory(root string) (Manifest, error) {
 		}
 	}
 	sort.Strings(paths)
-	fingerprint := sha256.New()
 	apis := map[string][]string{}
 	for _, p := range paths {
 		b, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(p)))
 		if err != nil {
 			return m, err
-		}
-		h := sha256.Sum256(b)
-		if sourceUnit(p) {
-			fingerprint.Write([]byte(p))
-			fingerprint.Write([]byte{0})
-			fingerprint.Write(h[:])
 		}
 		parts := strings.Split(p, "/")
 		component := parts[0]
@@ -194,7 +183,7 @@ func Inventory(root string) (Manifest, error) {
 				role = "build_specification"
 			}
 		}
-		u := Unit{Path: p, Hash: hex.EncodeToString(h[:]), Component: component, Role: role, Status: "unported", GoTargets: []string{}, Tests: []string{}, Methods: []Method{}, Ownership: []string{}, Deviations: []string{}}
+		u := Unit{Path: p, Component: component, Role: role, Status: "unported", GoTargets: []string{}, Tests: []string{}, Methods: []Method{}, Ownership: []string{}, Deviations: []string{}}
 		clean := uncomment(string(b))
 		for i, line := range strings.Split(clean, "\n") {
 			t := strings.TrimSpace(line)
@@ -225,7 +214,6 @@ func Inventory(root string) (Manifest, error) {
 		}
 		m.Units = append(m.Units, u)
 	}
-	m.Fingerprint = hex.EncodeToString(fingerprint.Sum(nil))
 	names := []string{}
 	for name := range apis {
 		names = append(names, name)
@@ -297,9 +285,6 @@ func Compare(ledger, current Manifest) error {
 	if err := Validate(ledger); err != nil {
 		return err
 	}
-	if ledger.Fingerprint != current.Fingerprint {
-		return fmt.Errorf("reference fingerprint drift: ledger %s current %s", ledger.Fingerprint, current.Fingerprint)
-	}
 	if len(ledger.Units) != len(current.Units) || len(ledger.APIs) != len(current.APIs) {
 		return fmt.Errorf("source/API inventory count changed")
 	}
@@ -308,9 +293,9 @@ func Compare(ledger, current Manifest) error {
 		units[u.Path] = u
 	}
 	for _, u := range current.Units {
-		old, ok := units[u.Path]
-		if !ok || old.Hash != u.Hash {
-			return fmt.Errorf("missing or changed reference %s", u.Path)
+		_, ok := units[u.Path]
+		if !ok {
+			return fmt.Errorf("missing reference %s", u.Path)
 		}
 	}
 	apis := map[string]API{}

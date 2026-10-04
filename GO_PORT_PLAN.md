@@ -23,22 +23,9 @@ The survey covered the build component graph, API headers and dispatch, AST inte
 
 `scripts/mk_project.py` declares version **4.7.1.0**. The source contains `src/interp/`, `src/api/api_interp.cpp`, and `src/api/z3_interp.h`. Do not replace this baseline with modern upstream Z3 or reconstruct interpolation from papers.
 
-There are 1,619 files under `src/` with extensions `.cpp`, `.h`, `.hpp`, or `.pyg`, totaling 526,299 physical lines, including test files and parameter specifications. These numbers are inventory measurements, not estimates of Go implementation size. A reproducible content fingerprint is:
+There are 1,619 files under `src/` with extensions `.cpp`, `.h`, `.hpp`, or `.pyg`, totaling 526,299 physical lines, including test files and parameter specifications. These numbers are inventory measurements, not estimates of Go implementation size. Identify the fixed reference by its originating repository-relative source paths; do not compute or store C++ content hashes, checksums, or fingerprints.
 
-```text
-565f0ba019a9925d84f3ed7f227e19e8bdccf026cfb20df473fec5bdf8da01e2
-```
-
-Fingerprint procedure: sort those paths lexicographically as repository-relative POSIX paths; feed each path's UTF-8 bytes, a NUL byte, and the raw 32-byte SHA-256 digest of that file into one SHA-256 accumulator. This avoids dependence on Git metadata or checkout location. Record a new baseline explicitly if the source changes.
-
-Useful individual source checksums:
-
-| Source | SHA-256 |
-| --- | --- |
-| `src/ast/ast.cpp` | `ac1de339a71c12fabaf951db2b0936bb1a84990b337ce268490633cb7bb5ff52` |
-| `src/smt/smt_context.cpp` | `f41e7f4d9d46c32bcc78455bc324d7c6a1e3a01f57907d00bfd451028aba1a91` |
-| `src/api/api_interp.cpp` | `de9d72951e3382dfb76acc188dde145d6f3d8412c66c39d414230baaea82d264` |
-| `src/interp/iz3translate.h` | `2ae64fbee825268f7cc1b8c6e2a4aa5e813de7c188e8df3805220c9b8f6f9784` |
+Representative originating paths include `src/ast/ast.cpp`, `src/smt/smt_context.cpp`, `src/api/api_interp.cpp`, and `src/interp/iz3translate.h`.
 
 ### A2. Behavioral fidelity contract
 
@@ -51,7 +38,7 @@ Useful individual source checksums:
 7. Preserve model/proof/dependency converters through tactics. A transformation with correct SAT status but a wrong reconstructed model or proof is an incorrect port.
 8. Keep parameter names, types, defaults, descriptions, and unknown-parameter handling consistent with the fork. Generated tables count as functionality.
 9. The implementation must build and run without a C/C++ compiler, GMP, libz3, OpenMP, Emscripten, a neighboring repository, or a reference executable. Its semantic core must compile unchanged for native Go, `js/wasm`, and `wasip1/wasm`.
-10. Preserve source copyright and license notices in translated files, and retain `LICENSE.txt`. Inspect per-file notices as files are ported, including McMillan, Gurfinkel, and other contributors.
+10. Keep originating repository-relative source paths and license notices in ported files, and retain `LICENSE.txt`. Omit Microsoft copyright lines from current and new ported headers. Preserve other authors’ notices, including McMillan, Gurfinkel, and other contributors. The fixed C++ reference must not be content-hashed or assigned stored checksums/fingerprints; this does not remove solver algorithm hashes/fingerprints or Go working-tree verification.
 
 For deterministic workloads, aim to preserve source traversal, hash-table iteration, source RNG, and tie-breaking order. Go's unspecified map iteration must not choose solver branches. Raw process addresses, runtime memory statistics, wall-clock profiling strings, and OS signal machinery cannot be identical across languages. Record those representational differences; do not use them to justify changing algorithms.
 
@@ -547,13 +534,13 @@ WASI supports a serial execution path for source parallel facilities. Native Go 
 
 ### B18. Generated code and coverage ledger
 
-Create `port_manifest.json` as a complete inventory, initially marking all source units unported. Include source path/hash, component, Go targets, exported operations/types, source tests and assertions, generated inputs, conditional branches, ownership ledger, supported state, unit/property/fixture tests and approved deviations. A file-level “ported” tick must not hide unimplemented methods.
+Create `port_manifest.json` as a complete inventory, initially marking all source units unported. Include originating source paths, component, Go targets, exported operations/types, source tests and assertions, generated inputs, conditional branches, ownership ledger, supported state, unit/property/fixture tests and approved deviations. A file-level “ported” tick must not hide unimplemented methods.
 
 Generators must cover `.pyg` parameter specifications, `ADD_TACTIC`/probe/simplifier registrations, initializers/finalizers, API operation enumeration, version/error/decl-kind constants, and logging/replay tables. Read `scripts/mk_genfile_common.py`, `mk_util.py`, and `update_api.py` as specifications; generated C++ files absent from `src/` are still required behavior.
 
 Commit generated Go tables and a deterministic generator or declarative input so ordinary builds/tests do not require Python/C++ or the neighboring checkout. A generator may read the preserved reference source when deliberately regenerating; the resulting Go tests/builds must not. An eventual Go-only source release contains all required tables and permanent fixtures.
 
-`cmd/portcheck` verifies that new reference files/API operations cannot vanish from the ledger, source hashes have not drifted silently, and completed units name executable Go tests. The checker must distinguish source-existence inventory from hermetic runtime tests; only a maintainer inventory mode reads `../src`. CI semantic tests can run from the `golang/` subtree alone.
+`cmd/portcheck` verifies that new reference files/API operations cannot vanish from the ledger, originating source paths and method/evidence mappings remain inventoried, and completed units name executable Go tests. The checker must distinguish source-existence inventory from hermetic runtime tests; only a maintainer inventory mode reads `../src`. CI semantic tests can run from the `golang/` subtree alone.
 
 ### B19. Implementation phases and dependency gates
 
@@ -561,7 +548,7 @@ Every task ships source-linked code, actual source-test ports, independent expec
 
 | Phase | Deliverable | Gate to the next dependent work |
 | --- | --- | --- |
-| P0: baseline | complete source/API/test/conditional inventory; source fingerprints; conventions and planned deviations | no component omitted; known source defects recorded, not silently fixed |
+| P0: baseline | complete source/API/test/conditional inventory; originating source paths; conventions and planned deviations | no component omitted; known source defects recorded, not silently fixed |
 | P1: foundations | arena primitives and handles; numeric managers; hashes/containers; RNG/limits/params; registrations | unit/property tests; both handle modes; native and wasm build of utilities; allocation-failure cleanup |
 | P2: AST | all AST base kinds/plugins, intern/RC, binding/substitution, source printers/parser scaffolding, proof constructors/checker | identity/lifetime/binding tests; public owner validation; proof rule matrix started |
 | P3: solver spine | goals/converters/result/factory contracts, standalone SAT, legacy SMT congruence/search/trails/clauses | bounded SAT oracle; scope state machine; retained proofs/models; no fake unported outcome |

@@ -1,3 +1,4 @@
+// Source: src/util/id_gen.h; src/util/vector.h.
 package g3
 
 import (
@@ -135,13 +136,17 @@ func TestIDGeneratorBudgetWarmEmbeddedValueAndCapacityBounds(t *testing.T) {
 	if b.Used() != 0 {
 		t.Fatal(b.Used())
 	}
-	for _, old := range []uint32{0, 2, 3, 5, 100, math.MaxUint32 / 2, math.MaxUint32} {
-		want := (uint64(old)*3 + 1) / 2
+	for _, old := range []uint32{0, 2, 3, 5, 100, 0x40000000, 0x55555555, math.MaxUint32 / 2, math.MaxUint32} {
+		// Source SZ unsigned expressions wrap before the capacity shift and
+		// byte comparisons; the old wider oracle accepted source overflow.
+		want := ((uint64(old)*3 + 1) & math.MaxUint32) / 2
+		oldBytes := (uint64(old)*4 + 8) & math.MaxUint32
+		newBytes := (want*4 + 8) & math.MaxUint32
 		if old == 0 {
 			want = 2
 		}
 		capacity, e := idFreeGrowth(old)
-		if want > math.MaxUint32 || want*4 > uint64(^uint(0)>>1) {
+		if (old != 0 && (want <= uint64(old) || newBytes <= oldBytes)) || want*4 > uint64(^uint(0)>>1) {
 			if !errors.Is(e, arena.ErrBounds) {
 				t.Fatal("capacity overflow accepted", old, capacity, e)
 			}

@@ -1,8 +1,10 @@
 package portcheck
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
 )
 
@@ -34,7 +36,7 @@ func TestInventoryCompleteDeterministic(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if a.Fingerprint != b.Fingerprint || len(a.Units) != 6 {
+	if !reflect.DeepEqual(a, b) || len(a.Units) != 6 {
 		t.Fatalf("unstable or missing inventory: %+v", a)
 	}
 	if len(a.APIs) != 1 || a.APIs[0].Name != "Z3_compute_interpolant" {
@@ -129,5 +131,67 @@ func TestExecutableEvidence(t *testing.T) {
 	m.Units[0].GoTargets = []string{"missing.go"}
 	if VerifyEvidence(m, root) == nil {
 		t.Fatal("nonexistent implementation accepted")
+	}
+}
+
+// The reference source is fixed; inventory stores semantic coverage, never
+// source-content fingerprints or hashes.
+func TestInventoryDoesNotStoreSourceContentHashes(t *testing.T) {
+	root := t.TempDir()
+	source(t, root, "src/qe/qe.cpp", "#ifdef ACTIVE\nSASSERT(x);\n#endif\n")
+	m, e := Inventory(root)
+	if e != nil {
+		t.Fatal(e)
+	}
+	path := filepath.Join(root, "manifest.json")
+	if e = Save(path, m); e != nil {
+		t.Fatal(e)
+	}
+	b, e := os.ReadFile(path)
+	if e != nil {
+		t.Fatal(e)
+	}
+	var doc map[string]json.RawMessage
+	if e = json.Unmarshal(b, &doc); e != nil {
+		t.Fatal(e)
+	}
+	if _, ok := doc["source_fingerprint"]; ok {
+		t.Error("stored source fingerprint")
+	}
+	var units []map[string]json.RawMessage
+	if e = json.Unmarshal(doc["units"], &units); e != nil {
+		t.Fatal(e)
+	}
+	for _, u := range units {
+		if _, ok := u["sha256"]; ok {
+			t.Error("stored source content hash")
+		}
+	}
+}
+func TestCompareIgnoresSourceContentChanges(t *testing.T) {
+	root := t.TempDir()
+	source(t, root, "src/qe/qe.cpp", "#ifdef ACTIVE\nint value = 1;\n#endif\n")
+	a, e := Inventory(root)
+	if e != nil {
+		t.Fatal(e)
+	}
+	source(t, root, "src/qe/qe.cpp", "#ifdef ACTIVE\nint value = 2; // changed implementation, same inventory\n#endif\n")
+	b, e := Inventory(root)
+	if e != nil {
+		t.Fatal(e)
+	}
+	if e = Compare(a, b); e != nil {
+		t.Fatal("content-only changes must not cause hash drift", e)
+	}
+	if len(b.Units) != 1 || len(b.Units[0].Conditionals) != 2 {
+		t.Fatal("conditional inventory lost", b)
+	}
+	source(t, root, "src/qe/extra.cpp", "// additional source unit\n")
+	c, e := Inventory(root)
+	if e != nil {
+		t.Fatal(e)
+	}
+	if Compare(a, c) == nil {
+		t.Fatal("new unit must remain detected")
 	}
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2013 Microsoft Corporation. Licensed under the MIT license.
+// Source: src/util/inf_eps_rational.h. Licensed under the MIT license.
 // Translation of src/util/inf_eps_rational.h<inf_rational>. Selected raw-domain
 // projections/sign/hash retain source reads; diagnostic cleanup-refusal ownership
 // and other raw-domain arithmetic adapters remain separate obligations.
@@ -141,10 +141,13 @@ func (s *RationalService) InfEpsInfReset(v *OwnedInfEpsInfRational) error {
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return e
 	}
 	if e := s.manager.Reset(&v.infinity); e != nil {
+		return e
+	}
+	if e := s.infScalarOwner(&v.numeral); e != nil {
 		return e
 	}
 	if e := s.manager.Reset(&v.numeral.first); e != nil {
@@ -157,13 +160,19 @@ func (s *RationalService) InfEpsInfSwap(a, b *OwnedInfEpsInfRational) error {
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(a); e != nil {
+	if e := s.infEpsScalarOwner(a); e != nil {
 		return e
 	}
-	if e := s.infEpsInfCheck(b); e != nil {
+	if e := s.infEpsScalarOwner(b); e != nil {
 		return e
 	}
 	if e := s.manager.Swap(&a.infinity, &b.infinity); e != nil {
+		return e
+	}
+	if e := s.infScalarOwner(&a.numeral); e != nil {
+		return e
+	}
+	if e := s.infScalarOwner(&b.numeral); e != nil {
 		return e
 	}
 	if e := s.manager.Swap(&a.numeral.first, &b.numeral.first); e != nil {
@@ -444,6 +453,12 @@ func (s *RationalService) infEpsInfEqual(a, b *OwnedInfEpsInfRational) (bool, er
 	if e != nil || !ok {
 		return ok, e
 	}
+	if e := s.infScalarOwner(&a.numeral); e != nil {
+		return false, e
+	}
+	if e := s.infScalarOwner(&b.numeral); e != nil {
+		return false, e
+	}
 	ok, e = s.manager.Equal(&a.numeral.first, &b.numeral.first)
 	if e != nil || !ok {
 		return ok, e
@@ -486,6 +501,12 @@ func (s *RationalService) infEpsInfEqualRational(a *OwnedInfEpsInfRational, b *O
 		left, right = right, left
 	}
 	ok, e := s.manager.Equal(left, right)
+	if e != nil || !ok {
+		return false, e
+	}
+	if e := s.infScalarOwner(&a.numeral); e != nil {
+		return false, e
+	}
 	return ok && a.numeral.first.num.val == 0 && a.numeral.second.num.val == 0, e
 }
 func (s *RationalService) infEpsInfCompound(a, b *OwnedInfEpsInfRational, sub bool) error {
@@ -517,7 +538,7 @@ func (s *RationalService) InfEpsInfNeg(v *OwnedInfEpsInfRational) error {
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return e
 	}
 	return s.infEpsInfNeg(v)
@@ -531,7 +552,7 @@ func (s *RationalService) infEpsInfUnary(v *OwnedInfEpsInfRational, abs bool) (_
 		return OwnedInfEpsInfRational{}, e
 	}
 	defer s.endLexicalEps(&_lexOut, &_lexErr)
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return OwnedInfEpsInfRational{}, e
 	}
 	out, e := s.infEpsInfClone(v)
@@ -905,10 +926,10 @@ func (s *RationalService) InfEpsInfEqual(a, b *OwnedInfEpsInfRational) (bool, er
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(a); e != nil {
+	if e := s.infEpsScalarOwner(a); e != nil {
 		return false, e
 	}
-	if e := s.infEpsInfCheck(b); e != nil {
+	if e := s.infEpsScalarOwner(b); e != nil {
 		return false, e
 	}
 	ok, e := s.infEpsInfEqual(a, b)
@@ -919,10 +940,10 @@ func (s *RationalService) InfEpsInfNotEqual(a, b *OwnedInfEpsInfRational) (bool,
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(a); e != nil {
+	if e := s.infEpsScalarOwner(a); e != nil {
 		return false, e
 	}
-	if e := s.infEpsInfCheck(b); e != nil {
+	if e := s.infEpsScalarOwner(b); e != nil {
 		return false, e
 	}
 	ok, e := s.infEpsInfEqual(a, b)
@@ -933,10 +954,10 @@ func (s *RationalService) InfEpsInfLess(a, b *OwnedInfEpsInfRational) (bool, err
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(a); e != nil {
+	if e := s.infEpsScalarOwner(a); e != nil {
 		return false, e
 	}
-	if e := s.infEpsInfCheck(b); e != nil {
+	if e := s.infEpsScalarOwner(b); e != nil {
 		return false, e
 	}
 	ok, e := s.infEpsInfLess(a, b)
@@ -947,10 +968,10 @@ func (s *RationalService) InfEpsInfGreater(a, b *OwnedInfEpsInfRational) (bool, 
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(a); e != nil {
+	if e := s.infEpsScalarOwner(a); e != nil {
 		return false, e
 	}
-	if e := s.infEpsInfCheck(b); e != nil {
+	if e := s.infEpsScalarOwner(b); e != nil {
 		return false, e
 	}
 	ok, e := s.infEpsInfLess(b, a)
@@ -961,10 +982,10 @@ func (s *RationalService) InfEpsInfLessEqual(a, b *OwnedInfEpsInfRational) (bool
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(a); e != nil {
+	if e := s.infEpsScalarOwner(a); e != nil {
 		return false, e
 	}
-	if e := s.infEpsInfCheck(b); e != nil {
+	if e := s.infEpsScalarOwner(b); e != nil {
 		return false, e
 	}
 	ok, e := s.infEpsInfLess(b, a)
@@ -975,10 +996,10 @@ func (s *RationalService) InfEpsInfGreaterEqual(a, b *OwnedInfEpsInfRational) (b
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(a); e != nil {
+	if e := s.infEpsScalarOwner(a); e != nil {
 		return false, e
 	}
-	if e := s.infEpsInfCheck(b); e != nil {
+	if e := s.infEpsScalarOwner(b); e != nil {
 		return false, e
 	}
 	ok, e := s.infEpsInfLess(a, b)
@@ -989,10 +1010,10 @@ func (s *RationalService) InfEpsInfEqualRational(a *OwnedInfEpsInfRational, b *O
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(a); e != nil {
+	if e := s.infEpsScalarOwner(a); e != nil {
 		return false, e
 	}
-	if e := s.check(b); e != nil {
+	if e := s.rationalScalarOwner(b); e != nil {
 		return false, e
 	}
 	ok, e := s.infEpsInfEqualRational(a, b, false)
@@ -1003,10 +1024,10 @@ func (s *RationalService) InfEpsInfNotEqualRational(a *OwnedInfEpsInfRational, b
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(a); e != nil {
+	if e := s.infEpsScalarOwner(a); e != nil {
 		return false, e
 	}
-	if e := s.check(b); e != nil {
+	if e := s.rationalScalarOwner(b); e != nil {
 		return false, e
 	}
 	ok, e := s.infEpsInfEqualRational(a, b, false)
@@ -1017,10 +1038,10 @@ func (s *RationalService) InfEpsInfLessRational(a *OwnedInfEpsInfRational, b *Ow
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(a); e != nil {
+	if e := s.infEpsScalarOwner(a); e != nil {
 		return false, e
 	}
-	if e := s.check(b); e != nil {
+	if e := s.rationalScalarOwner(b); e != nil {
 		return false, e
 	}
 	ok, e := s.infEpsInfLessRational(a, b, false)
@@ -1031,10 +1052,10 @@ func (s *RationalService) InfEpsInfGreaterRational(a *OwnedInfEpsInfRational, b 
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(a); e != nil {
+	if e := s.infEpsScalarOwner(a); e != nil {
 		return false, e
 	}
-	if e := s.check(b); e != nil {
+	if e := s.rationalScalarOwner(b); e != nil {
 		return false, e
 	}
 	ok, e := s.infEpsInfLessRational(a, b, true)
@@ -1045,10 +1066,10 @@ func (s *RationalService) InfEpsInfLessEqualRational(a *OwnedInfEpsInfRational, 
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(a); e != nil {
+	if e := s.infEpsScalarOwner(a); e != nil {
 		return false, e
 	}
-	if e := s.check(b); e != nil {
+	if e := s.rationalScalarOwner(b); e != nil {
 		return false, e
 	}
 	ok, e := s.infEpsInfLessRational(a, b, true)
@@ -1059,10 +1080,10 @@ func (s *RationalService) InfEpsInfGreaterEqualRational(a *OwnedInfEpsInfRationa
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(a); e != nil {
+	if e := s.infEpsScalarOwner(a); e != nil {
 		return false, e
 	}
-	if e := s.check(b); e != nil {
+	if e := s.rationalScalarOwner(b); e != nil {
 		return false, e
 	}
 	ok, e := s.infEpsInfLessRational(a, b, false)
@@ -1073,10 +1094,10 @@ func (s *RationalService) InfEpsInfRationalEqual(b *OwnedRational, a *OwnedInfEp
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(a); e != nil {
+	if e := s.infEpsScalarOwner(a); e != nil {
 		return false, e
 	}
-	if e := s.check(b); e != nil {
+	if e := s.rationalScalarOwner(b); e != nil {
 		return false, e
 	}
 	ok, e := s.infEpsInfEqualRational(a, b, true)
@@ -1087,10 +1108,10 @@ func (s *RationalService) InfEpsInfRationalNotEqual(b *OwnedRational, a *OwnedIn
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(a); e != nil {
+	if e := s.infEpsScalarOwner(a); e != nil {
 		return false, e
 	}
-	if e := s.check(b); e != nil {
+	if e := s.rationalScalarOwner(b); e != nil {
 		return false, e
 	}
 	ok, e := s.infEpsInfEqualRational(a, b, true)
@@ -1101,10 +1122,10 @@ func (s *RationalService) InfEpsInfRationalLess(b *OwnedRational, a *OwnedInfEps
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(a); e != nil {
+	if e := s.infEpsScalarOwner(a); e != nil {
 		return false, e
 	}
-	if e := s.check(b); e != nil {
+	if e := s.rationalScalarOwner(b); e != nil {
 		return false, e
 	}
 	ok, e := s.infEpsInfLessRational(a, b, true)
@@ -1115,10 +1136,10 @@ func (s *RationalService) InfEpsInfRationalGreater(b *OwnedRational, a *OwnedInf
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(a); e != nil {
+	if e := s.infEpsScalarOwner(a); e != nil {
 		return false, e
 	}
-	if e := s.check(b); e != nil {
+	if e := s.rationalScalarOwner(b); e != nil {
 		return false, e
 	}
 	ok, e := s.infEpsInfLessRational(a, b, false)
@@ -1129,10 +1150,10 @@ func (s *RationalService) InfEpsInfRationalLessEqual(b *OwnedRational, a *OwnedI
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(a); e != nil {
+	if e := s.infEpsScalarOwner(a); e != nil {
 		return false, e
 	}
-	if e := s.check(b); e != nil {
+	if e := s.rationalScalarOwner(b); e != nil {
 		return false, e
 	}
 	ok, e := s.infEpsInfLessRational(a, b, false)
@@ -1143,10 +1164,10 @@ func (s *RationalService) InfEpsInfRationalGreaterEqual(b *OwnedRational, a *Own
 		return false, e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(a); e != nil {
+	if e := s.infEpsScalarOwner(a); e != nil {
 		return false, e
 	}
-	if e := s.check(b); e != nil {
+	if e := s.rationalScalarOwner(b); e != nil {
 		return false, e
 	}
 	ok, e := s.infEpsInfLessRational(a, b, true)

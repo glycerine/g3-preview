@@ -36,7 +36,7 @@ func run(root, p string, generate bool) error {
 		if err := portcheck.Save(p, m); err != nil {
 			return err
 		}
-		fmt.Printf("inventoried %d source/tool units and %d API operations; fingerprint %s\n", len(m.Units), len(m.APIs), m.Fingerprint)
+		fmt.Printf("inventoried %d source/tool units and %d API operations\n", len(m.Units), len(m.APIs))
 		return nil
 	}
 	if err := portcheck.CheckNoGenerics(filepath.Dir(p)); err != nil {

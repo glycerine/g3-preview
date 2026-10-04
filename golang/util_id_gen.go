@@ -1,10 +1,11 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Source: src/util/id_gen.h; src/util/vector.h. Licensed under the MIT license.
 // Translation of src/util/id_gen.h, Leonardo de Moura, 2008-02-02.
 package g3
 
 import (
 	"github.com/glycerine/g3/golang/arena"
 	"github.com/glycerine/g3/golang/utilhash"
+	"github.com/glycerine/g3/golang/utilid"
 	"math"
 	"strconv"
 	"strings"
@@ -34,14 +35,15 @@ func newBudgetedUtilIDGen(start uint32, budget *arena.Budget, outOfMemory func()
 }
 
 func idFreeGrowth(old uint32) (uint32, error) {
-	next := (uint64(old)*3 + 1) / 2
-	if old == 0 {
-		next = 2
-	}
-	if next > math.MaxUint32 || next*4 > uint64(^uint(0)>>1) {
+	n, _, e := utilid.VectorGrowth(old)
+	if e != nil {
 		return 0, arena.ErrBounds
 	}
-	return uint32(next), nil
+	// Legacy Go-typed free-list adapter checks its host slice extent too.
+	if uint64(n)*4 > uint64(^uint(0)>>1) {
+		return 0, arena.ErrBounds
+	}
+	return n, nil
 }
 
 // Preallocating this cold workspace lets an enclosing AST owner prepare for
@@ -69,13 +71,12 @@ func (g *utilIDGen) reserveFreeIDs(needed uint32) error {
 	return nil
 }
 func (g *utilIDGen) mk() uint32 {
-	if len(g.free) == 0 {
-		id := g.next
-		g.next++
-		return id
+	i, ok := utilid.PopIndex(uint32(len(g.free)))
+	if !ok {
+		return utilid.Fresh(&g.next)
 	}
-	id := g.free[len(g.free)-1]
-	g.free = g.free[:len(g.free)-1]
+	id := g.free[i]
+	g.free = g.free[:i]
 	return id
 }
 func (g *utilIDGen) recycle(id uint32) error {
@@ -100,19 +101,12 @@ func (g *utilIDGen) cleanup(start uint32) {
 func (g *utilIDGen) idRange() uint32 { return g.next }
 func (g *utilIDGen) setNextID(id uint32) uint32 {
 	g.next = id
-	for {
-		found := false
-		for _, free := range g.free {
-			if free == g.next {
-				found = true
-				break
-			}
-		}
-		if !found {
-			return g.next
-		}
-		g.next++
+	// Legacy accessor cannot fail; the shared scan still consumes source order.
+	v, e := utilid.SkipFree(&g.next, uint32(len(g.free)), func(i uint32) (uint32, error) { return g.free[i], nil })
+	if e != nil {
+		panic(e)
 	}
+	return v
 }
 func (g *utilIDGen) showHash() uint32 {
 	// Preserve the baseline byte order/sign policy of utilhash. Empty free IDs

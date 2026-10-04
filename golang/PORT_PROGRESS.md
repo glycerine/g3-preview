@@ -1,5 +1,7 @@
 # Port progress — authoritative TODO and FINISHED ledger
 
+Current source provenance policy: the C++ reference is fixed. Keep originating repository-relative source paths in ported files; do not compute, store, or verify C++ content hashes, checksums, or fingerprints. Omit Microsoft copyright lines from current and new ported headers, retain license notices and `LICENSE.txt`, and preserve other authors’ notices. Solver algorithm hashing/fingerprints and Go working-tree SHA verification remain unchanged. Historical source digest records below have been removed; source paths, method mappings, assertions, conditional profiles, and test evidence remain.
+
 [Current facts](#current-facts-and-conflict-resolution) · [TODO](#todo--prioritized-handoff) · [FINISHED](#finished--committed-subset-with-explicit-limits) · [Source inventory](#source-inventory--current-ledger-not-historical-packet-counts) · [Evidence](#current-failure-evidence-and-paused-working-tree) · [Family audits](#family-audits-against-actual-code-and-evidence)
 
 Audit baseline: repository HEAD `c08ebb2` before the documentation consolidation
@@ -18,9 +20,22 @@ passing suites do not satisfy this objective.
 
 ## Current facts and conflict resolution
 
-- Source ledger: **2,102 units; 28 ported, 160 partial, 1,914 unported**. All **677
-  API operations remain unported** in the machine inventory. Source fingerprint:
-  `f8480997c14e2d6c414f40c60ce5095ef40a89ce6d1bcf1ed196c5d682d42d8f`.
+- Verified679-Go-file follow-up after `dae49cc`: selected monomial storage,
+  SAT probing/dynamic subsumption and rational comparison/unary source paths,
+  shared raw ID vectors and stopwatch reporting are GREEN. Both final full
+  suites pass in `.cache/monomial-probing-provenance-{native,debug}.log`
+  (main12.964s/710.536s; unchanged numeric package results reused). Both full
+  vets and the hash-free source/no-generics audit pass. All679 Go files match
+  `.cache/monomial-probing-provenance-go-hashes.json`. The original debug
+  failure was a test-only omitted named comparison-root inventory, corrected
+  without weakening exact physical equality or any fault sweep. Latest user
+  rules remove C++ content digests and checker machinery, retain source paths,
+  and omit Microsoft copyright lines in this chunk and future port headers.
+  The full fork remains incomplete; source-family limits and next work below
+  stay explicit. No red suite crosses this implementation commit.
+
+- Source ledger: **2,102 units; 28 ported, 166 partial, 1,908 unported**. All **677
+  API operations remain unported** in the machine inventory.
 - Verified643-Go-file follow-up: corrected full native and checked/debug are
   terminal0 in `.cache/algebraic-combined-full-{native,debug}-corrected.log`.
   Native main13.439s/numeric89.024s; checked/debug main729.000s/numeric188.320s,
@@ -688,7 +703,7 @@ Combined gate evidence for the frozen611-Go-file tree:
 (main13.504s, numeric92.275s). Both full vet profiles ended0 in
 `.cache/scalar-phase-vet-{native,debug}.log`. Final source/no-generics verification
 with the synchronized method/test mappings ended0 in
-`.cache/scalar-phase-audit-final.log`; inventory statuses and source fingerprint
+`.cache/scalar-phase-audit-final.log`; inventory statuses and source inventory
 are unchanged. Full checked/debug `go test -tags g3checked,g3debug ./... -timeout=30m`
 ended0 in `.cache/scalar-phase-debug.log` (main753.057s, numeric197.999s).
 The original refinement precision and every allocation prefix remain intact.
@@ -782,7 +797,7 @@ Full checked/debug is terminal0 (main715.140s/numeric218.103s) in
 precision remain enabled. Final synchronized source/no-generics audit is terminal0 in
 `.cache/converter-guards-audit-final.log`.
 The converter cpp/header are newly partial: ledger now28 ported/157 partial/1917
-unported, with unchanged2102 total,677 unported APIs and source fingerprint.
+unported, with unchanged2102 total,677 unported APIs and source inventory.
 No registered ENSURE/VERIFY credit is added by these new Go tests.
 Fresh targeted `TestUPolynomialFactorFullAlgorithmImmediateFailureRoots`
 passes both native0.815s and checked/debug1.710s on this frozen tree.
@@ -952,7 +967,7 @@ checks do not freeze or validate the combined tree.
 Current progress source/evidence/no-generics audit is terminal0 in
 `.cache/algebraic-source-audit-progress.log`:2102units/677APIs,
 28ported157partial1917unported. This validates the current partial mappings and
-source fingerprint, not the still-changing algebraic implementation or full
+source inventory, not the still-changing algebraic implementation or full
 suite. `git diff --check` also passes at this observation.
 
 Actual source lifetime boundary found during conversion review:
@@ -1266,7 +1281,7 @@ extension/search and registered bounded user-scope checks remain real obligation
   files and repaired references. This document and instruction updates are the
   documentation-only consolidation checkpoint required before resuming.
 - [x] Concrete storage conversion and no-generics source audit infrastructure.
-- [x] Source inventory/evidence checker and recorded fork fingerprint. Every
+- [x] Source inventory/evidence checker and recorded fork inventory. Every
   current manifest Go target exists; test declarations are not test execution.
 - [x] Source-backed cell/limb/character allocator prerequisites and mandatory
   Integer physical backend checkpoint. Lifecycle and output integration remain
@@ -1319,7 +1334,7 @@ extension/search and registered bounded user-scope checks remain real obligation
 | util | 20 | 73 | 197 |
 
 All source units not listed in the following implemented-subset tables remain
-TODO/unported in `port_manifest.json`; its exact source SHA/method/assertion rows
+TODO/unported in `port_manifest.json`; its exact source path/method/assertion rows
 remain machine-readable evidence. No status is promoted by this consolidation.
 
 `src/util/rational.cpp` is now PARTIAL: selected cache algorithms and outer
@@ -1829,7 +1844,7 @@ Only this `.cache/consolidation/arena-audit.md` file was written. No Go/status/m
 
 #### Universal corrections
 
-- Preserve every old source map/hash/conditional/assertion/registration and terminal gate as historical evidence tied to its frozen bytes. Prior full GREEN never means the current changed default suite is GREEN; current-full native/debug campaigns contain unresolved numeric/physical-root failures. Current draft migrations are not silently validated by older logs.
+- Preserve every old source map/conditional/assertion/registration and terminal gate as historical evidence tied to its frozen bytes. Prior full GREEN never means the current changed default suite is GREEN; current-full native/debug campaigns contain unresolved numeric/physical-root failures. Current draft migrations are not silently validated by older logs.
 - Development is paused for this documentation consolidation. On resume the user requires the whole default suite GREEN before commits. No RED checkpoint policy survives. No Go generics (including tools/tests/generated code); no source changes outside golang.
 - Race/JS-Wasm/WASI gates in old documents are historical. User now defers those checks and requests single-goroutine development; do not run them or list them as current requirements. Preserve portable architecture and later completion obligations.
 - arena.Budget models real Go owner storage charges, not C++ malloc events/global memory getters. Only actual memory.Runtime operations publish source raw counter events; source globals/TLS/generated lifecycle and full participating-owner integration remain open.
@@ -2521,7 +2536,7 @@ All old isolated full-native/debug/race/JS/vet/WASI GREEN claims describe their 
 
 AST and SAT production inventories exist for their selected prerequisite families. The exploratory root logs show no named AST/SAT test failure; this is narrower than a current frozen AST/SAT gate, because some tests/gates stopped in other packages and pending-source APIs are excluded by tags. Full `NewSATSolver` / solver algorithms, SAT simplifier, arithmetic declaration plugin, proof checker and interpolation are still absent. `sat_solver_user_scope_test.go` is a genuine `port_pending_sat` missing-API fixture, not a passing producer test.
 
-Preserve each original source-to-method table, exact assertion count/classification, conditional/undefined domains, recorded RED route, source hash and historical snapshot/log attribution when consolidating. Do not replace partial units with whole-unit completion, nor count additional Go regressions as registered source ENSURE/VERIFY assertions.
+Preserve each original source-to-method table, exact assertion count/classification, conditional/undefined domains, recorded RED route, originating source paths and historical snapshot/log attribution when consolidating. Do not replace partial units with whole-unit completion, nor count additional Go regressions as registered source ENSURE/VERIFY assertions.
 
 #### Per-file correction notes
 
@@ -2754,7 +2769,7 @@ The final sentence saying AST interning and expression/dependency arrays are sti
 Static checks passed: every original record has a preserved source-map section
 and original SHA provenance; all 111 family records have explicit current audit
 corrections; all relocated section references resolve; no PACKET/STATUS files
-remain outside ignored cache history. Source/API statuses, source hashes, tests
+remain outside ignored cache history. Source/API statuses, source paths, tests
 and Go target lists in the manifest are unchanged. Every manifest Go target and
 Go test declaration exists. `git diff --check` passes.
 
@@ -3889,7 +3904,7 @@ certify HEAD/current drafts.
 > those13 files. Coordinator captured fresh logs at
 > `.cache/review/ast-dependency-integration-a6b3cc3/.cache/`: exactly26 RUN/PASS
 > names were independently verified under checked/debug race (1.270s) and
-> actual JavaScript (0.232s). Final metadata/source fingerprint/no-generics and
+> actual JavaScript (0.232s). Final metadata/source inventory/no-generics and
 > declaration checks passed at33ported/84partial/1985unported. Only dependency.h
 > and the selected ast_util.h dedup helper become partial; other touched AST and
 > parray units remain partial. These gates verify the isolated committed chunk;
@@ -4090,7 +4105,7 @@ certify HEAD/current drafts.
 > (root3.380s/mpnum22.733s), six expression-array groups under checked/debug race
 > (1.033s), six actual checked/debug JavaScript RUN/PASS events, vet and WASI
 > compilation passed. The three added groups also passed actual release JavaScript with explicit
-> RUN/PASS events. Source fingerprint audit passed at2102 units/677 APIs with
+> RUN/PASS events. Source inventory audit passed at2102 units/677 APIs with
 > 33 ported/77 partial/1992 unported; final metadata/no-generics checks passed.
 > WASI execution is not claimed.
 >
@@ -4348,7 +4363,7 @@ certify HEAD/current drafts.
 > | Actual JS/wasm execution, checked/debug | exit0 session54249; `js.log`; sixteen explicit RUN/PASS, root0.219s; real `.cache/js-exec`, `-count=1 -v` |
 > | Checked/debug vet all packages | exit0; `vet.log` |
 > | WASIp1/wasm checked/debug build all packages | exit0 session44376; `wasi.log` |
-> | Actual reference source inventory/fingerprint and no-generics audit | exit0 session61430; `source-audit.log`; `go run ./cmd/portcheck -source /mnt/oldrog/home/jaten/go/src/github.com/glycerine/g3` |
+> | Actual reference source inventory/inventory and no-generics audit | exit0 session61430; `source-audit.log`; `go run ./cmd/portcheck -source /mnt/oldrog/home/jaten/go/src/github.com/glycerine/g3` |
 >
 > Final inventory at snapshot HEAD: 2102 source/tool units, 677 APIs, 33 ported, 77 partial, 1992 unported. This packet did not edit central metadata.
 >
@@ -4522,13 +4537,13 @@ certify HEAD/current drafts.
 > its actual one VERIFY and real side-condition vector. Its source prints require
 > real AST printers before any complete diagnostic-output claim.
 >
-> ## Read-only baseline fingerprints
+> ## Read-only baseline inventory
 >
-> - src/ast/ast.h 5d006f0ccd5f44f25bc8e0de9f629d49cd1df8fa1275bb121696cd922d0069fd
-> - src/ast/ast.cpp ac1de339a71c12fabaf951db2b0936bb1a84990b337ce268490633cb7bb5ff52
-> - src/test/proof_checker.cpp 2ae06c3cecd842fe5d3034cdda5125dc345ab012efe99941ffcc8ec41fa1e450
-> - src/util/ref_vector.h 60bdb516c3df2130840407979d05022ed119a7dc17e93493298075a68df8c1a7
-> - src/util/ref_buffer.h c617e23849390bd3d20d98e538bc5e4f53e62b2577dc97bbe10678590e33d4eb
+> - src/ast/ast.h
+> - src/ast/ast.cpp
+> - src/test/proof_checker.cpp
+> - src/util/ref_vector.h
+> - src/util/ref_buffer.h
 
 <a id="audit-ast-proof-port-status-md"></a>
 
@@ -5324,7 +5339,7 @@ certify HEAD/current drafts.
 > units, not falsely marked complete. Real source statistics collectors/borrowed
 > keys and the actual solver remain future dependencies.
 >
-> ## Primary source hashes
+> ## Primary source paths
 >
 > ```
 > dda43e8c91d95f9dea0c46b2fec6637e5520cae099e40c5965dca0e41bbaab9e  GOROOT/src/strconv/number.go
@@ -5332,7 +5347,7 @@ certify HEAD/current drafts.
 > 6b8a2f52d5e53206930ba481165268f58d08b5477a4810b91eca55345fecc093  GOROOT/src/internal/strconv/ftoafixed.go
 > 131ede3bec4e39c5737c83fc074401bf22fa4e03b2038c972a039310f1f7dfb3  GOROOT/src/internal/strconv/ftoadbox.go
 > 23bd45989d0b5a7b441c45873bf43f210fdf8381132fc74424d381216ac3a8b4  GOROOT/src/internal/strconv/decimal.go
-> 9ba29fa5b08f571ff4bfbee8acd35e3f71cf4647b2f6fd02712e5d11119f30fb  /usr/include/c++/13/bits/locale_facets.tcc
+> /usr/include/c++/13/bits/locale_facets.tcc
 > ```
 >
 >
@@ -5553,45 +5568,45 @@ certify HEAD/current drafts.
 > 15. `sls`: Experimental Stochastic Local Search Solver (for QFBV only).
 > 16. `ackermannization`: tactics based on solving UF-theories via ackermannization (see also ackr module)
 >
-> ## Reference SHA256
+> ## Reference source paths
 >
-> * `scripts/mk_genfile_common.py` — `86cdb958696d411d48d04b74fc56e379a6ad41eba03d1f52cf76c53813f15482`
-> * `scripts/mk_util.py` — `4b1921c9cdf40923f8d12b81c6319cab2f9cfbb8dd5a3abcc48deeb94b3179fd`
-> * `src/test/gparams_register_modules.cpp` — `682377f035394159980e4362ca7d303c6488d0ad17c592c8d4fdc5d40b8ff723`
-> * `src/cmd_context/context_params.cpp` — `d7a23c364cd4141afad2d31339e19f65e4f475a7f018021fdc4ec458b872fe19`
-> * `src/util/env_params.cpp` — `50f9f1037080177fc94238dc662a6db726dc4eecdcaa3e85bcb12aba322fad65`
-> * `src/ast/normal_forms/nnf.cpp` — `560de5b04fa04bb4304e696d12198c42ac91c3d8bbd47a03b74f007bb4645acc`
-> * `src/ackermannization/ackermannization_params.hpp` — `81c11ede810dc135a9e0c42b87ce721f2b2d972b32b32ca11b01b30918805d90`
-> * `src/ackermannization/ackermannize_bv_tactic_params.hpp` — `4869771a7e400341bea0672d30d82ad2973b310ea6d883d94463820810a8ee88`
-> * `src/ast/fpa/fpa2bv_rewriter_params.hpp` — `7d8895e0e210d35436b5aaaa93eb824b4ca64c57a31dd2ad7414114e7c008193`
-> * `src/ast/normal_forms/nnf_params.hpp` — `95bf0c852f3a37898c024cd94b8b7f39f8ae1999a242535725498b54b2bfa774`
-> * `src/ast/pattern/pattern_inference_params_helper.hpp` — `2087b33deb1ea8271a654b4d757af1f39bb88ba7d884328e69d6e251962fcdd9`
-> * `src/ast/pp_params.hpp` — `db35bc2546189e941fa931092b6c3030dfdde789d92b70344969c1aba151ce93`
-> * `src/ast/rewriter/arith_rewriter_params.hpp` — `3ea48a9aaf4e963842210187a2261ea4f020fc3e08a3eb68c4d3a42ca1c20871`
-> * `src/ast/rewriter/array_rewriter_params.hpp` — `7dc7e99f3ddb9bbde7a3edf1ffd1ecd910d15e86a2c09026f1df115a34d21de7`
-> * `src/ast/rewriter/bool_rewriter_params.hpp` — `b31fb8aad246efac68934880efa991671a885cdfa1355371f47d34c130adb311`
-> * `src/ast/rewriter/bv_rewriter_params.hpp` — `f8ab87c91980d2f1ed259f7e6c50ff955604d8fc511f96c9c47665c5ee36d3a2`
-> * `src/ast/rewriter/fpa_rewriter_params.hpp` — `826bdd3f5399261577ae024d62aee1adc8a2fa27de3b74a15cbadec8a2232742`
-> * `src/ast/rewriter/poly_rewriter_params.hpp` — `e58e0860c8fa2dd41ce6ed85a73c6490083427f13a1dcaf933de3251a2054033`
-> * `src/ast/rewriter/rewriter_params.hpp` — `0dce2c6cadee2f1b4a409b6f9549615567f0918d2568829470a12afaf36bf992`
-> * `src/interp/interp_params.hpp` — `daee2b3402763d0b71beb5ad0ae2c2d7da64f1a18bb57bd0ade8e107377dbc85`
-> * `src/math/polynomial/algebraic_params.hpp` — `964aff3521baa5624fb57240b12e897f94b1c91f6bea2f27e8e1eaf931ef3c5f`
-> * `src/math/realclosure/rcf_params.hpp` — `36e500d8969537cac4c628d9730cbaad01002a61e1621c50a4a58ef9a61b8689`
-> * `src/model/model_evaluator_params.hpp` — `0cf305165a4dbe83a019f6f600d37293862e72be5ac0cadcca9a15924e61badd`
-> * `src/model/model_params.hpp` — `38950508d7155ef0bc057faeb8598082950fbbe521fce1032bf8dd08da226870`
-> * `src/muz/base/fixedpoint_params.hpp` — `9b464292f7f8ad2409be764a04b9f45ab59c452cd2084fd06dd5ee8b672ad554`
-> * `src/nlsat/nlsat_params.hpp` — `5a303fe15ce6ce2334f637e957ac0e0ee45fee9670e3de9a535cfaa6e99e9e18`
-> * `src/opt/opt_params.hpp` — `e08ed20495a1f4bd11e39aa939a65b79e23e72ec2c1ba640c5c67b4c0c583881`
-> * `src/parsers/util/parser_params.hpp` — `18b17fb81d735175e45b0fb3f7fb00f0ad5569e0c7d82fb59f5b6efde492e5fd`
-> * `src/sat/sat_asymm_branch_params.hpp` — `58ffd6f8486fa11980b3934777b27c4e425e2afa442fd802eec92eecc05e45d6`
-> * `src/sat/sat_params.hpp` — `e253cef347626558a87c85938349996f7a203500d39280f390dc89abe3045284`
-> * `src/sat/sat_scc_params.hpp` — `3f230001e4b89584956eb6ba59ea4a7bb48977fb975096d914686315fa1144c5`
-> * `src/sat/sat_simplifier_params.hpp` — `6c5097defa9b8789e0e21bb92ac0ddc5406a8073a4bdb2c14d51678141790ab9`
-> * `src/smt/params/smt_params_helper.hpp` — `09b28acdc4c25f4f86ca7a4c1f149abe9c245fbe0f07ecb13fbc1c039600d25e`
-> * `src/solver/combined_solver_params.hpp` — `2378a45d9eae15beded43d64c4f1e61a16e12e5c35b6eedc0e325bfefbe815b4`
-> * `src/tactic/sls/sls_params.hpp` — `d75b2e4c33753b231ac4599d33c376e0f56e87da015796f9baddf1650709fa9c`
-> * `src/tactic/smtlogics/qfufbv_tactic_params.hpp` — `0c63264a9ddeba2668c08c36856e10e763a1f56f5b6dbe9b41267b4f56ea08e6`
-> * `src/util/lp/lp_params.hpp` — `05c3a08d15fec382fc2fa6854806fc2e7f090aaaac29895ed810b47d1076694a`
+> * `scripts/mk_genfile_common.py`
+> * `scripts/mk_util.py`
+> * `src/test/gparams_register_modules.cpp`
+> * `src/cmd_context/context_params.cpp`
+> * `src/util/env_params.cpp`
+> * `src/ast/normal_forms/nnf.cpp`
+> * `src/ackermannization/ackermannization_params.hpp`
+> * `src/ackermannization/ackermannize_bv_tactic_params.hpp`
+> * `src/ast/fpa/fpa2bv_rewriter_params.hpp`
+> * `src/ast/normal_forms/nnf_params.hpp`
+> * `src/ast/pattern/pattern_inference_params_helper.hpp`
+> * `src/ast/pp_params.hpp`
+> * `src/ast/rewriter/arith_rewriter_params.hpp`
+> * `src/ast/rewriter/array_rewriter_params.hpp`
+> * `src/ast/rewriter/bool_rewriter_params.hpp`
+> * `src/ast/rewriter/bv_rewriter_params.hpp`
+> * `src/ast/rewriter/fpa_rewriter_params.hpp`
+> * `src/ast/rewriter/poly_rewriter_params.hpp`
+> * `src/ast/rewriter/rewriter_params.hpp`
+> * `src/interp/interp_params.hpp`
+> * `src/math/polynomial/algebraic_params.hpp`
+> * `src/math/realclosure/rcf_params.hpp`
+> * `src/model/model_evaluator_params.hpp`
+> * `src/model/model_params.hpp`
+> * `src/muz/base/fixedpoint_params.hpp`
+> * `src/nlsat/nlsat_params.hpp`
+> * `src/opt/opt_params.hpp`
+> * `src/parsers/util/parser_params.hpp`
+> * `src/sat/sat_asymm_branch_params.hpp`
+> * `src/sat/sat_params.hpp`
+> * `src/sat/sat_scc_params.hpp`
+> * `src/sat/sat_simplifier_params.hpp`
+> * `src/smt/params/smt_params_helper.hpp`
+> * `src/solver/combined_solver_params.hpp`
+> * `src/tactic/sls/sls_params.hpp`
+> * `src/tactic/smtlogics/qfufbv_tactic_params.hpp`
+> * `src/util/lp/lp_params.hpp`
 >
 > ## Frozen executable packet
 >
@@ -5821,16 +5836,16 @@ certify HEAD/current drafts.
 > * `TestGlobalParamsThreeDictionaryLayoutsAndPhysicalBucketOrder`
 > * `TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule`
 >
-> ## Reference SHA256
+> ## Reference source paths
 >
-> * `src/util/gparams.h` — `bf102cab1d1ad1bba0923daeec78d13ff9cbdb4bd305b7f311c33a3dc92546bc`
-> * `src/util/gparams.cpp` — `e00c0c7574b5a4e49926b9fe13a0289854c5e0f7b0824b40a3ac8ed039a6e235`
-> * `src/util/dictionary.h` — `defa2be995dc90b70c12342c23374a55159ce9fabde29ac83c76ddf2661b6289`
-> * `src/util/map.h` — `62db3b3819aa71f67bababdb3d5583d14fecebbde6f2d22866c28a86215aa850`
-> * `src/util/hashtable.h` — `bdc562a7db2c0d914dd896577c43e0648f501538873460d2e1a6c2d0932f64f2`
-> * `src/util/symbol.h` — `60ce765fb3b761ec178ceec7db59f7ddbce00dd0fad5148f6a8ec234f62b4fbf`
-> * `src/test/main.cpp` — `e18f789f7c4794ed08c2988aa637a778d58b72bb7c1bc616b8710a4c54c9e993`
-> * `src/test/gparams_register_modules.cpp` — `682377f035394159980e4362ca7d303c6488d0ad17c592c8d4fdc5d40b8ff723`
+> * `src/util/gparams.h`
+> * `src/util/gparams.cpp`
+> * `src/util/dictionary.h`
+> * `src/util/map.h`
+> * `src/util/hashtable.h`
+> * `src/util/symbol.h`
+> * `src/test/main.cpp`
+> * `src/test/gparams_register_modules.cpp`
 >
 > ## Coordinator integration
 >
@@ -6246,10 +6261,10 @@ certify HEAD/current drafts.
 > zero Go allocations under FailAfter(0); budget releases checked before and at
 > owner close. Parent owns separate actual complete hook/lifecycle/order tests.
 >
-> ## Source SHA256
+> ## source paths
 >
-> - `src/util/inf_int_rational.h`: `6f2ce95052ff18cc2e6fd7103741c1959c6004a4207fa9b366492d4e94ba95c8`
-> - `src/util/inf_int_rational.cpp`: `ff015c7ba05fbc9dd77a58e4226b803004e573c72b8fd77e1d2022e40a343486`
+> - `src/util/inf_int_rational.h`
+> - `src/util/inf_int_rational.cpp`
 >
 > Final gate evidence follows when all complete. All writes/temp/cache/artifacts
 > remain within golang; no external writes or commits are made by this packet.
@@ -6275,7 +6290,7 @@ certify HEAD/current drafts.
 > Parent final combined frozen native30734, full checked race63802, and full actual
 > checked JS67573 passed across every module package. All41 new packet tests have
 > explicit JS RUN/PASS evidence in
-> `.cache/rational-facade-inf-ext-gcd-frozen-checked-js.log`; source/test checksums
+> `.cache/rational-facade-inf-ext-gcd-frozen-checked-js.log`; Go implementation/test hashes
 > remained unchanged. Checked full vet, WASI build and no-generics/source audit
 > also passed. WASI runtime execution is not claimed.
 
@@ -6425,7 +6440,7 @@ certify HEAD/current drafts.
 > Parent final combined frozen native30734, full checked race63802, and full actual
 > checked JS67573 passed across every module package. All41 new packet tests have
 > explicit JS RUN/PASS evidence in
-> `.cache/rational-facade-inf-ext-gcd-frozen-checked-js.log`; source/test checksums
+> `.cache/rational-facade-inf-ext-gcd-frozen-checked-js.log`; Go implementation/test hashes
 > remained unchanged. Checked full vet, WASI build and no-generics/source audit
 > also passed. These combined results include the final signed-constructor and
 > increment-route corrections; WASI runtime execution is not claimed.
@@ -6552,7 +6567,7 @@ certify HEAD/current drafts.
 > Independent frozen HEAD-plus-heap snapshot gates passed: full native and full
 > checked/debug module tests; all twelve heap test names RUN/PASS under checked/debug
 > race and actual Node JS/WASM execution; checked/debug vet and WASI compilation;
-> source fingerprint and no-generics audit. The source ledger remains 33 ported,
+> source inventory and no-generics audit. The source ledger remains 33 ported,
 > 65 partial and 2004 unported; this corrects existing heap coverage without adding
 > source/API completion claims. The first three regression groups were observed
 > behavioral RED before the ordering/invariant correction; the out-of-bounds
@@ -6608,7 +6623,7 @@ certify HEAD/current drafts.
 > (root2.731s/mpnum22.594s), eight checked/debug race groups (1.016s), eight actual
 > checked/debug JavaScript RUN/PASS events, vet and WASI compilation passed.
 > WASI execution and actual process-wide concurrent accounting are not claimed.
-> Initial source fingerprint audit passed; final metadata/no-generics audit is
+> Initial source inventory audit passed; final metadata/no-generics audit is
 > recorded after its terminal result.
 >
 > memory_manager.h/.cpp remain partial. Registered src/test/memory.cpp is empty
@@ -6623,7 +6638,7 @@ certify HEAD/current drafts.
 > Final source/declaration/no-generics audit passed2102 units/677 APIs:
 > 33 ported,80 partial,1989 unported. Only memory_manager.h/.cpp move from
 > unported to partial. Whole-method/ownership flags and API coverage remain false.
-> Frozen byte hashes matched before commit; original source fingerprints unchanged.
+> Frozen byte hashes matched before commit; original source inventory unchanged.
 
 <a id="audit-memory-package-api-packet-md"></a>
 
@@ -6953,8 +6968,7 @@ certify HEAD/current drafts.
 >
 > Integrated source/evidence/no-generics audit95986 exited0, using the exact
 > relocated method targets and both real main bridge and lower-core test packages:
-> 2102 units,677 APIs,33ported/145partial/1924unported. Source fingerprint remains
-> `f8480997c14e2d6c414f40c60ce5095ef40a89ce6d1bcf1ed196c5d682d42d8f`.
+> 2102 units,677 APIs,33ported/145partial/1924unported. Source inventory is unchanged.
 > No whole source unit is promoted. Parent owns the final exact-index commit;
 > MPZ/natural default backend and the full solver/proof/interpolation objective
 > remain active.
@@ -7099,8 +7113,8 @@ certify HEAD/current drafts.
 >
 > Frozen snapshot .cache/release/memory-release-green-4370e7e includes committed4370e7e plus ONLY memory/runtime.go, small_allocator.go, release_progress.go and release_progress_test.go. Exact57 lower test names (committed49+new8) are .cache/memory-release-final-names.txt. All other new backend/Natural API drafts are excluded. No main, consolidation/vector, codec, arena, mpnum, metadata or Git changes in this chunk. Final hashes:
 >
-> | File | SHA256 |
-> | --- | --- |
+> | File |
+> | --- |
 > | memory/runtime.go | fa3a0c19c19005515c814d5217d4d707f801a5a8e5c44e0cf01524136b89bee7 |
 > | memory/small_allocator.go | cf0fa58e94f51579c653274448e7920b70d143b0b7f9c519090584712f9856b9 |
 > | memory/release_progress.go | b3da8fe2530e34444cf2c4cd217e0a716ae455018e8fa30ca379e9f4e214f40e |
@@ -7240,17 +7254,17 @@ certify HEAD/current drafts.
 > and runs until OOM for limits10/20/30. Do not claim that direct allocator fixtures
 > execute this registered Windows test; retain that obligation separately.
 >
-> ## Inspected source fingerprints
+> ## Inspected source inventory
 >
-> - `src/util/memory_manager.h`: `78b004da89d38686fdf0ad34807ad77f844e9d7ac275834ef312adc2c7bc1839`
-> - `src/util/memory_manager.cpp`: `3b884edd5463aa7ddfe68d6e0badc0695eff2b6b6fd90736850dd740f43e29d6`
-> - `src/test/memory.cpp`: `39c8d989b1dc67fca95d08a1559e27a28faf82c05d0ea63620ed21c0ec7f046b`
-> - `src/sat/sat_solver.h`: `7ec8a9c01ca2757723192c3e1098891043a91c7e719695fd2c806f717233c1c4`
-> - `src/sat/sat_probing.cpp`: `3dcf3eecc14646c45c2e9ed55210c6e7b87e1a459f77c548344700580694910e`
-> - `src/util/statistics.cpp`: `ee1b62f6d3daaa8e3b1b21731620f567f23bc084e32181b141aa3951d44bbb16`
-> - `scripts/mk_genfile_common.py`: `86cdb958696d411d48d04b74fc56e379a6ad41eba03d1f52cf76c53813f15482`
-> - `scripts/mk_util.py`: `4b1921c9cdf40923f8d12b81c6319cab2f9cfbb8dd5a3abcc48deeb94b3179fd`
-> - `CMakeLists.txt`: `832e85a5d21ec0baecb1fa08f166037719fdf363e09fd48a69f3f7ab4efca6bd`
+> - `src/util/memory_manager.h`
+> - `src/util/memory_manager.cpp`
+> - `src/test/memory.cpp`
+> - `src/sat/sat_solver.h`
+> - `src/sat/sat_probing.cpp`
+> - `src/util/statistics.cpp`
+> - `scripts/mk_genfile_common.py`
+> - `scripts/mk_util.py`
+> - `CMakeLists.txt`
 >
 > The counter component now exposes explicit32/64 size_t promotion helpers.
 > Physical adapter input deltas must use source unsigned arithmetic at that width.
@@ -7633,7 +7647,7 @@ certify HEAD/current drafts.
 > fourteen distinct expected RUN/PASS groups and the PASS footer. Checked/debug
 > vet PASS, WASI compilation82353 PASS. Central source/no-generics audit35987 PASS:
 > 2102 units/677 APIs,33ported/60partial/2009unported. Exactly five central source
-> rows changed; all source hashes/assertions/conditionals/registrations and API
+> rows changed; all source paths/assertions/conditionals/registrations and API
 > entries are unchanged. This numerical prerequisite does not implement the
 > remaining solver, proof or interpolation objective.
 
@@ -7938,8 +7952,8 @@ certify HEAD/current drafts.
 > Final tree `.cache/release/mpq-additive-final-facaeb4` is committed `facaeb4`
 > plus only these eight Go files. Snapshot and worktree hashes are identical:
 >
-> | File | SHA256 |
-> | --- | --- |
+> | File |
+> | --- |
 > | mpnum/mpq.go | b9eb7be7f2cf7d815172df34ca9668a79df9291e878084e63065c466684789dd |
 > | mpnum/mpq_ops.go | 526050baebb153069796127a938f5a7913627f6b0fc6a6cdee78f15e12251fee |
 > | mpnum/mp_add_publication_test.go | b39a35927c5295ced8be502ed775188ebd70d7370653ae13fc6148fd6ea0a142 |
@@ -8261,7 +8275,7 @@ certify HEAD/current drafts.
 >
 > Final freeze: exact approved file hashes/names, fresh committed HEAD plus only
 > selected overlays, full native and checked/debug, actual named race and JS
-> RUN/PASS, vet, full WASI and test compiles, integrated source fingerprint/
+> RUN/PASS, vet, full WASI and test compiles, integrated source inventory/
 > evidence/no-generics audit. Parent owns metadata/Git and stale old-doc correction.
 > Whole mpz/mpq/rational source units remain partial; GMP/64-bit-limb, TRACE,
 > persistent ostream, some source diagnostics, infallible scalar/physical field
@@ -8790,8 +8804,8 @@ certify HEAD/current drafts.
 >
 > Final frozen Go inventory, based on committed `de4d6a0` plus ONLY these files:
 >
-> | File | SHA256 |
-> | --- | --- |
+> | File |
+> | --- |
 > | mpnum/mpq_parse.go | 1cfdaf7ace6133201ab68cfae78e72af8aef57d919493c7ef53633456c580ebc |
 > | mpnum/mp_parse_test.go | 0d77d84c64a3efcb7aad7a8ed3db138f9e310cae9499f169039dd5a94189be5b |
 > | mpnum/mp_parse_publication_test.go | 163827b44aeb7c86b8c1c3a7946a1c4ec735d4d1adc7b91aa81bb224369ecb21 |
@@ -8818,7 +8832,7 @@ certify HEAD/current drafts.
 > `.cache/parser-final-native.log`, `parser-final-debug.log`, `parser-final-vet.log`.
 > No current race/JS/WASI checks: they remain user-deferred. Reference/source/no-generics/evidence audit85763 is terminalPASS on the
 > committed manifest:2102 units,677 APIs,33 ported,148 partial,1921 unported;
-> log `.cache/parser-final-source-audit.log`. Source inventory/fingerprints and
+> log `.cache/parser-final-source-audit.log`. Source inventory/inventory and
 > runnable evidence declarations do not hash Go test bodies; final-byte evidence/
 > no-generics audit41143 is terminalPASS on exact final bytes and supplements
 > that same source result without repeating source inventory (same2102/677 and
@@ -9512,16 +9526,16 @@ certify HEAD/current drafts.
 >
 > Natural expand is source uint32 capacity<<1. Memory request uses source sizeof(uint32)*newcapacity with selected size_t arithmetic; guard only actual endangered host/index/copy operations after source allocations where wrapped buffers are finite. Full old+new physical peak is real; old overflow frees after copying source pos bytes and before pointer/capacity publication. A post-free TLS error retains new pending root and old completed-free state, not a rolled-back buffer. Reverse Natural field destruction is t_ab,t_ms,v,u. Format lexical sbuffers and source verification/debug locals need their actual lifecycle order, not retained universal formatting arenas. This profile is wider than cell-only storage and cannot be marked complete while present preallocated arena formatScratch/text or early ab reservation remain.
 >
-> ## Source hashes
+> ## Source paths
 >
-> - mpz.h: 41891597e12173581e7ae3f108c048897761c48a191b06fd3ba160d1e98049b1
-> - mpz.cpp: 677698562746fdfa6d280f345d6efb805e810e3157c860881d22a9e8a0597aa3
-> - mpn.h: 78c22a9886044151fe808848e6045bfdae75ecd63ee394a8b50d222daffa7b50
-> - mpn.cpp: dc001ca86b19a2af70f45670fc5419d35ee105b4ed1f86cf12b684e95475fbca
-> - buffer.h: f5c876511a1fd5674ba5f9fa462d9206ffaad979ee90cc30e7d1b5fc9c4e07e1
-> - memory_manager.cpp: 3b884edd5463aa7ddfe68d6e0badc0695eff2b6b6fd90736850dd740f43e29d6
-> - small_object_allocator.h: 57b0a3bbc2d9fd10f008f371e3b5b9bee5535d39ab5cfbcb4afd9324018a140b
-> - small_object_allocator.cpp: 70cf910ed0a3871ea110ee01ff8d23a687f74af5972ab995dce32ba3e6e35994
+> - mpz.h
+> - mpz.cpp
+> - mpn.h
+> - mpn.cpp
+> - buffer.h
+> - memory_manager.cpp
+> - small_object_allocator.h
+> - small_object_allocator.cpp
 >
 >
 > ## Concrete Natural buffer interface and test-only RED disposition
@@ -9869,7 +9883,7 @@ certify HEAD/current drafts.
 > Final freeze: exact owned file hashes and named inventory; isolated current
 > approved HEAD plus only approved files; full native/g3checked+g3debug, named
 > race and actual JS/Wasm RUN/PASS, vet, full WASI plus test compilation,
-> integrated source fingerprint/evidence/no-generics audit. Parent owns commits
+> integrated source inventory/evidence/no-generics audit. Parent owns commits
 > and central unit/method coverage; whole headers stay partial.
 >
 > ## Ownership, physical allocation and dependencies left open
@@ -10040,8 +10054,7 @@ certify HEAD/current drafts.
 > compiles75367/91810 exited0. Parent integrated source/evidence/no-generics audit20630 exited0:
 > 2102units,677APIs,33ported145partial1924unported; log
 > `.cache/bitwise-parent-audit.log`. Parent independently verified all2102 unit
-> SHA values and the exact1687-file source fingerprint
-> `f8480997c14e2d6c414f40c60ce5095ef40a89ce6d1bcf1ed196c5d682d42d8f`.
+> paths and the exact1687-file source inventory.
 > No source-unit promotion occurred. Agent supplementary audit65989 also exited0 with the same counts; log
 > `.cache/bitwise-final-audit.log`.
 
@@ -10794,7 +10807,7 @@ certify HEAD/current drafts.
 > | Actual named32 checked-debug JS/Wasm `./...` | 96459 exit0; exact32 RUN/PASS, mpnum6.214s; absolute existing js-exec wrapper |
 > | Full checked-debug vet | 53039 exit0 |
 > | Full checked-debug WASI build plus mpnum test compile | 23269 exit0 |
-> | Source fingerprint, evidence and no-generics audit | 73031 exit0 on HEAD ledger,2102 units/677 APIs,33 ported/145 partial/1924 unported; integrated-ledger audit68048 exit0 with the same2102/677/33/145/1924 inventory |
+> | Source inventory, evidence and no-generics audit | 73031 exit0 on HEAD ledger,2102 units/677 APIs,33 ported/145 partial/1924 unported; integrated-ledger audit68048 exit0 with the same2102/677/33/145/1924 inventory |
 >
 > Logs are `.cache/mp-power-frozen-{native,debug,race,js,vet,audit}.log` and
 > `.cache/mp-power-frozen-integrated-audit.log`; WASI test output is
@@ -10811,8 +10824,8 @@ certify HEAD/current drafts.
 > The first13 files belong to this numerical packet; the final root test is the
 > parent's approved dependency correction. Source production is only the first3.
 >
-> | File | SHA256 |
-> | --- | --- |
+> | File |
+> | --- |
 > | `mpnum/mpz_power_shift.go` | `d46ce8c9c8a611e03b9338cedcfd215f05a998eae2b570721ee1f3c290d98ac2` |
 > | `mpnum/mpq_power.go` | `5e2dd0fed4a55e3fd0767e807eea9d1f2d0cf21e8f23f2997a8b0953d6de537a` |
 > | `mpnum/mpq.go` | `7e0b16d2a84677a7c3cc04b43ef4f7be10352f587dfea625033c92babeee2f58` |
@@ -10853,7 +10866,7 @@ certify HEAD/current drafts.
 > build31103 and root/mpnum WASI test compilations33790/26883 exited0. Integrated
 > source-evidence/no-generics audit79699 exited0 at2102units/677APIs with the
 > unchanged33ported/145partial/1924unported ledger. Agent integrated relative-source
-> audit68048 also exited0. Source SHA values and final Go hashes were independently
+> audit68048 also exited0. Source path evidence and final Go hashes were independently
 > checked; only this document changed after the final gates. Stage/index hashes
 > will be checked against .cache/mp-power-parent-final-inventory.json before the
 > coherent commit.
@@ -11710,7 +11723,7 @@ certify HEAD/current drafts.
 > WASI build and no-generics audit. Parent integration independently passed full
 > native, full checked-debug, targeted checked-debug race, vet, WASI build and
 > actual checked-debug JS for all eighteen registrations. The Go files matched
-> snapshot hashes after these gates. Source fingerprint/ledger checked separately.
+> snapshot hashes after these gates. Source inventory/ledger checked separately.
 
 <a id="audit-param-descrs-port-status-md"></a>
 
@@ -11854,17 +11867,17 @@ certify HEAD/current drafts.
 > race, actual checked JS, vet/WASI, and no-generics results appended below once
 > completed. No source reference checkout is needed at test runtime.
 >
-> ## Source SHA256
+> ## source paths
 >
 > ```
-> 50738b66c08a5d24f818eedf5fa4bafdaec8593b41408ae1173c78adc762c6fb  src/util/params.h
-> adfec5df1efec4cd4d08844d06463b58096d1c91e0374e7e432a5f1d9bb70dd9  src/util/params.cpp
-> 09356c28b4a280a7cf48d43e724396cbd3162db66949df033aebc5ad2bb5fbe9  src/util/cmd_context_types.h
-> 3dd955e878614004a06cca24f82c0f1a24ca33892869300abcb82fc08d9bc64f  src/util/cmd_context_types.cpp
-> defa2be995dc90b70c12342c23374a55159ce9fabde29ac83c76ddf2661b6289  src/util/dictionary.h
-> 62db3b3819aa71f67bababdb3d5583d14fecebbde6f2d22866c28a86215aa850  src/util/map.h
-> bdc562a7db2c0d914dd896577c43e0648f501538873460d2e1a6c2d0932f64f2  src/util/hashtable.h
-> aafafc0fe6ca0afd7bafe0c781342da259f9c34c0b94b16732c415cf2733066e  src/util/vector.h
+> src/util/params.h
+> src/util/params.cpp
+> src/util/cmd_context_types.h
+> src/util/cmd_context_types.cpp
+> src/util/dictionary.h
+> src/util/map.h
+> src/util/hashtable.h
+> src/util/vector.h
 > ```
 >
 > Final refreshed gates after the prefix constructor correction:
@@ -11956,9 +11969,9 @@ certify HEAD/current drafts.
 > - util_param_descrs_stream_nodebug.go:a7c4cd38ca69f4efabf312d9f7ee5d9880c504a351e34f450ddc656efb0ff034
 > - util_param_descrs_stream_test.go:a99cea4ff641e6fae8d84f9f85e811d95313b11133b94e6f1b41146503b6c625
 >
-> Source SHA256:
-> - src/util/params.cpp:adfec5df1efec4cd4d08844d06463b58096d1c91e0374e7e432a5f1d9bb70dd9
-> - src/util/vector.h:aafafc0fe6ca0afd7bafe0c781342da259f9c34c0b94b16732c415cf2733066e
+> source paths:
+> - src/util/params.cpp
+> - src/util/vector.h
 >
 > Root review and integration: .cache/review/pd-stream-guard-integration-fb08673
 > contains the identical final four Go files on the identical committed base,
@@ -12589,15 +12602,10 @@ certify HEAD/current drafts.
 >
 > `port_manifest.json` inventories 2,102 source/build/tool/example units and 677
 > API declarations. All production entries start unported. The 1,687 source files
-> with extensions `.cpp`, `.h`, `.hpp`, or `.pyg` have content fingerprint
-> `f8480997c14e2d6c414f40c60ce5095ef40a89ce6d1bcf1ed196c5d682d42d8f`.
-> This explicitly records the current checkout rather than claiming the plan's
-> 1,619-file fingerprint matches. There are 68 untracked generated source files in
-> that set; no reference files were altered during this work. Restricting the set
-> to Git-tracked files gives
-> `caabc82ba8943415d98e1d87be9c219aaed988ce8afdf8b16da3be146b4f55cc`.
-> The plan's four individual AST/SMT/interpolation checksums match. Generated files
-> and changed-baseline provenance still need detailed generator audits.
+> have extensions `.cpp`, `.h`, `.hpp`, or `.pyg`; this inventory includes 68
+> generated source files in addition to the plan's 1,619-file survey. No reference
+> files were altered. Originating paths identify the fixed source; generated
+> inputs and their generator behavior still need detailed audits.
 >
 > Conditional directives, executable assertion locations, and registration lines
 > are lexical inventory, not proof that branch activation or ownership was audited.
@@ -13577,7 +13585,7 @@ certify HEAD/current drafts.
 >
 > The frozen32-group packet passed native/debug, race, actual JS, vet, WASI
 > compilation and source/no-generics gates; full integration suites also passed
-> against HEAD81f1059. See PORT_PROGRESS.md#audit-sat-model-copy-port-status-md. Source inventory remains
+> against HEAD81f1059. See PORT_PROGRESS.md#audit-sat-model-copy-port-status-md. Source inventory is unchanged.
 > 33ported/87partial/1982unported; the full solver and runtime dependencies remain
 > open under the original complete-port goal.
 >
@@ -14360,16 +14368,16 @@ certify HEAD/current drafts.
 > 1cae63afb0e3097ce43d1ef235f26f7902926685bbf5e14c5d0205ceccabead9  golang/util_printf_test.go
 > ```
 >
-> ## Audited source SHA256
+> ## Audited source paths
 >
 > ```
-> fe2dd5906178c5c4f5469e0dfff5cdf15ac3b993a65ceb4ff3ddd5eb1534c0e5  src/util/warning.h
-> 6ef3f7c9d46d2d496f53f0d20ad5a66bc09b9df755997da2e0d9d53e2edc6db3  src/util/warning.cpp
-> aafafc0fe6ca0afd7bafe0c781342da259f9c34c0b94b16732c415cf2733066e  src/util/vector.h
-> 3fef3958a95b8020caeb2feddbc5bb7b3074dcb38c205b6af74b67c562b9a74d  src/util/z3_exception.cpp
-> d610cf65557aae3d4fbbc4963f3916694bb9ddf9661c6cb21083a68518e9d0b3  src/test/ex.cpp
-> 122fcabf395690b281e18d218a9a8fbb739bcbe226926d0342163f0ac1030c14  src/muz/fp/datalog_parser.cpp
-> 943a03b91df62f385b005fd25cc01970fbf42905d16d33a50bf435732c3aa65d  src/muz/rel/dl_instruction.cpp
+> src/util/warning.h
+> src/util/warning.cpp
+> src/util/vector.h
+> src/util/z3_exception.cpp
+> src/test/ex.cpp
+> src/muz/fp/datalog_parser.cpp
+> src/muz/rel/dl_instruction.cpp
 > ```
 
 <a id="audit-proof-rule-progress-md"></a>
@@ -14401,7 +14409,7 @@ certify HEAD/current drafts.
 > their explicit rule references are inventoried separately from lexical source
 > call sites. Constructor-name matches can include comments, declarations and
 > overloads; their producer behavior remains unaudited. Source files referenced
-> by the ledger carry SHA-256 fingerprints, and every evidence item has a checked
+> by the ledger are identified by originating paths, and every evidence item has a checked
 > repository-relative path, line and exact trimmed source line.
 >
 > ## Checker obligations and source limitations
@@ -14506,9 +14514,9 @@ certify HEAD/current drafts.
 > A maintainer-only builder/validator lives under `golang/.cache` and reads source;
 > ordinary Go tests do not depend on it. Validation checks all 37 unique IDs, exact
 > 14..50 ordering, sentinels, and every recorded evidence path/line/text. JSON
-> output is deterministic and contains source SHA-256 hashes without timestamps.
+> output is deterministic and contains source paths hashes without timestamps.
 > This is inventory validation, not semantic tests or a completed proof gate.
-> The inventory includes 105 source fingerprints and 490 lexical producer evidence
+> The inventory includes 105 source inventory and 490 lexical producer evidence
 > items, plus twelve interpolation enum labels and fifteen method families.
 >
 > Next implementation work must port source assertions first and add independent
@@ -14822,7 +14830,7 @@ certify HEAD/current drafts.
 > (67573). All41 new tests across facade, wrapper GCD, both infinitesimal types
 > and service lifecycle were explicitly observed RUN/PASS in
 > `.cache/rational-facade-inf-ext-gcd-frozen-checked-js.log`. Checked vet, WASI
-> cross-build and no-generics/source audit passed. Frozen source/test checksums
+> cross-build and no-generics/source audit passed. Frozen Go implementation/test hashes
 > remained unchanged. WASI runtime execution is not claimed.
 
 <a id="audit-rational-inf-lifecycle-port-status-md"></a>
@@ -14870,7 +14878,7 @@ certify HEAD/current drafts.
 > tests, including these three lifecycle tests, have explicit JS RUN/PASS records
 > in `.cache/rational-facade-inf-ext-gcd-frozen-checked-js.log`.
 > Checked full-module vet, WASI build and source/no-generics audit passed. Frozen
-> source/test checksum verification passed. WASI runtime execution is not claimed.
+> Go implementation/test hash verification passed. WASI runtime execution is not claimed.
 > The active rational.cpp algorithms/hooks are complete; its header facade and
 > the full solver/AST/proof/interpolation goal remain incomplete.
 >
@@ -15147,13 +15155,13 @@ certify HEAD/current drafts.
 >
 > Final gates are recorded below when complete.
 >
-> ## Source SHA256
+> ## source paths
 >
-> - `src/util/rational.cpp`: `4479ae33541ebd0481884deab48fabea327183d53e34ab3c6639246812adbd69`
-> - `src/util/rational.h`: `a23db256b5025d27e9bc295e0aa3c0d2d3892baf7d5c6845f35cff3579ea4b9c`
-> - `src/util/vector.h`: `aafafc0fe6ca0afd7bafe0c781342da259f9c34c0b94b16732c415cf2733066e`
-> - `src/test/rational.cpp`: `a6ef1049711361be794fcca1404de39d063f2f46f709aa8d3312461e15e1f8b6`
-> - `src/util/mpq.h`: `89498b6aced1bee1e7ec72e782bee3ae1549c47c0cc228a46d0d288a6353db58`
+> - `src/util/rational.cpp`
+> - `src/util/rational.h`
+> - `src/util/vector.h`
+> - `src/test/rational.cpp`
+> - `src/util/mpq.h`
 >
 > ### Final gate results
 >
@@ -15338,11 +15346,11 @@ certify HEAD/current drafts.
 > are in .cache/memory-runtime-final-hashes.json. Complete combined integration
 > and final source/no-generics evidence will be appended after terminal results.
 >
-> Reference SHA256:
+> Reference source paths:
 >
-> - src/util/memory_manager.cpp — 3b884edd5463aa7ddfe68d6e0badc0695eff2b6b6fd90736850dd740f43e29d6
-> - src/util/memory_manager.h — 78b004da89d38686fdf0ad34807ad77f844e9d7ac275834ef312adc2c7bc1839
-> - src/test/memory.cpp — 39c8d989b1dc67fca95d08a1559e27a28faf82c05d0ea63620ed21c0ec7f046b
+> - src/util/memory_manager.cpp
+> - src/util/memory_manager.h
+> - src/test/memory.cpp
 >
 > ## Final coordinator integration
 >
@@ -15648,8 +15656,7 @@ certify HEAD/current drafts.
 > # Actual SAT generated parameter descriptors
 >
 > Source sat::config::collect_param_descrs delegates to generated sat_params.
-> The actual preserved sat_params.hpp is present (SHA256
-> e253cef347626558a87c85938349996f7a203500d39280f390dc89abe3045284).
+> The actual preserved `src/params/sat_params.hpp` is present.
 > Its24 collector inserts match sat_params.pyg and scripts/mk_genfile_common.py
 > max_memory_param, pyg_default and collector emission bodies. Production repeats
 > those exact calls in declaration order without a host metadata array, generic
@@ -15696,12 +15703,11 @@ certify HEAD/current drafts.
 > - sat_main_config_descrs.go: ae4c99425254d7368058a5b77a5a1272c9f105e4964449c83360467c21124942
 > - sat_main_config_descrs_test.go: ad325ffeef8373bf4c594655039aba6987d7785a51ff8767dafb9dcb77229bbe
 >
-> Source SHA256:
-> - src/sat/sat_config.cpp: cfbc032cf10a16acb1f913a18286ef5d1fd846edd249081013d3f1b0ca58122f
-> - src/sat/sat_config.h: 4207a3caa3bc54a06e88064859db569b2f122d7a4c189e41bffe45175d8388ca
-> - src/sat/sat_params.pyg: 23c5c38b82c1184089a6e77dd8498a03b5607eb44f00ca972475fb18b5cf85df
-> - scripts/mk_genfile_common.py: 86cdb958696d411d48d04b74fc56e379a6ad41eba03d1f52cf76c53813f15482
-
+> source paths:
+> - src/sat/sat_config.cpp
+> - src/sat/sat_config.h
+> - src/sat/sat_params.pyg
+> - scripts/mk_genfile_common.py
 <a id="audit-sat-config-packet-md"></a>
 
 ### Historical evidence: SAT_CONFIG_PACKET.md
@@ -15827,17 +15833,17 @@ certify HEAD/current drafts.
 >
 > Coordinator options: assign full registry core first under new ownership/API review, or provide actual root-owned GlobalParams service; config constructor/updater waits for that production service. No config production/test writes until decision. Process-global registration concurrency and shared Budget confinement must be explicit (service mutex does not make independent external Budget mutations globally thread safe). C strtol/strtod external ABI, borrowed-string setter and generated full catalog/display stdout are named dependency gates, not silently unsupported config modes.
 >
-> ## Source SHA256
-> - src/sat/sat_config.h: 4207a3caa3bc54a06e88064859db569b2f122d7a4c189e41bffe45175d8388ca
-> - src/sat/sat_config.cpp: cfbc032cf10a16acb1f913a18286ef5d1fd846edd249081013d3f1b0ca58122f
-> - src/sat/sat_params.pyg: 23c5c38b82c1184089a6e77dd8498a03b5607eb44f00ca972475fb18b5cf85df
-> - scripts/mk_genfile_common.py: 86cdb958696d411d48d04b74fc56e379a6ad41eba03d1f52cf76c53813f15482
-> - src/util/params.cpp: adfec5df1efec4cd4d08844d06463b58096d1c91e0374e7e432a5f1d9bb70dd9
-> - src/util/gparams.cpp: e00c0c7574b5a4e49926b9fe13a0289854c5e0f7b0824b40a3ac8ed039a6e235
-> - src/util/util.h: a87417423f67da7a52a6b7e98a40902289047848c1129d1b687f816932ce6a07
-> - src/sat/sat_solver.cpp: ea35f45c69be4d179aec4e1af034b2295f2a026bb01c37a2d9f8c59abf519655
-> - src/sat/sat_solver.h: 7ec8a9c01ca2757723192c3e1098891043a91c7e719695fd2c806f717233c1c4
-> - src/test/sat_user_scope.cpp: c86c383ea199a89a5311bae5f8186e0b59e6953aa17bb7d675e221aa0c5edffc
+> ## source paths
+> - src/sat/sat_config.h
+> - src/sat/sat_config.cpp
+> - src/sat/sat_params.pyg
+> - scripts/mk_genfile_common.py
+> - src/util/params.cpp
+> - src/util/gparams.cpp
+> - src/util/util.h
+> - src/sat/sat_solver.cpp
+> - src/sat/sat_solver.h
+> - src/test/sat_user_scope.cpp
 
 <a id="audit-sat-literal-set-port-status-md"></a>
 
@@ -16072,7 +16078,7 @@ certify HEAD/current drafts.
 > Frozen `.cache/review/sat-main-config-integration-e59f032` adds only the four
 > verified config Go files to committed actual registrye59f032, including its
 > twenty-two registry tests. Full native handle10933 and checked-debug15735
-> passed; mpnum22.352s/22.875s. Coordinator verified four source hashes and all
+> passed; mpnum22.352s/22.875s. Coordinator verified four source paths and all
 > twenty-one exact race/actual JS RUN/PASS groups. Updated source/no-generics
 > audit82917 passed, ledger33ported/99partial/1970unported. Existing source
 > config rows remain partial; full SAT/SMT/proof/interpolation work remains open.
@@ -16130,11 +16136,11 @@ certify HEAD/current drafts.
 >
 > No committed watch files, root-owned PORT_PROGRESS.md#audit-sat-solver-packet-md/central metadata or Git were edited in this packet. Full solver registered-test missing APIs are excluded from this prerequisite snapshot, not hidden behind build tags or replaced by another solver.
 >
-> ## Preserved source hashes
+> ## Preserved source paths
 >
-> - src/sat/sat_model_converter.h:760b847933f74903f81b19dcc5cd98a560f1d01407dabc8042638aaab9d01c9a
-> - src/sat/sat_model_converter.cpp:57f99643ce2dc3eaf8866c01a9c4e621a64c84b496154e071cc8d819b79ab6e9
-> - src/util/vector.h:aafafc0fe6ca0afd7bafe0c781342da259f9c34c0b94b16732c415cf2733066e
+> - src/sat/sat_model_converter.h
+> - src/sat/sat_model_converter.cpp
+> - src/util/vector.h
 >
 > ## Coordinator integration
 >
@@ -17154,51 +17160,51 @@ certify HEAD/current drafts.
 >
 > Full solver production files will be coordinated new `sat_solver*.go` and concrete dependency specializations only. Existing utilities, frozen storage, runtime ownership edits, manifests, progress and Git are parent-owned. The source body inventory is a plan/evidence boundary, not implementation status.
 >
-> ## Pinned source hashes
+> ## Pinned source paths
 >
-> | Source file | SHA256 |
-> | --- | --- |
-> | `src/sat/sat_solver.h` | `7ec8a9c01ca2757723192c3e1098891043a91c7e719695fd2c806f717233c1c4` |
-> | `src/sat/sat_solver.cpp` | `ea35f45c69be4d179aec4e1af034b2295f2a026bb01c37a2d9f8c59abf519655` |
-> | `src/test/sat_user_scope.cpp` | `c86c383ea199a89a5311bae5f8186e0b59e6953aa17bb7d675e221aa0c5edffc` |
-> | `src/test/main.cpp` | `e18f789f7c4794ed08c2988aa637a778d58b72bb7c1bc616b8710a4c54c9e993` |
-> | `src/sat/sat_extension.h` | `18ee5002876191ffa8a3b50681d5f93b58ee912140956d228b7e0c69bff087b9` |
-> | `src/sat/sat_config.h` | `4207a3caa3bc54a06e88064859db569b2f122d7a4c189e41bffe45175d8388ca` |
-> | `src/sat/sat_config.cpp` | `cfbc032cf10a16acb1f913a18286ef5d1fd846edd249081013d3f1b0ca58122f` |
-> | `src/sat/sat_params.pyg` | `23c5c38b82c1184089a6e77dd8498a03b5607eb44f00ca972475fb18b5cf85df` |
-> | `src/sat/sat_scc_params.pyg` | `dc0a71c2aa4d5e8f1138a4f0bc46e9896c246b9a105e1daf6b75c8d0336deed7` |
-> | `src/sat/sat_asymm_branch_params.pyg` | `aa1fc70459542f193c2efb5bd54c985c83ed2e7a5cbdb5a339bd842d7b731f0e` |
-> | `src/sat/sat_simplifier_params.pyg` | `e3b1e74369b98a67bc0508882111d89f94cdc4695bbf277b17fab565d72dbda9` |
-> | `src/util/memory_manager.h` | `78b004da89d38686fdf0ad34807ad77f844e9d7ac275834ef312adc2c7bc1839` |
-> | `src/util/memory_manager.cpp` | `3b884edd5463aa7ddfe68d6e0badc0695eff2b6b6fd90736850dd740f43e29d6` |
-> | `src/util/luby.cpp` | `b11c52b8b4070fa8c3068abe87c9e1b2e1048b86a7e83515343796887392dab7` |
-> | `src/util/stopwatch.h` | `d04639e66c71315e72c145add2ceb6c52614a88d701170649f94b9b92ee9876b` |
-> | `src/util/max_cliques.h` | `08ffe398e0d558ac867e0fea775cf6ff6b60c5752016a8e1ed552e598b70fbba` |
-> | `src/sat/CMakeLists.txt` | `9e3420309620143592d3e7692ba9d072195bbd25758bdedaa599d36fd4422f1a` |
-> | `src/sat/sat_cleaner.h` | `da27c8f85264d0ebbac26604cf2e9f42ea83a788e53ff905314b2c1fb92b3044` |
-> | `src/sat/sat_cleaner.cpp` | `c054a91bd51798136c59ee1dd29f228960c912ca44c23b1143dbf6b1b3af899e` |
-> | `src/sat/sat_simplifier.h` | `d2a2d46302077c837ed22480be93a570ec0d74339c8b071ed6808ed2332e254a` |
-> | `src/sat/sat_simplifier.cpp` | `3ca576a5a9af07d608d5f19352b0661abaff5a743b09522658031cc4df656b09` |
-> | `src/sat/sat_scc.h` | `dcd5f98bd7a41f9f4b31212bccac77596d5d19b4dc09cc5084c53a893ad6716f` |
-> | `src/sat/sat_scc.cpp` | `2d02927006a609549c4c2fcde160dd4492beb50c62db5197b7d33d2b3cda560e` |
-> | `src/sat/sat_asymm_branch.h` | `54c07e4db1dd6b83ac1f2be987dfba76067baa4e8b27be259350a9c74e10bb9b` |
-> | `src/sat/sat_asymm_branch.cpp` | `a811281bb3da28e5b0087d36bd4f43d2b79f1ed276a6ae6b4e0dab26e89d7f66` |
-> | `src/sat/sat_probing.h` | `0837280ffa8cb5fe8eea62deb146bb43ab1ad5133db53cb2216e757157721e96` |
-> | `src/sat/sat_probing.cpp` | `3dcf3eecc14646c45c2e9ed55210c6e7b87e1a459f77c548344700580694910e` |
-> | `src/sat/sat_mus.h` | `70b609ae89bee2afd1e0dc1cae6af78f731c778c6317c8f261cf05a5dc458042` |
-> | `src/sat/sat_mus.cpp` | `3d830423a53ed0e1bcad8eb8b80a81e75ede654b55230642637640aecd3b4a9e` |
-> | `src/sat/sat_model_converter.h` | `760b847933f74903f81b19dcc5cd98a560f1d01407dabc8042638aaab9d01c9a` |
-> | `src/sat/sat_model_converter.cpp` | `57f99643ce2dc3eaf8866c01a9c4e621a64c84b496154e071cc8d819b79ab6e9` |
-> | `src/sat/sat_elim_eqs.h` | `e70d68b7bdac18ae3db23871c3d28b73e90d3dbccb8cf663728ee4401751f166` |
-> | `src/sat/sat_elim_eqs.cpp` | `532c3170feeb3b5057b77103dab74d92aa39bade4e1ec62d6b31f3562b0b4566` |
-> | `src/sat/sat_clause_use_list.h` | `b2b968c1172f8c93495b2b4ce773b669dcae05314f5416c39842350efd641bc6` |
-> | `src/sat/sat_clause_use_list.cpp` | `97f55406648121cc4e0ed7ebfc53f085171e5e261776c3fd424233328e6fcf65` |
-> | `src/sat/sat_integrity_checker.h` | `c7bf5d610fa2f30d361a3f1d74105bbb1380c6b58b8dd91ec6e6fc946c3d5f08` |
-> | `src/sat/sat_integrity_checker.cpp` | `65ac0aa33d67ef60b2ecb3511ef5b3ce7201500068e9cfd4b3decd78e584fde8` |
-> | `src/sat/sat_iff3_finder.h` | `5504f07974a849512ad07d6b136de5a9f3098da6c76aadd8e359988ea23b1c7e` |
-> | `src/sat/sat_iff3_finder.cpp` | `61137a1c6e5afde5c9d9346dec028d5fba2a6c4413a548fc4eb5f17acc390195` |
-> | `src/sat/sat_par.h` | `a49acb20e847429edbcbdd601808406aa7d5c8bac963185d162810e0db464617` |
-> | `src/sat/sat_par.cpp` | `149ff96bbb21c6ae9edbf619b9057e40c58f7aac6d4bb125cc8b0e8ec8947dca` |
+> | Source file |
+> | --- |
+> | `src/sat/sat_solver.h`|
+> | `src/sat/sat_solver.cpp`|
+> | `src/test/sat_user_scope.cpp`|
+> | `src/test/main.cpp`|
+> | `src/sat/sat_extension.h`|
+> | `src/sat/sat_config.h`|
+> | `src/sat/sat_config.cpp`|
+> | `src/sat/sat_params.pyg`|
+> | `src/sat/sat_scc_params.pyg`|
+> | `src/sat/sat_asymm_branch_params.pyg`|
+> | `src/sat/sat_simplifier_params.pyg`|
+> | `src/util/memory_manager.h`|
+> | `src/util/memory_manager.cpp`|
+> | `src/util/luby.cpp`|
+> | `src/util/stopwatch.h`|
+> | `src/util/max_cliques.h`|
+> | `src/sat/CMakeLists.txt`|
+> | `src/sat/sat_cleaner.h`|
+> | `src/sat/sat_cleaner.cpp`|
+> | `src/sat/sat_simplifier.h`|
+> | `src/sat/sat_simplifier.cpp`|
+> | `src/sat/sat_scc.h`|
+> | `src/sat/sat_scc.cpp`|
+> | `src/sat/sat_asymm_branch.h`|
+> | `src/sat/sat_asymm_branch.cpp`|
+> | `src/sat/sat_probing.h`|
+> | `src/sat/sat_probing.cpp`|
+> | `src/sat/sat_mus.h`|
+> | `src/sat/sat_mus.cpp`|
+> | `src/sat/sat_model_converter.h`|
+> | `src/sat/sat_model_converter.cpp`|
+> | `src/sat/sat_elim_eqs.h`|
+> | `src/sat/sat_elim_eqs.cpp`|
+> | `src/sat/sat_clause_use_list.h`|
+> | `src/sat/sat_clause_use_list.cpp`|
+> | `src/sat/sat_integrity_checker.h`|
+> | `src/sat/sat_integrity_checker.cpp`|
+> | `src/sat/sat_iff3_finder.h`|
+> | `src/sat/sat_iff3_finder.cpp`|
+> | `src/sat/sat_par.h`|
+> | `src/sat/sat_par.cpp`|
 >
 > ## Solver.cpp member definition index (all solver bodies currently unported)
 >
@@ -17392,7 +17398,7 @@ certify HEAD/current drafts.
 >
 > The earlier four-file13-group freeze/gates are historical evidence and superseded by the six-file20-group packet, with fullsolver compile-RED still excluded. New final hashes and terminal gates follow. Source implicit model-converter Clone/Assign remain explicitly OPEN, as approved by parent; no source header-wide owning copy completion is claimed.
 >
-> - `src/sat/sat_types.h` SHA256: `d6577e8da7b2a07cb13959816adf5bbed512cf7049ebf5351ff600b7620e1ba2` (local uint-set and bool-var alias source).
+> - `src/sat/sat_types.h`: (local uint-set and bool-var alias source).
 >
 > ## Supplemental nonmember/conditional solver inventory
 >
@@ -17461,7 +17467,7 @@ certify HEAD/current drafts.
 > these six files include the committed memory counter and expression-array fixes.
 >
 > The final ledger was separately checked in
-> `.cache/review/sat-model-final24-0ec768f`: source fingerprint, no-generics AST
+> `.cache/review/sat-model-final24-0ec768f`: source inventory, no-generics AST
 > scan and implementation/test declarations passed at2102units/677APIs,
 > 33ported/82partial/1987unported. Only model_converter.h/.cpp advance from
 > unported to partial; full sat_solver.cpp/.h remain unported. Whole-unit method
@@ -17552,13 +17558,13 @@ certify HEAD/current drafts.
 >
 > Proposed Clone(config): charge a new cold owner and literal store, allocate exact source outer capacity, publish source logical size, then copy var/kind and exact-capacity nested lists ascending. Record actual constructed prefix for failure cleanup; unconstructed reads guard at actual access, not by inventing atomic rollback. Copy constructor spare capacity remains unconstructed. Proposed Assign(src): self no-op; destroy existing logical nested entries ascending, release old outer backing, then exact-capacity source copy. Destruction/allocation/construction prefixes remain observable; preserve partial roots in charged metadata and clean every owned list once. Borrowed Budget differs between owners, requiring actual nested word transfer. An explicitly documented resumable Go continuation may manage source-unsafe interrupted construction; no C++ exception recovery is claimed. Do not copy cold Go self identity or mutex/value ownership. Tests FIRST will cover empty retained capacity, independent nested roots, destination destruction-before-refusal, ascending copy/failure lifetime and exact capacities. Other class owning operations remain a separately authorized follow-up, not claims of this watch packet.
 >
-> ## Source hashes
+> ## Source paths
 >
-> - src/sat/sat_watched.h:1d2969f295a5f9ab042c5997fdc0717dc6cfe74711c6037802a780c78c72bf28
-> - src/sat/sat_watched.cpp:8ffc73b9e0e8cd99b2d5a663af51f3aa629f522d4bfdce6e896c066be3037d27
-> - src/util/vector.h:aafafc0fe6ca0afd7bafe0c781342da259f9c34c0b94b16732c415cf2733066e
-> - src/sat/sat_model_converter.h:760b847933f74903f81b19dcc5cd98a560f1d01407dabc8042638aaab9d01c9a
-> - src/sat/sat_solver.cpp:ea35f45c69be4d179aec4e1af034b2295f2a026bb01c37a2d9f8c59abf519655
+> - src/sat/sat_watched.h
+> - src/sat/sat_watched.cpp
+> - src/util/vector.h
+> - src/sat/sat_model_converter.h
+> - src/sat/sat_solver.cpp
 >
 > ## Historical 18-group validation (superseded)
 >
@@ -17602,7 +17608,7 @@ certify HEAD/current drafts.
 > actual backing-following iterators across Move/MoveAssign/Swap before integration;
 > those changes each had behavioral RED evidence before correction.
 >
-> Final source fingerprint/declaration/no-generics audit passed in the isolated
+> Final source inventory/declaration/no-generics audit passed in the isolated
 > `.cache/review/sat-watch-integration-d4da375` tree with the coordinator ledger,
 > at33ported/84partial/1985unported. No unit advances to complete or newly partial:
 > the existing watched/vector units remain partial, and sat_solver.cpp/.h remain
@@ -17622,7 +17628,7 @@ certify HEAD/current drafts.
 > The new backend uses O(NlogN) slot assignments, O(N) comparisons and no heap
 > scratch; it preserves clause/external interleaving and existing backing lifetimes.
 > Old storage hashes/gates above describe their original snapshot; the new store
-> hash and sorting source hashes are recorded in the new packet. Actual full
+> hash and sorting source paths are recorded in the new packet. Actual full
 > solver sort_watch_lits outer iteration and solver algorithms remain open.
 
 <a id="audit-sat-storage-packet-md"></a>
@@ -18160,7 +18166,7 @@ certify HEAD/current drafts.
 >     checked vet/WASI and real source/no-generics audit, isolated committedHEAD+
 >     owned files only. Frozen hashes and exact source registration evidence.
 >
-> ## Reference probe and source hashes
+> ## Reference probe and source paths
 >
 > Bounded scratch probe `.cache/sat-storage-traits.cpp` includes the ACTUAL preserved
 > SAT headers. `TMPDIR=golang/.cache/tmp g++ -std=c++17 -D_AMD64_ -Isrc -fsyntax-only`
@@ -18170,22 +18176,22 @@ certify HEAD/current drafts.
 > Permanent Go regressions above preserve the corresponding lifecycle distinctions.
 > No external scratch files/compiler outputs were written.
 >
-> | Source | SHA256 |
-> | --- | --- |
-> | src/sat/sat_clause.h | b66b1e936801b63d3d93f504cd934089ed755a4720081d03c94effc1a5c57707 |
-> | src/sat/sat_clause.cpp | 862cd6ea1c065ee1ef4e1477380e4f93d2e1a66facbcf8ec627f7ec496b7ec82 |
-> | src/sat/sat_clause_set.h | 4b69e9601f4fb27e16cf80727d32d6cbca5793c32baccd626deb4c9d6d76622d |
-> | src/sat/sat_clause_set.cpp | ca1fe1b4e757849ab7b0d2a6dce8e0391ec0ebcb3d174df28a0e5e4585001db0 |
-> | src/sat/sat_watched.h | 1d2969f295a5f9ab042c5997fdc0717dc6cfe74711c6037802a780c78c72bf28 |
-> | src/sat/sat_watched.cpp | 8ffc73b9e0e8cd99b2d5a663af51f3aa629f522d4bfdce6e896c066be3037d27 |
-> | src/sat/sat_justification.h | 0a3af366718264233e8a9bc7598d871fccf150356a36c010cee3462396258a48 |
-> | src/sat/sat_var_queue.h | 642aaa8dd58e029bef06825e7ca0a8662c00fea89f79dcfd75e17b8ada6ded68 |
-> | src/util/heap.h | 6451a4522708f62df4ead0d6bc893820987d60012e532decb92d57646b8249bd |
-> | src/util/id_gen.h | 1708ba4b1bf14008c6e60e656b2b964cc3ab1dd7e0768f25242b347cd37da04f |
-> | src/util/small_object_allocator.h | 57b0a3bbc2d9fd10f008f371e3b5b9bee5535d39ab5cfbcb4afd9324018a140b |
-> | src/util/small_object_allocator.cpp | 70cf910ed0a3871ea110ee01ff8d23a687f74af5972ab995dce32ba3e6e35994 |
-> | src/test/heap.cpp | 3706ff918ca7b64a8cb44ec3647a2507a71db4fb02c79dd35d73e73183bde8fc |
-> | src/test/sat_user_scope.cpp | c86c383ea199a89a5311bae5f8186e0b59e6953aa17bb7d675e221aa0c5edffc |
+> | Source |
+> | --- |
+> | src/sat/sat_clause.h|
+> | src/sat/sat_clause.cpp|
+> | src/sat/sat_clause_set.h|
+> | src/sat/sat_clause_set.cpp|
+> | src/sat/sat_watched.h|
+> | src/sat/sat_watched.cpp|
+> | src/sat/sat_justification.h|
+> | src/sat/sat_var_queue.h|
+> | src/util/heap.h|
+> | src/util/id_gen.h|
+> | src/util/small_object_allocator.h|
+> | src/util/small_object_allocator.cpp|
+> | src/test/heap.cpp|
+> | src/test/sat_user_scope.cpp|
 >
 > Implementation and final ownership/gate evidence below await parent integration.
 > Full solver/backend/extension functionality remains OPEN; complete standalone
@@ -18395,7 +18401,7 @@ certify HEAD/current drafts.
 > borrowed and must be readonly/nonreentrant, caller-serialized and nonpanicking.
 > Caller-owned iterator values/output objects are cold boundaries, not retained SAT records. All12 iterator factories return concrete values, matching source iterators and IntHeap.Begin/End. Next remains a pointer receiver updating caller state; epochs, provenance and traversal bodies are unchanged. No iterator owner allocation or new retained charge is introduced.
 >
-> All source files/hashes above remain unchanged. No manifest/progress/Git changes
+> All originating source paths above remain recorded. No manifest/progress/Git changes
 > or writes outside golang occurred in this packet. Code/tests are frozen for
 > parent review/integration; remaining global debug tags/TRACE and pointer ABI
 > representations are explicit adapters/open runtime prerequisites, not solver code.
@@ -18495,9 +18501,9 @@ certify HEAD/current drafts.
 >
 > Selected storage adaptation: standard-library stable sorting's unobservable implementation may allocate scratch or choose an in-place fallback. This concrete always-in-place backend preserves observable stable ordering and meets the source asymptotic contract, without claiming libstdc++ exact malloc counts or comparison sequence. The actual source comparator has no observable callbacks/side effects. Full solver method must later call this real backend on its real outer watch owner; this packet does not construct a fake solver facade.
 >
-> Source hashes:
-> - src/sat/sat_solver.cpp:ea35f45c69be4d179aec4e1af034b2295f2a026bb01c37a2d9f8c59abf519655
-> - src/sat/sat_watched.h:1d2969f295a5f9ab042c5997fdc0717dc6cfe74711c6037802a780c78c72bf28
+> Source paths:
+> - src/sat/sat_solver.cpp
+> - src/sat/sat_watched.h
 >
 > Tests-first evidence: the named helper was missing and compilation failed before production. The original insertion body was then extracted unchanged into the instrumented helper, and TestSATSolverWatchSortLargeStableOrderAndWorkBound failed behaviorally: actual 1,050,622 comparator calls and 1,050,623 successful assignments versus limits 4,096 and 98,304. The replacement passes these independent work bounds. No timing threshold or manufactured failure was used.
 >
@@ -18689,13 +18695,13 @@ certify HEAD/current drafts.
 > were edited. Other manager specializations, arbitrary generic vector operations,
 > parser/AST/solver consumers and whole numeric/solver completion remain separate.
 >
-> Source SHA256:
+> source paths:
 >
-> - scoped_numeral.h: e36703e7acdf210c3246844a06f9a2e8515f4c377dce2b1d07258460c3e90867
-> - scoped_numeral_vector.h: b8b591945603b19e5d50dff21f92821f60bf866ff07f7ef3687f01a5cfd64a29
-> - vector.h: aafafc0fe6ca0afd7bafe0c781342da259f9c34c0b94b16732c415cf2733066e
-> - mpz.h: 41891597e12173581e7ae3f108c048897761c48a191b06fd3ba160d1e98049b1
-> - test/mpz.cpp: 183aa746a766abe4d7f3e2c908dfe3836f4534410f54152de62a5103582dff29
+> - scoped_numeral.h
+> - scoped_numeral_vector.h
+> - vector.h
+> - mpz.h
+> - test/mpz.cpp
 
 <a id="audit-sexpr-port-status-md"></a>
 
@@ -18787,7 +18793,7 @@ certify HEAD/current drafts.
 > Full CGO-disabled native and full g3checked+g3debug module tests passed.
 > All sixteen named groups explicitly RUN/PASS under native checked-debug race
 > and actual checked-debug JavaScript/Wasm execution. Full vet and WASI build
-> passed. Final Go bytes matched the snapshot hashes; source ledger/fingerprint
+> passed. Final Go bytes matched the snapshot hashes; source ledger/inventory
 > and no-generics audit passed separately. WASI is a build check, not a runtime
 > claim. The broader solver/AST/interpolation implementation remains open.
 
@@ -18856,14 +18862,14 @@ certify HEAD/current drafts.
 >
 > Actual missing-API RED was observed in isolated git archive fdf6f3c plus ONLY the new test. Ordinary tests require no reference compiler, network, or source tree. Final native/checked-debug/race/actualJS/vet/WASI/no-generics gates use e3a76a6 plus only the five frozen Go files. Full numeric allocator topology, typed-owner hooks, generated memory lifecycle and full solver remain OPEN.
 >
-> ## Source SHA256
+> ## source paths
 >
-> - `src/util/small_object_allocator.h`: `57b0a3bbc2d9fd10f008f371e3b5b9bee5535d39ab5cfbcb4afd9324018a140b`
-> - `src/util/small_object_allocator.cpp`: `70cf910ed0a3871ea110ee01ff8d23a687f74af5972ab995dce32ba3e6e35994`
-> - `src/test/small_object_allocator.cpp`: `98d72b253f1b8bda2ef5e6c9ad460064ceaee571ae15a7016b37cbf55ea79618`
-> - `src/util/machine.h`: `dba7365724c1167ee4bced664de38169c02624eedd6059ebb0d3d66213e64abc`
-> - `src/util/vector.h`: `aafafc0fe6ca0afd7bafe0c781342da259f9c34c0b94b16732c415cf2733066e`
-> - `src/util/memory_manager.cpp`: `3b884edd5463aa7ddfe68d6e0badc0695eff2b6b6fd90736850dd740f43e29d6`
+> - `src/util/small_object_allocator.h`
+> - `src/util/small_object_allocator.cpp`
+> - `src/test/small_object_allocator.cpp`
+> - `src/util/machine.h`
+> - `src/util/vector.h`
+> - `src/util/memory_manager.cpp`
 >
 > ## Initial test inventory and observed RED
 >
@@ -18939,7 +18945,7 @@ certify HEAD/current drafts.
 > source-evidence/no-generics audit17827 exited0 with the integrated manifest:
 > 2102units/677APIs,33ported/145partial/1924unported. The preceding relative-source
 > audit26012 exited0 and an independent check matched all2102 recorded source/tool
-> SHA256 values. Final production bytes were unchanged through these gates.
+> paths. Final production bytes were unchanged through these gates.
 > Parent logs and inventories are .cache/small-object-parent-final-*.log and
 > .cache/small-object-parent-final-inventory.json. No full solver completion is
 > claimed; standalone source units retain partial status and integration remains
@@ -19140,14 +19146,14 @@ certify HEAD/current drafts.
 > necessary: archive from a subdirectory otherwise filters the archive to empty.
 > All scratch/archive/build caches/temp/output remain beneath golang/.cache.
 >
-> ## Audited source SHA256
+> ## Audited source paths
 >
 > ```
-> 37dfbf93e3e69e5c328fc17f316687bf53e9642394d32cebeae5915de948a797  src/util/smt2_util.h
-> d833e788ffce835f7882c0e0f99b42efd0d3d1e9eea3030490fa2ea6a1373d69  src/util/smt2_util.cpp
-> a87417423f67da7a52a6b7e98a40902289047848c1129d1b687f816932ce6a07  src/util/util.h
-> 4ff022fc3d1a8a922cbd47f8289b6150b935f5265329d7d4bad900248218a3f8  src/util/util.cpp
-> b6268fc7569c7003f4a925e88b97c559c94ab0293c813f582828f8fb83930c97  src/test/escaped.cpp
+> src/util/smt2_util.h
+> src/util/smt2_util.cpp
+> src/util/util.h
+> src/util/util.cpp
+> src/test/escaped.cpp
 > ```
 >
 > ## Final frozen evidence
@@ -19285,8 +19291,8 @@ certify HEAD/current drafts.
 > ## SHA256
 >
 > ```
-> 5d006f0ccd5f44f25bc8e0de9f629d49cd1df8fa1275bb121696cd922d0069fd  src/ast/ast.h
-> ac1de339a71c12fabaf951db2b0936bb1a84990b337ce268490633cb7bb5ff52  src/ast/ast.cpp
+> src/ast/ast.h
+> src/ast/ast.cpp
 > e43a2983cbaee86eea1e9048ee13870dfe0d1c4b163abb25fcfdb4d8589a31e0  ast_sort_size.go
 > 228c109cb5ab1103529298cbc152a2a7448cb3d27f78a4a7a2583dbc2324ce6e  ast_sort_size_test.go
 > ```
@@ -19530,24 +19536,24 @@ certify HEAD/current drafts.
 >
 > Frozen SHA256:
 >
-> | File | SHA256 |
-> | --- | --- |
+> | File |
+> | --- |
 > | util_statistics.go | a2ba50adec47660c04e89f023260194a4c92c64a077b68ac6a540d4388d7bb21 |
 > | util_statistics_render.go | 0a502180d70d04e219bffe0e1acdc6c6675fb2c99d49d99880a024cd13046282 |
 > | util_statistics_test.go | ae2cc59da4c327068778ddefcf84b43a972c379a7cc09818d55f938577a78e2b |
 >
-> Audited active source SHA256:
+> Audited active source paths:
 >
-> | Source | SHA256 |
-> | --- | --- |
-> | src/util/statistics.h | c6793c4216c5c54787bd3c22a6a5479030bc08ff2519d961c8635ef15b1712f2 |
-> | src/util/statistics.cpp | ee1b62f6d3daaa8e3b1b21731620f567f23bc084e32181b141aa3951d44bbb16 |
-> | src/util/vector.h | aafafc0fe6ca0afd7bafe0c781342da259f9c34c0b94b16732c415cf2733066e |
-> | src/util/hashtable.h | bdc562a7db2c0d914dd896577c43e0648f501538873460d2e1a6c2d0932f64f2 |
-> | src/util/map.h | 62db3b3819aa71f67bababdb3d5583d14fecebbde6f2d22866c28a86215aa850 |
-> | src/util/buffer.h | f5c876511a1fd5674ba5f9fa462d9206ffaad979ee90cc30e7d1b5fc9c4e07e1 |
-> | src/util/hash.cpp | 05f32077835d6def70963af8ef79f5344b233cff55ca2f12ce38dc2dfde89d3a |
-> | src/util/str_hashtable.h | e6bbfd47cff10b6def5cc1ab1ea5a4d3a47da70e39a9d51de2f063b59dca22a5 |
+> | Source |
+> | --- |
+> | src/util/statistics.h|
+> | src/util/statistics.cpp|
+> | src/util/vector.h|
+> | src/util/hashtable.h|
+> | src/util/map.h|
+> | src/util/buffer.h|
+> | src/util/hash.cpp|
+> | src/util/str_hashtable.h|
 >
 > ## Parent independent frozen integration
 >
@@ -19735,13 +19741,13 @@ certify HEAD/current drafts.
 > 6e4d439a974e1481b39e65b39576b76cfdcb006a88d447bbb55fab2b1449458e  golang/util_string_buffer_test.go
 > ```
 >
-> Source SHA256:
+> source paths:
 >
 > ```
-> dac7740d1679a51d8fce15a622850a42ef8fae82f4e80625fec02be2613d3b5b  src/util/string_buffer.h
-> e86a4980e1f170e7572fd29b89c820acb72f859bb3b3188a78b49654c0b43b40  src/test/string_buffer.cpp
-> 60ce765fb3b761ec178ceec7db59f7ddbce00dd0fad5148f6a8ec234f62b4fbf  src/util/symbol.h
-> 840d0480a03ddb1b0ed529338baebb4d32ad385db6fabd5f7037bcaa2b2db1bb  src/util/symbol.cpp
+> src/util/string_buffer.h
+> src/test/string_buffer.cpp
+> src/util/symbol.h
+> src/util/symbol.cpp
 > ```
 
 <a id="audit-symbol-port-status-md"></a>
@@ -19942,12 +19948,12 @@ certify HEAD/current drafts.
 > Tests require no source checkout or reference executable. No solver/domain
 > algorithms, other symbol-table payload types or whole-port completion are claimed.
 >
-> Source SHA256:
+> source paths:
 >
-> - symbol_table.h: ebb97249e3df7344be8926974cc3fbee266cf2d802bbbb456b536b262862a38a
-> - test/symbol_table.cpp: ba72eb9b1ae2aa8fd66adfbd340ccb8d8f4eb01405a893ed3a6e24c6829b8321
-> - hashtable.h: bdc562a7db2c0d914dd896577c43e0648f501538873460d2e1a6c2d0932f64f2
-> - vector.h: aafafc0fe6ca0afd7bafe0c781342da259f9c34c0b94b16732c415cf2733066e
+> - symbol_table.h
+> - test/symbol_table.cpp
+> - hashtable.h
+> - vector.h
 >
 > ## Independent second source review
 >
@@ -20802,8 +20808,8 @@ certify HEAD/current drafts.
 >
 > Immutable hashes (also machine-readable `.cache/isolation-final/inventory.json`):
 >
-> | File | SHA256 |
-> |---|---|
+> | File |
+> |---|
 > | `mpnum/upolynomial_binary_vector.go` | `f7c8bde551ac0093f6f51d2d09e58bcfb580a4965951306cd1c86e4e9c7277de` |
 > | `mpnum/upolynomial_isolation.go` | `d04f21dfbfd992c572846df7439090594eb24873f3ef46c102f51724d56ef8eb` |
 > | `mpnum/upolynomial_sturm_isolation.go` | `40a0b5bd27fa1dd65ba6c6d739ac4c692b8d7fa4f76cc07a745fa317510f9839` |
@@ -20825,7 +20831,7 @@ certify HEAD/current drafts.
 > full WASI build54956, root WASI test compile93036 and mpnum test compile49865
 > exited0. Integrated source-evidence/no-generics audit77029 exited0 at
 > 2102units/677APIs,33ported/145partial/1924unported. All2102 recorded source/tool
-> SHA256 values were independently matched to the unchanged reference files.
+> paths were independently matched to the fixed reference inventory.
 > Final nine Go hashes remained unchanged throughout gates; only this document
 > changed afterward. Commit/index names and hashes are checked against
 > .cache/isolation-parent-final-inventory.json. The full solver goal remains
@@ -21029,10 +21035,9 @@ certify HEAD/current drafts.
 > no-generics and full reference comparison: handle55839 exit0 with the actual
 > repository reached through `-source ../../../..`; log
 > `.cache/upoly-sturm-final-audit-relative.log`. A separately materialized reference
-> copy of all2102 byte-verified ledger units also passes, handle21593 exit0,
+> copy of all2102 inventoried source units also passes, handle21593 exit0,
 > `.cache/upoly-sturm-final-audit-materialized.log`. Direct checkout checks match
-> every unit SHA256 and the1687-source-file fingerprint
-> `f8480997c14e2d6c414f40c60ce5095ef40a89ce6d1bcf1ed196c5d682d42d8f`.
+> all unit paths and the1687-source-file inventory.
 > The initial absolute-path invocation yielded an empty reference inventory;
 > it is superseded by these concrete relative-path and copied-reference checks.
 > The initial metadata audit also caught method evidence assigned to the wrong
@@ -21216,15 +21221,15 @@ certify HEAD/current drafts.
 > vet/WASI/no-generics results appended on completion. No reference checkout is
 > needed by tests at runtime.
 >
-> ## Source SHA256
+> ## source paths
 >
 > ```
-> a9a944d327c1755b886d1f95a9ec0a1bdc48582c20e91b7c4bc576b038cedd3c  src/util/error_codes.h
-> a73002ce776425cbd302e2aca030c18babae39ea754175b57ec49cf8d022ee5a  src/util/z3_exception.h
-> 3fef3958a95b8020caeb2feddbc5bb7b3074dcb38c205b6af74b67c562b9a74d  src/util/z3_exception.cpp
-> 09356c28b4a280a7cf48d43e724396cbd3162db66949df033aebc5ad2bb5fbe9  src/util/cmd_context_types.h
-> 6ef3f7c9d46d2d496f53f0d20ad5a66bc09b9df755997da2e0d9d53e2edc6db3  src/util/warning.cpp
-> d610cf65557aae3d4fbbc4963f3916694bb9ddf9661c6cb21083a68518e9d0b3  src/test/ex.cpp
+> src/util/error_codes.h
+> src/util/z3_exception.h
+> src/util/z3_exception.cpp
+> src/util/cmd_context_types.h
+> src/util/warning.cpp
+> src/test/ex.cpp
 > ```
 >
 > Final targeted gates on frozen production/tests:
@@ -21496,12 +21501,12 @@ certify HEAD/current drafts.
 > | trail_stack push_scope/pop_scope | Mark/PopScopes coordinate typed record reclamation only; real domain undo entries and subsystem callbacks remain open |
 > | value/reset_flag/restore_size/vector/map/ref/new_obj trail subclasses | Not translated by generic storage; tagged domain dispatch and logical ownership remain higher-layer work |
 >
-> Read-only inspection checksums:
+> Read-only inspected source paths:
 >
-> - region.h: fab2ab6cdc6bdc067f38a8908c7591e9dc90bfea116823d2c744ead9238b32d1
-> - region.cpp: 23908446c761dfb4e7b1165f2545f69f3e8726b7139f07b30133488559562eb3
-> - trail.h: 453e4c187865dbf98893988f51152c67bf5ae98d0a69caf9c4640eea94136a6c
-> - test/region.cpp: 09bc4beded6a1b360db26f37f2b3df70e0c525be0d586896acd0018cdda0243c
+> - region.h
+> - region.cpp
+> - trail.h
+> - test/region.cpp
 >
 > ## TDD and checks
 >
@@ -21673,13 +21678,13 @@ certify HEAD/current drafts.
 > | source constructed/deallocated balance (`:121`) | Finite scalar-policy lifetime/counter projection, explicitly partial; real rational-cell source instance remains pending |
 > | small_object_allocator source/tests | Read and inventoried only; byte alignment, chunk lists, debug Valgrind path, exact size accounting and consolidate algorithm remain unported |
 >
-> Read-only source fingerprints:
+> Read-only source inventory:
 >
-> - object_allocator.h: e2e1d6936945317d9e7af20cb1f564fb0ef384deb90360157b262ad50a7a291a
-> - test/object_allocator.cpp: 03098e9577fb03cd306eb6302dc70570d6e8efafc9b6f59aab77e300bdff88d3
-> - small_object_allocator.h: 57b0a3bbc2d9fd10f008f371e3b5b9bee5535d39ab5cfbcb4afd9324018a140b
-> - small_object_allocator.cpp: 70cf910ed0a3871ea110ee01ff8d23a687f74af5972ab995dce32ba3e6e35994
-> - test/small_object_allocator.cpp: 98d72b253f1b8bda2ef5e6c9ad460064ceaee571ae15a7016b37cbf55ea79618
+> - object_allocator.h
+> - test/object_allocator.cpp
+> - small_object_allocator.h
+> - small_object_allocator.cpp
+> - test/small_object_allocator.cpp
 >
 > ## TDD and verification
 >
@@ -22064,15 +22069,15 @@ certify HEAD/current drafts.
 >   and pointer4/pointer8 subcases, all PASS. Normal compiler environment, minimal
 >   Node runtime only, TMPDIR/cache/output all under golang/.cache.
 >
-> Read-only source SHA256 fingerprints:
+> Read-only source paths:
 >
-> - page.h: dc795874f31a21332aad1cbd44711866cade9e30b1c4f5976c135a7de4e8ee47
-> - page.cpp: 9f5cae6305874ae6ffc87d48bdf5eac3001049c92f32b1d84047f1bb3c2efb4e
-> - region.h: fab2ab6cdc6bdc067f38a8908c7591e9dc90bfea116823d2c744ead9238b32d1
-> - region.cpp: 23908446c761dfb4e7b1165f2545f69f3e8726b7139f07b30133488559562eb3
-> - tptr.h: 9e2ed0bc7f5b32ba6656374795d5a3cde31a1fba0c241cfc5baa52c0aa9efa64
-> - machine.h: dba7365724c1167ee4bced664de38169c02624eedd6059ebb0d3d66213e64abc
-> - test/region.cpp: 09bc4beded6a1b360db26f37f2b3df70e0c525be0d586896acd0018cdda0243c
+> - page.h
+> - page.cpp
+> - region.h
+> - region.cpp
+> - tptr.h
+> - machine.h
+> - test/region.cpp
 >
 > This packet supplies scoped variable bytes needed by StrHashtable/symbol owners.
 > It does not port those owners, source raw-address tags/ABI, source display text,
@@ -24115,3 +24120,498 @@ certify HEAD/current drafts.
 > 386 size36 versus charged40. After padding, 386/amd64/arm/arm64/wasm all report40;
 > native Stats/budget tests additionally check the exact physical array charge.
 > Padding is representation metadata, not additional source key/value data.
+
+
+## Active source follow-up after dae49cc
+
+Root utility source mapping: `utilid/generator.go` specializes actual
+`src/util/id_gen.h` counter/recycle/reset/cleanup and the unsigned trivially
+copyable vector path in `src/util/vector.h:55-98`. Its cold embedded header is
+charged by the enclosing owner. Raw backing stores cap/size (four bytes each)
+and actual ID words, with no shadow typed free list or allocation ticket.
+Initial allocation's pending lexical `mem` stays an explicit owning field
+until publication. Reallocation uses Runtime's actual generation/token update;
+failure before publication preserves the old token, and completed realloc/header
+prefix requires explicit owning cleanup if a later guard fails. Cleanup frees
+only its named tokens and respects Runtime's retained deallocation progress.
+Source vector unsigned capacity and byte-expression wrap are literal, including
+malformed-header geometry; actual reads/writes guard physical extents. Overflow
+uses the source vector failure category. Legacy main `utilIDGen` retains its
+explicit Go-typed storage adapter but shares source Fresh/PopIndex/VectorGrowth
+algorithms and host-slice extent guard; this does not migrate all AST roots to
+raw storage. `TestGeneratorRawOrderAndLifecycle`,
+`TestGeneratorRealRefusalAndOOM`, and `TestSourceVectorGrowthWidths` were added
+before declarations; targeted native and checked/debug now pass. Runtime budget
+refusal goes through its existing real physical-failure OOM transition, so later
+recycle correctly stops on Runtime OOM. The test initially assumed direct arena
+errors/no OOM and was corrected to the actual dependency behavior; no production
+OOM predicate was fabricated. Growth's independent extreme geometry was corrected
+from a wider-arithmetic expectation to source uint32 arithmetic.
+
+`utiltime/stopwatch.go` preserves POSIX start/stop idempotence, reset-only-elapsed,
+add, unsigned accumulation/borrow guard, and running query stop/start control.
+Linux `clock_linux.go` uses actual syscall Getrusage process user+system CPU totals,
+without unsafe or cgo. Microsecond resolution explicitly replaces
+CLOCK_PROCESS_CPUTIME_ID's nanosecond timespec. Other targets use actual Go monotonic
+elapsed time for diagnostics, an explicit platform replacement rather than a CPU
+identity claim. Clock errors become returned Go failures instead of uninitialized
+source timespec reads. `TestStopwatchSourceControls` uses a finite independent
+clock sequence, while `TestStopwatchActualClock` exercises the actual platform
+reader without unstable timing thresholds. Tests-first API RED and targeted
+native/checked-debug GREEN are recorded; report/verbose integration remains in
+progress with the SAT owner. This utility does not replace solver resource limits.
+
+The main physical numeral census now includes active compareOne/compareTwo
+fields supplied by each explicit RationalManager owner. It does not infer lexical
+roots from allocator directories, and retains the unchanged other scratch-root
+rules and service lexical bound.
+
+Root follow-up utility checks also cover actual TLS initial-allocation publication
+failure after real 100000-byte local accounting threshold synchronization, explicit
+pending-root census, copied owner/lifetime guards, repeated Close, and warmed
+zero-allocation ID recycle. `utilid` now supplies source ascending set_next_id,
+actual-byte signed-char debug hashing and borrowed TextSink display. Empty hash
+remains an explicit defined diagnostic adapter for source &empty[0] UB. Additional
+missing-API RED `.cache/utilid-debug-api-red.log` and borrowed-runtime behavioral
+RED `.cache/utilid-runtime-lifetime-red.log` precede GREEN. Existing main ID tests
+exposed a uint64 growth oracle on source-overflow input (2147483647), recorded in
+`.cache/id-shared-source-growth-red.log`; the independent masked-width oracle now
+preserves source unsigned shift/extent comparisons, including added 0x40000000
+and 0x55555555 endpoints. All original warm/charge/order assertions remain.
+Focused utility and legacy-ID checks pass both profiles; early source audit
+terminal0 in `.cache/monomial-probing-early-audit.log` before these latest mapping
+updates. stopwatch.h is now partial (selected POSIX control plus explicit clock
+adapters), leaving scoped_watch and per-platform native behavior open; this adds
+one partial unit without promoting APIs or adding registered source assertion credit.
+
+
+### Inf/MPQ comparison and unary follow-up frozen evidence
+
+Nine numeric Go files froze at `.cache/inf-unary-frozen-hashes.json`:
+Inf_rational/Inf_int_rational/Inf_eps_rational, mpq.go, raw arithmetic scope,
+selected rational service/operations, exact caller-named qops census and the
+sixteen new groups in `.cache/inf-unary-final-tests.json`. Isolated committed
+`dae49cc` plus these nine files passed166 RUN/166 PASS in both profiles:
+`.cache/inf-unary-final-adjacent-native.log`14.272s and debug26.396s. Both selected
+vets are terminal0. This is targeted frozen evidence, not the combined full gate.
+
+Source mpq.h201/205 reads only NUM for Neg/Abs; h566 Eq short-circuits NUM then
+DEN. h572–596/cpp39–75 comparison first uses structural integer checks, then
+actual numerator-sign shortcuts, and only reached same-sign paths form two
+crossproducts. Actual SYNCH RAW mpq tmp1/tmp2 now occupy distinct
+rawArithmetic.compareOne/compareTwo fields (four actual Int roots), with source
+normal-end Del tmp1 NUM/DEN then tmp2 NUM/DEN. Failure preserves these real roots
+and exact cursor/cause; owning cleanup is separate. Reset/Swap and required
+underlying Move execute NUM then DEN without unread-field preflight. Selected
+rational service same-owner Swap/Reset and unary/cmp forwarding use shared public
+algorithms; general Go-extension Move remains outside this source family.
+
+Inf_rational.h242–275/361–405/unary~445–479, InfInt.h201–233/308–384,
+InfEps.h239–271/335–391/403–440 same/mixed six relations preserve literal reached
+component order and reversal. InfEps's mixed equality infinity-vs-rational plus
+nested-zero quirk remains distinct from ordering. In-place unary mutates actual
+FIRST before later EPS fault; signed EPS overflow remains the existing declared
+adapter after FIRST mutation. Owning unary first copies through actual constructor
+and lexical lifetime controls, then changes the copied components; raw1/0 output
+is genuinely owned, not bypassed with a private transfer path. Service retained
+lexical bound9 is unchanged. Unrelated Add/Sub/scalar/fused/raw-header profiles,
+TRACE/ostream/global manager binding and complete headers remain open.
+
+Behavioral RED preceding implementation: firstfour groups in
+`.cache/inf-compare-unary-behavior-red.log`, additional reset/raw-temp groups in
+`.cache/inf-compare-unary-additional-red.log`, copy/service in
+`.cache/inf-compare-unary-copy-red.log`, required Move publication in
+`.cache/inf-unary-move-red.log`, service Swap/mixed read mask in
+`.cache/inf-service-swap-red.log`. Draft compile errors do not count as behavioral
+RED. Actual cold64/33-limb comparison reservation sweeps refuse native prefixes
+0..4 then succeed5; debug0..6 then succeed7 in both SYNCH policies. Named physical
+censuses run before fault disable; warm actual storage paths allocate Go0. The
+added malformed-layout source-end fixture deliberately builds both real
+crossproducts, temporarily alters only actual second ILP32 extent metadata,
+confirms completed first NUM/DEN destruction before second physical guard at
+cursor2, and restores only deliberate fixture metadata before explicit owning
+cleanup. compareGuard=false here because source capacity read passed: the actual
+lower requested-size guard failed. No allocator repair or source assertion
+relabeling. Existing test expectations were unchanged; mpq_ops_test.go only adds
+four explicit comparison roots. Manifest adds selected method maps without whole
+unit/API promotions or new registered ENSURE credit.
+
+Root ID malformed-header ILP32 follow-up also has genuine behavioral RED in
+`.cache/utilid-wrapped-cleanup-red.log`: source unsigned old cap=size0x55555553
+accepts new cap0x7ffffffd/bytes0xfffffffc, and Runtime SIZE_T extent actually wraps
+zero. Reallocation publishes a changed token with no physical header bytes,
+then the actual header guard fires. Named Generator cleanup now calls actual
+Runtime.CleanupPartial only for that known changed short-extent token; no counter
+subtraction is fabricated. Native/debug both pass this regression and the
+utility owner/warm/debug/source-width families.
+
+
+Independent read-only root-utility review confirmed literal normal ID algorithms,
+actual Runtime realloc and named cleanup; it found a malformed nonnull cap0 branch
+mismatch. Source vector.h chooses initialization by null m_data, and nonnull cap0
+asserts under DEBUG or overflows under release before allocation. Genuine RED
+`.cache/utilid-nonnull-cap0-red.log` preceded corrected raw-vs-null grow dispatch;
+new source debug flags preserve both paths without repairing headers. Added
+stopwatch adapter confirmations cover Start/Stop clock refusal, successful query
+Stop then refused Start retaining elapsed and running=false, plus the exact Linux
+zero-second backwards-nanosecond guard and nonzero unsigned wrap. These are added
+confirmation tests, not fabricated baseline RED. Current utility native/debug and
+legacy ID checks pass. Numeric nine-file frozen hashes were reverified unchanged.
+
+
+### Frozen monomial ordering source family
+
+Two files froze with native/debug5 named groups and both vets terminal0:
+`polynomial_monomial_order.go` SHA256
+b029436216cfd328d3c23133a19418027b108bf1e854f71fe277589a6040d176;
+`polynomial_monomial_order_test.go` SHA256
+6e5ee64ef58da735e3d93ca748f9e35e0e5f0a5a117831d675dd3f99025539a6.
+Genuine missing-API RED `.cache/monomial-order-api-red.log` used committed dae49cc
+plus actual monomial/utility production prerequisites. Targeted GREEN is in
+`.cache/monomial-order-{native,debug}.log` (0.008/0.009s), both vets in
+`.cache/monomial-order-{debug-,}vet.log`. Source cpp609 Lex,637 LexWithMinimum,
+694 GradedLex,706 ReverseLexRange,738 ReverseLex,749 GradedReverseLex use literal
+comparison loops and precise Size12/TotalDegree8/power reads, without unread
+hash/refcount preflight. cpp228 idx<size DEBUG read guard is retained. No owned
+numeric locals/reference changes or new cleanup roots exist in comparators.
+
+Dormant source21 tst_lex cases yield84 adapted comparator conditions through real
+monomial construction; registered tst_polynomial returns after active tst_psc
+before tst_lex. Thus no new active ENSURE credit. Added27-value/729-pair independent
+models, ranged assertions/no-read/stale scalar branches, explicit signed size
+conversion and actual INT32_MIN-1 UB guard, and warm Go0/source count stable checks
+complement those dormant projections. TRACE lex_lt2 and native sorting functor
+bindings remain open, as do active polynomial manager/PSC/resultant tests and
+whole multivariate polynomial arithmetic. Three previously unported polynomial
+production/header/test units are now partial for this justified selected family;
+full monomial lifecycle/table bodies still await independent review and combined
+full gates.
+
+
+### Frozen SAT probing and dynamic subsumption follow-up
+
+Eleven NEW Go files only, no existing SAT edits, froze in
+`.cache/probing-final-inventory.json` (source paths and32 exact names). Isolated
+committed dae49cc plus those11 and actual utiltime4 files passes184 RUN/184 PASS
+native0.062s/debug0.058s in `.cache/probing-final-{native,debug}.log`; debug vet
+terminal0 in `.cache/probing-final-vet.log`. Isolated source/no-generics audit
+terminal0 in `.cache/probing-final-source.log`, before parent metadata updates.
+Root reverified all11 hashes unchanged. These targeted gates do not replace
+combined full native/debug gates or prove full solver integration.
+
+Source cpp24–31 constructor,33–39 reset_cache,42–58 cache_bins,60–108 try_lit,
+110–159 process_core,161–170 process,172–191 report,193–244 operator,
+246–252 parameters,254–256 empty descriptor TODO,258–262 finalize,
+264–270 statistics and h cached_implied_lits/dec map to probing owner/cache/body
+files. Sole actual propagation.probingCounter is retained. Default probe/cache/
+binary=true, limit5000000/quota1024MB and misspelled probing_chache_limit remain
+literal. Successful run always finalizes assigned→toAssert→cache; it does not
+leave a cache for later dynamic subsumption. Report Start/deferred Stop uses
+actual utiltime, preserves first body failure, and leaves verbose stream/mem_stat
+binding open. Statistics counter uses explicit caller key binding for exact
+'probing assigned', with whole caller/name/global wiring partial.
+
+Source sat_types.h155–226/229ff probing-used assigned-set member bodies now use
+actual SAME Runtime char membership and uint values, not the old Budget-only
+set arrays. Source size is published before ascending false construction,
+membership is marked before list push, values precede membership reset/finalize.
+Failed push retains real marked membership, source finalized fields can be reused
+next round, and all actual source allocations affect Runtime cache quota. The
+new embedded metadata is charged once in the probing owner header; no set box,
+shadow storage or synthetic ticket is used. Runtime quota remains actual raw
+source accounting, with extra Go cold provenance separately charged to Budget.
+
+Dynamic source solver.cpp2408–2522 uses separate literalMark, captured watches/
+cache iterators, source binary/ternary short circuits, first nonbinary break,
+FUIP preservation and ascending compaction/stat sequence. Source missed-propagation
+predicate producers cpp3022–3074 are real code over actual original/learned clause
+owners and27 lbool states. Missing integrity_checker dispatch remains explicit
+only for enabled source tag after real reslimit.inc; default owner-local tag
+switches reflect initially empty source debug tags. Global tag lifecycle/full
+checker/real EXT/full FIRST-UIP/default policy/solver Check remain open, never
+success callbacks. Existing sat_user_scope42 pending campaign is untouched.
+
+Cache raw LP64 entries are16 bytes with authoritative available/header;
+actual40-byte scalar provenance rows retain only returned Block tokens. Cold
+sidecar full incoming backing is charged before source malloc, with old/new
+coexistence and retained successful prefixes; native inner pointer ABI remains
+an explicit Go representation adaptation. Outer borrowers bind actual allocation
+identity; inner iterators retain actual captured payload. Charged embedded row
+workspace fixes2 warm Go allocations while preserving token transfer on every
+return. Source uint32 wrapped request old300000000→cap450000000/2905032712 is
+literal after removing a wider raw-extent rejection; only real host-sidecar extent
+checks remain. No cache disable shortcut or default change.
+
+All19 real reservation prefixes precede first success19; all8 canceled quota
+prefixes precede success9. Physical raw roots+cold graph are censused before
+fault-disable; warm process is Go0 with exact Budget/Runtime plateau. Independent
+CNF models and48 non-complementary ternary pairs (24 fully normalized) use16-value
+entailment checks. Eight complementary raw-watch pairs retain exact source quirks,
+including actual mathematical counterexamples; source simplify_clause cpp442
+rejects such tautologies upstream. No production algorithm repair or blanket
+branch skip. No newly registered probing/dynamic ENSURE credit.
+
+Tests-first evidence: probing-api-red, probing-dynamic-api-red,
+probing-diagnostic-api-red, warm2-allocation probing-branches-native/cache escape,
+probing-cache-capacity-behavior-red, probing-cache-wrapped-red,
+probing-assigned-runtime-red, probing-finalize-reuse-red and probing-level-read-red
+logs. Actual level header error now propagates at source num_vars rather than
+silently becoming0; that regression is an explicitly allocated unconstructed
+header diagnostic domain, not a canonical source assertion. Two source probing
+units promoted only to partial; full ledger now28/166/1908 with APIs unported.
+
+Fresh named TestUPolynomialFactorFullAlgorithmImmediateFailureRoots passes both
+current worktree profiles in `.cache/monomial-probing-factor-immediate-{native,debug}.log`
+(main0.812/1.689s). Whole-suite freeze/full gates still await monomial owner audits;
+no new commit or completion claim yet.
+
+
+Generator source-only member teardown is now separate from owning Close:
+`SourceFinalize()` guards ordinary entry first, deallocates only published raw,
+retains unpublished initial mem and actual partial-header guard, and acknowledges
+an already consumed raw token on retry. Genuine API RED is
+`.cache/utilid-source-finalize-api-red.log`; native/debug regressions cover actual
+TLS postallocation pending token and wrapped header stop before owning cleanup.
+Monomial source/constructor member teardown uses that source-only path, retaining
+metadata for later explicit owning cleanup; no recycled-ID repair is attempted
+through destroyed or interrupted members.
+
+
+Continuation revalidated the actual changed worktree and existing agent states.
+The pre-freeze combined full native suite is terminal GREEN in
+`.cache/monomial-probing-pre-freeze-native.log` (main12.713s, mpnum87.887s).
+This run precedes final precise-read corrections and the monomial2pos helper;
+it is integration evidence only, not the final immutable commit gate.
+Exact frozen rational9 and SAT11 inventories were rehashed unchanged. One exact
+duplicate SAT ownership narrative in the machine manifest was removed.
+Independent monomial review confirms earlier retained-slot, destructor retry,
+manager refcount route and source assertion-timing corrections. Identified
+remaining singleton/power degree read-order differences are being corrected
+with focused tests before final freeze. Source TRACE/conditional chashtable
+visited-set diagnostics and full polynomial imp/PSC remain explicit obligations.
+
+
+Comparator final follow-up corrects an actual reached-field defect discovered
+by parent review: source get_power returns references before VAR comparison;
+unequal VAR branches never read DEGREE. Genuine behavioral RED is
+`.cache/monomial-order-degree-red.log`. The two source reference/debug guards
+now precede both VAR reads, and DEGREE is read only for matching variables or
+the reached minimum-variable branch, preserving the first minimum DEGREE
+before the second VAR. Real fresh allocator objects initialize only actual
+source-reached fields; tests perform explicit caller CleanupValue without
+repairing unread fields. Six groups plus four subtests (10 RUN/10 PASS) pass
+native0.009s/debug0.010s in `.cache/monomial-order-{native,debug}.log`; both
+selected vets pass. Existing five groups and numeric nine-file freeze remain
+unchanged; comparator two-file hashes were explicitly refrozen.
+
+
+### Frozen monomial position helper
+
+Exact two-file inventory `.cache/positions-final-inventory.json` was rehashed
+unchanged. Source monomial2pos cpp456–499 Get/Reset/Set and concrete caller-array
+SetMonomials/ResetMonomials loops use the same manager Runtime unsigned vector
+(capacity0,size4,payload8), literal uint32 ID+1 and UINTMAX defaults. Actual
+polynomial imp template consumers remain open; no substitute Poly interface.
+Size is published before ascending defaults, debug assertions retain source
+order, and source member destruction excludes actual unreturned initial malloc.
+Owning cleanup separately retains/drains pending allocation and actual ILP32
+changed-token physically short header via CleanupPartial without accounting
+repair. Nonnull cap0 distinguishes source vector overflow from null initial
+growth. Ordinary scalar ID reads avoid unrelated monomial fields.
+
+Eight groups/fourteen RUN+PASS pass native0.006s/debug0.007s in
+`.cache/positions-final-{native,debug}.log`; selected debug vet passes in
+`.cache/positions-final-vet.log`. All five actual refused prefixes then first
+success5 are censused before disabling faults; cold header/full backing charge
+and warm Go0 allocation/account plateau are checked. Actual TLS caller
+allocation reaches99977 local bytes before initial physical vector allocation
+triggers source memout, with pending destructor/owning cleanup distinctions.
+Tests-first missing API and real boundary regressions are preserved in
+`.cache/positions-api-red.log` and `.cache/positions-boundary-red.log`.
+No whole polynomial or registered assertion completion is claimed.
+
+
+Final immutable commit-gate freeze captures every679 Go source file, including
+untracked files and all build profiles, in
+`.cache/monomial-probing-go-hashes.json`. The full file set and every SHA256
+were reverified unchanged immediately after launching native/debug gates.
+Both full vet profiles are terminal0 in
+`.cache/monomial-probing-final-vet-{native,debug}.log`. Full native/debug logs
+are `.cache/monomial-probing-final-{native,debug}.log`; terminal suite outcomes
+remain pending. No Go edits are permitted while this frozen gate runs.
+
+
+### Frozen monomial owner and selected source bodies
+
+`.cache/monomial-frozen-source-map.json` records all16 immutable monomial Go
+files: twelve core, two comparison and two position-helper files. Root
+reverified every hash. All43 focused groups pass native0.034s/debug0.071s in
+`.cache/monomial-final-{native,debug}.log`; focused vet is terminal0.
+The machine manifest now maps selected cpp92–1292 power/monomial/temp/manager
+bodies and the concrete chained-table specialization to actual Go files and
+29 core tests, retaining partial classification and zero active driver credit.
+Registered tst_polynomial runs PSC then returns; dormant manager/conversion
+and21 lex-input/84 expression conditions are explicitly adaptations.
+
+Actual manager owns chained table8+2, shared ID vector, four128-capacity temps,
+allocator, unit and real source scratch. Cold scalar provenance directories
+are charged once; owning abort uses only caller values or named creation, unit,
+temp, ID, table and rename fields. Constructor unwind destroys only completed
+members; source completed destructor executes unit decrement/debug empty
+assertion/allocator/power/temp3→0/ID/table sequence. Release source destruction
+can consume pooled storage while direct caller objects remain; explicit caller
+CleanupValue distinguishes actual consumed pooled tokens from saved direct raw
+allocations. Owning Close guards caller roots and extra unit references first.
+Postphysical temp releases are acknowledged once, while a true failed
+free-before-grow missing pointer remains a stopped source hole. Interrupted
+private-unit ID recycle retains actual pending ID allocation and owning abort
+releases the known unit without replaying recycle or repairing source counters.
+
+Interning publishes temporary table key before source allocation/ID/header and
+permanent publication. Rename mutates/hash-updates before new-table insertion
+and swaps only at source end, preserving interrupted stale old buckets; no
+rollback/rebuild. Actual source reversed GCD remainder reserve and exponent/RC
+unsigned wrap are preserved. NumVars/IsValidVar ordinary APIs now guard owner
+lifetime. IsValid tests-first RED `.cache/monomial-core-read-order-red.log`
+locks size0/1 no VAR read, degree-only sums, and sorted-vars short circuit before
+degree sum before stored-degree. Source Mul validations use actual input powers.
+
+Remaining selected partial-record query/display/algorithm eager reads are
+explicit next fidelity work, along with external ostream/display-variable
+bindings, conditional chashtable visited-set diagnostics, TRACE/global tags and
+global Runtime binding. Heapsort replaces the external std::sort backend only
+for canonical unique-variable result order; no comparator-call sequence claim.
+The fixed scalar16-byte chained-table codec replaces native pointer ABI. Full
+polynomial imp construction, constants, all member lifetimes, arithmetic and
+active PSC/resultant driver remain required and unported. These limits do not
+reduce the complete-fork objective.
+
+
+Final full native is terminal0 on the679-file freeze
+(`.cache/monomial-probing-final-native.log`, main13.102s/mpnum89.307s).
+Both full vets remain terminal0. Final synchronized source/evidence/no-generics
+audit is terminal0 in `.cache/monomial-probing-final-source.log`, with unchanged
+2102-unit/677-API inventory and justified28/166/1908 statuses. Final named
+TestUPolynomialFactorFullAlgorithmImmediateFailureRoots fresh -count=1 passes
+native0.776s/debug1.750s in `.cache/monomial-probing-final-factor-{native,debug}.log`.
+Full checked/debug remains live on its original handle; no observation timeout
+is treated as terminal, and its100-bit/16146-prefix campaign is unchanged.
+
+
+### Next bounded fidelity work from frozen-tree review
+
+Read-only monomial review (`.cache/monomial-next-read-audit.json`) identifies13
+remaining method groups. Prioritize SIZE-only query headers and VAR-only searches;
+then preserve source callbacks and degree branches in display/SMT2; then scalar
+merge, Sqrt odd-degree short circuit, RemoveVariable ignored matching degree and
+Rename unchanged-degree access. In particular source GCD unequal-variable
+no-common branch can publish left quotient powers and return before reading the
+unchosen right degree. Tests must use actual fresh incomplete physical objects
+and source prefixes, without field repair, before changing bodies. All16
+monomial hashes remained unchanged during review.
+
+Read-only SAT conflict review (`.cache/sat-first-uip-next-source-map.json`)
+identifies actual resolve_conflict/core cpp1675–1820 plus maxlevel/trail/
+antecedent/phase2091–2219. Real Runtime lemma spans must bridge numDiffLevels
+and MkClauseCore/MkClauseN without shadow host slices. pop_reinit2545 is
+pop→exchange_par→reinit_assumptions; existing pop alone is insufficient.
+Nonempty scopes require actual assumption vectors/literal set/core traversal
+1822–2087 and reinit-induced conflict retry. Source minimization/dynamic defaults
+remain true, phase400/100 and glue-before-pop order remain required, with
+mark/activity-before-push failure roots. Full ctor/Check and registered
+sat_user_scope42-assertion infinite campaign remain open. Frozen SAT11 and
+positions2 hashes stayed unchanged; no source tests were added during gates.
+
+
+Read-only arithmetic review (`.cache/inf-next-arithmetic-source-map.json`)
+corrects the next dependency plan: public raw Add/Sub already use cold scalar
+guards and actual source component/end actions; do not invent a transaction
+rewrite. Remaining facade whole-value preflight, Inf unrelated EPS/infinity
+reads before reached FIRST actions, and Mul/Div eager all-field checks need
+tests-first entry-profile corrections. Existing approximate Mult/Power raw
+parity/n0/constructor/move algorithms must be retained. Div divisor-output alias
+currently defers Del across body failure and ignores cleanup errors; widening
+that family needs a proved retained raw cursor/root, not a cleanup shortcut.
+C++11 unspecified operand evaluation remains an explicit selected profile.
+Numeric9/comparator2 files stayed unchanged; no new registered assertion credit.
+
+
+### Full debug integration correction before any commit
+
+The original full checked/debug gate is terminal RED (main724.883s) in
+`.cache/monomial-probing-final-debug.log`; mpnum and all other packages passed
+(numeric189.933s). Sole failure TestSexprDebugBVComparisonFailureRoots had
+40 actual cells versus39 named roots, and43 actual payloads versus42 named
+payloads. Its test-only source-root inventory omitted the newly implemented
+rawArithmetic.compareOne/compareTwo locals. Five lines now enumerate those
+actual manager-named temporaries only while compareActive; the exact existing
+cell/payload equality assertion is unchanged, with no registry-derived root,
+physical/accounting repair, source algorithm change, skip or horizon reduction.
+The genuine existing failure passes fresh checked/debug -count=1 in
+`.cache/monomial-probing-sexpr-roots-corrected.log` (0.082s). A first compile
+attempt reused a local raw name and was corrected to arithmetic; that compile
+error is not claimed as semantic tests-first evidence.
+
+All679 corrected Go files freeze in
+`.cache/monomial-probing-corrected-go-hashes.json`; only
+util_sexpr_debug_test.go changed from the initial full-gate freeze.
+Both full suites and static/source gates must pass on this corrected tree
+before any commit. The original100-bit/every16146-prefix sweep remains intact.
+
+
+### Latest source provenance and header rules
+
+The user guarantees that the C++ reference is fixed. The current verifier no
+longer computes or stores content digests or aggregate reference identity
+values. Source/API/path inventories and conditional/assertion/method/test
+evidence remain. The active source ledger and proof matrix retain paths while
+dropping reference content digests; obsolete cached copies are being cleaned.
+Root plan and this ledger remove the corresponding requirements and stored
+C++ digest values. The durable policy is in golang/AGENTS.md.
+
+Tests-first verifier regressions are recorded in
+`.cache/portcheck-hashless-red.log`; all8 tool-package groups and both focused
+vets pass in `.cache/portcheck-hashless-{native,debug}.log` and corresponding
+vet logs. Three verifier Go files changed. Forty-eight current port headers
+now retain originating source paths and MIT notices while omitting the
+Microsoft copyright line, with no algorithm or assertion change. Other
+authors' notices and LICENSE.txt are retained. Historical untouched Go files
+were not rewritten. The final679-Go-file verification tree is recorded in
+`.cache/monomial-probing-provenance-go-hashes.json`; Go tested-tree verification
+is separate from the removed C++ content bookkeeping.
+
+
+Provenance cleanup is complete: active source manifest removes aggregate and
+all2102 unit content digests while preserving every path, assertion, conditional
+and API entry; proof matrix removes105 reference digests and otherwise remains
+structurally equal to the baseline. Relevant cache cleanup covers681 JSON files,
+8162 text/report files and676 obsolete checker package/command directories, plus
+the obsolete proof-inventory digest generator. Exact machine path lists are
+`.cache/source-digest-json-cleanup.json`,
+`.cache/obsolete-reference-text-cleanup.json` and
+`.cache/obsolete-reference-tool-cleanup.json`. No Git history or original C++
+source was rewritten. Solver hash/quantifier behavior and Go verification
+evidence remain. Final native, both full vets and hash-free source/no-generics
+audit are terminal0; final checked/debug is still live on its original handle.
+
+
+### Final green commit evidence
+
+Both final full suites on the provenance-policy tree are terminal GREEN:
+`.cache/monomial-probing-provenance-native.log` (main12.964s) and
+`.cache/monomial-probing-provenance-debug.log` (main710.536s). Unchanged numeric
+package successes are reused by Go's valid test cache. Both full vet profiles
+are terminal0 in `.cache/monomial-probing-provenance-vet-{native,debug}.log`;
+hash-free source/method/test/no-generics audit is terminal0 in
+`.cache/monomial-probing-provenance-source.log`, reporting2102 units/677 APIs
+and28/166/1908 statuses. The complete679-Go-file set and bytes were verified
+unchanged after terminal results; no C++ content hashes were computed.
+
+Earlier pending/live gate entries are historical observations superseded by
+this final evidence. Full checked/debug original100-bit precision and every
+actual reservation prefix are preserved. The named factor regression passed
+fresh both profiles before metadata/header-only updates and is included in
+these final full suites. No test was hidden, skipped, deleted, weakened or
+truncated; no algorithm or physical accounting was repaired to obtain GREEN.
+The complete fork, APIs, actual solver/search and remaining source tests remain
+required; this selected port chunk does not satisfy full goal completion.

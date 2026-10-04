@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation
+// Source: src/util/inf_int_rational.h. Licensed under the MIT license.
 // Concrete translation of src/util/inf_int_rational.h/.cpp.
 package mpnum
 
@@ -249,7 +249,7 @@ func (s *RationalService) InfIntSetInt(dst *OwnedInfIntRational, n int32) error 
 	return nil
 }
 func (s *RationalService) InfIntReset(v *OwnedInfIntRational) error {
-	if e := s.lockInfInt(v); e != nil {
+	if e := s.lockInfIntSource(v); e != nil {
 		return e
 	}
 	defer s.mu.Unlock()
@@ -260,7 +260,7 @@ func (s *RationalService) InfIntReset(v *OwnedInfIntRational) error {
 	return nil
 }
 func (s *RationalService) InfIntSwap(a, b *OwnedInfIntRational) error {
-	if e := s.lockInfInt2(a, b); e != nil {
+	if e := s.lockInfIntSource2(a, b); e != nil {
 		return e
 	}
 	defer s.mu.Unlock()
@@ -401,7 +401,7 @@ func (s *RationalService) negInfInt(v *OwnedInfIntRational) error {
 	return infIntPublishSecond(v, -int64(v.second))
 }
 func (s *RationalService) InfIntNeg(v *OwnedInfIntRational) error {
-	if e := s.lockInfInt(v); e != nil {
+	if e := s.lockInfIntSource(v); e != nil {
 		return e
 	}
 	defer s.mu.Unlock()
@@ -458,7 +458,7 @@ func (s *RationalService) InfIntMul(r *OwnedRational, a *OwnedInfIntRational) (_
 	return s.copyInfInt(&tmp)
 }
 func (s *RationalService) InfIntNegCopy(v *OwnedInfIntRational) (_lexOut OwnedInfIntRational, _lexErr error) {
-	if e := s.lockInfInt(v); e != nil {
+	if e := s.lockInfIntSource(v); e != nil {
 		return OwnedInfIntRational{}, e
 	}
 	defer s.mu.Unlock()
@@ -477,7 +477,7 @@ func (s *RationalService) InfIntNegCopy(v *OwnedInfIntRational) (_lexOut OwnedIn
 	return out, nil
 }
 func (s *RationalService) InfIntAbs(v *OwnedInfIntRational) (_lexOut OwnedInfIntRational, _lexErr error) {
-	if e := s.lockInfInt(v); e != nil {
+	if e := s.lockInfIntSource(v); e != nil {
 		return OwnedInfIntRational{}, e
 	}
 	defer s.mu.Unlock()
@@ -883,14 +883,14 @@ func (s *RationalService) InfIntIsUint64(v *OwnedInfIntRational) (bool, error) {
 	return s.infIntScalarFits(v, true)
 }
 func (s *RationalService) InfIntEqual(a, b *OwnedInfIntRational) (bool, error) {
-	if e := s.lockInfInt2(a, b); e != nil {
+	if e := s.lockInfIntSource2(a, b); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
 	return s.equalInfInt(&a.first, a.second, &b.first, b.second)
 }
 func (s *RationalService) InfIntNotEqual(a, b *OwnedInfIntRational) (bool, error) {
-	if e := s.lockInfInt2(a, b); e != nil {
+	if e := s.lockInfIntSource2(a, b); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
@@ -901,21 +901,21 @@ func (s *RationalService) InfIntNotEqual(a, b *OwnedInfIntRational) (bool, error
 	return !v, nil
 }
 func (s *RationalService) InfIntLess(a, b *OwnedInfIntRational) (bool, error) {
-	if e := s.lockInfInt2(a, b); e != nil {
+	if e := s.lockInfIntSource2(a, b); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
 	return s.lessInfInt(&a.first, a.second, &b.first, b.second)
 }
 func (s *RationalService) InfIntGreater(a, b *OwnedInfIntRational) (bool, error) {
-	if e := s.lockInfInt2(a, b); e != nil {
+	if e := s.lockInfIntSource2(a, b); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
 	return s.lessInfInt(&b.first, b.second, &a.first, a.second)
 }
 func (s *RationalService) InfIntLessEqual(a, b *OwnedInfIntRational) (bool, error) {
-	if e := s.lockInfInt2(a, b); e != nil {
+	if e := s.lockInfIntSource2(a, b); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
@@ -926,7 +926,7 @@ func (s *RationalService) InfIntLessEqual(a, b *OwnedInfIntRational) (bool, erro
 	return !v, nil
 }
 func (s *RationalService) InfIntGreaterEqual(a, b *OwnedInfIntRational) (bool, error) {
-	if e := s.lockInfInt2(a, b); e != nil {
+	if e := s.lockInfIntSource2(a, b); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
@@ -937,14 +937,14 @@ func (s *RationalService) InfIntGreaterEqual(a, b *OwnedInfIntRational) (bool, e
 	return !v, nil
 }
 func (s *RationalService) InfIntEqualRational(a *OwnedInfIntRational, b *OwnedRational) (bool, error) {
-	if e := s.lockInfIntRat(a, b); e != nil {
+	if e := s.lockInfIntSourceRat(a, b); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
 	return s.equalInfInt(&a.first, a.second, &b.raw, 0)
 }
 func (s *RationalService) InfIntNotEqualRational(a *OwnedInfIntRational, b *OwnedRational) (bool, error) {
-	if e := s.lockInfIntRat(a, b); e != nil {
+	if e := s.lockInfIntSourceRat(a, b); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
@@ -955,21 +955,21 @@ func (s *RationalService) InfIntNotEqualRational(a *OwnedInfIntRational, b *Owne
 	return !v, nil
 }
 func (s *RationalService) InfIntLessRational(a *OwnedInfIntRational, b *OwnedRational) (bool, error) {
-	if e := s.lockInfIntRat(a, b); e != nil {
+	if e := s.lockInfIntSourceRat(a, b); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
 	return s.lessInfInt(&a.first, a.second, &b.raw, 0)
 }
 func (s *RationalService) InfIntGreaterRational(a *OwnedInfIntRational, b *OwnedRational) (bool, error) {
-	if e := s.lockInfIntRat(a, b); e != nil {
+	if e := s.lockInfIntSourceRat(a, b); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
 	return s.lessInfInt(&b.raw, 0, &a.first, a.second)
 }
 func (s *RationalService) InfIntLessEqualRational(a *OwnedInfIntRational, b *OwnedRational) (bool, error) {
-	if e := s.lockInfIntRat(a, b); e != nil {
+	if e := s.lockInfIntSourceRat(a, b); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
@@ -980,7 +980,7 @@ func (s *RationalService) InfIntLessEqualRational(a *OwnedInfIntRational, b *Own
 	return !v, nil
 }
 func (s *RationalService) InfIntGreaterEqualRational(a *OwnedInfIntRational, b *OwnedRational) (bool, error) {
-	if e := s.lockInfIntRat(a, b); e != nil {
+	if e := s.lockInfIntSourceRat(a, b); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
@@ -991,14 +991,14 @@ func (s *RationalService) InfIntGreaterEqualRational(a *OwnedInfIntRational, b *
 	return !v, nil
 }
 func (s *RationalService) InfIntRationalEqual(a *OwnedRational, b *OwnedInfIntRational) (bool, error) {
-	if e := s.lockInfIntRat(b, a); e != nil {
+	if e := s.lockInfIntSourceRat(b, a); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
 	return s.equalInfInt(&a.raw, 0, &b.first, b.second)
 }
 func (s *RationalService) InfIntRationalNotEqual(a *OwnedRational, b *OwnedInfIntRational) (bool, error) {
-	if e := s.lockInfIntRat(b, a); e != nil {
+	if e := s.lockInfIntSourceRat(b, a); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
@@ -1009,21 +1009,21 @@ func (s *RationalService) InfIntRationalNotEqual(a *OwnedRational, b *OwnedInfIn
 	return !v, nil
 }
 func (s *RationalService) InfIntRationalLess(a *OwnedRational, b *OwnedInfIntRational) (bool, error) {
-	if e := s.lockInfIntRat(b, a); e != nil {
+	if e := s.lockInfIntSourceRat(b, a); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
 	return s.lessInfInt(&a.raw, 0, &b.first, b.second)
 }
 func (s *RationalService) InfIntRationalGreater(a *OwnedRational, b *OwnedInfIntRational) (bool, error) {
-	if e := s.lockInfIntRat(b, a); e != nil {
+	if e := s.lockInfIntSourceRat(b, a); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
 	return s.lessInfInt(&b.first, b.second, &a.raw, 0)
 }
 func (s *RationalService) InfIntRationalLessEqual(a *OwnedRational, b *OwnedInfIntRational) (bool, error) {
-	if e := s.lockInfIntRat(b, a); e != nil {
+	if e := s.lockInfIntSourceRat(b, a); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
@@ -1034,7 +1034,7 @@ func (s *RationalService) InfIntRationalLessEqual(a *OwnedRational, b *OwnedInfI
 	return !v, nil
 }
 func (s *RationalService) InfIntRationalGreaterEqual(a *OwnedRational, b *OwnedInfIntRational) (bool, error) {
-	if e := s.lockInfIntRat(b, a); e != nil {
+	if e := s.lockInfIntSourceRat(b, a); e != nil {
 		return false, e
 	}
 	defer s.mu.Unlock()
@@ -1054,4 +1054,37 @@ func (s *RationalService) InfIntClone(v *OwnedInfIntRational) (OwnedInfIntRation
 		return OwnedInfIntRational{}, e
 	}
 	return s.copyInfInt(v)
+}
+
+// Source-bound unary/comparison entry checks only provenance/readiness; reached
+// numeral operations perform their own actual handle checks.
+func (s *RationalService) lockInfIntSource(v *OwnedInfIntRational) error {
+	if e := s.lock(); e != nil {
+		return e
+	}
+	if e := s.infIntScalarOwner(v); e != nil {
+		s.mu.Unlock()
+		return e
+	}
+	return nil
+}
+func (s *RationalService) lockInfIntSource2(a, b *OwnedInfIntRational) error {
+	if e := s.lockInfIntSource(a); e != nil {
+		return e
+	}
+	if e := s.infIntScalarOwner(b); e != nil {
+		s.mu.Unlock()
+		return e
+	}
+	return nil
+}
+func (s *RationalService) lockInfIntSourceRat(a *OwnedInfIntRational, b *OwnedRational) error {
+	if e := s.lockInfIntSource(a); e != nil {
+		return e
+	}
+	if e := s.rationalScalarOwner(b); e != nil {
+		s.mu.Unlock()
+		return e
+	}
+	return nil
 }

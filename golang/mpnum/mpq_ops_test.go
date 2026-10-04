@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Microsoft Corporation. Licensed under the MIT license.
+// Source: src/util/mpq.h; src/util/mpq.cpp. Licensed under the MIT license.
 // Source: mpq.h mixed/fused overloads; rational.cpp active tst9 assertions.
 package mpnum
 
@@ -559,6 +559,9 @@ func qopsAuditLiveOwnership(t *testing.T, m *RationalManager, public []*Int) {
 	}
 	if raw.normActive {
 		roots = append(roots, &raw.norm)
+	}
+	if raw.compareActive {
+		roots = append(roots, &raw.compareOne.num, &raw.compareOne.den, &raw.compareTwo.num, &raw.compareTwo.den)
 	}
 	integerPhysicalAudit(t, m.z, roots...)
 }
