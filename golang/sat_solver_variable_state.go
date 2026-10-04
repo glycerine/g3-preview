@@ -34,7 +34,10 @@ type satSolverVariableStats struct {
 	NumVars, MkVarCount                                                                    uint32
 }
 
-func newSATSolverVariableState(todo *satSolverUintSet, b *arena.Budget, c arena.VectorConfig, raw *memory.Runtime) (*satSolverVariableState, error) {
+// Cold preparation provides actual source member borrows while later members
+// are still unconstructed. Full solver ordinary operations remain guarded by
+// its constructor completion; the standalone adapter below retains its order.
+func newSATColdVariableState(todo *satSolverUintSet, b *arena.Budget, c arena.VectorConfig, raw *memory.Runtime) (*satSolverVariableState, error) {
 	if e := todo.open(); e != nil {
 		return nil, e
 	}
@@ -60,7 +63,14 @@ func newSATSolverVariableState(todo *satSolverUintSet, b *arena.Budget, c arena.
 		col.bind(raw)
 	}
 	s.level.bind(raw)
-	var e error
+	return s, nil
+}
+
+func newSATSolverVariableState(todo *satSolverUintSet, b *arena.Budget, c arena.VectorConfig, raw *memory.Runtime) (*satSolverVariableState, error) {
+	s, e := newSATColdVariableState(todo, b, c, raw)
+	if e != nil {
+		return nil, e
+	}
 	s.watches, e = newSATSolverWatchLists(b, c)
 	if e == nil {
 		s.activity, e = newSATSolverRuntimeActivity(b, raw)
@@ -79,7 +89,7 @@ func newSATSolverVariableState(todo *satSolverUintSet, b *arena.Budget, c arena.
 	}
 	return s, nil
 }
-func (s *satSolverVariableState) open() error {
+func (s *satSolverVariableState) constructionBorrow() error {
 	if s == nil || s.self != s {
 		return ErrSATOwner
 	}
@@ -88,6 +98,16 @@ func (s *satSolverVariableState) open() error {
 	}
 	return nil
 }
+func (s *satSolverVariableState) open() error {
+	if e := s.constructionBorrow(); e != nil {
+		return e
+	}
+	if s.watches == nil || s.activity == nil || s.queue == nil || s.trail == nil {
+		return arena.ErrClosed
+	}
+	return nil
+}
+
 func (s *satSolverVariableState) numVars() uint32 { n, _ := s.level.size(); return n }
 func (s *satSolverVariableState) mkVar(ext, dvar bool) (satBoolVar, error) {
 	if e := s.open(); e != nil {
@@ -287,17 +307,51 @@ func (s *satSolverVariableState) Close() error {
 	}
 	// Selected member destruction follows reverse declaration order. No clauses
 	// or borrowed elimination todo are owned here, and no AST/SAT callbacks run.
+	if e := s.finalizeTrail(); e != nil {
+		return e
+	}
+	if e := s.finalizeQueue(); e != nil {
+		return e
+	}
+	if e := s.finalizeColumnsWatches(); e != nil {
+		return e
+	}
+	s.budget.Release(s.ownerBytes)
+	s.ownerBytes = 0
+	s.closed = true
+	return nil
+}
+
+// These concrete stages expose the actual reverse member actions for the full
+// facade. Standalone Close keeps its previous order. Retry is an explicit Go
+// owning acknowledgment, not a C++ destructor exception continuation.
+func (s *satSolverVariableState) finalizeTrail() error {
+	if s == nil || s.self != s {
+		return ErrSATOwner
+	}
 	if s.trail != nil {
 		if e := s.trail.Close(); e != nil {
 			return e
 		}
 		s.trail = nil
 	}
+	return nil
+}
+func (s *satSolverVariableState) finalizeQueue() error {
+	if s == nil || s.self != s {
+		return ErrSATOwner
+	}
 	if s.queue != nil {
 		if e := s.queue.Close(); e != nil {
 			return e
 		}
 		s.queue = nil
+	}
+	return nil
+}
+func (s *satSolverVariableState) finalizeColumnsWatches() error {
+	if s == nil || s.self != s {
+		return ErrSATOwner
 	}
 	if e := s.assignedSinceGC.finalize(); e != nil {
 		return e
@@ -344,8 +398,5 @@ func (s *satSolverVariableState) Close() error {
 		}
 		s.watches = nil
 	}
-	s.budget.Release(s.ownerBytes)
-	s.ownerBytes = 0
-	s.closed = true
 	return nil
 }

@@ -25902,3 +25902,79 @@ six-file bytes rechecked against immutable private prerequisite, no Microsoft
 copyright in new headers, full repo-relative source paths retained. Diff
 whitespace audit green. Coherent query chunk ready for commit; full objective
 remains active with full imp/GCD/PSC and remaining solver families open.
+
+### Default SAT Check and user scopes integrated; full gates pending
+
+Previous goal turn made progress: c456757 committed polynomial queries after
+all five immutable778 full gates GREEN, clean tree verified. This turn root
+reviewed actual source constructor/declaration hierarchy, destructor, parameter
+update, default Check/bounded search/backjump, assumptions, simplification,
+model conversion/check and userPush/UserGC/UserPop bodies against frozen42-file
+private port. All18 existing files exactly matched committed7c4af64 parent;
+24new files absent. Narrow full parent diff recorded for root review at
+.cache/sat-solver-check-parent-review.diff. Every frozen Go SHA verified before
+copy; immutable root review .cache/review/sat-solver-check-c456757 and explicit
+.cache/sat-solver-check-integrated-inventory.json. No historical module overlay.
+First integration command had an extra golang/ prefix under the module cwd and
+failed before edits; corrected before beginning any integration or full gates.
+
+Tests-first original pending registered UserScope API campaign now enabled only
+after actual42checks/168clauses pass against rebuilt solver and independent
+original CNF model oracle. Source driver never terminates; literal libc random
+sequence/printed harness remain open. CPP/h whole solver remains partial for
+nonnull extension callbacks, parallel search, recursive MUS/core minimization,
+clone, consequences/query APIs, printer/TRACE/verbose and global diagnostic tags.
+Preserved original minimize/dynamic-subsumption/core-min defaults; no production
+oracle or fake successful callback. Model lives in real Runtime signed32 enum
+fields, converter applies actual captured span. Clause IDs use actual embedded
+utilid.Generator borrowed Runtime; recycle observes real OOM before vector read.
+Failed pre-placement allocation retains declared actual extent before ID read;
+explicit owning abort does not invent a constructed source clause header.
+
+Full constructor73refusals then success; bounded Check5 then success; UserGC2
+then success; eager nested map14 then success. Immediate named physical/cold
+cohort before fault disable. UserGC stopped compaction retains disjoint kept/
+unread/current ranges, no snapshot or rollback; Close first owns those actual
+continuations and retains debug invariant guard. Explicit CleanupStopped only
+acknowledges reached stage1 source guard while preserving recorded cause/history,
+then drains original later member actions. Full source accounting and physical
+clause_offset32 adaptation remain open. Whole solver not promoted by green
+bounded tests. Forty declared new tests; private498 top-level SAT/Params/Resource
+native/debug tests, both vets and source/no-generics audit green. Evidence and
+remaining obligations in .cache/sat-solver-check-final-source-map.json.
+
+Applied five reviewed machine manifest unit proposals, preserving every old
+conditional/assertion/registration/method and existing target/test/ownership/
+deviation entry. Test source unit advances unported to partial; production
+solver/clause/ID units remain partial. Full source origins/MIT/other authors
+retained, Microsoft copyright omitted, C++ source not content-hashed.
+Full authoritative checks use .cache/sat-solver-full-complete-run.py, expected
+802 immutable Go files, five logs/results and Go-only snapshot. No master Go
+edits until terminal full gates. Private integer paired sentinel consumer
+migrations and exact division continue independently; neither is integrated.
+
+SAT complete authoritative802 gates terminal GREEN: native20.015s,
+checked/debug735.953s, vet-native1.552s, vet-debug1.498s,
+source/no-generics141.782s. Runner56644 terminal0 explicitly confirms immutable
+all802 Go files; root independently rechecked complete tree and exact42 frozen
+integration hashes. Evidence .cache/sat-solver-full-complete-{gates,go-hashes}.json
+and matching five logs. No tested Go edits during gates. Source audit records
+2102units/677APIs with30ported/185partial/1887unported. Whitespace audit green.
+Full selected default Check/user-scope chunk ready for coherent green commit;
+full solver/whole port remains open. New private MUS tests-first genuine
+missing-binding RED and literal-set/captured-assumption prerequisite API RED
+are separate future evidence; no promotion or integration here.
+
+Private linear draft extended while SAT gates ran, without master edits:
+.cache/polynomial-linear-zero-capacity-red.log genuinely found missing vector.h
+non-null zero-capacity debug assertion; reached guard added before growth.
+Native release retains actual source vector overflow. New real TLS reservation
+fixture primes lane using caller-owned physical extent, triggers memout AFTER
+actual vector malloc but BEFORE header publication, audits exact pending block
+and cold graph before cleanup. Literal SourceFinalize leaves unreturned helper
+allocation owned; explicit owning Close drains it. First counter assertion
+incorrectly omitted earlier unsynchronized local allocations, so that test-only
+oracle was corrected to actual source synchronization semantics (no production
+change or semantic RED credit). Fifteen groups pass both profiles in
+.cache/polynomial-linear-tls-final-*.log; draft stays unintegrated pending shared
+Integer source NULL state and broader arithmetic failure/partial-move review.

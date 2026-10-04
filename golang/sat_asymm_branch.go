@@ -32,7 +32,7 @@ type satAsymmBranch struct {
 }
 
 func newSATAsymmBranch(l *satSolverClauseLifecycle, p *ParamsRef) (*satAsymmBranch, error) {
-	if e := l.open(); e != nil {
+	if e := l.constructionBorrow(); e != nil {
 		return nil, e
 	}
 	n := uint64(reflect.TypeOf(satAsymmBranch{}).Size())
@@ -50,6 +50,15 @@ func newSATAsymmBranch(l *satSolverClauseLifecycle, p *ParamsRef) (*satAsymmBran
 	a.resetStatistics()
 	return a, nil
 }
+func (a *satAsymmBranch) constructionBorrow() error {
+	if a == nil || a.self != a {
+		return ErrSATOwner
+	}
+	if a.closed || a.closing || a.reportActive || a.savedConstructed || a.interrupted || a.sorting || a.detachActive || a.phaseRestoreStopped || a.savedPhase.block != (memory.Block{}) || a.savedPhase.pending != (memory.Block{}) {
+		return arena.ErrClosed
+	}
+	return a.lifecycle.constructionBorrow()
+}
 func (a *satAsymmBranch) open() error {
 	if a == nil || a.self != a {
 		return ErrSATOwner
@@ -60,7 +69,7 @@ func (a *satAsymmBranch) open() error {
 	return a.lifecycle.open()
 }
 func (a *satAsymmBranch) Update(p *ParamsRef) (err error) {
-	if e := a.open(); e != nil {
+	if e := a.constructionBorrow(); e != nil {
 		return e
 	}
 	cfg := a.lifecycle.propagation.config

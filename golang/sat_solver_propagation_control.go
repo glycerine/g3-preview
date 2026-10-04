@@ -42,13 +42,13 @@ type satSolverPropagationState struct {
 }
 
 func newSATSolverPropagationState(v *satSolverVariableState, a *satClauseAllocator, mc *satModelConverter, r *utilReslimit, mem *memory.Runtime, cfg *satMainConfig, b *arena.Budget) (*satSolverPropagationState, error) {
-	if e := v.open(); e != nil {
+	if e := v.constructionBorrow(); e != nil {
 		return nil, e
 	}
 	if e := a.open(); e != nil {
 		return nil, e
 	}
-	if e := mc.open(); e != nil {
+	if e := mc.constructionBorrow(); e != nil {
 		return nil, e
 	}
 	if e := cfg.open(); e != nil {
@@ -70,6 +70,15 @@ func newSATSolverPropagationState(v *satSolverVariableState, a *satClauseAllocat
 	s := &satSolverPropagationState{variables: v, clauses: a, converter: mc, limit: r, memory: mem, config: cfg, budget: b, ownerBytes: n, checkpointEnabled: true, notLiteral: satDefaultLiteral()}
 	s.self = s
 	return s, nil
+}
+func (s *satSolverPropagationState) constructionBorrow() error {
+	if s == nil || s.self != s {
+		return ErrSATOwner
+	}
+	if s.closed {
+		return arena.ErrClosed
+	}
+	return s.variables.constructionBorrow()
 }
 func (s *satSolverPropagationState) open() error {
 	if s == nil || s.self != s {

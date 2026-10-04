@@ -23,7 +23,7 @@ type satSCC struct {
 }
 
 func newSATSCC(l *satSolverClauseLifecycle, p *ParamsRef) (*satSCC, error) {
-	if e := l.open(); e != nil {
+	if e := l.constructionBorrow(); e != nil {
 		return nil, e
 	}
 	n := uint64(reflect.TypeOf(satSCC{}).Size())
@@ -50,6 +50,15 @@ func newSATSCC(l *satSolverClauseLifecycle, p *ParamsRef) (*satSCC, error) {
 	}
 	return c, nil
 }
+func (c *satSCC) constructionBorrow() error {
+	if c == nil || c.self != c {
+		return ErrSATOwner
+	}
+	if c.closed || c.closing {
+		return arena.ErrClosed
+	}
+	return c.lifecycle.constructionBorrow()
+}
 func (c *satSCC) open() error {
 	if c == nil || c.self != c {
 		return ErrSATOwner
@@ -60,7 +69,7 @@ func (c *satSCC) open() error {
 	return c.lifecycle.open()
 }
 func (c *satSCC) Update(local *ParamsRef) (err error) {
-	if e := c.open(); e != nil {
+	if e := c.constructionBorrow(); e != nil {
 		return e
 	}
 	cfg := c.lifecycle.propagation.config

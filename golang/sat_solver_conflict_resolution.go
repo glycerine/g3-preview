@@ -28,10 +28,10 @@ type satSolverConflictResolution struct {
 }
 
 func newSATSolverConflictResolution(a *satSolverConflictAnalysis, d *satSolverDynamicSubsumption) (*satSolverConflictResolution, error) {
-	if e := a.open(); e != nil {
+	if e := a.constructionBorrow(); e != nil {
 		return nil, e
 	}
-	if e := d.open(); e != nil {
+	if e := d.constructionBorrow(); e != nil {
 		return nil, e
 	}
 	if d.analysis != a {
@@ -48,6 +48,18 @@ func newSATSolverConflictResolution(a *satSolverConflictAnalysis, d *satSolverDy
 	}
 	s.assumptionSet.bind(a.propagation.memory)
 	return s, nil
+}
+func (s *satSolverConflictResolution) constructionBorrow() error {
+	if s == nil || s.self != s {
+		return ErrSATOwner
+	}
+	if s.closed || s.closing {
+		return arena.ErrClosed
+	}
+	if e := s.analysis.constructionBorrow(); e != nil {
+		return e
+	}
+	return s.dynamic.constructionBorrow()
 }
 func (s *satSolverConflictResolution) open() error {
 	if s == nil || s.self != s {

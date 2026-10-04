@@ -53295,7 +53295,8 @@
       "go_targets": [
         "sat_clause_storage.go",
         "sat_clause_large.go",
-        "sat_storage_vector.go"
+        "sat_storage_vector.go",
+        "sat_solver_clause_runtime_ids_test.go"
       ],
       "tests": [
         "TestSATClauseSetSourceOrderAndGhostPrefixes",
@@ -53328,7 +53329,11 @@
         "TestSATSolverConflictClauseReasonBothWatchedPositions",
         "TestSATSolverConflictFiniteImplicationOracle",
         "TestSATSolverConflictInitAndOptionalDispatchPrefixes",
-        "TestSATSolverConflictStaleSpanRetainsAllocatedCandidate"
+        "TestSATSolverConflictStaleSpanRetainsAllocatedCandidate",
+        "TestSATClauseRuntimeIDFreeVectorIsActualSourceStorage",
+        "TestSATClauseRuntimeIDRecycleRefusalKeepsClauseThenOOMSkips",
+        "TestSATClauseRuntimeIDReadRefusalRetainsDeclaredCandidate",
+        "TestSATClauseRuntimeIDBorrowLifetimeCheckedAtRecycleRead"
       ],
       "conditionals": [
         {
@@ -53449,10 +53454,22 @@
             "TestSATSolverConflictInitAndOptionalDispatchPrefixes",
             "TestSATSolverConflictStaleSpanRetainsAllocatedCandidate"
           ]
+        },
+        {
+          "name": "Selected real SAT clause-ID embedded Runtime Generator consumer and pre-placement candidate extent retention before fallible Next; legacy profile unchanged",
+          "status": "ported",
+          "go_target": "sat_clause_storage.go",
+          "tests": [
+            "TestSATClauseRuntimeIDFreeVectorIsActualSourceStorage",
+            "TestSATClauseRuntimeIDRecycleRefusalKeepsClauseThenOOMSkips",
+            "TestSATClauseRuntimeIDReadRefusalRetainsDeclaredCandidate",
+            "TestSATClauseRuntimeIDBorrowLifetimeCheckedAtRecycleRead"
+          ]
         }
       ],
       "ownership": [
-        "Concrete scalar clause locators are distinct from source IDs. Actual cold headers/directories/backing and allocation overlap are budgeted; small versus wide physical clause storage uses real allocations. Activity queues borrow actual mutable vectors; sets/vectors retain source bindings and copy/move prefixes. Watched erase retains live tails while actual destruction ends per-slot lifetime tracked by fully charged metadata. All twelve iterator factories return scalar values with zero escaping-wrapper allocation. See PORT_PROGRESS.md#audit-sat-storage-port-status-md for exact16-file/40-test evidence."
+        "Concrete scalar clause locators are distinct from source IDs. Actual cold headers/directories/backing and allocation overlap are budgeted; small versus wide physical clause storage uses real allocations. Activity queues borrow actual mutable vectors; sets/vectors retain source bindings and copy/move prefixes. Watched erase retains live tails while actual destruction ends per-slot lifetime tracked by fully charged metadata. All twelve iterator factories return scalar values with zero escaping-wrapper allocation. See PORT_PROGRESS.md#audit-sat-storage-port-status-md for exact16-file/40-test evidence.",
+        "Full facade uses existing embedded utilid.Generator on same actual Runtime; no OOM callback closure or second free-list owner. Source sticky OOM is read at actual recycle site before vector access, with Runtime provenance/lifetime guard. An actual allocation interrupted before placement retains declared extent for explicit owning abort; source Delete still exposes unread-header guard."
       ],
       "deviations": [
         "Pointer ABI becomes owner/kind/slot/generation locators and explicit typed invalid-domain guards. No fake address ordering, global OOM service, external extension callback, solver result or propagation/search algorithm is provided by this storage packet. Source OutOfMemory callback is borrowed; source global policy, conditional CASSERT tag control and TRACE/printer runtime remain open. Concrete vector aliases/invalid source instantiations and self-append/Fill nontermination adapters are recorded explicitly. No Go generics are used."
@@ -57245,7 +57262,36 @@
         "sat_clause_storage.go",
         "sat_solver_simplifier_kernel.go",
         "sat_solver_simplifier_subsumption.go",
-        "sat_var_queue.go"
+        "sat_var_queue.go",
+        "sat_asymm_branch.go",
+        "sat_scc.go",
+        "sat_solver.go",
+        "sat_solver_check_test.go",
+        "sat_solver_clause_runtime_ids_test.go",
+        "sat_solver_construction_test.go",
+        "sat_solver_constructor_fault_test.go",
+        "sat_solver_constructor_test.go",
+        "sat_solver_destruction_stages_test.go",
+        "sat_solver_full_audit_test.go",
+        "sat_solver_index_sets.go",
+        "sat_solver_index_sets_test.go",
+        "sat_solver_model.go",
+        "sat_solver_model_converter.go",
+        "sat_solver_model_source_test.go",
+        "sat_solver_model_span.go",
+        "sat_solver_model_test.go",
+        "sat_solver_mutable_span_test.go",
+        "sat_solver_probing.go",
+        "sat_solver_runtime.go",
+        "sat_solver_runtime_test.go",
+        "sat_solver_search.go",
+        "sat_solver_search_fault_test.go",
+        "sat_solver_search_model_test.go",
+        "sat_solver_user_scope.go",
+        "sat_solver_user_scope_fault_test.go",
+        "sat_solver_user_scope_model_test.go",
+        "sat_solver_user_scope_test.go",
+        "sat_solver_warm_test.go"
       ],
       "tests": [
         "TestSATSolverClauseCoreFiniteSimplification",
@@ -57444,7 +57490,47 @@
         "TestSATSimplifierActualSeparateDummyAllocator",
         "TestSATSimplifierCapturedResolventPayload",
         "TestSATSimplifierCleanupAll27AssignmentsAndUseCounts",
-        "TestSATSimplifierActualNumVarsUsesLevelAtRead"
+        "TestSATSimplifierActualNumVarsUsesLevelAtRead",
+        "TestSATSolverDefaultCheckSearchIndependentFiniteCNF",
+        "TestSATSolverCheckMaxConflictsZeroSourceReturnsUndef",
+        "TestSATSolverFullOwnerCopyClosedAndBorrowedRuntimeGuards",
+        "TestSATClauseRuntimeIDFreeVectorIsActualSourceStorage",
+        "TestSATClauseRuntimeIDRecycleRefusalKeepsClauseThenOOMSkips",
+        "TestSATClauseRuntimeIDReadRefusalRetainsDeclaredCandidate",
+        "TestSATClauseRuntimeIDBorrowLifetimeCheckedAtRecycleRead",
+        "TestSATSolverVariableColdPreparationHasNoPrematureQueue",
+        "TestSATSolverDecisionColdDefaultSeedAndOwningUnwind",
+        "TestSATSolverConverterColdBorrowBeforeSourceConstruction",
+        "TestSATSolverConverterColdUnwindAndReserveRefusal",
+        "TestSATSolverProbingConstructionBorrowDoesNotPermitRun",
+        "TestSATSolverColdVariableOrdinaryGuardBeforeAnyPublication",
+        "TestSATSolverInterveningChildFailureBeforeQueueConstruction",
+        "TestSATSolverFullConstructorEveryActualRefusalUnwindsRealMembers",
+        "TestSATSolverCompleteMemberConstructorHasRealDefaultChildren",
+        "TestSATSolverConstructorRefusesForeignRuntimeBeforeActualHeaderReserve",
+        "TestSATSolverUncompletedWrapperUnwindDoesNotRunDestructorBody",
+        "TestSATSolverRealDestructorStagesKeepLaterSourceMembers",
+        "TestSATSolverAntecedentMapEagerNestedConstruction",
+        "TestSATSolverAntecedentMapAllConstructorRefusalPrefixes",
+        "TestSATSolverAntecedentMapAscendingDestructionGuardPrefix",
+        "TestSATSolverSourceModelUsesRealAssignmentAndConverter",
+        "TestSATSolverSourceModelPublishesCurrentBeforeNumVarsRead",
+        "TestSATSolverActualRuntimeModelConverterMatchesSlice",
+        "TestSATSolverModelResizePublishesSizeBeforeDefaultPlacement",
+        "TestSATSolverMutableRuntimeClauseSpanMatchesFiniteSlice",
+        "TestSATSolverMutableCapturedSpanRejectsActualFreedPayload",
+        "TestSATFullRuntimeActualOwnersAndColdUnwind",
+        "TestSATFullRuntimeRejectsForeignBudgetBeforeReservation",
+        "TestSATSolverDefaultCheckEveryActualRefusalKeepsNamedRuntimeRoots",
+        "TestSATSolverDefaultSearchIndependentThreeVariableCNF",
+        "TestSATSolverActualAssumptionCoreAndLaterPlainCheck",
+        "TestSATSolverCheckRealCancellationDoesNotCatchSolverException",
+        "TestSATSolverOptionalDispatchGuardFollowsRealPopToBase",
+        "TestSATSolverUserGCDeletionRefusalOwnsExactCompactionRanges",
+        "TestSATSolverUserScopeSourcePushPopPreservesOriginalFormula",
+        "TestSATSolverOwningWatchShrinkRetainsOuterCapacity",
+        "TestSATSolverSourceUserScopeFiniteCycle",
+        "TestSATSolverWarmRepeatedCheckHasBoundedActualPhysicalGraph"
       ],
       "conditionals": [
         {
@@ -58292,6 +58378,94 @@
             "TestSATSimplifierCleanupAll27AssignmentsAndUseCounts",
             "TestSATSimplifierActualNumVarsUsesLevelAtRead"
           ]
+        },
+        {
+          "name": "Selected genuine default solver member construction and declaration-reverse destruction; source destructor body only completed wrapper; optional source profiles remain open",
+          "status": "partial",
+          "go_target": "sat_solver.go",
+          "tests": [
+            "TestSATSolverCompleteMemberConstructorHasRealDefaultChildren",
+            "TestSATSolverConstructorRefusesForeignRuntimeBeforeActualHeaderReserve",
+            "TestSATSolverFullConstructorEveryActualRefusalUnwindsRealMembers",
+            "TestSATSolverUncompletedWrapperUnwindDoesNotRunDestructorBody"
+          ]
+        },
+        {
+          "name": "Selected constructor-stage borrows versus ordinary member readiness; eager eight actual nested index_set tables, ascending dealloc_vect entries",
+          "status": "ported",
+          "go_target": "sat_solver_index_sets.go",
+          "tests": [
+            "TestSATSolverAntecedentMapEagerNestedConstruction",
+            "TestSATSolverAntecedentMapAllConstructorRefusalPrefixes",
+            "TestSATSolverAntecedentMapAscendingDestructionGuardPrefix"
+          ]
+        },
+        {
+          "name": "Selected updt_params source order through actual child services and sole decision RNG; no fake complete future members",
+          "status": "ported",
+          "go_target": "sat_solver.go",
+          "tests": [
+            "TestSATSolverCompleteMemberConstructorHasRealDefaultChildren",
+            "TestSATSolverConstructorRefusesForeignRuntimeBeforeActualHeaderReserve",
+            "TestSATSolverFullConstructorEveryActualRefusalUnwindsRealMembers",
+            "TestSATSolverUncompletedWrapperUnwindDoesNotRunDestructorBody"
+          ]
+        },
+        {
+          "name": "Selected real default Check, bounded search, backjump, null-extension final check, assumption setup and default simplify orchestration; global/optional branches remain open",
+          "status": "partial",
+          "go_target": "sat_solver_search.go",
+          "tests": [
+            "TestSATSolverDefaultCheckSearchIndependentFiniteCNF",
+            "TestSATSolverDefaultSearchIndependentThreeVariableCNF",
+            "TestSATSolverCheckMaxConflictsZeroSourceReturnsUndef",
+            "TestSATSolverFullOwnerCopyClosedAndBorrowedRuntimeGuards",
+            "TestSATSolverActualAssumptionCoreAndLaterPlainCheck",
+            "TestSATSolverCheckRealCancellationDoesNotCatchSolverException",
+            "TestSATSolverOptionalDispatchGuardFollowsRealPopToBase",
+            "TestSATSolverDefaultCheckEveryActualRefusalKeepsNamedRuntimeRoots",
+            "TestSATSolverWarmRepeatedCheckHasBoundedActualPhysicalGraph"
+          ]
+        },
+        {
+          "name": "Selected actual signed32 Runtime model mk_model/check_model and existing model-converter bridge; clone/TRACE/printer branches remain open",
+          "status": "partial",
+          "go_target": "sat_solver_model.go",
+          "tests": [
+            "TestSATSolverSourceModelUsesRealAssignmentAndConverter",
+            "TestSATSolverSourceModelPublishesCurrentBeforeNumVarsRead",
+            "TestSATSolverActualRuntimeModelConverterMatchesSlice",
+            "TestSATSolverModelResizePublishesSizeBeforeDefaultPlacement"
+          ]
+        },
+        {
+          "name": "Selected user scope push/pop, literal/binary collection and GC variable shrink plus reset_todos; source-guarded interrupted ownership explicit",
+          "status": "ported",
+          "go_target": "sat_solver_user_scope.go",
+          "tests": [
+            "TestSATSolverSourceUserScopeFiniteCycle",
+            "TestSATSolverUserScopeSourcePushPopPreservesOriginalFormula",
+            "TestSATSolverUserGCDeletionRefusalOwnsExactCompactionRanges",
+            "TestSATSolverOwningWatchShrinkRetainsOuterCapacity"
+          ]
+        },
+        {
+          "name": "Concrete in-place captured Runtime/Words mutable literal span for actual source aux clause consumer; slice boundary preserved, library comparison schedule adapter",
+          "status": "ported",
+          "go_target": "sat_solver_conflict_span.go",
+          "tests": [
+            "TestSATSolverMutableRuntimeClauseSpanMatchesFiniteSlice",
+            "TestSATSolverMutableCapturedSpanRejectsActualFreedPayload"
+          ]
+        },
+        {
+          "name": "Selected source wrapper stopped destructor invariant remains exposed; separate explicit CleanupStopped owning abort preserves cause and real action cursor",
+          "status": "ported",
+          "go_target": "sat_solver.go",
+          "tests": [
+            "TestSATSolverUserGCDeletionRefusalOwnsExactCompactionRanges",
+            "TestSATSolverSourceModelPublishesCurrentBeforeNumVarsRead"
+          ]
         }
       ],
       "ownership": [
@@ -58302,7 +58476,8 @@
         "Selected conflict owner charges actual cold fields once and borrows existing analysis/dynamic/probing/lifecycle/Runtime; owns actual Runtime assumption/core/literal-set members. Glue and clause consumers read captured lemma blocks directly. Constructor-read errors retain the actually allocated clause/ID in lifecycle pendingCandidate before return. Every real refusal prefix is rooted before fault disable; no host lemma copy or directory-derived owner roots.",
         "Cleaner interruption continuation is charged in the lifecycle header; owning Close drains only retained prefix and unread suffix with actual cursors. Source callbacks run while active; stopped lifecycle and direct pushClause reject later owning publication.",
         "Borrow sole conflict/phase counters and actual lifecycle/Runtime. Real cold GC owner, stable merge workspace and stopped compaction cursors are charged. Owning continuation drains only disjoint actual moved prefix/source ranges, not registry snapshots; lifecycle Close drains reached GC before ordinary vectors.",
-        "Decision cold owner charges actual RNG/statistic header and borrows conflict/lifecycle. Integrity checker is a by-value nonowning stack grouping; lifecycle borrows matching GC with its sole frozen count. Fresh disjoint ID set is constructed and closed on each reached call."
+        "Decision cold owner charges actual RNG/statistic header and borrows conflict/lifecycle. Integrity checker is a by-value nonowning stack grouping; lifecycle borrows matching GC with its sole frozen count. Fresh disjoint ID set is constructed and closed on each reached call.",
+        "Full selected facade owns actual completed cold child headers and sole source member graph; Runtime/global parameters and resource service are real borrowed caller owners. Ordinary access requires completed members; construction borrowing is only at reached source sites. Real Runtime enum model, eager outer map plus eight nested tables, and embedded Runtime ID generator have named scalar current/pending roots. Constructor sweep73 real refusals, bounded binary Check5, UserGC2 all inspect immediate physical ownership before disabling fault. User clause compaction retains only actual kept/unread ranges in embedded cursor; explicit CleanupStopped acknowledges observed source destructor guard without repairing watches/counters/vectors or reclassifying invalid source continuation as success."
       ],
       "deviations": [
         "Concrete allocation-free heapsort replaces std::sort on scalar literals. TRACE, solver construction, BCP, conflicts, search, scopes and remaining methods are unported.",
@@ -58312,7 +58487,8 @@
         "Only assignment char_vector source allocation accounting is integrated in this slice. Other SAT columns/watch/queue/clause/trail/vector allocations still require real global/runtime source hooks. Raw-state bounds/initialization guards act at endangered byte accesses; source DEBUG logical assertions remain distinct. No full solver construction/search or registered assertion completion is claimed.",
         "Selected FIRST-UIP and real assumption/init helpers are implemented with default minimization/dynamic subsumption. Full solver construction/Check/search, source extension calls, nonnull parallel exchange, optional MUS/model and global diagnostics remain explicit obligations. Constructor-error candidate retention is a typed owning adapter, not claimed C++ implicit unwinding; no registered user-scope assertion completion is credited.",
         "Complete selected ordinary GC/restart/init_search member algorithms executed; enabled integrity tags, verbose/TRACE and full constructor/search/Check remain open. Source comparator expressions/tie order preserved through explicitly charged concrete Go stable merge workspace; C++ standard library allocation/comparison schedule is not claimed identical. No new registered source assertion completion credit.",
-        "Selected enabled integrity and missed-propagation sites now call actual members, including Asymm entry/exit and propagation. Global debug-tag/assertions-enabled registry, TRACE/verbose, complete constructor/parameter updates/search and registered user-scope campaign remain open. Undefined floating-to-int conversion is guarded at reached source expression; not a C++ malformed-input guarantee."
+        "Selected enabled integrity and missed-propagation sites now call actual members, including Asymm entry/exit and propagation. Global debug-tag/assertions-enabled registry, TRACE/verbose, complete constructor/parameter updates/search and registered user-scope campaign remain open. Undefined floating-to-int conversion is guarded at reached source expression; not a C++ malformed-input guarantee.",
+        "Selected real finite src/test/sat_user_scope.cpp campaign executes42 original ENSURE comparisons/168 clauses and independent original-CNF oracle after pending tag removal. Whole solver remains partial: extension/parallel/MUS/clone/consequence methods, global debug tags, TRACE/printer and remaining actual source Runtime allocation accounting are open. Clause_offset physical pointer32 contract remains distinct from charged checked locator metadata. Std library sort schedule and explicit cold constructor contexts are Go adapters."
       ]
     },
     {
@@ -58398,7 +58574,38 @@
         "sat_clause_storage.go",
         "sat_solver_simplifier_kernel.go",
         "sat_solver_simplifier_subsumption.go",
-        "sat_var_queue.go"
+        "sat_var_queue.go",
+        "sat_asymm_branch.go",
+        "sat_cleaner.go",
+        "sat_scc.go",
+        "sat_solver.go",
+        "sat_solver_check_test.go",
+        "sat_solver_clause_runtime_ids_test.go",
+        "sat_solver_construction_test.go",
+        "sat_solver_constructor_fault_test.go",
+        "sat_solver_constructor_test.go",
+        "sat_solver_destruction_stages_test.go",
+        "sat_solver_dynamic_subsumption.go",
+        "sat_solver_full_audit_test.go",
+        "sat_solver_index_sets.go",
+        "sat_solver_index_sets_test.go",
+        "sat_solver_model.go",
+        "sat_solver_model_converter.go",
+        "sat_solver_model_source_test.go",
+        "sat_solver_model_span.go",
+        "sat_solver_model_test.go",
+        "sat_solver_mutable_span_test.go",
+        "sat_solver_probing.go",
+        "sat_solver_runtime.go",
+        "sat_solver_runtime_test.go",
+        "sat_solver_search.go",
+        "sat_solver_search_fault_test.go",
+        "sat_solver_search_model_test.go",
+        "sat_solver_user_scope.go",
+        "sat_solver_user_scope_fault_test.go",
+        "sat_solver_user_scope_model_test.go",
+        "sat_solver_user_scope_test.go",
+        "sat_solver_warm_test.go"
       ],
       "tests": [
         "TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots",
@@ -58554,7 +58761,47 @@
         "TestSATSimplifierActualSeparateDummyAllocator",
         "TestSATSimplifierCapturedResolventPayload",
         "TestSATSimplifierCleanupAll27AssignmentsAndUseCounts",
-        "TestSATSimplifierActualNumVarsUsesLevelAtRead"
+        "TestSATSimplifierActualNumVarsUsesLevelAtRead",
+        "TestSATSolverDefaultCheckSearchIndependentFiniteCNF",
+        "TestSATSolverCheckMaxConflictsZeroSourceReturnsUndef",
+        "TestSATSolverFullOwnerCopyClosedAndBorrowedRuntimeGuards",
+        "TestSATClauseRuntimeIDFreeVectorIsActualSourceStorage",
+        "TestSATClauseRuntimeIDRecycleRefusalKeepsClauseThenOOMSkips",
+        "TestSATClauseRuntimeIDReadRefusalRetainsDeclaredCandidate",
+        "TestSATClauseRuntimeIDBorrowLifetimeCheckedAtRecycleRead",
+        "TestSATSolverVariableColdPreparationHasNoPrematureQueue",
+        "TestSATSolverDecisionColdDefaultSeedAndOwningUnwind",
+        "TestSATSolverConverterColdBorrowBeforeSourceConstruction",
+        "TestSATSolverConverterColdUnwindAndReserveRefusal",
+        "TestSATSolverProbingConstructionBorrowDoesNotPermitRun",
+        "TestSATSolverColdVariableOrdinaryGuardBeforeAnyPublication",
+        "TestSATSolverInterveningChildFailureBeforeQueueConstruction",
+        "TestSATSolverFullConstructorEveryActualRefusalUnwindsRealMembers",
+        "TestSATSolverCompleteMemberConstructorHasRealDefaultChildren",
+        "TestSATSolverConstructorRefusesForeignRuntimeBeforeActualHeaderReserve",
+        "TestSATSolverUncompletedWrapperUnwindDoesNotRunDestructorBody",
+        "TestSATSolverRealDestructorStagesKeepLaterSourceMembers",
+        "TestSATSolverAntecedentMapEagerNestedConstruction",
+        "TestSATSolverAntecedentMapAllConstructorRefusalPrefixes",
+        "TestSATSolverAntecedentMapAscendingDestructionGuardPrefix",
+        "TestSATSolverSourceModelUsesRealAssignmentAndConverter",
+        "TestSATSolverSourceModelPublishesCurrentBeforeNumVarsRead",
+        "TestSATSolverActualRuntimeModelConverterMatchesSlice",
+        "TestSATSolverModelResizePublishesSizeBeforeDefaultPlacement",
+        "TestSATSolverMutableRuntimeClauseSpanMatchesFiniteSlice",
+        "TestSATSolverMutableCapturedSpanRejectsActualFreedPayload",
+        "TestSATFullRuntimeActualOwnersAndColdUnwind",
+        "TestSATFullRuntimeRejectsForeignBudgetBeforeReservation",
+        "TestSATSolverDefaultCheckEveryActualRefusalKeepsNamedRuntimeRoots",
+        "TestSATSolverDefaultSearchIndependentThreeVariableCNF",
+        "TestSATSolverActualAssumptionCoreAndLaterPlainCheck",
+        "TestSATSolverCheckRealCancellationDoesNotCatchSolverException",
+        "TestSATSolverOptionalDispatchGuardFollowsRealPopToBase",
+        "TestSATSolverUserGCDeletionRefusalOwnsExactCompactionRanges",
+        "TestSATSolverUserScopeSourcePushPopPreservesOriginalFormula",
+        "TestSATSolverOwningWatchShrinkRetainsOuterCapacity",
+        "TestSATSolverSourceUserScopeFiniteCycle",
+        "TestSATSolverWarmRepeatedCheckHasBoundedActualPhysicalGraph"
       ],
       "conditionals": [
         {
@@ -58890,6 +59137,94 @@
             "TestSATSimplifierCleanupAll27AssignmentsAndUseCounts",
             "TestSATSimplifierActualNumVarsUsesLevelAtRead"
           ]
+        },
+        {
+          "name": "Selected genuine default solver member construction and declaration-reverse destruction; source destructor body only completed wrapper; optional source profiles remain open",
+          "status": "partial",
+          "go_target": "sat_solver.go",
+          "tests": [
+            "TestSATSolverCompleteMemberConstructorHasRealDefaultChildren",
+            "TestSATSolverConstructorRefusesForeignRuntimeBeforeActualHeaderReserve",
+            "TestSATSolverFullConstructorEveryActualRefusalUnwindsRealMembers",
+            "TestSATSolverUncompletedWrapperUnwindDoesNotRunDestructorBody"
+          ]
+        },
+        {
+          "name": "Selected constructor-stage borrows versus ordinary member readiness; eager eight actual nested index_set tables, ascending dealloc_vect entries",
+          "status": "ported",
+          "go_target": "sat_solver_index_sets.go",
+          "tests": [
+            "TestSATSolverAntecedentMapEagerNestedConstruction",
+            "TestSATSolverAntecedentMapAllConstructorRefusalPrefixes",
+            "TestSATSolverAntecedentMapAscendingDestructionGuardPrefix"
+          ]
+        },
+        {
+          "name": "Selected updt_params source order through actual child services and sole decision RNG; no fake complete future members",
+          "status": "ported",
+          "go_target": "sat_solver.go",
+          "tests": [
+            "TestSATSolverCompleteMemberConstructorHasRealDefaultChildren",
+            "TestSATSolverConstructorRefusesForeignRuntimeBeforeActualHeaderReserve",
+            "TestSATSolverFullConstructorEveryActualRefusalUnwindsRealMembers",
+            "TestSATSolverUncompletedWrapperUnwindDoesNotRunDestructorBody"
+          ]
+        },
+        {
+          "name": "Selected real default Check, bounded search, backjump, null-extension final check, assumption setup and default simplify orchestration; global/optional branches remain open",
+          "status": "partial",
+          "go_target": "sat_solver_search.go",
+          "tests": [
+            "TestSATSolverDefaultCheckSearchIndependentFiniteCNF",
+            "TestSATSolverDefaultSearchIndependentThreeVariableCNF",
+            "TestSATSolverCheckMaxConflictsZeroSourceReturnsUndef",
+            "TestSATSolverFullOwnerCopyClosedAndBorrowedRuntimeGuards",
+            "TestSATSolverActualAssumptionCoreAndLaterPlainCheck",
+            "TestSATSolverCheckRealCancellationDoesNotCatchSolverException",
+            "TestSATSolverOptionalDispatchGuardFollowsRealPopToBase",
+            "TestSATSolverDefaultCheckEveryActualRefusalKeepsNamedRuntimeRoots",
+            "TestSATSolverWarmRepeatedCheckHasBoundedActualPhysicalGraph"
+          ]
+        },
+        {
+          "name": "Selected actual signed32 Runtime model mk_model/check_model and existing model-converter bridge; clone/TRACE/printer branches remain open",
+          "status": "partial",
+          "go_target": "sat_solver_model.go",
+          "tests": [
+            "TestSATSolverSourceModelUsesRealAssignmentAndConverter",
+            "TestSATSolverSourceModelPublishesCurrentBeforeNumVarsRead",
+            "TestSATSolverActualRuntimeModelConverterMatchesSlice",
+            "TestSATSolverModelResizePublishesSizeBeforeDefaultPlacement"
+          ]
+        },
+        {
+          "name": "Selected user scope push/pop, literal/binary collection and GC variable shrink plus reset_todos; source-guarded interrupted ownership explicit",
+          "status": "ported",
+          "go_target": "sat_solver_user_scope.go",
+          "tests": [
+            "TestSATSolverSourceUserScopeFiniteCycle",
+            "TestSATSolverUserScopeSourcePushPopPreservesOriginalFormula",
+            "TestSATSolverUserGCDeletionRefusalOwnsExactCompactionRanges",
+            "TestSATSolverOwningWatchShrinkRetainsOuterCapacity"
+          ]
+        },
+        {
+          "name": "Concrete in-place captured Runtime/Words mutable literal span for actual source aux clause consumer; slice boundary preserved, library comparison schedule adapter",
+          "status": "ported",
+          "go_target": "sat_solver_conflict_span.go",
+          "tests": [
+            "TestSATSolverMutableRuntimeClauseSpanMatchesFiniteSlice",
+            "TestSATSolverMutableCapturedSpanRejectsActualFreedPayload"
+          ]
+        },
+        {
+          "name": "Selected source wrapper stopped destructor invariant remains exposed; separate explicit CleanupStopped owning abort preserves cause and real action cursor",
+          "status": "ported",
+          "go_target": "sat_solver.go",
+          "tests": [
+            "TestSATSolverUserGCDeletionRefusalOwnsExactCompactionRanges",
+            "TestSATSolverSourceModelPublishesCurrentBeforeNumVarsRead"
+          ]
         }
       ],
       "ownership": [
@@ -58897,7 +59232,8 @@
         "Assignment bytes and initialization state are owned solely by the borrowed real Runtime, with source vector capacity/size headers and explicit block/pending tokens; enclosing variable owner charges embedded metadata. Variable graph Stats exclude borrowed runtime, which physical audits add exactly once. Runtime must outlive variable/propagation owners, which require the same actual Runtime identity.",
         "Selected conflict owner charges actual cold fields once and borrows existing analysis/dynamic/probing/lifecycle/Runtime; owns actual Runtime assumption/core/literal-set members. Glue and clause consumers read captured lemma blocks directly. Constructor-read errors retain the actually allocated clause/ID in lifecycle pendingCandidate before return. Every real refusal prefix is rooted before fault disable; no host lemma copy or directory-derived owner roots.",
         "Borrow sole conflict/phase counters and actual lifecycle/Runtime. Real cold GC owner, stable merge workspace and stopped compaction cursors are charged. Owning continuation drains only disjoint actual moved prefix/source ranges, not registry snapshots; lifecycle Close drains reached GC before ordinary vectors.",
-        "Decision cold owner charges actual RNG/statistic header and borrows conflict/lifecycle. Integrity checker is a by-value nonowning stack grouping; lifecycle borrows matching GC with its sole frozen count. Fresh disjoint ID set is constructed and closed on each reached call."
+        "Decision cold owner charges actual RNG/statistic header and borrows conflict/lifecycle. Integrity checker is a by-value nonowning stack grouping; lifecycle borrows matching GC with its sole frozen count. Fresh disjoint ID set is constructed and closed on each reached call.",
+        "Full selected facade owns actual completed cold child headers and sole source member graph; Runtime/global parameters and resource service are real borrowed caller owners. Ordinary access requires completed members; construction borrowing is only at reached source sites. Real Runtime enum model, eager outer map plus eight nested tables, and embedded Runtime ID generator have named scalar current/pending roots. Constructor sweep73 real refusals, bounded binary Check5, UserGC2 all inspect immediate physical ownership before disabling fault. User clause compaction retains only actual kept/unread ranges in embedded cursor; explicit CleanupStopped acknowledges observed source destructor guard without repairing watches/counters/vectors or reclassifying invalid source continuation as success."
       ],
       "deviations": [
         "Wrapped source allocations that cannot represent full typed capacity remain unported; host bounds are separate from exact source overflow DefaultException. Default child policies, full solver constructor, propagation, conflicts, scopes/search and TRACE remain open.",
@@ -58906,7 +59242,8 @@
         "Only assignment char_vector source allocation accounting is integrated in this slice. Other SAT columns/watch/queue/clause/trail/vector allocations still require real global/runtime source hooks. Raw-state bounds/initialization guards act at endangered byte accesses; source DEBUG logical assertions remain distinct. No full solver construction/search or registered assertion completion is claimed.",
         "Selected FIRST-UIP and real assumption/init helpers are implemented with default minimization/dynamic subsumption. Full solver construction/Check/search, source extension calls, nonnull parallel exchange, optional MUS/model and global diagnostics remain explicit obligations. Constructor-error candidate retention is a typed owning adapter, not claimed C++ implicit unwinding; no registered user-scope assertion completion is credited.",
         "Complete selected ordinary GC/restart/init_search member algorithms executed; enabled integrity tags, verbose/TRACE and full constructor/search/Check remain open. Source comparator expressions/tie order preserved through explicitly charged concrete Go stable merge workspace; C++ standard library allocation/comparison schedule is not claimed identical. No new registered source assertion completion credit.",
-        "Selected enabled integrity and missed-propagation sites now call actual members, including Asymm entry/exit and propagation. Global debug-tag/assertions-enabled registry, TRACE/verbose, complete constructor/parameter updates/search and registered user-scope campaign remain open. Undefined floating-to-int conversion is guarded at reached source expression; not a C++ malformed-input guarantee."
+        "Selected enabled integrity and missed-propagation sites now call actual members, including Asymm entry/exit and propagation. Global debug-tag/assertions-enabled registry, TRACE/verbose, complete constructor/parameter updates/search and registered user-scope campaign remain open. Undefined floating-to-int conversion is guarded at reached source expression; not a C++ malformed-input guarantee.",
+        "Selected real finite src/test/sat_user_scope.cpp campaign executes42 original ENSURE comparisons/168 clauses and independent original-CNF oracle after pending tag removal. Whole solver remains partial: extension/parallel/MUS/clone/consequence methods, global debug tags, TRACE/printer and remaining actual source Runtime allocation accounting are open. Clause_offset physical pointer32 contract remains distinct from charged checked locator metadata. Std library sort schedule and explicit cold constructor contexts are Go adapters."
       ]
     },
     {
@@ -91992,9 +92329,13 @@
       "path": "src/test/sat_user_scope.cpp",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_solver_user_scope_test.go"
+      ],
+      "tests": [
+        "TestSATSolverSourceUserScopeFiniteCycle"
+      ],
       "assertions": [
         {
           "line": 76,
@@ -92003,9 +92344,26 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "One finite actual source outer cycle:42 ENSURE executions and168 clause inputs, compared incremental versus rebuilt and independent original-CNF oracle",
+          "status": "ported",
+          "go_target": "sat_solver_user_scope_test.go",
+          "tests": [
+            "TestSATSolverSourceUserScopeFiniteCycle"
+          ]
+        },
+        {
+          "name": "Original forever-running randomized harness, native libc rand sequence and printed/source runtime harness profile",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Actual full selected solver/Runtime/resource/parameter owners execute the finite user scope source campaign; saved test formulas only feed independent oracle/rebuilt solver. Production has no brute-force algorithm."
+      ],
+      "deviations": [
+        "Infinite source campaign becomes one explicitly finite outer cycle, deterministic utilhash.Random and documented constructor argument order; not claiming literal libc rand or original nonterminating harness completion."
+      ]
     },
     {
       "path": "src/test/simple_parser.cpp",
@@ -100051,7 +100409,9 @@
       "status": "partial",
       "go_targets": [
         "util_id_gen.go",
-        "utilid/generator.go"
+        "utilid/generator.go",
+        "sat_clause_storage.go",
+        "sat_solver_clause_runtime_ids_test.go"
       ],
       "tests": [
         "TestIDGeneratorSourceOrder",
@@ -100072,7 +100432,11 @@
         "TestGeneratorWrappedReallocPhysicalCleanup",
         "TestGeneratorNonNullZeroCapacitySourceBranch",
         "TestGeneratorSourceFinalizeRetainsUnpublishedMem",
-        "TestGeneratorSourceFinalizePreservesHeaderGuard"
+        "TestGeneratorSourceFinalizePreservesHeaderGuard",
+        "TestSATClauseRuntimeIDFreeVectorIsActualSourceStorage",
+        "TestSATClauseRuntimeIDRecycleRefusalKeepsClauseThenOOMSkips",
+        "TestSATClauseRuntimeIDReadRefusalRetainsDeclaredCandidate",
+        "TestSATClauseRuntimeIDBorrowLifetimeCheckedAtRecycleRead"
       ],
       "conditionals": [
         {
@@ -100258,13 +100622,25 @@
         {
           "name": "full process memory service and AST register/delete/compress consumers",
           "status": "unported"
+        },
+        {
+          "name": "Selected real SAT clause-ID embedded Runtime Generator consumer and pre-placement candidate extent retention before fallible Next; legacy profile unchanged",
+          "status": "ported",
+          "go_target": "sat_clause_storage.go",
+          "tests": [
+            "TestSATClauseRuntimeIDFreeVectorIsActualSourceStorage",
+            "TestSATClauseRuntimeIDRecycleRefusalKeepsClauseThenOOMSkips",
+            "TestSATClauseRuntimeIDReadRefusalRetainsDeclaredCandidate",
+            "TestSATClauseRuntimeIDBorrowLifetimeCheckedAtRecycleRead"
+          ]
         }
       ],
       "ownership": [
         "Generator is embedded cold metadata, charged once in its enclosing owner. Free uint32 arrays reserve whole new capacity while old remains charged; successful prefixes retained, reset retains and cleanup refunds. Cold OOM callback is checked before reservation. Source resource-service and AST consumers remain open. See PORT_PROGRESS.md#audit-id-port-status-md.",
         "Raw specialization owns actual current vector and pending initial lexical mem tokens, with no mirrored free list. Cap/size/data live in Runtime bytes; real realloc and retained release cursors preserve physical prefixes. Cleanup only named tokens, close guards ordinary entry. Runtime must outlive embedded owner; charged in enclosing owner header.",
         "Malformed ILP32 accepted vector extent may wrap Runtime SIZE_T header extent to zero; changed actual realloc token is retained and only known short-extent owning cleanup uses Runtime.CleanupPartial without fabricated accounting subtraction. Nonnull cap0 source DEBUG assertion/release overflow precedes realloc; only null storage initializes cap2.",
-        "SourceFinalize guards ordinary read and frees only actual published raw; pending lexical mem remains for explicit owning Close, short-header source guard retained rather than repaired. Actual consumed raw token is not deallocated twice on retry."
+        "SourceFinalize guards ordinary read and frees only actual published raw; pending lexical mem remains for explicit owning Close, short-header source guard retained rather than repaired. Actual consumed raw token is not deallocated twice on retry.",
+        "Full facade uses existing embedded utilid.Generator on same actual Runtime; no OOM callback closure or second free-list owner. Source sticky OOM is read at actual recycle site before vector access, with Runtime provenance/lifetime guard. An actual allocation interrupted before placement retains declared extent for explicit owning abort; source Delete still exposes unread-header guard."
       ],
       "deviations": [
         "Budgeted recycle reports predictable allocation failure; reserveFreeIDs lets the future AST owner preflight reclamation before publication without changing logical IDs. The nil budget constructor remains unlimited. Host diagnostic free-ID rendering remains unbudgeted; actual AST printer is not credited.",

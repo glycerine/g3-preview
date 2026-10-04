@@ -1,5 +1,5 @@
 // Licensed under the MIT license.
-// Source: src/sat/sat_solver.cpp:367–465; sat_solver.h value/lvl accessors.
+// Source: src/sat/sat_solver.cpp:367–465; src/sat/sat_solver.h value/lvl accessors.
 package g3
 
 import "github.com/glycerine/g3/golang/arena"
@@ -72,11 +72,28 @@ func (s *satSolverClauseState) simplifyClause(scope uint32, n *uint32, lits []sa
 	if n == nil || uint64(*n) > uint64(len(lits)) {
 		return false, arena.ErrBounds
 	}
-	satSortClauseLiterals(lits[:*n])
+	return s.simplifyClauseSpan(scope, n, satSolverLiteralSpan{literals: lits})
+}
+func (s *satSolverClauseState) simplifyClauseSpan(scope uint32, n *uint32, span satSolverLiteralSpan) (bool, error) {
+	if s == nil {
+		return false, ErrSATOwner
+	}
+	if n == nil {
+		return false, arena.ErrBounds
+	}
+	if span.runtime == nil && span.words == nil && uint64(*n) > uint64(len(span.literals)) {
+		return false, arena.ErrBounds
+	}
+	if e := satSortClauseSpan(span, *n); e != nil {
+		return false, e
+	}
 	prev := satDefaultLiteral()
 	var j uint32
 	for i := uint32(0); i < *n; i++ {
-		curr := lits[i]
+		curr, e := span.literal(i)
+		if e != nil {
+			return false, e
+		}
 		val, e := s.value(curr)
 		if e != nil {
 			return false, e
@@ -99,7 +116,13 @@ func (s *satSolverClauseState) simplifyClause(scope uint32, n *uint32, lits []sa
 			if curr != prev {
 				prev = curr
 				if i != j {
-					lits[j] = lits[i]
+					l, e := span.literal(i)
+					if e != nil {
+						return false, e
+					}
+					if e = span.setLiteral(j, l); e != nil {
+						return false, e
+					}
 				}
 				j++
 			}

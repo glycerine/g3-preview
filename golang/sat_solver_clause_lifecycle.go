@@ -10,8 +10,10 @@ import (
 // raw-candidate root. Reinit/watch states are actual nonowning source borrowers.
 // This owner is not a complete solver constructor or source debug destructor.
 type satSolverClauseLifecycle struct {
+	userContinuation                                           *satSolver
 	integrityGC                                                *satSolverGC
 	simplifierContinuation                                     *satSimplifier
+	asymmContinuation                                          *satAsymmBranch
 	self                                                       *satSolverClauseLifecycle
 	propagation                                                *satSolverPropagationState
 	budget                                                     *arena.Budget
@@ -19,10 +21,11 @@ type satSolverClauseLifecycle struct {
 	reinit                                                     []satClauseWrapper
 	scopes                                                     []satSolverScope
 	pendingCandidate                                           satStoredClauseRef
+	pendingDeclaredSize                                        uint32
+	pendingUnconstructed                                       bool
 	cleanerContinuation                                        *satCleaner
 	gcContinuation                                             *satSolverGC
 	eqContinuation                                             *satElimEqs
-	asymmContinuation                                          *satAsymmBranch
 	ownerBytes                                                 uint64
 	mkBinary, mkTernary, mkNary, deleted, nonLearnedGeneration uint32
 	reinitInitialized, scopesInitialized                       uint32
@@ -35,7 +38,7 @@ type satSolverScope struct {
 }
 
 func newSATSolverClauseLifecycle(p *satSolverPropagationState, b *arena.Budget) (*satSolverClauseLifecycle, error) {
-	if e := p.open(); e != nil {
+	if e := p.constructionBorrow(); e != nil {
 		return nil, e
 	}
 	n := uint64(reflect.TypeOf(satSolverClauseLifecycle{}).Size())
@@ -46,11 +49,41 @@ func newSATSolverClauseLifecycle(p *satSolverPropagationState, b *arena.Budget) 
 	s.self = s
 	return s, nil
 }
+func (s *satSolverClauseLifecycle) constructionBorrow() error {
+	if s == nil || s.self != s {
+		return ErrSATOwner
+	}
+	if s.closed || s.closing {
+		return arena.ErrClosed
+	}
+	if s.userContinuation != nil && !s.userContinuation.userGC.running {
+		return arena.ErrClosed
+	}
+	if s.cleanerContinuation != nil && !s.cleanerContinuation.running {
+		return arena.ErrClosed
+	}
+	if s.gcContinuation != nil && !s.gcContinuation.running {
+		return arena.ErrClosed
+	}
+	if s.eqContinuation != nil && !s.eqContinuation.running {
+		return arena.ErrClosed
+	}
+	if s.asymmContinuation != nil && !s.asymmContinuation.running {
+		return arena.ErrClosed
+	}
+	if s.simplifierContinuation != nil && !s.simplifierContinuation.running {
+		return arena.ErrClosed
+	}
+	return s.propagation.constructionBorrow()
+}
 func (s *satSolverClauseLifecycle) open() error {
 	if s == nil || s.self != s {
 		return ErrSATOwner
 	}
 	if s.closed || s.closing {
+		return arena.ErrClosed
+	}
+	if s.userContinuation != nil && !s.userContinuation.userGC.running {
 		return arena.ErrClosed
 	}
 	if s.cleanerContinuation != nil && !s.cleanerContinuation.running {
@@ -134,6 +167,9 @@ func (s *satSolverClauseLifecycle) publishCandidate(learned bool) error {
 	if e := s.open(); e != nil {
 		return e
 	}
+	if s.pendingUnconstructed {
+		return ErrSATIncompleteGrowth
+	}
 	c := s.pendingCandidate
 	if c == (satStoredClauseRef{}) {
 		return arena.ErrInvalidSlot
@@ -145,6 +181,8 @@ func (s *satSolverClauseLifecycle) publishCandidate(learned bool) error {
 		return e
 	}
 	s.pendingCandidate = satStoredClauseRef{}
+	s.pendingDeclaredSize = 0
+	s.pendingUnconstructed = false
 	return nil
 }
 func (s *satSolverClauseLifecycle) delClause(c satStoredClauseRef) error {
@@ -175,10 +213,12 @@ func (s *satSolverClauseLifecycle) cleanupCandidate() error {
 	if s.pendingCandidate == (satStoredClauseRef{}) {
 		return nil
 	}
-	if e := s.propagation.clauses.Delete(s.pendingCandidate); e != nil {
+	if e := s.releasePendingCandidate(); e != nil {
 		return e
 	}
 	s.pendingCandidate = satStoredClauseRef{}
+	s.pendingDeclaredSize = 0
+	s.pendingUnconstructed = false
 	return nil
 }
 func (s *satSolverClauseLifecycle) mkClauseCore(n uint32, lits []satLiteral, learned bool) (satStoredClauseRef, error) {
@@ -193,12 +233,8 @@ func (s *satSolverClauseLifecycle) mkClauseCoreSpan(n uint32, span satSolverLite
 	}
 	p := s.propagation
 	if !learned {
-		if span.runtime != nil {
-			return satStoredClauseRef{}, ErrSATOwner
-		} // private Runtime bridge is the actual learned-lemma consumer
-		lits := span.literals
 		v := p.variables.clauseState()
-		keep, e := v.simplifyClause(p.variables.scopeLevel, &n, lits)
+		keep, e := v.simplifyClauseSpan(p.variables.scopeLevel, &n, span)
 		if e != nil {
 			return satStoredClauseRef{}, e
 		}
@@ -244,7 +280,10 @@ func (s *satSolverClauseLifecycle) mkTerClause(lits []satLiteral, learned bool) 
 }
 func (s *satSolverClauseLifecycle) mkTerClauseSpan(span satSolverLiteralSpan, learned bool) (satStoredClauseRef, error) {
 	s.mkTernary++
-	c, e := s.propagation.clauses.mkClauseSpan(3, span, learned)
+	var prefix satClauseConstructionPrefix
+	c, e := s.propagation.clauses.mkClauseSpanPrefix(3, span, learned, &prefix)
+	s.pendingDeclaredSize = 3
+	s.pendingUnconstructed = prefix.unconstructed
 	// Retain the actual allocated candidate even if a guarded constructor read
 	// fails. This is owning error continuation, not source exception rollback.
 	s.pendingCandidate = c
@@ -267,7 +306,10 @@ func (s *satSolverClauseLifecycle) mkNaryClause(n uint32, lits []satLiteral, lea
 }
 func (s *satSolverClauseLifecycle) mkNaryClauseSpan(n uint32, span satSolverLiteralSpan, learned bool) (satStoredClauseRef, error) {
 	s.mkNary++
-	c, e := s.propagation.clauses.mkClauseSpan(n, span, learned)
+	var prefix satClauseConstructionPrefix
+	c, e := s.propagation.clauses.mkClauseSpanPrefix(n, span, learned, &prefix)
+	s.pendingDeclaredSize = n
+	s.pendingUnconstructed = prefix.unconstructed
 	// Retain the actual allocated candidate even if a guarded constructor read
 	// fails. This is owning error continuation, not source exception rollback.
 	s.pendingCandidate = c
@@ -302,6 +344,48 @@ func (s *satSolverClauseLifecycle) Close() error {
 		return nil
 	}
 	s.closing = true
+	if e := s.cleanupOwningContinuations(); e != nil {
+		return e
+	}
+	if e := s.deleteClausesBody(); e != nil {
+		return e
+	}
+	if e := s.finalizeScopesReinit(); e != nil {
+		return e
+	}
+	if e := s.finalizeClauseVectors(); e != nil {
+		return e
+	}
+	return s.closeContext()
+}
+
+// Cold Go context acknowledgment after all actual members and (for a completed
+// solver wrapper only) its source destructor body have already been drained.
+// This is not a second invocation of solver::~solver's body.
+func (s *satSolverClauseLifecycle) closeContext() error {
+	if s == nil || s.self != s {
+		return ErrSATOwner
+	}
+	if s.closed {
+		return nil
+	}
+	s.budget.Release(s.ownerBytes)
+	s.ownerBytes = 0
+	s.closed = true
+	return nil
+}
+
+// Full facade destruction uses the declared-member stages independently.
+// The standalone Close adapter below retains its existing combined order.
+func (s *satSolverClauseLifecycle) cleanupOwningContinuations() error {
+	if s == nil || s.self != s {
+		return ErrSATOwner
+	}
+	if s.userContinuation != nil {
+		if e := s.userContinuation.cleanupUserGC(); e != nil {
+			return e
+		}
+	}
 	if s.simplifierContinuation != nil {
 		if e := s.simplifierContinuation.cleanupStopped(); e != nil {
 			return e
@@ -327,6 +411,12 @@ func (s *satSolverClauseLifecycle) Close() error {
 			return e
 		}
 	}
+	return nil
+}
+func (s *satSolverClauseLifecycle) deleteClausesBody() error {
+	if s == nil || s.self != s {
+		return ErrSATOwner
+	}
 	a := s.propagation.clauses
 	for s.closeOriginal < uint32(len(s.original)) {
 		if e := a.Delete(s.original[s.closeOriginal]); e != nil {
@@ -349,21 +439,39 @@ func (s *satSolverClauseLifecycle) Close() error {
 		s.learnedDone = true
 	}
 	if s.pendingCandidate != (satStoredClauseRef{}) {
-		if e := a.Delete(s.pendingCandidate); e != nil {
+		if e := s.releasePendingCandidate(); e != nil {
 			return e
 		}
 		s.pendingCandidate = satStoredClauseRef{}
+		s.pendingDeclaredSize = 0
+		s.pendingUnconstructed = false
+	}
+	return nil
+}
+func (s *satSolverClauseLifecycle) finalizeScopesReinit() error {
+	if s == nil || s.self != s {
+		return ErrSATOwner
 	}
 	// Adapter physical finalization after source clause deletion, reverse member order.
 	s.budget.Release(uint64(cap(s.scopes)) * uint64(reflect.TypeOf(satSolverScope{}).Size()))
 	s.scopes = nil
 	s.budget.Release(uint64(cap(s.reinit)) * uint64(reflect.TypeOf(satClauseWrapper{}).Size()))
 	s.reinit = nil
+	return nil
+}
+func (s *satSolverClauseLifecycle) finalizeClauseVectors() error {
+	if s == nil || s.self != s {
+		return ErrSATOwner
+	}
 	s.budget.Release(uint64(cap(s.learned)+cap(s.original)) * uint64(reflect.TypeOf(satStoredClauseRef{}).Size()))
 	s.learned = nil
 	s.original = nil
-	s.budget.Release(s.ownerBytes)
-	s.ownerBytes = 0
-	s.closed = true
 	return nil
+}
+
+func (s *satSolverClauseLifecycle) releasePendingCandidate() error {
+	if s.pendingUnconstructed {
+		return s.propagation.clauses.cleanupAllocated(s.pendingCandidate, s.pendingDeclaredSize)
+	}
+	return s.propagation.clauses.Delete(s.pendingCandidate)
 }

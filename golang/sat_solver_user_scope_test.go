@@ -1,6 +1,4 @@
-//go:build port_pending_sat
-
-// Licensed under the MIT license.
+// Source: src/test/sat_user_scope.cpp. Licensed under the MIT license.
 // Finite translation of src/test/sat_user_scope.cpp; exact oracle is Go-only.
 package g3
 

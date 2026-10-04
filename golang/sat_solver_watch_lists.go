@@ -201,3 +201,29 @@ func (w *satSolverWatchLists) Close() error {
 	w.closed = true
 	return nil
 }
+
+// Source vector<watch_list>::shrink destroys ascending removed members, then
+// publishes size. The physical outer backing and surviving tokens stay put.
+func (w *satSolverWatchLists) Shrink(n uint32) error {
+	if e := w.open(); e != nil {
+		return e
+	}
+	if satStorageSourceDebug && uint64(n) > uint64(len(w.lists)) {
+		return ErrSATAssertion
+	}
+	if uint64(n) > uint64(cap(w.lists)) {
+		return arena.ErrBounds
+	}
+	old := uint32(len(w.lists))
+	for i := n; i < old; i++ {
+		r := w.lists[i]
+		if r != (satSolverWatchListRef{}) {
+			if e := w.store.Free(r); e != nil {
+				return e
+			}
+			w.lists[i] = satSolverWatchListRef{}
+		}
+	}
+	w.lists = w.lists[:n]
+	return nil
+}

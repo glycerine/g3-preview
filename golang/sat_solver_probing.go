@@ -23,11 +23,13 @@ type satSolverProbing struct {
 	cacheLimit, ownerBytes                    uint64
 	enabled, cacheEnabled, binaryEnabled      bool
 	debugProbing, debugPropagate, debugMissed bool
-	closing, closed                           bool
+	constructed, closing, closed              bool
 }
 
-func newSATSolverProbing(l *satSolverClauseLifecycle, c *ParamsContext, v *ParamsRef, b *arena.Budget) (*satSolverProbing, error) {
-	if e := l.open(); e != nil {
+// The cold header and bound empty vectors are explicit Go ownership context;
+// actual source parameter/statistics construction remains initializeSource.
+func newSATColdProbing(l *satSolverClauseLifecycle, b *arena.Budget) (*satSolverProbing, error) {
+	if e := l.constructionBorrow(); e != nil {
 		return nil, e
 	}
 	if b != l.budget || b != l.propagation.memory.Budget() {
@@ -42,30 +44,58 @@ func newSATSolverProbing(l *satSolverClauseLifecycle, c *ParamsContext, v *Param
 	s.toAssert.bind(l.propagation.memory)
 	s.cacheWork.bind(l.propagation.memory)
 	s.assigned.bind(l.propagation.memory)
-	e := s.updateParams(c, v)
+	return s, nil
+}
+func (s *satSolverProbing) initializeSource(c *ParamsContext, v *ParamsRef) error {
+	if e := s.constructionBorrow(); e != nil {
+		return e
+	}
+	if s.constructed {
+		return ErrSATOwner
+	}
+	if e := s.updateParams(c, v); e != nil {
+		return e
+	}
+	s.resetStatistics()
+	s.stoppedAt = 0
+	s.propagation().probingCounter = 0
+	s.constructed = true
+	return nil
+}
+func newSATSolverProbing(l *satSolverClauseLifecycle, c *ParamsContext, v *ParamsRef, b *arena.Budget) (*satSolverProbing, error) {
+	s, e := newSATColdProbing(l, b)
 	if e != nil {
+		return nil, e
+	}
+	if e = s.initializeSource(c, v); e != nil {
 		if cleanup := s.Close(); cleanup != nil {
 			return s, cleanup
 		}
 		return nil, e
 	}
-	s.resetStatistics()
-	s.stoppedAt = 0
-	l.propagation.probingCounter = 0
 	return s, nil
 }
 func (s *satSolverProbing) propagation() *satSolverPropagationState { return s.lifecycle.propagation }
-func (s *satSolverProbing) open() error {
+func (s *satSolverProbing) constructionBorrow() error {
 	if s == nil || s.self != s {
 		return ErrSATOwner
 	}
 	if s.closed || s.closing {
 		return arena.ErrClosed
 	}
-	return s.lifecycle.open()
+	return s.lifecycle.constructionBorrow()
+}
+func (s *satSolverProbing) open() error {
+	if e := s.constructionBorrow(); e != nil {
+		return e
+	}
+	if !s.constructed {
+		return arena.ErrClosed
+	}
+	return nil
 }
 func (s *satSolverProbing) updateParams(c *ParamsContext, p *ParamsRef) error {
-	if e := s.open(); e != nil {
+	if e := s.constructionBorrow(); e != nil {
 		return e
 	}
 	var e error

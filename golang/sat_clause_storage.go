@@ -5,6 +5,8 @@ package g3
 import (
 	"errors"
 	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
+	"github.com/glycerine/g3/golang/utilid"
 	"reflect"
 	"sync/atomic"
 )
@@ -37,6 +39,7 @@ type satClauseHotHeader struct{ ID, Size, Capacity, Approx, Flags uint32 }
 type satClauseAllocatorConfig struct {
 	Storage        arena.SmallBytesConfig
 	OutOfMemory    func() bool
+	IDRuntime      *memory.Runtime
 	PooledOverride bool
 }
 type satClauseAllocator struct {
@@ -44,6 +47,9 @@ type satClauseAllocator struct {
 	origin                                 uint64
 	storage                                *arena.SmallBytes
 	ids                                    utilIDGen
+	runtimeIDs                             utilid.Generator
+	idRuntime                              *memory.Runtime
+	closing                                bool
 	budget                                 *arena.Budget
 	large                                  []satLargeClauseEntry
 	largeFree                              uint32
@@ -55,6 +61,15 @@ func NewSATClauseAllocator(c satClauseAllocatorConfig) (*satClauseAllocator, err
 	return newSATClauseAllocator(c, false)
 }
 func newSATClauseAllocator(c satClauseAllocatorConfig, tmp bool) (*satClauseAllocator, error) {
+	if c.IDRuntime != nil {
+		if c.OutOfMemory != nil || c.IDRuntime.Budget() != c.Storage.Descriptors.Budget {
+			return nil, arena.ErrConfig
+		}
+		if _, e := c.IDRuntime.AllocationSize(); e != nil {
+			return nil, e
+		}
+	}
+
 	if tmp || satStorageSourceDebug && !c.PooledOverride {
 		c.Storage.DirectOnly = true
 	}
@@ -75,13 +90,21 @@ func newSATClauseAllocator(c satClauseAllocatorConfig, tmp bool) (*satClauseAllo
 	}
 	a := &satClauseAllocator{origin: id, storage: store, budget: b, ids: newBudgetedUtilIDGen(0, b, c.OutOfMemory), ownerBytes: n, temporary: tmp}
 	a.self = a
+	if c.IDRuntime != nil {
+		if e := a.runtimeIDs.Init(0, c.IDRuntime); e != nil {
+			a.storage.Close()
+			b.Release(n)
+			return nil, e
+		}
+		a.idRuntime = c.IDRuntime
+	}
 	return a, nil
 }
 func (a *satClauseAllocator) open() error {
 	if a == nil || a.self != a {
 		return ErrSATOwner
 	}
-	if a.closed {
+	if a.closed || a.closing {
 		return arena.ErrClosed
 	}
 	return nil
@@ -228,6 +251,14 @@ func (a *satClauseAllocator) MkClauseN(n uint32, lits []satLiteral, learned bool
 	return a.mkClauseSpan(n, satSolverLiteralSpan{literals: lits}, learned)
 }
 func (a *satClauseAllocator) mkClauseSpan(n uint32, span satSolverLiteralSpan, learned bool) (satStoredClauseRef, error) {
+	return a.mkClauseSpanPrefix(n, span, learned, nil)
+}
+
+// Scalar construction stage accompanies the real returned allocation, without
+// inventing readable header fields after a failed ID free-vector read.
+type satClauseConstructionPrefix struct{ unconstructed bool }
+
+func (a *satClauseAllocator) mkClauseSpanPrefix(n uint32, span satSolverLiteralSpan, learned bool, prefix *satClauseConstructionPrefix) (satStoredClauseRef, error) {
 	if e := a.open(); e != nil {
 		return satStoredClauseRef{}, e
 	}
@@ -235,9 +266,22 @@ func (a *satClauseAllocator) mkClauseSpan(n uint32, span satSolverLiteralSpan, l
 	if e != nil {
 		return r, e
 	}
+	if prefix != nil {
+		prefix.unconstructed = true
+	}
 	id := uint32(^uint32(0))
 	if !a.temporary {
-		id = a.ids.mk()
+		if a.idRuntime != nil {
+			id, e = a.runtimeIDs.Next()
+			if e != nil {
+				return r, e
+			}
+		} else {
+			id = a.ids.mk()
+		}
+	}
+	if prefix != nil {
+		prefix.unconstructed = false
 	}
 	return r, a.constructSpan(r, id, n, span, learned)
 }
@@ -264,7 +308,7 @@ func (a *satClauseAllocator) Delete(r satStoredClauseRef) error {
 		if e != nil {
 			return e
 		}
-		if e = a.ids.recycle(id); e != nil {
+		if e = a.recycleID(id); e != nil {
 			return e
 		}
 	}
@@ -524,6 +568,9 @@ func (a *satClauseAllocator) ContainsVar(r satStoredClauseRef, v satBoolVar) (bo
 	return false, nil
 }
 func (a *satClauseAllocator) SatisfiedBy(r satStoredClauseRef, m satModel) (bool, error) {
+	return a.satisfiedByModelSpan(r, satSolverModelSpan{slice: m})
+}
+func (a *satClauseAllocator) satisfiedByModelSpan(r satStoredClauseRef, m satSolverModelSpan) (bool, error) {
 	n, e := a.Size(r)
 	if e != nil {
 		return false, e
@@ -533,10 +580,10 @@ func (a *satClauseAllocator) SatisfiedBy(r satStoredClauseRef, m satModel) (bool
 		if e != nil {
 			return false, e
 		}
-		if uint64(l.variable()) >= uint64(len(m)) {
-			return false, arena.ErrBounds
+		v, e := m.read(l.variable())
+		if e != nil {
+			return false, e
 		}
-		v := m[l.variable()]
 		if l.sign() && v == lFalse || !l.sign() && v == lTrue {
 			return true, nil
 		}
@@ -649,6 +696,13 @@ func (a *satClauseAllocator) Close() error {
 	if a.closed {
 		return nil
 	}
+	if a.idRuntime != nil {
+		a.closing = true
+		if e := a.runtimeIDs.CloseChecked(); e != nil {
+			return e
+		}
+	}
+
 	for i := range a.large {
 		if a.large[i].live {
 			a.budget.Release(uint64(len(a.large[i].data)) * 4)
@@ -957,6 +1011,40 @@ func (a *satClauseAllocator) Stats() satClauseAllocatorStats {
 	if a == nil {
 		return satClauseAllocatorStats{}
 	}
-	return satClauseAllocatorStats{a.ownerBytes, uint64(cap(a.ids.free)) * 4, a.largeDirectory, a.largeBytes, a.storage.Stats()}
+	return satClauseAllocatorStats{OwnerBytes: a.ownerBytes, IDFreeBytes: uint64(cap(a.ids.free)) * 4, WideDirectoryBytes: a.largeDirectory, WidePayloadBytes: a.largeBytes, SmallBytes: a.storage.Stats()}
 }
 func (w satWatched) NotEqual(v satWatched) bool { return !w.Equal(v) }
+
+// Actual source memory OOM check precedes any free-vector access. The legacy
+// adapter retains its existing caller provider; the Runtime profile has exactly
+// one actual process-state provider and no escaping callback context.
+func (a *satClauseAllocator) recycleID(id uint32) error {
+	if a.idRuntime == nil {
+		return a.ids.recycle(id)
+	}
+	if _, e := a.idRuntime.AllocationSize(); e != nil {
+		return e
+	}
+	if a.idRuntime.State().OutOfMemory {
+		return nil
+	}
+	return a.runtimeIDs.Recycle(id)
+}
+
+// An ID read can refuse after physical object allocation but before placement
+// construction. The caller's real ref plus the actual requested size remain
+// the owning root. This explicit abort does not invent readable source headers
+// or run source del_clause on an unconstructed clause.
+func (a *satClauseAllocator) cleanupAllocated(r satStoredClauseRef, n uint32) error {
+	if e := a.validate(r); e != nil {
+		return e
+	}
+	if r.storageKind == 1 {
+		return a.releaseLarge(r)
+	}
+	extent, e := satClauseObjectBytes(n)
+	if e != nil {
+		return e
+	}
+	return a.storage.Deallocate(uint32(extent), arena.SmallBytesRef{Slot: arena.Slot(r.slot), Generation: arena.Generation(r.generation)})
+}

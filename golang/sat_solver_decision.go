@@ -15,6 +15,7 @@ import (
 // cold member grouping owns the sole source random_gen and decision statistic;
 // it is not the complete solver constructor, parameter update or search loop.
 type satSolverDecision struct {
+	budget     *arena.Budget
 	self       *satSolverDecision
 	conflict   *satSolverConflictResolution
 	rng        utilhash.Random
@@ -31,14 +32,35 @@ func newSATSolverDecision(s *satSolverConflictResolution) (*satSolverDecision, e
 	if e != nil {
 		return nil, e
 	}
-	n := uint64(reflect.TypeOf(satSolverDecision{}).Size())
-	if e = s.analysis.budget.Reserve(n); e != nil {
+	d, e := newSATColdDecision(s.analysis.budget)
+	if e != nil {
 		return nil, e
 	}
-	d := &satSolverDecision{conflict: s, ownerBytes: n}
-	d.self = d
+	d.conflict = s
 	d.rng.SetSeed(cfg.RandomSeed)
 	return d, nil
+}
+
+// Source random_gen default construction precedes dependent solver members.
+// The explicit cold owner is real charged metadata, not a seeded shadow RNG.
+func newSATColdDecision(b *arena.Budget) (*satSolverDecision, error) {
+	n := uint64(reflect.TypeOf(satSolverDecision{}).Size())
+	if e := b.Reserve(n); e != nil {
+		return nil, e
+	}
+	d := &satSolverDecision{budget: b, ownerBytes: n}
+	d.self = d
+	return d, nil
+}
+
+func (d *satSolverDecision) constructionBorrow() error {
+	if d == nil || d.self != d {
+		return ErrSATOwner
+	}
+	if d.closed {
+		return arena.ErrClosed
+	}
+	return d.conflict.constructionBorrow()
 }
 
 func (d *satSolverDecision) open() error {
@@ -191,7 +213,7 @@ func (d *satSolverDecision) Close() error {
 	if d.closed {
 		return nil
 	}
-	d.conflict.analysis.budget.Release(d.ownerBytes)
+	d.budget.Release(d.ownerBytes)
 	d.ownerBytes = 0
 	d.closed = true
 	return nil

@@ -33,35 +33,70 @@ type satModelConverter struct {
 	entries, pending                                    []satModelConversionEntry
 	origin, epoch, ownerBytes, entryBytes, pendingBytes uint64
 	copyCursor, sourceCapacity, pendingCapacity         uint32
-	copying, closed                                     bool
+	copying, constructed, closed                        bool
 }
 
-func newSATModelConverter(c arena.VectorConfig) (*satModelConverter, error) {
-	b := c.Descriptors.Budget
+// Cold context is a charged Go owning adapter. The source store constructor
+// still executes only at its declared model-converter member stage.
+func newSATColdModelConverter(b *arena.Budget) (*satModelConverter, error) {
+	if b == nil {
+		return nil, ErrSATOwner
+	}
 	header := uint64(reflect.TypeOf(satModelConverter{}).Size())
 	if e := b.Reserve(header); e != nil {
 		return nil, e
 	}
-	s, e := newSATSolverLiteralStore(c)
-	if e != nil {
-		b.Release(header)
-		return nil, e
-	}
-	id, e := satNextOwner()
-	if e != nil {
-		_ = s.Close()
-		b.Release(header)
-		return nil, e
-	}
-	m := &satModelConverter{budget: b, store: s, origin: id, epoch: 1, ownerBytes: header}
+	m := &satModelConverter{budget: b, epoch: 1, ownerBytes: header}
 	m.self = m
 	return m, nil
 }
-func (m *satModelConverter) open() error {
+func (m *satModelConverter) constructionBorrow() error {
 	if m == nil || m.self != m {
 		return ErrSATOwner
 	}
 	if m.closed {
+		return arena.ErrClosed
+	}
+	return nil
+}
+func (m *satModelConverter) initializeSourceStore(c arena.VectorConfig) error {
+	if e := m.constructionBorrow(); e != nil {
+		return e
+	}
+	if m.constructed || m.store != nil || c.Descriptors.Budget != m.budget {
+		return ErrSATOwner
+	}
+	store, e := newSATSolverLiteralStore(c)
+	if e != nil {
+		return e
+	}
+	m.store = store
+	id, e := satNextOwner()
+	if e != nil {
+		return e
+	}
+	m.origin = id
+	m.constructed = true
+	return nil
+}
+func newSATModelConverter(c arena.VectorConfig) (*satModelConverter, error) {
+	m, e := newSATColdModelConverter(c.Descriptors.Budget)
+	if e != nil {
+		return nil, e
+	}
+	if e = m.initializeSourceStore(c); e != nil {
+		if cleanup := m.Close(); cleanup != nil {
+			return m, cleanup
+		}
+		return nil, e
+	}
+	return m, nil
+}
+func (m *satModelConverter) open() error {
+	if e := m.constructionBorrow(); e != nil {
+		return e
+	}
+	if !m.constructed {
 		return arena.ErrClosed
 	}
 	return nil
@@ -341,6 +376,9 @@ func satConverterModelValue(model satModel, l satLiteral) (lbool, error) {
 	return v, nil
 }
 func (m *satModelConverter) Apply(model satModel) error {
+	return m.applyModelSpan(satSolverModelSpan{slice: model})
+}
+func (m *satModelConverter) applyModelSpan(model satSolverModelSpan) error {
 	if e := m.open(); e != nil {
 		return e
 	}
@@ -356,10 +394,11 @@ func (m *satModelConverter) Apply(model satModel) error {
 		}
 		v := satBoolVar(x.varKind & 0x7fffffff)
 		if satStorageSourceDebug && satModelConversionKind(x.varKind>>31) == satModelElimVar {
-			if uint64(v) >= uint64(len(model)) {
-				return arena.ErrBounds
+			value, e := model.read(v)
+			if e != nil {
+				return e
 			}
-			if model[v] != lUndef {
+			if value != lUndef {
 				return ErrSATAssertion
 			}
 		}
@@ -375,12 +414,12 @@ func (m *satModelConverter) Apply(model satModel) error {
 			}
 			if l == satDefaultLiteral() {
 				if !sat {
-					if uint64(v) >= uint64(len(model)) {
-						return arena.ErrBounds
-					}
-					model[v] = lTrue
+					selected := lTrue
 					if sign {
-						model[v] = lFalse
+						selected = lFalse
+					}
+					if e := model.write(v, selected); e != nil {
+						return e
 					}
 					break
 				}
@@ -394,22 +433,31 @@ func (m *satModelConverter) Apply(model satModel) error {
 			if lv == v {
 				sign = l.sign()
 			}
-			value, e := satConverterModelValue(model, l)
+			value, e := model.value(l)
 			if e != nil {
 				return e
 			}
 			if value == lTrue {
 				sat = true
-			} else if lv != v && model[lv] == lUndef {
-				model[lv] = lTrue
-				if l.sign() {
-					model[lv] = lFalse
+			} else if lv != v {
+				current, e := model.read(lv)
+				if e != nil {
+					return e
 				}
-				sat = true
+				if current == lUndef {
+					selected := lTrue
+					if l.sign() {
+						selected = lFalse
+					}
+					if e := model.write(lv, selected); e != nil {
+						return e
+					}
+					sat = true
+				}
 			}
 		}
 		if satStorageSourceDebug {
-			if e := m.assertEntryModel(x, model); e != nil {
+			if e := m.assertEntryModelSpan(x, model); e != nil {
 				return e
 			}
 		}
@@ -420,6 +468,9 @@ func (m *satModelConverter) Apply(model satModel) error {
 // Apply's DEBUG_CODE asserts at each separator, before the next clause.
 // CheckModel deliberately keeps its separate accumulating source traversal.
 func (m *satModelConverter) assertEntryModel(x *satModelConversionEntry, model satModel) error {
+	return m.assertEntryModelSpan(x, satSolverModelSpan{slice: model})
+}
+func (m *satModelConverter) assertEntryModelSpan(x *satModelConversionEntry, model satSolverModelSpan) error {
 	n, e := m.store.Size(x.literals)
 	if e != nil {
 		return e
@@ -440,7 +491,7 @@ func (m *satModelConverter) assertEntryModel(x *satModelConversionEntry, model s
 		if sat {
 			continue
 		}
-		v, e := satConverterModelValue(model, l)
+		v, e := model.value(l)
 		if e != nil {
 			return e
 		}
@@ -449,6 +500,9 @@ func (m *satModelConverter) assertEntryModel(x *satModelConversionEntry, model s
 	return nil
 }
 func (m *satModelConverter) checkEntryModel(x *satModelConversionEntry, model satModel) (bool, error) {
+	return m.checkEntryModelSpan(x, satSolverModelSpan{slice: model})
+}
+func (m *satModelConverter) checkEntryModelSpan(x *satModelConversionEntry, model satSolverModelSpan) (bool, error) {
 	n, e := m.store.Size(x.literals)
 	if e != nil {
 		return false, e
@@ -469,7 +523,7 @@ func (m *satModelConverter) checkEntryModel(x *satModelConversionEntry, model sa
 		if sat {
 			continue
 		}
-		v, e := satConverterModelValue(model, l)
+		v, e := model.value(l)
 		if e != nil {
 			return false, e
 		}
@@ -478,6 +532,9 @@ func (m *satModelConverter) checkEntryModel(x *satModelConversionEntry, model sa
 	return ok, nil
 }
 func (m *satModelConverter) CheckModel(model satModel) (bool, error) {
+	return m.checkModelSpan(satSolverModelSpan{slice: model})
+}
+func (m *satModelConverter) checkModelSpan(model satSolverModelSpan) (bool, error) {
 	if e := m.open(); e != nil {
 		return false, e
 	}
@@ -492,7 +549,7 @@ func (m *satModelConverter) CheckModel(model satModel) (bool, error) {
 		if e != nil {
 			return false, e
 		}
-		good, e := m.checkEntryModel(x, model)
+		good, e := m.checkEntryModelSpan(x, model)
 		if e != nil {
 			return false, e
 		}
@@ -730,8 +787,10 @@ func (m *satModelConverter) Close() error {
 	if e := m.clearStorage(); e != nil {
 		return e
 	}
-	if e := m.store.Close(); e != nil {
-		return e
+	if m.store != nil {
+		if e := m.store.Close(); e != nil {
+			return e
+		}
 	}
 	m.budget.Release(m.ownerBytes)
 	m.ownerBytes = 0

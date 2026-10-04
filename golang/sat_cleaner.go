@@ -21,7 +21,7 @@ type satCleaner struct {
 }
 
 func newSATCleaner(l *satSolverClauseLifecycle, b *arena.Budget) (*satCleaner, error) {
-	if e := l.open(); e != nil {
+	if e := l.constructionBorrow(); e != nil {
 		return nil, e
 	}
 	if b != l.budget || b != l.propagation.memory.Budget() {
@@ -45,6 +45,15 @@ func (c *satCleaner) identity() error {
 		return arena.ErrClosed
 	}
 	return nil
+}
+func (c *satCleaner) constructionBorrow() error {
+	if e := c.identity(); e != nil {
+		return e
+	}
+	if c.closing || c.interrupted {
+		return arena.ErrClosed
+	}
+	return c.lifecycle.constructionBorrow()
 }
 func (c *satCleaner) open() error {
 	if e := c.identity(); e != nil {

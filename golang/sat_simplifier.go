@@ -52,13 +52,13 @@ type satSimplifier struct {
 }
 
 func newSATSimplifier(l *satSolverClauseLifecycle, c *satCleaner, d *satSolverDecision, p *ParamsRef) (s *satSimplifier, err error) {
-	if e := l.open(); e != nil {
+	if e := l.constructionBorrow(); e != nil {
 		return nil, e
 	}
-	if e := c.open(); e != nil {
+	if e := c.constructionBorrow(); e != nil {
 		return nil, e
 	}
-	if e := d.open(); e != nil {
+	if e := d.constructionBorrow(); e != nil {
 		return nil, e
 	}
 	if d.conflict.dynamic.probing.lifecycle != l {
@@ -129,14 +129,26 @@ func newSATSimplifier(l *satSolverClauseLifecycle, c *satCleaner, d *satSolverDe
 	s.constructed = true
 	return s, nil
 }
-func (s *satSimplifier) open() error {
+func (s *satSimplifier) constructionBorrow() error {
 	if s == nil || s.self != s {
 		return ErrSATOwner
 	}
 	if s.closed || s.closing || s.scopeActive || s.cleanupInterrupted || s.clauseSort.active || s.blocked.reportActive || s.elimination.reportActive || s.subReportActive || s.finalizeStage != 0 {
 		return arena.ErrClosed
 	}
-	return s.lifecycle.open()
+	if e := s.lifecycle.constructionBorrow(); e != nil {
+		return e
+	}
+	return s.decision.constructionBorrow()
+}
+func (s *satSimplifier) open() error {
+	if e := s.constructionBorrow(); e != nil {
+		return e
+	}
+	if !s.constructed {
+		return arena.ErrClosed
+	}
+	return s.decision.open()
 }
 func (s *satSimplifier) invariant() error {
 	if satStorageSourceDebug && s.debugInvariant {
@@ -145,7 +157,7 @@ func (s *satSimplifier) invariant() error {
 	return nil
 }
 func (s *satSimplifier) Update(p *ParamsRef) (err error) {
-	if e := s.open(); e != nil {
+	if e := s.constructionBorrow(); e != nil {
 		return e
 	}
 	cfg := s.lifecycle.propagation.config

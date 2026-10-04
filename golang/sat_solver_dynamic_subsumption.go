@@ -18,10 +18,10 @@ type satSolverDynamicSubsumption struct {
 }
 
 func newSATSolverDynamicSubsumption(a *satSolverConflictAnalysis, p *satSolverProbing, b *arena.Budget) (*satSolverDynamicSubsumption, error) {
-	if e := a.open(); e != nil {
+	if e := a.constructionBorrow(); e != nil {
 		return nil, e
 	}
-	if e := p.open(); e != nil {
+	if e := p.constructionBorrow(); e != nil {
 		return nil, e
 	}
 	if a.propagation != p.propagation() || b != a.budget {
@@ -34,6 +34,18 @@ func newSATSolverDynamicSubsumption(a *satSolverConflictAnalysis, p *satSolverPr
 	d := &satSolverDynamicSubsumption{analysis: a, probing: p, budget: b, ownerBytes: n}
 	d.self = d
 	return d, nil
+}
+func (d *satSolverDynamicSubsumption) constructionBorrow() error {
+	if d == nil || d.self != d {
+		return ErrSATOwner
+	}
+	if d.closed {
+		return arena.ErrClosed
+	}
+	if e := d.analysis.constructionBorrow(); e != nil {
+		return e
+	}
+	return d.probing.constructionBorrow()
 }
 func (d *satSolverDynamicSubsumption) open() error {
 	if d == nil || d.self != d {

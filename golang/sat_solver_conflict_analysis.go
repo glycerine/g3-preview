@@ -22,7 +22,7 @@ type satSolverConflictAnalysis struct {
 }
 
 func newSATSolverConflictAnalysis(p *satSolverPropagationState, b *arena.Budget) (*satSolverConflictAnalysis, error) {
-	if e := p.open(); e != nil {
+	if e := p.constructionBorrow(); e != nil {
 		return nil, e
 	}
 	if b != p.budget || b != p.memory.Budget() {
@@ -38,6 +38,15 @@ func newSATSolverConflictAnalysis(p *satSolverPropagationState, b *arena.Budget)
 		c.bind(p.memory)
 	}
 	return s, nil
+}
+func (s *satSolverConflictAnalysis) constructionBorrow() error {
+	if s == nil || s.self != s {
+		return ErrSATOwner
+	}
+	if s.closed || s.closing {
+		return arena.ErrClosed
+	}
+	return s.propagation.constructionBorrow()
 }
 func (s *satSolverConflictAnalysis) open() error {
 	if s == nil || s.self != s {
