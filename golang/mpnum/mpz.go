@@ -340,7 +340,7 @@ func (m *IntegerManager) publishCell(ref numericCellRef) {
 func (m *IntegerManager) free(ref numericCellRef) error {
 	c := m.cell(ref)
 	if !c.released {
-		progress, e := m.allocator.DeallocateTracked(c.backing.requested, c.backing.object)
+		progress, e := c.backing.deallocate(m.allocator)
 		if progress.PhysicalReleased || progress.PooledLinked {
 			c.released = true
 			m.store(ref, c)

@@ -109,17 +109,23 @@ func NewSmallAllocator(c SmallAllocatorConfig) (*SmallAllocator, error) {
 	a.self = a
 	return a, nil
 }
-func (a *SmallAllocator) open() error {
+func (a *SmallAllocator) entryOpen() error {
 	if a == nil || a.self != a {
 		return ErrAllocatorOwner
 	}
 	if a.closed || a.destructorDone {
 		return arena.ErrClosed
 	}
+	return a.config.Runtime.open()
+}
+func (a *SmallAllocator) open() error {
+	if e := a.entryOpen(); e != nil {
+		return e
+	}
 	if a.rawRelease.active {
 		return ErrAllocatorPending
 	}
-	return a.config.Runtime.open()
+	return nil
 }
 func (a *SmallAllocator) pointerBytes() uint64 {
 	return uint64(a.config.Profile.PointerBits / 8)
@@ -252,14 +258,16 @@ func (a *SmallAllocator) rememberPending(h Block) {
 	a.pendingPartial = e != nil
 }
 func (a *SmallAllocator) Allocate(n uint64) (ObjectRef, error) {
-	if e := a.open(); e != nil {
+	if e := a.entryOpen(); e != nil {
 		return ObjectRef{}, e
 	}
+	// Source size_t argument conversion precedes the body zero shortcut.
+	n = a.counter(n)
 	if n == 0 {
 		return ObjectRef{}, nil
 	}
-	if e := a.requireSize(n); e != nil {
-		return ObjectRef{}, e
+	if a.rawRelease.active {
+		return ObjectRef{}, ErrAllocatorPending
 	}
 	if a.hasPending() || a.cleanupMode != 0 || a.cleanupChunksNeeded {
 		return ObjectRef{}, ErrAllocatorPending
@@ -412,13 +420,13 @@ func (a *SmallAllocator) Write(r ObjectRef, i uint64, v byte) error {
 	return a.config.Runtime.Write(loc.raw, uint64(loc.offset)+i, v)
 }
 func (a *SmallAllocator) AllocationSize() (uint64, error) {
-	if e := a.open(); e != nil {
+	if e := a.entryOpen(); e != nil {
 		return 0, e
 	}
 	return a.allocSize, nil
 }
 func (a *SmallAllocator) freeMeasure(waste bool) (uint64, error) {
-	if e := a.open(); e != nil {
+	if e := a.entryOpen(); e != nil {
 		return 0, e
 	}
 	var result uint64

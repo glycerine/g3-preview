@@ -1,4 +1,5 @@
-// Licensed under the MIT license.
+// Source: src/util/mpz.h; src/util/mpz.cpp (_MP_INTERNAL, digit32).
+// Licensed under the MIT license. Source author: Leonardo de Moura.
 // Actual mpz.h cell allocation and object-bounded initialized-byte access.
 package mpnum
 
@@ -16,6 +17,16 @@ type sourceCellBacking struct {
 }
 
 func sourceMPZCellBytes(capacity uint32) uint64 { return uint64(uint32(8) + uint32(4)*capacity) }
+
+// requested retains the result of the source unsigned32 cell-byte expression,
+// widened only for the Go storage API. It cannot legitimately exceed uint32.
+// Guard corrupt retained metadata before source size_t conversion can erase it.
+func (c sourceCellBacking) deallocate(a *memory.SmallAllocator) (memory.ReleaseProgress, error) {
+	if c.requested > uint64(^uint32(0)) {
+		return memory.ReleaseProgress{}, arena.ErrBounds
+	}
+	return a.DeallocateTracked(c.requested, c.object)
+}
 
 // The returned scalar root is nonzero on a completed allocation even if the
 // capacity write fails. Its caller must retain it before descriptor preparation.

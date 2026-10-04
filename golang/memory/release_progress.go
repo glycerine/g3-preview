@@ -1,4 +1,7 @@
+// Source: src/util/small_object_allocator.cpp:72-96; src/util/memory_manager.cpp.
 // Licensed under the MIT license.
+// Small-allocator source author: Nikolaj bjorner (nbjorner) 2007-08-06.
+// Source revision: Leonardo de Moura (leonardo) 2011-04-27; rewrote/simplified allocator.
 // Explicit Go cleanup authority for completed source deallocation prefixes.
 package memory
 
@@ -84,14 +87,16 @@ func (a *SmallAllocator) releaseSnapshot(r ObjectRef, p *allocatorReleaseState) 
 // A genuine pending invocation resumes its stored phase; a completed normal
 // pooled release starts a new invocation, preserving source duplicate free.
 func (a *SmallAllocator) DeallocateTracked(n uint64, r ObjectRef) (ReleaseProgress, error) {
-	if e := a.open(); e != nil {
+	if e := a.entryOpen(); e != nil {
 		return ReleaseProgress{}, e
 	}
+	// Source size_t argument conversion precedes the body zero shortcut.
+	n = a.counter(n)
 	if n == 0 {
 		return ReleaseProgress{}, nil
 	}
-	if e := a.requireSize(n); e != nil {
-		return ReleaseProgress{}, e
+	if a.rawRelease.active {
+		return ReleaseProgress{}, ErrAllocatorPending
 	}
 	if r.owner == a.origin && r.slot != 0 && uint64(r.slot) <= uint64(len(a.locations)) {
 		loc := &a.locations[r.slot-1]
@@ -176,6 +181,8 @@ func (a *SmallAllocator) CompleteRelease(n uint64, r ObjectRef, progress *Releas
 	if e := a.open(); e != nil {
 		return e
 	}
+	// The retained invocation stores the actual source size_t argument.
+	n = a.counter(n)
 	if progress == nil || r.owner != a.origin || progress.owner != a.origin || progress.slot != r.slot || progress.generation != r.generation {
 		return ErrAllocatorOwner
 	}

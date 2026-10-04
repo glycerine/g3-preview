@@ -46,7 +46,7 @@ func (m *IntegerManager) cleanupPendingAllocation() error {
 			}
 			return e
 		}
-		progress, e := m.allocator.DeallocateTracked(m.pendingCell.requested, m.pendingCell.object)
+		progress, e := m.pendingCell.deallocate(m.allocator)
 		if progress.PhysicalReleased || progress.PooledLinked {
 			m.pendingCell = sourceCellBacking{}
 		}

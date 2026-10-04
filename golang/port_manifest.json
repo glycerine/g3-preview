@@ -118331,7 +118331,9 @@
         "mpnum/polynomial_gcd_indexed_test.go",
         "mpnum/polynomial_integer_array_source_test.go",
         "mpnum/mpz_square_scope.go",
-        "mpnum/mpz_square_source_scope_test.go"
+        "mpnum/mpz_square_source_scope_test.go",
+        "mpnum/mpz_allocator_backend.go",
+        "mpnum/mpz_pending_allocation.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -120235,6 +120237,18 @@
             "TestIntegerPerfectSquareEarlyRoutesKeepOlderRawInvocation",
             "TestIntegerPerfectSquareBigOneReachesRawCopy"
           ]
+        },
+        {
+          "name": "Retained digit32 cell-byte request metadata guard before allocator size_t entry conversion; same published/unpublished deallocation engine preserves source stops and actual roots",
+          "status": "partial",
+          "go_target": "mpnum/mpz_allocator_backend.go",
+          "tests": [
+            "TestLexicalInfDestructorRefusal",
+            "TestLexicalReverseMemberProgressAndExplicitRecovery",
+            "TestConstructorCompletedUnwindPrecedesOwningAbort",
+            "TestPolynomialExactDivReverseDestructionRefusal",
+            "TestPolynomialPseudoDivisionReverseDestructionRefusal"
+          ]
         }
       ],
       "ownership": [
@@ -120321,7 +120335,9 @@
         "mpnum/mpn_source_finalize.go",
         "mpnum/mp_integer_output_scope.go",
         "mpnum/mp_integer_output_scope_test.go",
-        "mpnum/mpn_cstring.go"
+        "mpnum/mpn_cstring.go",
+        "mpnum/mpz_allocator_backend.go",
+        "mpnum/mpz_pending_allocation.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -121747,6 +121763,18 @@
             "TestIntegerSourceFreshNullAndDestructiveDangling",
             "TestIntegerSourceFailureSentinelPreparationPrefixes",
             "TestIntegerSourceSentinelSlotLimitReachedAllocation"
+          ]
+        },
+        {
+          "name": "Retained digit32 cell-byte request metadata guard before allocator size_t entry conversion; same published/unpublished deallocation engine preserves source stops and actual roots",
+          "status": "partial",
+          "go_target": "mpnum/mpz_allocator_backend.go",
+          "tests": [
+            "TestLexicalInfDestructorRefusal",
+            "TestLexicalReverseMemberProgressAndExplicitRecovery",
+            "TestConstructorCompletedUnwindPrecedesOwningAbort",
+            "TestPolynomialExactDivReverseDestructionRefusal",
+            "TestPolynomialPseudoDivisionReverseDestructionRefusal"
           ]
         }
       ],
@@ -128218,7 +128246,9 @@
         "memory/small_allocator_pending_roots.go",
         "memory/small_allocator_pending_roots_test.go",
         "memory/small_allocator_raw.go",
-        "memory/small_allocator_raw_test.go"
+        "memory/small_allocator_raw_test.go",
+        "memory/small_allocator_size_t_entry_test.go",
+        "memory/small_allocator_query_prefix_test.go"
       ],
       "tests": [
         "TestSmallBytesSourceExercise",
@@ -128532,6 +128562,27 @@
             "TestSmallAllocatorRawUnrelatedReleasePreservesPendingAllocation",
             "TestSmallAllocatorRawSamePendingReleaseReceiptBeforeSubtraction"
           ]
+        },
+        {
+          "name": "Source size_t32/64 argument conversion before zero in Allocate/DeallocateTracked; exact normalized CompleteRelease receipt; zero preserves actual stopped raw invocation",
+          "status": "partial",
+          "go_target": "memory/release_progress.go",
+          "tests": [
+            "TestSmallAllocatorCheckedActualSizeTEntry",
+            "TestSmallAllocatorCheckedZeroPreservesStoppedRawInvocation",
+            "TestSmallAllocatorCheckedZeroRetainsIdentityLifetimeGuards",
+            "TestSmallAllocatorCheckedDeallocationSizeTEntry",
+            "TestSmallAllocatorCheckedNormalizedOwningReceipt",
+            "TestSmallAllocatorCheckedNormalizedStoppedOwningReceipt"
+          ]
+        },
+        {
+          "name": "get_allocation_size and get_wasted_size/get_num_free_objs read published count/free-list prefix during stopped raw sidecar allocation without mutation or cleanup",
+          "status": "partial",
+          "go_target": "memory/small_allocator.go",
+          "tests": [
+            "TestSmallAllocatorQueriesReadPublishedPrefixDuringRawStop"
+          ]
         }
       ],
       "ownership": [
@@ -128549,7 +128600,7 @@
         "Standalone deterministic scalar address codec and external sort adapter preserve source scan/relink order without claiming native pointer placements. Borrowed explicit diagnostic streams model selected bytes/state; global runtime/ostream wiring remains open. Legacy arena/small_bytes is a separate storage adapter with its recorded extensions.",
         "Explicit LE word codecs are a Go source-storage adapter, not an additional C++ allocator algorithm. MPZ backend typed accesses must bound against actual object extent; this prerequisite does not complete MPZ/Natural backing or tracked release/global lifecycle.",
         "Ordinary retry of an interrupted beforefree invocation resumes its real retained phase; explicit CompleteRelease can acknowledge afterfree failure without counter repair. This is a Go owning cleanup adapter to bounded source-undefined signed-overflow domains, not a C++ exception recovery claim. Actual MPZ/Natural and transitive numerical failure owners remain required.",
-        "Same Runtime provider/profile only; source global allocator and native pointer ABI remain open. SizeT32 truncation beforezero/bypass fixed in raw overload; existing generic ObjectRef size preflight remains partial. Raw retry is an explicit Go continuation, not native exception resumption. Actual public pool metadata refusal/ownabort proof preserves donor/caller roots; headerless wrapped realloc is guarded source-undefined domain only. Direct release stage2-to-physical has no fallible point, no fabricated failure credit. Whole units remain partial."
+        "Same Runtime provider/profile only; source global allocator and native pointer ABI remain open. SizeT32 conversion before zero/bypass applies to raw and checked allocation/deallocation entries; owning receipts match normalized size and exact private serial. Read-only source getters observe the published prefix while raw mutation stays stopped. Raw retry is an explicit Go continuation, not native exception resumption. Actual public pool metadata refusal/ownabort proof preserves donor/caller roots; headerless wrapped realloc is guarded source-undefined domain only. Direct release stage2-to-physical has no fallible point, no fabricated failure credit. Whole units remain partial."
       ]
     },
     {
@@ -128572,7 +128623,10 @@
         "memory/small_allocator_pending_roots.go",
         "memory/small_allocator_pending_roots_test.go",
         "memory/small_allocator_raw.go",
-        "memory/small_allocator_raw_test.go"
+        "memory/small_allocator_raw_test.go",
+        "memory/release_progress.go",
+        "memory/small_allocator_size_t_entry_test.go",
+        "memory/small_allocator_query_prefix_test.go"
       ],
       "tests": [
         "TestSmallBytesSourceExercise",
@@ -128806,6 +128860,27 @@
             "TestSmallAllocatorRawUnrelatedReleasePreservesPendingAllocation",
             "TestSmallAllocatorRawSamePendingReleaseReceiptBeforeSubtraction"
           ]
+        },
+        {
+          "name": "Source size_t32/64 argument conversion before zero in Allocate/DeallocateTracked; exact normalized CompleteRelease receipt; zero preserves actual stopped raw invocation",
+          "status": "partial",
+          "go_target": "memory/release_progress.go",
+          "tests": [
+            "TestSmallAllocatorCheckedActualSizeTEntry",
+            "TestSmallAllocatorCheckedZeroPreservesStoppedRawInvocation",
+            "TestSmallAllocatorCheckedZeroRetainsIdentityLifetimeGuards",
+            "TestSmallAllocatorCheckedDeallocationSizeTEntry",
+            "TestSmallAllocatorCheckedNormalizedOwningReceipt",
+            "TestSmallAllocatorCheckedNormalizedStoppedOwningReceipt"
+          ]
+        },
+        {
+          "name": "get_allocation_size and get_wasted_size/get_num_free_objs read published count/free-list prefix during stopped raw sidecar allocation without mutation or cleanup",
+          "status": "partial",
+          "go_target": "memory/small_allocator.go",
+          "tests": [
+            "TestSmallAllocatorQueriesReadPublishedPrefixDuringRawStop"
+          ]
         }
       ],
       "ownership": [
@@ -128819,7 +128894,7 @@
         "Conceptual chunk/block indices replace machine addresses for sorting; source strict endpoint/floor-count retention quirk preserved.",
         "Storage limits checked before publication; invalid size/generation diagnosed.",
         "Standalone deterministic scalar address codec and external sort adapter preserve source scan/relink order without claiming native pointer placements. Borrowed explicit diagnostic streams model selected bytes/state; global runtime/ostream wiring remains open. Legacy arena/small_bytes is a separate storage adapter with its recorded extensions.",
-        "Same Runtime provider/profile only; source global allocator and native pointer ABI remain open. SizeT32 truncation beforezero/bypass fixed in raw overload; existing generic ObjectRef size preflight remains partial. Raw retry is an explicit Go continuation, not native exception resumption. Actual public pool metadata refusal/ownabort proof preserves donor/caller roots; headerless wrapped realloc is guarded source-undefined domain only. Direct release stage2-to-physical has no fallible point, no fabricated failure credit. Whole units remain partial."
+        "Same Runtime provider/profile only; source global allocator and native pointer ABI remain open. SizeT32 conversion before zero/bypass applies to raw and checked allocation/deallocation entries; owning receipts match normalized size and exact private serial. Read-only source getters observe the published prefix while raw mutation stays stopped. Raw retry is an explicit Go continuation, not native exception resumption. Actual public pool metadata refusal/ownabort proof preserves donor/caller roots; headerless wrapped realloc is guarded source-undefined domain only. Direct release stage2-to-physical has no fallible point, no fabricated failure credit. Whole units remain partial."
       ]
     },
     {
