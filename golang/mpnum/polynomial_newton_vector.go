@@ -10,15 +10,18 @@ import (
 // The actual source pointer-vector backing is encoded as Runtime uint64 child
 // IDs; the separate, fully charged cold directory owns genuine child objects.
 type PolynomialNewtonVector struct {
-	self            *PolynomialNewtonVector
-	owner, storage  *MultivariatePolynomialCore
-	data            polynomialVector
-	children        []*PolynomialNewtonInterpolator
-	pending         *PolynomialNewtonInterpolator
-	header          uint64
-	cursor          uint32
-	closing, closed bool
-	sourceOrphans   bool
+	self                              *PolynomialNewtonVector
+	owner, storage                    *MultivariatePolynomialCore
+	data                              polynomialVector
+	children                          []*PolynomialNewtonInterpolator
+	pending                           *PolynomialNewtonInterpolator
+	header                            uint64
+	cursor                            uint32
+	closing, closed                   bool
+	sourceOrphans                     bool
+	sourceFinalizing, sourceFinalized bool
+	sourceStage                       uint8
+	sourceCause                       error
 }
 
 func NewPolynomialNewtonVector(m *MultivariatePolynomialCore) (*PolynomialNewtonVector, error) {
@@ -38,7 +41,7 @@ func (v *PolynomialNewtonVector) Size() (uint32, error) {
 	if v == nil || v.self != v {
 		return 0, ErrPolynomialOwner
 	}
-	if v.closed {
+	if v.closed || v.closing || v.sourceFinalizing {
 		return 0, arena.ErrClosed
 	}
 	return v.data.size(v.storage)
@@ -66,7 +69,7 @@ func (v *PolynomialNewtonVector) At(i uint32) (*PolynomialNewtonInterpolator, er
 	if v == nil || v.self != v {
 		return nil, ErrPolynomialOwner
 	}
-	if v.closed || v.closing {
+	if v.closed || v.closing || v.sourceFinalizing {
 		return nil, arena.ErrClosed
 	}
 	if e := v.storage.check(); e != nil {
@@ -132,7 +135,15 @@ func (v *PolynomialNewtonVector) At(i uint32) (*PolynomialNewtonInterpolator, er
 	}
 	return v.children[id-1], nil
 }
-func (v *PolynomialNewtonVector) Flush() error { return v.flushMode(false) }
+func (v *PolynomialNewtonVector) Flush() error {
+	if v == nil || v.self != v {
+		return ErrPolynomialOwner
+	}
+	if v.closed || v.closing || v.sourceFinalizing {
+		return arena.ErrClosed
+	}
+	return v.flushMode(false)
+}
 func (v *PolynomialNewtonVector) flushMode(owning bool) error {
 	if v == nil || v.self != v {
 		return ErrPolynomialOwner
@@ -218,7 +229,7 @@ func (v *PolynomialNewtonVector) SetOwner(m *MultivariatePolynomialCore) error {
 	if v == nil || v.self != v {
 		return ErrPolynomialOwner
 	}
-	if v.closed || v.closing {
+	if v.closed || v.closing || v.sourceFinalizing {
 		return arena.ErrClosed
 	}
 	if modularSourceDebug && v.owner != nil && v.owner != m {

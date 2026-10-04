@@ -28438,7 +28438,18 @@
         "mpnum/polynomial_variable_degrees.go",
         "mpnum/polynomial_variable_degrees_copy.go",
         "polynomial_var_degree_stream_test.go",
-        "mpnum/polynomial_member_constructor_test.go"
+        "mpnum/polynomial_member_constructor_test.go",
+        "mpnum/polynomial_skeleton.go",
+        "mpnum/polynomial_skeleton_test.go",
+        "mpnum/polynomial_skeleton_vector.go",
+        "mpnum/polynomial_skeleton_vector_test.go",
+        "mpnum/polynomial_newton_source_finalize.go",
+        "mpnum/polynomial_newton_source_finalize_test.go",
+        "mpnum/polynomial_variable_helpers.go",
+        "mpnum/polynomial_variable_helpers_lifetime.go",
+        "mpnum/polynomial_variable_helpers_scoped.go",
+        "mpnum/polynomial_variable_helpers_source_test.go",
+        "mpnum/polynomial_variable_helpers_physical_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -28611,7 +28622,36 @@
         "TestPolynomialModDConstantWithStoppedMapAssignmentKeepsActualRoots",
         "TestPolynomialMemberPreparationBeforeBody",
         "TestPolynomialRuntimeTempDefaultAndFailure",
-        "TestPolynomialRuntimeTempReachedPlacementGuard"
+        "TestPolynomialRuntimeTempReachedPlacementGuard",
+        "TestPolynomialSkeletonSourceGroupsAndLifetime",
+        "TestPolynomialSkeletonSourcePointerOnlyRead",
+        "TestPolynomialSkeletonConstructorEveryReservation",
+        "TestPolynomialSkeletonSourceDisplay",
+        "TestPolynomialSkeletonSourceDisplayReachedPointer",
+        "TestPolynomialSkeletonSourceInline128Overflow",
+        "TestPolynomialSkeletonSourceUnderlyingVectorGuards",
+        "TestPolynomialSkeletonOverflowConstructorEveryReservation",
+        "TestPolynomialSkeletonVectorSourceOperations",
+        "TestPolynomialSkeletonVectorPushFailureRetainsCaller",
+        "TestPolynomialSkeletonVectorPushEveryReservation",
+        "TestPolynomialSkeletonVectorSetDeleteBeforeColdReplacementRefusal",
+        "TestPolynomialSkeletonVectorOwnerGuards",
+        "TestPolynomialSkeletonVectorSetStoppedChildDestructor",
+        "TestPolynomialNewtonVectorSourceFinalizePrivateBacking",
+        "TestPolynomialNewtonVectorSourceFinalizeLeavesFailedChild",
+        "TestPolynomialNewtonVectorSourceFinalizeStickyPostPhysicalSuffix",
+        "TestPolynomialMaxDegreesIndependentFiniteModelAndRetainedVars",
+        "TestPolynomialVariablePositionsSentinelDuplicateSourceProfiles",
+        "TestScopedPolynomialVariablePositionsCapturedBackingLifetime",
+        "TestScopedPolynomialVariablePositionsFailedConstructorNoReset",
+        "TestPolynomialMaxDegreesFirstSeenReservationPrefixesAndFailedScope",
+        "TestPolynomialVariablePositionsEveryReservationKeepsOldSizeUntilFill",
+        "TestPolynomialVariableHelperImplicitCopyMoveAndScopedCopies",
+        "TestPolynomialVariableHelperScopedReachedResetPrefix",
+        "TestPolynomialMaxDegreesCopyConstructorCompletedMemberUnwind",
+        "TestPolynomialMaxDegreesCopyConstructorTLSIncompleteSecondRoot",
+        "TestPolynomialVariableHelperWarmAndColdOwnerGuards",
+        "TestPolynomialMaxDegreesStoppedSourceDestructorAndOwningAbort"
       ],
       "conditionals": [
         {
@@ -30882,6 +30922,49 @@
             "TestPolynomialRuntimeTempDefaultAndFailure",
             "TestPolynomialRuntimeTempReachedPlacementGuard"
           ]
+        },
+        {
+          "name": "Concrete polynomial skeleton cpp2958\u20133068 canonical grouping, actual monomial INC/DEC, inline128 overflow and failed ctor member unwind; scoped_ptr_vector<skeleton> complete operations; selected Newton source vector destruction cpp2923\u20132952. TRACE/global stream binding remains open.",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_skeleton.go",
+          "tests": [
+            "TestPolynomialSkeletonSourceGroupsAndLifetime",
+            "TestPolynomialSkeletonSourcePointerOnlyRead",
+            "TestPolynomialSkeletonConstructorEveryReservation",
+            "TestPolynomialSkeletonSourceDisplay",
+            "TestPolynomialSkeletonSourceDisplayReachedPointer",
+            "TestPolynomialSkeletonSourceInline128Overflow",
+            "TestPolynomialSkeletonSourceUnderlyingVectorGuards",
+            "TestPolynomialSkeletonOverflowConstructorEveryReservation",
+            "TestPolynomialSkeletonVectorSourceOperations",
+            "TestPolynomialSkeletonVectorPushFailureRetainsCaller",
+            "TestPolynomialSkeletonVectorPushEveryReservation",
+            "TestPolynomialSkeletonVectorSetDeleteBeforeColdReplacementRefusal",
+            "TestPolynomialSkeletonVectorOwnerGuards",
+            "TestPolynomialSkeletonVectorSetStoppedChildDestructor",
+            "TestPolynomialNewtonVectorSourceFinalizePrivateBacking",
+            "TestPolynomialNewtonVectorSourceFinalizeLeavesFailedChild",
+            "TestPolynomialNewtonVectorSourceFinalizeStickyPostPhysicalSuffix"
+          ]
+        },
+        {
+          "name": "Selected complete var_max_degree/scoped_var_max_degree cpp6179\u20136232 and var_pos/scoped_var_pos cpp6307\u20136344: reached source reads, all-expansion filled resize, actual embedded vector copy/move and scoped destruction; full imp composition remains open",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_variable_helpers.go",
+          "tests": [
+            "TestPolynomialMaxDegreesIndependentFiniteModelAndRetainedVars",
+            "TestPolynomialVariablePositionsSentinelDuplicateSourceProfiles",
+            "TestScopedPolynomialVariablePositionsCapturedBackingLifetime",
+            "TestScopedPolynomialVariablePositionsFailedConstructorNoReset",
+            "TestPolynomialMaxDegreesFirstSeenReservationPrefixesAndFailedScope",
+            "TestPolynomialVariablePositionsEveryReservationKeepsOldSizeUntilFill",
+            "TestPolynomialVariableHelperImplicitCopyMoveAndScopedCopies",
+            "TestPolynomialVariableHelperScopedReachedResetPrefix",
+            "TestPolynomialMaxDegreesCopyConstructorCompletedMemberUnwind",
+            "TestPolynomialMaxDegreesCopyConstructorTLSIncompleteSecondRoot",
+            "TestPolynomialVariableHelperWarmAndColdOwnerGuards",
+            "TestPolynomialMaxDegreesStoppedSourceDestructorAndOwningAbort"
+          ]
         }
       ],
       "ownership": [
@@ -30905,7 +30988,8 @@
         "actual positions Set, ms push, INC, default coefficient push, numeric Copy; borrowedAppend/index exclude guarded uncompleted INC from owning DEC",
         "Actual embedded pseudo continuation references, NUM and monomial fields with scalar lexical construction/destruction order. Same-engine Power accepts a completed source reference; completed destructors precede separate owning abort of actual unjoined INCs. Shared physical census names all actual scope fields and active nested Power directly, with immediate before-fault-disable evidence.",
         "One actual Runtime cap/size/unsigned degree vector with reflected charged cold owner and precise constructed/rawDestroyed/pending states. Failed ctor carrier rejects ordinary APIs, has no completed member destructor. Copy assignment frees old before replacement, stale pointer history is nonowning; actual returned pending blocks remain owning. Cold maps and their actual live/pending raw blocks are independently censused, including true BIG fresh-NULL reservation and stopped assignment constant branch.",
-        "Selected constructor helper split preserves existing actual modular/default/body order; Runtime temporary placement records real returned raw blocks and reached header writes. No full imp constructor/destructor credit or fabricated sizeof allocation event."
+        "Selected constructor helper split preserves existing actual modular/default/body order; Runtime temporary placement records real returned raw blocks and reached header writes. No full imp constructor/destructor credit or fabricated sizeof allocation event.",
+        "Skeleton entries/powers/originals use actual Runtime storage; failed constructor transfers actual unconsumed INC fields into charged cold owning-abort records before source backing free. Scoped pointer publications alone own concrete children; stopped source cause retained, separate owning cleanup. Variable helpers own two/one actual embedded uint vectors in one charged stable cold header, views/scopes borrow actual backing and references. Strong shared physical census names pseudo/Power/ExactDiv plus supplied headers/blocks without registry-derived ownership."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -30930,7 +31014,8 @@
         "Source coeff argument evaluation chooses coefficient read before RemoveVariable within allowed C++11 evaluation order. Source active linear Power preserved; #if0 alternative remains unported inventory. Full imp/GCD/PSC and global assertion/TRACE bindings remain open. See PORT_PROGRESS.md.",
         "Selected exact division and graded maxima only: full imp construction, PSC/GCD, source TRACE/global diagnostics and undefined dangling/fresh-NULL source destruction remain open. False GNU release VERIFY reaches a typed unreachable-domain guard; no registered original assertion completion credit. See PORT_PROGRESS.md.",
         "This selected source core omits only separately inventoried ModD specialization; full imp hierarchy, PSC/Lazard/subresultants/resultants/general GCD and registered driver credit remain open. TRACE/CTRACE/printers/global assertion bindings remain separate obligations. Malformed SIZE_T32 release metadata fixture is explicitly source undefined and uses caller restoration only after immediate physical census; no native recovery claim.",
-        "Selected concrete class and ModD methods only: whole polynomial hierarchy, PSC/Lazard/resultants/GCD/global diagnostic and source-driver assertion bindings remain OPEN. Borrowed cold stream interface binds actual NumericTextStream formatting state, no hot per-variable interface fields or decimal-only surrogate. No additional registered source assertion credit; malformed/wrapped source-undefined vector profiles are typed guards, not native recovery claims."
+        "Selected concrete class and ModD methods only: whole polynomial hierarchy, PSC/Lazard/resultants/GCD/global diagnostic and source-driver assertion bindings remain OPEN. Borrowed cold stream interface binds actual NumericTextStream formatting state, no hot per-variable interface fields or decimal-only surrogate. No additional registered source assertion credit; malformed/wrapped source-undefined vector profiles are typed guards, not native recovery claims.",
+        "Selected concrete skeleton canonical order uses heap sort; platform std::sort comparator dispatch order is not claimed. Scalar child IDs encode actual cold object provenance under a fixed Runtime. Cold ownership metadata fully charged and distinct from source malloc events. Whole imp and registered-driver/global diagnostic integration remain open."
       ]
     },
     {
@@ -30999,7 +31084,18 @@
         "mpnum/polynomial_variable_degrees.go",
         "mpnum/polynomial_variable_degrees_copy.go",
         "polynomial_var_degree_stream_test.go",
-        "mpnum/polynomial_member_constructor_test.go"
+        "mpnum/polynomial_member_constructor_test.go",
+        "mpnum/polynomial_skeleton.go",
+        "mpnum/polynomial_skeleton_test.go",
+        "mpnum/polynomial_skeleton_vector.go",
+        "mpnum/polynomial_skeleton_vector_test.go",
+        "mpnum/polynomial_newton_source_finalize.go",
+        "mpnum/polynomial_newton_source_finalize_test.go",
+        "mpnum/polynomial_variable_helpers.go",
+        "mpnum/polynomial_variable_helpers_lifetime.go",
+        "mpnum/polynomial_variable_helpers_scoped.go",
+        "mpnum/polynomial_variable_helpers_source_test.go",
+        "mpnum/polynomial_variable_helpers_physical_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -31172,7 +31268,36 @@
         "TestPolynomialModDConstantWithStoppedMapAssignmentKeepsActualRoots",
         "TestPolynomialMemberPreparationBeforeBody",
         "TestPolynomialRuntimeTempDefaultAndFailure",
-        "TestPolynomialRuntimeTempReachedPlacementGuard"
+        "TestPolynomialRuntimeTempReachedPlacementGuard",
+        "TestPolynomialSkeletonSourceGroupsAndLifetime",
+        "TestPolynomialSkeletonSourcePointerOnlyRead",
+        "TestPolynomialSkeletonConstructorEveryReservation",
+        "TestPolynomialSkeletonSourceDisplay",
+        "TestPolynomialSkeletonSourceDisplayReachedPointer",
+        "TestPolynomialSkeletonSourceInline128Overflow",
+        "TestPolynomialSkeletonSourceUnderlyingVectorGuards",
+        "TestPolynomialSkeletonOverflowConstructorEveryReservation",
+        "TestPolynomialSkeletonVectorSourceOperations",
+        "TestPolynomialSkeletonVectorPushFailureRetainsCaller",
+        "TestPolynomialSkeletonVectorPushEveryReservation",
+        "TestPolynomialSkeletonVectorSetDeleteBeforeColdReplacementRefusal",
+        "TestPolynomialSkeletonVectorOwnerGuards",
+        "TestPolynomialSkeletonVectorSetStoppedChildDestructor",
+        "TestPolynomialNewtonVectorSourceFinalizePrivateBacking",
+        "TestPolynomialNewtonVectorSourceFinalizeLeavesFailedChild",
+        "TestPolynomialNewtonVectorSourceFinalizeStickyPostPhysicalSuffix",
+        "TestPolynomialMaxDegreesIndependentFiniteModelAndRetainedVars",
+        "TestPolynomialVariablePositionsSentinelDuplicateSourceProfiles",
+        "TestScopedPolynomialVariablePositionsCapturedBackingLifetime",
+        "TestScopedPolynomialVariablePositionsFailedConstructorNoReset",
+        "TestPolynomialMaxDegreesFirstSeenReservationPrefixesAndFailedScope",
+        "TestPolynomialVariablePositionsEveryReservationKeepsOldSizeUntilFill",
+        "TestPolynomialVariableHelperImplicitCopyMoveAndScopedCopies",
+        "TestPolynomialVariableHelperScopedReachedResetPrefix",
+        "TestPolynomialMaxDegreesCopyConstructorCompletedMemberUnwind",
+        "TestPolynomialMaxDegreesCopyConstructorTLSIncompleteSecondRoot",
+        "TestPolynomialVariableHelperWarmAndColdOwnerGuards",
+        "TestPolynomialMaxDegreesStoppedSourceDestructorAndOwningAbort"
       ],
       "conditionals": [
         {
@@ -32215,6 +32340,49 @@
             "TestPolynomialRuntimeTempDefaultAndFailure",
             "TestPolynomialRuntimeTempReachedPlacementGuard"
           ]
+        },
+        {
+          "name": "Concrete polynomial skeleton cpp2958\u20133068 canonical grouping, actual monomial INC/DEC, inline128 overflow and failed ctor member unwind; scoped_ptr_vector<skeleton> complete operations; selected Newton source vector destruction cpp2923\u20132952. TRACE/global stream binding remains open.",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_skeleton.go",
+          "tests": [
+            "TestPolynomialSkeletonSourceGroupsAndLifetime",
+            "TestPolynomialSkeletonSourcePointerOnlyRead",
+            "TestPolynomialSkeletonConstructorEveryReservation",
+            "TestPolynomialSkeletonSourceDisplay",
+            "TestPolynomialSkeletonSourceDisplayReachedPointer",
+            "TestPolynomialSkeletonSourceInline128Overflow",
+            "TestPolynomialSkeletonSourceUnderlyingVectorGuards",
+            "TestPolynomialSkeletonOverflowConstructorEveryReservation",
+            "TestPolynomialSkeletonVectorSourceOperations",
+            "TestPolynomialSkeletonVectorPushFailureRetainsCaller",
+            "TestPolynomialSkeletonVectorPushEveryReservation",
+            "TestPolynomialSkeletonVectorSetDeleteBeforeColdReplacementRefusal",
+            "TestPolynomialSkeletonVectorOwnerGuards",
+            "TestPolynomialSkeletonVectorSetStoppedChildDestructor",
+            "TestPolynomialNewtonVectorSourceFinalizePrivateBacking",
+            "TestPolynomialNewtonVectorSourceFinalizeLeavesFailedChild",
+            "TestPolynomialNewtonVectorSourceFinalizeStickyPostPhysicalSuffix"
+          ]
+        },
+        {
+          "name": "Selected complete var_max_degree/scoped_var_max_degree cpp6179\u20136232 and var_pos/scoped_var_pos cpp6307\u20136344: reached source reads, all-expansion filled resize, actual embedded vector copy/move and scoped destruction; full imp composition remains open",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_variable_helpers.go",
+          "tests": [
+            "TestPolynomialMaxDegreesIndependentFiniteModelAndRetainedVars",
+            "TestPolynomialVariablePositionsSentinelDuplicateSourceProfiles",
+            "TestScopedPolynomialVariablePositionsCapturedBackingLifetime",
+            "TestScopedPolynomialVariablePositionsFailedConstructorNoReset",
+            "TestPolynomialMaxDegreesFirstSeenReservationPrefixesAndFailedScope",
+            "TestPolynomialVariablePositionsEveryReservationKeepsOldSizeUntilFill",
+            "TestPolynomialVariableHelperImplicitCopyMoveAndScopedCopies",
+            "TestPolynomialVariableHelperScopedReachedResetPrefix",
+            "TestPolynomialMaxDegreesCopyConstructorCompletedMemberUnwind",
+            "TestPolynomialMaxDegreesCopyConstructorTLSIncompleteSecondRoot",
+            "TestPolynomialVariableHelperWarmAndColdOwnerGuards",
+            "TestPolynomialMaxDegreesStoppedSourceDestructorAndOwningAbort"
+          ]
         }
       ],
       "ownership": [
@@ -32238,7 +32406,8 @@
         "actual positions Set, ms push, INC, default coefficient push, numeric Copy; borrowedAppend/index exclude guarded uncompleted INC from owning DEC",
         "Actual embedded pseudo continuation references, NUM and monomial fields with scalar lexical construction/destruction order. Same-engine Power accepts a completed source reference; completed destructors precede separate owning abort of actual unjoined INCs. Shared physical census names all actual scope fields and active nested Power directly, with immediate before-fault-disable evidence.",
         "One actual Runtime cap/size/unsigned degree vector with reflected charged cold owner and precise constructed/rawDestroyed/pending states. Failed ctor carrier rejects ordinary APIs, has no completed member destructor. Copy assignment frees old before replacement, stale pointer history is nonowning; actual returned pending blocks remain owning. Cold maps and their actual live/pending raw blocks are independently censused, including true BIG fresh-NULL reservation and stopped assignment constant branch.",
-        "Selected constructor helper split preserves existing actual modular/default/body order; Runtime temporary placement records real returned raw blocks and reached header writes. No full imp constructor/destructor credit or fabricated sizeof allocation event."
+        "Selected constructor helper split preserves existing actual modular/default/body order; Runtime temporary placement records real returned raw blocks and reached header writes. No full imp constructor/destructor credit or fabricated sizeof allocation event.",
+        "Skeleton entries/powers/originals use actual Runtime storage; failed constructor transfers actual unconsumed INC fields into charged cold owning-abort records before source backing free. Scoped pointer publications alone own concrete children; stopped source cause retained, separate owning cleanup. Variable helpers own two/one actual embedded uint vectors in one charged stable cold header, views/scopes borrow actual backing and references. Strong shared physical census names pseudo/Power/ExactDiv plus supplied headers/blocks without registry-derived ownership."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -32263,7 +32432,8 @@
         "Source coeff argument evaluation chooses coefficient read before RemoveVariable within allowed C++11 evaluation order. Source active linear Power preserved; #if0 alternative remains unported inventory. Full imp/GCD/PSC and global assertion/TRACE bindings remain open. See PORT_PROGRESS.md.",
         "Selected exact division and graded maxima only: full imp construction, PSC/GCD, source TRACE/global diagnostics and undefined dangling/fresh-NULL source destruction remain open. False GNU release VERIFY reaches a typed unreachable-domain guard; no registered original assertion completion credit. See PORT_PROGRESS.md.",
         "This selected source core omits only separately inventoried ModD specialization; full imp hierarchy, PSC/Lazard/subresultants/resultants/general GCD and registered driver credit remain open. TRACE/CTRACE/printers/global assertion bindings remain separate obligations. Malformed SIZE_T32 release metadata fixture is explicitly source undefined and uses caller restoration only after immediate physical census; no native recovery claim.",
-        "Selected concrete class and ModD methods only: whole polynomial hierarchy, PSC/Lazard/resultants/GCD/global diagnostic and source-driver assertion bindings remain OPEN. Borrowed cold stream interface binds actual NumericTextStream formatting state, no hot per-variable interface fields or decimal-only surrogate. No additional registered source assertion credit; malformed/wrapped source-undefined vector profiles are typed guards, not native recovery claims."
+        "Selected concrete class and ModD methods only: whole polynomial hierarchy, PSC/Lazard/resultants/GCD/global diagnostic and source-driver assertion bindings remain OPEN. Borrowed cold stream interface binds actual NumericTextStream formatting state, no hot per-variable interface fields or decimal-only surrogate. No additional registered source assertion credit; malformed/wrapped source-undefined vector profiles are typed guards, not native recovery claims.",
+        "Selected concrete skeleton canonical order uses heap sort; platform std::sort comparator dispatch order is not claimed. Scalar child IDs encode actual cold object provenance under a fixed Runtime. Cold ownership metadata fully charged and distinct from source malloc events. Whole imp and registered-driver/global diagnostic integration remain open."
       ]
     },
     {
@@ -123951,9 +124121,36 @@
       "path": "src/util/scoped_ptr_vector.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/polynomial_skeleton.go",
+        "mpnum/polynomial_skeleton_test.go",
+        "mpnum/polynomial_skeleton_vector.go",
+        "mpnum/polynomial_skeleton_vector_test.go",
+        "mpnum/polynomial_newton_vector.go",
+        "mpnum/polynomial_newton_source_finalize.go",
+        "mpnum/polynomial_newton_source_finalize_test.go",
+        "mpnum/polynomial_newton_physical_test.go"
+      ],
+      "tests": [
+        "TestPolynomialSkeletonSourceGroupsAndLifetime",
+        "TestPolynomialSkeletonSourcePointerOnlyRead",
+        "TestPolynomialSkeletonConstructorEveryReservation",
+        "TestPolynomialSkeletonSourceDisplay",
+        "TestPolynomialSkeletonSourceDisplayReachedPointer",
+        "TestPolynomialSkeletonSourceInline128Overflow",
+        "TestPolynomialSkeletonSourceUnderlyingVectorGuards",
+        "TestPolynomialSkeletonOverflowConstructorEveryReservation",
+        "TestPolynomialSkeletonVectorSourceOperations",
+        "TestPolynomialSkeletonVectorPushFailureRetainsCaller",
+        "TestPolynomialSkeletonVectorPushEveryReservation",
+        "TestPolynomialSkeletonVectorSetDeleteBeforeColdReplacementRefusal",
+        "TestPolynomialSkeletonVectorOwnerGuards",
+        "TestPolynomialSkeletonVectorSetStoppedChildDestructor",
+        "TestPolynomialNewtonVectorSourceFinalizePrivateBacking",
+        "TestPolynomialNewtonVectorSourceFinalizeLeavesFailedChild",
+        "TestPolynomialNewtonVectorSourceFinalizeStickyPostPhysicalSuffix"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -123972,9 +124169,38 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete polynomial skeleton cpp2958\u20133068 canonical grouping, actual monomial INC/DEC, inline128 overflow and failed ctor member unwind; scoped_ptr_vector<skeleton> complete operations; selected Newton source vector destruction cpp2923\u20132952. TRACE/global stream binding remains open.",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_skeleton.go",
+          "tests": [
+            "TestPolynomialSkeletonSourceGroupsAndLifetime",
+            "TestPolynomialSkeletonSourcePointerOnlyRead",
+            "TestPolynomialSkeletonConstructorEveryReservation",
+            "TestPolynomialSkeletonSourceDisplay",
+            "TestPolynomialSkeletonSourceDisplayReachedPointer",
+            "TestPolynomialSkeletonSourceInline128Overflow",
+            "TestPolynomialSkeletonSourceUnderlyingVectorGuards",
+            "TestPolynomialSkeletonOverflowConstructorEveryReservation",
+            "TestPolynomialSkeletonVectorSourceOperations",
+            "TestPolynomialSkeletonVectorPushFailureRetainsCaller",
+            "TestPolynomialSkeletonVectorPushEveryReservation",
+            "TestPolynomialSkeletonVectorSetDeleteBeforeColdReplacementRefusal",
+            "TestPolynomialSkeletonVectorOwnerGuards",
+            "TestPolynomialSkeletonVectorSetStoppedChildDestructor",
+            "TestPolynomialNewtonVectorSourceFinalizePrivateBacking",
+            "TestPolynomialNewtonVectorSourceFinalizeLeavesFailedChild",
+            "TestPolynomialNewtonVectorSourceFinalizeStickyPostPhysicalSuffix"
+          ]
+        }
+      ],
+      "ownership": [
+        "Skeleton entries/powers/originals use actual Runtime storage; failed constructor transfers actual unconsumed INC fields into charged cold owning-abort records before source backing free. Scoped pointer publications alone own concrete children; stopped source cause retained, separate owning cleanup. Variable helpers own two/one actual embedded uint vectors in one charged stable cold header, views/scopes borrow actual backing and references. Strong shared physical census names pseudo/Power/ExactDiv plus supplied headers/blocks without registry-derived ownership."
+      ],
+      "deviations": [
+        "Selected concrete skeleton canonical order uses heap sort; platform std::sort comparator dispatch order is not claimed. Scalar child IDs encode actual cold object provenance under a fixed Runtime. Cold ownership metadata fully charged and distinct from source malloc events. Whole imp and registered-driver/global diagnostic integration remain open."
+      ]
     },
     {
       "path": "src/util/scoped_timer.cpp",
@@ -128116,7 +128342,20 @@
         "mpnum/polynomial_monomial_positions.go",
         "sat_solver_mus_set.go",
         "mpnum/polynomial_variable_degrees.go",
-        "mpnum/polynomial_variable_degrees_copy.go"
+        "mpnum/polynomial_variable_degrees_copy.go",
+        "mpnum/polynomial_skeleton.go",
+        "mpnum/polynomial_skeleton_test.go",
+        "mpnum/polynomial_skeleton_vector.go",
+        "mpnum/polynomial_skeleton_vector_test.go",
+        "mpnum/polynomial_newton_vector.go",
+        "mpnum/polynomial_newton_source_finalize.go",
+        "mpnum/polynomial_newton_source_finalize_test.go",
+        "mpnum/polynomial_newton_physical_test.go",
+        "mpnum/polynomial_variable_helpers.go",
+        "mpnum/polynomial_variable_helpers_lifetime.go",
+        "mpnum/polynomial_variable_helpers_scoped.go",
+        "mpnum/polynomial_variable_helpers_source_test.go",
+        "mpnum/polynomial_variable_helpers_physical_test.go"
       ],
       "tests": [
         "TestParamDescrsBudgetFailuresAndWarmDuplicate",
@@ -128282,7 +128521,36 @@
         "TestPolynomialVariableDegreesFailedConstructorCarrierRejectsSourceAPI",
         "TestPolynomialVariableDegreesActualNumericStreamFlags",
         "TestPolynomialModDBigCoefficientEveryActualRefusal",
-        "TestPolynomialModDConstantWithStoppedMapAssignmentKeepsActualRoots"
+        "TestPolynomialModDConstantWithStoppedMapAssignmentKeepsActualRoots",
+        "TestPolynomialSkeletonSourceGroupsAndLifetime",
+        "TestPolynomialSkeletonSourcePointerOnlyRead",
+        "TestPolynomialSkeletonConstructorEveryReservation",
+        "TestPolynomialSkeletonSourceDisplay",
+        "TestPolynomialSkeletonSourceDisplayReachedPointer",
+        "TestPolynomialSkeletonSourceInline128Overflow",
+        "TestPolynomialSkeletonSourceUnderlyingVectorGuards",
+        "TestPolynomialSkeletonOverflowConstructorEveryReservation",
+        "TestPolynomialSkeletonVectorSourceOperations",
+        "TestPolynomialSkeletonVectorPushFailureRetainsCaller",
+        "TestPolynomialSkeletonVectorPushEveryReservation",
+        "TestPolynomialSkeletonVectorSetDeleteBeforeColdReplacementRefusal",
+        "TestPolynomialSkeletonVectorOwnerGuards",
+        "TestPolynomialSkeletonVectorSetStoppedChildDestructor",
+        "TestPolynomialNewtonVectorSourceFinalizePrivateBacking",
+        "TestPolynomialNewtonVectorSourceFinalizeLeavesFailedChild",
+        "TestPolynomialNewtonVectorSourceFinalizeStickyPostPhysicalSuffix",
+        "TestPolynomialMaxDegreesIndependentFiniteModelAndRetainedVars",
+        "TestPolynomialVariablePositionsSentinelDuplicateSourceProfiles",
+        "TestScopedPolynomialVariablePositionsCapturedBackingLifetime",
+        "TestScopedPolynomialVariablePositionsFailedConstructorNoReset",
+        "TestPolynomialMaxDegreesFirstSeenReservationPrefixesAndFailedScope",
+        "TestPolynomialVariablePositionsEveryReservationKeepsOldSizeUntilFill",
+        "TestPolynomialVariableHelperImplicitCopyMoveAndScopedCopies",
+        "TestPolynomialVariableHelperScopedReachedResetPrefix",
+        "TestPolynomialMaxDegreesCopyConstructorCompletedMemberUnwind",
+        "TestPolynomialMaxDegreesCopyConstructorTLSIncompleteSecondRoot",
+        "TestPolynomialVariableHelperWarmAndColdOwnerGuards",
+        "TestPolynomialMaxDegreesStoppedSourceDestructorAndOwningAbort"
       ],
       "conditionals": [
         {
@@ -128625,6 +128893,49 @@
             "TestPolynomialModDBigCoefficientEveryActualRefusal",
             "TestPolynomialModDConstantWithStoppedMapAssignmentKeepsActualRoots"
           ]
+        },
+        {
+          "name": "Concrete polynomial skeleton cpp2958\u20133068 canonical grouping, actual monomial INC/DEC, inline128 overflow and failed ctor member unwind; scoped_ptr_vector<skeleton> complete operations; selected Newton source vector destruction cpp2923\u20132952. TRACE/global stream binding remains open.",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_skeleton.go",
+          "tests": [
+            "TestPolynomialSkeletonSourceGroupsAndLifetime",
+            "TestPolynomialSkeletonSourcePointerOnlyRead",
+            "TestPolynomialSkeletonConstructorEveryReservation",
+            "TestPolynomialSkeletonSourceDisplay",
+            "TestPolynomialSkeletonSourceDisplayReachedPointer",
+            "TestPolynomialSkeletonSourceInline128Overflow",
+            "TestPolynomialSkeletonSourceUnderlyingVectorGuards",
+            "TestPolynomialSkeletonOverflowConstructorEveryReservation",
+            "TestPolynomialSkeletonVectorSourceOperations",
+            "TestPolynomialSkeletonVectorPushFailureRetainsCaller",
+            "TestPolynomialSkeletonVectorPushEveryReservation",
+            "TestPolynomialSkeletonVectorSetDeleteBeforeColdReplacementRefusal",
+            "TestPolynomialSkeletonVectorOwnerGuards",
+            "TestPolynomialSkeletonVectorSetStoppedChildDestructor",
+            "TestPolynomialNewtonVectorSourceFinalizePrivateBacking",
+            "TestPolynomialNewtonVectorSourceFinalizeLeavesFailedChild",
+            "TestPolynomialNewtonVectorSourceFinalizeStickyPostPhysicalSuffix"
+          ]
+        },
+        {
+          "name": "Selected complete var_max_degree/scoped_var_max_degree cpp6179\u20136232 and var_pos/scoped_var_pos cpp6307\u20136344: reached source reads, all-expansion filled resize, actual embedded vector copy/move and scoped destruction; full imp composition remains open",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_variable_helpers.go",
+          "tests": [
+            "TestPolynomialMaxDegreesIndependentFiniteModelAndRetainedVars",
+            "TestPolynomialVariablePositionsSentinelDuplicateSourceProfiles",
+            "TestScopedPolynomialVariablePositionsCapturedBackingLifetime",
+            "TestScopedPolynomialVariablePositionsFailedConstructorNoReset",
+            "TestPolynomialMaxDegreesFirstSeenReservationPrefixesAndFailedScope",
+            "TestPolynomialVariablePositionsEveryReservationKeepsOldSizeUntilFill",
+            "TestPolynomialVariableHelperImplicitCopyMoveAndScopedCopies",
+            "TestPolynomialVariableHelperScopedReachedResetPrefix",
+            "TestPolynomialMaxDegreesCopyConstructorCompletedMemberUnwind",
+            "TestPolynomialMaxDegreesCopyConstructorTLSIncompleteSecondRoot",
+            "TestPolynomialVariableHelperWarmAndColdOwnerGuards",
+            "TestPolynomialMaxDegreesStoppedSourceDestructorAndOwningAbort"
+          ]
         }
       ],
       "ownership": [
@@ -128636,7 +128947,8 @@
         "Model class-copy owns exact-capacity outer and deep nested literal vectors. Assignment destroys destination ascending before copy, publishes source size/capacity before constructors and retains completed prefixes; safe Go cleanup/restart tracks actual constructed roots. See PORT_PROGRESS.md#audit-sat-model-copy-port-status-md.",
         "Isolation uses charged concrete binary output vectors and lexical coefficient/frame backings; actual initialized extents and source ascending/reverse destruction orders are retained. Refusal/cancellation tests audit real output and manager cells/Words before fault disabling. See PORT_PROGRESS.md#audit-upolynomial-root-isolation-packet-md; allocator/backend integration remains open.",
         "Assignment bytes and initialization state are owned solely by the borrowed real Runtime, with source vector capacity/size headers and explicit block/pending tokens; enclosing variable owner charges embedded metadata. Variable graph Stats exclude borrowed runtime, which physical audits add exactly once. Runtime must outlive variable/propagation owners, which require the same actual Runtime identity.",
-        "MonomialPositions charges its actual cold header once and owns one real unsigned32 Runtime vector. Manager/monomials are borrowed. SourceFinalize frees only published member bytes; owning CloseChecked additionally drains actual unreturned pending malloc and physically short ILP32 changed-token blocks without counter repair."
+        "MonomialPositions charges its actual cold header once and owns one real unsigned32 Runtime vector. Manager/monomials are borrowed. SourceFinalize frees only published member bytes; owning CloseChecked additionally drains actual unreturned pending malloc and physically short ILP32 changed-token blocks without counter repair.",
+        "Skeleton entries/powers/originals use actual Runtime storage; failed constructor transfers actual unconsumed INC fields into charged cold owning-abort records before source backing free. Scoped pointer publications alone own concrete children; stopped source cause retained, separate owning cleanup. Variable helpers own two/one actual embedded uint vectors in one charged stable cold header, views/scopes borrow actual backing and references. Strong shared physical census names pseudo/Power/ExactDiv plus supplied headers/blocks without registry-derived ownership."
       ],
       "deviations": [
         "Concrete solver-specific storage, not complete generic vector template surface. Owning model Clone/Assign, other specializations and source-undefined continuation behavior remain explicitly separate.",
@@ -128646,7 +128958,8 @@
         "Owning reads and checked scalar lifetimes are Go adapters. Full-capacity guard rejects undersized source wrapped allocations after separate literal uint32 growth checks; raw allocation/header publication for that undefined domain is not represented. Multivariate conversion, factorization, algebraic consumers, full printers/TRACE and nonselected alternatives remain open.",
         "Only assignment char_vector source allocation accounting is integrated in this slice. Other SAT columns/watch/queue/clause/trail/vector allocations still require real global/runtime source hooks. Raw-state bounds/initialization guards act at endangered byte accesses; source DEBUG logical assertions remain distinct. No full solver construction/search or registered assertion completion is claimed.",
         "Actual polynomial imp template overload consumers remain open; concrete borrowed array loops preserve only the template iteration body. Runtime handles replace raw pointer ABI. Source invalid-memory continuation is guarded explicitly. No registered source assertion completion credit.",
-        "copy_core sizeof(T) uses actual source size_t width before Runtime call, while expansion retains unsigned32 source extent arithmetic. Oversized capacity/zero-size Runtime32 proof is a malformed source-domain prefix, not valid OOM or a large vector claim."
+        "copy_core sizeof(T) uses actual source size_t width before Runtime call, while expansion retains unsigned32 source extent arithmetic. Oversized capacity/zero-size Runtime32 proof is a malformed source-domain prefix, not valid OOM or a large vector claim.",
+        "Selected concrete skeleton canonical order uses heap sort; platform std::sort comparator dispatch order is not claimed. Scalar child IDs encode actual cold object provenance under a fixed Runtime. Cold ownership metadata fully charged and distinct from source malloc events. Whole imp and registered-driver/global diagnostic integration remain open."
       ]
     },
     {

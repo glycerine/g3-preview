@@ -16,6 +16,9 @@ func polynomialNewtonPhysicalAudit(t *testing.T, m *MultivariatePolynomialCore, 
 }
 
 func polynomialNewtonPhysicalWithRaw(t *testing.T, m *MultivariatePolynomialCore, owners []*PolynomialNewtonInterpolator, references []*PolynomialRef, refvectors []*PolynomialRefVector, lazy []*PolynomialNewtonVector, polys []Polynomial, handlers []*PolynomialDeletionHandler, external []memory.Block, public ...*Int) {
+	polynomialNewtonPhysicalWithExtra(t, m, owners, references, refvectors, lazy, polys, handlers, external, 0, public...)
+}
+func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCore, owners []*PolynomialNewtonInterpolator, references []*PolynomialRef, refvectors []*PolynomialRefVector, lazy []*PolynomialNewtonVector, polys []Polynomial, handlers []*PolynomialDeletionHandler, external []memory.Block, adapterBytes uint64, public ...*Int) {
 	t.Helper()
 	z := m.integer
 	refs := map[numericCellRef]bool{}
@@ -70,7 +73,7 @@ func polynomialNewtonPhysicalWithRaw(t *testing.T, m *MultivariatePolynomialCore
 		cell(m.pending.value, l.initializedCoefficients)
 	}
 	vectors := []*polynomialVector{&m.rationalTerms, &m.linearTerms, &m.linearMonomials, &m.polynomials}
-	extraBytes := uint64(0)
+	extraBytes := adapterBytes
 	addPolynomial := func(p Polynomial) {
 		if p == (Polynomial{}) {
 			return
