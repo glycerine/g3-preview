@@ -89014,7 +89014,8 @@
       "role": "test",
       "status": "partial",
       "go_targets": [
-        "bitset/fixed_bit_vector.go"
+        "bitset/fixed_bit_vector.go",
+        "util_fixed_bit_vector_runtime_registered_test.go"
       ],
       "tests": [
         "TestFixedSourceTst1",
@@ -89024,7 +89025,8 @@
         "TestFixedOwnershipAndLifetime",
         "TestFixedSourceHash",
         "TestFixedBoundedOracle",
-        "TestFixedBudgetsAndReuse"
+        "TestFixedBudgetsAndReuse",
+        "TestFixedBitVectorRuntimeRegisteredAssertions"
       ],
       "assertions": [
         {
@@ -89176,12 +89178,22 @@
             "TestFixedBoundedOracle",
             "TestFixedBudgetsAndReuse"
           ]
+        },
+        {
+          "name": "Registered tst1/or/eq source14 ENSURE sites and62 dynamic expressions; tst_and empty, native ostream not completed",
+          "status": "partial",
+          "go_target": "util_fixed_bit_vector_runtime_registered_test.go",
+          "tests": [
+            "TestFixedBitVectorRuntimeRegisteredAssertions"
+          ]
         }
       ],
       "ownership": [
         "Manager owns pooled fixed-width word descriptors and embedded zero root. Explicit Clone/Assign/Deallocate/Reset/Close. Source allocator replaced by arena; full named method ledger is in PORT_PROGRESS.md#audit-bitset-port-status-md."
       ],
-      "deviations": []
+      "deviations": [
+        "Registered source assertions translated through concrete Runtime binding. Additional native ostream/global diagnostic obligations remain open; utility consumer methods are attributed to their production units, not credited as source driver algorithms."
+      ]
     },
     {
       "path": "src/test/for_each_file.cpp",
@@ -101652,7 +101664,14 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "bitset/fixed_bit_vector.go"
+        "bitset/fixed_bit_vector.go",
+        "util_fixed_bit_vector_runtime.go",
+        "util_fixed_bit_vector_runtime_ops.go",
+        "util_fixed_bit_vector_runtime_view.go",
+        "util_fixed_bit_vector_runtime_registered_test.go",
+        "util_fixed_bit_vector_runtime_source_test.go",
+        "util_fixed_bit_vector_runtime_lifetime_test.go",
+        "util_fixed_bit_vector_runtime_view_test.go"
       ],
       "tests": [
         "TestFixedSourceTst1",
@@ -101662,7 +101681,29 @@
         "TestFixedOwnershipAndLifetime",
         "TestFixedSourceHash",
         "TestFixedBoundedOracle",
-        "TestFixedBudgetsAndReuse"
+        "TestFixedBudgetsAndReuse",
+        "TestFixedBitVectorRuntimeRegisteredAssertions",
+        "TestFixedBitVectorRuntimeIndependentWorldsAndRange",
+        "TestFixedBitVectorRuntimeUninitializedInlineAndUnsignedWrap",
+        "TestFixedBitVectorRuntimeAllocateCopyRetainsReachedCandidate",
+        "TestFixedBitVectorRuntimeEveryActualAllocationRefusal",
+        "TestFixedBitVectorRuntimeHashAndDisplayPrefixes",
+        "TestFixedBitVectorRuntimePaddingMasksResetValueAndShortCircuits",
+        "TestFixedBitVectorRuntimePooledEveryActualRefusalAndFreelistBytes",
+        "TestFixedBitVectorRuntimeRealProfilesResetAndCapturedLifetime",
+        "TestFixedBitVectorRuntimeDirectPostCloseCallerAndProvider",
+        "TestFixedBitVectorRuntimeActualDiagnosticStopOwningAcknowledgment",
+        "TestFixedBitVectorRuntimeColdCopyForeignAndWarmPlateau",
+        "TestFixedBitVectorRuntimeActualTLSUnpublishedAllocationRoot",
+        "TestFixedBitVectorRuntimeActualPostPhysicalDirectDeallocation",
+        "TestFixedBitVectorRuntimeBorrowedForeignDestinationAndQueries",
+        "TestFixedBitVectorRuntimeBorrowedReceiverAssertionsAndUnusedViews",
+        "TestFixedBitVectorRuntimeBorrowedCopyActualExtentPrefix",
+        "TestFixedBitVectorRuntimeBorrowedInlineActualColdHash",
+        "TestFixedBitVectorRuntimeForeignInlineFillInitializesActualBytes",
+        "TestFixedBitVectorRuntimeForeignInlinePartialCopyByteInitialization",
+        "TestFixedBitVectorRuntimeCapturedDirectViewAfterDonorClose",
+        "TestFixedBitVectorRuntimeRawAddressIdentityBeforePayloadReads"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -101756,12 +101797,44 @@
             "TestFixedBoundedOracle",
             "TestFixedBudgetsAndReuse"
           ]
+        },
+        {
+          "name": "Concrete Runtime fixed-bit-vector selected source bodies, reached receiver word/byte loops, raw address equality, actual cold m0 and source allocator destruction; foreign raw-pointer deallocation still OPEN",
+          "status": "partial",
+          "go_target": "util_fixed_bit_vector_runtime.go",
+          "tests": [
+            "TestFixedBitVectorRuntimeRegisteredAssertions",
+            "TestFixedBitVectorRuntimeIndependentWorldsAndRange",
+            "TestFixedBitVectorRuntimeUninitializedInlineAndUnsignedWrap",
+            "TestFixedBitVectorRuntimeAllocateCopyRetainsReachedCandidate",
+            "TestFixedBitVectorRuntimeEveryActualAllocationRefusal",
+            "TestFixedBitVectorRuntimeHashAndDisplayPrefixes",
+            "TestFixedBitVectorRuntimePaddingMasksResetValueAndShortCircuits",
+            "TestFixedBitVectorRuntimePooledEveryActualRefusalAndFreelistBytes",
+            "TestFixedBitVectorRuntimeRealProfilesResetAndCapturedLifetime",
+            "TestFixedBitVectorRuntimeDirectPostCloseCallerAndProvider",
+            "TestFixedBitVectorRuntimeActualDiagnosticStopOwningAcknowledgment",
+            "TestFixedBitVectorRuntimeColdCopyForeignAndWarmPlateau",
+            "TestFixedBitVectorRuntimeActualTLSUnpublishedAllocationRoot",
+            "TestFixedBitVectorRuntimeActualPostPhysicalDirectDeallocation",
+            "TestFixedBitVectorRuntimeBorrowedForeignDestinationAndQueries",
+            "TestFixedBitVectorRuntimeBorrowedReceiverAssertionsAndUnusedViews",
+            "TestFixedBitVectorRuntimeBorrowedCopyActualExtentPrefix",
+            "TestFixedBitVectorRuntimeBorrowedInlineActualColdHash",
+            "TestFixedBitVectorRuntimeForeignInlineFillInitializesActualBytes",
+            "TestFixedBitVectorRuntimeForeignInlinePartialCopyByteInitialization",
+            "TestFixedBitVectorRuntimeCapturedDirectViewAfterDonorClose",
+            "TestFixedBitVectorRuntimeRawAddressIdentityBeforePayloadReads"
+          ]
         }
       ],
       "ownership": [
-        "Manager owns pooled fixed-width word descriptors and embedded zero root. Explicit Clone/Assign/Deallocate/Reset/Close. Source allocator replaced by arena; full named method ledger is in PORT_PROGRESS.md#audit-bitset-port-status-md."
+        "Manager owns pooled fixed-width word descriptors and embedded zero root. Explicit Clone/Assign/Deallocate/Reset/Close. Source allocator replaced by arena; full named method ledger is in PORT_PROGRESS.md#audit-bitset-port-status-md.",
+        "Actual Runtime unsigned payload; scalar checked location/provenance acquired on allocation, concrete nonowning operand views and raw captured Runtime/block/offset lifetime. Inline cold m0 has actual per-byte initialization mask; no shadow arrays. Explicit direct caller allocations outlive allocator destruction, pooled chunks do not. Source destructor keeps first stop; explicit owning abort uses actual child pending/cursor/completed receipt, not statistics or registry-derived authority."
       ],
-      "deviations": []
+      "deviations": [
+        "Registered62 dynamic assertions and24 new total Runtime/hash groups cover selected profiles and every real reservation prefix. Existing checked Deallocate handles originating manager only. Source-defined foreign direct and pooled pointer deallocation, receiver counter/borrowed freelist behavior require an actual allocator raw facade and remain OPEN; ReleaseDirect is caller raw Runtime action, not a replacement for manager deallocate. Native pointer/ABI/global assertions/TRACE/ostream and remaining lifetime domains remain partial."
+      ]
     },
     {
       "path": "src/util/fixed_bit_vector.h",
@@ -101769,7 +101842,14 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "bitset/fixed_bit_vector.go"
+        "bitset/fixed_bit_vector.go",
+        "util_fixed_bit_vector_runtime.go",
+        "util_fixed_bit_vector_runtime_ops.go",
+        "util_fixed_bit_vector_runtime_view.go",
+        "util_fixed_bit_vector_runtime_registered_test.go",
+        "util_fixed_bit_vector_runtime_source_test.go",
+        "util_fixed_bit_vector_runtime_lifetime_test.go",
+        "util_fixed_bit_vector_runtime_view_test.go"
       ],
       "tests": [
         "TestFixedSourceTst1",
@@ -101779,7 +101859,29 @@
         "TestFixedOwnershipAndLifetime",
         "TestFixedSourceHash",
         "TestFixedBoundedOracle",
-        "TestFixedBudgetsAndReuse"
+        "TestFixedBudgetsAndReuse",
+        "TestFixedBitVectorRuntimeRegisteredAssertions",
+        "TestFixedBitVectorRuntimeIndependentWorldsAndRange",
+        "TestFixedBitVectorRuntimeUninitializedInlineAndUnsignedWrap",
+        "TestFixedBitVectorRuntimeAllocateCopyRetainsReachedCandidate",
+        "TestFixedBitVectorRuntimeEveryActualAllocationRefusal",
+        "TestFixedBitVectorRuntimeHashAndDisplayPrefixes",
+        "TestFixedBitVectorRuntimePaddingMasksResetValueAndShortCircuits",
+        "TestFixedBitVectorRuntimePooledEveryActualRefusalAndFreelistBytes",
+        "TestFixedBitVectorRuntimeRealProfilesResetAndCapturedLifetime",
+        "TestFixedBitVectorRuntimeDirectPostCloseCallerAndProvider",
+        "TestFixedBitVectorRuntimeActualDiagnosticStopOwningAcknowledgment",
+        "TestFixedBitVectorRuntimeColdCopyForeignAndWarmPlateau",
+        "TestFixedBitVectorRuntimeActualTLSUnpublishedAllocationRoot",
+        "TestFixedBitVectorRuntimeActualPostPhysicalDirectDeallocation",
+        "TestFixedBitVectorRuntimeBorrowedForeignDestinationAndQueries",
+        "TestFixedBitVectorRuntimeBorrowedReceiverAssertionsAndUnusedViews",
+        "TestFixedBitVectorRuntimeBorrowedCopyActualExtentPrefix",
+        "TestFixedBitVectorRuntimeBorrowedInlineActualColdHash",
+        "TestFixedBitVectorRuntimeForeignInlineFillInitializesActualBytes",
+        "TestFixedBitVectorRuntimeForeignInlinePartialCopyByteInitialization",
+        "TestFixedBitVectorRuntimeCapturedDirectViewAfterDonorClose",
+        "TestFixedBitVectorRuntimeRawAddressIdentityBeforePayloadReads"
       ],
       "conditionals": [
         {
@@ -101901,12 +102003,44 @@
             "TestFixedBoundedOracle",
             "TestFixedBudgetsAndReuse"
           ]
+        },
+        {
+          "name": "Concrete Runtime fixed-bit-vector selected source bodies, reached receiver word/byte loops, raw address equality, actual cold m0 and source allocator destruction; foreign raw-pointer deallocation still OPEN",
+          "status": "partial",
+          "go_target": "util_fixed_bit_vector_runtime.go",
+          "tests": [
+            "TestFixedBitVectorRuntimeRegisteredAssertions",
+            "TestFixedBitVectorRuntimeIndependentWorldsAndRange",
+            "TestFixedBitVectorRuntimeUninitializedInlineAndUnsignedWrap",
+            "TestFixedBitVectorRuntimeAllocateCopyRetainsReachedCandidate",
+            "TestFixedBitVectorRuntimeEveryActualAllocationRefusal",
+            "TestFixedBitVectorRuntimeHashAndDisplayPrefixes",
+            "TestFixedBitVectorRuntimePaddingMasksResetValueAndShortCircuits",
+            "TestFixedBitVectorRuntimePooledEveryActualRefusalAndFreelistBytes",
+            "TestFixedBitVectorRuntimeRealProfilesResetAndCapturedLifetime",
+            "TestFixedBitVectorRuntimeDirectPostCloseCallerAndProvider",
+            "TestFixedBitVectorRuntimeActualDiagnosticStopOwningAcknowledgment",
+            "TestFixedBitVectorRuntimeColdCopyForeignAndWarmPlateau",
+            "TestFixedBitVectorRuntimeActualTLSUnpublishedAllocationRoot",
+            "TestFixedBitVectorRuntimeActualPostPhysicalDirectDeallocation",
+            "TestFixedBitVectorRuntimeBorrowedForeignDestinationAndQueries",
+            "TestFixedBitVectorRuntimeBorrowedReceiverAssertionsAndUnusedViews",
+            "TestFixedBitVectorRuntimeBorrowedCopyActualExtentPrefix",
+            "TestFixedBitVectorRuntimeBorrowedInlineActualColdHash",
+            "TestFixedBitVectorRuntimeForeignInlineFillInitializesActualBytes",
+            "TestFixedBitVectorRuntimeForeignInlinePartialCopyByteInitialization",
+            "TestFixedBitVectorRuntimeCapturedDirectViewAfterDonorClose",
+            "TestFixedBitVectorRuntimeRawAddressIdentityBeforePayloadReads"
+          ]
         }
       ],
       "ownership": [
-        "Manager owns pooled fixed-width word descriptors and embedded zero root. Explicit Clone/Assign/Deallocate/Reset/Close. Source allocator replaced by arena; full named method ledger is in PORT_PROGRESS.md#audit-bitset-port-status-md."
+        "Manager owns pooled fixed-width word descriptors and embedded zero root. Explicit Clone/Assign/Deallocate/Reset/Close. Source allocator replaced by arena; full named method ledger is in PORT_PROGRESS.md#audit-bitset-port-status-md.",
+        "Actual Runtime unsigned payload; scalar checked location/provenance acquired on allocation, concrete nonowning operand views and raw captured Runtime/block/offset lifetime. Inline cold m0 has actual per-byte initialization mask; no shadow arrays. Explicit direct caller allocations outlive allocator destruction, pooled chunks do not. Source destructor keeps first stop; explicit owning abort uses actual child pending/cursor/completed receipt, not statistics or registry-derived authority."
       ],
-      "deviations": []
+      "deviations": [
+        "Registered62 dynamic assertions and24 new total Runtime/hash groups cover selected profiles and every real reservation prefix. Existing checked Deallocate handles originating manager only. Source-defined foreign direct and pooled pointer deallocation, receiver counter/borrowed freelist behavior require an actual allocator raw facade and remain OPEN; ReleaseDirect is caller raw Runtime action, not a replacement for manager deallocate. Native pointer/ABI/global assertions/TRACE/ostream and remaining lifetime domains remain partial."
+      ]
     },
     {
       "path": "src/util/gparams.cpp",
@@ -102188,13 +102322,17 @@
       "go_targets": [
         "utilhash/hash.go",
         "utilhash/runtime_bytes.go",
-        "utilhash/runtime_bytes_test.go"
+        "utilhash/runtime_bytes_test.go",
+        "utilhash/runtime_bytes_bounded.go",
+        "utilhash/runtime_bytes_bounded_test.go"
       ],
       "tests": [
         "TestSourceHashVectors",
         "TestCompositeVisitOrder",
         "TestRuntimeBytesSourceLengthAndSignedTail",
-        "TestRuntimeBytesReachedDescendingTailRead"
+        "TestRuntimeBytesReachedDescendingTailRead",
+        "TestRuntimeBytesBoundedActualReachedLoads",
+        "TestInlineWordBytesActualColdAndReadOrder"
       ],
       "assertions": [
         {
@@ -102276,10 +102414,20 @@
             "TestRuntimeBytesSourceLengthAndSignedTail",
             "TestRuntimeBytesReachedDescendingTailRead"
           ]
+        },
+        {
+          "name": "Shared concrete Runtime bounded/unbounded and actual cold inline-word source string_hash engine; bounds and initialization checked only at reached loads",
+          "status": "partial",
+          "go_target": "utilhash/runtime_bytes_bounded.go",
+          "tests": [
+            "TestRuntimeBytesBoundedActualReachedLoads",
+            "TestInlineWordBytesActualColdAndReadOrder"
+          ]
         }
       ],
       "ownership": [
-        "No retained caller data; baseline little-endian/signed-char policy explicit. Generic hash-table/container functors not yet audited; see PORT_PROGRESS.md#audit-utilhash-port-status-md."
+        "No retained caller data; baseline little-endian/signed-char policy explicit. Generic hash-table/container functors not yet audited; see PORT_PROGRESS.md#audit-utilhash-port-status-md.",
+        "Call-local concrete reader borrows Runtime/block/offset/requested extent or the actual cold word and initialization mask; zero length touches no provider. Actual source12-byte loops and descending signed-char tails share the same engine; no copied byte buffer."
       ],
       "deviations": [
         "Selected little-endian/signed-char source profile; global/other ABI transport remains open."
