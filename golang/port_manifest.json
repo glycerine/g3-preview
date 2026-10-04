@@ -87018,7 +87018,13 @@
       "role": "test",
       "status": "partial",
       "go_targets": [
-        "bitset/bit_vector.go"
+        "bitset/bit_vector.go",
+        "util_bit_vector_runtime_lifetime_test.go",
+        "util_bit_vector_runtime_registered_test.go",
+        "util_bit_vector_runtime_source_test.go",
+        "util_bit_vector_runtime_test.go",
+        "util_fr_bit_vector_runtime_source_test.go",
+        "util_bit_vector_runtime_query_source_test.go"
       ],
       "tests": [
         "TestSourceResizeCrash",
@@ -87026,7 +87032,33 @@
         "TestSourceAnd",
         "TestSourceReset",
         "TestSourceEq",
-        "TestBoundedOperationOracle"
+        "TestBoundedOperationOracle",
+        "TestBitVectorRuntimeHashCutoffAndEveryStreamPrefix",
+        "TestBitVectorRuntimeDistinctProviderSwapFieldsAndColdGuards",
+        "TestBitVectorRuntimeWarmZeroAllocAndPhysicalPlateau",
+        "TestBitVectorRuntimeCapturedRawSpanConstructor",
+        "TestBitVectorRuntimeRegisteredOrAndEquality",
+        "TestBitVectorRuntimeRawLayoutUnsignedAndNullAssignment",
+        "TestBitVectorRuntimeIncompleteConstructorHasNoSourceDestructor",
+        "TestBitVectorRuntimeEveryActualRefusal",
+        "TestBitVectorRuntimeReleaseLogicalGuardsAndScalarReads",
+        "TestBitVectorRuntimeSourceDestructorPostPhysicalAndOwningAbort",
+        "TestBitVectorRuntimeAllLiteralScalarAndBoundaryRoutes",
+        "TestBitVectorRuntimeSizeTRequestsAndReachedWrappedExpansion",
+        "TestBitVectorRuntimeColdSelfZeroAndClosedGuards",
+        "TestBitVectorRuntimeTLSConstructorPendingActualHeaderCleanup",
+        "TestBitVectorRuntimeSignedRawConstructorWrappedZeroWords",
+        "TestBitVectorRuntimeRegisteredCrashAndReset",
+        "TestBitVectorRuntimeIndependentWorldsAndShift",
+        "TestBitVectorRuntimePushPublishesBitsBeforeAllocation",
+        "TestFastResetBitVectorRuntimeSourceListBeforeBase",
+        "TestBitVectorRuntimeUnequalLengthsIndependentWordBoundaries",
+        "TestFastResetBitVectorRuntimeCopyAssignmentAndEveryRefusal",
+        "TestFastResetBitVectorRuntimeSelfAssignmentSourceMemberGuard",
+        "TestFastResetBitVectorRuntimeReverseMemberDestructorStop",
+        "TestFastResetBitVectorRuntimeFailedAssignmentStillReachesSourceDestructor",
+        "TestBitVectorRuntimeScalarAndZeroHashAfterActualTLSPushRefusal",
+        "TestBitVectorRuntimeScalarAndReachedHashAfterDestructiveAssignRefusal"
       ],
       "assertions": [
         {
@@ -87228,11 +87260,47 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Registered crash/shift/or/and/reset/equality driver: 36 active ENSURE sites, 7255 dynamic expressions; source early return leaves tst1/tst2 inactive",
+          "status": "partial",
+          "go_target": "util_bit_vector_runtime_registered_test.go",
+          "tests": [
+            "TestBitVectorRuntimeHashCutoffAndEveryStreamPrefix",
+            "TestBitVectorRuntimeDistinctProviderSwapFieldsAndColdGuards",
+            "TestBitVectorRuntimeWarmZeroAllocAndPhysicalPlateau",
+            "TestBitVectorRuntimeCapturedRawSpanConstructor",
+            "TestBitVectorRuntimeRegisteredOrAndEquality",
+            "TestBitVectorRuntimeRawLayoutUnsignedAndNullAssignment",
+            "TestBitVectorRuntimeIncompleteConstructorHasNoSourceDestructor",
+            "TestBitVectorRuntimeEveryActualRefusal",
+            "TestBitVectorRuntimeReleaseLogicalGuardsAndScalarReads",
+            "TestBitVectorRuntimeSourceDestructorPostPhysicalAndOwningAbort",
+            "TestBitVectorRuntimeAllLiteralScalarAndBoundaryRoutes",
+            "TestBitVectorRuntimeSizeTRequestsAndReachedWrappedExpansion",
+            "TestBitVectorRuntimeColdSelfZeroAndClosedGuards",
+            "TestBitVectorRuntimeTLSConstructorPendingActualHeaderCleanup",
+            "TestBitVectorRuntimeSignedRawConstructorWrappedZeroWords",
+            "TestBitVectorRuntimeRegisteredCrashAndReset",
+            "TestBitVectorRuntimeIndependentWorldsAndShift",
+            "TestBitVectorRuntimePushPublishesBitsBeforeAllocation",
+            "TestFastResetBitVectorRuntimeSourceListBeforeBase",
+            "TestBitVectorRuntimeUnequalLengthsIndependentWordBoundaries",
+            "TestFastResetBitVectorRuntimeCopyAssignmentAndEveryRefusal",
+            "TestFastResetBitVectorRuntimeSelfAssignmentSourceMemberGuard",
+            "TestFastResetBitVectorRuntimeReverseMemberDestructorStop",
+            "TestFastResetBitVectorRuntimeFailedAssignmentStillReachesSourceDestructor",
+            "TestBitVectorRuntimeScalarAndZeroHashAfterActualTLSPushRefusal",
+            "TestBitVectorRuntimeScalarAndReachedHashAfterDestructiveAssignRefusal"
+          ]
+        }
+      ],
       "ownership": [
         "Vector owns word storage; Clone/Assign copy, Swap transfers, source growth and stale bits retained. Full audit and test mapping pending package report."
       ],
-      "deviations": []
+      "deviations": [
+        "Independent 1024 same-size worlds and 49 unequal-length pairs supplement selected source assertions; inactive tst1/tst2 are not credited."
+      ]
     },
     {
       "path": "src/test/bits.cpp",
@@ -98478,7 +98546,16 @@
         "ast_mark_fast.go",
         "ast_mark_node.go",
         "ast_mark_scoped.go",
-        "bitset/bit_vector.go"
+        "bitset/bit_vector.go",
+        "util_bit_vector_runtime.go",
+        "util_bit_vector_runtime_lifetime_test.go",
+        "util_bit_vector_runtime_ops.go",
+        "util_bit_vector_runtime_registered_test.go",
+        "util_bit_vector_runtime_source_test.go",
+        "util_bit_vector_runtime_test.go",
+        "util_fr_bit_vector_runtime.go",
+        "util_fr_bit_vector_runtime_source_test.go",
+        "util_bit_vector_runtime_query_source_test.go"
       ],
       "tests": [
         "TestASTMarkAllNodeKindsIndependentBitOracleAndWarmPlateau",
@@ -98502,7 +98579,33 @@
         "TestSourceEq",
         "TestSourceOr",
         "TestSourceReset",
-        "TestSourceResizeCrash"
+        "TestSourceResizeCrash",
+        "TestBitVectorRuntimeHashCutoffAndEveryStreamPrefix",
+        "TestBitVectorRuntimeDistinctProviderSwapFieldsAndColdGuards",
+        "TestBitVectorRuntimeWarmZeroAllocAndPhysicalPlateau",
+        "TestBitVectorRuntimeCapturedRawSpanConstructor",
+        "TestBitVectorRuntimeRegisteredOrAndEquality",
+        "TestBitVectorRuntimeRawLayoutUnsignedAndNullAssignment",
+        "TestBitVectorRuntimeIncompleteConstructorHasNoSourceDestructor",
+        "TestBitVectorRuntimeEveryActualRefusal",
+        "TestBitVectorRuntimeReleaseLogicalGuardsAndScalarReads",
+        "TestBitVectorRuntimeSourceDestructorPostPhysicalAndOwningAbort",
+        "TestBitVectorRuntimeAllLiteralScalarAndBoundaryRoutes",
+        "TestBitVectorRuntimeSizeTRequestsAndReachedWrappedExpansion",
+        "TestBitVectorRuntimeColdSelfZeroAndClosedGuards",
+        "TestBitVectorRuntimeTLSConstructorPendingActualHeaderCleanup",
+        "TestBitVectorRuntimeSignedRawConstructorWrappedZeroWords",
+        "TestBitVectorRuntimeRegisteredCrashAndReset",
+        "TestBitVectorRuntimeIndependentWorldsAndShift",
+        "TestBitVectorRuntimePushPublishesBitsBeforeAllocation",
+        "TestFastResetBitVectorRuntimeSourceListBeforeBase",
+        "TestBitVectorRuntimeUnequalLengthsIndependentWordBoundaries",
+        "TestFastResetBitVectorRuntimeCopyAssignmentAndEveryRefusal",
+        "TestFastResetBitVectorRuntimeSelfAssignmentSourceMemberGuard",
+        "TestFastResetBitVectorRuntimeReverseMemberDestructorStop",
+        "TestFastResetBitVectorRuntimeFailedAssignmentStillReachesSourceDestructor",
+        "TestBitVectorRuntimeScalarAndZeroHashAfterActualTLSPushRefusal",
+        "TestBitVectorRuntimeScalarAndReachedHashAfterDestructiveAssignRefusal"
       ],
       "conditionals": [
         {
@@ -98557,14 +98660,65 @@
             "TestASTMarkScopedNestedScopesAndFlagRoute",
             "TestASTMarkUnsignedWrapPhysicalContinuationGuard"
           ]
+        },
+        {
+          "name": "Concrete Runtime bit_vector/fr_bit_vector selected source bodies, physical source lifetime and separate owning abort; completed-object scalar queries and reached-byte hash after body refusal",
+          "status": "partial",
+          "go_target": "util_bit_vector_runtime.go",
+          "tests": [
+            "TestBitVectorRuntimeHashCutoffAndEveryStreamPrefix",
+            "TestBitVectorRuntimeDistinctProviderSwapFieldsAndColdGuards",
+            "TestBitVectorRuntimeWarmZeroAllocAndPhysicalPlateau",
+            "TestBitVectorRuntimeCapturedRawSpanConstructor",
+            "TestBitVectorRuntimeRegisteredOrAndEquality",
+            "TestBitVectorRuntimeRawLayoutUnsignedAndNullAssignment",
+            "TestBitVectorRuntimeIncompleteConstructorHasNoSourceDestructor",
+            "TestBitVectorRuntimeEveryActualRefusal",
+            "TestBitVectorRuntimeReleaseLogicalGuardsAndScalarReads",
+            "TestBitVectorRuntimeSourceDestructorPostPhysicalAndOwningAbort",
+            "TestBitVectorRuntimeAllLiteralScalarAndBoundaryRoutes",
+            "TestBitVectorRuntimeSizeTRequestsAndReachedWrappedExpansion",
+            "TestBitVectorRuntimeColdSelfZeroAndClosedGuards",
+            "TestBitVectorRuntimeTLSConstructorPendingActualHeaderCleanup",
+            "TestBitVectorRuntimeSignedRawConstructorWrappedZeroWords",
+            "TestBitVectorRuntimeRegisteredCrashAndReset",
+            "TestBitVectorRuntimeIndependentWorldsAndShift",
+            "TestBitVectorRuntimePushPublishesBitsBeforeAllocation",
+            "TestFastResetBitVectorRuntimeSourceListBeforeBase",
+            "TestBitVectorRuntimeUnequalLengthsIndependentWordBoundaries",
+            "TestFastResetBitVectorRuntimeCopyAssignmentAndEveryRefusal",
+            "TestFastResetBitVectorRuntimeSelfAssignmentSourceMemberGuard",
+            "TestFastResetBitVectorRuntimeReverseMemberDestructorStop",
+            "TestFastResetBitVectorRuntimeFailedAssignmentStillReachesSourceDestructor",
+            "TestBitVectorRuntimeScalarAndZeroHashAfterActualTLSPushRefusal",
+            "TestBitVectorRuntimeScalarAndReachedHashAfterDestructiveAssignRefusal"
+          ]
         }
       ],
       "ownership": [
         "Vector owns word storage; Clone/Assign copy, Swap transfers, source growth and stale bits retained. Full audit and test mapping pending package report.",
-        "Real AST marks borrow manager with fully charged cold headers/inline16/backing/scope limits and source real ASTRefVector callbacks. Fast mark-before-push and ref INC-before-growth prefixes remain observable; ref reset clears all flags before ASC DEC. See PORT_PROGRESS.md#audit-ast-mark-port-status-md."
+        "Real AST marks borrow manager with fully charged cold headers/inline16/backing/scope limits and source real ASTRefVector callbacks. Fast mark-before-push and ref INC-before-growth prefixes remain observable; ref reset clears all flags before ASC DEC. See PORT_PROGRESS.md#audit-ast-mark-port-status-md.",
+        "payload-only unsigned array; no svector header for base",
+        "bits++ before push allocation; Resize bits published after writes",
+        "Assign bits first and source-null early return retains old capacity/pointer",
+        "raw provider provenance moves with pointer; bitcount/capacity also swapped, cold original Budget unchanged",
+        "copy ctor copies whole capacity; failed bit_vector ctor has no source class dtor",
+        "FR base ctor before member ctor; failed member ctor invokes completed base dtor only",
+        "FR member destructor before base, each stopped cause retained; owning abort separate",
+        "source-stopped FR forbids ordinary mutations; body stop does not substitute for reached source destructor",
+        "actual TLS header-complete pending uses Deallocate; actual headerless partial uses CleanupPartial",
+        "floor(bits/8) Hash cutoff and source signed chars/descending tail reads",
+        "pure cold scalar queries ignore body cause/pending after completed object body refusal",
+        "nonzero Hash propagates reached raw guard instead of substituting sticky body cause; zero bytes never dereference provider"
       ],
       "deviations": [
-        "Scalar owner identity replaces debug raw addresses. Typed physical/stale-owner guards and implicit owning-copy rejection are explicit Go adapters. Source ID marks survive deletion/reuse; sparse/shared-occurrence marks and other template specializations remain open. No generic Go code."
+        "Scalar owner identity replaces debug raw addresses. Typed physical/stale-owner guards and implicit owning-copy rejection are explicit Go adapters. Source ID marks survive deletion/reuse; sparse/shared-occurrence marks and other template specializations remain open. No generic Go code.",
+        "Legacy bitset.Vector Go-slice profile remains partial and unchanged",
+        "Actual global DebugContext assertion enable/tag and process-global memory wiring remain open; selected default source g3debug assertions execute",
+        "Go io.Writer synchronous refusal/ascending memcpy word guards classify checked/stream adapter; native ostream flag transport/allocation and raw memcpy schedule not claimed",
+        "inactive display #else and inactive tst1/tst2 not executed",
+        "source-overflow/malformed raw counts/capacities are typed reached guards; no source-undefined native continuation/termination promise",
+        "explicit split-provider Runtime ownership versus source single global allocator; no pointer-ABI ticket/shadow array"
       ]
     },
     {
@@ -98578,7 +98732,16 @@
         "ast_mark_fast.go",
         "ast_mark_node.go",
         "ast_mark_scoped.go",
-        "bitset/bit_vector.go"
+        "bitset/bit_vector.go",
+        "util_bit_vector_runtime.go",
+        "util_bit_vector_runtime_lifetime_test.go",
+        "util_bit_vector_runtime_ops.go",
+        "util_bit_vector_runtime_registered_test.go",
+        "util_bit_vector_runtime_source_test.go",
+        "util_bit_vector_runtime_test.go",
+        "util_fr_bit_vector_runtime.go",
+        "util_fr_bit_vector_runtime_source_test.go",
+        "util_bit_vector_runtime_query_source_test.go"
       ],
       "tests": [
         "TestASTMarkAllNodeKindsIndependentBitOracleAndWarmPlateau",
@@ -98602,7 +98765,33 @@
         "TestSourceEq",
         "TestSourceOr",
         "TestSourceReset",
-        "TestSourceResizeCrash"
+        "TestSourceResizeCrash",
+        "TestBitVectorRuntimeHashCutoffAndEveryStreamPrefix",
+        "TestBitVectorRuntimeDistinctProviderSwapFieldsAndColdGuards",
+        "TestBitVectorRuntimeWarmZeroAllocAndPhysicalPlateau",
+        "TestBitVectorRuntimeCapturedRawSpanConstructor",
+        "TestBitVectorRuntimeRegisteredOrAndEquality",
+        "TestBitVectorRuntimeRawLayoutUnsignedAndNullAssignment",
+        "TestBitVectorRuntimeIncompleteConstructorHasNoSourceDestructor",
+        "TestBitVectorRuntimeEveryActualRefusal",
+        "TestBitVectorRuntimeReleaseLogicalGuardsAndScalarReads",
+        "TestBitVectorRuntimeSourceDestructorPostPhysicalAndOwningAbort",
+        "TestBitVectorRuntimeAllLiteralScalarAndBoundaryRoutes",
+        "TestBitVectorRuntimeSizeTRequestsAndReachedWrappedExpansion",
+        "TestBitVectorRuntimeColdSelfZeroAndClosedGuards",
+        "TestBitVectorRuntimeTLSConstructorPendingActualHeaderCleanup",
+        "TestBitVectorRuntimeSignedRawConstructorWrappedZeroWords",
+        "TestBitVectorRuntimeRegisteredCrashAndReset",
+        "TestBitVectorRuntimeIndependentWorldsAndShift",
+        "TestBitVectorRuntimePushPublishesBitsBeforeAllocation",
+        "TestFastResetBitVectorRuntimeSourceListBeforeBase",
+        "TestBitVectorRuntimeUnequalLengthsIndependentWordBoundaries",
+        "TestFastResetBitVectorRuntimeCopyAssignmentAndEveryRefusal",
+        "TestFastResetBitVectorRuntimeSelfAssignmentSourceMemberGuard",
+        "TestFastResetBitVectorRuntimeReverseMemberDestructorStop",
+        "TestFastResetBitVectorRuntimeFailedAssignmentStillReachesSourceDestructor",
+        "TestBitVectorRuntimeScalarAndZeroHashAfterActualTLSPushRefusal",
+        "TestBitVectorRuntimeScalarAndReachedHashAfterDestructiveAssignRefusal"
       ],
       "conditionals": [
         {
@@ -98677,14 +98866,65 @@
             "TestASTMarkScopedNestedScopesAndFlagRoute",
             "TestASTMarkUnsignedWrapPhysicalContinuationGuard"
           ]
+        },
+        {
+          "name": "Concrete Runtime bit_vector/fr_bit_vector selected source bodies, physical source lifetime and separate owning abort; completed-object scalar queries and reached-byte hash after body refusal",
+          "status": "partial",
+          "go_target": "util_bit_vector_runtime.go",
+          "tests": [
+            "TestBitVectorRuntimeHashCutoffAndEveryStreamPrefix",
+            "TestBitVectorRuntimeDistinctProviderSwapFieldsAndColdGuards",
+            "TestBitVectorRuntimeWarmZeroAllocAndPhysicalPlateau",
+            "TestBitVectorRuntimeCapturedRawSpanConstructor",
+            "TestBitVectorRuntimeRegisteredOrAndEquality",
+            "TestBitVectorRuntimeRawLayoutUnsignedAndNullAssignment",
+            "TestBitVectorRuntimeIncompleteConstructorHasNoSourceDestructor",
+            "TestBitVectorRuntimeEveryActualRefusal",
+            "TestBitVectorRuntimeReleaseLogicalGuardsAndScalarReads",
+            "TestBitVectorRuntimeSourceDestructorPostPhysicalAndOwningAbort",
+            "TestBitVectorRuntimeAllLiteralScalarAndBoundaryRoutes",
+            "TestBitVectorRuntimeSizeTRequestsAndReachedWrappedExpansion",
+            "TestBitVectorRuntimeColdSelfZeroAndClosedGuards",
+            "TestBitVectorRuntimeTLSConstructorPendingActualHeaderCleanup",
+            "TestBitVectorRuntimeSignedRawConstructorWrappedZeroWords",
+            "TestBitVectorRuntimeRegisteredCrashAndReset",
+            "TestBitVectorRuntimeIndependentWorldsAndShift",
+            "TestBitVectorRuntimePushPublishesBitsBeforeAllocation",
+            "TestFastResetBitVectorRuntimeSourceListBeforeBase",
+            "TestBitVectorRuntimeUnequalLengthsIndependentWordBoundaries",
+            "TestFastResetBitVectorRuntimeCopyAssignmentAndEveryRefusal",
+            "TestFastResetBitVectorRuntimeSelfAssignmentSourceMemberGuard",
+            "TestFastResetBitVectorRuntimeReverseMemberDestructorStop",
+            "TestFastResetBitVectorRuntimeFailedAssignmentStillReachesSourceDestructor",
+            "TestBitVectorRuntimeScalarAndZeroHashAfterActualTLSPushRefusal",
+            "TestBitVectorRuntimeScalarAndReachedHashAfterDestructiveAssignRefusal"
+          ]
         }
       ],
       "ownership": [
         "Vector owns word storage; Clone/Assign copy, Swap transfers, source growth and stale bits retained. Full audit and test mapping pending package report.",
-        "Real AST marks borrow manager with fully charged cold headers/inline16/backing/scope limits and source real ASTRefVector callbacks. Fast mark-before-push and ref INC-before-growth prefixes remain observable; ref reset clears all flags before ASC DEC. See PORT_PROGRESS.md#audit-ast-mark-port-status-md."
+        "Real AST marks borrow manager with fully charged cold headers/inline16/backing/scope limits and source real ASTRefVector callbacks. Fast mark-before-push and ref INC-before-growth prefixes remain observable; ref reset clears all flags before ASC DEC. See PORT_PROGRESS.md#audit-ast-mark-port-status-md.",
+        "payload-only unsigned array; no svector header for base",
+        "bits++ before push allocation; Resize bits published after writes",
+        "Assign bits first and source-null early return retains old capacity/pointer",
+        "raw provider provenance moves with pointer; bitcount/capacity also swapped, cold original Budget unchanged",
+        "copy ctor copies whole capacity; failed bit_vector ctor has no source class dtor",
+        "FR base ctor before member ctor; failed member ctor invokes completed base dtor only",
+        "FR member destructor before base, each stopped cause retained; owning abort separate",
+        "source-stopped FR forbids ordinary mutations; body stop does not substitute for reached source destructor",
+        "actual TLS header-complete pending uses Deallocate; actual headerless partial uses CleanupPartial",
+        "floor(bits/8) Hash cutoff and source signed chars/descending tail reads",
+        "pure cold scalar queries ignore body cause/pending after completed object body refusal",
+        "nonzero Hash propagates reached raw guard instead of substituting sticky body cause; zero bytes never dereference provider"
       ],
       "deviations": [
-        "Scalar owner identity replaces debug raw addresses. Typed physical/stale-owner guards and implicit owning-copy rejection are explicit Go adapters. Source ID marks survive deletion/reuse; sparse/shared-occurrence marks and other template specializations remain open. No generic Go code."
+        "Scalar owner identity replaces debug raw addresses. Typed physical/stale-owner guards and implicit owning-copy rejection are explicit Go adapters. Source ID marks survive deletion/reuse; sparse/shared-occurrence marks and other template specializations remain open. No generic Go code.",
+        "Legacy bitset.Vector Go-slice profile remains partial and unchanged",
+        "Actual global DebugContext assertion enable/tag and process-global memory wiring remain open; selected default source g3debug assertions execute",
+        "Go io.Writer synchronous refusal/ascending memcpy word guards classify checked/stream adapter; native ostream flag transport/allocation and raw memcpy schedule not claimed",
+        "inactive display #else and inactive tst1/tst2 not executed",
+        "source-overflow/malformed raw counts/capacities are typed reached guards; no source-undefined native continuation/termination promise",
+        "explicit split-provider Runtime ownership versus source single global allocator; no pointer-ABI ticket/shadow array"
       ]
     },
     {
@@ -101734,11 +101974,15 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "utilhash/hash.go"
+        "utilhash/hash.go",
+        "utilhash/runtime_bytes.go",
+        "utilhash/runtime_bytes_test.go"
       ],
       "tests": [
         "TestSourceHashVectors",
-        "TestCompositeVisitOrder"
+        "TestCompositeVisitOrder",
+        "TestRuntimeBytesSourceLengthAndSignedTail",
+        "TestRuntimeBytesReachedDescendingTailRead"
       ],
       "assertions": [
         {
@@ -101811,12 +102055,23 @@
             "TestSourceHashVectors",
             "TestCompositeVisitOrder"
           ]
+        },
+        {
+          "name": "Concrete borrowed Runtime bytes string_hash: little-endian word loads, signed-char descending tail and zero-length no-read route",
+          "status": "partial",
+          "go_target": "utilhash/runtime_bytes.go",
+          "tests": [
+            "TestRuntimeBytesSourceLengthAndSignedTail",
+            "TestRuntimeBytesReachedDescendingTailRead"
+          ]
         }
       ],
       "ownership": [
         "No retained caller data; baseline little-endian/signed-char policy explicit. Generic hash-table/container functors not yet audited; see PORT_PROGRESS.md#audit-utilhash-port-status-md."
       ],
-      "deviations": []
+      "deviations": [
+        "Selected little-endian/signed-char source profile; global/other ABI transport remains open."
+      ]
     },
     {
       "path": "src/util/hash.h",
@@ -131032,7 +131287,9 @@
         "util_uint_set_runtime_test.go",
         "util_uint_set_runtime_constructor_source_test.go",
         "util_uint_set_runtime_swap_source_test.go",
-        "util_uint_set_runtime_distinct_budget_source_test.go"
+        "util_uint_set_runtime_distinct_budget_source_test.go",
+        "util_fr_bit_vector_runtime.go",
+        "util_fr_bit_vector_runtime_source_test.go"
       ],
       "tests": [
         "TestParamDescrsBudgetFailuresAndWarmDuplicate",
@@ -131327,7 +131584,11 @@
         "TestUintSetRuntimeAdoptedAssignAndCloneEveryActualRefusal",
         "TestUintSetRuntimeSwapDistinctBudgetsWarmAndEmptyLifetime",
         "TestUintSetRuntimeIteratorCachedValueDoesNotReadDeadOwner",
-        "TestUintSetRuntimeIteratorIncrementAssertionBeforeDeadOwnerRead"
+        "TestUintSetRuntimeIteratorIncrementAssertionBeforeDeadOwnerRead",
+        "TestFastResetBitVectorRuntimeCopyAssignmentAndEveryRefusal",
+        "TestFastResetBitVectorRuntimeSelfAssignmentSourceMemberGuard",
+        "TestFastResetBitVectorRuntimeReverseMemberDestructorStop",
+        "TestFastResetBitVectorRuntimeFailedAssignmentStillReachesSourceDestructor"
       ],
       "conditionals": [
         {
@@ -131862,6 +132123,17 @@
             "TestUintSetRuntimeIteratorCachedValueDoesNotReadDeadOwner",
             "TestUintSetRuntimeIteratorIncrementAssertionBeforeDeadOwnerRead"
           ]
+        },
+        {
+          "name": "Concrete unsigned-vector member copy/assignment used by fr_bit_vector; completed base unwind and reverse member destruction",
+          "status": "partial",
+          "go_target": "util_fr_bit_vector_runtime.go",
+          "tests": [
+            "TestFastResetBitVectorRuntimeCopyAssignmentAndEveryRefusal",
+            "TestFastResetBitVectorRuntimeSelfAssignmentSourceMemberGuard",
+            "TestFastResetBitVectorRuntimeReverseMemberDestructorStop",
+            "TestFastResetBitVectorRuntimeFailedAssignmentStillReachesSourceDestructor"
+          ]
         }
       ],
       "ownership": [
@@ -131894,7 +132166,8 @@
         "Standalone SOM buffers/vectors and selected fresh sorting scope added. Authoritative reflected Go class header and charged real retained fields; scalar child ID cold provenance adaptation, no unread native-size ticket or full global malloc/header geometry claim. Heap sort final-order contract only, native comparator schedule/global ostream/full imp remain OPEN. Original source implicit dtor has no Reset/DEC/NUM Del; separate own-abort drains actual named records. See PORT_PROGRESS.md.",
         "Selected concrete Runtime general heap source closure only: full process-global CASSERT/assertion-switch bindings, wrapped physical extents, legacy slice storage/iterator profile, full ostream transport and other template instantiations remain OPEN. Explicit signed TLS/partially initialized source fixtures prove ownership/physical guards in undefined source domains, not ordinary OOM or native recovery. No whole source-unit promotion.",
         "Explicit borrowed context specializes source assertion/tag gates at actual call sites; process-global binding, notify/debugger/TRACE, source global allocation geometry, legacy heap and wrapped extent profiles remain open. Original tst_heap enable_debug(\"heap\") is commented out; new enabled-tag worlds are independent fixtures and do not add registered enabled-tag credit.",
-        "Selected explicit-provider/default-enabled assertion profile; process-global assertion binding, endangered wrapped extents, native ostream failbit/libc rand profile and legacy bitset allocation topology remain open. New random campaign executes source assertion expressions with an independent deterministic stream, not the exact libc sequence; broad test driver remains partial."
+        "Selected explicit-provider/default-enabled assertion profile; process-global assertion binding, endangered wrapped extents, native ostream failbit/libc rand profile and legacy bitset allocation topology remain open. New random campaign executes source assertion expressions with an independent deterministic stream, not the exact libc sequence; broad test driver remains partial.",
+        "Uses existing concrete unsigned-vector engine; no Go generics or additional shadow storage."
       ]
     },
     {
