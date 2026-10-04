@@ -25075,3 +25075,77 @@ assign/propagate does not pop its scope; preserve that prefix. Only actual
 SATSolverException is caught at the source loop; other failures retain true
 owning roots without fake success or invented phase/counter restoration.
 All private families and the complete patched fork remain active obligations.
+
+
+### SCC and equivalence-elimination master integration
+
+Integrated the frozen16-test SCC family from `.cache/work/sat-scc-aa535da`,
+verified against its Go-only inventory before copying. Source paths are
+`src/sat/sat_scc.cpp`, `src/sat/sat_scc.h`, `src/sat/sat_scc_params.pyg`,
+`src/sat/sat_elim_eqs.cpp` and `src/sat/sat_elim_eqs.h`. Headers retain full
+repository-relative paths, MIT notices and authors, without Microsoft copyright.
+The existing cleaner and GC lifecycle continuations are preserved alongside the
+new actual charged equivalence-elimination continuation and its owning Close.
+
+Iterative Tarjan, external/root sign handling, captured physical watch frames,
+all clause arities, model-converter publication, exact local/global/default SCC
+parameters and fresh lexical vector lifetimes are covered. Independent checks
+cover64 bounded implication graphs and model reconstruction. Actual allocation
+ordinals0 through30 fail before first success31; every stopped physical graph is
+audited before faults are disabled and drained through named owners.
+
+Tests-first evidence includes `.cache/sat-scc-resize-red.log`,
+`.cache/sat-scc-elim-owner-red.log` and
+`.cache/sat-scc-frame-constructor-red.log`. Corrections preserve complete
+reservation before resize publication, reached constructor ordering, copied
+owner rejection and final source-site frozen-state reads. An initial root copy
+path setup failure was corrected before focused validation; it is not source
+algorithm RED credit. All16 focused groups pass in both profiles, with existing
+cleaner, GC and conflict integration tests.
+
+Frame provenance codec36 versus native LP64 frame24 is an explicit adaptation.
+Concrete allocation-free heapsort preserves raw unsigned literal ordering and
+identical-value ties; C++ library comparison/swap schedules and malformed-domain
+prefix equivalence are not claimed. Enabled scc_bug integrity bindings, verbose,
+TRACE, propagation-wrapper diagnostics and full solver construction/search/Check
+remain open. The five source units receive partial credit only; generated binding
+whole-unit audit and registered source assertion campaigns remain obligations.
+
+Full gates use the frozen703-Go-file tree in
+`.cache/sat-scc-final-go-hashes.json`. Logs are
+`.cache/sat-scc-complete-{native,debug,vet-native,vet-debug,source}.log`.
+Native and both vet profiles are terminal0; checked/debug is still live. Preserve
+the original100-bit refinement and every reservation prefix. No C++ hashes,
+generics, WASM/WASI or race gates were introduced.
+
+Independent read-only asymmetric review found two remaining lexical lifetime
+issues before master integration: the run defer stops the older report even
+when savedPhase destruction is interrupted, and unconditionally invokes a
+saved-phase destructor after its copy constructor failed. Source vector.h159–167
+has no completed object destructor in that failed-constructor path. The private
+lane is authorized to unfreeze solely to add genuine actual Runtime release
+and partial-copy fixtures first, then correct source unwind versus separate
+owning abort ordering and revalidate. Earlier focused GREEN does not prove these
+paths; asymmetric integration remains pending. No master Go bytes changed.
+
+
+### SCC master terminal GREEN evidence
+
+Full native and checked/debug tests, both complete vet profiles, and source/
+no-generics audit are terminal0. Exact results are recorded in
+`.cache/sat-scc-complete-gates.json`; complete logs are
+`.cache/sat-scc-complete-{native,debug,vet-native,vet-debug,source}.log`.
+All703 Go files were verified byte-identical after all gates. Native main is
+12.764s; checked/debug main timing is recorded in its complete log. Original
+100-bit/all-prefix refinement was preserved. Source inventory is2102 units/
+677 APIs:30ported,173partial,1899unported. Five selected SCC/equivalence source
+units moved to partial; no whole solver, API or registered assertion completion
+is claimed. Earlier live observations are superseded by these terminal results.
+
+Read-only final generator review compared actual sat_scc_params.pyg, generated
+sat_scc_params.hpp and scripts/mk_genfile_common.py882–929 against the exact
+SAT descriptor helper and local/module/default getter. Descriptor name, kind,
+description, default and module match. Full generated registration/default-empty
+binding audit remains a separate explicit completion obligation; current SCC
+parameter source status stays partial. Source paths and license notices remain,
+Microsoft copyright headers are absent, and no C++ content hashes were used.

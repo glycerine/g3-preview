@@ -53635,9 +53635,32 @@
       "path": "src/sat/sat_elim_eqs.cpp",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_scc.go",
+        "sat_scc_storage.go",
+        "sat_elim_eqs.go",
+        "sat_scc_test.go",
+        "sat_solver_clause_lifecycle.go"
+      ],
+      "tests": [
+        "TestSATSCCDefaultEquivalenceAndActualConverter",
+        "TestSATSCCExternalRootAndContradiction",
+        "TestSATElimEqsAllClauseAritiesAndModels",
+        "TestSATSCCIndependentBoundedImplicationGraphs",
+        "TestSATElimEqsEmptyUnitUnaffectedAndExternal",
+        "TestSATSCCParametersDefaultGlobalsAndFreshLocalStorage",
+        "TestSATSCCActualAllocationPrefixSweep",
+        "TestSATSCCCancelBeforeNodeAndCapturedPhysicalFrame",
+        "TestSATSCCColdConstructionAndSourceStatWrap",
+        "TestSATElimEqsBinaryUnitConflictKeepsSourcePrefix",
+        "TestSATSCCVectorSourceGeometryAndConstructorPublication",
+        "TestSATSCCVectorDebugCapacityAssertionBeforeOverflow",
+        "TestSATSCCResizeWholeReservationBeforeSizeAndShrink",
+        "TestSATElimEqsOwningIdentityGuard",
+        "TestSATSCCResizePublishesBeforeReachedConstructorGuard",
+        "TestSATElimEqsSortActualLargeBacking"
+      ],
       "assertions": [
         {
           "line": 100,
@@ -53674,17 +53697,68 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Selected SCC construction, parameters, statistics, iterative Tarjan and equivalence-elimination clause/model routes",
+          "status": "partial",
+          "go_target": "sat_scc.go",
+          "tests": [
+            "TestSATSCCDefaultEquivalenceAndActualConverter",
+            "TestSATSCCExternalRootAndContradiction",
+            "TestSATElimEqsAllClauseAritiesAndModels",
+            "TestSATSCCIndependentBoundedImplicationGraphs",
+            "TestSATElimEqsEmptyUnitUnaffectedAndExternal",
+            "TestSATSCCParametersDefaultGlobalsAndFreshLocalStorage",
+            "TestSATSCCActualAllocationPrefixSweep",
+            "TestSATSCCCancelBeforeNodeAndCapturedPhysicalFrame",
+            "TestSATSCCColdConstructionAndSourceStatWrap",
+            "TestSATElimEqsBinaryUnitConflictKeepsSourcePrefix",
+            "TestSATSCCVectorSourceGeometryAndConstructorPublication",
+            "TestSATSCCVectorDebugCapacityAssertionBeforeOverflow",
+            "TestSATSCCResizeWholeReservationBeforeSizeAndShrink",
+            "TestSATElimEqsOwningIdentityGuard",
+            "TestSATSCCResizePublishesBeforeReachedConstructorGuard",
+            "TestSATElimEqsSortActualLargeBacking"
+          ]
+        }
+      ],
+      "ownership": [
+        "Fresh charged Runtime vectors per run; captured physical watch frames; actual solver model converter; disjoint clause compaction prefix and suffix; standalone eliminator self guard and lifecycle Close continuation. Allocation ordinals 0 through 30 refuse, first success 31; immediate whole named graph audit before disabling faults."
+      ],
+      "deviations": [
+        "Enabled scc_bug integrity checker, TRACE/verbose and propagation-wrapper diagnostics remain open. Concrete in-place heapsort preserves unsigned literal order, not C++ standard-library invocation schedules. Frame codec uses 36 bytes versus native LP64 24 bytes to retain pointer provenance. Generated parameter binding receives no whole-unit completion credit pending complete generated binding audit. No whole solver or registered assertion completion credit."
+      ]
     },
     {
       "path": "src/sat/sat_elim_eqs.h",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_scc.go",
+        "sat_scc_storage.go",
+        "sat_elim_eqs.go",
+        "sat_scc_test.go",
+        "sat_solver_clause_lifecycle.go"
+      ],
+      "tests": [
+        "TestSATSCCDefaultEquivalenceAndActualConverter",
+        "TestSATSCCExternalRootAndContradiction",
+        "TestSATElimEqsAllClauseAritiesAndModels",
+        "TestSATSCCIndependentBoundedImplicationGraphs",
+        "TestSATElimEqsEmptyUnitUnaffectedAndExternal",
+        "TestSATSCCParametersDefaultGlobalsAndFreshLocalStorage",
+        "TestSATSCCActualAllocationPrefixSweep",
+        "TestSATSCCCancelBeforeNodeAndCapturedPhysicalFrame",
+        "TestSATSCCColdConstructionAndSourceStatWrap",
+        "TestSATElimEqsBinaryUnitConflictKeepsSourcePrefix",
+        "TestSATSCCVectorSourceGeometryAndConstructorPublication",
+        "TestSATSCCVectorDebugCapacityAssertionBeforeOverflow",
+        "TestSATSCCResizeWholeReservationBeforeSizeAndShrink",
+        "TestSATElimEqsOwningIdentityGuard",
+        "TestSATSCCResizePublishesBeforeReachedConstructorGuard",
+        "TestSATElimEqsSortActualLargeBacking"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -53697,9 +53771,37 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Selected SCC construction, parameters, statistics, iterative Tarjan and equivalence-elimination clause/model routes",
+          "status": "partial",
+          "go_target": "sat_scc.go",
+          "tests": [
+            "TestSATSCCDefaultEquivalenceAndActualConverter",
+            "TestSATSCCExternalRootAndContradiction",
+            "TestSATElimEqsAllClauseAritiesAndModels",
+            "TestSATSCCIndependentBoundedImplicationGraphs",
+            "TestSATElimEqsEmptyUnitUnaffectedAndExternal",
+            "TestSATSCCParametersDefaultGlobalsAndFreshLocalStorage",
+            "TestSATSCCActualAllocationPrefixSweep",
+            "TestSATSCCCancelBeforeNodeAndCapturedPhysicalFrame",
+            "TestSATSCCColdConstructionAndSourceStatWrap",
+            "TestSATElimEqsBinaryUnitConflictKeepsSourcePrefix",
+            "TestSATSCCVectorSourceGeometryAndConstructorPublication",
+            "TestSATSCCVectorDebugCapacityAssertionBeforeOverflow",
+            "TestSATSCCResizeWholeReservationBeforeSizeAndShrink",
+            "TestSATElimEqsOwningIdentityGuard",
+            "TestSATSCCResizePublishesBeforeReachedConstructorGuard",
+            "TestSATElimEqsSortActualLargeBacking"
+          ]
+        }
+      ],
+      "ownership": [
+        "Fresh charged Runtime vectors per run; captured physical watch frames; actual solver model converter; disjoint clause compaction prefix and suffix; standalone eliminator self guard and lifecycle Close continuation. Allocation ordinals 0 through 30 refuse, first success 31; immediate whole named graph audit before disabling faults."
+      ],
+      "deviations": [
+        "Enabled scc_bug integrity checker, TRACE/verbose and propagation-wrapper diagnostics remain open. Concrete in-place heapsort preserves unsigned literal order, not C++ standard-library invocation schedules. Frame codec uses 36 bytes versus native LP64 24 bytes to retain pointer provenance. Generated parameter binding receives no whole-unit completion credit pending complete generated binding audit. No whole solver or registered assertion completion credit."
+      ]
     },
     {
       "path": "src/sat/sat_extension.h",
@@ -55351,9 +55453,32 @@
       "path": "src/sat/sat_scc.cpp",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_scc.go",
+        "sat_scc_storage.go",
+        "sat_elim_eqs.go",
+        "sat_scc_test.go",
+        "sat_solver_clause_lifecycle.go"
+      ],
+      "tests": [
+        "TestSATSCCDefaultEquivalenceAndActualConverter",
+        "TestSATSCCExternalRootAndContradiction",
+        "TestSATElimEqsAllClauseAritiesAndModels",
+        "TestSATSCCIndependentBoundedImplicationGraphs",
+        "TestSATElimEqsEmptyUnitUnaffectedAndExternal",
+        "TestSATSCCParametersDefaultGlobalsAndFreshLocalStorage",
+        "TestSATSCCActualAllocationPrefixSweep",
+        "TestSATSCCCancelBeforeNodeAndCapturedPhysicalFrame",
+        "TestSATSCCColdConstructionAndSourceStatWrap",
+        "TestSATElimEqsBinaryUnitConflictKeepsSourcePrefix",
+        "TestSATSCCVectorSourceGeometryAndConstructorPublication",
+        "TestSATSCCVectorDebugCapacityAssertionBeforeOverflow",
+        "TestSATSCCResizeWholeReservationBeforeSizeAndShrink",
+        "TestSATElimEqsOwningIdentityGuard",
+        "TestSATSCCResizePublishesBeforeReachedConstructorGuard",
+        "TestSATElimEqsSortActualLargeBacking"
+      ],
       "assertions": [
         {
           "line": 66,
@@ -55378,17 +55503,68 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Selected SCC construction, parameters, statistics, iterative Tarjan and equivalence-elimination clause/model routes",
+          "status": "partial",
+          "go_target": "sat_scc.go",
+          "tests": [
+            "TestSATSCCDefaultEquivalenceAndActualConverter",
+            "TestSATSCCExternalRootAndContradiction",
+            "TestSATElimEqsAllClauseAritiesAndModels",
+            "TestSATSCCIndependentBoundedImplicationGraphs",
+            "TestSATElimEqsEmptyUnitUnaffectedAndExternal",
+            "TestSATSCCParametersDefaultGlobalsAndFreshLocalStorage",
+            "TestSATSCCActualAllocationPrefixSweep",
+            "TestSATSCCCancelBeforeNodeAndCapturedPhysicalFrame",
+            "TestSATSCCColdConstructionAndSourceStatWrap",
+            "TestSATElimEqsBinaryUnitConflictKeepsSourcePrefix",
+            "TestSATSCCVectorSourceGeometryAndConstructorPublication",
+            "TestSATSCCVectorDebugCapacityAssertionBeforeOverflow",
+            "TestSATSCCResizeWholeReservationBeforeSizeAndShrink",
+            "TestSATElimEqsOwningIdentityGuard",
+            "TestSATSCCResizePublishesBeforeReachedConstructorGuard",
+            "TestSATElimEqsSortActualLargeBacking"
+          ]
+        }
+      ],
+      "ownership": [
+        "Fresh charged Runtime vectors per run; captured physical watch frames; actual solver model converter; disjoint clause compaction prefix and suffix; standalone eliminator self guard and lifecycle Close continuation. Allocation ordinals 0 through 30 refuse, first success 31; immediate whole named graph audit before disabling faults."
+      ],
+      "deviations": [
+        "Enabled scc_bug integrity checker, TRACE/verbose and propagation-wrapper diagnostics remain open. Concrete in-place heapsort preserves unsigned literal order, not C++ standard-library invocation schedules. Frame codec uses 36 bytes versus native LP64 24 bytes to retain pointer provenance. Generated parameter binding receives no whole-unit completion credit pending complete generated binding audit. No whole solver or registered assertion completion credit."
+      ]
     },
     {
       "path": "src/sat/sat_scc.h",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_scc.go",
+        "sat_scc_storage.go",
+        "sat_elim_eqs.go",
+        "sat_scc_test.go",
+        "sat_solver_clause_lifecycle.go"
+      ],
+      "tests": [
+        "TestSATSCCDefaultEquivalenceAndActualConverter",
+        "TestSATSCCExternalRootAndContradiction",
+        "TestSATElimEqsAllClauseAritiesAndModels",
+        "TestSATSCCIndependentBoundedImplicationGraphs",
+        "TestSATElimEqsEmptyUnitUnaffectedAndExternal",
+        "TestSATSCCParametersDefaultGlobalsAndFreshLocalStorage",
+        "TestSATSCCActualAllocationPrefixSweep",
+        "TestSATSCCCancelBeforeNodeAndCapturedPhysicalFrame",
+        "TestSATSCCColdConstructionAndSourceStatWrap",
+        "TestSATElimEqsBinaryUnitConflictKeepsSourcePrefix",
+        "TestSATSCCVectorSourceGeometryAndConstructorPublication",
+        "TestSATSCCVectorDebugCapacityAssertionBeforeOverflow",
+        "TestSATSCCResizeWholeReservationBeforeSizeAndShrink",
+        "TestSATElimEqsOwningIdentityGuard",
+        "TestSATSCCResizePublishesBeforeReachedConstructorGuard",
+        "TestSATElimEqsSortActualLargeBacking"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -55401,9 +55577,37 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Selected SCC construction, parameters, statistics, iterative Tarjan and equivalence-elimination clause/model routes",
+          "status": "partial",
+          "go_target": "sat_scc.go",
+          "tests": [
+            "TestSATSCCDefaultEquivalenceAndActualConverter",
+            "TestSATSCCExternalRootAndContradiction",
+            "TestSATElimEqsAllClauseAritiesAndModels",
+            "TestSATSCCIndependentBoundedImplicationGraphs",
+            "TestSATElimEqsEmptyUnitUnaffectedAndExternal",
+            "TestSATSCCParametersDefaultGlobalsAndFreshLocalStorage",
+            "TestSATSCCActualAllocationPrefixSweep",
+            "TestSATSCCCancelBeforeNodeAndCapturedPhysicalFrame",
+            "TestSATSCCColdConstructionAndSourceStatWrap",
+            "TestSATElimEqsBinaryUnitConflictKeepsSourcePrefix",
+            "TestSATSCCVectorSourceGeometryAndConstructorPublication",
+            "TestSATSCCVectorDebugCapacityAssertionBeforeOverflow",
+            "TestSATSCCResizeWholeReservationBeforeSizeAndShrink",
+            "TestSATElimEqsOwningIdentityGuard",
+            "TestSATSCCResizePublishesBeforeReachedConstructorGuard",
+            "TestSATElimEqsSortActualLargeBacking"
+          ]
+        }
+      ],
+      "ownership": [
+        "Fresh charged Runtime vectors per run; captured physical watch frames; actual solver model converter; disjoint clause compaction prefix and suffix; standalone eliminator self guard and lifecycle Close continuation. Allocation ordinals 0 through 30 refuse, first success 31; immediate whole named graph audit before disabling faults."
+      ],
+      "deviations": [
+        "Enabled scc_bug integrity checker, TRACE/verbose and propagation-wrapper diagnostics remain open. Concrete in-place heapsort preserves unsigned literal order, not C++ standard-library invocation schedules. Frame codec uses 36 bytes versus native LP64 24 bytes to retain pointer provenance. Generated parameter binding receives no whole-unit completion credit pending complete generated binding audit. No whole solver or registered assertion completion credit."
+      ]
     },
     {
       "path": "src/sat/sat_scc_params.hpp",
@@ -55458,14 +55662,65 @@
       "path": "src/sat/sat_scc_params.pyg",
       "component": "sat",
       "role": "generated_input",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_scc.go",
+        "sat_scc_storage.go",
+        "sat_elim_eqs.go",
+        "sat_scc_test.go",
+        "sat_solver_clause_lifecycle.go"
+      ],
+      "tests": [
+        "TestSATSCCDefaultEquivalenceAndActualConverter",
+        "TestSATSCCExternalRootAndContradiction",
+        "TestSATElimEqsAllClauseAritiesAndModels",
+        "TestSATSCCIndependentBoundedImplicationGraphs",
+        "TestSATElimEqsEmptyUnitUnaffectedAndExternal",
+        "TestSATSCCParametersDefaultGlobalsAndFreshLocalStorage",
+        "TestSATSCCActualAllocationPrefixSweep",
+        "TestSATSCCCancelBeforeNodeAndCapturedPhysicalFrame",
+        "TestSATSCCColdConstructionAndSourceStatWrap",
+        "TestSATElimEqsBinaryUnitConflictKeepsSourcePrefix",
+        "TestSATSCCVectorSourceGeometryAndConstructorPublication",
+        "TestSATSCCVectorDebugCapacityAssertionBeforeOverflow",
+        "TestSATSCCResizeWholeReservationBeforeSizeAndShrink",
+        "TestSATElimEqsOwningIdentityGuard",
+        "TestSATSCCResizePublishesBeforeReachedConstructorGuard",
+        "TestSATElimEqsSortActualLargeBacking"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Selected SCC construction, parameters, statistics, iterative Tarjan and equivalence-elimination clause/model routes",
+          "status": "partial",
+          "go_target": "sat_scc.go",
+          "tests": [
+            "TestSATSCCDefaultEquivalenceAndActualConverter",
+            "TestSATSCCExternalRootAndContradiction",
+            "TestSATElimEqsAllClauseAritiesAndModels",
+            "TestSATSCCIndependentBoundedImplicationGraphs",
+            "TestSATElimEqsEmptyUnitUnaffectedAndExternal",
+            "TestSATSCCParametersDefaultGlobalsAndFreshLocalStorage",
+            "TestSATSCCActualAllocationPrefixSweep",
+            "TestSATSCCCancelBeforeNodeAndCapturedPhysicalFrame",
+            "TestSATSCCColdConstructionAndSourceStatWrap",
+            "TestSATElimEqsBinaryUnitConflictKeepsSourcePrefix",
+            "TestSATSCCVectorSourceGeometryAndConstructorPublication",
+            "TestSATSCCVectorDebugCapacityAssertionBeforeOverflow",
+            "TestSATSCCResizeWholeReservationBeforeSizeAndShrink",
+            "TestSATElimEqsOwningIdentityGuard",
+            "TestSATSCCResizePublishesBeforeReachedConstructorGuard",
+            "TestSATElimEqsSortActualLargeBacking"
+          ]
+        }
+      ],
+      "ownership": [
+        "Fresh charged Runtime vectors per run; captured physical watch frames; actual solver model converter; disjoint clause compaction prefix and suffix; standalone eliminator self guard and lifecycle Close continuation. Allocation ordinals 0 through 30 refuse, first success 31; immediate whole named graph audit before disabling faults."
+      ],
+      "deviations": [
+        "Enabled scc_bug integrity checker, TRACE/verbose and propagation-wrapper diagnostics remain open. Concrete in-place heapsort preserves unsigned literal order, not C++ standard-library invocation schedules. Frame codec uses 36 bytes versus native LP64 24 bytes to retain pointer provenance. Generated parameter binding receives no whole-unit completion credit pending complete generated binding audit. No whole solver or registered assertion completion credit."
+      ]
     },
     {
       "path": "src/sat/sat_simplifier.cpp",
