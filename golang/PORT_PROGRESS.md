@@ -25363,3 +25363,112 @@ both vets terminal0. Final715 Go bytes recorded in
 .cache/sat-decision-integrity-header-go-hashes.json. No Microsoft references
 remain in current tracked/new Go sources outside private cache snapshots.
 No C++ hashes/generics introduced. Entire port goal remains active.
+
+
+### Debug registry source family integration (full gates pending)
+
+Previous turn made authoritative progress: green commit f64e6b4 with SAT
+decision/integrity and provenance cleanup. Current tree began clean. Root
+source review found simplifier selected enabled integrity still stubbed and
+variable-cost ordering O(n²); container now binds actual lifecycle checker and
+uses a charged concrete stable merge, preserving equal-cost order. Full private
+simplifier remains incomplete pending stopped report/cleanup/failure audits.
+
+Root ports selected debug.cpp28–79/debug.h declarations and CASSERT gate from
+private .cache/work/util-debug-f64e6b4, with tests FIRST. Genuine API RED
+.cache/util-debug-api-red.log lacks actual DebugContext; separate genuine RED
+.cache/util-debug-conditional-api-red.log lacks the short-circuit gate. Six groups
+now GREEN native/debug .cache/util-debug-final-{native,debug}.log (.029s each),
+both full private vets0. Includes all729 action sequences of three steps,
+source lazy init even on disable/query, assertion-switch persistence through
+finalize/reinitialize, strcmp first-NUL behavior, copied/dead caller guards,
+actual context cold refusal, two table-construction refusals and existing
+load-threshold rehash refusal preserving old entries. Exact named whole graph
+census runs BEFORE faults disabled, to real Budget0 after owning close.
+
+Concrete cold DebugContext borrows caller immutable tag region, lazily owns
+existing real StrHashtable, and never clones/frees spellings. Finalize destroys
+the table rather than calling its distinct reset/finalize operation, nulls the
+pointer, preserves assertions. CASSERT gate reads assertions before tag lookup;
+false switch must not construct a table. The body is never passed as an already
+evaluated bool. Release erasure remains a consumer obligation. Numeric read-only
+source/ownership review approved this selected grouping; no material defect.
+Go-only final snapshot inventory .cache/util-debug-final-inventory.json.
+
+Private checks first hit module-path setup, missing embedded test vectors in
+root snapshot, and genuine ENOSPC during compilation (workspace48MB free).
+These were environmental/fixture errors, not algorithm RED. Root restored
+actual test_vectors, then removed88530 disposable Go cache entries older than
+12h (44596852434 bytes), preserving source/evidence/live temp directories.
+Filesystem recovered42GB. Rerun checks terminal0. No external project writes.
+
+Debug cpp/h remain PARTIAL; manifest now2102 units/677 APIs with30ported/
+180partial/1892unported. Explicit cold owner models source global members;
+whole global consumer macro binding, assertion notification, interactive GDB/
+fatal/abort/throw/output services and global finalizer orchestration remain
+OPEN. No registered source assertion credit. Source paths/license/author
+retained without Microsoft copyright. Full port scope remains unchanged.
+
+Root read-only review of full simplifier blocked880–1083 and cleanup254–318
+confirms selected process-var gates, learned-binary treatment, counter/MC/queue
+decreased ordering and kept-owning-prefix-before-attach publication against
+source. Explicit pending review sent: scoped finalizer must not replay already
+completed earlier cleanup phases after later actual typed free/diagnostic
+failure; source body progress and owning abort remain distinct. Container's real
+sort-workspace ownership RED and exact-root correction remain private, not a
+source unit completion claim.
+
+Arena direct selected-ctor body sweep now reaches firstsuccess with whole
+physical named roots inspected before disabling faults and finalBudget0.
+Read cpp1833–1834 actual declarations: m_polynomials then m_pid_gen, therefore
+reverse member destruction IDs before directory. Approved selected completed
+member unwind preserves actual body-created cells/MM retain for explicit
+owning abort, never invokes imp destructor body, never recycles IDs/writes a
+destroyed directory. Full source m_upm child precedes m_manager destruction
+and remains genuine missing dependency. Empty selected buffers do not justify
+invented source reset/free calls; their Go cold headers remain real owning
+cleanup obligations. Core callback/source-prefix read-only review confirms
+callback refusal is retained and repeated prefix call returns same cause
+without invoking handler twice; owning abort leaves source history unchanged.
+
+Numeric real Newton class still private and incomplete. Approved whole method
+retained lexical newtonLocal guard before CloseChecked actions; explicit
+CleanupNewtonInterpolation drains that genuine owner before normal caller-live
+guard/Close. No cached-vector substitute, no second whole method invocation
+while its local is pending. Refining incoming INC/consumed old DEC cleanup
+ordering to preserve actual older source scopes before unjoined owning abort.
+Full imp integrated private-reference multiplicity and destruction remains
+open. Existing nonlinear/full solver/API/PSC goal scope remains unchanged.
+
+
+### Debug registry master terminal GREEN
+
+Full native and checked/debug tests, both complete vet profiles and source/
+no-generics audit terminal0. .cache/util-debug-complete-gates.json records
+exact commands/results; logs .cache/util-debug-complete-{native,debug,
+vet-native,vet-debug,source}.log. Native19.516s; checked/debug769.066s.
+All717 Go files/bytes verified unchanged across gates; exact Go-only inventory
+.cache/util-debug-complete-go-hashes.json. Original100-bit refinement and every
+actual reservation prefix retained.30ported/180partial/1892unported,2102 units/
+677 APIs. No broad/debugger/solver-source completion claim.
+
+Container's complete selected simplifier snapshot is now frozen and terminal
+GREEN: inventory .cache/work/sat-simplifier-334de9d/
+sat-simplifier-final-inventory.json,27 Go files (21 new,6 scoped existing).
+Whole SAT native1061 RUN/PASS (.398s),debug1063 (.435s), simplifier202/202 per
+profile,22 new top-level groups, both vets0, source/no-generics0. Root verified
+all27 Go-only SHA values and prepared six scoped master diffs at
+.cache/sat-simplifier-master-<file>.diff. Full integration/root gates pending.
+Preserve current lifecycle integrityGC/cleaner/GC/eq/asymm continuations in
+manual merge; avoid unrelated asymm field relocation. Agent next lane reads
+full actual SAT constructor/UpdateParams/Check/search/member unwinds and
+registered user-scope campaign before TDD, using real current dependencies.
+
+Newton signed source loop widening identified by root review and sent exact
+Add unsigned-k-to-int32 / Mk signed-num expressions to numeric for correction
+and boundary/read-prefix evidence. General Scale Unit read short circuit is
+corrected by arena bounded source review, not fake behavioral RED; scalar
+overload cpp2732 correctly performs its initial mk_unit call unconditionally.
+Arena ctor completed-member ID→directory→numeral unwind genuine RED now GREEN
+.cache/polynomial-constructor-unwind-first-native.log; full family still private,
+not frozen or whole imp construction complete. Entire port goal stays active.

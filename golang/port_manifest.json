@@ -94839,9 +94839,19 @@
       "path": "src/util/debug.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_debug_context.go",
+        "util_debug_context_test.go"
+      ],
+      "tests": [
+        "TestDebugContextSourceLazyInitializationAndAssertions",
+        "TestDebugContextFiniteActionOracle",
+        "TestDebugContextEveryLazyConstructionRefusal",
+        "TestDebugContextBorrowedLifetimeAndOwnerGuards",
+        "TestDebugContextConditionalAssertionReadOrder",
+        "TestDebugContextColdOwnerAndExistingTableGrowthRefusal"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -94862,17 +94872,45 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Selected assertion switch, lazy debug table initialization, enable/disable/query, finalize and short-circuit CASSERT gate; whole global macro and debugger bindings remain open",
+          "status": "partial",
+          "go_target": "util_debug_context.go",
+          "tests": [
+            "TestDebugContextSourceLazyInitializationAndAssertions",
+            "TestDebugContextFiniteActionOracle",
+            "TestDebugContextEveryLazyConstructionRefusal",
+            "TestDebugContextBorrowedLifetimeAndOwnerGuards",
+            "TestDebugContextConditionalAssertionReadOrder",
+            "TestDebugContextColdOwnerAndExistingTableGrowthRefusal"
+          ]
+        }
+      ],
+      "ownership": [
+        "Explicit cold DebugContext charges its real header; borrows caller immutable NUL-terminated region keys; lazily owns existing concrete StrHashtable. finalize_debug closes and nulls table without touching caller tag bytes or assertion switch. Constructor header/table failures preserve actual publication and owning unwind."
+      ],
+      "deviations": [
+        "Source process globals represented by an explicit single-goroutine cold owner; process-wide/context API macro binding remains open. CASSERT gate preserves assertions-before-tag order, but release consumers must erase its call; no source macro consumer completion claimed. notify_assertion_violation, invoke_gdb, interactive fatal/abort/throw/debugger profiles, output services and full global finalizer orchestration remain open. Existing real table/region Go accounting is not C++ global allocator identity. No registered assertion completion credit."
+      ]
     },
     {
       "path": "src/util/debug.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_debug_context.go",
+        "util_debug_context_test.go"
+      ],
+      "tests": [
+        "TestDebugContextSourceLazyInitializationAndAssertions",
+        "TestDebugContextFiniteActionOracle",
+        "TestDebugContextEveryLazyConstructionRefusal",
+        "TestDebugContextBorrowedLifetimeAndOwnerGuards",
+        "TestDebugContextConditionalAssertionReadOrder",
+        "TestDebugContextColdOwnerAndExistingTableGrowthRefusal"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -94983,9 +95021,27 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Selected assertion switch, lazy debug table initialization, enable/disable/query, finalize and short-circuit CASSERT gate; whole global macro and debugger bindings remain open",
+          "status": "partial",
+          "go_target": "util_debug_context.go",
+          "tests": [
+            "TestDebugContextSourceLazyInitializationAndAssertions",
+            "TestDebugContextFiniteActionOracle",
+            "TestDebugContextEveryLazyConstructionRefusal",
+            "TestDebugContextBorrowedLifetimeAndOwnerGuards",
+            "TestDebugContextConditionalAssertionReadOrder",
+            "TestDebugContextColdOwnerAndExistingTableGrowthRefusal"
+          ]
+        }
+      ],
+      "ownership": [
+        "Explicit cold DebugContext charges its real header; borrows caller immutable NUL-terminated region keys; lazily owns existing concrete StrHashtable. finalize_debug closes and nulls table without touching caller tag bytes or assertion switch. Constructor header/table failures preserve actual publication and owning unwind."
+      ],
+      "deviations": [
+        "Source process globals represented by an explicit single-goroutine cold owner; process-wide/context API macro binding remains open. CASSERT gate preserves assertions-before-tag order, but release consumers must erase its call; no source macro consumer completion claimed. notify_assertion_violation, invoke_gdb, interactive fatal/abort/throw/debugger profiles, output services and full global finalizer orchestration remain open. Existing real table/region Go accounting is not C++ global allocator identity. No registered assertion completion credit."
+      ]
     },
     {
       "path": "src/util/dec_ref_util.h",
