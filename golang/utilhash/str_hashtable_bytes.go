@@ -1,4 +1,6 @@
-// Licensed under the MIT license.
+// Source: src/util/str_hashtable.h:24-31; src/util/hashtable.h:375-435,465-522.
+// Source author: Leonardo de Moura (2006-09-13 / 2006-09-11).
+// Licensed under the MIT license; see LICENSE.txt.
 // Borrowed byte-input adapter for the source CString query. No byte slice is
 // retained; the hash/probe/equality and prepare/publication actions are those
 // of the existing concrete source string table.
@@ -37,11 +39,22 @@ func (h *StrHashtable) FindCStringBytes(s []byte) (StrHashtableEntryRef, bool, e
 		return StrHashtableEntryRef{}, false, arena.ErrBounds
 	}
 	hash := strQueryBytesHash(s, 17)
-	mask := h.Capacity() - 1
+	capacity, e := h.capacityChecked()
+	if e != nil {
+		return StrHashtableEntryRef{}, false, e
+	}
+	mask := capacity - 1
 	i := hash & mask
-	for step := uint32(0); step < h.Capacity(); step++ {
-		entry := h.table[i]
+	for step := uint32(0); step < capacity; step++ {
+		entry, e := h.probeEntry(i)
+		if e != nil {
+			return StrHashtableEntryRef{}, false, e
+		}
 		if entry.state == strHashUsed && entry.hash == hash {
+			entry.key, e = h.entryKey(i)
+			if e != nil {
+				return StrHashtableEntryRef{}, false, e
+			}
 			if e := h.validateKey(entry.key); e != nil {
 				return StrHashtableEntryRef{}, false, e
 			}

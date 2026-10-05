@@ -120,10 +120,7 @@ func memoryProcessColdAudit(t *testing.T, p *MemoryProcess, anchors ...*mpnum.UP
 		n += v.OwnerBytes + v.Table.OwnerBytes + v.Table.TableBytes + v.Region.OwnerBytes + v.Region.PayloadBytes + v.Region.PageHeaderBytes + v.Region.DirectoryBytes + v.Region.LogBytes + v.Region.ScopeBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes
 	}
 	n += c.Debug.ownerBytes
-	if c.Debug.tags != nil {
-		s := c.Debug.tags.Stats()
-		n += s.OwnerBytes + s.TableBytes + s.DirectoryBytes
-	}
+	n += debugTagColdBytes(c.Debug)
 	n += c.Trace.ownerBytes
 	if c.Trace.tags != nil {
 		s := c.Trace.tags.Stats()

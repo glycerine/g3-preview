@@ -20,6 +20,7 @@ type paramsPhysicalRationalOwner struct {
 }
 
 type upolyPhysicalExtraOwners struct {
+	DebugContexts        []*DebugContext
 	ParamsRationalValues []paramsPhysicalRationalOwner
 	ParamsValues         []paramsPhysicalValueOwner
 	RationalServices     []*mpnum.RationalService

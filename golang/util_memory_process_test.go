@@ -340,7 +340,7 @@ func TestMemoryProcessActualGParamsStopPreservesLaterBorrowedChildren(t *testing
 	tag := traceKey(t, p.config.Debug.region, "later-borrowed-tag")
 	paramsMust(t, p.config.Debug.EnableDebug(tag))
 	paramsMust(t, p.config.Trace.EnableTrace(tag))
-	extras := upolyPhysicalExtraOwners{RationalServices: []*mpnum.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{p.context, &imp.globalParams}}, ParamsRationalValues: []paramsPhysicalRationalOwner{{q, &caller}}}
+	extras := upolyPhysicalExtraOwners{DebugContexts: []*DebugContext{p.config.Debug}, RationalServices: []*mpnum.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{p.context, &imp.globalParams}}, ParamsRationalValues: []paramsPhysicalRationalOwner{{q, &caller}}}
 	before := upolyHenselAuditPhysical(t, []*mpnum.UPolynomialManager{m}, nil, extras)
 	paramsDecTLSNearMinimum(t, p.config.Runtime)
 	cause := p.Finalize()

@@ -19,10 +19,7 @@ import (
 func debugGlobalBytes(s *DebugGlobalService) uint64 {
 	n := s.header + s.context.ownerBytes + s.streams.header + s.input.header + s.actions.header
 	n += s.streams.stdout.Stats().OwnerBytes + s.streams.stderr.Stats().OwnerBytes
-	if s.context.tags != nil {
-		v := s.context.tags.Stats()
-		n += v.OwnerBytes + v.TableBytes + v.DirectoryBytes
-	}
+	n += debugTagColdBytes(s.context)
 	return n
 }
 func debugGlobalRegionBytes(r *arena.BytesRegion) uint64 {
@@ -323,10 +320,7 @@ func debugGlobalProcessAudit(t *testing.T, p *MemoryProcess, service *DebugGloba
 		n += v.OwnerBytes + v.Table.OwnerBytes + v.Table.TableBytes + v.Region.OwnerBytes + v.Region.PayloadBytes + v.Region.PageHeaderBytes + v.Region.DirectoryBytes + v.Region.LogBytes + v.Region.ScopeBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes
 	}
 	n += c.Debug.ownerBytes
-	if c.Debug.tags != nil {
-		s := c.Debug.tags.Stats()
-		n += s.OwnerBytes + s.TableBytes + s.DirectoryBytes
-	}
+	n += debugTagColdBytes(c.Debug)
 	n += c.Trace.ownerBytes
 	if c.Trace.tags != nil {
 		s := c.Trace.tags.Stats()

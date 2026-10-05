@@ -5,6 +5,7 @@ package g3
 import (
 	"errors"
 	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
 	"github.com/glycerine/g3/golang/utilhash"
 	"reflect"
 )
@@ -18,15 +19,19 @@ var ErrDebugContextOwner = errors.New("g3: invalid debug context owner")
 // Source macro consumers and notification/interactive debugger remain separate
 // bindings. In particular source release CASSERT must not query this table.
 type DebugContext struct {
-	self             *DebugContext
-	region           *arena.BytesRegion
-	budget           *arena.Budget
-	assertionStreams *MemoryStandardStreams
-	assertionActions *DebugActionContext
-	tags             *utilhash.StrHashtable
-	assertions       bool
-	ownerBytes       uint64
-	closed           bool
+	self                   *DebugContext
+	region                 *arena.BytesRegion
+	budget                 *arena.Budget
+	assertionStreams       *MemoryStandardStreams
+	assertionActions       *DebugActionContext
+	tags                   *utilhash.StrHashtable
+	tagRuntime             *memory.Runtime
+	failedTags             *debugTagConstruction
+	currentTagConstruction *debugTagConstruction
+	tagConstructing        bool
+	assertions             bool
+	ownerBytes             uint64
+	closed                 bool
 }
 
 func NewDebugContext(r *arena.BytesRegion, b *arena.Budget) (*DebugContext, error) {
@@ -67,8 +72,14 @@ func (d *DebugContext) initDebugTable() error {
 	if e := d.open(); e != nil {
 		return e
 	}
+	if d.tagConstructing {
+		return ErrDebugTagConstructionExecuting
+	}
 	if d.tags != nil {
 		return nil
+	}
+	if d.tagRuntime != nil {
+		return d.initRuntimeDebugTable()
 	}
 	table, e := utilhash.NewStrHashtable(d.region, utilhash.StrHashtableConfig{Budget: d.budget})
 	if e != nil {
@@ -115,8 +126,27 @@ func (d *DebugContext) FinalizeDebug() error {
 		return e
 	}
 	if d.tags != nil {
-		d.tags.Close()
-		d.tags = nil
+		if e := d.tags.SourceFinalize(); e != nil {
+			return e
+		}
+		table := d.tags
+		d.tags = nil // actual source g_debug_tags = NULL after completed destruction
+		if d.currentTagConstruction != nil {
+			node := d.currentTagConstruction
+			d.currentTagConstruction = nil
+			if table.HasRetainedRuntimeAcquisitions() {
+				node.table = table
+				node.next = d.failedTags
+				d.failedTags = node
+			} else {
+				if e := table.CloseChecked(); e != nil {
+					return e
+				}
+				d.budget.Release(node.bytes)
+			}
+		} else if e := table.CloseChecked(); e != nil {
+			return e
+		}
 	}
 	return nil
 }
@@ -127,8 +157,28 @@ func (d *DebugContext) Close() error {
 	if d.closed {
 		return nil
 	}
-	if e := d.FinalizeDebug(); e != nil {
-		return e
+	if d.tagConstructing {
+		return ErrDebugTagConstructionExecuting
+	}
+	if d.tags != nil {
+		if e := d.tags.CloseChecked(); e != nil {
+			return e
+		}
+		d.tags = nil
+		if d.currentTagConstruction != nil {
+			d.budget.Release(d.currentTagConstruction.bytes)
+			d.currentTagConstruction = nil
+		}
+	}
+	for d.failedTags != nil {
+		node := d.failedTags
+		if node.table != nil {
+			if e := node.table.CloseChecked(); e != nil {
+				return e
+			}
+		}
+		d.failedTags = node.next
+		d.budget.Release(node.bytes)
 	}
 	d.budget.Release(d.ownerBytes)
 	d.ownerBytes = 0

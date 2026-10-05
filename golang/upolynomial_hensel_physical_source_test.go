@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/golang/arena"
 	"github.com/glycerine/g3/golang/memory"
 	"github.com/glycerine/g3/golang/mpnum"
+	"github.com/glycerine/g3/golang/utilhash"
 	"reflect"
 	"testing"
 )
@@ -316,6 +317,40 @@ func upolyHenselAuditPhysical(t *testing.T, cores []*mpnum.UPolynomialManager, f
 				key := rawKey(v.Index(i))
 				if key[1] != 0 {
 					rawRoots[key] = true
+				}
+			}
+		}
+	}
+	// These owners are explicitly supplied by the caller. No Runtime directory
+	// supplies authority for a missing debug root.
+	for _, extra := range extras {
+		for _, d := range extra.DebugContexts {
+			if d == nil || d.self != d {
+				t.Fatal("invalid named DebugContext")
+			}
+			addTable := func(table *utilhash.StrHashtable) {
+				if table == nil {
+					return
+				}
+				roots, e := table.RuntimeRoots()
+				if e != nil {
+					t.Fatal(e)
+				}
+				for _, b := range append([]memory.Block{roots.Object, roots.Table}, roots.Acquisitions...) {
+					if b == (memory.Block{}) {
+						continue
+					}
+					key := [3]uint64{b.OwnerID(), uint64(b.Slot()), uint64(b.Generation())}
+					if key[0] != runtime.FieldByName("origin").Uint() || rawRoots[key] {
+						t.Fatal("foreign or duplicate named debug root", key)
+					}
+					rawRoots[key] = true
+				}
+			}
+			if d.tagRuntime != nil {
+				addTable(d.tags)
+				for node := d.failedTags; node != nil; node = node.next {
+					addTable(node.table)
 				}
 			}
 		}

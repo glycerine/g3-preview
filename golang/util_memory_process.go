@@ -74,12 +74,19 @@ func NewMemoryProcess(c MemoryProcessConfig) (*MemoryProcess, error) {
 	if c.Params.Budget != c.Budget || c.Params.Text.Descriptors.Budget != c.Budget || c.Catalog.Budget != c.Budget || c.Global.Budget != c.Budget || c.Global.Register != nil || c.Global.Catalog != nil {
 		return nil, arena.ErrConfig
 	}
+	if e := c.Debug.canBindTagRuntime(c.Runtime); e != nil {
+		return nil, e
+	}
 	n := uint64(reflect.TypeOf(MemoryProcess{}).Size())
 	if e := c.Budget.Reserve(n); e != nil {
 		return nil, e
 	}
 	p := &MemoryProcess{config: c, header: n}
 	p.self = p
+	if e := c.Debug.BindTagRuntime(c.Runtime); e != nil {
+		c.Budget.Release(n)
+		return nil, e
+	}
 	return p, nil
 }
 func (p *MemoryProcess) open() error {

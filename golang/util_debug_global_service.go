@@ -7,12 +7,14 @@ package g3
 import (
 	"errors"
 	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
 	"reflect"
 )
 
 var ErrDebugGlobalOwner = errors.New("g3: invalid default debug service owner")
 
 type DebugGlobalServiceConfig struct {
+	Runtime *memory.Runtime
 	Budget  *arena.Budget
 	Region  *arena.BytesRegion
 	Profile DebugActionProfile
@@ -21,8 +23,8 @@ type DebugGlobalServiceConfig struct {
 // One explicit source-global namespace uses the actual process standard files
 // and one assertion/tag Context. The service owns only the acquired Go helper
 // headers. Region bytes and OS descriptors remain caller/process owned. Native
-// iostream static initialization, locale and Runtime tag storage are separate
-// representation obligations; this does not install package singleton state.
+// iostream static initialization and locale are separate representation
+// obligations; optional Runtime borrows bind actual lazy tag storage; this does not install package singleton state.
 type DebugGlobalService struct {
 	self    *DebugGlobalService
 	budget  *arena.Budget
@@ -35,7 +37,7 @@ type DebugGlobalService struct {
 }
 
 func NewDebugGlobalService(c DebugGlobalServiceConfig) (*DebugGlobalService, error) {
-	if c.Budget == nil || c.Region == nil || c.Profile > DebugNoDebugger {
+	if c.Budget == nil || c.Region == nil || c.Profile > DebugNoDebugger || c.Runtime != nil && c.Runtime.Budget() != c.Budget {
 		return nil, arena.ErrConfig
 	}
 	n := uint64(reflect.TypeOf(DebugGlobalService{}).Size())
@@ -54,6 +56,9 @@ func NewDebugGlobalService(c DebugGlobalServiceConfig) (*DebugGlobalService, err
 	}
 	if e == nil {
 		s.context, e = NewDebugContext(c.Region, c.Budget)
+	}
+	if e == nil && c.Runtime != nil {
+		e = s.context.BindTagRuntime(c.Runtime)
 	}
 	if e == nil {
 		e = s.context.BindAssertionStreams(s.streams)

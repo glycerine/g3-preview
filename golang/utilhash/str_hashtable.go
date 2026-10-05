@@ -1,10 +1,12 @@
 // Licensed under the MIT license.
-// Concrete str_hashtable/ptr_hashtable<char> from util/str_hashtable.h and
-// util/hashtable.h, Leonardo de Moura (2006-09-13 / 2006-09-11).
+// Source: src/util/str_hashtable.h:24-31; src/util/hashtable.h:94-110,222-645.
+// Source author: Leonardo de Moura (2006-09-13 / 2006-09-11).
 package utilhash
 
 import (
+	"errors"
 	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
 	"reflect"
 	"strings"
 )
@@ -34,6 +36,7 @@ type strHashEntry struct {
 	key         StrKey
 }
 type StrHashtableConfig struct {
+	Runtime     *memory.Runtime
 	Budget      *arena.Budget
 	OutOfMemory func() bool
 	// InitialCapacity is the source constructor parameter; zero selects8.
@@ -50,6 +53,7 @@ type strOwner struct {
 // the table. This owning struct must not be copied. Region Reset/rollback/Close
 // invalidates affected keys; callers keep all borrowed regions alive.
 type StrHashtable struct {
+	raw                   strHashtableRaw
 	table                 []strHashEntry
 	region                *arena.BytesRegion
 	owners                []strOwner
@@ -69,7 +73,7 @@ func NewStrHashtable(r *arena.BytesRegion, c StrHashtableConfig) (*StrHashtable,
 	return newStrHashtableCapacity(r, c, n)
 }
 func newStrHashtableCapacity(r *arena.BytesRegion, c StrHashtableConfig, n uint32) (*StrHashtable, error) {
-	if r == nil {
+	if r == nil || c.Runtime != nil && (c.Runtime.Budget() != c.Budget || c.OutOfMemory != nil) {
 		return nil, arena.ErrConfig
 	}
 	root := uint64(reflect.TypeOf(StrHashtable{}).Size())
@@ -77,6 +81,19 @@ func newStrHashtableCapacity(r *arena.BytesRegion, c StrHashtableConfig, n uint3
 		return nil, e
 	}
 	h := &StrHashtable{region: r, config: c, epoch: 1, rootBytes: root}
+	if c.Runtime != nil {
+		e := h.constructRuntime(n)
+		if e != nil && h.raw.object == (memory.Block{}) && h.raw.table == (memory.Block{}) && h.raw.acquisitions == nil && h.raw.sourceCause == nil {
+			// The source new-expression has consumed every acquired byte. Only this
+			// now-empty Go preparation header remains; no failed placement owner needs
+			// to survive. Actual unjoined tokens/stopped destruction stay returned.
+			if cleanup := h.CloseChecked(); cleanup != nil {
+				return h, errors.Join(e, cleanup)
+			}
+			return nil, e
+		}
+		return h, e
+	}
 	table, bytes, e := h.allocateTable(n)
 	if e != nil {
 		c.Budget.Release(root)
@@ -96,6 +113,12 @@ func (h *StrHashtable) allocateTable(n uint32) ([]strHashEntry, uint64, error) {
 	return make([]strHashEntry, n), amount, nil
 }
 func (h *StrHashtable) open() error {
+	if h == nil {
+		return arena.ErrClosed
+	}
+	if h.config.Runtime != nil {
+		return h.openRuntime()
+	}
 	if h.closed || len(h.table) == 0 {
 		return arena.ErrClosed
 	}
@@ -118,10 +141,25 @@ func (h *StrHashtable) canBump() error {
 	}
 	return nil
 }
-func (h *StrHashtable) Size() uint32           { return h.size }
-func (h *StrHashtable) Empty() bool            { return h.size == 0 }
-func (h *StrHashtable) Capacity() uint32       { return uint32(len(h.table)) }
-func (h *StrHashtable) Deleted() uint32        { return h.deleted }
+func (h *StrHashtable) Size() uint32 {
+	if h.config.Runtime != nil {
+		return h.mustRuntimeWord(12)
+	}
+	return h.size
+}
+func (h *StrHashtable) Empty() bool { return h.Size() == 0 }
+func (h *StrHashtable) Capacity() uint32 {
+	if h.config.Runtime != nil {
+		return h.mustRuntimeWord(8)
+	}
+	return uint32(len(h.table))
+}
+func (h *StrHashtable) Deleted() uint32 {
+	if h.config.Runtime != nil {
+		return h.mustRuntimeWord(16)
+	}
+	return h.deleted
+}
 func (h *StrHashtable) CollisionCount() uint64 { return 0 }
 
 // StrHashtableStats accounts this owner, scalar table and cold owner directory.
@@ -132,7 +170,7 @@ type StrHashtableStats struct {
 }
 
 func (h *StrHashtable) Stats() StrHashtableStats {
-	return StrHashtableStats{h.rootBytes, h.tableBytes, h.directoryBytes, h.size, h.deleted, h.Capacity()}
+	return StrHashtableStats{h.rootBytes, h.tableBytes, h.directoryBytes, h.Size(), h.Deleted(), h.Capacity()}
 }
 
 func (h *StrHashtable) keyRegion(k StrKey) (*arena.BytesRegion, error) {
@@ -401,6 +439,9 @@ func (h *StrHashtable) rehash(n uint32) error {
 	return nil
 }
 func (h *StrHashtable) prepareInsert() error {
+	if h.config.Runtime != nil {
+		return h.prepareInsertRuntime()
+	}
 	if e := h.open(); e != nil {
 		return e
 	}
@@ -423,6 +464,9 @@ func (h *StrHashtable) insert(key StrKey, overwrite bool) (bool, StrHashtableEnt
 	return h.insertFrom(region, key, overwrite)
 }
 func (h *StrHashtable) insertFrom(region *arena.BytesRegion, key StrKey, overwrite bool) (bool, StrHashtableEntryRef, error) {
+	if h.config.Runtime != nil {
+		return h.insertRuntime(region, key, overwrite)
+	}
 	if e := h.prepareInsert(); e != nil {
 		return false, StrHashtableEntryRef{}, e
 	}
@@ -516,11 +560,22 @@ func (h *StrHashtable) findSlotFrom(region *arena.BytesRegion, key StrKey) (uint
 	if e != nil {
 		return 0, false, e
 	}
-	mask := h.Capacity() - 1
+	capacity, e := h.capacityChecked()
+	if e != nil {
+		return 0, false, e
+	}
+	mask := capacity - 1
 	i := hash & mask
-	for step := uint32(0); step < h.Capacity(); step++ {
-		entry := h.table[i]
+	for step := uint32(0); step < capacity; step++ {
+		entry, e := h.probeEntry(i)
+		if e != nil {
+			return 0, false, e
+		}
 		if entry.state == strHashUsed && entry.hash == hash {
+			entry.key, e = h.entryKey(i)
+			if e != nil {
+				return 0, false, e
+			}
 			storedRegion, e := h.keyRegion(entry.key)
 			if e != nil {
 				return 0, false, e
@@ -585,7 +640,8 @@ func (h *StrHashtable) Find(k StrKey) (StrKey, bool, error) {
 	if e != nil || !ok {
 		return StrKey{}, ok, e
 	}
-	return h.table[r.slot].key, true, nil
+	key, e := h.entryKey(r.slot)
+	return key, e == nil, e
 }
 func (h *StrHashtable) FindInto(k StrKey, out *StrKey) (bool, error) {
 	found, ok, e := h.Find(k)
@@ -612,11 +668,22 @@ func (h *StrHashtable) FindCString(s string) (StrHashtableEntryRef, bool, error)
 		return StrHashtableEntryRef{}, false, arena.ErrBounds
 	}
 	hash := String(s, 17)
-	mask := h.Capacity() - 1
+	capacity, e := h.capacityChecked()
+	if e != nil {
+		return StrHashtableEntryRef{}, false, e
+	}
+	mask := capacity - 1
 	i := hash & mask
-	for step := uint32(0); step < h.Capacity(); step++ {
-		entry := h.table[i]
+	for step := uint32(0); step < capacity; step++ {
+		entry, e := h.probeEntry(i)
+		if e != nil {
+			return StrHashtableEntryRef{}, false, e
+		}
 		if entry.state == strHashUsed && entry.hash == hash {
+			entry.key, e = h.entryKey(i)
+			if e != nil {
+				return StrHashtableEntryRef{}, false, e
+			}
 			if e := h.validateKey(entry.key); e != nil {
 				return StrHashtableEntryRef{}, false, e
 			}
@@ -678,6 +745,9 @@ func (h *StrHashtable) Remove(k StrKey) error {
 	return h.RemoveFrom(region, k)
 }
 func (h *StrHashtable) RemoveFrom(region *arena.BytesRegion, k StrKey) error {
+	if h.config.Runtime != nil {
+		return h.removeRuntime(region, k)
+	}
 	if e := h.open(); e != nil {
 		return e
 	}
@@ -722,6 +792,9 @@ func (h *StrHashtable) replaceEmpty(n uint32) error {
 	return nil
 }
 func (h *StrHashtable) Reset() error {
+	if h.config.Runtime != nil {
+		return h.resetRuntime()
+	}
 	if e := h.open(); e != nil {
 		return e
 	}
@@ -749,6 +822,9 @@ func (h *StrHashtable) Reset() error {
 	return nil
 }
 func (h *StrHashtable) Finalize() error {
+	if h.config.Runtime != nil {
+		return h.finalizeRuntime()
+	}
 	if e := h.open(); e != nil {
 		return e
 	}
@@ -758,6 +834,12 @@ func (h *StrHashtable) Finalize() error {
 	return h.Reset()
 }
 func (h *StrHashtable) Close() {
+	if h.config.Runtime != nil {
+		if e := h.CloseChecked(); e != nil {
+			panic(e)
+		}
+		return
+	}
 	if h.closed {
 		return
 	}
@@ -774,6 +856,12 @@ func (h *StrHashtable) Close() {
 	}
 }
 func (h *StrHashtable) Clone() (*StrHashtable, error) {
+	if h.config.Runtime != nil {
+		if e := h.open(); e != nil {
+			return nil, e
+		}
+		return h.cloneRuntime(true)
+	}
 	if e := h.open(); e != nil {
 		return nil, e
 	}
@@ -832,7 +920,22 @@ func (h *StrHashtable) Union(src *StrHashtable) error {
 	if h == src {
 		return nil
 	}
-	for _, entry := range src.table {
+	capacity, e := src.capacityChecked()
+	if e != nil {
+		return e
+	}
+	for idx := uint32(0); idx < capacity; idx++ {
+		state, e := src.entryState(idx)
+		if e != nil {
+			return e
+		}
+		entry := strHashEntry{state: state}
+		if state == strHashUsed {
+			entry.key, e = src.entryKey(idx)
+			if e != nil {
+				return e
+			}
+		}
 		if entry.state == strHashUsed {
 			owner, e := src.keyRegion(entry.key)
 			if e != nil {
@@ -846,6 +949,9 @@ func (h *StrHashtable) Union(src *StrHashtable) error {
 	return nil
 }
 func (h *StrHashtable) Intersect(src *StrHashtable) error {
+	if h.config.Runtime != nil {
+		return h.intersectRuntime(src)
+	}
 	if e := h.bothOpen(src); e != nil {
 		return e
 	}
@@ -857,7 +963,18 @@ func (h *StrHashtable) Intersect(src *StrHashtable) error {
 		return e
 	}
 	defer copy.Close()
-	for _, entry := range copy.table {
+	for idx := uint32(0); idx < copy.Capacity(); idx++ {
+		state, e := copy.entryState(idx)
+		if e != nil {
+			return e
+		}
+		entry := strHashEntry{state: state}
+		if state == strHashUsed {
+			entry.key, e = copy.entryKey(idx)
+			if e != nil {
+				return e
+			}
+		}
 		if entry.state == strHashUsed {
 			owner, e := copy.keyRegion(entry.key)
 			if e != nil {
@@ -877,6 +994,9 @@ func (h *StrHashtable) Intersect(src *StrHashtable) error {
 	return nil
 }
 func (h *StrHashtable) Swap(other *StrHashtable) error {
+	if h.config.Runtime != nil || other.config.Runtime != nil {
+		return h.swapRuntime(other)
+	}
 	if e := h.open(); e != nil {
 		return e
 	}
@@ -917,6 +1037,13 @@ func (h *StrHashtable) Swap(other *StrHashtable) error {
 	return nil
 }
 func (h *StrHashtable) CheckInvariant() bool {
+	if h.config.Runtime != nil {
+		ok, e := h.CheckInvariantChecked()
+		if e != nil {
+			panic(e)
+		}
+		return ok
+	}
 	if h.open() != nil {
 		return false
 	}
@@ -926,7 +1053,11 @@ func (h *StrHashtable) CheckInvariant() bool {
 			return false
 		}
 	}
-	for _, e := range h.table {
+	for idx := uint32(0); idx < h.Capacity(); idx++ {
+		e, err := h.readEntry(idx)
+		if err != nil {
+			panic(err)
+		}
 		if e.state == strHashUsed {
 			used++
 			if _, err := h.keyRegion(e.key); err != nil {
@@ -936,7 +1067,7 @@ func (h *StrHashtable) CheckInvariant() bool {
 			deleted++
 		}
 	}
-	return used == h.size && deleted == h.deleted
+	return used == h.Size() && deleted == h.Deleted()
 }
 
 // Dump is the source [spellings separated by spaces] byte-oriented format.
@@ -947,7 +1078,22 @@ func (h *StrHashtable) Dump() (string, error) {
 	var out strings.Builder
 	out.WriteByte('[')
 	first := true
-	for _, entry := range h.table {
+	capacity, e := h.capacityChecked()
+	if e != nil {
+		return "", e
+	}
+	for idx := uint32(0); idx < capacity; idx++ {
+		state, e := h.entryState(idx)
+		if e != nil {
+			return "", e
+		}
+		entry := strHashEntry{state: state}
+		if state == strHashUsed {
+			entry.key, e = h.entryKey(idx)
+			if e != nil {
+				return "", e
+			}
+		}
 		if entry.state != strHashUsed {
 			continue
 		}
@@ -979,7 +1125,18 @@ func (r StrHashtableEntryRef) validate() error {
 	if e := r.owner.open(); e != nil {
 		return e
 	}
-	if r.epoch != r.owner.epoch || r.slot >= r.owner.Capacity() || r.owner.table[r.slot].state != strHashUsed {
+	capacity, e := r.owner.capacityChecked()
+	if e != nil {
+		return e
+	}
+	if r.epoch != r.owner.epoch || r.slot >= capacity {
+		return arena.ErrInvalidSlot
+	}
+	state, e := r.owner.entryState(r.slot)
+	if e != nil {
+		return e
+	}
+	if state != strHashUsed {
 		return arena.ErrInvalidSlot
 	}
 	return nil
@@ -988,7 +1145,10 @@ func (r StrHashtableEntryRef) Key() (StrKey, error) {
 	if e := r.validate(); e != nil {
 		return StrKey{}, e
 	}
-	k := r.owner.table[r.slot].key
+	k, e := r.owner.entryKey(r.slot)
+	if e != nil {
+		return StrKey{}, e
+	}
 	if e := r.owner.validateKey(k); e != nil {
 		return StrKey{}, e
 	}
@@ -998,7 +1158,8 @@ func (r StrHashtableEntryRef) Hash() (uint32, error) {
 	if e := r.validate(); e != nil {
 		return 0, e
 	}
-	return r.owner.table[r.slot].hash, nil
+	entry, e := r.owner.probeEntry(r.slot)
+	return entry.hash, e
 }
 
 // SetKey represents source e->set_data(owned_spelling) after interning. It
@@ -1021,7 +1182,10 @@ func (r StrHashtableEntryRef) SetKeyFrom(region *arena.BytesRegion, k StrKey) er
 	if e != nil {
 		return e
 	}
-	entry := &r.owner.table[r.slot]
+	entry, e := r.owner.readEntry(r.slot)
+	if e != nil {
+		return e
+	}
 	if hash != entry.hash {
 		return arena.ErrBounds
 	}
@@ -1039,7 +1203,14 @@ func (r StrHashtableEntryRef) SetKeyFrom(region *arena.BytesRegion, k StrKey) er
 	if e := r.owner.adopt(region); e != nil {
 		return e
 	}
-	entry.key = k
+	if r.owner.config.Runtime != nil {
+		b, e := r.owner.runtimeTable()
+		if e != nil {
+			return e
+		}
+		return r.owner.putKeyAt(b, r.slot, k)
+	}
+	r.owner.table[r.slot].key = k
 	return nil
 }
 
@@ -1080,7 +1251,14 @@ func (h *StrHashtable) FindIteratorFrom(region *arena.BytesRegion, k StrKey) (St
 	return StrHashtableIterator{h, h.epoch, r.slot, h.Capacity()}, nil
 }
 func (it *StrHashtableIterator) scan() {
-	for it.index < it.end && it.owner.table[it.index].state != strHashUsed {
+	for it.index < it.end {
+		state, e := it.owner.entryState(it.index)
+		if e != nil {
+			panic(e)
+		}
+		if state == strHashUsed {
+			break
+		}
 		it.index++
 	}
 }
