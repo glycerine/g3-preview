@@ -210,7 +210,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	for i := range z.rootRaw.values {
 		add(z.rootRaw.values[i])
 	}
-	for _, s := range []*integerRawScope{&z.divisionRaw, &z.extendedRaw} {
+	for _, s := range []*integerRawScope{&z.divisionRaw, &z.extendedRaw, &z.gcdRaw} {
 		for i := uint8(0); i < s.count; i++ {
 			add(s.values[i])
 		}
@@ -223,6 +223,9 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 		add(z.rawDisplay.roots[i])
 	}
 	add(z.smt2Display.value)
+	if z.matchesAddMulInvocation(&z.gcdRaw.addMul) {
+		add(z.addMulInvocation.tmp)
+	}
 	add(z.intMin)
 	add(z.two64)
 	for _, a := range public {

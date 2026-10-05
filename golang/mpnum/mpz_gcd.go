@@ -1,6 +1,6 @@
 // Licensed under the MIT license.
-// Source: src/util/mpz.cpp gcd_core and gcd(_MP_INTERNAL / LEHMER_GCD),
-// src/util/mpz.h addmul/submul. Original author: Leonardo de Moura.
+// Source: src/util/mpz.cpp:49-84,560-817 (_MP_INTERNAL / LEHMER_GCD);
+// src/util/mpz.h:393-426 addmul/submul. Original author: Leonardo de Moura.
 package mpnum
 
 import "math"
@@ -86,13 +86,17 @@ func (m *IntegerManager) AddMul(a, b, c, d *Int) error {
 // One literal arithmetic body serves public and explicitly source-owned calls.
 // The nil-receipt failure adapter temporarily preserves historical eager RAW
 // cleanup; it is an incomplete deviation, not source AddMul lifetime credit.
-func (m *IntegerManager) addMulWithSourceReceipt(a, b, c, d *Int, receipt *integerAddMulInvocationReceipt, arithmetic *polynomialArithmeticInvocationReceipt) (err error) {
+
+func (m *IntegerManager) addMulWithSourceReceipt(a, b, c, d *Int, receipt *integerAddMulInvocationReceipt, arithmetic *polynomialArithmeticInvocationReceipt) error {
+	return m.addMulWithAllocationContext(a, b, c, d, receipt, integerAllocationInvocationContext{arithmetic: arithmetic})
+}
+func (m *IntegerManager) addMulWithAllocationContext(a, b, c, d *Int, receipt *integerAddMulInvocationReceipt, context integerAllocationInvocationContext) (err error) {
 	for _, n := range []*Int{a, b, c, d} {
 		if e := m.check(n); e != nil {
 			return e
 		}
 	}
-	context := integerAllocationInvocationContext{arithmetic: arithmetic}
+	callerContext := context
 	if b.IsSmall() && b.val == 1 {
 		return m.addSubWithAllocationContext(a, c, d, false, context)
 	}
@@ -109,12 +113,13 @@ func (m *IntegerManager) addMulWithSourceReceipt(a, b, c, d *Int, receipt *integ
 			return ErrPolynomialPending
 		}
 		*frame = integerAddMulScope{active: true, executing: true, invocation: frame.invocation + 1, stage: 1}
-		if arithmetic != nil {
-			frame.parent = *arithmetic
+		frame.parentContext = callerContext
+		if callerContext.arithmetic != nil {
+			frame.parent = *callerContext.arithmetic
 		}
 		*receipt = integerAddMulInvocationReceipt{m, frame, frame.invocation}
 		tmp = &frame.tmp
-		context = integerAllocationInvocationContext{addMul: receipt}
+		context = (integerAllocationInvocationContext{}).withAddMulInvocation(receipt)
 		defer func() {
 			frame.executing = false
 			if frame.stage < 3 {
@@ -139,8 +144,8 @@ func (m *IntegerManager) addMulWithSourceReceipt(a, b, c, d *Int, receipt *integ
 	}
 	if frame != nil {
 		frame.stage = 2
-		if arithmetic != nil {
-			context = integerAllocationInvocationContext{arithmetic: arithmetic}
+		if callerContext != (integerAllocationInvocationContext{}) {
+			context = callerContext
 		}
 	}
 	if e := m.addSubWithAllocationContext(a, tmp, d, false, context); e != nil {
@@ -181,6 +186,9 @@ func (m *IntegerManager) SubMul(a, b, c, d *Int) error {
 // owner-local source copies. The zero fastpath Copies and Abs directly into the
 // caller; errors preserve completed actions rather than a staged destination.
 func (m *IntegerManager) GCD(a, b, c *Int) error {
+	return m.gcdWithAllocationContext(a, b, c, integerAllocationInvocationContext{})
+}
+func (m *IntegerManager) gcdWithAllocationContext(a, b, c *Int, context integerAllocationInvocationContext) (err error) {
 	for _, n := range []*Int{a, b, c} {
 		if e := m.check(n); e != nil {
 			return e
@@ -194,66 +202,84 @@ func (m *IntegerManager) GCD(a, b, c *Int) error {
 		if bv < 0 {
 			bv = -bv
 		}
-		return m.SetInt64(c, int64(U32GCD(uint32(av), uint32(bv))))
+		return m.setInt64WithAllocationContext(c, int64(U32GCD(uint32(av), uint32(bv))), context)
 	}
 	if a.val == 0 {
-		if e := m.Copy(c, b); e != nil {
+		if e := m.copyFromOwnerWithAllocationContext(c, m, b, nil, context); e != nil {
 			return e
 		}
-		return m.Abs(c)
+		return m.absWithAllocationContext(c, context)
 	}
 	if b.val == 0 {
-		if e := m.Copy(c, a); e != nil {
+		if e := m.copyFromOwnerWithAllocationContext(c, m, a, nil, context); e != nil {
 			return e
 		}
-		return m.Abs(c)
+		return m.absWithAllocationContext(c, context)
 	}
-	var a1, b1, t, r, tmp Int
-	defer func() { m.Del(&a1); m.Del(&b1); m.Del(&r); m.Del(&t); m.Del(&tmp) }()
-	if e := m.Copy(&a1, a); e != nil {
+	s := &m.gcdRaw
+	receipt, e := m.beginRawInvocation(s, 5)
+	if e != nil {
 		return e
 	}
-	if e := m.Copy(&b1, b); e != nil {
+	context = context.withRawInvocation(receipt)
+	a1, b1, r, t, tmp := &s.values[0], &s.values[1], &s.values[2], &s.values[3], &s.values[4]
+	defer func() {
+		s.executing = false
+		s.bodyCause = err
+		if child := m.addMulInvocationSourceCause(&s.addMul); child != nil {
+			s.sourceCause = child
+		} else if child := m.natural.pnVerificationSourceCause(&s.verification); child != nil {
+			s.sourceCause = child
+		}
+		if err == nil {
+			s.bodySucceeded = true
+			err = m.finishRawSource(s)
+		}
+	}()
+	if e := m.copyFromOwnerWithAllocationContext(a1, m, a, nil, context); e != nil {
 		return e
 	}
-	if e := m.Abs(&a1); e != nil {
+	if e := m.copyFromOwnerWithAllocationContext(b1, m, b, nil, context); e != nil {
 		return e
 	}
-	if e := m.Abs(&b1); e != nil {
+	if e := m.absWithAllocationContext(a1, context); e != nil {
 		return e
 	}
-	cmp, e := m.Compare(&a1, &b1)
+	if e := m.absWithAllocationContext(b1, context); e != nil {
+		return e
+	}
+	cmp, e := m.Compare(a1, b1)
 	if e != nil {
 		return e
 	}
 	if cmp < 0 {
-		if e = m.Swap(&a1, &b1); e != nil {
+		if e = m.Swap(a1, b1); e != nil {
 			return e
 		}
 	}
 	for {
-		if e = m.gcdSourceGreaterEqual(&a1, &b1); e != nil {
+		if e = m.gcdSourceGreaterEqual(a1, b1); e != nil {
 			return e
 		}
 		if b1.IsSmall() {
 			if a1.IsSmall() {
-				return m.SetInt64(c, int64(U32GCD(uint32(a1.val), uint32(b1.val))))
+				return m.setInt64WithAllocationContext(c, int64(U32GCD(uint32(a1.val), uint32(b1.val))), context)
 			}
 			for b1.val != 0 {
-				if e = m.gcdSourceGreaterEqual(&a1, &b1); e != nil {
+				if e = m.gcdSourceGreaterEqual(a1, b1); e != nil {
 					return e
 				}
-				if e = m.Rem(&a1, &b1, &tmp); e != nil {
+				if e = m.remWithAllocationContext(a1, b1, tmp, context); e != nil {
 					return e
 				}
-				if e = m.Swap(&a1, &b1); e != nil {
+				if e = m.Swap(a1, b1); e != nil {
 					return e
 				}
-				if e = m.Swap(&b1, &tmp); e != nil {
+				if e = m.Swap(b1, tmp); e != nil {
 					return e
 				}
 			}
-			return m.Swap(c, &a1)
+			return m.Swap(c, a1)
 		}
 		if sourceGCDDebug {
 			if e = gcdSourceRequire(!a1.IsSmall()); e != nil {
@@ -308,54 +334,54 @@ func (m *IntegerManager) GCD(a, b, c *Int) error {
 			ahat = bhat
 			bhat = T
 		}
-		if e = m.gcdSourceGreaterEqual(&a1, &b1); e != nil {
+		if e = m.gcdSourceGreaterEqual(a1, b1); e != nil {
 			return e
 		}
 		if B == 0 {
-			if e = m.Rem(&a1, &b1, &t); e != nil {
+			if e = m.remWithAllocationContext(a1, b1, t, context); e != nil {
 				return e
 			}
-			if e = m.Swap(&a1, &b1); e != nil {
+			if e = m.Swap(a1, b1); e != nil {
 				return e
 			}
-			if e = m.Swap(&b1, &t); e != nil {
+			if e = m.Swap(b1, t); e != nil {
 				return e
 			}
-			if e = m.gcdSourceGreaterEqual(&a1, &b1); e != nil {
+			if e = m.gcdSourceGreaterEqual(a1, b1); e != nil {
 				return e
 			}
 		} else {
-			if e = m.SetInt64(&tmp, A); e != nil {
+			if e = m.setInt64WithAllocationContext(tmp, A, context); e != nil {
 				return e
 			}
-			if e = m.Mul(&a1, &tmp, &t); e != nil {
+			if e = m.mulWithAllocationContext(a1, tmp, t, context); e != nil {
 				return e
 			}
-			if e = m.SetInt64(&tmp, B); e != nil {
+			if e = m.setInt64WithAllocationContext(tmp, B, context); e != nil {
 				return e
 			}
-			if e = m.AddMul(&t, &tmp, &b1, &t); e != nil {
+			if e = m.addMulWithAllocationContext(t, tmp, b1, t, &s.addMul, context); e != nil {
 				return e
 			}
-			if e = m.SetInt64(&tmp, C); e != nil {
+			if e = m.setInt64WithAllocationContext(tmp, C, context); e != nil {
 				return e
 			}
-			if e = m.Mul(&a1, &tmp, &r); e != nil {
+			if e = m.mulWithAllocationContext(a1, tmp, r, context); e != nil {
 				return e
 			}
-			if e = m.SetInt64(&tmp, D); e != nil {
+			if e = m.setInt64WithAllocationContext(tmp, D, context); e != nil {
 				return e
 			}
-			if e = m.AddMul(&r, &tmp, &b1, &r); e != nil {
+			if e = m.addMulWithAllocationContext(r, tmp, b1, r, &s.addMul, context); e != nil {
 				return e
 			}
-			if e = m.Swap(&a1, &t); e != nil {
+			if e = m.Swap(a1, t); e != nil {
 				return e
 			}
-			if e = m.Swap(&b1, &r); e != nil {
+			if e = m.Swap(b1, r); e != nil {
 				return e
 			}
-			if e = m.gcdSourceGreaterEqual(&a1, &b1); e != nil {
+			if e = m.gcdSourceGreaterEqual(a1, b1); e != nil {
 				return e
 			}
 		}

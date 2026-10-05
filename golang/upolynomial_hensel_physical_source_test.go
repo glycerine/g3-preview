@@ -143,12 +143,17 @@ func upolyHenselAuditPhysical(t *testing.T, cores []*mpnum.UPolynomialManager, f
 	}
 	// Actual reached RAW declarations are owned by the shared Integer manager.
 	// Read their named count/fields; descriptor liveness never supplies roots.
-	for _, field := range []string{"divisionRaw", "extendedRaw"} {
+	for _, field := range []string{"divisionRaw", "extendedRaw", "gcdRaw"} {
 		scope := z.FieldByName(field)
 		values := scope.FieldByName("values")
 		for i := uint64(0); i < scope.FieldByName("count").Uint(); i++ {
 			addInt(values.Index(int(i)))
 		}
+	}
+	child := z.FieldByName("gcdRaw").FieldByName("addMul")
+	addMul := z.FieldByName("addMulInvocation")
+	if child.FieldByName("manager").Pointer() == z.Addr().Pointer() && child.FieldByName("frame").Pointer() == addMul.Addr().Pointer() && child.FieldByName("invocation").Uint() != 0 && child.FieldByName("invocation").Uint() == addMul.FieldByName("invocation").Uint() && addMul.FieldByName("active").Bool() {
+		addInt(addMul.FieldByName("tmp"))
 	}
 	addInt(z.FieldByName("intMin"))
 	addInt(z.FieldByName("two64"))
@@ -591,4 +596,60 @@ func upolyHenselAllocationRefusal(z *mpnum.IntegerManager, err error) bool {
 	}
 	var failure memory.Failure
 	return errors.As(err, &failure) && failure.Kind == memory.FailureMemout && z.RuntimeOwner().State().OutOfMemory
+}
+
+// Source: src/util/mpz.cpp:730-817.
+// Retained Lehmer declarations belong to the external shared Integer owner,
+// not UPolynomial cached/owned stats. Name only actual source frame fields.
+func upolyIntegerGCDRawOwnedCells(t *testing.T, zowner *mpnum.IntegerManager) uint32 {
+	t.Helper()
+	z := reflect.ValueOf(zowner).Elem()
+	if z.FieldByName("self").Pointer() != z.Addr().Pointer() {
+		t.Fatal("invalid Integer census owner")
+	}
+	raw := z.FieldByName("gcdRaw")
+	if raw.FieldByName("invocation").Uint() == 0 {
+		return 0
+	}
+	if raw.FieldByName("owner").Pointer() != z.Addr().Pointer() {
+		t.Fatal("invalid actual GCD frame owner")
+	}
+	cells := z.FieldByName("cells").Elem()
+	pages := cells.FieldByName("pages")
+	pageSize := cells.FieldByName("config").FieldByName("PageSize").Uint()
+	named := map[uint64]bool{}
+	add := func(v reflect.Value) {
+		ref := v.FieldByName("cell").Uint()
+		if ref == 0 || ref == z.FieldByName("failedRef").Uint() || ref == z.FieldByName("failedNullRef").Uint() {
+			return
+		}
+		slot := uint64(uint32(ref))
+		if slot == 0 || slot > cells.FieldByName("slots").Uint() {
+			t.Fatal("named GCD source token outside directory", ref)
+		}
+		state := pages.Index(int((slot - 1) / pageSize)).FieldByName("meta").Index(int((slot - 1) % pageSize))
+		if !state.FieldByName("live").Bool() || z.FieldByName("failedRef").Type().Size() == 8 && state.FieldByName("generation").Uint() != ref>>32 {
+			t.Fatal("named GCD token stale", ref)
+		}
+		named[state.FieldByName("generation").Uint()<<32|slot] = true
+	}
+	values := raw.FieldByName("values")
+	count := raw.FieldByName("count").Uint()
+	if count != 5 {
+		t.Fatal("invalid actual GCD declaration count", count)
+	}
+	for i := uint64(0); i < count; i++ {
+		add(values.Index(int(i)))
+	}
+	child := raw.FieldByName("addMul")
+	scope := z.FieldByName("addMulInvocation")
+	parent := scope.FieldByName("parentContext")
+	rawReceipt := parent.FieldByName("raw")
+	if child.FieldByName("manager").Pointer() == z.Addr().Pointer() && child.FieldByName("frame").Pointer() == scope.Addr().Pointer() && child.FieldByName("invocation").Uint() != 0 && child.FieldByName("invocation").Uint() == scope.FieldByName("invocation").Uint() && scope.FieldByName("active").Bool() {
+		if rawReceipt.IsNil() || !raw.FieldByName("active").Bool() || rawReceipt.Elem().FieldByName("manager").Pointer() != z.Addr().Pointer() || rawReceipt.Elem().FieldByName("invocation").Uint() != raw.FieldByName("invocation").Uint() || rawReceipt.Elem().FieldByName("frame").Pointer() != raw.Addr().Pointer() || parent.FieldByName("rawInvocation").Uint() != raw.FieldByName("invocation").Uint() {
+			t.Fatal("invalid matched GCD child parent context")
+		}
+		add(scope.FieldByName("tmp"))
+	}
+	return uint32(len(named))
 }

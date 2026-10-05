@@ -5,6 +5,7 @@ package mpnum
 // This is actual source invocation state in the charged Integer owner. Body
 // failure does not reach DEL; its published temporary is explicitly unjoined.
 type integerAddMulScope struct {
+	parentContext                   integerAllocationInvocationContext
 	invocation                      uint64
 	active, executing, ended, owned bool
 	stage                           uint8
@@ -59,7 +60,7 @@ func (m *IntegerManager) cleanupAddMulInvocation(r *integerAddMulInvocationRecei
 	}
 	// Only reached end DEL may complete before older caller declarations.
 	if s.stage == 3 && !s.ended && !s.owned {
-		if e := m.Del(&s.tmp); e != nil {
+		if e := m.cleanupRawNumeral(&s.tmp); e != nil {
 			return e
 		}
 		s.owned = true
@@ -68,7 +69,7 @@ func (m *IntegerManager) cleanupAddMulInvocation(r *integerAddMulInvocationRecei
 		return nil
 	}
 	if !s.ended && !s.owned {
-		if e := m.Del(&s.tmp); e != nil {
+		if e := m.cleanupRawNumeral(&s.tmp); e != nil {
 			return e
 		}
 		s.owned = true

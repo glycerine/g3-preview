@@ -1,10 +1,11 @@
-// Source: src/util/mpz.h:468-485; src/util/mpz.cpp:915-985.
+// Source: src/util/mpz.h:468-485; src/util/mpz.cpp:730-817,915-985.
 // Licensed under the MIT license. Source author: Leonardo de Moura.
 package mpnum
 
 // Real retained RAW declarations in the charged Integer owner. Count marks
 // reached declarations; values beyond count carry no source constructor credit.
 type integerRawScope struct {
+	addMul                                         integerAddMulInvocationReceipt
 	owner                                          *IntegerManager
 	receipt                                        integerRawInvocationReceipt
 	invocation                                     uint64
@@ -23,7 +24,7 @@ type integerRawInvocationReceipt struct {
 }
 
 func (m *IntegerManager) rawFrameAddress(s *integerRawScope) bool {
-	return m != nil && m.self == m && s != nil && (s == &m.divisionRaw || s == &m.extendedRaw)
+	return m != nil && m.self == m && s != nil && (s == &m.divisionRaw || s == &m.extendedRaw || s == &m.gcdRaw)
 }
 func (m *IntegerManager) matchesRawInvocation(r *integerRawInvocationReceipt) bool {
 	return r != nil && r.manager == m && m.rawFrameAddress(r.frame) && r.frame.owner == m && r.invocation != 0 && r.invocation == r.frame.invocation && r.frame.active
@@ -52,6 +53,14 @@ func (m *IntegerManager) finishRawSource(s *integerRawScope) error {
 	if s.sourceCause != nil {
 		return s.sourceCause
 	}
+	if e := m.addMulInvocationSourceCause(&s.addMul); e != nil {
+		s.sourceCause = e
+		return e
+	}
+	if e := m.natural.pnVerificationSourceCause(&s.verification); e != nil {
+		s.sourceCause = e
+		return e
+	}
 	if !s.active || !s.bodySucceeded || s.ended || s.owned {
 		return nil
 	}
@@ -76,7 +85,7 @@ func (m *IntegerManager) rawInvocationSourceCause(r *integerRawInvocationReceipt
 	return nil
 }
 func (s *integerRawScope) pending(m *IntegerManager) bool {
-	if polynomialNegNumericPending(&s.numeric) || m.natural.matchesPNVerification(&s.verification) {
+	if m.matchesAddMulInvocation(&s.addMul) || polynomialNegNumericPending(&s.numeric) || m.natural.matchesPNVerification(&s.verification) {
 		return true
 	}
 	for i := range s.buffers {
@@ -94,6 +103,9 @@ func (m *IntegerManager) cleanupRawInvocation(r *integerRawInvocationReceipt, ab
 	if s.executing {
 		return ErrPolynomialPending
 	}
+	if e := m.cleanupAddMulInvocation(&s.addMul, false); e != nil {
+		return e
+	}
 	if e := m.natural.cleanupPNVerification(&s.verification, false); e != nil {
 		return e
 	}
@@ -108,6 +120,9 @@ func (m *IntegerManager) cleanupRawInvocation(r *integerRawInvocationReceipt, ab
 	}
 	if !abort {
 		return nil
+	}
+	if e := m.cleanupAddMulInvocation(&s.addMul, true); e != nil {
+		return e
 	}
 	if e := m.natural.cleanupPNVerification(&s.verification, true); e != nil {
 		return e
@@ -163,4 +178,15 @@ func (m *IntegerManager) cleanupRawNumeral(p *Int) error {
 		return nil
 	}
 	return m.Del(p)
+}
+
+// CleanupGCDRaw acknowledges the actual retained Lehmer RAW fields; it does
+// not repair source scratch holes or replay source explicit DEL.
+func (m *IntegerManager) CleanupGCDRaw() error {
+	if m == nil || m.self != m {
+		return ErrPolynomialOwner
+	}
+	s := &m.gcdRaw
+	r := integerRawInvocationReceipt{m, s, s.invocation}
+	return m.cleanupRawInvocation(&r, true)
 }

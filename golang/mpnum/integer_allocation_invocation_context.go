@@ -5,16 +5,25 @@ package mpnum
 // Explicit passed invocation identity. It carries no allocation snapshot and
 // creates no source numeral, reservation, or ambient callback owner hook.
 type integerAllocationInvocationContext struct {
-	raw           *integerRawInvocationReceipt
-	rawInvocation uint64
-	pn            *integerPNormalizeScope
-	pnInvocation  uint64
-	arithmetic    *polynomialArithmeticInvocationReceipt
-	addMul        *integerAddMulInvocationReceipt
-	derivative    *polynomialDerivativeInvocationReceipt
-	scalarDiv     *polynomialScalarDivInvocationReceipt
+	raw              *integerRawInvocationReceipt
+	rawInvocation    uint64
+	pn               *integerPNormalizeScope
+	pnInvocation     uint64
+	arithmetic       *polynomialArithmeticInvocationReceipt
+	addMul           *integerAddMulInvocationReceipt
+	addMulInvocation uint64
+	derivative       *polynomialDerivativeInvocationReceipt
+	scalarDiv        *polynomialScalarDivInvocationReceipt
 }
 
+func (c integerAllocationInvocationContext) withAddMulInvocation(r *integerAddMulInvocationReceipt) integerAllocationInvocationContext {
+	c.addMul = r
+	c.addMulInvocation = 0
+	if r != nil {
+		c.addMulInvocation = r.invocation
+	}
+	return c
+}
 func (c integerAllocationInvocationContext) withRawInvocation(r *integerRawInvocationReceipt) integerAllocationInvocationContext {
 	c.raw = r
 	c.rawInvocation = 0
@@ -53,8 +62,11 @@ func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomial
 	if c.derivative != nil {
 		return m.derivativeAllocationRoots(c.derivative)
 	}
-	if c.addMul != nil && m.matchesAddMulInvocation(c.addMul) && c.addMul.frame.executing {
+	if c.addMul != nil && c.addMulInvocation != 0 && c.addMulInvocation == c.addMul.invocation && m.matchesAddMulInvocation(c.addMul) && c.addMul.frame.executing {
 		s := c.addMul.frame
+		if s.parentContext != (integerAllocationInvocationContext{}) && s.parentContext.roots(m) == nil {
+			return nil
+		}
 		if s.parent.manager != nil && m.arithmeticAllocationRoots(&s.parent) == nil {
 			return nil
 		}

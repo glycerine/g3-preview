@@ -46,7 +46,7 @@ type IntegerConfig struct {
 // Cells, transitional Natural Words and the actual memory backend share one Budget.
 // Close invalidates every live numeral; a supplied Runtime is borrowed.
 type IntegerManager struct {
-	divisionRaw, extendedRaw               integerRawScope
+	divisionRaw, extendedRaw, gcdRaw       integerRawScope
 	addMulInvocation                       integerAddMulScope
 	copyAllocation                         integerCopyAllocationScope
 	self                                   *IntegerManager
@@ -447,6 +447,9 @@ func (m *IntegerManager) CloseChecked() error {
 	if e := m.CleanupExtendedGCD(); e != nil {
 		return fail(e)
 	}
+	if e := m.CleanupGCDRaw(); e != nil {
+		return fail(e)
+	}
 	if m.cells != nil {
 		for n := uint64(1); n <= uint64(m.cells.Stats().Slots); n++ {
 			slot := arena.Slot(n)
@@ -783,22 +786,28 @@ func (m *IntegerManager) Swap(a, b *Int) error {
 	return nil
 }
 func (m *IntegerManager) Neg(a *Int) error {
+	return m.negWithAllocationContext(a, integerAllocationInvocationContext{})
+}
+func (m *IntegerManager) negWithAllocationContext(a *Int, context integerAllocationInvocationContext) error {
 	if e := m.check(a); e != nil {
 		return e
 	}
 	if a.IsSmall() && a.val == math.MinInt32 {
-		return m.SetInt64(a, -int64(math.MinInt32))
+		return m.setInt64WithAllocationContext(a, -int64(math.MinInt32), context)
 	}
 	a.val = -a.val
 	return nil
 }
 func (m *IntegerManager) Abs(a *Int) error {
+	return m.absWithAllocationContext(a, integerAllocationInvocationContext{})
+}
+func (m *IntegerManager) absWithAllocationContext(a *Int, context integerAllocationInvocationContext) error {
 	if e := m.check(a); e != nil {
 		return e
 	}
 	if a.IsSmall() {
 		if a.val < 0 {
-			return m.Neg(a)
+			return m.negWithAllocationContext(a, context)
 		}
 	} else {
 		a.val = 1

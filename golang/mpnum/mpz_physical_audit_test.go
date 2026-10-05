@@ -43,10 +43,13 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []mem
 	for i := range m.rawDisplay.roots {
 		add(m.rawDisplay.roots[i].cell)
 	}
-	for _, s := range []*integerRawScope{&m.divisionRaw, &m.extendedRaw} {
+	for _, s := range []*integerRawScope{&m.divisionRaw, &m.extendedRaw, &m.gcdRaw} {
 		for i := uint8(0); i < s.count; i++ {
 			add(s.values[i].cell)
 		}
+	}
+	if m.matchesAddMulInvocation(&m.gcdRaw.addMul) {
+		add(m.addMulInvocation.tmp.cell)
 	}
 	add(m.powerRaw.value.cell)
 	for i := range m.rootRaw.values {
