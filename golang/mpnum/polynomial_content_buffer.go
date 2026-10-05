@@ -140,6 +140,9 @@ func (b *polynomialContentUnsignedBuffer) resize(n, w uint32) error {
 }
 func (b *polynomialContentUnsignedBuffer) reset() { b.count = 0 }
 func (b *polynomialContentUnsignedBuffer) close(owning bool) error {
+	return b.closePhase(owning, owning)
+}
+func (b *polynomialContentUnsignedBuffer) closePhase(owning, abort bool) error {
 	if !b.constructed || b.finalized && !owning {
 		return nil
 	}
@@ -155,7 +158,7 @@ func (b *polynomialContentUnsignedBuffer) close(owning bool) error {
 			return e
 		}
 	}
-	if owning && b.pending != (memory.Block{}) {
+	if owning && abort && b.pending != (memory.Block{}) {
 		if e := b.runtime.Deallocate(&b.pending); e != nil {
 			return e
 		}

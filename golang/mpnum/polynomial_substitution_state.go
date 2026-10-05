@@ -32,6 +32,7 @@ type polynomialSubstitutionState struct {
 	bodyCause, cleanupCause error
 }
 type polynomialSubstitutionScope struct {
+	somInvocation                                    uint64
 	active, executing                                bool
 	kind                                             uint8
 	newA, tmp                                        Int

@@ -28572,7 +28572,56 @@
         "mpnum/polynomial_display_source_test.go",
         "mpnum/polynomial_display_tls_test.go",
         "mpnum/polynomial_factors.go",
-        "mpnum/polynomial_factors_operations.go"
+        "mpnum/polynomial_factors_operations.go",
+        "mpnum/polynomial_content_buffer.go",
+        "mpnum/polynomial_content_mode_source_test.go",
+        "mpnum/polynomial_divides.go",
+        "mpnum/polynomial_divides_source_test.go",
+        "mpnum/polynomial_gcd.go",
+        "mpnum/polynomial_gcd_big_field_source_test.go",
+        "mpnum/polynomial_gcd_buffer_stopped_growth_source_test.go",
+        "mpnum/polynomial_gcd_cancel_source_test.go",
+        "mpnum/polynomial_gcd_checkpoint_foreign_source_test.go",
+        "mpnum/polynomial_gcd_cleanup.go",
+        "mpnum/polynomial_gcd_cra.go",
+        "mpnum/polynomial_gcd_cra_source_test.go",
+        "mpnum/polynomial_gcd_default_source_test.go",
+        "mpnum/polynomial_gcd_euclid.go",
+        "mpnum/polynomial_gcd_euclid_source_test.go",
+        "mpnum/polynomial_gcd_iccp_zpx.go",
+        "mpnum/polynomial_gcd_modular.go",
+        "mpnum/polynomial_gcd_monomial_buffer.go",
+        "mpnum/polynomial_gcd_numeric_pending_source_test.go",
+        "mpnum/polynomial_gcd_power_buffer.go",
+        "mpnum/polynomial_gcd_power_buffer_source_test.go",
+        "mpnum/polynomial_gcd_prs.go",
+        "mpnum/polynomial_gcd_random.go",
+        "mpnum/polynomial_gcd_random_source_test.go",
+        "mpnum/polynomial_gcd_recursive.go",
+        "mpnum/polynomial_gcd_recursive_source_test.go",
+        "mpnum/polynomial_gcd_scope.go",
+        "mpnum/polynomial_gcd_source_test.go",
+        "mpnum/polynomial_gcd_univariate_modular.go",
+        "mpnum/polynomial_gcd_unwind_phase_source_test.go",
+        "mpnum/polynomial_gcd_variable_buffer.go",
+        "mpnum/polynomial_gcd_variable_buffer_source_test.go",
+        "mpnum/polynomial_gcd_zpx.go",
+        "mpnum/polynomial_gcd_zpx_source_test.go",
+        "mpnum/polynomial_iccp.go",
+        "mpnum/polynomial_iccp_cleanup_order_source_test.go",
+        "mpnum/polynomial_iccp_source_test.go",
+        "mpnum/polynomial_invocation_receipts.go",
+        "mpnum/polynomial_invocation_receipts_source_test.go",
+        "mpnum/polynomial_normalize.go",
+        "mpnum/polynomial_normalize_source_test.go",
+        "mpnum/polynomial_primitive_return_order_source_test.go",
+        "mpnum/polynomial_resultant.go",
+        "mpnum/polynomial_resultant_source_test.go",
+        "mpnum/polynomial_scoped_zp.go",
+        "mpnum/polynomial_scoped_zp_source_test.go",
+        "mpnum/polynomial_som_normalize_lifetime_source_test.go",
+        "mpnum/polynomial_som_normalize_scope.go",
+        "mpnum/polynomial_sparse_embedded_constructor_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -29008,7 +29057,80 @@
         "TestPolynomialFactorsSourceControlAndOwnership",
         "TestPolynomialFactorsSourceDegreeQuirkAndWrap",
         "TestPolynomialFactorsSourceFinalizeAndClosedGuards",
-        "TestPolynomialFactorsYoungerPowerStop"
+        "TestPolynomialFactorsYoungerPowerStop",
+        "TestPolynomialDividesIndependentFiniteAndZeroReadMask",
+        "TestPolynomialDividesEveryActualReservationPrefix",
+        "TestPolynomialDividesBigNumericPendingBlocksOwningClose",
+        "TestPolynomialGCDRecursiveBigFieldEveryReservationPrefix",
+        "TestPolynomialGCDMonomialBufferConsumedOldGrowth",
+        "TestPolynomialGCDAndResultantEveryReachedCancellation",
+        "TestPolynomialGCDCheckpointPreservesActualForeignPrimitiveCreation",
+        "TestPolynomialGCDCooperationPreservesActualForeignPrimitiveCreation",
+        "TestPolynomialGCDCRAIndependentBalancedCoefficientTable",
+        "TestPolynomialGCDCRAEveryActualBigNumeralPrefix",
+        "TestPolynomialGCDCRACompletedNumeralGuardRetainsOlderRoots",
+        "TestPolynomialGCDDefaultIntegerIndependentCommonFactors",
+        "TestPolynomialGCDDefaultIntegerEveryReservationPrefix",
+        "TestPolynomialGCDDefaultIntegerCRAReconstruction",
+        "TestPolynomialGCDSourcePrimeExhaustionUsesLiteralPRS",
+        "TestPolynomialGCDEuclidSourceShortcutsAndIntegerContent",
+        "TestPolynomialGCDDispatcherConstantNormalizesSourceScalarSets",
+        "TestPolynomialResultantPhysicalDescriptorRefusalComposedCleanup",
+        "TestPolynomialGCDPowerSortIndependentUnsignedPairs",
+        "TestPolynomialGCDPowerSortUnsignedBoundary",
+        "TestPolynomialGCDPowerDegreeSortSourceAdapter",
+        "TestPolynomialFreshValueUsesSharedLibcStreamAndRejectsUsedInputs",
+        "TestPolynomialFreshValueZeroModulusSourceProfile",
+        "TestPolynomialGCDRecursiveLastVariableUsesEuclidWithoutReadingVariable",
+        "TestPolynomialGCDRecursiveDenseIndependentCommonFactor",
+        "TestPolynomialGCDRecursiveSavedSkeletonIndependentCommonFactor",
+        "TestPolynomialGCDRecursiveActualSparseBodyExceptionAfterCompletedUnwind",
+        "TestPolynomialGCDSparseCatchWaitsForGuardedActualDestructorStop",
+        "TestPolynomialGCDSourceZeroIdentityAndConstantContent",
+        "TestPolynomialGCDPRSIndependentFactorTable",
+        "TestPolynomialGCDDefaultUnivariateModularImages",
+        "TestPolynomialGCDScalarProductSourceIndependentOrder",
+        "TestPolynomialGCDDefaultMultivariateIndependentCommonFactor",
+        "TestPolynomialPSCCompletedPhaseLeavesFailedConstructorForOuterUnwind",
+        "TestPolynomialGCDInnerModeBlockWaitsForActualYoungerSourceStop",
+        "TestPolynomialGCDCompletedMonomialBufferFreePrecedesOlderStop",
+        "TestPolynomialGCDVariableBufferActualInlineAndOverflow",
+        "TestPolynomialGCDGlexZPXIndependentCoefficientModel",
+        "TestPolynomialGCDICCPZPXContentAndPrimitiveIndependentModel",
+        "TestPolynomialGCDICCPZPXSourceShortcutTable",
+        "TestPolynomialGCDIntegerContentFieldChangeSourceInputAssertion",
+        "TestPolynomialResultantICCPStoppedChildPrecedesOlderLocals",
+        "TestPolynomialICCPIndependentContentAndPrimitiveBranches",
+        "TestPolynomialGeneralGCDIndependentCommonContent",
+        "TestPolynomialICCPInvocationReceiptRejectsReusedFrame",
+        "TestPolynomialGCDInvocationReceiptRejectsReusedFrame",
+        "TestPolynomialNormalizeInvocationReceiptRejectsReusedFrame",
+        "TestPolynomialICCPExpandedFilterEveryActualReservation",
+        "TestPolynomialICCPRetainsActualPendingGCDInvocation",
+        "TestPolynomialNormalizeIndependentSignedIntegerContent",
+        "TestPolynomialNormalizeIndependentModularResidues",
+        "TestPolynomialNormalizeEveryActualReservationPrefix",
+        "TestPolynomialNormalizeBigDescriptorRefusalAndReplacement",
+        "TestPolynomialPrimitivePartReturnedTemporaryPrecedesCallerAssignment",
+        "TestPolynomialResultantIndependentLinearAndQuadraticIdentity",
+        "TestPolynomialResultantRegisteredPSCThirdAssertion",
+        "TestPolynomialResultantIndependentDegreeAndSignTable",
+        "TestPolynomialResultantEveryReservationPrefix",
+        "TestPolynomialResultantBigNumeralEveryReservationPrefix",
+        "TestPolynomialResultantAllEightOriginalPSCAssertions",
+        "TestPolynomialScopedZPActualModeAndPrimeRestoration",
+        "TestPolynomialScopedZPFailedBodyDoesNotRestoreMode",
+        "TestPolynomialScopedZPFailedMemberCopyRetainsPhysicalPending",
+        "TestPolynomialScopedZPCompletedMemberGuardIsSticky",
+        "TestPolynomialSOMNormalizeCompletedNumeralSourceGuard",
+        "TestPolynomialNormalizeYoungerSourceGuardRetainsOlderNumeral",
+        "TestPolynomialSubstitutionYoungerSOMGuardRetainsOlderNumerals",
+        "TestPolynomialSubstitutionExpiredSOMReceiptPreservesReplacement",
+        "TestPolynomialSparseEmbeddedNilConstructorHasNoReservation",
+        "TestPolynomialSparseEmbeddedEveryMemberPrefix",
+        "TestPolynomialContentModeSwitchSourceSet",
+        "TestPolynomialIntegerContentFieldEveryActualReservationPrefix",
+        "TestPolynomialICCPZPXModeSwitchSourceSet"
       ],
       "conditionals": [
         {
@@ -31775,6 +31897,180 @@
             "TestPolynomialFactorsLiteralDisplayAndConstantHelpers",
             "TestPolynomialFactorsModularAndZeroDegreeSource"
           ]
+        },
+        {
+          "name": "IC both overloads cpp3344-3359/3405-3430: m_manager is mpzzp_manager; actual modular SET/GCD/Div guards, field inverse scratch and mode-switch normalization; explicit m().m() arithmetic remains raw",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_content.go",
+          "tests": [
+            "TestPolynomialContentModeSwitchSourceSet",
+            "TestPolynomialIntegerContentFieldEveryActualReservationPrefix",
+            "TestPolynomialICCPZPXModeSwitchSourceSet",
+            "TestPolynomialIntegerContentIndependentSignedBranches",
+            "TestPolynomialIntegerContentEveryActualReservationPrefix"
+          ]
+        },
+        {
+          "name": "ICCP cpp3432-3534: zero/constant/degree-zero guards, inline128 filter/powers, literal IC/coefficient GCD/sign/exact division and matched lexical invocation ownership",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_iccp.go",
+          "tests": [
+            "TestPolynomialICCPIndependentContentAndPrimitiveBranches",
+            "TestPolynomialGeneralGCDIndependentCommonContent",
+            "TestPolynomialResultantICCPStoppedChildPrecedesOlderLocals",
+            "TestPolynomialICCPInvocationReceiptRejectsReusedFrame",
+            "TestPolynomialGCDInvocationReceiptRejectsReusedFrame",
+            "TestPolynomialNormalizeInvocationReceiptRejectsReusedFrame",
+            "TestPolynomialICCPExpandedFilterEveryActualReservation",
+            "TestPolynomialICCPRetainsActualPendingGCDInvocation"
+          ]
+        },
+        {
+          "name": "pp/is_primitive/gcd_content/gcd_prs cpp3536-3636: source returned-reference temporary finishes helper c/i before caller assignment, then temporary destructor",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_gcd_prs.go",
+          "tests": [
+            "TestPolynomialPrimitivePartReturnedTemporaryPrecedesCallerAssignment",
+            "TestPolynomialGCDSourceZeroIdentityAndConstantContent",
+            "TestPolynomialGCDPRSIndependentFactorTable",
+            "TestPolynomialGCDDefaultUnivariateModularImages",
+            "TestPolynomialGCDScalarProductSourceIndependentOrder",
+            "TestPolynomialGCDDefaultMultivariateIndependentCommonFactor"
+          ]
+        },
+        {
+          "name": "gcd_euclid cpp3639-3672: modular wrapper scalar SET/GCD route",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_gcd_euclid.go",
+          "tests": [
+            "TestPolynomialGCDEuclidSourceShortcutsAndIntegerContent",
+            "TestPolynomialGCDDispatcherConstantNormalizesSourceScalarSets"
+          ]
+        },
+        {
+          "name": "CRA cpp3675-3767: literal signed modular inverse, coefficient merge and indexed alias behavior with source-scoped NUM ownership",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_gcd_cra.go",
+          "tests": [
+            "TestPolynomialGCDCRAIndependentBalancedCoefficientTable",
+            "TestPolynomialGCDCRAEveryActualBigNumeralPrefix",
+            "TestPolynomialGCDCRACompletedNumeralGuardRetainsOlderRoots"
+          ]
+        },
+        {
+          "name": "uni_mod_gcd cpp3769-3865: integer primitive/content reconstruction, real prime iteration and scoped Zp restoration",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_gcd_univariate_modular.go",
+          "tests": [
+            "TestPolynomialGCDDefaultIntegerIndependentCommonFactors",
+            "TestPolynomialGCDDefaultIntegerEveryReservationPrefix",
+            "TestPolynomialGCDDefaultIntegerCRAReconstruction",
+            "TestPolynomialGCDSourcePrimeExhaustionUsesLiteralPRS",
+            "TestPolynomialGCDRecursiveBigFieldEveryReservationPrefix",
+            "TestPolynomialPSCCompletedPhaseLeavesFailedConstructorForOuterUnwind",
+            "TestPolynomialGCDInnerModeBlockWaitsForActualYoungerSourceStop",
+            "TestPolynomialGCDCompletedMonomialBufferFreePrecedesOlderStop"
+          ]
+        },
+        {
+          "name": "iccp_ZpX/gcd_ZpX cpp3867-4051: source Zp contents, monomial ref-buffer, dense remainder and sparse interpolation branch",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_gcd_zpx.go",
+          "tests": [
+            "TestPolynomialGCDGlexZPXIndependentCoefficientModel",
+            "TestPolynomialGCDICCPZPXContentAndPrimitiveIndependentModel",
+            "TestPolynomialGCDICCPZPXSourceShortcutTable",
+            "TestPolynomialGCDIntegerContentFieldChangeSourceInputAssertion",
+            "TestPolynomialGCDMonomialBufferConsumedOldGrowth",
+            "TestPolynomialContentModeSwitchSourceSet",
+            "TestPolynomialIntegerContentFieldEveryActualReservationPrefix",
+            "TestPolynomialICCPZPXModeSwitchSourceSet"
+          ]
+        },
+        {
+          "name": "peek_fresh_value cpp4053-4068: actual shared source rand stream, source modulus behavior and occupied-degree traversal",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_gcd_random.go",
+          "tests": [
+            "TestPolynomialFreshValueUsesSharedLibcStreamAndRejectsUsedInputs",
+            "TestPolynomialFreshValueZeroModulusSourceProfile"
+          ]
+        },
+        {
+          "name": "mod_gcd_rec/mod_gcd cpp4076-4350: source degree/variable choice, exact sample/interpolator recursion, skeleton restoration and typed sparse failure fallback",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_gcd_recursive.go",
+          "tests": [
+            "TestPolynomialGCDRecursiveLastVariableUsesEuclidWithoutReadingVariable",
+            "TestPolynomialGCDRecursiveDenseIndependentCommonFactor",
+            "TestPolynomialGCDRecursiveSavedSkeletonIndependentCommonFactor",
+            "TestPolynomialGCDRecursiveActualSparseBodyExceptionAfterCompletedUnwind",
+            "TestPolynomialGCDSparseCatchWaitsForGuardedActualDestructorStop",
+            "TestPolynomialGCDAndResultantEveryReachedCancellation",
+            "TestPolynomialGCDCheckpointPreservesActualForeignPrimitiveCreation",
+            "TestPolynomialGCDCooperationPreservesActualForeignPrimitiveCreation"
+          ]
+        },
+        {
+          "name": "GCD dispatcher cpp4352-4506: actual scalar/identity/content selection, source variable degree ordering, modular/PRS choice; mgcd_check global diagnostic remains open",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_gcd.go",
+          "tests": [
+            "TestPolynomialGCDSourceZeroIdentityAndConstantContent",
+            "TestPolynomialGCDPRSIndependentFactorTable",
+            "TestPolynomialGCDDefaultUnivariateModularImages",
+            "TestPolynomialGCDScalarProductSourceIndependentOrder",
+            "TestPolynomialGCDDefaultMultivariateIndependentCommonFactor",
+            "TestPolynomialGCDDefaultIntegerIndependentCommonFactors",
+            "TestPolynomialGCDDefaultIntegerEveryReservationPrefix",
+            "TestPolynomialGCDDefaultIntegerCRAReconstruction",
+            "TestPolynomialGCDSourcePrimeExhaustionUsesLiteralPRS",
+            "TestPolynomialResultantPhysicalDescriptorRefusalComposedCleanup"
+          ]
+        },
+        {
+          "name": "divides cpp5154-5194: source constant shortcuts and exact remainder-based decision with actual numeral local",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_divides.go",
+          "tests": [
+            "TestPolynomialDividesIndependentFiniteAndZeroReadMask",
+            "TestPolynomialDividesEveryActualReservationPrefix",
+            "TestPolynomialDividesBigNumericPendingBlocksOwningClose"
+          ]
+        },
+        {
+          "name": "Resultant cpp5358-5480: zero/constant/degree guards, ICCP factors, literal subresultant recurrence and degree/sign restoration",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_resultant.go",
+          "tests": [
+            "TestPolynomialResultantIndependentLinearAndQuadraticIdentity",
+            "TestPolynomialResultantRegisteredPSCThirdAssertion",
+            "TestPolynomialResultantIndependentDegreeAndSignTable",
+            "TestPolynomialResultantEveryReservationPrefix",
+            "TestPolynomialResultantBigNumeralEveryReservationPrefix",
+            "TestPolynomialResultantAllEightOriginalPSCAssertions",
+            "TestPolynomialResultantICCPStoppedChildPrecedesOlderLocals"
+          ]
+        },
+        {
+          "name": "Normalize cpp5904-5940: actual modular normalization and integer gcd/divide paths, source SOM NUM/g/a scopes and uniquely guarded invocation",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_normalize.go",
+          "tests": [
+            "TestPolynomialNormalizeIndependentSignedIntegerContent",
+            "TestPolynomialNormalizeIndependentModularResidues",
+            "TestPolynomialNormalizeEveryActualReservationPrefix",
+            "TestPolynomialNormalizeBigDescriptorRefusalAndReplacement",
+            "TestPolynomialSOMNormalizeCompletedNumeralSourceGuard",
+            "TestPolynomialNormalizeYoungerSourceGuardRetainsOlderNumeral",
+            "TestPolynomialSubstitutionYoungerSOMGuardRetainsOlderNumerals",
+            "TestPolynomialSubstitutionExpiredSOMReceiptPreservesReplacement",
+            "TestPolynomialICCPInvocationReceiptRejectsReusedFrame",
+            "TestPolynomialGCDInvocationReceiptRejectsReusedFrame",
+            "TestPolynomialNormalizeInvocationReceiptRejectsReusedFrame",
+            "TestPolynomialICCPExpandedFilterEveryActualReservation",
+            "TestPolynomialICCPRetainsActualPendingGCDInvocation"
+          ]
         }
       ],
       "ownership": [
@@ -31822,7 +32118,8 @@
         "source Reset earlier consumed last DEC stop leaves actual fresh failedNull constant untouched",
         "genuine public TLS signed-host-domain postphysical constant deletion stop sticky and distinct from OOM",
         "persistent source SOM members reinitialized only after actual complete owning destruction; independent subsequent Mul at every failure prefix",
-        "source sourceCause/cursor retained through own Cleanup/Close; no source retry acknowledgement"
+        "source sourceCause/cursor retained through own Cleanup/Close; no source retry acknowledgement",
+        "Cold reflected GCD/ICCP/Normalize records acquire only actual guarded invocations. Receipts match exact manager, stable frame pointer and nonwrapping invocation nonce; common PSC generation is not invocation identity. Completed younger source locals precede older caller locals; explicit owning numeric/reference/buffer abort is a separate pass. Source pp moves its result to a named returned temporary, ends helper c/i before caller old-DEC, then ends the temporary. Named pending/raw/backing/retired/cold graph includes all reached records; no registry/RC/whole-call snapshot supplies ownership."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -31872,7 +32169,8 @@
         "full mathematical factorization cpp6591-6829 and registered tst_mfact remain open; driver assertion credit0",
         "source globals/ostream/profile/reentrancy guarantees inherit existing dependent engine limitations; no universal C++ ABI allocation geometry claim",
         "all unrelated polynomial imp/GCD/ICCP/CRA/Resultant methods remain parent/numeric scope",
-        "WASM/WASI/race deferred per project instructions"
+        "WASM/WASI/race deferred per project instructions",
+        "Selected algorithms and explicit Runtime/NUM cohorts only. Actual signed-TLS/consumed-raw proofs exercise guarded owner domains, not claimed ordinary mathematical OOM reachability. Global mgcd_check/TRACE/assertion dispatcher/native ostream/other ABI and source expression-driver construction remain open. Original tst_polynomial returns after PSC: dormant GCD/primitive source fixture bodies have zero active-driver credit. Eight original PSC cases reach first coefficient8, second coefficient5 and Resultant8 selected ENSURE expressions (21 dynamic expressions at3 static sites); full original registered-driver lifecycle/printing is not promoted."
       ]
     },
     {
@@ -32025,7 +32323,56 @@
         "mpnum/polynomial_display_source_test.go",
         "mpnum/polynomial_display_tls_test.go",
         "mpnum/polynomial_factors.go",
-        "mpnum/polynomial_factors_operations.go"
+        "mpnum/polynomial_factors_operations.go",
+        "mpnum/polynomial_content_buffer.go",
+        "mpnum/polynomial_content_mode_source_test.go",
+        "mpnum/polynomial_divides.go",
+        "mpnum/polynomial_divides_source_test.go",
+        "mpnum/polynomial_gcd.go",
+        "mpnum/polynomial_gcd_big_field_source_test.go",
+        "mpnum/polynomial_gcd_buffer_stopped_growth_source_test.go",
+        "mpnum/polynomial_gcd_cancel_source_test.go",
+        "mpnum/polynomial_gcd_checkpoint_foreign_source_test.go",
+        "mpnum/polynomial_gcd_cleanup.go",
+        "mpnum/polynomial_gcd_cra.go",
+        "mpnum/polynomial_gcd_cra_source_test.go",
+        "mpnum/polynomial_gcd_default_source_test.go",
+        "mpnum/polynomial_gcd_euclid.go",
+        "mpnum/polynomial_gcd_euclid_source_test.go",
+        "mpnum/polynomial_gcd_iccp_zpx.go",
+        "mpnum/polynomial_gcd_modular.go",
+        "mpnum/polynomial_gcd_monomial_buffer.go",
+        "mpnum/polynomial_gcd_numeric_pending_source_test.go",
+        "mpnum/polynomial_gcd_power_buffer.go",
+        "mpnum/polynomial_gcd_power_buffer_source_test.go",
+        "mpnum/polynomial_gcd_prs.go",
+        "mpnum/polynomial_gcd_random.go",
+        "mpnum/polynomial_gcd_random_source_test.go",
+        "mpnum/polynomial_gcd_recursive.go",
+        "mpnum/polynomial_gcd_recursive_source_test.go",
+        "mpnum/polynomial_gcd_scope.go",
+        "mpnum/polynomial_gcd_source_test.go",
+        "mpnum/polynomial_gcd_univariate_modular.go",
+        "mpnum/polynomial_gcd_unwind_phase_source_test.go",
+        "mpnum/polynomial_gcd_variable_buffer.go",
+        "mpnum/polynomial_gcd_variable_buffer_source_test.go",
+        "mpnum/polynomial_gcd_zpx.go",
+        "mpnum/polynomial_gcd_zpx_source_test.go",
+        "mpnum/polynomial_iccp.go",
+        "mpnum/polynomial_iccp_cleanup_order_source_test.go",
+        "mpnum/polynomial_iccp_source_test.go",
+        "mpnum/polynomial_invocation_receipts.go",
+        "mpnum/polynomial_invocation_receipts_source_test.go",
+        "mpnum/polynomial_normalize.go",
+        "mpnum/polynomial_normalize_source_test.go",
+        "mpnum/polynomial_primitive_return_order_source_test.go",
+        "mpnum/polynomial_resultant.go",
+        "mpnum/polynomial_resultant_source_test.go",
+        "mpnum/polynomial_scoped_zp.go",
+        "mpnum/polynomial_scoped_zp_source_test.go",
+        "mpnum/polynomial_som_normalize_lifetime_source_test.go",
+        "mpnum/polynomial_som_normalize_scope.go",
+        "mpnum/polynomial_sparse_embedded_constructor_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -32417,7 +32764,80 @@
         "TestPolynomialFactorsSourceControlAndOwnership",
         "TestPolynomialFactorsSourceDegreeQuirkAndWrap",
         "TestPolynomialFactorsSourceFinalizeAndClosedGuards",
-        "TestPolynomialFactorsYoungerPowerStop"
+        "TestPolynomialFactorsYoungerPowerStop",
+        "TestPolynomialDividesIndependentFiniteAndZeroReadMask",
+        "TestPolynomialDividesEveryActualReservationPrefix",
+        "TestPolynomialDividesBigNumericPendingBlocksOwningClose",
+        "TestPolynomialGCDRecursiveBigFieldEveryReservationPrefix",
+        "TestPolynomialGCDMonomialBufferConsumedOldGrowth",
+        "TestPolynomialGCDAndResultantEveryReachedCancellation",
+        "TestPolynomialGCDCheckpointPreservesActualForeignPrimitiveCreation",
+        "TestPolynomialGCDCooperationPreservesActualForeignPrimitiveCreation",
+        "TestPolynomialGCDCRAIndependentBalancedCoefficientTable",
+        "TestPolynomialGCDCRAEveryActualBigNumeralPrefix",
+        "TestPolynomialGCDCRACompletedNumeralGuardRetainsOlderRoots",
+        "TestPolynomialGCDDefaultIntegerIndependentCommonFactors",
+        "TestPolynomialGCDDefaultIntegerEveryReservationPrefix",
+        "TestPolynomialGCDDefaultIntegerCRAReconstruction",
+        "TestPolynomialGCDSourcePrimeExhaustionUsesLiteralPRS",
+        "TestPolynomialGCDEuclidSourceShortcutsAndIntegerContent",
+        "TestPolynomialGCDDispatcherConstantNormalizesSourceScalarSets",
+        "TestPolynomialResultantPhysicalDescriptorRefusalComposedCleanup",
+        "TestPolynomialGCDPowerSortIndependentUnsignedPairs",
+        "TestPolynomialGCDPowerSortUnsignedBoundary",
+        "TestPolynomialGCDPowerDegreeSortSourceAdapter",
+        "TestPolynomialFreshValueUsesSharedLibcStreamAndRejectsUsedInputs",
+        "TestPolynomialFreshValueZeroModulusSourceProfile",
+        "TestPolynomialGCDRecursiveLastVariableUsesEuclidWithoutReadingVariable",
+        "TestPolynomialGCDRecursiveDenseIndependentCommonFactor",
+        "TestPolynomialGCDRecursiveSavedSkeletonIndependentCommonFactor",
+        "TestPolynomialGCDRecursiveActualSparseBodyExceptionAfterCompletedUnwind",
+        "TestPolynomialGCDSparseCatchWaitsForGuardedActualDestructorStop",
+        "TestPolynomialGCDSourceZeroIdentityAndConstantContent",
+        "TestPolynomialGCDPRSIndependentFactorTable",
+        "TestPolynomialGCDDefaultUnivariateModularImages",
+        "TestPolynomialGCDScalarProductSourceIndependentOrder",
+        "TestPolynomialGCDDefaultMultivariateIndependentCommonFactor",
+        "TestPolynomialPSCCompletedPhaseLeavesFailedConstructorForOuterUnwind",
+        "TestPolynomialGCDInnerModeBlockWaitsForActualYoungerSourceStop",
+        "TestPolynomialGCDCompletedMonomialBufferFreePrecedesOlderStop",
+        "TestPolynomialGCDVariableBufferActualInlineAndOverflow",
+        "TestPolynomialGCDGlexZPXIndependentCoefficientModel",
+        "TestPolynomialGCDICCPZPXContentAndPrimitiveIndependentModel",
+        "TestPolynomialGCDICCPZPXSourceShortcutTable",
+        "TestPolynomialGCDIntegerContentFieldChangeSourceInputAssertion",
+        "TestPolynomialResultantICCPStoppedChildPrecedesOlderLocals",
+        "TestPolynomialICCPIndependentContentAndPrimitiveBranches",
+        "TestPolynomialGeneralGCDIndependentCommonContent",
+        "TestPolynomialICCPInvocationReceiptRejectsReusedFrame",
+        "TestPolynomialGCDInvocationReceiptRejectsReusedFrame",
+        "TestPolynomialNormalizeInvocationReceiptRejectsReusedFrame",
+        "TestPolynomialICCPExpandedFilterEveryActualReservation",
+        "TestPolynomialICCPRetainsActualPendingGCDInvocation",
+        "TestPolynomialNormalizeIndependentSignedIntegerContent",
+        "TestPolynomialNormalizeIndependentModularResidues",
+        "TestPolynomialNormalizeEveryActualReservationPrefix",
+        "TestPolynomialNormalizeBigDescriptorRefusalAndReplacement",
+        "TestPolynomialPrimitivePartReturnedTemporaryPrecedesCallerAssignment",
+        "TestPolynomialResultantIndependentLinearAndQuadraticIdentity",
+        "TestPolynomialResultantRegisteredPSCThirdAssertion",
+        "TestPolynomialResultantIndependentDegreeAndSignTable",
+        "TestPolynomialResultantEveryReservationPrefix",
+        "TestPolynomialResultantBigNumeralEveryReservationPrefix",
+        "TestPolynomialResultantAllEightOriginalPSCAssertions",
+        "TestPolynomialScopedZPActualModeAndPrimeRestoration",
+        "TestPolynomialScopedZPFailedBodyDoesNotRestoreMode",
+        "TestPolynomialScopedZPFailedMemberCopyRetainsPhysicalPending",
+        "TestPolynomialScopedZPCompletedMemberGuardIsSticky",
+        "TestPolynomialSOMNormalizeCompletedNumeralSourceGuard",
+        "TestPolynomialNormalizeYoungerSourceGuardRetainsOlderNumeral",
+        "TestPolynomialSubstitutionYoungerSOMGuardRetainsOlderNumerals",
+        "TestPolynomialSubstitutionExpiredSOMReceiptPreservesReplacement",
+        "TestPolynomialSparseEmbeddedNilConstructorHasNoReservation",
+        "TestPolynomialSparseEmbeddedEveryMemberPrefix",
+        "TestPolynomialContentModeSwitchSourceSet",
+        "TestPolynomialIntegerContentFieldEveryActualReservationPrefix",
+        "TestPolynomialICCPZPXModeSwitchSourceSet"
       ],
       "conditionals": [
         {
@@ -33849,6 +34269,86 @@
             "TestPolynomialFactorsLiteralDisplayAndConstantHelpers",
             "TestPolynomialFactorsModularAndZeroDegreeSource"
           ]
+        },
+        {
+          "name": "Selected GCD/ICCP/CRA/Resultant/Normalize manager declarations and scoped_set_zp; source-native/global bindings remain partial",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_imp.go",
+          "tests": [
+            "TestPolynomialDividesIndependentFiniteAndZeroReadMask",
+            "TestPolynomialDividesEveryActualReservationPrefix",
+            "TestPolynomialDividesBigNumericPendingBlocksOwningClose",
+            "TestPolynomialGCDRecursiveBigFieldEveryReservationPrefix",
+            "TestPolynomialGCDMonomialBufferConsumedOldGrowth",
+            "TestPolynomialGCDAndResultantEveryReachedCancellation",
+            "TestPolynomialGCDCheckpointPreservesActualForeignPrimitiveCreation",
+            "TestPolynomialGCDCooperationPreservesActualForeignPrimitiveCreation",
+            "TestPolynomialGCDCRAIndependentBalancedCoefficientTable",
+            "TestPolynomialGCDCRAEveryActualBigNumeralPrefix",
+            "TestPolynomialGCDCRACompletedNumeralGuardRetainsOlderRoots",
+            "TestPolynomialGCDDefaultIntegerIndependentCommonFactors",
+            "TestPolynomialGCDDefaultIntegerEveryReservationPrefix",
+            "TestPolynomialGCDDefaultIntegerCRAReconstruction",
+            "TestPolynomialGCDSourcePrimeExhaustionUsesLiteralPRS",
+            "TestPolynomialGCDEuclidSourceShortcutsAndIntegerContent",
+            "TestPolynomialGCDDispatcherConstantNormalizesSourceScalarSets",
+            "TestPolynomialResultantPhysicalDescriptorRefusalComposedCleanup",
+            "TestPolynomialGCDPowerSortIndependentUnsignedPairs",
+            "TestPolynomialGCDPowerSortUnsignedBoundary",
+            "TestPolynomialGCDPowerDegreeSortSourceAdapter",
+            "TestPolynomialFreshValueUsesSharedLibcStreamAndRejectsUsedInputs",
+            "TestPolynomialFreshValueZeroModulusSourceProfile",
+            "TestPolynomialGCDRecursiveLastVariableUsesEuclidWithoutReadingVariable",
+            "TestPolynomialGCDRecursiveDenseIndependentCommonFactor",
+            "TestPolynomialGCDRecursiveSavedSkeletonIndependentCommonFactor",
+            "TestPolynomialGCDRecursiveActualSparseBodyExceptionAfterCompletedUnwind",
+            "TestPolynomialGCDSparseCatchWaitsForGuardedActualDestructorStop",
+            "TestPolynomialGCDSourceZeroIdentityAndConstantContent",
+            "TestPolynomialGCDPRSIndependentFactorTable",
+            "TestPolynomialGCDDefaultUnivariateModularImages",
+            "TestPolynomialGCDScalarProductSourceIndependentOrder",
+            "TestPolynomialGCDDefaultMultivariateIndependentCommonFactor",
+            "TestPolynomialPSCCompletedPhaseLeavesFailedConstructorForOuterUnwind",
+            "TestPolynomialGCDInnerModeBlockWaitsForActualYoungerSourceStop",
+            "TestPolynomialGCDCompletedMonomialBufferFreePrecedesOlderStop",
+            "TestPolynomialGCDVariableBufferActualInlineAndOverflow",
+            "TestPolynomialGCDGlexZPXIndependentCoefficientModel",
+            "TestPolynomialGCDICCPZPXContentAndPrimitiveIndependentModel",
+            "TestPolynomialGCDICCPZPXSourceShortcutTable",
+            "TestPolynomialGCDIntegerContentFieldChangeSourceInputAssertion",
+            "TestPolynomialResultantICCPStoppedChildPrecedesOlderLocals",
+            "TestPolynomialICCPIndependentContentAndPrimitiveBranches",
+            "TestPolynomialGeneralGCDIndependentCommonContent",
+            "TestPolynomialICCPInvocationReceiptRejectsReusedFrame",
+            "TestPolynomialGCDInvocationReceiptRejectsReusedFrame",
+            "TestPolynomialNormalizeInvocationReceiptRejectsReusedFrame",
+            "TestPolynomialICCPExpandedFilterEveryActualReservation",
+            "TestPolynomialICCPRetainsActualPendingGCDInvocation",
+            "TestPolynomialNormalizeIndependentSignedIntegerContent",
+            "TestPolynomialNormalizeIndependentModularResidues",
+            "TestPolynomialNormalizeEveryActualReservationPrefix",
+            "TestPolynomialNormalizeBigDescriptorRefusalAndReplacement",
+            "TestPolynomialPrimitivePartReturnedTemporaryPrecedesCallerAssignment",
+            "TestPolynomialResultantIndependentLinearAndQuadraticIdentity",
+            "TestPolynomialResultantRegisteredPSCThirdAssertion",
+            "TestPolynomialResultantIndependentDegreeAndSignTable",
+            "TestPolynomialResultantEveryReservationPrefix",
+            "TestPolynomialResultantBigNumeralEveryReservationPrefix",
+            "TestPolynomialResultantAllEightOriginalPSCAssertions",
+            "TestPolynomialScopedZPActualModeAndPrimeRestoration",
+            "TestPolynomialScopedZPFailedBodyDoesNotRestoreMode",
+            "TestPolynomialScopedZPFailedMemberCopyRetainsPhysicalPending",
+            "TestPolynomialScopedZPCompletedMemberGuardIsSticky",
+            "TestPolynomialSOMNormalizeCompletedNumeralSourceGuard",
+            "TestPolynomialNormalizeYoungerSourceGuardRetainsOlderNumeral",
+            "TestPolynomialSubstitutionYoungerSOMGuardRetainsOlderNumerals",
+            "TestPolynomialSubstitutionExpiredSOMReceiptPreservesReplacement",
+            "TestPolynomialSparseEmbeddedNilConstructorHasNoReservation",
+            "TestPolynomialSparseEmbeddedEveryMemberPrefix",
+            "TestPolynomialContentModeSwitchSourceSet",
+            "TestPolynomialIntegerContentFieldEveryActualReservationPrefix",
+            "TestPolynomialICCPZPXModeSwitchSourceSet"
+          ]
         }
       ],
       "ownership": [
@@ -33892,7 +34392,8 @@
         "source Reset earlier consumed last DEC stop leaves actual fresh failedNull constant untouched",
         "genuine public TLS signed-host-domain postphysical constant deletion stop sticky and distinct from OOM",
         "persistent source SOM members reinitialized only after actual complete owning destruction; independent subsequent Mul at every failure prefix",
-        "source sourceCause/cursor retained through own Cleanup/Close; no source retry acknowledgement"
+        "source sourceCause/cursor retained through own Cleanup/Close; no source retry acknowledgement",
+        "Cold reflected GCD/ICCP/Normalize records acquire only actual guarded invocations. Receipts match exact manager, stable frame pointer and nonwrapping invocation nonce; common PSC generation is not invocation identity. Completed younger source locals precede older caller locals; explicit owning numeric/reference/buffer abort is a separate pass. Source pp moves its result to a named returned temporary, ends helper c/i before caller old-DEC, then ends the temporary. Named pending/raw/backing/retired/cold graph includes all reached records; no registry/RC/whole-call snapshot supplies ownership."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -33938,7 +34439,8 @@
         "full mathematical factorization cpp6591-6829 and registered tst_mfact remain open; driver assertion credit0",
         "source globals/ostream/profile/reentrancy guarantees inherit existing dependent engine limitations; no universal C++ ABI allocation geometry claim",
         "all unrelated polynomial imp/GCD/ICCP/CRA/Resultant methods remain parent/numeric scope",
-        "WASM/WASI/race deferred per project instructions"
+        "WASM/WASI/race deferred per project instructions",
+        "Selected algorithms and explicit Runtime/NUM cohorts only. Actual signed-TLS/consumed-raw proofs exercise guarded owner domains, not claimed ordinary mathematical OOM reachability. Global mgcd_check/TRACE/assertion dispatcher/native ostream/other ABI and source expression-driver construction remain open. Original tst_polynomial returns after PSC: dormant GCD/primitive source fixture bodies have zero active-driver credit. Eight original PSC cases reach first coefficient8, second coefficient5 and Resultant8 selected ENSURE expressions (21 dynamic expressions at3 static sites); full original registered-driver lifecycle/printing is not promoted."
       ]
     },
     {
@@ -94193,7 +94695,8 @@
         "mpnum/polynomial_composition_receipt_test.go",
         "mpnum/polynomial_composition_test.go",
         "mpnum/polynomial_sqrt.go",
-        "mpnum/polynomial_sqrt_test.go"
+        "mpnum/polynomial_sqrt_test.go",
+        "mpnum/polynomial_resultant_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -94305,7 +94808,13 @@
         "TestPolynomialSqrtFinalFactoryPostphysicalRaw",
         "TestPolynomialSqrtEveryCheckpointFrontier",
         "TestPolynomialSqrtSourceAuxStopKeepsOlderFields",
-        "TestPolynomialSqrtDeletionCallbackForeignRootsStayCallerOwned"
+        "TestPolynomialSqrtDeletionCallbackForeignRootsStayCallerOwned",
+        "TestPolynomialResultantIndependentLinearAndQuadraticIdentity",
+        "TestPolynomialResultantRegisteredPSCThirdAssertion",
+        "TestPolynomialResultantIndependentDegreeAndSignTable",
+        "TestPolynomialResultantEveryReservationPrefix",
+        "TestPolynomialResultantBigNumeralEveryReservationPrefix",
+        "TestPolynomialResultantAllEightOriginalPSCAssertions"
       ],
       "conditionals": [
         {
@@ -94775,6 +95284,15 @@
             "TestPolynomialSqrtSourceAuxStopKeepsOlderFields",
             "TestPolynomialSqrtDeletionCallbackForeignRootsStayCallerOwned"
           ]
+        },
+        {
+          "name": "Selected original PSC third ENSURE cpp722 for all8 original inputs cpp741-821:8 dynamic Resultant equality checks. Alongside committed coefficient fixture campaign8first+5second,3static sites/21dynamic selected expressions; supersedes earlier unported-Resultant obligation only",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_resultant_source_test.go",
+          "tests": [
+            "TestPolynomialResultantAllEightOriginalPSCAssertions",
+            "TestPolynomialResultantRegisteredPSCThirdAssertion"
+          ]
         }
       ],
       "ownership": [
@@ -94788,7 +95306,8 @@
         "Selected active PSC coefficient inputs and first/second static ENSURE sites now executed. Third static ENSURE calls Resultant and remains unported; complete original expression-constructor/lifetime/TRACE driver credit is not claimed.",
         "Dense coefficient construction adapts unavailable expression builder; registered driver returns at cpp1825 before these eval cases. Active original-driver assertion credit is zero.",
         "Selected source composition bodies complete for explicit same-Integer rational binding and actual Runtime profile. Dormant cpp573-574 ENSURE adapted via dense term construction; registered driver returns before tst_compose, active original driver credit zero. TLS/dangling-pointer proofs are actual owner-primitive guarded-domain tests, not ordinary mathematical OOM reachability. Global TRACE/assertions/native ABI, same-frame high-level callback reentry and full polynomial family remain open; persistent source class members are not implicitly reset by owning lexical abort.",
-        "Selected source algorithms and explicit Runtime profile only. Signed TLS stops and large factory/auxiliary receipts are guarded owner-primitive proofs, not ordinary mathematical exhaustion. Non-Z perfect-square remains the source unsupported operation. Registered polynomial driver returns before sqrt; dormant assertions give no active driver completion credit. Global diagnostics/native ABI and remaining source methods stay partial."
+        "Selected source algorithms and explicit Runtime profile only. Signed TLS stops and large factory/auxiliary receipts are guarded owner-primitive proofs, not ordinary mathematical exhaustion. Non-Z perfect-square remains the source unsupported operation. Registered polynomial driver returns before sqrt; dormant assertions give no active driver completion credit. Global diagnostics/native ABI and remaining source methods stay partial.",
+        "Selected algorithms and explicit Runtime/NUM cohorts only. Actual signed-TLS/consumed-raw proofs exercise guarded owner domains, not claimed ordinary mathematical OOM reachability. Global mgcd_check/TRACE/assertion dispatcher/native ostream/other ABI and source expression-driver construction remain open. Original tst_polynomial returns after PSC: dormant GCD/primitive source fixture bodies have zero active-driver credit. Eight original PSC cases reach first coefficient8, second coefficient5 and Resultant8 selected ENSURE expressions (21 dynamic expressions at3 static sites); full original registered-driver lifecycle/printing is not promoted."
       ]
     },
     {
@@ -99572,7 +100091,11 @@
         "mpnum/polynomial_psc_buffer_test.go",
         "mpnum/polynomial_psc_unwind_test.go",
         "mpnum/polynomial_content_buffer.go",
-        "mpnum/polynomial_content_buffer_source_test.go"
+        "mpnum/polynomial_content_buffer_source_test.go",
+        "mpnum/polynomial_gcd_power_buffer.go",
+        "mpnum/polynomial_gcd_power_buffer_source_test.go",
+        "mpnum/polynomial_gcd_variable_buffer_source_test.go",
+        "mpnum/polynomial_invocation_receipts_source_test.go"
       ],
       "tests": [
         "TestSexprBVSourceInlineBufferAndTemporaryLifetime",
@@ -99622,7 +100145,16 @@
         "TestPolynomialPSCNextHeapBufferIndependentRemainder",
         "TestPolynomialPSCBufferDestructorStopsOlderSourceLocals",
         "TestPolynomialContentBufferReturnedBlockSourceDestructorAndAbort",
-        "TestPolynomialContentBufferSourcePushResizeAndRetainedGrowth"
+        "TestPolynomialContentBufferSourcePushResizeAndRetainedGrowth",
+        "TestPolynomialGCDPowerSortIndependentUnsignedPairs",
+        "TestPolynomialGCDPowerSortUnsignedBoundary",
+        "TestPolynomialGCDPowerDegreeSortSourceAdapter",
+        "TestPolynomialGCDVariableBufferActualInlineAndOverflow",
+        "TestPolynomialICCPInvocationReceiptRejectsReusedFrame",
+        "TestPolynomialGCDInvocationReceiptRejectsReusedFrame",
+        "TestPolynomialNormalizeInvocationReceiptRejectsReusedFrame",
+        "TestPolynomialICCPExpandedFilterEveryActualReservation",
+        "TestPolynomialICCPRetainsActualPendingGCDInvocation"
       ],
       "conditionals": [
         {
@@ -99780,6 +100312,22 @@
             "TestPolynomialContentBufferReturnedBlockSourceDestructorAndAbort",
             "TestPolynomialContentBufferSourcePushResizeAndRetainedGrowth"
           ]
+        },
+        {
+          "name": "Concrete inline128 unsigned, inline32 power and inline16 var specializations; actual expanded backing/source destructor versus owning pending abort",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_gcd_power_buffer.go",
+          "tests": [
+            "TestPolynomialGCDPowerSortIndependentUnsignedPairs",
+            "TestPolynomialGCDPowerSortUnsignedBoundary",
+            "TestPolynomialGCDPowerDegreeSortSourceAdapter",
+            "TestPolynomialGCDVariableBufferActualInlineAndOverflow",
+            "TestPolynomialICCPInvocationReceiptRejectsReusedFrame",
+            "TestPolynomialGCDInvocationReceiptRejectsReusedFrame",
+            "TestPolynomialNormalizeInvocationReceiptRejectsReusedFrame",
+            "TestPolynomialICCPExpandedFilterEveryActualReservation",
+            "TestPolynomialICCPRetainsActualPendingGCDInvocation"
+          ]
         }
       ],
       "ownership": [
@@ -99787,7 +100335,8 @@
         "Concrete AST expr identity-table and shared-occurrence owners preserve source bucket-order callbacks, borrowing, actual node shared flags and charged backing/header peaks. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md.",
         "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets.",
         "Actual completed lexical references and source INC-before-push incoming token, charged inline16/cold header and Runtime scalar-handle backing. Named failed allocation/consumed destructor state retained until owning abort. See PORT_PROGRESS.md.",
-        "Actual inline prefix and Runtime block are authoritative; initialized/copy cursors follow source push/resize and returned-allocation lifetime, with enclosing owner charging cold fields."
+        "Actual inline prefix and Runtime block are authoritative; initialized/copy cursors follow source push/resize and returned-allocation lifetime, with enclosing owner charging cold fields.",
+        "Cold reflected GCD/ICCP/Normalize records acquire only actual guarded invocations. Receipts match exact manager, stable frame pointer and nonwrapping invocation nonce; common PSC generation is not invocation identity. Completed younger source locals precede older caller locals; explicit owning numeric/reference/buffer abort is a separate pass. Source pp moves its result to a named returned temporary, ends helper c/i before caller old-DEC, then ends the temporary. Named pending/raw/backing/retired/cold graph includes all reached records; no registry/RC/whole-call snapshot supplies ownership."
       ],
       "deviations": [
         "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md.",
@@ -123064,7 +123613,10 @@
         "mpnum/polynomial_newton_physical_test.go",
         "mpnum/polynomial_psc_buffer.go",
         "mpnum/polynomial_psc_buffer_test.go",
-        "mpnum/polynomial_psc_unwind_test.go"
+        "mpnum/polynomial_psc_unwind_test.go",
+        "mpnum/polynomial_gcd_prs.go",
+        "mpnum/polynomial_primitive_return_order_source_test.go",
+        "mpnum/polynomial_iccp_cleanup_order_source_test.go"
       ],
       "tests": [
         "TestASTRefVectorBorrowedInputDefaultEraseAndMove",
@@ -123145,7 +123697,9 @@
         "TestPolynomialPSCBufferReturnedAllocationBeforeSourceDestruction",
         "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
         "TestPolynomialPSCNextHeapBufferIndependentRemainder",
-        "TestPolynomialPSCBufferDestructorStopsOlderSourceLocals"
+        "TestPolynomialPSCBufferDestructorStopsOlderSourceLocals",
+        "TestPolynomialPrimitivePartReturnedTemporaryPrecedesCallerAssignment",
+        "TestPolynomialResultantICCPStoppedChildPrecedesOlderLocals"
       ],
       "conditionals": [
         {
@@ -123279,13 +123833,23 @@
             "TestPolynomialPSCNextHeapBufferIndependentRemainder",
             "TestPolynomialPSCBufferDestructorStopsOlderSourceLocals"
           ]
+        },
+        {
+          "name": "Concrete source result-reference move/temporary, exact INC before old DEC and matched source/owning cleanup",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_gcd_prs.go",
+          "tests": [
+            "TestPolynomialPrimitivePartReturnedTemporaryPrecedesCallerAssignment",
+            "TestPolynomialResultantICCPStoppedChildPrecedesOlderLocals"
+          ]
         }
       ],
       "ownership": [
         "Scalar references/views and charged cold vector headers/backing; source reference action order and ownership transfer mapped for sexpr. See PORT_PROGRESS.md#audit-sexpr-port-status-md.",
         "Actual AST callbacks, source INC-before-growth/set-index ordering, ASC teardown, backing-bound views and charged initialized high-water metadata are recorded in PORT_PROGRESS.md#audit-ast-core-packet-md. No fake rollback consumes orphan INC prefixes; source manager teardown remains responsible for actual unowned nodes.",
         "Actual dependency INC/DEC callbacks, raw scalar tokens and charged16-byte obj_ref/24-byte ref_vector/160-byte inline buffer records in existing real AST allocators. Source INC-before-growth, retained backing, captured-end append and consumed cleanup progress preserved. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
-        "Actual completed lexical references and source INC-before-push incoming token, charged inline16/cold header and Runtime scalar-handle backing. Named failed allocation/consumed destructor state retained until owning abort. See PORT_PROGRESS.md."
+        "Actual completed lexical references and source INC-before-push incoming token, charged inline16/cold header and Runtime scalar-handle backing. Named failed allocation/consumed destructor state retained until owning abort. See PORT_PROGRESS.md.",
+        "Cold reflected GCD/ICCP/Normalize records acquire only actual guarded invocations. Receipts match exact manager, stable frame pointer and nonwrapping invocation nonce; common PSC generation is not invocation identity. Completed younger source locals precede older caller locals; explicit owning numeric/reference/buffer abort is a separate pass. Source pp moves its result to a named returned temporary, ends helper c/i before caller old-DEC, then ends the temporary. Named pending/raw/backing/retired/cold graph includes all reached records; no registry/RC/whole-call snapshot supplies ownership."
       ],
       "deviations": [
         "This concrete specialization does not implement all AST/other source specializations or remaining generic helper/hash surfaces. Ref-vector null callbacks and nonempty self-append have explicit checked Go adaptations.",
@@ -126286,7 +126850,9 @@
         "ast_dependency_ref_vector_ops.go",
         "mpnum/polynomial_psc_buffer.go",
         "mpnum/polynomial_psc_buffer_test.go",
-        "mpnum/polynomial_psc_unwind_test.go"
+        "mpnum/polynomial_psc_unwind_test.go",
+        "mpnum/polynomial_gcd_monomial_buffer.go",
+        "mpnum/polynomial_gcd_buffer_stopped_growth_source_test.go"
       ],
       "tests": [
         "TestASTDependencyRefBufferInlineSourceRoutesAndCapturedAppend",
@@ -126324,7 +126890,8 @@
         "TestPolynomialPSCBufferReturnedAllocationBeforeSourceDestruction",
         "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
         "TestPolynomialPSCNextHeapBufferIndependentRemainder",
-        "TestPolynomialPSCBufferDestructorStopsOlderSourceLocals"
+        "TestPolynomialPSCBufferDestructorStopsOlderSourceLocals",
+        "TestPolynomialGCDMonomialBufferConsumedOldGrowth"
       ],
       "conditionals": [
         {
@@ -126408,11 +126975,20 @@
             "TestPolynomialPSCNextHeapBufferIndependentRemainder",
             "TestPolynomialPSCBufferDestructorStopsOlderSourceLocals"
           ]
+        },
+        {
+          "name": "Concrete selected monomial ref_buffer lexical range, raw second-growth consumption and completed versus incoming ownership phases",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_gcd_monomial_buffer.go",
+          "tests": [
+            "TestPolynomialGCDMonomialBufferConsumedOldGrowth"
+          ]
         }
       ],
       "ownership": [
         "Actual dependency INC/DEC callbacks, raw scalar tokens and charged16-byte obj_ref/24-byte ref_vector/160-byte inline buffer records in existing real AST allocators. Source INC-before-growth, retained backing, captured-end append and consumed cleanup progress preserved. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
-        "Actual completed lexical references and source INC-before-push incoming token, charged inline16/cold header and Runtime scalar-handle backing. Named failed allocation/consumed destructor state retained until owning abort. See PORT_PROGRESS.md."
+        "Actual completed lexical references and source INC-before-push incoming token, charged inline16/cold header and Runtime scalar-handle backing. Named failed allocation/consumed destructor state retained until owning abort. See PORT_PROGRESS.md.",
+        "Cold reflected GCD/ICCP/Normalize records acquire only actual guarded invocations. Receipts match exact manager, stable frame pointer and nonwrapping invocation nonce; common PSC generation is not invocation identity. Completed younger source locals precede older caller locals; explicit owning numeric/reference/buffer abort is a separate pass. Source pp moves its result to a named returned temporary, ends helper c/i before caller old-DEC, then ends the temporary. Named pending/raw/backing/retired/cold graph includes all reached records; no registry/RC/whole-call snapshot supplies ownership."
       ],
       "deviations": [
         "Owning construction cleanup refusal publishes a nonzero partial token with original error; scalar pending target/cursor tracks consumed callbacks without changing raw retained slots. Explicit Go retry/cleanup protects source-undefined interrupted destruction. Preserved ref_buffer copy ctor dependent-base lookup is uninstantiable; no repaired copy API. General templates, other owners/configs and full consumers remain open. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md."
@@ -127608,7 +128184,11 @@
         "mpnum/scoped_fast_float.go",
         "mpnum/mp_smt2_scope.go",
         "mpnum/mp_smt2_scope_test.go",
-        "mpnum/polynomial_evaluation.go"
+        "mpnum/polynomial_evaluation.go",
+        "mpnum/polynomial_gcd_scope.go",
+        "mpnum/polynomial_gcd_numeric_pending_source_test.go",
+        "mpnum/polynomial_gcd_unwind_phase_source_test.go",
+        "mpnum/polynomial_som_normalize_lifetime_source_test.go"
       ],
       "tests": [
         "TestScopedNumeralSourceTstScoped",
@@ -127662,7 +128242,15 @@
         "TestSMT2CompletedTemporaryGuardedLateFree",
         "TestPolynomialEvaluationStoppedPhysicalLeafAndReuse",
         "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary",
-        "TestPolynomialEvaluationWarmInlineSourceLocals"
+        "TestPolynomialEvaluationWarmInlineSourceLocals",
+        "TestPolynomialResultantPhysicalDescriptorRefusalComposedCleanup",
+        "TestPolynomialPSCCompletedPhaseLeavesFailedConstructorForOuterUnwind",
+        "TestPolynomialGCDInnerModeBlockWaitsForActualYoungerSourceStop",
+        "TestPolynomialGCDCompletedMonomialBufferFreePrecedesOlderStop",
+        "TestPolynomialSOMNormalizeCompletedNumeralSourceGuard",
+        "TestPolynomialNormalizeYoungerSourceGuardRetainsOlderNumeral",
+        "TestPolynomialSubstitutionYoungerSOMGuardRetainsOlderNumerals",
+        "TestPolynomialSubstitutionExpiredSOMReceiptPreservesReplacement"
       ],
       "conditionals": [
         {
@@ -127838,13 +128426,29 @@
             "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary",
             "TestPolynomialEvaluationWarmInlineSourceLocals"
           ]
+        },
+        {
+          "name": "Actual selected GCD/ICCP/Normalize numeral declaration and reverse lexical destructor stack, distinct completed owning acknowledgement and unjoined abort",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_gcd_scope.go",
+          "tests": [
+            "TestPolynomialResultantPhysicalDescriptorRefusalComposedCleanup",
+            "TestPolynomialPSCCompletedPhaseLeavesFailedConstructorForOuterUnwind",
+            "TestPolynomialGCDInnerModeBlockWaitsForActualYoungerSourceStop",
+            "TestPolynomialGCDCompletedMonomialBufferFreePrecedesOlderStop",
+            "TestPolynomialSOMNormalizeCompletedNumeralSourceGuard",
+            "TestPolynomialNormalizeYoungerSourceGuardRetainsOlderNumeral",
+            "TestPolynomialSubstitutionYoungerSOMGuardRetainsOlderNumerals",
+            "TestPolynomialSubstitutionExpiredSOMReceiptPreservesReplacement"
+          ]
         }
       ],
       "ownership": [
         "Concrete scoped Int/Rational objects borrow managers; all cold headers and actual old+new pointer-free backing are charged. Deep copy owns independent limbs, source ascending truncation releases them, vector failure prefixes retained. See PORT_PROGRESS.md#audit-scoped-numeral-port-status-md.",
         "MPBQ specialization owns deep numerator values and real cold headers/backing; self identity/manager checks, borrowed owner lifetime, grow transfer and old/new peak audited. See PORT_PROGRESS.md#audit-mpbq-port-status-md.",
         "MPFF specialization borrows its manager, owns deep significand blocks and charges actual headers/full old-new element backing. Failure retains default failed-push element; ascending cleanup preserves source actions. See PORT_PROGRESS.md#audit-mpff-port-status-md.",
-        "Source destructor stops retain the first cause and older auxiliary roots; separate owning cleanup completes exact retained owners before cache reuse."
+        "Source destructor stops retain the first cause and older auxiliary roots; separate owning cleanup completes exact retained owners before cache reuse.",
+        "Cold reflected GCD/ICCP/Normalize records acquire only actual guarded invocations. Receipts match exact manager, stable frame pointer and nonwrapping invocation nonce; common PSC generation is not invocation identity. Completed younger source locals precede older caller locals; explicit owning numeric/reference/buffer abort is a separate pass. Source pp moves its result to a named returned temporary, ends helper c/i before caller old-DEC, then ends the temporary. Named pending/raw/backing/retired/cold graph includes all reached records; no registry/RC/whole-call snapshot supplies ownership."
       ],
       "deviations": [
         "Explicit Close substitutes RAII; self identity rejects shallow Go owner copies. Vectors expose deep Read/Set rather than escaping indexed element addresses. Source noncopyable vector remains noncopyable; other numeral manager specializations stay open.",

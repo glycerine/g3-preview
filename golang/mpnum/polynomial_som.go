@@ -2,7 +2,10 @@
 // Source author: Leonardo de Moura (leonardo), 2011-11-15.
 package mpnum
 
-import "github.com/glycerine/g3/golang/arena"
+import (
+	"errors"
+	"github.com/glycerine/g3/golang/arena"
+)
 
 type polynomialSOM struct {
 	factorsParent                 *PolynomialFactors
@@ -19,6 +22,12 @@ type polynomialSOM struct {
 	as, ms                        polynomialVector
 	gcd                           Int
 	gcdActive                     bool
+	gcdEnded                      bool
+	gcdGeneration                 uint64
+	gcdInvocation                 uint64
+	gcdSubstitution               *polynomialSubstitutionScope
+	gcdNormalization              *polynomialNormalizeScope
+	gcdNumeric                    polynomialNumericRoots
 	gcdBodyCause, gcdCleanupCause error
 	pendingMonomial               Monomial
 	transferred, cleanupIndex     uint32
@@ -40,6 +49,9 @@ func (b *polynomialSOM) add(a *Int, term Monomial, take bool) error {
 	return b.addConsumed(a, term, take, nil)
 }
 func (b *polynomialSOM) addConsumed(a *Int, term Monomial, take bool, consumed *bool) error {
+	return b.addConsumedNumeric(a, term, take, consumed, nil)
+}
+func (b *polynomialSOM) addConsumedNumeric(a *Int, term Monomial, take bool, consumed *bool, receipt *polynomialNumericRoots) error {
 	if consumed != nil {
 		*consumed = false
 	}
@@ -75,7 +87,7 @@ func (b *polynomialSOM) addConsumed(a *Int, term Monomial, take bool, consumed *
 		if e != nil {
 			return e
 		}
-		e = m.compositionNumericCall(1, &old, a, nil, &old)
+		e = b.addNumericLeaf(receipt, 1, &old, a, nil, &old)
 		w := b.as.putCoefficient(m, pos, old)
 		if e != nil {
 			return e
@@ -108,7 +120,7 @@ func (b *polynomialSOM) addConsumed(a *Int, term Monomial, take bool, consumed *
 		if take {
 			e = m.modular.Swap(&value, a)
 		} else {
-			e = m.compositionNumericCall(0, a, nil, nil, &value)
+			e = b.addNumericLeaf(receipt, 0, a, nil, nil, &value)
 		}
 		if w := b.as.putCoefficient(m, n, value); w != nil {
 			return w
@@ -144,7 +156,7 @@ func (b *polynomialSOM) addConsumed(a *Int, term Monomial, take bool, consumed *
 		if take {
 			e = m.modular.Swap(&value, a)
 		} else {
-			e = m.compositionNumericCall(0, a, nil, nil, &value)
+			e = b.addNumericLeaf(receipt, 0, a, nil, nil, &value)
 		}
 		if w := b.as.putCoefficient(m, n, value); w != nil {
 			return w
@@ -551,7 +563,8 @@ func (b *polynomialSOM) removeZeros(normalize bool) error {
 	}
 	return nil
 }
-func (b *polynomialSOM) normalize() (result error) {
+func (b *polynomialSOM) normalize() error { return b.normalizeWithOwner(nil) }
+func (b *polynomialSOM) normalizeWithOwner(parent *polynomialNormalizeScope) (result error) {
 	m := b.owner
 	n, e := b.as.size(m)
 	if e != nil {
@@ -562,24 +575,22 @@ func (b *polynomialSOM) normalize() (result error) {
 	}
 	// A fresh completed default scoped_numeral is constructed only after the
 	// source empty early return. An interrupted previous local is not repaired.
-	if b.gcdActive {
-		return ErrPolynomialPending
+	if e := b.beginNormalizeNumeral(parent); e != nil {
+		return e
 	}
-	b.gcd = Int{}
-	b.gcdActive = true
-	b.gcdBodyCause = nil
-	b.gcdCleanupCause = nil
 	defer func() {
 		b.gcdBodyCause = result
-		cleanup := m.deleteNumeral(&b.gcd)
-		b.gcdCleanupCause = cleanup
-		if cleanup == nil {
-			b.gcdActive = false
-		} else if result == nil {
-			result = cleanup
+		if cleanup := b.finishNormalizeNumeral(false); cleanup != nil {
+			result = errors.Join(result, cleanup)
 		}
 	}()
-	if e = m.modular.GCDManyIndexed(integerArrayView{runtime: m.memory, raw: b.as.raw, count: n, offset: 8, stride: 12}, &b.gcd); e != nil {
+	before, probe := polynomialNumericBefore(m.integer)
+	if probe != nil {
+		return probe
+	}
+	e = m.modular.GCDManyIndexed(integerArrayView{runtime: m.memory, raw: b.as.raw, count: n, offset: 8, stride: 12}, &b.gcd)
+	e = polynomialNewtonJoin(e, b.gcdNumeric.after(m.integer, before))
+	if e != nil {
 		return e
 	}
 	one, e := m.modular.IsOne(&b.gcd)
@@ -601,7 +612,12 @@ func (b *polynomialSOM) normalize() (result error) {
 			if e != nil {
 				return e
 			}
+			before, probe := polynomialNumericBefore(m.integer)
+			if probe != nil {
+				return probe
+			}
 			e = m.compositionNumericCall(4, &a, &b.gcd, nil, &a)
+			e = polynomialNewtonJoin(e, b.gcdNumeric.after(m.integer, before))
 			if w := b.as.putCoefficient(m, i, a); w != nil {
 				return w
 			}
@@ -640,6 +656,9 @@ func (b *polynomialSOM) close() error {
 		return nil
 	}
 	m := b.owner
+	if e := b.finishNormalizeNumeral(true); e != nil {
+		return e
+	}
 	if b.hasPendingReference {
 		if e := m.monomials.DecRef(b.pendingMonomial); e != nil {
 			return e
@@ -706,12 +725,6 @@ func (b *polynomialSOM) close() error {
 		}
 		b.cleanupIndex++
 	}
-	if e = m.deleteNumeral(&b.gcd); e != nil {
-		b.gcdCleanupCause = e
-		return e
-	}
-	b.gcdActive = false
-	b.gcdCleanupCause = nil
 	if e = b.ms.close(m); e != nil {
 		return e
 	}
@@ -724,4 +737,16 @@ func (b *polynomialSOM) close() error {
 		}
 	}
 	return nil
+}
+
+func (b *polynomialSOM) addNumericLeaf(receipt *polynomialNumericRoots, op uint8, a, c, d, out *Int) error {
+	if receipt == nil {
+		return b.owner.compositionNumericCall(op, a, c, d, out)
+	}
+	before, e := polynomialNumericBefore(b.owner.integer)
+	if e != nil {
+		return e
+	}
+	e = b.owner.compositionNumericCall(op, a, c, d, out)
+	return errors.Join(e, receipt.after(b.owner.integer, before))
 }

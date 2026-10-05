@@ -31,6 +31,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	handlers := []*PolynomialDeletionHandler{}
 	external := []memory.Block{m.tmp1.raw, m.tmp1.pending, full.degree2pos.raw, full.degree2pos.pending, full.lexPermutation.raw, full.lexPermutation.pending, full.varDegrees.raw, full.varDegrees.pending, m.substitution.found.raw, m.substitution.found.pending, m.substitution.max.maxDegree.raw, m.substitution.max.maxDegree.pending, m.substitution.max.variables.raw, m.substitution.max.variables.pending, m.substitution.positions.positions.raw, m.substitution.positions.positions.pending}
 	external = append(external, extraRaw...)
+	external = append(external, m.queryPositions.raw, m.queryPositions.pending)
 	external = append(external, full.lexBuckets.data.raw, full.lexBuckets.data.pending, full.lexBuckets.data.old)
 	for i := range full.lexBuckets.children {
 		v := &full.lexBuckets.children[i]
@@ -56,6 +57,27 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 			public = append(public, &a)
 		}
 	}
+	if m.substitution.scope.active {
+		if m.substitution.scope.newAConstructed {
+			public = append(public, &m.substitution.scope.newA)
+		}
+		if m.substitution.scope.tmpConstructed {
+			public = append(public, &m.substitution.scope.tmp)
+		}
+	}
+	if full.cra.active {
+		for i := uint8(0); i < full.cra.constructed; i++ {
+			public = append(public, &full.cra.nums[i])
+		}
+	}
+	if full.normalization.active {
+		if full.normalization.gConstructed {
+			public = append(public, &full.normalization.g)
+		}
+		if full.normalization.aConstructed {
+			public = append(public, &full.normalization.a)
+		}
+	}
 	if m.contentLocal.active {
 		public = append(public, &m.contentLocal.ai)
 	}
@@ -71,6 +93,32 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	public = append(public, &full.squareRoot.two)
 	public = append(public, input...)
 	adapterBytes += uint64(cap(full.squareRoot.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size())
+
+	adapterBytes += uint64(cap(full.gcdFrames)) * uint64(reflect.TypeOf((*polynomialGCDFunctionScope)(nil)).Size())
+	for _, f := range full.gcdFrames {
+		adapterBytes += f.header
+		if !f.active {
+			continue
+		}
+		for i := range f.nums {
+			public = append(public, &f.nums[i])
+		}
+		if f.zp.active {
+			public = append(public, &f.zp.p)
+		}
+		for i := range f.refs {
+			references = append(references, &f.refs[i])
+		}
+		for i := range f.powers {
+			external = append(external, f.powers[i].raw, f.powers[i].pending)
+		}
+		external = append(external, f.vars.raw, f.vars.pending, f.monomialBuffer.raw, f.monomialBuffer.pending)
+	}
+	adapterBytes += uint64(cap(full.iccpFrames)) * uint64(reflect.TypeOf((*polynomialICCPScope)(nil)).Size())
+	for _, f := range full.iccpFrames {
+		adapterBytes += f.header
+	}
+	adapterBytes += uint64(cap(m.substitution.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size())
 	adapterBytes += externalHeaders
 	adapterBytes += uint64(cap(m.display.frames))*uint64(reflect.TypeOf((*polynomialDisplayFrame)(nil)).Size()) + uint64(len(m.display.frames))*uint64(reflect.TypeOf(polynomialDisplayFrame{}).Size())
 	for _, f := range m.display.frames {
@@ -179,7 +227,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 		}
 	}
 	if m.modular != nil {
-		for _, a := range []Int{m.modular.p, m.modular.lower, m.modular.upper, m.modular.invTmp1, m.modular.invTmp2, m.modular.invTmp3, m.modular.divTmp, m.zeroNumeral, m.minusOne, m.negativeCoefficient, m.constantCopy, m.linearConstant, m.constantScope.numeral, m.constantScope.rational.num, m.constantScope.rational.den, m.exactDivision.numeral, m.pseudoDivision.numeral} {
+		for _, a := range []Int{m.modular.p, m.modular.lower, m.modular.upper, m.modular.invTmp1, m.modular.invTmp2, m.modular.invTmp3, m.modular.divTmp, m.zeroNumeral, m.minusOne, m.negativeCoefficient, m.constantCopy, m.linearConstant, m.constantScope.numeral, m.constantScope.rational.num, m.constantScope.rational.den, m.exactDivision.numeral, m.pseudoDivision.numeral, m.dividesLocal.numeral} {
 			add(a)
 		}
 	}
@@ -192,6 +240,11 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	}
 	for _, p := range []Polynomial{m.zero, m.unit, m.constantScope.result, m.overloadResult, m.negativeResult} {
 		if p != (Polynomial{}) && !(p == m.zero && full.bodyStage > 0) && !(p == m.unit && full.bodyStage > 1) {
+			l, e := m.polynomialLocation(p)
+			serviceMust(t, e)
+			if l.released {
+				continue
+			}
 			n, e := m.readWord(p, 8)
 			serviceMust(t, e)
 			cell(p, n)
@@ -202,7 +255,33 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 		serviceMust(t, e)
 		cell(m.pending.value, l.initializedCoefficients)
 	}
-	vectors := []*polynomialVector{&m.rationalTerms, &m.linearTerms, &m.linearMonomials, &m.polynomials}
+
+	vectors := []*polynomialVector{&m.rationalTerms, &m.linearTerms, &m.linearMonomials, &m.polynomials, &full.skeletons.data}
+	adapterBytes += full.skeletons.header + uint64(cap(full.skeletons.children))*uint64(reflect.TypeOf((*PolynomialSkeleton)(nil)).Size())
+	seenSkeleton := map[*PolynomialSkeleton]bool{}
+	addSkeleton := func(sk *PolynomialSkeleton) {
+		if sk == nil || seenSkeleton[sk] {
+			return
+		}
+		seenSkeleton[sk] = true
+		adapterBytes += sk.header + uint64(cap(sk.retiredEntries)+cap(sk.retiredOriginals))*uint64(reflect.TypeOf(Monomial{}).Size())
+		vectors = append(vectors, &sk.entries, &sk.powers, &sk.originals)
+		external = append(external, sk.ms.raw, sk.ms.pending)
+	}
+	for _, sk := range full.skeletons.children {
+		addSkeleton(sk)
+	}
+	for _, f := range full.gcdFrames {
+		if !f.active {
+			continue
+		}
+		addSkeleton(f.newSkeleton)
+		if f.sparse.self != nil && !f.sparse.closed {
+			vectors = append(vectors, &f.sparse.inputs, &f.sparse.outputs)
+			adapterBytes += f.sparse.header
+		}
+	}
+
 	somRaw, _, somNumerals, somBytes := polynomialSOMNamedRoots(t, m, []*PolynomialSOMVector{&full.iccp})
 	external = append(external, somRaw...)
 	for _, a := range somNumerals {
@@ -219,6 +298,20 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 			return
 		}
 		cell(p, l.initializedCoefficients)
+	}
+	for _, f := range full.gcdFrames {
+		if f.active {
+			addPolynomial(f.returned.value)
+			addPolynomial(f.returned.incoming)
+		}
+	}
+	for _, f := range full.iccpFrames {
+		if !f.active {
+			continue
+		}
+		external = append(external, f.filter.raw, f.filter.pending, f.powers.raw, f.powers.pending)
+		addPolynomial(f.ci.value)
+		addPolynomial(f.ci.incoming)
 	}
 	addPolynomial(full.squareRoot.freshResult)
 	addPolynomial(full.composition.local.value)
@@ -446,4 +539,8 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	if bytes != z.budget.Used() {
 		t.Fatalf("actual charged headers and backings %d/%d full%d core%d mm%d up%d/%d/%d extra%d mmbytes%d runtime%d qa%d monoalloc%d", bytes, z.budget.Used(), full.header, m.header, mm.header, full.upm.header, full.upm.modular.header, full.upm.store.header, extraBytes, mmBytes, m.memory.Stats().TotalBytes, q.headerBytes, ma.TotalBytes)
 	}
+}
+
+func polynomialImpPhysicalAuditNamedRaw(t *testing.T, full *MultivariatePolynomialManager, polys []Polynomial, input []*Int, externalHeaders uint64, extraRaw []memory.Block, supplied ...*memory.SmallAllocator) {
+	polynomialImpPhysicalAuditNamedExtra(t, full, polys, input, externalHeaders, extraRaw, supplied...)
 }

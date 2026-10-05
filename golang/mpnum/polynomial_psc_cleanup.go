@@ -65,6 +65,24 @@ func (m *MultivariatePolynomialCore) CleanupPSC() error {
 		return ErrPolynomialPending
 	}
 	g := r.generation
+	if e := m.cleanupPSCCompleted(g); e != nil {
+		return e
+	}
+	return m.cleanupPSCAborts(g)
+}
+
+// An outer lexical owner may unwind its completed locals between these
+// phases. Only the exact invocation may acknowledge failed constructors.
+func (m *MultivariatePolynomialCore) cleanupPSCCompleted(g uint64) error {
+	if m == nil || m.self != m {
+		return ErrPolynomialOwner
+	}
+	if m.pscReceipts.depth != 0 {
+		return ErrPolynomialPending
+	}
+	if g != m.pscReceipts.generation {
+		return nil
+	}
 	if m.powerLocal.pscOwner == g && g != 0 {
 		if e := m.cleanupPolynomialPowerPhase(true, false); e != nil {
 			return e
@@ -89,6 +107,20 @@ func (m *MultivariatePolynomialCore) CleanupPSC() error {
 	if e := m.finishPSCPhase(true, false); e != nil {
 		return e
 	}
+	return nil
+}
+
+func (m *MultivariatePolynomialCore) cleanupPSCAborts(g uint64) error {
+	if m == nil || m.self != m {
+		return ErrPolynomialOwner
+	}
+	if m.pscReceipts.depth != 0 {
+		return ErrPolynomialPending
+	}
+	if g != m.pscReceipts.generation {
+		return nil
+	}
+	r := &m.pscReceipts
 	if e := m.finishLazardPhase(true, true); e != nil {
 		return e
 	}

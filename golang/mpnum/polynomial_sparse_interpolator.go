@@ -38,7 +38,29 @@ func NewPolynomialSparseInterpolator(m *MultivariatePolynomialManager, sk *Polyn
 	if e := m.core.integer.budget.Reserve(header); e != nil {
 		return nil, e
 	}
-	s = &PolynomialSparseInterpolator{owner: m, skeleton: sk, header: header, inputs: polynomialVector{width: 12}, outputs: polynomialVector{width: 12}}
+	s = &PolynomialSparseInterpolator{}
+	err = initializePolynomialSparseInterpolator(m, sk, s, header)
+	return s, err
+}
+
+func constructPolynomialSparseInterpolator(m *MultivariatePolynomialManager, sk *PolynomialSkeleton, s *PolynomialSparseInterpolator) error {
+	if e := m.ready(); e != nil {
+		return e
+	}
+	if sk != nil && sk.owner != m.core {
+		return ErrPolynomialOwner
+	}
+	if s == nil {
+		return ErrPolynomialOwner
+	}
+	if s.self != nil && !s.closed {
+		return ErrPolynomialPending
+	}
+	return initializePolynomialSparseInterpolator(m, sk, s, 0)
+}
+
+func initializePolynomialSparseInterpolator(m *MultivariatePolynomialManager, sk *PolynomialSkeleton, s *PolynomialSparseInterpolator, header uint64) (err error) {
+	*s = PolynomialSparseInterpolator{owner: m, skeleton: sk, header: header, inputs: polynomialVector{width: 12}, outputs: polynomialVector{width: 12}}
 	s.self = s
 	defer func() {
 		if err != nil {
@@ -52,22 +74,22 @@ func NewPolynomialSparseInterpolator(m *MultivariatePolynomialManager, sk *Polyn
 	if sk != nil {
 		n, e := sk.NumEntries()
 		if e != nil {
-			return s, e
+			return e
 		}
 		for i := uint32(0); i < n; i++ {
 			entry, e := sk.Entry(i)
 			if e != nil {
-				return s, e
+				return e
 			}
 			for j := uint32(0); j < entry.NumPowers; j++ {
 				if e = s.outputs.appendCoefficient(m.core, Int{}); e != nil {
-					return s, e
+					return e
 				}
 			}
 		}
 	}
 	s.constructed = true
-	return s, nil
+	return nil
 }
 func (s *PolynomialSparseInterpolator) identity() error {
 	if s == nil || s.self != s || s.owner == nil {

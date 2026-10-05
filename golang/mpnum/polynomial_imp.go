@@ -24,6 +24,12 @@ type MultivariatePolynomialManagerConfig struct {
 type MultivariatePolynomialManager struct {
 	conversion                                                 polynomialGlobalConversionScope
 	toPolynomial                                               polynomialToPolynomialScope
+	gcdFrames                                                  []*polynomialGCDFunctionScope
+	gcdDepth                                                   uint32
+	normalization                                              polynomialNormalizeScope
+	cra                                                        polynomialCRAScope
+	iccpFrames                                                 []*polynomialICCPScope
+	iccpDepth                                                  uint32
 	monic                                                      polynomialMonicScope
 	self                                                       *MultivariatePolynomialManager
 	core                                                       *MultivariatePolynomialCore

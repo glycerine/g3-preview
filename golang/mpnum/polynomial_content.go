@@ -1,4 +1,4 @@
-// Source: src/math/polynomial/polynomial.cpp:3384-3428.
+// Source: src/math/polynomial/polynomial.cpp:3344-3359,3384-3428.
 // Licensed under the MIT license. Source author: Leonardo de Moura (leonardo).
 package mpnum
 
@@ -13,6 +13,9 @@ type polynomialContentScope struct {
 }
 
 func (m *MultivariatePolynomialCore) finishIntegerContent(owning bool) error {
+	return m.finishIntegerContentPhase(owning, owning)
+}
+func (m *MultivariatePolynomialCore) finishIntegerContentPhase(owning, abort bool) error {
 	s := &m.contentLocal
 	if !s.active {
 		return nil
@@ -35,7 +38,7 @@ func (m *MultivariatePolynomialCore) finishIntegerContent(owning bool) error {
 		return e
 	}
 	s.aiEnded = true
-	if owning {
+	if owning && abort {
 		if e = s.numeric.cleanup(m.integer); e != nil {
 			return e
 		}
@@ -85,7 +88,8 @@ func (m *MultivariatePolynomialCore) integerContent(p Polynomial, i *Int, c *pol
 		if e != nil {
 			return e
 		}
-		if e = m.modular.Copy(i, &a); e != nil {
+		e = m.modular.Copy(i, &a)
+		if e != nil {
 			return e
 		}
 		return c.assign(m, m.unit)
@@ -99,7 +103,8 @@ func (m *MultivariatePolynomialCore) integerContent(p Polynomial, i *Int, c *pol
 		return e
 	}
 	view := integerArrayView{allocator: m.monomials.allocator, object: l.raw, count: n, offset: 12, stride: 12}
-	if e = m.modular.GCDManyIndexed(view, i); e != nil {
+	e = m.modular.GCDManyIndexed(view, i)
+	if e != nil {
 		return e
 	}
 	one, e := m.modular.IsOne(i)

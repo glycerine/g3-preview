@@ -50,6 +50,7 @@ type MultivariatePolynomialCore struct {
 	display                                                                                    polynomialDisplayState
 	conversionOwner                                                                            *polynomialGlobalConversionScope
 	toPolynomialOwner                                                                          *polynomialToPolynomialScope
+	dividesLocal                                                                               polynomialDividesScope
 	contentLocal                                                                               polynomialContentScope
 	pscReceipts                                                                                polynomialPSCReceipts
 	generatedPSC                                                                               uint64
@@ -384,6 +385,9 @@ func (m *MultivariatePolynomialCore) MkTerms(as []Int, ms []Monomial) (Polynomia
 }
 func (m *MultivariatePolynomialCore) CloseChecked() error {
 	if m != nil && m.self == m && m.displayPending() {
+		return ErrPolynomialPending
+	}
+	if m != nil && m.self == m && m.dividesLocal.active {
 		return ErrPolynomialPending
 	}
 	if m != nil && m.self == m && m.contentLocal.active {

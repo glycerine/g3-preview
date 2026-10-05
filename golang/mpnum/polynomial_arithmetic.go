@@ -12,6 +12,11 @@ func (m *MultivariatePolynomialCore) checkpoint() error {
 		defer func() { s.executing = true }()
 	}
 
+	// These hooks are external source resource/cooperation boundaries. Their
+	// primitive constructions belong to the caller, not an executing PSC frame.
+	m.callbackDepth++
+	defer func() { m.callbackDepth-- }()
+
 	if !m.config.Checkpoint() {
 		return ErrUPolynomialCanceled
 	}

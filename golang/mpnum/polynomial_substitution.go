@@ -75,6 +75,16 @@ func (m *MultivariatePolynomialCore) substitutionCleanup(owning bool) error {
 	if s.cleanupCause != nil && !owning {
 		return s.cleanupCause
 	}
+	b := &m.som
+	if b.gcdActive && b.gcdInvocation == s.somInvocation && b.gcdSubstitution == s {
+		if owning {
+			if e := b.finishNormalizeNumeral(true); e != nil {
+				return e
+			}
+		} else if b.gcdCleanupCause != nil {
+			return b.gcdCleanupCause
+		}
+	}
 	if s.kind == 3 {
 		if s.stage == 0 {
 			if s.productConstructed {

@@ -183,6 +183,18 @@ func (m *MultivariatePolynomialManager) CloseChecked() error {
 	if m != nil && m.self == m && m.toPolynomial.active {
 		return ErrPolynomialPending
 	}
+	if m != nil && m.self == m && (m.gcdPending() || m.iccpPending()) {
+		return ErrPolynomialPending
+	}
+	if m != nil && m.self == m && m.cra.active {
+		return ErrPolynomialPending
+	}
+	if m != nil && m.self == m && m.core != nil && m.core.dividesLocal.active {
+		return ErrPolynomialPending
+	}
+	if m != nil && m.self == m && m.normalization.active {
+		return ErrPolynomialPending
+	}
 	if m != nil && m.self == m && (m.composition.active || m.compositionHasOrphans()) {
 		return ErrPolynomialPending
 	}
@@ -225,6 +237,9 @@ func (m *MultivariatePolynomialManager) CloseChecked() error {
 		if e := m.CleanupConversion(); e != nil {
 			return e
 		}
+	}
+	if e := m.closeGCDMetadata(); e != nil {
+		return e
 	}
 	if e := m.closeEvaluationFrames(); e != nil {
 		return e

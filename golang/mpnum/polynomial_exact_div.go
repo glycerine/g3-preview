@@ -66,6 +66,7 @@ type polynomialExactDivisionScope struct {
 	pscOwner                uint64
 	monomial                polynomialDivisionReference
 	numeral                 Int
+	numeric                 polynomialNumericRoots
 	returned                Polynomial
 	kind, stage             uint8
 	active, endEntered      bool
@@ -111,10 +112,17 @@ func (m *MultivariatePolynomialCore) exactDivisionCleanupPhase(owning, abort boo
 		}
 		s.stage = 2
 	}
-	if !abort && s.monomial.assigning {
+	pendingNumeric := s.numeric.cell.object.OwnerID() != 0
+	for _, raw := range s.numeric.allocator {
+		pendingNumeric = pendingNumeric || raw.OwnerID() != 0
+	}
+	if !abort && (s.monomial.assigning || pendingNumeric) {
 		return nil
 	}
 	if abort {
+		if e := s.numeric.cleanup(m.integer); e != nil {
+			return e
+		}
 		if e := s.monomial.drop(m, &s.monomial.incoming, &s.monomial.incomingStarted, true); e != nil {
 			return e
 		}
@@ -318,7 +326,7 @@ func (m *MultivariatePolynomialCore) ExactDiv(p, q Polynomial) (result Polynomia
 		if e = m.modular.Div(&coefficientR, &coefficientQ, &s.numeral); e != nil {
 			return Polynomial{}, e
 		}
-		if e = m.som2.add(&s.numeral, quotient, false); e != nil {
+		if e = m.som2.addConsumedNumeric(&s.numeral, quotient, false, nil, &s.numeric); e != nil {
 			return Polynomial{}, e
 		}
 		if e = m.modular.Neg(&s.numeral); e != nil {
