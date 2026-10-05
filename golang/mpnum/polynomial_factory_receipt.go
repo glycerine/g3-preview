@@ -57,6 +57,9 @@ func (m *MultivariatePolynomialCore) transferFactoryResult(r *polynomialFactoryI
 		return ErrPolynomialOwner
 	}
 	s.result = Polynomial{}
+	if e := m.cheap.acknowledgeFactoryAppendTransfer(s.invocation); e != nil {
+		return e
+	}
 	if s.allocator == ([3]memory.Block{}) {
 		s.active = false
 	}

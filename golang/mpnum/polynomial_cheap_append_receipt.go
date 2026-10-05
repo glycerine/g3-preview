@@ -2,6 +2,8 @@
 // Licensed under the MIT license. Source author: Leonardo de Moura.
 package mpnum
 
+import "github.com/glycerine/g3/golang/memory"
+
 type polynomialCheapAppendScope struct {
 	invocation                                    uint64
 	active, stopped, foreignMixed                 bool
@@ -129,6 +131,33 @@ func (b *polynomialSOM) cleanupAppendInvocation(r *polynomialCheapAppendInvocati
 	}
 	if e = s.numeric.cleanup(m.integer); e != nil {
 		return e
+	}
+	*s = polynomialCheapAppendScope{invocation: s.invocation}
+	return nil
+}
+
+// At the real returned factory's incoming INC, the source vectors have already
+// transferred every row and reset their logical sizes. Acknowledge only that
+// matching completed adapter cohort before the older DEC can call user code.
+// No source RESET, DEL, DEC, backing release or numeric sweep occurs here.
+func (b *polynomialSOM) acknowledgeFactoryAppendTransfer(invocation uint64) error {
+	s := &b.appendScope
+	if !s.active || s.factoryInvocation != invocation {
+		return nil
+	}
+	if !s.completedTransfer || s.foreignMixed || s.stopped || s.transferredCoefficients != s.coefficients || s.transferredMonomials != s.monomials || b.hasPendingReference || s.pending != (Monomial{}) || s.movingCoefficient.cell != 0 || s.numeric.cell.object != (sourceCellBacking{}).object || s.numeric.allocator != ([3]memory.Block{}) {
+		return ErrPolynomialPending
+	}
+	as, e := b.as.size(b.owner)
+	if e != nil {
+		return e
+	}
+	ms, e := b.ms.size(b.owner)
+	if e != nil {
+		return e
+	}
+	if as != 0 || ms != 0 {
+		return ErrPolynomialPending
 	}
 	*s = polynomialCheapAppendScope{invocation: s.invocation}
 	return nil

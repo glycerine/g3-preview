@@ -28638,7 +28638,8 @@
         "mpnum/polynomial_sqrt_invocation.go",
         "mpnum/polynomial_sqrt_invocation_source_test.go",
         "mpnum/polynomial_constant_coefficient_receipt.go",
-        "mpnum/polynomial_constant_coefficient_receipt_source_test.go"
+        "mpnum/polynomial_constant_coefficient_receipt_source_test.go",
+        "mpnum/polynomial_completed_append_transfer_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -29194,7 +29195,11 @@
         "TestPolynomialSqrtInvocationPreservesLaterForeignPerfectSquare",
         "TestPolynomialSqrtReceiptOlderCohortTransfersAtActualLaterINC",
         "TestPolynomialSqrtInvocationBigNumeralEveryReservation",
-        "TestPolynomialConstantCoefficientReceiptActualSETLateTLSLeaf"
+        "TestPolynomialConstantCoefficientReceiptActualSETLateTLSLeaf",
+        "TestPolynomialCoefficientSequentialActualCompletedTransfer",
+        "TestPolynomialCompletedAppendActualINCBeforeForeignOldDECCallback",
+        "TestPolynomialCompletedAppendForeignMixedRefusalKeepsActualCallerINC",
+        "TestPolynomialActualStoppedAppendGuardPreservesFailurePrefix"
       ],
       "conditionals": [
         {
@@ -32244,6 +32249,17 @@
           "tests": [
             "TestPolynomialConstantCoefficientReceiptActualSETLateTLSLeaf"
           ]
+        },
+        {
+          "name": "Selected Coeff cpp3264-3277 and actual quadratic sequential callers cpp6607-6609: completed append adapter acknowledgement at returned factory actual incomingINC before older DEC callback",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_factory_receipt.go",
+          "tests": [
+            "TestPolynomialCoefficientSequentialActualCompletedTransfer",
+            "TestPolynomialCompletedAppendActualINCBeforeForeignOldDECCallback",
+            "TestPolynomialCompletedAppendForeignMixedRefusalKeepsActualCallerINC",
+            "TestPolynomialActualStoppedAppendGuardPreservesFailurePrefix"
+          ]
         }
       ],
       "ownership": [
@@ -32307,7 +32323,8 @@
         "Parent optional Neg/ScalarDiv arguments route through unchanged arithmetic engines and actual shared append/factory acquisition; incoming polynomial INC transfers raw factory before old DEC/callback",
         "Parent Discriminant, ordered foreign mixed-cohort retirement and NUM DT after published factory stop proofs remain open",
         "Actual sqrt lexical NUM/reference fields and matched perfect-square endEntered distinction; stale/foreign generations preserved; actual charged orphan/tag backing old+new capacity; source first cause/stage retained through owning continuation; partial ownership prerequisite, no whole-unit completion.",
-        "Actual guarded manager/frame/unique invocation plus direct argument acquisition tokens; legacy foreign calls have nil receipt; same-cardinality replacement and stale frame owning cleanup preserve foreign graph before cleanup."
+        "Actual guarded manager/frame/unique invocation plus direct argument acquisition tokens; legacy foreign calls have nil receipt; same-cardinality replacement and stale frame owning cleanup preserve foreign graph before cleanup.",
+        "Actual matched append factory nonce/completed row transfer: incomingINC transfers caller root then retires adapter metadata before older DEC callback; logical buffers are already empty and no numeric/pending roots remain; no source reset/delete/free/count repair, and foreign/stale receipts remain untouched. Selected partial owner evidence only. Current binding is specifically core.cheap, not generic cheap2 or PWSOM."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -32364,7 +32381,10 @@
         "Sqrt optional receipts and orphan invocation tags are charged Go ownership adaptation; no native allocation ticket/source event.",
         "Real public TLS postphysical release/allocation profiles test signed-host guarded owner-primitive domains, not ordinary mathematical free-failure reachability.",
         "No dormant original source driver assertion credit; full parent Factor and strict UP prime/Hensel remains open.",
-        "Partial SET acquisition prerequisite only; allocating finite-field PNormalize, complete Discriminant source-stop/reservation/coldgraph proof and source parent remain open. No source unit/API promotion."
+        "Partial SET acquisition prerequisite only; allocating finite-field PNormalize, complete Discriminant source-stop/reservation/coldgraph proof and source parent remain open. No source unit/API promotion.",
+        "Metadata acknowledgement is explicit Go checked owner adaptation at actual INC, not an added C++ vector/numeric operation or allocator event.",
+        "No whole source class/driver completion or original dormant ENSURE credit.",
+        "Stopped-prefix proof uses a real source append reservation refusal; direct zero factory marker is adapter-state guard coverage only, with no source ctor/INC credit."
       ]
     },
     {
