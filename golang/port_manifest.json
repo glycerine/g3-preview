@@ -126644,9 +126644,18 @@
       "path": "src/util/permutation.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "utilbits/permutation.go",
+        "utilbits/permutation_source_test.go"
+      ],
+      "tests": [
+        "TestPermutationCyclesExhaustiveIndependentCopy",
+        "TestPermutationCyclesActualMarkBeforeReachedDataFailure",
+        "TestPermutationCyclesUnreadAndSignedCountBranches",
+        "TestPermutationCyclesOverlappingActualBorrow",
+        "TestPermutationCyclesReachedSourceAssertionAndDuplicateCycle"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -126673,9 +126682,40 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "apply_permutation_core concrete uint32 specialization",
+          "status": "ported",
+          "go_target": "utilbits/permutation.go",
+          "tests": [
+            "TestPermutationCyclesExhaustiveIndependentCopy",
+            "TestPermutationCyclesActualMarkBeforeReachedDataFailure",
+            "TestPermutationCyclesUnreadAndSignedCountBranches",
+            "TestPermutationCyclesOverlappingActualBorrow",
+            "TestPermutationCyclesReachedSourceAssertionAndDuplicateCycle"
+          ]
+        },
+        {
+          "name": "apply_permutation concrete uint32 specialization with literal restoration",
+          "status": "ported",
+          "go_target": "utilbits/permutation.go",
+          "tests": [
+            "TestPermutationCyclesExhaustiveIndependentCopy",
+            "TestPermutationCyclesActualMarkBeforeReachedDataFailure",
+            "TestPermutationCyclesUnreadAndSignedCountBranches",
+            "TestPermutationCyclesOverlappingActualBorrow",
+            "TestPermutationCyclesReachedSourceAssertionAndDuplicateCycle"
+          ]
+        }
+      ],
+      "ownership": [
+        "Borrowed actual uint32 data/mapping, inplace signed marks and swaps; no scratch allocation or overlapping-range clone. Reached bounds guards preserve earlier marks and swaps."
+      ],
+      "deviations": [
+        "Concrete uint32 specialization only; permutation class and additional typed consumers remain open, with no Go generics.",
+        "Source tst1 body is disabled by #if0 and its ENSURE loop bound is zero; independent exhaustive checks supply mathematical evidence, not registered source driver credit.",
+        "Explicit int32 cast profile and reached Go bounds/assertion guards cover native undefined access domains; source global assertion-switch/debug continuation remains open."
+      ]
     },
     {
       "path": "src/util/plugin_manager.h",
