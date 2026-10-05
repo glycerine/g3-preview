@@ -458,6 +458,35 @@ func TestParamsReferenceSourceGrowthAndFailurePrefixes(t *testing.T) {
 func paramsAuditRoots(t *testing.T, c *ParamsContext, q *mpnum.RationalService, base, basePayloads uint32, roots []ParamsRef) {
 	t.Helper()
 	var strings, bigs uint32
+	auditNumeral := func(value *mpnum.OwnedRational) {
+		big, e := q.IsBig(value)
+		if e != nil {
+			// Read-only test reflection checks the actual service-owned dead
+			// descriptor published by numerator Copy refusal. Other invalid
+			// roots remain errors; this fixture's denominator is inline one.
+			service := reflect.ValueOf(q).Elem()
+			z := service.FieldByName("manager").Elem().FieldByName("z").Elem()
+			owned := reflect.ValueOf(value).Elem()
+			raw := owned.FieldByName("raw")
+			num, den := raw.FieldByName("num"), raw.FieldByName("den")
+			if !errors.Is(e, arena.ErrInvalidSlot) || owned.FieldByName("ownerID").Uint() != service.FieldByName("ownerID").Uint() || num.FieldByName("val").Int() != 1 || num.FieldByName("cell").Uint() == 0 || (num.FieldByName("cell").Uint() != z.FieldByName("failedRef").Uint() && num.FieldByName("cell").Uint() != z.FieldByName("failedNullRef").Uint()) || den.FieldByName("cell").Uint() != 0 || den.FieldByName("val").Int() != 1 {
+				t.Fatal("unexpected invalid published parameter numeral", e)
+			}
+			return
+		}
+		if big {
+			bigs++
+		}
+	}
+	for i, frame := range c.setFrames {
+		if !frame.active {
+			continue
+		}
+		if !frame.acquired || frame.invocation == 0 || frame.generation != c.blocks[i].generation || frame.next.kind != ParamNumeral {
+			t.Fatal("invalid actual acquired setter local")
+		}
+		auditNumeral(&frame.next.rat)
+	}
 	for i := range c.blocks {
 		b := &c.blocks[i]
 		if !b.live {
@@ -486,24 +515,7 @@ func paramsAuditRoots(t *testing.T, c *ParamsContext, q *mpnum.RationalService, 
 				strings++
 			}
 			if x.kind == ParamNumeral {
-				big, e := q.IsBig(&x.rat)
-				if e != nil {
-					// Read-only test reflection checks the actual service-owned dead
-					// descriptor published by numerator Copy refusal. Other invalid
-					// roots remain errors; this fixture's denominator is inline one.
-					service := reflect.ValueOf(q).Elem()
-					z := service.FieldByName("manager").Elem().FieldByName("z").Elem()
-					owned := reflect.ValueOf(&x.rat).Elem()
-					raw := owned.FieldByName("raw")
-					num, den := raw.FieldByName("num"), raw.FieldByName("den")
-					if !errors.Is(e, arena.ErrInvalidSlot) || owned.FieldByName("ownerID").Uint() != service.FieldByName("ownerID").Uint() || num.FieldByName("val").Int() != 1 || num.FieldByName("cell").Uint() == 0 || (num.FieldByName("cell").Uint() != z.FieldByName("failedRef").Uint() && num.FieldByName("cell").Uint() != z.FieldByName("failedNullRef").Uint()) || den.FieldByName("cell").Uint() != 0 || den.FieldByName("val").Int() != 1 {
-						t.Fatal("unexpected invalid published parameter numeral", e)
-					}
-					continue
-				}
-				if big {
-					bigs++
-				}
+				auditNumeral(&x.rat)
 			}
 		}
 	}
@@ -859,7 +871,7 @@ func TestParamsReferenceExactContextAccountingAndGrowthPeak(t *testing.T) {
 	check := func() {
 		s := c.Stats()
 		d := s.Text.Descriptors
-		total := s.HeaderBytes + s.BlockBytes + s.ReceiptBytes + s.SourceFrameBytes + s.PageBytes + s.DirectoryBytes + s.FormatBytes + s.Text.OwnerBytes + s.Text.PayloadBytes + s.Text.BlockMetadataBytes + s.Text.DirectoryBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes
+		total := s.HeaderBytes + s.BlockBytes + s.ReceiptBytes + s.SourceFrameBytes + s.SourceSetBytes + s.PageBytes + s.DirectoryBytes + s.FormatBytes + s.Text.OwnerBytes + s.Text.PayloadBytes + s.Text.BlockMetadataBytes + s.Text.DirectoryBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes
 		if c.budget.Used() != borrowed+total {
 			t.Fatal("actual context charge", c.budget.Used(), borrowed+total)
 		}

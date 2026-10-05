@@ -14,18 +14,24 @@ type paramsPhysicalValueOwner struct {
 	Value   *ParamsRef
 }
 
+type paramsPhysicalRationalOwner struct {
+	Service *mpnum.RationalService
+	Value   *mpnum.OwnedRational
+}
+
 type upolyPhysicalExtraOwners struct {
-	ParamsValues     []paramsPhysicalValueOwner
-	RationalServices []*mpnum.RationalService
-	SexprManagers    []*SexprManager
-	Services         []*mpnum.UPolynomialFactorizationService
-	Integers         []*mpnum.Int
-	Rationals        []*mpnum.Rational
-	RationalManagers []*mpnum.RationalManager
-	BinaryValues     []*mpnum.BinaryRational
-	BinaryManagers   []*mpnum.BinaryRationalManager
-	BinaryVectors    []*mpnum.BinaryRationalVector
-	Sequences        []*mpnum.UPolynomialSequence
+	ParamsRationalValues []paramsPhysicalRationalOwner
+	ParamsValues         []paramsPhysicalValueOwner
+	RationalServices     []*mpnum.RationalService
+	SexprManagers        []*SexprManager
+	Services             []*mpnum.UPolynomialFactorizationService
+	Integers             []*mpnum.Int
+	Rationals            []*mpnum.Rational
+	RationalManagers     []*mpnum.RationalManager
+	BinaryValues         []*mpnum.BinaryRational
+	BinaryManagers       []*mpnum.BinaryRationalManager
+	BinaryVectors        []*mpnum.BinaryRationalVector
+	Sequences            []*mpnum.UPolynomialSequence
 }
 
 func upolyPhysicalExtraNumerals(extras []upolyPhysicalExtraOwners, addInt func(reflect.Value)) {
@@ -62,6 +68,17 @@ func upolyPhysicalExtraNumerals(extras []upolyPhysicalExtraOwners, addInt func(r
 				addInt(raw.FieldByName("norm"))
 			}
 		}
+		for _, owner := range x.ParamsRationalValues {
+			if owner.Service == nil || owner.Value == nil {
+				panic(mpnum.ErrRationalServiceOwner)
+			}
+			service := reflect.ValueOf(owner.Service).Elem()
+			value := reflect.ValueOf(owner.Value).Elem()
+			if service.FieldByName("self").Pointer() != reflect.ValueOf(owner.Service).Pointer() || value.FieldByName("ownerID").Uint() == 0 || value.FieldByName("ownerID").Uint() != service.FieldByName("ownerID").Uint() {
+				panic(mpnum.ErrRationalServiceOwner)
+			}
+			addRat(value.FieldByName("raw"))
+		}
 		paramsContexts := make(map[*ParamsContext]bool)
 		for _, owner := range x.ParamsValues {
 			if owner.Context == nil || owner.Value == nil {
@@ -70,6 +87,19 @@ func upolyPhysicalExtraNumerals(extras []upolyPhysicalExtraOwners, addInt func(r
 			c, v := owner.Context, owner.Value
 			if !paramsContexts[c] {
 				paramsContexts[c] = true
+				for i, frame := range c.setFrames {
+					if !frame.active {
+						continue
+					}
+					if !frame.acquired || frame.invocation == 0 || i >= len(c.blocks) || frame.generation != c.blocks[i].generation || frame.next.kind != ParamNumeral {
+						panic(ErrParamsOwner)
+					}
+					raw := reflect.ValueOf(&frame.next.rat).Elem()
+					if raw.FieldByName("ownerID").Uint() != reflect.ValueOf(c.numerals).Elem().FieldByName("ownerID").Uint() {
+						panic(mpnum.ErrRationalServiceOwner)
+					}
+					addRat(raw.FieldByName("raw"))
+				}
 				for _, frame := range c.sourceFrames {
 					if !frame.active {
 						continue

@@ -66,9 +66,9 @@ type paramsEntryPage struct {
 	class   uint32
 }
 type ParamsStats struct {
-	LiveBlocks, References, Entries                                                                 uint32
-	HeaderBytes, BlockBytes, ReceiptBytes, SourceFrameBytes, PageBytes, DirectoryBytes, FormatBytes uint64
-	Text                                                                                            arena.VectorStats
+	LiveBlocks, References, Entries                                                                                 uint32
+	HeaderBytes, BlockBytes, ReceiptBytes, SourceFrameBytes, SourceSetBytes, PageBytes, DirectoryBytes, FormatBytes uint64
+	Text                                                                                                            arena.VectorStats
 }
 
 // This cold owner borrows both services. They must outlive it; budgets shared
@@ -84,6 +84,7 @@ type ParamsContext struct {
 	blocks            []paramsBlock
 	decrementReceipts []paramsDecrementReceipt
 	sourceFrames      []paramsSourceFrame
+	setFrames         []paramsSetFrame
 	sourceSerial      uint64
 	pages             []paramsEntryPage
 	workspace         []byte
@@ -248,11 +249,12 @@ func (c *ParamsContext) freeEntries(r paramsEntriesRef) {
 func (c *ParamsContext) newBlock() (uint32, error) {
 	for i := range c.blocks {
 		b := &c.blocks[i]
-		if !b.live && !c.sourceFrames[i].active && b.generation != math.MaxUint32 {
+		if !b.live && !c.sourceFrames[i].active && !c.setFrames[i].active && b.generation != math.MaxUint32 {
 			g := b.generation + 1
 			*b = paramsBlock{refs: 1, generation: g, live: true}
 			c.decrementReceipts[i] = paramsDecrementReceipt{}
 			c.sourceFrames[i] = paramsSourceFrame{}
+			c.setFrames[i] = paramsSetFrame{}
 			return uint32(i + 1), nil
 		}
 	}
@@ -261,7 +263,7 @@ func (c *ParamsContext) newBlock() (uint32, error) {
 		if e != nil {
 			return 0, e
 		}
-		if e = c.budget.Reserve(paramsBlockBytes(n) + paramsReceiptBytes(n) + paramsSourceFrameBytes(n)); e != nil {
+		if e = c.budget.Reserve(paramsBlockBytes(n) + paramsReceiptBytes(n) + paramsSourceFrameBytes(n) + paramsSetFrameBytes(n)); e != nil {
 			return 0, e
 		}
 		next := make([]paramsBlock, len(c.blocks), n)
@@ -270,13 +272,17 @@ func (c *ParamsContext) newBlock() (uint32, error) {
 		copy(receipts, c.decrementReceipts)
 		frames := make([]paramsSourceFrame, len(c.sourceFrames), n)
 		copy(frames, c.sourceFrames)
-		c.budget.Release(paramsBlockBytes(cap(c.blocks)) + paramsReceiptBytes(cap(c.decrementReceipts)) + paramsSourceFrameBytes(cap(c.sourceFrames)))
+		sets := make([]paramsSetFrame, len(c.setFrames), n)
+		copy(sets, c.setFrames)
+		c.budget.Release(paramsBlockBytes(cap(c.blocks)) + paramsReceiptBytes(cap(c.decrementReceipts)) + paramsSourceFrameBytes(cap(c.sourceFrames)) + paramsSetFrameBytes(cap(c.setFrames)))
 		c.blocks = next
 		c.decrementReceipts = receipts
 		c.sourceFrames = frames
+		c.setFrames = sets
 	}
 	c.decrementReceipts = append(c.decrementReceipts, paramsDecrementReceipt{})
 	c.sourceFrames = append(c.sourceFrames, paramsSourceFrame{})
+	c.setFrames = append(c.setFrames, paramsSetFrame{})
 	c.blocks = append(c.blocks, paramsBlock{refs: 1, generation: 1, live: true})
 	return uint32(len(c.blocks)), nil
 }
@@ -684,6 +690,9 @@ func (c *ParamsContext) setCore(slot uint32, k Symbol, kind ParamKind, bits uint
 			*x = paramEntry{key: k, kind: kind, rat: r}
 		}
 		return c.numerals.Copy(&x.rat, rat)
+	}
+	if kind == ParamNumeral && x == nil {
+		return c.setNewNumeral(slot, k, rat)
 	}
 	// Prepare owned text before deleting a replaced value: adapting borrowed C
 	// text to owned payload adds a failure point, without publishing a dangling tag.
@@ -1470,6 +1479,7 @@ func (c *ParamsContext) Stats() ParamsStats {
 	s.BlockBytes = paramsBlockBytes(cap(c.blocks))
 	s.ReceiptBytes = paramsReceiptBytes(cap(c.decrementReceipts))
 	s.SourceFrameBytes = paramsSourceFrameBytes(cap(c.sourceFrames))
+	s.SourceSetBytes = paramsSetFrameBytes(cap(c.setFrames))
 	s.DirectoryBytes = paramsDirectoryBytes(cap(c.pages))
 	s.FormatBytes = uint64(cap(c.workspace))
 	s.Text = c.texts.Stats()
@@ -1494,6 +1504,13 @@ func (c *ParamsContext) Close() error {
 	if c.closed {
 		return nil
 	}
+	for i := range c.setFrames {
+		if c.setFrames[i].active {
+			if e := c.cleanupSetFrame(uint32(i + 1)); e != nil {
+				return e
+			}
+		}
+	}
 	for i := range c.sourceFrames {
 		if c.sourceFrames[i].active {
 			if e := c.cleanupSourceFrame(uint32(i + 1)); e != nil {
@@ -1517,10 +1534,11 @@ func (c *ParamsContext) Close() error {
 	for _, p := range c.pages {
 		c.budget.Release(paramsPageBytes(p))
 	}
-	c.budget.Release(paramsDirectoryBytes(cap(c.pages)) + paramsBlockBytes(cap(c.blocks)) + paramsReceiptBytes(cap(c.decrementReceipts)) + paramsSourceFrameBytes(cap(c.sourceFrames)) + uint64(cap(c.workspace)) + c.headerBytes)
+	c.budget.Release(paramsDirectoryBytes(cap(c.pages)) + paramsBlockBytes(cap(c.blocks)) + paramsReceiptBytes(cap(c.decrementReceipts)) + paramsSourceFrameBytes(cap(c.sourceFrames)) + paramsSetFrameBytes(cap(c.setFrames)) + uint64(cap(c.workspace)) + c.headerBytes)
 	c.blocks = nil
 	c.decrementReceipts = nil
 	c.sourceFrames = nil
+	c.setFrames = nil
 	c.pages = nil
 	c.workspace = nil
 	c.closed = true
