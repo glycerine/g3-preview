@@ -125225,7 +125225,9 @@
       "go_targets": [
         "mpnum/prime_generator.go",
         "mpnum/prime_generator_test.go",
-        "prime_generator_source_test.go"
+        "prime_generator_source_test.go",
+        "util_default_prime_service.go",
+        "util_default_prime_service_test.go"
       ],
       "tests": [
         "TestPrimeGeneratorRegisteredTenThousandWithIntegerRoot",
@@ -125233,7 +125235,13 @@
         "TestPrimeIteratorIndexBeforeRefusalWrapAndColdOwner",
         "TestPrimeGeneratorConstructorAndSparseFailureAccounting",
         "TestPrimeGeneratorWarmCachedReadAndFinalizeDomain",
-        "TestPrimeGeneratorUnsignedSourceExtent"
+        "TestPrimeGeneratorUnsignedSourceExtent",
+        "TestDefaultPrimeEagerLifetimeAndIteratorSourcePrefixes",
+        "TestDefaultPrimeRegisteredSequential10000IndependentSieve",
+        "TestDefaultPrimeEveryEagerConstructionRefusal",
+        "TestDefaultPrimeLocalAndCachedWarmSourceRoutes",
+        "TestDefaultPrimeRegisteredIntegerRootAssertions",
+        "TestDefaultPrimeIndexWrapAndActualGrowthRefusal"
       ],
       "assertions": [
         {
@@ -125263,14 +125271,29 @@
           "tests": [
             "TestPrimeGeneratorRegisteredTenThousandWithIntegerRoot"
           ]
+        },
+        {
+          "name": "Eager default prime service, captured local/default iterator increment-before-read and finalize same generator",
+          "status": "partial",
+          "go_target": "util_default_prime_service.go",
+          "tests": [
+            "TestDefaultPrimeEagerLifetimeAndIteratorSourcePrefixes",
+            "TestDefaultPrimeRegisteredSequential10000IndependentSieve",
+            "TestDefaultPrimeEveryEagerConstructionRefusal",
+            "TestDefaultPrimeLocalAndCachedWarmSourceRoutes",
+            "TestDefaultPrimeRegisteredIntegerRootAssertions",
+            "TestDefaultPrimeIndexWrapAndActualGrowthRefusal"
+          ]
         }
       ],
       "ownership": [
-        "Actual charged concrete cold cache owner and full-capacity uint64 arrays; lexical todo destroys backing on each error with actual published cache prefix retained. Borrowed iterator does not own the cache. See PORT_PROGRESS.md#audit-prime-generator-port-status-md."
+        "Actual charged concrete cold cache owner and full-capacity uint64 arrays; lexical todo destroys backing on each error with actual published cache prefix retained. Borrowed iterator does not own the cache. See PORT_PROGRESS.md#audit-prime-generator-port-status-md.",
+        "Named reflected cold owners and real delegated table/cache storage; all actual constructor/growth/erase refusal prefixes audited before disabling faults; borrowed region/generator lifetimes remain explicit."
       ],
       "deviations": [
         "Explicit confined cache owner is selected Go profile. Default global/nullptr iterator binding, OpenMP global locking, generated global finalizer and source print/flush stream remain required. Source reversed nonterminating growth executes one complete16384 body then checked repeated-condition guard; later indefinite source allocation prefixes are not claimed.",
-        "Unsigned source vector extent checks remain separate from full typed-array extent guards; wrapped undersized raw allocation/header behavior and source memory-runtime vector integration remain open. Full prime source units remain partial."
+        "Unsigned source vector extent checks remain separate from full typed-array extent guards; wrapped undersized raw allocation/header behavior and source memory-runtime vector integration remain open. Full prime source units remain partial.",
+        "Explicit caller-bound single-lane service; source-global shared Runtime allocation and process singleton binding remain open. OpenMP and source print/flush remain open; source reversed sparse-growth loop unchanged, finalization does not recreate cache."
       ]
     },
     {
@@ -125281,7 +125304,9 @@
       "go_targets": [
         "mpnum/prime_generator.go",
         "mpnum/prime_generator_test.go",
-        "prime_generator_source_test.go"
+        "prime_generator_source_test.go",
+        "util_default_prime_service.go",
+        "util_default_prime_service_test.go"
       ],
       "tests": [
         "TestPrimeGeneratorRegisteredTenThousandWithIntegerRoot",
@@ -125289,7 +125314,13 @@
         "TestPrimeIteratorIndexBeforeRefusalWrapAndColdOwner",
         "TestPrimeGeneratorConstructorAndSparseFailureAccounting",
         "TestPrimeGeneratorWarmCachedReadAndFinalizeDomain",
-        "TestPrimeGeneratorUnsignedSourceExtent"
+        "TestPrimeGeneratorUnsignedSourceExtent",
+        "TestDefaultPrimeEagerLifetimeAndIteratorSourcePrefixes",
+        "TestDefaultPrimeRegisteredSequential10000IndependentSieve",
+        "TestDefaultPrimeEveryEagerConstructionRefusal",
+        "TestDefaultPrimeLocalAndCachedWarmSourceRoutes",
+        "TestDefaultPrimeRegisteredIntegerRootAssertions",
+        "TestDefaultPrimeIndexWrapAndActualGrowthRefusal"
       ],
       "conditionals": [
         {
@@ -125323,14 +125354,29 @@
           "tests": [
             "TestPrimeGeneratorRegisteredTenThousandWithIntegerRoot"
           ]
+        },
+        {
+          "name": "Eager default prime service, captured local/default iterator increment-before-read and finalize same generator",
+          "status": "partial",
+          "go_target": "util_default_prime_service.go",
+          "tests": [
+            "TestDefaultPrimeEagerLifetimeAndIteratorSourcePrefixes",
+            "TestDefaultPrimeRegisteredSequential10000IndependentSieve",
+            "TestDefaultPrimeEveryEagerConstructionRefusal",
+            "TestDefaultPrimeLocalAndCachedWarmSourceRoutes",
+            "TestDefaultPrimeRegisteredIntegerRootAssertions",
+            "TestDefaultPrimeIndexWrapAndActualGrowthRefusal"
+          ]
         }
       ],
       "ownership": [
-        "Actual charged concrete cold cache owner and full-capacity uint64 arrays; lexical todo destroys backing on each error with actual published cache prefix retained. Borrowed iterator does not own the cache. See PORT_PROGRESS.md#audit-prime-generator-port-status-md."
+        "Actual charged concrete cold cache owner and full-capacity uint64 arrays; lexical todo destroys backing on each error with actual published cache prefix retained. Borrowed iterator does not own the cache. See PORT_PROGRESS.md#audit-prime-generator-port-status-md.",
+        "Named reflected cold owners and real delegated table/cache storage; all actual constructor/growth/erase refusal prefixes audited before disabling faults; borrowed region/generator lifetimes remain explicit."
       ],
       "deviations": [
         "Explicit confined cache owner is selected Go profile. Default global/nullptr iterator binding, OpenMP global locking, generated global finalizer and source print/flush stream remain required. Source reversed nonterminating growth executes one complete16384 body then checked repeated-condition guard; later indefinite source allocation prefixes are not claimed.",
-        "Unsigned source vector extent checks remain separate from full typed-array extent guards; wrapped undersized raw allocation/header behavior and source memory-runtime vector integration remain open. Full prime source units remain partial."
+        "Unsigned source vector extent checks remain separate from full typed-array extent guards; wrapped undersized raw allocation/header behavior and source memory-runtime vector integration remain open. Full prime source units remain partial.",
+        "Explicit caller-bound single-lane service; source-global shared Runtime allocation and process singleton binding remain open. OpenMP and source print/flush remain open; source reversed sparse-growth loop unchanged, finalization does not recreate cache."
       ]
     },
     {
@@ -131769,9 +131815,20 @@
       "path": "src/util/trace.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_trace_context.go",
+        "util_trace_context_test.go"
+      ],
+      "tests": [
+        "TestTraceContextShortCircuitAndSourceFinalize",
+        "TestTraceContextIndependentBoundedSetModel",
+        "TestTraceContextEveryRealLazyConstructorRefusal",
+        "TestTraceContextForeignBorrowAndOwnerGuards",
+        "TestTraceContextCStringCurrentReadsAndWarmQueries",
+        "TestTraceContextForeignPublicationAndGrowthRefusalPrefixes",
+        "TestTraceContextEraseRehashCompletedPrefix"
+      ],
       "conditionals": [
         {
           "line": 22,
@@ -131800,17 +131857,47 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Caller-bound trace tags: lazy table, enable/disable/all, short-circuit query and finalize",
+          "status": "partial",
+          "go_target": "util_trace_context.go",
+          "tests": [
+            "TestTraceContextShortCircuitAndSourceFinalize",
+            "TestTraceContextIndependentBoundedSetModel",
+            "TestTraceContextEveryRealLazyConstructorRefusal",
+            "TestTraceContextForeignBorrowAndOwnerGuards",
+            "TestTraceContextCStringCurrentReadsAndWarmQueries",
+            "TestTraceContextForeignPublicationAndGrowthRefusalPrefixes",
+            "TestTraceContextEraseRehashCompletedPrefix"
+          ]
+        }
+      ],
+      "ownership": [
+        "Named reflected cold owners and real delegated table/cache storage; all actual constructor/growth/erase refusal prefixes audited before disabling faults; borrowed region/generator lifetimes remain explicit."
+      ],
+      "deviations": [
+        "Explicit caller-bound single-lane service; source-global shared Runtime allocation and process singleton binding remain open. _TRACE ofstream/macros remain open; enable-all survives finalization."
+      ]
     },
     {
       "path": "src/util/trace.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_trace_context.go",
+        "util_trace_context_test.go"
+      ],
+      "tests": [
+        "TestTraceContextShortCircuitAndSourceFinalize",
+        "TestTraceContextIndependentBoundedSetModel",
+        "TestTraceContextEveryRealLazyConstructorRefusal",
+        "TestTraceContextForeignBorrowAndOwnerGuards",
+        "TestTraceContextCStringCurrentReadsAndWarmQueries",
+        "TestTraceContextForeignPublicationAndGrowthRefusalPrefixes",
+        "TestTraceContextEraseRehashCompletedPrefix"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -131851,9 +131938,28 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Caller-bound trace tags: lazy table, enable/disable/all, short-circuit query and finalize",
+          "status": "partial",
+          "go_target": "util_trace_context.go",
+          "tests": [
+            "TestTraceContextShortCircuitAndSourceFinalize",
+            "TestTraceContextIndependentBoundedSetModel",
+            "TestTraceContextEveryRealLazyConstructorRefusal",
+            "TestTraceContextForeignBorrowAndOwnerGuards",
+            "TestTraceContextCStringCurrentReadsAndWarmQueries",
+            "TestTraceContextForeignPublicationAndGrowthRefusalPrefixes",
+            "TestTraceContextEraseRehashCompletedPrefix"
+          ]
+        }
+      ],
+      "ownership": [
+        "Named reflected cold owners and real delegated table/cache storage; all actual constructor/growth/erase refusal prefixes audited before disabling faults; borrowed region/generator lifetimes remain explicit."
+      ],
+      "deviations": [
+        "Explicit caller-bound single-lane service; source-global shared Runtime allocation and process singleton binding remain open. _TRACE ofstream/macros remain open; enable-all survives finalization."
+      ]
     },
     {
       "path": "src/util/trail.h",
