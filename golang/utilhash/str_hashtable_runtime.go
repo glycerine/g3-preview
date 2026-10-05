@@ -264,8 +264,7 @@ func (h *StrHashtable) SourceFinalize() error {
 		return ErrStrHashtableExecuting
 	}
 	if h.config.Runtime == nil {
-		h.Close()
-		return nil
+		return h.sourceFinalizeLegacy()
 	}
 	if h.raw.sourceCause != nil {
 		return h.raw.sourceCause
@@ -324,8 +323,7 @@ func (h *StrHashtable) CloseChecked() error {
 		return nil
 	}
 	if h.config.Runtime == nil {
-		h.Close()
-		return nil
+		return h.closeLegacyChecked()
 	}
 	for h.raw.lexical != nil {
 		frame := h.raw.lexical
@@ -943,7 +941,7 @@ func (h *StrHashtable) capacityChecked() (uint32, error) {
 	if h.config.Runtime != nil {
 		return h.runtimeWord(8)
 	}
-	return uint32(len(h.table)), nil
+	return h.raw.words[2], nil
 }
 func (h *StrHashtable) sizeChecked() (uint32, error) {
 	if h.config.Runtime != nil {

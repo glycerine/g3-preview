@@ -1,4 +1,7 @@
 // Licensed under the MIT license.
+// Source: src/util/str_hashtable.h:24-31; src/util/hashtable.h:259-322,613-623.
+// Source author: Leonardo de Moura (2006-09-13 / 2006-09-11).
+// See LICENSE.txt.
 // Concrete str_hashtable coverage; the active string->int map is separate.
 package utilhash
 
@@ -691,22 +694,31 @@ func TestStrHashtableMultiOriginFailureOrderAndAccounting(t *testing.T) {
 		t.Fatal("failed source bucket inserted", e)
 	}
 	destination.Close()
-	// Clone failures at header/table/directory prefix unwind all destination
-	// charges while keeping source bindings and borrowed allocations live.
+	// Source: src/util/hashtable.h:259-272. A failed copy constructor
+	// retains its acquired table for explicit owning abort; borrowed data survives.
 	mapMust(t, h.InsertFrom(second, s1))
 	mapMust(t, h.InsertFrom(third, s2))
 	used = budget.Used()
 	for fail := int64(0); fail < 5; fail++ {
 		budget.FailAfter(fail)
 		clone, e := h.Clone()
-		budget.FailAfter(-1)
-		if e == nil {
-			clone.Close()
-		} else if !errors.Is(e, arena.ErrInjectedFailure) {
+		if e != nil && !errors.Is(e, arena.ErrInjectedFailure) {
 			t.Fatal(e)
 		}
+		if clone != nil {
+			stats := clone.Stats()
+			if budget.Used() != used+stats.OwnerBytes+stats.TableBytes+stats.DirectoryBytes+stats.RetainedBytes {
+				t.Fatal("named copy constructor roots", fail, budget.Used(), used, stats)
+			}
+		} else if budget.Used() != used {
+			t.Fatal("empty failed copy context retained charge", fail)
+		}
+		budget.FailAfter(-1)
+		if clone != nil {
+			clone.Close()
+		}
 		if budget.Used() != used {
-			t.Fatal("failed clone binding leak", fail, budget.Used(), used)
+			t.Fatal("copy owning abort leak", fail, budget.Used(), used)
 		}
 	}
 }
@@ -1003,26 +1015,39 @@ func TestStrHashtableCleanupResetAndFailurePeaks(t *testing.T) {
 	if budget.Used() != 0 {
 		t.Fatal("budget leak")
 	}
-	// Source Reset destroys before allocation; this adaptation reserves the
-	// replacement table first and retains contents on predictable failure.
-	charged, e = NewStrHashtable(r, StrHashtableConfig{Budget: budget})
-	mapMust(t, e)
-	mapMust(t, charged.rehash(128))
-	mapMust(t, charged.Insert(key))
-	before = charged.Stats()
-	budget.FailAfter(0)
-	e = charged.Reset()
-	budget.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) || charged.Stats() != before || !strContains(t, charged, key) {
-		t.Fatal("atomic reset failure")
+	// Source: src/util/hashtable.h:287-322. Delete precedes replacement
+	// allocation; reset halves capacity before refusal, finalize retains it.
+	for _, finalize := range []bool{false, true} {
+		charged, e = NewStrHashtable(r, StrHashtableConfig{Budget: budget})
+		mapMust(t, e)
+		mapMust(t, charged.rehash(128))
+		mapMust(t, charged.Insert(key))
+		before = charged.Stats()
+		used = budget.Used()
+		budget.FailAfter(0)
+		if finalize {
+			e = charged.Finalize()
+		} else {
+			e = charged.Reset()
+		}
+		wantCapacity := uint32(64)
+		if finalize {
+			wantCapacity = 128
+		}
+		if !errors.Is(e, arena.ErrInjectedFailure) || charged.table != nil || charged.tableBytes != 0 || charged.Size() != before.Size || charged.Capacity() != wantCapacity || budget.Used() != used-before.TableBytes {
+			t.Fatal("source destructive replacement prefix", finalize, e, charged.Stats())
+		}
+		cause := e
+		mapMust(t, charged.SourceFinalize())
+		if charged.raw.sourceCause != cause || charged.raw.sourceStage != 2 {
+			t.Fatal("NULL destructor/body history")
+		}
+		budget.FailAfter(-1)
+		charged.Close()
+		if budget.Used() != 0 {
+			t.Fatal("replacement owning abort leak")
+		}
 	}
-	budget.FailAfter(0)
-	e = charged.Finalize()
-	budget.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) || charged.Stats() != before {
-		t.Fatal("atomic finalize failure")
-	}
-	charged.Close()
 	// A finite limit proving the new table is charged while the old is live.
 	root := uint64(reflect.TypeOf(StrHashtable{}).Size())
 	tight := arena.NewBudget(root + 24*strHashEntryBytes - 1)

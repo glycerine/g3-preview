@@ -106,6 +106,9 @@ func newStrHashtableCapacity(r *arena.BytesRegion, c StrHashtableConfig, n uint3
 		return nil, e
 	}
 	h.table, h.tableBytes = table, bytes
+	h.raw.self = h
+	h.raw.complete = true
+	h.raw.words[2] = n
 	return h, nil
 }
 func (h *StrHashtable) allocateTable(n uint32) ([]strHashEntry, uint64, error) {
@@ -124,6 +127,12 @@ func (h *StrHashtable) open() error {
 	}
 	if h.config.Runtime != nil {
 		return h.openRuntime()
+	}
+	if h.raw.destructing {
+		return arena.ErrClosed
+	}
+	if h.raw.sourceCause != nil {
+		return h.raw.sourceCause
 	}
 	if h.closed || len(h.table) == 0 {
 		return arena.ErrClosed
@@ -158,7 +167,7 @@ func (h *StrHashtable) Capacity() uint32 {
 	if h.config.Runtime != nil {
 		return h.mustRuntimeWord(8)
 	}
-	return uint32(len(h.table))
+	return h.raw.words[2]
 }
 func (h *StrHashtable) Deleted() uint32 {
 	if h.config.Runtime != nil {
@@ -186,12 +195,12 @@ func (h *StrHashtable) CollisionCount() uint64 {
 // StrHashtableStats accounts this owner, scalar table and cold owner directory.
 // Borrowed regions report their own graphs and are never charged by this table.
 type StrHashtableStats struct {
-	OwnerBytes, TableBytes, DirectoryBytes uint64
-	Size, Deleted, Capacity                uint32
+	OwnerBytes, TableBytes, DirectoryBytes, RetainedBytes uint64
+	Size, Deleted, Capacity                               uint32
 }
 
 func (h *StrHashtable) Stats() StrHashtableStats {
-	return StrHashtableStats{h.rootBytes, h.tableBytes, h.directoryBytes, h.Size(), h.Deleted(), h.Capacity()}
+	return StrHashtableStats{OwnerBytes: h.rootBytes, TableBytes: h.tableBytes, DirectoryBytes: h.directoryBytes, RetainedBytes: h.legacyRetainedBytes(), Size: h.Size(), Deleted: h.Deleted(), Capacity: h.Capacity()}
 }
 
 func (h *StrHashtable) keyRegion(k StrKey) (*arena.BytesRegion, error) {
@@ -434,6 +443,7 @@ func (h *StrHashtable) rehash(n uint32) error {
 	copyStrTable(h.table, table)
 	h.config.Budget.Release(h.tableBytes)
 	h.table, h.tableBytes = table, amount
+	h.raw.words[2] = n
 	h.deleted = 0
 	h.bump()
 	return nil
@@ -801,120 +811,31 @@ func (h *StrHashtable) Erase(k StrKey) error { return h.Remove(k) }
 func (h *StrHashtable) EraseFrom(region *arena.BytesRegion, k StrKey) error {
 	return h.RemoveFrom(region, k)
 }
-func (h *StrHashtable) replaceEmpty(n uint32) error {
-	if e := h.canBump(); e != nil {
-		return e
-	}
-	table, amount, e := h.allocateTable(n)
-	if e != nil {
-		return e
-	}
-	h.config.Budget.Release(h.tableBytes)
-	h.table, h.tableBytes = table, amount
-	h.size, h.deleted = 0, 0
-	h.bump()
-	return nil
-}
 func (h *StrHashtable) Reset() error {
 	if h.config.Runtime != nil {
 		return h.resetRuntime()
 	}
-	if e := h.open(); e != nil {
-		return e
-	}
-	if h.size == 0 && h.deleted == 0 {
-		return nil
-	}
-	if e := h.canBump(); e != nil {
-		return e
-	}
-	var overhead uint32
-	for _, entry := range h.table {
-		if entry.state == strHashFree {
-			overhead++
-		}
-	}
-	if h.Capacity() > 16 && uint64(overhead)*4 > uint64(h.Capacity())*3 {
-		return h.replaceEmpty(h.Capacity() >> 1)
-	}
-	for i := range h.table {
-		h.table[i].state = strHashFree
-		h.table[i].key = StrKey{}
-	}
-	h.size, h.deleted = 0, 0
-	h.bump()
-	return nil
+	return h.resetLegacy()
 }
 func (h *StrHashtable) Finalize() error {
 	if h.config.Runtime != nil {
 		return h.finalizeRuntime()
 	}
-	if e := h.open(); e != nil {
-		return e
-	}
-	if h.Capacity() > 64 {
-		return h.replaceEmpty(64)
-	}
-	return h.Reset()
+	return h.finalizeLegacy()
 }
 func (h *StrHashtable) Close() {
-	if h.config.Runtime != nil {
-		if e := h.CloseChecked(); e != nil {
-			panic(e)
-		}
-		return
-	}
-	if h.closed {
-		return
-	}
-	h.config.Budget.Release(h.rootBytes + h.tableBytes + h.directoryBytes)
-	h.table = nil
-	h.owners = nil
-	h.region = nil
-	h.rootBytes, h.tableBytes = 0, 0
-	h.directoryBytes = 0
-	h.size, h.deleted = 0, 0
-	h.closed = true
-	if h.epoch != ^uint64(0) {
-		h.bump()
+	if e := h.CloseChecked(); e != nil {
+		panic(e)
 	}
 }
 func (h *StrHashtable) Clone() (*StrHashtable, error) {
-	if h.config.Runtime != nil {
-		if e := h.open(); e != nil {
-			return nil, e
-		}
-		return h.cloneRuntime(true)
-	}
 	if e := h.open(); e != nil {
 		return nil, e
 	}
-	r, e := newStrHashtableCapacity(h.region, h.config, h.Capacity())
-	if e != nil {
-		return nil, e
+	if h.config.Runtime != nil {
+		return h.cloneRuntime(true)
 	}
-	mask := r.Capacity() - 1
-	for _, entry := range h.table {
-		if entry.state != strHashUsed {
-			continue
-		}
-		owner, e := h.keyRegion(entry.key)
-		if e != nil {
-			r.Close()
-			return nil, e
-		}
-		if e := r.adopt(owner); e != nil {
-			r.Close()
-			return nil, e
-		}
-		i := entry.hash & mask
-		for r.table[i].state != strHashFree {
-			i = (i + 1) & mask
-		}
-		r.table[i] = entry
-	}
-	r.size = h.size
-	return r, nil
+	return h.cloneLegacy()
 }
 func (h *StrHashtable) bothOpen(other *StrHashtable) error {
 	if e := h.open(); e != nil {
@@ -976,46 +897,7 @@ func (h *StrHashtable) Intersect(src *StrHashtable) error {
 	if h.config.Runtime != nil {
 		return h.intersectRuntime(src)
 	}
-	if e := h.bothOpen(src); e != nil {
-		return e
-	}
-	if h == src {
-		return nil
-	}
-	copy, e := h.Clone()
-	if e != nil {
-		return e
-	}
-	defer copy.Close()
-	for idx := uint32(0); idx < copy.Capacity(); idx++ {
-		state, e := copy.entryState(idx)
-		if e != nil {
-			return e
-		}
-		entry := strHashEntry{state: state}
-		if state == strHashUsed {
-			entry.key, e = copy.entryKey(idx)
-			if e != nil {
-				return e
-			}
-		}
-		if entry.state == strHashUsed {
-			owner, e := copy.keyRegion(entry.key)
-			if e != nil {
-				return e
-			}
-			ok, e := src.ContainsFrom(owner, entry.key)
-			if e != nil {
-				return e
-			}
-			if !ok {
-				if e := h.Remove(entry.key); e != nil {
-					return e
-				}
-			}
-		}
-	}
-	return nil
+	return h.intersectLegacy(src)
 }
 func (h *StrHashtable) Swap(other *StrHashtable) error {
 	if h.config.Runtime != nil || other.config.Runtime != nil {
@@ -1050,6 +932,7 @@ func (h *StrHashtable) Swap(other *StrHashtable) error {
 		other.config.Budget.Release(incoming)
 	}
 	h.table, other.table = other.table, h.table
+	h.raw.words[2], other.raw.words[2] = other.raw.words[2], h.raw.words[2]
 	h.region, other.region = other.region, h.region
 	h.owners, other.owners = other.owners, h.owners
 	h.directoryBytes, other.directoryBytes = other.directoryBytes, h.directoryBytes
