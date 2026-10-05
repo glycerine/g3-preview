@@ -103390,7 +103390,9 @@
         "util_gparams_global_reset_source_test.go",
         "util_gparams_service.go",
         "util_gparams_constructor_source.go",
-        "util_gparams_service_ops.go"
+        "util_gparams_service_ops.go",
+        "util_memory_process_children.go",
+        "util_memory_process_assertion_binding_test.go"
       ],
       "tests": [
         "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
@@ -103441,7 +103443,10 @@
         "TestGlobalParamsNamespaceModuleSnapshotDescriptionAndDisplays",
         "TestGlobalParamsNamespaceDisplayEveryActualOutputReservation",
         "TestGlobalParamsNamespaceActualSymbolConstructionRefusalBeforeNull",
-        "TestGlobalParamsNamespaceClosedDebugReadAfterSourceModuleArgument"
+        "TestGlobalParamsNamespaceClosedDebugReadAfterSourceModuleArgument",
+        "TestMemoryProcessPreparedNamespaceBorrowsActualAssertionOwner",
+        "TestMemoryProcessPreparedNamespaceNullGuardUsesCurrentAssertionState",
+        "TestMemoryProcessPreparedNamespaceReadsBorrowedDebugAtActualSite"
       ],
       "assertions": [
         {
@@ -103605,18 +103610,30 @@
             "TestGlobalParamsNamespaceActualSymbolConstructionRefusalBeforeNull",
             "TestGlobalParamsNamespaceClosedDebugReadAfterSourceModuleArgument"
           ]
+        },
+        {
+          "name": "caller-confined generated gparams preparation binds exact borrowed process assertion owner before imp initialize; reached namespace assertions and numeric bare_str share actual DebugContext state",
+          "status": "partial",
+          "go_target": "util_memory_process_children.go",
+          "tests": [
+            "TestMemoryProcessPreparedNamespaceBorrowsActualAssertionOwner",
+            "TestMemoryProcessPreparedNamespaceNullGuardUsesCurrentAssertionState",
+            "TestMemoryProcessPreparedNamespaceReadsBorrowedDebugAtActualSite"
+          ]
         }
       ],
       "ownership": [
         "Concrete charged registry header, three independent scalar dictionaries, owned descriptor roots and ParamsRef cells; canonical borrowed Symbol strings and deferred borrowed BytesRegion description reads. Immediate failure graph and source publication-prefix checks; see PORT_PROGRESS.md#audit-gparams-registry-port-status-md.",
         "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open.",
         "Source g_imp binds only a completed imp at unconditional successful pointer assignment. Failed constructor preserves old current pointer and retains actual unfinished placement header/child in named failed chain. Successful overwrite retains actual previous owner in named predecessor chain without source destruction. Completed constructor members unwind reverse declaration order only; imp reset/destructor body never executes on incomplete object. Explicit owning Close separately drains current, predecessors and failed headers. Exact reflected headers and additional Go copied-text context are charged and named.",
-        "Namespace facade reads actual current imp on every call. get_ref borrows the exact current ParamsRef; get_module returns an actual copied reference with independent caller ownership and no shadow snapshot. Namespace reset deletes table-held module references without destroying surviving caller references. One concrete DebugContext pointer is borrowed in the reflected cold service header, queried only at actual DEBUG SASSERT sites; release erases control accesses. Real output refusals retain completed stream prefix and actual source/cold owner graph before fault lift."
+        "Namespace facade reads actual current imp on every call. get_ref borrows the exact current ParamsRef; get_module returns an actual copied reference with independent caller ownership and no shadow snapshot. Namespace reset deletes table-held module references without destroying surviving caller references. One concrete DebugContext pointer is borrowed in the reflected cold service header, queried only at actual DEBUG SASSERT sites; release erases control accesses. Real output refusals retain completed stream prefix and actual source/cold owner graph before fault lift.",
+        "Existing service cold borrowed assertion pointer only, no allocation or new owner. All77 actual process initialization reservation prefixes unchanged; immediate named cold census after actual assertion/lifetime branches."
       ],
       "deviations": [
         "Explicit runtime lifetime, C long32/64 and C-locale IEEE64 profiles, charged Go scratch/backings and two borrowed byte streams. Complete generated catalog, process singleton/stdout wiring, OpenMP and physical global allocation hooks remain open.",
         "Explicit borrowed-owner single-lane namespace service, not process singleton/generated memory lifecycle completion. Actual C++ placement delete is no-op on failed ctor; Go owning abort refunds concrete retained storage separately. Source TRACE, native ABI/global Runtime table allocation, full descendant exceptional paths and arbitrary global bindings remain open. Independent source branch fixtures give no registered test-driver credit. TLS signed-host overflow stop is guarded undefined-domain evidence, not ordinary free failure/OOM.",
-        "Explicit single-lane namespace binding, not process singleton/generated memory lifecycle. TRACE, native ostream/global stdout, global notification/debugger behavior and wider physical ABI/accounting remain open. Null current pointer with erased/disabled assertion reaches a typed undefined-pointer-domain guard. Symbol bare_str assertion uses actual numeric scalar at source argument site; numeric source ternary routes empty-name engine even with assertions disabled in debug. Independent fixtures give no registered driver credit."
+        "Explicit single-lane namespace binding, not process singleton/generated memory lifecycle. TRACE, native ostream/global stdout, global notification/debugger behavior and wider physical ABI/accounting remain open. Null current pointer with erased/disabled assertion reaches a typed undefined-pointer-domain guard. Symbol bare_str assertion uses actual numeric scalar at source argument site; numeric source ternary routes empty-name engine even with assertions disabled in debug. Independent fixtures give no registered driver credit.",
+        "Caller-confined assertion binding does not complete process-global macros, debugger notification, TRACE, or native ostream/ABI. Null-imp and closed-context cases are explicitly checked diagnostic domains."
       ],
       "ownership_checks": [
         "actual source destructor reset/deletion/member cursor retained independently of sticky source cause; immediate named owner graph before sparse shrink fault lift; separate owning acknowledgment never replays failed source reset allocation; generated singleton ctor unwind and reached ParamsRef decrement-stop receipts remain open",
@@ -113824,7 +113841,13 @@
         "util_numeric_stream_file.go",
         "util_numeric_stream_file_test.go",
         "util_numeric_stream.go",
-        "memory/runtime_initialization_oom.go"
+        "memory/runtime_initialization_oom.go",
+        "util_memory_process.go",
+        "util_memory_process_children.go",
+        "util_memory_process_cleanup.go",
+        "util_memory_process_test.go",
+        "util_memory_process_physical_test.go",
+        "util_memory_process_assertion_binding_test.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -113889,7 +113912,21 @@
         "TestNumericFileStreamActualWriteFailureSetsNonthrowingBadbit",
         "TestNumericFileStreamEveryColdReservation",
         "TestMemoryRuntimeInitializationClearAfterActualAllocationFailure",
-        "TestMemoryRuntimeInitializationClearReachedOwnerGuard"
+        "TestMemoryRuntimeInitializationClearReachedOwnerGuard",
+        "TestMemoryProcessFirstInitFlagsAndGeneratedChildren",
+        "TestMemoryProcessFailedFirstWaitPreservesReachedOwnerPrefix",
+        "TestMemoryProcessFinalizeRetainsFullyFlagAndBorrowedOwnerIdentities",
+        "TestMemoryProcessEveryActualInitializationReservationAndOwnedAbort",
+        "TestMemoryProcessFirstCallClearsRealOOMBeforeFailedChild",
+        "TestMemoryProcessReinitRetainsFullyTrueAfterEndedStaticPublicationGuard",
+        "TestMemoryProcessSizeTConversionBeforeSentinelAndWait",
+        "TestMemoryProcessRejectsEachForeignColdChildBudgetBeforeReservation",
+        "TestMemoryProcessActualGParamsStopPreservesLaterBorrowedChildren",
+        "TestMemoryProcessFailedFirstFinalizeUsesActualNullGParamsBranch",
+        "TestMemoryProcessIdentityAndColdNoActionFinalizer",
+        "TestMemoryProcessPreparedNamespaceBorrowsActualAssertionOwner",
+        "TestMemoryProcessPreparedNamespaceNullGuardUsesCurrentAssertionState",
+        "TestMemoryProcessPreparedNamespaceReadsBorrowedDebugAtActualSite"
       ],
       "conditionals": [
         {
@@ -114080,6 +114117,34 @@
             "TestMemoryRuntimeInitializationClearAfterActualAllocationFailure",
             "TestMemoryRuntimeInitializationClearReachedOwnerGuard"
           ]
+        },
+        {
+          "name": "caller-confined actual generated initialize/finalize scalar order cpp89-113/153-160 with stable-priority rational-symbol-gparams and debug-gparams-prime-rational-symbol-trace finalizers",
+          "status": "partial",
+          "go_target": "util_memory_process.go",
+          "tests": [
+            "TestMemoryProcessFirstInitFlagsAndGeneratedChildren",
+            "TestMemoryProcessFailedFirstWaitPreservesReachedOwnerPrefix",
+            "TestMemoryProcessFinalizeRetainsFullyFlagAndBorrowedOwnerIdentities",
+            "TestMemoryProcessEveryActualInitializationReservationAndOwnedAbort",
+            "TestMemoryProcessFirstCallClearsRealOOMBeforeFailedChild",
+            "TestMemoryProcessReinitRetainsFullyTrueAfterEndedStaticPublicationGuard",
+            "TestMemoryProcessSizeTConversionBeforeSentinelAndWait",
+            "TestMemoryProcessRejectsEachForeignColdChildBudgetBeforeReservation",
+            "TestMemoryProcessActualGParamsStopPreservesLaterBorrowedChildren",
+            "TestMemoryProcessFailedFirstFinalizeUsesActualNullGParamsBranch",
+            "TestMemoryProcessIdentityAndColdNoActionFinalizer"
+          ]
+        },
+        {
+          "name": "caller-confined generated gparams preparation binds exact borrowed process assertion owner before imp initialize; reached namespace assertions and numeric bare_str share actual DebugContext state",
+          "status": "partial",
+          "go_target": "util_memory_process_children.go",
+          "tests": [
+            "TestMemoryProcessPreparedNamespaceBorrowsActualAssertionOwner",
+            "TestMemoryProcessPreparedNamespaceNullGuardUsesCurrentAssertionState",
+            "TestMemoryProcessPreparedNamespaceReadsBorrowedDebugAtActualSite"
+          ]
         }
       ],
       "ownership": [
@@ -114090,7 +114155,9 @@
         "Persistent pointer-free release stages/serials are part of the charged actual runtime/location directories. Public flags are observational; bound private owner/ref/serial resolves the retained stage. Physical-completed frees are never replayed. Original successful pooled duplicate free retains source requested subtraction/self-link.",
         "Actual Runtime header/data and TLS/global counter publication preserved, including zero-request header allocation and postphysical TLS limit errors. Wrapped headerless allocation is a guarded source-undefined domain with explicit CleanupPartial, not normal allocation exhaustion credit.",
         "Explicit standard-stream owner charges its reflected header plus two actual file-stream headers; files borrowed and never closed/sync/fsync by stream owners. Context charges one reflected cold header, borrows same Budget/streams/CString region, validates CString only at reached insertion. Real integer formatter remains local[67]byte; no output warm-up, hidden StringBuffer or fake Runtime allocation. Every actual provider/context reservation tested through success; child pre-refusal named cold/raw graph matches Budget once.",
-        "The actual Runtime owns OOM and accounting fields; this scalar source initialization action acquires/releases no block or cold root. Live and late-failed allocation tokens remain with their existing named owners."
+        "The actual Runtime owns OOM and accounting fields; this scalar source initialization action acquires/releases no block or cold root. Live and late-failed allocation tokens remain with their existing named owners.",
+        "Actual parent header and post-symbol Params/catalog/gparams preparation owners only; externally provided Runtime and six service wrappers remain borrowed. Immediate once-only actual cold graph at all77 initialization reservation prefixes, matching gparams child owning receipt and unrelated caller NUM survival.",
+        "Existing service cold borrowed assertion pointer only, no allocation or new owner. All77 actual process initialization reservation prefixes unchanged; immediate named cold census after actual assertion/lifetime branches."
       ],
       "deviations": [
         "Source signed-overflow/invalid-lane domains use scalar typed outcomes after completed field prefixes. Containing allocator must execute real physical operations between counter phases. Physical hooks, headers, generated callbacks, OOM exits/streams, concurrent global service and consumer integration remain open.",
@@ -114098,7 +114165,13 @@
         "Explicit LE word codecs are a Go source-storage adapter, not an additional C++ allocator algorithm. MPZ backend typed accesses must bound against actual object extent; this prerequisite does not complete MPZ/Natural backing or tracked release/global lifecycle.",
         "Ordinary retry of an interrupted beforefree invocation resumes its real retained phase; explicit CompleteRelease can acknowledge afterfree failure without counter repair. This is a Go owning cleanup adapter to bounded source-undefined signed-overflow domains, not a C++ exception recovery claim. Actual MPZ/Natural and transitive numerical failure owners remain required.",
         "Selected bound OOM/count exit/stream gap is now implemented: actual Runtime failure routes, real subprocess101/113 with Budget refusal still active, file badbit cannot suppress exit, borrowed CString mutation/false/null retention, errors.As derived/base catch. Prior broad global/exit/stream-open notes remain historical beyond this explicit provider binding. Generated initialize/finalize callbacks and process-global singleton wiring remain OPEN; direct Go file emission is not arbitrary ostream locale/flags/exception/native buffering ABI. Closed Runtime count getter fixture is checked invalid-lifetime prefix coverage, not valid source exhaustion. src/test/memory.cpp Windows high-level API campaign is not credited.",
-        "Only memory_manager.cpp102 assignment is selected. Outer first-initialize max-size/pointer guard, generated child initialization, fully-initialized publication/wait and process finalize remain incomplete; leaf fixtures are independent, not registered source driver credit."
+        "Only memory_manager.cpp102 assignment is selected. Outer first-initialize max-size/pointer guard, generated child initialization, fully-initialized publication/wait and process finalize remain incomplete; leaf fixtures are independent, not registered source driver credit.",
+        "Caller-confined explicit binding, not native process-global/OpenMP singleton.",
+        "Guarded failed-first single-lane spin domain; no silent retry or flag repair.",
+        "Repeated stopped source destructor invocation is guarded; Close is separate exact owning abort.",
+        "Legacy symbol/tag/prime/Params storage lacks actual source-global Runtime backing; no accounting tickets or inferred Budget malloc events.",
+        "_TRACE file path/PROFILE_MEMORY/global ostream and full registered test driver remain open.",
+        "Caller-confined assertion binding does not complete process-global macros, debugger notification, TRACE, or native ostream/ABI. Null-imp and closed-context cases are explicitly checked diagnostic domains."
       ]
     },
     {
@@ -114122,7 +114195,12 @@
         "util_numeric_stream_file.go",
         "util_numeric_stream_file_test.go",
         "util_numeric_stream.go",
-        "memory/runtime_initialization_oom.go"
+        "memory/runtime_initialization_oom.go",
+        "util_memory_process.go",
+        "util_memory_process_children.go",
+        "util_memory_process_cleanup.go",
+        "util_memory_process_test.go",
+        "util_memory_process_physical_test.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -114175,7 +114253,18 @@
         "TestNumericFileStreamActualWriteFailureSetsNonthrowingBadbit",
         "TestNumericFileStreamEveryColdReservation",
         "TestMemoryRuntimeInitializationClearAfterActualAllocationFailure",
-        "TestMemoryRuntimeInitializationClearReachedOwnerGuard"
+        "TestMemoryRuntimeInitializationClearReachedOwnerGuard",
+        "TestMemoryProcessFirstInitFlagsAndGeneratedChildren",
+        "TestMemoryProcessFailedFirstWaitPreservesReachedOwnerPrefix",
+        "TestMemoryProcessFinalizeRetainsFullyFlagAndBorrowedOwnerIdentities",
+        "TestMemoryProcessEveryActualInitializationReservationAndOwnedAbort",
+        "TestMemoryProcessFirstCallClearsRealOOMBeforeFailedChild",
+        "TestMemoryProcessReinitRetainsFullyTrueAfterEndedStaticPublicationGuard",
+        "TestMemoryProcessSizeTConversionBeforeSentinelAndWait",
+        "TestMemoryProcessRejectsEachForeignColdChildBudgetBeforeReservation",
+        "TestMemoryProcessActualGParamsStopPreservesLaterBorrowedChildren",
+        "TestMemoryProcessFailedFirstFinalizeUsesActualNullGParamsBranch",
+        "TestMemoryProcessIdentityAndColdNoActionFinalizer"
       ],
       "conditionals": [
         {
@@ -114344,6 +114433,24 @@
             "TestMemoryRuntimeInitializationClearAfterActualAllocationFailure",
             "TestMemoryRuntimeInitializationClearReachedOwnerGuard"
           ]
+        },
+        {
+          "name": "caller-confined actual generated initialize/finalize scalar order cpp89-113/153-160 with stable-priority rational-symbol-gparams and debug-gparams-prime-rational-symbol-trace finalizers",
+          "status": "partial",
+          "go_target": "util_memory_process.go",
+          "tests": [
+            "TestMemoryProcessFirstInitFlagsAndGeneratedChildren",
+            "TestMemoryProcessFailedFirstWaitPreservesReachedOwnerPrefix",
+            "TestMemoryProcessFinalizeRetainsFullyFlagAndBorrowedOwnerIdentities",
+            "TestMemoryProcessEveryActualInitializationReservationAndOwnedAbort",
+            "TestMemoryProcessFirstCallClearsRealOOMBeforeFailedChild",
+            "TestMemoryProcessReinitRetainsFullyTrueAfterEndedStaticPublicationGuard",
+            "TestMemoryProcessSizeTConversionBeforeSentinelAndWait",
+            "TestMemoryProcessRejectsEachForeignColdChildBudgetBeforeReservation",
+            "TestMemoryProcessActualGParamsStopPreservesLaterBorrowedChildren",
+            "TestMemoryProcessFailedFirstFinalizeUsesActualNullGParamsBranch",
+            "TestMemoryProcessIdentityAndColdNoActionFinalizer"
+          ]
         }
       ],
       "ownership": [
@@ -114352,13 +114459,19 @@
         "One concrete lower memory.Runtime owns source accounting, physical backings and charged directories; main g3 aliases use the real static nominal-error bridge. Borrowed static transport is cold; nil-returning transport cannot suppress source failure. See PORT_PROGRESS.md#audit-memory-package-api-packet-md. Numeric/default-backend and full process-global wiring remain required.",
         "Actual Runtime header/data and TLS/global counter publication preserved, including zero-request header allocation and postphysical TLS limit errors. Wrapped headerless allocation is a guarded source-undefined domain with explicit CleanupPartial, not normal allocation exhaustion credit.",
         "Explicit standard-stream owner charges its reflected header plus two actual file-stream headers; files borrowed and never closed/sync/fsync by stream owners. Context charges one reflected cold header, borrows same Budget/streams/CString region, validates CString only at reached insertion. Real integer formatter remains local[67]byte; no output warm-up, hidden StringBuffer or fake Runtime allocation. Every actual provider/context reservation tested through success; child pre-refusal named cold/raw graph matches Budget once.",
-        "The actual Runtime owns OOM and accounting fields; this scalar source initialization action acquires/releases no block or cold root. Live and late-failed allocation tokens remain with their existing named owners."
+        "The actual Runtime owns OOM and accounting fields; this scalar source initialization action acquires/releases no block or cold root. Live and late-failed allocation tokens remain with their existing named owners.",
+        "Actual parent header and post-symbol Params/catalog/gparams preparation owners only; externally provided Runtime and six service wrappers remain borrowed. Immediate once-only actual cold graph at all77 initialization reservation prefixes, matching gparams child owning receipt and unrelated caller NUM survival."
       ],
       "deviations": [
         "Source signed-overflow/invalid-lane domains use scalar typed outcomes after completed field prefixes. Containing allocator must execute real physical operations between counter phases. Physical hooks, headers, generated callbacks, OOM exits/streams, concurrent global service and consumer integration remain open.",
         "Size_t promotion is explicit32/64: LP64 updates use unsigned modular arithmetic; ILP32 shrink delta uses uint32 subtraction before LL64 promotion. Signed synchronization/count and ILP32 promoted overflow have typed boundaries after prior field prefixes.",
         "Selected bound OOM/count exit/stream gap is now implemented: actual Runtime failure routes, real subprocess101/113 with Budget refusal still active, file badbit cannot suppress exit, borrowed CString mutation/false/null retention, errors.As derived/base catch. Prior broad global/exit/stream-open notes remain historical beyond this explicit provider binding. Generated initialize/finalize callbacks and process-global singleton wiring remain OPEN; direct Go file emission is not arbitrary ostream locale/flags/exception/native buffering ABI. Closed Runtime count getter fixture is checked invalid-lifetime prefix coverage, not valid source exhaustion. src/test/memory.cpp Windows high-level API campaign is not credited.",
-        "Only memory_manager.cpp102 assignment is selected. Outer first-initialize max-size/pointer guard, generated child initialization, fully-initialized publication/wait and process finalize remain incomplete; leaf fixtures are independent, not registered source driver credit."
+        "Only memory_manager.cpp102 assignment is selected. Outer first-initialize max-size/pointer guard, generated child initialization, fully-initialized publication/wait and process finalize remain incomplete; leaf fixtures are independent, not registered source driver credit.",
+        "Caller-confined explicit binding, not native process-global/OpenMP singleton.",
+        "Guarded failed-first single-lane spin domain; no silent retry or flag repair.",
+        "Repeated stopped source destructor invocation is guarded; Close is separate exact owning abort.",
+        "Legacy symbol/tag/prime/Params storage lacks actual source-global Runtime backing; no accounting tickets or inferred Budget malloc events.",
+        "_TRACE file path/PROFILE_MEMORY/global ostream and full registered test driver remain open."
       ]
     },
     {
