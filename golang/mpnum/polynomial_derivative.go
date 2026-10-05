@@ -23,6 +23,8 @@ type polynomialDerivativeScope struct {
 	monomialAllocator                    monomialAllocatorInvocationReceipt
 	factoryGeneration                    uint64
 	numeric                              polynomialNumericRoots
+	append                               polynomialCheapAppendInvocationReceipt
+	factory                              polynomialFactoryInvocationReceipt
 	normalize                            integerPNormalizeInvocationReceipt
 	orphans                              []Monomial
 	orphanInvocations                    []uint64
@@ -161,6 +163,8 @@ func (m *MultivariatePolynomialManager) derivativeWithReceipt(p Polynomial, x ui
 	// This is a new guarded source invocation, not a retry of the older child.
 	// Its historical standalone receipt remains valid on the modular owner.
 	s.normalize = integerPNormalizeInvocationReceipt{}
+	s.append = polynomialCheapAppendInvocationReceipt{}
+	s.factory = polynomialFactoryInvocationReceipt{}
 	s.monomialAllocator = monomialAllocatorInvocationReceipt{}
 	s.numericPhase = 0
 	directReceipt := polynomialDerivativeInvocationReceipt{manager: m, frame: s, invocation: s.invocation}
@@ -242,7 +246,7 @@ func (m *MultivariatePolynomialManager) derivativeWithReceipt(p Polynomial, x ui
 			s.generated = derivative
 		}
 		consumed := false
-		e = c.cheap.addConsumed(&s.a, derivative, true, &consumed)
+		e = c.cheap.addConsumedReceipts(&s.a, derivative, true, &consumed, nil, &s.append)
 		if consumed {
 			m.transferDerivativeCreated(derivative)
 		}
@@ -254,7 +258,24 @@ func (m *MultivariatePolynomialManager) derivativeWithReceipt(p Polynomial, x ui
 			return Polynomial{}, e
 		}
 	}
-	return c.cheap.mk(false)
+	p, e = c.cheap.mkWithAppendReceipt(false, &s.append, &s.factory)
+	if e != nil {
+		return Polynomial{}, e
+	}
+	// Every per-term lexical NUM destructor has already completed. Preserve
+	// the exact constructed child until metadata acknowledgement succeeds,
+	// then hand this returned pointer to the caller without another INC.
+	if c.matchesFactoryInvocation(&s.factory) {
+		if c.cheap.matchesAppendInvocation(&s.append) {
+			if e = c.cheap.acknowledgeFactoryAppendTransfer(s.factory.invocation); e != nil {
+				return Polynomial{}, e
+			}
+		}
+		if e = c.transferFactoryResult(&s.factory, p); e != nil {
+			return Polynomial{}, e
+		}
+	}
+	return p, nil
 }
 
 // Owning abort: only actual fields and matching factory continuation identities.
@@ -287,8 +308,24 @@ func (m *MultivariatePolynomialManager) cleanupDerivativeModeOwned(abort bool, i
 		}
 	}
 	s.constructed = 0
+	if e := m.core.cleanupFactoryInvocation(&s.factory, false); e != nil {
+		s.cleanupCause = e
+		return e
+	}
+	if e := m.core.cheap.cleanupAppendInvocation(&s.append, false); e != nil {
+		s.cleanupCause = e
+		return e
+	}
 	if !abort {
 		return nil
+	}
+	if e := m.core.cleanupFactoryInvocation(&s.factory, true); e != nil {
+		s.cleanupCause = e
+		return e
+	}
+	if e := m.core.cheap.cleanupAppendInvocation(&s.append, true); e != nil {
+		s.cleanupCause = e
+		return e
 	}
 	if e := m.core.modular.cleanupPNormalizeInvocation(&s.normalize, true); e != nil {
 		s.cleanupCause = e

@@ -54,6 +54,7 @@ func (m *IntegerModularManager) cleanupPNormalizeInvocation(r *integerPNormalize
 // A receipt exists only for a real pending growth of the named source buffer.
 // Successful publication returns authority to the persistent Natural member.
 type naturalPNBufferReceipt struct {
+	raw        integerRawInvocationReceipt
 	scalar     polynomialScalarDivInvocationReceipt
 	owner      *NaturalManager
 	context    *integerPNormalizeScope
@@ -117,6 +118,23 @@ func (s *integerPNormalizeScope) pending() bool {
 }
 
 func (r *naturalPNBufferReceipt) bound(executing bool) bool {
+	if r.raw.manager != nil {
+		s := r.raw
+		if !s.manager.matchesRawInvocation(&s) || r.owner != s.manager.natural || r.invocation != s.invocation || (executing && !s.frame.executing) {
+			return false
+		}
+		if r.private {
+			v := &r.owner.verificationInvocation
+			return r == &v.buffer && r.buffer == &r.owner.verification && v.raw == s && r.owner.matchesPNVerification(&s.frame.verification)
+		}
+		for i := range s.frame.buffers {
+			if r == &s.frame.buffers[i] {
+				return r.buffer == &r.owner.division[i]
+			}
+		}
+		return false
+	}
+
 	if r.scalar.manager != nil {
 		s := r.scalar
 		if s.manager.self != s.manager || !s.manager.matchesScalarDivInvocation(&s) || r.owner != s.manager.integer.natural || r.invocation != s.invocation || (executing && (!s.frame.executing || s.manager.callbackDepth != 0)) {
@@ -136,6 +154,17 @@ func (r *naturalPNBufferReceipt) bound(executing bool) bool {
 	return r.context != nil && r.context.active && r.invocation == r.context.invocation && (!executing || r.context.executing)
 }
 func (m *NaturalManager) divisionBufferReceipt(context integerAllocationInvocationContext, i int) *naturalPNBufferReceipt {
+	if r := context.raw; r != nil && r.manager != nil && r.manager.natural == m && context.rawReceipt(r.manager) != nil {
+		b := &r.frame.buffers[i]
+		if b.owner == nil {
+			*b = naturalPNBufferReceipt{owner: m, raw: *r, invocation: r.invocation, buffer: &m.division[i]}
+		}
+		return b
+	}
+
+	if context.raw != nil {
+		return nil
+	}
 	if context.scalarDiv == nil {
 		return m.pnBufferReceipt(context.pn, i)
 	}

@@ -37,6 +37,11 @@ func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCo
 	for _, r := range z.arg {
 		add(Int{cell: r})
 	}
+	for _, s := range []*integerRawScope{&z.divisionRaw, &z.extendedRaw} {
+		for i := uint8(0); i < s.count; i++ {
+			add(s.values[i])
+		}
+	}
 	add(z.intMin)
 	add(z.two64)
 	public = append(public, &m.substitution.scope.newA, &m.substitution.scope.tmp)

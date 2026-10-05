@@ -20,9 +20,8 @@ func (m *IntegerManager) GCDMany(as []Int, g *Int) error {
 
 // ExtendedGCD preserves source coefficient publication at every action. Outputs
 // may alias each other or inputs; input signs are reread only after the loop.
-// A failure keeps already-published coefficients. The optional actual scalar
-// context retains RAW locals until owning abort; the historical nil/public
-// adapter still deletes locals eagerly on failure and remains incomplete.
+// A failure keeps already-published coefficients and actual RAW locals.
+// End DEL runs only after a successful body; explicit owning abort is separate.
 func (m *IntegerManager) ExtendedGCD(r1, r2, a, b, g *Int) error {
 	return m.extendedGCDWithAllocationContext(r1, r2, a, b, g, integerAllocationInvocationContext{})
 }
@@ -32,8 +31,7 @@ func (m *IntegerManager) extendedGCDWithAllocationContext(r1, r2, a, b, g *Int, 
 			return e
 		}
 	}
-	var local [6]Int
-	values := &local
+	var values *[6]Int
 	var raw *integerScalarRawScope
 	if r := context.scalarDiv; m.scalarDivAllocationRoots(r) != nil {
 		raw = &r.frame.extended
@@ -49,9 +47,19 @@ func (m *IntegerManager) extendedGCDWithAllocationContext(r1, r2, a, b, g *Int, 
 			}
 		}()
 	} else {
+		public := &m.extendedRaw
+		receipt, e := m.beginRawInvocation(public, 4)
+		if e != nil {
+			return e
+		}
+		values = &public.values
+		context = context.withRawInvocation(receipt)
 		defer func() {
-			for i := range local {
-				m.Del(&local[i])
+			public.executing = false
+			public.bodyCause = err
+			if err == nil {
+				public.bodySucceeded = true
+				err = m.finishRawSource(public)
 			}
 		}()
 	}
@@ -70,6 +78,8 @@ func (m *IntegerManager) extendedGCDWithAllocationContext(r1, r2, a, b, g *Int, 
 	}
 	if raw != nil {
 		raw.count = 6
+	} else {
+		m.extendedRaw.count = 6
 	}
 	if e := m.setInt64WithAllocationContext(nexta, 0, context); e != nil {
 		return e

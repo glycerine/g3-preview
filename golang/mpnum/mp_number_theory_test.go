@@ -188,6 +188,9 @@ func TestNumberTheoryFrozenExtendedGCDAliases(t *testing.T) {
 				t.Fatal("source alias fixture", tc, i, integerString(t, m, &values[i]))
 			}
 		}
+		if e != nil {
+			qopsMust(t, m.CleanupExtendedGCD())
+		}
 	}
 }
 
@@ -314,6 +317,7 @@ func TestNumberTheoryRationalResetPrefixAndOutputAliasing(t *testing.T) {
 	if !numericPhysicalReservationRefusal(e) || a.den != NewInt(1) || b.den != NewInt(1) || g.den != NewInt(1) {
 		t.Fatal("source denominator reset precedes local allocation", e)
 	}
+	qopsMust(t, m.z.CleanupExtendedGCD())
 	qopsMust(t, m.SetInt64(&r1, -26))
 	qopsMust(t, m.SetInt64(&r2, 7))
 	// The selected actual direct refusal precedes source scratch use. The

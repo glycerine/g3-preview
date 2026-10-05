@@ -43,6 +43,11 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []mem
 	for i := range m.rawDisplay.roots {
 		add(m.rawDisplay.roots[i].cell)
 	}
+	for _, s := range []*integerRawScope{&m.divisionRaw, &m.extendedRaw} {
+		for i := uint8(0); i < s.count; i++ {
+			add(s.values[i].cell)
+		}
+	}
 	add(m.powerRaw.value.cell)
 	for i := range m.rootRaw.values {
 		add(m.rootRaw.values[i].cell)
@@ -112,6 +117,18 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []mem
 		t.Fatal("unnamed real formatting Words root", len(words), m.words.Stats().Live)
 	}
 	raw := map[memory.Block]bool{}
+	if m.sourceFinalized || m.constructorUnwound {
+		for ref := range cells {
+			c := m.cell(ref)
+			if !c.released && c.backing.offset == 0 {
+				if _, e := m.memory.Size(c.backing.raw); e != nil {
+					t.Fatal("invalid named surviving direct source cell", e)
+				}
+				raw[c.backing.raw] = true
+			}
+		}
+	}
+
 	buffers := []*sourceLimbBuffer{&m.natural.division[0], &m.natural.division[1], &m.natural.division[2], &m.natural.division[3]}
 	if m.natural.verificationActive {
 		buffers = append(buffers, &m.natural.verification)

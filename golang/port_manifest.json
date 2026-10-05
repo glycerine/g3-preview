@@ -28658,7 +28658,8 @@
         "mpnum/polynomial_scalar_div_allocation_context.go",
         "mpnum/polynomial_cheap_append_receipt_source_test.go",
         "mpnum/polynomial_som_cohort_tags.go",
-        "mpnum/polynomial_som_ordered_cohort_source_test.go"
+        "mpnum/polynomial_som_ordered_cohort_source_test.go",
+        "mpnum/polynomial_derivative_som_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -29261,7 +29262,12 @@
         "TestPolynomialCheapStoppedPrecompactionPreservesLaterForeignAppend",
         "TestPolynomialCheapFactoryCoefficientMoveBeforeZeroRefSourceGuard",
         "TestPolynomialCheapCopiedBufferFrameCannotConsumeActualRows",
-        "TestPolynomialCheapOwnerClosePreservesAlreadyConsumedEarlierOwnedRow"
+        "TestPolynomialCheapOwnerClosePreservesAlreadyConsumedEarlierOwnedRow",
+        "TestPolynomialDerivativeMatchedCleanupRetiresActualPendingINC",
+        "TestPolynomialDerivativeActualAppendFactoryEveryPrefix",
+        "TestPolynomialDerivativeAbortPreservesLaterForeignSourceRow",
+        "TestPolynomialDerivativeFactoryReceiptPreservesForeignReplacement",
+        "TestPolynomialDerivativeReturnedCallerAndForeignCallbackSurviveAbort"
       ],
       "conditionals": [
         {
@@ -32478,6 +32484,30 @@
             "TestPolynomialCheapAppendReceiptForeignSameCardinality",
             "TestPolynomialCompletedAppendForeignMixedRefusalKeepsActualCallerINC"
           ]
+        },
+        {
+          "name": "src/math/polynomial/polynomial.cpp:4507-4528,7228-7229 derivativeWithReceipt: Same source public/optional engine, actual take=true Swap/default/INC/push and final factory receipts, successful raw return handoff.",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_derivative.go",
+          "tests": [
+            "TestPolynomialDerivativeMatchedCleanupRetiresActualPendingINC",
+            "TestPolynomialDerivativeActualAppendFactoryEveryPrefix",
+            "TestPolynomialDerivativeAbortPreservesLaterForeignSourceRow",
+            "TestPolynomialDerivativeFactoryReceiptPreservesForeignReplacement",
+            "TestPolynomialDerivativeReturnedCallerAndForeignCallbackSurviveAbort"
+          ]
+        },
+        {
+          "name": "src/math/polynomial/polynomial.cpp:4507-4528,2217-2255,2280-2299 cleanupDerivativeModeOwned: Explicit owning source-completed false phase then exact unjoined true abort; source NUM order/first history preserved.",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_derivative.go",
+          "tests": [
+            "TestPolynomialDerivativeMatchedCleanupRetiresActualPendingINC",
+            "TestPolynomialDerivativeActualAppendFactoryEveryPrefix",
+            "TestPolynomialDerivativeAbortPreservesLaterForeignSourceRow",
+            "TestPolynomialDerivativeFactoryReceiptPreservesForeignReplacement",
+            "TestPolynomialDerivativeReturnedCallerAndForeignCallbackSurviveAbort"
+          ]
         }
       ],
       "ownership": [
@@ -32565,7 +32595,11 @@
         "Actual cheap SOM row tags are pointer-free nonwrapping invocation numbers stamped only at zero-NUM construction, monomial slot publication and factory ownership transfer. Original source vectors remain authoritative; four fully charged cold uint64 directories are Go ownership metadata, not source malloc events.",
         "Actual owner/self/core.cheap/frame-address/nonce guards distinguish copied/stale/foreign receipts. Explicit mixed retirement follows NUM then pending/row INC ownership; foreign rows retain original order/RC/values and actual moving holders retain compaction payload. Source Reset and raw factory read order are unchanged.",
         "Phase-specific retry records actual consumed-last DEC outcome and completed compaction/SIZE/numeric cleanup. Whole owning close first resumes its already-started exact append phase so earlier DEC is not repeated. Completed foreign source appends during precompaction extend saved bounds only at actual slot/publication hooks; transient compaction rejects unsafe appends before mutation.",
-        "Factory transfer tags acknowledge consumed old columns, including qualified coefficient-before-zero-RC constructor assertion. Later foreign rows and caller incoming INC survive matched cleanup even when completed-transfer acknowledgment refuses. Accepted ScalarDiv direct transport and Lex monomialBase remain intact."
+        "Factory transfer tags acknowledge consumed old columns, including qualified coefficient-before-zero-RC constructor assertion. Later foreign rows and caller incoming INC survive matched cleanup even when completed-transfer acknowledgment refuses. Accepted ScalarDiv direct transport and Lex monomialBase remain intact.",
+        "Derivative actual n then a source construction and reverse a then n destructors remain before explicit unjoined child abort; direct SET/MUL/PN and monomial allocator authority are preserved.",
+        "Actual source cheap.add takes a through Swap; no allocating Copy is invented. An embedded concrete append receipt records only the real default-NUM slot, monomial INC/push and factory transfer. Embedded factory receipt captures only the same guarded constructor/outcome, with actual nonwrapping invocation and frame address. Class reflected cold header charges both receipt carriers once.",
+        "Explicit false acknowledgment preserves member rows/pending INC and factory placement; true after older NUM suffix drains only matched acquired append/factory roots. Known foreign rows and replacement constructors remain untouched.",
+        "At successful final raw return all per-term NUM destructors are already complete. Exact completed-append preack preserves the constructed result if metadata acknowledgment stops; exact factory token handoff then transfers ownership to the caller without extra INC/source operation. Ordinary public IncRef/DecRef remains unchanged."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -32634,7 +32668,8 @@
         "Existing registered high-level polynomial driver is not newly credited wholesale; independent branch/oracle and source-consumer tests only.",
         "Global DEBUG/TRACE/ostream and broad nested-vector/copy/lifecycle source methods remain partial.",
         "polynomial.cpp:2757-2768 selected ScalarDiv transport prerequisite only: public/nil Integer negative Div and ExtendedGCD still eagerly delete RAW locals on failed bodies and remain incomplete. Shared mixed cohort ordered retirement and full Discriminant/Factor parents remain open. Native real signed-TLS guard reaches caller NUM DT; checked reaches failed younger verification ctor with no invented source DT. No new dormant original driver assertion credit or unit promotion.",
-        "Selected ordered cheap append retirement prerequisite only; regular SOM arithmetic wrappers, full Factor/Discriminant, registered driver and source unit completion remain open. Guard-only/malformed owner fixtures have no valid C++ mathematical failure credit. Successful validated clear-to-publish writes have no intervening source allocation/callback; no manufactured faultpoint or ordinary-prefix claim."
+        "Selected ordered cheap append retirement prerequisite only; regular SOM arithmetic wrappers, full Factor/Discriminant, registered driver and source unit completion remain open. Guard-only/malformed owner fixtures have no valid C++ mathematical failure credit. Successful validated clear-to-publish writes have no intervening source allocation/callback; no manufactured faultpoint or ordinary-prefix claim.",
+        "Closes derivative actual cheap append/factory owning gap for existing concrete source profile. No ordinary Copy allocation is present on this take=true path. Interrupted direct-return metadata guard requires an existing real guarded state; no fabricated allocator/callback between source completed mk and handoff. Other regular SOM arithmetic wrappers, full Factor/Discriminant/source classes and dormant registered driver remain separate obligations; no unit promotion."
       ]
     },
     {
@@ -117573,7 +117608,14 @@
         "TestScalarDivDirectNumericNilContextSourceMath",
         "TestScalarDivDirectBigActualAllocationPrefixes",
         "TestScalarDivDirectCopiedRawChildRefusesWithoutMutation",
-        "TestScalarDivDirectStoppedReturnedCauseSurvivesOwnAndNewInvocation"
+        "TestScalarDivDirectStoppedReturnedCauseSurvivesOwnAndNewInvocation",
+        "TestIntegerPublicExtendedGCDRawBodyAndEndLifetimes",
+        "TestIntegerPublicRawEveryActualPrefixAndExactReceipt",
+        "TestIntegerPublicRawStaleForeignAndCopiedRefuseActiveReplacement",
+        "TestIntegerPublicRawOwnAfterSourceFinalize",
+        "TestIntegerPublicRawUnpublishedCellOwnAfterSourceFinalize",
+        "TestIntegerPublicRawRuntimeCallbackHasNoAmbientAcquisition",
+        "TestIntegerPublicRawContextNonceDoesNotFollowEmbeddedReceiptReuse"
       ],
       "conditionals": [
         {
@@ -118039,6 +118081,20 @@
             "TestScalarDivDirectCopiedRawChildRefusesWithoutMutation",
             "TestScalarDivDirectStoppedReturnedCauseSurvivesOwnAndNewInvocation"
           ]
+        },
+        {
+          "name": "Public/nil Integer RAW source lifetime mpz.h:468-485; mpz.cpp:915-985: actual retained declarations, strict successful end-DEL and separate exact owning acknowledgment",
+          "status": "partial",
+          "go_target": "mpnum/mpn_source_verify.go",
+          "tests": [
+            "TestIntegerPublicExtendedGCDRawBodyAndEndLifetimes",
+            "TestIntegerPublicRawEveryActualPrefixAndExactReceipt",
+            "TestIntegerPublicRawStaleForeignAndCopiedRefuseActiveReplacement",
+            "TestIntegerPublicRawOwnAfterSourceFinalize",
+            "TestIntegerPublicRawUnpublishedCellOwnAfterSourceFinalize",
+            "TestIntegerPublicRawRuntimeCallbackHasNoAmbientAcquisition",
+            "TestIntegerPublicRawContextNonceDoesNotFollowEmbeddedReceiptReuse"
+          ]
         }
       ],
       "ownership": [
@@ -118046,13 +118102,14 @@
         "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets.",
         "Stable charged recursive display frames own actual numeral, character and MPN locals; actual sink callbacks borrow decimal views only during insertion. Younger stopped destructor preserves older locals; CleanupDisplay uses exact physical tokens and leaves foreign/replacement roots intact.",
         "Exact actual manager/frame/nonzero invocation generation and named allocation/buffer token only; no registry/refcount/high-level snapshot authority. Shared successful publication remains member owned. Source DT cause remains sticky across explicit owning acknowledgement until actual new invocation.",
-        "Actual scalar core/embedded frame/nonwrapping invocation plus exact Integer/Modular receiver and executing callback-depth guard. Allocation capture/clear occurs only at actual existing integer, allocator and named Natural buffer leaves. Actual embedded RAW child and private buffer addresses reject copied owners. Successful persistent Inv/Natural publication stays member-owned; inactive same-invocation diagnostic history carries no numeric authority."
+        "Actual scalar core/embedded frame/nonwrapping invocation plus exact Integer/Modular receiver and executing callback-depth guard. Allocation capture/clear occurs only at actual existing integer, allocator and named Natural buffer leaves. Actual embedded RAW child and private buffer addresses reject copied owners. Successful persistent Inv/Natural publication stays member-owned; inactive same-invocation diagnostic history carries no numeric authority.",
+        "Actual self/embedded frame/nonwrapping invocation validation before NUM/source reads; count marks actual one or four-to-six RAW declarations. Concrete receipt lives in charged Integer frame, not a heap temporary. Direct numeric acquisition and exact Natural member/private verification buffer binding; no snapshot or registry ownership. Published shared scratch remains member-owned. Runtime callbacks public empty-context acquisitions excluded, active same-frame public reentry refused. Source-finalize owning continuation uses exact named retained fields/captured pending cell only (mpz.h:124-149; mpz.cpp:142-161)."
       ],
       "deviations": [
         "Go guards actual endangered reads/writes and retained lexical-holder reuse without blocking source paths that never reach those holders. Algorithm D allocates add-back storage only at the source borrow branch. Runtime owns real source allocations and initialized-byte state; no Words shadows represent limb scratch. Final escaped Go strings are caller-owned. Exact character-buffer/output lifetime, broader public source span domains, diagnostic transport, architecture profiles and OMP/global integration remain separate obligations.",
         "Source char bytes use physical capacity/initialization independently of POS and unsigned11*size wrap. Selected non-Windows digit32 snprintf lbuf0/truncation and multi-limb ignored-lbuf behavior execute. Windows sprintf_s constraint handler, GMP/digit64, global/locale/ostream and literal std::string temporary allocation/evaluation remain open. No whole-unit or registered assertion completion is claimed.",
         "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open.",
-        "mpn.cpp:152-217 selected ScalarDiv transport prerequisite only: public/nil Integer negative Div and ExtendedGCD still eagerly delete RAW locals on failed bodies and remain incomplete. Shared mixed cohort ordered retirement and full Discriminant/Factor parents remain open. Native real signed-TLS guard reaches caller NUM DT; checked reaches failed younger verification ctor with no invented source DT. No new dormant original driver assertion credit or unit promotion."
+        "Public/nil negative Div and ExtendedGCD now use the same literal engines with real IntegerManager RAW frames (mpz.h:468-485; mpz.cpp:915-985). Failed bodies retain reached declarations; successful bodies propagate strict end-DEL errors. Immutable source cause remains across exact owning acknowledgment until new guarded invocation. End-DEL Bounds proof is the real signed-host TLS guard domain, not ordinary mathematical OOM; checked diagnostic/verification failures remain literal failed-body prefixes. AddMul/SubMul public eager failure cleanup remains explicitly open. Shared polynomial cohorts, full Discriminant/Factor and whole source units remain partial; no original driver assertion credit added."
       ]
     },
     {
@@ -118072,7 +118129,8 @@
         "mpnum/mp_integer_output_scope.go",
         "mpnum/mp_integer_output_scope_test.go",
         "mpnum/mpn_cstring.go",
-        "mpnum/mpn_verification_invocation.go"
+        "mpnum/mpn_verification_invocation.go",
+        "mpnum/mpzzp_normalize_allocation_receipt.go"
       ],
       "tests": [
         "TestNaturalArithmeticOracle",
@@ -118116,7 +118174,14 @@
         "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
         "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
         "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
-        "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix"
+        "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix",
+        "TestIntegerPublicExtendedGCDRawBodyAndEndLifetimes",
+        "TestIntegerPublicRawEveryActualPrefixAndExactReceipt",
+        "TestIntegerPublicRawStaleForeignAndCopiedRefuseActiveReplacement",
+        "TestIntegerPublicRawOwnAfterSourceFinalize",
+        "TestIntegerPublicRawUnpublishedCellOwnAfterSourceFinalize",
+        "TestIntegerPublicRawRuntimeCallbackHasNoAmbientAcquisition",
+        "TestIntegerPublicRawContextNonceDoesNotFollowEmbeddedReceiptReuse"
       ],
       "conditionals": [
         {
@@ -118488,12 +118553,27 @@
             "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
             "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix"
           ]
+        },
+        {
+          "name": "Public/nil Integer RAW source lifetime mpz.h:468-485; mpz.cpp:915-985: actual retained declarations, strict successful end-DEL and separate exact owning acknowledgment",
+          "status": "partial",
+          "go_target": "mpnum/mpzzp_normalize_allocation_receipt.go",
+          "tests": [
+            "TestIntegerPublicExtendedGCDRawBodyAndEndLifetimes",
+            "TestIntegerPublicRawEveryActualPrefixAndExactReceipt",
+            "TestIntegerPublicRawStaleForeignAndCopiedRefuseActiveReplacement",
+            "TestIntegerPublicRawOwnAfterSourceFinalize",
+            "TestIntegerPublicRawUnpublishedCellOwnAfterSourceFinalize",
+            "TestIntegerPublicRawRuntimeCallbackHasNoAmbientAcquisition",
+            "TestIntegerPublicRawContextNonceDoesNotFollowEmbeddedReceiptReuse"
+          ]
         }
       ],
       "ownership": [
         "NaturalManager owns a charged real cold header, four actual source inline16/doubling division buffers, a debug lexical verification holder, and embedded formatting lexical limb roots. Published member source destruction is distinct from failed-constructor/unpublished-block owning cleanup. Integer child borrows parent Words/Budget/runtime without double ownership. Retained SmallBytes text is an explicit output assembly adapter. Borrowed operands/outputs are operation-local; source OMP/global lifecycle remains open.",
         "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets.",
-        "Exact actual manager/frame/nonzero invocation generation and named allocation/buffer token only; no registry/refcount/high-level snapshot authority. Shared successful publication remains member owned. Source DT cause remains sticky across explicit owning acknowledgement until actual new invocation."
+        "Exact actual manager/frame/nonzero invocation generation and named allocation/buffer token only; no registry/refcount/high-level snapshot authority. Shared successful publication remains member owned. Source DT cause remains sticky across explicit owning acknowledgement until actual new invocation.",
+        "Actual self/embedded frame/nonwrapping invocation validation before NUM/source reads; count marks actual one or four-to-six RAW declarations. Concrete receipt lives in charged Integer frame, not a heap temporary. Direct numeric acquisition and exact Natural member/private verification buffer binding; no snapshot or registry ownership. Published shared scratch remains member-owned. Runtime callbacks public empty-context acquisitions excluded, active same-frame public reentry refused. Source-finalize owning continuation uses exact named retained fields/captured pending cell only (mpz.h:124-149; mpz.cpp:142-161)."
       ],
       "deviations": [
         "Go guards actual endangered reads/writes and retained lexical-holder reuse without blocking source paths that never reach those holders. Algorithm D allocates add-back storage only at the source borrow branch. Runtime owns real source allocations and initialized-byte state; no Words shadows represent limb scratch. Final escaped Go strings are caller-owned. Exact character-buffer/output lifetime, broader public source span domains, diagnostic transport, architecture profiles and OMP/global integration remain separate obligations.",
@@ -120637,7 +120717,8 @@
         "mpnum/integer_copy_allocation_receipt.go",
         "mpnum/integer_copy_allocation_receipt_source_test.go",
         "mpnum/integer_allocation_invocation_context.go",
-        "mpnum/integer_scalar_raw_source_scope.go"
+        "mpnum/integer_scalar_raw_source_scope.go",
+        "mpnum/integer_raw_invocation.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -120883,7 +120964,14 @@
         "TestScalarDivDirectNumericNilContextSourceMath",
         "TestScalarDivDirectBigActualAllocationPrefixes",
         "TestScalarDivDirectCopiedRawChildRefusesWithoutMutation",
-        "TestScalarDivDirectStoppedReturnedCauseSurvivesOwnAndNewInvocation"
+        "TestScalarDivDirectStoppedReturnedCauseSurvivesOwnAndNewInvocation",
+        "TestIntegerPublicExtendedGCDRawBodyAndEndLifetimes",
+        "TestIntegerPublicRawEveryActualPrefixAndExactReceipt",
+        "TestIntegerPublicRawStaleForeignAndCopiedRefuseActiveReplacement",
+        "TestIntegerPublicRawOwnAfterSourceFinalize",
+        "TestIntegerPublicRawUnpublishedCellOwnAfterSourceFinalize",
+        "TestIntegerPublicRawRuntimeCallbackHasNoAmbientAcquisition",
+        "TestIntegerPublicRawContextNonceDoesNotFollowEmbeddedReceiptReuse"
       ],
       "conditionals": [
         {
@@ -122647,6 +122735,20 @@
             "TestScalarDivDirectCopiedRawChildRefusesWithoutMutation",
             "TestScalarDivDirectStoppedReturnedCauseSurvivesOwnAndNewInvocation"
           ]
+        },
+        {
+          "name": "Public/nil Integer RAW source lifetime mpz.h:468-485; mpz.cpp:915-985: actual retained declarations, strict successful end-DEL and separate exact owning acknowledgment",
+          "status": "partial",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerPublicExtendedGCDRawBodyAndEndLifetimes",
+            "TestIntegerPublicRawEveryActualPrefixAndExactReceipt",
+            "TestIntegerPublicRawStaleForeignAndCopiedRefuseActiveReplacement",
+            "TestIntegerPublicRawOwnAfterSourceFinalize",
+            "TestIntegerPublicRawUnpublishedCellOwnAfterSourceFinalize",
+            "TestIntegerPublicRawRuntimeCallbackHasNoAmbientAcquisition",
+            "TestIntegerPublicRawContextNonceDoesNotFollowEmbeddedReceiptReuse"
+          ]
         }
       ],
       "ownership": [
@@ -122675,7 +122777,8 @@
         "Actual guarded manager/frame/unique invocation plus direct argument acquisition tokens; legacy foreign calls have nil receipt; same-cardinality replacement and stale frame owning cleanup preserve foreign graph before cleanup.",
         "Exact actual manager/frame/nonzero invocation generation and named allocation/buffer token only; no registry/refcount/high-level snapshot authority. Shared successful publication remains member owned. Source DT cause remains sticky across explicit owning acknowledgement until actual new invocation.",
         "Actual manager/embedded frame/nonzero unique invocation and allocator/cell acquisition/clear only; MUL temporary child authority distinct from ADD caller-output authority. Sticky reached end DEL preserved through exact owning acknowledgement. No high-level differences, cache sweeping, repaired scratch holes or parent completion.",
-        "Actual scalar core/embedded frame/nonwrapping invocation plus exact Integer/Modular receiver and executing callback-depth guard. Allocation capture/clear occurs only at actual existing integer, allocator and named Natural buffer leaves. Actual embedded RAW child and private buffer addresses reject copied owners. Successful persistent Inv/Natural publication stays member-owned; inactive same-invocation diagnostic history carries no numeric authority."
+        "Actual scalar core/embedded frame/nonwrapping invocation plus exact Integer/Modular receiver and executing callback-depth guard. Allocation capture/clear occurs only at actual existing integer, allocator and named Natural buffer leaves. Actual embedded RAW child and private buffer addresses reject copied owners. Successful persistent Inv/Natural publication stays member-owned; inactive same-invocation diagnostic history carries no numeric authority.",
+        "Actual self/embedded frame/nonwrapping invocation validation before NUM/source reads; count marks actual one or four-to-six RAW declarations. Concrete receipt lives in charged Integer frame, not a heap temporary. Direct numeric acquisition and exact Natural member/private verification buffer binding; no snapshot or registry ownership. Published shared scratch remains member-owned. Runtime callbacks public empty-context acquisitions excluded, active same-frame public reentry refused. Source-finalize owning continuation uses exact named retained fields/captured pending cell only (mpz.h:124-149; mpz.cpp:142-161)."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -122701,7 +122804,7 @@
         "Partial SET acquisition prerequisite only; allocating finite-field PNormalize, complete Discriminant source-stop/reservation/coldgraph proof and source parent remain open. No source unit/API promotion.",
         "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open.",
         "Existing AddMul/SubMul success arithmetic and inline +/-1 shortcuts are covered, but mpnum/mpz_gcd.go deferred Del eagerly cleans RAW temporary on body failure and ignores end-DEL errors. Source mpz.h:393-426 deletes only after successful Mul plus Add/Sub. Shared literal engine and exact actual-leaf owning continuation are explicit open obligations; previous ported method status corrected to partial after source review.",
-        "mpz.cpp:474-548,915-988 selected ScalarDiv transport prerequisite only: public/nil Integer negative Div and ExtendedGCD still eagerly delete RAW locals on failed bodies and remain incomplete. Shared mixed cohort ordered retirement and full Discriminant/Factor parents remain open. Native real signed-TLS guard reaches caller NUM DT; checked reaches failed younger verification ctor with no invented source DT. No new dormant original driver assertion credit or unit promotion."
+        "Public/nil negative Div and ExtendedGCD now use the same literal engines with real IntegerManager RAW frames (mpz.h:468-485; mpz.cpp:915-985). Failed bodies retain reached declarations; successful bodies propagate strict end-DEL errors. Immutable source cause remains across exact owning acknowledgment until new guarded invocation. End-DEL Bounds proof is the real signed-host TLS guard domain, not ordinary mathematical OOM; checked diagnostic/verification failures remain literal failed-body prefixes. AddMul/SubMul public eager failure cleanup remains explicitly open. Shared polynomial cohorts, full Discriminant/Factor and whole source units remain partial; no original driver assertion credit added."
       ]
     },
     {
@@ -122755,7 +122858,8 @@
         "mpnum/integer_copy_allocation_receipt.go",
         "mpnum/integer_addmul_invocation.go",
         "mpnum/integer_allocation_invocation_context.go",
-        "mpnum/integer_scalar_raw_source_scope.go"
+        "mpnum/integer_scalar_raw_source_scope.go",
+        "mpnum/integer_raw_invocation.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -122987,7 +123091,14 @@
         "TestScalarDivDirectNumericNilContextSourceMath",
         "TestScalarDivDirectBigActualAllocationPrefixes",
         "TestScalarDivDirectCopiedRawChildRefusesWithoutMutation",
-        "TestScalarDivDirectStoppedReturnedCauseSurvivesOwnAndNewInvocation"
+        "TestScalarDivDirectStoppedReturnedCauseSurvivesOwnAndNewInvocation",
+        "TestIntegerPublicExtendedGCDRawBodyAndEndLifetimes",
+        "TestIntegerPublicRawEveryActualPrefixAndExactReceipt",
+        "TestIntegerPublicRawStaleForeignAndCopiedRefuseActiveReplacement",
+        "TestIntegerPublicRawOwnAfterSourceFinalize",
+        "TestIntegerPublicRawUnpublishedCellOwnAfterSourceFinalize",
+        "TestIntegerPublicRawRuntimeCallbackHasNoAmbientAcquisition",
+        "TestIntegerPublicRawContextNonceDoesNotFollowEmbeddedReceiptReuse"
       ],
       "conditionals": [
         {
@@ -124277,6 +124388,20 @@
             "TestScalarDivDirectCopiedRawChildRefusesWithoutMutation",
             "TestScalarDivDirectStoppedReturnedCauseSurvivesOwnAndNewInvocation"
           ]
+        },
+        {
+          "name": "Public/nil Integer RAW source lifetime mpz.h:468-485; mpz.cpp:915-985: actual retained declarations, strict successful end-DEL and separate exact owning acknowledgment",
+          "status": "partial",
+          "go_target": "mpnum/mpz.go",
+          "tests": [
+            "TestIntegerPublicExtendedGCDRawBodyAndEndLifetimes",
+            "TestIntegerPublicRawEveryActualPrefixAndExactReceipt",
+            "TestIntegerPublicRawStaleForeignAndCopiedRefuseActiveReplacement",
+            "TestIntegerPublicRawOwnAfterSourceFinalize",
+            "TestIntegerPublicRawUnpublishedCellOwnAfterSourceFinalize",
+            "TestIntegerPublicRawRuntimeCallbackHasNoAmbientAcquisition",
+            "TestIntegerPublicRawContextNonceDoesNotFollowEmbeddedReceiptReuse"
+          ]
         }
       ],
       "ownership": [
@@ -124302,7 +124427,8 @@
         "Current Root/Power RAW lifetime implementation supersedes earlier staged Root/output and implicit general Power cleanup descriptions. Actual four Root and one Power RAW fields are charged in the Integer header; body failures retain them, literal end-only DEL stops younger-to-older at the reached ascending source frontier. Exact manager/frame/unique nonwrapping nonce and physical object/block/extent identity match owning continuation; caller COPY/MUL output pending is excluded. Completed and abort phases distinguish reached end DEL from unfinished RAW body owners.",
         "Actual guarded manager/frame/unique invocation plus direct argument acquisition tokens; legacy foreign calls have nil receipt; same-cardinality replacement and stale frame owning cleanup preserve foreign graph before cleanup.",
         "Actual manager/embedded frame/nonzero unique invocation and allocator/cell acquisition/clear only; MUL temporary child authority distinct from ADD caller-output authority. Sticky reached end DEL preserved through exact owning acknowledgement. No high-level differences, cache sweeping, repaired scratch holes or parent completion.",
-        "Actual scalar core/embedded frame/nonwrapping invocation plus exact Integer/Modular receiver and executing callback-depth guard. Allocation capture/clear occurs only at actual existing integer, allocator and named Natural buffer leaves. Actual embedded RAW child and private buffer addresses reject copied owners. Successful persistent Inv/Natural publication stays member-owned; inactive same-invocation diagnostic history carries no numeric authority."
+        "Actual scalar core/embedded frame/nonwrapping invocation plus exact Integer/Modular receiver and executing callback-depth guard. Allocation capture/clear occurs only at actual existing integer, allocator and named Natural buffer leaves. Actual embedded RAW child and private buffer addresses reject copied owners. Successful persistent Inv/Natural publication stays member-owned; inactive same-invocation diagnostic history carries no numeric authority.",
+        "Actual self/embedded frame/nonwrapping invocation validation before NUM/source reads; count marks actual one or four-to-six RAW declarations. Concrete receipt lives in charged Integer frame, not a heap temporary. Direct numeric acquisition and exact Natural member/private verification buffer binding; no snapshot or registry ownership. Published shared scratch remains member-owned. Runtime callbacks public empty-context acquisitions excluded, active same-frame public reentry refused. Source-finalize owning continuation uses exact named retained fields/captured pending cell only (mpz.h:124-149; mpz.cpp:142-161)."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -124325,7 +124451,7 @@
         "Root output is now literal SET(input) before in-place domain guards and bisection, superseding previous output-atomic Root description. Wrapped Power mask and signed/TLS source-pointer domains remain explicit guarded domains; no transitive source/global/backend completion promotion.",
         "Partial SET acquisition prerequisite only; allocating finite-field PNormalize, complete Discriminant source-stop/reservation/coldgraph proof and source parent remain open. No source unit/API promotion.",
         "Existing AddMul/SubMul success arithmetic and inline +/-1 shortcuts are covered, but mpnum/mpz_gcd.go deferred Del eagerly cleans RAW temporary on body failure and ignores end-DEL errors. Source mpz.h:393-426 deletes only after successful Mul plus Add/Sub. Shared literal engine and exact actual-leaf owning continuation are explicit open obligations; previous ported method status corrected to partial after source review.",
-        "mpz.h:426-485 selected ScalarDiv transport prerequisite only: public/nil Integer negative Div and ExtendedGCD still eagerly delete RAW locals on failed bodies and remain incomplete. Shared mixed cohort ordered retirement and full Discriminant/Factor parents remain open. Native real signed-TLS guard reaches caller NUM DT; checked reaches failed younger verification ctor with no invented source DT. No new dormant original driver assertion credit or unit promotion."
+        "Public/nil negative Div and ExtendedGCD now use the same literal engines with real IntegerManager RAW frames (mpz.h:468-485; mpz.cpp:915-985). Failed bodies retain reached declarations; successful bodies propagate strict end-DEL errors. Immutable source cause remains across exact owning acknowledgment until new guarded invocation. End-DEL Bounds proof is the real signed-host TLS guard domain, not ordinary mathematical OOM; checked diagnostic/verification failures remain literal failed-body prefixes. AddMul/SubMul public eager failure cleanup remains explicitly open. Shared polynomial cohorts, full Discriminant/Factor and whole source units remain partial; no original driver assertion credit added."
       ]
     },
     {

@@ -107,8 +107,7 @@ func (m *IntegerManager) divWithAllocationContext(a, b, c *Int, context integerA
 		}
 	}
 	if a.val < 0 {
-		var local Int
-		tmp := &local
+		var tmp *Int
 		var raw *integerScalarRawScope
 		if r := context.scalarDiv; m.scalarDivAllocationRoots(r) != nil {
 			raw = &r.frame.division
@@ -124,8 +123,22 @@ func (m *IntegerManager) divWithAllocationContext(a, b, c *Int, context integerA
 				}
 			}()
 		} else {
-			defer m.Del(tmp)
-		} // historical public eager adapter remains qualified
+			public := &m.divisionRaw
+			receipt, e := m.beginRawInvocation(public, 1)
+			if e != nil {
+				return e
+			}
+			tmp = &public.values[0]
+			context = context.withRawInvocation(receipt)
+			defer func() {
+				public.executing = false
+				public.bodyCause = err
+				if err == nil {
+					public.bodySucceeded = true
+					err = m.finishRawSource(public)
+				}
+			}()
+		}
 		if e := m.machineDivRemWithAllocationContext(a, b, c, tmp, context); e != nil {
 			return e
 		}

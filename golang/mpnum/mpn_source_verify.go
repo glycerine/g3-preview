@@ -25,7 +25,7 @@ func (m *NaturalManager) sourceVerifyDivisionWithAllocationContext(a, b, q, r li
 	}
 	pn := context.pn
 	var frame *naturalPNVerificationScope
-	if pn != nil && pn.owner != nil && pn.owner.manager.natural == m && pn == &pn.owner.normalization && pn.active && pn.executing {
+	if context.raw == nil && pn != nil && pn.owner != nil && pn.owner.manager.natural == m && pn == &pn.owner.normalization && pn.active && pn.executing {
 		frame = &m.verificationInvocation
 		if frame.active || frame.invocation == ^uint64(0) {
 			return ErrPolynomialPending
@@ -36,13 +36,23 @@ func (m *NaturalManager) sourceVerifyDivisionWithAllocationContext(a, b, q, r li
 		defer func() { frame.executing = false }()
 	}
 
-	if r := context.scalarDiv; r != nil && r.manager != nil && r.manager.integer.natural == m && r.manager.integer.scalarDivAllocationRoots(r) != nil {
+	if r := context.scalarDiv; context.raw == nil && r != nil && r.manager != nil && r.manager.integer.natural == m && r.manager.integer.scalarDivAllocationRoots(r) != nil {
 		frame = &m.verificationInvocation
 		if frame.active || frame.invocation == ^uint64(0) {
 			return ErrPolynomialPending
 		}
 		*frame = naturalPNVerificationScope{active: true, executing: true, invocation: frame.invocation + 1, scalar: *r}
 		frame.buffer = naturalPNBufferReceipt{owner: m, scalar: *r, invocation: r.invocation, buffer: &m.verification, private: true}
+		r.frame.verification = naturalPNVerificationReceipt{m, frame, frame.invocation}
+		defer func() { frame.executing = false }()
+	}
+	if r := context.raw; r != nil && r.manager != nil && r.manager.natural == m && context.rawReceipt(r.manager) != nil {
+		frame = &m.verificationInvocation
+		if frame.active || frame.invocation == ^uint64(0) {
+			return ErrPolynomialPending
+		}
+		*frame = naturalPNVerificationScope{active: true, executing: true, invocation: frame.invocation + 1, raw: *r}
+		frame.buffer = naturalPNBufferReceipt{owner: m, raw: *r, invocation: r.invocation, buffer: &m.verification, private: true}
 		r.frame.verification = naturalPNVerificationReceipt{m, frame, frame.invocation}
 		defer func() { frame.executing = false }()
 	}

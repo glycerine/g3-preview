@@ -5,12 +5,29 @@ package mpnum
 // Explicit passed invocation identity. It carries no allocation snapshot and
 // creates no source numeral, reservation, or ambient callback owner hook.
 type integerAllocationInvocationContext struct {
-	pn           *integerPNormalizeScope
-	pnInvocation uint64
-	arithmetic   *polynomialArithmeticInvocationReceipt
-	addMul       *integerAddMulInvocationReceipt
-	derivative   *polynomialDerivativeInvocationReceipt
-	scalarDiv    *polynomialScalarDivInvocationReceipt
+	raw           *integerRawInvocationReceipt
+	rawInvocation uint64
+	pn            *integerPNormalizeScope
+	pnInvocation  uint64
+	arithmetic    *polynomialArithmeticInvocationReceipt
+	addMul        *integerAddMulInvocationReceipt
+	derivative    *polynomialDerivativeInvocationReceipt
+	scalarDiv     *polynomialScalarDivInvocationReceipt
+}
+
+func (c integerAllocationInvocationContext) withRawInvocation(r *integerRawInvocationReceipt) integerAllocationInvocationContext {
+	c.raw = r
+	c.rawInvocation = 0
+	if r != nil {
+		c.rawInvocation = r.invocation
+	}
+	return c
+}
+func (c integerAllocationInvocationContext) rawReceipt(m *IntegerManager) *integerRawInvocationReceipt {
+	if c.raw != nil && c.rawInvocation != 0 && c.rawInvocation == c.raw.invocation && m.rawAllocationRoots(c.raw) != nil {
+		return c.raw
+	}
+	return nil
 }
 
 func pnAllocationContext(pn *integerPNormalizeScope) integerAllocationInvocationContext {
@@ -21,6 +38,12 @@ func pnAllocationContext(pn *integerPNormalizeScope) integerAllocationInvocation
 	return c
 }
 func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomialNumericRoots {
+	if c.raw != nil {
+		if r := c.rawReceipt(m); r != nil {
+			return m.rawAllocationRoots(r)
+		}
+		return nil
+	}
 	if s := c.pn; s != nil && s.owner != nil && s.owner.manager == m && s == &s.owner.normalization && s.active && s.executing && c.pnInvocation != 0 && c.pnInvocation == s.invocation {
 		return &s.roots
 	}

@@ -510,6 +510,15 @@ func TestRationalServiceExtraIndependentRootsAndCoefficients(t *testing.T) {
 	// Source actions independently imply shared coefficient2 after the three
 	// quotient steps1,2,3. This is not a C++ execution or mathematical oracle.
 	serviceText(t, s, &x, "2")
+	if sourceExtendedGCDDebug {
+		// The literal assertion failed before the RAW end DEL. Observe that
+		// prefix before owning acknowledgment and the next same-owner call.
+		if !s.manager.z.extendedRaw.active || s.manager.z.extendedRaw.bodySucceeded || s.manager.z.extendedRaw.ended || s.manager.z.extendedRaw.count != 6 {
+			t.Fatal("actual failed RAW declaration prefix")
+		}
+		serviceAuditRationalRoots(t, s, &a.raw, &b.raw, &x.raw, &y.raw)
+		serviceMust(t, s.manager.z.CleanupExtendedGCD())
+	}
 	for _, f := range []struct {
 		av, bv       int64
 		alias        int
@@ -534,6 +543,10 @@ func TestRationalServiceExtraIndependentRootsAndCoefficients(t *testing.T) {
 		}
 		serviceText(t, s, xp, f.wantX)
 		serviceText(t, s, yp, f.wantY)
+		if sourceExtendedGCDDebug {
+			serviceAuditRationalRoots(t, s, &a.raw, &b.raw, &x.raw, &y.raw)
+			serviceMust(t, s.manager.z.CleanupExtendedGCD())
+		}
 		if !sourceExtendedGCDDebug {
 			serviceMust(t, s.Del(&gcd))
 		}

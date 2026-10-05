@@ -140,6 +140,15 @@ func upolyHenselAuditPhysical(t *testing.T, cores []*mpnum.UPolynomialManager, f
 			add(v.Index(i).Uint())
 		}
 	}
+	// Actual reached RAW declarations are owned by the shared Integer manager.
+	// Read their named count/fields; descriptor liveness never supplies roots.
+	for _, field := range []string{"divisionRaw", "extendedRaw"} {
+		scope := z.FieldByName(field)
+		values := scope.FieldByName("values")
+		for i := uint64(0); i < scope.FieldByName("count").Uint(); i++ {
+			addInt(values.Index(int(i)))
+		}
+	}
 	addInt(z.FieldByName("intMin"))
 	addInt(z.FieldByName("two64"))
 	rootRAW := z.FieldByName("rootRaw").FieldByName("values")

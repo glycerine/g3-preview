@@ -1,3 +1,5 @@
+// Source: src/util/mpz.h:124-149; src/util/mpz.cpp:142-161.
+// Licensed under the MIT license. Source author: Leonardo de Moura.
 package mpnum
 
 import (
@@ -27,7 +29,7 @@ func (m *IntegerManager) CleanupPendingAllocation() error {
 
 func (m *IntegerManager) cleanupPendingAllocation() error {
 	if m.pendingCell.object != (memory.ObjectRef{}) {
-		if m.constructorUnwound {
+		if m.constructorUnwound || m.sourceFinalized {
 			if m.pendingCell.offset != 0 {
 				_, e := m.memory.ReadUint32(m.pendingCell.raw, m.pendingCell.offset+4)
 				if e != memory.ErrRuntimeOwner {
