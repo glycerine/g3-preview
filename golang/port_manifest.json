@@ -2180,9 +2180,25 @@
       "path": "scripts/mk_genfile_common.py",
       "component": "scripts",
       "role": "reference_tool",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_smt_module_params_source.go",
+        "util_smt_qi_params_source_test.go"
+      ],
+      "tests": [
+        "TestParamsStringViewReturnedPointerNoFormatCopyAndInvalidation",
+        "TestParamsStringViewFallbackNullAndProviderLifetime",
+        "TestParamsStringViewCStringSentryNullAndStaleBeforeBadbit",
+        "TestSMTQILiteralDefaultsUninitializedEMatchingAndOwnedText",
+        "TestSMTQIEveryConstructorReservationAndOwnedMemberUnwind",
+        "TestSMTQIUpdateBorrowedIDOwnedCostAndLateAllocationPrefix",
+        "TestSMTQIDisplayAllChainsOutputPrefixesAndNullBadbit",
+        "TestSMTQIAllFourteenGettersIndependentFallbackAndUnchangedFields",
+        "TestSMTQIEveryUnwarmedSharedModuleAcquisitionReservation",
+        "TestSMTQIShowPosAndFileBadbitStillReachesBorrowedCString",
+        "TestSMTQIOwnedStringSameCapacityAliasAndNullCostPrefix",
+        "TestSMTQIEveryOwnedCostReplacementReservation"
+      ],
       "registrations": [
         {
           "line": 675,
@@ -2203,9 +2219,33 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete generated borrowed-string accessor through the existing lexical helper (scripts/mk_genfile_common.py:895-939)",
+          "status": "partial",
+          "go_target": "util_smt_module_params_source.go",
+          "tests": [
+            "TestParamsStringViewReturnedPointerNoFormatCopyAndInvalidation",
+            "TestParamsStringViewFallbackNullAndProviderLifetime",
+            "TestParamsStringViewCStringSentryNullAndStaleBeforeBadbit",
+            "TestSMTQILiteralDefaultsUninitializedEMatchingAndOwnedText",
+            "TestSMTQIEveryConstructorReservationAndOwnedMemberUnwind",
+            "TestSMTQIUpdateBorrowedIDOwnedCostAndLateAllocationPrefix",
+            "TestSMTQIDisplayAllChainsOutputPrefixesAndNullBadbit",
+            "TestSMTQIAllFourteenGettersIndependentFallbackAndUnchangedFields",
+            "TestSMTQIEveryUnwarmedSharedModuleAcquisitionReservation",
+            "TestSMTQIShowPosAndFileBadbitStillReachesBorrowedCString",
+            "TestSMTQIOwnedStringSameCapacityAliasAndNullCostPrefix",
+            "TestSMTQIEveryOwnedCostReplacementReservation"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual std::string members are concrete inline15+NUL / external byte storage embedded once in the reflected QI header. Construction follows cost then new_gen, body14 getters, reverse lexical helper DT, then reverse completed member unwind on constructor failure. Assignment strlen/allocate/ascending copy/dispose/pointer-capacity-length publication uses the selected primary libstdc++ profile; actual pending bytes are named and separate from source-current bytes. MBQI id is the actual returned borrowed Params pointer/provider/ref, with no formatting workspace, clone or INC. Wrapper/helper cold charges are explicit Go representation; source module/local owners remain borrowed."
+      ],
+      "deviations": [
+        "No complete quantifier/context/SMT driver, native global locale/boolalpha or whole std::string/class generated copy credit. m_qi_ematching is literally uninitialized: no assignment occurs anywhere in this source fork; explicit public-field assignment is required for a valid display read. Diagnostic State exposes initialization metadata and failed-constructor prefix; Display/Update refuse incomplete constructors. Existing Params text codec virtual NUL retains actual provider generation/lifetime guard, without claiming a native NUL-word ABI. Go immutable literal/string spans and direct file flush are selected adapters. Null cost dereference, stale provider, copied owner and destroyed word reads are guarded domains, not defined native continuation."
+      ]
     },
     {
       "path": "scripts/mk_gparams_register_modules_cpp.py",
@@ -68802,22 +68842,81 @@
       "path": "src/smt/params/qi_params.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_smt_qi_params.go",
+        "util_smt_qi_params_source_test.go"
+      ],
+      "tests": [
+        "TestSMTQILiteralDefaultsUninitializedEMatchingAndOwnedText",
+        "TestSMTQIEveryConstructorReservationAndOwnedMemberUnwind",
+        "TestSMTQIUpdateBorrowedIDOwnedCostAndLateAllocationPrefix",
+        "TestSMTQIDisplayAllChainsOutputPrefixesAndNullBadbit",
+        "TestSMTQIAllFourteenGettersIndependentFallbackAndUnchangedFields",
+        "TestSMTQIEveryUnwarmedSharedModuleAcquisitionReservation",
+        "TestSMTQIShowPosAndFileBadbitStillReachesBorrowedCString",
+        "TestSMTQIOwnedStringSameCapacityAliasAndNullCostPrefix",
+        "TestSMTQIEveryOwnedCostReplacementReservation",
+        "TestSMTQIFailedCostDoesNotPublishLaterScalarDefaults"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Fourteen getter/publications, one lexical helper and twenty-two endl insertion chains (src/smt/params/qi_params.cpp:22-65)",
+          "status": "partial",
+          "go_target": "util_smt_qi_params.go",
+          "tests": [
+            "TestSMTQILiteralDefaultsUninitializedEMatchingAndOwnedText",
+            "TestSMTQIEveryConstructorReservationAndOwnedMemberUnwind",
+            "TestSMTQIUpdateBorrowedIDOwnedCostAndLateAllocationPrefix",
+            "TestSMTQIDisplayAllChainsOutputPrefixesAndNullBadbit",
+            "TestSMTQIAllFourteenGettersIndependentFallbackAndUnchangedFields",
+            "TestSMTQIEveryUnwarmedSharedModuleAcquisitionReservation",
+            "TestSMTQIShowPosAndFileBadbitStillReachesBorrowedCString",
+            "TestSMTQIOwnedStringSameCapacityAliasAndNullCostPrefix",
+            "TestSMTQIEveryOwnedCostReplacementReservation"
+          ]
+        },
+        {
+          "name": "Actual cost/new_gen construction before later scalar initializer publication; failed-cost diagnostic prefix (src/smt/params/qi_params.h:32-104)",
+          "status": "partial",
+          "go_target": "util_smt_qi_params.go",
+          "tests": [
+            "TestSMTQIFailedCostDoesNotPublishLaterScalarDefaults"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual std::string members are concrete inline15+NUL / external byte storage embedded once in the reflected QI header. Construction follows cost then new_gen, body14 getters, reverse lexical helper DT, then reverse completed member unwind on constructor failure. Assignment strlen/allocate/ascending copy/dispose/pointer-capacity-length publication uses the selected primary libstdc++ profile; actual pending bytes are named and separate from source-current bytes. MBQI id is the actual returned borrowed Params pointer/provider/ref, with no formatting workspace, clone or INC. Wrapper/helper cold charges are explicit Go representation; source module/local owners remain borrowed.",
+        "DefaultsInitialized is actual cold diagnostic metadata published after both owned-string constructors, before later helper body. Failed first-member construction leaves later scalar initializers unread and uninitialized; State exposes diagnostic Go storage with the explicit mask, not native incomplete-object values. Reflected header accounts metadata once. Every real ctor/output refusal graph is checked before fault lift."
+      ],
+      "deviations": [
+        "No complete quantifier/context/SMT driver, native global locale/boolalpha or whole std::string/class generated copy credit. m_qi_ematching is literally uninitialized: no assignment occurs anywhere in this source fork; explicit public-field assignment is required for a valid display read. Diagnostic State exposes initialization metadata and failed-constructor prefix; Display/Update refuse incomplete constructors. Existing Params text codec virtual NUL retains actual provider generation/lifetime guard, without claiming a native NUL-word ABI. Go immutable literal/string spans and direct file flush are selected adapters. Null cost dereference, stale provider, copied owner and destroyed word reads are guarded domains, not defined native continuation.",
+        "The initial QI6 predecessor populated Go scalar defaults before string-member construction and did not mark that frontier explicitly; the genuine failed-cost diagnostic RED is corrected in this successor. Native incomplete-object member reads are not claimed defined. Source public ematching remains uninitialized until explicit caller assignment. File fixtures create and remove their own file under the tested Go module independently of verification TMPDIR."
+      ]
     },
     {
       "path": "src/smt/params/qi_params.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_smt_qi_params.go",
+        "util_smt_qi_params_source_test.go"
+      ],
+      "tests": [
+        "TestSMTQILiteralDefaultsUninitializedEMatchingAndOwnedText",
+        "TestSMTQIEveryConstructorReservationAndOwnedMemberUnwind",
+        "TestSMTQIUpdateBorrowedIDOwnedCostAndLateAllocationPrefix",
+        "TestSMTQIDisplayAllChainsOutputPrefixesAndNullBadbit",
+        "TestSMTQIAllFourteenGettersIndependentFallbackAndUnchangedFields",
+        "TestSMTQIEveryUnwarmedSharedModuleAcquisitionReservation",
+        "TestSMTQIShowPosAndFileBadbitStillReachesBorrowedCString",
+        "TestSMTQIOwnedStringSameCapacityAliasAndNullCostPrefix",
+        "TestSMTQIEveryOwnedCostReplacementReservation",
+        "TestSMTQIFailedCostDoesNotPublishLaterScalarDefaults"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -68830,9 +68929,40 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Twenty-two source members, literal uninitialized ematching, owned-string construction and update body (src/smt/params/qi_params.h:31-109)",
+          "status": "partial",
+          "go_target": "util_smt_qi_params.go",
+          "tests": [
+            "TestSMTQILiteralDefaultsUninitializedEMatchingAndOwnedText",
+            "TestSMTQIEveryConstructorReservationAndOwnedMemberUnwind",
+            "TestSMTQIUpdateBorrowedIDOwnedCostAndLateAllocationPrefix",
+            "TestSMTQIDisplayAllChainsOutputPrefixesAndNullBadbit",
+            "TestSMTQIAllFourteenGettersIndependentFallbackAndUnchangedFields",
+            "TestSMTQIEveryUnwarmedSharedModuleAcquisitionReservation",
+            "TestSMTQIShowPosAndFileBadbitStillReachesBorrowedCString",
+            "TestSMTQIOwnedStringSameCapacityAliasAndNullCostPrefix",
+            "TestSMTQIEveryOwnedCostReplacementReservation"
+          ]
+        },
+        {
+          "name": "Actual cost/new_gen construction before later scalar initializer publication; failed-cost diagnostic prefix (src/smt/params/qi_params.h:32-104)",
+          "status": "partial",
+          "go_target": "util_smt_qi_params.go",
+          "tests": [
+            "TestSMTQIFailedCostDoesNotPublishLaterScalarDefaults"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual std::string members are concrete inline15+NUL / external byte storage embedded once in the reflected QI header. Construction follows cost then new_gen, body14 getters, reverse lexical helper DT, then reverse completed member unwind on constructor failure. Assignment strlen/allocate/ascending copy/dispose/pointer-capacity-length publication uses the selected primary libstdc++ profile; actual pending bytes are named and separate from source-current bytes. MBQI id is the actual returned borrowed Params pointer/provider/ref, with no formatting workspace, clone or INC. Wrapper/helper cold charges are explicit Go representation; source module/local owners remain borrowed.",
+        "DefaultsInitialized is actual cold diagnostic metadata published after both owned-string constructors, before later helper body. Failed first-member construction leaves later scalar initializers unread and uninitialized; State exposes diagnostic Go storage with the explicit mask, not native incomplete-object values. Reflected header accounts metadata once. Every real ctor/output refusal graph is checked before fault lift."
+      ],
+      "deviations": [
+        "No complete quantifier/context/SMT driver, native global locale/boolalpha or whole std::string/class generated copy credit. m_qi_ematching is literally uninitialized: no assignment occurs anywhere in this source fork; explicit public-field assignment is required for a valid display read. Diagnostic State exposes initialization metadata and failed-constructor prefix; Display/Update refuse incomplete constructors. Existing Params text codec virtual NUL retains actual provider generation/lifetime guard, without claiming a native NUL-word ABI. Go immutable literal/string spans and direct file flush are selected adapters. Null cost dereference, stale provider, copied owner and destroyed word reads are guarded domains, not defined native continuation.",
+        "The initial QI6 predecessor populated Go scalar defaults before string-member construction and did not mark that frontier explicitly; the genuine failed-cost diagnostic RED is corrected in this successor. Native incomplete-object member reads are not claimed defined. Source public ematching remains uninitialized until explicit caller assignment. File fixtures create and remove their own file under the tested Go module independently of verification TMPDIR."
+      ]
     },
     {
       "path": "src/smt/params/smt_params.cpp",
@@ -68933,7 +69063,13 @@
         "util_smt_bv_params.go",
         "util_smt_bv_params_source_test.go",
         "util_smt_arith_params.go",
-        "util_smt_arith_params_source_test.go"
+        "util_smt_arith_params_source_test.go",
+        "util_smt_qi_params.go",
+        "util_smt_qi_params_source_test.go",
+        "util_smt_pb_params.go",
+        "util_smt_pb_params_source_test.go",
+        "util_smt_str_params.go",
+        "util_smt_str_params_source_test.go"
       ],
       "tests": [
         "TestSMTDynAckConstructorLiteralDefaultsAndFallbackOrder",
@@ -68965,7 +69101,27 @@
         "TestSMTArithEveryWarmConstructorReservation",
         "TestSMTArithFortySixDisplayChainsAllOutputPrefixesAndFlags",
         "TestSMTArithEveryUnwarmedSharedModuleAcquisitionReservation",
-        "TestSMTArithNullGlobalConstructorAndForeignLocalReachedGuards"
+        "TestSMTArithNullGlobalConstructorAndForeignLocalReachedGuards",
+        "TestSMTQILiteralDefaultsUninitializedEMatchingAndOwnedText",
+        "TestSMTQIEveryConstructorReservationAndOwnedMemberUnwind",
+        "TestSMTQIUpdateBorrowedIDOwnedCostAndLateAllocationPrefix",
+        "TestSMTQIDisplayAllChainsOutputPrefixesAndNullBadbit",
+        "TestSMTQIAllFourteenGettersIndependentFallbackAndUnchangedFields",
+        "TestSMTQIEveryUnwarmedSharedModuleAcquisitionReservation",
+        "TestSMTQIShowPosAndFileBadbitStillReachesBorrowedCString",
+        "TestSMTQIOwnedStringSameCapacityAliasAndNullCostPrefix",
+        "TestSMTQIEveryOwnedCostReplacementReservation",
+        "TestSMTPBConstructorDoesNotUpdateAndLiteralDefaults",
+        "TestSMTPBFourGettersIndependentLocalModuleWrongKindLiteral",
+        "TestSMTPBEveryConstructorAndWarmHelperReservation",
+        "TestSMTPBFourDisplayChainsEveryOutputReservationShowPosAndFileBadbit",
+        "TestSMTPBEveryUnwarmedSharedModuleAcquisitionReservation",
+        "TestSMTPBNullGlobalReachedHelperAndActualOwnerGuards",
+        "TestSMTStrSeventeenLiteralDefaultsAndMandatoryConstructorUpdate",
+        "TestSMTStrAllSeventeenGettersIndependentFallbackAndWholeState",
+        "TestSMTStrEveryConstructorReservationAndOwnedMemberUnwind",
+        "TestSMTStrEveryUnwarmedSharedModuleAcquisitionReservation",
+        "TestSMTStrNullGlobalIncompleteConstructorAndOwnerEligibility"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -69027,19 +69183,66 @@
             "TestSMTArithEveryUnwarmedSharedModuleAcquisitionReservation",
             "TestSMTArithNullGlobalConstructorAndForeignLocalReachedGuards"
           ]
+        },
+        {
+          "name": "Fourteen concrete QI generated local/module/literal accessors (src/smt/params/smt_params_helper.pyg:24-37)",
+          "status": "partial",
+          "go_target": "util_smt_qi_params.go",
+          "tests": [
+            "TestSMTQILiteralDefaultsUninitializedEMatchingAndOwnedText",
+            "TestSMTQIEveryConstructorReservationAndOwnedMemberUnwind",
+            "TestSMTQIUpdateBorrowedIDOwnedCostAndLateAllocationPrefix",
+            "TestSMTQIDisplayAllChainsOutputPrefixesAndNullBadbit",
+            "TestSMTQIAllFourteenGettersIndependentFallbackAndUnchangedFields",
+            "TestSMTQIEveryUnwarmedSharedModuleAcquisitionReservation",
+            "TestSMTQIShowPosAndFileBadbitStillReachesBorrowedCString",
+            "TestSMTQIOwnedStringSameCapacityAliasAndNullCostPrefix",
+            "TestSMTQIEveryOwnedCostReplacementReservation"
+          ]
+        },
+        {
+          "name": "Four concrete PB generated local/module/literal getter definitions (src/smt/params/smt_params_helper.pyg:55-58)",
+          "status": "partial",
+          "go_target": "util_smt_pb_params.go",
+          "tests": [
+            "TestSMTPBConstructorDoesNotUpdateAndLiteralDefaults",
+            "TestSMTPBFourGettersIndependentLocalModuleWrongKindLiteral",
+            "TestSMTPBEveryConstructorAndWarmHelperReservation",
+            "TestSMTPBFourDisplayChainsEveryOutputReservationShowPosAndFileBadbit",
+            "TestSMTPBEveryUnwarmedSharedModuleAcquisitionReservation",
+            "TestSMTPBNullGlobalReachedHelperAndActualOwnerGuards"
+          ]
+        },
+        {
+          "name": "Seventeen concrete string-theory generated local/module/literal defaults (src/smt/params/smt_params_helper.pyg:70-87)",
+          "status": "partial",
+          "go_target": "util_smt_str_params.go",
+          "tests": [
+            "TestSMTStrSeventeenLiteralDefaultsAndMandatoryConstructorUpdate",
+            "TestSMTStrAllSeventeenGettersIndependentFallbackAndWholeState",
+            "TestSMTStrEveryConstructorReservationAndOwnedMemberUnwind",
+            "TestSMTStrEveryUnwarmedSharedModuleAcquisitionReservation",
+            "TestSMTStrNullGlobalIncompleteConstructorAndOwnerEligibility"
+          ]
         }
       ],
       "ownership": [
         "Actual acquired helper module ParamsRef is stamped only at SourceGetModuleName return; lexical source DelTracked before function return, retained exact decrement receipt separate from owning Close. Standalone Go wrapper/helper are actual reflected cold allocations, not native scalar/stack malloc credit. Original Symbol/Params/global owners remain borrowed.",
         "The concrete generated helper owner is embedded once in the actual reflected parameter wrapper header; each reached lexical helper frame charges its actual cold fields, borrows the local ParamsRef pointer and acquires its module reference only at the returned SourceGetModuleName result. Source DelTracked executes before return; any stopped destructor retains its exact decrement receipt for separate owning Close. Caller contexts/global services remain borrowed.",
         "Two actual generated helpers are acquired in declaration order smt then rewriter; the borrowed local ParamsRef is read at each getter, and an older live helper remains readable while the younger helper exists. Exact returned module references are the only acquisition authority. Source destruction runs rewriter then smt; the first younger stopped destructor protects the unread older frame, retains immutable body/source history and exact decrement receipt, and is distinct from explicit owning Close. Embedded common fields are charged once in enclosing reflected wrappers; actual lexical frame cold allocations have no native stack-allocation credit.",
-        "Forty-six scalar members use exact declaration/default/display order. The actual smt helper is acquired before fifteen RHS/publications; the actual rewriter helper is acquired only after those complete, followed by eq2ineq. Each returned module ParamsRef stamps acquisition in the existing concrete shared helper engine; lexical reverse source destruction and exact stopped-child owning continuation remain separate. Reflected standalone wrapper/frame cold charges are Go lifetime representation, not native scalar/stack allocations; caller local/context/global owners remain borrowed."
+        "Forty-six scalar members use exact declaration/default/display order. The actual smt helper is acquired before fifteen RHS/publications; the actual rewriter helper is acquired only after those complete, followed by eq2ineq. Each returned module ParamsRef stamps acquisition in the existing concrete shared helper engine; lexical reverse source destruction and exact stopped-child owning continuation remain separate. Reflected standalone wrapper/frame cold charges are Go lifetime representation, not native scalar/stack allocations; caller local/context/global owners remain borrowed.",
+        "Actual std::string members are concrete inline15+NUL / external byte storage embedded once in the reflected QI header. Construction follows cost then new_gen, body14 getters, reverse lexical helper DT, then reverse completed member unwind on constructor failure. Assignment strlen/allocate/ascending copy/dispose/pointer-capacity-length publication uses the selected primary libstdc++ profile; actual pending bytes are named and separate from source-current bytes. MBQI id is the actual returned borrowed Params pointer/provider/ref, with no formatting workspace, clone or INC. Wrapper/helper cold charges are explicit Go representation; source module/local owners remain borrowed.",
+        "Four actual scalar fields embedded once in a reflected standalone wrapper/header. No constructor helper/global/parameter read. Update borrows caller local/global/context, stamps actual returned smt module reference in the existing concrete lexical frame, publishes four RHS results in source order and destroys that frame before return. Strict source-stop and matched owning cleanup remain separate; Close never adopts caller children.",
+        "All seventeen actual source members are scalar and embedded once in the reflected standalone wrapper. Constructor initializes those exact defaults then executes the mandatory one-helper update. Each actual returned module ParamsRef stamps acquisition at the same accepted concrete helper leaf; seventeen RHS/publications follow source order, and lexical source DT precedes return. Immutable source stop and matched owning cleanup remain separate. Caller local/global/context owners remain borrowed; wrapper Close owns only helper receipts and its actual header."
       ],
       "deviations": [
         "No registered SMT context/kernel driver credit. Scalar base embedding into complete smt_params and native global/locale/boolalpha profiles remain open. Go invalid local/closed/null owner guards and standalone incomplete-constructor owning continuation are explicit adapter domains. Strategy outside source enumerators is only selected fixed-width Go representation evidence. Generated helper credit is limited to six dack accessor definitions; full helper/generator remain partial.",
         "No complete SMT context, generated-helper/generator, native global/locale/boolalpha or registered SMT driver completion credit. The standalone facade and lexical-frame reflected cold charges are explicit Go ownership representation rather than native scalar/stack allocations. Disabled array registration is erased; Array constructor never reads params or performs update.",
         "No registered SMT context/kernel driver or whole generated helper/generator/global/locale/boolalpha completion credit. The seven literal defaults are followed by mandatory update, including source constructor false hi_div0 replaced by generated rewriter true. Invalid/cross-owner or incomplete-object, signed TLS overflow and native global-null lifetime conditions are explicitly guarded Go domains, not valid native OOM/undefined-behavior equivalence. Numeric test collector callbacks are unreachable configuration anchors, not injected source failure leaves.",
-        "No complete smt_params/context/kernel, registered SMT driver, whole generated helper/generator or native global/locale/boolalpha completion credit. Incomplete constructors return an explicitly diagnostic owner; Display/Update refuse before output/body while State can inspect actual initialized/published prefix. Cross-owner/null-global/closed/copy guards are precise Go domain evidence, not native null dereference equivalence. Source enum casts use fixed-width representation and signed ostream insertion; valid-enumerator oracle cases are distinct from out-of-domain conversion profiles."
+        "No complete smt_params/context/kernel, registered SMT driver, whole generated helper/generator or native global/locale/boolalpha completion credit. Incomplete constructors return an explicitly diagnostic owner; Display/Update refuse before output/body while State can inspect actual initialized/published prefix. Cross-owner/null-global/closed/copy guards are precise Go domain evidence, not native null dereference equivalence. Source enum casts use fixed-width representation and signed ostream insertion; valid-enumerator oracle cases are distinct from out-of-domain conversion profiles.",
+        "No complete quantifier/context/SMT driver, native global locale/boolalpha or whole std::string/class generated copy credit. m_qi_ematching is literally uninitialized: no assignment occurs anywhere in this source fork; explicit public-field assignment is required for a valid display read. Diagnostic State exposes initialization metadata and failed-constructor prefix; Display/Update refuse incomplete constructors. Existing Params text codec virtual NUL retains actual provider generation/lifetime guard, without claiming a native NUL-word ABI. Go immutable literal/string spans and direct file flush are selected adapters. Null cost dereference, stale provider, copied owner and destroyed word reads are guarded domains, not defined native continuation.",
+        "No complete SMT/context/solver or registered source driver credit; native global/locale/boolalpha profiles remain open. The actual scalar constructor reads no unused ParamsRef and does not update; standalone Go wrapper/header lifetime and wrong-owner/closed/global-null guards are explicit representation domains. Source lexical helper reverse DT and immutable source-stop cause use the accepted same-engine concrete helper, with actual returned module reference acquisition rather than reference-count/census authority.",
+        "No complete SMT/context/solver or registered driver credit; native global/std-helper/compiler-generated class copy profiles remain open. This source class has no Display method and no owned or borrowed string fields; no invented formatter/string ownership API. Diagnostic State inspects failed constructor scalar prefix, while Update rejects an incomplete constructor. Reflected standalone header and precise null/copied/closed-owner guards are Go representation domains. smt_params.cpp parent update does not call theory_str_params::updt_params in this source; that source omission is preserved as a future parent obligation."
       ]
     },
     {
@@ -69430,22 +69633,60 @@
       "path": "src/smt/params/theory_pb_params.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_smt_pb_params.go",
+        "util_smt_pb_params_source_test.go"
+      ],
+      "tests": [
+        "TestSMTPBConstructorDoesNotUpdateAndLiteralDefaults",
+        "TestSMTPBFourGettersIndependentLocalModuleWrongKindLiteral",
+        "TestSMTPBEveryConstructorAndWarmHelperReservation",
+        "TestSMTPBFourDisplayChainsEveryOutputReservationShowPosAndFileBadbit",
+        "TestSMTPBEveryUnwarmedSharedModuleAcquisitionReservation",
+        "TestSMTPBNullGlobalReachedHelperAndActualOwnerGuards"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "One lexical helper, UInt then three Bool publications, four separate endl insertion chains (src/smt/params/theory_pb_params.cpp:22-37)",
+          "status": "partial",
+          "go_target": "util_smt_pb_params.go",
+          "tests": [
+            "TestSMTPBConstructorDoesNotUpdateAndLiteralDefaults",
+            "TestSMTPBFourGettersIndependentLocalModuleWrongKindLiteral",
+            "TestSMTPBEveryConstructorAndWarmHelperReservation",
+            "TestSMTPBFourDisplayChainsEveryOutputReservationShowPosAndFileBadbit",
+            "TestSMTPBEveryUnwarmedSharedModuleAcquisitionReservation",
+            "TestSMTPBNullGlobalReachedHelperAndActualOwnerGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "Four actual scalar fields embedded once in a reflected standalone wrapper/header. No constructor helper/global/parameter read. Update borrows caller local/global/context, stamps actual returned smt module reference in the existing concrete lexical frame, publishes four RHS results in source order and destroys that frame before return. Strict source-stop and matched owning cleanup remain separate; Close never adopts caller children."
+      ],
+      "deviations": [
+        "No complete SMT/context/solver or registered source driver credit; native global/locale/boolalpha profiles remain open. The actual scalar constructor reads no unused ParamsRef and does not update; standalone Go wrapper/header lifetime and wrong-owner/closed/global-null guards are explicit representation domains. Source lexical helper reverse DT and immutable source-stop cause use the accepted same-engine concrete helper, with actual returned module reference acquisition rather than reference-count/census authority."
+      ]
     },
     {
       "path": "src/smt/params/theory_pb_params.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_smt_pb_params.go",
+        "util_smt_pb_params_source_test.go"
+      ],
+      "tests": [
+        "TestSMTPBConstructorDoesNotUpdateAndLiteralDefaults",
+        "TestSMTPBFourGettersIndependentLocalModuleWrongKindLiteral",
+        "TestSMTPBEveryConstructorAndWarmHelperReservation",
+        "TestSMTPBFourDisplayChainsEveryOutputReservationShowPosAndFileBadbit",
+        "TestSMTPBEveryUnwarmedSharedModuleAcquisitionReservation",
+        "TestSMTPBNullGlobalReachedHelperAndActualOwnerGuards"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -69458,30 +69699,83 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Four literal defaults; constructor has no update (src/smt/params/theory_pb_params.h:25-39)",
+          "status": "partial",
+          "go_target": "util_smt_pb_params.go",
+          "tests": [
+            "TestSMTPBConstructorDoesNotUpdateAndLiteralDefaults",
+            "TestSMTPBFourGettersIndependentLocalModuleWrongKindLiteral",
+            "TestSMTPBEveryConstructorAndWarmHelperReservation",
+            "TestSMTPBFourDisplayChainsEveryOutputReservationShowPosAndFileBadbit",
+            "TestSMTPBEveryUnwarmedSharedModuleAcquisitionReservation",
+            "TestSMTPBNullGlobalReachedHelperAndActualOwnerGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "Four actual scalar fields embedded once in a reflected standalone wrapper/header. No constructor helper/global/parameter read. Update borrows caller local/global/context, stamps actual returned smt module reference in the existing concrete lexical frame, publishes four RHS results in source order and destroys that frame before return. Strict source-stop and matched owning cleanup remain separate; Close never adopts caller children."
+      ],
+      "deviations": [
+        "No complete SMT/context/solver or registered source driver credit; native global/locale/boolalpha profiles remain open. The actual scalar constructor reads no unused ParamsRef and does not update; standalone Go wrapper/header lifetime and wrong-owner/closed/global-null guards are explicit representation domains. Source lexical helper reverse DT and immutable source-stop cause use the accepted same-engine concrete helper, with actual returned module reference acquisition rather than reference-count/census authority."
+      ]
     },
     {
       "path": "src/smt/params/theory_str_params.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_smt_str_params.go",
+        "util_smt_str_params_source_test.go"
+      ],
+      "tests": [
+        "TestSMTStrSeventeenLiteralDefaultsAndMandatoryConstructorUpdate",
+        "TestSMTStrAllSeventeenGettersIndependentFallbackAndWholeState",
+        "TestSMTStrEveryConstructorReservationAndOwnedMemberUnwind",
+        "TestSMTStrEveryUnwarmedSharedModuleAcquisitionReservation",
+        "TestSMTStrNullGlobalIncompleteConstructorAndOwnerEligibility"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "One lexical smt helper and seventeen ordered RHS publications (src/smt/params/theory_str_params.cpp:21-40)",
+          "status": "partial",
+          "go_target": "util_smt_str_params.go",
+          "tests": [
+            "TestSMTStrSeventeenLiteralDefaultsAndMandatoryConstructorUpdate",
+            "TestSMTStrAllSeventeenGettersIndependentFallbackAndWholeState",
+            "TestSMTStrEveryConstructorReservationAndOwnedMemberUnwind",
+            "TestSMTStrEveryUnwarmedSharedModuleAcquisitionReservation",
+            "TestSMTStrNullGlobalIncompleteConstructorAndOwnerEligibility"
+          ]
+        }
+      ],
+      "ownership": [
+        "All seventeen actual source members are scalar and embedded once in the reflected standalone wrapper. Constructor initializes those exact defaults then executes the mandatory one-helper update. Each actual returned module ParamsRef stamps acquisition at the same accepted concrete helper leaf; seventeen RHS/publications follow source order, and lexical source DT precedes return. Immutable source stop and matched owning cleanup remain separate. Caller local/global/context owners remain borrowed; wrapper Close owns only helper receipts and its actual header."
+      ],
+      "deviations": [
+        "No complete SMT/context/solver or registered driver credit; native global/std-helper/compiler-generated class copy profiles remain open. This source class has no Display method and no owned or borrowed string fields; no invented formatter/string ownership API. Diagnostic State inspects failed constructor scalar prefix, while Update rejects an incomplete constructor. Reflected standalone header and precise null/copied/closed-owner guards are Go representation domains. smt_params.cpp parent update does not call theory_str_params::updt_params in this source; that source omission is preserved as a future parent obligation."
+      ]
     },
     {
       "path": "src/smt/params/theory_str_params.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_smt_str_params.go",
+        "util_smt_str_params_source_test.go"
+      ],
+      "tests": [
+        "TestSMTStrSeventeenLiteralDefaultsAndMandatoryConstructorUpdate",
+        "TestSMTStrAllSeventeenGettersIndependentFallbackAndWholeState",
+        "TestSMTStrEveryConstructorReservationAndOwnedMemberUnwind",
+        "TestSMTStrEveryUnwarmedSharedModuleAcquisitionReservation",
+        "TestSMTStrNullGlobalIncompleteConstructorAndOwnerEligibility"
+      ],
       "conditionals": [
         {
           "line": 18,
@@ -69494,9 +69788,26 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Seventeen scalar defaults then mandatory constructor update (src/smt/params/theory_str_params.h:25-143)",
+          "status": "partial",
+          "go_target": "util_smt_str_params.go",
+          "tests": [
+            "TestSMTStrSeventeenLiteralDefaultsAndMandatoryConstructorUpdate",
+            "TestSMTStrAllSeventeenGettersIndependentFallbackAndWholeState",
+            "TestSMTStrEveryConstructorReservationAndOwnedMemberUnwind",
+            "TestSMTStrEveryUnwarmedSharedModuleAcquisitionReservation",
+            "TestSMTStrNullGlobalIncompleteConstructorAndOwnerEligibility"
+          ]
+        }
+      ],
+      "ownership": [
+        "All seventeen actual source members are scalar and embedded once in the reflected standalone wrapper. Constructor initializes those exact defaults then executes the mandatory one-helper update. Each actual returned module ParamsRef stamps acquisition at the same accepted concrete helper leaf; seventeen RHS/publications follow source order, and lexical source DT precedes return. Immutable source stop and matched owning cleanup remain separate. Caller local/global/context owners remain borrowed; wrapper Close owns only helper receipts and its actual header."
+      ],
+      "deviations": [
+        "No complete SMT/context/solver or registered driver credit; native global/std-helper/compiler-generated class copy profiles remain open. This source class has no Display method and no owned or borrowed string fields; no invented formatter/string ownership API. Diagnostic State inspects failed constructor scalar prefix, while Update rejects an incomplete constructor. Reflected standalone header and precise null/copied/closed-owner guards are Go representation domains. smt_params.cpp parent update does not call theory_str_params::updt_params in this source; that source omission is preserved as a future parent obligation."
+      ]
     },
     {
       "path": "src/smt/proto_model/CMakeLists.txt",
@@ -100596,29 +100907,60 @@
       "path": "src/util/approx_set.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "util_uint_approx_set.go",
+        "util_uint_approx_set_source_test.go"
+      ],
+      "tests": [
+        "TestUintApproxSetSourceIteratorRemainingWordEquality",
+        "TestUintApproxSetIndependentFiniteUnsignedAlgebraAndSize",
+        "TestUintApproxSetSourceDisplayFlagsEveryOutputPrefixAndBorrow"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Concrete uint64 unsigned set algebra, source iterator and remaining-word equality; complete display and size bodies (approx_set.h:43-158,162-233; approx_set.cpp:22-51)",
+          "status": "ported",
+          "go_target": "util_uint_approx_set.go",
+          "tests": [
+            "TestUintApproxSetSourceIteratorRemainingWordEquality",
+            "TestUintApproxSetIndependentFiniteUnsignedAlgebraAndSize",
+            "TestUintApproxSetSourceDisplayFlagsEveryOutputPrefixAndBorrow"
+          ]
+        }
+      ],
+      "ownership": [
+        "Inline uint64 set and scalar iterator own no payload. Borrowed constructor span is not retained. Const display executes actual separate CString/unsigned insertion leaves and immediate stream cold graphs before lifting refusals."
+      ],
+      "deviations": [
+        "Concrete unsigned/default-word specialization uses the selected NumericTextStream profile; no generic Go implementation or source loop replacement. Header remains partial beyond the proved concrete specializations; no SMT context/driver completion credit."
+      ]
     },
     {
       "path": "src/util/approx_set.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "sat_approx_set.go",
         "smt_literal_approx_set.go",
-        "smt_literal_approx_set_source_test.go"
+        "smt_literal_approx_set_source_test.go",
+        "util_uint_approx_set.go",
+        "util_uint_approx_set_source_test.go",
+        "sat_approx_set_source.go",
+        "sat_approx_set_source_test.go"
       ],
       "tests": [
         "TestSATApproximation",
         "TestSMTLiteralApproxSetSource64CollisionAndSentinels",
-        "TestSMTLiteralApproxSetIndependentFiniteResidueAlgebra"
+        "TestSMTLiteralApproxSetIndependentFiniteResidueAlgebra",
+        "TestUintApproxSetSourceIteratorRemainingWordEquality",
+        "TestUintApproxSetIndependentFiniteUnsignedAlgebraAndSize",
+        "TestUintApproxSetSourceDisplayFlagsEveryOutputPrefixAndBorrow",
+        "TestSATApproxSetAllSourceConstructorsAndLiteralMapping",
+        "TestSATApproxSetIndependentCompleteFiniteAlgebra"
       ],
       "conditionals": [
         {
@@ -100630,8 +100972,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "approx_set_tpl uint32 insert/may_contain/must_not_contain",
@@ -100665,14 +101007,37 @@
             "TestSMTLiteralApproxSetSource64CollisionAndSentinels",
             "TestSMTLiteralApproxSetIndependentFiniteResidueAlgebra"
           ]
+        },
+        {
+          "name": "Concrete uint64 unsigned set algebra, source iterator and remaining-word equality; complete display and size bodies (approx_set.h:43-158,162-233; approx_set.cpp:22-51)",
+          "status": "ported",
+          "go_target": "util_uint_approx_set.go",
+          "tests": [
+            "TestUintApproxSetSourceIteratorRemainingWordEquality",
+            "TestUintApproxSetIndependentFiniteUnsignedAlgebraAndSize",
+            "TestUintApproxSetSourceDisplayFlagsEveryOutputPrefixAndBorrow"
+          ]
+        },
+        {
+          "name": "Complete remaining uint32 constructors, literal/variable mapping, value union/intersection and equality/subsumption; all six actual fork template aliases audited (approx_set.h:25-233; sat_types.h:115-119; sat_solver.h:419; smt_literal.h:114-116; smt_conflict_resolution.h:34)",
+          "status": "ported",
+          "go_target": "sat_approx_set_source.go",
+          "tests": [
+            "TestSATApproxSetAllSourceConstructorsAndLiteralMapping",
+            "TestSATApproxSetIndependentCompleteFiniteAlgebra"
+          ]
         }
       ],
       "ownership": [
         "Scalar uint32 SAT specialization only; generic adapters, 64-bit specialization and iterator remain unported.",
-        "Concrete inline uint64 specialization owns no payload; range constructor only borrows input literals and preserves source iteration/collision behavior. No generics, ticket, owning wrapper or exact-set replacement."
+        "Concrete inline uint64 specialization owns no payload; range constructor only borrows input literals and preserves source iteration/collision behavior. No generics, ticket, owning wrapper or exact-set replacement.",
+        "Inline uint64 set and scalar iterator own no payload. Borrowed constructor span is not retained. Const display executes actual separate CString/unsigned insertion leaves and immediate stream cold graphs before lifting refusals.",
+        "All actual fork instantiations are concrete: uint32 unsigned variable/level and SAT literal indices, uint64 unsigned and signed SMT literal indices. Both word traits, all inline constructors/operators/predicates, unsigned iterator remaining-word equality and ostream display/size are now implemented. Historical generic/64-bit/iterator warnings are superseded for this file by these concrete source-audited counterparts; no generics, payload ownership, RC or exact-set substitution."
       ],
       "deviations": [
-        "This closes the complete literal_approx_set specialization, not generic approximate-set families, uint64 unsigned iterator/display/size, literal vector storage, AST-aware display, other SMT types or actual context/conflict-resolution drivers."
+        "This closes the complete literal_approx_set specialization, not generic approximate-set families, uint64 unsigned iterator/display/size, literal vector storage, AST-aware display, other SMT types or actual context/conflict-resolution drivers.",
+        "Concrete unsigned/default-word specialization uses the selected NumericTextStream profile; no generic Go implementation or source loop replacement. Header remains partial beyond the proved concrete specializations; no SMT context/driver completion credit.",
+        "C++ template syntax is replaced with concrete Go implementations for every instantiated production alias, as required by the no-generics policy. Source-required value copying uses Go inline-word value semantics; all six actual aliases were found by reading their originating declarations without reference content hashing. This header completion supplies utility functionality only, with no solver/context/conflict-resolution/MAM driver credit."
       ]
     },
     {
@@ -128687,7 +129052,9 @@
         "util_params_set_rat_source_test.go",
         "util_params_set_replacement_source.go",
         "util_params_set_replacement_source_test.go",
-        "util_gparams_constructor_source.go"
+        "util_gparams_constructor_source.go",
+        "util_params_string_view.go",
+        "util_params_string_view_source_test.go"
       ],
       "tests": [
         "TestParamNameNormalizationSourceBranches",
@@ -128763,7 +129130,10 @@
         "TestParamsReferenceMatchedReplacementIndependentFramesAndReuse",
         "TestGlobalParamsSourceConstructorAllActualNestedPrefixes",
         "TestGlobalParamsServiceUnconditionalInitAndCurrentPointer",
-        "TestGlobalParamsServiceCtorRefusalPreservesCurrentAndFailedHeaders"
+        "TestGlobalParamsServiceCtorRefusalPreservesCurrentAndFailedHeaders",
+        "TestParamsStringViewReturnedPointerNoFormatCopyAndInvalidation",
+        "TestParamsStringViewFallbackNullAndProviderLifetime",
+        "TestParamsStringViewCStringSentryNullAndStaleBeforeBadbit"
       ],
       "conditionals": [
         {
@@ -129148,6 +129518,16 @@
             "TestGlobalParamsServiceUnconditionalInitAndCurrentPointer",
             "TestGlobalParamsServiceCtorRefusalPreservesCurrentAndFailedHeaders"
           ]
+        },
+        {
+          "name": "Borrowed get_str fallback pointer at the returned entry, without formatting copy (src/util/params.cpp:639-648,902-930)",
+          "status": "partial",
+          "go_target": "util_params_string_view.go",
+          "tests": [
+            "TestParamsStringViewReturnedPointerNoFormatCopyAndInvalidation",
+            "TestParamsStringViewFallbackNullAndProviderLifetime",
+            "TestParamsStringViewCStringSentryNullAndStaleBeforeBadbit"
+          ]
         }
       ],
       "ownership": [
@@ -129164,7 +129544,8 @@
         "Defined absent-key lookup on a live parent after stopped numeral destruction returns without action or receipt stamp; source keys are scanned before the stopped mutation guard. Both symbol/name routes preserve original invocation, cursor, refs, size, Runtime and exact physical/cold graph. Source-ended zeroDEC lifetime is guarded before lookup separately. Historical premature whole-block guard candidate is superseded, not accepted.",
         "SET_RAT ADD stamps the actual NewValue result into precharged concrete setFrames.next.rat before Copy and retains it on actual Copy/append refusal. Source POD new_entry has no rational destructor; only true entry publication transfers ownership. Separate exact owning receipt or Context.Close releases this actual local, preserving first body and owning cleanup causes and actual consumed physical child frontier. SourceSetBytes is the independent reflected cold directory charge; audits name actual acquired tokens, not numeric live-count or RC inference.",
         "Concrete prepared per-block replacement frame binds actual matched index, old kind, slot/generation, nonwrapping invocation and borrowed current leaf identity at reached del_value. Actual owning NUM stays only in the entry, never copied into a second owning frame. Explicit CompleteSetReplacement acknowledges consumed physical child before kind then field publication; Context.Close instead discards prepared copied text and consumed old leaf before block teardown, with no setter body publication. Reflected ReplacementBytes cold directory and any actual acquired text are separately charged/named; no RC/count/registry authority.",
-        "Nested unfinished ParamDescrs is named ctorPendingDescriptor only, never published as completed globalDescriptors. Prepared Go copied-text context/header persists until explicit owning abort; reached completed info/names members alone unwind. Public ergonomic constructors use same source engine followed by separate all-refund abort on failure."
+        "Nested unfinished ParamDescrs is named ctorPendingDescriptor only, never published as completed globalDescriptors. Prepared Go copied-text context/header persists until explicit owning abort; reached completed info/names members alone unwind. Public ergonomic constructors use same source engine followed by separate all-refund abort on failure.",
+        "The concrete call-local pointer view captures actual Words/ref/length or Symbol BytesRegion/ref/offset from the returned source entry. No RC, copied payload or formatting-workspace allocation is acquired. Each reached byte retains actual provider/generation/lifetime checks; returned symbol spelling may outlive ParamsContext while its provider remains live."
       ],
       "deviations": [
         "Owner-local null replaces process-global empty reference. C strings become owned nullable first-NUL payloads; replacement stages new text. Detach error retains published partial block but cleans old reference. Pooled pages persist physically until Close; inline concrete numeric tokens replace separate heap objects. Provenance/overflow guards and libstdc++ null-C-string prefix error are explicit Go adapters; Z3DEBUG pp is explicit text API rather than global stdout.",
@@ -129176,7 +129557,8 @@
         "The first actual ResetKey numeral stop already preserved the source prefix; its RED concerns Go ordinary retry implicitly consuming a callee owning receipt. New stopped-owner guard is an explicit safety-domain adapter, not a first-call source algorithm correction. Default valid-domain scalar shift is independently checked for 56 symbol/name removal cases with reservations refusing. Global assertion/raw ABI/readiness profiles remain partial; SET_RAT untransferred local allocation ownership remains open.",
         "Only ADD/untransferred local path selected; existing-key exceptional destruction, native pointer ABI/global assertions and wider profiles stay partial. TLS signed-overflow guarded cleanup-stop proof is distinct from ordinary actual reservation/refusal campaigns. No source whole-class/ownership-audited promotion.",
         "Actual repeated ordinary setter consumed a callee owning receipt after postphysical TLS guard; this RED is Go stopped-owner safety-domain protocol, not first-call source math RED. Eleven source kind/name cases, pure absent RESET/Contains/scalar read and real Context.Close nonpublish stop are proved. Source borrowed C-string versus Go copied-text preparation is explicit; all preparation ordinals are independently audited. Whole params.cpp/h remain partial; source-global/native ABI/wider profiles and broader stopped-mutation domains stay open.",
-        "Explicit borrowed-owner single-lane namespace service, not process singleton/generated memory lifecycle completion. Actual C++ placement delete is no-op on failed ctor; Go owning abort refunds concrete retained storage separately. Source TRACE, native ABI/global Runtime table allocation, full descendant exceptional paths and arbitrary global bindings remain open. Independent source branch fixtures give no registered test-driver credit. TLS signed-host overflow stop is guarded undefined-domain evidence, not ordinary free failure/OOM."
+        "Explicit borrowed-owner single-lane namespace service, not process singleton/generated memory lifecycle completion. Actual C++ placement delete is no-op on failed ctor; Go owning abort refunds concrete retained storage separately. Source TRACE, native ABI/global Runtime table allocation, full descendant exceptional paths and arbitrary global bindings remain open. Independent source branch fixtures give no registered test-driver credit. TLS signed-host overflow stop is guarded undefined-domain evidence, not ordinary free failure/OOM.",
+        "Existing string getter APIs remain unchanged. The existing Words text codec virtual terminator is a precise representation adaptation; native pointer ABI and standalone whole Params exceptional lifetime families remain open. Getter and view tests are independent, no registered driver credit."
       ]
     },
     {

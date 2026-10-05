@@ -174,3 +174,13 @@ func (m *smtModuleParamsOwner) closeHelpers() error {
 	}
 	return nil
 }
+
+func (m *smtModuleParamsOwner) frameStringView(f *smtModuleParamsFrame, key string, def string) (ParamsStringView, error) {
+	if e := m.executingFrame(f); e != nil {
+		return ParamsStringView{}, e
+	}
+	if !f.acquired || f.destructorStarted {
+		return ParamsStringView{}, ErrParamsPrecondition
+	}
+	return m.context.GetStringViewFallbackName(f.local, &key, &f.value, &def)
+}
