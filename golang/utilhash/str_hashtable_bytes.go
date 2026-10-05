@@ -55,25 +55,13 @@ func (h *StrHashtable) FindCStringBytes(s []byte) (StrHashtableEntryRef, bool, e
 			if e != nil {
 				return StrHashtableEntryRef{}, false, e
 			}
-			if e := h.validateKey(entry.key); e != nil {
-				return StrHashtableEntryRef{}, false, e
-			}
 			region, e := h.keyRegion(entry.key)
 			if e != nil {
 				return StrHashtableEntryRef{}, false, e
 			}
-			equal := entry.key.length == uint32(len(s))
-			if equal {
-				for j := uint32(0); j < entry.key.length; j++ {
-					b, e := region.Read(entry.key.ref, entry.key.offset+j)
-					if e != nil {
-						return StrHashtableEntryRef{}, false, e
-					}
-					if b != s[j] {
-						equal = false
-						break
-					}
-				}
+			equal, e := strKeyEqualBytes(region, entry.key, s)
+			if e != nil {
+				return StrHashtableEntryRef{}, false, e
 			}
 			if equal {
 				return h.ref(i), true, nil

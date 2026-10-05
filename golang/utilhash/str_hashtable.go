@@ -336,7 +336,9 @@ func validateStrKey(region *arena.BytesRegion, k StrKey) error {
 }
 
 // Hash uses the source seed17, little-endian word loads and signed-char tail.
-// Caller-controlled mutation of a stored spelling violates the source borrow.
+// Hash rereads the actual CString length at this call. Mutating an inserted
+// key can invalidate its table cached hash; uninserted pointer inputs remain
+// ordinary caller-owned CString arguments.
 func (h *StrHashtable) Hash(k StrKey) (uint32, error) {
 	if e := h.open(); e != nil {
 		return 0, e
@@ -348,27 +350,11 @@ func (h *StrHashtable) Hash(k StrKey) (uint32, error) {
 	return hashStrKey(r, k)
 }
 func hashStrKey(region *arena.BytesRegion, k StrKey) (uint32, error) {
-	if e := validateStrKey(region, k); e != nil {
+	n, e := strKeyLength(region, k)
+	if e != nil {
 		return 0, e
 	}
-	var readError error
-	hash := WordReader(k.length, 17, func(word uint32) uint32 {
-		var v uint32
-		for j := uint32(0); j < 4; j++ {
-			i := word*4 + j
-			if i >= k.length {
-				break
-			}
-			b, e := region.Read(k.ref, k.offset+i)
-			if e != nil {
-				readError = e
-				return 0
-			}
-			v |= uint32(b) << (8 * j)
-		}
-		return v
-	})
-	return hash, readError
+	return RegionBytes(region, k.ref, uint64(k.offset), n, 17)
 }
 func (h *StrHashtable) Equal(a, b StrKey) (bool, error) {
 	if e := h.open(); e != nil {
@@ -385,29 +371,22 @@ func (h *StrHashtable) Equal(a, b StrKey) (bool, error) {
 	return equalStrKeys(ra, a, rb, b)
 }
 func equalStrKeys(ra *arena.BytesRegion, a StrKey, rb *arena.BytesRegion, b StrKey) (bool, error) {
-	if e := validateStrKey(ra, a); e != nil {
-		return false, e
-	}
-	if e := validateStrKey(rb, b); e != nil {
-		return false, e
-	}
-	if a.length != b.length {
-		return false, nil
-	}
-	for i := uint32(0); i < a.length; i++ {
-		x, e := ra.Read(a.ref, a.offset+i)
+	for i := uint64(0); ; i++ {
+		x, e := strKeyByte(ra, a, i)
 		if e != nil {
 			return false, e
 		}
-		y, e := rb.Read(b.ref, b.offset+i)
+		y, e := strKeyByte(rb, b, i)
 		if e != nil {
 			return false, e
 		}
 		if x != y {
 			return false, nil
 		}
+		if x == 0 {
+			return true, nil
+		}
 	}
-	return true, nil
 }
 func (h *StrHashtable) Text(k StrKey) (string, error) {
 	if e := h.open(); e != nil {
@@ -726,25 +705,13 @@ func (h *StrHashtable) FindCString(s string) (StrHashtableEntryRef, bool, error)
 			if e != nil {
 				return StrHashtableEntryRef{}, false, e
 			}
-			if e := h.validateKey(entry.key); e != nil {
-				return StrHashtableEntryRef{}, false, e
-			}
 			region, e := h.keyRegion(entry.key)
 			if e != nil {
 				return StrHashtableEntryRef{}, false, e
 			}
-			equal := entry.key.length == uint32(len(s))
-			if equal {
-				for j := uint32(0); j < entry.key.length; j++ {
-					b, e := region.Read(entry.key.ref, entry.key.offset+j)
-					if e != nil {
-						return StrHashtableEntryRef{}, false, e
-					}
-					if b != s[j] {
-						equal = false
-						break
-					}
-				}
+			equal, e := strKeyEqualString(region, entry.key, s)
+			if e != nil {
+				return StrHashtableEntryRef{}, false, e
 			}
 			if equal {
 				return h.ref(i), true, nil

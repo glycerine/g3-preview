@@ -11,6 +11,9 @@ import (
 // real source cold m_0 word and its checked initialized-byte mask.
 type runtimeHashSource struct {
 	runtime         *memory.Runtime
+	region          *arena.BytesRegion
+	regionRef       arena.BytesRegionRef
+	regionMode      bool
 	block           memory.Block
 	offset, extent  uint64
 	bounded, inline bool
@@ -31,6 +34,16 @@ func (s runtimeHashSource) byteAt(i uint64) (byte, error) {
 		}
 		return byte(*s.word >> (8 * i)), nil
 	}
+	if s.regionMode {
+		offset := s.offset + i
+		if offset < s.offset || offset > uint64(^uint32(0)) {
+			return 0, arena.ErrBounds
+		}
+		if s.region == nil {
+			return 0, arena.ErrInvalidSlot
+		}
+		return s.region.Read(s.regionRef, uint32(offset))
+	}
 	return s.runtime.Read(s.block, s.offset+i)
 }
 func (s runtimeHashSource) wordAt(i uint64) (uint32, error) {
@@ -45,6 +58,17 @@ func (s runtimeHashSource) wordAt(i uint64) (uint32, error) {
 			return 0, memory.ErrRuntimeUninitialized
 		}
 		return *s.word, nil
+	}
+	if s.regionMode {
+		var v uint32
+		for j := uint64(0); j < 4; j++ {
+			b, e := s.byteAt(i + j)
+			if e != nil {
+				return 0, e
+			}
+			v |= uint32(b) << (8 * j)
+		}
+		return v, nil
 	}
 	return s.runtime.ReadUint32(s.block, s.offset+i)
 }
