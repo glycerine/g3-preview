@@ -350,8 +350,9 @@ func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []Int, ms [
 		buffer.appendScope.foreignMixed = true
 	}
 	if receipt != nil {
-		m.factoryInvocation = polynomialFactoryScope{active: true, invocation: m.creationGeneration}
+		m.factoryInvocation = polynomialFactoryScope{active: true, executing: true, invocation: m.creationGeneration}
 		*receipt = polynomialFactoryInvocationReceipt{manager: m, frame: &m.factoryInvocation, invocation: m.creationGeneration}
+		defer func() { m.factoryInvocation.executing = false }()
 	}
 	if f := m.factorsOwner; f != nil && f.executing && m.callbackDepth == 0 {
 		m.pending.factorsParent = f
@@ -384,22 +385,25 @@ func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []Int, ms [
 	observer := m.pending.compositionParent
 	squareObserver := m.pending.squareRootParent
 	var before [3]memory.Block
-	if receipt != nil || observer != nil || squareObserver != nil || m.pending.toPolynomialParent != nil || m.pending.conversionParent != nil || m.pending.factorsParent != nil {
+	if observer != nil || squareObserver != nil || m.pending.toPolynomialParent != nil || m.pending.conversionParent != nil || m.pending.factorsParent != nil {
 		var e error
 		before, e = m.monomials.allocator.PendingRoots()
 		if e != nil {
 			return Polynomial{}, e
 		}
 	}
-	raw, e := m.monomials.allocator.Allocate(uint64(requested))
-	if receipt != nil {
-		after, x := m.monomials.allocator.PendingRoots()
-		for i := range after {
-			if after[i] != (memory.Block{}) && after[i] != before[i] {
-				m.factoryInvocation.allocator[i] = after[i]
-			}
+	var raw memory.ObjectRef
+	var e error
+	if outcome := m.factoryAllocationOutcome(receipt); outcome != nil {
+		var started bool
+		raw, started, e = m.monomials.allocator.AllocateWithOutcomeStarted(uint64(requested), outcome)
+		if started {
+			m.factoryInvocation.allocationStarted = true
+			m.factoryInvocation.allocationCause = e
+			m.factoryInvocation.allocator[0] = outcome.Pending
 		}
-		e = polynomialNewtonJoin(e, x)
+	} else {
+		raw, e = m.monomials.allocator.Allocate(uint64(requested))
 	}
 	if raw != (memory.ObjectRef{}) {
 		m.pending.raw = raw

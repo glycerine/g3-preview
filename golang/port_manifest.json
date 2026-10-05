@@ -29267,7 +29267,11 @@
         "TestPolynomialDerivativeActualAppendFactoryEveryPrefix",
         "TestPolynomialDerivativeAbortPreservesLaterForeignSourceRow",
         "TestPolynomialDerivativeFactoryReceiptPreservesForeignReplacement",
-        "TestPolynomialDerivativeReturnedCallerAndForeignCallbackSurviveAbort"
+        "TestPolynomialDerivativeReturnedCallerAndForeignCallbackSurviveAbort",
+        "TestPolynomialFactoryAllocationActualLeaf",
+        "TestPolynomialFactoryAllocationRealCallbackForeignStart",
+        "TestPolynomialFactoryAllocationConcreteFrameGuards",
+        "TestPolynomialFactoryAllocationPostphysicalOwnRetry"
       ],
       "conditionals": [
         {
@@ -32508,6 +32512,17 @@
             "TestPolynomialDerivativeFactoryReceiptPreservesForeignReplacement",
             "TestPolynomialDerivativeReturnedCallerAndForeignCallbackSurviveAbort"
           ]
+        },
+        {
+          "name": "polynomial.cpp:2481-2495 mkCellWithReceipts: Actual guarded factory receipt passes embedded lower AllocateWithOutcomeStarted outcome; acquire only returned Pending, never PendingRoots differences.",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_store.go",
+          "tests": [
+            "TestPolynomialFactoryAllocationActualLeaf",
+            "TestPolynomialFactoryAllocationRealCallbackForeignStart",
+            "TestPolynomialFactoryAllocationConcreteFrameGuards",
+            "TestPolynomialFactoryAllocationPostphysicalOwnRetry"
+          ]
         }
       ],
       "ownership": [
@@ -32599,7 +32614,8 @@
         "Derivative actual n then a source construction and reverse a then n destructors remain before explicit unjoined child abort; direct SET/MUL/PN and monomial allocator authority are preserved.",
         "Actual source cheap.add takes a through Swap; no allocating Copy is invented. An embedded concrete append receipt records only the real default-NUM slot, monomial INC/push and factory transfer. Embedded factory receipt captures only the same guarded constructor/outcome, with actual nonwrapping invocation and frame address. Class reflected cold header charges both receipt carriers once.",
         "Explicit false acknowledgment preserves member rows/pending INC and factory placement; true after older NUM suffix drains only matched acquired append/factory roots. Known foreign rows and replacement constructors remain untouched.",
-        "At successful final raw return all per-term NUM destructors are already complete. Exact completed-append preack preserves the constructed result if metadata acknowledgment stops; exact factory token handoff then transfers ownership to the caller without extra INC/source operation. Ordinary public IncRef/DecRef remains unchanged."
+        "At successful final raw return all per-term NUM destructors are already complete. Exact completed-append preack preserves the constructed result if metadata acknowledgment stops; exact factory token handoff then transfers ownership to the caller without extra INC/source operation. Ordinary public IncRef/DecRef remains unchanged.",
+        "Exact actual self/member/frame/nonwrapping creation invocation/executing/callback-zero binding at source allocation leaf. Existing pending-root observations only refuse unsafe cleanup or acknowledge consumption of previously captured identities; never acquire later replacement roots."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -32669,7 +32685,8 @@
         "Global DEBUG/TRACE/ostream and broad nested-vector/copy/lifecycle source methods remain partial.",
         "polynomial.cpp:2757-2768 selected ScalarDiv transport prerequisite only: public/nil Integer negative Div and ExtendedGCD still eagerly delete RAW locals on failed bodies and remain incomplete. Shared mixed cohort ordered retirement and full Discriminant/Factor parents remain open. Native real signed-TLS guard reaches caller NUM DT; checked reaches failed younger verification ctor with no invented source DT. No new dormant original driver assertion credit or unit promotion.",
         "Selected ordered cheap append retirement prerequisite only; regular SOM arithmetic wrappers, full Factor/Discriminant, registered driver and source unit completion remain open. Guard-only/malformed owner fixtures have no valid C++ mathematical failure credit. Successful validated clear-to-publish writes have no intervening source allocation/callback; no manufactured faultpoint or ordinary-prefix claim.",
-        "Closes derivative actual cheap append/factory owning gap for existing concrete source profile. No ordinary Copy allocation is present on this take=true path. Interrupted direct-return metadata guard requires an existing real guarded state; no fabricated allocator/callback between source completed mk and handoff. Other regular SOM arithmetic wrappers, full Factor/Discriminant/source classes and dormant registered driver remain separate obligations; no unit promotion."
+        "Closes derivative actual cheap append/factory owning gap for existing concrete source profile. No ordinary Copy allocation is present on this take=true path. Interrupted direct-return metadata guard requires an existing real guarded state; no fabricated allocator/callback between source completed mk and handoff. Other regular SOM arithmetic wrappers, full Factor/Discriminant/source classes and dormant registered driver remain separate obligations; no unit promotion.",
+        "Selected receipt leaf closure only. Signed-host TLS domain fixture is a public-operation guarded helper profile, not ordinary mathematical freeOOM. Bounds-to-ErrorTransport hypothesis was withdrawn after runtime.go:123-134/accounting.go:55-84,175-186 review. Other legacy parent observer snapshots, regular SOM wrappers, full Factor/Discriminant and whole source unit remain separately open; registered driver credit0."
       ]
     },
     {

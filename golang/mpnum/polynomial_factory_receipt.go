@@ -8,10 +8,14 @@ import "github.com/glycerine/g3/golang/memory"
 // stable frame and the real guarded constructor invocation, not a live value
 // discovered by examining the polynomial registry or its reference count.
 type polynomialFactoryScope struct {
-	invocation uint64
-	active     bool
-	result     Polynomial
-	allocator  [3]memory.Block
+	invocation        uint64
+	active            bool
+	executing         bool
+	allocationStarted bool
+	allocationCause   error
+	allocation        memory.SmallAllocatorAllocationOutcome
+	result            Polynomial
+	allocator         [3]memory.Block
 }
 type polynomialFactoryInvocationReceipt struct {
 	manager    *MultivariatePolynomialCore
@@ -20,7 +24,16 @@ type polynomialFactoryInvocationReceipt struct {
 }
 
 func (m *MultivariatePolynomialCore) matchesFactoryInvocation(r *polynomialFactoryInvocationReceipt) bool {
-	return r != nil && r.manager == m && r.frame == &m.factoryInvocation && r.invocation != 0 && r.invocation == r.frame.invocation && r.frame.active
+	return m != nil && m.self == m && r != nil && r.manager == m && r.frame == &m.factoryInvocation && r.invocation != 0 && r.invocation == r.frame.invocation && r.frame.active
+}
+
+// The actual constructor passes its embedded outcome directly to the malloc
+// engine. A copied owner/frame or a callback cannot acquire its authority.
+func (m *MultivariatePolynomialCore) factoryAllocationOutcome(r *polynomialFactoryInvocationReceipt) *memory.SmallAllocatorAllocationOutcome {
+	if !m.matchesFactoryInvocation(r) || !r.frame.executing || m.callbackDepth != 0 || m.pending.generation != r.invocation || m.monomials == nil || m.monomials.self != m.monomials {
+		return nil
+	}
+	return &r.frame.allocation
 }
 
 // Only the actual guarded constructor can publish this raw owning root. It
@@ -106,13 +119,22 @@ func (m *MultivariatePolynomialCore) cleanupFactoryInvocation(r *polynomialFacto
 		if x != nil {
 			return polynomialNewtonJoin(e, x)
 		}
-		s.allocator = now
+		// Observation acknowledges only consumption of the captured token. It
+		// never assigns a later allocator root to this older invocation.
+		for i, token := range s.allocator {
+			if token != (memory.Block{}) && now[i] != token {
+				s.allocator[i] = memory.Block{}
+			}
+		}
+		if s.allocation.Pending != (memory.Block{}) && now[0] != s.allocation.Pending {
+			s.allocation.Pending = memory.Block{}
+		}
 		if e != nil {
 			return e
 		}
 	} else {
 		s.allocator = [3]memory.Block{}
 	}
-	*s = polynomialFactoryScope{invocation: s.invocation}
+	*s = polynomialFactoryScope{invocation: s.invocation, allocation: s.allocation, allocationStarted: s.allocationStarted, allocationCause: s.allocationCause}
 	return nil
 }
