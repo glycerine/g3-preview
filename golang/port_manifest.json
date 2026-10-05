@@ -17179,14 +17179,44 @@
       "path": "src/ast/rewriter/arith_rewriter_params.pyg",
       "component": "ast",
       "role": "generated_input",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_smt_arith_params.go",
+        "util_smt_arith_params_source_test.go"
+      ],
+      "tests": [
+        "TestSMTArithAllFortySixLiteralDefaults",
+        "TestSMTArithSixteenGettersIndependentLocalModuleLiteralPaths",
+        "TestSMTArithSecondDeclarationRefusalKeepsFifteenFieldPrefix",
+        "TestSMTArithEveryWarmConstructorReservation",
+        "TestSMTArithFortySixDisplayChainsAllOutputPrefixesAndFlags",
+        "TestSMTArithEveryUnwarmedSharedModuleAcquisitionReservation",
+        "TestSMTArithNullGlobalConstructorAndForeignLocalReachedGuards"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete rewriter module eq2ineq accessor and false default (src/ast/rewriter/arith_rewriter_params.pyg:1-15; scripts/mk_genfile_common.py:895-939)",
+          "status": "partial",
+          "go_target": "util_smt_arith_params.go",
+          "tests": [
+            "TestSMTArithAllFortySixLiteralDefaults",
+            "TestSMTArithSixteenGettersIndependentLocalModuleLiteralPaths",
+            "TestSMTArithSecondDeclarationRefusalKeepsFifteenFieldPrefix",
+            "TestSMTArithEveryWarmConstructorReservation",
+            "TestSMTArithFortySixDisplayChainsAllOutputPrefixesAndFlags",
+            "TestSMTArithEveryUnwarmedSharedModuleAcquisitionReservation",
+            "TestSMTArithNullGlobalConstructorAndForeignLocalReachedGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "Forty-six scalar members use exact declaration/default/display order. The actual smt helper is acquired before fifteen RHS/publications; the actual rewriter helper is acquired only after those complete, followed by eq2ineq. Each returned module ParamsRef stamps acquisition in the existing concrete shared helper engine; lexical reverse source destruction and exact stopped-child owning continuation remain separate. Reflected standalone wrapper/frame cold charges are Go lifetime representation, not native scalar/stack allocations; caller local/context/global owners remain borrowed."
+      ],
+      "deviations": [
+        "No complete smt_params/context/kernel, registered SMT driver, whole generated helper/generator or native global/locale/boolalpha completion credit. Incomplete constructors return an explicitly diagnostic owner; Display/Update refuse before output/body while State can inspect actual initialized/published prefix. Cross-owner/null-global/closed/copy guards are precise Go domain evidence, not native null dereference equivalence. Source enum casts use fixed-width representation and signed ostream insertion; valid-enumerator oracle cases are distinct from out-of-domain conversion profiles."
+      ]
     },
     {
       "path": "src/ast/rewriter/array_rewriter.cpp",
@@ -68901,7 +68931,9 @@
         "util_smt_module_params_source.go",
         "util_smt_array_params_source_test.go",
         "util_smt_bv_params.go",
-        "util_smt_bv_params_source_test.go"
+        "util_smt_bv_params_source_test.go",
+        "util_smt_arith_params.go",
+        "util_smt_arith_params_source_test.go"
       ],
       "tests": [
         "TestSMTDynAckConstructorLiteralDefaultsAndFallbackOrder",
@@ -68926,7 +68958,14 @@
         "TestSMTBVYoungerRealNumeralDestructorStopProtectsOlderHelper",
         "TestSMTBVIncompleteSecondHelperConstructorDisplayRefusesBeforeInsertion",
         "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
-        "TestSMTBVNullGlobalsConstructorPrefixAndForeignLocalGetter"
+        "TestSMTBVNullGlobalsConstructorPrefixAndForeignLocalGetter",
+        "TestSMTArithAllFortySixLiteralDefaults",
+        "TestSMTArithSixteenGettersIndependentLocalModuleLiteralPaths",
+        "TestSMTArithSecondDeclarationRefusalKeepsFifteenFieldPrefix",
+        "TestSMTArithEveryWarmConstructorReservation",
+        "TestSMTArithFortySixDisplayChainsAllOutputPrefixesAndFlags",
+        "TestSMTArithEveryUnwarmedSharedModuleAcquisitionReservation",
+        "TestSMTArithNullGlobalConstructorAndForeignLocalReachedGuards"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -68974,39 +69013,96 @@
             "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
             "TestSMTBVNullGlobalsConstructorPrefixAndForeignLocalGetter"
           ]
+        },
+        {
+          "name": "Fifteen arithmetic SMT helper accessor definitions and literal defaults (src/smt/params/smt_params_helper.pyg:7,40-53)",
+          "status": "partial",
+          "go_target": "util_smt_arith_params.go",
+          "tests": [
+            "TestSMTArithAllFortySixLiteralDefaults",
+            "TestSMTArithSixteenGettersIndependentLocalModuleLiteralPaths",
+            "TestSMTArithSecondDeclarationRefusalKeepsFifteenFieldPrefix",
+            "TestSMTArithEveryWarmConstructorReservation",
+            "TestSMTArithFortySixDisplayChainsAllOutputPrefixesAndFlags",
+            "TestSMTArithEveryUnwarmedSharedModuleAcquisitionReservation",
+            "TestSMTArithNullGlobalConstructorAndForeignLocalReachedGuards"
+          ]
         }
       ],
       "ownership": [
         "Actual acquired helper module ParamsRef is stamped only at SourceGetModuleName return; lexical source DelTracked before function return, retained exact decrement receipt separate from owning Close. Standalone Go wrapper/helper are actual reflected cold allocations, not native scalar/stack malloc credit. Original Symbol/Params/global owners remain borrowed.",
         "The concrete generated helper owner is embedded once in the actual reflected parameter wrapper header; each reached lexical helper frame charges its actual cold fields, borrows the local ParamsRef pointer and acquires its module reference only at the returned SourceGetModuleName result. Source DelTracked executes before return; any stopped destructor retains its exact decrement receipt for separate owning Close. Caller contexts/global services remain borrowed.",
-        "Two actual generated helpers are acquired in declaration order smt then rewriter; the borrowed local ParamsRef is read at each getter, and an older live helper remains readable while the younger helper exists. Exact returned module references are the only acquisition authority. Source destruction runs rewriter then smt; the first younger stopped destructor protects the unread older frame, retains immutable body/source history and exact decrement receipt, and is distinct from explicit owning Close. Embedded common fields are charged once in enclosing reflected wrappers; actual lexical frame cold allocations have no native stack-allocation credit."
+        "Two actual generated helpers are acquired in declaration order smt then rewriter; the borrowed local ParamsRef is read at each getter, and an older live helper remains readable while the younger helper exists. Exact returned module references are the only acquisition authority. Source destruction runs rewriter then smt; the first younger stopped destructor protects the unread older frame, retains immutable body/source history and exact decrement receipt, and is distinct from explicit owning Close. Embedded common fields are charged once in enclosing reflected wrappers; actual lexical frame cold allocations have no native stack-allocation credit.",
+        "Forty-six scalar members use exact declaration/default/display order. The actual smt helper is acquired before fifteen RHS/publications; the actual rewriter helper is acquired only after those complete, followed by eq2ineq. Each returned module ParamsRef stamps acquisition in the existing concrete shared helper engine; lexical reverse source destruction and exact stopped-child owning continuation remain separate. Reflected standalone wrapper/frame cold charges are Go lifetime representation, not native scalar/stack allocations; caller local/context/global owners remain borrowed."
       ],
       "deviations": [
         "No registered SMT context/kernel driver credit. Scalar base embedding into complete smt_params and native global/locale/boolalpha profiles remain open. Go invalid local/closed/null owner guards and standalone incomplete-constructor owning continuation are explicit adapter domains. Strategy outside source enumerators is only selected fixed-width Go representation evidence. Generated helper credit is limited to six dack accessor definitions; full helper/generator remain partial.",
         "No complete SMT context, generated-helper/generator, native global/locale/boolalpha or registered SMT driver completion credit. The standalone facade and lexical-frame reflected cold charges are explicit Go ownership representation rather than native scalar/stack allocations. Disabled array registration is erased; Array constructor never reads params or performs update.",
-        "No registered SMT context/kernel driver or whole generated helper/generator/global/locale/boolalpha completion credit. The seven literal defaults are followed by mandatory update, including source constructor false hi_div0 replaced by generated rewriter true. Invalid/cross-owner or incomplete-object, signed TLS overflow and native global-null lifetime conditions are explicitly guarded Go domains, not valid native OOM/undefined-behavior equivalence. Numeric test collector callbacks are unreachable configuration anchors, not injected source failure leaves."
+        "No registered SMT context/kernel driver or whole generated helper/generator/global/locale/boolalpha completion credit. The seven literal defaults are followed by mandatory update, including source constructor false hi_div0 replaced by generated rewriter true. Invalid/cross-owner or incomplete-object, signed TLS overflow and native global-null lifetime conditions are explicitly guarded Go domains, not valid native OOM/undefined-behavior equivalence. Numeric test collector callbacks are unreachable configuration anchors, not injected source failure leaves.",
+        "No complete smt_params/context/kernel, registered SMT driver, whole generated helper/generator or native global/locale/boolalpha completion credit. Incomplete constructors return an explicitly diagnostic owner; Display/Update refuse before output/body while State can inspect actual initialized/published prefix. Cross-owner/null-global/closed/copy guards are precise Go domain evidence, not native null dereference equivalence. Source enum casts use fixed-width representation and signed ostream insertion; valid-enumerator oracle cases are distinct from out-of-domain conversion profiles."
       ]
     },
     {
       "path": "src/smt/params/theory_arith_params.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_smt_arith_params.go",
+        "util_smt_arith_params_source_test.go"
+      ],
+      "tests": [
+        "TestSMTArithAllFortySixLiteralDefaults",
+        "TestSMTArithSixteenGettersIndependentLocalModuleLiteralPaths",
+        "TestSMTArithSecondDeclarationRefusalKeepsFifteenFieldPrefix",
+        "TestSMTArithEveryWarmConstructorReservation",
+        "TestSMTArithFortySixDisplayChainsAllOutputPrefixesAndFlags",
+        "TestSMTArithEveryUnwarmedSharedModuleAcquisitionReservation",
+        "TestSMTArithNullGlobalConstructorAndForeignLocalReachedGuards"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Fifteen smt getter/publications before rewriter helper declaration, final eq2ineq, reverse lexical DT and forty-six ostream endl chains (src/smt/params/theory_arith_params.cpp:23-94)",
+          "status": "partial",
+          "go_target": "util_smt_arith_params.go",
+          "tests": [
+            "TestSMTArithAllFortySixLiteralDefaults",
+            "TestSMTArithSixteenGettersIndependentLocalModuleLiteralPaths",
+            "TestSMTArithSecondDeclarationRefusalKeepsFifteenFieldPrefix",
+            "TestSMTArithEveryWarmConstructorReservation",
+            "TestSMTArithFortySixDisplayChainsAllOutputPrefixesAndFlags",
+            "TestSMTArithEveryUnwarmedSharedModuleAcquisitionReservation",
+            "TestSMTArithNullGlobalConstructorAndForeignLocalReachedGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "Forty-six scalar members use exact declaration/default/display order. The actual smt helper is acquired before fifteen RHS/publications; the actual rewriter helper is acquired only after those complete, followed by eq2ineq. Each returned module ParamsRef stamps acquisition in the existing concrete shared helper engine; lexical reverse source destruction and exact stopped-child owning continuation remain separate. Reflected standalone wrapper/frame cold charges are Go lifetime representation, not native scalar/stack allocations; caller local/context/global owners remain borrowed."
+      ],
+      "deviations": [
+        "No complete smt_params/context/kernel, registered SMT driver, whole generated helper/generator or native global/locale/boolalpha completion credit. Incomplete constructors return an explicitly diagnostic owner; Display/Update refuse before output/body while State can inspect actual initialized/published prefix. Cross-owner/null-global/closed/copy guards are precise Go domain evidence, not native null dereference equivalence. Source enum casts use fixed-width representation and signed ostream insertion; valid-enumerator oracle cases are distinct from out-of-domain conversion profiles."
+      ]
     },
     {
       "path": "src/smt/params/theory_arith_params.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_smt_arith_params.go",
+        "util_smt_arith_params_source_test.go"
+      ],
+      "tests": [
+        "TestSMTArithAllFortySixLiteralDefaults",
+        "TestSMTArithSixteenGettersIndependentLocalModuleLiteralPaths",
+        "TestSMTArithSecondDeclarationRefusalKeepsFifteenFieldPrefix",
+        "TestSMTArithEveryWarmConstructorReservation",
+        "TestSMTArithFortySixDisplayChainsAllOutputPrefixesAndFlags",
+        "TestSMTArithEveryUnwarmedSharedModuleAcquisitionReservation",
+        "TestSMTArithNullGlobalConstructorAndForeignLocalReachedGuards"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -69019,9 +69115,28 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Forty-six declaration-order scalar defaults and mandatory constructor update (src/smt/params/theory_arith_params.h:53-164)",
+          "status": "partial",
+          "go_target": "util_smt_arith_params.go",
+          "tests": [
+            "TestSMTArithAllFortySixLiteralDefaults",
+            "TestSMTArithSixteenGettersIndependentLocalModuleLiteralPaths",
+            "TestSMTArithSecondDeclarationRefusalKeepsFifteenFieldPrefix",
+            "TestSMTArithEveryWarmConstructorReservation",
+            "TestSMTArithFortySixDisplayChainsAllOutputPrefixesAndFlags",
+            "TestSMTArithEveryUnwarmedSharedModuleAcquisitionReservation",
+            "TestSMTArithNullGlobalConstructorAndForeignLocalReachedGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "Forty-six scalar members use exact declaration/default/display order. The actual smt helper is acquired before fifteen RHS/publications; the actual rewriter helper is acquired only after those complete, followed by eq2ineq. Each returned module ParamsRef stamps acquisition in the existing concrete shared helper engine; lexical reverse source destruction and exact stopped-child owning continuation remain separate. Reflected standalone wrapper/frame cold charges are Go lifetime representation, not native scalar/stack allocations; caller local/context/global owners remain borrowed."
+      ],
+      "deviations": [
+        "No complete smt_params/context/kernel, registered SMT driver, whole generated helper/generator or native global/locale/boolalpha completion credit. Incomplete constructors return an explicitly diagnostic owner; Display/Update refuse before output/body while State can inspect actual initialized/published prefix. Cross-owner/null-global/closed/copy guards are precise Go domain evidence, not native null dereference equivalence. Source enum casts use fixed-width representation and signed ostream insertion; valid-enumerator oracle cases are distinct from out-of-domain conversion profiles."
+      ]
     },
     {
       "path": "src/smt/params/theory_array_params.cpp",
@@ -73365,13 +73480,17 @@
       "status": "partial",
       "go_targets": [
         "smt_literal.go",
-        "smt_literal_source_test.go"
+        "smt_literal_source_test.go",
+        "smt_literal_approx_set.go",
+        "smt_literal_approx_set_source_test.go"
       ],
       "tests": [
         "TestSMTLiteralSignedSentinelsAndSourceOperations",
         "TestSMTLiteralBackwardSubsumptionIndependentFiniteMultisets",
         "TestSMTLiteralSourceStreamSignedNullAndBooleanConstants",
-        "TestSMTLiteralSeparateInsertionFlagsAndEveryOutputReservation"
+        "TestSMTLiteralSeparateInsertionFlagsAndEveryOutputReservation",
+        "TestSMTLiteralApproxSetSource64CollisionAndSentinels",
+        "TestSMTLiteralApproxSetIndependentFiniteResidueAlgebra"
       ],
       "conditionals": [
         {
@@ -73402,13 +73521,24 @@
             "TestSMTLiteralSourceStreamSignedNullAndBooleanConstants",
             "TestSMTLiteralSeparateInsertionFlagsAndEveryOutputReservation"
           ]
+        },
+        {
+          "name": "Concrete SMT literal uint64 specialization: constructors, unsigned mapping, membership/collisions, all inline set algebra/predicates/reset (approx_set.h:43-154; smt_literal.h:114-116)",
+          "status": "ported",
+          "go_target": "smt_literal_approx_set.go",
+          "tests": [
+            "TestSMTLiteralApproxSetSource64CollisionAndSentinels",
+            "TestSMTLiteralApproxSetIndependentFiniteResidueAlgebra"
+          ]
         }
       ],
       "ownership": [
-        "Inline four-byte signed literal has no owning payload. Subsumption reads borrowed spans in source order; numeric ostream insertion uses the existing actual stream owner and preserves immediate output/cold graphs at every allocation refusal."
+        "Inline four-byte signed literal has no owning payload. Subsumption reads borrowed spans in source order; numeric ostream insertion uses the existing actual stream owner and preserves immediate output/cold graphs at every allocation refusal.",
+        "Concrete inline uint64 specialization owns no payload; range constructor only borrows input literals and preserves source iteration/collision behavior. No generics, ticket, owning wrapper or exact-set replacement."
       ],
       "deviations": [
-        "Go zero literal equals source true; source default construction explicitly calls DefaultSMTLiteral. Source signed-constructible variable domain is preserved without claiming C++ signed-overflow behavior. AST-aware/compact/vector display, neg_literals collection storage, literal approximate set, remaining SMT types and full context/kernel are still continuing dependencies. Source diff_logic literal fixtures are reused; the difference-logic graph test itself is not claimed ported."
+        "Go zero literal equals source true; source default construction explicitly calls DefaultSMTLiteral. Source signed-constructible variable domain is preserved without claiming C++ signed-overflow behavior. AST-aware/compact/vector display, neg_literals collection storage, literal approximate set, remaining SMT types and full context/kernel are still continuing dependencies. Source diff_logic literal fixtures are reused; the difference-logic graph test itself is not claimed ported.",
+        "This closes the complete literal_approx_set specialization, not generic approximate-set families, uint64 unsigned iterator/display/size, literal vector storage, AST-aware display, other SMT types or actual context/conflict-resolution drivers."
       ]
     },
     {
@@ -100481,10 +100611,14 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "sat_approx_set.go"
+        "sat_approx_set.go",
+        "smt_literal_approx_set.go",
+        "smt_literal_approx_set_source_test.go"
       ],
       "tests": [
-        "TestSATApproximation"
+        "TestSATApproximation",
+        "TestSMTLiteralApproxSetSource64CollisionAndSentinels",
+        "TestSMTLiteralApproxSetIndependentFiniteResidueAlgebra"
       ],
       "conditionals": [
         {
@@ -100522,12 +100656,24 @@
           "tests": [
             "TestSATApproximation"
           ]
+        },
+        {
+          "name": "Concrete SMT literal uint64 specialization: constructors, unsigned mapping, membership/collisions, all inline set algebra/predicates/reset (approx_set.h:43-154; smt_literal.h:114-116)",
+          "status": "ported",
+          "go_target": "smt_literal_approx_set.go",
+          "tests": [
+            "TestSMTLiteralApproxSetSource64CollisionAndSentinels",
+            "TestSMTLiteralApproxSetIndependentFiniteResidueAlgebra"
+          ]
         }
       ],
       "ownership": [
-        "Scalar uint32 SAT specialization only; generic adapters, 64-bit specialization and iterator remain unported."
+        "Scalar uint32 SAT specialization only; generic adapters, 64-bit specialization and iterator remain unported.",
+        "Concrete inline uint64 specialization owns no payload; range constructor only borrows input literals and preserves source iteration/collision behavior. No generics, ticket, owning wrapper or exact-set replacement."
       ],
-      "deviations": []
+      "deviations": [
+        "This closes the complete literal_approx_set specialization, not generic approximate-set families, uint64 unsigned iterator/display/size, literal vector storage, AST-aware display, other SMT types or actual context/conflict-resolution drivers."
+      ]
     },
     {
       "path": "src/util/array.h",
