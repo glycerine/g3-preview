@@ -13,6 +13,8 @@ import (
 // The created cohort is charged Go abort metadata for returned zero-RC locals;
 // it is not a source buffer or a source destructor repairing abandoned locals.
 type polynomialSquareRootScope struct {
+	invocation                                                   uint64
+	orphanInvocations                                            []uint64
 	values                                                       [4]Int
 	two                                                          Int
 	mask                                                         uint8
@@ -121,14 +123,17 @@ func (m *MultivariatePolynomialManager) reserveSquareRootCreated() error {
 		return nil
 	}
 	n := cap(s.orphans)*2 + 1
-	stride := uint64(reflect.TypeOf(Monomial{}).Size())
+	stride := uint64(reflect.TypeOf(Monomial{}).Size()) + 8
 	if e := m.core.integer.budget.Reserve(uint64(n) * stride); e != nil {
 		return e
 	}
 	next := make([]Monomial, len(s.orphans), n)
 	copy(next, s.orphans)
+	tags := make([]uint64, len(s.orphanInvocations), n)
+	copy(tags, s.orphanInvocations)
 	m.core.integer.budget.Release(uint64(cap(s.orphans)) * stride)
 	s.orphans = next
+	s.orphanInvocations = tags
 	return nil
 }
 func (m *MultivariatePolynomialManager) squareRootMonomial(op uint8, a, b Monomial) (Monomial, bool, error) {
@@ -159,6 +164,7 @@ func (m *MultivariatePolynomialManager) squareRootMonomial(op uint8, a, b Monomi
 	if e == nil && outcome.created {
 		idx := uint32(len(s.orphans))
 		s.orphans = append(s.orphans, p)
+		s.orphanInvocations = append(s.orphanInvocations, s.invocation)
 		l := &c.monomials.locations[p.slot-1]
 		l.squareRootCohort = s
 		l.squareRootSlot = idx
@@ -299,11 +305,18 @@ func (m *MultivariatePolynomialManager) finishSquareRoot(cause error) error {
 	return cause
 }
 func (m *MultivariatePolynomialManager) beginSquareRoot() error {
+	return m.beginSquareRootWithReceipt(nil)
+}
+func (m *MultivariatePolynomialManager) beginSquareRootWithReceipt(receipt *polynomialSqrtInvocationReceipt) error {
 	s := &m.squareRoot
 	if s.active {
 		return ErrPolynomialPending
 	}
-	orphans, drain := s.orphans, s.drain
+	if s.invocation == ^uint64(0) {
+		return ErrPolynomialPending
+	}
+	nonce := s.invocation + 1
+	orphans, tags, drain := s.orphans, s.orphanInvocations, s.drain
 	live := false
 	for _, a := range orphans {
 		if a != (Monomial{}) {
@@ -313,13 +326,20 @@ func (m *MultivariatePolynomialManager) beginSquareRoot() error {
 	}
 	if !live {
 		orphans = orphans[:0]
+		tags = tags[:0]
 		drain = 0
 	}
-	*s = polynomialSquareRootScope{active: true, executing: true, orphans: orphans, drain: drain, mask: 1}
+	*s = polynomialSquareRootScope{invocation: nonce, active: true, executing: true, orphans: orphans, orphanInvocations: tags, drain: drain, mask: 1}
 	m.core.squareRootOwner = s
+	if receipt != nil {
+		*receipt = polynomialSqrtInvocationReceipt{manager: m, frame: s, invocation: s.invocation}
+	}
 	return nil
 }
-func (m *MultivariatePolynomialManager) Sqrt(p Polynomial, r *PolynomialRef) (ok bool, cause error) {
+func (m *MultivariatePolynomialManager) Sqrt(p Polynomial, r *PolynomialRef) (bool, error) {
+	return m.sqrtWithReceipt(p, r, nil)
+}
+func (m *MultivariatePolynomialManager) sqrtWithReceipt(p Polynomial, r *PolynomialRef, receipt *polynomialSqrtInvocationReceipt) (ok bool, cause error) {
 	if e := m.ready(); e != nil {
 		return false, e
 	}
@@ -338,7 +358,7 @@ func (m *MultivariatePolynomialManager) Sqrt(p Polynomial, r *PolynomialRef) (ok
 	if s.active {
 		return false, ErrPolynomialPending
 	}
-	if e = m.beginSquareRoot(); e != nil {
+	if e = m.beginSquareRootWithReceipt(receipt); e != nil {
 		return false, e
 	}
 	defer func() { cause = m.finishSquareRoot(cause) }()
@@ -527,6 +547,9 @@ func (m *MultivariatePolynomialManager) Sqrt(p Polynomial, r *PolynomialRef) (ok
 
 // Explicit owning abort, independent of literal stopped source destruction.
 func (m *MultivariatePolynomialManager) CleanupSqrt() error {
+	return m.cleanupSqrtModeOwned(true, 0, &m.squareRoot.drain)
+}
+func (m *MultivariatePolynomialManager) cleanupSqrtModeOwned(abort bool, invocation uint64, cursor *uint32) error {
 	if e := m.identity(); e != nil {
 		return e
 	}
@@ -541,22 +564,26 @@ func (m *MultivariatePolynomialManager) CleanupSqrt() error {
 	if s.executing {
 		return ErrPolynomialPending
 	}
-	if s.perfectSquareGeneration != 0 && c.integer.perfectSquareGeneration == s.perfectSquareGeneration {
+	if s.perfectSquareGeneration != 0 && c.integer.perfectSquareGeneration == s.perfectSquareGeneration && (abort || c.integer.perfectSquare.endEntered) {
 		if e := c.integer.CleanupPerfectSquare(); e != nil {
 			s.cleanupCause = e
 			return e
 		}
 	}
-	s.perfectSquareGeneration = 0
+	if abort || !c.integer.perfectSquare.active {
+		s.perfectSquareGeneration = 0
+	}
 	if e := s.reference.drop(c, &s.reference.value, &s.reference.consumed, true); e != nil {
 		s.cleanupCause = e
 		return e
 	}
-	if e := s.reference.drop(c, &s.reference.incoming, &s.reference.incomingConsumed, true); e != nil {
-		s.cleanupCause = e
-		return e
+	if abort {
+		if e := s.reference.drop(c, &s.reference.incoming, &s.reference.incomingConsumed, true); e != nil {
+			s.cleanupCause = e
+			return e
+		}
+		s.reference.assigning = false
 	}
-	s.reference.assigning = false
 	s.referenceCompleted = false
 	for i := 3; i >= 0; i-- {
 		if e := c.integer.Del(&s.values[i]); e != nil {
@@ -565,6 +592,9 @@ func (m *MultivariatePolynomialManager) CleanupSqrt() error {
 		}
 	}
 	s.mask = 0
+	if !abort {
+		return nil
+	}
 	if e := c.integer.Del(&s.two); e != nil {
 		s.cleanupCause = e
 		return e
@@ -596,15 +626,8 @@ func (m *MultivariatePolynomialManager) CleanupSqrt() error {
 		}
 		s.calleeGeneration = 0
 	}
-	for s.drain < uint32(len(s.orphans)) {
-		p := &s.orphans[s.drain]
-		if *p != (Monomial{}) {
-			if e := c.monomials.CleanupValue(p); e != nil {
-				s.cleanupCause = e
-				return e
-			}
-		}
-		s.drain++
+	if e := m.cleanupSqrtOrphanInvocation(invocation, cursor); e != nil {
+		return e
 	}
 	if s.numericPending != (memory.ObjectRef{}) {
 		if c.integer.pendingCell.object == s.numericPending {
@@ -654,8 +677,9 @@ func (m *MultivariatePolynomialManager) closeSquareRootMetadata() error {
 		return e
 	}
 	s := &m.squareRoot
-	m.originalBudget.Release(uint64(cap(s.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size()))
+	m.originalBudget.Release(uint64(cap(s.orphans))*uint64(reflect.TypeOf(Monomial{}).Size()) + uint64(cap(s.orphanInvocations))*8)
 	s.orphans = nil
+	s.orphanInvocations = nil
 	s.drain = 0
 	return nil
 }

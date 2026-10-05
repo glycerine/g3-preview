@@ -93,6 +93,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	public = append(public, &full.squareRoot.two)
 	public = append(public, input...)
 	adapterBytes += uint64(cap(full.squareRoot.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size())
+	adapterBytes += uint64(cap(full.squareRoot.orphanInvocations)) * 8
 
 	adapterBytes += uint64(cap(full.gcdFrames)) * uint64(reflect.TypeOf((*polynomialGCDFunctionScope)(nil)).Size())
 	for _, f := range full.gcdFrames {

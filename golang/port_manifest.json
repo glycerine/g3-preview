@@ -28634,7 +28634,9 @@
         "mpnum/polynomial_primitive_public_source_test.go",
         "mpnum/polynomial_square_free.go",
         "mpnum/polynomial_square_free_source_test.go",
-        "mpnum/polynomial_coefficient_receipt.go"
+        "mpnum/polynomial_coefficient_receipt.go",
+        "mpnum/polynomial_sqrt_invocation.go",
+        "mpnum/polynomial_sqrt_invocation_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -29182,7 +29184,14 @@
         "TestPolynomialCoefficientReceiptPreservesOlderForeignConstructor",
         "TestPolynomialCoefficientReceiptUniqueFrameAndRejectedEntry",
         "TestPolynomialCoefficientReceiptCachedMonomialCreatesNoLeafAuthority",
-        "TestPolynomialCoefficientReceiptActualCalleeCompletionClearsTag"
+        "TestPolynomialCoefficientReceiptActualCalleeCompletionClearsTag",
+        "TestPolynomialSqrtInvocationGuardAndActualAcquisition",
+        "TestPolynomialSqrtReceiptPreservesOlderActualFalseQuotientCohort",
+        "TestPolynomialSqrtReceiptCompletedNUMBeforeUnjoinedAbort",
+        "TestPolynomialSqrtInvocationCompletedPhasePreservesUnenteredPerfectSquare",
+        "TestPolynomialSqrtInvocationPreservesLaterForeignPerfectSquare",
+        "TestPolynomialSqrtReceiptOlderCohortTransfersAtActualLaterINC",
+        "TestPolynomialSqrtInvocationBigNumeralEveryReservation"
       ],
       "conditionals": [
         {
@@ -32210,6 +32219,20 @@
           "tests": [
             "TestPolynomialParentFactoryHelpersEveryActualPrefix"
           ]
+        },
+        {
+          "name": "Selected same sqrt cpp5964-6068 internal exact invocation receipt: guarded actual begin/nonce; completed source child acknowledgement versus later unjoined owning abort; created-only cohort tag at returned-new append and consumed actual INC",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_sqrt_invocation.go",
+          "tests": [
+            "TestPolynomialSqrtInvocationGuardAndActualAcquisition",
+            "TestPolynomialSqrtReceiptPreservesOlderActualFalseQuotientCohort",
+            "TestPolynomialSqrtReceiptCompletedNUMBeforeUnjoinedAbort",
+            "TestPolynomialSqrtInvocationCompletedPhasePreservesUnenteredPerfectSquare",
+            "TestPolynomialSqrtInvocationPreservesLaterForeignPerfectSquare",
+            "TestPolynomialSqrtReceiptOlderCohortTransfersAtActualLaterINC",
+            "TestPolynomialSqrtInvocationBigNumeralEveryReservation"
+          ]
         }
       ],
       "ownership": [
@@ -32271,7 +32294,8 @@
         "Coefficient optional exact core/frame/nonwrapping invocation receipts record actual monomial factory started/created outcomes and only new pending allocator tokens at its actual Allocate leaf",
         "Actual successful monomial INC transfers generated authority; exact creation completion clears matching coefficient callee tag; borrowed cached monomials acquire no new factory authority",
         "Parent optional Neg/ScalarDiv arguments route through unchanged arithmetic engines and actual shared append/factory acquisition; incoming polynomial INC transfers raw factory before old DEC/callback",
-        "Parent Discriminant, ordered foreign mixed-cohort retirement and NUM DT after published factory stop proofs remain open"
+        "Parent Discriminant, ordered foreign mixed-cohort retirement and NUM DT after published factory stop proofs remain open",
+        "Actual sqrt lexical NUM/reference fields and matched perfect-square endEntered distinction; stale/foreign generations preserved; actual charged orphan/tag backing old+new capacity; source first cause/stage retained through owning continuation; partial ownership prerequisite, no whole-unit completion."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -32324,7 +32348,10 @@
         "WASM/WASI/race deferred per project instructions",
         "Selected algorithms and explicit Runtime/NUM cohorts only. Actual signed-TLS/consumed-raw proofs exercise guarded owner domains, not claimed ordinary mathematical OOM reachability. Global mgcd_check/TRACE/assertion dispatcher/native ostream/other ABI and source expression-driver construction remain open. Original tst_polynomial returns after PSC: dormant GCD/primitive source fixture bodies have zero active-driver credit. Eight original PSC cases reach first coefficient8, second coefficient5 and Resultant8 selected ENSURE expressions (21 dynamic expressions at3 static sites); full original registered-driver lifecycle/printing is not promoted.",
         "Actual public TLS near-minimum release fixture reaches guarded source signed-host undefined arithmetic domain, not ordinary free OOM. Zero registered driver assertion credit and no unit promotion; full Factor/Discriminant, parent lexical lifetimes and mixed foreign ordered cohort retirement remain open. Factory/append interrupted move has no ordinary reservation point between source slot clear and destination write; no manufactured reservation coverage is claimed.",
-        "Original tst_sqf seven expressions are dormant: zero registered source driver credit. Literal GF2 derivative-zero GCD/exact-division result is preserved. Source units remain partial; full parent Factor and strict UP prime/Hensel suffixes remain open."
+        "Original tst_sqf seven expressions are dormant: zero registered source driver credit. Literal GF2 derivative-zero GCD/exact-division result is preserved. Source units remain partial; full parent Factor and strict UP prime/Hensel suffixes remain open.",
+        "Sqrt optional receipts and orphan invocation tags are charged Go ownership adaptation; no native allocation ticket/source event.",
+        "Real public TLS postphysical release/allocation profiles test signed-host guarded owner-primitive domains, not ordinary mathematical free-failure reachability.",
+        "No dormant original source driver assertion credit; full parent Factor and strict UP prime/Hensel remains open."
       ]
     },
     {

@@ -383,6 +383,7 @@ func (m *MonomialManager) incRefCore(a Monomial) error {
 	}
 	if d := l.squareRootCohort; d != nil && uint64(l.squareRootSlot) < uint64(len(d.orphans)) && d.orphans[l.squareRootSlot] == a {
 		d.orphans[l.squareRootSlot] = Monomial{}
+		d.orphanInvocations[l.squareRootSlot] = 0
 		l.squareRootCohort = nil
 		l.squareRootSlot = 0
 	}
