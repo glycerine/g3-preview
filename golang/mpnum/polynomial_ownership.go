@@ -157,6 +157,9 @@ func (m *MultivariatePolynomialCore) generatedVariable(v, k uint32) (Monomial, e
 	}
 	if e == nil && outcome.created {
 		m.generatedMonomial = a
+		if f := m.factorsOwner; f != nil && f.executing && m.callbackDepth == 0 {
+			f.generated = a
+		}
 		if s := m.toPolynomialOwner; s != nil && s.executing && m.callbackDepth == 0 {
 			s.generated = a
 		}
@@ -185,6 +188,9 @@ func (m *MultivariatePolynomialCore) generatedProduct(a, b Monomial) (Monomial, 
 	}
 	if e == nil && outcome.created {
 		m.generatedMonomial = r
+		if f := m.factorsOwner; f != nil && f.executing && m.callbackDepth == 0 {
+			f.generated = r
+		}
 		if s := m.compositionOwner; s != nil && s.executing {
 			s.coreGenerated = r
 		}
@@ -200,6 +206,9 @@ func (m *MultivariatePolynomialCore) generatedProduct(a, b Monomial) (Monomial, 
 	return r, e
 }
 func (m *MultivariatePolynomialCore) transferGeneratedMonomial() {
+	if f := m.factorsOwner; f != nil && f.generated == m.generatedMonomial {
+		f.generated = Monomial{}
+	}
 	if s := m.toPolynomialOwner; s != nil && s.generated == m.generatedMonomial {
 		s.generated = Monomial{}
 	}
@@ -269,6 +278,9 @@ func (m *MultivariatePolynomialCore) recordGeneratedCallee(outcome monomialFacto
 	c := &m.monomials.creation
 	if !outcome.started || outcome.generation == 0 || c.generation != outcome.generation {
 		return
+	}
+	if f := m.factorsOwner; f != nil && f.executing && m.callbackDepth == 0 {
+		f.calleeGeneration = outcome.generation
 	}
 	m.generatedCalleePending = true
 	m.generatedCalleeGeneration = outcome.generation

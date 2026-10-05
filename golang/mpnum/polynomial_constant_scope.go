@@ -32,6 +32,9 @@ func (m *MultivariatePolynomialCore) beginConstantScope() error {
 		return ErrPolynomialPending
 	}
 	m.constantGeneration++
+	if f := m.factorsOwner; f != nil && f.executing && m.callbackDepth == 0 {
+		f.constantGeneration = m.constantGeneration
+	}
 	m.constantScope = polynomialConstantScope{active: true, rational: NewRational()}
 	if s := m.compositionOwner; s != nil && s.executing {
 		s.constantGeneration = m.constantGeneration
@@ -135,6 +138,9 @@ func (m *MultivariatePolynomialCore) cleanupConstantScope() error {
 		// operation receipt. Acknowledge its actual owning consumption here;
 		// no directory/refcount inference or second deletion is performed.
 		if s.result == (Polynomial{}) {
+			if f := m.factorsOwner; f != nil && f.constantGeneration == m.constantGeneration && f.freshResult == result {
+				f.freshResult = Polynomial{}
+			}
 			if c := m.compositionOwner; c != nil && c.constantGeneration == m.constantGeneration && c.freshResult == result {
 				c.freshResult = Polynomial{}
 			}

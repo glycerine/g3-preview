@@ -48,6 +48,9 @@ func (r *polynomialReference) assign(m *MultivariatePolynomialCore, p Polynomial
 			return e
 		}
 	}
+	if f := m.factorsOwner; f != nil && f.executing && m.callbackDepth == 0 && f.freshResult == p {
+		f.freshResult = Polynomial{}
+	}
 	r.incoming = p
 	r.assigning = true
 	// Actual INC has completed and this real caller reference now owns incoming.

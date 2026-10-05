@@ -89,6 +89,10 @@ func (m *MultivariatePolynomialCore) displayFrame(sink PolynomialTextSink) (*pol
 		if !f.active {
 			s.next++
 			*f = polynomialDisplayFrame{owner: m, parent: s.current, sink: sink, generation: s.next, active: true}
+			if owner := m.factorsOwner; owner != nil && owner.executing && m.callbackDepth == 0 {
+				owner.displayReceipt = f
+				owner.displayGeneration = f.generation
+			}
 			return f, nil
 		}
 	}
@@ -108,6 +112,10 @@ func (m *MultivariatePolynomialCore) displayFrame(sink PolynomialTextSink) (*pol
 	}
 	s.next++
 	f := &polynomialDisplayFrame{owner: m, parent: s.current, sink: sink, generation: s.next, active: true}
+	if owner := m.factorsOwner; owner != nil && owner.executing && m.callbackDepth == 0 {
+		owner.displayReceipt = f
+		owner.displayGeneration = f.generation
+	}
 	s.frames = append(s.frames, f)
 	return f, nil
 }
@@ -342,30 +350,42 @@ func (m *MultivariatePolynomialCore) CleanupDisplay() error {
 		if f.sink != nil || f.monomialSink != nil || f.inserting {
 			return ErrPolynomialPending
 		}
-		f.limbs.active = false
-		if e := m.integer.natural.cleanupFormattingScope(&f.limbs); e != nil {
-			f.cleanupCause = e
+		if e := m.cleanupDisplayFrame(f); e != nil {
 			return e
 		}
-		if e := f.characters.finalize(m.memory); e != nil {
-			f.cleanupCause = e
-			return e
-		}
-		f.characterCompleted = false
-		f.characterPending = false
-		if f.constructed {
-			if e := m.integer.Del(&f.numeral); e != nil {
-				f.cleanupCause = e
-				return e
-			}
-			f.constructed = false
-		}
-		if e := f.numeric.cleanup(m.integer); e != nil {
-			f.cleanupCause = e
-			return e
-		}
-		f.active = false
 	}
+	return nil
+}
+func (m *MultivariatePolynomialCore) cleanupDisplayFrame(f *polynomialDisplayFrame) error {
+	if !f.active {
+		return nil
+	}
+	if f.sink != nil || f.monomialSink != nil || f.inserting {
+		return ErrPolynomialPending
+	}
+	f.limbs.active = false
+	if e := m.integer.natural.cleanupFormattingScope(&f.limbs); e != nil {
+		f.cleanupCause = e
+		return e
+	}
+	if e := f.characters.finalize(m.memory); e != nil {
+		f.cleanupCause = e
+		return e
+	}
+	f.characterCompleted = false
+	f.characterPending = false
+	if f.constructed {
+		if e := m.integer.Del(&f.numeral); e != nil {
+			f.cleanupCause = e
+			return e
+		}
+		f.constructed = false
+	}
+	if e := f.numeric.cleanup(m.integer); e != nil {
+		f.cleanupCause = e
+		return e
+	}
+	f.active = false
 	return nil
 }
 func (m *MultivariatePolynomialManager) CleanupDisplay() error {

@@ -1,0 +1,50 @@
+// Source: src/math/polynomial/polynomial.cpp:1613-1683;
+// src/util/vector.h; src/util/mpz.cpp.
+// Licensed under the MIT license. Source author: Leonardo de Moura.
+package mpnum
+
+import (
+	"github.com/glycerine/g3/golang/memory"
+	"testing"
+)
+
+func polynomialFactorsAudit(t *testing.T, f *PolynomialFactors, caller []Polynomial, input []*Int, refs ...*PolynomialRef) {
+	polynomialFactorsAuditExtra(t, f, caller, input, 0, refs...)
+}
+func polynomialFactorsAuditExtra(t *testing.T, f *PolynomialFactors, caller []Polynomial, input []*Int, extraHeader uint64, refs ...*PolynomialRef) {
+	t.Helper()
+	m := f.manager.core
+	polys := append([]Polynomial(nil), caller...)
+	add := func(p Polynomial) {
+		if p == (Polynomial{}) {
+			return
+		}
+		l, e := m.polynomialLocation(p)
+		serviceMust(t, e)
+		if !l.released {
+			polys = append(polys, p)
+		}
+	}
+	for i, phase := range f.phases {
+		if phase == 0 || phase == factorDrained || phase == factorDropConsumed {
+			continue
+		}
+		p, e := f.factor(uint32(i))
+		serviceMust(t, e)
+		add(p)
+	}
+	add(f.current.value)
+	add(f.current.incoming)
+	add(f.freshResult)
+	h := f.header + uint64(cap(f.phases)) + extraHeader
+	for _, r := range refs {
+		if r != nil && !r.closed {
+			h += r.header
+			add(r.root.value)
+			add(r.root.incoming)
+		}
+	}
+	input = append(input, &f.constant, &f.local)
+	raw := []memory.Block{f.factors.raw, f.factors.pending, f.factors.old, f.degrees.raw, f.degrees.pending, f.degrees.old}
+	polynomialImpPhysicalAuditNamedExtra(t, f.manager, polys, input, h, raw)
+}

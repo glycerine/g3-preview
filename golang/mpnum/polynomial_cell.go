@@ -185,7 +185,13 @@ func (m *MultivariatePolynomialCore) DecRef(p Polynomial) error {
 	}
 	return m.decRefCore(p)
 }
+
+type polynomialDecrementOutcome struct{ consumed, last bool }
+
 func (m *MultivariatePolynomialCore) decRefCore(p Polynomial) error {
+	return m.decRefCoreOutcome(p, nil)
+}
+func (m *MultivariatePolynomialCore) decRefCoreOutcome(p Polynomial, out *polynomialDecrementOutcome) error {
 	r, e := m.readWord(p, 0)
 	if e != nil {
 		return e
@@ -196,6 +202,10 @@ func (m *MultivariatePolynomialCore) decRefCore(p Polynomial) error {
 	r--
 	if e = m.writeWord(p, 0, r); e != nil {
 		return e
+	}
+	if out != nil {
+		out.consumed = true
+		out.last = r == 0
 	}
 	if r == 0 {
 		return m.deleteCore(p)

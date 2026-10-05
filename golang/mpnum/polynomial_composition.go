@@ -1201,20 +1201,37 @@ func (m *MultivariatePolynomialManager) finishCompositionResult(p Polynomial, e 
 // Observe only around an actually reached numeric manager call, without
 // converting the allocator's retained directory into operation ownership.
 type polynomialCompositionNumericSnapshot struct {
-	scope  *polynomialCompositionScope
-	object memory.ObjectRef
-	raw    [3]memory.Block
+	factors       *PolynomialFactors
+	factorsBefore polynomialNumericRoots
+	scope         *polynomialCompositionScope
+	object        memory.ObjectRef
+	raw           [3]memory.Block
 }
 
 func (c *MultivariatePolynomialCore) compositionNumericBefore() (polynomialCompositionNumericSnapshot, error) {
+	before := polynomialCompositionNumericSnapshot{}
+	if f := c.factorsOwner; f != nil && f.executing && c.callbackDepth == 0 {
+		var e error
+		before.factors = f
+		before.factorsBefore, e = polynomialNumericBefore(c.integer)
+		if e != nil {
+			return before, e
+		}
+	}
 	s := c.compositionOwner
 	if s == nil || !s.executing {
-		return polynomialCompositionNumericSnapshot{}, nil
+		return before, nil
 	}
 	raw, e := c.integer.allocator.PendingRoots()
-	return polynomialCompositionNumericSnapshot{scope: s, object: c.integer.pendingCell.object, raw: raw}, e
+	before.scope = s
+	before.object = c.integer.pendingCell.object
+	before.raw = raw
+	return before, e
 }
 func (c *MultivariatePolynomialCore) compositionNumericAfter(before polynomialCompositionNumericSnapshot, cause error) error {
+	if f := before.factors; f != nil && f.executing && c.callbackDepth == 0 {
+		cause = errors.Join(cause, f.numeric.after(c.integer, before.factorsBefore))
+	}
 	s := before.scope
 	if s == nil || !s.executing {
 		return cause

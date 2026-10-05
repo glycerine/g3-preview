@@ -281,6 +281,10 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 	}
 	m.creationGeneration++
 	m.pending = polynomialCreation{generation: m.creationGeneration}
+	if f := m.factorsOwner; f != nil && f.executing && m.callbackDepth == 0 {
+		m.pending.factorsParent = f
+		f.factoryGeneration = m.creationGeneration
+	}
 	if owner := m.squareRootOwner; owner != nil && owner.executing && m.callbackDepth == 0 {
 		m.pending.squareRootParent = owner
 		owner.factoryGeneration = m.creationGeneration
@@ -308,7 +312,7 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 	observer := m.pending.compositionParent
 	squareObserver := m.pending.squareRootParent
 	var before [3]memory.Block
-	if observer != nil || squareObserver != nil || m.pending.toPolynomialParent != nil || m.pending.conversionParent != nil {
+	if observer != nil || squareObserver != nil || m.pending.toPolynomialParent != nil || m.pending.conversionParent != nil || m.pending.factorsParent != nil {
 		var e error
 		before, e = m.monomials.allocator.PendingRoots()
 		if e != nil {
@@ -350,6 +354,15 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 		}
 		if probe != nil {
 			return Polynomial{}, errors.Join(e, probe)
+		}
+	}
+	if f := m.pending.factorsParent; f != nil && before == ([3]memory.Block{}) {
+		after, x := m.monomials.allocator.PendingRoots()
+		if after != ([3]memory.Block{}) {
+			f.monomialRaw = after
+		}
+		if x != nil {
+			return Polynomial{}, errors.Join(e, x)
 		}
 	}
 	if e != nil {
@@ -438,6 +451,9 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 			if m.pscReceipts.singleton == term {
 				m.pscReceipts.singleton = Monomial{}
 			}
+			if f := m.factorsOwner; f != nil && f.singleton == term && f.singletonGeneration == m.singletonGeneration {
+				f.singleton = Monomial{}
+			}
 			m.singletonReference = false
 			m.singletonMonomial = Monomial{}
 		}
@@ -488,6 +504,10 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 	if owner := m.pending.squareRootParent; owner != nil && owner.factoryGeneration == m.pending.generation {
 		owner.factoryGeneration = 0
 		owner.freshResult = p
+	}
+	if f := m.pending.factorsParent; f != nil && f.factoryGeneration == m.pending.generation {
+		f.factoryGeneration = 0
+		f.freshResult = p
 	}
 	m.pending = polynomialCreation{}
 	m.live++

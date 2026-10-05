@@ -3,6 +3,10 @@
 package mpnum
 
 func (m *MultivariatePolynomialCore) checkpoint() error {
+	if f := m.factorsOwner; f != nil && f.executing {
+		f.executing = false
+		defer func() { f.executing = true }()
+	}
 	if s := m.compositionOwner; s != nil && s.executing {
 		s.executing = false
 		defer func() { s.executing = true }()

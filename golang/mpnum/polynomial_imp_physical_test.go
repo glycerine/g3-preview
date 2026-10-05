@@ -19,6 +19,9 @@ func polynomialImpPhysicalAuditValues(t *testing.T, full *MultivariatePolynomial
 	polynomialImpPhysicalAuditNamed(t, full, polys, nil, 0, supplied...)
 }
 func polynomialImpPhysicalAuditNamed(t *testing.T, full *MultivariatePolynomialManager, polys []Polynomial, input []*Int, externalHeaders uint64, supplied ...*memory.SmallAllocator) {
+	polynomialImpPhysicalAuditNamedExtra(t, full, polys, input, externalHeaders, nil, supplied...)
+}
+func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolynomialManager, polys []Polynomial, input []*Int, externalHeaders uint64, extraRaw []memory.Block, supplied ...*memory.SmallAllocator) {
 	t.Helper()
 	m := full.core
 	owners := []*PolynomialNewtonInterpolator{}
@@ -27,6 +30,7 @@ func polynomialImpPhysicalAuditNamed(t *testing.T, full *MultivariatePolynomialM
 	lazy := []*PolynomialNewtonVector{&full.newton}
 	handlers := []*PolynomialDeletionHandler{}
 	external := []memory.Block{m.tmp1.raw, m.tmp1.pending, full.degree2pos.raw, full.degree2pos.pending, full.lexPermutation.raw, full.lexPermutation.pending, full.varDegrees.raw, full.varDegrees.pending, m.substitution.found.raw, m.substitution.found.pending, m.substitution.max.maxDegree.raw, m.substitution.max.maxDegree.pending, m.substitution.max.variables.raw, m.substitution.max.variables.pending, m.substitution.positions.positions.raw, m.substitution.positions.positions.pending}
+	external = append(external, extraRaw...)
 	external = append(external, full.lexBuckets.data.raw, full.lexBuckets.data.pending, full.lexBuckets.data.old)
 	for i := range full.lexBuckets.children {
 		v := &full.lexBuckets.children[i]

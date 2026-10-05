@@ -28570,7 +28570,9 @@
         "mpnum/mpn_format_scope.go",
         "mpnum/polynomial_display.go",
         "mpnum/polynomial_display_source_test.go",
-        "mpnum/polynomial_display_tls_test.go"
+        "mpnum/polynomial_display_tls_test.go",
+        "mpnum/polynomial_factors.go",
+        "mpnum/polynomial_factors_operations.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -28985,7 +28987,28 @@
         "TestPolynomialDisplayMonomialWrapperAndFiniteField",
         "TestPolynomialDisplayYoungerStoppedDestructor",
         "TestPolynomialDisplayExactNumericReceiptAndReplacement",
-        "TestPolynomialDisplaySinkCreatesForeignPending"
+        "TestPolynomialDisplaySinkCreatesForeignPending",
+        "TestPolynomialFactorsAbortOwnsReachedCalleesOnly",
+        "TestPolynomialFactorsCallbackForeignFactoryAndIncoming",
+        "TestPolynomialFactorsConstantFactoryOwnsSingleton",
+        "TestPolynomialFactorsConstantHelpersEveryReservation",
+        "TestPolynomialFactorsConstructorColdRefusal",
+        "TestPolynomialFactorsDisplayEveryReservation",
+        "TestPolynomialFactorsDisplayReachesSizeAfterCallback",
+        "TestPolynomialFactorsFailedPushScalarQueries",
+        "TestPolynomialFactorsFreshNullVersusDestroyedConstant",
+        "TestPolynomialFactorsLiteralDisplayAndConstantHelpers",
+        "TestPolynomialFactorsModularAndZeroDegreeSource",
+        "TestPolynomialFactorsMultiplyEveryReservation",
+        "TestPolynomialFactorsMultiplyFiniteAndAlias",
+        "TestPolynomialFactorsPushEveryReservation",
+        "TestPolynomialFactorsResetActualConsumedDrop",
+        "TestPolynomialFactorsResetActualTLSConsumedConstant",
+        "TestPolynomialFactorsSingletonForeignReplacement",
+        "TestPolynomialFactorsSourceControlAndOwnership",
+        "TestPolynomialFactorsSourceDegreeQuirkAndWrap",
+        "TestPolynomialFactorsSourceFinalizeAndClosedGuards",
+        "TestPolynomialFactorsYoungerPowerStop"
       ],
       "conditionals": [
         {
@@ -31701,6 +31724,57 @@
             "TestPolynomialDisplayExactNumericReceiptAndReplacement",
             "TestPolynomialDisplaySinkCreatesForeignPending"
           ]
+        },
+        {
+          "name": "manager::factors ctor/destructor/reset/push/accessors/set_constant/set_degree/operator[] cpp1613-1638,1672-1684 and h120-190; source lifecycle versus explicit owning abort",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_factors.go",
+          "tests": [
+            "TestPolynomialFactorsConstructorColdRefusal",
+            "TestPolynomialFactorsFailedPushScalarQueries",
+            "TestPolynomialFactorsFreshNullVersusDestroyedConstant",
+            "TestPolynomialFactorsPushEveryReservation",
+            "TestPolynomialFactorsResetActualConsumedDrop",
+            "TestPolynomialFactorsResetActualTLSConsumedConstant",
+            "TestPolynomialFactorsSourceControlAndOwnership",
+            "TestPolynomialFactorsSourceDegreeQuirkAndWrap",
+            "TestPolynomialFactorsSourceFinalizeAndClosedGuards"
+          ]
+        },
+        {
+          "name": "manager::factors multiply cpp1640-1661; literal per-loop reference/Power/mul/scalar-mul and exact operation receipts",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_factors_operations.go",
+          "tests": [
+            "TestPolynomialFactorsAbortOwnsReachedCalleesOnly",
+            "TestPolynomialFactorsCallbackForeignFactoryAndIncoming",
+            "TestPolynomialFactorsConstantFactoryOwnsSingleton",
+            "TestPolynomialFactorsModularAndZeroDegreeSource",
+            "TestPolynomialFactorsMultiplyEveryReservation",
+            "TestPolynomialFactorsMultiplyFiniteAndAlias",
+            "TestPolynomialFactorsSingletonForeignReplacement",
+            "TestPolynomialFactorsYoungerPowerStop"
+          ]
+        },
+        {
+          "name": "manager::factors display cpp1663-1670; actual scalar to_string/term display and repeated SIZE after callbacks",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_factors_operations.go",
+          "tests": [
+            "TestPolynomialFactorsDisplayEveryReservation",
+            "TestPolynomialFactorsDisplayReachesSizeAfterCallback",
+            "TestPolynomialFactorsLiteralDisplayAndConstantHelpers"
+          ]
+        },
+        {
+          "name": "imp acc_constant/flip_sign cpp6577-6589; literal scoped numeral Mul/Set/Neg/Set and source destructor; full factorization OPEN",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_factors_operations.go",
+          "tests": [
+            "TestPolynomialFactorsConstantHelpersEveryReservation",
+            "TestPolynomialFactorsLiteralDisplayAndConstantHelpers",
+            "TestPolynomialFactorsModularAndZeroDegreeSource"
+          ]
         }
       ],
       "ownership": [
@@ -31738,7 +31812,17 @@
         "Charged concrete scope owns actual four scoped NUMs, RAW two, monomial_ref, exact created-only cohort and matched callee/factory/physical receipts. Successful incoming INC transfers output before older DEC callback; source destruction is reverse lexical and stops before older fields, separate from explicit owning CleanupSqrt.",
         "Actual lexical coefficient buffer receives zero SET then coefficient SET; borrowed c_ptr view runs the same descending mk_univariate engine with writeback at each mutation. Source buffer destruction precedes successful return; owning cleanup only captures exact executing factory/NUM/MM receipts and genuinely fresh output.",
         "Target inline128 lexical buffers live in its once-charged enclosing header; NUM buffer source destructor precedes pointer buffer. Fresh result, actual started factory generation and created-only zero-reference monomial slots carry exact owning abort authority. Source body/destructor first causes remain sticky; CleanupConversion is explicit, excludes replacement caller roots and never infers ownership from zero RC.",
-        "Stable charged recursive display frames own actual numeral, character and MPN locals; actual sink callbacks borrow decimal views only during insertion. Younger stopped destructor preserves older locals; CleanupDisplay uses exact physical tokens and leaves foreign/replacement roots intact."
+        "Stable charged recursive display frames own actual numeral, character and MPN locals; actual sink callbacks borrow decimal views only during insertion. Younger stopped destructor preserves older locals; CleanupDisplay uses exact physical tokens and leaves foreign/replacement roots intact.",
+        "pointer publication before degree/total/INC; byte phases track actual consumed actions",
+        "exact singleton token+generation acquired after INC and cleared at actual placement",
+        "factory generation+parent, raw allocator triple, numeric object/raw/request+pending triple captured only actual guarded calls",
+        "foreign generation replacement preserved",
+        "deletion callback factory/numeral roots remain caller-owned; actual output incoming INC preserved",
+        "actual younger Power source destructor stop retains older current; owning younger cleanup precedes older",
+        "source Reset earlier consumed last DEC stop leaves actual fresh failedNull constant untouched",
+        "genuine public TLS signed-host-domain postphysical constant deletion stop sticky and distinct from OOM",
+        "persistent source SOM members reinitialized only after actual complete owning destruction; independent subsequent Mul at every failure prefix",
+        "source sourceCause/cursor retained through own Cleanup/Close; no source retry acknowledgement"
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -31775,7 +31859,20 @@
         "C library rand/srand binding independently implements the selected Linux/glibc31 mathematical recurrence; captured glibc2.39 test oracle covers default and262 seeds. Other libc profiles and source test-driver migration remain open; no GNU implementation code is copied and no LP source-unit completion is credited.",
         "Selected source algorithms and explicit Runtime profile only. Signed TLS stops and large factory/auxiliary receipts are guarded owner-primitive proofs, not ordinary mathematical exhaustion. Non-Z perfect-square remains the source unsupported operation. Registered polynomial driver returns before sqrt; dormant assertions give no active driver completion credit. Global diagnostics/native ABI and remaining source methods stay partial.",
         "sz0 skips lexical buffer and source coefficient/x reads. Native8/debug11 real refusal prefixes, scoped pending foreign replacement, guarded raw destructor result proof. Full convert/GCD/other source methods still open; no whole source driver credit.",
-        "Global conversion retains existing guarded monomial class adapter and unsupported high-level same-frame reentry. Shared-MM ordinary values/identity have evidence; simultaneous shared-budget exhaustive graph proof and full polynomial/GCD/global manager completion remain open. No registered-driver assertion credit for independent conversion tests."
+        "Global conversion retains existing guarded monomial class adapter and unsupported high-level same-frame reentry. Shared-MM ordinary values/identity have evidence; simultaneous shared-budget exhaustive graph proof and full polynomial/GCD/global manager completion remain open. No registered-driver assertion credit for independent conversion tests.",
+        "actual reflected cold class header charged; no Runtime sizeof(C++ class) ticket",
+        "source pointer vector uses existing 16-byte checked scalar polynomial token; unsigned vector uses four-byte elements; Runtime headers actual cap/size8",
+        "charged cold uint8 phases record publication/ref/deletion progress, not mirrored authoritative polynomial handles",
+        "concrete caller-owned PolynomialRef pointer carrier replaces source by-value reference and has actual charged header",
+        "cached source display frames preserve char/MPN lexical lifetimes; shared same-engine cleanup extraction only",
+        "explicit owning abort may reconstruct a fully drained default SOM adapter; never literal source Reset/destructor credit",
+        "same-manager source NUM routes with existing modular Z/Zp engines; GF7 setup PNormalize actual balanced input",
+        "second degree read source-review correction has no claimed behavioral RED",
+        "TLS evidence guarded signed-host overflow domain with ordinary warm freelist setup; not ordinary mathematical failure reachability",
+        "full mathematical factorization cpp6591-6829 and registered tst_mfact remain open; driver assertion credit0",
+        "source globals/ostream/profile/reentrancy guarantees inherit existing dependent engine limitations; no universal C++ ABI allocation geometry claim",
+        "all unrelated polynomial imp/GCD/ICCP/CRA/Resultant methods remain parent/numeric scope",
+        "WASM/WASI/race deferred per project instructions"
       ]
     },
     {
@@ -31926,7 +32023,9 @@
         "mpnum/mpn_format_scope.go",
         "mpnum/polynomial_display.go",
         "mpnum/polynomial_display_source_test.go",
-        "mpnum/polynomial_display_tls_test.go"
+        "mpnum/polynomial_display_tls_test.go",
+        "mpnum/polynomial_factors.go",
+        "mpnum/polynomial_factors_operations.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -32297,7 +32396,28 @@
         "TestPolynomialDisplayMonomialWrapperAndFiniteField",
         "TestPolynomialDisplayYoungerStoppedDestructor",
         "TestPolynomialDisplayExactNumericReceiptAndReplacement",
-        "TestPolynomialDisplaySinkCreatesForeignPending"
+        "TestPolynomialDisplaySinkCreatesForeignPending",
+        "TestPolynomialFactorsAbortOwnsReachedCalleesOnly",
+        "TestPolynomialFactorsCallbackForeignFactoryAndIncoming",
+        "TestPolynomialFactorsConstantFactoryOwnsSingleton",
+        "TestPolynomialFactorsConstantHelpersEveryReservation",
+        "TestPolynomialFactorsConstructorColdRefusal",
+        "TestPolynomialFactorsDisplayEveryReservation",
+        "TestPolynomialFactorsDisplayReachesSizeAfterCallback",
+        "TestPolynomialFactorsFailedPushScalarQueries",
+        "TestPolynomialFactorsFreshNullVersusDestroyedConstant",
+        "TestPolynomialFactorsLiteralDisplayAndConstantHelpers",
+        "TestPolynomialFactorsModularAndZeroDegreeSource",
+        "TestPolynomialFactorsMultiplyEveryReservation",
+        "TestPolynomialFactorsMultiplyFiniteAndAlias",
+        "TestPolynomialFactorsPushEveryReservation",
+        "TestPolynomialFactorsResetActualConsumedDrop",
+        "TestPolynomialFactorsResetActualTLSConsumedConstant",
+        "TestPolynomialFactorsSingletonForeignReplacement",
+        "TestPolynomialFactorsSourceControlAndOwnership",
+        "TestPolynomialFactorsSourceDegreeQuirkAndWrap",
+        "TestPolynomialFactorsSourceFinalizeAndClosedGuards",
+        "TestPolynomialFactorsYoungerPowerStop"
       ],
       "conditionals": [
         {
@@ -33678,6 +33798,57 @@
             "TestPolynomialDisplayExactNumericReceiptAndReplacement",
             "TestPolynomialDisplaySinkCreatesForeignPending"
           ]
+        },
+        {
+          "name": "manager::factors ctor/destructor/reset/push/accessors/set_constant/set_degree/operator[] cpp1613-1638,1672-1684 and h120-190; source lifecycle versus explicit owning abort",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_factors.go",
+          "tests": [
+            "TestPolynomialFactorsConstructorColdRefusal",
+            "TestPolynomialFactorsFailedPushScalarQueries",
+            "TestPolynomialFactorsFreshNullVersusDestroyedConstant",
+            "TestPolynomialFactorsPushEveryReservation",
+            "TestPolynomialFactorsResetActualConsumedDrop",
+            "TestPolynomialFactorsResetActualTLSConsumedConstant",
+            "TestPolynomialFactorsSourceControlAndOwnership",
+            "TestPolynomialFactorsSourceDegreeQuirkAndWrap",
+            "TestPolynomialFactorsSourceFinalizeAndClosedGuards"
+          ]
+        },
+        {
+          "name": "manager::factors multiply cpp1640-1661; literal per-loop reference/Power/mul/scalar-mul and exact operation receipts",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_factors_operations.go",
+          "tests": [
+            "TestPolynomialFactorsAbortOwnsReachedCalleesOnly",
+            "TestPolynomialFactorsCallbackForeignFactoryAndIncoming",
+            "TestPolynomialFactorsConstantFactoryOwnsSingleton",
+            "TestPolynomialFactorsModularAndZeroDegreeSource",
+            "TestPolynomialFactorsMultiplyEveryReservation",
+            "TestPolynomialFactorsMultiplyFiniteAndAlias",
+            "TestPolynomialFactorsSingletonForeignReplacement",
+            "TestPolynomialFactorsYoungerPowerStop"
+          ]
+        },
+        {
+          "name": "manager::factors display cpp1663-1670; actual scalar to_string/term display and repeated SIZE after callbacks",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_factors_operations.go",
+          "tests": [
+            "TestPolynomialFactorsDisplayEveryReservation",
+            "TestPolynomialFactorsDisplayReachesSizeAfterCallback",
+            "TestPolynomialFactorsLiteralDisplayAndConstantHelpers"
+          ]
+        },
+        {
+          "name": "imp acc_constant/flip_sign cpp6577-6589; literal scoped numeral Mul/Set/Neg/Set and source destructor; full factorization OPEN",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_factors_operations.go",
+          "tests": [
+            "TestPolynomialFactorsConstantHelpersEveryReservation",
+            "TestPolynomialFactorsLiteralDisplayAndConstantHelpers",
+            "TestPolynomialFactorsModularAndZeroDegreeSource"
+          ]
         }
       ],
       "ownership": [
@@ -33711,7 +33882,17 @@
         "Content ai and monic inv/newA are actual named cold fields; the three actual retained BIG fixture detects missing root enumeration, without claiming simultaneous mathematical reachability. Direct caller output SET/ref-assignment roots remain caller-owned.",
         "Real source deletion callbacks do not grant outer PSC factory/singleton ownership; actual callback execution excludes receipt acquisition without changing source callback/depth order.",
         "Target inline128 lexical buffers live in its once-charged enclosing header; NUM buffer source destructor precedes pointer buffer. Fresh result, actual started factory generation and created-only zero-reference monomial slots carry exact owning abort authority. Source body/destructor first causes remain sticky; CleanupConversion is explicit, excludes replacement caller roots and never infers ownership from zero RC.",
-        "Stable charged recursive display frames own actual numeral, character and MPN locals; actual sink callbacks borrow decimal views only during insertion. Younger stopped destructor preserves older locals; CleanupDisplay uses exact physical tokens and leaves foreign/replacement roots intact."
+        "Stable charged recursive display frames own actual numeral, character and MPN locals; actual sink callbacks borrow decimal views only during insertion. Younger stopped destructor preserves older locals; CleanupDisplay uses exact physical tokens and leaves foreign/replacement roots intact.",
+        "pointer publication before degree/total/INC; byte phases track actual consumed actions",
+        "exact singleton token+generation acquired after INC and cleared at actual placement",
+        "factory generation+parent, raw allocator triple, numeric object/raw/request+pending triple captured only actual guarded calls",
+        "foreign generation replacement preserved",
+        "deletion callback factory/numeral roots remain caller-owned; actual output incoming INC preserved",
+        "actual younger Power source destructor stop retains older current; owning younger cleanup precedes older",
+        "source Reset earlier consumed last DEC stop leaves actual fresh failedNull constant untouched",
+        "genuine public TLS signed-host-domain postphysical constant deletion stop sticky and distinct from OOM",
+        "persistent source SOM members reinitialized only after actual complete owning destruction; independent subsequent Mul at every failure prefix",
+        "source sourceCause/cursor retained through own Cleanup/Close; no source retry acknowledgement"
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -33744,7 +33925,20 @@
         "Selected source composition bodies complete for explicit same-Integer rational binding and actual Runtime profile. Dormant cpp573-574 ENSURE adapted via dense term construction; registered driver returns before tst_compose, active original driver credit zero. TLS/dangling-pointer proofs are actual owner-primitive guarded-domain tests, not ordinary mathematical OOM reachability. Global TRACE/assertions/native ABI, same-frame high-level callback reentry and full polynomial family remain open; persistent source class members are not implicitly reset by owning lexical abort.",
         "ICCP recursive scopes, default modular GCD, CRA and Resultant bodies remain open; these selected prerequisites do not substitute for those algorithms.",
         "Global TRACE/diagnostic binding, high-level PSC callback reentrancy and complete polynomial family audit remain open. Sparse successful calls perform fresh source lexical allocations; no zero-Go-allocation claim.",
-        "Global conversion retains existing guarded monomial class adapter and unsupported high-level same-frame reentry. Shared-MM ordinary values/identity have evidence; simultaneous shared-budget exhaustive graph proof and full polynomial/GCD/global manager completion remain open. No registered-driver assertion credit for independent conversion tests."
+        "Global conversion retains existing guarded monomial class adapter and unsupported high-level same-frame reentry. Shared-MM ordinary values/identity have evidence; simultaneous shared-budget exhaustive graph proof and full polynomial/GCD/global manager completion remain open. No registered-driver assertion credit for independent conversion tests.",
+        "actual reflected cold class header charged; no Runtime sizeof(C++ class) ticket",
+        "source pointer vector uses existing 16-byte checked scalar polynomial token; unsigned vector uses four-byte elements; Runtime headers actual cap/size8",
+        "charged cold uint8 phases record publication/ref/deletion progress, not mirrored authoritative polynomial handles",
+        "concrete caller-owned PolynomialRef pointer carrier replaces source by-value reference and has actual charged header",
+        "cached source display frames preserve char/MPN lexical lifetimes; shared same-engine cleanup extraction only",
+        "explicit owning abort may reconstruct a fully drained default SOM adapter; never literal source Reset/destructor credit",
+        "same-manager source NUM routes with existing modular Z/Zp engines; GF7 setup PNormalize actual balanced input",
+        "second degree read source-review correction has no claimed behavioral RED",
+        "TLS evidence guarded signed-host overflow domain with ordinary warm freelist setup; not ordinary mathematical failure reachability",
+        "full mathematical factorization cpp6591-6829 and registered tst_mfact remain open; driver assertion credit0",
+        "source globals/ostream/profile/reentrancy guarantees inherit existing dependent engine limitations; no universal C++ ABI allocation geometry claim",
+        "all unrelated polynomial imp/GCD/ICCP/CRA/Resultant methods remain parent/numeric scope",
+        "WASM/WASI/race deferred per project instructions"
       ]
     },
     {

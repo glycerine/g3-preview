@@ -5,6 +5,8 @@ package mpnum
 import "github.com/glycerine/g3/golang/arena"
 
 type polynomialSOM struct {
+	factorsParent                 *PolynomialFactors
+	factorsGeneration             uint64
 	retirementOwner               *PolynomialSOMBuffer
 	borrowedAppend                bool
 	borrowedAppendIndex           uint32
@@ -215,6 +217,17 @@ func (b *polynomialSOM) addSourceInput(a *Int, term Monomial, p polynomialSOMInp
 	if e != nil {
 		return e
 	}
+	if n > 0 {
+		if f := m.factorsOwner; f != nil && f.executing && m.callbackDepth == 0 {
+			b.factorsParent = f
+			b.factorsGeneration = f.generation
+			if b.cheap {
+				f.cheapOwned = true
+			} else {
+				f.somOwned = true
+			}
+		}
+	}
 	for i := uint32(0); i < n; i++ {
 		other, e := p.monomial(m, i)
 		if e != nil {
@@ -351,6 +364,8 @@ func (b *polynomialSOM) reset() error {
 		return e
 	}
 	if n == 0 {
+		b.factorsParent = nil
+		b.factorsGeneration = 0
 		return nil
 	}
 	sz, e := b.as.size(m)
@@ -408,6 +423,8 @@ func (b *polynomialSOM) reset() error {
 	b.resetActive = false
 	b.resetIndex = 0
 	b.resetStage = 0
+	b.factorsParent = nil
+	b.factorsGeneration = 0
 	return nil
 }
 func (b *polynomialSOM) removeZeros(normalize bool) error {

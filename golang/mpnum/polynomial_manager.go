@@ -28,6 +28,7 @@ type MultivariatePolynomialConfig struct {
 	Cooperation func() error
 }
 type polynomialCreation struct {
+	factorsParent      *PolynomialFactors
 	conversionParent   *polynomialGlobalConversionScope
 	toPolynomialParent *polynomialToPolynomialScope
 	compositionParent  *polynomialCompositionScope
@@ -44,6 +45,8 @@ type polynomialCreation struct {
 	buffer             *polynomialSOM
 }
 type MultivariatePolynomialCore struct {
+	factorsOwner                                                                               *PolynomialFactors
+	powerGeneration                                                                            uint64
 	display                                                                                    polynomialDisplayState
 	conversionOwner                                                                            *polynomialGlobalConversionScope
 	toPolynomialOwner                                                                          *polynomialToPolynomialScope
@@ -291,6 +294,10 @@ func (m *MultivariatePolynomialCore) mkConstCore(a *Int) (Polynomial, error) {
 	m.singletonMonomial = u
 	m.singletonReference = true
 	m.singletonGeneration++
+	if f := m.factorsOwner; f != nil && f.executing && m.callbackDepth == 0 {
+		f.singleton = m.singletonMonomial
+		f.singletonGeneration = m.singletonGeneration
+	}
 	if s := m.compositionOwner; s != nil && s.executing {
 		s.singleton = m.singletonMonomial
 		s.singletonGeneration = m.singletonGeneration
@@ -343,6 +350,10 @@ func (m *MultivariatePolynomialCore) MkVariable(v, k uint32) (Polynomial, error)
 	m.singletonMonomial = b
 	m.singletonReference = true
 	m.singletonGeneration++
+	if f := m.factorsOwner; f != nil && f.executing && m.callbackDepth == 0 {
+		f.singleton = m.singletonMonomial
+		f.singletonGeneration = m.singletonGeneration
+	}
 	if s := m.compositionOwner; s != nil && s.executing {
 		s.singleton = m.singletonMonomial
 		s.singletonGeneration = m.singletonGeneration
