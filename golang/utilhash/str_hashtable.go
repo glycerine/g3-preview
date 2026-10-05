@@ -37,6 +37,7 @@ type strHashEntry struct {
 }
 type StrHashtableConfig struct {
 	Runtime     *memory.Runtime
+	Assertions  StrHashtableAssertionContext
 	Budget      *arena.Budget
 	OutOfMemory func() bool
 	// InitialCapacity is the source constructor parameter; zero selects8.
@@ -74,6 +75,9 @@ func NewStrHashtable(r *arena.BytesRegion, c StrHashtableConfig) (*StrHashtable,
 }
 func newStrHashtableCapacity(r *arena.BytesRegion, c StrHashtableConfig, n uint32) (*StrHashtable, error) {
 	if r == nil || c.Runtime != nil && (c.Runtime.Budget() != c.Budget || c.OutOfMemory != nil) {
+		return nil, arena.ErrConfig
+	}
+	if c.Assertions != nil && c.Assertions.StrHashtableAssertionBudget() != c.Budget {
 		return nil, arena.ErrConfig
 	}
 	root := uint64(reflect.TypeOf(StrHashtable{}).Size())
@@ -556,6 +560,9 @@ func (h *StrHashtable) findSlot(key StrKey) (uint32, bool, error) {
 	return h.findSlotFrom(region, key)
 }
 func (h *StrHashtable) findSlotFrom(region *arena.BytesRegion, key StrKey) (uint32, bool, error) {
+	return h.findSlotFromSource(region, key, nil)
+}
+func (h *StrHashtable) findSlotFromSource(region *arena.BytesRegion, key StrKey, exhausted *bool) (uint32, bool, error) {
 	hash, e := hashStrKey(region, key)
 	if e != nil {
 		return 0, false, e
@@ -591,7 +598,17 @@ func (h *StrHashtable) findSlotFrom(region *arena.BytesRegion, key StrKey) (uint
 		if entry.state == strHashFree {
 			return 0, false, nil
 		}
-		i = (i + 1) & mask
+		if h.config.Runtime != nil {
+			i++
+			if i == capacity {
+				i = 0
+			}
+		} else {
+			i = (i + 1) & mask
+		}
+	}
+	if exhausted != nil {
+		*exhausted = true
 	}
 	return 0, false, nil
 }
@@ -711,7 +728,14 @@ func (h *StrHashtable) FindCString(s string) (StrHashtableEntryRef, bool, error)
 		if entry.state == strHashFree {
 			return StrHashtableEntryRef{}, false, nil
 		}
-		i = (i + 1) & mask
+		if h.config.Runtime != nil {
+			i++
+			if i == capacity {
+				i = 0
+			}
+		} else {
+			i = (i + 1) & mask
+		}
 	}
 	return StrHashtableEntryRef{}, false, nil
 }

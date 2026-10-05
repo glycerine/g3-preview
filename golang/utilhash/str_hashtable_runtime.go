@@ -162,9 +162,6 @@ func (h *StrHashtable) runtimeTable() (memory.Block, error) {
 	return b, nil
 }
 func (h *StrHashtable) allocateRuntimeTable(n uint32) (*strHashtableAcquisition, error) {
-	if n == 0 || n&(n-1) != 0 {
-		return nil, arena.ErrBounds
-	}
 	a, e := h.allocateRuntime(uint64(n) * strHashEntryBytes)
 	if e != nil {
 		return a, e
@@ -183,6 +180,18 @@ func (h *StrHashtable) constructRuntime(n uint32) error {
 		return e
 	}
 	h.raw.object = h.transferRuntime(a)
+	on, e := h.assertionsEnabled()
+	if e == nil && on && (n == 0 || n&(n-1) != 0) {
+		e = h.assertionFailure(249, "is_power_of_two(initial_capacity)")
+	}
+	if e != nil {
+		body := e
+		d := h.config.Runtime.Deallocate(&h.raw.object)
+		if d != nil {
+			h.raw.sourceCause = d
+		}
+		return errors.Join(body, d)
+	}
 	a, e = h.allocateRuntimeTable(n)
 	if e != nil {
 		// The entry array's failed construction is not a completed member. The
@@ -409,6 +418,15 @@ func (h *StrHashtable) readEntry(i uint32) (strHashEntry, error) {
 	return entry, e
 }
 func (h *StrHashtable) moveRuntimeTable(old memory.Block, oldcap uint32, next memory.Block, n uint32) error {
+	on, e := h.assertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if on && n < oldcap {
+		if e = h.assertionFailure(191, "target_capacity >= source_capacity"); e != nil {
+			return e
+		}
+	}
 	for i := uint32(0); i < oldcap; i++ {
 		state, e := h.stateAt(old, i)
 		if e != nil {
@@ -421,16 +439,44 @@ func (h *StrHashtable) moveRuntimeTable(old memory.Block, oldcap uint32, next me
 		if e != nil {
 			return e
 		}
-		j := hash & (n - 1)
-		for {
+		start := hash & (n - 1)
+		j := start
+		found := false
+		for step := uint32(0); step < n; step++ {
+			j = sourceProbeIndex(start, step, n)
+			on, e = h.assertionsEnabled()
+			if e != nil {
+				return e
+			}
+			if on {
+				state, e = h.stateAt(next, j)
+				if e != nil {
+					return e
+				}
+				if state == strHashDeleted {
+					line := int32(202)
+					if j < start {
+						line = 209
+					}
+					if e = h.assertionFailure(line, "!target_curr->is_deleted()"); e != nil {
+						return e
+					}
+				}
+			}
 			state, e = h.stateAt(next, j)
 			if e != nil {
 				return e
 			}
 			if state == strHashFree {
+				found = true
 				break
 			}
-			j = (j + 1) & (n - 1)
+		}
+		if !found {
+			if e = h.unreachable(215); e != nil {
+				return e
+			}
+			continue
 		}
 		k, e := h.keyAt(old, i)
 		if e != nil {
@@ -560,7 +606,26 @@ func (h *StrHashtable) insertRuntime(region *arena.BytesRegion, key StrKey, over
 					return false, h.ref(i), nil
 				}
 			}
-		case strHashDeleted:
+		default:
+			on, err := h.assertionsEnabled()
+			if err != nil {
+				return false, StrHashtableEntryRef{}, err
+			}
+			if on {
+				actual, err := h.stateAt(b, i)
+				if err != nil {
+					return false, StrHashtableEntryRef{}, err
+				}
+				if actual != strHashDeleted {
+					line := int32(371)
+					if !overwrite {
+						line = 422
+					}
+					if err = h.assertionFailure(line, "curr->is_deleted()"); err != nil {
+						return false, StrHashtableEntryRef{}, err
+					}
+				}
+			}
 			deleted = i
 		case strHashFree:
 			if e = h.canBump(); e != nil {
@@ -596,9 +661,16 @@ func (h *StrHashtable) insertRuntime(region *arena.BytesRegion, key StrKey, over
 			h.bump()
 			return true, h.ref(slot), nil
 		}
-		i = (i + 1) & (cap - 1)
+		i++
+		if i == cap {
+			i = 0
+		}
 	}
-	return false, StrHashtableEntryRef{}, arena.ErrBounds
+	line := int32(395)
+	if !overwrite {
+		line = 451
+	}
+	return false, StrHashtableEntryRef{}, h.unreachable(line)
 }
 
 func (h *StrHashtable) deleteRuntimeTable() error {
@@ -658,8 +730,55 @@ func (h *StrHashtable) resetRuntime() error {
 		if e = h.deleteRuntimeTable(); e != nil {
 			return e
 		}
+		for _, site := range []struct {
+			line int32
+			text string
+		}{{300, "m_capacity > 16"}, {301, "is_power_of_two(m_capacity)"}} {
+			on, err := h.assertionsEnabled()
+			if err != nil {
+				return err
+			}
+			if on {
+				value, err := h.runtimeWord(8)
+				if err != nil {
+					return err
+				}
+				condition := value > 16
+				if site.line == 301 {
+					condition = value != 0 && value&(value-1) == 0
+				}
+				if !condition {
+					if err = h.assertionFailure(site.line, site.text); err != nil {
+						return err
+					}
+				}
+			}
+		}
+		cap, e = h.runtimeWord(8)
+		if e != nil {
+			return e
+		}
 		cap >>= 1
 		if e = h.writeRuntimeWord(8, cap); e != nil {
+			return e
+		}
+		on, err := h.assertionsEnabled()
+		if err != nil {
+			return err
+		}
+		if on {
+			value, err := h.runtimeWord(8)
+			if err != nil {
+				return err
+			}
+			if value == 0 || value&(value-1) != 0 {
+				if err = h.assertionFailure(303, "is_power_of_two(m_capacity)"); err != nil {
+					return err
+				}
+			}
+		}
+		cap, e = h.runtimeWord(8)
+		if e != nil {
 			return e
 		}
 		a, e := h.allocateRuntimeTable(cap)
@@ -711,9 +830,30 @@ func (h *StrHashtable) removeRuntime(region *arena.BytesRegion, k StrKey) error 
 	if e := h.open(); e != nil {
 		return e
 	}
-	i, ok, e := h.findSlotFrom(region, k)
-	if e != nil || !ok {
+	exhausted := false
+	i, ok, e := h.findSlotFromSource(region, k, &exhausted)
+	if e != nil {
 		return e
+	}
+	if !ok {
+		if exhausted {
+			on, err := h.assertionsEnabled()
+			if err != nil {
+				return err
+			}
+			if on {
+				found, err := h.ContainsFrom(region, k)
+				if err != nil {
+					return err
+				}
+				if found {
+					if err = h.assertionFailure(559, "!contains(e)"); err != nil {
+						return err
+					}
+				}
+			}
+		}
+		return nil
 	}
 	cap, e := h.runtimeWord(8)
 	if e != nil {
@@ -723,7 +863,11 @@ func (h *StrHashtable) removeRuntime(region *arena.BytesRegion, k StrKey) error 
 	if e != nil {
 		return e
 	}
-	next, e := h.stateAt(b, (i+1)&(cap-1))
+	nextIndex := i + 1
+	if nextIndex == cap {
+		nextIndex = 0
+	}
+	next, e := h.stateAt(b, nextIndex)
 	if e != nil {
 		return e
 	}
@@ -834,7 +978,21 @@ func (h *StrHashtable) cloneRuntime(heap bool) (*StrHashtable, error) {
 	if e != nil {
 		return failed(e)
 	}
-	// copy_table compresses deleted slots with ascending original bucket order.
+	// copy_table captures both actual pointer arguments before its own assertions.
+	target := out.raw.table
+	// Deleted slots compress with ascending original bucket order.
+	on, e := out.assertionsEnabled()
+	if e != nil {
+		return failed(e)
+	}
+	if on {
+		sourcecap := cap
+		if cap < sourcecap {
+			if e = out.assertionFailure(159, "target_capacity >= source_capacity"); e != nil {
+				return failed(e)
+			}
+		}
+	}
 	for i := uint32(0); i < cap; i++ {
 		state, e := h.stateAt(old, i)
 		if e != nil {
@@ -847,16 +1005,44 @@ func (h *StrHashtable) cloneRuntime(heap bool) (*StrHashtable, error) {
 		if e != nil {
 			return failed(e)
 		}
-		j := hash & (cap - 1)
-		for {
-			state, e = out.stateAt(out.raw.table, j)
+		start := hash & (cap - 1)
+		j := start
+		found := false
+		for step := uint32(0); step < cap; step++ {
+			j = sourceProbeIndex(start, step, cap)
+			on, e = out.assertionsEnabled()
+			if e != nil {
+				return failed(e)
+			}
+			if on {
+				state, e = out.stateAt(target, j)
+				if e != nil {
+					return failed(e)
+				}
+				if state == strHashDeleted {
+					line := int32(170)
+					if j < start {
+						line = 177
+					}
+					if e = out.assertionFailure(line, "!target_curr->is_deleted()"); e != nil {
+						return failed(e)
+					}
+				}
+			}
+			state, e = out.stateAt(target, j)
 			if e != nil {
 				return failed(e)
 			}
 			if state == strHashFree {
+				found = true
 				break
 			}
-			j = (j + 1) & (cap - 1)
+		}
+		if !found {
+			if e = out.unreachable(183); e != nil {
+				return failed(e)
+			}
+			continue
 		}
 		k, e := h.keyAt(old, i)
 		if e != nil {
@@ -869,10 +1055,10 @@ func (h *StrHashtable) cloneRuntime(heap bool) (*StrHashtable, error) {
 		if e = out.adopt(owner); e != nil {
 			return failed(e)
 		}
-		if e = out.putKeyAt(out.raw.table, j, k); e != nil {
+		if e = out.putKeyAt(target, j, k); e != nil {
 			return failed(e)
 		}
-		if e = out.config.Runtime.WriteUint32(out.raw.table, uint64(j)*32, hash); e != nil {
+		if e = out.config.Runtime.WriteUint32(target, uint64(j)*32, hash); e != nil {
 			return failed(e)
 		}
 	}
@@ -968,6 +1154,39 @@ func (h *StrHashtable) CheckInvariantChecked() (bool, error) {
 		if state == strHashUsed {
 			used++
 		}
+	}
+	if h.config.Runtime != nil && strHashtableSourceDebug {
+		on, e := h.assertionsEnabled()
+		if e != nil {
+			return false, e
+		}
+		if on {
+			expected, e := h.runtimeWord(16)
+			if e != nil {
+				return false, e
+			}
+			if deleted != expected {
+				if e = h.assertionFailure(643, "num_deleted == m_num_deleted"); e != nil {
+					return false, e
+				}
+			}
+		}
+		on, e = h.assertionsEnabled()
+		if e != nil {
+			return false, e
+		}
+		if on {
+			expected, e := h.runtimeWord(12)
+			if e != nil {
+				return false, e
+			}
+			if used != expected {
+				if e = h.assertionFailure(644, "num_used == m_size"); e != nil {
+					return false, e
+				}
+			}
+		}
+		return true, nil
 	}
 	size, e := h.sizeChecked()
 	if e != nil {

@@ -58,7 +58,7 @@ func (d *DebugContext) initRuntimeDebugTable() error {
 	node := &debugTagConstruction{bytes: bytes, next: d.failedTags}
 	d.failedTags = node
 	d.tagConstructing = true
-	table, e := utilhash.NewStrHashtable(d.region, utilhash.StrHashtableConfig{Budget: d.budget, Runtime: d.tagRuntime})
+	table, e := utilhash.NewStrHashtable(d.region, utilhash.StrHashtableConfig{Budget: d.budget, Runtime: d.tagRuntime, Assertions: d})
 	node.table = table
 	d.tagConstructing = false
 	if e != nil {

@@ -520,9 +520,15 @@ func TestStrHashtableRuntimeUnusedEntryWordsStayUnread(t *testing.T) {
 		t.Fatal("state-only iterator scan")
 	}
 	ok, e := h.CheckInvariantChecked()
-	mapMust(t, e)
-	if ok {
-		t.Fatal("source counts differ in malformed fixture")
+	if strHashtableSourceDebug {
+		if !errors.Is(e, ErrStrHashtableAssertion) || ok {
+			t.Fatal("literal false SASSERT has no bound action", ok, e)
+		}
+	} else {
+		mapMust(t, e)
+		if ok {
+			t.Fatal("release inspection adapter counts differ in malformed fixture")
+		}
 	}
 	mapMust(t, h.CloseChecked())
 	mapMust(t, region.Close())

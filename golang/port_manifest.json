@@ -102088,7 +102088,13 @@
         "util_gparams_service_ops.go",
         "util_debug_runtime.go",
         "util_debug_runtime_source_test.go",
-        "util_memory_process.go"
+        "util_memory_process.go",
+        "utilhash/str_hashtable_assertions.go",
+        "utilhash/str_hashtable_assertions_debug.go",
+        "utilhash/str_hashtable_assertions_release.go",
+        "utilhash/str_hashtable_assertions_source_test.go",
+        "util_str_hashtable_assertion_bridge.go",
+        "util_str_hashtable_assertions_source_test.go"
       ],
       "tests": [
         "TestDebugContextSourceLazyInitializationAndAssertions",
@@ -102160,7 +102166,21 @@
         "TestDebugRuntimePrephysicalFailedConstructionRetiresEmptyContexts",
         "TestDebugRuntimeProcessColdGraphIncludesActualCurrentContext",
         "TestDebugRuntimeConstructorExecutingTransportCannotRetireOuterContext",
-        "TestDebugRuntimePublicGrowthRetryFinalizeRetainsOlderAcquisition"
+        "TestDebugRuntimePublicGrowthRetryFinalizeRetainsOlderAcquisition",
+        "TestStrHashtableBoundConstructorConditionBeforeEntryAllocation",
+        "TestStrHashtableBoundInvariantContinuesLiteralSites",
+        "TestStrHashtableBoundDisabledNonPowerCapacityLinearProbe",
+        "TestStrHashtableBoundResetExactDeletedPrefixBeforeAssertion",
+        "TestStrHashtableBoundClosedProviderReadOnlyAtReachedMacro",
+        "TestStrHashtableBoundUnreachableIgnoresSwitchAndContinuesSource",
+        "TestStrHashtableBoundMoveAndCopyFlagAfterActualNewTable",
+        "TestStrHashtableBoundRemoveExhaustionFlagAndEarlyFreeErasure",
+        "TestStrHashtableBoundDisabledInvariantAndUnusedTransport",
+        "TestStrHashtableBoundBorrowBudgetValidationBeforeReservation",
+        "TestStrHashtableBoundEveryConstructorReservationImmediateGraph",
+        "TestStrHashtableSourceProbeIndexIndependentLinearLoops",
+        "TestStrHashtableRuntimeDefaultAssertionConstructorActualWrapperPrefix",
+        "TestStrHashtableRuntimeMoveTableActualDeletedTargetPredicate"
       ],
       "conditionals": [
         {
@@ -102325,6 +102345,34 @@
             "TestDebugRuntimeConstructorExecutingTransportCannotRetireOuterContext",
             "TestDebugRuntimePublicGrowthRetryFinalizeRetainsOlderAcquisition"
           ]
+        },
+        {
+          "name": "Selected concrete cold DebugContext bridge and real SASSERT/UNREACHABLE source-site transport for Runtime StrHashtable (src/util/hashtable.h:159-215,249,300-303,371,395,422,451,559,643-644); erased operands remain unread, C resumes literal source body",
+          "status": "partial",
+          "go_target": "util_str_hashtable_assertion_bridge.go",
+          "tests": [
+            "TestStrHashtableBoundConstructorConditionBeforeEntryAllocation",
+            "TestStrHashtableBoundInvariantContinuesLiteralSites",
+            "TestStrHashtableBoundDisabledNonPowerCapacityLinearProbe",
+            "TestStrHashtableBoundResetExactDeletedPrefixBeforeAssertion",
+            "TestStrHashtableBoundClosedProviderReadOnlyAtReachedMacro",
+            "TestStrHashtableBoundUnreachableIgnoresSwitchAndContinuesSource",
+            "TestStrHashtableBoundMoveAndCopyFlagAfterActualNewTable",
+            "TestStrHashtableBoundRemoveExhaustionFlagAndEarlyFreeErasure",
+            "TestStrHashtableBoundDisabledInvariantAndUnusedTransport",
+            "TestStrHashtableBoundBorrowBudgetValidationBeforeReservation",
+            "TestStrHashtableBoundEveryConstructorReservationImmediateGraph"
+          ]
+        },
+        {
+          "name": "Selected Runtime core source compile gates and default typed adapter, literal target-deleted static move predicate and finite source end/begin traversal (src/util/hashtable.h:159-215,249,497-514)",
+          "status": "partial",
+          "go_target": "utilhash/str_hashtable_assertions.go",
+          "tests": [
+            "TestStrHashtableSourceProbeIndexIndependentLinearLoops",
+            "TestStrHashtableRuntimeDefaultAssertionConstructorActualWrapperPrefix",
+            "TestStrHashtableRuntimeMoveTableActualDeletedTargetPredicate"
+          ]
         }
       ],
       "ownership": [
@@ -102342,7 +102390,8 @@
         "Call-local word views have no allocation or cold owner: pointer acquisition records actual provider/block/offset; retained live backing exchange test names both owner fields and validates complete raw/cold graph; genuine deallocation then makes captured token stale at reached load/store. No debugger mutation callbacks or snapshot authority.",
         "Both public binding setters enforce the same nonnull interactive standard-service identity without reading pointed closed/input/file state. Actual same-Budget distinct-file services/hex-versus-decimal flags are rejected without pointer or charge mutation; null/unbound and NO_DEBUGGER stream-erasure preserved.",
         "Actual reflected service and acquired helper headers charged once; only returned construction outcomes stored in named fields. Caller region/process descriptors and MemoryProcess borrowed children never adopted. Constructor horizons and process live cold graph audited before lifting real refusal.",
-        "BindTagRuntime borrows exact same-Budget Runtime identity without payload reads or allocation. Context prepares charged concrete lazy-constructor nodes before the leaf; actual failed returned owners remain named. Successful table publication retains one bounded current context, and completed source finalize clears current only after real wrapper/table destruction while retaining older unjoined storage separately. MemoryProcess binds the borrowed DebugContext only after successful parent header preparation."
+        "BindTagRuntime borrows exact same-Budget Runtime identity without payload reads or allocation. Context prepares charged concrete lazy-constructor nodes before the leaf; actual failed returned owners remain named. Successful table publication retains one bounded current context, and completed source finalize clears current only after real wrapper/table destruction while retaining older unjoined storage separately. MemoryProcess binds the borrowed DebugContext only after successful parent header preparation.",
+        "One cold borrowed assertion-context interface is charged inside the actual reflected table owner/config, never in a hot entry and never a condition callback. Runtime debug tags bind their exact owning DebugContext. SASSERT checks only the assertion flag, without recursively looking up tag storage. Constructor condition follows real wrapper allocation and precedes the real entry array; strict returned allocation/copy/move owners remain named across actual transport refusal."
       ],
       "deviations": [
         "Source process globals represented by an explicit single-goroutine cold owner; process-wide/context API macro binding remains open. CASSERT gate preserves assertions-before-tag order, but release consumers must erase its call; no source macro consumer completion claimed. notify_assertion_violation, invoke_gdb, interactive fatal/abort/throw/debugger profiles, output services and full global finalizer orchestration remain open. Existing real table/region Go accounting is not C++ global allocator identity. No registered assertion completion credit.",
@@ -102372,7 +102421,8 @@
         "Default direct-Go file emission/classic input/flush profiles; native iostream locale/buffering/throwmask/unitbuf ABI and nonLinux OS/debugbreak remain qualified",
         "Continued null g_imp is reached typed native-undefined-domain guard; no defined native nullptr continuation or source math-regression claim",
         "No new source registered debug driver credit: src/test/heap.cpp:138 remains commented out, independent bounded fixtures only; no whole source unit promotion",
-        "Explicit caller service namespace accounts real Runtime storage; native process-global provider identity and all core class assertion/statistics/ABI profiles remain partial. A live legacy tag table cannot silently migrate to Runtime storage. Ordinary provider and byte-region roots remain borrowed."
+        "Explicit caller service namespace accounts real Runtime storage; native process-global provider identity and all core class assertion/statistics/ABI profiles remain partial. A live legacy tag table cannot silently migrate to Runtime storage. Ordinary provider and byte-region roots remain borrowed.",
+        "Cold binding Budget/self validation is a Go configuration contract separate from erased source macro payload reads. A closed provider after valid preparation remains unread in release or at a source early return; DEBUG reaches its actual flag lifetime guard. The source check_invariant function exists only in Z3DEBUG; release CheckInvariantChecked retains the explicitly inventoried inspection adapter. GNU release UNREACHABLE is guarded with a class-local typed error before provider reads, not native undefined execution. Non-power-of-two constructor C/release continuation allocates actual entries and uses literal end/begin probe traversal; invalid/malformed source count fixtures are explicit guard domains, not ordinary source math failures. Other pointer-entry specializations, HASHTABLE_STATISTICS, native ostream/ABI/global provider profiles and legacy class assertion dispatch remain open."
       ]
     },
     {
@@ -102413,7 +102463,13 @@
         "util_gparams_service_ops.go",
         "util_debug_runtime.go",
         "util_debug_runtime_source_test.go",
-        "util_memory_process.go"
+        "util_memory_process.go",
+        "utilhash/str_hashtable_assertions.go",
+        "utilhash/str_hashtable_assertions_debug.go",
+        "utilhash/str_hashtable_assertions_release.go",
+        "utilhash/str_hashtable_assertions_source_test.go",
+        "util_str_hashtable_assertion_bridge.go",
+        "util_str_hashtable_assertions_source_test.go"
       ],
       "tests": [
         "TestDebugContextSourceLazyInitializationAndAssertions",
@@ -102507,7 +102563,21 @@
         "TestDebugRuntimePrephysicalFailedConstructionRetiresEmptyContexts",
         "TestDebugRuntimeProcessColdGraphIncludesActualCurrentContext",
         "TestDebugRuntimeConstructorExecutingTransportCannotRetireOuterContext",
-        "TestDebugRuntimePublicGrowthRetryFinalizeRetainsOlderAcquisition"
+        "TestDebugRuntimePublicGrowthRetryFinalizeRetainsOlderAcquisition",
+        "TestStrHashtableBoundConstructorConditionBeforeEntryAllocation",
+        "TestStrHashtableBoundInvariantContinuesLiteralSites",
+        "TestStrHashtableBoundDisabledNonPowerCapacityLinearProbe",
+        "TestStrHashtableBoundResetExactDeletedPrefixBeforeAssertion",
+        "TestStrHashtableBoundClosedProviderReadOnlyAtReachedMacro",
+        "TestStrHashtableBoundUnreachableIgnoresSwitchAndContinuesSource",
+        "TestStrHashtableBoundMoveAndCopyFlagAfterActualNewTable",
+        "TestStrHashtableBoundRemoveExhaustionFlagAndEarlyFreeErasure",
+        "TestStrHashtableBoundDisabledInvariantAndUnusedTransport",
+        "TestStrHashtableBoundBorrowBudgetValidationBeforeReservation",
+        "TestStrHashtableBoundEveryConstructorReservationImmediateGraph",
+        "TestStrHashtableSourceProbeIndexIndependentLinearLoops",
+        "TestStrHashtableRuntimeDefaultAssertionConstructorActualWrapperPrefix",
+        "TestStrHashtableRuntimeMoveTableActualDeletedTargetPredicate"
       ],
       "conditionals": [
         {
@@ -102809,6 +102879,34 @@
             "TestDebugRuntimeConstructorExecutingTransportCannotRetireOuterContext",
             "TestDebugRuntimePublicGrowthRetryFinalizeRetainsOlderAcquisition"
           ]
+        },
+        {
+          "name": "Selected concrete cold DebugContext bridge and real SASSERT/UNREACHABLE source-site transport for Runtime StrHashtable (src/util/hashtable.h:159-215,249,300-303,371,395,422,451,559,643-644); erased operands remain unread, C resumes literal source body",
+          "status": "partial",
+          "go_target": "util_str_hashtable_assertion_bridge.go",
+          "tests": [
+            "TestStrHashtableBoundConstructorConditionBeforeEntryAllocation",
+            "TestStrHashtableBoundInvariantContinuesLiteralSites",
+            "TestStrHashtableBoundDisabledNonPowerCapacityLinearProbe",
+            "TestStrHashtableBoundResetExactDeletedPrefixBeforeAssertion",
+            "TestStrHashtableBoundClosedProviderReadOnlyAtReachedMacro",
+            "TestStrHashtableBoundUnreachableIgnoresSwitchAndContinuesSource",
+            "TestStrHashtableBoundMoveAndCopyFlagAfterActualNewTable",
+            "TestStrHashtableBoundRemoveExhaustionFlagAndEarlyFreeErasure",
+            "TestStrHashtableBoundDisabledInvariantAndUnusedTransport",
+            "TestStrHashtableBoundBorrowBudgetValidationBeforeReservation",
+            "TestStrHashtableBoundEveryConstructorReservationImmediateGraph"
+          ]
+        },
+        {
+          "name": "Selected Runtime core source compile gates and default typed adapter, literal target-deleted static move predicate and finite source end/begin traversal (src/util/hashtable.h:159-215,249,497-514)",
+          "status": "partial",
+          "go_target": "utilhash/str_hashtable_assertions.go",
+          "tests": [
+            "TestStrHashtableSourceProbeIndexIndependentLinearLoops",
+            "TestStrHashtableRuntimeDefaultAssertionConstructorActualWrapperPrefix",
+            "TestStrHashtableRuntimeMoveTableActualDeletedTargetPredicate"
+          ]
         }
       ],
       "ownership": [
@@ -102830,7 +102928,8 @@
         "Both public binding setters enforce the same nonnull interactive standard-service identity without reading pointed closed/input/file state. Actual same-Budget distinct-file services/hex-versus-decimal flags are rejected without pointer or charge mutation; null/unbound and NO_DEBUGGER stream-erasure preserved.",
         "Concrete borrowed assertion/action/stream providers reuse actual charged existing headers; macro leaves and call-local scalar operands add no owning storage; actual heap refusal graph audited before fault lift.",
         "Actual reflected service and acquired helper headers charged once; only returned construction outcomes stored in named fields. Caller region/process descriptors and MemoryProcess borrowed children never adopted. Constructor horizons and process live cold graph audited before lifting real refusal.",
-        "BindTagRuntime borrows exact same-Budget Runtime identity without payload reads or allocation. Context prepares charged concrete lazy-constructor nodes before the leaf; actual failed returned owners remain named. Successful table publication retains one bounded current context, and completed source finalize clears current only after real wrapper/table destruction while retaining older unjoined storage separately. MemoryProcess binds the borrowed DebugContext only after successful parent header preparation."
+        "BindTagRuntime borrows exact same-Budget Runtime identity without payload reads or allocation. Context prepares charged concrete lazy-constructor nodes before the leaf; actual failed returned owners remain named. Successful table publication retains one bounded current context, and completed source finalize clears current only after real wrapper/table destruction while retaining older unjoined storage separately. MemoryProcess binds the borrowed DebugContext only after successful parent header preparation.",
+        "One cold borrowed assertion-context interface is charged inside the actual reflected table owner/config, never in a hot entry and never a condition callback. Runtime debug tags bind their exact owning DebugContext. SASSERT checks only the assertion flag, without recursively looking up tag storage. Constructor condition follows real wrapper allocation and precedes the real entry array; strict returned allocation/copy/move owners remain named across actual transport refusal."
       ],
       "deviations": [
         "Source process globals represented by an explicit single-goroutine cold owner; process-wide/context API macro binding remains open. CASSERT gate preserves assertions-before-tag order, but release consumers must erase its call; no source macro consumer completion claimed. notify_assertion_violation, invoke_gdb, interactive fatal/abort/throw/debugger profiles, output services and full global finalizer orchestration remain open. Existing real table/region Go accounting is not C++ global allocator identity. No registered assertion completion credit.",
@@ -102870,7 +102969,8 @@
         "Default direct-Go file emission/classic input/flush profiles; native iostream locale/buffering/throwmask/unitbuf ABI and nonLinux OS/debugbreak remain qualified",
         "Continued null g_imp is reached typed native-undefined-domain guard; no defined native nullptr continuation or source math-regression claim",
         "No new source registered debug driver credit: src/test/heap.cpp:138 remains commented out, independent bounded fixtures only; no whole source unit promotion",
-        "Explicit caller service namespace accounts real Runtime storage; native process-global provider identity and all core class assertion/statistics/ABI profiles remain partial. A live legacy tag table cannot silently migrate to Runtime storage. Ordinary provider and byte-region roots remain borrowed."
+        "Explicit caller service namespace accounts real Runtime storage; native process-global provider identity and all core class assertion/statistics/ABI profiles remain partial. A live legacy tag table cannot silently migrate to Runtime storage. Ordinary provider and byte-region roots remain borrowed.",
+        "Cold binding Budget/self validation is a Go configuration contract separate from erased source macro payload reads. A closed provider after valid preparation remains unread in release or at a source early return; DEBUG reaches its actual flag lifetime guard. The source check_invariant function exists only in Z3DEBUG; release CheckInvariantChecked retains the explicitly inventoried inspection adapter. GNU release UNREACHABLE is guarded with a class-local typed error before provider reads, not native undefined execution. Non-power-of-two constructor C/release continuation allocates actual entries and uses literal end/begin probe traversal; invalid/malformed source count fixtures are explicit guard domains, not ordinary source math failures. Other pointer-entry specializations, HASHTABLE_STATISTICS, native ostream/ABI/global provider profiles and legacy class assertion dispatch remain open."
       ]
     },
     {
@@ -104998,7 +105098,13 @@
         "sat_solver_mutex_pair_set_test.go",
         "utilhash/str_hashtable_runtime.go",
         "utilhash/str_hashtable_runtime_source_test.go",
-        "utilhash/str_hashtable_runtime_reentrant_source_test.go"
+        "utilhash/str_hashtable_runtime_reentrant_source_test.go",
+        "utilhash/str_hashtable_assertions.go",
+        "utilhash/str_hashtable_assertions_debug.go",
+        "utilhash/str_hashtable_assertions_release.go",
+        "utilhash/str_hashtable_assertions_source_test.go",
+        "util_str_hashtable_assertion_bridge.go",
+        "util_str_hashtable_assertions_source_test.go"
       ],
       "tests": [
         "TestUintMapSourceMapAssertions",
@@ -105166,7 +105272,21 @@
         "TestStrHashtableRuntimeEveryLexicalAndDeletedReplacementReservation",
         "TestStrHashtableRuntimeOrdinaryAllocatorProfiles",
         "TestStrHashtableRuntimeAllocationReentrantOwningClose",
-        "TestStrHashtableRuntimeLexicalCopyReentrantClosePreservesReturnedOwner"
+        "TestStrHashtableRuntimeLexicalCopyReentrantClosePreservesReturnedOwner",
+        "TestStrHashtableBoundConstructorConditionBeforeEntryAllocation",
+        "TestStrHashtableBoundInvariantContinuesLiteralSites",
+        "TestStrHashtableBoundDisabledNonPowerCapacityLinearProbe",
+        "TestStrHashtableBoundResetExactDeletedPrefixBeforeAssertion",
+        "TestStrHashtableBoundClosedProviderReadOnlyAtReachedMacro",
+        "TestStrHashtableBoundUnreachableIgnoresSwitchAndContinuesSource",
+        "TestStrHashtableBoundMoveAndCopyFlagAfterActualNewTable",
+        "TestStrHashtableBoundRemoveExhaustionFlagAndEarlyFreeErasure",
+        "TestStrHashtableBoundDisabledInvariantAndUnusedTransport",
+        "TestStrHashtableBoundBorrowBudgetValidationBeforeReservation",
+        "TestStrHashtableBoundEveryConstructorReservationImmediateGraph",
+        "TestStrHashtableSourceProbeIndexIndependentLinearLoops",
+        "TestStrHashtableRuntimeDefaultAssertionConstructorActualWrapperPrefix",
+        "TestStrHashtableRuntimeMoveTableActualDeletedTargetPredicate"
       ],
       "conditionals": [
         {
@@ -105908,6 +106028,34 @@
             "TestStrHashtableRuntimeAllocationReentrantOwningClose",
             "TestStrHashtableRuntimeLexicalCopyReentrantClosePreservesReturnedOwner"
           ]
+        },
+        {
+          "name": "Selected concrete cold DebugContext bridge and real SASSERT/UNREACHABLE source-site transport for Runtime StrHashtable (src/util/hashtable.h:159-215,249,300-303,371,395,422,451,559,643-644); erased operands remain unread, C resumes literal source body",
+          "status": "partial",
+          "go_target": "util_str_hashtable_assertion_bridge.go",
+          "tests": [
+            "TestStrHashtableBoundConstructorConditionBeforeEntryAllocation",
+            "TestStrHashtableBoundInvariantContinuesLiteralSites",
+            "TestStrHashtableBoundDisabledNonPowerCapacityLinearProbe",
+            "TestStrHashtableBoundResetExactDeletedPrefixBeforeAssertion",
+            "TestStrHashtableBoundClosedProviderReadOnlyAtReachedMacro",
+            "TestStrHashtableBoundUnreachableIgnoresSwitchAndContinuesSource",
+            "TestStrHashtableBoundMoveAndCopyFlagAfterActualNewTable",
+            "TestStrHashtableBoundRemoveExhaustionFlagAndEarlyFreeErasure",
+            "TestStrHashtableBoundDisabledInvariantAndUnusedTransport",
+            "TestStrHashtableBoundBorrowBudgetValidationBeforeReservation",
+            "TestStrHashtableBoundEveryConstructorReservationImmediateGraph"
+          ]
+        },
+        {
+          "name": "Selected Runtime core source compile gates and default typed adapter, literal target-deleted static move predicate and finite source end/begin traversal (src/util/hashtable.h:159-215,249,497-514)",
+          "status": "partial",
+          "go_target": "utilhash/str_hashtable_assertions.go",
+          "tests": [
+            "TestStrHashtableSourceProbeIndexIndependentLinearLoops",
+            "TestStrHashtableRuntimeDefaultAssertionConstructorActualWrapperPrefix",
+            "TestStrHashtableRuntimeMoveTableActualDeletedTargetPredicate"
+          ]
         }
       ],
       "ownership": [
@@ -105918,7 +106066,8 @@
         "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PORT_PROGRESS.md#audit-param-descrs-port-status-md.",
         "Concrete AST expr identity-table and shared-occurrence owners preserve source bucket-order callbacks, borrowing, actual node shared flags and charged backing/header peaks. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md.",
         "Three selected expression substitution map backings retain distinct capacities and actual ownership bits; expansion temporaries are nonowning, sparse reset publishes half-capacity before allocation and finalize publishes64 after allocation. Generic maps remain partial.",
-        "Runtime-backed mode uses its actual 24-byte wrapper and 32-byte pointer-free entry array, with NIL legacy hot slice. Exact acquisition nodes stamp returned Runtime leaves; ascending moves, destructive replacement, source strict destructor and separate owning cleanup retain each genuinely unjoined token. Lexical intersection copy has a concrete inline header, one actual table allocation, and source completed-copy destructor before owning abort."
+        "Runtime-backed mode uses its actual 24-byte wrapper and 32-byte pointer-free entry array, with NIL legacy hot slice. Exact acquisition nodes stamp returned Runtime leaves; ascending moves, destructive replacement, source strict destructor and separate owning cleanup retain each genuinely unjoined token. Lexical intersection copy has a concrete inline header, one actual table allocation, and source completed-copy destructor before owning abort.",
+        "One cold borrowed assertion-context interface is charged inside the actual reflected table owner/config, never in a hot entry and never a condition callback. Runtime debug tags bind their exact owning DebugContext. SASSERT checks only the assertion flag, without recursively looking up tag storage. Constructor condition follows real wrapper allocation and precedes the real entry array; strict returned allocation/copy/move owners remain named across actual transport refusal."
       ],
       "deviations": [
         "Checked cold owner/epoch snapshots replace borrowed entry pointers; structural mutation invalidates snapshots.",
@@ -105930,7 +106079,8 @@
         "Explicit scalar padding keeps Go default entries40bytes across architectures. Checked key replacement preserves hash/equality; scalar values remain mutable. Other entry/key/value variants and enabled statistics remain unported.",
         "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md.",
         "Selected concrete consequences and mutex family source mapping supersedes older missing-method notes only for listed sites. Source AST/BV/datatype registered6 assertions, TRACE/verbose, extension dispatch, dormant core_chunking/static helpers, general template variants and full source units remain OPEN. Scalar slot/generation encodes selected8-byte pointer ABI; actual named cold/raw/pending roots charged; no registry-derived ownership. See PORT_PROGRESS.md.",
-        "This is a concrete Go representation, not native pointer/ABI byte geometry. Runtime no-error observers raise typed failures on reached raw errors rather than return zero. Existing checked CString/iterator/reference lifetime profiles and legacy staged Reset/growth remain separately qualified; bound core SASSERT dispatch, HASHTABLE_STATISTICS and native ostream/global allocator profiles remain open. Reentrant returning Go ErrorTransport cleanup is guarded until each real allocation outcome is recorded; this is not native C++ callback equivalence."
+        "This is a concrete Go representation, not native pointer/ABI byte geometry. Runtime no-error observers raise typed failures on reached raw errors rather than return zero. Existing checked CString/iterator/reference lifetime profiles and legacy staged Reset/growth remain separately qualified; bound core SASSERT dispatch, HASHTABLE_STATISTICS and native ostream/global allocator profiles remain open. Reentrant returning Go ErrorTransport cleanup is guarded until each real allocation outcome is recorded; this is not native C++ callback equivalence.",
+        "Cold binding Budget/self validation is a Go configuration contract separate from erased source macro payload reads. A closed provider after valid preparation remains unread in release or at a source early return; DEBUG reaches its actual flag lifetime guard. The source check_invariant function exists only in Z3DEBUG; release CheckInvariantChecked retains the explicitly inventoried inspection adapter. GNU release UNREACHABLE is guarded with a class-local typed error before provider reads, not native undefined execution. Non-power-of-two constructor C/release continuation allocates actual entries and uses literal end/begin probe traversal; invalid/malformed source count fixtures are explicit guard domains, not ordinary source math failures. Other pointer-entry specializations, HASHTABLE_STATISTICS, native ostream/ABI/global provider profiles and legacy class assertion dispatch remain open."
       ]
     },
     {
@@ -134234,7 +134384,13 @@
         "utilhash/str_int32_map.go",
         "utilhash/str_hashtable_runtime.go",
         "utilhash/str_hashtable_runtime_source_test.go",
-        "utilhash/str_hashtable_runtime_reentrant_source_test.go"
+        "utilhash/str_hashtable_runtime_reentrant_source_test.go",
+        "utilhash/str_hashtable_assertions.go",
+        "utilhash/str_hashtable_assertions_debug.go",
+        "utilhash/str_hashtable_assertions_release.go",
+        "utilhash/str_hashtable_assertions_source_test.go",
+        "util_str_hashtable_assertion_bridge.go",
+        "util_str_hashtable_assertions_source_test.go"
       ],
       "tests": [
         "TestStrHashtableSourceHashCStringAndEquality",
@@ -134281,7 +134437,21 @@
         "TestStrHashtableRuntimeEveryLexicalAndDeletedReplacementReservation",
         "TestStrHashtableRuntimeOrdinaryAllocatorProfiles",
         "TestStrHashtableRuntimeAllocationReentrantOwningClose",
-        "TestStrHashtableRuntimeLexicalCopyReentrantClosePreservesReturnedOwner"
+        "TestStrHashtableRuntimeLexicalCopyReentrantClosePreservesReturnedOwner",
+        "TestStrHashtableBoundConstructorConditionBeforeEntryAllocation",
+        "TestStrHashtableBoundInvariantContinuesLiteralSites",
+        "TestStrHashtableBoundDisabledNonPowerCapacityLinearProbe",
+        "TestStrHashtableBoundResetExactDeletedPrefixBeforeAssertion",
+        "TestStrHashtableBoundClosedProviderReadOnlyAtReachedMacro",
+        "TestStrHashtableBoundUnreachableIgnoresSwitchAndContinuesSource",
+        "TestStrHashtableBoundMoveAndCopyFlagAfterActualNewTable",
+        "TestStrHashtableBoundRemoveExhaustionFlagAndEarlyFreeErasure",
+        "TestStrHashtableBoundDisabledInvariantAndUnusedTransport",
+        "TestStrHashtableBoundBorrowBudgetValidationBeforeReservation",
+        "TestStrHashtableBoundEveryConstructorReservationImmediateGraph",
+        "TestStrHashtableSourceProbeIndexIndependentLinearLoops",
+        "TestStrHashtableRuntimeDefaultAssertionConstructorActualWrapperPrefix",
+        "TestStrHashtableRuntimeMoveTableActualDeletedTargetPredicate"
       ],
       "conditionals": [
         {
@@ -134394,16 +134564,46 @@
             "TestStrHashtableRuntimeAllocationReentrantOwningClose",
             "TestStrHashtableRuntimeLexicalCopyReentrantClosePreservesReturnedOwner"
           ]
+        },
+        {
+          "name": "Selected concrete cold DebugContext bridge and real SASSERT/UNREACHABLE source-site transport for Runtime StrHashtable (src/util/hashtable.h:159-215,249,300-303,371,395,422,451,559,643-644); erased operands remain unread, C resumes literal source body",
+          "status": "partial",
+          "go_target": "util_str_hashtable_assertion_bridge.go",
+          "tests": [
+            "TestStrHashtableBoundConstructorConditionBeforeEntryAllocation",
+            "TestStrHashtableBoundInvariantContinuesLiteralSites",
+            "TestStrHashtableBoundDisabledNonPowerCapacityLinearProbe",
+            "TestStrHashtableBoundResetExactDeletedPrefixBeforeAssertion",
+            "TestStrHashtableBoundClosedProviderReadOnlyAtReachedMacro",
+            "TestStrHashtableBoundUnreachableIgnoresSwitchAndContinuesSource",
+            "TestStrHashtableBoundMoveAndCopyFlagAfterActualNewTable",
+            "TestStrHashtableBoundRemoveExhaustionFlagAndEarlyFreeErasure",
+            "TestStrHashtableBoundDisabledInvariantAndUnusedTransport",
+            "TestStrHashtableBoundBorrowBudgetValidationBeforeReservation",
+            "TestStrHashtableBoundEveryConstructorReservationImmediateGraph"
+          ]
+        },
+        {
+          "name": "Selected Runtime core source compile gates and default typed adapter, literal target-deleted static move predicate and finite source end/begin traversal (src/util/hashtable.h:159-215,249,497-514)",
+          "status": "partial",
+          "go_target": "utilhash/str_hashtable_assertions.go",
+          "tests": [
+            "TestStrHashtableSourceProbeIndexIndependentLinearLoops",
+            "TestStrHashtableRuntimeDefaultAssertionConstructorActualWrapperPrefix",
+            "TestStrHashtableRuntimeMoveTableActualDeletedTargetPredicate"
+          ]
         }
       ],
       "ownership": [
         "CString spellings are borrowed across explicit byte-region origins. Hot keys are scalar; cold sorted owner bindings and table/header capacities are budgeted. All normal concrete char-pointer table methods are represented, including multi-origin bulk operations. See PORT_PROGRESS.md#audit-utilhash-port-status-md.",
-        "Runtime-backed mode uses its actual 24-byte wrapper and 32-byte pointer-free entry array, with NIL legacy hot slice. Exact acquisition nodes stamp returned Runtime leaves; ascending moves, destructive replacement, source strict destructor and separate owning cleanup retain each genuinely unjoined token. Lexical intersection copy has a concrete inline header, one actual table allocation, and source completed-copy destructor before owning abort."
+        "Runtime-backed mode uses its actual 24-byte wrapper and 32-byte pointer-free entry array, with NIL legacy hot slice. Exact acquisition nodes stamp returned Runtime leaves; ascending moves, destructive replacement, source strict destructor and separate owning cleanup retain each genuinely unjoined token. Lexical intersection copy has a concrete inline header, one actual table allocation, and source completed-copy destructor before owning abort.",
+        "One cold borrowed assertion-context interface is charged inside the actual reflected table owner/config, never in a hot entry and never a condition callback. Runtime debug tags bind their exact owning DebugContext. SASSERT checks only the assertion flag, without recursively looking up tag storage. Constructor condition follows real wrapper allocation and precedes the real entry array; strict returned allocation/copy/move owners remain named across actual transport refusal."
       ],
       "deviations": [
         "Raw C-pointer/sentinel mechanics become scalar origin/ref/offset/length and checked epochs. Equality-preserving entry key replacement guards hash invariants; multi-origin binding directory is retained through Reset until Close. Other generic core specializations and optional enabled statistics remain open in hashtable.h.",
         "This is a concrete Go representation, not native pointer/ABI byte geometry. Runtime no-error observers raise typed failures on reached raw errors rather than return zero. Existing checked CString/iterator/reference lifetime profiles and legacy staged Reset/growth remain separately qualified; bound core SASSERT dispatch, HASHTABLE_STATISTICS and native ostream/global allocator profiles remain open. Reentrant returning Go ErrorTransport cleanup is guarded until each real allocation outcome is recorded; this is not native C++ callback equivalence.",
-        "Existing alias-wide class completion includes legacy staged reset/exception frontiers and checked invalidation adaptations; Runtime-supported source storage is now proved but global source assertions and remaining compile/stream profiles are not whole-class complete."
+        "Existing alias-wide class completion includes legacy staged reset/exception frontiers and checked invalidation adaptations; Runtime-supported source storage is now proved but global source assertions and remaining compile/stream profiles are not whole-class complete.",
+        "Cold binding Budget/self validation is a Go configuration contract separate from erased source macro payload reads. A closed provider after valid preparation remains unread in release or at a source early return; DEBUG reaches its actual flag lifetime guard. The source check_invariant function exists only in Z3DEBUG; release CheckInvariantChecked retains the explicitly inventoried inspection adapter. GNU release UNREACHABLE is guarded with a class-local typed error before provider reads, not native undefined execution. Non-power-of-two constructor C/release continuation allocates actual entries and uses literal end/begin probe traversal; invalid/malformed source count fixtures are explicit guard domains, not ordinary source math failures. Other pointer-entry specializations, HASHTABLE_STATISTICS, native ostream/ABI/global provider profiles and legacy class assertion dispatch remain open."
       ]
     },
     {
