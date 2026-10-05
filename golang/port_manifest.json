@@ -105367,7 +105367,20 @@
         "utilhash/str_hashtable_runtime_destructor_source_test.go",
         "utilhash/str_hashtable_legacy_statistics_source_test.go",
         "util_str_hashtable_legacy_statistics_output_source_test.go",
-        "utilhash/str_hashtable_owner_identity_source_test.go"
+        "utilhash/str_hashtable_owner_identity_source_test.go",
+        "util_str_int32_map_assertions_source_test.go",
+        "utilhash/str_int32_map_runtime_reentrant_source_test.go",
+        "utilhash/str_int32_map_legacy_lifecycle.go",
+        "utilhash/str_int32_map_legacy_assertions.go",
+        "utilhash/str_int32_map_lifecycle_source_test.go",
+        "utilhash/str_int32_map_bytes.go",
+        "utilhash/str_int32_map_assertions.go",
+        "utilhash/str_int32_map_runtime_source_test.go",
+        "utilhash/str_int32_map_statistics_source_test.go",
+        "utilhash/str_int32_map_statistics.go",
+        "utilhash/str_int32_map_runtime_destructor_source_test.go",
+        "utilhash/str_int32_map_runtime.go",
+        "utilhash/str_int32_map_owner_identity_source_test.go"
       ],
       "tests": [
         "TestUintMapSourceMapAssertions",
@@ -105599,7 +105612,27 @@
         "TestStrHashtableLegacyStatisticsDumpIntoActualFileAndEmptyBorrowErasure",
         "TestStrHashtableLegacyStatisticsDumpIntoBorrowedSpellingRereadAndFileBytes",
         "TestStrHashtableLegacyAccidentalGoCopyCannotOwnSourceActions",
-        "TestStrHashtableZeroGoWrapperCannotOwnCleanup"
+        "TestStrHashtableZeroGoWrapperCannotOwnCleanup",
+        "TestStrInt32MapBoundConstructorActualDefaultEntryContinueThrow",
+        "TestStrInt32MapClosedAssertionOwnerCopyInvariantAndErasedReset",
+        "TestStrInt32MapRuntimeBoundInvariantLiteralContinue",
+        "TestStrInt32MapLegacyGrowthSourceAssertionStopRetainsNewAndOld",
+        "TestStrInt32MapReferenceFindLiteralAssertionAndValueLvalue",
+        "TestStrInt32MapRuntimeAllocationReentrantOwningClose",
+        "TestStrInt32MapRuntimeLexicalCopyReentrantClosePreservesReturnedOwner",
+        "TestStrInt32MapSourceReplacementConsumesOldBeforeRefusal",
+        "TestStrInt32MapSourceCopyCtorRetainsActualAcquiredDefaultEntries",
+        "TestStrInt32MapRuntimeActualDefaultEntryStateAndKeyOnlyRead",
+        "TestStrInt32MapRuntimeEveryActualReservationAndDefaultEntryValues",
+        "TestStrInt32MapRuntimeIndependentFiniteValueIntersection",
+        "TestStrInt32MapRuntimeKeyOnlyLookupAndCopyReachedValueGuard",
+        "TestStrInt32MapLegacyEveryActualReservationAndDefaultEntryValues",
+        "TestStrInt32MapStatisticsIndependentDefaultEntryProbeCounts",
+        "TestStrInt32MapRuntimeNullReplacementDestructorRetainsUnjoinedNew",
+        "TestStrInt32MapRuntimeBodyReleaseStopReachesOwnDestructorBoundary",
+        "TestStrInt32MapRuntimeReplacementEveryRefusalThenSourceDestructor",
+        "TestStrInt32MapLegacyAccidentalGoCopyCannotOwnSourceActions",
+        "TestStrInt32MapZeroGoWrapperCannotOwnCleanup"
       ],
       "conditionals": [
         {
@@ -106489,6 +106522,52 @@
             "TestStrHashtableLegacyAccidentalGoCopyCannotOwnSourceActions",
             "TestStrHashtableZeroGoWrapperCannotOwnCleanup"
           ]
+        },
+        {
+          "name": "Concrete char-pointer/int32 default-entry Runtime and legacy source constructor/copy/DT, destructive reset/finalize and lexical intersection (src/util/map.h:24-196; src/util/hashtable.h:44-63,146-230,243-322,610-627)",
+          "status": "partial",
+          "go_target": "utilhash/str_int32_map_runtime.go",
+          "tests": [
+            "TestStrInt32MapRuntimeAllocationReentrantOwningClose",
+            "TestStrInt32MapRuntimeLexicalCopyReentrantClosePreservesReturnedOwner",
+            "TestStrInt32MapSourceReplacementConsumesOldBeforeRefusal",
+            "TestStrInt32MapSourceCopyCtorRetainsActualAcquiredDefaultEntries",
+            "TestStrInt32MapRuntimeEveryActualReservationAndDefaultEntryValues",
+            "TestStrInt32MapLegacyEveryActualReservationAndDefaultEntryValues",
+            "TestStrInt32MapRuntimeNullReplacementDestructorRetainsUnjoinedNew",
+            "TestStrInt32MapRuntimeBodyReleaseStopReachesOwnDestructorBoundary",
+            "TestStrInt32MapRuntimeReplacementEveryRefusalThenSourceDestructor"
+          ]
+        },
+        {
+          "name": "Concrete default-entry literal hash,state,key,value copy/move, state-only tombstones, key-only queries and mutable value facade (src/util/map.h:24-38,113-179; src/util/hashtable.h:44-63,353-576)",
+          "status": "partial",
+          "go_target": "utilhash/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapRuntimeActualDefaultEntryStateAndKeyOnlyRead",
+            "TestStrInt32MapRuntimeKeyOnlyLookupAndCopyReachedValueGuard",
+            "TestStrInt32MapRuntimeIndependentFiniteValueIntersection"
+          ]
+        },
+        {
+          "name": "Concrete source SASSERT/UNREACHABLE erased gates, same DebugContext C/T and reference find lvalue sites (src/util/hashtable.h:159-215,249,300-303,371,395,422,451,559,643-644; src/util/map.h:149-163)",
+          "status": "partial",
+          "go_target": "util_str_int32_map_assertions_source_test.go",
+          "tests": [
+            "TestStrInt32MapBoundConstructorActualDefaultEntryContinueThrow",
+            "TestStrInt32MapClosedAssertionOwnerCopyInvariantAndErasedReset",
+            "TestStrInt32MapRuntimeBoundInvariantLiteralContinue",
+            "TestStrInt32MapLegacyGrowthSourceAssertionStopRetainsNewAndOld",
+            "TestStrInt32MapReferenceFindLiteralAssertionAndValueLvalue"
+          ]
+        },
+        {
+          "name": "Concrete source HASHTABLE_STATISTICS sole physical/inline counter and independent default-entry collision/copy/swap proof (src/util/hashtable.h:138-140,254-283,359-424,481-543,649-653)",
+          "status": "partial",
+          "go_target": "utilhash/str_int32_map_statistics.go",
+          "tests": [
+            "TestStrInt32MapStatisticsIndependentDefaultEntryProbeCounts"
+          ]
         }
       ],
       "ownership": [
@@ -106508,7 +106587,8 @@
         "Actual legacy growth owns each returned NEW array and charged Go acquisition node before reached move assertion; OLD remains the source current table until delete/publish. Successful transfer retires only completed metadata; stopped NEW arrays remain independently named through completed core DT and separate owning abort. Every actual node/array reservation through first success has immediate independently named cold/backing graph before fault lift. Captured borrowed table/entry addresses survive owner field exchange while actual backing remains owned.",
         "Completed source DT frees only actual current table/object, null-skips after real replacement failure, retains actual unjoined NEW until explicit owning abort; failed constructors do not receive source DT. First body history and first reached destructor refusal are separate charged cold fields. Exact zero-token physical-consumption receipt permits owning continuation without source leaf replay; source cause/cursor remains sticky after owning closure. Every actual replacement allocation refusal through first success receives immediate named Runtime/cold bijection before fault lift.",
         "Legacy collision count is the existing actual embedded raw.inlineStatistics[2] source scalar, initialized only after completed constructor/copy source actions; it has no Runtime block, second mirror or synthetic event, and is charged once in existing reflected header. Runtime statistics keeps its sole physical32-byte object/lexical inline route. Every actual legacy constructor/copy/growth/replacement reservation through first success has immediate independent named table/cold/region census before fault lift, completed DT then separate failed-constructor/NEW owning abort.",
-        "SourceFinalize/CloseChecked validate exact raw.self in both Runtime and legacy profiles before any allocation release/cause mutation; ordinary open and empty reset reject accidental copied or zero/unprepared Go wrappers. Real Clone constructors establish fresh exact owner identity, and retained failed-copy owners still perform separate owning abort."
+        "SourceFinalize/CloseChecked validate exact raw.self in both Runtime and legacy profiles before any allocation release/cause mutation; ordinary open and empty reset reject accidental copied or zero/unprepared Go wrappers. Real Clone constructors establish fresh exact owner identity, and retained failed-copy owners still perform separate owning abort.",
+        "Default-entry Runtime mode has NIL Go hot slice and actual wrapper24/32-byte object plus40-byte record payload. Legacy mode has actual Go backing and cold scalar capacity/counter. Acquisitions stamp exact returned allocation; lexical copies are inline owners. Current field/pending nodes and failed copy owners remain named; source-completed DT separate from owning abort; immediate raw bijection/full cold sums precede each real reservation fault lift. Accidental Go owner copies reject exact self before mutation; actual source clones prepare valid owners."
       ],
       "deviations": [
         "Checked cold owner/epoch snapshots replace borrowed entry pointers; structural mutation invalidates snapshots.",
@@ -106529,7 +106609,8 @@
         "Legacy arrays and acquisition nodes use real Go Budget ownership representation, not native Runtime malloc accounting. Closed provider guard and GNU release unreachable are qualified typed domains. Runtime/default statistics profile and native ABI/global/other specialization obligations remain partial; no registered char-pointer driver credit. Actual compiled/flag erasure occurs before condition/provider access; bind borrows exact same DebugContext without tag-table recursion. Existing narrow NULL/nonNULL source DT proofs are preserved; actual table refusal ordinal follows new Go acquisition metadata reservation.",
         "Public Runtime TLS signed-overflow free fixture is source-undefined arithmetic domain; later dangling source pointer DT is a reached Go lifetime guard, not native successful destruction credit. Ordinary postphysical replacement OOM NULL-DT already passed; true regression was blanket bodycause masking reached destructor pointer guard. Native allocator ABI/global and other class specializations remain partial.",
         "Statistics config models HASHTABLE_STATISTICS compiled class profile; mixed statistics/nonstatistics swaps reject before mutation. Concrete field UINT64_MAX arithmetic codec proves unsigned wrap, not a claim that bounded fixture generated that many collisions. Source-defined selected Runtime and legacy statistics and narrow existing ostream profile are implemented; native ABI/global allocator, other pointer-specializations and full arbitrary ostream locale/exception profiles remain partial. No registered char-pointer driver credit. Source has get_num_collision, not a new display_statistics method; dump reuses exact existing insertion chain without changing collision count.",
-        "These are Go owner/config guard-domain proofs, not native C++ algorithm failure or source copy-constructor credit. Four real accidental-Go-copy public actions previously returned success, with Close/source DT releasing original owner bytes; they now reject without affecting original backing/state/cause/charges. No new storage or source allocator events."
+        "These are Go owner/config guard-domain proofs, not native C++ algorithm failure or source copy-constructor credit. Four real accidental-Go-copy public actions previously returned success, with Close/source DT releasing original owner bytes; they now reject without affecting original backing/state/cause/charges. No new storage or source allocator events.",
+        "Selected Runtime32/64 and legacy char-pointer/int32 engines implement literal source action/publication order and real shared assertion transport; representation geometry is not native ABI. Source source-pointer/runtime provider/borrowed spelling lifetime qualifications remain explicit. Malformed uninitialized value and dangling DT, closed assertion provider, and host ErrorTransport reentry are Go guard-domain proofs rather than ordinary native math REDs. Registered src/test/map.cpp:23-44 exact14 ENSURE credit remains unchanged, independent tests add none. Core dump key_data ostream instantiation lacks a source-defined operator<<; no fabricated value formatting is supplied. Other entry/key/value/native/global/compiler profiles remain partial."
       ]
     },
     {
@@ -114837,7 +114918,20 @@
         "sat_solver_index_set.go",
         "sat_solver_index_map.go",
         "sat_solver_index_set_test.go",
-        "sat_solver_index_iterator_source_test.go"
+        "sat_solver_index_iterator_source_test.go",
+        "util_str_int32_map_assertions_source_test.go",
+        "utilhash/str_int32_map_runtime_reentrant_source_test.go",
+        "utilhash/str_int32_map_legacy_lifecycle.go",
+        "utilhash/str_int32_map_legacy_assertions.go",
+        "utilhash/str_int32_map_lifecycle_source_test.go",
+        "utilhash/str_int32_map_bytes.go",
+        "utilhash/str_int32_map_assertions.go",
+        "utilhash/str_int32_map_runtime_source_test.go",
+        "utilhash/str_int32_map_statistics_source_test.go",
+        "utilhash/str_int32_map_statistics.go",
+        "utilhash/str_int32_map_runtime_destructor_source_test.go",
+        "utilhash/str_int32_map_runtime.go",
+        "utilhash/str_int32_map_owner_identity_source_test.go"
       ],
       "tests": [
         "TestUintMapSourceMapAssertions",
@@ -114918,7 +115012,27 @@
         "TestSATSolverConsequenceMapGrowthEveryActualRefusalRetainsNestedOwners",
         "TestSATSolverConsequenceMapResetShrinksAfterFreeBeforeAllocation",
         "TestSATSolverConsequenceNestedIndexSetReachedPointerWordsGuard",
-        "TestSATConsequenceIndexIteratorCaptureReadsActualNestedPointer"
+        "TestSATConsequenceIndexIteratorCaptureReadsActualNestedPointer",
+        "TestStrInt32MapBoundConstructorActualDefaultEntryContinueThrow",
+        "TestStrInt32MapClosedAssertionOwnerCopyInvariantAndErasedReset",
+        "TestStrInt32MapRuntimeBoundInvariantLiteralContinue",
+        "TestStrInt32MapLegacyGrowthSourceAssertionStopRetainsNewAndOld",
+        "TestStrInt32MapReferenceFindLiteralAssertionAndValueLvalue",
+        "TestStrInt32MapRuntimeAllocationReentrantOwningClose",
+        "TestStrInt32MapRuntimeLexicalCopyReentrantClosePreservesReturnedOwner",
+        "TestStrInt32MapSourceReplacementConsumesOldBeforeRefusal",
+        "TestStrInt32MapSourceCopyCtorRetainsActualAcquiredDefaultEntries",
+        "TestStrInt32MapRuntimeActualDefaultEntryStateAndKeyOnlyRead",
+        "TestStrInt32MapRuntimeEveryActualReservationAndDefaultEntryValues",
+        "TestStrInt32MapRuntimeIndependentFiniteValueIntersection",
+        "TestStrInt32MapRuntimeKeyOnlyLookupAndCopyReachedValueGuard",
+        "TestStrInt32MapLegacyEveryActualReservationAndDefaultEntryValues",
+        "TestStrInt32MapStatisticsIndependentDefaultEntryProbeCounts",
+        "TestStrInt32MapRuntimeNullReplacementDestructorRetainsUnjoinedNew",
+        "TestStrInt32MapRuntimeBodyReleaseStopReachesOwnDestructorBoundary",
+        "TestStrInt32MapRuntimeReplacementEveryRefusalThenSourceDestructor",
+        "TestStrInt32MapLegacyAccidentalGoCopyCannotOwnSourceActions",
+        "TestStrInt32MapZeroGoWrapperCannotOwnCleanup"
       ],
       "conditionals": [
         {
@@ -115354,6 +115468,52 @@
             "TestSATSolverConsequenceNestedIndexSetReachedPointerWordsGuard",
             "TestSATConsequenceIndexIteratorCaptureReadsActualNestedPointer"
           ]
+        },
+        {
+          "name": "Concrete char-pointer/int32 default-entry Runtime and legacy source constructor/copy/DT, destructive reset/finalize and lexical intersection (src/util/map.h:24-196; src/util/hashtable.h:44-63,146-230,243-322,610-627)",
+          "status": "partial",
+          "go_target": "utilhash/str_int32_map_runtime.go",
+          "tests": [
+            "TestStrInt32MapRuntimeAllocationReentrantOwningClose",
+            "TestStrInt32MapRuntimeLexicalCopyReentrantClosePreservesReturnedOwner",
+            "TestStrInt32MapSourceReplacementConsumesOldBeforeRefusal",
+            "TestStrInt32MapSourceCopyCtorRetainsActualAcquiredDefaultEntries",
+            "TestStrInt32MapRuntimeEveryActualReservationAndDefaultEntryValues",
+            "TestStrInt32MapLegacyEveryActualReservationAndDefaultEntryValues",
+            "TestStrInt32MapRuntimeNullReplacementDestructorRetainsUnjoinedNew",
+            "TestStrInt32MapRuntimeBodyReleaseStopReachesOwnDestructorBoundary",
+            "TestStrInt32MapRuntimeReplacementEveryRefusalThenSourceDestructor"
+          ]
+        },
+        {
+          "name": "Concrete default-entry literal hash,state,key,value copy/move, state-only tombstones, key-only queries and mutable value facade (src/util/map.h:24-38,113-179; src/util/hashtable.h:44-63,353-576)",
+          "status": "partial",
+          "go_target": "utilhash/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapRuntimeActualDefaultEntryStateAndKeyOnlyRead",
+            "TestStrInt32MapRuntimeKeyOnlyLookupAndCopyReachedValueGuard",
+            "TestStrInt32MapRuntimeIndependentFiniteValueIntersection"
+          ]
+        },
+        {
+          "name": "Concrete source SASSERT/UNREACHABLE erased gates, same DebugContext C/T and reference find lvalue sites (src/util/hashtable.h:159-215,249,300-303,371,395,422,451,559,643-644; src/util/map.h:149-163)",
+          "status": "partial",
+          "go_target": "util_str_int32_map_assertions_source_test.go",
+          "tests": [
+            "TestStrInt32MapBoundConstructorActualDefaultEntryContinueThrow",
+            "TestStrInt32MapClosedAssertionOwnerCopyInvariantAndErasedReset",
+            "TestStrInt32MapRuntimeBoundInvariantLiteralContinue",
+            "TestStrInt32MapLegacyGrowthSourceAssertionStopRetainsNewAndOld",
+            "TestStrInt32MapReferenceFindLiteralAssertionAndValueLvalue"
+          ]
+        },
+        {
+          "name": "Concrete source HASHTABLE_STATISTICS sole physical/inline counter and independent default-entry collision/copy/swap proof (src/util/hashtable.h:138-140,254-283,359-424,481-543,649-653)",
+          "status": "partial",
+          "go_target": "utilhash/str_int32_map_statistics.go",
+          "tests": [
+            "TestStrInt32MapStatisticsIndependentDefaultEntryProbeCounts"
+          ]
         }
       ],
       "ownership": [
@@ -115361,13 +115521,15 @@
         "Scalar owned key refs preserve synthesized capacity-copy assignment and retained FREE/DELETED payloads. Rehash duplicates used keys before old table destruction; Swap moves owners without key-copy actions. See PORT_PROGRESS.md#audit-bitset-port-status-md.",
         "CString/int32 default entries retain complete borrowed key/value data on FREE/DELETED. Fixed40-byte scalar entries, budgeted header/table/directory, borrowed origins and source cached hash/bucket/action order; see PORT_PROGRESS.md#audit-utilhash-str-int32-map-port-status-md.",
         "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PORT_PROGRESS.md#audit-param-descrs-port-status-md.",
-        "Three independent charged scalar record arrays and cold root directories preserve source physical bucket/action order. See PORT_PROGRESS.md#audit-gparams-registry-port-status-md; other source map operations remain required."
+        "Three independent charged scalar record arrays and cold root directories preserve source physical bucket/action order. See PORT_PROGRESS.md#audit-gparams-registry-port-status-md; other source map operations remain required.",
+        "Default-entry Runtime mode has NIL Go hot slice and actual wrapper24/32-byte object plus40-byte record payload. Legacy mode has actual Go backing and cold scalar capacity/counter. Acquisitions stamp exact returned allocation; lexical copies are inline owners. Current field/pending nodes and failed copy owners remain named; source-completed DT separate from owning abort; immediate raw bijection/full cold sums precede each real reservation fault lift. Accidental Go owner copies reject exact self before mutation; actual source clones prepare valid owners."
       ],
       "deviations": [
         "Checked cold owner/epoch snapshots replace borrowed entry pointers; structural mutation invalidates snapshots.",
         "Budgeted reset/finalize/cross-owner swap reserve before publication. A failed post-removal tombstone cleanup preserves the completed removal.",
         "Readonly owner/epoch key views replace mutable raw borrows. Predictable replacement failure preserves old contents and adds documented peak storage; partial bulk operations remain source ordered.",
-        "Explicit scalar padding keeps Go default entries40bytes across architectures. Checked key replacement preserves hash/equality; scalar values remain mutable. Other entry/key/value variants and enabled statistics remain unported."
+        "Explicit scalar padding keeps Go default entries40bytes across architectures. Checked key replacement preserves hash/equality; scalar values remain mutable. Selected char-pointer/int32 Runtime and legacy HASHTABLE_STATISTICS profiles are implemented; other entry/key/value statistics profiles remain required. Native key_data ostream insertion lacks a defined source overload and remains uninstantiated.",
+        "Selected Runtime32/64 and legacy char-pointer/int32 engines implement literal source action/publication order and real shared assertion transport; representation geometry is not native ABI. Source source-pointer/runtime provider/borrowed spelling lifetime qualifications remain explicit. Malformed uninitialized value and dangling DT, closed assertion provider, and host ErrorTransport reentry are Go guard-domain proofs rather than ordinary native math REDs. Registered src/test/map.cpp:23-44 exact14 ENSURE credit remains unchanged, independent tests add none. Core dump key_data ostream instantiation lacks a source-defined operator<<; no fabricated value formatting is supplied. Other entry/key/value/native/global/compiler profiles remain partial."
       ]
     },
     {

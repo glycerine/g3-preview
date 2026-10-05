@@ -1,10 +1,12 @@
-// Licensed under the MIT license.
-// Concrete map<char const*, int, str_hash_proc, str_eq_proc> from util/map.h
-// and core_hashtable default entries, Leonardo de Moura (2006-10-14).
+// Licensed under the MIT license; see LICENSE.txt.
+// Source: src/util/map.h:24-196; src/util/str_hashtable.h:24-31; src/util/hashtable.h:44-63,138-140,222-653.
+// Source author: Leonardo de Moura (2006-09-13 / 2006-09-11).
 package utilhash
 
 import (
+	"errors"
 	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
 	"reflect"
 	"strings"
 )
@@ -15,13 +17,15 @@ type strInt32Entry struct {
 	hash, state uint32
 	key         StrKey
 	value       int32
-	// Keep the charged physical record width40 on 32-bit targets as well.
-	padding uint32
+	padding     uint32
 }
 type StrInt32MapConfig struct {
+	Runtime     *memory.Runtime
+	Assertions  StrHashtableAssertionContext
+	Statistics  bool
 	Budget      *arena.Budget
 	OutOfMemory func() bool
-	// InitialCapacity is the source constructor parameter; zero selects8.
+	// InitialCapacity selects the concrete core adapter capacity; the source map constructor uses8.
 	InitialCapacity uint32
 }
 
@@ -30,6 +34,7 @@ type StrInt32MapConfig struct {
 // the table. This owning struct must not be copied. Region Reset/rollback/Close
 // invalidates affected keys; callers keep all borrowed regions alive.
 type StrInt32Map struct {
+	raw                   strInt32MapRaw
 	table                 []strInt32Entry
 	region                *arena.BytesRegion
 	owners                []strOwner
@@ -49,7 +54,10 @@ func NewStrInt32Map(r *arena.BytesRegion, c StrInt32MapConfig) (*StrInt32Map, er
 	return newStrInt32MapCapacity(r, c, n)
 }
 func newStrInt32MapCapacity(r *arena.BytesRegion, c StrInt32MapConfig, n uint32) (*StrInt32Map, error) {
-	if r == nil {
+	if r == nil || c.Runtime != nil && (c.Runtime.Budget() != c.Budget || c.OutOfMemory != nil) {
+		return nil, arena.ErrConfig
+	}
+	if c.Assertions != nil && c.Assertions.StrHashtableAssertionBudget() != c.Budget {
 		return nil, arena.ErrConfig
 	}
 	root := uint64(reflect.TypeOf(StrInt32Map{}).Size())
@@ -57,16 +65,29 @@ func newStrInt32MapCapacity(r *arena.BytesRegion, c StrInt32MapConfig, n uint32)
 		return nil, e
 	}
 	h := &StrInt32Map{region: r, config: c, epoch: 1, rootBytes: root}
-	table, bytes, e := h.allocateTable(n)
-	if e != nil {
-		c.Budget.Release(root)
+	if c.Runtime != nil {
+		e := h.constructRuntime(n)
+		if e != nil && h.raw.object == (memory.Block{}) && h.raw.table == (memory.Block{}) && h.raw.acquisitions == nil && h.raw.sourceCause == nil {
+			// The source new-expression has consumed every acquired byte. Only this
+			// now-empty Go preparation header remains; no failed placement owner needs
+			// to survive. Actual unjoined tokens/stopped destruction stay returned.
+			if cleanup := h.CloseChecked(); cleanup != nil {
+				return h, errors.Join(e, cleanup)
+			}
+			return nil, e
+		}
+		return h, e
+	}
+	if e := h.constructLegacy(n); e != nil {
+		if cleanup := h.CloseChecked(); cleanup != nil {
+			return h, errors.Join(e, cleanup)
+		}
 		return nil, e
 	}
-	h.table, h.tableBytes = table, bytes
 	return h, nil
 }
 func (h *StrInt32Map) allocateTable(n uint32) ([]strInt32Entry, uint64, error) {
-	if n == 0 || n&(n-1) != 0 || n > 1<<30 || uint64(n) > uint64(^uint(0)>>1)/strInt32EntryBytes {
+	if n == 0 || n > 1<<30 || uint64(n) > uint64(^uint(0)>>1)/strInt32EntryBytes {
 		return nil, 0, arena.ErrBounds
 	}
 	amount := uint64(n) * strInt32EntryBytes
@@ -76,6 +97,24 @@ func (h *StrInt32Map) allocateTable(n uint32) ([]strInt32Entry, uint64, error) {
 	return make([]strInt32Entry, n), amount, nil
 }
 func (h *StrInt32Map) open() error {
+	if h == nil {
+		return arena.ErrClosed
+	}
+	if h.raw.self != h {
+		return arena.ErrConfig
+	}
+	if h.config.Runtime != nil {
+		return h.openRuntime()
+	}
+	if h.raw.executing {
+		return ErrStrInt32MapExecuting
+	}
+	if h.raw.destructing {
+		return arena.ErrClosed
+	}
+	if h.raw.sourceCause != nil {
+		return h.raw.sourceCause
+	}
 	if h.closed || len(h.table) == 0 {
 		return arena.ErrClosed
 	}
@@ -98,21 +137,51 @@ func (h *StrInt32Map) canBump() error {
 	}
 	return nil
 }
-func (h *StrInt32Map) Size() uint32           { return h.size }
-func (h *StrInt32Map) Empty() bool            { return h.size == 0 }
-func (h *StrInt32Map) Capacity() uint32       { return uint32(len(h.table)) }
-func (h *StrInt32Map) Deleted() uint32        { return h.deleted }
-func (h *StrInt32Map) CollisionCount() uint64 { return 0 }
+func (h *StrInt32Map) Size() uint32 {
+	if h.config.Runtime != nil {
+		return h.mustRuntimeWord(12)
+	}
+	return h.size
+}
+func (h *StrInt32Map) Empty() bool { return h.Size() == 0 }
+func (h *StrInt32Map) Capacity() uint32 {
+	if h.config.Runtime != nil {
+		return h.mustRuntimeWord(8)
+	}
+	return h.raw.words[2]
+}
+func (h *StrInt32Map) Deleted() uint32 {
+	if h.config.Runtime != nil {
+		return h.mustRuntimeWord(16)
+	}
+	return h.deleted
+}
+func (h *StrInt32Map) CollisionCount() uint64 {
+	if !h.config.Statistics {
+		return 0
+	}
+	if h.raw.self != h {
+		panic(arena.ErrConfig)
+	}
+	if h.closed || !h.raw.complete || h.raw.destructing {
+		panic(arena.ErrClosed)
+	}
+	v, e := h.readCollision()
+	if e != nil {
+		panic(e)
+	}
+	return v
+}
 
 // StrInt32MapStats accounts this owner, scalar table and cold owner directory.
 // Borrowed regions report their own graphs and are never charged by this table.
 type StrInt32MapStats struct {
-	OwnerBytes, TableBytes, DirectoryBytes uint64
-	Size, Deleted, Capacity                uint32
+	OwnerBytes, TableBytes, DirectoryBytes, RetainedBytes uint64
+	Size, Deleted, Capacity                               uint32
 }
 
 func (h *StrInt32Map) Stats() StrInt32MapStats {
-	return StrInt32MapStats{h.rootBytes, h.tableBytes, h.directoryBytes, h.size, h.deleted, h.Capacity()}
+	return StrInt32MapStats{OwnerBytes: h.rootBytes, TableBytes: h.tableBytes, DirectoryBytes: h.directoryBytes, RetainedBytes: h.legacyRetainedBytes(), Size: h.Size(), Deleted: h.Deleted(), Capacity: h.Capacity()}
 }
 
 func (h *StrInt32Map) keyRegion(k StrKey) (*arena.BytesRegion, error) {
@@ -198,6 +267,9 @@ func (h *StrInt32Map) CString(ref arena.BytesRegionRef, offset uint32) (StrKey, 
 	return BorrowCString(h.region, ref, offset)
 }
 
+// BorrowCString constructs a checked scalar borrow without adopting or
+// allocating table metadata. The raw allocation ref is owner-local to region.
+
 func (h *StrInt32Map) validateKey(k StrKey) error {
 	r, e := h.keyRegion(k)
 	if e != nil {
@@ -205,6 +277,11 @@ func (h *StrInt32Map) validateKey(k StrKey) error {
 	}
 	return validateStrKey(r, k)
 }
+
+// Hash uses the source seed17, little-endian word loads and signed-char tail.
+// Hash rereads the actual CString length at this call. Mutating an inserted
+// key can invalidate its table cached hash; uninserted pointer inputs remain
+// ordinary caller-owned CString arguments.
 func (h *StrInt32Map) Hash(k StrKey) (uint32, error) {
 	if e := h.open(); e != nil {
 		return 0, e
@@ -215,6 +292,7 @@ func (h *StrInt32Map) Hash(k StrKey) (uint32, error) {
 	}
 	return hashStrKey(r, k)
 }
+
 func (h *StrInt32Map) Equal(a, b StrKey) (bool, error) {
 	if e := h.open(); e != nil {
 		return false, e
@@ -229,6 +307,7 @@ func (h *StrInt32Map) Equal(a, b StrKey) (bool, error) {
 	}
 	return equalStrKeys(ra, a, rb, b)
 }
+
 func (h *StrInt32Map) Text(k StrKey) (string, error) {
 	if e := h.open(); e != nil {
 		return "", e
@@ -251,39 +330,17 @@ func (h *StrInt32Map) Text(k StrKey) (string, error) {
 	}
 	return out.String(), nil
 }
-func copyStrInt32Table(source, target []strInt32Entry) {
-	mask := uint32(len(target)) - 1
-	for _, entry := range source {
-		if entry.state != strHashUsed {
-			continue
-		}
-		i := entry.hash & mask
-		for target[i].state != strHashFree {
-			i = (i + 1) & mask
-		}
-		target[i] = entry
-	}
-}
-func (h *StrInt32Map) rehash(n uint32) error {
-	if e := h.canBump(); e != nil {
-		return e
-	}
-	table, amount, e := h.allocateTable(n)
-	if e != nil {
-		return e
-	}
-	copyStrInt32Table(h.table, table)
-	h.config.Budget.Release(h.tableBytes)
-	h.table, h.tableBytes = table, amount
-	h.deleted = 0
-	h.bump()
-	return nil
-}
+
+func (h *StrInt32Map) rehash(n uint32) error { return h.rehashLegacy(n) }
+
 func (h *StrInt32Map) prepareInsert() error {
+	if h.config.Runtime != nil {
+		return h.prepareInsertRuntime()
+	}
 	if e := h.open(); e != nil {
 		return e
 	}
-	if uint64(h.size+h.deleted)*4 > uint64(h.Capacity())*3 {
+	if (h.size+h.deleted)<<2 > h.Capacity()*3 {
 		if h.Capacity() > 1<<29 {
 			return arena.ErrBounds
 		}
@@ -302,6 +359,9 @@ func (h *StrInt32Map) insert(key StrKey, value int32, overwrite bool) (bool, Str
 	return h.insertFrom(region, key, value, overwrite)
 }
 func (h *StrInt32Map) insertFrom(region *arena.BytesRegion, key StrKey, value int32, overwrite bool) (bool, StrInt32MapEntryRef, error) {
+	if h.config.Runtime != nil {
+		return h.insertRuntime(region, key, value, overwrite)
+	}
 	if e := h.prepareInsert(); e != nil {
 		return false, StrInt32MapEntryRef{}, e
 	}
@@ -309,11 +369,16 @@ func (h *StrInt32Map) insertFrom(region *arena.BytesRegion, key StrKey, value in
 	if e != nil {
 		return false, StrInt32MapEntryRef{}, e
 	}
-	mask := h.Capacity() - 1
+	capacity := h.Capacity()
+	table := h.table
+	mask := capacity - 1
 	i := hash & mask
 	deleted := ^uint32(0)
-	for step := uint32(0); step < h.Capacity(); step++ {
-		entry := &h.table[i]
+	for step := uint32(0); step < capacity; step++ {
+		entry, e := mapLegacyEntryAt(table, i)
+		if e != nil {
+			return false, StrInt32MapEntryRef{}, e
+		}
 		switch entry.state {
 		case strHashUsed:
 			if entry.hash == hash {
@@ -336,6 +401,9 @@ func (h *StrInt32Map) insertFrom(region *arena.BytesRegion, key StrKey, value in
 					return false, h.ref(i), nil
 				}
 			}
+			if e = h.incrementCollision(); e != nil {
+				return false, StrInt32MapEntryRef{}, e
+			}
 		case strHashFree:
 			if e := h.canBump(); e != nil {
 				return false, StrInt32MapEntryRef{}, e
@@ -348,16 +416,39 @@ func (h *StrInt32Map) insertFrom(region *arena.BytesRegion, key StrKey, value in
 				slot = deleted
 				h.deleted--
 			}
-			h.table[slot] = strInt32Entry{hash: hash, state: strHashUsed, key: key, value: value}
+			table[slot] = strInt32Entry{hash: hash, state: strHashUsed, key: key, value: value}
 			h.size++
 			h.bump()
 			return true, h.ref(slot), nil
-		case strHashDeleted:
+		default:
+			on, e := h.assertionsEnabled()
+			if e != nil {
+				return false, StrInt32MapEntryRef{}, e
+			}
+			if on && entry.state != strHashDeleted {
+				line := int32(371)
+				if !overwrite {
+					line = 422
+				}
+				if e = h.assertionFailure(line, "curr->is_deleted()"); e != nil {
+					return false, StrInt32MapEntryRef{}, e
+				}
+			}
 			deleted = i
+			if e = h.incrementCollision(); e != nil {
+				return false, StrInt32MapEntryRef{}, e
+			}
 		}
-		i = (i + 1) & mask
+		i++
+		if i == capacity {
+			i = 0
+		}
 	}
-	panic("utilhash: source string table has no free insertion slot")
+	line := int32(395)
+	if !overwrite {
+		line = 451
+	}
+	return false, StrInt32MapEntryRef{}, h.unreachable(line)
 }
 func (h *StrInt32Map) Insert(k StrKey, value int32) error {
 	_, _, e := h.insert(k, value, true)
@@ -395,15 +486,42 @@ func (h *StrInt32Map) findSlot(key StrKey) (uint32, bool, error) {
 	return h.findSlotFrom(region, key)
 }
 func (h *StrInt32Map) findSlotFrom(region *arena.BytesRegion, key StrKey) (uint32, bool, error) {
+	return h.findSlotFromSource(region, key, nil)
+}
+func (h *StrInt32Map) findSlotFromSource(region *arena.BytesRegion, key StrKey, exhausted *bool) (uint32, bool, error) {
 	hash, e := hashStrKey(region, key)
 	if e != nil {
 		return 0, false, e
 	}
-	mask := h.Capacity() - 1
+	capacity, e := h.capacityChecked()
+	if e != nil {
+		return 0, false, e
+	}
+	table := h.table
+	mask := capacity - 1
 	i := hash & mask
-	for step := uint32(0); step < h.Capacity(); step++ {
-		entry := h.table[i]
+	for step := uint32(0); step < capacity; step++ {
+		var entry strInt32Entry
+		if h.config.Runtime == nil {
+			p, re := mapLegacyEntryAt(table, i)
+			if re != nil {
+				e = re
+			} else {
+				entry = *p
+			}
+		} else {
+			entry, e = h.probeEntry(i)
+		}
+		if e != nil {
+			return 0, false, e
+		}
 		if entry.state == strHashUsed && entry.hash == hash {
+			if h.config.Runtime != nil {
+				entry.key, e = h.entryKey(i)
+			}
+			if e != nil {
+				return 0, false, e
+			}
 			storedRegion, e := h.keyRegion(entry.key)
 			if e != nil {
 				return 0, false, e
@@ -416,10 +534,24 @@ func (h *StrInt32Map) findSlotFrom(region *arena.BytesRegion, key StrKey) (uint3
 				return i, true, nil
 			}
 		}
+		if entry.state == strHashUsed {
+			if e := h.incrementCollision(); e != nil {
+				return 0, false, e
+			}
+		}
 		if entry.state == strHashFree {
 			return 0, false, nil
 		}
-		i = (i + 1) & mask
+		if e := h.incrementCollision(); e != nil {
+			return 0, false, e
+		}
+		i++
+		if i == capacity {
+			i = 0
+		}
+	}
+	if exhausted != nil {
+		*exhausted = true
 	}
 	return 0, false, nil
 }
@@ -451,32 +583,9 @@ func (h *StrInt32Map) ContainsFrom(region *arena.BytesRegion, k StrKey) (bool, e
 	_, ok, e := h.FindFrom(region, k)
 	return ok, e
 }
-func (h *StrInt32Map) FindIntoFrom(region *arena.BytesRegion, k StrKey, out *int32) (bool, error) {
-	r, found, e := h.FindFrom(region, k)
-	if e != nil || !found {
-		return found, e
-	}
-	value, e := r.Value()
-	if e != nil {
-		return false, e
-	}
-	*out = value
-	return true, nil
-}
-func (h *StrInt32Map) Find(k StrKey) (int32, bool, error) {
-	r, ok, e := h.FindCore(k)
-	if e != nil || !ok {
-		return 0, ok, e
-	}
-	return h.table[r.slot].value, true, nil
-}
-func (h *StrInt32Map) FindInto(k StrKey, out *int32) (bool, error) {
-	found, ok, e := h.Find(k)
-	if e == nil && ok {
-		*out = found
-	}
-	return ok, e
-}
+
+// FindCString uses a transient external query; no Go string is stored in the
+// table. Equality compares raw unsigned byte identities as source strcmp.
 func (h *StrInt32Map) FindCString(s string) (StrInt32MapEntryRef, bool, error) {
 	if e := h.open(); e != nil {
 		return StrInt32MapEntryRef{}, false, e
@@ -486,39 +595,62 @@ func (h *StrInt32Map) FindCString(s string) (StrInt32MapEntryRef, bool, error) {
 		return StrInt32MapEntryRef{}, false, arena.ErrBounds
 	}
 	hash := String(s, 17)
-	mask := h.Capacity() - 1
+	capacity, e := h.capacityChecked()
+	if e != nil {
+		return StrInt32MapEntryRef{}, false, e
+	}
+	table := h.table
+	mask := capacity - 1
 	i := hash & mask
-	for step := uint32(0); step < h.Capacity(); step++ {
-		entry := h.table[i]
+	for step := uint32(0); step < capacity; step++ {
+		var entry strInt32Entry
+		if h.config.Runtime == nil {
+			p, re := mapLegacyEntryAt(table, i)
+			if re != nil {
+				e = re
+			} else {
+				entry = *p
+			}
+		} else {
+			entry, e = h.probeEntry(i)
+		}
+		if e != nil {
+			return StrInt32MapEntryRef{}, false, e
+		}
 		if entry.state == strHashUsed && entry.hash == hash {
-			if e := h.validateKey(entry.key); e != nil {
+			if h.config.Runtime != nil {
+				entry.key, e = h.entryKey(i)
+			}
+			if e != nil {
 				return StrInt32MapEntryRef{}, false, e
 			}
 			region, e := h.keyRegion(entry.key)
 			if e != nil {
 				return StrInt32MapEntryRef{}, false, e
 			}
-			equal := entry.key.length == uint32(len(s))
-			if equal {
-				for j := uint32(0); j < entry.key.length; j++ {
-					b, e := region.Read(entry.key.ref, entry.key.offset+j)
-					if e != nil {
-						return StrInt32MapEntryRef{}, false, e
-					}
-					if b != s[j] {
-						equal = false
-						break
-					}
-				}
+			equal, e := strKeyEqualString(region, entry.key, s)
+			if e != nil {
+				return StrInt32MapEntryRef{}, false, e
 			}
 			if equal {
 				return h.ref(i), true, nil
 			}
 		}
+		if entry.state == strHashUsed {
+			if e := h.incrementCollision(); e != nil {
+				return StrInt32MapEntryRef{}, false, e
+			}
+		}
 		if entry.state == strHashFree {
 			return StrInt32MapEntryRef{}, false, nil
 		}
-		i = (i + 1) & mask
+		if e := h.incrementCollision(); e != nil {
+			return StrInt32MapEntryRef{}, false, e
+		}
+		i++
+		if i == capacity {
+			i = 0
+		}
 	}
 	return StrInt32MapEntryRef{}, false, nil
 }
@@ -552,17 +684,42 @@ func (h *StrInt32Map) Remove(k StrKey) error {
 	return h.RemoveFrom(region, k)
 }
 func (h *StrInt32Map) RemoveFrom(region *arena.BytesRegion, k StrKey) error {
+	if h.config.Runtime != nil {
+		return h.removeRuntime(region, k)
+	}
 	if e := h.open(); e != nil {
 		return e
 	}
-	i, ok, e := h.findSlotFrom(region, k)
-	if e != nil || !ok {
+	var exhausted bool
+	i, ok, e := h.findSlotFromSource(region, k, &exhausted)
+	if e != nil {
 		return e
+	}
+	if !ok {
+		if exhausted {
+			on, e := h.assertionsEnabled()
+			if e != nil {
+				return e
+			}
+			if on {
+				contains, e := h.ContainsFrom(region, k)
+				if e != nil {
+					return e
+				}
+				if contains {
+					return h.assertionFailure(559, "!contains(e)")
+				}
+			}
+		}
+		return nil
 	}
 	if e := h.canBump(); e != nil {
 		return e
 	}
-	next := (i + 1) & (h.Capacity() - 1)
+	next := i + 1
+	if next == h.Capacity() {
+		next = 0
+	}
 	h.size--
 	h.bump()
 	if h.table[next].state == strHashFree {
@@ -580,101 +737,31 @@ func (h *StrInt32Map) Erase(k StrKey) error { return h.Remove(k) }
 func (h *StrInt32Map) EraseFrom(region *arena.BytesRegion, k StrKey) error {
 	return h.RemoveFrom(region, k)
 }
-func (h *StrInt32Map) replaceEmpty(n uint32) error {
-	if e := h.canBump(); e != nil {
-		return e
-	}
-	table, amount, e := h.allocateTable(n)
-	if e != nil {
-		return e
-	}
-	h.config.Budget.Release(h.tableBytes)
-	h.table, h.tableBytes = table, amount
-	h.size, h.deleted = 0, 0
-	h.bump()
-	return nil
-}
 func (h *StrInt32Map) Reset() error {
-	if e := h.open(); e != nil {
-		return e
+	if h.config.Runtime != nil {
+		return h.resetRuntime()
 	}
-	if h.size == 0 && h.deleted == 0 {
-		return nil
-	}
-	if e := h.canBump(); e != nil {
-		return e
-	}
-	var overhead uint32
-	for _, entry := range h.table {
-		if entry.state == strHashFree {
-			overhead++
-		}
-	}
-	if h.Capacity() > 16 && uint64(overhead)*4 > uint64(h.Capacity())*3 {
-		return h.replaceEmpty(h.Capacity() >> 1)
-	}
-	for i := range h.table {
-		h.table[i].state = strHashFree
-	}
-	h.size, h.deleted = 0, 0
-	h.bump()
-	return nil
+	return h.resetLegacy()
 }
 func (h *StrInt32Map) Finalize() error {
-	if e := h.open(); e != nil {
-		return e
+	if h.config.Runtime != nil {
+		return h.finalizeRuntime()
 	}
-	if h.Capacity() > 64 {
-		return h.replaceEmpty(64)
-	}
-	return h.Reset()
+	return h.finalizeLegacy()
 }
 func (h *StrInt32Map) Close() {
-	if h.closed {
-		return
-	}
-	h.config.Budget.Release(h.rootBytes + h.tableBytes + h.directoryBytes)
-	h.table = nil
-	h.owners = nil
-	h.region = nil
-	h.rootBytes, h.tableBytes = 0, 0
-	h.directoryBytes = 0
-	h.size, h.deleted = 0, 0
-	h.closed = true
-	if h.epoch != ^uint64(0) {
-		h.bump()
+	if e := h.CloseChecked(); e != nil {
+		panic(e)
 	}
 }
 func (h *StrInt32Map) Clone() (*StrInt32Map, error) {
 	if e := h.open(); e != nil {
 		return nil, e
 	}
-	r, e := newStrInt32MapCapacity(h.region, h.config, h.Capacity())
-	if e != nil {
-		return nil, e
+	if h.config.Runtime != nil {
+		return h.cloneRuntime(true)
 	}
-	mask := r.Capacity() - 1
-	for _, entry := range h.table {
-		if entry.state != strHashUsed {
-			continue
-		}
-		owner, e := h.keyRegion(entry.key)
-		if e != nil {
-			r.Close()
-			return nil, e
-		}
-		if e := r.adopt(owner); e != nil {
-			r.Close()
-			return nil, e
-		}
-		i := entry.hash & mask
-		for r.table[i].state != strHashFree {
-			i = (i + 1) & mask
-		}
-		r.table[i] = entry
-	}
-	r.size = h.size
-	return r, nil
+	return h.cloneLegacy()
 }
 func (h *StrInt32Map) bothOpen(other *StrInt32Map) error {
 	if e := h.open(); e != nil {
@@ -704,7 +791,26 @@ func (h *StrInt32Map) Union(src *StrInt32Map) error {
 	if h == src {
 		return nil
 	}
-	for _, entry := range src.table {
+	capacity, e := src.capacityChecked()
+	if e != nil {
+		return e
+	}
+	for idx := uint32(0); idx < capacity; idx++ {
+		state, e := src.entryState(idx)
+		if e != nil {
+			return e
+		}
+		entry := strInt32Entry{state: state}
+		if state == strHashUsed {
+			entry.key, e = src.entryKey(idx)
+			if e != nil {
+				return e
+			}
+			entry.value, e = src.valueAt(idx)
+			if e != nil {
+				return e
+			}
+		}
 		if entry.state == strHashUsed {
 			owner, e := src.keyRegion(entry.key)
 			if e != nil {
@@ -718,37 +824,18 @@ func (h *StrInt32Map) Union(src *StrInt32Map) error {
 	return nil
 }
 func (h *StrInt32Map) Intersect(src *StrInt32Map) error {
-	if e := h.bothOpen(src); e != nil {
-		return e
+	if h.config.Runtime != nil {
+		return h.intersectRuntime(src)
 	}
-	if h == src {
-		return nil
-	}
-	copy, e := h.Clone()
-	if e != nil {
-		return e
-	}
-	defer copy.Close()
-	for _, entry := range copy.table {
-		if entry.state == strHashUsed {
-			owner, e := copy.keyRegion(entry.key)
-			if e != nil {
-				return e
-			}
-			ok, e := src.ContainsFrom(owner, entry.key)
-			if e != nil {
-				return e
-			}
-			if !ok {
-				if e := h.Remove(entry.key); e != nil {
-					return e
-				}
-			}
-		}
-	}
-	return nil
+	return h.intersectLegacy(src)
 }
 func (h *StrInt32Map) Swap(other *StrInt32Map) error {
+	if h.config.Runtime != nil || other.config.Runtime != nil {
+		return h.swapRuntime(other)
+	}
+	if h.config.Statistics != other.config.Statistics {
+		return arena.ErrConfig
+	}
 	if e := h.open(); e != nil {
 		return e
 	}
@@ -778,40 +865,41 @@ func (h *StrInt32Map) Swap(other *StrInt32Map) error {
 		other.config.Budget.Release(incoming)
 	}
 	h.table, other.table = other.table, h.table
+	h.raw.words[2], other.raw.words[2] = other.raw.words[2], h.raw.words[2]
 	h.region, other.region = other.region, h.region
 	h.owners, other.owners = other.owners, h.owners
 	h.directoryBytes, other.directoryBytes = other.directoryBytes, h.directoryBytes
 	h.tableBytes, other.tableBytes = other.tableBytes, h.tableBytes
 	h.size, other.size = other.size, h.size
 	h.deleted, other.deleted = other.deleted, h.deleted
+	if h.config.Statistics {
+		x, e := h.readCollision()
+		if e != nil {
+			return e
+		}
+		y, e := other.readCollision()
+		if e != nil {
+			return e
+		}
+		if e = h.writeCollision(y); e != nil {
+			return e
+		}
+		if e = other.writeCollision(x); e != nil {
+			return e
+		}
+	}
 	h.bump()
 	other.bump()
 	return nil
 }
 func (h *StrInt32Map) CheckInvariant() bool {
-	if h.open() != nil {
-		return false
+	ok, e := h.CheckInvariantChecked()
+	if e != nil {
+		panic(e)
 	}
-	var used, deleted uint32
-	for i, owner := range h.owners {
-		if owner.region == nil || owner.origin != owner.region.OwnerID() || owner.origin == h.region.OwnerID() || i != 0 && h.owners[i-1].origin >= owner.origin {
-			return false
-		}
-	}
-	for _, e := range h.table {
-		if e.state == strHashUsed {
-			used++
-			if _, err := h.keyRegion(e.key); err != nil {
-				return false
-			}
-		} else if e.state == strHashDeleted {
-			deleted++
-		}
-	}
-	return used == h.size && deleted == h.deleted
+	return ok
 }
 
-// EntryRef is cold owner/epoch metadata replacing source borrowed entry pointers.
 type StrInt32MapEntryRef struct {
 	owner *StrInt32Map
 	epoch uint64
@@ -826,7 +914,18 @@ func (r StrInt32MapEntryRef) validate() error {
 	if e := r.owner.open(); e != nil {
 		return e
 	}
-	if r.epoch != r.owner.epoch || r.slot >= r.owner.Capacity() || r.owner.table[r.slot].state != strHashUsed {
+	capacity, e := r.owner.capacityChecked()
+	if e != nil {
+		return e
+	}
+	if r.epoch != r.owner.epoch || r.slot >= capacity {
+		return arena.ErrInvalidSlot
+	}
+	state, e := r.owner.entryState(r.slot)
+	if e != nil {
+		return e
+	}
+	if state != strHashUsed {
 		return arena.ErrInvalidSlot
 	}
 	return nil
@@ -835,7 +934,10 @@ func (r StrInt32MapEntryRef) Key() (StrKey, error) {
 	if e := r.validate(); e != nil {
 		return StrKey{}, e
 	}
-	k := r.owner.table[r.slot].key
+	k, e := r.owner.entryKey(r.slot)
+	if e != nil {
+		return StrKey{}, e
+	}
 	if e := r.owner.validateKey(k); e != nil {
 		return StrKey{}, e
 	}
@@ -845,7 +947,8 @@ func (r StrInt32MapEntryRef) Hash() (uint32, error) {
 	if e := r.validate(); e != nil {
 		return 0, e
 	}
-	return r.owner.table[r.slot].hash, nil
+	entry, e := r.owner.probeEntry(r.slot)
+	return entry.hash, e
 }
 
 // SetKey represents source e->set_data(owned_spelling) after interning. It
@@ -868,7 +971,10 @@ func (r StrInt32MapEntryRef) SetKeyFrom(region *arena.BytesRegion, k StrKey) err
 	if e != nil {
 		return e
 	}
-	entry := &r.owner.table[r.slot]
+	entry, e := r.owner.readEntry(r.slot)
+	if e != nil {
+		return e
+	}
 	if hash != entry.hash {
 		return arena.ErrBounds
 	}
@@ -886,7 +992,14 @@ func (r StrInt32MapEntryRef) SetKeyFrom(region *arena.BytesRegion, k StrKey) err
 	if e := r.owner.adopt(region); e != nil {
 		return e
 	}
-	entry.key = k
+	if r.owner.config.Runtime != nil {
+		b, e := r.owner.runtimeTable()
+		if e != nil {
+			return e
+		}
+		return r.owner.putKeyAt(b, r.slot, k)
+	}
+	r.owner.table[r.slot].key = k
 	return nil
 }
 
@@ -927,7 +1040,14 @@ func (h *StrInt32Map) FindIteratorFrom(region *arena.BytesRegion, k StrKey) (Str
 	return StrInt32MapIterator{h, h.epoch, r.slot, h.Capacity()}, nil
 }
 func (it *StrInt32MapIterator) scan() {
-	for it.index < it.end && it.owner.table[it.index].state != strHashUsed {
+	for it.index < it.end {
+		state, e := it.owner.entryState(it.index)
+		if e != nil {
+			panic(e)
+		}
+		if state == strHashUsed {
+			break
+		}
 		it.index++
 	}
 }
@@ -982,7 +1102,36 @@ func (it *StrInt32MapIterator) PostNext() (StrInt32MapIterator, error) {
 	return old, nil
 }
 
-// Get implements the source default-value find overload, copying the scalar.
+func (h *StrInt32Map) FindIntoFrom(region *arena.BytesRegion, k StrKey, out *int32) (bool, error) {
+	r, found, e := h.FindFrom(region, k)
+	if e != nil || !found {
+		return found, e
+	}
+	value, e := r.Value()
+	if e != nil {
+		return false, e
+	}
+	*out = value
+	return true, nil
+}
+
+func (h *StrInt32Map) Find(k StrKey) (int32, bool, error) {
+	r, ok, e := h.FindCore(k)
+	if e != nil || !ok {
+		return 0, ok, e
+	}
+	value, e := r.Value()
+	return value, true, e
+}
+
+func (h *StrInt32Map) FindInto(k StrKey, out *int32) (bool, error) {
+	found, ok, e := h.Find(k)
+	if e == nil && ok {
+		*out = found
+	}
+	return ok, e
+}
+
 func (h *StrInt32Map) Get(k StrKey, fallback int32) (int32, error) {
 	v, ok, e := h.Find(k)
 	if e != nil {
@@ -993,6 +1142,7 @@ func (h *StrInt32Map) Get(k StrKey, fallback int32) (int32, error) {
 	}
 	return v, nil
 }
+
 func (h *StrInt32Map) FindFromValue(region *arena.BytesRegion, k StrKey) (int32, bool, error) {
 	r, ok, e := h.FindFrom(region, k)
 	if e != nil || !ok {
@@ -1002,19 +1152,17 @@ func (h *StrInt32Map) FindFromValue(region *arena.BytesRegion, k StrKey) (int32,
 	return v, true, e
 }
 
-// Value/SetValue replace the source borrowed int reference and operator[].
 func (r StrInt32MapEntryRef) Value() (int32, error) {
 	if e := r.validate(); e != nil {
 		return 0, e
 	}
-	return r.owner.table[r.slot].value, nil
+	return r.owner.valueAt(r.slot)
 }
 func (r StrInt32MapEntryRef) SetValue(v int32) error {
 	if e := r.validate(); e != nil {
 		return e
 	}
-	r.owner.table[r.slot].value = v
-	return nil
+	return r.owner.putValueAt(r.slot, v)
 }
 func (it StrInt32MapIterator) Value() (int32, error) {
 	r, e := it.Ref()
@@ -1022,4 +1170,38 @@ func (it StrInt32MapIterator) Value() (int32, error) {
 		return 0, e
 	}
 	return r.Value()
+}
+
+// At and AtConst port src/util/map.h:149-163 reference-returning find.
+// A continued absent-entry assertion reaches a Go null-lvalue guard.
+func (h *StrInt32Map) At(k StrKey) (StrInt32MapEntryRef, error) {
+	return h.sourceValueReference(k, 157)
+}
+func (h *StrInt32Map) AtConst(k StrKey) (StrInt32MapEntryRef, error) {
+	return h.sourceValueReference(k, 151)
+}
+func (h *StrInt32Map) sourceValueReference(k StrKey, line int32) (StrInt32MapEntryRef, error) {
+	ref, found, e := h.FindCore(k)
+	if e != nil {
+		return StrInt32MapEntryRef{}, e
+	}
+	enabled, e := h.assertionsEnabled()
+	if e != nil {
+		return StrInt32MapEntryRef{}, e
+	}
+	if enabled && !found {
+		if h.config.Assertions == nil {
+			return StrInt32MapEntryRef{}, ErrStrHashtableAssertion
+		}
+		if e = h.config.Assertions.NotifyAssertionViolation("src/util/map.h", line, "e"); e != nil {
+			return StrInt32MapEntryRef{}, e
+		}
+		if e = h.config.Assertions.InvokeAssertionDebugger(); e != nil {
+			return StrInt32MapEntryRef{}, e
+		}
+	}
+	if !found {
+		return StrInt32MapEntryRef{}, arena.ErrBounds
+	}
+	return ref, nil
 }
