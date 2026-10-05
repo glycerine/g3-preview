@@ -131,8 +131,28 @@ func TestPolynomialCompletedAppendForeignMixedRefusalKeepsActualCallerINC(t *tes
 		t.Fatal("actual INC must remain caller-owned despite ACK refusal", cause)
 	}
 	state, used := c.memory.State(), c.integer.budget.Used()
-	if e = c.cheap.cleanupAppendInvocation(&appendReceipt, true); e != ErrPolynomialPending || c.cheap.appendScope != saved || c.memory.State() != state || c.integer.budget.Used() != used {
-		t.Fatal("mixed abort must refuse unchanged", e)
+	foreignCoefficient, e := c.cheap.as.coefficient(c, 0)
+	serviceMust(t, e)
+	foreignMonomial, e := c.cheap.ms.monomial(c, 0)
+	serviceMust(t, e)
+	foreignRC, e := c.monomialRefCount(foreignMonomial)
+	serviceMust(t, e)
+	// The incoming INC remains caller-owned after the completed-transfer ACK
+	// refuses. Exact per-slot transfer tags let explicit abort acknowledge the
+	// old cohort without acquiring this later source row.
+	serviceMust(t, c.cheap.cleanupAppendInvocation(&appendReceipt, true))
+	nowCoefficient, e := c.cheap.as.coefficient(c, 0)
+	serviceMust(t, e)
+	nowMonomial, e := c.cheap.ms.monomial(c, 0)
+	serviceMust(t, e)
+	nowRC, e := c.monomialRefCount(nowMonomial)
+	serviceMust(t, e)
+	as, e := c.cheap.as.size(c)
+	serviceMust(t, e)
+	ms, e := c.cheap.ms.size(c)
+	serviceMust(t, e)
+	if nowCoefficient != foreignCoefficient || nowMonomial != foreignMonomial || nowRC != foreignRC || as != 1 || ms != 1 || c.cheap.appendScope.active || c.cheap.appendScope.invocation != saved.invocation || out.incoming != a || !out.assigning || c.memory.State() != state || c.integer.budget.Used() != used {
+		t.Fatal("matched abort consumed actual caller INC or later foreign row")
 	}
 	serviceMust(t, c.cleanupFactoryInvocation(&factory, true))
 	polynomialQueryExpect(t, c, out.incoming, map[[3]uint32]int64{{}: 1})

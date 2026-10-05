@@ -5,6 +5,14 @@ package mpnum
 import "github.com/glycerine/g3/golang/memory"
 
 type polynomialCheapAppendScope struct {
+	buffer                                        *polynomialSOM
+	coefficientClaims, monomialClaims             uint32
+	compactionStage                               uint8
+	retirePhase                                   uint8
+	retireAs, retireMs                            uint32
+	compactIndex, compactTarget                   uint32
+	dropConsumed, dropLast                        bool
+	pendingDropConsumed, pendingDropLast          bool
 	invocation                                    uint64
 	active, stopped, foreignMixed                 bool
 	coefficients, monomials                       uint32
@@ -23,10 +31,10 @@ type polynomialCheapAppendInvocationReceipt struct {
 }
 
 func (b *polynomialSOM) matchesAppendInvocation(r *polynomialCheapAppendInvocationReceipt) bool {
-	return r != nil && r.manager == b.owner && r.frame == &b.appendScope && r.invocation != 0 && r.invocation == b.appendScope.invocation && b.appendScope.active
+	return b != nil && b.owner != nil && b.owner.self == b.owner && b == &b.owner.cheap && b.appendScope.buffer == b && r != nil && r.manager == b.owner && r.frame == &b.appendScope && r.invocation != 0 && r.invocation == b.appendScope.invocation && b.appendScope.active
 }
 func (b *polynomialSOM) acquireAppendInvocation(r *polynomialCheapAppendInvocationReceipt, n uint32) error {
-	if !b.cheap || b != &b.owner.cheap {
+	if b == nil || b.owner == nil || b.owner.self != b.owner || !b.cheap || b != &b.owner.cheap {
 		return ErrPolynomialOwner
 	}
 	s := &b.appendScope
@@ -35,15 +43,17 @@ func (b *polynomialSOM) acquireAppendInvocation(r *polynomialCheapAppendInvocati
 		return e
 	}
 	if s.active {
-		if !b.matchesAppendInvocation(r) || s.stopped || s.foreignMixed || as != s.coefficients || n != s.monomials {
+		if !b.matchesAppendInvocation(r) || s.stopped || as != n || b.hasPendingReference || s.retirePhase != 0 {
 			return ErrPolynomialPending
 		}
 		return nil
 	}
-	if n != 0 || as != 0 || b.hasPendingReference || s.invocation == ^uint64(0) {
+	if as != n || b.hasPendingReference || s.invocation == ^uint64(0) {
 		return ErrPolynomialPending
 	}
-	*s = polynomialCheapAppendScope{active: true, invocation: s.invocation + 1}
+	// Existing source rows precede this invocation and remain borrowed. Only
+	// actual subsequent slot-construction hooks stamp the new invocation.
+	*s = polynomialCheapAppendScope{buffer: b, active: true, invocation: s.invocation + 1, foreignMixed: n != 0, coefficients: n, monomials: n}
 	*r = polynomialCheapAppendInvocationReceipt{manager: b.owner, frame: s, invocation: s.invocation}
 	return nil
 }
@@ -51,9 +61,9 @@ func (b *polynomialSOM) addWithAppendReceipt(a *Int, term Monomial, take bool, r
 	return b.addConsumedReceipts(a, term, take, nil, nil, r)
 }
 
-// This partial prerequisite can retire a matched unmixed append cohort.
-// Foreign mixed vectors stop before any row or numeric token is consumed.
-// Ordered retirement through a later factory transfer remains open.
+// Explicit owning retirement consumes only this invocation's acquired rows.
+// Mixed rows and partial factory transfers use actual per-slot acquisition and
+// transfer tags; unknown provenance refuses before any payload is consumed.
 func (b *polynomialSOM) cleanupAppendInvocation(r *polynomialCheapAppendInvocationReceipt, abort bool) error {
 	if !abort || !b.matchesAppendInvocation(r) {
 		return nil
@@ -68,8 +78,11 @@ func (b *polynomialSOM) cleanupAppendInvocation(r *polynomialCheapAppendInvocati
 	if e != nil {
 		return e
 	}
-	if s.foreignMixed || b.resetActive || b.removeActive {
+	if b.resetActive || b.removeActive {
 		return ErrPolynomialPending
+	}
+	if s.foreignMixed || (as == 0 && n == 0 && s.coefficientClaims == 0 && s.monomialClaims == 0) {
+		return b.cleanupTaggedAppendInvocation(r)
 	}
 	if s.completedTransfer {
 		if as != 0 || n != 0 || s.transferredCoefficients != s.coefficients || s.transferredMonomials != s.monomials {

@@ -39,6 +39,9 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	}
 	adapterBytes := full.header + uint64(cap(full.lexBuckets.children))*uint64(reflect.TypeOf(polynomialVector{}).Size())
 	public := []*Int{&full.derivative.n, &full.derivative.a, &full.composition.a}
+	for _, b := range []*polynomialSOM{&m.som, &m.som2, &m.cheap, &m.cheap2} {
+		public = append(public, &b.cohortMovingCoefficient, &b.appendScope.movingCoefficient)
+	}
 	if m.scalarDivision.transportBound {
 		public = append(public, &m.scalarDivision.transport)
 	}
@@ -540,6 +543,9 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	}
 	if q != nil {
 		bytes += q.headerBytes
+	}
+	for _, b := range []*polynomialSOM{&m.som, &m.som2, &m.cheap, &m.cheap2} {
+		bytes += uint64(cap(b.coefficientOwners)+cap(b.monomialOwners)+cap(b.coefficientTransferred)+cap(b.monomialTransferred)) * 8
 	}
 	for _, v := range vectors {
 		bytes += uint64(cap(v.retired)) * uint64(reflect.TypeOf(Int{}).Size())

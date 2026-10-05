@@ -186,21 +186,46 @@ func (v *polynomialVector) appendCoefficientWithAppendScope(m *MultivariatePolyn
 	// The actual zero NUM slot exists before vector-size publication and the
 	// subsequent SET. A stopped SET still belongs to this constructed row.
 	if scope != nil {
+		scope.buffer.coefficientTransferred[i] = 0
 		if owned {
 			scope.coefficients = i + 1
+			scope.buffer.coefficientOwners[i] = scope.invocation
+			scope.coefficientClaims++
 		} else {
 			scope.foreignMixed = true
+			scope.buffer.coefficientOwners[i] = 0
+			if scope.retirePhase == 1 || scope.retirePhase == 2 {
+				scope.retireAs = i + 1
+			}
 		}
 	}
 	return v.publishSize(m, i+1)
 }
 func (v *polynomialVector) appendMonomial(m *MultivariatePolynomialCore, a Monomial) error {
+	return v.appendMonomialWithAppendScope(m, a, nil, false)
+}
+func (v *polynomialVector) appendMonomialWithAppendScope(m *MultivariatePolynomialCore, a Monomial, scope *polynomialCheapAppendScope, owned bool) error {
 	i, e := v.appendSlot(m)
 	if e != nil {
 		return e
 	}
 	if e = v.putMonomial(m, i, a); e != nil {
 		return e
+	}
+	if scope != nil {
+		scope.buffer.monomialTransferred[i] = 0
+		if owned {
+			scope.buffer.monomialOwners[i] = scope.invocation
+			scope.monomialClaims++
+			scope.monomials = i + 1
+			scope.pending = Monomial{}
+		} else {
+			scope.buffer.monomialOwners[i] = 0
+			if scope.retirePhase == 1 || scope.retirePhase == 2 {
+				scope.retireMs = i + 1
+			}
+			scope.foreignMixed = true
+		}
 	}
 	return v.publishSize(m, i+1)
 }
@@ -459,6 +484,7 @@ func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []Int, ms [
 		}
 		l.initializedCoefficients = i + 1
 		var a Int
+		movingAppend := false
 		if buffer != nil {
 			a, e = buffer.as.coefficient(m, i)
 			if e != nil {
@@ -467,8 +493,12 @@ func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []Int, ms [
 			if e = buffer.as.putCoefficient(m, i, Int{}); e != nil {
 				return Polynomial{}, e
 			}
-			if appendScope != nil {
-				appendScope.movingCoefficient = a
+			if buffer.appendScope.active && uint64(i) < uint64(len(buffer.coefficientOwners)) && buffer.coefficientOwners[i] == buffer.appendScope.invocation {
+				buffer.appendScope.movingCoefficient = a
+				movingAppend = true
+				buffer.coefficientOwners[i] = 0
+				buffer.coefficientTransferred[i] = buffer.appendScope.invocation
+				buffer.appendScope.coefficientClaims--
 			}
 		} else if single != nil {
 			a = *single
@@ -483,8 +513,10 @@ func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []Int, ms [
 		if e = m.writeCoefficient(p, i, a); e != nil {
 			return Polynomial{}, e
 		}
+		if movingAppend {
+			buffer.appendScope.movingCoefficient = Int{}
+		}
 		if appendScope != nil {
-			appendScope.movingCoefficient = Int{}
 			appendScope.transferredCoefficients = i + 1
 		}
 		var term Monomial
@@ -521,6 +553,11 @@ func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []Int, ms [
 			}
 			m.singletonReference = false
 			m.singletonMonomial = Monomial{}
+		}
+		if buffer != nil && buffer.appendScope.active && uint64(i) < uint64(len(buffer.monomialOwners)) && buffer.monomialOwners[i] == buffer.appendScope.invocation {
+			buffer.monomialOwners[i] = 0
+			buffer.monomialTransferred[i] = buffer.appendScope.invocation
+			buffer.appendScope.monomialClaims--
 		}
 		if buffer != nil {
 			buffer.transferred = i + 1

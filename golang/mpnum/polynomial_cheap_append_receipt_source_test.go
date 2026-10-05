@@ -100,6 +100,10 @@ func TestPolynomialCheapAppendReceiptMixedForeignRefusal(t *testing.T) {
 	serviceMust(t, c.cheap.addWithAppendReceipt(&a, c.monomials.unit, false, &r))
 	// An actual nil-receipt append is foreign to the first explicit cohort.
 	serviceMust(t, c.cheap.add(&b, variable, false))
+	// Invalid-Go adapter provenance fixture: actual source rows remain intact,
+	// but the claimed old monomial slot no longer has its acquisition tag. This
+	// is guard evidence; the separate known-row test proves successful retirement.
+	c.cheap.monomialOwners[0] = 0
 	before := c.cheap.appendScope
 	used, state := c.integer.budget.Used(), c.memory.State()
 	a0, e := c.cheap.as.coefficient(c, 0)
@@ -177,16 +181,24 @@ func TestPolynomialCheapAppendReceiptForeignSameCardinality(t *testing.T) {
 	used, state := c.integer.budget.Used(), c.memory.State()
 	row, e := c.cheap.as.coefficient(c, 0)
 	serviceMust(t, e)
+	term, e := c.cheap.ms.monomial(c, 0)
+	serviceMust(t, e)
+	refCount, e := c.monomialRefCount(term)
+	serviceMust(t, e)
 	if !before.foreignMixed || before.coefficients != 1 || before.monomials != 1 {
 		t.Fatal("foreign actual slot constructor was not tagged")
 	}
 	e = c.cheap.cleanupAppendInvocation(&old, true)
-	if !errors.Is(e, ErrPolynomialPending) {
-		t.Fatal("matching cardinality granted cleanup authority", e)
+	if e != nil {
+		t.Fatal("actual source transfer consumed all old tags; acknowledgement must not own the foreign row", e)
 	}
 	now, e := c.cheap.as.coefficient(c, 0)
 	serviceMust(t, e)
-	if now != row || before != c.cheap.appendScope || c.integer.budget.Used() != used || c.memory.State() != state {
+	nowTerm, e := c.cheap.ms.monomial(c, 0)
+	serviceMust(t, e)
+	nowRefCount, e := c.monomialRefCount(nowTerm)
+	serviceMust(t, e)
+	if now != row || nowTerm != term || nowRefCount != refCount || before.invocation != c.cheap.appendScope.invocation || c.cheap.appendScope.active || c.integer.budget.Used() != used || c.memory.State() != state {
 		t.Fatal("old receipt consumed same-size foreign cohort")
 	}
 	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, nil, 0)

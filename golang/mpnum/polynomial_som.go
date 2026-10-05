@@ -8,36 +8,40 @@ import (
 )
 
 type polynomialSOM struct {
-	arithmeticScope                      polynomialArithmeticScope
-	appendScope                          polynomialCheapAppendScope
-	factorsParent                        *PolynomialFactors
-	factorsGeneration                    uint64
-	retirementOwner                      *PolynomialSOMBuffer
-	borrowedAppend                       bool
-	borrowedAppendIndex                  uint32
-	unreferencedConsumed                 bool
-	unreferencedIndex                    uint32
-	removeActive, removeStopped          bool
-	removePrefix, removeSuffix           uint32
-	owner                                *MultivariatePolynomialCore
-	positions                            MonomialPositions
-	as, ms                               polynomialVector
-	gcd                                  Int
-	gcdActive                            bool
-	gcdEnded                             bool
-	gcdGeneration                        uint64
-	gcdInvocation                        uint64
-	gcdSubstitution                      *polynomialSubstitutionScope
-	gcdNormalization                     *polynomialNormalizeScope
-	gcdNumeric                           polynomialNumericRoots
-	gcdBodyCause, gcdCleanupCause        error
-	pendingMonomial                      Monomial
-	transferred, cleanupIndex            uint32
-	cleanupDropConsumed, cleanupDropLast bool
-	cheap, hasPendingReference           bool
-	resetActive                          bool
-	resetIndex                           uint32
-	resetStage                           uint8
+	cohortMovingCoefficient                     Int
+	cohortMovingMonomial                        Monomial
+	coefficientOwners, monomialOwners           []uint64
+	coefficientTransferred, monomialTransferred []uint64
+	arithmeticScope                             polynomialArithmeticScope
+	appendScope                                 polynomialCheapAppendScope
+	factorsParent                               *PolynomialFactors
+	factorsGeneration                           uint64
+	retirementOwner                             *PolynomialSOMBuffer
+	borrowedAppend                              bool
+	borrowedAppendIndex                         uint32
+	unreferencedConsumed                        bool
+	unreferencedIndex                           uint32
+	removeActive, removeStopped                 bool
+	removePrefix, removeSuffix                  uint32
+	owner                                       *MultivariatePolynomialCore
+	positions                                   MonomialPositions
+	as, ms                                      polynomialVector
+	gcd                                         Int
+	gcdActive                                   bool
+	gcdEnded                                    bool
+	gcdGeneration                               uint64
+	gcdInvocation                               uint64
+	gcdSubstitution                             *polynomialSubstitutionScope
+	gcdNormalization                            *polynomialNormalizeScope
+	gcdNumeric                                  polynomialNumericRoots
+	gcdBodyCause, gcdCleanupCause               error
+	pendingMonomial                             Monomial
+	transferred, cleanupIndex                   uint32
+	cleanupDropConsumed, cleanupDropLast        bool
+	cheap, hasPendingReference                  bool
+	resetActive                                 bool
+	resetIndex                                  uint32
+	resetStage                                  uint8
 }
 
 func (b *polynomialSOM) init(m *MultivariatePolynomialCore, cheap bool) {
@@ -90,6 +94,12 @@ func (b *polynomialSOM) addConsumedScalarDivEngine(a *Int, term Monomial, take b
 	if e != nil || zero {
 		return e
 	}
+	// An owning compaction has already changed the source columns. Ordinary
+	// append may extend an earlier deletion prefix, but cannot interpret or
+	// overwrite a partially compacted member layout.
+	if b.cheap && b.appendScope.active && b.appendScope.retirePhase >= 3 && b.appendScope.retirePhase <= 5 {
+		return ErrPolynomialPending
+	}
 	pos := ^uint32(0)
 	if !b.cheap {
 		pos, e = b.positions.Get(term)
@@ -125,6 +135,11 @@ func (b *polynomialSOM) addConsumedScalarDivEngine(a *Int, term Monomial, take b
 				appendScope.stopped = true
 			}
 		}()
+	}
+	if b.cheap && b.appendScope.active {
+		if e = b.prepareAppendTags(n + 1); e != nil {
+			return e
+		}
 	}
 	if b.retirementOwner != nil {
 		if e = b.retirementOwner.prepareRetirement(n + 1); e != nil {
@@ -196,7 +211,11 @@ func (b *polynomialSOM) addConsumedScalarDivEngine(a *Int, term Monomial, take b
 	if m.generatedActive && m.generatedMonomial == term {
 		m.transferGeneratedMonomial()
 	}
-	if e = b.ms.appendMonomial(m, term); e != nil {
+	observer := appendScope
+	if observer == nil && b.appendScope.active {
+		observer = &b.appendScope
+	}
+	if e = b.ms.appendMonomialWithAppendScope(m, term, observer, appendScope != nil); e != nil {
 		return e
 	}
 	if appendScope != nil {
@@ -479,8 +498,20 @@ func (b *polynomialSOM) reset() error {
 		if e != nil {
 			return e
 		}
+		if b.appendScope.active && uint64(i) < uint64(len(b.coefficientOwners)) && b.coefficientOwners[i] == b.appendScope.invocation {
+			b.coefficientOwners[i] = 0
+			b.appendScope.coefficientClaims--
+		}
 		b.resetStage = 3
-		if e = m.monomials.DecRef(term); e != nil {
+		outcome := monomialDecrementOutcome{}
+		if e = m.monomials.check(); e == nil {
+			e = m.monomials.decRefCoreOutcome(term, &outcome)
+		}
+		if outcome.written && b.appendScope.active && uint64(i) < uint64(len(b.monomialOwners)) && b.monomialOwners[i] == b.appendScope.invocation {
+			b.monomialOwners[i] = 0
+			b.appendScope.monomialClaims--
+		}
+		if e != nil {
 			return e
 		}
 		b.resetIndex = i + 1
@@ -728,6 +759,18 @@ func (b *polynomialSOM) close() error {
 	if e := b.finishNormalizeNumeral(true); e != nil {
 		return e
 	}
+	// A previous explicit owning phase can have completed earlier row actions.
+	// Finish that exact actual frame before the whole class visits its remaining
+	// member fields, so completed references are not decremented a second time.
+	s := &b.appendScope
+	if s.active && (s.retirePhase != 0 || s.coefficientCursor != 0 || s.monomialCursor != 0) {
+		r := polynomialCheapAppendInvocationReceipt{manager: m, frame: s, invocation: s.invocation}
+		if b.matchesAppendInvocation(&r) {
+			if e := b.cleanupAppendInvocation(&r, true); e != nil {
+				return e
+			}
+		}
+	}
 	if b.hasPendingReference {
 		if e := m.monomials.DecRef(b.pendingMonomial); e != nil {
 			return e
@@ -824,6 +867,10 @@ func (b *polynomialSOM) close() error {
 	if e = b.as.close(m); e != nil {
 		return e
 	}
+	m.integer.budget.Release(uint64(cap(b.coefficientOwners)+cap(b.monomialOwners)+cap(b.coefficientTransferred)+cap(b.monomialTransferred)) * 8)
+	b.coefficientOwners = nil
+	b.monomialOwners = nil
+	b.coefficientTransferred, b.monomialTransferred = nil, nil
 	if !b.cheap && !b.positions.closed {
 		if e = b.positions.CloseChecked(); e != nil {
 			return e

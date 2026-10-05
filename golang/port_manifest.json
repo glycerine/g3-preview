@@ -28655,7 +28655,10 @@
         "mpnum/polynomial_monomial_allocator_leaf_source_test.go",
         "mpnum/polynomial_lex_raw_pointer.go",
         "mpnum/polynomial_lex_raw_source_test.go",
-        "mpnum/polynomial_scalar_div_allocation_context.go"
+        "mpnum/polynomial_scalar_div_allocation_context.go",
+        "mpnum/polynomial_cheap_append_receipt_source_test.go",
+        "mpnum/polynomial_som_cohort_tags.go",
+        "mpnum/polynomial_som_ordered_cohort_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -29244,7 +29247,21 @@
         "TestScalarDivDirectNumericNilContextSourceMath",
         "TestScalarDivDirectBigActualAllocationPrefixes",
         "TestScalarDivDirectCopiedRawChildRefusesWithoutMutation",
-        "TestScalarDivDirectStoppedReturnedCauseSurvivesOwnAndNewInvocation"
+        "TestScalarDivDirectStoppedReturnedCauseSurvivesOwnAndNewInvocation",
+        "TestPolynomialCheapMatchedRootRowRetirementPreservesForeign",
+        "TestPolynomialCheapActualFactoryMovesRetireMatchedTags",
+        "TestPolynomialCheapMatchedRowConsumedLastDropResumesExactLeaf",
+        "TestPolynomialCheapOwnerCloseResumesConsumedMatchedDrop",
+        "TestPolynomialCheapSourceResetConsumesOldTagsBeforeForeignReuse",
+        "TestPolynomialCheapMatchedInvocationStartsAfterForeignSourceRow",
+        "TestPolynomialCheapKnownPartialCopyPreservesEarlierForeignRow",
+        "TestPolynomialCheapCompactedRowsRetryAfterPendingPhysicalRelease",
+        "TestPolynomialCheapKnownPendingINCPreservesEarlierForeignRows",
+        "TestPolynomialCheapLiveMatchedInvocationContinuesAfterForeignAppend",
+        "TestPolynomialCheapStoppedPrecompactionPreservesLaterForeignAppend",
+        "TestPolynomialCheapFactoryCoefficientMoveBeforeZeroRefSourceGuard",
+        "TestPolynomialCheapCopiedBufferFrameCannotConsumeActualRows",
+        "TestPolynomialCheapOwnerClosePreservesAlreadyConsumedEarlierOwnedRow"
       ],
       "conditionals": [
         {
@@ -32389,6 +32406,78 @@
             "TestScalarDivDirectCopiedRawChildRefusesWithoutMutation",
             "TestScalarDivDirectStoppedReturnedCauseSurvivesOwnAndNewInvocation"
           ]
+        },
+        {
+          "name": "src/math/polynomial/polynomial.cpp:2217-2255,2280-2299 addConsumedScalarDivEngine/reset/close: Literal source append/reset preserved; explicit owning exact-cohort retirement and started-phase close resumption.",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_som.go",
+          "tests": [
+            "TestPolynomialCheapMatchedRootRowRetirementPreservesForeign",
+            "TestPolynomialCheapActualFactoryMovesRetireMatchedTags",
+            "TestPolynomialCheapMatchedRowConsumedLastDropResumesExactLeaf",
+            "TestPolynomialCheapOwnerCloseResumesConsumedMatchedDrop",
+            "TestPolynomialCheapSourceResetConsumesOldTagsBeforeForeignReuse",
+            "TestPolynomialCheapMatchedInvocationStartsAfterForeignSourceRow",
+            "TestPolynomialCheapKnownPartialCopyPreservesEarlierForeignRow",
+            "TestPolynomialCheapCompactedRowsRetryAfterPendingPhysicalRelease",
+            "TestPolynomialCheapKnownPendingINCPreservesEarlierForeignRows",
+            "TestPolynomialCheapLiveMatchedInvocationContinuesAfterForeignAppend",
+            "TestPolynomialCheapStoppedPrecompactionPreservesLaterForeignAppend",
+            "TestPolynomialCheapFactoryCoefficientMoveBeforeZeroRefSourceGuard",
+            "TestPolynomialCheapCopiedBufferFrameCannotConsumeActualRows",
+            "TestPolynomialCheapOwnerClosePreservesAlreadyConsumedEarlierOwnedRow",
+            "TestPolynomialCheapAppendReceiptMixedForeignRefusal",
+            "TestPolynomialCheapAppendReceiptForeignSameCardinality",
+            "TestPolynomialCompletedAppendForeignMixedRefusalKeepsActualCallerINC"
+          ]
+        },
+        {
+          "name": "src/math/polynomial/polynomial.cpp:1414-1416,2485-2492 mkCellWithReceipts: Coefficient clear/publication and monomial publication stamp actual transfer; raw ms read preserved, no logical SIZE assertion.",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_store.go",
+          "tests": [
+            "TestPolynomialCheapMatchedRootRowRetirementPreservesForeign",
+            "TestPolynomialCheapActualFactoryMovesRetireMatchedTags",
+            "TestPolynomialCheapMatchedRowConsumedLastDropResumesExactLeaf",
+            "TestPolynomialCheapOwnerCloseResumesConsumedMatchedDrop",
+            "TestPolynomialCheapSourceResetConsumesOldTagsBeforeForeignReuse",
+            "TestPolynomialCheapMatchedInvocationStartsAfterForeignSourceRow",
+            "TestPolynomialCheapKnownPartialCopyPreservesEarlierForeignRow",
+            "TestPolynomialCheapCompactedRowsRetryAfterPendingPhysicalRelease",
+            "TestPolynomialCheapKnownPendingINCPreservesEarlierForeignRows",
+            "TestPolynomialCheapLiveMatchedInvocationContinuesAfterForeignAppend",
+            "TestPolynomialCheapStoppedPrecompactionPreservesLaterForeignAppend",
+            "TestPolynomialCheapFactoryCoefficientMoveBeforeZeroRefSourceGuard",
+            "TestPolynomialCheapCopiedBufferFrameCannotConsumeActualRows",
+            "TestPolynomialCheapOwnerClosePreservesAlreadyConsumedEarlierOwnedRow",
+            "TestPolynomialCheapAppendReceiptMixedForeignRefusal",
+            "TestPolynomialCheapAppendReceiptForeignSameCardinality",
+            "TestPolynomialCompletedAppendForeignMixedRefusalKeepsActualCallerINC"
+          ]
+        },
+        {
+          "name": "src/math/polynomial/polynomial.cpp:2217-2255 cleanupTaggedAppendInvocation: Go owning adaptation: exact tags/remaining phases and foreign-preserving compaction; never literal Reset/destructor credit.",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_som_cohort_tags.go",
+          "tests": [
+            "TestPolynomialCheapMatchedRootRowRetirementPreservesForeign",
+            "TestPolynomialCheapActualFactoryMovesRetireMatchedTags",
+            "TestPolynomialCheapMatchedRowConsumedLastDropResumesExactLeaf",
+            "TestPolynomialCheapOwnerCloseResumesConsumedMatchedDrop",
+            "TestPolynomialCheapSourceResetConsumesOldTagsBeforeForeignReuse",
+            "TestPolynomialCheapMatchedInvocationStartsAfterForeignSourceRow",
+            "TestPolynomialCheapKnownPartialCopyPreservesEarlierForeignRow",
+            "TestPolynomialCheapCompactedRowsRetryAfterPendingPhysicalRelease",
+            "TestPolynomialCheapKnownPendingINCPreservesEarlierForeignRows",
+            "TestPolynomialCheapLiveMatchedInvocationContinuesAfterForeignAppend",
+            "TestPolynomialCheapStoppedPrecompactionPreservesLaterForeignAppend",
+            "TestPolynomialCheapFactoryCoefficientMoveBeforeZeroRefSourceGuard",
+            "TestPolynomialCheapCopiedBufferFrameCannotConsumeActualRows",
+            "TestPolynomialCheapOwnerClosePreservesAlreadyConsumedEarlierOwnedRow",
+            "TestPolynomialCheapAppendReceiptMixedForeignRefusal",
+            "TestPolynomialCheapAppendReceiptForeignSameCardinality",
+            "TestPolynomialCompletedAppendForeignMixedRefusalKeepsActualCallerINC"
+          ]
         }
       ],
       "ownership": [
@@ -32472,7 +32561,11 @@
         "Captured core/Polynomial/ObjectRef/base guard exact live slot/generation and current raw identity at each reached initialized-prefix/allocator word read. No logical SIZE read; same source buffer values/captured mapping pointer.",
         "Existing actual nested Runtime row backing, raw/moved-prefix/old/pending roots and charged children directory remain; source append rereads other.SIZE per loop, default CAP assertion before expansion overflow/allocation, size read before each source cycle.",
         "Independent full named polynomial/NUM/monomial/raw/cold census immediate under active fault for every existing reservation before firstsuccess; public higher-variable permutation retained before lower recursive refusal.",
-        "Actual scalar core/embedded frame/nonwrapping invocation plus exact Integer/Modular receiver and executing callback-depth guard. Allocation capture/clear occurs only at actual existing integer, allocator and named Natural buffer leaves. Actual embedded RAW child and private buffer addresses reject copied owners. Successful persistent Inv/Natural publication stays member-owned; inactive same-invocation diagnostic history carries no numeric authority."
+        "Actual scalar core/embedded frame/nonwrapping invocation plus exact Integer/Modular receiver and executing callback-depth guard. Allocation capture/clear occurs only at actual existing integer, allocator and named Natural buffer leaves. Actual embedded RAW child and private buffer addresses reject copied owners. Successful persistent Inv/Natural publication stays member-owned; inactive same-invocation diagnostic history carries no numeric authority.",
+        "Actual cheap SOM row tags are pointer-free nonwrapping invocation numbers stamped only at zero-NUM construction, monomial slot publication and factory ownership transfer. Original source vectors remain authoritative; four fully charged cold uint64 directories are Go ownership metadata, not source malloc events.",
+        "Actual owner/self/core.cheap/frame-address/nonce guards distinguish copied/stale/foreign receipts. Explicit mixed retirement follows NUM then pending/row INC ownership; foreign rows retain original order/RC/values and actual moving holders retain compaction payload. Source Reset and raw factory read order are unchanged.",
+        "Phase-specific retry records actual consumed-last DEC outcome and completed compaction/SIZE/numeric cleanup. Whole owning close first resumes its already-started exact append phase so earlier DEC is not repeated. Completed foreign source appends during precompaction extend saved bounds only at actual slot/publication hooks; transient compaction rejects unsafe appends before mutation.",
+        "Factory transfer tags acknowledge consumed old columns, including qualified coefficient-before-zero-RC constructor assertion. Later foreign rows and caller incoming INC survive matched cleanup even when completed-transfer acknowledgment refuses. Accepted ScalarDiv direct transport and Lex monomialBase remain intact."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -32540,7 +32633,8 @@
         "Concrete actual12/16-byte codecs remain replacement representation, not native NUM/pointer ABI closure.",
         "Existing registered high-level polynomial driver is not newly credited wholesale; independent branch/oracle and source-consumer tests only.",
         "Global DEBUG/TRACE/ostream and broad nested-vector/copy/lifecycle source methods remain partial.",
-        "polynomial.cpp:2757-2768 selected ScalarDiv transport prerequisite only: public/nil Integer negative Div and ExtendedGCD still eagerly delete RAW locals on failed bodies and remain incomplete. Shared mixed cohort ordered retirement and full Discriminant/Factor parents remain open. Native real signed-TLS guard reaches caller NUM DT; checked reaches failed younger verification ctor with no invented source DT. No new dormant original driver assertion credit or unit promotion."
+        "polynomial.cpp:2757-2768 selected ScalarDiv transport prerequisite only: public/nil Integer negative Div and ExtendedGCD still eagerly delete RAW locals on failed bodies and remain incomplete. Shared mixed cohort ordered retirement and full Discriminant/Factor parents remain open. Native real signed-TLS guard reaches caller NUM DT; checked reaches failed younger verification ctor with no invented source DT. No new dormant original driver assertion credit or unit promotion.",
+        "Selected ordered cheap append retirement prerequisite only; regular SOM arithmetic wrappers, full Factor/Discriminant, registered driver and source unit completion remain open. Guard-only/malformed owner fixtures have no valid C++ mathematical failure credit. Successful validated clear-to-publish writes have no intervening source allocation/callback; no manufactured faultpoint or ordinary-prefix claim."
       ]
     },
     {

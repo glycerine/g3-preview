@@ -37,6 +37,9 @@ func polynomialPhysicalAuditWithHandlers(t *testing.T, m *MultivariatePolynomial
 	add(z.intMin)
 	add(z.two64)
 	public = append(public, &m.substitution.scope.newA, &m.substitution.scope.tmp)
+	for _, b := range []*polynomialSOM{&m.som, &m.som2, &m.cheap, &m.cheap2} {
+		public = append(public, &b.cohortMovingCoefficient, &b.appendScope.movingCoefficient)
+	}
 	for _, a := range public {
 		if a != nil {
 			add(*a)
@@ -204,6 +207,9 @@ func polynomialPhysicalAuditWithHandlers(t *testing.T, m *MultivariatePolynomial
 	}
 	if q != nil {
 		bytes += q.headerBytes
+	}
+	for _, b := range []*polynomialSOM{&m.som, &m.som2, &m.cheap, &m.cheap2} {
+		bytes += uint64(cap(b.coefficientOwners)+cap(b.monomialOwners)+cap(b.coefficientTransferred)+cap(b.monomialTransferred)) * 8
 	}
 	for _, v := range vectors {
 		bytes += uint64(cap(v.retired)) * uint64(reflect.TypeOf(Int{}).Size())
