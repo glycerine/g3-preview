@@ -28809,7 +28809,10 @@
         "mpnum/polynomial_coefficient_two_buffer_big_source_test.go",
         "mpnum/polynomial_coefficient_factory_frame_source_test.go",
         "mpnum/polynomial_factor_n_sqf.go",
-        "mpnum/polynomial_factor_n_sqf_source_test.go"
+        "mpnum/polynomial_factor_n_sqf_source_test.go",
+        "mpnum/polynomial_power_invocation.go",
+        "mpnum/polynomial_power_child_source_test.go",
+        "mpnum/polynomial_power_raw_stop_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -29498,7 +29501,13 @@
         "TestPolynomialCoefficientTwoBufferStaleChildrenPreserveReplacement",
         "TestPolynomialHigherFactorSourceTODOKeepsOriginalFactor",
         "TestPolynomialHigherFactorDegreeAssertionPrecedesPublication",
-        "TestPolynomialHigherFactorEveryReachedAssertionAndPushPrefix"
+        "TestPolynomialHigherFactorEveryReachedAssertionAndPushPrefix",
+        "TestPolynomialPowerActualProductChildPrefixes",
+        "TestPolynomialPowerActualReceiptQuickAndReuse",
+        "TestPolynomialPowerMatchedAbortPreservesForeignRegularRow",
+        "TestPolynomialPowerSourceContinuationCopiedOwnerRefuses",
+        "TestPolynomialPowerBodyHistorySurvivesExactOwnACK",
+        "TestPolynomialPowerYoungerAddMulSourceStopPreservesOlderResultAndHistory"
       ],
       "conditionals": [
         {
@@ -32994,6 +33003,19 @@
             "TestPolynomialHigherFactorDegreeAssertionPrecedesPublication",
             "TestPolynomialHigherFactorEveryReachedAssertionAndPushPrefix"
           ]
+        },
+        {
+          "name": "Power polynomial.cpp:4600-4614 actual guarded invocation and Mul child, source result destructor and matched ownership history",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_power_invocation.go",
+          "tests": [
+            "TestPolynomialPowerActualProductChildPrefixes",
+            "TestPolynomialPowerActualReceiptQuickAndReuse",
+            "TestPolynomialPowerMatchedAbortPreservesForeignRegularRow",
+            "TestPolynomialPowerSourceContinuationCopiedOwnerRefuses",
+            "TestPolynomialPowerBodyHistorySurvivesExactOwnACK",
+            "TestPolynomialPowerYoungerAddMulSourceStopPreservesOlderResultAndHistory"
+          ]
         }
       ],
       "ownership": [
@@ -33097,7 +33119,8 @@
         "Scalar ExactDiv source polynomial.cpp:5094-5114 resets R before actual RAW tmp, captures direct Copy/Div and real negative RAW/field/PN/compiled Bool NUM children at their actual calls, and reaches explicit end-only DEL before R.mk. Actual matched cleanup owns only saved frame/nonwrapping invocation roots; public executing-owner guard precedes mutation; immutable child/body history survives acknowledgment. No failed-body synthetic DEL or global scratch sweep.",
         "Both actual cheap and cheap2 source children acquired at reached guarded ADD/mk actions, with direct accepted Copy/PN leaves, charged row tags and actual factory leaf authority. Actual incoming INC factory transfer acknowledges only matched coefficient-child metadata before older DEC callbacks; no mirrored NUM payload or high-level root snapshot.",
         "False completes younger reached child source suffix before caller older locals; true retires exact unjoined rows/factory/generated leaves afterward. Source cause and child diagnostic identities persist across owning acknowledgment. Copied factory source frame cannot acknowledge real child; stale reused Coeff/AR/append/factory tuples preserve current physical roots.",
-        "No additional lexical NUM or polynomial reference; actual factors Push publishes borrowed pointer before INC and records exact acquired ownership. Actual assertion predicate frames remain owned by the full manager; all prefix graphs precede fault lift, predicate/factors owning cleanup preserves caller RC."
+        "No additional lexical NUM or polynomial reference; actual factors Push publishes borrowed pointer before INC and records exact acquired ownership. Actual assertion predicate frames remain owned by the full manager; all prefix graphs precede fault lift, predicate/factors owning cleanup preserves caller RC.",
+        "Power polynomial.cpp:4600-4614 acquires only its actual charged embedded result frame for k>=2 after existing entry/active/nonwrapping generation guards; exact manager/frame/nonce identifies the actual Mul arithmetic child. Completed younger source children precede older result destruction; only explicit abort drains matched unjoined child roots afterward. Source/body causes and concrete child identity survive owning acknowledgment without retaining result or numeric payload authority; new guarded invocation retires that history."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -33175,7 +33198,8 @@
         "Selected standalone Neg closure only. Discriminant/Resultant/Power parent continuation remains held. Signed-host TLS destructor stops and returning Runtime error-transport owner refusal are qualified Go guard profiles. No new registered source-driver assertion credit or whole polynomial-unit promotion.",
         "Selected Divides/Neg/linear/quadratic helpers only; full factorization, held Discriminant/Resultant parent and original dormant driver completion are not claimed. Signed-host TLS destructor-stop evidence is a guarded owner-primitive profile, not ordinary OOM. Newton duplicate cold census and deterministic public stream fixture corrections preserve physical/source assertions. Existing Divides full Close preguard already prevents mutation; no unnecessary new guard introduced.",
         "Selected two-buffer optional Coeff continuation only. Pseudo/Resultant/Power/Discriminant actual parent child extraction remains separate; no whole polynomial/source driver completion credit. Metadata of actual foreign callback Coeff invocation remains admitted at reached source actions, while direct numerical acquisition still requires callbackDepth zero; no new callback allocating-OOM completion claim.",
-        "The source itself leaves higher-degree multivariate factorization as a TODO and pushes the original factor. This port preserves that literal algorithm; no enclosing Factor dispatcher/univariate backend completion or dormant source-driver credit is claimed."
+        "The source itself leaves higher-degree multivariate factorization as a TODO and pushes the original factor. This port preserves that literal algorithm; no enclosing Factor dispatcher/univariate backend completion or dormant source-driver credit is claimed.",
+        "Power ownership tests include real every-reservation prefixes, later foreign regular row preservation and signed-host TLS/direct-allocator RAW end-DEL profile, not ordinary mathematical free OOM. Copied-owner/frame and stale receipt tests are invalid-Go-owner guard coverage. Existing active linear Power arithmetic status is preserved; no complete Pseudo/Resultant/Discriminant/Factor or source-unit/registered-driver promotion."
       ]
     },
     {
