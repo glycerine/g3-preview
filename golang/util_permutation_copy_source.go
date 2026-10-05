@@ -18,11 +18,11 @@ func (p *RuntimePermutation) Clone() (*RuntimePermutation, error) {
 	if e := p.budget.Reserve(h); e != nil {
 		return nil, e
 	}
-	out := &RuntimePermutation{budget: p.budget, header: h}
+	out := &RuntimePermutation{budget: p.budget, header: h, debugContext: p.debugContext}
 	out.self = out
 	out.forward.bind(p.forward.column.raw.runtime, p.budget)
 	out.inverse.bind(p.inverse.column.raw.runtime, p.budget)
-	if e := out.forward.copyConstruct(&p.forward); e != nil {
+	if e := out.forward.copyConstructDebug(&p.forward, out.debugContext); e != nil {
 		out.constructorCause = e
 		if d := out.SourceFinalize(); d != nil {
 			return out, errors.Join(e, d)
@@ -30,7 +30,7 @@ func (p *RuntimePermutation) Clone() (*RuntimePermutation, error) {
 		return out, e
 	}
 	out.completedMembers = 1
-	if e := out.inverse.copyConstruct(&p.inverse); e != nil {
+	if e := out.inverse.copyConstructDebug(&p.inverse, out.debugContext); e != nil {
 		out.constructorCause = e
 		if d := out.SourceFinalize(); d != nil {
 			return out, errors.Join(e, d)
@@ -47,8 +47,8 @@ func (p *RuntimePermutation) Assign(src *RuntimePermutation) error {
 	if e := src.open(); e != nil {
 		return e
 	}
-	if e := p.forward.Assign(&src.forward); e != nil {
+	if e := p.forward.assignDebug(&src.forward, p.debugContext); e != nil {
 		return e
 	}
-	return p.inverse.Assign(&src.inverse)
+	return p.inverse.assignDebug(&src.inverse, p.debugContext)
 }

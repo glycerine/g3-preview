@@ -17,6 +17,7 @@ type RuntimePermutation struct {
 	forward, inverse                  RuntimeUnsignedVector
 	budget                            *arena.Budget
 	header                            uint64
+	debugContext                      *DebugContext
 	constructorCause, destructorCause error
 	destructorStage                   uint8
 	completedMembers                  uint8
@@ -24,6 +25,14 @@ type RuntimePermutation struct {
 }
 
 func NewRuntimePermutation(r *memory.Runtime, b *arena.Budget, n uint32) (*RuntimePermutation, error) {
+	return NewRuntimePermutationWithAssertions(r, b, n, nil)
+}
+
+// The assertion provider is borrowed configuration; it is read only at macro sites.
+func NewRuntimePermutationWithAssertions(r *memory.Runtime, b *arena.Budget, n uint32, d *DebugContext) (*RuntimePermutation, error) {
+	if d != nil && (d.self != d || d.budget != b) {
+		return nil, arena.ErrConfig
+	}
 	if r == nil || b == nil || r.Budget() != b {
 		return nil, arena.ErrConfig
 	}
@@ -34,7 +43,7 @@ func NewRuntimePermutation(r *memory.Runtime, b *arena.Budget, n uint32) (*Runti
 	if e := b.Reserve(h); e != nil {
 		return nil, e
 	}
-	p := &RuntimePermutation{budget: b, header: h}
+	p := &RuntimePermutation{budget: b, header: h, debugContext: d}
 	p.self = p
 	p.forward.bind(r, b)
 	p.inverse.bind(r, b)
@@ -69,13 +78,13 @@ func (p *RuntimePermutation) At(i uint32) (uint32, error) {
 	if e := p.open(); e != nil {
 		return 0, e
 	}
-	return p.forward.At(i)
+	return p.read(&p.forward, i)
 }
 func (p *RuntimePermutation) Inv(i uint32) (uint32, error) {
 	if e := p.open(); e != nil {
 		return 0, e
 	}
-	return p.inverse.At(i)
+	return p.read(&p.inverse, i)
 }
 func (p *RuntimePermutation) Reset(n uint32) error {
 	if e := p.open(); e != nil {
@@ -88,10 +97,10 @@ func (p *RuntimePermutation) Reset(n uint32) error {
 		return e
 	}
 	for i := uint32(0); i < n; i++ {
-		if e := p.forward.Push(i); e != nil {
+		if e := p.push(&p.forward, i); e != nil {
 			return e
 		}
-		if e := p.inverse.Push(i); e != nil {
+		if e := p.push(&p.inverse, i); e != nil {
 			return e
 		}
 	}
@@ -101,41 +110,41 @@ func (p *RuntimePermutation) Swap(i, j uint32) error {
 	if e := p.open(); e != nil {
 		return e
 	}
-	a, e := p.forward.At(i)
+	a, e := p.read(&p.forward, i)
 	if e != nil {
 		return e
 	}
-	b, e := p.forward.At(j)
+	b, e := p.read(&p.forward, j)
 	if e != nil {
 		return e
 	}
 	// std::swap first reads its actual operands, then publishes them in order.
-	x, e := p.forward.At(i)
+	x, e := p.read(&p.forward, i)
 	if e != nil {
 		return e
 	}
-	y, e := p.forward.At(j)
+	y, e := p.read(&p.forward, j)
 	if e != nil {
 		return e
 	}
-	if e = p.forward.Set(i, y); e != nil {
+	if e = p.write(&p.forward, i, y); e != nil {
 		return e
 	}
-	if e = p.forward.Set(j, x); e != nil {
+	if e = p.write(&p.forward, j, x); e != nil {
 		return e
 	}
-	x, e = p.inverse.At(a)
+	x, e = p.read(&p.inverse, a)
 	if e != nil {
 		return e
 	}
-	y, e = p.inverse.At(b)
+	y, e = p.read(&p.inverse, b)
 	if e != nil {
 		return e
 	}
-	if e = p.inverse.Set(a, y); e != nil {
+	if e = p.write(&p.inverse, a, y); e != nil {
 		return e
 	}
-	return p.inverse.Set(b, x)
+	return p.write(&p.inverse, b, x)
 }
 func (p *RuntimePermutation) MoveAfter(i, j uint32) error {
 	if e := p.open(); e != nil {
@@ -144,33 +153,37 @@ func (p *RuntimePermutation) MoveAfter(i, j uint32) error {
 	if i >= j {
 		return nil
 	}
-	a, e := p.forward.At(i)
+	a, e := p.read(&p.forward, i)
 	if e != nil {
 		return e
 	}
 	for k := i; k < j; k++ {
-		v, e := p.forward.At(k + 1)
+		v, e := p.read(&p.forward, k+1)
 		if e != nil {
 			return e
 		}
-		if e = p.forward.Set(k, v); e != nil {
+		if e = p.write(&p.forward, k, v); e != nil {
 			return e
 		}
-		v, e = p.forward.At(k)
+		v, e = p.read(&p.forward, k)
 		if e != nil {
 			return e
 		}
-		if e = p.inverse.Set(v, k); e != nil {
+		if e = p.write(&p.inverse, v, k); e != nil {
 			return e
 		}
 	}
-	if e = p.forward.Set(j, a); e != nil {
+	if e = p.write(&p.forward, j, a); e != nil {
 		return e
 	}
-	if e = p.inverse.Set(a, j); e != nil {
+	if e = p.write(&p.inverse, a, j); e != nil {
 		return e
 	}
-	if satStorageSourceDebug {
+	on, e := permutationAssertions(p.debugContext)
+	if e != nil {
+		return e
+	}
+	if on {
 		_, e = p.CheckInvariant()
 		return e
 	}
@@ -180,7 +193,11 @@ func (p *RuntimePermutation) CheckInvariant() (bool, error) {
 	if e := p.open(); e != nil {
 		return false, e
 	}
-	if satStorageSourceDebug {
+	on, e := permutationAssertions(p.debugContext)
+	if e != nil {
+		return false, e
+	}
+	if on {
 		a, e := p.forward.Size()
 		if e != nil {
 			return false, e
@@ -198,37 +215,59 @@ func (p *RuntimePermutation) CheckInvariant() (bool, error) {
 		return false, e
 	}
 	for i := uint32(0); i < n; i++ {
-		if satStorageSourceDebug {
-			a, e := p.forward.At(i)
+		on, e = permutationAssertions(p.debugContext)
+		if e != nil {
+			return false, e
+		}
+		if on {
+			a, e := p.read(&p.forward, i)
 			if e != nil {
 				return false, e
 			}
 			if a >= n {
 				return false, ErrSATAssertion
 			}
-			b, e := p.inverse.At(i)
+		}
+		on, e = permutationAssertions(p.debugContext)
+		if e != nil {
+			return false, e
+		}
+		if on {
+			a, e := p.read(&p.inverse, i)
 			if e != nil {
 				return false, e
 			}
-			if b >= n {
+			if a >= n {
 				return false, ErrSATAssertion
 			}
-			b, e = p.inverse.At(i)
+		}
+		on, e = permutationAssertions(p.debugContext)
+		if e != nil {
+			return false, e
+		}
+		if on {
+			a, e := p.read(&p.inverse, i)
 			if e != nil {
 				return false, e
 			}
-			a, e = p.forward.At(b)
+			b, e := p.read(&p.forward, a)
 			if e != nil {
 				return false, e
 			}
-			if a != i {
+			if b != i {
 				return false, ErrSATAssertion
 			}
-			a, e = p.forward.At(i)
+		}
+		on, e = permutationAssertions(p.debugContext)
+		if e != nil {
+			return false, e
+		}
+		if on {
+			a, e := p.read(&p.forward, i)
 			if e != nil {
 				return false, e
 			}
-			b, e = p.inverse.At(a)
+			b, e := p.read(&p.inverse, a)
 			if e != nil {
 				return false, e
 			}
@@ -256,7 +295,7 @@ func (p *RuntimePermutation) Display(w io.Writer) error {
 		if _, e = io.WriteString(w, ":"); e != nil {
 			return e
 		}
-		v, e := p.forward.At(i)
+		v, e := p.read(&p.forward, i)
 		if e != nil {
 			return e
 		}

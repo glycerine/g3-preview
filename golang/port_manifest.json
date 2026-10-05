@@ -102005,7 +102005,9 @@
         "util_int_heap_debug_source_test.go",
         "memory/small_allocator_assertions.go",
         "util_small_object_allocator_assertions_test.go",
-        "util_small_object_allocator.go"
+        "util_small_object_allocator.go",
+        "util_permutation_diagnostics_source.go",
+        "util_permutation_diagnostics_source_test.go"
       ],
       "tests": [
         "TestDebugContextSourceLazyInitializationAndAssertions",
@@ -102030,7 +102032,15 @@
         "TestIntHeapDebugBorrowedTagBytesGuardOnlyAtLookup",
         "TestIntHeapDebugFinalizeReinitializeAndCopiedBorrow",
         "TestIntHeapDebugSwapFourAssertionSitesInSourceOrder",
-        "TestIntHeapDebugBorrowedOwnerSeparateBudgetGraph"
+        "TestIntHeapDebugBorrowedOwnerSeparateBudgetGraph",
+        "TestRuntimePermutationAssertionsActualPartialResetAndScalarReads",
+        "TestRuntimePermutationClosedAssertionCopyPublication",
+        "TestRuntimePermutationDisplayIntoExactFormattingAndBadbitReads",
+        "TestRuntimePermutationEmptyDisplayLeavesStreamUnread",
+        "TestRuntimePermutationAssertionConstructorReachedGrowthAndUnwind",
+        "TestRuntimePermutationDiagnosticConstructorEveryActualReservation",
+        "TestRuntimePermutationFormattedDisplayEveryOutputReservation",
+        "TestRuntimePermutationBindingRejectsForeignCohortBeforeReservation"
       ],
       "conditionals": [
         {
@@ -102190,16 +102200,36 @@
             "TestSmallObjectAllocatorClosedAssertionOwnerDirectFreePrefix",
             "TestSmallObjectAllocatorAssertionControlColdEveryRefusal"
           ]
+        },
+        {
+          "name": "concrete permutation borrowed assertion switch at actual source macro sites and NumericTextStream formatted display insertion chain",
+          "status": "partial",
+          "go_target": "util_permutation_diagnostics_source.go",
+          "tests": [
+            "TestRuntimePermutationAssertionsActualPartialResetAndScalarReads",
+            "TestRuntimePermutationClosedAssertionCopyPublication",
+            "TestRuntimePermutationDisplayIntoExactFormattingAndBadbitReads",
+            "TestRuntimePermutationEmptyDisplayLeavesStreamUnread",
+            "TestRuntimePermutationAssertionConstructorReachedGrowthAndUnwind",
+            "TestRuntimePermutationDiagnosticConstructorEveryActualReservation",
+            "TestRuntimePermutationFormattedDisplayEveryOutputReservation",
+            "TestRuntimePermutationBindingRejectsForeignCohortBeforeReservation"
+          ]
         }
       ],
       "ownership": [
         "Explicit cold DebugContext charges its real header; borrows caller immutable NUL-terminated region keys; lazily owns existing concrete StrHashtable. finalize_debug closes and nulls table without touching caller tag bytes or assertion switch. Constructor header/table failures preserve actual publication and owning unwind.",
         "Runtime heap borrows an explicit DebugContext; context/table/region remain caller-owned and may use a separate Budget. Actual heap fields/lexical todo and real cold header charges remain explicit; source lookup table Budget reservations are never fabricated Runtime allocations.",
-        "Optional cold borrowed assertion-control interface binds directly to actual DebugContext, without closure/per-record interface/shadow bool or new Runtime events. Reflected allocator/IO headers charge actual fields once. Source DEBUG leak warning is independent of assertions enable switch. Native/global assertion wiring remains partial."
+        "Optional cold borrowed assertion-control interface binds directly to actual DebugContext, without closure/per-record interface/shadow bool or new Runtime events. Reflected allocator/IO headers charge actual fields once. Source DEBUG leak warning is independent of assertions enable switch. Native/global assertion wiring remains partial.",
+        "One borrowed DebugContext pointer included in actual reflected permutation header; no independent provider ownership, shadow switch or assertion reservation. Existing real vector raw/pending/acquisition ownership unchanged; independent named physical bijection and cold sum before every actual constructor/output refusal.",
+        "NumericTextStream real file storage borrows os.File without Close/Sync; existing integer local formatter and insertion flags reused, no unused output buffer or preformatted message. Real file write failure sets badbit and returns nil while later argument reads still execute."
       ],
       "deviations": [
         "Source process globals represented by an explicit single-goroutine cold owner; process-wide/context API macro binding remains open. CASSERT gate preserves assertions-before-tag order, but release consumers must erase its call; no source macro consumer completion claimed. notify_assertion_violation, invoke_gdb, interactive fatal/abort/throw/debugger profiles, output services and full global finalizer orchestration remain open. Existing real table/region Go accounting is not C++ global allocator identity. No registered assertion completion credit.",
-        "Explicit borrowed context specializes source assertion/tag gates at actual call sites; process-global binding, notify/debugger/TRACE, source global allocation geometry, legacy heap and wrapped extent profiles remain open. Original tst_heap enable_debug(\"heap\") is commented out; new enabled-tag worlds are independent fixtures and do not add registered enabled-tag credit."
+        "Explicit borrowed context specializes source assertion/tag gates at actual call sites; process-global binding, notify/debugger/TRACE, source global allocation geometry, legacy heap and wrapped extent profiles remain open. Original tst_heap enable_debug(\"heap\") is commented out; new enabled-tag worlds are independent fixtures and do not add registered enabled-tag credit.",
+        "Selected caller-confined assertion flag binding and libstdc++ formatting profile only; notification/debugger/fatal assertion transport, process global binding, arbitrary locale/native ostream buffering/throw masks remain OPEN.",
+        "Source registered permutation driver remains disabled #if0; new independent branch tests give no registered driver credit.",
+        "Closed-provider and completed partial Reset indexed spare fixtures qualify checked lifetime/initialization domains; output buffer refusal is Go transport accounting evidence, not C++ default stream exception behavior."
       ]
     },
     {
@@ -126982,7 +127012,9 @@
         "util_unsigned_vector_copy_source_test.go",
         "util_permutation_copy_source.go",
         "util_permutation_copy_source_test.go",
-        "util_unsigned_vector_copy_retire_source_test.go"
+        "util_unsigned_vector_copy_retire_source_test.go",
+        "util_permutation_diagnostics_source.go",
+        "util_permutation_diagnostics_source_test.go"
       ],
       "tests": [
         "TestRuntimeUnsignedVectorGeometryResetAndWarmReuse",
@@ -127010,7 +127042,15 @@
         "TestRuntimePermutationAssignStoppedDeallocateUsesExactConsumedFieldReceipt",
         "TestRuntimePermutationFailedSecondCopyReadRetainsUncompletedInverse",
         "TestRuntimeUnsignedVectorSuccessfulAssignRetiresTransferredAcquisitionMetadata",
-        "TestRuntimeUnsignedVectorSuccessfulRetryRetiresPrephysicalEmptyInvocation"
+        "TestRuntimeUnsignedVectorSuccessfulRetryRetiresPrephysicalEmptyInvocation",
+        "TestRuntimePermutationAssertionsActualPartialResetAndScalarReads",
+        "TestRuntimePermutationClosedAssertionCopyPublication",
+        "TestRuntimePermutationDisplayIntoExactFormattingAndBadbitReads",
+        "TestRuntimePermutationEmptyDisplayLeavesStreamUnread",
+        "TestRuntimePermutationAssertionConstructorReachedGrowthAndUnwind",
+        "TestRuntimePermutationDiagnosticConstructorEveryActualReservation",
+        "TestRuntimePermutationFormattedDisplayEveryOutputReservation",
+        "TestRuntimePermutationBindingRejectsForeignCohortBeforeReservation"
       ],
       "assertions": [
         {
@@ -127080,6 +127120,21 @@
             "TestRuntimeUnsignedVectorSuccessfulAssignRetiresTransferredAcquisitionMetadata",
             "TestRuntimeUnsignedVectorSuccessfulRetryRetiresPrephysicalEmptyInvocation"
           ]
+        },
+        {
+          "name": "concrete permutation borrowed assertion switch at actual source macro sites and NumericTextStream formatted display insertion chain",
+          "status": "partial",
+          "go_target": "util_permutation_diagnostics_source.go",
+          "tests": [
+            "TestRuntimePermutationAssertionsActualPartialResetAndScalarReads",
+            "TestRuntimePermutationClosedAssertionCopyPublication",
+            "TestRuntimePermutationDisplayIntoExactFormattingAndBadbitReads",
+            "TestRuntimePermutationEmptyDisplayLeavesStreamUnread",
+            "TestRuntimePermutationAssertionConstructorReachedGrowthAndUnwind",
+            "TestRuntimePermutationDiagnosticConstructorEveryActualReservation",
+            "TestRuntimePermutationFormattedDisplayEveryOutputReservation",
+            "TestRuntimePermutationBindingRejectsForeignCohortBeforeReservation"
+          ]
         }
       ],
       "ownership": [
@@ -127090,7 +127145,9 @@
         "Actual reflected cold node prepared before each Runtime Allocate; block acquired only from allocator return, transferred only at m_data publication. Native-valid retry retains earlier unjoined roots. Source destructor visits current pointer only; owning cleanup releases actual retained nodes with sticky physical-consumed progress.",
         "Independent caller-named physical Runtime block bijection plus actual wrapper/acquisition reflected cold headers; every reservation before first success retains completed source prefixes before faultlift.",
         "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration.",
-        "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration. A completed later operation also retires called/acquired=false/token-null contexts; no actual block was returned, first source cause stays on vector. 32 real prephysical refusal\u2192successful retry cycles prove bounded cold bytes, exact graph before faultlift, actual Code101+same-Runtime OOM and payload after success."
+        "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration. A completed later operation also retires called/acquired=false/token-null contexts; no actual block was returned, first source cause stays on vector. 32 real prephysical refusal\u2192successful retry cycles prove bounded cold bytes, exact graph before faultlift, actual Code101+same-Runtime OOM and payload after success.",
+        "One borrowed DebugContext pointer included in actual reflected permutation header; no independent provider ownership, shadow switch or assertion reservation. Existing real vector raw/pending/acquisition ownership unchanged; independent named physical bijection and cold sum before every actual constructor/output refusal.",
+        "NumericTextStream real file storage borrows os.File without Close/Sync; existing integer local formatter and insertion flags reused, no unused output buffer or preformatted message. Real file write failure sets badbit and returns nil while later argument reads still execute."
       ],
       "deviations": [
         "Whole vector source family including class copy/assignment/reserve/swap and other element types remains partial; new wrapper selected init/reset/push/resize/index/DT only",
@@ -127101,7 +127158,10 @@
         "Dangling destructor after failed nonnull assignment is source-undefined guarded domain",
         "Public TLS signed-overflow cleanup-stop fixtures are guarded-domain evidence, not ordinary OOM",
         "Native ostream/global debug/general vector and polynomial consumers remain partial",
-        "Nonwrapping acquisition invocation finite Go domain"
+        "Nonwrapping acquisition invocation finite Go domain",
+        "Selected caller-confined assertion flag binding and libstdc++ formatting profile only; notification/debugger/fatal assertion transport, process global binding, arbitrary locale/native ostream buffering/throw masks remain OPEN.",
+        "Source registered permutation driver remains disabled #if0; new independent branch tests give no registered driver credit.",
+        "Closed-provider and completed partial Reset indexed spare fixtures qualify checked lifetime/initialization domains; output buffer refusal is Go transport accounting evidence, not C++ default stream exception behavior."
       ]
     },
     {
@@ -127127,7 +127187,9 @@
         "mpnum/polynomial_store.go",
         "mpnum/polynomial_lex_sort.go",
         "mpnum/polynomial_lex_raw_pointer.go",
-        "mpnum/polynomial_lex_raw_source_test.go"
+        "mpnum/polynomial_lex_raw_source_test.go",
+        "util_permutation_diagnostics_source.go",
+        "util_permutation_diagnostics_source_test.go"
       ],
       "tests": [
         "TestPermutationCyclesExhaustiveIndependentCopy",
@@ -127176,7 +127238,15 @@
         "TestPolynomialLexSortNestedGrowthIndependentFiniteModel",
         "TestPolynomialLexSortNestedGrowthEveryReservation",
         "TestPolynomialLexSortActualBigCoefficientOwnership",
-        "TestPolynomialLexSortFreshNullCoefficientRawPermutation"
+        "TestPolynomialLexSortFreshNullCoefficientRawPermutation",
+        "TestRuntimePermutationAssertionsActualPartialResetAndScalarReads",
+        "TestRuntimePermutationClosedAssertionCopyPublication",
+        "TestRuntimePermutationDisplayIntoExactFormattingAndBadbitReads",
+        "TestRuntimePermutationEmptyDisplayLeavesStreamUnread",
+        "TestRuntimePermutationAssertionConstructorReachedGrowthAndUnwind",
+        "TestRuntimePermutationDiagnosticConstructorEveryActualReservation",
+        "TestRuntimePermutationFormattedDisplayEveryOutputReservation",
+        "TestRuntimePermutationBindingRejectsForeignCohortBeforeReservation"
       ],
       "conditionals": [
         {
@@ -127298,6 +127368,21 @@
             "TestPolynomialLexSortActualBigCoefficientOwnership",
             "TestPolynomialLexSortFreshNullCoefficientRawPermutation"
           ]
+        },
+        {
+          "name": "concrete permutation borrowed assertion switch at actual source macro sites and NumericTextStream formatted display insertion chain",
+          "status": "partial",
+          "go_target": "util_permutation_diagnostics_source.go",
+          "tests": [
+            "TestRuntimePermutationAssertionsActualPartialResetAndScalarReads",
+            "TestRuntimePermutationClosedAssertionCopyPublication",
+            "TestRuntimePermutationDisplayIntoExactFormattingAndBadbitReads",
+            "TestRuntimePermutationEmptyDisplayLeavesStreamUnread",
+            "TestRuntimePermutationAssertionConstructorReachedGrowthAndUnwind",
+            "TestRuntimePermutationDiagnosticConstructorEveryActualReservation",
+            "TestRuntimePermutationFormattedDisplayEveryOutputReservation",
+            "TestRuntimePermutationBindingRejectsForeignCohortBeforeReservation"
+          ]
         }
       ],
       "ownership": [
@@ -127315,7 +127400,9 @@
         "monomialBase uint64 stamped at real location publication from actual n; reflected cold location directory charged once, independent from mutable SIZE/request uint32 wrap.",
         "Captured core/Polynomial/ObjectRef/base guard exact live slot/generation and current raw identity at each reached initialized-prefix/allocator word read. No logical SIZE read; same source buffer values/captured mapping pointer.",
         "Existing actual nested Runtime row backing, raw/moved-prefix/old/pending roots and charged children directory remain; source append rereads other.SIZE per loop, default CAP assertion before expansion overflow/allocation, size read before each source cycle.",
-        "Independent full named polynomial/NUM/monomial/raw/cold census immediate under active fault for every existing reservation before firstsuccess; public higher-variable permutation retained before lower recursive refusal."
+        "Independent full named polynomial/NUM/monomial/raw/cold census immediate under active fault for every existing reservation before firstsuccess; public higher-variable permutation retained before lower recursive refusal.",
+        "One borrowed DebugContext pointer included in actual reflected permutation header; no independent provider ownership, shadow switch or assertion reservation. Existing real vector raw/pending/acquisition ownership unchanged; independent named physical bijection and cold sum before every actual constructor/output refusal.",
+        "NumericTextStream real file storage borrows os.File without Close/Sync; existing integer local formatter and insertion flags reused, no unused output buffer or preformatted message. Real file write failure sets badbit and returns nil while later argument reads still execute."
       ],
       "deviations": [
         "Concrete uint32 specialization only; permutation class and additional typed consumers remain open, with no Go generics.",
@@ -127337,7 +127424,10 @@
         "ObjectRef/init-prefix checking is explicit Go raw-pointer lifetime/safety domain; malformed header/subrange/reused token tests are not native valid exception claims.",
         "Concrete actual12/16-byte codecs remain replacement representation, not native NUM/pointer ABI closure.",
         "Existing registered high-level polynomial driver is not newly credited wholesale; independent branch/oracle and source-consumer tests only.",
-        "Global DEBUG/TRACE/ostream and broad nested-vector/copy/lifecycle source methods remain partial."
+        "Global DEBUG/TRACE/ostream and broad nested-vector/copy/lifecycle source methods remain partial.",
+        "Selected caller-confined assertion flag binding and libstdc++ formatting profile only; notification/debugger/fatal assertion transport, process global binding, arbitrary locale/native ostream buffering/throw masks remain OPEN.",
+        "Source registered permutation driver remains disabled #if0; new independent branch tests give no registered driver credit.",
+        "Closed-provider and completed partial Reset indexed spare fixtures qualify checked lifetime/initialization domains; output buffer refusal is Go transport accounting evidence, not C++ default stream exception behavior."
       ]
     },
     {
@@ -135435,7 +135525,9 @@
         "mpnum/polynomial_store.go",
         "mpnum/polynomial_lex_sort.go",
         "mpnum/polynomial_lex_raw_pointer.go",
-        "mpnum/polynomial_lex_raw_source_test.go"
+        "mpnum/polynomial_lex_raw_source_test.go",
+        "util_permutation_diagnostics_source.go",
+        "util_permutation_diagnostics_source_test.go"
       ],
       "tests": [
         "TestParamDescrsBudgetFailuresAndWarmDuplicate",
@@ -135774,7 +135866,15 @@
         "TestPolynomialLexSortNestedGrowthIndependentFiniteModel",
         "TestPolynomialLexSortNestedGrowthEveryReservation",
         "TestPolynomialLexSortActualBigCoefficientOwnership",
-        "TestPolynomialLexSortFreshNullCoefficientRawPermutation"
+        "TestPolynomialLexSortFreshNullCoefficientRawPermutation",
+        "TestRuntimePermutationAssertionsActualPartialResetAndScalarReads",
+        "TestRuntimePermutationClosedAssertionCopyPublication",
+        "TestRuntimePermutationDisplayIntoExactFormattingAndBadbitReads",
+        "TestRuntimePermutationEmptyDisplayLeavesStreamUnread",
+        "TestRuntimePermutationAssertionConstructorReachedGrowthAndUnwind",
+        "TestRuntimePermutationDiagnosticConstructorEveryActualReservation",
+        "TestRuntimePermutationFormattedDisplayEveryOutputReservation",
+        "TestRuntimePermutationBindingRejectsForeignCohortBeforeReservation"
       ],
       "conditionals": [
         {
@@ -136388,6 +136488,21 @@
             "TestPolynomialLexSortActualBigCoefficientOwnership",
             "TestPolynomialLexSortFreshNullCoefficientRawPermutation"
           ]
+        },
+        {
+          "name": "concrete permutation borrowed assertion switch at actual source macro sites and NumericTextStream formatted display insertion chain",
+          "status": "partial",
+          "go_target": "util_permutation_diagnostics_source.go",
+          "tests": [
+            "TestRuntimePermutationAssertionsActualPartialResetAndScalarReads",
+            "TestRuntimePermutationClosedAssertionCopyPublication",
+            "TestRuntimePermutationDisplayIntoExactFormattingAndBadbitReads",
+            "TestRuntimePermutationEmptyDisplayLeavesStreamUnread",
+            "TestRuntimePermutationAssertionConstructorReachedGrowthAndUnwind",
+            "TestRuntimePermutationDiagnosticConstructorEveryActualReservation",
+            "TestRuntimePermutationFormattedDisplayEveryOutputReservation",
+            "TestRuntimePermutationBindingRejectsForeignCohortBeforeReservation"
+          ]
         }
       ],
       "ownership": [
@@ -136418,7 +136533,9 @@
         "monomialBase uint64 stamped at real location publication from actual n; reflected cold location directory charged once, independent from mutable SIZE/request uint32 wrap.",
         "Captured core/Polynomial/ObjectRef/base guard exact live slot/generation and current raw identity at each reached initialized-prefix/allocator word read. No logical SIZE read; same source buffer values/captured mapping pointer.",
         "Existing actual nested Runtime row backing, raw/moved-prefix/old/pending roots and charged children directory remain; source append rereads other.SIZE per loop, default CAP assertion before expansion overflow/allocation, size read before each source cycle.",
-        "Independent full named polynomial/NUM/monomial/raw/cold census immediate under active fault for every existing reservation before firstsuccess; public higher-variable permutation retained before lower recursive refusal."
+        "Independent full named polynomial/NUM/monomial/raw/cold census immediate under active fault for every existing reservation before firstsuccess; public higher-variable permutation retained before lower recursive refusal.",
+        "One borrowed DebugContext pointer included in actual reflected permutation header; no independent provider ownership, shadow switch or assertion reservation. Existing real vector raw/pending/acquisition ownership unchanged; independent named physical bijection and cold sum before every actual constructor/output refusal.",
+        "NumericTextStream real file storage borrows os.File without Close/Sync; existing integer local formatter and insertion flags reused, no unused output buffer or preformatted message. Real file write failure sets badbit and returns nil while later argument reads still execute."
       ],
       "deviations": [
         "Concrete solver-specific storage, not complete generic vector template surface. Owning model Clone/Assign, other specializations and source-undefined continuation behavior remain explicitly separate.",
@@ -136452,7 +136569,10 @@
         "ObjectRef/init-prefix checking is explicit Go raw-pointer lifetime/safety domain; malformed header/subrange/reused token tests are not native valid exception claims.",
         "Concrete actual12/16-byte codecs remain replacement representation, not native NUM/pointer ABI closure.",
         "Existing registered high-level polynomial driver is not newly credited wholesale; independent branch/oracle and source-consumer tests only.",
-        "Global DEBUG/TRACE/ostream and broad nested-vector/copy/lifecycle source methods remain partial."
+        "Global DEBUG/TRACE/ostream and broad nested-vector/copy/lifecycle source methods remain partial.",
+        "Selected caller-confined assertion flag binding and libstdc++ formatting profile only; notification/debugger/fatal assertion transport, process global binding, arbitrary locale/native ostream buffering/throw masks remain OPEN.",
+        "Source registered permutation driver remains disabled #if0; new independent branch tests give no registered driver credit.",
+        "Closed-provider and completed partial Reset indexed spare fixtures qualify checked lifetime/initialization domains; output buffer refusal is Go transport accounting evidence, not C++ default stream exception behavior."
       ]
     },
     {

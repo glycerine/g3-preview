@@ -1,4 +1,4 @@
-// Source: src/util/vector.h:102-120,159-167,191-202,536-541.
+// Source: src/util/vector.h:102-120,159-167,191-202,536-541; src/util/debug.h:60-65.
 // Source author: Leonardo de Moura.
 // Licensed under the MIT license; see LICENSE.txt.
 package g3
@@ -14,6 +14,9 @@ import (
 // followed by ascending iterator dereferences. A failed pre-publication block
 // remains a named owning-abort root, separate from the source m_data pointer.
 func (v *RuntimeUnsignedVector) copyCore(src *RuntimeUnsignedVector) error {
+	return v.copyCoreDebug(src, nil)
+}
+func (v *RuntimeUnsignedVector) copyCoreDebug(src *RuntimeUnsignedVector, d *DebugContext) error {
 	n, e := src.column.size()
 	if e != nil {
 		return e
@@ -50,7 +53,11 @@ func (v *RuntimeUnsignedVector) copyCore(src *RuntimeUnsignedVector) error {
 	// Source it2=begin(), then SASSERT(it2==m_data): both name the
 	// same freshly published destination pointer. No extent validation.
 	it2 := v.column.raw.block
-	if satStorageSourceDebug && it2 != v.column.raw.block {
+	on, e := permutationAssertions(d)
+	if e != nil {
+		return e
+	}
+	if on && it2 != v.column.raw.block {
 		return ErrSATAssertion
 	}
 	end, e := src.column.size()
@@ -69,13 +76,21 @@ func (v *RuntimeUnsignedVector) copyCore(src *RuntimeUnsignedVector) error {
 	return nil
 }
 func (v *RuntimeUnsignedVector) copyConstruct(src *RuntimeUnsignedVector) error {
+	return v.copyConstructDebug(src, nil)
+}
+func (v *RuntimeUnsignedVector) copyConstructDebug(src *RuntimeUnsignedVector, d *DebugContext) error {
 	if src.column.raw.block != (memory.Block{}) {
-		if e := v.copyCore(src); e != nil {
+		if e := v.copyCoreDebug(src, d); e != nil {
 			v.constructorCause = e
 			return e
 		}
 	}
-	if satStorageSourceDebug {
+	on, e := permutationAssertions(d)
+	if e != nil {
+		v.constructorCause = e
+		return e
+	}
+	if on {
 		a, e := v.column.size()
 		if e != nil {
 			v.constructorCause = e
@@ -110,6 +125,9 @@ func (v *RuntimeUnsignedVector) Clone() (*RuntimeUnsignedVector, error) {
 	return out, nil
 }
 func (v *RuntimeUnsignedVector) Assign(src *RuntimeUnsignedVector) error {
+	return v.assignDebug(src, nil)
+}
+func (v *RuntimeUnsignedVector) assignDebug(src *RuntimeUnsignedVector, d *DebugContext) error {
 	if e := v.open(); e != nil {
 		return e
 	}
@@ -135,7 +153,7 @@ func (v *RuntimeUnsignedVector) Assign(src *RuntimeUnsignedVector) error {
 		}
 	}
 	if src.column.raw.block != (memory.Block{}) {
-		if e := v.copyCore(src); e != nil {
+		if e := v.copyCoreDebug(src, d); e != nil {
 			if v.assignmentCause == nil {
 				v.assignmentCause = e
 			}
