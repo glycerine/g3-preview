@@ -102011,7 +102011,11 @@
         "util_debug_notification_source_test.go",
         "util_numeric_char_input.go",
         "util_numeric_char_input_source_test.go",
-        "util_numeric_stream_flush.go"
+        "util_numeric_stream_flush.go",
+        "util_debug_actions.go",
+        "util_debug_actions_host_linux.go",
+        "util_debug_actions_host_other.go",
+        "util_debug_actions_source_test.go"
       ],
       "tests": [
         "TestDebugContextSourceLazyInitializationAndAssertions",
@@ -102050,7 +102054,15 @@
         "TestNumericCharInputNoSkipAndRealClosedFileBadState",
         "TestNumericCharInputConstructionEveryColdReservationAndForeignCohort",
         "TestNumericCharInputBadOutputDoesNotFailInputAndCloseKeepsBorrows",
-        "TestNumericCharInputCopiedOwnerAndReachedNilDestination"
+        "TestNumericCharInputCopiedOwnerAndReachedNilDestination",
+        "TestDebugActionSubprocessHelper",
+        "TestDebugActionLiteralContinueAbortThrowEOFFlow",
+        "TestDebugActionActualHostStopAndSystemFailure",
+        "TestDebugActionLiteralCommandUsesActualEmbeddedStorage",
+        "TestDebugActionConstructorEveryReservationAndBorrowedClose",
+        "TestDebugActionForeignBudgetCopyClosedAndUnreadProviders",
+        "TestDebugActionClosedOutputBadbitStillReachesInputAndThrow",
+        "TestDebugActionPromptBeforeClosedTieRead"
       ],
       "conditionals": [
         {
@@ -102137,6 +102149,21 @@
             "TestNumericCharInputBadOutputDoesNotFailInputAndCloseKeepsBorrows",
             "TestNumericCharInputCopiedOwnerAndReachedNilDestination"
           ]
+        },
+        {
+          "name": "invoke_gdb cpp73-117 and NO_Z3_DEBUGGER h42-56: literal prompt/extract/switch, real exit/default exception and concrete Linux system/signal action chain",
+          "status": "partial",
+          "go_target": "util_debug_actions.go",
+          "tests": [
+            "TestDebugActionSubprocessHelper",
+            "TestDebugActionLiteralContinueAbortThrowEOFFlow",
+            "TestDebugActionActualHostStopAndSystemFailure",
+            "TestDebugActionLiteralCommandUsesActualEmbeddedStorage",
+            "TestDebugActionConstructorEveryReservationAndBorrowedClose",
+            "TestDebugActionForeignBudgetCopyClosedAndUnreadProviders",
+            "TestDebugActionClosedOutputBadbitStillReachesInputAndThrow",
+            "TestDebugActionPromptBeforeClosedTieRead"
+          ]
         }
       ],
       "ownership": [
@@ -102145,7 +102172,9 @@
         "One borrowed MemoryStandardStreams pointer included once in actual reflected DebugContext header. No output/table/string owner created by notification; standard file streams and CString regions remain caller-owned.",
         "Immediate named region/debug/table/standard-stream/child-stream cold equation under active FailAfter0; foreign text provider Budget/contents unchanged after notification and context Close.",
         "Concrete file/tie borrows only; reflected cold NumericCharInput header includes actual one-byte scratch, flags and consumed-byte position. Close refunds only that header, never owns/closes caller file or tied output.",
-        "Constructor foreign Budget check precedes its sole actual cold reservation; first success1, failure0 with complete named input/standard-stream/child-stream cold equation. Extraction/Flush allocate nothing under actual FailAfter0."
+        "Constructor foreign Budget check precedes its sole actual cold reservation; first success1, failure0 with complete named input/standard-stream/child-stream cold equation. Extraction/Flush allocate nothing under actual FailAfter0.",
+        "One reflected DebugActionContext cold header includes actual used1024-byte command array; concrete standard-stream/input borrows remain caller-owned, Close refunds header only.",
+        "Sole actual constructor reservation: refusal0 and first success1; immediate named action/input/standard-header/two-file-stream cold equation before fault lift. Source actions execute under FailAfter0 without additional Budget reservation."
       ],
       "deviations": [
         "Source process globals represented by an explicit single-goroutine cold owner; process-wide/context API macro binding remains open. CASSERT gate preserves assertions-before-tag order, but release consumers must erase its call; no source macro consumer completion claimed. notify_assertion_violation, invoke_gdb, interactive fatal/abort/throw/debugger profiles, output services and full global finalizer orchestration remain open. Existing real table/region Go accounting is not C++ global allocator identity. No registered assertion completion credit.",
@@ -102156,7 +102185,13 @@
         "Input prerequisite only; complete source invoke_gdb prompt, exit/default exception/OS action chain remains required OPEN, no dispatcher or macro failure routing in this chunk.",
         "Classic-byte C locale and default nonthrowing input flags selected; native locale/exception masks/global initialization and underlying buffered stream ABI remain OPEN.",
         "Direct emitted output Flush reaches actual stream owner guard but performs no Write/Sync/fsync/Close or synthetic counter; native buffering/pub-sync/tie recursion remain explicit OS/ostream representation obligations.",
-        "Closed tie/null destination/closed file and copied-owner fixtures are Go physical/lifetime/OS-profile guard evidence, not native defined pointer exception claims. No source registered-driver promotion."
+        "Closed tie/null destination/closed file and copied-owner fixtures are Go physical/lifetime/OS-profile guard evidence, not native defined pointer exception claims. No source registered-driver promotion.",
+        "Supported concrete Linux and NO_Z3_DEBUGGER action loops implemented; macro false-site binding remains required separate successor, with no missing dispatcher substituted for actual actions.",
+        "Source null-store is undefined native behavior; Linux replacement sends actual self SIGSEGV and observes real Go runtime diagnostic/exit2 in bounded subprocesses, never fake exit139.",
+        "Actual /bin/sh command uses two real getpid reads and embedded source buffer; actual nonzero system branch proven with PATH empty. Successful external debugger attachment remains environment proof, not fabricated result.",
+        "Other OS debugbreak/system adapters and native ostream global locale/buffering/throwmask remain OPEN. Direct Go OS command/transient arguments are host adapter representation, not invented source Runtime allocations.",
+        "No whole-unit/class or registered source-driver promotion; copied/closed/foreign owner cases are precise Go owner-domain guards.",
+        "The OS boundary uses transient Go host allocations for command-string conversion and os/exec. Active Budget fault tests prove the charged owner graph and no source reservation event, not absence of Go host heap allocations. system() result is consumed only as zero/nonzero; internal nonzero1 preserves that branch and does not expose native wait encoding."
       ]
     },
     {
@@ -102182,7 +102217,11 @@
         "util_debug_notification_source_test.go",
         "util_numeric_char_input.go",
         "util_numeric_char_input_source_test.go",
-        "util_numeric_stream_flush.go"
+        "util_numeric_stream_flush.go",
+        "util_debug_actions.go",
+        "util_debug_actions_host_linux.go",
+        "util_debug_actions_host_other.go",
+        "util_debug_actions_source_test.go"
       ],
       "tests": [
         "TestDebugContextSourceLazyInitializationAndAssertions",
@@ -102229,7 +102268,15 @@
         "TestNumericCharInputNoSkipAndRealClosedFileBadState",
         "TestNumericCharInputConstructionEveryColdReservationAndForeignCohort",
         "TestNumericCharInputBadOutputDoesNotFailInputAndCloseKeepsBorrows",
-        "TestNumericCharInputCopiedOwnerAndReachedNilDestination"
+        "TestNumericCharInputCopiedOwnerAndReachedNilDestination",
+        "TestDebugActionSubprocessHelper",
+        "TestDebugActionLiteralContinueAbortThrowEOFFlow",
+        "TestDebugActionActualHostStopAndSystemFailure",
+        "TestDebugActionLiteralCommandUsesActualEmbeddedStorage",
+        "TestDebugActionConstructorEveryReservationAndBorrowedClose",
+        "TestDebugActionForeignBudgetCopyClosedAndUnreadProviders",
+        "TestDebugActionClosedOutputBadbitStillReachesInputAndThrow",
+        "TestDebugActionPromptBeforeClosedTieRead"
       ],
       "conditionals": [
         {
@@ -102432,6 +102479,21 @@
             "TestNumericCharInputBadOutputDoesNotFailInputAndCloseKeepsBorrows",
             "TestNumericCharInputCopiedOwnerAndReachedNilDestination"
           ]
+        },
+        {
+          "name": "invoke_gdb cpp73-117 and NO_Z3_DEBUGGER h42-56: literal prompt/extract/switch, real exit/default exception and concrete Linux system/signal action chain",
+          "status": "partial",
+          "go_target": "util_debug_actions.go",
+          "tests": [
+            "TestDebugActionSubprocessHelper",
+            "TestDebugActionLiteralContinueAbortThrowEOFFlow",
+            "TestDebugActionActualHostStopAndSystemFailure",
+            "TestDebugActionLiteralCommandUsesActualEmbeddedStorage",
+            "TestDebugActionConstructorEveryReservationAndBorrowedClose",
+            "TestDebugActionForeignBudgetCopyClosedAndUnreadProviders",
+            "TestDebugActionClosedOutputBadbitStillReachesInputAndThrow",
+            "TestDebugActionPromptBeforeClosedTieRead"
+          ]
         }
       ],
       "ownership": [
@@ -102443,7 +102505,9 @@
         "One borrowed MemoryStandardStreams pointer included once in actual reflected DebugContext header. No output/table/string owner created by notification; standard file streams and CString regions remain caller-owned.",
         "Immediate named region/debug/table/standard-stream/child-stream cold equation under active FailAfter0; foreign text provider Budget/contents unchanged after notification and context Close.",
         "Concrete file/tie borrows only; reflected cold NumericCharInput header includes actual one-byte scratch, flags and consumed-byte position. Close refunds only that header, never owns/closes caller file or tied output.",
-        "Constructor foreign Budget check precedes its sole actual cold reservation; first success1, failure0 with complete named input/standard-stream/child-stream cold equation. Extraction/Flush allocate nothing under actual FailAfter0."
+        "Constructor foreign Budget check precedes its sole actual cold reservation; first success1, failure0 with complete named input/standard-stream/child-stream cold equation. Extraction/Flush allocate nothing under actual FailAfter0.",
+        "One reflected DebugActionContext cold header includes actual used1024-byte command array; concrete standard-stream/input borrows remain caller-owned, Close refunds header only.",
+        "Sole actual constructor reservation: refusal0 and first success1; immediate named action/input/standard-header/two-file-stream cold equation before fault lift. Source actions execute under FailAfter0 without additional Budget reservation."
       ],
       "deviations": [
         "Source process globals represented by an explicit single-goroutine cold owner; process-wide/context API macro binding remains open. CASSERT gate preserves assertions-before-tag order, but release consumers must erase its call; no source macro consumer completion claimed. notify_assertion_violation, invoke_gdb, interactive fatal/abort/throw/debugger profiles, output services and full global finalizer orchestration remain open. Existing real table/region Go accounting is not C++ global allocator identity. No registered assertion completion credit.",
@@ -102457,7 +102521,13 @@
         "Input prerequisite only; complete source invoke_gdb prompt, exit/default exception/OS action chain remains required OPEN, no dispatcher or macro failure routing in this chunk.",
         "Classic-byte C locale and default nonthrowing input flags selected; native locale/exception masks/global initialization and underlying buffered stream ABI remain OPEN.",
         "Direct emitted output Flush reaches actual stream owner guard but performs no Write/Sync/fsync/Close or synthetic counter; native buffering/pub-sync/tie recursion remain explicit OS/ostream representation obligations.",
-        "Closed tie/null destination/closed file and copied-owner fixtures are Go physical/lifetime/OS-profile guard evidence, not native defined pointer exception claims. No source registered-driver promotion."
+        "Closed tie/null destination/closed file and copied-owner fixtures are Go physical/lifetime/OS-profile guard evidence, not native defined pointer exception claims. No source registered-driver promotion.",
+        "Supported concrete Linux and NO_Z3_DEBUGGER action loops implemented; macro false-site binding remains required separate successor, with no missing dispatcher substituted for actual actions.",
+        "Source null-store is undefined native behavior; Linux replacement sends actual self SIGSEGV and observes real Go runtime diagnostic/exit2 in bounded subprocesses, never fake exit139.",
+        "Actual /bin/sh command uses two real getpid reads and embedded source buffer; actual nonzero system branch proven with PATH empty. Successful external debugger attachment remains environment proof, not fabricated result.",
+        "Other OS debugbreak/system adapters and native ostream global locale/buffering/throwmask remain OPEN. Direct Go OS command/transient arguments are host adapter representation, not invented source Runtime allocations.",
+        "No whole-unit/class or registered source-driver promotion; copied/closed/foreign owner cases are precise Go owner-domain guards.",
+        "The OS boundary uses transient Go host allocations for command-string conversion and os/exec. Active Budget fault tests prove the charged owner graph and no source reservation event, not absence of Go host heap allocations. system() result is consumed only as zero/nonzero; internal nonzero1 preserves that branch and does not expose native wait encoding."
       ]
     },
     {
