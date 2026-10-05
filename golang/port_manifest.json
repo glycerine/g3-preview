@@ -121389,7 +121389,8 @@
         "mpnum/integer_scalar_raw_source_scope.go",
         "mpnum/integer_raw_invocation.go",
         "mpnum/integer_addmul_invocation.go",
-        "mpnum/integer_gcd_raw_source_test.go"
+        "mpnum/integer_gcd_raw_source_test.go",
+        "mpnum/integer_raw_owner_reentry_source_test.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -121649,7 +121650,8 @@
         "TestIntegerGCDRawOwnAfterSourceFinalize",
         "TestIntegerGCDRawChildContextDoesNotRetargetReceipt",
         "TestIntegerGCDRawMinInt32ActualAbsLeaf",
-        "TestIntegerGCDRawRuntimeCallbackHasNoAmbientAcquisition"
+        "TestIntegerGCDRawRuntimeCallbackHasNoAmbientAcquisition",
+        "TestIntegerRawExecutingOwnerRefusesFinalizeAndClose"
       ],
       "conditionals": [
         {
@@ -123441,6 +123443,14 @@
             "TestIntegerGCDRawMinInt32ActualAbsLeaf",
             "TestIntegerGCDRawRuntimeCallbackHasNoAmbientAcquisition"
           ]
+        },
+        {
+          "name": "IntegerManager public owner refusal during executing RAW calls in returning Go error transport",
+          "status": "partial",
+          "go_target": "mpnum/integer_raw_invocation.go",
+          "tests": [
+            "TestIntegerRawExecutingOwnerRefusesFinalizeAndClose"
+          ]
         }
       ],
       "ownership": [
@@ -123498,7 +123508,8 @@
         "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open.",
         "Existing AddMul/SubMul success arithmetic and inline +/-1 shortcuts are covered, but mpnum/mpz_gcd.go deferred Del eagerly cleans RAW temporary on body failure and ignores end-DEL errors. Source mpz.h:393-426 deletes only after successful Mul plus Add/Sub. Shared literal engine and exact actual-leaf owning continuation are explicit open obligations; previous ported method status corrected to partial after source review.",
         "Public/nil negative Div and ExtendedGCD now use the same literal engines with real IntegerManager RAW frames (mpz.h:468-485; mpz.cpp:915-985). Failed bodies retain reached declarations; successful bodies propagate strict end-DEL errors. Immutable source cause remains across exact owning acknowledgment until new guarded invocation. End-DEL Bounds proof is the real signed-host TLS guard domain, not ordinary mathematical OOM; checked diagnostic/verification failures remain literal failed-body prefixes. AddMul/SubMul public eager failure cleanup remains explicitly open. Shared polynomial cohorts, full Discriminant/Factor and whole source units remain partial; no original driver assertion credit added.",
-        "Selected scalar Lehmer lifetime now uses one literal GCD engine with concrete RAW/direct acquisition and reached end-DEL error propagation (mpz.cpp:560-817; mpz.h:632). Public AddMul eager failed-body cleanup and SubMul remain explicitly partial; only the two reached internal Lehmer AddMul calls use the actual source-owned child engine (mpz.h:393-407). Signed-host TLS end-release proof is a guarded source domain, not ordinary mathematical OOM. Actual failed-body shared scratch holes remain guarded and are never repaired; source-finalize proof records the real destructor guard before separate exact owning cleanup. No Content/ICCP/Discriminant/regular-SOM/whole-unit promotion or original assertion credit."
+        "Selected scalar Lehmer lifetime now uses one literal GCD engine with concrete RAW/direct acquisition and reached end-DEL error propagation (mpz.cpp:560-817; mpz.h:632). Public AddMul eager failed-body cleanup and SubMul remain explicitly partial; only the two reached internal Lehmer AddMul calls use the actual source-owned child engine (mpz.h:393-407). Signed-host TLS end-release proof is a guarded source domain, not ordinary mathematical OOM. Actual failed-body shared scratch holes remain guarded and are never repaired; source-finalize proof records the real destructor guard before separate exact owning cleanup. No Content/ICCP/Discriminant/regular-SOM/whole-unit promotion or original assertion credit.",
+        "Returning Go allocation-error transport cannot destroy an executing Integer RAW owner: SourceFinalize and CloseChecked refuse before mutating source/own cleanup state. Actual GCD callback counterfactual REDs cover early source destruction and late owning refusal mutation; immediate named physical/cold graph, exact failed RAW acknowledgment and same-input successful retry are proved. This is an explicit guarded Go callback domain, not native defined destructor reentry; selected source mpz.cpp:730-817 and whole unit remain partial."
       ]
     },
     {
@@ -123554,7 +123565,8 @@
         "mpnum/integer_allocation_invocation_context.go",
         "mpnum/integer_scalar_raw_source_scope.go",
         "mpnum/integer_raw_invocation.go",
-        "mpnum/integer_gcd_raw_source_test.go"
+        "mpnum/integer_gcd_raw_source_test.go",
+        "mpnum/integer_raw_owner_reentry_source_test.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -123800,7 +123812,8 @@
         "TestIntegerGCDRawOwnAfterSourceFinalize",
         "TestIntegerGCDRawChildContextDoesNotRetargetReceipt",
         "TestIntegerGCDRawMinInt32ActualAbsLeaf",
-        "TestIntegerGCDRawRuntimeCallbackHasNoAmbientAcquisition"
+        "TestIntegerGCDRawRuntimeCallbackHasNoAmbientAcquisition",
+        "TestIntegerRawExecutingOwnerRefusesFinalizeAndClose"
       ],
       "conditionals": [
         {
@@ -125118,6 +125131,14 @@
             "TestIntegerGCDRawMinInt32ActualAbsLeaf",
             "TestIntegerGCDRawRuntimeCallbackHasNoAmbientAcquisition"
           ]
+        },
+        {
+          "name": "IntegerManager public owner refusal during executing RAW calls in returning Go error transport",
+          "status": "partial",
+          "go_target": "mpnum/integer_raw_invocation.go",
+          "tests": [
+            "TestIntegerRawExecutingOwnerRefusesFinalizeAndClose"
+          ]
         }
       ],
       "ownership": [
@@ -125169,7 +125190,8 @@
         "Partial SET acquisition prerequisite only; allocating finite-field PNormalize, complete Discriminant source-stop/reservation/coldgraph proof and source parent remain open. No source unit/API promotion.",
         "Existing AddMul/SubMul success arithmetic and inline +/-1 shortcuts are covered, but mpnum/mpz_gcd.go deferred Del eagerly cleans RAW temporary on body failure and ignores end-DEL errors. Source mpz.h:393-426 deletes only after successful Mul plus Add/Sub. Shared literal engine and exact actual-leaf owning continuation are explicit open obligations; previous ported method status corrected to partial after source review.",
         "Public/nil negative Div and ExtendedGCD now use the same literal engines with real IntegerManager RAW frames (mpz.h:468-485; mpz.cpp:915-985). Failed bodies retain reached declarations; successful bodies propagate strict end-DEL errors. Immutable source cause remains across exact owning acknowledgment until new guarded invocation. End-DEL Bounds proof is the real signed-host TLS guard domain, not ordinary mathematical OOM; checked diagnostic/verification failures remain literal failed-body prefixes. AddMul/SubMul public eager failure cleanup remains explicitly open. Shared polynomial cohorts, full Discriminant/Factor and whole source units remain partial; no original driver assertion credit added.",
-        "Selected scalar Lehmer lifetime now uses one literal GCD engine with concrete RAW/direct acquisition and reached end-DEL error propagation (mpz.cpp:560-817; mpz.h:632). Public AddMul eager failed-body cleanup and SubMul remain explicitly partial; only the two reached internal Lehmer AddMul calls use the actual source-owned child engine (mpz.h:393-407). Signed-host TLS end-release proof is a guarded source domain, not ordinary mathematical OOM. Actual failed-body shared scratch holes remain guarded and are never repaired; source-finalize proof records the real destructor guard before separate exact owning cleanup. No Content/ICCP/Discriminant/regular-SOM/whole-unit promotion or original assertion credit."
+        "Selected scalar Lehmer lifetime now uses one literal GCD engine with concrete RAW/direct acquisition and reached end-DEL error propagation (mpz.cpp:560-817; mpz.h:632). Public AddMul eager failed-body cleanup and SubMul remain explicitly partial; only the two reached internal Lehmer AddMul calls use the actual source-owned child engine (mpz.h:393-407). Signed-host TLS end-release proof is a guarded source domain, not ordinary mathematical OOM. Actual failed-body shared scratch holes remain guarded and are never repaired; source-finalize proof records the real destructor guard before separate exact owning cleanup. No Content/ICCP/Discriminant/regular-SOM/whole-unit promotion or original assertion credit.",
+        "Returning Go allocation-error transport cannot destroy an executing Integer RAW owner: SourceFinalize and CloseChecked refuse before mutating source/own cleanup state. Actual GCD callback counterfactual REDs cover early source destruction and late owning refusal mutation; immediate named physical/cold graph, exact failed RAW acknowledgment and same-input successful retry are proved. This is an explicit guarded Go callback domain, not native defined destructor reentry; selected source mpz.cpp:730-817 and whole unit remain partial."
       ]
     },
     {

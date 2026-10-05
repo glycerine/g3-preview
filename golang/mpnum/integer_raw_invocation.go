@@ -23,6 +23,14 @@ type integerRawInvocationReceipt struct {
 	invocation uint64
 }
 
+// An executing RAW call owns these real embedded declarations. Public owner
+// destruction cannot run from its returning error transport callback.
+func (m *IntegerManager) rawInvocationExecuting() bool {
+	return (m.divisionRaw.active && m.divisionRaw.executing) ||
+		(m.extendedRaw.active && m.extendedRaw.executing) ||
+		(m.gcdRaw.active && m.gcdRaw.executing)
+}
+
 func (m *IntegerManager) rawFrameAddress(s *integerRawScope) bool {
 	return m != nil && m.self == m && s != nil && (s == &m.divisionRaw || s == &m.extendedRaw || s == &m.gcdRaw)
 }

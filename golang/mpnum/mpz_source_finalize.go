@@ -16,6 +16,9 @@ func (m *IntegerManager) SourceFinalize() error {
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
 	}
+	if m.rawInvocationExecuting() {
+		return ErrPolynomialPending
+	}
 	if m.closed || m.sourceFinalized {
 		return nil
 	}
