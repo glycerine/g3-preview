@@ -20,6 +20,7 @@ type polynomialDerivativeScope struct {
 	active, executing, stopped           bool
 	generated                            Monomial
 	calleeGeneration                     uint64
+	monomialAllocator                    monomialAllocatorInvocationReceipt
 	factoryGeneration                    uint64
 	numeric                              polynomialNumericRoots
 	normalize                            integerPNormalizeInvocationReceipt
@@ -160,6 +161,7 @@ func (m *MultivariatePolynomialManager) derivativeWithReceipt(p Polynomial, x ui
 	// This is a new guarded source invocation, not a retry of the older child.
 	// Its historical standalone receipt remains valid on the modular owner.
 	s.normalize = integerPNormalizeInvocationReceipt{}
+	s.monomialAllocator = monomialAllocatorInvocationReceipt{}
 	s.numericPhase = 0
 	directReceipt := polynomialDerivativeInvocationReceipt{manager: m, frame: s, invocation: s.invocation}
 	if receipt != nil {
@@ -226,6 +228,9 @@ func (m *MultivariatePolynomialManager) derivativeWithReceipt(p Polynomial, x ui
 		}
 		outcome := monomialFactoryOutcome{}
 		derivative, e := c.monomials.derivativeCreated(term, x, &outcome)
+		if outcome.allocatorInvocation.invocation != 0 {
+			s.monomialAllocator = outcome.allocatorInvocation
+		}
 		if e != nil {
 			if outcome.started {
 				c.recordGeneratedCallee(outcome)
@@ -315,6 +320,10 @@ func (m *MultivariatePolynomialManager) cleanupDerivativeModeOwned(abort bool, i
 			c.generatedCalleePending = false
 		}
 		s.calleeGeneration = 0
+	}
+	if e := m.core.monomials.cleanupMonomialAllocatorInvocation(&s.monomialAllocator, true); e != nil {
+		s.cleanupCause = e
+		return e
 	}
 	if s.factoryGeneration != 0 {
 		p := &m.core.pending

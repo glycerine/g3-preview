@@ -36,3 +36,12 @@ func (a *SmallAllocator) recordAllocationObject(o *SmallAllocatorAllocationOutco
 	}
 	return r
 }
+
+// AllocationOutcomeInvocation exposes the identity stamped at guarded entry;
+// it does not grant authority to an outcome from another allocator invocation.
+func (a *SmallAllocator) AllocationOutcomeInvocation(o *SmallAllocatorAllocationOutcome) uint64 {
+	if a == nil || a.self != a || !a.MatchesAllocationOutcome(o) {
+		return 0
+	}
+	return o.invocation
+}

@@ -28647,7 +28647,12 @@
         "mpnum/polynomial_derivative_allocation_context_test.go",
         "mpnum/polynomial_derivative_direct_source_test.go",
         "mpnum/polynomial_derivative_normalize_stop_source_test.go",
-        "mpnum/polynomial_derivative_uint32_leaf_source_test.go"
+        "mpnum/polynomial_derivative_uint32_leaf_source_test.go",
+        "memory/small_allocator.go",
+        "memory/small_allocator_allocation_outcome.go",
+        "memory/small_allocator_guarded_start_source_test.go",
+        "mpnum/polynomial_monomial_allocator_invocation.go",
+        "mpnum/polynomial_monomial_allocator_leaf_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -29219,7 +29224,14 @@
         "TestPolynomialDerivativeCopiedOwnerCannotMatchReceipt",
         "TestPolynomialDerivativeNumericContextInactiveReceiptUnchanged",
         "TestPolynomialDerivativeNumericContextRejectsCopiedFrameAndOwner",
-        "TestPolynomialDerivativeNumericContextRejectsForeignModularManager"
+        "TestPolynomialDerivativeNumericContextRejectsForeignModularManager",
+        "TestSmallAllocatorGuardedStartPreservesRejectedHistory",
+        "TestSmallAllocatorGuardedStartActualPendingAndValidRetry",
+        "TestMonomialFactoryAllocatorActualPhysicalPrefix",
+        "TestMonomialFactoryAllocatorRejectedNewCreationPreservesEarlierLeaf",
+        "TestPolynomialDerivativeOwnsActualMonomialAllocatorLeaf",
+        "TestPolynomialDerivativeMonomialAllocatorForeignReplacementPreserved",
+        "TestMonomialAllocatorOwnAcknowledgesPostphysicalRelease"
       ],
       "conditionals": [
         {
@@ -32310,6 +32322,30 @@
             "TestPolynomialDerivativeEveryReservationNamedPrefix",
             "TestPolynomialDerivativeNumericContextRejectsForeignModularManager"
           ]
+        },
+        {
+          "name": "internSourceTempCreated src/math/polynomial/polynomial.cpp:852-869: Actual source table insert then raw allocation then ID then placement/publication order preserved; direct outcome replaces before/after PendingRoots inference.",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_monomial_factory.go",
+          "tests": [
+            "TestMonomialFactoryAllocatorActualPhysicalPrefix",
+            "TestMonomialFactoryAllocatorRejectedNewCreationPreservesEarlierLeaf",
+            "TestPolynomialDerivativeOwnsActualMonomialAllocatorLeaf",
+            "TestPolynomialDerivativeMonomialAllocatorForeignReplacementPreserved",
+            "TestMonomialAllocatorOwnAcknowledgesPostphysicalRelease"
+          ]
+        },
+        {
+          "name": "derivativeWithReceipt/cleanupDerivativeScope src/math/polynomial/polynomial.cpp:4507-4528: Returned exact monomial allocator receipt joins actual callee continuation; NUM lexical suffix unchanged, unjoined raw only explicit true abort.",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_derivative.go",
+          "tests": [
+            "TestMonomialFactoryAllocatorActualPhysicalPrefix",
+            "TestMonomialFactoryAllocatorRejectedNewCreationPreservesEarlierLeaf",
+            "TestPolynomialDerivativeOwnsActualMonomialAllocatorLeaf",
+            "TestPolynomialDerivativeMonomialAllocatorForeignReplacementPreserved",
+            "TestMonomialAllocatorOwnAcknowledgesPostphysicalRelease"
+          ]
         }
       ],
       "ownership": [
@@ -32383,7 +32419,11 @@
         "Created-only monomial cohort/factory authority remains intact.",
         "Readonly source history validates owner/frame/same nonce even after own acknowledgment; inactive history never supplies numeric allocation or cleanup authority.",
         "Returned errors are captured cause identities rather than mutable owning frame pointers; later guarded source invocations cannot rewrite their category. No numeric/root authority copied into an error.",
-        "Exact modular receiver binding prevents a distinct modular manager sharing the Integer service from acquiring the parent derivative PN/numeric authority."
+        "Exact modular receiver binding prevents a distinct modular manager sharing the Integer service from acquiring the parent derivative PN/numeric authority.",
+        "Actual embedded MM allocation frame holds the single passed-by-address SmallAllocatorAllocationOutcome; reflected class header charges actual Go metadata once.",
+        "Lower started result is written beside real guarded nonce/outcome publication after open/zero/prior-pending guards. No before-after pending or counter inference acquires authority.",
+        "Exact MM self/frame/outcome address and lower nonwrapping invocation identify captured pending[0]; successful raw objects remain actual location/member owned, and foreign scratch is never drained.",
+        "Derivative captures only its actual returned callee receipt. False owning phase preserves unjoined raw; true phase follows matched creation abort and drains only exact allocation authority. Later foreign replacements and original stopped history remain unchanged."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -32445,7 +32485,8 @@
         "No whole source class/driver completion or original dormant ENSURE credit.",
         "Stopped-prefix proof uses a real source append reservation refusal; direct zero factory marker is adapter-state guard coverage only, with no source ctor/INC credit.",
         "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open.",
-        "Derivative numeric acquisition uses the actual guarded full-manager/frame/nonwrapping invocation at Integer allocation, descriptor publication/clear and allocator pending acquisition leaves. Public Derivative and optional invocation entry share direct SET/MUL engines. Matched younger PN source-stop blocks older a then n source destructors; false owning acknowledgment and true unjoined abort preserve first source history and foreign replacement roots. Fixed-owner high-level recursive reentry remains a Go owner limitation; other polynomial.cpp methods and whole imp completion retain existing qualifications. Returned exception cause identity remains stable after owning cleanup and a later invocation; inactive same-nonce source history is separate from active owning authority."
+        "Derivative numeric acquisition uses the actual guarded full-manager/frame/nonwrapping invocation at Integer allocation, descriptor publication/clear and allocator pending acquisition leaves. Public Derivative and optional invocation entry share direct SET/MUL engines. Matched younger PN source-stop blocks older a then n source destructors; false owning acknowledgment and true unjoined abort preserve first source history and foreign replacement roots. Fixed-owner high-level recursive reentry remains a Go owner limitation; other polynomial.cpp methods and whole imp completion retain existing qualifications. Returned exception cause identity remains stable after owning cleanup and a later invocation; inactive same-nonce source history is separate from active owning authority.",
+        "Selected actual monomial raw allocator transport closure only; whole source classes/units and fullFactor remain partial; dormant registered driver credit0."
       ]
     },
     {
@@ -32651,7 +32692,12 @@
         "mpnum/polynomial_primitive_public.go",
         "mpnum/polynomial_primitive_public_source_test.go",
         "mpnum/polynomial_square_free.go",
-        "mpnum/polynomial_square_free_source_test.go"
+        "mpnum/polynomial_square_free_source_test.go",
+        "memory/small_allocator.go",
+        "memory/small_allocator_allocation_outcome.go",
+        "memory/small_allocator_guarded_start_source_test.go",
+        "mpnum/polynomial_monomial_allocator_invocation.go",
+        "mpnum/polynomial_monomial_allocator_leaf_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -33127,7 +33173,14 @@
         "TestPolynomialSquareFreeDormantSourceSevenExpressions",
         "TestPolynomialSquareFreeEveryCheckpointFrontier",
         "TestPolynomialSquareFreeCallerPublicationPreservesForeignCallbackRoot",
-        "TestPolynomialSquareFreeCalleeAbortPreservesEarlierDerivativeCohort"
+        "TestPolynomialSquareFreeCalleeAbortPreservesEarlierDerivativeCohort",
+        "TestSmallAllocatorGuardedStartPreservesRejectedHistory",
+        "TestSmallAllocatorGuardedStartActualPendingAndValidRetry",
+        "TestMonomialFactoryAllocatorActualPhysicalPrefix",
+        "TestMonomialFactoryAllocatorRejectedNewCreationPreservesEarlierLeaf",
+        "TestPolynomialDerivativeOwnsActualMonomialAllocatorLeaf",
+        "TestPolynomialDerivativeMonomialAllocatorForeignReplacementPreserved",
+        "TestMonomialAllocatorOwnAcknowledgesPostphysicalRelease"
       ],
       "conditionals": [
         {
@@ -34657,6 +34710,30 @@
             "TestPolynomialSquareFreeCallerPublicationPreservesForeignCallbackRoot",
             "TestPolynomialSquareFreeCalleeAbortPreservesEarlierDerivativeCohort"
           ]
+        },
+        {
+          "name": "internSourceTempCreated src/math/polynomial/polynomial.cpp:852-869: Actual source table insert then raw allocation then ID then placement/publication order preserved; direct outcome replaces before/after PendingRoots inference.",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_monomial_factory.go",
+          "tests": [
+            "TestMonomialFactoryAllocatorActualPhysicalPrefix",
+            "TestMonomialFactoryAllocatorRejectedNewCreationPreservesEarlierLeaf",
+            "TestPolynomialDerivativeOwnsActualMonomialAllocatorLeaf",
+            "TestPolynomialDerivativeMonomialAllocatorForeignReplacementPreserved",
+            "TestMonomialAllocatorOwnAcknowledgesPostphysicalRelease"
+          ]
+        },
+        {
+          "name": "derivativeWithReceipt/cleanupDerivativeScope src/math/polynomial/polynomial.cpp:4507-4528: Returned exact monomial allocator receipt joins actual callee continuation; NUM lexical suffix unchanged, unjoined raw only explicit true abort.",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_derivative.go",
+          "tests": [
+            "TestMonomialFactoryAllocatorActualPhysicalPrefix",
+            "TestMonomialFactoryAllocatorRejectedNewCreationPreservesEarlierLeaf",
+            "TestPolynomialDerivativeOwnsActualMonomialAllocatorLeaf",
+            "TestPolynomialDerivativeMonomialAllocatorForeignReplacementPreserved",
+            "TestMonomialAllocatorOwnAcknowledgesPostphysicalRelease"
+          ]
         }
       ],
       "ownership": [
@@ -34702,7 +34779,11 @@
         "persistent source SOM members reinitialized only after actual complete owning destruction; independent subsequent Mul at every failure prefix",
         "source sourceCause/cursor retained through own Cleanup/Close; no source retry acknowledgement",
         "Cold reflected GCD/ICCP/Normalize records acquire only actual guarded invocations. Receipts match exact manager, stable frame pointer and nonwrapping invocation nonce; common PSC generation is not invocation identity. Completed younger source locals precede older caller locals; explicit owning numeric/reference/buffer abort is a separate pass. Source pp moves its result to a named returned temporary, ends helper c/i before caller old-DEC, then ends the temporary. Named pending/raw/backing/retired/cold graph includes all reached records; no registry/RC/whole-call snapshot supplies ownership.",
-        "SquareFree literal lexical NUM/reference order uses exact derivative/ExactDiv invocation receipts in actual charged GCD scope. Source stopped child remains before older scopes; explicit owning cleanup acknowledges completed children before locals, then only matched unjoined roots. Caller incoming INC and foreign created monomial retain actual ownership; earlier GF2 derivative cohort remains untouched."
+        "SquareFree literal lexical NUM/reference order uses exact derivative/ExactDiv invocation receipts in actual charged GCD scope. Source stopped child remains before older scopes; explicit owning cleanup acknowledges completed children before locals, then only matched unjoined roots. Caller incoming INC and foreign created monomial retain actual ownership; earlier GF2 derivative cohort remains untouched.",
+        "Actual embedded MM allocation frame holds the single passed-by-address SmallAllocatorAllocationOutcome; reflected class header charges actual Go metadata once.",
+        "Lower started result is written beside real guarded nonce/outcome publication after open/zero/prior-pending guards. No before-after pending or counter inference acquires authority.",
+        "Exact MM self/frame/outcome address and lower nonwrapping invocation identify captured pending[0]; successful raw objects remain actual location/member owned, and foreign scratch is never drained.",
+        "Derivative captures only its actual returned callee receipt. False owning phase preserves unjoined raw; true phase follows matched creation abort and drains only exact allocation authority. Later foreign replacements and original stopped history remain unchanged."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -34750,7 +34831,8 @@
         "all unrelated polynomial imp/GCD/ICCP/CRA/Resultant methods remain parent/numeric scope",
         "WASM/WASI/race deferred per project instructions",
         "Selected algorithms and explicit Runtime/NUM cohorts only. Actual signed-TLS/consumed-raw proofs exercise guarded owner domains, not claimed ordinary mathematical OOM reachability. Global mgcd_check/TRACE/assertion dispatcher/native ostream/other ABI and source expression-driver construction remain open. Original tst_polynomial returns after PSC: dormant GCD/primitive source fixture bodies have zero active-driver credit. Eight original PSC cases reach first coefficient8, second coefficient5 and Resultant8 selected ENSURE expressions (21 dynamic expressions at3 static sites); full original registered-driver lifecycle/printing is not promoted.",
-        "Original tst_sqf seven expressions are dormant: zero registered source driver credit. Literal GF2 derivative-zero GCD/exact-division result is preserved. Source units remain partial; full parent Factor and strict UP prime/Hensel suffixes remain open."
+        "Original tst_sqf seven expressions are dormant: zero registered source driver credit. Literal GF2 derivative-zero GCD/exact-division result is preserved. Source units remain partial; full parent Factor and strict UP prime/Hensel suffixes remain open.",
+        "Selected actual monomial raw allocator transport closure only; whole source classes/units and fullFactor remain partial; dormant registered driver credit0."
       ]
     },
     {
@@ -131151,7 +131233,13 @@
         "util_numeric_stream_file_test.go",
         "util_memory_fatal_policy_test.go",
         "memory/small_allocator_allocation_outcome.go",
-        "memory/small_allocator_allocation_outcome_test.go"
+        "memory/small_allocator_allocation_outcome_test.go",
+        "memory/small_allocator_guarded_start_source_test.go",
+        "mpnum/polynomial_monomial.go",
+        "mpnum/polynomial_monomial_factory.go",
+        "mpnum/polynomial_monomial_allocator_invocation.go",
+        "mpnum/polynomial_monomial_allocator_leaf_source_test.go",
+        "mpnum/polynomial_derivative.go"
       ],
       "tests": [
         "TestSmallBytesSourceExercise",
@@ -131233,7 +131321,14 @@
         "TestNumericFileStreamEveryColdReservation",
         "TestMemoryFatalBorrowedPointerRetentionAndReachedSentry",
         "TestSmallAllocatorOutcomeActualAcquisitionAndUnchangedQuickGuard",
-        "TestSmallAllocatorOutcomeActualPendingLeafAndRejectedEntry"
+        "TestSmallAllocatorOutcomeActualPendingLeafAndRejectedEntry",
+        "TestSmallAllocatorGuardedStartPreservesRejectedHistory",
+        "TestSmallAllocatorGuardedStartActualPendingAndValidRetry",
+        "TestMonomialFactoryAllocatorActualPhysicalPrefix",
+        "TestMonomialFactoryAllocatorRejectedNewCreationPreservesEarlierLeaf",
+        "TestPolynomialDerivativeOwnsActualMonomialAllocatorLeaf",
+        "TestPolynomialDerivativeMonomialAllocatorForeignReplacementPreserved",
+        "TestMonomialAllocatorOwnAcknowledgesPostphysicalRelease"
       ],
       "conditionals": [
         {
@@ -131542,6 +131637,15 @@
             "TestSmallAllocatorOutcomeActualAcquisitionAndUnchangedQuickGuard",
             "TestSmallAllocatorOutcomeActualPendingLeafAndRejectedEntry"
           ]
+        },
+        {
+          "name": "AllocateWithOutcomeStarted src/util/small_object_allocator.cpp:97-140: Same allocation engine; existing public entry signatures/routes unchanged. Concrete started result only actual guarded metadata publication.",
+          "status": "partial",
+          "go_target": "memory/small_allocator.go",
+          "tests": [
+            "TestSmallAllocatorGuardedStartPreservesRejectedHistory",
+            "TestSmallAllocatorGuardedStartActualPendingAndValidRetry"
+          ]
         }
       ],
       "ownership": [
@@ -131553,7 +131657,11 @@
         "Supplied Runtime/block/offset is a borrowed source address; receiver counter/class/freelist selects actions, no donor chunk adoption. Actual pointer codec sidecars belong to receiver, donor payload/page remains caller-owned. Exact raw invocation serial/stage/count and matching active ObjectRef release guard prevent duplicate owning continuation. SourceFinalize stays sticky; only explicit CleanupStopped discards the current stopped invocation via AbortRawInvocation, preserving source count/history and all donor/provider data.",
         "Optional cold borrowed assertion-control interface binds directly to actual DebugContext, without closure/per-record interface/shadow bool or new Runtime events. Reflected allocator/IO headers charge actual fields once. Source DEBUG leak warning is independent of assertions enable switch. Native/global assertion wiring remains partial.",
         "Actual cold charged VerboseContext owns the unsigned level and borrows selected NumericTextStream pointer. Get/set stream does not touch borrowed stream lifetime; reached insertion performs its existing guards. Allocator borrows optional getter interface, no shadow mutable scalar or source allocation events.",
-        "Actual guarded manager/frame/unique invocation plus direct argument acquisition tokens; legacy foreign calls have nil receipt; same-cardinality replacement and stale frame owning cleanup preserve foreign graph before cleanup."
+        "Actual guarded manager/frame/unique invocation plus direct argument acquisition tokens; legacy foreign calls have nil receipt; same-cardinality replacement and stale frame owning cleanup preserve foreign graph before cleanup.",
+        "Actual embedded MM allocation frame holds the single passed-by-address SmallAllocatorAllocationOutcome; reflected class header charges actual Go metadata once.",
+        "Lower started result is written beside real guarded nonce/outcome publication after open/zero/prior-pending guards. No before-after pending or counter inference acquires authority.",
+        "Exact MM self/frame/outcome address and lower nonwrapping invocation identify captured pending[0]; successful raw objects remain actual location/member owned, and foreign scratch is never drained.",
+        "Derivative captures only its actual returned callee receipt. False owning phase preserves unjoined raw; true phase follows matched creation abort and drains only exact allocation authority. Later foreign replacements and original stopped history remain unchanged."
       ],
       "deviations": [
         "Reset/Close reclaim tracked live direct blocks as explicit typed owner cleanup extension; source only frees pooled chunks.",
@@ -131564,7 +131672,8 @@
         "Ordinary retry of an interrupted beforefree invocation resumes its real retained phase; explicit CompleteRelease can acknowledge afterfree failure without counter repair. This is a Go owning cleanup adapter to bounded source-undefined signed-overflow domains, not a C++ exception recovery claim. Actual MPZ/Natural and transitive numerical failure owners remain required.",
         "Same Runtime provider/profile only; source global allocator and native pointer ABI remain open. SizeT32 conversion before zero/bypass applies to raw and checked allocation/deallocation entries; owning receipts match normalized size and exact private serial. Read-only source getters observe the published prefix while raw mutation stays stopped. Raw retry is an explicit Go continuation, not native exception resumption. Actual public pool metadata refusal/ownabort proof preserves donor/caller roots; headerless wrapped realloc is guarded source-undefined domain only. Direct release stage2-to-physical has no fallible point, no fabricated failure credit. Whole units remain partial.",
         "File-backed diagnostics use explicit borrowed os.File service; default write failure is nonthrowing badbit. Native stream buffering/locale/exception masks/global stderr initialization remain separate.",
-        "Partial SET acquisition prerequisite only; allocating finite-field PNormalize, complete Discriminant source-stop/reservation/coldgraph proof and source parent remain open. No source unit/API promotion."
+        "Partial SET acquisition prerequisite only; allocating finite-field PNormalize, complete Discriminant source-stop/reservation/coldgraph proof and source parent remain open. No source unit/API promotion.",
+        "Selected actual monomial raw allocator transport closure only; whole source classes/units and fullFactor remain partial; dormant registered driver credit0."
       ]
     },
     {
@@ -131597,7 +131706,14 @@
         "util_verbose_context_test.go",
         "util_numeric_stream_file.go",
         "util_numeric_stream_file_test.go",
-        "util_memory_fatal_policy_test.go"
+        "util_memory_fatal_policy_test.go",
+        "memory/small_allocator_allocation_outcome.go",
+        "memory/small_allocator_guarded_start_source_test.go",
+        "mpnum/polynomial_monomial.go",
+        "mpnum/polynomial_monomial_factory.go",
+        "mpnum/polynomial_monomial_allocator_invocation.go",
+        "mpnum/polynomial_monomial_allocator_leaf_source_test.go",
+        "mpnum/polynomial_derivative.go"
       ],
       "tests": [
         "TestSmallBytesSourceExercise",
@@ -131665,7 +131781,14 @@
         "TestNumericFileStreamExactFormattingAndBorrow",
         "TestNumericFileStreamActualWriteFailureSetsNonthrowingBadbit",
         "TestNumericFileStreamEveryColdReservation",
-        "TestMemoryFatalBorrowedPointerRetentionAndReachedSentry"
+        "TestMemoryFatalBorrowedPointerRetentionAndReachedSentry",
+        "TestSmallAllocatorGuardedStartPreservesRejectedHistory",
+        "TestSmallAllocatorGuardedStartActualPendingAndValidRetry",
+        "TestMonomialFactoryAllocatorActualPhysicalPrefix",
+        "TestMonomialFactoryAllocatorRejectedNewCreationPreservesEarlierLeaf",
+        "TestPolynomialDerivativeOwnsActualMonomialAllocatorLeaf",
+        "TestPolynomialDerivativeMonomialAllocatorForeignReplacementPreserved",
+        "TestMonomialAllocatorOwnAcknowledgesPostphysicalRelease"
       ],
       "conditionals": [
         {
@@ -131897,6 +132020,15 @@
             "TestNumericFileStreamEveryColdReservation",
             "TestMemoryFatalBorrowedPointerRetentionAndReachedSentry"
           ]
+        },
+        {
+          "name": "AllocateWithOutcomeStarted src/util/small_object_allocator.cpp:97-140: Same allocation engine; existing public entry signatures/routes unchanged. Concrete started result only actual guarded metadata publication.",
+          "status": "partial",
+          "go_target": "memory/small_allocator.go",
+          "tests": [
+            "TestSmallAllocatorGuardedStartPreservesRejectedHistory",
+            "TestSmallAllocatorGuardedStartActualPendingAndValidRetry"
+          ]
         }
       ],
       "ownership": [
@@ -131905,7 +132037,11 @@
         "The sole allocator core now lives in memory.SmallAllocator over one actual borrowed memory.Runtime. Main wrappers separately charge their real wrapper/IO headers and retain them until pending roots finalize; genuine borrowed CString/NumericTextStream formatting remains in main. All41 original accounting/runtime/allocator test names are retained across packages; no solver/numeric backend wiring is claimed. See PORT_PROGRESS.md#audit-memory-package-api-packet-md.",
         "Supplied Runtime/block/offset is a borrowed source address; receiver counter/class/freelist selects actions, no donor chunk adoption. Actual pointer codec sidecars belong to receiver, donor payload/page remains caller-owned. Exact raw invocation serial/stage/count and matching active ObjectRef release guard prevent duplicate owning continuation. SourceFinalize stays sticky; only explicit CleanupStopped discards the current stopped invocation via AbortRawInvocation, preserving source count/history and all donor/provider data.",
         "Optional cold borrowed assertion-control interface binds directly to actual DebugContext, without closure/per-record interface/shadow bool or new Runtime events. Reflected allocator/IO headers charge actual fields once. Source DEBUG leak warning is independent of assertions enable switch. Native/global assertion wiring remains partial.",
-        "Actual cold charged VerboseContext owns the unsigned level and borrows selected NumericTextStream pointer. Get/set stream does not touch borrowed stream lifetime; reached insertion performs its existing guards. Allocator borrows optional getter interface, no shadow mutable scalar or source allocation events."
+        "Actual cold charged VerboseContext owns the unsigned level and borrows selected NumericTextStream pointer. Get/set stream does not touch borrowed stream lifetime; reached insertion performs its existing guards. Allocator borrows optional getter interface, no shadow mutable scalar or source allocation events.",
+        "Actual embedded MM allocation frame holds the single passed-by-address SmallAllocatorAllocationOutcome; reflected class header charges actual Go metadata once.",
+        "Lower started result is written beside real guarded nonce/outcome publication after open/zero/prior-pending guards. No before-after pending or counter inference acquires authority.",
+        "Exact MM self/frame/outcome address and lower nonwrapping invocation identify captured pending[0]; successful raw objects remain actual location/member owned, and foreign scratch is never drained.",
+        "Derivative captures only its actual returned callee receipt. False owning phase preserves unjoined raw; true phase follows matched creation abort and drains only exact allocation authority. Later foreign replacements and original stopped history remain unchanged."
       ],
       "deviations": [
         "Reset/Close reclaim tracked live direct blocks as explicit typed owner cleanup extension; source only frees pooled chunks.",
@@ -131913,7 +132049,8 @@
         "Storage limits checked before publication; invalid size/generation diagnosed.",
         "Standalone deterministic scalar address codec and external sort adapter preserve source scan/relink order without claiming native pointer placements. Borrowed explicit diagnostic streams model selected bytes/state; global runtime/ostream wiring remains open. Legacy arena/small_bytes is a separate storage adapter with its recorded extensions.",
         "Same Runtime provider/profile only; source global allocator and native pointer ABI remain open. SizeT32 conversion before zero/bypass applies to raw and checked allocation/deallocation entries; owning receipts match normalized size and exact private serial. Read-only source getters observe the published prefix while raw mutation stays stopped. Raw retry is an explicit Go continuation, not native exception resumption. Actual public pool metadata refusal/ownabort proof preserves donor/caller roots; headerless wrapped realloc is guarded source-undefined domain only. Direct release stage2-to-physical has no fallible point, no fabricated failure credit. Whole units remain partial.",
-        "File-backed diagnostics use explicit borrowed os.File service; default write failure is nonthrowing badbit. Native stream buffering/locale/exception masks/global stderr initialization remain separate."
+        "File-backed diagnostics use explicit borrowed os.File service; default write failure is nonthrowing badbit. Native stream buffering/locale/exception masks/global stderr initialization remain separate.",
+        "Selected actual monomial raw allocator transport closure only; whole source classes/units and fullFactor remain partial; dormant registered driver credit0."
       ]
     },
     {

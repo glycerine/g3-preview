@@ -60,6 +60,7 @@ type monomialCreation struct {
 }
 type monomialPowerVector struct{ raw, pending memory.Block }
 type MonomialManager struct {
+	allocatorInvocation                                                       monomialAllocatorScope
 	unitDropConsumed                                                          bool
 	unitDropCause                                                             error
 	continuationGeneration                                                    uint64

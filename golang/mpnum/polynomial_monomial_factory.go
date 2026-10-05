@@ -58,9 +58,10 @@ func validMonomialPowers(p []MonomialPower) bool {
 // Ephemeral outcome of one actual factory call, not persistent ownership.
 // Existing interned/unit results do not start a creation, irrespective of RC.
 type monomialFactoryOutcome struct {
-	created, started bool
-	generation       uint64
-	allocator        [3]memory.Block
+	created, started    bool
+	generation          uint64
+	allocator           [3]memory.Block
+	allocatorInvocation monomialAllocatorInvocationReceipt
 }
 
 func (m *MonomialManager) MkMonomial(p []MonomialPower) (Monomial, error) {
@@ -173,22 +174,17 @@ func (m *MonomialManager) internSourceTempCreated(t *monomialTemp, key monomialK
 	}
 	requested := monomialObjectSize(n)
 	l.requested = requested
-	var allocatorBefore [3]memory.Block
-	if outcome != nil {
-		allocatorBefore, e = m.allocator.PendingRoots()
-		if e != nil {
-			return Monomial{}, e
+	frame := &m.allocatorInvocation
+	object, started, e := m.allocator.AllocateWithOutcomeStarted(uint64(requested), &frame.outcome)
+	if started {
+		frame.owner = m
+		frame.invocation = m.allocator.AllocationOutcomeInvocation(&frame.outcome)
+		frame.creationGeneration = m.creation.generation
+		frame.sourceCause = e
+		if outcome != nil {
+			outcome.allocatorInvocation = monomialAllocatorInvocationReceipt{m, frame, &frame.outcome, frame.invocation}
+			outcome.allocator[0] = frame.outcome.Pending
 		}
-	}
-	object, e := m.allocator.Allocate(uint64(requested))
-	if outcome != nil {
-		after, x := m.allocator.PendingRoots()
-		for i := range after {
-			if after[i] != (memory.Block{}) && after[i] != allocatorBefore[i] {
-				outcome.allocator[i] = after[i]
-			}
-		}
-		e = polynomialNewtonJoin(e, x)
 	}
 	if object != (memory.ObjectRef{}) {
 		l.raw = object

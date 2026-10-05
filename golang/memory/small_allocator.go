@@ -255,11 +255,21 @@ func (a *SmallAllocator) rememberPending(h Block) {
 	_, e := a.config.Runtime.Size(h)
 	a.pendingPartial = e != nil
 }
-func (a *SmallAllocator) Allocate(n uint64) (ObjectRef, error) { return a.allocateWithOutcome(n, nil) }
-func (a *SmallAllocator) AllocateWithOutcome(n uint64, outcome *SmallAllocatorAllocationOutcome) (ObjectRef, error) {
-	return a.allocateWithOutcome(n, outcome)
+func (a *SmallAllocator) Allocate(n uint64) (ObjectRef, error) {
+	return a.allocateWithOutcome(n, nil, nil)
 }
-func (a *SmallAllocator) allocateWithOutcome(n uint64, outcome *SmallAllocatorAllocationOutcome) (ObjectRef, error) {
+func (a *SmallAllocator) AllocateWithOutcome(n uint64, outcome *SmallAllocatorAllocationOutcome) (ObjectRef, error) {
+	return a.allocateWithOutcome(n, outcome, nil)
+}
+
+// AllocateWithOutcomeStarted reports only the actual guarded outcome publication.
+// Rejected and source-zero calls preserve the supplied prior outcome.
+func (a *SmallAllocator) AllocateWithOutcomeStarted(n uint64, outcome *SmallAllocatorAllocationOutcome) (ObjectRef, bool, error) {
+	var started bool
+	object, cause := a.allocateWithOutcome(n, outcome, &started)
+	return object, started, cause
+}
+func (a *SmallAllocator) allocateWithOutcome(n uint64, outcome *SmallAllocatorAllocationOutcome, started *bool) (ObjectRef, error) {
 	if e := a.entryOpen(); e != nil {
 		return ObjectRef{}, e
 	}
@@ -282,6 +292,9 @@ func (a *SmallAllocator) allocateWithOutcome(n uint64, outcome *SmallAllocatorAl
 		frame.invocation++
 		frame.executing = true
 		*outcome = SmallAllocatorAllocationOutcome{owner: a, frame: frame, invocation: frame.invocation}
+		if started != nil {
+			*started = true
+		}
 		defer func() { frame.executing = false }()
 	}
 	if !a.bypass() {
