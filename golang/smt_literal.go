@@ -1,5 +1,5 @@
-// Source: src/smt/smt_literal.h:35-103; src/smt/smt_literal.cpp:54-65,95-112;
-// src/smt/smt_types.h:36-40.
+// Source: src/smt/smt_literal.h:35-103; src/smt/smt_literal.cpp:49-59,86-98;
+// src/smt/smt_types.h:33-37.
 // Source author: Leonardo de Moura (2008-02-18).
 // Licensed under the MIT license; see LICENSE.txt.
 package g3
@@ -54,7 +54,7 @@ func SMTBackwardSubsumption(first, second []SMTLiteral) bool {
 	return i == len(first)
 }
 
-// DisplayNumeric is the literal ostream insertion at smt_literal.cpp:54-65.
+// DisplayNumeric is the literal ostream insertion at smt_literal.cpp:49-59.
 // Its null output is p-1; the separate AST-aware display's null special case
 // belongs to that source method, not this insertion.
 func (l SMTLiteral) DisplayNumeric(out *NumericTextStream) error {

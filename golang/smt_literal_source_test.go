@@ -1,5 +1,5 @@
-// Source: src/smt/smt_literal.h:35-103; src/smt/smt_literal.cpp:54-65,95-112;
-// src/smt/smt_types.h:36-40; source literal fixtures src/test/diff_logic.cpp:44,61-66.
+// Source: src/smt/smt_literal.h:35-103; src/smt/smt_literal.cpp:49-59,86-98;
+// src/smt/smt_types.h:33-37; source literal fixtures src/test/diff_logic.cpp:44,61-66.
 // Source author: Leonardo de Moura (2008-02-18).
 // Licensed under the MIT license; see LICENSE.txt.
 package g3
