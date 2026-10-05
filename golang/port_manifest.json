@@ -103350,7 +103350,8 @@
         "util_gparams_child_decrement_source_test.go",
         "util_gparams_global_reset_source_test.go",
         "util_gparams_service.go",
-        "util_gparams_constructor_source.go"
+        "util_gparams_constructor_source.go",
+        "util_gparams_service_ops.go"
       ],
       "tests": [
         "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
@@ -103392,7 +103393,16 @@
         "TestGlobalParamsServiceCtorRefusalPreservesCurrentAndFailedHeaders",
         "TestGlobalParamsServiceFinalizePointerAfterActualSparseShrinkStop",
         "TestGlobalParamsServiceFinalizeRetainsCurrentBeforeActualConsumedNUMStop",
-        "TestGlobalParamsServiceBorrowedLifetimeAndIdentity"
+        "TestGlobalParamsServiceBorrowedLifetimeAndIdentity",
+        "TestGlobalParamsNamespaceNullAndSourceArgumentOrder",
+        "TestGlobalParamsNamespaceActualCurrentReinitAndSharedRef",
+        "TestGlobalParamsNamespaceAssertionBindingAtReachedSites",
+        "TestGlobalParamsNamespaceEveryNullForwardLeavesUnusedArgumentsUnread",
+        "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion",
+        "TestGlobalParamsNamespaceModuleSnapshotDescriptionAndDisplays",
+        "TestGlobalParamsNamespaceDisplayEveryActualOutputReservation",
+        "TestGlobalParamsNamespaceActualSymbolConstructionRefusalBeforeNull",
+        "TestGlobalParamsNamespaceClosedDebugReadAfterSourceModuleArgument"
       ],
       "assertions": [
         {
@@ -103540,16 +103550,34 @@
             "TestGlobalParamsServiceFinalizeRetainsCurrentBeforeActualConsumedNUMStop",
             "TestGlobalParamsServiceBorrowedLifetimeAndIdentity"
           ]
+        },
+        {
+          "name": "actual namespace current-imp forwarding cpp557-631 with get_module char symbol construction before SASSERT and display_module SASSERT before symbol; numeric bare_str assertion/empty-string ternary uses same imp engine",
+          "status": "partial",
+          "go_target": "util_gparams_service_ops.go",
+          "tests": [
+            "TestGlobalParamsNamespaceNullAndSourceArgumentOrder",
+            "TestGlobalParamsNamespaceActualCurrentReinitAndSharedRef",
+            "TestGlobalParamsNamespaceAssertionBindingAtReachedSites",
+            "TestGlobalParamsNamespaceEveryNullForwardLeavesUnusedArgumentsUnread",
+            "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion",
+            "TestGlobalParamsNamespaceModuleSnapshotDescriptionAndDisplays",
+            "TestGlobalParamsNamespaceDisplayEveryActualOutputReservation",
+            "TestGlobalParamsNamespaceActualSymbolConstructionRefusalBeforeNull",
+            "TestGlobalParamsNamespaceClosedDebugReadAfterSourceModuleArgument"
+          ]
         }
       ],
       "ownership": [
         "Concrete charged registry header, three independent scalar dictionaries, owned descriptor roots and ParamsRef cells; canonical borrowed Symbol strings and deferred borrowed BytesRegion description reads. Immediate failure graph and source publication-prefix checks; see PORT_PROGRESS.md#audit-gparams-registry-port-status-md.",
         "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open.",
-        "Source g_imp binds only a completed imp at unconditional successful pointer assignment. Failed constructor preserves old current pointer and retains actual unfinished placement header/child in named failed chain. Successful overwrite retains actual previous owner in named predecessor chain without source destruction. Completed constructor members unwind reverse declaration order only; imp reset/destructor body never executes on incomplete object. Explicit owning Close separately drains current, predecessors and failed headers. Exact reflected headers and additional Go copied-text context are charged and named."
+        "Source g_imp binds only a completed imp at unconditional successful pointer assignment. Failed constructor preserves old current pointer and retains actual unfinished placement header/child in named failed chain. Successful overwrite retains actual previous owner in named predecessor chain without source destruction. Completed constructor members unwind reverse declaration order only; imp reset/destructor body never executes on incomplete object. Explicit owning Close separately drains current, predecessors and failed headers. Exact reflected headers and additional Go copied-text context are charged and named.",
+        "Namespace facade reads actual current imp on every call. get_ref borrows the exact current ParamsRef; get_module returns an actual copied reference with independent caller ownership and no shadow snapshot. Namespace reset deletes table-held module references without destroying surviving caller references. One concrete DebugContext pointer is borrowed in the reflected cold service header, queried only at actual DEBUG SASSERT sites; release erases control accesses. Real output refusals retain completed stream prefix and actual source/cold owner graph before fault lift."
       ],
       "deviations": [
         "Explicit runtime lifetime, C long32/64 and C-locale IEEE64 profiles, charged Go scratch/backings and two borrowed byte streams. Complete generated catalog, process singleton/stdout wiring, OpenMP and physical global allocation hooks remain open.",
-        "Explicit borrowed-owner single-lane namespace service, not process singleton/generated memory lifecycle completion. Actual C++ placement delete is no-op on failed ctor; Go owning abort refunds concrete retained storage separately. Source TRACE, native ABI/global Runtime table allocation, full descendant exceptional paths and arbitrary global bindings remain open. Independent source branch fixtures give no registered test-driver credit. TLS signed-host overflow stop is guarded undefined-domain evidence, not ordinary free failure/OOM."
+        "Explicit borrowed-owner single-lane namespace service, not process singleton/generated memory lifecycle completion. Actual C++ placement delete is no-op on failed ctor; Go owning abort refunds concrete retained storage separately. Source TRACE, native ABI/global Runtime table allocation, full descendant exceptional paths and arbitrary global bindings remain open. Independent source branch fixtures give no registered test-driver credit. TLS signed-host overflow stop is guarded undefined-domain evidence, not ordinary free failure/OOM.",
+        "Explicit single-lane namespace binding, not process singleton/generated memory lifecycle. TRACE, native ostream/global stdout, global notification/debugger behavior and wider physical ABI/accounting remain open. Null current pointer with erased/disabled assertion reaches a typed undefined-pointer-domain guard. Symbol bare_str assertion uses actual numeric scalar at source argument site; numeric source ternary routes empty-name engine even with assertions disabled in debug. Independent fixtures give no registered driver credit."
       ],
       "ownership_checks": [
         "actual source destructor reset/deletion/member cursor retained independently of sticky source cause; immediate named owner graph before sparse shrink fault lift; separate owning acknowledgment never replays failed source reset allocation; generated singleton ctor unwind and reached ParamsRef decrement-stop receipts remain open",
@@ -103577,7 +103605,8 @@
         "util_gparams_source_finalize.go",
         "util_gparams_source_finalize_test.go",
         "util_gparams_service.go",
-        "util_gparams_constructor_source.go"
+        "util_gparams_constructor_source.go",
+        "util_gparams_service_ops.go"
       ],
       "tests": [
         "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
@@ -103617,7 +103646,16 @@
         "TestGlobalParamsServiceCtorRefusalPreservesCurrentAndFailedHeaders",
         "TestGlobalParamsServiceFinalizePointerAfterActualSparseShrinkStop",
         "TestGlobalParamsServiceFinalizeRetainsCurrentBeforeActualConsumedNUMStop",
-        "TestGlobalParamsServiceBorrowedLifetimeAndIdentity"
+        "TestGlobalParamsServiceBorrowedLifetimeAndIdentity",
+        "TestGlobalParamsNamespaceNullAndSourceArgumentOrder",
+        "TestGlobalParamsNamespaceActualCurrentReinitAndSharedRef",
+        "TestGlobalParamsNamespaceAssertionBindingAtReachedSites",
+        "TestGlobalParamsNamespaceEveryNullForwardLeavesUnusedArgumentsUnread",
+        "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion",
+        "TestGlobalParamsNamespaceModuleSnapshotDescriptionAndDisplays",
+        "TestGlobalParamsNamespaceDisplayEveryActualOutputReservation",
+        "TestGlobalParamsNamespaceActualSymbolConstructionRefusalBeforeNull",
+        "TestGlobalParamsNamespaceClosedDebugReadAfterSourceModuleArgument"
       ],
       "conditionals": [
         {
@@ -103697,16 +103735,34 @@
             "TestGlobalParamsServiceFinalizeRetainsCurrentBeforeActualConsumedNUMStop",
             "TestGlobalParamsServiceBorrowedLifetimeAndIdentity"
           ]
+        },
+        {
+          "name": "actual namespace current-imp forwarding cpp557-631 with get_module char symbol construction before SASSERT and display_module SASSERT before symbol; numeric bare_str assertion/empty-string ternary uses same imp engine",
+          "status": "partial",
+          "go_target": "util_gparams_service_ops.go",
+          "tests": [
+            "TestGlobalParamsNamespaceNullAndSourceArgumentOrder",
+            "TestGlobalParamsNamespaceActualCurrentReinitAndSharedRef",
+            "TestGlobalParamsNamespaceAssertionBindingAtReachedSites",
+            "TestGlobalParamsNamespaceEveryNullForwardLeavesUnusedArgumentsUnread",
+            "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion",
+            "TestGlobalParamsNamespaceModuleSnapshotDescriptionAndDisplays",
+            "TestGlobalParamsNamespaceDisplayEveryActualOutputReservation",
+            "TestGlobalParamsNamespaceActualSymbolConstructionRefusalBeforeNull",
+            "TestGlobalParamsNamespaceClosedDebugReadAfterSourceModuleArgument"
+          ]
         }
       ],
       "ownership": [
         "Concrete charged registry header, three independent scalar dictionaries, owned descriptor roots and ParamsRef cells; canonical borrowed Symbol strings and deferred borrowed BytesRegion description reads. Immediate failure graph and source publication-prefix checks; see PORT_PROGRESS.md#audit-gparams-registry-port-status-md.",
         "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open.",
-        "Source g_imp binds only a completed imp at unconditional successful pointer assignment. Failed constructor preserves old current pointer and retains actual unfinished placement header/child in named failed chain. Successful overwrite retains actual previous owner in named predecessor chain without source destruction. Completed constructor members unwind reverse declaration order only; imp reset/destructor body never executes on incomplete object. Explicit owning Close separately drains current, predecessors and failed headers. Exact reflected headers and additional Go copied-text context are charged and named."
+        "Source g_imp binds only a completed imp at unconditional successful pointer assignment. Failed constructor preserves old current pointer and retains actual unfinished placement header/child in named failed chain. Successful overwrite retains actual previous owner in named predecessor chain without source destruction. Completed constructor members unwind reverse declaration order only; imp reset/destructor body never executes on incomplete object. Explicit owning Close separately drains current, predecessors and failed headers. Exact reflected headers and additional Go copied-text context are charged and named.",
+        "Namespace facade reads actual current imp on every call. get_ref borrows the exact current ParamsRef; get_module returns an actual copied reference with independent caller ownership and no shadow snapshot. Namespace reset deletes table-held module references without destroying surviving caller references. One concrete DebugContext pointer is borrowed in the reflected cold service header, queried only at actual DEBUG SASSERT sites; release erases control accesses. Real output refusals retain completed stream prefix and actual source/cold owner graph before fault lift."
       ],
       "deviations": [
         "Explicit runtime lifetime, C long32/64 and C-locale IEEE64 profiles, charged Go scratch/backings and two borrowed byte streams. Complete generated catalog, process singleton/stdout wiring, OpenMP and physical global allocation hooks remain open.",
-        "Explicit borrowed-owner single-lane namespace service, not process singleton/generated memory lifecycle completion. Actual C++ placement delete is no-op on failed ctor; Go owning abort refunds concrete retained storage separately. Source TRACE, native ABI/global Runtime table allocation, full descendant exceptional paths and arbitrary global bindings remain open. Independent source branch fixtures give no registered test-driver credit. TLS signed-host overflow stop is guarded undefined-domain evidence, not ordinary free failure/OOM."
+        "Explicit borrowed-owner single-lane namespace service, not process singleton/generated memory lifecycle completion. Actual C++ placement delete is no-op on failed ctor; Go owning abort refunds concrete retained storage separately. Source TRACE, native ABI/global Runtime table allocation, full descendant exceptional paths and arbitrary global bindings remain open. Independent source branch fixtures give no registered test-driver credit. TLS signed-host overflow stop is guarded undefined-domain evidence, not ordinary free failure/OOM.",
+        "Explicit single-lane namespace binding, not process singleton/generated memory lifecycle. TRACE, native ostream/global stdout, global notification/debugger behavior and wider physical ABI/accounting remain open. Null current pointer with erased/disabled assertion reaches a typed undefined-pointer-domain guard. Symbol bare_str assertion uses actual numeric scalar at source argument site; numeric source ternary routes empty-name engine even with assertions disabled in debug. Independent fixtures give no registered driver credit."
       ],
       "ownership_checks": [
         "actual source destructor reset/deletion/member cursor retained independently of sticky source cause; immediate named owner graph before sparse shrink fault lift; separate owning acknowledgment never replays failed source reset allocation; generated singleton ctor unwind and reached ParamsRef decrement-stop receipts remain open"

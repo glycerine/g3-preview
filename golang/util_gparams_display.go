@@ -1,4 +1,6 @@
-// Licensed under the MIT license.
+// Source: src/util/gparams.cpp:150-160,446-550,623-627; src/util/gparams.h.
+// Author: Leonardo de Moura (2012-11-29).
+// Licensed under the MIT license; see LICENSE.txt in the source distribution.
 package g3
 
 import (
@@ -214,6 +216,11 @@ func (g *GlobalParams) DisplayModuleInto(out *StringBuffer64, name string) error
 	if e != nil {
 		return e
 	}
+	return g.displayModuleKey(out, key)
+}
+
+// Caller owns the existing imp lock and has reached its ordinary open guard.
+func (g *GlobalParams) displayModuleKey(out *StringBuffer64, key Symbol) error {
 	d, found, e := g.findModuleDescriptor(key)
 	if e != nil {
 		return e

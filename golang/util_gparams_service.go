@@ -17,6 +17,7 @@ var ErrGlobalParamsUninitialized = errors.New("g3: source global parameter point
 // accounting remain separate bindings. The header and all nodes are charged.
 type GlobalParamsService struct {
 	self                        *GlobalParamsService
+	namespaceAssertions         *DebugContext
 	symbols                     *SymbolManager
 	context                     *ParamsContext
 	config                      GlobalParamsConfig
