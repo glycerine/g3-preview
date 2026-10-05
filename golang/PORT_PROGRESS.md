@@ -195,7 +195,7 @@ suites now pass. No existing tests were weakened or hidden.
   check at public Mul/Div entry fixes these while retaining the source arithmetic,
   parser, normalization and ordinary rational reader guards. The independent
   alias table covers864 cases; Power and first-growth refusal prefixes also pass.
-- SAT clause methods: source solver.cpp367–465 simplification and both watch
+- SAT clause methods: source solver.cpp:367–465 simplification and both watch
   selectors run on borrowed assignment/level views and real clause storage.
   Independent finite simplification covers111888 calls; watch priorities/ties,
   source debug assertions and warm zero-allocation behavior execute. Concrete
@@ -322,7 +322,7 @@ No failed run is counted as a green gate.
 
 Read-only next-slice audit (no new implementation/tests after the frozen gate):
 
-- Natural formatting `mpn.cpp360–399` constructs temp, numerator, denominator
+- Natural formatting `mpn.cpp:360–399` constructs temp, numerator, denominator
   left to right and destroys them in reverse before returning the caller pointer;
   `mpz.cpp` keeps its inline1024 char buffer live through output insertion.
   A failed buffer constructor never runs that failed object's destructor; only
@@ -332,7 +332,7 @@ Read-only next-slice audit (no new implementation/tests after the frozen gate):
   multi-limb top0 inputs (`[0,0]`→"0", `[1,0]`→"1"); current normalization
   precondition is invented. Empty lng0 and uint32 `11*size` wrap need actual
   source action prefixes and guards at endangered accesses, not blanket preflight.
-- Remaining rational read/copy family: `mpq.h666–669` copies NUM then DEN with
+- Remaining rational read/copy family: `mpq.h:666–669` copies NUM then DEN with
   no whole-pair denominator preflight. Sign/zero/one/hash read actual selected
   scalar fields/NUM; extraction copies the chosen component then resets output
   DEN at its source site. Facade/Inf3 owning projections and Copy/Clone must
@@ -507,7 +507,7 @@ Read-only next-slice audits (no post-freeze implementation):
   abort. Shared consumers must inherit real scope integration without claiming
   their independent scoped-numeral/stream/global lifetimes complete.
 - Additional unused-source-scope guard: `Natural.check` still rejects pending
-  verification even for source lnum<lden early return (mpn.cpp160–166), which
+  verification even for source lnum<lden early return (mpn.cpp:160–166), which
   never reads/constructs verification locals. Move that guard to the actual
   verification reuse point with test-first retained-root evidence in a later
   chunk. The unsupported whole div method claim is corrected to partial, alongside
@@ -523,7 +523,7 @@ assignment storage, owning numeric lexical roots and actual decimal character
 buffer lifetimes. All three selected lanes and the root correction passed combined full gates
 before the implementation commit.
 
-Root MPN verification-holder correction: source mpn.cpp158–168 returns before
+Root MPN verification-holder correction: source mpn.cpp:158–168 returns before
 its Z3DEBUG lexical constructor at206–217. The general Natural.check guard
 incorrectly blocked that return after a retained failed constructor. A new test
 observed actual behavioral RED in `.cache/verification-local-red.log`; the guard
@@ -546,7 +546,7 @@ its vet run ended0. Ten new groups cover actual same-runtime MkVar/checkpoint,
 header/byte/realloc lifetimes, real TLS post-physical pending roots, independent
 slot/generation census, source accounting-before-realloc refusal, current-member
 borrows, source uint overflow and null/non-null/capacity0 boundaries. Source
-vector.h43–44/59–101/303–308/350–365/389–405/531–547 is mapped explicitly.
+vector.h:43–44/59–101/303–308/350–365/389–405/531–547 is mapped explicitly.
 Other SAT source allocation hooks and full solver lifecycle/search remain open;
 no public API, whole unit or registered assertion completion is added.
 
@@ -586,7 +586,7 @@ CleanupLexical is a Go owning continuation, not an assertion that C++ retries a
 throwing destructor. No source ENSURE/API/whole-unit credit is added.
 
 Read-only constructor-phase debt found after numeric freeze (no post-freeze
-Go edits): rational.h449–452/462–465/480–483/491–494 free expressions construct
+Go edits): rational.h:449–452/462–465/480–483/491–494 free expressions construct
 rational(r1), and h314–338 fused operations construct tmp(k). Current infRatExpr,
 infRatFused and corresponding facadeValueLocked/facadeAddMul/facadePostfix/ModHat
 paths install completed cleanup before initial Copy succeeds. Ordinary successful
@@ -648,7 +648,7 @@ is claimed by these selected physical-storage/lifetime slices.
   seven-file evidence `.cache/sat-scalar-runtime/final-sha256.txt`; native/debug
   focused suites each pass128 groups/262 RUN-PASS; vet passes. Other SAT activity,
   justification, pointers, watches, clauses and trail storage remain separate.
-- Root raw rational decimal display: mpq.cpp156–184 has raw `mpz` locals and an
+- Root raw rational decimal display: mpq.cpp:156–184 has raw `mpz` locals and an
   explicit normal end-label Del order NUM→DEN→digit. Three actual Int records now
   live in the charged IntegerManager header. Early body failure retains them;
   successful return runs the exact Del cursor and propagates cleanup failure.
@@ -677,7 +677,7 @@ is claimed by these selected physical-storage/lifetime slices.
   `.cache/constructor-phase-red.log`, `.cache/constructor-power-move-red.log`
   and `.cache/constructor-expression-phase-red.log`. No existing
   tests were weakened or changed and no registered ENSURE credit was added.
-- MPFF mpff.cpp1161–1382: source precision is retained despite leading zero limbs,
+- MPFF mpff.cpp:1161–1382: source precision is retained despite leading zero limbs,
   so precision96/value1 executes seven real allocation calls; warmed Go allocation
   count is14 rather than a fabricated zero. Actual lexical character1024, three
   unsigned1024 buffers and unsigned16 buffer replace retained decimal Words.
@@ -728,8 +728,8 @@ precision and every actual failure prefix; no WASM/WASI/race gate was run.
   literal32 Runtime vector. The queue comparator borrows current activity storage;
   clone/move preserves that borrow. Source increment updates the queue before
   rescaling, and decay/rescale preserve unsigned arithmetic and ascending writes.
-  Source maps: sat_solver.h109/119/517–528, sat_solver.cpp135–160/505–533/2804–2812,
-  sat_types.h47–57/108, sat_var_queue.h29–35 and vector.h43–101/303–308/350–405.
+  Source maps: sat_solver.h:109/119/517–528, sat_solver.cpp:135–160/505–533/2804–2812,
+  sat_types.h:47–57/108, sat_var_queue.h:29–35 and vector.h:43–101/303–308/350–405.
   First MkVar now owns210 raw bytes/11 blocks; first trail push234/12. Actual
   TLS unpublished roots, relocated token lifetimes and immediate fault-prefix
   ownership are checked. The obsolete186-byte fixture was updated to the actual
@@ -740,8 +740,8 @@ precision and every actual failure prefix; no WASM/WASI/race gate was run.
   solver/global storage remain open.
 - ExtendedGCD now supplies the actual external COPY/VALUE/DEFAULT lexical frames.
   Quotient, tmp, lastY, lastX, b and a unwind before queued partial adapter aborts;
-  coefficient difference precedes product destruction. Source maps: ext_gcd.h27–53,
-  rational.h selected constructors/free arithmetic and scoped_numeral.h31–33.
+  coefficient difference precedes product destruction. Source maps: ext_gcd.h:27–53,
+  rational.h selected constructors/free arithmetic and scoped_numeral.h:31–33.
   Genuine source-order RED is `.cache/ext-gcd-boundary-behavior-red.log`; actual
   retained storage expands from eight to nine records because six outer locals,
   coefficient product, completed inner work and a partial returned-copy adapter
@@ -752,9 +752,9 @@ precision and every actual failure prefix; no WASM/WASI/race gate was run.
   Original999 iterations/500 ENSURE actions and immediate pre-disable audits stay.
 - FastFloatConfig.Memory borrows the exact open same-Budget Runtime; nil retains
   an owned default. Two managers and caller raw blocks share physical Runtime
-  accounting without double charging its header. Source maps: mpff.h119,
-  mpff.cpp1173–1217/1251–1284, buffer.h45–50/80–103 and
-  memory_manager.cpp236–306. Actual TLS allocation-limit failure retains the
+  accounting without double charging its header. Source maps: mpff.h:119,
+  mpff.cpp:1173–1217/1251–1284, buffer.h:45–50/80–103 and
+  memory_manager.cpp:236–306. Actual TLS allocation-limit failure retains the
   unpublished char block; completed decimal buffers unwind before owning abort.
   Oversized public reallocations also exercise a clearly labelled guarded signed
   overflow/host-size boundary, where physical free completes before checked sync
@@ -766,7 +766,7 @@ precision and every actual failure prefix; no WASM/WASI/race gate was run.
   Permanent significand topology and generated/global binding remain open.
 - Negative SMT2 display owns its completed DEFAULT temporary in the charged
   IntegerManager, preserving inner-before-outer destruction and cleanup errors.
-  Source maps: mpz.cpp1186 big_set and1409–1434, scoped_numeral.h31–33.
+  Source maps: mpz.cpp:1186 big_set and1409–1434, scoped_numeral.h:31–33.
   Fresh default pointer assignment remains null if allocation throws; Go failedRef
   is a diagnostic abort token, not a dangling source pointer. The first test
   incorrectly expected a capacity-read guard here; source review corrected that
@@ -807,8 +807,8 @@ passes both native0.815s and checked/debug1.710s on this frozen tree.
   separately charged real12-byte provenance element plus fixed borrowed clause
   allocator retains Go generation/kind guards; producer slot is explicitly NOT
   claimed to be physical pointer/segment clause_offset32. That compact allocator
-  contract remains open. Source maps: sat_justification.h24–58, solver.h102,
-  solver.cpp143/513, vector.h59–100/303–308/351–365. Raw source val1→val2 and
+  contract remains open. Source maps: sat_justification.h:24–58, solver.h:102,
+  solver.cpp:143/513, vector.h:59–100/303–308/351–365. Raw source val1→val2 and
   push size++ precede real Go provenance reservation; incomplete overwrite clears
   old provenance without restoring source bytes or reconstructing registry roots.
   Genuine raw allocation RED, missing-API RED and size-publication behavior RED
@@ -825,7 +825,7 @@ passes both native0.815s and checked/debug1.710s on this frozen tree.
   DEBUG only. Release division can publish raw FIRST/EPS ±1/0 or reach the actual
   Integer DivideByZero; lower root returns completed DEFAULT0 without numeral
   reads, upper copies FIRST thenEPS. Strict ordinary readers remain unchanged.
-  Source maps: inf_rational.cpp80–111/169–179 and corresponding DEFAULT/pair-COPY
+  Source maps: inf_rational.cpp:80–111/169–179 and corresponding DEFAULT/pair-COPY
   header constructors. Four new groups exercise unread/stale fields, true first
   BIG Copy refusal, immediate physical census and inline warmGo0. Genuine RED
   in `.cache/inf-guard-{native,debug}-red.log` plus isolated unread/precedence
@@ -836,7 +836,7 @@ passes both native0.815s and checked/debug1.710s on this frozen tree.
 - Binary decimal/interval raw mpz locals now survive thrown operations, matching
   source explicit end labels. The charged Binary manager retains six actual Int
   records and separate normal-end/owning cursors. Scalar end deletes n1,v1,two_k1;
-  interval end deletes n1,v1,n2,v2,two_k1,two_k2. Source maps: mpbq.cpp426–457,
+  interval end deletes n1,v1,n2,v2,two_k1,two_k2. Source maps: mpbq.cpp:426–457,
   460–515; existing private manager order47–59 retained by checked owning close.
   This does not claim literal standalone SourceFinalize. True behavioral RED
   `.cache/binary-display-prefix-red.log` showed old unconditional defer destroying
@@ -853,7 +853,7 @@ passes both native0.815s and checked/debug1.710s on this frozen tree.
   Integer production untouched. Stream/platform/global lifecycle remains open.
 - Real s-expression-to-univariate-polynomial recursive parser now uses actual
   Sexpr records and the rational service's same Integer owner. Source maps:
-  sexpr2upolynomial.cpp25–113 and header exception constructor/entry point.
+  sexpr2upolynomial.cpp:25–113 and header exception constructor/entry point.
   Preserve depth>65536, head/arity checks, first argument mutation before later
   errors, unary negation, Reset of each scoped argument, add/mul(arg,p,p),
   sub(p,arg,p), borrowed unsigned exponent and owning constant COPY before IsInt.
@@ -905,7 +905,7 @@ phantom raw mpz[] tickets. Real basic/root cell scalar bytes reside in their
 actual allocator records, with cold provenance separate from payload ownership.
 
 Source review also identified reached rational raw temporary dependencies:
-mpq.cpp282–298 Power has end-only del(power), and SYNCH mpq.h80–91 AddSub/
+mpq.cpp:282–298 Power has end-only del(power), and SYNCH mpq.h:80–91 AddSub/
 normalization use raw local mpz temporaries. Existing unconditional Go deferred
 cleanup cannot be relabelled source RAII. The numeric lane will tests-first
 preserve actual source end cleanup separately from owning abort, including
@@ -971,7 +971,7 @@ source inventory, not the still-changing algebraic implementation or full
 suite. `git diff --check` also passes at this observation.
 
 Actual source lifetime boundary found during conversion review:
-algebraic_numbers.cpp292 calls `save_intervals saved_a(*this, c)` with an
+algebraic_numbers.cpp:292 calls `save_intervals saved_a(*this, c)` with an
 algebraic_cell pointer. The implicit anum constructor (header366–371) creates a
 temporary numeral, while save_intervals (cpp897–929) stores `numeral const&`.
 That temporary dies after the constructor statement; later restore/destruction
@@ -1084,7 +1084,7 @@ GREEN. The complete fork remains required and unfinished; selected partial
 algebraic and SAT/Inf work does not complete APIs, solver/search, multivariate
 arithmetic, plugins, interpolation or the remaining source/test inventory.
 
-Next multivariate prerequisite reviewed: polynomial.cpp765–885 monomial manager
+Next multivariate prerequisite reviewed: polynomial.cpp:765–885 monomial manager
 owns intern table/unit/refcounts/ID recycling and variable generation;
 1821–1910/2324–2388 polynomial imp owns actual mpzzp/upolynomial services,
 polynomial table/IDs, zero/unit, sum-of-monomials scratch and destructor order.
@@ -1115,7 +1115,7 @@ extension/search and registered bounded user-scope checks remain real obligation
 ### Next source lanes from read-only dependency review
 
 - SAT lemma minimization is the next bounded conflict-analysis family:
-  solver.cpp2238–2402, using actual same-Runtime lemma/unmark/min-stack vectors,
+  solver.cpp:2238–2402, using actual same-Runtime lemma/unmark/min-stack vectors,
   real assignment reasons, level approximation and clause allocator. Tests must
   preserve mark-before-reservation failures and source compaction; never repair
   marks on abort. Full FIRST-UIP/search additionally requires dynamic subsumption,
@@ -1123,14 +1123,14 @@ extension/search and registered bounded user-scope checks remain real obligation
   Default minimize_lemmas/dyn_sub_res cannot be disabled to bypass dependencies.
 - Inf approximate Mul/Power requires the actual shared Rational Add/Sub/Power
   entry profiles and raw constructor/assignment phases, not only colder Inf
-  guards. Source inf_rational.cpp25–54/115–167 and rational constructors admit
+  guards. Source inf_rational.cpp:25–54/115–167 and rational constructors admit
   branch-specific unread fields/raw1/0 copies. Use source sign/parity tables,
   actual earlier allocation refusals, completed-expression destruction and
   immediate physical census. C++11 multiplication operand evaluation direction
   is unspecified; do not claim the selected profile is universally mandated.
   Existing registered80 source assertions retain their unchanged credit.
 - Algebraic basic/root cell ownership plus isolate/refine/deep-copy/MkRoot/compare
-  is the next univariate algorithm lane (algebraic_numbers.cpp33–53,180–211,
+  is the next univariate algorithm lane (algebraic_numbers.cpp:33–53,180–211,
   362–539,567–684,729–781,1669–1821). Existing polynomial and binary interval
   algorithms provide real dependencies; overlapping comparison uses Sturm–Tarski,
   not the commented resultant alternative. Preserve null zero, mutating rational
@@ -1155,7 +1155,7 @@ extension/search and registered bounded user-scope checks remain real obligation
 - [ ] Remaining numeric display families: broader raw decimal assertions and
   stream/global/locale/architecture profiles; binary raw decimal/interval explicit
   end-label lifetimes now execute with separate owning abort. Rational
-  mpq.cpp156 raw locals now retain actual early-failure roots; MPFF full-precision
+  mpq.cpp:156 raw locals now retain actual early-failure roots; MPFF full-precision
   char1024/unsigned1024/16 scopes and borrowed/TLS Runtime config are integrated.
   Permanent mantissa/storage topology and unsupported profile closure remain open.
 - [ ] Maintain full native and checked/debug GREEN across implementation commits;
@@ -2225,7 +2225,7 @@ Historical mapping anchors to retain: `mp_div_publication_test.go`, `mpnum/mp_di
 
 ##### `MPQ_PARSER_PUBLICATION_PACKET.md`
 
-Source/method map: mpq.cpp186-276 -> mpq_parse.go SetString/parseRationalSuffix.
+Source/method map: mpq.cpp:186-276 -> mpq_parse.go SetString/parseRationalSuffix.
 
 Implemented direct caller Reset NUM/grammar/exception actions, no whole result transaction. Entry validates ordinary Integer NUM then DEN, allowing den0 and explicit raw Go-zero initialization without weakening ordinary rational arithmetic. Preserve old denominator scientific quirk, uint64 exponent wrap, UINT_MAX check, NUL/ASCII parsing and delayed final sign. Scientific den0 nonzero-exponent arithmetic entry guard remains a source-domain debt; exp0 normalize finite raw behavior documented. Selected parser12 groups last green; full backend suite RED separately. Integer parser remains staged and was not changed here.
 
@@ -2233,7 +2233,7 @@ Historical mapping anchors to retain: `mp_parse_test.go`, `mpnum/mp_parse_public
 
 ##### `MPQ_ROUNDING_PUBLICATION_PACKET.md`
 
-Source/method map: mpq.cpp78-99/mpq.h239-251 -> mpq_round.go.
+Source/method map: mpq.cpp:78-99/mpq.h:239-251 -> mpq_round.go.
 
 Implemented direct Floor/Ceil Int and Rational four routes; sign-before-div and denominator Reset only after integer success. PrevPowerOfTwo retains source local division work. Initial staged proposal obsolete. Preserve raw negative-denominator and component-output aliases, independent exact models. Source 16 rounding/log assertions historic shared inventory, not new inflation. Current Direct warm test obsolete; missing broader integer diagnostics/backend separate.
 
@@ -2273,7 +2273,7 @@ Historical mapping anchors to retain: `mp_format_output.go`, `mpn_source_buffer.
 
 ##### `MPZ_BITWISE_PUBLICATION_PACKET.md`
 
-Source/method map: mpz.cpp1018-1185/mpq forwarding -> mpz_bitwise.go, mpq_bitwise.go.
+Source/method map: mpz.cpp:1018-1185/mpq forwarding -> mpz_bitwise.go, mpq_bitwise.go.
 
 Implemented all four direct integer algorithms/raw rational forwards, source debug-only sign/integrality predicates, actual both-quotients -1 nontermination guard after completed action prefix, finite width NOT and unused final chunk actions. Preserve inline INT_MIN negative/output aliases and caller chunk/tail prefix models. Baseline staged/universal-negative defects fixed. Integer Mod/Div direct since fdf6f3c; packet caveat already corrected. Physical topology/lifetime and alternate backends/TRACE open.
 
@@ -2289,7 +2289,7 @@ Historical mapping anchors to retain: `mpnum/mpz_facade_extra.go`, `src/test/mpq
 
 ##### `MPZ_GCD_PUBLICATION_PACKET.md`
 
-Source/method map: mpz.cpp560-825/ExtendedGCD diagnostic + mpq.h GCD integrality -> mpz_gcd.go, mpz_number_theory.go, mpq_ops.go guard.
+Source/method map: mpz.cpp:560-825/ExtendedGCD diagnostic + mpq.h GCD integrality -> mpz_gcd.go, mpz_number_theory.go, mpq_ops.go guard.
 
 Implemented direct zero Copy->Abs, selected exact Lehmer algorithm and diagnostics at sites, rational debug-only integrality guard. Full168-prime registered source campaign uses documented deterministic RNG adapter; zero MIN promotion failure copies inline MIN before Abs allocation refusal. No GCD staging debt remains in selected branch. Other alternate GCD/GMP/digit64/TRACE and allocator exception topology remain open.
 
@@ -2489,7 +2489,7 @@ Historical mapping anchors to retain: `mpnum/upolynomial.go`, `mpnum/upolynomial
 
 ##### `UPOLYNOMIAL_STURM_PACKET.md`
 
-Source/method map: upolynomial.cpp1233-1740/1845-2081/2392-2484/2519-2573/2949/3120 -> upolynomial_sequence.go/sturm/transforms/bounds.
+Source/method map: upolynomial.cpp:1233-1740/1845-2081/2392-2484/2519-2573/2949/3120 -> upolynomial_sequence.go/sturm/transforms/bounds.
 
 Selected real flat sequence storage push-copy/move/reset and Sturm/Tarski/Fourier/variation/GetRootID/Descartes/transforms/root bounds implemented. Preserve TranslatePowerTwo shadowed source argument, final unused powers and const-cast mutation restoration only on success. Source21 added translate/half-root assertion routes, earlier9notrecounted; print-only Sturm0,12 multivariate lower-bound assertions open. Root isolation/q2bq/refinement no longer open algorithm family; printers/global/multivariate/algebraic consumers remain open.
 
@@ -2505,7 +2505,7 @@ Historical mapping anchors to retain: `mpq.go`, `src/test/mpq.cpp`, `src/test/ra
 
 ##### `mpnum/BITWISE_PORT_STATUS.md`
 
-Source/method map: initial mpz.cpp1018-1185 integer bitwise -> mpz_bitwise.go and source bug4/positive models in mpz_bitwise_test.go.
+Source/method map: initial mpz.cpp:1018-1185 integer bitwise -> mpz_bitwise.go and source bug4/positive models in mpz_bitwise_test.go.
 
 The initial positive selected algorithms and aliases existed, but its staged-result/universal negative guard policy is superseded by 57d0c64 direct all-four bitwise and actual raw rational forwarding. Preserve bug4 fixture and independent positive model maps as history. Current selected finite negative release versus debug SASSERT, width-bounded NOT and actual both-quotients -1 continuation are detailed by MPZ_BITWISE_PUBLICATION_PACKET. TRACE/alternate backend/full physical profile remain open.
 
@@ -3689,7 +3689,7 @@ certify HEAD/current drafts.
 > The integrated packet is the corrected67-file/52-test freeze above, including
 > the six quantifier-update overloads in ast_core_update.go and its tests. These
 > two files first produced missing-API RED, then passed; independent source review
-> verified ast.cpp2381–2503 identity returns, replacement/retention of patterns and
+> verified ast.cpp:2381–2503 identity returns, replacement/retention of patterns and
 > no-patterns, kind/body/weight changes and retained names/sorts/qid/skid. Payload
 > copying uses actual candidate storage with no intermediate handle slices. The
 > weight-update TRACE and constructor printer/trace events remain open.
@@ -3853,7 +3853,7 @@ certify HEAD/current drafts.
 >
 > The final corrected prospective tree is HEADa6b3cc3:golang plus the same13 owned Go files at `.cache/release/ast-dependency-corrected`. Only `ast_dependency_array.go`, `ast_dependency_array_api.go`, `ast_dependency_array_values.go`, `ast_dependency_failure_test.go`, and this document were thawed. No central metadata or Git changes are included.
 >
-> `copy_values` now writes each destination scalar before executing its actual INC, matching parray.h198–204. A failed INC does not confer ownership of that current scalar; lexical cleanup decrements only the preceding successful INC prefix. Read/write guard failures also release that prefix and its temporary backing. A valid root's logical slots are initialized, so later raw-read refusal is not an ordinary source path: the additional malformed-metadata regression explicitly checks this safety adapter. Its behavioral RED45202 reported copied-reference count2 instead of1 before teardown; corrected GREEN19714 passes.
+> `copy_values` now writes each destination scalar before executing its actual INC, matching parray.h:198–204. A failed INC does not confer ownership of that current scalar; lexical cleanup decrements only the preceding successful INC prefix. Read/write guard failures also release that prefix and its temporary backing. A valid root's logical slots are initialized, so later raw-read refusal is not an ordinary source path: the additional malformed-metadata regression explicitly checks this safety adapter. Its behavioral RED45202 reported copied-reference count2 instead of1 before teardown; corrected GREEN19714 passes.
 >
 > A dependency DEC refused by its source debug RC0 assertion now reports consumed=false. This keeps the root SET slot intact at the source assertion rather than publishing its replacement. The regression seeds the independently tested MAX30 boundary, then calls actual array Push to perform the source wrapping INC to0; it does not invent a callback. Debug RED55414 reported the incorrectly replaced slot; corrected GREEN50444/19714 passes. Release preserves unsigned0→MAX30 decrement and replacement. Both fixtures check immediate physical ownership before Close. There are now25 new test groups plus the existing eager binding test; the source adapted-condition total remains356.
 >
@@ -3861,9 +3861,9 @@ certify HEAD/current drafts.
 >
 > The selected release algorithms and public logical/RC0 assertions are implemented; this packet does **not** claim every internal parray SASSERT. Remaining exact diagnostic sites include capacity-allocation equality (line41), private cell kind accessors (72–75), some internal next/reference-count checks and helper ROOT/capacity/null-target assertions (128,169,177,184,194,199,215,253), construction/unshared/update-counter/reference-count postconditions in Copy/Set/Push/Pop (281,326,357–358,376,386,410–411,417,428,438,460–461,467,480,488,507), and Unshare/Unfold structural postconditions (511–512,520).
 >
-> In particular Reroot's exact source assertions after unfold (`c` ROOT), at each inverse step (`c` ROOT, `p` nonROOT, `p->next==c`), and at its final publication (`c==r.m_ref`, ROOT, size==initial r_sz, then counter reset and r.root()) remain open at parray.h541,546,549–550,585–589. Existing typed switch/lifetime/storage guards are not equivalents for these source diagnostic checkpoints. Source finite inverse PUSH/POP index quirks remain preserved in release; no claim of complete malformed-graph debug diagnosis is made. Registered original dependency-specialization assertion count remains zero.
+> In particular Reroot's exact source assertions after unfold (`c` ROOT), at each inverse step (`c` ROOT, `p` nonROOT, `p->next==c`), and at its final publication (`c==r.m_ref`, ROOT, size==initial r_sz, then counter reset and r.root()) remain open at parray.h:541,546,549–550,585–589. Existing typed switch/lifetime/storage guards are not equivalents for these source diagnostic checkpoints. Source finite inverse PUSH/POP index quirks remain preserved in release; no claim of complete malformed-graph debug diagnosis is made. Registered original dependency-specialization assertion count remains zero.
 >
-> Copy-only `DependencyArrayGet` now matches ast.h1958: release returns the retained raw scalar without an invented dependency dereference. Actual RefCount/IsLeaf later validate its ended lifetime; debug logical Get refuses before copying the retained slot. Regression RED68137 demonstrated the extra lifetime guard.
+> Copy-only `DependencyArrayGet` now matches ast.h:1958: release returns the retained raw scalar without an invented dependency dereference. Actual RefCount/IsLeaf later validate its ended lifetime; debug logical Get refuses before copying the retained slot. Regression RED68137 demonstrated the extra lifetime guard.
 >
 >
 > ### Corrected frozen verification
@@ -3920,7 +3920,7 @@ certify HEAD/current drafts.
 
 > # AST dependency owning alias packet
 >
-> Source: ast.h2232–2234, complete obj_ref.h, ref_vector.h, ref_buffer.h, their concrete pointer vector/buffer algorithms, and actual AST dependency INC/DEC callbacks. This packet closes the selected dependency owning aliases, not the generic templates or their other configurations. Source Microsoft notices will be preserved in translated files. No generic Go, unsafe, per-entry Go pointers, hidden slices, or substitute callback owners.
+> Source: ast.h:2232–2234, complete obj_ref.h, ref_vector.h, ref_buffer.h, their concrete pointer vector/buffer algorithms, and actual AST dependency INC/DEC callbacks. This packet closes the selected dependency owning aliases, not the generic templates or their other configurations. Source Microsoft notices will be preserved in translated files. No generic Go, unsafe, per-entry Go pointers, hidden slices, or substitute callback owners.
 >
 > ## Concrete ownership and storage
 >
@@ -3969,7 +3969,7 @@ certify HEAD/current drafts.
 >
 > ## Preserved uninstantiable buffer copy constructor
 >
-> Actual `g++ -std=c++17 -fsyntax-only -I src` with real util/debug.h and util/ref_buffer.h, a concrete INC/DEC manager, and `ref_buffer<int,manager> b(a)` rejects ref_buffer.h162: unqualified `append(other)` is not found in its dependent base; the diagnostic explicitly requires `this->append`. This is a compiler lookup defect, not a missing Go prerequisite. Fixture `.cache/dependency-ref-audit/ref_buffer_copy.cpp` stays under golang. Do not claim the preserved constructor executed or silently fix C++.
+> Actual `g++ -std=c++17 -fsyntax-only -I src` with real util/debug.h and util/ref_buffer.h, a concrete INC/DEC manager, and `ref_buffer<int,manager> b(a)` rejects ref_buffer.h:162: unqualified `append(other)` is not found in its dependent base; the diagnostic explicitly requires `this->append`. This is a compiler lookup defect, not a missing Go prerequisite. Fixture `.cache/dependency-ref-audit/ref_buffer_copy.cpp` stays under golang. Do not claim the preserved constructor executed or silently fix C++.
 >
 > CopyDependencyRefBuffer is omitted: no intended-source repair adapter is authorized or required by an actual consumer. Ordinary inherited assignment remains executable and differs from this constructor lookup. Buffer owning move remains absent. Source specialization/template status stays partial for this constructor and nonselected configs. The real same-header buffer assignment instantiation `.cache/dependency-ref-audit/ref_buffer_assign.cpp` compiles successfully; this route is selected.
 >
@@ -5670,7 +5670,7 @@ certify HEAD/current drafts.
 >
 > ## Borrowed-symbol Params string dependency: frozen helper
 >
-> Source gparams.cpp301–322 CPK_STRING interns symbol(value), then calls set_str on its bare pointer. This helper translates that retained pointer to a canonical pointer-free Symbol held in the existing paramEntry.symbol field with paramsText.borrowed=true. No second Words payload is allocated; borrowed symbols must outlive all copied/shared ParamsRef values. This extends the existing copied-string adaptation without silently using it for actual gparams source pointers.
+> Source gparams.cpp:301–322 CPK_STRING interns symbol(value), then calls set_str on its bare pointer. This helper translates that retained pointer to a canonical pointer-free Symbol held in the existing paramEntry.symbol field with paramsText.borrowed=true. No second Words payload is allocated; borrowed symbols must outlive all copied/shared ParamsRef values. This extends the existing copied-string adaptation without silently using it for actual gparams source pointers.
 >
 > Changed only util_params_ref.go and NEW util_params_string_symbol_test.go. Added SetStringSymbol(v,key,spelling), restricted to actual same-owner plain nonnull symbols; init/COW uses the existing real source Ref operations. Copy retains borrowed text metadata and canonical identity. Owned string setter/storeText remain the existing owned spelling path. delEntry frees only owned text. GetString and appendValue/display dispatch borrowed text directly through actual SymbolManager backing bytes into charged Params format workspace; only final returned string is caller-owned. Lock order remains Params→Symbol, like existing parameter lookup/render operations. No Symbol.String/BareString intermediate and no per-record Go pointer/closure/interface. The cold borrowing service/Budget remains externally confined; symbol teardown concurrent with an active borrower is forbidden.
 >
@@ -7763,7 +7763,7 @@ certify HEAD/current drafts.
 >
 > Post-commit vector correction (base HEAD9f8974d): only scoped_fast_float_vector.go and scoped_fast_float_test.go change, with this status appendix. Four new regressions first observed RED: release retained-zero Shrink/At were rejected, and a successful first growth followed by injected failure discarded an initialized capacity-tail record. Release Shrink may now increase the logical length within retained, previously initialized storage, and release At may address that storage beyond the current length. g3debug reports ErrFastFloatInvariant at the respective source SASSERT; actual physical bounds remain checked in all profiles. A charged scalar initialized high-water mark rejects never-constructed source storage with ErrFastFloatDomain. Growth copies the entire old capacity, retaining initialized tail records and completed growth/failure prefixes.
 >
-> This follows mpff's trivially-copyable source representation: vector expansion uses reallocate rather than copying just live-size records. A real C++ syntax-only audit under golang/.cache confirmed std::is_trivially_copyable<mpff>; the executable base svector<mpff> default-construction resize and scoped Shrink/At compiled in release and Z3DEBUG. Conversely, invoking scoped_mpff_vector.resize(3) failed compilation at scoped_numeral_vector.h66/vector.h418: its resize(sz,0) requires a nonexistent mpff(int) constructor. Go Resize is therefore an explicit executable base-svector default-construction convenience adapter, not a claimed instantiation of that scoped overload. Source matrix capacity tests use Push; original908316ENSURE+2VERIFY counts remain unchanged. The four additional tests are independent regression fixtures, not added source assertion counts.
+> This follows mpff's trivially-copyable source representation: vector expansion uses reallocate rather than copying just live-size records. A real C++ syntax-only audit under golang/.cache confirmed std::is_trivially_copyable<mpff>; the executable base svector<mpff> default-construction resize and scoped Shrink/At compiled in release and Z3DEBUG. Conversely, invoking scoped_mpff_vector.resize(3) failed compilation at scoped_numeral_vector.h:66/vector.h:418: its resize(sz,0) requires a nonexistent mpff(int) constructor. Go Resize is therefore an explicit executable base-svector default-construction convenience adapter, not a claimed instantiation of that scoped overload. Source matrix capacity tests use Push; original908316ENSURE+2VERIFY counts remain unchanged. The four additional tests are independent regression fixtures, not added source assertion counts.
 >
 > The existing removal safety adapter remains explicit: after source-order Del, Go clears ended scalar records instead of retaining stale nonzero handles whose ownership has ended. Retained initialized zeros and live manually assigned scalar metadata survive real capacity growth; ended nonzero source bits are not reintroduced as owning numerals. Empty Back/Pop and never-initialized capacity accesses remain typed guards for source-invalid memory domains. These adaptations do not claim full unsafe C++ stale-record semantics. Whole source units remain partial for the scoped resize instantiation, persistent ostream/TRACE and existing external consumer obligations above.
 >
@@ -7781,7 +7781,7 @@ certify HEAD/current drafts.
 > | All-package checked/debug WASI cross-build | PASS23204, unique artifacts under golang/.cache/wasi-fast-float-vector |
 > | Source inventory/no-generics | PASS63072,2102units677APIs33ported68partial2001unported |
 >
-> Final correction Go SHA256: scoped_fast_float_vector.go4850705e2932dee198f16cfc9a24504e0edf412bde22a0f48dcc6aa39bb4fef6; scoped_fast_float_test.go1b958c70fe532b39b74328da1509ace8b2ca9126eafb776cc935a12214325ffb. Both files are under mpnum; no other Go bytes changed. This appendix supersedes the corresponding two initial-packet hashes only for this correction. All checks are terminal; the two Go files and updated document are frozen for coordinator review. No Git or central metadata writes were made.
+> Final correction Go SHA256: scoped_fast_float_vector.go:4850705e2932dee198f16cfc9a24504e0edf412bde22a0f48dcc6aa39bb4fef6; scoped_fast_float_test.go:1b958c70fe532b39b74328da1509ace8b2ca9126eafb776cc935a12214325ffb. Both files are under mpnum; no other Go bytes changed. This appendix supersedes the corresponding two initial-packet hashes only for this correction. All checks are terminal; the two Go files and updated document are frozen for coordinator review. No Git or central metadata writes were made.
 
 <a id="audit-mpq-additive-publication-packet-md"></a>
 
@@ -8062,20 +8062,20 @@ certify HEAD/current drafts.
 >
 > **Integer division is already direct.** The historical staged transaction
 > from c3b3e9a was removed by `fdf6f3c` (git log for mpz_div.go). At current
-> mpz_div.go139–183, quotRemCore uses the actual two retained scratch cells,
+> mpz_div.go:139–183, quotRemCore uses the actual two retained scratch cells,
 > executes one Natural Algorithm D, publishes quotient via publishTmpAt0 then
 > remainder via publishTmpAt1. The shorter-numerator branch Copies r then
-> Resets q. mpz.go579–605 publishes sign/pointer/size and transfers the actual
+> Resets q. mpz.go:579–605 publishes sign/pointer/size and transfers the actual
 > scratch before any replacement allocation. It neither prepares both outputs
 > atomically nor Move-publishes a private result pair. These match
-> mpz.cpp474–507 and source setter transfer semantics, with documented storage
+> mpz.cpp:474–507 and source setter transfer semantics, with documented storage
 > and typed failed-pointer adaptations.
 >
-> Current Div at mpz_div.go89–112 publishes MachineDivRem into c and a real
+> Current Div at mpz_div.go:89–112 publishes MachineDivRem into c and a real
 > local remainder before reading **actual b.val** for Add/Sub adjustment.
 > Mod at115–131 publishes Rem into c then reads actual b for Add/Sub. Therefore
 > c==b retains the actual source overwritten-divisor defects; there is no shadow
-> transaction here. Source mpz.h466–496 uses exactly those rereads. The existing
+> transaction here. Source mpz.h:466–496 uses exactly those rereads. The existing
 > TestIntegerEuclideanStagedFailurePointsAndAliases name is historical; its
 > current assertions recognize real scratch/free/publication prefixes.
 > The committed bitwise packet's inherited-Mod/Div-staging caveat is stale and
@@ -8365,7 +8365,7 @@ certify HEAD/current drafts.
 >   Scope roots are audited immediately and the owner closes normally.
 >
 > The full45f5d4b native module exposed one additional parent-owned root RED:
-> TestSexprBVSourceWidthQuirks for BV1/2,width4. Source sexpr.cpp138–145 takes
+> TestSexprBVSourceWidthQuirks for BV1/2,width4. Source sexpr.cpp:138–145 takes
 > Rem→IDiv→unsigned digit. Release now prints#x1 then the existing
 > ErrSexprDisplayContinuation; debug fails the actual Rem integrality assertion
 > following#x. Parent independently reproduced RED93250 and owns the narrow
@@ -8526,7 +8526,7 @@ certify HEAD/current drafts.
 >
 > ## Full selected source and actual debt
 >
-> Read complete `src/util/mpq.cpp:186–276`, mpq.h48–77normalize,
+> Read complete `src/util/mpq.cpp:186–276`, mpq.h:48–77normalize,
 > 696–708pair setter,666–669Copy, and actual current mpq_parse.go/mpq.go plus
 > mp_parse_test.go and registered mpq.cpp tests. The entire selected string
 > setter already has its permissive grammar and arithmetic routes implemented.
@@ -8767,8 +8767,8 @@ certify HEAD/current drafts.
 > private Power, and delayed negative flag. A failedDEN owning descriptor is
 > admitted only at the decimal public Add's actual Mul(1,BIGfractionDEN,DEN)
 > Copy-growth action, paired with its unchanged numerator. Selected internal
-> Integer Add(tmp,0,caller) has no zero-Copy shortcut: mpz.h349–359 and
-> mpz.cpp357–413 use the actual big_add_sub scratch/publication algorithm.
+> Integer Add(tmp,0,caller) has no zero-Copy shortcut: mpz.h:349–359 and
+> mpz.cpp:357–413 use the actual big_add_sub scratch/publication algorithm.
 > No fictitious failedNUM allowance is used. Cache-only independent checks of
 > all four fixtures ×80 refusal positions ×two policies pass native78498 and
 > debug63645 (`parser-pair-model-native.log`, `parser-pair-model-debug.log`);
@@ -8961,17 +8961,17 @@ certify HEAD/current drafts.
 >
 > | Adjacent source family | Evidence and current Go behavior | Action / dependency boundary |
 > | --- | --- | --- |
-> | Copy rational, raw components | mpq.h666–669 sequential numerator Copy then denominator Copy; current mpq.go Copy is now direct since Power/publication chunk. | Already corrected; no imaginary transaction debt. |
-> | Integral scalar / MPZ / limb setters | mpq.h673–676,712–745 numerator setter then reset_denominator; current SetInt64,SetUint64,SetInteger,SetLimbs are direct. | Already source ordered subject inherited physical setter adapters. Stale mpq_inspect.go comment claiming allocation preparation before publication is historical prose, not another staged implementation. |
-> | Numerator/denominator extraction | mpq.h191–197 actual component Copy then reset result denominator for rational overload; Go Numerator/Denominator and rational counterparts route those same methods. | Already direct, including aliases. Do not infer a defect merely from an old atomic fixture that currently passes due real capacity reuse. |
-> | Pair scalar setter | mpq.h689–693 asserts d!=0 only debug, writes caller.num then caller.den then normalize. Current SetFraction has universal d0 check and whole-rational work/Move. | Actual staged/diagnostic debt. Signed32 pair overload mpq.h678–687 also has signed-negative flip and INT_MIN unary-negation UB to classify. Not bundled into rounding; arena owns related physical/output helpers. |
-> | MPZ-pair setter | mpq.h696–708 tests denominator sign BEFORE numerator/denominator Copies, then negates both if original sign negative, then normalize. Current SetParts stages and reads d.val after copies into work. | Actual caller publication/alias debt; source0den has no initial assertion and normalize can produce finite +/-1/0 or 0/0 endangered Div. Requires complete field-alias/error/root/domain review, no blanket initial Div0 guard. |
-> | String parser | mpq.cpp186–276 Reset actual caller numerator immediately; source numerator/denominator digit actions, old-denominator scientific quirk and three source exceptions. Current mpq_parse.go stages work with copied old denominator. | Complete grammar/action algorithms already present; caller source exceptions/OOM prefixes remain transaction debt. New direct parser must reuse public setters/Power/Add/Div/Mul rather than private duplicates. Separate full parser packet after pair setters; preserveuint64 exponent wrap and actual mask-wrap precedence. |
+> | Copy rational, raw components | mpq.h:666–669 sequential numerator Copy then denominator Copy; current mpq.go Copy is now direct since Power/publication chunk. | Already corrected; no imaginary transaction debt. |
+> | Integral scalar / MPZ / limb setters | mpq.h:673–676,712–745 numerator setter then reset_denominator; current SetInt64,SetUint64,SetInteger,SetLimbs are direct. | Already source ordered subject inherited physical setter adapters. Stale mpq_inspect.go comment claiming allocation preparation before publication is historical prose, not another staged implementation. |
+> | Numerator/denominator extraction | mpq.h:191–197 actual component Copy then reset result denominator for rational overload; Go Numerator/Denominator and rational counterparts route those same methods. | Already direct, including aliases. Do not infer a defect merely from an old atomic fixture that currently passes due real capacity reuse. |
+> | Pair scalar setter | mpq.h:689–693 asserts d!=0 only debug, writes caller.num then caller.den then normalize. Current SetFraction has universal d0 check and whole-rational work/Move. | Actual staged/diagnostic debt. Signed32 pair overload mpq.h:678–687 also has signed-negative flip and INT_MIN unary-negation UB to classify. Not bundled into rounding; arena owns related physical/output helpers. |
+> | MPZ-pair setter | mpq.h:696–708 tests denominator sign BEFORE numerator/denominator Copies, then negates both if original sign negative, then normalize. Current SetParts stages and reads d.val after copies into work. | Actual caller publication/alias debt; source0den has no initial assertion and normalize can produce finite +/-1/0 or 0/0 endangered Div. Requires complete field-alias/error/root/domain review, no blanket initial Div0 guard. |
+> | String parser | mpq.cpp:186–276 Reset actual caller numerator immediately; source numerator/denominator digit actions, old-denominator scientific quirk and three source exceptions. Current mpq_parse.go stages work with copied old denominator. | Complete grammar/action algorithms already present; caller source exceptions/OOM prefixes remain transaction debt. New direct parser must reuse public setters/Power/Add/Div/Mul rather than private duplicates. Separate full parser packet after pair setters; preserveuint64 exponent wrap and actual mask-wrap precedence. |
 > | Scalar predicates, Hash, Bitsize, StorageSize, parity/power query | mpq.h predicates and inspection source branches match current mpq_inspect.go, subject ordinary safe read boundary. | No staged output to remove; source radix/statistics quirks retained. |
-> | Uint64/Int64 getters | mpq.h776/778 has only SASSERT(rational range), then actual inherited integer getter. Go universally uses IsUint64/IsInt64 then ErrConversion. Finite7/2 should return numerator7 in release, debug rejects. Inline negative Uint64 cast is also actual source. | Real diagnostic-profile debt. Integer get_int64 mpz.cpp1335–1360 and big_abs_to_uint64 diagnostic/host cast/limb truncation must be audited first; no broad integer getter guard change or private conversion algorithm in rounding. |
-> | Unsigned/Int32 wrapper projections | rational.h107–122 asserts wrapper range only debug, then inherited64-bit getter and actual narrowing. Go universally rejects. | Real layered diagnostic debt; inclusive predicate boundaries themselves are already right. Cast profile/unsafe signed-negation and inherited getter guards require full selected-profile audit before implementation. |
-> | Float64 | mpq.cpp297–305 converts num then den with inherited actualUINT_MAX radix; only SASSERT(d>0), then n/d. Go universally returns ErrRationalFloatDomain for negative/NaN converted denominator. Raw1/-2 release returns-0.5; NaN denominator release yieldsNaN. | Real debug-only assertion debt. Preserve numerator→den conversion order, IEEE results and existing radix defect; ordinary den0 read guard separate. No integer Float64 rewrite justified. This finite, read-only diagnostic closure can follow rounding after parent reviews exact source category. |
-> | Inc/Dec | mpq.h313/315 inc adds scalar1, dec adds scalar-1. Current inspection forwards single AddInt. | Additive dependencies now direct; no duplicate algorithms needed. |
+> | Uint64/Int64 getters | mpq.h:776/778 has only SASSERT(rational range), then actual inherited integer getter. Go universally uses IsUint64/IsInt64 then ErrConversion. Finite7/2 should return numerator7 in release, debug rejects. Inline negative Uint64 cast is also actual source. | Real diagnostic-profile debt. Integer get_int64 mpz.cpp:1335–1360 and big_abs_to_uint64 diagnostic/host cast/limb truncation must be audited first; no broad integer getter guard change or private conversion algorithm in rounding. |
+> | Unsigned/Int32 wrapper projections | rational.h:107–122 asserts wrapper range only debug, then inherited64-bit getter and actual narrowing. Go universally rejects. | Real layered diagnostic debt; inclusive predicate boundaries themselves are already right. Cast profile/unsafe signed-negation and inherited getter guards require full selected-profile audit before implementation. |
+> | Float64 | mpq.cpp:297–305 converts num then den with inherited actualUINT_MAX radix; only SASSERT(d>0), then n/d. Go universally returns ErrRationalFloatDomain for negative/NaN converted denominator. Raw1/-2 release returns-0.5; NaN denominator release yieldsNaN. | Real debug-only assertion debt. Preserve numerator→den conversion order, IEEE results and existing radix defect; ordinary den0 read guard separate. No integer Float64 rewrite justified. This finite, read-only diagnostic closure can follow rounding after parent reviews exact source category. |
+> | Inc/Dec | mpq.h:313/315 inc adds scalar1, dec adds scalar-1. Current inspection forwards single AddInt. | Additive dependencies now direct; no duplicate algorithms needed. |
 >
 > The getter predicates are intentionally different from getters: IsUint64,
 > IsInt64,IsUnsigned,IsInt32 must continue to report false for source fractional
@@ -9123,7 +9123,7 @@ certify HEAD/current drafts.
 >
 > ## Complete selected source/API inventory
 >
-> Read mpq.h48–77 normalize and all setters/factories at180–182,664–747,
+> Read mpq.h:48–77 normalize and all setters/factories at180–182,664–747,
 > current mpq.go and mpq_inspect.go, RationalService setters, registered
 > src/test/mpq.cpp bodies and matching manager/service failure assertions.
 >
@@ -9909,7 +9909,7 @@ certify HEAD/current drafts.
 > Actual bitwise calls use the existing single Copy, SetUint64, Add, Mul, Mod,
 > Div and Uint64 methods. Copy/Mul caller publication is now reconciled.
 > Integer Mod/Div and quotRemCore have been direct since fdf6f3c: current
-> mpz_div.go89–183 follows mpz.h466–496/mpz.cpp474–507, including actual
+> mpz_div.go:89–183 follows mpz.h:466–496/mpz.cpp:474–507, including actual
 > overwritten-divisor rereads and quotient-before-remainder publication. Remaining
 > boundaries include omitted generic getter/arithmetic diagnostics, source scalar
 > infallible field ordering and Words tail clearing. Do not
@@ -10571,13 +10571,13 @@ certify HEAD/current drafts.
 >
 > Integer constructor: owner/descriptor/dead-token preparation (explicit Go metadata safety adapter), actual allocator header and embedded Natural state, then source tmp0,arg0,tmp1,arg1,intMin,two64 and final tmp0/two64 exchange. Cursor reflects actual completed roots, not a presumed six-cell baseline. Missing scratch remains absent. One pendingCell field captures a successfully allocated object before capacity write/descriptor preparation; another pending allocation cannot overwrite it. The allocator itself owns any partial raw/headerless or lexical scratch failure roots.
 >
-> Integer source finalization order follows mpz.cpp142–161 and reverse member destruction: two64, intMin, tmp0,arg0,tmp1,arg1; source SYNCH lock destruction; Natural t_ab,t_ms,v,u; allocator chunk frees/diagnostics. Only completed release steps advance root cursor. Failed physical release retains the object and real memory.ReleaseProgress; after physical release an error is retained and retry acknowledges the same private authority rather than refreeing or repeating requested/global subtraction. Managed roots are cleared only when their cleanup step completes; separate physical-dead state rejects dangling normal reads while still allowing cleanup continuation.
+> Integer source finalization order follows mpz.cpp:142–161 and reverse member destruction: two64, intMin, tmp0,arg0,tmp1,arg1; source SYNCH lock destruction; Natural t_ab,t_ms,v,u; allocator chunk frees/diagnostics. Only completed release steps advance root cursor. Failed physical release retains the object and real memory.ReleaseProgress; after physical release an error is retained and retry acknowledges the same private authority rather than refreeing or repeating requested/global subtraction. Managed roots are cleared only when their cleanup step completes; separate physical-dead state rejects dangling normal reads while still allowing cleanup continuation.
 >
 > SourceFinalize never frees caller direct cells. Pooled caller locators become dangling only when actual chunks are freed. Direct live objects survive allocator source destruction; descriptor retains original request, raw Block/offset and release phase before allocator context closes. Owning CloseChecked cleans caller live cells/pending cells and any remaining source members; after SourceFinalize it uses those captured direct raw tokens through the same Runtime, never fabricates a SmallAllocator event on a closed allocator. Runtime.Deallocate retries persisted before-free authority; after-free pending acknowledgement is completed through retained genuine authority. If the current API cannot acknowledge a postfree error after allocator context is closed, preserve that context until completion; do not use exported flags to authorize skipping. The descriptor directory and header release only after actual roots and allocator pending roots are empty. Internally owned Runtime closes last; borrowed Runtime never closes.
 >
-> Rational constructor currently has only one child construction edge (mpq.go49): IntegerManager. Proposed owner is charged/allocated first. If child construction fails, no other Rational root exists, so refund the Rational header and forward the child owner error unchanged. Otherwise retain child pointer immediately. Rational SourceFinalize destroys nTmp,addTmp1,addTmp2 then ltTmp1,ltTmp2,addMulTmp; each rational is NUMERATOR then DENOMINATOR (mpq.h186–189). Cursor advances component by component; never clear the whole pair after only numerator cleanup. Then call child's SourceFinalize. Owning CloseChecked follows those same leaf actions, then child's owning CloseChecked, then releases Rational header. A child failure retains the Rational parent if it still owns child/other roots. `drop` cannot remain an error-ignoring helper for owning destruction.
+> Rational constructor currently has only one child construction edge (mpq.go:49): IntegerManager. Proposed owner is charged/allocated first. If child construction fails, no other Rational root exists, so refund the Rational header and forward the child owner error unchanged. Otherwise retain child pointer immediately. Rational SourceFinalize destroys nTmp,addTmp1,addTmp2 then ltTmp1,ltTmp2,addMulTmp; each rational is NUMERATOR then DENOMINATOR (mpq.h:186–189). Cursor advances component by component; never clear the whole pair after only numerator cleanup. Then call child's SourceFinalize. Owning CloseChecked follows those same leaf actions, then child's owning CloseChecked, then releases Rational header. A child failure retains the Rational parent if it still owns child/other roots. `drop` cannot remain an error-ignoring helper for owning destruction.
 >
-> Service constructor currently has only one child edge (rational_service.go76): RationalManager. Before constants, a failed child is forwarded unchanged after the unused Service header is refunded. Once manager exists, service owner retains it and any initialized constant prefix. Initialization order is zero,one,minusOne,inf-rational constants,inf-int constants. Per-constant initialized components must be recorded before copy calls. Partial construction must not pretend all constants exist or free uninitialized handles.
+> Service constructor currently has only one child edge (rational_service.go:76): RationalManager. Before constants, a failed child is forwarded unchanged after the unused Service header is refunded. Once manager exists, service owner retains it and any initialized constant prefix. Initialization order is zero,one,minusOne,inf-rational constants,inf-int constants. Per-constant initialized components must be recorded before copy calls. Partial construction must not pretend all constants exist or free uninitialized handles.
 >
 > Service teardown follows existing audited rational service ordering: inf-rational zero/one/minusOne, each SECOND then FIRST (wrapper lexical member destruction); inf-int zero/one/minusOne FIRST; ascending power-cache values, each NUM then DEN; free cache backing only after all entries clean; zero,one,minusOne NUM then DEN; manager checked teardown; service header last. Separate stage/cache-index/component cursors retain the exact current root. Parent/child locks follow existing service->manager order; Cleanup must not call a public service method recursively while holding its mutex. A late initialization error never calls Close and discards its result. Store both original and cleanup cause in the existing service, retaining its manager and partially initialized components.
 >
@@ -10585,7 +10585,7 @@ certify HEAD/current drafts.
 >
 > | Source operation | Actual write/action order |
 > | --- | --- |
-> | mpz.h124 allocate | actual object allocation, capacity store ONLY; no size/digit initialization |
+> | mpz.h:124 allocate | actual object allocation, capacity store ONLY; no size/digit initialization |
 > | h132 allocate_if_needed | small sign1 before allocation; growing old free before sign1/new allocation; capacity repeated only at its source statement |
 > | h156 ensure_tmp | old free; then uint32 `(3*needed+1)>>1`; allocate/capacity only; actual endangered span guard after allocation |
 > | cpp165/207 set_big_i64/ui64 | allocate/pointer publication if needed; sign; low AND high32 digit stores even when high0; size last |
@@ -10605,9 +10605,9 @@ certify HEAD/current drafts.
 >
 > Four embedded source sbuffer<uint32,16> fields expand with source uint32 doubled capacity. Each actual raw allocation succeeds before copy of POS initialized words, old overflow deallocation, and new pointer/capacity publication. Old/new raw backing and bitmap/cold metadata peaks are charged honestly. Retained pending new and completed oldfree phases require scalar per-buffer root state on a failure. Reset retains capacity; finalization frees overflow in reverse field order and returns to inline16.
 >
-> mpn.cpp308 div_n resizes ms(n+1) first; writes quotient q_hat, then if borrow decrements quotient and resizes ab(n+2) at THAT branch. Remove current universal preprepared ab: no-addback paths do not allocate it. Late ab failure preserves prior numerator subtraction/quotient decrement. Existing single AlgorithmD and direct paired quotient/remainder publication are retained, not restaged.
+> mpn.cpp:308 div_n resizes ms(n+1) first; writes quotient q_hat, then if borrow decrements quotient and resizes ab(n+2) at THAT branch. Remove current universal preprepared ab: no-addback paths do not allocate it. Late ab failure preserves prior numerator subtraction/quotient decrement. Existing single AlgorithmD and direct paired quotient/remainder publication are retained, not restaged.
 >
-> mpn.cpp206 Z3DEBUG verification is a real lexical temp buffer after output writes, even in early division branches. It must not be an always-preflight scratch allocation. Formatting (cpp360) with >1 limb owns three lexical inline16 sbuffers temp,t_numer,t_denom, constructed in that order and destroyed reverse; one-limb route uses the actual bounded unsigned stack conversion. mpz display emits sign before its inline1024 char buffer (uint32 `11*size` requested construction), then converts, then C-string insertion. Existing retained formatScratch/text owners must be removed in the faithful backend, not counted as equivalent topology. External ostream/string allocation and TRACE channel bindings remain explicit separately audited runtime prerequisites.
+> mpn.cpp:206 Z3DEBUG verification is a real lexical temp buffer after output writes, even in early division branches. It must not be an always-preflight scratch allocation. Formatting (cpp360) with >1 limb owns three lexical inline16 sbuffers temp,t_numer,t_denom, constructed in that order and destroyed reverse; one-limb route uses the actual bounded unsigned stack conversion. mpz display emits sign before its inline1024 char buffer (uint32 `11*size` requested construction), then converts, then C-string insertion. Existing retained formatScratch/text owners must be removed in the faithful backend, not counted as equivalent topology. External ostream/string allocation and TRACE channel bindings remain explicit separately audited runtime prerequisites.
 >
 > ## Exact proposed production/test ownership map (not yet approved)
 >
@@ -14114,7 +14114,7 @@ certify HEAD/current drafts.
 >
 > ## Current scalar projection audit
 >
-> Read-only comparison of mpq.h776/778 and mpq.cpp297–305 with current Go
+> Read-only comparison of mpq.h:776/778 and mpq.cpp:297–305 with current Go
 > getters found two remaining diagnostic-profile debts. Rational integer getters
 > reject finite fractions universally, while source release forwards the raw
 > numerator to the inherited integer getter. Float64 rejects a finite negative
@@ -15722,9 +15722,9 @@ certify HEAD/current drafts.
 >
 > ## Full source surface and dependencies
 >
-> sat_config.h27–45 declares four phase values in order ALWAYS_TRUE=0, ALWAYS_FALSE=1, CACHING=2, RANDOM=3; two restart values GEOMETRIC=0,LUBY=1; and five GC values DYN_PSM=0,PSM=1,GLUE=2,GLUE_PSM=3,PSM_GLUE=4. Its config contains 26 scalar policy fields and 11 symbol values. Explicit executable surface is constructor (cpp25–40), updt_params (cpp42–118), and static collect_param_descrs (cpp120–122). Implicit copy construction/assignment copy all scalar/symbol members; there is no explicit destructor and no owned ParamsRef member.
+> sat_config.h:27–45 declares four phase values in order ALWAYS_TRUE=0, ALWAYS_FALSE=1, CACHING=2, RANDOM=3; two restart values GEOMETRIC=0,LUBY=1; and five GC values DYN_PSM=0,PSM=1,GLUE=2,GLUE_PSM=3,PSM_GLUE=4. Its config contains 26 scalar policy fields and 11 symbol values. Explicit executable surface is constructor (cpp25–40), updt_params (cpp42–118), and static collect_param_descrs (cpp120–122). Implicit copy construction/assignment copy all scalar/symbol members; there is no explicit destructor and no owned ParamsRef member.
 >
-> Generated sat_params.hpp is absent from the preserved source tree. Its authoritative inputs are sat_params.pyg and scripts/mk_genfile_common.py828–948: constructor borrows local params_ref and RETAINS a current gparams::get_module("sat") snapshot. Every generated getter uses local→module→literal fallback; wrong-kind local entries do not override correctly typed fallback. collect_param_descrs inserts every pyg tuple sequentially with exact description/default/module bytes. Source global registry get_module (gparams.cpp424–435,598–604) copies the current module Ref in a critical section; absent module yields null Ref. Existing ParamsContext already provides real typed fallback and shared Assign/Del. Actual gparams registry remains unported and must not be silently replaced by literal defaults.
+> Generated sat_params.hpp is absent from the preserved source tree. Its authoritative inputs are sat_params.pyg and scripts/mk_genfile_common.py828–948: constructor borrows local params_ref and RETAINS a current gparams::get_module("sat") snapshot. Every generated getter uses local→module→literal fallback; wrong-kind local entries do not override correctly typed fallback. collect_param_descrs inserts every pyg tuple sequentially with exact description/default/module bytes. Source global registry get_module (gparams.cpp:424–435,598–604) copies the current module Ref in a critical section; absent module yields null Ref. Existing ParamsContext already provides real typed fallback and shared Assign/Del. Actual gparams registry remains unported and must not be silently replaced by literal defaults.
 >
 > Coordinator rejected caller-snapshot injection as the production route. Constructor and Update must call a REAL owner-local GlobalParams.GetModule("sat") registry on every update, obtaining its shared Ref snapshot and releasing it at scope end. The registry lookup itself does NOT trigger source lazy descriptor registration: it reads only m_module_params and returns null if absent. Descriptor access in Set/GetValue/display triggers registration. The proposed next prerequisite is the actual registry packet below; config code will wait for integrated API approval. Existing generated registration functions and source global singleton placement remain explicitly separate dependencies, not simulated defaults.
 >
@@ -15739,7 +15739,7 @@ certify HEAD/current drafts.
 > - Clone(budget *arena.Budget) (*satMainConfig,error) and Assign(src *satMainConfig) error: actual implicit scalar/symbol copy, no interning/getters/update, same borrowed SymbolManager domain; Clone gets real independent charged cold header, borrows same context. Assign can retain receiver context if same symbol domain (no source ParamsRef member), self no-op. Cross-symbol-domain copies reject source-global-symbol mismatch instead of copying foreign identities. No mutex/header by-value ownership copy.
 > - Close() error: releases only real owner header, idempotent; never destroys borrowed symbols/context/numerals or caller Ref.
 > - collectSATConfigParamDescrs(d *ParamDescrs) error: actual generated 24 sequential InsertName calls; no descriptor metadata slice or unbudgeted text intermediate. Existing real ParamDescrs handles metadata/table/names charges and source publication prefixes. Static literals are borrowed source constants. This function is independent of config lifetime, matching static source route.
-> - satConfigMegabytesToBytes(mb uint32) uint64 plus scalar helper with explicit size_tBits32/64 for tests: UINTMAX maps selected SIZE_MAX, otherwise widen MB multiplication to uint64 then saturate to actual host size_t max on overflow, exactly util.h391–399. On32 source m_max_memory still uint64 but receives widened uint32 SIZE_MAX. No fixed always-UINT64MAX substitute.
+> - satConfigMegabytesToBytes(mb uint32) uint64 plus scalar helper with explicit size_tBits32/64 for tests: UINTMAX maps selected SIZE_MAX, otherwise widen MB multiplication to uint64 then saturate to actual host size_t max on overflow, exactly util.h:391–399. On32 source m_max_memory still uint64 but receives widened uint32 SIZE_MAX. No fixed always-UINT64MAX substitute.
 >
 > ## Defaults and complete generated descriptor inventory
 >
@@ -15784,9 +15784,9 @@ certify HEAD/current drafts.
 >
 > ## Real consumer inventory and scope boundary
 >
-> solver.h76 embeds config; h281 compares actual global memory allocation getter to MaxMemory and must wait for real root-owned memory runtime, never Budget.Used. solver.cpp727 display flag,734/806 parallel threads,752–788 burst/conflict/restart caps; 936 random frequency,963 phase policy; 1174/1176 restart/GC thresholds;1242–1247 simplification policy;1357–1363 restart geometry/Luby;1382–1405 GC switch/increment;1551–1593 dyn GC lbd/k;1790–1793 lemma/sub-resolution;2072 core;2201–2207 phase caching;2765–2770 config update before simplifier/asymm/probing/SCC update and RNG seed. All these algorithms remain full solver work and must preserve prefixes rather than disabling components. collect_param_descrs solver.cpp2773–2778 also collects four actual inprocessors; this config packet does not replace their descriptors or claim the full solver collector complete.
+> solver.h:76 embeds config; h281 compares actual global memory allocation getter to MaxMemory and must wait for real root-owned memory runtime, never Budget.Used. solver.cpp:727 display flag,734/806 parallel threads,752–788 burst/conflict/restart caps; 936 random frequency,963 phase policy; 1174/1176 restart/GC thresholds;1242–1247 simplification policy;1357–1363 restart geometry/Luby;1382–1405 GC switch/increment;1551–1593 dyn GC lbd/k;1790–1793 lemma/sub-resolution;2072 core;2201–2207 phase caching;2765–2770 config update before simplifier/asymm/probing/SCC update and RNG seed. All these algorithms remain full solver work and must preserve prefixes rather than disabling components. collect_param_descrs solver.cpp:2773–2778 also collects four actual inprocessors; this config packet does not replace their descriptors or claim the full solver collector complete.
 >
-> Registered sat_user_scope source test appears src/test/main.cpp239 and CMakeLists.txt95. It defaults through real config but its one ENSURE at sat_user_scope.cpp76 checks solver coherence, not config; cannot label that assertion ported by config tests. No standalone registered sat_config assertions found. New tests are independent policy/lifetime/source-body fixtures, zero fabricated source ENSURE counts. Full solver registered missing-API RED remains separate.
+> Registered sat_user_scope source test appears src/test/main.cpp:239 and CMakeLists.txt95. It defaults through real config but its one ENSURE at sat_user_scope.cpp:76 checks solver coherence, not config; cannot label that assertion ported by config tests. No standalone registered sat_config assertions found. New tests are independent policy/lifetime/source-body fixtures, zero fabricated source ENSURE counts. Full solver registered missing-API RED remains separate.
 >
 > ## Tests-first complete finite packet
 >
@@ -15855,7 +15855,7 @@ certify HEAD/current drafts.
 
 > # Actual SAT literal-set storage
 >
-> The concrete sat::literal_set at src/sat/sat_types.h230–284 now owns charged
+> The concrete sat::literal_set at src/sat/sat_types.h:230–284 now owns charged
 > SAT uint-set membership and ordered values. It does not reuse the earlier
 > uncharged satLiteralSet convenience facade as solver storage. Source registered
 > SAT solver assertions still require the actual solver; no registered literal-set
@@ -16097,7 +16097,7 @@ certify HEAD/current drafts.
 >
 > ## Exact source map
 >
-> Read complete sat_model_converter.h/.cpp and vector.h copy/destruction bodies. Header41–55 entry initializes the31-bit var/1-bit kind and deep-copies m_clauses; entry has no move constructor. Header57–60 owns vector<entry> and declares destructor but no copy/move; standard implicit class copy invokes its member's owning copy. vector.h102–118 copy_core allocates EXACT source capacity, publishes capacity/size before ascending constructors, and constructs only logical entries. vector.h161–175 copy/move constructors,187–214 copy/move assignments and47–56/120–126 destruction determine member action order. The selected source entry layout16 bytes is used only for source growth overflow, never claimed equal to Go scalar-record storage.
+> Read complete sat_model_converter.h/.cpp and vector.h copy/destruction bodies. Header41–55 entry initializes the31-bit var/1-bit kind and deep-copies m_clauses; entry has no move constructor. Header57–60 owns vector<entry> and declares destructor but no copy/move; standard implicit class copy invokes its member's owning copy. vector.h:102–118 copy_core allocates EXACT source capacity, publishes capacity/size before ascending constructors, and constructs only logical entries. vector.h:161–175 copy/move constructors,187–214 copy/move assignments and47–56/120–126 destruction determine member action order. The selected source entry layout16 bytes is used only for source growth overflow, never claimed equal to Go scalar-record storage.
 >
 > `Clone` constructs a new charged cold model/store owner, then exact-capacity outer copy. Each source entry's var/kind initializes before its real nested literal CopyList; nested capacity is exact and word ownership belongs to the destination. No source arena handle or callback environment is silently retained. Copied spare outer entries are unconstructed; a source allocated-empty vector retains its backing capacity on copy. Failed unpublished clone cleans every actual constructed root and all its cold owner graphs; original source is unchanged. Consumed reservation attempts/global scalar owner IDs are not rewound.
 >
@@ -16226,7 +16226,7 @@ certify HEAD/current drafts.
 > copy/move instantiations, nonlazy profile and STRACE remain separately open.
 > All remaining source simplifier methods below are currently unimplemented.
 > No directly registered SAT simplifier unit test exists: source-port ENSURE/VERIFY
-> count for this unit is zero. `TST(simplifier)` at test/main.cpp169 refers to the
+> count for this unit is zero. `TST(simplifier)` at test/main.cpp:169 refers to the
 > Windows-only public Z3 AST simplifier tests, not sat::simplifier, and must not
 > be counted as SAT assertions. Actual SAT consumers include `sat_user_scope`
 > (TST239), the argument-driven `cnf_backbones` (TST_ARGV247), and solver use by
@@ -17518,19 +17518,19 @@ certify HEAD/current drafts.
 >
 > | Preserved source | Store implementation |
 > | --- | --- |
-> | vector.h47–124, destructor/finalize/reset215–226 | NewList, ResetList, Finalize, Free, Reset, Close; logical destructors clear each slot lifetime, physical finalization frees both payload and bitmap. Reset retains erased live tails beyond logical size; Finalize keeps the descriptor object alive but ends backing. Free increments/retains generation or retires exhausted slots. |
-> | vector.h60–100 expansion | ReserveCapacity expands 2,3,5,8,... with source unsigned byte-overflow domain (watched size8, two uint32 header fields). It copies the FULL old payload capacity and FULL bitmap, preserving erased live tails and destroyed holes. Each completed expansion remains published when a later expansion fails. |
-> | vector.h102–118 copy_core,161–214 ctor/assign/move | CloneList/CopyList allocate exact source capacity and construct logical size only. AssignList destroys destination before preparation; copied size publishes before ascending scalar constructions, and unconstructed accesses guard at the actual slot. MoveList/MoveAssignList transfer within the common owner and leave source empty. SwapLists swaps payloads. Cross-owner CopyList/AssignList copy actual words, never foreign arena descriptors. |
-> | vector.h156–159 fill constructor,178–184 array constructor | NewListFill uses source geometric ResizeFill; NewListArray performs sequential Push. Failed unpublished construction cleans its actual roots (explicit Go ownership continuation); completed pooled physical allocations remain charged until Close. Default watched construction/Resize/Reserve without a fill value is ill-formed in the source because watched has no default constructor. |
-> | vector.h302–375 indexed/back/push/pop | Read/Write/GetDefault/Back/Push/Pop preserve logical source-debug assertions, release access to retained initialized slots, construction and destruction. Pointer accesses are represented by readPhysical and value iterators, which do not invent source operator[] assertions. |
-> | vector.h376–389 erase | EraseAt/Erase/EraseTernaryWatch shift and decrement without destroying the trailing watch. |
-> | vector.h390–434,287–301 | Shrink/SetEnd/ResizeFill/ReserveFill destroy or construct the source range. SetEnd does not borrow Shrink's allocated debug assertion; unsafe allocated increasing destructor loops get a genuine bounds guard. With null backing both methods preserve finite release no-op and their own source-debug assertion. Resize publishes complete logical size before constructing new slots. |
-> | vector.h436–493 append/reverse/fill/contains/swap | Append/AppendArray/Reverse/Fill/Contains/SwapLists. Nonempty same-list Append has the documented source growing-size nontermination guard before action. Empty self-append is valid. This is distinct from model_converter::copy's captured-end semantics. |
-> | vector.h496–528 | SetX preserves uint32 idx+1 wrap and completed resize/destruction before guarding the subsequent UINTMAX write. GetDefault skips accesses outside logical size. |
-> | vector.h252–285 raw forward/reverse iterators | Iter/ReverseIter return cold concrete VALUES; pointer-receiver Next retains captured end, reads actual lifetime, and guards actual scalar arena backing generations. Reset/erase/pop alone do not relocate pointers; pointer lifetime checks distinguish live erase tails and destroyed holes. Actual backing free/reallocation or StoreClose invalidates access; within-owner move/swap preserves old iterators following that same backing, including when the moved-from list object is freed. Destination destruction updates the captured bitmap at the real slot. |
-> | sat_watched.cpp27–46 | EraseClauseWatch shifts then SetEnd destroys tail BEFORE size publication, distinct from generic erase. |
-> | sat_watched.cpp48–81 | DisplayInto reads real watches and real borrowed clause allocator, writes exact binary/ternary/clause/external branches into borrowed NumericTextStream, no intermediate or hidden literal storage. Dead clause owners are checked at actual display dereference; scalar watch copies retain raw references without reading clauses. |
-> | solver.cpp1251–1255 watched_lt | SortByKind is an additional convenience semantic-order adapter using concrete allocation-free quadratic insertion sort. The real solver std::stable_sort backend/performance integration remains OPEN; comparator and stable order are tested, but this helper does not satisfy the source large-list complexity contract. A separately authorized concrete O(NlogN) stable partition/rotation or merge packet follows the model-owning freeze. |
+> | vector.h:47–124, destructor/finalize/reset215–226 | NewList, ResetList, Finalize, Free, Reset, Close; logical destructors clear each slot lifetime, physical finalization frees both payload and bitmap. Reset retains erased live tails beyond logical size; Finalize keeps the descriptor object alive but ends backing. Free increments/retains generation or retires exhausted slots. |
+> | vector.h:60–100 expansion | ReserveCapacity expands 2,3,5,8,... with source unsigned byte-overflow domain (watched size8, two uint32 header fields). It copies the FULL old payload capacity and FULL bitmap, preserving erased live tails and destroyed holes. Each completed expansion remains published when a later expansion fails. |
+> | vector.h:102–118 copy_core,161–214 ctor/assign/move | CloneList/CopyList allocate exact source capacity and construct logical size only. AssignList destroys destination before preparation; copied size publishes before ascending scalar constructions, and unconstructed accesses guard at the actual slot. MoveList/MoveAssignList transfer within the common owner and leave source empty. SwapLists swaps payloads. Cross-owner CopyList/AssignList copy actual words, never foreign arena descriptors. |
+> | vector.h:156–159 fill constructor,178–184 array constructor | NewListFill uses source geometric ResizeFill; NewListArray performs sequential Push. Failed unpublished construction cleans its actual roots (explicit Go ownership continuation); completed pooled physical allocations remain charged until Close. Default watched construction/Resize/Reserve without a fill value is ill-formed in the source because watched has no default constructor. |
+> | vector.h:302–375 indexed/back/push/pop | Read/Write/GetDefault/Back/Push/Pop preserve logical source-debug assertions, release access to retained initialized slots, construction and destruction. Pointer accesses are represented by readPhysical and value iterators, which do not invent source operator[] assertions. |
+> | vector.h:376–389 erase | EraseAt/Erase/EraseTernaryWatch shift and decrement without destroying the trailing watch. |
+> | vector.h:390–434,287–301 | Shrink/SetEnd/ResizeFill/ReserveFill destroy or construct the source range. SetEnd does not borrow Shrink's allocated debug assertion; unsafe allocated increasing destructor loops get a genuine bounds guard. With null backing both methods preserve finite release no-op and their own source-debug assertion. Resize publishes complete logical size before constructing new slots. |
+> | vector.h:436–493 append/reverse/fill/contains/swap | Append/AppendArray/Reverse/Fill/Contains/SwapLists. Nonempty same-list Append has the documented source growing-size nontermination guard before action. Empty self-append is valid. This is distinct from model_converter::copy's captured-end semantics. |
+> | vector.h:496–528 | SetX preserves uint32 idx+1 wrap and completed resize/destruction before guarding the subsequent UINTMAX write. GetDefault skips accesses outside logical size. |
+> | vector.h:252–285 raw forward/reverse iterators | Iter/ReverseIter return cold concrete VALUES; pointer-receiver Next retains captured end, reads actual lifetime, and guards actual scalar arena backing generations. Reset/erase/pop alone do not relocate pointers; pointer lifetime checks distinguish live erase tails and destroyed holes. Actual backing free/reallocation or StoreClose invalidates access; within-owner move/swap preserves old iterators following that same backing, including when the moved-from list object is freed. Destination destruction updates the captured bitmap at the real slot. |
+> | sat_watched.cpp:27–46 | EraseClauseWatch shifts then SetEnd destroys tail BEFORE size publication, distinct from generic erase. |
+> | sat_watched.cpp:48–81 | DisplayInto reads real watches and real borrowed clause allocator, writes exact binary/ternary/clause/external branches into borrowed NumericTextStream, no intermediate or hidden literal storage. Dead clause owners are checked at actual display dereference; scalar watch copies retain raw references without reading clauses. |
+> | solver.cpp:1251–1255 watched_lt | SortByKind is an additional convenience semantic-order adapter using concrete allocation-free quadratic insertion sort. The real solver std::stable_sort backend/performance integration remains OPEN; comparator and stable order are tested, but this helper does not satisfy the source large-list complexity contract. A separately authorized concrete O(NlogN) stable partition/rotation or merge packet follows the model-owning freeze. |
 >
 > Source solver consumers include mk_var139–140, binary/ternary/clause attachment231–336, propagation569–582 with source raw iterator compaction and SetEnd, gc_bin2646–2662, scope shrink2708 and copy/display loops. They remain solver algorithm work; this store does not claim those methods implemented.
 >
@@ -18093,8 +18093,8 @@ certify HEAD/current drafts.
 >
 > No standalone sat_clause/sat_watched/sat_var_queue storage test or TST(sat) exists
 > in preserved src/test. There are ZERO source ENSURE sites in the six scoped SAT
-> storage headers/cpps. Textual source SASSERT inventory is59: clause.h10,clause.cpp13,
-> clause_set.cpp7,watched.h25,justification.h3,var_queue.h1. Five clause.cpp sites
+> storage headers/cpps. Textual source SASSERT inventory is59: clause.h:10,clause.cpp:13,
+> clause_set.cpp:7,watched.h:25,justification.h:3,var_queue.h:1. Five clause.cpp sites
 > (140,154,161,187,189) are pointer-segment platform checks replaced by explicit
 > checked locator/provenance/storage adapters, not pretend translated address tests.
 > ClauseSet has two actual CASSERT calls (31/51); watched has four static tag-range
@@ -18491,7 +18491,7 @@ certify HEAD/current drafts.
 
 > # Stable watch sorting implementation
 >
-> Read solver.cpp1251–1255: sort_watch_lits calls std::stable_sort on each logical watch_list with watched_lt. Full watched_lt in sat_watched.h has THREE equivalence classes: binary < ternary < combined {clause,external}; clause/external original interleaving must survive. The former SortByKind insertion helper preserved semantic order but had quadratic moves. This packet replaces it with the concrete backend below. No other solver body or source global memory-counter equivalence is claimed.
+> Read solver.cpp:1251–1255: sort_watch_lits calls std::stable_sort on each logical watch_list with watched_lt. Full watched_lt in sat_watched.h has THREE equivalence classes: binary < ternary < combined {clause,external}; clause/external original interleaving must survive. The former SortByKind insertion helper preserved semantic order but had quadratic moves. This packet replaces it with the concrete backend below. No other solver body or source global memory-counter equivalence is claimed.
 >
 > Implemented concrete backend: recursively stable-partition the logical range for binary, then partition the remaining suffix for ternary. Each leaf invokes actual satWatchedLess with a legal ternary/clause-kind pivot, so classification uses the exact source comparator. Recursively combine true/false halves by three in-place reversals, yielding O(NlogN) record moves and O(N) comparisons over two passes; no heap array, interface/generic sort, per-record closure or hidden scratch owner. Preserve all logical watch objects/lifetime bits and source erased live tails outside size. Existing actual backing captures/iterators stay valid because sorting only assigns existing slots. Guard invalid/unconstructed accesses at actual read/write, retaining completed permutation prefixes.
 >
@@ -18513,7 +18513,7 @@ certify HEAD/current drafts.
 > - TestSATSolverWatchSortIndependentMixedOracleAndWarmAllocation: deterministic 513-record mixed exact oracle, measured comparator/assignment bounds, zero warmed Go allocations with Budget.FailAfter(0).
 > - TestSATSolverWatchSortBoundaryAndGuardPrefixes: empty/singleton/all-equivalent boundaries; equivalent classes make no assignments; actual uninitialized-slot and closed-owner guards.
 >
-> Method/source map: SortByKind delegates only to this backend. sortByKindWithWork validates the actual owner/list, uses the existing exact satWatchedLess (sat_watched.h117–126), partitions binary records before a legal ternary pivot, then ternary records before a legal clause pivot. stableWatchPartition recursively joins partitions with reverseWatchRange's three scalar reversals. Source solver::sort_watch_lits (sat_solver.cpp1251–1255) still needs future integration into the full solver's actual outer watch owner. No other solver method is claimed implemented. Logical records are assigned through existing Read/Write; sorting does not change capacity, descriptor identity, bitmap, generation, owner charge, or erased live tails. Actual guard failures retain already-completed assignments; no rollback is invented.
+> Method/source map: SortByKind delegates only to this backend. sortByKindWithWork validates the actual owner/list, uses the existing exact satWatchedLess (sat_watched.h:117–126), partitions binary records before a legal ternary pivot, then ternary records before a legal clause pivot. stableWatchPartition recursively joins partitions with reverseWatchRange's three scalar reversals. Source solver::sort_watch_lits (sat_solver.cpp:1251–1255) still needs future integration into the full solver's actual outer watch owner. No other solver method is claimed implemented. Logical records are assigned through existing Read/Write; sorting does not change capacity, descriptor identity, bitmap, generation, owner charge, or erased live tails. Actual guard failures retain already-completed assignments; no rollback is invented.
 >
 > Work bounds: each partition examines every leaf once, so at most 2N comparator calls. Each level rotates disjoint ranges with at most 2N successful slot assignments; two passes cost at most 4N*(ceil(log2 N)+1). Recursion is logarithmic stack depth; no heap scratch/callback closure/interface or retained diagnostic allocation. Empty halves skip rotations. Clauses/external records never receive separate classification, preserving their mutual equivalence. This is a selected standard-library backend adaptation and makes no libstdc++ physical-allocation/comparison-order equivalence claim.
 >
@@ -24195,7 +24195,7 @@ sixteen new groups in `.cache/inf-unary-final-tests.json`. Isolated committed
 `.cache/inf-unary-final-adjacent-native.log`14.272s and debug26.396s. Both selected
 vets are terminal0. This is targeted frozen evidence, not the combined full gate.
 
-Source mpq.h201/205 reads only NUM for Neg/Abs; h566 Eq short-circuits NUM then
+Source mpq.h:201/205 reads only NUM for Neg/Abs; h566 Eq short-circuits NUM then
 DEN. h572–596/cpp39–75 comparison first uses structural integer checks, then
 actual numerator-sign shortcuts, and only reached same-sign paths form two
 crossproducts. Actual SYNCH RAW mpq tmp1/tmp2 now occupy distinct
@@ -24206,8 +24206,8 @@ underlying Move execute NUM then DEN without unread-field preflight. Selected
 rational service same-owner Swap/Reset and unary/cmp forwarding use shared public
 algorithms; general Go-extension Move remains outside this source family.
 
-Inf_rational.h242–275/361–405/unary~445–479, InfInt.h201–233/308–384,
-InfEps.h239–271/335–391/403–440 same/mixed six relations preserve literal reached
+Inf_rational.h:242–275/361–405/unary~445–479, InfInt.h:201–233/308–384,
+InfEps.h:239–271/335–391/403–440 same/mixed six relations preserve literal reached
 component order and reversal. InfEps's mixed equality infinity-vs-rational plus
 nested-zero quirk remains distinct from ordering. In-place unary mutates actual
 FIRST before later EPS fault; signed EPS overflow remains the existing declared
@@ -24311,7 +24311,7 @@ actual utiltime, preserves first body failure, and leaves verbose stream/mem_sta
 binding open. Statistics counter uses explicit caller key binding for exact
 'probing assigned', with whole caller/name/global wiring partial.
 
-Source sat_types.h155–226/229ff probing-used assigned-set member bodies now use
+Source sat_types.h:155–226/229ff probing-used assigned-set member bodies now use
 actual SAME Runtime char membership and uint values, not the old Budget-only
 set arrays. Source size is published before ascending false construction,
 membership is marked before list push, values precede membership reset/finalize.
@@ -24321,7 +24321,7 @@ new embedded metadata is charged once in the probing owner header; no set box,
 shadow storage or synthetic ticket is used. Runtime quota remains actual raw
 source accounting, with extra Go cold provenance separately charged to Budget.
 
-Dynamic source solver.cpp2408–2522 uses separate literalMark, captured watches/
+Dynamic source solver.cpp:2408–2522 uses separate literalMark, captured watches/
 cache iterators, source binary/ternary short circuits, first nonbinary break,
 FUIP preservation and ascending compaction/stat sequence. Source missed-propagation
 predicate producers cpp3022–3074 are real code over actual original/learned clause
@@ -24804,16 +24804,16 @@ raw denominator/zero routes, scalar member aliases, foreign/closed ownership
 and zero-allocation warm paths. Full mpnum native and checked/debug logs
 `.cache/cleaner-muldiv-mpnum-{native,debug}.log` are terminal green at88.241s
 and196.451s. Raw MPQ10/facade lexical9 bounds and approximate algorithms remain
-unchanged. Sources: rational.h160–169/480–481/491–493;
-inf_rational.h189–192/218–221/422–435;
-inf_eps_rational.h211–222/409–426;
-inf_int_rational.h160–167/360–362, under src/util.
+unchanged. Sources: rational.h:160–169/480–481/491–493;
+inf_rational.h:189–192/218–221/422–435;
+inf_eps_rational.h:211–222/409–426;
+inf_int_rational.h:160–167/360–362, under src/util.
 
 The cleaner five-file inventory `.cache/cleaner-final-inventory.json` records
 eleven groups and59 new RUN/PASS cases in each profile; focused SAT integration
 passes388 native and390 checked/debug cases, with both vets green. Source maps
-cover src/sat/sat_cleaner.cpp26–229, sat_cleaner.h and
-sat_solver.cpp3082–3087. The cold owner borrows the actual lifecycle; source
+cover src/sat/sat_cleaner.cpp:26–229, sat_cleaner.h and
+sat_solver.cpp:3082–3087. The cold owner borrows the actual lifecycle; source
 cleanup uses the sole signed32 cost, captured pre-propagation trail size,
 watch/original/learned order, frozen clause branches and actual front compaction.
 All five actual allocation refusals precede success5 in each profile, with
@@ -24993,10 +24993,10 @@ are running on the frozen699-Go-file tree recorded in
 `.cache/sat-gc-final-go-hashes.json`. Exact final result files are
 `.cache/sat-gc-final-{native,debug,vet-native,vet-debug,source}.log`.
 
-Source maps: src/sat/sat_solver.cpp1169–1190 init_search,
+Source maps: src/sat/sat_solver.cpp:1169–1190 init_search,
 1347–1373 restart,1378–1509 GC dispatch/all four stable sort policies/half-delete,
 1481–1487 save_psm,1518–1670 dynamic GC/reactivation/PSM;
-sat_solver.h380–389 can_delete; src/util/luby.cpp21–31 complete get_luby
+sat_solver.h:380–389 can_delete; src/util/luby.cpp:21–31 complete get_luby
 and luby.h declaration. The Luby utility has no owning fields or payload;
 actual float log/floor/equality/pow and uint32 wrapping are translated, with
 undefined unsigned-conversion guards at the reached cast. Literal UINT_MAX
@@ -25121,7 +25121,7 @@ generics, WASM/WASI or race gates were introduced.
 Independent read-only asymmetric review found two remaining lexical lifetime
 issues before master integration: the run defer stops the older report even
 when savedPhase destruction is interrupted, and unconditionally invokes a
-saved-phase destructor after its copy constructor failed. Source vector.h159–167
+saved-phase destructor after its copy constructor failed. Source vector.h:159–167
 has no completed object destructor in that failed-constructor path. The private
 lane is authorized to unfreeze solely to add genuine actual Runtime release
 and partial-copy fixtures first, then correct source unwind versus separate
@@ -25161,10 +25161,10 @@ source header paths were expanded without changing implementation bodies.
 An inventory schema mismatch stopped the first copy before any mutation; it was
 corrected before the actual focused integration, not source-algorithm RED.
 
-Source map: src/sat/sat_asymm_branch.cpp26–32 constructor,34–36 descending size
+Source map: src/sat/sat_asymm_branch.cpp:26–32 constructor,34–36 descending size
 comparison,38–58 report,61–120 complete operator,123–204 process,207–235
-parameters/descriptors/statistics; sat_asymm_branch.h61 counter narrowing;
-sat_solver.h199–218 lexical scoped detach. The sole cost is actual
+parameters/descriptors/statistics; sat_asymm_branch.h:61 counter narrowing;
+sat_solver.h:199–218 lexical scoped detach. The sole cost is actual
 propagation.asymmCounter, and phases use actual Runtime source-style copies.
 Source cancellation catches only actual SATSolverException: suffix compaction
 and cost negation occur in that catch, phase is not restored, and the pushed
@@ -25210,8 +25210,8 @@ and native/checked-debug remain the gates without WASM/WASI/race.
 ### Current private tests-first follow-on lanes
 
 Root decision-selection snapshot `.cache/work/sat-decision-334de9d` reads actual
-sat_solver.cpp933–988 next_var/decide, constructor/update seed sites and
-sat_solver.h337–338 before new tests. `.cache/sat-decision-api-red.log` is genuine
+sat_solver.cpp:933–988 next_var/decide, constructor/update seed sites and
+sat_solver.h:337–338 before new tests. `.cache/sat-decision-api-red.log` is genuine
 missing-API RED. It binds existing actual variable queue/scopes/assignment/
 conflict phase-cache fields and a separate sole source RNG/decision-stat owner;
 full search and actual EXT phase/push service remain explicit obligations.
@@ -25277,7 +25277,7 @@ vet-debug}.log` evidence. Master decision integration and full gates remain
 pending; full construction/update/shared RNG/search/EXT remain obligations.
 
 Container's initial simplifier draft incorrectly interpreted source num_vars
-using assignment size. Actual sat_solver.h246 reads m_level.size(); three
+using assignment size. Actual sat_solver.h:246 reads m_level.size(); three
 private sites were corrected before full orchestration compiled GREEN. Partial
 MkVar and reached malformed-level fixtures remain required. Full default
 simplifier still compiles honestly missing its remaining actual algorithm bodies.
@@ -25286,9 +25286,9 @@ simplifier still compiles honestly missing its remaining actual algorithm bodies
 ### Decision and integrity master integration (full gates running)
 
 Root integrated the three independently reviewed decision files and the complete
-selected integrity-checker member family. Source maps: sat_solver.cpp933–988
+selected integrity-checker member family. Source maps: sat_solver.cpp:933–988
 (next_var/decide),2770(seed),711–716(propagation),2845–2850(check_invariant),
-3053–3075(missed propagation); sat_solver.h246 actual num_vars=m_level.size.
+3053–3075(missed propagation); sat_solver.h:246 actual num_vars=m_level.size.
 Integrity cpp method starts:26 constructor;31/36 contains;52 clause;105/112
 clause range/noarg;116 learned;128 assignment;132 boolean columns;155 watches;
 199 reinit;210 disjoint;228 operator. Origin headers retain source paths and
@@ -25374,7 +25374,7 @@ variable-cost ordering O(n²); container now binds actual lifecycle checker and
 uses a charged concrete stable merge, preserving equal-cost order. Full private
 simplifier remains incomplete pending stopped report/cleanup/failure audits.
 
-Root ports selected debug.cpp28–79/debug.h declarations and CASSERT gate from
+Root ports selected debug.cpp:28–79/debug.h declarations and CASSERT gate from
 private .cache/work/util-debug-f64e6b4, with tests FIRST. Genuine API RED
 .cache/util-debug-api-red.log lacks actual DebugContext; separate genuine RED
 .cache/util-debug-conditional-api-red.log lacks the short-circuit gate. Six groups
@@ -25547,7 +25547,7 @@ owning cleanup remain distinct; full family is not frozen yet.
 Container full-solver source-first API REDs exited1 in both registered-driver
 and independent16-clause-subset fixtures. Source ctor audit identified mandatory
 eager u_map<index_set>: outer capacity8 entries each placement-construct a real
-capacity8 nested table. memory_manager.h112–120 dealloc_vect destroys entries
+capacity8 nested table. memory_manager.h:112–120 dealloc_vect destroys entries
 ascending; member destruction within each entry follows reverse declaration
 order. Failed alloc_vect has no completed wrapper destructor, so any Go owning
 abort must retain its actual construction prefix separately. These are private
@@ -25582,7 +25582,7 @@ private lanes; whole patched solver objective remains active.
 
 Root Newton review found a further actual source/owning boundary issue before
 freeze. obj_ref.h operator= increments incoming, decrements old, then publishes;
-its destructor only decrements the completed m_obj. ref_vector.h96–99 increments
+its destructor only decrements the completed m_obj. ref_vector.h:96–99 increments
 before m_nodes.push_back; its destructor traverses only completed m_nodes.
 Private scopeCleanup(false) still called reference.abort in its terminal phase,
 and sourceClose delegated to owning Close, which aborted the unjoined vector
@@ -25661,7 +25661,7 @@ clears newtonLocal only when adapter closed. Persistent-vector SourceFinalize
 is still an explicit next full-imp obligation, never alias to owning Close.
 
 Root started complete bit_util family privately while master gates ran:
-.cache/work/util-bits-9c90112. Source test bits.cpp registered at main.cpp217;
+.cache/work/util-bits-9c90112. Source test bits.cpp registered at main.cpp:217;
 fixed nine shift tables, zero right-shift and full100000-case randomized driver
 ported before production. Actual missing-API RED exit1 is
 .cache/util-bits-api-red.log. Source libc rand replaced by explicit deterministic
@@ -26231,7 +26231,7 @@ read audit is private, no held candidate integrated.
 Previous goal turn made authoritative progress with green MUS9edf179/clean
 worktree. Root rechecked current five existing dependency hashes and all seven
 reviewed candidate hashes before exact integration. Actual selected source
-polynomial.cpp4905-5091 and same-engine Power4600-4630 remain literal algorithms;
+polynomial.cpp:4905-5091 and same-engine Power4600-4630 remain literal algorithms;
 no low-degree shortcut, constant-divisor correction/unsigned exponent updates,
 Q/R alias identity and source DEBUG verification retained. Nine independent
 /source/failure groups include27 signed bounded systems and every true route
@@ -26253,7 +26253,7 @@ Root full native/checked-debug/vets/source gates required before commit; full
 Private root future ModD/var2degree closure review while pseudo825 gates live:
 verified immutable ModD5 and corrected var-degree03 (failed-constructor carrier
 open guard) into same private145fdec+reviewed pseudo7, no main Go edits. Actual
-polynomial.cpp66-82 and vector101-116/191-216/529-550 compared: move constructor
+polynomial.cpp:66-82 and vector101-116/191-216/529-550 compared: move constructor
 steals, implicit svector assignment deep-copies; actual SIZE_T32/64 conversion,
 size/cap/header/elements sequence, nonowning dangling pointer history, failed
 constructor abort/token guard and separate source member destruction retained.
@@ -26351,9 +26351,9 @@ Full authoritative834 Go checks are terminal GREEN: native99.751s, checked/debug
 
 ## Concrete polynomial member lifecycle integration after a50ecc4
 
-Reviewed immutable six-file candidate .cache/polynomial-member-lifecycle-inventory.json against actual upolynomial.cpp138–155/1259–1265 and mpzzp.h97–105. All production/source-test changes read; current-base private merge retains every newer manager field and operation, replacing only selected constructor region. Other two modified files independently equal their historical base before application. Actual source private deletion and reverse member destruction have sticky causes/cursors, distinct owning abort and explicit caller cleanup. Missing-API RED logs remain as inventoried; actual fresh-NULL endpoint is confirmation rather than a new RED claim. Private integrated polynomial/univariate/monomial/linear native and checked/debug tests both terminal0 (sessions1398/12079; .cache/polynomial-member-integrated-{native,debug}.log). Six root bytes inventoried in .cache/polynomial-member-root-integrated-inventory.json. Full imp binding remains OPEN; no registered driver assertion credit. No generics/C++ hashes/Microsoft copyright. Starting authoritative full native/debug/vets/source gates with original100-bit/allactualreservation debug campaign and30m timeout.
+Reviewed immutable six-file candidate .cache/polynomial-member-lifecycle-inventory.json against actual upolynomial.cpp:138–155/1259–1265 and mpzzp.h:97–105. All production/source-test changes read; current-base private merge retains every newer manager field and operation, replacing only selected constructor region. Other two modified files independently equal their historical base before application. Actual source private deletion and reverse member destruction have sticky causes/cursors, distinct owning abort and explicit caller cleanup. Missing-API RED logs remain as inventoried; actual fresh-NULL endpoint is confirmation rather than a new RED claim. Private integrated polynomial/univariate/monomial/linear native and checked/debug tests both terminal0 (sessions1398/12079; .cache/polynomial-member-integrated-{native,debug}.log). Six root bytes inventoried in .cache/polynomial-member-root-integrated-inventory.json. Full imp binding remains OPEN; no registered driver assertion credit. No generics/C++ hashes/Microsoft copyright. Starting authoritative full native/debug/vets/source gates with original100-bit/allactualreservation debug campaign and30m timeout.
 
-Future skeleton8 review and current-base private composition: complete production files read alongside actual cpp2914–3068 and scoped_ptr_vector.h31–66. Eight exact candidate bytes independently verified; .cache/polynomial-skeleton-current-integrated-inventory.json names the future snapshot. Shared Newton census merges ONLY extra adapter-byte parameter into current helper, preserving pseudo NUM/ref/activePower roots and exact paired failure predicate. Integrated Polynomial/Monomial/Linear native0.650s/debug0.671s terminal0 sessions80499/41388; both private vets terminal0 sessions28182/76393. No main Go change while lifecycle837 full gates live46298. Source skeleton canonical grouping/inline128→256 overflow, INC-before-push and failed-class member-only unwind, actual stopped source child destruction all retain original evidence. Global stream flags/TRACE/full imp and algorithm obligations remain open; no whole-unit or registered assertion credit.
+Future skeleton8 review and current-base private composition: complete production files read alongside actual cpp2914–3068 and scoped_ptr_vector.h:31–66. Eight exact candidate bytes independently verified; .cache/polynomial-skeleton-current-integrated-inventory.json names the future snapshot. Shared Newton census merges ONLY extra adapter-byte parameter into current helper, preserving pseudo NUM/ref/activePower roots and exact paired failure predicate. Integrated Polynomial/Monomial/Linear native0.650s/debug0.671s terminal0 sessions80499/41388; both private vets terminal0 sessions28182/76393. No main Go change while lifecycle837 full gates live46298. Source skeleton canonical grouping/inline128→256 overflow, INC-before-push and failed-class member-only unwind, actual stopped source child destruction all retain original evidence. Global stream flags/TRACE/full imp and algorithm obligations remain open; no whole-unit or registered assertion credit.
 
 ## SAT consequence root review and actual nested move correction
 
@@ -26385,7 +26385,7 @@ Manifest additive selected-method evidence; max_cliques unported to partial only
 
 Full authoritative875 gates all terminal0 on SAME runner72978: native21.439s, checked/debug733.480s, vet native1.885s/debug1.856s, source/evidence/no-generics163.892s. Runner and root independently verified all875 frozen Go bytes plus exact31 candidate files; origin/MIT/no-Microsoft headers and diff --check pass. Original100-bit/everyactualreservation refinement retained. Source ledger2102units/677APIs:30ported190partial1882unported. Coherent concrete consequences/mutex chunk GREEN for commit; full goal remains ACTIVE.
 
-Future static consequence chunking4 remains private/frozen, not main: root read full production against cpp3157-3249, actual lambda/gamma/omega/asms1/occurs lexical ordering and true/false/undef branch semantics retained. Source get_core/get_model sat_solver.h320-322 direct member getters confirmed. Literal false default dispatch unchanged; K0/repeatedundef nontermination/verbose/AST remain OPEN. Exact .cache/sat-consequence-chunking-final-inventory.json and source-map name4, focused adjacent native/debug/vets0; source57264 pending at this observation. Main full875 Go untouched during run. Numeric actual zero-created cohort/factory work and arena SOM/full imp remain private mutable with source-dtor vs own-abort distinction.
+Future static consequence chunking4 remains private/frozen, not main: root read full production against cpp3157-3249, actual lambda/gamma/omega/asms1/occurs lexical ordering and true/false/undef branch semantics retained. Source get_core/get_model sat_solver.h:320-322 direct member getters confirmed. Literal false default dispatch unchanged; K0/repeatedundef nontermination/verbose/AST remain OPEN. Exact .cache/sat-consequence-chunking-final-inventory.json and source-map name4, focused adjacent native/debug/vets0; source57264 pending at this observation. Main full875 Go untouched during run. Numeric actual zero-created cohort/factory work and arena SOM/full imp remain private mutable with source-dtor vs own-abort distinction.
 
 ## Static consequence helper integration after2a39db9
 
@@ -26409,7 +26409,7 @@ Authoritative SOM/COPY889 gates all terminal0 on SAME runner40781: native98.628s
 
 ## Solver statistics integration after772b87a
 
-Prior SOM/COPY889 full gates all0 committed772b87a. Root read complete frozen statistics production and both test files against actual src/sat/sat_solver.cpp2781-2801/3716-3751 and header48-70; exact sole existing solver field addition independently verified against current baseline. Original4 freeze unchanged; .cache/sat-statistics-root-integrated-inventory.json records current-base private successor. Adjacent SAT native1.355s/debug1.440s terminal0 sessions21603/79621; both vets56179/78439 terminal0. Actual25 contributions and16 main reset fields retain source order; SCC deliberately remains unreset. Sole new blockedCorrectionSets cold uint32 has no source producer and actual reflected header charge. No duplicate/shadow counters. Six groups include32 sparse masks, zero/warm physical plateau, actual output growth prefixes0-6 and firstsuccess7 with immediate named ownership graph. Genuine missingAPI RED83715 retained. Statistics output still uses existing charged Go backend; same-Runtime global output storage remains OPEN. Disabled illformed clone constructor remains OPEN; no inferred executable branch or registered assertion credit. Source mappings additive; units remain partial. Starting full892 Go native/debug/vets/source validation, original100-bit/everyactualreservation refinement retained with30m timeout.
+Prior SOM/COPY889 full gates all0 committed772b87a. Root read complete frozen statistics production and both test files against actual src/sat/sat_solver.cpp:2781-2801/3716-3751 and header48-70; exact sole existing solver field addition independently verified against current baseline. Original4 freeze unchanged; .cache/sat-statistics-root-integrated-inventory.json records current-base private successor. Adjacent SAT native1.355s/debug1.440s terminal0 sessions21603/79621; both vets56179/78439 terminal0. Actual25 contributions and16 main reset fields retain source order; SCC deliberately remains unreset. Sole new blockedCorrectionSets cold uint32 has no source producer and actual reflected header charge. No duplicate/shadow counters. Six groups include32 sparse masks, zero/warm physical plateau, actual output growth prefixes0-6 and firstsuccess7 with immediate named ownership graph. Genuine missingAPI RED83715 retained. Statistics output still uses existing charged Go backend; same-Runtime global output storage remains OPEN. Disabled illformed clone constructor remains OPEN; no inferred executable branch or registered assertion credit. Source mappings additive; units remain partial. Starting full892 Go native/debug/vets/source validation, original100-bit/everyactualreservation refinement retained with30m timeout.
 
 Future private review while statistics892 full gates live37739: root read entire current imp constructor/lifetime/owning-cleanup and actual source declaration/init/body/reverse-member order. Both source constructor forms and completed destructor first fixtures GREEN privately; every-prefix full named graph and stopped child teardown still required before freeze. Source MM DEC remains before reverse members; source failure history and owning abort distinct. Retirement captures must count numerals only in their current actual raw or consumed-retention owner, not twice. No main imp changes.
 
@@ -26417,7 +26417,7 @@ Numeric replacement-factory genuine RED .cache/polynomial-substitution-replaceme
 
 Actual checked/debug Newton route0 old refund discrepancy independently measured: Runtime DirectoryBytes1280to2560, OwnerBytes168/PhysicalBytes5812/InitializationBytes784/LiveBlocks16 unchanged, Budget21444to22724 exact+1280; .cache/polynomial-substitution-directory-debug.log. Strong named graph passes immediately and after cleanup. Approved only narrow route0 retained-directory equation matching existing route1, preserving all original fault ordinals, mathematical assertions and source counters; require final minimal diff/broad profiles proof. AllocationSize may retain failed physical request40 exactly as source; no rollback/equality repair.
 
-Future private inspection8 provisional review: root read complete new display/num-clauses/check-marks against src/sat/sat_solver.cpp1289-1346/2818-3051, src/sat/sat_types.h295-324 and src/sat/sat_clause.cpp223-240. Base-unit display versus all-trail DIMACS/num_clauses, strict< binary counting versus <= display and WCNF unsigned max+1/soft literal source spelling retained. Initial missing strengthened+ in output fixture is expectation correction, not a production RED. Agent reports native11groups incl16 external assignments/32 parsed CNFs times8 assignments and actual output failure horizons2/2/3/4/0; final profiles/vets/source/freeze still pending. Existing collect_bin_clauses mapping must be proved or remain OPEN; new inspection body alone does not implement it. Disabled illformed clone branch remains OPEN. No main inspection changes.
+Future private inspection8 provisional review: root read complete new display/num-clauses/check-marks against src/sat/sat_solver.cpp:1289-1346/2818-3051, src/sat/sat_types.h:295-324 and src/sat/sat_clause.cpp:223-240. Base-unit display versus all-trail DIMACS/num_clauses, strict< binary counting versus <= display and WCNF unsigned max+1/soft literal source spelling retained. Initial missing strengthened+ in output fixture is expectation correction, not a production RED. Agent reports native11groups incl16 external assignments/32 parsed CNFs times8 assignments and actual output failure horizons2/2/3/4/0; final profiles/vets/source/freeze still pending. Existing collect_bin_clauses mapping must be proved or remain OPEN; new inspection body alone does not implement it. Disabled illformed clone branch remains OPEN. No main inspection changes.
 
 Numeric original22 frozen candidate audit49790 terminal0, broad native/debug215 top-level groups and20 selected groups confirmed, original inventory retained. Root current-base review found constructor discrepancy: frozen polynomial_manager.go reverts already committed772b87a preparePolynomialCore/constructPolynomialCoreDefaults/initializePolynomialCoreBody into older monolithic body. Reject that reversion for integration. Requested corrected private successor preserving current staging/guards and constructing actual tmp1 after directory/ID defaults before body, with broad profiles/vets rerun. Original22 not modified and not claimed integrated. Root read all other narrow shared factory/ownership/Power/store/census/Exact/Pseudo/Remove changes; ModD census delegation preserves current strong collector and exact paired-failure roots. Approved Newton route0 diff adds postcleanup graph and exact retained directory equation only; original reservation loops/branch/source math unchanged. Future translation/coeffs source3282-3291/6865-6902 remains private, coordinated with actual arena fullimp vector.
 
@@ -26425,7 +26425,7 @@ Authoritative statistics892 gates all terminal0 on SAME runner37739: native20.99
 
 ## SAT inspection and display integration afterb9dc2c6
 
-Prior statistics892 fullfive gates0 committedb9dc2c6 clean. Root read all frozen8 production/newtests/existing3 narrow diffs against actual model1289-1346, bin collection2818-2838, marks2852-2857, display2859-3017 and Check723-735, sat_types295-324/clause.cpp223-240/h286 nested literal-pair. Verified original8 SHA and current existing model/search historicalbase plus solver statistics dependency; private current-tree integration preserves all newer SOM/other files. Root successor header endpoints extend3014to3017 for actual display_assignment, body unchanged/original8 preserved. .cache/sat-inspection-root-integrated-inventory.json names eight exactbytes. Current-base SAT native1.171s/debug1.271s terminal0 sessions16119/29503; both vets52745/1023 terminal0.
+Prior statistics892 fullfive gates0 committedb9dc2c6 clean. Root read all frozen8 production/newtests/existing3 narrow diffs against actual model1289-1346, bin collection2818-2838, marks2852-2857, display2859-3017 and Check723-735, sat_types295-324/clause.cpp:223-240/h286 nested literal-pair. Verified original8 SHA and current existing model/search historicalbase plus solver statistics dependency; private current-tree integration preserves all newer SOM/other files. Root successor header endpoints extend3014to3017 for actual display_assignment, body unchanged/original8 preserved. .cache/sat-inspection-root-integrated-inventory.json names eight exactbytes. Current-base SAT native1.171s/debug1.271s terminal0 sessions16119/29503; both vets52745/1023 terminal0.
 
 Twelve groups:16 independent external-model assignments,32 parsed DIMACS CNFs times8 assignments, exact source units/binary/clause/watch/justification/assignment output, base-trail versus all-trail, source DEBUG marks, soft-span reached read and unsigned max+1, actual source Check currentmodel/decision preservation, warm owned output and every real output growth horizon2/2/3/4/0 plus binary pair7 immediate strong Runtime graph. Learned filter and full32-bit nested solver pair preserved; same-cap source clauses and strengthened+ spelling exact. No fabricated source failures or output allocation tickets. Initial cwd failure and fixture correction are not production RED; real missing APIs retained. Global stdout/flush transport remains an explicit borrowed memory-only stream adapter, source storage/ABI/clone disabled illformed branch remain OPEN, whole units partial and registered assertion credit unchanged. Starting full897 Go native/debug/vets/source gates, original100-bit/everyactualreservation refinement retained with30m timeout; main Go frozen.
 
@@ -26498,15 +26498,15 @@ Authoritative main925 full five gates all terminal0 on SAME runner56433: native9
 
 User source-provenance rule remains in AGENTS.md: retain originating repository-relative source paths and MIT/other author notices, omit Microsoft copyright. Root verified and added missing paths to five modified SAT tests; the queue header now also names src/sat/sat_var_queue.h. No fixed C++ source content hashes were computed. Main baseline72b665a remains GREEN and clean while the reviewed private candidate runs adjacent checks.
 
-Selected source src/util/heap.h55-239, src/sat/sat_var_queue.h31-67 and src/util/vector.h actual signed32 capacity/size/payload are now represented by two real borrowed SAME Runtime vectors, without legacy slice shadows. Source constructor values.push(-1) precedes indices.resize(128): capacities2/140, requested16/568 plus actual LP64 malloc headers8 each, total600 allocation-size bytes and two actual live blocks. Solver and blocked-literal consumers use checked reads; existing TLS fixtures subtract600 from their external request to continue reaching exactly the original failure sites. Physical audits explicitly name queue published/pending backings and actual retained Runtime directory capacity, rather than compensating counters.
+Selected source src/util/heap.h:55-239, src/sat/sat_var_queue.h:31-67 and src/util/vector.h actual signed32 capacity/size/payload are now represented by two real borrowed SAME Runtime vectors, without legacy slice shadows. Source constructor values.push(-1) precedes indices.resize(128): capacities2/140, requested16/568 plus actual LP64 malloc headers8 each, total600 allocation-size bytes and two actual live blocks. Solver and blocked-literal consumers use checked reads; existing TLS fixtures subtract600 from their external request to continue reaching exactly the original failure sites. Physical audits explicitly name queue published/pending backings and actual retained Runtime directory capacity, rather than compensating counters.
 
-Tests-first accounting/missing-API/null-pop REDs are preserved in machine logs. Root review additionally found direct heap erase versus var_queue delete distinction: wrapper alone checks contains; src/util/heap.h195-217 directly asserts in debug, then reads the index in release. Sentinel-only absent0 release pops the sentinel and publishes SIZE0; debug refuses before mutation. Both-profile RED logs .cache/sat-heap-direct-erase-{red,debug-red}.log precede the fix. Further cohort RED .cache/sat-heap-cohort-wrapper-red.log proves ctor/Clone/Move must reject foreign Budget before cold reservation; compatibility Size/Empty/Contains expose reached typed errors rather than silently returning defaults. Production Runtime consumers retain error-returning methods. Real Runtime.Close refuses until original and copied backing owners release their actual blocks.
+Tests-first accounting/missing-API/null-pop REDs are preserved in machine logs. Root review additionally found direct heap erase versus var_queue delete distinction: wrapper alone checks contains; src/util/heap.h:195-217 directly asserts in debug, then reads the index in release. Sentinel-only absent0 release pops the sentinel and publishes SIZE0; debug refuses before mutation. Both-profile RED logs .cache/sat-heap-direct-erase-{red,debug-red}.log precede the fix. Further cohort RED .cache/sat-heap-cohort-wrapper-red.log proves ctor/Clone/Move must reject foreign Budget before cold reservation; compatibility Size/Empty/Contains expose reached typed errors rather than silently returning defaults. Production Runtime consumers retain error-returning methods. Real Runtime.Close refuses until original and copied backing owners release their actual blocks.
 
 Immutable final16 cohort .cache/sat-heap-runtime-cohort-final-inventory.json and source map .cache/sat-heap-runtime-cohort-source-map.json record18 new groups,81 independent activity worlds, constructor14/reserve5/copy4 actual refusal horizons, warm zero-allocation/physical plateau and real source destructor stops. Child native/debug/vets/source all terminal0. Actual signed-near-min TLS preparation produces postphysical indices free stop, then a separate actual values stop; source cause remains sticky and owning acknowledgments follow exact consumed cursors. This guarded source signed-overflow domain is not ordinary OOM, and the direct-child fixture does not claim a fabricated full-parent callback. Failed copy preserves actual completed-member destruction before owning abort. Blocked constructor preserves joined real body/cleanup causes; no unreachable simultaneous-error fixture is claimed.
 
 Root current-base candidate .cache/review/sat-heap-runtime-current-72b665a contains exact final16 bodies plus six provenance-only header changes. Independently verified every unchanged main925 Go dependency and all16 candidate hashes/headers/gofmt; candidate927 frozen under root adjacent runner45279. Main implementation remains unchanged until its five private gates succeed, then authoritative full native/checked-debug/vets/source must pass before commit; original100-bit/everyactualreservation refinement retains30m timeout.
 
-Completion audit correction: src/util/heap.h whole unit is PARTIAL. Existing util_int_heap.go Assign stages a complete clone and FindLE stages retained found/todo, unlike source implicit assignment and live result publication. Exact src/util/vector.h191-202 destroys/frees old vector storage BEFORE exact-capacity copy_core; null source publishes null. FindLE src/util/heap.h272-290 appends caller result before distinct left/right child pushes on lexical fresh todo. Existing successful driver/oracle evidence remains scoped to actual exercised behavior; assignment/find_le method groups are partial, whole methods/ownership audits false. Corrected ledger will be29ported191partial1882unported across2102units/677APIs. General concrete Runtime assignment/find_le and remaining heap methods are continuing tests-first privately, not silently accepted as source-equivalent staging. Global enabled heap CASSERT binding, broader vector wrapped extent and full source/class ABI remain OPEN.
+Completion audit correction: src/util/heap.h whole unit is PARTIAL. Existing util_int_heap.go Assign stages a complete clone and FindLE stages retained found/todo, unlike source implicit assignment and live result publication. Exact src/util/vector.h:191-202 destroys/frees old vector storage BEFORE exact-capacity copy_core; null source publishes null. FindLE src/util/heap.h:272-290 appends caller result before distinct left/right child pushes on lexical fresh todo. Existing successful driver/oracle evidence remains scoped to actual exercised behavior; assignment/find_le method groups are partial, whole methods/ownership audits false. Corrected ledger will be29ported191partial1882unported across2102units/677APIs. General concrete Runtime assignment/find_le and remaining heap methods are continuing tests-first privately, not silently accepted as source-equivalent staging. Global enabled heap CASSERT binding, broader vector wrapped extent and full source/class ABI remain OPEN.
 
 Root current-base927 adjacent runner45279 terminal0 allfive: native13.346s, checked/debug13.586s, vets5.713s/5.856s, source190.698s. Immutable927 Go verified by runner and independently checked against exact16 integration inventory. Integrated only reviewed16 Go plus additive/demotion manifest onto current72b665a; beginning authoritative full927 native/debug/vets/source gates, no commit until all terminal0. Source audit confirms corrected29ported191partial1882unported ledger; original100-bit/everyactualreservation campaign unchanged.
 
@@ -26550,7 +26550,7 @@ Previous goal turn PROGRESS: committed6a9b168 optimized PSC24 after authoritativ
 
 Authoritative main954 full SAME71083 allfive terminal0: native21.614s, checked/debug748.626s, vets1.658s/1.650s, source187.744s. Runner and root independently verify all954 Go unchanged, exact selected9 bytes/provenance-only2, all source paths/MIT/no-Microsoft/gofmt and expected11 paths; diff check clean. Original100-bit/everyactualreservation refinement retained with30m timeout. General Runtime IntHeap source-order assignment/fresh FindLE/unsigned bounds/actual Empty/scalar publication and exact owning cleanup chunk GREEN for commit. Whole source heap remains partial for enabled assertion binding, wrapped extents, legacy allocation/iterator profile and full diagnostic transport; ledger29/191/1882 across2102units/677APIs unchanged.
 
-Root independent numeric successor review found newly added ObjectRef GCDManyIndexed allocator preflight reads an input that active src/util/mpz.cpp893-914 count0 must leave unread. Immutable indexed3 retained. Genuine root private foreign-empty view RED in both native40502/debug61598, logs .cache/polynomial-indexed-empty-root-{native,debug}-red.log, snapshot .cache/review/polynomial-indexed-empty-root-red-6a9b168. Initial nested-module command was setup-only failure, corrected to private module cwd before these actual semantic REDs. Numeric source successor tests foreign/closed empty views now GREEN via cohort check at actual coefficient reads, preserving slice self-identity and early-one unread tail. Root isolated same correction in separate .cache/review/polynomial-indexed-empty-root-green-6a9b168, leaving RED snapshot unchanged. Numeric sparse/unsigned128/actual indexed same-engine constructor/ICCP/defaultGCD/Resultant closure continues; no new driver credit or main numeric integration. Evaluation early zero/constant after old retained LexSort invocation similarly genuine RED→GREEN with exact newly reached Integer roots, frozen17 native/debug/vets0, source72098 still owned by arena lane.
+Root independent numeric successor review found newly added ObjectRef GCDManyIndexed allocator preflight reads an input that active src/util/mpz.cpp:893-914 count0 must leave unread. Immutable indexed3 retained. Genuine root private foreign-empty view RED in both native40502/debug61598, logs .cache/polynomial-indexed-empty-root-{native,debug}-red.log, snapshot .cache/review/polynomial-indexed-empty-root-red-6a9b168. Initial nested-module command was setup-only failure, corrected to private module cwd before these actual semantic REDs. Numeric source successor tests foreign/closed empty views now GREEN via cohort check at actual coefficient reads, preserving slice self-identity and early-one unread tail. Root isolated same correction in separate .cache/review/polynomial-indexed-empty-root-green-6a9b168, leaving RED snapshot unchanged. Numeric sparse/unsigned128/actual indexed same-engine constructor/ICCP/defaultGCD/Resultant closure continues; no new driver credit or main numeric integration. Evaluation early zero/constant after old retained LexSort invocation similarly genuine RED→GREEN with exact newly reached Integer roots, frozen17 native/debug/vets0, source72098 still owned by arena lane.
 
 Root isolated empty-view GCD correction native SAME63978/debug SAME63708 both terminal0; independent original RED snapshot and corrected GREEN snapshot remain distinct, no assertion/input repair. Exact private logs .cache/polynomial-indexed-empty-root-{native,debug}-green.log. This source-read-order correction is required in the later numeric successor, and excluded from the general heap implementation commit.
 
@@ -26578,11 +26578,11 @@ Main971 authoritative native23.753s/vets1.678s/1.686s/source187.541s terminal0, 
 
 Authoritative main971 full SAME28916 allfive terminal0: native23.753s, checked/debug778.376s, vets1.678s/1.686s, source187.541s. Runner and root independently verify immutable971 Go, exact selected3 hashes/source/MIT/other-author/no-Microsoft/gofmt/diff and expected5 paths. Original100-bit/everyactualreservation refinement preserved with30m timeout. Runtime uint_set selected complete scalar/copy/assignment/iterator/hash/display body and source failed-copy completed-base destruction,10 groups/all actual prefixes/independent models GREEN for coherent commit. Whole source units remain partial; ledger29/191/1882 across2102units677APIs unchanged. Future same-Budget Swap4 adjacent allfive0 including SAME source62014, separately frozen and excluded; source range correction42-44 will be made only in its next successor, preserving original freeze. Numeric actual source callback pending regression .cache/polynomial-sparse-callback-red.log53900 is genuine: whole ref.assign before/after wrongly captures caller handler-created numeric pending; removing unsupported numeric acquisition and proving polynomial/factory callback continuations remain foreign is continuing privately. No main RED implementation committed; composition and full ICCP/defaultGCD/Resultant/Swap profile work continues, project ACTIVE.
 
-Previous goal turn classified as progress: source-header policy verified already recorded in AGENTS.md and GO_PORT_PLAN.md and relayed to all active lanes. Current main13eb11a clean971 verified. Distinct-Budget/iterator successor5 READY, .cache/uint-set-runtime-distinct-budget-final-inventory.json, all five private gates terminal0 including source56884; native649 groups2653 cases4.054s/debug649 groups2657 cases4.657s. Root independently validates exact5 Go hashes, headers/gofmt and all971 dependencies: only core and cached-value expectation changed; other969 unchanged. Literal source uint_set.h162-221 confirms cached operator* does not read owner and scan_idx invariant precedes Contains; genuine iterator-order RED retained, obsolete eager owner guard corrected. End constructor now preserves two get_max_elem reads and final invariant, source-review corrections without fabricated RED. Actual distinct-Budget Swap preserves cold owner Budget and moves physical block+provider; no charge transfer or source events. New every-prefix adopted growth/Assign/Clone horizons5/1/7 both profiles with immediate actual per-provider graph. Integrated selected four changed/new Go files and partial manifest, corrected source42-44 ranges. Main973 full five gates starting with immutable Go and original100-bit/everyreservation/30m campaign; global allocator/assertions, endangered extents, libc rand/native ostream and legacy profiles remain OPEN. Numeric IC/ICCP/defaultGCD/Resultant and composition ownership closures continue privately; no RED commit.
+Previous goal turn classified as progress: source-header policy verified already recorded in AGENTS.md and GO_PORT_PLAN.md and relayed to all active lanes. Current main13eb11a clean971 verified. Distinct-Budget/iterator successor5 READY, .cache/uint-set-runtime-distinct-budget-final-inventory.json, all five private gates terminal0 including source56884; native649 groups2653 cases4.054s/debug649 groups2657 cases4.657s. Root independently validates exact5 Go hashes, headers/gofmt and all971 dependencies: only core and cached-value expectation changed; other969 unchanged. Literal source uint_set.h:162-221 confirms cached operator* does not read owner and scan_idx invariant precedes Contains; genuine iterator-order RED retained, obsolete eager owner guard corrected. End constructor now preserves two get_max_elem reads and final invariant, source-review corrections without fabricated RED. Actual distinct-Budget Swap preserves cold owner Budget and moves physical block+provider; no charge transfer or source events. New every-prefix adopted growth/Assign/Clone horizons5/1/7 both profiles with immediate actual per-provider graph. Integrated selected four changed/new Go files and partial manifest, corrected source42-44 ranges. Main973 full five gates starting with immutable Go and original100-bit/everyreservation/30m campaign; global allocator/assertions, endangered extents, libc rand/native ostream and legacy profiles remain OPEN. Numeric IC/ICCP/defaultGCD/Resultant and composition ownership closures continue privately; no RED commit.
 
 Authoritative main973 full SAME57368 allfive terminal0: native24.268s, checked/debug754.087s, vets1.935s/1.924s, source192.553s. Runner and root independently verify973 immutable Go, exact selected5 frozen bytes, source paths/MIT/other-author/no-Microsoft headers, gofmt/diff and expected6 integration paths. Original100-bit/everyactualreservation refinement retained with30m timeout; no wasm/wasi/race gates. Literal cached iterator Value and assertion/read order plus actual distinct-provider/Budget Swap closure,20 source/independent groups, adopted growth/Assign/Clone horizons5/1/7 GREEN for coherent commit. Ledger29ported191partial1882unported across2102units677APIs unchanged; whole source/global/legacy profiles remain partial. Root source review during gates independently confirms Integer pending object cannot be rebound while live and genuine later object replacement needs generation proof; composition exact mkCell raw snapshot/cleanup triple inspected, callback receipt suppression does not prove high-level frame reentry. Numeric actual callback-depth acquisition guard/source IC destructor and unrelated-IC generic cleanup corrections are private GREEN selected evidence, not integrated full algorithms. Runtime bit_vector/fr_bit_vector full source tests-first lane started separately with frozen973 dependencies. Full project remains ACTIVE.
 
-Previous goal turn PROGRESS: committed98e9c47 after full973 five gates terminal0; current HEAD/clean tree independently revalidated before source review. Root complete selected composition source4653-4890/wrappers7248-7284 review confirms literal bodies, degree2pos persistent member and completed/failed constructor distinction, actual store-result/caller reference transfers. Review finds reached younger constant-overload destructor gap: MulAdd zero route calls MkConstantTakeCopy; finishConstantScope currently uses owning numeral/rational deletion and lacks sticky source-stop, while finishComposition sees only its own stopped flag. Source mpq.h186-189 deletes numerator then denominator; matched constantGeneration stop must prevent older composition numeral/degree/local destruction, and explicit owning cleanup must resume younger matched callee before older locals. Arena lane instructed tests-first genuine guarded owner-primitive proof and honest mathematical reachability limits, exact source deletion/cause protocol, foreign-generation independence and separate owning cleanup. Numeric lane starts actual ICCP/generalGCD API RED privately on current98e9c47 plus proven prerequisites; recursive typed charged frames required, no PRS shortcut/default algorithm substitution. Bit-vector family true raw API/hash RED and source bitcount-first failure fixture continue privately. No main Go edits or new RED implementation commit.
+Previous goal turn PROGRESS: committed98e9c47 after full973 five gates terminal0; current HEAD/clean tree independently revalidated before source review. Root complete selected composition source4653-4890/wrappers7248-7284 review confirms literal bodies, degree2pos persistent member and completed/failed constructor distinction, actual store-result/caller reference transfers. Review finds reached younger constant-overload destructor gap: MulAdd zero route calls MkConstantTakeCopy; finishConstantScope currently uses owning numeral/rational deletion and lacks sticky source-stop, while finishComposition sees only its own stopped flag. Source mpq.h:186-189 deletes numerator then denominator; matched constantGeneration stop must prevent older composition numeral/degree/local destruction, and explicit owning cleanup must resume younger matched callee before older locals. Arena lane instructed tests-first genuine guarded owner-primitive proof and honest mathematical reachability limits, exact source deletion/cause protocol, foreign-generation independence and separate owning cleanup. Numeric lane starts actual ICCP/generalGCD API RED privately on current98e9c47 plus proven prerequisites; recursive typed charged frames required, no PRS shortcut/default algorithm substitution. Bit-vector family true raw API/hash RED and source bitcount-first failure fixture continue privately. No main Go edits or new RED implementation commit.
 
 Root inspection of first new constant-stop regression shows direct assignment of failedRef sentinel into the local, so .cache/polynomial-composition-constant-stop-red.log55807 is synthetic source guard coverage only, not genuine allocation-prefix evidence. Root requires actual Copy(two64) then refused larger Copy after physical old destruction (or genuine TLS postphysical local release) to create the paired recorded state before claiming owner-primitive RED. Existing synthetic test may remain honestly labelled, without fabricated reachability credit. No production fix or main Go mutation yet.
 
@@ -26596,7 +26596,7 @@ Main976 full SAME10938 verified live on same root tool handle; native101.006s/ve
 
 Authoritative main976 full SAME10938 allfive terminal0: native101.006s, checked/debug768.351s, vets5.110s/5.233s, source195.137s. Runner and root independently verify976 immutable Go, exact selected16 hashes, originating paths/MIT/other-author/no-Microsoft/gofmt/diff and expected18 integration paths. Original100-bit/everyactualreservation refinement preserved with30m timeout. Complete selected composition source bodies plus actual callee ownership/source-stop closure and21groups GREEN for coherent commit, no whole polynomial/registered driver/global/reentry completion claim; ledger29/191/1882 across2102units677APIs unchanged. Numeric current97632 and bit-vector current97610 compatibility remain private, each four gates0 and source20723/23459 under child authority (bit-vector source23459 later terminal0). Bit-vector completed-object scalar getters/hash review yielded genuine actual TLS Push/Assign RED45566 and corrected41990; original10/current976 freezes preserved, corrected11 private gates pending. Next polynomial sqrt tests-first reveals actual Integer old-big direct-reset source RED11891 plus obsolete unchanged-output op2 fixture; exact six RAW/sourceend-onlyDel/caller-output phase correction authorized privately, keeping Root/RootInPlace assertions and complete sweeps. Full project remains ACTIVE.
 
-Root continuation revalidated prior instruction-only turn as no implementation progress: clean committed79a6134/976 Go is authoritative. Numeric current97632 review verifies selected hashes/provenance and unrelated dependencies, but eight unformatted files, named contentLocal/monic collector additions and reached Runtime-cohort/younger-source-stop questions require a corrected private successor; no premature integration. Container corrected11 .cache/bit-vector-runtime-query-final-inventory.json is immutable READY: all976 committed dependencies exact, eleven NEW Go hashes/gofmt/originating source/MIT/no-Microsoft verified. Genuine scalar-query RED45566 from actual TLS Push pending and destructive Assign corrected without hiding scalar state or substituting body errors for reached Hash reads. Private native19082/debug30928/vets25860/60975/source3249 terminal0; 28 selected new groups, 36 active registered ENSURE sites/7255 dynamic expressions, 1024 independent same-size worlds and49 unequal pairs. Payload-only uint32 backing, capacity-wide reset/copy, source bitcount publication, exact pending allocation lifetime and FR base/member construction/destruction reviewed against src/util/bit_vector.h32-252/cpp27-247 and src/util/hash.cpp26-102. Headers retain paths/licenses/other authors and omit Microsoft notices. Integrated only eleven NEW Go plus additive partial manifest/progress; no whole-source or global/otherABI/ostream/legacy bitset completion claim. Main987 full native/debug/both vets/source-no-generics gates starting; original100-bit/every-real-reservation refinement and30m timeout preserved. ICCP/default modular GCD/CRA/Resultant and full polynomial sqrt remain private active obligations.
+Root continuation revalidated prior instruction-only turn as no implementation progress: clean committed79a6134/976 Go is authoritative. Numeric current97632 review verifies selected hashes/provenance and unrelated dependencies, but eight unformatted files, named contentLocal/monic collector additions and reached Runtime-cohort/younger-source-stop questions require a corrected private successor; no premature integration. Container corrected11 .cache/bit-vector-runtime-query-final-inventory.json is immutable READY: all976 committed dependencies exact, eleven NEW Go hashes/gofmt/originating source/MIT/no-Microsoft verified. Genuine scalar-query RED45566 from actual TLS Push pending and destructive Assign corrected without hiding scalar state or substituting body errors for reached Hash reads. Private native19082/debug30928/vets25860/60975/source3249 terminal0; 28 selected new groups, 36 active registered ENSURE sites/7255 dynamic expressions, 1024 independent same-size worlds and49 unequal pairs. Payload-only uint32 backing, capacity-wide reset/copy, source bitcount publication, exact pending allocation lifetime and FR base/member construction/destruction reviewed against src/util/bit_vector.h:32-252/cpp27-247 and src/util/hash.cpp:26-102. Headers retain paths/licenses/other authors and omit Microsoft notices. Integrated only eleven NEW Go plus additive partial manifest/progress; no whole-source or global/otherABI/ostream/legacy bitset completion claim. Main987 full native/debug/both vets/source-no-generics gates starting; original100-bit/every-real-reservation refinement and30m timeout preserved. ICCP/default modular GCD/CRA/Resultant and full polynomial sqrt remain private active obligations.
 
 Main987 bit-vector full runner SAME54828 authoritatively live, most recently polled through completed functions cell4641: native100.977s, vets5.317s/5.438s, source198.391s all terminal0. Checked/debug remains running on SAME54828; do not restart due cross-namespace process visibility or observation timeout. Root independently verifies immutable987 Go and exact13 integration paths. No commit until remaining full checked/debug gateGREEN; source audit ledger29/191/1882 unchanged. This turn is PROGRESS through exact11 integration and four full terminal gates plus verified wait on the actual runner. Numeric corrected formatting/collector and reached ownership/source-stop review stays private; container next fixed_bit_vector audit and arena true six-RAW IsPerfectSquare/full sqrt continue.
 
@@ -26610,11 +26610,11 @@ Main1011 corrected33b full runner SAME17508 authoritatively live, latest owning 
 
 Authoritative main1011 corrected33b full SAME17508 terminal0; allfive GREEN: native101.495s, checked/debug745.379s, vets5.121s/5.210s, source202.882s. Runner/root independently verify immutable1011 Go, exact33 selected hashes/gofmt/sourcepaths/MIT/no-Microsoft and35 integration paths; unchanged original100-bit/everyactualreservation/30m refinement. Sparse constructor/reset/add/interpolation, scalar/primitive integer content, GlexMonic, exact borrowed/indexed concrete prerequisites and source/owning local cleanup ready for coherent commit,31 new named groups; ledger29/191/1882 unchanged, no fullfamily/global/ABI claim. Current turn PROGRESS through fullfiveGREEN and read-only next-family source review: actual sqrt output-transfer RED22584 proved caller incoming INC survives olderDEC callback refusal, parent freshResult incorrectly deleted it; fix same reference assign engine acknowledges exactexecuting parent token after actual INC/incoming beforeoldDEC (noRCinference), privateGREEN94511 pending. Fullsqrt body/default fixtures andeveryprefix proofs remainprivate. Fixed fullfamily contract expands concrete borrowedviews to foreign destinations/queries and reached-bounds common hash; rootidentified sourcevalid foreignreceiver32 Fill0(empty-owner inline m0) initialization and partialbyte memcpy requirement, tests-first actual4-bit initializationmask requested (no shadowword). Normalize source-scoped SOM/fullg/a closure remains private prerequisite for actual defaultGCD/ICCP/CRA/Resultant; fullgoal ACTIVE.
 
-Previous note turn classified NO PROGRESS for implementation: verified existing source-path/no-Microsoft instruction and relayed it; main5d9a2f4 remained clean1011. Current turn revalidates clean main and takes the next required safe action: actual polynomial peek_fresh cpp4053-4068 requires a shared nonnegative C rand stream. Tests-first genuine missing-API RED .cache/libc-rand-api-red.log precedes independent pure-Go selected Linux/glibc31 recurrence. Source srand user src/test/lp.cpp1459 informs global reseeding contract without LP-unit port credit. Test-only host C oracle records glibc2.39 RAND_MAX2147483647,262 seeds including signed-boundary uint32 values with128 draws each, plus128 unseeded draws; no C source hashes, GNU implementation copies, cgo/unsafe/generics or runtime C compiler. Mathematical description attribution: https://www.mathstat.dal.ca/~selinger/random/. Native/debug six groups and both selected vets terminal0; fresh compiled Go child verifies process default, aliases verify shared reseed, independent fixed31 states verify isolation, real AllocsPerRun verifies zero draw storage. Source-origin paths/MIT/LICENSE retained and Microsoft omitted. Integrating two Go plus captured JSON/C oracle and additive partial metadata; starting full1013 native/debug/bothvets/source gates with original100-bit/everyactualreservation30m campaign. No commit before all full gates GREEN. Actual Normalize/Sub SOM younger-stop, full sqrt/raw acquisition, fixed foreign views/hash, ICCP/default modularGCD/CRA/Resultant remain private ongoing; ledger29/191/1882 unchanged and whole goal ACTIVE.
+Previous note turn classified NO PROGRESS for implementation: verified existing source-path/no-Microsoft instruction and relayed it; main5d9a2f4 remained clean1011. Current turn revalidates clean main and takes the next required safe action: actual polynomial peek_fresh cpp4053-4068 requires a shared nonnegative C rand stream. Tests-first genuine missing-API RED .cache/libc-rand-api-red.log precedes independent pure-Go selected Linux/glibc31 recurrence. Source srand user src/test/lp.cpp:1459 informs global reseeding contract without LP-unit port credit. Test-only host C oracle records glibc2.39 RAND_MAX2147483647,262 seeds including signed-boundary uint32 values with128 draws each, plus128 unseeded draws; no C source hashes, GNU implementation copies, cgo/unsafe/generics or runtime C compiler. Mathematical description attribution: https://www.mathstat.dal.ca/~selinger/random/. Native/debug six groups and both selected vets terminal0; fresh compiled Go child verifies process default, aliases verify shared reseed, independent fixed31 states verify isolation, real AllocsPerRun verifies zero draw storage. Source-origin paths/MIT/LICENSE retained and Microsoft omitted. Integrating two Go plus captured JSON/C oracle and additive partial metadata; starting full1013 native/debug/bothvets/source gates with original100-bit/everyactualreservation30m campaign. No commit before all full gates GREEN. Actual Normalize/Sub SOM younger-stop, full sqrt/raw acquisition, fixed foreign views/hash, ICCP/default modularGCD/CRA/Resultant remain private ongoing; ledger29/191/1882 unchanged and whole goal ACTIVE.
 
 Authoritative main1013 shared C rand binding full SAME79215 terminal0 and allfive GREEN: native0.636s, checked/debug0.627s, vets0.409s/0.404s, source229.238s. Existing expensive unchanged suites legitimately reuse the last successful full test cache; new clibrand six groups ran independently in both profiles and match captured host fixtures. Original100-bit/everyactualreservation checks and30m command remain unchanged, no shortened campaign. Runner/root independently verify immutable1013 Go, exact two selected Go plus JSON/C-oracle bytes, gofmt/diff/source-origin/MIT/no-Microsoft/no-generics and six integration paths. The oracle is test-only and not compiled by Go tests. Selected Linux/glibc31 shared rand/srand dependency ready for coherent green commit, with default GCD/peek_fresh consumer still explicitly open. Parallel mutable raw-view equality review found distinct raw inputs share zero ordinary identity; tests-first actual address shortcut successor requested before accepting fixed family. Whole ledger29/191/1882 remains unchanged and goal ACTIVE.
 
-Previous goal turn PROGRESS through private scoped numeral buffer128 source port, genuine dead-token destructor RED41103→GREEN95659/22309 and selected actual allocation/foreign proofs; main remained clean3da4eee1013. Root current review accepts only exact current fixed10 .cache/fixed-bit-vector-runtime-current-final-inventory.json / .cache/work/fixed-bit-vector-runtime-current-3da4eee: all1012 unrelated committed Go exact,9NEW plusexisting utilhash/runtime_bytes.go, source header range corrected138–140 in explicit successor with historical freeze untouched. Native32988/debug43038 selected63RUN63PASS each, wholevets62916/84268 and SAME source99599 terminal0; allfive actual gates0. Source h/cpp/full selected production bodies, actual m0 byte mask, raw identity before payload, allocator strict named caller/chunk/pending/raw cold graph and diagnostic/TLS source-versus-owning receipts independently reviewed. Registered14sites62dynamic assertions,24 new total groups/1024 worlds; every actual direct failure horizons ctor2/allocate0=3/allocate1=3/copy1 and pooledallocate0=3/copy1. Genuine raw-address RED30344→GREEN35578 preserved. Root further source review found a genuine OPEN cross-manager raw deallocation contract (allocator.cpp72–96 accepts source pointers without origin requirement; DEBUG direct bypass versus receiver counters/pool linking). Existing checked Deallocate and caller ReleaseDirect are explicitly partial, not substitutes. Separate child tests-first allocator raw facade/foreign borrowed freelist/counter/lifetime successor required and underway; frozen10 unchanged. Integrating only exact10 plus additive partial manifest/progress, ledger29/191/1882 unchanged. Starting full1022 native/debug/vets/source immutable Go with unchanged original100-bit/everyactualreservation30m refinement. No implementation commit until fullfiveGREEN; no whole-family/global/ABI completion claim. Buffer second growth/indexed views, fullsqrt, actual ICCP/default modularGCD/PRS/CRA/divides/Resultant remain ongoing.
+Previous goal turn PROGRESS through private scoped numeral buffer128 source port, genuine dead-token destructor RED41103→GREEN95659/22309 and selected actual allocation/foreign proofs; main remained clean3da4eee1013. Root current review accepts only exact current fixed10 .cache/fixed-bit-vector-runtime-current-final-inventory.json / .cache/work/fixed-bit-vector-runtime-current-3da4eee: all1012 unrelated committed Go exact,9NEW plusexisting utilhash/runtime_bytes.go, source header range corrected138–140 in explicit successor with historical freeze untouched. Native32988/debug43038 selected63RUN63PASS each, wholevets62916/84268 and SAME source99599 terminal0; allfive actual gates0. Source h/cpp/full selected production bodies, actual m0 byte mask, raw identity before payload, allocator strict named caller/chunk/pending/raw cold graph and diagnostic/TLS source-versus-owning receipts independently reviewed. Registered14sites62dynamic assertions,24 new total groups/1024 worlds; every actual direct failure horizons ctor2/allocate0=3/allocate1=3/copy1 and pooledallocate0=3/copy1. Genuine raw-address RED30344→GREEN35578 preserved. Root further source review found a genuine OPEN cross-manager raw deallocation contract (allocator.cpp:72–96 accepts source pointers without origin requirement; DEBUG direct bypass versus receiver counters/pool linking). Existing checked Deallocate and caller ReleaseDirect are explicitly partial, not substitutes. Separate child tests-first allocator raw facade/foreign borrowed freelist/counter/lifetime successor required and underway; frozen10 unchanged. Integrating only exact10 plus additive partial manifest/progress, ledger29/191/1882 unchanged. Starting full1022 native/debug/vets/source immutable Go with unchanged original100-bit/everyactualreservation30m refinement. No implementation commit until fullfiveGREEN; no whole-family/global/ABI completion claim. Buffer second growth/indexed views, fullsqrt, actual ICCP/default modularGCD/PRS/CRA/divides/Resultant remain ongoing.
 
 Authoritative fixed core main1022 full SAME34916 terminal0 and allfive GREEN: native101.717s, checked/debug758.558s, vets5.452s/5.679s, source198.874s. Runner/root independently verify immutable1022 Go, exact10 selected hashes/provenance/MIT/otherauthors/no-Microsoft/gofmt/diff and12 integration paths; original100-bit/everyactualreservation30m campaign unchanged. Coherent selected fixed core/borrowed operations/raw address/actual m0/bounded hash and source driver assertions ready for green commit, whole units partial for explicit foreign raw deallocation/native pointer/global/ABI/ostream obligations. Separate raw5 successor actual missingAPI and warm-pointercodec REDs→allfive privateGREEN source28846,79RUN79PASS both profiles; source receiver counters/direct release/foreign pooled freelist borrowing and cold plateau awaiting root source review, no chunk transfer. Fullsqrt17 allfive privateGREEN source63561 and independent extra warm/root groups, remains frozen/unintegrated. Root buffer review independently exposed three genuine REDs: Copy postphysical cleanupPending wrongly acknowledged by source destructor22887, stopped-source push mutatedcount68332, and release oversized shrink added ErrBounds29782. Root reuses existing strict upolynomialSourceNumeralDel, sourceCause mutation guards, and removes unsupported unconditional release-size guard; twelve selected groups currently running privately on own handles91304/59101. Explicit alias/guard domains and future enclosing cold charge remain open; no main buffer writes. Full goal ACTIVE, ledger29/191/1882 unchanged.
 
@@ -26634,7 +26634,7 @@ unchanged throughout. Evidence: .cache/pure-go-oracle-full-gates.json.
 No tracked C/C++ source/header files remain in the Go tree.
 
 
-Previous goal turn PROGRESS: bf63fe8 removed four C/C++ fixture generators, kept Go implementations and JSON, full CGO_ENABLED=0 five gates GREEN and clean tree. Current root independently reviewed source mpz.cpp1871-1929 and polynomial.cpp5954-6068 against immutable sqrt17 snapshot .cache/polynomial-sqrt-final-inventory.json: exact17 hashes and all13 existing main paths match base5d9a2f4. Same binary search/reset/direct caller SET/six RAW end-only ascending Del; literal polynomial quick checks/R-C SOM/checkpoints/result INC before older callback/reverse lexical scopes and separate exact owning cleanup. Allfive private gates0 plus root ancillary groups, six new integer and13 polynomial groups; original precision100-bit/everyactualreservation/30m unchanged. Integrated17 exact Go plus additive selected partial manifest evidence; starting full1026 Go CGO_ENABLED=0 gates. No whole sqrt family/source-driver/global/ABI completion claim. Raw5 remains frozen pending independent size/bypass/pending source-order review. Scoped numeral buffer/ToPolynomial, full default modular GCD/ICCP/CRA/Resultant continue privately. Full goal ACTIVE; ledger29 ported/191 partial/1882 unported unchanged.
+Previous goal turn PROGRESS: bf63fe8 removed four C/C++ fixture generators, kept Go implementations and JSON, full CGO_ENABLED=0 five gates GREEN and clean tree. Current root independently reviewed source mpz.cpp:1871-1929 and polynomial.cpp:5954-6068 against immutable sqrt17 snapshot .cache/polynomial-sqrt-final-inventory.json: exact17 hashes and all13 existing main paths match base5d9a2f4. Same binary search/reset/direct caller SET/six RAW end-only ascending Del; literal polynomial quick checks/R-C SOM/checkpoints/result INC before older callback/reverse lexical scopes and separate exact owning cleanup. Allfive private gates0 plus root ancillary groups, six new integer and13 polynomial groups; original precision100-bit/everyactualreservation/30m unchanged. Integrated17 exact Go plus additive selected partial manifest evidence; starting full1026 Go CGO_ENABLED=0 gates. No whole sqrt family/source-driver/global/ABI completion claim. Raw5 remains frozen pending independent size/bypass/pending source-order review. Scoped numeral buffer/ToPolynomial, full default modular GCD/ICCP/CRA/Resultant continue privately. Full goal ACTIVE; ledger29 ported/191 partial/1882 unported unchanged.
 
 
 Authoritative sqrt17 main1026 full SAME24684 terminal0: native102.502s, checked/debug754.868s, nativevet5.260s/debugvet5.302s, source202.095s; allfive CGO_ENABLED=0 GREEN. Runner/root verify immutable1026 Go and exact17 selected hashes, sourcepaths/MIT/otherauthors/no-Microsoft/gofmt/diff and19 integration paths. Source100-bit/everyactualreservation/30m sweep unchanged. Literal selected square-root algorithms/RAW and scoped source lifetimes ready for coherent commit; source units remainpartial and ledger29/191/1882 unchanged. Next ToPolynomial14 private root composition .cache/polynomial-to-polynomial-sqrt-composed-inventory.json preserves both factory parent receipts and tested bothprofiles/vets/source0; full future gates pending. Corrected raw5 successor adds actual32bit size_t conversion beforezero/bypass and exactsamependingrelease guard beforesecondcount action; originalfreeze retained, finalprovenance successor source73037 still child-owned. Full GCD/CRA/uniModGCD/modGCD/ICCP/Resultant and distinctowner global convert continueprivate. Fullgoal ACTIVE.
@@ -26710,7 +26710,7 @@ Fourteen groups cover literal output quirks, GF5 text, 130-limb decimal oracle, 
 
 ## Mutable allocator verbosity and Runtime size_t entries
 
-Ported util.cpp22–40/util.h176–186 level and borrowed-stream setters/getters through an actual charged cold VerboseContext. Stream selection copies only the borrowed pointer, including closed pointees; insertion reaches its existing lifetime guards. Each allocator IF_VERBOSE site rereads the actual level, and each source output chain selects its stream once. Optional cold getter interface replaces stale construction-time levels without a closure/shadow mutable scalar or additional Runtime event. Nil source-reference adapter remains explicitly ErrConfig, and native stderr/global ownership remains open. Six tests-first groups cover mutation after allocator construction, rerouting, closed/copied owners, actual cold charge/refund, exact output refusal prefixes (2 then success), persistent formatting and warm FailAfter0.
+Ported util.cpp:22–40/util.h:176–186 level and borrowed-stream setters/getters through an actual charged cold VerboseContext. Stream selection copies only the borrowed pointer, including closed pointees; insertion reaches its existing lifetime guards. Each allocator IF_VERBOSE site rereads the actual level, and each source output chain selects its stream once. Optional cold getter interface replaces stale construction-time levels without a closure/shadow mutable scalar or additional Runtime event. Nil source-reference adapter remains explicitly ErrConfig, and native stderr/global ownership remains open. Six tests-first groups cover mutation after allocator construction, rerouting, closed/copied owners, actual cold charge/refund, exact output refusal prefixes (2 then success), persistent formatting and warm FailAfter0.
 
 Runtime now converts size_t32 arguments before header addition in Allocate/Reallocate and before storing max-size/max-count/watermark. LP64 bodies and TLS/nonTLS source accounting/check order are unchanged. Raw malloc(0) still allocates its SIZE_T header; small allocator zero remains its separate source action. Seven groups cover wrapped argument aliases, actual zero header, preserved realloc payload/stale token, strict limits/watermark and TLS returned physical OOM roots. Every physical malloc reservation (2 then success) and realloc reservation (1 then success) is checked against the immediate named graph before fault lift. Wrapped headerless extent is a guarded source-undefined header domain with explicit CleanupPartial; it is not normal mathematical OOM evidence. Generated initialize/finalize children, global process/concurrency/fatal CString/stdout/stderr/exit integration and native ABI remain open.
 
@@ -26721,7 +26721,7 @@ Root composed exact verbosity6 and Runtimewidth2 onto committed05b3421 Display p
 
 Previous goal turn was PROGRESS: exact1056 factors and combined1060 private candidates were source/ownership reviewed and passed full native/vets/source; checked/debug handles46643/70237 remain live. Main remains clean f146fb4. The independent memory provider9 now has all five full gates green on its frozen1054 lane tree. Root verified every Go byte and reproduced that entire tree in .cache/work/memory-fatal-root-standalone-f146fb4: four new and five modified Go files,1045 unrelated main Go files identical. This exact-Go equality retains the completed whole-suite receipts; final additive metadata requires a root source recheck before integration.
 
-Source memory_manager.cpp33–72, memory_manager.h, error_codes.h and z3_exception.h are translated with an explicit same-Budget borrowed service binding. MemoryStandardStreams charges actual cold NumericTextStream headers, borrows os.File providers, uses the same formatting engine, embeds one-byte emission scratch and nonthrowing sticky badbit, and owns no unused StringBuffer. Files remain borrowed through owner close. CString length precedes sentry. MemoryFatalContext stores the flag first, conditionally borrows a live CString pointer and retains the old/default pointer on false/null calls. Runtime dispatch/main alias wrapper bind this policy exclusively with the legacy transport.
+Source memory_manager.cpp:33–72, memory_manager.h, error_codes.h and z3_exception.h are translated with an explicit same-Budget borrowed service binding. MemoryStandardStreams charges actual cold NumericTextStream headers, borrows os.File providers, uses the same formatting engine, embeds one-byte emission scratch and nonthrowing sticky badbit, and owns no unused StringBuffer. Files remain borrowed through owner close. CString length precedes sentry. MemoryFatalContext stores the flag first, conditionally borrows a live CString pointer and retains the old/default pointer on false/null calls. Runtime dispatch/main alias wrapper bind this policy exclusively with the legacy transport.
 
 OOM publication precedes policy dispatch. False-exit OOM returns OutOfMemoryError with errors.As derived/base catch. True OOM emits stderr and exits101; allocation count emits stdout prefix, reaches current max-count at that source site, emits suffix and exits113 regardless of OOM flag. Six compiled Go subprocess routes prove output/code with FailAfter(0) still active, including closed files and mutated borrowed text. Existing local integer scratch needs no warm-up or hidden reservation. Three provider and one context cold reservations are tested through success with exact named graph accounting. Genuine missing APIs and main-wrapper failure preceded implementation. Eleven new groups and45 adjacent groups pass both profiles without new skips.
 
@@ -26788,7 +26788,7 @@ Root final source-backed audit21425 terminal0 on integrated1112 tree:2102 units/
 
 ## Port rational source manager initialization publication
 
-Translated src/util/rational.cpp64–73 using the existing actual synchronized RationalManager and infinitesimal initialization bodies. PrepareRationalService constructs only the charged cold owner and source static defaults. InitializeSource publishes a completed manager pointer before SET zero→one→minusOne→InfRational→InfInt. Pointer-present calls return without allocations. Ordinary service access requires completed initialization; both CopyFrom domains and Stats are guarded before manager use. No C/C++ dependency or generics added.
+Translated src/util/rational.cpp:64–73 using the existing actual synchronized RationalManager and infinitesimal initialization bodies. PrepareRationalService constructs only the charged cold owner and source static defaults. InitializeSource publishes a completed manager pointer before SET zero→one→minusOne→InfRational→InfInt. Pointer-present calls return without allocations. Ordinary service access requires completed initialization; both CopyFrom domains and Stats are guarded before manager use. No C/C++ dependency or generics added.
 
 A failed actual IntegerManager constructor receipt stays distinct from the unpublished rational manager pointer. Standalone NewRationalService preserves that original child error and refunds only its uncompleted outer header; it does not silently abort the retained child. Prepared owning cleanup drains that exact retained child before the header. Source finalization with a null manager reaches the unconditional rational member destructor access and stops before older members; explicit owning abort is separate. Four new groups cover static defaults, publication/readiness, actual constructor refusal graphs, copied-owner rejection before mutex use and cold abort. Native every-prefix firstsuccess17 has zero retained child prefixes; checked/debug firstsuccess24 has13 actual retained child prefixes. Immediate named graph checks include physically retained raw object/block/offset/extent even after allocator close, before fault lift.
 
@@ -26803,7 +26803,7 @@ Root integrated source audit75662 terminal0:2102 units/677 APIs,29ported194parti
 
 ## Port global parameter source destructor traversal
 
-Translated src/util/gparams.cpp106–123 destructor body followed by the implicit reverse member suffix. SourceFinalize resets global ParamsRef, destroys module values in physical dictionary order, executes the actual module dictionary reset/shrink, destroys module descriptors in physical dictionary order, then destroys params→moduleParams→globalDescriptors→moduleDescriptions→moduleDescriptors. Actual source cursor/cause are sticky; ordinary mutations are refused after traversal starts. The source global g_imp pointer binding remains separate.
+Translated src/util/gparams.cpp:106–123 destructor body followed by the implicit reverse member suffix. SourceFinalize resets global ParamsRef, destroys module values in physical dictionary order, executes the actual module dictionary reset/shrink, destroys module descriptors in physical dictionary order, then destroys params→moduleParams→globalDescriptors→moduleDescriptions→moduleDescriptors. Actual source cursor/cause are sticky; ordinary mutations are refused after traversal starts. The source global g_imp pointer binding remains separate.
 
 A genuine real sparse64-table shrink refusal occurs after completed module-value deletion and old table release. Immediate named graph is checked before fault lift; repeated SourceFinalize preserves the exact source error/state, and separate CleanupStopped acknowledges this consumed shrink frontier without replaying the allocation. It then consumes the remaining actual members and Go cold directories. Failed ParamsRef decrement/numeric leaf destruction requires its own exact callee receipt; CleanupStopped returns that stopped cause without replaying a decrement. This chunk does not claim that descendant case is implemented. Ordinary successful legacy GlobalParams.Close and public ParamDescrs.Close behavior remain unchanged. The narrow source ParamDescrs helper destroys actual names before info, then Go-only copied text and cold header. No fabricated allocation/free failure is introduced.
 
@@ -26818,11 +26818,11 @@ Root integrated source audit4995 terminal0:2102units/677APIs,29ported194partial1
 
 ## Port literal integer Root/Power RAW scopes and search resource limits
 
-Translated src/util/mpz.cpp1942–2021, mpz.h836–837 and mpzzp.h279 with the actual source copy-before-guard Root overload, unchanged bisection/comparison operations and four RAW locals destroyed in ascending order only at the explicit end. Power cpp1453–1507 preserves fast2/0/1, general COPY before output SET1, unsigned mask/MUL and the final unused square; -1 follows the general RAW path. Failed bodies retain their actual RAW and allocator roots. Completed lexical destruction and separate explicit owning cleanup have different phases. Optional concrete receipts acquire at actual guarded RAW entry and match manager/frame/nonwrapping nonce, never inferred from reference counts, registries or whole-call snapshots. Physical pending identity includes actual ObjectRef/raw/requested allocation; caller output SET/MUL pending is excluded from callee RAW ownership. End-entered proof follows completed body operations. Foreign and replacement invocation roots cannot be consumed by a stale receipt.
+Translated src/util/mpz.cpp:1942–2021, mpz.h:836–837 and mpzzp.h:279 with the actual source copy-before-guard Root overload, unchanged bisection/comparison operations and four RAW locals destroyed in ascending order only at the explicit end. Power cpp1453–1507 preserves fast2/0/1, general COPY before output SET1, unsigned mask/MUL and the final unused square; -1 follows the general RAW path. Failed bodies retain their actual RAW and allocator roots. Completed lexical destruction and separate explicit owning cleanup have different phases. Optional concrete receipts acquire at actual guarded RAW entry and match manager/frame/nonwrapping nonce, never inferred from reference counts, registries or whole-call snapshots. Physical pending identity includes actual ObjectRef/raw/requested allocation; caller output SET/MUL pending is excluded from callee RAW ownership. End-entered proof follows completed body operations. Foreign and replacement invocation roots cannot be consumed by a stale receipt.
 
 Source-backed tests correct previous staged-output expectations: Root copies the input before degree/even-negative guards, and inline degree UINT_MAX reaches the actual retained Power mask-wrap prefix. Power's independent subsequent call requires explicit cleanup of its previous failed RAW scope. Immediate named graph assertions precede fault lift. Physical helpers name Root's four fields and Power's one field without weakening accounting equations or exempting registry owners. Public TLS postphysical release fixtures retain their explicit signed-host undefined-domain qualification; they do not claim ordinary allocation-refusal behavior. RAW fields and continuation metadata use the existing charged cold IntegerManager header. GMP and full Factor/Mignotte remain open. Canonical evidence: .cache/integer-root-power-current-02-proof-map.json and inventory. Historical original native/debug failures remain recorded; source-unit/API/registered-driver completion is not promoted.
 
-Tests-first port of src/util/resource_limit.h39–164 adds concrete caller-owned base, linear and exponential limits with no generic types, owned payload or synthetic allocations. Increment increments first and accepts equality; exhaustion also accepts equality. ResetCounters, reset, SetInit and negative-unbounded maxima preserve distinct source effects. Linear uses signed increments, including zero/negative policies; exponential truncates the double product to int before checking maximum. Reached undefined signed overflow/nonfinite conversion domains are guarded before wrapped publication. Nullable descriptions preserve nil versus present empty spelling and first-NUL C-string text using immutable borrowed Go storage. Seven groups include3125 independent five-action histories, virtual cold contract, null descriptions and reached arithmetic domains. Original missing API RED and all selected/full gates are recorded in .cache/search-resource-limit-frozen-inventory.json; intermediate missing-field compile failure is not algorithm RED credit. TRACE stream binding remains open; resource_limit.h changes unported to partial only.
+Tests-first port of src/util/resource_limit.h:39–164 adds concrete caller-owned base, linear and exponential limits with no generic types, owned payload or synthetic allocations. Increment increments first and accepts equality; exhaustion also accepts equality. ResetCounters, reset, SetInit and negative-unbounded maxima preserve distinct source effects. Linear uses signed increments, including zero/negative policies; exponential truncates the double product to int before checking maximum. Reached undefined signed overflow/nonfinite conversion domains are guarded before wrapped publication. Nullable descriptions preserve nil versus present empty spelling and first-NUL C-string text using immutable borrowed Go storage. Seven groups include3125 independent five-action histories, virtual cold contract, null descriptions and reached arithmetic domains. Original missing API RED and all selected/full gates are recorded in .cache/search-resource-limit-frozen-inventory.json; intermediate missing-field compile failure is not algorithm RED credit. TRACE stream binding remains open; resource_limit.h changes unported to partial only.
 
 Both independent components and the composed candidate passed full clean uncached native and checked/debug suites, both vets and source audit. Root/Power13 standalone native79675/debug45299/vets66337,14555/source64694 all terminal0. Search limit standalone native101.592s/debug755.320s/vets5.000s,5.020s/source3.908s all terminal0 (runner96193). Final combined1122 runner89352 all terminal0: native105.434s, checked/debug746.449s, vets6.425s/6.761s and source4.108s. No .cache before/after in tested module; logs/compiler caches/tmp remain outside the copy. CGO_ENABLED=0, count1, original100-bit every-reservation refinement and30m timeout retained; WASM/WASI/race deferred. Final additive manifest union separately audited80939 terminal0, preserving prior scalar/list/API entries and explicitly superseding earlier staged Root/output/implicit Power cleanup descriptions.
 
@@ -26847,7 +26847,7 @@ Root integrated audit87387 terminal0:2102 units/677 APIs,29ported195partial1878u
 
 ## Port symbol-table initialization and finalization binding
 
-Translated src/util/symbol.cpp70–83 using an explicit single-lane SymbolService nullable table pointer. Preparation charges its actual reflected cold header without constructing the table. InitializeSource invokes the existing real SymbolManager constructor (region then table) and publishes only after it completes; pointer-present initialization returns without allocations. FinalizeSource destroys the table then region before clearing the pointer; null finalization is allocation-free and safe. A later initialize constructs a fresh owner identity, invalidating previous spelling handles. Separate Close retires the cold service header. Self identity guards reject copied owners before mutation/cleanup. No fake Runtime allocation, generic type or C dependency is introduced. Process singleton/global Runtime accounting and whole memory lifecycle remain open bindings, not credited by this owner-local prerequisite.
+Translated src/util/symbol.cpp:70–83 using an explicit single-lane SymbolService nullable table pointer. Preparation charges its actual reflected cold header without constructing the table. InitializeSource invokes the existing real SymbolManager constructor (region then table) and publishes only after it completes; pointer-present initialization returns without allocations. FinalizeSource destroys the table then region before clearing the pointer; null finalization is allocation-free and safe. A later initialize constructs a fresh owner identity, invalidating previous spelling handles. Separate Close retires the cold service header. Self identity guards reject copied owners before mutation/cleanup. No fake Runtime allocation, generic type or C dependency is introduced. Process singleton/global Runtime accounting and whole memory lifecycle remain open bindings, not credited by this owner-local prerequisite.
 
 Tests-first missing actual API RED43458 precedes implementation. Three new groups exercise nullable defaults, repeated initialized calls under FailAfter0, finalization/reinitialization, dead owner and stale handles, cold prepare failure, copied-owner rejection and every actual constructor reservation. Native/debug firstsuccess7 normal region and5 direct region; each refusal preserves null publication and exact service header graph before fault lift. Completed constructor graph names actual manager/table/region/descriptor backing and cold directories. Selected native14356/final99330 and debug70306 terminal0; immutable full suites include the final complete graph assertion. Service initialization can retry an unpublished constructor failure; source memory initialized/fully_initialized orchestration remains distinct and open.
 
@@ -26880,7 +26880,7 @@ Frozen current1132 Go preserves1126 unselected3834f71 ancestor bytes. Full clean
 
 ## Params Assign/init exact exceptional source frames
 
-Source params_ref assignment (params.cpp550–558) increments incoming first, decrements old destination next, and publishes the new pointer only after that succeeds. Failed old destruction now preserves the old destination and the actual extra incoming reference. Source init (598–610) publishes a completed new block before copying old contents, and skips old DEC when copying throws. Constructor failure before publication leaves the old reference with its caller; no frame ownership is invented.
+Source params_ref assignment (params.cpp:550–558) increments incoming first, decrements old destination next, and publishes the new pointer only after that succeeds. Failed old destruction now preserves the old destination and the actual extra incoming reference. Source init (598–610) publishes a completed new block before copying old contents, and skips old DEC when copying throws. Constructor failure before publication leaves the old reference with its caller; no frame ownership is invented.
 
 Actual held references are stamped at successful source INC or new-pointer publication in a separately prepared, charged per-block cold directory. Concrete context/slot/generation/nonwrapping invocation receipts identify the frame; explicit CleanupSource discards its held reference without replaying copy or pointer publication. A consumed own DEC has its own exact phase. New blocks cannot reuse active-frame roots, even after their ordinary values are deleted. Actual frame census feeds reference/physical audits and owning Context.Close. No reference-count delta or registry discovery establishes ownership.
 
@@ -26891,7 +26891,7 @@ Final current1134 composition preserves accepted parent cleanup4fa8716 and exact
 
 ## Live Params Reset traversal and global parent continuation
 
-Source params::reset (params.cpp753–781,799–803) traverses numeral destruction without clearing scalar entries, then finalizes vector storage. Actual stopped NUM release previously erased earlier UINT42 while the parent object remained live. Standalone and nested global-parameter regressions reproduced the missing value after exact numeric/raw and charged graph checks. The corrected live-reset cursor preserves inline keys/values/size and shared reference count until final backing disposal. Owned copied text is an explicit Go adapter released after source numeral traversal.
+Source params::reset (params.cpp:753–781,799–803) traverses numeral destruction without clearing scalar entries, then finalizes vector storage. Actual stopped NUM release previously erased earlier UINT42 while the parent object remained live. Standalone and nested global-parameter regressions reproduced the missing value after exact numeric/raw and charged graph checks. The corrected live-reset cursor preserves inline keys/values/size and shared reference count until final backing disposal. Owned copied text is an explicit Go adapter released after source numeral traversal.
 
 ResetTracked stamps actual owner/slot/generation/nonwrapping invocation with a separate live-reset kind in the already prepared per-block metadata. CompleteReset validates that exact stopped action, finishes its retained leaf, and preserves caller identity/reference count. Two independent stops, null/no-stamp, stale generation and wrong kind/invocation cannot adopt foreign storage. Shared nonfinal DEC remains scalar; last-reference DEC during a stopped live reset has an explicit Go lifetime guard against replaying consumed leaves, not source final-destructor completion credit. Zero-reference destructor entry ends source object lifetime and does not carry the ordinary scalar-visibility claim of live Reset.
 
@@ -26913,7 +26913,7 @@ Independent corrected callee9 full five all0; frozen combined owning18 full nati
 
 ## Matched Params ResetKey source traversal and owning continuation
 
-Source params.cpp805–828 deletes only the matched entry, shifts its suffix in ascending order, then pops the final duplicate. ResetKey and ResetKeyName now retain that actual matched index during a numeral release stop; the live vector, scalar prefix/suffix and shared identity remain unchanged until explicit continuation. Already prepared metadata records actual owner/slot/generation/nonwrapping invocation/kind/index, with no count or registry authority. CompleteResetKey validates the exact stopped action before finishing its retained leaf and shift. No fallible allocation is invented in scalar entry movement.
+Source params.cpp:805–828 deletes only the matched entry, shifts its suffix in ascending order, then pops the final duplicate. ResetKey and ResetKeyName now retain that actual matched index during a numeral release stop; the live vector, scalar prefix/suffix and shared identity remain unchanged until explicit continuation. Already prepared metadata records actual owner/slot/generation/nonwrapping invocation/kind/index, with no count or registry authority. CompleteResetKey validates the exact stopped action before finishing its retained leaf and shift. No fallible allocation is invented in scalar entry movement.
 
 The ordinary-replay RED is an explicit Go guard against acknowledging a consumed source leaf, not a first-call source algorithm discrepancy. Root review found and corrected an overbroad guard: an absent symbol or name remains a defined no-op on a stopped live parent, preserving any prior receipt and graph. Zero-reference destruction has ended the source object lifetime and retains its separate guard. Actual TLS numerical release fixture reaches guarded signed-host undefined arithmetic, not ordinary math OOM. Fifty-six finite symbol/name removal cases run without new reservations; foreign/stale/wrong-index receipts and independent stops preserve exact roots. Source units remain partial.
 
@@ -26924,14 +26924,14 @@ Historical corrected1139 runner51790 completed all five gates green, but cannot 
 
 PrimitivePart/IsPrimitive preserve cpp3536–3549 and7212–7214 helper return/reference lifetime. General and variable SquareFree/IsSquareFree preserve cpp4529–4598 and7232–7246: zero/constant shortcuts, content recursion, derivative, GCD, constant/equality pointer shortcut, exact division and literal scalar/product order. Actual declaration stacks in existing charged GCD frames retain separate derivative and ExactDiv invocation receipts. Completed younger child acknowledgement precedes older locals; unjoined roots abort only after completed locals. No manager-wide root inference or new numerical substitute is introduced.
 
-Seven dormant tst_sqf expressions (src/test/polynomial.cpp894–916), three ENSURE each, are translated with zero active registered-driver credit. Independent bounded multiplicity/alias/absent-variable checks and literal GF2 derivative0→GCD(p,0)=p→quotient1 preserve source behavior. Every actual reservation frontier is audited before fault lift (native71/71/72/72, checked100/100/101/101); checkpoint horizons25/24/25/24 preserve source controls. Real caller incoming INC before old output DEC callback refuses without losing incoming identity or foreign callback-created monomial. Earlier GF2 derivative cohort and actual source stopped NUM/nonce survive unrelated zero/constant paths and younger matched owning abort. Prior fixture/error-wrapper corrections are not algorithm RED credit. Full Factor and whole source units remain partial.
+Seven dormant tst_sqf expressions (src/test/polynomial.cpp:894–916), three ENSURE each, are translated with zero active registered-driver credit. Independent bounded multiplicity/alias/absent-variable checks and literal GF2 derivative0→GCD(p,0)=p→quotient1 preserve source behavior. Every actual reservation frontier is audited before fault lift (native71/71/72/72, checked100/100/101/101); checkpoint horizons25/24/25/24 preserve source controls. Real caller incoming INC before old output DEC callback refuses without losing incoming identity or foreign callback-created monomial. Earlier GF2 derivative cohort and actual source stopped NUM/nonce survive unrelated zero/constant paths and younger matched owning abort. Prior fixture/error-wrapper corrections are not algorithm RED credit. Full Factor and whole source units remain partial.
 
 Frozen standalone six-file component1137 passed all five gates; final composed1151 preserves all1145 unselected60cf244 ancestor Go files, including accepted polynomial ownership and Params/global/ResetKey work. Root runner30363 all five clean uncached gates terminal0: native 106.647s, checked/debug 781.269s, vets 7.173/7.388s, source 4.102s. All1151 Go bytes immutable and exact at integration; tested module.cache absent before/after, logs/compiler cache/tmp external. CGO_ENABLED=0/count1,100-bit every-reservation campaign and30m timeout retained; WASM/WASI/race deferred. Additive manifest retains all previous evidence/API/status/audit data. Optional Sqrt, coefficient and SET_RAT source lifetimes continue in separate composed candidates; full port goal remains active.
 
 
 ## SET_RAT acquired local before vector publication
 
-Source params.cpp992–1014 ADD allocates the new rational, copies its value, then appends its POD entry. That POD has no rational destructor if copy/append throws. The old Go route eagerly destroyed the actual copied local on ordinary append refusal. Tests-first actual NUM copy plus separate Params Budget refusal preserved the published UINT42/vector yet lost the untransferred local. The corrected route stamps actual successful NewValue into prepared cold setFrames.next.rat, keeps it through copy/append refusal, and clears it only at true entry publication. Exact owner/slot/generation/nonwrapping invocation receipts authorize separate CleanupSet; Context.Close drains the retained local before blocks. Counts or registry differences grant no ownership.
+Source params.cpp:992–1014 ADD allocates the new rational, copies its value, then appends its POD entry. That POD has no rational destructor if copy/append throws. The old Go route eagerly destroyed the actual copied local on ordinary append refusal. Tests-first actual NUM copy plus separate Params Budget refusal preserved the published UINT42/vector yet lost the untransferred local. The corrected route stamps actual successful NewValue into prepared cold setFrames.next.rat, keeps it through copy/append refusal, and clears it only at true entry publication. Exact owner/slot/generation/nonwrapping invocation receipts authorize separate CleanupSet; Context.Close drains the retained local before blocks. Counts or registry differences grant no ownership.
 
 SourceSetBytes accounts for actual reflected cold backing capacity, prepared atomically with block/decrement/source-frame directories and refunded with them. Exact physical/reference helpers count only declared acquired next tokens. Genuine missing cold-byte and root-census fixture REDs are preserved separately from source body RED. Native/debug actual copy and append campaigns each reach first success1; four groups cover foreign/stale guards, independent locals, dead destination/slot reuse and actual postphysical TLS descriptor-only retry. First source and owning causes stay sticky after acknowledgement; raw object count proves no double release. TLS proof is the guarded signed-host undefined domain, distinct from ordinary reservation refusal. NUM-to-NUM remains literal in-place Copy. Existing-key exceptional replacement and broader profiles remain open; selected method and whole params units stay partial.
 
@@ -26940,7 +26940,7 @@ Frozen selected8 on60cf244 passed focused native/debug167 groups and both whole 
 
 ## Actual coefficient and incoming factory reference prerequisites
 
-The unchanged Coeff engine (polynomial.cpp3264–3277) now accepts optional concrete actual invocation/append/factory receipts. Each matching term still removes its variable, copies the coefficient, performs real monomial INC, then constructs the result through cheap.mk. There is no coefficient-level empty shortcut. Actual monomial factory started/created outcomes distinguish new roots from borrowed cached results; exact pending allocator tokens are captured at actual Allocate, not by whole-call snapshots. Generated ownership transfers at real successful INC. Actual creation completion clears only the matching parent/frame/invocation/generation tag. Wrong, stale and same-cardinality foreign roots cannot be adopted.
+The unchanged Coeff engine (polynomial.cpp:3264–3277) now accepts optional concrete actual invocation/append/factory receipts. Each matching term still removes its variable, copies the coefficient, performs real monomial INC, then constructs the result through cheap.mk. There is no coefficient-level empty shortcut. Actual monomial factory started/created outcomes distinguish new roots from borrowed cached results; exact pending allocator tokens are captured at actual Allocate, not by whole-call snapshots. Generated ownership transfers at real successful INC. Actual creation completion clears only the matching parent/frame/invocation/generation tag. Wrong, stale and same-cardinality foreign roots cannot be adopted.
 
 Neg/ScalarDiv parent arguments use the same source engines. Caller factory-result ownership now transfers at actual successful incoming INC before old destination DEC/callback, preserving source incoming reference even when old destruction fails. Actual callback RED79225 demonstrates the previous double authority; matching source fix and physical graphs pass. Missing-API and setup failures are separate evidence, not arithmetic RED. Coefficient SET fault horizons native9/debug10 retain exact created monomial before INC; tests cover older foreign constructor, unique nonce reuse, rejected entry, cached borrowed monomial and exact callee completion. No registered driver or parent Discriminant completion credit is granted. Source NUM DT after factory publication and ordered mixed-cohort retirement remain open.
 
@@ -26949,7 +26949,7 @@ Standalone frozen thirteen-file prerequisite1151 on60cf244 passed all five gates
 
 ## Matched scalar/symbol/string setter stopped-leaf continuation
 
-Source SET_SIMPLE/SET_SYM (params.cpp753–763,946–1014,1017–1033) destroys the matched old numeral before publishing the new kind then field. A real postphysical TLS stop retained its old entry/tag, but an ordinary SetUInt retry silently acknowledged the consumed child and published99. Tests-first RED63016 is a Go lifetime-guard discrepancy, not first-call arithmetic/source body RED. A concrete prepared replacement frame now records actual matched index/context/generation/nonwrapping invocation, old kind and first source/owning causes. Its leaf field is a borrowed scalar identity only; actual old numeral ownership stays in the entry and actual prepared copied text stays in next.
+Source SET_SIMPLE/SET_SYM (params.cpp:753–763,946–1014,1017–1033) destroys the matched old numeral before publishing the new kind then field. A real postphysical TLS stop retained its old entry/tag, but an ordinary SetUInt retry silently acknowledged the consumed child and published99. Tests-first RED63016 is a Go lifetime-guard discrepancy, not first-call arithmetic/source body RED. A concrete prepared replacement frame now records actual matched index/context/generation/nonwrapping invocation, old kind and first source/owning causes. Its leaf field is a borrowed scalar identity only; actual old numeral ownership stays in the entry and actual prepared copied text stays in next.
 
 CompleteSetReplacement validates the exact stopped action, acknowledges its retained child, then publishes kind before scalar/symbol/text field. Context.Close instead discards the retained argument and clears the consumed old entry without publishing a replacement body. Actual leaf identity updates only after the real q.Del prefix. Eleven symbol/name field cases, absent ResetKey/Contains/read no-ops, two independent frames/reuse, owned versus borrowed text and actual Context.Close target discard before later older NUM stop pass. ReplacementBytes charges actual reflected cold backing; the432-byte omitted test equation was corrected separately from source RED. Shared nonfinal DEC is scalar, stopped last DEC remains a qualified Go guard. Native C strings are borrowed; copied text is explicit adapter. Source units remain partial.
 
@@ -26958,7 +26958,7 @@ Frozen seven-file successor1155 onc06b5c7+SET8 passed186 focused groups each pro
 
 ## Exact Sqrt child invocation and created-cohort continuation
 
-The unchanged literal Sqrt engine (polynomial.cpp5954–6068) now accepts an optional guarded concrete invocation receipt. Zero shortcut leaves the receipt unchanged; actual begin records manager/frame/nonwrapping nonce. Actual returned-new monomial appends carry charged invocation tags; successful real INC or exact owning consumption clears only the matching root/tag/location route. Older false-quotient cohorts remain retained across later invocations and cleanup drains only the matched receipt cursor. No RC0/count/registry inference grants ownership. Current source-aware monomial hunks preserve accepted coefficient hooks.
+The unchanged literal Sqrt engine (polynomial.cpp:5954–6068) now accepts an optional guarded concrete invocation receipt. Zero shortcut leaves the receipt unchanged; actual begin records manager/frame/nonwrapping nonce. Actual returned-new monomial appends carry charged invocation tags; successful real INC or exact owning consumption clears only the matching root/tag/location route. Older false-quotient cohorts remain retained across later invocations and cleanup drains only the matched receipt cursor. No RC0/count/registry inference grants ownership. Current source-aware monomial hunks preserve accepted coefficient hooks.
 
 Completed-child acknowledgement and unjoined owning abort remain distinct. A real perfect-square child which has not entered end retains all RAW fields through false-phase cleanup; true-phase abort drains its exact acquired roots. Actual postphysical NUM3 stop preserves older NUM0/1/2 and sticky source stage/cause; completed cleanup consumes NUMs before unjoined cohort abort. Later foreign perfect-square invocation at reused scope/new nonce remains untouched by old Sqrt receipt. A later real INC can transfer an older false-quotient cohort to a caller, invalidating old cleanup authority without losing that caller. All existing Sqrt tests and optional big-NUM every-reservation/physical/cold graphs pass. Public TLS fixtures explicitly reach guarded signed-host domains, not ordinary mathematical allocation/free failure. No registered dormant source-driver or whole parent Factor completion credit.
 
@@ -26996,7 +26996,7 @@ Frozen seven-file component1165 on3d80cd6 passed focused native/debug2794/2796 g
 
 ## Literal gparams namespace forwarding and argument order
 
-The fifteen source namespace forwards (gparams.cpp557–631) now read the actual current imp on each call, using its unchanged reset/set/get/register/module/ref/display engines. get_module(char*) constructs its symbol before the current-pointer assertion; display_module asserts before symbol construction, then calls the same factored key body. Symbol set/get performs actual bare_str numeric assertion after the current-pointer assertion; its numeric ternary routes an empty name in release or assertion-disabled debug. No copied string/second normalization or duplicated display body is introduced. Existing public display adapter keeps its prior open→Intern order.
+The fifteen source namespace forwards (gparams.cpp:557–631) now read the actual current imp on each call, using its unchanged reset/set/get/register/module/ref/display engines. get_module(char*) constructs its symbol before the current-pointer assertion; display_module asserts before symbol construction, then calls the same factored key body. Symbol set/get performs actual bare_str numeric assertion after the current-pointer assertion; its numeric ternary routes an empty name in release or assertion-disabled debug. No copied string/second normalization or duplicated display body is introduced. Existing public display adapter keeps its prior open→Intern order.
 
 One reflected cold service field borrows DebugContext, read only at reached debug assertion sites; release erases the read. Source null pointer in release/disabled assertions stops at an explicitly qualified undefined-pointer guard. get_ref borrows exact current ParamsRef; get_module performs actual copied reference acquisition, so source reset drops only table-held references and surviving caller copies remain live. Source reinit namespace operations read new current, preserving overwritten predecessor owner. Actual output refusal retains emitted prefix and complete cold/physical graph before fault lift; output first success2. Real symbol allocation refusal and closed-debug argument ordering are covered.
 
@@ -27007,7 +27007,7 @@ Frozen namespace4 composed on0fa63bb+immutable gparams7 preserves all1170 Go anc
 
 ## Actual source initialization OOM scalar prerequisite
 
-Runtime.ClearOutOfMemoryForInitialization implements only the reached memory_manager.cpp102 assignment to g_memory_out_of_memory=false. The actual confined Runtime owns this scalar; no new context/ticket, allocation, deallocation, counter or limit reset occurs. A containing source process binding must still perform first-initialize guard, conditional max-size update, generated child initialization and fully-initialized publication/wait. This leaf does not claim those controls or the outer finalize hierarchy.
+Runtime.ClearOutOfMemoryForInitialization implements only the reached memory_manager.cpp:102 assignment to g_memory_out_of_memory=false. The actual confined Runtime owns this scalar; no new context/ticket, allocation, deallocation, counter or limit reset occurs. A containing source process binding must still perform first-initialize guard, conditional max-size update, generated child initialization and fully-initialized publication/wait. This leaf does not claim those controls or the outer finalize hierarchy.
 
 Tests first demonstrated the missing method, then eight independent TLS/non-TLS32/64-bit actual physical/size-limit failure profiles verified retained live and late-failed block identities, initialized-byte state, limits/accounting/cold graph and allocation-free scalar reassignment under still-active failure control. Nil/shallow/copied/closed owner guards preserve actual owner. Missing API RED is not algorithm discrepancy. Initial redirected command had no external log parent and ran no test; corrected paths keep logs/compiler caches/tmp outside the clean module. A fixture incorrectly expected late failed payload Read to succeed; corrected actual Size and ErrRuntimeUninitialized proof, preserving both profile failure logs, not weakening source initialization-state expectations. No registered source driver credit.
 
@@ -27025,7 +27025,7 @@ Root clean immutable1179-Go snapshot preserves1166 unselected current ancestors.
 
 ### Rational namespace publication and original static lifetime binding
 
-Accepted8-file prerequisite binds rational.cpp64-83 to one original prepared RationalService static context and a distinct borrowed current-manager scalar. Actual completed constructor publication transfers the first manager to that context before constants; failed returned children and post-finalization managers remain in exact charged acquisition nodes. A null pointer retries the actual constructor without losing prior failed owners. Successful source finalize nulls current only after manager teardown, while owning cleanup retains its original context. Each static lifetime ends at the reached DT entry, including stopped destructors. Reinitialization never recreates defaults: actual new manager publication precedes the ended-zero guard; subsequent pointer-present initialize remains a no-op. Never-initialized finalize reaches first Inf DT entry before the null-manager guard.
+Accepted8-file prerequisite binds rational.cpp:64-83 to one original prepared RationalService static context and a distinct borrowed current-manager scalar. Actual completed constructor publication transfers the first manager to that context before constants; failed returned children and post-finalization managers remain in exact charged acquisition nodes. A null pointer retries the actual constructor without losing prior failed owners. Successful source finalize nulls current only after manager teardown, while owning cleanup retains its original context. Each static lifetime ends at the reached DT entry, including stopped destructors. Reinitialization never recreates defaults: actual new manager publication precedes the ended-zero guard; subsequent pointer-present initialize remains a no-op. Never-initialized finalize reaches first Inf DT entry before the null-manager guard.
 
 Tests-first missing APIs and a genuine null-constructor retry defect are retained separately from fixture corrections. Immediate named cold/raw graphs precede fault lifting across every constructor reservation: first complete child24, wrapper publication25, post-finalize reinitialization22. Actual stopped cache teardown preserves current and the original source cause; owning retries demonstrate actual storage/cursor progression. Borrowed independent polynomial roots survive own abort. TLS release-stop evidence is explicitly guarded signed-domain behavior, not ordinary valid-source OOM. Latest scoped native and checked/debug campaigns each pass455 tests. Metadata-only rejected Inf partial-method additions are retained as failed audit evidence; canonical additions are limited to rational.cpp/h and preserve prior source unit methods/status.
 
@@ -27034,7 +27034,7 @@ Root immutable1183-Go clean snapshot preserves1175 unselected PN ancestors. Full
 
 ### Corrected fused-integer source coverage qualification
 
-Direct review of src/util/mpz.h393-426 confirms addmul/submul declare a RAW mpz temporary, execute Mul then Add/Sub, and explicitly DEL only after body success. Current mpnum/mpz_gcd.go uses deferred Del, eagerly cleans on body failure and ignores end-DEL errors. Existing success/cleanup tests do not prove this source failure contract. Corrected the two prior addmul/submul method entries from ported to partial, preserving all test/target/ownership lists and source-unit partial status; an additive deviation records the exact open obligation. Numeric continuation is implementing one shared literal engine with actual allocation-leaf receipts, older-local preservation, sticky explicit DEL stop and owning acknowledgement. This is a qualification correction, not a substitute for that implementation.
+Direct review of src/util/mpz.h:393-426 confirms addmul/submul declare a RAW mpz temporary, execute Mul then Add/Sub, and explicitly DEL only after body success. Current mpnum/mpz_gcd.go uses deferred Del, eagerly cleans on body failure and ignores end-DEL errors. Existing success/cleanup tests do not prove this source failure contract. Corrected the two prior addmul/submul method entries from ported to partial, preserving all test/target/ownership lists and source-unit partial status; an additive deviation records the exact open obligation. Numeric continuation is implementing one shared literal engine with actual allocation-leaf receipts, older-local preservation, sticky explicit DEL stop and owning acknowledgement. This is a qualification correction, not a substitute for that implementation.
 
 No Go bytes change: the current1183 full native/checked suites and static gates remain valid. Fresh source/no-generics audit is required for this metadata-only correction. All solver/interpolation and fused arithmetic failure obligations remain within the active full port goal.
 
@@ -27045,14 +27045,14 @@ Fresh main source/no-generics audit terminal0; all1183 Go bytes independently ve
 
 Ported src/util/permutation.h cycle traversal into utilbits/permutation.go with actual borrowed uint32 data and mapping, no generics or scratch allocations. Signed int32 markers and signed count comparison retain source traversal; marking occurs before reached data reads/swaps. The preserving wrapper restores only after destructive child success, so stopped calls retain completed marks and swaps. Negative entries and identity cycles leave data unread; actual overlapping identity data/mapping is neither copied nor prevalidated. Reached debug assertions precede their writes. Native undefined access and INT_MIN signed-negation domains receive explicit reached guards; no undefined-memory continuation is claimed.
 
-Tests first produced genuine missing-API RED, then five native/debug groups passed, including independent copy-model checks across all46234 permutations of sizes0-8. Separate probes verify source successful prefixes, invalid duplicate cycles, signed high-bit count/core-vs-restoration behavior, unread tails and actual aliasing. src/test/permutation.cpp tst1 is disabled by#if0 and its ENSURE loop has zero bound: these finite mathematical tests earn no active registered-driver coverage. The permutation class and additional concrete coefficient/monomial buffer consumers at polynomial.cpp1334-1335 remain open; src/util/permutation.h is partial and src/util/permutation.cpp remains unported.
+Tests first produced genuine missing-API RED, then five native/debug groups passed, including independent copy-model checks across all46234 permutations of sizes0-8. Separate probes verify source successful prefixes, invalid duplicate cycles, signed high-bit count/core-vs-restoration behavior, unread tails and actual aliasing. src/test/permutation.cpp tst1 is disabled by#if0 and its ENSURE loop has zero bound: these finite mathematical tests earn no active registered-driver coverage. The permutation class and additional concrete coefficient/monomial buffer consumers at polynomial.cpp:1334-1335 remain open; src/util/permutation.h is partial and src/util/permutation.cpp remains unported.
 
 Root full clean immutable1185-Go snapshot preserves all1183 accepted ancestor Go bytes: full CGO_ENABLED=0 uncached native terminal0 114.533s, checked/debug terminal0 784.773s with30m timeout, native/debug vets terminal0 6.565s/6.660s and source/no-generics audit terminal0 3.897s. No.cache exists in the tested module before/after. Final main manifest appends only the reviewed permutation header scope to current3ae3296 metadata, preserving its corrected AddMul/SubMul partial qualification; fresh main source audit verifies this metadata composition separately. Evidence: .cache/rational-permutation-current1185-frozen-inventory.json, .cache/permutation-cycles-root-source-review-81f4887.json and .cache/rational-permutation-current1185-evidence/. Full solver/interpolation goal ACTIVE; WASM/WASI/race remain deferred.
 
 
 ### Caller-confined generated memory lifecycle and actual namespace assertion binding
 
-Accepted6 NEW files preserve memory_manager.cpp89-113/153-160 scalar/action order. size_t conversion precedes UINT_MAX sentinel comparison and SetMaxSize precedes repeat-call flag reads. First initialization publishes initialized=true, performs the actual Runtime OOM=false assignment, then calls real rational, symbol and gparams children in generated stable-priority order. Only actual post-symbol preparation owns ParamsContext/catalog/GlobalParamsService cold contexts; no callback-loop stand-ins or source allocation tickets are used. Finalization executes actual debug→gparams→prime→rational→symbol→trace methods and clears initialized/finalizing only on success, retaining fullyInitialized and accounting.
+Accepted6 NEW files preserve memory_manager.cpp:89-113/153-160 scalar/action order. size_t conversion precedes UINT_MAX sentinel comparison and SetMaxSize precedes repeat-call flag reads. First initialization publishes initialized=true, performs the actual Runtime OOM=false assignment, then calls real rational, symbol and gparams children in generated stable-priority order. Only actual post-symbol preparation owns ParamsContext/catalog/GlobalParamsService cold contexts; no callback-loop stand-ins or source allocation tickets are used. Finalization executes actual debug→gparams→prime→rational→symbol→trace methods and clears initialized/finalizing only on success, retaining fullyInitialized and accounting.
 
 Tests first include missing APIs and actual foreign child Budget RED→fix, all77 initialization reservation prefixes with immediate named cold/physical census before fault lifting, SIZE_T32/64 limits/sentinels, real OOM reset, null g_imp no-op after failed first call, and a real gparams NUM teardown stop preserving later unread children and caller numeral. Failed-first single-lane repeat is an explicitly guarded source wait domain. Successful finalize retains fully=true; later rational reinit publishes its real manager before ended-zero guard, then a subsequent initialized shortcut returns without waiting. Source stopped destructor cause stays sticky. Owning abort releases only the actual parent acquisitions/header, preserving caller-owned Runtime and six external wrappers/anchors.
 
@@ -27065,7 +27065,7 @@ This is a caller-confined partial binding, not complete native process/OpenMP/gl
 
 ### Dynamic unsigned vector and permutation class
 
-Ported the concrete src/util/permutation.cpp21-76 class actions and unsigned-vector backing from src/util/vector.h546 using the existing Runtime scalar allocation engine. Reset alternates forward and inverse pushes in literal source order; Swap and Move retain each actual write prefix and reached debug invariant. The constructor unwinds completed vector members inverse then forward. Vector reset writes SIZE=0 without an extra indexed assertion; Resize publishes SIZE before ascending raw placement. Native undefined access and signed release domains remain reached typed guards. No generic or pooled fixed-capacity substitute is used.
+Ported the concrete src/util/permutation.cpp:21-76 class actions and unsigned-vector backing from src/util/vector.h:546 using the existing Runtime scalar allocation engine. Reset alternates forward and inverse pushes in literal source order; Swap and Move retain each actual write prefix and reached debug invariant. The constructor unwinds completed vector members inverse then forward. Vector reset writes SIZE=0 without an extra indexed assertion; Resize publishes SIZE before ascending raw placement. Native undefined access and signed release domains remain reached typed guards. No generic or pooled fixed-capacity substitute is used.
 
 Tests-first missing APIs and a genuine extra debug SIZE-read defect preceded the correction. Twenty-five scoped tests pass in each profile, including every constructor reservation through success12, unequal reset prefixes, eleven output-write boundaries, real TLS destructor stops and explicit owning retries. Immediate named physical/cold graphs precede fault lifting. Actual source destructor errors remain sticky; source finalize frees vector backing without prematurely refunding the owning cold header. Compiler-generated copy/assignment, native ostream/global assertion bindings and typed polynomial consumers remain open; disabled source tests earn no registered-driver credit. Source units remain partial, with permutation.cpp now partial rather than unported.
 
@@ -27074,7 +27074,7 @@ Root immutable1195-Go clean snapshot preserves all1191 accepted ancestors. Full 
 
 ### Derivative numeric acquisition qualification
 
-Source polynomial.cpp4507-4528 constructs NUM n, sets degree, constructs NUM a, multiplies, then appends the actual derived monomial before the NUM destructors. Review of current polynomial_derivative.go shows pendingCell/allocator PendingRoots snapshots around SetUint32 and Mul, followed by recordDerivativeNumericPending inference. This is not actual leaf acquisition authority. The source unit and derivative methods already remain partial; an additive manifest deviation makes the exact replacement obligation explicit without changing statuses, tests or targets. Discriminant and other callers retain this prerequisite even when mathematical and stopped-destructor tests pass. Numeric continuation must use guarded real allocation/publication transport and exact invocation ownership; no broad derivative/parent completion credit is assigned.
+Source polynomial.cpp:4507-4528 constructs NUM n, sets degree, constructs NUM a, multiplies, then appends the actual derived monomial before the NUM destructors. Review of current polynomial_derivative.go shows pendingCell/allocator PendingRoots snapshots around SetUint32 and Mul, followed by recordDerivativeNumericPending inference. This is not actual leaf acquisition authority. The source unit and derivative methods already remain partial; an additive manifest deviation makes the exact replacement obligation explicit without changing statuses, tests or targets. Discriminant and other callers retain this prerequisite even when mathematical and stopped-destructor tests pass. Numeric continuation must use guarded real allocation/publication transport and exact invocation ownership; no broad derivative/parent completion credit is assigned.
 
 Metadata-only change: all1195 Go bytes remain equal to the full-tested8188ec5 permutation snapshot. Fresh source/no-generics audit gates this clarification; no implementation test rerun is needed for unchanged Go. Full solver/interpolation goal ACTIVE; WASM/WASI/race remain deferred.
 
@@ -27088,3 +27088,14 @@ The shared literal AddMul engine preserves inline±1 shortcuts before RAW frame 
 Tests first verify missing APIs, published Mul tmp before actual scratch refusal, independent limb arithmetic, inline shortcuts leaving receipts untouched, stale/copied/foreign invocation rejection, every actual reservation through native4/debug7 and actual TLS signed-domain end DEL stopping after caller output publication. Immediate named physical/cold graphs precede fault lifting. The TLS fixture guards an undefined signed accounting domain; it is not ordinary valid-source OOM. No repaired scratch holes, private counter edits or fabricated source callbacks are used.
 
 Root exact1200-Go clean snapshot preserves1190 unselected ancestors of accepted1195. Full uncached CGO_ENABLED=0 native terminal0 112.503s, checked/debug terminal0 819.862s with30m timeout, native/debug vets terminal0 7.018s/7.118s and source/no-generics terminal0 3.891s. No.cache exists in tested module before/after and all Go bytes match main. Evidence: .cache/polynomial-arithmetic-current1200-frozen-inventory.json, .cache/polynomial-arithmetic-current1200-root-review.json, .cache/polynomial-arithmetic-leaf-guard-frozen-inventory.json and external full evidence logs. Canonical additive proposal preserves the intervening b9b4c8b derivative snapshot-acquisition qualification; fresh main source audit verifies that metadata composition. All source units remain partial. Full solver/interpolation goal ACTIVE; WASM/WASI/race deferred.
+
+
+### Common diagnostic bindings and reached exception capture
+
+Ported all seven static message definitions/macros from common_msgs.cpp:21-27/common_msgs.h:22-39 as shared mutable Go string bindings. Exact defaults distinguish canceled, memory/scopes/steps/frames/resource limits and unsupported proof generation. Existing resource-limit cancel_msg at rlimit.cpp:62-68 now reads the current binding; SAT checkpoint at sat_solver.h:268-282 constructs its exception from that binding after the literal reset/check actions. Already constructed exceptions retain immutable original bytes across later reassignment. Default Go sentinels retain their established values and normal source-default comparisons. Go strings replace native C-string pointer/macros; no C ABI, native pointer identity or null/dangling domain is promised. There is no Runtime allocation ticket or added owner header for static messages.
+
+Tests-first missing message APIs were followed by actual behavior RED for hard-coded resource messages and prebuilt SAT exceptions. Four new test groups prove exact defaults, all seven mutable independent bindings, same-owner message rereads and reached cancellation/memory exception capture. Both scoped profiles pass20 existing/new groups. An incorrect fixture field was corrected to actual State.MaxMemory with actual Runtime allocation8 before claiming behavior RED. Two initial manifest completion/method qualification errors are preserved as audit evidence; corrected source audit is green. Both complete common-message source units are now ported; resource/SAT and full solver completion are not promoted beyond their actual scope.
+
+User-requested readability correction inserts a colon between existing source filenames and line numbers throughout this progress log and canonical manifest, e.g. polynomial.cpp:4507-4528. No prior Go implementation bytes change for this formatting. The derivative numeric acquisition issue remains an active implementation obligation, now prioritized for actual public/internal leaf transport and full failure proof rather than left at documentation-only qualification.
+
+Root immutable1202-Go clean snapshot preserves1198 unselected accepted ancestors. Full uncached CGO_ENABLED=0 native terminal0 112.269s, checked/debug terminal0 809.689s with30m timeout, native/debug vets terminal0 5.252s/5.313s and source/no-generics terminal0 3.601s. No.cache exists in the tested module before/after; exact whole Go bytes match main. Evidence: .cache/common-messages-current1202-frozen-inventory.json, .cache/common-messages-evidence/ and .cache/common-messages-current1202-evidence/. Fresh main source audit verifies canonical metadata/readability. Full solver/interpolation goal ACTIVE; WASM/WASI/race deferred.

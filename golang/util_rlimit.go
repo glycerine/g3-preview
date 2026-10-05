@@ -100,9 +100,9 @@ func (r *utilReslimit) pop() {
 func (r *utilReslimit) cancelFlag() bool { return r.cancelCount.Load() > 0 && !r.suspended }
 func (r *utilReslimit) cancelMessage() string {
 	if r.cancelCount.Load() > 0 {
-		return "canceled"
+		return Z3CanceledMessage
 	}
-	return "max. resource limit exceeded"
+	return Z3MaxResourceMessage
 }
 func (r *utilReslimit) pushChild(child *utilReslimit) error {
 	utilReslimitCancelMu.Lock()

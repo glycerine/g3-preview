@@ -1,4 +1,4 @@
-// Source: src/sat/sat_solver.cpp; src/sat/sat_clause.h. Licensed under the MIT license.
+// Source: src/sat/sat_solver.cpp; src/sat/sat_solver.h:268-282; src/sat/sat_clause.h. Licensed under the MIT license.
 package g3
 
 import (
@@ -118,7 +118,7 @@ func (s *satSolverPropagationState) checkpoint() error {
 		}
 		s.variables.modelIsCurrent = false
 		s.variables.modelKnown = true
-		return ErrSATSolverCanceled
+		return SATSolverException{NewDefaultException(Z3CanceledMessage)}
 	}
 	s.numCheckpoints++
 	if s.numCheckpoints < 10 {
@@ -134,7 +134,7 @@ func (s *satSolverPropagationState) checkpoint() error {
 		return e
 	}
 	if n > cfg.MaxMemory {
-		return ErrSATSolverMaxMemory
+		return SATSolverException{NewDefaultException(Z3MaxMemoryMessage)}
 	}
 	return nil
 }

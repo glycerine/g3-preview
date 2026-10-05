@@ -9761,7 +9761,7 @@
           ]
         },
         {
-          "name": "sort_size stream insertion exact infinite/very-big/finite decimal (ast.cpp235-239)",
+          "name": "sort_size stream insertion exact infinite/very-big/finite decimal (ast.cpp:235-239)",
           "status": "ported",
           "go_target": "ast_sort_size.go",
           "tests": [
@@ -10713,7 +10713,7 @@
           ]
         },
         {
-          "name": "sort_size private kind/storage, default/uint64/copy constructors and finite/very-big/infinite factories (ast.h291-319)",
+          "name": "sort_size private kind/storage, default/uint64/copy constructors and finite/very-big/infinite factories (ast.h:291-319)",
           "status": "ported",
           "go_target": "ast_sort_size.go",
           "tests": [
@@ -10722,7 +10722,7 @@
           ]
         },
         {
-          "name": "sort_size rational constructor actual IsUint64 then Uint64 or very-big (ast.h307-316)",
+          "name": "sort_size rational constructor actual IsUint64 then Uint64 or very-big (ast.h:307-316)",
           "status": "ported",
           "go_target": "ast_sort_size.go",
           "tests": [
@@ -10731,7 +10731,7 @@
           ]
         },
         {
-          "name": "sort_size predicates and inclusive base2 power>=64 threshold (ast.h321-325)",
+          "name": "sort_size predicates and inclusive base2 power>=64 threshold (ast.h:321-325)",
           "status": "ported",
           "go_target": "ast_sort_size.go",
           "tests": [
@@ -10740,7 +10740,7 @@
           ]
         },
         {
-          "name": "sort_size size finite SASSERT precondition (ast.h327)",
+          "name": "sort_size size finite SASSERT precondition (ast.h:327)",
           "status": "ported",
           "go_target": "ast_sort_size.go",
           "tests": [
@@ -36307,7 +36307,7 @@
           ]
         },
         {
-          "name": "core_manager and manager destructor bodies cpp138\u2013155/1259\u20131265, reverse numeral-vector members, then mpzzp.h97\u2013105 actual source Del; explicit caller CleanupPolynomial and separate owning abort",
+          "name": "core_manager and manager destructor bodies cpp138\u2013155/1259\u20131265, reverse numeral-vector members, then mpzzp.h:97\u2013105 actual source Del; explicit caller CleanupPolynomial and separate owning abort",
           "status": "ported",
           "go_target": "mpnum/upolynomial_source_finalize.go",
           "tests": [
@@ -36880,7 +36880,7 @@
           ]
         },
         {
-          "name": "core_manager and manager destructor bodies cpp138\u2013155/1259\u20131265, reverse numeral-vector members, then mpzzp.h97\u2013105 actual source Del; explicit caller CleanupPolynomial and separate owning abort",
+          "name": "core_manager and manager destructor bodies cpp138\u2013155/1259\u20131265, reverse numeral-vector members, then mpzzp.h:97\u2013105 actual source Del; explicit caller CleanupPolynomial and separate owning abort",
           "status": "ported",
           "go_target": "mpnum/upolynomial_source_finalize.go",
           "tests": [
@@ -62412,7 +62412,9 @@
         "sat_solver_inspection_fault_test.go",
         "sat_solver_views.go",
         "sat_solver_clause_iterator.go",
-        "sat_solver_views_test.go"
+        "sat_solver_views_test.go",
+        "util_common_messages.go",
+        "util_common_messages_source_test.go"
       ],
       "tests": [
         "TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots",
@@ -62697,7 +62699,8 @@
         "TestSATSolverBorrowedCanceledActualResourcePrefix",
         "TestSATSolverBorrowedZeroAllocAndCopiedClosedGuards",
         "TestSATSolverBorrowedReachedCurrentHeaderReadGuards",
-        "TestSATSolverClauseIteratorLearnedEmptyAndOwnerLifetime"
+        "TestSATSolverClauseIteratorLearnedEmptyAndOwnerLifetime",
+        "TestCommonMessagesSATExceptionCapturesReachedBinding"
       ],
       "conditionals": [
         {
@@ -63279,6 +63282,14 @@
             "TestSATSolverBorrowedZeroAllocAndCopiedClosedGuards",
             "TestSATSolverBorrowedReachedCurrentHeaderReadGuards",
             "TestSATSolverClauseIteratorLearnedEmptyAndOwnerLifetime"
+          ]
+        },
+        {
+          "name": "checkpoint sat_solver.h:268-282 captures shared diagnostic at actual exception construction",
+          "status": "partial",
+          "go_target": "sat_solver_propagation_control.go",
+          "tests": [
+            "TestCommonMessagesSATExceptionCapturesReachedBinding"
           ]
         }
       ],
@@ -101445,22 +101456,54 @@
       "path": "src/util/common_msgs.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "util_common_messages.go",
+        "util_common_messages_source_test.go"
+      ],
+      "tests": [
+        "TestCommonMessagesSourceDefaults",
+        "TestCommonMessagesAllStaticBindingsRemainMutable",
+        "TestCommonMessagesResourceLimitReadsCurrentBindings",
+        "TestCommonMessagesSATExceptionCapturesReachedBinding"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "All seven static message initializers and shared macro bindings common_msgs.h:22-39/common_msgs.cpp:21-27",
+          "status": "ported",
+          "go_target": "util_common_messages.go",
+          "tests": [
+            "TestCommonMessagesSourceDefaults",
+            "TestCommonMessagesAllStaticBindingsRemainMutable",
+            "TestCommonMessagesResourceLimitReadsCurrentBindings",
+            "TestCommonMessagesSATExceptionCapturesReachedBinding"
+          ]
+        }
+      ],
+      "ownership": [
+        "One mutable Go string binding per source static char-const pointer/macro alias; immutable bytes retain existing exceptions independently of later pointer reassignment. No Runtime allocation, copy of an owner header, or pointer-bearing hot record."
+      ],
+      "deviations": [
+        "Go strings replace native C-string pointers and macro names; no C ABI, null/dangling pointer domain or native pointer identity is exposed. Source consumers reread current bindings at the reached lookup/throw; already constructed exceptions keep their original message."
+      ]
     },
     {
       "path": "src/util/common_msgs.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "util_common_messages.go",
+        "util_common_messages_source_test.go"
+      ],
+      "tests": [
+        "TestCommonMessagesSourceDefaults",
+        "TestCommonMessagesAllStaticBindingsRemainMutable",
+        "TestCommonMessagesResourceLimitReadsCurrentBindings",
+        "TestCommonMessagesSATExceptionCapturesReachedBinding"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -101471,11 +101514,27 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "All seven static message initializers and shared macro bindings common_msgs.h:22-39/common_msgs.cpp:21-27",
+          "status": "ported",
+          "go_target": "util_common_messages.go",
+          "tests": [
+            "TestCommonMessagesSourceDefaults",
+            "TestCommonMessagesAllStaticBindingsRemainMutable",
+            "TestCommonMessagesResourceLimitReadsCurrentBindings",
+            "TestCommonMessagesSATExceptionCapturesReachedBinding"
+          ]
+        }
+      ],
+      "ownership": [
+        "One mutable Go string binding per source static char-const pointer/macro alias; immutable bytes retain existing exceptions independently of later pointer reassignment. No Runtime allocation, copy of an owner header, or pointer-bearing hot record."
+      ],
+      "deviations": [
+        "Go strings replace native C-string pointers and macro names; no C ABI, null/dangling pointer domain or native pointer identity is exposed. Source consumers reread current bindings at the reached lookup/throw; already constructed exceptions keep their original message."
+      ]
     },
     {
       "path": "src/util/container_util.h",
@@ -114166,7 +114225,7 @@
         "Explicit LE word codecs are a Go source-storage adapter, not an additional C++ allocator algorithm. MPZ backend typed accesses must bound against actual object extent; this prerequisite does not complete MPZ/Natural backing or tracked release/global lifecycle.",
         "Ordinary retry of an interrupted beforefree invocation resumes its real retained phase; explicit CompleteRelease can acknowledge afterfree failure without counter repair. This is a Go owning cleanup adapter to bounded source-undefined signed-overflow domains, not a C++ exception recovery claim. Actual MPZ/Natural and transitive numerical failure owners remain required.",
         "Selected bound OOM/count exit/stream gap is now implemented: actual Runtime failure routes, real subprocess101/113 with Budget refusal still active, file badbit cannot suppress exit, borrowed CString mutation/false/null retention, errors.As derived/base catch. Prior broad global/exit/stream-open notes remain historical beyond this explicit provider binding. Generated initialize/finalize callbacks and process-global singleton wiring remain OPEN; direct Go file emission is not arbitrary ostream locale/flags/exception/native buffering ABI. Closed Runtime count getter fixture is checked invalid-lifetime prefix coverage, not valid source exhaustion. src/test/memory.cpp Windows high-level API campaign is not credited.",
-        "Only memory_manager.cpp102 assignment is selected. Outer first-initialize max-size/pointer guard, generated child initialization, fully-initialized publication/wait and process finalize remain incomplete; leaf fixtures are independent, not registered source driver credit.",
+        "Only memory_manager.cpp:102 assignment is selected. Outer first-initialize max-size/pointer guard, generated child initialization, fully-initialized publication/wait and process finalize remain incomplete; leaf fixtures are independent, not registered source driver credit.",
         "Caller-confined explicit binding, not native process-global/OpenMP singleton.",
         "Guarded failed-first single-lane spin domain; no silent retry or flag repair.",
         "Repeated stopped source destructor invocation is guarded; Close is separate exact owning abort.",
@@ -114467,7 +114526,7 @@
         "Source signed-overflow/invalid-lane domains use scalar typed outcomes after completed field prefixes. Containing allocator must execute real physical operations between counter phases. Physical hooks, headers, generated callbacks, OOM exits/streams, concurrent global service and consumer integration remain open.",
         "Size_t promotion is explicit32/64: LP64 updates use unsigned modular arithmetic; ILP32 shrink delta uses uint32 subtraction before LL64 promotion. Signed synchronization/count and ILP32 promoted overflow have typed boundaries after prior field prefixes.",
         "Selected bound OOM/count exit/stream gap is now implemented: actual Runtime failure routes, real subprocess101/113 with Budget refusal still active, file badbit cannot suppress exit, borrowed CString mutation/false/null retention, errors.As derived/base catch. Prior broad global/exit/stream-open notes remain historical beyond this explicit provider binding. Generated initialize/finalize callbacks and process-global singleton wiring remain OPEN; direct Go file emission is not arbitrary ostream locale/flags/exception/native buffering ABI. Closed Runtime count getter fixture is checked invalid-lifetime prefix coverage, not valid source exhaustion. src/test/memory.cpp Windows high-level API campaign is not credited.",
-        "Only memory_manager.cpp102 assignment is selected. Outer first-initialize max-size/pointer guard, generated child initialization, fully-initialized publication/wait and process finalize remain incomplete; leaf fixtures are independent, not registered source driver credit.",
+        "Only memory_manager.cpp:102 assignment is selected. Outer first-initialize max-size/pointer guard, generated child initialization, fully-initialized publication/wait and process finalize remain incomplete; leaf fixtures are independent, not registered source driver credit.",
         "Caller-confined explicit binding, not native process-global/OpenMP singleton.",
         "Guarded failed-first single-lane spin domain; no silent retry or flag repair.",
         "Repeated stopped source destructor invocation is guarded; Close is separate exact owning abort.",
@@ -119842,7 +119901,7 @@
           ]
         },
         {
-          "name": "Source mpq.h191\u2013237,562,666\u2013669 same-owner receiver Copy, scalar sign/structural predicates/NUM hash and selected direct component extraction; no whole-pair raw-denominator preflight",
+          "name": "Source mpq.h:191\u2013237,562,666\u2013669 same-owner receiver Copy, scalar sign/structural predicates/NUM hash and selected direct component extraction; no whole-pair raw-denominator preflight",
           "status": "ported",
           "go_target": "mpnum/mpq_inspect.go",
           "tests": [
@@ -121873,7 +121932,7 @@
           ]
         },
         {
-          "name": "Explicit completed-owner destructor body and reverse members (mpz.cpp142\u2013161)",
+          "name": "Explicit completed-owner destructor body and reverse members (mpz.cpp:142\u2013161)",
           "status": "ported",
           "go_target": "mpnum/mpz_source_finalize.go",
           "tests": [
@@ -122119,7 +122178,7 @@
         "Root output is now literal SET(input) before in-place domain guards and bisection, superseding previous output-atomic Root description. Wrapped Power mask and signed/TLS source-pointer domains remain explicit guarded domains; no transitive source/global/backend completion promotion.",
         "Partial SET acquisition prerequisite only; allocating finite-field PNormalize, complete Discriminant source-stop/reservation/coldgraph proof and source parent remain open. No source unit/API promotion.",
         "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open.",
-        "Existing AddMul/SubMul success arithmetic and inline +/-1 shortcuts are covered, but mpnum/mpz_gcd.go deferred Del eagerly cleans RAW temporary on body failure and ignores end-DEL errors. Source mpz.h393-426 deletes only after successful Mul plus Add/Sub. Shared literal engine and exact actual-leaf owning continuation are explicit open obligations; previous ported method status corrected to partial after source review."
+        "Existing AddMul/SubMul success arithmetic and inline +/-1 shortcuts are covered, but mpnum/mpz_gcd.go deferred Del eagerly cleans RAW temporary on body failure and ignores end-DEL errors. Source mpz.h:393-426 deletes only after successful Mul plus Add/Sub. Shared literal engine and exact actual-leaf owning continuation are explicit open obligations; previous ported method status corrected to partial after source review."
       ]
     },
     {
@@ -123725,7 +123784,7 @@
         "Public failed-value reads still reject both dead Go descriptors; defined source-only NULL deletion is modeled independently. Postexception source small-scalar continuation, staged CopyFrom/ffSetInteger topology, process/TLS binding and complete source lifecycle remain separate obligations. Existing cleanupPending retry acknowledges Go owning continuation, not another literal source destructor. See PORT_PROGRESS.md.",
         "Root output is now literal SET(input) before in-place domain guards and bisection, superseding previous output-atomic Root description. Wrapped Power mask and signed/TLS source-pointer domains remain explicit guarded domains; no transitive source/global/backend completion promotion.",
         "Partial SET acquisition prerequisite only; allocating finite-field PNormalize, complete Discriminant source-stop/reservation/coldgraph proof and source parent remain open. No source unit/API promotion.",
-        "Existing AddMul/SubMul success arithmetic and inline +/-1 shortcuts are covered, but mpnum/mpz_gcd.go deferred Del eagerly cleans RAW temporary on body failure and ignores end-DEL errors. Source mpz.h393-426 deletes only after successful Mul plus Add/Sub. Shared literal engine and exact actual-leaf owning continuation are explicit open obligations; previous ported method status corrected to partial after source review."
+        "Existing AddMul/SubMul success arithmetic and inline +/-1 shortcuts are covered, but mpnum/mpz_gcd.go deferred Del eagerly cleans RAW temporary on body failure and ignores end-DEL errors. Source mpz.h:393-426 deletes only after successful Mul plus Add/Sub. Shared literal engine and exact actual-leaf owning continuation are explicit open obligations; previous ported method status corrected to partial after source review."
       ]
     },
     {
@@ -129273,7 +129332,9 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "util_rlimit.go"
+        "util_rlimit.go",
+        "util_common_messages.go",
+        "util_common_messages_source_test.go"
       ],
       "tests": [
         "TestResourceLimitSourceScopes",
@@ -129283,7 +129344,8 @@
         "TestResourceLimitBudgetsAndWarmScopes",
         "TestResourceLimitConcurrentCancel",
         "TestResourceLimitSuspensionAndLateChild",
-        "TestResourceLimitGrowthFailureAndPeak"
+        "TestResourceLimitGrowthFailureAndPeak",
+        "TestCommonMessagesResourceLimitReadsCurrentBindings"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -129391,6 +129453,14 @@
             "TestResourceLimitConcurrentCancel",
             "TestResourceLimitSuspensionAndLateChild",
             "TestResourceLimitGrowthFailureAndPeak"
+          ]
+        },
+        {
+          "name": "cancel_msg rlimit.cpp:62-68 reads actual shared message binding",
+          "status": "ported",
+          "go_target": "util_rlimit.go",
+          "tests": [
+            "TestCommonMessagesResourceLimitReadsCurrentBindings"
           ]
         }
       ],
