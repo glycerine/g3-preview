@@ -28633,7 +28633,8 @@
         "mpnum/polynomial_primitive_public.go",
         "mpnum/polynomial_primitive_public_source_test.go",
         "mpnum/polynomial_square_free.go",
-        "mpnum/polynomial_square_free_source_test.go"
+        "mpnum/polynomial_square_free_source_test.go",
+        "mpnum/polynomial_coefficient_receipt.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -29173,7 +29174,15 @@
         "TestPolynomialSquareFreeDormantSourceSevenExpressions",
         "TestPolynomialSquareFreeEveryCheckpointFrontier",
         "TestPolynomialSquareFreeCallerPublicationPreservesForeignCallbackRoot",
-        "TestPolynomialSquareFreeCalleeAbortPreservesEarlierDerivativeCohort"
+        "TestPolynomialSquareFreeCalleeAbortPreservesEarlierDerivativeCohort",
+        "TestPolynomialFactoryActualIncomingINCTransfersBeforeOldDECCallback",
+        "TestPolynomialFactoryReferenceWrongPointerAndForeignReceiptGuards",
+        "TestPolynomialParentFactoryHelpersEveryActualPrefix",
+        "TestPolynomialCoefficientReceiptActualSETBeforeINC",
+        "TestPolynomialCoefficientReceiptPreservesOlderForeignConstructor",
+        "TestPolynomialCoefficientReceiptUniqueFrameAndRejectedEntry",
+        "TestPolynomialCoefficientReceiptCachedMonomialCreatesNoLeafAuthority",
+        "TestPolynomialCoefficientReceiptActualCalleeCompletionClearsTag"
       ],
       "conditionals": [
         {
@@ -32181,6 +32190,26 @@
             "TestPolynomialSquareFreeCallerPublicationPreservesForeignCallbackRoot",
             "TestPolynomialSquareFreeCalleeAbortPreservesEarlierDerivativeCohort"
           ]
+        },
+        {
+          "name": "manager::imp::coeff optional actual invocation leaf ownership cpp3264-3277",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_coefficient_receipt.go",
+          "tests": [
+            "TestPolynomialCoefficientReceiptActualSETBeforeINC",
+            "TestPolynomialCoefficientReceiptPreservesOlderForeignConstructor",
+            "TestPolynomialCoefficientReceiptUniqueFrameAndRejectedEntry",
+            "TestPolynomialCoefficientReceiptCachedMonomialCreatesNoLeafAuthority",
+            "TestPolynomialCoefficientReceiptActualCalleeCompletionClearsTag"
+          ]
+        },
+        {
+          "name": "Neg and scalar div optional parent append/factory receipts cpp2757-2768,5940-5951",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_scalar_div.go",
+          "tests": [
+            "TestPolynomialParentFactoryHelpersEveryActualPrefix"
+          ]
         }
       ],
       "ownership": [
@@ -32238,7 +32267,11 @@
         "Generic owning construction/close drains exact retained constructor and transported NUM roots; raw factory contributes no INC and actual caller reference refuses before cleanup",
         "Append receipts record actual coefficient construction/INC/transfer actions; mixed foreign cohorts refuse unchanged as a partial prerequisite; ordered mixed-cohort retirement and parent Discriminant remain open",
         "Actual derivative created roots retain pointer-free invocation tags published with their append, charged with backing, and cleared at actual successful monomial INC or exact owning consumption. Per-receipt cursor drains only its invocation; later abort preserves older GF2 cohort. Generic manager-wide cleanup remains separate. Source NUM/cause/stage remain sticky, explicit owned cleanup acknowledges consumed last DEC without dropping older lexical monomial first. No registry or reference-count inference grants cohort authority.",
-        "SquareFree literal lexical NUM/reference order uses exact derivative/ExactDiv invocation receipts in actual charged GCD scope. Source stopped child remains before older scopes; explicit owning cleanup acknowledges completed children before locals, then only matched unjoined roots. Caller incoming INC and foreign created monomial retain actual ownership; earlier GF2 derivative cohort remains untouched."
+        "SquareFree literal lexical NUM/reference order uses exact derivative/ExactDiv invocation receipts in actual charged GCD scope. Source stopped child remains before older scopes; explicit owning cleanup acknowledges completed children before locals, then only matched unjoined roots. Caller incoming INC and foreign created monomial retain actual ownership; earlier GF2 derivative cohort remains untouched.",
+        "Coefficient optional exact core/frame/nonwrapping invocation receipts record actual monomial factory started/created outcomes and only new pending allocator tokens at its actual Allocate leaf",
+        "Actual successful monomial INC transfers generated authority; exact creation completion clears matching coefficient callee tag; borrowed cached monomials acquire no new factory authority",
+        "Parent optional Neg/ScalarDiv arguments route through unchanged arithmetic engines and actual shared append/factory acquisition; incoming polynomial INC transfers raw factory before old DEC/callback",
+        "Parent Discriminant, ordered foreign mixed-cohort retirement and NUM DT after published factory stop proofs remain open"
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -124007,7 +124040,9 @@
         "TestPolynomialPSCNextHeapBufferIndependentRemainder",
         "TestPolynomialPSCBufferDestructorStopsOlderSourceLocals",
         "TestPolynomialPrimitivePartReturnedTemporaryPrecedesCallerAssignment",
-        "TestPolynomialResultantICCPStoppedChildPrecedesOlderLocals"
+        "TestPolynomialResultantICCPStoppedChildPrecedesOlderLocals",
+        "TestPolynomialFactoryActualIncomingINCTransfersBeforeOldDECCallback",
+        "TestPolynomialFactoryReferenceWrongPointerAndForeignReceiptGuards"
       ],
       "conditionals": [
         {
@@ -124157,7 +124192,8 @@
         "Actual AST callbacks, source INC-before-growth/set-index ordering, ASC teardown, backing-bound views and charged initialized high-water metadata are recorded in PORT_PROGRESS.md#audit-ast-core-packet-md. No fake rollback consumes orphan INC prefixes; source manager teardown remains responsible for actual unowned nodes.",
         "Actual dependency INC/DEC callbacks, raw scalar tokens and charged16-byte obj_ref/24-byte ref_vector/160-byte inline buffer records in existing real AST allocators. Source INC-before-growth, retained backing, captured-end append and consumed cleanup progress preserved. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
         "Actual completed lexical references and source INC-before-push incoming token, charged inline16/cold header and Runtime scalar-handle backing. Named failed allocation/consumed destructor state retained until owning abort. See PORT_PROGRESS.md.",
-        "Cold reflected GCD/ICCP/Normalize records acquire only actual guarded invocations. Receipts match exact manager, stable frame pointer and nonwrapping invocation nonce; common PSC generation is not invocation identity. Completed younger source locals precede older caller locals; explicit owning numeric/reference/buffer abort is a separate pass. Source pp moves its result to a named returned temporary, ends helper c/i before caller old-DEC, then ends the temporary. Named pending/raw/backing/retired/cold graph includes all reached records; no registry/RC/whole-call snapshot supplies ownership."
+        "Cold reflected GCD/ICCP/Normalize records acquire only actual guarded invocations. Receipts match exact manager, stable frame pointer and nonwrapping invocation nonce; common PSC generation is not invocation identity. Completed younger source locals precede older caller locals; explicit owning numeric/reference/buffer abort is a separate pass. Source pp moves its result to a named returned temporary, ends helper c/i before caller old-DEC, then ends the temporary. Named pending/raw/backing/retired/cold graph includes all reached records; no registry/RC/whole-call snapshot supplies ownership.",
+        "Optional factory receipt transfers exact raw constructor authority at actual successful incoming INC before old-reference DEC/callback; nil path uses unchanged same assignment engine"
       ],
       "deviations": [
         "This concrete specialization does not implement all AST/other source specializations or remaining generic helper/hash surfaces. Ref-vector null callbacks and nonempty self-append have explicit checked Go adaptations.",

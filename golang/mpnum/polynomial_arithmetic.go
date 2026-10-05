@@ -152,6 +152,9 @@ func (m *MultivariatePolynomialCore) Neg(p Polynomial) (Polynomial, error) {
 	return m.negWithReceipt(p, nil)
 }
 func (m *MultivariatePolynomialCore) negWithReceipt(p Polynomial, receipt *polynomialNegInvocationReceipt) (result Polynomial, cause error) {
+	return m.negWithParentReceipts(p, receipt, nil, nil)
+}
+func (m *MultivariatePolynomialCore) negWithParentReceipts(p Polynomial, receipt *polynomialNegInvocationReceipt, appendReceipt *polynomialCheapAppendInvocationReceipt, factoryReceipt *polynomialFactoryInvocationReceipt) (result Polynomial, cause error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
@@ -176,6 +179,11 @@ func (m *MultivariatePolynomialCore) negWithReceipt(p Polynomial, receipt *polyn
 	defer func() {
 		m.negativeBodyCause = cause
 		m.negativeResult = result
+		if m.matchesFactoryInvocation(factoryReceipt) && m.factoryInvocation.result == result {
+			// The guarded constructor transferred its raw pointer to the
+			// parent factory frame before this NUM's source destructor.
+			m.negativeResult = Polynomial{}
+		}
 		if e := m.finishNegSource(); e != nil {
 			result = Polynomial{}
 			cause = polynomialNewtonJoin(cause, e)
@@ -216,7 +224,7 @@ func (m *MultivariatePolynomialCore) negWithReceipt(p Polynomial, receipt *polyn
 		if x != nil {
 			return Polynomial{}, x
 		}
-		e = m.cheap.add(&m.negativeCoefficient, t, false)
+		e = m.cheap.addWithAppendReceipt(&m.negativeCoefficient, t, false, appendReceipt)
 		e = polynomialNewtonJoin(e, m.numeric.after(m.integer, before))
 		if e != nil {
 			return Polynomial{}, e
@@ -226,7 +234,7 @@ func (m *MultivariatePolynomialCore) negWithReceipt(p Polynomial, receipt *polyn
 	if x != nil {
 		return Polynomial{}, x
 	}
-	result, e = m.cheap.mk(false)
+	result, e = m.cheap.mkWithAppendReceipt(false, appendReceipt, factoryReceipt)
 	e = polynomialNewtonJoin(e, m.numeric.after(m.integer, before))
 	return result, e
 }

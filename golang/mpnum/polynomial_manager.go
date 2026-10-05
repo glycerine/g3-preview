@@ -87,6 +87,7 @@ type MultivariatePolynomialCore struct {
 	sourceDecDone, sourceDeleteNeeded                                                          [2]bool
 	polynomialNegScope
 	factoryInvocation                                            polynomialFactoryScope
+	coefficientInvocation                                        polynomialCoefficientScope
 	scalarDivision                                               polynomialScalarDivScope
 	deletionHead                                                 *PolynomialDeletionHandler
 	callbackDepth                                                uint32
@@ -385,6 +386,9 @@ func (m *MultivariatePolynomialCore) MkTerms(as []Int, ms []Monomial) (Polynomia
 	return m.som.mk(false)
 }
 func (m *MultivariatePolynomialCore) CloseChecked() error {
+	if m != nil && m.self == m && m.coefficientInvocation.active {
+		return ErrPolynomialPending
+	}
 	if m != nil && m.self == m && m.displayPending() {
 		return ErrPolynomialPending
 	}

@@ -60,6 +60,7 @@ func validMonomialPowers(p []MonomialPower) bool {
 type monomialFactoryOutcome struct {
 	created, started bool
 	generation       uint64
+	allocator        [3]memory.Block
 }
 
 func (m *MonomialManager) MkMonomial(p []MonomialPower) (Monomial, error) {
@@ -172,7 +173,23 @@ func (m *MonomialManager) internSourceTempCreated(t *monomialTemp, key monomialK
 	}
 	requested := monomialObjectSize(n)
 	l.requested = requested
+	var allocatorBefore [3]memory.Block
+	if outcome != nil {
+		allocatorBefore, e = m.allocator.PendingRoots()
+		if e != nil {
+			return Monomial{}, e
+		}
+	}
 	object, e := m.allocator.Allocate(uint64(requested))
+	if outcome != nil {
+		after, x := m.allocator.PendingRoots()
+		for i := range after {
+			if after[i] != (memory.Block{}) && after[i] != allocatorBefore[i] {
+				outcome.allocator[i] = after[i]
+			}
+		}
+		e = polynomialNewtonJoin(e, x)
+	}
 	if object != (memory.ObjectRef{}) {
 		l.raw = object
 		l.live = true
@@ -399,6 +416,11 @@ func (m *MonomialManager) nextContinuationGeneration() uint64 {
 }
 func (m *MonomialManager) completeCreationContinuation() {
 	c := &m.creation
+	if s := c.coefficientParent; s != nil && s.active && s.invocation == c.coefficientInvocation && s.calleeGeneration == c.generation {
+		s.calleeGeneration = 0
+	}
+	c.coefficientParent = nil
+	c.coefficientInvocation = 0
 	if p := c.parent; p != nil && p.generatedCalleeGeneration == c.generation {
 		p.generatedCalleePending = false
 		p.generatedCalleeGeneration = 0

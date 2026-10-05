@@ -57,6 +57,9 @@ func (b *polynomialSOM) addConsumedNumeric(a *Int, term Monomial, take bool, con
 	return b.addConsumedReceipts(a, term, take, consumed, receipt, nil)
 }
 func (b *polynomialSOM) addConsumedReceipts(a *Int, term Monomial, take bool, consumed *bool, receipt *polynomialNumericRoots, appendReceipt *polynomialCheapAppendInvocationReceipt) (cause error) {
+	return b.addConsumedCoefficientReceipts(a, term, take, consumed, receipt, appendReceipt, nil)
+}
+func (b *polynomialSOM) addConsumedCoefficientReceipts(a *Int, term Monomial, take bool, consumed *bool, receipt *polynomialNumericRoots, appendReceipt *polynomialCheapAppendInvocationReceipt, coefficientReceipt *polynomialCoefficientInvocationReceipt) (cause error) {
 	if consumed != nil {
 		*consumed = false
 	}
@@ -154,6 +157,7 @@ func (b *polynomialSOM) addConsumedReceipts(a *Int, term Monomial, take bool, co
 	if e = m.monomials.IncRef(term); e != nil {
 		return e
 	}
+	m.transferCoefficientGenerated(coefficientReceipt, term)
 	if appendScope != nil {
 		appendScope.pending = term
 	}

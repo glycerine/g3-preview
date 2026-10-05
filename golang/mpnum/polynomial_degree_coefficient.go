@@ -2,6 +2,8 @@
 // Licensed under the MIT license.
 package mpnum
 
+import "github.com/glycerine/g3/golang/memory"
+
 func (m *MultivariatePolynomialCore) IsZero(p Polynomial) (bool, error) {
 	if e := m.check(); e != nil {
 		return false, e
@@ -114,11 +116,29 @@ func (m *MultivariatePolynomialCore) coefficientAssertions(x uint32, reduct bool
 	return nil
 }
 func (m *MultivariatePolynomialCore) generatedRemoveVariable(term Monomial, x uint32) (Monomial, error) {
+	return m.generatedRemoveVariableWithCoefficient(term, x, nil)
+}
+func (m *MultivariatePolynomialCore) generatedRemoveVariableWithCoefficient(term Monomial, x uint32, scope *polynomialCoefficientScope) (Monomial, error) {
 	if m.generatedActive {
 		return Monomial{}, ErrPolynomialPending
 	}
 	outcome := monomialFactoryOutcome{}
 	a, e := m.monomials.removeVariableCreated(term, x, &outcome)
+	if scope != nil && scope == &m.coefficientInvocation && scope.active && scope.executing {
+		for i, root := range outcome.allocator {
+			if root != (memory.Block{}) {
+				scope.allocator[i] = root
+			}
+		}
+		if e != nil && outcome.started && m.monomials.creation.generation == outcome.generation {
+			scope.calleeGeneration = outcome.generation
+			m.monomials.creation.coefficientParent = scope
+			m.monomials.creation.coefficientInvocation = scope.invocation
+		}
+		if e == nil && outcome.created {
+			scope.generated = a
+		}
+	}
 	if e != nil && outcome.started {
 		m.recordGeneratedCallee(outcome)
 	}
@@ -148,6 +168,12 @@ func (m *MultivariatePolynomialCore) CoeffWithReduct(p Polynomial, x, k uint32, 
 	return m.coeffCore(p, x, k, &reduct.root)
 }
 func (m *MultivariatePolynomialCore) coeffCore(p Polynomial, x, k uint32, reduct *polynomialReference) (Polynomial, error) {
+	return m.coeffCoreWithReceipts(p, x, k, reduct, nil, nil, nil)
+}
+func (m *MultivariatePolynomialCore) coeffWithReceipts(p Polynomial, x, k uint32, receipt *polynomialCoefficientInvocationReceipt, appendReceipt *polynomialCheapAppendInvocationReceipt, factoryReceipt *polynomialFactoryInvocationReceipt) (Polynomial, error) {
+	return m.coeffCoreWithReceipts(p, x, k, nil, receipt, appendReceipt, factoryReceipt)
+}
+func (m *MultivariatePolynomialCore) coeffCoreWithReceipts(p Polynomial, x, k uint32, reduct *polynomialReference, receipt *polynomialCoefficientInvocationReceipt, appendReceipt *polynomialCheapAppendInvocationReceipt, factoryReceipt *polynomialFactoryInvocationReceipt) (result Polynomial, cause error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
@@ -157,6 +183,21 @@ func (m *MultivariatePolynomialCore) coeffCore(p Polynomial, x, k uint32, reduct
 	n, e := m.readWord(p, 8)
 	if e != nil {
 		return Polynomial{}, e
+	}
+	var scope *polynomialCoefficientScope
+	if receipt != nil {
+		scope = &m.coefficientInvocation
+		if scope.active || scope.invocation == ^uint64(0) {
+			return Polynomial{}, ErrPolynomialPending
+		}
+		*scope = polynomialCoefficientScope{active: true, executing: true, invocation: scope.invocation + 1}
+		*receipt = polynomialCoefficientInvocationReceipt{manager: m, frame: scope, invocation: scope.invocation}
+		defer func() {
+			scope.executing = false
+			if cause == nil && scope.generated == (Monomial{}) && scope.calleeGeneration == 0 && scope.allocator == ([3]memory.Block{}) {
+				scope.active = false
+			}
+		}()
 	}
 	for i := uint32(0); i < n; i++ {
 		term, e := m.monomialCore(p, i)
@@ -172,11 +213,11 @@ func (m *MultivariatePolynomialCore) coeffCore(p Polynomial, x, k uint32, reduct
 			if e != nil {
 				return Polynomial{}, e
 			}
-			term, e = m.generatedRemoveVariable(term, x)
+			term, e = m.generatedRemoveVariableWithCoefficient(term, x, scope)
 			if e != nil {
 				return Polynomial{}, e
 			}
-			if e = m.cheap.add(&a, term, false); e != nil {
+			if e = m.cheap.addConsumedCoefficientReceipts(&a, term, false, nil, nil, appendReceipt, receipt); e != nil {
 				return Polynomial{}, e
 			}
 		} else if reduct != nil {
@@ -198,7 +239,7 @@ func (m *MultivariatePolynomialCore) coeffCore(p Polynomial, x, k uint32, reduct
 			return Polynomial{}, e
 		}
 	}
-	return m.cheap.mk(false)
+	return m.cheap.mkWithAppendReceipt(false, appendReceipt, factoryReceipt)
 }
 func (m *MultivariatePolynomialCore) LeadingCoefficient(p Polynomial, x uint32) (Polynomial, error) {
 	d, e := m.Degree(p, x)

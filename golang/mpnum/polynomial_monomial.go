@@ -50,6 +50,8 @@ type monomialLocation struct {
 	live, headerInitialized, published bool
 }
 type monomialCreation struct {
+	coefficientParent        *polynomialCoefficientScope
+	coefficientInvocation    uint64
 	generation               uint64
 	parent                   *MultivariatePolynomialCore
 	tableIndex, slot, id     uint32

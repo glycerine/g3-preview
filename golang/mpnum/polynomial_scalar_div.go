@@ -83,6 +83,9 @@ func (m *MultivariatePolynomialCore) scalarDiv(p Polynomial, d *Int) (Polynomial
 	return m.scalarDivWithReceipt(p, d, nil)
 }
 func (m *MultivariatePolynomialCore) scalarDivWithReceipt(p Polynomial, d *Int, receipt *polynomialScalarDivInvocationReceipt) (result Polynomial, cause error) {
+	return m.scalarDivWithParentReceipts(p, d, receipt, nil, nil)
+}
+func (m *MultivariatePolynomialCore) scalarDivWithParentReceipts(p Polynomial, d *Int, receipt *polynomialScalarDivInvocationReceipt, appendReceipt *polynomialCheapAppendInvocationReceipt, factoryReceipt *polynomialFactoryInvocationReceipt) (result Polynomial, cause error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
@@ -110,6 +113,9 @@ func (m *MultivariatePolynomialCore) scalarDivWithReceipt(p Polynomial, d *Int, 
 	defer func() {
 		s.bodyCause = cause
 		s.returned = result
+		if m.matchesFactoryInvocation(factoryReceipt) && m.factoryInvocation.result == result {
+			s.returned = Polynomial{}
+		}
 		if e := m.finishScalarDivSource(); e != nil {
 			result = Polynomial{}
 			cause = polynomialNewtonJoin(cause, e)
@@ -137,7 +143,7 @@ func (m *MultivariatePolynomialCore) scalarDivWithReceipt(p Polynomial, d *Int, 
 		if x != nil {
 			return Polynomial{}, x
 		}
-		e = m.cheap.add(&s.a, term, false)
+		e = m.cheap.addWithAppendReceipt(&s.a, term, false, appendReceipt)
 		e = polynomialNewtonJoin(e, s.numeric.after(m.integer, before))
 		if e != nil {
 			return Polynomial{}, e
@@ -147,6 +153,6 @@ func (m *MultivariatePolynomialCore) scalarDivWithReceipt(p Polynomial, d *Int, 
 	if x != nil {
 		return Polynomial{}, x
 	}
-	result, e = m.cheap.mk(false)
+	result, e = m.cheap.mkWithAppendReceipt(false, appendReceipt, factoryReceipt)
 	return result, polynomialNewtonJoin(e, s.numeric.after(m.integer, before))
 }

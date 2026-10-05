@@ -40,8 +40,14 @@ func polynomialReferenceDrop(m *MultivariatePolynomialCore, p *Polynomial, start
 	return nil
 }
 func (r *polynomialReference) assign(m *MultivariatePolynomialCore, p Polynomial) error {
+	return r.assignWithFactoryReceipt(m, p, nil)
+}
+func (r *polynomialReference) assignWithFactoryReceipt(m *MultivariatePolynomialCore, p Polynomial, receipt *polynomialFactoryInvocationReceipt) error {
 	if r.assigning {
 		return ErrPolynomialPending
+	}
+	if m.matchesFactoryInvocation(receipt) && m.factoryInvocation.result != p {
+		return ErrPolynomialOwner
 	}
 	if p != (Polynomial{}) {
 		if e := m.incRefCore(p); e != nil {
@@ -54,6 +60,9 @@ func (r *polynomialReference) assign(m *MultivariatePolynomialCore, p Polynomial
 	r.incoming = p
 	r.assigning = true
 	// Actual INC has completed and this real caller reference now owns incoming.
+	if e := m.transferFactoryResult(receipt, p); e != nil {
+		return e
+	}
 	if owner := m.squareRootOwner; owner != nil && owner.executing && m.callbackDepth == 0 && owner.freshResult == p {
 		owner.freshResult = Polynomial{}
 	}

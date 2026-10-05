@@ -140,6 +140,9 @@ func (m *MultivariatePolynomialCore) CleanupConstruction() error {
 	if m == nil || m.self != m {
 		return ErrPolynomialOwner
 	}
+	if m.coefficientInvocation.active {
+		return ErrPolynomialPending
+	}
 	return m.cleanupCreation()
 }
 
