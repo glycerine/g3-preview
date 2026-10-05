@@ -126718,9 +126718,26 @@
       "path": "src/util/permutation.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_unsigned_vector_runtime.go",
+        "util_unsigned_vector_runtime_test.go",
+        "util_permutation_runtime.go",
+        "util_permutation_runtime_test.go"
+      ],
+      "tests": [
+        "TestRuntimeUnsignedVectorGeometryResetAndWarmReuse",
+        "TestRuntimePermutationEveryConstructorReservationSourceMemberUnwind",
+        "TestRuntimeUnsignedVectorResetDoesNotReadOldSizeHeader",
+        "TestRuntimeUnsignedVectorResizeRetainsSizeUntilAllCapacityReady",
+        "TestRuntimeUnsignedVectorAndPermutationOwnerAndProviderGuards",
+        "TestRuntimePermutationIndependentResetSwapMove",
+        "TestRuntimePermutationMoveNoopLeavesInvalidIndicesUnread",
+        "TestRuntimePermutationSourceResetRetainsActualAlternatingFailurePrefix",
+        "TestRuntimePermutationDisplayExactInsertionAndRefusalPrefixes",
+        "TestRuntimePermutationResetEveryReservationPrefixAndRecovery",
+        "TestRuntimePermutationDestructorStoppedPhysicalReceiptKeepsOlderMember"
+      ],
       "assertions": [
         {
           "line": 54,
@@ -126749,9 +126766,39 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "concrete Runtime unsigned-vector/permutation class selected source reset alternating growth, swap, move_after, display, default-debug invariant and member destruction; exact ranges in cached source map",
+          "status": "partial",
+          "go_target": "util_permutation_runtime.go",
+          "tests": [
+            "TestRuntimeUnsignedVectorGeometryResetAndWarmReuse",
+            "TestRuntimePermutationEveryConstructorReservationSourceMemberUnwind",
+            "TestRuntimeUnsignedVectorResetDoesNotReadOldSizeHeader",
+            "TestRuntimeUnsignedVectorResizeRetainsSizeUntilAllCapacityReady",
+            "TestRuntimeUnsignedVectorAndPermutationOwnerAndProviderGuards",
+            "TestRuntimePermutationIndependentResetSwapMove",
+            "TestRuntimePermutationMoveNoopLeavesInvalidIndicesUnread",
+            "TestRuntimePermutationSourceResetRetainsActualAlternatingFailurePrefix",
+            "TestRuntimePermutationDisplayExactInsertionAndRefusalPrefixes",
+            "TestRuntimePermutationResetEveryReservationPrefixAndRecovery",
+            "TestRuntimePermutationDestructorStoppedPhysicalReceiptKeepsOlderMember"
+          ]
+        }
+      ],
+      "ownership": [
+        "Two embedded concrete unsigned vectors charge only enclosing reflected permutation header; independent wrapper charges its own reflected header. No shadow slices, tickets, new shared engine mutations.",
+        "Exact named raw block+pending roots validated against live Runtime records by independent existing physical bijection; Budget total Runtime once+actual cold header before faultlift.",
+        "Source ctor failure DT completed inverse then forward before return; no completed outer-object destructor body. Separate owning Close drains actual pending roots/refunds cold header.",
+        "Public TLS signed-overflow-domain stop: inverse physical free precedes older forward; ordinary/source cause and cursor sticky, explicit own cleanup frees forward then second attempt acknowledges consumed physical state/refunds."
+      ],
+      "deviations": [
+        "Whole vector source family including class copy/assignment/reserve/swap and other element types remains partial; new wrapper selected init/reset/push/resize/index/DT only",
+        "Permutation compiler-generated copy/assignment future obligation; no whole class/native ostream/global debug complete claim",
+        "Existing registered src/test/permutation.cpp tst1 algorithm body is disabled #if0, new class tests independent branch/oracles, not enabled driver assertions",
+        "Go io.Writer left-to-right insertion/refusal adapter, native ostream flags/locale/badbit/global services open",
+        "Reuses concrete main-package Runtime scalar engine; polynomial lex-sort adoption remains future integration"
+      ]
     },
     {
       "path": "src/util/permutation.h",
@@ -126760,14 +126807,29 @@
       "status": "partial",
       "go_targets": [
         "utilbits/permutation.go",
-        "utilbits/permutation_source_test.go"
+        "utilbits/permutation_source_test.go",
+        "util_unsigned_vector_runtime.go",
+        "util_unsigned_vector_runtime_test.go",
+        "util_permutation_runtime.go",
+        "util_permutation_runtime_test.go"
       ],
       "tests": [
         "TestPermutationCyclesExhaustiveIndependentCopy",
         "TestPermutationCyclesActualMarkBeforeReachedDataFailure",
         "TestPermutationCyclesUnreadAndSignedCountBranches",
         "TestPermutationCyclesOverlappingActualBorrow",
-        "TestPermutationCyclesReachedSourceAssertionAndDuplicateCycle"
+        "TestPermutationCyclesReachedSourceAssertionAndDuplicateCycle",
+        "TestRuntimeUnsignedVectorGeometryResetAndWarmReuse",
+        "TestRuntimePermutationEveryConstructorReservationSourceMemberUnwind",
+        "TestRuntimeUnsignedVectorResetDoesNotReadOldSizeHeader",
+        "TestRuntimeUnsignedVectorResizeRetainsSizeUntilAllCapacityReady",
+        "TestRuntimeUnsignedVectorAndPermutationOwnerAndProviderGuards",
+        "TestRuntimePermutationIndependentResetSwapMove",
+        "TestRuntimePermutationMoveNoopLeavesInvalidIndicesUnread",
+        "TestRuntimePermutationSourceResetRetainsActualAlternatingFailurePrefix",
+        "TestRuntimePermutationDisplayExactInsertionAndRefusalPrefixes",
+        "TestRuntimePermutationResetEveryReservationPrefixAndRecovery",
+        "TestRuntimePermutationDestructorStoppedPhysicalReceiptKeepsOlderMember"
       ],
       "conditionals": [
         {
@@ -126819,15 +126881,42 @@
             "TestPermutationCyclesOverlappingActualBorrow",
             "TestPermutationCyclesReachedSourceAssertionAndDuplicateCycle"
           ]
+        },
+        {
+          "name": "concrete Runtime unsigned-vector/permutation class selected source reset alternating growth, swap, move_after, display, default-debug invariant and member destruction; exact ranges in cached source map",
+          "status": "partial",
+          "go_target": "util_permutation_runtime.go",
+          "tests": [
+            "TestRuntimeUnsignedVectorGeometryResetAndWarmReuse",
+            "TestRuntimePermutationEveryConstructorReservationSourceMemberUnwind",
+            "TestRuntimeUnsignedVectorResetDoesNotReadOldSizeHeader",
+            "TestRuntimeUnsignedVectorResizeRetainsSizeUntilAllCapacityReady",
+            "TestRuntimeUnsignedVectorAndPermutationOwnerAndProviderGuards",
+            "TestRuntimePermutationIndependentResetSwapMove",
+            "TestRuntimePermutationMoveNoopLeavesInvalidIndicesUnread",
+            "TestRuntimePermutationSourceResetRetainsActualAlternatingFailurePrefix",
+            "TestRuntimePermutationDisplayExactInsertionAndRefusalPrefixes",
+            "TestRuntimePermutationResetEveryReservationPrefixAndRecovery",
+            "TestRuntimePermutationDestructorStoppedPhysicalReceiptKeepsOlderMember"
+          ]
         }
       ],
       "ownership": [
-        "Borrowed actual uint32 data/mapping, inplace signed marks and swaps; no scratch allocation or overlapping-range clone. Reached bounds guards preserve earlier marks and swaps."
+        "Borrowed actual uint32 data/mapping, inplace signed marks and swaps; no scratch allocation or overlapping-range clone. Reached bounds guards preserve earlier marks and swaps.",
+        "Two embedded concrete unsigned vectors charge only enclosing reflected permutation header; independent wrapper charges its own reflected header. No shadow slices, tickets, new shared engine mutations.",
+        "Exact named raw block+pending roots validated against live Runtime records by independent existing physical bijection; Budget total Runtime once+actual cold header before faultlift.",
+        "Source ctor failure DT completed inverse then forward before return; no completed outer-object destructor body. Separate owning Close drains actual pending roots/refunds cold header.",
+        "Public TLS signed-overflow-domain stop: inverse physical free precedes older forward; ordinary/source cause and cursor sticky, explicit own cleanup frees forward then second attempt acknowledges consumed physical state/refunds."
       ],
       "deviations": [
         "Concrete uint32 specialization only; permutation class and additional typed consumers remain open, with no Go generics.",
         "Source tst1 body is disabled by #if0 and its ENSURE loop bound is zero; independent exhaustive checks supply mathematical evidence, not registered source driver credit.",
-        "Explicit int32 cast profile and reached Go bounds/assertion guards cover native undefined access domains; source global assertion-switch/debug continuation remains open."
+        "Explicit int32 cast profile and reached Go bounds/assertion guards cover native undefined access domains; source global assertion-switch/debug continuation remains open.",
+        "Whole vector source family including class copy/assignment/reserve/swap and other element types remains partial; new wrapper selected init/reset/push/resize/index/DT only",
+        "Permutation compiler-generated copy/assignment future obligation; no whole class/native ostream/global debug complete claim",
+        "Existing registered src/test/permutation.cpp tst1 algorithm body is disabled #if0, new class tests independent branch/oracles, not enabled driver assertions",
+        "Go io.Writer left-to-right insertion/refusal adapter, native ostream flags/locale/badbit/global services open",
+        "Reuses concrete main-package Runtime scalar engine; polynomial lex-sort adoption remains future integration"
       ]
     },
     {
@@ -134844,7 +134933,11 @@
         "util_uint_set_runtime_swap_source_test.go",
         "util_uint_set_runtime_distinct_budget_source_test.go",
         "util_fr_bit_vector_runtime.go",
-        "util_fr_bit_vector_runtime_source_test.go"
+        "util_fr_bit_vector_runtime_source_test.go",
+        "util_unsigned_vector_runtime.go",
+        "util_unsigned_vector_runtime_test.go",
+        "util_permutation_runtime.go",
+        "util_permutation_runtime_test.go"
       ],
       "tests": [
         "TestParamDescrsBudgetFailuresAndWarmDuplicate",
@@ -135143,7 +135236,18 @@
         "TestFastResetBitVectorRuntimeCopyAssignmentAndEveryRefusal",
         "TestFastResetBitVectorRuntimeSelfAssignmentSourceMemberGuard",
         "TestFastResetBitVectorRuntimeReverseMemberDestructorStop",
-        "TestFastResetBitVectorRuntimeFailedAssignmentStillReachesSourceDestructor"
+        "TestFastResetBitVectorRuntimeFailedAssignmentStillReachesSourceDestructor",
+        "TestRuntimeUnsignedVectorGeometryResetAndWarmReuse",
+        "TestRuntimePermutationEveryConstructorReservationSourceMemberUnwind",
+        "TestRuntimeUnsignedVectorResetDoesNotReadOldSizeHeader",
+        "TestRuntimeUnsignedVectorResizeRetainsSizeUntilAllCapacityReady",
+        "TestRuntimeUnsignedVectorAndPermutationOwnerAndProviderGuards",
+        "TestRuntimePermutationIndependentResetSwapMove",
+        "TestRuntimePermutationMoveNoopLeavesInvalidIndicesUnread",
+        "TestRuntimePermutationSourceResetRetainsActualAlternatingFailurePrefix",
+        "TestRuntimePermutationDisplayExactInsertionAndRefusalPrefixes",
+        "TestRuntimePermutationResetEveryReservationPrefixAndRecovery",
+        "TestRuntimePermutationDestructorStoppedPhysicalReceiptKeepsOlderMember"
       ],
       "conditionals": [
         {
@@ -135689,6 +135793,24 @@
             "TestFastResetBitVectorRuntimeReverseMemberDestructorStop",
             "TestFastResetBitVectorRuntimeFailedAssignmentStillReachesSourceDestructor"
           ]
+        },
+        {
+          "name": "concrete Runtime unsigned-vector/permutation class selected source reset alternating growth, swap, move_after, display, default-debug invariant and member destruction; exact ranges in cached source map",
+          "status": "partial",
+          "go_target": "util_unsigned_vector_runtime.go",
+          "tests": [
+            "TestRuntimeUnsignedVectorGeometryResetAndWarmReuse",
+            "TestRuntimePermutationEveryConstructorReservationSourceMemberUnwind",
+            "TestRuntimeUnsignedVectorResetDoesNotReadOldSizeHeader",
+            "TestRuntimeUnsignedVectorResizeRetainsSizeUntilAllCapacityReady",
+            "TestRuntimeUnsignedVectorAndPermutationOwnerAndProviderGuards",
+            "TestRuntimePermutationIndependentResetSwapMove",
+            "TestRuntimePermutationMoveNoopLeavesInvalidIndicesUnread",
+            "TestRuntimePermutationSourceResetRetainsActualAlternatingFailurePrefix",
+            "TestRuntimePermutationDisplayExactInsertionAndRefusalPrefixes",
+            "TestRuntimePermutationResetEveryReservationPrefixAndRecovery",
+            "TestRuntimePermutationDestructorStoppedPhysicalReceiptKeepsOlderMember"
+          ]
         }
       ],
       "ownership": [
@@ -135705,7 +135827,11 @@
         "Actual two Runtime int columns; cold IntHeap header embeds queue and borrows comparator, independent destination Runtime owns copies. Source completed-member unwind/indices-before-values destruction, raw allocation and consumed-field receipts, and fresh lexical todo precede distinct explicit owning abort. Caller IntHeapVector owns real Runtime output; []int32 is borrowed Go output adapter. Exact named-block/bitmap/cold-header census, no registry-derived owners. See PORT_PROGRESS.md.",
         "Runtime heap borrows an explicit DebugContext; context/table/region remain caller-owned and may use a separate Budget. Actual heap fields/lexical todo and real cold header charges remain explicit; source lookup table Budget reservations are never fabricated Runtime allocations.",
         "One actual Runtime unsigned svector plus its named pending token; reflected cold owner is separately charged. Exact consumed field receipt preserves source dangling assignment after physical destroy. Copy constructor automatically runs the completed base destructor before failure return, retaining cold/pending abort context only. Ordinary destructor stop/cause is sticky; CleanupStopped separately acknowledges actual consumed storage. Immediate named graph accounts blocks, initialization bitmap and once-only cold charges.",
-        "Swap exchanges actual block and concrete physical-provider provenance without allocation, copy or charge transfer; cold wrappers retain original Budgets, moved raw growth/free use the adopted provider. Cached iterator Value reads no owner; scan_idx debug invariant precedes reached membership/word reads. Both providers must outlive exchanged backing."
+        "Swap exchanges actual block and concrete physical-provider provenance without allocation, copy or charge transfer; cold wrappers retain original Budgets, moved raw growth/free use the adopted provider. Cached iterator Value reads no owner; scan_idx debug invariant precedes reached membership/word reads. Both providers must outlive exchanged backing.",
+        "Two embedded concrete unsigned vectors charge only enclosing reflected permutation header; independent wrapper charges its own reflected header. No shadow slices, tickets, new shared engine mutations.",
+        "Exact named raw block+pending roots validated against live Runtime records by independent existing physical bijection; Budget total Runtime once+actual cold header before faultlift.",
+        "Source ctor failure DT completed inverse then forward before return; no completed outer-object destructor body. Separate owning Close drains actual pending roots/refunds cold header.",
+        "Public TLS signed-overflow-domain stop: inverse physical free precedes older forward; ordinary/source cause and cursor sticky, explicit own cleanup frees forward then second attempt acknowledges consumed physical state/refunds."
       ],
       "deviations": [
         "Concrete solver-specific storage, not complete generic vector template surface. Owning model Clone/Assign, other specializations and source-undefined continuation behavior remain explicitly separate.",
@@ -135722,7 +135848,12 @@
         "Selected concrete Runtime general heap source closure only: full process-global CASSERT/assertion-switch bindings, wrapped physical extents, legacy slice storage/iterator profile, full ostream transport and other template instantiations remain OPEN. Explicit signed TLS/partially initialized source fixtures prove ownership/physical guards in undefined source domains, not ordinary OOM or native recovery. No whole source-unit promotion.",
         "Explicit borrowed context specializes source assertion/tag gates at actual call sites; process-global binding, notify/debugger/TRACE, source global allocation geometry, legacy heap and wrapped extent profiles remain open. Original tst_heap enable_debug(\"heap\") is commented out; new enabled-tag worlds are independent fixtures and do not add registered enabled-tag credit.",
         "Selected explicit-provider/default-enabled assertion profile; process-global assertion binding, endangered wrapped extents, native ostream failbit/libc rand profile and legacy bitset allocation topology remain open. New random campaign executes source assertion expressions with an independent deterministic stream, not the exact libc sequence; broad test driver remains partial.",
-        "Uses existing concrete unsigned-vector engine; no Go generics or additional shadow storage."
+        "Uses existing concrete unsigned-vector engine; no Go generics or additional shadow storage.",
+        "Whole vector source family including class copy/assignment/reserve/swap and other element types remains partial; new wrapper selected init/reset/push/resize/index/DT only",
+        "Permutation compiler-generated copy/assignment future obligation; no whole class/native ostream/global debug complete claim",
+        "Existing registered src/test/permutation.cpp tst1 algorithm body is disabled #if0, new class tests independent branch/oracles, not enabled driver assertions",
+        "Go io.Writer left-to-right insertion/refusal adapter, native ostream flags/locale/badbit/global services open",
+        "Reuses concrete main-package Runtime scalar engine; polynomial lex-sort adoption remains future integration"
       ]
     },
     {
