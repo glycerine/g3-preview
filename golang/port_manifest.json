@@ -29147,7 +29147,17 @@
         "mpnum/polynomial_pseudo_numeric_child_source_test.go",
         "mpnum/polynomial_pseudo_buffer_child_source_test.go",
         "mpnum/polynomial_pseudo_child_stop_source_test.go",
-        "mpnum/polynomial_pseudo_mod_d_child_source_test.go"
+        "mpnum/polynomial_pseudo_mod_d_child_source_test.go",
+        "mpnum/polynomial_iccp_constant_invocation.go",
+        "mpnum/polynomial_iccp_concrete_children.go",
+        "mpnum/polynomial_resultant_concrete_children.go",
+        "mpnum/polynomial_iccp_coefficient_child_source_test.go",
+        "mpnum/polynomial_iccp_constant_child_source_test.go",
+        "mpnum/polynomial_iccp_constant_pn_stop_source_test.go",
+        "mpnum/polynomial_iccp_constant_context_source_test.go",
+        "mpnum/polynomial_resultant_children_source_test.go",
+        "mpnum/polynomial_resultant_power_stop_source_test.go",
+        "mpnum/polynomial_resultant_parent_receipt_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -29860,7 +29870,23 @@
         "TestPolynomialPseudoYoungerRAWSourceStopPreservesActualOlderLocals",
         "TestPolynomialPseudoConstantDivisorActualModDChild",
         "TestPolynomialPseudoConditionalPowerBorrowedPositionContinuation",
-        "TestPolynomialGCDRecursiveRepeatedSparsePointThrowsAfterActualUnwind"
+        "TestPolynomialGCDRecursiveRepeatedSparsePointThrowsAfterActualUnwind",
+        "TestPolynomialICCPFirstCoefficientChildPreservesConstructedEmptyCI",
+        "TestPolynomialICCPLaterCIAssignmentRetainsActualOldAndIncomingReferences",
+        "TestPolynomialICCPNegSourceStopProtectsConstructedCI",
+        "TestPolynomialICCPConstantSETActualPendingAcquisition",
+        "TestPolynomialICCPConstantModeSwitchSETAndNoLexicalLocals",
+        "TestPolynomialICCPConstantOldReceiptPreservesLaterForeignPendingCell",
+        "TestPolynomialICCPConstantYoungerPNSourceStopAndImmutableHistory",
+        "TestPolynomialICCPConstantActualExecutingContextForeignAndReusedNonce",
+        "TestPolynomialResultantActualConstantPowerChildPrefixes",
+        "TestPolynomialResultantActualContentPowerChildPrefixes",
+        "TestPolynomialResultantActualPseudoChildInvocationPrefixes",
+        "TestPolynomialResultantActualArithmeticChildRetirementPrefixes",
+        "TestPolynomialResultantLaterFailurePreservesSuccessfulDividesMemberRows",
+        "TestPolynomialResultantCompletedSourceBodyHistorySurvivesOwningACK",
+        "TestPolynomialResultantYoungerPowerSourceStopPreservesOlderAB",
+        "TestPolynomialResultantReceiptRejectsCopiedActualFrame"
       ],
       "conditionals": [
         {
@@ -33406,6 +33432,43 @@
             "TestPolynomialGCDSparseCatchWaitsForGuardedActualDestructorStop",
             "TestPolynomialGCDRecursiveRepeatedSparsePointThrowsAfterActualUnwind"
           ]
+        },
+        {
+          "name": "polynomial.cpp:3453-3530 ICCP actual constant SET and nonconstant Content/Coeff/GCD/Neg/ExactDiv invoked child ownership, lexical ci constructor/destructor order",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_iccp.go",
+          "tests": [
+            "TestPolynomialICCPFirstCoefficientChildPreservesConstructedEmptyCI",
+            "TestPolynomialICCPLaterCIAssignmentRetainsActualOldAndIncomingReferences",
+            "TestPolynomialICCPNegSourceStopProtectsConstructedCI",
+            "TestPolynomialICCPConstantSETActualPendingAcquisition",
+            "TestPolynomialICCPConstantModeSwitchSETAndNoLexicalLocals",
+            "TestPolynomialICCPConstantOldReceiptPreservesLaterForeignPendingCell",
+            "TestPolynomialICCPConstantYoungerPNSourceStopAndImmutableHistory",
+            "TestPolynomialICCPConstantActualExecutingContextForeignAndReusedNonce"
+          ]
+        },
+        {
+          "name": "polynomial.cpp:5356-5480 Resultant actual Power/Pseudo/AR/Coeff/Neg/ExactDiv source child calls and younger-source-stop versus owning continuation",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_resultant.go",
+          "tests": [
+            "TestPolynomialResultantActualConstantPowerChildPrefixes",
+            "TestPolynomialResultantActualContentPowerChildPrefixes",
+            "TestPolynomialResultantActualPseudoChildInvocationPrefixes",
+            "TestPolynomialResultantActualArithmeticChildRetirementPrefixes",
+            "TestPolynomialResultantLaterFailurePreservesSuccessfulDividesMemberRows",
+            "TestPolynomialResultantCompletedSourceBodyHistorySurvivesOwningACK",
+            "TestPolynomialResultantYoungerPowerSourceStopPreservesOlderAB"
+          ]
+        },
+        {
+          "name": "polynomial.cpp:5356-5480 guarded Resultant invocation receipt plus actual owning-directory frame-address validation for existing GCD tuple",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_invocation_receipts.go",
+          "tests": [
+            "TestPolynomialResultantReceiptRejectsCopiedActualFrame"
+          ]
         }
       ],
       "ownership": [
@@ -33514,7 +33577,9 @@
         "Power polynomial.cpp:4600-4614 preserves the identical nonnil cleanupCause together with bodyCause/sourceCause and concrete arithmetic child identity through false/true owning acknowledgment; inactive metadata carries no result/numeric authority. Actual next guarded invocation retires all prior history.",
         "Exact actual Set write stamps actual embedded positions owner/self, arithmetic frame/nonwrapping captured invocation and vector block/id/value. Owning reset reads the exact position slot without dereferencing borrowed monomial. Successful foreign Set/Reset acknowledges prior token at its actual write; actual reallocation carries the existing token at publication. Actual row push transfers marker ownership to the source row; no extra monomial INC.",
         "Actual map SourceFinalize/Close acknowledges only the token bound to that physically consumed map block, before propagating any postphysical release error. Refused releases retain exact marker authority. Immutable body/source error values are not overwritten by token retirement.",
-        "Pseudo polynomial.cpp:4905-5065 retains actual completed declaration stack; conditional coefficient and Power children precede minus_a construction. Direct NUM allocation captures exact owner/frame/captured nonce at real Copy/Neg/PN leaves, generated created-token authority at actual factory outcome, and R/Q row/factory transport at actual guarded actions. Younger source stops precede older NUM/ref destruction; false acknowledges completed source suffix and true only drains matched unjoined roots afterward. Inactive retirement preserves immutable body/source/cleanup and child identities without NUM/ref payload ownership."
+        "Pseudo polynomial.cpp:4905-5065 retains actual completed declaration stack; conditional coefficient and Power children precede minus_a construction. Direct NUM allocation captures exact owner/frame/captured nonce at real Copy/Neg/PN leaves, generated created-token authority at actual factory outcome, and R/Q row/factory transport at actual guarded actions. Younger source stops precede older NUM/ref destruction; false acknowledges completed source suffix and true only drains matched unjoined roots afterward. Inactive retirement preserves immutable body/source/cleanup and child identities without NUM/ref payload ownership.",
+        "polynomial.cpp:3461-3465 constant SET acquires only the actual guarded cold continuation and direct Copy/PN leaves; no ai/ci/GCD/filter/powers construction. polynomial.cpp:3512-3530 ci is constructed after Content and before first coefficient; matched younger child source stop precedes ci DT. polynomial.cpp:5356-5480 actual child tuples are captured at invoked guards and retired false-before-older/true-after-older source suffix, with body/source/cleanup history retained separately from active authority.",
+        "Known captured frame address is checked against the actual owning GCD cold directory before any frame payload/history read, in addition to full owner self and nonzero invocation. This is identity validation of a passed tuple, not root acquisition through directory enumeration. Owning cleanup refuses copied frames/owners and preserves actual NUM/declaration/cold budget fields. Historical cause reads are separate from active ownership predicates."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -33596,7 +33661,9 @@
         "Power ownership tests include real every-reservation prefixes, later foreign regular row preservation and signed-host TLS/direct-allocator RAW end-DEL profile, not ordinary mathematical free OOM. Copied-owner/frame and stale receipt tests are invalid-Go-owner guard coverage. Existing active linear Power arithmetic status is preserved; no complete Pseudo/Resultant/Discriminant/Factor or source-unit/registered-driver promotion.",
         "Pointer-free numeric position identity plus charged cold owner/frame marker is a Go owning adaptation; public source Set/Reset order and vector geometry remain unchanged. Copied/stale/callback receipt guard fixtures are invalid Go metadata tests, independent of the valid actual reservation refusal proof. No Pseudo/Resultant or full factorization completion claim.",
         "Postphysical map release is proven in a qualified signed-host TLS owner-primitive domain using only public allocation/reallocation setup and public recovery, not ordinary mathematical OOM. Frozen predecessor release gap and RED logs are preserved.",
-        "Deterministic sparse point fixture seeds only the shared source stream; independent polynomial.cpp:4120-4232 repeated-point regression proves the literal sparse exception with immediate owner graph. Production point selection unchanged; direct mod_gcd_rec has no catch and is not credited with invented fallback. Resultant/ICCP/Discriminant parent completion is separate."
+        "Deterministic sparse point fixture seeds only the shared source stream; independent polynomial.cpp:4120-4232 repeated-point regression proves the literal sparse exception with immediate owner graph. Production point selection unchanged; direct mod_gcd_rec has no catch and is not credited with invented fallback. Resultant/ICCP/Discriminant parent completion is separate.",
+        "Selected ICCP/Resultant child extraction evidence only; enclosing source unit remains partial and Discriminant is not promoted. Signed-host TLS/direct descriptor source-stop profiles are qualified owner-primitive tests, not ordinary mathematical allocation-free OOM. Actual successful Divides transfers R rows to persistent member ownership; matched later parent cleanup preserves those rows until real entry reset/manager destruction. Historical unsupported blanket zero-row oracle and setup fixture failures are retained separately from genuine acquisition/history REDs.",
+        "Copied-frame/owner tests are invalid Go metadata boundary coverage, not mathematical allocation failure; actual Resultant source entry and body are unchanged. This corrects a demonstrated copied-frame guard omission in frozen predecessor30; no Discriminant or whole source unit promotion."
       ]
     },
     {

@@ -16,11 +16,17 @@ func (m *MultivariatePolynomialManager) Resultant(p, q Polynomial, x uint32, res
 	}
 	return m.resultant(p, q, x, &result.root)
 }
-func (m *MultivariatePolynomialManager) resultant(p, q Polynomial, x uint32, result *polynomialReference) (err error) {
+func (m *MultivariatePolynomialManager) resultant(p, q Polynomial, x uint32, result *polynomialReference) error {
+	return m.resultantWithReceipt(p, q, x, result, nil)
+}
+func (m *MultivariatePolynomialManager) resultantWithReceipt(p, q Polynomial, x uint32, result *polynomialReference, receipt *polynomialGCDInvocationReceipt) (err error) {
 	c := m.core
 	s, e := m.beginGCDFunction()
 	if e != nil {
 		return e
+	}
+	if receipt != nil {
+		*receipt = polynomialGCDInvocationReceipt{manager: m, frame: s, invocation: s.invocation}
 	}
 	defer func() {
 		s.bodyCause = err
@@ -66,7 +72,7 @@ func (m *MultivariatePolynomialManager) resultant(p, q Polynomial, x uint32, res
 		if e != nil {
 			return e
 		}
-		return c.powerInto(A.value, d, result)
+		return c.powerIntoWithReceipt(A.value, d, result, &s.resultantPower)
 	}
 	constant, e = c.IsConstant(B.value)
 	if e != nil {
@@ -77,7 +83,7 @@ func (m *MultivariatePolynomialManager) resultant(p, q Polynomial, x uint32, res
 		if e != nil {
 			return e
 		}
-		return c.powerInto(B.value, d, result)
+		return c.powerIntoWithReceipt(B.value, d, result, &s.resultantPower)
 	}
 	s.constructNumeral(0)
 	s.constructNumeral(1)
@@ -95,7 +101,7 @@ func (m *MultivariatePolynomialManager) resultant(p, q Polynomial, x uint32, res
 	if e != nil {
 		return e
 	}
-	v, e := c.Scale(&s.nums[0], unit, cA.value)
+	v, e := c.scaleWithReceipt(&s.nums[0], unit, cA.value, &s.resultantArithmetic)
 	if e != nil {
 		return e
 	}
@@ -106,7 +112,7 @@ func (m *MultivariatePolynomialManager) resultant(p, q Polynomial, x uint32, res
 	if e != nil {
 		return e
 	}
-	v, e = c.Scale(&s.nums[1], unit, cB.value)
+	v, e = c.scaleWithReceipt(&s.nums[1], unit, cB.value, &s.resultantArithmetic)
 	if e != nil {
 		return e
 	}
@@ -119,17 +125,17 @@ func (m *MultivariatePolynomialManager) resultant(p, q Polynomial, x uint32, res
 	if e != nil {
 		return e
 	}
-	if e = c.powerInto(cA.value, d, cA); e != nil {
+	if e = c.powerIntoWithReceipt(cA.value, d, cA, &s.resultantPower); e != nil {
 		return e
 	}
 	d, e = c.Degree(A.value, x)
 	if e != nil {
 		return e
 	}
-	if e = c.powerInto(cB.value, d, cB); e != nil {
+	if e = c.powerIntoWithReceipt(cB.value, d, cB, &s.resultantPower); e != nil {
 		return e
 	}
-	v, e = c.Mul(cA.value, cB.value)
+	v, e = c.mulWithReceipt(cA.value, cB.value, &s.resultantArithmetic)
 	if e != nil {
 		return e
 	}
@@ -183,13 +189,13 @@ func (m *MultivariatePolynomialManager) resultant(p, q Polynomial, x uint32, res
 		if degA%2 == 1 && degB%2 == 1 {
 			sign = -sign
 		}
-		if e = c.ExactPseudoRemainder(A.value, B.value, x, &s.refs[7]); e != nil {
+		if e = c.exactPseudoRemainderWithReceipt(A.value, B.value, x, &s.refs[7], &s.resultantPseudo); e != nil {
 			return e
 		}
 		if e = A.assign(c, B.value); e != nil {
 			return e
 		}
-		v, e = c.ExactDiv(R.value, g.value)
+		v, e = c.exactDivWithReceipt(R.value, g.value, &s.divisionInvocation)
 		if e != nil {
 			return e
 		}
@@ -197,7 +203,7 @@ func (m *MultivariatePolynomialManager) resultant(p, q Polynomial, x uint32, res
 			return e
 		}
 		for i := uint32(0); i < delta; i++ {
-			v, e = c.ExactDiv(B.value, h.value)
+			v, e = c.exactDivWithReceipt(B.value, h.value, &s.divisionInvocation)
 			if e != nil {
 				return e
 			}
@@ -205,22 +211,22 @@ func (m *MultivariatePolynomialManager) resultant(p, q Polynomial, x uint32, res
 				return e
 			}
 		}
-		v, e = c.LeadingCoefficient(A.value, x)
+		v, e = m.resultantLeadingCoefficient(s, A.value, x)
 		if e != nil {
 			return e
 		}
-		if e = g.assign(c, v); e != nil {
+		if e = g.assignWithFactoryReceipt(c, v, &s.resultantFactory); e != nil {
 			return e
 		}
 		if e = newH.assign(c, c.unit); e != nil {
 			return e
 		}
-		if e = c.powerInto(g.value, delta, newH); e != nil {
+		if e = c.powerIntoWithReceipt(g.value, delta, newH, &s.resultantPower); e != nil {
 			return e
 		}
 		if delta > 1 {
 			for i := uint32(0); i < delta-1; i++ {
-				v, e = c.ExactDiv(newH.value, h.value)
+				v, e = c.exactDivWithReceipt(newH.value, h.value, &s.divisionInvocation)
 				if e != nil {
 					return e
 				}
@@ -241,19 +247,19 @@ func (m *MultivariatePolynomialManager) resultant(p, q Polynomial, x uint32, res
 			if e != nil {
 				return e
 			}
-			v, e = c.LeadingCoefficient(B.value, x)
+			v, e = m.resultantLeadingCoefficient(s, B.value, x)
 			if e != nil {
 				return e
 			}
-			if e = newH.assign(c, v); e != nil {
+			if e = newH.assignWithFactoryReceipt(c, v, &s.resultantFactory); e != nil {
 				return e
 			}
-			if e = c.powerInto(newH.value, degA, newH); e != nil {
+			if e = c.powerIntoWithReceipt(newH.value, degA, newH, &s.resultantPower); e != nil {
 				return e
 			}
 			if degA > 1 {
 				for i := uint32(0); i < degA-1; i++ {
-					v, e = c.ExactDiv(newH.value, h.value)
+					v, e = c.exactDivWithReceipt(newH.value, h.value, &s.divisionInvocation)
 					if e != nil {
 						return e
 					}
@@ -265,7 +271,7 @@ func (m *MultivariatePolynomialManager) resultant(p, q Polynomial, x uint32, res
 			if e = h.assign(c, newH.value); e != nil {
 				return e
 			}
-			v, e = c.Mul(t.value, h.value)
+			v, e = c.mulWithReceipt(t.value, h.value, &s.resultantArithmetic)
 			if e != nil {
 				return e
 			}
@@ -273,7 +279,7 @@ func (m *MultivariatePolynomialManager) resultant(p, q Polynomial, x uint32, res
 				return e
 			}
 			if sign < 0 {
-				v, e = c.Neg(result.value)
+				v, e = c.negWithReceipt(result.value, &s.resultantNeg)
 				if e != nil {
 					return e
 				}

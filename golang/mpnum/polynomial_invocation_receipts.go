@@ -6,13 +6,15 @@ package mpnum
 // These are owning adapter receipts for an actual guarded callee invocation.
 // The shared PSC owner generation is deliberately not invocation identity.
 // Stable frame address, manager and monotonically increasing frame nonce must
-// all match. Erased zero/constant paths acquire no new receipt. The degree-zero
+// all match. Erased zero paths acquire no new receipt. Constant SET has only its
+// real cold copy continuation; it constructs no ICCP lexical locals. The degree-zero
 // ICCP delegate can acquire only its actual Content child, without an ICCP frame.
 type polynomialICCPInvocationReceipt struct {
-	shortcutContent polynomialContentInvocationReceipt
-	manager         *MultivariatePolynomialManager
-	frame           *polynomialICCPScope
-	invocation      uint64
+	shortcutContent  polynomialContentInvocationReceipt
+	shortcutConstant polynomialICCPConstantInvocationReceipt
+	manager          *MultivariatePolynomialManager
+	frame            *polynomialICCPScope
+	invocation       uint64
 }
 type polynomialGCDInvocationReceipt struct {
 	manager    *MultivariatePolynomialManager
@@ -25,26 +27,57 @@ type polynomialNormalizeInvocationReceipt struct {
 	invocation uint64
 }
 
+func (m *MultivariatePolynomialManager) hasICCPInvocationHistory(r *polynomialICCPInvocationReceipt) bool {
+	if m == nil || m.self != m || r == nil || r.manager != m || r.frame == nil || r.invocation == 0 {
+		return false
+	}
+	// The actual owning directory names the guarded frame; copied descriptors
+	// never acquire authority over its source children.
+	for _, frame := range m.iccpFrames {
+		if frame == r.frame {
+			return frame.invocation == r.invocation
+		}
+	}
+	return false
+}
 func (m *MultivariatePolynomialManager) matchesICCPInvocation(r *polynomialICCPInvocationReceipt) bool {
-	return r != nil && r.manager == m && r.frame != nil && r.invocation != 0 && r.frame.invocation == r.invocation && r.frame.active
+	return m.hasICCPInvocationHistory(r) && r.frame.active
+}
+
+// Validate the captured known frame against its actual owning directory before
+// reading payload/history. Directory membership validates address, never roots.
+func (m *MultivariatePolynomialManager) hasGCDInvocationHistory(r *polynomialGCDInvocationReceipt) bool {
+	if m == nil || m.self != m || r == nil || r.manager != m || r.frame == nil || r.invocation == 0 {
+		return false
+	}
+	for _, actual := range m.gcdFrames {
+		if actual == r.frame {
+			return actual.invocation == r.invocation
+		}
+	}
+	return false
 }
 func (m *MultivariatePolynomialManager) matchesGCDInvocation(r *polynomialGCDInvocationReceipt) bool {
-	return r != nil && r.manager == m && r.frame != nil && r.invocation != 0 && r.frame.invocation == r.invocation && r.frame.active
+	return m.hasGCDInvocationHistory(r) && r.frame.active
 }
+
 func (m *MultivariatePolynomialManager) matchesNormalizeInvocation(r *polynomialNormalizeInvocationReceipt) bool {
 	return r != nil && r.manager == m && r.frame == &m.normalization && r.invocation != 0 && r.frame.invocation == r.invocation && r.frame.active
 }
 func (m *MultivariatePolynomialManager) iccpInvocationSourceCause(r *polynomialICCPInvocationReceipt) error {
+	if r != nil && m.hasICCPConstantHistory(&r.shortcutConstant) {
+		return r.shortcutConstant.frame.sourceCause
+	}
 	if m.hasICCPShortcutContentHistory(r) {
 		return m.core.contentInvocationSourceCause(&r.shortcutContent)
 	}
-	if m.matchesICCPInvocation(r) {
+	if m.hasICCPInvocationHistory(r) {
 		return r.frame.cleanupCause
 	}
 	return nil
 }
 func (m *MultivariatePolynomialManager) gcdInvocationSourceCause(r *polynomialGCDInvocationReceipt) error {
-	if m.matchesGCDInvocation(r) {
+	if m.hasGCDInvocationHistory(r) {
 		return r.frame.cleanupCause
 	}
 	return nil
@@ -56,6 +89,9 @@ func (m *MultivariatePolynomialManager) normalizeInvocationSourceCause(r *polyno
 	return nil
 }
 func (m *MultivariatePolynomialManager) cleanupICCPInvocation(r *polynomialICCPInvocationReceipt, abort bool) error {
+	if r != nil && m.hasICCPConstantHistory(&r.shortcutConstant) {
+		return m.cleanupICCPConstantInvocation(&r.shortcutConstant, abort)
+	}
 	if m.matchesICCPShortcutContent(r) {
 		return m.core.cleanupContentInvocation(&r.shortcutContent, abort)
 	}

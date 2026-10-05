@@ -14,6 +14,14 @@ import (
 // PRS has nine references and three numerals. The dispatcher instead begins
 // with its two actual sbuffer<power,32> objects.
 type polynomialGCDFunctionScope struct {
+	resultantPseudo      polynomialPseudoDivisionInvocationReceipt
+	resultantPower       polynomialPowerInvocationReceipt
+	resultantArithmetic  polynomialArithmeticInvocationReceipt
+	resultantCoefficient polynomialCoefficientInvocationReceipt
+	resultantAppend      polynomialCheapAppendInvocationReceipt
+	resultantFactory     polynomialFactoryInvocationReceipt
+	resultantNeg         polynomialNegInvocationReceipt
+
 	quadraticArithmetic   [9]polynomialArithmeticInvocationReceipt
 	quadraticSqrt         polynomialSqrtInvocationReceipt
 	quadraticNeg          [3]polynomialNegInvocationReceipt
@@ -126,6 +134,30 @@ func (m *MultivariatePolynomialManager) beginGCDFunction() (*polynomialGCDFuncti
 	return s, nil
 }
 func (m *MultivariatePolynomialManager) gcdYoungerSourceStop(s *polynomialGCDFunctionScope) error {
+	if e := m.resultantConcreteChildSourceCause(s); e != nil {
+		if s.cleanupCause == nil {
+			s.cleanupCause = e
+		}
+		return s.cleanupCause
+	}
+	if e := m.core.arithmeticInvocationSourceCause(&s.resultantArithmetic); e != nil {
+		if s.cleanupCause == nil {
+			s.cleanupCause = e
+		}
+		return s.cleanupCause
+	}
+	if e := m.core.pseudoInvocationSourceCause(&s.resultantPseudo); e != nil {
+		if s.cleanupCause == nil {
+			s.cleanupCause = e
+		}
+		return s.cleanupCause
+	}
+	if e := m.core.powerInvocationSourceCause(&s.resultantPower); e != nil {
+		if s.cleanupCause == nil {
+			s.cleanupCause = e
+		}
+		return s.cleanupCause
+	}
 	for i := len(s.quadraticArithmetic) - 1; i >= 0; i-- {
 		if e := m.core.arithmeticInvocationSourceCause(&s.quadraticArithmetic[i]); e != nil {
 			if s.cleanupCause == nil {
@@ -229,7 +261,7 @@ func (m *MultivariatePolynomialManager) finishGCDLocalsTo(s *polynomialGCDFuncti
 	}
 	pending := (s.child != nil && s.child.active && s.child.invocation == s.childInvocation) || m.matchesICCPInvocation(&s.iccpInvocation) || m.matchesICCPShortcutContent(&s.iccpInvocation) || m.core.matchesContentInvocation(&s.contentInvocation) || s.returned.value != (Polynomial{}) || s.returned.assigning || s.zp.active || s.vars.pending.OwnerID() != 0 || (s.sparse.self != nil && !s.sparse.closed && (s.sparse.inputs.pending.OwnerID() != 0 || s.sparse.outputs.pending.OwnerID() != 0)) || s.topOwner && m.core.pscPending()
 	pending = pending || (m.matchesDerivativeInvocation(&s.derivativeInvocation) || m.derivativeInvocationHasOrphans(&s.derivativeInvocation)) || m.core.matchesExactDivInvocation(&s.divisionInvocation) || m.core.dividesInvocationPending(&s.dividesInvocation)
-	pending = pending || m.quadraticPending(s)
+	pending = pending || m.quadraticPending(s) || m.core.matchesPowerInvocation(&s.resultantPower) || m.core.matchesPseudoInvocation(&s.resultantPseudo) || m.core.matchesArithmeticInvocation(&s.resultantArithmetic) || m.resultantConcreteChildrenPending(s)
 	pending = pending || s.newSkeleton != nil || s.monomialBuffer.incoming != (Monomial{}) || s.monomialBuffer.pending.OwnerID() != 0
 	for i := range s.monomials {
 		pending = pending || s.monomials[i].assigning
@@ -246,7 +278,7 @@ func (m *MultivariatePolynomialManager) finishGCDLocalsTo(s *polynomialGCDFuncti
 	}
 	if !pending {
 		h := s.header
-		*s = polynomialGCDFunctionScope{header: h, invocation: s.invocation}
+		*s = polynomialGCDFunctionScope{header: h, invocation: s.invocation, bodyCause: s.bodyCause, cleanupCause: s.cleanupCause, resultantPower: s.resultantPower, resultantPseudo: s.resultantPseudo, resultantArithmetic: s.resultantArithmetic, resultantCoefficient: s.resultantCoefficient, resultantAppend: s.resultantAppend, resultantFactory: s.resultantFactory, resultantNeg: s.resultantNeg}
 	}
 	return nil
 }

@@ -5,34 +5,36 @@ package mpnum
 // Explicit passed invocation identity. It carries no allocation snapshot and
 // creates no source numeral, reservation, or ambient callback owner hook.
 type integerAllocationInvocationContext struct {
-	primeTrial            *upolyPrimeTrialInvocationReceipt
-	primeTrialInvocation  uint64
-	pseudo                *polynomialPseudoDivisionInvocationReceipt
-	pseudoInvocation      uint64
-	mignotte              *upolyMignotteInvocationReceipt
-	mignotteInvocation    uint64
-	divides               *polynomialDividesInvocationReceipt
-	dividesInvocation     uint64
-	boolDivides           *integerDividesNumeralInvocationReceipt
-	boolDividesInvocation uint64
-	neg                   *polynomialNegInvocationReceipt
-	negInvocation         uint64
-	arithmeticInvocation  uint64
-	scalarExact           *polynomialScalarExactDivInvocationReceipt
-	scalarExactInvocation uint64
-	exactDiv              *polynomialExactDivInvocationReceipt
-	exactDivInvocation    uint64
-	content               *polynomialContentInvocationReceipt
-	contentInvocation     uint64
-	raw                   *integerRawInvocationReceipt
-	rawInvocation         uint64
-	pn                    *integerPNormalizeScope
-	pnInvocation          uint64
-	arithmetic            *polynomialArithmeticInvocationReceipt
-	addMul                *integerAddMulInvocationReceipt
-	addMulInvocation      uint64
-	derivative            *polynomialDerivativeInvocationReceipt
-	scalarDiv             *polynomialScalarDivInvocationReceipt
+	iccpConstant           *polynomialICCPConstantInvocationReceipt
+	iccpConstantInvocation uint64
+	primeTrial             *upolyPrimeTrialInvocationReceipt
+	primeTrialInvocation   uint64
+	pseudo                 *polynomialPseudoDivisionInvocationReceipt
+	pseudoInvocation       uint64
+	mignotte               *upolyMignotteInvocationReceipt
+	mignotteInvocation     uint64
+	divides                *polynomialDividesInvocationReceipt
+	dividesInvocation      uint64
+	boolDivides            *integerDividesNumeralInvocationReceipt
+	boolDividesInvocation  uint64
+	neg                    *polynomialNegInvocationReceipt
+	negInvocation          uint64
+	arithmeticInvocation   uint64
+	scalarExact            *polynomialScalarExactDivInvocationReceipt
+	scalarExactInvocation  uint64
+	exactDiv               *polynomialExactDivInvocationReceipt
+	exactDivInvocation     uint64
+	content                *polynomialContentInvocationReceipt
+	contentInvocation      uint64
+	raw                    *integerRawInvocationReceipt
+	rawInvocation          uint64
+	pn                     *integerPNormalizeScope
+	pnInvocation           uint64
+	arithmetic             *polynomialArithmeticInvocationReceipt
+	addMul                 *integerAddMulInvocationReceipt
+	addMulInvocation       uint64
+	derivative             *polynomialDerivativeInvocationReceipt
+	scalarDiv              *polynomialScalarDivInvocationReceipt
 }
 
 func (c integerAllocationInvocationContext) withAddMulInvocation(r *integerAddMulInvocationReceipt) integerAllocationInvocationContext {
@@ -66,6 +68,9 @@ func pnAllocationContext(pn *integerPNormalizeScope) integerAllocationInvocation
 	return c
 }
 func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomialNumericRoots {
+	if c.iccpConstant != nil && m.iccpConstantContextRoots(c) == nil {
+		return nil
+	}
 	if c.primeTrial != nil && c.primeTrialReceipt(m) == nil {
 		return nil
 	}
@@ -91,6 +96,9 @@ func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomial
 	}
 	if s := c.pn; s != nil && s.owner != nil && s.owner.manager == m && s == &s.owner.normalization && s.active && s.executing && c.pnInvocation != 0 && c.pnInvocation == s.invocation {
 		return &s.roots
+	}
+	if c.iccpConstant != nil {
+		return m.iccpConstantContextRoots(c)
 	}
 	if c.pseudo != nil {
 		return m.pseudoContextRoots(c)

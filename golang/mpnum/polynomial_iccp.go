@@ -14,6 +14,12 @@ import (
 // 128> objects and the ci reference constructed only after the integer content.
 // The cold Go directory is an owning adapter, not a source allocation ticket.
 type polynomialICCPScope struct {
+	coefficient        polynomialCoefficientInvocationReceipt
+	coefficientAppend  polynomialCheapAppendInvocationReceipt
+	coefficientFactory polynomialFactoryInvocationReceipt
+	neg                polynomialNegInvocationReceipt
+	division           polynomialExactDivInvocationReceipt
+
 	invocation                      uint64
 	childInvocation                 uint64
 	gcdInvocation                   polynomialGCDInvocationReceipt
@@ -61,6 +67,10 @@ func (m *MultivariatePolynomialManager) iccpSourceEnd(s *polynomialICCPScope) er
 		return s.cleanupCause
 	}
 	c := m.core
+	if e := m.iccpConcreteChildSourceCause(s); e != nil {
+		s.cleanupCause = e
+		return e
+	}
 	if e := c.contentInvocationSourceCause(&s.contentInvocation); e != nil {
 		s.cleanupCause = e
 		return e
@@ -100,13 +110,15 @@ func (m *MultivariatePolynomialManager) iccpSourceEnd(s *polynomialICCPScope) er
 		}
 		s.cursor = 3
 	}
-	if s.filter.pending == (memory.Block{}) && s.powers.pending == (memory.Block{}) && !s.ci.assigning && !(s.topOwner && c.pscPending()) && !c.matchesContentInvocation(&s.contentInvocation) {
-		h := s.header
-		*s = polynomialICCPScope{header: h, invocation: s.invocation}
+	if s.filter.pending == (memory.Block{}) && s.powers.pending == (memory.Block{}) && !s.ci.assigning && !(s.topOwner && c.pscPending()) && !c.matchesContentInvocation(&s.contentInvocation) && !m.iccpConcreteChildrenPending(s) {
+		s.retireICCPInvocation()
 	}
 	return nil
 }
 func (m *MultivariatePolynomialManager) flipLeadingSign(p *polynomialReference) error {
+	return m.flipLeadingSignWithReceipt(p, nil)
+}
+func (m *MultivariatePolynomialManager) flipLeadingSignWithReceipt(p *polynomialReference, receipt *polynomialNegInvocationReceipt) error {
 	c := m.core
 	zero, e := c.IsZero(p.value)
 	if e != nil || zero {
@@ -127,7 +139,7 @@ func (m *MultivariatePolynomialManager) flipLeadingSign(p *polynomialReference) 
 	if e != nil || !negative {
 		return e
 	}
-	q, e := c.Neg(p.value)
+	q, e := c.negWithReceipt(p.value, receipt)
 	if e != nil {
 		return e
 	}
@@ -175,7 +187,7 @@ func (m *MultivariatePolynomialManager) iccpPartsWithReceipt(p Polynomial, x uin
 		if e != nil {
 			return e
 		}
-		e = core.modular.Copy(i, &a)
+		e = m.iccpConstantSET(i, &a, receipt)
 		if e != nil {
 			return e
 		}
@@ -313,11 +325,11 @@ func (m *MultivariatePolynomialManager) iccpPartsWithReceipt(p Polynomial, x uin
 	if e != nil {
 		return e
 	}
-	q, e := core.Coeff(pp.value, x, k)
+	q, e := core.coeffCoreWithReceipts(pp.value, x, k, nil, &s.coefficient, &s.coefficientAppend, &s.coefficientFactory)
 	if e != nil {
 		return e
 	}
-	if e = c.assign(core, q); e != nil {
+	if e = c.assignWithFactoryReceipt(core, q, &s.coefficientFactory); e != nil {
 		return e
 	}
 	for j := uint32(1); j < number; j++ {
@@ -325,11 +337,11 @@ func (m *MultivariatePolynomialManager) iccpPartsWithReceipt(p Polynomial, x uin
 		if e != nil {
 			return e
 		}
-		q, e := core.Coeff(pp.value, x, k)
+		q, e := core.coeffCoreWithReceipts(pp.value, x, k, nil, &s.coefficient, &s.coefficientAppend, &s.coefficientFactory)
 		if e != nil {
 			return e
 		}
-		if e = s.ci.assign(core, q); e != nil {
+		if e = s.ci.assignWithFactoryReceipt(core, q, &s.coefficientFactory); e != nil {
 			return e
 		}
 		if e = m.gcdIntoWithReceipt(c.value, s.ci.value, c, &s.gcdInvocation); e != nil {
@@ -352,10 +364,10 @@ func (m *MultivariatePolynomialManager) iccpPartsWithReceipt(p Polynomial, x uin
 			return ErrPolynomialAssertion
 		}
 	}
-	if e = m.flipLeadingSign(c); e != nil {
+	if e = m.flipLeadingSignWithReceipt(c, &s.neg); e != nil {
 		return e
 	}
-	q, e = core.ExactDiv(pp.value, c.value)
+	q, e = core.exactDivWithReceipt(pp.value, c.value, &s.division)
 	if e != nil {
 		return e
 	}
@@ -371,6 +383,9 @@ func (m *MultivariatePolynomialManager) CleanupContentPrimitiveParts() error {
 	if m.iccpDepth != 0 {
 		return ErrPolynomialPending
 	}
+	if e := m.cleanupICCPConstantInvocation(&m.iccpConstant.directReceipt, false); e != nil {
+		return e
+	}
 	if e := m.core.cleanupContentInvocation(&m.iccpShortcutContent, false); e != nil {
 		return e
 	}
@@ -378,6 +393,9 @@ func (m *MultivariatePolynomialManager) CleanupContentPrimitiveParts() error {
 		return e
 	}
 	if e := m.cleanupICCPScopes(m.iccpFrames, true); e != nil {
+		return e
+	}
+	if e := m.cleanupICCPConstantInvocation(&m.iccpConstant.directReceipt, true); e != nil {
 		return e
 	}
 	return m.core.cleanupContentInvocation(&m.iccpShortcutContent, true)
@@ -389,6 +407,9 @@ func (m *MultivariatePolynomialManager) cleanupICCPScopes(scopes []*polynomialIC
 			s := scopes[j]
 			if !s.active {
 				continue
+			}
+			if e := m.cleanupICCPConcreteChildren(s, false); e != nil {
+				return e
 			}
 			if e := m.cleanupGCDInvocation(&s.gcdInvocation, false); e != nil {
 				return e
@@ -417,6 +438,9 @@ func (m *MultivariatePolynomialManager) cleanupICCPScopes(scopes []*polynomialIC
 		if !s.active {
 			continue
 		}
+		if e := m.cleanupICCPConcreteChildren(s, true); e != nil {
+			return e
+		}
 		if e := m.cleanupGCDInvocation(&s.gcdInvocation, true); e != nil {
 			return e
 		}
@@ -444,13 +468,15 @@ func (m *MultivariatePolynomialManager) cleanupICCPScopes(scopes []*polynomialIC
 	}
 	for _, s := range scopes {
 		if s.active {
-			h := s.header
-			*s = polynomialICCPScope{header: h, invocation: s.invocation}
+			s.retireICCPInvocation()
 		}
 	}
 	return nil
 }
 func (m *MultivariatePolynomialManager) iccpPending() bool {
+	if m.iccpConstant.active {
+		return true
+	}
 	if m.core.matchesContentInvocation(&m.iccpShortcutContent) {
 		return true
 	}
