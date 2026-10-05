@@ -97730,9 +97730,37 @@
       "path": "src/test/sorting_network.cpp",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_sorting_network_unsigned_source_test.go",
+        "util_sorting_network_unsigned_diagnostics_source_test.go",
+        "util_sorting_network_unsigned_storage.go",
+        "util_sorting_network_unsigned_ownership_source_test.go",
+        "util_sorting_network_unsigned.go",
+        "util_unsigned_vector_growth_source.go",
+        "util_unsigned_vector_growth_retry_source_test.go"
+      ],
+      "tests": [
+        "TestUnsignedSortingNetworkSourceRegisteredUnsignedCampaigns",
+        "TestUnsignedSortingNetworkIndependentFiniteUnsignedOracle",
+        "TestUnsignedSortingNetworkSourceRepeatedStorageAndSelfAlias",
+        "TestUnsignedSortingNetworkFullUnsignedBoundaryOracle",
+        "TestUnsignedSortingNetworkLiteralExchangeAndSortActions",
+        "TestUnsignedSortingNetworkClosedAssertionProviderAndUnusedBorrow",
+        "TestUnsignedSortingNetworkCapturedExchangeOperandsAndSetSourceOrder",
+        "TestUnsignedSortingNetworkEveryActualReservationAndCallerPrefix",
+        "TestUnsignedSortingNetworkConstructorIdentityAndColdRefusal",
+        "TestUnsignedSortingNetworkStoppedReverseDestructorActualReceipt",
+        "TestUnsignedSortingNetworkActualAllocationTransportCannotCloseExecutingOwner",
+        "TestUnsignedSortingNetworkSourceValidNullGrowthRetryRetainsAcquisitions",
+        "TestUnsignedVectorEveryNullRetryReservationPreservesOldAcquisition",
+        "TestUnsignedVectorTwoReturnedNullAcquisitionsAndPrephysicalCause",
+        "TestUnsignedVectorExecutingGrowthGuardsActualTransportCleanup",
+        "TestUnsignedVectorGrowthOwnerExactBindingBeforeMutation",
+        "TestUnsignedVectorGrowthClosedProviderBeforeArchiveMutation",
+        "TestUnsignedVectorAssignedCurrentGrowthRetainsOlderNullAcquisition",
+        "TestUnsignedVectorEveryAssignedCurrentGrowthReservation"
+      ],
       "assertions": [
         {
           "line": 58,
@@ -97789,9 +97817,57 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete unsigned_ext sorting_network constructor, literal padded unsigned comparator network and recursive current/next pointer schedule (src/util/sorting_network.h:28-115)",
+          "status": "partial",
+          "go_target": "util_sorting_network_unsigned.go",
+          "tests": [
+            "TestUnsignedSortingNetworkSourceRegisteredUnsignedCampaigns",
+            "TestUnsignedSortingNetworkIndependentFiniteUnsignedOracle",
+            "TestUnsignedSortingNetworkSourceRepeatedStorageAndSelfAlias",
+            "TestUnsignedSortingNetworkFullUnsignedBoundaryOracle"
+          ]
+        },
+        {
+          "name": "Concrete actual Runtime svector index/payload prefix and SASSERT transport, reverse source DT with separate owning abort and reentrant lower allocation guard (src/util/sorting_network.h:31-34,39-50,98-108; src/util/vector.h:178-189,303-329,350-365,437-440)",
+          "status": "partial",
+          "go_target": "util_sorting_network_unsigned_storage.go",
+          "tests": [
+            "TestUnsignedSortingNetworkLiteralExchangeAndSortActions",
+            "TestUnsignedSortingNetworkClosedAssertionProviderAndUnusedBorrow",
+            "TestUnsignedSortingNetworkCapturedExchangeOperandsAndSetSourceOrder",
+            "TestUnsignedSortingNetworkEveryActualReservationAndCallerPrefix",
+            "TestUnsignedSortingNetworkConstructorIdentityAndColdRefusal",
+            "TestUnsignedSortingNetworkStoppedReverseDestructorActualReceipt",
+            "TestUnsignedSortingNetworkActualAllocationTransportCannotCloseExecutingOwner"
+          ]
+        },
+        {
+          "name": "Concrete unsigned vector source-valid NULL-growth retry with actual returned acquisition archives, scalar first cause, strict current-member DT and separate exact owning cleanup (src/util/vector.h:59-100,178-189,350-365; src/util/memory_manager.cpp:274-289)",
+          "status": "partial",
+          "go_target": "util_unsigned_vector_growth_source.go",
+          "tests": [
+            "TestUnsignedSortingNetworkSourceValidNullGrowthRetryRetainsAcquisitions",
+            "TestUnsignedVectorEveryNullRetryReservationPreservesOldAcquisition",
+            "TestUnsignedVectorTwoReturnedNullAcquisitionsAndPrephysicalCause",
+            "TestUnsignedVectorExecutingGrowthGuardsActualTransportCleanup",
+            "TestUnsignedVectorGrowthOwnerExactBindingBeforeMutation",
+            "TestUnsignedVectorGrowthClosedProviderBeforeArchiveMutation",
+            "TestUnsignedVectorAssignedCurrentGrowthRetainsOlderNullAcquisition",
+            "TestUnsignedVectorEveryAssignedCurrentGrowthReservation"
+          ]
+        }
+      ],
+      "ownership": [
+        "One reflected network cold header owns its embedded real currentv/nextv Runtime unsigned columns; input/output/DebugContext/Runtime remain borrowed. Source current/next pointer exchanges move no allocation ownership. Every actual19-reservation operation prefix in both Runtime32/64 has immediate named physical/cold graph before faultlift, completed nextv-before-currentv source DT and separate exact owning pending abort. Actual lower acquisition executing guard retains returned root against real Go ErrorTransport reentry; no native callback equivalence.",
+        "Actual prior returned NULL-growth acquisition transfers to charged concrete archive only at retry; exact vector/column/Runtime/nonce tokens remain named. Prephysical failure owns no token/context; first diagnostic cause stays scalar. Source DT frees current member only, explicit owning close drains every pending/archive once. Real Go ErrorTransport executing guard rejects destructive cleanup before lower token return, no native callback equivalence.",
+        "A real successful Assign may publish a live distinct current field while an earlier NULL-allocation token is still pending. Next ordinary growth archives only that exact earlier token after actual current capacity/lifetime reads; pendingReplaces/dangling realloc is never repaired. Real constructor/copy publication supplies current ownership independently of the archived token."
+      ],
+      "deviations": [
+        "Selected unsigned_ext source test_sorting1/test_sorting2/test_sorting4 runs2030 original is_sorted ENSURE instances; AST/psort_nw branches and full registered driver stdout remain open, no whole-driver credit. Concrete stateless unsigned extension preserves source mk_ite/mk_le/default0 without callbacks; source persistent appended mapping columns and reset-self-alias behavior remain literal. Other numeral/AST/psort specializations, TRACE/native ABI/global allocator/other compile profiles remain separate completion obligations. Actual closed-provider/invalid get/division-by-zero and signed TLS overflow tests are explicit Go guard-domain evidence, not ordinary native algorithm/OOM credit.",
+        "Shared SAT column layout remains unchanged, including fixed queue geometry. Extra unsigned context fields are reflected enclosing cold charge; each archive is real Go owner metadata charged before token transfer, with no source Runtime event. Dangling nonnull realloc retries still reach actual raw guards, no repair or native-defined continuation claim."
+      ]
     },
     {
       "path": "src/test/stack.cpp",
@@ -134544,9 +134620,45 @@
       "path": "src/util/sorting_network.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_sorting_network_unsigned_source_test.go",
+        "util_sorting_network_unsigned_diagnostics_source_test.go",
+        "util_sorting_network_unsigned_storage.go",
+        "util_sorting_network_unsigned_ownership_source_test.go",
+        "util_sorting_network_unsigned.go",
+        "util_unsigned_vector_growth_source.go",
+        "util_unsigned_vector_growth_retry_source_test.go",
+        "util_sorting_network_unsigned_copy_source.go",
+        "util_sorting_network_unsigned_copy_source_test.go"
+      ],
+      "tests": [
+        "TestUnsignedSortingNetworkSourceRegisteredUnsignedCampaigns",
+        "TestUnsignedSortingNetworkIndependentFiniteUnsignedOracle",
+        "TestUnsignedSortingNetworkSourceRepeatedStorageAndSelfAlias",
+        "TestUnsignedSortingNetworkFullUnsignedBoundaryOracle",
+        "TestUnsignedSortingNetworkLiteralExchangeAndSortActions",
+        "TestUnsignedSortingNetworkClosedAssertionProviderAndUnusedBorrow",
+        "TestUnsignedSortingNetworkCapturedExchangeOperandsAndSetSourceOrder",
+        "TestUnsignedSortingNetworkEveryActualReservationAndCallerPrefix",
+        "TestUnsignedSortingNetworkConstructorIdentityAndColdRefusal",
+        "TestUnsignedSortingNetworkStoppedReverseDestructorActualReceipt",
+        "TestUnsignedSortingNetworkActualAllocationTransportCannotCloseExecutingOwner",
+        "TestUnsignedSortingNetworkSourceValidNullGrowthRetryRetainsAcquisitions",
+        "TestUnsignedVectorEveryNullRetryReservationPreservesOldAcquisition",
+        "TestUnsignedVectorTwoReturnedNullAcquisitionsAndPrephysicalCause",
+        "TestUnsignedVectorExecutingGrowthGuardsActualTransportCleanup",
+        "TestUnsignedVectorGrowthOwnerExactBindingBeforeMutation",
+        "TestUnsignedVectorGrowthClosedProviderBeforeArchiveMutation",
+        "TestUnsignedVectorAssignedCurrentGrowthRetainsOlderNullAcquisition",
+        "TestUnsignedVectorEveryAssignedCurrentGrowthReservation",
+        "TestUnsignedSortingNetworkGeneratedCopyMemberStorageAndPointerAliases",
+        "TestUnsignedSortingNetworkEveryGeneratedCopyReservationAndMemberUnwind",
+        "TestUnsignedSortingNetworkCopiedPointersBorrowOriginalLifetimeOnlyAtDereference",
+        "TestUnsignedSortingNetworkGeneratedCopyClosedAssertionPrefixAndEmptyMembers",
+        "TestUnsignedSortingNetworkEmptyGeneratedCopyAndAccidentalOwnerCopy",
+        "TestUnsignedSortingNetworkGeneratedCopyPostphysicalFailuresRetainExactChild"
+      ],
       "conditionals": [
         {
           "line": 24,
@@ -134717,9 +134829,72 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete unsigned_ext sorting_network constructor, literal padded unsigned comparator network and recursive current/next pointer schedule (src/util/sorting_network.h:28-115)",
+          "status": "partial",
+          "go_target": "util_sorting_network_unsigned.go",
+          "tests": [
+            "TestUnsignedSortingNetworkSourceRegisteredUnsignedCampaigns",
+            "TestUnsignedSortingNetworkIndependentFiniteUnsignedOracle",
+            "TestUnsignedSortingNetworkSourceRepeatedStorageAndSelfAlias",
+            "TestUnsignedSortingNetworkFullUnsignedBoundaryOracle"
+          ]
+        },
+        {
+          "name": "Concrete actual Runtime svector index/payload prefix and SASSERT transport, reverse source DT with separate owning abort and reentrant lower allocation guard (src/util/sorting_network.h:31-34,39-50,98-108; src/util/vector.h:178-189,303-329,350-365,437-440)",
+          "status": "partial",
+          "go_target": "util_sorting_network_unsigned_storage.go",
+          "tests": [
+            "TestUnsignedSortingNetworkLiteralExchangeAndSortActions",
+            "TestUnsignedSortingNetworkClosedAssertionProviderAndUnusedBorrow",
+            "TestUnsignedSortingNetworkCapturedExchangeOperandsAndSetSourceOrder",
+            "TestUnsignedSortingNetworkEveryActualReservationAndCallerPrefix",
+            "TestUnsignedSortingNetworkConstructorIdentityAndColdRefusal",
+            "TestUnsignedSortingNetworkStoppedReverseDestructorActualReceipt",
+            "TestUnsignedSortingNetworkActualAllocationTransportCannotCloseExecutingOwner"
+          ]
+        },
+        {
+          "name": "Concrete unsigned vector source-valid NULL-growth retry with actual returned acquisition archives, scalar first cause, strict current-member DT and separate exact owning cleanup (src/util/vector.h:59-100,178-189,350-365; src/util/memory_manager.cpp:274-289)",
+          "status": "partial",
+          "go_target": "util_unsigned_vector_growth_source.go",
+          "tests": [
+            "TestUnsignedSortingNetworkSourceValidNullGrowthRetryRetainsAcquisitions",
+            "TestUnsignedVectorEveryNullRetryReservationPreservesOldAcquisition",
+            "TestUnsignedVectorTwoReturnedNullAcquisitionsAndPrephysicalCause",
+            "TestUnsignedVectorExecutingGrowthGuardsActualTransportCleanup",
+            "TestUnsignedVectorGrowthOwnerExactBindingBeforeMutation",
+            "TestUnsignedVectorGrowthClosedProviderBeforeArchiveMutation",
+            "TestUnsignedVectorAssignedCurrentGrowthRetainsOlderNullAcquisition",
+            "TestUnsignedVectorEveryAssignedCurrentGrowthReservation"
+          ]
+        },
+        {
+          "name": "Generated unsigned sorting_network copy constructor: vector members current\u2192next exact-cap copy then original scalar pointer aliases, completed-member reverse unwind and failed-constructor owning abort (src/util/sorting_network.h:28-34,87-94; src/util/vector.h:102-120,159-167,178-189)",
+          "status": "partial",
+          "go_target": "util_sorting_network_unsigned_copy_source.go",
+          "tests": [
+            "TestUnsignedSortingNetworkGeneratedCopyMemberStorageAndPointerAliases",
+            "TestUnsignedSortingNetworkEveryGeneratedCopyReservationAndMemberUnwind",
+            "TestUnsignedSortingNetworkCopiedPointersBorrowOriginalLifetimeOnlyAtDereference",
+            "TestUnsignedSortingNetworkGeneratedCopyClosedAssertionPrefixAndEmptyMembers",
+            "TestUnsignedSortingNetworkEmptyGeneratedCopyAndAccidentalOwnerCopy",
+            "TestUnsignedSortingNetworkGeneratedCopyPostphysicalFailuresRetainExactChild"
+          ]
+        }
+      ],
+      "ownership": [
+        "One reflected network cold header owns its embedded real currentv/nextv Runtime unsigned columns; input/output/DebugContext/Runtime remain borrowed. Source current/next pointer exchanges move no allocation ownership. Every actual19-reservation operation prefix in both Runtime32/64 has immediate named physical/cold graph before faultlift, completed nextv-before-currentv source DT and separate exact owning pending abort. Actual lower acquisition executing guard retains returned root against real Go ErrorTransport reentry; no native callback equivalence.",
+        "Actual prior returned NULL-growth acquisition transfers to charged concrete archive only at retry; exact vector/column/Runtime/nonce tokens remain named. Prephysical failure owns no token/context; first diagnostic cause stays scalar. Source DT frees current member only, explicit owning close drains every pending/archive once. Real Go ErrorTransport executing guard rejects destructive cleanup before lower token return, no native callback equivalence.",
+        "A real successful Assign may publish a live distinct current field while an earlier NULL-allocation token is still pending. Next ordinary growth archives only that exact earlier token after actual current capacity/lifetime reads; pendingReplaces/dangling realloc is never repaired. Real constructor/copy publication supplies current ownership independently of the archived token.",
+        "One reflected class owner header includes true constructor-completion fields and both embedded vectors. Generated copy constructs currentv then nextv using source size/capacity/exact allocation/ascending SIZE placements. Only after completion do current/next copy original member addresses, borrowed until reached dereference. Next-member failure source-destructs completed current before return; failed member has no source DT, and actual returned allocation/published partial field stays named for distinct owning Close. Every actual constructor reservation and first/second postphysical failure retains original, caller output and separate failed/successful later class graphs before lift."
+      ],
+      "deviations": [
+        "Selected unsigned_ext source test_sorting1/test_sorting2/test_sorting4 runs2030 original is_sorted ENSURE instances; AST/psort_nw branches and full registered driver stdout remain open, no whole-driver credit. Concrete stateless unsigned extension preserves source mk_ite/mk_le/default0 without callbacks; source persistent appended mapping columns and reset-self-alias behavior remain literal. Other numeral/AST/psort specializations, TRACE/native ABI/global allocator/other compile profiles remain separate completion obligations. Actual closed-provider/invalid get/division-by-zero and signed TLS overflow tests are explicit Go guard-domain evidence, not ordinary native algorithm/OOM credit.",
+        "Shared SAT column layout remains unchanged, including fixed queue geometry. Extra unsigned context fields are reflected enclosing cold charge; each archive is real Go owner metadata charged before token transfer, with no source Runtime event. Dangling nonnull realloc retries still reach actual raw guards, no repair or native-defined continuation claim.",
+        "Generated copy counterpart has no originating registered-driver copy assertion credit. Empty/cold/closed-provider/accidental-copy guards are Go representation/lifetime domains. Default reference-member assignment has no generated supported operator, so no assignment API is invented. Source scalar pointer aliases deliberately remain original; ended original is unread on zero input, then actual source kernel dereference returns typed lifetime guard after caller/own-member prefixes. GNU/default unsigned specialization only; other ext/AST/native global diagnostics/ABI remain separate obligations."
+      ]
     },
     {
       "path": "src/util/sstream.h",
@@ -137876,7 +138051,11 @@
         "util_permutation_word_view.go",
         "util_debug_notification.go",
         "util_debug_macros.go",
-        "util_debug_macro_source_test.go"
+        "util_debug_macro_source_test.go",
+        "util_unsigned_vector_growth_source.go",
+        "util_unsigned_vector_growth_retry_source_test.go",
+        "util_sorting_network_unsigned_copy_source.go",
+        "util_sorting_network_unsigned_copy_source_test.go"
       ],
       "tests": [
         "TestParamDescrsBudgetFailuresAndWarmDuplicate",
@@ -138250,7 +138429,21 @@
         "TestDebugMacroHeapNonInsertFalseMinReachesSourceNotification",
         "TestDebugMacroHeapMinContinueReachesConstIndexedSpare",
         "TestDebugMacroHeapRemainingFalseLeavesThrowBeforeBody",
-        "TestDebugMacroHeapNestedVectorShrinkContinuePublishesAfterAssertion"
+        "TestDebugMacroHeapNestedVectorShrinkContinuePublishesAfterAssertion",
+        "TestUnsignedSortingNetworkSourceValidNullGrowthRetryRetainsAcquisitions",
+        "TestUnsignedVectorEveryNullRetryReservationPreservesOldAcquisition",
+        "TestUnsignedVectorTwoReturnedNullAcquisitionsAndPrephysicalCause",
+        "TestUnsignedVectorExecutingGrowthGuardsActualTransportCleanup",
+        "TestUnsignedVectorGrowthOwnerExactBindingBeforeMutation",
+        "TestUnsignedVectorGrowthClosedProviderBeforeArchiveMutation",
+        "TestUnsignedVectorAssignedCurrentGrowthRetainsOlderNullAcquisition",
+        "TestUnsignedVectorEveryAssignedCurrentGrowthReservation",
+        "TestUnsignedSortingNetworkGeneratedCopyMemberStorageAndPointerAliases",
+        "TestUnsignedSortingNetworkEveryGeneratedCopyReservationAndMemberUnwind",
+        "TestUnsignedSortingNetworkCopiedPointersBorrowOriginalLifetimeOnlyAtDereference",
+        "TestUnsignedSortingNetworkGeneratedCopyClosedAssertionPrefixAndEmptyMembers",
+        "TestUnsignedSortingNetworkEmptyGeneratedCopyAndAccidentalOwnerCopy",
+        "TestUnsignedSortingNetworkGeneratedCopyPostphysicalFailuresRetainExactChild"
       ],
       "conditionals": [
         {
@@ -138937,6 +139130,34 @@
             "TestDebugMacroHeapRemainingFalseLeavesThrowBeforeBody",
             "TestDebugMacroHeapNestedVectorShrinkContinuePublishesAfterAssertion"
           ]
+        },
+        {
+          "name": "Concrete unsigned vector source-valid NULL-growth retry with actual returned acquisition archives, scalar first cause, strict current-member DT and separate exact owning cleanup (src/util/vector.h:59-100,178-189,350-365; src/util/memory_manager.cpp:274-289)",
+          "status": "partial",
+          "go_target": "util_unsigned_vector_growth_source.go",
+          "tests": [
+            "TestUnsignedSortingNetworkSourceValidNullGrowthRetryRetainsAcquisitions",
+            "TestUnsignedVectorEveryNullRetryReservationPreservesOldAcquisition",
+            "TestUnsignedVectorTwoReturnedNullAcquisitionsAndPrephysicalCause",
+            "TestUnsignedVectorExecutingGrowthGuardsActualTransportCleanup",
+            "TestUnsignedVectorGrowthOwnerExactBindingBeforeMutation",
+            "TestUnsignedVectorGrowthClosedProviderBeforeArchiveMutation",
+            "TestUnsignedVectorAssignedCurrentGrowthRetainsOlderNullAcquisition",
+            "TestUnsignedVectorEveryAssignedCurrentGrowthReservation"
+          ]
+        },
+        {
+          "name": "Generated unsigned sorting_network copy constructor: vector members current\u2192next exact-cap copy then original scalar pointer aliases, completed-member reverse unwind and failed-constructor owning abort (src/util/sorting_network.h:28-34,87-94; src/util/vector.h:102-120,159-167,178-189)",
+          "status": "partial",
+          "go_target": "util_sorting_network_unsigned_copy_source.go",
+          "tests": [
+            "TestUnsignedSortingNetworkGeneratedCopyMemberStorageAndPointerAliases",
+            "TestUnsignedSortingNetworkEveryGeneratedCopyReservationAndMemberUnwind",
+            "TestUnsignedSortingNetworkCopiedPointersBorrowOriginalLifetimeOnlyAtDereference",
+            "TestUnsignedSortingNetworkGeneratedCopyClosedAssertionPrefixAndEmptyMembers",
+            "TestUnsignedSortingNetworkEmptyGeneratedCopyAndAccidentalOwnerCopy",
+            "TestUnsignedSortingNetworkGeneratedCopyPostphysicalFailuresRetainExactChild"
+          ]
         }
       ],
       "ownership": [
@@ -138975,7 +139196,10 @@
         "Source indexed std::swap lvalues acquired once: mutable vector.h:304 checks4 failed forward accesses in completed SIZE0 spare fixture; assignments write through reached lvalues without repeated SASSERT. Actual initialized spare reads/writes remain physically guarded.",
         "Call-local word views have no allocation or cold owner: pointer acquisition records actual provider/block/offset; retained live backing exchange test names both owner fields and validates complete raw/cold graph; genuine deallocation then makes captured token stale at reached load/store. No debugger mutation callbacks or snapshot authority.",
         "Both public binding setters enforce the same nonnull interactive standard-service identity without reading pointed closed/input/file state. Actual same-Budget distinct-file services/hex-versus-decimal flags are rejected without pointer or charge mutation; null/unbound and NO_DEBUGGER stream-erasure preserved.",
-        "Concrete borrowed assertion/action/stream providers reuse actual charged existing headers; macro leaves and call-local scalar operands add no owning storage; actual heap refusal graph audited before fault lift."
+        "Concrete borrowed assertion/action/stream providers reuse actual charged existing headers; macro leaves and call-local scalar operands add no owning storage; actual heap refusal graph audited before fault lift.",
+        "Actual prior returned NULL-growth acquisition transfers to charged concrete archive only at retry; exact vector/column/Runtime/nonce tokens remain named. Prephysical failure owns no token/context; first diagnostic cause stays scalar. Source DT frees current member only, explicit owning close drains every pending/archive once. Real Go ErrorTransport executing guard rejects destructive cleanup before lower token return, no native callback equivalence.",
+        "A real successful Assign may publish a live distinct current field while an earlier NULL-allocation token is still pending. Next ordinary growth archives only that exact earlier token after actual current capacity/lifetime reads; pendingReplaces/dangling realloc is never repaired. Real constructor/copy publication supplies current ownership independently of the archived token.",
+        "One reflected class owner header includes true constructor-completion fields and both embedded vectors. Generated copy constructs currentv then nextv using source size/capacity/exact allocation/ascending SIZE placements. Only after completion do current/next copy original member addresses, borrowed until reached dereference. Next-member failure source-destructs completed current before return; failed member has no source DT, and actual returned allocation/published partial field stays named for distinct owning Close. Every actual constructor reservation and first/second postphysical failure retains original, caller output and separate failed/successful later class graphs before lift."
       ],
       "deviations": [
         "Concrete solver-specific storage, not complete generic vector template surface. Owning model Clone/Assign, other specializations and source-undefined continuation behavior remain explicitly separate.",
@@ -139026,7 +139250,9 @@
         "No whole debug.h/heap.h/source-driver promotion",
         "Legacy slice-backed heap and unbound SAT assertion adapters remain separately partial; concrete Runtime general heap false sites covered here",
         "Per-instance borrowed debug contexts represent selected source-global namespace; independent unrelated contexts are not a completed process-global registry binding",
-        "Outer check_invariant always returns true after nested C continuation; no observed false outer CASSERT or fabricated source line0 regression claim"
+        "Outer check_invariant always returns true after nested C continuation; no observed false outer CASSERT or fabricated source line0 regression claim",
+        "Shared SAT column layout remains unchanged, including fixed queue geometry. Extra unsigned context fields are reflected enclosing cold charge; each archive is real Go owner metadata charged before token transfer, with no source Runtime event. Dangling nonnull realloc retries still reach actual raw guards, no repair or native-defined continuation claim.",
+        "Generated copy counterpart has no originating registered-driver copy assertion credit. Empty/cold/closed-provider/accidental-copy guards are Go representation/lifetime domains. Default reference-member assignment has no generated supported operator, so no assignment API is invented. Source scalar pointer aliases deliberately remain original; ended original is unread on zero input, then actual source kernel dereference returns typed lifetime guard after caller/own-member prefixes. GNU/default unsigned specialization only; other ext/AST/native global diagnostics/ABI remain separate obligations."
       ]
     },
     {

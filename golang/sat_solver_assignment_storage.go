@@ -1,5 +1,6 @@
 // Source: src/util/vector.h:59-100,303-310,389-405.
-// Licensed under the MIT license.
+// Source author: Leonardo de Moura.
+// Licensed under the MIT license; see LICENSE.txt.
 package g3
 
 import (
@@ -85,6 +86,17 @@ func (c *satSolverAssignmentColumn) expandStride(stride uint32) error {
 // The default SAT adapter remains assertion-enabled. The concrete general heap
 // may borrow the actual global switch at this one reached source SASSERT site.
 func (c *satSolverAssignmentColumn) expandStrideDebug(stride uint32, debug *DebugContext) error {
+	return c.expandStrideUnsignedOwner(stride, debug, nil)
+}
+
+// Concrete optional unsigned owner records actual lower allocation outcomes.
+// The shared column layout and every legacy/SAT default route stay unchanged.
+func (c *satSolverAssignmentColumn) expandStrideUnsignedOwner(stride uint32, debug *DebugContext, owner *RuntimeUnsignedVector) error {
+	if owner != nil {
+		if e := owner.matchGrowthColumn(c); e != nil {
+			return e
+		}
+	}
 	if c.block != (memory.Block{}) && satStorageSourceDebug {
 		enabled := true
 		if debug != nil {
@@ -119,11 +131,20 @@ func (c *satSolverAssignmentColumn) expandStrideDebug(stride uint32, debug *Debu
 	if e != nil {
 		return e
 	}
+	if owner != nil {
+		if e = owner.startUnsignedGrowth(c); e != nil {
+			return e
+		}
+		defer owner.endUnsignedGrowth()
+	}
 	if c.block == (memory.Block{}) {
 		h, e := c.runtime.Allocate(uint64(request))
 		if e != nil {
 			if h != (memory.Block{}) {
 				c.pending = h
+			}
+			if owner != nil {
+				owner.recordUnsignedGrowth(e, h != (memory.Block{}))
 			}
 			return e
 		}
@@ -133,6 +154,9 @@ func (c *satSolverAssignmentColumn) expandStrideDebug(stride uint32, debug *Debu
 		}
 		if e != nil {
 			c.pending = h
+			if owner != nil {
+				owner.recordUnsignedGrowth(e, true)
+			}
 			return e
 		}
 		c.block = h
@@ -143,6 +167,9 @@ func (c *satSolverAssignmentColumn) expandStrideDebug(stride uint32, debug *Debu
 		if h != c.block {
 			c.pending = h
 			c.pendingReplaces = true
+		}
+		if owner != nil {
+			owner.recordUnsignedGrowth(e, h != c.block && h != (memory.Block{}))
 		}
 		return e
 	}

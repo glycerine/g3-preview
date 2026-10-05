@@ -24,6 +24,10 @@ type RuntimeUnsignedVector struct {
 	copyCleanupCause                  error
 	assignmentDestroyed, constructed  bool
 	sourceDone, closed                bool
+	growthAcquisitions                *runtimeUnsignedGrowthAcquisition
+	growthSerial, growthInvocation    uint64
+	growthCause, growthPendingCause   error
+	growthExecuting                   bool
 }
 
 func (v *RuntimeUnsignedVector) bind(r *memory.Runtime, b *arena.Budget) {
@@ -49,6 +53,9 @@ func NewRuntimeUnsignedVector(r *memory.Runtime, b *arena.Budget) (*RuntimeUnsig
 func (v *RuntimeUnsignedVector) open() error {
 	if v == nil || v.self != v {
 		return ErrSATOwner
+	}
+	if v.growthExecuting {
+		return ErrRuntimeUnsignedGrowthExecuting
 	}
 	if v.closed || !v.constructed || v.sourceDone || v.destructorCause != nil {
 		return arena.ErrClosed
@@ -83,7 +90,7 @@ func (v *RuntimeUnsignedVector) Push(n uint32) error {
 	if e := v.open(); e != nil {
 		return e
 	}
-	return v.column.push(n)
+	return v.pushUnsignedSource(n, nil)
 }
 func (v *RuntimeUnsignedVector) Reset() error {
 	if e := v.open(); e != nil {
@@ -115,7 +122,7 @@ func (v *RuntimeUnsignedVector) Resize(n, fill uint32) error {
 		if n <= cap {
 			break
 		}
-		if e = v.column.raw.expandStride(4); e != nil {
+		if e = v.expandUnsignedSource(nil); e != nil {
 			return e
 		}
 	}
@@ -132,6 +139,9 @@ func (v *RuntimeUnsignedVector) Resize(n, fill uint32) error {
 func (v *RuntimeUnsignedVector) SourceFinalize() error {
 	if v == nil || v.self != v {
 		return ErrSATOwner
+	}
+	if v.growthExecuting {
+		return ErrRuntimeUnsignedGrowthExecuting
 	}
 	if v.closed || v.sourceDone || !v.constructed {
 		return nil
@@ -157,6 +167,9 @@ func (v *RuntimeUnsignedVector) closeOwning() error {
 		if v.copyCleanupCause == nil {
 			v.copyCleanupCause = e
 		}
+		return e
+	}
+	if e := v.cleanupGrowthAcquisitions(); e != nil {
 		return e
 	}
 	if e := v.cleanupCopyAcquisitions(); e != nil {
