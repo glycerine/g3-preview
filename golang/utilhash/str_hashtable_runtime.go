@@ -17,18 +17,19 @@ import (
 var ErrStrHashtableExecuting = errors.New("g3: string-table allocation is executing")
 
 type strHashtableRaw struct {
-	destructing   bool
-	executing     bool
-	inline        bool
-	words         [6]uint32
-	initialized   uint8
-	lexical       *strHashtableScope
-	self          *StrHashtable
-	object, table memory.Block
-	acquisitions  *strHashtableAcquisition
-	sourceCause   error
-	sourceStage   uint8
-	complete      bool
+	destructing      bool
+	executing        bool
+	inline           bool
+	words            [6]uint32
+	inlineStatistics [2]uint32
+	initialized      uint8
+	lexical          *strHashtableScope
+	self             *StrHashtable
+	object, table    memory.Block
+	acquisitions     *strHashtableAcquisition
+	sourceCause      error
+	sourceStage      uint8
+	complete         bool
 }
 type strHashtableAcquisition struct {
 	next  *strHashtableAcquisition
@@ -102,10 +103,14 @@ func (h *StrHashtable) transferRuntime(a *strHashtableAcquisition) memory.Block 
 }
 func (h *StrHashtable) writeRuntimeWord(off uint64, v uint32) error {
 	if h.raw.inline {
-		if off%4 != 0 || off >= 24 {
+		if off%4 != 0 || off >= h.runtimeObjectExtent() {
 			return arena.ErrBounds
 		}
-		h.raw.words[off/4] = v
+		if off >= 24 {
+			h.raw.inlineStatistics[(off-24)/4] = v
+		} else {
+			h.raw.words[off/4] = v
+		}
 		h.raw.initialized |= 1 << uint8(off/4)
 		return nil
 	}
@@ -113,11 +118,14 @@ func (h *StrHashtable) writeRuntimeWord(off uint64, v uint32) error {
 }
 func (h *StrHashtable) runtimeWord(off uint64) (uint32, error) {
 	if h.raw.inline {
-		if off%4 != 0 || off >= 24 {
+		if off%4 != 0 || off >= h.runtimeObjectExtent() {
 			return 0, arena.ErrBounds
 		}
 		if h.raw.initialized&(1<<uint8(off/4)) == 0 {
 			return 0, memory.ErrRuntimeUninitialized
+		}
+		if off >= 24 {
+			return h.raw.inlineStatistics[(off-24)/4], nil
 		}
 		return h.raw.words[off/4], nil
 	}
@@ -175,7 +183,7 @@ func (h *StrHashtable) allocateRuntimeTable(n uint32) (*strHashtableAcquisition,
 }
 func (h *StrHashtable) constructRuntime(n uint32) error {
 	h.raw.self = h
-	a, e := h.allocateRuntime(24)
+	a, e := h.allocateRuntime(h.runtimeObjectExtent())
 	if e != nil {
 		return e
 	}
@@ -213,6 +221,11 @@ func (h *StrHashtable) constructRuntime(n uint32) error {
 		v   uint32
 	}{{8, n}, {12, 0}, {16, 0}} {
 		if e = h.writeRuntimeWord(w.off, w.v); e != nil {
+			return e
+		}
+	}
+	if h.config.Statistics {
+		if e = h.writeCollision(0); e != nil {
 			return e
 		}
 	}
@@ -606,6 +619,9 @@ func (h *StrHashtable) insertRuntime(region *arena.BytesRegion, key StrKey, over
 					return false, h.ref(i), nil
 				}
 			}
+			if e = h.incrementCollision(); e != nil {
+				return false, StrHashtableEntryRef{}, e
+			}
 		default:
 			on, err := h.assertionsEnabled()
 			if err != nil {
@@ -627,6 +643,9 @@ func (h *StrHashtable) insertRuntime(region *arena.BytesRegion, key StrKey, over
 				}
 			}
 			deleted = i
+			if e = h.incrementCollision(); e != nil {
+				return false, StrHashtableEntryRef{}, e
+			}
 		case strHashFree:
 			if e = h.canBump(); e != nil {
 				return false, StrHashtableEntryRef{}, e
@@ -943,7 +962,7 @@ func (h *StrHashtable) cloneRuntime(heap bool) (*StrHashtable, error) {
 	out.raw.inline = !heap
 	var a *strHashtableAcquisition
 	if heap {
-		a, e = out.allocateRuntime(24)
+		a, e = out.allocateRuntime(out.runtimeObjectExtent())
 		if e != nil {
 			return retireEmptyFailedRuntime(out, e)
 		}
@@ -1072,11 +1091,16 @@ func (h *StrHashtable) cloneRuntime(heap bool) (*StrHashtable, error) {
 	if e = out.writeRuntimeWord(16, 0); e != nil {
 		return failed(e)
 	}
+	if out.config.Statistics {
+		if e = out.writeCollision(0); e != nil {
+			return failed(e)
+		}
+	}
 	out.raw.complete = true
 	return out, nil
 }
 func (h *StrHashtable) swapRuntime(other *StrHashtable) error {
-	if h.config.Runtime != other.config.Runtime || h.config.Budget != other.config.Budget {
+	if h.config.Runtime != other.config.Runtime || h.config.Budget != other.config.Budget || h.config.Statistics != other.config.Statistics {
 		return arena.ErrConfig
 	}
 	if e := h.bothOpen(other); e != nil {
@@ -1113,6 +1137,22 @@ func (h *StrHashtable) swapRuntime(other *StrHashtable) error {
 			return e
 		}
 		if e = other.writeRuntimeWord(off, x); e != nil {
+			return e
+		}
+	}
+	if h.config.Statistics {
+		left, e := h.readCollision()
+		if e != nil {
+			return e
+		}
+		right, e := other.readCollision()
+		if e != nil {
+			return e
+		}
+		if e = h.writeCollision(right); e != nil {
+			return e
+		}
+		if e = other.writeCollision(left); e != nil {
 			return e
 		}
 	}

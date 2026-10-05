@@ -27,6 +27,7 @@ type StrKey struct {
 	origin         uint64
 }
 
+func (k StrKey) Origin() uint64                   { return k.origin }
 func (k StrKey) Allocation() arena.BytesRegionRef { return k.ref }
 func (k StrKey) Offset() uint32                   { return k.offset }
 func (k StrKey) Length() uint32                   { return k.length }
@@ -38,6 +39,7 @@ type strHashEntry struct {
 type StrHashtableConfig struct {
 	Runtime     *memory.Runtime
 	Assertions  StrHashtableAssertionContext
+	Statistics  bool
 	Budget      *arena.Budget
 	OutOfMemory func() bool
 	// InitialCapacity is the source constructor parameter; zero selects8.
@@ -74,7 +76,7 @@ func NewStrHashtable(r *arena.BytesRegion, c StrHashtableConfig) (*StrHashtable,
 	return newStrHashtableCapacity(r, c, n)
 }
 func newStrHashtableCapacity(r *arena.BytesRegion, c StrHashtableConfig, n uint32) (*StrHashtable, error) {
-	if r == nil || c.Runtime != nil && (c.Runtime.Budget() != c.Budget || c.OutOfMemory != nil) {
+	if r == nil || c.Statistics && c.Runtime == nil || c.Runtime != nil && (c.Runtime.Budget() != c.Budget || c.OutOfMemory != nil) {
 		return nil, arena.ErrConfig
 	}
 	if c.Assertions != nil && c.Assertions.StrHashtableAssertionBudget() != c.Budget {
@@ -164,7 +166,22 @@ func (h *StrHashtable) Deleted() uint32 {
 	}
 	return h.deleted
 }
-func (h *StrHashtable) CollisionCount() uint64 { return 0 }
+func (h *StrHashtable) CollisionCount() uint64 {
+	if !h.config.Statistics {
+		return 0
+	}
+	if h.raw.self != h {
+		panic(arena.ErrConfig)
+	}
+	if h.closed || !h.raw.complete || h.raw.destructing {
+		panic(arena.ErrClosed)
+	}
+	v, e := h.readCollision()
+	if e != nil {
+		panic(e)
+	}
+	return v
+}
 
 // StrHashtableStats accounts this owner, scalar table and cold owner directory.
 // Borrowed regions report their own graphs and are never charged by this table.
@@ -595,8 +612,16 @@ func (h *StrHashtable) findSlotFromSource(region *arena.BytesRegion, key StrKey,
 				return i, true, nil
 			}
 		}
+		if entry.state == strHashUsed {
+			if e := h.incrementCollision(); e != nil {
+				return 0, false, e
+			}
+		}
 		if entry.state == strHashFree {
 			return 0, false, nil
+		}
+		if e := h.incrementCollision(); e != nil {
+			return 0, false, e
 		}
 		if h.config.Runtime != nil {
 			i++
@@ -725,8 +750,16 @@ func (h *StrHashtable) FindCString(s string) (StrHashtableEntryRef, bool, error)
 				return h.ref(i), true, nil
 			}
 		}
+		if entry.state == strHashUsed {
+			if e := h.incrementCollision(); e != nil {
+				return StrHashtableEntryRef{}, false, e
+			}
+		}
 		if entry.state == strHashFree {
 			return StrHashtableEntryRef{}, false, nil
+		}
+		if e := h.incrementCollision(); e != nil {
+			return StrHashtableEntryRef{}, false, e
 		}
 		if h.config.Runtime != nil {
 			i++

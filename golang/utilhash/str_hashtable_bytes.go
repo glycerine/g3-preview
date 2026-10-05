@@ -79,8 +79,16 @@ func (h *StrHashtable) FindCStringBytes(s []byte) (StrHashtableEntryRef, bool, e
 				return h.ref(i), true, nil
 			}
 		}
+		if entry.state == strHashUsed {
+			if e := h.incrementCollision(); e != nil {
+				return StrHashtableEntryRef{}, false, e
+			}
+		}
 		if entry.state == strHashFree {
 			return StrHashtableEntryRef{}, false, nil
+		}
+		if e := h.incrementCollision(); e != nil {
+			return StrHashtableEntryRef{}, false, e
 		}
 		if h.config.Runtime != nil {
 			i++
