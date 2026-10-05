@@ -60,13 +60,17 @@ func (h *StrHashtable) DumpInto(out StrHashtableOutput) error {
 		return out.AppendCString("]")
 	}
 	table := h.table
-	cap := uint32(len(table))
+	cap := h.Capacity()
 	if e := out.AppendCString("["); e != nil {
 		return e
 	}
 	first := true
 	for i := uint32(0); i < cap; i++ {
-		if table[i].state != strHashUsed {
+		entry, e := legacyEntryAt(table, i)
+		if e != nil {
+			return e
+		}
+		if entry.state != strHashUsed {
 			continue
 		}
 		if first {
@@ -74,7 +78,7 @@ func (h *StrHashtable) DumpInto(out StrHashtableOutput) error {
 		} else if e := out.AppendCString(" "); e != nil {
 			return e
 		}
-		key := table[i].key
+		key := entry.key
 		region, e := h.keyRegion(key)
 		if e != nil {
 			return e

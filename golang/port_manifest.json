@@ -105144,7 +105144,14 @@
         "utilhash/str_hashtable_cstring_source_test.go",
         "utilhash/str_hashtable_test.go",
         "utilhash/str_hashtable_legacy_lifecycle.go",
-        "utilhash/str_hashtable_legacy_lifecycle_source_test.go"
+        "utilhash/str_hashtable_legacy_lifecycle_source_test.go",
+        "utilhash/str_hashtable_legacy_assertions.go",
+        "utilhash/str_hashtable_legacy_assertions_source_test.go",
+        "util_str_hashtable_legacy_assertions_source_test.go",
+        "utilhash/str_hashtable_runtime_destructor_source_test.go",
+        "utilhash/str_hashtable_legacy_statistics_source_test.go",
+        "util_str_hashtable_legacy_statistics_output_source_test.go",
+        "utilhash/str_hashtable_owner_identity_source_test.go"
       ],
       "tests": [
         "TestUintMapSourceMapAssertions",
@@ -105351,7 +105358,32 @@
         "TestStrHashtableLegacyCompletedCopyDestructorBeforeOwningHeaderAbort",
         "TestStrHashtableLegacyEmptyResetDoesNotReadDestroyedBacking",
         "TestStrHashtableLegacyReplacementBodyFailureNullSourceDestructor",
-        "TestStrHashtableLegacyGrowthBodyFailureNonNullSourceDestructor"
+        "TestStrHashtableLegacyGrowthBodyFailureNonNullSourceDestructor",
+        "TestStrHashtableLegacyGrowthEveryActualReservationBeforeSuccess",
+        "TestStrHashtableLegacyCopyMoveActualDeletedTargetAssertion",
+        "TestStrHashtableLegacyInvariantDefaultSourceAssertion",
+        "TestStrHashtableLegacyActualExhaustedProbeUnreachableProfiles",
+        "TestStrHashtableLegacyCapturedReachedPointerRetainsLiveBacking",
+        "TestStrHashtableLegacyBoundConstructorAndLinearSourceContinuation",
+        "TestStrHashtableLegacyClosedAssertionProviderAtCopyAndInvariantSites",
+        "TestStrHashtableLegacyGrowthSourceAssertionStopRetainsNewAndOld",
+        "TestStrHashtableLegacyClosedFlagAtActualDeletedInsertAndFullRemove",
+        "TestStrHashtableLegacyNonPowerResetRealSourceContinueAndThrow",
+        "TestStrHashtableRuntimeNullReplacementDestructorRetainsUnjoinedNew",
+        "TestStrHashtableRuntimeBodyReleaseStopReachesOwnDestructorBoundary",
+        "TestStrHashtableRuntimeReplacementEveryRefusalThenSourceDestructor",
+        "TestStrHashtableLegacyStatisticsActualScalarAndLiteralMissCounts",
+        "TestStrHashtableLegacyStatisticsIndependentFiniteProbeCounts",
+        "TestStrHashtableLegacyStatisticsEveryConstructorCopyAndReplacementReservation",
+        "TestStrHashtableLegacyStatisticsUnsignedScalarAndCopyBodyOrder",
+        "TestStrHashtableLegacyStatisticsBothInsertMacrosAndProfileBinding",
+        "TestStrHashtableLegacyStatisticsDumpIntoActualFieldFormattingAndCallerWidth",
+        "TestStrHashtableLegacyStatisticsDumpIntoClosedFileStillReachesActualBorrowedCString",
+        "TestStrHashtableLegacyStatisticsDumpIntoEveryOutputReservationAndExactPrefix",
+        "TestStrHashtableLegacyStatisticsDumpIntoActualFileAndEmptyBorrowErasure",
+        "TestStrHashtableLegacyStatisticsDumpIntoBorrowedSpellingRereadAndFileBytes",
+        "TestStrHashtableLegacyAccidentalGoCopyCannotOwnSourceActions",
+        "TestStrHashtableZeroGoWrapperCannotOwnCleanup"
       ],
       "conditionals": [
         {
@@ -106174,6 +106206,73 @@
             "TestStrHashtableLegacyReplacementBodyFailureNullSourceDestructor",
             "TestStrHashtableLegacyGrowthBodyFailureNonNullSourceDestructor"
           ]
+        },
+        {
+          "name": "Legacy char-pointer actual SASSERT/UNREACHABLE constructor, copy/move, linear wrapped probe, remove and invariant dispatch (src/util/hashtable.h:159-215,249,371-451,559,643-644)",
+          "status": "partial",
+          "go_target": "utilhash/str_hashtable_legacy_assertions.go",
+          "tests": [
+            "TestStrHashtableLegacyGrowthEveryActualReservationBeforeSuccess",
+            "TestStrHashtableLegacyCopyMoveActualDeletedTargetAssertion",
+            "TestStrHashtableLegacyInvariantDefaultSourceAssertion",
+            "TestStrHashtableLegacyActualExhaustedProbeUnreachableProfiles",
+            "TestStrHashtableLegacyCapturedReachedPointerRetainsLiveBacking"
+          ]
+        },
+        {
+          "name": "Borrowed concrete DebugContext legacy constructor C/T and reached flag control (src/util/hashtable.h:249; src/util/debug.h:60-65,76-89)",
+          "status": "partial",
+          "go_target": "util_str_hashtable_legacy_assertions_source_test.go",
+          "tests": [
+            "TestStrHashtableLegacyBoundConstructorAndLinearSourceContinuation",
+            "TestStrHashtableLegacyClosedAssertionProviderAtCopyAndInvariantSites",
+            "TestStrHashtableLegacyGrowthSourceAssertionStopRetainsNewAndOld",
+            "TestStrHashtableLegacyClosedFlagAtActualDeletedInsertAndFullRemove",
+            "TestStrHashtableLegacyNonPowerResetRealSourceContinueAndThrow"
+          ]
+        },
+        {
+          "name": "Runtime completed core source DT distinguishes NULL current table, first body cause and actual reached destructor stop (src/util/hashtable.h:146-148,259-261; src/util/memory_manager.h:112-119)",
+          "status": "partial",
+          "go_target": "utilhash/str_hashtable_runtime.go",
+          "tests": [
+            "TestStrHashtableRuntimeNullReplacementDestructorRetainsUnjoinedNew",
+            "TestStrHashtableRuntimeBodyReleaseStopReachesOwnDestructorBoundary",
+            "TestStrHashtableRuntimeReplacementEveryRefusalThenSourceDestructor"
+          ]
+        },
+        {
+          "name": "Legacy HASHTABLE_STATISTICS actual cold scalar init/copy/swap and source insert/find/remove increments (src/util/hashtable.h:138-140,254-256,267-269,281-283,359-373,409-424,481-491,533-543,649-653)",
+          "status": "partial",
+          "go_target": "utilhash/str_hashtable_statistics.go",
+          "tests": [
+            "TestStrHashtableLegacyStatisticsActualScalarAndLiteralMissCounts",
+            "TestStrHashtableLegacyStatisticsIndependentFiniteProbeCounts",
+            "TestStrHashtableLegacyStatisticsEveryConstructorCopyAndReplacementReservation",
+            "TestStrHashtableLegacyStatisticsUnsignedScalarAndCopyBodyOrder",
+            "TestStrHashtableLegacyStatisticsBothInsertMacrosAndProfileBinding"
+          ]
+        },
+        {
+          "name": "Legacy statistics profile real borrowed ostream dump, badbit late CString and exact every-output-refusal prefix (src/util/hashtable.h:581-600)",
+          "status": "partial",
+          "go_target": "util_str_hashtable_legacy_statistics_output_source_test.go",
+          "tests": [
+            "TestStrHashtableLegacyStatisticsDumpIntoActualFieldFormattingAndCallerWidth",
+            "TestStrHashtableLegacyStatisticsDumpIntoClosedFileStillReachesActualBorrowedCString",
+            "TestStrHashtableLegacyStatisticsDumpIntoEveryOutputReservationAndExactPrefix",
+            "TestStrHashtableLegacyStatisticsDumpIntoActualFileAndEmptyBorrowErasure",
+            "TestStrHashtableLegacyStatisticsDumpIntoBorrowedSpellingRereadAndFileBytes"
+          ]
+        },
+        {
+          "name": "Actual concrete Go owner identity guards before legacy source/owning cleanup and empty reset (source ctor/copy/DT src/util/hashtable.h:243-275; Go non-copying ownership guard)",
+          "status": "partial",
+          "go_target": "utilhash/str_hashtable_runtime.go",
+          "tests": [
+            "TestStrHashtableLegacyAccidentalGoCopyCannotOwnSourceActions",
+            "TestStrHashtableZeroGoWrapperCannotOwnCleanup"
+          ]
         }
       ],
       "ownership": [
@@ -106189,7 +106288,11 @@
         "Enabled Runtime objects own32 physical bytes, default objects retain24; the unsigned64 statistics field is actual payload, while lexical copies use their actual inline scalar words. No mirrored statistics counter. Call-local output method set borrows actual NumericTextStream and actual stored CString region/token/offset; no cloned spelling or custom writer. Every constructor/copy/growth/replacement/output reservation prefix has immediate named physical/cold bijection before fault lift.",
         "No allocation or copied spelling is introduced at strlen/strcmp/hash entry. Actual region origin/ref/offset is retained; reached bytes validate provider lifetime and bounds. Forty-one independent signed-byte length/equality cases and related StrInt32Map common consumers execute under active reservation refusal with immediate named Runtime/cold graph.",
         "Legacy source capacity is the actual scalar raw.words[2]; Runtime remains actual raw-byte authority. Delete detaches and refunds actual legacy table before replacement allocation; failed copies retain acquired table/header/directory in their actual returned or lexical owner. Completed local destructor consumes only table backing before Go cold cleanup. RetainedBytes reports exact lexical frame/copy storage once; independent physical-Go/cold tree census runs before fault lift at every constructor reservation through first success.",
-        "Completed-object SourceFinalize follows actual dealloc_vect null-skip after body replacement refusal; it also destroys actual nonnull OLD after failed growth allocation. Body error history is unchanged. Failed copy complete=false never receives source core DT, and explicit owning abort separately refunds actual cold/header contexts."
+        "Completed-object SourceFinalize follows actual dealloc_vect null-skip after body replacement refusal; it also destroys actual nonnull OLD after failed growth allocation. Body error history is unchanged. Failed copy complete=false never receives source core DT, and explicit owning abort separately refunds actual cold/header contexts.",
+        "Actual legacy growth owns each returned NEW array and charged Go acquisition node before reached move assertion; OLD remains the source current table until delete/publish. Successful transfer retires only completed metadata; stopped NEW arrays remain independently named through completed core DT and separate owning abort. Every actual node/array reservation through first success has immediate independently named cold/backing graph before fault lift. Captured borrowed table/entry addresses survive owner field exchange while actual backing remains owned.",
+        "Completed source DT frees only actual current table/object, null-skips after real replacement failure, retains actual unjoined NEW until explicit owning abort; failed constructors do not receive source DT. First body history and first reached destructor refusal are separate charged cold fields. Exact zero-token physical-consumption receipt permits owning continuation without source leaf replay; source cause/cursor remains sticky after owning closure. Every actual replacement allocation refusal through first success receives immediate named Runtime/cold bijection before fault lift.",
+        "Legacy collision count is the existing actual embedded raw.inlineStatistics[2] source scalar, initialized only after completed constructor/copy source actions; it has no Runtime block, second mirror or synthetic event, and is charged once in existing reflected header. Runtime statistics keeps its sole physical32-byte object/lexical inline route. Every actual legacy constructor/copy/growth/replacement reservation through first success has immediate independent named table/cold/region census before fault lift, completed DT then separate failed-constructor/NEW owning abort.",
+        "SourceFinalize/CloseChecked validate exact raw.self in both Runtime and legacy profiles before any allocation release/cause mutation; ordinary open and empty reset reject accidental copied or zero/unprepared Go wrappers. Real Clone constructors establish fresh exact owner identity, and retained failed-copy owners still perform separate owning abort."
       ],
       "deviations": [
         "Checked cold owner/epoch snapshots replace borrowed entry pointers; structural mutation invalidates snapshots.",
@@ -106201,12 +106304,16 @@
         "Explicit scalar padding keeps Go default entries40bytes across architectures. Checked key replacement preserves hash/equality; scalar values remain mutable. Other entry/key/value variants and enabled statistics remain unported.",
         "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md.",
         "Selected concrete consequences and mutex family source mapping supersedes older missing-method notes only for listed sites. Source AST/BV/datatype registered6 assertions, TRACE/verbose, extension dispatch, dormant core_chunking/static helpers, general template variants and full source units remain OPEN. Scalar slot/generation encodes selected8-byte pointer ABI; actual named cold/raw/pending roots charged; no registry-derived ownership. See PORT_PROGRESS.md.",
-        "This is a concrete Go representation, not native pointer/ABI byte geometry. Runtime no-error observers raise typed failures on reached raw errors rather than return zero. Existing checked CString/iterator/reference lifetime profiles and legacy staged Reset/growth remain separately qualified; bound core SASSERT dispatch, HASHTABLE_STATISTICS and native ostream/global allocator profiles remain open. Reentrant returning Go ErrorTransport cleanup is guarded until each real allocation outcome is recorded; this is not native C++ callback equivalence.",
-        "Cold binding Budget/self validation is a Go configuration contract separate from erased source macro payload reads. A closed provider after valid preparation remains unread in release or at a source early return; DEBUG reaches its actual flag lifetime guard. The source check_invariant function exists only in Z3DEBUG; release CheckInvariantChecked retains the explicitly inventoried inspection adapter. GNU release UNREACHABLE is guarded with a class-local typed error before provider reads, not native undefined execution. Non-power-of-two constructor C/release continuation allocates actual entries and uses literal end/begin probe traversal; invalid/malformed source count fixtures are explicit guard domains, not ordinary source math failures. Other pointer-entry specializations, HASHTABLE_STATISTICS, native ostream/ABI/global provider profiles and legacy class assertion dispatch remain open.",
-        "Statistics mode is an explicit supported Runtime specialization; legacy hot-slice Statistics configuration is rejected before reservation and remains open. Physical wrapper24/32 and entry32 codecs are Go representation, not native C++ ABI. Collision arithmetic uses source unsigned64 wrap. Output is the existing selected narrow libstdc++/classic-format adapter with real borrowed os.File badbit; arbitrary native ostream locale/exception/ABI/global bindings remain open. Existing broader legacy and native pointer specializations retain partial status.",
-        "Borrow-time length remains advisory checked-borrow metadata; source Hash/Eq and char-pointer query comparisons no longer use it as source strlen/strcmp authority. Changing an inserted spelling can invalidate its cached table hash; source-valid regression changes the uninserted caller buffer, including before insertion, then leaves stored bytes unchanged. BytesRegion uses existing zeroed Go backing rather than Runtime initialized-byte tracking; raw oversized extent tests are checked/source-undefined guard-domain proof only. Source memcpy whole-word codec uses selected little-endian ascending byte loads and signed-char descending tails. Native libc optimized strcmp/strlen, sizeof(unsigned) assertion/global provider binding, other char/compiler/ABI profiles and legacy transactional Reset/Finalize/Intersect remain explicit open obligations. No registered char-pointer test driver exists; src/test/hashtable.cpp registered int_set/safe_int_set is not credited by these independent tests.",
+        "This is a concrete Go representation, not native pointer/ABI byte geometry. Runtime no-error observers raise typed failures on reached raw errors rather than return zero. Existing checked CString/iterator/reference lifetime profiles remain qualified. Selected Runtime and legacy core SASSERT dispatch and destructive legacy lifecycle are implemented; selected Runtime HASHTABLE_STATISTICS and narrow real stream output are implemented. Legacy nilRuntime statistics, other specializations, full native ostream/global allocator profiles remain open. Reentrant returning Go ErrorTransport cleanup is guarded until each real allocation outcome is recorded; this is not native C++ callback equivalence.",
+        "Cold binding Budget/self validation is a Go configuration contract separate from erased source macro payload reads. A closed provider after valid preparation remains unread in release or at a source early return; DEBUG reaches its actual flag lifetime guard. The source check_invariant function exists only in Z3DEBUG; release CheckInvariantChecked retains the explicitly inventoried inspection adapter. GNU release UNREACHABLE is guarded with a class-local typed error before provider reads, not native undefined execution. Non-power-of-two constructor C/release continuation allocates actual entries and uses literal end/begin probe traversal; invalid/malformed source count fixtures are explicit guard domains, not ordinary source math failures. Other pointer-entry specializations and full native ostream/ABI/global provider profiles remain open; selected Runtime and legacy core class assertions are implemented.",
+        "Statistics mode is supported by the actual Runtime scalar and the actual legacy inline scalar; both follow source init/collision/swap order. Physical wrapper24/32 and entry32 codecs are Go representation, not native C++ ABI. Collision arithmetic uses source unsigned64 wrap. Output is the existing selected narrow libstdc++/classic-format adapter with real borrowed os.File badbit; arbitrary native ostream locale/exception/ABI/global bindings remain open. Existing broader legacy and native pointer specializations retain partial status.",
+        "Borrow-time length remains advisory checked-borrow metadata; source Hash/Eq and char-pointer query comparisons no longer use it as source strlen/strcmp authority. Changing an inserted spelling can invalidate its cached table hash; source-valid regression changes the uninserted caller buffer, including before insertion, then leaves stored bytes unchanged. BytesRegion uses existing zeroed Go backing rather than Runtime initialized-byte tracking; raw oversized extent tests are checked/source-undefined guard-domain proof only. Source memcpy whole-word codec uses selected little-endian ascending byte loads and signed-char descending tails. Native libc optimized strcmp/strlen, sizeof(unsigned) assertion/global provider binding, other char/compiler/ABI profiles remain explicit open obligations. Selected legacy Reset/Finalize now delete before replacement, and Intersect uses its actual lexical copied-owner/source-DT frontier; those lifecycle obligations are closed by f00606c. Legacy assertions are covered by the separate assertion10 successor, while global/native profiles remain open; actual legacy collision statistics are implemented by the statistics successor. No registered char-pointer test driver exists; src/test/hashtable.cpp registered int_set/safe_int_set is not credited by these independent tests.",
         "Reached uint64 region offset addition rejects overflow before token/payload access; zero-n erases the guard. Genuine checked Go helper-domain RED, not native CString algorithm credit.",
-        "Legacy storage remains pointer-free Go array plus actual Budget header/directory/context charges, not native global Runtime allocation/ABI. Native implicit member/object addresses, legacy core assertion/collision-statistics dispatch and other pointer specializations remain open. Foreign borrow-directory/context reservation is a Go ownership representation leaf, not invented native allocation. delete_table explicitly publishes NULL before failed replacement; further nonempty table-access bodies use a stopped-owner Go guard, while completed-object SourceFinalize is defined and skips NULL, retaining body cause history. Failed copy construction has no source core DT; explicit owning abort releases acquired roots. Existing incorrect rollback/blanket-body-cause DT assertions are migrated to immediate destructive/retained prefixes, real source NULL/nonNULL DT and once-only final refund. Registered int_set/safe_int_set driver credit unchanged."
+        "Legacy storage remains pointer-free Go array plus actual Budget header/directory/context charges, not native global Runtime allocation/ABI. Native implicit member/object addresses and other pointer specializations remain open; actual legacy collision-statistics dispatch is implemented; selected legacy core assertions are implemented in the separate assertion10 successor. Foreign borrow-directory/context reservation is a Go ownership representation leaf, not invented native allocation. delete_table explicitly publishes NULL before failed replacement; further nonempty table-access bodies use a stopped-owner Go guard, while completed-object SourceFinalize is defined and skips NULL, retaining body cause history. Failed copy construction has no source core DT; explicit owning abort releases acquired roots. Existing incorrect rollback/blanket-body-cause DT assertions are migrated to immediate destructive/retained prefixes, real source NULL/nonNULL DT and once-only final refund. Registered int_set/safe_int_set driver credit unchanged.",
+        "Legacy arrays and acquisition nodes use real Go Budget ownership representation, not native Runtime malloc accounting. Closed provider guard and GNU release unreachable are qualified typed domains. Runtime/default statistics profile and native ABI/global/other specialization obligations remain partial; no registered char-pointer driver credit. Actual compiled/flag erasure occurs before condition/provider access; bind borrows exact same DebugContext without tag-table recursion. Existing narrow NULL/nonNULL source DT proofs are preserved; actual table refusal ordinal follows new Go acquisition metadata reservation.",
+        "Public Runtime TLS signed-overflow free fixture is source-undefined arithmetic domain; later dangling source pointer DT is a reached Go lifetime guard, not native successful destruction credit. Ordinary postphysical replacement OOM NULL-DT already passed; true regression was blanket bodycause masking reached destructor pointer guard. Native allocator ABI/global and other class specializations remain partial.",
+        "Statistics config models HASHTABLE_STATISTICS compiled class profile; mixed statistics/nonstatistics swaps reject before mutation. Concrete field UINT64_MAX arithmetic codec proves unsigned wrap, not a claim that bounded fixture generated that many collisions. Source-defined selected Runtime and legacy statistics and narrow existing ostream profile are implemented; native ABI/global allocator, other pointer-specializations and full arbitrary ostream locale/exception profiles remain partial. No registered char-pointer driver credit. Source has get_num_collision, not a new display_statistics method; dump reuses exact existing insertion chain without changing collision count.",
+        "These are Go owner/config guard-domain proofs, not native C++ algorithm failure or source copy-constructor credit. Four real accidental-Go-copy public actions previously returned success, with Close/source DT releasing original owner bytes; they now reject without affecting original backing/state/cause/charges. No new storage or source allocator events."
       ]
     },
     {

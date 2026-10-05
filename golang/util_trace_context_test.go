@@ -305,7 +305,9 @@ func TestTraceContextForeignPublicationAndGrowthRefusalPrefixes(t *testing.T) {
 				break
 			}
 		}
-		want := 1
+		// Legacy growth charges its concrete acquisition header and actual NEW
+		// array separately. Both refusal prefixes preserve every old key above.
+		want := 2
 		if foreignRoute {
 			want = 3
 		}

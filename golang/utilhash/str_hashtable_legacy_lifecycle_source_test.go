@@ -394,7 +394,7 @@ func TestStrHashtableLegacyGrowthBodyFailureNonNullSourceDestructor(t *testing.T
 		}
 	}
 	oldBytes := h.tableBytes
-	b.FailAfter(0)
+	b.FailAfter(1) // Actual table reservation after the new Go acquisition header.
 	cause := h.Insert(keys[7])
 	if !errors.Is(cause, arena.ErrInjectedFailure) || h.table == nil || h.tableBytes != oldBytes || h.Size() != 7 {
 		t.Fatal("actual OLD remains after failed NEW allocation", cause, h.Stats())

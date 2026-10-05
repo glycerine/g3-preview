@@ -17,19 +17,21 @@ import (
 var ErrStrHashtableExecuting = errors.New("g3: string-table allocation is executing")
 
 type strHashtableRaw struct {
-	destructing      bool
-	executing        bool
-	inline           bool
-	words            [6]uint32
-	inlineStatistics [2]uint32
-	initialized      uint8
-	lexical          *strHashtableScope
-	self             *StrHashtable
-	object, table    memory.Block
-	acquisitions     *strHashtableAcquisition
-	sourceCause      error
-	sourceStage      uint8
-	complete         bool
+	destructing        bool
+	executing          bool
+	inline             bool
+	words              [6]uint32
+	inlineStatistics   [2]uint32
+	initialized        uint8
+	lexical            *strHashtableScope
+	legacyAcquisitions *strHashtableLegacyAllocation
+	self               *StrHashtable
+	object, table      memory.Block
+	acquisitions       *strHashtableAcquisition
+	sourceCause        error
+	destructorCause    error
+	sourceStage        uint8
+	complete           bool
 }
 type strHashtableAcquisition struct {
 	next  *strHashtableAcquisition
@@ -239,7 +241,7 @@ func (h *StrHashtable) openRuntime() error {
 	if h.raw.self != h {
 		return arena.ErrConfig
 	}
-	if h.closed {
+	if h.closed || h.raw.destructing {
 		return arena.ErrClosed
 	}
 	if h.raw.sourceCause != nil {
@@ -257,7 +259,7 @@ func (h *StrHashtable) SourceFinalize() error {
 	if h == nil {
 		return arena.ErrClosed
 	}
-	if h.config.Runtime != nil && h.raw.self != h {
+	if h.raw.self != h {
 		return arena.ErrConfig
 	}
 	if h.raw.executing {
@@ -266,29 +268,35 @@ func (h *StrHashtable) SourceFinalize() error {
 	if h.config.Runtime == nil {
 		return h.sourceFinalizeLegacy()
 	}
-	if h.raw.sourceCause != nil {
-		return h.raw.sourceCause
-	}
 	if !h.raw.complete {
+		if h.raw.sourceCause != nil {
+			return h.raw.sourceCause
+		}
+		return arena.ErrClosed
+	}
+	if h.raw.destructorCause != nil {
+		return h.raw.destructorCause
+	}
+	if h.closed {
 		return arena.ErrClosed
 	}
 	if h.raw.sourceStage == 0 {
 		h.raw.destructing = true
 		b, e := h.runtimeTable()
 		if e != nil {
-			h.raw.sourceCause = e
+			h.stopRuntimeDestructor(e)
 			return e
 		}
 		if b != (memory.Block{}) {
 			e = h.config.Runtime.Deallocate(&b)
 			h.raw.table = b
 			if e != nil {
-				h.raw.sourceCause = e
+				h.stopRuntimeDestructor(e)
 				return e
 			}
 		}
 		if e = h.publishRuntimeTable(memory.Block{}); e != nil {
-			h.raw.sourceCause = e
+			h.stopRuntimeDestructor(e)
 			return e
 		}
 		h.raw.sourceStage = 1
@@ -299,12 +307,24 @@ func (h *StrHashtable) SourceFinalize() error {
 			e = h.config.Runtime.Deallocate(&h.raw.object)
 		}
 		if e != nil {
-			h.raw.sourceCause = e
+			h.stopRuntimeDestructor(e)
 			return e
 		}
 		h.raw.sourceStage = 2
 	}
 	return nil
+}
+
+// Preserve the first body history separately from the first actually reached
+// destructor refusal. A completed object's source DT does not replay a body
+// failure; incomplete constructors receive only separate owning abort.
+func (h *StrHashtable) stopRuntimeDestructor(e error) {
+	if h.raw.destructorCause == nil {
+		h.raw.destructorCause = e
+	}
+	if h.raw.sourceCause == nil {
+		h.raw.sourceCause = e
+	}
 }
 
 // CloseChecked is explicit owning abort. Token-zero receipts acknowledge real
@@ -313,7 +333,7 @@ func (h *StrHashtable) CloseChecked() error {
 	if h == nil {
 		return arena.ErrClosed
 	}
-	if h.config.Runtime != nil && h.raw.self != h {
+	if h.raw.self != h {
 		return arena.ErrConfig
 	}
 	if h.raw.executing {
@@ -1180,9 +1200,20 @@ func (h *StrHashtable) CheckInvariantChecked() (bool, error) {
 	if e != nil {
 		return false, e
 	}
+	table := h.table
 	var used, deleted uint32
 	for i := uint32(0); i < cap; i++ {
-		state, e := h.entryState(i)
+		var state uint32
+		if h.config.Runtime == nil {
+			p, re := legacyEntryAt(table, i)
+			if re != nil {
+				e = re
+			} else {
+				state = p.state
+			}
+		} else {
+			state, e = h.entryState(i)
+		}
 		if e != nil {
 			return false, e
 		}
@@ -1193,15 +1224,18 @@ func (h *StrHashtable) CheckInvariantChecked() (bool, error) {
 			used++
 		}
 	}
-	if h.config.Runtime != nil && strHashtableSourceDebug {
+	if strHashtableSourceDebug {
 		on, e := h.assertionsEnabled()
 		if e != nil {
 			return false, e
 		}
 		if on {
-			expected, e := h.runtimeWord(16)
-			if e != nil {
-				return false, e
+			expected := h.deleted
+			if h.config.Runtime != nil {
+				expected, e = h.runtimeWord(16)
+				if e != nil {
+					return false, e
+				}
 			}
 			if deleted != expected {
 				if e = h.assertionFailure(643, "num_deleted == m_num_deleted"); e != nil {
@@ -1214,9 +1248,12 @@ func (h *StrHashtable) CheckInvariantChecked() (bool, error) {
 			return false, e
 		}
 		if on {
-			expected, e := h.runtimeWord(12)
-			if e != nil {
-				return false, e
+			expected := h.size
+			if h.config.Runtime != nil {
+				expected, e = h.runtimeWord(12)
+				if e != nil {
+					return false, e
+				}
 			}
 			if used != expected {
 				if e = h.assertionFailure(644, "num_used == m_size"); e != nil {

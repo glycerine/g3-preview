@@ -1040,7 +1040,7 @@ func TestStrHashtableCleanupResetAndFailurePeaks(t *testing.T) {
 		cause := e
 		mapMust(t, charged.SourceFinalize())
 		if charged.raw.sourceCause != cause || charged.raw.sourceStage != 2 {
-			t.Fatal("NULL destructor/body history")
+			t.Fatal("NULL destructor/body cause history")
 		}
 		budget.FailAfter(-1)
 		charged.Close()
@@ -1083,10 +1083,23 @@ func TestStrHashtableSourceInitialCapacity(t *testing.T) {
 		clone.Close()
 		h.Close()
 	}
-	for _, capacity := range []uint32{3, 5, 1 << 31} {
-		if _, e := NewStrHashtable(region, StrHashtableConfig{InitialCapacity: capacity}); !errors.Is(e, arena.ErrBounds) {
-			t.Fatal("invalid/overflow capacity", capacity, e)
+	// src/util/hashtable.h:249 is a source SASSERT, not a physical size guard.
+	for _, capacity := range []uint32{3, 5} {
+		h, e := NewStrHashtable(region, StrHashtableConfig{InitialCapacity: capacity})
+		if strHashtableSourceDebug {
+			if !errors.Is(e, ErrStrHashtableAssertion) || h != nil {
+				t.Fatal("literal constructor assertion", capacity, e)
+			}
+		} else {
+			mapMust(t, e)
+			if h.Capacity() != capacity {
+				t.Fatal("release condition erased", capacity)
+			}
+			h.Close()
 		}
+	}
+	if _, e := NewStrHashtable(region, StrHashtableConfig{InitialCapacity: 1 << 31}); !errors.Is(e, arena.ErrBounds) {
+		t.Fatal("actual host extent guard", e)
 	}
 }
 

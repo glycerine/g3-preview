@@ -43,15 +43,28 @@ func (h *StrHashtable) FindCStringBytes(s []byte) (StrHashtableEntryRef, bool, e
 	if e != nil {
 		return StrHashtableEntryRef{}, false, e
 	}
+	table := h.table
 	mask := capacity - 1
 	i := hash & mask
 	for step := uint32(0); step < capacity; step++ {
-		entry, e := h.probeEntry(i)
+		var entry strHashEntry
+		if h.config.Runtime == nil {
+			p, re := legacyEntryAt(table, i)
+			if re != nil {
+				e = re
+			} else {
+				entry = *p
+			}
+		} else {
+			entry, e = h.probeEntry(i)
+		}
 		if e != nil {
 			return StrHashtableEntryRef{}, false, e
 		}
 		if entry.state == strHashUsed && entry.hash == hash {
-			entry.key, e = h.entryKey(i)
+			if h.config.Runtime != nil {
+				entry.key, e = h.entryKey(i)
+			}
 			if e != nil {
 				return StrHashtableEntryRef{}, false, e
 			}
@@ -78,13 +91,9 @@ func (h *StrHashtable) FindCStringBytes(s []byte) (StrHashtableEntryRef, bool, e
 		if e := h.incrementCollision(); e != nil {
 			return StrHashtableEntryRef{}, false, e
 		}
-		if h.config.Runtime != nil {
-			i++
-			if i == capacity {
-				i = 0
-			}
-		} else {
-			i = (i + 1) & mask
+		i++
+		if i == capacity {
+			i = 0
 		}
 	}
 	return StrHashtableEntryRef{}, false, nil

@@ -1,4 +1,4 @@
-// Source: src/util/hashtable.h:259-275,287-322,613-623.
+// Source: src/util/hashtable.h:259-283,287-322,613-623.
 // Source author: Leonardo de Moura (2006-09-11).
 // Licensed under the MIT license; see LICENSE.txt.
 package utilhash
@@ -21,6 +21,9 @@ func (h *StrHashtable) stopLegacy(e error) error {
 	return e
 }
 func (h *StrHashtable) resetLegacy() error {
+	if h != nil && h.raw.self != h {
+		return arena.ErrConfig
+	}
 	// src/util/hashtable.h:288-289 reads only these scalar members. A prior
 	// replacement refusal does not make this defined no-op read the table.
 	if h == nil || h.closed || h.raw.destructing {
@@ -114,15 +117,12 @@ func (h *StrHashtable) finalizeLegacy() error {
 
 func (h *StrHashtable) sourceFinalizeLegacy() error {
 	if !h.raw.complete {
-		// Failed copy construction has no source core destructor.
+		// A failed copy constructor has no source core destructor.
 		if h.raw.sourceCause != nil {
 			return h.raw.sourceCause
 		}
 		return arena.ErrClosed
 	}
-	// src/util/hashtable.h:146-148 publishes NULL before replacement. Its
-	// later DT is defined: memory_manager.h:112-114 skips a NULL table. A
-	// method-body cause remains history and never substitutes for a DT action.
 	if h.raw.sourceStage == 2 {
 		return nil
 	}
@@ -134,6 +134,11 @@ func (h *StrHashtable) sourceFinalizeLegacy() error {
 func (h *StrHashtable) closeLegacyChecked() error {
 	if h.closed {
 		return nil
+	}
+	for a := h.raw.legacyAcquisitions; a != nil; a = h.raw.legacyAcquisitions {
+		h.config.Budget.Release(a.tableBytes)
+		a.table, a.tableBytes = nil, 0
+		h.retireLegacyAllocation(a)
 	}
 	for h.raw.lexical != nil {
 		frame := h.raw.lexical
@@ -162,6 +167,9 @@ func (h *StrHashtable) legacyRetainedBytes() uint64 {
 		return 0
 	}
 	var total uint64
+	for a := h.raw.legacyAcquisitions; a != nil; a = a.next {
+		total += a.bytes + a.tableBytes
+	}
 	for frame := h.raw.lexical; frame != nil; frame = frame.next {
 		total += frame.bytes
 		if frame.copy != nil {
@@ -187,27 +195,16 @@ func (h *StrHashtable) cloneLegacy() (*StrHashtable, error) {
 		return nil, e
 	}
 	out.table, out.tableBytes = table, bytes
-	mask := out.raw.words[2] - 1
-	for _, entry := range h.table {
-		if entry.state != strHashUsed {
-			continue
-		}
-		owner, e := h.keyRegion(entry.key)
-		if e != nil {
-			out.raw.sourceCause = e
-			return out, e
-		}
-		if e = out.adopt(owner); e != nil {
-			out.raw.sourceCause = e
-			return out, e
-		}
-		i := entry.hash & mask
-		for out.table[i].state != strHashFree {
-			i = (i + 1) & mask
-		}
-		out.table[i] = entry
+	if e = out.copyLegacyEntries(h, h.table, out.table, h.raw.words[2], out.raw.words[2], false); e != nil {
+		out.raw.sourceCause = e
+		return out, e
 	}
 	out.size = h.size
+	if out.config.Statistics {
+		if e = out.writeCollision(0); e != nil {
+			return out, e
+		}
+	}
 	out.raw.complete = true
 	return out, nil
 }

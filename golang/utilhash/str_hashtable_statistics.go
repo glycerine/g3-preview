@@ -3,6 +3,8 @@
 // Licensed under the MIT license; see LICENSE.txt.
 package utilhash
 
+import "github.com/glycerine/g3/golang/memory"
+
 func (h *StrHashtable) runtimeObjectExtent() uint64 {
 	if h.config.Statistics {
 		return 32
@@ -10,6 +12,12 @@ func (h *StrHashtable) runtimeObjectExtent() uint64 {
 	return 24
 }
 func (h *StrHashtable) readCollision() (uint64, error) {
+	if h.config.Runtime == nil {
+		if h.raw.initialized&0xC0 != 0xC0 {
+			return 0, memory.ErrRuntimeUninitialized
+		}
+		return uint64(h.raw.inlineStatistics[0]) | uint64(h.raw.inlineStatistics[1])<<32, nil
+	}
 	lo, e := h.runtimeWord(24)
 	if e != nil {
 		return 0, e
@@ -21,6 +29,12 @@ func (h *StrHashtable) readCollision() (uint64, error) {
 	return uint64(lo) | uint64(hi)<<32, nil
 }
 func (h *StrHashtable) writeCollision(v uint64) error {
+	if h.config.Runtime == nil {
+		h.raw.inlineStatistics[0] = uint32(v)
+		h.raw.inlineStatistics[1] = uint32(v >> 32)
+		h.raw.initialized |= 0xC0
+		return nil
+	}
 	if e := h.writeRuntimeWord(24, uint32(v)); e != nil {
 		return e
 	}
