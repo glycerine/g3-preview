@@ -14,7 +14,7 @@ import (
 
 func numericFileFixture(t *testing.T) (*os.File, *NumericTextStream, *arena.Budget) {
 	t.Helper()
-	f, e := os.CreateTemp(".cache", "numeric-file-*")
+	f, e := os.CreateTemp(".", "numeric-file-*")
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -85,7 +85,7 @@ func TestNumericFileStreamActualWriteFailureSetsNonthrowingBadbit(t *testing.T) 
 	}
 }
 func TestNumericFileStreamEveryColdReservation(t *testing.T) {
-	f, e := os.CreateTemp(".cache", "numeric-file-cold-*")
+	f, e := os.CreateTemp(".", "numeric-file-cold-*")
 	smallObjectMust(t, e)
 	defer f.Close()
 	defer os.Remove(f.Name())

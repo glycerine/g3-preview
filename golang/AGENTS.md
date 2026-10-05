@@ -63,6 +63,13 @@ default ten-minute timeout. Use `go test -tags g3checked,g3debug ./... -timeout=
 checked/debug gate; do not truncate that campaign
 to fit the default timeout. Native full validation remains `go test ./...`.
 
+Before an implementation commit, verify the full native and checked/debug
+suites from a clean module copy with no pre-existing `.cache` directory. Keep
+verification logs and compiler caches outside that copy so setup cannot mask
+test fixture dependencies. For this check, use `-count=1` to execute the tests.
+File fixtures must create and clean up their own files under the Go subtree;
+they must not assume an ignored cache directory exists in a fresh checkout.
+
 ## Fixed source provenance
 
 Keep originating repository-relative source paths in ported files. The C++ reference is fixed: do not compute, store, or verify its content hashes, checksums, or fingerprints. Omit Microsoft copyright lines from current and new ported headers; retain license notices and `LICENSE.txt`, and preserve other authors’ notices. This policy does not change solver algorithm hashing/fingerprints or Go working-tree SHA verification.

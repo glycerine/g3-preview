@@ -16,7 +16,7 @@ import (
 )
 
 func TestMemoryFatalStandardStreamsColdGraph(t *testing.T) {
-	f, e := os.CreateTemp(".cache", "fatal-stdout-*")
+	f, e := os.CreateTemp(".", "fatal-stdout-*")
 	smallObjectMust(t, e)
 	defer os.Remove(f.Name())
 	defer f.Close()
