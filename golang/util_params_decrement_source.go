@@ -24,6 +24,9 @@ func paramsReceiptBytes(n int) uint64 {
 // continueDecrement is an explicit Go owning continuation, never a second
 // source dec_ref. Its scalar cursor names the exact retained entry/leaf token.
 func (c *ParamsContext) continueDecrement(slot uint32) error {
+	if c.blocks[slot-1].resetKind == paramsResetLive {
+		return c.continueReset(slot)
+	}
 	b := &c.blocks[slot-1]
 	receipt := &c.decrementReceipts[slot-1]
 	if !b.live || !b.resetActive || receipt.generation != b.generation {
@@ -82,7 +85,7 @@ func (c *ParamsContext) CleanupDecrement(v *ParamsRef) error {
 		return ErrParamsPrecondition
 	}
 	b := &c.blocks[v.slot-1]
-	if !b.resetActive || b.refs != 0 {
+	if !b.resetActive || b.resetKind != paramsResetDestroy || b.refs != 0 {
 		return ErrParamsPrecondition
 	}
 	if e := c.continueDecrement(v.slot); e != nil {
@@ -128,7 +131,7 @@ func (c *ParamsContext) CompleteDecrement(v *ParamsRef, receipt ParamsDecrementR
 	}
 	b := &c.blocks[v.slot-1]
 	r := &c.decrementReceipts[v.slot-1]
-	if !b.resetActive || b.refs != 0 || r.generation != v.generation || r.invocation != receipt.invocation {
+	if !b.resetActive || b.resetKind != paramsResetDestroy || b.refs != 0 || r.generation != v.generation || r.invocation != receipt.invocation {
 		return ErrParamsPrecondition
 	}
 	if e := c.continueDecrement(v.slot); e != nil {

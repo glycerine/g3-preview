@@ -41,7 +41,7 @@ func (g *GlobalParams) sourceFinalizeBody(owning bool) error {
 		switch g.sourceStage {
 		case 0:
 			if g.globalParams.owner != 0 {
-				if e := g.context.Reset(&g.globalParams); e != nil {
+				if e := g.sourceResetValue(owning); e != nil {
 					return e
 				}
 			}
@@ -162,6 +162,10 @@ func (g *GlobalParams) CleanupStopped() error {
 	}
 	if g.sourceCause != nil {
 		switch g.sourceStage {
+		case 0:
+			if g.sourceReset.invocation == 0 {
+				return g.sourceCause
+			}
 		case 1, 4:
 			if g.sourceDecrement.invocation == 0 {
 				return g.sourceCause
@@ -174,4 +178,21 @@ func (g *GlobalParams) CleanupStopped() error {
 		}
 	}
 	return g.sourceFinalizeBody(true)
+}
+
+// The reset receipt is stamped at the live child reset entry, independently
+// from zero-reference destruction. Owning completion preserves child identity.
+func (g *GlobalParams) sourceResetValue(owning bool) error {
+	if owning && g.sourceReset.invocation != 0 {
+		if e := g.context.CompleteReset(&g.globalParams, g.sourceReset); e != nil {
+			return e
+		}
+		g.sourceReset = ParamsResetReceipt{}
+		return nil
+	}
+	if e := g.context.ResetTracked(&g.globalParams, &g.sourceReset); e != nil {
+		return e
+	}
+	g.sourceReset = ParamsResetReceipt{}
+	return nil
 }

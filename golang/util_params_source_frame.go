@@ -73,6 +73,11 @@ func (c *ParamsContext) cleanupSourceFrame(slot uint32) error {
 	if b.generation != f.heldGeneration || !b.live {
 		return ErrParamsOwner
 	}
+	if b.resetActive && b.resetKind == paramsResetLive {
+		if e := c.continueReset(f.heldSlot); e != nil {
+			return e
+		}
+	}
 	if !f.decrementStarted {
 		if b.refs == 0 {
 			return ErrParamsPrecondition

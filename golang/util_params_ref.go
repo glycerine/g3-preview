@@ -38,6 +38,7 @@ type paramsBlock struct {
 	live                             bool
 	resetCursor                      uint32
 	resetStage                       uint8
+	resetKind                        uint8
 	resetActive                      bool
 }
 type paramsText struct {
@@ -293,17 +294,21 @@ func (c *ParamsContext) delEntry(x *paramEntry) error {
 	*x = paramEntry{}
 	return nil
 }
-func (c *ParamsContext) resetBlock(b *paramsBlock) error {
-	for i := uint32(0); i < b.size; i++ {
-		if e := c.delEntry(c.entry(b, i)); e != nil {
-			return e
-		}
+func (c *ParamsContext) resetBlock(slot uint32, out *ParamsResetReceipt) error {
+	b := &c.blocks[slot-1]
+	serial, e := c.nextSourceInvocation()
+	if e != nil {
+		return e
 	}
-	c.freeEntries(b.entries)
-	b.entries = paramsEntriesRef{}
-	b.size = 0
-	b.capacity = 0
-	return nil
+	b.resetActive = true
+	b.resetKind = paramsResetLive
+	b.resetCursor = 0
+	b.resetStage = 0
+	c.decrementReceipts[slot-1] = paramsDecrementReceipt{generation: b.generation, invocation: serial}
+	if out != nil {
+		*out = ParamsResetReceipt{owner: c.owner, slot: slot, generation: b.generation, invocation: serial}
+	}
+	return c.continueReset(slot)
 }
 func (c *ParamsContext) dec(slot uint32) error {
 	return c.decTracked(slot, nil)
@@ -316,9 +321,16 @@ func (c *ParamsContext) decTracked(slot uint32, out *ParamsDecrementReceipt) err
 	if globalParamsSourceDebug && b.refs == 0 {
 		return ErrParamsPrecondition
 	}
+	// A shared scalar DEC remains defined during an interrupted live reset.
+	// The last-reference destructor would replay already-consumed source leaves;
+	// reject that invalid continuation rather than adopt its reset receipt.
+	if b.resetActive && b.resetKind == paramsResetLive && b.refs == 1 {
+		return ErrParamsPrecondition
+	}
 	b.refs--
 	if b.refs == 0 {
 		b.resetActive = true
+		b.resetKind = paramsResetDestroy
 		serial, e := c.nextSourceInvocation()
 		c.decrementReceipts[slot-1] = paramsDecrementReceipt{generation: b.generation, invocation: serial}
 		if e != nil {
@@ -532,7 +544,8 @@ func (c *ParamsContext) Empty(v *ParamsRef) (bool, error) {
 	}
 	return v.slot == 0 || c.blocks[v.slot-1].size == 0, nil
 }
-func (c *ParamsContext) Reset(v *ParamsRef) error {
+func (c *ParamsContext) Reset(v *ParamsRef) error { return c.ResetTracked(v, nil) }
+func (c *ParamsContext) ResetTracked(v *ParamsRef, receipt *ParamsResetReceipt) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if e := c.mutable(v); e != nil {
@@ -541,7 +554,7 @@ func (c *ParamsContext) Reset(v *ParamsRef) error {
 	if v.slot == 0 {
 		return nil
 	}
-	return c.resetBlock(&c.blocks[v.slot-1])
+	return c.resetBlock(v.slot, receipt)
 }
 func (c *ParamsContext) resetKey(v *ParamsRef, k Symbol, name *string, byName bool) error {
 	if e := c.mutable(v); e != nil {
@@ -1479,7 +1492,7 @@ func (c *ParamsContext) Close() error {
 				if e := c.continueDecrement(uint32(i + 1)); e != nil {
 					return e
 				}
-			} else if e := c.resetBlock(&c.blocks[i]); e != nil {
+			} else if e := c.resetBlock(uint32(i+1), nil); e != nil {
 				return e
 			}
 		}
