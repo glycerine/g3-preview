@@ -72,6 +72,8 @@ type polynomialExactDivisionScope struct {
 	divisionRaw, extendedRaw             integerRawInvocationReceipt
 	buffers                              [4]naturalPNBufferReceipt
 	verification                         naturalPNVerificationReceipt
+	boolNumeral                          integerDividesNumeralInvocationReceipt
+	scalarReceipt                        polynomialScalarExactDivInvocationReceipt
 	directReceipt                        polynomialExactDivInvocationReceipt
 	output                               polynomialArithmeticInvocationReceipt
 	executing                            bool
@@ -105,6 +107,14 @@ func (m *MultivariatePolynomialCore) exactDivisionCleanup(owning bool) error {
 }
 func (m *MultivariatePolynomialCore) exactDivisionCleanupPhase(owning, abort bool) error {
 	s := &m.exactDivision
+	if s.kind == 2 {
+		if !owning {
+			// Source tmp DEL is end-only and the scalar body executes it at
+			// its literal frontier. A stopped source suffix stays unread.
+			return s.sourceCause
+		}
+		return m.cleanupScalarExactDivInvocation(&s.scalarReceipt, abort)
+	}
 	if !s.active {
 		return nil
 	}
@@ -231,86 +241,6 @@ func (m *MultivariatePolynomialCore) CleanupExactDivision() error {
 		m.exactDivision.cleanupCause = e
 	}
 	return e
-}
-func (m *MultivariatePolynomialCore) ExactDivScalar(p Polynomial, c *Int) (result Polynomial, err error) {
-	if e := m.check(); e != nil {
-		return Polynomial{}, e
-	}
-	if modularSourceDebug {
-		zero, e := m.modular.IsZero(c)
-		if e != nil {
-			return Polynomial{}, e
-		}
-		if zero {
-			return Polynomial{}, ErrPolynomialAssertion
-		}
-	}
-	if m.exactDivision.active {
-		return Polynomial{}, ErrPolynomialPending
-	}
-	if e := m.som.reset(); e != nil {
-		return Polynomial{}, e
-	}
-	s := &m.exactDivision
-	if s.invocation == ^uint64(0) {
-		return Polynomial{}, ErrPolynomialPending
-	}
-	*s = polynomialExactDivisionScope{active: true, kind: 2, pscOwner: m.pscExecutingOwner(), invocation: s.invocation + 1}
-	defer func() {
-		if !s.active {
-			return
-		}
-		s.bodyCause = err
-		// No heap-owned numeral remains when only an inline scalar was published.
-		if err != nil && !s.endEntered && s.numeral.cell == 0 {
-			*s = polynomialExactDivisionScope{invocation: s.invocation}
-		}
-	}()
-	n, e := m.readWord(p, 8)
-	if e != nil {
-		return Polynomial{}, e
-	}
-	for i := uint32(0); i < n; i++ {
-		if modularSourceDebug {
-			a, e := m.coefficientCore(p, i)
-			if e != nil {
-				return Polynomial{}, e
-			}
-			divisible, e := m.modular.Divides(c, &a)
-			if e != nil {
-				return Polynomial{}, e
-			}
-			if !divisible {
-				return Polynomial{}, ErrPolynomialAssertion
-			}
-		}
-		a, e := m.coefficientCore(p, i)
-		if e != nil {
-			return Polynomial{}, e
-		}
-		if e = m.modular.Div(&a, c, &s.numeral); e != nil {
-			return Polynomial{}, e
-		}
-		zero, e := m.modular.IsZero(&s.numeral)
-		if e != nil {
-			return Polynomial{}, e
-		}
-		if !zero {
-			term, e := m.monomialCore(p, i)
-			if e != nil {
-				return Polynomial{}, e
-			}
-			if e = m.som.add(&s.numeral, term, false); e != nil {
-				return Polynomial{}, e
-			}
-		}
-	}
-	s.endEntered = true
-	if e = m.exactDivisionCleanup(false); e != nil {
-		s.cleanupCause = e
-		return Polynomial{}, e
-	}
-	return m.som.mk(false)
 }
 func (m *MultivariatePolynomialCore) ExactDiv(p, q Polynomial) (Polynomial, error) {
 	return m.exactDivWithReceipt(p, q, nil)

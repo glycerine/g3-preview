@@ -172,9 +172,13 @@ func TestPolynomialExactDivScalarRawLocalFailurePrefixes(t *testing.T) {
 					if beforeA != afterA || beforeM != afterM {
 						t.Fatal("blocked source reuse mutated older R", beforeA, afterA, beforeM, afterM)
 					}
-					retained++
-					if m.exactDivision.kind != 2 || m.exactDivision.numeral.cell == 0 {
-						t.Fatal("actual raw local retention", m.exactDivision)
+					if m.exactDivision.kind != 2 || !m.matchesScalarExactDivInvocation(&m.exactDivision.scalarReceipt) {
+						t.Fatal("actual scalar declaration retention", m.exactDivision)
+					}
+					if m.exactDivision.numeral.cell != 0 {
+						retained++ // Retain the original positive heap-RAW assertion.
+					} else if !m.exactDivDirectPending(&m.exactDivision) && !polynomialNegNumericPending(&m.exactDivision.numeric) && !m.matchesArithmeticInvocation(&m.exactDivision.scalarReceipt.prelude) {
+						t.Fatal("inline RAW retained without its actual acquired child")
 					}
 					if !errors.Is(m.CloseChecked(), ErrPolynomialPending) {
 						t.Fatal("owning abort must be explicit")

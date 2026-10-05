@@ -46,6 +46,7 @@ type IntegerConfig struct {
 // Cells, transitional Natural Words and the actual memory backend share one Budget.
 // Close invalidates every live numeral; a supplied Runtime is borrowed.
 type IntegerManager struct {
+	dividesNumeral                         integerDividesNumeralScope
 	divisionRaw, extendedRaw, gcdRaw       integerRawScope
 	addMulInvocation                       integerAddMulScope
 	copyAllocation                         integerCopyAllocationScope
@@ -454,6 +455,9 @@ func (m *IntegerManager) CloseChecked() error {
 		return fail(e)
 	}
 	if e := m.CleanupAddMulRaw(); e != nil {
+		return fail(e)
+	}
+	if e := m.CleanupDividesNumeral(); e != nil {
 		return fail(e)
 	}
 	if m.cells != nil {

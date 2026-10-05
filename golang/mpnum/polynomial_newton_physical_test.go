@@ -37,6 +37,9 @@ func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCo
 	for _, r := range z.arg {
 		add(Int{cell: r})
 	}
+	if z.matchesDividesNumeralInvocation(&z.dividesNumeral.receipt) {
+		add(z.dividesNumeral.numeral)
+	}
 	for _, s := range []*integerRawScope{&z.divisionRaw, &z.extendedRaw, &z.gcdRaw} {
 		for i := uint8(0); i < s.count; i++ {
 			add(s.values[i])
@@ -48,6 +51,12 @@ func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCo
 	add(z.intMin)
 	add(z.two64)
 	public = append(public, &m.substitution.scope.newA, &m.substitution.scope.tmp)
+	for _, b := range []*polynomialSOM{&m.som, &m.som2, &m.cheap, &m.cheap2} {
+		public = append(public, &b.cohortMovingCoefficient, &b.appendScope.movingCoefficient)
+	}
+	if m.transportBound {
+		public = append(public, &m.transport)
+	}
 	for _, a := range public {
 		if a != nil {
 			add(*a)

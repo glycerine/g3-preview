@@ -131,6 +131,8 @@ func (m *IntegerManager) divWithAllocationContext(a, b, c *Int, context integerA
 			tmp = &public.values[0]
 			context.recordContentRaw(m, receipt)
 			m.bindExactDivRaw(context, receipt, true)
+			m.bindScalarExactDivRaw(context, receipt, true)
+			m.bindDividesRaw(context, receipt, true)
 			context = context.withRawInvocation(receipt)
 			defer func() {
 				public.executing = false

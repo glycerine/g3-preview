@@ -55,6 +55,8 @@ func (m *IntegerManager) extendedGCDWithAllocationContext(r1, r2, a, b, g *Int, 
 		values = &public.values
 		context.recordContentRaw(m, receipt)
 		m.bindExactDivRaw(context, receipt, false)
+		m.bindScalarExactDivRaw(context, receipt, false)
+		m.bindDividesRaw(context, receipt, false)
 		context = context.withRawInvocation(receipt)
 		defer func() {
 			public.executing = false
@@ -212,19 +214,31 @@ func (m *IntegerManager) LCM(a, b, c *Int) error {
 	return m.Mul(&r, b, c)
 }
 func (m *IntegerManager) Divides(a, b *Int) (bool, error) {
+	return m.dividesWithAllocationContext(a, b, integerAllocationInvocationContext{})
+}
+func (m *IntegerManager) dividesWithAllocationContext(a, b *Int, parent integerAllocationInvocationContext) (result bool, cause error) {
 	if e := m.check(a); e != nil {
 		return false, e
 	}
 	if e := m.check(b); e != nil {
 		return false, e
 	}
+	receipt, e := m.beginDividesNumeralInvocation(parent)
+	if e != nil {
+		return false, e
+	}
+	s := receipt.frame
+	defer func() {
+		s.executing = false
+		s.bodyCause = cause
+		cause = polynomialNewtonJoin(cause, m.finishDividesNumeralSource(s))
+	}()
 	if a.val == 0 {
 		return b.val == 0, nil
 	}
-	var tmp Int
-	defer m.Del(&tmp)
-	if e := m.Rem(b, a, &tmp); e != nil {
+	context := integerAllocationInvocationContext{boolDivides: &s.receipt, boolDividesInvocation: s.invocation}
+	if e := m.remWithAllocationContext(b, a, &s.numeral, context); e != nil {
 		return false, e
 	}
-	return tmp.val == 0, nil
+	return s.numeral.val == 0, nil
 }

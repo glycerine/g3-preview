@@ -71,11 +71,28 @@ func TestPolynomialNegFailedSetterSourceDestructorGuard(t *testing.T) {
 				t.Log("actual source capacity stop", ordinal)
 				guard = true
 			}
+			firstCause := c.negInvocationSourceCause(&current)
 			c.integer.budget.FailAfter(-1)
 			serviceMust(t, c.cleanupNegInvocation(&current, false))
+			if c.negInvocationSourceCause(&current) != firstCause {
+				t.Fatal("owning NUM acknowledgment erased source first cause")
+			}
 			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, warm, result, c.negativeResult}, []*Int{&first, &large}, 0)
 			serviceMust(t, c.cleanupNegInvocation(&current, true))
+			if c.negInvocationSourceCause(&current) != firstCause {
+				t.Fatal("owning abort erased source first cause")
+			}
 			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, warm, result}, []*Int{&first, &large}, 0)
+			if firstCause != nil {
+				stoppedReturn := e
+				var later polynomialNegInvocationReceipt
+				next, nextCause := c.negWithReceipt(c.unit, &later)
+				serviceMust(t, nextCause)
+				next = polynomialCaller(t, c, next)
+				if c.negInvocationSourceCause(&later) != nil || c.negInvocationSourceCause(&current) != nil || !errors.Is(stoppedReturn, firstCause) {
+					t.Fatal("next invocation retargeted the earlier returned source error", stoppedReturn, firstCause)
+				}
+			}
 			if result != (Polynomial{}) {
 				result = polynomialCaller(t, c, result)
 			}

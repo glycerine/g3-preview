@@ -26,7 +26,11 @@ func polynomialFactorsAuditExtra(t *testing.T, f *PolynomialFactors, caller []Po
 		}
 	}
 	for i, phase := range f.phases {
-		if phase == 0 || phase == factorDrained || phase == factorDropConsumed {
+		// Published-before-INC pointers are borrowed, including the source-defined
+		// degree-push failure followed by caller lexical destruction. Their actual
+		// owning caller/frame roots are enumerated independently; the stale pointer
+		// itself grants neither polynomial nor physical-block ownership.
+		if phase == 0 || phase == factorPublished || phase == factorDrained || phase == factorDropConsumed {
 			continue
 		}
 		p, e := f.factor(uint32(i))

@@ -188,41 +188,46 @@ func (m *MultivariatePolynomialCore) negWithReceipt(p Polynomial, receipt *polyn
 	return m.negWithParentReceipts(p, receipt, nil, nil)
 }
 func (m *MultivariatePolynomialCore) negWithParentReceipts(p Polynomial, receipt *polynomialNegInvocationReceipt, appendReceipt *polynomialCheapAppendInvocationReceipt, factoryReceipt *polynomialFactoryInvocationReceipt) (result Polynomial, cause error) {
-	if e := m.check(); e != nil {
-		return Polynomial{}, e
-	}
-	n, e := m.cheap.ms.size(m)
+	actualReceipt, e := m.beginNegInvocation(receipt)
 	if e != nil {
 		return Polynomial{}, e
 	}
-	if modularSourceDebug && n != 0 {
-		return Polynomial{}, ErrPolynomialAssertion
+	if appendReceipt == nil {
+		m.internalAppend = true
+		appendReceipt = &m.negAppend
 	}
-	if m.negativeActive {
-		return Polynomial{}, ErrPolynomialPending
-	}
-	if m.invocation == ^uint64(0) {
-		return Polynomial{}, ErrPolynomialPending
-	}
-	invocation := m.invocation + 1
-	m.polynomialNegScope = polynomialNegScope{invocation: invocation, negativeActive: true}
-	if receipt != nil {
-		*receipt = polynomialNegInvocationReceipt{manager: m, frame: &m.polynomialNegScope, invocation: invocation}
+	if factoryReceipt == nil {
+		m.internalFactory = true
+		factoryReceipt = &m.negFactory
 	}
 	defer func() {
+		m.negativeExecuting = false
 		m.negativeBodyCause = cause
-		m.negativeResult = result
-		if m.matchesFactoryInvocation(factoryReceipt) && m.factoryInvocation.result == result {
-			// The guarded constructor transferred its raw pointer to the
-			// parent factory frame before this NUM's source destructor.
-			m.negativeResult = Polynomial{}
-		}
+		// Only the actual factory leaf receipt owns an untransferred raw result.
+		// Even an empty input reaches mk_core; only its actual factory
+		// receipt owns that new raw result until source NUM DT completes.
+		m.negativeResult = Polynomial{}
 		if e := m.finishNegSource(); e != nil {
 			result = Polynomial{}
 			cause = polynomialNewtonJoin(cause, e)
 		}
+		if cause == nil && m.internalFactory && m.matchesFactoryInvocation(factoryReceipt) {
+			if e := m.cheap.acknowledgeFactoryAppendTransfer(factoryReceipt.invocation); e != nil {
+				result = Polynomial{}
+				cause = e
+				return
+			}
+			if e := m.transferFactoryResult(factoryReceipt, result); e != nil {
+				result = Polynomial{}
+				cause = e
+				return
+			}
+		}
+		if !m.directPending(m) {
+			m.negativeActive = false
+		}
 	}()
-	n, e = m.readWord(p, 8)
+	n, e := m.readWord(p, 8)
 	if e != nil {
 		return Polynomial{}, e
 	}
@@ -231,21 +236,11 @@ func (m *MultivariatePolynomialCore) negWithParentReceipts(p Polynomial, receipt
 		if e != nil {
 			return Polynomial{}, e
 		}
-		before, x := polynomialNumericBefore(m.integer)
-		if x != nil {
-			return Polynomial{}, x
-		}
-		e = m.modular.Copy(&m.negativeCoefficient, &a)
-		e = polynomialNewtonJoin(e, m.numeric.after(m.integer, before))
+		e = m.modular.copyWithNegReceipt(&m.negativeCoefficient, &a, actualReceipt)
 		if e != nil {
 			return Polynomial{}, e
 		}
-		before, x = polynomialNumericBefore(m.integer)
-		if x != nil {
-			return Polynomial{}, x
-		}
-		e = m.modular.Neg(&m.negativeCoefficient)
-		e = polynomialNewtonJoin(e, m.numeric.after(m.integer, before))
+		e = m.modular.negWithNegReceipt(&m.negativeCoefficient, actualReceipt)
 		if e != nil {
 			return Polynomial{}, e
 		}
@@ -253,22 +248,12 @@ func (m *MultivariatePolynomialCore) negWithParentReceipts(p Polynomial, receipt
 		if e != nil {
 			return Polynomial{}, e
 		}
-		before, x = polynomialNumericBefore(m.integer)
-		if x != nil {
-			return Polynomial{}, x
-		}
-		e = m.cheap.addWithAppendReceipt(&m.negativeCoefficient, t, false, appendReceipt)
-		e = polynomialNewtonJoin(e, m.numeric.after(m.integer, before))
+		e = m.cheap.addConsumedNegReceipts(&m.negativeCoefficient, t, false, nil, appendReceipt, actualReceipt)
 		if e != nil {
 			return Polynomial{}, e
 		}
 	}
-	before, x := polynomialNumericBefore(m.integer)
-	if x != nil {
-		return Polynomial{}, x
-	}
 	result, e = m.cheap.mkWithAppendReceipt(false, appendReceipt, factoryReceipt)
-	e = polynomialNewtonJoin(e, m.numeric.after(m.integer, before))
 	return result, e
 }
 func (m *MultivariatePolynomialCore) MkUnivariateTake(v, n uint32, as []Int) (Polynomial, error) {

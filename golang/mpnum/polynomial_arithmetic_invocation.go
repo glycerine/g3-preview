@@ -290,6 +290,11 @@ func (m *MultivariatePolynomialCore) arithmeticExecuting() bool {
 	if m == nil || m.self != m {
 		return false
 	}
+	// A direct ExactDiv NUM is executing before any R.add arithmetic child.
+	// Whole-owner destruction must refuse at that real caller frontier too.
+	if s := &m.exactDivision; s.active && s.executing {
+		return true
+	}
 	if s := &m.constantScope.arithmeticScope; s.active && s.executing {
 		return true
 	}

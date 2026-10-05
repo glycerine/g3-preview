@@ -5,8 +5,10 @@ package mpnum
 // Real retained RAW declarations in the charged Integer owner. Count marks
 // reached declarations; values beyond count carry no source constructor credit.
 type integerRawScope struct {
+	divides                                        polynomialDividesInvocationReceipt
 	content                                        polynomialContentInvocationReceipt
 	addMul                                         integerAddMulInvocationReceipt
+	scalarExact                                    polynomialScalarExactDivInvocationReceipt
 	exactDiv                                       polynomialExactDivInvocationReceipt
 	owner                                          *IntegerManager
 	receipt                                        integerRawInvocationReceipt
@@ -25,13 +27,14 @@ type integerRawInvocationReceipt struct {
 	invocation uint64
 }
 
-// An executing RAW call owns these real embedded declarations. Public owner
-// destruction cannot run from its returning error transport callback.
+// Executing RAW and scoped Divides NUM calls retain their real declarations.
+// Public owner destruction cannot run from a returning error transport callback.
 func (m *IntegerManager) rawInvocationExecuting() bool {
 	return (m.divisionRaw.active && m.divisionRaw.executing) ||
 		(m.extendedRaw.active && m.extendedRaw.executing) ||
 		(m.gcdRaw.active && m.gcdRaw.executing) ||
-		(m.addMulInvocation.active && m.addMulInvocation.executing)
+		(m.addMulInvocation.active && m.addMulInvocation.executing) ||
+		(m.dividesNumeral.active && m.dividesNumeral.executing)
 }
 
 func (m *IntegerManager) rawFrameAddress(s *integerRawScope) bool {
@@ -43,6 +46,12 @@ func (m *IntegerManager) matchesRawInvocation(r *integerRawInvocationReceipt) bo
 func (m *IntegerManager) rawAllocationRoots(r *integerRawInvocationReceipt) *polynomialNumericRoots {
 
 	if !m.matchesRawInvocation(r) || !r.frame.executing || m.closed || m.sourceFinalizing || m.constructionFailed {
+		return nil
+	}
+	if p := &r.frame.divides; p.core != nil && m.dividesAllocationRoots(p) == nil {
+		return nil
+	}
+	if p := &r.frame.scalarExact; p.core != nil && m.scalarExactAllocationRoots(p) == nil {
 		return nil
 	}
 	if p := &r.frame.exactDiv; p.core != nil && m.exactDivAllocationRoots(p) == nil {

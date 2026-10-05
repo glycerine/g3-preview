@@ -277,13 +277,13 @@ func (m *MultivariatePolynomialManager) uniModGCD(u, v Polynomial, r *polynomial
 			return e
 		}
 		if divides {
-			divides, e = c.Divides(s.refs[6].root.value, s.refs[0].root.value)
+			divides, e = c.dividesWithReceipt(s.refs[6].root.value, s.refs[0].root.value, &s.dividesInvocation)
 			if e != nil {
 				return e
 			}
 		}
 		if divides {
-			divides, e = c.Divides(s.refs[6].root.value, s.refs[1].root.value)
+			divides, e = c.dividesWithReceipt(s.refs[6].root.value, s.refs[1].root.value, &s.dividesInvocation)
 			if e != nil {
 				return e
 			}

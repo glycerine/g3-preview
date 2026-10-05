@@ -42,6 +42,9 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	for _, b := range []*polynomialSOM{&m.som, &m.som2, &m.cheap, &m.cheap2} {
 		public = append(public, &b.cohortMovingCoefficient, &b.appendScope.movingCoefficient, &b.arithmeticScope.transport)
 	}
+	if m.transportBound {
+		public = append(public, &m.transport)
+	}
 	if m.scalarDivision.transportBound {
 		public = append(public, &m.scalarDivision.transport)
 	}
@@ -209,6 +212,9 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	}
 	for i := range z.rootRaw.values {
 		add(z.rootRaw.values[i])
+	}
+	if z.matchesDividesNumeralInvocation(&z.dividesNumeral.receipt) {
+		add(z.dividesNumeral.numeral)
 	}
 	for _, s := range []*integerRawScope{&z.divisionRaw, &z.extendedRaw, &z.gcdRaw} {
 		for i := uint8(0); i < s.count; i++ {

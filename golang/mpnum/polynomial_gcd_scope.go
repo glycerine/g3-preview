@@ -14,6 +14,13 @@ import (
 // PRS has nine references and three numerals. The dispatcher instead begins
 // with its two actual sbuffer<power,32> objects.
 type polynomialGCDFunctionScope struct {
+	quadraticArithmetic   [9]polynomialArithmeticInvocationReceipt
+	quadraticSqrt         polynomialSqrtInvocationReceipt
+	quadraticNeg          [3]polynomialNegInvocationReceipt
+	quadraticCoefficients [3]polynomialCoefficientInvocationReceipt
+	quadraticAppend       [3]polynomialCheapAppendInvocationReceipt
+	quadraticFactory      [3]polynomialFactoryInvocationReceipt
+
 	invocation              uint64
 	childInvocation         uint64
 	returned                polynomialReference
@@ -22,6 +29,7 @@ type polynomialGCDFunctionScope struct {
 	normalizeInvocation     polynomialNormalizeInvocationReceipt
 	derivativeInvocation    polynomialDerivativeInvocationReceipt
 	divisionInvocation      polynomialExactDivInvocationReceipt
+	dividesInvocation       polynomialDividesInvocationReceipt
 	parent, child           *polynomialGCDFunctionScope
 	refs                    [14]PolynomialRef
 	monomials               [2]polynomialDivisionReference
@@ -118,6 +126,25 @@ func (m *MultivariatePolynomialManager) beginGCDFunction() (*polynomialGCDFuncti
 	return s, nil
 }
 func (m *MultivariatePolynomialManager) gcdYoungerSourceStop(s *polynomialGCDFunctionScope) error {
+	for i := len(s.quadraticArithmetic) - 1; i >= 0; i-- {
+		if e := m.core.arithmeticInvocationSourceCause(&s.quadraticArithmetic[i]); e != nil {
+			if s.cleanupCause == nil {
+				s.cleanupCause = e
+			}
+			return s.cleanupCause
+		}
+	}
+	if e := m.sqrtInvocationSourceCause(&s.quadraticSqrt); e != nil {
+		s.cleanupCause = e
+		return e
+	}
+	for i := 2; i >= 0; i-- {
+		if e := m.core.negInvocationSourceCause(&s.quadraticNeg[i]); e != nil {
+			s.cleanupCause = e
+			return e
+		}
+	}
+
 	if s.cleanupCause != nil {
 		return s.cleanupCause
 	}
@@ -138,6 +165,10 @@ func (m *MultivariatePolynomialManager) gcdYoungerSourceStop(s *polynomialGCDFun
 		return e
 	}
 	if e := m.derivativeInvocationSourceCause(&s.derivativeInvocation); e != nil {
+		s.cleanupCause = e
+		return e
+	}
+	if e := m.core.dividesInvocationSourceCause(&s.dividesInvocation); e != nil {
 		s.cleanupCause = e
 		return e
 	}
@@ -197,7 +228,8 @@ func (m *MultivariatePolynomialManager) finishGCDLocalsTo(s *polynomialGCDFuncti
 		return nil
 	}
 	pending := (s.child != nil && s.child.active && s.child.invocation == s.childInvocation) || m.matchesICCPInvocation(&s.iccpInvocation) || m.matchesICCPShortcutContent(&s.iccpInvocation) || m.core.matchesContentInvocation(&s.contentInvocation) || s.returned.value != (Polynomial{}) || s.returned.assigning || s.zp.active || s.vars.pending.OwnerID() != 0 || (s.sparse.self != nil && !s.sparse.closed && (s.sparse.inputs.pending.OwnerID() != 0 || s.sparse.outputs.pending.OwnerID() != 0)) || s.topOwner && m.core.pscPending()
-	pending = pending || (m.matchesDerivativeInvocation(&s.derivativeInvocation) || m.derivativeInvocationHasOrphans(&s.derivativeInvocation)) || m.core.matchesExactDivInvocation(&s.divisionInvocation)
+	pending = pending || (m.matchesDerivativeInvocation(&s.derivativeInvocation) || m.derivativeInvocationHasOrphans(&s.derivativeInvocation)) || m.core.matchesExactDivInvocation(&s.divisionInvocation) || m.core.dividesInvocationPending(&s.dividesInvocation)
+	pending = pending || m.quadraticPending(s)
 	pending = pending || s.newSkeleton != nil || s.monomialBuffer.incoming != (Monomial{}) || s.monomialBuffer.pending.OwnerID() != 0
 	for i := range s.monomials {
 		pending = pending || s.monomials[i].assigning

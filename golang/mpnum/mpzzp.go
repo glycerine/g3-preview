@@ -403,20 +403,7 @@ func (m *IntegerModularManager) divWithAllocationContext(a, b, c *Int, context i
 	return m.assertNormalized(c)
 }
 func (m *IntegerModularManager) Divides(a, b *Int) (bool, error) {
-	f, e := m.Field()
-	if e != nil {
-		return false, e
-	}
-	if f {
-		zero, e := m.IsZero(a)
-		if e != nil {
-			return false, e
-		}
-		if !zero {
-			return true, nil
-		}
-	}
-	return m.manager.Divides(a, b)
+	return m.dividesWithAllocationContext(a, b, integerAllocationInvocationContext{})
 }
 func (m *IntegerModularManager) GCD(a, b, c *Int) error {
 	if e := m.check(); e != nil {

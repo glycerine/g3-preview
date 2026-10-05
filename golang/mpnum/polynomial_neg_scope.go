@@ -1,5 +1,5 @@
 // Source: src/math/polynomial/polynomial.cpp:5940-5951;
-// src/util/scoped_numeral.h. Licensed under the MIT license.
+// src/util/scoped_numeral.h:31-33. Licensed under the MIT license.
 // Source author: Leonardo de Moura.
 package mpnum
 
@@ -9,6 +9,16 @@ type polynomialNegScope struct {
 	negativeCoefficient                     Int
 	negativeResult                          Polynomial
 	negativeActive, negativeEnded           bool
+	negativeExecuting                       bool
+	normalize                               integerPNormalizeInvocationReceipt
+	transport                               Int
+	transportBuffer                         *polynomialSOM
+	transportSlot                           uint32
+	transportBound                          bool
+	receipt                                 polynomialNegInvocationReceipt
+	negAppend                               polynomialCheapAppendInvocationReceipt
+	negFactory                              polynomialFactoryInvocationReceipt
+	internalAppend, internalFactory         bool
 	negativeBodyCause, negativeCleanupCause error
 	invocation                              uint64
 	numeric                                 polynomialNumericRoots
@@ -20,23 +30,30 @@ type polynomialNegInvocationReceipt struct {
 }
 
 func (m *MultivariatePolynomialCore) matchesNegInvocation(r *polynomialNegInvocationReceipt) bool {
-	return r != nil && r.manager == m && r.frame == &m.polynomialNegScope && r.invocation != 0 && r.invocation == r.frame.invocation && r.frame.negativeActive
+	return m != nil && m.self == m && r != nil && r.manager == m && r.frame == &m.polynomialNegScope && r.invocation != 0 && r.invocation == r.frame.invocation && r.frame.negativeActive
 }
 func (m *MultivariatePolynomialCore) negInvocationSourceCause(r *polynomialNegInvocationReceipt) error {
-	if m.matchesNegInvocation(r) {
+	if m != nil && m.self == m && r != nil && r.manager == m && r.frame == &m.polynomialNegScope && r.invocation != 0 && r.invocation == r.frame.invocation {
 		return r.frame.negativeCleanupCause
 	}
 	return nil
 }
 func (m *MultivariatePolynomialCore) finishNegSource() error {
-	s := &m.polynomialNegScope
-	if !s.negativeActive || s.negativeEnded {
-		return nil
+	if m == nil || m.self != m {
+		return ErrPolynomialOwner
 	}
+	s := &m.polynomialNegScope
 	if s.negativeCleanupCause != nil {
 		return s.negativeCleanupCause
 	}
-	_, e := sourceNumeralDel(m.integer, &s.negativeCoefficient)
+	if !s.negativeActive || s.negativeEnded {
+		return nil
+	}
+	if e := m.modular.pNormalizeInvocationSourceCause(&s.normalize); e != nil {
+		s.negativeCleanupCause = e
+		return e
+	}
+	_, e := upolynomialSourceNumeralDel(m.integer, &s.negativeCoefficient)
 	if e != nil {
 		s.negativeCleanupCause = e
 		return e
@@ -44,7 +61,7 @@ func (m *MultivariatePolynomialCore) finishNegSource() error {
 	s.negativeEnded = true
 	// A returned factory is exposed to the caller only after this source DT.
 	s.negativeResult = Polynomial{}
-	if !polynomialNegNumericPending(&s.numeric) {
+	if !s.directPending(m) {
 		s.negativeActive = false
 	}
 	return nil
@@ -67,20 +84,54 @@ func (m *MultivariatePolynomialCore) cleanupNegInvocation(r *polynomialNegInvoca
 	return m.cleanupNegPhase(abort)
 }
 func (m *MultivariatePolynomialCore) cleanupNegPhase(abort bool) error {
+	if m == nil || m.self != m {
+		return ErrPolynomialOwner
+	}
 	s := &m.polynomialNegScope
 	if !s.negativeActive {
 		return nil
+	}
+	if s.negativeExecuting {
+		return ErrPolynomialPending
+	}
+	if s.internalAppend {
+		if e := m.cheap.cleanupAppendInvocation(&s.negAppend, false); e != nil {
+			return e
+		}
+	}
+	if e := m.modular.cleanupPNormalizeInvocation(&s.normalize, false); e != nil {
+		return e
 	}
 	if !s.negativeEnded {
 		if e := m.deleteNumeral(&s.negativeCoefficient); e != nil {
 			return e
 		}
 		s.negativeEnded = true
-		s.negativeCleanupCause = nil
 	}
 	if abort {
+		if s.transportBound {
+			if e := m.deleteNumeral(&s.transport); e != nil {
+				return e
+			}
+			s.transportBound = false
+			s.transportBuffer = nil
+			s.transportSlot = 0
+		}
+		if e := m.modular.cleanupPNormalizeInvocation(&s.normalize, true); e != nil {
+			return e
+		}
 		if s.negativeResult != (Polynomial{}) {
 			if e := m.CleanupValue(&s.negativeResult); e != nil {
+				return e
+			}
+		}
+		if s.internalFactory {
+			if e := m.cleanupFactoryInvocation(&s.negFactory, true); e != nil {
+				return e
+			}
+		}
+		if s.internalAppend {
+			if e := m.cheap.cleanupAppendInvocation(&s.negAppend, true); e != nil {
 				return e
 			}
 		}
@@ -88,9 +139,39 @@ func (m *MultivariatePolynomialCore) cleanupNegPhase(abort bool) error {
 			return e
 		}
 	}
-	if s.negativeResult == (Polynomial{}) && !polynomialNegNumericPending(&s.numeric) {
+	if s.negativeResult == (Polynomial{}) && !s.directPending(m) {
 		invocation := s.invocation
-		*s = polynomialNegScope{invocation: invocation}
+		*s = polynomialNegScope{invocation: invocation, negativeBodyCause: s.negativeBodyCause, negativeCleanupCause: s.negativeCleanupCause, normalize: s.normalize}
 	}
 	return nil
+}
+
+// This is the existing source entry, including the cheap-buffer assertion and
+// the actual minus_a NUM construction. No polynomial operand is read here.
+func (m *MultivariatePolynomialCore) beginNegInvocation(out *polynomialNegInvocationReceipt) (*polynomialNegInvocationReceipt, error) {
+	if e := m.check(); e != nil {
+		return nil, e
+	}
+	n, e := m.cheap.ms.size(m)
+	if e != nil {
+		return nil, e
+	}
+	if modularSourceDebug && n != 0 {
+		return nil, ErrPolynomialAssertion
+	}
+	if m.negativeActive || m.invocation == ^uint64(0) {
+		return nil, ErrPolynomialPending
+	}
+	invocation := m.invocation + 1
+	m.polynomialNegScope = polynomialNegScope{invocation: invocation, negativeActive: true, negativeExecuting: true}
+	s := &m.polynomialNegScope
+	s.receipt = polynomialNegInvocationReceipt{manager: m, frame: s, invocation: invocation}
+	if out != nil {
+		*out = s.receipt
+	}
+	return &s.receipt, nil
+}
+
+func (s *polynomialNegScope) directPending(m *MultivariatePolynomialCore) bool {
+	return s.transportBound || polynomialNegNumericPending(&s.numeric) || m.modular.matchesPNormalizeInvocation(&s.normalize) || (s.internalAppend && m.cheap.matchesAppendInvocation(&s.negAppend)) || (s.internalFactory && m.matchesFactoryInvocation(&s.negFactory))
 }

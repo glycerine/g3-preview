@@ -26,6 +26,9 @@ func (m *MultivariatePolynomialManager) cleanupGCDScopes(scopes []*polynomialGCD
 			if !s.active {
 				continue
 			}
+			if e := m.cleanupQuadraticChildren(s, false); e != nil {
+				return e
+			}
 			if e := c.cleanupContentInvocation(&s.contentInvocation, false); e != nil {
 				return e
 			}
@@ -33,6 +36,9 @@ func (m *MultivariatePolynomialManager) cleanupGCDScopes(scopes []*polynomialGCD
 				return e
 			}
 			if e := m.cleanupDerivativeInvocation(&s.derivativeInvocation, false); e != nil {
+				return e
+			}
+			if e := c.cleanupDividesInvocation(&s.dividesInvocation, false); e != nil {
 				return e
 			}
 			if e := c.cleanupExactDivInvocation(&s.divisionInvocation, false); e != nil {
@@ -92,6 +98,9 @@ func (m *MultivariatePolynomialManager) cleanupGCDScopes(scopes []*polynomialGCD
 		if !s.active {
 			continue
 		}
+		if e := m.cleanupQuadraticChildren(s, true); e != nil {
+			return e
+		}
 		if e := c.cleanupContentInvocation(&s.contentInvocation, true); e != nil {
 			return e
 		}
@@ -99,6 +108,9 @@ func (m *MultivariatePolynomialManager) cleanupGCDScopes(scopes []*polynomialGCD
 			return e
 		}
 		if e := m.cleanupDerivativeInvocation(&s.derivativeInvocation, true); e != nil {
+			return e
+		}
+		if e := c.cleanupDividesInvocation(&s.dividesInvocation, true); e != nil {
 			return e
 		}
 		if e := c.cleanupExactDivInvocation(&s.divisionInvocation, true); e != nil {
@@ -159,7 +171,8 @@ func (m *MultivariatePolynomialManager) cleanupGCDScopes(scopes []*polynomialGCD
 	for _, s := range scopes {
 		if s.active {
 			h := s.header
-			*s = polynomialGCDFunctionScope{header: h, invocation: s.invocation}
+			// Retain captured diagnostic causes only; the next guarded begin resets them.
+			*s = polynomialGCDFunctionScope{header: h, invocation: s.invocation, bodyCause: s.bodyCause, cleanupCause: s.cleanupCause}
 		}
 	}
 	return nil

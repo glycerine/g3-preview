@@ -26,6 +26,27 @@ func (m *IntegerModularManager) derivativeAllocationContext(r *polynomialDerivat
 }
 
 func (m *IntegerModularManager) normalizeWithSourceContext(out *Int, context integerAllocationInvocationContext) error {
+	if r := context.divides; m.manager.dividesContextRoots(context) != nil && r.core.modular == m {
+		e := m.pNormalizeWithReceipt(out, &r.frame.normalize)
+		if r.frame.sourceCause == nil {
+			r.frame.sourceCause = m.pNormalizeInvocationSourceCause(&r.frame.normalize)
+		}
+		return e
+	}
+	if r := context.neg; r != nil && context.negInvocation != 0 && context.negInvocation == r.invocation && m.manager.negAllocationRoots(r) != nil && r.manager.modular == m {
+		e := m.pNormalizeWithReceipt(out, &r.frame.normalize)
+		if r.frame.negativeCleanupCause == nil {
+			r.frame.negativeCleanupCause = m.pNormalizeInvocationSourceCause(&r.frame.normalize)
+		}
+		return e
+	}
+	if r := context.scalarExact; m.manager.scalarExactContextRoots(context) != nil && r.core.modular == m {
+		e := m.pNormalizeWithReceipt(out, &r.frame.normalize)
+		if r.frame.sourceCause == nil {
+			r.frame.sourceCause = m.pNormalizeInvocationSourceCause(&r.frame.normalize)
+		}
+		return e
+	}
 	if r := context.exactDiv; m.manager.exactDivContextRoots(context) != nil && r.core.modular == m {
 		e := m.pNormalizeWithReceipt(out, &r.frame.normalize)
 		if r.frame.sourceCause == nil {

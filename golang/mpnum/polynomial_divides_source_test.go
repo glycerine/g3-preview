@@ -127,7 +127,21 @@ func TestPolynomialDividesBigNumericPendingBlocksOwningClose(t *testing.T) {
 	if c.closing || full.closing {
 		t.Fatal("pending preguard started owning shutdown")
 	}
-	serviceMust(t, c.CleanupDivides())
+	receipt := c.dividesLocal.directReceipt
+	actual := q.z.pendingCell
+	if receipt.frame.numeric.cell != actual {
+		t.Fatal("actual quotient allocation did not acquire its full backing at the leaf", receipt.frame.numeric.cell, actual)
+	}
+	source := c.dividesInvocationSourceCause(&receipt)
+	serviceMust(t, c.cleanupDividesInvocation(&receipt, false))
+	if q.z.pendingCell != actual || receipt.frame.numeric.cell != actual || !receipt.frame.active || c.dividesInvocationSourceCause(&receipt) != source {
+		t.Fatal("completed suffix consumed unjoined quotient allocation")
+	}
+	polynomialImpPhysicalAuditValues(t, full, []Polynomial{p, divisor})
+	serviceMust(t, c.cleanupDividesInvocation(&receipt, true))
+	if c.dividesInvocationSourceCause(&receipt) != source {
+		t.Fatal("true own erased source history")
+	}
 	if q.z.pendingCell.object != (memory.ObjectRef{}) {
 		t.Fatal("actual matching numerical pending retained after owning cleanup")
 	}

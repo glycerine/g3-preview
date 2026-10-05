@@ -401,6 +401,9 @@ func (m *MultivariatePolynomialCore) MkTerms(as []Int, ms []Monomial) (Polynomia
 	return m.som.mk(false)
 }
 func (m *MultivariatePolynomialCore) CloseChecked() error {
+	if m != nil && m.self == m && m.negativeActive && m.negativeExecuting {
+		return ErrPolynomialPending
+	}
 	if m.arithmeticExecuting() {
 		return ErrPolynomialPending
 	}

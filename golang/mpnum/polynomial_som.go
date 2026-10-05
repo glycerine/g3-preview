@@ -70,7 +70,13 @@ func (b *polynomialSOM) addConsumedCoefficientReceipts(a *Int, term Monomial, ta
 func (b *polynomialSOM) addConsumedScalarDivReceipts(a *Int, term Monomial, take bool, consumed *bool, appendReceipt *polynomialCheapAppendInvocationReceipt, scalarReceipt *polynomialScalarDivInvocationReceipt) error {
 	return b.addConsumedScalarDivEngine(a, term, take, consumed, nil, appendReceipt, nil, scalarReceipt, nil)
 }
-func (b *polynomialSOM) addConsumedScalarDivEngine(a *Int, term Monomial, take bool, consumed *bool, receipt *polynomialNumericRoots, appendReceipt *polynomialCheapAppendInvocationReceipt, coefficientReceipt *polynomialCoefficientInvocationReceipt, scalarReceipt *polynomialScalarDivInvocationReceipt, arithmeticReceipt *polynomialArithmeticInvocationReceipt) (cause error) {
+func (b *polynomialSOM) addConsumedNegReceipts(a *Int, term Monomial, take bool, consumed *bool, appendReceipt *polynomialCheapAppendInvocationReceipt, negReceipt *polynomialNegInvocationReceipt) error {
+	return b.addConsumedScalarNegEngine(a, term, take, consumed, nil, appendReceipt, nil, nil, nil, negReceipt)
+}
+func (b *polynomialSOM) addConsumedScalarDivEngine(a *Int, term Monomial, take bool, consumed *bool, receipt *polynomialNumericRoots, appendReceipt *polynomialCheapAppendInvocationReceipt, coefficientReceipt *polynomialCoefficientInvocationReceipt, scalarReceipt *polynomialScalarDivInvocationReceipt, arithmeticReceipt *polynomialArithmeticInvocationReceipt) error {
+	return b.addConsumedScalarNegEngine(a, term, take, consumed, receipt, appendReceipt, coefficientReceipt, scalarReceipt, arithmeticReceipt, nil)
+}
+func (b *polynomialSOM) addConsumedScalarNegEngine(a *Int, term Monomial, take bool, consumed *bool, receipt *polynomialNumericRoots, appendReceipt *polynomialCheapAppendInvocationReceipt, coefficientReceipt *polynomialCoefficientInvocationReceipt, scalarReceipt *polynomialScalarDivInvocationReceipt, arithmeticReceipt *polynomialArithmeticInvocationReceipt, negReceipt *polynomialNegInvocationReceipt) (cause error) {
 	if consumed != nil {
 		*consumed = false
 	}
@@ -198,10 +204,21 @@ func (b *polynomialSOM) addConsumedScalarDivEngine(a *Int, term Monomial, take b
 		} else {
 			transport = &value
 		}
+		if negReceipt != nil {
+			if b != &m.cheap || m.integer.negAllocationRoots(negReceipt) == nil || !m.matchesNegInvocation(negReceipt) || negReceipt.frame.transportBound {
+				return ErrPolynomialOwner
+			}
+			s := negReceipt.frame
+			s.transport = value
+			s.transportBuffer, s.transportSlot, s.transportBound = b, n, true
+			transport = &s.transport
+		}
 		if take {
 			e = m.modular.Swap(transport, a)
 		} else if scalarReceipt != nil {
 			e = m.modular.copyWithScalarDivReceipt(transport, a, scalarReceipt)
+		} else if negReceipt != nil {
+			e = m.modular.copyWithNegReceipt(transport, a, negReceipt)
 		} else if arithmeticReceipt != nil {
 			e = b.arithmeticNumericCall(0, a, nil, nil, transport, arithmeticReceipt)
 		} else {
@@ -212,6 +229,10 @@ func (b *polynomialSOM) addConsumedScalarDivEngine(a *Int, term Monomial, take b
 		}
 		if scalarReceipt != nil {
 			s := scalarReceipt.frame
+			s.transport, s.transportBuffer, s.transportSlot, s.transportBound = Int{}, nil, 0, false
+		}
+		if negReceipt != nil {
+			s := negReceipt.frame
 			s.transport, s.transportBuffer, s.transportSlot, s.transportBound = Int{}, nil, 0, false
 		}
 		if e != nil {

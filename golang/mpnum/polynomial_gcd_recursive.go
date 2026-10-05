@@ -277,13 +277,13 @@ func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32
 					return e
 				}
 			}
-			first, e := c.Divides(candidate.value, pu.value)
+			first, e := c.dividesWithReceipt(candidate.value, pu.value, &s.dividesInvocation)
 			if e != nil {
 				return e
 			}
 			second := false
 			if first {
-				second, e = c.Divides(candidate.value, pv.value)
+				second, e = c.dividesWithReceipt(candidate.value, pv.value, &s.dividesInvocation)
 				if e != nil {
 					return e
 				}

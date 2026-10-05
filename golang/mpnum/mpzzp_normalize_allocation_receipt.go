@@ -54,18 +54,21 @@ func (m *IntegerModularManager) cleanupPNormalizeInvocation(r *integerPNormalize
 // A receipt exists only for a real pending growth of the named source buffer.
 // Successful publication returns authority to the persistent Natural member.
 type naturalPNBufferReceipt struct {
-	exactDiv   polynomialExactDivInvocationReceipt
-	raw        integerRawInvocationReceipt
-	scalar     polynomialScalarDivInvocationReceipt
-	content    polynomialContentInvocationReceipt
-	owner      *NaturalManager
-	context    *integerPNormalizeScope
-	invocation uint64
-	buffer     *sourceLimbBuffer
-	pending    memory.Block
-	stage      uint8
-	private    bool
-	published  memory.Block
+	divides     polynomialDividesInvocationReceipt
+	boolDivides integerDividesNumeralInvocationReceipt
+	scalarExact polynomialScalarExactDivInvocationReceipt
+	exactDiv    polynomialExactDivInvocationReceipt
+	raw         integerRawInvocationReceipt
+	scalar      polynomialScalarDivInvocationReceipt
+	content     polynomialContentInvocationReceipt
+	owner       *NaturalManager
+	context     *integerPNormalizeScope
+	invocation  uint64
+	buffer      *sourceLimbBuffer
+	pending     memory.Block
+	stage       uint8
+	private     bool
+	published   memory.Block
 }
 
 func (m *NaturalManager) pnBufferReceipt(pn *integerPNormalizeScope, i int) *naturalPNBufferReceipt {
@@ -120,6 +123,21 @@ func (s *integerPNormalizeScope) pending() bool {
 }
 
 func (r *naturalPNBufferReceipt) bound(executing bool) bool {
+	if s := r.boolDivides; s.manager != nil {
+		if !s.manager.matchesDividesNumeralInvocation(&s) || r.owner != s.manager.natural || r.invocation != s.invocation || (executing && s.manager.dividesNumeralContextRoots(integerAllocationInvocationContext{boolDivides: &s, boolDividesInvocation: s.invocation}) == nil) {
+			return false
+		}
+		if r.private {
+			v := &r.owner.verificationInvocation
+			return r == &v.buffer && r.buffer == &r.owner.verification && v.boolDivides == s && r.owner.matchesPNVerification(&s.frame.verification)
+		}
+		for i := range s.frame.buffers {
+			if r == &s.frame.buffers[i] {
+				return r.buffer == &r.owner.division[i]
+			}
+		}
+		return false
+	}
 
 	if r.raw.manager != nil {
 		s := r.raw
@@ -138,6 +156,38 @@ func (r *naturalPNBufferReceipt) bound(executing bool) bool {
 		return false
 	}
 
+	if r.divides.core != nil {
+		s := r.divides
+		if s.core.self != s.core || !s.core.matchesDividesInvocation(&s) || r.owner != s.core.integer.natural || r.invocation != s.invocation || (executing && s.core.integer.dividesAllocationRoots(&s) == nil) {
+			return false
+		}
+		if r.private {
+			v := &r.owner.verificationInvocation
+			return r == &v.buffer && r.buffer == &r.owner.verification && v.divides == s && r.owner.matchesPNVerification(&s.frame.verification)
+		}
+		for i := range s.frame.buffers {
+			if r == &s.frame.buffers[i] {
+				return r.buffer == &r.owner.division[i]
+			}
+		}
+		return false
+	}
+	if r.scalarExact.core != nil {
+		s := r.scalarExact
+		if s.core.self != s.core || !s.core.matchesScalarExactDivInvocation(&s) || r.owner != s.core.integer.natural || r.invocation != s.invocation || (executing && s.core.integer.scalarExactAllocationRoots(&s) == nil) {
+			return false
+		}
+		if r.private {
+			v := &r.owner.verificationInvocation
+			return r == &v.buffer && r.buffer == &r.owner.verification && v.scalarExact == s && r.owner.matchesPNVerification(&s.frame.verification)
+		}
+		for i := range s.frame.buffers {
+			if r == &s.frame.buffers[i] {
+				return r.buffer == &r.owner.division[i]
+			}
+		}
+		return false
+	}
 	if r.exactDiv.core != nil {
 		s := r.exactDiv
 		if s.core.self != s.core || !s.core.matchesExactDivInvocation(&s) || r.owner != s.core.integer.natural || r.invocation != s.invocation || (executing && s.core.integer.exactDivAllocationRoots(&s) == nil) {
@@ -189,6 +239,16 @@ func (r *naturalPNBufferReceipt) bound(executing bool) bool {
 	return r.context != nil && r.context.active && r.invocation == r.context.invocation && (!executing || r.context.executing)
 }
 func (m *NaturalManager) divisionBufferReceipt(context integerAllocationInvocationContext, i int) *naturalPNBufferReceipt {
+	if r := context.boolDivides; r != nil {
+		if r.manager == nil || r.manager.natural != m || r.manager.dividesNumeralContextRoots(context) == nil {
+			return nil
+		}
+		b := &r.frame.buffers[i]
+		if b.owner == nil {
+			*b = naturalPNBufferReceipt{owner: m, boolDivides: *r, invocation: r.invocation, buffer: &m.division[i]}
+		}
+		return b
+	}
 
 	if r := context.raw; r != nil && r.manager != nil && r.manager.natural == m && context.rawReceipt(r.manager) != nil {
 		b := &r.frame.buffers[i]
@@ -202,6 +262,26 @@ func (m *NaturalManager) divisionBufferReceipt(context integerAllocationInvocati
 		return nil
 	}
 
+	if r := context.divides; r != nil {
+		if r.core == nil || r.core.integer.natural != m || r.core.integer.dividesContextRoots(context) == nil {
+			return nil
+		}
+		b := &r.frame.buffers[i]
+		if b.owner == nil {
+			*b = naturalPNBufferReceipt{owner: m, divides: *r, invocation: r.invocation, buffer: &m.division[i]}
+		}
+		return b
+	}
+	if r := context.scalarExact; r != nil {
+		if r.core == nil || r.core.integer.natural != m || r.core.integer.scalarExactContextRoots(context) == nil {
+			return nil
+		}
+		b := &r.frame.buffers[i]
+		if b.owner == nil {
+			*b = naturalPNBufferReceipt{owner: m, scalarExact: *r, invocation: r.invocation, buffer: &m.division[i]}
+		}
+		return b
+	}
 	if r := context.exactDiv; r != nil {
 		if r.core == nil || r.core.integer.natural != m || r.core.integer.exactDivContextRoots(context) == nil {
 			return nil
