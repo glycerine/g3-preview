@@ -103095,7 +103095,9 @@
         "util_gparams_values.go",
         "util_gparams_catalog.go",
         "util_gparams_catalog_collectors.go",
-        "util_gparams_catalog_dispatch.go"
+        "util_gparams_catalog_dispatch.go",
+        "util_gparams_source_finalize.go",
+        "util_gparams_source_finalize_test.go"
       ],
       "tests": [
         "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
@@ -103124,7 +103126,12 @@
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
-        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription",
+        "TestGlobalParamsSourceFinalizeSparseShrinkRefusal",
+        "TestGlobalParamsSourceFinalizeEmptyMembersAndGuards",
+        "TestGlobalParamsSourceFinalizeFiniteNamedModuleOwners",
+        "TestGlobalParamsSourceFinalizeEveryActualShrinkReservation",
+        "TestGlobalParamsSourceFinalizeCopiedOwnerBeforeMutex"
       ],
       "assertions": [
         {
@@ -103231,6 +103238,18 @@
             "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
             "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
           ]
+        },
+        {
+          "name": "imp destructor body reset/module deletion and reverse member suffix; guarded source stop with separate owning sparse-shrink acknowledgment (cpp106-123); generated g_imp finalization/nulling, ctor unwind and descendant stopped numeral decrements remain open",
+          "status": "partial",
+          "go_target": "util_gparams_source_finalize.go",
+          "tests": [
+            "TestGlobalParamsSourceFinalizeSparseShrinkRefusal",
+            "TestGlobalParamsSourceFinalizeEmptyMembersAndGuards",
+            "TestGlobalParamsSourceFinalizeFiniteNamedModuleOwners",
+            "TestGlobalParamsSourceFinalizeEveryActualShrinkReservation",
+            "TestGlobalParamsSourceFinalizeCopiedOwnerBeforeMutex"
+          ]
         }
       ],
       "ownership": [
@@ -103239,6 +103258,9 @@
       ],
       "deviations": [
         "Explicit runtime lifetime, C long32/64 and C-locale IEEE64 profiles, charged Go scratch/backings and two borrowed byte streams. Complete generated catalog, process singleton/stdout wiring, OpenMP and physical global allocation hooks remain open."
+      ],
+      "ownership_checks": [
+        "actual source destructor reset/deletion/member cursor retained independently of sticky source cause; immediate named owner graph before sparse shrink fault lift; separate owning acknowledgment never replays failed source reset allocation; generated singleton ctor unwind and reached ParamsRef decrement-stop receipts remain open"
       ]
     },
     {
@@ -103257,7 +103279,9 @@
         "util_gparams_values.go",
         "util_gparams_catalog.go",
         "util_gparams_catalog_collectors.go",
-        "util_gparams_catalog_dispatch.go"
+        "util_gparams_catalog_dispatch.go",
+        "util_gparams_source_finalize.go",
+        "util_gparams_source_finalize_test.go"
       ],
       "tests": [
         "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
@@ -103286,7 +103310,12 @@
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
-        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription",
+        "TestGlobalParamsSourceFinalizeSparseShrinkRefusal",
+        "TestGlobalParamsSourceFinalizeEmptyMembersAndGuards",
+        "TestGlobalParamsSourceFinalizeFiniteNamedModuleOwners",
+        "TestGlobalParamsSourceFinalizeEveryActualShrinkReservation",
+        "TestGlobalParamsSourceFinalizeCopiedOwnerBeforeMutex"
       ],
       "conditionals": [
         {
@@ -103341,6 +103370,18 @@
             "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
             "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
           ]
+        },
+        {
+          "name": "imp destructor body reset/module deletion and reverse member suffix; guarded source stop with separate owning sparse-shrink acknowledgment (cpp106-123); generated g_imp finalization/nulling, ctor unwind and descendant stopped numeral decrements remain open",
+          "status": "partial",
+          "go_target": "util_gparams_source_finalize.go",
+          "tests": [
+            "TestGlobalParamsSourceFinalizeSparseShrinkRefusal",
+            "TestGlobalParamsSourceFinalizeEmptyMembersAndGuards",
+            "TestGlobalParamsSourceFinalizeFiniteNamedModuleOwners",
+            "TestGlobalParamsSourceFinalizeEveryActualShrinkReservation",
+            "TestGlobalParamsSourceFinalizeCopiedOwnerBeforeMutex"
+          ]
         }
       ],
       "ownership": [
@@ -103349,6 +103390,9 @@
       ],
       "deviations": [
         "Explicit runtime lifetime, C long32/64 and C-locale IEEE64 profiles, charged Go scratch/backings and two borrowed byte streams. Complete generated catalog, process singleton/stdout wiring, OpenMP and physical global allocation hooks remain open."
+      ],
+      "ownership_checks": [
+        "actual source destructor reset/deletion/member cursor retained independently of sticky source cause; immediate named owner graph before sparse shrink fault lift; separate owning acknowledgment never replays failed source reset allocation; generated singleton ctor unwind and reached ParamsRef decrement-stop receipts remain open"
       ]
     },
     {

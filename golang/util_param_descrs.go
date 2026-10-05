@@ -1,3 +1,5 @@
+// Source: src/util/params.cpp:59-86; src/util/params.h.
+// Author: Leonardo de Moura (2011-05-09).
 // Licensed under the MIT license.
 // Licensed under the MIT license; see LICENSE.txt in the source distribution.
 // Concrete translation of util/params.cpp param_descrs and dictionary<info>.
@@ -1036,3 +1038,31 @@ func InsertTimeout(d *ParamDescrs) error {
 	return d.InsertName("timeout", ParamUInt, pdLiteral("(default: infty) timeout in milliseconds."), nil, nil)
 }
 func pdLiteral(s string) *string { return &s }
+
+// sourceFinalizeMembers follows the actual reverse m_names/m_info declaration
+// order. Copied text is additional Go storage and drains after source members.
+func (d *ParamDescrs) sourceFinalizeMembers() error {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	if d.self != d {
+		return ErrParamDescrsPrecondition
+	}
+	if d.closed {
+		return nil
+	}
+	return d.closeSourceMembers()
+}
+
+// Caller holds mu; each consumed concrete backing is cleared immediately.
+func (d *ParamDescrs) closeSourceMembers() error {
+	d.budget.Release(pdNameBytes(cap(d.names)))
+	d.names = nil
+	d.budget.Release(pdEntryBytes(len(d.entries)))
+	d.entries = nil
+	d.size = 0
+	d.deleted = 0
+	d.texts.Close()
+	d.budget.Release(uint64(reflect.TypeOf(ParamDescrs{}).Size()))
+	d.closed = true
+	return nil
+}

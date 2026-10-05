@@ -1,4 +1,6 @@
-// Licensed under the MIT license.
+// Source: src/util/gparams.cpp:81-123,633-644; src/util/gparams.h.
+// Author: Leonardo de Moura (2012-11-29).
+// Licensed under the MIT license; see LICENSE.txt in the source distribution.
 // Explicit runtime-owned gparams::imp; source catalog dispatch is borrowed.
 package g3
 
@@ -39,6 +41,10 @@ type GlobalParams struct {
 	budget                                 *arena.Budget
 	register                               func(GlobalParamsRegistrar) error
 	modulesRegistered, registering, closed bool
+	sourceStarted, sourceCompleted         bool
+	sourceStage                            uint8
+	sourceIndex                            uint32
+	sourceCause                            error
 	ownerBytes                             uint64
 	cLongBits                              uint8
 	moduleDescriptors                      gparamsDescriptorDictionary
@@ -130,7 +136,7 @@ func (g *GlobalParams) open() error {
 	if g == nil || g.self != g {
 		return ErrGlobalParamsOwner
 	}
-	if g.closed {
+	if g.closed || g.sourceStarted {
 		return arena.ErrClosed
 	}
 	return g.context.open()
@@ -416,6 +422,12 @@ func (g *GlobalParams) Reset() error {
 	return g.reset()
 }
 func (g *GlobalParams) Close() error {
+	if g != nil && g.self == g && g.sourceStarted {
+		return g.CleanupStopped()
+	}
+	return g.closeLegacy()
+}
+func (g *GlobalParams) closeLegacy() error {
 	if g == nil || g.self != g {
 		return ErrGlobalParamsOwner
 	}
