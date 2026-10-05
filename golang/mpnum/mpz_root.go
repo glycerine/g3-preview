@@ -45,40 +45,43 @@ func rootDomain(a *Int, n uint32) error {
 	return nil
 }
 
-// Root is the source copy-then-in-place root overload, using staged owned work
-// so predictable failures leave out unchanged. A false result publishes the
-// source upper bound (signed ceiling), and either output/input alias is allowed.
+// Root is literal source SET(out,a) followed by in-place root. Caller output
+// publication precedes domain checks and every bisection/body failure.
 func (m *IntegerManager) Root(a *Int, n uint32, out *Int) (bool, error) {
-	if e := m.check(a); e != nil {
+	if e := m.Copy(out, a); e != nil {
 		return false, e
 	}
-	if e := m.check(out); e != nil {
+	return m.RootInPlace(out, n)
+}
+func (m *IntegerManager) RootInPlace(a *Int, n uint32) (bool, error) {
+	return m.rootInPlaceWithReceipt(a, n, nil)
+}
+func (m *IntegerManager) rootInPlaceWithReceipt(a *Int, n uint32, receipt *integerRootInvocationReceipt) (bool, error) {
+	if e := m.check(a); e != nil {
 		return false, e
 	}
 	if e := rootDomain(a, n); e != nil {
 		return false, e
 	}
-	var work Int
-	defer m.Del(&work)
-	if e := m.Copy(&work, a); e != nil {
-		return false, e
-	}
-	exact, e := m.rootCore(&work, n)
-	if e != nil {
-		return false, e
-	}
-	if e = m.Move(out, &work); e != nil {
-		return false, e
-	}
-	return exact, nil
+	return m.rootCoreWithReceipt(a, n, receipt)
 }
-func (m *IntegerManager) RootInPlace(a *Int, n uint32) (bool, error) { return m.Root(a, n, a) }
 func (m *IntegerManager) rootCore(a *Int, n uint32) (bool, error) {
+	return m.rootCoreWithReceipt(a, n, nil)
+}
+func (m *IntegerManager) rootCoreWithReceipt(a *Int, n uint32, receipt *integerRootInvocationReceipt) (exact bool, cause error) {
 	if a.val == 0 {
 		return true, nil
 	}
-	var lower, upper, mid, midN Int
-	defer func() { m.Del(&lower); m.Del(&upper); m.Del(&mid); m.Del(&midN) }()
+	if e := m.beginRootRawScopeWithReceipt(receipt); e != nil {
+		return false, e
+	}
+	s := &m.rootRaw
+	defer func() {
+		if cause != nil && !s.endEntered && s.bodyCause == nil {
+			s.bodyCause = cause
+		}
+	}()
+	lower, upper, mid, midN := &s.values[0], &s.values[1], &s.values[2], &s.values[3]
 	var k uint32
 	var e error
 	if a.val > 0 {
@@ -89,83 +92,108 @@ func (m *IntegerManager) rootCore(a *Int, n uint32) (bool, error) {
 	if e != nil {
 		return false, e
 	}
-	// Keep source unsigned k+1 width and div_l/div_u bounds. Degree zero has
-	// already been classified; zero input returned above before that division.
-	l := k / n
-	u := (k + 1) / n
+	l, u := k/n, (k+1)/n
 	if (k+1)%n != 0 {
 		u++
 	}
 	two := NewInt(2)
+	loExp, hiExp := NewInt(int32(l)), NewInt(int32(u))
 	if a.val > 0 {
-		if e = m.Power(&two, l, &lower); e != nil {
+		if e = m.rootRawCall(0, &two, &loExp, lower); e != nil {
 			return false, e
 		}
-		if e = m.Power(&two, u, &upper); e != nil {
+		if e = m.rootRawCall(0, &two, &hiExp, upper); e != nil {
 			return false, e
 		}
 	} else {
-		if e = m.Power(&two, u, &lower); e != nil {
+		if e = m.rootRawCall(0, &two, &hiExp, lower); e != nil {
 			return false, e
 		}
-		if e = m.Power(&two, l, &upper); e != nil {
+		if e = m.rootRawCall(0, &two, &loExp, upper); e != nil {
 			return false, e
 		}
-		if e = m.Neg(&lower); e != nil {
+		if e = m.Neg(lower); e != nil {
 			return false, e
 		}
-		if e = m.Neg(&upper); e != nil {
+		if e = m.Neg(upper); e != nil {
 			return false, e
 		}
 	}
-	compare, e := m.Compare(&lower, &upper)
+	if modularSourceDebug {
+		le, e := m.LessEqual(lower, upper)
+		if e != nil {
+			return false, e
+		}
+		if !le {
+			return false, ErrIntegerAssertion
+		}
+	}
+	equal, e := m.Equal(lower, upper)
 	if e != nil {
 		return false, e
 	}
-	if compare == 0 {
-		if e = m.Swap(a, &lower); e != nil {
+	if equal {
+		if e = m.Swap(a, lower); e != nil {
 			return false, e
 		}
-		return true, nil
+		return true, m.endRootRawScope()
 	}
 	for {
-		if e = m.Add(&upper, &lower, &mid); e != nil {
+		if e = m.rootRawCall(1, upper, lower, mid); e != nil {
 			return false, e
 		}
-		if e = m.machineDiv2kCore(&mid, 1); e != nil {
+		one := NewInt(1)
+		if e = m.rootRawCall(2, nil, &one, mid); e != nil {
 			return false, e
 		}
-		if e = m.Power(&mid, n, &midN); e != nil {
+		power := NewInt(int32(n))
+		if e = m.rootRawCall(0, mid, &power, midN); e != nil {
 			return false, e
 		}
-		compare, e = m.Compare(&midN, a)
+		equal, e = m.Equal(midN, a)
 		if e != nil {
 			return false, e
 		}
-		if compare == 0 {
-			if e = m.Swap(a, &mid); e != nil {
+		if equal {
+			if e = m.Swap(a, mid); e != nil {
 				return false, e
 			}
-			return true, nil
+			return true, m.endRootRawScope()
 		}
-		atLower, e := m.Compare(&mid, &lower)
+		atLower, e := m.Equal(mid, lower)
 		if e != nil {
 			return false, e
 		}
-		atUpper, e := m.Compare(&mid, &upper)
-		if e != nil {
-			return false, e
-		}
-		if atLower == 0 || atUpper == 0 {
-			if e = m.Swap(a, &upper); e != nil {
+		atEndpoint := atLower
+		if !atEndpoint {
+			atEndpoint, e = m.Equal(mid, upper)
+			if e != nil {
 				return false, e
 			}
-			return false, nil
 		}
-		if compare < 0 {
-			e = m.Swap(&mid, &lower)
+		if atEndpoint {
+			if e = m.Swap(a, upper); e != nil {
+				return false, e
+			}
+			return false, m.endRootRawScope()
+		}
+		less, e := m.Less(midN, a)
+		if e != nil {
+			return false, e
+		}
+		if less {
+			e = m.Swap(mid, lower)
 		} else {
-			e = m.Swap(&mid, &upper)
+			if modularSourceDebug {
+				less, e := m.Less(a, midN)
+				if e != nil {
+					return false, e
+				}
+				if !less {
+					return false, ErrIntegerAssertion
+				}
+			}
+			e = m.Swap(mid, upper)
 		}
 		if e != nil {
 			return false, e

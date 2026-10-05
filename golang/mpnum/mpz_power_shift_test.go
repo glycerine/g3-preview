@@ -602,6 +602,10 @@ func TestPowerDomainAliases(t *testing.T) {
 				t.Fatal(base, a, e)
 			}
 		}
+		// Each case is an independent call. The source general RAW has
+		// no destructor on a body error; audit before explicit owning abort.
+		serviceMust(t, m.CleanupPower())
+		integerPhysicalAudit(t, m, &a)
 	}
 	for _, synch := range []bool{false, true} {
 		rm, b := rationalManager(t, synch)

@@ -467,7 +467,18 @@ func (m *IntegerModularManager) Root(a *Int, n uint32, out *Int) (bool, error) {
 	}
 	return m.manager.Root(a, n, out)
 }
-func (m *IntegerModularManager) RootInPlace(a *Int, n uint32) (bool, error) { return m.Root(a, n, a) }
+func (m *IntegerModularManager) RootInPlace(a *Int, n uint32) (bool, error) {
+	return m.rootInPlaceWithReceipt(a, n, nil)
+}
+func (m *IntegerModularManager) rootInPlaceWithReceipt(a *Int, n uint32, receipt *integerRootInvocationReceipt) (bool, error) {
+	if e := m.check(); e != nil {
+		return false, e
+	}
+	if modularSourceDebug && !m.z {
+		return false, ErrModularAssertion
+	}
+	return m.manager.rootInPlaceWithReceipt(a, n, receipt)
+}
 
 // borrowedModulus mirrors source p(): private non-owning actual numeral.
 // The caller must hold this manager lifetime and must not mutate/delete it.

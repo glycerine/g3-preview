@@ -142,6 +142,11 @@ func upolyHenselAuditPhysical(t *testing.T, cores []*mpnum.UPolynomialManager, f
 	}
 	addInt(z.FieldByName("intMin"))
 	addInt(z.FieldByName("two64"))
+	rootRAW := z.FieldByName("rootRaw").FieldByName("values")
+	for i := 0; i < rootRAW.Len(); i++ {
+		addInt(rootRAW.Index(i))
+	}
+	addInt(z.FieldByName("powerRaw").FieldByName("value"))
 	stores := map[uintptr]reflect.Value{}
 	for _, owner := range cores {
 		core := reflect.ValueOf(owner).Elem()

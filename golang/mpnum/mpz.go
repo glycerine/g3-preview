@@ -58,6 +58,10 @@ type IntegerManager struct {
 	failedRef, failedNullRef               numericCellRef  // permanently dead, charged auxiliary descriptor
 	natural                                *NaturalManager // child borrows this manager's Words and Budget
 	intMin, two64                          Int
+	powerRaw                               integerPowerScope
+	powerGeneration                        uint64
+	rootRaw                                integerRootScope
+	rootGeneration                         uint64
 	perfectSquare                          integerPerfectSquareScope
 	perfectSquareGeneration                uint64
 	rawDisplay                             rawDisplayScope
@@ -390,6 +394,12 @@ func (m *IntegerManager) CloseChecked() error {
 		}
 	}
 
+	if e := m.CleanupRoot(); e != nil {
+		return fail(e)
+	}
+	if e := m.CleanupPower(); e != nil {
+		return fail(e)
+	}
 	if e := m.CleanupPerfectSquare(); e != nil {
 		return fail(e)
 	}

@@ -193,6 +193,10 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	for _, r := range z.arg {
 		add(Int{cell: r})
 	}
+	for i := range z.rootRaw.values {
+		add(z.rootRaw.values[i])
+	}
+	add(z.powerRaw.value)
 	for i := range z.perfectSquare.values {
 		add(z.perfectSquare.values[i])
 	}

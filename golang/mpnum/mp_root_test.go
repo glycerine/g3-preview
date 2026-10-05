@@ -198,8 +198,19 @@ func TestRootDomainsAndInitialization(t *testing.T) {
 		a, out := NewInt(f.a), NewInt(29)
 		before := b.Used()
 		precise, e := m.Root(&a, f.n, &out)
-		if precise || !errors.Is(e, f.sentinel) || out.val != 29 || a.val != f.a || b.Used() != before {
+		// Source mpz.h:837 SET(out,a) precedes the in-place domain guard.
+		if precise || !errors.Is(e, f.sentinel) || out != a || a.val != f.a || b.Used() != before {
 			t.Fatal(f, precise, e)
+		}
+		if f.sentinel == ErrNonterminatingPower {
+			if !m.rootRaw.active || m.rootRaw.endEntered || !m.powerRaw.active || m.powerRaw.endEntered || m.rootRaw.values[0] != NewInt(-2) || m.rootRaw.values[1] != NewInt(-1) || m.rootRaw.values[2] != NewInt(-1) || m.powerRaw.value != NewInt(1) {
+				t.Fatal("actual wrapped-mask RAW prefix", m.rootRaw, m.powerRaw)
+			}
+			integerPhysicalAudit(t, m, &a, &out)
+			serviceMust(t, m.CleanupRoot())
+			integerPhysicalAudit(t, m, &a, &out)
+		} else if m.rootRaw.active || m.powerRaw.active {
+			t.Fatal("prebody guarded domain constructed RAW locals")
 		}
 	}
 	for _, f := range []struct {
@@ -340,6 +351,7 @@ func TestIntegerRootAndSquareFailureCleanup(t *testing.T) {
 						dst = &a
 					}
 					inputBefore, outputBefore := integerString(t, m, &a), integerString(t, m, dst)
+					initialDestination := *dst
 					b.FailAfter(fault)
 					var exact bool
 					var e error
@@ -360,10 +372,38 @@ func TestIntegerRootAndSquareFailureCleanup(t *testing.T) {
 							t.Fatal(operation, alias, fault, e)
 						}
 						if operation != 2 {
-							// Existing Root/RootInPlace owning adapters preserve
-							// their original input/destination behavior.
-							if integerString(t, m, &a) != inputBefore || integerString(t, m, dst) != outputBefore {
-								t.Fatal("root publication/temporary leak", operation, alias, fault)
+							scope := &m.rootRaw
+							if scope.active {
+								want := inputBefore
+								if scope.endEntered {
+									root, _ := rootOracle(large, 2)
+									want = root.String()
+								}
+								if integerString(t, m, dst) != want {
+									t.Fatal("source Root caller SET/SWAP prefix", operation, alias, fault)
+								}
+							} else {
+								if operation != 0 || alias || !m.isFailureRef(dst.cell) || dst.val != 1 {
+									t.Fatal("failed source caller SET route", operation, alias, fault, *dst)
+								}
+								want := m.failedNullRef
+								if initialDestination.cell != 0 {
+									want = m.failedRef
+								}
+								if dst.cell != want {
+									t.Fatal("source caller SET exact pointer publication", fault, dst.cell, want)
+								}
+								if x := m.check(dst); !errors.Is(x, arena.ErrInvalidSlot) {
+									t.Fatal("actual failed caller pointer guard", x)
+								}
+							}
+							if !alias && integerString(t, m, &a) != inputBefore {
+								t.Fatal("source Root input changed", fault)
+							}
+							callerPending := !scope.active && m.pendingCell.object != (memory.ObjectRef{})
+							serviceMust(t, m.CleanupRoot())
+							if callerPending {
+								serviceMust(t, m.CleanupPendingAllocation())
 							}
 						} else {
 							scope := &m.perfectSquare

@@ -122,15 +122,21 @@ func (m *IntegerManager) normalizeOwned(a *Int) error {
 	return nil
 }
 func (m *IntegerManager) Power(a *Int, p uint32, out *Int) error {
+	return m.powerWithReceipt(a, p, out, nil)
+}
+func (m *IntegerManager) powerWithReceipt(a *Int, p uint32, out *Int, receipt *integerPowerInvocationReceipt) error {
 	if e := m.check(a); e != nil {
 		return e
 	}
 	if e := m.check(out); e != nil {
 		return e
 	}
-	return m.powerCore(a, p, out)
+	return m.powerCoreWithReceipt(a, p, out, receipt)
 }
 func (m *IntegerManager) powerCore(a *Int, p uint32, out *Int) error {
+	return m.powerCoreWithReceipt(a, p, out, nil)
+}
+func (m *IntegerManager) powerCoreWithReceipt(a *Int, p uint32, out *Int, receipt *integerPowerInvocationReceipt) (cause error) {
 	if a.IsSmall() {
 		switch a.val {
 		case 2:
@@ -174,9 +180,17 @@ func (m *IntegerManager) powerCore(a *Int, p uint32, out *Int) error {
 			return m.SetInt64(out, 1)
 		}
 	}
-	var power Int
-	defer m.Del(&power)
-	if e := m.Copy(&power, a); e != nil {
+	if e := m.beginPowerRawScopeWithReceipt(receipt); e != nil {
+		return e
+	}
+	s := &m.powerRaw
+	defer func() {
+		if cause != nil && !s.endEntered && s.bodyCause == nil {
+			s.bodyCause = cause
+		}
+	}()
+	power := &s.value
+	if e := m.powerRawCall(0, a, nil, power); e != nil {
 		return e
 	}
 	if e := m.SetInt64(out, 1); e != nil {
@@ -187,16 +201,16 @@ func (m *IntegerManager) powerCore(a *Int, p uint32, out *Int) error {
 			return &PowerDomainError{Exponent: p, Reason: PowerMaskOverflow}
 		}
 		if mask&p != 0 {
-			if e := m.Mul(out, &power, out); e != nil {
+			if e := m.Mul(out, power, out); e != nil {
 				return e
 			}
 		}
 		// The final square is deliberately retained, even when its value is unused.
-		if e := m.Mul(&power, &power, &power); e != nil {
+		if e := m.powerRawCall(1, power, power, power); e != nil {
 			return e
 		}
 	}
-	return nil
+	return m.endPowerRawScope()
 }
 func (m *IntegerManager) IsPowerOfTwo(a *Int) (bool, uint32, error) {
 	if e := m.check(a); e != nil {

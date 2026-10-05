@@ -43,6 +43,10 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []mem
 	for i := range m.rawDisplay.roots {
 		add(m.rawDisplay.roots[i].cell)
 	}
+	add(m.powerRaw.value.cell)
+	for i := range m.rootRaw.values {
+		add(m.rootRaw.values[i].cell)
+	}
 	for i := range m.perfectSquare.values {
 		add(m.perfectSquare.values[i].cell)
 	}
