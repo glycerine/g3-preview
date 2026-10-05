@@ -340,7 +340,13 @@ func (m *IntegerModularManager) CopyFromOwner(a *Int, source *IntegerManager, b 
 	return m.copyFromOwnerCore(a, source, b)
 }
 func (m *IntegerModularManager) copyFromOwnerCore(a *Int, source *IntegerManager, b *Int) error {
-	if e := m.manager.CopyFromOwner(a, source, b); e != nil {
+	return m.copyFromOwnerWithAllocationReceipt(a, source, b, nil)
+}
+func (m *IntegerModularManager) copyFromOwnerWithAllocationReceipt(a *Int, source *IntegerManager, b *Int, receipt *integerCopyAllocationReceipt) error {
+	if e := m.check(); e != nil {
+		return e
+	}
+	if e := m.manager.copyFromOwnerWithReceipt(a, source, b, receipt); e != nil {
 		return e
 	}
 	return m.PNormalize(a)

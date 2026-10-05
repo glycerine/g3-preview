@@ -249,6 +249,9 @@ func (m *MultivariatePolynomialCore) LeadingCoefficient(p Polynomial, x uint32) 
 	return m.Coeff(p, x, d)
 }
 func (m *MultivariatePolynomialCore) ConstantCoefficient(p Polynomial, x, k uint32, c *Int) (bool, error) {
+	return m.constantCoefficientWithReceipt(p, x, k, c, nil)
+}
+func (m *MultivariatePolynomialCore) constantCoefficientWithReceipt(p Polynomial, x, k uint32, c *Int, receipt *polynomialConstantCoefficientInvocationReceipt) (bool, error) {
 	if e := m.check(); e != nil {
 		return false, e
 	}
@@ -260,6 +263,21 @@ func (m *MultivariatePolynomialCore) ConstantCoefficient(p Polynomial, x, k uint
 		if !valid {
 			return false, ErrPolynomialAssertion
 		}
+	}
+	var frame *polynomialConstantCoefficientScope
+	if receipt != nil {
+		frame = &m.constantCoefficientInvocation
+		if frame.active || frame.invocation == ^uint64(0) {
+			return false, ErrPolynomialPending
+		}
+		*frame = polynomialConstantCoefficientScope{active: true, executing: true, invocation: frame.invocation + 1}
+		*receipt = polynomialConstantCoefficientInvocationReceipt{m, frame, frame.invocation}
+		defer func() {
+			frame.executing = false
+			if !m.integer.matchesCopyAllocationInvocation(&frame.copy) {
+				frame.active = false
+			}
+		}()
 	}
 	if e := m.modular.Reset(c); e != nil {
 		return false, e
@@ -289,7 +307,11 @@ func (m *MultivariatePolynomialCore) ConstantCoefficient(p Polynomial, x, k uint
 			if e != nil {
 				return false, e
 			}
-			if e = m.modular.Copy(c, &a); e != nil {
+			var child *integerCopyAllocationReceipt
+			if frame != nil {
+				child = &frame.copy
+			}
+			if e = m.modular.copyFromOwnerWithAllocationReceipt(c, m.integer, &a, child); e != nil {
 				return false, e
 			}
 		}

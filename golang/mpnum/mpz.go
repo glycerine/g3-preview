@@ -46,6 +46,7 @@ type IntegerConfig struct {
 // Cells, transitional Natural Words and the actual memory backend share one Budget.
 // Close invalidates every live numeral; a supplied Runtime is borrowed.
 type IntegerManager struct {
+	copyAllocation                         integerCopyAllocationScope
 	self                                   *IntegerManager
 	memory                                 *memory.Runtime
 	allocator                              *memory.SmallAllocator
@@ -313,15 +314,31 @@ func (m *IntegerManager) resizeCell(ref numericCellRef, size uint32) {
 	m.store(ref, c)
 }
 func (m *IntegerManager) allocate(capacity, size uint32) (numericCellRef, error) {
+	return m.allocateWithCopyReceipt(capacity, size, nil)
+}
+func (m *IntegerManager) allocateWithCopyReceipt(capacity, size uint32, s *integerCopyAllocationScope) (numericCellRef, error) {
 	if modularSourceDebug && capacity < 6 {
 		return 0, ErrIntegerAssertion
 	}
 	if m.pendingCell.object != (memory.ObjectRef{}) {
 		return 0, memory.ErrAllocatorPending
 	}
-	backing, e := allocateSourceCell(m.allocator, capacity)
+	var outcome memory.SmallAllocatorAllocationOutcome
+	var out *memory.SmallAllocatorAllocationOutcome
+	if s != nil && s == &m.copyAllocation && s.active && s.executing {
+		out = &outcome
+	}
+	backing, e := allocateSourceCellWithOutcome(m.allocator, capacity, out)
 	// Capture the physical prefix before charged descriptor preparation.
 	m.pendingCell = backing
+	if out != nil {
+		if backing.object != (memory.ObjectRef{}) {
+			s.roots.cell = backing
+		}
+		if outcome.Pending != (memory.Block{}) {
+			s.roots.allocator[0] = outcome.Pending
+		}
+	}
 	if e != nil {
 		return 0, e
 	}
@@ -332,6 +349,9 @@ func (m *IntegerManager) allocate(capacity, size uint32) (numericCellRef, error)
 	ref := makeNumericRef(slot, gen)
 	m.store(ref, numericCell{backing: backing, capacity: capacity, unpublished: true})
 	m.pendingCell = sourceCellBacking{}
+	if out != nil && s.roots.cell == backing {
+		s.roots.cell = sourceCellBacking{}
+	}
 	return ref, nil
 }
 
@@ -631,6 +651,9 @@ func (m *IntegerManager) Copy(dst, src *Int) error { return m.CopyFromOwner(dst,
 // cell owner. It differs from the staged ergonomic CopyFrom adapter: growth
 // publishes sign and destroys the old destination BEFORE allocation.
 func (m *IntegerManager) CopyFromOwner(dst *Int, sourceManager *IntegerManager, src *Int) error {
+	return m.copyFromOwnerWithReceipt(dst, sourceManager, src, nil)
+}
+func (m *IntegerManager) copyFromOwnerWithReceipt(dst *Int, sourceManager *IntegerManager, src *Int, receipt *integerCopyAllocationReceipt) error {
 	if e := m.check(dst); e != nil {
 		return e
 	}
@@ -643,6 +666,7 @@ func (m *IntegerManager) CopyFromOwner(dst *Int, sourceManager *IntegerManager, 
 	if dst == src {
 		return nil
 	}
+	var owned *integerCopyAllocationScope
 	if src.IsSmall() {
 		v := src.val
 		if e := m.Del(dst); e != nil {
@@ -664,8 +688,22 @@ func (m *IntegerManager) CopyFromOwner(dst *Int, sourceManager *IntegerManager, 
 		if ref == 0 {
 			dst.cell = m.failedNullRef
 		}
+		if receipt != nil {
+			owned = &m.copyAllocation
+			if owned.active || owned.invocation == ^uint64(0) {
+				return ErrPolynomialPending
+			}
+			*owned = integerCopyAllocationScope{active: true, executing: true, invocation: owned.invocation + 1}
+			*receipt = integerCopyAllocationReceipt{m, owned, owned.invocation}
+			defer func() {
+				owned.executing = false
+				if !polynomialNegNumericPending(&owned.roots) {
+					owned.active = false
+				}
+			}()
+		}
 		var e error
-		ref, e = m.allocate(source.capacity, source.size)
+		ref, e = m.allocateWithCopyReceipt(source.capacity, source.size, owned)
 		if e != nil {
 			return e
 		}

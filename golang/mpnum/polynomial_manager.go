@@ -46,6 +46,7 @@ type polynomialCreation struct {
 	buffer             *polynomialSOM
 }
 type MultivariatePolynomialCore struct {
+	constantCoefficientInvocation                                                              polynomialConstantCoefficientScope
 	factorsOwner                                                                               *PolynomialFactors
 	powerGeneration                                                                            uint64
 	display                                                                                    polynomialDisplayState
@@ -386,7 +387,7 @@ func (m *MultivariatePolynomialCore) MkTerms(as []Int, ms []Monomial) (Polynomia
 	return m.som.mk(false)
 }
 func (m *MultivariatePolynomialCore) CloseChecked() error {
-	if m != nil && m.self == m && m.coefficientInvocation.active {
+	if m != nil && m.self == m && (m.coefficientInvocation.active || m.constantCoefficientInvocation.active) {
 		return ErrPolynomialPending
 	}
 	if m != nil && m.self == m && m.displayPending() {

@@ -55,6 +55,7 @@ type smallObjectLocation struct {
 	release                           allocatorReleaseState
 }
 type SmallAllocator struct {
+	allocationInvocation                smallAllocatorAllocationScope
 	self                                *SmallAllocator
 	config                              SmallAllocatorConfig
 	origin, header, allocSize, sequence uint64
@@ -254,7 +255,11 @@ func (a *SmallAllocator) rememberPending(h Block) {
 	_, e := a.config.Runtime.Size(h)
 	a.pendingPartial = e != nil
 }
-func (a *SmallAllocator) Allocate(n uint64) (ObjectRef, error) {
+func (a *SmallAllocator) Allocate(n uint64) (ObjectRef, error) { return a.allocateWithOutcome(n, nil) }
+func (a *SmallAllocator) AllocateWithOutcome(n uint64, outcome *SmallAllocatorAllocationOutcome) (ObjectRef, error) {
+	return a.allocateWithOutcome(n, outcome)
+}
+func (a *SmallAllocator) allocateWithOutcome(n uint64, outcome *SmallAllocatorAllocationOutcome) (ObjectRef, error) {
 	if e := a.entryOpen(); e != nil {
 		return ObjectRef{}, e
 	}
@@ -268,6 +273,16 @@ func (a *SmallAllocator) Allocate(n uint64) (ObjectRef, error) {
 	}
 	if a.hasPending() || a.cleanupMode != 0 || a.cleanupChunksNeeded {
 		return ObjectRef{}, ErrAllocatorPending
+	}
+	if outcome != nil {
+		frame := &a.allocationInvocation
+		if frame.executing || frame.invocation == ^uint64(0) {
+			return ObjectRef{}, ErrAllocatorPending
+		}
+		frame.invocation++
+		frame.executing = true
+		*outcome = SmallAllocatorAllocationOutcome{owner: a, frame: frame, invocation: frame.invocation}
+		defer func() { frame.executing = false }()
 	}
 	if !a.bypass() {
 		a.allocSize = a.counter(a.allocSize + n)
@@ -283,11 +298,11 @@ func (a *SmallAllocator) Allocate(n uint64) (ObjectRef, error) {
 		}
 		h, e := a.config.Runtime.Allocate(n)
 		if e != nil {
-			a.rememberPending(h)
+			a.rememberPendingWithOutcome(h, outcome)
 			return ObjectRef{}, e
 		}
 		id := a.installLocation(smallObjectLocation{raw: h, address: address, requested: n, kind: smallObjectDirect, live: true})
-		return a.ref(id), nil
+		return a.recordAllocationObject(outcome, a.ref(id), true), nil
 	}
 	slot := uint32((n + width - 1) / width)
 	if e := a.sourceAssert(slot < a.slots()); e != nil {
@@ -324,7 +339,7 @@ func (a *SmallAllocator) Allocate(n uint64) (ObjectRef, error) {
 		loc.live = true
 		loc.requested = n
 		loc.extent = slot * uint32(width)
-		return a.ref(id), nil
+		return a.recordAllocationObject(outcome, a.ref(id), false), nil
 	}
 	if e := a.reserveLocations(1); e != nil {
 		return ObjectRef{}, e
@@ -350,7 +365,7 @@ func (a *SmallAllocator) Allocate(n uint64) (ObjectRef, error) {
 				return ObjectRef{}, e
 			}
 			id := a.installLocation(smallObjectLocation{raw: chunk.raw, address: chunk.address + curr, requested: n, offset: uint32(curr), extent: uint32(size), chunk: a.chunks[slot], kind: smallObjectPooled, live: true})
-			return a.ref(id), nil
+			return a.recordAllocationObject(outcome, a.ref(id), false), nil
 		}
 	}
 	if e := a.reserveLocations(2); e != nil {
@@ -362,16 +377,16 @@ func (a *SmallAllocator) Allocate(n uint64) (ObjectRef, error) {
 	}
 	h, e := a.config.Runtime.Allocate(8192)
 	if e != nil {
-		a.rememberPending(h)
+		a.rememberPendingWithOutcome(h, outcome)
 		return ObjectRef{}, e
 	}
 	// ctor sets curr first; source next and chain publication follow.
 	if e = smallObjectWriteWord(a.config.Runtime, h, width, width, 2*width); e != nil {
-		a.rememberPending(h)
+		a.rememberPendingWithOutcome(h, outcome)
 		return ObjectRef{}, e
 	}
 	if e = smallObjectWriteWord(a.config.Runtime, h, 0, width, uint64(a.chunks[slot])); e != nil {
-		a.rememberPending(h)
+		a.rememberPendingWithOutcome(h, outcome)
 		return ObjectRef{}, e
 	}
 	chunkID := a.installLocation(smallObjectLocation{raw: h, address: address, kind: smallObjectChunk, live: true})
@@ -380,7 +395,7 @@ func (a *SmallAllocator) Allocate(n uint64) (ObjectRef, error) {
 		return ObjectRef{}, e
 	}
 	id := a.installLocation(smallObjectLocation{raw: h, address: address + 2*width, requested: n, offset: uint32(2 * width), extent: uint32(size), chunk: chunkID, kind: smallObjectPooled, live: true})
-	return a.ref(id), nil
+	return a.recordAllocationObject(outcome, a.ref(id), true), nil
 }
 func (a *SmallAllocator) Deallocate(n uint64, r ObjectRef) error {
 	_, e := a.DeallocateTracked(n, r)

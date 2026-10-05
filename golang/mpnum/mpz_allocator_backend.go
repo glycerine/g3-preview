@@ -31,9 +31,12 @@ func (c sourceCellBacking) deallocate(a *memory.SmallAllocator) (memory.ReleaseP
 // The returned scalar root is nonzero on a completed allocation even if the
 // capacity write fails. Its caller must retain it before descriptor preparation.
 func allocateSourceCell(a *memory.SmallAllocator, capacity uint32) (sourceCellBacking, error) {
+	return allocateSourceCellWithOutcome(a, capacity, nil)
+}
+func allocateSourceCellWithOutcome(a *memory.SmallAllocator, capacity uint32, outcome *memory.SmallAllocatorAllocationOutcome) (sourceCellBacking, error) {
 	var c sourceCellBacking
 	c.requested = sourceMPZCellBytes(capacity)
-	object, e := a.Allocate(c.requested)
+	object, e := a.AllocateWithOutcome(c.requested, outcome)
 	c.object = object
 	if e != nil {
 		return c, e

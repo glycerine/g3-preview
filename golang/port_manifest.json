@@ -28636,7 +28636,9 @@
         "mpnum/polynomial_square_free_source_test.go",
         "mpnum/polynomial_coefficient_receipt.go",
         "mpnum/polynomial_sqrt_invocation.go",
-        "mpnum/polynomial_sqrt_invocation_source_test.go"
+        "mpnum/polynomial_sqrt_invocation_source_test.go",
+        "mpnum/polynomial_constant_coefficient_receipt.go",
+        "mpnum/polynomial_constant_coefficient_receipt_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -29191,7 +29193,8 @@
         "TestPolynomialSqrtInvocationCompletedPhasePreservesUnenteredPerfectSquare",
         "TestPolynomialSqrtInvocationPreservesLaterForeignPerfectSquare",
         "TestPolynomialSqrtReceiptOlderCohortTransfersAtActualLaterINC",
-        "TestPolynomialSqrtInvocationBigNumeralEveryReservation"
+        "TestPolynomialSqrtInvocationBigNumeralEveryReservation",
+        "TestPolynomialConstantCoefficientReceiptActualSETLateTLSLeaf"
       ],
       "conditionals": [
         {
@@ -32233,6 +32236,14 @@
             "TestPolynomialSqrtReceiptOlderCohortTransfersAtActualLaterINC",
             "TestPolynomialSqrtInvocationBigNumeralEveryReservation"
           ]
+        },
+        {
+          "name": "const_coeff cpp3318-3338 same guarded Reset/iteration/degree/size/SET source loop; optional concrete frame retains exact actual allocating SET child; unchanged finite-field PNormalize allocating leaf is explicitly still open",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_constant_coefficient_receipt.go",
+          "tests": [
+            "TestPolynomialConstantCoefficientReceiptActualSETLateTLSLeaf"
+          ]
         }
       ],
       "ownership": [
@@ -32295,7 +32306,8 @@
         "Actual successful monomial INC transfers generated authority; exact creation completion clears matching coefficient callee tag; borrowed cached monomials acquire no new factory authority",
         "Parent optional Neg/ScalarDiv arguments route through unchanged arithmetic engines and actual shared append/factory acquisition; incoming polynomial INC transfers raw factory before old DEC/callback",
         "Parent Discriminant, ordered foreign mixed-cohort retirement and NUM DT after published factory stop proofs remain open",
-        "Actual sqrt lexical NUM/reference fields and matched perfect-square endEntered distinction; stale/foreign generations preserved; actual charged orphan/tag backing old+new capacity; source first cause/stage retained through owning continuation; partial ownership prerequisite, no whole-unit completion."
+        "Actual sqrt lexical NUM/reference fields and matched perfect-square endEntered distinction; stale/foreign generations preserved; actual charged orphan/tag backing old+new capacity; source first cause/stage retained through owning continuation; partial ownership prerequisite, no whole-unit completion.",
+        "Actual guarded manager/frame/unique invocation plus direct argument acquisition tokens; legacy foreign calls have nil receipt; same-cardinality replacement and stale frame owning cleanup preserve foreign graph before cleanup."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -32351,7 +32363,8 @@
         "Original tst_sqf seven expressions are dormant: zero registered source driver credit. Literal GF2 derivative-zero GCD/exact-division result is preserved. Source units remain partial; full parent Factor and strict UP prime/Hensel suffixes remain open.",
         "Sqrt optional receipts and orphan invocation tags are charged Go ownership adaptation; no native allocation ticket/source event.",
         "Real public TLS postphysical release/allocation profiles test signed-host guarded owner-primitive domains, not ordinary mathematical free-failure reachability.",
-        "No dormant original source driver assertion credit; full parent Factor and strict UP prime/Hensel remains open."
+        "No dormant original source driver assertion credit; full parent Factor and strict UP prime/Hensel remains open.",
+        "Partial SET acquisition prerequisite only; allocating finite-field PNormalize, complete Discriminant source-stop/reservation/coldgraph proof and source parent remain open. No source unit/API promotion."
       ]
     },
     {
@@ -119712,7 +119725,9 @@
         "mpnum/mpz_root_scope.go",
         "mpnum/mpz_power_scope.go",
         "mpnum/mpz_root_source_prefix_test.go",
-        "mpnum/mpz_power_raw_source_test.go"
+        "mpnum/mpz_power_raw_source_test.go",
+        "mpnum/integer_copy_allocation_receipt.go",
+        "mpnum/integer_copy_allocation_receipt_source_test.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -119947,7 +119962,9 @@
         "TestIntegerPowerGeneralMinusOneUsesActualRAW",
         "TestIntegerPowerPendingBackingExactAndForeignReplacement",
         "TestIntegerPowerCallerOutputPendingExcludedFromRAWOwner",
-        "TestIntegerPowerReceiptRejectQuickAndReplacement"
+        "TestIntegerPowerReceiptRejectQuickAndReplacement",
+        "TestIntegerCopyAllocationReceiptExactBackingAndForeignReplacement",
+        "TestIntegerCopyAllocationReceiptUnchangedWithoutAllocation"
       ],
       "conditionals": [
         {
@@ -121673,6 +121690,15 @@
             "TestIntegerPowerCallerOutputPendingExcludedFromRAWOwner",
             "TestIntegerPowerReceiptRejectQuickAndReplacement"
           ]
+        },
+        {
+          "name": "big_set optional concrete allocating-branch receipt preserves actual SET engine; direct argument through allocate/allocateSourceCell, record source backing before descriptor allocation and clear at actual pending-clear; self/inline/capacity-reuse leaves receipt unchanged",
+          "status": "partial",
+          "go_target": "mpnum/integer_copy_allocation_receipt.go",
+          "tests": [
+            "TestIntegerCopyAllocationReceiptExactBackingAndForeignReplacement",
+            "TestIntegerCopyAllocationReceiptUnchangedWithoutAllocation"
+          ]
         }
       ],
       "ownership": [
@@ -121697,7 +121723,8 @@
         "Two actual permanently dead charged Go descriptors precede Words/Natural construction. Actual six source numeric cells unchanged. Source fresh NULL comes only from exact setter branch, never registry/scope inference; reserve failure retains charged constructor owner. No source allocator event invented for Go metadata.",
         "Actual real foreign Runtime coefficient RED89453 led to reached-only owner check; empty borrowed view is unread. No owning numeral-array copy or generic storage introduced.",
         "Six actual RAW Int fields live in the charged IntegerManager header. Literal source end deletion stops at its first cause; explicit CleanupPerfectSquare resumes only owned fields and exact pending ObjectRef/physical roots. Direct final output SET remains caller-owned.",
-        "Current Root/Power RAW lifetime implementation supersedes earlier staged Root/output and implicit general Power cleanup descriptions. Actual four Root and one Power RAW fields are charged in the Integer header; body failures retain them, literal end-only DEL stops younger-to-older at the reached ascending source frontier. Exact manager/frame/unique nonwrapping nonce and physical object/block/extent identity match owning continuation; caller COPY/MUL output pending is excluded. Completed and abort phases distinguish reached end DEL from unfinished RAW body owners."
+        "Current Root/Power RAW lifetime implementation supersedes earlier staged Root/output and implicit general Power cleanup descriptions. Actual four Root and one Power RAW fields are charged in the Integer header; body failures retain them, literal end-only DEL stops younger-to-older at the reached ascending source frontier. Exact manager/frame/unique nonwrapping nonce and physical object/block/extent identity match owning continuation; caller COPY/MUL output pending is excluded. Completed and abort phases distinguish reached end DEL from unfinished RAW body owners.",
+        "Actual guarded manager/frame/unique invocation plus direct argument acquisition tokens; legacy foreign calls have nil receipt; same-cardinality replacement and stale frame owning cleanup preserve foreign graph before cleanup."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -121719,7 +121746,8 @@
         "Public failed-value reads still reject both dead Go descriptors; defined source-only NULL deletion is modeled independently. Postexception source small-scalar continuation, staged CopyFrom/ffSetInteger topology, process/TLS binding and complete source lifecycle remain separate obligations. Existing cleanupPending retry acknowledges Go owning continuation, not another literal source destructor. See PORT_PROGRESS.md.",
         "Selected array-view prerequisite; broader integer/modular source audits remain partial.",
         "Selected source algorithms and explicit Runtime profile only. Signed TLS stops and large factory/auxiliary receipts are guarded owner-primitive proofs, not ordinary mathematical exhaustion. Non-Z perfect-square remains the source unsupported operation. Registered polynomial driver returns before sqrt; dormant assertions give no active driver completion credit. Global diagnostics/native ABI and remaining source methods stay partial.",
-        "Root output is now literal SET(input) before in-place domain guards and bisection, superseding previous output-atomic Root description. Wrapped Power mask and signed/TLS source-pointer domains remain explicit guarded domains; no transitive source/global/backend completion promotion."
+        "Root output is now literal SET(input) before in-place domain guards and bisection, superseding previous output-atomic Root description. Wrapped Power mask and signed/TLS source-pointer domains remain explicit guarded domains; no transitive source/global/backend completion promotion.",
+        "Partial SET acquisition prerequisite only; allocating finite-field PNormalize, complete Discriminant source-stop/reservation/coldgraph proof and source parent remain open. No source unit/API promotion."
       ]
     },
     {
@@ -121769,7 +121797,8 @@
         "mpnum/mpz_root_scope.go",
         "mpnum/mpz_power_scope.go",
         "mpnum/mpz_root_source_prefix_test.go",
-        "mpnum/mpz_power_raw_source_test.go"
+        "mpnum/mpz_power_raw_source_test.go",
+        "mpnum/integer_copy_allocation_receipt.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -123253,6 +123282,12 @@
             "TestIntegerPowerCallerOutputPendingExcludedFromRAWOwner",
             "TestIntegerPowerReceiptRejectQuickAndReplacement"
           ]
+        },
+        {
+          "name": "allocate optional exact source backing and allocator raw token acquisition transport; no high-level allocation differences",
+          "status": "partial",
+          "go_target": "mpnum/integer_copy_allocation_receipt.go",
+          "tests": []
         }
       ],
       "ownership": [
@@ -123275,7 +123310,8 @@
         "Zero GCD copies directly into caller before Abs; minimum-promotion allocation refusal retains the completed inline copy, while failed BIG Copy retains the actual published sign/dead descriptor. Existing general GCD locals and final publication remain source ordered; twelve Lehmer and one intermediate ExtendedGCD diagnostics execute only in g3debug. Named roots audited before fault disabling. See PORT_PROGRESS.md#audit-mpz-gcd-publication-packet-md.",
         "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets.",
         "Two actual permanently dead charged Go descriptors precede Words/Natural construction. Actual six source numeric cells unchanged. Source fresh NULL comes only from exact setter branch, never registry/scope inference; reserve failure retains charged constructor owner. No source allocator event invented for Go metadata.",
-        "Current Root/Power RAW lifetime implementation supersedes earlier staged Root/output and implicit general Power cleanup descriptions. Actual four Root and one Power RAW fields are charged in the Integer header; body failures retain them, literal end-only DEL stops younger-to-older at the reached ascending source frontier. Exact manager/frame/unique nonwrapping nonce and physical object/block/extent identity match owning continuation; caller COPY/MUL output pending is excluded. Completed and abort phases distinguish reached end DEL from unfinished RAW body owners."
+        "Current Root/Power RAW lifetime implementation supersedes earlier staged Root/output and implicit general Power cleanup descriptions. Actual four Root and one Power RAW fields are charged in the Integer header; body failures retain them, literal end-only DEL stops younger-to-older at the reached ascending source frontier. Exact manager/frame/unique nonwrapping nonce and physical object/block/extent identity match owning continuation; caller COPY/MUL output pending is excluded. Completed and abort phases distinguish reached end DEL from unfinished RAW body owners.",
+        "Actual guarded manager/frame/unique invocation plus direct argument acquisition tokens; legacy foreign calls have nil receipt; same-cardinality replacement and stale frame owning cleanup preserve foreign graph before cleanup."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -123295,7 +123331,8 @@
         "ConstructionFailure is the already charged owner. Successful member unwind can retain direct roots with no cleanup error; owning Cleanup is separate. Full transitive/global source lifetime and other source branches remain open.",
         "Source char bytes use physical capacity/initialization independently of POS and unsigned11*size wrap. Selected non-Windows digit32 snprintf lbuf0/truncation and multi-limb ignored-lbuf behavior execute. Windows sprintf_s constraint handler, GMP/digit64, global/locale/ostream and literal std::string temporary allocation/evaluation remain open. No whole-unit or registered assertion completion is claimed.",
         "Public failed-value reads still reject both dead Go descriptors; defined source-only NULL deletion is modeled independently. Postexception source small-scalar continuation, staged CopyFrom/ffSetInteger topology, process/TLS binding and complete source lifecycle remain separate obligations. Existing cleanupPending retry acknowledges Go owning continuation, not another literal source destructor. See PORT_PROGRESS.md.",
-        "Root output is now literal SET(input) before in-place domain guards and bisection, superseding previous output-atomic Root description. Wrapped Power mask and signed/TLS source-pointer domains remain explicit guarded domains; no transitive source/global/backend completion promotion."
+        "Root output is now literal SET(input) before in-place domain guards and bisection, superseding previous output-atomic Root description. Wrapped Power mask and signed/TLS source-pointer domains remain explicit guarded domains; no transitive source/global/backend completion promotion.",
+        "Partial SET acquisition prerequisite only; allocating finite-field PNormalize, complete Discriminant source-stop/reservation/coldgraph proof and source parent remain open. No source unit/API promotion."
       ]
     },
     {
@@ -130240,7 +130277,9 @@
         "util_verbose_context_test.go",
         "util_numeric_stream_file.go",
         "util_numeric_stream_file_test.go",
-        "util_memory_fatal_policy_test.go"
+        "util_memory_fatal_policy_test.go",
+        "memory/small_allocator_allocation_outcome.go",
+        "memory/small_allocator_allocation_outcome_test.go"
       ],
       "tests": [
         "TestSmallBytesSourceExercise",
@@ -130320,7 +130359,9 @@
         "TestNumericFileStreamExactFormattingAndBorrow",
         "TestNumericFileStreamActualWriteFailureSetsNonthrowingBadbit",
         "TestNumericFileStreamEveryColdReservation",
-        "TestMemoryFatalBorrowedPointerRetentionAndReachedSentry"
+        "TestMemoryFatalBorrowedPointerRetentionAndReachedSentry",
+        "TestSmallAllocatorOutcomeActualAcquisitionAndUnchangedQuickGuard",
+        "TestSmallAllocatorOutcomeActualPendingLeafAndRejectedEntry"
       ],
       "conditionals": [
         {
@@ -130620,6 +130661,15 @@
             "TestNumericFileStreamEveryColdReservation",
             "TestMemoryFatalBorrowedPointerRetentionAndReachedSentry"
           ]
+        },
+        {
+          "name": "allocate optional concrete actual acquisition outcome preserves same source engine: stamp guarded frame/nonce at body start, actual rememberPending and installed/free-list object leaves; zero/rejected entry unchanged",
+          "status": "partial",
+          "go_target": "memory/small_allocator_allocation_outcome.go",
+          "tests": [
+            "TestSmallAllocatorOutcomeActualAcquisitionAndUnchangedQuickGuard",
+            "TestSmallAllocatorOutcomeActualPendingLeafAndRejectedEntry"
+          ]
         }
       ],
       "ownership": [
@@ -130630,7 +130680,8 @@
         "Persistent pointer-free release stages/serials are part of the charged actual runtime/location directories. Public flags are observational; bound private owner/ref/serial resolves the retained stage. Physical-completed frees are never replayed. Original successful pooled duplicate free retains source requested subtraction/self-link.",
         "Supplied Runtime/block/offset is a borrowed source address; receiver counter/class/freelist selects actions, no donor chunk adoption. Actual pointer codec sidecars belong to receiver, donor payload/page remains caller-owned. Exact raw invocation serial/stage/count and matching active ObjectRef release guard prevent duplicate owning continuation. SourceFinalize stays sticky; only explicit CleanupStopped discards the current stopped invocation via AbortRawInvocation, preserving source count/history and all donor/provider data.",
         "Optional cold borrowed assertion-control interface binds directly to actual DebugContext, without closure/per-record interface/shadow bool or new Runtime events. Reflected allocator/IO headers charge actual fields once. Source DEBUG leak warning is independent of assertions enable switch. Native/global assertion wiring remains partial.",
-        "Actual cold charged VerboseContext owns the unsigned level and borrows selected NumericTextStream pointer. Get/set stream does not touch borrowed stream lifetime; reached insertion performs its existing guards. Allocator borrows optional getter interface, no shadow mutable scalar or source allocation events."
+        "Actual cold charged VerboseContext owns the unsigned level and borrows selected NumericTextStream pointer. Get/set stream does not touch borrowed stream lifetime; reached insertion performs its existing guards. Allocator borrows optional getter interface, no shadow mutable scalar or source allocation events.",
+        "Actual guarded manager/frame/unique invocation plus direct argument acquisition tokens; legacy foreign calls have nil receipt; same-cardinality replacement and stale frame owning cleanup preserve foreign graph before cleanup."
       ],
       "deviations": [
         "Reset/Close reclaim tracked live direct blocks as explicit typed owner cleanup extension; source only frees pooled chunks.",
@@ -130640,7 +130691,8 @@
         "Explicit LE word codecs are a Go source-storage adapter, not an additional C++ allocator algorithm. MPZ backend typed accesses must bound against actual object extent; this prerequisite does not complete MPZ/Natural backing or tracked release/global lifecycle.",
         "Ordinary retry of an interrupted beforefree invocation resumes its real retained phase; explicit CompleteRelease can acknowledge afterfree failure without counter repair. This is a Go owning cleanup adapter to bounded source-undefined signed-overflow domains, not a C++ exception recovery claim. Actual MPZ/Natural and transitive numerical failure owners remain required.",
         "Same Runtime provider/profile only; source global allocator and native pointer ABI remain open. SizeT32 conversion before zero/bypass applies to raw and checked allocation/deallocation entries; owning receipts match normalized size and exact private serial. Read-only source getters observe the published prefix while raw mutation stays stopped. Raw retry is an explicit Go continuation, not native exception resumption. Actual public pool metadata refusal/ownabort proof preserves donor/caller roots; headerless wrapped realloc is guarded source-undefined domain only. Direct release stage2-to-physical has no fallible point, no fabricated failure credit. Whole units remain partial.",
-        "File-backed diagnostics use explicit borrowed os.File service; default write failure is nonthrowing badbit. Native stream buffering/locale/exception masks/global stderr initialization remain separate."
+        "File-backed diagnostics use explicit borrowed os.File service; default write failure is nonthrowing badbit. Native stream buffering/locale/exception masks/global stderr initialization remain separate.",
+        "Partial SET acquisition prerequisite only; allocating finite-field PNormalize, complete Discriminant source-stop/reservation/coldgraph proof and source parent remain open. No source unit/API promotion."
       ]
     },
     {
