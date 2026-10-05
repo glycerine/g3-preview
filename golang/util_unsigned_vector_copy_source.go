@@ -58,7 +58,9 @@ func (v *RuntimeUnsignedVector) copyCoreDebug(src *RuntimeUnsignedVector, d *Deb
 		return e
 	}
 	if on && it2 != v.column.raw.block {
-		return ErrSATAssertion
+		if e := debugAssertionFailure(d, "src/util/vector.h", 113, "it2 == m_data"); e != nil {
+			return e
+		}
 	}
 	end, e := src.column.size()
 	if e != nil {
@@ -102,8 +104,10 @@ func (v *RuntimeUnsignedVector) copyConstructDebug(src *RuntimeUnsignedVector, d
 			return e
 		}
 		if a != b {
-			v.constructorCause = ErrSATAssertion
-			return ErrSATAssertion
+			if e := debugAssertionFailure(d, "src/util/vector.h", 167, "size() == source.size()"); e != nil {
+				v.constructorCause = e
+				return e
+			}
 		}
 	}
 	v.constructed = true

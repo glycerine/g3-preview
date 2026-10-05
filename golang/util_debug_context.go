@@ -22,6 +22,7 @@ type DebugContext struct {
 	region           *arena.BytesRegion
 	budget           *arena.Budget
 	assertionStreams *MemoryStandardStreams
+	assertionActions *DebugActionContext
 	tags             *utilhash.StrHashtable
 	assertions       bool
 	ownerBytes       uint64

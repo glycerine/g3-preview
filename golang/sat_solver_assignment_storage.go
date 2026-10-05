@@ -100,7 +100,9 @@ func (c *satSolverAssignmentColumn) expandStrideDebug(stride uint32, debug *Debu
 				return e
 			}
 			if capacity == 0 {
-				return ErrSATAssertion
+				if e := debugAssertionFailure(debug, "src/util/vector.h", 70, "capacity() > 0"); e != nil {
+					return e
+				}
 			}
 		}
 	}

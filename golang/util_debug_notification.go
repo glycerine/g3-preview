@@ -20,6 +20,9 @@ func (d *DebugContext) BindAssertionStreams(s *MemoryStandardStreams) error {
 	if s != nil && (s.self != s || s.budget != d.budget) {
 		return arena.ErrConfig
 	}
+	if s != nil && d.assertionActions != nil && d.assertionActions.profile == DebugInteractive && d.assertionActions.streams != s {
+		return arena.ErrConfig
+	}
 	d.assertionStreams = s
 	return nil
 }

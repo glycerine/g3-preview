@@ -102050,7 +102050,10 @@
         "util_debug_actions.go",
         "util_debug_actions_host_linux.go",
         "util_debug_actions_host_other.go",
-        "util_debug_actions_source_test.go"
+        "util_debug_actions_source_test.go",
+        "util_debug_action_binding.go",
+        "util_debug_action_binding_source_test.go",
+        "util_permutation_word_view.go"
       ],
       "tests": [
         "TestDebugContextSourceLazyInitializationAndAssertions",
@@ -102097,7 +102100,20 @@
         "TestDebugActionConstructorEveryReservationAndBorrowedClose",
         "TestDebugActionForeignBudgetCopyClosedAndUnreadProviders",
         "TestDebugActionClosedOutputBadbitStillReachesInputAndThrow",
-        "TestDebugActionPromptBeforeClosedTieRead"
+        "TestDebugActionPromptBeforeClosedTieRead",
+        "TestPermutationBoundFalseSizeContinueResumesSourceBody",
+        "TestPermutationBoundIndexedContinueReadsActualInitializedSpare",
+        "TestPermutationBoundThrowAndDisabledUnreadClosedAction",
+        "TestPermutationBoundTrueAndBindingOwnerGuards",
+        "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce",
+        "TestPermutationBoundImmediateNamedGraphUnderActualRefusal",
+        "TestPermutationBoundNestedConditionsContinueWithoutReplacingSourceResult",
+        "TestPermutationBoundSubprocessHelper",
+        "TestPermutationBoundActualAbortEOFAndNoDebuggerActions",
+        "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
+        "TestPermutationAcquiredWordGuardAfterActualBackingDestruction",
+        "TestDebugBindingReciprocalPublicSetterKeepsOneActualStreamService",
+        "TestDebugBindingReverseOrderNullAndNoDebuggerConfiguration"
       ],
       "conditionals": [
         {
@@ -102199,6 +102215,43 @@
             "TestDebugActionClosedOutputBadbitStillReachesInputAndThrow",
             "TestDebugActionPromptBeforeClosedTieRead"
           ]
+        },
+        {
+          "name": "Concrete enabled-false SASSERT notification/action binding: permutation.cpp:67,70-73 and vector.h:70,113,167,304,309; actual C continuation/T exception/exit action sites",
+          "status": "partial",
+          "go_target": "util_debug_action_binding.go",
+          "tests": [
+            "TestPermutationBoundFalseSizeContinueResumesSourceBody",
+            "TestPermutationBoundIndexedContinueReadsActualInitializedSpare",
+            "TestPermutationBoundThrowAndDisabledUnreadClosedAction",
+            "TestPermutationBoundTrueAndBindingOwnerGuards",
+            "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce",
+            "TestPermutationBoundImmediateNamedGraphUnderActualRefusal",
+            "TestPermutationBoundNestedConditionsContinueWithoutReplacingSourceResult",
+            "TestPermutationBoundSubprocessHelper",
+            "TestPermutationBoundActualAbortEOFAndNoDebuggerActions",
+            "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
+            "TestPermutationAcquiredWordGuardAfterActualBackingDestruction"
+          ]
+        },
+        {
+          "name": "Captured concrete std::swap word-reference transport at permutation.cpp:35-40/vector.h:303-310: both lvalues acquired before actual payload loads, writes preserve captured provider/block/offset",
+          "status": "partial",
+          "go_target": "util_permutation_word_view.go",
+          "tests": [
+            "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
+            "TestPermutationAcquiredWordGuardAfterActualBackingDestruction",
+            "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce"
+          ]
+        },
+        {
+          "name": "Symmetric same-service binding of actual notification std::cerr and interactive action stream borrows, preserving nil/unbound and NO_Z3_DEBUGGER erased stream configurations",
+          "status": "partial",
+          "go_target": "util_debug_notification.go",
+          "tests": [
+            "TestDebugBindingReciprocalPublicSetterKeepsOneActualStreamService",
+            "TestDebugBindingReverseOrderNullAndNoDebuggerConfiguration"
+          ]
         }
       ],
       "ownership": [
@@ -102209,7 +102262,12 @@
         "Concrete file/tie borrows only; reflected cold NumericCharInput header includes actual one-byte scratch, flags and consumed-byte position. Close refunds only that header, never owns/closes caller file or tied output.",
         "Constructor foreign Budget check precedes its sole actual cold reservation; first success1, failure0 with complete named input/standard-stream/child-stream cold equation. Extraction/Flush allocate nothing under actual FailAfter0.",
         "One reflected DebugActionContext cold header includes actual used1024-byte command array; concrete standard-stream/input borrows remain caller-owned, Close refunds header only.",
-        "Sole actual constructor reservation: refusal0 and first success1; immediate named action/input/standard-header/two-file-stream cold equation before fault lift. Source actions execute under FailAfter0 without additional Budget reservation."
+        "Sole actual constructor reservation: refusal0 and first success1; immediate named action/input/standard-header/two-file-stream cold equation before fault lift. Source actions execute under FailAfter0 without additional Budget reservation.",
+        "DebugContext reflected owner header charges one actual borrowed action pointer; setter validates self/common Budget identity without reading input/file/closed pointed state. Streams and action contexts remain caller-owned.",
+        "Bound invocation under actual FailAfter0 retains exact named Runtime forward/inverse raw bijection plus permutation/copy, debug/region, action/input, standard-service/two-file-stream cold sum before fault lift; no new Budget reservation.",
+        "Source indexed std::swap lvalues acquired once: mutable vector.h:304 checks4 failed forward accesses in completed SIZE0 spare fixture; assignments write through reached lvalues without repeated SASSERT. Actual initialized spare reads/writes remain physically guarded.",
+        "Call-local word views have no allocation or cold owner: pointer acquisition records actual provider/block/offset; retained live backing exchange test names both owner fields and validates complete raw/cold graph; genuine deallocation then makes captured token stale at reached load/store. No debugger mutation callbacks or snapshot authority.",
+        "Both public binding setters enforce the same nonnull interactive standard-service identity without reading pointed closed/input/file state. Actual same-Budget distinct-file services/hex-versus-decimal flags are rejected without pointer or charge mutation; null/unbound and NO_DEBUGGER stream-erasure preserved."
       ],
       "deviations": [
         "Source process globals represented by an explicit single-goroutine cold owner; process-wide/context API macro binding remains open. CASSERT gate preserves assertions-before-tag order, but release consumers must erase its call; no source macro consumer completion claimed. notify_assertion_violation, invoke_gdb, interactive fatal/abort/throw/debugger profiles, output services and full global finalizer orchestration remain open. Existing real table/region Go accounting is not C++ global allocator identity. No registered assertion completion credit.",
@@ -102226,7 +102284,14 @@
         "Actual /bin/sh command uses two real getpid reads and embedded source buffer; actual nonzero system branch proven with PATH empty. Successful external debugger attachment remains environment proof, not fabricated result.",
         "Other OS debugbreak/system adapters and native ostream global locale/buffering/throwmask remain OPEN. Direct Go OS command/transient arguments are host adapter representation, not invented source Runtime allocations.",
         "No whole-unit/class or registered source-driver promotion; copied/closed/foreign owner cases are precise Go owner-domain guards.",
-        "The OS boundary uses transient Go host allocations for command-string conversion and os/exec. Active Budget fault tests prove the charged owner graph and no source reservation event, not absence of Go host heap allocations. system() result is consumed only as zero/nonzero; internal nonzero1 preserves that branch and does not expose native wait encoding."
+        "The OS boundary uses transient Go host allocations for command-string conversion and os/exec. Active Budget fault tests prove the charged owner graph and no source reservation event, not absence of Go host heap allocations. system() result is consumed only as zero/nonzero; internal nonzero1 preserves that branch and does not expose native wait encoding.",
+        "Partial concrete source-site binding only: unbound ErrSATAssertion remains legacy explicit Go adapter; no process singleton, broad macro/tag/notify/native ABI completion claim.",
+        "CASSERT/XASSERT/UNREACHABLE/VERIFY/ENSURE wider consumers remain source obligations; release and disabled SASSERT erase provider/condition reads, unconditional invariant SIZE preserved.",
+        "Repository-relative source file spellings represent __FILE__ diagnostics; other compiler path spellings and native formatter/locale/OS profiles remain qualified.",
+        "Real bounded child A/EOF/NO_DEBUGGER source exits verified; Linux action context uses real process signal/shell adapter. Source Budget refusal is not proof of zero transient Go host heap allocation; collapsed internal nonzero system status is branch outcome only.",
+        "Nested invariant fixture corrected2\u21924 C commands because two failed predicates per each of two terms; preserved actualEOF110 fixture log, not source algorithm RED.",
+        "Frozen binding7 was superseded for actual lvalue capture: old putReached reevaluated current source field at store; corrected8 acquires both addresses before loads. Direct retained pointer-exchange proof is source pointer representation evidence, not ordinary source allocator failure credit.",
+        "Reciprocal binding guard is concrete Go owner/config-domain enforcement of the documented single source std::cerr reference; it does not establish process-global standard stream initialization or native ABI."
       ]
     },
     {
@@ -102256,7 +102321,10 @@
         "util_debug_actions.go",
         "util_debug_actions_host_linux.go",
         "util_debug_actions_host_other.go",
-        "util_debug_actions_source_test.go"
+        "util_debug_actions_source_test.go",
+        "util_debug_action_binding.go",
+        "util_debug_action_binding_source_test.go",
+        "util_permutation_word_view.go"
       ],
       "tests": [
         "TestDebugContextSourceLazyInitializationAndAssertions",
@@ -102311,7 +102379,20 @@
         "TestDebugActionConstructorEveryReservationAndBorrowedClose",
         "TestDebugActionForeignBudgetCopyClosedAndUnreadProviders",
         "TestDebugActionClosedOutputBadbitStillReachesInputAndThrow",
-        "TestDebugActionPromptBeforeClosedTieRead"
+        "TestDebugActionPromptBeforeClosedTieRead",
+        "TestPermutationBoundFalseSizeContinueResumesSourceBody",
+        "TestPermutationBoundIndexedContinueReadsActualInitializedSpare",
+        "TestPermutationBoundThrowAndDisabledUnreadClosedAction",
+        "TestPermutationBoundTrueAndBindingOwnerGuards",
+        "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce",
+        "TestPermutationBoundImmediateNamedGraphUnderActualRefusal",
+        "TestPermutationBoundNestedConditionsContinueWithoutReplacingSourceResult",
+        "TestPermutationBoundSubprocessHelper",
+        "TestPermutationBoundActualAbortEOFAndNoDebuggerActions",
+        "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
+        "TestPermutationAcquiredWordGuardAfterActualBackingDestruction",
+        "TestDebugBindingReciprocalPublicSetterKeepsOneActualStreamService",
+        "TestDebugBindingReverseOrderNullAndNoDebuggerConfiguration"
       ],
       "conditionals": [
         {
@@ -102529,6 +102610,43 @@
             "TestDebugActionClosedOutputBadbitStillReachesInputAndThrow",
             "TestDebugActionPromptBeforeClosedTieRead"
           ]
+        },
+        {
+          "name": "Concrete enabled-false SASSERT notification/action binding: permutation.cpp:67,70-73 and vector.h:70,113,167,304,309; actual C continuation/T exception/exit action sites",
+          "status": "partial",
+          "go_target": "util_debug_action_binding.go",
+          "tests": [
+            "TestPermutationBoundFalseSizeContinueResumesSourceBody",
+            "TestPermutationBoundIndexedContinueReadsActualInitializedSpare",
+            "TestPermutationBoundThrowAndDisabledUnreadClosedAction",
+            "TestPermutationBoundTrueAndBindingOwnerGuards",
+            "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce",
+            "TestPermutationBoundImmediateNamedGraphUnderActualRefusal",
+            "TestPermutationBoundNestedConditionsContinueWithoutReplacingSourceResult",
+            "TestPermutationBoundSubprocessHelper",
+            "TestPermutationBoundActualAbortEOFAndNoDebuggerActions",
+            "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
+            "TestPermutationAcquiredWordGuardAfterActualBackingDestruction"
+          ]
+        },
+        {
+          "name": "Captured concrete std::swap word-reference transport at permutation.cpp:35-40/vector.h:303-310: both lvalues acquired before actual payload loads, writes preserve captured provider/block/offset",
+          "status": "partial",
+          "go_target": "util_permutation_word_view.go",
+          "tests": [
+            "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
+            "TestPermutationAcquiredWordGuardAfterActualBackingDestruction",
+            "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce"
+          ]
+        },
+        {
+          "name": "Symmetric same-service binding of actual notification std::cerr and interactive action stream borrows, preserving nil/unbound and NO_Z3_DEBUGGER erased stream configurations",
+          "status": "partial",
+          "go_target": "util_debug_notification.go",
+          "tests": [
+            "TestDebugBindingReciprocalPublicSetterKeepsOneActualStreamService",
+            "TestDebugBindingReverseOrderNullAndNoDebuggerConfiguration"
+          ]
         }
       ],
       "ownership": [
@@ -102542,7 +102660,12 @@
         "Concrete file/tie borrows only; reflected cold NumericCharInput header includes actual one-byte scratch, flags and consumed-byte position. Close refunds only that header, never owns/closes caller file or tied output.",
         "Constructor foreign Budget check precedes its sole actual cold reservation; first success1, failure0 with complete named input/standard-stream/child-stream cold equation. Extraction/Flush allocate nothing under actual FailAfter0.",
         "One reflected DebugActionContext cold header includes actual used1024-byte command array; concrete standard-stream/input borrows remain caller-owned, Close refunds header only.",
-        "Sole actual constructor reservation: refusal0 and first success1; immediate named action/input/standard-header/two-file-stream cold equation before fault lift. Source actions execute under FailAfter0 without additional Budget reservation."
+        "Sole actual constructor reservation: refusal0 and first success1; immediate named action/input/standard-header/two-file-stream cold equation before fault lift. Source actions execute under FailAfter0 without additional Budget reservation.",
+        "DebugContext reflected owner header charges one actual borrowed action pointer; setter validates self/common Budget identity without reading input/file/closed pointed state. Streams and action contexts remain caller-owned.",
+        "Bound invocation under actual FailAfter0 retains exact named Runtime forward/inverse raw bijection plus permutation/copy, debug/region, action/input, standard-service/two-file-stream cold sum before fault lift; no new Budget reservation.",
+        "Source indexed std::swap lvalues acquired once: mutable vector.h:304 checks4 failed forward accesses in completed SIZE0 spare fixture; assignments write through reached lvalues without repeated SASSERT. Actual initialized spare reads/writes remain physically guarded.",
+        "Call-local word views have no allocation or cold owner: pointer acquisition records actual provider/block/offset; retained live backing exchange test names both owner fields and validates complete raw/cold graph; genuine deallocation then makes captured token stale at reached load/store. No debugger mutation callbacks or snapshot authority.",
+        "Both public binding setters enforce the same nonnull interactive standard-service identity without reading pointed closed/input/file state. Actual same-Budget distinct-file services/hex-versus-decimal flags are rejected without pointer or charge mutation; null/unbound and NO_DEBUGGER stream-erasure preserved."
       ],
       "deviations": [
         "Source process globals represented by an explicit single-goroutine cold owner; process-wide/context API macro binding remains open. CASSERT gate preserves assertions-before-tag order, but release consumers must erase its call; no source macro consumer completion claimed. notify_assertion_violation, invoke_gdb, interactive fatal/abort/throw/debugger profiles, output services and full global finalizer orchestration remain open. Existing real table/region Go accounting is not C++ global allocator identity. No registered assertion completion credit.",
@@ -102562,7 +102685,14 @@
         "Actual /bin/sh command uses two real getpid reads and embedded source buffer; actual nonzero system branch proven with PATH empty. Successful external debugger attachment remains environment proof, not fabricated result.",
         "Other OS debugbreak/system adapters and native ostream global locale/buffering/throwmask remain OPEN. Direct Go OS command/transient arguments are host adapter representation, not invented source Runtime allocations.",
         "No whole-unit/class or registered source-driver promotion; copied/closed/foreign owner cases are precise Go owner-domain guards.",
-        "The OS boundary uses transient Go host allocations for command-string conversion and os/exec. Active Budget fault tests prove the charged owner graph and no source reservation event, not absence of Go host heap allocations. system() result is consumed only as zero/nonzero; internal nonzero1 preserves that branch and does not expose native wait encoding."
+        "The OS boundary uses transient Go host allocations for command-string conversion and os/exec. Active Budget fault tests prove the charged owner graph and no source reservation event, not absence of Go host heap allocations. system() result is consumed only as zero/nonzero; internal nonzero1 preserves that branch and does not expose native wait encoding.",
+        "Partial concrete source-site binding only: unbound ErrSATAssertion remains legacy explicit Go adapter; no process singleton, broad macro/tag/notify/native ABI completion claim.",
+        "CASSERT/XASSERT/UNREACHABLE/VERIFY/ENSURE wider consumers remain source obligations; release and disabled SASSERT erase provider/condition reads, unconditional invariant SIZE preserved.",
+        "Repository-relative source file spellings represent __FILE__ diagnostics; other compiler path spellings and native formatter/locale/OS profiles remain qualified.",
+        "Real bounded child A/EOF/NO_DEBUGGER source exits verified; Linux action context uses real process signal/shell adapter. Source Budget refusal is not proof of zero transient Go host heap allocation; collapsed internal nonzero system status is branch outcome only.",
+        "Nested invariant fixture corrected2\u21924 C commands because two failed predicates per each of two terms; preserved actualEOF110 fixture log, not source algorithm RED.",
+        "Frozen binding7 was superseded for actual lvalue capture: old putReached reevaluated current source field at store; corrected8 acquires both addresses before loads. Direct retained pointer-exchange proof is source pointer representation evidence, not ordinary source allocator failure credit.",
+        "Reciprocal binding guard is concrete Go owner/config-domain enforcement of the documented single source std::cerr reference; it does not establish process-global standard stream initialization or native ABI."
       ]
     },
     {
@@ -127511,7 +127641,10 @@
         "util_permutation_copy_source_test.go",
         "util_unsigned_vector_copy_retire_source_test.go",
         "util_permutation_diagnostics_source.go",
-        "util_permutation_diagnostics_source_test.go"
+        "util_permutation_diagnostics_source_test.go",
+        "util_debug_action_binding_source_test.go",
+        "util_permutation_word_view.go",
+        "util_debug_notification.go"
       ],
       "tests": [
         "TestRuntimeUnsignedVectorGeometryResetAndWarmReuse",
@@ -127547,7 +127680,20 @@
         "TestRuntimePermutationAssertionConstructorReachedGrowthAndUnwind",
         "TestRuntimePermutationDiagnosticConstructorEveryActualReservation",
         "TestRuntimePermutationFormattedDisplayEveryOutputReservation",
-        "TestRuntimePermutationBindingRejectsForeignCohortBeforeReservation"
+        "TestRuntimePermutationBindingRejectsForeignCohortBeforeReservation",
+        "TestPermutationBoundFalseSizeContinueResumesSourceBody",
+        "TestPermutationBoundIndexedContinueReadsActualInitializedSpare",
+        "TestPermutationBoundThrowAndDisabledUnreadClosedAction",
+        "TestPermutationBoundTrueAndBindingOwnerGuards",
+        "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce",
+        "TestPermutationBoundImmediateNamedGraphUnderActualRefusal",
+        "TestPermutationBoundNestedConditionsContinueWithoutReplacingSourceResult",
+        "TestPermutationBoundSubprocessHelper",
+        "TestPermutationBoundActualAbortEOFAndNoDebuggerActions",
+        "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
+        "TestPermutationAcquiredWordGuardAfterActualBackingDestruction",
+        "TestDebugBindingReciprocalPublicSetterKeepsOneActualStreamService",
+        "TestDebugBindingReverseOrderNullAndNoDebuggerConfiguration"
       ],
       "assertions": [
         {
@@ -127632,6 +127778,43 @@
             "TestRuntimePermutationFormattedDisplayEveryOutputReservation",
             "TestRuntimePermutationBindingRejectsForeignCohortBeforeReservation"
           ]
+        },
+        {
+          "name": "Concrete enabled-false SASSERT notification/action binding: permutation.cpp:67,70-73 and vector.h:70,113,167,304,309; actual C continuation/T exception/exit action sites",
+          "status": "partial",
+          "go_target": "util_debug_action_binding.go",
+          "tests": [
+            "TestPermutationBoundFalseSizeContinueResumesSourceBody",
+            "TestPermutationBoundIndexedContinueReadsActualInitializedSpare",
+            "TestPermutationBoundThrowAndDisabledUnreadClosedAction",
+            "TestPermutationBoundTrueAndBindingOwnerGuards",
+            "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce",
+            "TestPermutationBoundImmediateNamedGraphUnderActualRefusal",
+            "TestPermutationBoundNestedConditionsContinueWithoutReplacingSourceResult",
+            "TestPermutationBoundSubprocessHelper",
+            "TestPermutationBoundActualAbortEOFAndNoDebuggerActions",
+            "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
+            "TestPermutationAcquiredWordGuardAfterActualBackingDestruction"
+          ]
+        },
+        {
+          "name": "Captured concrete std::swap word-reference transport at permutation.cpp:35-40/vector.h:303-310: both lvalues acquired before actual payload loads, writes preserve captured provider/block/offset",
+          "status": "partial",
+          "go_target": "util_permutation_word_view.go",
+          "tests": [
+            "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
+            "TestPermutationAcquiredWordGuardAfterActualBackingDestruction",
+            "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce"
+          ]
+        },
+        {
+          "name": "Symmetric same-service binding of actual notification std::cerr and interactive action stream borrows, preserving nil/unbound and NO_Z3_DEBUGGER erased stream configurations",
+          "status": "partial",
+          "go_target": "util_debug_notification.go",
+          "tests": [
+            "TestDebugBindingReciprocalPublicSetterKeepsOneActualStreamService",
+            "TestDebugBindingReverseOrderNullAndNoDebuggerConfiguration"
+          ]
         }
       ],
       "ownership": [
@@ -127644,7 +127827,12 @@
         "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration.",
         "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration. A completed later operation also retires called/acquired=false/token-null contexts; no actual block was returned, first source cause stays on vector. 32 real prephysical refusal\u2192successful retry cycles prove bounded cold bytes, exact graph before faultlift, actual Code101+same-Runtime OOM and payload after success.",
         "One borrowed DebugContext pointer included in actual reflected permutation header; no independent provider ownership, shadow switch or assertion reservation. Existing real vector raw/pending/acquisition ownership unchanged; independent named physical bijection and cold sum before every actual constructor/output refusal.",
-        "NumericTextStream real file storage borrows os.File without Close/Sync; existing integer local formatter and insertion flags reused, no unused output buffer or preformatted message. Real file write failure sets badbit and returns nil while later argument reads still execute."
+        "NumericTextStream real file storage borrows os.File without Close/Sync; existing integer local formatter and insertion flags reused, no unused output buffer or preformatted message. Real file write failure sets badbit and returns nil while later argument reads still execute.",
+        "DebugContext reflected owner header charges one actual borrowed action pointer; setter validates self/common Budget identity without reading input/file/closed pointed state. Streams and action contexts remain caller-owned.",
+        "Bound invocation under actual FailAfter0 retains exact named Runtime forward/inverse raw bijection plus permutation/copy, debug/region, action/input, standard-service/two-file-stream cold sum before fault lift; no new Budget reservation.",
+        "Source indexed std::swap lvalues acquired once: mutable vector.h:304 checks4 failed forward accesses in completed SIZE0 spare fixture; assignments write through reached lvalues without repeated SASSERT. Actual initialized spare reads/writes remain physically guarded.",
+        "Call-local word views have no allocation or cold owner: pointer acquisition records actual provider/block/offset; retained live backing exchange test names both owner fields and validates complete raw/cold graph; genuine deallocation then makes captured token stale at reached load/store. No debugger mutation callbacks or snapshot authority.",
+        "Both public binding setters enforce the same nonnull interactive standard-service identity without reading pointed closed/input/file state. Actual same-Budget distinct-file services/hex-versus-decimal flags are rejected without pointer or charge mutation; null/unbound and NO_DEBUGGER stream-erasure preserved."
       ],
       "deviations": [
         "Whole vector source family including class copy/assignment/reserve/swap and other element types remains partial; new wrapper selected init/reset/push/resize/index/DT only",
@@ -127658,7 +127846,14 @@
         "Nonwrapping acquisition invocation finite Go domain",
         "Selected caller-confined assertion flag binding and libstdc++ formatting profile only; notification/debugger/fatal assertion transport, process global binding, arbitrary locale/native ostream buffering/throw masks remain OPEN.",
         "Source registered permutation driver remains disabled #if0; new independent branch tests give no registered driver credit.",
-        "Closed-provider and completed partial Reset indexed spare fixtures qualify checked lifetime/initialization domains; output buffer refusal is Go transport accounting evidence, not C++ default stream exception behavior."
+        "Closed-provider and completed partial Reset indexed spare fixtures qualify checked lifetime/initialization domains; output buffer refusal is Go transport accounting evidence, not C++ default stream exception behavior.",
+        "Partial concrete source-site binding only: unbound ErrSATAssertion remains legacy explicit Go adapter; no process singleton, broad macro/tag/notify/native ABI completion claim.",
+        "CASSERT/XASSERT/UNREACHABLE/VERIFY/ENSURE wider consumers remain source obligations; release and disabled SASSERT erase provider/condition reads, unconditional invariant SIZE preserved.",
+        "Repository-relative source file spellings represent __FILE__ diagnostics; other compiler path spellings and native formatter/locale/OS profiles remain qualified.",
+        "Real bounded child A/EOF/NO_DEBUGGER source exits verified; Linux action context uses real process signal/shell adapter. Source Budget refusal is not proof of zero transient Go host heap allocation; collapsed internal nonzero system status is branch outcome only.",
+        "Nested invariant fixture corrected2\u21924 C commands because two failed predicates per each of two terms; preserved actualEOF110 fixture log, not source algorithm RED.",
+        "Frozen binding7 was superseded for actual lvalue capture: old putReached reevaluated current source field at store; corrected8 acquires both addresses before loads. Direct retained pointer-exchange proof is source pointer representation evidence, not ordinary source allocator failure credit.",
+        "Reciprocal binding guard is concrete Go owner/config-domain enforcement of the documented single source std::cerr reference; it does not establish process-global standard stream initialization or native ABI."
       ]
     },
     {
@@ -127686,7 +127881,10 @@
         "mpnum/polynomial_lex_raw_pointer.go",
         "mpnum/polynomial_lex_raw_source_test.go",
         "util_permutation_diagnostics_source.go",
-        "util_permutation_diagnostics_source_test.go"
+        "util_permutation_diagnostics_source_test.go",
+        "util_debug_action_binding_source_test.go",
+        "util_permutation_word_view.go",
+        "util_debug_notification.go"
       ],
       "tests": [
         "TestPermutationCyclesExhaustiveIndependentCopy",
@@ -127743,7 +127941,20 @@
         "TestRuntimePermutationAssertionConstructorReachedGrowthAndUnwind",
         "TestRuntimePermutationDiagnosticConstructorEveryActualReservation",
         "TestRuntimePermutationFormattedDisplayEveryOutputReservation",
-        "TestRuntimePermutationBindingRejectsForeignCohortBeforeReservation"
+        "TestRuntimePermutationBindingRejectsForeignCohortBeforeReservation",
+        "TestPermutationBoundFalseSizeContinueResumesSourceBody",
+        "TestPermutationBoundIndexedContinueReadsActualInitializedSpare",
+        "TestPermutationBoundThrowAndDisabledUnreadClosedAction",
+        "TestPermutationBoundTrueAndBindingOwnerGuards",
+        "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce",
+        "TestPermutationBoundImmediateNamedGraphUnderActualRefusal",
+        "TestPermutationBoundNestedConditionsContinueWithoutReplacingSourceResult",
+        "TestPermutationBoundSubprocessHelper",
+        "TestPermutationBoundActualAbortEOFAndNoDebuggerActions",
+        "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
+        "TestPermutationAcquiredWordGuardAfterActualBackingDestruction",
+        "TestDebugBindingReciprocalPublicSetterKeepsOneActualStreamService",
+        "TestDebugBindingReverseOrderNullAndNoDebuggerConfiguration"
       ],
       "conditionals": [
         {
@@ -127880,6 +128091,43 @@
             "TestRuntimePermutationFormattedDisplayEveryOutputReservation",
             "TestRuntimePermutationBindingRejectsForeignCohortBeforeReservation"
           ]
+        },
+        {
+          "name": "Concrete enabled-false SASSERT notification/action binding: permutation.cpp:67,70-73 and vector.h:70,113,167,304,309; actual C continuation/T exception/exit action sites",
+          "status": "partial",
+          "go_target": "util_debug_action_binding.go",
+          "tests": [
+            "TestPermutationBoundFalseSizeContinueResumesSourceBody",
+            "TestPermutationBoundIndexedContinueReadsActualInitializedSpare",
+            "TestPermutationBoundThrowAndDisabledUnreadClosedAction",
+            "TestPermutationBoundTrueAndBindingOwnerGuards",
+            "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce",
+            "TestPermutationBoundImmediateNamedGraphUnderActualRefusal",
+            "TestPermutationBoundNestedConditionsContinueWithoutReplacingSourceResult",
+            "TestPermutationBoundSubprocessHelper",
+            "TestPermutationBoundActualAbortEOFAndNoDebuggerActions",
+            "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
+            "TestPermutationAcquiredWordGuardAfterActualBackingDestruction"
+          ]
+        },
+        {
+          "name": "Captured concrete std::swap word-reference transport at permutation.cpp:35-40/vector.h:303-310: both lvalues acquired before actual payload loads, writes preserve captured provider/block/offset",
+          "status": "partial",
+          "go_target": "util_permutation_word_view.go",
+          "tests": [
+            "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
+            "TestPermutationAcquiredWordGuardAfterActualBackingDestruction",
+            "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce"
+          ]
+        },
+        {
+          "name": "Symmetric same-service binding of actual notification std::cerr and interactive action stream borrows, preserving nil/unbound and NO_Z3_DEBUGGER erased stream configurations",
+          "status": "partial",
+          "go_target": "util_debug_notification.go",
+          "tests": [
+            "TestDebugBindingReciprocalPublicSetterKeepsOneActualStreamService",
+            "TestDebugBindingReverseOrderNullAndNoDebuggerConfiguration"
+          ]
         }
       ],
       "ownership": [
@@ -127899,7 +128147,12 @@
         "Existing actual nested Runtime row backing, raw/moved-prefix/old/pending roots and charged children directory remain; source append rereads other.SIZE per loop, default CAP assertion before expansion overflow/allocation, size read before each source cycle.",
         "Independent full named polynomial/NUM/monomial/raw/cold census immediate under active fault for every existing reservation before firstsuccess; public higher-variable permutation retained before lower recursive refusal.",
         "One borrowed DebugContext pointer included in actual reflected permutation header; no independent provider ownership, shadow switch or assertion reservation. Existing real vector raw/pending/acquisition ownership unchanged; independent named physical bijection and cold sum before every actual constructor/output refusal.",
-        "NumericTextStream real file storage borrows os.File without Close/Sync; existing integer local formatter and insertion flags reused, no unused output buffer or preformatted message. Real file write failure sets badbit and returns nil while later argument reads still execute."
+        "NumericTextStream real file storage borrows os.File without Close/Sync; existing integer local formatter and insertion flags reused, no unused output buffer or preformatted message. Real file write failure sets badbit and returns nil while later argument reads still execute.",
+        "DebugContext reflected owner header charges one actual borrowed action pointer; setter validates self/common Budget identity without reading input/file/closed pointed state. Streams and action contexts remain caller-owned.",
+        "Bound invocation under actual FailAfter0 retains exact named Runtime forward/inverse raw bijection plus permutation/copy, debug/region, action/input, standard-service/two-file-stream cold sum before fault lift; no new Budget reservation.",
+        "Source indexed std::swap lvalues acquired once: mutable vector.h:304 checks4 failed forward accesses in completed SIZE0 spare fixture; assignments write through reached lvalues without repeated SASSERT. Actual initialized spare reads/writes remain physically guarded.",
+        "Call-local word views have no allocation or cold owner: pointer acquisition records actual provider/block/offset; retained live backing exchange test names both owner fields and validates complete raw/cold graph; genuine deallocation then makes captured token stale at reached load/store. No debugger mutation callbacks or snapshot authority.",
+        "Both public binding setters enforce the same nonnull interactive standard-service identity without reading pointed closed/input/file state. Actual same-Budget distinct-file services/hex-versus-decimal flags are rejected without pointer or charge mutation; null/unbound and NO_DEBUGGER stream-erasure preserved."
       ],
       "deviations": [
         "Concrete uint32 specialization only; permutation class and additional typed consumers remain open, with no Go generics.",
@@ -127924,7 +128177,14 @@
         "Global DEBUG/TRACE/ostream and broad nested-vector/copy/lifecycle source methods remain partial.",
         "Selected caller-confined assertion flag binding and libstdc++ formatting profile only; notification/debugger/fatal assertion transport, process global binding, arbitrary locale/native ostream buffering/throw masks remain OPEN.",
         "Source registered permutation driver remains disabled #if0; new independent branch tests give no registered driver credit.",
-        "Closed-provider and completed partial Reset indexed spare fixtures qualify checked lifetime/initialization domains; output buffer refusal is Go transport accounting evidence, not C++ default stream exception behavior."
+        "Closed-provider and completed partial Reset indexed spare fixtures qualify checked lifetime/initialization domains; output buffer refusal is Go transport accounting evidence, not C++ default stream exception behavior.",
+        "Partial concrete source-site binding only: unbound ErrSATAssertion remains legacy explicit Go adapter; no process singleton, broad macro/tag/notify/native ABI completion claim.",
+        "CASSERT/XASSERT/UNREACHABLE/VERIFY/ENSURE wider consumers remain source obligations; release and disabled SASSERT erase provider/condition reads, unconditional invariant SIZE preserved.",
+        "Repository-relative source file spellings represent __FILE__ diagnostics; other compiler path spellings and native formatter/locale/OS profiles remain qualified.",
+        "Real bounded child A/EOF/NO_DEBUGGER source exits verified; Linux action context uses real process signal/shell adapter. Source Budget refusal is not proof of zero transient Go host heap allocation; collapsed internal nonzero system status is branch outcome only.",
+        "Nested invariant fixture corrected2\u21924 C commands because two failed predicates per each of two terms; preserved actualEOF110 fixture log, not source algorithm RED.",
+        "Frozen binding7 was superseded for actual lvalue capture: old putReached reevaluated current source field at store; corrected8 acquires both addresses before loads. Direct retained pointer-exchange proof is source pointer representation evidence, not ordinary source allocator failure credit.",
+        "Reciprocal binding guard is concrete Go owner/config-domain enforcement of the documented single source std::cerr reference; it does not establish process-global standard stream initialization or native ABI."
       ]
     },
     {
@@ -136024,7 +136284,10 @@
         "mpnum/polynomial_lex_raw_pointer.go",
         "mpnum/polynomial_lex_raw_source_test.go",
         "util_permutation_diagnostics_source.go",
-        "util_permutation_diagnostics_source_test.go"
+        "util_permutation_diagnostics_source_test.go",
+        "util_debug_action_binding_source_test.go",
+        "util_permutation_word_view.go",
+        "util_debug_notification.go"
       ],
       "tests": [
         "TestParamDescrsBudgetFailuresAndWarmDuplicate",
@@ -136371,7 +136634,20 @@
         "TestRuntimePermutationAssertionConstructorReachedGrowthAndUnwind",
         "TestRuntimePermutationDiagnosticConstructorEveryActualReservation",
         "TestRuntimePermutationFormattedDisplayEveryOutputReservation",
-        "TestRuntimePermutationBindingRejectsForeignCohortBeforeReservation"
+        "TestRuntimePermutationBindingRejectsForeignCohortBeforeReservation",
+        "TestPermutationBoundFalseSizeContinueResumesSourceBody",
+        "TestPermutationBoundIndexedContinueReadsActualInitializedSpare",
+        "TestPermutationBoundThrowAndDisabledUnreadClosedAction",
+        "TestPermutationBoundTrueAndBindingOwnerGuards",
+        "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce",
+        "TestPermutationBoundImmediateNamedGraphUnderActualRefusal",
+        "TestPermutationBoundNestedConditionsContinueWithoutReplacingSourceResult",
+        "TestPermutationBoundSubprocessHelper",
+        "TestPermutationBoundActualAbortEOFAndNoDebuggerActions",
+        "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
+        "TestPermutationAcquiredWordGuardAfterActualBackingDestruction",
+        "TestDebugBindingReciprocalPublicSetterKeepsOneActualStreamService",
+        "TestDebugBindingReverseOrderNullAndNoDebuggerConfiguration"
       ],
       "conditionals": [
         {
@@ -137000,6 +137276,43 @@
             "TestRuntimePermutationFormattedDisplayEveryOutputReservation",
             "TestRuntimePermutationBindingRejectsForeignCohortBeforeReservation"
           ]
+        },
+        {
+          "name": "Concrete enabled-false SASSERT notification/action binding: permutation.cpp:67,70-73 and vector.h:70,113,167,304,309; actual C continuation/T exception/exit action sites",
+          "status": "partial",
+          "go_target": "util_debug_action_binding.go",
+          "tests": [
+            "TestPermutationBoundFalseSizeContinueResumesSourceBody",
+            "TestPermutationBoundIndexedContinueReadsActualInitializedSpare",
+            "TestPermutationBoundThrowAndDisabledUnreadClosedAction",
+            "TestPermutationBoundTrueAndBindingOwnerGuards",
+            "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce",
+            "TestPermutationBoundImmediateNamedGraphUnderActualRefusal",
+            "TestPermutationBoundNestedConditionsContinueWithoutReplacingSourceResult",
+            "TestPermutationBoundSubprocessHelper",
+            "TestPermutationBoundActualAbortEOFAndNoDebuggerActions",
+            "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
+            "TestPermutationAcquiredWordGuardAfterActualBackingDestruction"
+          ]
+        },
+        {
+          "name": "Captured concrete std::swap word-reference transport at permutation.cpp:35-40/vector.h:303-310: both lvalues acquired before actual payload loads, writes preserve captured provider/block/offset",
+          "status": "partial",
+          "go_target": "util_permutation_word_view.go",
+          "tests": [
+            "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
+            "TestPermutationAcquiredWordGuardAfterActualBackingDestruction",
+            "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce"
+          ]
+        },
+        {
+          "name": "Symmetric same-service binding of actual notification std::cerr and interactive action stream borrows, preserving nil/unbound and NO_Z3_DEBUGGER erased stream configurations",
+          "status": "partial",
+          "go_target": "util_debug_notification.go",
+          "tests": [
+            "TestDebugBindingReciprocalPublicSetterKeepsOneActualStreamService",
+            "TestDebugBindingReverseOrderNullAndNoDebuggerConfiguration"
+          ]
         }
       ],
       "ownership": [
@@ -137032,7 +137345,12 @@
         "Existing actual nested Runtime row backing, raw/moved-prefix/old/pending roots and charged children directory remain; source append rereads other.SIZE per loop, default CAP assertion before expansion overflow/allocation, size read before each source cycle.",
         "Independent full named polynomial/NUM/monomial/raw/cold census immediate under active fault for every existing reservation before firstsuccess; public higher-variable permutation retained before lower recursive refusal.",
         "One borrowed DebugContext pointer included in actual reflected permutation header; no independent provider ownership, shadow switch or assertion reservation. Existing real vector raw/pending/acquisition ownership unchanged; independent named physical bijection and cold sum before every actual constructor/output refusal.",
-        "NumericTextStream real file storage borrows os.File without Close/Sync; existing integer local formatter and insertion flags reused, no unused output buffer or preformatted message. Real file write failure sets badbit and returns nil while later argument reads still execute."
+        "NumericTextStream real file storage borrows os.File without Close/Sync; existing integer local formatter and insertion flags reused, no unused output buffer or preformatted message. Real file write failure sets badbit and returns nil while later argument reads still execute.",
+        "DebugContext reflected owner header charges one actual borrowed action pointer; setter validates self/common Budget identity without reading input/file/closed pointed state. Streams and action contexts remain caller-owned.",
+        "Bound invocation under actual FailAfter0 retains exact named Runtime forward/inverse raw bijection plus permutation/copy, debug/region, action/input, standard-service/two-file-stream cold sum before fault lift; no new Budget reservation.",
+        "Source indexed std::swap lvalues acquired once: mutable vector.h:304 checks4 failed forward accesses in completed SIZE0 spare fixture; assignments write through reached lvalues without repeated SASSERT. Actual initialized spare reads/writes remain physically guarded.",
+        "Call-local word views have no allocation or cold owner: pointer acquisition records actual provider/block/offset; retained live backing exchange test names both owner fields and validates complete raw/cold graph; genuine deallocation then makes captured token stale at reached load/store. No debugger mutation callbacks or snapshot authority.",
+        "Both public binding setters enforce the same nonnull interactive standard-service identity without reading pointed closed/input/file state. Actual same-Budget distinct-file services/hex-versus-decimal flags are rejected without pointer or charge mutation; null/unbound and NO_DEBUGGER stream-erasure preserved."
       ],
       "deviations": [
         "Concrete solver-specific storage, not complete generic vector template surface. Owning model Clone/Assign, other specializations and source-undefined continuation behavior remain explicitly separate.",
@@ -137069,7 +137387,14 @@
         "Global DEBUG/TRACE/ostream and broad nested-vector/copy/lifecycle source methods remain partial.",
         "Selected caller-confined assertion flag binding and libstdc++ formatting profile only; notification/debugger/fatal assertion transport, process global binding, arbitrary locale/native ostream buffering/throw masks remain OPEN.",
         "Source registered permutation driver remains disabled #if0; new independent branch tests give no registered driver credit.",
-        "Closed-provider and completed partial Reset indexed spare fixtures qualify checked lifetime/initialization domains; output buffer refusal is Go transport accounting evidence, not C++ default stream exception behavior."
+        "Closed-provider and completed partial Reset indexed spare fixtures qualify checked lifetime/initialization domains; output buffer refusal is Go transport accounting evidence, not C++ default stream exception behavior.",
+        "Partial concrete source-site binding only: unbound ErrSATAssertion remains legacy explicit Go adapter; no process singleton, broad macro/tag/notify/native ABI completion claim.",
+        "CASSERT/XASSERT/UNREACHABLE/VERIFY/ENSURE wider consumers remain source obligations; release and disabled SASSERT erase provider/condition reads, unconditional invariant SIZE preserved.",
+        "Repository-relative source file spellings represent __FILE__ diagnostics; other compiler path spellings and native formatter/locale/OS profiles remain qualified.",
+        "Real bounded child A/EOF/NO_DEBUGGER source exits verified; Linux action context uses real process signal/shell adapter. Source Budget refusal is not proof of zero transient Go host heap allocation; collapsed internal nonzero system status is branch outcome only.",
+        "Nested invariant fixture corrected2\u21924 C commands because two failed predicates per each of two terms; preserved actualEOF110 fixture log, not source algorithm RED.",
+        "Frozen binding7 was superseded for actual lvalue capture: old putReached reevaluated current source field at store; corrected8 acquires both addresses before loads. Direct retained pointer-exchange proof is source pointer representation evidence, not ordinary source allocator failure credit.",
+        "Reciprocal binding guard is concrete Go owner/config-domain enforcement of the documented single source std::cerr reference; it does not establish process-global standard stream initialization or native ABI."
       ]
     },
     {

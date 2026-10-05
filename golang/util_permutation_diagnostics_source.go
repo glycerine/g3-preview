@@ -28,26 +28,17 @@ func (p *RuntimePermutation) BindAssertions(d *DebugContext) error {
 	return nil
 }
 func (p *RuntimePermutation) read(v *RuntimeUnsignedVector, i uint32) (uint32, error) {
-	if e := v.open(); e != nil {
-		return 0, e
-	}
-	on, e := permutationAssertions(p.debugContext)
+	return p.readAtSource(v, i, 309)
+}
+func (p *RuntimePermutation) readMutable(v *RuntimeUnsignedVector, i uint32) (uint32, error) {
+	return p.readAtSource(v, i, 304)
+}
+func (p *RuntimePermutation) readAtSource(v *RuntimeUnsignedVector, i uint32, line int32) (uint32, error) {
+	view, e := p.acquireAtSource(v, i, line)
 	if e != nil {
 		return 0, e
 	}
-	if on {
-		n, e := v.column.size()
-		if e != nil {
-			return 0, e
-		}
-		if i >= n {
-			return 0, ErrSATAssertion
-		}
-	}
-	if v.column.raw.block == (memory.Block{}) {
-		return 0, arena.ErrBounds
-	}
-	return satAssignmentReadWord(v.column.raw.runtime, v.column.raw.block, 8+4*uint64(i))
+	return view.read()
 }
 func (p *RuntimePermutation) write(v *RuntimeUnsignedVector, i, x uint32) error {
 	if e := v.open(); e != nil {
@@ -63,7 +54,9 @@ func (p *RuntimePermutation) write(v *RuntimeUnsignedVector, i, x uint32) error 
 			return e
 		}
 		if i >= n {
-			return ErrSATAssertion
+			if e := debugAssertionFailure(p.debugContext, "src/util/vector.h", 304, "idx < size()"); e != nil {
+				return e
+			}
 		}
 	}
 	if v.column.raw.block == (memory.Block{}) {

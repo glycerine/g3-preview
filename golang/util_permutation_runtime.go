@@ -110,41 +110,35 @@ func (p *RuntimePermutation) Swap(i, j uint32) error {
 	if e := p.open(); e != nil {
 		return e
 	}
-	a, e := p.read(&p.forward, i)
+	a, e := p.readMutable(&p.forward, i)
 	if e != nil {
 		return e
 	}
-	b, e := p.read(&p.forward, j)
+	b, e := p.readMutable(&p.forward, j)
 	if e != nil {
 		return e
 	}
-	// std::swap first reads its actual operands, then publishes them in order.
-	x, e := p.read(&p.forward, i)
+	// Source std::swap arguments acquire both actual lvalues before its body.
+	left, e := p.acquireMutable(&p.forward, i)
 	if e != nil {
 		return e
 	}
-	y, e := p.read(&p.forward, j)
+	right, e := p.acquireMutable(&p.forward, j)
 	if e != nil {
 		return e
 	}
-	if e = p.write(&p.forward, i, y); e != nil {
+	if e = permutationSwapWords(left, right); e != nil {
 		return e
 	}
-	if e = p.write(&p.forward, j, x); e != nil {
-		return e
-	}
-	x, e = p.read(&p.inverse, a)
+	left, e = p.acquireMutable(&p.inverse, a)
 	if e != nil {
 		return e
 	}
-	y, e = p.read(&p.inverse, b)
+	right, e = p.acquireMutable(&p.inverse, b)
 	if e != nil {
 		return e
 	}
-	if e = p.write(&p.inverse, a, y); e != nil {
-		return e
-	}
-	return p.write(&p.inverse, b, x)
+	return permutationSwapWords(left, right)
 }
 func (p *RuntimePermutation) MoveAfter(i, j uint32) error {
 	if e := p.open(); e != nil {
@@ -153,19 +147,19 @@ func (p *RuntimePermutation) MoveAfter(i, j uint32) error {
 	if i >= j {
 		return nil
 	}
-	a, e := p.read(&p.forward, i)
+	a, e := p.readMutable(&p.forward, i)
 	if e != nil {
 		return e
 	}
 	for k := i; k < j; k++ {
-		v, e := p.read(&p.forward, k+1)
+		v, e := p.readMutable(&p.forward, k+1)
 		if e != nil {
 			return e
 		}
 		if e = p.write(&p.forward, k, v); e != nil {
 			return e
 		}
-		v, e = p.read(&p.forward, k)
+		v, e = p.readMutable(&p.forward, k)
 		if e != nil {
 			return e
 		}
@@ -207,7 +201,9 @@ func (p *RuntimePermutation) CheckInvariant() (bool, error) {
 			return false, e
 		}
 		if a != b {
-			return false, ErrSATAssertion
+			if e := debugAssertionFailure(p.debugContext, "src/util/permutation.cpp", 67, "m_p.size() == m_inv_p.size()"); e != nil {
+				return false, e
+			}
 		}
 	}
 	n, e := p.forward.Size()
@@ -225,7 +221,9 @@ func (p *RuntimePermutation) CheckInvariant() (bool, error) {
 				return false, e
 			}
 			if a >= n {
-				return false, ErrSATAssertion
+				if e := debugAssertionFailure(p.debugContext, "src/util/permutation.cpp", 70, "m_p[i] < n"); e != nil {
+					return false, e
+				}
 			}
 		}
 		on, e = permutationAssertions(p.debugContext)
@@ -238,7 +236,9 @@ func (p *RuntimePermutation) CheckInvariant() (bool, error) {
 				return false, e
 			}
 			if a >= n {
-				return false, ErrSATAssertion
+				if e := debugAssertionFailure(p.debugContext, "src/util/permutation.cpp", 71, "m_inv_p[i] < n"); e != nil {
+					return false, e
+				}
 			}
 		}
 		on, e = permutationAssertions(p.debugContext)
@@ -255,7 +255,9 @@ func (p *RuntimePermutation) CheckInvariant() (bool, error) {
 				return false, e
 			}
 			if b != i {
-				return false, ErrSATAssertion
+				if e := debugAssertionFailure(p.debugContext, "src/util/permutation.cpp", 72, "m_p[m_inv_p[i]] == i"); e != nil {
+					return false, e
+				}
 			}
 		}
 		on, e = permutationAssertions(p.debugContext)
@@ -272,7 +274,9 @@ func (p *RuntimePermutation) CheckInvariant() (bool, error) {
 				return false, e
 			}
 			if b != i {
-				return false, ErrSATAssertion
+				if e := debugAssertionFailure(p.debugContext, "src/util/permutation.cpp", 73, "m_inv_p[m_p[i]] == i"); e != nil {
+					return false, e
+				}
 			}
 		}
 	}
