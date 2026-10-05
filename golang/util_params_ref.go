@@ -65,9 +65,9 @@ type paramsEntryPage struct {
 	class   uint32
 }
 type ParamsStats struct {
-	LiveBlocks, References, Entries                                               uint32
-	HeaderBytes, BlockBytes, ReceiptBytes, PageBytes, DirectoryBytes, FormatBytes uint64
-	Text                                                                          arena.VectorStats
+	LiveBlocks, References, Entries                                                                 uint32
+	HeaderBytes, BlockBytes, ReceiptBytes, SourceFrameBytes, PageBytes, DirectoryBytes, FormatBytes uint64
+	Text                                                                                            arena.VectorStats
 }
 
 // This cold owner borrows both services. They must outlive it; budgets shared
@@ -82,6 +82,7 @@ type ParamsContext struct {
 	owner             uint64
 	blocks            []paramsBlock
 	decrementReceipts []paramsDecrementReceipt
+	sourceFrames      []paramsSourceFrame
 	sourceSerial      uint64
 	pages             []paramsEntryPage
 	workspace         []byte
@@ -246,10 +247,11 @@ func (c *ParamsContext) freeEntries(r paramsEntriesRef) {
 func (c *ParamsContext) newBlock() (uint32, error) {
 	for i := range c.blocks {
 		b := &c.blocks[i]
-		if !b.live && b.generation != math.MaxUint32 {
+		if !b.live && !c.sourceFrames[i].active && b.generation != math.MaxUint32 {
 			g := b.generation + 1
 			*b = paramsBlock{refs: 1, generation: g, live: true}
 			c.decrementReceipts[i] = paramsDecrementReceipt{}
+			c.sourceFrames[i] = paramsSourceFrame{}
 			return uint32(i + 1), nil
 		}
 	}
@@ -258,18 +260,22 @@ func (c *ParamsContext) newBlock() (uint32, error) {
 		if e != nil {
 			return 0, e
 		}
-		if e = c.budget.Reserve(paramsBlockBytes(n) + paramsReceiptBytes(n)); e != nil {
+		if e = c.budget.Reserve(paramsBlockBytes(n) + paramsReceiptBytes(n) + paramsSourceFrameBytes(n)); e != nil {
 			return 0, e
 		}
 		next := make([]paramsBlock, len(c.blocks), n)
 		copy(next, c.blocks)
 		receipts := make([]paramsDecrementReceipt, len(c.decrementReceipts), n)
 		copy(receipts, c.decrementReceipts)
-		c.budget.Release(paramsBlockBytes(cap(c.blocks)) + paramsReceiptBytes(cap(c.decrementReceipts)))
+		frames := make([]paramsSourceFrame, len(c.sourceFrames), n)
+		copy(frames, c.sourceFrames)
+		c.budget.Release(paramsBlockBytes(cap(c.blocks)) + paramsReceiptBytes(cap(c.decrementReceipts)) + paramsSourceFrameBytes(cap(c.sourceFrames)))
 		c.blocks = next
 		c.decrementReceipts = receipts
+		c.sourceFrames = frames
 	}
 	c.decrementReceipts = append(c.decrementReceipts, paramsDecrementReceipt{})
+	c.sourceFrames = append(c.sourceFrames, paramsSourceFrame{})
 	c.blocks = append(c.blocks, paramsBlock{refs: 1, generation: 1, live: true})
 	return uint32(len(c.blocks)), nil
 }
@@ -336,16 +342,32 @@ func (c *ParamsContext) assign(dst, src *ParamsRef) error {
 	if e := c.mutable(src); e != nil {
 		return e
 	}
+	serial, e := c.nextSourceInvocation()
+	if e != nil {
+		return e
+	}
 	if src.slot != 0 {
 		b := &c.blocks[src.slot-1]
 		if b.refs == math.MaxUint32 {
 			return arena.ErrBounds
 		}
 		b.refs++
+		if dst.slot != 0 {
+			c.sourceFrames[dst.slot-1] = paramsSourceFrame{active: true, rootGeneration: dst.generation, invocation: serial, kind: paramsFrameAssign, heldSlot: src.slot, heldGeneration: src.generation}
+		}
 	}
 	old := dst.slot
+	if e := c.dec(old); e != nil {
+		if old != 0 && c.sourceFrames[old-1].active {
+			c.sourceFrames[old-1].cause = e
+		}
+		return e
+	}
 	*dst = *src
-	return c.dec(old)
+	if old != 0 {
+		c.sourceFrames[old-1].active = false
+	}
+	return nil
 }
 func (c *ParamsContext) Assign(dst, src *ParamsRef) error {
 	c.mu.Lock()
@@ -376,7 +398,12 @@ func (c *ParamsContext) init(v *ParamsRef) error {
 	if v.slot != 0 && c.blocks[v.slot-1].refs == 1 {
 		return nil
 	}
+	serial, e := c.nextSourceInvocation()
+	if e != nil {
+		return e
+	}
 	old := v.slot
+	oldGeneration := v.generation
 	slot, e := c.newBlock()
 	if e != nil {
 		return e
@@ -384,10 +411,17 @@ func (c *ParamsContext) init(v *ParamsRef) error {
 	v.slot = slot
 	v.generation = c.blocks[slot-1].generation
 	if old != 0 {
-		e = c.copyCore(slot, old)
-		de := c.dec(old)
-		if e == nil {
-			e = de
+		c.sourceFrames[slot-1] = paramsSourceFrame{active: true, rootGeneration: v.generation, invocation: serial, kind: paramsFrameInit, heldSlot: old, heldGeneration: oldGeneration}
+		if e = c.copyCore(slot, old); e != nil {
+			c.sourceFrames[slot-1].cause = e
+			return e
+		}
+		e = c.dec(old)
+		if e != nil {
+			c.sourceFrames[slot-1].cause = e
+			c.sourceFrames[slot-1].decrementStarted = true
+		} else {
+			c.sourceFrames[slot-1].active = false
 		}
 	}
 	return e
@@ -1406,6 +1440,7 @@ func (c *ParamsContext) Stats() ParamsStats {
 	s.HeaderBytes = c.headerBytes
 	s.BlockBytes = paramsBlockBytes(cap(c.blocks))
 	s.ReceiptBytes = paramsReceiptBytes(cap(c.decrementReceipts))
+	s.SourceFrameBytes = paramsSourceFrameBytes(cap(c.sourceFrames))
 	s.DirectoryBytes = paramsDirectoryBytes(cap(c.pages))
 	s.FormatBytes = uint64(cap(c.workspace))
 	s.Text = c.texts.Stats()
@@ -1430,6 +1465,14 @@ func (c *ParamsContext) Close() error {
 	if c.closed {
 		return nil
 	}
+	for i := range c.sourceFrames {
+		if c.sourceFrames[i].active {
+			if e := c.cleanupSourceFrame(uint32(i + 1)); e != nil {
+				return e
+			}
+		}
+	}
+
 	for i := range c.blocks {
 		if c.blocks[i].live {
 			if c.blocks[i].resetActive {
@@ -1445,9 +1488,10 @@ func (c *ParamsContext) Close() error {
 	for _, p := range c.pages {
 		c.budget.Release(paramsPageBytes(p))
 	}
-	c.budget.Release(paramsDirectoryBytes(cap(c.pages)) + paramsBlockBytes(cap(c.blocks)) + paramsReceiptBytes(cap(c.decrementReceipts)) + uint64(cap(c.workspace)) + c.headerBytes)
+	c.budget.Release(paramsDirectoryBytes(cap(c.pages)) + paramsBlockBytes(cap(c.blocks)) + paramsReceiptBytes(cap(c.decrementReceipts)) + paramsSourceFrameBytes(cap(c.sourceFrames)) + uint64(cap(c.workspace)) + c.headerBytes)
 	c.blocks = nil
 	c.decrementReceipts = nil
+	c.sourceFrames = nil
 	c.pages = nil
 	c.workspace = nil
 	c.closed = true

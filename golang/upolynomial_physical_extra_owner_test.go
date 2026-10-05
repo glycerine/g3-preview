@@ -62,11 +62,33 @@ func upolyPhysicalExtraNumerals(extras []upolyPhysicalExtraOwners, addInt func(r
 				addInt(raw.FieldByName("norm"))
 			}
 		}
+		paramsContexts := make(map[*ParamsContext]bool)
 		for _, owner := range x.ParamsValues {
 			if owner.Context == nil || owner.Value == nil {
 				panic(ErrParamsOwner)
 			}
 			c, v := owner.Context, owner.Value
+			if !paramsContexts[c] {
+				paramsContexts[c] = true
+				for _, frame := range c.sourceFrames {
+					if !frame.active {
+						continue
+					}
+					if frame.invocation == 0 || frame.heldSlot == 0 || int(frame.heldSlot) > len(c.blocks) {
+						panic(ErrParamsOwner)
+					}
+					held := &c.blocks[frame.heldSlot-1]
+					if !held.live || held.generation != frame.heldGeneration {
+						panic(ErrParamsOwner)
+					}
+					for i := uint32(0); i < held.size; i++ {
+						entry := c.entry(held, i)
+						if entry.kind == ParamNumeral {
+							addRat(reflect.ValueOf(&entry.rat).Elem().FieldByName("raw"))
+						}
+					}
+				}
+			}
 			if c.self != c || c.closed || v.owner != c.owner {
 				panic(ErrParamsOwner)
 			}

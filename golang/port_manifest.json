@@ -124437,7 +124437,9 @@
         "util_param_descrs_stream_nodebug.go",
         "util_param_descrs_stream_test.go",
         "util_params_decrement_source.go",
-        "util_params_decrement_tracked_test.go"
+        "util_params_decrement_tracked_test.go",
+        "util_params_source_frame.go",
+        "util_params_assignment_source_test.go"
       ],
       "tests": [
         "TestParamNameNormalizationSourceBranches",
@@ -124487,7 +124489,15 @@
         "TestParamsReferenceRepeatedDECSourceAssertionAfterActualSetLimbsLeafStop",
         "TestParamsReferenceCleanupDecrementActualLeafReceipt",
         "TestParamsReferenceIndependentStoppedBlocksAndReplacementGeneration",
-        "TestParamsReferenceTrackedDecrementGuardedEntryReceipt"
+        "TestParamsReferenceTrackedDecrementGuardedEntryReceipt",
+        "TestParamsReferenceAssignmentSourcePointerPublicationAfterDEC",
+        "TestParamsReferenceInitFailedCopySkipsOldDEC",
+        "TestParamsReferenceInitFrameOwnAbortActualLeafReceipt",
+        "TestParamsReferenceTwoFramesAndFreshInvocationReuse",
+        "TestParamsReferenceNullAssignmentOldDECStop",
+        "TestParamsReferenceAssignmentSelfAliasSourceINCThenDEC",
+        "TestParamsReferenceContextCloseConsumesExactStoppedFrame",
+        "TestParamsReferenceInitConstructorFailureKeepsCallerOldReference"
       ],
       "conditionals": [
         {
@@ -124804,6 +124814,21 @@
           "tests": [
             "TestParamsReferenceTrackedDecrementGuardedEntryReceipt"
           ]
+        },
+        {
+          "name": "selected params_ref assignment srcINC then oldDEC then pointer publication, and init published-pointer copy before oldDEC with charged exact failed-source frame owning abort",
+          "status": "ported",
+          "go_target": "util_params_source_frame.go",
+          "tests": [
+            "TestParamsReferenceAssignmentSourcePointerPublicationAfterDEC",
+            "TestParamsReferenceInitFailedCopySkipsOldDEC",
+            "TestParamsReferenceInitFrameOwnAbortActualLeafReceipt",
+            "TestParamsReferenceTwoFramesAndFreshInvocationReuse",
+            "TestParamsReferenceNullAssignmentOldDECStop",
+            "TestParamsReferenceAssignmentSelfAliasSourceINCThenDEC",
+            "TestParamsReferenceContextCloseConsumesExactStoppedFrame",
+            "TestParamsReferenceInitConstructorFailureKeepsCallerOldReference"
+          ]
         }
       ],
       "ownership": [
@@ -124813,13 +124838,15 @@
         "Borrowed canonical spelling occupies existing scalar symbol field with a paramsText tag; copy retains identity and deletion frees only owned text. SymbolManager outlives borrowers; physical record stride remains reflect-accounted. See PORT_PROGRESS.md#audit-gparams-port-status-md.",
         "DisplayInto borrows charged StringBuffer64; destination then descriptor then Symbol lock order. Temporary names use actual charged old/new peaks and are refunded; text bytes read directly without intermediate strings. See PORT_PROGRESS.md#audit-param-descrs-stream-port-status-md.",
         "Actual zero-ref leaf destruction stop retains pointer-free per-block cursor/stage and precharged cold cause/generation receipts; exact current entry numeral is retained, mutation cannot replace it, independent blocks can stop/continue separately. Explicit CleanupDecrement and owning context Close acknowledge actual child release receipts without a second decrement. Whole ownership remains unproven for Reset/resetBlock outside zero-ref DEC and exceptional copy/init/value replacement.",
-        "Actual per-block cold invocation is prepared with the charged receipt directory. Null/shared/failed entry cannot stamp; wrong invocation, foreign value, empty receipt, double acknowledgment and stale reused generation cannot adopt a stopped block. Broader non-DEC reset and exceptional Assign/init remain open."
+        "Actual per-block cold invocation is prepared with the charged receipt directory. Null/shared/failed entry cannot stamp; wrong invocation, foreign value, empty receipt, double acknowledgment and stale reused generation cannot adopt a stopped block. Broader non-DEC reset and exceptional Assign/init remain open.",
+        "Prepared charged per-block source-frame directory stamps held old reference only at actual init new-pointer publication, or extra SRC reference only at actual completed INC. Exact context/slot/generation/invocation and actual owning DEC phase govern abort. Named physical census enumerates these actual held tokens; source failure never rolls back caller output or reconstructs vectors."
       ],
       "deviations": [
         "Owner-local null replaces process-global empty reference. C strings become owned nullable first-NUL payloads; replacement stages new text. Detach error retains published partial block but cleans old reference. Pooled pages persist physically until Close; inline concrete numeric tokens replace separate heap objects. Provenance/overflow guards and libstdc++ null-C-string prefix error are explicit Go adapters; Z3DEBUG pp is explicit text API rather than global stdout.",
         "SetStringSymbol explicitly translates interned bare_str pointers without a second payload; original SetString remains the owned-string adapter. Registry and generated registration are still open.",
         "The byte destination returns typed failures at debug null-description assertion or release null-string stream action, retaining emitted prefix. Existing caller-string Display API remains; tests compare valid-domain output only.",
-        "Go signed-overflow-domain TLS fixture reaches real postphysical numeral release stop; it is not valid OOM. Per-block receipt directory is actual charged Go metadata prepared before block publication, not source malloc. Pure reads and release zero-ref unsigned wrap remain source-reached; stopped-owner mutation guard is explicit Go lifetime qualification. Global assertion control/native stream profiles and exceptional non-DEC Reset/destructor closure remain open."
+        "Go signed-overflow-domain TLS fixture reaches real postphysical numeral release stop; it is not valid OOM. Per-block receipt directory is actual charged Go metadata prepared before block publication, not source malloc. Pure reads and release zero-ref unsigned wrap remain source-reached; stopped-owner mutation guard is explicit Go lifetime qualification. Global assertion control/native stream profiles and exceptional non-DEC Reset/destructor closure remain open.",
+        "This selected successor supersedes the historical detach-error old-reference cleanup description: failed copy after new pointer publication skips source oldDEC, retaining its actual old reference in a named Go source frame; explicit owning abort is separate. Failed assignment preserves old destination and completed SRC INC. Constructor failure before pointer publication leaves old reference with caller and stamps no owning frame. Serial wrap is guarded Go invocation-domain limit. NonDEC Reset/resetBlock and unselected exceptional value/copy lifecycle remain open; no whole-class/global assertion/native ABI completion."
       ]
     },
     {
@@ -124837,7 +124864,9 @@
         "util_param_descrs_stream_nodebug.go",
         "util_param_descrs_stream_test.go",
         "util_params_decrement_source.go",
-        "util_params_decrement_tracked_test.go"
+        "util_params_decrement_tracked_test.go",
+        "util_params_source_frame.go",
+        "util_params_assignment_source_test.go"
       ],
       "tests": [
         "TestParamNameNormalizationSourceBranches",
@@ -124887,7 +124916,15 @@
         "TestParamsReferenceRepeatedDECSourceAssertionAfterActualSetLimbsLeafStop",
         "TestParamsReferenceCleanupDecrementActualLeafReceipt",
         "TestParamsReferenceIndependentStoppedBlocksAndReplacementGeneration",
-        "TestParamsReferenceTrackedDecrementGuardedEntryReceipt"
+        "TestParamsReferenceTrackedDecrementGuardedEntryReceipt",
+        "TestParamsReferenceAssignmentSourcePointerPublicationAfterDEC",
+        "TestParamsReferenceInitFailedCopySkipsOldDEC",
+        "TestParamsReferenceInitFrameOwnAbortActualLeafReceipt",
+        "TestParamsReferenceTwoFramesAndFreshInvocationReuse",
+        "TestParamsReferenceNullAssignmentOldDECStop",
+        "TestParamsReferenceAssignmentSelfAliasSourceINCThenDEC",
+        "TestParamsReferenceContextCloseConsumesExactStoppedFrame",
+        "TestParamsReferenceInitConstructorFailureKeepsCallerOldReference"
       ],
       "conditionals": [
         {
@@ -125178,6 +125215,21 @@
           "tests": [
             "TestParamsReferenceTrackedDecrementGuardedEntryReceipt"
           ]
+        },
+        {
+          "name": "selected params_ref assignment srcINC then oldDEC then pointer publication, and init published-pointer copy before oldDEC with charged exact failed-source frame owning abort",
+          "status": "ported",
+          "go_target": "util_params_source_frame.go",
+          "tests": [
+            "TestParamsReferenceAssignmentSourcePointerPublicationAfterDEC",
+            "TestParamsReferenceInitFailedCopySkipsOldDEC",
+            "TestParamsReferenceInitFrameOwnAbortActualLeafReceipt",
+            "TestParamsReferenceTwoFramesAndFreshInvocationReuse",
+            "TestParamsReferenceNullAssignmentOldDECStop",
+            "TestParamsReferenceAssignmentSelfAliasSourceINCThenDEC",
+            "TestParamsReferenceContextCloseConsumesExactStoppedFrame",
+            "TestParamsReferenceInitConstructorFailureKeepsCallerOldReference"
+          ]
         }
       ],
       "ownership": [
@@ -125187,13 +125239,15 @@
         "Borrowed canonical spelling occupies existing scalar symbol field with a paramsText tag; copy retains identity and deletion frees only owned text. SymbolManager outlives borrowers; physical record stride remains reflect-accounted. See PORT_PROGRESS.md#audit-gparams-port-status-md.",
         "DisplayInto borrows charged StringBuffer64; destination then descriptor then Symbol lock order. Temporary names use actual charged old/new peaks and are refunded; text bytes read directly without intermediate strings. See PORT_PROGRESS.md#audit-param-descrs-stream-port-status-md.",
         "Actual zero-ref leaf destruction stop retains pointer-free per-block cursor/stage and precharged cold cause/generation receipts; exact current entry numeral is retained, mutation cannot replace it, independent blocks can stop/continue separately. Explicit CleanupDecrement and owning context Close acknowledge actual child release receipts without a second decrement. Whole ownership remains unproven for Reset/resetBlock outside zero-ref DEC and exceptional copy/init/value replacement.",
-        "Actual per-block cold invocation is prepared with the charged receipt directory. Null/shared/failed entry cannot stamp; wrong invocation, foreign value, empty receipt, double acknowledgment and stale reused generation cannot adopt a stopped block. Broader non-DEC reset and exceptional Assign/init remain open."
+        "Actual per-block cold invocation is prepared with the charged receipt directory. Null/shared/failed entry cannot stamp; wrong invocation, foreign value, empty receipt, double acknowledgment and stale reused generation cannot adopt a stopped block. Broader non-DEC reset and exceptional Assign/init remain open.",
+        "Prepared charged per-block source-frame directory stamps held old reference only at actual init new-pointer publication, or extra SRC reference only at actual completed INC. Exact context/slot/generation/invocation and actual owning DEC phase govern abort. Named physical census enumerates these actual held tokens; source failure never rolls back caller output or reconstructs vectors."
       ],
       "deviations": [
         "Owner-local null replaces process-global empty reference. C strings become owned nullable first-NUL payloads; replacement stages new text. Detach error retains published partial block but cleans old reference. Pooled pages persist physically until Close; inline concrete numeric tokens replace separate heap objects. Provenance/overflow guards and libstdc++ null-C-string prefix error are explicit Go adapters; Z3DEBUG pp is explicit text API rather than global stdout.",
         "SetStringSymbol explicitly translates interned bare_str pointers without a second payload; original SetString remains the owned-string adapter. Registry and generated registration are still open.",
         "The byte destination returns typed failures at debug null-description assertion or release null-string stream action, retaining emitted prefix. Existing caller-string Display API remains; tests compare valid-domain output only.",
-        "Go signed-overflow-domain TLS fixture reaches real postphysical numeral release stop; it is not valid OOM. Per-block receipt directory is actual charged Go metadata prepared before block publication, not source malloc. Pure reads and release zero-ref unsigned wrap remain source-reached; stopped-owner mutation guard is explicit Go lifetime qualification. Global assertion control/native stream profiles and exceptional non-DEC Reset/destructor closure remain open."
+        "Go signed-overflow-domain TLS fixture reaches real postphysical numeral release stop; it is not valid OOM. Per-block receipt directory is actual charged Go metadata prepared before block publication, not source malloc. Pure reads and release zero-ref unsigned wrap remain source-reached; stopped-owner mutation guard is explicit Go lifetime qualification. Global assertion control/native stream profiles and exceptional non-DEC Reset/destructor closure remain open.",
+        "This selected successor supersedes the historical detach-error old-reference cleanup description: failed copy after new pointer publication skips source oldDEC, retaining its actual old reference in a named Go source frame; explicit owning abort is separate. Failed assignment preserves old destination and completed SRC INC. Constructor failure before pointer publication leaves old reference with caller and stamps no owning frame. Serial wrap is guarded Go invocation-domain limit. NonDEC Reset/resetBlock and unselected exceptional value/copy lifecycle remain open; no whole-class/global assertion/native ABI completion."
       ]
     },
     {

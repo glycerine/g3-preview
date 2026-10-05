@@ -434,8 +434,14 @@ func TestParamsReferenceSourceGrowthAndFailurePrefixes(t *testing.T) {
 	if e != nil && e != arena.ErrInjectedFailure {
 		t.Fatal(e)
 	}
-	if c.Stats().References != refs {
-		t.Fatal("detach lost reference")
+	retained := uint32(0)
+	for _, frame := range c.sourceFrames {
+		if frame.active {
+			retained++
+		}
+	}
+	if c.Stats().References != refs+retained {
+		t.Fatal("source published current and retained old references", c.Stats().References, refs, retained)
 	}
 	stats, e := q.Stats()
 	paramsMust(t, e)
@@ -460,6 +466,14 @@ func paramsAuditRoots(t *testing.T, c *ParamsContext, q *mpnum.RationalService, 
 		var refs uint32
 		for _, r := range roots {
 			if r.slot == uint32(i+1) {
+				refs++
+			}
+		}
+		for _, frame := range c.sourceFrames {
+			if frame.active && frame.heldSlot == uint32(i+1) && !frame.decrementStarted {
+				if frame.invocation == 0 || frame.heldGeneration != b.generation {
+					t.Fatal("invalid actual held source reference")
+				}
 				refs++
 			}
 		}
@@ -670,8 +684,12 @@ func TestParamsReferenceReservationFailureSweeps(t *testing.T) {
 			paramsAuditRoots(t, c, q, base, qs.LivePayloads, []ParamsRef{a, b, bank})
 			c.budget.FailAfter(-1)
 			if (op == 0 || op == 1) && a.slot != b.slot {
-				if c.blocks[b.slot-1].refs != 1 {
-					t.Fatal("detach error retained old reference")
+				wantRefs := uint32(1)
+				if c.sourceFrames[a.slot-1].active {
+					wantRefs++
+				}
+				if c.blocks[b.slot-1].refs != wantRefs {
+					t.Fatal("source copy completion frontier refs", c.blocks[b.slot-1].refs, wantRefs)
 				}
 				copied := &c.blocks[a.slot-1]
 				source := &c.blocks[b.slot-1]
@@ -841,7 +859,7 @@ func TestParamsReferenceExactContextAccountingAndGrowthPeak(t *testing.T) {
 	check := func() {
 		s := c.Stats()
 		d := s.Text.Descriptors
-		total := s.HeaderBytes + s.BlockBytes + s.ReceiptBytes + s.PageBytes + s.DirectoryBytes + s.FormatBytes + s.Text.OwnerBytes + s.Text.PayloadBytes + s.Text.BlockMetadataBytes + s.Text.DirectoryBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes
+		total := s.HeaderBytes + s.BlockBytes + s.ReceiptBytes + s.SourceFrameBytes + s.PageBytes + s.DirectoryBytes + s.FormatBytes + s.Text.OwnerBytes + s.Text.PayloadBytes + s.Text.BlockMetadataBytes + s.Text.DirectoryBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes
 		if c.budget.Used() != borrowed+total {
 			t.Fatal("actual context charge", c.budget.Used(), borrowed+total)
 		}
