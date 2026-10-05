@@ -143,6 +143,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	}
 	adapterBytes += uint64(cap(full.composition.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size())
 	adapterBytes += uint64(cap(full.derivative.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size())
+	adapterBytes += uint64(cap(full.derivative.orphanInvocations)) * 8
 	if full.upm != nil {
 		u := full.upm
 		if len(u.store.backings) != 0 || len(u.pages) != 0 {

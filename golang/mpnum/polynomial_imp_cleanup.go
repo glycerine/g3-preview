@@ -121,7 +121,10 @@ func (m *MultivariatePolynomialManager) callerGuard() error {
 	if m.originalCause != nil {
 		return nil
 	} // an unreturned failed constructor has no callers.
-	distinct := uint32(0)
+	distinct, e := m.core.factoryCallerGuard()
+	if e != nil {
+		return e
+	}
 	for i := uint32(0); ; i++ {
 		p, ok, e := m.privatePolynomial(i)
 		if e != nil {

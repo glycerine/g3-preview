@@ -17,6 +17,9 @@ func (m *MultivariatePolynomialCore) monomialRefCount(a Monomial) (uint32, error
 	return m.monomials.allocator.ReadUint32(l.raw, 0)
 }
 func (m *MultivariatePolynomialCore) cleanupCreation() error {
+	if _, e := m.factoryCallerGuard(); e != nil {
+		return e
+	}
 	if e := m.cleanupGeneratedMonomial(); e != nil {
 		return e
 	}
@@ -47,12 +50,25 @@ func (m *MultivariatePolynomialCore) cleanupCreation() error {
 		m.singletonReference = false
 		m.singletonMonomial = Monomial{}
 	}
+	if s := &m.factoryInvocation; s.active {
+		r := polynomialFactoryInvocationReceipt{manager: m, frame: s, invocation: s.invocation}
+		if e := m.cleanupFactoryInvocation(&r, true); e != nil {
+			return e
+		}
+	}
 	return nil
 }
 
 // Drain only the actual pending placement, excluding other lexical owners.
 func (m *MultivariatePolynomialCore) cleanupPendingCreation() error {
 	p := &m.pending
+	// The real source move clears its vector slot before writing placement.
+	// Only that constructor's exact append frame may retain the intervening NUM.
+	if s := p.appendParent; s != nil && s == &m.cheap.appendScope && s.active && s.factoryInvocation == p.generation {
+		if e := m.deleteNumeral(&s.movingCoefficient); e != nil {
+			return e
+		}
+	}
 	if p.value != (Polynomial{}) {
 		l, e := m.polynomialLocation(p.value)
 		if e != nil {

@@ -1,0 +1,67 @@
+// Source: src/math/polynomial/polynomial.cpp:4507-4528,5114-5156;
+// src/util/scoped_numeral.h; src/util/obj_ref.h.
+// Licensed under the MIT license. Source author: Leonardo de Moura.
+package mpnum
+
+// Cold owning continuation identities are acquired only at the actual guarded
+// invocation. The source NUM arithmetic and persistent buffers stay unchanged.
+type polynomialDerivativeInvocationReceipt struct {
+	orphanDrain uint32
+	manager     *MultivariatePolynomialManager
+	frame       *polynomialDerivativeScope
+	invocation  uint64
+}
+type polynomialExactDivInvocationReceipt struct {
+	core       *MultivariatePolynomialCore
+	frame      *polynomialExactDivisionScope
+	invocation uint64
+}
+
+func (m *MultivariatePolynomialManager) matchesDerivativeInvocation(r *polynomialDerivativeInvocationReceipt) bool {
+	return r != nil && r.manager == m && r.frame == &m.derivative && r.invocation != 0 && r.frame.invocation == r.invocation && r.frame.active
+}
+func (m *MultivariatePolynomialManager) derivativeInvocationSourceCause(r *polynomialDerivativeInvocationReceipt) error {
+	if m.matchesDerivativeInvocation(r) {
+		return r.frame.sourceCause
+	}
+	return nil
+}
+func (m *MultivariatePolynomialManager) cleanupDerivativeInvocation(r *polynomialDerivativeInvocationReceipt, abort bool) error {
+	if r == nil || r.manager != m || r.frame != &m.derivative || r.invocation == 0 {
+		return nil
+	}
+	if m.matchesDerivativeInvocation(r) {
+		return m.cleanupDerivativeModeOwned(abort, r.invocation, &r.orphanDrain)
+	}
+	if !abort {
+		return nil
+	}
+	if e := m.identity(); e != nil {
+		return e
+	}
+	if m.derivative.executing {
+		return ErrPolynomialPending
+	}
+	if e := m.cleanupDerivativeOrphanInvocation(r.invocation, &r.orphanDrain); e != nil {
+		return e
+	}
+	if m.derivative.invocation == r.invocation {
+		m.releaseDerivativeRetirementIfEmpty()
+	}
+	return nil
+}
+func (m *MultivariatePolynomialCore) matchesExactDivInvocation(r *polynomialExactDivInvocationReceipt) bool {
+	return r != nil && r.core == m && r.frame == &m.exactDivision && r.invocation != 0 && r.frame.invocation == r.invocation && r.frame.kind == 1 && r.frame.active
+}
+func (m *MultivariatePolynomialCore) exactDivInvocationSourceCause(r *polynomialExactDivInvocationReceipt) error {
+	if m.matchesExactDivInvocation(r) {
+		return r.frame.sourceCause
+	}
+	return nil
+}
+func (m *MultivariatePolynomialCore) cleanupExactDivInvocation(r *polynomialExactDivInvocationReceipt, abort bool) error {
+	if !m.matchesExactDivInvocation(r) {
+		return nil
+	}
+	return m.exactDivisionCleanupPhase(true, abort)
+}

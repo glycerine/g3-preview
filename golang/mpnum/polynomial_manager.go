@@ -28,6 +28,7 @@ type MultivariatePolynomialConfig struct {
 	Cooperation func() error
 }
 type polynomialCreation struct {
+	appendParent       *polynomialCheapAppendScope
 	factorsParent      *PolynomialFactors
 	conversionParent   *polynomialGlobalConversionScope
 	toPolynomialParent *polynomialToPolynomialScope
@@ -85,6 +86,7 @@ type MultivariatePolynomialCore struct {
 	sourceCause                                                                                error
 	sourceDecDone, sourceDeleteNeeded                                                          [2]bool
 	polynomialNegScope
+	factoryInvocation                                            polynomialFactoryScope
 	scalarDivision                                               polynomialScalarDivScope
 	deletionHead                                                 *PolynomialDeletionHandler
 	callbackDepth                                                uint32
@@ -447,7 +449,10 @@ func (m *MultivariatePolynomialCore) CloseChecked() error {
 				}
 			}
 		}
-		private := uint32(0)
+		private, e := m.factoryCallerGuard()
+		if e != nil {
+			return e
+		}
 		if m.zero != (Polynomial{}) && m.sourceStage == 0 {
 			private++
 		}

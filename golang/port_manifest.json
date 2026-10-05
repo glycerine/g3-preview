@@ -28623,7 +28623,13 @@
         "mpnum/polynomial_som_normalize_scope.go",
         "mpnum/polynomial_sparse_embedded_constructor_source_test.go",
         "mpnum/polynomial_neg_scope.go",
-        "mpnum/polynomial_scalar_div.go"
+        "mpnum/polynomial_scalar_div.go",
+        "mpnum/polynomial_factory_receipt.go",
+        "mpnum/polynomial_cheap_append_receipt.go",
+        "mpnum/polynomial_factor_callee_receipts.go",
+        "mpnum/polynomial_factor_callee_receipts_source_test.go",
+        "mpnum/polynomial_exact_div_source_stop_actual_test.go",
+        "mpnum/polynomial_factory_owning_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -29136,7 +29142,23 @@
         "TestPolynomialNegFailedSetterSourceDestructorGuard",
         "TestPolynomialScalarDivLiteralIntegerAndFieldValues",
         "TestPolynomialScalarDivEmptyDoesNotReadDivisor",
-        "TestPolynomialScalarDivEveryActualReservationPrefix"
+        "TestPolynomialScalarDivEveryActualReservationPrefix",
+        "TestPolynomialFactoryReceiptActualConstructorPrefixes",
+        "TestPolynomialFactoryReceiptReplacementAndRejectedEntry",
+        "TestPolynomialFactoryReceiptCheapTransferOwnsActualFactory",
+        "TestPolynomialFactoryReceiptPreservesUnreceiptedReplacement",
+        "TestPolynomialCheapAppendReceiptActualActionsAndZeroGuard",
+        "TestPolynomialCheapAppendReceiptEveryActualConstructionPrefix",
+        "TestPolynomialCheapAppendReceiptMixedForeignRefusal",
+        "TestPolynomialCheapAppendReceiptUniqueReplacement",
+        "TestPolynomialCheapAppendReceiptForeignSameCardinality",
+        "TestPolynomialCheapAppendReceiptActualFactoryTransferPrefixes",
+        "TestPolynomialFactoryOwningCloseRetainedActualResult",
+        "TestPolynomialFactoryOwningConstructionActualPrefixes",
+        "TestPolynomialDerivativeInvocationAcquisitionAndReplacement",
+        "TestPolynomialExactDivInvocationQuickAndCompleted",
+        "TestPolynomialDerivativeReceiptPreservesEarlierGF2CreatedCohort",
+        "TestPolynomialExactDivActualNUMStopPreservesOlderReference"
       ],
       "conditionals": [
         {
@@ -32095,6 +32117,37 @@
             "TestPolynomialScalarDivEmptyDoesNotReadDivisor",
             "TestPolynomialScalarDivEveryActualReservationPrefix"
           ]
+        },
+        {
+          "name": "manager::imp::mk_cell actual optional factory owning receipt cpp2481-2495",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_factory_receipt.go",
+          "tests": [
+            "TestPolynomialFactoryReceiptActualConstructorPrefixes",
+            "TestPolynomialFactoryOwningCloseRetainedActualResult",
+            "TestPolynomialFactoryOwningConstructionActualPrefixes"
+          ]
+        },
+        {
+          "name": "cheap_som append and constructor transfer optional owning receipts cpp2238-2299",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_cheap_append_receipt.go",
+          "tests": [
+            "TestPolynomialCheapAppendReceiptEveryActualConstructionPrefix",
+            "TestPolynomialCheapAppendReceiptActualFactoryTransferPrefixes",
+            "TestPolynomialCheapAppendReceiptForeignSameCardinality"
+          ]
+        },
+        {
+          "name": "Derivative cpp4507-4528 and ExactDiv cpp5114-5156 optional guarded invocation receipts with source NUM-first stopped destructor and separate exact owning continuation; owning SOM consumed-last DEC acknowledgment cpp1885-1940",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_factor_callee_receipts.go",
+          "tests": [
+            "TestPolynomialDerivativeInvocationAcquisitionAndReplacement",
+            "TestPolynomialExactDivInvocationQuickAndCompleted",
+            "TestPolynomialDerivativeReceiptPreservesEarlierGF2CreatedCohort",
+            "TestPolynomialExactDivActualNUMStopPreservesOlderReference"
+          ]
         }
       ],
       "ownership": [
@@ -32147,7 +32200,11 @@
         "Neg and ScalarDiv concrete receipts identify actual core, stable embedded scope pointer and unique nonwrapping guarded invocation nonce",
         "Source NUM destructor stops remain separate from explicit owning completed-local acknowledgement and unjoined numeric abort",
         "Only actual arithmetic leaf pending NUM cell and allocator tokens are captured; no whole-call snapshot, registry scan or reference-count inference",
-        "Shared cheap SOM and enclosing Discriminant factory ownership remain separate open prerequisites"
+        "Shared cheap SOM and enclosing Discriminant factory ownership remain separate open prerequisites",
+        "Factory owning authority is stamped at actual guarded constructor and allocator leaf actions, identifies exact manager/stable frame/unique invocation, and retains actual published raw pointer before pending clear",
+        "Generic owning construction/close drains exact retained constructor and transported NUM roots; raw factory contributes no INC and actual caller reference refuses before cleanup",
+        "Append receipts record actual coefficient construction/INC/transfer actions; mixed foreign cohorts refuse unchanged as a partial prerequisite; ordered mixed-cohort retirement and parent Discriminant remain open",
+        "Actual derivative created roots retain pointer-free invocation tags published with their append, charged with backing, and cleared at actual successful monomial INC or exact owning consumption. Per-receipt cursor drains only its invocation; later abort preserves older GF2 cohort. Generic manager-wide cleanup remains separate. Source NUM/cause/stage remain sticky, explicit owned cleanup acknowledges consumed last DEC without dropping older lexical monomial first. No registry or reference-count inference grants cohort authority."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -32198,7 +32255,8 @@
         "source globals/ostream/profile/reentrancy guarantees inherit existing dependent engine limitations; no universal C++ ABI allocation geometry claim",
         "all unrelated polynomial imp/GCD/ICCP/CRA/Resultant methods remain parent/numeric scope",
         "WASM/WASI/race deferred per project instructions",
-        "Selected algorithms and explicit Runtime/NUM cohorts only. Actual signed-TLS/consumed-raw proofs exercise guarded owner domains, not claimed ordinary mathematical OOM reachability. Global mgcd_check/TRACE/assertion dispatcher/native ostream/other ABI and source expression-driver construction remain open. Original tst_polynomial returns after PSC: dormant GCD/primitive source fixture bodies have zero active-driver credit. Eight original PSC cases reach first coefficient8, second coefficient5 and Resultant8 selected ENSURE expressions (21 dynamic expressions at3 static sites); full original registered-driver lifecycle/printing is not promoted."
+        "Selected algorithms and explicit Runtime/NUM cohorts only. Actual signed-TLS/consumed-raw proofs exercise guarded owner domains, not claimed ordinary mathematical OOM reachability. Global mgcd_check/TRACE/assertion dispatcher/native ostream/other ABI and source expression-driver construction remain open. Original tst_polynomial returns after PSC: dormant GCD/primitive source fixture bodies have zero active-driver credit. Eight original PSC cases reach first coefficient8, second coefficient5 and Resultant8 selected ENSURE expressions (21 dynamic expressions at3 static sites); full original registered-driver lifecycle/printing is not promoted.",
+        "Actual public TLS near-minimum release fixture reaches guarded source signed-host undefined arithmetic domain, not ordinary free OOM. Zero registered driver assertion credit and no unit promotion; full Factor/Discriminant, parent lexical lifetimes and mixed foreign ordered cohort retirement remain open. Factory/append interrupted move has no ordinary reservation point between source slot clear and destination write; no manufactured reservation coverage is claimed."
       ]
     },
     {

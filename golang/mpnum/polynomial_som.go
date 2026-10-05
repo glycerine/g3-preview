@@ -8,33 +8,35 @@ import (
 )
 
 type polynomialSOM struct {
-	factorsParent                 *PolynomialFactors
-	factorsGeneration             uint64
-	retirementOwner               *PolynomialSOMBuffer
-	borrowedAppend                bool
-	borrowedAppendIndex           uint32
-	unreferencedConsumed          bool
-	unreferencedIndex             uint32
-	removeActive, removeStopped   bool
-	removePrefix, removeSuffix    uint32
-	owner                         *MultivariatePolynomialCore
-	positions                     MonomialPositions
-	as, ms                        polynomialVector
-	gcd                           Int
-	gcdActive                     bool
-	gcdEnded                      bool
-	gcdGeneration                 uint64
-	gcdInvocation                 uint64
-	gcdSubstitution               *polynomialSubstitutionScope
-	gcdNormalization              *polynomialNormalizeScope
-	gcdNumeric                    polynomialNumericRoots
-	gcdBodyCause, gcdCleanupCause error
-	pendingMonomial               Monomial
-	transferred, cleanupIndex     uint32
-	cheap, hasPendingReference    bool
-	resetActive                   bool
-	resetIndex                    uint32
-	resetStage                    uint8
+	appendScope                          polynomialCheapAppendScope
+	factorsParent                        *PolynomialFactors
+	factorsGeneration                    uint64
+	retirementOwner                      *PolynomialSOMBuffer
+	borrowedAppend                       bool
+	borrowedAppendIndex                  uint32
+	unreferencedConsumed                 bool
+	unreferencedIndex                    uint32
+	removeActive, removeStopped          bool
+	removePrefix, removeSuffix           uint32
+	owner                                *MultivariatePolynomialCore
+	positions                            MonomialPositions
+	as, ms                               polynomialVector
+	gcd                                  Int
+	gcdActive                            bool
+	gcdEnded                             bool
+	gcdGeneration                        uint64
+	gcdInvocation                        uint64
+	gcdSubstitution                      *polynomialSubstitutionScope
+	gcdNormalization                     *polynomialNormalizeScope
+	gcdNumeric                           polynomialNumericRoots
+	gcdBodyCause, gcdCleanupCause        error
+	pendingMonomial                      Monomial
+	transferred, cleanupIndex            uint32
+	cleanupDropConsumed, cleanupDropLast bool
+	cheap, hasPendingReference           bool
+	resetActive                          bool
+	resetIndex                           uint32
+	resetStage                           uint8
 }
 
 func (b *polynomialSOM) init(m *MultivariatePolynomialCore, cheap bool) {
@@ -52,6 +54,9 @@ func (b *polynomialSOM) addConsumed(a *Int, term Monomial, take bool, consumed *
 	return b.addConsumedNumeric(a, term, take, consumed, nil)
 }
 func (b *polynomialSOM) addConsumedNumeric(a *Int, term Monomial, take bool, consumed *bool, receipt *polynomialNumericRoots) error {
+	return b.addConsumedReceipts(a, term, take, consumed, receipt, nil)
+}
+func (b *polynomialSOM) addConsumedReceipts(a *Int, term Monomial, take bool, consumed *bool, receipt *polynomialNumericRoots, appendReceipt *polynomialCheapAppendInvocationReceipt) (cause error) {
 	if consumed != nil {
 		*consumed = false
 	}
@@ -98,6 +103,19 @@ func (b *polynomialSOM) addConsumedNumeric(a *Int, term Monomial, take bool, con
 	if e != nil {
 		return e
 	}
+	var appendScope *polynomialCheapAppendScope
+	if appendReceipt != nil {
+		if e = b.acquireAppendInvocation(appendReceipt, n); e != nil {
+			return e
+		}
+		appendScope = &b.appendScope
+		receipt = &appendScope.numeric
+		defer func() {
+			if cause != nil {
+				appendScope.stopped = true
+			}
+		}()
+	}
 	if b.retirementOwner != nil {
 		if e = b.retirementOwner.prepareRetirement(n + 1); e != nil {
 			return e
@@ -110,7 +128,11 @@ func (b *polynomialSOM) addConsumedNumeric(a *Int, term Monomial, take bool, con
 		}
 	}
 	if b.cheap {
-		if e = b.as.appendCoefficient(m, Int{}); e != nil {
+		observer := appendScope
+		if observer == nil && b.appendScope.active {
+			observer = &b.appendScope
+		}
+		if e = b.as.appendCoefficientWithAppendScope(m, Int{}, observer, appendScope != nil); e != nil {
 			return e
 		}
 		value, e := b.as.coefficient(m, n)
@@ -132,6 +154,9 @@ func (b *polynomialSOM) addConsumedNumeric(a *Int, term Monomial, take bool, con
 	if e = m.monomials.IncRef(term); e != nil {
 		return e
 	}
+	if appendScope != nil {
+		appendScope.pending = term
+	}
 	if consumed != nil {
 		*consumed = true
 	}
@@ -142,6 +167,10 @@ func (b *polynomialSOM) addConsumedNumeric(a *Int, term Monomial, take bool, con
 	}
 	if e = b.ms.appendMonomial(m, term); e != nil {
 		return e
+	}
+	if appendScope != nil {
+		appendScope.pending = Monomial{}
+		appendScope.monomials = n + 1
 	}
 	b.hasPendingReference = false
 	b.pendingMonomial = Monomial{}
@@ -629,6 +658,12 @@ func (b *polynomialSOM) normalizeWithOwner(parent *polynomialNormalizeScope) (re
 	return nil
 }
 func (b *polynomialSOM) mk(normalize bool) (Polynomial, error) {
+	return b.mkWithFactoryReceipt(normalize, nil)
+}
+func (b *polynomialSOM) mkWithFactoryReceipt(normalize bool, receipt *polynomialFactoryInvocationReceipt) (Polynomial, error) {
+	return b.mkWithAppendReceipt(normalize, nil, receipt)
+}
+func (b *polynomialSOM) mkWithAppendReceipt(normalize bool, appendReceipt *polynomialCheapAppendInvocationReceipt, receipt *polynomialFactoryInvocationReceipt) (Polynomial, error) {
 	if !b.cheap {
 		if e := b.removeZeros(normalize); e != nil {
 			return Polynomial{}, e
@@ -638,7 +673,7 @@ func (b *polynomialSOM) mk(normalize bool) (Polynomial, error) {
 	if e != nil {
 		return Polynomial{}, e
 	}
-	p, e := b.owner.mkCell(n, nil, nil, b, nil)
+	p, e := b.owner.mkCellWithReceipts(n, nil, nil, b, nil, receipt, appendReceipt)
 	if e != nil {
 		return Polynomial{}, e
 	}
@@ -647,6 +682,9 @@ func (b *polynomialSOM) mk(normalize bool) (Polynomial, error) {
 	}
 	if e = b.ms.reset(b.owner); e != nil {
 		return Polynomial{}, e
+	}
+	if b.matchesAppendInvocation(appendReceipt) {
+		b.appendScope.completedTransfer = true
 	}
 	b.transferred = 0
 	return p, nil
@@ -702,12 +740,24 @@ func (b *polynomialSOM) close() error {
 			if e != nil {
 				return e
 			}
-			if !b.cheap && !(b.resetActive && i == b.resetIndex && b.resetStage >= 1) && !(b.removeActive && b.removeStopped && i == b.removeSuffix) {
+			if !b.cheap && !b.cleanupDropConsumed && !(b.resetActive && i == b.resetIndex && b.resetStage >= 1) && !(b.removeActive && b.removeStopped && i == b.removeSuffix) {
 				if e = b.positions.Reset(x); e != nil {
 					return e
 				}
 			}
-			if (b.resetActive && i == b.resetIndex && b.resetStage == 3) || (b.removeActive && b.removeStopped && i == b.removeSuffix) {
+			if b.cleanupDropConsumed {
+				// The actual preceding DEC wrote zero before its deletion refused.
+				// Resume only that caller-reachable slot; never DEC it again.
+				if b.cleanupDropLast {
+					e = m.monomials.CleanupValue(&x)
+					if w := b.ms.putMonomial(m, i, x); w != nil {
+						return w
+					}
+					if e != nil {
+						return e
+					}
+				}
+			} else if (b.resetActive && i == b.resetIndex && b.resetStage == 3) || (b.removeActive && b.removeStopped && i == b.removeSuffix) {
 				l, e := m.monomials.location(x)
 				if e != nil {
 					return e
@@ -719,10 +769,22 @@ func (b *polynomialSOM) close() error {
 				} else if e = m.monomials.DecRef(x); e != nil {
 					return e
 				}
-			} else if e = m.monomials.DecRef(x); e != nil {
-				return e
+			} else {
+				outcome := monomialDecrementOutcome{}
+				if e = m.monomials.check(); e == nil {
+					e = m.monomials.decRefCoreOutcome(x, &outcome)
+				}
+				if outcome.written {
+					b.cleanupDropConsumed = true
+					b.cleanupDropLast = outcome.last
+				}
+				if e != nil {
+					return e
+				}
 			}
 		}
+		b.cleanupDropConsumed = false
+		b.cleanupDropLast = false
 		b.cleanupIndex++
 	}
 	if e = b.ms.close(m); e != nil {

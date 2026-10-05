@@ -399,6 +399,7 @@ func (m *MonomialManager) incRefCore(a Monomial) error {
 
 	if d := l.derivativeCohort; d != nil && uint64(l.derivativeSlot) < uint64(len(d.orphans)) && d.orphans[l.derivativeSlot] == a {
 		d.orphans[l.derivativeSlot] = Monomial{}
+		d.orphanInvocations[l.derivativeSlot] = 0
 		l.derivativeCohort = nil
 		l.derivativeSlot = 0
 	}

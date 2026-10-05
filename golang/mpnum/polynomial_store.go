@@ -158,6 +158,9 @@ func (v *polynomialVector) putMonomial(m *MultivariatePolynomialCore, i uint32, 
 	return m.memory.WriteUint32(v.raw, o+12, a.generation)
 }
 func (v *polynomialVector) appendCoefficient(m *MultivariatePolynomialCore, a Int) error {
+	return v.appendCoefficientWithAppendScope(m, a, nil, false)
+}
+func (v *polynomialVector) appendCoefficientWithAppendScope(m *MultivariatePolynomialCore, a Int, scope *polynomialCheapAppendScope, owned bool) error {
 	i, e := v.appendSlot(m)
 	if e != nil {
 		return e
@@ -179,6 +182,15 @@ func (v *polynomialVector) appendCoefficient(m *MultivariatePolynomialCore, a In
 	v.retiredActive = uint32(len(v.retired))
 	if i >= v.initialized {
 		v.initialized = i + 1
+	}
+	// The actual zero NUM slot exists before vector-size publication and the
+	// subsequent SET. A stopped SET still belongs to this constructed row.
+	if scope != nil {
+		if owned {
+			scope.coefficients = i + 1
+		} else {
+			scope.foreignMixed = true
+		}
 	}
 	return v.publishSize(m, i+1)
 }
@@ -272,8 +284,31 @@ func (m *MultivariatePolynomialCore) publishDirectory(p Polynomial, id uint32) e
 	return m.polynomials.putMonomial(m, id, Monomial{owner: p.owner, slot: p.slot, generation: p.generation})
 }
 func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, buffer *polynomialSOM, single *Int) (Polynomial, error) {
+	return m.mkCellWithReceipt(n, as, ms, buffer, single, nil)
+}
+func (m *MultivariatePolynomialCore) mkCellWithReceipt(n uint32, as []Int, ms []Monomial, buffer *polynomialSOM, single *Int, receipt *polynomialFactoryInvocationReceipt) (Polynomial, error) {
+	return m.mkCellWithReceipts(n, as, ms, buffer, single, receipt, nil)
+}
+func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []Int, ms []Monomial, buffer *polynomialSOM, single *Int, receipt *polynomialFactoryInvocationReceipt, appendReceipt *polynomialCheapAppendInvocationReceipt) (Polynomial, error) {
 	if m.pending.raw != (memory.ObjectRef{}) || m.pending.value != (Polynomial{}) {
 		return Polynomial{}, ErrPolynomialPending
+	}
+	if receipt != nil && m.factoryInvocation.active {
+		return Polynomial{}, ErrPolynomialPending
+	}
+	var appendScope *polynomialCheapAppendScope
+	if appendReceipt != nil && appendReceipt.invocation != 0 {
+		if buffer == nil || !buffer.matchesAppendInvocation(appendReceipt) {
+			return Polynomial{}, ErrPolynomialPending
+		}
+		appendScope = &buffer.appendScope
+		size, e := buffer.as.size(m)
+		if e != nil {
+			return Polynomial{}, e
+		}
+		if appendScope.foreignMixed || appendScope.stopped || appendScope.completedTransfer || appendScope.monomials != n || appendScope.coefficients != size || buffer.hasPendingReference {
+			return Polynomial{}, ErrPolynomialPending
+		}
 	}
 	// Actual constructor start receipt, after the foreign pending guard.
 	if m.creationGeneration == ^uint64(0) {
@@ -281,6 +316,18 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 	}
 	m.creationGeneration++
 	m.pending = polynomialCreation{generation: m.creationGeneration}
+	if appendScope != nil {
+		m.pending.appendParent = appendScope
+		appendScope.factoryInvocation = m.creationGeneration
+	} else if buffer != nil && buffer.appendScope.active {
+		// Actual unreceipted constructor transfer is foreign to the old append
+		// cohort, even when a later vector happens to have identical sizes.
+		buffer.appendScope.foreignMixed = true
+	}
+	if receipt != nil {
+		m.factoryInvocation = polynomialFactoryScope{active: true, invocation: m.creationGeneration}
+		*receipt = polynomialFactoryInvocationReceipt{manager: m, frame: &m.factoryInvocation, invocation: m.creationGeneration}
+	}
 	if f := m.factorsOwner; f != nil && f.executing && m.callbackDepth == 0 {
 		m.pending.factorsParent = f
 		f.factoryGeneration = m.creationGeneration
@@ -312,7 +359,7 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 	observer := m.pending.compositionParent
 	squareObserver := m.pending.squareRootParent
 	var before [3]memory.Block
-	if observer != nil || squareObserver != nil || m.pending.toPolynomialParent != nil || m.pending.conversionParent != nil || m.pending.factorsParent != nil {
+	if receipt != nil || observer != nil || squareObserver != nil || m.pending.toPolynomialParent != nil || m.pending.conversionParent != nil || m.pending.factorsParent != nil {
 		var e error
 		before, e = m.monomials.allocator.PendingRoots()
 		if e != nil {
@@ -320,6 +367,15 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 		}
 	}
 	raw, e := m.monomials.allocator.Allocate(uint64(requested))
+	if receipt != nil {
+		after, x := m.monomials.allocator.PendingRoots()
+		for i := range after {
+			if after[i] != (memory.Block{}) && after[i] != before[i] {
+				m.factoryInvocation.allocator[i] = after[i]
+			}
+		}
+		e = polynomialNewtonJoin(e, x)
+	}
 	if raw != (memory.ObjectRef{}) {
 		m.pending.raw = raw
 		m.pending.requested = requested
@@ -409,6 +465,9 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 			if e = buffer.as.putCoefficient(m, i, Int{}); e != nil {
 				return Polynomial{}, e
 			}
+			if appendScope != nil {
+				appendScope.movingCoefficient = a
+			}
 		} else if single != nil {
 			a = *single
 			*single = Int{}
@@ -421,6 +480,10 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 		}
 		if e = m.writeCoefficient(p, i, a); e != nil {
 			return Polynomial{}, e
+		}
+		if appendScope != nil {
+			appendScope.movingCoefficient = Int{}
+			appendScope.transferredCoefficients = i + 1
 		}
 		var term Monomial
 		if buffer != nil {
@@ -459,6 +522,9 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 		}
 		if buffer != nil {
 			buffer.transferred = i + 1
+			if appendScope != nil {
+				appendScope.transferredMonomials = i + 1
+			}
 		}
 		if i > 0 {
 			best, e := m.monomialCore(p, max)
@@ -508,6 +574,9 @@ func (m *MultivariatePolynomialCore) mkCell(n uint32, as []Int, ms []Monomial, b
 	if f := m.pending.factorsParent; f != nil && f.factoryGeneration == m.pending.generation {
 		f.factoryGeneration = 0
 		f.freshResult = p
+	}
+	if receipt != nil {
+		m.factoryInvocation.result = p
 	}
 	m.pending = polynomialCreation{}
 	m.live++
