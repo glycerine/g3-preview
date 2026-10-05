@@ -1,5 +1,5 @@
-// Source: src/math/polynomial/polynomial.cpp; src/math/polynomial/polynomial.h. Licensed under the MIT license.
-// Concrete translation of polynomial.cpp monomial2pos (449–505).
+// Source: src/math/polynomial/polynomial.cpp:449-505; src/math/polynomial/polynomial.h. Licensed under the MIT license.
+// Concrete translation of src/math/polynomial/polynomial.cpp:449-505 monomial2pos.
 package mpnum
 
 import (
@@ -15,6 +15,8 @@ import (
 // allocation, retained solely for explicit Go owning cleanup after an error.
 // Implicit copies of this owning wrapper are rejected.
 type MonomialPositions struct {
+	markerFrame                     *polynomialArithmeticScope
+	markerInvocation                uint64
 	self                            *MonomialPositions
 	manager                         *MonomialManager
 	raw, pending                    memory.Block
@@ -112,6 +114,9 @@ func (p *MonomialPositions) expand() error {
 		}
 		return e
 	}
+	if s := p.markerFrame; s != nil && s.positionPublished && s.invocation == p.markerInvocation && s.positionBlock == before {
+		s.positionBlock = p.raw
+	}
 	return r.WriteUint32(p.raw, 0, nc)
 }
 func (p *MonomialPositions) reserve(n uint32) error {
@@ -193,9 +198,19 @@ func (p *MonomialPositions) Reset(a Monomial) error {
 			return ErrMonomialAssertion
 		}
 	}
-	return p.manager.memory.WriteUint32(p.raw, 8+uint64(id)*4, ^uint32(0))
+	if e = p.manager.memory.WriteUint32(p.raw, 8+uint64(id)*4, ^uint32(0)); e != nil {
+		return e
+	}
+	p.acknowledgeMarkerWrite(id)
+	return nil
 }
 func (p *MonomialPositions) Set(a Monomial, pos uint32) error {
+	return p.setWithArithmeticReceipt(a, pos, nil)
+}
+func (p *MonomialPositions) setWithArithmeticReceipt(a Monomial, pos uint32, r *polynomialArithmeticInvocationReceipt) error {
+	if r != nil && !p.acceptsArithmeticMarker(r) {
+		return ErrPolynomialOwner
+	}
 	if e := p.check(); e != nil {
 		return e
 	}
@@ -215,7 +230,21 @@ func (p *MonomialPositions) Set(a Monomial, pos uint32) error {
 			return ErrMonomialAssertion
 		}
 	}
-	return p.manager.memory.WriteUint32(p.raw, 8+uint64(id)*4, pos)
+	if e = p.manager.memory.WriteUint32(p.raw, 8+uint64(id)*4, pos); e != nil {
+		return e
+	}
+	p.acknowledgeMarkerWrite(id)
+	if r != nil {
+		s := r.frame
+		s.positionTerm = a
+		s.positionPublished = true
+		s.positionBlock = p.raw
+		s.positionID = id
+		s.positionValue = pos
+		p.markerFrame = s
+		p.markerInvocation = r.invocation
+	}
+	return nil
 }
 
 // These concrete arrays replace only the two source Poly template loops. The
@@ -257,7 +286,12 @@ func (p *MonomialPositions) SourceFinalize() error {
 	}
 	p.finalizing = true
 	if p.raw != (memory.Block{}) {
-		if e := p.manager.memory.Deallocate(&p.raw); e != nil {
+		before := p.raw
+		e := p.manager.memory.Deallocate(&p.raw)
+		if p.raw == (memory.Block{}) {
+			p.acknowledgeReleasedMarker(before)
+		}
+		if e != nil {
 			return e
 		}
 	}
@@ -275,11 +309,15 @@ func (p *MonomialPositions) CloseChecked() error {
 	}
 	p.finalizing = true
 	if p.raw != (memory.Block{}) {
+		before := p.raw
 		var e error
 		if p.partialRaw {
 			e = p.manager.memory.CleanupPartial(&p.raw)
 		} else {
 			e = p.manager.memory.Deallocate(&p.raw)
+		}
+		if p.raw == (memory.Block{}) {
+			p.acknowledgeReleasedMarker(before)
 		}
 		if e != nil {
 			return e

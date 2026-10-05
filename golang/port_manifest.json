@@ -28861,7 +28861,9 @@
         "mpnum/polynomial_factor_n_sqf_source_test.go",
         "mpnum/polynomial_power_invocation.go",
         "mpnum/polynomial_power_child_source_test.go",
-        "mpnum/polynomial_power_raw_stop_source_test.go"
+        "mpnum/polynomial_power_raw_stop_source_test.go",
+        "mpnum/polynomial_arithmetic_position_marker_source_test.go",
+        "mpnum/polynomial_position_marker.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -29556,7 +29558,13 @@
         "TestPolynomialPowerMatchedAbortPreservesForeignRegularRow",
         "TestPolynomialPowerSourceContinuationCopiedOwnerRefuses",
         "TestPolynomialPowerBodyHistorySurvivesExactOwnACK",
-        "TestPolynomialPowerYoungerAddMulSourceStopPreservesOlderResultAndHistory"
+        "TestPolynomialPowerYoungerAddMulSourceStopPreservesOlderResultAndHistory",
+        "TestPolynomialRegularBorrowedPositionSurvivesOlderMonomialDestruction",
+        "TestPolynomialRegularPositionMarkerPreservesRecycledForeignWrite",
+        "TestPolynomialRegularPositionMarkerCallbackWritePreserved",
+        "TestPolynomialRegularPositionMarkerRejectsCopiedAndStaleAcquisition",
+        "TestPolynomialRegularPositionMarkerActualMapDestructionConsumesToken",
+        "TestPolynomialRegularPositionMarkerPostphysicalMapRelease"
       ],
       "conditionals": [
         {
@@ -33065,6 +33073,19 @@
             "TestPolynomialPowerBodyHistorySurvivesExactOwnACK",
             "TestPolynomialPowerYoungerAddMulSourceStopPreservesOlderResultAndHistory"
           ]
+        },
+        {
+          "name": "polynomial.cpp:454-481 monomial2pos Set/Reset actual write token and regular borrowed-before-INC owning continuation",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_position_marker.go",
+          "tests": [
+            "TestPolynomialRegularBorrowedPositionSurvivesOlderMonomialDestruction",
+            "TestPolynomialRegularPositionMarkerPreservesRecycledForeignWrite",
+            "TestPolynomialRegularPositionMarkerCallbackWritePreserved",
+            "TestPolynomialRegularPositionMarkerRejectsCopiedAndStaleAcquisition",
+            "TestPolynomialRegularPositionMarkerActualMapDestructionConsumesToken",
+            "TestPolynomialRegularPositionMarkerPostphysicalMapRelease"
+          ]
         }
       ],
       "ownership": [
@@ -33170,7 +33191,9 @@
         "False completes younger reached child source suffix before caller older locals; true retires exact unjoined rows/factory/generated leaves afterward. Source cause and child diagnostic identities persist across owning acknowledgment. Copied factory source frame cannot acknowledge real child; stale reused Coeff/AR/append/factory tuples preserve current physical roots.",
         "No additional lexical NUM or polynomial reference; actual factors Push publishes borrowed pointer before INC and records exact acquired ownership. Actual assertion predicate frames remain owned by the full manager; all prefix graphs precede fault lift, predicate/factors owning cleanup preserves caller RC.",
         "Power polynomial.cpp:4600-4614 acquires only its actual charged embedded result frame for k>=2 after existing entry/active/nonwrapping generation guards; exact manager/frame/nonce identifies the actual Mul arithmetic child. Completed younger source children precede older result destruction; only explicit abort drains matched unjoined child roots afterward. Source/body causes and concrete child identity survive owning acknowledgment without retaining result or numeric payload authority; new guarded invocation retires that history.",
-        "Power polynomial.cpp:4600-4614 preserves the identical nonnil cleanupCause together with bodyCause/sourceCause and concrete arithmetic child identity through false/true owning acknowledgment; inactive metadata carries no result/numeric authority. Actual next guarded invocation retires all prior history."
+        "Power polynomial.cpp:4600-4614 preserves the identical nonnil cleanupCause together with bodyCause/sourceCause and concrete arithmetic child identity through false/true owning acknowledgment; inactive metadata carries no result/numeric authority. Actual next guarded invocation retires all prior history.",
+        "Exact actual Set write stamps actual embedded positions owner/self, arithmetic frame/nonwrapping captured invocation and vector block/id/value. Owning reset reads the exact position slot without dereferencing borrowed monomial. Successful foreign Set/Reset acknowledges prior token at its actual write; actual reallocation carries the existing token at publication. Actual row push transfers marker ownership to the source row; no extra monomial INC.",
+        "Actual map SourceFinalize/Close acknowledges only the token bound to that physically consumed map block, before propagating any postphysical release error. Refused releases retain exact marker authority. Immutable body/source error values are not overwritten by token retirement."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -33249,7 +33272,9 @@
         "Selected Divides/Neg/linear/quadratic helpers only; full factorization, held Discriminant/Resultant parent and original dormant driver completion are not claimed. Signed-host TLS destructor-stop evidence is a guarded owner-primitive profile, not ordinary OOM. Newton duplicate cold census and deterministic public stream fixture corrections preserve physical/source assertions. Existing Divides full Close preguard already prevents mutation; no unnecessary new guard introduced.",
         "Selected two-buffer optional Coeff continuation only. Pseudo/Resultant/Power/Discriminant actual parent child extraction remains separate; no whole polynomial/source driver completion credit. Metadata of actual foreign callback Coeff invocation remains admitted at reached source actions, while direct numerical acquisition still requires callbackDepth zero; no new callback allocating-OOM completion claim.",
         "The source itself leaves higher-degree multivariate factorization as a TODO and pushes the original factor. This port preserves that literal algorithm; no enclosing Factor dispatcher/univariate backend completion or dormant source-driver credit is claimed.",
-        "Power ownership tests include real every-reservation prefixes, later foreign regular row preservation and signed-host TLS/direct-allocator RAW end-DEL profile, not ordinary mathematical free OOM. Copied-owner/frame and stale receipt tests are invalid-Go-owner guard coverage. Existing active linear Power arithmetic status is preserved; no complete Pseudo/Resultant/Discriminant/Factor or source-unit/registered-driver promotion."
+        "Power ownership tests include real every-reservation prefixes, later foreign regular row preservation and signed-host TLS/direct-allocator RAW end-DEL profile, not ordinary mathematical free OOM. Copied-owner/frame and stale receipt tests are invalid-Go-owner guard coverage. Existing active linear Power arithmetic status is preserved; no complete Pseudo/Resultant/Discriminant/Factor or source-unit/registered-driver promotion.",
+        "Pointer-free numeric position identity plus charged cold owner/frame marker is a Go owning adaptation; public source Set/Reset order and vector geometry remain unchanged. Copied/stale/callback receipt guard fixtures are invalid Go metadata tests, independent of the valid actual reservation refusal proof. No Pseudo/Resultant or full factorization completion claim.",
+        "Postphysical map release is proven in a qualified signed-host TLS owner-primitive domain using only public allocation/reallocation setup and public recovery, not ordinary mathematical OOM. Frozen predecessor release gap and RED logs are preserved."
       ]
     },
     {
@@ -68532,7 +68557,9 @@
       "status": "partial",
       "go_targets": [
         "util_smt_dyn_ack_params.go",
-        "util_smt_dyn_ack_params_source_test.go"
+        "util_smt_dyn_ack_params_source_test.go",
+        "util_smt_module_params_source.go",
+        "util_smt_array_params_source_test.go"
       ],
       "tests": [
         "TestSMTDynAckConstructorLiteralDefaultsAndFallbackOrder",
@@ -68541,7 +68568,10 @@
         "TestSMTDynAckLiteralDisplayFlagsEveryOutputRefusalAndBadFile",
         "TestSMTDynAckEveryActualUnwarmedSymbolAndHelperConstructorPrefix",
         "TestSMTDynAckReachedNamespaceAssertionConstructorPrefix",
-        "TestSMTDynAckDisplayNumericBoolShowPosSignedLongProfile"
+        "TestSMTDynAckDisplayNumericBoolShowPosSignedLongProfile",
+        "TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards",
+        "TestSMTArrayConstructorAndUpdateEveryRealReservationPrefix",
+        "TestSMTArrayConstructorUninitializedGlobalsAndFunctionFailureRetry"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -68559,10 +68589,21 @@
             "TestSMTDynAckReachedNamespaceAssertionConstructorPrefix",
             "TestSMTDynAckDisplayNumericBoolShowPosSignedLongProfile"
           ]
+        },
+        {
+          "name": "Concrete embedded generated module helper engine shared with array without changing dack assignments or source acquisition/destructor order (scripts/mk_genfile_common.py:895-939; src/smt/params/dyn_ack_params.cpp:22-30)",
+          "status": "partial",
+          "go_target": "util_smt_module_params_source.go",
+          "tests": [
+            "TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards",
+            "TestSMTArrayConstructorAndUpdateEveryRealReservationPrefix",
+            "TestSMTArrayConstructorUninitializedGlobalsAndFunctionFailureRetry"
+          ]
         }
       ],
       "ownership": [
-        "Actual acquired helper module ParamsRef is stamped only at SourceGetModuleName return; lexical source DelTracked before function return, retained exact decrement receipt separate from owning Close. Standalone Go wrapper/helper are actual reflected cold allocations, not native scalar/stack malloc credit. Original Symbol/Params/global owners remain borrowed."
+        "Actual acquired helper module ParamsRef is stamped only at SourceGetModuleName return; lexical source DelTracked before function return, retained exact decrement receipt separate from owning Close. Standalone Go wrapper/helper are actual reflected cold allocations, not native scalar/stack malloc credit. Original Symbol/Params/global owners remain borrowed.",
+        "The concrete generated helper owner is embedded once in the actual reflected parameter wrapper header; each reached lexical helper frame charges its actual cold fields, borrows the local ParamsRef pointer and acquires its module reference only at the returned SourceGetModuleName result. Source DelTracked executes before return; any stopped destructor retains its exact decrement receipt for separate owning Close. Caller contexts/global services remain borrowed."
       ],
       "deviations": [
         "No registered SMT context/kernel driver credit. Scalar base embedding into complete smt_params and native global/locale/boolalpha profiles remain open. Go invalid local/closed/null owner guards and standalone incomplete-constructor owning continuation are explicit adapter domains. Strategy outside source enumerators is only selected fixed-width Go representation evidence. Generated helper credit is limited to six dack accessor definitions; full helper/generator remain partial."
@@ -68575,7 +68616,9 @@
       "status": "partial",
       "go_targets": [
         "util_smt_dyn_ack_params.go",
-        "util_smt_dyn_ack_params_source_test.go"
+        "util_smt_dyn_ack_params_source_test.go",
+        "util_smt_module_params_source.go",
+        "util_smt_array_params_source_test.go"
       ],
       "tests": [
         "TestSMTDynAckConstructorLiteralDefaultsAndFallbackOrder",
@@ -68584,7 +68627,10 @@
         "TestSMTDynAckLiteralDisplayFlagsEveryOutputRefusalAndBadFile",
         "TestSMTDynAckEveryActualUnwarmedSymbolAndHelperConstructorPrefix",
         "TestSMTDynAckReachedNamespaceAssertionConstructorPrefix",
-        "TestSMTDynAckDisplayNumericBoolShowPosSignedLongProfile"
+        "TestSMTDynAckDisplayNumericBoolShowPosSignedLongProfile",
+        "TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards",
+        "TestSMTArrayConstructorAndUpdateEveryRealReservationPrefix",
+        "TestSMTArrayConstructorUninitializedGlobalsAndFunctionFailureRetry"
       ],
       "conditionals": [
         {
@@ -68612,10 +68658,21 @@
             "TestSMTDynAckReachedNamespaceAssertionConstructorPrefix",
             "TestSMTDynAckDisplayNumericBoolShowPosSignedLongProfile"
           ]
+        },
+        {
+          "name": "Concrete embedded generated module helper engine shared with array without changing dack assignments or source acquisition/destructor order (scripts/mk_genfile_common.py:895-939; src/smt/params/dyn_ack_params.cpp:22-30)",
+          "status": "partial",
+          "go_target": "util_smt_module_params_source.go",
+          "tests": [
+            "TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards",
+            "TestSMTArrayConstructorAndUpdateEveryRealReservationPrefix",
+            "TestSMTArrayConstructorUninitializedGlobalsAndFunctionFailureRetry"
+          ]
         }
       ],
       "ownership": [
-        "Actual acquired helper module ParamsRef is stamped only at SourceGetModuleName return; lexical source DelTracked before function return, retained exact decrement receipt separate from owning Close. Standalone Go wrapper/helper are actual reflected cold allocations, not native scalar/stack malloc credit. Original Symbol/Params/global owners remain borrowed."
+        "Actual acquired helper module ParamsRef is stamped only at SourceGetModuleName return; lexical source DelTracked before function return, retained exact decrement receipt separate from owning Close. Standalone Go wrapper/helper are actual reflected cold allocations, not native scalar/stack malloc credit. Original Symbol/Params/global owners remain borrowed.",
+        "The concrete generated helper owner is embedded once in the actual reflected parameter wrapper header; each reached lexical helper frame charges its actual cold fields, borrows the local ParamsRef pointer and acquires its module reference only at the returned SourceGetModuleName result. Source DelTracked executes before return; any stopped destructor retains its exact decrement receipt for separate owning Close. Caller contexts/global services remain borrowed."
       ],
       "deviations": [
         "No registered SMT context/kernel driver credit. Scalar base embedding into complete smt_params and native global/locale/boolalpha profiles remain open. Go invalid local/closed/null owner guards and standalone incomplete-constructor owning continuation are explicit adapter domains. Strategy outside source enumerators is only selected fixed-width Go representation evidence. Generated helper credit is limited to six dack accessor definitions; full helper/generator remain partial."
@@ -68785,7 +68842,10 @@
       "status": "partial",
       "go_targets": [
         "util_smt_dyn_ack_params.go",
-        "util_smt_dyn_ack_params_source_test.go"
+        "util_smt_dyn_ack_params_source_test.go",
+        "util_smt_array_params.go",
+        "util_smt_module_params_source.go",
+        "util_smt_array_params_source_test.go"
       ],
       "tests": [
         "TestSMTDynAckConstructorLiteralDefaultsAndFallbackOrder",
@@ -68794,7 +68854,13 @@
         "TestSMTDynAckLiteralDisplayFlagsEveryOutputRefusalAndBadFile",
         "TestSMTDynAckEveryActualUnwarmedSymbolAndHelperConstructorPrefix",
         "TestSMTDynAckReachedNamespaceAssertionConstructorPrefix",
-        "TestSMTDynAckDisplayNumericBoolShowPosSignedLongProfile"
+        "TestSMTDynAckDisplayNumericBoolShowPosSignedLongProfile",
+        "TestSMTArrayConstructorElevenDefaultsDoesNotUpdate",
+        "TestSMTArrayDisplayExactlyNineFieldsAndSignedBooleanShowPos",
+        "TestSMTArrayConstructorAndUpdateEveryRealReservationPrefix",
+        "TestSMTArrayConstructorUninitializedGlobalsAndFunctionFailureRetry",
+        "TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards",
+        "TestSMTArrayEveryActualOutputReservationAndClosedFileBadbit"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -68812,13 +68878,28 @@
             "TestSMTDynAckReachedNamespaceAssertionConstructorPrefix",
             "TestSMTDynAckDisplayNumericBoolShowPosSignedLongProfile"
           ]
+        },
+        {
+          "name": "Two array accessor definitions sharing exact borrowed-local/module/literal engine (src/smt/params/smt_params_helper.pyg:59-60; scripts/mk_genfile_common.py:895-939)",
+          "status": "partial",
+          "go_target": "util_smt_array_params.go",
+          "tests": [
+            "TestSMTArrayConstructorElevenDefaultsDoesNotUpdate",
+            "TestSMTArrayDisplayExactlyNineFieldsAndSignedBooleanShowPos",
+            "TestSMTArrayConstructorAndUpdateEveryRealReservationPrefix",
+            "TestSMTArrayConstructorUninitializedGlobalsAndFunctionFailureRetry",
+            "TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards",
+            "TestSMTArrayEveryActualOutputReservationAndClosedFileBadbit"
+          ]
         }
       ],
       "ownership": [
-        "Actual acquired helper module ParamsRef is stamped only at SourceGetModuleName return; lexical source DelTracked before function return, retained exact decrement receipt separate from owning Close. Standalone Go wrapper/helper are actual reflected cold allocations, not native scalar/stack malloc credit. Original Symbol/Params/global owners remain borrowed."
+        "Actual acquired helper module ParamsRef is stamped only at SourceGetModuleName return; lexical source DelTracked before function return, retained exact decrement receipt separate from owning Close. Standalone Go wrapper/helper are actual reflected cold allocations, not native scalar/stack malloc credit. Original Symbol/Params/global owners remain borrowed.",
+        "The concrete generated helper owner is embedded once in the actual reflected parameter wrapper header; each reached lexical helper frame charges its actual cold fields, borrows the local ParamsRef pointer and acquires its module reference only at the returned SourceGetModuleName result. Source DelTracked executes before return; any stopped destructor retains its exact decrement receipt for separate owning Close. Caller contexts/global services remain borrowed."
       ],
       "deviations": [
-        "No registered SMT context/kernel driver credit. Scalar base embedding into complete smt_params and native global/locale/boolalpha profiles remain open. Go invalid local/closed/null owner guards and standalone incomplete-constructor owning continuation are explicit adapter domains. Strategy outside source enumerators is only selected fixed-width Go representation evidence. Generated helper credit is limited to six dack accessor definitions; full helper/generator remain partial."
+        "No registered SMT context/kernel driver credit. Scalar base embedding into complete smt_params and native global/locale/boolalpha profiles remain open. Go invalid local/closed/null owner guards and standalone incomplete-constructor owning continuation are explicit adapter domains. Strategy outside source enumerators is only selected fixed-width Go representation evidence. Generated helper credit is limited to six dack accessor definitions; full helper/generator remain partial.",
+        "No complete SMT context, generated-helper/generator, native global/locale/boolalpha or registered SMT driver completion credit. The standalone facade and lexical-frame reflected cold charges are explicit Go ownership representation rather than native scalar/stack allocations. Disabled array registration is erased; Array constructor never reads params or performs update."
       ]
     },
     {
@@ -68861,22 +68942,62 @@
       "path": "src/smt/params/theory_array_params.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_smt_array_params.go",
+        "util_smt_module_params_source.go",
+        "util_smt_array_params_source_test.go"
+      ],
+      "tests": [
+        "TestSMTArrayConstructorElevenDefaultsDoesNotUpdate",
+        "TestSMTArrayDisplayExactlyNineFieldsAndSignedBooleanShowPos",
+        "TestSMTArrayConstructorAndUpdateEveryRealReservationPrefix",
+        "TestSMTArrayConstructorUninitializedGlobalsAndFunctionFailureRetry",
+        "TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards",
+        "TestSMTArrayEveryActualOutputReservationAndClosedFileBadbit"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Literal weak then extensional RHS/publication, source module-reference destructor and nine separate ostream endl chains (src/smt/params/theory_array_params.cpp:22-40)",
+          "status": "partial",
+          "go_target": "util_smt_array_params.go",
+          "tests": [
+            "TestSMTArrayConstructorElevenDefaultsDoesNotUpdate",
+            "TestSMTArrayDisplayExactlyNineFieldsAndSignedBooleanShowPos",
+            "TestSMTArrayConstructorAndUpdateEveryRealReservationPrefix",
+            "TestSMTArrayConstructorUninitializedGlobalsAndFunctionFailureRetry",
+            "TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards",
+            "TestSMTArrayEveryActualOutputReservationAndClosedFileBadbit"
+          ]
+        }
+      ],
+      "ownership": [
+        "The concrete generated helper owner is embedded once in the actual reflected parameter wrapper header; each reached lexical helper frame charges its actual cold fields, borrows the local ParamsRef pointer and acquires its module reference only at the returned SourceGetModuleName result. Source DelTracked executes before return; any stopped destructor retains its exact decrement receipt for separate owning Close. Caller contexts/global services remain borrowed."
+      ],
+      "deviations": [
+        "No complete SMT context, generated-helper/generator, native global/locale/boolalpha or registered SMT driver completion credit. The standalone facade and lexical-frame reflected cold charges are explicit Go ownership representation rather than native scalar/stack allocations. Disabled array registration is erased; Array constructor never reads params or performs update."
+      ]
     },
     {
       "path": "src/smt/params/theory_array_params.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_smt_array_params.go",
+        "util_smt_module_params_source.go",
+        "util_smt_array_params_source_test.go"
+      ],
+      "tests": [
+        "TestSMTArrayConstructorElevenDefaultsDoesNotUpdate",
+        "TestSMTArrayDisplayExactlyNineFieldsAndSignedBooleanShowPos",
+        "TestSMTArrayConstructorAndUpdateEveryRealReservationPrefix",
+        "TestSMTArrayConstructorUninitializedGlobalsAndFunctionFailureRetry",
+        "TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards",
+        "TestSMTArrayEveryActualOutputReservationAndClosedFileBadbit"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -68897,9 +69018,27 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Eleven declaration-order scalar defaults; constructor performs no update; disabled registration erased (src/smt/params/theory_array_params.h:24-75)",
+          "status": "partial",
+          "go_target": "util_smt_array_params.go",
+          "tests": [
+            "TestSMTArrayConstructorElevenDefaultsDoesNotUpdate",
+            "TestSMTArrayDisplayExactlyNineFieldsAndSignedBooleanShowPos",
+            "TestSMTArrayConstructorAndUpdateEveryRealReservationPrefix",
+            "TestSMTArrayConstructorUninitializedGlobalsAndFunctionFailureRetry",
+            "TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards",
+            "TestSMTArrayEveryActualOutputReservationAndClosedFileBadbit"
+          ]
+        }
+      ],
+      "ownership": [
+        "The concrete generated helper owner is embedded once in the actual reflected parameter wrapper header; each reached lexical helper frame charges its actual cold fields, borrows the local ParamsRef pointer and acquires its module reference only at the returned SourceGetModuleName result. Source DelTracked executes before return; any stopped destructor retains its exact decrement receipt for separate owning Close. Caller contexts/global services remain borrowed."
+      ],
+      "deviations": [
+        "No complete SMT context, generated-helper/generator, native global/locale/boolalpha or registered SMT driver completion credit. The standalone facade and lexical-frame reflected cold charges are explicit Go ownership representation rather than native scalar/stack allocations. Disabled array registration is erased; Array constructor never reads params or performs update."
+      ]
     },
     {
       "path": "src/smt/params/theory_bv_params.cpp",

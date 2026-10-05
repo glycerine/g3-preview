@@ -96,7 +96,7 @@ func dynAckNamedColdGraph(t *testing.T, d *SMTDynAckParams, g *GlobalParamsServi
 		}
 		total += d.header
 		for f := d.helpers; f != nil; f = f.next {
-			if f.owner != d {
+			if f.owner != &d.smtModuleParamsOwner {
 				t.Fatal("actual helper acquisition owner")
 			}
 			total += f.header
@@ -266,7 +266,7 @@ func TestSMTDynAckEveryActualUnwarmedSymbolAndHelperConstructorPrefix(t *testing
 		if d != nil {
 			named += d.header
 			for f := d.helpers; f != nil; f = f.next {
-				if f.owner != d {
+				if f.owner != &d.smtModuleParamsOwner {
 					t.Fatal("helper owner")
 				}
 				named += f.header

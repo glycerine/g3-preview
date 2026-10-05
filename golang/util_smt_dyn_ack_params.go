@@ -5,7 +5,6 @@
 package g3
 
 import (
-	"errors"
 	"github.com/glycerine/g3/golang/arena"
 	"reflect"
 )
@@ -20,24 +19,12 @@ type SMTDynAckState struct {
 	Threshold, GC  uint32
 	GCInverseDecay float64
 }
-type smtDynAckHelper struct {
-	owner                                    *SMTDynAckParams
-	next                                     *smtDynAckHelper
-	value                                    ParamsRef
-	receipt                                  ParamsDecrementReceipt
-	header                                   uint64
-	acquired, destructorStarted, sourceDone  bool
-	bodyCause, destructorCause, cleanupCause error
-}
 type SMTDynAckParams struct {
+	smtModuleParamsOwner
 	self             *SMTDynAckParams
-	context          *ParamsContext
-	globals          *GlobalParamsService
-	budget           *arena.Budget
 	state            SMTDynAckState
-	helpers          *smtDynAckHelper
 	header           uint64
-	running, closed  bool
+	closed           bool
 	constructorCause error
 	constructorReady bool
 }
@@ -56,8 +43,9 @@ func NewSMTDynAckParams(c *ParamsContext, p *ParamsRef, g *GlobalParamsService, 
 	if e := b.Reserve(n); e != nil {
 		return nil, e
 	}
-	s := &SMTDynAckParams{context: c, globals: g, budget: b, header: n, state: SMTDynAckState{1, false, 0.1, 10, 2000, 0.8}}
+	s := &SMTDynAckParams{smtModuleParamsOwner: smtModuleParamsOwner{context: c, globals: g, budget: b}, header: n, state: SMTDynAckState{1, false, 0.1, 10, 2000, 0.8}}
 	s.self = s
+	s.smtModuleParamsOwner.self = &s.smtModuleParamsOwner
 	e := s.update(p)
 	if e != nil {
 		s.constructorCause = e
@@ -83,30 +71,6 @@ func (s *SMTDynAckParams) State() (SMTDynAckState, error) {
 	}
 	return s.state, nil
 }
-func (s *SMTDynAckParams) finishHelper(f *smtDynAckHelper, body error) error {
-	if f.bodyCause == nil {
-		f.bodyCause = body
-	}
-	if !f.acquired {
-		s.helpers = f.next
-		s.budget.Release(f.header)
-		f.header = 0
-		return body
-	}
-	f.destructorStarted = true
-	e := s.context.DelTracked(&f.value, &f.receipt)
-	if e != nil {
-		if f.destructorCause == nil {
-			f.destructorCause = e
-		}
-		return errors.Join(body, e)
-	}
-	f.sourceDone = true
-	s.helpers = f.next
-	s.budget.Release(f.header)
-	f.header = 0
-	return body
-}
 func (s *SMTDynAckParams) Update(p *ParamsRef) error {
 	if e := s.open(); e != nil {
 		return e
@@ -127,51 +91,45 @@ func (s *SMTDynAckParams) update(p *ParamsRef) (result error) {
 	}
 	s.running = true
 	defer func() { s.running = false }()
-	n := uint64(reflect.TypeOf(smtDynAckHelper{}).Size())
-	if e := s.budget.Reserve(n); e != nil {
-		return e
+	f, e := s.beginHelper(p, "smt")
+	if f != nil {
+		defer func() { result = s.finishHelper(f, result) }()
 	}
-	f := &smtDynAckHelper{owner: s, header: n, next: s.helpers}
-	s.helpers = f
-	defer func() { result = s.finishHelper(f, result) }()
-	var e error
-	f.value, e = s.globals.SourceGetModuleName("smt")
 	if e != nil {
 		return e
 	}
-	f.acquired = true // authority is this actual returned module reference.
 	key := "dack"
-	u, e := s.context.GetUIntFallbackName(p, &key, &f.value, 1)
+	u, e := s.frameUInt(f, key, 1)
 	if e != nil {
 		return e
 	}
 	s.state.Strategy = u
 	key = "dack.eq"
-	v, e := s.context.GetBoolFallbackName(p, &key, &f.value, false)
+	v, e := s.frameBool(f, key, false)
 	if e != nil {
 		return e
 	}
 	s.state.Equalities = v
 	key = "dack.factor"
-	d, e := s.context.GetDoubleFallbackName(p, &key, &f.value, 0.1)
+	d, e := s.frameDouble(f, key, 0.1)
 	if e != nil {
 		return e
 	}
 	s.state.Factor = d
 	key = "dack.threshold"
-	u, e = s.context.GetUIntFallbackName(p, &key, &f.value, 10)
+	u, e = s.frameUInt(f, key, 10)
 	if e != nil {
 		return e
 	}
 	s.state.Threshold = u
 	key = "dack.gc"
-	u, e = s.context.GetUIntFallbackName(p, &key, &f.value, 2000)
+	u, e = s.frameUInt(f, key, 2000)
 	if e != nil {
 		return e
 	}
 	s.state.GC = u
 	key = "dack.gc_inv_decay"
-	d, e = s.context.GetDoubleFallbackName(p, &key, &f.value, 0.8)
+	d, e = s.frameDouble(f, key, 0.8)
 	if e != nil {
 		return e
 	}
@@ -188,35 +146,8 @@ func (s *SMTDynAckParams) Close() error {
 	if s.running {
 		return ErrParamsPrecondition
 	}
-	s.running = true
-	defer func() { s.running = false }()
-	for s.helpers != nil {
-		f := s.helpers
-		if f.owner != s {
-			return ErrParamsOwner
-		}
-		if f.acquired && !f.sourceDone {
-			var e error
-			if f.destructorStarted {
-				if f.receipt.invocation == 0 {
-					return f.destructorCause
-				}
-				e = s.context.CompleteDecrement(&f.value, f.receipt)
-			} else {
-				f.destructorStarted = true
-				e = s.context.DelTracked(&f.value, &f.receipt)
-			}
-			if e != nil {
-				if f.cleanupCause == nil {
-					f.cleanupCause = e
-				}
-				return e
-			}
-			f.sourceDone = true
-		}
-		s.helpers = f.next
-		s.budget.Release(f.header)
-		f.header = 0
+	if e := s.closeHelpers(); e != nil {
+		return e
 	}
 	s.budget.Release(s.header)
 	s.header = 0

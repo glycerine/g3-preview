@@ -26,6 +26,8 @@ type polynomialArithmeticScope struct {
 	transport                                         Int
 	transportSlot                                     uint32
 	transportBound                                    bool
+	positionBlock                                     memory.Block
+	positionID, positionValue                         uint32
 	positionTerm                                      Monomial
 	positionPublished                                 bool
 	calleeGeneration                                  uint64
@@ -217,7 +219,7 @@ func (m *MultivariatePolynomialCore) cleanupArithmeticInvocation(r *polynomialAr
 		return e
 	}
 	if s.positionPublished {
-		if e := s.buffer.positions.Reset(s.positionTerm); e != nil {
+		if e := s.buffer.positions.cleanupArithmeticMarker(r); e != nil {
 			return e
 		}
 		s.positionPublished = false

@@ -171,12 +171,8 @@ func (b *polynomialSOM) addConsumedScalarNegEngine(a *Int, term Monomial, take b
 	}
 
 	if !b.cheap {
-		if e = b.positions.Set(term, n); e != nil {
+		if e = b.positions.setWithArithmeticReceipt(term, n, arithmeticReceipt); e != nil {
 			return e
-		}
-		if arithmeticReceipt != nil {
-			arithmeticReceipt.frame.positionTerm = term
-			arithmeticReceipt.frame.positionPublished = true
 		}
 	}
 	if b.cheap {
@@ -272,8 +268,7 @@ func (b *polynomialSOM) addConsumedScalarNegEngine(a *Int, term Monomial, take b
 	b.hasPendingReference = false
 	b.pendingMonomial = Monomial{}
 	if arithmeticReceipt != nil {
-		arithmeticReceipt.frame.positionPublished = false
-		arithmeticReceipt.frame.positionTerm = Monomial{}
+		b.positions.releaseArithmeticMarker(arithmeticReceipt)
 	}
 	if !b.cheap {
 		if e = b.as.appendCoefficientWithAppendScope(m, Int{}, observer, appendScope != nil); e != nil {
@@ -467,23 +462,18 @@ func (b *polynomialSOM) addSourceInputWithArithmeticReceipt(a *Int, term Monomia
 				}
 			}
 			if !b.cheap {
-				if e = b.positions.Set(prod, n); e != nil {
+				if e = b.positions.setWithArithmeticReceipt(prod, n, receipt); e != nil {
 					return e
 				}
 				// Source regular push precedes INC. This publication is a
 				// borrowed pointer, so the cheap post-INC hook cannot stamp
 				// monomial ownership here. Authority is stamped below only
 				// after the actual successful INC.
-				if receipt != nil {
-					receipt.frame.positionTerm = prod
-					receipt.frame.positionPublished = true
-				}
 				if e = b.ms.appendMonomial(m, prod); e != nil {
 					return e
 				}
 				if receipt != nil {
-					receipt.frame.positionPublished = false
-					receipt.frame.positionTerm = Monomial{}
+					b.positions.releaseArithmeticMarker(receipt)
 				}
 				if b.appendScope.active {
 					b.monomialOwners[n], b.monomialTransferred[n] = 0, 0
