@@ -27,6 +27,7 @@ type UPolynomialFactorizationService struct {
 type UPolynomialFactorizationStats struct {
 	OwnerBytes, RetainedOwnerBytes uint64
 	RetainedScopes                 uint32
+	MignottePending                bool
 }
 
 func NewUPolynomialFactorizationService(m *UPolynomialManager, c UPolynomialFactorizationConfig) (*UPolynomialFactorizationService, error) {
@@ -91,6 +92,7 @@ func (s *UPolynomialFactorizationService) Stats() UPolynomialFactorizationStats 
 	if s.scope != nil {
 		r.RetainedScopes = 1
 		r.RetainedOwnerBytes = s.scope.header
+		r.MignottePending = s.scope.mignotte.active
 	}
 	return r
 }

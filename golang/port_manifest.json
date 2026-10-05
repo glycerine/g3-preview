@@ -37830,8 +37830,40 @@
       "component": "math",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "mpnum/integer_allocation_invocation_context.go",
+        "mpnum/mpz_power_shift.go",
+        "mpnum/mpzzp_ops.go",
+        "mpnum/polynomial_derivative_allocation_context.go",
+        "mpnum/upolynomial.go",
+        "mpnum/upolynomial_factor_recombine.go",
+        "mpnum/upolynomial_factor_scope.go",
+        "mpnum/upolynomial_factor_service.go",
+        "mpnum/upolynomial_mignotte_addmul_stop_source_test.go",
+        "mpnum/upolynomial_mignotte_allocation_context.go",
+        "mpnum/upolynomial_mignotte_body_source_test.go",
+        "mpnum/upolynomial_mignotte_context_source_test.go",
+        "mpnum/upolynomial_mignotte_direct_source_test.go",
+        "mpnum/upolynomial_mignotte_invocation.go",
+        "mpnum/upolynomial_mignotte_owner_transport_source_test.go",
+        "mpnum/upolynomial_mignotte_parent_source_test.go",
+        "mpnum/upolynomial_mignotte_physical_source_test.go",
+        "mpnum/upolynomial_mignotte_root_stop_source_test.go",
+        "mpnum/upolynomial_source_finalize.go",
+        "upolynomial_factor_retained_scope_source_test.go"
+      ],
+      "tests": [
+        "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
+        "TestUPolynomialMignotteLiteralIndependentExponent",
+        "TestUPolynomialMignotteBIGEveryActualSourcePrefix",
+        "TestUPolynomialMignotteSourceDegreeAssertionBeforeNUM",
+        "TestUPolynomialMignotteExactContextAndReusedReceipt",
+        "TestUPolynomialMignotteActualYoungerNUMStopsOlderFields",
+        "TestUPolynomialMignotteTransportCannotRetireExecutingOwner",
+        "TestUPolynomialMignotteSourceFinalizerPreservesOlderParent",
+        "TestUPolynomialMignotteActualRootEndStopsOlderNUM",
+        "TestUPolynomialFactorRetainedLexicalCleanup"
+      ],
       "conditionals": [
         {
           "line": 1148,
@@ -37942,9 +37974,41 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "upolynomial_factorization.cpp:979-1017 mignotte_bound literal direct numeric body and reverse tmp/bound/norm source destruction",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_factor_recombine.go",
+          "tests": [
+            "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
+            "TestUPolynomialMignotteLiteralIndependentExponent",
+            "TestUPolynomialMignotteBIGEveryActualSourcePrefix",
+            "TestUPolynomialMignotteSourceDegreeAssertionBeforeNUM",
+            "TestUPolynomialMignotteExactContextAndReusedReceipt",
+            "TestUPolynomialMignotteActualYoungerNUMStopsOlderFields",
+            "TestUPolynomialMignotteTransportCannotRetireExecutingOwner",
+            "TestUPolynomialMignotteSourceFinalizerPreservesOlderParent",
+            "TestUPolynomialMignotteActualRootEndStopsOlderNUM"
+          ]
+        },
+        {
+          "name": "upolynomial_factorization.cpp:1023-1465 factor_square_free selected source-only enclosing epilogue and separate exact owning continuation",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_factor_scope.go",
+          "tests": [
+            "TestUPolynomialMignotteSourceFinalizerPreservesOlderParent",
+            "TestUPolynomialMignotteTransportCannotRetireExecutingOwner"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual charged enclosing frame owns norm/bound/tmp at their literal declaration frontiers; direct Integer acquisition leaves plus exact Root/AddMul/PN child receipts; source reverse destruction and separate false/true owning cleanup preserve first causes and foreign roots.",
+        "Actual source epilogue never invokes automatic owning abort. Executing caller chain protects reached numeric/destructor callbacks; idle retained invocation permits explicit exact owning cleanup."
+      ],
+      "deviations": [
+        "Selected Mignotte helper and enclosing epilogue only; prime-trial and pair-Hensel lexical scope closure remain open. No full factor_square_free completion or original registered driver assertion credit.",
+        "Signed-host TLS and destroyed-pointer profiles qualify source guard/owning behavior, not ordinary supported mathematical failure reachability. Source unsigned exponent doubling is retained without Go overflow refusal."
+      ]
     },
     {
       "path": "src/math/polynomial/upolynomial_factorization.h",
@@ -68465,22 +68529,63 @@
       "path": "src/smt/params/dyn_ack_params.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_smt_dyn_ack_params.go",
+        "util_smt_dyn_ack_params_source_test.go"
+      ],
+      "tests": [
+        "TestSMTDynAckConstructorLiteralDefaultsAndFallbackOrder",
+        "TestSMTDynAckEveryActualConstructorReservationAndFailedHeader",
+        "TestSMTDynAckFailedGetterDoesNotPublishFallbackAndModuleReferenceEnds",
+        "TestSMTDynAckLiteralDisplayFlagsEveryOutputRefusalAndBadFile",
+        "TestSMTDynAckEveryActualUnwarmedSymbolAndHelperConstructorPrefix",
+        "TestSMTDynAckReachedNamespaceAssertionConstructorPrefix",
+        "TestSMTDynAckDisplayNumericBoolShowPosSignedLongProfile"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Literal six assignment getter sequence, acquired module reference source destructor and six ostream chains with endl (src/smt/params/dyn_ack_params.cpp:22-41)",
+          "status": "partial",
+          "go_target": "util_smt_dyn_ack_params.go",
+          "tests": [
+            "TestSMTDynAckConstructorLiteralDefaultsAndFallbackOrder",
+            "TestSMTDynAckEveryActualConstructorReservationAndFailedHeader",
+            "TestSMTDynAckFailedGetterDoesNotPublishFallbackAndModuleReferenceEnds",
+            "TestSMTDynAckLiteralDisplayFlagsEveryOutputRefusalAndBadFile",
+            "TestSMTDynAckEveryActualUnwarmedSymbolAndHelperConstructorPrefix",
+            "TestSMTDynAckReachedNamespaceAssertionConstructorPrefix",
+            "TestSMTDynAckDisplayNumericBoolShowPosSignedLongProfile"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual acquired helper module ParamsRef is stamped only at SourceGetModuleName return; lexical source DelTracked before function return, retained exact decrement receipt separate from owning Close. Standalone Go wrapper/helper are actual reflected cold allocations, not native scalar/stack malloc credit. Original Symbol/Params/global owners remain borrowed."
+      ],
+      "deviations": [
+        "No registered SMT context/kernel driver credit. Scalar base embedding into complete smt_params and native global/locale/boolalpha profiles remain open. Go invalid local/closed/null owner guards and standalone incomplete-constructor owning continuation are explicit adapter domains. Strategy outside source enumerators is only selected fixed-width Go representation evidence. Generated helper credit is limited to six dack accessor definitions; full helper/generator remain partial."
+      ]
     },
     {
       "path": "src/smt/params/dyn_ack_params.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_smt_dyn_ack_params.go",
+        "util_smt_dyn_ack_params_source_test.go"
+      ],
+      "tests": [
+        "TestSMTDynAckConstructorLiteralDefaultsAndFallbackOrder",
+        "TestSMTDynAckEveryActualConstructorReservationAndFailedHeader",
+        "TestSMTDynAckFailedGetterDoesNotPublishFallbackAndModuleReferenceEnds",
+        "TestSMTDynAckLiteralDisplayFlagsEveryOutputRefusalAndBadFile",
+        "TestSMTDynAckEveryActualUnwarmedSymbolAndHelperConstructorPrefix",
+        "TestSMTDynAckReachedNamespaceAssertionConstructorPrefix",
+        "TestSMTDynAckDisplayNumericBoolShowPosSignedLongProfile"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -68493,9 +68598,28 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete dyn_ack_params scalar initialization then actual generated helper source update (src/smt/params/dyn_ack_params.h:24-51)",
+          "status": "partial",
+          "go_target": "util_smt_dyn_ack_params.go",
+          "tests": [
+            "TestSMTDynAckConstructorLiteralDefaultsAndFallbackOrder",
+            "TestSMTDynAckEveryActualConstructorReservationAndFailedHeader",
+            "TestSMTDynAckFailedGetterDoesNotPublishFallbackAndModuleReferenceEnds",
+            "TestSMTDynAckLiteralDisplayFlagsEveryOutputRefusalAndBadFile",
+            "TestSMTDynAckEveryActualUnwarmedSymbolAndHelperConstructorPrefix",
+            "TestSMTDynAckReachedNamespaceAssertionConstructorPrefix",
+            "TestSMTDynAckDisplayNumericBoolShowPosSignedLongProfile"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual acquired helper module ParamsRef is stamped only at SourceGetModuleName return; lexical source DelTracked before function return, retained exact decrement receipt separate from owning Close. Standalone Go wrapper/helper are actual reflected cold allocations, not native scalar/stack malloc credit. Original Symbol/Params/global owners remain borrowed."
+      ],
+      "deviations": [
+        "No registered SMT context/kernel driver credit. Scalar base embedding into complete smt_params and native global/locale/boolalpha profiles remain open. Go invalid local/closed/null owner guards and standalone incomplete-constructor owning continuation are explicit adapter domains. Strategy outside source enumerators is only selected fixed-width Go representation evidence. Generated helper credit is limited to six dack accessor definitions; full helper/generator remain partial."
+      ]
     },
     {
       "path": "src/smt/params/preprocessor_params.cpp",
@@ -68658,14 +68782,44 @@
       "path": "src/smt/params/smt_params_helper.pyg",
       "component": "smt",
       "role": "generated_input",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_smt_dyn_ack_params.go",
+        "util_smt_dyn_ack_params_source_test.go"
+      ],
+      "tests": [
+        "TestSMTDynAckConstructorLiteralDefaultsAndFallbackOrder",
+        "TestSMTDynAckEveryActualConstructorReservationAndFailedHeader",
+        "TestSMTDynAckFailedGetterDoesNotPublishFallbackAndModuleReferenceEnds",
+        "TestSMTDynAckLiteralDisplayFlagsEveryOutputRefusalAndBadFile",
+        "TestSMTDynAckEveryActualUnwarmedSymbolAndHelperConstructorPrefix",
+        "TestSMTDynAckReachedNamespaceAssertionConstructorPrefix",
+        "TestSMTDynAckDisplayNumericBoolShowPosSignedLongProfile"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Six concrete dack generated accessors with local/module/literal precedence and actual module acquisition (src/smt/params/smt_params_helper.pyg:61-66; scripts/mk_genfile_common.py:895-939)",
+          "status": "partial",
+          "go_target": "util_smt_dyn_ack_params.go",
+          "tests": [
+            "TestSMTDynAckConstructorLiteralDefaultsAndFallbackOrder",
+            "TestSMTDynAckEveryActualConstructorReservationAndFailedHeader",
+            "TestSMTDynAckFailedGetterDoesNotPublishFallbackAndModuleReferenceEnds",
+            "TestSMTDynAckLiteralDisplayFlagsEveryOutputRefusalAndBadFile",
+            "TestSMTDynAckEveryActualUnwarmedSymbolAndHelperConstructorPrefix",
+            "TestSMTDynAckReachedNamespaceAssertionConstructorPrefix",
+            "TestSMTDynAckDisplayNumericBoolShowPosSignedLongProfile"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual acquired helper module ParamsRef is stamped only at SourceGetModuleName return; lexical source DelTracked before function return, retained exact decrement receipt separate from owning Close. Standalone Go wrapper/helper are actual reflected cold allocations, not native scalar/stack malloc credit. Original Symbol/Params/global owners remain borrowed."
+      ],
+      "deviations": [
+        "No registered SMT context/kernel driver credit. Scalar base embedding into complete smt_params and native global/locale/boolalpha profiles remain open. Go invalid local/closed/null owner guards and standalone incomplete-constructor owning continuation are explicit adapter domains. Strategy outside source enumerators is only selected fixed-width Go representation evidence. Generated helper credit is limited to six dack accessor definitions; full helper/generator remain partial."
+      ]
     },
     {
       "path": "src/smt/params/theory_arith_params.cpp",
@@ -68787,9 +68941,15 @@
       "path": "src/smt/params/theory_datatype_params.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "util_smt_datatype_params.go",
+        "util_smt_datatype_params_source_test.go"
+      ],
+      "tests": [
+        "TestSMTDatatypeParamsSourceConstructorAndUnsignedDisplay",
+        "TestSMTDatatypeParamsSourceStreamFlagsAndClosedEntry"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -68808,11 +68968,33 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "theory_datatype_params scalar constructor at theory_datatype_params.h:25-27",
+          "status": "ported",
+          "go_target": "util_smt_datatype_params.go",
+          "tests": [
+            "TestSMTDatatypeParamsSourceConstructorAndUnsignedDisplay"
+          ]
+        },
+        {
+          "name": "display unsigned insertion and endl at theory_datatype_params.h:35",
+          "status": "ported",
+          "go_target": "util_smt_datatype_params.go",
+          "tests": [
+            "TestSMTDatatypeParamsSourceConstructorAndUnsignedDisplay",
+            "TestSMTDatatypeParamsSourceStreamFlagsAndClosedEntry"
+          ]
+        }
+      ],
+      "ownership": [
+        "A single concrete uint32 value, with no owning payload, destructor or heap wrapper; constructing and copying the value performs no reservation. The const display borrows the actual NumericTextStream and its file, preserves parameter value and stream flags, and invokes unsigned insertion followed by unformatted newline and Flush."
+      ],
+      "deviations": [
+        "The register_params block at theory_datatype_params.h:29-33 is erased by literal #if 0: no active registration or range validation is invented. Arbitrary uint32 values remain observable, including UINT_MAX. NumericTextStream implements the existing direct-emission selected stream adapter; Flush preserves that adapter boundary and does not claim native ostream buffering, ties or pubsync. The enclosing smt_params/context/kernel are separate unported work."
+      ]
     },
     {
       "path": "src/smt/params/theory_pb_params.cpp",
@@ -74017,22 +74199,50 @@
       "path": "src/smt/smt_statistics.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "util_smt_context_statistics.go",
+        "util_smt_context_statistics_source_test.go"
+      ],
+      "tests": [
+        "TestSMTContextStatisticsConstructorAndLiteralResetAllFields",
+        "TestSMTContextStatisticsInlineCopiesAndUnsignedProducerWords"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Actual smt::statistics first context scalar member constructor and whole-object memset reset (src/smt/smt_statistics.h:26-54; src/smt/smt_statistics.cpp:24-26; src/smt/smt_context.h:70)",
+          "status": "ported",
+          "go_target": "util_smt_context_statistics.go",
+          "tests": [
+            "TestSMTContextStatisticsConstructorAndLiteralResetAllFields",
+            "TestSMTContextStatisticsInlineCopiesAndUnsignedProducerWords"
+          ]
+        }
+      ],
+      "ownership": [
+        "Inline22 uint32 fields only; no owner wrapper/Budget reservation or allocation event. Future context enclosing reflected header charges actual embedded value once.",
+        "Root complete-file audit matches all22 ordered source unsigned fields to concrete uint32 members,88-byte inline value, actual ctor invokes Reset and sole CPP body clears whole value. No allocated payload or destructor exists in these two source units."
+      ],
+      "deviations": [
+        "No context constructor completion or real counter producer credit. Full native ABI/global/compiler transport bindings remain separate, no registered source driver tests for this standalone scalar type.",
+        "Complete scalar statistics definitions only. Actual SMT context construction, counter-producing actions and registered driver assertions remain separate source units and receive no completion credit."
+      ]
     },
     {
       "path": "src/smt/smt_statistics.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "util_smt_context_statistics.go",
+        "util_smt_context_statistics_source_test.go"
+      ],
+      "tests": [
+        "TestSMTContextStatisticsConstructorAndLiteralResetAllFields",
+        "TestSMTContextStatisticsInlineCopiesAndUnsignedProducerWords"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -74043,11 +74253,27 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Actual smt::statistics first context scalar member constructor and whole-object memset reset (src/smt/smt_statistics.h:26-54; src/smt/smt_statistics.cpp:24-26; src/smt/smt_context.h:70)",
+          "status": "ported",
+          "go_target": "util_smt_context_statistics.go",
+          "tests": [
+            "TestSMTContextStatisticsConstructorAndLiteralResetAllFields",
+            "TestSMTContextStatisticsInlineCopiesAndUnsignedProducerWords"
+          ]
+        }
+      ],
+      "ownership": [
+        "Inline22 uint32 fields only; no owner wrapper/Budget reservation or allocation event. Future context enclosing reflected header charges actual embedded value once.",
+        "Root complete-file audit matches all22 ordered source unsigned fields to concrete uint32 members,88-byte inline value, actual ctor invokes Reset and sole CPP body clears whole value. No allocated payload or destructor exists in these two source units."
+      ],
+      "deviations": [
+        "No context constructor completion or real counter producer credit. Full native ABI/global/compiler transport bindings remain separate, no registered source driver tests for this standalone scalar type.",
+        "Complete scalar statistics definitions only. Actual SMT context construction, counter-producing actions and registered driver assertions remain separate source units and receive no completion credit."
+      ]
     },
     {
       "path": "src/smt/smt_theory.cpp",

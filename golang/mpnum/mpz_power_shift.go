@@ -38,6 +38,9 @@ func (e *PowerDomainError) Unwrap() error {
 // ensureOwnedCapacity translates ensure_capacity, including requested capacity
 // six and INT_MIN promotion. Old ownership is released after replacement exists.
 func (m *IntegerManager) ensureOwnedCapacity(a *Int, capacity uint32) error {
+	return m.ensureOwnedCapacityWithAllocationContext(a, capacity, integerAllocationInvocationContext{})
+}
+func (m *IntegerManager) ensureOwnedCapacityWithAllocationContext(a *Int, capacity uint32, context integerAllocationInvocationContext) error {
 	if capacity <= 1 {
 		return nil
 	}
@@ -52,7 +55,7 @@ func (m *IntegerManager) ensureOwnedCapacity(a *Int, capacity uint32) error {
 	if old != 0 {
 		size = m.cell(old).size
 	}
-	ref, e := m.allocate(capacity, size)
+	ref, e := m.allocateWithSourceContext(capacity, size, nil, context)
 	if e != nil {
 		return e
 	}
@@ -257,17 +260,20 @@ func (m *IntegerManager) Mul2kInPlace(a *Int, k uint32) error {
 	return m.mul2kCore(a, k)
 }
 func (m *IntegerManager) shift(a *Int, k uint32, out *Int, left bool) error {
+	return m.shiftWithAllocationContext(a, k, out, left, integerAllocationInvocationContext{})
+}
+func (m *IntegerManager) shiftWithAllocationContext(a *Int, k uint32, out *Int, left bool, context integerAllocationInvocationContext) error {
 	if e := m.check(a); e != nil {
 		return e
 	}
 	if e := m.check(out); e != nil {
 		return e
 	}
-	if e := m.Copy(out, a); e != nil {
+	if e := m.copyFromOwnerWithAllocationContext(out, m, a, nil, context); e != nil {
 		return e
 	}
 	if left {
-		return m.mul2kCore(out, k)
+		return m.mul2kCoreWithAllocationContext(out, k, context)
 	}
 	return m.machineDiv2kCore(out, k)
 }
@@ -323,11 +329,14 @@ func (m *IntegerManager) machineDiv2kCore(a *Int, k uint32) error {
 	return m.normalizeOwned(a)
 }
 func (m *IntegerManager) mul2kCore(a *Int, k uint32) error {
+	return m.mul2kCoreWithAllocationContext(a, k, integerAllocationInvocationContext{})
+}
+func (m *IntegerManager) mul2kCoreWithAllocationContext(a *Int, k uint32, context integerAllocationInvocationContext) error {
 	if k == 0 || a.val == 0 {
 		return nil
 	}
 	if a.IsSmall() && k < 32 {
-		return m.SetInt64(a, int64(a.val)*(int64(1)<<k))
+		return m.setInt64WithAllocationContext(a, int64(a.val)*(int64(1)<<k), context)
 	}
 	wordShift, bitShift := k/32, k%32
 	oldSize := uint32(1)
@@ -335,7 +344,7 @@ func (m *IntegerManager) mul2kCore(a *Int, k uint32) error {
 		oldSize = m.cell(a.cell).size
 	}
 	newSize := oldSize + wordShift + 1 // source unsigned32 addition
-	if e := m.ensureOwnedCapacity(a, newSize); e != nil {
+	if e := m.ensureOwnedCapacityWithAllocationContext(a, newSize, context); e != nil {
 		return e
 	}
 	if modularSourceDebug && a.IsSmall() {

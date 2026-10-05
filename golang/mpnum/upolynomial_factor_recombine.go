@@ -1,8 +1,9 @@
+// Source: src/math/polynomial/upolynomial_factorization.cpp:979-1465.
+// Source author: Leonardo de Moura.
 // Licensed under the MIT license.
 // Actual Mignotte bound, prime image trials and subset recombination.
 package mpnum
 
-import "math"
 
 func (s *UPolynomialFactorizationService) FactorSquareFree(f UPolynomialView, fs *UPolynomialFactors, k uint32, params UPolynomialFactorParams) (bool, error) {
 	if e := s.check(); e != nil {
@@ -16,15 +17,21 @@ func (s *UPolynomialFactorizationService) FactorSquareFree(f UPolynomialView, fs
 func (s *UPolynomialFactorizationService) FactorSquareFreeDefault(f UPolynomialView, fs *UPolynomialFactors, params UPolynomialFactorParams) (bool, error) {
 	return s.FactorSquareFree(f, fs, 1, params)
 }
-func (s *UPolynomialFactorizationService) mignotteBound(f UPolynomialView, p *Int) (uint32, error) {
+func (s *UPolynomialFactorizationService) mignotteBound(f UPolynomialView, p *Int) (answer uint32, cause error) {
 	m := s.manager
 	nm := m.modular
 	if modularSourceDebug && upolyViewDegree(f) < 2 {
 		return 0, ErrUPolynomialAssertion
 	}
 	n := upolyViewDegree(f) / 2
-	var norm, bound, tmp Int
-	defer nm.Del(&norm)
+	r, e := s.beginMignotteInvocation()
+	if e != nil {
+		return 0, e
+	}
+	q := r.frame
+	q.constructed = 1
+	defer func() { q.executing = false; cause = s.finishMignotteSource(&r, cause) }()
+	norm, bound, tmp := &q.norm, &q.bound, &q.tmp
 	for i := uint32(0); i < f.count; i++ {
 		a, e := m.read(f, i)
 		if e != nil {
@@ -35,55 +42,52 @@ func (s *UPolynomialFactorizationService) mignotteBound(f UPolynomialView, p *In
 			return 0, e
 		}
 		if !zero {
-			if e = nm.AddMul(&norm, a, a, &norm); e != nil {
+			if e = s.mignotteNumericCall(&r, 0, a, a, norm, 0); e != nil {
 				return 0, e
 			}
 		}
 	}
-	if _, e := nm.RootInPlace(&norm, 2); e != nil {
+	if e := s.mignotteNumericCall(&r, 1, nil, nil, norm, 2); e != nil {
 		return 0, e
 	}
-	defer nm.Del(&bound)
-	if e := nm.SetInt32(&bound, 1); e != nil {
+	q.constructed = 2
+	if e := s.mignotteNumericCall(&r, 2, nil, nil, bound, 1); e != nil {
 		return 0, e
 	}
-	if e := nm.Mul2k(&bound, n, &bound); e != nil {
+	if e := s.mignotteNumericCall(&r, 3, bound, nil, bound, n); e != nil {
 		return 0, e
 	}
-	defer nm.Del(&tmp)
+	q.constructed = 3
 	top, e := m.read(f, f.count-1)
 	if e != nil {
 		return 0, e
 	}
-	if e = nm.Copy(&tmp, top); e != nil {
+	if e = s.mignotteNumericCall(&r, 4, top, nil, tmp, 0); e != nil {
 		return 0, e
 	}
-	if e = nm.Abs(&tmp); e != nil {
+	if e = s.mignotteNumericCall(&r, 5, nil, nil, tmp, 0); e != nil {
 		return 0, e
 	}
-	if e = nm.Add(&norm, &tmp, &norm); e != nil {
+	if e = s.mignotteNumericCall(&r, 6, norm, tmp, norm, 0); e != nil {
 		return 0, e
 	}
-	if e = nm.Mul(&bound, &norm, &bound); e != nil {
+	if e = s.mignotteNumericCall(&r, 7, bound, norm, bound, 0); e != nil {
 		return 0, e
 	}
-	if e = nm.Copy(&tmp, p); e != nil {
+	if e = s.mignotteNumericCall(&r, 4, p, nil, tmp, 0); e != nil {
 		return 0, e
 	}
 	exponent := uint32(1)
 	for {
-		le, e := nm.LessEqual(&tmp, &bound)
+		le, e := nm.LessEqual(tmp, bound)
 		if e != nil {
 			return 0, e
 		}
 		if !le {
 			return exponent, nil
 		}
-		if e = nm.Mul(&tmp, &tmp, &tmp); e != nil {
+		if e = s.mignotteNumericCall(&r, 7, tmp, tmp, tmp, 0); e != nil {
 			return 0, e
-		}
-		if exponent > math.MaxUint32/2 {
-			return 0, ErrUPolynomialNontermination
 		}
 		exponent *= 2
 	}
@@ -163,9 +167,7 @@ func (s *UPolynomialFactorizationService) factorSquareFree(f UPolynomialView, fs
 		return false, e
 	}
 	defer func() {
-		if e := s.CleanupRetained(); e != nil && failure == nil {
-			failure = e
-		}
+		failure = s.finishSquareFreeScopeError(failure)
 	}()
 	c.constructed = 1
 	if e := m.setView(&c.fpp, f); e != nil {

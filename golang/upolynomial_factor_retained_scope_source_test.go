@@ -50,14 +50,36 @@ func TestUPolynomialFactorRetainedLexicalCleanup(t *testing.T) {
 		immediate := upolyHenselAuditPhysical(t, []*mpnum.UPolynomialManager{m}, []*mpnum.UPolynomialFactors{fs}, upolyPhysicalExtraOwners{Services: []*mpnum.UPolynomialFactorizationService{service}})
 		stats := service.Stats()
 		if stats.RetainedScopes != 0 {
-			found = true
 			if stats.RetainedOwnerBytes == 0 {
 				t.Fatal("uncharged lexical scope")
 			}
 			core, e := service.RetainedCleanupCore(0)
+			if errors.Is(e, arena.ErrBounds) && stats.MignottePending {
+				// Source completed older declarations, leaving an exact unjoined
+				// Mignotte child. A related core is no longer a universal scope invariant.
+				// This new case must not replace the original later core/set_z campaign.
+				b.FailAfter(-1)
+				if e = service.CleanupRetained(); e != nil {
+					t.Fatal("exact Mignotte child owning acknowledgment", e)
+				}
+				if service.Stats().RetainedScopes != 0 {
+					t.Fatal("unjoined Mignotte scope not consumed")
+				}
+				if e = fs.Close(); e != nil {
+					t.Fatal(e)
+				}
+				if e = service.Close(); e != nil {
+					t.Fatal(e)
+				}
+				if e = primes.Close(); e != nil {
+					t.Fatal(e)
+				}
+				continue
+			}
 			if e != nil {
 				t.Fatal(e)
 			}
+			found = true
 			if _, e = service.Factor(mustUPolyView(t, m, p), fs, mpnum.DefaultUPolynomialFactorParams()); !errors.Is(e, mpnum.ErrUPolynomialCleanupPending) {
 				t.Fatal("new arithmetic accepted", e)
 			}

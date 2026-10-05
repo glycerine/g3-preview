@@ -1,3 +1,5 @@
+// Source: src/math/polynomial/upolynomial_factorization.cpp:979-1465.
+// Source author: Leonardo de Moura.
 // Licensed under the MIT license.
 package mpnum
 
@@ -14,6 +16,11 @@ var ErrUPolynomialCleanupPending = errors.New("mpnum: retained factorization lex
 // the unfinished reverse destruction cursor instead of losing its owner. This
 // additional charged header is a Go exception/lifetime adapter, not C++ malloc.
 type upolyFactorSquareFreeScope struct {
+	self            *upolyFactorSquareFreeScope
+	service         *UPolynomialFactorizationService
+	callerPrevious  *upolyFactorSquareFreeScope
+	callDepth       uint32
+	mignotte        upolyMignotteScope
 	manager         *UPolynomialManager
 	fpp             upolyVectorState
 	p               Int
@@ -40,7 +47,8 @@ func (s *UPolynomialFactorizationService) newSquareFreeScope() (*upolyFactorSqua
 	if e := s.manager.config.Integer.budget.Reserve(n); e != nil {
 		return nil, e
 	}
-	c := &upolyFactorSquareFreeScope{manager: s.manager, header: n}
+	c := &upolyFactorSquareFreeScope{manager: s.manager, service: s, header: n}
+	c.self = c
 	s.scope = c
 	return c, nil
 }
@@ -50,6 +58,24 @@ func (s *UPolynomialFactorizationService) newSquareFreeScope() (*upolyFactorSqua
 // prime, prime factors, prime core, prime, primitive vector. Only constructed
 // objects participate; publication/cleanup advances one completed action.
 func (c *upolyFactorSquareFreeScope) cleanup() error {
+	if q := &c.mignotte; q.active && q.service != nil {
+		if q.executing || q.callDepth != 0 {
+			return ErrUPolynomialCleanupPending
+		}
+		q.service.finishMignotteSource(&q.receipt, q.bodyCause)
+		if q.sourceCause != nil {
+			return q.sourceCause
+		}
+	}
+	if e := c.cleanupMembers(); e != nil {
+		return e
+	}
+	if c.mignotte.active {
+		return ErrUPolynomialCleanupPending
+	}
+	return nil
+}
+func (c *upolyFactorSquareFreeScope) cleanupMembers() error {
 	m := c.manager
 	for c.constructed != 0 {
 		var e error
@@ -131,8 +157,28 @@ func (s *UPolynomialFactorizationService) CleanupRetained() error {
 	if e := s.checkOwner(); e != nil {
 		return e
 	}
-	if e := s.scope.cleanup(); e != nil {
+	if s.scope.callDepth != 0 {
+		return ErrUPolynomialCleanupPending
+	}
+	caller := s.scope
+	caller.enterCall()
+	defer caller.leaveCall()
+	q := &s.scope.mignotte
+	if q.executing || q.callDepth != 0 {
+		return ErrUPolynomialCleanupPending
+	}
+	if q.active {
+		if e := s.cleanupMignotteInvocation(&q.receipt, false); e != nil {
+			return e
+		}
+	}
+	if e := s.scope.cleanupMembers(); e != nil {
 		return e
+	}
+	if q.active {
+		if e := s.cleanupMignotteInvocation(&q.receipt, true); e != nil {
+			return e
+		}
 	}
 	s.manager.config.Integer.budget.Release(s.scope.header)
 	s.scope = nil
@@ -173,4 +219,45 @@ func (s *UPolynomialFactorizationService) RetainedCleanupFactors(index uint32) (
 		}
 	}
 	return nil, arena.ErrBounds
+}
+
+// The automatic enclosing epilogue is source-only. Explicit CleanupRetained
+// separately acknowledges acquired unjoined child roots after older locals.
+func (s *UPolynomialFactorizationService) finishSquareFreeScopeSource() error {
+	if e := s.checkOwner(); e != nil {
+		return e
+	}
+	c := s.scope
+	if c == nil {
+		return nil
+	}
+	c.enterCall()
+	defer c.leaveCall()
+	if e := c.cleanup(); e != nil {
+		return e
+	}
+	s.manager.config.Integer.budget.Release(c.header)
+	s.scope = nil
+	return nil
+}
+
+// Actual enclosing destructor calls carry their own concrete caller identity;
+// an idle retained scope is never treated as an executing caller.
+func (c *upolyFactorSquareFreeScope) enterCall() {
+	if c.callDepth == 0 {
+		c.callerPrevious = c.manager.squareFreeCaller
+		c.manager.squareFreeCaller = c
+	}
+	c.callDepth++
+}
+func (c *upolyFactorSquareFreeScope) leaveCall() {
+	c.callDepth--
+	if c.callDepth == 0 {
+		c.manager.squareFreeCaller = c.callerPrevious
+		c.callerPrevious = nil
+	}
+}
+
+func (s *UPolynomialFactorizationService) finishSquareFreeScopeError(body error) error {
+	return errors.Join(body, s.finishSquareFreeScopeSource())
 }

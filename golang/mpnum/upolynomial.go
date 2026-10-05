@@ -26,10 +26,13 @@ type UPolynomialConfig struct {
 // are required, even though operations without a checkpoint do not call them.
 // Cold ownership and every actual typed backing are charged to Integer's budget.
 type UPolynomialManager struct {
-	self    *UPolynomialManager
-	origin  uint64
-	config  UPolynomialConfig
-	modular *IntegerModularManager
+	callbackDepth    uint32
+	mignotteCaller   *upolyMignotteScope
+	squareFreeCaller *upolyFactorSquareFreeScope
+	self             *UPolynomialManager
+	origin           uint64
+	config           UPolynomialConfig
+	modular          *IntegerModularManager
 	// Actual source members: 16 core and five derived numeral vectors.
 	basic, div1, div2, exactDiv, gcd1, gcd2, cra   upolyVectorState
 	mgcd                                           [6]upolyVectorState
@@ -111,6 +114,8 @@ func (m *UPolynomialManager) IntegerManager() *IntegerManager {
 	return m.config.Integer
 }
 func (m *UPolynomialManager) checkpoint() error {
+	m.callbackDepth++
+	defer func() { m.callbackDepth-- }()
 	if !m.config.Checkpoint() {
 		return ErrUPolynomialCanceled
 	}
@@ -200,6 +205,9 @@ func (m *UPolynomialManager) DelPolynomial(p *UPolynomial) error {
 func (m *UPolynomialManager) Close() error {
 	if m == nil || m.self != m || m.config.Integer == nil {
 		return ErrUPolynomialOwner
+	}
+	if m.mignotteCallPending() {
+		return ErrUPolynomialCleanupPending
 	}
 	if m.closed || m.config.Integer.closed {
 		return arena.ErrClosed

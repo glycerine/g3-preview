@@ -10,6 +10,9 @@ func (m *UPolynomialManager) SourceFinalize() error {
 	if m == nil || m.self != m || m.config.Integer == nil {
 		return ErrUPolynomialOwner
 	}
+	if m.mignotteCallPending() {
+		return ErrUPolynomialCleanupPending
+	}
 	if m.sourceFinalized {
 		return nil
 	}

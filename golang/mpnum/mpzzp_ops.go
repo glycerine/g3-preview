@@ -31,13 +31,16 @@ func (m *IntegerModularManager) Neg(a *Int) error {
 	return m.PNormalize(a)
 }
 func (m *IntegerModularManager) Abs(a *Int) error {
+	return m.absWithSourceContext(a, integerAllocationInvocationContext{})
+}
+func (m *IntegerModularManager) absWithSourceContext(a *Int, context integerAllocationInvocationContext) error {
 	if e := m.check(); e != nil {
 		return e
 	}
-	if e := m.manager.Abs(a); e != nil {
+	if e := m.manager.absWithAllocationContext(a, context); e != nil {
 		return e
 	}
-	return m.PNormalize(a)
+	return m.normalizeWithSourceContext(a, context)
 }
 func (m *IntegerModularManager) Inc(a *Int) error {
 	if e := m.check(); e != nil {
@@ -67,6 +70,9 @@ func (m *IntegerModularManager) Add(a, b, c *Int) error {
 	return m.addWithArithmeticReceipt(a, b, c, nil)
 }
 func (m *IntegerModularManager) addWithArithmeticReceipt(a, b, c *Int, receipt *polynomialArithmeticInvocationReceipt) error {
+	return m.addWithSourceContext(a, b, c, m.arithmeticAllocationContext(receipt))
+}
+func (m *IntegerModularManager) addWithSourceContext(a, b, c *Int, context integerAllocationInvocationContext) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -76,10 +82,10 @@ func (m *IntegerModularManager) addWithArithmeticReceipt(a, b, c *Int, receipt *
 	if e := m.assertNormalized(b); e != nil {
 		return e
 	}
-	if e := m.manager.addSubWithAllocationContext(a, b, c, false, m.arithmeticAllocationContext(receipt)); e != nil {
+	if e := m.manager.addSubWithAllocationContext(a, b, c, false, context); e != nil {
 		return e
 	}
-	return m.normalizeWithArithmeticReceipt(c, receipt)
+	return m.normalizeWithSourceContext(c, context)
 }
 func (m *IntegerModularManager) Sub(a, b, c *Int) error {
 	if e := m.check(); e != nil {
@@ -121,6 +127,15 @@ func (m *IntegerModularManager) AddMul(a, b, c, d *Int) error {
 	return m.addMulWithArithmeticReceipt(a, b, c, d, nil)
 }
 func (m *IntegerModularManager) addMulWithArithmeticReceipt(a, b, c, d *Int, receipt *polynomialArithmeticInvocationReceipt) error {
+	receipt = m.arithmeticReceiptForReceiver(receipt)
+	child := m.arithmeticAddMulReceipt(receipt)
+	e := m.addMulWithSourceContext(a, b, c, d, child, m.arithmeticAllocationContext(receipt))
+	if child != nil && receipt.frame.sourceCause == nil {
+		receipt.frame.sourceCause = m.manager.addMulInvocationSourceCause(child)
+	}
+	return e
+}
+func (m *IntegerModularManager) addMulWithSourceContext(a, b, c, d *Int, child *integerAddMulInvocationReceipt, context integerAllocationInvocationContext) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -133,16 +148,10 @@ func (m *IntegerModularManager) addMulWithArithmeticReceipt(a, b, c, d *Int, rec
 	if e := m.assertNormalized(c); e != nil {
 		return e
 	}
-	receipt = m.arithmeticReceiptForReceiver(receipt)
-	child := m.arithmeticAddMulReceipt(receipt)
-	e := m.manager.addMulWithSourceReceipt(a, b, c, d, child, receipt)
-	if child != nil && receipt.frame.sourceCause == nil {
-		receipt.frame.sourceCause = m.manager.addMulInvocationSourceCause(child)
-	}
-	if e != nil {
+	if e := m.manager.addMulWithAllocationContext(a, b, c, d, child, context); e != nil {
 		return e
 	}
-	return m.normalizeWithArithmeticReceipt(d, receipt)
+	return m.normalizeWithSourceContext(d, context)
 }
 func (m *IntegerModularManager) SubMul(a, b, c, d *Int) error {
 	if e := m.check(); e != nil {
@@ -322,13 +331,16 @@ func (m *IntegerModularManager) SetInt64(a *Int, v int64) error {
 	return m.setInt64WithArithmeticReceipt(a, v, nil)
 }
 func (m *IntegerModularManager) setInt64WithArithmeticReceipt(a *Int, v int64, receipt *polynomialArithmeticInvocationReceipt) error {
+	return m.setInt64WithSourceContext(a, v, m.arithmeticAllocationContext(receipt))
+}
+func (m *IntegerModularManager) setInt64WithSourceContext(a *Int, v int64, context integerAllocationInvocationContext) error {
 	if e := m.check(); e != nil {
 		return e
 	}
-	if e := m.manager.setInt64WithAllocationContext(a, v, m.arithmeticAllocationContext(receipt)); e != nil {
+	if e := m.manager.setInt64WithAllocationContext(a, v, context); e != nil {
 		return e
 	}
-	return m.normalizeWithArithmeticReceipt(a, receipt)
+	return m.normalizeWithSourceContext(a, context)
 }
 func (m *IntegerModularManager) SetUint64(a *Int, v uint64) error {
 	if e := m.check(); e != nil {
@@ -352,13 +364,16 @@ func (m *IntegerModularManager) Copy(a, b *Int) error {
 	return m.copyWithArithmeticReceipt(a, b, nil)
 }
 func (m *IntegerModularManager) copyWithArithmeticReceipt(a, b *Int, receipt *polynomialArithmeticInvocationReceipt) error {
+	return m.copyWithSourceContext(a, b, m.arithmeticAllocationContext(receipt))
+}
+func (m *IntegerModularManager) copyWithSourceContext(a, b *Int, context integerAllocationInvocationContext) error {
 	if e := m.check(); e != nil {
 		return e
 	}
-	if e := m.manager.copyFromOwnerWithAllocationContext(a, m.manager, b, nil, m.arithmeticAllocationContext(receipt)); e != nil {
+	if e := m.manager.copyFromOwnerWithAllocationContext(a, m.manager, b, nil, context); e != nil {
 		return e
 	}
-	return m.normalizeWithArithmeticReceipt(a, receipt)
+	return m.normalizeWithSourceContext(a, context)
 }
 
 // Exact target SET followed by source p_normalize, using the actual operand
@@ -463,13 +478,16 @@ func (m *IntegerModularManager) MLog2(a *Int) (uint32, error) {
 	return m.manager.MLog2(a)
 }
 func (m *IntegerModularManager) Mul2k(a *Int, k uint32, out *Int) error {
+	return m.mul2kWithSourceContext(a, k, out, integerAllocationInvocationContext{})
+}
+func (m *IntegerModularManager) mul2kWithSourceContext(a *Int, k uint32, out *Int, context integerAllocationInvocationContext) error {
 	if e := m.check(); e != nil {
 		return e
 	}
-	if e := m.manager.Mul2k(a, k, out); e != nil {
+	if e := m.manager.shiftWithAllocationContext(a, k, out, true, context); e != nil {
 		return e
 	}
-	return m.PNormalize(out)
+	return m.normalizeWithSourceContext(out, context)
 }
 func (m *IntegerModularManager) MachineDiv2k(a *Int, k uint32, out *Int) error {
 	if e := m.check(); e != nil {
