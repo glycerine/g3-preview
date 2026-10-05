@@ -8990,7 +8990,11 @@
         "ast_ref_vector_ops.go",
         "ast_sort_size.go",
         "ast_table.go",
-        "ast_table_hash.go"
+        "ast_table_hash.go",
+        "ast_core_fresh_factories.go",
+        "ast_core_fresh_factories_source_test.go",
+        "ast_core_boolean_factories.go",
+        "ast_core_boolean_factories_source_test.go"
       ],
       "tests": [
         "TestASTAllEagerPluginBranches",
@@ -9133,7 +9137,15 @@
         "TestSortSizeIndependentModelPointerFreedomAndWarmAllocations",
         "TestSortSizeRationalActualUint64Classification",
         "TestSortSizeRationalBorrowedOwnerLifetime",
-        "TestSortSizeSourceDefaultFactoriesAndGuards"
+        "TestSortSizeSourceDefaultFactoriesAndGuards",
+        "TestASTFreshConstActualSourceCounterAndSkolemMetadata",
+        "TestASTFreshNameBorrowedBytesOwnedInterning",
+        "TestASTFreshFuncDeclNullAndSuffixSourceNames",
+        "TestASTFreshFactoryEveryActualReservationAndLexicalOwner",
+        "TestASTFreshConstDeclarationCopyPageAndApplicationPrefixes",
+        "TestASTFreshConstApplicationFailureRetainsDeclarationCounter",
+        "TestASTFreshConstNullPointerPrefixSourceOverload",
+        "TestASTSortingBooleanFactoryRealNodesAndNotUnwrap"
       ],
       "conditionals": [
         {
@@ -10071,6 +10083,20 @@
             "TestASTDependencyScratchActualAndSourceByteBounds",
             "TestASTDependencyWarmDestructionNoReservationOrHeapAllocation"
           ]
+        },
+        {
+          "name": "ast_manager fresh declaration and constant source factory (src/ast/ast.cpp:2213-2238; src/ast/ast.h:1811-1825)",
+          "status": "partial",
+          "go_target": "ast_core_fresh_factories.go",
+          "tests": [
+            "TestASTFreshConstActualSourceCounterAndSkolemMetadata",
+            "TestASTFreshNameBorrowedBytesOwnedInterning",
+            "TestASTFreshFuncDeclNullAndSuffixSourceNames",
+            "TestASTFreshFactoryEveryActualReservationAndLexicalOwner",
+            "TestASTFreshConstDeclarationCopyPageAndApplicationPrefixes",
+            "TestASTFreshConstApplicationFailureRetainsDeclarationCounter",
+            "TestASTFreshConstNullPointerPrefixSourceOverload"
+          ]
         }
       ],
       "ownership": [
@@ -10081,7 +10107,8 @@
         "Expression-array backing has real12-byte capacity/initialized header; copies full retained capacity on growth and only logical elements on copy_values. Source debug-only logical bounds preserve retained pointers and arbitrary-index nonroot SET. See PORT_PROGRESS.md#audit-ast-expr-array-retained-status-md.",
         "Real AST marks borrow manager with fully charged cold headers/inline16/backing/scope limits and source real ASTRefVector callbacks. Fast mark-before-push and ref INC-before-growth prefixes remain observable; ref reset clears all flags before ASC DEC. See PORT_PROGRESS.md#audit-ast-mark-port-status-md.",
         "Expression-array empty nonroot POP preserves the finite release unsigned size wrap; retained root SET increments the incoming AST before old physical access and never rolls it back at an invalid old pointer. See PORT_PROGRESS.md#audit-ast-expr-array-retained-status-md.",
-        "Actual AST manager embeds dependency and array owners eagerly; FIFO identity traversal, real AST retain/release and LIFO deletion callbacks. Source RC30 wrapping, leaf/join16/24 versus actual charged24/32 intrusive continuation records, cold manager/scratch/header/payload and old/new overlaps charged. Persistent arrays have12-byte capacity/initialized backing and preserve finite retained pointer/patch behavior; see PORT_PROGRESS.md#audit-ast-dependency-packet-md."
+        "Actual AST manager embeds dependency and array owners eagerly; FIFO identity traversal, real AST retain/release and LIFO deletion callbacks. Source RC30 wrapping, leaf/join16/24 versus actual charged24/32 intrusive continuation records, cold manager/scratch/header/payload and old/new overlaps charged. Persistent arrays have12-byte capacity/initialized backing and preserve finite retained pointer/patch behavior; see PORT_PROGRESS.md#audit-ast-dependency-packet-md.",
+        "Fresh lexical func_decl_info resides in actual charged ASTManager header with exact epoch token and is cloned by real registerNode/copyInfo; stack StringBuffer64 uses existing formatter and borrowed byte interner, overflow arrays destroyed before fresh_id increment; acquired node/metadata belongs to actual ASTManager pages."
       ],
       "deviations": [
         "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
@@ -10091,7 +10118,8 @@
         "Expression-array never-initialized physical slots are guarded using charged initialized high-water metadata; retained freed tokens can be read before actual AST dereference rejects their generation. No new whole-unit completion claim.",
         "Scalar owner identity replaces debug raw addresses. Typed physical/stale-owner guards and implicit owning-copy rejection are explicit Go adapters. Source ID marks survive deletion/reuse; sparse/shared-occurrence marks and other template specializations remain open. No generic Go code.",
         "Empty null/root POP is guarded at source physical undefined access. Debug empty POP assertion executes before From output copy. Invalid/uninitialized old root SET returns a typed guard with the incoming source INC retained and leaves backing unchanged.",
-        "Source-undefined allocation/lifetime domains have explicit Go continuation and typed guards. Temporary copied-prefix cleanup releases only successful ownership acquisitions; source write-before-INC and debug RC0 refusal consumption are distinct. Copy-only Get returns retained raw tokens; actual later dereference guards generation. Source internal parray/Reroot debug checkpoints, TRACE/address printing, owning aliases and scoped configurations remain open. No whole-unit audit or full solver claim; no generics."
+        "Source-undefined allocation/lifetime domains have explicit Go continuation and typed guards. Temporary copied-prefix cleanup releases only successful ownership acquisitions; source write-before-INC and debug RC0 refusal consumption are distinct. Copy-only Get returns retained raw tokens; actual later dereference guards generation. Source internal parray/Reroot debug checkpoints, TRACE/address printing, owning aliases and scoped configurations remain open. No whole-unit audit or full solver claim; no generics.",
+        "Selected AST sorting-network prerequisites only; no SMT kernel or psort_nw driver assertion credit. AST DEBUG assertions retain existing typed adapter/global-binding qualifications; lexical-info nonwrapping epoch is Go borrow guard, not source fresh_id arithmetic."
       ]
     },
     {
@@ -10171,7 +10199,11 @@
         "ast_dependency_ref_vector_access.go",
         "ast_dependency_ref_vector_borrow.go",
         "ast_dependency_ref_vector.go",
-        "ast_dependency_ref_vector_ops.go"
+        "ast_dependency_ref_vector_ops.go",
+        "ast_core_fresh_factories.go",
+        "ast_core_fresh_factories_source_test.go",
+        "ast_core_boolean_factories.go",
+        "ast_core_boolean_factories_source_test.go"
       ],
       "tests": [
         "TestASTAllEagerPluginBranches",
@@ -10365,7 +10397,15 @@
         "TestASTDependencyRefConstructorRefusedCleanupPublishesOwner",
         "TestASTDependencyRefCopyConstructorRefusedCleanupPublishesOwner",
         "TestASTDependencyRefActualOwnerCopyMoveStealAndAssignment",
-        "TestASTDependencyRefVectorSourceCallbacksAndFullRoutes"
+        "TestASTDependencyRefVectorSourceCallbacksAndFullRoutes",
+        "TestASTFreshConstActualSourceCounterAndSkolemMetadata",
+        "TestASTFreshNameBorrowedBytesOwnedInterning",
+        "TestASTFreshFuncDeclNullAndSuffixSourceNames",
+        "TestASTFreshFactoryEveryActualReservationAndLexicalOwner",
+        "TestASTFreshConstDeclarationCopyPageAndApplicationPrefixes",
+        "TestASTFreshConstApplicationFailureRetainsDeclarationCounter",
+        "TestASTFreshConstNullPointerPrefixSourceOverload",
+        "TestASTSortingBooleanFactoryRealNodesAndNotUnwrap"
       ],
       "conditionals": [
         {
@@ -11114,6 +11154,28 @@
             "TestASTDependencyRefActualOwnerCopyMoveStealAndAssignment",
             "TestASTDependencyRefVectorSourceCallbacksAndFullRoutes"
           ]
+        },
+        {
+          "name": "ast_manager fresh declaration and constant source factory (src/ast/ast.cpp:2213-2238; src/ast/ast.h:1811-1825)",
+          "status": "partial",
+          "go_target": "ast_core_fresh_factories.go",
+          "tests": [
+            "TestASTFreshConstActualSourceCounterAndSkolemMetadata",
+            "TestASTFreshNameBorrowedBytesOwnedInterning",
+            "TestASTFreshFuncDeclNullAndSuffixSourceNames",
+            "TestASTFreshFactoryEveryActualReservationAndLexicalOwner",
+            "TestASTFreshConstDeclarationCopyPageAndApplicationPrefixes",
+            "TestASTFreshConstApplicationFailureRetainsDeclarationCounter",
+            "TestASTFreshConstNullPointerPrefixSourceOverload"
+          ]
+        },
+        {
+          "name": "Concrete basic Boolean factories and is_not argument unwrap (src/ast/ast.h:1984,2008-2018,2039-2046)",
+          "status": "partial",
+          "go_target": "ast_core_boolean_factories.go",
+          "tests": [
+            "TestASTSortingBooleanFactoryRealNodesAndNotUnwrap"
+          ]
         }
       ],
       "ownership": [
@@ -11126,7 +11188,8 @@
         "Expression-array empty nonroot POP preserves the finite release unsigned size wrap; retained root SET increments the incoming AST before old physical access and never rolls it back at an invalid old pointer. See PORT_PROGRESS.md#audit-ast-expr-array-retained-status-md.",
         "Actual AST manager embeds dependency and array owners eagerly; FIFO identity traversal, real AST retain/release and LIFO deletion callbacks. Source RC30 wrapping, leaf/join16/24 versus actual charged24/32 intrusive continuation records, cold manager/scratch/header/payload and old/new overlaps charged. Persistent arrays have12-byte capacity/initialized backing and preserve finite retained pointer/patch behavior; see PORT_PROGRESS.md#audit-ast-dependency-packet-md.",
         "Concrete AST expr identity-table and shared-occurrence owners preserve source bucket-order callbacks, borrowing, actual node shared flags and charged backing/header peaks. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md.",
-        "Actual dependency INC/DEC callbacks, raw scalar tokens and charged16-byte obj_ref/24-byte ref_vector/160-byte inline buffer records in existing real AST allocators. Source INC-before-growth, retained backing, captured-end append and consumed cleanup progress preserved. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md."
+        "Actual dependency INC/DEC callbacks, raw scalar tokens and charged16-byte obj_ref/24-byte ref_vector/160-byte inline buffer records in existing real AST allocators. Source INC-before-growth, retained backing, captured-end append and consumed cleanup progress preserved. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
+        "Fresh lexical func_decl_info resides in actual charged ASTManager header with exact epoch token and is cloned by real registerNode/copyInfo; stack StringBuffer64 uses existing formatter and borrowed byte interner, overflow arrays destroyed before fresh_id increment; acquired node/metadata belongs to actual ASTManager pages."
       ],
       "deviations": [
         "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
@@ -11138,7 +11201,8 @@
         "Empty null/root POP is guarded at source physical undefined access. Debug empty POP assertion executes before From output copy. Invalid/uninitialized old root SET returns a typed guard with the incoming source INC retained and leaves backing unchanged.",
         "Source-undefined allocation/lifetime domains have explicit Go continuation and typed guards. Temporary copied-prefix cleanup releases only successful ownership acquisitions; source write-before-INC and debug RC0 refusal consumption are distinct. Copy-only Get returns retained raw tokens; actual later dereference guards generation. Source internal parray/Reroot debug checkpoints, TRACE/address printing, owning aliases and scoped configurations remain open. No whole-unit audit or full solver claim; no generics.",
         "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md.",
-        "Owning construction cleanup refusal publishes a nonzero partial token with original error; scalar pending target/cursor tracks consumed callbacks without changing raw retained slots. Explicit Go retry/cleanup protects source-undefined interrupted destruction. Preserved ref_buffer copy ctor dependent-base lookup is uninstantiable; no repaired copy API. General templates, other owners/configs and full consumers remain open. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md."
+        "Owning construction cleanup refusal publishes a nonzero partial token with original error; scalar pending target/cursor tracks consumed callbacks without changing raw retained slots. Explicit Go retry/cleanup protects source-undefined interrupted destruction. Preserved ref_buffer copy ctor dependent-base lookup is uninstantiable; no repaired copy API. General templates, other owners/configs and full consumers remain open. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
+        "Selected AST sorting-network prerequisites only; no SMT kernel or psort_nw driver assertion credit. AST DEBUG assertions retain existing typed adapter/global-binding qualifications; lexical-info nonwrapping epoch is Go borrow guard, not source fresh_id arithmetic."
       ]
     },
     {
@@ -11723,9 +11787,14 @@
       "path": "src/ast/ast_util.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "ast_core_boolean_factories.go",
+        "ast_core_boolean_factories_source_test.go"
+      ],
+      "tests": [
+        "TestASTSortingBooleanFactoryRealNodesAndNotUnwrap"
+      ],
       "assertions": [
         {
           "line": 22,
@@ -11798,9 +11867,22 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "ast_util mk_or zero/singleton/multi pointer branches (src/ast/ast_util.cpp:173-180)",
+          "status": "partial",
+          "go_target": "ast_core_boolean_factories.go",
+          "tests": [
+            "TestASTSortingBooleanFactoryRealNodesAndNotUnwrap"
+          ]
+        }
+      ],
+      "ownership": [
+        "Fresh lexical func_decl_info resides in actual charged ASTManager header with exact epoch token and is cloned by real registerNode/copyInfo; stack StringBuffer64 uses existing formatter and borrowed byte interner, overflow arrays destroyed before fresh_id increment; acquired node/metadata belongs to actual ASTManager pages."
+      ],
+      "deviations": [
+        "Selected AST sorting-network prerequisites only; no SMT kernel or psort_nw driver assertion credit. AST DEBUG assertions retain existing typed adapter/global-binding qualifications; lexical-info nonwrapping epoch is Go borrow guard, not source fresh_id arithmetic."
+      ]
     },
     {
       "path": "src/ast/ast_util.h",

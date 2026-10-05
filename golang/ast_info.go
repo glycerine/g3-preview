@@ -1,4 +1,6 @@
-// Licensed under the MIT license.
+// Source: src/ast/ast.h; src/ast/ast.cpp:2213-2238.
+// Source author: Leonardo de Moura (2006-09-18; 2006-09-28).
+// Licensed under the MIT license; see LICENSE.txt.
 // Concrete decl_info, sort_info and func_decl_info storage/action translation.
 package g3
 
@@ -9,6 +11,12 @@ import (
 )
 
 func (m *ASTManager) info(slot, generation uint32) (*astInfoRecord, error) {
+	if slot == math.MaxUint32 {
+		if !m.freshInfoActive || generation != m.freshInfoEpoch {
+			return nil, ErrASTHandle
+		}
+		return &m.freshInfo, nil
+	}
 	if slot == 0 || slot >= m.nextInfo {
 		return nil, ErrASTHandle
 	}

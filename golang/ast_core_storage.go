@@ -1,4 +1,6 @@
-// Licensed under the MIT license.
+// Source: src/ast/ast.h; src/ast/ast.cpp:1354,2213-2238.
+// Source author: Leonardo de Moura (2006-09-18; 2006-09-28).
+// Licensed under the MIT license; see LICENSE.txt.
 // Concrete pointer-free storage for src/ast/ast.h. Domain destruction is
 // performed by ast_manager action translations, never by page reclamation.
 package g3
@@ -251,6 +253,11 @@ type ASTManager struct {
 	exprArrays                                                                                         astExprArrayManager
 	// Actual AST-valued dependency manager and persistent-array specialization;
 	// borrowed owners are bound eagerly and scratch backing is charged on use.
+	// Source fresh_id and lexical func_decl_info storage; included in owner header.
+	freshID          uint32
+	freshInfo        astInfoRecord
+	freshInfoEpoch   uint32
+	freshInfoActive  bool
 	dependencies     astDependencyManager
 	dependencyArrays astDependencyArrayManager
 }
