@@ -9,6 +9,9 @@ import "github.com/glycerine/g3/golang/memory"
 // buffer. It is embedded in its charged core header; no lexical Runtime ticket
 // or duplicate numeral array is constructed for this metadata.
 type polynomialArithmeticScope struct {
+	coefficientOwner                                  *polynomialCoefficientScope
+	coefficientInvocation                             uint64
+	coefficientReady                                  bool
 	buffer                                            *polynomialSOM
 	invocation                                        uint64
 	active, executing, claimed, foreignMixed, stopped bool
@@ -66,10 +69,16 @@ func (m *MultivariatePolynomialCore) ownsArithmeticBuffer(b *polynomialSOM) bool
 // Acquisition follows the reached source reset/empty-buffer preflight. It
 // creates no source allocation and gives no authority over older source rows.
 func (b *polynomialSOM) acquireArithmeticInvocation(r *polynomialArithmeticInvocationReceipt) error {
+	return b.acquireArithmeticInvocationWithCoefficient(r, nil)
+}
+func (b *polynomialSOM) acquireArithmeticInvocationWithCoefficient(r *polynomialArithmeticInvocationReceipt, parent *polynomialCoefficientInvocationReceipt) error {
 	if b == nil || b.owner == nil || !b.owner.ownsArithmeticBuffer(b) || r == nil {
 		return ErrPolynomialOwner
 	}
 	m := b.owner
+	if parent != nil && (!m.matchesCoefficientInvocation(parent) || !parent.frame.executing) {
+		return ErrPolynomialOwner
+	}
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -89,6 +98,11 @@ func (b *polynomialSOM) acquireArithmeticInvocation(r *polynomialArithmeticInvoc
 	}
 	m.arithmeticInvocation++
 	b.arithmeticScope = polynomialArithmeticScope{buffer: b, invocation: m.arithmeticInvocation, active: true, claimed: true}
+	if parent != nil {
+		b.arithmeticScope.coefficientOwner = parent.frame
+		b.arithmeticScope.coefficientInvocation = parent.invocation
+		parent.frame.bufferActive = true
+	}
 	*r = polynomialArithmeticInvocationReceipt{manager: m, frame: &b.arithmeticScope, invocation: m.arithmeticInvocation}
 	return nil
 }

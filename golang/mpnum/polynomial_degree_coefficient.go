@@ -187,13 +187,14 @@ func (m *MultivariatePolynomialCore) coeffCoreWithReceipts(p Polynomial, x, k ui
 	var scope *polynomialCoefficientScope
 	if receipt != nil {
 		scope = &m.coefficientInvocation
-		if scope.active || scope.invocation == ^uint64(0) {
+		if scope.active || scope.bufferActive || scope.invocation == ^uint64(0) {
 			return Polynomial{}, ErrPolynomialPending
 		}
 		*scope = polynomialCoefficientScope{active: true, executing: true, invocation: scope.invocation + 1}
 		*receipt = polynomialCoefficientInvocationReceipt{manager: m, frame: scope, invocation: scope.invocation}
 		defer func() {
 			scope.executing = false
+			_ = m.coefficientInvocationSourceCause(receipt)
 			if cause == nil && scope.generated == (Monomial{}) && scope.calleeGeneration == 0 && scope.allocator == ([3]memory.Block{}) {
 				scope.active = false
 			}
@@ -217,7 +218,7 @@ func (m *MultivariatePolynomialCore) coeffCoreWithReceipts(p Polynomial, x, k ui
 			if e != nil {
 				return Polynomial{}, e
 			}
-			if e = m.cheap.addConsumedCoefficientReceipts(&a, term, false, nil, nil, appendReceipt, receipt); e != nil {
+			if e = m.coefficientSourceAdd(&m.cheap, &a, term, scope, receipt, appendReceipt, 0); e != nil {
 				return Polynomial{}, e
 			}
 		} else if reduct != nil {
@@ -225,21 +226,21 @@ func (m *MultivariatePolynomialCore) coeffCoreWithReceipts(p Polynomial, x, k ui
 			if e != nil {
 				return Polynomial{}, e
 			}
-			if e = m.cheap2.add(&a, term, false); e != nil {
+			if e = m.coefficientSourceAdd(&m.cheap2, &a, term, scope, receipt, nil, 1); e != nil {
 				return Polynomial{}, e
 			}
 		}
 	}
 	if reduct != nil {
-		r, e := m.cheap2.mk(false)
+		r, e := m.coefficientSourceMK(&m.cheap2, scope, nil, nil, 1)
 		if e != nil {
 			return Polynomial{}, e
 		}
-		if e = reduct.assign(m, r); e != nil {
+		if e = m.coefficientAssignReduct(reduct, r, scope); e != nil {
 			return Polynomial{}, e
 		}
 	}
-	return m.cheap.mkWithAppendReceipt(false, appendReceipt, factoryReceipt)
+	return m.coefficientSourceMK(&m.cheap, scope, appendReceipt, factoryReceipt, 0)
 }
 func (m *MultivariatePolynomialCore) LeadingCoefficient(p Polynomial, x uint32) (Polynomial, error) {
 	d, e := m.Degree(p, x)

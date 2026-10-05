@@ -74,6 +74,7 @@ func (m *MultivariatePolynomialCore) transferFactoryResult(r *polynomialFactoryI
 	if p == (Polynomial{}) || p != s.result {
 		return ErrPolynomialOwner
 	}
+	m.acknowledgeCoefficientArithmeticFactory(s, r)
 	s.result = Polynomial{}
 	if s.buffer != nil {
 		if e := s.buffer.acknowledgeFactoryAppendTransfer(s.invocation); e != nil {

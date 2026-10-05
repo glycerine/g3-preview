@@ -28771,7 +28771,10 @@
         "mpnum/polynomial_exact_div_direct_numeric_source_test.go",
         "mpnum/polynomial_exact_div_numeric_context_source_test.go",
         "mpnum/polynomial_exact_div_pn_stop_source_test.go",
-        "mpnum/polynomial_exact_div_prelude_source_test.go"
+        "mpnum/polynomial_exact_div_prelude_source_test.go",
+        "mpnum/polynomial_coefficient_reduct_ownership_source_test.go",
+        "mpnum/polynomial_coefficient_two_buffer_big_source_test.go",
+        "mpnum/polynomial_coefficient_factory_frame_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -29421,7 +29424,11 @@
         "TestPolynomialRegularSourceZeroRemovalTransfersActualTags",
         "TestPolynomialRegularStoppedPNPreservesActualRowsAndHistory",
         "TestPolynomialRegularZeroAddMulPreservesUnreadInvocation",
-        "TestPolynomialScaleEarlyAliasesDoNotAcquireOlderRegularFrame"
+        "TestPolynomialScaleEarlyAliasesDoNotAcquireOlderRegularFrame",
+        "TestPolynomialCoefficientReductActualTwoBufferOwnershipPrefixes",
+        "TestPolynomialCoefficientReductActualTwoBIGBufferPrefixes",
+        "TestPolynomialCoefficientFactoryACKRequiresActualSourceFrame",
+        "TestPolynomialCoefficientTwoBufferStaleChildrenPreserveReplacement"
       ],
       "conditionals": [
         {
@@ -32826,6 +32833,22 @@
             "TestPolynomialExactDivPublicOwnAcknowledgmentPermitsSameOwnerRetry",
             "TestPolynomialExactDivYoungerPNSourceStopPreservesOlderNUMReference"
           ]
+        },
+        {
+          "go_target": "mpnum/polynomial_coefficient_receipt.go",
+          "name": "polynomial.cpp:3264-3277,3297-3312 Coeff two-buffer invocation continuation: actual leading/reduct ADD and mk children; reduct incoming INC handoff before leading factory; exact parent/buffer/factory frame and captured nonwrap generation.",
+          "status": "partial",
+          "tests": [
+            "TestPolynomialCoefficientReductActualTwoBufferOwnershipPrefixes",
+            "TestPolynomialCoefficientReductActualTwoBIGBufferPrefixes",
+            "TestPolynomialCoefficientFactoryACKRequiresActualSourceFrame",
+            "TestPolynomialCoefficientTwoBufferStaleChildrenPreserveReplacement",
+            "TestPolynomialCoefficientReceiptActualSETBeforeINC",
+            "TestPolynomialCoefficientReceiptPreservesOlderForeignConstructor",
+            "TestPolynomialCoefficientReceiptUniqueFrameAndRejectedEntry",
+            "TestPolynomialCoefficientReceiptCachedMonomialCreatesNoLeafAuthority",
+            "TestPolynomialCoefficientReceiptActualCalleeCompletionClearsTag"
+          ]
         }
       ],
       "ownership": [
@@ -32922,7 +32945,9 @@
         "Actual lower-allocation executing frame cannot be retired by a reentrant Go ErrorTransport owning cleanup; original returned Pending outcome stays bound through actual refusal and later own abort. Early factoryCallerGuard refuses before public CleanupConstruction or manager.CloseChecked reaches older construction storage; private receipt cleanup independently refuses while executing.",
         "Exact actual guarded Content owner/member/frame/nonwrapping immutable invocation; direct source allocation and actual pending-clear hooks only. Actual source child end/verification DT remains separate from false completed and true unjoined owning phases. Diagnostic child tuples survive own acknowledgment without numeric/root authority.",
         "Actual self/embedded source buffer/frame/nonwrapping immutable invocation/executing/callback-zero identity; direct allocation leaves and actual default NUM/INC/push/factory handoff alone grant roots.",
-        "False acknowledges only completed younger child suffix; true retires exact unjoined acquisitions after caller older source declarations, preserving first cause and later foreign generation."
+        "False acknowledges only completed younger child suffix; true retires exact unjoined acquisitions after caller older source declarations, preserving first cause and later foreign generation.",
+        "Both actual cheap and cheap2 source children acquired at reached guarded ADD/mk actions, with direct accepted Copy/PN leaves, charged row tags and actual factory leaf authority. Actual incoming INC factory transfer acknowledges only matched coefficient-child metadata before older DEC callbacks; no mirrored NUM payload or high-level root snapshot.",
+        "False completes younger reached child source suffix before caller older locals; true retires exact unjoined rows/factory/generated leaves afterward. Source cause and child diagnostic identities persist across owning acknowledgment. Copied factory source frame cannot acknowledge real child; stale reused Coeff/AR/append/factory tuples preserve current physical roots."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -32996,7 +33021,8 @@
         "Selected receipt leaf closure only. Signed-host TLS domain fixture is a public-operation guarded helper profile, not ordinary mathematical freeOOM. Bounds-to-ErrorTransport hypothesis was withdrawn after runtime.go:123-134/accounting.go:55-84,175-186 review. Other legacy parent observer snapshots, regular SOM wrappers, full Factor/Discriminant and whole source unit remain separately open; registered driver credit0.",
         "ErrorTransport reentry is a supported Go helper callback profile; this proof does not invent a corresponding native C++ callback at malloc exception. Exact executing cleanup refuses ErrPolynomialPending. Original postphysical Pending token survived before fix, but its prematurely inactive receipt could not own-abort; real RED preserved. Additional actual public cleanup RED showed pending-generation mutation before late refusal; corrected early guard preserves original pending state, Runtime graph, cold charge and manager retirement stage in all three modes.",
         "Selected concrete Content invocation closure only; unrelated polynomial parent/regular SOM/ExactDiv/Neg/Discriminant and whole unit remain partial. Signed-host TLS tests are guarded owner-primitive profiles, not ordinary mathematical free-OOM. No new registered C++ driver assertion credit.",
-        "Selected concrete supported source profiles only; no source-unit/API promotion or registered-driver assertion credit. Signed-host TLS/source pointer guards are explicit helper domains, not ordinary mathematical OOM reachability. Unselected scalar ExactDiv, full Factor/Discriminant and high-level shared-buffer callback reentry remain distinct obligations."
+        "Selected concrete supported source profiles only; no source-unit/API promotion or registered-driver assertion credit. Signed-host TLS/source pointer guards are explicit helper domains, not ordinary mathematical OOM reachability. Unselected scalar ExactDiv, full Factor/Discriminant and high-level shared-buffer callback reentry remain distinct obligations.",
+        "Selected two-buffer optional Coeff continuation only. Pseudo/Resultant/Power/Discriminant actual parent child extraction remains separate; no whole polynomial/source driver completion credit. Metadata of actual foreign callback Coeff invocation remains admitted at reached source actions, while direct numerical acquisition still requires callbackDepth zero; no new callback allocating-OOM completion claim."
       ]
     },
     {
