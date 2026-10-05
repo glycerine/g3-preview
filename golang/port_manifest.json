@@ -125979,7 +125979,9 @@
         "mpnum/construction_failure.go",
         "mpnum/mpz_allocator_phase_b_test.go",
         "mpnum/rational_service_source_finalize.go",
-        "mpnum/transitive_source_finalize_test.go"
+        "mpnum/transitive_source_finalize_test.go",
+        "mpnum/rational_service_source_initialize.go",
+        "mpnum/rational_service_source_initialize_test.go"
       ],
       "tests": [
         "TestRationalServiceSourceConstructorAssertions",
@@ -126034,7 +126036,11 @@
         "TestServiceSourceFinalizeActualCacheDenominatorGuard",
         "TestTransitiveSourceFinalizeActualChildScratchHole",
         "TestTransitiveSourceFinalizeColdOwnerAndReadinessGuards",
-        "TestServiceSourceFinalizeActualHookAndConstantOrder"
+        "TestServiceSourceFinalizeActualHookAndConstantOrder",
+        "TestRationalServicePreparedSourcePublicationAndConstants",
+        "TestRationalServicePreparedEveryActualManagerConstructorRefusal",
+        "TestRationalServicePreparedColdAbortAndOwnerGuards",
+        "TestRationalServicePreparedOrdinaryReadiness"
       ],
       "conditionals": [
         {
@@ -126138,15 +126144,28 @@
             "TestTransitiveSourceFinalizeColdOwnerAndReadinessGuards",
             "TestServiceSourceFinalizeActualHookAndConstantOrder"
           ]
+        },
+        {
+          "name": "Source rational initialize pointer publication before constant/inf hooks, pointer-present shortcut, separate prepared cold owner and retained failed child ctor receipt; unconditional finalizer manager read",
+          "status": "partial",
+          "go_target": "mpnum/rational_service_source_initialize.go",
+          "tests": [
+            "TestRationalServicePreparedSourcePublicationAndConstants",
+            "TestRationalServicePreparedEveryActualManagerConstructorRefusal",
+            "TestRationalServicePreparedColdAbortAndOwnerGuards",
+            "TestRationalServicePreparedOrdinaryReadiness"
+          ]
         }
       ],
       "ownership": [
         "Owner-local RationalService owns synchronized numerical manager, constants and pointer-free cache; scalar provenance on OwnedRational validates all public operands. Cold mutexes ordered by immutable ownerID for CopyFrom; all headers/backing/old+new charged. See PORT_PROGRESS.md#audit-rational-service-port-status-md.",
-        "All six infinitesimal constants are actual pointer-free service fields included in reflected header bytes. Constructor order rational/InfRat/InfInt; finalization InfRat/InfInt/cache/rational constants/manager. Production hook traversal observed via free-slot reuse before manager close. See PORT_PROGRESS.md#audit-rational-inf-lifecycle-port-status-md."
+        "All six infinitesimal constants are actual pointer-free service fields included in reflected header bytes. Constructor order rational/InfRat/InfInt; finalization InfRat/InfInt/cache/rational constants/manager. Production hook traversal observed via free-slot reuse before manager close. See PORT_PROGRESS.md#audit-rational-inf-lifecycle-port-status-md.",
+        "Prepared cold header/config is charged once; manager-nil returned Integer constructor failure is separate actual owner, not published manager. Standalone constructor forwards that child receipt after only outer header refund. Source finalizer stops at first unconditional null-manager access; explicit owning abort drains retained child and cold header. Exact named provider/slab/object/raw graphs precede fault disable."
       ],
       "deviations": [
         "Global mutable numerical manager/cache/constants become an explicit owner-local service; getters produce independent values and scalar provenance guards service domains. Cache algorithms and outer hooks have bounded evidence; transitive source finalization and header facade remain partial. Windows compiler warning pragma has no Go runtime counterpart.",
-        "The transitive destructor body now reaches actual source finalizers instead of scanning caller descriptors. Charged Go ownership metadata and surviving direct caller raw blocks remain until explicit owning cleanup. Generated global/TLS bindings, typed source object allocation/deallocation hooks and full Natural lexical/output lifetime remain open; no whole-unit promotion."
+        "The transitive destructor body now reaches actual source finalizers instead of scanning caller descriptors. Charged Go ownership metadata and surviving direct caller raw blocks remain until explicit owning cleanup. Generated global/TLS bindings, typed source object allocation/deallocation hooks and full Natural lexical/output lifetime remain open; no whole-unit promotion.",
+        "Generated process memory initialize/finalize remains open. Pending failed-child source init retry is an explicit Go pending-own guard; source rational::initialize with null pointer would retry. Valid fresh source constants remain inline; no invented postmanager allocation failure. Cold ordinary service methods reject unavailable source state; OwnerID remains scalar inspection."
       ]
     },
     {
@@ -126167,7 +126186,11 @@
         "mpnum/upolynomial_rational_context.go",
         "mpnum/upolynomial_rational_context_test.go",
         "mpnum/inf_arithmetic_entry_source_test.go",
-        "mpnum/inf_muldiv_entry_source_test.go"
+        "mpnum/inf_muldiv_entry_source_test.go",
+        "mpnum/rational_service_cleanup.go",
+        "mpnum/rational_service_source_finalize.go",
+        "mpnum/rational_service_source_initialize.go",
+        "mpnum/rational_service_source_initialize_test.go"
       ],
       "tests": [
         "TestSourceRationalConversionAssertions",
@@ -126297,7 +126320,11 @@
         "TestInfMulDivEntryScalarMemberAliasRereads",
         "TestInfMulDivEntryRawDenominatorAndZero",
         "TestInfMulDivEntryInlineWarmZero",
-        "TestInfMulDivEntryForeignAndClosedBeforeActions"
+        "TestInfMulDivEntryForeignAndClosedBeforeActions",
+        "TestRationalServicePreparedSourcePublicationAndConstants",
+        "TestRationalServicePreparedEveryActualManagerConstructorRefusal",
+        "TestRationalServicePreparedColdAbortAndOwnerGuards",
+        "TestRationalServicePreparedOrdinaryReadiness"
       ],
       "conditionals": [
         {
@@ -126789,6 +126816,17 @@
             "TestInfMulDivEntryInlineWarmZero",
             "TestInfMulDivEntryForeignAndClosedBeforeActions"
           ]
+        },
+        {
+          "name": "Source rational initialize pointer publication before constant/inf hooks, pointer-present shortcut, separate prepared cold owner and retained failed child ctor receipt; unconditional finalizer manager read",
+          "status": "partial",
+          "go_target": "mpnum/rational_service_source_initialize.go",
+          "tests": [
+            "TestRationalServicePreparedSourcePublicationAndConstants",
+            "TestRationalServicePreparedEveryActualManagerConstructorRefusal",
+            "TestRationalServicePreparedColdAbortAndOwnerGuards",
+            "TestRationalServicePreparedOrdinaryReadiness"
+          ]
         }
       ],
       "ownership": [
@@ -126798,7 +126836,8 @@
         "Complete facade uses existing budgeted service manager and checked scoped deep-copy bridges. Source const references become independent owning copies; root/coefficient outputs preserve actual identity, source failure/alias prefixes and g3debug assertion timing. See PORT_PROGRESS.md#audit-rational-facade-extra-port-status-md.",
         "Real remaining temporary Rational records are moved into charged embedded service9/manager1 storage before stack owners vanish; completed source destruction and partial-constructor owning abort are distinguished. Named-return finishers propagate refused cleanup and retain unpublished result roots. Public Inf Del retains caller suffix in actual source component order; pure queries and caller cleanup remain usable. Explicit CleanupLexical is Go owning recovery, not source destructor retry equivalence.",
         "Selected source comparison/unary/reset/swap paths check cold ownership then each reached component action, preserving unread invalid fields and partial publication. Actual SYNCH RAW comparison locals are charged distinct manager fields, normal deletion cursor follows source, body failure retains real limbs for explicit owning cleanup. Service lexical bound9 unchanged; copied unary results use existing literal constructor/temporary machinery. Immediate caller-named physical censuses, cold reservation sweeps and warm allocation checks cover selected routes. Unrelated arithmetic and Go-extension Move preflights remain open.",
-        "Selected alias division owns a real retained raw Int; source body failure skips explicit Del, source end precedes sign/normalize, and owning cleanup is separate. The raw scope is ten Int fields charged by the manager header; facade lexical bound remains nine. Named physical audits include active div and retain exact equality."
+        "Selected alias division owns a real retained raw Int; source body failure skips explicit Del, source end precedes sign/normalize, and owning cleanup is separate. The raw scope is ten Int fields charged by the manager header; facade lexical bound remains nine. Named physical audits include active div and retain exact equality.",
+        "Prepared cold header/config is charged once; manager-nil returned Integer constructor failure is separate actual owner, not published manager. Standalone constructor forwards that child receipt after only outer header refund. Source finalizer stops at first unconditional null-manager access; explicit owning abort drains retained child and cold header. Exact named provider/slab/object/raw graphs precede fault disable."
       ],
       "deviations": [
         "Explicit manager projects rational.h inclusive32-bit wrappers, distinct from strict MPZ boundaries; global wrapper remains incomplete. Float positive converted denominator SASSERT becomes typed ErrRationalFloatDomain. Source raw component alias publication can leave denominator zero; subsequent operations diagnose initialization.",
@@ -126808,7 +126847,8 @@
         "Whole-header completion is unproven: source NUM-only hash/sign and selected reference projections permit finite raw denominator0; current ordinary manager Hash/Sign/Copy guards reject that source state. The source inversion of zero can produce this state. Scalar projection closure does not close these separate families or generated global/TLS lifecycle.",
         "Malformed32-bit requested-byte layouts are labelled guarded Go boundary evidence, not ordinary valid C++ destructor allocation failure. Budget supplies actual allocation refusal/failed-copy token only, never simulated Del failure. Selected scope records preserve original vs cleanup causes; broader raw constructor/reset/alias/default-copy-constructor arithmetic temporaries, registry/global ownership and transport remain partial. Cross-owner staged CopyFrom is explicit Go ownership bridge, not a source alias transaction. No whole-unit/API/registered assertion promotion.",
         "No newly registered source assertion credit: sixteen added source-profile regressions complement existing active assertions. Selected ordinary whole-value preflights are replaced only where they precede actual source reads/mutations. Malformed ILP32 second temporary end-cursor test diagnoses physical requested-size guard after actual source first destruction, with no guard relabeling or allocator repair. Whole header and global service binding remain partial.",
-        "Eleven Mul/Div regression groups include five tests-first source-order defects plus honest existing-behavior confirmations, independent bounded rational oracle, alias rereads and warm ownership checks. No additional registered source assertions or whole-header completion credited; raw MPQ10 and facade lexical9 bounds unchanged."
+        "Eleven Mul/Div regression groups include five tests-first source-order defects plus honest existing-behavior confirmations, independent bounded rational oracle, alias rereads and warm ownership checks. No additional registered source assertions or whole-header completion credited; raw MPQ10 and facade lexical9 bounds unchanged.",
+        "Generated process memory initialize/finalize remains open. Pending failed-child source init retry is an explicit Go pending-own guard; source rational::initialize with null pointer would retry. Valid fresh source constants remain inline; no invented postmanager allocation failure. Cold ordinary service methods reject unavailable source state; OwnerID remains scalar inspection."
       ]
     },
     {

@@ -1,4 +1,5 @@
 // Source: src/util/rational.h; src/util/rational.cpp. Licensed under the MIT license.
+// Source author: Leonardo de Moura (2006-09-18). See LICENSE.txt.
 // Concrete owner-local core of src/util/rational.h/.cpp and vector.h.
 package mpnum
 
@@ -60,6 +61,11 @@ type RationalService struct {
 	closing                                        bool
 	sourceFinalizing, sourceFinalized, sourceGuard bool
 	sourceCause                                    error
+	initializationConfig                           RationalServiceConfig
+	initializationBudget                           *arena.Budget
+	initializationFailure                          *IntegerManager
+	initializationCause                            error
+	initializationStage                            uint8
 }
 
 func nextRationalServiceID() (uint64, error) {
@@ -74,40 +80,20 @@ func nextRationalServiceID() (uint64, error) {
 	}
 }
 func NewRationalService(c RationalServiceConfig) (*RationalService, error) {
-	if c.Integers.Cells.Budget != c.Integers.Words.Descriptors.Budget {
-		return nil, arena.ErrConfig
-	}
-	id, e := nextRationalServiceID()
+	s, e := PrepareRationalService(c)
 	if e != nil {
 		return nil, e
 	}
-	b := c.Integers.Cells.Budget
-	header := uint64(reflect.TypeOf(RationalService{}).Size())
-	if e = b.Reserve(header); e != nil {
-		return nil, e
-	}
-	s := &RationalService{ownerID: id, zero: NewRational(), one: NewRational(), minusOne: NewRational(), headerBytes: header}
-	s.self = s
-	m, e := NewRationalManager(RationalConfig{Integers: c.Integers, Synchronized: true})
-	if e != nil {
-		b.Release(header)
-		return nil, e
-	}
-	s.manager = m
-	// Source initialization order: manager, zero, one, minus one.
-	if e = m.SetInt64(&s.zero, 0); e == nil {
-		e = m.SetInt64(&s.one, 1)
-	}
-	if e == nil {
-		e = m.SetInt64(&s.minusOne, -1)
-	}
-	if e == nil {
-		e = s.initInfRationalConstants()
-	}
-	if e == nil {
-		e = s.initInfIntRationalConstants()
-	}
-	if e != nil {
+	if e = s.InitializeSource(); e != nil {
+		if s.manager == nil {
+			// The enclosing constructor was never completed. Its header is consumed;
+			// any actual failed child constructor remains the returned owning receipt.
+			s.initializationFailure = nil
+			s.initializationBudget.Release(s.headerBytes)
+			s.headerBytes = 0
+			s.closed = true
+			return nil, e
+		}
 		s.originalCause = e
 		if cleanup := s.CloseChecked(); cleanup != nil {
 			return nil, s
@@ -127,7 +113,7 @@ func (s *RationalService) lock() error {
 		return ErrRationalServiceCopy
 	}
 	s.mu.Lock()
-	if s.closed || s.closing || s.sourceFinalizing {
+	if s.closed || s.closing || s.sourceFinalizing || s.initializationStage != 6 {
 		s.mu.Unlock()
 		return arena.ErrClosed
 	}
@@ -191,7 +177,7 @@ func (s *RationalService) CopyFrom(dst *OwnedRational, source *RationalService, 
 	defer first.mu.Unlock()
 	second.mu.Lock()
 	defer second.mu.Unlock()
-	if s.closed || source.closed {
+	if s.closed || source.closed || s.initializationStage != 6 || source.initializationStage != 6 {
 		return arena.ErrClosed
 	}
 	if e := s.check(dst); e != nil {

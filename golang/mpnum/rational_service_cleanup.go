@@ -1,4 +1,5 @@
-// Licensed under the MIT license.
+// Source: src/util/rational.cpp:64-83; src/util/rational.h.
+// Leonardo de Moura (2006-09-18). Licensed under the MIT license; see LICENSE.txt.
 package mpnum
 
 import "github.com/glycerine/g3/golang/memory"
@@ -13,10 +14,16 @@ func (s *RationalService) Unwrap() error {
 func (s *RationalService) OriginalCause() error { return s.originalCause }
 func (s *RationalService) CleanupCause() error  { return s.cleanupCause }
 func (s *RationalService) RuntimeOwner() *memory.Runtime {
-	if s == nil || s.self != s || s.manager == nil {
+	if s == nil || s.self != s {
 		return nil
 	}
-	return s.manager.RuntimeOwner()
+	if s.manager != nil {
+		return s.manager.RuntimeOwner()
+	}
+	if s.initializationFailure != nil {
+		return s.initializationFailure.RuntimeOwner()
+	}
+	return nil
 }
 func (s *RationalService) Cleanup() error { return s.CloseChecked() }
 func (s *RationalService) CloseChecked() error {
@@ -26,6 +33,21 @@ func (s *RationalService) CloseChecked() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if s.closed {
+		s.cleanupCause = nil
+		return nil
+	}
+	if s.manager == nil {
+		s.closing = true
+		if s.initializationFailure != nil {
+			if e := s.initializationFailure.CloseChecked(); e != nil {
+				s.cleanupCause = e
+				return s
+			}
+			s.initializationFailure = nil
+		}
+		s.initializationBudget.Release(s.headerBytes)
+		s.headerBytes = 0
+		s.closed = true
 		s.cleanupCause = nil
 		return nil
 	}

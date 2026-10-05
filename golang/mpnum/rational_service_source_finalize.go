@@ -1,10 +1,15 @@
-// Licensed under the MIT license.
-// rational.cpp75-83: hooks, cache, constants, actual manager destruction.
+// Source: src/util/rational.cpp:75-83; src/util/rational.h:67.
+// Leonardo de Moura (2006-09-18). Licensed under the MIT license; see LICENSE.txt.
 package mpnum
 
 import "github.com/glycerine/g3/golang/arena"
 
 func (s *RationalService) releaseOuterLeaf(a *Int, source bool) error {
+	if source && s.manager == nil {
+		s.sourceGuard = true
+		s.sourceCause = ErrRationalServiceNoManager
+		return s.sourceCause
+	}
 	if !source {
 		return s.manager.z.Del(a)
 	}
@@ -30,7 +35,7 @@ func (s *RationalService) sourceFinalizeLocked() error {
 	if s.closed || s.sourceFinalized {
 		return nil
 	}
-	if s.originalCause != nil || (s.closing && !s.sourceFinalizing) {
+	if s.closing && !s.sourceFinalizing {
 		return arena.ErrClosed
 	}
 	if s.lexical.pending() {
