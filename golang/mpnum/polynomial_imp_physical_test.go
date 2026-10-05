@@ -223,7 +223,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 		add(z.rawDisplay.roots[i])
 	}
 	add(z.smt2Display.value)
-	if z.matchesAddMulInvocation(&z.gcdRaw.addMul) {
+	if z.matchesAddMulInvocation(&z.gcdRaw.addMul) || z.matchesAddMulInvocation(&z.addMulInvocation.receipt) {
 		add(z.addMulInvocation.tmp)
 	}
 	add(z.intMin)

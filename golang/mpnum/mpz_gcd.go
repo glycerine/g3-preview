@@ -76,108 +76,73 @@ func U64GCD(u, v uint64) uint64 {
 	return u << k
 }
 
-// AddMul stores a+b*c, preserving the source +/-1 shortcut predicates (only
-// inline +/-1 qualify). The nil public adapter retains its explicitly
-// incomplete eager failure cleanup; source-owned RAW uses end-only DEL.
+// AddMul stores a+b*c. Only inline +/-1 take the source shortcut paths.
 func (m *IntegerManager) AddMul(a, b, c, d *Int) error {
 	return m.addMulWithSourceReceipt(a, b, c, d, nil, nil)
 }
-
-// One literal arithmetic body serves public and explicitly source-owned calls.
-// The nil-receipt failure adapter temporarily preserves historical eager RAW
-// cleanup; it is an incomplete deviation, not source AddMul lifetime credit.
-
 func (m *IntegerManager) addMulWithSourceReceipt(a, b, c, d *Int, receipt *integerAddMulInvocationReceipt, arithmetic *polynomialArithmeticInvocationReceipt) error {
 	return m.addMulWithAllocationContext(a, b, c, d, receipt, integerAllocationInvocationContext{arithmetic: arithmetic})
 }
-func (m *IntegerManager) addMulWithAllocationContext(a, b, c, d *Int, receipt *integerAddMulInvocationReceipt, context integerAllocationInvocationContext) (err error) {
+func (m *IntegerManager) addMulWithAllocationContext(a, b, c, d *Int, receipt *integerAddMulInvocationReceipt, context integerAllocationInvocationContext) error {
+	return m.addSubMulWithAllocationContext(a, b, c, d, false, receipt, context)
+}
+
+// Both literal bodies construct one RAW tmp, perform Mul then Add/Sub, and
+// execute DEL only after the body succeeds. Failed bodies retain actual roots.
+func (m *IntegerManager) addSubMulWithAllocationContext(a, b, c, d *Int, subtract bool, receipt *integerAddMulInvocationReceipt, context integerAllocationInvocationContext) (err error) {
 	for _, n := range []*Int{a, b, c, d} {
 		if e := m.check(n); e != nil {
 			return e
 		}
 	}
-	callerContext := context
 	if b.IsSmall() && b.val == 1 {
-		return m.addSubWithAllocationContext(a, c, d, false, context)
+		return m.addSubWithAllocationContext(a, c, d, subtract, context)
 	}
 	if b.IsSmall() && b.val == -1 {
-		return m.addSubWithAllocationContext(a, c, d, true, context)
+		return m.addSubWithAllocationContext(a, c, d, !subtract, context)
 	}
-	var legacyTmp Int
-	endReached := false
-	tmp := &legacyTmp
-	var frame *integerAddMulScope
-	if receipt != nil {
-		frame = &m.addMulInvocation
-		if frame.active || frame.invocation == ^uint64(0) {
-			return ErrPolynomialPending
-		}
-		*frame = integerAddMulScope{active: true, executing: true, invocation: frame.invocation + 1, stage: 1}
-		frame.parentContext = callerContext
-		if callerContext.arithmetic != nil {
-			frame.parent = *callerContext.arithmetic
-		}
-		*receipt = integerAddMulInvocationReceipt{m, frame, frame.invocation}
-		tmp = &frame.tmp
-		context = (integerAllocationInvocationContext{}).withAddMulInvocation(receipt)
-		defer func() {
-			frame.executing = false
-			if frame.stage < 3 {
-				frame.bodyCause = err
-			}
-			if tmp.IsSmall() && !polynomialNegNumericPending(&frame.numeric) && frame.sourceCause == nil {
-				frame.active = false
-			}
-		}()
-	} else {
-		// Source RAW has no destructor on body failure. This legacy ergonomic
-		// adapter remains separately incomplete until all public users carry source
-		// ownership; its mathematical Mul/Add engine is shared with the source path.
-		defer func() {
-			if err != nil && !endReached {
-				_ = m.Del(tmp)
-			}
-		}()
+	callerContext := context
+	frame := &m.addMulInvocation
+	if frame.active || frame.invocation == ^uint64(0) {
+		return ErrPolynomialPending
 	}
+	if receipt == nil {
+		receipt = &frame.receipt
+	}
+	*frame = integerAddMulScope{active: true, executing: true, invocation: frame.invocation + 1, stage: 1, parentContext: callerContext}
+	if callerContext.arithmetic != nil {
+		frame.parent = *callerContext.arithmetic
+	}
+	frame.receipt = integerAddMulInvocationReceipt{m, frame, frame.invocation}
+	*receipt = frame.receipt
+	tmp := &frame.tmp
+	context = (integerAllocationInvocationContext{}).withAddMulInvocation(receipt)
+	defer func() {
+		frame.executing = false
+		if frame.stage < 3 {
+			frame.bodyCause = err
+		}
+		if tmp.IsSmall() && !polynomialNegNumericPending(&frame.numeric) && frame.sourceCause == nil {
+			frame.active = false
+		}
+	}()
 	if e := m.mulWithAllocationContext(b, c, tmp, context); e != nil {
 		return e
 	}
-	if frame != nil {
-		frame.stage = 2
-		if callerContext != (integerAllocationInvocationContext{}) {
-			context = callerContext
-		}
+	frame.stage = 2
+	if callerContext != (integerAllocationInvocationContext{}) {
+		context = callerContext
 	}
-	if e := m.addSubWithAllocationContext(a, tmp, d, false, context); e != nil {
+	if e := m.addSubWithAllocationContext(a, tmp, d, subtract, context); e != nil {
 		return e
 	}
-	if frame != nil {
-		frame.stage = 3
-		return m.finishAddMulSource(frame)
-	}
-	endReached = true
-	return m.Del(tmp)
+	frame.stage = 3
+	return m.finishAddMulSource(frame)
 }
 
-// SubMul stores a-b*c with the source corresponding shortcut branches.
+// SubMul stores a-b*c with the corresponding source shortcut branches.
 func (m *IntegerManager) SubMul(a, b, c, d *Int) error {
-	for _, n := range []*Int{a, b, c, d} {
-		if e := m.check(n); e != nil {
-			return e
-		}
-	}
-	if b.IsSmall() && b.val == 1 {
-		return m.Sub(a, c, d)
-	}
-	if b.IsSmall() && b.val == -1 {
-		return m.Add(a, c, d)
-	}
-	var tmp Int
-	defer m.Del(&tmp)
-	if e := m.Mul(b, c, &tmp); e != nil {
-		return e
-	}
-	return m.Sub(a, &tmp, d)
+	return m.addSubMulWithAllocationContext(a, b, c, d, true, nil, integerAllocationInvocationContext{})
 }
 
 // GCD translates the internal backend's selected Lehmer algorithm, not the

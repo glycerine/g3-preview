@@ -1,10 +1,13 @@
-// Source: src/util/mpz.h:393-407 (plain RAW tmp; end-only explicit DEL).
+// Source: src/util/mpz.h:393-426 (plain RAW tmp; end-only explicit DEL).
 // Licensed under the MIT license. Source author: Leonardo de Moura.
 package mpnum
+
+import "github.com/glycerine/g3/golang/memory"
 
 // This is actual source invocation state in the charged Integer owner. Body
 // failure does not reach DEL; its published temporary is explicitly unjoined.
 type integerAddMulScope struct {
+	receipt                         integerAddMulInvocationReceipt
 	parentContext                   integerAllocationInvocationContext
 	invocation                      uint64
 	active, executing, ended, owned bool
@@ -79,4 +82,15 @@ func (m *IntegerManager) cleanupAddMulInvocation(r *integerAddMulInvocationRecei
 	}
 	*s = integerAddMulScope{invocation: s.invocation, stage: s.stage, ended: s.ended, owned: s.owned, bodyCause: s.bodyCause, sourceCause: s.sourceCause}
 	return nil
+}
+
+// CleanupAddMulRaw acknowledges only the actual retained AddMul/SubMul frame.
+// Source body failure does not imply that its end DEL was reached.
+func (m *IntegerManager) CleanupAddMulRaw() error {
+	if m == nil || m.self != m {
+		return memory.ErrRuntimeOwner
+	}
+	s := &m.addMulInvocation
+	r := integerAddMulInvocationReceipt{m, s, s.invocation}
+	return m.cleanupAddMulInvocation(&r, true)
 }

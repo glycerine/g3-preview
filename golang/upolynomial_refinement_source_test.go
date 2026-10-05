@@ -323,7 +323,7 @@ func TestUPolynomialRefinementFaultPrefixesImmediateRoots(t *testing.T) {
 					graph := m.Stats()
 					scratch, e2 := bqm.Stats()
 					callers := upolyIsolationCallerNumerators(m, &a, &b, &c, &d) + inputs
-					if e2 != nil || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+scratch.LiveScratchNumerators+callers {
+					if e2 != nil || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+upolyIntegerRawOwnedCells(t, m.IntegerManager())+scratch.LiveScratchNumerators+callers {
 						t.Fatal("immediate refine/conversion graph", route, fault, e, e2, graph, scratch, callers)
 					}
 
@@ -350,7 +350,7 @@ func TestUPolynomialRefinementFaultPrefixesImmediateRoots(t *testing.T) {
 					}
 					graph = m.Stats()
 					scratch, e2 = bqm.Stats()
-					if e2 != nil || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+scratch.LiveScratchNumerators {
+					if e2 != nil || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+upolyIntegerRawOwnedCells(t, m.IntegerManager())+scratch.LiveScratchNumerators {
 						t.Fatal("untracked lexical root", route, fault, e2, graph)
 					}
 

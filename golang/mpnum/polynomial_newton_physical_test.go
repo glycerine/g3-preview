@@ -42,7 +42,7 @@ func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCo
 			add(s.values[i])
 		}
 	}
-	if z.matchesAddMulInvocation(&z.gcdRaw.addMul) {
+	if z.matchesAddMulInvocation(&z.gcdRaw.addMul) || z.matchesAddMulInvocation(&z.addMulInvocation.receipt) {
 		add(z.addMulInvocation.tmp)
 	}
 	add(z.intMin)

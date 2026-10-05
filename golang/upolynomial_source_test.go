@@ -557,13 +557,13 @@ func TestUPolynomialImmediateNumericFailureAccounting(t *testing.T) {
 			t.Fatal(e)
 		}
 		base := m.Stats()
-		external := base.IntegerLiveCells - base.OwnedNumeralCells - base.IntegerCachedCells
+		external := base.IntegerLiveCells - base.OwnedNumeralCells - base.IntegerCachedCells - upolyIntegerRawOwnedCells(t, m.IntegerManager())
 		b.FailAfter(fail)
 		_, _ = m.EvalSignRational(v, &point)
 		// Audit BEFORE any numeric formatting, deletion or owner close. These
 		// observations count real storage independently from the arithmetic result.
 		now := m.Stats()
-		if now.IntegerLiveCells != external+now.OwnedNumeralCells+now.IntegerCachedCells {
+		if now.IntegerLiveCells != external+now.OwnedNumeralCells+now.IntegerCachedCells+upolyIntegerRawOwnedCells(t, m.IntegerManager()) {
 			t.Fatal("untracked numeric temporary", fail, base, now)
 		}
 		upolyHenselAuditPhysical(t, []*mpnum.UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{Rationals: []*mpnum.Rational{&point}, RationalManagers: []*mpnum.RationalManager{q}})
@@ -887,7 +887,7 @@ func TestUPolynomialAllSelectedOutputFailurePrefixes(t *testing.T) {
 				t.Fatal(e)
 			}
 			base := m.Stats()
-			external := base.IntegerLiveCells - base.OwnedNumeralCells - base.IntegerCachedCells
+			external := base.IntegerLiveCells - base.OwnedNumeralCells - base.IntegerCachedCells - upolyIntegerRawOwnedCells(t, m.IntegerManager())
 			b.FailAfter(fail)
 			switch op {
 			case 0:
@@ -906,7 +906,7 @@ func TestUPolynomialAllSelectedOutputFailurePrefixes(t *testing.T) {
 				_ = m.Power(p, 3, out)
 			}
 			now := m.Stats()
-			if now.IntegerLiveCells != external+now.OwnedNumeralCells+now.IntegerCachedCells {
+			if now.IntegerLiveCells != external+now.OwnedNumeralCells+now.IntegerCachedCells+upolyIntegerRawOwnedCells(t, m.IntegerManager()) {
 				t.Fatal("unowned temporary after output prefix", op, fail, base, now)
 			}
 			upolyHenselAuditPhysical(t, []*mpnum.UPolynomialManager{m}, nil)

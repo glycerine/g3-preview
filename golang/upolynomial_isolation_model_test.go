@@ -166,7 +166,7 @@ func TestUPolynomialBinaryVectorBigCopyFaultImmediateRoots(t *testing.T) {
 		e := v.PushCopy(&a)
 		graph, vec := m.Stats(), v.Stats()
 		binary, e2 := b.Stats()
-		if e2 != nil || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+upolyIntegerGCDRawOwnedCells(t, m.IntegerManager())+vec.OwnedNumeralCells+binary.LiveScratchNumerators+1 {
+		if e2 != nil || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+upolyIntegerRawOwnedCells(t, m.IntegerManager())+vec.OwnedNumeralCells+binary.LiveScratchNumerators+1 {
 			t.Fatal("immediate binary output graph", fault, e, e2, graph, vec, binary)
 		}
 
@@ -185,7 +185,7 @@ func TestUPolynomialBinaryVectorBigCopyFaultImmediateRoots(t *testing.T) {
 		}
 		graph, vec = m.Stats(), v.Stats()
 		binary, e2 = b.Stats()
-		if e2 != nil || vec.OwnedNumeralCells != 0 || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+upolyIntegerGCDRawOwnedCells(t, m.IntegerManager())+binary.LiveScratchNumerators+1 {
+		if e2 != nil || vec.OwnedNumeralCells != 0 || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+upolyIntegerRawOwnedCells(t, m.IntegerManager())+binary.LiveScratchNumerators+1 {
 			t.Fatal("failed companion cleanup", fault, e2, graph, vec)
 		}
 		if e = b.Del(&a); e != nil {
@@ -284,7 +284,7 @@ func TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph(t *testing.T) {
 				graph := m.Stats()
 				scratch, e2 := b.Stats()
 				roots := r.Stats().OwnedNumeralCells + l.Stats().OwnedNumeralCells + u.Stats().OwnedNumeralCells
-				if e2 != nil || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+upolyIntegerGCDRawOwnedCells(t, m.IntegerManager())+scratch.LiveScratchNumerators+roots {
+				if e2 != nil || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+upolyIntegerRawOwnedCells(t, m.IntegerManager())+scratch.LiveScratchNumerators+roots {
 					t.Fatal("immediate isolation graph", route, fault, e, e2, graph, scratch, roots)
 				}
 
@@ -307,7 +307,7 @@ func TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph(t *testing.T) {
 				}
 				graph = m.Stats()
 				scratch, e2 = b.Stats()
-				if e2 != nil || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+upolyIntegerGCDRawOwnedCells(t, m.IntegerManager())+scratch.LiveScratchNumerators {
+				if e2 != nil || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+upolyIntegerRawOwnedCells(t, m.IntegerManager())+scratch.LiveScratchNumerators {
 					t.Fatal("lost local/frame", route, fault, e2, graph)
 				}
 
@@ -333,7 +333,7 @@ func TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph(t *testing.T) {
 	_, e := m.RefineToPrecision(mustUPolyView(t, m, p), bqm, &a, &b, 40)
 	graph := m.Stats()
 	scratch, e2 := bqm.Stats()
-	if !errors.Is(e, mpnum.ErrUPolynomialCanceled) || e2 != nil || limit.steps != steps+1 || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+upolyIntegerGCDRawOwnedCells(t, m.IntegerManager())+scratch.LiveScratchNumerators {
+	if !errors.Is(e, mpnum.ErrUPolynomialCanceled) || e2 != nil || limit.steps != steps+1 || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+upolyIntegerRawOwnedCells(t, m.IntegerManager())+scratch.LiveScratchNumerators {
 		t.Fatal("source pre-width cancel", e, e2, steps, limit.steps, graph)
 	}
 	one, two := mpnum.NewInt(1), mpnum.NewInt(2)
@@ -368,7 +368,7 @@ func TestUPolynomialIsolationZeroResetPublicationBeforeRefusal(t *testing.T) {
 	e := m.SquareFreeIsolateRoots(mustUPolyView(t, m, p), b, r, l, u)
 	graph := m.Stats()
 	scratch, e2 := b.Stats()
-	if !numericStorageReservationRefusal(e) || e2 != nil || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+upolyIntegerGCDRawOwnedCells(t, m.IntegerManager())+scratch.LiveScratchNumerators+r.Stats().OwnedNumeralCells+l.Stats().OwnedNumeralCells+u.Stats().OwnedNumeralCells || upolyIsolationSize(t, r) != 1 || upolyIsolationSize(t, l) != 0 || upolyIsolationSize(t, u) != 0 {
+	if !numericStorageReservationRefusal(e) || e2 != nil || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+upolyIntegerRawOwnedCells(t, m.IntegerManager())+scratch.LiveScratchNumerators+r.Stats().OwnedNumeralCells+l.Stats().OwnedNumeralCells+u.Stats().OwnedNumeralCells || upolyIsolationSize(t, r) != 1 || upolyIsolationSize(t, l) != 0 || upolyIsolationSize(t, u) != 0 {
 		t.Fatal("reset roots/lower/upper and publish zero before nz backing refusal", e, e2, graph, r.Stats(), l.Stats(), u.Stats())
 	}
 	budget.FailAfter(-1)

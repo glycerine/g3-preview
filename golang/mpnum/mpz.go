@@ -453,6 +453,9 @@ func (m *IntegerManager) CloseChecked() error {
 	if e := m.CleanupGCDRaw(); e != nil {
 		return fail(e)
 	}
+	if e := m.CleanupAddMulRaw(); e != nil {
+		return fail(e)
+	}
 	if m.cells != nil {
 		for n := uint64(1); n <= uint64(m.cells.Stats().Slots); n++ {
 			slot := arena.Slot(n)

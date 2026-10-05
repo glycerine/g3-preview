@@ -48,7 +48,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []mem
 			add(s.values[i].cell)
 		}
 	}
-	if m.matchesAddMulInvocation(&m.gcdRaw.addMul) {
+	if m.matchesAddMulInvocation(&m.gcdRaw.addMul) || m.matchesAddMulInvocation(&m.addMulInvocation.receipt) {
 		add(m.addMulInvocation.tmp.cell)
 	}
 	add(m.powerRaw.value.cell)

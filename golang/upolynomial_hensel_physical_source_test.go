@@ -150,10 +150,11 @@ func upolyHenselAuditPhysical(t *testing.T, cores []*mpnum.UPolynomialManager, f
 			addInt(values.Index(int(i)))
 		}
 	}
-	child := z.FieldByName("gcdRaw").FieldByName("addMul")
 	addMul := z.FieldByName("addMulInvocation")
-	if child.FieldByName("manager").Pointer() == z.Addr().Pointer() && child.FieldByName("frame").Pointer() == addMul.Addr().Pointer() && child.FieldByName("invocation").Uint() != 0 && child.FieldByName("invocation").Uint() == addMul.FieldByName("invocation").Uint() && addMul.FieldByName("active").Bool() {
-		addInt(addMul.FieldByName("tmp"))
+	for _, child := range []reflect.Value{z.FieldByName("gcdRaw").FieldByName("addMul"), addMul.FieldByName("receipt")} {
+		if child.FieldByName("manager").Pointer() == z.Addr().Pointer() && child.FieldByName("frame").Pointer() == addMul.Addr().Pointer() && child.FieldByName("invocation").Uint() != 0 && child.FieldByName("invocation").Uint() == addMul.FieldByName("invocation").Uint() && addMul.FieldByName("active").Bool() {
+			addInt(addMul.FieldByName("tmp"))
+		}
 	}
 	addInt(z.FieldByName("intMin"))
 	addInt(z.FieldByName("two64"))
@@ -652,4 +653,39 @@ func upolyIntegerGCDRawOwnedCells(t *testing.T, zowner *mpnum.IntegerManager) ui
 		add(scope.FieldByName("tmp"))
 	}
 	return uint32(len(named))
+}
+
+// Source: src/util/mpz.h:393-426. Public AddMul/SubMul retain the actual
+// reached RAW temporary separately from UPolynomial members and cached cells.
+func upolyIntegerRawOwnedCells(t *testing.T, owner *mpnum.IntegerManager) uint32 {
+	t.Helper()
+	count := upolyIntegerGCDRawOwnedCells(t, owner)
+	z := reflect.ValueOf(owner).Elem()
+	scope := z.FieldByName("addMulInvocation")
+	if !scope.FieldByName("active").Bool() {
+		return count
+	}
+	// A GCD child is already named by its exact parent receipt above.
+	if !scope.FieldByName("parentContext").FieldByName("raw").IsNil() {
+		return count
+	}
+	receipt := scope.FieldByName("receipt")
+	if receipt.FieldByName("manager").Pointer() != z.Addr().Pointer() || receipt.FieldByName("frame").Pointer() != scope.Addr().Pointer() || receipt.FieldByName("invocation").Uint() == 0 || receipt.FieldByName("invocation").Uint() != scope.FieldByName("invocation").Uint() {
+		t.Fatal("invalid actual public AddMul/SubMul receipt")
+	}
+	ref := scope.FieldByName("tmp").FieldByName("cell").Uint()
+	if ref == 0 || ref == z.FieldByName("failedRef").Uint() || ref == z.FieldByName("failedNullRef").Uint() {
+		return count
+	}
+	cells := z.FieldByName("cells").Elem()
+	slot := uint64(uint32(ref))
+	if slot == 0 || slot > cells.FieldByName("slots").Uint() {
+		t.Fatal("public RAW token outside directory", ref)
+	}
+	pageSize := cells.FieldByName("config").FieldByName("PageSize").Uint()
+	state := cells.FieldByName("pages").Index(int((slot - 1) / pageSize)).FieldByName("meta").Index(int((slot - 1) % pageSize))
+	if !state.FieldByName("live").Bool() || z.FieldByName("failedRef").Type().Size() == 8 && state.FieldByName("generation").Uint() != ref>>32 {
+		t.Fatal("public RAW token stale", ref)
+	}
+	return count + 1
 }

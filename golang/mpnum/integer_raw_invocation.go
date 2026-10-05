@@ -28,7 +28,8 @@ type integerRawInvocationReceipt struct {
 func (m *IntegerManager) rawInvocationExecuting() bool {
 	return (m.divisionRaw.active && m.divisionRaw.executing) ||
 		(m.extendedRaw.active && m.extendedRaw.executing) ||
-		(m.gcdRaw.active && m.gcdRaw.executing)
+		(m.gcdRaw.active && m.gcdRaw.executing) ||
+		(m.addMulInvocation.active && m.addMulInvocation.executing)
 }
 
 func (m *IntegerManager) rawFrameAddress(s *integerRawScope) bool {

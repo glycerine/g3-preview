@@ -215,7 +215,7 @@ func TestUPolynomialSequenceBigCopyFailureImmediateGraph(t *testing.T) {
 		b.FailAfter(fault)
 		e := seq.PushCopy(mustUPolyView(t, m, p))
 		managerGraph, sequenceGraph := m.Stats(), seq.Stats()
-		if managerGraph.IntegerLiveCells != managerGraph.IntegerCachedCells+managerGraph.OwnedNumeralCells+upolyIntegerGCDRawOwnedCells(t, m.IntegerManager())+sequenceGraph.OwnedNumeralCells {
+		if managerGraph.IntegerLiveCells != managerGraph.IntegerCachedCells+managerGraph.OwnedNumeralCells+upolyIntegerRawOwnedCells(t, m.IntegerManager())+sequenceGraph.OwnedNumeralCells {
 			t.Fatal("immediate complete graph", fault, e, managerGraph, sequenceGraph)
 		}
 		upolyHenselAuditPhysical(t, []*mpnum.UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{Sequences: []*mpnum.UPolynomialSequence{seq}})
@@ -255,7 +255,7 @@ func TestUPolynomialSequenceBigCopyFailureImmediateGraph(t *testing.T) {
 			t.Fatal("prefix reset", fault, e)
 		}
 		managerGraph, sequenceGraph = m.Stats(), seq.Stats()
-		if sequenceGraph.OwnedNumeralCells != 0 || managerGraph.IntegerLiveCells != managerGraph.IntegerCachedCells+managerGraph.OwnedNumeralCells+upolyIntegerGCDRawOwnedCells(t, m.IntegerManager()) {
+		if sequenceGraph.OwnedNumeralCells != 0 || managerGraph.IntegerLiveCells != managerGraph.IntegerCachedCells+managerGraph.OwnedNumeralCells+upolyIntegerRawOwnedCells(t, m.IntegerManager()) {
 			t.Fatal("reset lost roots", fault, managerGraph, sequenceGraph)
 		}
 		if successes > 0 {
@@ -279,7 +279,7 @@ func TestUPolynomialTransformCancellationAfterComposition(t *testing.T) {
 	steps := limit.steps
 	e := m.TranslateRationalViewInPlace(mustUPolyView(t, m, p), &c)
 	graph := m.Stats()
-	if !errors.Is(e, mpnum.ErrUPolynomialCanceled) || limit.steps != steps+1 || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+upolyIntegerGCDRawOwnedCells(t, m.IntegerManager()) {
+	if !errors.Is(e, mpnum.ErrUPolynomialCanceled) || limit.steps != steps+1 || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+upolyIntegerRawOwnedCells(t, m.IntegerManager()) {
 		t.Fatal("actual canceled checkpoint prefix", e, limit.steps, steps, graph)
 	}
 	upolyGCDExpect(t, m, p, []int64{9, 6, 3}) // denominator composition BEFORE checkpoint
@@ -294,7 +294,7 @@ func TestUPolynomialSturmFailureAndCancellationImmediateGraph(t *testing.T) {
 		budget.FailAfter(fault)
 		e := m.SturmSequence(mustUPolyView(t, m, p), seq)
 		graph, external := m.Stats(), seq.Stats()
-		if graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+upolyIntegerGCDRawOwnedCells(t, m.IntegerManager())+external.OwnedNumeralCells {
+		if graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+upolyIntegerRawOwnedCells(t, m.IntegerManager())+external.OwnedNumeralCells {
 			t.Fatal("Sturm immediate roots", fault, e, graph, external)
 		}
 		upolyHenselAuditPhysical(t, []*mpnum.UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{Sequences: []*mpnum.UPolynomialSequence{seq}})
@@ -315,7 +315,7 @@ func TestUPolynomialSturmFailureAndCancellationImmediateGraph(t *testing.T) {
 			t.Fatal("failed-prefix cleanup", fault, e)
 		}
 		graph, external = m.Stats(), seq.Stats()
-		if external.OwnedNumeralCells != 0 || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+upolyIntegerGCDRawOwnedCells(t, m.IntegerManager()) {
+		if external.OwnedNumeralCells != 0 || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+upolyIntegerRawOwnedCells(t, m.IntegerManager()) {
 			t.Fatal("lost local", fault, graph, external)
 		}
 		if successes != 0 {
@@ -332,7 +332,7 @@ func TestUPolynomialSturmFailureAndCancellationImmediateGraph(t *testing.T) {
 	steps := limit.steps
 	e := m.SturmSequence(mustUPolyView(t, m, p), seq)
 	graph, external := m.Stats(), seq.Stats()
-	if !errors.Is(e, mpnum.ErrUPolynomialCanceled) || limit.steps != steps+1 || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+upolyIntegerGCDRawOwnedCells(t, m.IntegerManager())+external.OwnedNumeralCells {
+	if !errors.Is(e, mpnum.ErrUPolynomialCanceled) || limit.steps != steps+1 || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+upolyIntegerRawOwnedCells(t, m.IntegerManager())+external.OwnedNumeralCells {
 		t.Fatal("canceled remainder", e, limit.steps, graph, external)
 	}
 	size, e := seq.Size()
