@@ -16264,22 +16264,64 @@
       "path": "src/ast/pattern/pattern_inference_params.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_smt_pattern_inference_params.go",
+        "util_smt_pattern_inference_params_source_test.go"
+      ],
+      "tests": [
+        "TestSMTPatternTenMembersLiteralConstructorAndPIModule",
+        "TestSMTPatternEightGettersIndependentFallbackAndUntouchedInitializers",
+        "TestSMTPatternEveryWarmConstructorReservationUninitializedPrefix",
+        "TestSMTPatternTenDisplayChainsOutputReservationsSignedEnumAndBool",
+        "TestSMTPatternFailedConstructorDisplayAndUpdateUnread",
+        "TestSMTPatternInferenceEveryUnwarmedSharedModuleAcquisitionReservation"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Actual pi helper, eight ordered getter publications and ten separate endl chains (src/ast/pattern/pattern_inference_params.cpp:22-47)",
+          "status": "partial",
+          "go_target": "util_smt_pattern_inference_params.go",
+          "tests": [
+            "TestSMTPatternTenMembersLiteralConstructorAndPIModule",
+            "TestSMTPatternEightGettersIndependentFallbackAndUntouchedInitializers",
+            "TestSMTPatternEveryWarmConstructorReservationUninitializedPrefix",
+            "TestSMTPatternTenDisplayChainsOutputReservationsSignedEnumAndBool",
+            "TestSMTPatternFailedConstructorDisplayAndUpdateUnread",
+            "TestSMTPatternInferenceEveryUnwarmedSharedModuleAcquisitionReservation"
+          ]
+        }
+      ],
+      "ownership": [
+        "Ten actual scalar source fields are embedded once in the reflected standalone wrapper. Only two explicit initializers run before mandatory update; each of eight returned RHS values publishes its field and initialized bit in order. Actual pi module reference is acquired at the returned leaf in the existing concrete helper frame, with lexical source DT before return and distinct matched owning continuation. Local/global/context remain borrowed; no duplicate header charge for embedded helper metadata."
+      ],
+      "deviations": [
+        "No preprocessor/smt parent, real SMT context/driver, global/locale/boolalpha or whole generated descriptor-registration credit. Actual pattern constructor initializes only nopat_weight and avoid_skolems before module pi declaration; Initialized metadata distinguishes those source-reached fields from uninitialized diagnostic Go storage. Incomplete constructors remain diagnostic owners and ordinary Update/Display reject them. Enumeration valid0/1/2 cases are distinct from native out-of-domain casts."
+      ]
     },
     {
       "path": "src/ast/pattern/pattern_inference_params.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_smt_pattern_inference_params.go",
+        "util_smt_pattern_inference_params_source_test.go",
+        "util_smt_preprocessor_params.go"
+      ],
+      "tests": [
+        "TestSMTPatternTenMembersLiteralConstructorAndPIModule",
+        "TestSMTPatternEightGettersIndependentFallbackAndUntouchedInitializers",
+        "TestSMTPatternEveryWarmConstructorReservationUninitializedPrefix",
+        "TestSMTPatternTenDisplayChainsOutputReservationsSignedEnumAndBool",
+        "TestSMTPatternFailedConstructorDisplayAndUpdateUnread",
+        "TestSMTPatternInferenceEveryUnwarmedSharedModuleAcquisitionReservation",
+        "TestSMTPreprocessorImplicitPatternBaseGetsEmptyInsteadOfParentArgument",
+        "TestSMTPreprocessorEveryWarmConstructorReservationAndBaseUnwind",
+        "TestSMTPreprocessorUpdatePatternPublicationBeforeLocalDeclarationRefusal"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -16292,9 +16334,39 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Ten declared fields, two explicit initializers then mandatory update (src/ast/pattern/pattern_inference_params.h:30-50)",
+          "status": "partial",
+          "go_target": "util_smt_pattern_inference_params.go",
+          "tests": [
+            "TestSMTPatternTenMembersLiteralConstructorAndPIModule",
+            "TestSMTPatternEightGettersIndependentFallbackAndUntouchedInitializers",
+            "TestSMTPatternEveryWarmConstructorReservationUninitializedPrefix",
+            "TestSMTPatternTenDisplayChainsOutputReservationsSignedEnumAndBool",
+            "TestSMTPatternFailedConstructorDisplayAndUpdateUnread",
+            "TestSMTPatternInferenceEveryUnwarmedSharedModuleAcquisitionReservation"
+          ]
+        },
+        {
+          "name": "Same-engine standalone or embedded pattern construction with literal default-empty implicit base (src/ast/pattern/pattern_inference_params.h:30-50)",
+          "status": "partial",
+          "go_target": "util_smt_pattern_inference_params.go",
+          "tests": [
+            "TestSMTPreprocessorImplicitPatternBaseGetsEmptyInsteadOfParentArgument",
+            "TestSMTPreprocessorEveryWarmConstructorReservationAndBaseUnwind",
+            "TestSMTPreprocessorUpdatePatternPublicationBeforeLocalDeclarationRefusal"
+          ]
+        }
+      ],
+      "ownership": [
+        "Ten actual scalar source fields are embedded once in the reflected standalone wrapper. Only two explicit initializers run before mandatory update; each of eight returned RHS values publishes its field and initialized bit in order. Actual pi module reference is acquired at the returned leaf in the existing concrete helper frame, with lexical source DT before return and distinct matched owning continuation. Local/global/context remain borrowed; no duplicate header charge for embedded helper metadata.",
+        "Actual implicit pattern base uses default empty ParamsRef, followed by inline bit base, nineteen local initializers, then five local smt getter publications. Update completes pattern before local helper; Display preserves pattern ten, bit two, then nineteen separate local endl chains. Parent reflected header charges embedded metadata once; returned helper references use actual shared leaf receipts, strict source stops and separate owning cleanup before older bases."
+      ],
+      "deviations": [
+        "No preprocessor/smt parent, real SMT context/driver, global/locale/boolalpha or whole generated descriptor-registration credit. Actual pattern constructor initializes only nopat_weight and avoid_skolems before module pi declaration; Initialized metadata distinguishes those source-reached fields from uninitialized diagnostic Go storage. Incomplete constructors remain diagnostic owners and ordinary Update/Display reject them. Enumeration valid0/1/2 cases are distinct from native out-of-domain casts.",
+        "Source scalar State inspection after incomplete construction is diagnostic; ordinary Update and Display reject it. Guarded TLS destruction fixture reaches the real smt helper and public SourceReset, without a source callback claim. Compiler-generated parent copies, real SMT context/driver, native ABI, global ostream locale/boolalpha and full process binding remain open."
+      ]
     },
     {
       "path": "src/ast/pattern/pattern_inference_params_helper.hpp",
@@ -16349,14 +16421,42 @@
       "path": "src/ast/pattern/pattern_inference_params_helper.pyg",
       "component": "ast",
       "role": "generated_input",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_smt_pattern_inference_params.go",
+        "util_smt_pattern_inference_params_source_test.go"
+      ],
+      "tests": [
+        "TestSMTPatternTenMembersLiteralConstructorAndPIModule",
+        "TestSMTPatternEightGettersIndependentFallbackAndUntouchedInitializers",
+        "TestSMTPatternEveryWarmConstructorReservationUninitializedPrefix",
+        "TestSMTPatternTenDisplayChainsOutputReservationsSignedEnumAndBool",
+        "TestSMTPatternFailedConstructorDisplayAndUpdateUnread",
+        "TestSMTPatternInferenceEveryUnwarmedSharedModuleAcquisitionReservation"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Eight concrete pattern getter defaults and pi module (src/ast/pattern/pattern_inference_params_helper.pyg:1-12)",
+          "status": "partial",
+          "go_target": "util_smt_pattern_inference_params.go",
+          "tests": [
+            "TestSMTPatternTenMembersLiteralConstructorAndPIModule",
+            "TestSMTPatternEightGettersIndependentFallbackAndUntouchedInitializers",
+            "TestSMTPatternEveryWarmConstructorReservationUninitializedPrefix",
+            "TestSMTPatternTenDisplayChainsOutputReservationsSignedEnumAndBool",
+            "TestSMTPatternFailedConstructorDisplayAndUpdateUnread",
+            "TestSMTPatternInferenceEveryUnwarmedSharedModuleAcquisitionReservation"
+          ]
+        }
+      ],
+      "ownership": [
+        "Ten actual scalar source fields are embedded once in the reflected standalone wrapper. Only two explicit initializers run before mandatory update; each of eight returned RHS values publishes its field and initialized bit in order. Actual pi module reference is acquired at the returned leaf in the existing concrete helper frame, with lexical source DT before return and distinct matched owning continuation. Local/global/context remain borrowed; no duplicate header charge for embedded helper metadata."
+      ],
+      "deviations": [
+        "No preprocessor/smt parent, real SMT context/driver, global/locale/boolalpha or whole generated descriptor-registration credit. Actual pattern constructor initializes only nopat_weight and avoid_skolems before module pi declaration; Initialized metadata distinguishes those source-reached fields from uninitialized diagnostic Go storage. Incomplete constructors remain diagnostic owners and ordinary Update/Display reject them. Enumeration valid0/1/2 cases are distinct from native out-of-domain casts."
+      ]
     },
     {
       "path": "src/ast/pb_decl_plugin.cpp",
@@ -17597,9 +17697,15 @@
       "path": "src/ast/rewriter/bit_blaster/bit_blaster_params.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "util_smt_bit_blaster_params.go",
+        "util_smt_bit_blaster_params_source_test.go"
+      ],
+      "tests": [
+        "TestSMTBitBlasterLiteralPODDefaults",
+        "TestSMTBitBlasterAllFourScalarValuesDisplayFlagsAndOutputPrefixes"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -17618,11 +17724,26 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Inline two-bool false defaults and two signed bool endl display chains; erased registration (src/ast/rewriter/bit_blaster/bit_blaster_params.h:22-40)",
+          "status": "ported",
+          "go_target": "util_smt_bit_blaster_params.go",
+          "tests": [
+            "TestSMTBitBlasterLiteralPODDefaults",
+            "TestSMTBitBlasterAllFourScalarValuesDisplayFlagsAndOutputPrefixes"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual inline pointer-free two-byte POD; no allocator/header/owner or active update/provider read is introduced. Only caller-supplied NumericTextStream owns output storage. Source bool numeric insertion uses the selected signed-long profile, with actual endl put/Flush and nonthrowing file badbit.",
+        "Root complete-file audit at src/ast/rewriter/bit_blaster/bit_blaster_params.h:19-42 covers both inline bool declarations/default constructor, all four value combinations, implicit by-value copies, both separate display/endl chains and erased #if0 registration. No other active source method or owned allocation exists in this header; no bit-blaster algorithm/parent/context driver completion follows."
+      ],
+      "deviations": [
+        "Disabled #if0 registration remains erased; no invented bit-blaster cpp/update method. No parent/context/driver or native global/locale/boolalpha promotion. Initial64-byte output storage already fits both default chains, so the post-construction display reservation horizon is zero, not an invented allocation."
+      ]
     },
     {
       "path": "src/ast/rewriter/bit_blaster/bit_blaster_rewriter.cpp",
@@ -23148,14 +23269,22 @@
         "util_gparams.go",
         "util_gparams_catalog.go",
         "util_gparams_catalog_collectors.go",
-        "util_gparams_catalog_dispatch.go"
+        "util_gparams_catalog_dispatch.go",
+        "util_context_params.go",
+        "util_context_params_source_test.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
-        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription",
+        "TestContextParamsDefaultConstructorAndGlobalUpdate",
+        "TestContextParamsNestedBoolAndCurrentScalarFallbackButLiteralStrings",
+        "TestContextParamsEveryConstructorReservationAndReverseStringUnwind",
+        "TestContextParamsUpdateStringRefusalPrefixAndIncompleteOwnerGuards",
+        "TestContextParamsEveryUpdateAllocationAndReachedStringViewLifetime",
+        "TestContextParamsAllBooleanUpdateFieldsWrongKindsAndGlobalReRead"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -23171,12 +23300,28 @@
             "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
             "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
           ]
+        },
+        {
+          "name": "Actual context defaults, direct/global ordered updates and rlimit scalar (src/cmd_context/context_params.cpp:26-40,137-156)",
+          "status": "partial",
+          "go_target": "util_context_params.go",
+          "tests": [
+            "TestContextParamsDefaultConstructorAndGlobalUpdate",
+            "TestContextParamsNestedBoolAndCurrentScalarFallbackButLiteralStrings",
+            "TestContextParamsEveryConstructorReservationAndReverseStringUnwind",
+            "TestContextParamsUpdateStringRefusalPrefixAndIncompleteOwnerGuards",
+            "TestContextParamsEveryUpdateAllocationAndReachedStringViewLifetime",
+            "TestContextParamsAllBooleanUpdateFieldsWrongKindsAndGlobalReRead"
+          ]
         }
       ],
       "ownership": [
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open.",
+        "Actual two default std::string members construct in declaration order before twelve constructor-body scalar assignments; constructor then reaches global gparams::get_ref and the same direct update engine. UInt/Bool/string getter RHS values publish in literal source order, including inner well_sorted_check fallback before outer type_check. No lexical module helper, Params INC, clone or snapshot is invented. The reflected context wrapper charges both embedded inline strings once; external/pending arrays are actual qiOwnedString engine allocations. Constructor failure traverses completed strings trace-file then dot-proof before return; owning Close separately drains unjoined arrays."
       ],
-      "deviations": []
+      "deviations": [
+        "Only context constructor, both direct/global updates and scalar rlimit setter/access are implemented here. m_interpolants is never initialized by this source; false Go storage with InterpolantsInitialized=false is diagnostic, not a source default. Failed constructor State is diagnostic and Update rejects it. Source set parsing, descriptor collectors, merge_default_params/get_solver_params, AST-manager construction and compiler-generated copies remain separate obligations. Existing independently ported collector evidence is preserved; no new driver/context/native ABI/global registration credit."
+      ]
     },
     {
       "path": "src/cmd_context/context_params.h",
@@ -23187,14 +23332,22 @@
         "util_gparams.go",
         "util_gparams_catalog.go",
         "util_gparams_catalog_collectors.go",
-        "util_gparams_catalog_dispatch.go"
+        "util_gparams_catalog_dispatch.go",
+        "util_context_params.go",
+        "util_context_params_source_test.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
-        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription",
+        "TestContextParamsDefaultConstructorAndGlobalUpdate",
+        "TestContextParamsNestedBoolAndCurrentScalarFallbackButLiteralStrings",
+        "TestContextParamsEveryConstructorReservationAndReverseStringUnwind",
+        "TestContextParamsUpdateStringRefusalPrefixAndIncompleteOwnerGuards",
+        "TestContextParamsEveryUpdateAllocationAndReachedStringViewLifetime",
+        "TestContextParamsAllBooleanUpdateFieldsWrongKindsAndGlobalReRead"
       ],
       "conditionals": [
         {
@@ -23220,12 +23373,28 @@
             "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
             "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
           ]
+        },
+        {
+          "name": "Actual context defaults, direct/global ordered updates and rlimit scalar (src/cmd_context/context_params.h:26-55)",
+          "status": "partial",
+          "go_target": "util_context_params.go",
+          "tests": [
+            "TestContextParamsDefaultConstructorAndGlobalUpdate",
+            "TestContextParamsNestedBoolAndCurrentScalarFallbackButLiteralStrings",
+            "TestContextParamsEveryConstructorReservationAndReverseStringUnwind",
+            "TestContextParamsUpdateStringRefusalPrefixAndIncompleteOwnerGuards",
+            "TestContextParamsEveryUpdateAllocationAndReachedStringViewLifetime",
+            "TestContextParamsAllBooleanUpdateFieldsWrongKindsAndGlobalReRead"
+          ]
         }
       ],
       "ownership": [
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open.",
+        "Actual two default std::string members construct in declaration order before twelve constructor-body scalar assignments; constructor then reaches global gparams::get_ref and the same direct update engine. UInt/Bool/string getter RHS values publish in literal source order, including inner well_sorted_check fallback before outer type_check. No lexical module helper, Params INC, clone or snapshot is invented. The reflected context wrapper charges both embedded inline strings once; external/pending arrays are actual qiOwnedString engine allocations. Constructor failure traverses completed strings trace-file then dot-proof before return; owning Close separately drains unjoined arrays."
       ],
-      "deviations": []
+      "deviations": [
+        "Only context constructor, both direct/global updates and scalar rlimit setter/access are implemented here. m_interpolants is never initialized by this source; false Go storage with InterpolantsInitialized=false is diagnostic, not a source default. Failed constructor State is diagnostic and Update rejects it. Source set parsing, descriptor collectors, merge_default_params/get_solver_params, AST-manager construction and compiler-generated copies remain separate obligations. Existing independently ported collector evidence is preserved; no new driver/context/native ABI/global registration credit."
+      ]
     },
     {
       "path": "src/cmd_context/echo_tactic.cpp",
@@ -68921,22 +69090,66 @@
       "path": "src/smt/params/preprocessor_params.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_smt_preprocessor_params.go",
+        "util_smt_preprocessor_params_source_test.go"
+      ],
+      "tests": [
+        "TestSMTPreprocessorImplicitPatternBaseGetsEmptyInsteadOfParentArgument",
+        "TestSMTPreprocessorAllNineteenDefaultsAndFiveLocalGetters",
+        "TestSMTPreprocessorEveryWarmConstructorReservationAndBaseUnwind",
+        "TestSMTPreprocessorUpdatePatternPublicationBeforeLocalDeclarationRefusal",
+        "TestSMTPreprocessorThirtyOneDisplayChainsEveryOutputPrefixAndBadbit",
+        "TestSMTPreprocessorEveryUnwarmedSharedModuleAcquisitionReservation",
+        "TestSMTPreprocessorFailedConstructorOrdinaryCallsAndOuterGuardUnread",
+        "TestSMTPreprocessorConcreteLexicalStopProtectsBasesAndNextMutation"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete preprocessor bases, local update and thirty-one display chains (src/smt/params/preprocessor_params.cpp:22-61)",
+          "status": "partial",
+          "go_target": "util_smt_preprocessor_params.go",
+          "tests": [
+            "TestSMTPreprocessorImplicitPatternBaseGetsEmptyInsteadOfParentArgument",
+            "TestSMTPreprocessorAllNineteenDefaultsAndFiveLocalGetters",
+            "TestSMTPreprocessorEveryWarmConstructorReservationAndBaseUnwind",
+            "TestSMTPreprocessorUpdatePatternPublicationBeforeLocalDeclarationRefusal",
+            "TestSMTPreprocessorThirtyOneDisplayChainsEveryOutputPrefixAndBadbit",
+            "TestSMTPreprocessorEveryUnwarmedSharedModuleAcquisitionReservation",
+            "TestSMTPreprocessorFailedConstructorOrdinaryCallsAndOuterGuardUnread",
+            "TestSMTPreprocessorConcreteLexicalStopProtectsBasesAndNextMutation"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual implicit pattern base uses default empty ParamsRef, followed by inline bit base, nineteen local initializers, then five local smt getter publications. Update completes pattern before local helper; Display preserves pattern ten, bit two, then nineteen separate local endl chains. Parent reflected header charges embedded metadata once; returned helper references use actual shared leaf receipts, strict source stops and separate owning cleanup before older bases."
+      ],
+      "deviations": [
+        "Source scalar State inspection after incomplete construction is diagnostic; ordinary Update and Display reject it. Guarded TLS destruction fixture reaches the real smt helper and public SourceReset, without a source callback claim. Compiler-generated parent copies, real SMT context/driver, native ABI, global ostream locale/boolalpha and full process binding remain open."
+      ]
     },
     {
       "path": "src/smt/params/preprocessor_params.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_smt_preprocessor_params.go",
+        "util_smt_preprocessor_params_source_test.go"
+      ],
+      "tests": [
+        "TestSMTPreprocessorImplicitPatternBaseGetsEmptyInsteadOfParentArgument",
+        "TestSMTPreprocessorAllNineteenDefaultsAndFiveLocalGetters",
+        "TestSMTPreprocessorEveryWarmConstructorReservationAndBaseUnwind",
+        "TestSMTPreprocessorUpdatePatternPublicationBeforeLocalDeclarationRefusal",
+        "TestSMTPreprocessorThirtyOneDisplayChainsEveryOutputPrefixAndBadbit",
+        "TestSMTPreprocessorEveryUnwarmedSharedModuleAcquisitionReservation",
+        "TestSMTPreprocessorFailedConstructorOrdinaryCallsAndOuterGuardUnread",
+        "TestSMTPreprocessorConcreteLexicalStopProtectsBasesAndNextMutation"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -68949,9 +69162,29 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete preprocessor bases, local update and thirty-one display chains (src/smt/params/preprocessor_params.h:31-81)",
+          "status": "partial",
+          "go_target": "util_smt_preprocessor_params.go",
+          "tests": [
+            "TestSMTPreprocessorImplicitPatternBaseGetsEmptyInsteadOfParentArgument",
+            "TestSMTPreprocessorAllNineteenDefaultsAndFiveLocalGetters",
+            "TestSMTPreprocessorEveryWarmConstructorReservationAndBaseUnwind",
+            "TestSMTPreprocessorUpdatePatternPublicationBeforeLocalDeclarationRefusal",
+            "TestSMTPreprocessorThirtyOneDisplayChainsEveryOutputPrefixAndBadbit",
+            "TestSMTPreprocessorEveryUnwarmedSharedModuleAcquisitionReservation",
+            "TestSMTPreprocessorFailedConstructorOrdinaryCallsAndOuterGuardUnread",
+            "TestSMTPreprocessorConcreteLexicalStopProtectsBasesAndNextMutation"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual implicit pattern base uses default empty ParamsRef, followed by inline bit base, nineteen local initializers, then five local smt getter publications. Update completes pattern before local helper; Display preserves pattern ten, bit two, then nineteen separate local endl chains. Parent reflected header charges embedded metadata once; returned helper references use actual shared leaf receipts, strict source stops and separate owning cleanup before older bases."
+      ],
+      "deviations": [
+        "Source scalar State inspection after incomplete construction is diagnostic; ordinary Update and Display reject it. Guarded TLS destruction fixture reaches the real smt helper and public SourceReset, without a source callback claim. Compiler-generated parent copies, real SMT context/driver, native ABI, global ostream locale/boolalpha and full process binding remain open."
+      ]
     },
     {
       "path": "src/smt/params/qi_params.cpp",
@@ -69184,7 +69417,9 @@
         "util_smt_pb_params.go",
         "util_smt_pb_params_source_test.go",
         "util_smt_str_params.go",
-        "util_smt_str_params_source_test.go"
+        "util_smt_str_params_source_test.go",
+        "util_smt_preprocessor_params.go",
+        "util_smt_preprocessor_params_source_test.go"
       ],
       "tests": [
         "TestSMTDynAckConstructorLiteralDefaultsAndFallbackOrder",
@@ -69236,7 +69471,15 @@
         "TestSMTStrAllSeventeenGettersIndependentFallbackAndWholeState",
         "TestSMTStrEveryConstructorReservationAndOwnedMemberUnwind",
         "TestSMTStrEveryUnwarmedSharedModuleAcquisitionReservation",
-        "TestSMTStrNullGlobalIncompleteConstructorAndOwnerEligibility"
+        "TestSMTStrNullGlobalIncompleteConstructorAndOwnerEligibility",
+        "TestSMTPreprocessorImplicitPatternBaseGetsEmptyInsteadOfParentArgument",
+        "TestSMTPreprocessorAllNineteenDefaultsAndFiveLocalGetters",
+        "TestSMTPreprocessorEveryWarmConstructorReservationAndBaseUnwind",
+        "TestSMTPreprocessorUpdatePatternPublicationBeforeLocalDeclarationRefusal",
+        "TestSMTPreprocessorThirtyOneDisplayChainsEveryOutputPrefixAndBadbit",
+        "TestSMTPreprocessorEveryUnwarmedSharedModuleAcquisitionReservation",
+        "TestSMTPreprocessorFailedConstructorOrdinaryCallsAndOuterGuardUnread",
+        "TestSMTPreprocessorConcreteLexicalStopProtectsBasesAndNextMutation"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -69339,6 +69582,21 @@
             "TestSMTStrEveryUnwarmedSharedModuleAcquisitionReservation",
             "TestSMTStrNullGlobalIncompleteConstructorAndOwnerEligibility"
           ]
+        },
+        {
+          "name": "Concrete preprocessor bases, local update and thirty-one display chains (src/smt/params/smt_params_helper.pyg:9-11,19-20)",
+          "status": "partial",
+          "go_target": "util_smt_preprocessor_params.go",
+          "tests": [
+            "TestSMTPreprocessorImplicitPatternBaseGetsEmptyInsteadOfParentArgument",
+            "TestSMTPreprocessorAllNineteenDefaultsAndFiveLocalGetters",
+            "TestSMTPreprocessorEveryWarmConstructorReservationAndBaseUnwind",
+            "TestSMTPreprocessorUpdatePatternPublicationBeforeLocalDeclarationRefusal",
+            "TestSMTPreprocessorThirtyOneDisplayChainsEveryOutputPrefixAndBadbit",
+            "TestSMTPreprocessorEveryUnwarmedSharedModuleAcquisitionReservation",
+            "TestSMTPreprocessorFailedConstructorOrdinaryCallsAndOuterGuardUnread",
+            "TestSMTPreprocessorConcreteLexicalStopProtectsBasesAndNextMutation"
+          ]
         }
       ],
       "ownership": [
@@ -69348,7 +69606,8 @@
         "Forty-six scalar members use exact declaration/default/display order. The actual smt helper is acquired before fifteen RHS/publications; the actual rewriter helper is acquired only after those complete, followed by eq2ineq. Each returned module ParamsRef stamps acquisition in the existing concrete shared helper engine; lexical reverse source destruction and exact stopped-child owning continuation remain separate. Reflected standalone wrapper/frame cold charges are Go lifetime representation, not native scalar/stack allocations; caller local/context/global owners remain borrowed.",
         "Actual std::string members are concrete inline15+NUL / external byte storage embedded once in the reflected QI header. Construction follows cost then new_gen, body14 getters, reverse lexical helper DT, then reverse completed member unwind on constructor failure. Assignment strlen/allocate/ascending copy/dispose/pointer-capacity-length publication uses the selected primary libstdc++ profile; actual pending bytes are named and separate from source-current bytes. MBQI id is the actual returned borrowed Params pointer/provider/ref, with no formatting workspace, clone or INC. Wrapper/helper cold charges are explicit Go representation; source module/local owners remain borrowed.",
         "Four actual scalar fields embedded once in a reflected standalone wrapper/header. No constructor helper/global/parameter read. Update borrows caller local/global/context, stamps actual returned smt module reference in the existing concrete lexical frame, publishes four RHS results in source order and destroys that frame before return. Strict source-stop and matched owning cleanup remain separate; Close never adopts caller children.",
-        "All seventeen actual source members are scalar and embedded once in the reflected standalone wrapper. Constructor initializes those exact defaults then executes the mandatory one-helper update. Each actual returned module ParamsRef stamps acquisition at the same accepted concrete helper leaf; seventeen RHS/publications follow source order, and lexical source DT precedes return. Immutable source stop and matched owning cleanup remain separate. Caller local/global/context owners remain borrowed; wrapper Close owns only helper receipts and its actual header."
+        "All seventeen actual source members are scalar and embedded once in the reflected standalone wrapper. Constructor initializes those exact defaults then executes the mandatory one-helper update. Each actual returned module ParamsRef stamps acquisition at the same accepted concrete helper leaf; seventeen RHS/publications follow source order, and lexical source DT precedes return. Immutable source stop and matched owning cleanup remain separate. Caller local/global/context owners remain borrowed; wrapper Close owns only helper receipts and its actual header.",
+        "Actual implicit pattern base uses default empty ParamsRef, followed by inline bit base, nineteen local initializers, then five local smt getter publications. Update completes pattern before local helper; Display preserves pattern ten, bit two, then nineteen separate local endl chains. Parent reflected header charges embedded metadata once; returned helper references use actual shared leaf receipts, strict source stops and separate owning cleanup before older bases."
       ],
       "deviations": [
         "No registered SMT context/kernel driver credit. Scalar base embedding into complete smt_params and native global/locale/boolalpha profiles remain open. Go invalid local/closed/null owner guards and standalone incomplete-constructor owning continuation are explicit adapter domains. Strategy outside source enumerators is only selected fixed-width Go representation evidence. Generated helper credit is limited to six dack accessor definitions; full helper/generator remain partial.",
@@ -69357,7 +69616,8 @@
         "No complete smt_params/context/kernel, registered SMT driver, whole generated helper/generator or native global/locale/boolalpha completion credit. Incomplete constructors return an explicitly diagnostic owner; Display/Update refuse before output/body while State can inspect actual initialized/published prefix. Cross-owner/null-global/closed/copy guards are precise Go domain evidence, not native null dereference equivalence. Source enum casts use fixed-width representation and signed ostream insertion; valid-enumerator oracle cases are distinct from out-of-domain conversion profiles.",
         "No complete quantifier/context/SMT driver, native global locale/boolalpha or whole std::string/class generated copy credit. m_qi_ematching is literally uninitialized: no assignment occurs anywhere in this source fork; explicit public-field assignment is required for a valid display read. Diagnostic State exposes initialization metadata and failed-constructor prefix; Display/Update refuse incomplete constructors. Existing Params text codec virtual NUL retains actual provider generation/lifetime guard, without claiming a native NUL-word ABI. Go immutable literal/string spans and direct file flush are selected adapters. Null cost dereference, stale provider, copied owner and destroyed word reads are guarded domains, not defined native continuation.",
         "No complete SMT/context/solver or registered source driver credit; native global/locale/boolalpha profiles remain open. The actual scalar constructor reads no unused ParamsRef and does not update; standalone Go wrapper/header lifetime and wrong-owner/closed/global-null guards are explicit representation domains. Source lexical helper reverse DT and immutable source-stop cause use the accepted same-engine concrete helper, with actual returned module reference acquisition rather than reference-count/census authority.",
-        "No complete SMT/context/solver or registered driver credit; native global/std-helper/compiler-generated class copy profiles remain open. This source class has no Display method and no owned or borrowed string fields; no invented formatter/string ownership API. Diagnostic State inspects failed constructor scalar prefix, while Update rejects an incomplete constructor. Reflected standalone header and precise null/copied/closed-owner guards are Go representation domains. smt_params.cpp parent update does not call theory_str_params::updt_params in this source; that source omission is preserved as a future parent obligation."
+        "No complete SMT/context/solver or registered driver credit; native global/std-helper/compiler-generated class copy profiles remain open. This source class has no Display method and no owned or borrowed string fields; no invented formatter/string ownership API. Diagnostic State inspects failed constructor scalar prefix, while Update rejects an incomplete constructor. Reflected standalone header and precise null/copied/closed-owner guards are Go representation domains. smt_params.cpp parent update does not call theory_str_params::updt_params in this source; that source omission is preserved as a future parent obligation.",
+        "Source scalar State inspection after incomplete construction is diagnostic; ordinary Update and Display reject it. Guarded TLS destruction fixture reaches the real smt helper and public SourceReset, without a source callback claim. Compiler-generated parent copies, real SMT context/driver, native ABI, global ostream locale/boolalpha and full process binding remain open."
       ]
     },
     {

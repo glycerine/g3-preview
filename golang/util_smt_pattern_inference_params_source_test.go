@@ -1,0 +1,311 @@
+// Source: src/ast/pattern/pattern_inference_params.h:30-50;
+// src/ast/pattern/pattern_inference_params.cpp:22-47; src/ast/pattern/pattern_inference_params_helper.pyg:1-12.
+// Source author: Leonardo de Moura (2008-03-24; 2012-12-02).
+// Licensed under the MIT license; see LICENSE.txt.
+package g3
+
+import (
+	"errors"
+	"github.com/glycerine/g3/golang/arena"
+	"os"
+	"reflect"
+	"testing"
+)
+
+func TestSMTPatternTenMembersLiteralConstructorAndPIModule(t *testing.T) {
+	c, g, p, b := dynAckSourceFixture(t)
+	pi, e := g.symbols.Intern("pi")
+	paramsMust(t, e)
+	global, e := g.current.getParams(pi)
+	paramsMust(t, e)
+	key := "arith_weight"
+	paramsMust(t, c.SetUIntName(global, &key, 23))
+	v, e := NewSMTPatternInferenceParams(c, p, g, b)
+	paramsMust(t, e)
+	defer func() { paramsMust(t, v.Close()) }()
+	got, e := v.State()
+	paramsMust(t, e)
+	want := SMTPatternInferenceState{0, true, 1, false, 23, 10, true, -1, true, false, 0x3ff}
+	if got != want {
+		t.Fatal("two explicit initializers then eight generated pi publications", got, want)
+	}
+}
+
+func patternNamedColdGraph(t *testing.T, v *SMTPatternInferenceParams, g *GlobalParamsService, b *arena.Budget) {
+	t.Helper()
+	n := g.ownerBytes + catalogGraph(g.config.Catalog)
+	if g.current != nil {
+		n += gparamsGraph(g.current)
+	}
+	for x := g.failed; x != nil; x = x.retainedNext {
+		n += gparamsGraph(x)
+	}
+	for x := g.superseded; x != nil; x = x.retainedNext {
+		n += gparamsGraph(x)
+	}
+	if v != nil {
+		if v.self != v || v.budget != b {
+			t.Fatal("actual pattern wrapper")
+		}
+		n += v.header
+		for f := v.helpers; f != nil; f = f.next {
+			if f.self != f || f.owner != &v.smtModuleParamsOwner {
+				t.Fatal("actual lexical helper")
+			}
+			n += f.header
+		}
+	}
+	if n != b.Used() {
+		t.Fatal("immediate named cold graph", n, b.Used())
+	}
+}
+func TestSMTPatternEightGettersIndependentFallbackAndUntouchedInitializers(t *testing.T) {
+	c, g, p, b := dynAckSourceFixture(t)
+	v, e := NewSMTPatternInferenceParams(c, p, g, b)
+	paramsMust(t, e)
+	defer func() { paramsMust(t, v.Close()) }()
+	pi, e := g.symbols.Intern("pi")
+	paramsMust(t, e)
+	global, e := g.current.getParams(pi)
+	paramsMust(t, e)
+	cases := []struct {
+		key, field string
+		isBool     bool
+	}{{"max_multi_patterns", "MaxMultiPatterns", false}, {"block_loop_patterns", "BlockLoopPatterns", true}, {"arith", "Arithmetic", false}, {"use_database", "UseDatabase", true}, {"arith_weight", "ArithmeticWeight", false}, {"non_nested_arith_weight", "NonNestedArithmeticWeight", false}, {"pull_quantifiers", "PullQuantifiers", true}, {"warnings", "Warnings", true}}
+	for _, tc := range cases {
+		for mode := 0; mode < 4; mode++ {
+			paramsMust(t, c.Reset(p))
+			paramsMust(t, c.Reset(global))
+			want := SMTPatternInferenceState{0, true, 1, false, 5, 10, true, -1, true, false, 0x3ff}
+			field := reflect.ValueOf(&want).Elem().FieldByName(tc.field)
+			if mode < 3 {
+				if tc.isBool {
+					field.SetBool(!field.Bool())
+					paramsMust(t, c.SetBoolName(global, &tc.key, field.Bool()))
+				} else {
+					n := uint32(77)
+					if tc.field == "Arithmetic" {
+						n = 2
+					}
+					field.SetUint(uint64(n))
+					paramsMust(t, c.SetUIntName(global, &tc.key, n))
+				}
+			}
+			if mode == 1 {
+				if tc.isBool {
+					field.SetBool(!field.Bool())
+					paramsMust(t, c.SetBoolName(p, &tc.key, field.Bool()))
+				} else {
+					n := uint32(13)
+					if tc.field == "Arithmetic" {
+						n = 0
+					}
+					field.SetUint(uint64(n))
+					paramsMust(t, c.SetUIntName(p, &tc.key, n))
+				}
+			}
+			if mode == 2 {
+				if tc.isBool {
+					paramsMust(t, c.SetUIntName(p, &tc.key, 99))
+				} else {
+					paramsMust(t, c.SetBoolName(p, &tc.key, true))
+				}
+			}
+			paramsMust(t, v.Update(p))
+			got, e := v.State()
+			paramsMust(t, e)
+			if got != want {
+				t.Fatal("independent full ten-field state and initialization mask", tc, mode, got, want)
+			}
+		}
+	}
+	patternNamedColdGraph(t, v, g, b)
+}
+func TestSMTPatternEveryWarmConstructorReservationUninitializedPrefix(t *testing.T) {
+	first := -1
+	for ordinal := int64(0); ordinal < 8; ordinal++ {
+		c, g, p, b := dynAckSourceFixture(t)
+		_, e := g.symbols.Intern("pi")
+		paramsMust(t, e)
+		b.FailAfter(ordinal)
+		v, cause := NewSMTPatternInferenceParams(c, p, g, b)
+		patternNamedColdGraph(t, v, g, b)
+		if cause != nil && !errors.Is(cause, arena.ErrInjectedFailure) {
+			t.Fatal(cause)
+		}
+		if v != nil && cause != nil {
+			if v.constructorReady || v.state.Initialized != 0x180 || v.state.NoPatternWeight != -1 || !v.state.AvoidSkolems || v.helpers != nil {
+				t.Fatal("only literal two initializers before failed helper", ordinal, v.state)
+			}
+			copyOwner := *v
+			if e = copyOwner.Close(); !errors.Is(e, ErrParamsOwner) {
+				t.Fatal("copy guard", e)
+			}
+		}
+		b.FailAfter(-1)
+		if v != nil {
+			paramsMust(t, v.Close())
+		}
+		patternNamedColdGraph(t, nil, g, b)
+		if cause == nil {
+			first = int(ordinal)
+			break
+		}
+	}
+	if first != 2 {
+		t.Fatal("actual wrapper then lexical helper", first)
+	}
+}
+
+const patternDefaultDisplay = "m_pi_max_multi_patterns=0\nm_pi_block_loop_patterns=1\nm_pi_arith=1\nm_pi_use_database=0\nm_pi_arith_weight=5\nm_pi_non_nested_arith_weight=10\nm_pi_pull_quantifiers=1\nm_pi_nopat_weight=-1\nm_pi_avoid_skolems=1\nm_pi_warnings=0\n"
+
+func TestSMTPatternTenDisplayChainsOutputReservationsSignedEnumAndBool(t *testing.T) {
+	c, g, p, b := dynAckSourceFixture(t)
+	v, e := NewSMTPatternInferenceParams(c, p, g, b)
+	paramsMust(t, e)
+	defer func() { paramsMust(t, v.Close()) }()
+	first := -1
+	for ordinal := int64(0); ordinal < 32; ordinal++ {
+		sb := arena.NewBudget(^uint64(0))
+		out, e := NewNumericTextStream(NumericTextStreamConfig{Budget: sb})
+		paramsMust(t, e)
+		sb.FailAfter(ordinal)
+		cause := v.Display(out)
+		got, e := out.String()
+		paramsMust(t, e)
+		if len(got) > len(patternDefaultDisplay) || got != patternDefaultDisplay[:len(got)] {
+			t.Fatal("ten independent chain prefix", ordinal, got, cause)
+		}
+		if cause != nil && !errors.Is(cause, arena.ErrInjectedFailure) {
+			t.Fatal(cause)
+		}
+		if cause == nil && got != patternDefaultDisplay {
+			t.Fatal("complete display", got)
+		}
+		stats := out.Stats()
+		if sb.Used() != stats.OwnerBytes+stats.ScratchBytes+stats.OutputOwnerBytes+stats.OutputOverflowBytes {
+			t.Fatal("actual output graph before fault lift", ordinal, sb.Used(), stats)
+		}
+		sb.FailAfter(-1)
+		paramsMust(t, out.Close())
+		if sb.Used() != 0 {
+			t.Fatal("output own refund")
+		}
+		if cause == nil {
+			first = int(ordinal)
+			break
+		}
+	}
+	if first < 1 {
+		t.Fatal("real output growth", first)
+	}
+	out, e := NewNumericTextStream(NumericTextStreamConfig{Budget: b})
+	paramsMust(t, e)
+	paramsMust(t, out.SetShowPos(true))
+	paramsMust(t, v.Display(out))
+	got, e := out.String()
+	paramsMust(t, e)
+	want := "m_pi_max_multi_patterns=0\nm_pi_block_loop_patterns=+1\nm_pi_arith=+1\nm_pi_use_database=+0\nm_pi_arith_weight=5\nm_pi_non_nested_arith_weight=10\nm_pi_pull_quantifiers=+1\nm_pi_nopat_weight=-1\nm_pi_avoid_skolems=+1\nm_pi_warnings=+0\n"
+	if got != want {
+		t.Fatal("signed bool/enum/int vs unsigned source insertion", got)
+	}
+	paramsMust(t, out.Close())
+	file, e := os.CreateTemp(".", "pattern-output-*")
+	paramsMust(t, e)
+	defer os.Remove(file.Name())
+	out, e = NewNumericTextStream(NumericTextStreamConfig{Budget: b, BorrowedFile: file})
+	paramsMust(t, e)
+	paramsMust(t, file.Close())
+	paramsMust(t, v.Display(out))
+	if !out.fileBad || out.filePosition != 0 {
+		t.Fatal("real nonthrowing file badbit")
+	}
+	paramsMust(t, out.Close())
+	patternNamedColdGraph(t, v, g, b)
+}
+func TestSMTPatternFailedConstructorDisplayAndUpdateUnread(t *testing.T) {
+	c, g, p, b := dynAckSourceFixture(t)
+	paramsMust(t, g.FinalizeSource())
+	v, cause := NewSMTPatternInferenceParams(c, p, g, b)
+	if globalParamsSourceDebug {
+		if !errors.Is(cause, ErrGlobalParamsAssertion) {
+			t.Fatal(cause)
+		}
+	} else if !errors.Is(cause, ErrGlobalParamsUninitialized) {
+		t.Fatal(cause)
+	}
+	out, e := NewNumericTextStream(NumericTextStreamConfig{Budget: b})
+	paramsMust(t, e)
+	stats := b.Used()
+	if e = v.Display(out); !errors.Is(e, ErrParamsPrecondition) {
+		t.Fatal("incomplete display", e)
+	}
+	if e = v.Update(p); !errors.Is(e, ErrParamsPrecondition) {
+		t.Fatal("incomplete update", e)
+	}
+	got, e := out.String()
+	paramsMust(t, e)
+	if got != "" || b.Used() != stats || v.state.Initialized != 0x180 {
+		t.Fatal("no invented initialization or output")
+	}
+	paramsMust(t, out.Close())
+	patternNamedColdGraph(t, v, g, b)
+	paramsMust(t, v.Close())
+	patternNamedColdGraph(t, nil, g, b)
+}
+func TestSMTPatternInferenceEveryUnwarmedSharedModuleAcquisitionReservation(t *testing.T) {
+	first := -1
+	for ordinal := int64(0); ordinal < 64; ordinal++ {
+		_, _, q := paramsTestOwner(t)
+		b := arena.NewBudget(^uint64(0))
+		sy, e := NewSymbolManager(SymbolConfig{Budget: b, PageSize: 64, DescriptorPageSize: 2})
+		paramsMust(t, e)
+		bc := arena.NewBudget(^uint64(0))
+		c, e := NewParamsContext(sy, q, ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
+		paramsMust(t, e)
+		catalog, e := NewGlobalParamsCatalog(sy, catalogTestConfig(b))
+		paramsMust(t, e)
+		cfg := gparamsTestConfig(b)
+		cfg.Catalog = catalog
+		g, e := NewGlobalParamsService(sy, c, cfg)
+		paramsMust(t, e)
+		paramsMust(t, g.InitializeSource())
+		local, e := c.NewValue()
+		paramsMust(t, e)
+		b.FailAfter(ordinal)
+		v, cause := NewSMTPatternInferenceParams(c, &local, g, b)
+		n := g.ownerBytes + catalogGraph(catalog) + gparamsGraph(g.current) + astTestSymbolGraph(sy) + sy.Stats().Table.RetainedBytes
+		if v != nil {
+			n += v.header
+			for f := v.helpers; f != nil; f = f.next {
+				n += f.header
+			}
+		}
+		if n != b.Used() {
+			t.Fatal("exact shared graph before lift", ordinal, n, b.Used())
+		}
+		if cause != nil && !errors.Is(cause, arena.ErrInjectedFailure) {
+			t.Fatal("source constructor actual leaf", cause)
+		}
+		b.FailAfter(-1)
+		if v != nil {
+			paramsMust(t, v.Close())
+		}
+		paramsMust(t, c.Del(&local))
+		paramsMust(t, g.Close())
+		paramsMust(t, catalog.Close())
+		paramsMust(t, c.Close())
+		paramsMust(t, sy.Close())
+		if b.Used() != 0 || bc.Used() != 0 {
+			t.Fatal("all named refund once", ordinal, b.Used(), bc.Used())
+		}
+		if cause == nil {
+			first = int(ordinal)
+			break
+		}
+	}
+	if first != 4 {
+		t.Fatal("actual shared symbol/module acquisition absent", first)
+	}
+	t.Log("first successful unwarmed pattern constructor", first)
+}
