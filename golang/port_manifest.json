@@ -113784,7 +113784,8 @@
         "util_memory_fatal_policy_test.go",
         "util_numeric_stream_file.go",
         "util_numeric_stream_file_test.go",
-        "util_numeric_stream.go"
+        "util_numeric_stream.go",
+        "memory/runtime_initialization_oom.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -113847,7 +113848,9 @@
         "TestMemoryFatalMainRuntimeBinding",
         "TestNumericFileStreamExactFormattingAndBorrow",
         "TestNumericFileStreamActualWriteFailureSetsNonthrowingBadbit",
-        "TestNumericFileStreamEveryColdReservation"
+        "TestNumericFileStreamEveryColdReservation",
+        "TestMemoryRuntimeInitializationClearAfterActualAllocationFailure",
+        "TestMemoryRuntimeInitializationClearReachedOwnerGuard"
       ],
       "conditionals": [
         {
@@ -114029,6 +114032,15 @@
             "TestMemoryFatalNonExitExceptionCatch",
             "TestMemoryFatalContextActualColdRefusalAndCohort"
           ]
+        },
+        {
+          "name": "reached initialization OOM=false scalar assignment cpp102 through actual Runtime, preserving real allocation/counter/limit state; containing first-init/generated children/full-init publication remain open",
+          "status": "partial",
+          "go_target": "memory/runtime_initialization_oom.go",
+          "tests": [
+            "TestMemoryRuntimeInitializationClearAfterActualAllocationFailure",
+            "TestMemoryRuntimeInitializationClearReachedOwnerGuard"
+          ]
         }
       ],
       "ownership": [
@@ -114038,14 +114050,16 @@
         "Word codecs read/write the sole actual initialized backing with no allocations or counter events. Allocator word APIs retain requested bounds; ObjectExtent exposes actual rounded/direct physical span with live owner/generation guards. See PORT_PROGRESS.md#audit-memory-uint32-codec-port-status-md.",
         "Persistent pointer-free release stages/serials are part of the charged actual runtime/location directories. Public flags are observational; bound private owner/ref/serial resolves the retained stage. Physical-completed frees are never replayed. Original successful pooled duplicate free retains source requested subtraction/self-link.",
         "Actual Runtime header/data and TLS/global counter publication preserved, including zero-request header allocation and postphysical TLS limit errors. Wrapped headerless allocation is a guarded source-undefined domain with explicit CleanupPartial, not normal allocation exhaustion credit.",
-        "Explicit standard-stream owner charges its reflected header plus two actual file-stream headers; files borrowed and never closed/sync/fsync by stream owners. Context charges one reflected cold header, borrows same Budget/streams/CString region, validates CString only at reached insertion. Real integer formatter remains local[67]byte; no output warm-up, hidden StringBuffer or fake Runtime allocation. Every actual provider/context reservation tested through success; child pre-refusal named cold/raw graph matches Budget once."
+        "Explicit standard-stream owner charges its reflected header plus two actual file-stream headers; files borrowed and never closed/sync/fsync by stream owners. Context charges one reflected cold header, borrows same Budget/streams/CString region, validates CString only at reached insertion. Real integer formatter remains local[67]byte; no output warm-up, hidden StringBuffer or fake Runtime allocation. Every actual provider/context reservation tested through success; child pre-refusal named cold/raw graph matches Budget once.",
+        "The actual Runtime owns OOM and accounting fields; this scalar source initialization action acquires/releases no block or cold root. Live and late-failed allocation tokens remain with their existing named owners."
       ],
       "deviations": [
         "Source signed-overflow/invalid-lane domains use scalar typed outcomes after completed field prefixes. Containing allocator must execute real physical operations between counter phases. Physical hooks, headers, generated callbacks, OOM exits/streams, concurrent global service and consumer integration remain open.",
         "Size_t promotion is explicit32/64: LP64 updates use unsigned modular arithmetic; ILP32 shrink delta uses uint32 subtraction before LL64 promotion. Signed synchronization/count and ILP32 promoted overflow have typed boundaries after prior field prefixes.",
         "Explicit LE word codecs are a Go source-storage adapter, not an additional C++ allocator algorithm. MPZ backend typed accesses must bound against actual object extent; this prerequisite does not complete MPZ/Natural backing or tracked release/global lifecycle.",
         "Ordinary retry of an interrupted beforefree invocation resumes its real retained phase; explicit CompleteRelease can acknowledge afterfree failure without counter repair. This is a Go owning cleanup adapter to bounded source-undefined signed-overflow domains, not a C++ exception recovery claim. Actual MPZ/Natural and transitive numerical failure owners remain required.",
-        "Selected bound OOM/count exit/stream gap is now implemented: actual Runtime failure routes, real subprocess101/113 with Budget refusal still active, file badbit cannot suppress exit, borrowed CString mutation/false/null retention, errors.As derived/base catch. Prior broad global/exit/stream-open notes remain historical beyond this explicit provider binding. Generated initialize/finalize callbacks and process-global singleton wiring remain OPEN; direct Go file emission is not arbitrary ostream locale/flags/exception/native buffering ABI. Closed Runtime count getter fixture is checked invalid-lifetime prefix coverage, not valid source exhaustion. src/test/memory.cpp Windows high-level API campaign is not credited."
+        "Selected bound OOM/count exit/stream gap is now implemented: actual Runtime failure routes, real subprocess101/113 with Budget refusal still active, file badbit cannot suppress exit, borrowed CString mutation/false/null retention, errors.As derived/base catch. Prior broad global/exit/stream-open notes remain historical beyond this explicit provider binding. Generated initialize/finalize callbacks and process-global singleton wiring remain OPEN; direct Go file emission is not arbitrary ostream locale/flags/exception/native buffering ABI. Closed Runtime count getter fixture is checked invalid-lifetime prefix coverage, not valid source exhaustion. src/test/memory.cpp Windows high-level API campaign is not credited.",
+        "Only memory_manager.cpp102 assignment is selected. Outer first-initialize max-size/pointer guard, generated child initialization, fully-initialized publication/wait and process finalize remain incomplete; leaf fixtures are independent, not registered source driver credit."
       ]
     },
     {
@@ -114068,7 +114082,8 @@
         "util_memory_fatal_policy_test.go",
         "util_numeric_stream_file.go",
         "util_numeric_stream_file_test.go",
-        "util_numeric_stream.go"
+        "util_numeric_stream.go",
+        "memory/runtime_initialization_oom.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -114119,7 +114134,9 @@
         "TestMemoryFatalMainRuntimeBinding",
         "TestNumericFileStreamExactFormattingAndBorrow",
         "TestNumericFileStreamActualWriteFailureSetsNonthrowingBadbit",
-        "TestNumericFileStreamEveryColdReservation"
+        "TestNumericFileStreamEveryColdReservation",
+        "TestMemoryRuntimeInitializationClearAfterActualAllocationFailure",
+        "TestMemoryRuntimeInitializationClearReachedOwnerGuard"
       ],
       "conditionals": [
         {
@@ -114279,6 +114296,15 @@
             "TestMemoryFatalNonExitExceptionCatch",
             "TestMemoryFatalContextActualColdRefusalAndCohort"
           ]
+        },
+        {
+          "name": "reached initialization OOM=false scalar assignment cpp102 through actual Runtime, preserving real allocation/counter/limit state; containing first-init/generated children/full-init publication remain open",
+          "status": "partial",
+          "go_target": "memory/runtime_initialization_oom.go",
+          "tests": [
+            "TestMemoryRuntimeInitializationClearAfterActualAllocationFailure",
+            "TestMemoryRuntimeInitializationClearReachedOwnerGuard"
+          ]
         }
       ],
       "ownership": [
@@ -114286,12 +114312,14 @@
         "Actual prefix-bearing byte backings plus charged initialized-byte bitmap and cold allocation directory; immediate physical roots, TLS allocated-error owner and bad-header cleanup retain source action/counter prefixes. Real runtime typed-owner hooks, generated lifetime and process transports remain open. See PORT_PROGRESS.md#audit-raw-memory-port-status-md.",
         "One concrete lower memory.Runtime owns source accounting, physical backings and charged directories; main g3 aliases use the real static nominal-error bridge. Borrowed static transport is cold; nil-returning transport cannot suppress source failure. See PORT_PROGRESS.md#audit-memory-package-api-packet-md. Numeric/default-backend and full process-global wiring remain required.",
         "Actual Runtime header/data and TLS/global counter publication preserved, including zero-request header allocation and postphysical TLS limit errors. Wrapped headerless allocation is a guarded source-undefined domain with explicit CleanupPartial, not normal allocation exhaustion credit.",
-        "Explicit standard-stream owner charges its reflected header plus two actual file-stream headers; files borrowed and never closed/sync/fsync by stream owners. Context charges one reflected cold header, borrows same Budget/streams/CString region, validates CString only at reached insertion. Real integer formatter remains local[67]byte; no output warm-up, hidden StringBuffer or fake Runtime allocation. Every actual provider/context reservation tested through success; child pre-refusal named cold/raw graph matches Budget once."
+        "Explicit standard-stream owner charges its reflected header plus two actual file-stream headers; files borrowed and never closed/sync/fsync by stream owners. Context charges one reflected cold header, borrows same Budget/streams/CString region, validates CString only at reached insertion. Real integer formatter remains local[67]byte; no output warm-up, hidden StringBuffer or fake Runtime allocation. Every actual provider/context reservation tested through success; child pre-refusal named cold/raw graph matches Budget once.",
+        "The actual Runtime owns OOM and accounting fields; this scalar source initialization action acquires/releases no block or cold root. Live and late-failed allocation tokens remain with their existing named owners."
       ],
       "deviations": [
         "Source signed-overflow/invalid-lane domains use scalar typed outcomes after completed field prefixes. Containing allocator must execute real physical operations between counter phases. Physical hooks, headers, generated callbacks, OOM exits/streams, concurrent global service and consumer integration remain open.",
         "Size_t promotion is explicit32/64: LP64 updates use unsigned modular arithmetic; ILP32 shrink delta uses uint32 subtraction before LL64 promotion. Signed synchronization/count and ILP32 promoted overflow have typed boundaries after prior field prefixes.",
-        "Selected bound OOM/count exit/stream gap is now implemented: actual Runtime failure routes, real subprocess101/113 with Budget refusal still active, file badbit cannot suppress exit, borrowed CString mutation/false/null retention, errors.As derived/base catch. Prior broad global/exit/stream-open notes remain historical beyond this explicit provider binding. Generated initialize/finalize callbacks and process-global singleton wiring remain OPEN; direct Go file emission is not arbitrary ostream locale/flags/exception/native buffering ABI. Closed Runtime count getter fixture is checked invalid-lifetime prefix coverage, not valid source exhaustion. src/test/memory.cpp Windows high-level API campaign is not credited."
+        "Selected bound OOM/count exit/stream gap is now implemented: actual Runtime failure routes, real subprocess101/113 with Budget refusal still active, file badbit cannot suppress exit, borrowed CString mutation/false/null retention, errors.As derived/base catch. Prior broad global/exit/stream-open notes remain historical beyond this explicit provider binding. Generated initialize/finalize callbacks and process-global singleton wiring remain OPEN; direct Go file emission is not arbitrary ostream locale/flags/exception/native buffering ABI. Closed Runtime count getter fixture is checked invalid-lifetime prefix coverage, not valid source exhaustion. src/test/memory.cpp Windows high-level API campaign is not credited.",
+        "Only memory_manager.cpp102 assignment is selected. Outer first-initialize max-size/pointer guard, generated child initialization, fully-initialized publication/wait and process finalize remain incomplete; leaf fixtures are independent, not registered source driver credit."
       ]
     },
     {
