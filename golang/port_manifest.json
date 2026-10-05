@@ -28629,7 +28629,11 @@
         "mpnum/polynomial_factor_callee_receipts.go",
         "mpnum/polynomial_factor_callee_receipts_source_test.go",
         "mpnum/polynomial_exact_div_source_stop_actual_test.go",
-        "mpnum/polynomial_factory_owning_source_test.go"
+        "mpnum/polynomial_factory_owning_source_test.go",
+        "mpnum/polynomial_primitive_public.go",
+        "mpnum/polynomial_primitive_public_source_test.go",
+        "mpnum/polynomial_square_free.go",
+        "mpnum/polynomial_square_free_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -29158,7 +29162,18 @@
         "TestPolynomialDerivativeInvocationAcquisitionAndReplacement",
         "TestPolynomialExactDivInvocationQuickAndCompleted",
         "TestPolynomialDerivativeReceiptPreservesEarlierGF2CreatedCohort",
-        "TestPolynomialExactDivActualNUMStopPreservesOlderReference"
+        "TestPolynomialExactDivActualNUMStopPreservesOlderReference",
+        "TestPolynomialPublicPrimitivePartLiteralContent",
+        "TestPolynomialPrimitivePredicateLiteralCoefficientContent",
+        "TestPolynomialPrimitivePublicEveryReservation",
+        "TestPolynomialSquareFreeLiteralMultiplicityAndAliases",
+        "TestPolynomialSquareFreeEveryReservation",
+        "TestPolynomialSquareFreeLiteralGF2AndAbsentVariable",
+        "TestPolynomialSquareFreeEarlyRoutesPreserveOlderDerivative",
+        "TestPolynomialSquareFreeDormantSourceSevenExpressions",
+        "TestPolynomialSquareFreeEveryCheckpointFrontier",
+        "TestPolynomialSquareFreeCallerPublicationPreservesForeignCallbackRoot",
+        "TestPolynomialSquareFreeCalleeAbortPreservesEarlierDerivativeCohort"
       ],
       "conditionals": [
         {
@@ -32148,6 +32163,24 @@
             "TestPolynomialDerivativeReceiptPreservesEarlierGF2CreatedCohort",
             "TestPolynomialExactDivActualNUMStopPreservesOlderReference"
           ]
+        },
+        {
+          "name": "PrimitivePart/IsPrimitive cpp3536-3549,7212-7214; SquareFree and IsSquareFree general/variable cpp4529-4598,7232-7246",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_square_free.go",
+          "tests": [
+            "TestPolynomialPublicPrimitivePartLiteralContent",
+            "TestPolynomialPrimitivePredicateLiteralCoefficientContent",
+            "TestPolynomialPrimitivePublicEveryReservation",
+            "TestPolynomialSquareFreeLiteralMultiplicityAndAliases",
+            "TestPolynomialSquareFreeEveryReservation",
+            "TestPolynomialSquareFreeLiteralGF2AndAbsentVariable",
+            "TestPolynomialSquareFreeEarlyRoutesPreserveOlderDerivative",
+            "TestPolynomialSquareFreeDormantSourceSevenExpressions",
+            "TestPolynomialSquareFreeEveryCheckpointFrontier",
+            "TestPolynomialSquareFreeCallerPublicationPreservesForeignCallbackRoot",
+            "TestPolynomialSquareFreeCalleeAbortPreservesEarlierDerivativeCohort"
+          ]
         }
       ],
       "ownership": [
@@ -32204,7 +32237,8 @@
         "Factory owning authority is stamped at actual guarded constructor and allocator leaf actions, identifies exact manager/stable frame/unique invocation, and retains actual published raw pointer before pending clear",
         "Generic owning construction/close drains exact retained constructor and transported NUM roots; raw factory contributes no INC and actual caller reference refuses before cleanup",
         "Append receipts record actual coefficient construction/INC/transfer actions; mixed foreign cohorts refuse unchanged as a partial prerequisite; ordered mixed-cohort retirement and parent Discriminant remain open",
-        "Actual derivative created roots retain pointer-free invocation tags published with their append, charged with backing, and cleared at actual successful monomial INC or exact owning consumption. Per-receipt cursor drains only its invocation; later abort preserves older GF2 cohort. Generic manager-wide cleanup remains separate. Source NUM/cause/stage remain sticky, explicit owned cleanup acknowledges consumed last DEC without dropping older lexical monomial first. No registry or reference-count inference grants cohort authority."
+        "Actual derivative created roots retain pointer-free invocation tags published with their append, charged with backing, and cleared at actual successful monomial INC or exact owning consumption. Per-receipt cursor drains only its invocation; later abort preserves older GF2 cohort. Generic manager-wide cleanup remains separate. Source NUM/cause/stage remain sticky, explicit owned cleanup acknowledges consumed last DEC without dropping older lexical monomial first. No registry or reference-count inference grants cohort authority.",
+        "SquareFree literal lexical NUM/reference order uses exact derivative/ExactDiv invocation receipts in actual charged GCD scope. Source stopped child remains before older scopes; explicit owning cleanup acknowledges completed children before locals, then only matched unjoined roots. Caller incoming INC and foreign created monomial retain actual ownership; earlier GF2 derivative cohort remains untouched."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -32256,7 +32290,8 @@
         "all unrelated polynomial imp/GCD/ICCP/CRA/Resultant methods remain parent/numeric scope",
         "WASM/WASI/race deferred per project instructions",
         "Selected algorithms and explicit Runtime/NUM cohorts only. Actual signed-TLS/consumed-raw proofs exercise guarded owner domains, not claimed ordinary mathematical OOM reachability. Global mgcd_check/TRACE/assertion dispatcher/native ostream/other ABI and source expression-driver construction remain open. Original tst_polynomial returns after PSC: dormant GCD/primitive source fixture bodies have zero active-driver credit. Eight original PSC cases reach first coefficient8, second coefficient5 and Resultant8 selected ENSURE expressions (21 dynamic expressions at3 static sites); full original registered-driver lifecycle/printing is not promoted.",
-        "Actual public TLS near-minimum release fixture reaches guarded source signed-host undefined arithmetic domain, not ordinary free OOM. Zero registered driver assertion credit and no unit promotion; full Factor/Discriminant, parent lexical lifetimes and mixed foreign ordered cohort retirement remain open. Factory/append interrupted move has no ordinary reservation point between source slot clear and destination write; no manufactured reservation coverage is claimed."
+        "Actual public TLS near-minimum release fixture reaches guarded source signed-host undefined arithmetic domain, not ordinary free OOM. Zero registered driver assertion credit and no unit promotion; full Factor/Discriminant, parent lexical lifetimes and mixed foreign ordered cohort retirement remain open. Factory/append interrupted move has no ordinary reservation point between source slot clear and destination write; no manufactured reservation coverage is claimed.",
+        "Original tst_sqf seven expressions are dormant: zero registered source driver credit. Literal GF2 derivative-zero GCD/exact-division result is preserved. Source units remain partial; full parent Factor and strict UP prime/Hensel suffixes remain open."
       ]
     },
     {
@@ -32458,7 +32493,11 @@
         "mpnum/polynomial_scoped_zp_source_test.go",
         "mpnum/polynomial_som_normalize_lifetime_source_test.go",
         "mpnum/polynomial_som_normalize_scope.go",
-        "mpnum/polynomial_sparse_embedded_constructor_source_test.go"
+        "mpnum/polynomial_sparse_embedded_constructor_source_test.go",
+        "mpnum/polynomial_primitive_public.go",
+        "mpnum/polynomial_primitive_public_source_test.go",
+        "mpnum/polynomial_square_free.go",
+        "mpnum/polynomial_square_free_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -32923,7 +32962,18 @@
         "TestPolynomialSparseEmbeddedEveryMemberPrefix",
         "TestPolynomialContentModeSwitchSourceSet",
         "TestPolynomialIntegerContentFieldEveryActualReservationPrefix",
-        "TestPolynomialICCPZPXModeSwitchSourceSet"
+        "TestPolynomialICCPZPXModeSwitchSourceSet",
+        "TestPolynomialPublicPrimitivePartLiteralContent",
+        "TestPolynomialPrimitivePredicateLiteralCoefficientContent",
+        "TestPolynomialPrimitivePublicEveryReservation",
+        "TestPolynomialSquareFreeLiteralMultiplicityAndAliases",
+        "TestPolynomialSquareFreeEveryReservation",
+        "TestPolynomialSquareFreeLiteralGF2AndAbsentVariable",
+        "TestPolynomialSquareFreeEarlyRoutesPreserveOlderDerivative",
+        "TestPolynomialSquareFreeDormantSourceSevenExpressions",
+        "TestPolynomialSquareFreeEveryCheckpointFrontier",
+        "TestPolynomialSquareFreeCallerPublicationPreservesForeignCallbackRoot",
+        "TestPolynomialSquareFreeCalleeAbortPreservesEarlierDerivativeCohort"
       ],
       "conditionals": [
         {
@@ -34435,6 +34485,24 @@
             "TestPolynomialIntegerContentFieldEveryActualReservationPrefix",
             "TestPolynomialICCPZPXModeSwitchSourceSet"
           ]
+        },
+        {
+          "name": "PrimitivePart/IsPrimitive cpp3536-3549,7212-7214; SquareFree and IsSquareFree general/variable cpp4529-4598,7232-7246",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_square_free.go",
+          "tests": [
+            "TestPolynomialPublicPrimitivePartLiteralContent",
+            "TestPolynomialPrimitivePredicateLiteralCoefficientContent",
+            "TestPolynomialPrimitivePublicEveryReservation",
+            "TestPolynomialSquareFreeLiteralMultiplicityAndAliases",
+            "TestPolynomialSquareFreeEveryReservation",
+            "TestPolynomialSquareFreeLiteralGF2AndAbsentVariable",
+            "TestPolynomialSquareFreeEarlyRoutesPreserveOlderDerivative",
+            "TestPolynomialSquareFreeDormantSourceSevenExpressions",
+            "TestPolynomialSquareFreeEveryCheckpointFrontier",
+            "TestPolynomialSquareFreeCallerPublicationPreservesForeignCallbackRoot",
+            "TestPolynomialSquareFreeCalleeAbortPreservesEarlierDerivativeCohort"
+          ]
         }
       ],
       "ownership": [
@@ -34479,7 +34547,8 @@
         "genuine public TLS signed-host-domain postphysical constant deletion stop sticky and distinct from OOM",
         "persistent source SOM members reinitialized only after actual complete owning destruction; independent subsequent Mul at every failure prefix",
         "source sourceCause/cursor retained through own Cleanup/Close; no source retry acknowledgement",
-        "Cold reflected GCD/ICCP/Normalize records acquire only actual guarded invocations. Receipts match exact manager, stable frame pointer and nonwrapping invocation nonce; common PSC generation is not invocation identity. Completed younger source locals precede older caller locals; explicit owning numeric/reference/buffer abort is a separate pass. Source pp moves its result to a named returned temporary, ends helper c/i before caller old-DEC, then ends the temporary. Named pending/raw/backing/retired/cold graph includes all reached records; no registry/RC/whole-call snapshot supplies ownership."
+        "Cold reflected GCD/ICCP/Normalize records acquire only actual guarded invocations. Receipts match exact manager, stable frame pointer and nonwrapping invocation nonce; common PSC generation is not invocation identity. Completed younger source locals precede older caller locals; explicit owning numeric/reference/buffer abort is a separate pass. Source pp moves its result to a named returned temporary, ends helper c/i before caller old-DEC, then ends the temporary. Named pending/raw/backing/retired/cold graph includes all reached records; no registry/RC/whole-call snapshot supplies ownership.",
+        "SquareFree literal lexical NUM/reference order uses exact derivative/ExactDiv invocation receipts in actual charged GCD scope. Source stopped child remains before older scopes; explicit owning cleanup acknowledges completed children before locals, then only matched unjoined roots. Caller incoming INC and foreign created monomial retain actual ownership; earlier GF2 derivative cohort remains untouched."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -34526,7 +34595,8 @@
         "source globals/ostream/profile/reentrancy guarantees inherit existing dependent engine limitations; no universal C++ ABI allocation geometry claim",
         "all unrelated polynomial imp/GCD/ICCP/CRA/Resultant methods remain parent/numeric scope",
         "WASM/WASI/race deferred per project instructions",
-        "Selected algorithms and explicit Runtime/NUM cohorts only. Actual signed-TLS/consumed-raw proofs exercise guarded owner domains, not claimed ordinary mathematical OOM reachability. Global mgcd_check/TRACE/assertion dispatcher/native ostream/other ABI and source expression-driver construction remain open. Original tst_polynomial returns after PSC: dormant GCD/primitive source fixture bodies have zero active-driver credit. Eight original PSC cases reach first coefficient8, second coefficient5 and Resultant8 selected ENSURE expressions (21 dynamic expressions at3 static sites); full original registered-driver lifecycle/printing is not promoted."
+        "Selected algorithms and explicit Runtime/NUM cohorts only. Actual signed-TLS/consumed-raw proofs exercise guarded owner domains, not claimed ordinary mathematical OOM reachability. Global mgcd_check/TRACE/assertion dispatcher/native ostream/other ABI and source expression-driver construction remain open. Original tst_polynomial returns after PSC: dormant GCD/primitive source fixture bodies have zero active-driver credit. Eight original PSC cases reach first coefficient8, second coefficient5 and Resultant8 selected ENSURE expressions (21 dynamic expressions at3 static sites); full original registered-driver lifecycle/printing is not promoted.",
+        "Original tst_sqf seven expressions are dormant: zero registered source driver credit. Literal GF2 derivative-zero GCD/exact-division result is preserved. Source units remain partial; full parent Factor and strict UP prime/Hensel suffixes remain open."
       ]
     },
     {

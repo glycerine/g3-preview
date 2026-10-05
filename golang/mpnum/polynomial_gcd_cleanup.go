@@ -29,6 +29,12 @@ func (m *MultivariatePolynomialManager) cleanupGCDScopes(scopes []*polynomialGCD
 			if e := m.cleanupICCPInvocation(&s.iccpInvocation, false); e != nil {
 				return e
 			}
+			if e := m.cleanupDerivativeInvocation(&s.derivativeInvocation, false); e != nil {
+				return e
+			}
+			if e := c.cleanupExactDivInvocation(&s.divisionInvocation, false); e != nil {
+				return e
+			}
 			if e := m.cleanupNormalizeInvocation(&s.normalizeInvocation, false); e != nil {
 				return e
 			}
@@ -84,6 +90,12 @@ func (m *MultivariatePolynomialManager) cleanupGCDScopes(scopes []*polynomialGCD
 			continue
 		}
 		if e := m.cleanupICCPInvocation(&s.iccpInvocation, true); e != nil {
+			return e
+		}
+		if e := m.cleanupDerivativeInvocation(&s.derivativeInvocation, true); e != nil {
+			return e
+		}
+		if e := c.cleanupExactDivInvocation(&s.divisionInvocation, true); e != nil {
 			return e
 		}
 		if e := m.cleanupNormalizeInvocation(&s.normalizeInvocation, true); e != nil {

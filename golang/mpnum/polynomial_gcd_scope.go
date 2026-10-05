@@ -19,6 +19,8 @@ type polynomialGCDFunctionScope struct {
 	returned                polynomialReference
 	iccpInvocation          polynomialICCPInvocationReceipt
 	normalizeInvocation     polynomialNormalizeInvocationReceipt
+	derivativeInvocation    polynomialDerivativeInvocationReceipt
+	divisionInvocation      polynomialExactDivInvocationReceipt
 	parent, child           *polynomialGCDFunctionScope
 	refs                    [14]PolynomialRef
 	monomials               [2]polynomialDivisionReference
@@ -130,6 +132,14 @@ func (m *MultivariatePolynomialManager) gcdYoungerSourceStop(s *polynomialGCDFun
 		s.cleanupCause = e
 		return e
 	}
+	if e := m.derivativeInvocationSourceCause(&s.derivativeInvocation); e != nil {
+		s.cleanupCause = e
+		return e
+	}
+	if e := m.core.exactDivInvocationSourceCause(&s.divisionInvocation); e != nil {
+		s.cleanupCause = e
+		return e
+	}
 	if s.sparse.self != nil && s.sparse.cleanupCause != nil {
 		s.cleanupCause = s.sparse.cleanupCause
 		return s.cleanupCause
@@ -182,6 +192,7 @@ func (m *MultivariatePolynomialManager) finishGCDLocalsTo(s *polynomialGCDFuncti
 		return nil
 	}
 	pending := s.returned.value != (Polynomial{}) || s.returned.assigning || s.zp.active || s.vars.pending.OwnerID() != 0 || (s.sparse.self != nil && !s.sparse.closed && (s.sparse.inputs.pending.OwnerID() != 0 || s.sparse.outputs.pending.OwnerID() != 0)) || s.topOwner && m.core.pscPending()
+	pending = pending || (m.matchesDerivativeInvocation(&s.derivativeInvocation) || m.derivativeInvocationHasOrphans(&s.derivativeInvocation)) || m.core.matchesExactDivInvocation(&s.divisionInvocation)
 	pending = pending || s.newSkeleton != nil || s.monomialBuffer.incoming != (Monomial{}) || s.monomialBuffer.pending.OwnerID() != 0
 	for i := range s.monomials {
 		pending = pending || s.monomials[i].assigning
