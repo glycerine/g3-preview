@@ -26,6 +26,20 @@ func (m *IntegerModularManager) derivativeAllocationContext(r *polynomialDerivat
 }
 
 func (m *IntegerModularManager) normalizeWithSourceContext(out *Int, context integerAllocationInvocationContext) error {
+	if r := context.primeTrialReceipt(m.manager); r != nil && (r.frame.zp.modular == m || r.service.manager.modular == m) {
+		e := m.pNormalizeWithReceipt(out, &r.frame.normalize)
+		if r.frame.sourceCause == nil {
+			r.frame.sourceCause = m.pNormalizeInvocationSourceCause(&r.frame.normalize)
+		}
+		return e
+	}
+	if r := context.pseudo; m.manager.pseudoContextRoots(context) != nil && r.manager.modular == m {
+		e := m.pNormalizeWithReceipt(out, &r.frame.normalize)
+		if r.frame.sourceCause == nil {
+			r.frame.sourceCause = m.pNormalizeInvocationSourceCause(&r.frame.normalize)
+		}
+		return e
+	}
 	if r := context.mignotteReceipt(m.manager); r != nil && r.service.manager.modular == m {
 		e := m.pNormalizeWithReceipt(out, &r.frame.normalize)
 		if r.frame.sourceCause == nil {

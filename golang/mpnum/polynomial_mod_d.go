@@ -78,6 +78,9 @@ func (b *polynomialSOM) modD(d *PolynomialVariableDegrees) error {
 	return nil
 }
 func (m *MultivariatePolynomialCore) ModD(p Polynomial, d *PolynomialVariableDegrees) (Polynomial, error) {
+	return m.modDWithReceipt(p, d, nil)
+}
+func (m *MultivariatePolynomialCore) modDWithReceipt(p Polynomial, d *PolynomialVariableDegrees, receipt *polynomialArithmeticInvocationReceipt) (Polynomial, error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
@@ -90,6 +93,11 @@ func (m *MultivariatePolynomialCore) ModD(p Polynomial, d *PolynomialVariableDeg
 	}
 	if e = m.cheap.reset(); e != nil {
 		return Polynomial{}, e
+	}
+	if receipt != nil {
+		if e = m.cheap.acquireArithmeticInvocation(receipt); e != nil {
+			return Polynomial{}, e
+		}
 	}
 	n, e := m.readWord(p, 8)
 	if e != nil {
@@ -114,12 +122,12 @@ func (m *MultivariatePolynomialCore) ModD(p Polynomial, d *PolynomialVariableDeg
 			if e != nil {
 				return Polynomial{}, e
 			}
-			if e = m.cheap.add(&a, term, false); e != nil {
+			if e = m.cheap.addWithArithmeticReceipt(&a, term, receipt); e != nil {
 				return Polynomial{}, e
 			}
 		}
 	}
-	return m.cheap.mk(false)
+	return m.cheap.mkWithArithmeticReceipt(false, receipt)
 }
 func (m *MultivariatePolynomialCore) ExactPseudoDivideModD(p, q Polynomial, x uint32, d *PolynomialVariableDegrees, Q, R *PolynomialRef) (err error) {
 	if Q == nil {

@@ -130,6 +130,12 @@ func upolyHenselCheckVectorOwners(cores []*mpnum.UPolynomialManager, factors []*
 				continue
 			}
 			scope = scope.Elem()
+			prime := scope.FieldByName("primeTrial")
+			if !prime.FieldByName("zp").IsNil() {
+				if e := add(prime.FieldByName("zp").Elem(), prime.FieldByName("fzp"), "retained primeTrial.f_pp_zp"); e != nil {
+					return e
+				}
+			}
 			core := scope.FieldByName("manager").Elem()
 			for _, field := range []string{"fpp", "trial", "quotient"} {
 				if e := add(core, scope.FieldByName(field), "retained factorSquareFree."+field); e != nil {
@@ -178,7 +184,7 @@ func upolyPhysicalRetainedOwners(cores []*mpnum.UPolynomialManager, factors []*m
 					cs = append(cs, c)
 				}
 			}
-			for i := uint32(0); i < 2; i++ {
+			for i := uint32(0); i < 3; i++ {
 				f, e := service.RetainedCleanupFactors(i)
 				if errors.Is(e, arena.ErrBounds) {
 					break

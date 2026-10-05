@@ -5,6 +5,10 @@ package mpnum
 // Explicit passed invocation identity. It carries no allocation snapshot and
 // creates no source numeral, reservation, or ambient callback owner hook.
 type integerAllocationInvocationContext struct {
+	primeTrial            *upolyPrimeTrialInvocationReceipt
+	primeTrialInvocation  uint64
+	pseudo                *polynomialPseudoDivisionInvocationReceipt
+	pseudoInvocation      uint64
 	mignotte              *upolyMignotteInvocationReceipt
 	mignotteInvocation    uint64
 	divides               *polynomialDividesInvocationReceipt
@@ -62,7 +66,10 @@ func pnAllocationContext(pn *integerPNormalizeScope) integerAllocationInvocation
 	return c
 }
 func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomialNumericRoots {
-	if c.mignotte != nil && c.mignotteReceipt(m) == nil {
+	if c.primeTrial != nil && c.primeTrialReceipt(m) == nil {
+		return nil
+	}
+	if (c.pseudo != nil && m.pseudoContextRoots(c) == nil) || (c.mignotte != nil && c.mignotteReceipt(m) == nil) {
 		return nil
 	}
 	if c.boolDivides != nil {
@@ -84,6 +91,9 @@ func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomial
 	}
 	if s := c.pn; s != nil && s.owner != nil && s.owner.manager == m && s == &s.owner.normalization && s.active && s.executing && c.pnInvocation != 0 && c.pnInvocation == s.invocation {
 		return &s.roots
+	}
+	if c.pseudo != nil {
+		return m.pseudoContextRoots(c)
 	}
 	if c.divides != nil {
 		return m.dividesContextRoots(c)
@@ -115,6 +125,9 @@ func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomial
 			return nil
 		}
 		return &s.numeric
+	}
+	if r := c.primeTrialReceipt(m); r != nil {
+		return &r.frame.numeric
 	}
 	if r := c.mignotteReceipt(m); r != nil {
 		return &r.frame.numeric

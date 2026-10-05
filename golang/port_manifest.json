@@ -28970,7 +28970,15 @@
         "mpnum/polynomial_power_child_source_test.go",
         "mpnum/polynomial_power_raw_stop_source_test.go",
         "mpnum/polynomial_arithmetic_position_marker_source_test.go",
-        "mpnum/polynomial_position_marker.go"
+        "mpnum/polynomial_position_marker.go",
+        "mpnum/polynomial_pseudo_invocation.go",
+        "mpnum/polynomial_pseudo_allocation_context.go",
+        "mpnum/polynomial_pseudo_created.go",
+        "mpnum/polynomial_pseudo_coefficient_child_source_test.go",
+        "mpnum/polynomial_pseudo_numeric_child_source_test.go",
+        "mpnum/polynomial_pseudo_buffer_child_source_test.go",
+        "mpnum/polynomial_pseudo_child_stop_source_test.go",
+        "mpnum/polynomial_pseudo_mod_d_child_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -29671,7 +29679,19 @@
         "TestPolynomialRegularPositionMarkerCallbackWritePreserved",
         "TestPolynomialRegularPositionMarkerRejectsCopiedAndStaleAcquisition",
         "TestPolynomialRegularPositionMarkerActualMapDestructionConsumesToken",
-        "TestPolynomialRegularPositionMarkerPostphysicalMapRelease"
+        "TestPolynomialRegularPositionMarkerPostphysicalMapRelease",
+        "TestPolynomialPseudoActualCoefficientChildPrefixes",
+        "TestPolynomialPseudoReceiptActualFrameAndReuse",
+        "TestPolynomialPseudoActualMinusANumericAcquisition",
+        "TestPolynomialPseudoDirectContextActualFrameAndCapturedNonce",
+        "TestPolynomialPseudoActualRAndQBufferChildren",
+        "TestPolynomialPseudoActualGeneratedMonomialChild",
+        "TestPolynomialPseudoActualVerificationChildren",
+        "TestPolynomialPseudoMatchedAbortPreservesForeignQuotientRow",
+        "TestPolynomialPseudoYoungerRAWSourceStopPreservesActualOlderLocals",
+        "TestPolynomialPseudoConstantDivisorActualModDChild",
+        "TestPolynomialPseudoConditionalPowerBorrowedPositionContinuation",
+        "TestPolynomialGCDRecursiveRepeatedSparsePointThrowsAfterActualUnwind"
       ],
       "conditionals": [
         {
@@ -33193,6 +33213,30 @@
             "TestPolynomialRegularPositionMarkerActualMapDestructionConsumesToken",
             "TestPolynomialRegularPositionMarkerPostphysicalMapRelease"
           ]
+        },
+        {
+          "name": "pseudo_remainder polynomial.cpp:4905-5065 and exact_pseudo_division_mod_d polynomial.cpp:5065-5091 actual Coeff/Power/NUM/R/Q/generated/DEBUG invocation transport",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_pseudo_invocation.go",
+          "tests": [
+            "TestPolynomialPseudoActualCoefficientChildPrefixes",
+            "TestPolynomialPseudoReceiptActualFrameAndReuse",
+            "TestPolynomialPseudoActualMinusANumericAcquisition",
+            "TestPolynomialPseudoDirectContextActualFrameAndCapturedNonce",
+            "TestPolynomialPseudoActualRAndQBufferChildren",
+            "TestPolynomialPseudoActualGeneratedMonomialChild",
+            "TestPolynomialPseudoActualVerificationChildren",
+            "TestPolynomialPseudoMatchedAbortPreservesForeignQuotientRow",
+            "TestPolynomialPseudoYoungerRAWSourceStopPreservesActualOlderLocals",
+            "TestPolynomialPseudoConstantDivisorActualModDChild",
+            "TestPolynomialPseudoConditionalPowerBorrowedPositionContinuation",
+            "TestPolynomialGCDRecursiveLastVariableUsesEuclidWithoutReadingVariable",
+            "TestPolynomialGCDRecursiveDenseIndependentCommonFactor",
+            "TestPolynomialGCDRecursiveSavedSkeletonIndependentCommonFactor",
+            "TestPolynomialGCDRecursiveActualSparseBodyExceptionAfterCompletedUnwind",
+            "TestPolynomialGCDSparseCatchWaitsForGuardedActualDestructorStop",
+            "TestPolynomialGCDRecursiveRepeatedSparsePointThrowsAfterActualUnwind"
+          ]
         }
       ],
       "ownership": [
@@ -33300,7 +33344,8 @@
         "Power polynomial.cpp:4600-4614 acquires only its actual charged embedded result frame for k>=2 after existing entry/active/nonwrapping generation guards; exact manager/frame/nonce identifies the actual Mul arithmetic child. Completed younger source children precede older result destruction; only explicit abort drains matched unjoined child roots afterward. Source/body causes and concrete child identity survive owning acknowledgment without retaining result or numeric payload authority; new guarded invocation retires that history.",
         "Power polynomial.cpp:4600-4614 preserves the identical nonnil cleanupCause together with bodyCause/sourceCause and concrete arithmetic child identity through false/true owning acknowledgment; inactive metadata carries no result/numeric authority. Actual next guarded invocation retires all prior history.",
         "Exact actual Set write stamps actual embedded positions owner/self, arithmetic frame/nonwrapping captured invocation and vector block/id/value. Owning reset reads the exact position slot without dereferencing borrowed monomial. Successful foreign Set/Reset acknowledges prior token at its actual write; actual reallocation carries the existing token at publication. Actual row push transfers marker ownership to the source row; no extra monomial INC.",
-        "Actual map SourceFinalize/Close acknowledges only the token bound to that physically consumed map block, before propagating any postphysical release error. Refused releases retain exact marker authority. Immutable body/source error values are not overwritten by token retirement."
+        "Actual map SourceFinalize/Close acknowledges only the token bound to that physically consumed map block, before propagating any postphysical release error. Refused releases retain exact marker authority. Immutable body/source error values are not overwritten by token retirement.",
+        "Pseudo polynomial.cpp:4905-5065 retains actual completed declaration stack; conditional coefficient and Power children precede minus_a construction. Direct NUM allocation captures exact owner/frame/captured nonce at real Copy/Neg/PN leaves, generated created-token authority at actual factory outcome, and R/Q row/factory transport at actual guarded actions. Younger source stops precede older NUM/ref destruction; false acknowledges completed source suffix and true only drains matched unjoined roots afterward. Inactive retirement preserves immutable body/source/cleanup and child identities without NUM/ref payload ownership."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -33381,7 +33426,8 @@
         "The source itself leaves higher-degree multivariate factorization as a TODO and pushes the original factor. This port preserves that literal algorithm; no enclosing Factor dispatcher/univariate backend completion or dormant source-driver credit is claimed.",
         "Power ownership tests include real every-reservation prefixes, later foreign regular row preservation and signed-host TLS/direct-allocator RAW end-DEL profile, not ordinary mathematical free OOM. Copied-owner/frame and stale receipt tests are invalid-Go-owner guard coverage. Existing active linear Power arithmetic status is preserved; no complete Pseudo/Resultant/Discriminant/Factor or source-unit/registered-driver promotion.",
         "Pointer-free numeric position identity plus charged cold owner/frame marker is a Go owning adaptation; public source Set/Reset order and vector geometry remain unchanged. Copied/stale/callback receipt guard fixtures are invalid Go metadata tests, independent of the valid actual reservation refusal proof. No Pseudo/Resultant or full factorization completion claim.",
-        "Postphysical map release is proven in a qualified signed-host TLS owner-primitive domain using only public allocation/reallocation setup and public recovery, not ordinary mathematical OOM. Frozen predecessor release gap and RED logs are preserved."
+        "Postphysical map release is proven in a qualified signed-host TLS owner-primitive domain using only public allocation/reallocation setup and public recovery, not ordinary mathematical OOM. Frozen predecessor release gap and RED logs are preserved.",
+        "Deterministic sparse point fixture seeds only the shared source stream; independent polynomial.cpp:4120-4232 repeated-point regression proves the literal sparse exception with immediate owner graph. Production point selection unchanged; direct mod_gcd_rec has no catch and is not credited with invented fallback. Resultant/ICCP/Discriminant parent completion is separate."
       ]
     },
     {
@@ -33598,7 +33644,8 @@
         "mpnum/polynomial_scalar_exact_div_bool_child_source_test.go",
         "mpnum/polynomial_scalar_exact_div_invocation.go",
         "mpnum/polynomial_scalar_exact_div_numeric_context_source_test.go",
-        "mpnum/polynomial_scalar_exact_div_reentry_source_test.go"
+        "mpnum/polynomial_scalar_exact_div_reentry_source_test.go",
+        "mpnum/polynomial_pseudo_invocation.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -34089,7 +34136,19 @@
         "TestPolynomialScalarExactDivNegativeActualRAWChildAllocationAuthority",
         "TestPolynomialScalarExactDivFieldActualCalleePrefixes",
         "TestScalarExactDivNumericActualFrameAndImmutableContext",
-        "TestScalarExactDivNumericLowerActualPrefixes"
+        "TestScalarExactDivNumericLowerActualPrefixes",
+        "TestPolynomialPseudoActualCoefficientChildPrefixes",
+        "TestPolynomialPseudoReceiptActualFrameAndReuse",
+        "TestPolynomialPseudoActualMinusANumericAcquisition",
+        "TestPolynomialPseudoDirectContextActualFrameAndCapturedNonce",
+        "TestPolynomialPseudoActualRAndQBufferChildren",
+        "TestPolynomialPseudoActualGeneratedMonomialChild",
+        "TestPolynomialPseudoActualVerificationChildren",
+        "TestPolynomialPseudoMatchedAbortPreservesForeignQuotientRow",
+        "TestPolynomialPseudoYoungerRAWSourceStopPreservesActualOlderLocals",
+        "TestPolynomialPseudoConstantDivisorActualModDChild",
+        "TestPolynomialPseudoConditionalPowerBorrowedPositionContinuation",
+        "TestPolynomialGCDRecursiveRepeatedSparsePointThrowsAfterActualUnwind"
       ],
       "conditionals": [
         {
@@ -37982,7 +38041,14 @@
         "mpnum/upolynomial_mignotte_physical_source_test.go",
         "mpnum/upolynomial_mignotte_root_stop_source_test.go",
         "mpnum/upolynomial_source_finalize.go",
-        "upolynomial_factor_retained_scope_source_test.go"
+        "upolynomial_factor_retained_scope_source_test.go",
+        "upolynomial_hensel_physical_source_test.go",
+        "upolynomial_hensel_vector_owner_source_test.go",
+        "mpnum/upolynomial_factor_hensel.go",
+        "mpnum/upolynomial_prime_trial_owner_transport_source_test.go",
+        "mpnum/upolynomial_prime_trial_source_test.go",
+        "mpnum/upolynomial_prime_trial_invocation.go",
+        "mpnum/upolynomial_prime_trial_allocation_context.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -37994,7 +38060,15 @@
         "TestUPolynomialMignotteTransportCannotRetireExecutingOwner",
         "TestUPolynomialMignotteSourceFinalizerPreservesOlderParent",
         "TestUPolynomialMignotteActualRootEndStopsOlderNUM",
-        "TestUPolynomialFactorRetainedLexicalCleanup"
+        "TestUPolynomialFactorRetainedLexicalCleanup",
+        "TestUPolynomialPrimeTrialTransportCannotRetireActualRelatedOwner",
+        "TestUPolynomialPrimeTrialLiteralRoutes",
+        "TestUPolynomialPrimeTrialToZPRawEveryPrefix",
+        "TestUPolynomialPrimeTrialCurrentDestructorStopsOlderVector",
+        "TestUPolynomialPrimeTrialEveryActualReservation",
+        "TestUPolynomialPrimeTrialCapturedContextRejectsReuseCopiesAndForeign",
+        "TestUPolynomialPrimeToZPCompletedPrefixAndPublishedRawPushFailure",
+        "TestUPolynomialPrimeTrialEnclosingOwnContinuationEveryHelperPrefix"
       ],
       "conditionals": [
         {
@@ -38131,15 +38205,36 @@
             "TestUPolynomialMignotteSourceFinalizerPreservesOlderParent",
             "TestUPolynomialMignotteTransportCannotRetireExecutingOwner"
           ]
+        },
+        {
+          "name": "upolynomial_factorization.cpp:1097-1145 selected prime-trial body and current_degree_set/current_fs/f_pp_zp reverse source destruction",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_factor_recombine.go",
+          "tests": [
+            "TestUPolynomialPrimeTrialTransportCannotRetireActualRelatedOwner",
+            "TestUPolynomialPrimeTrialLiteralRoutes",
+            "TestUPolynomialPrimeTrialToZPRawEveryPrefix",
+            "TestUPolynomialPrimeTrialCurrentDestructorStopsOlderVector",
+            "TestUPolynomialPrimeTrialEveryActualReservation",
+            "TestUPolynomialPrimeTrialCapturedContextRejectsReuseCopiesAndForeign",
+            "TestUPolynomialPrimeToZPCompletedPrefixAndPublishedRawPushFailure",
+            "TestUPolynomialPrimeTrialEnclosingOwnContinuationEveryHelperPrefix"
+          ]
         }
       ],
       "ownership": [
         "Actual charged enclosing frame owns norm/bound/tmp at their literal declaration frontiers; direct Integer acquisition leaves plus exact Root/AddMul/PN child receipts; source reverse destruction and separate false/true owning cleanup preserve first causes and foreign roots.",
-        "Actual source epilogue never invokes automatic owning abort. Executing caller chain protects reached numeric/destructor callbacks; idle retained invocation permits explicit exact owning cleanup."
+        "Actual source epilogue never invokes automatic owning abort. Executing caller chain protects reached numeric/destructor callbacks; idle retained invocation permits explicit exact owning cleanup.",
+        "Actual charged enclosing prime frame owns reached RAW transport and lexical f_pp_zp/current_fs/current_degree_set at actual declaration frontiers; direct Integer acquisition and exact PN child; immutable first source causes and matched false/true owning continuation.",
+        "Actual related/root manager executing caller chain protects source body and destructor callbacks before owning or SourceFinalize mutation; idle retained scopes permit explicit owning abort."
       ],
       "deviations": [
-        "Selected Mignotte helper and enclosing epilogue only; prime-trial and pair-Hensel lexical scope closure remain open. No full factor_square_free completion or original registered driver assertion credit.",
-        "Signed-host TLS and destroyed-pointer profiles qualify source guard/owning behavior, not ordinary supported mathematical failure reachability. Source unsigned exponent doubling is retained without Go overflow refusal."
+        "Selected Mignotte helper, enclosing epilogue and literal prime-trial lexical scope/RAW transport are closed. Pair-Hensel and generic nil to_zp helper scope closure remain open. No full factor_square_free completion or original registered driver assertion credit.",
+        "Signed-host TLS and destroyed-pointer profiles qualify source guard/owning behavior, not ordinary supported mathematical failure reachability. Source unsigned exponent doubling is retained without Go overflow refusal.",
+        "Destroyed-old source guard is owner-primitive/dangling checked domain, not ordinary mathematical OOM.",
+        "Runtime signed-TLS transport owner proof uses actual returning ErrorTransport callback.",
+        "The nil toZPCopy adapter retains historical eager deletion and is outside the corrected actual Prime receipt route; pair-Hensel closure remains open.",
+        "Dormant original registered source driver assertions receive zero credit."
       ]
     },
     {
@@ -38170,8 +38265,14 @@
       "component": "math",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "mpnum/upolynomial_factor_hensel.go",
+        "mpnum/upolynomial_prime_trial_invocation.go"
+      ],
+      "tests": [
+        "TestUPolynomialPrimeTrialToZPRawEveryPrefix",
+        "TestUPolynomialPrimeToZPCompletedPrefixAndPublishedRawPushFailure"
+      ],
       "conditionals": [
         {
           "line": 26,
@@ -38226,9 +38327,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "upolynomial_factorization_int.h:42-52 selected actual prime-trial RAW SET and move publication",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_factor_hensel.go",
+          "tests": [
+            "TestUPolynomialPrimeTrialToZPRawEveryPrefix",
+            "TestUPolynomialPrimeToZPCompletedPrefixAndPublishedRawPushFailure"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual RAW p_i remains source-unjoined on SET/push refusal; move clears transport only at real vector publication."
+      ],
+      "deviations": [
+        "Only the actual prime receipt route is closed; generic nil helper and pair-Hensel lexical lifetime remain open."
+      ]
     },
     {
       "path": "src/math/realclosure/CMakeLists.txt",
@@ -127554,7 +127669,9 @@
         "mpnum/polynomial_content_allocation_context.go",
         "mpnum/polynomial_exact_div_allocation_context.go",
         "mpnum/polynomial_divides_allocation_context.go",
-        "mpnum/polynomial_divides_numeric_context_source_test.go"
+        "mpnum/polynomial_divides_numeric_context_source_test.go",
+        "mpnum/polynomial_pseudo_allocation_context.go",
+        "mpnum/integer_allocation_invocation_context.go"
       ],
       "tests": [
         "TestIntegerModularCenteredOracle",
@@ -127621,7 +127738,9 @@
         "TestPolynomialScaleEarlyAliasesDoNotAcquireOlderRegularFrame",
         "TestDividesNumericActualFrameAndImmutableContext",
         "TestDividesNumericLowerActualPrefixes",
-        "TestDividesNumericActualBoolChildAndErasedFieldRoute"
+        "TestDividesNumericActualBoolChildAndErasedFieldRoute",
+        "TestPolynomialPseudoActualMinusANumericAcquisition",
+        "TestPolynomialPseudoMatchedAbortPreservesForeignQuotientRow"
       ],
       "conditionals": [
         {
@@ -127996,7 +128115,8 @@
         "Exact actual guarded Content owner/member/frame/nonwrapping immutable invocation; direct source allocation and actual pending-clear hooks only. Actual source child end/verification DT remains separate from false completed and true unjoined owning phases. Diagnostic child tuples survive own acknowledgment without numeric/root authority.",
         "Actual self/embedded source buffer/frame/nonwrapping immutable invocation/executing/callback-zero identity; direct allocation leaves and actual default NUM/INC/push/factory handoff alone grant roots.",
         "False acknowledges only completed younger child suffix; true retires exact unjoined acquisitions after caller older source declarations, preserving first cause and later foreign generation.",
-        "Actual self/embedded frame/nonwrapping captured invocation identities; direct cell/backing/allocator and Natural buffer acquisitions only. Scoped bool tmp construction precedes zero branch; all completed constructors run strict source DT. First source cause persists across separate false/true owning acknowledgment until next actual invocation. Successful shared Natural publications remain member-owned."
+        "Actual self/embedded frame/nonwrapping captured invocation identities; direct cell/backing/allocator and Natural buffer acquisitions only. Scoped bool tmp construction precedes zero branch; all completed constructors run strict source DT. First source cause persists across separate false/true owning acknowledgment until next actual invocation. Successful shared Natural publications remain member-owned.",
+        "Direct pseudo NUM context validates actual modular receiver and guarded frame/nonwrap nonce/executing/callback boundary before same-engine Copy/Neg/PN acquisition."
       ],
       "deviations": [
         "Source modulus constructors leave prime flag indeterminate; typed guard only actual read, not invented release Div precondition. Source Power maskwrap nontermination diagnosed after completed actions; deferred local/constructor cleanup is safe Go ownership adaptation, not claimed raw MPZ exception destructor. Source TRACE/unsupported/undefined and full consumer algorithms remain open. See PORT_PROGRESS.md#audit-mpzzp-port-status-md.",

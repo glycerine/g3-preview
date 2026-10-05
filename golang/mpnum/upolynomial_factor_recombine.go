@@ -4,7 +4,6 @@
 // Actual Mignotte bound, prime image trials and subset recombination.
 package mpnum
 
-
 func (s *UPolynomialFactorizationService) FactorSquareFree(f UPolynomialView, fs *UPolynomialFactors, k uint32, params UPolynomialFactorParams) (bool, error) {
 	if e := s.check(); e != nil {
 		return false, e
@@ -95,44 +94,54 @@ func (s *UPolynomialFactorizationService) mignotteBound(f UPolynomialView, p *In
 
 // Trial result: 0 continue (bad prime), 1 completed ordinary candidate,
 // 2 source early return true (irreducible/trivial degree set).
-func (s *UPolynomialFactorizationService) factorPrimeTrial(zp *UPolynomialManager, fpp *upolyVectorState, fs, best *UPolynomialFactors, k uint32, p, bestP *Int, ds *upolyFactorDegreeState, trials *uint32) (uint8, error) {
+func (s *UPolynomialFactorizationService) factorPrimeTrial(zp *UPolynomialManager, fpp *upolyVectorState, fs, best *UPolynomialFactors, k uint32, p, bestP *Int, ds *upolyFactorDegreeState, trials *uint32) (route uint8, failure error) {
 	m := s.manager
-	var fzp upolyVectorState
-	defer m.dropLocalVector(&fzp)
-	if e := zp.toZPCopy(m.stateView(fpp), &fzp); e != nil {
+	r, e := s.beginPrimeTrialInvocation(zp)
+	if e != nil {
 		return 0, e
 	}
-	squareFree, e := zp.IsSquareFreeView(zp.stateView(&fzp))
+	q := r.frame
+	q.enterCall()
+	defer q.leaveCall()
+	defer func() { q.executing = false; failure = s.finishPrimeTrialSource(&r, failure) }()
+	q.constructed = 1
+	fzp := &q.fzp
+	if e := zp.toZPCopyWithPrimeReceipt(m.stateView(fpp), fzp, &r); e != nil {
+		return 0, e
+	}
+	squareFree, e := zp.IsSquareFreeView(zp.stateView(fzp))
 	if e != nil {
 		return 0, e
 	}
 	if !squareFree {
 		return 0, nil
 	}
-	if e = zp.monicLocal(zp.stateView(&fzp)); e != nil {
+	if e = zp.monicLocal(zp.stateView(fzp)); e != nil {
 		return 0, e
 	}
 	current, e := zp.NewFactors()
 	if e != nil {
 		return 0, e
 	}
-	defer current.Close()
-	factored, e := zp.factorZPBerlekamp(zp.stateView(&fzp), current, false)
+	q.current = current
+	q.constructed = 2
+	factored, e := zp.factorZPBerlekamp(zp.stateView(fzp), current, false)
 	if e != nil {
 		return 0, e
 	}
 	if !factored {
 		return 2, fs.PushCopy(m.stateView(fpp), k)
 	}
-	var imageDegrees upolyFactorDegreeState
-	defer imageDegrees.close(m.config.Integer.budget)
+	q.degreesStarted = true
+	imageDegrees := &q.degrees
 	if e = imageDegrees.init(current); e != nil {
 		return 0, e
 	}
+	q.constructed = 3
 	if ds.bits-1 == 0 {
-		*ds, imageDegrees = imageDegrees, *ds
+		*ds, *imageDegrees = *imageDegrees, *ds
 	} else {
-		if e = ds.intersect(&imageDegrees); e != nil {
+		if e = ds.intersect(imageDegrees); e != nil {
 			return 0, e
 		}
 	}
@@ -148,7 +157,7 @@ func (s *UPolynomialFactorizationService) factorPrimeTrial(zp *UPolynomialManage
 		if e = best.Swap(current); e != nil {
 			return 0, e
 		}
-		if e = m.modular.Copy(bestP, p); e != nil {
+		if e = m.modular.copyWithSourceContext(bestP, p, m.modular.primeTrialAllocationContext(&r)); e != nil {
 			return 0, e
 		}
 	}

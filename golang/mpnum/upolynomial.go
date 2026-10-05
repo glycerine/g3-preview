@@ -28,6 +28,7 @@ type UPolynomialConfig struct {
 type UPolynomialManager struct {
 	callbackDepth    uint32
 	mignotteCaller   *upolyMignotteScope
+	primeTrialCaller *upolyPrimeTrialScope
 	squareFreeCaller *upolyFactorSquareFreeScope
 	self             *UPolynomialManager
 	origin           uint64

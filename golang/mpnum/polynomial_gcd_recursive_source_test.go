@@ -5,6 +5,7 @@ package mpnum
 import (
 	"errors"
 	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/clibrand"
 	"testing"
 )
 
@@ -68,6 +69,9 @@ func TestPolynomialGCDRecursiveDenseIndependentCommonFactor(t *testing.T) {
 }
 
 func TestPolynomialGCDRecursiveSavedSkeletonIndependentCommonFactor(t *testing.T) {
+	// The independent success fixture owns its source-compatible process seed.
+	clibrand.Srand(1)
+	t.Cleanup(func() { clibrand.Srand(1) })
 	full := polynomialPSCFullFixture(t)
 	c := full.core
 	_, e := c.monomials.MkVar()
@@ -305,6 +309,86 @@ func TestPolynomialGCDSparseCatchWaitsForGuardedActualDestructorStop(t *testing.
 	var failed *polynomialSparseMGCDException
 	if !errors.As(body, &failed) {
 		t.Fatal("actual saved sparse skeleton mismatch did not throw source exception", body)
+	}
+
+	same, e := c.Equal(r.root.value, factor)
+	serviceMust(t, e)
+	if !same {
+		t.Fatal("actual recursive field GCD independent common factor")
+	}
+}
+
+func TestPolynomialGCDRecursiveRepeatedSparsePointThrowsAfterActualUnwind(t *testing.T) {
+	// The independent success fixture owns its source-compatible process seed.
+	clibrand.Srand(1)
+	t.Cleanup(func() { clibrand.Srand(1) })
+	full := polynomialPSCFullFixture(t)
+	c := full.core
+	_, e := c.monomials.MkVar()
+	serviceMust(t, e)
+	_, e = c.monomials.MkVar()
+	serviceMust(t, e)
+	serviceMust(t, c.modular.SetZPUint64(11))
+	full.useSparseGCD = true
+	factor := polynomialQueryTerms(t, c, []int32{1, 1, 1}, [][]MonomialPower{{{0, 1}}, {{1, 1}}, nil})
+	left := polynomialQueryTerms(t, c, []int32{1, 1}, [][]MonomialPower{{{1, 1}}, nil})
+	right := polynomialQueryTerms(t, c, []int32{1, 2}, [][]MonomialPower{{{1, 1}}, nil})
+	u, e := c.Mul(factor, left)
+	serviceMust(t, e)
+	ur, e := NewPolynomialRef(c)
+	serviceMust(t, e)
+	serviceMust(t, ur.root.assign(c, u))
+	v, e := c.Mul(factor, right)
+	serviceMust(t, e)
+	vr, e := NewPolynomialRef(c)
+	serviceMust(t, e)
+	serviceMust(t, vr.root.assign(c, v))
+	r, e := NewPolynomialRef(c)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, r.Close()); serviceMust(t, ur.Close()); serviceMust(t, vr.Close()) })
+	serviceMust(t, full.newton.SetOwner(c))
+	serviceMust(t, full.skeletons.Push(nil))
+	serviceMust(t, full.skeletons.Push(nil))
+	var vars polynomialGCDVariableBuffer
+	vars.construct(c.memory)
+	serviceMust(t, vars.push(0))
+	serviceMust(t, vars.push(1))
+	serviceMust(t, full.modGCDRec(u, v, 11, 0, &vars, &r.root))
+	saved, e := full.skeletons.Get(0)
+	serviceMust(t, e)
+	if saved == nil {
+		t.Fatal("source did not publish learned skeleton")
+	}
+	// Seed2 starts with two literal selected-profile draws congruent to8 mod11.
+	var stream clibrand.GLibc31
+	stream.Seed(2)
+	if stream.Next()%11 != 8 || stream.Next()%11 != 8 {
+		t.Fatal("literal duplicate source sample fixture")
+	}
+	dense, e := full.newton.At(0)
+	serviceMust(t, e)
+	n, e := dense.Inputs().Size()
+	serviceMust(t, e)
+	for i := uint32(0); i < n; i++ {
+		a, e := dense.Inputs().Get(i)
+		serviceMust(t, e)
+		if a == NewInt(-3) {
+			t.Fatal("selected sparse point was already excluded by dense inputs")
+		}
+	}
+	clibrand.Srand(2)
+	body := full.modGCDRec(u, v, 11, 0, &vars, &r.root)
+	var failed *polynomialSparseMGCDException
+	if !errors.As(body, &failed) {
+		t.Fatal("literal repeated-point sparse exception absent", body)
+	}
+	// Direct mod_gcd_rec has no catch. Its actual caller may catch only after
+	// the completed lexical unwind, which is checked before any owning ACK.
+	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{factor, left, right, ur.root.value, vr.root.value, r.root.value}, nil, ur.header+vr.header+r.header)
+	for _, frame := range full.gcdFrames {
+		if frame.active || frame.cleanupCause != nil {
+			t.Fatal("literal sparse body exception retained source DT", frame)
+		}
 	}
 
 	same, e := c.Equal(r.root.value, factor)

@@ -28,7 +28,25 @@ const (
 // Nested Power has its own existing result record. The candidate slots are a
 // charged Go continuation representation, not the C++ stack allocation geometry.
 type polynomialPseudoDivisionScope struct {
+	modD                                  polynomialArithmeticInvocationReceipt
+	operation                             polynomialArithmeticInvocationReceipt
+	generated                             Monomial
+	calleeGeneration                      uint64
+	monomialAllocator                     monomialAllocatorInvocationReceipt
+	remainderBuffer                       polynomialArithmeticInvocationReceipt
+	quotientBuffer                        polynomialArithmeticInvocationReceipt
+	normalize                             integerPNormalizeInvocationReceipt
+	directReceipt                         polynomialPseudoDivisionInvocationReceipt
+	numeric                               polynomialNumericRoots
+	numericPhase                          uint8
+	invocation                            uint64
+	executing                             bool
+	sourceCause                           error
 	pscOwner                              uint64
+	power                                 polynomialPowerInvocationReceipt
+	coefficient                           polynomialCoefficientInvocationReceipt
+	coefficientAppend                     polynomialCheapAppendInvocationReceipt
+	coefficientFactory                    polynomialFactoryInvocationReceipt
 	refs                                  [11]polynomialReference
 	numeral                               Int
 	monomial                              polynomialDivisionReference
@@ -56,7 +74,11 @@ func (m *MultivariatePolynomialCore) pseudoPop(owning bool) error {
 		if s.numeralStopped && !owning {
 			return s.numeralCause
 		}
-		e = m.deleteNumeral(&s.numeral)
+		if owning {
+			e = m.deleteNumeral(&s.numeral)
+		} else {
+			_, e = upolynomialSourceNumeralDel(m.integer, &s.numeral)
+		}
 		if e != nil {
 			s.numeralStopped = true
 			s.numeralCause = e
@@ -67,8 +89,12 @@ func (m *MultivariatePolynomialCore) pseudoPop(owning bool) error {
 		e = s.refs[id].closeValue(m, owning)
 	}
 	if e != nil {
+		if !owning && s.sourceCause == nil {
+			s.sourceCause = e
+		}
 		return e
 	}
+	s.constructed &^= uint16(1) << id
 	s.depth--
 	return nil
 }
@@ -76,17 +102,47 @@ func (m *MultivariatePolynomialCore) pseudoCleanup(owning bool) error {
 	return m.pseudoCleanupPhase(owning, owning)
 }
 func (m *MultivariatePolynomialCore) pseudoCleanupPhase(owning, abort bool) error {
+	if m == nil || m.self != m {
+		return ErrPolynomialOwner
+	}
 	s := &m.pseudoDivision
+	if !owning && s.sourceCause != nil {
+		return s.sourceCause
+	}
 	if !s.active {
 		return nil
 	}
-	if m.powerLocal.active && m.powerLocal.cleanupCause != nil {
+	if s.executing {
+		return ErrPolynomialPending
+	}
+	if !owning && s.sourceCause != nil {
+		return s.sourceCause
+	}
+	for _, child := range []*polynomialArithmeticInvocationReceipt{&s.modD, &s.operation, &s.quotientBuffer, &s.remainderBuffer} {
 		if !owning {
-			return m.powerLocal.cleanupCause
+			if cause := m.arithmeticInvocationSourceCause(child); cause != nil {
+				if s.sourceCause == nil {
+					s.sourceCause = cause
+				}
+				return cause
+			}
 		}
-		if e := m.cleanupPolynomialPowerPhase(true, abort); e != nil {
+		if e := m.cleanupArithmeticInvocation(child, false); e != nil {
 			return e
 		}
+	}
+	if e := m.modular.cleanupPNormalizeInvocation(&s.normalize, false); e != nil {
+		return e
+	}
+	if e := m.cleanupCoefficientInvocation(&s.coefficient, false); e != nil {
+		return e
+	}
+	if !owning {
+		if cause := m.powerInvocationSourceCause(&s.power); cause != nil {
+			return cause
+		}
+	} else if e := m.cleanupPowerInvocation(&s.power, false); e != nil {
+		return e
 	}
 	for s.depth != 0 {
 		if e := m.pseudoPop(owning); e != nil {
@@ -105,6 +161,34 @@ func (m *MultivariatePolynomialCore) pseudoCleanupPhase(owning, abort bool) erro
 		}
 		s.monomial.assigning = false
 	}
+	if abort {
+		for _, child := range []*polynomialArithmeticInvocationReceipt{&s.modD, &s.operation, &s.quotientBuffer, &s.remainderBuffer} {
+			if e := m.cleanupArithmeticInvocation(child, true); e != nil {
+				return e
+			}
+		}
+		if e := m.modular.cleanupPNormalizeInvocation(&s.normalize, true); e != nil {
+			return e
+		}
+		if e := m.cleanupPseudoCreated(&s.directReceipt); e != nil {
+			return e
+		}
+		if e := s.numeric.cleanup(m.integer); e != nil {
+			return e
+		}
+		if e := m.cleanupPowerInvocation(&s.power, true); e != nil {
+			return e
+		}
+		if e := m.cleanupCoefficientInvocation(&s.coefficient, true); e != nil {
+			return e
+		}
+		if e := m.cleanupFactoryInvocation(&s.coefficientFactory, true); e != nil {
+			return e
+		}
+		if e := m.cheap.cleanupAppendInvocation(&s.coefficientAppend, true); e != nil {
+			return e
+		}
+	}
 	for i := range s.refs {
 		if s.refs[i].assigning || s.refs[i].incoming != (Polynomial{}) {
 			return nil
@@ -113,7 +197,19 @@ func (m *MultivariatePolynomialCore) pseudoCleanupPhase(owning, abort bool) erro
 	if s.monomial.assigning || s.monomial.incoming != (Monomial{}) {
 		return nil
 	}
-	*s = polynomialPseudoDivisionScope{}
+	if r := &s.coefficient; r.manager == m && r.frame == &m.coefficientInvocation && r.invocation != 0 && r.invocation == r.frame.invocation && (r.frame.active || r.frame.bufferActive) {
+		return nil
+	}
+	if m.matchesPowerInvocation(&s.power) {
+		return nil
+	}
+	if m.matchesArithmeticInvocation(&s.modD) || m.matchesArithmeticInvocation(&s.operation) || m.matchesArithmeticInvocation(&s.quotientBuffer) || m.matchesArithmeticInvocation(&s.remainderBuffer) {
+		return nil
+	}
+	if polynomialNegNumericPending(&s.numeric) || m.modular.matchesPNormalizeInvocation(&s.normalize) {
+		return nil
+	}
+	*s = polynomialPseudoDivisionScope{invocation: s.invocation, sourceCause: s.sourceCause, bodyCause: s.bodyCause, cleanupCause: s.cleanupCause, numeralCause: s.numeralCause, directReceipt: s.directReceipt, monomialAllocator: s.monomialAllocator, coefficientAppend: s.coefficientAppend, coefficientFactory: s.coefficientFactory, power: s.power, coefficient: s.coefficient, normalize: s.normalize, remainderBuffer: s.remainderBuffer, quotientBuffer: s.quotientBuffer, operation: s.operation, modD: s.modD}
 	return nil
 }
 func (m *MultivariatePolynomialCore) CleanupPseudoDivision() error {
@@ -127,22 +223,46 @@ func (m *MultivariatePolynomialCore) CleanupPseudoDivision() error {
 	return e
 }
 func (m *MultivariatePolynomialCore) generatedDivideVariablePower(a Monomial, x, k uint32) (Monomial, error) {
+	return m.generatedDivideVariablePowerWithReceipt(a, x, k, nil)
+}
+func (m *MultivariatePolynomialCore) generatedDivideVariablePowerWithReceipt(a Monomial, x, k uint32, r *polynomialPseudoDivisionInvocationReceipt) (Monomial, error) {
+	if r != nil && (!m.matchesPseudoInvocation(r) || !r.frame.executing || m.callbackDepth != 0) {
+		return Monomial{}, ErrPolynomialOwner
+	}
 	if m.generatedActive {
 		return Monomial{}, ErrPolynomialPending
 	}
 	outcome := monomialFactoryOutcome{}
 	p, e := m.monomials.variableTransformCreated(a, x, k, 0, &outcome)
+	if r != nil && outcome.allocatorInvocation.invocation != 0 {
+		r.frame.monomialAllocator = outcome.allocatorInvocation
+	}
 	if e != nil && outcome.started {
 		m.recordGeneratedCallee(outcome)
+		if r != nil {
+			r.frame.calleeGeneration = outcome.generation
+		}
 	}
 	if e == nil && outcome.created {
 		m.generatedMonomial = p
 		m.generatedActive = true
 		m.generatedPSC = m.pscExecutingOwner()
+		if r != nil {
+			r.frame.generated = p
+			l, readErr := m.monomials.location(p)
+			if readErr != nil {
+				return p, readErr
+			}
+			l.pseudoCohort = r.frame
+			l.pseudoInvocation = r.invocation
+		}
 	}
 	return p, e
 }
 func (m *MultivariatePolynomialCore) pseudoEntry(q, r *PolynomialRef) error {
+	return m.pseudoEntryWithReceipt(q, r, nil)
+}
+func (m *MultivariatePolynomialCore) pseudoEntryWithReceipt(q, r *PolynomialRef, receipt *polynomialPseudoDivisionInvocationReceipt) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -160,14 +280,20 @@ func (m *MultivariatePolynomialCore) pseudoEntry(q, r *PolynomialRef) error {
 			return e
 		}
 	}
-	if m.pseudoDivision.active || m.powerLocal.active {
+	if m.pseudoDivision.active || m.powerLocal.active || m.pseudoDivision.invocation == ^uint64(0) {
 		return ErrPolynomialPending
 	}
-	m.pseudoDivision = polynomialPseudoDivisionScope{active: true, pscOwner: m.pscExecutingOwner()}
+	next := m.pseudoDivision.invocation + 1
+	m.pseudoDivision = polynomialPseudoDivisionScope{active: true, executing: true, invocation: next, pscOwner: m.pscExecutingOwner()}
+	m.pseudoDivision.directReceipt = polynomialPseudoDivisionInvocationReceipt{m, &m.pseudoDivision, next}
+	if receipt != nil {
+		*receipt = m.pseudoDivision.directReceipt
+	}
 	return nil
 }
 func (m *MultivariatePolynomialCore) pseudoFinish(err *error) {
 	s := &m.pseudoDivision
+	s.executing = false
 	s.bodyCause = *err
 	if s.cleanupCause != nil {
 		*err = errors.Join(*err, s.cleanupCause)
@@ -176,6 +302,9 @@ func (m *MultivariatePolynomialCore) pseudoFinish(err *error) {
 	e := m.pseudoCleanup(false)
 	if e != nil {
 		s.cleanupCause = e
+		if s.sourceCause == nil {
+			s.sourceCause = e
+		}
 		*err = errors.Join(*err, e)
 	}
 }
@@ -200,8 +329,11 @@ func (m *MultivariatePolynomialCore) ExactPseudoDivide(p, q Polynomial, x uint32
 	var d uint32
 	return m.pseudoCore(p, q, x, &d, &Q.root, &R.root, true, true, false, nil)
 }
-func (m *MultivariatePolynomialCore) ExactPseudoRemainder(p, q Polynomial, x uint32, R *PolynomialRef) (err error) {
-	if e := m.pseudoEntry(nil, R); e != nil {
+func (m *MultivariatePolynomialCore) ExactPseudoRemainder(p, q Polynomial, x uint32, R *PolynomialRef) error {
+	return m.exactPseudoRemainderWithReceipt(p, q, x, R, nil)
+}
+func (m *MultivariatePolynomialCore) exactPseudoRemainderWithReceipt(p, q Polynomial, x uint32, R *PolynomialRef, receipt *polynomialPseudoDivisionInvocationReceipt) (err error) {
+	if e := m.pseudoEntryWithReceipt(nil, R, receipt); e != nil {
 		return e
 	}
 	defer m.pseudoFinish(&err)
@@ -241,19 +373,19 @@ func (m *MultivariatePolynomialCore) PseudoRemainder(p, q Polynomial, x uint32, 
 	if e != nil {
 		return e
 	}
-	l, e := m.Coeff(s.refs[pseudoOldQ].value, x, degree)
+	l, e := m.coeffCoreWithReceipts(s.refs[pseudoOldQ].value, x, degree, nil, &s.coefficient, &s.coefficientAppend, &s.coefficientFactory)
 	if e != nil {
 		return e
 	}
-	if e = s.refs[pseudoLeading].assign(m, l); e != nil {
+	if e = s.refs[pseudoLeading].assignWithFactoryReceipt(m, l, &s.coefficientFactory); e != nil {
 		return e
 	}
 	s.construct(pseudoPowered)
-	if e = m.powerInto(s.refs[pseudoLeading].value, *d, &s.refs[pseudoPowered]); e != nil {
+	if e = m.powerIntoWithReceipt(s.refs[pseudoLeading].value, *d, &s.refs[pseudoPowered], &s.power); e != nil {
 		return e
 	}
 	s.construct(pseudoLeft)
-	lhs, e := m.Mul(s.refs[pseudoPowered].value, s.refs[pseudoOldP].value)
+	lhs, e := m.mulWithReceipt(s.refs[pseudoPowered].value, s.refs[pseudoOldP].value, &s.operation)
 	if e != nil {
 		return e
 	}
@@ -261,14 +393,14 @@ func (m *MultivariatePolynomialCore) PseudoRemainder(p, q Polynomial, x uint32, 
 		return e
 	}
 	s.construct(pseudoRight)
-	rhs, e := m.Mul(s.refs[pseudoQuotient].value, s.refs[pseudoOldQ].value)
+	rhs, e := m.mulWithReceipt(s.refs[pseudoQuotient].value, s.refs[pseudoOldQ].value, &s.operation)
 	if e != nil {
 		return e
 	}
 	if e = s.refs[pseudoRight].assign(m, rhs); e != nil {
 		return e
 	}
-	rhs, e = m.Add(s.refs[pseudoRight].value, R.root.value)
+	rhs, e = m.addWithReceipt(s.refs[pseudoRight].value, R.root.value, &s.operation)
 	if e != nil {
 		return e
 	}
@@ -291,8 +423,53 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 		if s.cleanupCause != nil {
 			return
 		}
-		if m.powerLocal.active && m.powerLocal.cleanupCause != nil {
-			err = errors.Join(err, m.powerLocal.cleanupCause)
+		for _, child := range []*polynomialArithmeticInvocationReceipt{&s.modD, &s.operation, &s.quotientBuffer, &s.remainderBuffer} {
+			if cause := m.arithmeticInvocationSourceCause(child); cause != nil {
+				s.cleanupCause = cause
+				if s.sourceCause == nil {
+					s.sourceCause = cause
+				}
+				err = errors.Join(err, cause)
+				return
+			}
+			if e := m.cleanupArithmeticInvocation(child, false); e != nil {
+				s.cleanupCause = e
+				err = errors.Join(err, e)
+				return
+			}
+		}
+		if cause := m.modular.pNormalizeInvocationSourceCause(&s.normalize); cause != nil {
+			s.cleanupCause = cause
+			if s.sourceCause == nil {
+				s.sourceCause = cause
+			}
+			err = errors.Join(err, cause)
+			return
+		}
+		if e := m.modular.cleanupPNormalizeInvocation(&s.normalize, false); e != nil {
+			s.cleanupCause = e
+			err = errors.Join(err, e)
+			return
+		}
+		if cause := m.coefficientInvocationSourceCause(&s.coefficient); cause != nil {
+			s.cleanupCause = cause
+			if s.sourceCause == nil {
+				s.sourceCause = cause
+			}
+			err = errors.Join(err, cause)
+			return
+		}
+		if e := m.cleanupCoefficientInvocation(&s.coefficient, false); e != nil {
+			s.cleanupCause = e
+			err = errors.Join(err, e)
+			return
+		}
+		if cause := m.powerInvocationSourceCause(&s.power); cause != nil {
+			s.cleanupCause = cause
+			if s.sourceCause == nil {
+				s.sourceCause = cause
+			}
+			err = errors.Join(err, cause)
 			return
 		}
 		for s.depth > baseDepth {
@@ -334,10 +511,10 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 					return Q.assign(m, p)
 				}
 				s.construct(pseudoConstantPower)
-				if e = m.powerInto(q, *d-1, &s.refs[pseudoConstantPower]); e != nil {
+				if e = m.powerIntoWithReceipt(q, *d-1, &s.refs[pseudoConstantPower], &s.power); e != nil {
 					return e
 				}
-				product, e := m.Mul(p, s.refs[pseudoConstantPower].value)
+				product, e := m.mulWithReceipt(p, s.refs[pseudoConstantPower].value, &s.operation)
 				if e != nil {
 					return e
 				}
@@ -345,7 +522,7 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 					return e
 				}
 				if modulo {
-					product, e = m.ModD(Q.value, bounds)
+					product, e = m.modDWithReceipt(Q.value, bounds, &s.modD)
 					if e != nil {
 						return e
 					}
@@ -370,11 +547,11 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 	s.construct(pseudoNumeral)
 	s.construct(pseudoLeadB)
 	s.construct(pseudoReductB)
-	lead, e := m.coeffCore(q, x, degB, &s.refs[pseudoReductB])
+	lead, e := m.coeffCoreWithReceipts(q, x, degB, &s.refs[pseudoReductB], &s.coefficient, &s.coefficientAppend, &s.coefficientFactory)
 	if e != nil {
 		return e
 	}
-	if e = s.refs[pseudoLeadB].assign(m, lead); e != nil {
+	if e = s.refs[pseudoLeadB].assignWithFactoryReceipt(m, lead, &s.coefficientFactory); e != nil {
 		return e
 	}
 	*d = 0
@@ -400,11 +577,11 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 				}
 				if *d < exactD {
 					s.construct(pseudoAdjusted)
-					if e = m.powerInto(s.refs[pseudoLeadB].value, exactD-*d, &s.refs[pseudoAdjusted]); e != nil {
+					if e = m.powerIntoWithReceipt(s.refs[pseudoLeadB].value, exactD-*d, &s.refs[pseudoAdjusted], &s.power); e != nil {
 						return e
 					}
 					if quotient {
-						product, e := m.Mul(s.refs[pseudoAdjusted].value, Q.value)
+						product, e := m.mulWithReceipt(s.refs[pseudoAdjusted].value, Q.value, &s.operation)
 						if e != nil {
 							return e
 						}
@@ -412,7 +589,7 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 							return e
 						}
 						if modulo {
-							product, e = m.ModD(Q.value, bounds)
+							product, e = m.modDWithReceipt(Q.value, bounds, &s.modD)
 							if e != nil {
 								return e
 							}
@@ -421,7 +598,7 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 							}
 						}
 					}
-					product, e := m.Mul(s.refs[pseudoAdjusted].value, R.value)
+					product, e := m.mulWithReceipt(s.refs[pseudoAdjusted].value, R.value, &s.operation)
 					if e != nil {
 						return e
 					}
@@ -429,7 +606,7 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 						return e
 					}
 					if modulo {
-						product, e = m.ModD(R.value, bounds)
+						product, e = m.modDWithReceipt(R.value, bounds, &s.modD)
 						if e != nil {
 							return e
 						}
@@ -444,8 +621,16 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 		if e = m.som.reset(); e != nil {
 			return e
 		}
+		if e = m.som.acquireArithmeticInvocation(&s.remainderBuffer); e != nil {
+			return e
+		}
 		if e = m.som2.reset(); e != nil {
 			return e
+		}
+		if quotient {
+			if e = m.som2.acquireArithmeticInvocation(&s.quotientBuffer); e != nil {
+				return e
+			}
 		}
 		size, e := m.readWord(R.value, 8)
 		if e != nil {
@@ -466,7 +651,7 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 			}
 			if degree == degR {
 				s.construct(pseudoMonomial)
-				prime, e := m.generatedDivideVariablePower(term, x, degB)
+				prime, e := m.generatedDivideVariablePowerWithReceipt(term, x, degB, &s.directReceipt)
 				if e != nil {
 					return e
 				}
@@ -490,17 +675,19 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 					}
 				}
 				if quotient {
-					if e = m.som2.add(&a, s.monomial.value, false); e != nil {
+					if e = m.som2.addWithArithmeticReceipt(&a, s.monomial.value, &s.quotientBuffer); e != nil {
 						return e
 					}
 				}
-				if e = m.modular.Copy(&s.numeral, &a); e != nil {
+				s.numericPhase = 1
+				if e = m.modular.copyWithPseudoReceipt(&s.numeral, &a, &s.directReceipt); e != nil {
 					return e
 				}
-				if e = m.modular.Neg(&s.numeral); e != nil {
+				s.numericPhase = 2
+				if e = m.modular.negWithPseudoReceipt(&s.numeral, &s.directReceipt); e != nil {
 					return e
 				}
-				if e = m.som.addMul(&s.numeral, s.monomial.value, s.refs[pseudoReductB].value); e != nil {
+				if e = m.som.addMulWithArithmeticReceipt(&s.numeral, s.monomial.value, s.refs[pseudoReductB].value, &s.remainderBuffer); e != nil {
 					return e
 				}
 				if e = m.pseudoPop(false); e != nil {
@@ -508,7 +695,7 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 					return e
 				}
 			} else {
-				if e = m.som.addMul(&a, term, s.refs[pseudoLeadB].value); e != nil {
+				if e = m.som.addMulWithArithmeticReceipt(&a, term, s.refs[pseudoLeadB].value, &s.remainderBuffer); e != nil {
 					return e
 				}
 			}
@@ -518,7 +705,7 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 				return e
 			}
 		}
-		remainder, e := m.som.mk(false)
+		remainder, e := m.som.mkWithArithmeticReceipt(false, &s.remainderBuffer)
 		if e != nil {
 			return e
 		}
@@ -539,7 +726,7 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 				if e != nil {
 					return e
 				}
-				if e = m.som2.addMul(&a, term, s.refs[pseudoLeadB].value); e != nil {
+				if e = m.som2.addMulWithArithmeticReceipt(&a, term, s.refs[pseudoLeadB].value, &s.quotientBuffer); e != nil {
 					return e
 				}
 			}
@@ -548,7 +735,7 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 					return e
 				}
 			}
-			result, e := m.som2.mk(false)
+			result, e := m.som2.mkWithArithmeticReceipt(false, &s.quotientBuffer)
 			if e != nil {
 				return e
 			}

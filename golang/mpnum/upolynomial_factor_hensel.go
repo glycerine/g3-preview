@@ -1,3 +1,6 @@
+// Source: src/math/polynomial/upolynomial_factorization_int.h:32-52;
+// src/math/polynomial/upolynomial_factorization.cpp:583-843.
+// Source authors: Leonardo de Moura; Dejan (t-dejanj), 2011-11-29.
 // Licensed under the MIT license.
 package mpnum
 
@@ -17,25 +20,49 @@ func (m *UPolynomialManager) toZPInPlace(p *upolyVectorState) error {
 	return m.trim(p)
 }
 func (m *UPolynomialManager) toZPCopy(p UPolynomialView, out *upolyVectorState) error {
+	return m.toZPCopyEngine(p, out, nil)
+}
+func (m *UPolynomialManager) toZPCopyEngine(p UPolynomialView, out *upolyVectorState, r *upolyPrimeTrialInvocationReceipt) error {
 	if e := m.reset(out); e != nil {
 		return e
 	}
 	for i := uint32(0); i < p.count; i++ {
 		var local Int
+		value := &local
+		if r != nil {
+			r.frame.transport = Int{}
+			r.frame.transportBound = true
+			value = &r.frame.transport
+		}
 		a, e := m.read(p, i)
 		if e != nil {
 			return e
 		}
-		if e = m.modular.Copy(&local, a); e != nil {
-			m.modular.Del(&local)
+		context := integerAllocationInvocationContext{}
+		if r != nil {
+			context = m.modular.primeTrialAllocationContext(r)
+			if context.primeTrialReceipt(m.config.Integer) == nil {
+				return ErrUPolynomialOwner
+			}
+		}
+		if e = m.modular.copyWithSourceContext(value, a, context); e != nil {
+			if r == nil {
+				m.modular.Del(value)
+			}
 			return e
 		}
 		target, e := m.pushDefault(out)
 		if e != nil {
-			m.modular.Del(&local)
+			if r == nil {
+				m.modular.Del(value)
+			}
 			return e
 		}
-		*target = local // literal nontrivial mpz move, no coefficient copy or replay
+		*target = *value // literal nontrivial mpz move, no coefficient copy or replay
+		if r != nil {
+			r.frame.transport = Int{}
+			r.frame.transportBound = false
+		}
 	}
 	return m.trim(out)
 }

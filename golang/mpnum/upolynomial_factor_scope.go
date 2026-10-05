@@ -21,6 +21,7 @@ type upolyFactorSquareFreeScope struct {
 	callerPrevious  *upolyFactorSquareFreeScope
 	callDepth       uint32
 	mignotte        upolyMignotteScope
+	primeTrial      upolyPrimeTrialScope
 	manager         *UPolynomialManager
 	fpp             upolyVectorState
 	p               Int
@@ -58,6 +59,15 @@ func (s *UPolynomialFactorizationService) newSquareFreeScope() (*upolyFactorSqua
 // prime, prime factors, prime core, prime, primitive vector. Only constructed
 // objects participate; publication/cleanup advances one completed action.
 func (c *upolyFactorSquareFreeScope) cleanup() error {
+	if q := &c.primeTrial; q.active {
+		if q.executing || q.callDepth != 0 {
+			return ErrUPolynomialCleanupPending
+		}
+		q.service.finishPrimeTrialSource(&q.receipt, q.bodyCause)
+		if q.sourceCause != nil {
+			return q.sourceCause
+		}
+	}
 	if q := &c.mignotte; q.active && q.service != nil {
 		if q.executing || q.callDepth != 0 {
 			return ErrUPolynomialCleanupPending
@@ -70,7 +80,7 @@ func (c *upolyFactorSquareFreeScope) cleanup() error {
 	if e := c.cleanupMembers(); e != nil {
 		return e
 	}
-	if c.mignotte.active {
+	if c.mignotte.active || c.primeTrial.active {
 		return ErrUPolynomialCleanupPending
 	}
 	return nil
@@ -163,6 +173,12 @@ func (s *UPolynomialFactorizationService) CleanupRetained() error {
 	caller := s.scope
 	caller.enterCall()
 	defer caller.leaveCall()
+	prime := &s.scope.primeTrial
+	if prime.active {
+		if e := s.cleanupPrimeTrialInvocation(&prime.receipt, false); e != nil {
+			return e
+		}
+	}
 	q := &s.scope.mignotte
 	if q.executing || q.callDepth != 0 {
 		return ErrUPolynomialCleanupPending
@@ -177,6 +193,11 @@ func (s *UPolynomialFactorizationService) CleanupRetained() error {
 	}
 	if q.active {
 		if e := s.cleanupMignotteInvocation(&q.receipt, true); e != nil {
+			return e
+		}
+	}
+	if prime.active {
+		if e := s.cleanupPrimeTrialInvocation(&prime.receipt, true); e != nil {
 			return e
 		}
 	}
@@ -209,8 +230,11 @@ func (s *UPolynomialFactorizationService) RetainedCleanupFactors(index uint32) (
 		return nil, e
 	}
 	if s.scope != nil {
-		for _, f := range [2]*UPolynomialFactors{s.scope.lifted, s.scope.best} {
+		for _, f := range [3]*UPolynomialFactors{s.scope.primeTrial.current, s.scope.lifted, s.scope.best} {
 			if f != nil {
+				if f == s.scope.primeTrial.current && (s.scope.primeTrial.executing || s.scope.primeTrial.sourceExecuting || s.scope.primeTrial.callDepth != 0) {
+					return nil, ErrUPolynomialCleanupPending
+				}
 				if index == 0 {
 					return f, nil
 				}

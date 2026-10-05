@@ -54,16 +54,16 @@ func TestUPolynomialFactorRetainedLexicalCleanup(t *testing.T) {
 				t.Fatal("uncharged lexical scope")
 			}
 			core, e := service.RetainedCleanupCore(0)
-			if errors.Is(e, arena.ErrBounds) && stats.MignottePending {
+			if errors.Is(e, arena.ErrBounds) && (stats.MignottePending || stats.PrimeTrialPending) {
 				// Source completed older declarations, leaving an exact unjoined
-				// Mignotte child. A related core is no longer a universal scope invariant.
+				// Mignotte or Prime RAW child. A related core is no longer a universal scope invariant.
 				// This new case must not replace the original later core/set_z campaign.
 				b.FailAfter(-1)
 				if e = service.CleanupRetained(); e != nil {
-					t.Fatal("exact Mignotte child owning acknowledgment", e)
+					t.Fatal("exact retained child owning acknowledgment", e)
 				}
 				if service.Stats().RetainedScopes != 0 {
-					t.Fatal("unjoined Mignotte scope not consumed")
+					t.Fatal("unjoined retained child scope not consumed")
 				}
 				if e = fs.Close(); e != nil {
 					t.Fatal(e)

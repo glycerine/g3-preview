@@ -237,6 +237,16 @@ func (q *upolyMignotteScope) leaveCall(m *UPolynomialManager) {
 	}
 }
 func (m *UPolynomialManager) mignotteCallPending() bool {
+	for q := m.primeTrialCaller; q != nil; {
+		if q.self == q && q.service != nil && q.service.self == q.service && q.callDepth != 0 && (q.zp == m || q.service.manager == m) {
+			return true
+		}
+		if q.service != nil && q.service.manager == m {
+			q = q.rootPrevious
+		} else {
+			q = q.zpPrevious
+		}
+	}
 	for c := m.squareFreeCaller; c != nil; c = c.callerPrevious {
 		if c.self == c && c.service != nil && c.service.self == c.service && c.manager == m && c.service.manager == m && c.callDepth != 0 {
 			return true

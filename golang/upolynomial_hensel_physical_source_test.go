@@ -208,6 +208,10 @@ func upolyHenselAuditPhysical(t *testing.T, cores []*mpnum.UPolynomialManager, f
 				continue
 			}
 			scope = scope.Elem()
+			prime := scope.FieldByName("primeTrial")
+			if prime.FieldByName("transportBound").Bool() {
+				addInt(prime.FieldByName("transport"))
+			}
 			for _, field := range []string{"p", "bestP", "gcdTmp", "leading", "trialContent"} {
 				addInt(scope.FieldByName(field))
 			}

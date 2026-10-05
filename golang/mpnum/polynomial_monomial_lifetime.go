@@ -204,6 +204,7 @@ func (m *MonomialManager) CleanupValue(a *Monomial) error {
 	l.derivativeCohort = nil
 	l.derivativeSlot = 0
 	l.acknowledgeArithmeticProduct(*a)
+	l.acknowledgePseudoCreated(*a)
 	l.live = false
 	*a = Monomial{}
 	return nil
