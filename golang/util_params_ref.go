@@ -324,7 +324,7 @@ func (c *ParamsContext) decTracked(slot uint32, out *ParamsDecrementReceipt) err
 	// A shared scalar DEC remains defined during an interrupted live reset.
 	// The last-reference destructor would replay already-consumed source leaves;
 	// reject that invalid continuation rather than adopt its reset receipt.
-	if b.resetActive && b.resetKind == paramsResetLive && b.refs == 1 {
+	if b.resetActive && (b.resetKind == paramsResetLive || b.resetKind == paramsResetKey) && b.refs == 1 {
 		return ErrParamsPrecondition
 	}
 	b.refs--
@@ -556,12 +556,20 @@ func (c *ParamsContext) ResetTracked(v *ParamsRef, receipt *ParamsResetReceipt) 
 	}
 	return c.resetBlock(v.slot, receipt)
 }
-func (c *ParamsContext) resetKey(v *ParamsRef, k Symbol, name *string, byName bool) error {
-	if e := c.mutable(v); e != nil {
+func (c *ParamsContext) resetKey(v *ParamsRef, k Symbol, name *string, byName bool, receipt *ParamsResetKeyReceipt) error {
+	if e := c.check(v); e != nil {
 		return e
+	}
+	// A zero-reference destructor has ended the source object's lifetime;
+	// unlike a live reset, its missing-key scan is not a defined continuation.
+	if v.slot != 0 && c.blocks[v.slot-1].resetActive && c.blocks[v.slot-1].resetKind == paramsResetDestroy {
+		return ErrParamsPrecondition
 	}
 	x, e := c.find(v, k, name, byName, 0, true)
 	if e != nil || x == nil {
+		return e
+	}
+	if e := c.mutable(v); e != nil {
 		return e
 	}
 	b := &c.blocks[v.slot-1]
@@ -569,27 +577,35 @@ func (c *ParamsContext) resetKey(v *ParamsRef, k Symbol, name *string, byName bo
 		if c.entry(b, i) != x {
 			continue
 		}
-		if e = c.delEntry(x); e != nil {
+		serial, e := c.nextSourceInvocation()
+		if e != nil {
 			return e
 		}
-		for j := i + 1; j < b.size; j++ {
-			*c.entry(b, j-1) = *c.entry(b, j)
+		b.resetActive = true
+		b.resetKind = paramsResetKey
+		b.resetCursor = i
+		b.resetStage = 0
+		c.decrementReceipts[v.slot-1] = paramsDecrementReceipt{generation: b.generation, invocation: serial}
+		if receipt != nil {
+			*receipt = ParamsResetKeyReceipt{owner: c.owner, slot: v.slot, generation: v.generation, invocation: serial, index: i}
 		}
-		b.size--
-		*c.entry(b, b.size) = paramEntry{}
-		break
+		return c.continueResetKey(v.slot)
 	}
 	return nil
 }
-func (c *ParamsContext) ResetKey(v *ParamsRef, k Symbol) error {
+func (c *ParamsContext) ResetKey(v *ParamsRef, k Symbol) error { return c.ResetKeyTracked(v, k, nil) }
+func (c *ParamsContext) ResetKeyTracked(v *ParamsRef, k Symbol, receipt *ParamsResetKeyReceipt) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	return c.resetKey(v, k, nil, false)
+	return c.resetKey(v, k, nil, false, receipt)
 }
 func (c *ParamsContext) ResetKeyName(v *ParamsRef, k *string) error {
+	return c.ResetKeyNameTracked(v, k, nil)
+}
+func (c *ParamsContext) ResetKeyNameTracked(v *ParamsRef, k *string, receipt *ParamsResetKeyReceipt) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	return c.resetKey(v, Symbol{}, k, true)
+	return c.resetKey(v, Symbol{}, k, true, receipt)
 }
 func (c *ParamsContext) storeText(s *string, source *paramsText) (paramsText, error) {
 	n := uint32(0)

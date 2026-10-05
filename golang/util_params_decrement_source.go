@@ -24,6 +24,9 @@ func paramsReceiptBytes(n int) uint64 {
 // continueDecrement is an explicit Go owning continuation, never a second
 // source dec_ref. Its scalar cursor names the exact retained entry/leaf token.
 func (c *ParamsContext) continueDecrement(slot uint32) error {
+	if c.blocks[slot-1].resetKind == paramsResetKey {
+		return c.continueResetKey(slot)
+	}
 	if c.blocks[slot-1].resetKind == paramsResetLive {
 		return c.continueReset(slot)
 	}

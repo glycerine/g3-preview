@@ -124510,7 +124510,9 @@
         "util_params_source_frame.go",
         "util_params_assignment_source_test.go",
         "util_params_reset_source.go",
-        "util_params_reset_source_test.go"
+        "util_params_reset_source_test.go",
+        "util_params_reset_key_source.go",
+        "util_params_reset_key_source_test.go"
       ],
       "tests": [
         "TestParamNameNormalizationSourceBranches",
@@ -124571,7 +124573,10 @@
         "TestParamsReferenceInitConstructorFailureKeepsCallerOldReference",
         "TestParamsReferenceResetRetainsCompletedInlinePrefixAtActualLeafStop",
         "TestParamsReferenceResetOwnContinuationMatchesKindAndInvocation",
-        "TestParamsReferenceIndependentResetReceiptsAndGenerationReuse"
+        "TestParamsReferenceIndependentResetReceiptsAndGenerationReuse",
+        "TestParamsReferenceResetKeyRejectsOrdinaryReplayAfterActualLeafStop",
+        "TestParamsReferenceResetKeyMatchedOwnShiftAndForeignStop",
+        "TestParamsReferenceResetKeyFiniteAscendingShiftAndNoReservation"
       ],
       "conditionals": [
         {
@@ -124913,6 +124918,16 @@
             "TestParamsReferenceResetOwnContinuationMatchesKindAndInvocation",
             "TestParamsReferenceIndependentResetReceiptsAndGenerationReuse"
           ]
+        },
+        {
+          "name": "selected matched-key del_value then ascending suffix assignment/pop with exact index/kind/invocation explicit owning continuation",
+          "status": "ported",
+          "go_target": "util_params_reset_key_source.go",
+          "tests": [
+            "TestParamsReferenceResetKeyRejectsOrdinaryReplayAfterActualLeafStop",
+            "TestParamsReferenceResetKeyMatchedOwnShiftAndForeignStop",
+            "TestParamsReferenceResetKeyFiniteAscendingShiftAndNoReservation"
+          ]
         }
       ],
       "ownership": [
@@ -124924,7 +124939,9 @@
         "Actual zero-ref leaf destruction stop retains pointer-free per-block cursor/stage and precharged cold cause/generation receipts; exact current entry numeral is retained, mutation cannot replace it, independent blocks can stop/continue separately. Explicit CleanupDecrement and owning context Close acknowledge actual child release receipts without a second decrement. Whole ownership remains unproven for Reset/resetBlock outside zero-ref DEC and exceptional copy/init/value replacement.",
         "Actual per-block cold invocation is prepared with the charged receipt directory. Null/shared/failed entry cannot stamp; wrong invocation, foreign value, empty receipt, double acknowledgment and stale reused generation cannot adopt a stopped block. Broader non-DEC reset and exceptional Assign/init remain open.",
         "Prepared charged per-block source-frame directory stamps held old reference only at actual init new-pointer publication, or extra SRC reference only at actual completed INC. Exact context/slot/generation/invocation and actual owning DEC phase govern abort. Named physical census enumerates these actual held tokens; source failure never rolls back caller output or reconstructs vectors.",
-        "NonDEC Reset uses the same precharged per-block cold invocation/cause directory with a separate live-reset scalar kind/cursor. Inline source entries remain until backing finalization; matched CompleteReset preserves caller token and live reference count. Two actual stopped actions cannot adopt or overwrite each other; shared nonfinal DEC remains scalar-only."
+        "NonDEC Reset uses the same precharged per-block cold invocation/cause directory with a separate live-reset scalar kind/cursor. Inline source entries remain until backing finalization; matched CompleteReset preserves caller token and live reference count. Two actual stopped actions cannot adopt or overwrite each other; shared nonfinal DEC remains scalar-only.",
+        "Matched ResetKey stamps only the actual reached index, slot/generation and unique invocation in precharged block metadata; source prefix/suffix/refcount retain their exact pre-shift state during numeral cleanup stop. Explicit CompleteResetKey completes only that current leaf then assigns suffix ascending before pop, with no allocations. Unmatched keys cannot adopt earlier stopped owners.",
+        "Defined absent-key lookup on a live parent after stopped numeral destruction returns without action or receipt stamp; source keys are scanned before the stopped mutation guard. Both symbol/name routes preserve original invocation, cursor, refs, size, Runtime and exact physical/cold graph. Source-ended zeroDEC lifetime is guarded before lookup separately. Historical premature whole-block guard candidate is superseded, not accepted."
       ],
       "deviations": [
         "Owner-local null replaces process-global empty reference. C strings become owned nullable first-NUL payloads; replacement stages new text. Detach error retains published partial block but cleans old reference. Pooled pages persist physically until Close; inline concrete numeric tokens replace separate heap objects. Provenance/overflow guards and libstdc++ null-C-string prefix error are explicit Go adapters; Z3DEBUG pp is explicit text API rather than global stdout.",
@@ -124932,7 +124949,8 @@
         "The byte destination returns typed failures at debug null-description assertion or release null-string stream action, retaining emitted prefix. Existing caller-string Display API remains; tests compare valid-domain output only.",
         "Go signed-overflow-domain TLS fixture reaches real postphysical numeral release stop; it is not valid OOM. Per-block receipt directory is actual charged Go metadata prepared before block publication, not source malloc. Pure reads and release zero-ref unsigned wrap remain source-reached; stopped-owner mutation guard is explicit Go lifetime qualification. Global assertion control/native stream profiles and exceptional non-DEC Reset/destructor closure remain open.",
         "This selected successor supersedes the historical detach-error old-reference cleanup description: failed copy after new pointer publication skips source oldDEC, retaining its actual old reference in a named Go source frame; explicit owning abort is separate. Failed assignment preserves old destination and completed SRC INC. Constructor failure before pointer publication leaves old reference with caller and stamps no owning frame. Serial wrap is guarded Go invocation-domain limit. NonDEC Reset/resetBlock and unselected exceptional value/copy lifecycle remain open; no whole-class/global assertion/native ABI completion.",
-        "ZeroDEC destruction ends object lifetime at destructor entry; its consumed-entry cleanup gives no ordinary source visibility credit. Live nonDEC reset retains defined UINT/BOOL/key/size prefixes on later numeral release stop. Last-reference DEC during a stopped live Reset has explicit Go stopped-owner guard to avoid replaying consumed source leaves, not literal final-destructor execution credit. Owned copied text is released in backing disposal after source numeral traversal. Global assertion profiles, reset(key) failure shifts, context destruction readiness and other source lifecycle scopes remain partial."
+        "ZeroDEC destruction ends object lifetime at destructor entry; its consumed-entry cleanup gives no ordinary source visibility credit. Live nonDEC reset retains defined UINT/BOOL/key/size prefixes on later numeral release stop. Last-reference DEC during a stopped live Reset has explicit Go stopped-owner guard to avoid replaying consumed source leaves, not literal final-destructor execution credit. Owned copied text is released in backing disposal after source numeral traversal. Global assertion profiles, reset(key) failure shifts, context destruction readiness and other source lifecycle scopes remain partial.",
+        "The first actual ResetKey numeral stop already preserved the source prefix; its RED concerns Go ordinary retry implicitly consuming a callee owning receipt. New stopped-owner guard is an explicit safety-domain adapter, not a first-call source algorithm correction. Default valid-domain scalar shift is independently checked for 56 symbol/name removal cases with reservations refusing. Global assertion/raw ABI/readiness profiles remain partial; SET_RAT untransferred local allocation ownership remains open."
       ]
     },
     {
@@ -124954,7 +124972,9 @@
         "util_params_source_frame.go",
         "util_params_assignment_source_test.go",
         "util_params_reset_source.go",
-        "util_params_reset_source_test.go"
+        "util_params_reset_source_test.go",
+        "util_params_reset_key_source.go",
+        "util_params_reset_key_source_test.go"
       ],
       "tests": [
         "TestParamNameNormalizationSourceBranches",
@@ -125015,7 +125035,10 @@
         "TestParamsReferenceInitConstructorFailureKeepsCallerOldReference",
         "TestParamsReferenceResetRetainsCompletedInlinePrefixAtActualLeafStop",
         "TestParamsReferenceResetOwnContinuationMatchesKindAndInvocation",
-        "TestParamsReferenceIndependentResetReceiptsAndGenerationReuse"
+        "TestParamsReferenceIndependentResetReceiptsAndGenerationReuse",
+        "TestParamsReferenceResetKeyRejectsOrdinaryReplayAfterActualLeafStop",
+        "TestParamsReferenceResetKeyMatchedOwnShiftAndForeignStop",
+        "TestParamsReferenceResetKeyFiniteAscendingShiftAndNoReservation"
       ],
       "conditionals": [
         {
@@ -125331,6 +125354,16 @@
             "TestParamsReferenceResetOwnContinuationMatchesKindAndInvocation",
             "TestParamsReferenceIndependentResetReceiptsAndGenerationReuse"
           ]
+        },
+        {
+          "name": "selected matched-key del_value then ascending suffix assignment/pop with exact index/kind/invocation explicit owning continuation",
+          "status": "ported",
+          "go_target": "util_params_reset_key_source.go",
+          "tests": [
+            "TestParamsReferenceResetKeyRejectsOrdinaryReplayAfterActualLeafStop",
+            "TestParamsReferenceResetKeyMatchedOwnShiftAndForeignStop",
+            "TestParamsReferenceResetKeyFiniteAscendingShiftAndNoReservation"
+          ]
         }
       ],
       "ownership": [
@@ -125342,7 +125375,9 @@
         "Actual zero-ref leaf destruction stop retains pointer-free per-block cursor/stage and precharged cold cause/generation receipts; exact current entry numeral is retained, mutation cannot replace it, independent blocks can stop/continue separately. Explicit CleanupDecrement and owning context Close acknowledge actual child release receipts without a second decrement. Whole ownership remains unproven for Reset/resetBlock outside zero-ref DEC and exceptional copy/init/value replacement.",
         "Actual per-block cold invocation is prepared with the charged receipt directory. Null/shared/failed entry cannot stamp; wrong invocation, foreign value, empty receipt, double acknowledgment and stale reused generation cannot adopt a stopped block. Broader non-DEC reset and exceptional Assign/init remain open.",
         "Prepared charged per-block source-frame directory stamps held old reference only at actual init new-pointer publication, or extra SRC reference only at actual completed INC. Exact context/slot/generation/invocation and actual owning DEC phase govern abort. Named physical census enumerates these actual held tokens; source failure never rolls back caller output or reconstructs vectors.",
-        "NonDEC Reset uses the same precharged per-block cold invocation/cause directory with a separate live-reset scalar kind/cursor. Inline source entries remain until backing finalization; matched CompleteReset preserves caller token and live reference count. Two actual stopped actions cannot adopt or overwrite each other; shared nonfinal DEC remains scalar-only."
+        "NonDEC Reset uses the same precharged per-block cold invocation/cause directory with a separate live-reset scalar kind/cursor. Inline source entries remain until backing finalization; matched CompleteReset preserves caller token and live reference count. Two actual stopped actions cannot adopt or overwrite each other; shared nonfinal DEC remains scalar-only.",
+        "Matched ResetKey stamps only the actual reached index, slot/generation and unique invocation in precharged block metadata; source prefix/suffix/refcount retain their exact pre-shift state during numeral cleanup stop. Explicit CompleteResetKey completes only that current leaf then assigns suffix ascending before pop, with no allocations. Unmatched keys cannot adopt earlier stopped owners.",
+        "Defined absent-key lookup on a live parent after stopped numeral destruction returns without action or receipt stamp; source keys are scanned before the stopped mutation guard. Both symbol/name routes preserve original invocation, cursor, refs, size, Runtime and exact physical/cold graph. Source-ended zeroDEC lifetime is guarded before lookup separately. Historical premature whole-block guard candidate is superseded, not accepted."
       ],
       "deviations": [
         "Owner-local null replaces process-global empty reference. C strings become owned nullable first-NUL payloads; replacement stages new text. Detach error retains published partial block but cleans old reference. Pooled pages persist physically until Close; inline concrete numeric tokens replace separate heap objects. Provenance/overflow guards and libstdc++ null-C-string prefix error are explicit Go adapters; Z3DEBUG pp is explicit text API rather than global stdout.",
@@ -125350,7 +125385,8 @@
         "The byte destination returns typed failures at debug null-description assertion or release null-string stream action, retaining emitted prefix. Existing caller-string Display API remains; tests compare valid-domain output only.",
         "Go signed-overflow-domain TLS fixture reaches real postphysical numeral release stop; it is not valid OOM. Per-block receipt directory is actual charged Go metadata prepared before block publication, not source malloc. Pure reads and release zero-ref unsigned wrap remain source-reached; stopped-owner mutation guard is explicit Go lifetime qualification. Global assertion control/native stream profiles and exceptional non-DEC Reset/destructor closure remain open.",
         "This selected successor supersedes the historical detach-error old-reference cleanup description: failed copy after new pointer publication skips source oldDEC, retaining its actual old reference in a named Go source frame; explicit owning abort is separate. Failed assignment preserves old destination and completed SRC INC. Constructor failure before pointer publication leaves old reference with caller and stamps no owning frame. Serial wrap is guarded Go invocation-domain limit. NonDEC Reset/resetBlock and unselected exceptional value/copy lifecycle remain open; no whole-class/global assertion/native ABI completion.",
-        "ZeroDEC destruction ends object lifetime at destructor entry; its consumed-entry cleanup gives no ordinary source visibility credit. Live nonDEC reset retains defined UINT/BOOL/key/size prefixes on later numeral release stop. Last-reference DEC during a stopped live Reset has explicit Go stopped-owner guard to avoid replaying consumed source leaves, not literal final-destructor execution credit. Owned copied text is released in backing disposal after source numeral traversal. Global assertion profiles, reset(key) failure shifts, context destruction readiness and other source lifecycle scopes remain partial."
+        "ZeroDEC destruction ends object lifetime at destructor entry; its consumed-entry cleanup gives no ordinary source visibility credit. Live nonDEC reset retains defined UINT/BOOL/key/size prefixes on later numeral release stop. Last-reference DEC during a stopped live Reset has explicit Go stopped-owner guard to avoid replaying consumed source leaves, not literal final-destructor execution credit. Owned copied text is released in backing disposal after source numeral traversal. Global assertion profiles, reset(key) failure shifts, context destruction readiness and other source lifecycle scopes remain partial.",
+        "The first actual ResetKey numeral stop already preserved the source prefix; its RED concerns Go ordinary retry implicitly consuming a callee owning receipt. New stopped-owner guard is an explicit safety-domain adapter, not a first-call source algorithm correction. Default valid-domain scalar shift is independently checked for 56 symbol/name removal cases with reservations refusing. Global assertion/raw ABI/readiness profiles remain partial; SET_RAT untransferred local allocation ownership remains open."
       ]
     },
     {
