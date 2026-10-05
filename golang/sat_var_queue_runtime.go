@@ -130,7 +130,7 @@ func (q *satVarQueue) lessRuntime(a, b int32) (bool, error) {
 	return x > y, e
 }
 func (q *satVarQueue) upRuntime(i int32) error {
-	v, e := q.valueRuntime(i)
+	v, e := q.valueMutableRuntime(i)
 	if e != nil {
 		return e
 	}
@@ -139,7 +139,7 @@ func (q *satVarQueue) upRuntime(i int32) error {
 		if parent == 0 {
 			break
 		}
-		p, e := q.valueRuntime(parent)
+		p, e := q.valueMutableRuntime(parent)
 		if e != nil {
 			return e
 		}
@@ -150,11 +150,20 @@ func (q *satVarQueue) upRuntime(i int32) error {
 		if !less {
 			break
 		}
-		p, e = q.valueRuntime(parent)
+		p, e = q.valueMutableRuntime(parent)
 		if e != nil {
 			return e
 		}
-		if e = q.putRuntime(i, p); e != nil {
+		if e = q.writeUintRuntime(&q.runtimeValues, uint32(i), uint32(p)); e != nil {
+			return e
+		}
+		// heap.h:87 reaches operator[] again after the preceding value store.
+		// Preserve that separate assertion/read before indexing the inverse.
+		moved, e := q.valueMutableRuntime(i)
+		if e != nil {
+			return e
+		}
+		if e = q.writeUintRuntime(&q.runtimeIndices, uint32(moved), uint32(i)); e != nil {
 			return e
 		}
 		i = parent
@@ -162,7 +171,7 @@ func (q *satVarQueue) upRuntime(i int32) error {
 	if e := q.putRuntime(i, v); e != nil {
 		return e
 	}
-	return q.cassertRuntime()
+	return q.cassertRuntimeAt(92)
 }
 func satHeapLeft(i int32) (int32, error) {
 	if i < 0 || i > int32(^uint32(0)>>2) {
@@ -171,7 +180,7 @@ func satHeapLeft(i int32) (int32, error) {
 	return i << 1, nil
 }
 func (q *satVarQueue) downRuntime(i int32) error {
-	v, e := q.valueRuntime(i)
+	v, e := q.valueMutableRuntime(i)
 	if e != nil {
 		return e
 	}
@@ -191,11 +200,11 @@ func (q *satVarQueue) downRuntime(i int32) error {
 		right := left + 1
 		c := left
 		if right < sz {
-			a, e := q.valueRuntime(right)
+			a, e := q.valueMutableRuntime(right)
 			if e != nil {
 				return e
 			}
-			b, e := q.valueRuntime(left)
+			b, e := q.valueMutableRuntime(left)
 			if e != nil {
 				return e
 			}
@@ -210,9 +219,11 @@ func (q *satVarQueue) downRuntime(i int32) error {
 		if enabled, gateErr := q.assertionsRuntime(); gateErr != nil {
 			return gateErr
 		} else if enabled && c>>1 != i {
-			return ErrSATAssertion
+			if e := q.assertionFailureRuntime("src/util/heap.h", 105, "parent(min_idx) == idx"); e != nil {
+				return e
+			}
 		}
-		child, e := q.valueRuntime(c)
+		child, e := q.valueMutableRuntime(c)
 		if e != nil {
 			return e
 		}
@@ -231,13 +242,13 @@ func (q *satVarQueue) downRuntime(i int32) error {
 	if e := q.putRuntime(i, v); e != nil {
 		return e
 	}
-	return q.cassertRuntime()
+	return q.cassertRuntimeAt(116)
 }
 func (q *satVarQueue) insertRuntime(v satBoolVar) error {
 	if e := q.change(); e != nil {
 		return e
 	}
-	if e := q.cassertRuntime(); e != nil {
+	if e := q.cassertRuntimeAt(231); e != nil {
 		return e
 	}
 	if q.generalSource != nil && satStorageSourceDebug && q.generalSource.debugContext != nil {
@@ -251,7 +262,9 @@ func (q *satVarQueue) insertRuntime(v satBoolVar) error {
 				return e
 			}
 			if yes {
-				return ErrSATAssertion
+				if e = q.assertionFailureRuntime("src/util/heap.h", 232, "!contains(val)"); e != nil {
+					return e
+				}
 			}
 		}
 	}
@@ -259,15 +272,9 @@ func (q *satVarQueue) insertRuntime(v satBoolVar) error {
 	if enabled, gateErr := q.assertionsRuntime(); gateErr != nil {
 		return gateErr
 	} else if enabled {
-		if int32(v) < 0 {
-			return ErrSATAssertion
-		}
-		n, e := q.runtimeIndices.size()
-		if e != nil {
+		// SASSERT(is_valid_value(val)) evaluates its nested source SASSERT separately.
+		if e := q.isValidValueRuntime(int32(v)); e != nil {
 			return e
-		}
-		if int32(v) >= int32(n) {
-			return ErrSATAssertion
 		}
 	}
 	n, e := q.runtimeValues.size()
@@ -290,13 +297,15 @@ func (q *satVarQueue) insertRuntime(v satBoolVar) error {
 			return e
 		}
 		if i != int32(n)-1 {
-			return ErrSATAssertion
+			if e = q.assertionFailureRuntime("src/util/heap.h", 237, "idx == static_cast<int>(m_values.size()) - 1"); e != nil {
+				return e
+			}
 		}
 	}
 	if e := q.upRuntime(i); e != nil {
 		return e
 	}
-	return q.cassertRuntime()
+	return q.cassertRuntimeAt(239)
 }
 func (q *satVarQueue) popRuntime() error {
 	if enabled, gateErr := q.assertionsRuntime(); gateErr != nil {
@@ -307,10 +316,12 @@ func (q *satVarQueue) popRuntime() error {
 			return e
 		}
 		if n == 0 {
-			return ErrSATAssertion
+			if e := q.assertionFailureRuntime("src/util/vector.h", 344, "!empty()"); e != nil {
+				return e
+			}
 		}
 	}
-	// vector.h343–348 decrements the actual size word directly. shrink's
+	// vector.h:343–348 decrements the actual size word directly. shrink's
 	// null no-op and logical-size assertion are not the pop_back body.
 	c := &q.runtimeValues.raw
 	n, e := satAssignmentReadWord(c.runtime, c.block, 4)
@@ -323,7 +334,7 @@ func (q *satVarQueue) nextRuntime() (satBoolVar, error) {
 	if e := q.change(); e != nil {
 		return 0, e
 	}
-	if e := q.cassertRuntime(); e != nil {
+	if e := q.cassertRuntimeAt(174); e != nil {
 		return 0, e
 	}
 	if enabled, gateErr := q.assertionsRuntime(); gateErr != nil {
@@ -343,17 +354,25 @@ func (q *satVarQueue) nextRuntime() (satBoolVar, error) {
 			return 0, e
 		}
 		if empty {
-			return 0, ErrSATAssertion
+			if e := q.assertionFailureRuntime("src/util/heap.h", 175, "!empty()"); e != nil {
+				return 0, e
+			}
 		}
+	}
+	if enabled, gateErr := q.assertionsRuntime(); gateErr != nil {
+		return 0, gateErr
+	} else if enabled {
 		n, e := q.runtimeValues.size()
 		if e != nil {
 			return 0, e
 		}
 		if n < 2 {
-			return 0, ErrSATAssertion
+			if e := q.assertionFailureRuntime("src/util/heap.h", 176, "m_values.size() >= 2"); e != nil {
+				return 0, e
+			}
 		}
 	}
-	result, e := q.valueRuntime(1)
+	result, e := q.valueMutableRuntime(1)
 	if e != nil {
 		return 0, e
 	}
@@ -376,15 +395,13 @@ func (q *satVarQueue) nextRuntime() (satBoolVar, error) {
 				return 0, e
 			}
 			if !empty {
-				return 0, ErrSATAssertion
+				if e := q.assertionFailureRuntime("src/util/heap.h", 181, "empty()"); e != nil {
+					return 0, e
+				}
 			}
 		}
 	} else {
-		n, e = q.runtimeValues.size()
-		if e != nil {
-			return 0, e
-		}
-		last, e := q.valueRuntime(int32(n) - 1)
+		last, e := q.backValuesRuntime()
 		if e != nil {
 			return 0, e
 		}
@@ -401,7 +418,7 @@ func (q *satVarQueue) nextRuntime() (satBoolVar, error) {
 			return satBoolVar(result), e
 		}
 	}
-	if e := q.cassertRuntime(); e != nil {
+	if e := q.cassertRuntimeAt(191); e != nil {
 		return 0, e
 	}
 	return satBoolVar(result), nil
@@ -410,7 +427,7 @@ func (q *satVarQueue) eraseRuntime(v satBoolVar) error {
 	if e := q.change(); e != nil {
 		return e
 	}
-	if e := q.cassertRuntime(); e != nil {
+	if e := q.cassertRuntimeAt(196); e != nil {
 		return e
 	}
 	if enabled, gateErr := q.assertionsRuntime(); gateErr != nil {
@@ -421,10 +438,12 @@ func (q *satVarQueue) eraseRuntime(v satBoolVar) error {
 			return e
 		}
 		if !present {
-			return ErrSATAssertion
+			if e := q.assertionFailureRuntime("src/util/heap.h", 197, "contains(val)"); e != nil {
+				return e
+			}
 		}
 	}
-	i, e := q.indexRuntime(int32(v))
+	i, e := q.indexMutableRuntime(int32(v))
 	if e != nil {
 		return e
 	}
@@ -439,13 +458,9 @@ func (q *satVarQueue) eraseRuntime(v satBoolVar) error {
 		if e := q.popRuntime(); e != nil {
 			return e
 		}
-		return q.cassertRuntime()
+		return q.cassertRuntimeAt(217)
 	}
-	n, e = q.runtimeValues.size()
-	if e != nil {
-		return e
-	}
-	last, e := q.valueRuntime(int32(n) - 1)
+	last, e := q.backValuesRuntime()
 	if e != nil {
 		return e
 	}
@@ -460,7 +475,7 @@ func (q *satVarQueue) eraseRuntime(v satBoolVar) error {
 	}
 	parent := i >> 1
 	if parent != 0 {
-		p, e := q.valueRuntime(i >> 1)
+		p, e := q.valueMutableRuntime(i >> 1)
 		if e != nil {
 			return e
 		}
@@ -472,19 +487,19 @@ func (q *satVarQueue) eraseRuntime(v satBoolVar) error {
 			if e := q.upRuntime(i); e != nil {
 				return e
 			}
-			return q.cassertRuntime()
+			return q.cassertRuntimeAt(217)
 		}
 	}
 	if e := q.downRuntime(i); e != nil {
 		return e
 	}
-	return q.cassertRuntime()
+	return q.cassertRuntimeAt(217)
 }
 func (q *satVarQueue) resetRuntime() error {
 	if e := q.open(); e != nil {
 		return e
 	}
-	if e := q.cassertRuntime(); e != nil {
+	if e := q.cassertRuntimeAt(138); e != nil {
 		return e
 	}
 	empty, e := q.emptyChecked()
@@ -509,7 +524,7 @@ func (q *satVarQueue) resetRuntime() error {
 	if e := q.pushValuesRuntime(^uint32(0)); e != nil {
 		return e
 	}
-	return q.cassertRuntime()
+	return q.cassertRuntimeAt(145)
 }
 func (q *satVarQueue) invariantRuntime() (bool, error) {
 	if e := q.open(); e != nil {
@@ -718,4 +733,60 @@ func (q *satVarQueue) moveRuntime(b *arena.Budget) (*satVarQueue, error) {
 	q.runtimeIndices = satSolverRuntimeUintColumn{}
 	q.bindRuntime(r)
 	return v, nil
+}
+
+func (q *satVarQueue) valueMutableRuntime(i int32) (int32, error) {
+	if q.generalSource == nil {
+		return q.valueRuntime(i)
+	}
+	x, e := q.generalSource.readUintRuntimeAt(&q.runtimeValues, uint32(i), 304)
+	return int32(x), e
+}
+func (q *satVarQueue) isValidValueRuntime(v int32) error {
+	enabled, e := q.assertionsRuntime()
+	if e != nil || !enabled {
+		return e
+	}
+	valid := v >= 0
+	if valid {
+		n, e := q.runtimeIndices.size()
+		if e != nil {
+			return e
+		}
+		valid = v < int32(n)
+	}
+	if !valid {
+		return q.assertionFailureRuntime("src/util/heap.h", 57, "v >= 0 && v < static_cast<int>(m_value2indices.size())")
+	}
+	return nil
+}
+
+func (q *satVarQueue) indexMutableRuntime(v int32) (int32, error) {
+	if q.generalSource == nil {
+		return q.indexRuntime(v)
+	}
+	x, e := q.generalSource.readUintRuntimeAt(&q.runtimeIndices, uint32(v), 304)
+	return int32(x), e
+}
+func (q *satVarQueue) backValuesRuntime() (int32, error) {
+	enabled, e := q.assertionsRuntime()
+	if e != nil {
+		return 0, e
+	}
+	if enabled {
+		n, e := q.runtimeValues.size()
+		if e != nil {
+			return 0, e
+		}
+		if n == 0 {
+			if e := q.assertionFailureRuntime("src/util/vector.h", 334, "!empty()"); e != nil {
+				return 0, e
+			}
+		}
+	}
+	n, e := q.runtimeValues.size()
+	if e != nil {
+		return 0, e
+	}
+	return q.valueMutableRuntime(int32(n) - 1)
 }

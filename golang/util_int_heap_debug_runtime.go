@@ -19,7 +19,10 @@ func (h *IntHeap) assertionsRuntime() (bool, error) {
 	}
 	return h.debugContext.AssertionsEnabled()
 }
-func (h *IntHeap) cassertRuntime() error {
+func (h *IntHeap) cassertRuntimeAt(line int32) error {
+	return h.cassertHeapRuntimeAt(h, line, "check_invariant()")
+}
+func (h *IntHeap) cassertHeapRuntimeAt(target *IntHeap, line int32, condition string) error {
 	if !satStorageSourceDebug || h.debugContext == nil {
 		return nil
 	}
@@ -27,12 +30,12 @@ func (h *IntHeap) cassertRuntime() error {
 	if e != nil || !on {
 		return e
 	}
-	ok, e := h.invariantRuntime()
+	ok, e := target.invariantRuntime()
 	if e != nil {
 		return e
 	}
 	if !ok {
-		return ErrSATAssertion
+		return debugAssertionFailure(h.debugContext, "src/util/heap.h", line, condition)
 	}
 	return nil
 }
@@ -42,16 +45,26 @@ func (q *satVarQueue) assertionsRuntime() (bool, error) {
 	}
 	return satStorageSourceDebug, nil
 }
-func (q *satVarQueue) cassertRuntime() error {
+func (q *satVarQueue) cassertRuntimeAt(line int32) error {
 	if q.generalSource != nil {
-		return q.generalSource.cassertRuntime()
+		return q.generalSource.cassertRuntimeAt(line)
 	}
 	return nil
+}
+func (q *satVarQueue) assertionFailureRuntime(file string, line int32, condition string) error {
+	var d *DebugContext
+	if q.generalSource != nil {
+		d = q.generalSource.debugContext
+	}
+	return debugAssertionFailure(d, file, line, condition)
 }
 
 // Only the source operator[] logical-size assertion is conditional. Runtime
 // initialized-byte, actual physical extent and provenance guards always run.
 func (h *IntHeap) readUintRuntime(c *satSolverRuntimeUintColumn, i uint32) (uint32, error) {
+	return h.readUintRuntimeAt(c, i, 309)
+}
+func (h *IntHeap) readUintRuntimeAt(c *satSolverRuntimeUintColumn, i uint32, line int32) (uint32, error) {
 	if e := c.raw.open(); e != nil {
 		return 0, e
 	}
@@ -65,7 +78,9 @@ func (h *IntHeap) readUintRuntime(c *satSolverRuntimeUintColumn, i uint32) (uint
 			return 0, e
 		}
 		if i >= n {
-			return 0, ErrSATAssertion
+			if e := debugAssertionFailure(h.debugContext, "src/util/vector.h", line, "idx < size()"); e != nil {
+				return 0, e
+			}
 		}
 	}
 	if c.raw.block == (memory.Block{}) {
@@ -87,7 +102,9 @@ func (h *IntHeap) writeUintRuntime(c *satSolverRuntimeUintColumn, i, v uint32) e
 			return e
 		}
 		if i >= n {
-			return ErrSATAssertion
+			if e := debugAssertionFailure(h.debugContext, "src/util/vector.h", 304, "idx < size()"); e != nil {
+				return e
+			}
 		}
 	}
 	if c.raw.block == (memory.Block{}) {
@@ -117,7 +134,7 @@ func (h *IntHeap) shrinkUintRuntime(c *satSolverRuntimeUintColumn, n uint32) err
 	}
 	if c.raw.block == (memory.Block{}) {
 		if on && n != 0 {
-			return ErrSATAssertion
+			return debugAssertionFailure(h.debugContext, "src/util/vector.h", 402, "s == 0")
 		}
 		return nil
 	}
@@ -127,7 +144,9 @@ func (h *IntHeap) shrinkUintRuntime(c *satSolverRuntimeUintColumn, n uint32) err
 			return e
 		}
 		if n > old {
-			return ErrSATAssertion
+			if e := debugAssertionFailure(h.debugContext, "src/util/vector.h", 391, "s <= reinterpret_cast<SZ *>(m_data)[SIZE_IDX]"); e != nil {
+				return e
+			}
 		}
 	}
 	return satAssignmentWriteWord(c.raw.runtime, c.raw.block, 4, n)
@@ -165,7 +184,9 @@ func (h *IntHeap) invariantRuntimeAt(i int32) (bool, error) {
 			return false, e
 		}
 		if j != i {
-			return false, ErrSATAssertion
+			if e := debugAssertionFailure(h.debugContext, "src/util/heap.h", 63, "m_value2indices[m_values[idx]] == idx"); e != nil {
+				return false, e
+			}
 		}
 	}
 	on, e = h.assertionsRuntime()
@@ -186,7 +207,9 @@ func (h *IntHeap) invariantRuntimeAt(i int32) (bool, error) {
 			return false, e
 		}
 		if less {
-			return false, ErrSATAssertion
+			if e := debugAssertionFailure(h.debugContext, "src/util/heap.h", 64, "parent(idx) == 0 || !less_than(m_values[idx], m_values[parent(idx)])"); e != nil {
+				return false, e
+			}
 		}
 	}
 	on, e = h.assertionsRuntime()
@@ -284,14 +307,16 @@ func (h *IntHeap) backUintRuntime(c *satSolverRuntimeUintColumn) (uint32, error)
 			return 0, e
 		}
 		if n == 0 {
-			return 0, ErrSATAssertion
+			if e := debugAssertionFailure(h.debugContext, "src/util/vector.h", 334, "!empty()"); e != nil {
+				return 0, e
+			}
 		}
 	}
 	n, e := c.size()
 	if e != nil {
 		return 0, e
 	}
-	return h.readUintRuntime(c, n-1)
+	return h.readUintRuntimeAt(c, n-1, 304)
 }
 func (h *IntHeap) popUintRuntime(c *satSolverRuntimeUintColumn) error {
 	on, e := h.assertionsRuntime()
@@ -304,7 +329,9 @@ func (h *IntHeap) popUintRuntime(c *satSolverRuntimeUintColumn) error {
 			return e
 		}
 		if n == 0 {
-			return ErrSATAssertion
+			if e := debugAssertionFailure(h.debugContext, "src/util/vector.h", 344, "!empty()"); e != nil {
+				return e
+			}
 		}
 	}
 	n, e := satAssignmentReadWord(c.raw.runtime, c.raw.block, 4)

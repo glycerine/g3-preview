@@ -291,7 +291,9 @@ func (h *IntHeap) Min() (int32, error) {
 				return 0, e
 			}
 			if yes {
-				return 0, ErrSATAssertion
+				if e := debugAssertionFailure(h.debugContext, "src/util/heap.h", 169, "!empty()"); e != nil {
+					return 0, e
+				}
 			}
 		}
 		return h.runtimeQueue.valueRuntime(1)
@@ -366,10 +368,12 @@ func (h *IntHeap) Increased(v int32) error {
 				return e
 			}
 			if !yes {
-				return ErrSATAssertion
+				if e := debugAssertionFailure(h.debugContext, "src/util/heap.h", 226, "contains(val)"); e != nil {
+					return e
+				}
 			}
 		}
-		i, e := h.runtimeQueue.indexRuntime(v)
+		i, e := h.runtimeQueue.indexMutableRuntime(v)
 		if e != nil {
 			return e
 		}
@@ -401,10 +405,12 @@ func (h *IntHeap) Decreased(v int32) error {
 				return e
 			}
 			if !yes {
-				return ErrSATAssertion
+				if e := debugAssertionFailure(h.debugContext, "src/util/heap.h", 221, "contains(val)"); e != nil {
+					return e
+				}
 			}
 		}
-		i, e := h.runtimeQueue.indexRuntime(v)
+		i, e := h.runtimeQueue.indexMutableRuntime(v)
 		if e != nil {
 			return e
 		}
@@ -465,7 +471,7 @@ func (h *IntHeap) Reserve(n int32) error {
 		return e
 	}
 	if h.runtimeBacked() {
-		if e := h.cassertRuntime(); e != nil {
+		if e := h.cassertRuntimeAt(162); e != nil {
 			return e
 		}
 	}
@@ -475,7 +481,7 @@ func (h *IntHeap) Reserve(n int32) error {
 		}
 	}
 	if h.runtimeBacked() {
-		return h.cassertRuntime()
+		return h.cassertRuntimeAt(165)
 	}
 	return nil
 }

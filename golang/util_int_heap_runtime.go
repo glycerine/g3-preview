@@ -29,7 +29,7 @@ func newIntHeapRuntime(bounds int32, c IntHeapConfig) (*IntHeap, error) {
 		e = h.setBoundsRuntime(uint32(bounds))
 	}
 	if e == nil {
-		e = h.cassertRuntime()
+		e = h.cassertRuntimeAt(126)
 	}
 	if e != nil {
 		if cleanup := h.Close(); cleanup != nil {
@@ -412,7 +412,7 @@ func (h *IntHeap) setBoundsRuntime(n uint32) error {
 		if e = h.shrinkUintRuntime(c, n); e != nil {
 			return e
 		}
-		return h.cassertRuntime()
+		return h.cassertRuntimeAt(154)
 	}
 	// set_bounds invokes unsigned vector resize directly; heap::reserve's
 	// separate signed comparison must not suppress this actual growth loop.
@@ -436,7 +436,7 @@ func (h *IntHeap) setBoundsRuntime(n uint32) error {
 			return e
 		}
 	}
-	return h.cassertRuntime()
+	return h.cassertRuntimeAt(154)
 }
 
 func (h *IntHeap) cloneRuntime(b *arena.Budget) (*IntHeap, error) {
@@ -474,10 +474,10 @@ func (h *IntHeap) swapRuntime(other *IntHeap) error {
 	if !h.runtimeBacked() || !other.runtimeBacked() {
 		return ErrSATOwner
 	}
-	if e := other.cassertRuntime(); e != nil {
+	if e := h.cassertHeapRuntimeAt(other, 260, "other.check_invariant()"); e != nil {
 		return e
 	}
-	if e := h.cassertRuntime(); e != nil {
+	if e := h.cassertRuntimeAt(261); e != nil {
 		return e
 	}
 	a, b := &h.runtimeQueue, &other.runtimeQueue
@@ -487,10 +487,10 @@ func (h *IntHeap) swapRuntime(other *IntHeap) error {
 	b.runtimeValues.raw.self = &b.runtimeValues.raw
 	a.runtimeIndices.raw.self = &a.runtimeIndices.raw
 	b.runtimeIndices.raw.self = &b.runtimeIndices.raw
-	if e := other.cassertRuntime(); e != nil {
+	if e := h.cassertHeapRuntimeAt(other, 264, "other.check_invariant()"); e != nil {
 		return e
 	}
-	return h.cassertRuntime()
+	return h.cassertRuntimeAt(265)
 }
 
 func (h *IntHeap) appendRuntime(dst []int32) ([]int32, error) {
