@@ -128,7 +128,7 @@ func TestParamsBorrowedStringSymbolProvenanceAndLifetimeGuards(t *testing.T) {
 
 func paramsBorrowedPhysicalBytes(s ParamsStats) uint64 {
 	d := s.Text.Descriptors
-	return s.HeaderBytes + s.BlockBytes + s.ReceiptBytes + s.SourceFrameBytes + s.SourceSetBytes + s.PageBytes + s.DirectoryBytes + s.FormatBytes + s.Text.OwnerBytes + s.Text.PayloadBytes + s.Text.BlockMetadataBytes + s.Text.DirectoryBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes
+	return s.HeaderBytes + s.BlockBytes + s.ReceiptBytes + s.SourceFrameBytes + s.SourceSetBytes + s.ReplacementBytes + s.PageBytes + s.DirectoryBytes + s.FormatBytes + s.Text.OwnerBytes + s.Text.PayloadBytes + s.Text.BlockMetadataBytes + s.Text.DirectoryBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes
 }
 func TestParamsBorrowedStringSymbolSharedCopyFaultPrefixes(t *testing.T) {
 	for fail := int64(0); fail < 12; fail++ {

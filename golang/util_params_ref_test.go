@@ -458,6 +458,16 @@ func TestParamsReferenceSourceGrowthAndFailurePrefixes(t *testing.T) {
 func paramsAuditRoots(t *testing.T, c *ParamsContext, q *mpnum.RationalService, base, basePayloads uint32, roots []ParamsRef) {
 	t.Helper()
 	var strings, bigs uint32
+	for i, frame := range c.replacementFrames {
+		if frame.active {
+			if frame.invocation == 0 || frame.generation != c.blocks[i].generation || frame.index >= c.blocks[i].size {
+				t.Fatal("invalid declared replacement frame")
+			}
+			if frame.next.text.present && !frame.next.text.borrowed {
+				strings++
+			}
+		}
+	}
 	auditNumeral := func(value *mpnum.OwnedRational) {
 		big, e := q.IsBig(value)
 		if e != nil {
@@ -871,7 +881,7 @@ func TestParamsReferenceExactContextAccountingAndGrowthPeak(t *testing.T) {
 	check := func() {
 		s := c.Stats()
 		d := s.Text.Descriptors
-		total := s.HeaderBytes + s.BlockBytes + s.ReceiptBytes + s.SourceFrameBytes + s.SourceSetBytes + s.PageBytes + s.DirectoryBytes + s.FormatBytes + s.Text.OwnerBytes + s.Text.PayloadBytes + s.Text.BlockMetadataBytes + s.Text.DirectoryBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes
+		total := s.HeaderBytes + s.BlockBytes + s.ReceiptBytes + s.SourceFrameBytes + s.SourceSetBytes + s.ReplacementBytes + s.PageBytes + s.DirectoryBytes + s.FormatBytes + s.Text.OwnerBytes + s.Text.PayloadBytes + s.Text.BlockMetadataBytes + s.Text.DirectoryBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes
 		if c.budget.Used() != borrowed+total {
 			t.Fatal("actual context charge", c.budget.Used(), borrowed+total)
 		}
