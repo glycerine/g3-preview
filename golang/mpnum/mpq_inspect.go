@@ -296,10 +296,13 @@ func (m *RationalManager) DenominatorRational(a, out *Rational) error {
 // reset_denominator. Errors retain actual Integer publication prefixes and leave
 // DEN untouched if NUM fails. No borrowed limb slice remains.
 func (m *RationalManager) SetInteger(a *Rational, n *Int) error {
+	return m.setIntegerWithArithmeticReceipt(a, n, nil)
+}
+func (m *RationalManager) setIntegerWithArithmeticReceipt(a *Rational, n *Int, receipt *polynomialArithmeticInvocationReceipt) error {
 	if e := m.checkSetter(a); e != nil {
 		return e
 	}
-	if e := m.z.Copy(&a.num, n); e != nil {
+	if e := m.z.copyFromOwnerWithArithmeticReceipt(&a.num, m.z, n, receipt); e != nil {
 		return e
 	}
 	return m.resetDenominator(a)

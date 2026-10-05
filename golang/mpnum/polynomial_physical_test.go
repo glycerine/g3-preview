@@ -38,7 +38,7 @@ func polynomialPhysicalAuditWithHandlers(t *testing.T, m *MultivariatePolynomial
 	add(z.two64)
 	public = append(public, &m.substitution.scope.newA, &m.substitution.scope.tmp)
 	for _, b := range []*polynomialSOM{&m.som, &m.som2, &m.cheap, &m.cheap2} {
-		public = append(public, &b.cohortMovingCoefficient, &b.appendScope.movingCoefficient)
+		public = append(public, &b.cohortMovingCoefficient, &b.appendScope.movingCoefficient, &b.arithmeticScope.transport)
 	}
 	for _, a := range public {
 		if a != nil {

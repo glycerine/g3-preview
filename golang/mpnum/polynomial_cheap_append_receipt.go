@@ -18,6 +18,7 @@ type polynomialCheapAppendScope struct {
 	coefficients, monomials                       uint32
 	pending                                       Monomial
 	coefficientCursor, monomialCursor             uint32
+	positionCursor                                uint32
 	numeric                                       polynomialNumericRoots
 	factoryInvocation                             uint64
 	transferredCoefficients, transferredMonomials uint32
@@ -31,10 +32,10 @@ type polynomialCheapAppendInvocationReceipt struct {
 }
 
 func (b *polynomialSOM) matchesAppendInvocation(r *polynomialCheapAppendInvocationReceipt) bool {
-	return b != nil && b.owner != nil && b.owner.self == b.owner && b == &b.owner.cheap && b.appendScope.buffer == b && r != nil && r.manager == b.owner && r.frame == &b.appendScope && r.invocation != 0 && r.invocation == b.appendScope.invocation && b.appendScope.active
+	return b != nil && b.owner != nil && b.owner.self == b.owner && b.owner.ownsArithmeticBuffer(b) && b.appendScope.buffer == b && r != nil && r.manager == b.owner && r.frame == &b.appendScope && r.invocation != 0 && r.invocation == b.appendScope.invocation && b.appendScope.active
 }
 func (b *polynomialSOM) acquireAppendInvocation(r *polynomialCheapAppendInvocationReceipt, n uint32) error {
-	if b == nil || b.owner == nil || b.owner.self != b.owner || !b.cheap || b != &b.owner.cheap {
+	if b == nil || b.owner == nil || b.owner.self != b.owner || !b.owner.ownsArithmeticBuffer(b) {
 		return ErrPolynomialOwner
 	}
 	s := &b.appendScope
@@ -130,6 +131,15 @@ func (b *polynomialSOM) cleanupAppendInvocation(r *polynomialCheapAppendInvocati
 		term, e := b.ms.monomial(m, s.monomialCursor)
 		if e != nil {
 			return e
+		}
+		// A regular source buffer also owns this term's position publication.
+		// Record the actual reset frontier before DEC, so a consumed-last
+		// cleanup retry never rereads the already released term for reset.
+		if !b.cheap && s.positionCursor <= s.monomialCursor {
+			if e = b.positions.Reset(term); e != nil {
+				return e
+			}
+			s.positionCursor = s.monomialCursor + 1
 		}
 		if e = m.monomials.DecRef(term); e != nil {
 			return e

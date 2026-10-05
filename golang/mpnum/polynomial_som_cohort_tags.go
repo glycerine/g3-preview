@@ -134,6 +134,12 @@ func (b *polynomialSOM) cleanupTaggedAppendInvocation(r *polynomialCheapAppendIn
 			if e != nil {
 				return e
 			}
+			if !b.cheap && s.positionCursor <= i {
+				if e = b.positions.Reset(term); e != nil {
+					return e
+				}
+				s.positionCursor = i + 1
+			}
 			if s.dropConsumed {
 				if s.dropLast {
 					e = m.monomials.CleanupValue(&term)
@@ -212,6 +218,18 @@ func (b *polynomialSOM) cleanupTaggedAppendInvocation(r *polynomialCheapAppendIn
 				b.cohortMovingMonomial = Monomial{}
 				s.compactionStage = 4
 			}
+			if !b.cheap && s.compactionStage == 4 {
+				term, e := b.ms.monomial(m, target)
+				if e != nil {
+					return e
+				}
+				if e = b.positions.Reset(term); e != nil {
+					return e
+				}
+				if e = b.positions.Set(term, target); e != nil {
+					return e
+				}
+			}
 			b.coefficientOwners[target] = b.coefficientOwners[i]
 			b.monomialOwners[target] = b.monomialOwners[i]
 			b.coefficientTransferred[target], b.monomialTransferred[target] = b.coefficientTransferred[i], b.monomialTransferred[i]
@@ -253,4 +271,39 @@ func (b *polynomialSOM) cleanupTaggedAppendInvocation(r *polynomialCheapAppendIn
 	}
 	*s = polynomialCheapAppendScope{invocation: s.invocation}
 	return nil
+}
+
+// A later unreceipted source write uses the existing accumulator row as a
+// persistent member. Capture its actual prior tags before the scalar action;
+// acknowledge only that exact frame and those tags after successful publication.
+type polynomialAccumulatorRowTransfer struct {
+	buffer                            *polynomialSOM
+	owner                             *MultivariatePolynomialCore
+	frame                             *polynomialCheapAppendScope
+	invocation, coefficient, monomial uint64
+	coefficientValue                  Int
+	monomialValue                     Monomial
+}
+
+func (b *polynomialSOM) accumulatorRowTransfer(i uint32) polynomialAccumulatorRowTransfer {
+	s := &b.appendScope
+	if b.owner == nil || b.owner.self != b.owner || b.owner.callbackDepth != 0 || !b.owner.ownsArithmeticBuffer(b) || !s.active || uint64(i) >= uint64(len(b.coefficientOwners)) || uint64(i) >= uint64(len(b.monomialOwners)) {
+		return polynomialAccumulatorRowTransfer{}
+	}
+	return polynomialAccumulatorRowTransfer{buffer: b, owner: b.owner, frame: s, invocation: s.invocation, coefficient: b.coefficientOwners[i], monomial: b.monomialOwners[i]}
+}
+func (b *polynomialSOM) transferAccumulatorRowToMember(i uint32, r polynomialAccumulatorRowTransfer) {
+	s := &b.appendScope
+	if r.buffer != b || r.owner != b.owner || b.owner == nil || b.owner.self != b.owner || b.owner.callbackDepth != 0 || r.frame != s || !s.active || s.invocation != r.invocation || r.invocation == 0 || uint64(i) >= uint64(len(b.coefficientOwners)) || uint64(i) >= uint64(len(b.monomialOwners)) || b.coefficientOwners[i] != r.coefficient || b.monomialOwners[i] != r.monomial {
+		return
+	}
+	if r.coefficient == s.invocation {
+		b.coefficientOwners[i] = 0
+		s.coefficientClaims--
+	}
+	if r.monomial == s.invocation {
+		b.monomialOwners[i] = 0
+		s.monomialClaims--
+	}
+	s.foreignMixed = true
 }

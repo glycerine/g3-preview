@@ -12,6 +12,7 @@ import (
 // This is call-local source state embedded in the charged prerequisite header,
 // not an imp-owned rational manager or an escaping per-call scope allocation.
 type polynomialConstantScope struct {
+	arithmeticScope                                                polynomialArithmeticScope
 	rational                                                       Rational
 	numeral                                                        Int
 	result                                                         Polynomial
@@ -28,7 +29,7 @@ func (m *MultivariatePolynomialCore) beginConstantScope() error {
 	if e := m.config.Rationals.checkOwnerReady(); e != nil {
 		return e
 	}
-	if m.constantScope.active {
+	if m.constantScope.active || m.constantScope.arithmeticScope.active || m.constantGeneration == ^uint64(0) {
 		return ErrPolynomialPending
 	}
 	m.constantGeneration++
@@ -48,6 +49,21 @@ func (m *MultivariatePolynomialCore) finishConstantScope(body error) error {
 	}
 	if s.stopped {
 		return errors.Join(body, s.sourceCause)
+	}
+	// Only the actually acquired child of this real constant invocation may
+	// stop the older NUM -> rational source suffix. A global normalization
+	// history from another caller supplies no authority or stopped frontier.
+	if s.arithmeticScope.active {
+		if child := m.modular.pNormalizeInvocationSourceCause(&s.arithmeticScope.normalize); child != nil {
+			s.stopped = true
+			if s.sourceCause == nil {
+				s.sourceCause = child
+			}
+			if s.arithmeticScope.sourceCause == nil {
+				s.arithmeticScope.sourceCause = child
+			}
+			return errors.Join(body, s.sourceCause)
+		}
 	}
 	if s.numeralCompleted {
 		if _, e := upolynomialSourceNumeralDel(m.integer, &s.numeral); e != nil {
@@ -78,11 +94,14 @@ func (m *MultivariatePolynomialCore) finishConstantScope(body error) error {
 		s.active = false
 	}
 	if !s.active {
-		*s = polynomialConstantScope{}
+		*s = polynomialConstantScope{arithmeticScope: s.arithmeticScope}
 	}
 	return body
 }
 func (m *MultivariatePolynomialCore) MkConstantTakeCopy(a *Int) (Polynomial, error) {
+	return m.mkConstantTakeCopyWithArithmeticReceipt(a, nil)
+}
+func (m *MultivariatePolynomialCore) mkConstantTakeCopyWithArithmeticReceipt(a *Int, receipt *polynomialArithmeticInvocationReceipt) (result Polynomial, cause error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
@@ -93,6 +112,32 @@ func (m *MultivariatePolynomialCore) MkConstantTakeCopy(a *Int) (Polynomial, err
 		return Polynomial{}, e
 	}
 	s := &m.constantScope
+	if receipt != nil {
+		if m.arithmeticInvocation == ^uint64(0) {
+			return Polynomial{}, ErrPolynomialPending
+		}
+		m.arithmeticInvocation++
+		s.arithmeticScope = polynomialArithmeticScope{active: true, executing: true, invocation: m.arithmeticInvocation, constantGeneration: m.constantGeneration}
+		*receipt = polynomialArithmeticInvocationReceipt{manager: m, frame: &s.arithmeticScope, invocation: m.arithmeticInvocation}
+		defer func() {
+			s.arithmeticScope.executing = false
+			s.arithmeticScope.bodyCause = cause
+			if s.arithmeticScope.sourceCause == nil {
+				s.arithmeticScope.sourceCause = s.sourceCause
+			}
+		}()
+		if e := m.config.Rationals.setIntegerWithArithmeticReceipt(&s.rational, a, receipt); e != nil {
+			s.failedConstructor = true
+			s.cause = e
+			return Polynomial{}, e
+		}
+		s.rationalCompleted = true
+		p, e := m.constantFromRationalScopeWithArithmeticReceipt(receipt)
+		if e == nil {
+			s.arithmeticScope.active = false
+		}
+		return p, e
+	}
 	before, e := m.compositionNumericBefore()
 	if e != nil {
 		return Polynomial{}, e
@@ -107,20 +152,35 @@ func (m *MultivariatePolynomialCore) MkConstantTakeCopy(a *Int) (Polynomial, err
 	return m.constantFromRationalScope()
 }
 func (m *MultivariatePolynomialCore) constantFromRationalScope() (Polynomial, error) {
+	return m.constantFromRationalScopeWithArithmeticReceipt(nil)
+}
+func (m *MultivariatePolynomialCore) constantFromRationalScopeWithArithmeticReceipt(receipt *polynomialArithmeticInvocationReceipt) (Polynomial, error) {
 	s := &m.constantScope
 	if modularSourceDebug && !isIntegerRational(&s.rational) {
 		return Polynomial{}, m.finishConstantScope(ErrPolynomialAssertion)
 	}
 	s.numeral = Int{}
 	s.numeralCompleted = true
-	if e := m.compositionNumericCall(0, &s.rational.num, nil, nil, &s.numeral); e != nil {
+	var copyCause error
+	if receipt == nil {
+		copyCause = m.compositionNumericCall(0, &s.rational.num, nil, nil, &s.numeral)
+	} else {
+		copyCause = m.modular.copyWithArithmeticReceipt(&s.numeral, &s.rational.num, receipt)
+	}
+	if copyCause != nil {
+		e := copyCause
 		return Polynomial{}, m.finishConstantScope(e)
 	}
-	p, e := m.MkConstantTake(&s.numeral)
+	p, e := m.mkConstantTakeWithArithmeticReceipt(&s.numeral, receipt)
 	if e != nil {
 		return Polynomial{}, m.finishConstantScope(e)
 	}
 	s.result = p
+	if receipt != nil && m.matchesFactoryInvocation(&receipt.frame.factory) {
+		if e = m.transferFactoryResult(&receipt.frame.factory, p); e != nil {
+			return Polynomial{}, m.finishConstantScope(e)
+		}
+	}
 	if e = m.finishConstantScope(nil); e != nil {
 		return Polynomial{}, e
 	}
@@ -161,6 +221,52 @@ func (m *MultivariatePolynomialCore) cleanupConstantScope() error {
 		return e
 	}
 	cause, sourceCause, stopped := s.cause, s.sourceCause, s.stopped
-	*s = polynomialConstantScope{cause: cause, sourceCause: sourceCause, stopped: stopped}
+	*s = polynomialConstantScope{cause: cause, sourceCause: sourceCause, stopped: stopped, arithmeticScope: s.arithmeticScope}
+	return nil
+}
+
+// Completed source locals precede the parent's older declarations. Failed
+// constructors and raw factory/singleton acquisitions are explicit abort only.
+func (m *MultivariatePolynomialCore) cleanupConstantArithmeticInvocation(r *polynomialArithmeticInvocationReceipt, abort bool) error {
+	s := &m.constantScope
+	if r.frame != &s.arithmeticScope {
+		return ErrPolynomialOwner
+	}
+	if s.numeralCompleted {
+		if e := m.integer.Del(&s.numeral); e != nil {
+			return e
+		}
+		s.numeralCompleted = false
+	}
+	if s.rationalCompleted {
+		if e := m.config.Rationals.Del(&s.rational); e != nil {
+			return e
+		}
+		s.rationalCompleted = false
+	}
+	if !abort {
+		return nil
+	}
+	if e := m.cleanupConstantScope(); e != nil {
+		return e
+	}
+	if e := m.cleanupFactoryInvocation(&r.frame.factory, true); e != nil {
+		return e
+	}
+	if r.frame.singleton != (Monomial{}) && m.singletonReference && m.singletonMonomial == r.frame.singleton && m.singletonGeneration == r.frame.singletonGeneration {
+		if e := m.monomials.DecRef(r.frame.singleton); e != nil {
+			return e
+		}
+		m.singletonReference = false
+		m.singletonMonomial = Monomial{}
+		r.frame.singleton = Monomial{}
+	}
+	if e := r.frame.numeric.cleanup(m.integer); e != nil {
+		return e
+	}
+	if e := m.modular.cleanupPNormalizeInvocation(&r.frame.normalize, true); e != nil {
+		return e
+	}
+	r.frame.active = false
 	return nil
 }

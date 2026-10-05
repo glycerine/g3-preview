@@ -74,7 +74,17 @@ func (b *polynomialSOM) gradedLexMaxPosition() (uint32, error) {
 // Unlike add(a,m), this source overload publishes the borrowed monomial slot
 // before INC. A guarded INC failure leaves that exact slot nonowning.
 func (b *polynomialSOM) addPolynomial(p Polynomial) error {
+	return b.addPolynomialWithArithmeticReceipt(p, nil)
+}
+func (b *polynomialSOM) addPolynomialWithArithmeticReceipt(p Polynomial, receipt *polynomialArithmeticInvocationReceipt) (cause error) {
 	m := b.owner
+	if receipt != nil {
+		if !m.matchesArithmeticInvocation(receipt) || receipt.frame.buffer != b || receipt.frame.executing {
+			return ErrPolynomialOwner
+		}
+		receipt.frame.executing = true
+		defer func() { receipt.frame.executing = false; receipt.frame.bodyCause = cause }()
+	}
 	n, e := m.readWord(p, 8)
 	if e != nil {
 		return e
@@ -93,11 +103,34 @@ func (b *polynomialSOM) addPolynomial(p Polynomial) error {
 			if e != nil {
 				return e
 			}
+			var appendScope *polynomialCheapAppendScope
+			if receipt != nil {
+				if e = b.acquireAppendInvocation(&receipt.frame.append, sz); e != nil {
+					return e
+				}
+				appendScope = &b.appendScope
+			}
+			if b.appendScope.active {
+				if e = b.prepareAppendTags(sz + 1); e != nil {
+					return e
+				}
+			}
 			if e = b.positions.Set(term, sz); e != nil {
 				return e
 			}
+			if receipt != nil {
+				receipt.frame.positionTerm = term
+				receipt.frame.positionPublished = true
+			}
 			if e = b.ms.appendMonomial(m, term); e != nil {
 				return e
+			}
+			if b.appendScope.active {
+				b.monomialOwners[sz], b.monomialTransferred[sz] = 0, 0
+			}
+			if receipt != nil {
+				receipt.frame.positionPublished = false
+				receipt.frame.positionTerm = Monomial{}
 			}
 			b.borrowedAppend = true
 			b.borrowedAppendIndex = sz
@@ -105,7 +138,18 @@ func (b *polynomialSOM) addPolynomial(p Polynomial) error {
 				return e
 			}
 			b.borrowedAppend = false
-			if e = b.as.appendCoefficient(m, Int{}); e != nil {
+			if appendScope != nil {
+				b.monomialOwners[sz] = appendScope.invocation
+				appendScope.monomialClaims++
+				appendScope.monomials = sz + 1
+			} else if b.appendScope.active {
+				b.appendScope.foreignMixed = true
+			}
+			observer := appendScope
+			if observer == nil && b.appendScope.active {
+				observer = &b.appendScope
+			}
+			if e = b.as.appendCoefficientWithAppendScope(m, Int{}, observer, appendScope != nil); e != nil {
 				return e
 			}
 			a, e := b.as.coefficient(m, sz)
@@ -116,7 +160,11 @@ func (b *polynomialSOM) addPolynomial(p Polynomial) error {
 			if e != nil {
 				return e
 			}
-			e = m.modular.Copy(&a, &source)
+			if receipt == nil {
+				e = m.modular.Copy(&a, &source)
+			} else {
+				e = m.modular.copyWithArithmeticReceipt(&a, &source, receipt)
+			}
 			if w := b.as.putCoefficient(m, sz, a); w != nil {
 				return w
 			}
@@ -132,7 +180,11 @@ func (b *polynomialSOM) addPolynomial(p Polynomial) error {
 			if e != nil {
 				return e
 			}
-			e = m.modular.Add(&a, &source, &a)
+			if receipt == nil {
+				e = m.modular.Add(&a, &source, &a)
+			} else {
+				e = m.modular.addWithArithmeticReceipt(&a, &source, &a, receipt)
+			}
 			if w := b.as.putCoefficient(m, pos, a); w != nil {
 				return w
 			}

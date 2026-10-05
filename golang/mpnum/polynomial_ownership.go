@@ -197,11 +197,17 @@ func (m *MultivariatePolynomialCore) generatedVariable(v, k uint32) (Monomial, e
 	return a, e
 }
 func (m *MultivariatePolynomialCore) generatedProduct(a, b Monomial) (Monomial, error) {
+	return m.generatedProductWithOutcome(a, b, nil)
+}
+func (m *MultivariatePolynomialCore) generatedProductWithOutcome(a, b Monomial, result *monomialFactoryOutcome) (Monomial, error) {
 	if m.generatedActive {
 		return Monomial{}, ErrPolynomialPending
 	}
 	outcome := monomialFactoryOutcome{}
 	r, e := m.monomials.mulCreated(a, b, &outcome)
+	if result != nil {
+		*result = outcome
+	}
 	if e != nil && outcome.started {
 		m.recordGeneratedCallee(outcome)
 	}

@@ -350,7 +350,7 @@ func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []Int, ms [
 		buffer.appendScope.foreignMixed = true
 	}
 	if receipt != nil {
-		m.factoryInvocation = polynomialFactoryScope{active: true, executing: true, invocation: m.creationGeneration}
+		m.factoryInvocation = polynomialFactoryScope{active: true, executing: true, invocation: m.creationGeneration, buffer: buffer}
 		*receipt = polynomialFactoryInvocationReceipt{manager: m, frame: &m.factoryInvocation, invocation: m.creationGeneration}
 		defer func() { m.factoryInvocation.executing = false }()
 	}

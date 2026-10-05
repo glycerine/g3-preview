@@ -4,7 +4,10 @@ package mpnum
 
 import "errors"
 
-func (m *MultivariatePolynomialManager) iccpZPX(p Polynomial, x uint32, ci *Int, content, pp *polynomialReference) (err error) {
+func (m *MultivariatePolynomialManager) iccpZPX(p Polynomial, x uint32, ci *Int, content, pp *polynomialReference) error {
+	return m.iccpZPXWithContentReceipt(p, x, ci, content, pp, nil)
+}
+func (m *MultivariatePolynomialManager) iccpZPXWithContentReceipt(p Polynomial, x uint32, ci *Int, content, pp *polynomialReference, contentReceipt *polynomialContentInvocationReceipt) (err error) {
 	c := m.core
 	if modularSourceDebug {
 		field, e := c.modular.Modular()
@@ -50,7 +53,7 @@ func (m *MultivariatePolynomialManager) iccpZPX(p Polynomial, x uint32, ci *Int,
 		return e
 	}
 	if d == 0 {
-		if e = c.integerContent(p, ci, pp); e != nil {
+		if e = c.integerContentWithReceipt(p, ci, pp, contentReceipt); e != nil {
 			return e
 		}
 		return content.assign(c, c.unit)
@@ -124,7 +127,7 @@ func (m *MultivariatePolynomialManager) iccpZPX(p Polynomial, x uint32, ci *Int,
 		if e = s.refs[1].root.assign(c, a); e != nil {
 			return e
 		}
-		if e = m.iccpZPX(s.refs[1].root.value, x, ci, content, pp); e != nil {
+		if e = m.iccpZPXWithContentReceipt(s.refs[1].root.value, x, ci, content, pp, &s.contentInvocation); e != nil {
 			return e
 		}
 		a, e = c.Mul(s.refs[0].root.value, content.value)
@@ -191,12 +194,12 @@ func (m *MultivariatePolynomialManager) iccpZPX(p Polynomial, x uint32, ci *Int,
 				return e
 			}
 		}
-		if e = c.integerContent(p, ci, pp); e != nil {
+		if e = c.integerContentWithReceipt(p, ci, pp, &s.contentInvocation); e != nil {
 			return e
 		}
 		return content.assign(c, c.unit)
 	}
-	if e = c.integerContent(p, ci, pp); e != nil {
+	if e = c.integerContentWithReceipt(p, ci, pp, &s.contentInvocation); e != nil {
 		return e
 	}
 	if e = ms.reset(c, false); e != nil {

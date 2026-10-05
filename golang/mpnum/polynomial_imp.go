@@ -30,6 +30,7 @@ type MultivariatePolynomialManager struct {
 	cra                                                        polynomialCRAScope
 	iccpFrames                                                 []*polynomialICCPScope
 	iccpDepth                                                  uint32
+	iccpShortcutContent                                        polynomialContentInvocationReceipt
 	monic                                                      polynomialMonicScope
 	self                                                       *MultivariatePolynomialManager
 	core                                                       *MultivariatePolynomialCore

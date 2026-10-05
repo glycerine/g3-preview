@@ -53,6 +53,8 @@ func (m *IntegerManager) extendedGCDWithAllocationContext(r1, r2, a, b, g *Int, 
 			return e
 		}
 		values = &public.values
+		context.recordContentRaw(m, receipt)
+		m.bindExactDivRaw(context, receipt, false)
 		context = context.withRawInvocation(receipt)
 		defer func() {
 			public.executing = false
@@ -87,10 +89,10 @@ func (m *IntegerManager) extendedGCDWithAllocationContext(r1, r2, a, b, g *Int, 
 	if e := m.setInt64WithAllocationContext(nextb, 1, context); e != nil {
 		return e
 	}
-	if e := m.Abs(tmp1); e != nil {
+	if e := m.absWithAllocationContext(tmp1, context); e != nil {
 		return e
 	}
-	if e := m.Abs(tmp2); e != nil {
+	if e := m.absWithAllocationContext(tmp2, context); e != nil {
 		return e
 	}
 	cmp, e := m.Compare(tmp1, tmp2)
@@ -150,12 +152,12 @@ func (m *IntegerManager) extendedGCDWithAllocationContext(r1, r2, a, b, g *Int, 
 		}
 	}
 	if r1.val < 0 {
-		if e = m.Neg(a); e != nil {
+		if e = m.negWithAllocationContext(a, context); e != nil {
 			return e
 		}
 	}
 	if r2.val < 0 {
-		if e = m.Neg(b); e != nil {
+		if e = m.negWithAllocationContext(b, context); e != nil {
 			return e
 		}
 	}

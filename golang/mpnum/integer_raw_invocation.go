@@ -5,7 +5,9 @@ package mpnum
 // Real retained RAW declarations in the charged Integer owner. Count marks
 // reached declarations; values beyond count carry no source constructor credit.
 type integerRawScope struct {
+	content                                        polynomialContentInvocationReceipt
 	addMul                                         integerAddMulInvocationReceipt
+	exactDiv                                       polynomialExactDivInvocationReceipt
 	owner                                          *IntegerManager
 	receipt                                        integerRawInvocationReceipt
 	invocation                                     uint64
@@ -39,7 +41,14 @@ func (m *IntegerManager) matchesRawInvocation(r *integerRawInvocationReceipt) bo
 	return r != nil && r.manager == m && m.rawFrameAddress(r.frame) && r.frame.owner == m && r.invocation != 0 && r.invocation == r.frame.invocation && r.frame.active
 }
 func (m *IntegerManager) rawAllocationRoots(r *integerRawInvocationReceipt) *polynomialNumericRoots {
+
 	if !m.matchesRawInvocation(r) || !r.frame.executing || m.closed || m.sourceFinalizing || m.constructionFailed {
+		return nil
+	}
+	if p := &r.frame.exactDiv; p.core != nil && m.exactDivAllocationRoots(p) == nil {
+		return nil
+	}
+	if p := &r.frame.content; p.manager != nil && m.contentAllocationRoots(p) == nil {
 		return nil
 	}
 	return &r.frame.numeric

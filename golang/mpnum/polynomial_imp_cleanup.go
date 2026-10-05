@@ -118,6 +118,9 @@ func (m *MultivariatePolynomialManager) privatePolynomial(index uint32) (Polynom
 	return Polynomial{}, false, nil
 }
 func (m *MultivariatePolynomialManager) callerGuard() error {
+	if m.core.arithmeticExecuting() {
+		return ErrPolynomialPending
+	}
 	if m.originalCause != nil {
 		return nil
 	} // an unreturned failed constructor has no callers.

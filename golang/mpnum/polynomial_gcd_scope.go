@@ -18,6 +18,7 @@ type polynomialGCDFunctionScope struct {
 	childInvocation         uint64
 	returned                polynomialReference
 	iccpInvocation          polynomialICCPInvocationReceipt
+	contentInvocation       polynomialContentInvocationReceipt
 	normalizeInvocation     polynomialNormalizeInvocationReceipt
 	derivativeInvocation    polynomialDerivativeInvocationReceipt
 	divisionInvocation      polynomialExactDivInvocationReceipt
@@ -124,6 +125,10 @@ func (m *MultivariatePolynomialManager) gcdYoungerSourceStop(s *polynomialGCDFun
 		s.cleanupCause = s.child.cleanupCause
 		return s.cleanupCause
 	}
+	if e := m.core.contentInvocationSourceCause(&s.contentInvocation); e != nil {
+		s.cleanupCause = e
+		return e
+	}
 	if e := m.iccpInvocationSourceCause(&s.iccpInvocation); e != nil {
 		s.cleanupCause = e
 		return e
@@ -191,7 +196,7 @@ func (m *MultivariatePolynomialManager) finishGCDLocalsTo(s *polynomialGCDFuncti
 	if frontier != 0 {
 		return nil
 	}
-	pending := s.returned.value != (Polynomial{}) || s.returned.assigning || s.zp.active || s.vars.pending.OwnerID() != 0 || (s.sparse.self != nil && !s.sparse.closed && (s.sparse.inputs.pending.OwnerID() != 0 || s.sparse.outputs.pending.OwnerID() != 0)) || s.topOwner && m.core.pscPending()
+	pending := (s.child != nil && s.child.active && s.child.invocation == s.childInvocation) || m.matchesICCPInvocation(&s.iccpInvocation) || m.matchesICCPShortcutContent(&s.iccpInvocation) || m.core.matchesContentInvocation(&s.contentInvocation) || s.returned.value != (Polynomial{}) || s.returned.assigning || s.zp.active || s.vars.pending.OwnerID() != 0 || (s.sparse.self != nil && !s.sparse.closed && (s.sparse.inputs.pending.OwnerID() != 0 || s.sparse.outputs.pending.OwnerID() != 0)) || s.topOwner && m.core.pscPending()
 	pending = pending || (m.matchesDerivativeInvocation(&s.derivativeInvocation) || m.derivativeInvocationHasOrphans(&s.derivativeInvocation)) || m.core.matchesExactDivInvocation(&s.divisionInvocation)
 	pending = pending || s.newSkeleton != nil || s.monomialBuffer.incoming != (Monomial{}) || s.monomialBuffer.pending.OwnerID() != 0
 	for i := range s.monomials {

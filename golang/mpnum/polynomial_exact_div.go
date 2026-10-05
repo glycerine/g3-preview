@@ -68,7 +68,15 @@ type polynomialExactDivisionScope struct {
 	monomial                             polynomialDivisionReference
 	numeral                              Int
 	numeric                              polynomialNumericRoots
+	normalize                            integerPNormalizeInvocationReceipt
+	divisionRaw, extendedRaw             integerRawInvocationReceipt
+	buffers                              [4]naturalPNBufferReceipt
+	verification                         naturalPNVerificationReceipt
+	directReceipt                        polynomialExactDivInvocationReceipt
+	output                               polynomialArithmeticInvocationReceipt
+	executing                            bool
 	returned                             Polynomial
+	numericPhase                         uint8
 	kind, stage                          uint8
 	active, endEntered                   bool
 	ownStage                             uint8
@@ -103,8 +111,27 @@ func (m *MultivariatePolynomialCore) exactDivisionCleanupPhase(owning, abort boo
 	if s.kind == 2 && !abort && !s.endEntered {
 		return nil
 	}
+	if s.executing {
+		return ErrPolynomialPending
+	}
 	if !owning && s.sourceCause != nil {
 		return s.sourceCause
+	}
+	if s.kind == 1 {
+		if owning {
+			if e := m.cleanupArithmeticInvocation(&s.directReceipt.prelude, false); e != nil {
+				return e
+			}
+			if e := m.cleanupArithmeticInvocation(&s.output, false); e != nil {
+				return e
+			}
+			if e := m.integer.cleanupExactDivNumeric(&s.directReceipt, false); e != nil {
+				return e
+			}
+		} else if e := m.exactDivChildSourceCause(s); e != nil {
+			s.sourceCause = e
+			return e
+		}
 	}
 	cursor := &s.stage
 	if owning {
@@ -142,10 +169,21 @@ func (m *MultivariatePolynomialCore) exactDivisionCleanupPhase(owning, abort boo
 	for _, raw := range s.numeric.allocator {
 		pendingNumeric = pendingNumeric || raw.OwnerID() != 0
 	}
+	if s.kind == 1 {
+		pendingNumeric = pendingNumeric || m.exactDivDirectPending(s) || m.matchesArithmeticInvocation(&s.output)
+	}
 	if !abort && (s.monomial.assigning || pendingNumeric) {
 		return nil
 	}
 	if abort {
+		if s.kind == 1 {
+			if e := m.integer.cleanupExactDivNumeric(&s.directReceipt, true); e != nil {
+				return e
+			}
+			if e := m.cleanupArithmeticInvocation(&s.output, true); e != nil {
+				return e
+			}
+		}
 		if e := s.numeric.cleanup(m.integer); e != nil {
 			return e
 		}
@@ -170,6 +208,14 @@ func (m *MultivariatePolynomialCore) exactDivisionCleanupPhase(owning, abort boo
 		s.cleanupCause = nil
 		return nil
 	}
+	if s.kind == 1 && s.bodyCause != nil && m.matchesArithmeticInvocation(&s.directReceipt.prelude) {
+		// The actual NUM/reference suffix is complete. Retain only its
+		// diagnostic history and embedded prelude receipt: R is an earlier
+		// persistent member invocation, not a still-live lexical NUM.
+		s.active = false
+		s.pscOwner = 0
+		return nil
+	}
 	*s = polynomialExactDivisionScope{invocation: s.invocation}
 	return nil
 }
@@ -177,7 +223,10 @@ func (m *MultivariatePolynomialCore) CleanupExactDivision() error {
 	if m == nil || m.self != m {
 		return ErrPolynomialOwner
 	}
-	e := m.exactDivisionCleanup(true)
+	e := m.cleanupExactDivInvocation(&m.exactDivision.directReceipt, true)
+	if e == nil && m.exactDivision.kind == 2 {
+		e = m.exactDivisionCleanup(true)
+	}
 	if e != nil {
 		m.exactDivision.cleanupCause = e
 	}
@@ -289,13 +338,28 @@ func (m *MultivariatePolynomialCore) exactDivWithReceipt(p, q Polynomial, receip
 	if m.exactDivision.active {
 		return Polynomial{}, ErrPolynomialPending
 	}
+	if receipt == nil {
+		receipt = &m.exactDivision.directReceipt
+	}
 	if e = m.som.reset(); e != nil {
 		return Polynomial{}, e
 	}
 	if e = m.som2.reset(); e != nil {
 		return Polynomial{}, e
 	}
-	if e = m.som.addPolynomial(p); e != nil {
+	if receipt != nil {
+		if e = m.som.acquireArithmeticInvocation(&receipt.prelude); e != nil {
+			return Polynomial{}, e
+		}
+		// This cold member records only the actual prelude acquisition. No
+		// source NUM/reference declaration has been constructed at this point.
+		m.exactDivision.directReceipt.prelude = receipt.prelude
+	}
+	var prelude *polynomialArithmeticInvocationReceipt
+	if receipt != nil {
+		prelude = &receipt.prelude
+	}
+	if e = m.som.addPolynomialWithArithmeticReceipt(p, prelude); e != nil {
 		return Polynomial{}, e
 	}
 	maxQ, e := m.gradedLexMaxPosition(q)
@@ -314,13 +378,20 @@ func (m *MultivariatePolynomialCore) exactDivWithReceipt(p, q Polynomial, receip
 	if s.invocation == ^uint64(0) {
 		return Polynomial{}, ErrPolynomialPending
 	}
-	*s = polynomialExactDivisionScope{active: true, kind: 1, pscOwner: m.pscExecutingOwner(), invocation: s.invocation + 1}
-	if receipt != nil {
-		*receipt = polynomialExactDivInvocationReceipt{m, s, s.invocation}
-	}
+	preludeIdentity := receipt.prelude
+	*s = polynomialExactDivisionScope{active: true, executing: true, kind: 1, pscOwner: m.pscExecutingOwner(), invocation: s.invocation + 1}
+	s.directReceipt = polynomialExactDivInvocationReceipt{core: m, frame: s, invocation: s.invocation, prelude: preludeIdentity}
+	*receipt = s.directReceipt
 	defer func() {
+		s.executing = false
 		s.bodyCause = err
 		cleanup := m.exactDivisionCleanup(false)
+		if cleanup == nil && err == nil {
+			// R.reset has completed every source row action, and the actual
+			// NUM/reference suffix has now completed. Acknowledge only this
+			// reached prelude before allowing another invocation to reuse R.
+			cleanup = m.cleanupArithmeticInvocation(&preludeIdentity, true)
+		}
 		if cleanup != nil {
 			s.cleanupCause = cleanup
 			// The source evaluates C.mk before destroying locals. Its actual new
@@ -344,7 +415,7 @@ func (m *MultivariatePolynomialCore) exactDivWithReceipt(p, q Polynomial, receip
 			if e = m.som.reset(); e != nil {
 				return Polynomial{}, e
 			}
-			return m.som2.mk(false)
+			return m.som2.mkWithArithmeticReceipt(false, &s.output)
 		}
 		monomialR, e := m.som.ms.monomial(m, maxR)
 		if e != nil {
@@ -369,17 +440,49 @@ func (m *MultivariatePolynomialCore) exactDivWithReceipt(p, q Polynomial, receip
 		if e = s.monomial.assign(m, quotient); e != nil {
 			return Polynomial{}, e
 		}
-		if e = m.modular.Div(&coefficientR, &coefficientQ, &s.numeral); e != nil {
+		s.numericPhase = 1
+		if e = m.modular.divWithExactDivReceipt(&coefficientR, &coefficientQ, &s.numeral, &s.directReceipt); e != nil {
 			return Polynomial{}, e
 		}
-		if e = m.som2.addConsumedNumeric(&s.numeral, quotient, false, nil, &s.numeric); e != nil {
+		s.numericPhase = 2
+		if s.output.invocation == 0 {
+			if e = m.som2.acquireArithmeticInvocation(&s.output); e != nil {
+				return Polynomial{}, e
+			}
+		}
+		if e = m.som2.addWithArithmeticReceipt(&s.numeral, quotient, &s.output); e != nil {
 			return Polynomial{}, e
 		}
-		if e = m.modular.Neg(&s.numeral); e != nil {
+		s.numericPhase = 3
+		if e = m.modular.negWithExactDivReceipt(&s.numeral, &s.directReceipt); e != nil {
 			return Polynomial{}, e
 		}
-		if e = m.som.addMul(&s.numeral, quotient, q); e != nil {
+		s.numericPhase = 4
+		if e = m.som.addMulWithArithmeticReceipt(&s.numeral, quotient, q, &s.directReceipt.prelude); e != nil {
 			return Polynomial{}, e
 		}
 	}
+}
+
+func (m *MultivariatePolynomialCore) exactDivDirectPending(s *polynomialExactDivisionScope) bool {
+	if m.modular.matchesPNormalizeInvocation(&s.normalize) || m.integer.matchesRawInvocation(&s.divisionRaw) || m.integer.matchesRawInvocation(&s.extendedRaw) || m.integer.natural.matchesPNVerification(&s.verification) {
+		return true
+	}
+	for i := range s.buffers {
+		if s.buffers[i].pending != (naturalPNBufferReceipt{}).pending {
+			return true
+		}
+	}
+	return false
+}
+
+// These are actual called children; no foreign/global active frame is read.
+func (m *MultivariatePolynomialCore) exactDivChildSourceCause(s *polynomialExactDivisionScope) error {
+	if e := m.arithmeticInvocationSourceCause(&s.directReceipt.prelude); e != nil {
+		return e
+	}
+	if e := m.integer.exactDivNumericSourceCause(&s.directReceipt); e != nil {
+		return e
+	}
+	return m.arithmeticInvocationSourceCause(&s.output)
 }

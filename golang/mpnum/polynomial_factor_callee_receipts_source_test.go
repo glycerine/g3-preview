@@ -134,3 +134,33 @@ func TestPolynomialDerivativeReceiptPreservesEarlierGF2CreatedCohort(t *testing.
 	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, first, transferred}, nil, 0)
 	serviceMust(t, m.CleanupDerivative())
 }
+
+// Source: src/math/polynomial/polynomial.cpp:5114-5156. The completed
+// R.reset and NUM/reference suffix precede reuse of the same persistent SOM.
+func TestPolynomialExactDivCompletedPreludeAllowsActualSourceReuse(t *testing.T) {
+	m := polynomialCellFixture(t)
+	p := polynomialQueryTerms(t, m, []int32{1, -1}, [][]MonomialPower{{{0, 2}}, nil})
+	q := polynomialQueryTerms(t, m, []int32{1, 1}, [][]MonomialPower{{{0, 1}}, nil})
+	var old, current polynomialExactDivInvocationReceipt
+	first, e := m.exactDivWithReceipt(p, q, &old)
+	serviceMust(t, e)
+	polynomialCaller(t, m, first)
+	if m.matchesArithmeticInvocation(&old.prelude) {
+		t.Fatal("completed actual source rows retained owning invocation")
+	}
+	second, e := m.exactDivWithReceipt(p, q, &current)
+	serviceMust(t, e)
+	polynomialCaller(t, m, second)
+	if current.prelude.invocation == old.prelude.invocation {
+		t.Fatal("source reuse did not acquire a distinct invocation")
+	}
+	before := m.integer.budget.Used()
+	serviceMust(t, m.cleanupExactDivInvocation(&old, true))
+	if m.integer.budget.Used() != before {
+		t.Fatal("stale completed prelude mutated newer result")
+	}
+	for _, result := range []Polynomial{first, second} {
+		polynomialQueryExpect(t, m, result, map[[3]uint32]int64{{1, 0, 0}: 1, {}: -1})
+	}
+	polynomialExactDivisionPhysical(t, m, []Polynomial{p, q, first, second})
+}

@@ -88,6 +88,7 @@ type MultivariatePolynomialCore struct {
 	sourceDecDone, sourceDeleteNeeded                                                          [2]bool
 	polynomialNegScope
 	factoryInvocation                                            polynomialFactoryScope
+	arithmeticInvocation                                         uint64
 	coefficientInvocation                                        polynomialCoefficientScope
 	scalarDivision                                               polynomialScalarDivScope
 	deletionHead                                                 *PolynomialDeletionHandler
@@ -285,6 +286,9 @@ func (m *MultivariatePolynomialCore) MkCoreTake(as []Int, ms []Monomial) (Polyno
 	return m.mkCell(uint32(len(as)), as, ms, nil, nil)
 }
 func (m *MultivariatePolynomialCore) mkConstCore(a *Int) (Polynomial, error) {
+	return m.mkConstCoreWithArithmeticReceipt(a, nil)
+}
+func (m *MultivariatePolynomialCore) mkConstCoreWithArithmeticReceipt(a *Int, receipt *polynomialArithmeticInvocationReceipt) (Polynomial, error) {
 	if m.singletonReference {
 		return Polynomial{}, ErrPolynomialPending
 	}
@@ -298,6 +302,10 @@ func (m *MultivariatePolynomialCore) mkConstCore(a *Int) (Polynomial, error) {
 	m.singletonMonomial = u
 	m.singletonReference = true
 	m.singletonGeneration++
+	if receipt != nil && m.matchesArithmeticInvocation(receipt) && receipt.frame.executing && m.callbackDepth == 0 {
+		receipt.frame.singleton = m.singletonMonomial
+		receipt.frame.singletonGeneration = m.singletonGeneration
+	}
 	if f := m.factorsOwner; f != nil && f.executing && m.callbackDepth == 0 {
 		f.singleton = m.singletonMonomial
 		f.singletonGeneration = m.singletonGeneration
@@ -309,9 +317,15 @@ func (m *MultivariatePolynomialCore) mkConstCore(a *Int) (Polynomial, error) {
 	if m.pscExecutingOwner() != 0 {
 		m.pscReceipts.singleton = u
 	}
+	if receipt != nil {
+		return m.mkCellWithReceipt(1, nil, []Monomial{u}, nil, a, &receipt.frame.factory)
+	}
 	return m.mkCell(1, nil, []Monomial{u}, nil, a)
 }
 func (m *MultivariatePolynomialCore) MkConstantTake(a *Int) (Polynomial, error) {
+	return m.mkConstantTakeWithArithmeticReceipt(a, nil)
+}
+func (m *MultivariatePolynomialCore) mkConstantTakeWithArithmeticReceipt(a *Int, receipt *polynomialArithmeticInvocationReceipt) (Polynomial, error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
@@ -332,7 +346,7 @@ func (m *MultivariatePolynomialCore) MkConstantTake(a *Int) (Polynomial, error) 
 	if one {
 		return m.unit, nil
 	}
-	return m.mkConstCore(a)
+	return m.mkConstCoreWithArithmeticReceipt(a, receipt)
 }
 func (m *MultivariatePolynomialCore) MkVariable(v, k uint32) (Polynomial, error) {
 	if e := m.check(); e != nil {
@@ -387,6 +401,9 @@ func (m *MultivariatePolynomialCore) MkTerms(as []Int, ms []Monomial) (Polynomia
 	return m.som.mk(false)
 }
 func (m *MultivariatePolynomialCore) CloseChecked() error {
+	if m.arithmeticExecuting() {
+		return ErrPolynomialPending
+	}
 	if m != nil && m.self == m && (m.coefficientInvocation.active || m.constantCoefficientInvocation.active) {
 		return ErrPolynomialPending
 	}

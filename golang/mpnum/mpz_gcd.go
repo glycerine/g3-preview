@@ -81,7 +81,7 @@ func (m *IntegerManager) AddMul(a, b, c, d *Int) error {
 	return m.addMulWithSourceReceipt(a, b, c, d, nil, nil)
 }
 func (m *IntegerManager) addMulWithSourceReceipt(a, b, c, d *Int, receipt *integerAddMulInvocationReceipt, arithmetic *polynomialArithmeticInvocationReceipt) error {
-	return m.addMulWithAllocationContext(a, b, c, d, receipt, integerAllocationInvocationContext{arithmetic: arithmetic})
+	return m.addMulWithAllocationContext(a, b, c, d, receipt, (integerAllocationInvocationContext{}).withArithmeticInvocation(arithmetic))
 }
 func (m *IntegerManager) addMulWithAllocationContext(a, b, c, d *Int, receipt *integerAddMulInvocationReceipt, context integerAllocationInvocationContext) error {
 	return m.addSubMulWithAllocationContext(a, b, c, d, false, receipt, context)
@@ -110,8 +110,8 @@ func (m *IntegerManager) addSubMulWithAllocationContext(a, b, c, d *Int, subtrac
 		receipt = &frame.receipt
 	}
 	*frame = integerAddMulScope{active: true, executing: true, invocation: frame.invocation + 1, stage: 1, parentContext: callerContext}
-	if callerContext.arithmetic != nil {
-		frame.parent = *callerContext.arithmetic
+	if arithmetic := callerContext.arithmeticReceipt(m); arithmetic != nil {
+		frame.parent = *arithmetic
 	}
 	frame.receipt = integerAddMulInvocationReceipt{m, frame, frame.invocation}
 	*receipt = frame.receipt
@@ -186,6 +186,7 @@ func (m *IntegerManager) gcdWithAllocationContext(a, b, c *Int, context integerA
 	if e != nil {
 		return e
 	}
+	context.recordContentRaw(m, receipt)
 	context = context.withRawInvocation(receipt)
 	a1, b1, r, t, tmp := &s.values[0], &s.values[1], &s.values[2], &s.values[3], &s.values[4]
 	defer func() {

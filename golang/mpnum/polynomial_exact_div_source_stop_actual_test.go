@@ -81,26 +81,7 @@ func TestPolynomialExactDivActualNUMStopPreservesOlderReference(t *testing.T) {
 		contextTLSFinish(t, rt, func() error { return m.CleanupValue(&p) })
 		contextTLSFinish(t, rt, func() error { return m.integer.Del(&negative) })
 		contextTLSFinish(t, rt, func() error { return m.integer.Del(&big) })
-		seenConsumedDrop := false
-		contextTLSFinish(t, rt, func() error {
-			e := m.CloseChecked()
-			if errors.Is(e, arena.ErrBounds) && m.closeStage == 2 && m.som.cleanupDropConsumed && m.som.cleanupDropLast {
-				// Exact current slot and actual DEC outcome prove the released
-				// root, before the next owning attempt; no global-count inference.
-				x, read := m.som.ms.monomial(m, m.som.cleanupIndex)
-				serviceMust(t, read)
-				l, lookup := mm.location(x)
-				serviceMust(t, lookup)
-				if l.raw != (memory.ObjectRef{}) || l.stage != 2 || !l.live {
-					t.Fatal("actual consumed-last leaf", l)
-				}
-				seenConsumedDrop = true
-			}
-			return e
-		})
-		if !seenConsumedDrop {
-			t.Fatal("real SOM consumed-last cleanup boundary not reached")
-		}
+		contextTLSFinish(t, rt, m.CloseChecked)
 		dropCause := mm.DecManagerRef()
 		if dropCause != nil {
 			if !errors.Is(dropCause, arena.ErrBounds) || mm.managerRefs != 0 {
@@ -135,7 +116,64 @@ func TestPolynomialExactDivActualNUMStopPreservesOlderReference(t *testing.T) {
 		t.Fatal("ordinary source retry acknowledged consumed NUM or dropped older reference", again, m.exactDivision.stage)
 	}
 	contextTLSFinish(t, rt, func() error { return m.cleanupExactDivInvocation(&receipt, false) })
+	// Actual source-loop additions with no prelude receipt remain foreign.
+	// Owning abort retires only the acquired prelude rows before caller roots;
+	// whole Close consequently no longer owns their last reference.
+	type foreignRow struct {
+		term        Monomial
+		coefficient Int
+		refs        uint32
+	}
+	var foreign []foreignRow
+	refCount := func(term Monomial) (uint32, error) {
+		location, e := mm.location(term)
+		if e != nil {
+			return 0, e
+		}
+		return mm.allocator.ReadUint32(location.raw, 0)
+	}
+	count, e := m.som.ms.size(m)
+	serviceMust(t, e)
+	for i := uint32(0); i < count; i++ {
+		if m.som.monomialOwners[i] != receipt.prelude.frame.append.invocation {
+			term, e := m.som.ms.monomial(m, i)
+			serviceMust(t, e)
+			coefficient, e := m.som.as.coefficient(m, i)
+			serviceMust(t, e)
+			refs, e := refCount(term)
+			serviceMust(t, e)
+			foreign = append(foreign, foreignRow{term, coefficient, refs})
+		}
+	}
 	contextTLSFinish(t, rt, func() error { return m.cleanupExactDivInvocation(&receipt, true) })
+	if m.matchesArithmeticInvocation(&receipt.prelude) {
+		t.Fatal("exact completed prelude still owns rows")
+	}
+	count, e = m.som.ms.size(m)
+	serviceMust(t, e)
+	if count != uint32(len(foreign)) {
+		t.Fatal("owning abort changed foreign row count", count, len(foreign))
+	}
+	for i, want := range foreign {
+		term, e := m.som.ms.monomial(m, uint32(i))
+		serviceMust(t, e)
+		coefficient, e := m.som.as.coefficient(m, uint32(i))
+		serviceMust(t, e)
+		refs, e := refCount(term)
+		serviceMust(t, e)
+		position, e := m.som.positions.Get(term)
+		serviceMust(t, e)
+		if term != want.term || coefficient != want.coefficient || refs != want.refs || position != uint32(i) {
+			t.Fatal("owning abort changed foreign row identity/value/RC/position", i)
+		}
+	}
+	for _, term := range []Monomial{x2, unit} {
+		position, e := m.som.positions.Get(term)
+		serviceMust(t, e)
+		if position != ^uint32(0) {
+			t.Fatal("owned prelude position not retired", term, position)
+		}
+	}
 	if !errors.Is(m.exactDivision.sourceCause, arena.ErrBounds) || m.exactDivision.stage != 0 || !errors.Is(m.exactDivision.bodyCause, ErrUPolynomialCanceled) {
 		t.Fatal("owning cleanup changed source first cause/frontier")
 	}

@@ -5,15 +5,20 @@ package mpnum
 // Explicit passed invocation identity. It carries no allocation snapshot and
 // creates no source numeral, reservation, or ambient callback owner hook.
 type integerAllocationInvocationContext struct {
-	raw              *integerRawInvocationReceipt
-	rawInvocation    uint64
-	pn               *integerPNormalizeScope
-	pnInvocation     uint64
-	arithmetic       *polynomialArithmeticInvocationReceipt
-	addMul           *integerAddMulInvocationReceipt
-	addMulInvocation uint64
-	derivative       *polynomialDerivativeInvocationReceipt
-	scalarDiv        *polynomialScalarDivInvocationReceipt
+	arithmeticInvocation uint64
+	exactDiv             *polynomialExactDivInvocationReceipt
+	exactDivInvocation   uint64
+	content              *polynomialContentInvocationReceipt
+	contentInvocation    uint64
+	raw                  *integerRawInvocationReceipt
+	rawInvocation        uint64
+	pn                   *integerPNormalizeScope
+	pnInvocation         uint64
+	arithmetic           *polynomialArithmeticInvocationReceipt
+	addMul               *integerAddMulInvocationReceipt
+	addMulInvocation     uint64
+	derivative           *polynomialDerivativeInvocationReceipt
+	scalarDiv            *polynomialScalarDivInvocationReceipt
 }
 
 func (c integerAllocationInvocationContext) withAddMulInvocation(r *integerAddMulInvocationReceipt) integerAllocationInvocationContext {
@@ -47,6 +52,9 @@ func pnAllocationContext(pn *integerPNormalizeScope) integerAllocationInvocation
 	return c
 }
 func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomialNumericRoots {
+	if c.content != nil && c.contentReceipt(m) == nil {
+		return nil
+	}
 	if c.raw != nil {
 		if r := c.rawReceipt(m); r != nil {
 			return m.rawAllocationRoots(r)
@@ -55,6 +63,12 @@ func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomial
 	}
 	if s := c.pn; s != nil && s.owner != nil && s.owner.manager == m && s == &s.owner.normalization && s.active && s.executing && c.pnInvocation != 0 && c.pnInvocation == s.invocation {
 		return &s.roots
+	}
+	if c.exactDiv != nil {
+		return m.exactDivContextRoots(c)
+	}
+	if p := c.contentReceipt(m); p != nil {
+		return m.contentAllocationRoots(p)
 	}
 	if c.scalarDiv != nil {
 		return m.scalarDivAllocationRoots(c.scalarDiv)
@@ -72,20 +86,29 @@ func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomial
 		}
 		return &s.numeric
 	}
-	return m.arithmeticAllocationRoots(c.arithmetic)
+	return m.arithmeticAllocationRoots(c.arithmeticReceipt(m))
 }
 
 func (m *IntegerManager) copyFromOwnerWithArithmeticReceipt(out *Int, owner *IntegerManager, value *Int, receipt *polynomialArithmeticInvocationReceipt) error {
-	return m.copyFromOwnerWithAllocationContext(out, owner, value, nil, integerAllocationInvocationContext{arithmetic: receipt})
+	return m.copyFromOwnerWithAllocationContext(out, owner, value, nil, (integerAllocationInvocationContext{}).withArithmeticInvocation(receipt))
+}
+func (m *IntegerModularManager) arithmeticReceiptForReceiver(r *polynomialArithmeticInvocationReceipt) *polynomialArithmeticInvocationReceipt {
+	if m == nil || m.manager == nil || r == nil || r.manager == nil || r.manager.modular != m || m.manager.arithmeticAllocationRoots(r) == nil {
+		return nil
+	}
+	return r
+}
+func (m *IntegerModularManager) arithmeticAllocationContext(r *polynomialArithmeticInvocationReceipt) integerAllocationInvocationContext {
+	return (integerAllocationInvocationContext{}).withArithmeticInvocation(m.arithmeticReceiptForReceiver(r))
 }
 func (m *IntegerModularManager) arithmeticAddMulReceipt(r *polynomialArithmeticInvocationReceipt) *integerAddMulInvocationReceipt {
-	if m.manager.arithmeticAllocationRoots(r) == nil {
+	if m.arithmeticReceiptForReceiver(r) == nil {
 		return nil
 	}
 	return &r.frame.addMul
 }
 func (m *IntegerModularManager) normalizeWithArithmeticReceipt(out *Int, r *polynomialArithmeticInvocationReceipt) error {
-	if m.manager.arithmeticAllocationRoots(r) == nil {
+	if m.arithmeticReceiptForReceiver(r) == nil {
 		return m.PNormalize(out)
 	}
 	e := m.pNormalizeWithReceipt(out, &r.frame.normalize)
@@ -93,4 +116,19 @@ func (m *IntegerModularManager) normalizeWithArithmeticReceipt(out *Int, r *poly
 		r.frame.sourceCause = m.pNormalizeInvocationSourceCause(&r.frame.normalize)
 	}
 	return e
+}
+
+func (c integerAllocationInvocationContext) withArithmeticInvocation(r *polynomialArithmeticInvocationReceipt) integerAllocationInvocationContext {
+	c.arithmetic = r
+	c.arithmeticInvocation = 0
+	if r != nil {
+		c.arithmeticInvocation = r.invocation
+	}
+	return c
+}
+func (c integerAllocationInvocationContext) arithmeticReceipt(m *IntegerManager) *polynomialArithmeticInvocationReceipt {
+	if c.arithmetic != nil && c.arithmeticInvocation != 0 && c.arithmeticInvocation == c.arithmetic.invocation && m.arithmeticAllocationRoots(c.arithmetic) != nil {
+		return c.arithmetic
+	}
+	return nil
 }

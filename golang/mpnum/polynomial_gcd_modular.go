@@ -163,10 +163,10 @@ func (m *MultivariatePolynomialManager) modGCD(u, v Polynomial, ud, vd *polynomi
 	s.constructNumeral(1)
 	s.constructReference(c, 0)
 	s.constructReference(c, 1)
-	if e = c.integerContent(u, &s.nums[0], &s.refs[0].root); e != nil {
+	if e = c.integerContentWithReceipt(u, &s.nums[0], &s.refs[0].root, &s.contentInvocation); e != nil {
 		return e
 	}
-	if e = c.integerContent(v, &s.nums[1], &s.refs[1].root); e != nil {
+	if e = c.integerContentWithReceipt(v, &s.nums[1], &s.refs[1].root, &s.contentInvocation); e != nil {
 		return e
 	}
 	s.constructNumeral(2)

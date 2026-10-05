@@ -110,5 +110,5 @@ func (m *MultivariatePolynomialManager) primitiveZPX(p Polynomial, x uint32, out
 		err = errors.Join(err, m.finishGCDFunctionSource(s))
 		m.core.pscLeave()
 	}()
-	return m.iccpZPX(p, x, &s.nums[0], &s.refs[0].root, out)
+	return m.iccpZPXWithContentReceipt(p, x, &s.nums[0], &s.refs[0].root, out, &s.contentInvocation)
 }

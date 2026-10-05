@@ -26,6 +26,9 @@ func (m *MultivariatePolynomialManager) cleanupGCDScopes(scopes []*polynomialGCD
 			if !s.active {
 				continue
 			}
+			if e := c.cleanupContentInvocation(&s.contentInvocation, false); e != nil {
+				return e
+			}
 			if e := m.cleanupICCPInvocation(&s.iccpInvocation, false); e != nil {
 				return e
 			}
@@ -88,6 +91,9 @@ func (m *MultivariatePolynomialManager) cleanupGCDScopes(scopes []*polynomialGCD
 		s := scopes[j]
 		if !s.active {
 			continue
+		}
+		if e := c.cleanupContentInvocation(&s.contentInvocation, true); e != nil {
+			return e
 		}
 		if e := m.cleanupICCPInvocation(&s.iccpInvocation, true); e != nil {
 			return e

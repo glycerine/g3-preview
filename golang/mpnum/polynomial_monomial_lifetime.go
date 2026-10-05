@@ -203,6 +203,7 @@ func (m *MonomialManager) CleanupValue(a *Monomial) error {
 	l.compositionSlot = 0
 	l.derivativeCohort = nil
 	l.derivativeSlot = 0
+	l.acknowledgeArithmeticProduct(*a)
 	l.live = false
 	*a = Monomial{}
 	return nil

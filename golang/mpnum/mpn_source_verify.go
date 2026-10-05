@@ -15,6 +15,7 @@ func (m *NaturalManager) sourceVerifyDivisionWithPNReceipt(a, b, q, r limbView, 
 	return m.sourceVerifyDivisionWithAllocationContext(a, b, q, r, pnAllocationContext(pn))
 }
 func (m *NaturalManager) sourceVerifyDivisionWithAllocationContext(a, b, q, r limbView, context integerAllocationInvocationContext) (err error) {
+
 	if !modularSourceDebug {
 		return nil
 	}
@@ -36,6 +37,26 @@ func (m *NaturalManager) sourceVerifyDivisionWithAllocationContext(a, b, q, r li
 		defer func() { frame.executing = false }()
 	}
 
+	if r := context.exactDiv; context.raw == nil && r != nil && r.core != nil && r.core.integer.natural == m && r.core.integer.exactDivContextRoots(context) != nil {
+		frame = &m.verificationInvocation
+		if frame.active || frame.invocation == ^uint64(0) {
+			return ErrPolynomialPending
+		}
+		*frame = naturalPNVerificationScope{active: true, executing: true, invocation: frame.invocation + 1, exactDiv: *r}
+		frame.buffer = naturalPNBufferReceipt{owner: m, exactDiv: *r, invocation: r.invocation, buffer: &m.verification, private: true}
+		r.frame.verification = naturalPNVerificationReceipt{m, frame, frame.invocation}
+		defer func() { frame.executing = false }()
+	}
+	if r := context.content; context.raw == nil && r != nil && r.manager != nil && r.manager.integer != nil && r.manager.integer.natural == m && context.contentReceipt(r.manager.integer) != nil {
+		frame = &m.verificationInvocation
+		if frame.active || frame.invocation == ^uint64(0) {
+			return ErrPolynomialPending
+		}
+		*frame = naturalPNVerificationScope{active: true, executing: true, invocation: frame.invocation + 1, content: *r}
+		frame.buffer = naturalPNBufferReceipt{owner: m, content: *r, invocation: r.invocation, buffer: &m.verification, private: true}
+		r.frame.verification = naturalPNVerificationReceipt{m, frame, frame.invocation}
+		defer func() { frame.executing = false }()
+	}
 	if r := context.scalarDiv; context.raw == nil && r != nil && r.manager != nil && r.manager.integer.natural == m && r.manager.integer.scalarDivAllocationRoots(r) != nil {
 		frame = &m.verificationInvocation
 		if frame.active || frame.invocation == ^uint64(0) {

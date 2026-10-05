@@ -21,7 +21,7 @@ func TestPolynomialIntegerContentCompletedLocalActualDanglingGuard(t *testing.T)
 	limbs[len(limbs)-1] = 1
 	serviceMust(t, z.SetLimbs(&large, limbs))
 	t.Cleanup(func() { serviceMust(t, z.Del(&large)) })
-	m.contentLocal = polynomialContentScope{active: true}
+	m.contentLocal = polynomialContentScope{invocation: 1, active: true, aiConstructed: true}
 	t.Cleanup(func() { z.budget.FailAfter(-1); serviceMust(t, m.CleanupIntegerContent()) })
 	serviceMust(t, z.Copy(&m.contentLocal.ai, &z.two64))
 	z.budget.FailAfter(0)
@@ -62,8 +62,33 @@ func TestPolynomialIntegerContentCompletedLocalActualDanglingGuard(t *testing.T)
 		t.Fatal("unrelated IC generation blocked source destruction", stopped)
 	}
 	m.pscLeave()
-	serviceMust(t, m.CleanupIntegerContent())
+	receipt := polynomialContentInvocationReceipt{m, &m.contentLocal, m.contentLocal.invocation}
+	captured := e.Error()
+	serviceMust(t, m.cleanupContentInvocation(&receipt, false))
+	if m.contentInvocationSourceCause(&receipt) != e {
+		t.Fatal("false owning phase erased source cause")
+	}
+	serviceMust(t, m.cleanupContentInvocation(&receipt, true))
+	if m.contentInvocationSourceCause(&receipt) != e {
+		t.Fatal("true owning phase erased source cause")
+	}
 	polynomialImpPhysicalAuditNamed(t, full, nil, []*Int{&large}, 0)
+	p := polynomialQueryTerms(t, m, []int32{2, 4}, [][]MonomialPower{{{0, 1}}, {{1, 1}}})
+	var i Int
+	var primitive polynomialReference
+	var current polynomialContentInvocationReceipt
+	serviceMust(t, m.integerContentWithReceipt(p, &i, &primitive, &current))
+	if current.invocation == receipt.invocation || e.Error() != captured || !errors.Is(e, arena.ErrInvalidSlot) {
+		t.Fatal("later invocation changed original source error", e)
+	}
+	serviceMust(t, m.cleanupContentInvocation(&receipt, false))
+	serviceMust(t, m.cleanupContentInvocation(&receipt, true))
+	if i != NewInt(2) {
+		t.Fatal("later mathematical content", i)
+	}
+	polynomialQueryExpect(t, m, primitive.value, map[[3]uint32]int64{{1, 0, 0}: 1, {0, 1, 0}: 2})
+	serviceMust(t, primitive.close(m))
+	serviceMust(t, m.integer.Del(&i))
 }
 
 // A named cold-owner census fixture, not a claim that a mathematical IC call
@@ -73,6 +98,7 @@ func TestPolynomialContentMonicCollectorActualRetainedLocals(t *testing.T) {
 	full := polynomialPSCFullFixture(t)
 	m := full.core
 	m.contentLocal.active = true
+	m.contentLocal.aiConstructed = true
 	full.monic.active = true
 	t.Cleanup(func() {
 		serviceMust(t, full.CleanupGlexMonic())

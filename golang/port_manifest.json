@@ -28660,7 +28660,36 @@
         "mpnum/polynomial_som_cohort_tags.go",
         "mpnum/polynomial_som_ordered_cohort_source_test.go",
         "mpnum/polynomial_derivative_som_source_test.go",
-        "mpnum/polynomial_factory_reentrant_allocation_source_test.go"
+        "mpnum/polynomial_factory_reentrant_allocation_source_test.go",
+        "mpnum/polynomial_content_allocation_context.go",
+        "mpnum/polynomial_content_prelude_source_test.go",
+        "mpnum/integer_raw_invocation.go",
+        "mpnum/mpn_source_verify.go",
+        "mpnum/mpn_verification_invocation.go",
+        "mpnum/mpq_inspect.go",
+        "mpnum/mpz_div.go",
+        "mpnum/mpz_gcd.go",
+        "mpnum/mpzzp_normalize_allocation_receipt.go",
+        "mpnum/polynomial_arithmetic_acquisition_source_test.go",
+        "mpnum/polynomial_arithmetic_constant_normalize_stop_source_test.go",
+        "mpnum/polynomial_arithmetic_constant_reentrant_source_test.go",
+        "mpnum/polynomial_arithmetic_constant_source_test.go",
+        "mpnum/polynomial_arithmetic_factory_buffer_source_test.go",
+        "mpnum/polynomial_arithmetic_generated_source_test.go",
+        "mpnum/polynomial_arithmetic_invocation.go",
+        "mpnum/polynomial_arithmetic_modular_guard_source_test.go",
+        "mpnum/polynomial_arithmetic_normalize_stop_source_test.go",
+        "mpnum/polynomial_arithmetic_numeric_slot_source_test.go",
+        "mpnum/polynomial_arithmetic_regular_mixed_source_test.go",
+        "mpnum/polynomial_arithmetic_regular_row_source_test.go",
+        "mpnum/polynomial_arithmetic_remove_zero_source_test.go",
+        "mpnum/polynomial_arithmetic_upper_source_test.go",
+        "mpnum/polynomial_arithmetic_wrappers_source_test.go",
+        "mpnum/polynomial_exact_div_allocation_context.go",
+        "mpnum/polynomial_exact_div_direct_numeric_source_test.go",
+        "mpnum/polynomial_exact_div_numeric_context_source_test.go",
+        "mpnum/polynomial_exact_div_pn_stop_source_test.go",
+        "mpnum/polynomial_exact_div_prelude_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -29273,7 +29302,44 @@
         "TestPolynomialFactoryAllocationRealCallbackForeignStart",
         "TestPolynomialFactoryAllocationConcreteFrameGuards",
         "TestPolynomialFactoryAllocationPostphysicalOwnRetry",
-        "TestPolynomialFactoryAllocationTransportCannotRetireExecutingReceipt"
+        "TestPolynomialFactoryAllocationTransportCannotRetireExecutingReceipt",
+        "TestPolynomialContentBeforeAIActualGCDPrelude",
+        "TestPolynomialICCPShortcutBeforeAIActualContent",
+        "TestPolynomialContentPreludeActualFrameAndSavedContextGuards",
+        "TestPolynomialContentPreludeNilParentBufferGuard",
+        "TestPolynomialContentBeforeAIReachedGCDSourceStop",
+        "TestPolynomialContentConstantActualSETAllocation",
+        "TestPolynomialContentConstantPNSourceStopBeforeAbsentAI",
+        "TestPolynomialContentFieldActualBIGInverseChildren",
+        "TestExactDivNumericActualFrameAndImmutableContext",
+        "TestExactDivNumericLowerActualPrefixes",
+        "TestPolynomialArithmeticContextKeepsCapturedInvocationAcrossReceiptReuse",
+        "TestPolynomialArithmeticGuardedEmptySourceBufferAcquisition",
+        "TestPolynomialArithmeticReceiptRejectsForeignModularReceiver",
+        "TestPolynomialArithmeticSourceWrappersEveryActualPrefix",
+        "TestPolynomialArithmeticWrappersUseActualReturnedReceipt",
+        "TestPolynomialConstantAllocationTransportCannotRetireExecutingFrame",
+        "TestPolynomialConstantYoungerPNStopPreservesOlderNUMSuffix",
+        "TestPolynomialExactDivActualNUMAcquisitionUsesDirectFrame",
+        "TestPolynomialExactDivCompletedSourceResetPermitsLiteralRetry",
+        "TestPolynomialExactDivPreludeActualRowsBeforeNUMDeclaration",
+        "TestPolynomialExactDivPublicOwnAcknowledgmentPermitsSameOwnerRetry",
+        "TestPolynomialExactDivYoungerPNSourceStopPreservesOlderNUMReference",
+        "TestPolynomialMulAddConstantShortcutActualAcquisitionsPreserveOlderRegular",
+        "TestPolynomialRegularActualINCBindsRowBeforeCoefficientConstruction",
+        "TestPolynomialRegularAddMulActualFactoryReturnEveryPrefix",
+        "TestPolynomialRegularCreatedProductActualINCTransfersExactScope",
+        "TestPolynomialRegularCreatedProductGenericConsumptionAcknowledgesExactScope",
+        "TestPolynomialRegularFactoryReceiptBindsActualSourceBuffer",
+        "TestPolynomialRegularFailedNilSetterKeepsForeignPendingAndOldTags",
+        "TestPolynomialRegularLaterNilAccumulatorWriteTransfersActualRowToMember",
+        "TestPolynomialRegularMatchedRowsPreserveLaterForeignPositions",
+        "TestPolynomialRegularProductActualCalleeAcquisition",
+        "TestPolynomialRegularSetActualDefaultSlotNumericAcquisition",
+        "TestPolynomialRegularSourceZeroRemovalTransfersActualTags",
+        "TestPolynomialRegularStoppedPNPreservesActualRowsAndHistory",
+        "TestPolynomialRegularZeroAddMulPreservesUnreadInvocation",
+        "TestPolynomialScaleEarlyAliasesDoNotAcquireOlderRegularFrame"
       ],
       "conditionals": [
         {
@@ -32533,6 +32599,151 @@
           "tests": [
             "TestPolynomialFactoryAllocationTransportCannotRetireExecutingReceipt"
           ]
+        },
+        {
+          "name": "polynomial.cpp:3405-3430 ic: actual zero/constant/GCD/cheap reset/ai/Div/add_reset/mk source order with direct guarded numeric child receipts; no numeral construction on erased branches.",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_content.go",
+          "tests": [
+            "TestPolynomialContentBeforeAIActualGCDPrelude",
+            "TestPolynomialICCPShortcutBeforeAIActualContent",
+            "TestPolynomialContentPreludeActualFrameAndSavedContextGuards",
+            "TestPolynomialContentPreludeNilParentBufferGuard",
+            "TestPolynomialContentBeforeAIReachedGCDSourceStop",
+            "TestPolynomialContentConstantActualSETAllocation",
+            "TestPolynomialContentConstantPNSourceStopBeforeAbsentAI",
+            "TestPolynomialContentFieldActualBIGInverseChildren"
+          ]
+        },
+        {
+          "name": "src/math/polynomial/polynomial.cpp:1885-2156,2217-2300 regular/cheap actual add/addMul/addPolynomial/reset/removeZeros ownership",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_som.go",
+          "tests": [
+            "TestPolynomialArithmeticContextKeepsCapturedInvocationAcrossReceiptReuse",
+            "TestPolynomialArithmeticGuardedEmptySourceBufferAcquisition",
+            "TestPolynomialArithmeticReceiptRejectsForeignModularReceiver",
+            "TestPolynomialArithmeticSourceWrappersEveryActualPrefix",
+            "TestPolynomialArithmeticWrappersUseActualReturnedReceipt",
+            "TestPolynomialConstantAllocationTransportCannotRetireExecutingFrame",
+            "TestPolynomialConstantYoungerPNStopPreservesOlderNUMSuffix",
+            "TestPolynomialMulAddConstantShortcutActualAcquisitionsPreserveOlderRegular",
+            "TestPolynomialRegularActualINCBindsRowBeforeCoefficientConstruction",
+            "TestPolynomialRegularAddMulActualFactoryReturnEveryPrefix",
+            "TestPolynomialRegularCreatedProductActualINCTransfersExactScope",
+            "TestPolynomialRegularCreatedProductGenericConsumptionAcknowledgesExactScope",
+            "TestPolynomialRegularFactoryReceiptBindsActualSourceBuffer",
+            "TestPolynomialRegularFailedNilSetterKeepsForeignPendingAndOldTags",
+            "TestPolynomialRegularLaterNilAccumulatorWriteTransfersActualRowToMember",
+            "TestPolynomialRegularMatchedRowsPreserveLaterForeignPositions",
+            "TestPolynomialRegularProductActualCalleeAcquisition",
+            "TestPolynomialRegularSetActualDefaultSlotNumericAcquisition",
+            "TestPolynomialRegularSourceZeroRemovalTransfersActualTags",
+            "TestPolynomialRegularStoppedPNPreservesActualRowsAndHistory",
+            "TestPolynomialRegularZeroAddMulPreservesUnreadInvocation",
+            "TestPolynomialScaleEarlyAliasesDoNotAcquireOlderRegularFrame"
+          ]
+        },
+        {
+          "name": "src/math/polynomial/polynomial.cpp:1885-2156,2217-2300 exact source buffer/frame invocation and mixed-row owning retirement",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_arithmetic_invocation.go",
+          "tests": [
+            "TestPolynomialArithmeticContextKeepsCapturedInvocationAcrossReceiptReuse",
+            "TestPolynomialArithmeticGuardedEmptySourceBufferAcquisition",
+            "TestPolynomialArithmeticReceiptRejectsForeignModularReceiver",
+            "TestPolynomialArithmeticSourceWrappersEveryActualPrefix",
+            "TestPolynomialArithmeticWrappersUseActualReturnedReceipt",
+            "TestPolynomialConstantAllocationTransportCannotRetireExecutingFrame",
+            "TestPolynomialConstantYoungerPNStopPreservesOlderNUMSuffix",
+            "TestPolynomialMulAddConstantShortcutActualAcquisitionsPreserveOlderRegular",
+            "TestPolynomialRegularActualINCBindsRowBeforeCoefficientConstruction",
+            "TestPolynomialRegularAddMulActualFactoryReturnEveryPrefix",
+            "TestPolynomialRegularCreatedProductActualINCTransfersExactScope",
+            "TestPolynomialRegularCreatedProductGenericConsumptionAcknowledgesExactScope",
+            "TestPolynomialRegularFactoryReceiptBindsActualSourceBuffer",
+            "TestPolynomialRegularFailedNilSetterKeepsForeignPendingAndOldTags",
+            "TestPolynomialRegularLaterNilAccumulatorWriteTransfersActualRowToMember",
+            "TestPolynomialRegularMatchedRowsPreserveLaterForeignPositions",
+            "TestPolynomialRegularProductActualCalleeAcquisition",
+            "TestPolynomialRegularSetActualDefaultSlotNumericAcquisition",
+            "TestPolynomialRegularSourceZeroRemovalTransfersActualTags",
+            "TestPolynomialRegularStoppedPNPreservesActualRowsAndHistory",
+            "TestPolynomialRegularZeroAddMulPreservesUnreadInvocation",
+            "TestPolynomialScaleEarlyAliasesDoNotAcquireOlderRegularFrame"
+          ]
+        },
+        {
+          "name": "src/math/polynomial/polynomial.cpp:2665-2744 Add/Sub/Mul/Scale/MulAdd same source wrapper shortcut and returned token custody",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_arithmetic.go",
+          "tests": [
+            "TestPolynomialArithmeticContextKeepsCapturedInvocationAcrossReceiptReuse",
+            "TestPolynomialArithmeticGuardedEmptySourceBufferAcquisition",
+            "TestPolynomialArithmeticReceiptRejectsForeignModularReceiver",
+            "TestPolynomialArithmeticSourceWrappersEveryActualPrefix",
+            "TestPolynomialArithmeticWrappersUseActualReturnedReceipt",
+            "TestPolynomialConstantAllocationTransportCannotRetireExecutingFrame",
+            "TestPolynomialConstantYoungerPNStopPreservesOlderNUMSuffix",
+            "TestPolynomialMulAddConstantShortcutActualAcquisitionsPreserveOlderRegular",
+            "TestPolynomialRegularActualINCBindsRowBeforeCoefficientConstruction",
+            "TestPolynomialRegularAddMulActualFactoryReturnEveryPrefix",
+            "TestPolynomialRegularCreatedProductActualINCTransfersExactScope",
+            "TestPolynomialRegularCreatedProductGenericConsumptionAcknowledgesExactScope",
+            "TestPolynomialRegularFactoryReceiptBindsActualSourceBuffer",
+            "TestPolynomialRegularFailedNilSetterKeepsForeignPendingAndOldTags",
+            "TestPolynomialRegularLaterNilAccumulatorWriteTransfersActualRowToMember",
+            "TestPolynomialRegularMatchedRowsPreserveLaterForeignPositions",
+            "TestPolynomialRegularProductActualCalleeAcquisition",
+            "TestPolynomialRegularSetActualDefaultSlotNumericAcquisition",
+            "TestPolynomialRegularSourceZeroRemovalTransfersActualTags",
+            "TestPolynomialRegularStoppedPNPreservesActualRowsAndHistory",
+            "TestPolynomialRegularZeroAddMulPreservesUnreadInvocation",
+            "TestPolynomialScaleEarlyAliasesDoNotAcquireOlderRegularFrame"
+          ]
+        },
+        {
+          "name": "src/math/polynomial/polynomial.cpp:2485-2495 actual source-buffer-bound constructor/factory transfer receipt",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_store.go",
+          "tests": [
+            "TestPolynomialArithmeticContextKeepsCapturedInvocationAcrossReceiptReuse",
+            "TestPolynomialArithmeticGuardedEmptySourceBufferAcquisition",
+            "TestPolynomialArithmeticReceiptRejectsForeignModularReceiver",
+            "TestPolynomialArithmeticSourceWrappersEveryActualPrefix",
+            "TestPolynomialArithmeticWrappersUseActualReturnedReceipt",
+            "TestPolynomialConstantAllocationTransportCannotRetireExecutingFrame",
+            "TestPolynomialConstantYoungerPNStopPreservesOlderNUMSuffix",
+            "TestPolynomialMulAddConstantShortcutActualAcquisitionsPreserveOlderRegular",
+            "TestPolynomialRegularActualINCBindsRowBeforeCoefficientConstruction",
+            "TestPolynomialRegularAddMulActualFactoryReturnEveryPrefix",
+            "TestPolynomialRegularCreatedProductActualINCTransfersExactScope",
+            "TestPolynomialRegularCreatedProductGenericConsumptionAcknowledgesExactScope",
+            "TestPolynomialRegularFactoryReceiptBindsActualSourceBuffer",
+            "TestPolynomialRegularFailedNilSetterKeepsForeignPendingAndOldTags",
+            "TestPolynomialRegularLaterNilAccumulatorWriteTransfersActualRowToMember",
+            "TestPolynomialRegularMatchedRowsPreserveLaterForeignPositions",
+            "TestPolynomialRegularProductActualCalleeAcquisition",
+            "TestPolynomialRegularSetActualDefaultSlotNumericAcquisition",
+            "TestPolynomialRegularSourceZeroRemovalTransfersActualTags",
+            "TestPolynomialRegularStoppedPNPreservesActualRowsAndHistory",
+            "TestPolynomialRegularZeroAddMulPreservesUnreadInvocation",
+            "TestPolynomialScaleEarlyAliasesDoNotAcquireOlderRegularFrame"
+          ]
+        },
+        {
+          "name": "src/math/polynomial/polynomial.cpp:5114-5156 ExactDiv prelude before NUM/reference declarations, typed child source suffix and public own continuation",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_exact_div.go",
+          "tests": [
+            "TestExactDivNumericActualFrameAndImmutableContext",
+            "TestExactDivNumericLowerActualPrefixes",
+            "TestPolynomialExactDivActualNUMAcquisitionUsesDirectFrame",
+            "TestPolynomialExactDivCompletedSourceResetPermitsLiteralRetry",
+            "TestPolynomialExactDivPreludeActualRowsBeforeNUMDeclaration",
+            "TestPolynomialExactDivPublicOwnAcknowledgmentPermitsSameOwnerRetry",
+            "TestPolynomialExactDivYoungerPNSourceStopPreservesOlderNUMReference"
+          ]
         }
       ],
       "ownership": [
@@ -32626,7 +32837,10 @@
         "Explicit false acknowledgment preserves member rows/pending INC and factory placement; true after older NUM suffix drains only matched acquired append/factory roots. Known foreign rows and replacement constructors remain untouched.",
         "At successful final raw return all per-term NUM destructors are already complete. Exact completed-append preack preserves the constructed result if metadata acknowledgment stops; exact factory token handoff then transfers ownership to the caller without extra INC/source operation. Ordinary public IncRef/DecRef remains unchanged.",
         "Exact actual self/member/frame/nonwrapping creation invocation/executing/callback-zero binding at source allocation leaf. Existing pending-root observations only refuse unsafe cleanup or acknowledge consumption of previously captured identities; never acquire later replacement roots.",
-        "Actual lower-allocation executing frame cannot be retired by a reentrant Go ErrorTransport owning cleanup; original returned Pending outcome stays bound through actual refusal and later own abort. Early factoryCallerGuard refuses before public CleanupConstruction or manager.CloseChecked reaches older construction storage; private receipt cleanup independently refuses while executing."
+        "Actual lower-allocation executing frame cannot be retired by a reentrant Go ErrorTransport owning cleanup; original returned Pending outcome stays bound through actual refusal and later own abort. Early factoryCallerGuard refuses before public CleanupConstruction or manager.CloseChecked reaches older construction storage; private receipt cleanup independently refuses while executing.",
+        "Exact actual guarded Content owner/member/frame/nonwrapping immutable invocation; direct source allocation and actual pending-clear hooks only. Actual source child end/verification DT remains separate from false completed and true unjoined owning phases. Diagnostic child tuples survive own acknowledgment without numeric/root authority.",
+        "Actual self/embedded source buffer/frame/nonwrapping immutable invocation/executing/callback-zero identity; direct allocation leaves and actual default NUM/INC/push/factory handoff alone grant roots.",
+        "False acknowledges only completed younger child suffix; true retires exact unjoined acquisitions after caller older source declarations, preserving first cause and later foreign generation."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -32698,7 +32912,9 @@
         "Selected ordered cheap append retirement prerequisite only; regular SOM arithmetic wrappers, full Factor/Discriminant, registered driver and source unit completion remain open. Guard-only/malformed owner fixtures have no valid C++ mathematical failure credit. Successful validated clear-to-publish writes have no intervening source allocation/callback; no manufactured faultpoint or ordinary-prefix claim.",
         "Closes derivative actual cheap append/factory owning gap for existing concrete source profile. No ordinary Copy allocation is present on this take=true path. Interrupted direct-return metadata guard requires an existing real guarded state; no fabricated allocator/callback between source completed mk and handoff. Other regular SOM arithmetic wrappers, full Factor/Discriminant/source classes and dormant registered driver remain separate obligations; no unit promotion.",
         "Selected receipt leaf closure only. Signed-host TLS domain fixture is a public-operation guarded helper profile, not ordinary mathematical freeOOM. Bounds-to-ErrorTransport hypothesis was withdrawn after runtime.go:123-134/accounting.go:55-84,175-186 review. Other legacy parent observer snapshots, regular SOM wrappers, full Factor/Discriminant and whole source unit remain separately open; registered driver credit0.",
-        "ErrorTransport reentry is a supported Go helper callback profile; this proof does not invent a corresponding native C++ callback at malloc exception. Exact executing cleanup refuses ErrPolynomialPending. Original postphysical Pending token survived before fix, but its prematurely inactive receipt could not own-abort; real RED preserved. Additional actual public cleanup RED showed pending-generation mutation before late refusal; corrected early guard preserves original pending state, Runtime graph, cold charge and manager retirement stage in all three modes."
+        "ErrorTransport reentry is a supported Go helper callback profile; this proof does not invent a corresponding native C++ callback at malloc exception. Exact executing cleanup refuses ErrPolynomialPending. Original postphysical Pending token survived before fix, but its prematurely inactive receipt could not own-abort; real RED preserved. Additional actual public cleanup RED showed pending-generation mutation before late refusal; corrected early guard preserves original pending state, Runtime graph, cold charge and manager retirement stage in all three modes.",
+        "Selected concrete Content invocation closure only; unrelated polynomial parent/regular SOM/ExactDiv/Neg/Discriminant and whole unit remain partial. Signed-host TLS tests are guarded owner-primitive profiles, not ordinary mathematical free-OOM. No new registered C++ driver assertion credit.",
+        "Selected concrete supported source profiles only; no source-unit/API promotion or registered-driver assertion credit. Signed-host TLS/source pointer guards are explicit helper domains, not ordinary mathematical OOM reachability. Unselected scalar ExactDiv, full Factor/Discriminant and high-level shared-buffer callback reentry remain distinct obligations."
       ]
     },
     {
@@ -118422,7 +118638,15 @@
         "TestIntegerPublicRawOwnAfterSourceFinalize",
         "TestIntegerPublicRawUnpublishedCellOwnAfterSourceFinalize",
         "TestIntegerPublicRawRuntimeCallbackHasNoAmbientAcquisition",
-        "TestIntegerPublicRawContextNonceDoesNotFollowEmbeddedReceiptReuse"
+        "TestIntegerPublicRawContextNonceDoesNotFollowEmbeddedReceiptReuse",
+        "TestPolynomialContentBeforeAIActualGCDPrelude",
+        "TestPolynomialICCPShortcutBeforeAIActualContent",
+        "TestPolynomialContentPreludeActualFrameAndSavedContextGuards",
+        "TestPolynomialContentPreludeNilParentBufferGuard",
+        "TestPolynomialContentBeforeAIReachedGCDSourceStop",
+        "TestPolynomialContentConstantActualSETAllocation",
+        "TestPolynomialContentConstantPNSourceStopBeforeAbsentAI",
+        "TestPolynomialContentFieldActualBIGInverseChildren"
       ],
       "conditionals": [
         {
@@ -118902,6 +119126,15 @@
             "TestIntegerPublicRawRuntimeCallbackHasNoAmbientAcquisition",
             "TestIntegerPublicRawContextNonceDoesNotFollowEmbeddedReceiptReuse"
           ]
+        },
+        {
+          "name": "mpn.cpp:206-217 exact Content/raw-parent verification constructor, private buffer and source first-cause history; actual Natural pending publication fields remain direct.",
+          "status": "partial",
+          "go_target": "mpnum/mpn_source_verify.go",
+          "tests": [
+            "TestPolynomialContentConstantPNSourceStopBeforeAbsentAI",
+            "TestPolynomialContentFieldActualBIGInverseChildren"
+          ]
         }
       ],
       "ownership": [
@@ -118910,13 +119143,15 @@
         "Stable charged recursive display frames own actual numeral, character and MPN locals; actual sink callbacks borrow decimal views only during insertion. Younger stopped destructor preserves older locals; CleanupDisplay uses exact physical tokens and leaves foreign/replacement roots intact.",
         "Exact actual manager/frame/nonzero invocation generation and named allocation/buffer token only; no registry/refcount/high-level snapshot authority. Shared successful publication remains member owned. Source DT cause remains sticky across explicit owning acknowledgement until actual new invocation.",
         "Actual scalar core/embedded frame/nonwrapping invocation plus exact Integer/Modular receiver and executing callback-depth guard. Allocation capture/clear occurs only at actual existing integer, allocator and named Natural buffer leaves. Actual embedded RAW child and private buffer addresses reject copied owners. Successful persistent Inv/Natural publication stays member-owned; inactive same-invocation diagnostic history carries no numeric authority.",
-        "Actual self/embedded frame/nonwrapping invocation validation before NUM/source reads; count marks actual one or four-to-six RAW declarations. Concrete receipt lives in charged Integer frame, not a heap temporary. Direct numeric acquisition and exact Natural member/private verification buffer binding; no snapshot or registry ownership. Published shared scratch remains member-owned. Runtime callbacks public empty-context acquisitions excluded, active same-frame public reentry refused. Source-finalize owning continuation uses exact named retained fields/captured pending cell only (mpz.h:124-149; mpz.cpp:142-161)."
+        "Actual self/embedded frame/nonwrapping invocation validation before NUM/source reads; count marks actual one or four-to-six RAW declarations. Concrete receipt lives in charged Integer frame, not a heap temporary. Direct numeric acquisition and exact Natural member/private verification buffer binding; no snapshot or registry ownership. Published shared scratch remains member-owned. Runtime callbacks public empty-context acquisitions excluded, active same-frame public reentry refused. Source-finalize owning continuation uses exact named retained fields/captured pending cell only (mpz.h:124-149; mpz.cpp:142-161).",
+        "Exact actual guarded Content owner/member/frame/nonwrapping immutable invocation; direct source allocation and actual pending-clear hooks only. Actual source child end/verification DT remains separate from false completed and true unjoined owning phases. Diagnostic child tuples survive own acknowledgment without numeric/root authority."
       ],
       "deviations": [
         "Go guards actual endangered reads/writes and retained lexical-holder reuse without blocking source paths that never reach those holders. Algorithm D allocates add-back storage only at the source borrow branch. Runtime owns real source allocations and initialized-byte state; no Words shadows represent limb scratch. Final escaped Go strings are caller-owned. Exact character-buffer/output lifetime, broader public source span domains, diagnostic transport, architecture profiles and OMP/global integration remain separate obligations.",
         "Source char bytes use physical capacity/initialization independently of POS and unsigned11*size wrap. Selected non-Windows digit32 snprintf lbuf0/truncation and multi-limb ignored-lbuf behavior execute. Windows sprintf_s constraint handler, GMP/digit64, global/locale/ostream and literal std::string temporary allocation/evaluation remain open. No whole-unit or registered assertion completion is claimed.",
         "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open.",
-        "Public/nil negative Div and ExtendedGCD now use the same literal engines with real IntegerManager RAW frames (mpz.h:468-485; mpz.cpp:915-985). Failed bodies retain reached declarations; successful bodies propagate strict end-DEL errors. Immutable source cause remains across exact owning acknowledgment until new guarded invocation. End-DEL Bounds proof is the real signed-host TLS guard domain, not ordinary mathematical OOM; checked diagnostic/verification failures remain literal failed-body prefixes. AddMul/SubMul public eager failure cleanup remains explicitly open. Shared polynomial cohorts, full Discriminant/Factor and whole source units remain partial; no original driver assertion credit added."
+        "Public/nil negative Div and ExtendedGCD now use the same literal engines with real IntegerManager RAW frames (mpz.h:468-485; mpz.cpp:915-985). Failed bodies retain reached declarations; successful bodies propagate strict end-DEL errors. Immutable source cause remains across exact owning acknowledgment until new guarded invocation. End-DEL Bounds proof is the real signed-host TLS guard domain, not ordinary mathematical OOM; checked diagnostic/verification failures remain literal failed-body prefixes. AddMul/SubMul public eager failure cleanup remains explicitly open. Shared polynomial cohorts, full Discriminant/Factor and whole source units remain partial; no original driver assertion credit added.",
+        "Selected concrete Content invocation closure only; unrelated polynomial parent/regular SOM/ExactDiv/Neg/Discriminant and whole unit remain partial. Signed-host TLS tests are guarded owner-primitive profiles, not ordinary mathematical free-OOM. No new registered C++ driver assertion credit."
       ]
     },
     {
@@ -121529,7 +121764,8 @@
         "mpnum/integer_addmul_invocation.go",
         "mpnum/integer_gcd_raw_source_test.go",
         "mpnum/integer_raw_owner_reentry_source_test.go",
-        "mpnum/integer_public_addsubmul_raw_source_test.go"
+        "mpnum/integer_public_addsubmul_raw_source_test.go",
+        "mpnum/polynomial_content_allocation_context.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -121793,7 +122029,15 @@
         "TestIntegerRawExecutingOwnerRefusesFinalizeAndClose",
         "TestIntegerPublicAddSubMulRetainsReachedRAWTemporary",
         "TestIntegerPublicAddSubMulEndDELAfterOutput",
-        "TestIntegerPublicAddSubMulOwnAckDoesNotRepairSourceScratchHole"
+        "TestIntegerPublicAddSubMulOwnAckDoesNotRepairSourceScratchHole",
+        "TestPolynomialContentBeforeAIActualGCDPrelude",
+        "TestPolynomialICCPShortcutBeforeAIActualContent",
+        "TestPolynomialContentPreludeActualFrameAndSavedContextGuards",
+        "TestPolynomialContentPreludeNilParentBufferGuard",
+        "TestPolynomialContentBeforeAIReachedGCDSourceStop",
+        "TestPolynomialContentConstantActualSETAllocation",
+        "TestPolynomialContentConstantPNSourceStopBeforeAbsentAI",
+        "TestPolynomialContentFieldActualBIGInverseChildren"
       ],
       "conditionals": [
         {
@@ -123607,6 +123851,21 @@
             "TestIntegerPublicAddSubMulOwnAckDoesNotRepairSourceScratchHole",
             "TestIntegerRawExecutingOwnerRefusesFinalizeAndClose"
           ]
+        },
+        {
+          "name": "mpz.cpp:730-817,845-922,924-985 actual Content GCD/array GCD/ExtendedGCD direct invocation transport; source arithmetic and end-only RAW DEL unchanged.",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_content_allocation_context.go",
+          "tests": [
+            "TestPolynomialContentBeforeAIActualGCDPrelude",
+            "TestPolynomialICCPShortcutBeforeAIActualContent",
+            "TestPolynomialContentPreludeActualFrameAndSavedContextGuards",
+            "TestPolynomialContentPreludeNilParentBufferGuard",
+            "TestPolynomialContentBeforeAIReachedGCDSourceStop",
+            "TestPolynomialContentConstantActualSETAllocation",
+            "TestPolynomialContentConstantPNSourceStopBeforeAbsentAI",
+            "TestPolynomialContentFieldActualBIGInverseChildren"
+          ]
         }
       ],
       "ownership": [
@@ -123637,7 +123896,8 @@
         "Actual manager/embedded frame/nonzero unique invocation and allocator/cell acquisition/clear only; MUL temporary child authority distinct from ADD caller-output authority. Sticky reached end DEL preserved through exact owning acknowledgement. No high-level differences, cache sweeping, repaired scratch holes or parent completion.",
         "Actual scalar core/embedded frame/nonwrapping invocation plus exact Integer/Modular receiver and executing callback-depth guard. Allocation capture/clear occurs only at actual existing integer, allocator and named Natural buffer leaves. Actual embedded RAW child and private buffer addresses reject copied owners. Successful persistent Inv/Natural publication stays member-owned; inactive same-invocation diagnostic history carries no numeric authority.",
         "Actual self/embedded frame/nonwrapping invocation validation before NUM/source reads; count marks actual one or four-to-six RAW declarations. Concrete receipt lives in charged Integer frame, not a heap temporary. Direct numeric acquisition and exact Natural member/private verification buffer binding; no snapshot or registry ownership. Published shared scratch remains member-owned. Runtime callbacks public empty-context acquisitions excluded, active same-frame public reentry refused. Source-finalize owning continuation uses exact named retained fields/captured pending cell only (mpz.h:124-149; mpz.cpp:142-161).",
-        "Actual Integer self/embedded gcdRaw frame/nonwrapping invocation; source mpz.cpp:730-817 RAW a1,b1,t,r,tmp is retained on failed bodies and explicit DEL order is a1,b1,r,t,tmp only after completed output. Real AddMul TMP allocation belongs to the exact child, ADD caller allocation belongs to the explicitly passed RAW parent; immutable captured child nonce rejects embedded receipt reuse. Actual lower allocation/publication and Natural bindings provide authority; no snapshots or registry/refcount inference. Source first release cause survives own acknowledgment until actual new invocation; source-finalize owning continuation names exact retained fields and matched child TMP."
+        "Actual Integer self/embedded gcdRaw frame/nonwrapping invocation; source mpz.cpp:730-817 RAW a1,b1,t,r,tmp is retained on failed bodies and explicit DEL order is a1,b1,r,t,tmp only after completed output. Real AddMul TMP allocation belongs to the exact child, ADD caller allocation belongs to the explicitly passed RAW parent; immutable captured child nonce rejects embedded receipt reuse. Actual lower allocation/publication and Natural bindings provide authority; no snapshots or registry/refcount inference. Source first release cause survives own acknowledgment until actual new invocation; source-finalize owning continuation names exact retained fields and matched child TMP.",
+        "Exact actual guarded Content owner/member/frame/nonwrapping immutable invocation; direct source allocation and actual pending-clear hooks only. Actual source child end/verification DT remains separate from false completed and true unjoined owning phases. Diagnostic child tuples survive own acknowledgment without numeric/root authority."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -123666,7 +123926,8 @@
         "Public/nil negative Div and ExtendedGCD now use the same literal engines with real IntegerManager RAW frames (mpz.h:468-485; mpz.cpp:915-985). Failed bodies retain reached declarations; successful bodies propagate strict end-DEL errors. Immutable source cause remains across exact owning acknowledgment until new guarded invocation. End-DEL Bounds proof is the real signed-host TLS guard domain, not ordinary mathematical OOM; checked diagnostic/verification failures remain literal failed-body prefixes. Public AddMul/SubMul failed-body owning continuation is now completed separately by the shared literal engine. Shared polynomial cohorts, full Discriminant/Factor and whole source units remain partial; no original driver assertion credit added.",
         "Selected scalar Lehmer lifetime now uses one literal GCD engine with concrete RAW/direct acquisition and reached end-DEL error propagation (mpz.cpp:560-817; mpz.h:632). Public AddMul/SubMul and the two reached internal Lehmer AddMul calls share the actual source-owned child engine (mpz.h:393-426); public failure and strict end-DEL prefixes now have exact owning acknowledgment. Signed-host TLS end-release proof is a guarded source domain, not ordinary mathematical OOM. Actual failed-body shared scratch holes remain guarded and are never repaired; source-finalize proof records the real destructor guard before separate exact owning cleanup. No Content/ICCP/Discriminant/regular-SOM/whole-unit promotion or original assertion credit.",
         "Returning Go allocation-error transport cannot destroy an executing Integer RAW owner: SourceFinalize and CloseChecked refuse before mutating source/own cleanup state. Actual GCD callback counterfactual REDs cover early source destruction and late owning refusal mutation; immediate named physical/cold graph, exact failed RAW acknowledgment and same-input successful retry are proved. This is an explicit guarded Go callback domain, not native defined destructor reentry; selected source mpz.cpp:730-817 and whole unit remain partial.",
-        "Actual cold scratch free-before-replacement and result publication swap can leave a guarded shared tmp hole after allocation refusal. CleanupAddMulRaw never repairs this native-invalid pointer domain; retry remains ErrInvalidSlot. Signed-host TLS end-DEL stop proof is a guard-domain fixture, not ordinary mathematical OOM. Real returning Go failure transport refuses owner destruction while any RAW/AddMul child executes before mutation. Other backends/native ABI/global assertions and whole source unit remain partial; no original driver assertion or API credit."
+        "Actual cold scratch free-before-replacement and result publication swap can leave a guarded shared tmp hole after allocation refusal. CleanupAddMulRaw never repairs this native-invalid pointer domain; retry remains ErrInvalidSlot. Signed-host TLS end-DEL stop proof is a guard-domain fixture, not ordinary mathematical OOM. Real returning Go failure transport refuses owner destruction while any RAW/AddMul child executes before mutation. Other backends/native ABI/global assertions and whole source unit remain partial; no original driver assertion or API credit.",
+        "Selected concrete Content invocation closure only; unrelated polynomial parent/regular SOM/ExactDiv/Neg/Discriminant and whole unit remain partial. Signed-host TLS tests are guarded owner-primitive profiles, not ordinary mathematical free-OOM. No new registered C++ driver assertion credit."
       ]
     },
     {
@@ -123974,7 +124235,44 @@
         "TestIntegerRawExecutingOwnerRefusesFinalizeAndClose",
         "TestIntegerPublicAddSubMulRetainsReachedRAWTemporary",
         "TestIntegerPublicAddSubMulEndDELAfterOutput",
-        "TestIntegerPublicAddSubMulOwnAckDoesNotRepairSourceScratchHole"
+        "TestIntegerPublicAddSubMulOwnAckDoesNotRepairSourceScratchHole",
+        "TestPolynomialContentBeforeAIActualGCDPrelude",
+        "TestPolynomialICCPShortcutBeforeAIActualContent",
+        "TestPolynomialContentPreludeActualFrameAndSavedContextGuards",
+        "TestPolynomialContentPreludeNilParentBufferGuard",
+        "TestPolynomialContentBeforeAIReachedGCDSourceStop",
+        "TestPolynomialContentConstantActualSETAllocation",
+        "TestPolynomialContentConstantPNSourceStopBeforeAbsentAI",
+        "TestPolynomialContentFieldActualBIGInverseChildren",
+        "TestExactDivNumericActualFrameAndImmutableContext",
+        "TestExactDivNumericLowerActualPrefixes",
+        "TestPolynomialArithmeticContextKeepsCapturedInvocationAcrossReceiptReuse",
+        "TestPolynomialArithmeticGuardedEmptySourceBufferAcquisition",
+        "TestPolynomialArithmeticReceiptRejectsForeignModularReceiver",
+        "TestPolynomialArithmeticSourceWrappersEveryActualPrefix",
+        "TestPolynomialArithmeticWrappersUseActualReturnedReceipt",
+        "TestPolynomialConstantAllocationTransportCannotRetireExecutingFrame",
+        "TestPolynomialConstantYoungerPNStopPreservesOlderNUMSuffix",
+        "TestPolynomialExactDivActualNUMAcquisitionUsesDirectFrame",
+        "TestPolynomialExactDivCompletedSourceResetPermitsLiteralRetry",
+        "TestPolynomialExactDivPreludeActualRowsBeforeNUMDeclaration",
+        "TestPolynomialExactDivPublicOwnAcknowledgmentPermitsSameOwnerRetry",
+        "TestPolynomialExactDivYoungerPNSourceStopPreservesOlderNUMReference",
+        "TestPolynomialMulAddConstantShortcutActualAcquisitionsPreserveOlderRegular",
+        "TestPolynomialRegularActualINCBindsRowBeforeCoefficientConstruction",
+        "TestPolynomialRegularAddMulActualFactoryReturnEveryPrefix",
+        "TestPolynomialRegularCreatedProductActualINCTransfersExactScope",
+        "TestPolynomialRegularCreatedProductGenericConsumptionAcknowledgesExactScope",
+        "TestPolynomialRegularFactoryReceiptBindsActualSourceBuffer",
+        "TestPolynomialRegularFailedNilSetterKeepsForeignPendingAndOldTags",
+        "TestPolynomialRegularLaterNilAccumulatorWriteTransfersActualRowToMember",
+        "TestPolynomialRegularMatchedRowsPreserveLaterForeignPositions",
+        "TestPolynomialRegularProductActualCalleeAcquisition",
+        "TestPolynomialRegularSetActualDefaultSlotNumericAcquisition",
+        "TestPolynomialRegularSourceZeroRemovalTransfersActualTags",
+        "TestPolynomialRegularStoppedPNPreservesActualRowsAndHistory",
+        "TestPolynomialRegularZeroAddMulPreservesUnreadInvocation",
+        "TestPolynomialScaleEarlyAliasesDoNotAcquireOlderRegularFrame"
       ],
       "conditionals": [
         {
@@ -125314,6 +125612,50 @@
             "TestIntegerPublicAddSubMulOwnAckDoesNotRepairSourceScratchHole",
             "TestIntegerRawExecutingOwnerRefusesFinalizeAndClose"
           ]
+        },
+        {
+          "name": "mpz.h:467-481 actual Content negative division child begins at reached RAW constructor with explicit parent context; no body-failure end DEL.",
+          "status": "partial",
+          "go_target": "mpnum/mpz_div.go",
+          "tests": [
+            "TestPolynomialContentFieldActualBIGInverseChildren"
+          ]
+        },
+        {
+          "name": "src/util/mpz.h:124-149,156-162,393-407,468-485 direct immutable invocation contexts at actual NUM/raw acquisition leaves",
+          "status": "partial",
+          "go_target": "mpnum/integer_allocation_invocation_context.go",
+          "tests": [
+            "TestPolynomialArithmeticContextKeepsCapturedInvocationAcrossReceiptReuse",
+            "TestPolynomialArithmeticGuardedEmptySourceBufferAcquisition",
+            "TestPolynomialArithmeticReceiptRejectsForeignModularReceiver",
+            "TestPolynomialArithmeticSourceWrappersEveryActualPrefix",
+            "TestPolynomialArithmeticWrappersUseActualReturnedReceipt",
+            "TestPolynomialConstantAllocationTransportCannotRetireExecutingFrame",
+            "TestPolynomialConstantYoungerPNStopPreservesOlderNUMSuffix",
+            "TestPolynomialMulAddConstantShortcutActualAcquisitionsPreserveOlderRegular",
+            "TestPolynomialRegularActualINCBindsRowBeforeCoefficientConstruction",
+            "TestPolynomialRegularAddMulActualFactoryReturnEveryPrefix",
+            "TestPolynomialRegularCreatedProductActualINCTransfersExactScope",
+            "TestPolynomialRegularCreatedProductGenericConsumptionAcknowledgesExactScope",
+            "TestPolynomialRegularFactoryReceiptBindsActualSourceBuffer",
+            "TestPolynomialRegularFailedNilSetterKeepsForeignPendingAndOldTags",
+            "TestPolynomialRegularLaterNilAccumulatorWriteTransfersActualRowToMember",
+            "TestPolynomialRegularMatchedRowsPreserveLaterForeignPositions",
+            "TestPolynomialRegularProductActualCalleeAcquisition",
+            "TestPolynomialRegularSetActualDefaultSlotNumericAcquisition",
+            "TestPolynomialRegularSourceZeroRemovalTransfersActualTags",
+            "TestPolynomialRegularStoppedPNPreservesActualRowsAndHistory",
+            "TestPolynomialRegularZeroAddMulPreservesUnreadInvocation",
+            "TestPolynomialScaleEarlyAliasesDoNotAcquireOlderRegularFrame",
+            "TestExactDivNumericActualFrameAndImmutableContext",
+            "TestExactDivNumericLowerActualPrefixes",
+            "TestPolynomialExactDivActualNUMAcquisitionUsesDirectFrame",
+            "TestPolynomialExactDivCompletedSourceResetPermitsLiteralRetry",
+            "TestPolynomialExactDivPreludeActualRowsBeforeNUMDeclaration",
+            "TestPolynomialExactDivPublicOwnAcknowledgmentPermitsSameOwnerRetry",
+            "TestPolynomialExactDivYoungerPNSourceStopPreservesOlderNUMReference"
+          ]
         }
       ],
       "ownership": [
@@ -125341,7 +125683,10 @@
         "Actual manager/embedded frame/nonzero unique invocation and allocator/cell acquisition/clear only; MUL temporary child authority distinct from ADD caller-output authority. Sticky reached end DEL preserved through exact owning acknowledgement. No high-level differences, cache sweeping, repaired scratch holes or parent completion.",
         "Actual scalar core/embedded frame/nonwrapping invocation plus exact Integer/Modular receiver and executing callback-depth guard. Allocation capture/clear occurs only at actual existing integer, allocator and named Natural buffer leaves. Actual embedded RAW child and private buffer addresses reject copied owners. Successful persistent Inv/Natural publication stays member-owned; inactive same-invocation diagnostic history carries no numeric authority.",
         "Actual self/embedded frame/nonwrapping invocation validation before NUM/source reads; count marks actual one or four-to-six RAW declarations. Concrete receipt lives in charged Integer frame, not a heap temporary. Direct numeric acquisition and exact Natural member/private verification buffer binding; no snapshot or registry ownership. Published shared scratch remains member-owned. Runtime callbacks public empty-context acquisitions excluded, active same-frame public reentry refused. Source-finalize owning continuation uses exact named retained fields/captured pending cell only (mpz.h:124-149; mpz.cpp:142-161).",
-        "Actual Integer self/embedded gcdRaw frame/nonwrapping invocation; source mpz.cpp:730-817 RAW a1,b1,t,r,tmp is retained on failed bodies and explicit DEL order is a1,b1,r,t,tmp only after completed output. Real AddMul TMP allocation belongs to the exact child, ADD caller allocation belongs to the explicitly passed RAW parent; immutable captured child nonce rejects embedded receipt reuse. Actual lower allocation/publication and Natural bindings provide authority; no snapshots or registry/refcount inference. Source first release cause survives own acknowledgment until actual new invocation; source-finalize owning continuation names exact retained fields and matched child TMP."
+        "Actual Integer self/embedded gcdRaw frame/nonwrapping invocation; source mpz.cpp:730-817 RAW a1,b1,t,r,tmp is retained on failed bodies and explicit DEL order is a1,b1,r,t,tmp only after completed output. Real AddMul TMP allocation belongs to the exact child, ADD caller allocation belongs to the explicitly passed RAW parent; immutable captured child nonce rejects embedded receipt reuse. Actual lower allocation/publication and Natural bindings provide authority; no snapshots or registry/refcount inference. Source first release cause survives own acknowledgment until actual new invocation; source-finalize owning continuation names exact retained fields and matched child TMP.",
+        "Exact actual guarded Content owner/member/frame/nonwrapping immutable invocation; direct source allocation and actual pending-clear hooks only. Actual source child end/verification DT remains separate from false completed and true unjoined owning phases. Diagnostic child tuples survive own acknowledgment without numeric/root authority.",
+        "Actual self/embedded source buffer/frame/nonwrapping immutable invocation/executing/callback-zero identity; direct allocation leaves and actual default NUM/INC/push/factory handoff alone grant roots.",
+        "False acknowledges only completed younger child suffix; true retires exact unjoined acquisitions after caller older source declarations, preserving first cause and later foreign generation."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -125367,7 +125712,9 @@
         "Public/nil negative Div and ExtendedGCD now use the same literal engines with real IntegerManager RAW frames (mpz.h:468-485; mpz.cpp:915-985). Failed bodies retain reached declarations; successful bodies propagate strict end-DEL errors. Immutable source cause remains across exact owning acknowledgment until new guarded invocation. End-DEL Bounds proof is the real signed-host TLS guard domain, not ordinary mathematical OOM; checked diagnostic/verification failures remain literal failed-body prefixes. Public AddMul/SubMul failed-body owning continuation is now completed separately by the shared literal engine. Shared polynomial cohorts, full Discriminant/Factor and whole source units remain partial; no original driver assertion credit added.",
         "Selected scalar Lehmer lifetime now uses one literal GCD engine with concrete RAW/direct acquisition and reached end-DEL error propagation (mpz.cpp:560-817; mpz.h:632). Public AddMul/SubMul and the two reached internal Lehmer AddMul calls share the actual source-owned child engine (mpz.h:393-426); public failure and strict end-DEL prefixes now have exact owning acknowledgment. Signed-host TLS end-release proof is a guarded source domain, not ordinary mathematical OOM. Actual failed-body shared scratch holes remain guarded and are never repaired; source-finalize proof records the real destructor guard before separate exact owning cleanup. No Content/ICCP/Discriminant/regular-SOM/whole-unit promotion or original assertion credit.",
         "Returning Go allocation-error transport cannot destroy an executing Integer RAW owner: SourceFinalize and CloseChecked refuse before mutating source/own cleanup state. Actual GCD callback counterfactual REDs cover early source destruction and late owning refusal mutation; immediate named physical/cold graph, exact failed RAW acknowledgment and same-input successful retry are proved. This is an explicit guarded Go callback domain, not native defined destructor reentry; selected source mpz.cpp:730-817 and whole unit remain partial.",
-        "Actual cold scratch free-before-replacement and result publication swap can leave a guarded shared tmp hole after allocation refusal. CleanupAddMulRaw never repairs this native-invalid pointer domain; retry remains ErrInvalidSlot. Signed-host TLS end-DEL stop proof is a guard-domain fixture, not ordinary mathematical OOM. Real returning Go failure transport refuses owner destruction while any RAW/AddMul child executes before mutation. Other backends/native ABI/global assertions and whole source unit remain partial; no original driver assertion or API credit."
+        "Actual cold scratch free-before-replacement and result publication swap can leave a guarded shared tmp hole after allocation refusal. CleanupAddMulRaw never repairs this native-invalid pointer domain; retry remains ErrInvalidSlot. Signed-host TLS end-DEL stop proof is a guard-domain fixture, not ordinary mathematical OOM. Real returning Go failure transport refuses owner destruction while any RAW/AddMul child executes before mutation. Other backends/native ABI/global assertions and whole source unit remain partial; no original driver assertion or API credit.",
+        "Selected concrete Content invocation closure only; unrelated polynomial parent/regular SOM/ExactDiv/Neg/Discriminant and whole unit remain partial. Signed-host TLS tests are guarded owner-primitive profiles, not ordinary mathematical free-OOM. No new registered C++ driver assertion credit.",
+        "Selected concrete supported source profiles only; no source-unit/API promotion or registered-driver assertion credit. Signed-host TLS/source pointer guards are explicit helper domains, not ordinary mathematical OOM reachability. Unselected scalar ExactDiv, full Factor/Discriminant and high-level shared-buffer callback reentry remain distinct obligations."
       ]
     },
     {
@@ -125387,7 +125734,9 @@
         "mpnum/mpz_power_scope.go",
         "mpnum/mpzzp_normalize_allocation_receipt.go",
         "mpnum/polynomial_scalar_div_allocation_context.go",
-        "mpnum/polynomial_derivative_allocation_context.go"
+        "mpnum/polynomial_derivative_allocation_context.go",
+        "mpnum/polynomial_content_allocation_context.go",
+        "mpnum/polynomial_exact_div_allocation_context.go"
       ],
       "tests": [
         "TestIntegerModularCenteredOracle",
@@ -125414,7 +125763,44 @@
         "TestScalarDivDirectNumericNilContextSourceMath",
         "TestScalarDivDirectBigActualAllocationPrefixes",
         "TestScalarDivDirectCopiedRawChildRefusesWithoutMutation",
-        "TestScalarDivDirectStoppedReturnedCauseSurvivesOwnAndNewInvocation"
+        "TestScalarDivDirectStoppedReturnedCauseSurvivesOwnAndNewInvocation",
+        "TestPolynomialContentBeforeAIActualGCDPrelude",
+        "TestPolynomialICCPShortcutBeforeAIActualContent",
+        "TestPolynomialContentPreludeActualFrameAndSavedContextGuards",
+        "TestPolynomialContentPreludeNilParentBufferGuard",
+        "TestPolynomialContentBeforeAIReachedGCDSourceStop",
+        "TestPolynomialContentConstantActualSETAllocation",
+        "TestPolynomialContentConstantPNSourceStopBeforeAbsentAI",
+        "TestPolynomialContentFieldActualBIGInverseChildren",
+        "TestExactDivNumericActualFrameAndImmutableContext",
+        "TestExactDivNumericLowerActualPrefixes",
+        "TestPolynomialArithmeticContextKeepsCapturedInvocationAcrossReceiptReuse",
+        "TestPolynomialArithmeticGuardedEmptySourceBufferAcquisition",
+        "TestPolynomialArithmeticReceiptRejectsForeignModularReceiver",
+        "TestPolynomialArithmeticSourceWrappersEveryActualPrefix",
+        "TestPolynomialArithmeticWrappersUseActualReturnedReceipt",
+        "TestPolynomialConstantAllocationTransportCannotRetireExecutingFrame",
+        "TestPolynomialConstantYoungerPNStopPreservesOlderNUMSuffix",
+        "TestPolynomialExactDivActualNUMAcquisitionUsesDirectFrame",
+        "TestPolynomialExactDivCompletedSourceResetPermitsLiteralRetry",
+        "TestPolynomialExactDivPreludeActualRowsBeforeNUMDeclaration",
+        "TestPolynomialExactDivPublicOwnAcknowledgmentPermitsSameOwnerRetry",
+        "TestPolynomialExactDivYoungerPNSourceStopPreservesOlderNUMReference",
+        "TestPolynomialMulAddConstantShortcutActualAcquisitionsPreserveOlderRegular",
+        "TestPolynomialRegularActualINCBindsRowBeforeCoefficientConstruction",
+        "TestPolynomialRegularAddMulActualFactoryReturnEveryPrefix",
+        "TestPolynomialRegularCreatedProductActualINCTransfersExactScope",
+        "TestPolynomialRegularCreatedProductGenericConsumptionAcknowledgesExactScope",
+        "TestPolynomialRegularFactoryReceiptBindsActualSourceBuffer",
+        "TestPolynomialRegularFailedNilSetterKeepsForeignPendingAndOldTags",
+        "TestPolynomialRegularLaterNilAccumulatorWriteTransfersActualRowToMember",
+        "TestPolynomialRegularMatchedRowsPreserveLaterForeignPositions",
+        "TestPolynomialRegularProductActualCalleeAcquisition",
+        "TestPolynomialRegularSetActualDefaultSlotNumericAcquisition",
+        "TestPolynomialRegularSourceZeroRemovalTransfersActualTags",
+        "TestPolynomialRegularStoppedPNPreservesActualRowsAndHistory",
+        "TestPolynomialRegularZeroAddMulPreservesUnreadInvocation",
+        "TestPolynomialScaleEarlyAliasesDoNotAcquireOlderRegularFrame"
       ],
       "conditionals": [
         {
@@ -125710,6 +126096,64 @@
             "TestScalarDivDirectCopiedRawChildRefusesWithoutMutation",
             "TestScalarDivDirectStoppedReturnedCauseSurvivesOwnAndNewInvocation"
           ]
+        },
+        {
+          "name": "mpzzp.h:58-68,111-114,217-220 actual Content modular receiver, Copy/PN/GCDMany/Div context and immutable invocation binding.",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_content_allocation_context.go",
+          "tests": [
+            "TestPolynomialContentBeforeAIActualGCDPrelude",
+            "TestPolynomialICCPShortcutBeforeAIActualContent",
+            "TestPolynomialContentPreludeActualFrameAndSavedContextGuards",
+            "TestPolynomialContentPreludeNilParentBufferGuard",
+            "TestPolynomialContentBeforeAIReachedGCDSourceStop",
+            "TestPolynomialContentConstantActualSETAllocation",
+            "TestPolynomialContentConstantPNSourceStopBeforeAbsentAI",
+            "TestPolynomialContentFieldActualBIGInverseChildren"
+          ]
+        },
+        {
+          "name": "src/util/mpzzp.h:58-68,154,167-185,230-233 same scalar SET/ADD/MUL/ADDMUL with exact arithmetic receiver and direct child allocation",
+          "status": "partial",
+          "go_target": "mpnum/mpzzp_ops.go",
+          "tests": [
+            "TestPolynomialArithmeticContextKeepsCapturedInvocationAcrossReceiptReuse",
+            "TestPolynomialArithmeticGuardedEmptySourceBufferAcquisition",
+            "TestPolynomialArithmeticReceiptRejectsForeignModularReceiver",
+            "TestPolynomialArithmeticSourceWrappersEveryActualPrefix",
+            "TestPolynomialArithmeticWrappersUseActualReturnedReceipt",
+            "TestPolynomialConstantAllocationTransportCannotRetireExecutingFrame",
+            "TestPolynomialConstantYoungerPNStopPreservesOlderNUMSuffix",
+            "TestPolynomialMulAddConstantShortcutActualAcquisitionsPreserveOlderRegular",
+            "TestPolynomialRegularActualINCBindsRowBeforeCoefficientConstruction",
+            "TestPolynomialRegularAddMulActualFactoryReturnEveryPrefix",
+            "TestPolynomialRegularCreatedProductActualINCTransfersExactScope",
+            "TestPolynomialRegularCreatedProductGenericConsumptionAcknowledgesExactScope",
+            "TestPolynomialRegularFactoryReceiptBindsActualSourceBuffer",
+            "TestPolynomialRegularFailedNilSetterKeepsForeignPendingAndOldTags",
+            "TestPolynomialRegularLaterNilAccumulatorWriteTransfersActualRowToMember",
+            "TestPolynomialRegularMatchedRowsPreserveLaterForeignPositions",
+            "TestPolynomialRegularProductActualCalleeAcquisition",
+            "TestPolynomialRegularSetActualDefaultSlotNumericAcquisition",
+            "TestPolynomialRegularSourceZeroRemovalTransfersActualTags",
+            "TestPolynomialRegularStoppedPNPreservesActualRowsAndHistory",
+            "TestPolynomialRegularZeroAddMulPreservesUnreadInvocation",
+            "TestPolynomialScaleEarlyAliasesDoNotAcquireOlderRegularFrame"
+          ]
+        },
+        {
+          "name": "src/util/mpzzp.h:167-185,208-233 ExactDiv same Div/Neg and actual PN/RAW/Natural children",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_exact_div_allocation_context.go",
+          "tests": [
+            "TestExactDivNumericActualFrameAndImmutableContext",
+            "TestExactDivNumericLowerActualPrefixes",
+            "TestPolynomialExactDivActualNUMAcquisitionUsesDirectFrame",
+            "TestPolynomialExactDivCompletedSourceResetPermitsLiteralRetry",
+            "TestPolynomialExactDivPreludeActualRowsBeforeNUMDeclaration",
+            "TestPolynomialExactDivPublicOwnAcknowledgmentPermitsSameOwnerRetry",
+            "TestPolynomialExactDivYoungerPNSourceStopPreservesOlderNUMReference"
+          ]
         }
       ],
       "ownership": [
@@ -125717,13 +126161,18 @@
         "Actual real foreign Runtime coefficient RED89453 led to reached-only owner check; empty borrowed view is unread. No owning numeral-array copy or generic storage introduced.",
         "Exact actual manager/frame/nonzero invocation generation and named allocation/buffer token only; no registry/refcount/high-level snapshot authority. Shared successful publication remains member owned. Source DT cause remains sticky across explicit owning acknowledgement until actual new invocation.",
         "Actual manager/embedded frame/nonzero unique invocation and allocator/cell acquisition/clear only; MUL temporary child authority distinct from ADD caller-output authority. Sticky reached end DEL preserved through exact owning acknowledgement. No high-level differences, cache sweeping, repaired scratch holes or parent completion.",
-        "Actual scalar core/embedded frame/nonwrapping invocation plus exact Integer/Modular receiver and executing callback-depth guard. Allocation capture/clear occurs only at actual existing integer, allocator and named Natural buffer leaves. Actual embedded RAW child and private buffer addresses reject copied owners. Successful persistent Inv/Natural publication stays member-owned; inactive same-invocation diagnostic history carries no numeric authority."
+        "Actual scalar core/embedded frame/nonwrapping invocation plus exact Integer/Modular receiver and executing callback-depth guard. Allocation capture/clear occurs only at actual existing integer, allocator and named Natural buffer leaves. Actual embedded RAW child and private buffer addresses reject copied owners. Successful persistent Inv/Natural publication stays member-owned; inactive same-invocation diagnostic history carries no numeric authority.",
+        "Exact actual guarded Content owner/member/frame/nonwrapping immutable invocation; direct source allocation and actual pending-clear hooks only. Actual source child end/verification DT remains separate from false completed and true unjoined owning phases. Diagnostic child tuples survive own acknowledgment without numeric/root authority.",
+        "Actual self/embedded source buffer/frame/nonwrapping immutable invocation/executing/callback-zero identity; direct allocation leaves and actual default NUM/INC/push/factory handoff alone grant roots.",
+        "False acknowledges only completed younger child suffix; true retires exact unjoined acquisitions after caller older source declarations, preserving first cause and later foreign generation."
       ],
       "deviations": [
         "Source modulus constructors leave prime flag indeterminate; typed guard only actual read, not invented release Div precondition. Source Power maskwrap nontermination diagnosed after completed actions; deferred local/constructor cleanup is safe Go ownership adaptation, not claimed raw MPZ exception destructor. Source TRACE/unsupported/undefined and full consumer algorithms remain open. See PORT_PROGRESS.md#audit-mpzzp-port-status-md.",
         "Selected array-view prerequisite; broader integer/modular source audits remain partial.",
         "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open.",
-        "mpzzp.h:167-185,195-208 selected ScalarDiv transport prerequisite only: public/nil Integer negative Div and ExtendedGCD still eagerly delete RAW locals on failed bodies and remain incomplete. Shared mixed cohort ordered retirement and full Discriminant/Factor parents remain open. Native real signed-TLS guard reaches caller NUM DT; checked reaches failed younger verification ctor with no invented source DT. No new dormant original driver assertion credit or unit promotion."
+        "mpzzp.h:167-185,195-208 selected ScalarDiv transport prerequisite only: public/nil Integer negative Div and ExtendedGCD still eagerly delete RAW locals on failed bodies and remain incomplete. Shared mixed cohort ordered retirement and full Discriminant/Factor parents remain open. Native real signed-TLS guard reaches caller NUM DT; checked reaches failed younger verification ctor with no invented source DT. No new dormant original driver assertion credit or unit promotion.",
+        "Selected concrete Content invocation closure only; unrelated polynomial parent/regular SOM/ExactDiv/Neg/Discriminant and whole unit remain partial. Signed-host TLS tests are guarded owner-primitive profiles, not ordinary mathematical free-OOM. No new registered C++ driver assertion credit.",
+        "Selected concrete supported source profiles only; no source-unit/API promotion or registered-driver assertion credit. Signed-host TLS/source pointer guards are explicit helper domains, not ordinary mathematical OOM reachability. Unselected scalar ExactDiv, full Factor/Discriminant and high-level shared-buffer callback reentry remain distinct obligations."
       ]
     },
     {

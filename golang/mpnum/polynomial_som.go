@@ -65,12 +65,12 @@ func (b *polynomialSOM) addConsumedReceipts(a *Int, term Monomial, take bool, co
 	return b.addConsumedCoefficientReceipts(a, term, take, consumed, receipt, appendReceipt, nil)
 }
 func (b *polynomialSOM) addConsumedCoefficientReceipts(a *Int, term Monomial, take bool, consumed *bool, receipt *polynomialNumericRoots, appendReceipt *polynomialCheapAppendInvocationReceipt, coefficientReceipt *polynomialCoefficientInvocationReceipt) (cause error) {
-	return b.addConsumedScalarDivEngine(a, term, take, consumed, receipt, appendReceipt, coefficientReceipt, nil)
+	return b.addConsumedScalarDivEngine(a, term, take, consumed, receipt, appendReceipt, coefficientReceipt, nil, nil)
 }
 func (b *polynomialSOM) addConsumedScalarDivReceipts(a *Int, term Monomial, take bool, consumed *bool, appendReceipt *polynomialCheapAppendInvocationReceipt, scalarReceipt *polynomialScalarDivInvocationReceipt) error {
-	return b.addConsumedScalarDivEngine(a, term, take, consumed, nil, appendReceipt, nil, scalarReceipt)
+	return b.addConsumedScalarDivEngine(a, term, take, consumed, nil, appendReceipt, nil, scalarReceipt, nil)
 }
-func (b *polynomialSOM) addConsumedScalarDivEngine(a *Int, term Monomial, take bool, consumed *bool, receipt *polynomialNumericRoots, appendReceipt *polynomialCheapAppendInvocationReceipt, coefficientReceipt *polynomialCoefficientInvocationReceipt, scalarReceipt *polynomialScalarDivInvocationReceipt) (cause error) {
+func (b *polynomialSOM) addConsumedScalarDivEngine(a *Int, term Monomial, take bool, consumed *bool, receipt *polynomialNumericRoots, appendReceipt *polynomialCheapAppendInvocationReceipt, coefficientReceipt *polynomialCoefficientInvocationReceipt, scalarReceipt *polynomialScalarDivInvocationReceipt, arithmeticReceipt *polynomialArithmeticInvocationReceipt) (cause error) {
 	if consumed != nil {
 		*consumed = false
 	}
@@ -94,10 +94,18 @@ func (b *polynomialSOM) addConsumedScalarDivEngine(a *Int, term Monomial, take b
 	if e != nil || zero {
 		return e
 	}
+	if arithmeticReceipt != nil {
+		if !m.matchesArithmeticInvocation(arithmeticReceipt) || arithmeticReceipt.frame.buffer != b || arithmeticReceipt.frame.executing {
+			return ErrPolynomialOwner
+		}
+		arithmeticReceipt.frame.executing = true
+		defer func() { arithmeticReceipt.frame.executing = false; arithmeticReceipt.frame.bodyCause = cause }()
+		appendReceipt = &arithmeticReceipt.frame.append
+	}
 	// An owning compaction has already changed the source columns. Ordinary
 	// append may extend an earlier deletion prefix, but cannot interpret or
 	// overwrite a partially compacted member layout.
-	if b.cheap && b.appendScope.active && b.appendScope.retirePhase >= 3 && b.appendScope.retirePhase <= 5 {
+	if b.appendScope.active && b.appendScope.retirePhase >= 3 && b.appendScope.retirePhase <= 5 {
 		return ErrPolynomialPending
 	}
 	pos := ^uint32(0)
@@ -108,12 +116,21 @@ func (b *polynomialSOM) addConsumedScalarDivEngine(a *Int, term Monomial, take b
 		}
 	}
 	if pos != ^uint32(0) {
+		priorTransfer := b.accumulatorRowTransfer(pos)
 		old, e := b.as.coefficient(m, pos)
 		if e != nil {
 			return e
 		}
-		e = b.addNumericLeaf(receipt, 1, &old, a, nil, &old)
+		priorTransfer.coefficientValue, priorTransfer.monomialValue = old, term
+		if arithmeticReceipt != nil {
+			e = b.arithmeticNumericCall(1, &old, a, nil, &old, arithmeticReceipt)
+		} else {
+			e = b.addNumericLeaf(receipt, 1, &old, a, nil, &old)
+		}
 		w := b.as.putCoefficient(m, pos, old)
+		if e == nil && w == nil && arithmeticReceipt == nil && appendReceipt == nil {
+			b.transferAccumulatorRowToMember(pos, priorTransfer)
+		}
 		if e != nil {
 			return e
 		}
@@ -136,7 +153,7 @@ func (b *polynomialSOM) addConsumedScalarDivEngine(a *Int, term Monomial, take b
 			}
 		}()
 	}
-	if b.cheap && b.appendScope.active {
+	if b.appendScope.active {
 		if e = b.prepareAppendTags(n + 1); e != nil {
 			return e
 		}
@@ -150,6 +167,10 @@ func (b *polynomialSOM) addConsumedScalarDivEngine(a *Int, term Monomial, take b
 	if !b.cheap {
 		if e = b.positions.Set(term, n); e != nil {
 			return e
+		}
+		if arithmeticReceipt != nil {
+			arithmeticReceipt.frame.positionTerm = term
+			arithmeticReceipt.frame.positionPublished = true
 		}
 	}
 	if b.cheap {
@@ -181,6 +202,8 @@ func (b *polynomialSOM) addConsumedScalarDivEngine(a *Int, term Monomial, take b
 			e = m.modular.Swap(transport, a)
 		} else if scalarReceipt != nil {
 			e = m.modular.copyWithScalarDivReceipt(transport, a, scalarReceipt)
+		} else if arithmeticReceipt != nil {
+			e = b.arithmeticNumericCall(0, a, nil, nil, transport, arithmeticReceipt)
 		} else {
 			e = b.addNumericLeaf(receipt, 0, a, nil, nil, transport)
 		}
@@ -198,6 +221,9 @@ func (b *polynomialSOM) addConsumedScalarDivEngine(a *Int, term Monomial, take b
 	}
 	if e = m.monomials.IncRef(term); e != nil {
 		return e
+	}
+	if arithmeticReceipt != nil && arithmeticReceipt.frame.generated == term {
+		arithmeticReceipt.frame.generated = Monomial{}
 	}
 	m.transferCoefficientGenerated(coefficientReceipt, term)
 	if appendScope != nil {
@@ -224,21 +250,41 @@ func (b *polynomialSOM) addConsumedScalarDivEngine(a *Int, term Monomial, take b
 	}
 	b.hasPendingReference = false
 	b.pendingMonomial = Monomial{}
+	if arithmeticReceipt != nil {
+		arithmeticReceipt.frame.positionPublished = false
+		arithmeticReceipt.frame.positionTerm = Monomial{}
+	}
 	if !b.cheap {
-		if e = b.as.appendCoefficient(m, Int{}); e != nil {
+		if e = b.as.appendCoefficientWithAppendScope(m, Int{}, observer, appendScope != nil); e != nil {
 			return e
 		}
 		value, e := b.as.coefficient(m, n)
 		if e != nil {
 			return e
 		}
-		if take {
-			e = m.modular.Swap(&value, a)
-		} else {
-			e = b.addNumericLeaf(receipt, 0, a, nil, nil, &value)
+		var target *Int = &value
+		if arithmeticReceipt != nil {
+			s := arithmeticReceipt.frame
+			s.transport = value
+			s.transportSlot = n
+			s.transportBound = true
+			target = &s.transport
 		}
-		if w := b.as.putCoefficient(m, n, value); w != nil {
+		if take {
+			e = m.modular.Swap(target, a)
+		} else {
+			if arithmeticReceipt != nil {
+				e = b.arithmeticNumericCall(0, a, nil, nil, target, arithmeticReceipt)
+			} else {
+				e = b.addNumericLeaf(receipt, 0, a, nil, nil, target)
+			}
+		}
+		if w := b.as.putCoefficient(m, n, *target); w != nil {
 			return w
+		}
+		if arithmeticReceipt != nil {
+			arithmeticReceipt.frame.transport = Int{}
+			arithmeticReceipt.frame.transportBound = false
 		}
 		return e
 	}
@@ -296,7 +342,13 @@ func (p polynomialSOMInput) coefficient(m *MultivariatePolynomialCore, i uint32)
 func (b *polynomialSOM) addMul(a *Int, term Monomial, p Polynomial) error {
 	return b.addSourceInput(a, term, polynomialSOMInput{polynomial: p}, true)
 }
+func (b *polynomialSOM) addMulWithArithmeticReceipt(a *Int, term Monomial, p Polynomial, receipt *polynomialArithmeticInvocationReceipt) error {
+	return b.addSourceInputWithArithmeticReceipt(a, term, polynomialSOMInput{polynomial: p}, true, receipt)
+}
 func (b *polynomialSOM) addSourceInput(a *Int, term Monomial, p polynomialSOMInput, multiply bool) error {
+	return b.addSourceInputWithArithmeticReceipt(a, term, p, multiply, nil)
+}
+func (b *polynomialSOM) addSourceInputWithArithmeticReceipt(a *Int, term Monomial, p polynomialSOMInput, multiply bool, receipt *polynomialArithmeticInvocationReceipt) (cause error) {
 	m := b.owner
 	if multiply {
 		z, e := m.modular.IsZero(a)
@@ -304,6 +356,28 @@ func (b *polynomialSOM) addSourceInput(a *Int, term Monomial, p polynomialSOMInp
 			return e
 		}
 	}
+	if b.appendScope.active && b.appendScope.retirePhase >= 3 && b.appendScope.retirePhase <= 5 {
+		return ErrPolynomialPending
+	}
+	// The erased zero route above never acquires or inspects this invocation.
+	// The source body uses only the actual buffer named by its guarded caller.
+	if receipt != nil {
+		if !m.matchesArithmeticInvocation(receipt) || receipt.frame.buffer != b || m.callbackDepth != 0 {
+			return ErrPolynomialOwner
+		}
+		frame := receipt.frame
+		frame.executing = true
+		defer func() {
+			frame.executing = false
+			if frame.bodyCause == nil {
+				frame.bodyCause = cause
+			}
+			if frame.sourceCause != nil {
+				frame.stopped = true
+			}
+		}()
+	}
+
 	n, e := p.size(m)
 	if e != nil {
 		return e
@@ -326,7 +400,7 @@ func (b *polynomialSOM) addSourceInput(a *Int, term Monomial, p polynomialSOMInp
 		}
 		prod := other
 		if multiply {
-			prod, e = m.generatedProduct(term, other)
+			prod, e = b.arithmeticProduct(term, other, receipt)
 			if e != nil {
 				return e
 			}
@@ -354,6 +428,18 @@ func (b *polynomialSOM) addSourceInput(a *Int, term Monomial, p polynomialSOMInp
 					}
 				}
 			}
+			var appendScope *polynomialCheapAppendScope
+			if receipt != nil {
+				if e = b.acquireAppendInvocation(&receipt.frame.append, n); e != nil {
+					return e
+				}
+				appendScope = &b.appendScope
+			}
+			if b.appendScope.active {
+				if e = b.prepareAppendTags(n + 1); e != nil {
+					return e
+				}
+			}
 			if b.retirementOwner != nil {
 				if e = b.retirementOwner.prepareRetirement(n + 1); e != nil {
 					return e
@@ -363,9 +449,25 @@ func (b *polynomialSOM) addSourceInput(a *Int, term Monomial, p polynomialSOMInp
 				if e = b.positions.Set(prod, n); e != nil {
 					return e
 				}
+				// Source regular push precedes INC. This publication is a
+				// borrowed pointer, so the cheap post-INC hook cannot stamp
+				// monomial ownership here. Authority is stamped below only
+				// after the actual successful INC.
+				if receipt != nil {
+					receipt.frame.positionTerm = prod
+					receipt.frame.positionPublished = true
+				}
 				if e = b.ms.appendMonomial(m, prod); e != nil {
 					return e
 				}
+				if receipt != nil {
+					receipt.frame.positionPublished = false
+					receipt.frame.positionTerm = Monomial{}
+				}
+				if b.appendScope.active {
+					b.monomialOwners[n], b.monomialTransferred[n] = 0, 0
+				}
+
 				b.borrowedAppend = true
 				b.borrowedAppendIndex = n
 				if multiply && m.generatedActive {
@@ -376,17 +478,43 @@ func (b *polynomialSOM) addSourceInput(a *Int, term Monomial, p polynomialSOMInp
 			if e = m.monomials.IncRef(prod); e != nil {
 				return e
 			}
+			// Actual successful INC transfers this newly created product into
+			// the source buffer. No RC lookup or later registry inspection.
+			if receipt != nil && receipt.frame.generated == prod {
+				receipt.frame.generated = Monomial{}
+			}
+
 			if !b.cheap {
 				b.borrowedAppend = false
+				if appendScope != nil {
+					b.monomialOwners[n] = appendScope.invocation
+					b.monomialTransferred[n] = 0
+					appendScope.monomialClaims++
+					appendScope.monomials = n + 1
+				} else if b.appendScope.active {
+					b.monomialOwners[n], b.monomialTransferred[n] = 0, 0
+					b.appendScope.foreignMixed = true
+				}
 			}
 			if b.cheap {
 				b.pendingMonomial = prod
 				b.hasPendingReference = true
+				if appendScope != nil {
+					appendScope.pending = prod
+				}
 				if multiply {
 					m.transferGeneratedMonomial()
 				}
-				if e = b.ms.appendMonomial(m, prod); e != nil {
+				observer := appendScope
+				if observer == nil && b.appendScope.active {
+					observer = &b.appendScope
+				}
+				if e = b.ms.appendMonomialWithAppendScope(m, prod, observer, appendScope != nil); e != nil {
 					return e
+				}
+				if appendScope != nil {
+					appendScope.pending = Monomial{}
+					appendScope.monomials = n + 1
 				}
 				b.hasPendingReference = false
 				b.pendingMonomial = Monomial{}
@@ -396,7 +524,11 @@ func (b *polynomialSOM) addSourceInput(a *Int, term Monomial, p polynomialSOMInp
 					m.transferGeneratedMonomial()
 				}
 			}
-			if e = b.as.appendCoefficient(m, Int{}); e != nil {
+			observer := appendScope
+			if observer == nil && b.appendScope.active {
+				observer = &b.appendScope
+			}
+			if e = b.as.appendCoefficientWithAppendScope(m, Int{}, observer, appendScope != nil); e != nil {
 				return e
 			}
 			out, e := b.as.coefficient(m, n)
@@ -408,9 +540,9 @@ func (b *polynomialSOM) addSourceInput(a *Int, term Monomial, p polynomialSOMInp
 				return e
 			}
 			if multiply {
-				e = m.compositionNumericCall(2, a, &source, nil, &out)
+				e = b.arithmeticNumericCall(2, a, &source, nil, &out, receipt)
 			} else {
-				e = m.compositionNumericCall(0, &source, nil, nil, &out)
+				e = b.arithmeticNumericCall(0, &source, nil, nil, &out, receipt)
 			}
 			if w := b.as.putCoefficient(m, n, out); w != nil {
 				return w
@@ -419,6 +551,7 @@ func (b *polynomialSOM) addSourceInput(a *Int, term Monomial, p polynomialSOMInp
 				return e
 			}
 		} else {
+			priorTransfer := b.accumulatorRowTransfer(pos)
 			if multiply {
 				m.transferGeneratedMonomial()
 			}
@@ -430,13 +563,17 @@ func (b *polynomialSOM) addSourceInput(a *Int, term Monomial, p polynomialSOMInp
 			if e != nil {
 				return e
 			}
+			priorTransfer.coefficientValue, priorTransfer.monomialValue = out, prod
 			if multiply {
-				e = m.compositionNumericCall(3, &out, a, &source, &out)
+				e = b.arithmeticNumericCall(3, &out, a, &source, &out, receipt)
 			} else {
-				e = m.compositionNumericCall(1, &out, &source, nil, &out)
+				e = b.arithmeticNumericCall(1, &out, &source, nil, &out, receipt)
 			}
 			if w := b.as.putCoefficient(m, pos, out); w != nil {
 				return w
+			}
+			if e == nil && receipt == nil {
+				b.transferAccumulatorRowToMember(pos, priorTransfer)
 			}
 			if e != nil {
 				return e
@@ -450,6 +587,7 @@ func (b *polynomialSOM) reset() error {
 		return ErrPolynomialPending
 	}
 	m := b.owner
+	resetReceipt := polynomialArithmeticInvocationReceipt{manager: m, frame: &b.arithmeticScope, invocation: b.arithmeticScope.invocation}
 	n, e := b.ms.size(m)
 	if e != nil {
 		return e
@@ -457,6 +595,7 @@ func (b *polynomialSOM) reset() error {
 	if n == 0 {
 		b.factorsParent = nil
 		b.factorsGeneration = 0
+		b.acknowledgeArithmeticSourceReset(&resetReceipt)
 		return nil
 	}
 	sz, e := b.as.size(m)
@@ -528,6 +667,7 @@ func (b *polynomialSOM) reset() error {
 	b.resetStage = 0
 	b.factorsParent = nil
 	b.factorsGeneration = 0
+	b.acknowledgeArithmeticSourceReset(&resetReceipt)
 	return nil
 }
 func (b *polynomialSOM) removeZeros(normalize bool) error {
@@ -577,8 +717,20 @@ func (b *polynomialSOM) removeZeros(normalize bool) error {
 			if e != nil {
 				return e
 			}
+			if b.appendScope.active && uint64(i) < uint64(len(b.coefficientOwners)) && b.coefficientOwners[i] == b.appendScope.invocation {
+				b.coefficientOwners[i] = 0
+				b.appendScope.coefficientClaims--
+			}
 			b.removeStopped = true
-			if e = m.monomials.DecRef(term); e != nil {
+			outcome := monomialDecrementOutcome{}
+			if e = m.monomials.check(); e == nil {
+				e = m.monomials.decRefCoreOutcome(term, &outcome)
+			}
+			if outcome.written && b.appendScope.active && uint64(i) < uint64(len(b.monomialOwners)) && b.monomialOwners[i] == b.appendScope.invocation {
+				b.monomialOwners[i] = 0
+				b.appendScope.monomialClaims--
+			}
+			if e != nil {
 				return e
 			}
 			b.removeStopped = false
@@ -596,6 +748,10 @@ func (b *polynomialSOM) removeZeros(normalize bool) error {
 				}
 				if e = b.ms.putMonomial(m, j, term); e != nil {
 					return e
+				}
+				if b.appendScope.active && uint64(i) < uint64(len(b.monomialOwners)) && uint64(j) < uint64(len(b.monomialOwners)) {
+					b.monomialOwners[j], b.monomialTransferred[j] = b.monomialOwners[i], b.monomialTransferred[i]
+					b.monomialOwners[i], b.monomialTransferred[i] = 0, 0
 				}
 				// The source raw pointer copy does not increment refs. Ownership
 				// follows that one real destination; the old source slot is a
@@ -615,6 +771,10 @@ func (b *polynomialSOM) removeZeros(normalize bool) error {
 				}
 				if e != nil {
 					return e
+				}
+				if b.appendScope.active && uint64(i) < uint64(len(b.coefficientOwners)) && uint64(j) < uint64(len(b.coefficientOwners)) {
+					b.coefficientOwners[j], b.coefficientOwners[i] = b.coefficientOwners[i], b.coefficientOwners[j]
+					b.coefficientTransferred[j], b.coefficientTransferred[i] = b.coefficientTransferred[i], b.coefficientTransferred[j]
 				}
 			}
 			j++
@@ -644,6 +804,9 @@ func (b *polynomialSOM) removeZeros(normalize bool) error {
 		if e = b.ms.publishSize(m, j); e != nil {
 			return e
 		}
+	}
+	if b.appendScope.active {
+		b.appendScope.coefficients, b.appendScope.monomials = j, j
 	}
 	b.removeActive = false
 	b.removePrefix = 0
@@ -889,4 +1052,8 @@ func (b *polynomialSOM) addNumericLeaf(receipt *polynomialNumericRoots, op uint8
 	}
 	e = b.owner.compositionNumericCall(op, a, c, d, out)
 	return errors.Join(e, receipt.after(b.owner.integer, before))
+}
+
+func (b *polynomialSOM) addWithArithmeticReceipt(a *Int, term Monomial, receipt *polynomialArithmeticInvocationReceipt) error {
+	return b.addConsumedScalarDivEngine(a, term, false, nil, nil, nil, nil, nil, receipt)
 }

@@ -76,7 +76,7 @@ func (m *IntegerModularManager) addWithArithmeticReceipt(a, b, c *Int, receipt *
 	if e := m.assertNormalized(b); e != nil {
 		return e
 	}
-	if e := m.manager.addSubWithAllocationContext(a, b, c, false, integerAllocationInvocationContext{arithmetic: receipt}); e != nil {
+	if e := m.manager.addSubWithAllocationContext(a, b, c, false, m.arithmeticAllocationContext(receipt)); e != nil {
 		return e
 	}
 	return m.normalizeWithArithmeticReceipt(c, receipt)
@@ -100,7 +100,7 @@ func (m *IntegerModularManager) Mul(a, b, c *Int) error {
 	return m.mulWithArithmeticReceipt(a, b, c, nil)
 }
 func (m *IntegerModularManager) mulWithArithmeticReceipt(a, b, c *Int, receipt *polynomialArithmeticInvocationReceipt) error {
-	return m.mulWithSourceContext(a, b, c, integerAllocationInvocationContext{arithmetic: receipt})
+	return m.mulWithSourceContext(a, b, c, m.arithmeticAllocationContext(receipt))
 }
 func (m *IntegerModularManager) mulWithSourceContext(a, b, c *Int, context integerAllocationInvocationContext) error {
 	if e := m.check(); e != nil {
@@ -133,6 +133,7 @@ func (m *IntegerModularManager) addMulWithArithmeticReceipt(a, b, c, d *Int, rec
 	if e := m.assertNormalized(c); e != nil {
 		return e
 	}
+	receipt = m.arithmeticReceiptForReceiver(receipt)
 	child := m.arithmeticAddMulReceipt(receipt)
 	e := m.manager.addMulWithSourceReceipt(a, b, c, d, child, receipt)
 	if child != nil && receipt.frame.sourceCause == nil {
@@ -324,7 +325,7 @@ func (m *IntegerModularManager) setInt64WithArithmeticReceipt(a *Int, v int64, r
 	if e := m.check(); e != nil {
 		return e
 	}
-	if e := m.manager.setInt64WithAllocationContext(a, v, integerAllocationInvocationContext{arithmetic: receipt}); e != nil {
+	if e := m.manager.setInt64WithAllocationContext(a, v, m.arithmeticAllocationContext(receipt)); e != nil {
 		return e
 	}
 	return m.normalizeWithArithmeticReceipt(a, receipt)
@@ -354,7 +355,7 @@ func (m *IntegerModularManager) copyWithArithmeticReceipt(a, b *Int, receipt *po
 	if e := m.check(); e != nil {
 		return e
 	}
-	if e := m.manager.copyFromOwnerWithArithmeticReceipt(a, m.manager, b, receipt); e != nil {
+	if e := m.manager.copyFromOwnerWithAllocationContext(a, m.manager, b, nil, m.arithmeticAllocationContext(receipt)); e != nil {
 		return e
 	}
 	return m.normalizeWithArithmeticReceipt(a, receipt)

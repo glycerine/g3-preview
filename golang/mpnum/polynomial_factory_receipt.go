@@ -8,6 +8,7 @@ import "github.com/glycerine/g3/golang/memory"
 // stable frame and the real guarded constructor invocation, not a live value
 // discovered by examining the polynomial registry or its reference count.
 type polynomialFactoryScope struct {
+	buffer            *polynomialSOM
 	invocation        uint64
 	active            bool
 	executing         bool
@@ -74,8 +75,10 @@ func (m *MultivariatePolynomialCore) transferFactoryResult(r *polynomialFactoryI
 		return ErrPolynomialOwner
 	}
 	s.result = Polynomial{}
-	if e := m.cheap.acknowledgeFactoryAppendTransfer(s.invocation); e != nil {
-		return e
+	if s.buffer != nil {
+		if e := s.buffer.acknowledgeFactoryAppendTransfer(s.invocation); e != nil {
+			return e
+		}
 	}
 	if s.allocator == ([3]memory.Block{}) {
 		s.active = false

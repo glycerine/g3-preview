@@ -173,6 +173,10 @@ func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCo
 	buffers := [4]*polynomialSOM{&m.som, &m.som2, &m.cheap, &m.cheap2}
 	for _, b := range buffers {
 		add(b.gcd)
+		add(b.cohortMovingCoefficient)
+		add(b.appendScope.movingCoefficient)
+		add(b.arithmeticScope.transport)
+		extraBytes += uint64(cap(b.coefficientOwners)+cap(b.monomialOwners)+cap(b.coefficientTransferred)+cap(b.monomialTransferred)) * 8
 		vectors = append(vectors, &b.as, &b.ms)
 	}
 	for _, v := range vectors {

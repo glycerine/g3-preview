@@ -17,6 +17,7 @@ type polynomialICCPScope struct {
 	invocation                      uint64
 	childInvocation                 uint64
 	gcdInvocation                   polynomialGCDInvocationReceipt
+	contentInvocation               polynomialContentInvocationReceipt
 	parent, child                   *polynomialICCPScope
 	filter, powers                  polynomialContentUnsignedBuffer
 	ci                              polynomialReference
@@ -60,6 +61,10 @@ func (m *MultivariatePolynomialManager) iccpSourceEnd(s *polynomialICCPScope) er
 		return s.cleanupCause
 	}
 	c := m.core
+	if e := c.contentInvocationSourceCause(&s.contentInvocation); e != nil {
+		s.cleanupCause = e
+		return e
+	}
 	if e := m.gcdInvocationSourceCause(&s.gcdInvocation); e != nil {
 		s.cleanupCause = e
 		return e
@@ -95,7 +100,7 @@ func (m *MultivariatePolynomialManager) iccpSourceEnd(s *polynomialICCPScope) er
 		}
 		s.cursor = 3
 	}
-	if s.filter.pending == (memory.Block{}) && s.powers.pending == (memory.Block{}) && !s.ci.assigning && !(s.topOwner && c.pscPending()) && !c.contentLocal.active {
+	if s.filter.pending == (memory.Block{}) && s.powers.pending == (memory.Block{}) && !s.ci.assigning && !(s.topOwner && c.pscPending()) && !c.matchesContentInvocation(&s.contentInvocation) {
 		h := s.header
 		*s = polynomialICCPScope{header: h, invocation: s.invocation}
 	}
@@ -184,7 +189,7 @@ func (m *MultivariatePolynomialManager) iccpPartsWithReceipt(p Polynomial, x uin
 		return e
 	}
 	if d == 0 {
-		if e = core.integerContent(p, i, c); e != nil {
+		if e = core.integerContentForICCPShortcut(p, i, c, m, receipt); e != nil {
 			return e
 		}
 		return pp.assign(core, core.unit)
@@ -208,7 +213,7 @@ func (m *MultivariatePolynomialManager) iccpPartsWithReceipt(p Polynomial, x uin
 		s.parent.childInvocation = s.invocation
 	}
 	if receipt != nil {
-		*receipt = polynomialICCPInvocationReceipt{m, s, s.invocation}
+		*receipt = polynomialICCPInvocationReceipt{manager: m, frame: s, invocation: s.invocation}
 	}
 	m.iccpDepth++
 	s.filter.construct(core.memory)
@@ -294,13 +299,13 @@ func (m *MultivariatePolynomialManager) iccpPartsWithReceipt(p Polynomial, x uin
 			return e
 		}
 		if count == 1 {
-			if e = core.integerContent(p, i, pp); e != nil {
+			if e = core.integerContentWithReceipt(p, i, pp, &s.contentInvocation); e != nil {
 				return e
 			}
 			return c.assign(core, core.unit)
 		}
 	}
-	if e = core.integerContent(p, i, pp); e != nil {
+	if e = core.integerContentWithReceipt(p, i, pp, &s.contentInvocation); e != nil {
 		return e
 	}
 	s.ciConstructed = true
@@ -366,10 +371,16 @@ func (m *MultivariatePolynomialManager) CleanupContentPrimitiveParts() error {
 	if m.iccpDepth != 0 {
 		return ErrPolynomialPending
 	}
+	if e := m.core.cleanupContentInvocation(&m.iccpShortcutContent, false); e != nil {
+		return e
+	}
 	if e := m.cleanupICCPScopes(m.iccpFrames, false); e != nil {
 		return e
 	}
-	return m.cleanupICCPScopes(m.iccpFrames, true)
+	if e := m.cleanupICCPScopes(m.iccpFrames, true); e != nil {
+		return e
+	}
+	return m.core.cleanupContentInvocation(&m.iccpShortcutContent, true)
 }
 func (m *MultivariatePolynomialManager) cleanupICCPScopes(scopes []*polynomialICCPScope, abort bool) error {
 	c := m.core
@@ -382,8 +393,8 @@ func (m *MultivariatePolynomialManager) cleanupICCPScopes(scopes []*polynomialIC
 			if e := m.cleanupGCDInvocation(&s.gcdInvocation, false); e != nil {
 				return e
 			}
-			if c.contentLocal.active && c.contentLocal.generation == s.generation && s.generation != 0 {
-				if e := c.finishIntegerContentPhase(true, false); e != nil {
+			if c.matchesContentInvocation(&s.contentInvocation) {
+				if e := c.cleanupContentInvocation(&s.contentInvocation, false); e != nil {
 					return e
 				}
 			}
@@ -409,8 +420,8 @@ func (m *MultivariatePolynomialManager) cleanupICCPScopes(scopes []*polynomialIC
 		if e := m.cleanupGCDInvocation(&s.gcdInvocation, true); e != nil {
 			return e
 		}
-		if c.contentLocal.active && c.contentLocal.generation == s.generation && s.generation != 0 {
-			if e := c.finishIntegerContentPhase(true, true); e != nil {
+		if c.matchesContentInvocation(&s.contentInvocation) {
+			if e := c.cleanupContentInvocation(&s.contentInvocation, true); e != nil {
 				return e
 			}
 		}
@@ -440,6 +451,9 @@ func (m *MultivariatePolynomialManager) cleanupICCPScopes(scopes []*polynomialIC
 	return nil
 }
 func (m *MultivariatePolynomialManager) iccpPending() bool {
+	if m.core.matchesContentInvocation(&m.iccpShortcutContent) {
+		return true
+	}
 	for _, s := range m.iccpFrames {
 		if s.active {
 			return true

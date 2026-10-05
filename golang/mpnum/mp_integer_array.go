@@ -1,4 +1,5 @@
-// Source: src/util/mpz.cpp array gcd; src/util/mpzzp.h array gcd. Licensed under the MIT license.
+// Source: src/util/mpz.cpp:845-922; src/util/mpzzp.h:217-220.
+// Licensed under the MIT license. Source author: Leonardo de Moura.
 package mpnum
 
 import (
@@ -84,6 +85,9 @@ func (v integerArrayView) reference(i uint32, local *Int) (*Int, error) {
 	return local, nil
 }
 func (m *IntegerManager) GCDManyIndexed(as integerArrayView, g *Int) error {
+	return m.gcdManyIndexedWithAllocationContext(as, g, integerAllocationInvocationContext{})
+}
+func (m *IntegerManager) gcdManyIndexedWithAllocationContext(as integerArrayView, g *Int, context integerAllocationInvocationContext) error {
 	if e := m.check(g); e != nil {
 		return e
 	}
@@ -96,10 +100,10 @@ func (m *IntegerManager) GCDManyIndexed(as integerArrayView, g *Int) error {
 		if e != nil {
 			return e
 		}
-		if e = m.Copy(g, pa); e != nil {
+		if e = m.copyFromOwnerWithAllocationContext(g, m, pa, nil, context); e != nil {
 			return e
 		}
-		return m.Abs(g)
+		return m.absWithAllocationContext(g, context)
 	}
 	pa, e := as.referenceWithAllocatorOwner(m.memory, 0, &a)
 	if e != nil {
@@ -109,7 +113,7 @@ func (m *IntegerManager) GCDManyIndexed(as integerArrayView, g *Int) error {
 	if e != nil {
 		return e
 	}
-	if e = m.GCD(pa, pb, g); e != nil {
+	if e = m.gcdWithAllocationContext(pa, pb, g, context); e != nil {
 		return e
 	}
 	for i := uint32(2); i < as.count; i++ {
@@ -120,7 +124,7 @@ func (m *IntegerManager) GCDManyIndexed(as integerArrayView, g *Int) error {
 		if e != nil {
 			return e
 		}
-		if e = m.GCD(g, pa, g); e != nil {
+		if e = m.gcdWithAllocationContext(g, pa, g, context); e != nil {
 			return e
 		}
 	}

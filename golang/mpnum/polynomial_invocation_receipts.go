@@ -6,11 +6,13 @@ package mpnum
 // These are owning adapter receipts for an actual guarded callee invocation.
 // The shared PSC owner generation is deliberately not invocation identity.
 // Stable frame address, manager and monotonically increasing frame nonce must
-// all match; rejected entry and quick paths never acquire a new receipt.
+// all match. Erased zero/constant paths acquire no new receipt. The degree-zero
+// ICCP delegate can acquire only its actual Content child, without an ICCP frame.
 type polynomialICCPInvocationReceipt struct {
-	manager    *MultivariatePolynomialManager
-	frame      *polynomialICCPScope
-	invocation uint64
+	shortcutContent polynomialContentInvocationReceipt
+	manager         *MultivariatePolynomialManager
+	frame           *polynomialICCPScope
+	invocation      uint64
 }
 type polynomialGCDInvocationReceipt struct {
 	manager    *MultivariatePolynomialManager
@@ -33,6 +35,9 @@ func (m *MultivariatePolynomialManager) matchesNormalizeInvocation(r *polynomial
 	return r != nil && r.manager == m && r.frame == &m.normalization && r.invocation != 0 && r.frame.invocation == r.invocation && r.frame.active
 }
 func (m *MultivariatePolynomialManager) iccpInvocationSourceCause(r *polynomialICCPInvocationReceipt) error {
+	if m.hasICCPShortcutContentHistory(r) {
+		return m.core.contentInvocationSourceCause(&r.shortcutContent)
+	}
 	if m.matchesICCPInvocation(r) {
 		return r.frame.cleanupCause
 	}
@@ -51,6 +56,9 @@ func (m *MultivariatePolynomialManager) normalizeInvocationSourceCause(r *polyno
 	return nil
 }
 func (m *MultivariatePolynomialManager) cleanupICCPInvocation(r *polynomialICCPInvocationReceipt, abort bool) error {
+	if m.matchesICCPShortcutContent(r) {
+		return m.core.cleanupContentInvocation(&r.shortcutContent, abort)
+	}
 	if !m.matchesICCPInvocation(r) {
 		return nil
 	}
@@ -91,4 +99,16 @@ func (m *MultivariatePolynomialManager) cleanupNormalizeInvocation(r *polynomial
 		return nil
 	}
 	return m.cleanupNormalizationPhase(abort)
+}
+
+func (m *MultivariatePolynomialManager) matchesICCPShortcutContent(r *polynomialICCPInvocationReceipt) bool {
+	return m != nil && m.self == m && m.core != nil && m.core.self == m.core && r != nil && r.manager == m && r.frame == nil && r.invocation == 0 && r.shortcutContent.manager == m.core && m.core.matchesContentInvocation(&r.shortcutContent)
+}
+
+func (m *MultivariatePolynomialManager) hasICCPShortcutContentHistory(r *polynomialICCPInvocationReceipt) bool {
+	if m == nil || m.self != m || m.core == nil || m.core.self != m.core || r == nil || r.manager != m || r.frame != nil || r.invocation != 0 {
+		return false
+	}
+	c := &r.shortcutContent
+	return c.manager == m.core && c.frame == &m.core.contentLocal && c.invocation != 0 && c.invocation == c.frame.invocation
 }

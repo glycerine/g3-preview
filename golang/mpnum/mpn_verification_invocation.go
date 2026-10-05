@@ -7,10 +7,12 @@ import "github.com/glycerine/g3/golang/memory"
 // The reached lexical constructor has its own identity. An unfinished
 // construction owns exact raw/pending leaves but has no source destructor.
 type naturalPNVerificationScope struct {
+	exactDiv                                     polynomialExactDivInvocationReceipt
 	raw                                          integerRawInvocationReceipt
 	invocation                                   uint64
 	parent                                       *integerPNormalizeScope
 	scalar                                       polynomialScalarDivInvocationReceipt
+	content                                      polynomialContentInvocationReceipt
 	active, executing, constructed, ended, owned bool
 	buffer                                       naturalPNBufferReceipt
 	sourceCause                                  error

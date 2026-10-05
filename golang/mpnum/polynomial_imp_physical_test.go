@@ -40,7 +40,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	adapterBytes := full.header + uint64(cap(full.lexBuckets.children))*uint64(reflect.TypeOf(polynomialVector{}).Size())
 	public := []*Int{&full.derivative.n, &full.derivative.a, &full.composition.a}
 	for _, b := range []*polynomialSOM{&m.som, &m.som2, &m.cheap, &m.cheap2} {
-		public = append(public, &b.cohortMovingCoefficient, &b.appendScope.movingCoefficient)
+		public = append(public, &b.cohortMovingCoefficient, &b.appendScope.movingCoefficient, &b.arithmeticScope.transport)
 	}
 	if m.scalarDivision.transportBound {
 		public = append(public, &m.scalarDivision.transport)

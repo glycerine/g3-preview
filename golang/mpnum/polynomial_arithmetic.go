@@ -23,21 +23,32 @@ func (m *MultivariatePolynomialCore) checkpoint() error {
 	return m.config.Cooperation()
 }
 func (m *MultivariatePolynomialCore) AddMul(a1 *Int, t1 Monomial, p1 Polynomial, a2 *Int, t2 Monomial, p2 Polynomial) (Polynomial, error) {
+	return m.addMulWithReceipt(a1, t1, p1, a2, t2, p2, nil)
+}
+func (m *MultivariatePolynomialCore) addMulWithReceipt(a1 *Int, t1 Monomial, p1 Polynomial, a2 *Int, t2 Monomial, p2 Polynomial, receipt *polynomialArithmeticInvocationReceipt) (Polynomial, error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
 	if e := m.som.reset(); e != nil {
 		return Polynomial{}, e
 	}
-	if e := m.som.addMul(a1, t1, p1); e != nil {
+	if receipt != nil {
+		if e := m.som.acquireArithmeticInvocation(receipt); e != nil {
+			return Polynomial{}, e
+		}
+	}
+	if e := m.som.addMulWithArithmeticReceipt(a1, t1, p1, receipt); e != nil {
 		return Polynomial{}, e
 	}
-	if e := m.som.addMul(a2, t2, p2); e != nil {
+	if e := m.som.addMulWithArithmeticReceipt(a2, t2, p2, receipt); e != nil {
 		return Polynomial{}, e
 	}
-	return m.som.mk(false)
+	return m.som.mkWithArithmeticReceipt(false, receipt)
 }
 func (m *MultivariatePolynomialCore) Add(p, q Polynomial) (Polynomial, error) {
+	return m.addWithReceipt(p, q, nil)
+}
+func (m *MultivariatePolynomialCore) addWithReceipt(p, q Polynomial, receipt *polynomialArithmeticInvocationReceipt) (Polynomial, error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
@@ -46,9 +57,12 @@ func (m *MultivariatePolynomialCore) Add(p, q Polynomial) (Polynomial, error) {
 	if e != nil {
 		return Polynomial{}, e
 	}
-	return m.AddMul(&one, u, p, &one, u, q)
+	return m.addMulWithReceipt(&one, u, p, &one, u, q, receipt)
 }
 func (m *MultivariatePolynomialCore) Sub(p, q Polynomial) (Polynomial, error) {
+	return m.subWithReceipt(p, q, nil)
+}
+func (m *MultivariatePolynomialCore) subWithReceipt(p, q Polynomial, receipt *polynomialArithmeticInvocationReceipt) (Polynomial, error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
@@ -60,9 +74,12 @@ func (m *MultivariatePolynomialCore) Sub(p, q Polynomial) (Polynomial, error) {
 	if e != nil {
 		return Polynomial{}, e
 	}
-	return m.AddMul(&one, u, p, &m.minusOne, u, q)
+	return m.addMulWithReceipt(&one, u, p, &m.minusOne, u, q, receipt)
 }
 func (m *MultivariatePolynomialCore) MulAdd(p, q Polynomial, a *Int) (Polynomial, error) {
+	return m.mulAddWithReceipt(p, q, a, nil)
+}
+func (m *MultivariatePolynomialCore) mulAddWithReceipt(p, q Polynomial, a *Int, receipt *polynomialArithmeticInvocationReceipt) (Polynomial, error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
@@ -71,17 +88,22 @@ func (m *MultivariatePolynomialCore) MulAdd(p, q Polynomial, a *Int) (Polynomial
 		return Polynomial{}, e
 	}
 	if np == 0 {
-		return m.MkConstantTakeCopy(a)
+		return m.mkConstantTakeCopyWithArithmeticReceipt(a, receipt)
 	}
 	nq, e := m.readWord(q, 8)
 	if e != nil {
 		return Polynomial{}, e
 	}
 	if np == 0 || nq == 0 {
-		return m.MkConstantTakeCopy(a)
+		return m.mkConstantTakeCopyWithArithmeticReceipt(a, receipt)
 	}
 	if e = m.som.reset(); e != nil {
 		return Polynomial{}, e
+	}
+	if receipt != nil {
+		if e = m.som.acquireArithmeticInvocation(receipt); e != nil {
+			return Polynomial{}, e
+		}
 	}
 	for i := uint32(0); i < np; i++ {
 		if e = m.checkpoint(); e != nil {
@@ -95,7 +117,7 @@ func (m *MultivariatePolynomialCore) MulAdd(p, q Polynomial, a *Int) (Polynomial
 		if e != nil {
 			return Polynomial{}, e
 		}
-		if e = m.som.addMul(&coef, term, q); e != nil {
+		if e = m.som.addMulWithArithmeticReceipt(&coef, term, q, receipt); e != nil {
 			return Polynomial{}, e
 		}
 	}
@@ -103,16 +125,22 @@ func (m *MultivariatePolynomialCore) MulAdd(p, q Polynomial, a *Int) (Polynomial
 	if e != nil {
 		return Polynomial{}, e
 	}
-	if e = m.som.add(a, u, false); e != nil {
+	if e = m.som.addWithArithmeticReceipt(a, u, receipt); e != nil {
 		return Polynomial{}, e
 	}
-	return m.som.mk(false)
+	return m.som.mkWithArithmeticReceipt(false, receipt)
 }
 func (m *MultivariatePolynomialCore) Mul(p, q Polynomial) (Polynomial, error) {
+	return m.mulWithReceipt(p, q, nil)
+}
+func (m *MultivariatePolynomialCore) mulWithReceipt(p, q Polynomial, receipt *polynomialArithmeticInvocationReceipt) (Polynomial, error) {
 	zero := NewInt(0)
-	return m.MulAdd(p, q, &zero)
+	return m.mulAddWithReceipt(p, q, &zero, receipt)
 }
 func (m *MultivariatePolynomialCore) Scale(a *Int, t Monomial, p Polynomial) (Polynomial, error) {
+	return m.scaleWithReceipt(a, t, p, nil)
+}
+func (m *MultivariatePolynomialCore) scaleWithReceipt(a *Int, t Monomial, p Polynomial, receipt *polynomialArithmeticInvocationReceipt) (Polynomial, error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
@@ -143,10 +171,15 @@ func (m *MultivariatePolynomialCore) Scale(a *Int, t Monomial, p Polynomial) (Po
 	if modularSourceDebug && n != 0 {
 		return Polynomial{}, ErrPolynomialAssertion
 	}
-	if e = m.cheap.addMul(a, t, p); e != nil {
+	if receipt != nil {
+		if e = m.cheap.acquireArithmeticInvocation(receipt); e != nil {
+			return Polynomial{}, e
+		}
+	}
+	if e = m.cheap.addMulWithArithmeticReceipt(a, t, p, receipt); e != nil {
 		return Polynomial{}, e
 	}
-	return m.cheap.mk(false)
+	return m.cheap.mkWithArithmeticReceipt(false, receipt)
 }
 func (m *MultivariatePolynomialCore) Neg(p Polynomial) (Polynomial, error) {
 	return m.negWithReceipt(p, nil)

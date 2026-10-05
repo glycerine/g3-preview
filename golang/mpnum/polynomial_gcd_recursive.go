@@ -51,10 +51,10 @@ func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32
 	}
 	cu, pu, lu := &s.refs[0].root, &s.refs[1].root, &s.refs[2].root
 	cv, pv, lv := &s.refs[3].root, &s.refs[4].root, &s.refs[5].root
-	if e = m.iccpZPX(u, x, &s.nums[0], cu, pu); e != nil {
+	if e = m.iccpZPXWithContentReceipt(u, x, &s.nums[0], cu, pu, &s.contentInvocation); e != nil {
 		return e
 	}
-	if e = m.iccpZPX(v, x, &s.nums[1], cv, pv); e != nil {
+	if e = m.iccpZPXWithContentReceipt(v, x, &s.nums[1], cv, pv, &s.contentInvocation); e != nil {
 		return e
 	}
 	a, e := m.lcGlexZPX(pu.value, x)
