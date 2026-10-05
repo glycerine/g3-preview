@@ -8,6 +8,7 @@ import (
 )
 
 type polynomialSOM struct {
+	arithmeticScope                      polynomialArithmeticScope
 	appendScope                          polynomialCheapAppendScope
 	factorsParent                        *PolynomialFactors
 	factorsGeneration                    uint64

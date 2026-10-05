@@ -46,6 +46,7 @@ type IntegerConfig struct {
 // Cells, transitional Natural Words and the actual memory backend share one Budget.
 // Close invalidates every live numeral; a supplied Runtime is borrowed.
 type IntegerManager struct {
+	addMulInvocation                       integerAddMulScope
 	copyAllocation                         integerCopyAllocationScope
 	self                                   *IntegerManager
 	memory                                 *memory.Runtime
@@ -320,6 +321,9 @@ func (m *IntegerManager) allocateWithCopyReceipt(capacity, size uint32, s *integ
 	return m.allocateWithInvocationReceipts(capacity, size, s, nil)
 }
 func (m *IntegerManager) allocateWithInvocationReceipts(capacity, size uint32, s *integerCopyAllocationScope, pn *integerPNormalizeScope) (numericCellRef, error) {
+	return m.allocateWithSourceContext(capacity, size, s, pnAllocationContext(pn))
+}
+func (m *IntegerManager) allocateWithSourceContext(capacity, size uint32, s *integerCopyAllocationScope, context integerAllocationInvocationContext) (numericCellRef, error) {
 	if modularSourceDebug && capacity < 6 {
 		return 0, ErrIntegerAssertion
 	}
@@ -332,8 +336,8 @@ func (m *IntegerManager) allocateWithInvocationReceipts(capacity, size uint32, s
 	if s != nil && s == &m.copyAllocation && s.active && s.executing {
 		roots = &s.roots
 	}
-	if pn != nil && pn.owner != nil && pn.owner.manager == m && pn == &pn.owner.normalization && pn.active && pn.executing {
-		roots = &pn.roots
+	if r := context.roots(m); r != nil {
+		roots = r
 	}
 	if roots != nil {
 		out = &outcome
@@ -552,10 +556,13 @@ func (m *IntegerManager) allocateIfNeeded(a *Int, capacity uint32) error {
 }
 
 func (m *IntegerManager) setBig64(a *Int, v uint64, sign int32) error {
+	return m.setBig64WithAllocationContext(a, v, sign, integerAllocationInvocationContext{})
+}
+func (m *IntegerManager) setBig64WithAllocationContext(a *Int, v uint64, sign int32, context integerAllocationInvocationContext) error {
 	ref := a.cell
 	if ref == 0 {
 		var e error
-		ref, e = m.allocate(6, 0)
+		ref, e = m.allocateWithSourceContext(6, 0, nil, context)
 		if e != nil {
 			return e
 		}
@@ -578,6 +585,9 @@ func (m *IntegerManager) setBig64(a *Int, v uint64, sign int32) error {
 	return nil
 }
 func (m *IntegerManager) SetInt64(a *Int, v int64) error {
+	return m.setInt64WithAllocationContext(a, v, integerAllocationInvocationContext{})
+}
+func (m *IntegerManager) setInt64WithAllocationContext(a *Int, v int64, context integerAllocationInvocationContext) error {
 	if e := m.check(a); e != nil {
 		return e
 	}
@@ -594,7 +604,7 @@ func (m *IntegerManager) SetInt64(a *Int, v int64) error {
 		sign = -1
 		magnitude = 0 - uint64(v)
 	}
-	return m.setBig64(a, magnitude, sign)
+	return m.setBig64WithAllocationContext(a, magnitude, sign, context)
 }
 
 // SetUint64 preserves the source's strict < INT_MAX inline threshold.
@@ -667,6 +677,9 @@ func (m *IntegerManager) copyFromOwnerWithReceipt(dst *Int, sourceManager *Integ
 	return m.copyFromOwnerWithReceipts(dst, sourceManager, src, receipt, nil)
 }
 func (m *IntegerManager) copyFromOwnerWithReceipts(dst *Int, sourceManager *IntegerManager, src *Int, receipt *integerCopyAllocationReceipt, pn *integerPNormalizeScope) error {
+	return m.copyFromOwnerWithAllocationContext(dst, sourceManager, src, receipt, pnAllocationContext(pn))
+}
+func (m *IntegerManager) copyFromOwnerWithAllocationContext(dst *Int, sourceManager *IntegerManager, src *Int, receipt *integerCopyAllocationReceipt, context integerAllocationInvocationContext) error {
 	if e := m.check(dst); e != nil {
 		return e
 	}
@@ -716,7 +729,7 @@ func (m *IntegerManager) copyFromOwnerWithReceipts(dst *Int, sourceManager *Inte
 			}()
 		}
 		var e error
-		ref, e = m.allocateWithInvocationReceipts(source.capacity, source.size, owned, pn)
+		ref, e = m.allocateWithSourceContext(source.capacity, source.size, owned, context)
 		if e != nil {
 			return e
 		}
@@ -848,6 +861,9 @@ func (m *IntegerManager) ensureTmp(idx int, size uint32) error {
 	return m.ensureTmpWithPNReceipt(idx, size, nil)
 }
 func (m *IntegerManager) ensureTmpWithPNReceipt(idx int, size uint32, pn *integerPNormalizeScope) error {
+	return m.ensureTmpWithAllocationContext(idx, size, pnAllocationContext(pn))
+}
+func (m *IntegerManager) ensureTmpWithAllocationContext(idx int, size uint32, context integerAllocationInvocationContext) error {
 	if idx < 0 || idx >= len(m.tmp) || m.tmp[idx] == 0 {
 		return arena.ErrInvalidSlot
 	}
@@ -859,7 +875,7 @@ func (m *IntegerManager) ensureTmpWithPNReceipt(idx int, size uint32, pn *intege
 	}
 	m.tmp[idx] = 0                // source leaves a dangling pointer; Go keeps a guarded hole
 	capacity := (3*size + 1) >> 1 // actual unsigned32 source arithmetic
-	ref, e := m.allocateWithInvocationReceipts(capacity, 0, nil, pn)
+	ref, e := m.allocateWithSourceContext(capacity, 0, nil, context)
 	if e != nil {
 		return e
 	}
@@ -880,6 +896,9 @@ func (m *IntegerManager) publishTmpAt(idx int, dst *Int, sign int32, size uint32
 	return m.publishTmpAtWithPNReceipt(idx, dst, sign, size, nil)
 }
 func (m *IntegerManager) publishTmpAtWithPNReceipt(idx int, dst *Int, sign int32, size uint32, pn *integerPNormalizeScope) error {
+	return m.publishTmpAtWithAllocationContext(idx, dst, sign, size, pnAllocationContext(pn))
+}
+func (m *IntegerManager) publishTmpAtWithAllocationContext(idx int, dst *Int, sign int32, size uint32, context integerAllocationInvocationContext) error {
 	if idx < 0 || idx >= len(m.tmp) || m.tmp[idx] == 0 {
 		return arena.ErrInvalidSlot
 	}
@@ -895,14 +914,14 @@ func (m *IntegerManager) publishTmpAtWithPNReceipt(idx int, dst *Int, sign int32
 		if sign < 0 {
 			v = -v
 		}
-		return m.SetInt64(dst, int64(v))
+		return m.setInt64WithAllocationContext(dst, int64(v), context)
 	}
 	dst.val = sign
 	dst.cell, m.tmp[idx] = m.tmp[idx], dst.cell
 	m.resizeCell(ref, size)
 	if m.tmp[idx] == 0 {
 		var e error
-		m.tmp[idx], e = m.allocateWithInvocationReceipts(6, 0, nil, pn)
+		m.tmp[idx], e = m.allocateWithSourceContext(6, 0, nil, context)
 		if e == nil {
 			m.publishCell(m.tmp[idx])
 		}
@@ -916,6 +935,9 @@ func (m *IntegerManager) addSub(a, b, c *Int, subtract bool) error {
 	return m.addSubWithPNReceipt(a, b, c, subtract, nil)
 }
 func (m *IntegerManager) addSubWithPNReceipt(a, b, c *Int, subtract bool, pn *integerPNormalizeScope) error {
+	return m.addSubWithAllocationContext(a, b, c, subtract, pnAllocationContext(pn))
+}
+func (m *IntegerManager) addSubWithAllocationContext(a, b, c *Int, subtract bool, context integerAllocationInvocationContext) error {
 	for _, n := range []*Int{a, b, c} {
 		if e := m.check(n); e != nil {
 			return e
@@ -926,7 +948,7 @@ func (m *IntegerManager) addSubWithPNReceipt(a, b, c *Int, subtract bool, pn *in
 		if subtract {
 			v = -v
 		}
-		return m.SetInt64(c, int64(a.val)+v)
+		return m.setInt64WithAllocationContext(c, int64(a.val)+v, context)
 	}
 	sa, ca := m.signCell(a, 0)
 	sb, cb := m.signCell(b, 1)
@@ -940,7 +962,7 @@ func (m *IntegerManager) addSubWithPNReceipt(a, b, c *Int, subtract bool, pn *in
 		if n == math.MaxUint32 {
 			return arena.ErrBounds
 		}
-		if e := m.ensureTmpWithPNReceipt(0, n+1, pn); e != nil {
+		if e := m.ensureTmpWithAllocationContext(0, n+1, context); e != nil {
 			return e
 		}
 		if e := m.prepareTmpSpan(0, n+1); e != nil {
@@ -960,7 +982,7 @@ func (m *IntegerManager) addSubWithPNReceipt(a, b, c *Int, subtract bool, pn *in
 			}
 		}
 		m.writeDigit(m.tmp[0], n, k)
-		return m.publishTmpAtWithPNReceipt(0, c, sign, n+1, pn)
+		return m.publishTmpAtWithAllocationContext(0, c, sign, n+1, context)
 	}
 	cmp := m.compareCells(ca, cb)
 	if cmp == 0 {
@@ -973,7 +995,7 @@ func (m *IntegerManager) addSubWithPNReceipt(a, b, c *Int, subtract bool, pn *in
 	} else {
 		n = na
 	}
-	if e := m.ensureTmpWithPNReceipt(0, n, pn); e != nil {
+	if e := m.ensureTmpWithAllocationContext(0, n, context); e != nil {
 		return e
 	}
 	if e := m.prepareTmpSpan(0, n); e != nil {
@@ -995,7 +1017,7 @@ func (m *IntegerManager) addSubWithPNReceipt(a, b, c *Int, subtract bool, pn *in
 	if k != 0 {
 		panic("mpnum: unexpected subtraction borrow")
 	}
-	return m.publishTmpAtWithPNReceipt(0, c, sign, n, pn)
+	return m.publishTmpAtWithAllocationContext(0, c, sign, n, context)
 }
 
 func (m *IntegerManager) absUint64(a *Int) (uint64, error) {

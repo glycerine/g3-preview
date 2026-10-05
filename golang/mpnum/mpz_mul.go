@@ -11,13 +11,16 @@ import (
 // Mul translates the source small-int path and big multiplication. Exact
 // destination/input aliasing is supported through the manager's result scratch.
 func (m *IntegerManager) Mul(a, b, c *Int) error {
+	return m.mulWithAllocationContext(a, b, c, integerAllocationInvocationContext{})
+}
+func (m *IntegerManager) mulWithAllocationContext(a, b, c *Int, context integerAllocationInvocationContext) error {
 	for _, n := range []*Int{a, b, c} {
 		if e := m.check(n); e != nil {
 			return e
 		}
 	}
 	if a.IsSmall() && b.IsSmall() {
-		return m.SetInt64(c, int64(a.val)*int64(b.val))
+		return m.setInt64WithAllocationContext(c, int64(a.val)*int64(b.val), context)
 	}
 	sa, ca := m.signCell(a, 0)
 	sb, cb := m.signCell(b, 1)
@@ -25,7 +28,7 @@ func (m *IntegerManager) Mul(a, b, c *Int) error {
 	if size > math.MaxUint32 {
 		return arena.ErrBounds
 	}
-	if e := m.ensureTmp(0, uint32(size)); e != nil {
+	if e := m.ensureTmpWithAllocationContext(0, uint32(size), context); e != nil {
 		return e
 	}
 	if e := m.prepareTmpSpan(0, uint32(size)); e != nil {
@@ -36,7 +39,7 @@ func (m *IntegerManager) Mul(a, b, c *Int) error {
 	if sa != sb {
 		sign = -1
 	}
-	return m.publishTmp(c, sign, uint32(size))
+	return m.publishTmpAtWithAllocationContext(0, c, sign, uint32(size), context)
 }
 
 // multiplyCells is indexed Knuth Algorithm M. Destination must not alias an

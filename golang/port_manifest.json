@@ -120071,7 +120071,8 @@
         "mpnum/mpz_root_source_prefix_test.go",
         "mpnum/mpz_power_raw_source_test.go",
         "mpnum/integer_copy_allocation_receipt.go",
-        "mpnum/integer_copy_allocation_receipt_source_test.go"
+        "mpnum/integer_copy_allocation_receipt_source_test.go",
+        "mpnum/integer_allocation_invocation_context.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -122060,6 +122061,12 @@
             "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
             "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix"
           ]
+        },
+        {
+          "name": "Same-engine direct arithmetic caller leaf transport and optional actual AddMul RAW end-only DEL continuation; public AddMul body-failure adapter and SubMul remain incomplete",
+          "status": "partial",
+          "go_target": "mpnum/integer_allocation_invocation_context.go",
+          "tests": []
         }
       ],
       "ownership": [
@@ -122086,7 +122093,8 @@
         "Six actual RAW Int fields live in the charged IntegerManager header. Literal source end deletion stops at its first cause; explicit CleanupPerfectSquare resumes only owned fields and exact pending ObjectRef/physical roots. Direct final output SET remains caller-owned.",
         "Current Root/Power RAW lifetime implementation supersedes earlier staged Root/output and implicit general Power cleanup descriptions. Actual four Root and one Power RAW fields are charged in the Integer header; body failures retain them, literal end-only DEL stops younger-to-older at the reached ascending source frontier. Exact manager/frame/unique nonwrapping nonce and physical object/block/extent identity match owning continuation; caller COPY/MUL output pending is excluded. Completed and abort phases distinguish reached end DEL from unfinished RAW body owners.",
         "Actual guarded manager/frame/unique invocation plus direct argument acquisition tokens; legacy foreign calls have nil receipt; same-cardinality replacement and stale frame owning cleanup preserve foreign graph before cleanup.",
-        "Exact actual manager/frame/nonzero invocation generation and named allocation/buffer token only; no registry/refcount/high-level snapshot authority. Shared successful publication remains member owned. Source DT cause remains sticky across explicit owning acknowledgement until actual new invocation."
+        "Exact actual manager/frame/nonzero invocation generation and named allocation/buffer token only; no registry/refcount/high-level snapshot authority. Shared successful publication remains member owned. Source DT cause remains sticky across explicit owning acknowledgement until actual new invocation.",
+        "Actual manager/embedded frame/nonzero unique invocation and allocator/cell acquisition/clear only; MUL temporary child authority distinct from ADD caller-output authority. Sticky reached end DEL preserved through exact owning acknowledgement. No high-level differences, cache sweeping, repaired scratch holes or parent completion."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -122162,7 +122170,9 @@
         "mpnum/mpz_power_scope.go",
         "mpnum/mpz_root_source_prefix_test.go",
         "mpnum/mpz_power_raw_source_test.go",
-        "mpnum/integer_copy_allocation_receipt.go"
+        "mpnum/integer_copy_allocation_receipt.go",
+        "mpnum/integer_addmul_invocation.go",
+        "mpnum/integer_allocation_invocation_context.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -122385,7 +122395,12 @@
         "TestIntegerPowerGeneralMinusOneUsesActualRAW",
         "TestIntegerPowerPendingBackingExactAndForeignReplacement",
         "TestIntegerPowerCallerOutputPendingExcludedFromRAWOwner",
-        "TestIntegerPowerReceiptRejectQuickAndReplacement"
+        "TestIntegerPowerReceiptRejectQuickAndReplacement",
+        "TestIntegerAddMulSourceShortcutsLeaveReceiptUnchanged",
+        "TestIntegerAddMulSourceRAWBodyFailureRetainsPublishedTemporary",
+        "TestIntegerAddMulSourceEndDELStopsAfterCallerOutput",
+        "TestIntegerAddMulSourceStaleAndForeignReceiptsPreserveLaterRAW",
+        "TestIntegerAddMulSourceEveryActualReservationPrefix"
       ],
       "conditionals": [
         {
@@ -123652,6 +123667,18 @@
           "status": "partial",
           "go_target": "mpnum/integer_copy_allocation_receipt.go",
           "tests": []
+        },
+        {
+          "name": "Same-engine direct arithmetic caller leaf transport and optional actual AddMul RAW end-only DEL continuation; public AddMul body-failure adapter and SubMul remain incomplete",
+          "status": "partial",
+          "go_target": "mpnum/integer_addmul_invocation.go",
+          "tests": [
+            "TestIntegerAddMulSourceShortcutsLeaveReceiptUnchanged",
+            "TestIntegerAddMulSourceRAWBodyFailureRetainsPublishedTemporary",
+            "TestIntegerAddMulSourceEndDELStopsAfterCallerOutput",
+            "TestIntegerAddMulSourceStaleAndForeignReceiptsPreserveLaterRAW",
+            "TestIntegerAddMulSourceEveryActualReservationPrefix"
+          ]
         }
       ],
       "ownership": [
@@ -123675,7 +123702,8 @@
         "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets.",
         "Two actual permanently dead charged Go descriptors precede Words/Natural construction. Actual six source numeric cells unchanged. Source fresh NULL comes only from exact setter branch, never registry/scope inference; reserve failure retains charged constructor owner. No source allocator event invented for Go metadata.",
         "Current Root/Power RAW lifetime implementation supersedes earlier staged Root/output and implicit general Power cleanup descriptions. Actual four Root and one Power RAW fields are charged in the Integer header; body failures retain them, literal end-only DEL stops younger-to-older at the reached ascending source frontier. Exact manager/frame/unique nonwrapping nonce and physical object/block/extent identity match owning continuation; caller COPY/MUL output pending is excluded. Completed and abort phases distinguish reached end DEL from unfinished RAW body owners.",
-        "Actual guarded manager/frame/unique invocation plus direct argument acquisition tokens; legacy foreign calls have nil receipt; same-cardinality replacement and stale frame owning cleanup preserve foreign graph before cleanup."
+        "Actual guarded manager/frame/unique invocation plus direct argument acquisition tokens; legacy foreign calls have nil receipt; same-cardinality replacement and stale frame owning cleanup preserve foreign graph before cleanup.",
+        "Actual manager/embedded frame/nonzero unique invocation and allocator/cell acquisition/clear only; MUL temporary child authority distinct from ADD caller-output authority. Sticky reached end DEL preserved through exact owning acknowledgement. No high-level differences, cache sweeping, repaired scratch holes or parent completion."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -124017,12 +124045,19 @@
             "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
             "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix"
           ]
+        },
+        {
+          "name": "Same-engine direct arithmetic caller leaf transport and optional actual AddMul RAW end-only DEL continuation; public AddMul body-failure adapter and SubMul remain incomplete",
+          "status": "partial",
+          "go_target": "mpnum/mpzzp_ops.go",
+          "tests": []
         }
       ],
       "ownership": [
         "Actual charged cold wrapper owns seven pointer-free Ints and borrows real IntegerManager/Budget; source ordered fields and scratch/publication preserved. Cold self guard rejects copied/zero owner; source modulus copied public accessor distinguished from actual private borrowed numeral. See PORT_PROGRESS.md#audit-mpzzp-port-status-md.",
         "Actual real foreign Runtime coefficient RED89453 led to reached-only owner check; empty borrowed view is unread. No owning numeral-array copy or generic storage introduced.",
-        "Exact actual manager/frame/nonzero invocation generation and named allocation/buffer token only; no registry/refcount/high-level snapshot authority. Shared successful publication remains member owned. Source DT cause remains sticky across explicit owning acknowledgement until actual new invocation."
+        "Exact actual manager/frame/nonzero invocation generation and named allocation/buffer token only; no registry/refcount/high-level snapshot authority. Shared successful publication remains member owned. Source DT cause remains sticky across explicit owning acknowledgement until actual new invocation.",
+        "Actual manager/embedded frame/nonzero unique invocation and allocator/cell acquisition/clear only; MUL temporary child authority distinct from ADD caller-output authority. Sticky reached end DEL preserved through exact owning acknowledgement. No high-level differences, cache sweeping, repaired scratch holes or parent completion."
       ],
       "deviations": [
         "Source modulus constructors leave prime flag indeterminate; typed guard only actual read, not invented release Div precondition. Source Power maskwrap nontermination diagnosed after completed actions; deferred local/constructor cleanup is safe Go ownership adaptation, not claimed raw MPZ exception destructor. Source TRACE/unsupported/undefined and full consumer algorithms remain open. See PORT_PROGRESS.md#audit-mpzzp-port-status-md.",

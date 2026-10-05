@@ -64,6 +64,9 @@ func (m *IntegerModularManager) Dec(a *Int) error {
 	return m.PNormalize(a)
 }
 func (m *IntegerModularManager) Add(a, b, c *Int) error {
+	return m.addWithArithmeticReceipt(a, b, c, nil)
+}
+func (m *IntegerModularManager) addWithArithmeticReceipt(a, b, c *Int, receipt *polynomialArithmeticInvocationReceipt) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -73,10 +76,10 @@ func (m *IntegerModularManager) Add(a, b, c *Int) error {
 	if e := m.assertNormalized(b); e != nil {
 		return e
 	}
-	if e := m.manager.Add(a, b, c); e != nil {
+	if e := m.manager.addSubWithAllocationContext(a, b, c, false, integerAllocationInvocationContext{arithmetic: receipt}); e != nil {
 		return e
 	}
-	return m.PNormalize(c)
+	return m.normalizeWithArithmeticReceipt(c, receipt)
 }
 func (m *IntegerModularManager) Sub(a, b, c *Int) error {
 	if e := m.check(); e != nil {
@@ -94,6 +97,9 @@ func (m *IntegerModularManager) Sub(a, b, c *Int) error {
 	return m.PNormalize(c)
 }
 func (m *IntegerModularManager) Mul(a, b, c *Int) error {
+	return m.mulWithArithmeticReceipt(a, b, c, nil)
+}
+func (m *IntegerModularManager) mulWithArithmeticReceipt(a, b, c *Int, receipt *polynomialArithmeticInvocationReceipt) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -103,12 +109,15 @@ func (m *IntegerModularManager) Mul(a, b, c *Int) error {
 	if e := m.assertNormalized(b); e != nil {
 		return e
 	}
-	if e := m.manager.Mul(a, b, c); e != nil {
+	if e := m.manager.mulWithAllocationContext(a, b, c, integerAllocationInvocationContext{arithmetic: receipt}); e != nil {
 		return e
 	}
-	return m.PNormalize(c)
+	return m.normalizeWithArithmeticReceipt(c, receipt)
 }
 func (m *IntegerModularManager) AddMul(a, b, c, d *Int) error {
+	return m.addMulWithArithmeticReceipt(a, b, c, d, nil)
+}
+func (m *IntegerModularManager) addMulWithArithmeticReceipt(a, b, c, d *Int, receipt *polynomialArithmeticInvocationReceipt) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -121,10 +130,15 @@ func (m *IntegerModularManager) AddMul(a, b, c, d *Int) error {
 	if e := m.assertNormalized(c); e != nil {
 		return e
 	}
-	if e := m.manager.AddMul(a, b, c, d); e != nil {
+	child := m.arithmeticAddMulReceipt(receipt)
+	e := m.manager.addMulWithSourceReceipt(a, b, c, d, child, receipt)
+	if child != nil && receipt.frame.sourceCause == nil {
+		receipt.frame.sourceCause = m.manager.addMulInvocationSourceCause(child)
+	}
+	if e != nil {
 		return e
 	}
-	return m.PNormalize(d)
+	return m.normalizeWithArithmeticReceipt(d, receipt)
 }
 func (m *IntegerModularManager) SubMul(a, b, c, d *Int) error {
 	if e := m.check(); e != nil {
@@ -298,13 +312,16 @@ func (m *IntegerModularManager) SetUint32(a *Int, v uint32) error {
 	return m.PNormalize(a)
 }
 func (m *IntegerModularManager) SetInt64(a *Int, v int64) error {
+	return m.setInt64WithArithmeticReceipt(a, v, nil)
+}
+func (m *IntegerModularManager) setInt64WithArithmeticReceipt(a *Int, v int64, receipt *polynomialArithmeticInvocationReceipt) error {
 	if e := m.check(); e != nil {
 		return e
 	}
-	if e := m.manager.SetInt64(a, v); e != nil {
+	if e := m.manager.setInt64WithAllocationContext(a, v, integerAllocationInvocationContext{arithmetic: receipt}); e != nil {
 		return e
 	}
-	return m.PNormalize(a)
+	return m.normalizeWithArithmeticReceipt(a, receipt)
 }
 func (m *IntegerModularManager) SetUint64(a *Int, v uint64) error {
 	if e := m.check(); e != nil {
@@ -325,10 +342,16 @@ func (m *IntegerModularManager) SetString(a *Int, v string) error {
 	return m.PNormalize(a)
 }
 func (m *IntegerModularManager) Copy(a, b *Int) error {
+	return m.copyWithArithmeticReceipt(a, b, nil)
+}
+func (m *IntegerModularManager) copyWithArithmeticReceipt(a, b *Int, receipt *polynomialArithmeticInvocationReceipt) error {
 	if e := m.check(); e != nil {
 		return e
 	}
-	return m.copyFromOwnerCore(a, m.manager, b)
+	if e := m.manager.copyFromOwnerWithArithmeticReceipt(a, m.manager, b, receipt); e != nil {
+		return e
+	}
+	return m.normalizeWithArithmeticReceipt(a, receipt)
 }
 
 // Exact target SET followed by source p_normalize, using the actual operand
