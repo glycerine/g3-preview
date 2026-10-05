@@ -18,13 +18,14 @@ var ErrDebugContextOwner = errors.New("g3: invalid debug context owner")
 // Source macro consumers and notification/interactive debugger remain separate
 // bindings. In particular source release CASSERT must not query this table.
 type DebugContext struct {
-	self       *DebugContext
-	region     *arena.BytesRegion
-	budget     *arena.Budget
-	tags       *utilhash.StrHashtable
-	assertions bool
-	ownerBytes uint64
-	closed     bool
+	self             *DebugContext
+	region           *arena.BytesRegion
+	budget           *arena.Budget
+	assertionStreams *MemoryStandardStreams
+	tags             *utilhash.StrHashtable
+	assertions       bool
+	ownerBytes       uint64
+	closed           bool
 }
 
 func NewDebugContext(r *arena.BytesRegion, b *arena.Budget) (*DebugContext, error) {
