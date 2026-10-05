@@ -40,6 +40,10 @@ func (m *MultivariatePolynomialCore) factoryAllocationOutcome(r *polynomialFacto
 // contributes a live cell, but no reference: a real caller INC must refuse.
 func (m *MultivariatePolynomialCore) factoryCallerGuard() (uint32, error) {
 	s := &m.factoryInvocation
+	// Refuse before caller cleanup reads or retires older source fields.
+	if s.executing {
+		return 0, ErrPolynomialPending
+	}
 	if !s.active || s.result == (Polynomial{}) {
 		return 0, nil
 	}
@@ -84,6 +88,11 @@ func (m *MultivariatePolynomialCore) transferFactoryResult(r *polynomialFactoryI
 func (m *MultivariatePolynomialCore) cleanupFactoryInvocation(r *polynomialFactoryInvocationReceipt, abort bool) error {
 	if !abort || !m.matchesFactoryInvocation(r) {
 		return nil
+	}
+	// The lower malloc has not returned its actual outcome while executing.
+	// An external transport callback cannot retire this acquisition frame.
+	if r.frame.executing {
+		return ErrPolynomialPending
 	}
 	s := r.frame
 	if m.pending.generation == s.invocation {

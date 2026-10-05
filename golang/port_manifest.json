@@ -28659,7 +28659,8 @@
         "mpnum/polynomial_cheap_append_receipt_source_test.go",
         "mpnum/polynomial_som_cohort_tags.go",
         "mpnum/polynomial_som_ordered_cohort_source_test.go",
-        "mpnum/polynomial_derivative_som_source_test.go"
+        "mpnum/polynomial_derivative_som_source_test.go",
+        "mpnum/polynomial_factory_reentrant_allocation_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -29271,7 +29272,8 @@
         "TestPolynomialFactoryAllocationActualLeaf",
         "TestPolynomialFactoryAllocationRealCallbackForeignStart",
         "TestPolynomialFactoryAllocationConcreteFrameGuards",
-        "TestPolynomialFactoryAllocationPostphysicalOwnRetry"
+        "TestPolynomialFactoryAllocationPostphysicalOwnRetry",
+        "TestPolynomialFactoryAllocationTransportCannotRetireExecutingReceipt"
       ],
       "conditionals": [
         {
@@ -32523,6 +32525,14 @@
             "TestPolynomialFactoryAllocationConcreteFrameGuards",
             "TestPolynomialFactoryAllocationPostphysicalOwnRetry"
           ]
+        },
+        {
+          "name": "polynomial.cpp:2481-2495 guarded factory malloc executing receipt and supported Go ErrorTransport reentry",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_factory_receipt.go",
+          "tests": [
+            "TestPolynomialFactoryAllocationTransportCannotRetireExecutingReceipt"
+          ]
         }
       ],
       "ownership": [
@@ -32615,7 +32625,8 @@
         "Actual source cheap.add takes a through Swap; no allocating Copy is invented. An embedded concrete append receipt records only the real default-NUM slot, monomial INC/push and factory transfer. Embedded factory receipt captures only the same guarded constructor/outcome, with actual nonwrapping invocation and frame address. Class reflected cold header charges both receipt carriers once.",
         "Explicit false acknowledgment preserves member rows/pending INC and factory placement; true after older NUM suffix drains only matched acquired append/factory roots. Known foreign rows and replacement constructors remain untouched.",
         "At successful final raw return all per-term NUM destructors are already complete. Exact completed-append preack preserves the constructed result if metadata acknowledgment stops; exact factory token handoff then transfers ownership to the caller without extra INC/source operation. Ordinary public IncRef/DecRef remains unchanged.",
-        "Exact actual self/member/frame/nonwrapping creation invocation/executing/callback-zero binding at source allocation leaf. Existing pending-root observations only refuse unsafe cleanup or acknowledge consumption of previously captured identities; never acquire later replacement roots."
+        "Exact actual self/member/frame/nonwrapping creation invocation/executing/callback-zero binding at source allocation leaf. Existing pending-root observations only refuse unsafe cleanup or acknowledge consumption of previously captured identities; never acquire later replacement roots.",
+        "Actual lower-allocation executing frame cannot be retired by a reentrant Go ErrorTransport owning cleanup; original returned Pending outcome stays bound through actual refusal and later own abort. Early factoryCallerGuard refuses before public CleanupConstruction or manager.CloseChecked reaches older construction storage; private receipt cleanup independently refuses while executing."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -32686,7 +32697,8 @@
         "polynomial.cpp:2757-2768 selected ScalarDiv transport prerequisite only: public/nil Integer negative Div and ExtendedGCD still eagerly delete RAW locals on failed bodies and remain incomplete. Shared mixed cohort ordered retirement and full Discriminant/Factor parents remain open. Native real signed-TLS guard reaches caller NUM DT; checked reaches failed younger verification ctor with no invented source DT. No new dormant original driver assertion credit or unit promotion.",
         "Selected ordered cheap append retirement prerequisite only; regular SOM arithmetic wrappers, full Factor/Discriminant, registered driver and source unit completion remain open. Guard-only/malformed owner fixtures have no valid C++ mathematical failure credit. Successful validated clear-to-publish writes have no intervening source allocation/callback; no manufactured faultpoint or ordinary-prefix claim.",
         "Closes derivative actual cheap append/factory owning gap for existing concrete source profile. No ordinary Copy allocation is present on this take=true path. Interrupted direct-return metadata guard requires an existing real guarded state; no fabricated allocator/callback between source completed mk and handoff. Other regular SOM arithmetic wrappers, full Factor/Discriminant/source classes and dormant registered driver remain separate obligations; no unit promotion.",
-        "Selected receipt leaf closure only. Signed-host TLS domain fixture is a public-operation guarded helper profile, not ordinary mathematical freeOOM. Bounds-to-ErrorTransport hypothesis was withdrawn after runtime.go:123-134/accounting.go:55-84,175-186 review. Other legacy parent observer snapshots, regular SOM wrappers, full Factor/Discriminant and whole source unit remain separately open; registered driver credit0."
+        "Selected receipt leaf closure only. Signed-host TLS domain fixture is a public-operation guarded helper profile, not ordinary mathematical freeOOM. Bounds-to-ErrorTransport hypothesis was withdrawn after runtime.go:123-134/accounting.go:55-84,175-186 review. Other legacy parent observer snapshots, regular SOM wrappers, full Factor/Discriminant and whole source unit remain separately open; registered driver credit0.",
+        "ErrorTransport reentry is a supported Go helper callback profile; this proof does not invent a corresponding native C++ callback at malloc exception. Exact executing cleanup refuses ErrPolynomialPending. Original postphysical Pending token survived before fix, but its prematurely inactive receipt could not own-abort; real RED preserved. Additional actual public cleanup RED showed pending-generation mutation before late refusal; corrected early guard preserves original pending state, Runtime graph, cold charge and manager retirement stage in all three modes."
       ]
     },
     {
