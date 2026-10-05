@@ -117,16 +117,20 @@ type ParamDescrsStats struct {
 // The cold mutex protects this owner; a shared external Budget requires caller
 // serialization. Owning Go values must not be shallow-copied.
 type ParamDescrs struct {
-	mu            sync.Mutex
-	self          *ParamDescrs
-	manager       *SymbolManager
-	budget        *arena.Budget
-	texts         *arena.Words
-	entries       []paramDescrEntry
-	names         []Symbol
-	size, deleted uint32
-	outOfMemory   func() bool
-	closed        bool
+	mu                   sync.Mutex
+	self                 *ParamDescrs
+	manager              *SymbolManager
+	budget               *arena.Budget
+	texts                *arena.Words
+	entries              []paramDescrEntry
+	names                []Symbol
+	size, deleted        uint32
+	outOfMemory          func() bool
+	closed               bool
+	constructorReady     bool
+	constructorCompleted uint8
+	constructorCause     error
+	ownerBytes           uint64
 }
 
 func pdEntryBytes(n int) uint64 { return uint64(n) * uint64(reflect.TypeOf(paramDescrEntry{}).Size()) }
@@ -144,7 +148,7 @@ func pdGrowth(n int) (int, error) {
 	}
 	return v, nil
 }
-func NewParamDescrs(m *SymbolManager, c ParamDescrsConfig) (*ParamDescrs, error) {
+func newSourceParamDescrs(m *SymbolManager, c ParamDescrsConfig) (*ParamDescrs, error) {
 	if m == nil {
 		return nil, ErrParamDescrsPrecondition
 	}
@@ -175,18 +179,28 @@ func NewParamDescrs(m *SymbolManager, c ParamDescrsConfig) (*ParamDescrs, error)
 	if e := c.Budget.Reserve(owner); e != nil {
 		return nil, e
 	}
+	d := &ParamDescrs{manager: m, budget: c.Budget, outOfMemory: c.OutOfMemory, ownerBytes: owner}
+	d.self = d
+	// Copied-text storage is actual additional Go cold context, prepared before
+	// source m_info construction; it is not a native table allocation ticket.
 	text, e := arena.NewWords(c.Text)
 	if e != nil {
-		c.Budget.Release(owner)
-		return nil, e
+		d.constructorCause = e
+		return d, e
 	}
+	d.texts = text
 	if e = c.Budget.Reserve(pdEntryBytes(int(n))); e != nil {
-		text.Close()
-		c.Budget.Release(owner)
-		return nil, e
+		d.constructorCause = e
+		return d, e
 	}
-	d := &ParamDescrs{manager: m, budget: c.Budget, texts: text, entries: make([]paramDescrEntry, n), outOfMemory: c.OutOfMemory}
-	d.self = d
+	d.entries = make([]paramDescrEntry, n)
+	for i := range d.entries {
+		d.entries[i].info.kind = ParamInvalid
+	}
+	d.constructorCompleted = 1 // actual info dictionary completed
+	d.names = nil              // source null names vector default construction cannot fail
+	d.constructorCompleted = 2
+	d.constructorReady = true
 	return d, nil
 }
 func (d *ParamDescrs) open() error {
@@ -195,6 +209,9 @@ func (d *ParamDescrs) open() error {
 	}
 	if d.closed {
 		return arena.ErrClosed
+	}
+	if !d.constructorReady {
+		return ErrParamDescrsPrecondition
 	}
 	_, e := d.manager.Hash(Symbol{})
 	return e
@@ -1002,7 +1019,11 @@ func (d *ParamDescrs) Stats() ParamDescrsStats {
 	if d.closed {
 		return ParamDescrsStats{}
 	}
-	return ParamDescrsStats{d.size, d.deleted, uint32(len(d.entries)), uint32(len(d.names)), uint32(cap(d.names)), uint64(reflect.TypeOf(ParamDescrs{}).Size()), pdEntryBytes(len(d.entries)), pdNameBytes(cap(d.names)), d.texts.Stats()}
+	var text arena.VectorStats
+	if d.texts != nil {
+		text = d.texts.Stats()
+	}
+	return ParamDescrsStats{d.size, d.deleted, uint32(len(d.entries)), uint32(len(d.names)), uint32(cap(d.names)), d.ownerBytes, pdEntryBytes(len(d.entries)), pdNameBytes(cap(d.names)), text}
 }
 func (d *ParamDescrs) Close() error {
 	d.mu.Lock()
@@ -1013,8 +1034,12 @@ func (d *ParamDescrs) Close() error {
 	if d.closed {
 		return nil
 	}
+	if !d.constructorReady {
+		return ErrParamDescrsPrecondition
+	}
 	d.texts.Close()
-	d.budget.Release(pdEntryBytes(len(d.entries)) + pdNameBytes(cap(d.names)) + uint64(reflect.TypeOf(ParamDescrs{}).Size()))
+	d.budget.Release(pdEntryBytes(len(d.entries)) + pdNameBytes(cap(d.names)) + d.ownerBytes)
+	d.ownerBytes = 0
 	d.entries = nil
 	d.names = nil
 	d.size = 0
@@ -1050,6 +1075,9 @@ func (d *ParamDescrs) sourceFinalizeMembers() error {
 	if d.closed {
 		return nil
 	}
+	if !d.constructorReady {
+		return ErrParamDescrsPrecondition
+	}
 	return d.closeSourceMembers()
 }
 
@@ -1062,7 +1090,8 @@ func (d *ParamDescrs) closeSourceMembers() error {
 	d.size = 0
 	d.deleted = 0
 	d.texts.Close()
-	d.budget.Release(uint64(reflect.TypeOf(ParamDescrs{}).Size()))
+	d.budget.Release(d.ownerBytes)
+	d.ownerBytes = 0
 	d.closed = true
 	return nil
 }

@@ -33,31 +33,36 @@ type gparamsRegionBinding struct {
 	region *arena.BytesRegion
 }
 type GlobalParams struct {
-	catalog                                *GlobalParamsCatalog
-	mu                                     sync.Mutex
-	self                                   *GlobalParams
-	symbols                                *SymbolManager
-	context                                *ParamsContext
-	budget                                 *arena.Budget
-	register                               func(GlobalParamsRegistrar) error
-	modulesRegistered, registering, closed bool
-	sourceStarted, sourceCompleted         bool
-	sourceStage                            uint8
-	sourceIndex                            uint32
-	sourceCause                            error
-	sourceDecrement                        ParamsDecrementReceipt
-	sourceReset                            ParamsResetReceipt
-	ownerBytes                             uint64
-	cLongBits                              uint8
-	moduleDescriptors                      gparamsDescriptorDictionary
-	moduleDescriptions                     gparamsDescriptionDictionary
-	moduleParams                           gparamsRefDictionary
-	descriptors                            []*ParamDescrs
-	cells                                  []*gparamsRefCell
-	bindings                               []gparamsRegionBinding
-	globalDescriptors                      *ParamDescrs
-	globalParams                           ParamsRef
-	workspace                              []byte
+	catalog                                 *GlobalParamsCatalog
+	mu                                      sync.Mutex
+	self                                    *GlobalParams
+	symbols                                 *SymbolManager
+	context                                 *ParamsContext
+	budget                                  *arena.Budget
+	register                                func(GlobalParamsRegistrar) error
+	modulesRegistered, registering, closed  bool
+	sourceStarted, sourceCompleted          bool
+	sourceStage                             uint8
+	sourceIndex                             uint32
+	sourceCause                             error
+	sourceDecrement                         ParamsDecrementReceipt
+	sourceReset                             ParamsResetReceipt
+	ownerBytes                              uint64
+	constructorReady                        bool
+	constructorCompleted, constructorUnwind uint8
+	constructorCause                        error
+	constructorPendingDescriptor            *ParamDescrs
+	retainedNext                            *GlobalParams
+	cLongBits                               uint8
+	moduleDescriptors                       gparamsDescriptorDictionary
+	moduleDescriptions                      gparamsDescriptionDictionary
+	moduleParams                            gparamsRefDictionary
+	descriptors                             []*ParamDescrs
+	cells                                   []*gparamsRefCell
+	bindings                                []gparamsRegionBinding
+	globalDescriptors                       *ParamDescrs
+	globalParams                            ParamsRef
+	workspace                               []byte
 }
 
 // Registrar is a cold by-value capability used only inside the registration
@@ -76,7 +81,7 @@ func (r GlobalParamsRegistrar) RegisterGlobal(d *ParamDescrs) error {
 	}
 	return r.owner.globalDescriptors.Copy(d)
 }
-func NewGlobalParams(s *SymbolManager, p *ParamsContext, c GlobalParamsConfig) (*GlobalParams, error) {
+func newSourceGlobalParams(s *SymbolManager, p *ParamsContext, c GlobalParamsConfig) (*GlobalParams, error) {
 	if s == nil || p == nil || p.symbols != s {
 		return nil, ErrGlobalParamsOwner
 	}
@@ -113,30 +118,47 @@ func NewGlobalParams(s *SymbolManager, p *ParamsContext, c GlobalParamsConfig) (
 	g := &GlobalParams{symbols: s, context: p, budget: c.Budget, register: c.Register, ownerBytes: n, catalog: c.Catalog}
 	g.self = g
 	g.cLongBits = longBits
-	fail := func(e error) (*GlobalParams, error) { _ = g.Close(); return nil, e }
+	fail := func(e error) (*GlobalParams, error) {
+		g.constructorCause = e
+		g.constructorUnwind = g.constructorCompleted
+		if cleanup := g.unwindConstructor(); cleanup != nil {
+			return g, errors.Join(e, cleanup)
+		}
+		return g, e
+	}
 	if e := g.moduleDescriptors.allocate(c.Budget, 8); e != nil {
 		return fail(e)
 	}
+	g.constructorCompleted = 1
 	if e := g.moduleDescriptions.allocate(c.Budget, 8); e != nil {
 		return fail(e)
 	}
-	d, e := NewParamDescrs(s, ParamDescrsConfig{Budget: c.Budget, Text: arena.VectorConfig{PageSize: c.DescriptorWordsPageSize, Descriptors: arena.Config{PageSize: c.DescriptorPageSize, Budget: c.Budget}}})
+	g.constructorCompleted = 2
+	d, e := newSourceParamDescrs(s, ParamDescrsConfig{Budget: c.Budget, Text: arena.VectorConfig{PageSize: c.DescriptorWordsPageSize, Descriptors: arena.Config{PageSize: c.DescriptorPageSize, Budget: c.Budget}}})
 	if e != nil {
+		g.constructorPendingDescriptor = d
 		return fail(e)
 	}
 	g.globalDescriptors = d
+	g.constructorCompleted = 3
 	if e = g.moduleParams.allocate(c.Budget, 8); e != nil {
 		return fail(e)
 	}
+	g.constructorCompleted = 4
 	g.globalParams, e = p.NewValue()
 	if e != nil {
 		return fail(e)
 	}
+	g.constructorCompleted = 5
+	g.constructorReady = true
 	return g, nil
 }
 func (g *GlobalParams) open() error {
 	if g == nil || g.self != g {
 		return ErrGlobalParamsOwner
+	}
+	if !g.constructorReady {
+		return ErrGlobalParamsUnconstructed
 	}
 	if g.closed || g.sourceStarted {
 		return arena.ErrClosed

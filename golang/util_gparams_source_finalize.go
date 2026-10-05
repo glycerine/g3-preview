@@ -17,6 +17,9 @@ func (g *GlobalParams) SourceFinalize() error {
 	}
 	g.mu.Lock()
 	defer g.mu.Unlock()
+	if !g.constructorReady {
+		return ErrGlobalParamsUnconstructed
+	}
 	if g.sourceCause != nil {
 		return g.sourceCause
 	}
