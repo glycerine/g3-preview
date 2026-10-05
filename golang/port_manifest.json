@@ -18937,14 +18937,51 @@
       "path": "src/ast/rewriter/bv_rewriter_params.pyg",
       "component": "ast",
       "role": "generated_input",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_smt_bv_params.go",
+        "util_smt_bv_params_source_test.go",
+        "util_smt_module_params_source.go"
+      ],
+      "tests": [
+        "TestSMTBVSimultaneousHelperOlderReadAndReverseDestruction",
+        "TestSMTBVSevenDefaultsThenActualUpdate",
+        "TestSMTBVIndependentBooleanPrecedenceAndUntouchedMembers",
+        "TestSMTBVEveryActualWarmConstructorReservationAndDeclarationPrefix",
+        "TestSMTBVUnwarmedSharedSymbolAndHelperAcquisitionPrefixes",
+        "TestSMTBVSevenDisplayChainsShowPosAllOutputPrefixesAndBadbit",
+        "TestSMTBVYoungerRealNumeralDestructorStopProtectsOlderHelper",
+        "TestSMTBVIncompleteSecondHelperConstructorDisplayRefusesBeforeInsertion",
+        "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
+        "TestSMTBVNullGlobalsConstructorPrefixAndForeignLocalGetter"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Actual rewriter-module hi_div0 accessor and true default (src/ast/rewriter/bv_rewriter_params.pyg:1-9; scripts/mk_genfile_common.py:895-939)",
+          "status": "partial",
+          "go_target": "util_smt_bv_params.go",
+          "tests": [
+            "TestSMTBVSimultaneousHelperOlderReadAndReverseDestruction",
+            "TestSMTBVSevenDefaultsThenActualUpdate",
+            "TestSMTBVIndependentBooleanPrecedenceAndUntouchedMembers",
+            "TestSMTBVEveryActualWarmConstructorReservationAndDeclarationPrefix",
+            "TestSMTBVUnwarmedSharedSymbolAndHelperAcquisitionPrefixes",
+            "TestSMTBVSevenDisplayChainsShowPosAllOutputPrefixesAndBadbit",
+            "TestSMTBVYoungerRealNumeralDestructorStopProtectsOlderHelper",
+            "TestSMTBVIncompleteSecondHelperConstructorDisplayRefusesBeforeInsertion",
+            "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
+            "TestSMTBVNullGlobalsConstructorPrefixAndForeignLocalGetter"
+          ]
+        }
+      ],
+      "ownership": [
+        "Two actual generated helpers are acquired in declaration order smt then rewriter; the borrowed local ParamsRef is read at each getter, and an older live helper remains readable while the younger helper exists. Exact returned module references are the only acquisition authority. Source destruction runs rewriter then smt; the first younger stopped destructor protects the unread older frame, retains immutable body/source history and exact decrement receipt, and is distinct from explicit owning Close. Embedded common fields are charged once in enclosing reflected wrappers; actual lexical frame cold allocations have no native stack-allocation credit."
+      ],
+      "deviations": [
+        "No registered SMT context/kernel driver or whole generated helper/generator/global/locale/boolalpha completion credit. The seven literal defaults are followed by mandatory update, including source constructor false hi_div0 replaced by generated rewriter true. Invalid/cross-owner or incomplete-object, signed TLS overflow and native global-null lifetime conditions are explicitly guarded Go domains, not valid native OOM/undefined-behavior equivalence. Numeric test collector callbacks are unreachable configuration anchors, not injected source failure leaves."
+      ]
     },
     {
       "path": "src/ast/rewriter/bv_trailing.cpp",
@@ -68559,7 +68596,8 @@
         "util_smt_dyn_ack_params.go",
         "util_smt_dyn_ack_params_source_test.go",
         "util_smt_module_params_source.go",
-        "util_smt_array_params_source_test.go"
+        "util_smt_array_params_source_test.go",
+        "util_smt_bv_params_source_test.go"
       ],
       "tests": [
         "TestSMTDynAckConstructorLiteralDefaultsAndFallbackOrder",
@@ -68571,7 +68609,11 @@
         "TestSMTDynAckDisplayNumericBoolShowPosSignedLongProfile",
         "TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards",
         "TestSMTArrayConstructorAndUpdateEveryRealReservationPrefix",
-        "TestSMTArrayConstructorUninitializedGlobalsAndFunctionFailureRetry"
+        "TestSMTArrayConstructorUninitializedGlobalsAndFunctionFailureRetry",
+        "TestSMTBVSimultaneousHelperOlderReadAndReverseDestruction",
+        "TestSMTBVYoungerRealNumeralDestructorStopProtectsOlderHelper",
+        "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
+        "TestSMTBVEveryActualWarmConstructorReservationAndDeclarationPrefix"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -68599,11 +68641,23 @@
             "TestSMTArrayConstructorAndUpdateEveryRealReservationPrefix",
             "TestSMTArrayConstructorUninitializedGlobalsAndFunctionFailureRetry"
           ]
+        },
+        {
+          "name": "Concrete simultaneous generated-helper frame engine, older reads and strict younger source stop before older DT (scripts/mk_genfile_common.py:895-939; src/smt/params/theory_bv_params.cpp:24-29)",
+          "status": "partial",
+          "go_target": "util_smt_module_params_source.go",
+          "tests": [
+            "TestSMTBVSimultaneousHelperOlderReadAndReverseDestruction",
+            "TestSMTBVYoungerRealNumeralDestructorStopProtectsOlderHelper",
+            "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
+            "TestSMTBVEveryActualWarmConstructorReservationAndDeclarationPrefix"
+          ]
         }
       ],
       "ownership": [
         "Actual acquired helper module ParamsRef is stamped only at SourceGetModuleName return; lexical source DelTracked before function return, retained exact decrement receipt separate from owning Close. Standalone Go wrapper/helper are actual reflected cold allocations, not native scalar/stack malloc credit. Original Symbol/Params/global owners remain borrowed.",
-        "The concrete generated helper owner is embedded once in the actual reflected parameter wrapper header; each reached lexical helper frame charges its actual cold fields, borrows the local ParamsRef pointer and acquires its module reference only at the returned SourceGetModuleName result. Source DelTracked executes before return; any stopped destructor retains its exact decrement receipt for separate owning Close. Caller contexts/global services remain borrowed."
+        "The concrete generated helper owner is embedded once in the actual reflected parameter wrapper header; each reached lexical helper frame charges its actual cold fields, borrows the local ParamsRef pointer and acquires its module reference only at the returned SourceGetModuleName result. Source DelTracked executes before return; any stopped destructor retains its exact decrement receipt for separate owning Close. Caller contexts/global services remain borrowed.",
+        "Two actual generated helpers are acquired in declaration order smt then rewriter; the borrowed local ParamsRef is read at each getter, and an older live helper remains readable while the younger helper exists. Exact returned module references are the only acquisition authority. Source destruction runs rewriter then smt; the first younger stopped destructor protects the unread older frame, retains immutable body/source history and exact decrement receipt, and is distinct from explicit owning Close. Embedded common fields are charged once in enclosing reflected wrappers; actual lexical frame cold allocations have no native stack-allocation credit."
       ],
       "deviations": [
         "No registered SMT context/kernel driver credit. Scalar base embedding into complete smt_params and native global/locale/boolalpha profiles remain open. Go invalid local/closed/null owner guards and standalone incomplete-constructor owning continuation are explicit adapter domains. Strategy outside source enumerators is only selected fixed-width Go representation evidence. Generated helper credit is limited to six dack accessor definitions; full helper/generator remain partial."
@@ -68845,7 +68899,9 @@
         "util_smt_dyn_ack_params_source_test.go",
         "util_smt_array_params.go",
         "util_smt_module_params_source.go",
-        "util_smt_array_params_source_test.go"
+        "util_smt_array_params_source_test.go",
+        "util_smt_bv_params.go",
+        "util_smt_bv_params_source_test.go"
       ],
       "tests": [
         "TestSMTDynAckConstructorLiteralDefaultsAndFallbackOrder",
@@ -68860,7 +68916,17 @@
         "TestSMTArrayConstructorAndUpdateEveryRealReservationPrefix",
         "TestSMTArrayConstructorUninitializedGlobalsAndFunctionFailureRetry",
         "TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards",
-        "TestSMTArrayEveryActualOutputReservationAndClosedFileBadbit"
+        "TestSMTArrayEveryActualOutputReservationAndClosedFileBadbit",
+        "TestSMTBVSimultaneousHelperOlderReadAndReverseDestruction",
+        "TestSMTBVSevenDefaultsThenActualUpdate",
+        "TestSMTBVIndependentBooleanPrecedenceAndUntouchedMembers",
+        "TestSMTBVEveryActualWarmConstructorReservationAndDeclarationPrefix",
+        "TestSMTBVUnwarmedSharedSymbolAndHelperAcquisitionPrefixes",
+        "TestSMTBVSevenDisplayChainsShowPosAllOutputPrefixesAndBadbit",
+        "TestSMTBVYoungerRealNumeralDestructorStopProtectsOlderHelper",
+        "TestSMTBVIncompleteSecondHelperConstructorDisplayRefusesBeforeInsertion",
+        "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
+        "TestSMTBVNullGlobalsConstructorPrefixAndForeignLocalGetter"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -68891,15 +68957,34 @@
             "TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards",
             "TestSMTArrayEveryActualOutputReservationAndClosedFileBadbit"
           ]
+        },
+        {
+          "name": "Two actual BV SMT getters with borrowed local/module/default precedence (src/smt/params/smt_params_helper.pyg:38-39)",
+          "status": "partial",
+          "go_target": "util_smt_bv_params.go",
+          "tests": [
+            "TestSMTBVSimultaneousHelperOlderReadAndReverseDestruction",
+            "TestSMTBVSevenDefaultsThenActualUpdate",
+            "TestSMTBVIndependentBooleanPrecedenceAndUntouchedMembers",
+            "TestSMTBVEveryActualWarmConstructorReservationAndDeclarationPrefix",
+            "TestSMTBVUnwarmedSharedSymbolAndHelperAcquisitionPrefixes",
+            "TestSMTBVSevenDisplayChainsShowPosAllOutputPrefixesAndBadbit",
+            "TestSMTBVYoungerRealNumeralDestructorStopProtectsOlderHelper",
+            "TestSMTBVIncompleteSecondHelperConstructorDisplayRefusesBeforeInsertion",
+            "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
+            "TestSMTBVNullGlobalsConstructorPrefixAndForeignLocalGetter"
+          ]
         }
       ],
       "ownership": [
         "Actual acquired helper module ParamsRef is stamped only at SourceGetModuleName return; lexical source DelTracked before function return, retained exact decrement receipt separate from owning Close. Standalone Go wrapper/helper are actual reflected cold allocations, not native scalar/stack malloc credit. Original Symbol/Params/global owners remain borrowed.",
-        "The concrete generated helper owner is embedded once in the actual reflected parameter wrapper header; each reached lexical helper frame charges its actual cold fields, borrows the local ParamsRef pointer and acquires its module reference only at the returned SourceGetModuleName result. Source DelTracked executes before return; any stopped destructor retains its exact decrement receipt for separate owning Close. Caller contexts/global services remain borrowed."
+        "The concrete generated helper owner is embedded once in the actual reflected parameter wrapper header; each reached lexical helper frame charges its actual cold fields, borrows the local ParamsRef pointer and acquires its module reference only at the returned SourceGetModuleName result. Source DelTracked executes before return; any stopped destructor retains its exact decrement receipt for separate owning Close. Caller contexts/global services remain borrowed.",
+        "Two actual generated helpers are acquired in declaration order smt then rewriter; the borrowed local ParamsRef is read at each getter, and an older live helper remains readable while the younger helper exists. Exact returned module references are the only acquisition authority. Source destruction runs rewriter then smt; the first younger stopped destructor protects the unread older frame, retains immutable body/source history and exact decrement receipt, and is distinct from explicit owning Close. Embedded common fields are charged once in enclosing reflected wrappers; actual lexical frame cold allocations have no native stack-allocation credit."
       ],
       "deviations": [
         "No registered SMT context/kernel driver credit. Scalar base embedding into complete smt_params and native global/locale/boolalpha profiles remain open. Go invalid local/closed/null owner guards and standalone incomplete-constructor owning continuation are explicit adapter domains. Strategy outside source enumerators is only selected fixed-width Go representation evidence. Generated helper credit is limited to six dack accessor definitions; full helper/generator remain partial.",
-        "No complete SMT context, generated-helper/generator, native global/locale/boolalpha or registered SMT driver completion credit. The standalone facade and lexical-frame reflected cold charges are explicit Go ownership representation rather than native scalar/stack allocations. Disabled array registration is erased; Array constructor never reads params or performs update."
+        "No complete SMT context, generated-helper/generator, native global/locale/boolalpha or registered SMT driver completion credit. The standalone facade and lexical-frame reflected cold charges are explicit Go ownership representation rather than native scalar/stack allocations. Disabled array registration is erased; Array constructor never reads params or performs update.",
+        "No registered SMT context/kernel driver or whole generated helper/generator/global/locale/boolalpha completion credit. The seven literal defaults are followed by mandatory update, including source constructor false hi_div0 replaced by generated rewriter true. Invalid/cross-owner or incomplete-object, signed TLS overflow and native global-null lifetime conditions are explicitly guarded Go domains, not valid native OOM/undefined-behavior equivalence. Numeric test collector callbacks are unreachable configuration anchors, not injected source failure leaves."
       ]
     },
     {
@@ -68946,7 +69031,8 @@
       "go_targets": [
         "util_smt_array_params.go",
         "util_smt_module_params_source.go",
-        "util_smt_array_params_source_test.go"
+        "util_smt_array_params_source_test.go",
+        "util_smt_bv_params_source_test.go"
       ],
       "tests": [
         "TestSMTArrayConstructorElevenDefaultsDoesNotUpdate",
@@ -68954,7 +69040,11 @@
         "TestSMTArrayConstructorAndUpdateEveryRealReservationPrefix",
         "TestSMTArrayConstructorUninitializedGlobalsAndFunctionFailureRetry",
         "TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards",
-        "TestSMTArrayEveryActualOutputReservationAndClosedFileBadbit"
+        "TestSMTArrayEveryActualOutputReservationAndClosedFileBadbit",
+        "TestSMTBVSimultaneousHelperOlderReadAndReverseDestruction",
+        "TestSMTBVYoungerRealNumeralDestructorStopProtectsOlderHelper",
+        "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
+        "TestSMTBVEveryActualWarmConstructorReservationAndDeclarationPrefix"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -68971,10 +69061,22 @@
             "TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards",
             "TestSMTArrayEveryActualOutputReservationAndClosedFileBadbit"
           ]
+        },
+        {
+          "name": "Concrete simultaneous generated-helper frame engine, older reads and strict younger source stop before older DT (scripts/mk_genfile_common.py:895-939; src/smt/params/theory_bv_params.cpp:24-29)",
+          "status": "partial",
+          "go_target": "util_smt_module_params_source.go",
+          "tests": [
+            "TestSMTBVSimultaneousHelperOlderReadAndReverseDestruction",
+            "TestSMTBVYoungerRealNumeralDestructorStopProtectsOlderHelper",
+            "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
+            "TestSMTBVEveryActualWarmConstructorReservationAndDeclarationPrefix"
+          ]
         }
       ],
       "ownership": [
-        "The concrete generated helper owner is embedded once in the actual reflected parameter wrapper header; each reached lexical helper frame charges its actual cold fields, borrows the local ParamsRef pointer and acquires its module reference only at the returned SourceGetModuleName result. Source DelTracked executes before return; any stopped destructor retains its exact decrement receipt for separate owning Close. Caller contexts/global services remain borrowed."
+        "The concrete generated helper owner is embedded once in the actual reflected parameter wrapper header; each reached lexical helper frame charges its actual cold fields, borrows the local ParamsRef pointer and acquires its module reference only at the returned SourceGetModuleName result. Source DelTracked executes before return; any stopped destructor retains its exact decrement receipt for separate owning Close. Caller contexts/global services remain borrowed.",
+        "Two actual generated helpers are acquired in declaration order smt then rewriter; the borrowed local ParamsRef is read at each getter, and an older live helper remains readable while the younger helper exists. Exact returned module references are the only acquisition authority. Source destruction runs rewriter then smt; the first younger stopped destructor protects the unread older frame, retains immutable body/source history and exact decrement receipt, and is distinct from explicit owning Close. Embedded common fields are charged once in enclosing reflected wrappers; actual lexical frame cold allocations have no native stack-allocation credit."
       ],
       "deviations": [
         "No complete SMT context, generated-helper/generator, native global/locale/boolalpha or registered SMT driver completion credit. The standalone facade and lexical-frame reflected cold charges are explicit Go ownership representation rather than native scalar/stack allocations. Disabled array registration is erased; Array constructor never reads params or performs update."
@@ -69044,22 +69146,74 @@
       "path": "src/smt/params/theory_bv_params.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_smt_bv_params.go",
+        "util_smt_bv_params_source_test.go",
+        "util_smt_module_params_source.go"
+      ],
+      "tests": [
+        "TestSMTBVSimultaneousHelperOlderReadAndReverseDestruction",
+        "TestSMTBVSevenDefaultsThenActualUpdate",
+        "TestSMTBVIndependentBooleanPrecedenceAndUntouchedMembers",
+        "TestSMTBVEveryActualWarmConstructorReservationAndDeclarationPrefix",
+        "TestSMTBVUnwarmedSharedSymbolAndHelperAcquisitionPrefixes",
+        "TestSMTBVSevenDisplayChainsShowPosAllOutputPrefixesAndBadbit",
+        "TestSMTBVYoungerRealNumeralDestructorStopProtectsOlderHelper",
+        "TestSMTBVIncompleteSecondHelperConstructorDisplayRefusesBeforeInsertion",
+        "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
+        "TestSMTBVNullGlobalsConstructorPrefixAndForeignLocalGetter"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Two helper declarations, three RHS/publications, reverse lexical DT and seven literal ostream endl chains (src/smt/params/theory_bv_params.cpp:23-40)",
+          "status": "partial",
+          "go_target": "util_smt_bv_params.go",
+          "tests": [
+            "TestSMTBVSimultaneousHelperOlderReadAndReverseDestruction",
+            "TestSMTBVSevenDefaultsThenActualUpdate",
+            "TestSMTBVIndependentBooleanPrecedenceAndUntouchedMembers",
+            "TestSMTBVEveryActualWarmConstructorReservationAndDeclarationPrefix",
+            "TestSMTBVUnwarmedSharedSymbolAndHelperAcquisitionPrefixes",
+            "TestSMTBVSevenDisplayChainsShowPosAllOutputPrefixesAndBadbit",
+            "TestSMTBVYoungerRealNumeralDestructorStopProtectsOlderHelper",
+            "TestSMTBVIncompleteSecondHelperConstructorDisplayRefusesBeforeInsertion",
+            "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
+            "TestSMTBVNullGlobalsConstructorPrefixAndForeignLocalGetter"
+          ]
+        }
+      ],
+      "ownership": [
+        "Two actual generated helpers are acquired in declaration order smt then rewriter; the borrowed local ParamsRef is read at each getter, and an older live helper remains readable while the younger helper exists. Exact returned module references are the only acquisition authority. Source destruction runs rewriter then smt; the first younger stopped destructor protects the unread older frame, retains immutable body/source history and exact decrement receipt, and is distinct from explicit owning Close. Embedded common fields are charged once in enclosing reflected wrappers; actual lexical frame cold allocations have no native stack-allocation credit."
+      ],
+      "deviations": [
+        "No registered SMT context/kernel driver or whole generated helper/generator/global/locale/boolalpha completion credit. The seven literal defaults are followed by mandatory update, including source constructor false hi_div0 replaced by generated rewriter true. Invalid/cross-owner or incomplete-object, signed TLS overflow and native global-null lifetime conditions are explicitly guarded Go domains, not valid native OOM/undefined-behavior equivalence. Numeric test collector callbacks are unreachable configuration anchors, not injected source failure leaves."
+      ]
     },
     {
       "path": "src/smt/params/theory_bv_params.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_smt_bv_params.go",
+        "util_smt_bv_params_source_test.go",
+        "util_smt_module_params_source.go"
+      ],
+      "tests": [
+        "TestSMTBVSimultaneousHelperOlderReadAndReverseDestruction",
+        "TestSMTBVSevenDefaultsThenActualUpdate",
+        "TestSMTBVIndependentBooleanPrecedenceAndUntouchedMembers",
+        "TestSMTBVEveryActualWarmConstructorReservationAndDeclarationPrefix",
+        "TestSMTBVUnwarmedSharedSymbolAndHelperAcquisitionPrefixes",
+        "TestSMTBVSevenDisplayChainsShowPosAllOutputPrefixesAndBadbit",
+        "TestSMTBVYoungerRealNumeralDestructorStopProtectsOlderHelper",
+        "TestSMTBVIncompleteSecondHelperConstructorDisplayRefusesBeforeInsertion",
+        "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
+        "TestSMTBVNullGlobalsConstructorPrefixAndForeignLocalGetter"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -69072,9 +69226,31 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Seven scalar defaults then actual constructor update and incomplete object eligibility (src/smt/params/theory_bv_params.h:24-50)",
+          "status": "partial",
+          "go_target": "util_smt_bv_params.go",
+          "tests": [
+            "TestSMTBVSimultaneousHelperOlderReadAndReverseDestruction",
+            "TestSMTBVSevenDefaultsThenActualUpdate",
+            "TestSMTBVIndependentBooleanPrecedenceAndUntouchedMembers",
+            "TestSMTBVEveryActualWarmConstructorReservationAndDeclarationPrefix",
+            "TestSMTBVUnwarmedSharedSymbolAndHelperAcquisitionPrefixes",
+            "TestSMTBVSevenDisplayChainsShowPosAllOutputPrefixesAndBadbit",
+            "TestSMTBVYoungerRealNumeralDestructorStopProtectsOlderHelper",
+            "TestSMTBVIncompleteSecondHelperConstructorDisplayRefusesBeforeInsertion",
+            "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
+            "TestSMTBVNullGlobalsConstructorPrefixAndForeignLocalGetter"
+          ]
+        }
+      ],
+      "ownership": [
+        "Two actual generated helpers are acquired in declaration order smt then rewriter; the borrowed local ParamsRef is read at each getter, and an older live helper remains readable while the younger helper exists. Exact returned module references are the only acquisition authority. Source destruction runs rewriter then smt; the first younger stopped destructor protects the unread older frame, retains immutable body/source history and exact decrement receipt, and is distinct from explicit owning Close. Embedded common fields are charged once in enclosing reflected wrappers; actual lexical frame cold allocations have no native stack-allocation credit."
+      ],
+      "deviations": [
+        "No registered SMT context/kernel driver or whole generated helper/generator/global/locale/boolalpha completion credit. The seven literal defaults are followed by mandatory update, including source constructor false hi_div0 replaced by generated rewriter true. Invalid/cross-owner or incomplete-object, signed TLS overflow and native global-null lifetime conditions are explicitly guarded Go domains, not valid native OOM/undefined-behavior equivalence. Numeric test collector callbacks are unreachable configuration anchors, not injected source failure leaves."
+      ]
     },
     {
       "path": "src/smt/params/theory_datatype_params.h",
@@ -73149,22 +73325,54 @@
       "path": "src/smt/smt_literal.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "smt_literal.go",
+        "smt_literal_source_test.go"
+      ],
+      "tests": [
+        "TestSMTLiteralSignedSentinelsAndSourceOperations",
+        "TestSMTLiteralBackwardSubsumptionIndependentFiniteMultisets",
+        "TestSMTLiteralSourceStreamSignedNullAndBooleanConstants",
+        "TestSMTLiteralSeparateInsertionFlagsAndEveryOutputReservation"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Literal numeric ostream insertion and literal nested backward subsumption membership scan",
+          "status": "ported",
+          "go_target": "smt_literal.go",
+          "tests": [
+            "TestSMTLiteralSignedSentinelsAndSourceOperations",
+            "TestSMTLiteralBackwardSubsumptionIndependentFiniteMultisets",
+            "TestSMTLiteralSourceStreamSignedNullAndBooleanConstants",
+            "TestSMTLiteralSeparateInsertionFlagsAndEveryOutputReservation"
+          ]
+        }
+      ],
+      "ownership": [
+        "Inline four-byte signed literal has no owning payload. Subsumption reads borrowed spans in source order; numeric ostream insertion uses the existing actual stream owner and preserves immediate output/cold graphs at every allocation refusal."
+      ],
+      "deviations": [
+        "Go zero literal equals source true; source default construction explicitly calls DefaultSMTLiteral. Source signed-constructible variable domain is preserved without claiming C++ signed-overflow behavior. AST-aware/compact/vector display, neg_literals collection storage, literal approximate set, remaining SMT types and full context/kernel are still continuing dependencies. Source diff_logic literal fixtures are reused; the difference-logic graph test itself is not claimed ported."
+      ]
     },
     {
       "path": "src/smt/smt_literal.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "smt_literal.go",
+        "smt_literal_source_test.go"
+      ],
+      "tests": [
+        "TestSMTLiteralSignedSentinelsAndSourceOperations",
+        "TestSMTLiteralBackwardSubsumptionIndependentFiniteMultisets",
+        "TestSMTLiteralSourceStreamSignedNullAndBooleanConstants",
+        "TestSMTLiteralSeparateInsertionFlagsAndEveryOutputReservation"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -73183,9 +73391,25 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Signed literal representation, default sentinel, decoding, complement, hash and signed order",
+          "status": "ported",
+          "go_target": "smt_literal.go",
+          "tests": [
+            "TestSMTLiteralSignedSentinelsAndSourceOperations",
+            "TestSMTLiteralBackwardSubsumptionIndependentFiniteMultisets",
+            "TestSMTLiteralSourceStreamSignedNullAndBooleanConstants",
+            "TestSMTLiteralSeparateInsertionFlagsAndEveryOutputReservation"
+          ]
+        }
+      ],
+      "ownership": [
+        "Inline four-byte signed literal has no owning payload. Subsumption reads borrowed spans in source order; numeric ostream insertion uses the existing actual stream owner and preserves immediate output/cold graphs at every allocation refusal."
+      ],
+      "deviations": [
+        "Go zero literal equals source true; source default construction explicitly calls DefaultSMTLiteral. Source signed-constructible variable domain is preserved without claiming C++ signed-overflow behavior. AST-aware/compact/vector display, neg_literals collection storage, literal approximate set, remaining SMT types and full context/kernel are still continuing dependencies. Source diff_logic literal fixtures are reused; the difference-logic graph test itself is not claimed ported."
+      ]
     },
     {
       "path": "src/smt/smt_model_checker.cpp",
@@ -74521,9 +74745,17 @@
       "path": "src/smt/smt_types.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "smt_literal.go",
+        "smt_literal_source_test.go"
+      ],
+      "tests": [
+        "TestSMTLiteralSignedSentinelsAndSourceOperations",
+        "TestSMTLiteralBackwardSubsumptionIndependentFiniteMultisets",
+        "TestSMTLiteralSourceStreamSignedNullAndBooleanConstants",
+        "TestSMTLiteralSeparateInsertionFlagsAndEveryOutputReservation"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -74536,9 +74768,25 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Actual signed bool_var constants used by SMT literal construction",
+          "status": "ported",
+          "go_target": "smt_literal.go",
+          "tests": [
+            "TestSMTLiteralSignedSentinelsAndSourceOperations",
+            "TestSMTLiteralBackwardSubsumptionIndependentFiniteMultisets",
+            "TestSMTLiteralSourceStreamSignedNullAndBooleanConstants",
+            "TestSMTLiteralSeparateInsertionFlagsAndEveryOutputReservation"
+          ]
+        }
+      ],
+      "ownership": [
+        "Inline four-byte signed literal has no owning payload. Subsumption reads borrowed spans in source order; numeric ostream insertion uses the existing actual stream owner and preserves immediate output/cold graphs at every allocation refusal."
+      ],
+      "deviations": [
+        "Go zero literal equals source true; source default construction explicitly calls DefaultSMTLiteral. Source signed-constructible variable domain is preserved without claiming C++ signed-overflow behavior. AST-aware/compact/vector display, neg_literals collection storage, literal approximate set, remaining SMT types and full context/kernel are still continuing dependencies. Source diff_logic literal fixtures are reused; the difference-logic graph test itself is not claimed ported."
+      ]
     },
     {
       "path": "src/smt/smt_value_sort.cpp",

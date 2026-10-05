@@ -15,13 +15,14 @@ import (
 // second allocation/charge is made for it. A frame represents only the reached
 // lexical helper: borrowed local reference and one acquired module reference.
 type smtModuleParamsOwner struct {
-	self    *smtModuleParamsOwner
-	context *ParamsContext
-	globals *GlobalParamsService
-	budget  *arena.Budget
-	helpers *smtModuleParamsFrame
-	serial  uint64
-	running bool
+	self            *smtModuleParamsOwner
+	context         *ParamsContext
+	globals         *GlobalParamsService
+	budget          *arena.Budget
+	helpers         *smtModuleParamsFrame
+	serial          uint64
+	running         bool
+	destructorCause error
 }
 type smtModuleParamsFrame struct {
 	self                                     *smtModuleParamsFrame
@@ -36,7 +37,7 @@ type smtModuleParamsFrame struct {
 }
 
 func (m *smtModuleParamsOwner) bind(c *ParamsContext, g *GlobalParamsService) error {
-	if m == nil || m.self != m || m.running || m.helpers != nil {
+	if m == nil || m.self != m || m.running || m.helpers != nil || m.destructorCause != nil {
 		return ErrParamsPrecondition
 	}
 	if c == nil || c.self != c || g == nil || g.self != g || g.context != c || g.config.Budget != m.budget {
@@ -49,7 +50,7 @@ func (m *smtModuleParamsOwner) bind(c *ParamsContext, g *GlobalParamsService) er
 	return nil
 }
 func (m *smtModuleParamsOwner) beginHelper(p *ParamsRef, module string) (*smtModuleParamsFrame, error) {
-	if m == nil || m.self != m || !m.running || m.helpers != nil {
+	if m == nil || m.self != m || !m.running || m.destructorCause != nil {
 		return nil, ErrParamsPrecondition
 	}
 	if m.serial == math.MaxUint64 {
@@ -71,10 +72,17 @@ func (m *smtModuleParamsOwner) beginHelper(p *ParamsRef, module string) (*smtMod
 	return f, e
 }
 func (m *smtModuleParamsOwner) executingFrame(f *smtModuleParamsFrame) error {
-	if m == nil || m.self != m || !m.running || f == nil || f.self != f || f.owner != m || m.helpers != f || f.invocation == 0 || f.invocation > m.serial {
+	if m == nil || m.self != m || !m.running || f == nil || f.self != f || f.owner != m || f.invocation == 0 || f.invocation > m.serial || f.header == 0 {
 		return ErrParamsPrecondition
 	}
-	return nil
+	// Concrete active declaration links identify this exact retained frame. Older
+	// live helpers stay readable while later source declarations are alive.
+	for live := m.helpers; live != nil; live = live.next {
+		if live == f {
+			return nil
+		}
+	}
+	return ErrParamsPrecondition
 }
 func (m *smtModuleParamsOwner) frameBool(f *smtModuleParamsFrame, key string, def bool) (bool, error) {
 	if e := m.executingFrame(f); e != nil {
@@ -110,13 +118,17 @@ func (m *smtModuleParamsOwner) finishHelper(f *smtModuleParamsFrame, body error)
 	if f.bodyCause == nil {
 		f.bodyCause = body
 	}
-	if f.destructorCause != nil {
-		return errors.Join(body, f.destructorCause)
+	if m.destructorCause != nil {
+		return errors.Join(body, m.destructorCause)
+	}
+	if m.helpers != f {
+		return errors.Join(body, ErrParamsPrecondition)
 	}
 	if f.acquired && !f.sourceDone {
 		f.destructorStarted = true
 		if e := m.context.DelTracked(&f.value, &f.receipt); e != nil {
 			f.destructorCause = e
+			m.destructorCause = e
 			return errors.Join(body, e)
 		}
 		f.sourceDone = true
