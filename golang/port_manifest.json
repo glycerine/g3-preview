@@ -126859,7 +126859,12 @@
         "util_unsigned_vector_runtime.go",
         "util_unsigned_vector_runtime_test.go",
         "util_permutation_runtime.go",
-        "util_permutation_runtime_test.go"
+        "util_permutation_runtime_test.go",
+        "util_unsigned_vector_copy_source.go",
+        "util_unsigned_vector_copy_source_test.go",
+        "util_permutation_copy_source.go",
+        "util_permutation_copy_source_test.go",
+        "util_unsigned_vector_copy_retire_source_test.go"
       ],
       "tests": [
         "TestRuntimeUnsignedVectorGeometryResetAndWarmReuse",
@@ -126872,7 +126877,22 @@
         "TestRuntimePermutationSourceResetRetainsActualAlternatingFailurePrefix",
         "TestRuntimePermutationDisplayExactInsertionAndRefusalPrefixes",
         "TestRuntimePermutationResetEveryReservationPrefixAndRecovery",
-        "TestRuntimePermutationDestructorStoppedPhysicalReceiptKeepsOlderMember"
+        "TestRuntimePermutationDestructorStoppedPhysicalReceiptKeepsOlderMember",
+        "TestRuntimeUnsignedVectorAssignmentDestroyBeforeExactCopyFailure",
+        "TestRuntimeUnsignedVectorCopyPreservesNonNullEmptyCapacity",
+        "TestRuntimeUnsignedVectorCopySizeT32ConversionBeforePhysicalAllocation",
+        "TestRuntimeUnsignedVectorAssignRetryRetainsActualAcquisitionHistory",
+        "TestRuntimeUnsignedVectorAcquisitionHistoryStoppedOwningCleanup",
+        "TestRuntimePermutationCopyMemberOrderAndIndependentDestination",
+        "TestRuntimePermutationFailedInverseCopyDestructsOnlyCompletedForward",
+        "TestRuntimePermutationCopyEveryReservationAndConstructorUnwind",
+        "TestRuntimePermutationAssignEveryReservationAndLiteralMemberPrefix",
+        "TestRuntimePermutationFailedCopyReadHasNoUncompletedMemberDestructor",
+        "TestRuntimePermutationAssignNullSourceAndSelfUseNoAllocation",
+        "TestRuntimePermutationAssignStoppedDeallocateUsesExactConsumedFieldReceipt",
+        "TestRuntimePermutationFailedSecondCopyReadRetainsUncompletedInverse",
+        "TestRuntimeUnsignedVectorSuccessfulAssignRetiresTransferredAcquisitionMetadata",
+        "TestRuntimeUnsignedVectorSuccessfulRetryRetiresPrephysicalEmptyInvocation"
       ],
       "assertions": [
         {
@@ -126920,20 +126940,50 @@
             "TestRuntimePermutationResetEveryReservationPrefixAndRecovery",
             "TestRuntimePermutationDestructorStoppedPhysicalReceiptKeepsOlderMember"
           ]
+        },
+        {
+          "name": "concrete unsigned-vector exact-cap deep copy/destructive assignment and permutation forward-then-inverse implicit member copy; actual acquisition history and completed-member constructor unwind",
+          "status": "partial",
+          "go_target": "util_permutation_copy_source.go",
+          "tests": [
+            "TestRuntimeUnsignedVectorAssignmentDestroyBeforeExactCopyFailure",
+            "TestRuntimeUnsignedVectorCopyPreservesNonNullEmptyCapacity",
+            "TestRuntimeUnsignedVectorCopySizeT32ConversionBeforePhysicalAllocation",
+            "TestRuntimeUnsignedVectorAssignRetryRetainsActualAcquisitionHistory",
+            "TestRuntimeUnsignedVectorAcquisitionHistoryStoppedOwningCleanup",
+            "TestRuntimePermutationCopyMemberOrderAndIndependentDestination",
+            "TestRuntimePermutationFailedInverseCopyDestructsOnlyCompletedForward",
+            "TestRuntimePermutationCopyEveryReservationAndConstructorUnwind",
+            "TestRuntimePermutationAssignEveryReservationAndLiteralMemberPrefix",
+            "TestRuntimePermutationFailedCopyReadHasNoUncompletedMemberDestructor",
+            "TestRuntimePermutationAssignNullSourceAndSelfUseNoAllocation",
+            "TestRuntimePermutationAssignStoppedDeallocateUsesExactConsumedFieldReceipt",
+            "TestRuntimePermutationFailedSecondCopyReadRetainsUncompletedInverse",
+            "TestRuntimeUnsignedVectorSuccessfulAssignRetiresTransferredAcquisitionMetadata",
+            "TestRuntimeUnsignedVectorSuccessfulRetryRetiresPrephysicalEmptyInvocation"
+          ]
         }
       ],
       "ownership": [
         "Two embedded concrete unsigned vectors charge only enclosing reflected permutation header; independent wrapper charges its own reflected header. No shadow slices, tickets, new shared engine mutations.",
         "Exact named raw block+pending roots validated against live Runtime records by independent existing physical bijection; Budget total Runtime once+actual cold header before faultlift.",
         "Source ctor failure DT completed inverse then forward before return; no completed outer-object destructor body. Separate owning Close drains actual pending roots/refunds cold header.",
-        "Public TLS signed-overflow-domain stop: inverse physical free precedes older forward; ordinary/source cause and cursor sticky, explicit own cleanup frees forward then second attempt acknowledges consumed physical state/refunds."
+        "Public TLS signed-overflow-domain stop: inverse physical free precedes older forward; ordinary/source cause and cursor sticky, explicit own cleanup frees forward then second attempt acknowledges consumed physical state/refunds.",
+        "Actual reflected cold node prepared before each Runtime Allocate; block acquired only from allocator return, transferred only at m_data publication. Native-valid retry retains earlier unjoined roots. Source destructor visits current pointer only; owning cleanup releases actual retained nodes with sticky physical-consumed progress.",
+        "Independent caller-named physical Runtime block bijection plus actual wrapper/acquisition reflected cold headers; every reservation before first success retains completed source prefixes before faultlift.",
+        "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration.",
+        "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration. A completed later operation also retires called/acquired=false/token-null contexts; no actual block was returned, first source cause stays on vector. 32 real prephysical refusal\u2192successful retry cycles prove bounded cold bytes, exact graph before faultlift, actual Code101+same-Runtime OOM and payload after success."
       ],
       "deviations": [
         "Whole vector source family including class copy/assignment/reserve/swap and other element types remains partial; new wrapper selected init/reset/push/resize/index/DT only",
         "Permutation compiler-generated copy/assignment future obligation; no whole class/native ostream/global debug complete claim",
         "Existing registered src/test/permutation.cpp tst1 algorithm body is disabled #if0, new class tests independent branch/oracles, not enabled driver assertions",
         "Go io.Writer left-to-right insertion/refusal adapter, native ostream flags/locale/badbit/global services open",
-        "Reuses concrete main-package Runtime scalar engine; polynomial lex-sort adoption remains future integration"
+        "Reuses concrete main-package Runtime scalar engine; polynomial lex-sort adoption remains future integration",
+        "Dangling destructor after failed nonnull assignment is source-undefined guarded domain",
+        "Public TLS signed-overflow cleanup-stop fixtures are guarded-domain evidence, not ordinary OOM",
+        "Native ostream/global debug/general vector and polynomial consumers remain partial",
+        "Nonwrapping acquisition invocation finite Go domain"
       ]
     },
     {
@@ -126947,7 +126997,12 @@
         "util_unsigned_vector_runtime.go",
         "util_unsigned_vector_runtime_test.go",
         "util_permutation_runtime.go",
-        "util_permutation_runtime_test.go"
+        "util_permutation_runtime_test.go",
+        "util_unsigned_vector_copy_source.go",
+        "util_unsigned_vector_copy_source_test.go",
+        "util_permutation_copy_source.go",
+        "util_permutation_copy_source_test.go",
+        "util_unsigned_vector_copy_retire_source_test.go"
       ],
       "tests": [
         "TestPermutationCyclesExhaustiveIndependentCopy",
@@ -126965,7 +127020,22 @@
         "TestRuntimePermutationSourceResetRetainsActualAlternatingFailurePrefix",
         "TestRuntimePermutationDisplayExactInsertionAndRefusalPrefixes",
         "TestRuntimePermutationResetEveryReservationPrefixAndRecovery",
-        "TestRuntimePermutationDestructorStoppedPhysicalReceiptKeepsOlderMember"
+        "TestRuntimePermutationDestructorStoppedPhysicalReceiptKeepsOlderMember",
+        "TestRuntimeUnsignedVectorAssignmentDestroyBeforeExactCopyFailure",
+        "TestRuntimeUnsignedVectorCopyPreservesNonNullEmptyCapacity",
+        "TestRuntimeUnsignedVectorCopySizeT32ConversionBeforePhysicalAllocation",
+        "TestRuntimeUnsignedVectorAssignRetryRetainsActualAcquisitionHistory",
+        "TestRuntimeUnsignedVectorAcquisitionHistoryStoppedOwningCleanup",
+        "TestRuntimePermutationCopyMemberOrderAndIndependentDestination",
+        "TestRuntimePermutationFailedInverseCopyDestructsOnlyCompletedForward",
+        "TestRuntimePermutationCopyEveryReservationAndConstructorUnwind",
+        "TestRuntimePermutationAssignEveryReservationAndLiteralMemberPrefix",
+        "TestRuntimePermutationFailedCopyReadHasNoUncompletedMemberDestructor",
+        "TestRuntimePermutationAssignNullSourceAndSelfUseNoAllocation",
+        "TestRuntimePermutationAssignStoppedDeallocateUsesExactConsumedFieldReceipt",
+        "TestRuntimePermutationFailedSecondCopyReadRetainsUncompletedInverse",
+        "TestRuntimeUnsignedVectorSuccessfulAssignRetiresTransferredAcquisitionMetadata",
+        "TestRuntimeUnsignedVectorSuccessfulRetryRetiresPrephysicalEmptyInvocation"
       ],
       "conditionals": [
         {
@@ -127035,6 +127105,28 @@
             "TestRuntimePermutationResetEveryReservationPrefixAndRecovery",
             "TestRuntimePermutationDestructorStoppedPhysicalReceiptKeepsOlderMember"
           ]
+        },
+        {
+          "name": "concrete unsigned-vector exact-cap deep copy/destructive assignment and permutation forward-then-inverse implicit member copy; actual acquisition history and completed-member constructor unwind",
+          "status": "partial",
+          "go_target": "util_permutation_copy_source.go",
+          "tests": [
+            "TestRuntimeUnsignedVectorAssignmentDestroyBeforeExactCopyFailure",
+            "TestRuntimeUnsignedVectorCopyPreservesNonNullEmptyCapacity",
+            "TestRuntimeUnsignedVectorCopySizeT32ConversionBeforePhysicalAllocation",
+            "TestRuntimeUnsignedVectorAssignRetryRetainsActualAcquisitionHistory",
+            "TestRuntimeUnsignedVectorAcquisitionHistoryStoppedOwningCleanup",
+            "TestRuntimePermutationCopyMemberOrderAndIndependentDestination",
+            "TestRuntimePermutationFailedInverseCopyDestructsOnlyCompletedForward",
+            "TestRuntimePermutationCopyEveryReservationAndConstructorUnwind",
+            "TestRuntimePermutationAssignEveryReservationAndLiteralMemberPrefix",
+            "TestRuntimePermutationFailedCopyReadHasNoUncompletedMemberDestructor",
+            "TestRuntimePermutationAssignNullSourceAndSelfUseNoAllocation",
+            "TestRuntimePermutationAssignStoppedDeallocateUsesExactConsumedFieldReceipt",
+            "TestRuntimePermutationFailedSecondCopyReadRetainsUncompletedInverse",
+            "TestRuntimeUnsignedVectorSuccessfulAssignRetiresTransferredAcquisitionMetadata",
+            "TestRuntimeUnsignedVectorSuccessfulRetryRetiresPrephysicalEmptyInvocation"
+          ]
         }
       ],
       "ownership": [
@@ -127042,7 +127134,11 @@
         "Two embedded concrete unsigned vectors charge only enclosing reflected permutation header; independent wrapper charges its own reflected header. No shadow slices, tickets, new shared engine mutations.",
         "Exact named raw block+pending roots validated against live Runtime records by independent existing physical bijection; Budget total Runtime once+actual cold header before faultlift.",
         "Source ctor failure DT completed inverse then forward before return; no completed outer-object destructor body. Separate owning Close drains actual pending roots/refunds cold header.",
-        "Public TLS signed-overflow-domain stop: inverse physical free precedes older forward; ordinary/source cause and cursor sticky, explicit own cleanup frees forward then second attempt acknowledges consumed physical state/refunds."
+        "Public TLS signed-overflow-domain stop: inverse physical free precedes older forward; ordinary/source cause and cursor sticky, explicit own cleanup frees forward then second attempt acknowledges consumed physical state/refunds.",
+        "Actual reflected cold node prepared before each Runtime Allocate; block acquired only from allocator return, transferred only at m_data publication. Native-valid retry retains earlier unjoined roots. Source destructor visits current pointer only; owning cleanup releases actual retained nodes with sticky physical-consumed progress.",
+        "Independent caller-named physical Runtime block bijection plus actual wrapper/acquisition reflected cold headers; every reservation before first success retains completed source prefixes before faultlift.",
+        "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration.",
+        "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration. A completed later operation also retires called/acquired=false/token-null contexts; no actual block was returned, first source cause stays on vector. 32 real prephysical refusal\u2192successful retry cycles prove bounded cold bytes, exact graph before faultlift, actual Code101+same-Runtime OOM and payload after success."
       ],
       "deviations": [
         "Concrete uint32 specialization only; permutation class and additional typed consumers remain open, with no Go generics.",
@@ -127052,7 +127148,11 @@
         "Permutation compiler-generated copy/assignment future obligation; no whole class/native ostream/global debug complete claim",
         "Existing registered src/test/permutation.cpp tst1 algorithm body is disabled #if0, new class tests independent branch/oracles, not enabled driver assertions",
         "Go io.Writer left-to-right insertion/refusal adapter, native ostream flags/locale/badbit/global services open",
-        "Reuses concrete main-package Runtime scalar engine; polynomial lex-sort adoption remains future integration"
+        "Reuses concrete main-package Runtime scalar engine; polynomial lex-sort adoption remains future integration",
+        "Dangling destructor after failed nonnull assignment is source-undefined guarded domain",
+        "Public TLS signed-overflow cleanup-stop fixtures are guarded-domain evidence, not ordinary OOM",
+        "Native ostream/global debug/general vector and polynomial consumers remain partial",
+        "Nonwrapping acquisition invocation finite Go domain"
       ]
     },
     {
@@ -135084,7 +135184,12 @@
         "util_unsigned_vector_runtime.go",
         "util_unsigned_vector_runtime_test.go",
         "util_permutation_runtime.go",
-        "util_permutation_runtime_test.go"
+        "util_permutation_runtime_test.go",
+        "util_unsigned_vector_copy_source.go",
+        "util_unsigned_vector_copy_source_test.go",
+        "util_permutation_copy_source.go",
+        "util_permutation_copy_source_test.go",
+        "util_unsigned_vector_copy_retire_source_test.go"
       ],
       "tests": [
         "TestParamDescrsBudgetFailuresAndWarmDuplicate",
@@ -135394,7 +135499,22 @@
         "TestRuntimePermutationSourceResetRetainsActualAlternatingFailurePrefix",
         "TestRuntimePermutationDisplayExactInsertionAndRefusalPrefixes",
         "TestRuntimePermutationResetEveryReservationPrefixAndRecovery",
-        "TestRuntimePermutationDestructorStoppedPhysicalReceiptKeepsOlderMember"
+        "TestRuntimePermutationDestructorStoppedPhysicalReceiptKeepsOlderMember",
+        "TestRuntimeUnsignedVectorAssignmentDestroyBeforeExactCopyFailure",
+        "TestRuntimeUnsignedVectorCopyPreservesNonNullEmptyCapacity",
+        "TestRuntimeUnsignedVectorCopySizeT32ConversionBeforePhysicalAllocation",
+        "TestRuntimeUnsignedVectorAssignRetryRetainsActualAcquisitionHistory",
+        "TestRuntimeUnsignedVectorAcquisitionHistoryStoppedOwningCleanup",
+        "TestRuntimePermutationCopyMemberOrderAndIndependentDestination",
+        "TestRuntimePermutationFailedInverseCopyDestructsOnlyCompletedForward",
+        "TestRuntimePermutationCopyEveryReservationAndConstructorUnwind",
+        "TestRuntimePermutationAssignEveryReservationAndLiteralMemberPrefix",
+        "TestRuntimePermutationFailedCopyReadHasNoUncompletedMemberDestructor",
+        "TestRuntimePermutationAssignNullSourceAndSelfUseNoAllocation",
+        "TestRuntimePermutationAssignStoppedDeallocateUsesExactConsumedFieldReceipt",
+        "TestRuntimePermutationFailedSecondCopyReadRetainsUncompletedInverse",
+        "TestRuntimeUnsignedVectorSuccessfulAssignRetiresTransferredAcquisitionMetadata",
+        "TestRuntimeUnsignedVectorSuccessfulRetryRetiresPrephysicalEmptyInvocation"
       ],
       "conditionals": [
         {
@@ -135958,6 +136078,28 @@
             "TestRuntimePermutationResetEveryReservationPrefixAndRecovery",
             "TestRuntimePermutationDestructorStoppedPhysicalReceiptKeepsOlderMember"
           ]
+        },
+        {
+          "name": "concrete unsigned-vector exact-cap deep copy/destructive assignment and permutation forward-then-inverse implicit member copy; actual acquisition history and completed-member constructor unwind",
+          "status": "partial",
+          "go_target": "util_unsigned_vector_copy_source.go",
+          "tests": [
+            "TestRuntimeUnsignedVectorAssignmentDestroyBeforeExactCopyFailure",
+            "TestRuntimeUnsignedVectorCopyPreservesNonNullEmptyCapacity",
+            "TestRuntimeUnsignedVectorCopySizeT32ConversionBeforePhysicalAllocation",
+            "TestRuntimeUnsignedVectorAssignRetryRetainsActualAcquisitionHistory",
+            "TestRuntimeUnsignedVectorAcquisitionHistoryStoppedOwningCleanup",
+            "TestRuntimePermutationCopyMemberOrderAndIndependentDestination",
+            "TestRuntimePermutationFailedInverseCopyDestructsOnlyCompletedForward",
+            "TestRuntimePermutationCopyEveryReservationAndConstructorUnwind",
+            "TestRuntimePermutationAssignEveryReservationAndLiteralMemberPrefix",
+            "TestRuntimePermutationFailedCopyReadHasNoUncompletedMemberDestructor",
+            "TestRuntimePermutationAssignNullSourceAndSelfUseNoAllocation",
+            "TestRuntimePermutationAssignStoppedDeallocateUsesExactConsumedFieldReceipt",
+            "TestRuntimePermutationFailedSecondCopyReadRetainsUncompletedInverse",
+            "TestRuntimeUnsignedVectorSuccessfulAssignRetiresTransferredAcquisitionMetadata",
+            "TestRuntimeUnsignedVectorSuccessfulRetryRetiresPrephysicalEmptyInvocation"
+          ]
         }
       ],
       "ownership": [
@@ -135978,7 +136120,11 @@
         "Two embedded concrete unsigned vectors charge only enclosing reflected permutation header; independent wrapper charges its own reflected header. No shadow slices, tickets, new shared engine mutations.",
         "Exact named raw block+pending roots validated against live Runtime records by independent existing physical bijection; Budget total Runtime once+actual cold header before faultlift.",
         "Source ctor failure DT completed inverse then forward before return; no completed outer-object destructor body. Separate owning Close drains actual pending roots/refunds cold header.",
-        "Public TLS signed-overflow-domain stop: inverse physical free precedes older forward; ordinary/source cause and cursor sticky, explicit own cleanup frees forward then second attempt acknowledges consumed physical state/refunds."
+        "Public TLS signed-overflow-domain stop: inverse physical free precedes older forward; ordinary/source cause and cursor sticky, explicit own cleanup frees forward then second attempt acknowledges consumed physical state/refunds.",
+        "Actual reflected cold node prepared before each Runtime Allocate; block acquired only from allocator return, transferred only at m_data publication. Native-valid retry retains earlier unjoined roots. Source destructor visits current pointer only; owning cleanup releases actual retained nodes with sticky physical-consumed progress.",
+        "Independent caller-named physical Runtime block bijection plus actual wrapper/acquisition reflected cold headers; every reservation before first success retains completed source prefixes before faultlift.",
+        "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration.",
+        "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration. A completed later operation also retires called/acquired=false/token-null contexts; no actual block was returned, first source cause stays on vector. 32 real prephysical refusal\u2192successful retry cycles prove bounded cold bytes, exact graph before faultlift, actual Code101+same-Runtime OOM and payload after success."
       ],
       "deviations": [
         "Concrete solver-specific storage, not complete generic vector template surface. Owning model Clone/Assign, other specializations and source-undefined continuation behavior remain explicitly separate.",
@@ -136000,7 +136146,11 @@
         "Permutation compiler-generated copy/assignment future obligation; no whole class/native ostream/global debug complete claim",
         "Existing registered src/test/permutation.cpp tst1 algorithm body is disabled #if0, new class tests independent branch/oracles, not enabled driver assertions",
         "Go io.Writer left-to-right insertion/refusal adapter, native ostream flags/locale/badbit/global services open",
-        "Reuses concrete main-package Runtime scalar engine; polynomial lex-sort adoption remains future integration"
+        "Reuses concrete main-package Runtime scalar engine; polynomial lex-sort adoption remains future integration",
+        "Dangling destructor after failed nonnull assignment is source-undefined guarded domain",
+        "Public TLS signed-overflow cleanup-stop fixtures are guarded-domain evidence, not ordinary OOM",
+        "Native ostream/global debug/general vector and polynomial consumers remain partial",
+        "Nonwrapping acquisition invocation finite Go domain"
       ]
     },
     {

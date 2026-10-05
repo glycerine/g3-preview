@@ -19,6 +19,7 @@ type RuntimePermutation struct {
 	header                            uint64
 	constructorCause, destructorCause error
 	destructorStage                   uint8
+	completedMembers                  uint8
 	closed                            bool
 }
 
@@ -37,6 +38,9 @@ func NewRuntimePermutation(r *memory.Runtime, b *arena.Budget, n uint32) (*Runti
 	p.self = p
 	p.forward.bind(r, b)
 	p.inverse.bind(r, b)
+	p.forward.constructed = true
+	p.inverse.constructed = true
+	p.completedMembers = 3
 	if e := p.Reset(n); e != nil {
 		p.constructorCause = e
 		if d := p.SourceFinalize(); d != nil {
@@ -50,7 +54,7 @@ func (p *RuntimePermutation) open() error {
 	if p == nil || p.self != p {
 		return ErrSATOwner
 	}
-	if p.closed || p.constructorCause != nil || p.destructorStage != 0 || p.destructorCause != nil {
+	if p.closed || p.completedMembers != 3 || p.constructorCause != nil || p.destructorStage != 0 || p.destructorCause != nil {
 		return arena.ErrClosed
 	}
 	return nil
@@ -273,15 +277,19 @@ func (p *RuntimePermutation) SourceFinalize() error {
 		return p.destructorCause
 	}
 	if p.destructorStage == 0 {
-		if e := p.inverse.SourceFinalize(); e != nil {
-			p.destructorCause = e
-			return e
+		if p.completedMembers&2 != 0 {
+			if e := p.inverse.SourceFinalize(); e != nil {
+				p.destructorCause = e
+				return e
+			}
 		}
 		p.destructorStage = 1
 	}
-	if e := p.forward.SourceFinalize(); e != nil {
-		p.destructorCause = e
-		return e
+	if p.completedMembers&1 != 0 {
+		if e := p.forward.SourceFinalize(); e != nil {
+			p.destructorCause = e
+			return e
+		}
 	}
 	p.destructorStage = 2
 	return nil

@@ -12,12 +12,17 @@ import (
 // RuntimeUnsignedVector owns actual unsigned svector bytes. Embedded instances
 // have no separate header charge; the concrete enclosing owner charges them.
 type RuntimeUnsignedVector struct {
-	self               *RuntimeUnsignedVector
-	column             satSolverRuntimeUintColumn
-	budget             *arena.Budget
-	header             uint64
-	destructorCause    error
-	sourceDone, closed bool
+	self                              *RuntimeUnsignedVector
+	column                            satSolverRuntimeUintColumn
+	budget                            *arena.Budget
+	header                            uint64
+	destructorCause                   error
+	constructorCause, assignmentCause error
+	copyAcquisitions                  *runtimeUnsignedCopyAcquisition
+	copySerial                        uint64
+	copyCleanupCause                  error
+	assignmentDestroyed, constructed  bool
+	sourceDone, closed                bool
 }
 
 func (v *RuntimeUnsignedVector) bind(r *memory.Runtime, b *arena.Budget) {
@@ -36,7 +41,7 @@ func NewRuntimeUnsignedVector(r *memory.Runtime, b *arena.Budget) (*RuntimeUnsig
 	if e := b.Reserve(n); e != nil {
 		return nil, e
 	}
-	v := &RuntimeUnsignedVector{header: n}
+	v := &RuntimeUnsignedVector{header: n, constructed: true}
 	v.bind(r, b)
 	return v, nil
 }
@@ -44,7 +49,7 @@ func (v *RuntimeUnsignedVector) open() error {
 	if v == nil || v.self != v {
 		return ErrSATOwner
 	}
-	if v.closed || v.sourceDone || v.destructorCause != nil {
+	if v.closed || !v.constructed || v.sourceDone || v.destructorCause != nil {
 		return arena.ErrClosed
 	}
 	return v.column.raw.open()
@@ -127,7 +132,7 @@ func (v *RuntimeUnsignedVector) SourceFinalize() error {
 	if v == nil || v.self != v {
 		return ErrSATOwner
 	}
-	if v.closed || v.sourceDone {
+	if v.closed || v.sourceDone || !v.constructed {
 		return nil
 	}
 	if v.destructorCause != nil {
@@ -143,7 +148,17 @@ func (v *RuntimeUnsignedVector) SourceFinalize() error {
 	return nil
 }
 func (v *RuntimeUnsignedVector) closeOwning() error {
+	if v.assignmentDestroyed {
+		v.column.raw.block = memory.Block{}
+		v.assignmentDestroyed = false
+	}
 	if e := v.column.finalize(); e != nil {
+		if v.copyCleanupCause == nil {
+			v.copyCleanupCause = e
+		}
+		return e
+	}
+	if e := v.cleanupCopyAcquisitions(); e != nil {
 		return e
 	}
 	v.budget.Release(v.header)
