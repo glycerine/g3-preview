@@ -121259,7 +121259,7 @@
         },
         {
           "name": "addmul/submul",
-          "status": "ported",
+          "status": "partial",
           "go_target": "mpnum/mpz_gcd.go",
           "tests": [
             "TestIntegerScalarGCD",
@@ -121996,7 +121996,8 @@
         "Selected source algorithms and explicit Runtime profile only. Signed TLS stops and large factory/auxiliary receipts are guarded owner-primitive proofs, not ordinary mathematical exhaustion. Non-Z perfect-square remains the source unsupported operation. Registered polynomial driver returns before sqrt; dormant assertions give no active driver completion credit. Global diagnostics/native ABI and remaining source methods stay partial.",
         "Root output is now literal SET(input) before in-place domain guards and bisection, superseding previous output-atomic Root description. Wrapped Power mask and signed/TLS source-pointer domains remain explicit guarded domains; no transitive source/global/backend completion promotion.",
         "Partial SET acquisition prerequisite only; allocating finite-field PNormalize, complete Discriminant source-stop/reservation/coldgraph proof and source parent remain open. No source unit/API promotion.",
-        "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open."
+        "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open.",
+        "Existing AddMul/SubMul success arithmetic and inline +/-1 shortcuts are covered, but mpnum/mpz_gcd.go deferred Del eagerly cleans RAW temporary on body failure and ignores end-DEL errors. Source mpz.h393-426 deletes only after successful Mul plus Add/Sub. Shared literal engine and exact actual-leaf owning continuation are explicit open obligations; previous ported method status corrected to partial after source review."
       ]
     },
     {
@@ -122842,7 +122843,7 @@
         },
         {
           "name": "addmul/submul",
-          "status": "ported",
+          "status": "partial",
           "go_target": "mpnum/mpz_gcd.go",
           "tests": [
             "TestIntegerScalarGCD",
@@ -123581,7 +123582,8 @@
         "Source char bytes use physical capacity/initialization independently of POS and unsigned11*size wrap. Selected non-Windows digit32 snprintf lbuf0/truncation and multi-limb ignored-lbuf behavior execute. Windows sprintf_s constraint handler, GMP/digit64, global/locale/ostream and literal std::string temporary allocation/evaluation remain open. No whole-unit or registered assertion completion is claimed.",
         "Public failed-value reads still reject both dead Go descriptors; defined source-only NULL deletion is modeled independently. Postexception source small-scalar continuation, staged CopyFrom/ffSetInteger topology, process/TLS binding and complete source lifecycle remain separate obligations. Existing cleanupPending retry acknowledges Go owning continuation, not another literal source destructor. See PORT_PROGRESS.md.",
         "Root output is now literal SET(input) before in-place domain guards and bisection, superseding previous output-atomic Root description. Wrapped Power mask and signed/TLS source-pointer domains remain explicit guarded domains; no transitive source/global/backend completion promotion.",
-        "Partial SET acquisition prerequisite only; allocating finite-field PNormalize, complete Discriminant source-stop/reservation/coldgraph proof and source parent remain open. No source unit/API promotion."
+        "Partial SET acquisition prerequisite only; allocating finite-field PNormalize, complete Discriminant source-stop/reservation/coldgraph proof and source parent remain open. No source unit/API promotion.",
+        "Existing AddMul/SubMul success arithmetic and inline +/-1 shortcuts are covered, but mpnum/mpz_gcd.go deferred Del eagerly cleans RAW temporary on body failure and ignores end-DEL errors. Source mpz.h393-426 deletes only after successful Mul plus Add/Sub. Shared literal engine and exact actual-leaf owning continuation are explicit open obligations; previous ported method status corrected to partial after source review."
       ]
     },
     {
