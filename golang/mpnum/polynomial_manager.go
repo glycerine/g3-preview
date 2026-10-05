@@ -84,44 +84,43 @@ type MultivariatePolynomialCore struct {
 	sourceStarted                                                                              bool
 	sourceCause                                                                                error
 	sourceDecDone, sourceDeleteNeeded                                                          [2]bool
-	negativeActive                                                                             bool
-	negativeBodyCause, negativeCleanupCause                                                    error
-	negativeResult                                                                             Polynomial
-	deletionHead                                                                               *PolynomialDeletionHandler
-	callbackDepth                                                                              uint32
-	callbackValue                                                                              Polynomial
-	linearConstant                                                                             Int
-	linearConstantActive                                                                       bool
-	overloadResult                                                                             Polynomial
-	constantScope                                                                              polynomialConstantScope
-	singletonMonomial                                                                          Monomial
-	singletonReference                                                                         bool
-	singletonGeneration, constantGeneration                                                    uint64
-	self                                                                                       *MultivariatePolynomialCore
-	config                                                                                     MultivariatePolynomialConfig
-	integer                                                                                    *IntegerManager
-	modular                                                                                    *IntegerModularManager
-	monomials                                                                                  *MonomialManager
-	memory                                                                                     *memory.Runtime
-	ids                                                                                        utilid.Generator
-	polynomials                                                                                polynomialVector
-	locations                                                                                  []polynomialLocation
-	squareRootOwner                                                                            *polynomialSquareRootScope
-	derivativeOwner                                                                            *polynomialDerivativeScope
-	compositionOwner                                                                           *polynomialCompositionScope
-	creationGeneration                                                                         uint64
-	pending                                                                                    polynomialCreation
-	som, som2, cheap, cheap2                                                                   polynomialSOM
-	zero, unit                                                                                 Polynomial
-	zeroNumeral                                                                                Int
-	minusOne, negativeCoefficient, constantCopy                                                Int
-	rationalTerms, linearTerms                                                                 polynomialVector
-	linearMonomials                                                                            polynomialVector
-	origin, header                                                                             uint64
-	live                                                                                       uint32
-	closeStage                                                                                 uint8
-	completed, closing, closed, monomialRetained, idsInitialized                               bool
-	originalCause, cleanupCause                                                                error
+	polynomialNegScope
+	scalarDivision                                               polynomialScalarDivScope
+	deletionHead                                                 *PolynomialDeletionHandler
+	callbackDepth                                                uint32
+	callbackValue                                                Polynomial
+	linearConstant                                               Int
+	linearConstantActive                                         bool
+	overloadResult                                               Polynomial
+	constantScope                                                polynomialConstantScope
+	singletonMonomial                                            Monomial
+	singletonReference                                           bool
+	singletonGeneration, constantGeneration                      uint64
+	self                                                         *MultivariatePolynomialCore
+	config                                                       MultivariatePolynomialConfig
+	integer                                                      *IntegerManager
+	modular                                                      *IntegerModularManager
+	monomials                                                    *MonomialManager
+	memory                                                       *memory.Runtime
+	ids                                                          utilid.Generator
+	polynomials                                                  polynomialVector
+	locations                                                    []polynomialLocation
+	squareRootOwner                                              *polynomialSquareRootScope
+	derivativeOwner                                              *polynomialDerivativeScope
+	compositionOwner                                             *polynomialCompositionScope
+	creationGeneration                                           uint64
+	pending                                                      polynomialCreation
+	som, som2, cheap, cheap2                                     polynomialSOM
+	zero, unit                                                   Polynomial
+	zeroNumeral                                                  Int
+	minusOne, constantCopy                                       Int
+	rationalTerms, linearTerms                                   polynomialVector
+	linearMonomials                                              polynomialVector
+	origin, header                                               uint64
+	live                                                         uint32
+	closeStage                                                   uint8
+	completed, closing, closed, monomialRetained, idsInitialized bool
+	originalCause, cleanupCause                                  error
 }
 
 func NewMultivariatePolynomialCore(c MultivariatePolynomialConfig) (*MultivariatePolynomialCore, error) {
@@ -492,18 +491,13 @@ func (m *MultivariatePolynomialCore) CloseChecked() error {
 		m.cleanupCause = e
 		return e
 	}
-	if m.negativeActive {
-		if e := m.deleteNumeral(&m.negativeCoefficient); e != nil {
-			m.negativeCleanupCause = e
-			return e
-		}
-		m.negativeActive = false
-		m.negativeCleanupCause = nil
+	if e := m.cleanupNegPhase(true); e != nil {
+		m.cleanupCause = e
+		return e
 	}
-	if m.negativeResult != (Polynomial{}) {
-		if e := m.CleanupValue(&m.negativeResult); e != nil {
-			return e
-		}
+	if e := m.cleanupScalarDivPhase(true); e != nil {
+		m.cleanupCause = e
+		return e
 	}
 	privates := [2]*Polynomial{&m.zero, &m.unit}
 	for m.closeStage < 2 {

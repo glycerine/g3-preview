@@ -148,7 +148,10 @@ func (m *MultivariatePolynomialCore) Scale(a *Int, t Monomial, p Polynomial) (Po
 	}
 	return m.cheap.mk(false)
 }
-func (m *MultivariatePolynomialCore) Neg(p Polynomial) (result Polynomial, cause error) {
+func (m *MultivariatePolynomialCore) Neg(p Polynomial) (Polynomial, error) {
+	return m.negWithReceipt(p, nil)
+}
+func (m *MultivariatePolynomialCore) negWithReceipt(p Polynomial, receipt *polynomialNegInvocationReceipt) (result Polynomial, cause error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
@@ -162,23 +165,20 @@ func (m *MultivariatePolynomialCore) Neg(p Polynomial) (result Polynomial, cause
 	if m.negativeActive {
 		return Polynomial{}, ErrPolynomialPending
 	}
-	m.negativeCoefficient = Int{}
-	m.negativeActive = true
-	m.negativeBodyCause = nil
-	m.negativeCleanupCause = nil
+	if m.invocation == ^uint64(0) {
+		return Polynomial{}, ErrPolynomialPending
+	}
+	invocation := m.invocation + 1
+	m.polynomialNegScope = polynomialNegScope{invocation: invocation, negativeActive: true}
+	if receipt != nil {
+		*receipt = polynomialNegInvocationReceipt{manager: m, frame: &m.polynomialNegScope, invocation: invocation}
+	}
 	defer func() {
 		m.negativeBodyCause = cause
 		m.negativeResult = result
-		cleanup := m.deleteNumeral(&m.negativeCoefficient)
-		m.negativeCleanupCause = cleanup
-		if cleanup == nil {
-			m.negativeActive = false
-			m.negativeResult = Polynomial{}
-		} else {
+		if e := m.finishNegSource(); e != nil {
 			result = Polynomial{}
-			if cause == nil {
-				cause = cleanup
-			}
+			cause = polynomialNewtonJoin(cause, e)
 		}
 	}()
 	n, e = m.readWord(p, 8)
@@ -190,21 +190,45 @@ func (m *MultivariatePolynomialCore) Neg(p Polynomial) (result Polynomial, cause
 		if e != nil {
 			return Polynomial{}, e
 		}
-		if e = m.modular.Copy(&m.negativeCoefficient, &a); e != nil {
+		before, x := polynomialNumericBefore(m.integer)
+		if x != nil {
+			return Polynomial{}, x
+		}
+		e = m.modular.Copy(&m.negativeCoefficient, &a)
+		e = polynomialNewtonJoin(e, m.numeric.after(m.integer, before))
+		if e != nil {
 			return Polynomial{}, e
 		}
-		if e = m.modular.Neg(&m.negativeCoefficient); e != nil {
+		before, x = polynomialNumericBefore(m.integer)
+		if x != nil {
+			return Polynomial{}, x
+		}
+		e = m.modular.Neg(&m.negativeCoefficient)
+		e = polynomialNewtonJoin(e, m.numeric.after(m.integer, before))
+		if e != nil {
 			return Polynomial{}, e
 		}
 		t, e := m.monomialCore(p, i)
 		if e != nil {
 			return Polynomial{}, e
 		}
-		if e = m.cheap.add(&m.negativeCoefficient, t, false); e != nil {
+		before, x = polynomialNumericBefore(m.integer)
+		if x != nil {
+			return Polynomial{}, x
+		}
+		e = m.cheap.add(&m.negativeCoefficient, t, false)
+		e = polynomialNewtonJoin(e, m.numeric.after(m.integer, before))
+		if e != nil {
 			return Polynomial{}, e
 		}
 	}
-	return m.cheap.mk(false)
+	before, x := polynomialNumericBefore(m.integer)
+	if x != nil {
+		return Polynomial{}, x
+	}
+	result, e = m.cheap.mk(false)
+	e = polynomialNewtonJoin(e, m.numeric.after(m.integer, before))
+	return result, e
 }
 func (m *MultivariatePolynomialCore) MkUnivariateTake(v, n uint32, as []Int) (Polynomial, error) {
 	if e := m.check(); e != nil {
