@@ -1,4 +1,7 @@
-// Licensed under the MIT license.
+// Source: src/util/memory_manager.cpp:33-72; src/util/memory_manager.h:49-71.
+// Source: src/util/error_codes.h; src/util/z3_exception.h.
+// Licensed under the MIT license. See LICENSE.txt.
+// Source authors: Nikolaj Bjorner (nbjorner), 2007; Leonardo de Moura (leonardo), 2007/2011.
 // Main compatibility/error bridge to the single concrete lower runtime.
 package g3
 
@@ -26,7 +29,7 @@ func memoryErrorTransport(f memory.Failure) error {
 	return memory.ErrFailureTransport
 }
 func newUtilMemoryRuntime(c utilMemoryRuntimeConfig) (*utilMemoryRuntime, error) {
-	if c.Transport == nil {
+	if c.Transport == nil && c.FatalPolicy == nil {
 		c.Transport = memoryErrorTransport
 	}
 	return memory.NewRuntime(c)

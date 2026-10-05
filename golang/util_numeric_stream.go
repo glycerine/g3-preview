@@ -1,3 +1,6 @@
+// Source: src/util/memory_manager.cpp:55-72; src/util/small_object_allocator.cpp:172-242.
+// Licensed under the MIT license. See LICENSE.txt.
+// Source author: Nikolaj Bjorner (nbjorner), 2007.
 // Numeric stream platform adapter for repository C++ ostream consumers.
 // C-locale/libstdc++ AMD64 dynamic-int precision and nearest/even IEEE64 profile.
 // Go strconv is the explicit external runtime dependency, not a solver algorithm.
@@ -7,6 +10,7 @@ import (
 	"errors"
 	"github.com/glycerine/g3/golang/arena"
 	"math"
+	"os"
 	"reflect"
 	"strconv"
 	"sync"
@@ -38,8 +42,9 @@ const NumericLibStdCPPAMD64 NumericStreamProfile = 0
 // Profile0 explicitly denotes the selected narrow C-locale, nearest/even,
 // libstdc++ AMD64 precision ABI. It does not select arbitrary host CRT behavior.
 type NumericTextStreamConfig struct {
-	Budget  *arena.Budget
-	Profile NumericStreamProfile
+	Budget       *arena.Budget
+	Profile      NumericStreamProfile
+	BorrowedFile *os.File
 }
 type NumericStreamState struct {
 	Precision, Width                        int64
@@ -58,14 +63,18 @@ type NumericStreamStats struct {
 // Budget is borrowed and remains externally confined; the mutex does not make
 // a Budget shared with unrelated owners globally thread-safe.
 type NumericTextStream struct {
-	mu         sync.Mutex
-	self       *NumericTextStream
-	budget     *arena.Budget
-	buffer     *StringBuffer64
-	scratch    []byte
-	ownerBytes uint64
-	state      NumericStreamState
-	closed     bool
+	mu           sync.Mutex
+	self         *NumericTextStream
+	budget       *arena.Budget
+	buffer       *StringBuffer64
+	file         *os.File
+	fileByte     [1]byte
+	filePosition uint64
+	fileBad      bool
+	scratch      []byte
+	ownerBytes   uint64
+	state        NumericStreamState
+	closed       bool
 }
 
 func NewNumericTextStream(c NumericTextStreamConfig) (*NumericTextStream, error) {
@@ -76,12 +85,16 @@ func NewNumericTextStream(c NumericTextStreamConfig) (*NumericTextStream, error)
 	if e := c.Budget.Reserve(header); e != nil {
 		return nil, e
 	}
-	b, e := NewStringBuffer64(StringBufferConfig{Budget: c.Budget})
+	var b *StringBuffer64
+	var e error
+	if c.BorrowedFile == nil {
+		b, e = NewStringBuffer64(StringBufferConfig{Budget: c.Budget})
+	}
 	if e != nil {
 		c.Budget.Release(header)
 		return nil, e
 	}
-	s := &NumericTextStream{budget: c.Budget, buffer: b, ownerBytes: header, state: NumericStreamState{Precision: 6, IntegerBase: 10, Fill: ' '}}
+	s := &NumericTextStream{budget: c.Budget, buffer: b, file: c.BorrowedFile, ownerBytes: header, state: NumericStreamState{Precision: 6, IntegerBase: 10, Fill: ' '}}
 	s.self = s
 	return s, nil
 }
@@ -108,6 +121,9 @@ func (s *NumericTextStream) Stats() NumericStreamStats {
 		return NumericStreamStats{}
 	}
 	defer s.mu.Unlock()
+	if s.file != nil {
+		return NumericStreamStats{OwnerBytes: s.ownerBytes, ScratchBytes: uint64(len(s.scratch)), Position: s.filePosition, State: s.state}
+	}
 	b := s.buffer.state.stats(true)
 	return NumericStreamStats{s.ownerBytes, uint64(len(s.scratch)), b.Position, b.Capacity, b.OwnerBytes, b.OverflowBytes, s.state}
 }
@@ -213,6 +229,18 @@ func (s *NumericTextStream) fieldPadding(n uint64) (uint64, error) {
 	return size - n, nil
 }
 func (s *NumericTextStream) emitByte(c byte) error {
+	if s.file != nil {
+		if s.fileBad {
+			return nil
+		}
+		s.fileByte[0] = c
+		n, e := s.file.Write(s.fileByte[:])
+		s.filePosition += uint64(n)
+		if e != nil || n != 1 {
+			s.fileBad = true
+		}
+		return nil
+	}
 	return s.buffer.state.appendByte(s.buffer.inline[:], c)
 }
 func (s *NumericTextStream) padding(n uint64) error {
@@ -224,6 +252,9 @@ func (s *NumericTextStream) padding(n uint64) error {
 	return nil
 }
 func (s *NumericTextStream) emitBytes(v []byte, numeric bool) error {
+	if s.fileBad {
+		return nil
+	}
 	pad, e := s.fieldPadding(uint64(len(v)))
 	if e != nil {
 		return e
@@ -262,6 +293,9 @@ func (s *NumericTextStream) AppendCString(v string) error {
 	}
 	defer s.mu.Unlock()
 	n := cSymbolLength(v)
+	if s.fileBad {
+		return nil
+	}
 	pad, e := s.fieldPadding(uint64(n))
 	if e != nil {
 		return e
@@ -382,6 +416,9 @@ func (s *NumericTextStream) AppendFloat64(v float64) error {
 		return e
 	}
 	defer s.mu.Unlock()
+	if s.fileBad {
+		return nil
+	}
 	bits := math.Float64bits(v)
 	negative := bits>>63 != 0
 	if bits&0x7ff0000000000000 == 0x7ff0000000000000 {
@@ -496,6 +533,9 @@ func (s *NumericTextStream) String() (string, error) {
 		return "", e
 	}
 	defer s.mu.Unlock()
+	if s.file != nil {
+		return "", ErrNumericStreamFile
+	}
 	return string(s.buffer.state.data(s.buffer.inline[:])[:s.buffer.state.pos]), nil
 }
 func (s *NumericTextStream) ResetText() error {
@@ -503,6 +543,9 @@ func (s *NumericTextStream) ResetText() error {
 		return e
 	}
 	defer s.mu.Unlock()
+	if s.file != nil {
+		return ErrNumericStreamFile
+	}
 	s.buffer.state.pos = 0
 	return nil
 }
@@ -515,7 +558,9 @@ func (s *NumericTextStream) Close() error {
 	if s.closed {
 		return nil
 	}
-	s.buffer.state.close(true)
+	if s.buffer != nil {
+		s.buffer.state.close(true)
+	}
 	s.budget.Release(uint64(len(s.scratch)) + s.ownerBytes)
 	s.scratch = nil
 	s.closed = true

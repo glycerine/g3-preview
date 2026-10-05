@@ -101592,11 +101592,15 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "util_z3_exception.go"
+        "util_z3_exception.go",
+        "util_memory_fatal_policy.go",
+        "util_memory_fatal_policy_test.go"
       ],
       "tests": [
         "TestZ3ExceptionSourceCodesAndLabels",
-        "TestDefaultExceptionSourceStringAndEmbeddedNUL"
+        "TestDefaultExceptionSourceStringAndEmbeddedNUL",
+        "TestMemoryFatalNonExitExceptionCatch",
+        "TestMemoryFatalRealExitWithActiveReservationRefusal"
       ],
       "conditionals": [
         {
@@ -101618,6 +101622,15 @@
           "tests": [
             "TestZ3ExceptionSourceCodesAndLabels",
             "TestDefaultExceptionSourceStringAndEmbeddedNUL"
+          ]
+        },
+        {
+          "name": "ERR_MEMOUT101/ERR_ALLOC_EXCEEDED113 exact constants exercised by real compiled-Go fatal dispatch",
+          "status": "ported",
+          "go_target": "util_memory_fatal_policy.go",
+          "tests": [
+            "TestMemoryFatalNonExitExceptionCatch",
+            "TestMemoryFatalRealExitWithActiveReservationRefusal"
           ]
         }
       ],
@@ -112606,7 +112619,12 @@
         "memory/uint32_codec_test.go",
         "memory/release_progress.go",
         "memory/release_progress_test.go",
-        "memory/runtime_size_t_entry_test.go"
+        "memory/runtime_size_t_entry_test.go",
+        "util_memory_fatal_policy.go",
+        "util_memory_fatal_policy_test.go",
+        "util_numeric_stream_file.go",
+        "util_numeric_stream_file_test.go",
+        "util_numeric_stream.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -112658,7 +112676,18 @@
         "TestMemoryRuntimeSizeT32EveryActualPhysicalRefusal",
         "TestMemoryRuntimeSizeTEntryRetainsOwnerAndLP64Domains",
         "TestMemoryRuntimeSizeT32EveryReallocatePhysicalRefusal",
-        "TestMemoryRuntimeSizeT32TLSLimitAfterPhysicalPublication"
+        "TestMemoryRuntimeSizeT32TLSLimitAfterPhysicalPublication",
+        "TestMemoryFatalStandardStreamsColdGraph",
+        "TestMemoryFatalNonExitExceptionCatch",
+        "TestMemoryFatalSubprocessChild",
+        "TestMemoryFatalRealExitWithActiveReservationRefusal",
+        "TestMemoryFatalBorrowedPointerRetentionAndReachedSentry",
+        "TestMemoryFatalReachedMaxCountReadAfterOutput",
+        "TestMemoryFatalContextActualColdRefusalAndCohort",
+        "TestMemoryFatalMainRuntimeBinding",
+        "TestNumericFileStreamExactFormattingAndBorrow",
+        "TestNumericFileStreamActualWriteFailureSetsNonthrowingBadbit",
+        "TestNumericFileStreamEveryColdReservation"
       ],
       "conditionals": [
         {
@@ -112804,6 +112833,42 @@
             "TestMemoryRuntimeSizeT32EveryReallocatePhysicalRefusal",
             "TestMemoryRuntimeSizeT32TLSLimitAfterPhysicalPublication"
           ]
+        },
+        {
+          "name": "cpp33-72/h44-47,70: explicit same-cohort source OOM policy, derived/base exception catch, conditional borrowed CString setter, count prefix then actual current max-count read, real exits101/113 through standard file providers",
+          "status": "partial",
+          "go_target": "util_memory_fatal_policy.go",
+          "tests": [
+            "TestMemoryFatalStandardStreamsColdGraph",
+            "TestMemoryFatalNonExitExceptionCatch",
+            "TestMemoryFatalSubprocessChild",
+            "TestMemoryFatalRealExitWithActiveReservationRefusal",
+            "TestMemoryFatalBorrowedPointerRetentionAndReachedSentry",
+            "TestMemoryFatalReachedMaxCountReadAfterOutput",
+            "TestMemoryFatalContextActualColdRefusalAndCohort",
+            "TestMemoryFatalMainRuntimeBinding"
+          ]
+        },
+        {
+          "name": "cpp55-72 standard ostream prerequisite: concrete borrowed os.File provider, default nonthrowing badbit, selected existing C-locale formatting, reflected cold header/embedded emission byte without unused StringBuffer",
+          "status": "partial",
+          "go_target": "util_numeric_stream_file.go",
+          "tests": [
+            "TestNumericFileStreamExactFormattingAndBorrow",
+            "TestNumericFileStreamActualWriteFailureSetsNonthrowingBadbit",
+            "TestNumericFileStreamEveryColdReservation",
+            "TestMemoryFatalRealExitWithActiveReservationRefusal"
+          ]
+        },
+        {
+          "name": "Bound FatalPolicy through real lower Runtime dispatch and main alias wrapper; unbound legacy transport unchanged; source vector-overflow transport remains separate",
+          "status": "partial",
+          "go_target": "util_memory_runtime.go",
+          "tests": [
+            "TestMemoryFatalMainRuntimeBinding",
+            "TestMemoryFatalNonExitExceptionCatch",
+            "TestMemoryFatalContextActualColdRefusalAndCohort"
+          ]
         }
       ],
       "ownership": [
@@ -112812,13 +112877,15 @@
         "One concrete lower memory.Runtime owns source accounting, physical backings and charged directories; main g3 aliases use the real static nominal-error bridge. Borrowed static transport is cold; nil-returning transport cannot suppress source failure. See PORT_PROGRESS.md#audit-memory-package-api-packet-md. Numeric/default-backend and full process-global wiring remain required.",
         "Word codecs read/write the sole actual initialized backing with no allocations or counter events. Allocator word APIs retain requested bounds; ObjectExtent exposes actual rounded/direct physical span with live owner/generation guards. See PORT_PROGRESS.md#audit-memory-uint32-codec-port-status-md.",
         "Persistent pointer-free release stages/serials are part of the charged actual runtime/location directories. Public flags are observational; bound private owner/ref/serial resolves the retained stage. Physical-completed frees are never replayed. Original successful pooled duplicate free retains source requested subtraction/self-link.",
-        "Actual Runtime header/data and TLS/global counter publication preserved, including zero-request header allocation and postphysical TLS limit errors. Wrapped headerless allocation is a guarded source-undefined domain with explicit CleanupPartial, not normal allocation exhaustion credit."
+        "Actual Runtime header/data and TLS/global counter publication preserved, including zero-request header allocation and postphysical TLS limit errors. Wrapped headerless allocation is a guarded source-undefined domain with explicit CleanupPartial, not normal allocation exhaustion credit.",
+        "Explicit standard-stream owner charges its reflected header plus two actual file-stream headers; files borrowed and never closed/sync/fsync by stream owners. Context charges one reflected cold header, borrows same Budget/streams/CString region, validates CString only at reached insertion. Real integer formatter remains local[67]byte; no output warm-up, hidden StringBuffer or fake Runtime allocation. Every actual provider/context reservation tested through success; child pre-refusal named cold/raw graph matches Budget once."
       ],
       "deviations": [
         "Source signed-overflow/invalid-lane domains use scalar typed outcomes after completed field prefixes. Containing allocator must execute real physical operations between counter phases. Physical hooks, headers, generated callbacks, OOM exits/streams, concurrent global service and consumer integration remain open.",
         "Size_t promotion is explicit32/64: LP64 updates use unsigned modular arithmetic; ILP32 shrink delta uses uint32 subtraction before LL64 promotion. Signed synchronization/count and ILP32 promoted overflow have typed boundaries after prior field prefixes.",
         "Explicit LE word codecs are a Go source-storage adapter, not an additional C++ allocator algorithm. MPZ backend typed accesses must bound against actual object extent; this prerequisite does not complete MPZ/Natural backing or tracked release/global lifecycle.",
-        "Ordinary retry of an interrupted beforefree invocation resumes its real retained phase; explicit CompleteRelease can acknowledge afterfree failure without counter repair. This is a Go owning cleanup adapter to bounded source-undefined signed-overflow domains, not a C++ exception recovery claim. Actual MPZ/Natural and transitive numerical failure owners remain required."
+        "Ordinary retry of an interrupted beforefree invocation resumes its real retained phase; explicit CompleteRelease can acknowledge afterfree failure without counter repair. This is a Go owning cleanup adapter to bounded source-undefined signed-overflow domains, not a C++ exception recovery claim. Actual MPZ/Natural and transitive numerical failure owners remain required.",
+        "Selected bound OOM/count exit/stream gap is now implemented: actual Runtime failure routes, real subprocess101/113 with Budget refusal still active, file badbit cannot suppress exit, borrowed CString mutation/false/null retention, errors.As derived/base catch. Prior broad global/exit/stream-open notes remain historical beyond this explicit provider binding. Generated initialize/finalize callbacks and process-global singleton wiring remain OPEN; direct Go file emission is not arbitrary ostream locale/flags/exception/native buffering ABI. Closed Runtime count getter fixture is checked invalid-lifetime prefix coverage, not valid source exhaustion. src/test/memory.cpp Windows high-level API campaign is not credited."
       ]
     },
     {
@@ -112836,7 +112903,12 @@
         "memory/runtime_test.go",
         "memory/shared_runtime_api_test.go",
         "util_memory_bridge_test.go",
-        "memory/runtime_size_t_entry_test.go"
+        "memory/runtime_size_t_entry_test.go",
+        "util_memory_fatal_policy.go",
+        "util_memory_fatal_policy_test.go",
+        "util_numeric_stream_file.go",
+        "util_numeric_stream_file_test.go",
+        "util_numeric_stream.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -112876,7 +112948,18 @@
         "TestMemoryRuntimeSizeT32EveryActualPhysicalRefusal",
         "TestMemoryRuntimeSizeTEntryRetainsOwnerAndLP64Domains",
         "TestMemoryRuntimeSizeT32EveryReallocatePhysicalRefusal",
-        "TestMemoryRuntimeSizeT32TLSLimitAfterPhysicalPublication"
+        "TestMemoryRuntimeSizeT32TLSLimitAfterPhysicalPublication",
+        "TestMemoryFatalStandardStreamsColdGraph",
+        "TestMemoryFatalNonExitExceptionCatch",
+        "TestMemoryFatalSubprocessChild",
+        "TestMemoryFatalRealExitWithActiveReservationRefusal",
+        "TestMemoryFatalBorrowedPointerRetentionAndReachedSentry",
+        "TestMemoryFatalReachedMaxCountReadAfterOutput",
+        "TestMemoryFatalContextActualColdRefusalAndCohort",
+        "TestMemoryFatalMainRuntimeBinding",
+        "TestNumericFileStreamExactFormattingAndBorrow",
+        "TestNumericFileStreamActualWriteFailureSetsNonthrowingBadbit",
+        "TestNumericFileStreamEveryColdReservation"
       ],
       "conditionals": [
         {
@@ -113000,17 +113083,55 @@
             "TestMemoryRuntimeSizeT32EveryReallocatePhysicalRefusal",
             "TestMemoryRuntimeSizeT32TLSLimitAfterPhysicalPublication"
           ]
+        },
+        {
+          "name": "cpp33-72/h44-47,70: explicit same-cohort source OOM policy, derived/base exception catch, conditional borrowed CString setter, count prefix then actual current max-count read, real exits101/113 through standard file providers",
+          "status": "partial",
+          "go_target": "util_memory_fatal_policy.go",
+          "tests": [
+            "TestMemoryFatalStandardStreamsColdGraph",
+            "TestMemoryFatalNonExitExceptionCatch",
+            "TestMemoryFatalSubprocessChild",
+            "TestMemoryFatalRealExitWithActiveReservationRefusal",
+            "TestMemoryFatalBorrowedPointerRetentionAndReachedSentry",
+            "TestMemoryFatalReachedMaxCountReadAfterOutput",
+            "TestMemoryFatalContextActualColdRefusalAndCohort",
+            "TestMemoryFatalMainRuntimeBinding"
+          ]
+        },
+        {
+          "name": "cpp55-72 standard ostream prerequisite: concrete borrowed os.File provider, default nonthrowing badbit, selected existing C-locale formatting, reflected cold header/embedded emission byte without unused StringBuffer",
+          "status": "partial",
+          "go_target": "util_numeric_stream_file.go",
+          "tests": [
+            "TestNumericFileStreamExactFormattingAndBorrow",
+            "TestNumericFileStreamActualWriteFailureSetsNonthrowingBadbit",
+            "TestNumericFileStreamEveryColdReservation",
+            "TestMemoryFatalRealExitWithActiveReservationRefusal"
+          ]
+        },
+        {
+          "name": "Bound FatalPolicy through real lower Runtime dispatch and main alias wrapper; unbound legacy transport unchanged; source vector-overflow transport remains separate",
+          "status": "partial",
+          "go_target": "util_memory_runtime.go",
+          "tests": [
+            "TestMemoryFatalMainRuntimeBinding",
+            "TestMemoryFatalNonExitExceptionCatch",
+            "TestMemoryFatalContextActualColdRefusalAndCohort"
+          ]
         }
       ],
       "ownership": [
         "Pointer-free scalar accounting is intended for once-charged runtime embedding with explicit caller-confined lanes and source counter prefixes. No raw allocator/backend or process-global integration is claimed; see PORT_PROGRESS.md#audit-memory-accounting-port-status-md.",
         "Actual prefix-bearing byte backings plus charged initialized-byte bitmap and cold allocation directory; immediate physical roots, TLS allocated-error owner and bad-header cleanup retain source action/counter prefixes. Real runtime typed-owner hooks, generated lifetime and process transports remain open. See PORT_PROGRESS.md#audit-raw-memory-port-status-md.",
         "One concrete lower memory.Runtime owns source accounting, physical backings and charged directories; main g3 aliases use the real static nominal-error bridge. Borrowed static transport is cold; nil-returning transport cannot suppress source failure. See PORT_PROGRESS.md#audit-memory-package-api-packet-md. Numeric/default-backend and full process-global wiring remain required.",
-        "Actual Runtime header/data and TLS/global counter publication preserved, including zero-request header allocation and postphysical TLS limit errors. Wrapped headerless allocation is a guarded source-undefined domain with explicit CleanupPartial, not normal allocation exhaustion credit."
+        "Actual Runtime header/data and TLS/global counter publication preserved, including zero-request header allocation and postphysical TLS limit errors. Wrapped headerless allocation is a guarded source-undefined domain with explicit CleanupPartial, not normal allocation exhaustion credit.",
+        "Explicit standard-stream owner charges its reflected header plus two actual file-stream headers; files borrowed and never closed/sync/fsync by stream owners. Context charges one reflected cold header, borrows same Budget/streams/CString region, validates CString only at reached insertion. Real integer formatter remains local[67]byte; no output warm-up, hidden StringBuffer or fake Runtime allocation. Every actual provider/context reservation tested through success; child pre-refusal named cold/raw graph matches Budget once."
       ],
       "deviations": [
         "Source signed-overflow/invalid-lane domains use scalar typed outcomes after completed field prefixes. Containing allocator must execute real physical operations between counter phases. Physical hooks, headers, generated callbacks, OOM exits/streams, concurrent global service and consumer integration remain open.",
-        "Size_t promotion is explicit32/64: LP64 updates use unsigned modular arithmetic; ILP32 shrink delta uses uint32 subtraction before LL64 promotion. Signed synchronization/count and ILP32 promoted overflow have typed boundaries after prior field prefixes."
+        "Size_t promotion is explicit32/64: LP64 updates use unsigned modular arithmetic; ILP32 shrink delta uses uint32 subtraction before LL64 promotion. Signed synchronization/count and ILP32 promoted overflow have typed boundaries after prior field prefixes.",
+        "Selected bound OOM/count exit/stream gap is now implemented: actual Runtime failure routes, real subprocess101/113 with Budget refusal still active, file badbit cannot suppress exit, borrowed CString mutation/false/null retention, errors.As derived/base catch. Prior broad global/exit/stream-open notes remain historical beyond this explicit provider binding. Generated initialize/finalize callbacks and process-global singleton wiring remain OPEN; direct Go file emission is not arbitrary ostream locale/flags/exception/native buffering ABI. Closed Runtime count getter fixture is checked invalid-lifetime prefix coverage, not valid source exhaustion. src/test/memory.cpp Windows high-level API campaign is not credited."
       ]
     },
     {
@@ -128511,7 +128632,10 @@
         "memory/small_allocator_assertions.go",
         "util_small_object_allocator_assertions_test.go",
         "util_verbose_context.go",
-        "util_verbose_context_test.go"
+        "util_verbose_context_test.go",
+        "util_numeric_stream_file.go",
+        "util_numeric_stream_file_test.go",
+        "util_memory_fatal_policy_test.go"
       ],
       "tests": [
         "TestSmallBytesSourceExercise",
@@ -128587,7 +128711,11 @@
         "TestVerboseContextColdRefusalAndExactCharge",
         "TestVerboseContextAllocatorEveryOutputRefusal",
         "TestVerboseContextClosedLevelReachedBeforeOutput",
-        "TestVerboseContextWarmOutputAndNullAdapter"
+        "TestVerboseContextWarmOutputAndNullAdapter",
+        "TestNumericFileStreamExactFormattingAndBorrow",
+        "TestNumericFileStreamActualWriteFailureSetsNonthrowingBadbit",
+        "TestNumericFileStreamEveryColdReservation",
+        "TestMemoryFatalBorrowedPointerRetentionAndReachedSentry"
       ],
       "conditionals": [
         {
@@ -128876,6 +129004,17 @@
             "TestVerboseContextClosedLevelReachedBeforeOutput",
             "TestVerboseContextWarmOutputAndNullAdapter"
           ]
+        },
+        {
+          "name": "Selected ostream provider prerequisite and external CString strlen-before-badbit sentry; actual file write failure sets nonthrowing badbit without output-buffer allocation",
+          "status": "partial",
+          "go_target": "util_small_object_allocator_stream.go",
+          "tests": [
+            "TestNumericFileStreamExactFormattingAndBorrow",
+            "TestNumericFileStreamActualWriteFailureSetsNonthrowingBadbit",
+            "TestNumericFileStreamEveryColdReservation",
+            "TestMemoryFatalBorrowedPointerRetentionAndReachedSentry"
+          ]
         }
       ],
       "ownership": [
@@ -128895,7 +129034,8 @@
         "Standalone deterministic scalar address codec and external sort adapter preserve source scan/relink order without claiming native pointer placements. Borrowed explicit diagnostic streams model selected bytes/state; global runtime/ostream wiring remains open. Legacy arena/small_bytes is a separate storage adapter with its recorded extensions.",
         "Explicit LE word codecs are a Go source-storage adapter, not an additional C++ allocator algorithm. MPZ backend typed accesses must bound against actual object extent; this prerequisite does not complete MPZ/Natural backing or tracked release/global lifecycle.",
         "Ordinary retry of an interrupted beforefree invocation resumes its real retained phase; explicit CompleteRelease can acknowledge afterfree failure without counter repair. This is a Go owning cleanup adapter to bounded source-undefined signed-overflow domains, not a C++ exception recovery claim. Actual MPZ/Natural and transitive numerical failure owners remain required.",
-        "Same Runtime provider/profile only; source global allocator and native pointer ABI remain open. SizeT32 conversion before zero/bypass applies to raw and checked allocation/deallocation entries; owning receipts match normalized size and exact private serial. Read-only source getters observe the published prefix while raw mutation stays stopped. Raw retry is an explicit Go continuation, not native exception resumption. Actual public pool metadata refusal/ownabort proof preserves donor/caller roots; headerless wrapped realloc is guarded source-undefined domain only. Direct release stage2-to-physical has no fallible point, no fabricated failure credit. Whole units remain partial."
+        "Same Runtime provider/profile only; source global allocator and native pointer ABI remain open. SizeT32 conversion before zero/bypass applies to raw and checked allocation/deallocation entries; owning receipts match normalized size and exact private serial. Read-only source getters observe the published prefix while raw mutation stays stopped. Raw retry is an explicit Go continuation, not native exception resumption. Actual public pool metadata refusal/ownabort proof preserves donor/caller roots; headerless wrapped realloc is guarded source-undefined domain only. Direct release stage2-to-physical has no fallible point, no fabricated failure credit. Whole units remain partial.",
+        "File-backed diagnostics use explicit borrowed os.File service; default write failure is nonthrowing badbit. Native stream buffering/locale/exception masks/global stderr initialization remain separate."
       ]
     },
     {
@@ -128925,7 +129065,10 @@
         "memory/small_allocator_assertions.go",
         "util_small_object_allocator_assertions_test.go",
         "util_verbose_context.go",
-        "util_verbose_context_test.go"
+        "util_verbose_context_test.go",
+        "util_numeric_stream_file.go",
+        "util_numeric_stream_file_test.go",
+        "util_memory_fatal_policy_test.go"
       ],
       "tests": [
         "TestSmallBytesSourceExercise",
@@ -128989,7 +129132,11 @@
         "TestVerboseContextColdRefusalAndExactCharge",
         "TestVerboseContextAllocatorEveryOutputRefusal",
         "TestVerboseContextClosedLevelReachedBeforeOutput",
-        "TestVerboseContextWarmOutputAndNullAdapter"
+        "TestVerboseContextWarmOutputAndNullAdapter",
+        "TestNumericFileStreamExactFormattingAndBorrow",
+        "TestNumericFileStreamActualWriteFailureSetsNonthrowingBadbit",
+        "TestNumericFileStreamEveryColdReservation",
+        "TestMemoryFatalBorrowedPointerRetentionAndReachedSentry"
       ],
       "conditionals": [
         {
@@ -129210,6 +129357,17 @@
             "TestVerboseContextClosedLevelReachedBeforeOutput",
             "TestVerboseContextWarmOutputAndNullAdapter"
           ]
+        },
+        {
+          "name": "Selected ostream provider prerequisite and external CString strlen-before-badbit sentry; actual file write failure sets nonthrowing badbit without output-buffer allocation",
+          "status": "partial",
+          "go_target": "util_small_object_allocator_stream.go",
+          "tests": [
+            "TestNumericFileStreamExactFormattingAndBorrow",
+            "TestNumericFileStreamActualWriteFailureSetsNonthrowingBadbit",
+            "TestNumericFileStreamEveryColdReservation",
+            "TestMemoryFatalBorrowedPointerRetentionAndReachedSentry"
+          ]
         }
       ],
       "ownership": [
@@ -129225,7 +129383,8 @@
         "Conceptual chunk/block indices replace machine addresses for sorting; source strict endpoint/floor-count retention quirk preserved.",
         "Storage limits checked before publication; invalid size/generation diagnosed.",
         "Standalone deterministic scalar address codec and external sort adapter preserve source scan/relink order without claiming native pointer placements. Borrowed explicit diagnostic streams model selected bytes/state; global runtime/ostream wiring remains open. Legacy arena/small_bytes is a separate storage adapter with its recorded extensions.",
-        "Same Runtime provider/profile only; source global allocator and native pointer ABI remain open. SizeT32 conversion before zero/bypass applies to raw and checked allocation/deallocation entries; owning receipts match normalized size and exact private serial. Read-only source getters observe the published prefix while raw mutation stays stopped. Raw retry is an explicit Go continuation, not native exception resumption. Actual public pool metadata refusal/ownabort proof preserves donor/caller roots; headerless wrapped realloc is guarded source-undefined domain only. Direct release stage2-to-physical has no fallible point, no fabricated failure credit. Whole units remain partial."
+        "Same Runtime provider/profile only; source global allocator and native pointer ABI remain open. SizeT32 conversion before zero/bypass applies to raw and checked allocation/deallocation entries; owning receipts match normalized size and exact private serial. Read-only source getters observe the published prefix while raw mutation stays stopped. Raw retry is an explicit Go continuation, not native exception resumption. Actual public pool metadata refusal/ownabort proof preserves donor/caller roots; headerless wrapped realloc is guarded source-undefined domain only. Direct release stage2-to-physical has no fallible point, no fabricated failure credit. Whole units remain partial.",
+        "File-backed diagnostics use explicit borrowed os.File service; default write failure is nonthrowing badbit. Native stream buffering/locale/exception masks/global stderr initialization remain separate."
       ]
     },
     {
@@ -133561,7 +133720,9 @@
       "status": "partial",
       "go_targets": [
         "util_z3_exception.go",
-        "util_printf.go"
+        "util_printf.go",
+        "util_memory_fatal_policy.go",
+        "util_memory_fatal_policy_test.go"
       ],
       "tests": [
         "TestZ3ExceptionSourceCodesAndLabels",
@@ -133576,7 +133737,9 @@
         "TestPrintfIndependentFiniteIntegerAndPaddingOracle",
         "TestPrintfSignedCountOverflowOnEscapedPercent",
         "TestPrintfBudgetPeakExactAndObserverPanicCleanup",
-        "TestPrintfByteBoundaryAndBackendEventClassification"
+        "TestPrintfByteBoundaryAndBackendEventClassification",
+        "TestMemoryFatalNonExitExceptionCatch",
+        "TestMemoryFatalRealExitWithActiveReservationRefusal"
       ],
       "conditionals": [
         {
@@ -133625,6 +133788,15 @@
             "TestPrintfSignedCountOverflowOnEscapedPercent",
             "TestPrintfBudgetPeakExactAndObserverPanicCleanup",
             "TestPrintfByteBoundaryAndBackendEventClassification"
+          ]
+        },
+        {
+          "name": "ERR_MEMOUT101/ERR_ALLOC_EXCEEDED113 actual fatal dispatch and out_of_memory_error -> z3_error derived/base Go catch adaptation",
+          "status": "partial",
+          "go_target": "util_memory_fatal_policy.go",
+          "tests": [
+            "TestMemoryFatalNonExitExceptionCatch",
+            "TestMemoryFatalRealExitWithActiveReservationRefusal"
           ]
         }
       ],

@@ -1,4 +1,4 @@
-// Source: src/util/memory_manager.cpp:124-149,274-305,326-377; src/util/memory_manager.h:49-71.
+// Source: src/util/memory_manager.cpp:33-72,124-149,274-305,326-377; src/util/memory_manager.h:49-71.
 // Licensed under the MIT license. See LICENSE.txt.
 // Source author: Nikolaj Bjorner (nbjorner), 2007-07-24.
 package memory
@@ -20,6 +20,7 @@ type RuntimeConfig struct {
 	Budget      *arena.Budget
 	ThreadLocal bool
 	Transport   ErrorTransport
+	FatalPolicy FatalPolicy
 	SizeTBits   uint8
 }
 type Block struct {
@@ -61,6 +62,9 @@ type RuntimeStats struct {
 // One confined lane implements the selected TLS/non-TLS source body. Owners
 // and their Budget require caller confinement; process-global wiring stays open.
 func NewRuntime(c RuntimeConfig) (*Runtime, error) {
+	if c.FatalPolicy != nil && (c.Transport != nil || c.FatalPolicy.MemoryBudget() != c.Budget) {
+		return nil, arena.ErrConfig
+	}
 	if c.SizeTBits == 0 {
 		c.SizeTBits = 64
 	}
@@ -453,4 +457,12 @@ func (m *Runtime) CleanupPartial(h *Block) error {
 	}
 	*h = Block{}
 	return nil
+}
+
+// Reached source g_memory_max_alloc_count read, after the first insertion.
+func (m *Runtime) ConfiguredMaxAllocationCount() (int64, error) {
+	if e := m.open(); e != nil {
+		return 0, e
+	}
+	return m.accounting.maxCount, nil
 }

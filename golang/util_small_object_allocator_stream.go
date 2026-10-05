@@ -39,6 +39,9 @@ func smallObjectCStringInto(out *NumericTextStream, region *arena.BytesRegion, t
 		}
 		length++
 	}
+	if out.fileBad {
+		return nil
+	}
 	pad, e := out.fieldPadding(length)
 	if e != nil {
 		return e
