@@ -436,7 +436,9 @@ func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []Int, ms [
 	}
 	l := &m.locations[slot-1]
 	g := l.generation
-	*l = polynomialLocation{raw: raw, requested: requested, generation: g, live: true}
+	// Actual constructor layout fixes m_ms independently of later mutable SIZE.
+	// Retain the allocation count before the uint32 request-size wrap.
+	*l = polynomialLocation{raw: raw, requested: requested, generation: g, live: true, monomialBase: 12 + uint64(n)*12}
 	p := Polynomial{owner: m.origin, slot: slot, generation: g}
 	m.pending.value = p
 	m.pending.raw = memory.ObjectRef{}

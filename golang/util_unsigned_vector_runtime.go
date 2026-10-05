@@ -1,4 +1,4 @@
-// Source: src/util/vector.h:43-125,178-189,215-240,303-310,350-365,389-433,531-546.
+// Source: src/util/vector.h:43-125,178-189,215-240,303-310,350-365,389-433,449-451,531-546.
 // Source author: Leonardo de Moura.
 // Licensed under the MIT license; see LICENSE.txt.
 package g3
@@ -6,6 +6,7 @@ package g3
 import (
 	"github.com/glycerine/g3/golang/arena"
 	"github.com/glycerine/g3/golang/memory"
+	"github.com/glycerine/g3/golang/utilbits"
 	"reflect"
 )
 
@@ -186,4 +187,16 @@ func (v *RuntimeUnsignedVector) CleanupStopped() error {
 		return nil
 	}
 	return v.closeOwning()
+}
+
+// CPtr reads the actual current member pointer only. Logical SIZE/CAP headers
+// and borrowed provider/payload guards are reached only by later dereferences.
+func (v *RuntimeUnsignedVector) CPtr() (utilbits.RuntimeUint32View, error) {
+	if v == nil || v.self != v {
+		return utilbits.RuntimeUint32View{}, ErrSATOwner
+	}
+	if !v.constructed || v.closed || v.sourceDone || v.destructorCause != nil {
+		return utilbits.RuntimeUint32View{}, arena.ErrClosed
+	}
+	return utilbits.BorrowRuntimeUint32(v.column.raw.runtime, v.column.raw.block, 8), nil
 }

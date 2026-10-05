@@ -28652,7 +28652,9 @@
         "memory/small_allocator_allocation_outcome.go",
         "memory/small_allocator_guarded_start_source_test.go",
         "mpnum/polynomial_monomial_allocator_invocation.go",
-        "mpnum/polynomial_monomial_allocator_leaf_source_test.go"
+        "mpnum/polynomial_monomial_allocator_leaf_source_test.go",
+        "mpnum/polynomial_lex_raw_pointer.go",
+        "mpnum/polynomial_lex_raw_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -29231,7 +29233,13 @@
         "TestMonomialFactoryAllocatorRejectedNewCreationPreservesEarlierLeaf",
         "TestPolynomialDerivativeOwnsActualMonomialAllocatorLeaf",
         "TestPolynomialDerivativeMonomialAllocatorForeignReplacementPreserved",
-        "TestMonomialAllocatorOwnAcknowledgesPostphysicalRelease"
+        "TestMonomialAllocatorOwnAcknowledgesPostphysicalRelease",
+        "TestPolynomialLexRawCycleReadsInitializedSpareMappingAfterReset",
+        "TestPolynomialLexCapturedPayloadViewsKeepStableColumnAndExactObject",
+        "TestPolynomialLexRawCycleSignedSkippedLoopLeavesPayloadProviderUnread",
+        "TestPolynomialLexRawCycleMarkPrecedesReachedConstructedPayloadGuard",
+        "TestPolynomialLexBucketExpansionReachedSourceCapacityAssertion",
+        "TestPolynomialLexCapturedPayloadRejectsRealDeletedReusedSlot"
       ],
       "conditionals": [
         {
@@ -32346,6 +32354,25 @@
             "TestPolynomialDerivativeMonomialAllocatorForeignReplacementPreserved",
             "TestMonomialAllocatorOwnAcknowledgesPostphysicalRelease"
           ]
+        },
+        {
+          "name": "actual polynomial lex recursive raw NUM/monomial cycle consumers and captured Runtime mapping; stable actual allocation layout and literal nested bucket size/append/capacity source reads",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_lex_sort.go",
+          "tests": [
+            "TestPolynomialLexRawCycleReadsInitializedSpareMappingAfterReset",
+            "TestPolynomialLexCapturedPayloadViewsKeepStableColumnAndExactObject",
+            "TestPolynomialLexRawCycleSignedSkippedLoopLeavesPayloadProviderUnread",
+            "TestPolynomialLexRawCycleMarkPrecedesReachedConstructedPayloadGuard",
+            "TestPolynomialLexBucketExpansionReachedSourceCapacityAssertion",
+            "TestPolynomialLexCapturedPayloadRejectsRealDeletedReusedSlot",
+            "TestPolynomialLexSortIndependentRecursiveOrder",
+            "TestPolynomialLexSortEveryReservationPreservesTermPairs",
+            "TestPolynomialLexSortNestedGrowthIndependentFiniteModel",
+            "TestPolynomialLexSortNestedGrowthEveryReservation",
+            "TestPolynomialLexSortActualBigCoefficientOwnership",
+            "TestPolynomialLexSortFreshNullCoefficientRawPermutation"
+          ]
         }
       ],
       "ownership": [
@@ -32423,7 +32450,12 @@
         "Actual embedded MM allocation frame holds the single passed-by-address SmallAllocatorAllocationOutcome; reflected class header charges actual Go metadata once.",
         "Lower started result is written beside real guarded nonce/outcome publication after open/zero/prior-pending guards. No before-after pending or counter inference acquires authority.",
         "Exact MM self/frame/outcome address and lower nonwrapping invocation identify captured pending[0]; successful raw objects remain actual location/member owned, and foreign scratch is never drained.",
-        "Derivative captures only its actual returned callee receipt. False owning phase preserves unjoined raw; true phase follows matched creation abort and drains only exact allocation authority. Later foreign replacements and original stopped history remain unchanged."
+        "Derivative captures only its actual returned callee receipt. False owning phase preserves unjoined raw; true phase follows matched creation abort and drains only exact allocation authority. Later foreign replacements and original stopped history remain unchanged.",
+        "Actual NUM12 and monomial16 encoded payloads swapped in place with no INC/DEL, clone, replacement allocation or snapshot ownership.",
+        "monomialBase uint64 stamped at real location publication from actual n; reflected cold location directory charged once, independent from mutable SIZE/request uint32 wrap.",
+        "Captured core/Polynomial/ObjectRef/base guard exact live slot/generation and current raw identity at each reached initialized-prefix/allocator word read. No logical SIZE read; same source buffer values/captured mapping pointer.",
+        "Existing actual nested Runtime row backing, raw/moved-prefix/old/pending roots and charged children directory remain; source append rereads other.SIZE per loop, default CAP assertion before expansion overflow/allocation, size read before each source cycle.",
+        "Independent full named polynomial/NUM/monomial/raw/cold census immediate under active fault for every existing reservation before firstsuccess; public higher-variable permutation retained before lower recursive refusal."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -32486,7 +32518,11 @@
         "Stopped-prefix proof uses a real source append reservation refusal; direct zero factory marker is adapter-state guard coverage only, with no source ctor/INC credit.",
         "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open.",
         "Derivative numeric acquisition uses the actual guarded full-manager/frame/nonwrapping invocation at Integer allocation, descriptor publication/clear and allocator pending acquisition leaves. Public Derivative and optional invocation entry share direct SET/MUL engines. Matched younger PN source-stop blocks older a then n source destructors; false owning acknowledgment and true unjoined abort preserve first source history and foreign replacement roots. Fixed-owner high-level recursive reentry remains a Go owner limitation; other polynomial.cpp methods and whole imp completion retain existing qualifications. Returned exception cause identity remains stable after owning cleanup and a later invocation; inactive same-nonce source history is separate from active owning authority.",
-        "Selected actual monomial raw allocator transport closure only; whole source classes/units and fullFactor remain partial; dormant registered driver credit0."
+        "Selected actual monomial raw allocator transport closure only; whole source classes/units and fullFactor remain partial; dormant registered driver credit0.",
+        "ObjectRef/init-prefix checking is explicit Go raw-pointer lifetime/safety domain; malformed header/subrange/reused token tests are not native valid exception claims.",
+        "Concrete actual12/16-byte codecs remain replacement representation, not native NUM/pointer ABI closure.",
+        "Existing registered high-level polynomial driver is not newly credited wholesale; independent branch/oracle and source-consumer tests only.",
+        "Global DEBUG/TRACE/ostream and broad nested-vector/copy/lifecycle source methods remain partial."
       ]
     },
     {
@@ -127084,7 +127120,14 @@
         "util_unsigned_vector_copy_source_test.go",
         "util_permutation_copy_source.go",
         "util_permutation_copy_source_test.go",
-        "util_unsigned_vector_copy_retire_source_test.go"
+        "util_unsigned_vector_copy_retire_source_test.go",
+        "utilbits/permutation_runtime_view.go",
+        "utilbits/permutation_runtime_view_test.go",
+        "mpnum/polynomial_cell.go",
+        "mpnum/polynomial_store.go",
+        "mpnum/polynomial_lex_sort.go",
+        "mpnum/polynomial_lex_raw_pointer.go",
+        "mpnum/polynomial_lex_raw_source_test.go"
       ],
       "tests": [
         "TestPermutationCyclesExhaustiveIndependentCopy",
@@ -127117,7 +127160,23 @@
         "TestRuntimePermutationAssignStoppedDeallocateUsesExactConsumedFieldReceipt",
         "TestRuntimePermutationFailedSecondCopyReadRetainsUncompletedInverse",
         "TestRuntimeUnsignedVectorSuccessfulAssignRetiresTransferredAcquisitionMetadata",
-        "TestRuntimeUnsignedVectorSuccessfulRetryRetiresPrephysicalEmptyInvocation"
+        "TestRuntimeUnsignedVectorSuccessfulRetryRetiresPrephysicalEmptyInvocation",
+        "TestRuntimePermutationPointerCyclesIndependentFiniteOracle",
+        "TestRuntimePermutationPointerMarkBeforeReachedReadAndAliasing",
+        "TestRuntimePermutationPointerUnreadZeroSignedLoopAndLifetime",
+        "TestRuntimePermutationPointerReachedAssertionBoundsAndRestorationPrefix",
+        "TestPolynomialLexRawCycleReadsInitializedSpareMappingAfterReset",
+        "TestPolynomialLexCapturedPayloadViewsKeepStableColumnAndExactObject",
+        "TestPolynomialLexRawCycleSignedSkippedLoopLeavesPayloadProviderUnread",
+        "TestPolynomialLexRawCycleMarkPrecedesReachedConstructedPayloadGuard",
+        "TestPolynomialLexBucketExpansionReachedSourceCapacityAssertion",
+        "TestPolynomialLexCapturedPayloadRejectsRealDeletedReusedSlot",
+        "TestPolynomialLexSortIndependentRecursiveOrder",
+        "TestPolynomialLexSortEveryReservationPreservesTermPairs",
+        "TestPolynomialLexSortNestedGrowthIndependentFiniteModel",
+        "TestPolynomialLexSortNestedGrowthEveryReservation",
+        "TestPolynomialLexSortActualBigCoefficientOwnership",
+        "TestPolynomialLexSortFreshNullCoefficientRawPermutation"
       ],
       "conditionals": [
         {
@@ -127209,6 +127268,36 @@
             "TestRuntimeUnsignedVectorSuccessfulAssignRetiresTransferredAcquisitionMetadata",
             "TestRuntimeUnsignedVectorSuccessfulRetryRetiresPrephysicalEmptyInvocation"
           ]
+        },
+        {
+          "name": "concrete borrowed Runtime uint32 apply_permutation_core and restoring wrapper; literal signed loop, marker-before-swap and reached pointer accesses",
+          "status": "partial",
+          "go_target": "utilbits/permutation_runtime_view.go",
+          "tests": [
+            "TestRuntimePermutationPointerCyclesIndependentFiniteOracle",
+            "TestRuntimePermutationPointerMarkBeforeReachedReadAndAliasing",
+            "TestRuntimePermutationPointerUnreadZeroSignedLoopAndLifetime",
+            "TestRuntimePermutationPointerReachedAssertionBoundsAndRestorationPrefix"
+          ]
+        },
+        {
+          "name": "actual polynomial lex recursive raw NUM/monomial cycle consumers and captured Runtime mapping; stable actual allocation layout and literal nested bucket size/append/capacity source reads",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_lex_raw_pointer.go",
+          "tests": [
+            "TestPolynomialLexRawCycleReadsInitializedSpareMappingAfterReset",
+            "TestPolynomialLexCapturedPayloadViewsKeepStableColumnAndExactObject",
+            "TestPolynomialLexRawCycleSignedSkippedLoopLeavesPayloadProviderUnread",
+            "TestPolynomialLexRawCycleMarkPrecedesReachedConstructedPayloadGuard",
+            "TestPolynomialLexBucketExpansionReachedSourceCapacityAssertion",
+            "TestPolynomialLexCapturedPayloadRejectsRealDeletedReusedSlot",
+            "TestPolynomialLexSortIndependentRecursiveOrder",
+            "TestPolynomialLexSortEveryReservationPreservesTermPairs",
+            "TestPolynomialLexSortNestedGrowthIndependentFiniteModel",
+            "TestPolynomialLexSortNestedGrowthEveryReservation",
+            "TestPolynomialLexSortActualBigCoefficientOwnership",
+            "TestPolynomialLexSortFreshNullCoefficientRawPermutation"
+          ]
         }
       ],
       "ownership": [
@@ -127220,7 +127309,13 @@
         "Actual reflected cold node prepared before each Runtime Allocate; block acquired only from allocator return, transferred only at m_data publication. Native-valid retry retains earlier unjoined roots. Source destructor visits current pointer only; owning cleanup releases actual retained nodes with sticky physical-consumed progress.",
         "Independent caller-named physical Runtime block bijection plus actual wrapper/acquisition reflected cold headers; every reservation before first success retains completed source prefixes before faultlift.",
         "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration.",
-        "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration. A completed later operation also retires called/acquired=false/token-null contexts; no actual block was returned, first source cause stays on vector. 32 real prephysical refusal\u2192successful retry cycles prove bounded cold bytes, exact graph before faultlift, actual Code101+same-Runtime OOM and payload after success."
+        "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration. A completed later operation also retires called/acquired=false/token-null contexts; no actual block was returned, first source cause stays on vector. 32 real prephysical refusal\u2192successful retry cycles prove bounded cold bytes, exact graph before faultlift, actual Code101+same-Runtime OOM and payload after success.",
+        "Call-local pointer-free borrowed Runtime+Block+offset only. CPtr reads no SIZE/CAP/payload/provider; reached access uses existing actual Runtime word codecs. No allocation, metadata owner, whole-range preflight, clone or shadow. Captured generation invalidates on real realloc/free; same backing changes remain visible. Per-word writes validate physical word extent and initialization read guards before swaps. Caller-named graph unchanged under FailAfter0.",
+        "Actual NUM12 and monomial16 encoded payloads swapped in place with no INC/DEL, clone, replacement allocation or snapshot ownership.",
+        "monomialBase uint64 stamped at real location publication from actual n; reflected cold location directory charged once, independent from mutable SIZE/request uint32 wrap.",
+        "Captured core/Polynomial/ObjectRef/base guard exact live slot/generation and current raw identity at each reached initialized-prefix/allocator word read. No logical SIZE read; same source buffer values/captured mapping pointer.",
+        "Existing actual nested Runtime row backing, raw/moved-prefix/old/pending roots and charged children directory remain; source append rereads other.SIZE per loop, default CAP assertion before expansion overflow/allocation, size read before each source cycle.",
+        "Independent full named polynomial/NUM/monomial/raw/cold census immediate under active fault for every existing reservation before firstsuccess; public higher-variable permutation retained before lower recursive refusal."
       ],
       "deviations": [
         "Concrete uint32 specialization only; permutation class and additional typed consumers remain open, with no Go generics.",
@@ -127234,7 +127329,15 @@
         "Dangling destructor after failed nonnull assignment is source-undefined guarded domain",
         "Public TLS signed-overflow cleanup-stop fixtures are guarded-domain evidence, not ordinary OOM",
         "Native ostream/global debug/general vector and polynomial consumers remain partial",
-        "Nonwrapping acquisition invocation finite Go domain"
+        "Nonwrapping acquisition invocation finite Go domain",
+        "Concrete uint32 cycle payload only; polynomial numeral and monomial handle payload specializations, actual bucket vectors and lex-sort adoption remain OPEN",
+        "Captured token generation is checked Go lifetime domain; no native address/ABI claim",
+        "Default source DEBUG assertions only; full global macro controls/native std::swap variants remain partial",
+        "Existing registered permutation test algorithm remains #if0, independent new branch tests do not claim source driver execution",
+        "ObjectRef/init-prefix checking is explicit Go raw-pointer lifetime/safety domain; malformed header/subrange/reused token tests are not native valid exception claims.",
+        "Concrete actual12/16-byte codecs remain replacement representation, not native NUM/pointer ABI closure.",
+        "Existing registered high-level polynomial driver is not newly credited wholesale; independent branch/oracle and source-consumer tests only.",
+        "Global DEBUG/TRACE/ostream and broad nested-vector/copy/lifecycle source methods remain partial."
       ]
     },
     {
@@ -135326,7 +135429,13 @@
         "util_unsigned_vector_copy_source_test.go",
         "util_permutation_copy_source.go",
         "util_permutation_copy_source_test.go",
-        "util_unsigned_vector_copy_retire_source_test.go"
+        "util_unsigned_vector_copy_retire_source_test.go",
+        "util_unsigned_vector_view_source_test.go",
+        "mpnum/polynomial_cell.go",
+        "mpnum/polynomial_store.go",
+        "mpnum/polynomial_lex_sort.go",
+        "mpnum/polynomial_lex_raw_pointer.go",
+        "mpnum/polynomial_lex_raw_source_test.go"
       ],
       "tests": [
         "TestParamDescrsBudgetFailuresAndWarmDuplicate",
@@ -135651,7 +135760,21 @@
         "TestRuntimePermutationAssignStoppedDeallocateUsesExactConsumedFieldReceipt",
         "TestRuntimePermutationFailedSecondCopyReadRetainsUncompletedInverse",
         "TestRuntimeUnsignedVectorSuccessfulAssignRetiresTransferredAcquisitionMetadata",
-        "TestRuntimeUnsignedVectorSuccessfulRetryRetiresPrephysicalEmptyInvocation"
+        "TestRuntimeUnsignedVectorSuccessfulRetryRetiresPrephysicalEmptyInvocation",
+        "TestRuntimeUnsignedVectorCPtrCapturesPhysicalLifetimeAndSameCapacityMutation",
+        "TestRuntimeUnsignedVectorCPtrDoesNotReadUnreadHeader",
+        "TestPolynomialLexRawCycleReadsInitializedSpareMappingAfterReset",
+        "TestPolynomialLexCapturedPayloadViewsKeepStableColumnAndExactObject",
+        "TestPolynomialLexRawCycleSignedSkippedLoopLeavesPayloadProviderUnread",
+        "TestPolynomialLexRawCycleMarkPrecedesReachedConstructedPayloadGuard",
+        "TestPolynomialLexBucketExpansionReachedSourceCapacityAssertion",
+        "TestPolynomialLexCapturedPayloadRejectsRealDeletedReusedSlot",
+        "TestPolynomialLexSortIndependentRecursiveOrder",
+        "TestPolynomialLexSortEveryReservationPreservesTermPairs",
+        "TestPolynomialLexSortNestedGrowthIndependentFiniteModel",
+        "TestPolynomialLexSortNestedGrowthEveryReservation",
+        "TestPolynomialLexSortActualBigCoefficientOwnership",
+        "TestPolynomialLexSortFreshNullCoefficientRawPermutation"
       ],
       "conditionals": [
         {
@@ -136237,6 +136360,34 @@
             "TestRuntimeUnsignedVectorSuccessfulAssignRetiresTransferredAcquisitionMetadata",
             "TestRuntimeUnsignedVectorSuccessfulRetryRetiresPrephysicalEmptyInvocation"
           ]
+        },
+        {
+          "name": "concrete Runtime unsigned_vector c_ptr captures actual current pointer without header/provider read; reached physical view generation and same-cap mutation",
+          "status": "partial",
+          "go_target": "util_unsigned_vector_runtime.go",
+          "tests": [
+            "TestRuntimeUnsignedVectorCPtrCapturesPhysicalLifetimeAndSameCapacityMutation",
+            "TestRuntimeUnsignedVectorCPtrDoesNotReadUnreadHeader"
+          ]
+        },
+        {
+          "name": "actual polynomial lex recursive raw NUM/monomial cycle consumers and captured Runtime mapping; stable actual allocation layout and literal nested bucket size/append/capacity source reads",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_lex_sort.go",
+          "tests": [
+            "TestPolynomialLexRawCycleReadsInitializedSpareMappingAfterReset",
+            "TestPolynomialLexCapturedPayloadViewsKeepStableColumnAndExactObject",
+            "TestPolynomialLexRawCycleSignedSkippedLoopLeavesPayloadProviderUnread",
+            "TestPolynomialLexRawCycleMarkPrecedesReachedConstructedPayloadGuard",
+            "TestPolynomialLexBucketExpansionReachedSourceCapacityAssertion",
+            "TestPolynomialLexCapturedPayloadRejectsRealDeletedReusedSlot",
+            "TestPolynomialLexSortIndependentRecursiveOrder",
+            "TestPolynomialLexSortEveryReservationPreservesTermPairs",
+            "TestPolynomialLexSortNestedGrowthIndependentFiniteModel",
+            "TestPolynomialLexSortNestedGrowthEveryReservation",
+            "TestPolynomialLexSortActualBigCoefficientOwnership",
+            "TestPolynomialLexSortFreshNullCoefficientRawPermutation"
+          ]
         }
       ],
       "ownership": [
@@ -136261,7 +136412,13 @@
         "Actual reflected cold node prepared before each Runtime Allocate; block acquired only from allocator return, transferred only at m_data publication. Native-valid retry retains earlier unjoined roots. Source destructor visits current pointer only; owning cleanup releases actual retained nodes with sticky physical-consumed progress.",
         "Independent caller-named physical Runtime block bijection plus actual wrapper/acquisition reflected cold headers; every reservation before first success retains completed source prefixes before faultlift.",
         "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration.",
-        "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration. A completed later operation also retires called/acquired=false/token-null contexts; no actual block was returned, first source cause stays on vector. 32 real prephysical refusal\u2192successful retry cycles prove bounded cold bytes, exact graph before faultlift, actual Code101+same-Runtime OOM and payload after success."
+        "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration. A completed later operation also retires called/acquired=false/token-null contexts; no actual block was returned, first source cause stays on vector. 32 real prephysical refusal\u2192successful retry cycles prove bounded cold bytes, exact graph before faultlift, actual Code101+same-Runtime OOM and payload after success.",
+        "Call-local pointer-free borrowed Runtime+Block+offset only. CPtr reads no SIZE/CAP/payload/provider; reached access uses existing actual Runtime word codecs. No allocation, metadata owner, whole-range preflight, clone or shadow. Captured generation invalidates on real realloc/free; same backing changes remain visible. Per-word writes validate physical word extent and initialization read guards before swaps. Caller-named graph unchanged under FailAfter0.",
+        "Actual NUM12 and monomial16 encoded payloads swapped in place with no INC/DEL, clone, replacement allocation or snapshot ownership.",
+        "monomialBase uint64 stamped at real location publication from actual n; reflected cold location directory charged once, independent from mutable SIZE/request uint32 wrap.",
+        "Captured core/Polynomial/ObjectRef/base guard exact live slot/generation and current raw identity at each reached initialized-prefix/allocator word read. No logical SIZE read; same source buffer values/captured mapping pointer.",
+        "Existing actual nested Runtime row backing, raw/moved-prefix/old/pending roots and charged children directory remain; source append rereads other.SIZE per loop, default CAP assertion before expansion overflow/allocation, size read before each source cycle.",
+        "Independent full named polynomial/NUM/monomial/raw/cold census immediate under active fault for every existing reservation before firstsuccess; public higher-variable permutation retained before lower recursive refusal."
       ],
       "deviations": [
         "Concrete solver-specific storage, not complete generic vector template surface. Owning model Clone/Assign, other specializations and source-undefined continuation behavior remain explicitly separate.",
@@ -136287,7 +136444,15 @@
         "Dangling destructor after failed nonnull assignment is source-undefined guarded domain",
         "Public TLS signed-overflow cleanup-stop fixtures are guarded-domain evidence, not ordinary OOM",
         "Native ostream/global debug/general vector and polynomial consumers remain partial",
-        "Nonwrapping acquisition invocation finite Go domain"
+        "Nonwrapping acquisition invocation finite Go domain",
+        "Concrete uint32 cycle payload only; polynomial numeral and monomial handle payload specializations, actual bucket vectors and lex-sort adoption remain OPEN",
+        "Captured token generation is checked Go lifetime domain; no native address/ABI claim",
+        "Default source DEBUG assertions only; full global macro controls/native std::swap variants remain partial",
+        "Existing registered permutation test algorithm remains #if0, independent new branch tests do not claim source driver execution",
+        "ObjectRef/init-prefix checking is explicit Go raw-pointer lifetime/safety domain; malformed header/subrange/reused token tests are not native valid exception claims.",
+        "Concrete actual12/16-byte codecs remain replacement representation, not native NUM/pointer ABI closure.",
+        "Existing registered high-level polynomial driver is not newly credited wholesale; independent branch/oracle and source-consumer tests only.",
+        "Global DEBUG/TRACE/ostream and broad nested-vector/copy/lifecycle source methods remain partial."
       ]
     },
     {

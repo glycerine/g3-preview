@@ -61,6 +61,15 @@ func (b *polynomialImpBuckets) reserve(n uint32) error {
 func (b *polynomialImpBuckets) expandClasses() error {
 	m := b.owner
 	v := &b.data
+	if modularSourceDebug && v.raw != (memory.Block{}) {
+		cap, e := v.capacity(m)
+		if e != nil {
+			return e
+		}
+		if cap == 0 {
+			return ErrPolynomialAssertion
+		}
+	}
 	oldCap, e := v.capacity(m)
 	if e != nil {
 		return e
@@ -172,8 +181,12 @@ func polynomialUnsignedRead(m *MultivariatePolynomialCore, v *polynomialVector, 
 }
 func (m *MultivariatePolynomialManager) lexMaximumBelow(p Polynomial, start, end, x uint32) (uint32, error) {
 	max := ^uint32(0)
+	ms, e := m.core.captureMonomialPointer(p, 0)
+	if e != nil {
+		return 0, e
+	}
 	for i := start; i < end; i++ {
-		a, e := m.core.monomialCore(p, i)
+		a, e := ms.read(i)
 		if e != nil {
 			return 0, e
 		}
@@ -192,9 +205,13 @@ func (m *MultivariatePolynomialManager) lexRange(p Polynomial, start, end, x uin
 		return ErrPolynomialAssertion
 	}
 	c := m.core
+	ms, e := c.captureMonomialPointer(p, 0)
+	if e != nil {
+		return e
+	}
 	maxDegree := uint32(0)
 	for i, j := start, uint32(0); i < end; i, j = i+1, j+1 {
-		a, e := c.monomialCore(p, i)
+		a, e := ms.read(i)
 		if e != nil {
 			return e
 		}
@@ -225,11 +242,14 @@ func (m *MultivariatePolynomialManager) lexRange(p Polynomial, start, end, x uin
 		if e != nil {
 			return e
 		}
-		n, e := b.size(c)
-		if e != nil {
-			return e
-		}
-		for j := uint32(0); j < n; j++ {
+		for j := uint32(0); ; j++ {
+			n, e := b.size(c)
+			if e != nil {
+				return e
+			}
+			if j >= n {
+				break
+			}
 			v, e := polynomialUnsignedRead(c, b, j)
 			if e != nil {
 				return e
@@ -242,21 +262,31 @@ func (m *MultivariatePolynomialManager) lexRange(p Polynomial, start, end, x uin
 			return e
 		}
 	}
+	if modularSourceDebug {
+		n, e := m.lexPermutation.size(c)
+		if e != nil {
+			return e
+		}
+		if n != end-start {
+			return ErrPolynomialAssertion
+		}
+	}
 	n, e := m.lexPermutation.size(c)
 	if e != nil {
 		return e
 	}
-	if modularSourceDebug && n != end-start {
-		return ErrPolynomialAssertion
-	}
 	if e = m.lexApplyPermutation(p, start, n, true); e != nil {
+		return e
+	}
+	n, e = m.lexPermutation.size(c)
+	if e != nil {
 		return e
 	}
 	if e = m.lexApplyPermutation(p, start, n, false); e != nil {
 		return e
 	}
 	for i := start; i < end; {
-		a, e := c.monomialCore(p, i)
+		a, e := ms.read(i)
 		if e != nil {
 			return e
 		}
@@ -276,7 +306,7 @@ func (m *MultivariatePolynomialManager) lexRange(p Polynomial, start, end, x uin
 		}
 		j := i + 1
 		for ; j < end; j++ {
-			a, e := c.monomialCore(p, j)
+			a, e := ms.read(j)
 			if e != nil {
 				return e
 			}
@@ -292,7 +322,7 @@ func (m *MultivariatePolynomialManager) lexRange(p Polynomial, start, end, x uin
 			}
 		}
 		if modularSourceDebug && j != end {
-			a, e := c.monomialCore(p, j)
+			a, e := ms.read(j)
 			if e != nil {
 				return e
 			}
@@ -316,85 +346,6 @@ func (m *MultivariatePolynomialManager) lexRange(p Polynomial, start, end, x uin
 			}
 		}
 		i = j
-	}
-	return nil
-}
-func (m *MultivariatePolynomialManager) lexApplyPermutation(p Polynomial, start, n uint32, numerals bool) error {
-	c := m.core
-	perm := &m.lexPermutation
-	for i := int32(0); i < int32(n); i++ {
-		x, e := polynomialUnsignedRead(c, perm, uint32(i))
-		if e != nil {
-			return e
-		}
-		if int32(x) < 0 {
-			continue
-		}
-		j := i
-		for {
-			if modularSourceDebug && j < 0 {
-				return ErrPolynomialAssertion
-			}
-			next, e := polynomialUnsignedRead(c, perm, uint32(j))
-			if e != nil {
-				return e
-			}
-			k := int32(next)
-			if modularSourceDebug && (k < 0 || k >= int32(n)) {
-				return ErrPolynomialAssertion
-			}
-			if e = c.memory.WriteUint32(perm.raw, 8+uint64(uint32(j))*4, uint32(-k-1)); e != nil {
-				return e
-			}
-			if k == i {
-				break
-			}
-			if numerals {
-				a, e := c.coefficientCore(p, start+uint32(j))
-				if e != nil {
-					return e
-				}
-				b, e := c.coefficientCore(p, start+uint32(k))
-				if e != nil {
-					return e
-				}
-				// apply_permutation uses representation swap, not numeral_manager.swap.
-				a, b = b, a
-				if e = c.writeCoefficient(p, start+uint32(j), a); e != nil {
-					return e
-				}
-				if e = c.writeCoefficient(p, start+uint32(k), b); e != nil {
-					return e
-				}
-			} else {
-				a, e := c.monomialCore(p, start+uint32(j))
-				if e != nil {
-					return e
-				}
-				b, e := c.monomialCore(p, start+uint32(k))
-				if e != nil {
-					return e
-				}
-				if e = c.writeMonomial(p, start+uint32(j), b); e != nil {
-					return e
-				}
-				if e = c.writeMonomial(p, start+uint32(k), a); e != nil {
-					return e
-				}
-			}
-			j = k
-		}
-	}
-	if numerals {
-		for i := uint32(0); i < n; i++ {
-			x, e := polynomialUnsignedRead(c, perm, i)
-			if e != nil {
-				return e
-			}
-			if e = c.memory.WriteUint32(perm.raw, 8+uint64(i)*4, uint32(-int32(x)-1)); e != nil {
-				return e
-			}
-		}
 	}
 	return nil
 }
@@ -440,12 +391,16 @@ func (m *MultivariatePolynomialManager) LexSort(p Polynomial) error {
 		return e
 	}
 	if modularSourceDebug {
+		ms, e := m.core.captureMonomialPointer(p, 0)
+		if e != nil {
+			return e
+		}
 		for i := uint32(0); i < n-1; i++ {
-			a, e := m.core.monomialCore(p, i)
+			a, e := ms.read(i)
 			if e != nil {
 				return e
 			}
-			b, e := m.core.monomialCore(p, i+1)
+			b, e := ms.read(i + 1)
 			if e != nil {
 				return e
 			}
