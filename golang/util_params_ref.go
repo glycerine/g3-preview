@@ -1,5 +1,6 @@
-// Licensed under the MIT license.
-// Translation of src/util/params.h/.cpp; concrete owner-local storage.
+// Source: src/util/params.h; src/util/params.cpp.
+// Author: Leonardo de Moura (2011-05-09).
+// Licensed under the MIT license; see LICENSE.txt in the source distribution.
 package g3
 
 import (
@@ -35,6 +36,9 @@ type paramsBlock struct {
 	refs, generation, size, capacity uint32
 	entries                          paramsEntriesRef
 	live                             bool
+	resetCursor                      uint32
+	resetStage                       uint8
+	resetActive                      bool
 }
 type paramsText struct {
 	ref     arena.VectorRef
@@ -61,27 +65,28 @@ type paramsEntryPage struct {
 	class   uint32
 }
 type ParamsStats struct {
-	LiveBlocks, References, Entries                                 uint32
-	HeaderBytes, BlockBytes, PageBytes, DirectoryBytes, FormatBytes uint64
-	Text                                                            arena.VectorStats
+	LiveBlocks, References, Entries                                               uint32
+	HeaderBytes, BlockBytes, ReceiptBytes, PageBytes, DirectoryBytes, FormatBytes uint64
+	Text                                                                          arena.VectorStats
 }
 
 // This cold owner borrows both services. They must outlive it; budgets shared
 // across owners require external confinement. All hot records are pointer-free.
 type ParamsContext struct {
-	mu          sync.Mutex
-	self        *ParamsContext
-	symbols     *SymbolManager
-	numerals    *mpnum.RationalService
-	budget      *arena.Budget
-	texts       *arena.Words
-	owner       uint64
-	blocks      []paramsBlock
-	pages       []paramsEntryPage
-	workspace   []byte
-	pageEntries uint32
-	headerBytes uint64
-	closed      bool
+	mu                sync.Mutex
+	self              *ParamsContext
+	symbols           *SymbolManager
+	numerals          *mpnum.RationalService
+	budget            *arena.Budget
+	texts             *arena.Words
+	owner             uint64
+	blocks            []paramsBlock
+	decrementReceipts []paramsDecrementReceipt
+	pages             []paramsEntryPage
+	workspace         []byte
+	pageEntries       uint32
+	headerBytes       uint64
+	closed            bool
 }
 
 func paramsBytes(n int, t reflect.Type) uint64 { return uint64(n) * uint64(t.Size()) }
@@ -243,6 +248,7 @@ func (c *ParamsContext) newBlock() (uint32, error) {
 		if !b.live && b.generation != math.MaxUint32 {
 			g := b.generation + 1
 			*b = paramsBlock{refs: 1, generation: g, live: true}
+			c.decrementReceipts[i] = paramsDecrementReceipt{}
 			return uint32(i + 1), nil
 		}
 	}
@@ -251,14 +257,18 @@ func (c *ParamsContext) newBlock() (uint32, error) {
 		if e != nil {
 			return 0, e
 		}
-		if e = c.budget.Reserve(paramsBlockBytes(n)); e != nil {
+		if e = c.budget.Reserve(paramsBlockBytes(n) + paramsReceiptBytes(n)); e != nil {
 			return 0, e
 		}
 		next := make([]paramsBlock, len(c.blocks), n)
 		copy(next, c.blocks)
-		c.budget.Release(paramsBlockBytes(cap(c.blocks)))
+		receipts := make([]paramsDecrementReceipt, len(c.decrementReceipts), n)
+		copy(receipts, c.decrementReceipts)
+		c.budget.Release(paramsBlockBytes(cap(c.blocks)) + paramsReceiptBytes(cap(c.decrementReceipts)))
 		c.blocks = next
+		c.decrementReceipts = receipts
 	}
+	c.decrementReceipts = append(c.decrementReceipts, paramsDecrementReceipt{})
 	c.blocks = append(c.blocks, paramsBlock{refs: 1, generation: 1, live: true})
 	return uint32(len(c.blocks)), nil
 }
@@ -293,9 +303,14 @@ func (c *ParamsContext) dec(slot uint32) error {
 		return nil
 	}
 	b := &c.blocks[slot-1]
+	if globalParamsSourceDebug && b.refs == 0 {
+		return ErrParamsPrecondition
+	}
 	b.refs--
 	if b.refs == 0 {
-		if e := c.resetBlock(b); e != nil {
+		b.resetActive = true
+		c.decrementReceipts[slot-1] = paramsDecrementReceipt{generation: b.generation}
+		if e := c.continueDecrement(slot); e != nil {
 			return e
 		}
 		b.live = false
@@ -303,10 +318,10 @@ func (c *ParamsContext) dec(slot uint32) error {
 	return nil
 }
 func (c *ParamsContext) assign(dst, src *ParamsRef) error {
-	if e := c.check(dst); e != nil {
+	if e := c.mutable(dst); e != nil {
 		return e
 	}
-	if e := c.check(src); e != nil {
+	if e := c.mutable(src); e != nil {
 		return e
 	}
 	if src.slot != 0 {
@@ -338,7 +353,7 @@ func (c *ParamsContext) Del(v *ParamsRef) error {
 	return e
 }
 func (c *ParamsContext) init(v *ParamsRef) error {
-	if e := c.check(v); e != nil {
+	if e := c.mutable(v); e != nil {
 		return e
 	}
 	if v.slot != 0 && c.blocks[v.slot-1].refs == 1 {
@@ -401,10 +416,10 @@ func (c *ParamsContext) copyCore(dst, src uint32) error {
 func (c *ParamsContext) Copy(dst, src *ParamsRef) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	if e := c.check(dst); e != nil {
+	if e := c.mutable(dst); e != nil {
 		return e
 	}
-	if e := c.check(src); e != nil {
+	if e := c.mutable(src); e != nil {
 		return e
 	}
 	if dst.slot == 0 {
@@ -469,7 +484,7 @@ func (c *ParamsContext) Empty(v *ParamsRef) (bool, error) {
 func (c *ParamsContext) Reset(v *ParamsRef) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	if e := c.check(v); e != nil {
+	if e := c.mutable(v); e != nil {
 		return e
 	}
 	if v.slot == 0 {
@@ -478,6 +493,9 @@ func (c *ParamsContext) Reset(v *ParamsRef) error {
 	return c.resetBlock(&c.blocks[v.slot-1])
 }
 func (c *ParamsContext) resetKey(v *ParamsRef, k Symbol, name *string, byName bool) error {
+	if e := c.mutable(v); e != nil {
+		return e
+	}
 	x, e := c.find(v, k, name, byName, 0, true)
 	if e != nil || x == nil {
 		return e
@@ -1370,6 +1388,7 @@ func (c *ParamsContext) Stats() ParamsStats {
 	}
 	s.HeaderBytes = c.headerBytes
 	s.BlockBytes = paramsBlockBytes(cap(c.blocks))
+	s.ReceiptBytes = paramsReceiptBytes(cap(c.decrementReceipts))
 	s.DirectoryBytes = paramsDirectoryBytes(cap(c.pages))
 	s.FormatBytes = uint64(cap(c.workspace))
 	s.Text = c.texts.Stats()
@@ -1396,7 +1415,11 @@ func (c *ParamsContext) Close() error {
 	}
 	for i := range c.blocks {
 		if c.blocks[i].live {
-			if e := c.resetBlock(&c.blocks[i]); e != nil {
+			if c.blocks[i].resetActive {
+				if e := c.continueDecrement(uint32(i + 1)); e != nil {
+					return e
+				}
+			} else if e := c.resetBlock(&c.blocks[i]); e != nil {
 				return e
 			}
 		}
@@ -1405,8 +1428,9 @@ func (c *ParamsContext) Close() error {
 	for _, p := range c.pages {
 		c.budget.Release(paramsPageBytes(p))
 	}
-	c.budget.Release(paramsDirectoryBytes(cap(c.pages)) + paramsBlockBytes(cap(c.blocks)) + uint64(cap(c.workspace)) + c.headerBytes)
+	c.budget.Release(paramsDirectoryBytes(cap(c.pages)) + paramsBlockBytes(cap(c.blocks)) + paramsReceiptBytes(cap(c.decrementReceipts)) + uint64(cap(c.workspace)) + c.headerBytes)
 	c.blocks = nil
+	c.decrementReceipts = nil
 	c.pages = nil
 	c.workspace = nil
 	c.closed = true

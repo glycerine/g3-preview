@@ -841,7 +841,7 @@ func TestParamsReferenceExactContextAccountingAndGrowthPeak(t *testing.T) {
 	check := func() {
 		s := c.Stats()
 		d := s.Text.Descriptors
-		total := s.HeaderBytes + s.BlockBytes + s.PageBytes + s.DirectoryBytes + s.FormatBytes + s.Text.OwnerBytes + s.Text.PayloadBytes + s.Text.BlockMetadataBytes + s.Text.DirectoryBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes
+		total := s.HeaderBytes + s.BlockBytes + s.ReceiptBytes + s.PageBytes + s.DirectoryBytes + s.FormatBytes + s.Text.OwnerBytes + s.Text.PayloadBytes + s.Text.BlockMetadataBytes + s.Text.DirectoryBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes
 		if c.budget.Used() != borrowed+total {
 			t.Fatal("actual context charge", c.budget.Used(), borrowed+total)
 		}

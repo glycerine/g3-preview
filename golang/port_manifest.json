@@ -124415,7 +124415,7 @@
       "path": "src/util/params.cpp",
       "component": "util",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "util_param_name.go",
         "util_param_descrs.go",
@@ -124424,7 +124424,8 @@
         "util_param_descrs_stream.go",
         "util_param_descrs_stream_debug.go",
         "util_param_descrs_stream_nodebug.go",
-        "util_param_descrs_stream_test.go"
+        "util_param_descrs_stream_test.go",
+        "util_params_decrement_source.go"
       ],
       "tests": [
         "TestParamNameNormalizationSourceBranches",
@@ -124470,7 +124471,10 @@
         "TestParamDescrsDisplayIntoNullDescriptionActualAction",
         "TestParamDescrsDisplayIntoBudgetsScratchAndHugeIndentPrefix",
         "TestParamDescrsDisplayIntoGuardTimingAndIndependentOwner",
-        "TestParamDescrsDisplayIntoSourceScratchCapacityWidths"
+        "TestParamDescrsDisplayIntoSourceScratchCapacityWidths",
+        "TestParamsReferenceRepeatedDECSourceAssertionAfterActualSetLimbsLeafStop",
+        "TestParamsReferenceCleanupDecrementActualLeafReceipt",
+        "TestParamsReferenceIndependentStoppedBlocksAndReplacementGeneration"
       ],
       "conditionals": [
         {
@@ -124508,8 +124512,8 @@
           "text": "SASSERT(empty());"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
+      "methods_audited": false,
+      "ownership_audited": false,
       "methods": [
         {
           "name": "norm_param_name complete nullable C-string and symbol overloads",
@@ -124624,7 +124628,7 @@
         },
         {
           "name": "params_ref default/get_empty, owning copy/destructor/assignment and sharing Copy/Append",
-          "status": "ported",
+          "status": "partial",
           "go_target": "util_params_ref.go",
           "tests": [
             "TestParamsReferenceSourceSharingAndReset",
@@ -124649,7 +124653,7 @@
         },
         {
           "name": "params_ref init/copy_core and private params ordered entries/refcounts/value destruction",
-          "status": "ported",
+          "status": "partial",
           "go_target": "util_params_ref.go",
           "tests": [
             "TestParamsReferenceSourceSharingAndReset",
@@ -124699,7 +124703,7 @@
         },
         {
           "name": "shared reset/contains and validation module mutation, duplicate/key-kind scan and exact exception text",
-          "status": "ported",
+          "status": "partial",
           "go_target": "util_params_ref.go",
           "tests": [
             "TestParamsReferenceSourceSharingAndReset",
@@ -124769,6 +124773,16 @@
             "TestParamDescrsDisplayIntoGuardTimingAndIndependentOwner",
             "TestParamDescrsDisplayIntoSourceScratchCapacityWidths"
           ]
+        },
+        {
+          "name": "selected default DEBUG dec_ref predecrement assertion and zero-reference ascending destruction with explicit per-block owning continuation",
+          "status": "ported",
+          "go_target": "util_params_decrement_source.go",
+          "tests": [
+            "TestParamsReferenceRepeatedDECSourceAssertionAfterActualSetLimbsLeafStop",
+            "TestParamsReferenceCleanupDecrementActualLeafReceipt",
+            "TestParamsReferenceIndependentStoppedBlocksAndReplacementGeneration"
+          ]
         }
       ],
       "ownership": [
@@ -124776,19 +124790,21 @@
         "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PORT_PROGRESS.md#audit-param-descrs-port-status-md.",
         "Scalar owner-local ParamsRef and backing blocks; typed pooled pointer-free entries retain concrete numeral tokens and owned packed C text. Context header, all arrays/directories/text/workspaces and old/new peaks charged; immediate fault roots tested. Source action publication and shared resets preserved. See PORT_PROGRESS.md#audit-params-ref-port-status-md.",
         "Borrowed canonical spelling occupies existing scalar symbol field with a paramsText tag; copy retains identity and deletion frees only owned text. SymbolManager outlives borrowers; physical record stride remains reflect-accounted. See PORT_PROGRESS.md#audit-gparams-port-status-md.",
-        "DisplayInto borrows charged StringBuffer64; destination then descriptor then Symbol lock order. Temporary names use actual charged old/new peaks and are refunded; text bytes read directly without intermediate strings. See PORT_PROGRESS.md#audit-param-descrs-stream-port-status-md."
+        "DisplayInto borrows charged StringBuffer64; destination then descriptor then Symbol lock order. Temporary names use actual charged old/new peaks and are refunded; text bytes read directly without intermediate strings. See PORT_PROGRESS.md#audit-param-descrs-stream-port-status-md.",
+        "Actual zero-ref leaf destruction stop retains pointer-free per-block cursor/stage and precharged cold cause/generation receipts; exact current entry numeral is retained, mutation cannot replace it, independent blocks can stop/continue separately. Explicit CleanupDecrement and owning context Close acknowledge actual child release receipts without a second decrement. Whole ownership remains unproven for Reset/resetBlock outside zero-ref DEC and exceptional copy/init/value replacement."
       ],
       "deviations": [
         "Owner-local null replaces process-global empty reference. C strings become owned nullable first-NUL payloads; replacement stages new text. Detach error retains published partial block but cleans old reference. Pooled pages persist physically until Close; inline concrete numeric tokens replace separate heap objects. Provenance/overflow guards and libstdc++ null-C-string prefix error are explicit Go adapters; Z3DEBUG pp is explicit text API rather than global stdout.",
         "SetStringSymbol explicitly translates interned bare_str pointers without a second payload; original SetString remains the owned-string adapter. Registry and generated registration are still open.",
-        "The byte destination returns typed failures at debug null-description assertion or release null-string stream action, retaining emitted prefix. Existing caller-string Display API remains; tests compare valid-domain output only."
+        "The byte destination returns typed failures at debug null-description assertion or release null-string stream action, retaining emitted prefix. Existing caller-string Display API remains; tests compare valid-domain output only.",
+        "Go signed-overflow-domain TLS fixture reaches real postphysical numeral release stop; it is not valid OOM. Per-block receipt directory is actual charged Go metadata prepared before block publication, not source malloc. Pure reads and release zero-ref unsigned wrap remain source-reached; stopped-owner mutation guard is explicit Go lifetime qualification. Global assertion control/native stream profiles and exceptional non-DEC Reset/destructor closure remain open."
       ]
     },
     {
       "path": "src/util/params.h",
       "component": "util",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "util_param_name.go",
         "util_param_descrs.go",
@@ -124797,7 +124813,8 @@
         "util_param_descrs_stream.go",
         "util_param_descrs_stream_debug.go",
         "util_param_descrs_stream_nodebug.go",
-        "util_param_descrs_stream_test.go"
+        "util_param_descrs_stream_test.go",
+        "util_params_decrement_source.go"
       ],
       "tests": [
         "TestParamNameNormalizationSourceBranches",
@@ -124843,7 +124860,10 @@
         "TestParamDescrsDisplayIntoNullDescriptionActualAction",
         "TestParamDescrsDisplayIntoBudgetsScratchAndHugeIndentPrefix",
         "TestParamDescrsDisplayIntoGuardTimingAndIndependentOwner",
-        "TestParamDescrsDisplayIntoSourceScratchCapacityWidths"
+        "TestParamDescrsDisplayIntoSourceScratchCapacityWidths",
+        "TestParamsReferenceRepeatedDECSourceAssertionAfterActualSetLimbsLeafStop",
+        "TestParamsReferenceCleanupDecrementActualLeafReceipt",
+        "TestParamsReferenceIndependentStoppedBlocksAndReplacementGeneration"
       ],
       "conditionals": [
         {
@@ -124855,8 +124875,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
+      "methods_audited": false,
+      "ownership_audited": false,
       "methods": [
         {
           "name": "norm_param_name complete nullable C-string and symbol overloads",
@@ -124971,7 +124991,7 @@
         },
         {
           "name": "params_ref default/get_empty, owning copy/destructor/assignment and sharing Copy/Append",
-          "status": "ported",
+          "status": "partial",
           "go_target": "util_params_ref.go",
           "tests": [
             "TestParamsReferenceSourceSharingAndReset",
@@ -124996,7 +125016,7 @@
         },
         {
           "name": "params_ref init/copy_core and private params ordered entries/refcounts/value destruction",
-          "status": "ported",
+          "status": "partial",
           "go_target": "util_params_ref.go",
           "tests": [
             "TestParamsReferenceSourceSharingAndReset",
@@ -125046,7 +125066,7 @@
         },
         {
           "name": "shared reset/contains and validation module mutation, duplicate/key-kind scan and exact exception text",
-          "status": "ported",
+          "status": "partial",
           "go_target": "util_params_ref.go",
           "tests": [
             "TestParamsReferenceSourceSharingAndReset",
@@ -125116,6 +125136,16 @@
             "TestParamDescrsDisplayIntoGuardTimingAndIndependentOwner",
             "TestParamDescrsDisplayIntoSourceScratchCapacityWidths"
           ]
+        },
+        {
+          "name": "selected default DEBUG dec_ref predecrement assertion and zero-reference ascending destruction with explicit per-block owning continuation",
+          "status": "ported",
+          "go_target": "util_params_decrement_source.go",
+          "tests": [
+            "TestParamsReferenceRepeatedDECSourceAssertionAfterActualSetLimbsLeafStop",
+            "TestParamsReferenceCleanupDecrementActualLeafReceipt",
+            "TestParamsReferenceIndependentStoppedBlocksAndReplacementGeneration"
+          ]
         }
       ],
       "ownership": [
@@ -125123,12 +125153,14 @@
         "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PORT_PROGRESS.md#audit-param-descrs-port-status-md.",
         "Scalar owner-local ParamsRef and backing blocks; typed pooled pointer-free entries retain concrete numeral tokens and owned packed C text. Context header, all arrays/directories/text/workspaces and old/new peaks charged; immediate fault roots tested. Source action publication and shared resets preserved. See PORT_PROGRESS.md#audit-params-ref-port-status-md.",
         "Borrowed canonical spelling occupies existing scalar symbol field with a paramsText tag; copy retains identity and deletion frees only owned text. SymbolManager outlives borrowers; physical record stride remains reflect-accounted. See PORT_PROGRESS.md#audit-gparams-port-status-md.",
-        "DisplayInto borrows charged StringBuffer64; destination then descriptor then Symbol lock order. Temporary names use actual charged old/new peaks and are refunded; text bytes read directly without intermediate strings. See PORT_PROGRESS.md#audit-param-descrs-stream-port-status-md."
+        "DisplayInto borrows charged StringBuffer64; destination then descriptor then Symbol lock order. Temporary names use actual charged old/new peaks and are refunded; text bytes read directly without intermediate strings. See PORT_PROGRESS.md#audit-param-descrs-stream-port-status-md.",
+        "Actual zero-ref leaf destruction stop retains pointer-free per-block cursor/stage and precharged cold cause/generation receipts; exact current entry numeral is retained, mutation cannot replace it, independent blocks can stop/continue separately. Explicit CleanupDecrement and owning context Close acknowledge actual child release receipts without a second decrement. Whole ownership remains unproven for Reset/resetBlock outside zero-ref DEC and exceptional copy/init/value replacement."
       ],
       "deviations": [
         "Owner-local null replaces process-global empty reference. C strings become owned nullable first-NUL payloads; replacement stages new text. Detach error retains published partial block but cleans old reference. Pooled pages persist physically until Close; inline concrete numeric tokens replace separate heap objects. Provenance/overflow guards and libstdc++ null-C-string prefix error are explicit Go adapters; Z3DEBUG pp is explicit text API rather than global stdout.",
         "SetStringSymbol explicitly translates interned bare_str pointers without a second payload; original SetString remains the owned-string adapter. Registry and generated registration are still open.",
-        "The byte destination returns typed failures at debug null-description assertion or release null-string stream action, retaining emitted prefix. Existing caller-string Display API remains; tests compare valid-domain output only."
+        "The byte destination returns typed failures at debug null-description assertion or release null-string stream action, retaining emitted prefix. Existing caller-string Display API remains; tests compare valid-domain output only.",
+        "Go signed-overflow-domain TLS fixture reaches real postphysical numeral release stop; it is not valid OOM. Per-block receipt directory is actual charged Go metadata prepared before block publication, not source malloc. Pure reads and release zero-ref unsigned wrap remain source-reached; stopped-owner mutation guard is explicit Go lifetime qualification. Global assertion control/native stream profiles and exceptional non-DEC Reset/destructor closure remain open."
       ]
     },
     {

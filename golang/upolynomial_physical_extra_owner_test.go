@@ -9,7 +9,13 @@ import (
 
 // Every entry is supplied by its actual caller owner; storage directories do
 // not supply missing lexical roots.
+type paramsPhysicalValueOwner struct {
+	Context *ParamsContext
+	Value   *ParamsRef
+}
+
 type upolyPhysicalExtraOwners struct {
+	ParamsValues     []paramsPhysicalValueOwner
 	RationalServices []*mpnum.RationalService
 	SexprManagers    []*SexprManager
 	Services         []*mpnum.UPolynomialFactorizationService
@@ -54,6 +60,33 @@ func upolyPhysicalExtraNumerals(extras []upolyPhysicalExtraOwners, addInt func(r
 			}
 			if raw.FieldByName("normActive").Bool() {
 				addInt(raw.FieldByName("norm"))
+			}
+		}
+		for _, owner := range x.ParamsValues {
+			if owner.Context == nil || owner.Value == nil {
+				panic(ErrParamsOwner)
+			}
+			c, v := owner.Context, owner.Value
+			if c.self != c || c.closed || v.owner != c.owner {
+				panic(ErrParamsOwner)
+			}
+			if v.slot == 0 {
+				continue
+			}
+			if int(v.slot) > len(c.blocks) {
+				panic(ErrParamsOwner)
+			}
+			b := &c.blocks[v.slot-1]
+			if !b.live || b.generation != v.generation {
+				panic(ErrParamsOwner)
+			}
+			// refs==0 is allowed only as a reached stopped destructor owner. The
+			// explicitly supplied owning value, not the count, names its actual block.
+			for i := uint32(0); i < b.size; i++ {
+				e := c.entry(b, i)
+				if e.kind == ParamNumeral {
+					addRat(reflect.ValueOf(&e.rat).Elem().FieldByName("raw"))
+				}
 			}
 		}
 		for _, s := range x.RationalServices {
