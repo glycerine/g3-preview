@@ -1,4 +1,6 @@
-// Licensed under the MIT license.
+// Source: src/ast/ast.cpp:349-355,2064-2135; src/ast/ast.h:665-683.
+// Source author: Leonardo de Moura.
+// Licensed under the MIT license; see LICENSE.txt.
 // Scalar payload encoding. No unsafe or borrowed slice escapes.
 package g3
 
@@ -104,13 +106,16 @@ func (m *ASTManager) readSymbol(p arena.SmallBytesRef, index uint32) (Symbol, er
 	return m.symbols.FromToken(Symbol{owner: uint64(v[0]) | uint64(v[1])<<32, value: v[2], generation: arena.Generation(v[3]), tag: v[4]}.Token())
 }
 func (m *ASTManager) newASTPayload(hs []ASTHandle) (arena.SmallBytesRef, error) {
-	if len(hs) == 0 {
-		return arena.SmallBytesRef{}, nil
-	}
 	if uint64(len(hs)) > math.MaxUint32 {
 		return arena.SmallBytesRef{}, arena.ErrBounds
 	}
-	n, e := astPayloadBytes(uint32(len(hs)), astRefBytes)
+	return m.newASTPayloadArguments(astAppArguments{slice: hs, count: uint32(len(hs))})
+}
+func (m *ASTManager) newASTPayloadArguments(hs astAppArguments) (arena.SmallBytesRef, error) {
+	if hs.count == 0 {
+		return arena.SmallBytesRef{}, nil
+	}
+	n, e := astPayloadBytes(hs.count, astRefBytes)
 	if e != nil {
 		return arena.SmallBytesRef{}, e
 	}
@@ -118,8 +123,12 @@ func (m *ASTManager) newASTPayload(hs []ASTHandle) (arena.SmallBytesRef, error) 
 	if e != nil {
 		return p, e
 	}
-	for i, h := range hs {
-		r, e := m.internal(h)
+	for i := uint32(0); i < hs.count; i++ {
+		h, e := hs.at(i)
+		var r astNodeRef
+		if e == nil {
+			r, e = m.internal(h)
+		}
 		if e == nil {
 			e = m.writeInternal(p, uint32(i), r)
 		}

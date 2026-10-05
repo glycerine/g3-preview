@@ -92,6 +92,17 @@ func (c *satSolverAssignmentColumn) expandStrideDebug(stride uint32, debug *Debu
 // Concrete optional unsigned owner records actual lower allocation outcomes.
 // The shared column layout and every legacy/SAT default route stay unchanged.
 func (c *satSolverAssignmentColumn) expandStrideUnsignedOwner(stride uint32, debug *DebugContext, owner *RuntimeUnsignedVector) error {
+	return c.expandStrideConcreteOwners(stride, debug, owner, nil)
+}
+func (c *satSolverAssignmentColumn) expandStrideASTOwner(stride uint32, debug *DebugContext, owner *RuntimeASTLiteralVector) error {
+	return c.expandStrideConcreteOwners(stride, debug, nil, owner)
+}
+func (c *satSolverAssignmentColumn) expandStrideConcreteOwners(stride uint32, debug *DebugContext, owner *RuntimeUnsignedVector, astOwner *RuntimeASTLiteralVector) error {
+	if astOwner != nil {
+		if e := astOwner.matchGrowthColumn(c); e != nil {
+			return e
+		}
+	}
 	if owner != nil {
 		if e := owner.matchGrowthColumn(c); e != nil {
 			return e
@@ -137,6 +148,12 @@ func (c *satSolverAssignmentColumn) expandStrideUnsignedOwner(stride uint32, deb
 		}
 		defer owner.endUnsignedGrowth()
 	}
+	if astOwner != nil {
+		if e = astOwner.startASTGrowth(c); e != nil {
+			return e
+		}
+		defer astOwner.endASTGrowth()
+	}
 	if c.block == (memory.Block{}) {
 		h, e := c.runtime.Allocate(uint64(request))
 		if e != nil {
@@ -145,6 +162,9 @@ func (c *satSolverAssignmentColumn) expandStrideUnsignedOwner(stride uint32, deb
 			}
 			if owner != nil {
 				owner.recordUnsignedGrowth(e, h != (memory.Block{}))
+			}
+			if astOwner != nil {
+				astOwner.recordASTGrowth(e, h != (memory.Block{}))
 			}
 			return e
 		}
@@ -156,6 +176,9 @@ func (c *satSolverAssignmentColumn) expandStrideUnsignedOwner(stride uint32, deb
 			c.pending = h
 			if owner != nil {
 				owner.recordUnsignedGrowth(e, true)
+			}
+			if astOwner != nil {
+				astOwner.recordASTGrowth(e, true)
 			}
 			return e
 		}
@@ -170,6 +193,9 @@ func (c *satSolverAssignmentColumn) expandStrideUnsignedOwner(stride uint32, deb
 		}
 		if owner != nil {
 			owner.recordUnsignedGrowth(e, h != c.block && h != (memory.Block{}))
+		}
+		if astOwner != nil {
+			astOwner.recordASTGrowth(e, h != c.block && h != (memory.Block{}))
 		}
 		return e
 	}

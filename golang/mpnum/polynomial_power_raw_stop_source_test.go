@@ -117,6 +117,10 @@ func TestPolynomialPowerYoungerAddMulSourceStopPreservesOlderResultAndHistory(t 
 	oldArithmetic := receipt.frame.arithmetic
 	oldRAW := oldArithmetic.frame.addMul
 	source := receipt.frame.sourceCause
+	cleanup := receipt.frame.cleanupCause
+	if cleanup == nil {
+		t.Fatal("actual source stop omitted cleanup history")
+	}
 	if c.integer.addMulInvocationSourceCause(&oldRAW) != source || oldRAW.frame.stage != 3 || oldRAW.frame.bodyCause != nil {
 		t.Fatal("matching source end-only DEL cause", source)
 	}
@@ -142,7 +146,13 @@ func TestPolynomialPowerYoungerAddMulSourceStopPreservesOlderResultAndHistory(t 
 		}
 	}()
 	contextTLSFinish(t, rt, func() error { return c.cleanupPowerInvocation(&receipt, false) })
+	if receipt.frame.cleanupCause != cleanup {
+		t.Fatal("false own acknowledgment erased cleanup history")
+	}
 	contextTLSFinish(t, rt, func() error { return c.cleanupPowerInvocation(&receipt, true) })
+	if receipt.frame.cleanupCause != cleanup {
+		t.Fatal("true own acknowledgment erased cleanup history")
+	}
 	if receipt.frame.sourceCause != source || c.powerInvocationSourceCause(&receipt) != source || c.integer.addMulInvocationSourceCause(&oldRAW) != source {
 		t.Fatal("own ack erased source history")
 	}

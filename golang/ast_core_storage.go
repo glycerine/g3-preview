@@ -254,12 +254,13 @@ type ASTManager struct {
 	// Actual AST-valued dependency manager and persistent-array specialization;
 	// borrowed owners are bound eagerly and scratch backing is charged on use.
 	// Source fresh_id and lexical func_decl_info storage; included in owner header.
-	freshID          uint32
-	freshInfo        astInfoRecord
-	freshInfoEpoch   uint32
-	freshInfoActive  bool
-	dependencies     astDependencyManager
-	dependencyArrays astDependencyArrayManager
+	refVectorPushSerial uint64
+	freshID             uint32
+	freshInfo           astInfoRecord
+	freshInfoEpoch      uint32
+	freshInfoActive     bool
+	dependencies        astDependencyManager
+	dependencyArrays    astDependencyArrayManager
 }
 
 func astNextOrigin() (uint64, error) {

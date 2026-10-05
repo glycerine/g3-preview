@@ -1,4 +1,6 @@
-// Licensed under the MIT license.
+// Source: src/util/ref_vector.h:28-217; src/ast/ast.h:2273-2277.
+// Source author: Leonardo de Moura.
+// Licensed under the MIT license; see LICENSE.txt.
 // Concrete ast_ref_vector specialization; encoded cold owners, scalar entries.
 package g3
 
@@ -171,11 +173,34 @@ func (m *ASTManager) growVector(v ASTRefVector, s *astRefVectorState) error {
 	return m.storeVector(v, *s)
 }
 func (m *ASTManager) pushVector(v ASTRefVector, r astNodeRef) error {
-	s, e := m.vectorState(v)
-	if e != nil {
+	return m.pushVectorTracked(v, r, nil)
+}
+func (m *ASTManager) pushVectorTracked(v ASTRefVector, r astNodeRef, receipt *ASTRefVectorPushReceipt) (result error) {
+	acquiredHere := false
+	defer func() {
+		if acquiredHere && result != nil && receipt.cause == nil {
+			receipt.cause = result
+		}
+	}()
+	// Identity guards do not read SIZE/CAP payload before the source INC.
+	if v.origin != m.origin || !m.allocator.IsLive(v.record) {
+		return ErrASTHandle
+	}
+	if receipt != nil {
+		if e := receipt.prepare(m, v); e != nil {
+			return e
+		}
+	}
+	if e := m.incNode(r); e != nil {
 		return e
 	}
-	if e = m.incNode(r); e != nil {
+	if receipt != nil && r.slot != 0 {
+		acquiredHere = true
+		m.refVectorPushSerial++
+		*receipt = ASTRefVectorPushReceipt{self: receipt, owner: m, vector: v, node: r, invocation: m.refVectorPushSerial, acquired: true}
+	}
+	s, e := m.vectorState(v)
+	if e != nil {
 		return e
 	}
 	// Preserve source's retained INC prefix on growth failure. There is no
@@ -194,7 +219,13 @@ func (m *ASTManager) pushVector(v ASTRefVector, r astNodeRef) error {
 		m.vectorPutWord(s.payload, 8, s.initialized)
 	}
 	m.vectorPutWord(s.payload, 4, s.size)
-	return m.storeVector(v, s)
+	if e = m.storeVector(v, s); e != nil {
+		return e
+	}
+	if receipt != nil && r.slot != 0 {
+		receipt.published = true
+	}
+	return nil
 }
 func (m *ASTManager) vectorInput(h ASTHandle) (astNodeRef, error) {
 	if h.IsNull() {

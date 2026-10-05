@@ -1,4 +1,6 @@
-// Licensed under the MIT license.
+// Source: src/ast/ast.cpp:2064-2211.
+// Source author: Leonardo de Moura.
+// Licensed under the MIT license; see LICENSE.txt.
 // Source node construction. Results are non-owning source RC0 handles.
 package g3
 
@@ -170,6 +172,9 @@ func (m *ASTManager) mkAppCore(decl astNodeRef, args []ASTHandle) (astNodeRef, e
 	if uint64(len(args)) > math.MaxUint32 {
 		return astNodeRef{}, arena.ErrBounds
 	}
+	return m.mkAppCoreArguments(decl, astAppArguments{slice: args, count: uint32(len(args))})
+}
+func (m *ASTManager) mkAppCoreArguments(decl astNodeRef, args astAppArguments) (astNodeRef, error) {
 	// Source allocates app storage before check_args/coercion. The arithmetic
 	// plugin is an explicit dependency; no fabricated int/real cast is emitted.
 	r, e := m.allocateNode(ASTApp)
@@ -178,14 +183,19 @@ func (m *ASTManager) mkAppCore(decl astNodeRef, args []ASTHandle) (astNodeRef, e
 	}
 	v := m.appAt(r.slot)
 	v.decl = decl
-	v.count = uint32(len(args))
+	v.count = args.count
 	flags, e := m.funcFlags(decl)
 	if e != nil {
 		m.freeNodeStorage(r)
 		return astNodeRef{}, e
 	}
 	d := m.declAt(decl.slot)
-	for i, h := range args {
+	for i := uint32(0); i < args.count; i++ {
+		h, e := args.at(i)
+		if e != nil {
+			m.freeNodeStorage(r)
+			return astNodeRef{}, e
+		}
 		child, e := m.requireExpr(h)
 		if e != nil {
 			m.freeNodeStorage(r)
@@ -214,7 +224,7 @@ func (m *ASTManager) mkAppCore(decl astNodeRef, args []ASTHandle) (astNodeRef, e
 			return astNodeRef{}, ErrASTDomain
 		}
 	}
-	v.args, e = m.newASTPayload(args)
+	v.args, e = m.newASTPayloadArguments(args)
 	if e != nil {
 		m.freeNodeStorage(r)
 		return astNodeRef{}, e
@@ -222,27 +232,40 @@ func (m *ASTManager) mkAppCore(decl astNodeRef, args []ASTHandle) (astNodeRef, e
 	return m.registerNode(r)
 }
 func (m *ASTManager) mkApp(decl astNodeRef, args []ASTHandle) (astNodeRef, error) {
+	if uint64(len(args)) > math.MaxUint32 {
+		return astNodeRef{}, arena.ErrBounds
+	}
+	return m.mkAppArguments(decl, astAppArguments{slice: args, count: uint32(len(args))})
+}
+func (m *ASTManager) mkAppArguments(decl astNodeRef, args astAppArguments) (astNodeRef, error) {
 	f, e := m.funcFlags(decl)
 	if e != nil {
 		return astNodeRef{}, e
 	}
 	arity := m.declAt(decl.slot).arity
-	mismatch := uint64(arity) != uint64(len(args))
+	mismatch := uint64(arity) != uint64(int(args.count))
 	fid, _, e := m.declIdentity(decl)
 	if e != nil {
 		return astNodeRef{}, e
 	}
-	if mismatch && (!f.LeftAssociative && !f.RightAssociative && !f.Chainable || len(args) < 2 && fid == 0 && !(f.LeftAssociative && f.RightAssociative)) {
+	if mismatch && (!f.LeftAssociative && !f.RightAssociative && !f.Chainable || int(args.count) < 2 && fid == 0 && !(f.LeftAssociative && f.RightAssociative)) {
 		return astNodeRef{}, ErrASTDomain
 	}
-	if len(args) == 1 && f.Chainable && arity == 2 {
+	if int(args.count) == 1 && f.Chainable && arity == 2 {
 		return m.trueApp, nil
 	}
-	if len(args) > 2 && !f.FlatAssociative {
+	if int(args.count) > 2 && !f.FlatAssociative {
 		var pair [2]ASTHandle
 		if f.RightAssociative {
-			j := len(args) - 1
-			pair = [2]ASTHandle{args[j-1], args[j]}
+			j := int(args.count) - 1
+			pair[0], e = args.at(uint32(j - 1))
+			if e != nil {
+				return astNodeRef{}, e
+			}
+			pair[1], e = args.at(uint32(j))
+			if e != nil {
+				return astNodeRef{}, e
+			}
 			r, e := m.mkAppCore(decl, pair[:])
 			if e != nil {
 				return r, e
@@ -250,7 +273,11 @@ func (m *ASTManager) mkApp(decl astNodeRef, args []ASTHandle) (astNodeRef, error
 			j--
 			for j > 0 {
 				j--
-				pair = [2]ASTHandle{args[j], m.external(r)}
+				pair[0], e = args.at(uint32(j))
+				if e != nil {
+					return astNodeRef{}, e
+				}
+				pair[1] = m.external(r)
 				r, e = m.mkAppCore(decl, pair[:])
 				if e != nil {
 					return r, e
@@ -259,13 +286,24 @@ func (m *ASTManager) mkApp(decl astNodeRef, args []ASTHandle) (astNodeRef, error
 			return r, nil
 		}
 		if f.LeftAssociative {
-			pair = [2]ASTHandle{args[0], args[1]}
+			pair[0], e = args.at(0)
+			if e != nil {
+				return astNodeRef{}, e
+			}
+			pair[1], e = args.at(1)
+			if e != nil {
+				return astNodeRef{}, e
+			}
 			r, e := m.mkAppCore(decl, pair[:])
 			if e != nil {
 				return r, e
 			}
-			for i := 2; i < len(args); i++ {
-				pair = [2]ASTHandle{m.external(r), args[i]}
+			for i := 2; i < int(args.count); i++ {
+				pair[0] = m.external(r)
+				pair[1], e = args.at(uint32(i))
+				if e != nil {
+					return astNodeRef{}, e
+				}
 				r, e = m.mkAppCore(decl, pair[:])
 				if e != nil {
 					return r, e
@@ -278,8 +316,15 @@ func (m *ASTManager) mkApp(decl astNodeRef, args []ASTHandle) (astNodeRef, error
 			buffer := inline[:0]
 			var bytes uint64
 			defer func() { m.budget.Release(bytes) }()
-			for i := 1; i < len(args); i++ {
-				pair = [2]ASTHandle{args[i-1], args[i]}
+			for i := 1; i < int(args.count); i++ {
+				pair[0], e = args.at(uint32(i - 1))
+				if e != nil {
+					return astNodeRef{}, e
+				}
+				pair[1], e = args.at(uint32(i))
+				if e != nil {
+					return astNodeRef{}, e
+				}
 				r, e := m.mkAppCore(decl, pair[:])
 				if e != nil {
 					return r, e
@@ -305,7 +350,7 @@ func (m *ASTManager) mkApp(decl astNodeRef, args []ASTHandle) (astNodeRef, error
 			return m.mkFamilyApp(0, ASTOpAnd, nil, buffer)
 		}
 	}
-	return m.mkAppCore(decl, args)
+	return m.mkAppCoreArguments(decl, args)
 }
 func (m *ASTManager) MkApp(decl ASTHandle, args []ASTHandle) (ASTHandle, error) {
 	if e := m.lock(); e != nil {

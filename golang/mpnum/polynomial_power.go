@@ -110,7 +110,7 @@ func (m *MultivariatePolynomialCore) finishPolynomialPowerSource() error {
 		return e
 	}
 	if s.result.value == (Polynomial{}) && s.result.incoming == (Polynomial{}) && !s.result.assigning && !m.matchesArithmeticInvocation(&s.arithmetic) {
-		*s = polynomialPowerScope{generation: s.generation, sourceCause: s.sourceCause, bodyCause: s.bodyCause, arithmetic: s.arithmetic}
+		*s = polynomialPowerScope{generation: s.generation, sourceCause: s.sourceCause, bodyCause: s.bodyCause, cleanupCause: s.cleanupCause, arithmetic: s.arithmetic}
 	}
 	return nil
 }
@@ -157,6 +157,6 @@ func (m *MultivariatePolynomialCore) cleanupPolynomialPowerPhase(owning, abort b
 	if m.matchesArithmeticInvocation(&m.powerLocal.arithmetic) {
 		return nil
 	}
-	m.powerLocal = polynomialPowerScope{generation: m.powerLocal.generation, sourceCause: m.powerLocal.sourceCause, bodyCause: m.powerLocal.bodyCause, arithmetic: m.powerLocal.arithmetic}
+	m.powerLocal = polynomialPowerScope{generation: m.powerLocal.generation, sourceCause: m.powerLocal.sourceCause, bodyCause: m.powerLocal.bodyCause, cleanupCause: m.powerLocal.cleanupCause, arithmetic: m.powerLocal.arithmetic}
 	return nil
 }

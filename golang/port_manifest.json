@@ -8994,7 +8994,9 @@
         "ast_core_fresh_factories.go",
         "ast_core_fresh_factories_source_test.go",
         "ast_core_boolean_factories.go",
-        "ast_core_boolean_factories_source_test.go"
+        "ast_core_boolean_factories_source_test.go",
+        "ast_core_span_factories.go",
+        "ast_core_span_factories_source_test.go"
       ],
       "tests": [
         "TestASTAllEagerPluginBranches",
@@ -9145,7 +9147,8 @@
         "TestASTFreshConstDeclarationCopyPageAndApplicationPrefixes",
         "TestASTFreshConstApplicationFailureRetainsDeclarationCounter",
         "TestASTFreshConstNullPointerPrefixSourceOverload",
-        "TestASTSortingBooleanFactoryRealNodesAndNotUnwrap"
+        "TestASTSortingBooleanFactoryRealNodesAndNotUnwrap",
+        "TestASTOrSpanSourceZeroSingletonAndInitializedSpare"
       ],
       "conditionals": [
         {
@@ -10097,6 +10100,14 @@
             "TestASTFreshConstApplicationFailureRetainsDeclarationCounter",
             "TestASTFreshConstNullPointerPrefixSourceOverload"
           ]
+        },
+        {
+          "name": "Borrowed Runtime AST argument span through actual application/check_args/payload/register engines (src/ast/ast.cpp:2064-2211)",
+          "status": "partial",
+          "go_target": "ast_core_span_factories.go",
+          "tests": [
+            "TestASTOrSpanSourceZeroSingletonAndInitializedSpare"
+          ]
         }
       ],
       "ownership": [
@@ -10119,7 +10130,8 @@
         "Scalar owner identity replaces debug raw addresses. Typed physical/stale-owner guards and implicit owning-copy rejection are explicit Go adapters. Source ID marks survive deletion/reuse; sparse/shared-occurrence marks and other template specializations remain open. No generic Go code.",
         "Empty null/root POP is guarded at source physical undefined access. Debug empty POP assertion executes before From output copy. Invalid/uninitialized old root SET returns a typed guard with the incoming source INC retained and leaves backing unchanged.",
         "Source-undefined allocation/lifetime domains have explicit Go continuation and typed guards. Temporary copied-prefix cleanup releases only successful ownership acquisitions; source write-before-INC and debug RC0 refusal consumption are distinct. Copy-only Get returns retained raw tokens; actual later dereference guards generation. Source internal parray/Reroot debug checkpoints, TRACE/address printing, owning aliases and scoped configurations remain open. No whole-unit audit or full solver claim; no generics.",
-        "Selected AST sorting-network prerequisites only; no SMT kernel or psort_nw driver assertion credit. AST DEBUG assertions retain existing typed adapter/global-binding qualifications; lexical-info nonwrapping epoch is Go borrow guard, not source fresh_id arithmetic."
+        "Selected AST sorting-network prerequisites only; no SMT kernel or psort_nw driver assertion credit. AST DEBUG assertions retain existing typed adapter/global-binding qualifications; lexical-info nonwrapping epoch is Go borrow guard, not source fresh_id arithmetic.",
+        "Selected concrete AST Runtime/profile only; actual SMT kernel driver, native pretty/TRACE/global transport and other context/copy profiles remain separate obligations. Source-stopped destruction and explicit owning abort are distinct; pointer-free Go geometry is not native ABI credit."
       ]
     },
     {
@@ -10203,7 +10215,10 @@
         "ast_core_fresh_factories.go",
         "ast_core_fresh_factories_source_test.go",
         "ast_core_boolean_factories.go",
-        "ast_core_boolean_factories_source_test.go"
+        "ast_core_boolean_factories_source_test.go",
+        "ast_core_span_factories.go",
+        "ast_core_span_factories_source_test.go",
+        "ast_ref_vector_push_source_test.go"
       ],
       "tests": [
         "TestASTAllEagerPluginBranches",
@@ -10405,7 +10420,14 @@
         "TestASTFreshConstDeclarationCopyPageAndApplicationPrefixes",
         "TestASTFreshConstApplicationFailureRetainsDeclarationCounter",
         "TestASTFreshConstNullPointerPrefixSourceOverload",
-        "TestASTSortingBooleanFactoryRealNodesAndNotUnwrap"
+        "TestASTSortingBooleanFactoryRealNodesAndNotUnwrap",
+        "TestASTOrSpanSourceZeroSingletonAndInitializedSpare",
+        "TestASTRefVectorPushExactAcquiredReferenceBeforeGrowthRefusal",
+        "TestASTRefVectorPushForeignAndIndependentAcquisitions",
+        "TestASTRefVectorPushSuccessfulTransferAndNullReceiptErasure",
+        "TestASTRefVectorPushConsumedDeletionWarningAcknowledgesWithoutReplay",
+        "TestASTRefVectorPushStaleInvocationVectorAndNodeGeneration",
+        "TestASTRefVectorPushNonwrappingNonceGuardDomain"
       ],
       "conditionals": [
         {
@@ -11176,6 +11198,20 @@
           "tests": [
             "TestASTSortingBooleanFactoryRealNodesAndNotUnwrap"
           ]
+        },
+        {
+          "name": "Concrete Boolean AST span factories and reference-vector successful INC ownership (src/ast/ast.h:1984-2046,2273-2277)",
+          "status": "partial",
+          "go_target": "ast_core_span_factories.go",
+          "tests": [
+            "TestASTOrSpanSourceZeroSingletonAndInitializedSpare",
+            "TestASTRefVectorPushExactAcquiredReferenceBeforeGrowthRefusal",
+            "TestASTRefVectorPushForeignAndIndependentAcquisitions",
+            "TestASTRefVectorPushSuccessfulTransferAndNullReceiptErasure",
+            "TestASTRefVectorPushConsumedDeletionWarningAcknowledgesWithoutReplay",
+            "TestASTRefVectorPushStaleInvocationVectorAndNodeGeneration",
+            "TestASTRefVectorPushNonwrappingNonceGuardDomain"
+          ]
         }
       ],
       "ownership": [
@@ -11202,7 +11238,8 @@
         "Source-undefined allocation/lifetime domains have explicit Go continuation and typed guards. Temporary copied-prefix cleanup releases only successful ownership acquisitions; source write-before-INC and debug RC0 refusal consumption are distinct. Copy-only Get returns retained raw tokens; actual later dereference guards generation. Source internal parray/Reroot debug checkpoints, TRACE/address printing, owning aliases and scoped configurations remain open. No whole-unit audit or full solver claim; no generics.",
         "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md.",
         "Owning construction cleanup refusal publishes a nonzero partial token with original error; scalar pending target/cursor tracks consumed callbacks without changing raw retained slots. Explicit Go retry/cleanup protects source-undefined interrupted destruction. Preserved ref_buffer copy ctor dependent-base lookup is uninstantiable; no repaired copy API. General templates, other owners/configs and full consumers remain open. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
-        "Selected AST sorting-network prerequisites only; no SMT kernel or psort_nw driver assertion credit. AST DEBUG assertions retain existing typed adapter/global-binding qualifications; lexical-info nonwrapping epoch is Go borrow guard, not source fresh_id arithmetic."
+        "Selected AST sorting-network prerequisites only; no SMT kernel or psort_nw driver assertion credit. AST DEBUG assertions retain existing typed adapter/global-binding qualifications; lexical-info nonwrapping epoch is Go borrow guard, not source fresh_id arithmetic.",
+        "Selected concrete AST Runtime/profile only; actual SMT kernel driver, native pretty/TRACE/global transport and other context/copy profiles remain separate obligations. Source-stopped destruction and explicit owning abort are distinct; pointer-free Go geometry is not native ABI credit."
       ]
     },
     {
@@ -11790,10 +11827,13 @@
       "status": "partial",
       "go_targets": [
         "ast_core_boolean_factories.go",
-        "ast_core_boolean_factories_source_test.go"
+        "ast_core_boolean_factories_source_test.go",
+        "ast_core_span_factories.go",
+        "ast_core_span_factories_source_test.go"
       ],
       "tests": [
-        "TestASTSortingBooleanFactoryRealNodesAndNotUnwrap"
+        "TestASTSortingBooleanFactoryRealNodesAndNotUnwrap",
+        "TestASTOrSpanSourceZeroSingletonAndInitializedSpare"
       ],
       "assertions": [
         {
@@ -11875,13 +11915,22 @@
           "tests": [
             "TestASTSortingBooleanFactoryRealNodesAndNotUnwrap"
           ]
+        },
+        {
+          "name": "Actual mk_or zero/singleton/multi borrowed pointer branches (src/ast/ast_util.cpp:173-180)",
+          "status": "partial",
+          "go_target": "ast_core_span_factories.go",
+          "tests": [
+            "TestASTOrSpanSourceZeroSingletonAndInitializedSpare"
+          ]
         }
       ],
       "ownership": [
         "Fresh lexical func_decl_info resides in actual charged ASTManager header with exact epoch token and is cloned by real registerNode/copyInfo; stack StringBuffer64 uses existing formatter and borrowed byte interner, overflow arrays destroyed before fresh_id increment; acquired node/metadata belongs to actual ASTManager pages."
       ],
       "deviations": [
-        "Selected AST sorting-network prerequisites only; no SMT kernel or psort_nw driver assertion credit. AST DEBUG assertions retain existing typed adapter/global-binding qualifications; lexical-info nonwrapping epoch is Go borrow guard, not source fresh_id arithmetic."
+        "Selected AST sorting-network prerequisites only; no SMT kernel or psort_nw driver assertion credit. AST DEBUG assertions retain existing typed adapter/global-binding qualifications; lexical-info nonwrapping epoch is Go borrow guard, not source fresh_id arithmetic.",
+        "Selected concrete AST Runtime/profile only; actual SMT kernel driver, native pretty/TRACE/global transport and other context/copy profiles remain separate obligations. Source-stopped destruction and explicit owning abort are distinct; pointer-free Go geometry is not native ABI credit."
       ]
     },
     {
@@ -33120,7 +33169,8 @@
         "Both actual cheap and cheap2 source children acquired at reached guarded ADD/mk actions, with direct accepted Copy/PN leaves, charged row tags and actual factory leaf authority. Actual incoming INC factory transfer acknowledges only matched coefficient-child metadata before older DEC callbacks; no mirrored NUM payload or high-level root snapshot.",
         "False completes younger reached child source suffix before caller older locals; true retires exact unjoined rows/factory/generated leaves afterward. Source cause and child diagnostic identities persist across owning acknowledgment. Copied factory source frame cannot acknowledge real child; stale reused Coeff/AR/append/factory tuples preserve current physical roots.",
         "No additional lexical NUM or polynomial reference; actual factors Push publishes borrowed pointer before INC and records exact acquired ownership. Actual assertion predicate frames remain owned by the full manager; all prefix graphs precede fault lift, predicate/factors owning cleanup preserves caller RC.",
-        "Power polynomial.cpp:4600-4614 acquires only its actual charged embedded result frame for k>=2 after existing entry/active/nonwrapping generation guards; exact manager/frame/nonce identifies the actual Mul arithmetic child. Completed younger source children precede older result destruction; only explicit abort drains matched unjoined child roots afterward. Source/body causes and concrete child identity survive owning acknowledgment without retaining result or numeric payload authority; new guarded invocation retires that history."
+        "Power polynomial.cpp:4600-4614 acquires only its actual charged embedded result frame for k>=2 after existing entry/active/nonwrapping generation guards; exact manager/frame/nonce identifies the actual Mul arithmetic child. Completed younger source children precede older result destruction; only explicit abort drains matched unjoined child roots afterward. Source/body causes and concrete child identity survive owning acknowledgment without retaining result or numeric payload authority; new guarded invocation retires that history.",
+        "Power polynomial.cpp:4600-4614 preserves the identical nonnil cleanupCause together with bodyCause/sourceCause and concrete arithmetic child identity through false/true owning acknowledgment; inactive metadata carries no result/numeric authority. Actual next guarded invocation retires all prior history."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -98046,7 +98096,9 @@
         "util_sorting_network_unsigned_ownership_source_test.go",
         "util_sorting_network_unsigned.go",
         "util_unsigned_vector_growth_source.go",
-        "util_unsigned_vector_growth_retry_source_test.go"
+        "util_unsigned_vector_growth_retry_source_test.go",
+        "util_psort_ast_context.go",
+        "util_psort_ast_context_source_test.go"
       ],
       "tests": [
         "TestUnsignedSortingNetworkSourceRegisteredUnsignedCampaigns",
@@ -98067,7 +98119,11 @@
         "TestUnsignedVectorGrowthOwnerExactBindingBeforeMutation",
         "TestUnsignedVectorGrowthClosedProviderBeforeArchiveMutation",
         "TestUnsignedVectorAssignedCurrentGrowthRetainsOlderNullAcquisition",
-        "TestUnsignedVectorEveryAssignedCurrentGrowthReservation"
+        "TestUnsignedVectorEveryAssignedCurrentGrowthReservation",
+        "TestPsortASTContextActualFactoriesClausesAndTrail",
+        "TestPsortASTContextUnpublishedClauseConsumedCleanupRetry",
+        "TestPsortASTContextActualConstructorRefusalPrefixes",
+        "TestPsortASTContextStoppedTrailKeepsLaterClausesAndSourceCause"
       ],
       "assertions": [
         {
@@ -98165,6 +98221,17 @@
             "TestUnsignedVectorAssignedCurrentGrowthRetainsOlderNullAcquisition",
             "TestUnsignedVectorEveryAssignedCurrentGrowthReservation"
           ]
+        },
+        {
+          "name": "Actual ast_ext2 Boolean factories and owning trail/clauses context; independent bounded clause semantics, no registered SMT driver completion (src/test/sorting_network.cpp:150-181)",
+          "status": "partial",
+          "go_target": "util_psort_ast_context.go",
+          "tests": [
+            "TestPsortASTContextActualFactoriesClausesAndTrail",
+            "TestPsortASTContextUnpublishedClauseConsumedCleanupRetry",
+            "TestPsortASTContextActualConstructorRefusalPrefixes",
+            "TestPsortASTContextStoppedTrailKeepsLaterClausesAndSourceCause"
+          ]
         }
       ],
       "ownership": [
@@ -98174,7 +98241,8 @@
       ],
       "deviations": [
         "Selected unsigned_ext source test_sorting1/test_sorting2/test_sorting4 runs2030 original is_sorted ENSURE instances; AST/psort_nw branches and full registered driver stdout remain open, no whole-driver credit. Concrete stateless unsigned extension preserves source mk_ite/mk_le/default0 without callbacks; source persistent appended mapping columns and reset-self-alias behavior remain literal. Other numeral/AST/psort specializations, TRACE/native ABI/global allocator/other compile profiles remain separate completion obligations. Actual closed-provider/invalid get/division-by-zero and signed TLS overflow tests are explicit Go guard-domain evidence, not ordinary native algorithm/OOM credit.",
-        "Shared SAT column layout remains unchanged, including fixed queue geometry. Extra unsigned context fields are reflected enclosing cold charge; each archive is real Go owner metadata charged before token transfer, with no source Runtime event. Dangling nonnull realloc retries still reach actual raw guards, no repair or native-defined continuation claim."
+        "Shared SAT column layout remains unchanged, including fixed queue geometry. Extra unsigned context fields are reflected enclosing cold charge; each archive is real Go owner metadata charged before token transfer, with no source Runtime event. Dangling nonnull realloc retries still reach actual raw guards, no repair or native-defined continuation claim.",
+        "Selected concrete AST Runtime/profile only; actual SMT kernel driver, native pretty/TRACE/global transport and other context/copy profiles remain separate obligations. Source-stopped destruction and explicit owning abort are distinct; pointer-free Go geometry is not native ABI credit."
       ]
     },
     {
@@ -131602,7 +131670,9 @@
         "ast_dependency_ref_vector_ops.go",
         "mpnum/polynomial_ref.go",
         "mpnum/polynomial_newton_test.go",
-        "mpnum/polynomial_newton_physical_test.go"
+        "mpnum/polynomial_newton_physical_test.go",
+        "ast_ref_vector_push_source.go",
+        "ast_ref_vector_push_source_test.go"
       ],
       "tests": [
         "TestASTRefVectorBorrowedInputDefaultEraseAndMove",
@@ -131677,7 +131747,13 @@
         "TestPolynomialNewtonWholeSourcePushBeforeOwningAbort",
         "TestPolynomialNewtonRefVectorSourceResetStop",
         "TestPolynomialNewtonLazySourceFlushBeforeOwningAbort",
-        "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock"
+        "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock",
+        "TestASTRefVectorPushExactAcquiredReferenceBeforeGrowthRefusal",
+        "TestASTRefVectorPushForeignAndIndependentAcquisitions",
+        "TestASTRefVectorPushSuccessfulTransferAndNullReceiptErasure",
+        "TestASTRefVectorPushConsumedDeletionWarningAcknowledgesWithoutReplay",
+        "TestASTRefVectorPushStaleInvocationVectorAndNodeGeneration",
+        "TestASTRefVectorPushNonwrappingNonceGuardDomain"
       ],
       "conditionals": [
         {
@@ -131814,6 +131890,19 @@
             "TestPolynomialNewtonLazySourceFlushBeforeOwningAbort",
             "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock"
           ]
+        },
+        {
+          "name": "Actual successful INC and vector publication receipts with exact consumed DEC owning continuation (src/util/ref_vector.h:28-217)",
+          "status": "partial",
+          "go_target": "ast_ref_vector_push_source.go",
+          "tests": [
+            "TestASTRefVectorPushExactAcquiredReferenceBeforeGrowthRefusal",
+            "TestASTRefVectorPushForeignAndIndependentAcquisitions",
+            "TestASTRefVectorPushSuccessfulTransferAndNullReceiptErasure",
+            "TestASTRefVectorPushConsumedDeletionWarningAcknowledgesWithoutReplay",
+            "TestASTRefVectorPushStaleInvocationVectorAndNodeGeneration",
+            "TestASTRefVectorPushNonwrappingNonceGuardDomain"
+          ]
         }
       ],
       "ownership": [
@@ -131825,7 +131914,8 @@
         "This concrete specialization does not implement all AST/other source specializations or remaining generic helper/hash surfaces. Ref-vector null callbacks and nonempty self-append have explicit checked Go adaptations.",
         "Go scalar tokens replace addresses and encode copied/stale-owner/lifetime guards. Source initialized retained pointer slots remain readable in release and by physical borrows; never-initialized/OOB access is guarded. Other template specializations and pointer-hash/eq helpers remain open.",
         "Owning construction cleanup refusal publishes a nonzero partial token with original error; scalar pending target/cursor tracks consumed callbacks without changing raw retained slots. Explicit Go retry/cleanup protects source-undefined interrupted destruction. Preserved ref_buffer copy ctor dependent-base lookup is uninstantiable; no repaired copy API. General templates, other owners/configs and full consumers remain open. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
-        "Only selected default/INC-before-push/get/size/reset/assignment/destructor methods; full concrete equivalents of all source generic Ref/vector methods and global lifetime bindings remain open."
+        "Only selected default/INC-before-push/get/size/reset/assignment/destructor methods; full concrete equivalents of all source generic Ref/vector methods and global lifetime bindings remain open.",
+        "Selected concrete AST Runtime/profile only; actual SMT kernel driver, native pretty/TRACE/global transport and other context/copy profiles remain separate obligations. Source-stopped destruction and explicit owning abort are distinct; pointer-free Go geometry is not native ABI credit."
       ]
     },
     {
@@ -135035,7 +135125,16 @@
         "util_unsigned_vector_growth_source.go",
         "util_unsigned_vector_growth_retry_source_test.go",
         "util_sorting_network_unsigned_copy_source.go",
-        "util_sorting_network_unsigned_copy_source_test.go"
+        "util_sorting_network_unsigned_copy_source_test.go",
+        "util_psort_ast_network.go",
+        "util_psort_ast_context_source_test.go",
+        "util_psort_ast_costs_source_test.go",
+        "util_psort_ast_diagnostics_source_test.go",
+        "util_psort_ast_helper_source_test.go",
+        "util_psort_ast_network_prefix_source_test.go",
+        "util_psort_ast_network_source_test.go",
+        "util_psort_ast_ownership_source_test.go",
+        "util_psort_ast_recursive_oracle_source_test.go"
       ],
       "tests": [
         "TestUnsignedSortingNetworkSourceRegisteredUnsignedCampaigns",
@@ -135062,7 +135161,23 @@
         "TestUnsignedSortingNetworkCopiedPointersBorrowOriginalLifetimeOnlyAtDereference",
         "TestUnsignedSortingNetworkGeneratedCopyClosedAssertionPrefixAndEmptyMembers",
         "TestUnsignedSortingNetworkEmptyGeneratedCopyAndAccidentalOwnerCopy",
-        "TestUnsignedSortingNetworkGeneratedCopyPostphysicalFailuresRetainExactChild"
+        "TestUnsignedSortingNetworkGeneratedCopyPostphysicalFailuresRetainExactChild",
+        "TestPsortASTContextActualFactoriesClausesAndTrail",
+        "TestPsortASTContextUnpublishedClauseConsumedCleanupRetry",
+        "TestPsortASTContextActualConstructorRefusalPrefixes",
+        "TestPsortASTContextStoppedTrailKeepsLaterClausesAndSourceCause",
+        "TestPsortASTCostLiteralWrapTieAndReset",
+        "TestPsortASTCostActualBoundModeSelection",
+        "TestPsortASTNetworkBoundContinueThenThrowActualSourcePrefix",
+        "TestPsortASTNetworkUnusedClosedAssertionProviderAndDisabledBound",
+        "TestPsortASTNetworkDefinedPairwiseAndErasedBimanderHelpers",
+        "TestPsortASTNetworkDirectMergeAppendPrefixAndLexicalScopeRetirement",
+        "TestPsortASTNetworkUninitializedModeReachedAfterActualComparatorPrefix",
+        "TestPsortASTNetworkRealErrorTransportCannotRetireExecutingLexicalOwner",
+        "TestPsortASTNetworkFiniteCardinalityClauseSemantics",
+        "TestPsortASTNetworkEveryActualBoundReservationNamedBeforeFaultLift",
+        "TestPsortASTNetworkRecursiveFamiliesIndependentClauseOracle",
+        "TestPsortASTNetworkYoungerStoppedDestructorLeavesOuterUnread"
       ],
       "conditionals": [
         {
@@ -135287,6 +135402,29 @@
             "TestUnsignedSortingNetworkEmptyGeneratedCopyAndAccidentalOwnerCopy",
             "TestUnsignedSortingNetworkGeneratedCopyPostphysicalFailuresRetainExactChild"
           ]
+        },
+        {
+          "name": "Concrete AST psort bound policies, cost arithmetic, recursive card/sort/merge/direct subset encodings, pairwise/bimander helpers and lexical placement/reverse destructor ownership (src/util/sorting_network.h:120-1046)",
+          "status": "partial",
+          "go_target": "util_psort_ast_network.go",
+          "tests": [
+            "TestPsortASTContextActualFactoriesClausesAndTrail",
+            "TestPsortASTContextUnpublishedClauseConsumedCleanupRetry",
+            "TestPsortASTContextActualConstructorRefusalPrefixes",
+            "TestPsortASTContextStoppedTrailKeepsLaterClausesAndSourceCause",
+            "TestPsortASTCostLiteralWrapTieAndReset",
+            "TestPsortASTCostActualBoundModeSelection",
+            "TestPsortASTNetworkBoundContinueThenThrowActualSourcePrefix",
+            "TestPsortASTNetworkUnusedClosedAssertionProviderAndDisabledBound",
+            "TestPsortASTNetworkDefinedPairwiseAndErasedBimanderHelpers",
+            "TestPsortASTNetworkDirectMergeAppendPrefixAndLexicalScopeRetirement",
+            "TestPsortASTNetworkUninitializedModeReachedAfterActualComparatorPrefix",
+            "TestPsortASTNetworkRealErrorTransportCannotRetireExecutingLexicalOwner",
+            "TestPsortASTNetworkFiniteCardinalityClauseSemantics",
+            "TestPsortASTNetworkEveryActualBoundReservationNamedBeforeFaultLift",
+            "TestPsortASTNetworkRecursiveFamiliesIndependentClauseOracle",
+            "TestPsortASTNetworkYoungerStoppedDestructorLeavesOuterUnread"
+          ]
         }
       ],
       "ownership": [
@@ -135298,7 +135436,8 @@
       "deviations": [
         "Selected unsigned_ext source test_sorting1/test_sorting2/test_sorting4 runs2030 original is_sorted ENSURE instances; AST/psort_nw branches and full registered driver stdout remain open, no whole-driver credit. Concrete stateless unsigned extension preserves source mk_ite/mk_le/default0 without callbacks; source persistent appended mapping columns and reset-self-alias behavior remain literal. Other numeral/AST/psort specializations, TRACE/native ABI/global allocator/other compile profiles remain separate completion obligations. Actual closed-provider/invalid get/division-by-zero and signed TLS overflow tests are explicit Go guard-domain evidence, not ordinary native algorithm/OOM credit.",
         "Shared SAT column layout remains unchanged, including fixed queue geometry. Extra unsigned context fields are reflected enclosing cold charge; each archive is real Go owner metadata charged before token transfer, with no source Runtime event. Dangling nonnull realloc retries still reach actual raw guards, no repair or native-defined continuation claim.",
-        "Generated copy counterpart has no originating registered-driver copy assertion credit. Empty/cold/closed-provider/accidental-copy guards are Go representation/lifetime domains. Default reference-member assignment has no generated supported operator, so no assignment API is invented. Source scalar pointer aliases deliberately remain original; ended original is unread on zero input, then actual source kernel dereference returns typed lifetime guard after caller/own-member prefixes. GNU/default unsigned specialization only; other ext/AST/native global diagnostics/ABI remain separate obligations."
+        "Generated copy counterpart has no originating registered-driver copy assertion credit. Empty/cold/closed-provider/accidental-copy guards are Go representation/lifetime domains. Default reference-member assignment has no generated supported operator, so no assignment API is invented. Source scalar pointer aliases deliberately remain original; ended original is unread on zero input, then actual source kernel dereference returns typed lifetime guard after caller/own-member prefixes. GNU/default unsigned specialization only; other ext/AST/native global diagnostics/ABI remain separate obligations.",
+        "Selected concrete AST Runtime/profile only; actual SMT kernel driver, native pretty/TRACE/global transport and other context/copy profiles remain separate obligations. Source-stopped destruction and explicit owning abort are distinct; pointer-free Go geometry is not native ABI credit."
       ]
     },
     {
@@ -138460,7 +138599,10 @@
         "util_unsigned_vector_growth_source.go",
         "util_unsigned_vector_growth_retry_source_test.go",
         "util_sorting_network_unsigned_copy_source.go",
-        "util_sorting_network_unsigned_copy_source_test.go"
+        "util_sorting_network_unsigned_copy_source_test.go",
+        "util_ast_literal_vector.go",
+        "util_ast_literal_vector_copy_source_test.go",
+        "util_ast_literal_vector_source_test.go"
       ],
       "tests": [
         "TestParamDescrsBudgetFailuresAndWarmDuplicate",
@@ -138848,7 +138990,14 @@
         "TestUnsignedSortingNetworkCopiedPointersBorrowOriginalLifetimeOnlyAtDereference",
         "TestUnsignedSortingNetworkGeneratedCopyClosedAssertionPrefixAndEmptyMembers",
         "TestUnsignedSortingNetworkEmptyGeneratedCopyAndAccidentalOwnerCopy",
-        "TestUnsignedSortingNetworkGeneratedCopyPostphysicalFailuresRetainExactChild"
+        "TestUnsignedSortingNetworkGeneratedCopyPostphysicalFailuresRetainExactChild",
+        "TestASTLiteralVectorExactCopyCapacityAndRawTokens",
+        "TestASTLiteralVectorEveryCopyReservationAndUnfinishedOwner",
+        "TestASTLiteralVectorAllocationCallbacksCannotRetireExactCopyOwner",
+        "TestASTLiteralVectorEveryDestructiveAssignReservationAndDanglingDestructorGuard",
+        "TestASTLiteralVectorActualPointerPayloadAndNonowningReset",
+        "TestASTLiteralVectorEveryActualResizeReservation",
+        "TestASTLiteralVectorRealNullRetryAndSourceDestructorRoots"
       ],
       "conditionals": [
         {
@@ -139563,6 +139712,20 @@
             "TestUnsignedSortingNetworkEmptyGeneratedCopyAndAccidentalOwnerCopy",
             "TestUnsignedSortingNetworkGeneratedCopyPostphysicalFailuresRetainExactChild"
           ]
+        },
+        {
+          "name": "Concrete Runtime ASTHandle16 nonowning vector source ctor/growth/resize/copy/destructive assignment and current-member destructor with exact owning acquisition history (src/util/vector.h:59-120,159-202,303-365)",
+          "status": "partial",
+          "go_target": "util_ast_literal_vector.go",
+          "tests": [
+            "TestASTLiteralVectorExactCopyCapacityAndRawTokens",
+            "TestASTLiteralVectorEveryCopyReservationAndUnfinishedOwner",
+            "TestASTLiteralVectorAllocationCallbacksCannotRetireExactCopyOwner",
+            "TestASTLiteralVectorEveryDestructiveAssignReservationAndDanglingDestructorGuard",
+            "TestASTLiteralVectorActualPointerPayloadAndNonowningReset",
+            "TestASTLiteralVectorEveryActualResizeReservation",
+            "TestASTLiteralVectorRealNullRetryAndSourceDestructorRoots"
+          ]
         }
       ],
       "ownership": [
@@ -139657,7 +139820,8 @@
         "Per-instance borrowed debug contexts represent selected source-global namespace; independent unrelated contexts are not a completed process-global registry binding",
         "Outer check_invariant always returns true after nested C continuation; no observed false outer CASSERT or fabricated source line0 regression claim",
         "Shared SAT column layout remains unchanged, including fixed queue geometry. Extra unsigned context fields are reflected enclosing cold charge; each archive is real Go owner metadata charged before token transfer, with no source Runtime event. Dangling nonnull realloc retries still reach actual raw guards, no repair or native-defined continuation claim.",
-        "Generated copy counterpart has no originating registered-driver copy assertion credit. Empty/cold/closed-provider/accidental-copy guards are Go representation/lifetime domains. Default reference-member assignment has no generated supported operator, so no assignment API is invented. Source scalar pointer aliases deliberately remain original; ended original is unread on zero input, then actual source kernel dereference returns typed lifetime guard after caller/own-member prefixes. GNU/default unsigned specialization only; other ext/AST/native global diagnostics/ABI remain separate obligations."
+        "Generated copy counterpart has no originating registered-driver copy assertion credit. Empty/cold/closed-provider/accidental-copy guards are Go representation/lifetime domains. Default reference-member assignment has no generated supported operator, so no assignment API is invented. Source scalar pointer aliases deliberately remain original; ended original is unread on zero input, then actual source kernel dereference returns typed lifetime guard after caller/own-member prefixes. GNU/default unsigned specialization only; other ext/AST/native global diagnostics/ABI remain separate obligations.",
+        "Selected concrete AST Runtime/profile only; actual SMT kernel driver, native pretty/TRACE/global transport and other context/copy profiles remain separate obligations. Source-stopped destruction and explicit owning abort are distinct; pointer-free Go geometry is not native ABI credit."
       ]
     },
     {
