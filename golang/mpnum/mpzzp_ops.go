@@ -100,6 +100,9 @@ func (m *IntegerModularManager) Mul(a, b, c *Int) error {
 	return m.mulWithArithmeticReceipt(a, b, c, nil)
 }
 func (m *IntegerModularManager) mulWithArithmeticReceipt(a, b, c *Int, receipt *polynomialArithmeticInvocationReceipt) error {
+	return m.mulWithSourceContext(a, b, c, integerAllocationInvocationContext{arithmetic: receipt})
+}
+func (m *IntegerModularManager) mulWithSourceContext(a, b, c *Int, context integerAllocationInvocationContext) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -109,10 +112,10 @@ func (m *IntegerModularManager) mulWithArithmeticReceipt(a, b, c *Int, receipt *
 	if e := m.assertNormalized(b); e != nil {
 		return e
 	}
-	if e := m.manager.mulWithAllocationContext(a, b, c, integerAllocationInvocationContext{arithmetic: receipt}); e != nil {
+	if e := m.manager.mulWithAllocationContext(a, b, c, context); e != nil {
 		return e
 	}
-	return m.normalizeWithArithmeticReceipt(c, receipt)
+	return m.normalizeWithSourceContext(c, context)
 }
 func (m *IntegerModularManager) AddMul(a, b, c, d *Int) error {
 	return m.addMulWithArithmeticReceipt(a, b, c, d, nil)
@@ -303,13 +306,16 @@ func (m *IntegerModularManager) SetInt32(a *Int, v int32) error {
 	return m.PNormalize(a)
 }
 func (m *IntegerModularManager) SetUint32(a *Int, v uint32) error {
+	return m.setUint32WithSourceContext(a, v, integerAllocationInvocationContext{})
+}
+func (m *IntegerModularManager) setUint32WithSourceContext(a *Int, v uint32, context integerAllocationInvocationContext) error {
 	if e := m.check(); e != nil {
 		return e
 	}
-	if e := m.manager.SetUint32(a, v); e != nil {
+	if e := m.manager.setUint32WithAllocationContext(a, v, context); e != nil {
 		return e
 	}
-	return m.PNormalize(a)
+	return m.normalizeWithSourceContext(a, context)
 }
 func (m *IntegerModularManager) SetInt64(a *Int, v int64) error {
 	return m.setInt64WithArithmeticReceipt(a, v, nil)

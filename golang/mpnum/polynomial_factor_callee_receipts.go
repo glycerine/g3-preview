@@ -17,11 +17,14 @@ type polynomialExactDivInvocationReceipt struct {
 	invocation uint64
 }
 
+func (m *MultivariatePolynomialManager) matchesDerivativeInvocationHistory(r *polynomialDerivativeInvocationReceipt) bool {
+	return m != nil && m.self == m && m.core != nil && m.core.self == m.core && r != nil && r.manager == m && r.frame == &m.derivative && r.invocation != 0 && r.frame.invocation == r.invocation
+}
 func (m *MultivariatePolynomialManager) matchesDerivativeInvocation(r *polynomialDerivativeInvocationReceipt) bool {
-	return r != nil && r.manager == m && r.frame == &m.derivative && r.invocation != 0 && r.frame.invocation == r.invocation && r.frame.active
+	return m.matchesDerivativeInvocationHistory(r) && r.frame.active
 }
 func (m *MultivariatePolynomialManager) derivativeInvocationSourceCause(r *polynomialDerivativeInvocationReceipt) error {
-	if m.matchesDerivativeInvocation(r) {
+	if m.matchesDerivativeInvocationHistory(r) {
 		return r.frame.sourceCause
 	}
 	return nil

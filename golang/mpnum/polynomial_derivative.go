@@ -4,7 +4,6 @@
 package mpnum
 
 import (
-	"github.com/glycerine/g3/golang/memory"
 	"reflect"
 )
 
@@ -17,12 +16,13 @@ type polynomialDerivativeScope struct {
 	n, a                                 Int
 	constructed                          uint8
 	stage                                uint8
+	numericPhase                         uint8
 	active, executing, stopped           bool
 	generated                            Monomial
 	calleeGeneration                     uint64
 	factoryGeneration                    uint64
-	numericPending                       memory.ObjectRef
-	allocatorPending                     [3]memory.Block
+	numeric                              polynomialNumericRoots
+	normalize                            integerPNormalizeInvocationReceipt
 	orphans                              []Monomial
 	orphanInvocations                    []uint64
 	drain                                uint32
@@ -45,6 +45,13 @@ func (m *MonomialManager) derivativeCreated(a Monomial, x uint32, out *monomialF
 func (m *MultivariatePolynomialManager) finishDerivativeNumerals() error {
 	s := &m.derivative
 	if s.stopped {
+		return s.sourceCause
+	}
+	if e := m.core.modular.pNormalizeInvocationSourceCause(&s.normalize); e != nil {
+		s.stopped = true
+		if s.sourceCause == nil {
+			s.sourceCause = e
+		}
 		return s.sourceCause
 	}
 	for s.stage < 2 {
@@ -150,8 +157,13 @@ func (m *MultivariatePolynomialManager) derivativeWithReceipt(p Polynomial, x ui
 		return Polynomial{}, ErrPolynomialPending
 	}
 	s.invocation++
+	// This is a new guarded source invocation, not a retry of the older child.
+	// Its historical standalone receipt remains valid on the modular owner.
+	s.normalize = integerPNormalizeInvocationReceipt{}
+	s.numericPhase = 0
+	directReceipt := polynomialDerivativeInvocationReceipt{manager: m, frame: s, invocation: s.invocation}
 	if receipt != nil {
-		*receipt = polynomialDerivativeInvocationReceipt{manager: m, frame: s, invocation: s.invocation}
+		*receipt = directReceipt
 	}
 	s.active = true
 	s.executing = true
@@ -164,7 +176,13 @@ func (m *MultivariatePolynomialManager) derivativeWithReceipt(p Polynomial, x ui
 		s.executing = false
 		s.bodyCause = cause
 		if e := m.finishDerivativeNumerals(); e != nil {
-			cause = s
+			// Return the captured exception cause, never the mutable owning
+			// frame. Its first body/source diagnostics remain on the owner.
+			if s.bodyCause != nil {
+				cause = s.bodyCause
+			} else {
+				cause = e
+			}
 			return
 		}
 		if cause == nil && s.generated == (Monomial{}) && s.calleeGeneration == 0 {
@@ -188,36 +206,20 @@ func (m *MultivariatePolynomialManager) derivativeWithReceipt(p Polynomial, x ui
 		s.a = Int{}
 		s.constructed = 1
 		s.stage = 0
-		beforePending := c.integer.pendingCell.object
-		beforeRaw, e := c.integer.allocator.PendingRoots()
+		s.numericPhase = 1
+		e = c.modular.setUint32WithDerivativeReceipt(&s.n, d, &directReceipt)
 		if e != nil {
 			return Polynomial{}, e
-		}
-		e = c.modular.SetUint32(&s.n, d)
-		pendingError := m.recordDerivativeNumericPending(beforePending, beforeRaw)
-		if e != nil {
-			return Polynomial{}, e
-		}
-		if pendingError != nil {
-			return Polynomial{}, pendingError
 		}
 		s.constructed |= 2
 		coefficient, e := c.coefficientCore(p, i)
 		if e != nil {
 			return Polynomial{}, e
 		}
-		beforePending = c.integer.pendingCell.object
-		beforeRaw, e = c.integer.allocator.PendingRoots()
+		s.numericPhase = 2
+		e = c.modular.mulWithDerivativeReceipt(&coefficient, &s.n, &s.a, &directReceipt)
 		if e != nil {
 			return Polynomial{}, e
-		}
-		e = c.modular.Mul(&coefficient, &s.n, &s.a)
-		pendingError = m.recordDerivativeNumericPending(beforePending, beforeRaw)
-		if e != nil {
-			return Polynomial{}, e
-		}
-		if pendingError != nil {
-			return Polynomial{}, pendingError
 		}
 		if e = m.prepareDerivativeRetirement(); e != nil {
 			return Polynomial{}, e
@@ -250,23 +252,6 @@ func (m *MultivariatePolynomialManager) derivativeWithReceipt(p Polynomial, x ui
 	return c.cheap.mk(false)
 }
 
-func (m *MultivariatePolynomialManager) recordDerivativeNumericPending(before memory.ObjectRef, beforeRaw [3]memory.Block) error {
-	s := &m.derivative
-	if s.executing && before == (memory.ObjectRef{}) && m.core.integer.pendingCell.object != (memory.ObjectRef{}) {
-		s.numericPending = m.core.integer.pendingCell.object
-	}
-	if s.executing && beforeRaw == ([3]memory.Block{}) {
-		roots, e := m.core.integer.allocator.PendingRoots()
-		if e != nil {
-			return e
-		}
-		if roots != ([3]memory.Block{}) {
-			s.allocatorPending = roots
-		}
-	}
-	return nil
-}
-
 // Owning abort: only actual fields and matching factory continuation identities.
 // No source destructor retry, no caller directory scan, no source counter repair.
 func (m *MultivariatePolynomialManager) CleanupDerivative() error {
@@ -286,6 +271,10 @@ func (m *MultivariatePolynomialManager) cleanupDerivativeModeOwned(abort bool, i
 	if s.executing {
 		return ErrPolynomialPending
 	}
+	if e := m.core.modular.cleanupPNormalizeInvocation(&s.normalize, false); e != nil {
+		s.cleanupCause = e
+		return e
+	}
 	for _, a := range [2]*Int{&s.a, &s.n} {
 		if e := m.core.integer.Del(a); e != nil {
 			s.cleanupCause = e
@@ -295,6 +284,14 @@ func (m *MultivariatePolynomialManager) cleanupDerivativeModeOwned(abort bool, i
 	s.constructed = 0
 	if !abort {
 		return nil
+	}
+	if e := m.core.modular.cleanupPNormalizeInvocation(&s.normalize, true); e != nil {
+		s.cleanupCause = e
+		return e
+	}
+	if e := s.numeric.cleanup(m.core.integer); e != nil {
+		s.cleanupCause = e
+		return e
 	}
 	if s.generated != (Monomial{}) {
 		if e := m.core.monomials.CleanupValue(&s.generated); e != nil {
@@ -328,41 +325,6 @@ func (m *MultivariatePolynomialManager) cleanupDerivativeModeOwned(abort bool, i
 			}
 		}
 		s.factoryGeneration = 0
-	}
-	if s.numericPending != (memory.ObjectRef{}) {
-		if m.core.integer.pendingCell.object == s.numericPending {
-			if e := m.core.integer.cleanupPendingAllocation(); e != nil {
-				s.cleanupCause = e
-				return e
-			}
-		}
-		s.numericPending = memory.ObjectRef{}
-	}
-	if s.allocatorPending != ([3]memory.Block{}) {
-		current, e := m.core.integer.allocator.PendingRoots()
-		if e != nil {
-			s.cleanupCause = e
-			return e
-		}
-		if current == s.allocatorPending {
-			e = m.core.integer.allocator.CleanupPending()
-			after, inspect := m.core.integer.allocator.PendingRoots()
-			for i := range s.allocatorPending {
-				if after[i] == (memory.Block{}) {
-					s.allocatorPending[i] = memory.Block{}
-				}
-			}
-			if e != nil {
-				s.cleanupCause = e
-				return e
-			}
-			if inspect != nil {
-				s.cleanupCause = inspect
-				return inspect
-			}
-		}
-		// A changed generation belongs to a later caller; never sweep it.
-		s.allocatorPending = [3]memory.Block{}
 	}
 
 	s.active = false

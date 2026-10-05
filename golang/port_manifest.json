@@ -28639,7 +28639,15 @@
         "mpnum/polynomial_sqrt_invocation_source_test.go",
         "mpnum/polynomial_constant_coefficient_receipt.go",
         "mpnum/polynomial_constant_coefficient_receipt_source_test.go",
-        "mpnum/polynomial_completed_append_transfer_source_test.go"
+        "mpnum/polynomial_completed_append_transfer_source_test.go",
+        "mpnum/integer_allocation_invocation_context.go",
+        "mpnum/mpz_facade_extra.go",
+        "mpnum/mpzzp_ops.go",
+        "mpnum/polynomial_derivative_allocation_context.go",
+        "mpnum/polynomial_derivative_allocation_context_test.go",
+        "mpnum/polynomial_derivative_direct_source_test.go",
+        "mpnum/polynomial_derivative_normalize_stop_source_test.go",
+        "mpnum/polynomial_derivative_uint32_leaf_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -29204,7 +29212,14 @@
         "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
         "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
         "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
-        "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix"
+        "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix",
+        "TestPolynomialDerivativeDirectEveryBigCoefficientPrefix",
+        "TestPolynomialDerivativeActualUnsignedSetLeafPrefixes",
+        "TestPolynomialDerivativePriorStoppedPNDoesNotPoisonUnreadNewInvocation",
+        "TestPolynomialDerivativeCopiedOwnerCannotMatchReceipt",
+        "TestPolynomialDerivativeNumericContextInactiveReceiptUnchanged",
+        "TestPolynomialDerivativeNumericContextRejectsCopiedFrameAndOwner",
+        "TestPolynomialDerivativeNumericContextRejectsForeignModularManager"
       ],
       "conditionals": [
         {
@@ -32277,6 +32292,24 @@
             "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
             "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix"
           ]
+        },
+        {
+          "name": "Derivative numeric allocation and stopped-child continuation src/math/polynomial/polynomial.cpp:4507-4528; direct unsigned SET src/util/mpz.h:680-694 and modular SET/MUL src/util/mpzzp.h:154,230-233",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_derivative_allocation_context.go",
+          "tests": [
+            "TestPolynomialDerivativeDirectEveryBigCoefficientPrefix",
+            "TestPolynomialDerivativeActualUnsignedSetLeafPrefixes",
+            "TestPolynomialDerivativePriorStoppedPNDoesNotPoisonUnreadNewInvocation",
+            "TestPolynomialDerivativeNumericPendingIdentity",
+            "TestPolynomialDerivativePostphysicalAllocatorRootOwnedByOperation",
+            "TestPolynomialDerivativeStoppedNumeralDestructorKeepsSourceCause",
+            "TestPolynomialDerivativeCopiedOwnerCannotMatchReceipt",
+            "TestPolynomialDerivativeNumericContextInactiveReceiptUnchanged",
+            "TestPolynomialDerivativeNumericContextRejectsCopiedFrameAndOwner",
+            "TestPolynomialDerivativeEveryReservationNamedPrefix",
+            "TestPolynomialDerivativeNumericContextRejectsForeignModularManager"
+          ]
         }
       ],
       "ownership": [
@@ -32342,7 +32375,15 @@
         "Actual sqrt lexical NUM/reference fields and matched perfect-square endEntered distinction; stale/foreign generations preserved; actual charged orphan/tag backing old+new capacity; source first cause/stage retained through owning continuation; partial ownership prerequisite, no whole-unit completion.",
         "Actual guarded manager/frame/unique invocation plus direct argument acquisition tokens; legacy foreign calls have nil receipt; same-cardinality replacement and stale frame owning cleanup preserve foreign graph before cleanup.",
         "Actual matched append factory nonce/completed row transfer: incomingINC transfers caller root then retires adapter metadata before older DEC callback; logical buffers are already empty and no numeric/pending roots remain; no source reset/delete/free/count repair, and foreign/stale receipts remain untouched. Selected partial owner evidence only. Current binding is specifically core.cheap, not generic cheap2 or PWSOM.",
-        "Exact actual manager/frame/nonzero invocation generation and named allocation/buffer token only; no registry/refcount/high-level snapshot authority. Shared successful publication remains member owned. Source DT cause remains sticky across explicit owning acknowledgement until actual new invocation."
+        "Exact actual manager/frame/nonzero invocation generation and named allocation/buffer token only; no registry/refcount/high-level snapshot authority. Shared successful publication remains member owned. Source DT cause remains sticky across explicit owning acknowledgement until actual new invocation.",
+        "Actual full manager embedded frame/nonwrapping invocation; self and exact frame checked.",
+        "Actual sourceCellBacking object/raw/request and exact allocator tokens recorded at allocation leaves; no before-after or registry ownership discovery.",
+        "False owning acknowledges matched younger PN lexical phases before a/n; true drains exact unjoined child/numeric roots afterward.",
+        "New guarded derivative invocation clears older PN binding; independently retained child source history remains queryable.",
+        "Created-only monomial cohort/factory authority remains intact.",
+        "Readonly source history validates owner/frame/same nonce even after own acknowledgment; inactive history never supplies numeric allocation or cleanup authority.",
+        "Returned errors are captured cause identities rather than mutable owning frame pointers; later guarded source invocations cannot rewrite their category. No numeric/root authority copied into an error.",
+        "Exact modular receiver binding prevents a distinct modular manager sharing the Integer service from acquiring the parent derivative PN/numeric authority."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -32404,7 +32445,7 @@
         "No whole source class/driver completion or original dormant ENSURE credit.",
         "Stopped-prefix proof uses a real source append reservation refusal; direct zero factory marker is adapter-state guard coverage only, with no source ctor/INC credit.",
         "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open.",
-        "Derivative cpp4507-4528 numeric owning continuation remains incomplete: polynomial_derivative.go snapshots pendingCell/allocator PendingRoots before SetUint32 and Mul, then recordDerivativeNumericPending infers acquisition afterward. Replace this authority with actual guarded integer allocation/publication leaves and exact manager/frame/nonwrapping invocation transport; existing finite-value and cleanup tests do not prove that contract. Discriminant and other derivative callers inherit this open prerequisite."
+        "Derivative numeric acquisition uses the actual guarded full-manager/frame/nonwrapping invocation at Integer allocation, descriptor publication/clear and allocator pending acquisition leaves. Public Derivative and optional invocation entry share direct SET/MUL engines. Matched younger PN source-stop blocks older a then n source destructors; false owning acknowledgment and true unjoined abort preserve first source history and foreign replacement roots. Fixed-owner high-level recursive reentry remains a Go owner limitation; other polynomial.cpp methods and whole imp completion retain existing qualifications. Returned exception cause identity remains stable after owning cleanup and a later invocation; inactive same-nonce source history is separate from active owning authority."
       ]
     },
     {

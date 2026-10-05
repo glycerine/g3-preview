@@ -507,14 +507,15 @@ func TestPolynomialDerivativeNumericPendingIdentity(t *testing.T) {
 	serviceMust(t, e)
 	serviceMust(t, m.core.IncRef(p))
 	_, cause := m.Derivative(p, 0)
-	if !errors.Is(cause, arena.ErrSlotLimit) || q.z.pendingCell.object == (memory.ObjectRef{}) || m.derivative.numericPending != q.z.pendingCell.object {
-		t.Fatal("actual n setter descriptor-refusal root", cause, m.derivative.numericPending, q.z.pendingCell)
+	if !errors.Is(cause, arena.ErrSlotLimit) || q.z.pendingCell.object == (memory.ObjectRef{}) || m.derivative.numeric.cell != q.z.pendingCell {
+		t.Fatal("actual n setter descriptor-refusal root", cause, m.derivative.numeric.cell.object, q.z.pendingCell)
 	}
 	polynomialDerivativePhysicalAudit(t, m, []Polynomial{p})
 	// Explicit old callee cleanup leaves the derivative's original receipt stale.
-	old := m.derivative.numericPending
+	oldBacking := m.derivative.numeric.cell
+	old := oldBacking.object
 	serviceMust(t, q.z.CleanupPendingAllocation())
-	if q.z.pendingCell.object != (memory.ObjectRef{}) || m.derivative.numericPending != old {
+	if q.z.pendingCell.object != (memory.ObjectRef{}) || m.derivative.numeric.cell != oldBacking {
 		t.Fatal("old physical root or stale receipt changed unexpectedly")
 	}
 	// A later caller reuses the allocator but owns a distinct object generation.
@@ -566,7 +567,7 @@ func TestPolynomialDerivativeStoppedNumeralDestructorKeepsSourceCause(t *testing
 	contextTLSNearMinimum(t, r)
 	b.FailAfter(0)
 	_, cause := m.Derivative(p, 0)
-	if cause != &m.derivative || !numericPhysicalReservationRefusal(m.derivative.bodyCause) || !errors.Is(m.derivative.sourceCause, arena.ErrBounds) || !m.derivative.stopped {
+	if cause != m.derivative.bodyCause || !numericPhysicalReservationRefusal(m.derivative.bodyCause) || !errors.Is(m.derivative.sourceCause, arena.ErrBounds) || !m.derivative.stopped {
 		t.Fatal("actual body publication then stopped a destructor", cause, m.derivative.bodyCause, m.derivative.sourceCause)
 	}
 	polynomialDerivativePhysicalAudit(t, m, []Polynomial{p})
@@ -619,8 +620,8 @@ func TestPolynomialDerivativePostphysicalAllocatorRootOwnedByOperation(t *testin
 			polynomialDerivativePhysicalAudit(t, m, []Polynomial{p})
 			roots, e := q.z.allocator.PendingRoots()
 			serviceMust(t, e)
-			if roots != m.derivative.allocatorPending || roots[0] == (memory.Block{}) {
-				t.Fatal("exact executing raw receipt", roots, m.derivative.allocatorPending)
+			if roots != m.derivative.numeric.allocator || roots[0] == (memory.Block{}) {
+				t.Fatal("exact executing raw receipt", roots, m.derivative.numeric.allocator)
 			}
 			rawSize, e := r.Size(roots[0])
 			serviceMust(t, e)
@@ -654,7 +655,7 @@ func TestPolynomialDerivativePostphysicalAllocatorRootOwnedByOperation(t *testin
 				if mode == "postfree" {
 					contextTLSNearMinimum(t, r)
 					cleanup := m.CleanupDerivative()
-					if !errors.Is(cleanup, arena.ErrBounds) || m.derivative.allocatorPending != ([3]memory.Block{}) || m.derivative.bodyCause != cause {
+					if !errors.Is(cleanup, arena.ErrBounds) || m.derivative.numeric.allocator != ([3]memory.Block{}) || m.derivative.bodyCause != cause {
 						t.Fatal("actual physical consumption not recorded with original cause", cleanup, m.derivative)
 					}
 					polynomialDerivativePhysicalAudit(t, m, []Polynomial{p})
