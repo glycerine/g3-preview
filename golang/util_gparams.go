@@ -45,6 +45,7 @@ type GlobalParams struct {
 	sourceStage                            uint8
 	sourceIndex                            uint32
 	sourceCause                            error
+	sourceDecrement                        ParamsDecrementReceipt
 	ownerBytes                             uint64
 	cLongBits                              uint8
 	moduleDescriptors                      gparamsDescriptorDictionary

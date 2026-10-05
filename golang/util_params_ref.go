@@ -82,6 +82,7 @@ type ParamsContext struct {
 	owner             uint64
 	blocks            []paramsBlock
 	decrementReceipts []paramsDecrementReceipt
+	sourceSerial      uint64
 	pages             []paramsEntryPage
 	workspace         []byte
 	pageEntries       uint32
@@ -299,6 +300,9 @@ func (c *ParamsContext) resetBlock(b *paramsBlock) error {
 	return nil
 }
 func (c *ParamsContext) dec(slot uint32) error {
+	return c.decTracked(slot, nil)
+}
+func (c *ParamsContext) decTracked(slot uint32, out *ParamsDecrementReceipt) error {
 	if slot == 0 {
 		return nil
 	}
@@ -309,7 +313,15 @@ func (c *ParamsContext) dec(slot uint32) error {
 	b.refs--
 	if b.refs == 0 {
 		b.resetActive = true
-		c.decrementReceipts[slot-1] = paramsDecrementReceipt{generation: b.generation}
+		serial, e := c.nextSourceInvocation()
+		c.decrementReceipts[slot-1] = paramsDecrementReceipt{generation: b.generation, invocation: serial}
+		if e != nil {
+			c.decrementReceipts[slot-1].cause = e
+			return e
+		}
+		if out != nil {
+			*out = ParamsDecrementReceipt{owner: c.owner, slot: slot, generation: b.generation, invocation: serial}
+		}
 		if e := c.continueDecrement(slot); e != nil {
 			return e
 		}
@@ -341,12 +353,17 @@ func (c *ParamsContext) Assign(dst, src *ParamsRef) error {
 	return c.assign(dst, src)
 }
 func (c *ParamsContext) Del(v *ParamsRef) error {
+	return c.DelTracked(v, nil)
+}
+
+// DelTracked stamps a receipt only at the actual zero-reference destruction entry.
+func (c *ParamsContext) DelTracked(v *ParamsRef, receipt *ParamsDecrementReceipt) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if e := c.check(v); e != nil {
 		return e
 	}
-	e := c.dec(v.slot)
+	e := c.decTracked(v.slot, receipt)
 	if e == nil {
 		*v = ParamsRef{}
 	}

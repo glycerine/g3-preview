@@ -3,12 +3,17 @@
 // Licensed under the MIT license; see LICENSE.txt in the source distribution.
 package g3
 
-import "reflect"
+import (
+	"github.com/glycerine/g3/golang/arena"
+	"math"
+	"reflect"
+)
 
 // Cold error metadata is prepared with the block directory. Actual leaf owners
 // remain in their entries; this receipt never manufactures an owning numeral.
 type paramsDecrementReceipt struct {
 	cause      error
+	invocation uint64
 	generation uint32
 }
 
@@ -98,4 +103,45 @@ func (c *ParamsContext) mutable(v *ParamsRef) error {
 		return ErrParamsPrecondition
 	}
 	return nil
+}
+
+// ParamsDecrementReceipt binds a parent to the exact reached child destruction.
+// It carries no authority derived from a block's reference count or registry.
+type ParamsDecrementReceipt struct {
+	owner, invocation uint64
+	slot, generation  uint32
+}
+
+// CompleteDecrement consumes only a matching stopped invocation. It never
+// repeats dec_ref, and leaves the original source failure in cold history.
+func (c *ParamsContext) CompleteDecrement(v *ParamsRef, receipt ParamsDecrementReceipt) error {
+	if c == nil || c.self != c {
+		return ErrParamsOwner
+	}
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if e := c.check(v); e != nil {
+		return e
+	}
+	if v.slot == 0 || receipt.owner != c.owner || receipt.slot != v.slot || receipt.generation != v.generation || receipt.invocation == 0 {
+		return ErrParamsPrecondition
+	}
+	b := &c.blocks[v.slot-1]
+	r := &c.decrementReceipts[v.slot-1]
+	if !b.resetActive || b.refs != 0 || r.generation != v.generation || r.invocation != receipt.invocation {
+		return ErrParamsPrecondition
+	}
+	if e := c.continueDecrement(v.slot); e != nil {
+		return e
+	}
+	*v = ParamsRef{}
+	return nil
+}
+
+func (c *ParamsContext) nextSourceInvocation() (uint64, error) {
+	if c.sourceSerial == math.MaxUint64 {
+		return 0, arena.ErrBounds
+	}
+	c.sourceSerial++
+	return c.sourceSerial, nil
 }

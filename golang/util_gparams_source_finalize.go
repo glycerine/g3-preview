@@ -27,7 +27,7 @@ func (g *GlobalParams) SourceFinalize() error {
 		return arena.ErrClosed
 	}
 	g.sourceStarted = true
-	e := g.sourceFinalizeBody()
+	e := g.sourceFinalizeBody(false)
 	if e != nil {
 		g.sourceCause = e
 	} else {
@@ -36,7 +36,7 @@ func (g *GlobalParams) SourceFinalize() error {
 	return e
 }
 
-func (g *GlobalParams) sourceFinalizeBody() error {
+func (g *GlobalParams) sourceFinalizeBody(owning bool) error {
 	for {
 		switch g.sourceStage {
 		case 0:
@@ -54,7 +54,7 @@ func (g *GlobalParams) sourceFinalizeBody() error {
 						return ErrGlobalParamsOwner
 					}
 					cell := g.cells[x.cell-1]
-					if e := g.context.Del(&cell.value); e != nil {
+					if e := g.sourceDecrementValue(&cell.value, owning); e != nil {
 						return e
 					}
 					g.budget.Release(uint64(reflect.TypeOf(*cell).Size()))
@@ -88,7 +88,7 @@ func (g *GlobalParams) sourceFinalizeBody() error {
 			g.sourceIndex = 0
 		case 4:
 			if g.globalParams.owner != 0 {
-				if e := g.context.Del(&g.globalParams); e != nil {
+				if e := g.sourceDecrementValue(&g.globalParams, owning); e != nil {
 					return e
 				}
 			}
@@ -128,9 +128,26 @@ func (g *GlobalParams) sourceFinalizeBody() error {
 	}
 }
 
-// CleanupStopped acknowledges only a completed reset-table release frontier.
-// It never retries the source shrinking allocation. Reached ParamsRef decrement
-// or reset-leaf failures require their own exact callee receipt and remain open.
+// sourceDecrementValue captures a receipt only at the child's actual guarded
+// zero-reference destructor entry. The owning path finishes that exact child;
+// it cannot adopt a stopped block reached by another caller's decrement.
+func (g *GlobalParams) sourceDecrementValue(v *ParamsRef, owning bool) error {
+	if owning && g.sourceDecrement.invocation != 0 {
+		if e := g.context.CompleteDecrement(v, g.sourceDecrement); e != nil {
+			return e
+		}
+		g.sourceDecrement = ParamsDecrementReceipt{}
+		return nil
+	}
+	if e := g.context.DelTracked(v, &g.sourceDecrement); e != nil {
+		return e
+	}
+	g.sourceDecrement = ParamsDecrementReceipt{}
+	return nil
+}
+
+// CleanupStopped finishes the matched child or acknowledges a completed table
+// release. The original source cause and source completion flag remain sticky.
 func (g *GlobalParams) CleanupStopped() error {
 	if g == nil || g.self != g {
 		return ErrGlobalParamsOwner
@@ -144,11 +161,17 @@ func (g *GlobalParams) CleanupStopped() error {
 		return ErrGlobalParamsOwner
 	}
 	if g.sourceCause != nil {
-		if g.sourceStage != 2 {
+		switch g.sourceStage {
+		case 1, 4:
+			if g.sourceDecrement.invocation == 0 {
+				return g.sourceCause
+			}
+		case 2:
+			g.moduleParams.close(g.budget)
+			g.sourceStage = 3
+		default:
 			return g.sourceCause
 		}
-		g.moduleParams.close(g.budget)
-		g.sourceStage = 3
 	}
-	return g.sourceFinalizeBody()
+	return g.sourceFinalizeBody(true)
 }

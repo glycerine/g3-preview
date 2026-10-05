@@ -103125,7 +103125,8 @@
         "util_gparams_catalog_collectors.go",
         "util_gparams_catalog_dispatch.go",
         "util_gparams_source_finalize.go",
-        "util_gparams_source_finalize_test.go"
+        "util_gparams_source_finalize_test.go",
+        "util_gparams_child_decrement_source_test.go"
       ],
       "tests": [
         "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
@@ -103159,7 +103160,8 @@
         "TestGlobalParamsSourceFinalizeEmptyMembersAndGuards",
         "TestGlobalParamsSourceFinalizeFiniteNamedModuleOwners",
         "TestGlobalParamsSourceFinalizeEveryActualShrinkReservation",
-        "TestGlobalParamsSourceFinalizeCopiedOwnerBeforeMutex"
+        "TestGlobalParamsSourceFinalizeCopiedOwnerBeforeMutex",
+        "TestGlobalParamsSourceModuleDECStoppedChildOwningContinuation"
       ],
       "assertions": [
         {
@@ -103278,6 +103280,14 @@
             "TestGlobalParamsSourceFinalizeEveryActualShrinkReservation",
             "TestGlobalParamsSourceFinalizeCopiedOwnerBeforeMutex"
           ]
+        },
+        {
+          "name": "imp destructor module ParamsRef zero-count child stop and matching explicit owning continuation; actual internal get_params plus numeral setter lifecycle route, not public string parser coverage",
+          "status": "partial",
+          "go_target": "util_gparams_source_finalize.go",
+          "tests": [
+            "TestGlobalParamsSourceModuleDECStoppedChildOwningContinuation"
+          ]
         }
       ],
       "ownership": [
@@ -103288,7 +103298,8 @@
         "Explicit runtime lifetime, C long32/64 and C-locale IEEE64 profiles, charged Go scratch/backings and two borrowed byte streams. Complete generated catalog, process singleton/stdout wiring, OpenMP and physical global allocation hooks remain open."
       ],
       "ownership_checks": [
-        "actual source destructor reset/deletion/member cursor retained independently of sticky source cause; immediate named owner graph before sparse shrink fault lift; separate owning acknowledgment never replays failed source reset allocation; generated singleton ctor unwind and reached ParamsRef decrement-stop receipts remain open"
+        "actual source destructor reset/deletion/member cursor retained independently of sticky source cause; immediate named owner graph before sparse shrink fault lift; separate owning acknowledgment never replays failed source reset allocation; generated singleton ctor unwind and reached ParamsRef decrement-stop receipts remain open",
+        "Module destruction stamps its child receipt at actual guarded zero-reference entry. Explicit own continuation finishes that exact child before freeing cell and advancing cursor; source cause/completion stay sticky. Wrong invocation preserves named physical/cold graph. Earlier stage0 non-DEC reset, descriptor descendant failures and process g_imp binding remain open. Public TLS realloc fixture reaches guarded signed-host undefined domain, not ordinary OOM."
       ]
     },
     {
@@ -124425,7 +124436,8 @@
         "util_param_descrs_stream_debug.go",
         "util_param_descrs_stream_nodebug.go",
         "util_param_descrs_stream_test.go",
-        "util_params_decrement_source.go"
+        "util_params_decrement_source.go",
+        "util_params_decrement_tracked_test.go"
       ],
       "tests": [
         "TestParamNameNormalizationSourceBranches",
@@ -124474,7 +124486,8 @@
         "TestParamDescrsDisplayIntoSourceScratchCapacityWidths",
         "TestParamsReferenceRepeatedDECSourceAssertionAfterActualSetLimbsLeafStop",
         "TestParamsReferenceCleanupDecrementActualLeafReceipt",
-        "TestParamsReferenceIndependentStoppedBlocksAndReplacementGeneration"
+        "TestParamsReferenceIndependentStoppedBlocksAndReplacementGeneration",
+        "TestParamsReferenceTrackedDecrementGuardedEntryReceipt"
       ],
       "conditionals": [
         {
@@ -124783,6 +124796,14 @@
             "TestParamsReferenceCleanupDecrementActualLeafReceipt",
             "TestParamsReferenceIndependentStoppedBlocksAndReplacementGeneration"
           ]
+        },
+        {
+          "name": "explicit Go child DEL receipt stamped only at actual zero-reference destructor entry; exact owner/slot/generation/nonwrapping invocation match before owning continuation, no repeated DEC",
+          "status": "ported",
+          "go_target": "util_params_decrement_source.go",
+          "tests": [
+            "TestParamsReferenceTrackedDecrementGuardedEntryReceipt"
+          ]
         }
       ],
       "ownership": [
@@ -124791,7 +124812,8 @@
         "Scalar owner-local ParamsRef and backing blocks; typed pooled pointer-free entries retain concrete numeral tokens and owned packed C text. Context header, all arrays/directories/text/workspaces and old/new peaks charged; immediate fault roots tested. Source action publication and shared resets preserved. See PORT_PROGRESS.md#audit-params-ref-port-status-md.",
         "Borrowed canonical spelling occupies existing scalar symbol field with a paramsText tag; copy retains identity and deletion frees only owned text. SymbolManager outlives borrowers; physical record stride remains reflect-accounted. See PORT_PROGRESS.md#audit-gparams-port-status-md.",
         "DisplayInto borrows charged StringBuffer64; destination then descriptor then Symbol lock order. Temporary names use actual charged old/new peaks and are refunded; text bytes read directly without intermediate strings. See PORT_PROGRESS.md#audit-param-descrs-stream-port-status-md.",
-        "Actual zero-ref leaf destruction stop retains pointer-free per-block cursor/stage and precharged cold cause/generation receipts; exact current entry numeral is retained, mutation cannot replace it, independent blocks can stop/continue separately. Explicit CleanupDecrement and owning context Close acknowledge actual child release receipts without a second decrement. Whole ownership remains unproven for Reset/resetBlock outside zero-ref DEC and exceptional copy/init/value replacement."
+        "Actual zero-ref leaf destruction stop retains pointer-free per-block cursor/stage and precharged cold cause/generation receipts; exact current entry numeral is retained, mutation cannot replace it, independent blocks can stop/continue separately. Explicit CleanupDecrement and owning context Close acknowledge actual child release receipts without a second decrement. Whole ownership remains unproven for Reset/resetBlock outside zero-ref DEC and exceptional copy/init/value replacement.",
+        "Actual per-block cold invocation is prepared with the charged receipt directory. Null/shared/failed entry cannot stamp; wrong invocation, foreign value, empty receipt, double acknowledgment and stale reused generation cannot adopt a stopped block. Broader non-DEC reset and exceptional Assign/init remain open."
       ],
       "deviations": [
         "Owner-local null replaces process-global empty reference. C strings become owned nullable first-NUL payloads; replacement stages new text. Detach error retains published partial block but cleans old reference. Pooled pages persist physically until Close; inline concrete numeric tokens replace separate heap objects. Provenance/overflow guards and libstdc++ null-C-string prefix error are explicit Go adapters; Z3DEBUG pp is explicit text API rather than global stdout.",
@@ -124814,7 +124836,8 @@
         "util_param_descrs_stream_debug.go",
         "util_param_descrs_stream_nodebug.go",
         "util_param_descrs_stream_test.go",
-        "util_params_decrement_source.go"
+        "util_params_decrement_source.go",
+        "util_params_decrement_tracked_test.go"
       ],
       "tests": [
         "TestParamNameNormalizationSourceBranches",
@@ -124863,7 +124886,8 @@
         "TestParamDescrsDisplayIntoSourceScratchCapacityWidths",
         "TestParamsReferenceRepeatedDECSourceAssertionAfterActualSetLimbsLeafStop",
         "TestParamsReferenceCleanupDecrementActualLeafReceipt",
-        "TestParamsReferenceIndependentStoppedBlocksAndReplacementGeneration"
+        "TestParamsReferenceIndependentStoppedBlocksAndReplacementGeneration",
+        "TestParamsReferenceTrackedDecrementGuardedEntryReceipt"
       ],
       "conditionals": [
         {
@@ -125146,6 +125170,14 @@
             "TestParamsReferenceCleanupDecrementActualLeafReceipt",
             "TestParamsReferenceIndependentStoppedBlocksAndReplacementGeneration"
           ]
+        },
+        {
+          "name": "explicit Go child DEL receipt stamped only at actual zero-reference destructor entry; exact owner/slot/generation/nonwrapping invocation match before owning continuation, no repeated DEC",
+          "status": "ported",
+          "go_target": "util_params_decrement_source.go",
+          "tests": [
+            "TestParamsReferenceTrackedDecrementGuardedEntryReceipt"
+          ]
         }
       ],
       "ownership": [
@@ -125154,7 +125186,8 @@
         "Scalar owner-local ParamsRef and backing blocks; typed pooled pointer-free entries retain concrete numeral tokens and owned packed C text. Context header, all arrays/directories/text/workspaces and old/new peaks charged; immediate fault roots tested. Source action publication and shared resets preserved. See PORT_PROGRESS.md#audit-params-ref-port-status-md.",
         "Borrowed canonical spelling occupies existing scalar symbol field with a paramsText tag; copy retains identity and deletion frees only owned text. SymbolManager outlives borrowers; physical record stride remains reflect-accounted. See PORT_PROGRESS.md#audit-gparams-port-status-md.",
         "DisplayInto borrows charged StringBuffer64; destination then descriptor then Symbol lock order. Temporary names use actual charged old/new peaks and are refunded; text bytes read directly without intermediate strings. See PORT_PROGRESS.md#audit-param-descrs-stream-port-status-md.",
-        "Actual zero-ref leaf destruction stop retains pointer-free per-block cursor/stage and precharged cold cause/generation receipts; exact current entry numeral is retained, mutation cannot replace it, independent blocks can stop/continue separately. Explicit CleanupDecrement and owning context Close acknowledge actual child release receipts without a second decrement. Whole ownership remains unproven for Reset/resetBlock outside zero-ref DEC and exceptional copy/init/value replacement."
+        "Actual zero-ref leaf destruction stop retains pointer-free per-block cursor/stage and precharged cold cause/generation receipts; exact current entry numeral is retained, mutation cannot replace it, independent blocks can stop/continue separately. Explicit CleanupDecrement and owning context Close acknowledge actual child release receipts without a second decrement. Whole ownership remains unproven for Reset/resetBlock outside zero-ref DEC and exceptional copy/init/value replacement.",
+        "Actual per-block cold invocation is prepared with the charged receipt directory. Null/shared/failed entry cannot stamp; wrong invocation, foreign value, empty receipt, double acknowledgment and stale reused generation cannot adopt a stopped block. Broader non-DEC reset and exceptional Assign/init remain open."
       ],
       "deviations": [
         "Owner-local null replaces process-global empty reference. C strings become owned nullable first-NUL payloads; replacement stages new text. Detach error retains published partial block but cleans old reference. Pooled pages persist physically until Close; inline concrete numeric tokens replace separate heap objects. Provenance/overflow guards and libstdc++ null-C-string prefix error are explicit Go adapters; Z3DEBUG pp is explicit text API rather than global stdout.",
