@@ -10,6 +10,7 @@ type integerAllocationInvocationContext struct {
 	arithmetic   *polynomialArithmeticInvocationReceipt
 	addMul       *integerAddMulInvocationReceipt
 	derivative   *polynomialDerivativeInvocationReceipt
+	scalarDiv    *polynomialScalarDivInvocationReceipt
 }
 
 func pnAllocationContext(pn *integerPNormalizeScope) integerAllocationInvocationContext {
@@ -22,6 +23,9 @@ func pnAllocationContext(pn *integerPNormalizeScope) integerAllocationInvocation
 func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomialNumericRoots {
 	if s := c.pn; s != nil && s.owner != nil && s.owner.manager == m && s == &s.owner.normalization && s.active && s.executing && c.pnInvocation != 0 && c.pnInvocation == s.invocation {
 		return &s.roots
+	}
+	if c.scalarDiv != nil {
+		return m.scalarDivAllocationRoots(c.scalarDiv)
 	}
 	if c.derivative != nil {
 		return m.derivativeAllocationRoots(c.derivative)

@@ -3,12 +3,21 @@
 package mpnum
 
 type polynomialScalarDivScope struct {
-	a                      Int
-	returned               Polynomial
-	active, ended          bool
-	bodyCause, sourceCause error
-	invocation             uint64
-	numeric                polynomialNumericRoots
+	a                        Int
+	returned                 Polynomial
+	active, ended, executing bool
+	normalize                integerPNormalizeInvocationReceipt
+	buffers                  [4]naturalPNBufferReceipt
+	verification             naturalPNVerificationReceipt
+	transport                Int
+	transportBuffer          *polynomialSOM
+	transportSlot            uint32
+	transportBound           bool
+	division                 integerScalarRawScope
+	extended                 integerScalarRawScope
+	bodyCause, sourceCause   error
+	invocation               uint64
+	numeric                  polynomialNumericRoots
 }
 type polynomialScalarDivInvocationReceipt struct {
 	manager    *MultivariatePolynomialCore
@@ -17,30 +26,36 @@ type polynomialScalarDivInvocationReceipt struct {
 }
 
 func (m *MultivariatePolynomialCore) matchesScalarDivInvocation(r *polynomialScalarDivInvocationReceipt) bool {
-	return r != nil && r.manager == m && r.frame == &m.scalarDivision && r.invocation != 0 && r.invocation == r.frame.invocation && r.frame.active
+	return m != nil && m.self == m && r != nil && r.manager == m && r.frame == &m.scalarDivision && r.invocation != 0 && r.invocation == r.frame.invocation && r.frame.active
 }
 func (m *MultivariatePolynomialCore) scalarDivInvocationSourceCause(r *polynomialScalarDivInvocationReceipt) error {
-	if m.matchesScalarDivInvocation(r) {
+	if m != nil && m.self == m && r != nil && r.manager == m && r.frame == &m.scalarDivision && r.invocation != 0 && r.invocation == r.frame.invocation {
 		return r.frame.sourceCause
 	}
 	return nil
 }
 func (m *MultivariatePolynomialCore) finishScalarDivSource() error {
 	s := &m.scalarDivision
-	if !s.active || s.ended {
-		return nil
-	}
 	if s.sourceCause != nil {
 		return s.sourceCause
 	}
-	_, e := sourceNumeralDel(m.integer, &s.a)
+	if !s.active || s.ended {
+		return nil
+	}
+	for _, e := range []error{s.division.sourceCause, s.extended.sourceCause, m.modular.pNormalizeInvocationSourceCause(&s.normalize), m.integer.natural.pnVerificationSourceCause(&s.verification)} {
+		if e != nil {
+			s.sourceCause = e
+			return e
+		}
+	}
+	_, e := upolynomialSourceNumeralDel(m.integer, &s.a)
 	if e != nil {
 		s.sourceCause = e
 		return e
 	}
 	s.ended = true
 	s.returned = Polynomial{}
-	if !polynomialNegNumericPending(&s.numeric) {
+	if !s.directPending(m) {
 		s.active = false
 	}
 	return nil
@@ -56,14 +71,54 @@ func (m *MultivariatePolynomialCore) cleanupScalarDivPhase(abort bool) error {
 	if !s.active {
 		return nil
 	}
+	if s.executing {
+		return ErrPolynomialPending
+	}
+	r := polynomialScalarDivInvocationReceipt{m, s, s.invocation}
+	if e := m.modular.cleanupPNormalizeInvocation(&s.normalize, false); e != nil {
+		return e
+	}
+	if e := m.integer.natural.cleanupPNVerification(&s.verification, false); e != nil {
+		return e
+	}
+	if e := m.integer.cleanupScalarRaw(&s.division, &r, false); e != nil {
+		return e
+	}
+	if e := m.integer.cleanupScalarRaw(&s.extended, &r, false); e != nil {
+		return e
+	}
 	if !s.ended {
 		if e := m.deleteNumeral(&s.a); e != nil {
 			return e
 		}
 		s.ended = true
-		s.sourceCause = nil
 	}
 	if abort {
+		if s.transportBound {
+			if e := m.deleteNumeral(&s.transport); e != nil {
+				return e
+			}
+			s.transportBound = false
+			s.transportBuffer = nil
+			s.transportSlot = 0
+		}
+		if e := m.modular.cleanupPNormalizeInvocation(&s.normalize, true); e != nil {
+			return e
+		}
+		if e := m.integer.natural.cleanupPNVerification(&s.verification, true); e != nil {
+			return e
+		}
+		if e := m.integer.cleanupScalarRaw(&s.division, &r, true); e != nil {
+			return e
+		}
+		if e := m.integer.cleanupScalarRaw(&s.extended, &r, true); e != nil {
+			return e
+		}
+		for i := len(s.buffers) - 1; i >= 0; i-- {
+			if e := s.buffers[i].cleanup(); e != nil {
+				return e
+			}
+		}
 		if s.returned != (Polynomial{}) {
 			if e := m.CleanupValue(&s.returned); e != nil {
 				return e
@@ -73,9 +128,9 @@ func (m *MultivariatePolynomialCore) cleanupScalarDivPhase(abort bool) error {
 			return e
 		}
 	}
-	if s.returned == (Polynomial{}) && !polynomialNegNumericPending(&s.numeric) {
+	if s.returned == (Polynomial{}) && !s.directPending(m) {
 		invocation := s.invocation
-		*s = polynomialScalarDivScope{invocation: invocation}
+		*s = polynomialScalarDivScope{invocation: invocation, bodyCause: s.bodyCause, sourceCause: s.sourceCause, division: s.division, extended: s.extended, normalize: s.normalize, verification: s.verification}
 	}
 	return nil
 }
@@ -106,11 +161,14 @@ func (m *MultivariatePolynomialCore) scalarDivWithParentReceipts(p Polynomial, d
 	if s.active || s.invocation == ^uint64(0) {
 		return Polynomial{}, ErrPolynomialPending
 	}
-	*s = polynomialScalarDivScope{active: true, invocation: s.invocation + 1}
+	*s = polynomialScalarDivScope{active: true, executing: true, invocation: s.invocation + 1}
+	directReceipt := polynomialScalarDivInvocationReceipt{manager: m, frame: s, invocation: s.invocation}
 	if receipt != nil {
-		*receipt = polynomialScalarDivInvocationReceipt{manager: m, frame: s, invocation: s.invocation}
+		*receipt = directReceipt
 	}
+
 	defer func() {
+		s.executing = false
 		s.bodyCause = cause
 		s.returned = result
 		if m.matchesFactoryInvocation(factoryReceipt) && m.factoryInvocation.result == result {
@@ -126,12 +184,7 @@ func (m *MultivariatePolynomialCore) scalarDivWithParentReceipts(p Polynomial, d
 		if e != nil {
 			return Polynomial{}, e
 		}
-		before, x := polynomialNumericBefore(m.integer)
-		if x != nil {
-			return Polynomial{}, x
-		}
-		e = m.modular.Div(&a, d, &s.a)
-		e = polynomialNewtonJoin(e, s.numeric.after(m.integer, before))
+		e = m.modular.divWithScalarDivReceipt(&a, d, &s.a, &directReceipt)
 		if e != nil {
 			return Polynomial{}, e
 		}
@@ -139,20 +192,22 @@ func (m *MultivariatePolynomialCore) scalarDivWithParentReceipts(p Polynomial, d
 		if e != nil {
 			return Polynomial{}, e
 		}
-		before, x = polynomialNumericBefore(m.integer)
-		if x != nil {
-			return Polynomial{}, x
-		}
-		e = m.cheap.addWithAppendReceipt(&s.a, term, false, appendReceipt)
-		e = polynomialNewtonJoin(e, s.numeric.after(m.integer, before))
+		e = m.cheap.addConsumedScalarDivReceipts(&s.a, term, false, nil, appendReceipt, &directReceipt)
 		if e != nil {
 			return Polynomial{}, e
 		}
 	}
-	before, x := polynomialNumericBefore(m.integer)
-	if x != nil {
-		return Polynomial{}, x
+	return m.cheap.mkWithAppendReceipt(false, appendReceipt, factoryReceipt)
+}
+
+func (s *polynomialScalarDivScope) directPending(m *MultivariatePolynomialCore) bool {
+	if s.transportBound || polynomialNegNumericPending(&s.numeric) || s.division.active || s.extended.active || m.modular.matchesPNormalizeInvocation(&s.normalize) || m.integer.natural.matchesPNVerification(&s.verification) {
+		return true
 	}
-	result, e = m.cheap.mkWithAppendReceipt(false, appendReceipt, factoryReceipt)
-	return result, polynomialNewtonJoin(e, s.numeric.after(m.integer, before))
+	for i := range s.buffers {
+		if s.buffers[i].pending != (naturalPNBufferReceipt{}).pending {
+			return true
+		}
+	}
+	return false
 }

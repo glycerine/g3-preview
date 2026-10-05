@@ -328,6 +328,9 @@ func (m *IntegerModularManager) pNormalizeWithReceipt(a *Int, receipt *integerPN
 	return m.assertNormalized(a)
 }
 func (m *IntegerModularManager) Inv(a *Int) error {
+	return m.invWithAllocationContext(a, integerAllocationInvocationContext{})
+}
+func (m *IntegerModularManager) invWithAllocationContext(a *Int, context integerAllocationInvocationContext) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -343,13 +346,13 @@ func (m *IntegerModularManager) Inv(a *Int) error {
 			return ErrModularAssertion
 		}
 	}
-	if e := m.PNormalize(a); e != nil {
+	if e := m.normalizeWithSourceContext(a, context); e != nil {
 		return e
 	}
-	if e := m.manager.ExtendedGCD(a, &m.p, &m.invTmp1, &m.invTmp2, &m.invTmp3); e != nil {
+	if e := m.manager.extendedGCDWithAllocationContext(a, &m.p, &m.invTmp1, &m.invTmp2, &m.invTmp3, context); e != nil {
 		return e
 	}
-	if e := m.PNormalize(&m.invTmp1); e != nil {
+	if e := m.normalizeWithSourceContext(&m.invTmp1, context); e != nil {
 		return e
 	}
 	if e := m.manager.Swap(a, &m.invTmp1); e != nil {
@@ -367,11 +370,14 @@ func (m *IntegerModularManager) Inv(a *Int) error {
 	return nil
 }
 func (m *IntegerModularManager) Div(a, b, c *Int) error {
+	return m.divWithAllocationContext(a, b, c, integerAllocationInvocationContext{})
+}
+func (m *IntegerModularManager) divWithAllocationContext(a, b, c *Int, context integerAllocationInvocationContext) error {
 	if e := m.check(); e != nil {
 		return e
 	}
 	if m.z {
-		return m.manager.Div(a, b, c)
+		return m.manager.divWithAllocationContext(a, b, c, context)
 	}
 	if modularSourceDebug {
 		f, e := m.Field()
@@ -385,13 +391,13 @@ func (m *IntegerModularManager) Div(a, b, c *Int) error {
 			return e
 		}
 	}
-	if e := m.manager.Copy(&m.divTmp, b); e != nil {
+	if e := m.manager.copyFromOwnerWithAllocationContext(&m.divTmp, m.manager, b, nil, context); e != nil {
 		return e
 	}
-	if e := m.Inv(&m.divTmp); e != nil {
+	if e := m.invWithAllocationContext(&m.divTmp, context); e != nil {
 		return e
 	}
-	if e := m.Mul(a, &m.divTmp, c); e != nil {
+	if e := m.mulWithSourceContext(a, &m.divTmp, c, context); e != nil {
 		return e
 	}
 	return m.assertNormalized(c)

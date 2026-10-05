@@ -225,10 +225,13 @@ func (m *NaturalManager) resizeScratch(ref *arena.VectorRef, capacity *uint32, s
 }
 func (m *NaturalManager) resizeDiv(i int, n uint32) error { return m.resizeDivWithPNReceipt(i, n, nil) }
 func (m *NaturalManager) resizeDivWithPNReceipt(i int, n uint32, pn *integerPNormalizeScope) error {
+	return m.resizeDivWithAllocationContext(i, n, pnAllocationContext(pn))
+}
+func (m *NaturalManager) resizeDivWithAllocationContext(i int, n uint32, context integerAllocationInvocationContext) error {
 	if i < 0 || i >= 4 {
 		return arena.ErrBounds
 	}
-	e := m.division[i].resizeWithPNReceipt(m.runtime, n, m.pnBufferReceipt(pn, i))
+	e := m.division[i].resizeWithPNReceipt(m.runtime, n, m.divisionBufferReceipt(context, i))
 	m.divCapacity[i] = m.division[i].capacity()
 	return e
 }

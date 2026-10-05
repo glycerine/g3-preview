@@ -12,6 +12,9 @@ func (m *NaturalManager) sourceVerifyDivision(a, b, q, r limbView) error {
 	return m.sourceVerifyDivisionWithPNReceipt(a, b, q, r, nil)
 }
 func (m *NaturalManager) sourceVerifyDivisionWithPNReceipt(a, b, q, r limbView, pn *integerPNormalizeScope) (err error) {
+	return m.sourceVerifyDivisionWithAllocationContext(a, b, q, r, pnAllocationContext(pn))
+}
+func (m *NaturalManager) sourceVerifyDivisionWithAllocationContext(a, b, q, r limbView, context integerAllocationInvocationContext) (err error) {
 	if !modularSourceDebug {
 		return nil
 	}
@@ -20,6 +23,7 @@ func (m *NaturalManager) sourceVerifyDivisionWithPNReceipt(a, b, q, r limbView, 
 	if m.verificationActive {
 		return arena.ErrInvalidSlot
 	}
+	pn := context.pn
 	var frame *naturalPNVerificationScope
 	if pn != nil && pn.owner != nil && pn.owner.manager.natural == m && pn == &pn.owner.normalization && pn.active && pn.executing {
 		frame = &m.verificationInvocation
@@ -29,6 +33,17 @@ func (m *NaturalManager) sourceVerifyDivisionWithPNReceipt(a, b, q, r limbView, 
 		*frame = naturalPNVerificationScope{active: true, executing: true, invocation: frame.invocation + 1, parent: pn}
 		frame.buffer = naturalPNBufferReceipt{owner: m, context: pn, invocation: pn.invocation, buffer: &m.verification, stage: pn.stage, private: true}
 		pn.verification = naturalPNVerificationReceipt{m, frame, frame.invocation}
+		defer func() { frame.executing = false }()
+	}
+
+	if r := context.scalarDiv; r != nil && r.manager != nil && r.manager.integer.natural == m && r.manager.integer.scalarDivAllocationRoots(r) != nil {
+		frame = &m.verificationInvocation
+		if frame.active || frame.invocation == ^uint64(0) {
+			return ErrPolynomialPending
+		}
+		*frame = naturalPNVerificationScope{active: true, executing: true, invocation: frame.invocation + 1, scalar: *r}
+		frame.buffer = naturalPNBufferReceipt{owner: m, scalar: *r, invocation: r.invocation, buffer: &m.verification, private: true}
+		r.frame.verification = naturalPNVerificationReceipt{m, frame, frame.invocation}
 		defer func() { frame.executing = false }()
 	}
 	m.verificationActive = true

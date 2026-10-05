@@ -20,55 +20,78 @@ func (m *IntegerManager) GCDMany(as []Int, g *Int) error {
 
 // ExtendedGCD preserves source coefficient publication at every action. Outputs
 // may alias each other or inputs; input signs are reread only after the loop.
-// A failure keeps already-published coefficients and always deletes locals.
+// A failure keeps already-published coefficients. The optional actual scalar
+// context retains RAW locals until owning abort; the historical nil/public
+// adapter still deletes locals eagerly on failure and remains incomplete.
 func (m *IntegerManager) ExtendedGCD(r1, r2, a, b, g *Int) error {
+	return m.extendedGCDWithAllocationContext(r1, r2, a, b, g, integerAllocationInvocationContext{})
+}
+func (m *IntegerManager) extendedGCDWithAllocationContext(r1, r2, a, b, g *Int, context integerAllocationInvocationContext) (err error) {
 	for _, v := range []*Int{r1, r2, a, b, g} {
 		if e := m.check(v); e != nil {
 			return e
 		}
 	}
-	var tmp1, tmp2, aux, quot, nexta, nextb Int
-	defer func() {
-		m.Del(&tmp1)
-		m.Del(&tmp2)
-		m.Del(&aux)
-		m.Del(&quot)
-		m.Del(&nexta)
-		m.Del(&nextb)
-	}()
-	if e := m.Copy(&tmp1, r1); e != nil {
+	var local [6]Int
+	values := &local
+	var raw *integerScalarRawScope
+	if r := context.scalarDiv; m.scalarDivAllocationRoots(r) != nil {
+		raw = &r.frame.extended
+		if e := m.beginScalarRaw(raw, r, 4); e != nil {
+			return e
+		}
+		values = &raw.values
+		defer func() {
+			raw.executing = false
+			if err == nil {
+				raw.bodySucceeded = true
+				err = m.finishScalarRawSource(raw)
+			}
+		}()
+	} else {
+		defer func() {
+			for i := range local {
+				m.Del(&local[i])
+			}
+		}()
+	}
+	tmp1, tmp2, aux, quot, nexta, nextb := &values[0], &values[1], &values[2], &values[3], &values[4], &values[5]
+	if e := m.copyFromOwnerWithAllocationContext(tmp1, m, r1, nil, context); e != nil {
 		return e
 	}
-	if e := m.Copy(&tmp2, r2); e != nil {
+	if e := m.copyFromOwnerWithAllocationContext(tmp2, m, r2, nil, context); e != nil {
 		return e
 	}
-	if e := m.SetInt64(a, 1); e != nil {
+	if e := m.setInt64WithAllocationContext(a, 1, context); e != nil {
 		return e
 	}
-	if e := m.SetInt64(b, 0); e != nil {
+	if e := m.setInt64WithAllocationContext(b, 0, context); e != nil {
 		return e
 	}
-	if e := m.SetInt64(&nexta, 0); e != nil {
+	if raw != nil {
+		raw.count = 6
+	}
+	if e := m.setInt64WithAllocationContext(nexta, 0, context); e != nil {
 		return e
 	}
-	if e := m.SetInt64(&nextb, 1); e != nil {
+	if e := m.setInt64WithAllocationContext(nextb, 1, context); e != nil {
 		return e
 	}
-	if e := m.Abs(&tmp1); e != nil {
+	if e := m.Abs(tmp1); e != nil {
 		return e
 	}
-	if e := m.Abs(&tmp2); e != nil {
+	if e := m.Abs(tmp2); e != nil {
 		return e
 	}
-	cmp, e := m.Compare(&tmp1, &tmp2)
+	cmp, e := m.Compare(tmp1, tmp2)
 	if e != nil {
 		return e
 	}
 	if cmp < 0 {
-		if e = m.Swap(&tmp1, &tmp2); e != nil {
+		if e = m.Swap(tmp1, tmp2); e != nil {
 			return e
 		}
-		if e = m.Swap(&nexta, &nextb); e != nil {
+		if e = m.Swap(nexta, nextb); e != nil {
 			return e
 		}
 		if e = m.Swap(a, b); e != nil {
@@ -76,43 +99,43 @@ func (m *IntegerManager) ExtendedGCD(r1, r2, a, b, g *Int) error {
 		}
 	}
 	for tmp2.val > 0 {
-		if e = m.gcdSourceGreaterEqual(&tmp1, &tmp2); e != nil {
+		if e = m.gcdSourceGreaterEqual(tmp1, tmp2); e != nil {
 			return e
 		}
-		if e = m.Copy(&aux, &tmp2); e != nil {
+		if e = m.copyFromOwnerWithAllocationContext(aux, m, tmp2, nil, context); e != nil {
 			return e
 		}
-		if e = m.MachineDiv(&tmp1, &tmp2, &quot); e != nil {
+		if e = m.machineDivWithAllocationContext(tmp1, tmp2, quot, context); e != nil {
 			return e
 		}
-		if e = m.Rem(&tmp1, &tmp2, &tmp2); e != nil {
+		if e = m.remWithAllocationContext(tmp1, tmp2, tmp2, context); e != nil {
 			return e
 		}
-		if e = m.Copy(&tmp1, &aux); e != nil {
+		if e = m.copyFromOwnerWithAllocationContext(tmp1, m, aux, nil, context); e != nil {
 			return e
 		}
-		if e = m.Copy(&aux, &nexta); e != nil {
+		if e = m.copyFromOwnerWithAllocationContext(aux, m, nexta, nil, context); e != nil {
 			return e
 		}
-		if e = m.Mul(&quot, &nexta, &nexta); e != nil {
+		if e = m.mulWithAllocationContext(quot, nexta, nexta, context); e != nil {
 			return e
 		}
-		if e = m.Sub(a, &nexta, &nexta); e != nil {
+		if e = m.addSubWithAllocationContext(a, nexta, nexta, true, context); e != nil {
 			return e
 		}
-		if e = m.Copy(a, &aux); e != nil {
+		if e = m.copyFromOwnerWithAllocationContext(a, m, aux, nil, context); e != nil {
 			return e
 		}
-		if e = m.Copy(&aux, &nextb); e != nil {
+		if e = m.copyFromOwnerWithAllocationContext(aux, m, nextb, nil, context); e != nil {
 			return e
 		}
-		if e = m.Mul(&nextb, &quot, &nextb); e != nil {
+		if e = m.mulWithAllocationContext(nextb, quot, nextb, context); e != nil {
 			return e
 		}
-		if e = m.Sub(b, &nextb, &nextb); e != nil {
+		if e = m.addSubWithAllocationContext(b, nextb, nextb, true, context); e != nil {
 			return e
 		}
-		if e = m.Copy(b, &aux); e != nil {
+		if e = m.copyFromOwnerWithAllocationContext(b, m, aux, nil, context); e != nil {
 			return e
 		}
 	}
@@ -126,10 +149,10 @@ func (m *IntegerManager) ExtendedGCD(r1, r2, a, b, g *Int) error {
 			return e
 		}
 	}
-	if e = m.extendedGCDDiagnostic(r1, r2, a, b, &tmp1, &nexta, &nextb); e != nil {
+	if e = m.extendedGCDDiagnosticWithAllocationContext(r1, r2, a, b, tmp1, nexta, nextb, context); e != nil {
 		return e
 	}
-	return m.Copy(g, &tmp1)
+	return m.copyFromOwnerWithAllocationContext(g, m, tmp1, nil, context)
 }
 
 // LCM follows the signed source shortcuts; it is not canonical abs(a*b)/gcd.

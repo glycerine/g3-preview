@@ -54,6 +54,7 @@ func (m *IntegerModularManager) cleanupPNormalizeInvocation(r *integerPNormalize
 // A receipt exists only for a real pending growth of the named source buffer.
 // Successful publication returns authority to the persistent Natural member.
 type naturalPNBufferReceipt struct {
+	scalar     polynomialScalarDivInvocationReceipt
 	owner      *NaturalManager
 	context    *integerPNormalizeScope
 	invocation uint64
@@ -75,7 +76,7 @@ func (m *NaturalManager) pnBufferReceipt(pn *integerPNormalizeScope, i int) *nat
 	return r
 }
 func (r *naturalPNBufferReceipt) acquire(s *sourceLimbBuffer, block memory.Block) {
-	if r.buffer == s && r.context.active && r.context.executing && r.invocation == r.context.invocation {
+	if r.buffer == s && r.bound(true) {
 		r.pending = block
 	}
 }
@@ -91,7 +92,7 @@ func (r *naturalPNBufferReceipt) cleanup() error {
 	if r.pending == (memory.Block{}) {
 		return nil
 	}
-	if r.context == nil || !r.context.active || r.invocation != r.context.invocation || r.buffer.pending != r.pending {
+	if !r.bound(false) || r.buffer.pending != r.pending {
 		return nil
 	}
 	e := r.owner.runtime.Deallocate(&r.buffer.pending)
@@ -113,4 +114,38 @@ func (s *integerPNormalizeScope) pending() bool {
 		}
 	}
 	return false
+}
+
+func (r *naturalPNBufferReceipt) bound(executing bool) bool {
+	if r.scalar.manager != nil {
+		s := r.scalar
+		if s.manager.self != s.manager || !s.manager.matchesScalarDivInvocation(&s) || r.owner != s.manager.integer.natural || r.invocation != s.invocation || (executing && (!s.frame.executing || s.manager.callbackDepth != 0)) {
+			return false
+		}
+		if r.private {
+			v := &r.owner.verificationInvocation
+			return r == &v.buffer && r.buffer == &r.owner.verification && v.scalar == s && r.owner.matchesPNVerification(&s.frame.verification)
+		}
+		for i := range s.frame.buffers {
+			if r == &s.frame.buffers[i] {
+				return r.buffer == &r.owner.division[i]
+			}
+		}
+		return false
+	}
+	return r.context != nil && r.context.active && r.invocation == r.context.invocation && (!executing || r.context.executing)
+}
+func (m *NaturalManager) divisionBufferReceipt(context integerAllocationInvocationContext, i int) *naturalPNBufferReceipt {
+	if context.scalarDiv == nil {
+		return m.pnBufferReceipt(context.pn, i)
+	}
+	r := context.scalarDiv
+	if r.manager == nil || r.manager.integer.natural != m || r.manager.integer.scalarDivAllocationRoots(r) == nil {
+		return nil
+	}
+	b := &r.frame.buffers[i]
+	if b.owner == nil {
+		*b = naturalPNBufferReceipt{owner: m, scalar: *r, invocation: r.invocation, buffer: &m.division[i]}
+	}
+	return b
 }

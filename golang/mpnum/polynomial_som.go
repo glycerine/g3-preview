@@ -61,6 +61,12 @@ func (b *polynomialSOM) addConsumedReceipts(a *Int, term Monomial, take bool, co
 	return b.addConsumedCoefficientReceipts(a, term, take, consumed, receipt, appendReceipt, nil)
 }
 func (b *polynomialSOM) addConsumedCoefficientReceipts(a *Int, term Monomial, take bool, consumed *bool, receipt *polynomialNumericRoots, appendReceipt *polynomialCheapAppendInvocationReceipt, coefficientReceipt *polynomialCoefficientInvocationReceipt) (cause error) {
+	return b.addConsumedScalarDivEngine(a, term, take, consumed, receipt, appendReceipt, coefficientReceipt, nil)
+}
+func (b *polynomialSOM) addConsumedScalarDivReceipts(a *Int, term Monomial, take bool, consumed *bool, appendReceipt *polynomialCheapAppendInvocationReceipt, scalarReceipt *polynomialScalarDivInvocationReceipt) error {
+	return b.addConsumedScalarDivEngine(a, term, take, consumed, nil, appendReceipt, nil, scalarReceipt)
+}
+func (b *polynomialSOM) addConsumedScalarDivEngine(a *Int, term Monomial, take bool, consumed *bool, receipt *polynomialNumericRoots, appendReceipt *polynomialCheapAppendInvocationReceipt, coefficientReceipt *polynomialCoefficientInvocationReceipt, scalarReceipt *polynomialScalarDivInvocationReceipt) (cause error) {
 	if consumed != nil {
 		*consumed = false
 	}
@@ -143,17 +149,37 @@ func (b *polynomialSOM) addConsumedCoefficientReceipts(a *Int, term Monomial, ta
 		if e != nil {
 			return e
 		}
-		if take {
-			e = m.modular.Swap(&value, a)
+		var transport *Int
+		if scalarReceipt != nil {
+			if m.integer.scalarDivAllocationRoots(scalarReceipt) == nil || b != &m.cheap || !m.matchesScalarDivInvocation(scalarReceipt) || scalarReceipt.frame.transportBound {
+				return ErrPolynomialPending
+			}
+			s := scalarReceipt.frame
+			// The actual source default NUM already exists at this slot. This
+			// adapter holder becomes the SET destination until codec publication.
+			s.transport, s.transportBuffer, s.transportSlot, s.transportBound = value, b, n, true
+			transport = &s.transport
 		} else {
-			e = b.addNumericLeaf(receipt, 0, a, nil, nil, &value)
+			transport = &value
 		}
-		if w := b.as.putCoefficient(m, n, value); w != nil {
+		if take {
+			e = m.modular.Swap(transport, a)
+		} else if scalarReceipt != nil {
+			e = m.modular.copyWithScalarDivReceipt(transport, a, scalarReceipt)
+		} else {
+			e = b.addNumericLeaf(receipt, 0, a, nil, nil, transport)
+		}
+		if w := b.as.putCoefficient(m, n, *transport); w != nil {
 			return w
+		}
+		if scalarReceipt != nil {
+			s := scalarReceipt.frame
+			s.transport, s.transportBuffer, s.transportSlot, s.transportBound = Int{}, nil, 0, false
 		}
 		if e != nil {
 			return e
 		}
+
 	}
 	if e = m.monomials.IncRef(term); e != nil {
 		return e

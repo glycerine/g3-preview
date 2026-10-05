@@ -9,6 +9,7 @@ import "github.com/glycerine/g3/golang/memory"
 type naturalPNVerificationScope struct {
 	invocation                                   uint64
 	parent                                       *integerPNormalizeScope
+	scalar                                       polynomialScalarDivInvocationReceipt
 	active, executing, constructed, ended, owned bool
 	buffer                                       naturalPNBufferReceipt
 	sourceCause                                  error
