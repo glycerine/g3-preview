@@ -273,8 +273,11 @@ func (m *MultivariatePolynomialCore) constantCoefficientWithReceipt(p Polynomial
 		*frame = polynomialConstantCoefficientScope{active: true, executing: true, invocation: frame.invocation + 1}
 		*receipt = polynomialConstantCoefficientInvocationReceipt{m, frame, frame.invocation}
 		defer func() {
+			if frame.sourceCause == nil {
+				frame.sourceCause = m.modular.pNormalizeInvocationSourceCause(&frame.normalize)
+			}
 			frame.executing = false
-			if !m.integer.matchesCopyAllocationInvocation(&frame.copy) {
+			if !m.integer.matchesCopyAllocationInvocation(&frame.copy) && !m.modular.matchesPNormalizeInvocation(&frame.normalize) {
 				frame.active = false
 			}
 		}()
@@ -311,7 +314,11 @@ func (m *MultivariatePolynomialCore) constantCoefficientWithReceipt(p Polynomial
 			if frame != nil {
 				child = &frame.copy
 			}
-			if e = m.modular.copyFromOwnerWithAllocationReceipt(c, m.integer, &a, child); e != nil {
+			var normalized *integerPNormalizeInvocationReceipt
+			if frame != nil {
+				normalized = &frame.normalize
+			}
+			if e = m.modular.copyFromOwnerWithAllocationReceipts(c, m.integer, &a, child, normalized); e != nil {
 				return false, e
 			}
 		}

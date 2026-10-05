@@ -19,6 +19,7 @@ type NaturalManager struct {
 	ownsRuntime                       bool
 	division                          [4]sourceLimbBuffer
 	verification                      sourceLimbBuffer
+	verificationInvocation            naturalPNVerificationScope
 	formatting                        naturalFormattingScope
 	charFormatting                    integerCharacterScope
 	sourceFinalizing, sourceFinalized bool
@@ -222,11 +223,12 @@ func (m *NaturalManager) resizeScratch(ref *arena.VectorRef, capacity *uint32, s
 	*capacity = c
 	return nil
 }
-func (m *NaturalManager) resizeDiv(i int, n uint32) error {
+func (m *NaturalManager) resizeDiv(i int, n uint32) error { return m.resizeDivWithPNReceipt(i, n, nil) }
+func (m *NaturalManager) resizeDivWithPNReceipt(i int, n uint32, pn *integerPNormalizeScope) error {
 	if i < 0 || i >= 4 {
 		return arena.ErrBounds
 	}
-	e := m.division[i].resize(m.runtime, n)
+	e := m.division[i].resizeWithPNReceipt(m.runtime, n, m.pnBufferReceipt(pn, i))
 	m.divCapacity[i] = m.division[i].capacity()
 	return e
 }

@@ -10,6 +10,8 @@ type polynomialConstantCoefficientScope struct {
 	invocation        uint64
 	active, executing bool
 	copy              integerCopyAllocationReceipt
+	normalize         integerPNormalizeInvocationReceipt
+	sourceCause       error
 }
 type polynomialConstantCoefficientInvocationReceipt struct {
 	manager    *MultivariatePolynomialCore
@@ -21,16 +23,29 @@ func (m *MultivariatePolynomialCore) matchesConstantCoefficientInvocation(r *pol
 	return r != nil && r.manager == m && r.frame == &m.constantCoefficientInvocation && r.invocation != 0 && r.invocation == r.frame.invocation && r.frame.active
 }
 func (m *MultivariatePolynomialCore) cleanupConstantCoefficientInvocation(r *polynomialConstantCoefficientInvocationReceipt, abort bool) error {
-	if !abort || !m.matchesConstantCoefficientInvocation(r) {
+	if !m.matchesConstantCoefficientInvocation(r) {
 		return nil
 	}
 	s := r.frame
 	if s.executing {
 		return ErrPolynomialPending
 	}
+	if e := m.modular.cleanupPNormalizeInvocation(&s.normalize, abort); e != nil {
+		return e
+	}
+	if !abort {
+		return nil
+	}
 	if e := m.integer.cleanupCopyAllocationInvocation(&s.copy); e != nil {
 		return e
 	}
-	*s = polynomialConstantCoefficientScope{invocation: s.invocation}
+	*s = polynomialConstantCoefficientScope{invocation: s.invocation, normalize: s.normalize, sourceCause: s.sourceCause}
 	return nil
+}
+
+func (m *MultivariatePolynomialCore) constantCoefficientInvocationSourceCause(r *polynomialConstantCoefficientInvocationReceipt) error {
+	if r == nil || r.manager != m || r.frame != &m.constantCoefficientInvocation || r.invocation == 0 || r.invocation != r.frame.invocation {
+		return nil
+	}
+	return r.frame.sourceCause
 }

@@ -29199,7 +29199,12 @@
         "TestPolynomialCoefficientSequentialActualCompletedTransfer",
         "TestPolynomialCompletedAppendActualINCBeforeForeignOldDECCallback",
         "TestPolynomialCompletedAppendForeignMixedRefusalKeepsActualCallerINC",
-        "TestPolynomialActualStoppedAppendGuardPreservesFailurePrefix"
+        "TestPolynomialActualStoppedAppendGuardPreservesFailurePrefix",
+        "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
+        "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
+        "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
+        "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
+        "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix"
       ],
       "conditionals": [
         {
@@ -32260,6 +32265,18 @@
             "TestPolynomialCompletedAppendForeignMixedRefusalKeepsActualCallerINC",
             "TestPolynomialActualStoppedAppendGuardPreservesFailurePrefix"
           ]
+        },
+        {
+          "name": "const_coeff3318-3338 same SET then reached field PNormalize: exact younger lexical DT acknowledgment before older caller NUM; explicit unjoined cleanup after caller declarations",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_constant_coefficient_receipt.go",
+          "tests": [
+            "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
+            "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
+            "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
+            "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
+            "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix"
+          ]
         }
       ],
       "ownership": [
@@ -32324,7 +32341,8 @@
         "Parent Discriminant, ordered foreign mixed-cohort retirement and NUM DT after published factory stop proofs remain open",
         "Actual sqrt lexical NUM/reference fields and matched perfect-square endEntered distinction; stale/foreign generations preserved; actual charged orphan/tag backing old+new capacity; source first cause/stage retained through owning continuation; partial ownership prerequisite, no whole-unit completion.",
         "Actual guarded manager/frame/unique invocation plus direct argument acquisition tokens; legacy foreign calls have nil receipt; same-cardinality replacement and stale frame owning cleanup preserve foreign graph before cleanup.",
-        "Actual matched append factory nonce/completed row transfer: incomingINC transfers caller root then retires adapter metadata before older DEC callback; logical buffers are already empty and no numeric/pending roots remain; no source reset/delete/free/count repair, and foreign/stale receipts remain untouched. Selected partial owner evidence only. Current binding is specifically core.cheap, not generic cheap2 or PWSOM."
+        "Actual matched append factory nonce/completed row transfer: incomingINC transfers caller root then retires adapter metadata before older DEC callback; logical buffers are already empty and no numeric/pending roots remain; no source reset/delete/free/count repair, and foreign/stale receipts remain untouched. Selected partial owner evidence only. Current binding is specifically core.cheap, not generic cheap2 or PWSOM.",
+        "Exact actual manager/frame/nonzero invocation generation and named allocation/buffer token only; no registry/refcount/high-level snapshot authority. Shared successful publication remains member owned. Source DT cause remains sticky across explicit owning acknowledgement until actual new invocation."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -32384,7 +32402,8 @@
         "Partial SET acquisition prerequisite only; allocating finite-field PNormalize, complete Discriminant source-stop/reservation/coldgraph proof and source parent remain open. No source unit/API promotion.",
         "Metadata acknowledgement is explicit Go checked owner adaptation at actual INC, not an added C++ vector/numeric operation or allocator event.",
         "No whole source class/driver completion or original dormant ENSURE credit.",
-        "Stopped-prefix proof uses a real source append reservation refusal; direct zero factory marker is adapter-state guard coverage only, with no source ctor/INC credit."
+        "Stopped-prefix proof uses a real source append reservation refusal; direct zero factory marker is adapter-state guard coverage only, with no source ctor/INC credit.",
+        "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open."
       ]
     },
     {
@@ -100344,7 +100363,8 @@
         "mpnum/polynomial_gcd_power_buffer.go",
         "mpnum/polynomial_gcd_power_buffer_source_test.go",
         "mpnum/polynomial_gcd_variable_buffer_source_test.go",
-        "mpnum/polynomial_invocation_receipts_source_test.go"
+        "mpnum/polynomial_invocation_receipts_source_test.go",
+        "mpnum/mpn_source_buffer.go"
       ],
       "tests": [
         "TestSexprBVSourceInlineBufferAndTemporaryLifetime",
@@ -100403,7 +100423,12 @@
         "TestPolynomialGCDInvocationReceiptRejectsReusedFrame",
         "TestPolynomialNormalizeInvocationReceiptRejectsReusedFrame",
         "TestPolynomialICCPExpandedFilterEveryActualReservation",
-        "TestPolynomialICCPRetainsActualPendingGCDInvocation"
+        "TestPolynomialICCPRetainsActualPendingGCDInvocation",
+        "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
+        "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
+        "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
+        "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
+        "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix"
       ],
       "conditionals": [
         {
@@ -100577,6 +100602,18 @@
             "TestPolynomialICCPExpandedFilterEveryActualReservation",
             "TestPolynomialICCPRetainsActualPendingGCDInvocation"
           ]
+        },
+        {
+          "name": "Reached sbuffer expand/push/resize exact pending acquisition, shared publication or private constructed raw transfer and actual cleared-token frontier",
+          "status": "partial",
+          "go_target": "mpnum/mpn_source_buffer.go",
+          "tests": [
+            "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
+            "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
+            "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
+            "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
+            "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix"
+          ]
         }
       ],
       "ownership": [
@@ -100585,12 +100622,14 @@
         "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets.",
         "Actual completed lexical references and source INC-before-push incoming token, charged inline16/cold header and Runtime scalar-handle backing. Named failed allocation/consumed destructor state retained until owning abort. See PORT_PROGRESS.md.",
         "Actual inline prefix and Runtime block are authoritative; initialized/copy cursors follow source push/resize and returned-allocation lifetime, with enclosing owner charging cold fields.",
-        "Cold reflected GCD/ICCP/Normalize records acquire only actual guarded invocations. Receipts match exact manager, stable frame pointer and nonwrapping invocation nonce; common PSC generation is not invocation identity. Completed younger source locals precede older caller locals; explicit owning numeric/reference/buffer abort is a separate pass. Source pp moves its result to a named returned temporary, ends helper c/i before caller old-DEC, then ends the temporary. Named pending/raw/backing/retired/cold graph includes all reached records; no registry/RC/whole-call snapshot supplies ownership."
+        "Cold reflected GCD/ICCP/Normalize records acquire only actual guarded invocations. Receipts match exact manager, stable frame pointer and nonwrapping invocation nonce; common PSC generation is not invocation identity. Completed younger source locals precede older caller locals; explicit owning numeric/reference/buffer abort is a separate pass. Source pp moves its result to a named returned temporary, ends helper c/i before caller old-DEC, then ends the temporary. Named pending/raw/backing/retired/cold graph includes all reached records; no registry/RC/whole-call snapshot supplies ownership.",
+        "Exact actual manager/frame/nonzero invocation generation and named allocation/buffer token only; no registry/refcount/high-level snapshot authority. Shared successful publication remains member owned. Source DT cause remains sticky across explicit owning acknowledgement until actual new invocation."
       ],
       "deviations": [
         "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md.",
         "Source char bytes use physical capacity/initialization independently of POS and unsigned11*size wrap. Selected non-Windows digit32 snprintf lbuf0/truncation and multi-limb ignored-lbuf behavior execute. Windows sprintf_s constraint handler, GMP/digit64, global/locale/ostream and literal std::string temporary allocation/evaluation remain open. No whole-unit or registered assertion completion is claimed.",
-        "Concrete prerequisite does not implement all source buffer types or complete ICCP algorithm."
+        "Concrete prerequisite does not implement all source buffer types or complete ICCP algorithm.",
+        "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open."
       ]
     },
     {
@@ -116809,7 +116848,9 @@
         "mpnum/polynomial_display_tls_test.go",
         "mpnum/polynomial_imp_cleanup.go",
         "mpnum/polynomial_imp_physical_test.go",
-        "mpnum/polynomial_manager.go"
+        "mpnum/polynomial_manager.go",
+        "mpnum/mpn_source_verify.go",
+        "mpnum/mpn_verification_invocation.go"
       ],
       "tests": [
         "TestNaturalArithmeticOracle",
@@ -116862,7 +116903,12 @@
         "TestPolynomialDisplayMonomialWrapperAndFiniteField",
         "TestPolynomialDisplayYoungerStoppedDestructor",
         "TestPolynomialDisplayExactNumericReceiptAndReplacement",
-        "TestPolynomialDisplaySinkCreatesForeignPending"
+        "TestPolynomialDisplaySinkCreatesForeignPending",
+        "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
+        "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
+        "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
+        "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
+        "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix"
       ],
       "conditionals": [
         {
@@ -117305,16 +117351,30 @@
             "TestPolynomialDisplayExactNumericReceiptAndReplacement",
             "TestPolynomialDisplaySinkCreatesForeignPending"
           ]
+        },
+        {
+          "name": "Algorithm D real source-buffer growth acquisition plus debug206-217 exact lexical constructor/DT receipt; unfinished ctor roots versus sticky completed DT source stop",
+          "status": "partial",
+          "go_target": "mpnum/mpn_verification_invocation.go",
+          "tests": [
+            "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
+            "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
+            "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
+            "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
+            "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix"
+          ]
         }
       ],
       "ownership": [
         "NaturalManager owns a charged real cold header, four actual source inline16/doubling division buffers, a debug lexical verification holder, and embedded formatting lexical limb roots. Published member source destruction is distinct from failed-constructor/unpublished-block owning cleanup. Integer child borrows parent Words/Budget/runtime without double ownership. Retained SmallBytes text is an explicit output assembly adapter. Borrowed operands/outputs are operation-local; source OMP/global lifecycle remains open.",
         "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets.",
-        "Stable charged recursive display frames own actual numeral, character and MPN locals; actual sink callbacks borrow decimal views only during insertion. Younger stopped destructor preserves older locals; CleanupDisplay uses exact physical tokens and leaves foreign/replacement roots intact."
+        "Stable charged recursive display frames own actual numeral, character and MPN locals; actual sink callbacks borrow decimal views only during insertion. Younger stopped destructor preserves older locals; CleanupDisplay uses exact physical tokens and leaves foreign/replacement roots intact.",
+        "Exact actual manager/frame/nonzero invocation generation and named allocation/buffer token only; no registry/refcount/high-level snapshot authority. Shared successful publication remains member owned. Source DT cause remains sticky across explicit owning acknowledgement until actual new invocation."
       ],
       "deviations": [
         "Go guards actual endangered reads/writes and retained lexical-holder reuse without blocking source paths that never reach those holders. Algorithm D allocates add-back storage only at the source borrow branch. Runtime owns real source allocations and initialized-byte state; no Words shadows represent limb scratch. Final escaped Go strings are caller-owned. Exact character-buffer/output lifetime, broader public source span domains, diagnostic transport, architecture profiles and OMP/global integration remain separate obligations.",
-        "Source char bytes use physical capacity/initialization independently of POS and unsigned11*size wrap. Selected non-Windows digit32 snprintf lbuf0/truncation and multi-limb ignored-lbuf behavior execute. Windows sprintf_s constraint handler, GMP/digit64, global/locale/ostream and literal std::string temporary allocation/evaluation remain open. No whole-unit or registered assertion completion is claimed."
+        "Source char bytes use physical capacity/initialization independently of POS and unsigned11*size wrap. Selected non-Windows digit32 snprintf lbuf0/truncation and multi-limb ignored-lbuf behavior execute. Windows sprintf_s constraint handler, GMP/digit64, global/locale/ostream and literal std::string temporary allocation/evaluation remain open. No whole-unit or registered assertion completion is claimed.",
+        "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open."
       ]
     },
     {
@@ -117333,7 +117393,8 @@
         "mpnum/mpn_verification_scope_test.go",
         "mpnum/mp_integer_output_scope.go",
         "mpnum/mp_integer_output_scope_test.go",
-        "mpnum/mpn_cstring.go"
+        "mpnum/mpn_cstring.go",
+        "mpnum/mpn_verification_invocation.go"
       ],
       "tests": [
         "TestNaturalArithmeticOracle",
@@ -117372,7 +117433,12 @@
         "TestIntegerCharacterFailedConstructorSurvivesSourceFinalize",
         "TestIntegerCharacterUsesActualInitializedSizeHeader",
         "TestIntegerCharacterRationalNumeratorBeforeDenominator",
-        "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots"
+        "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots",
+        "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
+        "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
+        "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
+        "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
+        "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix"
       ],
       "conditionals": [
         {
@@ -117732,15 +117798,29 @@
             "TestIntegerCharacterRationalNumeratorBeforeDenominator",
             "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots"
           ]
+        },
+        {
+          "name": "Exact named persistent division buffers and charged embedded verification invocation identity, preserving shared successful publication ownership",
+          "status": "partial",
+          "go_target": "mpnum/mpn_storage.go",
+          "tests": [
+            "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
+            "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
+            "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
+            "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
+            "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix"
+          ]
         }
       ],
       "ownership": [
         "NaturalManager owns a charged real cold header, four actual source inline16/doubling division buffers, a debug lexical verification holder, and embedded formatting lexical limb roots. Published member source destruction is distinct from failed-constructor/unpublished-block owning cleanup. Integer child borrows parent Words/Budget/runtime without double ownership. Retained SmallBytes text is an explicit output assembly adapter. Borrowed operands/outputs are operation-local; source OMP/global lifecycle remains open.",
-        "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets."
+        "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets.",
+        "Exact actual manager/frame/nonzero invocation generation and named allocation/buffer token only; no registry/refcount/high-level snapshot authority. Shared successful publication remains member owned. Source DT cause remains sticky across explicit owning acknowledgement until actual new invocation."
       ],
       "deviations": [
         "Go guards actual endangered reads/writes and retained lexical-holder reuse without blocking source paths that never reach those holders. Algorithm D allocates add-back storage only at the source borrow branch. Runtime owns real source allocations and initialized-byte state; no Words shadows represent limb scratch. Final escaped Go strings are caller-owned. Exact character-buffer/output lifetime, broader public source span domains, diagnostic transport, architecture profiles and OMP/global integration remain separate obligations.",
-        "Source char bytes use physical capacity/initialization independently of POS and unsigned11*size wrap. Selected non-Windows digit32 snprintf lbuf0/truncation and multi-limb ignored-lbuf behavior execute. Windows sprintf_s constraint handler, GMP/digit64, global/locale/ostream and literal std::string temporary allocation/evaluation remain open. No whole-unit or registered assertion completion is claimed."
+        "Source char bytes use physical capacity/initialization independently of POS and unsigned11*size wrap. Selected non-Windows digit32 snprintf lbuf0/truncation and multi-limb ignored-lbuf behavior execute. Windows sprintf_s constraint handler, GMP/digit64, global/locale/ostream and literal std::string temporary allocation/evaluation remain open. No whole-unit or registered assertion completion is claimed.",
+        "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open."
       ]
     },
     {
@@ -120114,7 +120194,12 @@
         "TestIntegerPowerCallerOutputPendingExcludedFromRAWOwner",
         "TestIntegerPowerReceiptRejectQuickAndReplacement",
         "TestIntegerCopyAllocationReceiptExactBackingAndForeignReplacement",
-        "TestIntegerCopyAllocationReceiptUnchangedWithoutAllocation"
+        "TestIntegerCopyAllocationReceiptUnchangedWithoutAllocation",
+        "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
+        "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
+        "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
+        "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
+        "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix"
       ],
       "conditionals": [
         {
@@ -121849,6 +121934,18 @@
             "TestIntegerCopyAllocationReceiptExactBackingAndForeignReplacement",
             "TestIntegerCopyAllocationReceiptUnchangedWithoutAllocation"
           ]
+        },
+        {
+          "name": "quot_rem_core and reached add/sub: direct actual pendingCell/object/backing/allocation-token acquisition and clear at real publication; shared scratch remains manager owned",
+          "status": "partial",
+          "go_target": "mpnum/mpz_div.go",
+          "tests": [
+            "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
+            "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
+            "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
+            "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
+            "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix"
+          ]
         }
       ],
       "ownership": [
@@ -121874,7 +121971,8 @@
         "Actual real foreign Runtime coefficient RED89453 led to reached-only owner check; empty borrowed view is unread. No owning numeral-array copy or generic storage introduced.",
         "Six actual RAW Int fields live in the charged IntegerManager header. Literal source end deletion stops at its first cause; explicit CleanupPerfectSquare resumes only owned fields and exact pending ObjectRef/physical roots. Direct final output SET remains caller-owned.",
         "Current Root/Power RAW lifetime implementation supersedes earlier staged Root/output and implicit general Power cleanup descriptions. Actual four Root and one Power RAW fields are charged in the Integer header; body failures retain them, literal end-only DEL stops younger-to-older at the reached ascending source frontier. Exact manager/frame/unique nonwrapping nonce and physical object/block/extent identity match owning continuation; caller COPY/MUL output pending is excluded. Completed and abort phases distinguish reached end DEL from unfinished RAW body owners.",
-        "Actual guarded manager/frame/unique invocation plus direct argument acquisition tokens; legacy foreign calls have nil receipt; same-cardinality replacement and stale frame owning cleanup preserve foreign graph before cleanup."
+        "Actual guarded manager/frame/unique invocation plus direct argument acquisition tokens; legacy foreign calls have nil receipt; same-cardinality replacement and stale frame owning cleanup preserve foreign graph before cleanup.",
+        "Exact actual manager/frame/nonzero invocation generation and named allocation/buffer token only; no registry/refcount/high-level snapshot authority. Shared successful publication remains member owned. Source DT cause remains sticky across explicit owning acknowledgement until actual new invocation."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -121897,7 +121995,8 @@
         "Selected array-view prerequisite; broader integer/modular source audits remain partial.",
         "Selected source algorithms and explicit Runtime profile only. Signed TLS stops and large factory/auxiliary receipts are guarded owner-primitive proofs, not ordinary mathematical exhaustion. Non-Z perfect-square remains the source unsupported operation. Registered polynomial driver returns before sqrt; dormant assertions give no active driver completion credit. Global diagnostics/native ABI and remaining source methods stay partial.",
         "Root output is now literal SET(input) before in-place domain guards and bisection, superseding previous output-atomic Root description. Wrapped Power mask and signed/TLS source-pointer domains remain explicit guarded domains; no transitive source/global/backend completion promotion.",
-        "Partial SET acquisition prerequisite only; allocating finite-field PNormalize, complete Discriminant source-stop/reservation/coldgraph proof and source parent remain open. No source unit/API promotion."
+        "Partial SET acquisition prerequisite only; allocating finite-field PNormalize, complete Discriminant source-stop/reservation/coldgraph proof and source parent remain open. No source unit/API promotion.",
+        "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open."
       ]
     },
     {
@@ -123499,7 +123598,8 @@
         "mpnum/polynomial_integer_array_source_test.go",
         "mpnum/mpz_source_copy_owner_test.go",
         "mpnum/mpz_root_scope.go",
-        "mpnum/mpz_power_scope.go"
+        "mpnum/mpz_power_scope.go",
+        "mpnum/mpzzp_normalize_allocation_receipt.go"
       ],
       "tests": [
         "TestIntegerModularCenteredOracle",
@@ -123517,7 +123617,12 @@
         "TestIntegerModularConstructorOwnershipAndRefusal",
         "TestPolynomialIntegerArrayActualObjectAndEarlyOne",
         "TestPolynomialIntegerArrayReachedRuntimeCohortAndUnreadZero",
-        "TestPolynomialIntegerArrayZeroLeavesForeignAllocatorUnread"
+        "TestPolynomialIntegerArrayZeroLeavesForeignAllocatorUnread",
+        "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
+        "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
+        "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
+        "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
+        "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix"
       ],
       "conditionals": [
         {
@@ -123784,15 +123889,29 @@
             "TestIntegerSourceCopyFromOwnerEveryDestructivePrefix",
             "TestIntegerSourceCopyFromOwnerPendingReplacement"
           ]
+        },
+        {
+          "name": "PNormalize exact guarded direct argument allocation receipt: original Rem/Greater/Less/Sub/Add with younger lexical checked verification before caller NUM",
+          "status": "partial",
+          "go_target": "mpnum/mpzzp_normalize_allocation_receipt.go",
+          "tests": [
+            "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
+            "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
+            "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
+            "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
+            "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix"
+          ]
         }
       ],
       "ownership": [
         "Actual charged cold wrapper owns seven pointer-free Ints and borrows real IntegerManager/Budget; source ordered fields and scratch/publication preserved. Cold self guard rejects copied/zero owner; source modulus copied public accessor distinguished from actual private borrowed numeral. See PORT_PROGRESS.md#audit-mpzzp-port-status-md.",
-        "Actual real foreign Runtime coefficient RED89453 led to reached-only owner check; empty borrowed view is unread. No owning numeral-array copy or generic storage introduced."
+        "Actual real foreign Runtime coefficient RED89453 led to reached-only owner check; empty borrowed view is unread. No owning numeral-array copy or generic storage introduced.",
+        "Exact actual manager/frame/nonzero invocation generation and named allocation/buffer token only; no registry/refcount/high-level snapshot authority. Shared successful publication remains member owned. Source DT cause remains sticky across explicit owning acknowledgement until actual new invocation."
       ],
       "deviations": [
         "Source modulus constructors leave prime flag indeterminate; typed guard only actual read, not invented release Div precondition. Source Power maskwrap nontermination diagnosed after completed actions; deferred local/constructor cleanup is safe Go ownership adaptation, not claimed raw MPZ exception destructor. Source TRACE/unsupported/undefined and full consumer algorithms remain open. See PORT_PROGRESS.md#audit-mpzzp-port-status-md.",
-        "Selected array-view prerequisite; broader integer/modular source audits remain partial."
+        "Selected array-view prerequisite; broader integer/modular source audits remain partial.",
+        "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open."
       ]
     },
     {

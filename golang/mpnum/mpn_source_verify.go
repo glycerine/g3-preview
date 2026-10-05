@@ -9,6 +9,9 @@ import "github.com/glycerine/g3/golang/arena"
 // only for explicit Go owning cleanup. Successful calls destroy it immediately;
 // its allocation is never reused as source manager scratch.
 func (m *NaturalManager) sourceVerifyDivision(a, b, q, r limbView) error {
+	return m.sourceVerifyDivisionWithPNReceipt(a, b, q, r, nil)
+}
+func (m *NaturalManager) sourceVerifyDivisionWithPNReceipt(a, b, q, r limbView, pn *integerPNormalizeScope) (err error) {
 	if !modularSourceDebug {
 		return nil
 	}
@@ -17,10 +20,29 @@ func (m *NaturalManager) sourceVerifyDivision(a, b, q, r limbView) error {
 	if m.verificationActive {
 		return arena.ErrInvalidSlot
 	}
+	var frame *naturalPNVerificationScope
+	if pn != nil && pn.owner != nil && pn.owner.manager.natural == m && pn == &pn.owner.normalization && pn.active && pn.executing {
+		frame = &m.verificationInvocation
+		if frame.active || frame.invocation == ^uint64(0) {
+			return ErrPolynomialPending
+		}
+		*frame = naturalPNVerificationScope{active: true, executing: true, invocation: frame.invocation + 1, parent: pn}
+		frame.buffer = naturalPNBufferReceipt{owner: m, context: pn, invocation: pn.invocation, buffer: &m.verification, stage: pn.stage, private: true}
+		pn.verification = naturalPNVerificationReceipt{m, frame, frame.invocation}
+		defer func() { frame.executing = false }()
+	}
 	m.verificationActive = true
 	temp := &m.verification
-	if e := temp.resize(m.runtime, a.size+1); e != nil {
+	var buffer *naturalPNBufferReceipt
+	if frame != nil {
+		buffer = &frame.buffer
+	}
+	if e := temp.resizeWithPNReceipt(m.runtime, a.size+1, buffer); e != nil {
 		return e
+	}
+	if frame != nil {
+		frame.constructed = true
+		defer func() { err = polynomialNewtonJoin(err, m.finishPNVerificationSource(frame)) }()
 	}
 	out := limbView{runtime: m.runtime, source: temp, size: a.size + 1}
 	// mpn_manager::mul, Knuth M: initialize lnga cells, then every column.
@@ -77,6 +99,9 @@ func (m *NaturalManager) sourceVerifyDivision(a, b, q, r limbView) error {
 	}
 	if !ok {
 		return ErrIntegerAssertion
+	}
+	if frame != nil {
+		return nil
 	}
 	if e := temp.finalize(m.runtime); e != nil {
 		return e

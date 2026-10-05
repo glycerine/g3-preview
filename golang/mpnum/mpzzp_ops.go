@@ -343,13 +343,16 @@ func (m *IntegerModularManager) copyFromOwnerCore(a *Int, source *IntegerManager
 	return m.copyFromOwnerWithAllocationReceipt(a, source, b, nil)
 }
 func (m *IntegerModularManager) copyFromOwnerWithAllocationReceipt(a *Int, source *IntegerManager, b *Int, receipt *integerCopyAllocationReceipt) error {
+	return m.copyFromOwnerWithAllocationReceipts(a, source, b, receipt, nil)
+}
+func (m *IntegerModularManager) copyFromOwnerWithAllocationReceipts(a *Int, source *IntegerManager, b *Int, receipt *integerCopyAllocationReceipt, pn *integerPNormalizeInvocationReceipt) error {
 	if e := m.check(); e != nil {
 		return e
 	}
 	if e := m.manager.copyFromOwnerWithReceipt(a, source, b, receipt); e != nil {
 		return e
 	}
-	return m.PNormalize(a)
+	return m.pNormalizeWithReceipt(a, pn)
 }
 func (m *IntegerModularManager) IsUint64(a *Int) (bool, error) {
 	if e := m.check(); e != nil {

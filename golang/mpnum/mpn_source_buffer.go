@@ -50,7 +50,8 @@ func (s *sourceLimbBuffer) write(r *memory.Runtime, i, n uint32) error {
 	}
 	return r.WriteUint32(s.raw, uint64(i)*4, n)
 }
-func (s *sourceLimbBuffer) expand(r *memory.Runtime) error {
+func (s *sourceLimbBuffer) expand(r *memory.Runtime) error { return s.expandWithPNReceipt(r, nil) }
+func (s *sourceLimbBuffer) expandWithPNReceipt(r *memory.Runtime, receipt *naturalPNBufferReceipt) error {
 	if s.pending != (memory.Block{}) {
 		return arena.ErrInvalidSlot
 	}
@@ -64,6 +65,9 @@ func (s *sourceLimbBuffer) expand(r *memory.Runtime) error {
 	block, e := r.Allocate(request)
 	if block != (memory.Block{}) {
 		s.pending = block
+		if receipt != nil {
+			receipt.acquire(s, block)
+		}
 	}
 	if e != nil {
 		return e
@@ -78,28 +82,45 @@ func (s *sourceLimbBuffer) expand(r *memory.Runtime) error {
 		}
 	}
 	if s.raw != (memory.Block{}) {
-		if e = r.Deallocate(&s.raw); e != nil {
+		old := s.raw
+		e = r.Deallocate(&s.raw)
+		if receipt != nil && receipt.private && s.raw == (memory.Block{}) && receipt.published == old {
+			receipt.published = memory.Block{}
+		}
+		if e != nil {
 			return e
 		}
 	}
 	s.raw = block
 	s.pending = memory.Block{}
+	if receipt != nil {
+		receipt.publish(s, block)
+	}
 	s.cap = n
 	// cap zero after wrap cannot select inline storage: the endangered write
 	// below checks actual allocation size while this pending object remains owned.
 	if n == 0 {
 		s.pending = s.raw
+		if receipt != nil {
+			if receipt.private && receipt.published == s.pending {
+				receipt.published = memory.Block{}
+			}
+			receipt.acquire(s, s.pending)
+		}
 		s.raw = memory.Block{}
 		return arena.ErrBounds
 	}
 	return nil
 }
 func (s *sourceLimbBuffer) push(r *memory.Runtime, n uint32) error {
+	return s.pushWithPNReceipt(r, n, nil)
+}
+func (s *sourceLimbBuffer) pushWithPNReceipt(r *memory.Runtime, n uint32, receipt *naturalPNBufferReceipt) error {
 	if s.pending != (memory.Block{}) {
 		return arena.ErrInvalidSlot
 	}
 	if s.pos >= s.capacity() {
-		if e := s.expand(r); e != nil {
+		if e := s.expandWithPNReceipt(r, receipt); e != nil {
 			return e
 		}
 	}
@@ -110,12 +131,15 @@ func (s *sourceLimbBuffer) push(r *memory.Runtime, n uint32) error {
 	return nil
 }
 func (s *sourceLimbBuffer) resize(r *memory.Runtime, n uint32) error {
+	return s.resizeWithPNReceipt(r, n, nil)
+}
+func (s *sourceLimbBuffer) resizeWithPNReceipt(r *memory.Runtime, n uint32, receipt *naturalPNBufferReceipt) error {
 	if n < s.pos {
 		s.pos = n
 		return nil
 	}
 	for s.pos < n {
-		if e := s.push(r, 0); e != nil {
+		if e := s.pushWithPNReceipt(r, 0, receipt); e != nil {
 			return e
 		}
 	}

@@ -68,7 +68,8 @@ func (m *IntegerManager) MachineDiv(a, b, c *Int) error {
 	var dummy Int
 	return m.quotRemCore(a, b, c, &dummy, quotientOnly)
 }
-func (m *IntegerManager) Rem(a, b, c *Int) error {
+func (m *IntegerManager) Rem(a, b, c *Int) error { return m.remWithPNReceipt(a, b, c, nil) }
+func (m *IntegerManager) remWithPNReceipt(a, b, c *Int, pn *integerPNormalizeScope) error {
 	for _, n := range []*Int{a, b, c} {
 		if e := m.check(n); e != nil {
 			return e
@@ -81,7 +82,7 @@ func (m *IntegerManager) Rem(a, b, c *Int) error {
 		return m.SetInt64(c, int64(a.val)%int64(b.val))
 	}
 	var dummy Int
-	return m.quotRemCore(a, b, &dummy, c, remainderOnly)
+	return m.quotRemWithPNReceipt(a, b, &dummy, c, remainderOnly, pn)
 }
 
 // Div implements the source Euclidean quotient adjustment for a negative
@@ -138,12 +139,15 @@ func (m *IntegerManager) normalizedTmpSize(idx int, size uint32) uint32 {
 	return size
 }
 func (m *IntegerManager) quotRemCore(a, b, q, r *Int, mode int) error {
+	return m.quotRemWithPNReceipt(a, b, q, r, mode, nil)
+}
+func (m *IntegerManager) quotRemWithPNReceipt(a, b, q, r *Int, mode int, pn *integerPNormalizeScope) error {
 	sa, ca := m.signCell(a, 0)
 	sb, cb := m.signCell(b, 1)
 	na, nb := m.cell(ca).size, m.cell(cb).size
 	if nb > na {
 		if mode != quotientOnly {
-			if e := m.Copy(r, a); e != nil {
+			if e := m.copyFromOwnerWithReceipts(r, m, a, nil, pn); e != nil {
 				return e
 			}
 		}
@@ -153,10 +157,10 @@ func (m *IntegerManager) quotRemCore(a, b, q, r *Int, mode int) error {
 		return nil
 	}
 	qsize, rsize := na-nb+1, nb
-	if e := m.ensureTmp(0, qsize); e != nil {
+	if e := m.ensureTmpWithPNReceipt(0, qsize, pn); e != nil {
 		return e
 	}
-	if e := m.ensureTmp(1, rsize); e != nil {
+	if e := m.ensureTmpWithPNReceipt(1, rsize, pn); e != nil {
 		return e
 	}
 	if e := m.prepareTmpSpan(0, qsize); e != nil {
@@ -165,7 +169,7 @@ func (m *IntegerManager) quotRemCore(a, b, q, r *Int, mode int) error {
 	if e := m.prepareTmpSpan(1, rsize); e != nil {
 		return e
 	}
-	if e := m.divideCells(ca, cb); e != nil {
+	if e := m.divideCellsWithPNReceipt(ca, cb, pn); e != nil {
 		return e
 	}
 	sign := int32(1)
@@ -173,20 +177,23 @@ func (m *IntegerManager) quotRemCore(a, b, q, r *Int, mode int) error {
 		sign = -1
 	}
 	if mode != remainderOnly {
-		if e := m.publishTmpAt(0, q, sign, qsize); e != nil {
+		if e := m.publishTmpAtWithPNReceipt(0, q, sign, qsize, pn); e != nil {
 			return e
 		}
 	}
 	if mode != quotientOnly {
-		return m.publishTmpAt(1, r, sa, rsize)
+		return m.publishTmpAtWithPNReceipt(1, r, sa, rsize, pn)
 	}
 	return nil
 }
 
 // divideCells borrows ephemeral indexed views; no arena backing slice escapes.
 func (m *IntegerManager) divideCells(a, b numericCellRef) error {
+	return m.divideCellsWithPNReceipt(a, b, nil)
+}
+func (m *IntegerManager) divideCellsWithPNReceipt(a, b numericCellRef, pn *integerPNormalizeScope) error {
 	ca, cb := m.cell(a), m.cell(b)
 	cq, cr := m.cell(m.tmp[0]), m.cell(m.tmp[1])
-	_, e := m.natural.divide(limbView{allocator: m.allocator, backing: ca.backing, size: ca.size}, limbView{allocator: m.allocator, backing: cb.backing, size: cb.size}, limbView{allocator: m.allocator, backing: cq.backing, size: cq.span}, limbView{allocator: m.allocator, backing: cr.backing, size: cr.span})
+	_, e := m.natural.divideWithPNReceipt(limbView{allocator: m.allocator, backing: ca.backing, size: ca.size}, limbView{allocator: m.allocator, backing: cb.backing, size: cb.size}, limbView{allocator: m.allocator, backing: cq.backing, size: cq.span}, limbView{allocator: m.allocator, backing: cr.backing, size: cr.span}, pn)
 	return e
 }

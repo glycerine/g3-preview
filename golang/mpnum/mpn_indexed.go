@@ -105,6 +105,9 @@ func (m *NaturalManager) Div(a, b, q, r []uint32) (bool, error) {
 
 // divide is shared source Algorithm D over concrete ephemeral limb views.
 func (m *NaturalManager) divide(a, b, q, r limbView) (bool, error) {
+	return m.divideWithPNReceipt(a, b, q, r, nil)
+}
+func (m *NaturalManager) divideWithPNReceipt(a, b, q, r limbView, pn *integerPNormalizeScope) (bool, error) {
 	if e := m.check(); e != nil {
 		return false, e
 	}
@@ -138,14 +141,14 @@ func (m *NaturalManager) divide(a, b, q, r limbView) (bool, error) {
 	if na == 1 && nb == 1 {
 		q.write(0, a.read(0)/b.read(0))
 		r.write(0, a.read(0)%b.read(0))
-		return false, m.sourceVerifyDivision(a, b, q, r)
+		return false, m.sourceVerifyDivisionWithPNReceipt(a, b, q, r, pn)
 	}
 	if na == nb && a.read(na-1) < b.read(nb-1) {
 		q.write(0, 0)
 		for i := uint32(0); i < nb; i++ {
 			r.write(i, a.read(i))
 		}
-		return false, m.sourceVerifyDivision(a, b, q, r)
+		return false, m.sourceVerifyDivisionWithPNReceipt(a, b, q, r, pn)
 	}
 	if na == math.MaxUint32 {
 		return false, arena.ErrBounds
@@ -154,10 +157,10 @@ func (m *NaturalManager) divide(a, b, q, r limbView) (bool, error) {
 	for b.read(nb-1)<<d&0x80000000 == 0 {
 		d++
 	}
-	if e := m.resizeDiv(0, na+1); e != nil {
+	if e := m.resizeDivWithPNReceipt(0, na+1, pn); e != nil {
 		return false, e
 	}
-	if e := m.resizeDiv(1, nb); e != nil {
+	if e := m.resizeDivWithPNReceipt(1, nb, pn); e != nil {
 		return false, e
 	}
 	u, v := 0, 1
@@ -183,7 +186,7 @@ func (m *NaturalManager) divide(a, b, q, r limbView) (bool, error) {
 	if nb == 1 {
 		divideViewOne(limbView{runtime: m.runtime, source: &m.division[u], size: na + 1}, m.sourceDivRead(v, 0), q)
 	} else {
-		if e := m.divideMany(na+1, nb, q); e != nil {
+		if e := m.divideManyWithPNReceipt(na+1, nb, q, pn); e != nil {
 			return false, e
 		}
 	}
@@ -198,7 +201,7 @@ func (m *NaturalManager) divide(a, b, q, r limbView) (bool, error) {
 		}
 		r.write(nb-1, m.sourceDivRead(u, nb-1)>>d)
 	}
-	return true, m.sourceVerifyDivision(a, b, q, r)
+	return true, m.sourceVerifyDivisionWithPNReceipt(a, b, q, r, pn)
 }
 func divideViewOne(a limbView, b uint32, q limbView) {
 	denom := uint64(b)
@@ -223,10 +226,13 @@ func divideViewOne(a limbView, b uint32, q limbView) {
 // divideMany is source Knuth Algorithm D, including estimate correction,
 // single-limb multiplication, modular subtraction, and conditional add-back.
 func (m *NaturalManager) divideMany(size, n uint32, q limbView) error {
+	return m.divideManyWithPNReceipt(size, n, q, nil)
+}
+func (m *NaturalManager) divideManyWithPNReceipt(size, n uint32, q limbView, pn *integerPNormalizeScope) error {
 	if n > math.MaxUint32-2 {
 		return arena.ErrBounds
 	}
-	if e := m.resizeDiv(2, n+1); e != nil {
+	if e := m.resizeDivWithPNReceipt(2, n+1, pn); e != nil {
 		return e
 	}
 	u, v, ms := 0, 1, 2
@@ -279,7 +285,7 @@ func (m *NaturalManager) divideMany(size, n uint32, q limbView) error {
 		q.write(j, small)
 		if borrow != 0 {
 			q.write(j, small-1)
-			if e := m.resizeDiv(3, n+2); e != nil {
+			if e := m.resizeDivWithPNReceipt(3, n+2, pn); e != nil {
 				return e
 			}
 			ab := 3

@@ -317,6 +317,9 @@ func (m *IntegerManager) allocate(capacity, size uint32) (numericCellRef, error)
 	return m.allocateWithCopyReceipt(capacity, size, nil)
 }
 func (m *IntegerManager) allocateWithCopyReceipt(capacity, size uint32, s *integerCopyAllocationScope) (numericCellRef, error) {
+	return m.allocateWithInvocationReceipts(capacity, size, s, nil)
+}
+func (m *IntegerManager) allocateWithInvocationReceipts(capacity, size uint32, s *integerCopyAllocationScope, pn *integerPNormalizeScope) (numericCellRef, error) {
 	if modularSourceDebug && capacity < 6 {
 		return 0, ErrIntegerAssertion
 	}
@@ -325,7 +328,14 @@ func (m *IntegerManager) allocateWithCopyReceipt(capacity, size uint32, s *integ
 	}
 	var outcome memory.SmallAllocatorAllocationOutcome
 	var out *memory.SmallAllocatorAllocationOutcome
+	var roots *polynomialNumericRoots
 	if s != nil && s == &m.copyAllocation && s.active && s.executing {
+		roots = &s.roots
+	}
+	if pn != nil && pn.owner != nil && pn.owner.manager == m && pn == &pn.owner.normalization && pn.active && pn.executing {
+		roots = &pn.roots
+	}
+	if roots != nil {
 		out = &outcome
 	}
 	backing, e := allocateSourceCellWithOutcome(m.allocator, capacity, out)
@@ -333,10 +343,10 @@ func (m *IntegerManager) allocateWithCopyReceipt(capacity, size uint32, s *integ
 	m.pendingCell = backing
 	if out != nil {
 		if backing.object != (memory.ObjectRef{}) {
-			s.roots.cell = backing
+			roots.cell = backing
 		}
 		if outcome.Pending != (memory.Block{}) {
-			s.roots.allocator[0] = outcome.Pending
+			roots.allocator[0] = outcome.Pending
 		}
 	}
 	if e != nil {
@@ -349,8 +359,8 @@ func (m *IntegerManager) allocateWithCopyReceipt(capacity, size uint32, s *integ
 	ref := makeNumericRef(slot, gen)
 	m.store(ref, numericCell{backing: backing, capacity: capacity, unpublished: true})
 	m.pendingCell = sourceCellBacking{}
-	if out != nil && s.roots.cell == backing {
-		s.roots.cell = sourceCellBacking{}
+	if out != nil && roots.cell == backing {
+		roots.cell = sourceCellBacking{}
 	}
 	return ref, nil
 }
@@ -654,6 +664,9 @@ func (m *IntegerManager) CopyFromOwner(dst *Int, sourceManager *IntegerManager, 
 	return m.copyFromOwnerWithReceipt(dst, sourceManager, src, nil)
 }
 func (m *IntegerManager) copyFromOwnerWithReceipt(dst *Int, sourceManager *IntegerManager, src *Int, receipt *integerCopyAllocationReceipt) error {
+	return m.copyFromOwnerWithReceipts(dst, sourceManager, src, receipt, nil)
+}
+func (m *IntegerManager) copyFromOwnerWithReceipts(dst *Int, sourceManager *IntegerManager, src *Int, receipt *integerCopyAllocationReceipt, pn *integerPNormalizeScope) error {
 	if e := m.check(dst); e != nil {
 		return e
 	}
@@ -703,7 +716,7 @@ func (m *IntegerManager) copyFromOwnerWithReceipt(dst *Int, sourceManager *Integ
 			}()
 		}
 		var e error
-		ref, e = m.allocateWithCopyReceipt(source.capacity, source.size, owned)
+		ref, e = m.allocateWithInvocationReceipts(source.capacity, source.size, owned, pn)
 		if e != nil {
 			return e
 		}
@@ -832,6 +845,9 @@ func (m *IntegerManager) Compare(a, b *Int) (int, error) {
 }
 
 func (m *IntegerManager) ensureTmp(idx int, size uint32) error {
+	return m.ensureTmpWithPNReceipt(idx, size, nil)
+}
+func (m *IntegerManager) ensureTmpWithPNReceipt(idx int, size uint32, pn *integerPNormalizeScope) error {
 	if idx < 0 || idx >= len(m.tmp) || m.tmp[idx] == 0 {
 		return arena.ErrInvalidSlot
 	}
@@ -843,7 +859,7 @@ func (m *IntegerManager) ensureTmp(idx int, size uint32) error {
 	}
 	m.tmp[idx] = 0                // source leaves a dangling pointer; Go keeps a guarded hole
 	capacity := (3*size + 1) >> 1 // actual unsigned32 source arithmetic
-	ref, e := m.allocate(capacity, 0)
+	ref, e := m.allocateWithInvocationReceipts(capacity, 0, nil, pn)
 	if e != nil {
 		return e
 	}
@@ -861,6 +877,9 @@ func (m *IntegerManager) publishTmp(dst *Int, sign int32, size uint32) error {
 // publishTmpAt publishes the source sign/pointer/size prefix before requesting
 // missing scratch. Paired division calls the setters sequentially.
 func (m *IntegerManager) publishTmpAt(idx int, dst *Int, sign int32, size uint32) error {
+	return m.publishTmpAtWithPNReceipt(idx, dst, sign, size, nil)
+}
+func (m *IntegerManager) publishTmpAtWithPNReceipt(idx int, dst *Int, sign int32, size uint32, pn *integerPNormalizeScope) error {
 	if idx < 0 || idx >= len(m.tmp) || m.tmp[idx] == 0 {
 		return arena.ErrInvalidSlot
 	}
@@ -883,7 +902,7 @@ func (m *IntegerManager) publishTmpAt(idx int, dst *Int, sign int32, size uint32
 	m.resizeCell(ref, size)
 	if m.tmp[idx] == 0 {
 		var e error
-		m.tmp[idx], e = m.allocate(6, 0)
+		m.tmp[idx], e = m.allocateWithInvocationReceipts(6, 0, nil, pn)
 		if e == nil {
 			m.publishCell(m.tmp[idx])
 		}
@@ -894,6 +913,9 @@ func (m *IntegerManager) publishTmpAt(idx int, dst *Int, sign int32, size uint32
 func (m *IntegerManager) Add(a, b, c *Int) error { return m.addSub(a, b, c, false) }
 func (m *IntegerManager) Sub(a, b, c *Int) error { return m.addSub(a, b, c, true) }
 func (m *IntegerManager) addSub(a, b, c *Int, subtract bool) error {
+	return m.addSubWithPNReceipt(a, b, c, subtract, nil)
+}
+func (m *IntegerManager) addSubWithPNReceipt(a, b, c *Int, subtract bool, pn *integerPNormalizeScope) error {
 	for _, n := range []*Int{a, b, c} {
 		if e := m.check(n); e != nil {
 			return e
@@ -918,7 +940,7 @@ func (m *IntegerManager) addSub(a, b, c *Int, subtract bool) error {
 		if n == math.MaxUint32 {
 			return arena.ErrBounds
 		}
-		if e := m.ensureTmp(0, n+1); e != nil {
+		if e := m.ensureTmpWithPNReceipt(0, n+1, pn); e != nil {
 			return e
 		}
 		if e := m.prepareTmpSpan(0, n+1); e != nil {
@@ -938,7 +960,7 @@ func (m *IntegerManager) addSub(a, b, c *Int, subtract bool) error {
 			}
 		}
 		m.writeDigit(m.tmp[0], n, k)
-		return m.publishTmp(c, sign, n+1)
+		return m.publishTmpAtWithPNReceipt(0, c, sign, n+1, pn)
 	}
 	cmp := m.compareCells(ca, cb)
 	if cmp == 0 {
@@ -951,7 +973,7 @@ func (m *IntegerManager) addSub(a, b, c *Int, subtract bool) error {
 	} else {
 		n = na
 	}
-	if e := m.ensureTmp(0, n); e != nil {
+	if e := m.ensureTmpWithPNReceipt(0, n, pn); e != nil {
 		return e
 	}
 	if e := m.prepareTmpSpan(0, n); e != nil {
@@ -973,7 +995,7 @@ func (m *IntegerManager) addSub(a, b, c *Int, subtract bool) error {
 	if k != 0 {
 		panic("mpnum: unexpected subtraction borrow")
 	}
-	return m.publishTmp(c, sign, n)
+	return m.publishTmpAtWithPNReceipt(0, c, sign, n, pn)
 }
 
 func (m *IntegerManager) absUint64(a *Int) (uint64, error) {

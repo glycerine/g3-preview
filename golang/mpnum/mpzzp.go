@@ -18,6 +18,7 @@ var ErrModularUnsupported = errors.New("mpnum: source modular operation unsuppor
 // manager. It is caller-confined; Int operands obey the borrowed manager's
 // implicit ownership contract. Explicit Close replaces the source destructor.
 type IntegerModularManager struct {
+	normalization                                      integerPNormalizeScope
 	self                                               *IntegerModularManager
 	manager                                            *IntegerManager
 	z, prime, primeKnown, closed                       bool
@@ -96,6 +97,9 @@ func (m *IntegerModularManager) OwnerBytes() uint64 {
 	return m.header
 }
 func (m *IntegerModularManager) Close() error {
+	if m != nil && m.self == m && m.normalization.active {
+		return ErrPolynomialPending
+	}
 	if m == nil || m.self != m || m.manager == nil {
 		return ErrModularOwner
 	}
@@ -258,20 +262,52 @@ func (m *IntegerModularManager) assertNormalized(a *Int) error {
 	}
 	return nil
 }
-func (m *IntegerModularManager) PNormalize(a *Int) error {
+func (m *IntegerModularManager) PNormalize(a *Int) error { return m.pNormalizeWithReceipt(a, nil) }
+func (m *IntegerModularManager) pNormalizeWithReceipt(a *Int, receipt *integerPNormalizeInvocationReceipt) error {
 	if e := m.check(); e != nil {
 		return e
 	}
-	if !m.z {
-		if e := m.manager.Rem(a, &m.p, a); e != nil {
+	var scope *integerPNormalizeScope
+	if receipt != nil && !m.z {
+		// These are the reached Rem operand/divisor guards, before invocation.
+		if e := m.manager.check(a); e != nil {
 			return e
+		}
+		if e := m.manager.check(&m.p); e != nil {
+			return e
+		}
+		if m.p.val == 0 {
+			return ErrDivideByZero
+		}
+		scope = &m.normalization
+		if scope.active || scope.invocation == ^uint64(0) {
+			return ErrPolynomialPending
+		}
+		*scope = integerPNormalizeScope{owner: m, invocation: scope.invocation + 1, active: true, executing: true, stage: 1}
+		*receipt = integerPNormalizeInvocationReceipt{m, scope, scope.invocation}
+		defer func() {
+			if scope.sourceCause == nil {
+				scope.sourceCause = m.manager.natural.pnVerificationSourceCause(&scope.verification)
+			}
+			scope.executing = false
+			if !scope.pending() {
+				scope.active = false
+			}
+		}()
+	}
+	if !m.z {
+		if e := m.manager.remWithPNReceipt(a, &m.p, a, scope); e != nil {
+			return e
+		}
+		if scope != nil {
+			scope.stage = 2
 		}
 		gt, e := m.manager.Greater(a, &m.upper)
 		if e != nil {
 			return e
 		}
 		if gt {
-			if e = m.manager.Sub(a, &m.p, a); e != nil {
+			if e = m.manager.addSubWithPNReceipt(a, &m.p, a, true, scope); e != nil {
 				return e
 			}
 		} else {
@@ -280,7 +316,7 @@ func (m *IntegerModularManager) PNormalize(a *Int) error {
 				return e
 			}
 			if lt {
-				if e = m.manager.Add(a, &m.p, a); e != nil {
+				if e = m.manager.addSubWithPNReceipt(a, &m.p, a, false, scope); e != nil {
 					return e
 				}
 			}
