@@ -102053,7 +102053,10 @@
         "util_debug_actions_source_test.go",
         "util_debug_action_binding.go",
         "util_debug_action_binding_source_test.go",
-        "util_permutation_word_view.go"
+        "util_permutation_word_view.go",
+        "util_debug_global_service.go",
+        "util_debug_global_service_test.go",
+        "util_gparams_service_ops.go"
       ],
       "tests": [
         "TestDebugContextSourceLazyInitializationAndAssertions",
@@ -102113,7 +102116,12 @@
         "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
         "TestPermutationAcquiredWordGuardAfterActualBackingDestruction",
         "TestDebugBindingReciprocalPublicSetterKeepsOneActualStreamService",
-        "TestDebugBindingReverseOrderNullAndNoDebuggerConfiguration"
+        "TestDebugBindingReverseOrderNullAndNoDebuggerConfiguration",
+        "TestDebugGlobalServiceDefaultOwnersAndSourceFinalize",
+        "TestDebugGlobalServiceEveryConstructorRefusalKeepsBorrowedRegion",
+        "TestDebugGlobalServiceOwnerCopyAndDefaultBorrowLifetime",
+        "TestDebugGlobalServiceProcessSubprocessHelper",
+        "TestDebugGlobalServiceActualProcessDefaultFalseConsumerActions"
       ],
       "conditionals": [
         {
@@ -102252,6 +102260,18 @@
             "TestDebugBindingReciprocalPublicSetterKeepsOneActualStreamService",
             "TestDebugBindingReverseOrderNullAndNoDebuggerConfiguration"
           ]
+        },
+        {
+          "name": "Concrete default standard-stream/action service preparation and exact borrowed generated process Context finalizer; source-site namespace assertion transport with gate-before-condition and bare_str C continuation (src/util/debug.cpp:28-35; src/util/debug.cpp:44-68; src/util/debug.cpp:37-42,73-117; src/test/mem_initializer.cpp:13-20; src/util/gparams.cpp:558,564,569,574,579,584,589,594,603,609,614,619,624,629; src/util/symbol.h:96)",
+          "status": "partial",
+          "go_target": "util_debug_global_service.go",
+          "tests": [
+            "TestDebugGlobalServiceDefaultOwnersAndSourceFinalize",
+            "TestDebugGlobalServiceEveryConstructorRefusalKeepsBorrowedRegion",
+            "TestDebugGlobalServiceOwnerCopyAndDefaultBorrowLifetime",
+            "TestDebugGlobalServiceProcessSubprocessHelper",
+            "TestDebugGlobalServiceActualProcessDefaultFalseConsumerActions"
+          ]
         }
       ],
       "ownership": [
@@ -102267,7 +102287,8 @@
         "Bound invocation under actual FailAfter0 retains exact named Runtime forward/inverse raw bijection plus permutation/copy, debug/region, action/input, standard-service/two-file-stream cold sum before fault lift; no new Budget reservation.",
         "Source indexed std::swap lvalues acquired once: mutable vector.h:304 checks4 failed forward accesses in completed SIZE0 spare fixture; assignments write through reached lvalues without repeated SASSERT. Actual initialized spare reads/writes remain physically guarded.",
         "Call-local word views have no allocation or cold owner: pointer acquisition records actual provider/block/offset; retained live backing exchange test names both owner fields and validates complete raw/cold graph; genuine deallocation then makes captured token stale at reached load/store. No debugger mutation callbacks or snapshot authority.",
-        "Both public binding setters enforce the same nonnull interactive standard-service identity without reading pointed closed/input/file state. Actual same-Budget distinct-file services/hex-versus-decimal flags are rejected without pointer or charge mutation; null/unbound and NO_DEBUGGER stream-erasure preserved."
+        "Both public binding setters enforce the same nonnull interactive standard-service identity without reading pointed closed/input/file state. Actual same-Budget distinct-file services/hex-versus-decimal flags are rejected without pointer or charge mutation; null/unbound and NO_DEBUGGER stream-erasure preserved.",
+        "Actual reflected service and acquired helper headers charged once; only returned construction outcomes stored in named fields. Caller region/process descriptors and MemoryProcess borrowed children never adopted. Constructor horizons and process live cold graph audited before lifting real refusal."
       ],
       "deviations": [
         "Source process globals represented by an explicit single-goroutine cold owner; process-wide/context API macro binding remains open. CASSERT gate preserves assertions-before-tag order, but release consumers must erase its call; no source macro consumer completion claimed. notify_assertion_violation, invoke_gdb, interactive fatal/abort/throw/debugger profiles, output services and full global finalizer orchestration remain open. Existing real table/region Go accounting is not C++ global allocator identity. No registered assertion completion credit.",
@@ -102291,7 +102312,12 @@
         "Real bounded child A/EOF/NO_DEBUGGER source exits verified; Linux action context uses real process signal/shell adapter. Source Budget refusal is not proof of zero transient Go host heap allocation; collapsed internal nonzero system status is branch outcome only.",
         "Nested invariant fixture corrected2\u21924 C commands because two failed predicates per each of two terms; preserved actualEOF110 fixture log, not source algorithm RED.",
         "Frozen binding7 was superseded for actual lvalue capture: old putReached reevaluated current source field at store; corrected8 acquires both addresses before loads. Direct retained pointer-exchange proof is source pointer representation evidence, not ordinary source allocator failure credit.",
-        "Reciprocal binding guard is concrete Go owner/config-domain enforcement of the documented single source std::cerr reference; it does not establish process-global standard stream initialization or native ABI."
+        "Reciprocal binding guard is concrete Go owner/config-domain enforcement of the documented single source std::cerr reference; it does not establish process-global standard stream initialization or native ABI.",
+        "Existing utilhash.StrHashtable storage is Budget-backed pointer-free Go table, not memory.Runtime; actual global Runtime table/allocator accounting migration remains required next prerequisite",
+        "One explicit caller-supplied source global namespace; no package singleton/independent process Runtime adoption or native stdio static constructor claim",
+        "Default direct-Go file emission/classic input/flush profiles; native iostream locale/buffering/throwmask/unitbuf ABI and nonLinux OS/debugbreak remain qualified",
+        "Continued null g_imp is reached typed native-undefined-domain guard; no defined native nullptr continuation or source math-regression claim",
+        "No new source registered debug driver credit: src/test/heap.cpp:138 remains commented out, independent bounded fixtures only; no whole source unit promotion"
       ]
     },
     {
@@ -102326,7 +102352,10 @@
         "util_debug_action_binding_source_test.go",
         "util_permutation_word_view.go",
         "util_debug_macros.go",
-        "util_debug_macro_source_test.go"
+        "util_debug_macro_source_test.go",
+        "util_debug_global_service.go",
+        "util_debug_global_service_test.go",
+        "util_gparams_service_ops.go"
       ],
       "tests": [
         "TestDebugContextSourceLazyInitializationAndAssertions",
@@ -102408,7 +102437,12 @@
         "TestDebugMacroHeapNonInsertFalseMinReachesSourceNotification",
         "TestDebugMacroHeapMinContinueReachesConstIndexedSpare",
         "TestDebugMacroHeapRemainingFalseLeavesThrowBeforeBody",
-        "TestDebugMacroHeapNestedVectorShrinkContinuePublishesAfterAssertion"
+        "TestDebugMacroHeapNestedVectorShrinkContinuePublishesAfterAssertion",
+        "TestDebugGlobalServiceDefaultOwnersAndSourceFinalize",
+        "TestDebugGlobalServiceEveryConstructorRefusalKeepsBorrowedRegion",
+        "TestDebugGlobalServiceOwnerCopyAndDefaultBorrowLifetime",
+        "TestDebugGlobalServiceProcessSubprocessHelper",
+        "TestDebugGlobalServiceActualProcessDefaultFalseConsumerActions"
       ],
       "conditionals": [
         {
@@ -102684,6 +102718,18 @@
             "TestDebugMacroHeapRemainingFalseLeavesThrowBeforeBody",
             "TestDebugMacroHeapNestedVectorShrinkContinuePublishesAfterAssertion"
           ]
+        },
+        {
+          "name": "Concrete default standard-stream/action service preparation and exact borrowed generated process Context finalizer; source-site namespace assertion transport with gate-before-condition and bare_str C continuation (src/util/debug.cpp:28-35; src/util/debug.cpp:44-68; src/util/debug.cpp:37-42,73-117; src/test/mem_initializer.cpp:13-20; src/util/gparams.cpp:558,564,569,574,579,584,589,594,603,609,614,619,624,629; src/util/symbol.h:96)",
+          "status": "partial",
+          "go_target": "util_debug_global_service.go",
+          "tests": [
+            "TestDebugGlobalServiceDefaultOwnersAndSourceFinalize",
+            "TestDebugGlobalServiceEveryConstructorRefusalKeepsBorrowedRegion",
+            "TestDebugGlobalServiceOwnerCopyAndDefaultBorrowLifetime",
+            "TestDebugGlobalServiceProcessSubprocessHelper",
+            "TestDebugGlobalServiceActualProcessDefaultFalseConsumerActions"
+          ]
         }
       ],
       "ownership": [
@@ -102703,7 +102749,8 @@
         "Source indexed std::swap lvalues acquired once: mutable vector.h:304 checks4 failed forward accesses in completed SIZE0 spare fixture; assignments write through reached lvalues without repeated SASSERT. Actual initialized spare reads/writes remain physically guarded.",
         "Call-local word views have no allocation or cold owner: pointer acquisition records actual provider/block/offset; retained live backing exchange test names both owner fields and validates complete raw/cold graph; genuine deallocation then makes captured token stale at reached load/store. No debugger mutation callbacks or snapshot authority.",
         "Both public binding setters enforce the same nonnull interactive standard-service identity without reading pointed closed/input/file state. Actual same-Budget distinct-file services/hex-versus-decimal flags are rejected without pointer or charge mutation; null/unbound and NO_DEBUGGER stream-erasure preserved.",
-        "Concrete borrowed assertion/action/stream providers reuse actual charged existing headers; macro leaves and call-local scalar operands add no owning storage; actual heap refusal graph audited before fault lift."
+        "Concrete borrowed assertion/action/stream providers reuse actual charged existing headers; macro leaves and call-local scalar operands add no owning storage; actual heap refusal graph audited before fault lift.",
+        "Actual reflected service and acquired helper headers charged once; only returned construction outcomes stored in named fields. Caller region/process descriptors and MemoryProcess borrowed children never adopted. Constructor horizons and process live cold graph audited before lifting real refusal."
       ],
       "deviations": [
         "Source process globals represented by an explicit single-goroutine cold owner; process-wide/context API macro binding remains open. CASSERT gate preserves assertions-before-tag order, but release consumers must erase its call; no source macro consumer completion claimed. notify_assertion_violation, invoke_gdb, interactive fatal/abort/throw/debugger profiles, output services and full global finalizer orchestration remain open. Existing real table/region Go accounting is not C++ global allocator identity. No registered assertion completion credit.",
@@ -102737,7 +102784,12 @@
         "No whole debug.h/heap.h/source-driver promotion",
         "Legacy slice-backed heap and unbound SAT assertion adapters remain separately partial; concrete Runtime general heap false sites covered here",
         "Per-instance borrowed debug contexts represent selected source-global namespace; independent unrelated contexts are not a completed process-global registry binding",
-        "Outer check_invariant always returns true after nested C continuation; no observed false outer CASSERT or fabricated source line0 regression claim"
+        "Outer check_invariant always returns true after nested C continuation; no observed false outer CASSERT or fabricated source line0 regression claim",
+        "Existing utilhash.StrHashtable storage is Budget-backed pointer-free Go table, not memory.Runtime; actual global Runtime table/allocator accounting migration remains required next prerequisite",
+        "One explicit caller-supplied source global namespace; no package singleton/independent process Runtime adoption or native stdio static constructor claim",
+        "Default direct-Go file emission/classic input/flush profiles; native iostream locale/buffering/throwmask/unitbuf ABI and nonLinux OS/debugbreak remain qualified",
+        "Continued null g_imp is reached typed native-undefined-domain guard; no defined native nullptr continuation or source math-regression claim",
+        "No new source registered debug driver credit: src/test/heap.cpp:138 remains commented out, independent bounded fixtures only; no whole source unit promotion"
       ]
     },
     {
@@ -104149,7 +104201,9 @@
         "util_gparams_constructor_source.go",
         "util_gparams_service_ops.go",
         "util_memory_process_children.go",
-        "util_memory_process_assertion_binding_test.go"
+        "util_memory_process_assertion_binding_test.go",
+        "util_debug_global_service.go",
+        "util_debug_global_service_test.go"
       ],
       "tests": [
         "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
@@ -104203,7 +104257,12 @@
         "TestGlobalParamsNamespaceClosedDebugReadAfterSourceModuleArgument",
         "TestMemoryProcessPreparedNamespaceBorrowsActualAssertionOwner",
         "TestMemoryProcessPreparedNamespaceNullGuardUsesCurrentAssertionState",
-        "TestMemoryProcessPreparedNamespaceReadsBorrowedDebugAtActualSite"
+        "TestMemoryProcessPreparedNamespaceReadsBorrowedDebugAtActualSite",
+        "TestDebugGlobalServiceDefaultOwnersAndSourceFinalize",
+        "TestDebugGlobalServiceEveryConstructorRefusalKeepsBorrowedRegion",
+        "TestDebugGlobalServiceOwnerCopyAndDefaultBorrowLifetime",
+        "TestDebugGlobalServiceProcessSubprocessHelper",
+        "TestDebugGlobalServiceActualProcessDefaultFalseConsumerActions"
       ],
       "assertions": [
         {
@@ -104377,6 +104436,18 @@
             "TestMemoryProcessPreparedNamespaceNullGuardUsesCurrentAssertionState",
             "TestMemoryProcessPreparedNamespaceReadsBorrowedDebugAtActualSite"
           ]
+        },
+        {
+          "name": "Concrete default standard-stream/action service preparation and exact borrowed generated process Context finalizer; source-site namespace assertion transport with gate-before-condition and bare_str C continuation (src/util/debug.cpp:28-35; src/util/debug.cpp:44-68; src/util/debug.cpp:37-42,73-117; src/test/mem_initializer.cpp:13-20; src/util/gparams.cpp:558,564,569,574,579,584,589,594,603,609,614,619,624,629; src/util/symbol.h:96)",
+          "status": "partial",
+          "go_target": "util_gparams_service_ops.go",
+          "tests": [
+            "TestDebugGlobalServiceDefaultOwnersAndSourceFinalize",
+            "TestDebugGlobalServiceEveryConstructorRefusalKeepsBorrowedRegion",
+            "TestDebugGlobalServiceOwnerCopyAndDefaultBorrowLifetime",
+            "TestDebugGlobalServiceProcessSubprocessHelper",
+            "TestDebugGlobalServiceActualProcessDefaultFalseConsumerActions"
+          ]
         }
       ],
       "ownership": [
@@ -104384,13 +104455,19 @@
         "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open.",
         "Source g_imp binds only a completed imp at unconditional successful pointer assignment. Failed constructor preserves old current pointer and retains actual unfinished placement header/child in named failed chain. Successful overwrite retains actual previous owner in named predecessor chain without source destruction. Completed constructor members unwind reverse declaration order only; imp reset/destructor body never executes on incomplete object. Explicit owning Close separately drains current, predecessors and failed headers. Exact reflected headers and additional Go copied-text context are charged and named.",
         "Namespace facade reads actual current imp on every call. get_ref borrows the exact current ParamsRef; get_module returns an actual copied reference with independent caller ownership and no shadow snapshot. Namespace reset deletes table-held module references without destroying surviving caller references. One concrete DebugContext pointer is borrowed in the reflected cold service header, queried only at actual DEBUG SASSERT sites; release erases control accesses. Real output refusals retain completed stream prefix and actual source/cold owner graph before fault lift.",
-        "Existing service cold borrowed assertion pointer only, no allocation or new owner. All77 actual process initialization reservation prefixes unchanged; immediate named cold census after actual assertion/lifetime branches."
+        "Existing service cold borrowed assertion pointer only, no allocation or new owner. All77 actual process initialization reservation prefixes unchanged; immediate named cold census after actual assertion/lifetime branches.",
+        "Actual reflected service and acquired helper headers charged once; only returned construction outcomes stored in named fields. Caller region/process descriptors and MemoryProcess borrowed children never adopted. Constructor horizons and process live cold graph audited before lifting real refusal."
       ],
       "deviations": [
         "Explicit runtime lifetime, C long32/64 and C-locale IEEE64 profiles, charged Go scratch/backings and two borrowed byte streams. Complete generated catalog, process singleton/stdout wiring, OpenMP and physical global allocation hooks remain open.",
         "Explicit borrowed-owner single-lane namespace service, not process singleton/generated memory lifecycle completion. Actual C++ placement delete is no-op on failed ctor; Go owning abort refunds concrete retained storage separately. Source TRACE, native ABI/global Runtime table allocation, full descendant exceptional paths and arbitrary global bindings remain open. Independent source branch fixtures give no registered test-driver credit. TLS signed-host overflow stop is guarded undefined-domain evidence, not ordinary free failure/OOM.",
         "Explicit single-lane namespace binding, not process singleton/generated memory lifecycle. TRACE, native ostream/global stdout, global notification/debugger behavior and wider physical ABI/accounting remain open. Null current pointer with erased/disabled assertion reaches a typed undefined-pointer-domain guard. Symbol bare_str assertion uses actual numeric scalar at source argument site; numeric source ternary routes empty-name engine even with assertions disabled in debug. Independent fixtures give no registered driver credit.",
-        "Caller-confined assertion binding does not complete process-global macros, debugger notification, TRACE, or native ostream/ABI. Null-imp and closed-context cases are explicitly checked diagnostic domains."
+        "Caller-confined assertion binding does not complete process-global macros, debugger notification, TRACE, or native ostream/ABI. Null-imp and closed-context cases are explicitly checked diagnostic domains.",
+        "Existing utilhash.StrHashtable storage is Budget-backed pointer-free Go table, not memory.Runtime; actual global Runtime table/allocator accounting migration remains required next prerequisite",
+        "One explicit caller-supplied source global namespace; no package singleton/independent process Runtime adoption or native stdio static constructor claim",
+        "Default direct-Go file emission/classic input/flush profiles; native iostream locale/buffering/throwmask/unitbuf ABI and nonLinux OS/debugbreak remain qualified",
+        "Continued null g_imp is reached typed native-undefined-domain guard; no defined native nullptr continuation or source math-regression claim",
+        "No new source registered debug driver credit: src/test/heap.cpp:138 remains commented out, independent bounded fixtures only; no whole source unit promotion"
       ],
       "ownership_checks": [
         "actual source destructor reset/deletion/member cursor retained independently of sticky source cause; immediate named owner graph before sparse shrink fault lift; separate owning acknowledgment never replays failed source reset allocation; generated singleton ctor unwind and reached ParamsRef decrement-stop receipts remain open",
@@ -134511,7 +134588,10 @@
         "util_symbol.go",
         "util_string_buffer.go",
         "util_symbol_service.go",
-        "util_symbol_service_source_test.go"
+        "util_symbol_service_source_test.go",
+        "util_debug_global_service.go",
+        "util_debug_global_service_test.go",
+        "util_gparams_service_ops.go"
       ],
       "tests": [
         "TestSymbolSourceAssertions",
@@ -134524,7 +134604,12 @@
         "TestStringBufferOwnerConfigurationAndSymbolGuards",
         "TestSymbolServiceSourcePublicationAndReinitialize",
         "TestSymbolServiceSourceEveryConstructorReservation",
-        "TestSymbolServiceSourceCopiedOwnerAndPrepareFailure"
+        "TestSymbolServiceSourceCopiedOwnerAndPrepareFailure",
+        "TestDebugGlobalServiceDefaultOwnersAndSourceFinalize",
+        "TestDebugGlobalServiceEveryConstructorRefusalKeepsBorrowedRegion",
+        "TestDebugGlobalServiceOwnerCopyAndDefaultBorrowLifetime",
+        "TestDebugGlobalServiceProcessSubprocessHelper",
+        "TestDebugGlobalServiceActualProcessDefaultFalseConsumerActions"
       ],
       "conditionals": [
         {
@@ -134690,18 +134775,36 @@
             "TestSymbolServiceSourceEveryConstructorReservation",
             "TestSymbolServiceSourceCopiedOwnerAndPrepareFailure"
           ]
+        },
+        {
+          "name": "Concrete default standard-stream/action service preparation and exact borrowed generated process Context finalizer; source-site namespace assertion transport with gate-before-condition and bare_str C continuation (src/util/debug.cpp:28-35; src/util/debug.cpp:44-68; src/util/debug.cpp:37-42,73-117; src/test/mem_initializer.cpp:13-20; src/util/gparams.cpp:558,564,569,574,579,584,589,594,603,609,614,619,624,629; src/util/symbol.h:96)",
+          "status": "partial",
+          "go_target": "util_gparams_service_ops.go",
+          "tests": [
+            "TestDebugGlobalServiceDefaultOwnersAndSourceFinalize",
+            "TestDebugGlobalServiceEveryConstructorRefusalKeepsBorrowedRegion",
+            "TestDebugGlobalServiceOwnerCopyAndDefaultBorrowLifetime",
+            "TestDebugGlobalServiceProcessSubprocessHelper",
+            "TestDebugGlobalServiceActualProcessDefaultFalseConsumerActions"
+          ]
         }
       ],
       "ownership": [
         "Explicit owner-local SymbolManager (GO_PORT_PLAN.md B storage ownership) replaces mutable global cache. Manager owns region+table, strings live until Close, hot Symbol records contain only scalar origin/ref/generation/tag. Other managers are separate identity domains. Full nested cold/payload budget graph and mutex-protected canonical interning are audited. See PORT_PROGRESS.md#audit-symbol-port-status-md.",
         "Selected buffer insertion borrows SymbolManager only during the call, reads checked spelling bytes directly, and charges destination growth without intermediate Symbol.String text. See PORT_PROGRESS.md#audit-string-buffer-port-status-md.",
-        "Explicit SymbolService cold owner holds nullable symbol-table pointer. Actual SymbolManager constructor region/table publishes only after completion; destructor table/region precedes pointer clear. Separate Close retires service header. Process singleton/global Runtime accounting remain open; no such completion credit."
+        "Explicit SymbolService cold owner holds nullable symbol-table pointer. Actual SymbolManager constructor region/table publishes only after completion; destructor table/region precedes pointer clear. Separate Close retires service header. Process singleton/global Runtime accounting remain open; no such completion credit.",
+        "Actual reflected service and acquired helper headers charged once; only returned construction outcomes stored in named fields. Caller region/process descriptors and MemoryProcess borrowed children never adopted. Constructor horizons and process live cold graph audited before lifting real refusal."
       ],
       "deviations": [
         "Native tagged pointers become explicit scalar tags/refs and owner-bound opaque tokens; callers cannot reinterpret a foreign symbol or raw address. Source full uint32 AMD64 numerical baseline remains valid on every Go target, independently of configurable4/8 byte page geometry.",
         "Interner prepares source growth/probe, fills owned hash-prefix/spelling/NUL, then publishes; predictable failure never retains a caller query pointer. Earlier prepared storage may remain charged. Returned text is caller-owned, not temporarily budget-reserved.",
         "Source null/marked/numeric-invalid data operations return typed precondition errors instead of invalid dereferences; identical marked/dummy Less still returnsfalse before dereference as source.",
-        "Selected numerical buffer insertion preserves source k! publication before signed integer suffix; other INITIAL_SIZE template insertion specializations remain open."
+        "Selected numerical buffer insertion preserves source k! publication before signed integer suffix; other INITIAL_SIZE template insertion specializations remain open.",
+        "Existing utilhash.StrHashtable storage is Budget-backed pointer-free Go table, not memory.Runtime; actual global Runtime table/allocator accounting migration remains required next prerequisite",
+        "One explicit caller-supplied source global namespace; no package singleton/independent process Runtime adoption or native stdio static constructor claim",
+        "Default direct-Go file emission/classic input/flush profiles; native iostream locale/buffering/throwmask/unitbuf ABI and nonLinux OS/debugbreak remain qualified",
+        "Continued null g_imp is reached typed native-undefined-domain guard; no defined native nullptr continuation or source math-regression claim",
+        "No new source registered debug driver credit: src/test/heap.cpp:138 remains commented out, independent bounded fixtures only; no whole source unit promotion"
       ]
     },
     {
