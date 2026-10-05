@@ -42,10 +42,17 @@ func (s *RationalService) sourceFinalizeLocked() error {
 		return ErrRationalLexicalPending
 	}
 	s.sourceFinalizing = true
-	if s.sourceGuard {
+	if s.sourceGuard || s.sourceGlobalStopped {
 		return s.sourceCause
 	}
-	fail := func(e error) error { s.sourceCause = e; s.cleanupCause = e; return e }
+	fail := func(e error) error {
+		if s.sourceGlobalSlot != nil {
+			s.sourceGlobalStopped = true
+		}
+		s.sourceCause = e
+		s.cleanupCause = e
+		return e
+	}
 	if e := s.cleanupOuter(true); e != nil {
 		return fail(e)
 	}
@@ -54,6 +61,9 @@ func (s *RationalService) sourceFinalizeLocked() error {
 			s.sourceGuard = true
 		}
 		return fail(e)
+	}
+	if s.sourceGlobalSlot != nil {
+		*s.sourceGlobalSlot = nil
 	}
 	s.sourceFinalized = true
 	s.sourceCause = nil

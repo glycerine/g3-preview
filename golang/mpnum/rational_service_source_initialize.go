@@ -43,7 +43,13 @@ func (s *RationalService) InitializeSource() error {
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if s.closed || s.closing || s.sourceFinalizing {
+	if s.closed || s.closing {
+		return arena.ErrClosed
+	}
+	if s.sourceGlobalSlot != nil && *s.sourceGlobalSlot != nil {
+		return nil
+	}
+	if s.sourceFinalizing {
 		return arena.ErrClosed
 	}
 	if s.manager != nil {
@@ -65,6 +71,9 @@ func (s *RationalService) InitializeSource() error {
 		return e
 	}
 	s.manager = m // actual source pointer publication precedes every constant set
+	if s.sourceGlobalSlot != nil {
+		*s.sourceGlobalSlot = m
+	}
 	s.initializationStage = 1
 	e = s.initializeConstantsSource(m)
 	s.initializationCause = e
@@ -72,22 +81,37 @@ func (s *RationalService) InitializeSource() error {
 }
 
 func (s *RationalService) initializeConstantsSource(m *RationalManager) error {
+	if e := s.checkSourceStaticLifetimeLocked(SourceStaticZero); e != nil {
+		return e
+	}
 	if e := m.SetInt64(&s.zero, 0); e != nil {
 		return e
 	}
 	s.initializationStage = 2
+	if e := s.checkSourceStaticLifetimeLocked(SourceStaticOne); e != nil {
+		return e
+	}
 	if e := m.SetInt64(&s.one, 1); e != nil {
 		return e
 	}
 	s.initializationStage = 3
+	if e := s.checkSourceStaticLifetimeLocked(SourceStaticMinusOne); e != nil {
+		return e
+	}
 	if e := m.SetInt64(&s.minusOne, -1); e != nil {
 		return e
 	}
 	s.initializationStage = 4
+	if e := s.checkSourceStaticLifetimeLocked(SourceStaticInfZero); e != nil {
+		return e
+	}
 	if e := s.initInfRationalConstants(); e != nil {
 		return e
 	}
 	s.initializationStage = 5
+	if e := s.checkSourceStaticLifetimeLocked(SourceStaticInfIntZero); e != nil {
+		return e
+	}
 	if e := s.initInfIntRationalConstants(); e != nil {
 		return e
 	}

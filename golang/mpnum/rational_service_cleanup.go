@@ -57,7 +57,7 @@ func (s *RationalService) CloseChecked() error {
 	}
 	s.closing = true
 	fail := func(e error) error { s.cleanupCause = e; return s }
-	if s.sourceFinalizing && !s.sourceFinalized && !s.sourceGuard {
+	if s.sourceFinalizing && !s.sourceFinalized && !s.sourceGuard && !s.sourceGlobalStopped {
 		if e := s.sourceFinalizeLocked(); e != nil {
 			return fail(e)
 		}
@@ -100,6 +100,22 @@ func (s *RationalService) cleanupOuter(source bool) error {
 		&s.infMinusOne.second.num, &s.infMinusOne.second.den, &s.infMinusOne.first.num, &s.infMinusOne.first.den,
 		&s.infIntZero.first.num, &s.infIntZero.first.den, &s.infIntOne.first.num, &s.infIntOne.first.den, &s.infIntMinusOne.first.num, &s.infIntMinusOne.first.den}
 	for s.cleanupStage < 18 {
+		if source && s.sourceGlobalSlot != nil {
+			switch s.cleanupStage {
+			case 0:
+				s.sourceEndedStatics |= 1 << SourceStaticInfZero
+			case 4:
+				s.sourceEndedStatics |= 1 << SourceStaticInfOne
+			case 8:
+				s.sourceEndedStatics |= 1 << SourceStaticInfMinusOne
+			case 12:
+				s.sourceEndedStatics |= 1 << SourceStaticInfIntZero
+			case 14:
+				s.sourceEndedStatics |= 1 << SourceStaticInfIntOne
+			case 16:
+				s.sourceEndedStatics |= 1 << SourceStaticInfIntMinusOne
+			}
+		}
 		if e := s.releaseOuterLeaf(infRoots[s.cleanupStage], source); e != nil {
 			return e
 		}
@@ -142,6 +158,16 @@ func (s *RationalService) cleanupOuter(source bool) error {
 	}
 	constants := [6]*Int{&s.zero.num, &s.zero.den, &s.one.num, &s.one.den, &s.minusOne.num, &s.minusOne.den}
 	for s.cleanupStage < 25 {
+		if source && s.sourceGlobalSlot != nil {
+			switch s.cleanupStage {
+			case 19:
+				s.sourceEndedStatics |= 1 << SourceStaticZero
+			case 21:
+				s.sourceEndedStatics |= 1 << SourceStaticOne
+			case 23:
+				s.sourceEndedStatics |= 1 << SourceStaticMinusOne
+			}
+		}
 		if e := s.releaseOuterLeaf(constants[s.cleanupStage-19], source); e != nil {
 			return e
 		}

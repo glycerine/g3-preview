@@ -66,6 +66,9 @@ type RationalService struct {
 	initializationFailure                          *IntegerManager
 	initializationCause                            error
 	initializationStage                            uint8
+	sourceGlobalSlot                               **RationalManager
+	sourceEndedStatics                             uint16
+	sourceGlobalStopped                            bool
 }
 
 func nextRationalServiceID() (uint64, error) {
