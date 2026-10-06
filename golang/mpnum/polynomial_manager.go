@@ -46,6 +46,7 @@ type polynomialCreation struct {
 	buffer             *polynomialSOM
 }
 type MultivariatePolynomialCore struct {
+	collectingVariables                                                                        bool
 	somNormalizationOwner                                                                      polynomialSOMNormalizeInvocationReceipt
 	normalizationOwner                                                                         polynomialNormalizeInvocationReceipt
 	constantCoefficientInvocation                                                              polynomialConstantCoefficientScope
@@ -262,6 +263,9 @@ func (m *MultivariatePolynomialCore) Error() string {
 }
 func (m *MultivariatePolynomialCore) Unwrap() error { return m.originalCause }
 func (m *MultivariatePolynomialCore) check() error {
+	if m != nil && m.self == m && m.collectingVariables {
+		return ErrPolynomialPending
+	}
 	if m == nil || m.self != m {
 		return ErrPolynomialOwner
 	}
@@ -446,6 +450,9 @@ func (m *MultivariatePolynomialCore) MkTerms(as []Int, ms []Monomial) (Polynomia
 	return m.som.mk(false)
 }
 func (m *MultivariatePolynomialCore) CloseChecked() error {
+	if m != nil && m.self == m && m.collectingVariables {
+		return ErrPolynomialPending
+	}
 	if m != nil && m.self == m && m.normalizationPending() {
 		return ErrPolynomialPending
 	}

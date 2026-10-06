@@ -13,6 +13,7 @@ import (
 // bytes are authoritative; there is no shadow slice or per-variable owner.
 // The extra charged cold header and stopped-release cursor are Go adapters.
 type PolynomialVariableDegrees struct {
+	collecting                                          bool
 	self                                                *PolynomialVariableDegrees
 	runtime                                             *memory.Runtime
 	constructed, rawDestroyed, copyBroken               bool
@@ -45,6 +46,9 @@ func (d *PolynomialVariableDegrees) identity() error {
 	return d.runtime.CheckOpen()
 }
 func (d *PolynomialVariableDegrees) open() error {
+	if d != nil && d.self == d && d.collecting {
+		return ErrPolynomialPending
+	}
 	if e := d.identity(); e != nil {
 		return e
 	}
@@ -184,6 +188,9 @@ func (d *PolynomialVariableDegrees) Degree(x uint32) (uint32, error) {
 // The implicit source member destructor sees only published m_data. Failed
 // initial allocation roots belong to explicit owning abort, not source unwind.
 func (d *PolynomialVariableDegrees) SourceFinalize() error {
+	if d != nil && d.self == d && d.collecting {
+		return ErrPolynomialPending
+	}
 	if e := d.identity(); e != nil {
 		return e
 	}
@@ -207,6 +214,9 @@ func (d *PolynomialVariableDegrees) SourceFinalize() error {
 	return nil
 }
 func (d *PolynomialVariableDegrees) CloseChecked() error {
+	if d != nil && d.self == d && d.collecting {
+		return ErrPolynomialPending
+	}
 	if d == nil || d.self != d {
 		return ErrPolynomialOwner
 	}

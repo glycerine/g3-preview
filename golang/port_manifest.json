@@ -29548,7 +29548,11 @@
         "mpnum/polynomial_psc_classic_prefix_source_test.go",
         "mpnum/polynomial_psc_classic_source_test.go",
         "mpnum/polynomial_normalize_allocation_context.go",
-        "mpnum/polynomial_som_normalize_allocation_context.go"
+        "mpnum/polynomial_som_normalize_allocation_context.go",
+        "mpnum/polynomial_sign.go",
+        "mpnum/polynomial_sign_source_test.go",
+        "mpnum/polynomial_vars.go",
+        "mpnum/polynomial_vars_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -30344,7 +30348,16 @@
         "TestPolynomialSOMNormalizeFirstOwnCauseHistory",
         "TestPolynomialNormalizeGCDParentRetainsActualStoppedChild",
         "TestPolynomialSOMNormalizeActualStandaloneMember",
-        "TestPolynomialSOMNormalizeStandaloneSourceOwnerProtectsActualChild"
+        "TestPolynomialSOMNormalizeStandaloneSourceOwnerProtectsActualChild",
+        "TestPolynomialSignSourceTable",
+        "TestPolynomialSignSourceUnreadSuffixAndNoReservation",
+        "TestPolynomialSignSourceZeroCoefficientAndOwnerGuards",
+        "TestPolynomialSignSourceModularCoefficientBoundary",
+        "TestPolynomialVarsOriginalDormantAssertions",
+        "TestPolynomialVarsEveryActualReservationAndNamedGraph",
+        "TestPolynomialVarsFlagBeforePushAndNormalOnlyReset",
+        "TestPolynomialVarsReturningTransportOwnerReentry",
+        "TestPolynomialVarsLiteralResetEmptyWarmAndBorrowGuards"
       ],
       "conditionals": [
         {
@@ -34092,6 +34105,29 @@
           "tests": [
             "TestPolynomialNormalizeGCDParentRetainsActualStoppedChild"
           ]
+        },
+        {
+          "name": "sign, is_pos, is_neg, is_nonpos, is_nonneg polynomial.cpp:6101-6176,7336-7354: literal three-valued term consensus and incomplete even-power sign predicates",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_sign.go",
+          "tests": [
+            "TestPolynomialSignSourceTable",
+            "TestPolynomialSignSourceUnreadSuffixAndNoReservation",
+            "TestPolynomialSignSourceZeroCoefficientAndOwnerGuards",
+            "TestPolynomialSignSourceModularCoefficientBoundary"
+          ]
+        },
+        {
+          "name": "vars polynomial.cpp:3186-3205,7359-7361: literal output reset/bool reserve/first-encounter flags/push and normal-only flag reset",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_vars.go",
+          "tests": [
+            "TestPolynomialVarsOriginalDormantAssertions",
+            "TestPolynomialVarsEveryActualReservationAndNamedGraph",
+            "TestPolynomialVarsFlagBeforePushAndNormalOnlyReset",
+            "TestPolynomialVarsReturningTransportOwnerReentry",
+            "TestPolynomialVarsLiteralResetEmptyWarmAndBorrowGuards"
+          ]
         }
       ],
       "ownership": [
@@ -34218,7 +34254,10 @@
         "Actual source/own finishing plus executing and callbackDepth guards refuse recursive deletion cleanup before cursor/root/history mutation. Whole source/own manager refusal precedes older body/core mutations. Caller-owned stopped vector Reset is acknowledged by the caller owner, not a parent row sweep. Stale/copy tuples and an actual later failed Coeff frame preserve foreign roots and Budget state.",
         "Normalize and each actual SOM member retain concrete manager/frame/nonwrapping invocation contexts at real guarded source entry. SET/GCD/Div/PN/RAW/Natural acquisition authority is transported directly through the actual allocation/publication leaves, never derived from pending-root snapshots. Source g/a destruction remains separate from explicit false acknowledgment and true unjoined abort. Captured Substitution SOM child is acknowledged before older caller locals and aborted afterward; stopped source cursors and first body/source/own diagnostic causes survive acknowledgment until the next actual invocation.",
         "An actual standalone SOM source class is accepted only through its existing charged wrapper self/storage and exact embedded buffer address, in addition to the four imp members. Guarded helper begin captures the concrete current SOM tuple for owner refusal; no callback or copied buffer gains allocation authority. An inactive standalone class has no scoped g constructor and therefore invokes no g cleanup. GCD source completion tests its actual captured Normalize child before retirement, and source/owning inactive records preserve that child history until actual context end.",
-        "The standalone source owner refuses its older class-vector SourceFinalize prefix while an actual constructed helper g remains active. Exact source body/cleanup executing guards also precede standalone owning mutation. The guarded-child proof preserves the original Runtime state, source stage/start flag, raw vector and numeral token before explicit owning acknowledgment."
+        "The standalone source owner refuses its older class-vector SourceFinalize prefix while an actual constructed helper g remains active. Exact source body/cleanup executing guards also precede standalone owning mutation. The guarded-child proof preserves the original Runtime state, source stage/start flag, raw vector and numeral token before explicit owning acknowledgment.",
+        "polynomial.cpp:6101-6176: read-only borrowed polynomial/monomial/coefficient views; no NUM declarations, INC/DEC, reset, source destructor, pending acquisition or owning continuation occurs. Term size precedes coefficient is_pos; variable then degree precedes default-unknown sign lookup. Unknown/different term sign and odd-power rejection skip later source records.",
+        "polynomial.cpp:3186-3205: actual caller-owned unsigned vector and persistent imp m_found_vars bool vector retain their own direct raw/pending leaves. No source NUM/ref local is declared, no INC/DEC or child receipt is invented. Failed push leaves preceding true flag, and final reset loop runs only after successful body; later source retry skips retained flag without adapter repair.",
+        "polynomial.cpp:3186-3205: executing metadata in actual core/output owners refuses returning Runtime ErrorTransport reentry before source/own destruction, output mutation or same-call reset. Reflected existing owner charges include these scalar fields; flags convey no raw/numeric acquisition authority."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -34315,7 +34354,10 @@
         "Dormant classic alternative gains zero active registered-driver assertion credit. Default polynomial.cpp:5897-5902 stays optimized, all accepted optimized/PSC1/PSC2/Subchain bytes are retained. Selected classic closure does not promote the whole polynomial unit or alter DEBUG/TRACE behavior.",
         "Actual reached Power AddMul RAW end-DT stop is a qualified signed-host TLS owner-primitive profile, not ordinary mathematical free OOM. Returning deletion callbacks and invalid Go owner/frame metadata tests are explicit Go helper domains. Independent bounded elimination checks cover regular, defective, swapped and zero outputs, separate from source literal recurrence.",
         "Initial missing-API test also contained a fixture pointer compilation mistake; corrected read-only missing-API baseline proves only absent PSCChainClassic. Zero polynomial has no coefficient slot0, so its independent oracle uses IsZero. Retry after a real caller vector Reset stop requires caller-own acknowledgment; historical unsupported immediate source retry is preserved separately from the genuine whole-owner source reentry RED.",
-        "Selected Normalize and reached nested SOM/Substitution continuation closure only; broader source unit remains partial and no dormant original driver assertion credit is added. Signed-host TLS destructor-stop tests are explicit owner-primitive guard profiles, not ordinary mathematical free OOM. Returning Runtime callbacks, copied metadata and saved-context refusal tests cover supported Go owner boundaries. Historical retained-Substitution broad RED and withdrawn initial source-stop recipe are preserved independently."
+        "Selected Normalize and reached nested SOM/Substitution continuation closure only; broader source unit remains partial and no dormant original driver assertion credit is added. Signed-host TLS destructor-stop tests are explicit owner-primitive guard profiles, not ordinary mathematical free OOM. Returning Runtime callbacks, copied metadata and saved-context refusal tests cover supported Go owner boundaries. Historical retained-Substitution broad RED and withdrawn initial source-stop recipe are preserved independently.",
+        "polynomial.cpp:6101-6176: PolynomialSign is the concrete source int32 lbool representation because root package lbool is private; source enum values -1/0/1 are retained. Source predicates are intentionally incomplete: unknown even-power variable stays unknown, zero polynomial sign is unknown, zero polynomial satisfies both non-strict checks. No original active driver assertion credit.",
+        "polynomial.cpp:3186-3205: returning allocation transport callbacks are a supported Go owner domain, separately qualified from original C++ source. Invalid Go polynomial borrow is guarded at reached p.size after literal output reset/reserve; invalid/copy output and manager guards precede source body.",
+        "src/test/polynomial.cpp:837-879,1824-1825,1853: seven literal dormant Vars cases retain seven size and twenty sorted variable ENSURE comparisons (27 source assertions). The driver returns at line1825 before Vars at line1853; active original-driver credit is zero. Existing pure-Go expression parser maps x0..x4 to a,b,c,d,x and evaluates original arithmetic."
       ]
     },
     {
@@ -34538,7 +34580,11 @@
         "mpnum/polynomial_subresultant_chain_callback_source_test.go",
         "mpnum/polynomial_subresultant_chain_child_stop_source_test.go",
         "mpnum/polynomial_subresultant_chain_prefix_source_test.go",
-        "mpnum/polynomial_subresultant_chain_source_test.go"
+        "mpnum/polynomial_subresultant_chain_source_test.go",
+        "mpnum/polynomial_sign.go",
+        "mpnum/polynomial_sign_source_test.go",
+        "mpnum/polynomial_vars.go",
+        "mpnum/polynomial_vars_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -35050,7 +35096,16 @@
         "TestPolynomialSubresultantChainSourceRegularFixture",
         "TestPolynomialSubresultantChainDefectiveGapAndSwappedInputs",
         "TestPolynomialSubresultantChainCheckedSourceAssertions",
-        "TestPolynomialSubresultantChainActualUnsignedResizeWrap"
+        "TestPolynomialSubresultantChainActualUnsignedResizeWrap",
+        "TestPolynomialSignSourceTable",
+        "TestPolynomialSignSourceUnreadSuffixAndNoReservation",
+        "TestPolynomialSignSourceZeroCoefficientAndOwnerGuards",
+        "TestPolynomialSignSourceModularCoefficientBoundary",
+        "TestPolynomialVarsOriginalDormantAssertions",
+        "TestPolynomialVarsEveryActualReservationAndNamedGraph",
+        "TestPolynomialVarsFlagBeforePushAndNormalOnlyReset",
+        "TestPolynomialVarsReturningTransportOwnerReentry",
+        "TestPolynomialVarsLiteralResetEmptyWarmAndBorrowGuards"
       ],
       "conditionals": [
         {
@@ -36628,6 +36683,29 @@
             "TestPolynomialSubresultantChainCheckedSourceAssertions",
             "TestPolynomialSubresultantChainActualUnsignedResizeWrap"
           ]
+        },
+        {
+          "name": "sign, is_pos, is_neg, is_nonpos, is_nonneg polynomial.cpp:6101-6176,7336-7354: literal three-valued term consensus and incomplete even-power sign predicates",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_sign.go",
+          "tests": [
+            "TestPolynomialSignSourceTable",
+            "TestPolynomialSignSourceUnreadSuffixAndNoReservation",
+            "TestPolynomialSignSourceZeroCoefficientAndOwnerGuards",
+            "TestPolynomialSignSourceModularCoefficientBoundary"
+          ]
+        },
+        {
+          "name": "vars polynomial.cpp:3186-3205,7359-7361: literal output reset/bool reserve/first-encounter flags/push and normal-only flag reset",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_vars.go",
+          "tests": [
+            "TestPolynomialVarsOriginalDormantAssertions",
+            "TestPolynomialVarsEveryActualReservationAndNamedGraph",
+            "TestPolynomialVarsFlagBeforePushAndNormalOnlyReset",
+            "TestPolynomialVarsReturningTransportOwnerReentry",
+            "TestPolynomialVarsLiteralResetEmptyWarmAndBorrowGuards"
+          ]
         }
       ],
       "ownership": [
@@ -36680,7 +36758,10 @@
         "Derivative captures only its actual returned callee receipt. False owning phase preserves unjoined raw; true phase follows matched creation abort and drains only exact allocation authority. Later foreign replacements and original stopped history remain unchanged.",
         "Scalar ExactDiv source polynomial.cpp:5094-5114 resets R before actual RAW tmp, captures direct Copy/Div and real negative RAW/field/PN/compiled Bool NUM children at their actual calls, and reaches explicit end-only DEL before R.mk. Actual matched cleanup owns only saved frame/nonwrapping invocation roots; public executing-owner guard precedes mutation; immutable child/body history survives acknowledgment. No failed-body synthetic DEL or global scratch sweep.",
         "Actual embedded full-manager frame and nonwrapping invocation; only real SET incoming INC and three constructed references are acquired. Child completed source suffix precedes older newS/prem/R destruction; unjoined assignment/child ownership abort follows older declarations. Caller output range remains independent.",
-        "SET source INC precedes actual vector operator[] assertion and old-slot read (ref_vector.h:128-132; vector.h:303-311). Actual n+1 unsigned wrap test retains incoming INC before checked assertion/native bounds guard; exact own abort never reads or writes an old slot that was not reached. Native invalid-range memory access remains a Go guard qualification, not C++ undefined-access equivalence."
+        "SET source INC precedes actual vector operator[] assertion and old-slot read (ref_vector.h:128-132; vector.h:303-311). Actual n+1 unsigned wrap test retains incoming INC before checked assertion/native bounds guard; exact own abort never reads or writes an old slot that was not reached. Native invalid-range memory access remains a Go guard qualification, not C++ undefined-access equivalence.",
+        "polynomial.cpp:6101-6176: read-only borrowed polynomial/monomial/coefficient views; no NUM declarations, INC/DEC, reset, source destructor, pending acquisition or owning continuation occurs. Term size precedes coefficient is_pos; variable then degree precedes default-unknown sign lookup. Unknown/different term sign and odd-power rejection skip later source records.",
+        "polynomial.cpp:3186-3205: actual caller-owned unsigned vector and persistent imp m_found_vars bool vector retain their own direct raw/pending leaves. No source NUM/ref local is declared, no INC/DEC or child receipt is invented. Failed push leaves preceding true flag, and final reset loop runs only after successful body; later source retry skips retained flag without adapter repair.",
+        "polynomial.cpp:3186-3205: executing metadata in actual core/output owners refuses returning Runtime ErrorTransport reentry before source/own destruction, output mutation or same-call reset. Reflected existing owner charges include these scalar fields; flags convey no raw/numeric acquisition authority."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -36731,7 +36812,10 @@
         "Original tst_sqf seven expressions are dormant: zero registered source driver credit. Literal GF2 derivative-zero GCD/exact-division result is preserved. Source units remain partial; full parent Factor and strict UP prime/Hensel suffixes remain open.",
         "Selected actual monomial raw allocator transport closure only; whole source classes/units and fullFactor remain partial; dormant registered driver credit0.",
         "Source remark equal-degree limitation and checked assertions retained. Default registered PSC dispatch uses optimized chain; dormant alternative gains zero active-driver credit. Pointer resize evidence covers only reached growth after completed reset, not ref_vector shrink. Signed-host TLS source release proof is an owner-primitive profile, not ordinary mathematical OOM. Actual mpz.h:156-163 old-TMP destruction before failing replacement leaves tmp[i]==0; only that literal dangling-pointer guard domain expects ErrInvalidSlot on retry. No scratch repair.",
-        "Literal uint32 arithmetic is retained for n+1 and degree/exponent differences; defective zero-gap loop casts unsigned endpoints to signed int32. Bounded owner budgets refuse oversized range allocation before signed-gap execution. Source signed overflow beyond defined loop domain gains no mathematical completion claim."
+        "Literal uint32 arithmetic is retained for n+1 and degree/exponent differences; defective zero-gap loop casts unsigned endpoints to signed int32. Bounded owner budgets refuse oversized range allocation before signed-gap execution. Source signed overflow beyond defined loop domain gains no mathematical completion claim.",
+        "polynomial.cpp:6101-6176: PolynomialSign is the concrete source int32 lbool representation because root package lbool is private; source enum values -1/0/1 are retained. Source predicates are intentionally incomplete: unknown even-power variable stays unknown, zero polynomial sign is unknown, zero polynomial satisfies both non-strict checks. No original active driver assertion credit.",
+        "polynomial.cpp:3186-3205: returning allocation transport callbacks are a supported Go owner domain, separately qualified from original C++ source. Invalid Go polynomial borrow is guarded at reached p.size after literal output reset/reserve; invalid/copy output and manager guards precede source body.",
+        "src/test/polynomial.cpp:837-879,1824-1825,1853: seven literal dormant Vars cases retain seven size and twenty sorted variable ENSURE comparisons (27 source assertions). The driver returns at line1825 before Vars at line1853; active original-driver credit is zero. Existing pure-Go expression parser maps x0..x4 to a,b,c,d,x and evaluates original arithmetic."
       ]
     },
     {
@@ -98643,7 +98727,9 @@
         "mpnum/polynomial_composition_test.go",
         "mpnum/polynomial_sqrt.go",
         "mpnum/polynomial_sqrt_test.go",
-        "mpnum/polynomial_resultant_source_test.go"
+        "mpnum/polynomial_resultant_source_test.go",
+        "mpnum/polynomial_vars.go",
+        "mpnum/polynomial_vars_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -98761,7 +98847,12 @@
         "TestPolynomialResultantIndependentDegreeAndSignTable",
         "TestPolynomialResultantEveryReservationPrefix",
         "TestPolynomialResultantBigNumeralEveryReservationPrefix",
-        "TestPolynomialResultantAllEightOriginalPSCAssertions"
+        "TestPolynomialResultantAllEightOriginalPSCAssertions",
+        "TestPolynomialVarsOriginalDormantAssertions",
+        "TestPolynomialVarsEveryActualReservationAndNamedGraph",
+        "TestPolynomialVarsFlagBeforePushAndNormalOnlyReset",
+        "TestPolynomialVarsReturningTransportOwnerReentry",
+        "TestPolynomialVarsLiteralResetEmptyWarmAndBorrowGuards"
       ],
       "conditionals": [
         {
@@ -99240,11 +99331,25 @@
             "TestPolynomialResultantAllEightOriginalPSCAssertions",
             "TestPolynomialResultantRegisteredPSCThirdAssertion"
           ]
+        },
+        {
+          "name": "vars polynomial.cpp:3186-3205,7359-7361: literal output reset/bool reserve/first-encounter flags/push and normal-only flag reset",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_vars.go",
+          "tests": [
+            "TestPolynomialVarsOriginalDormantAssertions",
+            "TestPolynomialVarsEveryActualReservationAndNamedGraph",
+            "TestPolynomialVarsFlagBeforePushAndNormalOnlyReset",
+            "TestPolynomialVarsReturningTransportOwnerReentry",
+            "TestPolynomialVarsLiteralResetEmptyWarmAndBorrowGuards"
+          ]
         }
       ],
       "ownership": [
         "Concrete reflected composition scope borrows source degree2pos member, owns actual completed numeral/poly locals and exact created-outcome orphan cohort. Source auxiliary then degree then local destruction; matching younger constant numeral\u2192rational NUM/DEN stop preserves older locals and sticky causes. Explicit owning cleanup resumes matching callee first and acknowledges only its exact consumed returned result; physical pending ObjectRef/triples and borrowed callbacks remain separate, no registry-derived authority.",
-        "Charged concrete scope owns actual four scoped NUMs, RAW two, monomial_ref, exact created-only cohort and matched callee/factory/physical receipts. Successful incoming INC transfers output before older DEC callback; source destruction is reverse lexical and stops before older fields, separate from explicit owning CleanupSqrt."
+        "Charged concrete scope owns actual four scoped NUMs, RAW two, monomial_ref, exact created-only cohort and matched callee/factory/physical receipts. Successful incoming INC transfers output before older DEC callback; source destruction is reverse lexical and stops before older fields, separate from explicit owning CleanupSqrt.",
+        "polynomial.cpp:3186-3205: actual caller-owned unsigned vector and persistent imp m_found_vars bool vector retain their own direct raw/pending leaves. No source NUM/ref local is declared, no INC/DEC or child receipt is invented. Failed push leaves preceding true flag, and final reset loop runs only after successful body; later source retry skips retained flag without adapter repair.",
+        "polynomial.cpp:3186-3205: executing metadata in actual core/output owners refuses returning Runtime ErrorTransport reentry before source/own destruction, output mutation or same-call reset. Reflected existing owner charges include these scalar fields; flags convey no raw/numeric acquisition authority."
       ],
       "deviations": [
         "No active source ENSURE credit: tst_polynomial1815ff invokes tst_psc and returns before tst_lex. Added comparator models are independent bounded regressions, not evidence of active PSC/resultant completion.",
@@ -99254,7 +99359,9 @@
         "Dense coefficient construction adapts unavailable expression builder; registered driver returns at cpp1825 before these eval cases. Active original-driver assertion credit is zero.",
         "Selected source composition bodies complete for explicit same-Integer rational binding and actual Runtime profile. Dormant cpp573-574 ENSURE adapted via dense term construction; registered driver returns before tst_compose, active original driver credit zero. TLS/dangling-pointer proofs are actual owner-primitive guarded-domain tests, not ordinary mathematical OOM reachability. Global TRACE/assertions/native ABI, same-frame high-level callback reentry and full polynomial family remain open; persistent source class members are not implicitly reset by owning lexical abort.",
         "Selected source algorithms and explicit Runtime profile only. Signed TLS stops and large factory/auxiliary receipts are guarded owner-primitive proofs, not ordinary mathematical exhaustion. Non-Z perfect-square remains the source unsupported operation. Registered polynomial driver returns before sqrt; dormant assertions give no active driver completion credit. Global diagnostics/native ABI and remaining source methods stay partial.",
-        "Selected algorithms and explicit Runtime/NUM cohorts only. Actual signed-TLS/consumed-raw proofs exercise guarded owner domains, not claimed ordinary mathematical OOM reachability. Global mgcd_check/TRACE/assertion dispatcher/native ostream/other ABI and source expression-driver construction remain open. Original tst_polynomial returns after PSC: dormant GCD/primitive source fixture bodies have zero active-driver credit. Eight original PSC cases reach first coefficient8, second coefficient5 and Resultant8 selected ENSURE expressions (21 dynamic expressions at3 static sites); full original registered-driver lifecycle/printing is not promoted."
+        "Selected algorithms and explicit Runtime/NUM cohorts only. Actual signed-TLS/consumed-raw proofs exercise guarded owner domains, not claimed ordinary mathematical OOM reachability. Global mgcd_check/TRACE/assertion dispatcher/native ostream/other ABI and source expression-driver construction remain open. Original tst_polynomial returns after PSC: dormant GCD/primitive source fixture bodies have zero active-driver credit. Eight original PSC cases reach first coefficient8, second coefficient5 and Resultant8 selected ENSURE expressions (21 dynamic expressions at3 static sites); full original registered-driver lifecycle/printing is not promoted.",
+        "polynomial.cpp:3186-3205: returning allocation transport callbacks are a supported Go owner domain, separately qualified from original C++ source. Invalid Go polynomial borrow is guarded at reached p.size after literal output reset/reserve; invalid/copy output and manager guards precede source body.",
+        "src/test/polynomial.cpp:837-879,1824-1825,1853: seven literal dormant Vars cases retain seven size and twenty sorted variable ENSURE comparisons (27 source assertions). The driver returns at line1825 before Vars at line1853; active original-driver credit is zero. Existing pure-Go expression parser maps x0..x4 to a,b,c,d,x and evaluates original arithmetic."
       ]
     },
     {
