@@ -13351,22 +13351,84 @@
       "path": "src/ast/for_each_expr.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "ast_for_each_expr.go",
+        "ast_for_each_expr_source_test.go",
+        "ast_for_each_expr_close_source_test.go"
+      ],
+      "tests": [
+        "TestASTExprVisitorSourceCountSharedAndAllMarks",
+        "TestASTExprVisitorSourceSkolemAndQuantifierNoPatterns",
+        "TestASTExprVisitorSourceUnsignedAssociativityAndOracle",
+        "TestASTExprVisitorSourceEarlyFoundErasesLaterMarkAllocation",
+        "TestASTExprVisitorSourceStackEveryGrowthPrefixAndWarmBound",
+        "TestASTExprVisitorSourceMarkedBeforeTrailAppendOwnsExactPendingLeaf",
+        "TestASTExprVisitorSourceBorrowedMarksForeignClosedAndCopyGuards",
+        "TestASTExprVisitorSourceReleaseRetryKeepsOriginalUnlistedMarkHistory",
+        "TestASTExprVisitorSourceFinalizeEndsNodesWithoutAdoptingUnlistedMark",
+        "TestASTExprVisitorSourcePendingMarkCannotClearForeignActualMark",
+        "TestASTExprVisitorSourcePatternBodyOrderAndAllMarkedUnreadStack",
+        "TestASTExprVisitorSourceSkolemParentProcFollowsDeepChild",
+        "TestASTExprVisitorHistorySurvivesActualLaterNumeralCloseStop"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Concrete counter and has-skolem iterative source traversal (src/ast/for_each_expr.cpp:23-66)",
+          "status": "partial",
+          "go_target": "ast_for_each_expr.go",
+          "tests": [
+            "TestASTExprVisitorSourceCountSharedAndAllMarks",
+            "TestASTExprVisitorSourceSkolemAndQuantifierNoPatterns",
+            "TestASTExprVisitorSourceUnsignedAssociativityAndOracle",
+            "TestASTExprVisitorSourceEarlyFoundErasesLaterMarkAllocation",
+            "TestASTExprVisitorSourceStackEveryGrowthPrefixAndWarmBound",
+            "TestASTExprVisitorSourceMarkedBeforeTrailAppendOwnsExactPendingLeaf",
+            "TestASTExprVisitorSourceBorrowedMarksForeignClosedAndCopyGuards",
+            "TestASTExprVisitorSourceReleaseRetryKeepsOriginalUnlistedMarkHistory",
+            "TestASTExprVisitorSourceFinalizeEndsNodesWithoutAdoptingUnlistedMark",
+            "TestASTExprVisitorSourcePendingMarkCannotClearForeignActualMark",
+            "TestASTExprVisitorSourcePatternBodyOrderAndAllMarkedUnreadStack",
+            "TestASTExprVisitorSourceSkolemParentProcFollowsDeepChild",
+            "TestASTExprVisitorHistorySurvivesActualLaterNumeralCloseStop"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Concrete counter/skolem visitors preserve shared-only versus all-mark schedules, source unsigned associativity arithmetic, body/pattern/no-pattern order, and found early exit. Lexical inline16 pair storage is embedded in the charged manager header; separately owned dynamic entries are 12-byte Go scalar records, not native pointer ABI.",
+        "Actual marked-before-fast-trail-append refusal retains the exact unlisted mark action. Source clears only its completed trail; Go archive reservation before lexical frame reuse preserves original mark token, generation, owner and invocation. Release retry observes the old mark; existing checked mark-owner guards remain typed Go source-assertion adapters without bound C/T transport credit.",
+        "Source completed lexical stack/marks cleanup is separate from exact manager-owned pending-mark cleanup. Mark-owner scalar metadata is stamped at actual leaves in both profiles for owning authority; release source reads remain bit-only. No arbitrary proc specialization, IgnorePatterns=true, for_each_expr_args ptr-vector helper, caller asserted_formulas/goal driver or whole source-unit completion credit.",
+        "Real public AST Close may acknowledge younger lexical marks then stop on an older NUM formatting destructor. Original archived tuples/body/source/first-own causes remain charged and attached after ACK; retries skip the acknowledged leaf without reading later foreign marks. Exact history metadata is refunded only by actual final owning manager storage/header teardown. Current unlisted diagnostics remain in the charged header, and a later call archives source-ended acknowledged diagnostics before overwriting lexical storage. Independent fresh-context ordinal campaigns preserve every original source mark-trail reservation; private child ACK is not represented as enclosing owner end."
+      ]
     },
     {
       "path": "src/ast/for_each_expr.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "ast_for_each_expr.go",
+        "ast_for_each_expr_source_test.go",
+        "ast_for_each_expr_close_source_test.go"
+      ],
+      "tests": [
+        "TestASTExprVisitorSourceCountSharedAndAllMarks",
+        "TestASTExprVisitorSourceSkolemAndQuantifierNoPatterns",
+        "TestASTExprVisitorSourceUnsignedAssociativityAndOracle",
+        "TestASTExprVisitorSourceEarlyFoundErasesLaterMarkAllocation",
+        "TestASTExprVisitorSourceStackEveryGrowthPrefixAndWarmBound",
+        "TestASTExprVisitorSourceMarkedBeforeTrailAppendOwnsExactPendingLeaf",
+        "TestASTExprVisitorSourceBorrowedMarksForeignClosedAndCopyGuards",
+        "TestASTExprVisitorSourceReleaseRetryKeepsOriginalUnlistedMarkHistory",
+        "TestASTExprVisitorSourceFinalizeEndsNodesWithoutAdoptingUnlistedMark",
+        "TestASTExprVisitorSourcePendingMarkCannotClearForeignActualMark",
+        "TestASTExprVisitorSourcePatternBodyOrderAndAllMarkedUnreadStack",
+        "TestASTExprVisitorSourceSkolemParentProcFollowsDeepChild",
+        "TestASTExprVisitorHistorySurvivesActualLaterNumeralCloseStop"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -13379,9 +13441,35 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Concrete counter and has-skolem iterative source traversal (src/ast/for_each_expr.h:27-105,120-139)",
+          "status": "partial",
+          "go_target": "ast_for_each_expr.go",
+          "tests": [
+            "TestASTExprVisitorSourceCountSharedAndAllMarks",
+            "TestASTExprVisitorSourceSkolemAndQuantifierNoPatterns",
+            "TestASTExprVisitorSourceUnsignedAssociativityAndOracle",
+            "TestASTExprVisitorSourceEarlyFoundErasesLaterMarkAllocation",
+            "TestASTExprVisitorSourceStackEveryGrowthPrefixAndWarmBound",
+            "TestASTExprVisitorSourceMarkedBeforeTrailAppendOwnsExactPendingLeaf",
+            "TestASTExprVisitorSourceBorrowedMarksForeignClosedAndCopyGuards",
+            "TestASTExprVisitorSourceReleaseRetryKeepsOriginalUnlistedMarkHistory",
+            "TestASTExprVisitorSourceFinalizeEndsNodesWithoutAdoptingUnlistedMark",
+            "TestASTExprVisitorSourcePendingMarkCannotClearForeignActualMark",
+            "TestASTExprVisitorSourcePatternBodyOrderAndAllMarkedUnreadStack",
+            "TestASTExprVisitorSourceSkolemParentProcFollowsDeepChild",
+            "TestASTExprVisitorHistorySurvivesActualLaterNumeralCloseStop"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Concrete counter/skolem visitors preserve shared-only versus all-mark schedules, source unsigned associativity arithmetic, body/pattern/no-pattern order, and found early exit. Lexical inline16 pair storage is embedded in the charged manager header; separately owned dynamic entries are 12-byte Go scalar records, not native pointer ABI.",
+        "Actual marked-before-fast-trail-append refusal retains the exact unlisted mark action. Source clears only its completed trail; Go archive reservation before lexical frame reuse preserves original mark token, generation, owner and invocation. Release retry observes the old mark; existing checked mark-owner guards remain typed Go source-assertion adapters without bound C/T transport credit.",
+        "Source completed lexical stack/marks cleanup is separate from exact manager-owned pending-mark cleanup. Mark-owner scalar metadata is stamped at actual leaves in both profiles for owning authority; release source reads remain bit-only. No arbitrary proc specialization, IgnorePatterns=true, for_each_expr_args ptr-vector helper, caller asserted_formulas/goal driver or whole source-unit completion credit.",
+        "Real public AST Close may acknowledge younger lexical marks then stop on an older NUM formatting destructor. Original archived tuples/body/source/first-own causes remain charged and attached after ACK; retries skip the acknowledged leaf without reading later foreign marks. Exact history metadata is refunded only by actual final owning manager storage/header teardown. Current unlisted diagnostics remain in the charged header, and a later call archives source-ended acknowledged diagnostics before overwriting lexical storage. Independent fresh-context ordinal campaigns preserve every original source mark-trail reservation; private child ACK is not represented as enclosing owner end."
+      ]
     },
     {
       "path": "src/ast/format.cpp",

@@ -28,6 +28,10 @@ func (m *ASTManager) Stats() ASTManagerStats {
 	if f := m.traceAcquisitionExecuting; f != nil {
 		s.AllocatedBytes += f.bytes
 	}
+	s.AllocatedBytes += m.exprVisit.bytes + m.exprVisit.localFast.heapBytes + m.exprVisit.localBits.bytes
+	for h := m.exprVisitHistory; h != nil; h = h.next {
+		s.AllocatedBytes += h.bytes
+	}
 	width := uint64(reflect.TypeOf(astNodeRef{}).Size())
 	s.AllocatedBytes += uint64(cap(m.basic.eq)+cap(m.basic.oeq)+cap(m.basic.ite)) * width
 	for _, v := range m.basic.proofCaches {

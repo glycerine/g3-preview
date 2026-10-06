@@ -1,4 +1,6 @@
-// Licensed under the MIT license.
+// Licensed under the MIT license; see LICENSE.txt.
+// Source: src/ast/ast.h:495-518.
+// Source author: Leonardo de Moura (2006-09-18).
 package g3
 
 func (m *ASTManager) nodeMark(r astNodeRef, plane uint8, owner uint64, op uint8, flag bool) (bool, error) {
@@ -24,14 +26,10 @@ func (m *ASTManager) nodeMark(r astNodeRef, plane uint8, owner uint64, op uint8,
 	}
 	if plane == 1 {
 		n.mark1 = flag
-		if astSourceDebug {
-			n.markOwner1 = owner
-		}
+		n.markOwner1 = owner // actual Go action identity; source reads it only in DEBUG
 	} else {
 		n.mark2 = flag
-		if astSourceDebug {
-			n.markOwner2 = owner
-		}
+		n.markOwner2 = owner // actual Go action identity; source reads it only in DEBUG
 	}
 	return flag, nil
 }

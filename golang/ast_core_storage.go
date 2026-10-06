@@ -218,6 +218,9 @@ type astBuiltinPluginState struct {
 }
 
 type ASTManager struct {
+	exprVisitHistory *astExprPendingMark
+	exprVisit        astExprVisitFrame // actual charged lexical traversal storage
+
 	traceAcquisitionHistory                                                                            *astTraceAcquisition
 	traceAcquisitions, traceAcquisitionExecuting                                                       *astTraceAcquisition
 	traceAcquisitionSerial                                                                             uint64

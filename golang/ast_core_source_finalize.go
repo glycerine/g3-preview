@@ -12,6 +12,9 @@ func (m *ASTManager) SourceFinalize() error {
 	}
 	m.mu.Lock()
 	defer m.mu.Unlock()
+	if m.exprVisit.active && (m.exprVisit.pendingMark.slot == 0 || m.exprVisit.mode == 0 && !m.exprVisit.localFast.owner.closed) {
+		return ErrASTPending
+	}
 	if !m.constructorComplete {
 		return ErrASTDomain
 	}
@@ -69,6 +72,7 @@ func (m *ASTManager) closeSourceOwnedStorageCore() error {
 		m.vectorAllocator = nil
 	}
 	m.releaseTraceAcquisitionHistory()
+	m.releaseExprVisitHistory()
 	m.releasePages()
 	m.budget.Release(m.ownerBytes)
 	m.ownerBytes = 0

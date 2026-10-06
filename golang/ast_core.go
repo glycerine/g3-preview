@@ -205,6 +205,9 @@ func (m *ASTManager) Close() error {
 	if m.closed {
 		return nil
 	}
+	if e := m.cleanupExprVisitFrame(); e != nil {
+		return e
+	}
 	if !m.constructorComplete {
 		return m.abortConstructionCore()
 	}
@@ -470,6 +473,7 @@ func (m *ASTManager) closeCore(source bool) error {
 		return nil
 	}
 	m.releaseTraceAcquisitionHistory()
+	m.releaseExprVisitHistory()
 	m.releasePages()
 	m.closed = true
 	m.closing = false
