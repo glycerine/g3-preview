@@ -23,6 +23,7 @@ type MultivariatePolynomialManagerConfig struct {
 // owners are charged by this class header and have no second standalone charge.
 type MultivariatePolynomialManager struct {
 	discriminant                                               polynomialDiscriminantScope
+	subresultant                                               polynomialSubresultantChainScope
 	conversion                                                 polynomialGlobalConversionScope
 	toPolynomial                                               polynomialToPolynomialScope
 	gcdFrames                                                  []*polynomialGCDFunctionScope

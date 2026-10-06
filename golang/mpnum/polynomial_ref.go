@@ -164,13 +164,19 @@ func (r *PolynomialRef) Close() error {
 }
 
 type polynomialReferenceVector struct {
-	values       polynomialVector
-	cleanupCause error
-	incoming     Polynomial
-	incomingDec  bool
-	drainDec     bool
-	drain        uint32
-	draining     bool
+	setInvocation                           uint64
+	setIndex                                uint32
+	setActive, setExecuting, setOldConsumed bool
+	setOldRead                              bool
+	resetExecuting                          bool
+	setBodyCause, setCleanupCause           error
+	values                                  polynomialVector
+	cleanupCause                            error
+	incoming                                Polynomial
+	incomingDec                             bool
+	drainDec                                bool
+	drain                                   uint32
+	draining                                bool
 }
 
 func (v *polynomialReferenceVector) get(m *MultivariatePolynomialCore, i uint32) (Polynomial, error) {
@@ -188,7 +194,7 @@ func (v *polynomialReferenceVector) get(m *MultivariatePolynomialCore, i uint32)
 	return Polynomial{owner: a.owner, slot: a.slot, generation: a.generation}, e
 }
 func (v *polynomialReferenceVector) push(m *MultivariatePolynomialCore, p Polynomial) error {
-	if v.draining || v.incoming != (Polynomial{}) {
+	if v.setActive || v.draining || v.incoming != (Polynomial{}) {
 		return ErrPolynomialPending
 	}
 	if p != (Polynomial{}) {
@@ -217,9 +223,17 @@ func (v *polynomialReferenceVector) reset(m *MultivariatePolynomialCore) error {
 	return v.resetMode(m, false)
 }
 func (v *polynomialReferenceVector) resetMode(m *MultivariatePolynomialCore, owning bool) (err error) {
+	if v.resetExecuting {
+		return ErrPolynomialPending
+	}
+	if v.setActive {
+		return ErrPolynomialPending
+	}
 	if !owning && v.cleanupCause != nil {
 		return v.cleanupCause
 	}
+	v.resetExecuting = true
+	defer func() { v.resetExecuting = false }()
 	defer func() {
 		if err != nil {
 			v.cleanupCause = err
@@ -255,6 +269,9 @@ func (v *polynomialReferenceVector) resetMode(m *MultivariatePolynomialCore, own
 	return nil
 }
 func (v *polynomialReferenceVector) close(m *MultivariatePolynomialCore) error {
+	if e := v.abortSet(m); e != nil {
+		return e
+	}
 	if e := v.resetMode(m, true); e != nil {
 		return e
 	}
@@ -330,6 +347,9 @@ func (v *PolynomialRefVector) Close() error {
 	}
 	if v.closed {
 		return nil
+	}
+	if v.state.setExecuting || v.state.resetExecuting {
+		return ErrPolynomialPending
 	}
 	v.closing = true
 	if e := v.state.close(v.owner); e != nil {

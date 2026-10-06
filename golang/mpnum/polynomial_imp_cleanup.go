@@ -180,7 +180,7 @@ func (m *MultivariatePolynomialManager) callerGuard() error {
 	return nil
 }
 func (m *MultivariatePolynomialManager) CloseChecked() error {
-	if m != nil && m.self == m && m.discriminant.active {
+	if m != nil && m.self == m && (m.discriminant.active || m.subresultant.active) {
 		return ErrPolynomialPending
 	}
 	if m != nil && m.self == m && m.core != nil && m.core.self == m.core && m.core.negativeActive && m.core.negativeExecuting {
