@@ -6,28 +6,30 @@ package mpnum
 // Explicit passed invocation identity. It carries no allocation snapshot and
 // creates no source numeral, reservation, or ambient callback owner hook.
 type integerAllocationInvocationContext struct {
-	binaryEvaluation           *upolyBinaryEvaluationScope
-	binaryEvaluationInvocation uint64
-	algebraicNegEvalInvocation uint64
-	algebraicNeg               *algebraicNegScope
-	algebraicNegInvocation     uint64
-	algebraicNegEval           bool
-	mpfInput                   *arbitraryFloatInputBinding
-	mpfInputInvocation         uint64
-	mpfConversion              *arbitraryFloatRationalConversionScope
-	mpfConversionInvocation    uint64
-	mpfConversionOutput        bool
-	mpfFormat                  *ArbitraryFloatFormatInvocation
-	mpfFormatInvocation        uint64
-	formatDecimal              *rationalDecimalScope
-	mpfPower                   *arbitraryFloatPowerWrapper
-	mpfPowerInvocation         uint64
-	upolyDisplay               *upolyDisplayScope
-	upolyDisplayInvocation     uint64
-	mpfRound                   *arbitraryFloatRoundScope
-	mpfRoundInvocation         uint64
-	mpfRoundSqrt               *arbitraryFloatRoundScope
-	mpfRoundSqrtInvocation     uint64
+	rationalEvaluation           *upolyRationalEvaluationScope
+	rationalEvaluationInvocation uint64
+	binaryEvaluation             *upolyBinaryEvaluationScope
+	binaryEvaluationInvocation   uint64
+	algebraicNegEvalInvocation   uint64
+	algebraicNeg                 *algebraicNegScope
+	algebraicNegInvocation       uint64
+	algebraicNegEval             bool
+	mpfInput                     *arbitraryFloatInputBinding
+	mpfInputInvocation           uint64
+	mpfConversion                *arbitraryFloatRationalConversionScope
+	mpfConversionInvocation      uint64
+	mpfConversionOutput          bool
+	mpfFormat                    *ArbitraryFloatFormatInvocation
+	mpfFormatInvocation          uint64
+	formatDecimal                *rationalDecimalScope
+	mpfPower                     *arbitraryFloatPowerWrapper
+	mpfPowerInvocation           uint64
+	upolyDisplay                 *upolyDisplayScope
+	upolyDisplayInvocation       uint64
+	mpfRound                     *arbitraryFloatRoundScope
+	mpfRoundInvocation           uint64
+	mpfRoundSqrt                 *arbitraryFloatRoundScope
+	mpfRoundSqrtInvocation       uint64
 
 	factorNumeralVector              *polynomialFactorNumeralVectorReceipt
 	factorNumeralVectorInvocation    uint64
@@ -127,6 +129,9 @@ func pnAllocationContext(pn *integerPNormalizeScope) integerAllocationInvocation
 	return c
 }
 func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomialNumericRoots {
+	if c.rationalEvaluation != nil && c.rationalEvaluationFrame(m) == nil {
+		return nil
+	}
 	if c.binaryEvaluation != nil && c.binaryEvaluationFrame(m) == nil {
 		return nil
 	}
@@ -303,6 +308,9 @@ func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomial
 			return nil
 		}
 		return &s.numeric
+	}
+	if q := c.rationalEvaluationFrame(m); q != nil {
+		return &q.numeric
 	}
 	if q := c.binaryEvaluationFrame(m); q != nil {
 		return &q.numeric

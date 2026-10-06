@@ -27,14 +27,17 @@ type UPolynomialConfig struct {
 // are required, even though operations without a checkpoint do not call them.
 // Cold ownership and every actual typed backing are charged to Integer's budget.
 type UPolynomialManager struct {
-	binaryEvaluation              upolyBinaryEvaluationScope
-	binaryEvaluationHistory       *upolyBinaryEvaluationHistory
-	binaryEvaluationHistoryBytes  uint64
-	algebraicNegCaller            *AlgebraicRootCore
-	display                       upolyDisplayScope
-	displaySequence               *UPolynomialSequence
-	currentDisplay, displayFrames *upolyDisplayScope
-	displayNonce                  uint64
+	rationalEvaluation             upolyRationalEvaluationScope
+	rationalEvaluationHistory      *upolyRationalEvaluationHistory
+	rationalEvaluationHistoryBytes uint64
+	binaryEvaluation               upolyBinaryEvaluationScope
+	binaryEvaluationHistory        *upolyBinaryEvaluationHistory
+	binaryEvaluationHistoryBytes   uint64
+	algebraicNegCaller             *AlgebraicRootCore
+	display                        upolyDisplayScope
+	displaySequence                *UPolynomialSequence
+	currentDisplay, displayFrames  *upolyDisplayScope
+	displayNonce                   uint64
 
 	factorFrontendCaller         *upolyFactorFrontendScope
 	factorFrontendConstantCaller *UPolynomialFactorizationService
@@ -210,6 +213,11 @@ func (m *UPolynomialManager) DelPolynomial(p *UPolynomial) error {
 	if e != nil {
 		return e
 	}
+	qr := &m.rationalEvaluation
+	if qr.owner == m && qr.active && !qr.falseAcknowledged && qr.target.origin == m.origin && qr.target.backing == d.state.backing && qr.target.generation == d.state.generation && (qr.executing || qr.finishing || qr.sourceCause != nil) {
+		return ErrUPolynomialCleanupPending
+	}
+
 	q := &m.binaryEvaluation
 	if q.owner == m && q.active && !q.falseAcknowledged && q.target.origin == m.origin && q.target.backing == d.state.backing && q.target.generation == d.state.generation && (q.executing || q.finishing || q.sourceCause != nil) {
 		return ErrUPolynomialCleanupPending
@@ -234,7 +242,7 @@ func (m *UPolynomialManager) closeWithHenselOwners(r *upolyHenselPairInvocationR
 	return m.closeWithCallerOwners(r, c, nil)
 }
 func (m *UPolynomialManager) closeWithCallerOwners(r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope, p *upolyFactorPrimePreparationInvocationReceipt) error {
-	if m.binaryEvaluationExecuting() {
+	if m.rationalEvaluationExecuting() || m.binaryEvaluationExecuting() {
 		return ErrUPolynomialCleanupPending
 	}
 	if m != nil && m.self == m && m.algebraicNegCaller != nil && m.algebraicNegCaller.negationExecuting() {
@@ -251,6 +259,9 @@ func (m *UPolynomialManager) closeWithCallerOwners(r *upolyHenselPairInvocationR
 	}
 	if m.live != 0 || m.liveSequences != 0 || m.liveFactors != 0 {
 		return ErrUPolynomialLive
+	}
+	if e := m.CleanupRationalEvaluation(); e != nil {
+		return e
 	}
 	if e := m.CleanupBinaryEvaluation(); e != nil {
 		return e
@@ -305,6 +316,9 @@ func (m *UPolynomialManager) closeWithCallerOwners(r *upolyHenselPairInvocationR
 		q = next
 	}
 	m.displayFrames = nil
+	b.Release(m.rationalEvaluationHistoryBytes)
+	m.rationalEvaluationHistoryBytes = 0
+	m.rationalEvaluationHistory = nil
 	b.Release(m.binaryEvaluationHistoryBytes)
 	m.binaryEvaluationHistoryBytes = 0
 	m.binaryEvaluationHistory = nil

@@ -14,7 +14,9 @@ import (
 
 func polynomialDiscriminantFixture(t *testing.T) *MultivariatePolynomialManager {
 	t.Helper()
-	q, _ := rationalManager(t, false)
+	// This source corpus constructs large multivariate resultants; keep its
+	// bounded fixture storage separate from the small rational API helper.
+	q, _ := rationalManagerWithLimit(t, false, 2<<20)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.z, Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
 	t.Cleanup(func() {

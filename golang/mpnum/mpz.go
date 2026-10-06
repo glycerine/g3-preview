@@ -48,6 +48,7 @@ type IntegerConfig struct {
 // Cells, transitional Natural Words and the actual memory backend share one Budget.
 // Close invalidates every live numeral; a supplied Runtime is borrowed.
 type IntegerManager struct {
+	rationalEvaluationCaller               *UPolynomialManager
 	binaryEvaluationCaller                 *UPolynomialManager
 	algebraicNegCaller                     *AlgebraicRootCore
 	conversionDetachedOutputs              *arbitraryFloatRationalConversionScope

@@ -15,7 +15,7 @@ func (m *UPolynomialManager) sourceFinalizeWithHenselOwners(r *upolyHenselPairIn
 	return m.sourceFinalizeWithCallerOwners(r, c, nil)
 }
 func (m *UPolynomialManager) sourceFinalizeWithCallerOwners(r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope, p *upolyFactorPrimePreparationInvocationReceipt) error {
-	if m.binaryEvaluationExecuting() {
+	if m.rationalEvaluationExecuting() || m.binaryEvaluationExecuting() {
 		return ErrUPolynomialCleanupPending
 	}
 	if m != nil && m.self == m && m.algebraicNegCaller != nil && m.algebraicNegCaller.negationExecuting() {
@@ -24,6 +24,10 @@ func (m *UPolynomialManager) sourceFinalizeWithCallerOwners(r *upolyHenselPairIn
 	if m == nil || m.self != m || m.config.Integer == nil {
 		return ErrUPolynomialOwner
 	}
+	if m.rationalEvaluation.active && m.rationalEvaluation.sourceCause != nil {
+		return m.rationalEvaluation.sourceCause
+	}
+
 	if m.binaryEvaluation.active && m.binaryEvaluation.sourceCause != nil {
 		return m.binaryEvaluation.sourceCause
 	}

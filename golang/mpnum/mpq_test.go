@@ -16,7 +16,12 @@ import (
 
 func rationalManager(t *testing.T, synch bool) (*RationalManager, *arena.Budget) {
 	t.Helper()
-	budget := arena.NewBudget(1 << 20)
+	return rationalManagerWithLimit(t, synch, 1<<20)
+}
+
+func rationalManagerWithLimit(t *testing.T, synch bool, limit uint64) (*RationalManager, *arena.Budget) {
+	t.Helper()
+	budget := arena.NewBudget(limit)
 	m, e := NewRationalManager(RationalConfig{Integers: IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: budget}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: budget}}}, Synchronized: synch})
 	if e != nil {
 		t.Fatal(e)

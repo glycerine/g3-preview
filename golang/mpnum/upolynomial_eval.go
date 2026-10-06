@@ -1,4 +1,4 @@
-// Source: src/math/polynomial/upolynomial.cpp:1734-1764.
+// Source: src/math/polynomial/upolynomial.cpp:1734-1797.
 // Licensed under the MIT license.
 package mpnum
 
@@ -66,7 +66,7 @@ func (m *UPolynomialManager) EvalSignInt(v UPolynomialView, b *Int) (int, error)
 	}
 	return m.sign(&r)
 }
-func (m *UPolynomialManager) EvalSignRational(v UPolynomialView, b *Rational) (int, error) {
+func (m *UPolynomialManager) EvalSignRational(v UPolynomialView, b *Rational) (sign int, cause error) {
 	if e := m.check(); e != nil {
 		return 0, e
 	}
@@ -76,23 +76,31 @@ func (m *UPolynomialManager) EvalSignRational(v UPolynomialView, b *Rational) (i
 	if v.count == 1 {
 		return m.signAt(v, 0)
 	}
-	// Source denominator copy precedes r/ak and the first coefficient access.
-	var di Int
-	defer m.modular.Del(&di)
 	if b == nil {
 		return 0, ErrUPolynomialOwner
 	}
-	if e := m.modular.Copy(&di, &b.den); e != nil {
+	q, e := m.beginRationalEvaluation()
+	if e != nil {
 		return 0, e
 	}
-	var r, ak Int
-	defer m.modular.Del(&r)
-	defer m.modular.Del(&ak)
+	q.target = v
+	context := q.context()
+	z := m.config.Integer
+	prior := z.rationalEvaluationCaller
+	z.rationalEvaluationCaller = m
+	defer func() { q.executing = false; cause = q.finish(cause); z.rationalEvaluationCaller = prior }()
+	di, r, ak := &q.values[0], &q.values[1], &q.values[2]
+	if e = m.modular.copyWithSourceContext(di, &b.den, context); e != nil {
+		return 0, e
+	}
+	// Actual r and ak constructors occur only after the denominator SET returns.
+	q.constructed = 3
+	q.sourceRemaining = 3
 	a, e := m.read(v, v.count-1)
 	if e != nil {
 		return 0, e
 	}
-	if e = m.modular.Copy(&r, a); e != nil {
+	if e = m.modular.copyWithSourceContext(r, a, context); e != nil {
 		return 0, e
 	}
 	for i := v.count - 1; i > 0; {
@@ -106,21 +114,21 @@ func (m *UPolynomialManager) EvalSignRational(v UPolynomialView, b *Rational) (i
 			return 0, e
 		}
 		if zero {
-			e = m.modular.Mul(&r, &b.num, &r)
+			e = m.modular.mulWithSourceContext(r, &b.num, r, context)
 		} else {
-			e = m.modular.Mul(a, &di, &ak)
+			e = m.modular.mulWithSourceContext(a, di, ak, context)
 			if e == nil {
-				e = m.modular.AddMul(&ak, &r, &b.num, &r)
+				e = m.modular.addMulWithSourceContext(ak, r, &b.num, r, &q.addMul, context)
 			}
 		}
 		if e != nil {
 			return 0, e
 		}
-		if e = m.modular.Mul(&di, &b.den, &di); e != nil {
+		if e = m.modular.mulWithSourceContext(di, &b.den, di, context); e != nil {
 			return 0, e
 		}
 	}
-	return m.sign(&r)
+	return m.sign(r)
 }
 func (m *UPolynomialManager) EvalSignBinary(v UPolynomialView, b *BinaryRational) (int, error) {
 	return m.evalSignBinaryWithNegScope(v, b, nil)

@@ -37920,7 +37920,11 @@
         "mpnum/upolynomial_eval_binary_callback_source_test.go",
         "mpnum/upolynomial_eval_binary_invocation.go",
         "mpnum/upolynomial_eval_binary_prefix_source_test.go",
-        "mpnum/upolynomial_eval_binary_source_test.go"
+        "mpnum/upolynomial_eval_binary_source_test.go",
+        "mpnum/upolynomial_eval_rational_callback_source_test.go",
+        "mpnum/upolynomial_eval_rational_invocation.go",
+        "mpnum/upolynomial_eval_rational_prefix_source_test.go",
+        "mpnum/upolynomial_eval_rational_source_test.go"
       ],
       "tests": [
         "TestUPolynomialScalarExtentAndLayout",
@@ -38084,7 +38088,11 @@
         "TestUPolynomialEvalSignBinaryPublicBodyAndNumeralDT",
         "TestUPolynomialEvalSignBinaryEveryActualReservationPrefix",
         "TestUPolynomialEvalSignBinaryLiteralDyadicHornerBranches",
-        "TestUPolynomialEvalSignBinaryActualCallbackOwnerAndTupleRefusal"
+        "TestUPolynomialEvalSignBinaryActualCallbackOwnerAndTupleRefusal",
+        "TestUPolynomialEvalSignRationalPublicBodyAndNumeralDT",
+        "TestUPolynomialEvalSignRationalEveryActualReservationPrefix",
+        "TestUPolynomialEvalSignRationalLiteralHornerBranches",
+        "TestUPolynomialEvalSignRationalActualCallbackOwnerAndTupleRefusal"
       ],
       "conditionals": [
         {
@@ -39158,6 +39166,17 @@
             "TestUPolynomialEvalSignBinaryEveryActualReservationPrefix",
             "TestUPolynomialEvalSignBinaryLiteralDyadicHornerBranches",
             "TestUPolynomialEvalSignBinaryActualCallbackOwnerAndTupleRefusal"
+          ]
+        },
+        {
+          "name": "upolynomial.cpp:1767-1797 public rational eval_sign_at direct d_i/r/ak scope and source/own lifetimes",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_eval.go",
+          "tests": [
+            "TestUPolynomialEvalSignRationalPublicBodyAndNumeralDT",
+            "TestUPolynomialEvalSignRationalEveryActualReservationPrefix",
+            "TestUPolynomialEvalSignRationalLiteralHornerBranches",
+            "TestUPolynomialEvalSignRationalActualCallbackOwnerAndTupleRefusal"
           ]
         }
       ],
