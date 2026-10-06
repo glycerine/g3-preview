@@ -28351,7 +28351,9 @@
         "mpnum/algebraic_cell_source_test.go",
         "mpnum/algebraic_pipeline_test.go",
         "mpnum/algebraic_compare_test.go",
-        "algebraic_root_source_test.go"
+        "algebraic_root_source_test.go",
+        "mpnum/algebraic_query.go",
+        "mpnum/algebraic_query_source_test.go"
       ],
       "tests": [
         "TestAlgebraicSourceRootCounts",
@@ -28367,7 +28369,10 @@
         "TestAlgebraicCompareMinimalAndMagnitudeRefinement",
         "TestAlgebraicCompareSturmTarskiIndependentOrder",
         "TestAlgebraicCompareSequenceReservationPrefixes",
-        "TestAlgebraicRealResourceCancellationBeforeMinimalRefine"
+        "TestAlgebraicRealResourceCancellationBeforeMinimalRefine",
+        "TestAlgebraicSignAndDegreeLiteralBranches",
+        "TestAlgebraicQueriesRejectCopiedForeignAndStaleOwners",
+        "TestAlgebraicDegreeUsesActualNonminimalPolynomial"
       ],
       "conditionals": [
         {
@@ -28812,6 +28817,16 @@
             "TestAlgebraicCompareSturmTarskiIndependentOrder",
             "TestAlgebraicCompareSequenceReservationPrefixes"
           ]
+        },
+        {
+          "name": "algebraic_numbers.cpp:217-240,350-356 sign predicates and stored-cell degree; public forwarding :2807-2828",
+          "status": "ported",
+          "go_target": "mpnum/algebraic_query.go",
+          "tests": [
+            "TestAlgebraicSignAndDegreeLiteralBranches",
+            "TestAlgebraicQueriesRejectCopiedForeignAndStaleOwners",
+            "TestAlgebraicDegreeUsesActualNonminimalPolynomial"
+          ]
         }
       ],
       "ownership": [
@@ -28823,7 +28838,8 @@
         "Basic24/root56 byte scalar codec and typed UPolynomial coefficient backing are Go storage adaptations, not claims about C++ sizeof or raw coefficient allocator extents.",
         "External std::sort is adapted to concrete heap sort; comparison/refinement/checkpoint order can differ by backend. Source comparison bodies and errors remain actual.",
         "IsRational cpp292 passes algebraic_cell* through temporary anum (header366\u2013371) into save_intervals numeral const& (cpp897\u2013929); source reference dangles after construction. The Go lifetime adaptation binds the actual current caller and refreshes its handle after conversion; independent tests cover adapted behavior, not a source-defined dangling-reference result.",
-        "Selected uint32 arithmetic/conversion profile is explicit; full manager construction, multivariate/resultant arithmetic, plugins, printers, and complete header/registered test surfaces remain OPEN."
+        "Selected uint32 arithmetic/conversion profile is explicit; full manager construction, multivariate/resultant arithmetic, plugins, printers, and complete header/registered test surfaces remain OPEN.",
+        "Selected IsPos/IsNeg and Degree queries dispatch to actual null/basic/algebraic cells. Root sign uses actual BinaryIntervalManager predicates; degree reports stored m_p_sz\u22121 without minimizing or refining. Queries construct no source locals and allocate no archive/NUM/backing, including repeated FailAfter(0) calls. Invalid Go copied/foreign/stale owner fixtures prove guard refusal/nonmutation. New sign/degree output assertions are independent checks, not invented registered ENSURE coverage. Existing registered algebraic root drivers provide reached cells; no whole algebraic or UP unit promotion."
       ]
     },
     {
@@ -28841,7 +28857,9 @@
         "mpnum/algebraic_cell_source_test.go",
         "mpnum/algebraic_pipeline_test.go",
         "mpnum/algebraic_compare_test.go",
-        "algebraic_root_source_test.go"
+        "algebraic_root_source_test.go",
+        "mpnum/algebraic_query.go",
+        "mpnum/algebraic_query_source_test.go"
       ],
       "tests": [
         "TestAlgebraicSourceRootCounts",
@@ -28857,7 +28875,10 @@
         "TestAlgebraicCompareMinimalAndMagnitudeRefinement",
         "TestAlgebraicCompareSturmTarskiIndependentOrder",
         "TestAlgebraicCompareSequenceReservationPrefixes",
-        "TestAlgebraicRealResourceCancellationBeforeMinimalRefine"
+        "TestAlgebraicRealResourceCancellationBeforeMinimalRefine",
+        "TestAlgebraicSignAndDegreeLiteralBranches",
+        "TestAlgebraicQueriesRejectCopiedForeignAndStaleOwners",
+        "TestAlgebraicDegreeUsesActualNonminimalPolynomial"
       ],
       "conditionals": [
         {
@@ -28922,6 +28943,16 @@
             "TestAlgebraicCompareSturmTarskiIndependentOrder",
             "TestAlgebraicCompareSequenceReservationPrefixes"
           ]
+        },
+        {
+          "name": "algebraic_numbers.cpp:217-240,350-356 sign predicates and stored-cell degree; public forwarding :2807-2828",
+          "status": "ported",
+          "go_target": "mpnum/algebraic_query.go",
+          "tests": [
+            "TestAlgebraicSignAndDegreeLiteralBranches",
+            "TestAlgebraicQueriesRejectCopiedForeignAndStaleOwners",
+            "TestAlgebraicDegreeUsesActualNonminimalPolynomial"
+          ]
         }
       ],
       "ownership": [
@@ -28933,7 +28964,8 @@
         "Basic24/root56 byte scalar codec and typed UPolynomial coefficient backing are Go storage adaptations, not claims about C++ sizeof or raw coefficient allocator extents.",
         "External std::sort is adapted to concrete heap sort; comparison/refinement/checkpoint order can differ by backend. Source comparison bodies and errors remain actual.",
         "IsRational cpp292 passes algebraic_cell* through temporary anum (header366\u2013371) into save_intervals numeral const& (cpp897\u2013929); source reference dangles after construction. The Go lifetime adaptation binds the actual current caller and refreshes its handle after conversion; independent tests cover adapted behavior, not a source-defined dangling-reference result.",
-        "Selected uint32 arithmetic/conversion profile is explicit; full manager construction, multivariate/resultant arithmetic, plugins, printers, and complete header/registered test surfaces remain OPEN."
+        "Selected uint32 arithmetic/conversion profile is explicit; full manager construction, multivariate/resultant arithmetic, plugins, printers, and complete header/registered test surfaces remain OPEN.",
+        "Selected IsPos/IsNeg and Degree queries dispatch to actual null/basic/algebraic cells. Root sign uses actual BinaryIntervalManager predicates; degree reports stored m_p_sz\u22121 without minimizing or refining. Queries construct no source locals and allocate no archive/NUM/backing, including repeated FailAfter(0) calls. Invalid Go copied/foreign/stale owner fixtures prove guard refusal/nonmutation. New sign/degree output assertions are independent checks, not invented registered ENSURE coverage. Existing registered algebraic root drivers provide reached cells; no whole algebraic or UP unit promotion."
       ]
     },
     {
