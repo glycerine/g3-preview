@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.cpp:1324-1329,432-513.
 // Licensed under the MIT license.
 // Source: src/util/mpn.cpp:206-217 and actual Algorithm M/A bodies.
 package mpnum
@@ -37,6 +38,20 @@ func (m *NaturalManager) sourceVerifyDivisionWithAllocationContext(a, b, q, r li
 		}
 		*frame = naturalPNVerificationScope{active: true, executing: true, invocation: frame.invocation + 1, rootUpperBound: q, rootUpperInvocation: q.invocation}
 		frame.buffer = naturalPNBufferReceipt{owner: m, rootUpperBound: q, rootUpperInvocation: q.invocation, invocation: q.invocation, buffer: &m.verification, private: true}
+		q.verification = naturalPNVerificationReceipt{m, frame, frame.invocation}
+		defer func() { frame.executing = false }()
+	}
+	if q := context.removeOneHalfRoot; context.pn == nil && context.raw == nil && q != nil {
+		z := q.owner.config.Integer
+		if z.natural != m || context.removeOneHalfRootFrame(z) == nil {
+			return ErrPolynomialOwner
+		}
+		frame = &m.verificationInvocation
+		if frame.active || frame.invocation == ^uint64(0) {
+			return ErrPolynomialPending
+		}
+		*frame = naturalPNVerificationScope{active: true, executing: true, invocation: frame.invocation + 1, removeOneHalfRoot: q, removeOneHalfInvocation: q.invocation}
+		frame.buffer = naturalPNBufferReceipt{owner: m, removeOneHalfRoot: q, removeOneHalfInvocation: q.invocation, invocation: q.invocation, buffer: &m.verification, private: true}
 		q.verification = naturalPNVerificationReceipt{m, frame, frame.invocation}
 		defer func() { frame.executing = false }()
 	}

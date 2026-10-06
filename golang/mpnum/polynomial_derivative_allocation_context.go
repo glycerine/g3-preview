@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.cpp:1324-1329,432-513.
 // Source: src/math/polynomial/upolynomial.cpp:1298-1321.
 // Source: src/math/polynomial/algebraic_numbers.cpp:1565-1577; src/math/polynomial/upolynomial.cpp:1734-1764.
 // Source: src/math/polynomial/polynomial.cpp:4507-4528;
@@ -43,6 +44,13 @@ func (m *IntegerModularManager) normalizeWithSourceContext(out *Int, context int
 		return e
 	}
 	if q := context.rootUpperBoundFrame(m.manager); q != nil && q.owner.modular == m {
+		e := m.pNormalizeWithFactorHistory(out, &q.normalize, context)
+		if q.sourceCause == nil {
+			q.sourceCause = m.pNormalizeInvocationSourceCause(&q.normalize)
+		}
+		return e
+	}
+	if q := context.removeOneHalfRootFrame(m.manager); q != nil && q.owner.modular == m {
 		e := m.pNormalizeWithFactorHistory(out, &q.normalize, context)
 		if q.sourceCause == nil {
 			q.sourceCause = m.pNormalizeInvocationSourceCause(&q.normalize)

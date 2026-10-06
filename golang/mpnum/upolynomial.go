@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.cpp:1324-1329,432-513.
 // Source: src/math/polynomial/upolynomial.cpp:1298-1321.
 // Source: src/math/polynomial/upolynomial.cpp:1734-1764.
 // Source: src/math/polynomial/upolynomial.h; src/math/polynomial/upolynomial.cpp.
@@ -35,8 +36,12 @@ type UPolynomialManager struct {
 	knuthHistory                   *upolyKnuthHistory
 	knuthHistoryBytes              uint64
 	rootUpperBound                 upolyRootUpperBoundScope
+	removeOneHalfRoot              upolyRemoveOneHalfRootScope
 	rootUpperBoundHistory          *upolyRootUpperBoundHistory
+	removeOneHalfRootHistory       *upolyRemoveOneHalfRootHistory
+	removeOneHalfRootFirstHistory  upolyRemoveOneHalfRootHistory
 	rootUpperBoundHistoryBytes     uint64
+	removeOneHalfRootHistoryBytes  uint64
 	integerEvaluation              upolyIntegerEvaluationScope
 	integerEvaluationHistory       *upolyIntegerEvaluationHistory
 	integerEvaluationHistoryBytes  uint64
@@ -234,6 +239,13 @@ func (m *UPolynomialManager) DelPolynomial(p *UPolynomial) error {
 	if qk.owner == m && qk.active && !qk.falseAcknowledged && qk.target.origin == m.origin && qk.target.backing == d.state.backing && qk.target.generation == d.state.generation && (qk.executing || qk.finishing || qk.sourceCause != nil) {
 		return ErrUPolynomialCleanupPending
 	}
+	qx := &m.removeOneHalfRoot
+	if qx.owner == m && qx.active && qx.output == *p && (qx.executing || qx.finishing) {
+		return ErrUPolynomialCleanupPending
+	}
+	if qx.owner == m && qx.active && !qx.falseAcknowledged && qx.target.origin == m.origin && qx.target.backing == d.state.backing && qx.target.generation == d.state.generation && (qx.executing || qx.finishing || qx.sourceCause != nil) {
+		return ErrUPolynomialCleanupPending
+	}
 	qu := &m.rootUpperBound
 	if qu.owner == m && qu.active && !qu.falseAcknowledged && qu.target.origin == m.origin && qu.target.backing == d.state.backing && qu.target.generation == d.state.generation && (qu.executing || qu.finishing || qu.sourceCause != nil) {
 		return ErrUPolynomialCleanupPending
@@ -273,7 +285,7 @@ func (m *UPolynomialManager) closeWithHenselOwners(r *upolyHenselPairInvocationR
 	return m.closeWithCallerOwners(r, c, nil)
 }
 func (m *UPolynomialManager) closeWithCallerOwners(r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope, p *upolyFactorPrimePreparationInvocationReceipt) error {
-	if m.oneHalfRootExecuting() || m.knuthExecuting() || m.rootUpperBoundExecuting() || m.integerEvaluationExecuting() || m.rationalEvaluationExecuting() || m.binaryEvaluationExecuting() {
+	if m.removeOneHalfRootExecuting() || m.oneHalfRootExecuting() || m.knuthExecuting() || m.rootUpperBoundExecuting() || m.integerEvaluationExecuting() || m.rationalEvaluationExecuting() || m.binaryEvaluationExecuting() {
 		return ErrUPolynomialCleanupPending
 	}
 	if m != nil && m.self == m && m.algebraicNegCaller != nil && m.algebraicNegCaller.negationExecuting() {
@@ -295,6 +307,9 @@ func (m *UPolynomialManager) closeWithCallerOwners(r *upolyHenselPairInvocationR
 		return e
 	}
 	if e := m.CleanupKnuthBounds(); e != nil {
+		return e
+	}
+	if e := m.CleanupRemoveOneHalfRoot(); e != nil {
 		return e
 	}
 	if e := m.CleanupRootUpperBound(); e != nil {
@@ -365,6 +380,9 @@ func (m *UPolynomialManager) closeWithCallerOwners(r *upolyHenselPairInvocationR
 	b.Release(m.knuthHistoryBytes)
 	m.knuthHistoryBytes = 0
 	m.knuthHistory = nil
+	b.Release(m.removeOneHalfRootHistoryBytes)
+	m.removeOneHalfRootHistoryBytes = 0
+	m.removeOneHalfRootHistory = nil
 	b.Release(m.rootUpperBoundHistoryBytes)
 	m.rootUpperBoundHistoryBytes = 0
 	m.rootUpperBoundHistory = nil

@@ -1,6 +1,9 @@
 package portcheck
 
-import "testing"
+import (
+	"path/filepath"
+	"testing"
+)
 
 func TestNoGenericsAudit(t *testing.T) {
 	for _, body := range []string{
@@ -29,5 +32,23 @@ func TestNoGenericsHiddenSource(t *testing.T) {
 	source(t, root, ".source/hidden.go", "package p\nfunc F[T any]() {}\n")
 	if CheckNoGenerics(root) == nil {
 		t.Fatal("hidden project Go source bypassed audit")
+	}
+}
+
+func TestNoGenericsAuditSeparateModuleBoundary(t *testing.T) {
+	root := t.TempDir()
+	source(t, root, "go.mod", "module mainmodule\n")
+	source(t, root, "ok.go", "package p\n")
+	source(t, root, "worktrees/candidate/go.mod", "module candidate\n")
+	source(t, root, "worktrees/candidate/bad.go", "package p\nfunc F[T any]() {}\n")
+	if err := CheckNoGenerics(root); err != nil {
+		t.Fatalf("separate candidate module leaked into main audit: %v", err)
+	}
+	if err := CheckNoGenerics(filepath.Join(root, "worktrees/candidate")); err == nil {
+		t.Fatal("candidate's direct audit accepted generics")
+	}
+	source(t, root, "worktrees/production/bad.go", "package p\nfunc F[T any]() {}\n")
+	if err := CheckNoGenerics(root); err == nil {
+		t.Fatal("ordinary project source inside worktrees bypassed audit")
 	}
 }

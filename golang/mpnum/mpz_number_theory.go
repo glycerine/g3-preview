@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.cpp:1324-1329,432-513.
 // Source: src/util/mpz.cpp. Licensed under the MIT license.
 // Source: src/util/mpz.cpp array gcd, extended Euclid, lcm, divides.
 package mpnum
@@ -55,6 +56,7 @@ func (m *IntegerManager) extendedGCDWithAllocationContext(r1, r2, a, b, g *Int, 
 		values = &public.values
 		context.recordRecombinationRaw(m, receipt)
 		context.recordRootUpperRaw(m, receipt)
+		context.recordRemoveOneHalfRaw(m, receipt)
 		context.recordPrimePreparationRaw(m, receipt)
 		context.recordFactorFrontendRaw(m, receipt)
 		context.recordContentRaw(m, receipt)

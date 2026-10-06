@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.cpp:1324-1329,432-513.
 // Source: src/math/polynomial/upolynomial.cpp:1298-1321.
 // Source: src/math/polynomial/upolynomial.cpp:1734-1764; src/util/mpz.h:393-407.
 // Source: src/util/mpz.h:468-485; src/util/mpz.cpp:730-817,915-985.
@@ -8,7 +9,9 @@ package mpnum
 // reached declarations; values beyond count carry no source constructor credit.
 type integerRawScope struct {
 	rootUpperBound                                 *upolyRootUpperBoundScope
+	removeOneHalfRoot                              *upolyRemoveOneHalfRootScope
 	rootUpperInvocation                            uint64
+	removeOneHalfInvocation                        uint64
 	rationalSetContext                             integerAllocationInvocationContext
 	formatContext                                  integerAllocationInvocationContext
 	conversionContext                              integerAllocationInvocationContext
@@ -42,7 +45,7 @@ type integerRawInvocationReceipt struct {
 // Executing RAW and scoped Divides NUM calls retain their real declarations.
 // Public owner destruction cannot run from a returning error transport callback.
 func (m *IntegerManager) rawInvocationExecuting() bool {
-	return m.oneHalfRootCallerExecuting() || m.knuthCallerExecuting() || m.rootUpperBoundCallerExecuting() || m.rationalServiceReadCallbackActive() || m.integerEvaluationCallerExecuting() || m.rationalEvaluationCallerExecuting() || m.binaryEvaluationCallerExecuting() || m.algebraicNegCallerExecuting() || m.conversionCallerExecuting() || (m.mpfParent != nil && m.mpfParent.formatInvocationExecuting()) || m.mpfBorrowedSourceCallbackActive() || m.mpfLifecycleCallbackActive() || (m.divisionRaw.active && m.divisionRaw.executing) ||
+	return m.removeOneHalfRootCallerExecuting() || m.oneHalfRootCallerExecuting() || m.knuthCallerExecuting() || m.rootUpperBoundCallerExecuting() || m.rationalServiceReadCallbackActive() || m.integerEvaluationCallerExecuting() || m.rationalEvaluationCallerExecuting() || m.binaryEvaluationCallerExecuting() || m.algebraicNegCallerExecuting() || m.conversionCallerExecuting() || (m.mpfParent != nil && m.mpfParent.formatInvocationExecuting()) || m.mpfBorrowedSourceCallbackActive() || m.mpfLifecycleCallbackActive() || (m.divisionRaw.active && m.divisionRaw.executing) ||
 		(m.extendedRaw.active && m.extendedRaw.executing) ||
 		(m.gcdRaw.active && m.gcdRaw.executing) ||
 		(m.addMulInvocation.active && m.addMulInvocation.executing) ||
@@ -61,6 +64,9 @@ func (m *IntegerManager) rawAllocationRoots(r *integerRawInvocationReceipt) *pol
 		return nil
 	}
 	if q := r.frame.rootUpperBound; q != nil && (integerAllocationInvocationContext{rootUpperBound: q, rootUpperBoundInvocation: r.frame.rootUpperInvocation}).rootUpperBoundFrame(m) == nil {
+		return nil
+	}
+	if q := r.frame.removeOneHalfRoot; q != nil && (integerAllocationInvocationContext{removeOneHalfRoot: q, removeOneHalfRootInvocation: r.frame.removeOneHalfInvocation}).removeOneHalfRootFrame(m) == nil {
 		return nil
 	}
 	if c := r.frame.rationalSetContext; c.mpfRationalSet != nil && c.rationalSetFrame(m, true) == nil {

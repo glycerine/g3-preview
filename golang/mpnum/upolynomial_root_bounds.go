@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.cpp:1324-1329,432-513.
 // Source: src/math/polynomial/upolynomial.cpp:1298-1321.
 // Source: src/math/polynomial/upolynomial.cpp:1906-1951 (Cauchy bound),
 // src/math/polynomial/upolynomial.cpp:1995-2074 (Knuth/nonzero bounds), related root-bound bodies.
@@ -72,7 +73,13 @@ func (m *UPolynomialManager) removeZeroRootsState(v UPolynomialView, out *upolyV
 	}
 	return m.setSize(out, n)
 }
-func (m *UPolynomialManager) HasOneHalfRoot(v UPolynomialView) (result bool, cause error) {
+func (m *UPolynomialManager) HasOneHalfRoot(v UPolynomialView) (bool, error) {
+	return m.hasOneHalfRootWithRemove(v, nil)
+}
+func (m *UPolynomialManager) hasOneHalfRootWithRemove(v UPolynomialView, parent *upolyRemoveOneHalfRootScope) (result bool, cause error) {
+	if parent != nil && (!parent.matches() || parent.owner != m || !parent.active || !parent.executing || m.callbackDepth != 0) {
+		return false, ErrUPolynomialOwner
+	}
 	if e := m.check(); e != nil {
 		return false, e
 	}
@@ -88,6 +95,14 @@ func (m *UPolynomialManager) HasOneHalfRoot(v UPolynomialView) (result bool, cau
 		return false, e
 	}
 	q.target = v
+	if parent != nil {
+		if !parent.matches() || parent.owner != m || !parent.active || !parent.executing {
+			return false, ErrUPolynomialOwner
+		}
+		q.removeParent = parent
+		q.removeParentInvocation = parent.invocation
+		parent.assertion = m.oneHalfRootReceipt()
+	}
 	z := m.config.Integer
 	old, oldN := z.oneHalfRootCaller, z.natural.oneHalfRootCaller
 	z.oneHalfRootCaller = m
@@ -95,6 +110,10 @@ func (m *UPolynomialManager) HasOneHalfRoot(v UPolynomialView) (result bool, cau
 	defer func() {
 		q.executing = false
 		cause = q.finish(cause)
+		if parent != nil && parent.matches() && parent.invocation == q.removeParentInvocation {
+			parent.assertion = m.oneHalfRootReceipt()
+			parent.updateHistory()
+		}
 		z.oneHalfRootCaller = old
 		z.natural.oneHalfRootCaller = oldN
 	}()
@@ -123,13 +142,29 @@ func (m *UPolynomialManager) HasOneHalfRoot(v UPolynomialView) (result bool, cau
 	}
 	return m.modular.IsZero(r)
 }
-func (m *UPolynomialManager) RemoveOneHalfRoot(v UPolynomialView, out UPolynomial) error {
+func (m *UPolynomialManager) RemoveOneHalfRoot(v UPolynomialView, out UPolynomial) (cause error) {
 	d, e := m.descriptor(out)
 	if e != nil {
 		return e
 	}
+	q, e := m.beginRemoveOneHalfRoot()
+	if e != nil {
+		return e
+	}
+	q.target = v
+	q.output = out
+	z := m.config.Integer
+	old, oldN := z.removeOneHalfRootCaller, z.natural.removeOneHalfRootCaller
+	z.removeOneHalfRootCaller = m
+	z.natural.removeOneHalfRootCaller = m
+	defer func() {
+		q.executing = false
+		cause = q.finish(cause)
+		z.removeOneHalfRootCaller = old
+		z.natural.removeOneHalfRootCaller = oldN
+	}()
 	if modularSourceDebug {
-		yes, e := m.HasOneHalfRoot(v)
+		yes, e := m.hasOneHalfRootWithRemove(v, q)
 		if e != nil {
 			return e
 		}
@@ -138,8 +173,17 @@ func (m *UPolynomialManager) RemoveOneHalfRoot(v UPolynomialView, out UPolynomia
 		}
 	}
 	divisor := upolyDivisorSpan{immediate: true, pair: [2]Int{NewInt(-1), NewInt(2)}}
-	return m.divSpanState(v, &divisor, &d.state)
+	var power uint32
+	if e = m.divRemCoreSpanWithSourceContext(v, &divisor, &power, &m.div2, &m.div1, nil, nil, q.context()); e != nil {
+		return e
+	}
+	if e = m.reset(&m.div1); e != nil {
+		return e
+	}
+	d.state, m.div2 = m.div2, d.state
+	return nil
 }
+
 func (m *UPolynomialManager) SignChanges(v UPolynomialView) (uint32, error) {
 	if e := m.check(); e != nil {
 		return 0, e

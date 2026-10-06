@@ -8,7 +8,11 @@ import "testing"
 
 func polynomialPSCFullFixture(t *testing.T) *MultivariatePolynomialManager {
 	t.Helper()
-	q, _ := rationalManager(t, false)
+	return polynomialPSCFullFixtureWithLimit(t, 1<<20)
+}
+func polynomialPSCFullFixtureWithLimit(t *testing.T, limit uint64) *MultivariatePolynomialManager {
+	t.Helper()
+	q, _ := rationalManagerWithLimit(t, false, limit)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{
 		Integer: q.z, Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil },
 	}})

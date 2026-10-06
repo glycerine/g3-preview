@@ -5,7 +5,7 @@ package mpnum
 import "testing"
 
 func TestPolynomialFactorUnivariateActualBackendOutputCloseRefusal(t *testing.T) {
-	full := polynomialPSCFullFixture(t)
+	full := polynomialPSCFullFixtureWithLimit(t, 2<<20)
 	primes, e := NewPrimeGenerator(full.originalBudget)
 	serviceMust(t, e)
 	full.factorConfig = UPolynomialFactorizationConfig{Primes: primes}

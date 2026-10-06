@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.cpp:1324-1329,432-513.
 // Source: src/math/polynomial/upolynomial.cpp:1298-1321.
 // Source: src/math/polynomial/algebraic_numbers.cpp:1565-1577; src/util/mpq.h:199-201.
 // Licensed under the MIT license.
@@ -66,7 +67,7 @@ func (m *RationalManager) SourceFinalize() error {
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
 	}
-	if m.z != nil && (m.z.oneHalfRootCallerExecuting() || m.z.knuthCallerExecuting() || m.z.rootUpperBoundCallerExecuting() || m.z.rationalServiceReadCallbackActive() || m.z.integerEvaluationCallerExecuting() || m.z.rationalEvaluationCallerExecuting() || m.z.binaryEvaluationCallerExecuting() || m.z.algebraicNegCallerExecuting() || m.z.conversionCallerExecuting() || m.z.copyAllocation.executing || m.z.normalizationExecuting || m.z.factorNumeralExecuting || m.z.factorNumeralVectorCallerExecuting() || m.z.factorUnivariateCallerExecuting() || m.z.factorCoreCallerExecuting() || m.z.factorFrontendCallerExecuting() || m.z.upolyDisplayCallerExecuting()) || (m.mpfParent != nil && m.mpfParent.formatInvocationExecuting()) || m.mpfLifecycleCallbackActive() || (m.z != nil && m.z.mpfBorrowedSourceCallbackActive()) {
+	if m.z != nil && (m.z.oneHalfRootCallerExecuting() || m.z.knuthCallerExecuting() || m.z.removeOneHalfRootCallerExecuting() || m.z.rootUpperBoundCallerExecuting() || m.z.rationalServiceReadCallbackActive() || m.z.integerEvaluationCallerExecuting() || m.z.rationalEvaluationCallerExecuting() || m.z.binaryEvaluationCallerExecuting() || m.z.algebraicNegCallerExecuting() || m.z.conversionCallerExecuting() || m.z.copyAllocation.executing || m.z.normalizationExecuting || m.z.factorNumeralExecuting || m.z.factorNumeralVectorCallerExecuting() || m.z.factorUnivariateCallerExecuting() || m.z.factorCoreCallerExecuting() || m.z.factorFrontendCallerExecuting() || m.z.upolyDisplayCallerExecuting()) || (m.mpfParent != nil && m.mpfParent.formatInvocationExecuting()) || m.mpfLifecycleCallbackActive() || (m.z != nil && m.z.mpfBorrowedSourceCallbackActive()) {
 		return ErrPolynomialPending
 	}
 	if m.closed || m.sourceFinalized {

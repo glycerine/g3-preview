@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.cpp:1324-1329,432-513.
 // Source: src/math/polynomial/upolynomial.cpp:1298-1321.
 // Source: src/util/mpzzp.h. Licensed under the MIT license.
 // Concrete source util/mpzzp.h manager; borrows one actual IntegerManager.
@@ -598,6 +599,9 @@ func (m *IntegerModularManager) upolynomialCallerExecuting() bool {
 		return true
 	}
 	if p := z.rootUpperBoundCaller; p != nil && p.config.Integer == z && p.modular == m && p.rootUpperBoundExecuting() {
+		return true
+	}
+	if p := z.removeOneHalfRootCaller; p != nil && p.config.Integer == z && p.modular == m && p.removeOneHalfRootExecuting() {
 		return true
 	}
 	if p := z.integerEvaluationCaller; p != nil && p.config.Integer == z && p.modular == m && p.integerEvaluationExecuting() {

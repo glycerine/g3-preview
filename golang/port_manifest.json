@@ -38367,7 +38367,14 @@
         "mpnum/upolynomial_one_half_root_history_source_test.go",
         "mpnum/upolynomial_one_half_root_invocation.go",
         "mpnum/upolynomial_one_half_root_prefix_source_test.go",
-        "mpnum/upolynomial_one_half_root_source_test.go"
+        "mpnum/upolynomial_one_half_root_source_test.go",
+        "mpnum/upolynomial_remove_one_half_dt_source_test.go",
+        "mpnum/upolynomial_remove_one_half_field_source_test.go",
+        "mpnum/upolynomial_remove_one_half_foreign_source_test.go",
+        "mpnum/upolynomial_remove_one_half_invocation.go",
+        "mpnum/upolynomial_remove_one_half_own_stop_source_test.go",
+        "mpnum/upolynomial_remove_one_half_prefix_source_test.go",
+        "mpnum/upolynomial_remove_one_half_source_test.go"
       ],
       "tests": [
         "TestUPolynomialScalarExtentAndLayout",
@@ -38558,7 +38565,16 @@
         "TestUPolynomialHasOneHalfRootEveryActualReservationPrefix",
         "TestUPolynomialHasOneHalfRootIndependentExactCases",
         "TestUPolynomialHasOneHalfRootFieldPNActualPrefixes",
-        "TestUPolynomialHasOneHalfRootOldAcknowledgmentPreservesLaterActualRoots"
+        "TestUPolynomialHasOneHalfRootOldAcknowledgmentPreservesLaterActualRoots",
+        "TestUPolynomialRemoveOneHalfRootActualAmSourceStop",
+        "TestUPolynomialRemoveOneHalfRootActualDivisionCaller",
+        "TestUPolynomialRemoveOneHalfRootActualUnjoinedOwnStop",
+        "TestUPolynomialRemoveOneHalfRootErasedAndInvalidContext",
+        "TestUPolynomialRemoveOneHalfRootErasedAssertionPreservesOlderChild",
+        "TestUPolynomialRemoveOneHalfRootEveryActualPrefix",
+        "TestUPolynomialRemoveOneHalfRootFailedRowForeignReplacement",
+        "TestUPolynomialRemoveOneHalfRootFieldEveryActualPrefix",
+        "TestUPolynomialRemoveOneHalfRootIndependentLiteralCases"
       ],
       "conditionals": [
         {
@@ -39719,6 +39735,22 @@
             "TestUPolynomialHasOneHalfRootIndependentExactCases",
             "TestUPolynomialHasOneHalfRootFieldPNActualPrefixes",
             "TestUPolynomialHasOneHalfRootOldAcknowledgmentPreservesLaterActualRoots"
+          ]
+        },
+        {
+          "name": "upolynomial.cpp:1324-1329 RemoveOneHalfRoot actual assertion child and same division caller; reached am lexical source suffix at432-493 before outer505-513 publication",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_root_bounds.go",
+          "tests": [
+            "TestUPolynomialRemoveOneHalfRootActualAmSourceStop",
+            "TestUPolynomialRemoveOneHalfRootActualDivisionCaller",
+            "TestUPolynomialRemoveOneHalfRootActualUnjoinedOwnStop",
+            "TestUPolynomialRemoveOneHalfRootErasedAndInvalidContext",
+            "TestUPolynomialRemoveOneHalfRootErasedAssertionPreservesOlderChild",
+            "TestUPolynomialRemoveOneHalfRootEveryActualPrefix",
+            "TestUPolynomialRemoveOneHalfRootFailedRowForeignReplacement",
+            "TestUPolynomialRemoveOneHalfRootFieldEveryActualPrefix",
+            "TestUPolynomialRemoveOneHalfRootIndependentLiteralCases"
           ]
         }
       ],

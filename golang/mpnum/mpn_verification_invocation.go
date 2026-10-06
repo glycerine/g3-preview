@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.cpp:1324-1329,432-513.
 // Source: src/util/mpn.cpp:206-217; src/util/buffer.h.
 // Licensed under the MIT license. Source author: Christoph Wintersteiger.
 package mpnum
@@ -8,7 +9,9 @@ import "github.com/glycerine/g3/golang/memory"
 // construction owns exact raw/pending leaves but has no source destructor.
 type naturalPNVerificationScope struct {
 	rootUpperBound                               *upolyRootUpperBoundScope
+	removeOneHalfRoot                            *upolyRemoveOneHalfRootScope
 	rootUpperInvocation                          uint64
+	removeOneHalfInvocation                      uint64
 	rationalSetContext                           integerAllocationInvocationContext
 	factorFrontendContext                        integerAllocationInvocationContext
 	roundContext                                 integerAllocationInvocationContext

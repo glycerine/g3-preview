@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.cpp:1324-1329,432-513.
 // Source: src/math/polynomial/upolynomial.cpp:1298-1321.
 // Source: src/math/polynomial/algebraic_numbers.cpp:1565-1577; src/util/mpz.h:124-149.
 // Source: src/util/mpz.h:698-707.
@@ -53,6 +54,7 @@ type IntegerManager struct {
 	rationalServiceParent                  *RationalService
 	rationalServiceRead                    *RationalServiceInvocation
 	rootUpperBoundCaller                   *UPolynomialManager
+	removeOneHalfRootCaller                *UPolynomialManager
 	oneHalfRootCaller                      *UPolynomialManager
 	integerEvaluationCaller                *UPolynomialManager
 	rationalEvaluationCaller               *UPolynomialManager

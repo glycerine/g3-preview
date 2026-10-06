@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.cpp:1324-1329,432-513.
 // Licensed under the MIT license.
 // Source: src/util/mpz.h and src/util/mpz.cpp internal signed division wrappers/core.
 // Knuth division translated from src/util/mpn.cpp.
@@ -134,6 +135,7 @@ func (m *IntegerManager) divWithAllocationContext(a, b, c *Int, context integerA
 			context.recordFormatRaw(m, receipt)
 			context.recordRecombinationRaw(m, receipt)
 			context.recordRootUpperRaw(m, receipt)
+			context.recordRemoveOneHalfRaw(m, receipt)
 			context.recordPrimePreparationRaw(m, receipt)
 			context.recordFactorFrontendRaw(m, receipt)
 			context.recordContentRaw(m, receipt)

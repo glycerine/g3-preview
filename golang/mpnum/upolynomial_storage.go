@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.cpp:1324-1329,432-513.
 // Licensed under the MIT license.
 // Source: src/util/vector.h:59-100; src/math/polynomial/upolynomial.cpp:164-203.
 // Concrete typed storage for actual svector<mpz> coefficient ownership.
@@ -455,6 +456,9 @@ func (m *UPolynomialManager) setViewWithSourceContext(s *upolyVectorState, v UPo
 			return e
 		}
 		if e = m.modular.copyWithSourceContext(&m.values(s)[i], a, context); e != nil {
+			if q := context.removeOneHalfRootFrame(m.config.Integer); q != nil {
+				q.recordFailedRow(s, i)
+			}
 			return e
 		}
 	}

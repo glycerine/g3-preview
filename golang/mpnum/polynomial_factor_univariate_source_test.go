@@ -8,7 +8,7 @@ import (
 )
 
 func TestPolynomialFactorUnivariateLiteralSquareFreeBackend(t *testing.T) {
-	full := polynomialPSCFullFixture(t)
+	full := polynomialPSCFullFixtureWithLimit(t, 2<<20)
 	primes, e := NewPrimeGenerator(full.core.integer.budget)
 	serviceMust(t, e)
 	full.factorConfig = UPolynomialFactorizationConfig{Primes: primes}
@@ -33,7 +33,7 @@ func TestPolynomialFactorUnivariateEveryActualReservationPrefix(t *testing.T) {
 	success := false
 	for prefix := int64(0); prefix < 240 && !success; prefix++ {
 		t.Run(strconv.FormatInt(prefix, 10), func(t *testing.T) {
-			full := polynomialPSCFullFixture(t)
+			full := polynomialPSCFullFixtureWithLimit(t, 2<<20)
 			primes, e := NewPrimeGenerator(full.core.integer.budget)
 			serviceMust(t, e)
 			full.factorConfig = UPolynomialFactorizationConfig{Primes: primes}
@@ -83,7 +83,7 @@ func TestPolynomialFactorUnivariateEveryActualReservationPrefix(t *testing.T) {
 func TestPolynomialFactorUnivariateLiteralSignParity(t *testing.T) {
 	for _, k := range []uint32{1, 2, 3} {
 		t.Run(strconv.FormatUint(uint64(k), 10), func(t *testing.T) {
-			full := polynomialPSCFullFixture(t)
+			full := polynomialPSCFullFixtureWithLimit(t, 2<<20)
 			primes, e := NewPrimeGenerator(full.core.integer.budget)
 			serviceMust(t, e)
 			full.factorConfig = UPolynomialFactorizationConfig{Primes: primes}

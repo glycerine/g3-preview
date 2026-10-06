@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.cpp:1324-1329,432-513.
 // Licensed under the MIT license.
 // Source: src/math/polynomial/upolynomial.cpp:403-651; outputs keep completed prefixes.
 package mpnum
@@ -108,6 +109,12 @@ func (m *UPolynomialManager) divRemCoreSpanWithHensel(a UPolynomialView, b *upol
 	return m.divRemCoreSpanWithSourceContext(a, b, d, q, r, receipt, nil, context)
 }
 func (m *UPolynomialManager) divRemCoreSpanWithSourceContext(a UPolynomialView, b *upolyDivisorSpan, d *uint32, q, r *upolyVectorState, receipt *upolyHenselPairInvocationReceipt, caller *upolyHenselCallerScope, context integerAllocationInvocationContext) (failure error) {
+	if context.removeOneHalfRoot != nil {
+		frame := context.removeOneHalfRootFrame(m.config.Integer)
+		if frame == nil || frame.owner != m || frame.owner.modular != m.modular {
+			return ErrUPolynomialOwner
+		}
+	}
 	if d == nil {
 		return arena.ErrBounds
 	}
@@ -174,8 +181,9 @@ func (m *UPolynomialManager) divRemCoreSpanWithSourceContext(a UPolynomialView, 
 		h.amConstructed = true
 		am = &h.am
 	}
-	// Source scoped_numeral destructor; cleanup on Go errors is the safe
-	// exception adapter. The counter and caller/scratch prefixes stay published.
+	// The selected Remove/Hensel callers retain and join this actual lexical
+	// destructor. Legacy nil public Div/DivRem still ignore Del errors and remain
+	// a separate caller-lifetime obligation; scratch/source prefixes stay published.
 	if caller != nil {
 		caller.am = Int{}
 		caller.amConstructed = true
@@ -183,7 +191,13 @@ func (m *UPolynomialManager) divRemCoreSpanWithSourceContext(a UPolynomialView, 
 		caller.amOwned = false
 		am = &caller.am
 	}
-	if receipt == nil && caller == nil {
+	if removing := context.removeOneHalfRootFrame(m.config.Integer); removing != nil {
+		removing.values[0] = Int{}
+		removing.constructed = 1
+		removing.sourceRemaining = 1
+		am = &removing.values[0]
+		defer func() { failure = removing.finishAmSource(failure) }()
+	} else if receipt == nil && caller == nil {
 		defer m.modular.Del(am)
 	} else if caller != nil {
 		defer func() { failure = joinHenselCaller(failure, caller.finishAmSource(failure)) }()
@@ -247,7 +261,7 @@ func (m *UPolynomialManager) divRemCoreSpanWithSourceContext(a UPolynomialView, 
 				return e
 			}
 			dst := &m.values(r)[i+delta]
-			if e = m.modular.subMulWithSourceContext(dst, am, x, dst, henselNumericAddMulChild(receipt, caller), context); e != nil {
+			if e = m.modular.subMulWithSourceContext(dst, am, x, dst, removeOrHenselAddMulChild(context, receipt, caller), context); e != nil {
 				return e
 			}
 		}

@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.cpp:1324-1329,432-513.
 // Source: src/util/mpzzp.h:58-68,111-114; src/util/mpz.cpp:quot_rem_core.
 // Licensed under the MIT license. Source author: Leonardo de Moura.
 package mpnum
@@ -56,7 +57,9 @@ func (m *IntegerModularManager) cleanupPNormalizeInvocation(r *integerPNormalize
 // Successful publication returns authority to the persistent Natural member.
 type naturalPNBufferReceipt struct {
 	rootUpperBound          *upolyRootUpperBoundScope
+	removeOneHalfRoot       *upolyRemoveOneHalfRootScope
 	rootUpperInvocation     uint64
+	removeOneHalfInvocation uint64
 	rationalSetContext      integerAllocationInvocationContext
 	factorFrontendContext   integerAllocationInvocationContext
 	roundContext            integerAllocationInvocationContext
@@ -251,6 +254,21 @@ func (r *naturalPNBufferReceipt) bound(executing bool) bool {
 		if r.private {
 			v := &r.owner.verificationInvocation
 			return r == &v.buffer && r.buffer == &r.owner.verification && v.rootUpperBound == q && v.rootUpperInvocation == q.invocation && r.owner.matchesPNVerification(&q.verification)
+		}
+		for i := range q.buffers {
+			if r == &q.buffers[i] {
+				return r.buffer == &r.owner.division[i]
+			}
+		}
+		return false
+	}
+	if q := r.removeOneHalfRoot; q != nil {
+		if !q.matches() || r.owner != q.owner.config.Integer.natural || r.removeOneHalfInvocation != q.invocation || r.invocation != q.invocation || (executing && (integerAllocationInvocationContext{removeOneHalfRoot: q, removeOneHalfRootInvocation: r.removeOneHalfInvocation}).removeOneHalfRootFrame(q.owner.config.Integer) == nil) {
+			return false
+		}
+		if r.private {
+			v := &r.owner.verificationInvocation
+			return r == &v.buffer && r.buffer == &r.owner.verification && v.removeOneHalfRoot == q && v.removeOneHalfInvocation == q.invocation && r.owner.matchesPNVerification(&q.verification)
 		}
 		for i := range q.buffers {
 			if r == &q.buffers[i] {
@@ -560,6 +578,17 @@ func (m *NaturalManager) divisionBufferReceipt(context integerAllocationInvocati
 		r := &q.buffers[i]
 		if r.owner == nil {
 			*r = naturalPNBufferReceipt{owner: m, rootUpperBound: q, rootUpperInvocation: q.invocation, invocation: q.invocation, buffer: &m.division[i]}
+		}
+		return r
+	}
+	if q := context.removeOneHalfRoot; q != nil && context.pn == nil && context.raw == nil {
+		z := q.owner.config.Integer
+		if z.natural != m || context.removeOneHalfRootFrame(z) == nil {
+			return nil
+		}
+		r := &q.buffers[i]
+		if r.owner == nil {
+			*r = naturalPNBufferReceipt{owner: m, removeOneHalfRoot: q, removeOneHalfInvocation: q.invocation, invocation: q.invocation, buffer: &m.division[i]}
 		}
 		return r
 	}

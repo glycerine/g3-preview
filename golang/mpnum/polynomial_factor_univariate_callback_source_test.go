@@ -6,7 +6,7 @@ import "testing"
 func TestPolynomialFactorUnivariateCheckpointProtectsOutputOwner(t *testing.T) {
 	for _, operation := range []string{"source", "close", "cleanup", "fullSource", "fullClose", "typedSource", "typedOwn"} {
 		t.Run(operation, func(t *testing.T) {
-			full := polynomialPSCFullFixture(t)
+			full := polynomialPSCFullFixtureWithLimit(t, 2<<20)
 			primes, e := NewPrimeGenerator(full.core.integer.budget)
 			serviceMust(t, e)
 			full.factorConfig = UPolynomialFactorizationConfig{Primes: primes}

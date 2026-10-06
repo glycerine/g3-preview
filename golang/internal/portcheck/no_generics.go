@@ -6,6 +6,7 @@ import (
 	"go/parser"
 	"go/token"
 	"io/fs"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -14,7 +15,8 @@ import (
 // CheckNoGenerics guards project declarations and explicit type-argument syntax
 // in production, tests and generated Go files. It also rejects generic standard
 // library calls used without explicit type arguments. Ordinary array indexing
-// remains valid. This syntax audit does not replace review of external APIs.
+// remains valid. Nested Go modules are audited separately at their own roots.
+// This syntax audit does not replace review of external APIs.
 func CheckNoGenerics(root string) error {
 	return filepath.WalkDir(root, func(p string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -23,6 +25,15 @@ func CheckNoGenerics(root string) error {
 		if d.IsDir() {
 			if p != root && (d.Name() == ".cache" || d.Name() == ".git") {
 				return filepath.SkipDir
+			}
+			if p != root {
+				info, err := os.Stat(filepath.Join(p, "go.mod"))
+				if err == nil && !info.IsDir() {
+					return filepath.SkipDir
+				}
+				if err != nil && !os.IsNotExist(err) {
+					return err
+				}
 			}
 			return nil
 		}

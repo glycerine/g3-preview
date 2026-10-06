@@ -39,7 +39,12 @@ func TestPolynomialFactorCoreLiteralRepeatedAndDispatcherCases(t *testing.T) {
 	}
 	for _, entry := range cases {
 		t.Run(entry.name, func(t *testing.T) {
-			full := polynomialPSCFullFixture(t)
+			var full *MultivariatePolynomialManager
+			if entry.name == "univariate" {
+				full = polynomialPSCFullFixtureWithLimit(t, 2<<20)
+			} else {
+				full = polynomialPSCFullFixture(t)
+			}
 			var primes *PrimeGenerator
 			if entry.name == "univariate" {
 				var e error

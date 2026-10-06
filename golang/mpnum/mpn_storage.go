@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.cpp:1324-1329,432-513.
 // Source: src/math/polynomial/upolynomial.cpp:1298-1321.
 // Licensed under the MIT license.
 // Source: src/util/mpn.h manager scratch and util/buffer.h growth policy.
@@ -18,6 +19,7 @@ type NaturalManager struct {
 	knuthCaller                       *UPolynomialManager
 	oneHalfRootCaller                 *UPolynomialManager
 	rootUpperBoundCaller              *UPolynomialManager
+	removeOneHalfRootCaller           *UPolynomialManager
 	self                              *NaturalManager
 	runtime                           *memory.Runtime
 	ownsRuntime                       bool
@@ -137,7 +139,7 @@ func (m *NaturalManager) Close() {
 	}
 }
 func (m *NaturalManager) CloseChecked() error {
-	if m.oneHalfRootCallerExecuting() || m.knuthCallerExecuting() || m.rootUpperBoundCallerExecuting() {
+	if m.oneHalfRootCallerExecuting() || m.knuthCallerExecuting() || m.removeOneHalfRootCallerExecuting() || m.rootUpperBoundCallerExecuting() {
 		return arena.ErrInvalidSlot
 	}
 	if m == nil || m.self != m {

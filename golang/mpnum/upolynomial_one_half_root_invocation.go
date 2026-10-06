@@ -11,6 +11,8 @@ import (
 
 type upolyOneHalfRootScope struct {
 	constructed                              uint8
+	removeParent                             *upolyRemoveOneHalfRootScope
+	removeParentInvocation                   uint64
 	target                                   UPolynomialView
 	falseAcknowledged                        bool
 	owner                                    *UPolynomialManager
@@ -60,6 +62,15 @@ func (q *upolyOneHalfRootScope) context() integerAllocationInvocationContext {
 	return integerAllocationInvocationContext{oneHalfRoot: q, oneHalfRootInvocation: q.invocation}
 }
 func (q *upolyOneHalfRootScope) prepareHistory() error {
+	if p := q.removeParent; p != nil {
+		if !p.matches() || p.owner != q.owner || p.invocation != q.removeParentInvocation || !p.active || !p.executing {
+			return ErrUPolynomialOwner
+		}
+		if e := p.prepareHistory(); e != nil {
+			return e
+		}
+	}
+
 	if q.history != nil {
 		return nil
 	}

@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.cpp:1324-1329,432-513.
 // Source: src/math/polynomial/upolynomial.cpp:1298-1321.
 // Source: src/math/polynomial/algebraic_numbers.cpp:1565-1577; src/util/mpz.h:124-149.
 // Source: src/util/mpz.h:124-149; src/util/buffer.h:39-46;
@@ -15,6 +16,9 @@ func (c integerAllocationInvocationContext) prepareFactorHistory(z *IntegerManag
 		return q.prepareHistory()
 	}
 	if q := c.rootUpperBoundFrame(z); q != nil {
+		return q.prepareHistory()
+	}
+	if q := c.removeOneHalfRootFrame(z); q != nil {
 		return q.prepareHistory()
 	}
 	if q := c.integerEvaluationFrame(z); q != nil {
