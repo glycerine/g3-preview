@@ -75,6 +75,9 @@ func (m *UPolynomialManager) Stats() UPolynomialStats {
 		return UPolynomialStats{}
 	}
 	s := UPolynomialStats{OwnerBytes: m.header, LivePolynomials: m.live, ModularBytes: m.modular.OwnerBytes()}
+	for f := m.displayFrames; f != nil; f = f.next {
+		s.OwnerBytes += f.header
+	}
 	s.DirectoryBytes = uint64(cap(m.pages))*uint64(reflect.TypeOf((*upolyDescriptorPage)(nil)).Size()) + uint64(cap(m.bindings))*uint64(reflect.TypeOf(upolyStoreBinding{}).Size())
 	s.PageBytes = uint64(len(m.pages)) * uint64(reflect.TypeOf(upolyDescriptorPage{}).Size())
 	m.addStoreStats(&s, m.store)
@@ -113,6 +116,14 @@ func (m *UPolynomialManager) Stats() UPolynomialStats {
 			if r.Slot != 0 {
 				s.IntegerNaturalWordsRefs++
 			}
+		}
+	}
+	if validNumericRef(z.cells, m.display.numeral.cell) {
+		s.OwnedNumeralCells++
+	}
+	for f := m.displayFrames; f != nil; f = f.next {
+		if validNumericRef(z.cells, f.numeral.cell) {
+			s.OwnedNumeralCells++
 		}
 	}
 	for _, a := range [7]Int{m.modular.p, m.modular.lower, m.modular.upper, m.modular.invTmp1, m.modular.invTmp2, m.modular.invTmp3, m.modular.divTmp} {

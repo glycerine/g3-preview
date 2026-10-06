@@ -23,7 +23,7 @@ func TestNumeralCStringViewExactCompletedCharacterInvocation(t *testing.T) {
 	construct := func() NumeralCStringView {
 		serviceMust(t, n.beginIntegerCharacters(uint32(11*size)))
 		serviceMust(t, n.sourceToCString(limbView{allocator: z.allocator, backing: c.backing, size: size}, sourceDecimalDestination{character: &n.charFormatting.buffer, assembly: n}, uint64(n.charFormatting.buffer.pos)))
-		return NumeralCStringView{n, n.charFormatting.invocation}
+		return NumeralCStringView{owner: n, invocation: n.charFormatting.invocation}
 	}
 	old := construct()
 	for i, want := range []byte("1099511627776\x00") {

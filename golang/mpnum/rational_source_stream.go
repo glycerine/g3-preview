@@ -28,8 +28,10 @@ type RationalSourceStream interface {
 // NumeralCStringView borrows the exact completed lexical char buffer invocation.
 // It performs reached byte reads without building a host string or assembly.
 type NumeralCStringView struct {
-	owner      *NaturalManager
-	invocation uint64
+	owner             *NaturalManager
+	invocation        uint64
+	character         *integerCharacterScope
+	displayInvocation uint64
 }
 
 func (v NumeralCStringView) Byte(i uint64) (byte, error) {
@@ -37,6 +39,12 @@ func (v NumeralCStringView) Byte(i uint64) (byte, error) {
 		return 0, arena.ErrInvalidSlot
 	}
 	s := &v.owner.charFormatting
+	if v.character != nil {
+		s = v.character
+		if !v.owner.matchesIntegerCharacterScope(s) || v.displayInvocation != s.displayInvocation {
+			return 0, arena.ErrInvalidSlot
+		}
+	}
 	if !s.active || !s.completed || s.invocation != v.invocation {
 		return 0, arena.ErrInvalidSlot
 	}
@@ -73,7 +81,10 @@ func (s *RationalService) InsertIntoTracked(out RationalSourceStream, v *OwnedRa
 func (m *IntegerManager) insertSourceInteger(out RationalSourceStream, a *Int) error {
 	return m.insertSourceIntegerTracked(out, a, nil, nil)
 }
-func (m *IntegerManager) insertSourceIntegerTracked(out RationalSourceStream, a *Int, service *RationalService, receipt *NumeralInsertionReceipt) (result error) {
+func (m *IntegerManager) insertSourceIntegerTracked(out RationalSourceStream, a *Int, service *RationalService, receipt *NumeralInsertionReceipt) error {
+	return m.insertSourceIntegerTrackedWithDisplay(out, a, service, receipt, nil)
+}
+func (m *IntegerManager) insertSourceIntegerTrackedWithDisplay(out RationalSourceStream, a *Int, service *RationalService, receipt *NumeralInsertionReceipt, display *upolyDisplayScope) (result error) {
 	if e := m.check(a); e != nil {
 		return e
 	}
@@ -91,10 +102,19 @@ func (m *IntegerManager) insertSourceIntegerTracked(out RationalSourceStream, a 
 		return e
 	}
 	n := m.natural
+	characters := &n.charFormatting
+	if display != nil {
+		characters = &display.characters
+	}
 	if receipt != nil && receipt.active {
 		return arena.ErrInvalidSlot
 	}
-	if e = n.beginIntegerCharactersTracked(uint32(11*size), service, receipt); e != nil {
+	previousInvocation := characters.invocation
+	e = n.beginIntegerCharactersForInsertion(uint32(11*size), service, receipt, display)
+	if characters.invocation != previousInvocation && characters.callExecuting {
+		defer n.endIntegerCharacterCall(characters)
+	}
+	if e != nil {
 		if receipt != nil && receipt.active {
 			receipt.bodyCause = e
 			receipt.sourceDone = true
@@ -118,12 +138,12 @@ func (m *IntegerManager) insertSourceIntegerTracked(out RationalSourceStream, a 
 			}
 		}
 	}()
-	e = n.sourceToCStringTracked(limbView{allocator: m.allocator, backing: c.backing, size: size}, sourceDecimalDestination{character: &n.charFormatting.buffer, assembly: n}, uint64(n.charFormatting.buffer.pos), receipt)
+	e = n.sourceToCStringScopedTracked(limbView{allocator: m.allocator, backing: c.backing, size: size}, sourceDecimalDestination{character: &characters.buffer, assembly: n}, uint64(characters.buffer.pos), characters.formatting, receipt)
 	if e == nil {
-		e = out.AppendNumeralCString(NumeralCStringView{n, n.charFormatting.invocation})
+		e = out.AppendNumeralCString(NumeralCStringView{owner: n, invocation: characters.invocation, character: characters, displayInvocation: characters.displayInvocation})
 	}
-	if e != nil && n.charFormatting.originalCause == nil {
-		n.charFormatting.originalCause = e
+	if e != nil && characters.originalCause == nil {
+		characters.originalCause = e
 	}
 	// A younger source local that stopped destruction protects the older char
 	// buffer. Failed construction likewise has no source destructor.
@@ -131,7 +151,7 @@ func (m *IntegerManager) insertSourceIntegerTracked(out RationalSourceStream, a 
 	if errors.As(e, &stopped) {
 		return e
 	}
-	if cleanup := n.destroyIntegerCharacters(); cleanup != nil {
+	if cleanup := n.destroyIntegerCharacterScope(characters); cleanup != nil {
 		return &NumeralSourceFailure{BodyCause: e, DestructorCause: cleanup}
 	}
 	if receipt != nil {

@@ -206,6 +206,29 @@ func primeTrialPhysicalAuditAll(t *testing.T, q *RationalManager, s *UPolynomial
 		if m == nil || m.closed {
 			continue
 		}
+		appendDisplay := func(f *upolyDisplayScope) {
+			n += f.header
+			roots = append(roots, &f.numeral)
+			if f.characters.buffer.raw != (memory.Block{}) {
+				external = append(external, f.characters.buffer.raw)
+			}
+			if f.characters.buffer.pending != (memory.Block{}) {
+				external = append(external, f.characters.buffer.pending)
+			}
+			for i := range f.characterFormatting.locals {
+				b := &f.characterFormatting.locals[i]
+				if b.raw != (memory.Block{}) {
+					external = append(external, b.raw)
+				}
+				if b.pending != (memory.Block{}) {
+					external = append(external, b.pending)
+				}
+			}
+		}
+		for f := m.displayFrames; f != nil; f = f.next {
+			appendDisplay(f)
+		}
+		appendDisplay(&m.display)
 		n += m.header + m.modular.header + uint64(cap(m.pages))*uint64(reflect.TypeOf((*upolyDescriptorPage)(nil)).Size()) + uint64(len(m.pages))*uint64(reflect.TypeOf(upolyDescriptorPage{}).Size()) + uint64(cap(m.bindings))*uint64(reflect.TypeOf(upolyStoreBinding{}).Size())
 		roots = append(roots, &m.modular.p, &m.modular.lower, &m.modular.upper, &m.modular.invTmp1, &m.modular.invTmp2, &m.modular.invTmp3, &m.modular.divTmp)
 		for _, v := range []*upolyVectorState{&m.db, &m.dbab1, &m.dbab2, &m.tr, &m.push, &m.basic, &m.div1, &m.div2, &m.exactDiv, &m.gcd1, &m.gcd2, &m.cra, &m.mgcd[0], &m.mgcd[1], &m.mgcd[2], &m.mgcd[3], &m.mgcd[4], &m.mgcd[5], &m.sqf1, &m.sqf2, &m.pw} {

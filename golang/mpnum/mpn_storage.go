@@ -22,6 +22,7 @@ type NaturalManager struct {
 	verificationInvocation            naturalPNVerificationScope
 	formatting                        naturalFormattingScope
 	charFormatting                    integerCharacterScope
+	characterCalls                    *integerCharacterScope
 	sourceFinalizing, sourceFinalized bool
 	sourceStage                       uint8
 	sourceCause                       error
@@ -137,6 +138,9 @@ func (m *NaturalManager) CloseChecked() error {
 	}
 	if m.closed {
 		return nil
+	}
+	if m.characterCalls != nil {
+		return arena.ErrInvalidSlot
 	}
 	m.closing = true
 	fail := func(e error) error { m.cleanupCause = e; return e }

@@ -31,6 +31,27 @@ func (m *UPolynomialManager) sourceFinalizeWithCallerOwners(r *upolyHenselPairIn
 	if m.sourceCause != nil {
 		return m.sourceCause
 	}
+	// Complete the actual display source suffix before private older members;
+	// failed SMT RAW bodies remain unjoined for explicit owning cleanup.
+	if q := &m.display; q.active {
+		q.enterCall()
+		e := q.finish(nil)
+		q.leaveCall()
+		if e != nil {
+			return e
+		}
+	}
+	for q := m.displayFrames; q != nil; q = q.next {
+		if !q.active {
+			continue
+		}
+		q.enterCall()
+		e := q.finish(nil)
+		q.leaveCall()
+		if e != nil {
+			return e
+		}
+	}
 	m.sourceFinalizing = true
 	derived := [5]*upolyVectorState{&m.db, &m.dbab1, &m.dbab2, &m.tr, &m.push}
 	core := [16]*upolyVectorState{&m.basic, &m.div1, &m.div2, &m.exactDiv, &m.gcd1, &m.gcd2, &m.cra, &m.mgcd[0], &m.mgcd[1], &m.mgcd[2], &m.mgcd[3], &m.mgcd[4], &m.mgcd[5], &m.sqf1, &m.sqf2, &m.pw}

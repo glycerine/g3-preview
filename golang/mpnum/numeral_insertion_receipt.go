@@ -12,7 +12,7 @@ type NumeralInsertionReceipt struct {
 	natural                                             *NaturalManager
 	character                                           *integerCharacterScope
 	formatting                                          *naturalFormattingScope
-	invocation, formattingInvocation                    uint64
+	invocation, formattingInvocation, displayInvocation uint64
 	characterOwned, characterCompleted, formattingOwned bool
 	active, sourceDone, retired                         bool
 	bodyCause, sourceCause, ownCause                    error
@@ -24,11 +24,17 @@ func (s *RationalService) CompleteNumeralInsertion(r *NumeralInsertionReceipt, o
 		return e
 	}
 	defer s.mu.Unlock()
-	if r == nil || !r.active || r.service != s || r.natural != s.manager.z.natural || r.character != &r.natural.charFormatting || r.invocation == 0 || (r.characterOwned && r.invocation != r.character.invocation) {
+	return completeNumeralInsertion(r, s.manager.z.natural, s, owning)
+}
+func completeNumeralInsertion(r *NumeralInsertionReceipt, natural *NaturalManager, service *RationalService, owning bool) error {
+	if r == nil || !r.active || r.service != service || r.natural != natural || !natural.matchesIntegerCharacterScope(r.character) || r.invocation == 0 || (r.characterOwned && r.invocation != r.character.invocation) || r.displayInvocation != r.character.displayInvocation {
 		return arena.ErrInvalidSlot
 	}
 	n := r.natural
-	if r.formattingOwned && r.formatting != nil && (r.formatting != &n.formatting || r.formattingInvocation != r.formatting.invocation) {
+	if r.character.callExecuting {
+		return arena.ErrInvalidSlot
+	}
+	if r.formattingOwned && r.formatting != nil && (r.formatting != r.character.formatting || r.formattingInvocation != r.formatting.invocation) {
 		return arena.ErrInvalidSlot
 	}
 	stop := func(e error) error {
@@ -47,7 +53,7 @@ func (s *RationalService) CompleteNumeralInsertion(r *NumeralInsertionReceipt, o
 			}
 		}
 		if r.characterOwned && r.characterCompleted {
-			if e := n.destroyIntegerCharacters(); e != nil {
+			if e := n.destroyIntegerCharacterScope(r.character); e != nil {
 				return stop(e)
 			}
 			r.characterOwned = false
@@ -63,11 +69,11 @@ func (s *RationalService) CompleteNumeralInsertion(r *NumeralInsertionReceipt, o
 			return stop(e)
 		}
 	}
-	if r.characterOwned && n.charFormatting.pending {
-		if e := n.charFormatting.buffer.finalize(n.runtime); e != nil {
+	if r.characterOwned && r.character.pending {
+		if e := r.character.buffer.finalize(n.runtime); e != nil {
 			return stop(e)
 		}
-		n.charFormatting = integerCharacterScope{invocation: n.charFormatting.invocation}
+		r.character.reset()
 	}
 	r.characterOwned = false
 	r.formattingOwned = false

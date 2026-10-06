@@ -5,6 +5,9 @@ package mpnum
 // Explicit passed invocation identity. It carries no allocation snapshot and
 // creates no source numeral, reservation, or ambient callback owner hook.
 type integerAllocationInvocationContext struct {
+	upolyDisplay           *upolyDisplayScope
+	upolyDisplayInvocation uint64
+
 	factorNumeralVector              *polynomialFactorNumeralVectorReceipt
 	factorNumeralVectorInvocation    uint64
 	toPolynomial                     *polynomialToPolynomialInvocationReceipt
@@ -103,6 +106,10 @@ func pnAllocationContext(pn *integerPNormalizeScope) integerAllocationInvocation
 	return c
 }
 func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomialNumericRoots {
+	if c.upolyDisplay != nil && c.upolyDisplayFrame(m) == nil {
+		return nil
+	}
+
 	if c.factorNumeralVector != nil && m.factorNumeralVectorRoots(c) == nil {
 		return nil
 	}
@@ -194,6 +201,9 @@ func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomial
 	}
 	if c.perfectSquare != nil {
 		return m.perfectSquareContextRoots(c)
+	}
+	if q := c.upolyDisplayFrame(m); q != nil {
+		return &q.numeric
 	}
 	if c.iccpConstant != nil {
 		return m.iccpConstantContextRoots(c)

@@ -10,6 +10,13 @@ import (
 )
 
 type integerCharacterScope struct {
+	self                        *integerCharacterScope
+	owner                       *NaturalManager
+	display                     *upolyDisplayScope
+	displayInvocation           uint64
+	formatting                  *naturalFormattingScope
+	previous                    *integerCharacterScope
+	callExecuting               bool
 	buffer                      sourceCharBuffer
 	invocation                  uint64
 	active, completed, pending  bool
@@ -20,19 +27,48 @@ func (m *NaturalManager) beginIntegerCharacters(n uint32) error {
 	return m.beginIntegerCharactersTracked(n, nil, nil)
 }
 func (m *NaturalManager) beginIntegerCharactersTracked(n uint32, service *RationalService, receipt *NumeralInsertionReceipt) error {
+	return m.beginIntegerCharactersWithDisplay(n, service, receipt, nil)
+}
+func (m *NaturalManager) beginIntegerCharactersWithDisplay(n uint32, service *RationalService, receipt *NumeralInsertionReceipt, display *upolyDisplayScope) error {
+	return m.beginIntegerCharacterScope(n, service, receipt, display, false)
+}
+func (m *NaturalManager) beginIntegerCharactersForInsertion(n uint32, service *RationalService, receipt *NumeralInsertionReceipt, display *upolyDisplayScope) error {
+	return m.beginIntegerCharacterScope(n, service, receipt, display, true)
+}
+func (m *NaturalManager) beginIntegerCharacterScope(n uint32, service *RationalService, receipt *NumeralInsertionReceipt, display *upolyDisplayScope, executing bool) error {
 	if e := m.check(); e != nil {
 		return e
 	}
 	s := &m.charFormatting
+	formatting := &m.formatting
+	if display != nil {
+		if !display.actual() || !display.executing || display.owner.config.Integer.natural != m || display.owner.currentDisplay != display {
+			return ErrUPolynomialOwner
+		}
+		s = &display.characters
+		formatting = &display.characterFormatting
+	}
 	if s.active || s.pending {
 		return arena.ErrInvalidSlot
 	}
 	if s.invocation == math.MaxUint64 {
 		return arena.ErrBounds
 	}
-	*s = integerCharacterScope{active: true, invocation: s.invocation + 1}
+	if display != nil {
+		if e := display.prepareStorage(); e != nil {
+			return e
+		}
+	}
+	*s = integerCharacterScope{owner: m, display: display, formatting: formatting, active: true, invocation: s.invocation + 1}
+	s.self = s
+	if display != nil {
+		s.displayInvocation = display.invocation
+	}
 	if receipt != nil {
-		*receipt = NumeralInsertionReceipt{service: service, natural: m, character: s, invocation: s.invocation, active: true, characterOwned: true}
+		*receipt = NumeralInsertionReceipt{service: service, natural: m, character: s, invocation: s.invocation, displayInvocation: s.displayInvocation, active: true, characterOwned: true}
+	}
+	if executing {
+		m.beginIntegerCharacterCall(s)
 	}
 	if e := s.buffer.resize(m.runtime, n); e != nil {
 		s.active = false
@@ -47,7 +83,9 @@ func (m *NaturalManager) beginIntegerCharactersTracked(n uint32, service *Ration
 	return nil
 }
 func (m *NaturalManager) destroyIntegerCharacters() error {
-	s := &m.charFormatting
+	return m.destroyIntegerCharacterScope(&m.charFormatting)
+}
+func (m *NaturalManager) destroyIntegerCharacterScope(s *integerCharacterScope) error {
 	if !s.completed {
 		return nil
 	}
@@ -68,8 +106,36 @@ func (m *NaturalManager) destroyIntegerCharacters() error {
 		s.pending = true
 		return arena.ErrInvalidSlot
 	}
-	*s = integerCharacterScope{invocation: s.invocation}
+	s.reset()
 	return nil
+}
+
+func (s *integerCharacterScope) reset() {
+	*s = integerCharacterScope{self: s.self, owner: s.owner, display: s.display, displayInvocation: s.displayInvocation, formatting: s.formatting, previous: s.previous, callExecuting: s.callExecuting, invocation: s.invocation}
+}
+
+func (m *NaturalManager) matchesIntegerCharacterScope(s *integerCharacterScope) bool {
+	if m == nil || m.self != m || s == nil || s.self != s || s.owner != m {
+		return false
+	}
+	if s == &m.charFormatting {
+		return s.display == nil && s.formatting == &m.formatting
+	}
+	q := s.display
+	return q != nil && q.actual() && q.owner.config.Integer.natural == m && s == &q.characters && s.displayInvocation != 0 && s.displayInvocation == q.invocation && s.formatting == &q.characterFormatting
+}
+
+func (m *NaturalManager) beginIntegerCharacterCall(s *integerCharacterScope) {
+	s.previous = m.characterCalls
+	s.callExecuting = true
+	m.characterCalls = s
+}
+func (m *NaturalManager) endIntegerCharacterCall(s *integerCharacterScope) {
+	if m.characterCalls == s && s.callExecuting {
+		m.characterCalls = s.previous
+		s.previous = nil
+		s.callExecuting = false
+	}
 }
 
 // cleanupOutputFormatting first resumes completed source local destructors,

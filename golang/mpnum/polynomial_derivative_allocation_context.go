@@ -26,6 +26,14 @@ func (m *IntegerModularManager) derivativeAllocationContext(r *polynomialDerivat
 }
 
 func (m *IntegerModularManager) normalizeWithSourceContext(out *Int, context integerAllocationInvocationContext) error {
+	if q := context.upolyDisplayFrame(m.manager); q != nil && q.owner.modular == m {
+		e := m.pNormalizeWithReceipt(out, &q.normalize)
+		if q.sourceCause == nil {
+			q.sourceCause = m.pNormalizeInvocationSourceCause(&q.normalize)
+		}
+		return e
+	}
+
 	if r := context.factorNumeralVector; r != nil && m.manager.factorNumeralVectorRoots(context) != nil && r.manager.upm.modular == m {
 		e := m.pNormalizeWithReceipt(out, &r.frame.normalize)
 		if r.frame.sourceCause == nil {

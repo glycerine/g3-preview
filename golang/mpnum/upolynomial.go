@@ -26,6 +26,11 @@ type UPolynomialConfig struct {
 // are required, even though operations without a checkpoint do not call them.
 // Cold ownership and every actual typed backing are charged to Integer's budget.
 type UPolynomialManager struct {
+	display                       upolyDisplayScope
+	displaySequence               *UPolynomialSequence
+	currentDisplay, displayFrames *upolyDisplayScope
+	displayNonce                  uint64
+
 	factorFrontendCaller         *upolyFactorFrontendScope
 	factorFrontendConstantCaller *UPolynomialFactorizationService
 	primePreparationCaller       *upolyFactorPrimePreparationScope
@@ -232,6 +237,9 @@ func (m *UPolynomialManager) closeWithCallerOwners(r *upolyHenselPairInvocationR
 	if m.live != 0 || m.liveSequences != 0 || m.liveFactors != 0 {
 		return ErrUPolynomialLive
 	}
+	if e := m.CleanupDisplay(); e != nil {
+		return e
+	}
 	m.closing = true
 	if m.sourceFinalizing && !m.sourceFinalized && m.sourceCause == nil {
 		if e := m.sourceFinalizeWithCallerOwners(r, c, p); e != nil {
@@ -271,6 +279,14 @@ func (m *UPolynomialManager) closeWithCallerOwners(r *upolyHenselPairInvocationR
 	}
 	b.Release(uint64(cap(m.bindings)) * uint64(reflect.TypeOf(upolyStoreBinding{}).Size()))
 	m.bindings = nil
+	for q := m.displayFrames; q != nil; {
+		next := q.next
+		b.Release(q.header)
+		q.header = 0
+		q.next = nil
+		q = next
+	}
+	m.displayFrames = nil
 	b.Release(m.header)
 	m.pages = nil
 

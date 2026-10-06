@@ -240,6 +240,10 @@ func (q *upolyMignotteScope) leaveCall(m *UPolynomialManager) {
 	}
 }
 func (m *UPolynomialManager) mignotteCallPending() bool {
+	if m.displayExecuting() {
+		return true
+	}
+
 	if m.preparationCallPending() || m.primePreparationCallPending() {
 		return true
 	}

@@ -26,7 +26,7 @@ func (m *NaturalManager) sourceFinalizeMembers() error {
 	if m.sourceFinalized {
 		return nil
 	}
-	if m.formatting.active || m.charFormatting.active {
+	if m.formatting.active || m.charFormatting.active || m.characterCalls != nil {
 		return arena.ErrInvalidSlot
 	}
 	m.sourceFinalizing = true

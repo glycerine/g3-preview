@@ -57,6 +57,8 @@ type IntegerManager struct {
 	factorUnivariateCaller                 *MultivariatePolynomialManager
 	factorNumeralVectorCaller              *MultivariatePolynomialManager
 	factorFrontendCaller                   *upolyFactorFrontendScope
+	upolyDisplayCaller                     *upolyDisplayScope
+	upolyDisplaySequenceCaller             *UPolynomialSequence
 	factorFrontendConstantCaller           *UPolynomialFactorizationService
 	self                                   *IntegerManager
 	memory                                 *memory.Runtime
@@ -355,6 +357,11 @@ func (m *IntegerManager) allocateWithSourceContext(capacity, size uint32, s *int
 	if roots != nil {
 		out = &outcome
 	}
+	if q := context.upolyDisplayFrame(m); q != nil {
+		if e := q.prepareStorage(); e != nil {
+			return 0, e
+		}
+	}
 	if e := context.prepareFactorHistory(m); e != nil {
 		return 0, e
 	}
@@ -416,7 +423,7 @@ func (m *IntegerManager) CloseChecked() error {
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
 	}
-	if m.rawInvocationExecuting() || m.copyAllocation.executing || m.normalizationExecuting || m.factorNumeralExecuting || m.factorNumeralVectorCallerExecuting() || m.factorUnivariateCallerExecuting() || m.factorCoreCallerExecuting() || m.factorFrontendCallerExecuting() {
+	if m.rawInvocationExecuting() || m.copyAllocation.executing || m.normalizationExecuting || m.factorNumeralExecuting || m.factorNumeralVectorCallerExecuting() || m.factorUnivariateCallerExecuting() || m.factorCoreCallerExecuting() || m.factorFrontendCallerExecuting() || m.upolyDisplayCallerExecuting() {
 		return ErrPolynomialPending
 	}
 	if m.closed {

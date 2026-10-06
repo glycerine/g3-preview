@@ -37807,7 +37807,11 @@
         "mpnum/upolynomial_factor_frontend_outer_stop_source_test.go",
         "mpnum/upolynomial_factor_frontend_owner_source_test.go",
         "mpnum/upolynomial_factor_frontend_quadratic_source_test.go",
-        "mpnum/upolynomial_factor_frontend_subscope_reentry_root_test.go"
+        "mpnum/upolynomial_factor_frontend_subscope_reentry_root_test.go",
+        "mpnum/upolynomial_display.go",
+        "mpnum/upolynomial_display_scope.go",
+        "mpnum/upolynomial_display_source_test.go",
+        "mpnum/upolynomial_display_borrow_epoch_test.go"
       ],
       "tests": [
         "TestUPolynomialScalarExtentAndLayout",
@@ -37941,7 +37945,25 @@
         "TestUPolynomialFactorFrontendReachedGCDOwnerTransport",
         "TestUPolynomialFactorFrontendReachedSubscopeOwningReentry",
         "TestUPolynomialFactorFrontendReachedSubscopeReentry",
-        "TestUPolynomialFactorFrontendRepeatedErasedSETWithRetainedRAW"
+        "TestUPolynomialFactorFrontendRepeatedErasedSETWithRetainedRAW",
+        "TestUPolynomialDisplayActualTst1DriverOutput",
+        "TestUPolynomialDisplaySMT2LiteralSingleMonomialFallthrough",
+        "TestUPolynomialDisplayActualStreamOwnerReentry",
+        "TestUPolynomialDisplayActualLowerOwnerReentry",
+        "TestUPolynomialDisplayBIGStreamFailureLiteralLifetime",
+        "TestUPolynomialDisplayEveryBIGReservationPrefix",
+        "TestUPolynomialDisplayActualSturmSequenceDriver",
+        "TestUPolynomialDisplayContextCopiedStaleCallbackGuards",
+        "TestUPolynomialDisplayActualNestedBeforeBorrow",
+        "TestUPolynomialDisplayNestedInlineErasedAllocation",
+        "TestUPolynomialDisplayNestedBIGPreservesActualOuterBorrow",
+        "TestUPolynomialDisplayNestedInlinePreservesActualOuterBorrow",
+        "TestUPolynomialDisplayNestedAllocationFailureExactRetirement",
+        "TestUPolynomialDisplayActualNaturalBorrowOwnerReentry",
+        "TestUPolynomialDisplayActualStoppedCharacterSuffix",
+        "TestUPolynomialDisplayErasedRoutePreservesEarlierUnjoinedRAW",
+        "TestUPolynomialDisplayBorrowRefusesLaterLiveEmbeddedCall",
+        "TestUPolynomialDisplayInsertionReceiptRefusesLaterEmbeddedCall"
       ],
       "conditionals": [
         {
@@ -38965,6 +38987,31 @@
             "TestUPolynomialFactorFrontendReachedSubscopeReentry",
             "TestUPolynomialFactorFrontendRepeatedErasedSETWithRetainedRAW"
           ]
+        },
+        {
+          "name": "upolynomial.cpp:1108-1225,3120-3124 literal display/SMT2 fallthrough and sequence wrapper with per-call lexical character storage",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_display.go",
+          "tests": [
+            "TestUPolynomialDisplayActualTst1DriverOutput",
+            "TestUPolynomialDisplaySMT2LiteralSingleMonomialFallthrough",
+            "TestUPolynomialDisplayActualStreamOwnerReentry",
+            "TestUPolynomialDisplayActualLowerOwnerReentry",
+            "TestUPolynomialDisplayBIGStreamFailureLiteralLifetime",
+            "TestUPolynomialDisplayEveryBIGReservationPrefix",
+            "TestUPolynomialDisplayActualSturmSequenceDriver",
+            "TestUPolynomialDisplayContextCopiedStaleCallbackGuards",
+            "TestUPolynomialDisplayActualNestedBeforeBorrow",
+            "TestUPolynomialDisplayNestedInlineErasedAllocation",
+            "TestUPolynomialDisplayNestedBIGPreservesActualOuterBorrow",
+            "TestUPolynomialDisplayNestedInlinePreservesActualOuterBorrow",
+            "TestUPolynomialDisplayNestedAllocationFailureExactRetirement",
+            "TestUPolynomialDisplayActualNaturalBorrowOwnerReentry",
+            "TestUPolynomialDisplayActualStoppedCharacterSuffix",
+            "TestUPolynomialDisplayErasedRoutePreservesEarlierUnjoinedRAW",
+            "TestUPolynomialDisplayBorrowRefusesLaterLiveEmbeddedCall",
+            "TestUPolynomialDisplayInsertionReceiptRefusesLaterEmbeddedCall"
+          ]
         }
       ],
       "ownership": [
@@ -38992,7 +39039,8 @@
         "Source unit remains partial; this closes the selected existing UP frontend and actual reached child lifetime/leaf transports, without whole factorization promotion.",
         "Signed-host TLS postphysical release guards qualify Go continuation outside native signed-overflow accounting. No invented allocation or callback frontier.",
         "mpz.h:156-162 successful publication order is unchanged; released scratch descriptor remains exact disposal token and later capacity reuse refuses ErrInvalidSlot before freed reads.",
-        "Count-zero/count-one erased SET issues no NUM/vector or per-call archival reserve. Stable call storage materializes only at actual Integer/Natural allocations. Field tests cover only literal count-one SET, not general field factorization. Native normalized SET completes PN without checked verification allocation; checked actual failed PN prefixes preserve exact child tuples."
+        "Count-zero/count-one erased SET issues no NUM/vector or per-call archival reserve. Stable call storage materializes only at actual Integer/Natural allocations. Field tests cover only literal count-one SET, not general field factorization. Native normalized SET completes PN without checked verification allocation; checked actual failed PN prefixes preserve exact child tuples.",
+        "Display drivers src/test/upolynomial.cpp:23-65,468-490 reach printing but contain no ENSURE assertions; these exact output assertions are independent new checks. No whole UP-unit promotion. Invalid-Go copied/stale view and insertion receipt fixtures prove lifetime guards, not native allocation credit. Root genuine stale view RED95325 and receipt RED36363 are corrected by captured display epoch, including receipt checks after character ownership ends. Signed-host TLS character-DT stops are qualified returning-transport guard profiles; the separate four-limb fixture reaches older NUM DT, not character heap DT. Nested scopes charge persistent metadata only at reached allocating leaves; repeated erased inline calls preserve older unjoined RAW without archival reservation."
       ]
     },
     {
