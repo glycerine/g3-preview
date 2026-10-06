@@ -20,6 +20,12 @@ Run the no-generics syntax audit through `go run ./cmd/portcheck`.
 
 ## Workflow
 
+Keep active implementation work visible. Use the main working tree or visible
+Git worktrees under `golang/worktrees/`; do not develop implementation in
+`.cache`. Reserve `.cache` for build caches, logs, machine-readable evidence,
+and immutable verification copies. Keep parallel tests-first work in those
+visible worktrees until it is ready for integration into a green main commit.
+
 Write project files and build/cache/temp artifacts only below this golang
 subtree. Port source assertions to Go tests before translating the corresponding
 implementation, and retain independent bounded correctness checks. After each
