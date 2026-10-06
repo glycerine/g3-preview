@@ -68794,17 +68794,33 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "sat_goal_recovery.go",
         "sat_goal_interface.go",
         "sat_goal_ast_map.go",
         "sat_goal_to_sat.go"
       ],
       "tests": [
+        "TestSATGoalInverseLiteralOwnership",
+        "TestSATGoalRecoveryIndependentBinaryTruthTables",
+        "TestSATGoalRecoveryFreshUnitsLearnedAndCheckpoints",
+        "TestSATGoalRecoveryLongClauseBufferGrowth",
         "TestSATGoalTranslatorBooleanInterfaceAndInterpretedAtoms",
         "TestSATGoalTranslatorAtomMapGrowthAndModel"
       ],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "atom2bool_var::mk_inv",
+          "status": "ported",
+          "go_target": "sat_goal_recovery.go",
+          "tests": [
+            "TestSATGoalInverseLiteralOwnership",
+            "TestSATGoalRecoveryIndependentBinaryTruthTables",
+            "TestSATGoalRecoveryFreshUnitsLearnedAndCheckpoints",
+            "TestSATGoalRecoveryLongClauseBufferGrowth"
+          ]
+        },
         {
           "name": "collect_boolean_interface(array overload)",
           "status": "ported",
@@ -68816,7 +68832,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "Goal-dependency traversal and mk_inv remain unported. The general expression visitor is specialized for collecting interface constants; broad quantifier and allocation-history qualification remains deferred."
+        "Goal-dependency traversal remains unported. Source mk_inv now owns both literal polarities through a concrete reference vector. The general expression visitor is specialized for collecting interface constants; broad quantifier and allocation-history qualification remains deferred."
       ]
     },
     {
@@ -68848,11 +68864,16 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "sat_goal_recovery.go",
         "sat_goal_to_sat.go",
         "sat_goal_ast_map.go",
         "sat_goal_interface.go"
       ],
       "tests": [
+        "TestSATGoalInverseLiteralOwnership",
+        "TestSATGoalRecoveryIndependentBinaryTruthTables",
+        "TestSATGoalRecoveryFreshUnitsLearnedAndCheckpoints",
+        "TestSATGoalRecoveryLongClauseBufferGrowth",
         "TestSATGoalTranslatorNestedBooleanTruthTableAndModel",
         "TestSATGoalTranslatorConstants",
         "TestSATGoalTranslatorConnectivesTruthTable",
@@ -68953,6 +68974,17 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "sat2goal::imp formula recovery/checkpoints (model converters outstanding)",
+          "status": "partial",
+          "go_target": "sat_goal_recovery.go",
+          "tests": [
+            "TestSATGoalInverseLiteralOwnership",
+            "TestSATGoalRecoveryIndependentBinaryTruthTables",
+            "TestSATGoalRecoveryFreshUnitsLearnedAndCheckpoints",
+            "TestSATGoalRecoveryLongClauseBufferGrowth"
+          ]
+        },
+        {
           "name": "imp::process / visit / Boolean clause conversion and array overload",
           "status": "ported",
           "go_target": "sat_goal_to_sat.go",
@@ -68972,7 +69004,7 @@
         "Concrete AST-hash linear-probing maps; atom keys and interpreted-atom trail retain AST references; explicit Close releases charged scalar storage."
       ],
       "deviations": [
-        "Goal dependencies, dep2asm, unsupported-operator SMT2 diagnostics, wrapper parameter updates and public tactic integration remain unported. Translation checkpoints now borrow the AST manager's actual inline resource limit; no whole-unit or public API completion is claimed."
+        "Goal dependencies, dep2asm, unsupported-operator SMT2 diagnostics, wrapper parameter updates and public tactic integration remain unported. sat2goal formula recovery now follows source units/binaries/originals/optional-learned order with fresh auxiliary atoms; its model-converter construction/application remains unported. Translation checkpoints now borrow the AST manager's actual inline resource limit; no whole-unit or public API completion is claimed."
       ]
     },
     {
