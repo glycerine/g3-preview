@@ -9036,7 +9036,9 @@
         "ast_core_boolean_factories.go",
         "ast_core_boolean_factories_source_test.go",
         "ast_core_span_factories.go",
-        "ast_core_span_factories_source_test.go"
+        "ast_core_span_factories_source_test.go",
+        "ast_core_basic_convenience.go",
+        "ast_core_basic_convenience_source_test.go"
       ],
       "tests": [
         "TestASTAllEagerPluginBranches",
@@ -9188,7 +9190,11 @@
         "TestASTFreshConstApplicationFailureRetainsDeclarationCounter",
         "TestASTFreshConstNullPointerPrefixSourceOverload",
         "TestASTSortingBooleanFactoryRealNodesAndNotUnwrap",
-        "TestASTOrSpanSourceZeroSingletonAndInitializedSpare"
+        "TestASTOrSpanSourceZeroSingletonAndInitializedSpare",
+        "TestASTBasicConvenienceFactoriesPreserveLiteralKindsAndInputs",
+        "TestASTDistinctExpandedLiteralNestedPairOrderAndNoEagerInputRead",
+        "TestASTDistinctExpandedEveryActualReservationKeepsNamedGraph",
+        "TestASTBasicConvenienceInvalidBorrowAndSortFailure"
       ],
       "conditionals": [
         {
@@ -10148,6 +10154,17 @@
           "tests": [
             "TestASTOrSpanSourceZeroSingletonAndInitializedSpare"
           ]
+        },
+        {
+          "name": "Concrete basic convenience factories, Bool/term equality selection and literal expanded distinct (src/ast/ast.h:1662,2033-2063; src/ast/ast.cpp:2503-2527)",
+          "status": "ported",
+          "go_target": "ast_core_basic_convenience.go",
+          "tests": [
+            "TestASTBasicConvenienceFactoriesPreserveLiteralKindsAndInputs",
+            "TestASTDistinctExpandedLiteralNestedPairOrderAndNoEagerInputRead",
+            "TestASTDistinctExpandedEveryActualReservationKeepsNamedGraph",
+            "TestASTBasicConvenienceInvalidBorrowAndSortFailure"
+          ]
         }
       ],
       "ownership": [
@@ -10159,7 +10176,8 @@
         "Real AST marks borrow manager with fully charged cold headers/inline16/backing/scope limits and source real ASTRefVector callbacks. Fast mark-before-push and ref INC-before-growth prefixes remain observable; ref reset clears all flags before ASC DEC. See PORT_PROGRESS.md#audit-ast-mark-port-status-md.",
         "Expression-array empty nonroot POP preserves the finite release unsigned size wrap; retained root SET increments the incoming AST before old physical access and never rolls it back at an invalid old pointer. See PORT_PROGRESS.md#audit-ast-expr-array-retained-status-md.",
         "Actual AST manager embeds dependency and array owners eagerly; FIFO identity traversal, real AST retain/release and LIFO deletion callbacks. Source RC30 wrapping, leaf/join16/24 versus actual charged24/32 intrusive continuation records, cold manager/scratch/header/payload and old/new overlaps charged. Persistent arrays have12-byte capacity/initialized backing and preserve finite retained pointer/patch behavior; see PORT_PROGRESS.md#audit-ast-dependency-packet-md.",
-        "Fresh lexical func_decl_info resides in actual charged ASTManager header with exact epoch token and is cloned by real registerNode/copyInfo; stack StringBuffer64 uses existing formatter and borrowed byte interner, overflow arrays destroyed before fresh_id increment; acquired node/metadata belongs to actual ASTManager pages."
+        "Fresh lexical func_decl_info resides in actual charged ASTManager header with exact epoch token and is cloned by real registerNode/copyInfo; stack StringBuffer64 uses existing formatter and borrowed byte interner, overflow arrays destroyed before fresh_id increment; acquired node/metadata belongs to actual ASTManager pages.",
+        "Convenience factories reach the existing application/cache/register engines without additional ownership or child cloning. Expanded distinct uses actual sixteen-inline non-owning ptr_buffer storage and ordered pair loop; its spill is released on source lexical exit without DEC of its unowned entries. Every actual reservation prefix checks complete named manager/symbol/budget graph before fault lift and successful same-owner retry."
       ],
       "deviations": [
         "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
@@ -10171,7 +10189,8 @@
         "Empty null/root POP is guarded at source physical undefined access. Debug empty POP assertion executes before From output copy. Invalid/uninitialized old root SET returns a typed guard with the incoming source INC retained and leaves backing unchanged.",
         "Source-undefined allocation/lifetime domains have explicit Go continuation and typed guards. Temporary copied-prefix cleanup releases only successful ownership acquisitions; source write-before-INC and debug RC0 refusal consumption are distinct. Copy-only Get returns retained raw tokens; actual later dereference guards generation. Source internal parray/Reroot debug checkpoints, TRACE/address printing, owning aliases and scoped configurations remain open. No whole-unit audit or full solver claim; no generics.",
         "Selected AST sorting-network prerequisites only; no SMT kernel or psort_nw driver assertion credit. AST DEBUG assertions retain existing typed adapter/global-binding qualifications; lexical-info nonwrapping epoch is Go borrow guard, not source fresh_id arithmetic.",
-        "Selected concrete AST Runtime/profile only; actual SMT kernel driver, native pretty/TRACE/global transport and other context/copy profiles remain separate obligations. Source-stopped destruction and explicit owning abort are distinct; pointer-free Go geometry is not native ABI credit."
+        "Selected concrete AST Runtime/profile only; actual SMT kernel driver, native pretty/TRACE/global transport and other context/copy profiles remain separate obligations. Source-stopped destruction and explicit owning abort are distinct; pointer-free Go geometry is not native ABI credit.",
+        "Go distinct convenience wrappers preserve the source Bool IFF/term EQ selection and right-associated XOR expansion through the existing source application engine. Array factories remain distinct from ast_util singleton/empty shortcuts. Focused source shape and failure tests do not promote the whole AST class, generic parser/API driver, diagnostic TRACE or original AST test driver."
       ]
     },
     {
@@ -10258,7 +10277,9 @@
         "ast_core_boolean_factories_source_test.go",
         "ast_core_span_factories.go",
         "ast_core_span_factories_source_test.go",
-        "ast_ref_vector_push_source_test.go"
+        "ast_ref_vector_push_source_test.go",
+        "ast_core_basic_convenience.go",
+        "ast_core_basic_convenience_source_test.go"
       ],
       "tests": [
         "TestASTAllEagerPluginBranches",
@@ -10467,7 +10488,11 @@
         "TestASTRefVectorPushSuccessfulTransferAndNullReceiptErasure",
         "TestASTRefVectorPushConsumedDeletionWarningAcknowledgesWithoutReplay",
         "TestASTRefVectorPushStaleInvocationVectorAndNodeGeneration",
-        "TestASTRefVectorPushNonwrappingNonceGuardDomain"
+        "TestASTRefVectorPushNonwrappingNonceGuardDomain",
+        "TestASTBasicConvenienceFactoriesPreserveLiteralKindsAndInputs",
+        "TestASTDistinctExpandedLiteralNestedPairOrderAndNoEagerInputRead",
+        "TestASTDistinctExpandedEveryActualReservationKeepsNamedGraph",
+        "TestASTBasicConvenienceInvalidBorrowAndSortFailure"
       ],
       "conditionals": [
         {
@@ -11252,6 +11277,17 @@
             "TestASTRefVectorPushStaleInvocationVectorAndNodeGeneration",
             "TestASTRefVectorPushNonwrappingNonceGuardDomain"
           ]
+        },
+        {
+          "name": "Concrete basic convenience factories, Bool/term equality selection and literal expanded distinct (src/ast/ast.h:1662,2033-2063; src/ast/ast.cpp:2503-2527)",
+          "status": "ported",
+          "go_target": "ast_core_basic_convenience.go",
+          "tests": [
+            "TestASTBasicConvenienceFactoriesPreserveLiteralKindsAndInputs",
+            "TestASTDistinctExpandedLiteralNestedPairOrderAndNoEagerInputRead",
+            "TestASTDistinctExpandedEveryActualReservationKeepsNamedGraph",
+            "TestASTBasicConvenienceInvalidBorrowAndSortFailure"
+          ]
         }
       ],
       "ownership": [
@@ -11265,7 +11301,8 @@
         "Actual AST manager embeds dependency and array owners eagerly; FIFO identity traversal, real AST retain/release and LIFO deletion callbacks. Source RC30 wrapping, leaf/join16/24 versus actual charged24/32 intrusive continuation records, cold manager/scratch/header/payload and old/new overlaps charged. Persistent arrays have12-byte capacity/initialized backing and preserve finite retained pointer/patch behavior; see PORT_PROGRESS.md#audit-ast-dependency-packet-md.",
         "Concrete AST expr identity-table and shared-occurrence owners preserve source bucket-order callbacks, borrowing, actual node shared flags and charged backing/header peaks. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md.",
         "Actual dependency INC/DEC callbacks, raw scalar tokens and charged16-byte obj_ref/24-byte ref_vector/160-byte inline buffer records in existing real AST allocators. Source INC-before-growth, retained backing, captured-end append and consumed cleanup progress preserved. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
-        "Fresh lexical func_decl_info resides in actual charged ASTManager header with exact epoch token and is cloned by real registerNode/copyInfo; stack StringBuffer64 uses existing formatter and borrowed byte interner, overflow arrays destroyed before fresh_id increment; acquired node/metadata belongs to actual ASTManager pages."
+        "Fresh lexical func_decl_info resides in actual charged ASTManager header with exact epoch token and is cloned by real registerNode/copyInfo; stack StringBuffer64 uses existing formatter and borrowed byte interner, overflow arrays destroyed before fresh_id increment; acquired node/metadata belongs to actual ASTManager pages.",
+        "Convenience factories reach the existing application/cache/register engines without additional ownership or child cloning. Expanded distinct uses actual sixteen-inline non-owning ptr_buffer storage and ordered pair loop; its spill is released on source lexical exit without DEC of its unowned entries. Every actual reservation prefix checks complete named manager/symbol/budget graph before fault lift and successful same-owner retry."
       ],
       "deviations": [
         "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
@@ -11279,7 +11316,8 @@
         "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md.",
         "Owning construction cleanup refusal publishes a nonzero partial token with original error; scalar pending target/cursor tracks consumed callbacks without changing raw retained slots. Explicit Go retry/cleanup protects source-undefined interrupted destruction. Preserved ref_buffer copy ctor dependent-base lookup is uninstantiable; no repaired copy API. General templates, other owners/configs and full consumers remain open. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
         "Selected AST sorting-network prerequisites only; no SMT kernel or psort_nw driver assertion credit. AST DEBUG assertions retain existing typed adapter/global-binding qualifications; lexical-info nonwrapping epoch is Go borrow guard, not source fresh_id arithmetic.",
-        "Selected concrete AST Runtime/profile only; actual SMT kernel driver, native pretty/TRACE/global transport and other context/copy profiles remain separate obligations. Source-stopped destruction and explicit owning abort are distinct; pointer-free Go geometry is not native ABI credit."
+        "Selected concrete AST Runtime/profile only; actual SMT kernel driver, native pretty/TRACE/global transport and other context/copy profiles remain separate obligations. Source-stopped destruction and explicit owning abort are distinct; pointer-free Go geometry is not native ABI credit.",
+        "Go distinct convenience wrappers preserve the source Bool IFF/term EQ selection and right-associated XOR expansion through the existing source application engine. Array factories remain distinct from ast_util singleton/empty shortcuts. Focused source shape and failure tests do not promote the whole AST class, generic parser/API driver, diagnostic TRACE or original AST test driver."
       ]
     },
     {
