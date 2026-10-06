@@ -90533,9 +90533,24 @@
       "path": "src/tactic/goal.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "tactic_goal.go"
+      ],
+      "tests": [
+        "TestTacticGoalAssertionSplittingAndSourceOrder",
+        "TestTacticGoalFalseReplacesAllAndResetAttributes",
+        "TestTacticGoalUpdateAndEliminateTrue",
+        "TestTacticGoalRedundanciesProofAndDependency",
+        "TestTacticGoalProofAssertionSplitting",
+        "TestTacticGoalCopyAndPrecisionAlgebra",
+        "TestTacticGoalDuplicateEliminationAndRetainedReferences",
+        "TestTacticGoalUpdateRetainsSavedFirstBeforeLaterFalse",
+        "TestTacticGoalUpdateLiteralFalseHeadSourceBehavior",
+        "TestTacticGoalAssertionsToSATAndValidatedModel",
+        "TestTacticGoalProofUpdateKeepsDerivedFacts",
+        "TestTacticGoalSourceDepthPrecisionCountsAndReferences"
+      ],
       "assertions": [
         {
           "line": 62,
@@ -90592,17 +90607,56 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "goal assertion, update, retained arrays, redundancy elimination, reset/copy, precision and source reference controls",
+          "status": "ported",
+          "go_target": "tactic_goal.go",
+          "tests": [
+            "TestTacticGoalAssertionSplittingAndSourceOrder",
+            "TestTacticGoalFalseReplacesAllAndResetAttributes",
+            "TestTacticGoalUpdateAndEliminateTrue",
+            "TestTacticGoalRedundanciesProofAndDependency",
+            "TestTacticGoalProofAssertionSplitting",
+            "TestTacticGoalCopyAndPrecisionAlgebra",
+            "TestTacticGoalDuplicateEliminationAndRetainedReferences",
+            "TestTacticGoalUpdateRetainsSavedFirstBeforeLaterFalse",
+            "TestTacticGoalUpdateLiteralFalseHeadSourceBehavior",
+            "TestTacticGoalAssertionsToSATAndValidatedModel",
+            "TestTacticGoalProofUpdateKeepsDerivedFacts",
+            "TestTacticGoalSourceDepthPrecisionCountsAndReferences"
+          ]
+        }
+      ],
+      "ownership": [
+        "Source retained expression and dependency arrays use existing AST-manager array owners. Assertions retain f/pr/dependencies through processing; false replacement protects pr/dependencies before resetting arrays; reference marks retain contradictions across compaction."
+      ],
+      "deviations": [
+        "Display/printing, cross-manager translation, is_well_sorted, is_equal, the default and copying constructor facades remain unported. No public context or solver API completion is claimed. Broad allocation-history/debug campaigns remain deferred."
+      ]
     },
     {
       "path": "src/tactic/goal.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "tactic_goal.go"
+      ],
+      "tests": [
+        "TestTacticGoalAssertionSplittingAndSourceOrder",
+        "TestTacticGoalFalseReplacesAllAndResetAttributes",
+        "TestTacticGoalUpdateAndEliminateTrue",
+        "TestTacticGoalRedundanciesProofAndDependency",
+        "TestTacticGoalProofAssertionSplitting",
+        "TestTacticGoalCopyAndPrecisionAlgebra",
+        "TestTacticGoalDuplicateEliminationAndRetainedReferences",
+        "TestTacticGoalUpdateRetainsSavedFirstBeforeLaterFalse",
+        "TestTacticGoalUpdateLiteralFalseHeadSourceBehavior",
+        "TestTacticGoalAssertionsToSATAndValidatedModel",
+        "TestTacticGoalProofUpdateKeepsDerivedFacts",
+        "TestTacticGoalSourceDepthPrecisionCountsAndReferences"
+      ],
       "conditionals": [
         {
           "line": 28,
@@ -90615,9 +90669,33 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "goal assertion, update, retained arrays, redundancy elimination, reset/copy, precision and source reference controls",
+          "status": "ported",
+          "go_target": "tactic_goal.go",
+          "tests": [
+            "TestTacticGoalAssertionSplittingAndSourceOrder",
+            "TestTacticGoalFalseReplacesAllAndResetAttributes",
+            "TestTacticGoalUpdateAndEliminateTrue",
+            "TestTacticGoalRedundanciesProofAndDependency",
+            "TestTacticGoalProofAssertionSplitting",
+            "TestTacticGoalCopyAndPrecisionAlgebra",
+            "TestTacticGoalDuplicateEliminationAndRetainedReferences",
+            "TestTacticGoalUpdateRetainsSavedFirstBeforeLaterFalse",
+            "TestTacticGoalUpdateLiteralFalseHeadSourceBehavior",
+            "TestTacticGoalAssertionsToSATAndValidatedModel",
+            "TestTacticGoalProofUpdateKeepsDerivedFacts",
+            "TestTacticGoalSourceDepthPrecisionCountsAndReferences"
+          ]
+        }
+      ],
+      "ownership": [
+        "Source retained expression and dependency arrays use existing AST-manager array owners. Assertions retain f/pr/dependencies through processing; false replacement protects pr/dependencies before resetting arrays; reference marks retain contradictions across compaction."
+      ],
+      "deviations": [
+        "Display/printing, cross-manager translation, is_well_sorted, is_equal, the default and copying constructor facades remain unported. No public context or solver API completion is claimed. Broad allocation-history/debug campaigns remain deferred."
+      ]
     },
     {
       "path": "src/tactic/goal_num_occurs.cpp",
