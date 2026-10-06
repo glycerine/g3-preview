@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.cpp:1298-1321.
 // Source: src/math/polynomial/upolynomial.cpp:1734-1764; src/util/mpz.h:393-407.
 // Source: src/util/mpz.h:468-485; src/util/mpz.cpp:730-817,915-985.
 // Licensed under the MIT license. Source author: Leonardo de Moura.
@@ -41,7 +42,7 @@ type integerRawInvocationReceipt struct {
 // Executing RAW and scoped Divides NUM calls retain their real declarations.
 // Public owner destruction cannot run from a returning error transport callback.
 func (m *IntegerManager) rawInvocationExecuting() bool {
-	return m.knuthCallerExecuting() || m.rootUpperBoundCallerExecuting() || m.rationalServiceReadCallbackActive() || m.integerEvaluationCallerExecuting() || m.rationalEvaluationCallerExecuting() || m.binaryEvaluationCallerExecuting() || m.algebraicNegCallerExecuting() || m.conversionCallerExecuting() || (m.mpfParent != nil && m.mpfParent.formatInvocationExecuting()) || m.mpfBorrowedSourceCallbackActive() || m.mpfLifecycleCallbackActive() || (m.divisionRaw.active && m.divisionRaw.executing) ||
+	return m.oneHalfRootCallerExecuting() || m.knuthCallerExecuting() || m.rootUpperBoundCallerExecuting() || m.rationalServiceReadCallbackActive() || m.integerEvaluationCallerExecuting() || m.rationalEvaluationCallerExecuting() || m.binaryEvaluationCallerExecuting() || m.algebraicNegCallerExecuting() || m.conversionCallerExecuting() || (m.mpfParent != nil && m.mpfParent.formatInvocationExecuting()) || m.mpfBorrowedSourceCallbackActive() || m.mpfLifecycleCallbackActive() || (m.divisionRaw.active && m.divisionRaw.executing) ||
 		(m.extendedRaw.active && m.extendedRaw.executing) ||
 		(m.gcdRaw.active && m.gcdRaw.executing) ||
 		(m.addMulInvocation.active && m.addMulInvocation.executing) ||

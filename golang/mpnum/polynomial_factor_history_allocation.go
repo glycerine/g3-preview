@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.cpp:1298-1321.
 // Source: src/math/polynomial/algebraic_numbers.cpp:1565-1577; src/util/mpz.h:124-149.
 // Source: src/util/mpz.h:124-149; src/util/buffer.h:39-46;
 // src/math/polynomial/upolynomial.h:401-450.
@@ -7,6 +8,9 @@ package mpnum
 import "reflect"
 
 func (c integerAllocationInvocationContext) prepareFactorHistory(z *IntegerManager) error {
+	if q := c.oneHalfRootFrame(z); q != nil {
+		return q.prepareHistory()
+	}
 	if q := c.knuthFrame(z); q != nil {
 		return q.prepareHistory()
 	}

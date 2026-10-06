@@ -7,6 +7,8 @@ import "github.com/glycerine/g3/golang/memory"
 // These are the actual reached lexical holders. Branch p2 and the nested
 // PrevPowerOfTwo NUM finish before the later p/t/sq declarations.
 type arbitraryFloatRationalSetScope struct {
+	plainParent                                              *arbitraryFloatPlainRationalSetScope
+	plainInvocation                                          uint64
 	receipt                                                  *ArbitraryFloatRationalSetReceipt
 	history                                                  *arbitraryFloatRationalSetHistory
 	buffers                                                  [4]naturalPNBufferReceipt

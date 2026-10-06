@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.cpp:1298-1321.
 // Source: src/math/polynomial/upolynomial.cpp:1906-1951 (Cauchy bound),
 // src/math/polynomial/upolynomial.cpp:1995-2074 (Knuth/nonzero bounds), related root-bound bodies.
 // Licensed under the MIT license.
@@ -71,7 +72,7 @@ func (m *UPolynomialManager) removeZeroRootsState(v UPolynomialView, out *upolyV
 	}
 	return m.setSize(out, n)
 }
-func (m *UPolynomialManager) HasOneHalfRoot(v UPolynomialView) (bool, error) {
+func (m *UPolynomialManager) HasOneHalfRoot(v UPolynomialView) (result bool, cause error) {
 	if e := m.check(); e != nil {
 		return false, e
 	}
@@ -81,32 +82,46 @@ func (m *UPolynomialManager) HasOneHalfRoot(v UPolynomialView) (bool, error) {
 	if v.count == 1 {
 		return false, nil
 	}
-	var r, ak Int
-	defer m.modular.Del(&r)
-	defer m.modular.Del(&ak)
+	k := uint32(1)
+	q, e := m.beginOneHalfRoot()
+	if e != nil {
+		return false, e
+	}
+	q.target = v
+	z := m.config.Integer
+	old, oldN := z.oneHalfRootCaller, z.natural.oneHalfRootCaller
+	z.oneHalfRootCaller = m
+	z.natural.oneHalfRootCaller = m
+	defer func() {
+		q.executing = false
+		cause = q.finish(cause)
+		z.oneHalfRootCaller = old
+		z.natural.oneHalfRootCaller = oldN
+	}()
+	r, ak := &q.values[0], &q.values[1]
+	context := q.context()
 	a, e := m.read(v, v.count-1)
 	if e != nil {
 		return false, e
 	}
-	if e = m.modular.Copy(&r, a); e != nil {
+	if e = m.modular.copyWithOneHalfRootContext(r, a, context); e != nil {
 		return false, e
 	}
-	k := uint32(1)
 	for i := v.count - 1; i > 0; {
 		i--
 		a, e = m.read(v, i)
 		if e != nil {
 			return false, e
 		}
-		if e = m.modular.Mul2k(a, k, &ak); e != nil {
+		if e = m.modular.mul2kWithOneHalfRootContext(a, k, ak, context); e != nil {
 			return false, e
 		}
-		if e = m.modular.Add(&r, &ak, &r); e != nil {
+		if e = m.modular.addWithOneHalfRootContext(r, ak, r, context); e != nil {
 			return false, e
 		}
 		k++
 	}
-	return m.modular.IsZero(&r)
+	return m.modular.IsZero(r)
 }
 func (m *UPolynomialManager) RemoveOneHalfRoot(v UPolynomialView, out UPolynomial) error {
 	d, e := m.descriptor(out)

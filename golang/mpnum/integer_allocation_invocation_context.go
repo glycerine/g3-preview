@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.cpp:1298-1321.
 // Source: src/math/polynomial/algebraic_numbers.cpp:1565-1577; src/util/mpz.h:124-149.
 // Source: src/util/mpz.h:allocate; src/util/mpz.cpp scratch/publication callers.
 // Licensed under the MIT license. Source author: Leonardo de Moura.
@@ -12,6 +13,8 @@ type integerAllocationInvocationContext struct {
 	rationalServiceInvocation    uint64
 	rootUpperBound               *upolyRootUpperBoundScope
 	rootUpperBoundInvocation     uint64
+	oneHalfRoot                  *upolyOneHalfRootScope
+	oneHalfRootInvocation        uint64
 	integerEvaluation            *upolyIntegerEvaluationScope
 	integerEvaluationInvocation  uint64
 	mpfRationalSet               *arbitraryFloatRationalSetScope
@@ -151,6 +154,9 @@ func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomial
 		return nil
 	}
 	if c.rootUpperBound != nil && c.rootUpperBoundFrame(m) == nil {
+		return nil
+	}
+	if c.oneHalfRoot != nil && c.oneHalfRootFrame(m) == nil {
 		return nil
 	}
 	if c.integerEvaluation != nil && c.integerEvaluationFrame(m) == nil {
@@ -355,6 +361,9 @@ func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomial
 		return &s.numeric
 	}
 	if q := c.rootUpperBoundFrame(m); q != nil {
+		return &q.numeric
+	}
+	if q := c.oneHalfRootFrame(m); q != nil {
 		return &q.numeric
 	}
 	if q := c.integerEvaluationFrame(m); q != nil {

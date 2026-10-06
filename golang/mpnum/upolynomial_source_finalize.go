@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.cpp:1298-1321.
 // Source: src/math/polynomial/upolynomial.cpp:1734-1764.
 // Source: src/math/polynomial/upolynomial.cpp:138-157,187,1259-1265; src/util/mpzzp.h:97-105. Licensed under the MIT license.
 package mpnum
@@ -15,7 +16,7 @@ func (m *UPolynomialManager) sourceFinalizeWithHenselOwners(r *upolyHenselPairIn
 	return m.sourceFinalizeWithCallerOwners(r, c, nil)
 }
 func (m *UPolynomialManager) sourceFinalizeWithCallerOwners(r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope, p *upolyFactorPrimePreparationInvocationReceipt) error {
-	if m.knuthExecuting() || m.rootUpperBoundExecuting() || m.integerEvaluationExecuting() || m.rationalEvaluationExecuting() || m.binaryEvaluationExecuting() {
+	if m.oneHalfRootExecuting() || m.knuthExecuting() || m.rootUpperBoundExecuting() || m.integerEvaluationExecuting() || m.rationalEvaluationExecuting() || m.binaryEvaluationExecuting() {
 		return ErrUPolynomialCleanupPending
 	}
 	if m != nil && m.self == m && m.algebraicNegCaller != nil && m.algebraicNegCaller.negationExecuting() {
@@ -23,6 +24,9 @@ func (m *UPolynomialManager) sourceFinalizeWithCallerOwners(r *upolyHenselPairIn
 	}
 	if m == nil || m.self != m || m.config.Integer == nil {
 		return ErrUPolynomialOwner
+	}
+	if m.oneHalfRoot.active && m.oneHalfRoot.sourceCause != nil {
+		return m.oneHalfRoot.sourceCause
 	}
 	if m.knuth.active && m.knuth.sourceCause != nil {
 		return m.knuth.sourceCause

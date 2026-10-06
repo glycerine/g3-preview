@@ -17,6 +17,7 @@ import (
 // manager-local mpz-wrapper IDs. No wrapper exists in default empty maps.
 // MPF numeral algorithms and populated powers2 operations remain separate.
 type ArbitraryFloatManager struct {
+	plainRationalSet         arbitraryFloatPlainRationalSetScope
 	rationalSetHistories     *arbitraryFloatRationalSetHistory
 	rationalSetHistoryBytes  uint64
 	rationalSet              arbitraryFloatRationalSetScope
@@ -123,7 +124,7 @@ func (m *ArbitraryFloatManager) SourceFinalize() error {
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
 	}
-	if m.rationalSet.executing || m.rationalSet.finishing || (m.integer != nil && m.integer.rationalServiceReadCallbackActive()) || m.formattedSet.executing || m.formattedSet.finishing || m.rationalConversion.executing || m.rationalConversion.finishing || m.valueExecuting || m.formatInvocationExecuting() || (m.integer != nil && m.integer.mpfBorrowedSourceCallbackActive()) {
+	if m.plainRationalSet.executing || m.plainRationalSet.finishing || m.rationalSet.executing || m.rationalSet.finishing || (m.integer != nil && m.integer.rationalServiceReadCallbackActive()) || m.formattedSet.executing || m.formattedSet.finishing || m.rationalConversion.executing || m.rationalConversion.finishing || m.valueExecuting || m.formatInvocationExecuting() || (m.integer != nil && m.integer.mpfBorrowedSourceCallbackActive()) {
 		return ErrPolynomialPending
 	}
 	// The caller-owned format context is a younger lexical scope. Query only
@@ -142,6 +143,12 @@ func (m *ArbitraryFloatManager) SourceFinalize() error {
 	}
 	if !m.constructorComplete {
 		return arena.ErrClosed
+	}
+	if e := m.finishPlainRationalSetSource(); e != nil {
+		if m.sourceCause == nil {
+			m.sourceCause = e
+		}
+		return e
 	}
 	if e := m.finishRationalSetSource(); e != nil {
 		if m.sourceCause == nil {
@@ -211,7 +218,7 @@ func (m *ArbitraryFloatManager) Close() error {
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
 	}
-	if m.rationalSet.executing || m.rationalSet.finishing || (m.integer != nil && m.integer.rationalServiceReadCallbackActive()) || m.formattedSet.executing || m.formattedSet.finishing || m.rationalConversion.executing || m.rationalConversion.finishing || m.valueExecuting || m.formatInvocationExecuting() || (m.integer != nil && m.integer.mpfBorrowedSourceCallbackActive()) {
+	if m.plainRationalSet.executing || m.plainRationalSet.finishing || m.rationalSet.executing || m.rationalSet.finishing || (m.integer != nil && m.integer.rationalServiceReadCallbackActive()) || m.formattedSet.executing || m.formattedSet.finishing || m.rationalConversion.executing || m.rationalConversion.finishing || m.valueExecuting || m.formatInvocationExecuting() || (m.integer != nil && m.integer.mpfBorrowedSourceCallbackActive()) {
 		return ErrPolynomialPending
 	}
 	// Registered diagnostic metadata is not ownership. Refuse only actual
@@ -234,6 +241,9 @@ func (m *ArbitraryFloatManager) Close() error {
 		return stop(e)
 	}
 	if e := m.CleanupRoundSqrt(); e != nil {
+		return stop(e)
+	}
+	if e := m.CleanupPlainRationalSet(); e != nil {
 		return stop(e)
 	}
 	if e := m.CleanupExponentRationalSet(); e != nil {

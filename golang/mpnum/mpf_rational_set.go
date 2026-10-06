@@ -11,9 +11,15 @@ import (
 func (m *ArbitraryFloatManager) SetExponentRational(out *ArbitraryFloat, ebits, sbits uint32, mode ArbitraryFloatRoundingMode, exponent *Int, significand *Rational) error {
 	return m.SetExponentRationalWithReceipt(out, ebits, sbits, mode, exponent, significand, nil)
 }
-func (m *ArbitraryFloatManager) SetExponentRationalWithReceipt(out *ArbitraryFloat, ebits, sbits uint32, mode ArbitraryFloatRoundingMode, exponent *Int, significand *Rational, r *ArbitraryFloatRationalSetReceipt) (cause error) {
+func (m *ArbitraryFloatManager) SetExponentRationalWithReceipt(out *ArbitraryFloat, ebits, sbits uint32, mode ArbitraryFloatRoundingMode, exponent *Int, significand *Rational, r *ArbitraryFloatRationalSetReceipt) error {
+	return m.setExponentRationalWithPlainCaller(out, ebits, sbits, mode, exponent, significand, r, nil)
+}
+func (m *ArbitraryFloatManager) setExponentRationalWithPlainCaller(out *ArbitraryFloat, ebits, sbits uint32, mode ArbitraryFloatRoundingMode, exponent *Int, significand *Rational, r *ArbitraryFloatRationalSetReceipt, plain *arbitraryFloatPlainRationalSetScope) (cause error) {
 	if e := m.valueGuard(out); e != nil {
 		return e
+	}
+	if plain != nil && (!plain.matched(m) || !plain.executing || plain.finishing || !plain.expLive || exponent != &plain.exp) {
+		return memory.ErrRuntimeOwner
 	}
 	if significand == nil {
 		return memory.ErrRuntimeOwner
@@ -38,6 +44,12 @@ func (m *ArbitraryFloatManager) SetExponentRationalWithReceipt(out *ArbitraryFlo
 	}
 	invocation := s.invocation + 1
 	*s = arbitraryFloatRationalSetScope{manager: m, invocation: invocation, active: true, executing: true, receipt: r}
+	if plain != nil {
+		s.plainParent = plain
+		s.plainInvocation = plain.invocation
+		plain.childFrame = s
+		plain.childInvocation = s.invocation
+	}
 	defer func() {
 		s.executing = false
 		s.bodyCause = cause

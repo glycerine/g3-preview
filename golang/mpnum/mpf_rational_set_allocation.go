@@ -13,23 +13,27 @@ type ArbitraryFloatRationalSetReceipt struct {
 	invocation uint64
 }
 type arbitraryFloatRationalSetHistory struct {
-	naturalOriginal                  [5]memory.Block
-	issued                           ArbitraryFloatRationalSetReceipt
-	gcd, division, extended          integerRawInvocationReceipt
-	roundChild                       ArbitraryFloatRoundReceipt
-	roundFrame                       *arbitraryFloatRoundScope
-	roundInvocation                  uint64
-	self                             *arbitraryFloatRationalSetHistory
-	manager                          *ArbitraryFloatManager
-	next                             *arbitraryFloatRationalSetHistory
-	invocation, header               uint64
-	numeric                          polynomialNumericRoots
-	transferred                      memory.SmallAllocatorPendingAllocation
-	cellRetired, owned               bool
-	originalCell                     sourceCellBacking
-	originalPending                  memory.Block
-	prevSourceCause                  error
-	bodyCause, sourceCause, ownCause error
+	plainParent                                     *arbitraryFloatPlainRationalSetScope
+	plainInvocation                                 uint64
+	plainBodyCause, plainSourceCause, plainOwnCause error
+	plainExpFinished                                bool
+	naturalOriginal                                 [5]memory.Block
+	issued                                          ArbitraryFloatRationalSetReceipt
+	gcd, division, extended                         integerRawInvocationReceipt
+	roundChild                                      ArbitraryFloatRoundReceipt
+	roundFrame                                      *arbitraryFloatRoundScope
+	roundInvocation                                 uint64
+	self                                            *arbitraryFloatRationalSetHistory
+	manager                                         *ArbitraryFloatManager
+	next                                            *arbitraryFloatRationalSetHistory
+	invocation, header                              uint64
+	numeric                                         polynomialNumericRoots
+	transferred                                     memory.SmallAllocatorPendingAllocation
+	cellRetired, owned                              bool
+	originalCell                                    sourceCellBacking
+	originalPending                                 memory.Block
+	prevSourceCause                                 error
+	bodyCause, sourceCause, ownCause                error
 }
 
 func (s *arbitraryFloatRationalSetScope) allocationContext() integerAllocationInvocationContext {
@@ -61,6 +65,16 @@ func (c integerAllocationInvocationContext) prepareRationalSetHistory(z *Integer
 		return e
 	}
 	h := &arbitraryFloatRationalSetHistory{manager: s.manager, next: s.manager.rationalSetHistories, invocation: s.invocation, header: bytes}
+	if p := s.plainParent; p != nil {
+		if !p.matched(s.manager) || p.invocation != s.plainInvocation || !p.executing {
+			s.manager.budget.Release(bytes)
+			return memory.ErrRuntimeOwner
+		}
+		h.plainParent, h.plainInvocation = p, p.invocation
+		if p.receipt != nil {
+			*p.receipt = ArbitraryFloatPlainRationalSetReceipt{s.manager, p, p.invocation, ArbitraryFloatRationalSetReceipt{s.manager, h, s.invocation}}
+		}
+	}
 	h.self = h
 	h.issued = ArbitraryFloatRationalSetReceipt{s.manager, h, s.invocation}
 	if s.receipt != nil {

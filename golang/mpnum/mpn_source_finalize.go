@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.cpp:1298-1321.
 // Licensed under the MIT license.
 // Source mpn.h manager member destruction: t_ab,t_ms,v,u.
 package mpnum
@@ -11,7 +12,7 @@ import (
 // destructors. Leaked failed-constructor locals and unpublished member expansion
 // blocks remain in the charged owner for separate explicit owning CloseChecked.
 func (m *NaturalManager) SourceFinalize() error {
-	if m.knuthCallerExecuting() || m.rootUpperBoundCallerExecuting() {
+	if m.oneHalfRootCallerExecuting() || m.knuthCallerExecuting() || m.rootUpperBoundCallerExecuting() {
 		return arena.ErrInvalidSlot
 	}
 	if m == nil || m.self != m {

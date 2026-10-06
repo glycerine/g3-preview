@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.cpp:1298-1321.
 // Licensed under the MIT license.
 // Source: src/util/mpn.h manager scratch and util/buffer.h growth policy.
 package mpnum
@@ -15,6 +16,7 @@ import (
 // capacities are kept separate from arena geometric allocation classes.
 type NaturalManager struct {
 	knuthCaller                       *UPolynomialManager
+	oneHalfRootCaller                 *UPolynomialManager
 	rootUpperBoundCaller              *UPolynomialManager
 	self                              *NaturalManager
 	runtime                           *memory.Runtime
@@ -135,7 +137,7 @@ func (m *NaturalManager) Close() {
 	}
 }
 func (m *NaturalManager) CloseChecked() error {
-	if m.knuthCallerExecuting() || m.rootUpperBoundCallerExecuting() {
+	if m.oneHalfRootCallerExecuting() || m.knuthCallerExecuting() || m.rootUpperBoundCallerExecuting() {
 		return arena.ErrInvalidSlot
 	}
 	if m == nil || m.self != m {
