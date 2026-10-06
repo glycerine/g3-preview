@@ -347,8 +347,26 @@ func (m *UPolynomialManager) ComposeRationalXViewInPlace(v UPolynomialView, q *R
 	}
 	return nil
 }
-func (m *UPolynomialManager) PMinusXViewInPlace(v UPolynomialView) error {
-	return m.pMinusXWithSourceContext(v, integerAllocationInvocationContext{})
+func (m *UPolynomialManager) PMinusXViewInPlace(v UPolynomialView) (cause error) {
+	if e := m.check(); e != nil {
+		return e
+	}
+	q, e := m.beginKnuth(v, 3)
+	if e != nil {
+		return e
+	}
+	z := m.config.Integer
+	old, oldN := z.knuthCaller, z.natural.knuthCaller
+	z.knuthCaller = m
+	z.natural.knuthCaller = m
+	defer func() {
+		q.executing = false
+		cause = q.finish(cause)
+		z.knuthCaller = old
+		z.natural.knuthCaller = oldN
+	}()
+	q.stage = 1
+	return m.pMinusXWithSourceContext(v, q.context())
 }
 func (m *UPolynomialManager) pMinusXWithSourceContext(v UPolynomialView, context integerAllocationInvocationContext) error {
 	if context.knuth != nil {

@@ -38364,7 +38364,8 @@
         "mpnum/upolynomial_knuth_invocation.go",
         "mpnum/upolynomial_knuth_source_test.go",
         "mpnum/mpzzp.go",
-        "mpnum/upolynomial_modular_caller_source_test.go"
+        "mpnum/upolynomial_modular_caller_source_test.go",
+        "mpnum/upolynomial_minus_x_source_test.go"
       ],
       "tests": [
         "TestUPolynomialScalarExtentAndLayout",
@@ -38546,7 +38547,10 @@
         "TestUPolynomialKnuthIndependentBoundsAndSourceAssertions",
         "TestUPolynomialKnuthOldAcknowledgmentPreservesLaterActualRoots",
         "TestUPolynomialActualModularCallerCloseBeforeReturn",
-        "TestAlgebraicBasicNegDoesNotBorrowUPModularOwner"
+        "TestAlgebraicBasicNegDoesNotBorrowUPModularOwner",
+        "TestUPolynomialPMinusXActualMinimumCallbackProtectsCaller",
+        "TestUPolynomialPMinusXActualMinimumEveryPrefixAndInlineReuse",
+        "TestUPolynomialPMinusXOldAcknowledgmentPreservesLaterActualRoots"
       ],
       "conditionals": [
         {
@@ -39684,6 +39688,16 @@
           "tests": [
             "TestUPolynomialActualModularCallerCloseBeforeReturn",
             "TestAlgebraicBasicNegDoesNotBorrowUPModularOwner"
+          ]
+        },
+        {
+          "name": "upolynomial.cpp:1594-1602 public p_minus_x exact borrowed-view caller and direct odd coefficient NEG/PN source transport",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_transforms.go",
+          "tests": [
+            "TestUPolynomialPMinusXActualMinimumCallbackProtectsCaller",
+            "TestUPolynomialPMinusXActualMinimumEveryPrefixAndInlineReuse",
+            "TestUPolynomialPMinusXOldAcknowledgmentPreservesLaterActualRoots"
           ]
         }
       ],
