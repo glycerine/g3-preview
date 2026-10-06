@@ -101,6 +101,7 @@ func (m *ASTManager) unwindConstructorMembers() error {
 			m.traceConstructorNodesEnded()
 			m.allocator = nil
 		}
+		m.limit.close() // first automatic member, last reverse-member destructor
 		m.constructorMemberStage = 6
 	}
 	return nil

@@ -243,6 +243,7 @@ type ASTManager struct {
 	recFun                                                                                             Symbol
 	numerals                                                                                           *mpnum.RationalService
 	families                                                                                           *FamilyManager
+	limit                                                                                              utilReslimit // source inline member, charged in the ASTManager header
 	allocator                                                                                          *arena.SmallBytes
 	vectorAllocator                                                                                    *arena.SmallBytes
 	format                                                                                             *ASTManager

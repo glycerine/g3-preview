@@ -309,8 +309,8 @@ func TestSATGoalTranslatorCancellationAndMemoryParams(t *testing.T) {
 			satOK(t, e)
 			t.Cleanup(func() { satOK(t, tr.Close()) })
 			if cancel {
-				s.limit.cancel()
-				defer s.limit.resetCancel()
+				m.limit.cancel()
+				defer m.limit.resetCancel()
 			}
 			if e = tr.Compile([]ASTHandle{h}); e == nil {
 				t.Fatal("source frame checkpoint must stop translation")

@@ -19,6 +19,7 @@ func (m *ASTManager) Stats() ASTManagerStats {
 	}
 	s := ASTManagerStats{LiveNodes: m.liveNodes, LiveParameters: m.liveParameters, LiveInfos: m.liveInfos, LiveReferences: m.liveReferences, ArrayLiveCells: m.exprArrays.liveCells, OwnerBytes: m.ownerBytes, PageBytes: m.pageBytes, DirectoryBytes: m.directoryBytes, TableSlots: m.table.slots, TableUsedSlots: m.table.used, TableCollisions: m.table.collisions}
 	s.AllocatedBytes = m.datatypePluginBytes() + m.auxiliaryPluginBytes() + m.floatingPointPluginBytes() + m.sequencePluginBytes() + m.plugins.bytes() + m.arrayCardinalityBytes() + m.arrayPluginBytes() + m.arithmeticPluginBytes() + m.bitVectorPluginBytes() + m.formatPluginBytes() + m.formatFramesBytes() + m.ppFramesBytes() + m.lowLevel.marks.exprs.bytes + m.lowLevel.marks.decls.bytes + m.debugFreeIndices.StorageBytes() + s.OwnerBytes + s.PageBytes + s.DirectoryBytes + astChainBytes(uint32(len(m.table.cells))) + m.builtin.userTable.bytes + uint64(cap(m.builtin.userNames))*uint64(reflect.TypeOf(Symbol{}).Size())
+	s.AllocatedBytes += uint64(cap(m.limit.limits))*8 + uint64(cap(m.limit.children))*uint64(reflect.TypeOf((*utilReslimit)(nil)).Size())
 	for f := m.traceAcquisitionHistory; f != nil; f = f.historyNext {
 		s.AllocatedBytes += f.bytes
 	}

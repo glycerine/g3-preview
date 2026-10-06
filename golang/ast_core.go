@@ -57,6 +57,9 @@ func constructSourceASTManager(c ASTManagerConfig, format bool, filename *astTra
 	}
 	m := &ASTManager{origin: id, budget: c.Budget, symbols: c.Symbols, numerals: c.Numerals, ownerBytes: bytes, proofMode: c.ProofMode, coercions: true, nextNode: 1, nextParameter: 1, nextInfo: 1, nextReference: 1}
 	m.self = m
+	// reslimit is the first automatic source member. Its zero-valued scalar
+	// constructor owns no vector payload and has no separate owner allocation.
+	m.limit.budget = c.Budget
 	for i := range m.nextKind {
 		m.nextKind[i] = 1
 	}
@@ -519,6 +522,8 @@ func (m *ASTManager) closeCore(source bool) error {
 		m.ppContextEnded()
 		m.allocator = nil
 	}
+	// The first source member is destroyed last, after m_alloc.
+	m.limit.close()
 	if source {
 		m.sourceDTCompleted = true
 		m.closing = false

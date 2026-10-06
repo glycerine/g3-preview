@@ -9035,6 +9035,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "ast_resource_limit.go",
         "ast_basic_plugin.go",
         "ast_basic_plugin_finalize.go",
         "ast_basic_plugin_kinds.go",
@@ -9115,6 +9116,8 @@
         "ast_auxiliary_plugins_source_test.go"
       ],
       "tests": [
+        "TestASTResourceLimitSourceCanceledCountsAndScopes",
+        "TestASTResourceLimitOwnedStorageAndIndependentFormat",
         "TestASTAllEagerPluginBranches",
         "TestASTAllFiveKindsAndQuantifierIdentity",
         "TestASTArrayHashPermanentActualSourceVectors",
@@ -10337,6 +10340,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "ast_resource_limit.go",
         "ast_basic_plugin.go",
         "ast_basic_plugin_finalize.go",
         "ast_basic_plugin_kinds.go",
@@ -10422,6 +10426,8 @@
         "ast_debug_ref_count.go"
       ],
       "tests": [
+        "TestASTResourceLimitSourceCanceledCountsAndScopes",
+        "TestASTResourceLimitOwnedStorageAndIndependentFormat",
         "TestASTAllEagerPluginBranches",
         "TestASTAllFiveKindsAndQuantifierIdentity",
         "TestASTArrayHashPermanentActualSourceVectors",
@@ -68846,7 +68852,8 @@
         "TestSATGoalTranslatorBooleanInterfaceAndInterpretedAtoms",
         "TestSATGoalTranslatorCancellationAndMemoryParams",
         "TestSATGoalTranslatorAtomMapGrowthAndModel",
-        "TestSATGoalTranslatorRejectsUnnormalizedSourceOperators"
+        "TestSATGoalTranslatorRejectsUnnormalizedSourceOperators",
+        "TestSATGoalTranslatorUsesASTManagerResourceLimit"
       ],
       "assertions": [
         {
@@ -68957,7 +68964,7 @@
         "Concrete AST-hash linear-probing maps; atom keys and interpreted-atom trail retain AST references; explicit Close releases charged scalar storage."
       ],
       "deviations": [
-        "Goal dependencies, dep2asm, unsupported-operator SMT2 diagnostics, wrapper parameter updates and public tactic integration remain unported. This internal adapter borrows the solver resource limit until the context binds an AST-manager limit; no whole-unit or public API completion is claimed."
+        "Goal dependencies, dep2asm, unsupported-operator SMT2 diagnostics, wrapper parameter updates and public tactic integration remain unported. Translation checkpoints now borrow the AST manager's actual inline resource limit; no whole-unit or public API completion is claimed."
       ]
     },
     {

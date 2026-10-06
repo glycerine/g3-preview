@@ -28,8 +28,7 @@ type satGoalTranslator struct {
 	self    *satGoalTranslator
 	manager *ASTManager
 	solver  *satSolver
-	// Until the context owns an AST-manager limit, the caller explicitly shares
-	// its SAT limit with this translation; no SAT propagation checkpoint is used.
+	// Borrow the AST manager's original resource limit for translation checkpoints.
 	limit                                     *utilReslimit
 	cooperation                               *utilCooperation
 	cache, atoms, interfaces                  satGoalASTMap
@@ -58,7 +57,7 @@ func newSATGoalTranslator(m *ASTManager, s *satSolver) (tr *satGoalTranslator, e
 	if err = s.budget.Reserve(amount); err != nil {
 		return nil, err
 	}
-	tr = &satGoalTranslator{manager: m, solver: s, limit: s.limit, trueVar: satNullBoolVar, boolSort: boolSort, ownerBytes: amount}
+	tr = &satGoalTranslator{manager: m, solver: s, limit: &m.limit, trueVar: satNullBoolVar, boolSort: boolSort, ownerBytes: amount}
 	tr.self = tr
 	defer func() {
 		if err != nil {
