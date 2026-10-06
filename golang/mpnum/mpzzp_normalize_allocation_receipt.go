@@ -54,24 +54,25 @@ func (m *IntegerModularManager) cleanupPNormalizeInvocation(r *integerPNormalize
 // A receipt exists only for a real pending growth of the named source buffer.
 // Successful publication returns authority to the persistent Natural member.
 type naturalPNBufferReceipt struct {
-	henselCallerContext integerAllocationInvocationContext
-	henselPair          upolyHenselPairInvocationReceipt
-	henselManager       *UPolynomialManager
-	divides             polynomialDividesInvocationReceipt
-	boolDivides         integerDividesNumeralInvocationReceipt
-	scalarExact         polynomialScalarExactDivInvocationReceipt
-	exactDiv            polynomialExactDivInvocationReceipt
-	raw                 integerRawInvocationReceipt
-	scalar              polynomialScalarDivInvocationReceipt
-	content             polynomialContentInvocationReceipt
-	owner               *NaturalManager
-	context             *integerPNormalizeScope
-	invocation          uint64
-	buffer              *sourceLimbBuffer
-	pending             memory.Block
-	stage               uint8
-	private             bool
-	published           memory.Block
+	henselCallerContext  integerAllocationInvocationContext
+	recombinationContext integerAllocationInvocationContext
+	henselPair           upolyHenselPairInvocationReceipt
+	henselManager        *UPolynomialManager
+	divides              polynomialDividesInvocationReceipt
+	boolDivides          integerDividesNumeralInvocationReceipt
+	scalarExact          polynomialScalarExactDivInvocationReceipt
+	exactDiv             polynomialExactDivInvocationReceipt
+	raw                  integerRawInvocationReceipt
+	scalar               polynomialScalarDivInvocationReceipt
+	content              polynomialContentInvocationReceipt
+	owner                *NaturalManager
+	context              *integerPNormalizeScope
+	invocation           uint64
+	buffer               *sourceLimbBuffer
+	pending              memory.Block
+	stage                uint8
+	private              bool
+	published            memory.Block
 }
 
 func (m *NaturalManager) pnBufferReceipt(pn *integerPNormalizeScope, i int) *naturalPNBufferReceipt {
@@ -126,6 +127,23 @@ func (s *integerPNormalizeScope) pending() bool {
 }
 
 func (r *naturalPNBufferReceipt) bound(executing bool) bool {
+	if context := r.recombinationContext; context.recombination != nil {
+		q := context.recombination
+		if !q.matches() || r.owner != q.owner.manager.config.Integer.natural || context.recombinationInvocation != q.invocation || r.invocation != q.invocation || (executing && context.recombinationFrame(q.owner.manager.config.Integer) == nil) {
+			return false
+		}
+		if r.private {
+			v := &r.owner.verificationInvocation
+			return r == &v.buffer && r.buffer == &r.owner.verification && v.recombinationContext.recombination == q && v.recombinationContext.recombinationInvocation == q.invocation && r.owner.matchesPNVerification(&q.verification)
+		}
+		for i := range q.buffers {
+			if r == &q.buffers[i] {
+				return r.buffer == &r.owner.division[i]
+			}
+		}
+		return false
+	}
+
 	if context := r.henselCallerContext; context.henselCaller != nil {
 		q := context.henselCaller
 		if !q.matches() || r.owner != q.owner.manager.config.Integer.natural || context.henselCallerInvocation != q.invocation || r.invocation != q.invocation || (executing && context.henselCallerFrame(q.owner.manager.config.Integer) == nil) {
@@ -301,6 +319,17 @@ func (m *NaturalManager) divisionBufferReceipt(context integerAllocationInvocati
 		return nil
 	}
 
+	if q := context.recombination; q != nil {
+		z := q.owner.manager.config.Integer
+		if z.natural != m || context.recombinationFrame(z) == nil {
+			return nil
+		}
+		b := &q.buffers[i]
+		if b.owner == nil {
+			*b = naturalPNBufferReceipt{owner: m, recombinationContext: context, invocation: q.invocation, buffer: &m.division[i]}
+		}
+		return b
+	}
 	if q := context.henselCaller; q != nil {
 		z := q.owner.manager.config.Integer
 		if z.natural != m || context.henselCallerFrame(z) == nil {

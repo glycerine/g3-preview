@@ -77,6 +77,16 @@ func (m *NaturalManager) sourceVerifyDivisionWithAllocationContext(a, b, q, r li
 		r.frame.verification = naturalPNVerificationReceipt{m, frame, frame.invocation}
 		defer func() { frame.executing = false }()
 	}
+	if q := context.recombination; context.raw == nil && q != nil && q.owner.manager.config.Integer.natural == m && context.recombinationFrame(q.owner.manager.config.Integer) != nil {
+		frame = &m.verificationInvocation
+		if frame.active || frame.invocation == ^uint64(0) {
+			return ErrPolynomialPending
+		}
+		*frame = naturalPNVerificationScope{active: true, executing: true, invocation: frame.invocation + 1, recombinationContext: context}
+		frame.buffer = naturalPNBufferReceipt{owner: m, recombinationContext: context, invocation: q.invocation, buffer: &m.verification, private: true}
+		q.verification = naturalPNVerificationReceipt{m, frame, frame.invocation}
+		defer func() { frame.executing = false }()
+	}
 	if q := context.henselCaller; context.raw == nil && q != nil && q.owner.manager.config.Integer.natural == m && context.henselCallerFrame(q.owner.manager.config.Integer) != nil {
 		frame = &m.verificationInvocation
 		if frame.active || frame.invocation == ^uint64(0) {

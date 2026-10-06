@@ -1,3 +1,5 @@
+// Source: src/math/polynomial/upolynomial.cpp:56-63.
+// Source author: Leonardo de Moura.
 // Licensed under the MIT license.
 // Concrete core_manager::factors, actual scoped coefficient ownership.
 package mpnum
@@ -214,6 +216,9 @@ func (fs *UPolynomialFactors) SetMultiplicity(index, degree uint32) error {
 	return nil
 }
 func (fs *UPolynomialFactors) PushCopy(v UPolynomialView, degree uint32) error {
+	return fs.pushCopyWithSourceContext(v, degree, integerAllocationInvocationContext{})
+}
+func (fs *UPolynomialFactors) pushCopyWithSourceContext(v UPolynomialView, degree uint32, context integerAllocationInvocationContext) error {
 	if e := fs.check(); e != nil {
 		return e
 	}
@@ -227,7 +232,7 @@ func (fs *UPolynomialFactors) PushCopy(v UPolynomialView, degree uint32) error {
 	if e = fs.manager.sequenceUnsignedPush(&fs.degrees, degree); e != nil {
 		return e
 	}
-	if e = fs.manager.setView(out, v); e != nil {
+	if e = fs.manager.setViewWithSourceContext(out, v, context); e != nil {
 		return e
 	}
 	fs.totalFactors += degree

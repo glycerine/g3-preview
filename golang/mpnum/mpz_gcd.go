@@ -186,6 +186,7 @@ func (m *IntegerManager) gcdWithAllocationContext(a, b, c *Int, context integerA
 	if e != nil {
 		return e
 	}
+	context.recordRecombinationRaw(m, receipt)
 	context.recordContentRaw(m, receipt)
 	context = context.withRawInvocation(receipt)
 	a1, b1, r, t, tmp := &s.values[0], &s.values[1], &s.values[2], &s.values[3], &s.values[4]

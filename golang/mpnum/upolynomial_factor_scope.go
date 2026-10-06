@@ -17,30 +17,31 @@ var ErrUPolynomialCleanupPending = errors.New("mpnum: retained factorization lex
 // the unfinished reverse destruction cursor instead of losing its owner. This
 // additional charged header is a Go exception/lifetime adapter, not C++ malloc.
 type upolyFactorSquareFreeScope struct {
-	hensel          upolyHenselCallerScope
-	trialHelper     upolyRecombinationTrialScope
-	self            *upolyFactorSquareFreeScope
-	service         *UPolynomialFactorizationService
-	callerPrevious  *upolyFactorSquareFreeScope
-	callDepth       uint32
-	mignotte        upolyMignotteScope
-	primeTrial      upolyPrimeTrialScope
-	manager         *UPolynomialManager
-	fpp             upolyVectorState
-	p               Int
-	zp              *UPolynomialManager
-	best            *UPolynomialFactors
-	bestP           Int
-	ds              upolyFactorDegreeState
-	gcdTmp          Int
-	zpe             *UPolynomialManager
-	lifted          *UPolynomialFactors
-	leading         Int
-	it              upolyFactorCombinationState
-	trial, quotient upolyVectorState
-	trialContent    Int
-	constructed     uint8
-	header          uint64
+	hensel            upolyHenselCallerScope
+	trialHelper       upolyRecombinationTrialScope
+	recombinationStep upolyRecombinationStepScope
+	self              *upolyFactorSquareFreeScope
+	service           *UPolynomialFactorizationService
+	callerPrevious    *upolyFactorSquareFreeScope
+	callDepth         uint32
+	mignotte          upolyMignotteScope
+	primeTrial        upolyPrimeTrialScope
+	manager           *UPolynomialManager
+	fpp               upolyVectorState
+	p                 Int
+	zp                *UPolynomialManager
+	best              *UPolynomialFactors
+	bestP             Int
+	ds                upolyFactorDegreeState
+	gcdTmp            Int
+	zpe               *UPolynomialManager
+	lifted            *UPolynomialFactors
+	leading           Int
+	it                upolyFactorCombinationState
+	trial, quotient   upolyVectorState
+	trialContent      Int
+	constructed       uint8
+	header            uint64
 }
 
 func (s *UPolynomialFactorizationService) newSquareFreeScope() (*upolyFactorSquareFreeScope, error) {
@@ -62,6 +63,15 @@ func (s *UPolynomialFactorizationService) newSquareFreeScope() (*upolyFactorSqua
 // prime, prime factors, prime core, prime, primitive vector. Only constructed
 // objects participate; publication/cleanup advances one completed action.
 func (c *upolyFactorSquareFreeScope) cleanup() error {
+	if q := &c.recombinationStep; q.active {
+		if q.executing || q.sourceExecuting || q.ownExecuting || q.callDepth != 0 {
+			return ErrUPolynomialCleanupPending
+		}
+		q.finish(&q.receipt, q.bodyCause)
+		if q.sourceCause != nil {
+			return q.sourceCause
+		}
+	}
 	if q := &c.trialHelper; q.active {
 		if q.executing || q.sourceExecuting || q.ownExecuting || q.callDepth != 0 {
 			return ErrUPolynomialCleanupPending
@@ -98,7 +108,7 @@ func (c *upolyFactorSquareFreeScope) cleanup() error {
 	if e := c.cleanupMembers(); e != nil {
 		return e
 	}
-	if c.mignotte.active || c.primeTrial.active || c.trialHelper.active {
+	if c.mignotte.active || c.primeTrial.active || c.trialHelper.active || c.recombinationStep.active {
 		return ErrUPolynomialCleanupPending
 	}
 	return nil
@@ -200,6 +210,11 @@ func (s *UPolynomialFactorizationService) CleanupRetained() error {
 		return ErrUPolynomialCleanupPending
 	}
 	caller := s.scope
+	if caller.recombinationStep.active {
+		if e := caller.recombinationStep.own(&caller.recombinationStep.receipt, false); e != nil {
+			return e
+		}
+	}
 	if caller.trialHelper.active {
 		if e := caller.trialHelper.own(&caller.trialHelper.receipt, false); e != nil {
 			return e
@@ -242,6 +257,11 @@ func (s *UPolynomialFactorizationService) CleanupRetained() error {
 	}
 	if s.scope.hensel.active {
 		if e := s.scope.hensel.own(true); e != nil {
+			return e
+		}
+	}
+	if caller.recombinationStep.active {
+		if e := caller.recombinationStep.own(&caller.recombinationStep.receipt, true); e != nil {
 			return e
 		}
 	}

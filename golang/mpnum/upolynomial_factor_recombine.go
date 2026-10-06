@@ -338,59 +338,13 @@ func (s *UPolynomialFactorizationService) factorSquareFree(f UPolynomialView, fs
 			remove = false
 			continue
 		}
-		if e = zpe.mulScalarState(&c.trial, &c.leading); e != nil {
-			return false, e
-		}
-		exact, e := m.exactDivState(m.stateView(&c.fpp), m.stateView(&c.trial), &c.quotient)
+		remove, e = s.publishRecombinationTrial(fs, k, left)
 		if e != nil {
 			return false, e
-		}
-		if exact {
-			if !left {
-				c.trial, c.quotient = c.quotient, c.trial
-			}
-			if e = m.primitiveState(m.stateView(&c.trial), &c.trial, &c.trialContent); e != nil {
-				return false, e
-			}
-			if e = fs.PushCopy(m.stateView(&c.trial), k); e != nil {
-				return false, e
-			}
-			if e = m.primitiveState(m.stateView(&c.quotient), &c.fpp, &c.trialContent); e != nil {
-				return false, e
-			}
-			top, e := m.read(m.stateView(&c.fpp), c.fpp.size-1)
-			if e != nil {
-				return false, e
-			}
-			if e = nm.Copy(&c.leading, top); e != nil {
-				return false, e
-			}
-			if e = m.mulScalarState(&c.fpp, &c.leading); e != nil {
-				return false, e
-			}
-			remove = true
-		} else {
-			remove = false
 		}
 	}
-	if c.fpp.size > 1 {
-		if e = m.divScalar(m.stateView(&c.fpp), &c.leading); e != nil {
-			return false, e
-		}
-		if e = fs.PushCopy(m.stateView(&c.fpp), k); e != nil {
-			return false, e
-		}
-	} else if modularSourceDebug {
-		if c.fpp.size != 1 {
-			return false, ErrUPolynomialAssertion
-		}
-		one, e := nm.IsOne(&m.values(&c.fpp)[c.fpp.size-1])
-		if e != nil {
-			return false, e
-		}
-		if !one {
-			return false, ErrUPolynomialAssertion
-		}
+	if e := s.publishRecombinationRemainder(fs, k); e != nil {
+		return false, e
 	}
 	return result, nil
 }
@@ -445,4 +399,89 @@ func (s *UPolynomialFactorizationService) selectFactorTrial(it *upolyFactorCombi
 		return true, it.leftWithSourceContext(trial, &q.addMul, context)
 	}
 	return true, it.rightWithSourceContext(nil, nil, trial, &q.addMul, context)
+}
+
+// Source: src/math/polynomial/upolynomial_factorization.cpp:1238-1273.
+func (s *UPolynomialFactorizationService) publishRecombinationTrial(fs *UPolynomialFactors, k uint32, left bool) (remove bool, failure error) {
+	q, e := s.beginRecombinationStep(fs)
+	if e != nil {
+		return false, e
+	}
+	r := q.receipt
+	q.enterCall()
+	defer func() { q.executing = false; q.leaveCall(); failure = q.finish(&r, failure) }()
+	c := q.owner
+	m := c.manager
+	nm := m.modular
+	zpe := q.related
+	context := nm.recombinationAllocationContext(q)
+	if e = zpe.mulScalarStateWithRecombination(&c.trial, &c.leading, q); e != nil {
+		return false, e
+	}
+	exact, e := m.exactDivStateWithSourceContext(m.stateView(&c.fpp), m.stateView(&c.trial), &c.quotient, &q.addMul, context)
+	if e != nil {
+		return false, e
+	}
+	if exact {
+		if !left {
+			c.trial, c.quotient = c.quotient, c.trial
+		}
+		if e = m.primitiveStateWithSourceContext(m.stateView(&c.trial), &c.trial, &c.trialContent, context); e != nil {
+			return false, e
+		}
+		if e = fs.pushCopyWithSourceContext(m.stateView(&c.trial), k, context); e != nil {
+			return false, e
+		}
+		if e = m.primitiveStateWithSourceContext(m.stateView(&c.quotient), &c.fpp, &c.trialContent, context); e != nil {
+			return false, e
+		}
+		top, e := m.read(m.stateView(&c.fpp), c.fpp.size-1)
+		if e != nil {
+			return false, e
+		}
+		if e = nm.copyWithSourceContext(&c.leading, top, context); e != nil {
+			return false, e
+		}
+		if e = m.mulScalarStateWithRecombination(&c.fpp, &c.leading, q); e != nil {
+			return false, e
+		}
+		return true, nil
+	} else {
+		return false, nil
+	}
+}
+
+// Source: src/math/polynomial/upolynomial_factorization.cpp:1285-1292.
+func (s *UPolynomialFactorizationService) publishRecombinationRemainder(fs *UPolynomialFactors, k uint32) (failure error) {
+	q, e := s.beginRecombinationStep(fs)
+	if e != nil {
+		return e
+	}
+	r := q.receipt
+	q.enterCall()
+	defer func() { q.executing = false; q.leaveCall(); failure = q.finish(&r, failure) }()
+	c := q.owner
+	m := c.manager
+	nm := m.modular
+	context := m.modular.recombinationAllocationContext(q)
+	if c.fpp.size > 1 {
+		if e = m.divScalarWithSourceContext(m.stateView(&c.fpp), &c.leading, context); e != nil {
+			return e
+		}
+		if e = fs.pushCopyWithSourceContext(m.stateView(&c.fpp), k, context); e != nil {
+			return e
+		}
+	} else if modularSourceDebug {
+		if c.fpp.size != 1 {
+			return ErrUPolynomialAssertion
+		}
+		one, e := nm.IsOne(&m.values(&c.fpp)[c.fpp.size-1])
+		if e != nil {
+			return e
+		}
+		if !one {
+			return ErrUPolynomialAssertion
+		}
+	}
+	return nil
 }

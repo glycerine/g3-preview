@@ -240,6 +240,9 @@ func (q *upolyMignotteScope) leaveCall(m *UPolynomialManager) {
 	}
 }
 func (m *UPolynomialManager) mignotteCallPending() bool {
+	if m.recombinationCallPending() {
+		return true
+	}
 	for q := m.trialCaller; q != nil; {
 		if q.matches() && q.callDepth != 0 && (q.owner.manager == m || q.factors.manager == m) {
 			return true

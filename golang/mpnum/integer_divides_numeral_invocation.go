@@ -42,6 +42,9 @@ func (m *IntegerManager) beginDividesNumeralInvocation(parent integerAllocationI
 	if m.scalarExactContextRoots(parent) != nil {
 		parent.scalarExact.frame.boolNumeral = s.receipt
 	}
+	if q := parent.recombinationFrame(m); q != nil {
+		q.boolNumeral = s.receipt
+	}
 	if q := parent.trialFrame(m); q != nil {
 		q.boolNumeral = s.receipt
 	}

@@ -53,6 +53,7 @@ func (m *IntegerManager) extendedGCDWithAllocationContext(r1, r2, a, b, g *Int, 
 			return e
 		}
 		values = &public.values
+		context.recordRecombinationRaw(m, receipt)
 		context.recordContentRaw(m, receipt)
 		m.bindHenselRaw(context, receipt, false)
 		m.bindHenselCallerRaw(context, receipt, false)

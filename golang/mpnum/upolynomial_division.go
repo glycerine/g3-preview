@@ -1,5 +1,5 @@
 // Licensed under the MIT license.
-// Source core_manager polynomial division; outputs keep completed prefixes.
+// Source: src/math/polynomial/upolynomial.cpp:403-651; outputs keep completed prefixes.
 package mpnum
 
 import "github.com/glycerine/g3/golang/arena"
@@ -409,6 +409,9 @@ func (m *UPolynomialManager) Divides(a, b UPolynomial) (bool, error) {
 }
 
 func (m *UPolynomialManager) exactDivState(a, b UPolynomialView, out *upolyVectorState) (bool, error) {
+	return m.exactDivStateWithSourceContext(a, b, out, nil, integerAllocationInvocationContext{})
+}
+func (m *UPolynomialManager) exactDivStateWithSourceContext(a, b UPolynomialView, out *upolyVectorState, child *integerAddMulInvocationReceipt, context integerAllocationInvocationContext) (bool, error) {
 	if b.count == 0 {
 		return false, nil
 	}
@@ -426,7 +429,7 @@ func (m *UPolynomialManager) exactDivState(a, b UPolynomialView, out *upolyVecto
 	if e != nil {
 		return false, e
 	}
-	ok, e := m.modular.Divides(bn, an)
+	ok, e := m.modular.dividesWithAllocationContext(bn, an, context)
 	if e != nil || !ok {
 		return false, e
 	}
@@ -438,7 +441,7 @@ func (m *UPolynomialManager) exactDivState(a, b UPolynomialView, out *upolyVecto
 	if e != nil {
 		return false, e
 	}
-	ok, e = m.modular.Divides(b0, a0)
+	ok, e = m.modular.dividesWithAllocationContext(b0, a0, context)
 	if e != nil || !ok {
 		return false, e
 	}
@@ -451,7 +454,7 @@ func (m *UPolynomialManager) exactDivState(a, b UPolynomialView, out *upolyVecto
 	if e = m.reserve(q, deg+1); e != nil {
 		return false, e
 	}
-	if e = m.setView(r, a); e != nil {
+	if e = m.setViewWithSourceContext(r, a, context); e != nil {
 		return false, e
 	}
 	if modularSourceDebug && r.size != a.count {
@@ -472,7 +475,7 @@ func (m *UPolynomialManager) exactDivState(a, b UPolynomialView, out *upolyVecto
 			if e != nil {
 				return false, e
 			}
-			ok, e = m.modular.Divides(bn, &m.values(r)[n-1])
+			ok, e = m.modular.dividesWithAllocationContext(bn, &m.values(r)[n-1], context)
 			if e != nil {
 				return false, e
 			}
@@ -483,7 +486,7 @@ func (m *UPolynomialManager) exactDivState(a, b UPolynomialView, out *upolyVecto
 			if e != nil {
 				return false, e
 			}
-			ok, e = m.modular.Divides(b0, &m.values(r)[0])
+			ok, e = m.modular.dividesWithAllocationContext(b0, &m.values(r)[0], context)
 			if e != nil {
 				return false, e
 			}
@@ -498,7 +501,7 @@ func (m *UPolynomialManager) exactDivState(a, b UPolynomialView, out *upolyVecto
 		if e != nil {
 			return false, e
 		}
-		if e = m.modular.Div(&m.values(r)[n-1], bn, dst); e != nil {
+		if e = m.modular.divWithAllocationContext(&m.values(r)[n-1], bn, dst, context); e != nil {
 			return false, e
 		}
 		for i := uint32(0); i < b.count-1; i++ {
@@ -512,7 +515,7 @@ func (m *UPolynomialManager) exactDivState(a, b UPolynomialView, out *upolyVecto
 			}
 			if !zero {
 				row := &m.values(r)[i+delta]
-				if e = m.modular.SubMul(row, dst, x, row); e != nil {
+				if e = m.modular.subMulWithSourceContext(row, dst, x, row, child, context); e != nil {
 					return false, e
 				}
 			}

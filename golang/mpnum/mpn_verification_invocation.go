@@ -8,6 +8,7 @@ import "github.com/glycerine/g3/golang/memory"
 // construction owns exact raw/pending leaves but has no source destructor.
 type naturalPNVerificationScope struct {
 	henselCallerContext                          integerAllocationInvocationContext
+	recombinationContext                         integerAllocationInvocationContext
 	henselPair                                   upolyHenselPairInvocationReceipt
 	divides                                      polynomialDividesInvocationReceipt
 	boolDivides                                  integerDividesNumeralInvocationReceipt

@@ -1,3 +1,5 @@
+// Source: src/math/polynomial/upolynomial.cpp:213-232; src/util/mpz.cpp:845-912.
+// Source author: Leonardo de Moura.
 // Licensed under the MIT license.
 package mpnum
 
@@ -5,6 +7,9 @@ package mpnum
 // array reads. Only the final result receives mpzzp's normalized assertion;
 // per-pair modular GCD would introduce different checks/actions.
 func (m *UPolynomialManager) gcdSpan(v UPolynomialView, out *Int) error {
+	return m.gcdSpanWithSourceContext(v, out, integerAllocationInvocationContext{})
+}
+func (m *UPolynomialManager) gcdSpanWithSourceContext(v UPolynomialView, out *Int, context integerAllocationInvocationContext) error {
 	if e := m.modular.check(); e != nil {
 		return e
 	}
@@ -22,10 +27,10 @@ func (m *UPolynomialManager) gcdSpan(v UPolynomialView, out *Int) error {
 		if e != nil {
 			return e
 		}
-		if e = z.Copy(out, first); e != nil {
+		if e = z.copyFromOwnerWithAllocationContext(out, z, first, nil, context); e != nil {
 			return e
 		}
-		if e = z.Abs(out); e != nil {
+		if e = z.absWithAllocationContext(out, context); e != nil {
 			return e
 		}
 	default:
@@ -37,7 +42,7 @@ func (m *UPolynomialManager) gcdSpan(v UPolynomialView, out *Int) error {
 		if e != nil {
 			return e
 		}
-		if e = z.GCD(first, second, out); e != nil {
+		if e = z.gcdWithAllocationContext(first, second, out, context); e != nil {
 			return e
 		}
 		for i := uint32(2); i < v.count; i++ {
@@ -48,7 +53,7 @@ func (m *UPolynomialManager) gcdSpan(v UPolynomialView, out *Int) error {
 			if e != nil {
 				return e
 			}
-			if e = z.GCD(out, next, out); e != nil {
+			if e = z.gcdWithAllocationContext(out, next, out, context); e != nil {
 				return e
 			}
 		}
@@ -56,10 +61,13 @@ func (m *UPolynomialManager) gcdSpan(v UPolynomialView, out *Int) error {
 	return m.modular.assertNormalized(out)
 }
 func (m *UPolynomialManager) primitiveState(v UPolynomialView, pp *upolyVectorState, cont *Int) error {
+	return m.primitiveStateWithSourceContext(v, pp, cont, integerAllocationInvocationContext{})
+}
+func (m *UPolynomialManager) primitiveStateWithSourceContext(v UPolynomialView, pp *upolyVectorState, cont *Int, context integerAllocationInvocationContext) error {
 	if modularSourceDebug && v.count == 0 {
 		return ErrUPolynomialAssertion
 	}
-	if e := m.gcdSpan(v, cont); e != nil {
+	if e := m.gcdSpanWithSourceContext(v, cont, context); e != nil {
 		return e
 	}
 	if modularSourceDebug {
@@ -76,7 +84,7 @@ func (m *UPolynomialManager) primitiveState(v UPolynomialView, pp *upolyVectorSt
 		return e
 	}
 	if one {
-		return m.setView(pp, v)
+		return m.setViewWithSourceContext(pp, v, context)
 	}
 	if e = m.reserve(pp, v.count); e != nil {
 		return e
@@ -92,9 +100,9 @@ func (m *UPolynomialManager) primitiveState(v UPolynomialView, pp *upolyVectorSt
 		}
 		dst := &m.values(pp)[i]
 		if zero {
-			e = m.modular.SetInt32(dst, 0)
+			e = m.modular.setInt64WithSourceContext(dst, 0, context)
 		} else {
-			e = m.modular.Div(x, cont, dst)
+			e = m.modular.divWithAllocationContext(x, cont, dst, context)
 		}
 		if e != nil {
 			return e

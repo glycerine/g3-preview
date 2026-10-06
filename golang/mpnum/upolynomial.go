@@ -32,6 +32,7 @@ type UPolynomialManager struct {
 	callbackDepth          uint32
 	mignotteCaller         *upolyMignotteScope
 	trialCaller            *upolyRecombinationTrialScope
+	recombinationCaller    *upolyRecombinationStepScope
 	primeTrialCaller       *upolyPrimeTrialScope
 	squareFreeCaller       *upolyFactorSquareFreeScope
 	self                   *UPolynomialManager

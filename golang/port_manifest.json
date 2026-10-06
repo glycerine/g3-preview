@@ -37125,7 +37125,9 @@
         "mpnum/upolynomial_source_finalize_test.go",
         "upolynomial_hensel_physical_source_test.go",
         "mpnum/upolynomial_hensel_extended_scope.go",
-        "mpnum/upolynomial_hensel_caller_engines.go"
+        "mpnum/upolynomial_hensel_caller_engines.go",
+        "mpnum/upolynomial_recombination_step_allocation_context.go",
+        "mpnum/upolynomial_recombination_publication_source_test.go"
       ],
       "tests": [
         "TestUPolynomialScalarExtentAndLayout",
@@ -37226,7 +37228,15 @@
         "TestUPolynomialSourceFinalizeFirstEntryConsumedLeafGuard",
         "TestUPolynomialSourceFinalizeFreshNullMember",
         "TestUPolynomialHenselActualExtendedGCDCallerIndependentIdentity",
-        "TestUPolynomialHenselActualExtendedGCDEveryBIGReservation"
+        "TestUPolynomialHenselActualExtendedGCDEveryBIGReservation",
+        "TestUPolynomialRecombinationPublicationTransportProtectsActualCaller",
+        "TestUPolynomialRecombinationPublicationEveryActualPrefix",
+        "TestUPolynomialRecombinationRemainingPublicationEveryActualPrefix",
+        "TestUPolynomialRecombinationPublicationBIGGCDDivEveryActualPrefix",
+        "TestUPolynomialRecombinationPublicationExactCapturedContext",
+        "TestUPolynomialRecombinationPublicationActualChildStopAndOwningHistory",
+        "TestUPolynomialRecombinationPublicationExactOldLeafPreservesForeignReplacement",
+        "TestUPolynomialRecombinationPublicationNumericAbortBeforeFaultLift"
       ],
       "conditionals": [
         {
@@ -38203,6 +38213,21 @@
             "TestUPolynomialHenselActualExtendedGCDCallerIndependentIdentity",
             "TestUPolynomialHenselActualExtendedGCDEveryBIGReservation"
           ]
+        },
+        {
+          "name": "upolynomial.cpp:213-232,609-651 same primitive-content and exact-division source engines with concrete caller transport",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_division.go",
+          "tests": [
+            "TestUPolynomialRecombinationPublicationTransportProtectsActualCaller",
+            "TestUPolynomialRecombinationPublicationEveryActualPrefix",
+            "TestUPolynomialRecombinationRemainingPublicationEveryActualPrefix",
+            "TestUPolynomialRecombinationPublicationBIGGCDDivEveryActualPrefix",
+            "TestUPolynomialRecombinationPublicationExactCapturedContext",
+            "TestUPolynomialRecombinationPublicationActualChildStopAndOwningHistory",
+            "TestUPolynomialRecombinationPublicationExactOldLeafPreservesForeignReplacement",
+            "TestUPolynomialRecombinationPublicationNumericAbortBeforeFaultLift"
+          ]
         }
       ],
       "ownership": [
@@ -38214,7 +38239,8 @@
         "Independent stores borrowing the same actual IntegerManager transfer scalar buffer states without coefficient copies. Charged cold bindings retain each distinct imported store once; captured physical views survive transfer and original-core close until actual backing growth/free. Related constructors inherit bindings and unwind retained refs on refusal. Sum core ExclusiveBytes plus each distinct store TotalBytes once; numeral cells belong to the shared IntegerManager. See PORT_PROGRESS.md#audit-upolynomial-store-adoption-port-status-md.",
         "Literal ascending private numeral deletion and reverse backing destruction retain exact stopped cause/cursor. Caller descriptors survive source finalization and require explicit caller-field cleanup. No registry-derived ownership or acknowledgement of consumed physical release on source retry. Whole imp/global bindings remain open.",
         "Upper isolation/Sturm tests account for exact external shared Integer gcdRaw five declarations and matched AddMul child TMP separately from UPolynomial-owned/cached stats. Actual Integer self/frame/count and immutable child/parent invocation identities name roots; live/generation metadata only validates those exact tokens. Physical anonymous-root audits remain intact. This is Go allocation-failure observation coverage, not additional registered C++ assertion credit.",
-        "Actual caller-owned stable V1/V3/Q/R/T/V1Q, conditional BV/expectedD and final lc_inv/lc frontiers; source youngest stop precedes older vectors and related owner."
+        "Actual caller-owned stable V1/V3/Q/R/T/V1Q, conditional BV/expectedD and final lc_inv/lc frontiers; source youngest stop precedes older vectors and related owner.",
+        "upolynomial.cpp:213-232,609-651: same actual array reads, scalar SET/Div, persistent quotient/remainder scratch, scoped compiled divisibility child and explicit RAW SubMul temporary; direct child acquisition and exact cleanup replace omitted source-call ownership transport without substituting algorithms."
       ],
       "deviations": [
         "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full isolation/refinement/conversion/factorization/algebraic and printers remain open; input conversion adapters do not establish complete registered tests.",
@@ -38887,7 +38913,17 @@
         "mpnum/upolynomial_recombination_trial_allocation_context.go",
         "mpnum/upolynomial_recombination_trial_foreign_source_test.go",
         "mpnum/upolynomial_recombination_trial_invocation.go",
-        "mpnum/upolynomial_recombination_trial_source_test.go"
+        "mpnum/upolynomial_recombination_trial_source_test.go",
+        "mpnum/mpn_source_verify.go",
+        "mpnum/mpn_verification_invocation.go",
+        "mpnum/mpz_div.go",
+        "mpnum/mpz_gcd.go",
+        "mpnum/mpz_number_theory.go",
+        "mpnum/mpzzp_normalize_allocation_receipt.go",
+        "mpnum/upolynomial_content.go",
+        "mpnum/upolynomial_recombination_publication_source_test.go",
+        "mpnum/upolynomial_recombination_step_allocation_context.go",
+        "mpnum/upolynomial_recombination_step_invocation.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -38954,7 +38990,15 @@
         "TestUPolynomialRecombinationTrialExactReceiptAndCapturedContext",
         "TestUPolynomialRecombinationTrialFiniteBIGEveryActualPrefix",
         "TestUPolynomialRecombinationTrialRelatedOwnerTransport",
-        "TestUPolynomialRecombinationTrialActualCompiledChildSourceStopProtectsTmp"
+        "TestUPolynomialRecombinationTrialActualCompiledChildSourceStopProtectsTmp",
+        "TestUPolynomialRecombinationPublicationTransportProtectsActualCaller",
+        "TestUPolynomialRecombinationPublicationEveryActualPrefix",
+        "TestUPolynomialRecombinationRemainingPublicationEveryActualPrefix",
+        "TestUPolynomialRecombinationPublicationBIGGCDDivEveryActualPrefix",
+        "TestUPolynomialRecombinationPublicationExactCapturedContext",
+        "TestUPolynomialRecombinationPublicationActualChildStopAndOwningHistory",
+        "TestUPolynomialRecombinationPublicationExactOldLeafPreservesForeignReplacement",
+        "TestUPolynomialRecombinationPublicationNumericAbortBeforeFaultLift"
       ],
       "conditionals": [
         {
@@ -39219,6 +39263,21 @@
             "TestUPolynomialRecombinationTrialRelatedOwnerTransport",
             "TestUPolynomialRecombinationTrialActualCompiledChildSourceStopProtectsTmp"
           ]
+        },
+        {
+          "name": "upolynomial_factorization.cpp:1238-1292 actual scalar multiplication, exact division, primitive-content extraction and sequential factor/remaining publication",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_factor_recombine.go",
+          "tests": [
+            "TestUPolynomialRecombinationPublicationTransportProtectsActualCaller",
+            "TestUPolynomialRecombinationPublicationEveryActualPrefix",
+            "TestUPolynomialRecombinationRemainingPublicationEveryActualPrefix",
+            "TestUPolynomialRecombinationPublicationBIGGCDDivEveryActualPrefix",
+            "TestUPolynomialRecombinationPublicationExactCapturedContext",
+            "TestUPolynomialRecombinationPublicationActualChildStopAndOwningHistory",
+            "TestUPolynomialRecombinationPublicationExactOldLeafPreservesForeignReplacement",
+            "TestUPolynomialRecombinationPublicationNumericAbortBeforeFaultLift"
+          ]
         }
       ],
       "ownership": [
@@ -39232,7 +39291,9 @@
         "Exact matched cleanup retains first owning error only after real owner/frame/nonce and executing guards; source finalization callback refuses before mutation and source history remains immutable after own acknowledgment.",
         "Direct exported HenselLiftFactors owns one reflected cold caller adapter, constructed zero before literal first SetZP; earliest body cause retained independently of source suffix; caller pf/lf and already-published output prefix are not adopted.",
         "upolynomial_factorization.cpp:1213-1240: actual embedded charged trial helper frame binds owner/frame/nonwrapping invocation and direct SET/MUL, PN, compiled scoped Integer Divides NUM, and RAW AddMul children; source branch-end tmp destruction precedes subsequent multiplication. False owning acknowledgment completes younger children before tmp; true unjoined cleanup follows older enclosing source members.",
-        "upolynomial_factorization.cpp:1213-1240: actual registered caller chain protects service and both related managers during body, source destruction, and owning cleanup; rejected copied/stale/foreign receipts do not acquire roots or poison first causes. Original body/source/own histories remain readable after exact retirement until the next actual invocation."
+        "upolynomial_factorization.cpp:1213-1240: actual registered caller chain protects service and both related managers during body, source destruction, and owning cleanup; rejected copied/stale/foreign receipts do not acquire roots or poison first causes. Original body/source/own histories remain readable after exact retirement until the next actual invocation.",
+        "upolynomial_factorization.cpp:1238-1292: actual charged embedded source-call adapter binds real parent/frame/nonwrapping invocation, captured root and related manager, direct scalar MUL/SET/Div/GCD leaves, scoped Integer Divides NUM and explicit RAW AddMul/Div/ExtendedGCD/GCD children. This span constructs no new source NUM.",
+        "upolynomial_factorization.cpp:1238-1292: first body/source/own causes survive exact false completed-child acknowledgment, older enclosing source fields, and true unjoined child abort. Successful factors remain caller-owned partial publication; no transactional rollback, clone, extra INC or whole-factor completion claim."
       ],
       "deviations": [
         "Selected Mignotte helper, enclosing epilogue and literal prime-trial lexical scope/RAW transport are closed. Pair-Hensel and generic nil to_zp helper scope closure remain open. No full factor_square_free completion or original registered driver assertion credit.",
@@ -39246,7 +39307,9 @@
         "No whole factorization class or dormant registered driver completion. Direct exported HenselLiftFactors is closed through its actual charged caller adapter; helpers outside the selected concrete caller remain separate.",
         "Actual public cold-adapter charge shifts the independently proved checked setup_p lower destroyed-Copy frontier 158 to159; all original InvalidSlot, one caller SetZ, named physical and retry assertions remain. Direct helper whole-finish fixture first proves executing rejection, then marks actual helper return before source completion; it is a helper/guard profile, not a nested source driver.",
         "upolynomial_factorization.cpp:1213-1240: supported Go ErrorTransport reentry tests protect actual lower acquisition; no C++ allocator-callback equivalence is claimed. Signed-host TLS destructor/compiled-child composition tests are guarded owner-primitive profiles, not ordinary mathematical allocation failure reachability.",
-        "upolynomial_factorization.cpp:1213-1240: actual reflected cold header contains the typed helper and related caller pointers; no per-call ticket, substitute INC/Copy, or native C++ malloc geometry claim. This closes the selected trial helper only; enclosing factorization and dormant registered drivers remain partial."
+        "upolynomial_factorization.cpp:1213-1240: actual reflected cold header contains the typed helper and related caller pointers; no per-call ticket, substitute INC/Copy, or native C++ malloc geometry claim. This closes the selected trial helper only; enclosing factorization and dormant registered drivers remain partial.",
+        "upolynomial_factorization.cpp:1238-1292: signed-host TLS destructor tests compose actual compiled child and real release under the qualified guarded owner-primitive profile, not ordinary mathematical OOM reachability. ErrorTransport tests are supported Go callback semantics, not C++ malloc callback equivalence.",
+        "upolynomial_factorization.cpp:1238-1292: actual reflected cold parent/header storage carries the concrete adapter/receipts; no per-call reservation ticket or native malloc geometry claim. Remaining factorization/recombination topology outside this selected source block remains partial."
       ]
     },
     {

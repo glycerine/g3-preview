@@ -129,6 +129,7 @@ func (m *IntegerManager) divWithAllocationContext(a, b, c *Int, context integerA
 				return e
 			}
 			tmp = &public.values[0]
+			context.recordRecombinationRaw(m, receipt)
 			context.recordContentRaw(m, receipt)
 			m.bindHenselRaw(context, receipt, true)
 			m.bindHenselCallerRaw(context, receipt, true)
