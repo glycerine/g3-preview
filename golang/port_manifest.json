@@ -29157,7 +29157,17 @@
         "mpnum/polynomial_iccp_constant_context_source_test.go",
         "mpnum/polynomial_resultant_children_source_test.go",
         "mpnum/polynomial_resultant_power_stop_source_test.go",
-        "mpnum/polynomial_resultant_parent_receipt_source_test.go"
+        "mpnum/polynomial_resultant_parent_receipt_source_test.go",
+        "mpnum/polynomial_discriminant.go",
+        "mpnum/polynomial_discriminant_c_stop_source_test.go",
+        "mpnum/polynomial_discriminant_callback_source_test.go",
+        "mpnum/polynomial_discriminant_coefficient_prefix_source_test.go",
+        "mpnum/polynomial_discriminant_even_modulus_source_test.go",
+        "mpnum/polynomial_discriminant_foreign_row_source_test.go",
+        "mpnum/polynomial_discriminant_lc_stop_source_test.go",
+        "mpnum/polynomial_discriminant_prefix_source_test.go",
+        "mpnum/polynomial_discriminant_resultant_parent_receipt_source_test.go",
+        "mpnum/polynomial_discriminant_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -29886,7 +29896,18 @@
         "TestPolynomialResultantLaterFailurePreservesSuccessfulDividesMemberRows",
         "TestPolynomialResultantCompletedSourceBodyHistorySurvivesOwningACK",
         "TestPolynomialResultantYoungerPowerSourceStopPreservesOlderAB",
-        "TestPolynomialResultantReceiptRejectsCopiedActualFrame"
+        "TestPolynomialResultantReceiptRejectsCopiedActualFrame",
+        "TestPolynomialDiscriminantYoungerCoefficientRefStopBeforeLeadingAndPrime",
+        "TestPolynomialDiscriminantDegreeZeroConstructsRefBeforeCallbackAndRefusesOwnerClose",
+        "TestPolynomialDiscriminantDegreeZeroCallbackRefusesSourceFinalizeBeforeMutation",
+        "TestPolynomialDiscriminantPolynomialLeadingCoefficientActualPrefixes",
+        "TestPolynomialDiscriminantEvenUpperActualNegNormalizeSuffixPrefixes",
+        "TestPolynomialDiscriminantYoungerRefCallbackForeignRowSurvivesExactAbort",
+        "TestPolynomialDiscriminantStrictLeadingNUMStopKeepsOlderPrimeAndCause",
+        "TestPolynomialDiscriminantActualResultantBeforeLeadingNUMPrefixes",
+        "TestPolynomialDiscriminantResultantReceiptRejectsCopiedActualFrame",
+        "TestPolynomialDiscriminantAllOriginalDormantAssertions",
+        "TestPolynomialDiscriminantIndependentDegreeZeroThroughFour"
       ],
       "conditionals": [
         {
@@ -33469,6 +33490,24 @@
           "tests": [
             "TestPolynomialResultantReceiptRejectsCopiedActualFrame"
           ]
+        },
+        {
+          "name": "discriminant polynomial.cpp:5473-5500: p_prime before degree guard, caller Resultant publication, uint64 sign, constant/polynomial leading coefficient suffix and ordered lexical destruction",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_discriminant.go",
+          "tests": [
+            "TestPolynomialDiscriminantYoungerCoefficientRefStopBeforeLeadingAndPrime",
+            "TestPolynomialDiscriminantDegreeZeroConstructsRefBeforeCallbackAndRefusesOwnerClose",
+            "TestPolynomialDiscriminantDegreeZeroCallbackRefusesSourceFinalizeBeforeMutation",
+            "TestPolynomialDiscriminantPolynomialLeadingCoefficientActualPrefixes",
+            "TestPolynomialDiscriminantEvenUpperActualNegNormalizeSuffixPrefixes",
+            "TestPolynomialDiscriminantYoungerRefCallbackForeignRowSurvivesExactAbort",
+            "TestPolynomialDiscriminantStrictLeadingNUMStopKeepsOlderPrimeAndCause",
+            "TestPolynomialDiscriminantActualResultantBeforeLeadingNUMPrefixes",
+            "TestPolynomialDiscriminantResultantReceiptRejectsCopiedActualFrame",
+            "TestPolynomialDiscriminantAllOriginalDormantAssertions",
+            "TestPolynomialDiscriminantIndependentDegreeZeroThroughFour"
+          ]
         }
       ],
       "ownership": [
@@ -33579,7 +33618,9 @@
         "Actual map SourceFinalize/Close acknowledges only the token bound to that physically consumed map block, before propagating any postphysical release error. Refused releases retain exact marker authority. Immutable body/source error values are not overwritten by token retirement.",
         "Pseudo polynomial.cpp:4905-5065 retains actual completed declaration stack; conditional coefficient and Power children precede minus_a construction. Direct NUM allocation captures exact owner/frame/captured nonce at real Copy/Neg/PN leaves, generated created-token authority at actual factory outcome, and R/Q row/factory transport at actual guarded actions. Younger source stops precede older NUM/ref destruction; false acknowledges completed source suffix and true only drains matched unjoined roots afterward. Inactive retirement preserves immutable body/source/cleanup and child identities without NUM/ref payload ownership.",
         "polynomial.cpp:3461-3465 constant SET acquires only the actual guarded cold continuation and direct Copy/PN leaves; no ai/ci/GCD/filter/powers construction. polynomial.cpp:3512-3530 ci is constructed after Content and before first coefficient; matched younger child source stop precedes ci DT. polynomial.cpp:5356-5480 actual child tuples are captured at invoked guards and retired false-before-older/true-after-older source suffix, with body/source/cleanup history retained separately from active authority.",
-        "Known captured frame address is checked against the actual owning GCD cold directory before any frame payload/history read, in addition to full owner self and nonzero invocation. This is identity validation of a passed tuple, not root acquisition through directory enumeration. Owning cleanup refuses copied frames/owners and preserves actual NUM/declaration/cold budget fields. Historical cause reads are separate from active ownership predicates."
+        "Known captured frame address is checked against the actual owning GCD cold directory before any frame payload/history read, in addition to full owner self and nonzero invocation. This is identity validation of a passed tuple, not root acquisition through directory enumeration. Owning cleanup refuses copied frames/owners and preserves actual NUM/declaration/cold budget fields. Historical cause reads are separate from active ownership predicates.",
+        "Actual full-manager member frame with nonwrapping guarded invocation records only reached p_prime/lc/c declarations and exact child invocation tuples. Resultant publishes caller output before lc constructor. Exact completed child source phases precede older parent destruction; unjoined ownership abort follows completed parent locals. Strict lc source release and c reference destructor preserve first source/body/own cleanup causes and captured child diagnostics through owning acknowledgement; a new actual invocation alone replaces history.",
+        "Shared cheap append and raw factory ownership are transported by the same actual default NUM/INC/slot publication and allocator leaf receipts accepted by the prerequisites; caller reference assignment transfers factory authority at incoming INC before older DEC callback. Known GCD frame address directory validates the captured identity, not discovered root authority."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -33663,7 +33704,9 @@
         "Postphysical map release is proven in a qualified signed-host TLS owner-primitive domain using only public allocation/reallocation setup and public recovery, not ordinary mathematical OOM. Frozen predecessor release gap and RED logs are preserved.",
         "Deterministic sparse point fixture seeds only the shared source stream; independent polynomial.cpp:4120-4232 repeated-point regression proves the literal sparse exception with immediate owner graph. Production point selection unchanged; direct mod_gcd_rec has no catch and is not credited with invented fallback. Resultant/ICCP/Discriminant parent completion is separate.",
         "Selected ICCP/Resultant child extraction evidence only; enclosing source unit remains partial and Discriminant is not promoted. Signed-host TLS/direct descriptor source-stop profiles are qualified owner-primitive tests, not ordinary mathematical allocation-free OOM. Actual successful Divides transfers R rows to persistent member ownership; matched later parent cleanup preserves those rows until real entry reset/manager destruction. Historical unsupported blanket zero-row oracle and setup fixture failures are retained separately from genuine acquisition/history REDs.",
-        "Copied-frame/owner tests are invalid Go metadata boundary coverage, not mathematical allocation failure; actual Resultant source entry and body are unchanged. This corrects a demonstrated copied-frame guard omission in frozen predecessor30; no Discriminant or whole source unit promotion."
+        "Copied-frame/owner tests are invalid Go metadata boundary coverage, not mathematical allocation failure; actual Resultant source entry and body are unchanged. This corrects a demonstrated copied-frame guard omission in frozen predecessor30; no Discriminant or whole source unit promotion.",
+        "The 24 original dormant fixtures from src/test/polynomial.cpp:341-451 provide zero active registered-driver assertion credit. Independent bounded degree-zero-through-four Sylvester determinant checks prove the result is constant before checking its numeric coefficient.",
+        "Signed-host TLS source release stops and returning owner callback refusals are qualified Go owner-primitive/invalid metadata profiles, not ordinary mathematical free OOM or C++ source defects. Positive even composite-modulus fixture follows the literal accepted manager API and reaches upper-bound Neg normalization; it claims no prime-field theorem or invented inverse allocation on the zero polynomial route. Broader polynomial source unit remains partial."
       ]
     },
     {
@@ -42157,14 +42200,60 @@
       "path": "src/model/model_params.pyg",
       "component": "model",
       "role": "generated_input",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_smt_params.go",
+        "util_smt_params_source_test.go"
+      ],
+      "tests": [
+        "TestSMTParamsImplicitBasesDefaultEmptyAndConstructorLocalOnly",
+        "TestSMTParamsContextOverloadOnlyTwoScalars",
+        "TestSMTParamsQIUninitializedDisplayPrefixAndCopiedOwnerGuard",
+        "TestSMTParamsEveryWarmConstructorReservationAndCompletedBaseUnwind",
+        "TestSMTParamsLocalAndFullUpdateActualHelperDeclarationPrefixes",
+        "TestSMTParamsModelModulePivotPrecedenceAndHiddenDumpReset",
+        "TestSMTParamsAllLocalGetterPublicationsFallbackAndDirectHiddenReads",
+        "TestSMTParamsAutoConfigShortCircuitLeavesClosedDefaultBorrowUnread",
+        "TestSMTParamsAllDisplayChainsIndependentLocalOracleEveryOutputRefusal",
+        "TestSMTParamsRealFileBadbitStillReachesQIUninitializedRead",
+        "TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags",
+        "TestSMTParamsRealYoungerModelDestructorStopProtectsOlderHelperAndAllBases",
+        "TestSMTParamsActualStringSolverMemberConstructorFailureFrontier",
+        "TestSMTParamsEveryUnwarmedSharedSymbolModuleAndClassReservation",
+        "TestSMTParamsCompletedSourceFinalizeEndsBasesBeforeOwningHeaderRefund"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Reached model.compact local-module-literal getter (src/model/model_params.pyg:1-8)",
+          "status": "partial",
+          "go_target": "util_smt_params.go",
+          "tests": [
+            "TestSMTParamsImplicitBasesDefaultEmptyAndConstructorLocalOnly",
+            "TestSMTParamsContextOverloadOnlyTwoScalars",
+            "TestSMTParamsQIUninitializedDisplayPrefixAndCopiedOwnerGuard",
+            "TestSMTParamsEveryWarmConstructorReservationAndCompletedBaseUnwind",
+            "TestSMTParamsLocalAndFullUpdateActualHelperDeclarationPrefixes",
+            "TestSMTParamsModelModulePivotPrecedenceAndHiddenDumpReset",
+            "TestSMTParamsAllLocalGetterPublicationsFallbackAndDirectHiddenReads",
+            "TestSMTParamsAutoConfigShortCircuitLeavesClosedDefaultBorrowUnread",
+            "TestSMTParamsAllDisplayChainsIndependentLocalOracleEveryOutputRefusal",
+            "TestSMTParamsRealFileBadbitStillReachesQIUninitializedRead",
+            "TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags",
+            "TestSMTParamsRealYoungerModelDestructorStopProtectsOlderHelperAndAllBases",
+            "TestSMTParamsActualStringSolverMemberConstructorFailureFrontier",
+            "TestSMTParamsEveryUnwarmedSharedSymbolModuleAndClassReservation",
+            "TestSMTParamsCompletedSourceFinalizeEndsBasesBeforeOwningHeaderRefund"
+          ]
+        }
+      ],
+      "ownership": [
+        "Nine implicit default-empty bases use their existing same constructor engines with embedded headers charged only by the actual parent header. Seventy preceding local initializer publications, final symbol(auto) member acquisition, and local-only constructor body retain their exact initialized frontier. Local smt/model helper declarations and nested array update use real borrowed reference acquisitions; younger source stops protect older helper/base lifetimes, while explicit owning Close drains exact retained leaves before embedded base owners and the parent header."
+      ],
+      "deviations": [
+        "Completed selected constructor/update/context/display bodies only; compiler-generated copies, real SMT context/driver, remaining generated parameter tables, global process/ABI profiles and arbitrary ostream locale/boolalpha remain open. QI m_qi_ematching is separately source-uninitialized until a real caller assignment; default parent Display reaches its actual label then typed initialization guard. State after failed construction is diagnostic, with explicit preceding scalar/string-solver/dump frontier flags. Guarded TLS fixture reaches actual younger model destructor and proves older helper protection without a native callback claim."
+      ]
     },
     {
       "path": "src/model/model_pp.cpp",
@@ -69318,7 +69407,9 @@
       "status": "partial",
       "go_targets": [
         "util_smt_qi_params.go",
-        "util_smt_qi_params_source_test.go"
+        "util_smt_qi_params_source_test.go",
+        "util_smt_params_copy_source.go",
+        "util_smt_params_copy_source_test.go"
       ],
       "tests": [
         "TestSMTQILiteralDefaultsUninitializedEMatchingAndOwnedText",
@@ -69330,7 +69421,13 @@
         "TestSMTQIShowPosAndFileBadbitStillReachesBorrowedCString",
         "TestSMTQIOwnedStringSameCapacityAliasAndNullCostPrefix",
         "TestSMTQIEveryOwnedCostReplacementReservation",
-        "TestSMTQIFailedCostDoesNotPublishLaterScalarDefaults"
+        "TestSMTQIFailedCostDoesNotPublishLaterScalarDefaults",
+        "TestSMTParamsCopyConstructorPreservesAllBasesAndBorrowedPointerWithoutGetters",
+        "TestSMTParamsCopyConstructorEveryActualAllocationAndReverseCompletedUnwind",
+        "TestSMTParamsAssignmentPublishesOnlyLiteralPrefixAtSecondStringRefusal",
+        "TestSMTParamsAssignmentEveryActualAllocationPreservesReceiverIdentityAndStickyBodyCause",
+        "TestSMTParamsCopyGuardsAndActualSelfAssignmentLeaveProviderAndAllocationsUnread",
+        "TestSMTParamsStringCopyUsesCountedBytesAndInlineAssignmentRetainsCapacity"
       ],
       "conditionals": [
         {
@@ -69368,37 +69465,126 @@
           "tests": [
             "TestSMTQIFailedCostDoesNotPublishLaterScalarDefaults"
           ]
+        },
+        {
+          "name": "Compiler-generated concrete parent/QI owned copy and assignment (src/smt/params/qi_params.h:31-109)",
+          "status": "partial",
+          "go_target": "util_smt_params_copy_source.go",
+          "tests": [
+            "TestSMTParamsCopyConstructorPreservesAllBasesAndBorrowedPointerWithoutGetters",
+            "TestSMTParamsCopyConstructorEveryActualAllocationAndReverseCompletedUnwind",
+            "TestSMTParamsAssignmentPublishesOnlyLiteralPrefixAtSecondStringRefusal",
+            "TestSMTParamsAssignmentEveryActualAllocationPreservesReceiverIdentityAndStickyBodyCause",
+            "TestSMTParamsCopyGuardsAndActualSelfAssignmentLeaveProviderAndAllocationsUnread",
+            "TestSMTParamsStringCopyUsesCountedBytesAndInlineAssignmentRetainsCapacity"
+          ]
         }
       ],
       "ownership": [
         "Actual std::string members are concrete inline15+NUL / external byte storage embedded once in the reflected QI header. Construction follows cost then new_gen, body14 getters, reverse lexical helper DT, then reverse completed member unwind on constructor failure. Assignment strlen/allocate/ascending copy/dispose/pointer-capacity-length publication uses the selected primary libstdc++ profile; actual pending bytes are named and separate from source-current bytes. MBQI id is the actual returned borrowed Params pointer/provider/ref, with no formatting workspace, clone or INC. Wrapper/helper cold charges are explicit Go representation; source module/local owners remain borrowed.",
-        "DefaultsInitialized is actual cold diagnostic metadata published after both owned-string constructors, before later helper body. Failed first-member construction leaves later scalar initializers unread and uninitialized; State exposes diagnostic Go storage with the explicit mask, not native incomplete-object values. Reflected header accounts metadata once. Every real ctor/output refusal graph is checked before fault lift."
+        "DefaultsInitialized is actual cold diagnostic metadata published after both owned-string constructors, before later helper body. Failed first-member construction leaves later scalar initializers unread and uninitialized; State exposes diagnostic Go storage with the explicit mask, not native incomplete-object values. Reflected header accounts metadata once. Every real ctor/output refusal graph is checked before fault lift.",
+        "Real source caller dependencies src/qe/qe_sat_tactic.cpp:632 and src/muz/pdr/pdr_farkas_learner.cpp:390 use parent copy construction. Copies initialize bases and members in declaration order without getters or default constructors. Only actual parent header and owned QI external byte allocations are acquired; completed string/member failure unwinds younger before older completed bases. Parent/QI states retain initialized-field diagnostics and borrowed mbqi_id exactly, while new self/header/context/helper/history metadata is fresh. Assignment preserves receiver identity and literal prefix: earlier POD bases, QI ematching, cost, new_gen, later QI scalars/borrowed pointer, remaining bases, local members. A failed allocation retains old string storage; successful replacement publishes new pointer/capacity before copying counted bytes. Sticky actual first assignment cause is diagnostic and never copied or substituted for source destruction."
       ],
       "deviations": [
         "No complete quantifier/context/SMT driver, native global locale/boolalpha or whole std::string/class generated copy credit. m_qi_ematching is literally uninitialized: no assignment occurs anywhere in this source fork; explicit public-field assignment is required for a valid display read. Diagnostic State exposes initialization metadata and failed-constructor prefix; Display/Update refuse incomplete constructors. Existing Params text codec virtual NUL retains actual provider generation/lifetime guard, without claiming a native NUL-word ABI. Go immutable literal/string spans and direct file flush are selected adapters. Null cost dereference, stale provider, copied owner and destroyed word reads are guarded domains, not defined native continuation.",
-        "The initial QI6 predecessor populated Go scalar defaults before string-member construction and did not mark that frontier explicitly; the genuine failed-cost diagnostic RED is corrected in this successor. Native incomplete-object member reads are not claimed defined. Source public ematching remains uninitialized until explicit caller assignment. File fixtures create and remove their own file under the tested Go module independently of verification TMPDIR."
+        "The initial QI6 predecessor populated Go scalar defaults before string-member construction and did not mark that frontier explicitly; the genuine failed-cost diagnostic RED is corrected in this successor. Native incomplete-object member reads are not claimed defined. Source public ematching remains uninitialized until explicit caller assignment. File fixtures create and remove their own file under the tested Go module independently of verification TMPDIR.",
+        "Selected libstdc++13 basic_string.h:547-552 and basic_string.tcc:139-156,222-255,278-300 storage profile uses inline15+NUL, exact constructor capacity, geometric assignment capacity and counted byte copies. Native STL ABI/global allocators/locale and real QE/PDR/context/SMT driver bodies remain open. Uninitialized source QI ematching is preserved as diagnostic initialization metadata, never claimed to become a defined default boolean. Go self/closed/stopped ownership and same borrowed context/service/Budget namespace guards are explicit representation boundaries."
       ]
     },
     {
       "path": "src/smt/params/smt_params.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_smt_params.go",
+        "util_smt_params_source_test.go"
+      ],
+      "tests": [
+        "TestSMTParamsImplicitBasesDefaultEmptyAndConstructorLocalOnly",
+        "TestSMTParamsContextOverloadOnlyTwoScalars",
+        "TestSMTParamsQIUninitializedDisplayPrefixAndCopiedOwnerGuard",
+        "TestSMTParamsEveryWarmConstructorReservationAndCompletedBaseUnwind",
+        "TestSMTParamsLocalAndFullUpdateActualHelperDeclarationPrefixes",
+        "TestSMTParamsModelModulePivotPrecedenceAndHiddenDumpReset",
+        "TestSMTParamsAllLocalGetterPublicationsFallbackAndDirectHiddenReads",
+        "TestSMTParamsAutoConfigShortCircuitLeavesClosedDefaultBorrowUnread",
+        "TestSMTParamsAllDisplayChainsIndependentLocalOracleEveryOutputRefusal",
+        "TestSMTParamsRealFileBadbitStillReachesQIUninitializedRead",
+        "TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags",
+        "TestSMTParamsRealYoungerModelDestructorStopProtectsOlderHelperAndAllBases",
+        "TestSMTParamsActualStringSolverMemberConstructorFailureFrontier",
+        "TestSMTParamsEveryUnwarmedSharedSymbolModuleAndClassReservation",
+        "TestSMTParamsCompletedSourceFinalizeEndsBasesBeforeOwningHeaderRefund"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Literal local/full/context update and eight-base plus sixty-eight local display chains (src/smt/params/smt_params.cpp:24-164)",
+          "status": "partial",
+          "go_target": "util_smt_params.go",
+          "tests": [
+            "TestSMTParamsImplicitBasesDefaultEmptyAndConstructorLocalOnly",
+            "TestSMTParamsContextOverloadOnlyTwoScalars",
+            "TestSMTParamsQIUninitializedDisplayPrefixAndCopiedOwnerGuard",
+            "TestSMTParamsEveryWarmConstructorReservationAndCompletedBaseUnwind",
+            "TestSMTParamsLocalAndFullUpdateActualHelperDeclarationPrefixes",
+            "TestSMTParamsModelModulePivotPrecedenceAndHiddenDumpReset",
+            "TestSMTParamsAllLocalGetterPublicationsFallbackAndDirectHiddenReads",
+            "TestSMTParamsAutoConfigShortCircuitLeavesClosedDefaultBorrowUnread",
+            "TestSMTParamsAllDisplayChainsIndependentLocalOracleEveryOutputRefusal",
+            "TestSMTParamsRealFileBadbitStillReachesQIUninitializedRead",
+            "TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags",
+            "TestSMTParamsRealYoungerModelDestructorStopProtectsOlderHelperAndAllBases",
+            "TestSMTParamsActualStringSolverMemberConstructorFailureFrontier",
+            "TestSMTParamsEveryUnwarmedSharedSymbolModuleAndClassReservation",
+            "TestSMTParamsCompletedSourceFinalizeEndsBasesBeforeOwningHeaderRefund"
+          ]
+        }
+      ],
+      "ownership": [
+        "Nine implicit default-empty bases use their existing same constructor engines with embedded headers charged only by the actual parent header. Seventy preceding local initializer publications, final symbol(auto) member acquisition, and local-only constructor body retain their exact initialized frontier. Local smt/model helper declarations and nested array update use real borrowed reference acquisitions; younger source stops protect older helper/base lifetimes, while explicit owning Close drains exact retained leaves before embedded base owners and the parent header."
+      ],
+      "deviations": [
+        "Completed selected constructor/update/context/display bodies only; compiler-generated copies, real SMT context/driver, remaining generated parameter tables, global process/ABI profiles and arbitrary ostream locale/boolalpha remain open. QI m_qi_ematching is separately source-uninitialized until a real caller assignment; default parent Display reaches its actual label then typed initialization guard. State after failed construction is diagnostic, with explicit preceding scalar/string-solver/dump frontier flags. Guarded TLS fixture reaches actual younger model destructor and proves older helper protection without a native callback claim."
+      ]
     },
     {
       "path": "src/smt/params/smt_params.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "util_smt_params.go",
+        "util_smt_params_source_test.go",
+        "util_smt_params_copy_source.go",
+        "util_smt_params_copy_source_test.go",
+        "util_smt_qi_params.go"
+      ],
+      "tests": [
+        "TestSMTParamsImplicitBasesDefaultEmptyAndConstructorLocalOnly",
+        "TestSMTParamsContextOverloadOnlyTwoScalars",
+        "TestSMTParamsQIUninitializedDisplayPrefixAndCopiedOwnerGuard",
+        "TestSMTParamsEveryWarmConstructorReservationAndCompletedBaseUnwind",
+        "TestSMTParamsLocalAndFullUpdateActualHelperDeclarationPrefixes",
+        "TestSMTParamsModelModulePivotPrecedenceAndHiddenDumpReset",
+        "TestSMTParamsAllLocalGetterPublicationsFallbackAndDirectHiddenReads",
+        "TestSMTParamsAutoConfigShortCircuitLeavesClosedDefaultBorrowUnread",
+        "TestSMTParamsAllDisplayChainsIndependentLocalOracleEveryOutputRefusal",
+        "TestSMTParamsRealFileBadbitStillReachesQIUninitializedRead",
+        "TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags",
+        "TestSMTParamsRealYoungerModelDestructorStopProtectsOlderHelperAndAllBases",
+        "TestSMTParamsActualStringSolverMemberConstructorFailureFrontier",
+        "TestSMTParamsEveryUnwarmedSharedSymbolModuleAndClassReservation",
+        "TestSMTParamsCompletedSourceFinalizeEndsBasesBeforeOwningHeaderRefund",
+        "TestSMTParamsCopyConstructorPreservesAllBasesAndBorrowedPointerWithoutGetters",
+        "TestSMTParamsCopyConstructorEveryActualAllocationAndReverseCompletedUnwind",
+        "TestSMTParamsAssignmentPublishesOnlyLiteralPrefixAtSecondStringRefusal",
+        "TestSMTParamsAssignmentEveryActualAllocationPreservesReceiverIdentityAndStickyBodyCause",
+        "TestSMTParamsCopyGuardsAndActualSelfAssignmentLeaveProviderAndAllocationsUnread",
+        "TestSMTParamsStringCopyUsesCountedBytesAndInlineAssignmentRetainsCapacity"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -69411,9 +69597,51 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete nine-base parent, local member frontier and display chains (src/smt/params/smt_params.h:75-318)",
+          "status": "partial",
+          "go_target": "util_smt_params.go",
+          "tests": [
+            "TestSMTParamsImplicitBasesDefaultEmptyAndConstructorLocalOnly",
+            "TestSMTParamsContextOverloadOnlyTwoScalars",
+            "TestSMTParamsQIUninitializedDisplayPrefixAndCopiedOwnerGuard",
+            "TestSMTParamsEveryWarmConstructorReservationAndCompletedBaseUnwind",
+            "TestSMTParamsLocalAndFullUpdateActualHelperDeclarationPrefixes",
+            "TestSMTParamsModelModulePivotPrecedenceAndHiddenDumpReset",
+            "TestSMTParamsAllLocalGetterPublicationsFallbackAndDirectHiddenReads",
+            "TestSMTParamsAutoConfigShortCircuitLeavesClosedDefaultBorrowUnread",
+            "TestSMTParamsAllDisplayChainsIndependentLocalOracleEveryOutputRefusal",
+            "TestSMTParamsRealFileBadbitStillReachesQIUninitializedRead",
+            "TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags",
+            "TestSMTParamsRealYoungerModelDestructorStopProtectsOlderHelperAndAllBases",
+            "TestSMTParamsActualStringSolverMemberConstructorFailureFrontier",
+            "TestSMTParamsEveryUnwarmedSharedSymbolModuleAndClassReservation",
+            "TestSMTParamsCompletedSourceFinalizeEndsBasesBeforeOwningHeaderRefund"
+          ]
+        },
+        {
+          "name": "Compiler-generated concrete parent/QI owned copy and assignment (src/smt/params/smt_params.h:75-318)",
+          "status": "partial",
+          "go_target": "util_smt_params_copy_source.go",
+          "tests": [
+            "TestSMTParamsCopyConstructorPreservesAllBasesAndBorrowedPointerWithoutGetters",
+            "TestSMTParamsCopyConstructorEveryActualAllocationAndReverseCompletedUnwind",
+            "TestSMTParamsAssignmentPublishesOnlyLiteralPrefixAtSecondStringRefusal",
+            "TestSMTParamsAssignmentEveryActualAllocationPreservesReceiverIdentityAndStickyBodyCause",
+            "TestSMTParamsCopyGuardsAndActualSelfAssignmentLeaveProviderAndAllocationsUnread",
+            "TestSMTParamsStringCopyUsesCountedBytesAndInlineAssignmentRetainsCapacity"
+          ]
+        }
+      ],
+      "ownership": [
+        "Nine implicit default-empty bases use their existing same constructor engines with embedded headers charged only by the actual parent header. Seventy preceding local initializer publications, final symbol(auto) member acquisition, and local-only constructor body retain their exact initialized frontier. Local smt/model helper declarations and nested array update use real borrowed reference acquisitions; younger source stops protect older helper/base lifetimes, while explicit owning Close drains exact retained leaves before embedded base owners and the parent header.",
+        "Real source caller dependencies src/qe/qe_sat_tactic.cpp:632 and src/muz/pdr/pdr_farkas_learner.cpp:390 use parent copy construction. Copies initialize bases and members in declaration order without getters or default constructors. Only actual parent header and owned QI external byte allocations are acquired; completed string/member failure unwinds younger before older completed bases. Parent/QI states retain initialized-field diagnostics and borrowed mbqi_id exactly, while new self/header/context/helper/history metadata is fresh. Assignment preserves receiver identity and literal prefix: earlier POD bases, QI ematching, cost, new_gen, later QI scalars/borrowed pointer, remaining bases, local members. A failed allocation retains old string storage; successful replacement publishes new pointer/capacity before copying counted bytes. Sticky actual first assignment cause is diagnostic and never copied or substituted for source destruction."
+      ],
+      "deviations": [
+        "Completed selected constructor/update/context/display bodies only; compiler-generated copies, real SMT context/driver, remaining generated parameter tables, global process/ABI profiles and arbitrary ostream locale/boolalpha remain open. QI m_qi_ematching is separately source-uninitialized until a real caller assignment; default parent Display reaches its actual label then typed initialization guard. State after failed construction is diagnostic, with explicit preceding scalar/string-solver/dump frontier flags. Guarded TLS fixture reaches actual younger model destructor and proves older helper protection without a native callback claim.",
+        "Selected libstdc++13 basic_string.h:547-552 and basic_string.tcc:139-156,222-255,278-300 storage profile uses inline15+NUL, exact constructor capacity, geometric assignment capacity and counted byte copies. Native STL ABI/global allocators/locale and real QE/PDR/context/SMT driver bodies remain open. Uninitialized source QI ematching is preserved as diagnostic initialization metadata, never claimed to become a defined default boolean. Go self/closed/stopped ownership and same borrowed context/service/Budget namespace guards are explicit representation boundaries."
+      ]
     },
     {
       "path": "src/smt/params/smt_params_helper.hpp",
@@ -69486,7 +69714,9 @@
         "util_smt_str_params.go",
         "util_smt_str_params_source_test.go",
         "util_smt_preprocessor_params.go",
-        "util_smt_preprocessor_params_source_test.go"
+        "util_smt_preprocessor_params_source_test.go",
+        "util_smt_params.go",
+        "util_smt_params_source_test.go"
       ],
       "tests": [
         "TestSMTDynAckConstructorLiteralDefaultsAndFallbackOrder",
@@ -69546,7 +69776,22 @@
         "TestSMTPreprocessorThirtyOneDisplayChainsEveryOutputPrefixAndBadbit",
         "TestSMTPreprocessorEveryUnwarmedSharedModuleAcquisitionReservation",
         "TestSMTPreprocessorFailedConstructorOrdinaryCallsAndOuterGuardUnread",
-        "TestSMTPreprocessorConcreteLexicalStopProtectsBasesAndNextMutation"
+        "TestSMTPreprocessorConcreteLexicalStopProtectsBasesAndNextMutation",
+        "TestSMTParamsImplicitBasesDefaultEmptyAndConstructorLocalOnly",
+        "TestSMTParamsContextOverloadOnlyTwoScalars",
+        "TestSMTParamsQIUninitializedDisplayPrefixAndCopiedOwnerGuard",
+        "TestSMTParamsEveryWarmConstructorReservationAndCompletedBaseUnwind",
+        "TestSMTParamsLocalAndFullUpdateActualHelperDeclarationPrefixes",
+        "TestSMTParamsModelModulePivotPrecedenceAndHiddenDumpReset",
+        "TestSMTParamsAllLocalGetterPublicationsFallbackAndDirectHiddenReads",
+        "TestSMTParamsAutoConfigShortCircuitLeavesClosedDefaultBorrowUnread",
+        "TestSMTParamsAllDisplayChainsIndependentLocalOracleEveryOutputRefusal",
+        "TestSMTParamsRealFileBadbitStillReachesQIUninitializedRead",
+        "TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags",
+        "TestSMTParamsRealYoungerModelDestructorStopProtectsOlderHelperAndAllBases",
+        "TestSMTParamsActualStringSolverMemberConstructorFailureFrontier",
+        "TestSMTParamsEveryUnwarmedSharedSymbolModuleAndClassReservation",
+        "TestSMTParamsCompletedSourceFinalizeEndsBasesBeforeOwningHeaderRefund"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -69664,6 +69909,28 @@
             "TestSMTPreprocessorFailedConstructorOrdinaryCallsAndOuterGuardUnread",
             "TestSMTPreprocessorConcreteLexicalStopProtectsBasesAndNextMutation"
           ]
+        },
+        {
+          "name": "Reached SMT parent local-module-literal helper getters (src/smt/params/smt_params_helper.pyg:5-23,67-69)",
+          "status": "partial",
+          "go_target": "util_smt_params.go",
+          "tests": [
+            "TestSMTParamsImplicitBasesDefaultEmptyAndConstructorLocalOnly",
+            "TestSMTParamsContextOverloadOnlyTwoScalars",
+            "TestSMTParamsQIUninitializedDisplayPrefixAndCopiedOwnerGuard",
+            "TestSMTParamsEveryWarmConstructorReservationAndCompletedBaseUnwind",
+            "TestSMTParamsLocalAndFullUpdateActualHelperDeclarationPrefixes",
+            "TestSMTParamsModelModulePivotPrecedenceAndHiddenDumpReset",
+            "TestSMTParamsAllLocalGetterPublicationsFallbackAndDirectHiddenReads",
+            "TestSMTParamsAutoConfigShortCircuitLeavesClosedDefaultBorrowUnread",
+            "TestSMTParamsAllDisplayChainsIndependentLocalOracleEveryOutputRefusal",
+            "TestSMTParamsRealFileBadbitStillReachesQIUninitializedRead",
+            "TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags",
+            "TestSMTParamsRealYoungerModelDestructorStopProtectsOlderHelperAndAllBases",
+            "TestSMTParamsActualStringSolverMemberConstructorFailureFrontier",
+            "TestSMTParamsEveryUnwarmedSharedSymbolModuleAndClassReservation",
+            "TestSMTParamsCompletedSourceFinalizeEndsBasesBeforeOwningHeaderRefund"
+          ]
         }
       ],
       "ownership": [
@@ -69674,7 +69941,8 @@
         "Actual std::string members are concrete inline15+NUL / external byte storage embedded once in the reflected QI header. Construction follows cost then new_gen, body14 getters, reverse lexical helper DT, then reverse completed member unwind on constructor failure. Assignment strlen/allocate/ascending copy/dispose/pointer-capacity-length publication uses the selected primary libstdc++ profile; actual pending bytes are named and separate from source-current bytes. MBQI id is the actual returned borrowed Params pointer/provider/ref, with no formatting workspace, clone or INC. Wrapper/helper cold charges are explicit Go representation; source module/local owners remain borrowed.",
         "Four actual scalar fields embedded once in a reflected standalone wrapper/header. No constructor helper/global/parameter read. Update borrows caller local/global/context, stamps actual returned smt module reference in the existing concrete lexical frame, publishes four RHS results in source order and destroys that frame before return. Strict source-stop and matched owning cleanup remain separate; Close never adopts caller children.",
         "All seventeen actual source members are scalar and embedded once in the reflected standalone wrapper. Constructor initializes those exact defaults then executes the mandatory one-helper update. Each actual returned module ParamsRef stamps acquisition at the same accepted concrete helper leaf; seventeen RHS/publications follow source order, and lexical source DT precedes return. Immutable source stop and matched owning cleanup remain separate. Caller local/global/context owners remain borrowed; wrapper Close owns only helper receipts and its actual header.",
-        "Actual implicit pattern base uses default empty ParamsRef, followed by inline bit base, nineteen local initializers, then five local smt getter publications. Update completes pattern before local helper; Display preserves pattern ten, bit two, then nineteen separate local endl chains. Parent reflected header charges embedded metadata once; returned helper references use actual shared leaf receipts, strict source stops and separate owning cleanup before older bases."
+        "Actual implicit pattern base uses default empty ParamsRef, followed by inline bit base, nineteen local initializers, then five local smt getter publications. Update completes pattern before local helper; Display preserves pattern ten, bit two, then nineteen separate local endl chains. Parent reflected header charges embedded metadata once; returned helper references use actual shared leaf receipts, strict source stops and separate owning cleanup before older bases.",
+        "Nine implicit default-empty bases use their existing same constructor engines with embedded headers charged only by the actual parent header. Seventy preceding local initializer publications, final symbol(auto) member acquisition, and local-only constructor body retain their exact initialized frontier. Local smt/model helper declarations and nested array update use real borrowed reference acquisitions; younger source stops protect older helper/base lifetimes, while explicit owning Close drains exact retained leaves before embedded base owners and the parent header."
       ],
       "deviations": [
         "No registered SMT context/kernel driver credit. Scalar base embedding into complete smt_params and native global/locale/boolalpha profiles remain open. Go invalid local/closed/null owner guards and standalone incomplete-constructor owning continuation are explicit adapter domains. Strategy outside source enumerators is only selected fixed-width Go representation evidence. Generated helper credit is limited to six dack accessor definitions; full helper/generator remain partial.",
@@ -69684,7 +69952,8 @@
         "No complete quantifier/context/SMT driver, native global locale/boolalpha or whole std::string/class generated copy credit. m_qi_ematching is literally uninitialized: no assignment occurs anywhere in this source fork; explicit public-field assignment is required for a valid display read. Diagnostic State exposes initialization metadata and failed-constructor prefix; Display/Update refuse incomplete constructors. Existing Params text codec virtual NUL retains actual provider generation/lifetime guard, without claiming a native NUL-word ABI. Go immutable literal/string spans and direct file flush are selected adapters. Null cost dereference, stale provider, copied owner and destroyed word reads are guarded domains, not defined native continuation.",
         "No complete SMT/context/solver or registered source driver credit; native global/locale/boolalpha profiles remain open. The actual scalar constructor reads no unused ParamsRef and does not update; standalone Go wrapper/header lifetime and wrong-owner/closed/global-null guards are explicit representation domains. Source lexical helper reverse DT and immutable source-stop cause use the accepted same-engine concrete helper, with actual returned module reference acquisition rather than reference-count/census authority.",
         "No complete SMT/context/solver or registered driver credit; native global/std-helper/compiler-generated class copy profiles remain open. This source class has no Display method and no owned or borrowed string fields; no invented formatter/string ownership API. Diagnostic State inspects failed constructor scalar prefix, while Update rejects an incomplete constructor. Reflected standalone header and precise null/copied/closed-owner guards are Go representation domains. smt_params.cpp parent update does not call theory_str_params::updt_params in this source; that source omission is preserved as a future parent obligation.",
-        "Source scalar State inspection after incomplete construction is diagnostic; ordinary Update and Display reject it. Guarded TLS destruction fixture reaches the real smt helper and public SourceReset, without a source callback claim. Compiler-generated parent copies, real SMT context/driver, native ABI, global ostream locale/boolalpha and full process binding remain open."
+        "Source scalar State inspection after incomplete construction is diagnostic; ordinary Update and Display reject it. Guarded TLS destruction fixture reaches the real smt helper and public SourceReset, without a source callback claim. Compiler-generated parent copies, real SMT context/driver, native ABI, global ostream locale/boolalpha and full process binding remain open.",
+        "Completed selected constructor/update/context/display bodies only; compiler-generated copies, real SMT context/driver, remaining generated parameter tables, global process/ABI profiles and arbitrary ostream locale/boolalpha remain open. QI m_qi_ematching is separately source-uninitialized until a real caller assignment; default parent Display reaches its actual label then typed initialization guard. State after failed construction is diagnostic, with explicit preceding scalar/string-solver/dump frontier flags. Guarded TLS fixture reaches actual younger model destructor and proves older helper protection without a native callback claim."
       ]
     },
     {
@@ -127998,7 +128267,8 @@
         "mpnum/polynomial_divides_allocation_context.go",
         "mpnum/polynomial_divides_numeric_context_source_test.go",
         "mpnum/polynomial_pseudo_allocation_context.go",
-        "mpnum/integer_allocation_invocation_context.go"
+        "mpnum/integer_allocation_invocation_context.go",
+        "mpnum/polynomial_discriminant_even_modulus_source_test.go"
       ],
       "tests": [
         "TestIntegerModularCenteredOracle",
@@ -128067,7 +128337,8 @@
         "TestDividesNumericLowerActualPrefixes",
         "TestDividesNumericActualBoolChildAndErasedFieldRoute",
         "TestPolynomialPseudoActualMinusANumericAcquisition",
-        "TestPolynomialPseudoMatchedAbortPreservesForeignQuotientRow"
+        "TestPolynomialPseudoMatchedAbortPreservesForeignQuotientRow",
+        "TestPolynomialDiscriminantEvenUpperActualNegNormalizeSuffixPrefixes"
       ],
       "conditionals": [
         {
@@ -128431,6 +128702,14 @@
             "TestDividesNumericLowerActualPrefixes",
             "TestDividesNumericActualBoolChildAndErasedFieldRoute"
           ]
+        },
+        {
+          "name": "mpzzp.h:131 same Neg engine optional actual PNormalize receipt after source sign mutation",
+          "status": "ported",
+          "go_target": "mpnum/mpzzp_ops.go",
+          "tests": [
+            "TestPolynomialDiscriminantEvenUpperActualNegNormalizeSuffixPrefixes"
+          ]
         }
       ],
       "ownership": [
@@ -128443,7 +128722,8 @@
         "Actual self/embedded source buffer/frame/nonwrapping immutable invocation/executing/callback-zero identity; direct allocation leaves and actual default NUM/INC/push/factory handoff alone grant roots.",
         "False acknowledges only completed younger child suffix; true retires exact unjoined acquisitions after caller older source declarations, preserving first cause and later foreign generation.",
         "Actual self/embedded frame/nonwrapping captured invocation identities; direct cell/backing/allocator and Natural buffer acquisitions only. Scoped bool tmp construction precedes zero branch; all completed constructors run strict source DT. First source cause persists across separate false/true owning acknowledgment until next actual invocation. Successful shared Natural publications remain member-owned.",
-        "Direct pseudo NUM context validates actual modular receiver and guarded frame/nonwrap nonce/executing/callback boundary before same-engine Copy/Neg/PN acquisition."
+        "Direct pseudo NUM context validates actual modular receiver and guarded frame/nonwrap nonce/executing/callback boundary before same-engine Copy/Neg/PN acquisition.",
+        "Optional PNormalize child is bound only at the actual reached call after Integer Neg sign mutation; the legacy public Neg route delegates the same engine with nil child receipt."
       ],
       "deviations": [
         "Source modulus constructors leave prime flag indeterminate; typed guard only actual read, not invented release Div precondition. Source Power maskwrap nontermination diagnosed after completed actions; deferred local/constructor cleanup is safe Go ownership adaptation, not claimed raw MPZ exception destructor. Source TRACE/unsupported/undefined and full consumer algorithms remain open. See PORT_PROGRESS.md#audit-mpzzp-port-status-md.",
@@ -138292,7 +138572,9 @@
         "util_symbol_service_source_test.go",
         "util_debug_global_service.go",
         "util_debug_global_service_test.go",
-        "util_gparams_service_ops.go"
+        "util_gparams_service_ops.go",
+        "util_numeric_stream_symbol_source.go",
+        "util_smt_params_source_test.go"
       ],
       "tests": [
         "TestSymbolSourceAssertions",
@@ -138310,7 +138592,8 @@
         "TestDebugGlobalServiceEveryConstructorRefusalKeepsBorrowedRegion",
         "TestDebugGlobalServiceOwnerCopyAndDefaultBorrowLifetime",
         "TestDebugGlobalServiceProcessSubprocessHelper",
-        "TestDebugGlobalServiceActualProcessDefaultFalseConsumerActions"
+        "TestDebugGlobalServiceActualProcessDefaultFalseConsumerActions",
+        "TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags"
       ],
       "conditionals": [
         {
@@ -138488,13 +138771,22 @@
             "TestDebugGlobalServiceProcessSubprocessHelper",
             "TestDebugGlobalServiceActualProcessDefaultFalseConsumerActions"
           ]
+        },
+        {
+          "name": "Reached null/string/numerical symbol ostream insertion (src/util/symbol.h:97-110)",
+          "status": "partial",
+          "go_target": "util_numeric_stream_symbol_source.go",
+          "tests": [
+            "TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags"
+          ]
         }
       ],
       "ownership": [
         "Explicit owner-local SymbolManager (GO_PORT_PLAN.md B storage ownership) replaces mutable global cache. Manager owns region+table, strings live until Close, hot Symbol records contain only scalar origin/ref/generation/tag. Other managers are separate identity domains. Full nested cold/payload budget graph and mutex-protected canonical interning are audited. See PORT_PROGRESS.md#audit-symbol-port-status-md.",
         "Selected buffer insertion borrows SymbolManager only during the call, reads checked spelling bytes directly, and charges destination growth without intermediate Symbol.String text. See PORT_PROGRESS.md#audit-string-buffer-port-status-md.",
         "Explicit SymbolService cold owner holds nullable symbol-table pointer. Actual SymbolManager constructor region/table publishes only after completion; destructor table/region precedes pointer clear. Separate Close retires service header. Process singleton/global Runtime accounting remain open; no such completion credit.",
-        "Actual reflected service and acquired helper headers charged once; only returned construction outcomes stored in named fields. Caller region/process descriptors and MemoryProcess borrowed children never adopted. Constructor horizons and process live cold graph audited before lifting real refusal."
+        "Actual reflected service and acquired helper headers charged once; only returned construction outcomes stored in named fields. Caller region/process descriptors and MemoryProcess borrowed children never adopted. Constructor horizons and process live cold graph audited before lifting real refusal.",
+        "Call-local actual symbol tag and provider identity drive separate insertion calls; string pointers use the existing borrowed CString engine and reached length/read guards, including badbit."
       ],
       "deviations": [
         "Native tagged pointers become explicit scalar tags/refs and owner-bound opaque tokens; callers cannot reinterpret a foreign symbol or raw address. Source full uint32 AMD64 numerical baseline remains valid on every Go target, independently of configurable4/8 byte page geometry.",
@@ -138505,7 +138797,8 @@
         "One explicit caller-supplied source global namespace; no package singleton/independent process Runtime adoption or native stdio static constructor claim",
         "Default direct-Go file emission/classic input/flush profiles; native iostream locale/buffering/throwmask/unitbuf ABI and nonLinux OS/debugbreak remain qualified",
         "Continued null g_imp is reached typed native-undefined-domain guard; no defined native nullptr continuation or source math-regression claim",
-        "No new source registered debug driver credit: src/test/heap.cpp:138 remains commented out, independent bounded fixtures only; no whole source unit promotion"
+        "No new source registered debug driver credit: src/test/heap.cpp:138 remains commented out, independent bounded fixtures only; no whole source unit promotion",
+        "Supported scalar ostream representation only; native pointer encoding and full locale/global stream bindings remain separate obligations."
       ]
     },
     {

@@ -241,18 +241,28 @@ func NewSMTQIParams(c *ParamsContext, p *ParamsRef, g *GlobalParamsService, b *a
 	if e := b.Reserve(n); e != nil {
 		return nil, e
 	}
-	s := &SMTQIParams{smtModuleParamsOwner: smtModuleParamsOwner{context: c, globals: g, budget: b}, header: n}
+	s := &SMTQIParams{header: n}
+	e := s.constructSource(c, p, g, b)
+	return s, e
+}
+
+// Same source constructor engine: an actual containing header charges embedded fields once.
+func (s *SMTQIParams) constructSource(c *ParamsContext, p *ParamsRef, g *GlobalParamsService, b *arena.Budget) error {
+	if s == nil || s.self != nil {
+		return ErrParamsOwner
+	}
+	*s = SMTQIParams{smtModuleParamsOwner: smtModuleParamsOwner{context: c, globals: g, budget: b}, header: s.header}
 	s.self = s
 	s.smtModuleParamsOwner.self = &s.smtModuleParamsOwner
 	if e := s.cost.construct(b, literalParamsStringView("(+ weight generation)")); e != nil {
 		s.constructorCause = e
-		return s, e
+		return e
 	}
 	s.completed = 1
 	if e := s.newGen.construct(b, literalParamsStringView("cost")); e != nil {
 		s.cost.sourceDestroy()
 		s.constructorCause = e
-		return s, e
+		return e
 	}
 	s.completed = 2
 	// Actual later scalar initializers run only after both earlier members.
@@ -269,7 +279,7 @@ func NewSMTQIParams(c *ParamsContext, p *ParamsRef, g *GlobalParamsService, b *a
 	} else {
 		s.constructorReady = true
 	}
-	return s, e
+	return e
 }
 func (s *SMTQIParams) open() error {
 	if s == nil || s.self != s || s.closed {
@@ -732,5 +742,89 @@ func (s *SMTQIParams) Display(out *NumericTextStream) error {
 	if e := out.Flush(); e != nil {
 		return e
 	}
+	return nil
+}
+
+// Selected libstdc++ basic_string.h:547-552/basic_string.tcc:222-255:
+// copy uses the source length directly, exact constructor capacity and the
+// actual construction guard dispose if a reached checked byte read fails.
+func (s *qiOwnedString) copyConstruct(b *arena.Budget, src *qiOwnedString) error {
+	if src == nil || src.self != src || src.closed || !src.ready {
+		return ErrParamsOwner
+	}
+	s.self = s
+	s.budget = b
+	s.capacity = 15
+	s.generation = 1
+	n := src.length
+	if n > 15 {
+		if n >= uint64(^uint(0)>>1) {
+			return arena.ErrBounds
+		}
+		if e := b.Reserve(n + 1); e != nil {
+			return e
+		}
+		s.external = make([]byte, int(n+1))
+		s.capacity = n
+	}
+	view := src.view()
+	for i := uint64(0); i < n; i++ {
+		ch, e := view.Byte(i)
+		if e != nil {
+			s.sourceDestroy()
+			return e
+		}
+		s.put(i, ch)
+	}
+	s.put(n, 0)
+	s.length = n
+	s.ready = true
+	return nil
+}
+
+// Selected libstdc++ basic_string.tcc:278-300 _M_assign allocates, disposes
+// old storage, publishes pointer/capacity, then copies bytes and sets length.
+// This differs from the existing const-char-pointer replacement source leaf.
+func (s *qiOwnedString) copyAssign(src *qiOwnedString) error {
+	if s.self != s || !s.ready || s.closed || s.pending != nil {
+		return ErrParamsPrecondition
+	}
+	if src == nil || src.self != src || src.closed || !src.ready {
+		return ErrParamsOwner
+	}
+	if s == src {
+		return nil
+	}
+	n := src.length
+	if n > s.capacity {
+		if s.generation == math.MaxUint64 || n >= uint64(^uint(0)>>1) {
+			return arena.ErrBounds
+		}
+		cap := n
+		if cap < 2*s.capacity {
+			cap = 2 * s.capacity
+		}
+		if cap >= uint64(^uint(0)>>1) {
+			return arena.ErrBounds
+		}
+		if e := s.budget.Reserve(cap + 1); e != nil {
+			return e
+		}
+		next := make([]byte, int(cap+1))
+		s.budget.Release(uint64(len(s.external)))
+		s.external = next
+		s.capacity = cap
+		s.generation++
+	}
+	view := src.view()
+	for i := uint64(0); i < n; i++ {
+		ch, e := view.Byte(i)
+		if e != nil {
+			return e
+		}
+		s.put(i, ch)
+	}
+	s.put(n, 0)
+	s.length = n
 	return nil
 }

@@ -59,7 +59,17 @@ func NewSMTPreprocessorParams(c *ParamsContext, p *ParamsRef, g *GlobalParamsSer
 	if e := b.Reserve(n); e != nil {
 		return nil, e
 	}
-	s := &SMTPreprocessorParams{smtModuleParamsOwner: smtModuleParamsOwner{context: c, globals: g, budget: b}, header: n, empty: ParamsRef{owner: c.owner}}
+	s := &SMTPreprocessorParams{header: n}
+	e := s.constructSource(c, p, g, b)
+	return s, e
+}
+
+// Same source constructor engine: an actual containing header charges embedded fields once.
+func (s *SMTPreprocessorParams) constructSource(c *ParamsContext, p *ParamsRef, g *GlobalParamsService, b *arena.Budget) error {
+	if s == nil || s.self != nil {
+		return ErrParamsOwner
+	}
+	*s = SMTPreprocessorParams{smtModuleParamsOwner: smtModuleParamsOwner{context: c, globals: g, budget: b}, header: s.header, empty: ParamsRef{owner: c.owner}}
 	s.self = s
 	s.smtModuleParamsOwner.self = &s.smtModuleParamsOwner
 	s.activeCall = true
@@ -68,7 +78,7 @@ func NewSMTPreprocessorParams(c *ParamsContext, p *ParamsRef, g *GlobalParamsSer
 	if e != nil {
 		s.constructorCause = e
 		s.activeCall = false
-		return s, e
+		return e
 	}
 	s.completedBases = 1
 	s.bit = NewSMTBitBlasterParams()
@@ -84,7 +94,7 @@ func NewSMTPreprocessorParams(c *ParamsContext, p *ParamsRef, g *GlobalParamsSer
 		s.constructorReady = true
 	}
 	s.activeCall = false
-	return s, e
+	return e
 }
 
 // Trivial base lifetime ends are source actions, not owning helper abort.

@@ -43,7 +43,17 @@ func NewSMTDynAckParams(c *ParamsContext, p *ParamsRef, g *GlobalParamsService, 
 	if e := b.Reserve(n); e != nil {
 		return nil, e
 	}
-	s := &SMTDynAckParams{smtModuleParamsOwner: smtModuleParamsOwner{context: c, globals: g, budget: b}, header: n, state: SMTDynAckState{1, false, 0.1, 10, 2000, 0.8}}
+	s := &SMTDynAckParams{header: n}
+	e := s.constructSource(c, p, g, b)
+	return s, e
+}
+
+// Same source constructor engine: an actual containing header charges embedded fields once.
+func (s *SMTDynAckParams) constructSource(c *ParamsContext, p *ParamsRef, g *GlobalParamsService, b *arena.Budget) error {
+	if s == nil || s.self != nil {
+		return ErrParamsOwner
+	}
+	*s = SMTDynAckParams{smtModuleParamsOwner: smtModuleParamsOwner{context: c, globals: g, budget: b}, header: s.header, state: SMTDynAckState{1, false, 0.1, 10, 2000, 0.8}}
 	s.self = s
 	s.smtModuleParamsOwner.self = &s.smtModuleParamsOwner
 	e := s.update(p)
@@ -54,7 +64,7 @@ func NewSMTDynAckParams(c *ParamsContext, p *ParamsRef, g *GlobalParamsService, 
 	}
 	// Failed source construction retains any actual helper acquisition. Owning
 	// caller Close is separate, even if a lexical source destructor stopped.
-	return s, e
+	return e
 }
 func (s *SMTDynAckParams) open() error {
 	if s == nil || s.self != s || s.closed {

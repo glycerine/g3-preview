@@ -184,3 +184,19 @@ func (m *smtModuleParamsOwner) frameStringView(f *smtModuleParamsFrame, key stri
 	}
 	return m.context.GetStringViewFallbackName(f.local, &key, &f.value, &def)
 }
+
+// Source: scripts/mk_genfile_common.py:842-851,895-921.
+// The symbol default is a real constructor expression before the Params getter.
+func (m *smtModuleParamsOwner) frameSymbol(f *smtModuleParamsFrame, key, def string) (Symbol, error) {
+	if e := m.executingFrame(f); e != nil {
+		return Symbol{}, e
+	}
+	if !f.acquired || f.destructorStarted {
+		return Symbol{}, ErrParamsPrecondition
+	}
+	d, e := m.context.symbols.Intern(def)
+	if e != nil {
+		return Symbol{}, e
+	}
+	return m.context.GetSymbolFallbackName(f.local, &key, &f.value, d)
+}

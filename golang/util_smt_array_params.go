@@ -35,11 +35,21 @@ func NewSMTArrayParams(b *arena.Budget) (*SMTArrayParams, error) {
 	if e := b.Reserve(n); e != nil {
 		return nil, e
 	}
-	s := &SMTArrayParams{smtModuleParamsOwner: smtModuleParamsOwner{budget: b}, header: n, state: SMTArrayState{false, true, 3, false, true, 1, true, false, true, false, 10}}
+	s := &SMTArrayParams{header: n}
+	e := s.constructSource(b)
+	return s, e
+}
+
+// Same source constructor engine: an actual containing header charges embedded fields once.
+func (s *SMTArrayParams) constructSource(b *arena.Budget) error {
+	if s == nil || s.self != nil {
+		return ErrParamsOwner
+	}
+	*s = SMTArrayParams{smtModuleParamsOwner: smtModuleParamsOwner{budget: b}, header: s.header, state: SMTArrayState{false, true, 3, false, true, 1, true, false, true, false, 10}}
 	s.self = s
 	s.smtModuleParamsOwner.self = &s.smtModuleParamsOwner
 	// Source constructor has no updt_params call: no global/local/provider read.
-	return s, nil
+	return nil
 }
 func (s *SMTArrayParams) open() error {
 	if s == nil || s.self != s || s.closed {

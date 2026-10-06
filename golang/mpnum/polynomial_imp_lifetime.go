@@ -229,6 +229,9 @@ func (m *MultivariatePolynomialManager) SourceFinalize() error {
 	if e := m.identity(); e != nil {
 		return e
 	}
+	if m.discriminant.active {
+		return ErrPolynomialPending
+	}
 	if m.closing || !m.completed || m.originalCause != nil {
 		return arena.ErrClosed
 	}

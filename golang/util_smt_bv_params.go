@@ -39,7 +39,17 @@ func NewSMTBVParams(c *ParamsContext, p *ParamsRef, g *GlobalParamsService, b *a
 	if e := b.Reserve(n); e != nil {
 		return nil, e
 	}
-	s := &SMTBVParams{smtModuleParamsOwner: smtModuleParamsOwner{context: c, globals: g, budget: b}, header: n, state: SMTBVState{1, false, true, false, false, 2147483647, true}}
+	s := &SMTBVParams{header: n}
+	e := s.constructSource(c, p, g, b)
+	return s, e
+}
+
+// Same source constructor engine: an actual containing header charges embedded fields once.
+func (s *SMTBVParams) constructSource(c *ParamsContext, p *ParamsRef, g *GlobalParamsService, b *arena.Budget) error {
+	if s == nil || s.self != nil {
+		return ErrParamsOwner
+	}
+	*s = SMTBVParams{smtModuleParamsOwner: smtModuleParamsOwner{context: c, globals: g, budget: b}, header: s.header, state: SMTBVState{1, false, true, false, false, 2147483647, true}}
 	s.self = s
 	s.smtModuleParamsOwner.self = &s.smtModuleParamsOwner
 	e := s.update(p)
@@ -48,7 +58,7 @@ func NewSMTBVParams(c *ParamsContext, p *ParamsRef, g *GlobalParamsService, b *a
 	} else {
 		s.constructorReady = true
 	}
-	return s, e
+	return e
 }
 func (s *SMTBVParams) open() error {
 	if s == nil || s.self != s || s.closed {

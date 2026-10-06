@@ -51,7 +51,17 @@ func NewSMTStrParams(c *ParamsContext, p *ParamsRef, g *GlobalParamsService, b *
 	if e := b.Reserve(n); e != nil {
 		return nil, e
 	}
-	s := &SMTStrParams{smtModuleParamsOwner: smtModuleParamsOwner{context: c, globals: g, budget: b}, header: n, state: SMTStrState{true, false, false, true, false, true, true, false, false, 64, -0.1, true, 1000, 1000, 10, 10, 10}}
+	s := &SMTStrParams{header: n}
+	e := s.constructSource(c, p, g, b)
+	return s, e
+}
+
+// Same source constructor engine: an actual containing header charges embedded fields once.
+func (s *SMTStrParams) constructSource(c *ParamsContext, p *ParamsRef, g *GlobalParamsService, b *arena.Budget) error {
+	if s == nil || s.self != nil {
+		return ErrParamsOwner
+	}
+	*s = SMTStrParams{smtModuleParamsOwner: smtModuleParamsOwner{context: c, globals: g, budget: b}, header: s.header, state: SMTStrState{true, false, false, true, false, true, true, false, false, 64, -0.1, true, 1000, 1000, 10, 10, 10}}
 	s.self = s
 	s.smtModuleParamsOwner.self = &s.smtModuleParamsOwner
 	e := s.update(p)
@@ -60,7 +70,7 @@ func NewSMTStrParams(c *ParamsContext, p *ParamsRef, g *GlobalParamsService, b *
 	} else {
 		s.constructorReady = true
 	}
-	return s, e
+	return e
 }
 func (s *SMTStrParams) open() error {
 	if s == nil || s.self != s || s.closed {

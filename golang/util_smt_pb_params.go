@@ -29,11 +29,21 @@ func NewSMTPBParams(b *arena.Budget) (*SMTPBParams, error) {
 	if e := b.Reserve(n); e != nil {
 		return nil, e
 	}
-	s := &SMTPBParams{smtModuleParamsOwner: smtModuleParamsOwner{budget: b}, state: SMTPBState{1000, true, true, false}, header: n}
+	s := &SMTPBParams{header: n}
+	e := s.constructSource(b)
+	return s, e
+}
+
+// Same source constructor engine: an actual containing header charges embedded fields once.
+func (s *SMTPBParams) constructSource(b *arena.Budget) error {
+	if s == nil || s.self != nil {
+		return ErrParamsOwner
+	}
+	*s = SMTPBParams{smtModuleParamsOwner: smtModuleParamsOwner{budget: b}, state: SMTPBState{1000, true, true, false}, header: s.header}
 	s.self = s
 	s.smtModuleParamsOwner.self = &s.smtModuleParamsOwner
 	// Source accepts an unused params_ref: it does not call updt_params.
-	return s, nil
+	return nil
 }
 func (s *SMTPBParams) open() error {
 	if s == nil || s.self != s || s.closed {

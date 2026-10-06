@@ -81,7 +81,17 @@ func NewSMTArithParams(c *ParamsContext, p *ParamsRef, g *GlobalParamsService, b
 	if e := b.Reserve(n); e != nil {
 		return nil, e
 	}
-	s := &SMTArithParams{smtModuleParamsOwner: smtModuleParamsOwner{context: c, globals: g, budget: b}, header: n, state: SMTArithState{Eq2Ineq: false, ProcessAllEqs: false, Mode: 2, AutoConfigSimplex: false, BlandsRuleThreshold: 1000, PropagateEqs: true, BoundProp: 2, StrongerLemmas: true, SkipRowsWithBigCoeffs: true, MaxLemmaSize: 128, SmallLemmaSize: 16, Reflect: true, IgnoreInt: false, LazyPivotingLevel: 0, RandomSeed: 0, RandomInitialValue: false, RandomLower: -1000, RandomUpper: 1000, Adaptive: false, AdaptiveAssertionThreshold: 0.2, AdaptivePropagationThreshold: 0.4, DumpLemmas: false, EagerEqAxioms: true, BranchCutRatio: 2, IntEqBranching: false, EnumConstMod: false, GCDTest: true, EagerGCD: false, AdaptiveGCD: false, PropagationThreshold: 4294967295, PivotStrategy: 0, AddBinaryBounds: false, PropagationStrategy: 1, EqBounds: false, LazyAdapter: false, Fixnum: false, IntOnly: false, NLArith: true, NLArithGB: true, NLArithGBThreshold: 512, NLArithGBEqs: false, NLArithGBPerturbate: true, NLArithMaxDegree: 6, NLArithBranching: true, NLArithRounds: 1024, EuclideanSolver: false}}
+	s := &SMTArithParams{header: n}
+	e := s.constructSource(c, p, g, b)
+	return s, e
+}
+
+// Same source constructor engine: an actual containing header charges embedded fields once.
+func (s *SMTArithParams) constructSource(c *ParamsContext, p *ParamsRef, g *GlobalParamsService, b *arena.Budget) error {
+	if s == nil || s.self != nil {
+		return ErrParamsOwner
+	}
+	*s = SMTArithParams{smtModuleParamsOwner: smtModuleParamsOwner{context: c, globals: g, budget: b}, header: s.header, state: SMTArithState{Eq2Ineq: false, ProcessAllEqs: false, Mode: 2, AutoConfigSimplex: false, BlandsRuleThreshold: 1000, PropagateEqs: true, BoundProp: 2, StrongerLemmas: true, SkipRowsWithBigCoeffs: true, MaxLemmaSize: 128, SmallLemmaSize: 16, Reflect: true, IgnoreInt: false, LazyPivotingLevel: 0, RandomSeed: 0, RandomInitialValue: false, RandomLower: -1000, RandomUpper: 1000, Adaptive: false, AdaptiveAssertionThreshold: 0.2, AdaptivePropagationThreshold: 0.4, DumpLemmas: false, EagerEqAxioms: true, BranchCutRatio: 2, IntEqBranching: false, EnumConstMod: false, GCDTest: true, EagerGCD: false, AdaptiveGCD: false, PropagationThreshold: 4294967295, PivotStrategy: 0, AddBinaryBounds: false, PropagationStrategy: 1, EqBounds: false, LazyAdapter: false, Fixnum: false, IntOnly: false, NLArith: true, NLArithGB: true, NLArithGBThreshold: 512, NLArithGBEqs: false, NLArithGBPerturbate: true, NLArithMaxDegree: 6, NLArithBranching: true, NLArithRounds: 1024, EuclideanSolver: false}}
 	s.self = s
 	s.smtModuleParamsOwner.self = &s.smtModuleParamsOwner
 	e := s.update(p)
@@ -90,7 +100,7 @@ func NewSMTArithParams(c *ParamsContext, p *ParamsRef, g *GlobalParamsService, b
 	} else {
 		s.constructorReady = true
 	}
-	return s, e
+	return e
 }
 func (s *SMTArithParams) open() error {
 	if s == nil || s.self != s || s.closed {

@@ -21,15 +21,20 @@ func (m *IntegerModularManager) Del(a *Int) error {
 	}
 	return nil
 }
-func (m *IntegerModularManager) Neg(a *Int) error {
+func (m *IntegerModularManager) Neg(a *Int) error { return m.negWithPNReceipt(a, nil) }
+
+// Source mpzzp.h:131: Neg mutates the numeral before reaching PN.
+// A caller receipt is acquired only by that real reached normalization guard.
+func (m *IntegerModularManager) negWithPNReceipt(a *Int, receipt *integerPNormalizeInvocationReceipt) error {
 	if e := m.check(); e != nil {
 		return e
 	}
 	if e := m.manager.Neg(a); e != nil {
 		return e
 	}
-	return m.PNormalize(a)
+	return m.pNormalizeWithReceipt(a, receipt)
 }
+
 func (m *IntegerModularManager) Abs(a *Int) error {
 	return m.absWithSourceContext(a, integerAllocationInvocationContext{})
 }
