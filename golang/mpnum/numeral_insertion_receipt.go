@@ -81,3 +81,18 @@ func completeNumeralInsertion(r *NumeralInsertionReceipt, natural *NaturalManage
 	r.retired = true
 	return nil
 }
+
+func matchesServiceCharacterScope(c *integerCharacterScope, n *NaturalManager) bool {
+	if c == nil {
+		return false
+	}
+	if c == &n.charFormatting {
+		return true
+	}
+	q := c.caller
+	return q.valid() && q.integer.natural == n && c == &q.characters
+}
+
+func completeServiceNumeralInsertion(r *NumeralInsertionReceipt, s *RationalService, owning bool) error {
+	return completeNumeralInsertion(r, s.manager.z.natural, s, owning)
+}

@@ -197,6 +197,15 @@ const (
 	astPatternPlugin
 	astModelValuePlugin
 	astUserSortPlugin
+	astFormatPlugin
+	astArithmeticPlugin
+	astBitVectorPlugin
+	astArrayPlugin
+	astSequencePlugin
+	astFloatingPointPlugin
+	astDatatypePlugin
+	astDatalogPlugin
+	astPseudoBooleanPlugin
 )
 
 // The five real implementations use a cold tagged registry. No per-node
@@ -218,8 +227,10 @@ type astBuiltinPluginState struct {
 }
 
 type ASTManager struct {
-	exprVisitHistory *astExprPendingMark
-	exprVisit        astExprVisitFrame // actual charged lexical traversal storage
+	arrayCardinality           *astArrayCardinalityFrame
+	arrayCardinalityInvocation uint64
+	exprVisitHistory           *astExprPendingMark
+	exprVisit                  astExprVisitFrame // actual charged lexical traversal storage
 
 	traceAcquisitionHistory                                                                            *astTraceAcquisition
 	traceAcquisitions, traceAcquisitionExecuting                                                       *astTraceAcquisition
@@ -268,7 +279,7 @@ type ASTManager struct {
 	liveNodes, liveParameters, liveInfos, liveReferences                                               uint32
 	pageBytes, directoryBytes, ownerBytes                                                              uint64
 	table                                                                                              astChainTable
-	plugins                                                                                            [5]astPluginBinding
+	plugins                                                                                            astPluginVector
 	basic                                                                                              astBasicPluginState
 	builtin                                                                                            astBuiltinPluginState
 	boolSort, proofSort, trueApp, falseApp, undefProof                                                 astNodeRef
@@ -278,13 +289,31 @@ type ASTManager struct {
 	// Actual AST-valued dependency manager and persistent-array specialization;
 	// borrowed owners are bound eagerly and scratch backing is charged on use.
 	// Source fresh_id and lexical func_decl_info storage; included in owner header.
-	refVectorPushSerial uint64
-	freshID             uint32
-	freshInfo           astInfoRecord
-	freshInfoEpoch      uint32
-	freshInfoActive     bool
-	dependencies        astDependencyManager
-	dependencyArrays    astDependencyArrayManager
+	refVectorPushSerial                            uint64
+	freshID                                        uint32
+	freshInfo                                      astInfoRecord
+	freshInfoEpoch                                 uint32
+	freshInfoActive                                bool
+	floatingPointPlugin, floatingPointPluginFailed *astFloatingPointPluginOwner
+	auxiliaryPlugins                               *astAuxiliaryPluginOwner
+	datatypePlugin, datatypePluginFailed           *astDatatypePluginOwner
+	sequencePlugin, sequencePluginFailed           *astSequencePluginOwner
+	arrayPlugin                                    *astArrayPluginOwner
+	arrayPluginFailed                              *astArrayPluginOwner
+	bitVectorPlugin                                *astBitVectorPluginOwner
+	bitVectorPluginFailed                          *astBitVectorPluginOwner
+	arithmeticPlugin                               *astArithmeticPluginOwner
+	arithmeticPluginFailed                         *astArithmeticPluginOwner
+	formatPlugin                                   *astFormatPluginOwner
+	formatPluginFailed                             *astFormatPluginOwner
+	formatLexical                                  astFormatLexical
+	formatExecuting                                bool
+	formatFrames                                   *astFormatFlatFrame
+	formatFrameSerial                              uint64
+	ppFrames                                       *astFormatPPFrame
+	ppFrameSerial                                  uint64
+	dependencies                                   astDependencyManager
+	dependencyArrays                               astDependencyArrayManager
 }
 
 func astNextOrigin() (uint64, error) {
@@ -373,7 +402,7 @@ func (m *ASTManager) lock() error {
 	if m == nil || m.self != m {
 		return ErrASTHandle
 	}
-	if m.traceExecuting {
+	if m.traceExecuting || m.formatExecuting {
 		return ErrASTPending
 	}
 	m.mu.Lock()

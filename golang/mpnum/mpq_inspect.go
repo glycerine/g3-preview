@@ -302,10 +302,13 @@ func (m *RationalManager) setIntegerWithArithmeticReceipt(a *Rational, n *Int, r
 	return m.setIntegerWithAllocationContext(a, n, (integerAllocationInvocationContext{}).withArithmeticInvocation(receipt))
 }
 func (m *RationalManager) setIntegerWithAllocationContext(a *Rational, n *Int, context integerAllocationInvocationContext) error {
+	return m.setIntegerFromOwnerWithAllocationContext(a, m.z, n, context)
+}
+func (m *RationalManager) setIntegerFromOwnerWithAllocationContext(a *Rational, source *IntegerManager, n *Int, context integerAllocationInvocationContext) error {
 	if e := m.checkSetter(a); e != nil {
 		return e
 	}
-	if e := m.z.copyFromOwnerWithAllocationContext(&a.num, m.z, n, nil, context); e != nil {
+	if e := m.z.copyFromOwnerWithAllocationContext(&a.num, source, n, nil, context); e != nil {
 		return e
 	}
 	return m.resetDenominator(a)

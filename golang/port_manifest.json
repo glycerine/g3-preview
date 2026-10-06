@@ -8813,8 +8813,17 @@
       "component": "ast",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "ast_arith_plugin.go",
+        "ast_arith_plugin_source_test.go"
+      ],
+      "tests": [
+        "TestASTArithmeticSourceRegistrationAndDeclarations",
+        "TestASTArithmeticSourceEveryRegistrationReservation",
+        "TestASTArithmeticSourceEverySymbolAndMemberAcquisition",
+        "TestASTArithmeticSourceFinalizeActualFieldOrderAndSeparateOwnClose",
+        "TestASTArithmeticReusedRealSortRejectedINCOwnAbort"
+      ],
       "assertions": [
         {
           "line": 40,
@@ -8859,9 +8868,26 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "ast_arith_plugin concrete reached source counterpart (arith_decl_plugin.cpp:115-332)",
+          "status": "partial",
+          "go_target": "ast_arith_plugin.go",
+          "tests": [
+            "TestASTArithmeticSourceRegistrationAndDeclarations",
+            "TestASTArithmeticSourceEveryRegistrationReservation",
+            "TestASTArithmeticSourceEverySymbolAndMemberAcquisition",
+            "TestASTArithmeticSourceFinalizeActualFieldOrderAndSeparateOwnClose",
+            "TestASTArithmeticReusedRealSortRejectedINCOwnAbort"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
+      ],
+      "deviations": [
+        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+      ]
     },
     {
       "path": "src/ast/arith_decl_plugin.h",
@@ -8905,8 +8931,23 @@
       "component": "ast",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "ast_array_plugin.go",
+        "ast_array_plugin_source_test.go",
+        "ast_array_cardinality.go",
+        "ast_array_cardinality_callback_source_test.go"
+      ],
+      "tests": [
+        "TestASTArraySourceConstructorAndInfiniteSortParameters",
+        "TestASTArrayEverySymbolConstructorAndPublicationReservation",
+        "TestASTArrayFiniteCardinalityIndependentBoundedOracle",
+        "TestASTArraySetSortActualLocalParameterCopy",
+        "TestASTArrayFiniteFunctionEnumerationOracle",
+        "TestASTArrayFiniteEveryReturnExpressionReservation",
+        "TestASTArrayFiniteRealCallbackOwnerGuard",
+        "TestASTArrayFiniteEveryRuntimeCountFailureTransport",
+        "TestASTArrayFiniteEveryActualBodyBudgetReservation"
+      ],
       "assertions": [
         {
           "line": 52,
@@ -8935,9 +8976,37 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "ast_array_plugin concrete reached source counterpart (array_decl_plugin.cpp:25-114)",
+          "status": "partial",
+          "go_target": "ast_array_plugin.go",
+          "tests": [
+            "TestASTArraySourceConstructorAndInfiniteSortParameters",
+            "TestASTArrayEverySymbolConstructorAndPublicationReservation",
+            "TestASTArrayFiniteCardinalityIndependentBoundedOracle",
+            "TestASTArraySetSortActualLocalParameterCopy",
+            "TestASTArrayFiniteFunctionEnumerationOracle",
+            "TestASTArrayFiniteEveryReturnExpressionReservation"
+          ]
+        },
+        {
+          "name": "ast_array_cardinality concrete reached source counterpart (array_decl_plugin.cpp:86-113)",
+          "status": "partial",
+          "go_target": "ast_array_cardinality.go",
+          "tests": [
+            "TestASTArrayFiniteRealCallbackOwnerGuard",
+            "TestASTArrayFiniteEveryRuntimeCountFailureTransport",
+            "TestASTArrayFiniteEveryActualBodyBudgetReservation"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
+      ],
+      "deviations": [
+        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+      ]
     },
     {
       "path": "src/ast/array_decl_plugin.h",
@@ -9044,7 +9113,8 @@
         "ast_debug_ref_count.go",
         "ast_trace_hooks.go",
         "ast_trace_file.go",
-        "ast_trace_acquisition.go"
+        "ast_trace_acquisition.go",
+        "ast_auxiliary_plugins_source_test.go"
       ],
       "tests": [
         "TestASTAllEagerPluginBranches",
@@ -9214,7 +9284,9 @@
         "TestASTSourceFinalizeKeepsFailedNumeralConstructorForExactOwnClose",
         "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame",
         "TestASTBorrowedFormatTraceCatchUsesReachedStreamWithoutFileOwnership",
-        "TestASTIncompleteBorrowedFormatConstructorRetainsCaughtHistoryUntilOwnAbort"
+        "TestASTIncompleteBorrowedFormatConstructorRetainsCaughtHistoryUntilOwnAbort",
+        "TestASTDatalogAndPseudoBooleanActualConstructorMembers",
+        "TestASTAuxiliaryPluginEveryConstructorPrefix"
       ],
       "conditionals": [
         {
@@ -10218,6 +10290,15 @@
             "TestASTBorrowedFormatTraceCatchUsesReachedStreamWithoutFileOwnership",
             "TestASTIncompleteBorrowedFormatConstructorRetainsCaughtHistoryUntilOwnAbort"
           ]
+        },
+        {
+          "name": "ast_core_plugin_dispatch concrete reached source counterpart (ast.cpp:1635-1638)",
+          "status": "partial",
+          "go_target": "ast_core_plugin_dispatch.go",
+          "tests": [
+            "TestASTDatalogAndPseudoBooleanActualConstructorMembers",
+            "TestASTAuxiliaryPluginEveryConstructorPrefix"
+          ]
         }
       ],
       "ownership": [
@@ -10231,7 +10312,8 @@
         "Actual AST manager embeds dependency and array owners eagerly; FIFO identity traversal, real AST retain/release and LIFO deletion callbacks. Source RC30 wrapping, leaf/join16/24 versus actual charged24/32 intrusive continuation records, cold manager/scratch/header/payload and old/new overlaps charged. Persistent arrays have12-byte capacity/initialized backing and preserve finite retained pointer/patch behavior; see PORT_PROGRESS.md#audit-ast-dependency-packet-md.",
         "Fresh lexical func_decl_info resides in actual charged ASTManager header with exact epoch token and is cloned by real registerNode/copyInfo; stack StringBuffer64 uses existing formatter and borrowed byte interner, overflow arrays destroyed before fresh_id increment; acquired node/metadata belongs to actual ASTManager pages.",
         "Convenience factories reach the existing application/cache/register engines without additional ownership or child cloning. Expanded distinct uses actual sixteen-inline non-owning ptr_buffer storage and ordered pair loop; its spill is released on source lexical exit without DEC of its unowned entries. Every actual reservation prefix checks complete named manager/symbol/budget graph before fault lift and successful same-owner retry.",
-        "Returned unfinished placement owns only actual completed members/body file-format pointers; automatic member unwind excludes source body DT. Completed body emits EOF before reverse members. Debug info numerals remain explicit original AST ownership until owning ACK."
+        "Returned unfinished placement owns only actual completed members/body file-format pointers; automatic member unwind excludes source body DT. Completed body emits EOF before reverse members. Debug info numerals remain explicit original AST ownership until owning ACK.",
+        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
       ],
       "deviations": [
         "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
@@ -10247,7 +10329,8 @@
         "Go distinct convenience wrappers preserve the source Bool IFF/term EQ selection and right-associated XOR expansion through the existing source application engine. Array factories remain distinct from ast_util singleton/empty shortcuts. Focused source shape and failure tests do not promote the whole AST class, generic parser/API driver, diagnostic TRACE or original AST test driver.",
         "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit.",
         "Concrete Go cold acquisition metadata is prepared before app placement, with pointer-free reference tokens stamped at actual successful INC leaves. Source catch releases placement without table/reference rollback. Reached dangling table reads use a typed slot/generation guard (native invalid-lifetime domain); separate owning ACK erases only captured insertion identity/hash and consumes stamped references. Completed caught tuples remain charged until this owning manager ends; no registered source driver credit.",
-        "Trace acquisition is gated by actual traceStream, including the format child borrowing the exact parent stream without owning traceFile. Completed member table release and allocator Close stamp source-ended state on matching cold caught contexts/history. Incomplete constructor own abort retires only metadata after those actual actions; it never replays table erasure or DEC in ended node context. Closed pointed-stream constructor is a Go lifetime-guard fixture, distinct from native ostream badbit; actual borrowed file remains caller-owned."
+        "Trace acquisition is gated by actual traceStream, including the format child borrowing the exact parent stream without owning traceFile. Completed member table release and allocator Close stamp source-ended state on matching cold caught contexts/history. Incomplete constructor own abort retires only metadata after those actual actions; it never replays table erasure or DEC in ended node context. Closed pointed-stream constructor is a Go lifetime-guard fixture, distinct from native ostream badbit; actual borrowed file remains caller-owned.",
+        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
       ]
     },
     {
@@ -11647,8 +11730,27 @@
       "component": "ast",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "ast_smt2_bv_literal.go",
+        "ast_smt2_bv_literal_source_test.go",
+        "ast_smt2_float_real.go",
+        "ast_smt2_float_real_source_test.go",
+        "ast_smt2_float_bv_literal.go",
+        "ast_smt2_float_bv_literal_source_test.go"
+      ],
+      "tests": [
+        "TestASTSMT2BitVectorLiteralRadixAndSignedOracle",
+        "TestASTSMT2BitVectorLiteralEveryReachedReservation",
+        "TestASTSMT2BitVectorLiteralWarmInlinePrimaryDoesNotArchive",
+        "TestASTSMT2BitVectorFalseNumeralActualActionAndErasure",
+        "TestASTSMT2FloatRealLiteralUsesActualNumeralTextAndFormat",
+        "TestASTSMT2FloatRealLiteralActualCallbackRetainsParent",
+        "TestASTSMT2FloatRealLiteralEveryActualReservationPrefix",
+        "TestASTSMT2FloatRealLiteralWarmSmallNaNErasesFrameAllocation",
+        "TestASTSMT2FloatDefaultBitVectorFields",
+        "TestASTSMT2FloatDefaultEveryActualReservation",
+        "TestASTSMT2FloatDefaultWarmActualConstructorFrontier"
+      ],
       "conditionals": [
         {
           "line": 972,
@@ -11795,9 +11897,46 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "ast_smt2_bv_literal concrete reached source counterpart (ast_smt2_pp.cpp:165-233)",
+          "status": "partial",
+          "go_target": "ast_smt2_bv_literal.go",
+          "tests": [
+            "TestASTSMT2BitVectorLiteralRadixAndSignedOracle",
+            "TestASTSMT2BitVectorLiteralEveryReachedReservation",
+            "TestASTSMT2BitVectorLiteralWarmInlinePrimaryDoesNotArchive",
+            "TestASTSMT2BitVectorFalseNumeralActualActionAndErasure"
+          ]
+        },
+        {
+          "name": "ast_smt2_float_real concrete reached source counterpart (ast_smt2_pp.cpp:235-268)",
+          "status": "partial",
+          "go_target": "ast_smt2_float_real.go",
+          "tests": [
+            "TestASTSMT2FloatRealLiteralUsesActualNumeralTextAndFormat",
+            "TestASTSMT2FloatRealLiteralActualCallbackRetainsParent",
+            "TestASTSMT2FloatRealLiteralEveryActualReservationPrefix",
+            "TestASTSMT2FloatRealLiteralWarmSmallNaNErasesFrameAllocation"
+          ]
+        },
+        {
+          "name": "ast_smt2_float_bv_literal concrete reached source counterpart (ast_smt2_pp.cpp:270-291)",
+          "status": "partial",
+          "go_target": "ast_smt2_float_bv_literal.go",
+          "tests": [
+            "TestASTSMT2FloatDefaultBitVectorFields",
+            "TestASTSMT2FloatDefaultEveryActualReservation",
+            "TestASTSMT2FloatDefaultWarmActualConstructorFrontier"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
+      ],
+      "deviations": [
+        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+      ]
     },
     {
       "path": "src/ast/ast_smt2_pp.h",
@@ -12220,8 +12359,23 @@
       "component": "ast",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "ast_bv_plugin.go",
+        "ast_bv_plugin_source_test.go",
+        "ast_bv_numeral.go",
+        "ast_bv_numeral_source_test.go",
+        "ast_bv_normalization.go"
+      ],
+      "tests": [
+        "TestASTBitVectorSourceEagerSortsAndPinnedDeclarations",
+        "TestASTBitVectorSourcePinnedKindsAndEveryASTReservation",
+        "TestASTBitVectorReusedSortActualINCAcquisitionGuard",
+        "TestASTBitVectorNumeralLiteralNormalizationAndRead",
+        "TestASTBitVectorNumeralUnmatchedLeavesArgumentsUnread",
+        "TestASTBitVectorBigNumeralEveryConstructorReservation",
+        "TestASTBitVectorSignedNormalizationIndependentOracle",
+        "TestASTBitVectorSignedNormalizationEveryReservation"
+      ],
       "conditionals": [
         {
           "line": 653,
@@ -12268,9 +12422,48 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "ast_bv_plugin concrete reached source counterpart (bv_decl_plugin.cpp:26-178)",
+          "status": "partial",
+          "go_target": "ast_bv_plugin.go",
+          "tests": [
+            "TestASTBitVectorSourceEagerSortsAndPinnedDeclarations",
+            "TestASTBitVectorSourcePinnedKindsAndEveryASTReservation",
+            "TestASTBitVectorReusedSortActualINCAcquisitionGuard"
+          ]
+        },
+        {
+          "name": "ast_bv_numeral concrete reached source counterpart (bv_decl_plugin.cpp:416-435,778-789,865-868)",
+          "status": "partial",
+          "go_target": "ast_bv_numeral.go",
+          "tests": [
+            "TestASTBitVectorNumeralLiteralNormalizationAndRead",
+            "TestASTBitVectorNumeralUnmatchedLeavesArgumentsUnread",
+            "TestASTBitVectorBigNumeralEveryConstructorReservation",
+            "TestASTBitVectorSignedNormalizationIndependentOracle",
+            "TestASTBitVectorSignedNormalizationEveryReservation"
+          ]
+        },
+        {
+          "name": "ast_bv_normalization concrete reached source counterpart (bv_decl_plugin.cpp:753-765)",
+          "status": "partial",
+          "go_target": "ast_bv_normalization.go",
+          "tests": [
+            "TestASTBitVectorNumeralLiteralNormalizationAndRead",
+            "TestASTBitVectorNumeralUnmatchedLeavesArgumentsUnread",
+            "TestASTBitVectorBigNumeralEveryConstructorReservation",
+            "TestASTBitVectorSignedNormalizationIndependentOracle",
+            "TestASTBitVectorSignedNormalizationEveryReservation"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
+      ],
+      "deviations": [
+        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+      ]
     },
     {
       "path": "src/ast/bv_decl_plugin.h",
@@ -12314,8 +12507,14 @@
       "component": "ast",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "ast_datatype_plugin.go",
+        "ast_datatype_plugin_source_test.go"
+      ],
+      "tests": [
+        "TestASTDatatypeActualPluginAndUtilityMembers",
+        "TestASTDatatypeUtilityEveryActualMapConstructorPrefix"
+      ],
       "assertions": [
         {
           "line": 38,
@@ -12428,9 +12627,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "ast_datatype_plugin concrete reached source counterpart (datatype_decl_plugin.cpp:150-162,739-750)",
+          "status": "partial",
+          "go_target": "ast_datatype_plugin.go",
+          "tests": [
+            "TestASTDatatypeActualPluginAndUtilityMembers",
+            "TestASTDatatypeUtilityEveryActualMapConstructorPrefix"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
+      ],
+      "deviations": [
+        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+      ]
     },
     {
       "path": "src/ast/datatype_decl_plugin.h",
@@ -12496,8 +12709,14 @@
       "component": "ast",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "ast_auxiliary_plugins.go",
+        "ast_auxiliary_plugins_source_test.go"
+      ],
+      "tests": [
+        "TestASTDatalogAndPseudoBooleanActualConstructorMembers",
+        "TestASTAuxiliaryPluginEveryConstructorPrefix"
+      ],
       "assertions": [
         {
           "line": 224,
@@ -12534,9 +12753,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "ast_auxiliary_plugins concrete reached source counterpart (dl_decl_plugin.cpp:31-48)",
+          "status": "partial",
+          "go_target": "ast_auxiliary_plugins.go",
+          "tests": [
+            "TestASTDatalogAndPseudoBooleanActualConstructorMembers",
+            "TestASTAuxiliaryPluginEveryConstructorPrefix"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
+      ],
+      "deviations": [
+        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+      ]
     },
     {
       "path": "src/ast/dl_decl_plugin.h",
@@ -13476,8 +13709,21 @@
       "component": "ast",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "ast_format.go",
+        "ast_format_source_test.go",
+        "ast_format_buffer.go",
+        "ast_format_buffer_source_test.go"
+      ],
+      "tests": [
+        "TestASTFormatSourcePluginAndLiteralPrimitives",
+        "TestASTFormatSourceEveryLazyPluginAndStringReservation",
+        "TestASTFormatSourceLexicalParameterAndCopiedInfo",
+        "TestASTFormatSourceFlatLiteralChoiceAndSharedChildren",
+        "TestASTFormatSourceEveryFlatAllocationAndImmediateGraph",
+        "TestASTFormatFlatHistorySurvivesActualLaterSourceFinalizeRefusal",
+        "TestASTFormatBorrowedBufferUsesActualStringEngine"
+      ],
       "conditionals": [
         {
           "line": 155,
@@ -13520,9 +13766,35 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "ast_format concrete reached source counterpart (format.cpp:66-212)",
+          "status": "partial",
+          "go_target": "ast_format.go",
+          "tests": [
+            "TestASTFormatSourcePluginAndLiteralPrimitives",
+            "TestASTFormatSourceEveryLazyPluginAndStringReservation",
+            "TestASTFormatSourceLexicalParameterAndCopiedInfo",
+            "TestASTFormatSourceFlatLiteralChoiceAndSharedChildren",
+            "TestASTFormatSourceEveryFlatAllocationAndImmediateGraph",
+            "TestASTFormatFlatHistorySurvivesActualLaterSourceFinalizeRefusal"
+          ]
+        },
+        {
+          "name": "ast_format_buffer concrete reached source counterpart (format.cpp:66-101)",
+          "status": "partial",
+          "go_target": "ast_format_buffer.go",
+          "tests": [
+            "TestASTFormatBorrowedBufferUsesActualStringEngine"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
+      ],
+      "deviations": [
+        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+      ]
     },
     {
       "path": "src/ast/format.h",
@@ -15161,8 +15433,27 @@
       "component": "ast",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "ast_fpa_plugin.go",
+        "ast_fpa_plugin_source_test.go",
+        "ast_fpa_numeral.go",
+        "ast_fpa_numeral_source_test.go",
+        "ast_fpa_value_binding.go",
+        "ast_fpa_value_binding_source_test.go"
+      ],
+      "tests": [
+        "TestASTFloatingPointActualConstructorRegistrationAndSorts",
+        "TestASTFloatingPointEveryActualConstructorAndPublicationPrefix",
+        "TestASTFloatingPointSourceFinalizeAndOwnContextEndPreserveBorrowedNumerals",
+        "TestASTFloatingPointNumeralLiteralDeclarationsAndExternalDeletion",
+        "TestASTFloatingPointNumeralDeclarationEveryReservationPrefix",
+        "TestASTFloatingPointSortLiteralMinimumMessagesAndCheckOrder",
+        "TestASTFloatingPointNumeralReadUsesActualExternalRowAndSpecialSort",
+        "TestASTFloatingPointNumeralReadUnmatchedErasesOutput",
+        "TestASTFloatingPointValueTableUsesActualMPFHashAndEquality",
+        "TestASTFloatingPointValueIDLiteralCanonicalization",
+        "TestASTFloatingPointValueIDEveryActualReservationPrefix"
+      ],
       "assertions": [
         {
           "line": 36,
@@ -15227,17 +15518,64 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "ast_fpa_plugin concrete reached source counterpart (fpa_decl_plugin.cpp:23-49,182-231)",
+          "status": "partial",
+          "go_target": "ast_fpa_plugin.go",
+          "tests": [
+            "TestASTFloatingPointActualConstructorRegistrationAndSorts",
+            "TestASTFloatingPointEveryActualConstructorAndPublicationPrefix",
+            "TestASTFloatingPointSourceFinalizeAndOwnContextEndPreserveBorrowedNumerals"
+          ]
+        },
+        {
+          "name": "ast_fpa_numeral concrete reached source counterpart (fpa_decl_plugin.cpp:64-95)",
+          "status": "partial",
+          "go_target": "ast_fpa_numeral.go",
+          "tests": [
+            "TestASTFloatingPointNumeralLiteralDeclarationsAndExternalDeletion",
+            "TestASTFloatingPointNumeralDeclarationEveryReservationPrefix",
+            "TestASTFloatingPointSortLiteralMinimumMessagesAndCheckOrder",
+            "TestASTFloatingPointNumeralReadUsesActualExternalRowAndSpecialSort",
+            "TestASTFloatingPointNumeralReadUnmatchedErasesOutput"
+          ]
+        },
+        {
+          "name": "ast_fpa_value_binding concrete reached source counterpart (fpa_decl_plugin.cpp:64-95)",
+          "status": "partial",
+          "go_target": "ast_fpa_value_binding.go",
+          "tests": [
+            "TestASTFloatingPointValueTableUsesActualMPFHashAndEquality",
+            "TestASTFloatingPointValueIDLiteralCanonicalization",
+            "TestASTFloatingPointValueIDEveryActualReservationPrefix"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
+      ],
+      "deviations": [
+        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+      ]
     },
     {
       "path": "src/ast/fpa_decl_plugin.h",
       "component": "ast",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "ast_fpa_scoped_values.go",
+        "ast_fpa_scoped_values_source_test.go"
+      ],
+      "tests": [
+        "TestASTFloatingPointScopedValueActualDefaultReserveGeometry",
+        "TestASTFloatingPointScopedValueEveryActualReservePrefix",
+        "TestASTFloatingPointScopedValueActualInlinePushPublication",
+        "TestASTFloatingPointScopedValueActualNullGrowthRetryKeepsOlderOutcome",
+        "TestASTFloatingPointScopedValueInlineErasesCopyAcquisition",
+        "TestASTFloatingPointScopedValueTwoRetainedAllocationChildren"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -15288,9 +15626,27 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "ast_fpa_scoped_values concrete reached source counterpart (fpa_decl_plugin.h:109-122)",
+          "status": "partial",
+          "go_target": "ast_fpa_scoped_values.go",
+          "tests": [
+            "TestASTFloatingPointScopedValueActualDefaultReserveGeometry",
+            "TestASTFloatingPointScopedValueEveryActualReservePrefix",
+            "TestASTFloatingPointScopedValueActualInlinePushPublication",
+            "TestASTFloatingPointScopedValueActualNullGrowthRetryKeepsOlderOutcome",
+            "TestASTFloatingPointScopedValueInlineErasesCopyAcquisition",
+            "TestASTFloatingPointScopedValueTwoRetainedAllocationChildren"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
+      ],
+      "deviations": [
+        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+      ]
     },
     {
       "path": "src/ast/func_decl_dependencies.cpp",
@@ -16721,8 +17077,14 @@
       "component": "ast",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "ast_auxiliary_plugins.go",
+        "ast_auxiliary_plugins_source_test.go"
+      ],
+      "tests": [
+        "TestASTDatalogAndPseudoBooleanActualConstructorMembers",
+        "TestASTAuxiliaryPluginEveryConstructorPrefix"
+      ],
       "assertions": [
         {
           "line": 33,
@@ -16747,9 +17109,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "ast_auxiliary_plugins concrete reached source counterpart (pb_decl_plugin.cpp:23-29)",
+          "status": "partial",
+          "go_target": "ast_auxiliary_plugins.go",
+          "tests": [
+            "TestASTDatalogAndPseudoBooleanActualConstructorMembers",
+            "TestASTAuxiliaryPluginEveryConstructorPrefix"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
+      ],
+      "deviations": [
+        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+      ]
     },
     {
       "path": "src/ast/pb_decl_plugin.h",
@@ -16779,8 +17155,14 @@
       "component": "ast",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "ast_format_pp.go",
+        "ast_format_pp_source_test.go"
+      ],
+      "tests": [
+        "TestASTFormatPrettyPrinterLiteralWidthIndentAndSingleLine",
+        "TestASTFormatPrettyEveryGetterStackAndOutputReservation"
+      ],
       "assertions": [
         {
           "line": 25,
@@ -16793,9 +17175,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "ast_format_pp concrete reached source counterpart (pp.cpp:22-132)",
+          "status": "partial",
+          "go_target": "ast_format_pp.go",
+          "tests": [
+            "TestASTFormatPrettyPrinterLiteralWidthIndentAndSingleLine",
+            "TestASTFormatPrettyEveryGetterStackAndOutputReservation"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
+      ],
+      "deviations": [
+        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+      ]
     },
     {
       "path": "src/ast/pp.h",
@@ -22020,8 +22416,15 @@
       "component": "ast",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "ast_seq_plugin.go",
+        "ast_seq_plugin_source_test.go"
+      ],
+      "tests": [
+        "TestASTSequenceSourceSetManagerAndRecursiveSignatureInitialization",
+        "TestASTSequenceEveryActualConstructorAndSignatureReservation",
+        "TestASTSequenceSourceFinalizeRetainsUnjoinedSignatureUntilContextEnd"
+      ],
       "conditionals": [
         {
           "line": 92,
@@ -22084,9 +22487,24 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "ast_seq_plugin concrete reached source counterpart (seq_decl_plugin.cpp:343-357,500-610)",
+          "status": "partial",
+          "go_target": "ast_seq_plugin.go",
+          "tests": [
+            "TestASTSequenceSourceSetManagerAndRecursiveSignatureInitialization",
+            "TestASTSequenceEveryActualConstructorAndSignatureReservation",
+            "TestASTSequenceSourceFinalizeRetainsUnjoinedSignatureUntilContextEnd"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
+      ],
+      "deviations": [
+        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+      ]
     },
     {
       "path": "src/ast/seq_decl_plugin.h",
@@ -122083,7 +122501,9 @@
         "mpnum/mpf_value_ieee_lifetime_source_test.go",
         "mpnum/mpf_value_input.go",
         "mpnum/mpf_extrema.go",
-        "mpnum/mpf_comparison_source_test.go"
+        "mpnum/mpf_comparison_source_test.go",
+        "mpnum/mpf_printer_parts.go",
+        "mpnum/mpf_printer_parts_source_test.go"
       ],
       "tests": [
         "TestArbitraryFloatScalarCopyReceiptEveryPrefix",
@@ -122109,7 +122529,9 @@
         "TestArbitraryFloatIEEEEveryReachedCacheReservationPrefix",
         "TestArbitraryFloatIEEEActualCacheTransportRetainsEarlierCall",
         "TestArbitraryFloatOriginalSetIntAndDoubleDriverAssertions",
-        "TestArbitraryFloatComparisonIndependentIEEEPairs"
+        "TestArbitraryFloatComparisonIndependentIEEEPairs",
+        "TestArbitraryFloatPrinterSourceBiasAndScopedSignificand",
+        "TestArbitraryFloatPrinterSignificandEveryReservation"
       ],
       "conditionals": [
         {
@@ -122175,12 +122597,24 @@
           "tests": [
             "TestArbitraryFloatComparisonIndependentIEEEPairs"
           ]
+        },
+        {
+          "name": "mpnum/mpf_printer_parts concrete reached source counterpart (mpf.h:152-153,192-193)",
+          "status": "partial",
+          "go_target": "mpnum/mpf_printer_parts.go",
+          "tests": [
+            "TestArbitraryFloatPrinterSourceBiasAndScopedSignificand",
+            "TestArbitraryFloatPrinterSignificandEveryReservation"
+          ]
         }
       ],
       "ownership": [
-        "mpf.h:146-147 explicitly supplied Rational owner remains sole output owner; exact invocation context is distinct from source Integer context."
+        "mpf.h:146-147 explicitly supplied Rational owner remains sole output owner; exact invocation context is distinct from source Integer context.",
+        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
       ],
-      "deviations": []
+      "deviations": [
+        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+      ]
     },
     {
       "path": "src/util/mpff.cpp",
@@ -134929,7 +135363,10 @@
         "mpnum/rational_service_global_binding_test.go",
         "util_rational_global_service.go",
         "util_rational_global_service_test.go",
-        "util_numeric_rational_source.go"
+        "util_numeric_rational_source.go",
+        "mpnum/rational_service_invocation.go",
+        "mpnum/rational_service_invocation_source_test.go",
+        "mpnum/rational_service_integer_source_test.go"
       ],
       "tests": [
         "TestRationalServiceSourceConstructorAssertions",
@@ -134999,7 +135436,15 @@
         "TestRationalServiceSourceGlobalSlotExactPublicationAndStaticEnd",
         "TestRationalGlobalAcquiredConstructorNamedPhysicalPrefixes",
         "TestNumericRationalSourceInsertionPreservesActualFieldChains",
-        "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame"
+        "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame",
+        "TestRationalServiceInvocationInlineHistoryAndExactOwner",
+        "TestRationalServiceInvocationEveryPowerReservation",
+        "TestRationalServiceInvocationDetachedCellSourceEnd",
+        "TestRationalServiceCopyInvocationEveryActualReservation",
+        "TestRationalServiceCompoundInvocationInlineExactReceiver",
+        "TestRationalServiceDigitInvocationExactBody",
+        "TestRationalServiceIntegerConstructorExplicitBorrowedOwner",
+        "TestRationalServiceIntegerConstructorActualReturningTransportProtectsSource"
       ],
       "conditionals": [
         {
@@ -135146,6 +135591,28 @@
             "TestNumericRationalSourceInsertionPreservesActualFieldChains",
             "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame"
           ]
+        },
+        {
+          "name": "mpnum/rational_service_invocation concrete reached source counterpart (rational.cpp:23-128)",
+          "status": "partial",
+          "go_target": "mpnum/rational_service_invocation.go",
+          "tests": [
+            "TestRationalServiceInvocationInlineHistoryAndExactOwner",
+            "TestRationalServiceInvocationEveryPowerReservation",
+            "TestRationalServiceInvocationDetachedCellSourceEnd",
+            "TestRationalServiceCopyInvocationEveryActualReservation",
+            "TestRationalServiceCompoundInvocationInlineExactReceiver",
+            "TestRationalServiceDigitInvocationExactBody"
+          ]
+        },
+        {
+          "name": "mpnum/rational_service_invocation concrete reached source counterpart (rational.cpp:23-128)",
+          "status": "partial",
+          "go_target": "mpnum/rational_service_invocation.go",
+          "tests": [
+            "TestRationalServiceIntegerConstructorExplicitBorrowedOwner",
+            "TestRationalServiceIntegerConstructorActualReturningTransportProtectsSource"
+          ]
         }
       ],
       "ownership": [
@@ -135153,7 +135620,8 @@
         "All six infinitesimal constants are actual pointer-free service fields included in reflected header bytes. Constructor order rational/InfRat/InfInt; finalization InfRat/InfInt/cache/rational constants/manager. Production hook traversal observed via free-slot reuse before manager close. See PORT_PROGRESS.md#audit-rational-inf-lifecycle-port-status-md.",
         "Prepared cold header/config is charged once; manager-nil returned Integer constructor failure is separate actual owner, not published manager. Standalone constructor forwards that child receipt after only outer header refund. Source finalizer stops at first unconditional null-manager access; explicit owning abort drains retained child and cold header. Exact named provider/slab/object/raw graphs precede fault disable.",
         "Source current is a borrowed scalar slot, never a duplicate manager owning root. Failed returned children and post-finalization managers are concrete charged acquisition nodes; first completed manager transfers at source publication to original static context. Owning cleanup drains exact nodes then retained original context and detaches only after real closure.",
-        "One reflected executing field, pre-lock callback guards reject destructive/read reentry before deadlock, retaining actual owner tuple and original source cause."
+        "One reflected executing field, pre-lock callback guards reject destructive/read reentry before deadlock, retaining actual owner tuple and original source cause.",
+        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
       ],
       "deviations": [
         "Global mutable numerical manager/cache/constants become an explicit owner-local service; getters produce independent values and scalar provenance guards service domains. Cache algorithms and outer hooks have bounded evidence; transitive source finalization and header facade remain partial. Windows compiler warning pragma has no Go runtime counterpart.",
@@ -135162,7 +135630,8 @@
         "Process-global generated memory lifecycle remains open. Explicit caller-confined namespace binding replaces native process globals; heterogeneous process initializer/finalizer orchestration is not claimed.",
         "Ended static objects are not reconstructed: source reinitialization and repeated finalization reach explicit invalid-lifetime guards after literal completed publication prefixes.",
         "TLS signed-overflow release fixture is source-undefined guarded-domain evidence, not valid-source OOM. Cold acquisition nodes are actual Go ownership metadata, not source malloc events.",
-        "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit."
+        "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit.",
+        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
       ]
     },
     {
@@ -144565,7 +145034,9 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "util_printf.go"
+        "util_printf.go",
+        "util_warning.go",
+        "util_warning_source_test.go"
       ],
       "tests": [
         "TestPrintfSourceExceptionConsumerAndCallsiteForms",
@@ -144578,7 +145049,14 @@
         "TestPrintfIndependentFiniteIntegerAndPaddingOracle",
         "TestPrintfSignedCountOverflowOnEscapedPercent",
         "TestPrintfBudgetPeakExactAndObserverPanicCleanup",
-        "TestPrintfByteBoundaryAndBackendEventClassification"
+        "TestPrintfByteBoundaryAndBackendEventClassification",
+        "TestWarningSourceStdioUntruncatedAndOstreamAMD64Truncation",
+        "TestWarningSourceDisabledErasesBorrowAndClosedFileKeepsArgumentReads",
+        "TestWarningSourceEveryFormattingReservationAndExactOwnCleanup",
+        "TestWarningSourceBorrowedCStringFullLengthAndStreamSelectionLifetime",
+        "TestWarningSourcePostphysicalFailedFrameSurvivesValidRetryAndCallback",
+        "TestWarningSourceHeaderPrefixAndBorrowedOwnerGuards",
+        "TestWarningSourceSamePrintfParserBorrowedPrecisionAndRawErasedWrites"
       ],
       "conditionals": [
         {
@@ -144646,13 +145124,29 @@
             "TestPrintfBudgetPeakExactAndObserverPanicCleanup",
             "TestPrintfByteBoundaryAndBackendEventClassification"
           ]
+        },
+        {
+          "name": "util_warning concrete reached source counterpart (warning.cpp:63-169)",
+          "status": "partial",
+          "go_target": "util_warning.go",
+          "tests": [
+            "TestWarningSourceStdioUntruncatedAndOstreamAMD64Truncation",
+            "TestWarningSourceDisabledErasesBorrowAndClosedFileKeepsArgumentReads",
+            "TestWarningSourceEveryFormattingReservationAndExactOwnCleanup",
+            "TestWarningSourceBorrowedCStringFullLengthAndStreamSelectionLifetime",
+            "TestWarningSourcePostphysicalFailedFrameSurvivesValidRetryAndCallback",
+            "TestWarningSourceHeaderPrefixAndBorrowedOwnerGuards",
+            "TestWarningSourceSamePrintfParserBorrowedPrecisionAndRawErasedWrites"
+          ]
         }
       ],
       "ownership": [
-        "Per-call concrete byte-vector scratch charges actual source capacities and old/new peaks; cold owner header charged, temporary arrays refunded on success/error/panic. Explicit arguments borrowed synchronously; only final caller string escapes. See PORT_PROGRESS.md#audit-printf-port-status-md."
+        "Per-call concrete byte-vector scratch charges actual source capacities and old/new peaks; cold owner header charged, temporary arrays refunded on success/error/panic. Explicit arguments borrowed synchronously; only final caller string escapes. See PORT_PROGRESS.md#audit-printf-port-status-md.",
+        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
       ],
       "deviations": [
-        "Go explicit tagged argument list replaces va_list; Linux/glibc C-locale integer/string subset implemented. Floating/wide/locale/positional/pointer/count-write formats, Windows CRT state and warning I/O/global behavior remain open. NonWindows32 persistent backend errors terminate with typed failure; original loop would retry forever."
+        "Go explicit tagged argument list replaces va_list; Linux/glibc C-locale integer/string subset implemented. Floating/wide/locale/positional/pointer/count-write formats, Windows CRT state and warning I/O/global behavior remain open. NonWindows32 persistent backend errors terminate with typed failure; original loop would retry forever.",
+        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
       ]
     },
     {

@@ -42,7 +42,9 @@ type RationalServiceStats struct {
 // requires external owner confinement; independent service locks do not make
 // the Budget safe for concurrent use. Never shallow-copy this owner.
 type RationalService struct {
-	sourceRuntimeExecuting uint32 // actual held lower-allocation invocation stamp
+	lexicalPrepared, lexicalExecuting, lexicalInvocations *RationalServiceInvocation
+	lexicalSerial                                         uint64
+	sourceRuntimeExecuting                                uint32 // actual held lower-allocation invocation stamp
 
 	sourceInsertionExecuting                       bool
 	polynomialContext                              UPolynomialRationalContext
@@ -165,13 +167,16 @@ func (s *RationalService) Copy(dst, src *OwnedRational) error {
 	defer s.mu.Unlock()
 	atomic.StoreUint32(&s.sourceRuntimeExecuting, 1)
 	defer atomic.StoreUint32(&s.sourceRuntimeExecuting, 0)
+	return s.copyLockedWithContext(dst, src, integerAllocationInvocationContext{})
+}
+func (s *RationalService) copyLockedWithContext(dst, src *OwnedRational, context integerAllocationInvocationContext) error {
 	if e := s.rationalScalarOwner(dst); e != nil {
 		return e
 	}
 	if e := s.rationalScalarOwner(src); e != nil {
 		return e
 	}
-	return s.manager.Copy(&dst.raw, &src.raw)
+	return s.manager.copyWithAllocationContext(&dst.raw, &src.raw, context)
 }
 func (s *RationalService) CopyFrom(dst *OwnedRational, source *RationalService, src *OwnedRational) error {
 	if s == nil || s.self != s || source == nil || source.self != source {
@@ -317,12 +322,15 @@ func (s *RationalService) Equal(a, b *OwnedRational) (bool, error) {
 	return s.manager.Equal(&a.raw, &b.raw)
 }
 func (s *RationalService) copyOutput(raw *Rational) (_lexOut OwnedRational, _lexErr error) {
+	return s.copyOutputWithInvocation(raw, nil)
+}
+func (s *RationalService) copyOutputWithInvocation(raw *Rational, c *RationalServiceInvocation) (_lexOut OwnedRational, _lexErr error) {
 	if e := s.beginLexical(); e != nil {
 		return OwnedRational{}, e
 	}
 	defer s.endLexicalRational(&_lexOut, &_lexErr)
 	v := OwnedRational{raw: NewRational(), ownerID: s.ownerID}
-	if e := s.manager.Copy(&v.raw, raw); e != nil {
+	if e := s.manager.copyWithAllocationContext(&v.raw, raw, c.allocationContext()); e != nil {
 		s.abortLexicalRational(&v.raw)
 		return OwnedRational{}, e
 	}
@@ -377,6 +385,9 @@ func (s *RationalService) growCache() error {
 	return nil
 }
 func (s *RationalService) pushCache(v *Rational) (_lexErr error) {
+	return s.pushCacheWithInvocation(v, nil)
+}
+func (s *RationalService) pushCacheWithInvocation(v *Rational, c *RationalServiceInvocation) (_lexErr error) {
 	if e := s.beginLexical(); e != nil {
 		return e
 	}
@@ -387,7 +398,7 @@ func (s *RationalService) pushCache(v *Rational) (_lexErr error) {
 		}
 	}
 	item := NewRational()
-	if e := s.manager.Copy(&item, v); e != nil {
+	if e := s.manager.copyWithAllocationContext(&item, v, c.allocationContext()); e != nil {
 		s.abortLexicalRational(&item)
 		return e
 	}
@@ -396,12 +407,15 @@ func (s *RationalService) pushCache(v *Rational) (_lexErr error) {
 	return nil
 }
 func (s *RationalService) fillPower(n uint32) (_lexErr error) {
+	return s.fillPowerWithInvocation(n, nil)
+}
+func (s *RationalService) fillPowerWithInvocation(n uint32, c *RationalServiceInvocation) (_lexErr error) {
 	if e := s.beginLexical(); e != nil {
 		return e
 	}
 	defer s.endLexicalError(&_lexErr)
 	if len(s.cache) == 0 {
-		if e := s.pushCache(&s.one); e != nil {
+		if e := s.pushCacheWithInvocation(&s.one, c); e != nil {
 			return e
 		}
 	}
@@ -411,7 +425,7 @@ func (s *RationalService) fillPower(n uint32) (_lexErr error) {
 	defer s.endLexicalLocal(&curr, &currComplete)
 	twoComplete := false
 	defer s.endLexicalLocal(&two, &twoComplete)
-	if e := s.manager.Copy(&curr, &s.cache[size-1]); e != nil {
+	if e := s.manager.copyWithAllocationContext(&curr, &s.cache[size-1], c.allocationContext()); e != nil {
 		return e
 	}
 	currComplete = true
@@ -420,10 +434,10 @@ func (s *RationalService) fillPower(n uint32) (_lexErr error) {
 	}
 	twoComplete = true
 	for i := size; i <= n; i++ {
-		if e := s.manager.Mul(&curr, &two, &curr); e != nil {
+		if e := s.manager.mulWithAllocationContext(&curr, &two, &curr, c.allocationContext()); e != nil {
 			return e
 		}
-		if e := s.pushCache(&curr); e != nil {
+		if e := s.pushCacheWithInvocation(&curr, c); e != nil {
 			return e
 		}
 	}
@@ -436,6 +450,12 @@ func (s *RationalService) PowerOfTwo(k uint32) (_lexOut OwnedRational, _lexErr e
 	defer s.mu.Unlock()
 	atomic.StoreUint32(&s.sourceRuntimeExecuting, 1)
 	defer func() { atomic.StoreUint32(&s.sourceRuntimeExecuting, 0) }()
+	return s.powerOfTwoLocked(k)
+}
+func (s *RationalService) powerOfTwoLocked(k uint32) (OwnedRational, error) {
+	return s.powerOfTwoLockedWithInvocation(k, nil)
+}
+func (s *RationalService) powerOfTwoLockedWithInvocation(k uint32, c *RationalServiceInvocation) (_lexOut OwnedRational, _lexErr error) {
 	if e := s.beginLexical(); e != nil {
 		return OwnedRational{}, e
 	}
@@ -449,11 +469,11 @@ func (s *RationalService) PowerOfTwo(k uint32) (_lexOut OwnedRational, _lexErr e
 		return OwnedRational{}, arena.ErrBounds
 	}
 	if uint64(k) >= uint64(len(s.cache)) {
-		if e := s.fillPower(k + 1); e != nil {
+		if e := s.fillPowerWithInvocation(k+1, c); e != nil {
 			return OwnedRational{}, e
 		}
 	}
-	if e := s.manager.Copy(&result, &s.cache[k]); e != nil {
+	if e := s.manager.copyWithAllocationContext(&result, &s.cache[k], c.allocationContext()); e != nil {
 		return OwnedRational{}, e
 	}
 	return s.facadeTakeLocked(&result)

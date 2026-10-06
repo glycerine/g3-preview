@@ -74,6 +74,7 @@ func (s *RationalService) InitializeSource() error {
 		return e
 	}
 	s.manager = m // actual source pointer publication precedes every constant set
+	m.z.rationalServiceParent = s
 	if s.sourceGlobalSlot != nil {
 		*s.sourceGlobalSlot = m
 	}

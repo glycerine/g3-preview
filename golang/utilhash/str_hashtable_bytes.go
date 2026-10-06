@@ -31,14 +31,16 @@ func CStringBytesHash(s []byte) (uint32, error) {
 	return strQueryBytesHash(s, 17), nil
 }
 func (h *StrHashtable) FindCStringBytes(s []byte) (StrHashtableEntryRef, bool, error) {
+	return h.FindCStringByteSource(BorrowBytesCString(s))
+}
+func (h *StrHashtable) FindCStringByteSource(s CStringByteSource) (StrHashtableEntryRef, bool, error) {
 	if e := h.open(); e != nil {
 		return StrHashtableEntryRef{}, false, e
 	}
-	s = strQueryBytesPrefix(s)
-	if uint64(len(s)) > uint64(^uint32(0)) {
-		return StrHashtableEntryRef{}, false, arena.ErrBounds
+	hash, e := s.Hash()
+	if e != nil {
+		return StrHashtableEntryRef{}, false, e
 	}
-	hash := strQueryBytesHash(s, 17)
 	capacity, e := h.capacityChecked()
 	if e != nil {
 		return StrHashtableEntryRef{}, false, e
@@ -72,7 +74,7 @@ func (h *StrHashtable) FindCStringBytes(s []byte) (StrHashtableEntryRef, bool, e
 			if e != nil {
 				return StrHashtableEntryRef{}, false, e
 			}
-			equal, e := strKeyEqualBytes(region, entry.key, s)
+			equal, e := strKeyEqualByteSource(region, entry.key, s)
 			if e != nil {
 				return StrHashtableEntryRef{}, false, e
 			}
@@ -99,10 +101,13 @@ func (h *StrHashtable) FindCStringBytes(s []byte) (StrHashtableEntryRef, bool, e
 	return StrHashtableEntryRef{}, false, nil
 }
 func (h *StrHashtable) PrepareFindCStringBytes(s []byte) (StrHashtableEntryRef, bool, error) {
+	return h.PrepareFindCStringByteSource(BorrowBytesCString(s))
+}
+func (h *StrHashtable) PrepareFindCStringByteSource(s CStringByteSource) (StrHashtableEntryRef, bool, error) {
 	if e := h.prepareInsert(); e != nil {
 		return StrHashtableEntryRef{}, false, e
 	}
-	r, found, e := h.FindCStringBytes(s)
+	r, found, e := h.FindCStringByteSource(s)
 	if e != nil || found {
 		return r, found, e
 	}

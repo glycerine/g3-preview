@@ -19,19 +19,23 @@ type ArbitraryFloatValueCopyReceipt struct {
 }
 
 type arbitraryFloatValueCopyCall struct {
-	self                *arbitraryFloatValueCopyCall
-	manager             *ArbitraryFloatManager
-	next                *arbitraryFloatValueCopyCall
-	issued              ArbitraryFloatValueCopyReceipt
-	header              uint64
-	childFrame          integerCopyAllocationScope
-	executing, retired  bool
-	bodyCause, ownCause error
+	caller                        *ArbitraryFloatValueCopyChain
+	callerNext                    *arbitraryFloatValueCopyCall
+	callerFalseAck, callerTrueAck bool
+	self                          *arbitraryFloatValueCopyCall
+	manager                       *ArbitraryFloatManager
+	next                          *arbitraryFloatValueCopyCall
+	issued                        ArbitraryFloatValueCopyReceipt
+	header                        uint64
+	childFrame                    integerCopyAllocationScope
+	executing, retired            bool
+	bodyCause, ownCause           error
 }
 
 // Embedded caller binding adds no acquisition to inline or reused-cell SET.
 // Only the existing Integer allocation branch materializes a charged record.
 type arbitraryFloatCopyBinding struct {
+	chain             *ArbitraryFloatValueCopyChain
 	conversionContext integerAllocationInvocationContext
 	manager           *ArbitraryFloatManager
 	sourceInteger     *IntegerManager
@@ -92,6 +96,15 @@ func (z *IntegerManager) prepareFloatCopyRecord(c *arbitraryFloatCopyBinding) er
 	}
 	q := &arbitraryFloatValueCopyCall{manager: m, next: m.valueCalls, header: bytes, executing: true}
 	q.self = q
+	if chain := c.chain; chain != nil {
+		if chain.self != chain || chain.manager != m || !chain.executing || chain.ended {
+			m.budget.Release(bytes)
+			return memory.ErrRuntimeOwner
+		}
+		q.caller = chain
+		q.callerNext = chain.head
+		chain.head = q
+	}
 	q.issued = ArbitraryFloatValueCopyReceipt{manager: m, frame: q, invocation: c.invocation}
 	c.record = q
 	m.valueCalls = q

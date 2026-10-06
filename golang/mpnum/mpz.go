@@ -48,6 +48,8 @@ type IntegerConfig struct {
 // Cells, transitional Natural Words and the actual memory backend share one Budget.
 // Close invalidates every live numeral; a supplied Runtime is borrowed.
 type IntegerManager struct {
+	rationalServiceParent                  *RationalService
+	rationalServiceRead                    *RationalServiceInvocation
 	integerEvaluationCaller                *UPolynomialManager
 	rationalEvaluationCaller               *UPolynomialManager
 	binaryEvaluationCaller                 *UPolynomialManager
@@ -249,7 +251,7 @@ func (m *IntegerManager) checkCleanup(a *Int) error {
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
 	}
-	if m.mpfValueRead != nil && m.mpfBorrowedSourceCallbackActive() {
+	if m.rationalServiceReadCallbackActive() || (m.mpfValueRead != nil && m.mpfBorrowedSourceCallbackActive()) {
 		return ErrPolynomialPending
 	}
 	if m.closed || m.sourceFinalizing || m.constructionFailed {
@@ -272,7 +274,7 @@ func (m *IntegerManager) check(a *Int) error {
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
 	}
-	if m.mpfValueRead != nil && m.mpfBorrowedSourceCallbackActive() {
+	if m.rationalServiceReadCallbackActive() || (m.mpfValueRead != nil && m.mpfBorrowedSourceCallbackActive()) {
 		return ErrPolynomialPending
 	}
 	if m.closed || m.sourceFinalizing || m.constructionFailed {
@@ -351,6 +353,9 @@ func (m *IntegerManager) allocateWithInvocationReceipts(capacity, size uint32, s
 	return m.allocateWithSourceContext(capacity, size, s, pnAllocationContext(pn))
 }
 func (m *IntegerManager) allocateWithSourceContext(capacity, size uint32, s *integerCopyAllocationScope, context integerAllocationInvocationContext) (numericCellRef, error) {
+	if context.rationalService != nil && context.rationalServiceFrame(m) == nil {
+		return 0, arena.ErrInvalidSlot
+	}
 	if modularSourceDebug && capacity < 6 {
 		return 0, ErrIntegerAssertion
 	}
@@ -407,6 +412,9 @@ func (m *IntegerManager) allocateWithSourceContext(capacity, size uint32, s *int
 		}
 	}
 	if e != nil {
+		if transfer := m.captureRationalServiceAllocationOutcome(context, backing, &outcome); transfer != nil {
+			return 0, polynomialNewtonJoin(e, transfer)
+		}
 		if transfer := m.captureFormattedSetAllocation(context, backing, &outcome); transfer != nil {
 			return 0, polynomialNewtonJoin(e, transfer)
 		}
@@ -441,6 +449,9 @@ func (m *IntegerManager) allocateWithSourceContext(capacity, size uint32, s *int
 	}
 	slot, gen, e := m.cells.Allocate()
 	if e != nil {
+		if transfer := m.captureRationalServiceAllocationOutcome(context, backing, &outcome); transfer != nil {
+			return 0, polynomialNewtonJoin(e, transfer)
+		}
 		if transfer := m.captureFormattedSetAllocation(context, backing, &outcome); transfer != nil {
 			return 0, polynomialNewtonJoin(e, transfer)
 		}

@@ -28,7 +28,7 @@ func (m *ASTManager) ConstructorState() ASTConstructorState {
 	if m == nil || m.self != m {
 		return ASTConstructorState{BodyCause: ErrASTHandle}
 	}
-	if m.traceExecuting {
+	if m.traceExecuting || m.formatExecuting {
 		panic(ErrASTPending)
 	}
 	m.mu.Lock()
@@ -49,6 +49,7 @@ func (m *ASTManager) unwindConstructorMembers() error {
 	// Body-owned trace and format pointers are deliberately not source members.
 	// Plugins' pointer records also have POD destruction, not plugin finalize.
 	if m.constructorMemberStage == 0 {
+		m.plugins.close(m.budget)
 		if m.debugFreeComplete {
 			m.debugFreeIndices.Close()
 			m.debugFreeComplete = false
@@ -96,6 +97,7 @@ func (m *ASTManager) unwindConstructorMembers() error {
 
 		if m.allocator != nil {
 			m.allocator.Close()
+			m.endSequenceContexts()
 			m.traceConstructorNodesEnded()
 			m.allocator = nil
 		}
@@ -108,7 +110,7 @@ func (m *ASTManager) AbortConstruction() error {
 	if m == nil || m.self != m {
 		return ErrASTHandle
 	}
-	if m.traceExecuting {
+	if m.traceExecuting || m.formatExecuting {
 		return ErrASTPending
 	}
 	m.mu.Lock()
@@ -185,6 +187,12 @@ func (m *ASTManager) abortConstructionCore() error {
 			}
 		}
 	}
+	if e := m.destroyFloatingPointMembers(true); e != nil {
+		return stop(e)
+	}
+	m.releaseFloatingPointHistory()
+	m.releaseAuxiliaryPluginHistory()
+	m.releaseDatatypePluginHistory()
 	m.destroyPluginBacking()
 	if m.vectorAllocator != nil {
 		m.vectorAllocator.Close()

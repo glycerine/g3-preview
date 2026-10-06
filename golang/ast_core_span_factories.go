@@ -6,13 +6,22 @@ package g3
 // This concrete call-local argument reader selects actual borrowed storage.
 // It never clones a pointer array or grants ownership of its elements.
 type astAppArguments struct {
-	slice []ASTHandle
-	span  ASTLiteralVectorSpan
-	count uint32
-	raw   bool
+	slice       []ASTHandle
+	format      *astFormatRefVector
+	formatOwner *ASTManager
+	span        ASTLiteralVectorSpan
+	count       uint32
+	raw         bool
 }
 
 func (a astAppArguments) at(i uint32) (ASTHandle, error) {
+	if a.format != nil {
+		r, e := a.format.at(i)
+		if e != nil {
+			return ASTHandle{}, e
+		}
+		return a.formatOwner.external(r), nil
+	}
 	if a.raw {
 		return a.span.At(i)
 	}
@@ -30,7 +39,7 @@ func (m *ASTManager) MkOrSpan(n uint32, span ASTLiteralVectorSpan) (ASTHandle, e
 		return span.At(0)
 	}
 	// Source basic-plugin expr overload uses this same OR declaration.
-	if !m.plugins[0].present {
+	if !m.pluginAt(0).present {
 		return ASTHandle{}, nil
 	}
 	r, e := m.mkAppArguments(m.basic.declarations[ASTOpOr], astAppArguments{span: span, count: n, raw: true})

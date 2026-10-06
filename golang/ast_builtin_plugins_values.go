@@ -1,3 +1,5 @@
+// Source: src/ast/ast.cpp:909-915,1127-1141,1246-1254,1589-1632,2556-2592; src/ast/ast.h:991-1020.
+// Source author: Leonardo de Moura.
 // Licensed under the MIT license.
 package g3
 
@@ -23,7 +25,7 @@ func (m *ASTManager) isValue(r astNodeRef) (bool, error) {
 	if e != nil {
 		return false, e
 	}
-	if fid < 0 || fid >= 5 || !m.plugins[fid].present {
+	if fid < 0 || !m.pluginAt(fid).present {
 		return false, nil
 	}
 	return m.pluginValue(fid, r)
@@ -80,13 +82,13 @@ func (m *ASTManager) AreDistinct(a, b ASTHandle) (bool, error) {
 	if e != nil {
 		return false, e
 	}
-	if fid < 0 || fid >= 5 || !m.plugins[fid].present {
+	if fid < 0 || !m.pluginAt(fid).present {
 		fid, _, e = m.declIdentity(m.appAt(y.slot).decl)
 		if e != nil {
 			return false, e
 		}
 	}
-	if fid < 0 || fid >= 5 || !m.plugins[fid].present || x == y {
+	if fid < 0 || !m.pluginAt(fid).present || x == y {
 		return false, nil
 	}
 	first, e := m.pluginValue(fid, x)
@@ -146,5 +148,5 @@ func (m *ASTManager) IsFullyInterpreted(sort ASTHandle) (bool, error) {
 	if fid == NullFamilyID || fid == 4 {
 		return false, nil
 	}
-	return fid >= 0 && fid < 5 && m.plugins[fid].present, nil
+	return fid >= 0 && m.pluginAt(fid).present, nil
 }

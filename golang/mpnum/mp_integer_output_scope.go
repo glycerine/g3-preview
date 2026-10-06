@@ -10,6 +10,7 @@ import (
 )
 
 type integerCharacterScope struct {
+	caller                      *RationalServiceInvocation
 	self                        *integerCharacterScope
 	owner                       *NaturalManager
 	display                     *upolyDisplayScope
@@ -36,6 +37,15 @@ func (m *NaturalManager) beginIntegerCharactersForInsertion(n uint32, service *R
 	return m.beginIntegerCharacterScope(n, service, receipt, display, true)
 }
 func (m *NaturalManager) beginIntegerCharacterScope(n uint32, service *RationalService, receipt *NumeralInsertionReceipt, display *upolyDisplayScope, executing bool) error {
+	return m.beginIntegerCharacterScopeWithCaller(n, service, receipt, display, executing, nil)
+}
+func (m *NaturalManager) beginIntegerCharactersWithCaller(n uint32, service *RationalService, receipt *NumeralInsertionReceipt, scope *integerCharacterScope, caller *RationalServiceInvocation) error {
+	if caller == nil || scope != &caller.characters {
+		return arena.ErrInvalidSlot
+	}
+	return m.beginIntegerCharacterScopeWithCaller(n, service, receipt, nil, true, caller)
+}
+func (m *NaturalManager) beginIntegerCharacterScopeWithCaller(n uint32, service *RationalService, receipt *NumeralInsertionReceipt, display *upolyDisplayScope, executing bool, caller *RationalServiceInvocation) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -48,6 +58,13 @@ func (m *NaturalManager) beginIntegerCharacterScope(n uint32, service *RationalS
 		s = &display.characters
 		formatting = &display.characterFormatting
 	}
+	if caller != nil {
+		if !caller.valid() || !caller.executing || caller.integer.natural != m || display != nil {
+			return arena.ErrInvalidSlot
+		}
+		s = &caller.characters
+		formatting = &caller.characterFormatting
+	}
 	if s.active || s.pending {
 		return arena.ErrInvalidSlot
 	}
@@ -59,7 +76,7 @@ func (m *NaturalManager) beginIntegerCharacterScope(n uint32, service *RationalS
 			return e
 		}
 	}
-	*s = integerCharacterScope{owner: m, display: display, formatting: formatting, active: true, invocation: s.invocation + 1}
+	*s = integerCharacterScope{caller: caller, owner: m, display: display, formatting: formatting, active: true, invocation: s.invocation + 1}
 	s.self = s
 	if display != nil {
 		s.displayInvocation = display.invocation
@@ -111,7 +128,7 @@ func (m *NaturalManager) destroyIntegerCharacterScope(s *integerCharacterScope) 
 }
 
 func (s *integerCharacterScope) reset() {
-	*s = integerCharacterScope{self: s.self, owner: s.owner, display: s.display, displayInvocation: s.displayInvocation, formatting: s.formatting, previous: s.previous, callExecuting: s.callExecuting, invocation: s.invocation}
+	*s = integerCharacterScope{caller: s.caller, self: s.self, owner: s.owner, display: s.display, displayInvocation: s.displayInvocation, formatting: s.formatting, previous: s.previous, callExecuting: s.callExecuting, invocation: s.invocation}
 }
 
 func (m *NaturalManager) matchesIntegerCharacterScope(s *integerCharacterScope) bool {
@@ -120,6 +137,9 @@ func (m *NaturalManager) matchesIntegerCharacterScope(s *integerCharacterScope) 
 	}
 	if s == &m.charFormatting {
 		return s.display == nil && s.formatting == &m.formatting
+	}
+	if c := s.caller; c != nil {
+		return c.valid() && c.integer.natural == m && s == &c.characters && s.formatting == &c.characterFormatting
 	}
 	q := s.display
 	return q != nil && q.actual() && q.owner.config.Integer.natural == m && s == &q.characters && s.displayInvocation != 0 && s.displayInvocation == q.invocation && s.formatting == &q.characterFormatting

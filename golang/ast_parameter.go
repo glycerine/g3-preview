@@ -1,3 +1,5 @@
+// Source: src/ast/ast.cpp:36-130; src/ast/ast.h:156-242.
+// Source author: Leonardo de Moura.
 // Licensed under the MIT license.
 // Source parameter constructors, copy/move, destruction, equality and hash.
 package g3
@@ -9,6 +11,15 @@ import (
 )
 
 func (m *ASTManager) parameter(p ASTParameter) (*astParameterRecord, error) {
+	if p.origin == m.origin && p.slot == math.MaxUint32-1 {
+		if !m.formatLexical.active || p.generation != m.formatLexical.epoch*2 && (!m.formatLexical.localPair || p.generation != m.formatLexical.epoch*2+1) {
+			return nil, ErrASTHandle
+		}
+		if m.formatLexical.localPair && p.generation == m.formatLexical.epoch*2+1 {
+			return &m.formatLexical.secondParameter, nil
+		}
+		return &m.formatLexical.parameter, nil
+	}
 	if p.origin != m.origin || p.slot == 0 || p.slot >= m.nextParameter {
 		return nil, ErrASTHandle
 	}

@@ -38,7 +38,7 @@ type integerRawInvocationReceipt struct {
 // Executing RAW and scoped Divides NUM calls retain their real declarations.
 // Public owner destruction cannot run from a returning error transport callback.
 func (m *IntegerManager) rawInvocationExecuting() bool {
-	return m.integerEvaluationCallerExecuting() || m.rationalEvaluationCallerExecuting() || m.binaryEvaluationCallerExecuting() || m.algebraicNegCallerExecuting() || m.conversionCallerExecuting() || (m.mpfParent != nil && m.mpfParent.formatInvocationExecuting()) || m.mpfBorrowedSourceCallbackActive() || m.mpfLifecycleCallbackActive() || (m.divisionRaw.active && m.divisionRaw.executing) ||
+	return m.rationalServiceReadCallbackActive() || m.integerEvaluationCallerExecuting() || m.rationalEvaluationCallerExecuting() || m.binaryEvaluationCallerExecuting() || m.algebraicNegCallerExecuting() || m.conversionCallerExecuting() || (m.mpfParent != nil && m.mpfParent.formatInvocationExecuting()) || m.mpfBorrowedSourceCallbackActive() || m.mpfLifecycleCallbackActive() || (m.divisionRaw.active && m.divisionRaw.executing) ||
 		(m.extendedRaw.active && m.extendedRaw.executing) ||
 		(m.gcdRaw.active && m.gcdRaw.executing) ||
 		(m.addMulInvocation.active && m.addMulInvocation.executing) ||

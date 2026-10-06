@@ -109,5 +109,13 @@ func (m *ASTManager) destroyPluginBacking() {
 	m.budget.Release(uint64(cap(m.builtin.userNames)) * uint64(reflect.TypeOf(Symbol{}).Size()))
 	m.builtin.userNames = nil
 	m.builtin.userTable.close()
-	m.plugins = [5]astPluginBinding{}
+	m.plugins.close(m.budget)
+	m.releaseFormatPluginHeaders()
+	m.releaseSequencePluginHeaders()
+	m.releaseArrayPluginHeaders()
+	m.releaseArithmeticPluginHeaders()
+	m.releaseBitVectorPluginHeaders()
+	if !m.sourceClosing {
+		m.releaseFormatFrames()
+	}
 }

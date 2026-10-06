@@ -11,6 +11,12 @@ import (
 )
 
 func (m *ASTManager) info(slot, generation uint32) (*astInfoRecord, error) {
+	if slot == math.MaxUint32-1 {
+		if !m.formatLexical.active || generation != m.formatLexical.epoch {
+			return nil, ErrASTHandle
+		}
+		return &m.formatLexical.info, nil
+	}
 	if slot == math.MaxUint32 {
 		if !m.freshInfoActive || generation != m.freshInfoEpoch {
 			return nil, ErrASTHandle
@@ -74,6 +80,19 @@ func (m *ASTManager) allocInfo() (uint32, uint32, error) {
 func (m *ASTManager) infoParameter(r *astInfoRecord, i uint32) (ASTParameter, error) {
 	if i >= r.count {
 		return ASTParameter{}, ErrASTDomain
+	}
+	if r.capacity == math.MaxUint32 {
+		if !m.formatLexical.active {
+			return ASTParameter{}, ErrASTHandle
+		}
+		if m.formatLexical.borrowed != nil {
+			return m.formatLexical.borrowed[i], nil
+		}
+		index := uint32(0)
+		if m.formatLexical.localPair {
+			index = i
+		}
+		return ASTParameter{m.origin, math.MaxUint32 - 1, m.formatLexical.epoch*2 + index}, nil
 	}
 	s, e := m.vectorWord(r.parameters, 8+i*8)
 	if e != nil {

@@ -56,6 +56,10 @@ func (s *RationalService) CloseChecked() error {
 		s.cleanupCause = nil
 		return nil
 	}
+	if e := s.cleanupLexicalInvocations(); e != nil {
+		s.cleanupCause = e
+		return s
+	}
 	if e := s.lexical.cleanup(s.manager.z); e != nil {
 		s.cleanupCause = e
 		return s

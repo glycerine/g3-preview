@@ -4,6 +4,7 @@ package g3
 
 import (
 	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
 	"github.com/glycerine/g3/golang/utilhash"
 	"math"
 	"strconv"
@@ -13,21 +14,22 @@ import (
 // prepare-before-duplicate, hash-prefix/CString region allocation and publication.
 // A nil slice denotes an empty CString; use Symbol{} for the null constructor.
 func (m *SymbolManager) InternBytes(text []byte) (Symbol, error) {
+	return m.internCStringSource(utilhash.BorrowBytesCString(text))
+}
+func (m *SymbolManager) InternRuntimeCString(r *memory.Runtime, b memory.Block, offset, extent uint64) (Symbol, error) {
+	return m.internCStringSource(utilhash.BorrowRuntimeCString(r, b, offset, extent))
+}
+func (m *SymbolManager) internCStringSource(text utilhash.CStringByteSource) (Symbol, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	if m.closed {
 		return Symbol{}, arena.ErrClosed
 	}
-	for i, b := range text {
-		if b == 0 {
-			text = text[:i]
-			break
-		}
+	length, e := text.Length()
+	if e != nil {
+		return Symbol{}, e
 	}
-	if uint64(len(text)) > math.MaxUint32 {
-		return Symbol{}, arena.ErrBounds
-	}
-	entry, found, e := m.table.PrepareFindCStringBytes(text)
+	entry, found, e := m.table.PrepareFindCStringByteSource(text)
 	if e != nil {
 		return Symbol{}, e
 	}
@@ -38,7 +40,7 @@ func (m *SymbolManager) InternBytes(text []byte) (Symbol, error) {
 		}
 		return m.symbol(k), nil
 	}
-	wide := uint64(len(text)) + 1 + uint64(m.pointerWidth)
+	wide := uint64(length) + 1 + uint64(m.pointerWidth)
 	if wide > math.MaxUint32 {
 		return Symbol{}, arena.ErrBounds
 	}
@@ -46,7 +48,7 @@ func (m *SymbolManager) InternBytes(text []byte) (Symbol, error) {
 	if e != nil {
 		return Symbol{}, e
 	}
-	hash, e := utilhash.CStringBytesHash(text)
+	hash, e := text.Hash()
 	if e != nil {
 		return Symbol{}, e
 	}
@@ -59,12 +61,16 @@ func (m *SymbolManager) InternBytes(text []byte) (Symbol, error) {
 			return Symbol{}, e
 		}
 	}
-	for i, v := range text {
-		if e = m.region.Write(r, m.pointerWidth+uint32(i), v); e != nil {
+	for i := uint32(0); i < length; i++ {
+		v, re := text.Byte(uint64(i))
+		if re != nil {
+			return Symbol{}, re
+		}
+		if e = m.region.Write(r, m.pointerWidth+i, v); e != nil {
 			return Symbol{}, e
 		}
 	}
-	if e = m.region.Write(r, m.pointerWidth+uint32(len(text)), 0); e != nil {
+	if e = m.region.Write(r, m.pointerWidth+length, 0); e != nil {
 		return Symbol{}, e
 	}
 	k, e := m.table.CString(r, m.pointerWidth)

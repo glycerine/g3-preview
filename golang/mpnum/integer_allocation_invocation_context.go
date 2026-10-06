@@ -6,6 +6,8 @@ package mpnum
 // Explicit passed invocation identity. It carries no allocation snapshot and
 // creates no source numeral, reservation, or ambient callback owner hook.
 type integerAllocationInvocationContext struct {
+	rationalService              *RationalServiceInvocation
+	rationalServiceInvocation    uint64
 	integerEvaluation            *upolyIntegerEvaluationScope
 	integerEvaluationInvocation  uint64
 	mpfFormattedSet              *arbitraryFloatFormattedSetScope
@@ -133,6 +135,9 @@ func pnAllocationContext(pn *integerPNormalizeScope) integerAllocationInvocation
 	return c
 }
 func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomialNumericRoots {
+	if c.rationalService != nil && c.rationalServiceFrame(m) == nil {
+		return nil
+	}
 	if c.integerEvaluation != nil && c.integerEvaluationFrame(m) == nil {
 		return nil
 	}
@@ -248,6 +253,9 @@ func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomial
 			return m.rawAllocationRoots(r)
 		}
 		return nil
+	}
+	if c.rationalService != nil {
+		return &c.rationalService.numeric
 	}
 	if c.mpfConversion != nil {
 		if c.mpfConversionOutput {

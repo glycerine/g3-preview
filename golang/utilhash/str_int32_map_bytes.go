@@ -7,17 +7,17 @@
 // of the existing concrete source string table.
 package utilhash
 
-import "github.com/glycerine/g3/golang/arena"
-
 func (h *StrInt32Map) FindCStringBytes(s []byte) (StrInt32MapEntryRef, bool, error) {
+	return h.FindCStringByteSource(BorrowBytesCString(s))
+}
+func (h *StrInt32Map) FindCStringByteSource(s CStringByteSource) (StrInt32MapEntryRef, bool, error) {
 	if e := h.open(); e != nil {
 		return StrInt32MapEntryRef{}, false, e
 	}
-	s = strQueryBytesPrefix(s)
-	if uint64(len(s)) > uint64(^uint32(0)) {
-		return StrInt32MapEntryRef{}, false, arena.ErrBounds
+	hash, e := s.Hash()
+	if e != nil {
+		return StrInt32MapEntryRef{}, false, e
 	}
-	hash := strQueryBytesHash(s, 17)
 	capacity, e := h.capacityChecked()
 	if e != nil {
 		return StrInt32MapEntryRef{}, false, e
@@ -51,7 +51,7 @@ func (h *StrInt32Map) FindCStringBytes(s []byte) (StrInt32MapEntryRef, bool, err
 			if e != nil {
 				return StrInt32MapEntryRef{}, false, e
 			}
-			equal, e := strKeyEqualBytes(region, entry.key, s)
+			equal, e := strKeyEqualByteSource(region, entry.key, s)
 			if e != nil {
 				return StrInt32MapEntryRef{}, false, e
 			}
@@ -78,10 +78,13 @@ func (h *StrInt32Map) FindCStringBytes(s []byte) (StrInt32MapEntryRef, bool, err
 	return StrInt32MapEntryRef{}, false, nil
 }
 func (h *StrInt32Map) PrepareFindCStringBytes(s []byte) (StrInt32MapEntryRef, bool, error) {
+	return h.PrepareFindCStringByteSource(BorrowBytesCString(s))
+}
+func (h *StrInt32Map) PrepareFindCStringByteSource(s CStringByteSource) (StrInt32MapEntryRef, bool, error) {
 	if e := h.prepareInsert(); e != nil {
 		return StrInt32MapEntryRef{}, false, e
 	}
-	r, found, e := h.FindCStringBytes(s)
+	r, found, e := h.FindCStringByteSource(s)
 	if e != nil || found {
 		return r, found, e
 	}

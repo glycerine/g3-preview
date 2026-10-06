@@ -192,16 +192,19 @@ func (m *RationalManager) Swap(a, b *Rational) error {
 	return m.z.Swap(&a.den, &b.den)
 }
 func (m *RationalManager) Copy(dst, src *Rational) error {
+	return m.copyWithAllocationContext(dst, src, integerAllocationInvocationContext{})
+}
+func (m *RationalManager) copyWithAllocationContext(dst, src *Rational, context integerAllocationInvocationContext) error {
 	if e := m.checkScalarValue(dst); e != nil {
 		return e
 	}
 	if e := m.checkScalarValue(src); e != nil {
 		return e
 	}
-	if e := m.z.Copy(&dst.num, &src.num); e != nil {
+	if e := m.z.copyFromOwnerWithAllocationContext(&dst.num, m.z, &src.num, nil, context); e != nil {
 		return e
 	}
-	return m.z.Copy(&dst.den, &src.den)
+	return m.z.copyFromOwnerWithAllocationContext(&dst.den, m.z, &src.den, nil, context)
 }
 
 // checkSetter authorizes explicit initialization/reinitialization, including
@@ -245,10 +248,13 @@ func (m *RationalManager) SetUint32(a *Rational, n uint32) error {
 	return m.resetDenominator(a)
 }
 func (m *RationalManager) SetInt64(a *Rational, n int64) error {
+	return m.setInt64WithAllocationContext(a, n, integerAllocationInvocationContext{})
+}
+func (m *RationalManager) setInt64WithAllocationContext(a *Rational, n int64, context integerAllocationInvocationContext) error {
 	if e := m.checkSetter(a); e != nil {
 		return e
 	}
-	if e := m.z.SetInt64(&a.num, n); e != nil {
+	if e := m.z.setInt64WithAllocationContext(&a.num, n, context); e != nil {
 		return e
 	}
 	return m.resetDenominator(a)
@@ -340,6 +346,9 @@ func (m *RationalManager) normalizeWithAllocationContext(a *Rational, context in
 			return e
 		}
 		r.normGeneration = generation
+		if c := context.rationalServiceFrame(m.z); c != nil {
+			c.normGeneration = generation
+		}
 		r.norm = Int{}
 		r.normActive = true
 		r.normEnd = false
@@ -481,6 +490,9 @@ func (m *RationalManager) Compare(a, b *Rational) (_rawValue int, _rawErr error)
 func (m *RationalManager) Add(a, b, out *Rational) error { return m.addSub(a, b, out, false) }
 func (m *RationalManager) Sub(a, b, out *Rational) error { return m.addSub(a, b, out, true) }
 func (m *RationalManager) addSub(a, b, out *Rational, subtract bool) (_rawErr error) {
+	return m.addSubWithAllocationContext(a, b, out, subtract, integerAllocationInvocationContext{})
+}
+func (m *RationalManager) addSubWithAllocationContext(a, b, out *Rational, subtract bool, context integerAllocationInvocationContext) (_rawErr error) {
 	for _, n := range []*Rational{a, b, out} {
 		if e := m.checkScalarValue(n); e != nil {
 			return e
@@ -489,9 +501,9 @@ func (m *RationalManager) addSub(a, b, out *Rational, subtract bool) (_rawErr er
 	if isIntegerRational(a) && isIntegerRational(b) {
 		var e error
 		if subtract {
-			e = m.z.Sub(&a.num, &b.num, &out.num)
+			e = m.z.addSubWithAllocationContext(&a.num, &b.num, &out.num, true, context)
 		} else {
-			e = m.z.Add(&a.num, &b.num, &out.num)
+			e = m.z.addSubWithAllocationContext(&a.num, &b.num, &out.num, false, context)
 		}
 		if e != nil {
 			return e
@@ -512,6 +524,9 @@ func (m *RationalManager) addSub(a, b, out *Rational, subtract bool) (_rawErr er
 			return e
 		}
 		r.addGeneration = generation
+		if c := context.rationalServiceFrame(m.z); c != nil {
+			c.addGeneration = generation
+		}
 		r.addOne = Int{}
 		r.addTwo = Int{}
 		r.addActive = true
@@ -522,25 +537,25 @@ func (m *RationalManager) addSub(a, b, out *Rational, subtract bool) (_rawErr er
 		one, two = &r.addOne, &r.addTwo
 		defer m.finishRawAdd(&_rawErr)
 	}
-	if e := m.z.Mul(&a.num, &b.den, one); e != nil {
+	if e := m.z.mulWithAllocationContext(&a.num, &b.den, one, context); e != nil {
 		return e
 	}
-	if e := m.z.Mul(&b.num, &a.den, two); e != nil {
+	if e := m.z.mulWithAllocationContext(&b.num, &a.den, two, context); e != nil {
 		return e
 	}
-	if e := m.z.Mul(&a.den, &b.den, &out.den); e != nil {
+	if e := m.z.mulWithAllocationContext(&a.den, &b.den, &out.den, context); e != nil {
 		return e
 	}
 	var e error
 	if subtract {
-		e = m.z.Sub(one, two, &out.num)
+		e = m.z.addSubWithAllocationContext(one, two, &out.num, true, context)
 	} else {
-		e = m.z.Add(one, two, &out.num)
+		e = m.z.addSubWithAllocationContext(one, two, &out.num, false, context)
 	}
 	if e != nil {
 		return e
 	}
-	if e = m.normalize(out); e != nil {
+	if e = m.normalizeWithAllocationContext(out, context); e != nil {
 		return e
 	}
 	if m.synchronized {
@@ -549,6 +564,9 @@ func (m *RationalManager) addSub(a, b, out *Rational, subtract bool) (_rawErr er
 	return nil
 }
 func (m *RationalManager) Mul(a, b, out *Rational) error {
+	return m.mulWithAllocationContext(a, b, out, integerAllocationInvocationContext{})
+}
+func (m *RationalManager) mulWithAllocationContext(a, b, out *Rational, context integerAllocationInvocationContext) error {
 	for _, n := range []*Rational{a, b, out} {
 		if e := m.checkScalarValue(n); e != nil {
 			return e
@@ -565,16 +583,16 @@ func (m *RationalManager) Mul(a, b, out *Rational) error {
 			return e
 		}
 	}
-	if e := m.z.Mul(&a.num, &b.num, &out.num); e != nil {
+	if e := m.z.mulWithAllocationContext(&a.num, &b.num, &out.num, context); e != nil {
 		return e
 	}
 	if integers {
 		return m.resetDenominator(out)
 	}
-	if e := m.z.Mul(&a.den, &b.den, &out.den); e != nil {
+	if e := m.z.mulWithAllocationContext(&a.den, &b.den, &out.den, context); e != nil {
 		return e
 	}
-	return m.normalize(out)
+	return m.normalizeWithAllocationContext(out, context)
 }
 
 // Div preserves the actual divisor/destination branch and component order.

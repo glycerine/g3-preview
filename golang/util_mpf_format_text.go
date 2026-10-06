@@ -105,6 +105,11 @@ func (s *mpfFormatStream) Close() error { return s.SourceFinalize() }
 // Source ss.str constructs a separate length-based string, preserving embedded
 // NUL bytes. It does not use CString construction or a Go string snapshot.
 func (t *ArbitraryFloatFormatText) captureStreamTemporary(s *NumericTextStream) error {
+	return captureNumericStreamOwnedString(&t.temporary, s, t.budget)
+}
+
+// Same actual ss.str() owned-string constructor, used by numerical callers.
+func captureNumericStreamOwnedString(q *qiOwnedString, s *NumericTextStream, b *arena.Budget) error {
 	if e := s.lock(); e != nil {
 		return e
 	}
@@ -112,18 +117,17 @@ func (t *ArbitraryFloatFormatText) captureStreamTemporary(s *NumericTextStream) 
 	if s.fileMode || s.buffer == nil {
 		return ErrNumericStreamFile
 	}
-	q := &t.temporary
 	if q.self != nil && !q.closed && (q.ready || len(q.external) != 0 || len(q.pending) != 0) {
 		return ErrParamsPrecondition
 	}
-	*q = qiOwnedString{budget: t.budget, capacity: 15, generation: 1}
+	*q = qiOwnedString{budget: b, capacity: 15, generation: 1}
 	q.self = q
 	n := s.buffer.state.pos
 	if n > 15 {
 		if n >= uint64(^uint(0)>>1) {
 			return arena.ErrBounds
 		}
-		if e := t.budget.Reserve(n + 1); e != nil {
+		if e := b.Reserve(n + 1); e != nil {
 			return e
 		}
 		q.external = make([]byte, int(n+1))

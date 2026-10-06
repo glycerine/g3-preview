@@ -239,6 +239,9 @@ func (m *RationalManager) integerOperands(a, b *Rational) error {
 	return nil
 }
 func (m *RationalManager) integerOp(a, b *Rational, out *Int, operation uint8) error {
+	return m.integerOpWithAllocationContext(a, b, out, operation, integerAllocationInvocationContext{})
+}
+func (m *RationalManager) integerOpWithAllocationContext(a, b *Rational, out *Int, operation uint8, context integerAllocationInvocationContext) error {
 	if e := m.check(a); e != nil {
 		return e
 	}
@@ -252,20 +255,23 @@ func (m *RationalManager) integerOp(a, b *Rational, out *Int, operation uint8) e
 	// alias quirks for Euclidean division and modulus.
 	switch operation {
 	case qIntegerDiv:
-		return m.z.Div(&a.num, &b.num, out)
+		return m.z.divWithAllocationContext(&a.num, &b.num, out, context)
 	case qIntegerMachineDiv:
-		return m.z.MachineDiv(&a.num, &b.num, out)
+		return m.z.machineDivWithAllocationContext(&a.num, &b.num, out, context)
 	case qIntegerRem:
-		return m.z.Rem(&a.num, &b.num, out)
+		return m.z.remWithAllocationContext(&a.num, &b.num, out, context)
 	default:
-		return m.z.Mod(&a.num, &b.num, out)
+		return m.z.modWithAllocationContext(&a.num, &b.num, out, context)
 	}
 }
 func (m *RationalManager) integerOpRational(a, b, out *Rational, operation uint8) error {
+	return m.integerOpRationalWithAllocationContext(a, b, out, operation, integerAllocationInvocationContext{})
+}
+func (m *RationalManager) integerOpRationalWithAllocationContext(a, b, out *Rational, operation uint8, context integerAllocationInvocationContext) error {
 	if e := m.check(out); e != nil {
 		return e
 	}
-	if e := m.integerOp(a, b, &out.num, operation); e != nil {
+	if e := m.integerOpWithAllocationContext(a, b, &out.num, operation, context); e != nil {
 		return e
 	}
 	return m.resetDenominator(out)
@@ -280,7 +286,19 @@ func (m *RationalManager) Rem(a, b, out *Rational) error {
 	return m.integerOpRational(a, b, out, qIntegerRem)
 }
 func (m *RationalManager) Mod(a, b, out *Rational) error {
-	return m.integerOpRational(a, b, out, qIntegerMod)
+	return m.modWithAllocationContext(a, b, out, integerAllocationInvocationContext{})
+}
+func (m *RationalManager) modWithAllocationContext(a, b, out *Rational, context integerAllocationInvocationContext) error {
+	if e := m.check(out); e != nil {
+		return e
+	}
+	if e := m.integerOperands(a, b); e != nil {
+		return e
+	}
+	if e := m.z.modWithAllocationContext(&a.num, &b.num, &out.num, context); e != nil {
+		return e
+	}
+	return m.resetDenominator(out)
 }
 func (m *RationalManager) IDivToInt(a, b *Rational, out *Int) error {
 	return m.integerOp(a, b, out, qIntegerDiv)

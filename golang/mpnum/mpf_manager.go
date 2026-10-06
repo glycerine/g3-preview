@@ -120,7 +120,7 @@ func (m *ArbitraryFloatManager) SourceFinalize() error {
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
 	}
-	if m.formattedSet.executing || m.formattedSet.finishing || m.rationalConversion.executing || m.rationalConversion.finishing || m.valueExecuting || m.formatInvocationExecuting() || (m.integer != nil && m.integer.mpfBorrowedSourceCallbackActive()) {
+	if (m.integer != nil && m.integer.rationalServiceReadCallbackActive()) || m.formattedSet.executing || m.formattedSet.finishing || m.rationalConversion.executing || m.rationalConversion.finishing || m.valueExecuting || m.formatInvocationExecuting() || (m.integer != nil && m.integer.mpfBorrowedSourceCallbackActive()) {
 		return ErrPolynomialPending
 	}
 	// The caller-owned format context is a younger lexical scope. Query only
@@ -202,7 +202,7 @@ func (m *ArbitraryFloatManager) Close() error {
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
 	}
-	if m.formattedSet.executing || m.formattedSet.finishing || m.rationalConversion.executing || m.rationalConversion.finishing || m.valueExecuting || m.formatInvocationExecuting() || (m.integer != nil && m.integer.mpfBorrowedSourceCallbackActive()) {
+	if (m.integer != nil && m.integer.rationalServiceReadCallbackActive()) || m.formattedSet.executing || m.formattedSet.finishing || m.rationalConversion.executing || m.rationalConversion.finishing || m.valueExecuting || m.formatInvocationExecuting() || (m.integer != nil && m.integer.mpfBorrowedSourceCallbackActive()) {
 		return ErrPolynomialPending
 	}
 	// Registered diagnostic metadata is not ownership. Refuse only actual

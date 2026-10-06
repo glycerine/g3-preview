@@ -67,6 +67,9 @@ func (s *RationalService) facadeRawBinaryLocked(a, b, out *Rational, op rational
 	}
 }
 func (s *RationalService) facadeValueLocked(a, b *OwnedRational, op rationalFacadeBinaryOp) (_lexOut OwnedRational, _lexErr error) {
+	return s.facadeValueLockedWithInvocation(a, b, op, nil)
+}
+func (s *RationalService) facadeValueLockedWithInvocation(a, b *OwnedRational, op rationalFacadeBinaryOp, c *RationalServiceInvocation) (_lexOut OwnedRational, _lexErr error) {
 	if e := s.beginLexical(); e != nil {
 		return OwnedRational{}, e
 	}
@@ -80,20 +83,44 @@ func (s *RationalService) facadeValueLocked(a, b *OwnedRational, op rationalFaca
 	work := NewRational()
 	workComplete := !(op >= rationalFacadeAdd && op <= rationalFacadeDiv)
 	defer s.endLexicalLocal(&work, &workComplete)
+	defer func() {
+		if cause := c.childSource(); cause != nil {
+			if s.lexical.cause == nil {
+				s.lexical.cause = cause
+			}
+			_lexErr = errors.Join(_lexErr, cause)
+		}
+	}()
 	if op >= rationalFacadeAdd && op <= rationalFacadeDiv {
 		// return rational(a) op= b: copy before compound, then copy the returned
 		// lvalue into the value result. The second copy is intentionally observable.
-		if e := s.manager.Copy(&work, &a.raw); e != nil {
+		if e := s.manager.copyWithAllocationContext(&work, &a.raw, c.allocationContext()); e != nil {
 			return OwnedRational{}, e
 		}
 		workComplete = true
-		if e := s.facadeRawBinaryLocked(&work, &b.raw, &work, op); e != nil {
-			return OwnedRational{}, e
+		var body error
+		if c != nil && op == rationalFacadeAdd {
+			body = s.manager.addSubWithAllocationContext(&work, &b.raw, &work, false, c.allocationContext())
+		} else {
+			body = s.facadeRawBinaryLocked(&work, &b.raw, &work, op)
 		}
-		return s.copyOutput(&work)
+		if body != nil {
+			return OwnedRational{}, body
+		}
+		return s.copyOutputWithInvocation(&work, c)
 	}
-	if e := s.facadeRawBinaryLocked(&a.raw, &b.raw, &work, op); e != nil {
-		return OwnedRational{}, e
+	var body error
+	if c != nil && op == rationalFacadeMod {
+		body = s.manager.modWithAllocationContext(&a.raw, &b.raw, &work, c.allocationContext())
+	} else if c != nil && op == rationalFacadeRem {
+		body = s.manager.integerOpRationalWithAllocationContext(&a.raw, &b.raw, &work, qIntegerRem, c.allocationContext())
+	} else if c != nil && op == rationalFacadeIDiv {
+		body = s.manager.integerOpRationalWithAllocationContext(&a.raw, &b.raw, &work, qIntegerDiv, c.allocationContext())
+	} else {
+		body = s.facadeRawBinaryLocked(&a.raw, &b.raw, &work, op)
+	}
+	if body != nil {
+		return OwnedRational{}, body
 	}
 	return s.facadeTakeLocked(&work)
 }
@@ -114,6 +141,11 @@ func (s *RationalService) facadeValue(a, b *OwnedRational, op rationalFacadeBina
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
+	// Same actual held numerical invocation as PowerOfTwo: only a reached
+	// Runtime transport erases reentrant mutex acquisition. Ordinary callers
+	// continue to serialize on mu.
+	atomic.StoreUint32(&s.sourceRuntimeExecuting, 1)
+	defer atomic.StoreUint32(&s.sourceRuntimeExecuting, 0)
 	return s.facadeValueLocked(a, b, op)
 }
 func (s *RationalService) facadeAssign(a, b *OwnedRational, op rationalFacadeBinaryOp) error {
@@ -969,4 +1001,11 @@ func (s *RationalService) NumBits(a *OwnedRational) (_lexValue uint32, _lexErr e
 		}
 		count++
 	}
+}
+
+func (s *RationalService) LessEqualInt(a *OwnedRational, n int32) (bool, error) {
+	return s.facadeCompareInt(a, n, 3)
+}
+func (s *RationalService) GreaterEqualInt(a *OwnedRational, n int32) (bool, error) {
+	return s.facadeCompareInt(a, n, 4)
 }

@@ -138,6 +138,7 @@ func (s *RationalService) PublishAcquiredSourceManager(slot **RationalManager, m
 		return ErrRationalServiceOwner
 	}
 	s.manager = m
+	m.z.rationalServiceParent = s
 	*slot = m
 	s.initializationStage = 1
 	return nil

@@ -184,6 +184,7 @@ func (s *RationalService) beginLexical() error {
 	if s.lexical.depth == 255 {
 		return arena.ErrBounds
 	}
+	s.enterLexicalInvocation()
 	s.lexical.depth++
 	return nil
 }
@@ -199,7 +200,7 @@ func (s *RationalService) endLexicalError(e *error) {
 	if s.lexical.depth > 0 {
 		s.lexical.depth--
 	}
-	if s.lexical.depth == 0 && s.lexical.cause == nil {
+	if s.lexical.depth == 0 && s.lexical.cause == nil && s.lexicalExecuting == nil {
 		if next := s.lexical.cleanup(s.manager.z); next != nil && *e == nil {
 			*e = next
 		}

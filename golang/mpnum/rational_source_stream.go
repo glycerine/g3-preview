@@ -28,6 +28,7 @@ type RationalSourceStream interface {
 // NumeralCStringView borrows the exact completed lexical char buffer invocation.
 // It performs reached byte reads without building a host string or assembly.
 type NumeralCStringView struct {
+	caller            *RationalServiceInvocation
 	owner             *NaturalManager
 	invocation        uint64
 	character         *integerCharacterScope
@@ -36,6 +37,9 @@ type NumeralCStringView struct {
 
 func (v NumeralCStringView) Byte(i uint64) (byte, error) {
 	if v.owner == nil || v.owner.self != v.owner || v.owner.closed {
+		return 0, arena.ErrInvalidSlot
+	}
+	if v.caller != nil && (!v.caller.valid() || v.caller.integer.natural != v.owner || v.character != &v.caller.characters) {
 		return 0, arena.ErrInvalidSlot
 	}
 	s := &v.owner.charFormatting
@@ -55,6 +59,15 @@ func (s *RationalService) InsertInto(out RationalSourceStream, v *OwnedRational)
 	return s.InsertIntoTracked(out, v, nil)
 }
 func (s *RationalService) InsertIntoTracked(out RationalSourceStream, v *OwnedRational, receipt *NumeralInsertionReceipt) error {
+	return s.insertIntoWithInvocation(out, v, receipt, nil)
+}
+func (s *RationalService) InsertIntoWithInvocation(out RationalSourceStream, v *OwnedRational, caller *RationalServiceInvocation) error {
+	if caller == nil {
+		return arena.ErrInvalidSlot
+	}
+	return s.insertIntoWithInvocation(out, v, &caller.insertion, caller)
+}
+func (s *RationalService) insertIntoWithInvocation(out RationalSourceStream, v *OwnedRational, receipt *NumeralInsertionReceipt, caller *RationalServiceInvocation) (result error) {
 	if e := s.lock(); e != nil {
 		return e
 	}
@@ -64,10 +77,20 @@ func (s *RationalService) InsertIntoTracked(out RationalSourceStream, v *OwnedRa
 	if e := s.check(v); e != nil {
 		return e
 	}
+	if caller != nil && caller.self != nil {
+		return arena.ErrInvalidSlot
+	}
+	defer func() {
+		if caller != nil && caller.self == caller {
+			caller.executing = false
+			caller.bodyCause = result
+			caller.sourceCause = caller.insertion.sourceCause
+		}
+	}()
 	if out == nil {
 		return arena.ErrConfig
 	}
-	if e := s.manager.z.insertSourceIntegerTracked(out, &v.raw.num, s, receipt); e != nil {
+	if e := s.manager.z.insertSourceIntegerWithInvocation(out, &v.raw.num, s, receipt, caller); e != nil {
 		return e
 	}
 	if isIntegerRational(&v.raw) {
@@ -76,7 +99,7 @@ func (s *RationalService) InsertIntoTracked(out RationalSourceStream, v *OwnedRa
 	if e := out.AppendCString("/"); e != nil {
 		return e
 	}
-	return s.manager.z.insertSourceIntegerTracked(out, &v.raw.den, s, receipt)
+	return s.manager.z.insertSourceIntegerWithInvocation(out, &v.raw.den, s, receipt, caller)
 }
 func (m *IntegerManager) insertSourceInteger(out RationalSourceStream, a *Int) error {
 	return m.insertSourceIntegerTracked(out, a, nil, nil)
@@ -85,6 +108,12 @@ func (m *IntegerManager) insertSourceIntegerTracked(out RationalSourceStream, a 
 	return m.insertSourceIntegerTrackedWithDisplay(out, a, service, receipt, nil)
 }
 func (m *IntegerManager) insertSourceIntegerTrackedWithDisplay(out RationalSourceStream, a *Int, service *RationalService, receipt *NumeralInsertionReceipt, display *upolyDisplayScope) (result error) {
+	return m.insertSourceIntegerTrackedWithContexts(out, a, service, receipt, display, nil)
+}
+func (m *IntegerManager) insertSourceIntegerWithInvocation(out RationalSourceStream, a *Int, service *RationalService, receipt *NumeralInsertionReceipt, caller *RationalServiceInvocation) (result error) {
+	return m.insertSourceIntegerTrackedWithContexts(out, a, service, receipt, nil, caller)
+}
+func (m *IntegerManager) insertSourceIntegerTrackedWithContexts(out RationalSourceStream, a *Int, service *RationalService, receipt *NumeralInsertionReceipt, display *upolyDisplayScope, caller *RationalServiceInvocation) (result error) {
 	if e := m.check(a); e != nil {
 		return e
 	}
@@ -106,11 +135,28 @@ func (m *IntegerManager) insertSourceIntegerTrackedWithDisplay(out RationalSourc
 	if display != nil {
 		characters = &display.characters
 	}
+	if caller != nil {
+		if caller.self == nil {
+			if e = service.prepareLexicalInvocation(caller); e != nil {
+				return e
+			}
+			service.enterLexicalInvocation()
+			service.lexicalExecuting = nil
+		}
+		if !caller.valid() || !caller.executing || caller.integer != m || display != nil {
+			return arena.ErrInvalidSlot
+		}
+		characters = &caller.characters
+	}
 	if receipt != nil && receipt.active {
 		return arena.ErrInvalidSlot
 	}
 	previousInvocation := characters.invocation
-	e = n.beginIntegerCharactersForInsertion(uint32(11*size), service, receipt, display)
+	if caller != nil {
+		e = n.beginIntegerCharactersWithCaller(uint32(11*size), service, receipt, characters, caller)
+	} else {
+		e = n.beginIntegerCharactersForInsertion(uint32(11*size), service, receipt, display)
+	}
 	if characters.invocation != previousInvocation && characters.callExecuting {
 		defer n.endIntegerCharacterCall(characters)
 	}
@@ -140,7 +186,7 @@ func (m *IntegerManager) insertSourceIntegerTrackedWithDisplay(out RationalSourc
 	}()
 	e = n.sourceToCStringScopedTracked(limbView{allocator: m.allocator, backing: c.backing, size: size}, sourceDecimalDestination{character: &characters.buffer, assembly: n}, uint64(characters.buffer.pos), characters.formatting, receipt)
 	if e == nil {
-		e = out.AppendNumeralCString(NumeralCStringView{owner: n, invocation: characters.invocation, character: characters, displayInvocation: characters.displayInvocation})
+		e = out.AppendNumeralCString(NumeralCStringView{owner: n, invocation: characters.invocation, character: characters, displayInvocation: characters.displayInvocation, caller: caller})
 	}
 	if e != nil && characters.originalCause == nil {
 		characters.originalCause = e

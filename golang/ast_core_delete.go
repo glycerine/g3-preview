@@ -151,7 +151,15 @@ func (m *ASTManager) deleteNode(first astNodeRef) error {
 					_, e = m.decNode(v.ast)
 					note(e)
 				}
-				// All five source eager plugins inherit actual default external del(),
+				if v.kind == ASTParameterExternal && info.family >= 0 && m.pluginAt(info.family).kind == astFloatingPointPlugin && m.pluginAt(info.family).present {
+					if m.floatingPointPlugin == nil || m.floatingPointPlugin.family != info.family {
+						return ErrASTHandle
+					}
+					if e = m.floatingPointPlugin.recycledValueID(v.external); e != nil {
+						return e
+					}
+				}
+				// The original eager plugins inherit default external del(),
 				// which has no action. A cleared registry also has no callback.
 				n = m.nodeAt(current.slot)
 				n.deleteIndex++

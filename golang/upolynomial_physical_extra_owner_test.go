@@ -90,6 +90,16 @@ func upolyPhysicalExtraNumerals(extras []upolyPhysicalExtraOwners, addInt func(r
 					}
 				}
 			}
+			for f := owner.arrayCardinality; f != nil; f = f.next {
+				if f.self != f || f.owner != owner || f.invocation == 0 {
+					panic(ErrASTHandle)
+				}
+				for i, owned := range f.acquired {
+					if owned {
+						addRat(reflect.ValueOf(&f.values[i]).Elem().FieldByName("raw"))
+					}
+				}
+			}
 			if owner.lowLevel.active && owner.lowLevel.numeralAcquired {
 				addRat(reflect.ValueOf(&owner.lowLevel.numeral).Elem().FieldByName("raw"))
 			}

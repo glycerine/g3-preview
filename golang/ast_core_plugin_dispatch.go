@@ -1,3 +1,5 @@
+// Source: src/ast/ast.cpp:1568-1638; src/ast/ast.h:1323-1402.
+// Source author: Leonardo de Moura.
 // Licensed under the MIT license.
 package g3
 
@@ -8,7 +10,7 @@ import (
 )
 
 func (m *ASTManager) mkFamilyApp(fid FamilyID, k int32, ps []ASTParameter, args []ASTHandle) (astNodeRef, error) {
-	if fid < 0 || fid >= 5 || !m.plugins[fid].present {
+	if fid < 0 || !m.pluginAt(fid).present {
 		return astNodeRef{}, nil
 	}
 	if uint64(len(args)) > math.MaxUint32 {
@@ -161,6 +163,8 @@ func (m *ASTManager) mkFamilyApp(fid FamilyID, k int32, ps []ASTParameter, args 
 	var e error
 	if fid == 0 {
 		decl, e = m.basicDecl(k, ps, domain)
+	} else if m.pluginAt(fid).kind == astFormatPlugin {
+		decl, e = m.formatDecl(k, ps, domain)
 	} else {
 		decl, e = m.builtinDecl(fid, k, ps, domain)
 	}
@@ -184,7 +188,7 @@ func (m *ASTManager) MkFamilyFuncDecl(fid FamilyID, k int32, ps []ASTParameter, 
 		return ASTHandle{}, e
 	}
 	defer m.mu.Unlock()
-	if fid < 0 || fid >= 5 || !m.plugins[fid].present {
+	if fid < 0 || !m.pluginAt(fid).present {
 		return ASTHandle{}, nil
 	}
 	if uint64(len(domain)) > math.MaxUint32 {
@@ -194,6 +198,8 @@ func (m *ASTManager) MkFamilyFuncDecl(fid FamilyID, k int32, ps []ASTParameter, 
 	var e error
 	if fid == 0 {
 		r, e = m.basicDecl(k, ps, domain)
+	} else if m.pluginAt(fid).kind == astFormatPlugin {
+		r, e = m.formatDecl(k, ps, domain)
 	} else {
 		r, e = m.builtinDecl(fid, k, ps, domain)
 	}
@@ -205,11 +211,55 @@ func (m *ASTManager) MkFamilySort(fid FamilyID, k int32, ps []ASTParameter) (AST
 		return ASTHandle{}, e
 	}
 	defer m.mu.Unlock()
-	if fid < 0 || fid >= 5 || !m.plugins[fid].present {
+	if fid < 0 || !m.pluginAt(fid).present {
 		return ASTHandle{}, nil
 	}
 	var r astNodeRef
 	var e error
+	if m.pluginAt(fid).kind == astFormatPlugin {
+		if astSourceDebug && k != 0 {
+			return ASTHandle{}, ErrASTDomain
+		}
+		return m.external(m.formatPlugin.sort), nil
+	}
+
+	if m.pluginAt(fid).kind == astFloatingPointPlugin {
+		m.formatExecuting = true
+		defer func() { m.formatExecuting = false }()
+		r, e = m.floatingPointSort(k, ps)
+		return m.external(r), e
+	}
+	if m.pluginAt(fid).kind == astSequencePlugin {
+		m.formatExecuting = true
+		defer func() { m.formatExecuting = false }()
+		if e = m.initializeSequence(m.sequencePlugin); e != nil {
+			return ASTHandle{}, e
+		}
+		var param *astParameterRecord
+		if k != 2 {
+			if len(ps) != 1 {
+				return ASTHandle{}, ErrASTDomain
+			}
+			param, e = m.parameter(ps[0])
+			if e != nil {
+				return ASTHandle{}, e
+			}
+		}
+		r, e = m.sequenceSort(m.sequencePlugin, k, param)
+		return m.external(r), e
+	}
+	if m.pluginAt(fid).kind == astArrayPlugin {
+		m.formatExecuting = true
+		defer func() { m.formatExecuting = false }()
+		r, e = m.arraySort(k, ps)
+		return m.external(r), e
+	}
+	if m.pluginAt(fid).kind == astArithmeticPlugin {
+		if k == 0 || k == 1 {
+			return m.external(m.arithmeticPlugin.fields[k]), nil
+		}
+		return ASTHandle{}, nil
+	}
 	switch fid {
 	case 0:
 		if k == 0 {

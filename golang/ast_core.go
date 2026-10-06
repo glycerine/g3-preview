@@ -140,7 +140,9 @@ func (m *ASTManager) initManager(oom func() bool) error {
 			return e
 		}
 	}
-	m.plugins[0] = astPluginBinding{kind: astBasicPlugin, present: true}
+	if e := m.setPlugin(0, astBasicPlugin); e != nil {
+		return e
+	}
 	if e := m.initBasic(); e != nil {
 		return e
 	}
@@ -173,13 +175,21 @@ func (m *ASTManager) initManager(oom func() bool) error {
 	if e != nil {
 		return e
 	}
-	m.plugins[1] = astPluginBinding{astLabelPlugin, true}
-	m.plugins[2] = astPluginBinding{astPatternPlugin, true}
-	m.plugins[3] = astPluginBinding{astModelValuePlugin, true}
+	if e := m.setPlugin(1, astLabelPlugin); e != nil {
+		return e
+	}
+	if e := m.setPlugin(2, astPatternPlugin); e != nil {
+		return e
+	}
+	if e := m.setPlugin(3, astModelValuePlugin); e != nil {
+		return e
+	}
 	if e = m.builtin.userTable.init(m.symbols, m.budget, oom); e != nil {
 		return e
 	}
-	m.plugins[4] = astPluginBinding{astUserSortPlugin, true}
+	if e := m.setPlugin(4, astUserSortPlugin); e != nil {
+		return e
+	}
 	m.trueApp, e = m.mkFamilyApp(0, ASTOpTrue, nil, nil)
 	if e != nil {
 		return e
@@ -197,7 +207,7 @@ func (m *ASTManager) Close() error {
 	if m == nil || m.self != m {
 		return ErrASTHandle
 	}
-	if m.traceExecuting {
+	if m.traceExecuting || m.formatExecuting {
 		return ErrASTPending
 	}
 	m.mu.Lock()
@@ -221,6 +231,11 @@ func (m *ASTManager) Close() error {
 	return e
 }
 func (m *ASTManager) closeCore(source bool) error {
+	if !source {
+		if e := m.cleanupArrayCardinality(); e != nil {
+			return e
+		}
+	}
 	if e := m.llFrameDestroy(!source); e != nil {
 		return e
 	}
@@ -250,11 +265,46 @@ func (m *ASTManager) closeCore(source bool) error {
 			}
 		}
 	}
-	if m.plugins[0].present {
-		note(m.finalizeBasic())
-		if source && failure != nil {
-			return failure
+	// Source finalizes concrete registered plugins in ascending registry order.
+	if len(m.plugins.words) != 0 {
+		for id := uint32(0); id < m.plugins.words[1]; id++ {
+			p := m.pluginAt(FamilyID(id))
+			if !p.present {
+				continue
+			}
+			var e error
+			switch p.kind {
+			case astBasicPlugin:
+				e = m.finalizeBasic()
+			case astFormatPlugin:
+				e = m.finalizeFormatPlugin()
+			case astArithmeticPlugin:
+				e = m.finalizeArithmeticPlugin()
+			case astBitVectorPlugin:
+				e = m.finalizeBitVectorPlugin()
+			case astFloatingPointPlugin:
+				e = m.finalizeFloatingPointPlugin()
+				if e == nil {
+					e = m.destroyFloatingPointMembers(!source)
+				}
+			case astDatatypePlugin:
+				e = m.finalizeDatatypePlugin()
+			case astSequencePlugin:
+				e = m.finalizeSequencePlugin()
+			}
+			note(e)
+			if source && failure != nil {
+				return failure
+			}
 		}
+	}
+	if !source {
+		if e := m.cleanupBitVectorPower(); e != nil {
+			return e
+		}
+	}
+	if e := m.destroyFloatingPointMembers(!source); e != nil {
+		return e
 	}
 	m.destroyPluginBacking()
 	// The source manager collects every physical table root after plugins are
@@ -465,6 +515,8 @@ func (m *ASTManager) closeCore(source bool) error {
 	}
 	if m.allocator != nil {
 		m.allocator.Close()
+		m.endSequenceContexts()
+		m.ppContextEnded()
 		m.allocator = nil
 	}
 	if source {
@@ -474,9 +526,18 @@ func (m *ASTManager) closeCore(source bool) error {
 	}
 	m.releaseTraceAcquisitionHistory()
 	m.releaseExprVisitHistory()
+	if !source {
+		if e := m.releasePPFrames(); e != nil {
+			return e
+		}
+	}
 	m.releasePages()
 	m.closed = true
 	m.closing = false
+	m.releaseFloatingPointHistory()
+	m.releaseAuxiliaryPluginHistory()
+	m.releaseDatatypePluginHistory()
+	m.releaseArrayCardinalityHistory()
 	m.budget.Release(m.ownerBytes)
 	m.ownerBytes = 0
 	return failure

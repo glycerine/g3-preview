@@ -92,6 +92,23 @@ func (m *IntegerManager) SourceFinalize() error {
 }
 
 func (m *IntegerManager) markSourceFreedPools() error {
+	if parent := m.rationalServiceParent; parent != nil {
+		if parent.self != parent {
+			return ErrPolynomialOwner
+		}
+		for c := parent.lexicalInvocations; c != nil; c = c.next {
+			if !c.valid() {
+				return ErrPolynomialOwner
+			}
+			if c.integer != m {
+				continue
+			}
+			if e := m.markSourceConsumedDetachedCell(&c.numeric.cell, &c.cellRetired); e != nil {
+				return e
+			}
+		}
+	}
+
 	if parent := m.mpfParent; parent != nil && parent.self == parent && parent.integer == m {
 		for _, s := range []*arbitraryFloatRoundScope{&parent.roundScope, &parent.roundSqrtScope} {
 			if s.manager == parent && s.invocation != 0 {

@@ -7,7 +7,7 @@ func (m *ASTManager) SourceFinalize() error {
 	if m == nil || m.self != m {
 		return ErrASTHandle
 	}
-	if m.traceExecuting {
+	if m.traceExecuting || m.formatExecuting {
 		return ErrASTPending
 	}
 	m.mu.Lock()
@@ -73,6 +73,28 @@ func (m *ASTManager) closeSourceOwnedStorageCore() error {
 	}
 	m.releaseTraceAcquisitionHistory()
 	m.releaseExprVisitHistory()
+	m.releaseFormatPluginHeaders()
+	if e := m.cleanupBitVectorPower(); e != nil {
+		return e
+	}
+	m.releaseSequencePluginHeaders()
+	m.releaseArrayPluginHeaders()
+	m.releaseArithmeticPluginHeaders()
+	m.releaseBitVectorPluginHeaders()
+	m.releaseFormatFrames()
+	if e := m.releasePPFrames(); e != nil {
+		return e
+	}
+	if e := m.cleanupArrayCardinality(); e != nil {
+		return e
+	}
+	m.releaseArrayCardinalityHistory()
+	if e := m.destroyFloatingPointMembers(true); e != nil {
+		return stop(e)
+	}
+	m.releaseFloatingPointHistory()
+	m.releaseAuxiliaryPluginHistory()
+	m.releaseDatatypePluginHistory()
 	m.releasePages()
 	m.budget.Release(m.ownerBytes)
 	m.ownerBytes = 0
