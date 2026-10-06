@@ -26,6 +26,7 @@ type UPolynomialConfig struct {
 // are required, even though operations without a checkpoint do not call them.
 // Cold ownership and every actual typed backing are charged to Integer's budget.
 type UPolynomialManager struct {
+	preparationCaller      *upolyFactorPreparationScope
 	henselPairCaller       *upolyHenselPairScope
 	henselCallerGuard      *upolyHenselCallerScope
 	henselCallerInvocation uint64

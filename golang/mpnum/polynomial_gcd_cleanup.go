@@ -196,7 +196,7 @@ func (m *MultivariatePolynomialManager) cleanupGCDScopes(scopes []*polynomialGCD
 		if s.active {
 			h := s.header
 			// Retain captured diagnostic causes only; the next guarded begin resets them.
-			*s = polynomialGCDFunctionScope{header: h, invocation: s.invocation, bodyCause: s.bodyCause, cleanupCause: s.cleanupCause, resultantPower: s.resultantPower, resultantPseudo: s.resultantPseudo, resultantArithmetic: s.resultantArithmetic, resultantCoefficient: s.resultantCoefficient, resultantAppend: s.resultantAppend, resultantFactory: s.resultantFactory, resultantNeg: s.resultantNeg}
+			*s = polynomialGCDFunctionScope{header: h, invocation: s.invocation, bodyCause: s.bodyCause, cleanupCause: s.cleanupCause, normalizeInvocation: s.normalizeInvocation, resultantPower: s.resultantPower, resultantPseudo: s.resultantPseudo, resultantArithmetic: s.resultantArithmetic, resultantCoefficient: s.resultantCoefficient, resultantAppend: s.resultantAppend, resultantFactory: s.resultantFactory, resultantNeg: s.resultantNeg}
 		}
 	}
 	return nil

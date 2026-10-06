@@ -29546,7 +29546,9 @@
         "mpnum/polynomial_psc_classic_child_stop_source_test.go",
         "mpnum/polynomial_psc_classic_cleanup.go",
         "mpnum/polynomial_psc_classic_prefix_source_test.go",
-        "mpnum/polynomial_psc_classic_source_test.go"
+        "mpnum/polynomial_psc_classic_source_test.go",
+        "mpnum/polynomial_normalize_allocation_context.go",
+        "mpnum/polynomial_som_normalize_allocation_context.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -30329,7 +30331,20 @@
         "TestPolynomialPSCClassicOldChildTuplePreservesLaterForeignCoefficient",
         "TestPolynomialPSCClassicYoungerPowerSourceStopPreservesThirteenLocals",
         "TestPolynomialPSCClassicActualEveryReservationPrefix",
-        "TestPolynomialPSCClassicLiteralRegularDefectiveAndZero"
+        "TestPolynomialPSCClassicLiteralRegularDefectiveAndZero",
+        "TestPolynomialNormalizeActualTransportOwnerSourceRefusal",
+        "TestPolynomialNormalizeActualGCDCopyRefusalPreservesBodyHistory",
+        "TestPolynomialNormalizeActualFailedGCDRawOwnedAfterOlderNUM",
+        "TestPolynomialCheapNormalizeActualGCDRawChild",
+        "TestPolynomialNormalizeDirectCapturedInvocationGuards",
+        "TestPolynomialSOMNormalizeDirectCapturedInvocationGuards",
+        "TestPolynomialNormalizeRetainedFrameRejectsBeforeForeignCheapReset",
+        "TestPolynomialSOMNormalizeCopiedReceiverCannotDestroyActualNUM",
+        "TestPolynomialNormalizeReachedGCDSourceStop",
+        "TestPolynomialSOMNormalizeFirstOwnCauseHistory",
+        "TestPolynomialNormalizeGCDParentRetainsActualStoppedChild",
+        "TestPolynomialSOMNormalizeActualStandaloneMember",
+        "TestPolynomialSOMNormalizeStandaloneSourceOwnerProtectsActualChild"
       ],
       "conditionals": [
         {
@@ -34031,6 +34046,52 @@
             "TestPolynomialPSCClassicActualEveryReservationPrefix",
             "TestPolynomialPSCClassicLiteralRegularDefectiveAndZero"
           ]
+        },
+        {
+          "name": "normalize polynomial.cpp:5904-5940 and normalize_numerals polynomial.cpp:1863-1876: actual direct numerical children, source g/a construction and ordered exact owning continuation",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_normalize.go",
+          "tests": [
+            "TestPolynomialNormalizeActualTransportOwnerSourceRefusal",
+            "TestPolynomialNormalizeIndependentSignedIntegerContent",
+            "TestPolynomialNormalizeIndependentModularResidues",
+            "TestPolynomialNormalizeEveryActualReservationPrefix",
+            "TestPolynomialNormalizeBigDescriptorRefusalAndReplacement",
+            "TestPolynomialNormalizeActualGCDCopyRefusalPreservesBodyHistory",
+            "TestPolynomialNormalizeActualFailedGCDRawOwnedAfterOlderNUM",
+            "TestPolynomialCheapNormalizeActualGCDRawChild",
+            "TestPolynomialNormalizeDirectCapturedInvocationGuards",
+            "TestPolynomialSOMNormalizeDirectCapturedInvocationGuards",
+            "TestPolynomialNormalizeRetainedFrameRejectsBeforeForeignCheapReset",
+            "TestPolynomialSOMNormalizeCopiedReceiverCannotDestroyActualNUM",
+            "TestPolynomialNormalizeReachedGCDSourceStop",
+            "TestPolynomialSOMNormalizeFirstOwnCauseHistory",
+            "TestPolynomialSOMNormalizeCompletedNumeralSourceGuard",
+            "TestPolynomialNormalizeYoungerSourceGuardRetainsOlderNumeral",
+            "TestPolynomialSubstitutionEveryReservationNamedPrefixes",
+            "TestPolynomialSubstitutionYoungerSOMGuardRetainsOlderNumerals",
+            "TestPolynomialSubstitutionExpiredSOMReceiptPreservesReplacement",
+            "TestPolynomialSOMNormalizeActualStandaloneMember",
+            "TestPolynomialSOMNormalizeStandaloneSourceOwnerProtectsActualChild"
+          ]
+        },
+        {
+          "name": "Substitution reached R.mk(true) captured normalize_numerals child and source/own continuation (polynomial.cpp:6237-6425)",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_substitution.go",
+          "tests": [
+            "TestPolynomialSubstitutionEveryReservationNamedPrefixes",
+            "TestPolynomialSubstitutionYoungerSOMGuardRetainsOlderNumerals",
+            "TestPolynomialSubstitutionExpiredSOMReceiptPreservesReplacement"
+          ]
+        },
+        {
+          "name": "GCD recursive Normalize child retention at polynomial.cpp:3867-4350: actual pending tuple and inactive history survive source and owning retirement",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_gcd_scope.go",
+          "tests": [
+            "TestPolynomialNormalizeGCDParentRetainsActualStoppedChild"
+          ]
         }
       ],
       "ownership": [
@@ -34154,7 +34215,10 @@
         "polynomial.cpp:5659-5831: source/own finalization marks the exact actor as finishing before child cleanup or DEC. Actual delete-callback same-finalizer reentry refuses before cursor/root/history changes; H has an independent real-finalization guard. Source constructor order and DEC prefix are unchanged.",
         "polynomial.cpp:5817-5881 declares seven plus five references before lc_Q assignment, then s after that assignment; source DT is reverse thirteen-reference order. Wrapper polynomial.cpp:5883-5895 asserts nonconstant operands before caller Reset, and core refs are destroyed before fallback zero Push/reverse. Source degree(B) is read before IsZero(B), and d-1/d-e/delta-1 retain uint32 source widths.",
         "Concrete actual classic core scope and nonwrapping invocation capture Coeff/Power/Neg/Pseudo/AR/ExactDiv/Push tuples only at reached child guards; no source generation or pending-root census grants ownership. Younger child source stop precedes older reference DT. False acknowledgment completes real children before older refs; true abort drains only matched unjoined children/incoming INC after older refs. Exact body/source/first-own history survives own acknowledgment.",
-        "Actual source/own finishing plus executing and callbackDepth guards refuse recursive deletion cleanup before cursor/root/history mutation. Whole source/own manager refusal precedes older body/core mutations. Caller-owned stopped vector Reset is acknowledged by the caller owner, not a parent row sweep. Stale/copy tuples and an actual later failed Coeff frame preserve foreign roots and Budget state."
+        "Actual source/own finishing plus executing and callbackDepth guards refuse recursive deletion cleanup before cursor/root/history mutation. Whole source/own manager refusal precedes older body/core mutations. Caller-owned stopped vector Reset is acknowledged by the caller owner, not a parent row sweep. Stale/copy tuples and an actual later failed Coeff frame preserve foreign roots and Budget state.",
+        "Normalize and each actual SOM member retain concrete manager/frame/nonwrapping invocation contexts at real guarded source entry. SET/GCD/Div/PN/RAW/Natural acquisition authority is transported directly through the actual allocation/publication leaves, never derived from pending-root snapshots. Source g/a destruction remains separate from explicit false acknowledgment and true unjoined abort. Captured Substitution SOM child is acknowledged before older caller locals and aborted afterward; stopped source cursors and first body/source/own diagnostic causes survive acknowledgment until the next actual invocation.",
+        "An actual standalone SOM source class is accepted only through its existing charged wrapper self/storage and exact embedded buffer address, in addition to the four imp members. Guarded helper begin captures the concrete current SOM tuple for owner refusal; no callback or copied buffer gains allocation authority. An inactive standalone class has no scoped g constructor and therefore invokes no g cleanup. GCD source completion tests its actual captured Normalize child before retirement, and source/owning inactive records preserve that child history until actual context end.",
+        "The standalone source owner refuses its older class-vector SourceFinalize prefix while an actual constructed helper g remains active. Exact source body/cleanup executing guards also precede standalone owning mutation. The guarded-child proof preserves the original Runtime state, source stage/start flag, raw vector and numeral token before explicit owning acknowledgment."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -34250,7 +34314,8 @@
         "H uses concrete 16-byte polynomial handle storage rather than native pointer ABI. New helper tests do not increase historical active-driver assertion counts; original optimized source mathematics and alternative layouts remain unchanged.",
         "Dormant classic alternative gains zero active registered-driver assertion credit. Default polynomial.cpp:5897-5902 stays optimized, all accepted optimized/PSC1/PSC2/Subchain bytes are retained. Selected classic closure does not promote the whole polynomial unit or alter DEBUG/TRACE behavior.",
         "Actual reached Power AddMul RAW end-DT stop is a qualified signed-host TLS owner-primitive profile, not ordinary mathematical free OOM. Returning deletion callbacks and invalid Go owner/frame metadata tests are explicit Go helper domains. Independent bounded elimination checks cover regular, defective, swapped and zero outputs, separate from source literal recurrence.",
-        "Initial missing-API test also contained a fixture pointer compilation mistake; corrected read-only missing-API baseline proves only absent PSCChainClassic. Zero polynomial has no coefficient slot0, so its independent oracle uses IsZero. Retry after a real caller vector Reset stop requires caller-own acknowledgment; historical unsupported immediate source retry is preserved separately from the genuine whole-owner source reentry RED."
+        "Initial missing-API test also contained a fixture pointer compilation mistake; corrected read-only missing-API baseline proves only absent PSCChainClassic. Zero polynomial has no coefficient slot0, so its independent oracle uses IsZero. Retry after a real caller vector Reset stop requires caller-own acknowledgment; historical unsupported immediate source retry is preserved separately from the genuine whole-owner source reentry RED.",
+        "Selected Normalize and reached nested SOM/Substitution continuation closure only; broader source unit remains partial and no dormant original driver assertion credit is added. Signed-host TLS destructor-stop tests are explicit owner-primitive guard profiles, not ordinary mathematical free OOM. Returning Runtime callbacks, copied metadata and saved-context refusal tests cover supported Go owner boundaries. Historical retained-Substitution broad RED and withdrawn initial source-stop recipe are preserved independently."
       ]
     },
     {
@@ -39011,7 +39076,11 @@
         "mpnum/upolynomial_content.go",
         "mpnum/upolynomial_recombination_publication_source_test.go",
         "mpnum/upolynomial_recombination_step_allocation_context.go",
-        "mpnum/upolynomial_recombination_step_invocation.go"
+        "mpnum/upolynomial_recombination_step_invocation.go",
+        "mpnum/upolynomial_factor_core.go",
+        "mpnum/upolynomial_factor_preparation_allocation_context.go",
+        "mpnum/upolynomial_factor_preparation_invocation.go",
+        "mpnum/upolynomial_factor_preparation_source_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -39086,7 +39155,14 @@
         "TestUPolynomialRecombinationPublicationExactCapturedContext",
         "TestUPolynomialRecombinationPublicationActualChildStopAndOwningHistory",
         "TestUPolynomialRecombinationPublicationExactOldLeafPreservesForeignReplacement",
-        "TestUPolynomialRecombinationPublicationNumericAbortBeforeFaultLift"
+        "TestUPolynomialRecombinationPublicationNumericAbortBeforeFaultLift",
+        "TestUPolynomialFactorPreparationActualCopyTransport",
+        "TestUPolynomialFactorPreparationDiagnosticBeforeParentTransport",
+        "TestUPolynomialFactorPreparationConditionalEveryActualPrefix",
+        "TestUPolynomialFactorPreparationActualConditionalDestructorHistory",
+        "TestUPolynomialFactorPreparationExactContextHistoryGuards",
+        "TestUPolynomialFactorPreparationDiagnosticOldLeafPreservesForeignReplacement",
+        "TestUPolynomialFactorPreparationDiagnosticEveryActualPrefix"
       ],
       "conditionals": [
         {
@@ -39366,6 +39442,20 @@
             "TestUPolynomialRecombinationPublicationExactOldLeafPreservesForeignReplacement",
             "TestUPolynomialRecombinationPublicationNumericAbortBeforeFaultLift"
           ]
+        },
+        {
+          "name": "upolynomial_factorization.cpp:1030-1050 actual pre-parent DEBUG content and conditional odd-negative content preparation",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_factor_preparation_invocation.go",
+          "tests": [
+            "TestUPolynomialFactorPreparationActualCopyTransport",
+            "TestUPolynomialFactorPreparationDiagnosticBeforeParentTransport",
+            "TestUPolynomialFactorPreparationConditionalEveryActualPrefix",
+            "TestUPolynomialFactorPreparationActualConditionalDestructorHistory",
+            "TestUPolynomialFactorPreparationExactContextHistoryGuards",
+            "TestUPolynomialFactorPreparationDiagnosticOldLeafPreservesForeignReplacement",
+            "TestUPolynomialFactorPreparationDiagnosticEveryActualPrefix"
+          ]
         }
       ],
       "ownership": [
@@ -39381,7 +39471,9 @@
         "upolynomial_factorization.cpp:1213-1240: actual embedded charged trial helper frame binds owner/frame/nonwrapping invocation and direct SET/MUL, PN, compiled scoped Integer Divides NUM, and RAW AddMul children; source branch-end tmp destruction precedes subsequent multiplication. False owning acknowledgment completes younger children before tmp; true unjoined cleanup follows older enclosing source members.",
         "upolynomial_factorization.cpp:1213-1240: actual registered caller chain protects service and both related managers during body, source destruction, and owning cleanup; rejected copied/stale/foreign receipts do not acquire roots or poison first causes. Original body/source/own histories remain readable after exact retirement until the next actual invocation.",
         "upolynomial_factorization.cpp:1238-1292: actual charged embedded source-call adapter binds real parent/frame/nonwrapping invocation, captured root and related manager, direct scalar MUL/SET/Div/GCD leaves, scoped Integer Divides NUM and explicit RAW AddMul/Div/ExtendedGCD/GCD children. This span constructs no new source NUM.",
-        "upolynomial_factorization.cpp:1238-1292: first body/source/own causes survive exact false completed-child acknowledgment, older enclosing source fields, and true unjoined child abort. Successful factors remain caller-owned partial publication; no transactional rollback, clone, extra INC or whole-factor completion claim."
+        "upolynomial_factorization.cpp:1238-1292: first body/source/own causes survive exact false completed-child acknowledgment, older enclosing source fields, and true unjoined child abort. Successful factors remain caller-owned partial publication; no transactional rollback, clone, extra INC or whole-factor completion claim.",
+        "upolynomial_factorization.cpp:1030-1050: separately charged real service members bind exact owner/frame/nonwrapping invocation and immutable captured context. DEBUG f_cont is declared before f_pp; odd-negative c is declared only after literal sign loop, with direct modular SET/NEG and fs constant publication.",
+        "upolynomial_factorization.cpp:1030-1050: actual GCD RAW5 and PN child source stops protect older NUM/parent fields; exact false completed-child acknowledgment precedes older fields and true unjoined abort follows them. First body/source/own causes and returned errors remain immutable through acknowledgment/new invocation."
       ],
       "deviations": [
         "Selected Mignotte helper, enclosing epilogue and literal prime-trial lexical scope/RAW transport are closed. Pair-Hensel and generic nil to_zp helper scope closure remain open. No full factor_square_free completion or original registered driver assertion credit.",
@@ -39397,7 +39489,9 @@
         "upolynomial_factorization.cpp:1213-1240: supported Go ErrorTransport reentry tests protect actual lower acquisition; no C++ allocator-callback equivalence is claimed. Signed-host TLS destructor/compiled-child composition tests are guarded owner-primitive profiles, not ordinary mathematical allocation failure reachability.",
         "upolynomial_factorization.cpp:1213-1240: actual reflected cold header contains the typed helper and related caller pointers; no per-call ticket, substitute INC/Copy, or native C++ malloc geometry claim. This closes the selected trial helper only; enclosing factorization and dormant registered drivers remain partial.",
         "upolynomial_factorization.cpp:1238-1292: signed-host TLS destructor tests compose actual compiled child and real release under the qualified guarded owner-primitive profile, not ordinary mathematical OOM reachability. ErrorTransport tests are supported Go callback semantics, not C++ malloc callback equivalence.",
-        "upolynomial_factorization.cpp:1238-1292: actual reflected cold parent/header storage carries the concrete adapter/receipts; no per-call reservation ticket or native malloc geometry claim. Remaining factorization/recombination topology outside this selected source block remains partial."
+        "upolynomial_factorization.cpp:1238-1292: actual reflected cold parent/header storage carries the concrete adapter/receipts; no per-call reservation ticket or native malloc geometry claim. Remaining factorization/recombination topology outside this selected source block remains partial.",
+        "upolynomial_factorization.cpp:1030-1050: explicit reflected Go adapter storage is charged once in actual enclosing service header; no C++ malloc geometry equivalence or whole factorization completion claim.",
+        "upolynomial_factorization.cpp:1030-1050: signed-host TLS destructor proofs use the qualified compiled owner-primitive domain; actual ErrorTransport callback proofs are Go callback behavior, not a fabricated C++ malloc callback."
       ]
     },
     {
@@ -125491,7 +125585,9 @@
         "TestNumericRationalSourceInsertionPreservesActualFieldChains",
         "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame",
         "TestNumeralInsertionReceiptUnusedSmallBranchAndForeignTupleGuard",
-        "TestNumeralInsertionReceiptActualCharacterConstructorPrefixesAndTupleGuards"
+        "TestNumeralInsertionReceiptActualCharacterConstructorPrefixesAndTupleGuards",
+        "TestPolynomialNormalizeActualTransportOwnerSourceRefusal",
+        "TestPolynomialNormalizeIndependentSignedIntegerContent"
       ],
       "conditionals": [
         {
@@ -127368,6 +127464,15 @@
             "TestNumeralInsertionReceiptUnusedSmallBranchAndForeignTupleGuard",
             "TestNumeralInsertionReceiptActualCharacterConstructorPrefixesAndTupleGuards"
           ]
+        },
+        {
+          "name": "Direct actual Normalize and SOM numerical caller contexts at mpz.cpp:730-817 RAW GCD entry and existing Div/ExtendedGCD allocation engines",
+          "status": "partial",
+          "go_target": "mpnum/integer_raw_invocation.go",
+          "tests": [
+            "TestPolynomialNormalizeActualTransportOwnerSourceRefusal",
+            "TestPolynomialNormalizeIndependentSignedIntegerContent"
+          ]
         }
       ],
       "ownership": [
@@ -127402,7 +127507,8 @@
         "Exact actual guarded Content owner/member/frame/nonwrapping immutable invocation; direct source allocation and actual pending-clear hooks only. Actual source child end/verification DT remains separate from false completed and true unjoined owning phases. Diagnostic child tuples survive own acknowledgment without numeric/root authority.",
         "Actual self/embedded frame/nonwrapping captured invocation identities; direct cell/backing/allocator and Natural buffer acquisitions only. Scoped bool tmp construction precedes zero branch; all completed constructors run strict source DT. First source cause persists across separate false/true owning acknowledgment until next actual invocation. Successful shared Natural publications remain member-owned.",
         "Selected direct caller context acquires only actual numeric allocation leaves; RAW Power receipt binds actual guarded member/nonce. Published checker output remains scoped caller-owned, and RAW body failures have no automatic source destructor. Legacy nil Power allocation snapshot adapter is not promoted by this selected route.",
-        "Small signed insertion differs from big signed-char CString insertion; CString strlen precedes sentry. Exact active character invocation view, typed actual destructor cause and acquired NUM/char/local roots retained; existing Go ErrorTransport callback guard is an explicit adapter profile, not native callback equivalence."
+        "Small signed insertion differs from big signed-char CString insertion; CString strlen precedes sentry. Exact active character invocation view, typed actual destructor cause and acquired NUM/char/local roots retained; existing Go ErrorTransport callback guard is an explicit adapter profile, not native callback equivalence.",
+        "Explicit Normalize/SOM contexts capture immutable parent invocation numbers and actual returned RAW child receipts at real guarded begin; older source numerals never acquire global child inventory."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -129275,7 +129381,9 @@
         "mpnum/polynomial_divides_numeric_context_source_test.go",
         "mpnum/polynomial_pseudo_allocation_context.go",
         "mpnum/integer_allocation_invocation_context.go",
-        "mpnum/polynomial_discriminant_even_modulus_source_test.go"
+        "mpnum/polynomial_discriminant_even_modulus_source_test.go",
+        "mpnum/polynomial_normalize_allocation_context.go",
+        "mpnum/polynomial_som_normalize_allocation_context.go"
       ],
       "tests": [
         "TestIntegerModularCenteredOracle",
@@ -129345,7 +129453,9 @@
         "TestDividesNumericActualBoolChildAndErasedFieldRoute",
         "TestPolynomialPseudoActualMinusANumericAcquisition",
         "TestPolynomialPseudoMatchedAbortPreservesForeignQuotientRow",
-        "TestPolynomialDiscriminantEvenUpperActualNegNormalizeSuffixPrefixes"
+        "TestPolynomialDiscriminantEvenUpperActualNegNormalizeSuffixPrefixes",
+        "TestPolynomialNormalizeActualTransportOwnerSourceRefusal",
+        "TestPolynomialNormalizeIndependentSignedIntegerContent"
       ],
       "conditionals": [
         {
@@ -129717,6 +129827,15 @@
           "tests": [
             "TestPolynomialDiscriminantEvenUpperActualNegNormalizeSuffixPrefixes"
           ]
+        },
+        {
+          "name": "Actual Normalize/SOM SET/GCD/Div wrappers preserve mpzzp.h:167-185,211 manager engine and exact receiver contexts",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_normalize_allocation_context.go",
+          "tests": [
+            "TestPolynomialNormalizeActualTransportOwnerSourceRefusal",
+            "TestPolynomialNormalizeIndependentSignedIntegerContent"
+          ]
         }
       ],
       "ownership": [
@@ -129730,7 +129849,8 @@
         "False acknowledges only completed younger child suffix; true retires exact unjoined acquisitions after caller older source declarations, preserving first cause and later foreign generation.",
         "Actual self/embedded frame/nonwrapping captured invocation identities; direct cell/backing/allocator and Natural buffer acquisitions only. Scoped bool tmp construction precedes zero branch; all completed constructors run strict source DT. First source cause persists across separate false/true owning acknowledgment until next actual invocation. Successful shared Natural publications remain member-owned.",
         "Direct pseudo NUM context validates actual modular receiver and guarded frame/nonwrap nonce/executing/callback boundary before same-engine Copy/Neg/PN acquisition.",
-        "Optional PNormalize child is bound only at the actual reached call after Integer Neg sign mutation; the legacy public Neg route delegates the same engine with nil child receipt."
+        "Optional PNormalize child is bound only at the actual reached call after Integer Neg sign mutation; the legacy public Neg route delegates the same engine with nil child receipt.",
+        "Same modular manager engine receives explicit concrete caller context; successful shared normalization temporaries remain member-owned, while actual pending acquisition belongs only its captured invocation."
       ],
       "deviations": [
         "Source modulus constructors leave prime flag indeterminate; typed guard only actual read, not invented release Div precondition. Source Power maskwrap nontermination diagnosed after completed actions; deferred local/constructor cleanup is safe Go ownership adaptation, not claimed raw MPZ exception destructor. Source TRACE/unsupported/undefined and full consumer algorithms remain open. See PORT_PROGRESS.md#audit-mpzzp-port-status-md.",

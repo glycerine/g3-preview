@@ -1,3 +1,6 @@
+// Source: src/math/polynomial/upolynomial_factorization.cpp:1030-1050;
+// src/math/polynomial/upolynomial_factorization.h:85-89.
+// Actual explicit Go service binding and reflected enclosing cold storage.
 // Licensed under the MIT license.
 package mpnum
 
@@ -17,13 +20,14 @@ type UPolynomialFactorizationConfig struct {
 	FactorizationDebugTag bool
 }
 type UPolynomialFactorizationService struct {
-	self        *UPolynomialFactorizationService
-	manager     *UPolynomialManager
-	config      UPolynomialFactorizationConfig
-	scope       *upolyFactorSquareFreeScope
-	henselPairs *upolyHenselPairScope
-	header      uint64
-	closed      bool
+	diagnostic, preparation upolyFactorPreparationScope
+	self                    *UPolynomialFactorizationService
+	manager                 *UPolynomialManager
+	config                  UPolynomialFactorizationConfig
+	scope                   *upolyFactorSquareFreeScope
+	henselPairs             *upolyHenselPairScope
+	header                  uint64
+	closed                  bool
 }
 type UPolynomialFactorizationStats struct {
 	OwnerBytes, RetainedOwnerBytes uint64

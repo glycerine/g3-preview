@@ -107,6 +107,26 @@ func (m *NaturalManager) sourceVerifyDivisionWithAllocationContext(a, b, q, r li
 		r.frame.verification = naturalPNVerificationReceipt{m, frame, frame.invocation}
 		defer func() { frame.executing = false }()
 	}
+	if r := context.somNormalize; context.raw == nil && r != nil && r.manager != nil && r.manager.hasSOMNormalizeInvocationHistory(r) && r.manager.integer != nil && r.manager.integer.natural == m && context.somNormalizeReceipt(r.manager.integer) != nil {
+		frame = &m.verificationInvocation
+		if frame.active || frame.invocation == ^uint64(0) {
+			return ErrPolynomialPending
+		}
+		*frame = naturalPNVerificationScope{active: true, executing: true, invocation: frame.invocation + 1, somNormalize: *r}
+		frame.buffer = naturalPNBufferReceipt{owner: m, somNormalize: *r, invocation: r.invocation, buffer: &m.verification, private: true}
+		r.frame.verification = naturalPNVerificationReceipt{m, frame, frame.invocation}
+		defer func() { frame.executing = false }()
+	}
+	if r := context.normalization; context.raw == nil && r != nil && r.manager != nil && r.manager.hasNormalizeInvocationHistory(r) && r.manager.core.integer != nil && r.manager.core.integer.natural == m && context.normalizationReceipt(r.manager.core.integer) != nil {
+		frame = &m.verificationInvocation
+		if frame.active || frame.invocation == ^uint64(0) {
+			return ErrPolynomialPending
+		}
+		*frame = naturalPNVerificationScope{active: true, executing: true, invocation: frame.invocation + 1, normalization: *r}
+		frame.buffer = naturalPNBufferReceipt{owner: m, normalization: *r, invocation: r.invocation, buffer: &m.verification, private: true}
+		r.frame.verification = naturalPNVerificationReceipt{m, frame, frame.invocation}
+		defer func() { frame.executing = false }()
+	}
 	if r := context.content; context.raw == nil && r != nil && r.manager != nil && r.manager.integer != nil && r.manager.integer.natural == m && context.contentReceipt(r.manager.integer) != nil {
 		frame = &m.verificationInvocation
 		if frame.active || frame.invocation == ^uint64(0) {

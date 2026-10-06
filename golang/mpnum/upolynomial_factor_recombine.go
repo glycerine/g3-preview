@@ -1,4 +1,4 @@
-// Source: src/math/polynomial/upolynomial_factorization.cpp:979-1465.
+// Source: src/math/polynomial/upolynomial_factorization.cpp:979-1299.
 // Source author: Leonardo de Moura.
 // Licensed under the MIT license.
 // Actual Mignotte bound, prime image trials and subset recombination.
@@ -168,7 +168,7 @@ func (s *UPolynomialFactorizationService) factorSquareFree(f UPolynomialView, fs
 	m := s.manager
 	nm := m.modular
 	if modularSourceDebug {
-		if e := s.primitiveDiagnostic(f); e != nil {
+		if e := s.primitiveDiagnosticWithPreparation(f); e != nil {
 			return false, e
 		}
 	}
@@ -180,10 +180,7 @@ func (s *UPolynomialFactorizationService) factorSquareFree(f UPolynomialView, fs
 		failure = s.finishSquareFreeScopeError(failure)
 	}()
 	c.constructed = 1
-	if e := m.setView(&c.fpp, f); e != nil {
-		return false, e
-	}
-	if e := s.flipLeadingIfNegative(&c.fpp, fs, k); e != nil {
+	if e := s.prepareSquareFree(f, fs, k); e != nil {
 		return false, e
 	}
 	c.constructed = 2

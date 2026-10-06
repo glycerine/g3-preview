@@ -239,6 +239,7 @@ func primeTrialPhysicalAuditAll(t *testing.T, q *RationalManager, s *UPolynomial
 		}
 	}
 
+	roots = append(roots, &s.diagnostic.numeral, &s.preparation.numeral)
 	mignotteNamedIntegerPhysicalAudit(t, q.z, external, roots...)
 	if n != q.budget.Used() {
 		t.Fatal("actual named prime trial cold ownership", n, q.budget.Used())

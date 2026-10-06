@@ -58,8 +58,13 @@ func (m *MultivariatePolynomialCore) finishSubstitution(cause error) error {
 	m.substitution.bodyCause = cause
 	cleanup := m.substitutionCleanup(false)
 	if cleanup != nil {
-		s.cleanupCause = cleanup
-		m.substitution.cleanupCause = cleanup
+		if s.sourceCause == nil {
+			s.sourceCause = cleanup
+		}
+		s.cleanupCause = s.sourceCause
+		if m.substitution.cleanupCause == nil {
+			m.substitution.cleanupCause = s.sourceCause
+		}
 	}
 	return errors.Join(cause, cleanup)
 }
@@ -76,49 +81,60 @@ func (m *MultivariatePolynomialCore) substitutionCleanup(owning bool) error {
 		return s.cleanupCause
 	}
 	b := &m.som
-	if b.gcdActive && b.gcdInvocation == s.somInvocation && b.gcdSubstitution == s {
+	if m.hasSOMNormalizeInvocationHistory(&s.som) && s.som.frame.active {
 		if owning {
-			if e := b.finishNormalizeNumeral(true); e != nil {
+			if e := b.finishNormalizeNumeralPhase(true, false); e != nil {
 				return e
 			}
 		} else if b.gcdCleanupCause != nil {
 			return b.gcdCleanupCause
 		}
 	}
+	phase := &s.stage
+	resetStopped := &s.resetStopped
+	if owning {
+		if !s.ownStarted {
+			s.ownStage = s.stage
+			s.ownResetStopped = s.resetStopped
+			s.ownStarted = true
+		}
+		phase = &s.ownStage
+		resetStopped = &s.ownResetStopped
+	}
 	if s.kind == 3 {
-		if s.stage == 0 {
+		if *phase == 0 {
 			if s.productConstructed {
 				if e := s.product.closeValue(m, owning); e != nil {
 					return e
 				}
 			}
-			s.stage = 1
+			*phase = 1
 		}
-		if s.stage == 1 {
+		if *phase == 1 {
 			if s.monomialConstructed {
 				if e := s.monomial.drop(m, &s.monomial.value, &s.monomial.decrementStarted, owning); e != nil {
 					return e
 				}
 			}
-			s.stage = 2
+			*phase = 2
 		}
 		// The completed empty polynomial_ref_buffer has no pushed elements and
 		// no dynamic backing; its genuine destructor reaches no callback.
-		if s.stage == 2 {
+		if *phase == 2 {
 			if s.q1Constructed {
 				if e := s.q1.closeValue(m, owning); e != nil {
 					return e
 				}
 			}
-			s.stage = 3
+			*phase = 3
 		}
-		if s.stage == 3 {
+		if *phase == 3 {
 			if s.p1Constructed {
 				if e := s.p1.closeValue(m, owning); e != nil {
 					return e
 				}
 			}
-			s.stage = 4
+			*phase = 4
 		}
 		if !owning && (s.product.assigning || s.monomial.assigning || s.q1.assigning || s.p1.assigning) {
 			return nil
@@ -139,7 +155,7 @@ func (m *MultivariatePolynomialCore) substitutionCleanup(owning bool) error {
 			}
 		}
 	} else {
-		if s.stage == 0 {
+		if *phase == 0 {
 			if s.tmpConstructed {
 				var e error
 				if owning {
@@ -151,9 +167,9 @@ func (m *MultivariatePolynomialCore) substitutionCleanup(owning bool) error {
 					return e
 				}
 			}
-			s.stage = 1
+			*phase = 1
 		}
-		if s.stage == 1 {
+		if *phase == 1 {
 			if s.newAConstructed {
 				var e error
 				if owning {
@@ -165,25 +181,25 @@ func (m *MultivariatePolynomialCore) substitutionCleanup(owning bool) error {
 					return e
 				}
 			}
-			s.stage = 2
+			*phase = 2
 		}
-		if s.stage == 2 {
-			if s.maxConstructed && !s.resetStopped {
+		if *phase == 2 {
+			if s.maxConstructed && !*resetStopped {
 				if e := m.substitution.max.Reset(); e != nil {
-					s.resetStopped = true
+					*resetStopped = true
 					return e
 				}
 			}
-			s.stage = 3
+			*phase = 3
 		}
-		if s.stage == 3 {
-			if s.posConstructed && !s.resetStopped {
+		if *phase == 3 {
+			if s.posConstructed && !*resetStopped {
 				if e := m.resetSubstitutionPositions(s); e != nil {
-					s.resetStopped = true
+					*resetStopped = true
 					return e
 				}
 			}
-			s.stage = 4
+			*phase = 4
 		}
 	}
 	if s.returned != (Polynomial{}) && !owning {
@@ -194,7 +210,16 @@ func (m *MultivariatePolynomialCore) substitutionCleanup(owning bool) error {
 			return e
 		}
 	}
-	*s = polynomialSubstitutionScope{}
+	if owning && m.hasSOMNormalizeInvocationHistory(&s.som) && s.som.frame.active {
+		if e := b.finishNormalizeNumeralPhase(true, true); e != nil {
+			return e
+		}
+	}
+	if !owning && m.hasSOMNormalizeInvocationHistory(&s.som) && s.som.frame.active {
+		return nil
+	}
+	s.active = false
+	s.executing = false
 	m.substitution.array.values = nil
 	return nil
 }
@@ -203,8 +228,15 @@ func (m *MultivariatePolynomialCore) CleanupSubstitution() error {
 		return ErrPolynomialOwner
 	}
 	if e := m.substitutionCleanup(true); e != nil {
-		m.substitution.scope.cleanupCause = e
-		m.substitution.cleanupCause = e
+		if m.substitution.scope.ownCause == nil {
+			m.substitution.scope.ownCause = e
+		}
+		if m.substitution.scope.cleanupCause == nil {
+			m.substitution.scope.cleanupCause = e
+		}
+		if m.substitution.cleanupCause == nil {
+			m.substitution.cleanupCause = e
+		}
 		return e
 	}
 	// The actual pending objects themselves carry the receipt; unrelated older

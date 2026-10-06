@@ -9,63 +9,113 @@ import "github.com/glycerine/g3/golang/arena"
 func (b *polynomialSOM) finishNormalizeNumeral(owning bool) error {
 	return b.finishNormalizeNumeralPhase(owning, owning)
 }
-func (b *polynomialSOM) finishNormalizeNumeralPhase(owning, abort bool) error {
+func (b *polynomialSOM) finishNormalizeNumeralPhase(owning, abort bool) (err error) {
+	m := b.owner
+	s := &b.normalizeScope
+	if !m.actualSOMNormalizeBuffer(b) {
+		return ErrPolynomialOwner
+	}
 	if !b.gcdActive {
+		if !owning {
+			return b.gcdCleanupCause
+		}
 		return nil
+	}
+	if m == nil || m.self != m || !m.hasSOMNormalizeInvocationHistory(&s.receipt) || s.receipt.buffer != b || s.receipt.frame != s {
+		return ErrPolynomialOwner
+	}
+	if s.executing || s.finishing || m.callbackDepth != 0 {
+		return ErrPolynomialPending
 	}
 	if !owning && b.gcdCleanupCause != nil {
 		return b.gcdCleanupCause
 	}
-	if !b.gcdEnded || owning {
+	if !b.gcdActive {
+		return nil
+	}
+	s.finishing = true
+	defer func() {
+		s.finishing = false
+		if owning && err != nil && s.ownCause == nil {
+			s.ownCause = err
+		}
+	}()
+	if !owning {
+		if e := m.integer.somNormalizeNumericSourceCause(&s.receipt); e != nil {
+			b.gcdCleanupCause = e
+			s.sourceCause = e
+			return e
+		}
+	}
+	if owning {
+		if e := m.integer.cleanupSOMNormalizationNumeric(&s.receipt, false); e != nil {
+			return e
+		}
+	}
+	if (!owning && !b.gcdEnded) || (owning && !s.ownEnded) {
 		var e error
 		if owning {
-			e = b.owner.deleteNumeral(&b.gcd)
+			e = m.deleteNumeral(&b.gcd)
 		} else {
-			_, e = sourceNumeralDel(b.owner.integer, &b.gcd)
+			_, e = upolynomialSourceNumeralDel(m.integer, &b.gcd)
 		}
 		if e != nil {
-			b.gcdCleanupCause = e
+			if !owning && b.gcdCleanupCause == nil {
+				b.gcdCleanupCause = e
+				s.sourceCause = e
+			}
 			return e
 		}
-		b.gcdEnded = true
+		if owning {
+			s.ownEnded = true
+		} else {
+			b.gcdEnded = true
+		}
 	}
 	if owning && abort {
-		if e := b.gcdNumeric.cleanup(b.owner.integer); e != nil {
+		if e := m.integer.cleanupSOMNormalizationNumeric(&s.receipt, true); e != nil {
 			return e
 		}
 	}
-	pending := b.gcdNumeric.cell.object.OwnerID() != 0
-	for _, raw := range b.gcdNumeric.allocator {
-		pending = pending || raw.OwnerID() != 0
+	pending := polynomialNegNumericPending(&b.gcdNumeric) || m.integer.matchesRawInvocation(&s.gcdRaw) || m.integer.matchesRawInvocation(&s.divisionRaw) || m.integer.matchesRawInvocation(&s.extendedRaw) || m.modular.matchesPNormalizeInvocation(&s.normalize) || m.integer.natural.matchesPNVerification(&s.verification)
+	for i := range s.buffers {
+		pending = pending || s.buffers[i].pending.OwnerID() != 0
 	}
 	if !pending {
 		b.gcdActive = false
-		b.gcdGeneration = 0
-		b.gcdSubstitution = nil
-		b.gcdNormalization = nil
-		b.gcdCleanupCause = nil
-		b.gcdNumeric = polynomialNumericRoots{}
+		s.active = false
 	}
 	return nil
 }
 
 func (b *polynomialSOM) beginNormalizeNumeral(parent *polynomialNormalizeScope) error {
 	m := b.owner
-	if b.gcdActive {
+	if !m.actualSOMNormalizeBuffer(b) {
+		return ErrPolynomialOwner
+	}
+	if m.callbackDepth != 0 || b.normalizeScope.finishing {
+		return ErrPolynomialPending
+	}
+	if b.gcdActive || (m.hasSOMNormalizeInvocationHistory(&m.somNormalizationOwner) && (m.somNormalizationOwner.frame.active || m.somNormalizationOwner.frame.finishing)) {
 		return ErrPolynomialPending
 	}
 	if b.gcdInvocation == ^uint64(0) {
 		return arena.ErrBounds
 	}
 	b.gcdInvocation++
+	b.normalizeScope = polynomialSOMNormalizeScope{active: true, invocation: b.gcdInvocation}
+	b.normalizeScope.receipt = polynomialSOMNormalizeInvocationReceipt{manager: m, buffer: b, frame: &b.normalizeScope, invocation: b.gcdInvocation}
+	m.somNormalizationOwner = b.normalizeScope.receipt
 	b.gcdNormalization = parent
 	if parent != nil {
 		parent.somInvocation = b.gcdInvocation
+		parent.som = b.normalizeScope.receipt
 	}
 	b.gcdSubstitution = nil
 	if b == &m.som && m.substitution.scope.executing && m.callbackDepth == 0 {
 		b.gcdSubstitution = &m.substitution.scope
 		m.substitution.scope.somInvocation = b.gcdInvocation
+		m.substitution.scope.som = b.normalizeScope.receipt
 	}
 	b.gcd = Int{}
 	b.gcdActive = true

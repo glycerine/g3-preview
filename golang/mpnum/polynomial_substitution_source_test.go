@@ -291,10 +291,22 @@ func TestPolynomialSubstitutionEveryReservationNamedPrefixes(t *testing.T) {
 			} else {
 				success = true
 			}
+			child := m.substitution.scope.som
+			body, source, stage := m.substitution.scope.bodyCause, m.substitution.scope.sourceCause, m.substitution.scope.stage
+			if m.hasSOMNormalizeInvocationHistory(&child) && child.frame.active && !m.substitution.scope.active {
+				t.Error("older source retirement discarded exact unfinished child tuple")
+			}
 			m.integer.budget.FailAfter(-1)
 			// Explicit owning cleanup follows the immediate named census. No source
 			// arithmetic retry or counter/numeral repair is used.
 			serviceMust(t, m.CleanupSubstitution())
+			if child.manager != nil && (m.substitution.scope.som != child || m.substitution.scope.bodyCause != body || m.substitution.scope.sourceCause != source || m.substitution.scope.stage != stage) {
+				t.Error("own retirement changed immutable called child/source history")
+			}
+			if m.som.gcdActive {
+				t.Errorf("exact reached SOM scoped child omitted route=%d prefix=%d invocation=%d older-active=%v older-stage=%d raw=%v", route, fault, m.som.gcdInvocation, m.substitution.scope.active, m.substitution.scope.stage, m.integer.gcdRaw.active)
+				serviceMust(t, m.som.finishNormalizeNumeral(true))
+			}
 			if m.powerLocal.active || m.pending.raw != (memory.ObjectRef{}) || m.pending.value != (Polynomial{}) || m.generatedActive || m.generatedCalleePending {
 				t.Fatal("standalone substitution cleanup did not drain started callees", route, fault, m.powerLocal, m.pending, m.generatedActive, m.generatedCalleePending, m.substitution.generatedReceipt, m.substitution.generatedCalleeReceipt)
 			}

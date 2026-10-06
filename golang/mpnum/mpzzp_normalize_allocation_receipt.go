@@ -73,6 +73,8 @@ type naturalPNBufferReceipt struct {
 	stage                uint8
 	private              bool
 	published            memory.Block
+	somNormalize         polynomialSOMNormalizeInvocationReceipt
+	normalization        polynomialNormalizeInvocationReceipt
 }
 
 func (m *NaturalManager) pnBufferReceipt(pn *integerPNormalizeScope, i int) *naturalPNBufferReceipt {
@@ -261,6 +263,38 @@ func (r *naturalPNBufferReceipt) bound(executing bool) bool {
 		}
 		return false
 	}
+	if r.somNormalize.manager != nil {
+		s := r.somNormalize
+		if !s.manager.hasSOMNormalizeInvocationHistory(&s) || !s.frame.active || s.manager.integer == nil || r.owner != s.manager.integer.natural || r.invocation != s.invocation || (executing && s.manager.integer.somNormalizeAllocationRoots(&s) == nil) {
+			return false
+		}
+		if r.private {
+			v := &r.owner.verificationInvocation
+			return r == &v.buffer && r.buffer == &r.owner.verification && v.somNormalize == s && r.owner.matchesPNVerification(&s.frame.verification)
+		}
+		for i := range s.frame.buffers {
+			if r == &s.frame.buffers[i] {
+				return r.buffer == &r.owner.division[i]
+			}
+		}
+		return false
+	}
+	if r.normalization.manager != nil {
+		s := r.normalization
+		if !s.manager.hasNormalizeInvocationHistory(&s) || !s.frame.active || s.manager.core.integer == nil || r.owner != s.manager.core.integer.natural || r.invocation != s.invocation || (executing && s.manager.core.integer.normalizationAllocationRoots(&s) == nil) {
+			return false
+		}
+		if r.private {
+			v := &r.owner.verificationInvocation
+			return r == &v.buffer && r.buffer == &r.owner.verification && v.normalization == s && r.owner.matchesPNVerification(&s.frame.verification)
+		}
+		for i := range s.frame.buffers {
+			if r == &s.frame.buffers[i] {
+				return r.buffer == &r.owner.division[i]
+			}
+		}
+		return false
+	}
 	if r.content.manager != nil {
 		s := r.content
 		if s.manager.integer == nil || !s.manager.matchesContentInvocation(&s) || r.owner != s.manager.integer.natural || r.invocation != s.invocation || (executing && s.manager.integer.contentAllocationRoots(&s) == nil) {
@@ -383,6 +417,34 @@ func (m *NaturalManager) divisionBufferReceipt(context integerAllocationInvocati
 		b := &r.frame.buffers[i]
 		if b.owner == nil {
 			*b = naturalPNBufferReceipt{owner: m, exactDiv: *r, invocation: r.invocation, buffer: &m.division[i]}
+		}
+		return b
+	}
+	if context.somNormalize != nil {
+		if context.somNormalize.manager == nil || !context.somNormalize.manager.hasSOMNormalizeInvocationHistory(context.somNormalize) || context.somNormalize.manager.integer == nil {
+			return nil
+		}
+		r := context.somNormalizeReceipt(context.somNormalize.manager.integer)
+		if r == nil || r.manager.integer.natural != m {
+			return nil
+		}
+		b := &r.frame.buffers[i]
+		if b.owner == nil {
+			*b = naturalPNBufferReceipt{owner: m, somNormalize: *r, invocation: r.invocation, buffer: &m.division[i]}
+		}
+		return b
+	}
+	if context.normalization != nil {
+		if context.normalization.manager == nil || !context.normalization.manager.hasNormalizeInvocationHistory(context.normalization) || context.normalization.manager.core.integer == nil {
+			return nil
+		}
+		r := context.normalizationReceipt(context.normalization.manager.core.integer)
+		if r == nil || r.manager.core.integer.natural != m {
+			return nil
+		}
+		b := &r.frame.buffers[i]
+		if b.owner == nil {
+			*b = naturalPNBufferReceipt{owner: m, normalization: *r, invocation: r.invocation, buffer: &m.division[i]}
 		}
 		return b
 	}

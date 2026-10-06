@@ -335,6 +335,9 @@ func (b *PolynomialSOMBuffer) SourceFinalize() error {
 	if b == nil || b.self != b {
 		return ErrPolynomialOwner
 	}
+	if b.buffer.normalizeScope.active || b.buffer.normalizeScope.executing || b.buffer.normalizeScope.finishing {
+		return ErrPolynomialPending
+	}
 	if b.closed || b.closing {
 		return arena.ErrClosed
 	}
@@ -380,6 +383,9 @@ func (b *PolynomialSOMBuffer) SourceFinalize() error {
 func (b *PolynomialSOMBuffer) CloseChecked() error {
 	if b == nil || b.self != b {
 		return ErrPolynomialOwner
+	}
+	if b.buffer.normalizeScope.executing || b.buffer.normalizeScope.finishing {
+		return ErrPolynomialPending
 	}
 	if b.closed {
 		return nil

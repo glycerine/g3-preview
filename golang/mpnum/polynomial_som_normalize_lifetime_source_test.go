@@ -90,6 +90,9 @@ func TestPolynomialNormalizeYoungerSourceGuardRetainsOlderNumeral(t *testing.T) 
 	}
 	z.budget.FailAfter(-1)
 	serviceMust(t, full.CleanupNormalization())
+	if s.cursor != 0 || b.gcdEnded || full.normalizeInvocationSourceCause(&s.directReceipt) != guard || b.gcdCleanupCause != guard {
+		t.Error("own acknowledgment advanced stopped source history")
+	}
 	if s.active || b.gcdActive {
 		t.Fatal("explicit exact child-first owning cleanup left roots")
 	}

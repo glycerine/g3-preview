@@ -26,6 +26,13 @@ func (m *IntegerModularManager) derivativeAllocationContext(r *polynomialDerivat
 }
 
 func (m *IntegerModularManager) normalizeWithSourceContext(out *Int, context integerAllocationInvocationContext) error {
+	if q := context.preparationFrame(m.manager); q != nil && q.service.manager.modular == m {
+		e := m.pNormalizeWithReceipt(out, &q.normalize)
+		if q.sourceCause == nil {
+			q.sourceCause = m.pNormalizeInvocationSourceCause(&q.normalize)
+		}
+		return e
+	}
 	if q := context.recombinationFrame(m.manager); q != nil && context.recombinationManager.modular == m {
 		child := q.normalizeReceipt(m)
 		e := m.pNormalizeWithReceipt(out, child)
@@ -117,6 +124,20 @@ func (m *IntegerModularManager) normalizeWithSourceContext(out *Int, context int
 		return e
 	}
 
+	if r := context.somNormalizeReceipt(m.manager); r != nil && r.manager.modular == m {
+		e := m.pNormalizeWithReceipt(out, &r.frame.normalize)
+		if r.frame.sourceCause == nil {
+			r.frame.sourceCause = m.pNormalizeInvocationSourceCause(&r.frame.normalize)
+		}
+		return e
+	}
+	if r := context.normalizationReceipt(m.manager); r != nil && r.manager.core.modular == m {
+		e := m.pNormalizeWithReceipt(out, &r.frame.normalize)
+		if r.frame.sourceCause == nil {
+			r.frame.sourceCause = m.pNormalizeInvocationSourceCause(&r.frame.normalize)
+		}
+		return e
+	}
 	if r := context.contentReceipt(m.manager); r != nil && r.manager.modular == m {
 		e := m.pNormalizeWithReceipt(out, &r.frame.normalize)
 		if r.frame.cleanupCause == nil {

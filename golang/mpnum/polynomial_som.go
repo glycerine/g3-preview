@@ -8,6 +8,7 @@ import (
 )
 
 type polynomialSOM struct {
+	normalizeScope                              polynomialSOMNormalizeScope
 	cohortMovingCoefficient                     Int
 	cohortMovingMonomial                        Monomial
 	coefficientOwners, monomialOwners           []uint64
@@ -593,11 +594,24 @@ func (b *polynomialSOM) addSourceInputWithArithmeticReceipt(a *Int, term Monomia
 	}
 	return nil
 }
-func (b *polynomialSOM) reset() error {
+func (b *polynomialSOM) reset() error { return b.resetWithNormalizationReceipt(nil) }
+func (b *polynomialSOM) resetWithNormalizationReceipt(receipt *polynomialNormalizeInvocationReceipt) error {
+	m := b.owner
+	if !m.actualSOMNormalizeBuffer(b) {
+		return ErrPolynomialOwner
+	}
+	if b.normalizeScope.active || b.normalizeScope.finishing {
+		return ErrPolynomialPending
+	}
+	owner := &m.normalizationOwner
+	if owner.manager != nil && owner.manager.hasNormalizeInvocationHistory(owner) && owner.manager.core == m && owner.frame.active {
+		if m.integer.normalizationAllocationRoots(receipt) == nil || receipt.manager != owner.manager || receipt.frame != owner.frame || receipt.invocation != owner.invocation || b != &m.cheap {
+			return ErrPolynomialPending
+		}
+	}
 	if b.resetActive {
 		return ErrPolynomialPending
 	}
-	m := b.owner
 	resetReceipt := polynomialArithmeticInvocationReceipt{manager: m, frame: &b.arithmeticScope, invocation: b.arithmeticScope.invocation}
 	n, e := b.ms.size(m)
 	if e != nil {
@@ -843,18 +857,15 @@ func (b *polynomialSOM) normalizeWithOwner(parent *polynomialNormalizeScope) (re
 	if e := b.beginNormalizeNumeral(parent); e != nil {
 		return e
 	}
+	b.normalizeScope.executing = true
 	defer func() {
 		b.gcdBodyCause = result
+		b.normalizeScope.executing = false
 		if cleanup := b.finishNormalizeNumeral(false); cleanup != nil {
 			result = errors.Join(result, cleanup)
 		}
 	}()
-	before, probe := polynomialNumericBefore(m.integer)
-	if probe != nil {
-		return probe
-	}
-	e = m.modular.GCDManyIndexed(integerArrayView{runtime: m.memory, raw: b.as.raw, count: n, offset: 8, stride: 12}, &b.gcd)
-	e = polynomialNewtonJoin(e, b.gcdNumeric.after(m.integer, before))
+	e = m.modular.gcdManyIndexedWithSOMNormalizeReceipt(integerArrayView{runtime: m.memory, raw: b.as.raw, count: n, offset: 8, stride: 12}, &b.gcd, &b.normalizeScope.receipt)
 	if e != nil {
 		return e
 	}
@@ -877,12 +888,7 @@ func (b *polynomialSOM) normalizeWithOwner(parent *polynomialNormalizeScope) (re
 			if e != nil {
 				return e
 			}
-			before, probe := polynomialNumericBefore(m.integer)
-			if probe != nil {
-				return probe
-			}
-			e = m.compositionNumericCall(4, &a, &b.gcd, nil, &a)
-			e = polynomialNewtonJoin(e, b.gcdNumeric.after(m.integer, before))
+			e = m.modular.divWithSOMNormalizeReceipt(&a, &b.gcd, &a, &b.normalizeScope.receipt)
 			if w := b.as.putCoefficient(m, i, a); w != nil {
 				return w
 			}
@@ -930,8 +936,12 @@ func (b *polynomialSOM) close() error {
 		return nil
 	}
 	m := b.owner
-	if e := b.finishNormalizeNumeral(true); e != nil {
-		return e
+	// No normalize_numerals constructor exists on an untouched standalone
+	// source buffer. Invoke its exact child continuation only if constructed.
+	if b.gcdActive {
+		if e := b.finishNormalizeNumeral(true); e != nil {
+			return e
+		}
 	}
 	// A previous explicit owning phase can have completed earlier row actions.
 	// Finish that exact actual frame before the whole class visits its remaining

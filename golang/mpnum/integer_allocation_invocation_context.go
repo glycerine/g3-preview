@@ -5,10 +5,16 @@ package mpnum
 // Explicit passed invocation identity. It carries no allocation snapshot and
 // creates no source numeral, reservation, or ambient callback owner hook.
 type integerAllocationInvocationContext struct {
+	preparation             *upolyFactorPreparationScope
+	preparationInvocation   uint64
 	trial                   *upolyRecombinationTrialScope
 	recombination           *upolyRecombinationStepScope
 	recombinationInvocation uint64
 	recombinationManager    *UPolynomialManager
+	somNormalize            *polynomialSOMNormalizeInvocationReceipt
+	somNormalizeInvocation  uint64
+	normalization           *polynomialNormalizeInvocationReceipt
+	normalizationInvocation uint64
 	trialInvocation         uint64
 	trialManager            *UPolynomialManager
 	henselCaller            *upolyHenselCallerScope
@@ -80,6 +86,9 @@ func pnAllocationContext(pn *integerPNormalizeScope) integerAllocationInvocation
 	return c
 }
 func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomialNumericRoots {
+	if c.preparation != nil && c.preparationFrame(m) == nil {
+		return nil
+	}
 	if c.recombination != nil && c.recombinationFrame(m) == nil {
 		return nil
 	}
@@ -109,6 +118,12 @@ func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomial
 			return nil
 		}
 	}
+	if c.somNormalize != nil && c.somNormalizeReceipt(m) == nil {
+		return nil
+	}
+	if c.normalization != nil && c.normalizationReceipt(m) == nil {
+		return nil
+	}
 	if c.content != nil && c.contentReceipt(m) == nil {
 		return nil
 	}
@@ -136,6 +151,12 @@ func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomial
 	if c.exactDiv != nil {
 		return m.exactDivContextRoots(c)
 	}
+	if r := c.somNormalizeReceipt(m); r != nil {
+		return m.somNormalizeAllocationRoots(r)
+	}
+	if p := c.normalizationReceipt(m); p != nil {
+		return m.normalizationAllocationRoots(p)
+	}
 	if p := c.contentReceipt(m); p != nil {
 		return m.contentAllocationRoots(p)
 	}
@@ -157,6 +178,9 @@ func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomial
 			return nil
 		}
 		return &s.numeric
+	}
+	if r := c.preparationFrame(m); r != nil {
+		return &r.numeric
 	}
 	if r := c.recombinationFrame(m); r != nil {
 		return &r.numeric

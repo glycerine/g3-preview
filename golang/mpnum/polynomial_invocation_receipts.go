@@ -62,7 +62,7 @@ func (m *MultivariatePolynomialManager) matchesGCDInvocation(r *polynomialGCDInv
 }
 
 func (m *MultivariatePolynomialManager) matchesNormalizeInvocation(r *polynomialNormalizeInvocationReceipt) bool {
-	return r != nil && r.manager == m && r.frame == &m.normalization && r.invocation != 0 && r.frame.invocation == r.invocation && r.frame.active
+	return m.hasNormalizeInvocationHistory(r) && r.frame.active
 }
 func (m *MultivariatePolynomialManager) iccpInvocationSourceCause(r *polynomialICCPInvocationReceipt) error {
 	if r != nil && m.hasICCPConstantHistory(&r.shortcutConstant) {
@@ -83,8 +83,8 @@ func (m *MultivariatePolynomialManager) gcdInvocationSourceCause(r *polynomialGC
 	return nil
 }
 func (m *MultivariatePolynomialManager) normalizeInvocationSourceCause(r *polynomialNormalizeInvocationReceipt) error {
-	if m.matchesNormalizeInvocation(r) {
-		return r.frame.cleanupCause
+	if m.hasNormalizeInvocationHistory(r) {
+		return r.frame.sourceCause
 	}
 	return nil
 }

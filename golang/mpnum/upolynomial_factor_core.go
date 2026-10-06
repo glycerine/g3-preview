@@ -1,3 +1,5 @@
+// Source: src/math/polynomial/upolynomial.cpp:2960-3118;
+// src/math/polynomial/upolynomial_factorization.cpp:1036-1050.
 // Licensed under the MIT license.
 package mpnum
 

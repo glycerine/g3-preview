@@ -226,6 +226,9 @@ func (v *PolynomialNewtonVector) sourceFinalizeMember() error {
 }
 
 func (m *MultivariatePolynomialManager) SourceFinalize() error {
+	if m != nil && m.self == m && m.core != nil && m.core.self == m.core && (m.normalization.active || m.core.normalizationPending()) {
+		return ErrPolynomialPending
+	}
 	if e := m.identity(); e != nil {
 		return e
 	}

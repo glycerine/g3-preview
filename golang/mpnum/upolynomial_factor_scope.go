@@ -63,6 +63,11 @@ func (s *UPolynomialFactorizationService) newSquareFreeScope() (*upolyFactorSqua
 // prime, prime factors, prime core, prime, primitive vector. Only constructed
 // objects participate; publication/cleanup advances one completed action.
 func (c *upolyFactorSquareFreeScope) cleanup() error {
+	if q := &c.service.preparation; q.active && q.parent == c {
+		if e := q.finish(&q.receipt, q.bodyCause); e != nil && q.sourceCause != nil {
+			return e
+		}
+	}
 	if q := &c.recombinationStep; q.active {
 		if q.executing || q.sourceExecuting || q.ownExecuting || q.callDepth != 0 {
 			return ErrUPolynomialCleanupPending
@@ -108,7 +113,7 @@ func (c *upolyFactorSquareFreeScope) cleanup() error {
 	if e := c.cleanupMembers(); e != nil {
 		return e
 	}
-	if c.mignotte.active || c.primeTrial.active || c.trialHelper.active || c.recombinationStep.active {
+	if c.mignotte.active || c.primeTrial.active || c.trialHelper.active || c.recombinationStep.active || c.service.preparation.active {
 		return ErrUPolynomialCleanupPending
 	}
 	return nil
@@ -187,6 +192,13 @@ func (s *UPolynomialFactorizationService) CleanupRetained() error {
 	if s.closed {
 		return arena.ErrClosed
 	}
+	for _, q := range []*upolyFactorPreparationScope{&s.diagnostic, &s.preparation} {
+		if q.active {
+			if e := q.own(&q.receipt, false); e != nil {
+				return e
+			}
+		}
+	}
 	if s.scope != nil {
 		c := &s.scope.hensel
 		if c.active && (c.executing || c.sourceExecuting || c.ownExecuting || c.callDepth != 0) {
@@ -201,6 +213,13 @@ func (s *UPolynomialFactorizationService) CleanupRetained() error {
 	// Empty-service Close still refunds its own header after a borrowed owner
 	// closes; no manager/prime access is needed without a retained scope.
 	if s.scope == nil {
+		for _, q := range []*upolyFactorPreparationScope{&s.diagnostic, &s.preparation} {
+			if q.active {
+				if e := q.own(&q.receipt, true); e != nil {
+					return e
+				}
+			}
+		}
 		return nil
 	}
 	if e := s.checkOwner(); e != nil {
@@ -268,6 +287,13 @@ func (s *UPolynomialFactorizationService) CleanupRetained() error {
 	if caller.trialHelper.active {
 		if e := caller.trialHelper.own(&caller.trialHelper.receipt, true); e != nil {
 			return e
+		}
+	}
+	for _, q := range []*upolyFactorPreparationScope{&s.diagnostic, &s.preparation} {
+		if q.active {
+			if e := q.own(&q.receipt, true); e != nil {
+				return e
+			}
 		}
 	}
 	s.manager.config.Integer.budget.Release(s.scope.header)

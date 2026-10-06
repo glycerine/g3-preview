@@ -1,0 +1,250 @@
+// Source: src/math/polynomial/upolynomial_factorization.cpp:1030-1050.
+// Licensed under the MIT license. Source authors: Dejan (t-dejanj), 2011-11-15; Leonardo de Moura.
+package mpnum
+
+import "errors"
+
+type upolyFactorPreparationReceipt struct {
+	service    *UPolynomialFactorizationService
+	frame      *upolyFactorPreparationScope
+	invocation uint64
+}
+type upolyFactorPreparationScope struct {
+	self                                                                                 *upolyFactorPreparationScope
+	service                                                                              *UPolynomialFactorizationService
+	parent                                                                               *upolyFactorSquareFreeScope
+	receipt                                                                              upolyFactorPreparationReceipt
+	invocation                                                                           uint64
+	active, executing, sourceExecuting, ownExecuting, constructed, sourceEnded, ownEnded bool
+	numeral                                                                              Int
+	numeric                                                                              polynomialNumericRoots
+	normalize                                                                            integerPNormalizeInvocationReceipt
+	gcdRaw                                                                               integerRawInvocationReceipt
+	bodyCause, sourceCause, ownCause                                                     error
+	previous                                                                             *upolyFactorPreparationScope
+	callDepth                                                                            uint32
+}
+
+func (q *upolyFactorPreparationScope) matches(r *upolyFactorPreparationReceipt) bool {
+	return q != nil && q.self == q && q.service != nil && q.service.self == q.service && q.service.manager != nil && q.service.manager.self == q.service.manager && (q == &q.service.diagnostic || q == &q.service.preparation) && r != nil && r.service == q.service && r.frame == q && r.invocation != 0 && r.invocation == q.invocation
+}
+func (s *UPolynomialFactorizationService) beginFactorPreparation(debug bool) (*upolyFactorPreparationScope, error) {
+	if e := s.checkOwner(); e != nil {
+		return nil, e
+	}
+	q := &s.preparation
+	if debug {
+		q = &s.diagnostic
+		if s.scope != nil {
+			return nil, ErrUPolynomialCleanupPending
+		}
+	} else if s.scope == nil || s.scope.self != s.scope {
+		return nil, ErrUPolynomialOwner
+	}
+	if q.active || q.invocation == ^uint64(0) {
+		return nil, ErrUPolynomialCleanupPending
+	}
+	*q = upolyFactorPreparationScope{service: s, invocation: q.invocation + 1, active: true, executing: true}
+	if !debug {
+		q.parent = s.scope
+	}
+	q.self = q
+	q.receipt = upolyFactorPreparationReceipt{s, q, q.invocation}
+	return q, nil
+}
+func (q *upolyFactorPreparationScope) enterCall() {
+	if q.callDepth == 0 {
+		q.previous = q.service.manager.preparationCaller
+		q.service.manager.preparationCaller = q
+	}
+	q.callDepth++
+}
+func (q *upolyFactorPreparationScope) leaveCall() {
+	q.callDepth--
+	if q.callDepth == 0 {
+		q.service.manager.preparationCaller = q.previous
+		q.previous = nil
+	}
+}
+func (m *UPolynomialManager) preparationCallPending() bool {
+	for q := m.preparationCaller; q != nil; q = q.previous {
+		if q.matches(&q.receipt) && q.service.manager == m && q.callDepth != 0 {
+			return true
+		}
+	}
+	return false
+}
+func (q *upolyFactorPreparationScope) childCause() error {
+	z := q.service.manager.config.Integer
+	if e := q.service.manager.modular.pNormalizeInvocationSourceCause(&q.normalize); e != nil {
+		return e
+	}
+	return z.rawInvocationSourceCause(&q.gcdRaw)
+}
+func (q *upolyFactorPreparationScope) pending() bool {
+	z := q.service.manager.config.Integer
+	return polynomialNegNumericPending(&q.numeric) || q.service.manager.modular.matchesPNormalizeInvocation(&q.normalize) || z.matchesRawInvocation(&q.gcdRaw)
+}
+func (q *upolyFactorPreparationScope) finish(r *upolyFactorPreparationReceipt, body error) error {
+	if !q.matches(r) {
+		return ErrUPolynomialOwner
+	}
+	if !q.active {
+		return errors.Join(q.bodyCause, q.sourceCause)
+	}
+	if q.executing || q.sourceExecuting || q.ownExecuting {
+		return ErrUPolynomialCleanupPending
+	}
+	q.enterCall()
+	defer q.leaveCall()
+	q.sourceExecuting = true
+	defer func() { q.sourceExecuting = false }()
+	if q.bodyCause == nil {
+		q.bodyCause = body
+	}
+	if q.sourceCause == nil {
+		q.sourceCause = q.childCause()
+	}
+	if q.sourceCause != nil {
+		return errors.Join(q.bodyCause, q.sourceCause)
+	}
+	if q.constructed {
+		if _, e := upolynomialSourceNumeralDel(q.service.manager.config.Integer, &q.numeral); e != nil {
+			q.sourceCause = e
+			return errors.Join(q.bodyCause, e)
+		}
+		q.constructed = false
+	}
+	q.sourceEnded = true
+	if !q.pending() {
+		q.active = false
+	}
+	return q.bodyCause
+}
+func (q *upolyFactorPreparationScope) own(r *upolyFactorPreparationReceipt, abort bool) (cause error) {
+	if !q.matches(r) {
+		return ErrUPolynomialOwner
+	}
+	if !q.active {
+		return nil
+	}
+	if q.executing || q.sourceExecuting || q.ownExecuting {
+		return ErrUPolynomialCleanupPending
+	}
+	defer func() {
+		if cause != nil && q.ownCause == nil {
+			q.ownCause = cause
+		}
+	}()
+	q.enterCall()
+	defer q.leaveCall()
+	q.ownExecuting = true
+	defer func() { q.ownExecuting = false }()
+	z := q.service.manager.config.Integer
+	if e := q.service.manager.modular.cleanupPNormalizeInvocation(&q.normalize, false); e != nil {
+		return e
+	}
+	if e := z.cleanupRawInvocation(&q.gcdRaw, false); e != nil {
+		return e
+	}
+	if q.constructed {
+		if e := z.cleanupRawNumeral(&q.numeral); e != nil {
+			return e
+		}
+		q.constructed = false
+	}
+	q.ownEnded = true
+	if abort {
+		if e := z.cleanupRawInvocation(&q.gcdRaw, true); e != nil {
+			return e
+		}
+		if e := q.service.manager.modular.cleanupPNormalizeInvocation(&q.normalize, true); e != nil {
+			return e
+		}
+		if e := cleanupUPolynomialNumericRoots(z, &q.numeric); e != nil {
+			return e
+		}
+		q.active = false
+	}
+	return nil
+}
+func (s *UPolynomialFactorizationService) prepareSquareFree(f UPolynomialView, fs *UPolynomialFactors, k uint32) (failure error) {
+	q, e := s.beginFactorPreparation(false)
+	if e != nil {
+		return e
+	}
+	r := q.receipt
+	q.enterCall()
+	defer q.leaveCall()
+	defer func() { q.executing = false; failure = q.finish(&r, failure) }()
+	m := s.manager
+	context := m.modular.preparationAllocationContext(q)
+	if e = m.setViewWithSourceContext(&q.parent.fpp, f, context); e != nil {
+		return e
+	}
+	p := &q.parent.fpp
+	if p.size == 0 {
+		return nil
+	}
+	top, e := m.read(m.stateView(p), p.size-1)
+	if e != nil {
+		return e
+	}
+	negative, e := m.modular.IsNeg(top)
+	if e != nil || !negative {
+		return e
+	}
+	for i := uint32(0); i < p.size; i++ {
+		a, e := m.read(m.stateView(p), i)
+		if e != nil {
+			return e
+		}
+		if e = m.modular.negWithSourceContext(a, context); e != nil {
+			return e
+		}
+	}
+	if k%2 == 0 {
+		return nil
+	}
+	q.constructed = true
+	if e = m.checkFactors(fs); e != nil {
+		return e
+	}
+	if e = m.modular.copyWithSourceContext(&q.numeral, &fs.constant, context); e != nil {
+		return e
+	}
+	if e = m.modular.negWithSourceContext(&q.numeral, context); e != nil {
+		return e
+	}
+	if e = fs.check(); e != nil {
+		return e
+	}
+	return fs.manager.modular.copyWithSourceContext(&fs.constant, &q.numeral, context)
+}
+func (s *UPolynomialFactorizationService) primitiveDiagnosticWithPreparation(f UPolynomialView) (failure error) {
+	q, e := s.beginFactorPreparation(true)
+	if e != nil {
+		return e
+	}
+	r := q.receipt
+	q.enterCall()
+	defer q.leaveCall()
+	defer func() { q.executing = false; failure = q.finish(&r, failure) }()
+	q.constructed = true
+	m := s.manager
+	context := m.modular.preparationAllocationContext(q)
+	if e = m.gcdSpanWithSourceContext(f, &q.numeral, context); e != nil {
+		return e
+	}
+	if f.count == 0 {
+		return nil
+	}
+	one, e := m.modular.IsOne(&q.numeral)
+	if e != nil {
+		return e
+	}
+	if !one {
+		return ErrUPolynomialAssertion
+	}
+	return nil
+}

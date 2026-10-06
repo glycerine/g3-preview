@@ -32,6 +32,10 @@ type polynomialSubstitutionState struct {
 	bodyCause, cleanupCause error
 }
 type polynomialSubstitutionScope struct {
+	som                                              polynomialSOMNormalizeInvocationReceipt
+	sourceCause, ownCause                            error
+	ownStage                                         uint8
+	ownStarted, ownResetStopped                      bool
 	somInvocation                                    uint64
 	active, executing                                bool
 	kind                                             uint8

@@ -5,6 +5,8 @@ package mpnum
 // Real retained RAW declarations in the charged Integer owner. Count marks
 // reached declarations; values beyond count carry no source constructor credit.
 type integerRawScope struct {
+	somNormalize                                   polynomialSOMNormalizeInvocationReceipt
+	normalization                                  polynomialNormalizeInvocationReceipt
 	henselCallerContext                            integerAllocationInvocationContext
 	henselPair                                     upolyHenselPairInvocationReceipt
 	henselManager                                  *UPolynomialManager
@@ -64,6 +66,12 @@ func (m *IntegerManager) rawAllocationRoots(r *integerRawInvocationReceipt) *pol
 		return nil
 	}
 	if p := &r.frame.exactDiv; p.core != nil && m.exactDivAllocationRoots(p) == nil {
+		return nil
+	}
+	if p := &r.frame.somNormalize; p.manager != nil && m.somNormalizeAllocationRoots(p) == nil {
+		return nil
+	}
+	if p := &r.frame.normalization; p.manager != nil && m.normalizationAllocationRoots(p) == nil {
 		return nil
 	}
 	if p := &r.frame.content; p.manager != nil && m.contentAllocationRoots(p) == nil {
