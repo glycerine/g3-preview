@@ -51,6 +51,7 @@ type IntegerManager struct {
 	divisionRaw, extendedRaw, gcdRaw       integerRawScope
 	addMulInvocation                       integerAddMulScope
 	copyAllocation                         integerCopyAllocationScope
+	normalizationExecuting                 bool
 	self                                   *IntegerManager
 	memory                                 *memory.Runtime
 	allocator                              *memory.SmallAllocator
@@ -403,7 +404,7 @@ func (m *IntegerManager) CloseChecked() error {
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
 	}
-	if m.rawInvocationExecuting() {
+	if m.rawInvocationExecuting() || m.copyAllocation.executing || m.normalizationExecuting {
 		return ErrPolynomialPending
 	}
 	if m.closed {

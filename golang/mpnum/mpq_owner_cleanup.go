@@ -23,6 +23,9 @@ func (m *RationalManager) CloseChecked() error {
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
 	}
+	if m.z != nil && (m.z.copyAllocation.executing || m.z.normalizationExecuting) {
+		return ErrPolynomialPending
+	}
 	if m.closed {
 		m.cleanupCause = nil
 		return nil

@@ -292,6 +292,11 @@ func (m *IntegerModularManager) pNormalizeWithReceipt(a *Int, receipt *integerPN
 		}()
 	}
 	if !m.z {
+		// This execution flag only protects the actual numerical owner from
+		// returning-transport destruction. Allocation authority stays explicit.
+		previousExecuting := m.manager.normalizationExecuting
+		m.manager.normalizationExecuting = true
+		defer func() { m.manager.normalizationExecuting = previousExecuting }()
 		if e := m.manager.remWithPNReceipt(a, &m.p, a, scope); e != nil {
 			return e
 		}

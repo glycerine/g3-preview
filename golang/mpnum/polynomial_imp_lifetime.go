@@ -226,7 +226,7 @@ func (v *PolynomialNewtonVector) sourceFinalizeMember() error {
 }
 
 func (m *MultivariatePolynomialManager) SourceFinalize() error {
-	if m != nil && m.self == m && m.core != nil && m.core.self == m.core && m.core.quasiResultant.active {
+	if m != nil && m.self == m && m.core != nil && m.core.self == m.core && (m.core.quasiResultant.active || m.core.variableNumeral.active) {
 		return ErrPolynomialPending
 	}
 	if m != nil && m.self == m && m.core != nil && m.core.self == m.core && m.core.collectingVariables {

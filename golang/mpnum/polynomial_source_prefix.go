@@ -13,7 +13,7 @@ var ErrPolynomialSourceMember = errors.New("mpnum: missing multivariate interpol
 // empty implementation or a completed polynomial::manager::imp destructor.
 // Owning Close is distinct and never advances this stopped source history.
 func (m *MultivariatePolynomialCore) SourceFinalizePrefix() error {
-	if m != nil && m.self == m && m.quasiResultant.active {
+	if m != nil && m.self == m && (m.quasiResultant.active || m.variableNumeral.active) {
 		return ErrPolynomialPending
 	}
 	if m != nil && m.self == m && m.collectingVariables {
