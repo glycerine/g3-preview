@@ -24689,9 +24689,9 @@
       "path": "src/cmd_context/tactic_cmds.cpp",
       "component": "cmd_context",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["tactic_command.go"],
+      "tests": ["TestTacticManagerSourceOrderLookupFactoryAndFinalization", "TestTacticManagerSourceProbeReferencesAndStructuralValues", "TestTacticManagerDestructorFinalizesTacticsBeforeProbes", "TestTacticManagerMetadataCapturesSourceDescriptionValue"],
       "conditionals": [
         {
           "line": 302,
@@ -24802,9 +24802,9 @@
       "path": "src/cmd_context/tactic_cmds.h",
       "component": "cmd_context",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["tactic_command.go"],
+      "tests": ["TestTacticManagerSourceOrderLookupFactoryAndFinalization", "TestTacticManagerSourceProbeReferencesAndStructuralValues", "TestTacticManagerCopiedForeignAndClosedGuards", "TestTacticManagerMetadataCapturesSourceDescriptionValue"],
       "conditionals": [
         {
           "line": 18,
@@ -24831,9 +24831,9 @@
       "path": "src/cmd_context/tactic_manager.cpp",
       "component": "cmd_context",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["tactic_manager.go", "tactic_command.go"],
+      "tests": ["TestTacticManagerSourceOrderLookupFactoryAndFinalization", "TestTacticManagerSourceProbeReferencesAndStructuralValues", "TestTacticManagerSourceDuplicateAssertionAndNamespaceSeparation", "TestTacticManagerSourcePublishedDictionaryBeforeVectorRefusal", "TestTacticManagerCopiedForeignAndClosedGuards", "TestTacticManagerDestructorFinalizesTacticsBeforeProbes"],
       "assertions": [
         {
           "line": 28,
@@ -24844,19 +24844,27 @@
           "text": "SASSERT(!m_name2probe.contains(s));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {"name": "~tactic_manager", "status": "ported", "go_target": "tactic_manager.go", "tests": ["TestTacticManagerDestructorFinalizesTacticsBeforeProbes"]},
+        {"name": "insert(tactic_cmd*)", "status": "ported", "go_target": "tactic_manager.go", "tests": ["TestTacticManagerSourceOrderLookupFactoryAndFinalization", "TestTacticManagerSourceDuplicateAssertionAndNamespaceSeparation", "TestTacticManagerSourcePublishedDictionaryBeforeVectorRefusal"]},
+        {"name": "insert(probe_info*)", "status": "ported", "go_target": "tactic_manager.go", "tests": ["TestTacticManagerSourceProbeReferencesAndStructuralValues", "TestTacticManagerSourceDuplicateAssertionAndNamespaceSeparation"]},
+        {"name": "find_tactic_cmd", "status": "ported", "go_target": "tactic_manager.go", "tests": ["TestTacticManagerSourceOrderLookupFactoryAndFinalization", "TestTacticManagerSourcePublishedDictionaryBeforeVectorRefusal"]},
+        {"name": "find_probe", "status": "ported", "go_target": "tactic_manager.go", "tests": ["TestTacticManagerSourceProbeReferencesAndStructuralValues"]},
+        {"name": "finalize_tactic_cmds", "status": "ported", "go_target": "tactic_manager.go", "tests": ["TestTacticManagerSourceOrderLookupFactoryAndFinalization", "TestTacticManagerSourcePublishedDictionaryBeforeVectorRefusal"]},
+        {"name": "finalize_probes", "status": "ported", "go_target": "tactic_manager.go", "tests": ["TestTacticManagerSourceProbeReferencesAndStructuralValues"]}
+      ],
+      "ownership": ["Dictionary values are scalar indices into cold descriptor vectors. Successful vector append transfers descriptor ownership; a map-published descriptor whose append fails remains borrowed and caller-owned. Source vector reset retains backing. Descriptors own factories and reference-counted probes; finalization destroys tactics before probes and follows vector insertion order."],
       "deviations": []
     },
     {
       "path": "src/cmd_context/tactic_manager.h",
       "component": "cmd_context",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["tactic_manager.go"],
+      "tests": ["TestTacticManagerSourceOrderLookupFactoryAndFinalization", "TestTacticManagerSourceProbeReferencesAndStructuralValues", "TestTacticManagerCopiedForeignAndClosedGuards"],
       "conditionals": [
         {
           "line": 18,
@@ -91366,9 +91374,9 @@
       "path": "src/tactic/probe.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["tactic_probe.go"],
+      "tests": ["TestTacticManagerSourceProbeReferencesAndStructuralValues"],
       "assertions": [
         {
           "line": 78,
@@ -91393,9 +91401,9 @@
       "path": "src/tactic/probe.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["tactic_probe.go"],
+      "tests": ["TestTacticManagerSourceProbeReferencesAndStructuralValues", "TestTacticManagerDestructorFinalizesTacticsBeforeProbes"],
       "conditionals": [
         {
           "line": 24,

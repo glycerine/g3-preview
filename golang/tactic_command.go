@@ -1,0 +1,166 @@
+// Source: src/cmd_context/tactic_cmds.h:30-63;
+// src/cmd_context/tactic_cmds.cpp:35-50; src/tactic/tactic.h:140-144.
+// Source author: Leonardo de Moura.
+// Licensed under the MIT license; see LICENSE.txt.
+package g3
+
+import (
+	"errors"
+	"reflect"
+
+	"github.com/glycerine/g3/golang/arena"
+)
+
+var errTacticRegistryOwner = errors.New("tactic: invalid, copied or retired registration owner")
+var errTacticRegistryPending = errors.New("tactic: registration stopped after source publication")
+
+// The cold reference contract of the source abstract tactic. Concrete tactics
+// must additionally supply their original execution/converter algorithms; this
+// registration layer neither applies tactics nor manufactures solver results.
+type tacticReference interface {
+	IncRef() error
+	DecRef() error
+	Close() error
+}
+type tacticFactory interface {
+	Make(*ASTManager, *ParamsRef) (tacticReference, error)
+	Close() error
+}
+
+// The source command owns its factory and borrows its symbol/description.
+// ParamsContext provides the source temporary empty params_ref at Make.
+type tacticCmd struct {
+	self               *tacticCmd
+	params             *ParamsContext
+	name               Symbol
+	description        string
+	descriptionPresent bool
+	factory            tacticFactory
+	registered         *tacticManager
+	ownerBytes         uint64
+	closed             bool
+}
+
+func newTacticCmd(c *ParamsContext, name Symbol, description *string, factory tacticFactory) (*tacticCmd, error) {
+	if c == nil || factory == nil {
+		return nil, errTacticRegistryOwner
+	}
+	if e := c.open(); e != nil {
+		return nil, e
+	}
+	if _, e := c.symbols.Hash(name); e != nil {
+		return nil, e
+	}
+	n := uint64(reflect.TypeOf(tacticCmd{}).Size())
+	if e := c.budget.Reserve(n); e != nil {
+		return nil, e
+	}
+	cmd := &tacticCmd{params: c, name: name, factory: factory, ownerBytes: n}
+	if description != nil {
+		cmd.description, cmd.descriptionPresent = *description, true
+	}
+	cmd.self = cmd
+	return cmd, nil
+}
+func (cmd *tacticCmd) open() error {
+	if cmd == nil || cmd.self != cmd || cmd.closed {
+		return errTacticRegistryOwner
+	}
+	return cmd.params.open()
+}
+func (cmd *tacticCmd) Make(m *ASTManager) (value tacticReference, err error) {
+	if err = cmd.open(); err != nil {
+		return nil, err
+	}
+	if m == nil {
+		return nil, ErrASTHandle
+	}
+	if _, err = m.ProofsEnabled(); err != nil {
+		return nil, err
+	}
+	p, err := cmd.params.NewValue() // actual null-backed params_ref temporary
+	if err != nil {
+		return nil, err
+	}
+	defer func() { err = errors.Join(err, cmd.params.Del(&p)) }()
+	return cmd.factory.Make(m, &p)
+}
+func (cmd *tacticCmd) Close() error {
+	if cmd == nil || cmd.self != cmd {
+		return errTacticRegistryOwner
+	}
+	if cmd.closed {
+		return nil
+	}
+	if e := cmd.factory.Close(); e != nil {
+		return e
+	}
+	cmd.factory = nil
+	cmd.closed = true
+	cmd.params.budget.Release(cmd.ownerBytes)
+	cmd.ownerBytes = 0
+	return nil
+}
+
+type tacticProbeInfo struct {
+	self               *tacticProbeInfo
+	symbols            *SymbolManager
+	budget             *arena.Budget
+	name               Symbol
+	description        string
+	descriptionPresent bool
+	probe              *tacticProbe
+	registered         *tacticManager
+	ownerBytes         uint64
+	closed             bool
+}
+
+func newTacticProbeInfo(s *SymbolManager, b *arena.Budget, name Symbol, description *string, probe *tacticProbe) (*tacticProbeInfo, error) {
+	if s == nil {
+		return nil, ErrSymbolOwner
+	}
+	if _, e := s.Hash(name); e != nil {
+		return nil, e
+	}
+	n := uint64(reflect.TypeOf(tacticProbeInfo{}).Size())
+	if e := b.Reserve(n); e != nil {
+		return nil, e
+	}
+	if probe != nil {
+		if e := probe.IncRef(); e != nil {
+			b.Release(n)
+			return nil, e
+		}
+	}
+	p := &tacticProbeInfo{symbols: s, budget: b, name: name, probe: probe, ownerBytes: n}
+	if description != nil {
+		p.description, p.descriptionPresent = *description, true
+	}
+	p.self = p
+	return p, nil
+}
+func (p *tacticProbeInfo) open() error {
+	if p == nil || p.self != p || p.closed {
+		return errTacticRegistryOwner
+	}
+	_, e := p.symbols.Hash(p.name)
+	return e
+}
+func (p *tacticProbeInfo) Close() error {
+	if p == nil || p.self != p {
+		return errTacticRegistryOwner
+	}
+	if p.closed {
+		return nil
+	}
+	if p.probe != nil {
+		if e := p.probe.DecRef(); e != nil {
+			return e
+		}
+		p.probe = nil
+	}
+	p.budget.Release(p.ownerBytes)
+	p.ownerBytes = 0
+	p.closed = true
+	return nil
+}
