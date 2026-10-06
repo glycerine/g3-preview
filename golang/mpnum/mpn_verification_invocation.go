@@ -7,6 +7,8 @@ import "github.com/glycerine/g3/golang/memory"
 // The reached lexical constructor has its own identity. An unfinished
 // construction owns exact raw/pending leaves but has no source destructor.
 type naturalPNVerificationScope struct {
+	rootUpperBound                               *upolyRootUpperBoundScope
+	rootUpperInvocation                          uint64
 	factorFrontendContext                        integerAllocationInvocationContext
 	roundContext                                 integerAllocationInvocationContext
 	formatContext                                integerAllocationInvocationContext

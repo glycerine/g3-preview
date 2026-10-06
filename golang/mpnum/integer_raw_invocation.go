@@ -6,6 +6,8 @@ package mpnum
 // Real retained RAW declarations in the charged Integer owner. Count marks
 // reached declarations; values beyond count carry no source constructor credit.
 type integerRawScope struct {
+	rootUpperBound                                 *upolyRootUpperBoundScope
+	rootUpperInvocation                            uint64
 	formatContext                                  integerAllocationInvocationContext
 	conversionContext                              integerAllocationInvocationContext
 	somNormalize                                   polynomialSOMNormalizeInvocationReceipt
@@ -38,7 +40,7 @@ type integerRawInvocationReceipt struct {
 // Executing RAW and scoped Divides NUM calls retain their real declarations.
 // Public owner destruction cannot run from a returning error transport callback.
 func (m *IntegerManager) rawInvocationExecuting() bool {
-	return m.rationalServiceReadCallbackActive() || m.integerEvaluationCallerExecuting() || m.rationalEvaluationCallerExecuting() || m.binaryEvaluationCallerExecuting() || m.algebraicNegCallerExecuting() || m.conversionCallerExecuting() || (m.mpfParent != nil && m.mpfParent.formatInvocationExecuting()) || m.mpfBorrowedSourceCallbackActive() || m.mpfLifecycleCallbackActive() || (m.divisionRaw.active && m.divisionRaw.executing) ||
+	return m.knuthCallerExecuting() || m.rootUpperBoundCallerExecuting() || m.rationalServiceReadCallbackActive() || m.integerEvaluationCallerExecuting() || m.rationalEvaluationCallerExecuting() || m.binaryEvaluationCallerExecuting() || m.algebraicNegCallerExecuting() || m.conversionCallerExecuting() || (m.mpfParent != nil && m.mpfParent.formatInvocationExecuting()) || m.mpfBorrowedSourceCallbackActive() || m.mpfLifecycleCallbackActive() || (m.divisionRaw.active && m.divisionRaw.executing) ||
 		(m.extendedRaw.active && m.extendedRaw.executing) ||
 		(m.gcdRaw.active && m.gcdRaw.executing) ||
 		(m.addMulInvocation.active && m.addMulInvocation.executing) ||
@@ -54,6 +56,9 @@ func (m *IntegerManager) matchesRawInvocation(r *integerRawInvocationReceipt) bo
 func (m *IntegerManager) rawAllocationRoots(r *integerRawInvocationReceipt) *polynomialNumericRoots {
 
 	if !m.matchesRawInvocation(r) || !r.frame.executing || m.closed || m.sourceFinalizing || m.constructionFailed {
+		return nil
+	}
+	if q := r.frame.rootUpperBound; q != nil && (integerAllocationInvocationContext{rootUpperBound: q, rootUpperBoundInvocation: r.frame.rootUpperInvocation}).rootUpperBoundFrame(m) == nil {
 		return nil
 	}
 	if c := r.frame.conversionContext; c.mpfConversion != nil && c.conversionFrame(m, true) == nil {

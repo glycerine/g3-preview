@@ -27,6 +27,20 @@ func (m *IntegerModularManager) derivativeAllocationContext(r *polynomialDerivat
 }
 
 func (m *IntegerModularManager) normalizeWithSourceContext(out *Int, context integerAllocationInvocationContext) error {
+	if q := context.knuthFrame(m.manager); q != nil && q.owner.modular == m {
+		e := m.pNormalizeWithFactorHistory(out, &q.normalize, context)
+		if q.sourceCause == nil {
+			q.sourceCause = m.pNormalizeInvocationSourceCause(&q.normalize)
+		}
+		return e
+	}
+	if q := context.rootUpperBoundFrame(m.manager); q != nil && q.owner.modular == m {
+		e := m.pNormalizeWithFactorHistory(out, &q.normalize, context)
+		if q.sourceCause == nil {
+			q.sourceCause = m.pNormalizeInvocationSourceCause(&q.normalize)
+		}
+		return e
+	}
 	if q := context.integerEvaluationFrame(m.manager); q != nil && q.owner.modular == m {
 		e := m.pNormalizeWithFactorHistory(out, &q.normalize, context)
 		if q.sourceCause == nil {

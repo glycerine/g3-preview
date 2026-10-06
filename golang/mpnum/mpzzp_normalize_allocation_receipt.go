@@ -55,6 +55,8 @@ func (m *IntegerModularManager) cleanupPNormalizeInvocation(r *integerPNormalize
 // A receipt exists only for a real pending growth of the named source buffer.
 // Successful publication returns authority to the persistent Natural member.
 type naturalPNBufferReceipt struct {
+	rootUpperBound          *upolyRootUpperBoundScope
+	rootUpperInvocation     uint64
 	factorFrontendContext   integerAllocationInvocationContext
 	roundContext            integerAllocationInvocationContext
 	formatContext           integerAllocationInvocationContext
@@ -209,6 +211,21 @@ func (r *naturalPNBufferReceipt) bound(executing bool) bool {
 		return false
 	}
 
+	if q := r.rootUpperBound; q != nil {
+		if !q.matches() || r.owner != q.owner.config.Integer.natural || r.rootUpperInvocation != q.invocation || r.invocation != q.invocation || (executing && (integerAllocationInvocationContext{rootUpperBound: q, rootUpperBoundInvocation: r.rootUpperInvocation}).rootUpperBoundFrame(q.owner.config.Integer) == nil) {
+			return false
+		}
+		if r.private {
+			v := &r.owner.verificationInvocation
+			return r == &v.buffer && r.buffer == &r.owner.verification && v.rootUpperBound == q && v.rootUpperInvocation == q.invocation && r.owner.matchesPNVerification(&q.verification)
+		}
+		for i := range q.buffers {
+			if r == &q.buffers[i] {
+				return r.buffer == &r.owner.division[i]
+			}
+		}
+		return false
+	}
 	if context := r.primePreparationContext; context.primePreparation != nil {
 		q := context.primePreparation
 		if !q.matches() || r.owner != q.owner.manager.config.Integer.natural || context.primePreparationInvocation != q.invocation || r.invocation != q.invocation || (executing && context.primePreparationFrame(q.owner.manager.config.Integer) == nil) {
@@ -488,6 +505,17 @@ func (m *NaturalManager) divisionBufferReceipt(context integerAllocationInvocati
 		r := &q.buffers[i]
 		if r.owner == nil {
 			*r = naturalPNBufferReceipt{owner: m, factorFrontendContext: context, invocation: q.invocation, buffer: &m.division[i]}
+		}
+		return r
+	}
+	if q := context.rootUpperBound; q != nil && context.pn == nil && context.raw == nil {
+		z := q.owner.config.Integer
+		if z.natural != m || context.rootUpperBoundFrame(z) == nil {
+			return nil
+		}
+		r := &q.buffers[i]
+		if r.owner == nil {
+			*r = naturalPNBufferReceipt{owner: m, rootUpperBound: q, rootUpperInvocation: q.invocation, invocation: q.invocation, buffer: &m.division[i]}
 		}
 		return r
 	}

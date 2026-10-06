@@ -54,6 +54,7 @@ func (m *IntegerManager) extendedGCDWithAllocationContext(r1, r2, a, b, g *Int, 
 		}
 		values = &public.values
 		context.recordRecombinationRaw(m, receipt)
+		context.recordRootUpperRaw(m, receipt)
 		context.recordPrimePreparationRaw(m, receipt)
 		context.recordFactorFrontendRaw(m, receipt)
 		context.recordContentRaw(m, receipt)

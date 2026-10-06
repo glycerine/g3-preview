@@ -1,3 +1,5 @@
+// Source: src/math/polynomial/upolynomial.cpp:1906-1951 (Cauchy bound),
+// src/math/polynomial/upolynomial.cpp:1995-2074 (Knuth/nonzero bounds), related root-bound bodies.
 // Licensed under the MIT license.
 package mpnum
 
@@ -294,7 +296,7 @@ func (m *UPolynomialManager) DescartesBoundInterval(v UPolynomialView, bqm *Bina
 	}
 	return 1, nil
 }
-func (m *UPolynomialManager) RootUpperBound(v UPolynomialView, out *Int) error {
+func (m *UPolynomialManager) RootUpperBound(v UPolynomialView, out *Int) (cause error) {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -314,23 +316,37 @@ func (m *UPolynomialManager) RootUpperBound(v UPolynomialView, out *Int) error {
 			return ErrUPolynomialAssertion
 		}
 	}
-	var maximum, minimum, an, r2 Int
-	defer m.modular.Del(&maximum)
-	defer m.modular.Del(&minimum)
-	defer m.modular.Del(&an)
-	defer m.modular.Del(&r2)
+	q, e := m.beginRootUpperBound()
+	if e != nil {
+		return e
+	}
+	q.target = v
+	context := q.context()
+	z := m.config.Integer
+	prior := z.rootUpperBoundCaller
+	z.rootUpperBoundCaller = m
+	priorNatural := z.natural.rootUpperBoundCaller
+	z.natural.rootUpperBoundCaller = m
+	defer func() {
+		q.executing = false
+		cause = q.finish(cause)
+		z.natural.rootUpperBoundCaller = priorNatural
+		z.rootUpperBoundCaller = prior
+	}()
+	maximum, minimum, an, r2 := &q.values[0], &q.values[1], &q.values[2], &q.values[3]
 	top, e := m.read(v, v.count-1)
 	if e != nil {
 		return e
 	}
-	if e = m.modular.Copy(&an, top); e != nil {
+	if e = m.modular.copyWithRootUpperContext(an, top, context); e != nil {
 		return e
 	}
-	if e = m.modular.Abs(&an); e != nil {
+	if e = m.modular.absWithRootUpperContext(an, context); e != nil {
 		return e
 	}
-	var c Int
-	defer m.modular.Del(&c)
+	q.constructed = 5
+	q.sourceRemaining = 5
+	c := &q.values[4]
 	initialized := false
 	for i := uint32(0); i < v.count; i++ {
 		a, e := m.read(v, i)
@@ -344,69 +360,69 @@ func (m *UPolynomialManager) RootUpperBound(v UPolynomialView, out *Int) error {
 		if zero {
 			continue
 		}
-		if e = m.modular.Copy(&c, a); e != nil {
+		if e = m.modular.copyWithRootUpperContext(c, a, context); e != nil {
 			return e
 		}
-		if e = m.modular.Abs(&c); e != nil {
+		if e = m.modular.absWithRootUpperContext(c, context); e != nil {
 			return e
 		}
 		if !initialized {
-			if e = m.modular.Copy(&maximum, &c); e != nil {
+			if e = m.modular.copyWithRootUpperContext(maximum, c, context); e != nil {
 				return e
 			}
-			if e = m.modular.Copy(&minimum, &c); e != nil {
+			if e = m.modular.copyWithRootUpperContext(minimum, c, context); e != nil {
 				return e
 			}
 			initialized = true
 			continue
 		}
-		greater, e := m.modular.Greater(&c, &maximum)
+		greater, e := m.modular.Greater(c, maximum)
 		if e != nil {
 			return e
 		}
 		if greater {
-			if e = m.modular.Copy(&maximum, &c); e != nil {
+			if e = m.modular.copyWithRootUpperContext(maximum, c, context); e != nil {
 				return e
 			}
 		}
-		less, e := m.modular.Less(&c, &minimum)
+		less, e := m.modular.Less(c, minimum)
 		if e != nil {
 			return e
 		}
 		if less {
-			if e = m.modular.Copy(&minimum, &c); e != nil {
+			if e = m.modular.copyWithRootUpperContext(minimum, c, context); e != nil {
 				return e
 			}
 		}
 	}
 	one := NewInt(1)
-	if e = m.modular.Add(&minimum, &maximum, out); e != nil {
+	if e = m.modular.addWithRootUpperContext(minimum, maximum, out, context); e != nil {
 		return e
 	}
-	if e = m.modular.Div(out, &minimum, out); e != nil {
+	if e = m.modular.divWithRootUpperContext(out, minimum, out, context); e != nil {
 		return e
 	}
-	if e = m.modular.Add(out, &one, out); e != nil {
+	if e = m.modular.addWithRootUpperContext(out, &one, out, context); e != nil {
 		return e
 	}
-	if e = m.modular.Add(&an, &maximum, &r2); e != nil {
+	if e = m.modular.addWithRootUpperContext(an, maximum, r2, context); e != nil {
 		return e
 	}
-	if e = m.modular.Div(&r2, &an, &r2); e != nil {
+	if e = m.modular.divWithRootUpperContext(r2, an, r2, context); e != nil {
 		return e
 	}
-	if e = m.modular.Add(&r2, &one, &r2); e != nil {
+	if e = m.modular.addWithRootUpperContext(r2, &one, r2, context); e != nil {
 		return e
 	}
-	less, e := m.modular.Less(&r2, out)
+	less, e := m.modular.Less(r2, out)
 	if e != nil {
 		return e
 	}
 	if less {
-		*out, r2 = r2, *out
+		*out, *r2 = *r2, *out
 	}
 	if modularSourceDebug {
-		le, e := m.modular.LessEqual(out, &r2)
+		le, e := m.modular.LessEqual(out, r2)
 		if e != nil {
 			return e
 		}
@@ -485,20 +501,69 @@ func (m *UPolynomialManager) KnuthPositiveRootUpperBound(v UPolynomialView) (uin
 	}
 	return maximum + 1, nil
 }
-func (m *UPolynomialManager) KnuthNegativeRootUpperBound(v UPolynomialView) (uint32, error) {
-	if e := m.PMinusXViewInPlace(v); e != nil {
+func (m *UPolynomialManager) KnuthNegativeRootUpperBound(v UPolynomialView) (bound uint32, cause error) {
+	if e := m.check(); e != nil {
 		return 0, e
+	}
+	q, e := m.beginKnuth(v, 1)
+	if e != nil {
+		return 0, e
+	}
+	z := m.config.Integer
+	old, oldN := z.knuthCaller, z.natural.knuthCaller
+	z.knuthCaller = m
+	z.natural.knuthCaller = m
+	defer func() {
+		q.executing = false
+		cause = q.finish(cause)
+		z.knuthCaller = old
+		z.natural.knuthCaller = oldN
+	}()
+	return m.knuthNegativeWithContext(v, q.context())
+}
+func (m *UPolynomialManager) knuthNegativeWithContext(v UPolynomialView, context integerAllocationInvocationContext) (uint32, error) {
+	if q := context.knuthFrame(m.config.Integer); q != nil {
+		q.stage = 1
+	}
+	if e := m.pMinusXWithSourceContext(v, context); e != nil {
+		return 0, e
+	}
+	if q := context.knuthFrame(m.config.Integer); q != nil {
+		q.stage = 2
 	}
 	r, e := m.KnuthPositiveRootUpperBound(v)
 	if e != nil {
 		return 0, e
 	}
-	if e = m.PMinusXViewInPlace(v); e != nil {
+	if q := context.knuthFrame(m.config.Integer); q != nil {
+		q.stage = 3
+	}
+	if e = m.pMinusXWithSourceContext(v, context); e != nil {
 		return 0, e
 	}
 	return r, nil
 }
-func (m *UPolynomialManager) NonzeroRootLowerBound(v UPolynomialView) (uint32, error) {
+func (m *UPolynomialManager) NonzeroRootLowerBound(v UPolynomialView) (bound uint32, cause error) {
+	if e := m.check(); e != nil {
+		return 0, e
+	}
+	q, e := m.beginKnuth(v, 2)
+	if e != nil {
+		return 0, e
+	}
+	z := m.config.Integer
+	old, oldN := z.knuthCaller, z.natural.knuthCaller
+	z.knuthCaller = m
+	z.natural.knuthCaller = m
+	defer func() {
+		q.executing = false
+		cause = q.finish(cause)
+		z.knuthCaller = old
+		z.natural.knuthCaller = oldN
+	}()
+	return m.nonzeroWithContext(v, q.context())
+}
+func (m *UPolynomialManager) nonzeroWithContext(v UPolynomialView, context integerAllocationInvocationContext) (uint32, error) {
 	if e := m.check(); e != nil {
 		return 0, e
 	}
@@ -543,6 +608,9 @@ func (m *UPolynomialManager) NonzeroRootLowerBound(v UPolynomialView) (uint32, e
 	nz := v
 	nz.start += i
 	nz.count -= i
+	if q := context.knuthFrame(m.config.Integer); q != nil {
+		q.stage = 4
+	}
 	if e := m.ReciprocalViewInPlace(nz); e != nil {
 		return 0, e
 	}
@@ -550,9 +618,12 @@ func (m *UPolynomialManager) NonzeroRootLowerBound(v UPolynomialView) (uint32, e
 	if e != nil {
 		return 0, e
 	}
-	k2, e := m.KnuthNegativeRootUpperBound(nz)
+	k2, e := m.knuthNegativeWithContext(nz, context)
 	if e != nil {
 		return 0, e
+	}
+	if q := context.knuthFrame(m.config.Integer); q != nil {
+		q.stage = 5
 	}
 	if e = m.ReciprocalViewInPlace(nz); e != nil {
 		return 0, e

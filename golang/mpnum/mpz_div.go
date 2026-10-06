@@ -132,6 +132,7 @@ func (m *IntegerManager) divWithAllocationContext(a, b, c *Int, context integerA
 			context.recordConversionRaw(m, receipt)
 			context.recordFormatRaw(m, receipt)
 			context.recordRecombinationRaw(m, receipt)
+			context.recordRootUpperRaw(m, receipt)
 			context.recordPrimePreparationRaw(m, receipt)
 			context.recordFactorFrontendRaw(m, receipt)
 			context.recordContentRaw(m, receipt)

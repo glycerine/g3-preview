@@ -11,6 +11,9 @@ import (
 // destructors. Leaked failed-constructor locals and unpublished member expansion
 // blocks remain in the charged owner for separate explicit owning CloseChecked.
 func (m *NaturalManager) SourceFinalize() error {
+	if m.knuthCallerExecuting() || m.rootUpperBoundCallerExecuting() {
+		return arena.ErrInvalidSlot
+	}
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
 	}

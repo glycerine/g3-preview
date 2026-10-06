@@ -38346,7 +38346,25 @@
         "mpnum/upolynomial_eval_integer_callback_source_test.go",
         "mpnum/upolynomial_eval_integer_invocation.go",
         "mpnum/upolynomial_eval_integer_prefix_source_test.go",
-        "mpnum/upolynomial_eval_integer_source_test.go"
+        "mpnum/upolynomial_eval_integer_source_test.go",
+        "mpnum/mpn_source_finalize.go",
+        "mpnum/mpn_source_verify.go",
+        "mpnum/mpn_storage.go",
+        "mpnum/mpn_verification_invocation.go",
+        "mpnum/mpz_div.go",
+        "mpnum/mpz_number_theory.go",
+        "mpnum/mpzzp_normalize_allocation_receipt.go",
+        "mpnum/upolynomial_root_upper_allocation_context.go",
+        "mpnum/upolynomial_root_upper_callback_source_test.go",
+        "mpnum/upolynomial_root_upper_invocation.go",
+        "mpnum/upolynomial_root_upper_prefix_source_test.go",
+        "mpnum/upolynomial_root_upper_source_test.go",
+        "mpnum/upolynomial_knuth_callback_source_test.go",
+        "mpnum/upolynomial_knuth_history_source_test.go",
+        "mpnum/upolynomial_knuth_invocation.go",
+        "mpnum/upolynomial_knuth_source_test.go",
+        "mpnum/mpzzp.go",
+        "mpnum/upolynomial_modular_caller_source_test.go"
       ],
       "tests": [
         "TestUPolynomialScalarExtentAndLayout",
@@ -38518,7 +38536,17 @@
         "TestUPolynomialEvalSignIntPublicBodyAndNumeralDT",
         "TestUPolynomialEvalSignIntEveryActualReservationPrefix",
         "TestUPolynomialEvalSignIntLiteralHornerBranches",
-        "TestUPolynomialEvalSignIntActualCallbackOwnerAndTupleRefusal"
+        "TestUPolynomialEvalSignIntActualCallbackOwnerAndTupleRefusal",
+        "TestUPolynomialRootUpperBoundActualBodyAndNumeralDT",
+        "TestUPolynomialRootUpperBoundEveryActualReservationPrefix",
+        "TestUPolynomialRootUpperBoundIndependentCauchyCases",
+        "TestUPolynomialRootUpperBoundActualCallbackOwnerAndTupleRefusal",
+        "TestUPolynomialKnuthMinimumActualOwnerCallback",
+        "TestUPolynomialKnuthMinimumEveryActualPrefixAndDestructiveSuffix",
+        "TestUPolynomialKnuthIndependentBoundsAndSourceAssertions",
+        "TestUPolynomialKnuthOldAcknowledgmentPreservesLaterActualRoots",
+        "TestUPolynomialActualModularCallerCloseBeforeReturn",
+        "TestAlgebraicBasicNegDoesNotBorrowUPModularOwner"
       ],
       "conditionals": [
         {
@@ -39614,6 +39642,48 @@
             "TestUPolynomialEvalSignIntEveryActualReservationPrefix",
             "TestUPolynomialEvalSignIntLiteralHornerBranches",
             "TestUPolynomialEvalSignIntActualCallbackOwnerAndTupleRefusal"
+          ]
+        },
+        {
+          "name": "upolynomial.cpp:1906-1951 public Cauchy root_upper_bound exact reached NUM and numeric-child lifetime",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_root_bounds.go",
+          "tests": [
+            "TestUPolynomialRootUpperBoundActualBodyAndNumeralDT",
+            "TestUPolynomialRootUpperBoundEveryActualReservationPrefix",
+            "TestUPolynomialRootUpperBoundIndependentCauchyCases",
+            "TestUPolynomialRootUpperBoundActualCallbackOwnerAndTupleRefusal"
+          ]
+        },
+        {
+          "name": "upolynomial.cpp:2029-2035 Knuth negative bound destructive two p_minus_x calls and direct NEG/PN leaves",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_root_bounds.go",
+          "tests": [
+            "TestUPolynomialKnuthMinimumActualOwnerCallback",
+            "TestUPolynomialKnuthMinimumEveryActualPrefixAndDestructiveSuffix",
+            "TestUPolynomialKnuthIndependentBoundsAndSourceAssertions",
+            "TestUPolynomialKnuthOldAcknowledgmentPreservesLaterActualRoots"
+          ]
+        },
+        {
+          "name": "upolynomial.cpp:2052-2074 nonzero lower bound zero-consume assertions and destructive reverse/Knuth/reverse source order",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_root_bounds.go",
+          "tests": [
+            "TestUPolynomialKnuthMinimumActualOwnerCallback",
+            "TestUPolynomialKnuthMinimumEveryActualPrefixAndDestructiveSuffix",
+            "TestUPolynomialKnuthIndependentBoundsAndSourceAssertions",
+            "TestUPolynomialKnuthOldAcknowledgmentPreservesLaterActualRoots"
+          ]
+        },
+        {
+          "name": "upolynomial.cpp:1108-1225,1734-1820,1906-1951,2029-2074 exact registered modular caller retirement exclusion before Close mutation",
+          "status": "partial",
+          "go_target": "mpnum/mpzzp.go",
+          "tests": [
+            "TestUPolynomialActualModularCallerCloseBeforeReturn",
+            "TestAlgebraicBasicNegDoesNotBorrowUPModularOwner"
           ]
         }
       ],

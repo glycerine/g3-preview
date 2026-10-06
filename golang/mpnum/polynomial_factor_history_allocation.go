@@ -7,6 +7,12 @@ package mpnum
 import "reflect"
 
 func (c integerAllocationInvocationContext) prepareFactorHistory(z *IntegerManager) error {
+	if q := c.knuthFrame(z); q != nil {
+		return q.prepareHistory()
+	}
+	if q := c.rootUpperBoundFrame(z); q != nil {
+		return q.prepareHistory()
+	}
 	if q := c.integerEvaluationFrame(z); q != nil {
 		return q.prepareHistory()
 	}

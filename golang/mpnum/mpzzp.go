@@ -97,6 +97,9 @@ func (m *IntegerModularManager) OwnerBytes() uint64 {
 	return m.header
 }
 func (m *IntegerModularManager) Close() error {
+	if m.upolynomialCallerExecuting() {
+		return ErrPolynomialPending
+	}
 	if m != nil && m.self == m && m.normalization.active {
 		return ErrPolynomialPending
 	}
@@ -565,4 +568,42 @@ func (m *IntegerModularManager) borrowedModulus() (*Int, error) {
 		return nil, e
 	}
 	return &m.p, nil
+}
+
+// Source: src/math/polynomial/upolynomial.cpp:1108-1225,1734-1820,1906-1951,2029-2074;
+// src/math/polynomial/algebraic_numbers.cpp:1565-1577;
+// src/util/mpzzp.h:97-105. A returning transport must not end the actual
+// modular owner while its registered source/NUM-destructor caller is executing.
+func (m *IntegerModularManager) upolynomialCallerExecuting() bool {
+	if m == nil || m.self != m || m.manager == nil || m.manager.self != m.manager {
+		return false
+	}
+	z := m.manager
+	if c := z.algebraicNegCaller; c != nil && c.config.Rationals != nil && c.config.Rationals.z == z && c.negation.phase >= 2 && c.negationExecuting() {
+		p := c.config.Polynomials
+		if p != nil && p.self == p && p.config.Integer == z && p.modular == m && p.algebraicNegCaller == c {
+			return true
+		}
+	}
+	for q := z.upolyDisplayCaller; q != nil; q = q.previousInteger {
+		if q.actual() && q.owner.config.Integer == z && q.owner.modular == m && (q.executing || q.sourceExecuting || q.ownExecuting) {
+			return true
+		}
+	}
+	if p := z.knuthCaller; p != nil && p.config.Integer == z && p.modular == m && p.knuthExecuting() {
+		return true
+	}
+	if p := z.rootUpperBoundCaller; p != nil && p.config.Integer == z && p.modular == m && p.rootUpperBoundExecuting() {
+		return true
+	}
+	if p := z.integerEvaluationCaller; p != nil && p.config.Integer == z && p.modular == m && p.integerEvaluationExecuting() {
+		return true
+	}
+	if p := z.rationalEvaluationCaller; p != nil && p.config.Integer == z && p.modular == m && p.rationalEvaluationExecuting() {
+		return true
+	}
+	if p := z.binaryEvaluationCaller; p != nil && p.config.Integer == z && p.modular == m && p.binaryEvaluationExecuting() {
+		return true
+	}
+	return false
 }

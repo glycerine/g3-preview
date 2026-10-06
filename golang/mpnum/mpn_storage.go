@@ -14,6 +14,8 @@ import (
 // copied or used concurrently. Close invalidates the service. Requested source
 // capacities are kept separate from arena geometric allocation classes.
 type NaturalManager struct {
+	knuthCaller                       *UPolynomialManager
+	rootUpperBoundCaller              *UPolynomialManager
 	self                              *NaturalManager
 	runtime                           *memory.Runtime
 	ownsRuntime                       bool
@@ -133,6 +135,9 @@ func (m *NaturalManager) Close() {
 	}
 }
 func (m *NaturalManager) CloseChecked() error {
+	if m.knuthCallerExecuting() || m.rootUpperBoundCallerExecuting() {
+		return arena.ErrInvalidSlot
+	}
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
 	}

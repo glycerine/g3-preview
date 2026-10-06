@@ -351,6 +351,13 @@ func (m *UPolynomialManager) PMinusXViewInPlace(v UPolynomialView) error {
 	return m.pMinusXWithSourceContext(v, integerAllocationInvocationContext{})
 }
 func (m *UPolynomialManager) pMinusXWithSourceContext(v UPolynomialView, context integerAllocationInvocationContext) error {
+	if context.knuth != nil {
+		q := context.knuthFrame(m.config.Integer)
+		if q == nil || q.owner != m || v.origin != q.target.origin || v.backing != q.target.backing || v.generation != q.target.generation || v.start < q.target.start || uint64(v.start)+uint64(v.count) > uint64(q.target.start)+uint64(q.target.count) {
+			return ErrUPolynomialOwner
+		}
+	}
+
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -365,6 +372,9 @@ func (m *UPolynomialManager) pMinusXWithSourceContext(v UPolynomialView, context
 		}
 		if zero || i%2 == 0 {
 			continue
+		}
+		if q := context.knuthFrame(m.config.Integer); q != nil {
+			q.cursor = i
 		}
 		if e = m.modular.negWithSourceContext(a, context); e != nil {
 			return e
