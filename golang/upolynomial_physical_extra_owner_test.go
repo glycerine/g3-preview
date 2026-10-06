@@ -3,6 +3,7 @@ package g3
 
 import (
 	"fmt"
+	"github.com/glycerine/g3/golang/memory"
 	"github.com/glycerine/g3/golang/mpnum"
 	"reflect"
 )
@@ -20,6 +21,7 @@ type paramsPhysicalRationalOwner struct {
 }
 
 type upolyPhysicalExtraOwners struct {
+	CallerBlocks         []memory.Block // actual directly returned caller allocations only
 	ASTManagers          []*ASTManager
 	DebugContexts        []*DebugContext
 	ParamsRationalValues []paramsPhysicalRationalOwner

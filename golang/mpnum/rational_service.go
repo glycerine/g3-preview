@@ -42,6 +42,8 @@ type RationalServiceStats struct {
 // requires external owner confinement; independent service locks do not make
 // the Budget safe for concurrent use. Never shallow-copy this owner.
 type RationalService struct {
+	sourceRuntimeExecuting uint32 // actual held lower-allocation invocation stamp
+
 	sourceInsertionExecuting                       bool
 	polynomialContext                              UPolynomialRationalContext
 	lexical                                        rationalLexicalScope
@@ -116,7 +118,7 @@ func (s *RationalService) lock() error {
 	if s == nil || s.self != s {
 		return ErrRationalServiceCopy
 	}
-	if s.sourceInsertionExecuting {
+	if s.sourceInsertionExecuting || s.runtimeTransportExecuting() {
 		return arena.ErrInvalidSlot
 	}
 	s.mu.Lock()
@@ -161,6 +163,8 @@ func (s *RationalService) Copy(dst, src *OwnedRational) error {
 		return e
 	}
 	defer s.mu.Unlock()
+	atomic.StoreUint32(&s.sourceRuntimeExecuting, 1)
+	defer atomic.StoreUint32(&s.sourceRuntimeExecuting, 0)
 	if e := s.rationalScalarOwner(dst); e != nil {
 		return e
 	}
@@ -180,7 +184,7 @@ func (s *RationalService) CopyFrom(dst *OwnedRational, source *RationalService, 
 	if first.ownerID > second.ownerID {
 		first, second = second, first
 	}
-	if first.sourceInsertionExecuting || second.sourceInsertionExecuting {
+	if first.sourceInsertionExecuting || second.sourceInsertionExecuting || first.runtimeTransportExecuting() || second.runtimeTransportExecuting() {
 		return arena.ErrInvalidSlot
 	}
 	first.mu.Lock()
@@ -252,6 +256,8 @@ func (s *RationalService) SetUint64(v *OwnedRational, n uint64) error {
 		return e
 	}
 	defer s.mu.Unlock()
+	atomic.StoreUint32(&s.sourceRuntimeExecuting, 1)
+	defer atomic.StoreUint32(&s.sourceRuntimeExecuting, 0)
 	if e := s.check(v); e != nil {
 		return e
 	}
@@ -428,6 +434,8 @@ func (s *RationalService) PowerOfTwo(k uint32) (_lexOut OwnedRational, _lexErr e
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
+	atomic.StoreUint32(&s.sourceRuntimeExecuting, 1)
+	defer func() { atomic.StoreUint32(&s.sourceRuntimeExecuting, 0) }()
 	if e := s.beginLexical(); e != nil {
 		return OwnedRational{}, e
 	}
@@ -495,3 +503,12 @@ func (s *RationalService) destroyInfinitesimalConstants() {
 	s.destroyInfIntRationalConstants()
 }
 func (s *RationalService) Close() error { return s.CloseChecked() }
+
+// The Runtime callback is a caller-confined Go adapter domain, distinct from
+// ordinary concurrent service calls, which continue to serialize on mu.
+func (s *RationalService) runtimeTransportExecuting() bool {
+	if atomic.LoadUint32(&s.sourceRuntimeExecuting) == 0 {
+		return false
+	}
+	return s.manager != nil && s.manager.z != nil && s.manager.z.memory.FailureTransportActive()
+}

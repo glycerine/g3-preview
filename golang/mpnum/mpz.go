@@ -49,6 +49,8 @@ type IntegerConfig struct {
 // Close invalidates every live numeral; a supplied Runtime is borrowed.
 type IntegerManager struct {
 	algebraicNegCaller                     *AlgebraicRootCore
+	conversionDetachedOutputs              *arbitraryFloatRationalConversionScope
+	mpfConversionCaller                    *arbitraryFloatRationalConversionScope
 	dividesNumeral                         integerDividesNumeralScope
 	divisionRaw, extendedRaw, gcdRaw       integerRawScope
 	addMulInvocation                       integerAddMulScope
@@ -63,6 +65,8 @@ type IntegerManager struct {
 	upolyDisplaySequenceCaller             *UPolynomialSequence
 	factorFrontendConstantCaller           *UPolynomialFactorizationService
 	self                                   *IntegerManager
+	mpfValueRead                           *arbitraryFloatCopyBinding
+	mpfParent                              *ArbitraryFloatManager
 	memory                                 *memory.Runtime
 	allocator                              *memory.SmallAllocator
 	ownsMemory                             bool
@@ -242,6 +246,9 @@ func (m *IntegerManager) checkCleanup(a *Int) error {
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
 	}
+	if m.mpfValueRead != nil && m.mpfBorrowedSourceCallbackActive() {
+		return ErrPolynomialPending
+	}
 	if m.closed || m.sourceFinalizing || m.constructionFailed {
 		return arena.ErrClosed
 	}
@@ -261,6 +268,9 @@ func (m *IntegerManager) checkCleanup(a *Int) error {
 func (m *IntegerManager) check(a *Int) error {
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
+	}
+	if m.mpfValueRead != nil && m.mpfBorrowedSourceCallbackActive() {
+		return ErrPolynomialPending
 	}
 	if m.closed || m.sourceFinalizing || m.constructionFailed {
 		return arena.ErrClosed
@@ -347,10 +357,13 @@ func (m *IntegerManager) allocateWithSourceContext(capacity, size uint32, s *int
 	if e := context.prepareFactorFrontendConstantHistory(m); e != nil {
 		return 0, e
 	}
+	if e := context.prepareInputAllocation(m); e != nil {
+		return 0, e
+	}
 	var outcome memory.SmallAllocatorAllocationOutcome
 	var out *memory.SmallAllocatorAllocationOutcome
 	var roots *polynomialNumericRoots
-	if s != nil && s == &m.copyAllocation && s.active && s.executing {
+	if s != nil && m.executingCopyAllocationScope(s) {
 		roots = &s.roots
 	}
 	if r := context.roots(m); r != nil {
@@ -364,6 +377,9 @@ func (m *IntegerManager) allocateWithSourceContext(capacity, size uint32, s *int
 			return 0, e
 		}
 	}
+	if e := context.prepareConversionHistory(m); e != nil {
+		return 0, e
+	}
 	if e := context.prepareFactorHistory(m); e != nil {
 		return 0, e
 	}
@@ -373,16 +389,60 @@ func (m *IntegerManager) allocateWithSourceContext(capacity, size uint32, s *int
 	if out != nil {
 		if backing.object != (memory.ObjectRef{}) {
 			roots.cell = backing
+			if s != nil && roots == &s.roots {
+				s.originalCell = backing
+			}
 		}
 		if outcome.Pending != (memory.Block{}) {
 			roots.allocator[0] = outcome.Pending
 		}
 	}
 	if e != nil {
+		if transfer := m.captureInputAllocationOutcome(context, backing, &outcome); transfer != nil {
+			return 0, polynomialNewtonJoin(e, transfer)
+		}
+		if transfer := m.captureConversionAllocationOutcome(context, backing, &outcome); transfer != nil {
+			return 0, polynomialNewtonJoin(e, transfer)
+		}
+		if transfer := m.captureFormatAllocationOutcome(context, backing, &outcome); transfer != nil {
+			return 0, polynomialNewtonJoin(e, transfer)
+		}
+		if context.mpfPower != nil && roots == context.mpfPowerRoots(m) {
+			if transfer := m.capturePowerAllocationOutcome(context, backing, &outcome); transfer != nil {
+				return 0, polynomialNewtonJoin(e, transfer)
+			}
+		}
+		if s != nil && s.mpfCaller != nil && roots == &s.roots {
+			if outcome.Pending != (memory.Block{}) {
+				if transfer := m.allocator.TransferAllocationPending(&outcome, &s.transferred); transfer != nil {
+					return 0, polynomialNewtonJoin(e, transfer)
+				}
+			}
+			if backing.object != (memory.ObjectRef{}) {
+				m.pendingCell = sourceCellBacking{}
+			}
+		}
 		return 0, e
 	}
 	slot, gen, e := m.cells.Allocate()
 	if e != nil {
+		if transfer := m.captureInputAllocationOutcome(context, backing, &outcome); transfer != nil {
+			return 0, polynomialNewtonJoin(e, transfer)
+		}
+		if transfer := m.captureConversionAllocationOutcome(context, backing, &outcome); transfer != nil {
+			return 0, polynomialNewtonJoin(e, transfer)
+		}
+		if transfer := m.captureFormatAllocationOutcome(context, backing, &outcome); transfer != nil {
+			return 0, polynomialNewtonJoin(e, transfer)
+		}
+		if context.mpfPower != nil && roots == context.mpfPowerRoots(m) {
+			if transfer := m.capturePowerAllocationOutcome(context, backing, &outcome); transfer != nil {
+				return 0, polynomialNewtonJoin(e, transfer)
+			}
+		}
+		if s != nil && s.mpfCaller != nil && roots == &s.roots {
+			m.pendingCell = sourceCellBacking{}
+		}
 		return 0, e
 	}
 	ref := makeNumericRef(slot, gen)
@@ -573,7 +633,13 @@ func (m *IntegerManager) allocateIfNeeded(a *Int, capacity uint32) error {
 	return m.allocateIfNeededWithAllocationContext(a, capacity, integerAllocationInvocationContext{})
 }
 func (m *IntegerManager) allocateIfNeededWithAllocationContext(a *Int, capacity uint32, context integerAllocationInvocationContext) error {
+	return m.allocateIfNeededWithPhysicalAllocationContext(a, capacity, context, nil)
+}
+func (m *IntegerManager) allocateIfNeededWithPhysicalAllocationContext(a *Int, capacity uint32, context integerAllocationInvocationContext, receiver *integerRuntimeValueReceiver) error {
 	if e := m.check(a); e != nil {
+		return e
+	}
+	if e := receiver.validate(m, a); e != nil {
 		return e
 	}
 	if capacity < 6 {
@@ -591,11 +657,20 @@ func (m *IntegerManager) allocateIfNeededWithAllocationContext(a *Int, capacity 
 		if aWasSmall {
 			a.cell = m.failedNullRef
 		}
+		if e := receiver.publishValue(a); e != nil {
+			return e
+		}
+		if e := receiver.publishCell(a); e != nil {
+			return e
+		}
 		ref, e := m.allocateWithSourceContext(capacity, 0, nil, context)
 		if e != nil {
 			return e
 		}
 		a.cell = ref
+		if e := receiver.publishCell(a); e != nil {
+			return e
+		}
 		m.publishCell(ref)
 	}
 	return nil
@@ -729,6 +804,12 @@ func (m *IntegerManager) copyFromOwnerWithReceipts(dst *Int, sourceManager *Inte
 	return m.copyFromOwnerWithAllocationContext(dst, sourceManager, src, receipt, pnAllocationContext(pn))
 }
 func (m *IntegerManager) copyFromOwnerWithAllocationContext(dst *Int, sourceManager *IntegerManager, src *Int, receipt *integerCopyAllocationReceipt, context integerAllocationInvocationContext) error {
+	return m.copyFromOwnerWithPhysicalAllocationContext(dst, sourceManager, src, receipt, context, nil)
+}
+func (m *IntegerManager) copyFromOwnerWithPhysicalAllocationContext(dst *Int, sourceManager *IntegerManager, src *Int, receipt *integerCopyAllocationReceipt, context integerAllocationInvocationContext, receiver *integerRuntimeValueReceiver) error {
+	return m.copyFromOwnerWithPhysicalFloatCaller(dst, sourceManager, src, receipt, context, receiver, nil)
+}
+func (m *IntegerManager) copyFromOwnerWithPhysicalFloatCaller(dst *Int, sourceManager *IntegerManager, src *Int, receipt *integerCopyAllocationReceipt, context integerAllocationInvocationContext, receiver *integerRuntimeValueReceiver, caller *arbitraryFloatCopyBinding) error {
 	if e := m.check(dst); e != nil {
 		return e
 	}
@@ -738,20 +819,39 @@ func (m *IntegerManager) copyFromOwnerWithAllocationContext(dst *Int, sourceMana
 	if e := sourceManager.check(src); e != nil {
 		return e
 	}
+	if e := receiver.validate(m, dst); e != nil {
+		return e
+	}
+	if e := m.validateFloatCopyBinding(caller); e != nil {
+		return e
+	}
 	if dst == src {
 		return nil
 	}
 	var owned *integerCopyAllocationScope
 	if src.IsSmall() {
 		v := src.val
-		if e := m.Del(dst); e != nil {
+		delError := m.Del(dst)
+		if e := receiver.publishCell(dst); e != nil {
 			return e
 		}
+		if e := receiver.publishValue(dst); e != nil {
+			return e
+		}
+		if delError != nil {
+			return delError
+		}
 		dst.val = v
+		if e := receiver.publishValue(dst); e != nil {
+			return e
+		}
 		return nil
 	}
 	source := sourceManager.cell(src.cell)
 	dst.val = src.val // big_set publishes sign before allocation/free
+	if e := receiver.publishValue(dst); e != nil {
+		return e
+	}
 	ref := dst.cell
 	if ref == 0 || m.cell(ref).capacity < source.size {
 		if ref != 0 {
@@ -763,13 +863,27 @@ func (m *IntegerManager) copyFromOwnerWithAllocationContext(dst *Int, sourceMana
 		if ref == 0 {
 			dst.cell = m.failedNullRef
 		}
+		if e := receiver.publishCell(dst); e != nil {
+			return e
+		}
 		if receipt != nil {
 			owned = &m.copyAllocation
-			if owned.active || owned.invocation == ^uint64(0) {
+			if caller == nil && (owned.active || owned.invocation == ^uint64(0)) {
 				return ErrPolynomialPending
 			}
-			*owned = integerCopyAllocationScope{active: true, executing: true, invocation: owned.invocation + 1}
+			if e := m.prepareFloatCopyRecord(caller); e != nil {
+				return e
+			}
+			var mpfCaller *arbitraryFloatValueCopyCall
+			invocation := owned.invocation + 1
+			if caller != nil {
+				mpfCaller = caller.record
+				owned = &mpfCaller.childFrame
+				invocation = caller.invocation
+			}
+			*owned = integerCopyAllocationScope{active: true, executing: true, invocation: invocation, mpfCaller: mpfCaller}
 			*receipt = integerCopyAllocationReceipt{m, owned, owned.invocation}
+			m.bindFloatCopyChild(caller, *receipt)
 			defer func() {
 				owned.executing = false
 				if !polynomialNegNumericPending(&owned.roots) {
@@ -784,14 +898,20 @@ func (m *IntegerManager) copyFromOwnerWithAllocationContext(dst *Int, sourceMana
 		}
 	}
 	dst.cell = ref
+	if e := receiver.publishCell(dst); e != nil {
+		return e
+	}
 	m.publishCell(ref)
 	m.resizeCell(ref, source.size)
 	for i := uint32(0); i < source.size; i++ {
 		m.writeDigit(ref, i, sourceManager.digit(src.cell, i))
 	}
 	dst.cell = ref
+	if e := receiver.publishCell(dst); e != nil {
+		return e
+	}
 	dst.val = src.val
-	return nil
+	return receiver.publishValue(dst)
 }
 
 // Move transfers the cell and preserves the source moved-from inline m_val.

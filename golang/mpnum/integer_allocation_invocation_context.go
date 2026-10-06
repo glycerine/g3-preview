@@ -10,6 +10,16 @@ type integerAllocationInvocationContext struct {
 	algebraicNeg               *algebraicNegScope
 	algebraicNegInvocation     uint64
 	algebraicNegEval           bool
+	mpfInput                   *arbitraryFloatInputBinding
+	mpfInputInvocation         uint64
+	mpfConversion              *arbitraryFloatRationalConversionScope
+	mpfConversionInvocation    uint64
+	mpfConversionOutput        bool
+	mpfFormat                  *ArbitraryFloatFormatInvocation
+	mpfFormatInvocation        uint64
+	formatDecimal              *rationalDecimalScope
+	mpfPower                   *arbitraryFloatPowerWrapper
+	mpfPowerInvocation         uint64
 	upolyDisplay               *upolyDisplayScope
 	upolyDisplayInvocation     uint64
 
@@ -117,7 +127,15 @@ func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomial
 	if c.upolyDisplay != nil && c.upolyDisplayFrame(m) == nil {
 		return nil
 	}
-
+	if c.mpfInput != nil {
+		return c.inputRoots(m)
+	}
+	if c.mpfConversion != nil && c.conversionFrame(m, true) == nil {
+		return nil
+	}
+	if c.mpfFormat != nil && c.formatFrame(m, true) == nil {
+		return nil
+	}
 	if c.factorNumeralVector != nil && m.factorNumeralVectorRoots(c) == nil {
 		return nil
 	}
@@ -138,6 +156,9 @@ func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomial
 	}
 	if c.factorFrontend != nil && c.factorFrontendFrame(m) == nil {
 		return nil
+	}
+	if c.mpfPower != nil {
+		return c.mpfPowerRoots(m)
 	}
 	if c.primePreparation != nil && c.primePreparationFrame(m) == nil {
 		return nil
@@ -194,6 +215,18 @@ func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomial
 			return m.rawAllocationRoots(r)
 		}
 		return nil
+	}
+	if c.mpfConversion != nil {
+		if c.mpfConversionOutput {
+			return &c.mpfConversion.outputAllocation.numeric
+		}
+		return &c.mpfConversion.numeric
+	}
+	if c.mpfFormat != nil {
+		if c.formatDecimal != nil {
+			return &c.formatDecimal.numeric
+		}
+		return &c.mpfFormat.numeric
 	}
 	if s := c.pn; s != nil && s.owner != nil && s.owner.manager == m && s == &s.owner.normalization && s.active && s.executing && c.pnInvocation != 0 && c.pnInvocation == s.invocation {
 		return &s.roots

@@ -7,6 +7,7 @@ package memory
 import (
 	"errors"
 	"github.com/glycerine/g3/golang/arena"
+	"sync/atomic"
 )
 
 type FailureKind uint8
@@ -57,6 +58,8 @@ var ErrFailureTransport = errors.New("memory: invalid failure transport")
 func (m *Runtime) emitFailure(kind FailureKind) error {
 	f := Failure{Kind: kind}
 	if m.config.FatalPolicy != nil && kind != FailureVectorOverflow {
+		atomic.AddUint32(&m.failureTransportDepth, 1)
+		defer atomic.AddUint32(&m.failureTransportDepth, ^uint32(0))
 		e := m.config.FatalPolicy.HandleMemoryFailure(m, f)
 		if e == nil {
 			return ErrFailureTransport
@@ -64,6 +67,8 @@ func (m *Runtime) emitFailure(kind FailureKind) error {
 		return e
 	}
 	if m.config.Transport != nil {
+		atomic.AddUint32(&m.failureTransportDepth, 1)
+		defer atomic.AddUint32(&m.failureTransportDepth, ^uint32(0))
 		e := m.config.Transport(f)
 		if e == nil {
 			return ErrFailureTransport
@@ -71,4 +76,13 @@ func (m *Runtime) emitFailure(kind FailureKind) error {
 		return e
 	}
 	return f
+}
+
+// FailureTransportActive reports only the dynamic invocation of this Runtime's
+// borrowed Go failure transport. It grants no block/cleanup authority. Runtime
+// payload operations remain caller-confined; the atomic observation permits a
+// synchronized borrowed numerical owner to avoid locking recursively in that
+// invocation, without rejecting its ordinary serialized calls.
+func (m *Runtime) FailureTransportActive() bool {
+	return m != nil && m.self == m && atomic.LoadUint32(&m.failureTransportDepth) != 0
 }

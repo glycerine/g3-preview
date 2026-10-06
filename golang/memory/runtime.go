@@ -38,15 +38,16 @@ type memoryRuntimeBlock struct {
 	release     runtimeReleaseState
 }
 type Runtime struct {
-	self              *Runtime
-	config            RuntimeConfig
-	origin, header    uint64
-	accounting        utilMemoryAccounting
-	lane              utilMemoryLaneAccounting
-	blocks            []memoryRuntimeBlock
-	live              uint32
-	closed            bool
-	nextReleaseSerial uint64
+	self                  *Runtime
+	config                RuntimeConfig
+	origin, header        uint64
+	accounting            utilMemoryAccounting
+	lane                  utilMemoryLaneAccounting
+	blocks                []memoryRuntimeBlock
+	live                  uint32
+	closed                bool
+	nextReleaseSerial     uint64
+	failureTransportDepth uint32
 }
 type RuntimeState struct {
 	GlobalSize, LocalSize, GlobalCount, LocalCount, Peak int64

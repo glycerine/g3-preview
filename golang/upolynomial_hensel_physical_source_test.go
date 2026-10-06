@@ -375,6 +375,17 @@ func upolyHenselAuditPhysical(t *testing.T, cores []*mpnum.UPolynomialManager, f
 	// These owners are explicitly supplied by the caller. No Runtime directory
 	// supplies authority for a missing debug root.
 	for _, extra := range extras {
+		for _, b := range extra.CallerBlocks {
+			key := [3]uint64{b.OwnerID(), uint64(b.Slot()), uint64(b.Generation())}
+			if key[0] != runtime.FieldByName("origin").Uint() || key[1] == 0 || key[1] > uint64(blocks.Len()) || rawRoots[key] {
+				t.Fatal("invalid or duplicate caller raw acquisition", key)
+			}
+			block := blocks.Index(int(key[1] - 1))
+			if !block.FieldByName("live").Bool() || block.FieldByName("generation").Uint() != key[2] {
+				t.Fatal("ended caller raw acquisition", key)
+			}
+			rawRoots[key] = true
+		}
 		for _, d := range extra.DebugContexts {
 			if d == nil || d.self != d {
 				t.Fatal("invalid named DebugContext")

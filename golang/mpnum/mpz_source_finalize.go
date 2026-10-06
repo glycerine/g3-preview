@@ -92,6 +92,69 @@ func (m *IntegerManager) SourceFinalize() error {
 }
 
 func (m *IntegerManager) markSourceFreedPools() error {
+	if parent := m.mpfParent; parent != nil && parent.self == parent && parent.integer == m {
+		for q := parent.inputCalls; q != nil; q = q.next {
+			if q.self != q || q.manager != parent || q.issued.manager != parent || q.issued.frame != q || q.issued.invocation == 0 {
+				return memory.ErrRuntimeOwner
+			}
+			if e := m.markSourceConsumedDetachedCell(&q.numeric.cell, &q.cellRetired); e != nil {
+				return e
+			}
+		}
+	}
+
+	for s := m.conversionDetachedOutputs; s != nil; s = s.outputDetachedNext {
+		if s.manager == nil || !s.manager.validConversionScope(s) || s.outputManager.z != m || s.outputDetachedInvocation == 0 || s.outputDetachedInvocation != s.invocation {
+			return memory.ErrRuntimeOwner
+		}
+		if e := m.markSourceConsumedDetachedCell(&s.outputAllocation.numeric.cell, &s.outputAllocation.cellRetired); e != nil {
+			return e
+		}
+	}
+	if parent := m.mpfParent; parent != nil {
+		s := &parent.rationalConversion
+		if parent.validConversionScope(s) {
+			if e := m.markSourceConsumedDetachedCell(&s.numeric.cell, &s.cellRetired); e != nil {
+				return e
+			}
+		}
+	}
+
+	if parent := m.mpfParent; parent != nil {
+		for s := parent.formatScopes; s != nil; s = s.next {
+			if !parent.matchesFormatFrame(s) {
+				return ErrPolynomialOwner
+			}
+			if e := m.markSourceConsumedDetachedCell(&s.numeric.cell, &s.cellRetired); e != nil {
+				return e
+			}
+			if e := m.markSourceConsumedDetachedCell(&s.decimal.numeric.cell, &s.decimal.cellRetired); e != nil {
+				return e
+			}
+		}
+	}
+
+	if parent := m.mpfParent; parent != nil {
+		for q := parent.valueCalls; q != nil; q = q.next {
+			if q.retired || !m.matchesCopyAllocationInvocation(&q.issued.child) {
+				continue
+			}
+			child := &q.childFrame
+			if e := m.markSourceConsumedDetachedCell(&child.roots.cell, &child.cellRetired); e != nil {
+				return e
+			}
+		}
+	}
+	if parent := m.mpfParent; parent != nil {
+		for w := parent.powerWrappers; w != nil; w = w.next {
+			if !w.valid() || w.manager.integer != m {
+				return ErrPolynomialOwner
+			}
+			if e := m.markSourceConsumedDetachedCell(&w.roots.cell, &w.cellRetired); e != nil {
+				return e
+			}
+		}
+	}
 	for n := uint64(1); n <= uint64(m.cells.Stats().Slots); n++ {
 		slot := arena.Slot(n)
 		c, e := m.cells.Read(slot)
@@ -137,4 +200,19 @@ func (m *IntegerManager) freeAfterSourceFinalize(ref numericCellRef) error {
 		}
 	}
 	return m.cells.Recycle(numericSlot(ref))
+}
+
+// markSourceConsumedDetachedCell checks only a previously acquired exact cell
+// token at the reached allocator destructor frontier. Direct blocks survive.
+func (m *IntegerManager) markSourceConsumedDetachedCell(c *sourceCellBacking, retired *bool) error {
+	if c.object == (memory.ObjectRef{}) || c.offset == 0 {
+		return nil
+	}
+	_, e := m.memory.ReadUint32(c.raw, c.offset+4)
+	if errors.Is(e, memory.ErrRuntimeOwner) {
+		*c = sourceCellBacking{}
+		*retired = true
+		return nil
+	}
+	return e
 }

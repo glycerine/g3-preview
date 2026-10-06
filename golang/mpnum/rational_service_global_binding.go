@@ -32,7 +32,7 @@ func (s *RationalService) BindSourceGlobalSlot(slot **RationalManager) error {
 	if s == nil || s.self != s || slot == nil {
 		return ErrRationalServiceOwner
 	}
-	if s.sourceInsertionExecuting {
+	if s.sourceInsertionExecuting || s.runtimeTransportExecuting() {
 		return arena.ErrInvalidSlot
 	}
 	s.mu.Lock()
@@ -65,7 +65,7 @@ func (s *RationalService) SourceEndedStaticMask() (uint16, error) {
 	if s == nil || s.self != s {
 		return 0, ErrRationalServiceOwner
 	}
-	if s.sourceInsertionExecuting {
+	if s.sourceInsertionExecuting || s.runtimeTransportExecuting() {
 		return 0, arena.ErrInvalidSlot
 	}
 	s.mu.Lock()
@@ -85,7 +85,7 @@ func (s *RationalService) CheckSourceStaticLifetime(slot **RationalManager, whic
 	if e := s.ValidateSourceGlobalSlot(slot); e != nil {
 		return e
 	}
-	if s.sourceInsertionExecuting {
+	if s.sourceInsertionExecuting || s.runtimeTransportExecuting() {
 		return arena.ErrInvalidSlot
 	}
 	s.mu.Lock()
@@ -113,7 +113,7 @@ func (s *RationalService) InitializeReboundSourceConstants(slot **RationalManage
 	if m == nil || *slot != m {
 		return ErrRationalServiceOwner
 	}
-	if s.sourceInsertionExecuting {
+	if s.sourceInsertionExecuting || s.runtimeTransportExecuting() {
 		return arena.ErrInvalidSlot
 	}
 	s.mu.Lock()
@@ -129,7 +129,7 @@ func (s *RationalService) PublishAcquiredSourceManager(slot **RationalManager, m
 	if e := s.ValidateSourceGlobalSlot(slot); e != nil {
 		return e
 	}
-	if s.sourceInsertionExecuting {
+	if s.sourceInsertionExecuting || s.runtimeTransportExecuting() {
 		return arena.ErrInvalidSlot
 	}
 	s.mu.Lock()

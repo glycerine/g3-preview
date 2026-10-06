@@ -31,6 +31,7 @@ type RationalConfig struct {
 // source reusable scratch algorithms. Both are owner-confined, not concurrent.
 // Manager header bytes include all retained scalar rational scratch members.
 type RationalManager struct {
+	mpfParent                                      *ArbitraryFloatManager
 	lexical                                        rationalManagerLexicalScope
 	rawArithmetic                                  rationalRawArithmeticScope
 	rawGeneration                                  uint64
@@ -292,30 +293,42 @@ func (m *RationalManager) SetFractionSigned(a *Rational, n, d int32) error {
 	return m.normalize(a)
 }
 func (m *RationalManager) SetParts(a *Rational, n, d *Int) error {
+	return m.setPartsFromIntegerOwner(a, n, d, m.z)
+}
+func (m *RationalManager) setPartsFromIntegerOwner(a *Rational, n, d *Int, sourceOwner *IntegerManager) error {
+	return m.setPartsFromIntegerOwnerWithAllocationContext(a, n, d, sourceOwner, integerAllocationInvocationContext{})
+}
+func (m *RationalManager) setPartsFromIntegerOwnerWithAllocationContext(a *Rational, n, d *Int, sourceOwner *IntegerManager, context integerAllocationInvocationContext) error {
 	if e := m.checkSetter(a); e != nil {
 		return e
 	}
-	if e := m.z.check(d); e != nil {
+	if sourceOwner == nil || sourceOwner.self != sourceOwner {
+		return memory.ErrRuntimeOwner
+	}
+	if e := sourceOwner.check(d); e != nil {
 		return e
 	}
 	negative := d.val < 0 // source branch decision precedes both caller Copies
-	if e := m.z.Copy(&a.num, n); e != nil {
+	if e := m.z.copyFromOwnerWithAllocationContext(&a.num, sourceOwner, n, nil, context); e != nil {
 		return e
 	}
-	if e := m.z.Copy(&a.den, d); e != nil {
+	if e := m.z.copyFromOwnerWithAllocationContext(&a.den, sourceOwner, d, nil, context); e != nil {
 		return e
 	}
 	if negative {
-		if e := m.z.Neg(&a.num); e != nil {
+		if e := m.z.negWithAllocationContext(&a.num, context); e != nil {
 			return e
 		}
-		if e := m.z.Neg(&a.den); e != nil {
+		if e := m.z.negWithAllocationContext(&a.den, context); e != nil {
 			return e
 		}
 	}
-	return m.normalize(a)
+	return m.normalizeWithAllocationContext(a, context)
 }
 func (m *RationalManager) normalize(a *Rational) (_rawErr error) {
+	return m.normalizeWithAllocationContext(a, integerAllocationInvocationContext{})
+}
+func (m *RationalManager) normalizeWithAllocationContext(a *Rational, context integerAllocationInvocationContext) (_rawErr error) {
 	tmp := &m.nTmp
 	if m.synchronized {
 		r := &m.rawArithmetic
@@ -335,14 +348,14 @@ func (m *RationalManager) normalize(a *Rational) (_rawErr error) {
 		tmp = &r.norm
 		defer m.finishRawNormalize(&_rawErr)
 	}
-	if e := m.z.GCD(&a.num, &a.den, tmp); e != nil {
+	if e := m.z.gcdWithAllocationContext(&a.num, &a.den, tmp, context); e != nil {
 		return e
 	}
 	if !isOneInteger(tmp) {
-		if e := m.z.Div(&a.num, tmp, &a.num); e != nil {
+		if e := m.z.divWithAllocationContext(&a.num, tmp, &a.num, context); e != nil {
 			return e
 		}
-		if e := m.z.Div(&a.den, tmp, &a.den); e != nil {
+		if e := m.z.divWithAllocationContext(&a.den, tmp, &a.den, context); e != nil {
 			return e
 		}
 	}

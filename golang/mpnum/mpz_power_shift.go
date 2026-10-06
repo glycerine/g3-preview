@@ -152,6 +152,25 @@ func (m *IntegerManager) powerWithAllocationContext(a *Int, p uint32, out *Int, 
 	return m.powerCoreWithContext(a, p, out, receipt, context)
 }
 func (m *IntegerManager) powerCoreWithContext(a *Int, p uint32, out *Int, receipt *integerPowerInvocationReceipt, context integerAllocationInvocationContext) (cause error) {
+	return m.powerCoreWithPhysicalContext(a, p, out, receipt, context, nil)
+}
+func (m *IntegerManager) powerWithPhysicalAllocationContext(a *Int, p uint32, out *Int, receipt *integerPowerInvocationReceipt, context integerAllocationInvocationContext, receiver *integerRuntimeValueReceiver) error {
+	if e := m.check(a); e != nil {
+		return e
+	}
+	if e := m.check(out); e != nil {
+		return e
+	}
+	if e := receiver.validate(m, out); e != nil {
+		return e
+	}
+	// This physical leaf represents the reached MPF powers-of-two specialization.
+	if !a.IsSmall() || a.val != 2 {
+		return arena.ErrInvalidSlot
+	}
+	return m.powerCoreWithPhysicalContext(a, p, out, receipt, context, receiver)
+}
+func (m *IntegerManager) powerCoreWithPhysicalContext(a *Int, p uint32, out *Int, receipt *integerPowerInvocationReceipt, context integerAllocationInvocationContext, receiver *integerRuntimeValueReceiver) (cause error) {
 	if context != (integerAllocationInvocationContext{}) && context.roots(m) == nil {
 		return ErrUPolynomialOwner
 	}
@@ -159,18 +178,22 @@ func (m *IntegerManager) powerCoreWithContext(a *Int, p uint32, out *Int, receip
 		switch a.val {
 		case 2:
 			if p < 31 {
-				if e := m.Del(out); e != nil {
+				e := m.Del(out)
+				if write := receiver.publishCell(out); write != nil {
+					return write
+				}
+				if e != nil {
 					return e
 				}
 				out.val = int32(uint32(1) << p)
-				return nil
+				return receiver.publishValue(out)
 			}
 			size := p/32 + 1
 			shift := p % 32
 			if modularSourceDebug && size == 0 {
 				return ErrIntegerAssertion
 			}
-			if e := m.allocateIfNeededWithAllocationContext(out, size, context); e != nil {
+			if e := m.allocateIfNeededWithPhysicalAllocationContext(out, size, context, receiver); e != nil {
 				return e
 			}
 			if modularSourceDebug && m.cell(out.cell).capacity < size {
@@ -188,7 +211,7 @@ func (m *IntegerManager) powerCoreWithContext(a *Int, p uint32, out *Int, receip
 			// Explicit unsigned limb shift defines the intended bit at source signed 1<<31.
 			m.writeDigit(out.cell, size-1, uint32(1)<<shift)
 			out.val = 1
-			return nil
+			return receiver.publishValue(out)
 		case 0:
 			if modularSourceDebug && p == 0 {
 				return &PowerDomainError{Exponent: p, Reason: PowerZeroToZero}

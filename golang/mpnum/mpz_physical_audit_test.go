@@ -64,6 +64,43 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []mem
 	add(m.smt2Display.value.cell)
 	add(m.intMin.cell)
 	add(m.two64.cell)
+	if parent := m.mpfParent; parent != nil {
+		for s := parent.formatScopes; s != nil; s = s.next {
+			if !parent.matchesFormatFrame(s) {
+				t.Fatal("invalid actual format frame")
+			}
+			if s.constructed >= 1 {
+				add(s.num.cell)
+			}
+			if s.constructed >= 2 {
+				add(s.denom.cell)
+			}
+			if s.constructed >= 3 {
+				add(s.q.num.cell)
+				add(s.q.den.cell)
+			}
+			if s.decimal.parent != nil {
+				for i := 1; i < 4; i++ {
+					add(s.decimal.values[i].cell)
+				}
+				if s.decimal.count >= 4 {
+					add(s.decimal.values[0].cell)
+				}
+			}
+		}
+		for w := parent.powerWrappers; w != nil; w = w.next {
+			if !w.valid() {
+				t.Fatal("invalid actual Power owner")
+			}
+			if w.initialized && !w.sourceDelDone && w.block != (memory.Block{}) {
+				a, e := w.capture()
+				if e != nil {
+					t.Fatal("invalid actual Power NUM", e)
+				}
+				add(a.cell)
+			}
+		}
+	}
 	for _, v := range public {
 		if v != nil {
 			add(v.cell)
@@ -123,6 +160,158 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []mem
 		t.Fatal("unnamed real formatting Words root", len(words), m.words.Stats().Live)
 	}
 	raw := map[memory.Block]bool{}
+	if parent := m.mpfParent; parent != nil {
+		for s := parent.formatScopes; s != nil; s = s.next {
+			if !parent.matchesFormatFrame(s) {
+				t.Fatal("invalid actual format frame")
+			}
+			for _, b := range []memory.Block{s.transferred.Block(), s.decimal.transferred.Block()} {
+				if b != (memory.Block{}) {
+					if raw[b] {
+						t.Fatal("duplicate format transferred raw")
+					}
+					if _, e := m.memory.Size(b); e != nil {
+						t.Fatal(e)
+					}
+					raw[b] = true
+				}
+			}
+			for _, c := range []sourceCellBacking{s.numeric.cell, s.decimal.numeric.cell} {
+				if c.object == (memory.ObjectRef{}) {
+					continue
+				}
+				if objects[c.object] {
+					t.Fatal("duplicate format object")
+				}
+				ended, e := m.allocator.SourceObjectOwnerEnded()
+				if e != nil {
+					t.Fatal(e)
+				}
+				if ended && c.offset == 0 {
+					if raw[c.raw] {
+						t.Fatal("duplicate format direct raw")
+					}
+					if _, e := m.memory.Size(c.raw); e != nil {
+						t.Fatal(e)
+					}
+					raw[c.raw] = true
+				} else {
+					if _, e := m.allocator.ObjectExtent(c.object); e != nil {
+						t.Fatal(e)
+					}
+					objects[c.object] = true
+				}
+			}
+		}
+	}
+
+	if parent := m.mpfParent; parent != nil {
+		for w := parent.powerWrappers; w != nil; w = w.next {
+			if !w.valid() {
+				t.Fatal("invalid actual Power owner")
+			}
+			for _, block := range []memory.Block{w.block, w.transferred.Block()} {
+				if block == (memory.Block{}) {
+					continue
+				}
+				if raw[block] {
+					t.Fatal("duplicate actual Power raw owner")
+				}
+				if _, e := m.memory.Size(block); e != nil {
+					t.Fatal("invalid actual Power raw owner", e)
+				}
+				raw[block] = true
+			}
+			if c := w.roots.cell; c.object != (memory.ObjectRef{}) {
+				if objects[c.object] {
+					t.Fatal("duplicate actual Power object")
+				}
+				if _, e := m.allocator.ObjectExtent(c.object); e != nil {
+					t.Fatal("invalid actual Power object", e)
+				}
+				objects[c.object] = true
+			}
+		}
+		for q := parent.inputCalls; q != nil; q = q.next {
+			if q.self != q || q.manager != parent || q.issued.manager != parent || q.issued.frame != q || q.issued.invocation == 0 {
+				t.Fatal("invalid actual input call owner")
+			}
+			if block := q.transferred.Block(); block != (memory.Block{}) {
+				if raw[block] {
+					t.Fatal("duplicate input transferred raw")
+				}
+				if _, e := m.memory.Size(block); e != nil {
+					t.Fatal(e)
+				}
+				raw[block] = true
+			}
+			if c := q.numeric.cell; c.object != (memory.ObjectRef{}) {
+				if objects[c.object] {
+					t.Fatal("duplicate input cell")
+				}
+				ended, e := m.allocator.SourceObjectOwnerEnded()
+				if e != nil {
+					t.Fatal(e)
+				}
+				if ended && c.offset == 0 {
+					if raw[c.raw] {
+						t.Fatal("duplicate input direct raw")
+					}
+					if _, e := m.memory.Size(c.raw); e != nil {
+						t.Fatal(e)
+					}
+					raw[c.raw] = true
+				} else {
+					if _, e := m.allocator.ObjectExtent(c.object); e != nil {
+						t.Fatal(e)
+					}
+					objects[c.object] = true
+				}
+			}
+		}
+		for q := parent.valueCalls; q != nil; q = q.next {
+			if q.retired {
+				continue
+			}
+			child := &q.childFrame
+			if !m.matchesCopyAllocationInvocation(&q.issued.child) {
+				t.Fatal("invalid retained MPF child")
+			}
+			block := child.transferred.Block()
+			if block != (memory.Block{}) {
+				if raw[block] {
+					t.Fatal("duplicate transferred MPF raw root")
+				}
+				if _, e := m.memory.Size(block); e != nil {
+					t.Fatal("invalid transferred MPF raw root", e)
+				}
+				raw[block] = true
+			}
+			if c := child.roots.cell; c.object != (memory.ObjectRef{}) {
+				if objects[c.object] {
+					t.Fatal("duplicate retained MPF cell")
+				}
+				ended, e := m.allocator.SourceObjectOwnerEnded()
+				if e != nil {
+					t.Fatal(e)
+				}
+				if ended && c.offset == 0 {
+					if raw[c.raw] {
+						t.Fatal("duplicate retained direct MPF raw")
+					}
+					if _, e := m.memory.Size(c.raw); e != nil {
+						t.Fatal(e)
+					}
+					raw[c.raw] = true
+				} else {
+					if _, e := m.allocator.ObjectExtent(c.object); e != nil {
+						t.Fatal("invalid retained MPF cell", e)
+					}
+					objects[c.object] = true
+				}
+			}
+		}
+	}
 	if m.sourceFinalized || m.constructorUnwound {
 		for ref := range cells {
 			c := m.cell(ref)

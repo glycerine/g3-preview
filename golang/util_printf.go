@@ -1,11 +1,15 @@
 // Licensed under the MIT license.
 // Licensed under the MIT license; see LICENSE.txt in the source distribution.
-// Explicit-argument integer/C-string subset of warning.cpp format2ostream.
+// Source: src/util/warning.cpp:105-169.
+// Source author: Leonardo de Moura (2006-12-01).
+// Explicit-argument integer/C-string subset of format2ostream.
 package g3
 
 import (
 	"errors"
 	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
+	"os"
 	"reflect"
 	"sync"
 )
@@ -38,9 +42,11 @@ const (
 // PrintfArg is a cold explicit va_list adaptation; args and nullable CString
 // pointers are borrowed for one synchronous call and never retained in an owner.
 type PrintfArg struct {
-	kind uint32
-	bits uint64
-	text *string
+	kind         uint32
+	bits         uint64
+	text         *string
+	view         ParamsStringView
+	borrowedView bool
 }
 
 func PrintfInt32(v int32) PrintfArg     { return PrintfArg{kind: pfInt32, bits: uint64(uint32(v))} }
@@ -48,7 +54,12 @@ func PrintfUInt32(v uint32) PrintfArg   { return PrintfArg{kind: pfUInt32, bits:
 func PrintfInt64(v int64) PrintfArg     { return PrintfArg{kind: pfInt64, bits: uint64(v)} }
 func PrintfUInt64(v uint64) PrintfArg   { return PrintfArg{kind: pfUInt64, bits: v} }
 func PrintfCString(v *string) PrintfArg { return PrintfArg{kind: pfCString, text: v} }
-func PrintfChar(v uint32) PrintfArg     { return PrintfArg{kind: pfChar, bits: uint64(v)} }
+
+// PrintfCStringView borrows the actual source pointer for the reached %s leaf.
+func PrintfCStringView(v ParamsStringView) PrintfArg {
+	return PrintfArg{kind: pfCString, view: v, borrowedView: true}
+}
+func PrintfChar(v uint32) PrintfArg { return PrintfArg{kind: pfChar, bits: uint64(v)} }
 
 type PrintfEventKind uint32
 
@@ -242,10 +253,54 @@ func NewDefaultExceptionFormatted(f *PrintfFormatter, format string, args []Prin
 
 // pfSink writes at most size-1 bytes but counts every conceptual output byte.
 // Repeated width/precision spans are counted in O(1), never allocated as strings.
+// Concrete call-local sinks share the original parser/number engine. Optional
+// raw and stdio destinations never retain a second hot byte payload. The file
+// sink is the explicit unbuffered Go adapter of fprintf, not an ostream.
 type pfSink struct {
-	buffer   []byte
-	count    uint64
-	overflow bool
+	buffer         []byte
+	runtime        *memory.Runtime
+	block          memory.Block
+	offset, extent uint64
+	file           *os.File
+	fileByte       [1]byte
+	count          uint64
+	overflow       bool
+	cause          error
+}
+
+func (s *pfSink) limit() uint64 {
+	if s.runtime != nil {
+		if s.extent == 0 {
+			return 0
+		}
+		return s.extent - 1
+	}
+	if s.file != nil {
+		return ^uint64(0)
+	}
+	return uint64(len(s.buffer) - 1)
+}
+func (s *pfSink) put(i uint64, v byte) {
+	if s.cause != nil {
+		return
+	}
+	if s.runtime != nil {
+		if s.extent == 0 {
+			return
+		}
+		if i > ^uint64(0)-s.offset {
+			s.cause = arena.ErrBounds
+			return
+		}
+		s.cause = s.runtime.Write(s.block, s.offset+i, v)
+		return
+	}
+	if s.file != nil {
+		s.fileByte[0] = v
+		_, _ = s.file.Write(s.fileByte[:])
+		return
+	}
+	s.buffer[i] = v
 }
 
 func (s *pfSink) add(n uint64) bool {
@@ -259,9 +314,9 @@ func (s *pfSink) repeat(ch byte, n uint64) {
 	if !s.add(n) {
 		return
 	}
-	limit := uint64(len(s.buffer) - 1)
+	limit := s.limit()
 	for i := s.count; i < limit && i < s.count+n; i++ {
-		s.buffer[i] = ch
+		s.put(i, ch)
 	}
 	s.count += n
 }
@@ -269,10 +324,10 @@ func (s *pfSink) bytes(b []byte) {
 	if !s.add(uint64(len(b))) {
 		return
 	}
-	limit := uint64(len(s.buffer) - 1)
+	limit := s.limit()
 	for i, ch := range b {
 		if s.count+uint64(i) < limit {
-			s.buffer[s.count+uint64(i)] = ch
+			s.put(s.count+uint64(i), ch)
 		}
 	}
 	s.count += uint64(len(b))
@@ -281,22 +336,58 @@ func (s *pfSink) text(b string) {
 	if !s.add(uint64(len(b))) {
 		return
 	}
-	limit := uint64(len(s.buffer) - 1)
+	limit := s.limit()
 	n := uint64(len(b))
 	if s.count < limit {
 		if n > limit-s.count {
 			n = limit - s.count
 		}
-		copy(s.buffer[s.count:s.count+n], b[:n])
+		for i := uint64(0); i < n; i++ {
+			s.put(s.count+i, b[i])
+		}
 	}
 	s.count += uint64(len(b))
 }
 func (s *pfSink) finish() {
-	i := s.count
-	if i >= uint64(len(s.buffer)) {
-		i = uint64(len(s.buffer) - 1)
+	if s.file != nil || s.runtime != nil && s.extent == 0 {
+		return
 	}
-	s.buffer[i] = 0
+	i := s.count
+	limit := s.limit()
+	if i > limit {
+		i = limit
+	}
+	s.put(i, 0)
+}
+func (s *pfSink) cstring(v ParamsStringView, precision int64) error {
+	var n uint64
+	for precision < 0 || n < uint64(precision) {
+		b, e := v.Byte(n)
+		if e != nil {
+			return e
+		}
+		if b == 0 {
+			break
+		}
+		n++
+	}
+	if !s.add(n) {
+		s.overflow = true
+		return nil
+	}
+	limit := s.limit()
+	for i := uint64(0); i < n && s.count+i < limit; i++ {
+		b, e := v.Byte(i)
+		if e != nil {
+			return e
+		}
+		s.put(s.count+i, b)
+		if s.cause != nil {
+			return s.cause
+		}
+	}
+	s.count += n
+	return nil
 }
 
 type pfFlags struct{ left, plus, space, alternate, zero bool }
@@ -454,7 +545,17 @@ func pfInteger(s *pfSink, a PrintfArg, verb byte, length uint32, profile PrintfP
 // Length codes: none0,hh1,h2,l3,ll4,j5,z6,t7. Unsupported standard
 // domains are typed errors, not fake negative vsnprintf results/raw fallback.
 func pfRender(buffer []byte, profile PrintfProfile, format string, args []PrintfArg) (int64, PrintfFailure, error) {
-	sink := pfSink{buffer: buffer}
+	return pfRenderSource(pfSink{buffer: buffer}, profile, format, args)
+}
+func pfRenderSource(sink pfSink, profile PrintfProfile, format string, args []PrintfArg) (count int64, failure PrintfFailure, result error) {
+	defer func() {
+		if sink.cause != nil {
+			count = int64(sink.count)
+			failure = PrintfArgumentFailure
+			result = sink.cause
+		}
+	}()
+
 	arg := 0
 	malformed := func() (int64, PrintfFailure, error) {
 		sink.finish()
@@ -469,6 +570,9 @@ func pfRender(buffer []byte, profile PrintfProfile, format string, args []Printf
 		return int64(sink.count), f, e
 	}
 	for i := 0; i < len(format); {
+		if sink.cause != nil {
+			return typed(PrintfArgumentFailure, sink.cause)
+		}
 		if format[i] != '%' {
 			start := i
 			for i < len(format) && format[i] != '%' {
@@ -614,6 +718,36 @@ func pfRender(buffer []byte, profile PrintfProfile, format string, args []Printf
 		if verb == 's' {
 			if a.kind != pfCString {
 				return typed(PrintfArgumentFailure, ErrPrintfArgument)
+			}
+			if a.borrowedView {
+				var n uint64
+				for precision < 0 || n < uint64(precision) {
+					v, e := a.view.Byte(n)
+					if e != nil {
+						return typed(PrintfArgumentFailure, e)
+					}
+					if v == 0 {
+						break
+					}
+					n++
+				}
+				padding := uint64(0)
+				if uint64(width) > n {
+					padding = uint64(width) - n
+				}
+				if !flags.left {
+					sink.repeat(' ', padding)
+				}
+				if e := sink.cstring(a.view, precision); e != nil {
+					return typed(PrintfArgumentFailure, e)
+				}
+				if flags.left {
+					sink.repeat(' ', padding)
+				}
+				if sink.overflow {
+					return countOverflow()
+				}
+				continue
 			}
 			text := "(null)"
 			if a.text != nil {

@@ -24,7 +24,7 @@ func (s *RationalService) SourceFinalize() error {
 	if s == nil || s.self != s {
 		return ErrRationalServiceCopy
 	}
-	if s.sourceInsertionExecuting {
+	if s.sourceInsertionExecuting || s.runtimeTransportExecuting() {
 		return arena.ErrInvalidSlot
 	}
 	s.mu.Lock()

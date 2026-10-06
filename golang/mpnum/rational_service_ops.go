@@ -1,8 +1,12 @@
 // Source: src/util/rational.h; src/util/rational.cpp. Licensed under the MIT license.
 // Source: src/util/rational.h owner-local operator facade.
+// Source author: Leonardo de Moura (2006-09-18). See LICENSE.txt.
 package mpnum
 
-import "errors"
+import (
+	"errors"
+	"sync/atomic"
+)
 
 var ErrRationalFacadeDomain = errors.New("mpnum: rational facade source assertion domain")
 
@@ -117,6 +121,10 @@ func (s *RationalService) facadeAssign(a, b *OwnedRational, op rationalFacadeBin
 		return e
 	}
 	defer s.mu.Unlock()
+	if op == rationalFacadeMul {
+		atomic.StoreUint32(&s.sourceRuntimeExecuting, 1)
+		defer atomic.StoreUint32(&s.sourceRuntimeExecuting, 0)
+	}
 	return s.facadeAssignLocked(a, b, op)
 }
 func (s *RationalService) Add(a, b *OwnedRational) (OwnedRational, error) {
@@ -347,6 +355,10 @@ func (s *RationalService) facadeUnary(a *OwnedRational, op rationalFacadeUnaryOp
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
+	if op == facadePower {
+		atomic.StoreUint32(&s.sourceRuntimeExecuting, 1)
+		defer atomic.StoreUint32(&s.sourceRuntimeExecuting, 0)
+	}
 	if e := s.beginLexical(); e != nil {
 		return OwnedRational{}, e
 	}

@@ -181,6 +181,26 @@ func (m *NaturalManager) sourceVerifyDivisionWithAllocationContext(a, b, q, r li
 		r.frame.verification = naturalPNVerificationReceipt{m, frame, frame.invocation}
 		defer func() { frame.executing = false }()
 	}
+
+	if context.raw == nil && context.mpfFormat != nil {
+		q := context.formatFrame(context.mpfFormat.manager.integer, true)
+		if q == nil || q.manager.integer.natural != m {
+			return ErrPolynomialOwner
+		}
+		frame = &m.verificationInvocation
+		if frame.active || frame.invocation == ^uint64(0) {
+			return ErrPolynomialPending
+		}
+		*frame = naturalPNVerificationScope{active: true, executing: true, invocation: frame.invocation + 1, formatContext: context}
+		frame.buffer = naturalPNBufferReceipt{owner: m, formatContext: context, invocation: q.invocation, buffer: &m.verification, private: true}
+		receipt := naturalPNVerificationReceipt{m, frame, frame.invocation}
+		if context.formatDecimal != nil {
+			context.formatDecimal.verification = receipt
+		} else {
+			q.verification = receipt
+		}
+		defer func() { frame.executing = false }()
+	}
 	m.verificationActive = true
 	temp := &m.verification
 	var buffer *naturalPNBufferReceipt

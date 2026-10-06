@@ -56,6 +56,7 @@ func (m *IntegerModularManager) cleanupPNormalizeInvocation(r *integerPNormalize
 // Successful publication returns authority to the persistent Natural member.
 type naturalPNBufferReceipt struct {
 	factorFrontendContext   integerAllocationInvocationContext
+	formatContext           integerAllocationInvocationContext
 	primePreparationContext integerAllocationInvocationContext
 	henselCallerContext     integerAllocationInvocationContext
 	recombinationContext    integerAllocationInvocationContext
@@ -147,6 +148,29 @@ func (r *naturalPNBufferReceipt) bound(executing bool) bool {
 		}
 		for i := range q.buffers {
 			if r == &q.buffers[i] {
+				return r.buffer == &r.owner.division[i]
+			}
+		}
+		return false
+	}
+
+	if c := r.formatContext; c.mpfFormat != nil {
+		s := c.mpfFormat
+		if r.owner == nil || s.manager == nil || r.owner != s.manager.integer.natural || c.formatFrame(s.manager.integer, executing) == nil || r.invocation != s.invocation {
+			return false
+		}
+		buffers := &s.buffers
+		verification := &s.verification
+		if c.formatDecimal != nil {
+			buffers = &c.formatDecimal.buffers
+			verification = &c.formatDecimal.verification
+		}
+		if r.private {
+			v := &r.owner.verificationInvocation
+			return r == &v.buffer && r.buffer == &r.owner.verification && v.formatContext.mpfFormat == s && v.formatContext.mpfFormatInvocation == s.invocation && v.formatContext.formatDecimal == c.formatDecimal && r.owner.matchesPNVerification(verification)
+		}
+		for i := range buffers {
+			if r == &buffers[i] {
 				return r.buffer == &r.owner.division[i]
 			}
 		}
@@ -392,6 +416,21 @@ func (m *NaturalManager) divisionBufferReceipt(context integerAllocationInvocati
 
 	if context.raw != nil {
 		return nil
+	}
+	if context.mpfFormat != nil {
+		q := context.formatFrame(context.mpfFormat.manager.integer, true)
+		if q == nil || q.manager.integer.natural != m {
+			return nil
+		}
+		buffers := &q.buffers
+		if context.formatDecimal != nil {
+			buffers = &context.formatDecimal.buffers
+		}
+		b := &buffers[i]
+		if b.owner == nil {
+			*b = naturalPNBufferReceipt{owner: m, formatContext: context, invocation: q.invocation, buffer: &m.division[i]}
+		}
+		return b
 	}
 
 	if q := context.factorFrontend; q != nil && context.pn == nil {

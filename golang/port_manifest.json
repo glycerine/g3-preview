@@ -97212,8 +97212,12 @@
       "component": "test",
       "role": "test",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "mpnum/mpf_value_input_driver_source_test.go"
+      ],
+      "tests": [
+        "TestArbitraryFloatOriginalSetIntAndDoubleDriverAssertions"
+      ],
       "assertions": [
         {
           "line": 27,
@@ -97291,7 +97295,9 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [],
-      "ownership": [],
+      "ownership": [
+        "All eighteen active ENSURE assertions in src/test/mpf.cpp:23-82 execute the literal int/double/float SET and ToDouble/ToFloat bodies. The Go fixture matches the separate manager and scoped value lifetimes of bug_set_int and bug_set_double. The source-commented rounding-dependent INT_MAX float assertion remains disabled; the trace toggle is diagnostic. Production MPF completion is not inferred from these driver assertions."
+      ],
       "deviations": []
     },
     {
@@ -121346,9 +121352,91 @@
       "path": "src/util/mpf.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/mpf_value_format.go",
+        "mpnum/mpf_value_format_allocation.go",
+        "mpnum/mpf_value_format_decimal.go",
+        "mpnum/mpf_value_format_invocation.go",
+        "mpnum/mpf_value_format_stream.go",
+        "mpnum/mpf_value_format_source_test.go",
+        "mpnum/mpf_value_format_cold_source_test.go",
+        "util_mpf_format_numeric_stop_source_test.go",
+        "util_mpf_format_text.go",
+        "mpnum/mpf_value_conversion_allocation.go",
+        "mpnum/mpf_value_scalar_receipt_source_test.go",
+        "mpnum/mpf_value_to_rational.go",
+        "mpnum/mpf_value_to_rational_allocation_source_test.go",
+        "mpnum/mpf_value_to_rational_callback_source_test.go",
+        "mpnum/mpf_value_to_rational_copied_scope_source_test.go",
+        "mpnum/mpf_value_to_rational_copy_source_test.go",
+        "mpnum/mpf_value_to_rational_direct_source_test.go",
+        "mpnum/mpf_value_to_rational_every_prefix_source_test.go",
+        "mpnum/mpf_value_to_rational_foreign_pending_source_test.go",
+        "mpnum/mpf_value_to_rational_foreign_setter_source_test.go",
+        "mpnum/mpf_value_to_rational_history.go",
+        "mpnum/mpf_value_to_rational_history_source_test.go",
+        "mpnum/mpf_value_to_rational_normalize_source_test.go",
+        "mpnum/mpf_value_to_rational_pool_source_test.go",
+        "mpnum/mpf_value_to_rational_scope.go",
+        "mpnum/mpf_value_to_rational_source_stop_test.go",
+        "mpnum/mpf_value_to_rational_source_test.go",
+        "mpnum/mpf_value_to_rational_stale_context_source_test.go",
+        "mpnum/mpf_value_to_rational_width_source_test.go",
+        "mpnum/mpf_value_ieee.go",
+        "mpnum/mpf_value_ieee_source_test.go",
+        "mpnum/mpf_value_ieee_branch_source_test.go",
+        "mpnum/mpf_value_ieee_lifetime_source_test.go",
+        "mpnum/mpf_value_ieee_signed_shift_source_test.go",
+        "mpnum/mpf_value_input.go",
+        "mpnum/mpf_value_input_invocation.go",
+        "mpnum/mpf_value_input_driver_source_test.go",
+        "mpnum/mpf_value_input_allocation_source_test.go",
+        "mpnum/mpf_value_input_history_source_test.go",
+        "mpnum/mpf_value_input_callback_source_test.go",
+        "mpnum/mpf_value_input_source_end_test.go",
+        "mpnum/mpf_value_input_guard_source_test.go"
+      ],
+      "tests": [
+        "TestArbitraryFloatToStringLiteralSpecialBranches",
+        "TestArbitraryFloatToStringLiteralFiniteBranches",
+        "TestArbitraryFloatToStringEveryNumericalReservationPrefix",
+        "TestArbitraryFloatToStringActualAllocationCallbackGuards",
+        "TestArbitraryFloatToStringScopedRationalSourceDTStop",
+        "TestArbitraryFloatToStringCopiedScopeAndRetainedHistory",
+        "TestArbitraryFloatToStringOldScopePreservesLaterAllocatingCall",
+        "TestArbitraryFloatToStringColdPrefixEightImmediateGraph",
+        "TestMPFFormatTextYoungerNumeralStopProtectsNonemptyResult",
+        "TestArbitraryFloatScalarCopyReceiptEveryPrefix",
+        "TestArbitraryFloatToRationalReachedUnpackOwnsDescriptorPrefix",
+        "TestArbitraryFloatToRationalAllocationCallbackGuards",
+        "TestArbitraryFloatToRationalCopiedParentCannotAbortChild",
+        "TestArbitraryFloatToRationalRetainsInitialCopyChild",
+        "TestArbitraryFloatToRationalDirectOutputAfterSourceEnd",
+        "TestArbitraryFloatToRationalEveryReachedReservationPrefix",
+        "TestArbitraryFloatToRationalOwnACKPreservesLaterForeignDescriptor",
+        "TestArbitraryFloatToRationalForeignSetterOwnsDescriptorPrefix",
+        "TestArbitraryFloatToRationalAllocatedHistorySurvivesInlineCall",
+        "TestArbitraryFloatToRationalOutputNormalizeCapturesGCD",
+        "TestArbitraryFloatToRationalPooledSourceConsumption",
+        "TestArbitraryFloatToRationalGCDSourceStopsOlderLocals",
+        "TestArbitraryFloatToRationalLiteralFiniteInputs",
+        "TestArbitraryFloatToRationalActualReusedFrameRejectsSavedContext",
+        "TestArbitraryFloatToRationalUndefinedSignedNegationGuard",
+        "TestArbitraryFloatIEEEOriginalAssertionsAdapted",
+        "TestArbitraryFloatIEEEIndependentBranchBitsAndWarmNoAllocation",
+        "TestArbitraryFloatIEEERepresentedShiftGuardDomains",
+        "TestArbitraryFloatIEEECompiledWidthAssertionLeavesSignificandUnread",
+        "TestArbitraryFloatIEEEEveryReachedCacheReservationPrefix",
+        "TestArbitraryFloatIEEEActualCacheTransportRetainsEarlierCall",
+        "TestArbitraryFloatToDoubleDefinedUnsignedRepresentableSignedShifts",
+        "TestArbitraryFloatOriginalSetIntAndDoubleDriverAssertions",
+        "TestArbitraryFloatInputReachedSETAndShiftAllocationReceipt",
+        "TestArbitraryFloatInputMultiplePendingAndInlineHistory",
+        "TestArbitraryFloatInputActualAllocationTransportOwnerGuards",
+        "TestArbitraryFloatInputDescriptorSourceEndHistory",
+        "TestArbitraryFloatInputCapturedContextExactFrameAndNonce"
+      ],
       "conditionals": [
         {
           "line": 1627,
@@ -121683,17 +121771,131 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "mpf.cpp:1519-1569 to_string explicit owned-text context numerical body",
+          "status": "partial",
+          "go_target": "mpnum/mpf_value_format.go",
+          "tests": [
+            "TestArbitraryFloatToStringLiteralSpecialBranches",
+            "TestArbitraryFloatToStringLiteralFiniteBranches",
+            "TestArbitraryFloatToStringEveryNumericalReservationPrefix",
+            "TestArbitraryFloatToStringActualAllocationCallbackGuards",
+            "TestArbitraryFloatToStringScopedRationalSourceDTStop",
+            "TestArbitraryFloatToStringCopiedScopeAndRetainedHistory",
+            "TestArbitraryFloatToStringOldScopePreservesLaterAllocatingCall",
+            "TestArbitraryFloatToStringColdPrefixEightImmediateGraph"
+          ]
+        },
+        {
+          "name": "mpf.cpp:1519-1569 actual owned res return and caller result DT adapter",
+          "status": "partial",
+          "go_target": "util_mpf_format_text.go",
+          "tests": [
+            "TestMPFFormatTextYoungerNumeralStopProtectsNonemptyResult"
+          ]
+        },
+        {
+          "name": "mpf.cpp:1695-1711 to_rational and reached unpack mpf.cpp:1922-1945",
+          "status": "ported",
+          "go_target": "mpnum/mpf_value_to_rational.go",
+          "tests": [
+            "TestArbitraryFloatScalarCopyReceiptEveryPrefix",
+            "TestArbitraryFloatToRationalReachedUnpackOwnsDescriptorPrefix",
+            "TestArbitraryFloatToRationalAllocationCallbackGuards",
+            "TestArbitraryFloatToRationalCopiedParentCannotAbortChild",
+            "TestArbitraryFloatToRationalRetainsInitialCopyChild",
+            "TestArbitraryFloatToRationalDirectOutputAfterSourceEnd",
+            "TestArbitraryFloatToRationalEveryReachedReservationPrefix",
+            "TestArbitraryFloatToRationalOwnACKPreservesLaterForeignDescriptor",
+            "TestArbitraryFloatToRationalForeignSetterOwnsDescriptorPrefix",
+            "TestArbitraryFloatToRationalAllocatedHistorySurvivesInlineCall",
+            "TestArbitraryFloatToRationalOutputNormalizeCapturesGCD",
+            "TestArbitraryFloatToRationalPooledSourceConsumption",
+            "TestArbitraryFloatToRationalGCDSourceStopsOlderLocals",
+            "TestArbitraryFloatToRationalLiteralFiniteInputs",
+            "TestArbitraryFloatToRationalActualReusedFrameRejectsSavedContext",
+            "TestArbitraryFloatToRationalUndefinedSignedNegationGuard"
+          ]
+        },
+        {
+          "name": "mpf.cpp:1712-1769 to_double/to_float literal native-bit conversions",
+          "status": "ported",
+          "go_target": "mpnum/mpf_value_ieee.go",
+          "tests": [
+            "TestArbitraryFloatIEEEOriginalAssertionsAdapted",
+            "TestArbitraryFloatIEEEIndependentBranchBitsAndWarmNoAllocation",
+            "TestArbitraryFloatIEEERepresentedShiftGuardDomains",
+            "TestArbitraryFloatIEEECompiledWidthAssertionLeavesSignificandUnread",
+            "TestArbitraryFloatIEEEEveryReachedCacheReservationPrefix",
+            "TestArbitraryFloatIEEEActualCacheTransportRetainsEarlierCall"
+          ]
+        },
+        {
+          "name": "mpf.cpp:69-106,114-181 machine int/double/float SET literal field and alignment bodies",
+          "status": "ported",
+          "go_target": "mpnum/mpf_value_input.go",
+          "tests": [
+            "TestArbitraryFloatOriginalSetIntAndDoubleDriverAssertions",
+            "TestArbitraryFloatInputReachedSETAndShiftAllocationReceipt",
+            "TestArbitraryFloatInputMultiplePendingAndInlineHistory",
+            "TestArbitraryFloatInputActualAllocationTransportOwnerGuards",
+            "TestArbitraryFloatInputDescriptorSourceEndHistory",
+            "TestArbitraryFloatInputCapturedContextExactFrameAndNonce"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual MPF text context embeds concrete numerical declarations and captured nonwrapping identity. Direct Integer allocation and Natural buffer/verification receipts retain only reached leaves; decimal RAW end DEL is distinct from failed-body owning abort after older scoped q/denom/num. Source/body/first-own/acquisition histories survive exact ACK until actual text context end. No ambient pending/root-count acquisition authority.",
+        "mpf.cpp:1695-1711 real a/n/d declarations, exact Copy child and captured source/output Integer contexts; foreign Rational SET/normalize actual GCD/Div and Natural children. Source d/n/a DT protects older MPF cached/member suffix on youngest stop; own completed child ACK then older local NUM disposal then exact unjoined abort. Issued backing/outcome tokens retain original acquisition and allocation-only charged immutable history through actual MPF context end. Actual pooled source physical retirement differs from direct raw surviving allocator-directory end. No pending-count/registry acquisition authority.",
+        "mpf.cpp:1712-1769 declares no NUM/RAW locals. Reached top/bottom bound cache calls reuse exact persistent Power wrapper owners; original input is borrowed, no mirrored acquisition scope. Actual cache reservation prefixes name physical/cold graph before fault lift; actual returning Runtime transport refuses same caller and lower-owner lifecycle before mutation. Later successful call retains earlier failed cache tuple until actual class end.",
+        "mpf.cpp:1712-1737 nonnegative signed-left shifts follow the C++11 CWG1457 corrected rule when the result fits corresponding uint64, with two's-complement signed conversion; sign-bit results from exponent and significand remain literal bits, including noncanonical raw field inputs. Shift count/unsigned-result overflow and initially negative signed operand still refuse at reached undefined-source expression. No extra numerical constructor or owning scope is introduced.",
+        "mpf.cpp:69-106,114-181 declares no lexical NUM/RAW. Source widths/sign/exponent precede literal significand SET and alignment. Embedded nonwrapping body binding allocates no metadata on inline/repeated SET; charged per-call records materialize only at actual Integer allocation branch. Exact failed backing/outcome transfers name independent pending roots, original issued token/body and first owning cause survive acknowledgment until actual MPF context end. Source allocator physical consumption retires only actual captured pooled token; direct captured token survives directory end for exact owning cleanup. Before-lift named cold/physical graphs, multiple stopped calls, actual returning allocation transport and exact copied/stale context guards are tested; undefined source shift argument domains are explicit reached Go guards."
+      ],
+      "deviations": [
+        "mpf.cpp:1519-1569 numerical body and mpq.cpp:156-185 caller-specific decimal engine are private scoped proofs; complete root owned-string/printer integration remains pending. No new active original-driver assertions or whole MPF/rational unit completion credit. Default decimal/no-flags stream profile only; native locale/ABI profiles remain open. Qualified signed-host TLS test proves reached q NUM DT protection; guessed youngest verification-DT recipe is diagnostic only.",
+        "mpf.cpp:1695-1711 represented Go INT64_MIN input refuses at reached undefined signed negation; no C++ assertion-prefix equivalence claimed. Signed-host TLS destructor-stop tests are actual owner-primitive guard domain, not ordinary mathematical allocation failure. New ToRational tests are adapted source assertions; no direct original mpf.cpp driver coverage or whole-unit completion credit.",
+        "mpf.cpp:1712-1769 C++ undefined signed shifts/addition and oversized shift counts have explicit reached represented-Go guard, distinct from compiled SASSERT width checks. uint32 exponent/float shift/addition source wrapping is retained. Narrow denormal to_double follows literal double bottom-exponent mapping rather than a general format conversion. src/test/mpf.cpp:23-82 all18 ENSURE output values adapted using explicit source fields; original int/double/float SET dependencies remain separately unported, so no complete active-driver or whole MPF unit credit."
+      ]
     },
     {
       "path": "src/util/mpf.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "mpnum/mpf_value_to_rational.go",
+        "mpnum/mpf_value_ieee.go",
+        "mpnum/mpf_value_ieee_source_test.go",
+        "mpnum/mpf_value_ieee_branch_source_test.go",
+        "mpnum/mpf_value_ieee_lifetime_source_test.go",
+        "mpnum/mpf_value_input.go"
+      ],
+      "tests": [
+        "TestArbitraryFloatScalarCopyReceiptEveryPrefix",
+        "TestArbitraryFloatToRationalReachedUnpackOwnsDescriptorPrefix",
+        "TestArbitraryFloatToRationalAllocationCallbackGuards",
+        "TestArbitraryFloatToRationalCopiedParentCannotAbortChild",
+        "TestArbitraryFloatToRationalRetainsInitialCopyChild",
+        "TestArbitraryFloatToRationalDirectOutputAfterSourceEnd",
+        "TestArbitraryFloatToRationalEveryReachedReservationPrefix",
+        "TestArbitraryFloatToRationalOwnACKPreservesLaterForeignDescriptor",
+        "TestArbitraryFloatToRationalForeignSetterOwnsDescriptorPrefix",
+        "TestArbitraryFloatToRationalAllocatedHistorySurvivesInlineCall",
+        "TestArbitraryFloatToRationalOutputNormalizeCapturesGCD",
+        "TestArbitraryFloatToRationalPooledSourceConsumption",
+        "TestArbitraryFloatToRationalGCDSourceStopsOlderLocals",
+        "TestArbitraryFloatToRationalLiteralFiniteInputs",
+        "TestArbitraryFloatToRationalActualReusedFrameRejectsSavedContext",
+        "TestArbitraryFloatToRationalUndefinedSignedNegationGuard",
+        "TestArbitraryFloatIEEEOriginalAssertionsAdapted",
+        "TestArbitraryFloatIEEEIndependentBranchBitsAndWarmNoAllocation",
+        "TestArbitraryFloatIEEERepresentedShiftGuardDomains",
+        "TestArbitraryFloatIEEECompiledWidthAssertionLeavesSignificandUnread",
+        "TestArbitraryFloatIEEEEveryReachedCacheReservationPrefix",
+        "TestArbitraryFloatIEEEActualCacheTransportRetainsEarlierCall",
+        "TestArbitraryFloatOriginalSetIntAndDoubleDriverAssertions"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -121706,8 +121908,55 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "mpf.h:146-147 explicit rational-owner to_rational adapter",
+          "status": "ported",
+          "go_target": "mpnum/mpf_value_to_rational.go",
+          "tests": [
+            "TestArbitraryFloatScalarCopyReceiptEveryPrefix",
+            "TestArbitraryFloatToRationalReachedUnpackOwnsDescriptorPrefix",
+            "TestArbitraryFloatToRationalAllocationCallbackGuards",
+            "TestArbitraryFloatToRationalCopiedParentCannotAbortChild",
+            "TestArbitraryFloatToRationalRetainsInitialCopyChild",
+            "TestArbitraryFloatToRationalDirectOutputAfterSourceEnd",
+            "TestArbitraryFloatToRationalEveryReachedReservationPrefix",
+            "TestArbitraryFloatToRationalOwnACKPreservesLaterForeignDescriptor",
+            "TestArbitraryFloatToRationalForeignSetterOwnsDescriptorPrefix",
+            "TestArbitraryFloatToRationalAllocatedHistorySurvivesInlineCall",
+            "TestArbitraryFloatToRationalOutputNormalizeCapturesGCD",
+            "TestArbitraryFloatToRationalPooledSourceConsumption",
+            "TestArbitraryFloatToRationalGCDSourceStopsOlderLocals",
+            "TestArbitraryFloatToRationalLiteralFiniteInputs",
+            "TestArbitraryFloatToRationalActualReusedFrameRejectsSavedContext",
+            "TestArbitraryFloatToRationalUndefinedSignedNegationGuard"
+          ]
+        },
+        {
+          "name": "mpf.h:149-150 to_double/to_float",
+          "status": "ported",
+          "go_target": "mpnum/mpf_value_ieee.go",
+          "tests": [
+            "TestArbitraryFloatIEEEOriginalAssertionsAdapted",
+            "TestArbitraryFloatIEEEIndependentBranchBitsAndWarmNoAllocation",
+            "TestArbitraryFloatIEEERepresentedShiftGuardDomains",
+            "TestArbitraryFloatIEEECompiledWidthAssertionLeavesSignificandUnread",
+            "TestArbitraryFloatIEEEEveryReachedCacheReservationPrefix",
+            "TestArbitraryFloatIEEEActualCacheTransportRetainsEarlierCall"
+          ]
+        },
+        {
+          "name": "mpf.h:76,78-79 machine SET overloads",
+          "status": "ported",
+          "go_target": "mpnum/mpf_value_input.go",
+          "tests": [
+            "TestArbitraryFloatOriginalSetIntAndDoubleDriverAssertions"
+          ]
+        }
+      ],
+      "ownership": [
+        "mpf.h:146-147 explicitly supplied Rational owner remains sole output owner; exact invocation context is distinct from source Integer context."
+      ],
       "deviations": []
     },
     {
@@ -124111,7 +124360,12 @@
         "mpnum/rational_source_stream.go",
         "mpnum/mp_integer_output_scope.go",
         "mpnum/numeral_insertion_receipt.go",
-        "mpnum/polynomial_variable_recognition_owner_source_test.go"
+        "mpnum/polynomial_variable_recognition_owner_source_test.go",
+        "mpnum/mpf_value_format_decimal.go",
+        "mpnum/mpq_ops.go",
+        "mpnum/mpf_value_format_source_test.go",
+        "mpnum/mpf_value_format_cold_source_test.go",
+        "util_mpf_format_numeric_stop_source_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -124264,7 +124518,16 @@
         "TestNumeralInsertionReceiptUnusedSmallBranchAndForeignTupleGuard",
         "TestNumeralInsertionReceiptActualCharacterConstructorPrefixesAndTupleGuards",
         "TestPolynomialVariableRecognitionExecutingIntegerOwnerRefusesFinalize",
-        "TestIntegerPNormalizeNilReturningTransportOwnerRefusal"
+        "TestIntegerPNormalizeNilReturningTransportOwnerRefusal",
+        "TestArbitraryFloatToStringLiteralSpecialBranches",
+        "TestArbitraryFloatToStringLiteralFiniteBranches",
+        "TestArbitraryFloatToStringEveryNumericalReservationPrefix",
+        "TestArbitraryFloatToStringActualAllocationCallbackGuards",
+        "TestArbitraryFloatToStringScopedRationalSourceDTStop",
+        "TestArbitraryFloatToStringCopiedScopeAndRetainedHistory",
+        "TestArbitraryFloatToStringOldScopePreservesLaterAllocatingCall",
+        "TestArbitraryFloatToStringColdPrefixEightImmediateGraph",
+        "TestMPFFormatTextYoungerNumeralStopProtectsNonemptyResult"
       ],
       "assertions": [
         {
@@ -124792,6 +125055,21 @@
             "TestNumeralInsertionReceiptUnusedSmallBranchAndForeignTupleGuard",
             "TestNumeralInsertionReceiptActualCharacterConstructorPrefixesAndTupleGuards"
           ]
+        },
+        {
+          "name": "mpq.cpp:156-185 display_decimal actual MPF caller RAW continuation",
+          "status": "partial",
+          "go_target": "mpnum/mpf_value_format_decimal.go",
+          "tests": [
+            "TestArbitraryFloatToStringLiteralSpecialBranches",
+            "TestArbitraryFloatToStringLiteralFiniteBranches",
+            "TestArbitraryFloatToStringEveryNumericalReservationPrefix",
+            "TestArbitraryFloatToStringActualAllocationCallbackGuards",
+            "TestArbitraryFloatToStringScopedRationalSourceDTStop",
+            "TestArbitraryFloatToStringCopiedScopeAndRetainedHistory",
+            "TestArbitraryFloatToStringOldScopePreservesLaterAllocatingCall",
+            "TestArbitraryFloatToStringColdPrefixEightImmediateGraph"
+          ]
         }
       ],
       "ownership": [
@@ -124810,7 +125088,8 @@
         "Two actual permanently dead charged Go descriptors precede Words/Natural construction. Actual six source numeric cells unchanged. Source fresh NULL comes only from exact setter branch, never registry/scope inference; reserve failure retains charged constructor owner. No source allocator event invented for Go metadata.",
         "Concrete generation identity starts at real guarded RAW group entry and survives scope reset; generic cleanup retains its existing group order. Evaluation cleans only matching actual invocations.",
         "Small signed insertion differs from big signed-char CString insertion; CString strlen precedes sentry. Exact active character invocation view, typed actual destructor cause and acquired NUM/char/local roots retained; existing Go ErrorTransport callback guard is an explicit adapter profile, not native callback equivalence.",
-        "mpz.cpp:1186-1207; mpzzp.h:58-68,111-114: returning Runtime transport cannot destroy executing Copy/PN Integer or enclosing Rational owner. Non-Z normalization execution scalar is a lifecycle guard only, set/restored around the same nil/receipt body; allocation authority remains exclusively explicit receipts."
+        "mpz.cpp:1186-1207; mpzzp.h:58-68,111-114: returning Runtime transport cannot destroy executing Copy/PN Integer or enclosing Rational owner. Non-Z normalization execution scalar is a lifecycle guard only, set/restored around the same nil/receipt body; allocation authority remains exclusively explicit receipts.",
+        "Actual MPF text context embeds concrete numerical declarations and captured nonwrapping identity. Direct Integer allocation and Natural buffer/verification receipts retain only reached leaves; decimal RAW end DEL is distinct from failed-body owning abort after older scoped q/denom/num. Source/body/first-own/acquisition histories survive exact ACK until actual text context end. No ambient pending/root-count acquisition authority."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -124827,7 +125106,8 @@
         "No newly registered source assertion credit: sixteen added source-profile regressions complement existing active assertions. Selected ordinary whole-value preflights are replaced only where they precede actual source reads/mutations. Malformed ILP32 second temporary end-cursor test diagnoses physical requested-size guard after actual source first destruction, with no guard relabeling or allocator repair. Whole header and global service binding remain partial.",
         "Public failed-value reads still reject both dead Go descriptors; defined source-only NULL deletion is modeled independently. Postexception source small-scalar continuation, staged CopyFrom/ffSetInteger topology, process/TLS binding and complete source lifecycle remain separate obligations. Existing cleanupPending retry acknowledges Go owning continuation, not another literal source destructor. See PORT_PROGRESS.md.",
         "Cold adapter generation metadata adds no source allocator event; no arithmetic algorithm changes.",
-        "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit."
+        "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit.",
+        "mpf.cpp:1519-1569 numerical body and mpq.cpp:156-185 caller-specific decimal engine are private scoped proofs; complete root owned-string/printer integration remains pending. No new active original-driver assertions or whole MPF/rational unit completion credit. Default decimal/no-flags stream profile only; native locale/ABI profiles remain open. Qualified signed-host TLS test proves reached q NUM DT protection; guessed youngest verification-DT recipe is diagnostic only."
       ]
     },
     {

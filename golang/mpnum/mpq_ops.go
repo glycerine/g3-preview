@@ -85,6 +85,9 @@ func (m *RationalManager) MulInt(a *Int, b, out *Rational) error {
 	return m.normalize(out)
 }
 func (m *RationalManager) DivInt(a *Rational, b *Int, out *Rational) error {
+	return m.divIntWithAllocationContext(a, b, out, integerAllocationInvocationContext{})
+}
+func (m *RationalManager) divIntWithAllocationContext(a *Rational, b *Int, out *Rational, context integerAllocationInvocationContext) error {
 	if e := m.check(a); e != nil {
 		return e
 	}
@@ -94,21 +97,21 @@ func (m *RationalManager) DivInt(a *Rational, b *Int, out *Rational) error {
 	if e := m.check(out); e != nil {
 		return e
 	}
-	if e := m.z.Copy(&out.num, &a.num); e != nil {
+	if e := m.z.copyFromOwnerWithAllocationContext(&out.num, m.z, &a.num, nil, context); e != nil {
 		return e
 	}
-	if e := m.z.Mul(&a.den, b, &out.den); e != nil {
+	if e := m.z.mulWithAllocationContext(&a.den, b, &out.den, context); e != nil {
 		return e
 	}
 	if b.val < 0 {
-		if e := m.z.Neg(&out.num); e != nil {
+		if e := m.z.negWithAllocationContext(&out.num, context); e != nil {
 			return e
 		}
-		if e := m.z.Neg(&out.den); e != nil {
+		if e := m.z.negWithAllocationContext(&out.den, context); e != nil {
 			return e
 		}
 	}
-	return m.normalize(out)
+	return m.normalizeWithAllocationContext(out, context)
 }
 
 // AccDiv publishes denominator multiplication before rereading the divisor.
