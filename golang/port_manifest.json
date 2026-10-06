@@ -28353,7 +28353,13 @@
         "mpnum/algebraic_compare_test.go",
         "algebraic_root_source_test.go",
         "mpnum/algebraic_query.go",
-        "mpnum/algebraic_query_source_test.go"
+        "mpnum/algebraic_query_source_test.go",
+        "mpnum/algebraic_neg_callback_source_test.go",
+        "mpnum/algebraic_neg_dt_source_test.go",
+        "mpnum/algebraic_neg_history_source_test.go",
+        "mpnum/algebraic_neg_invocation.go",
+        "mpnum/algebraic_neg_source_test.go",
+        "mpnum/algebraic_neg_owner_cleanup_source_test.go"
       ],
       "tests": [
         "TestAlgebraicSourceRootCounts",
@@ -28372,7 +28378,15 @@
         "TestAlgebraicRealResourceCancellationBeforeMinimalRefine",
         "TestAlgebraicSignAndDegreeLiteralBranches",
         "TestAlgebraicQueriesRejectCopiedForeignAndStaleOwners",
-        "TestAlgebraicDegreeUsesActualNonminimalPolynomial"
+        "TestAlgebraicDegreeUsesActualNonminimalPolynomial",
+        "TestAlgebraicNegActualTransportOwnerAndTupleRefusal",
+        "TestAlgebraicNegActualHornerBodyAndYoungerDestructorStop",
+        "TestAlgebraicNegCoreCloseAfterStickySourceStop",
+        "TestAlgebraicNegActualHistoryLaterFailureAndErasedZero",
+        "TestAlgebraicNegCoreCloseOwnsActualRetainedHornerChild",
+        "TestAlgebraicNegLiteralNullBasicAndRoot",
+        "TestAlgebraicNegMinimumEveryActualReservationPrefix",
+        "TestAlgebraicNegRootHornerEveryActualReservationPrefix"
       ],
       "conditionals": [
         {
@@ -28827,6 +28841,21 @@
             "TestAlgebraicQueriesRejectCopiedForeignAndStaleOwners",
             "TestAlgebraicDegreeUsesActualNonminimalPolynomial"
           ]
+        },
+        {
+          "name": "algebraic_numbers.cpp:1565-1577 negation with literal binary Horner child upolynomial.cpp:1734-1764 and lower-sign update algebraic_numbers.cpp:383-388",
+          "status": "ported",
+          "go_target": "mpnum/algebraic_neg_invocation.go",
+          "tests": [
+            "TestAlgebraicNegActualTransportOwnerAndTupleRefusal",
+            "TestAlgebraicNegActualHornerBodyAndYoungerDestructorStop",
+            "TestAlgebraicNegCoreCloseAfterStickySourceStop",
+            "TestAlgebraicNegActualHistoryLaterFailureAndErasedZero",
+            "TestAlgebraicNegCoreCloseOwnsActualRetainedHornerChild",
+            "TestAlgebraicNegLiteralNullBasicAndRoot",
+            "TestAlgebraicNegMinimumEveryActualReservationPrefix",
+            "TestAlgebraicNegRootHornerEveryActualReservationPrefix"
+          ]
         }
       ],
       "ownership": [
@@ -28839,7 +28868,8 @@
         "External std::sort is adapted to concrete heap sort; comparison/refinement/checkpoint order can differ by backend. Source comparison bodies and errors remain actual.",
         "IsRational cpp292 passes algebraic_cell* through temporary anum (header366\u2013371) into save_intervals numeral const& (cpp897\u2013929); source reference dangles after construction. The Go lifetime adaptation binds the actual current caller and refreshes its handle after conversion; independent tests cover adapted behavior, not a source-defined dangling-reference result.",
         "Selected uint32 arithmetic/conversion profile is explicit; full manager construction, multivariate/resultant arithmetic, plugins, printers, and complete header/registered test surfaces remain OPEN.",
-        "Selected IsPos/IsNeg and Degree queries dispatch to actual null/basic/algebraic cells. Root sign uses actual BinaryIntervalManager predicates; degree reports stored m_p_sz\u22121 without minimizing or refining. Queries construct no source locals and allocate no archive/NUM/backing, including repeated FailAfter(0) calls. Invalid Go copied/foreign/stale owner fixtures prove guard refusal/nonmutation. New sign/degree output assertions are independent checks, not invented registered ENSURE coverage. Existing registered algebraic root drivers provide reached cells; no whole algebraic or UP unit promotion."
+        "Selected IsPos/IsNeg and Degree queries dispatch to actual null/basic/algebraic cells. Root sign uses actual BinaryIntervalManager predicates; degree reports stored m_p_sz\u22121 without minimizing or refining. Queries construct no source locals and allocate no archive/NUM/backing, including repeated FailAfter(0) calls. Invalid Go copied/foreign/stale owner fixtures prove guard refusal/nonmutation. New sign/degree output assertions are independent checks, not invented registered ENSURE coverage. Existing registered algebraic root drivers provide reached cells; no whole algebraic or UP unit promotion.",
+        "Selected Neg ports algebraic_numbers.cpp:1565-1577,383-388,2933-2935 and its reached typed binary Horner child upolynomial.cpp:1734-1764 using literal r/ak declarations and ak then r destruction. Null returns without frame/history reservation, preserving older failed roots under FailAfter(0). Charged diagnostic-only records materialize at actual Integer/Natural allocating branches, retain final first body/source/own causes and captured child tuples through reuse, and carry no NUM/root/cleanup authority. Real MIN and BIG Horner prefixes audit named physical/cold ownership before fault lift. The returning-allocation plus signed-host TLS fixture reaches later ADD refusal with published BIG TMP, completed inline ak DT and consumed r DT Bounds; false child acknowledgment precedes caller Del and true exact unjoined abort. This qualifies the signed-host returning-transport guard domain, not ordinary native overflow. Copied/foreign/stale metadata guard fixtures are separate from source allocation credit. Actual Rational owner reentry RED is closed by an exact executing registered caller guard. Registered src/test/algebraic.cpp:376-379 reaches negation, but later multivariate evaluation is not claimed; new output assertions independently verify literal null/basic/root/p(-x)/lower-sign behavior. Public unrelated EvalSignBinary nil-route lifetimes remain separately qualified; no whole algebraic or UP driver/unit promotion. Actual core-owning lifecycle successor closes a genuine caller-Del then Close RED where header/history were refunded with BIG AddMul TMP still retained. CleanupRetained and Close now invoke exact false/true child acknowledgment; beginQ refuses actual pending Neg instead of silently aborting it. True abort refuses a still-live captured input token (a borrowed destruction-frontier identity, no INC/root acquisition). A real sticky Horner NUM-DT stop previously allowed direct caller Del to cross the younger stop; public Del/private delClosing/CleanupValue now protect only that exact caller token until completed-child false acknowledgment. The actual source/own TLS test proves caller-Del refusal with identical named graph, false ACK then caller Del, actual true-own Bounds protecting older core fields/header/history, and successful owning retry preserving original returned body/source/first-own histories and source cursor. Closed-core history queries end at the actual owner context; no archived diagnostic record authorizes cleanup."
       ]
     },
     {
@@ -28859,7 +28889,13 @@
         "mpnum/algebraic_compare_test.go",
         "algebraic_root_source_test.go",
         "mpnum/algebraic_query.go",
-        "mpnum/algebraic_query_source_test.go"
+        "mpnum/algebraic_query_source_test.go",
+        "mpnum/algebraic_neg_callback_source_test.go",
+        "mpnum/algebraic_neg_dt_source_test.go",
+        "mpnum/algebraic_neg_history_source_test.go",
+        "mpnum/algebraic_neg_invocation.go",
+        "mpnum/algebraic_neg_source_test.go",
+        "mpnum/algebraic_neg_owner_cleanup_source_test.go"
       ],
       "tests": [
         "TestAlgebraicSourceRootCounts",
@@ -28878,7 +28914,15 @@
         "TestAlgebraicRealResourceCancellationBeforeMinimalRefine",
         "TestAlgebraicSignAndDegreeLiteralBranches",
         "TestAlgebraicQueriesRejectCopiedForeignAndStaleOwners",
-        "TestAlgebraicDegreeUsesActualNonminimalPolynomial"
+        "TestAlgebraicDegreeUsesActualNonminimalPolynomial",
+        "TestAlgebraicNegActualTransportOwnerAndTupleRefusal",
+        "TestAlgebraicNegActualHornerBodyAndYoungerDestructorStop",
+        "TestAlgebraicNegCoreCloseAfterStickySourceStop",
+        "TestAlgebraicNegActualHistoryLaterFailureAndErasedZero",
+        "TestAlgebraicNegCoreCloseOwnsActualRetainedHornerChild",
+        "TestAlgebraicNegLiteralNullBasicAndRoot",
+        "TestAlgebraicNegMinimumEveryActualReservationPrefix",
+        "TestAlgebraicNegRootHornerEveryActualReservationPrefix"
       ],
       "conditionals": [
         {
@@ -28953,6 +28997,21 @@
             "TestAlgebraicQueriesRejectCopiedForeignAndStaleOwners",
             "TestAlgebraicDegreeUsesActualNonminimalPolynomial"
           ]
+        },
+        {
+          "name": "algebraic_numbers.cpp:1565-1577 negation with literal binary Horner child upolynomial.cpp:1734-1764 and lower-sign update algebraic_numbers.cpp:383-388",
+          "status": "ported",
+          "go_target": "mpnum/algebraic_neg_invocation.go",
+          "tests": [
+            "TestAlgebraicNegActualTransportOwnerAndTupleRefusal",
+            "TestAlgebraicNegActualHornerBodyAndYoungerDestructorStop",
+            "TestAlgebraicNegCoreCloseAfterStickySourceStop",
+            "TestAlgebraicNegActualHistoryLaterFailureAndErasedZero",
+            "TestAlgebraicNegCoreCloseOwnsActualRetainedHornerChild",
+            "TestAlgebraicNegLiteralNullBasicAndRoot",
+            "TestAlgebraicNegMinimumEveryActualReservationPrefix",
+            "TestAlgebraicNegRootHornerEveryActualReservationPrefix"
+          ]
         }
       ],
       "ownership": [
@@ -28965,7 +29024,8 @@
         "External std::sort is adapted to concrete heap sort; comparison/refinement/checkpoint order can differ by backend. Source comparison bodies and errors remain actual.",
         "IsRational cpp292 passes algebraic_cell* through temporary anum (header366\u2013371) into save_intervals numeral const& (cpp897\u2013929); source reference dangles after construction. The Go lifetime adaptation binds the actual current caller and refreshes its handle after conversion; independent tests cover adapted behavior, not a source-defined dangling-reference result.",
         "Selected uint32 arithmetic/conversion profile is explicit; full manager construction, multivariate/resultant arithmetic, plugins, printers, and complete header/registered test surfaces remain OPEN.",
-        "Selected IsPos/IsNeg and Degree queries dispatch to actual null/basic/algebraic cells. Root sign uses actual BinaryIntervalManager predicates; degree reports stored m_p_sz\u22121 without minimizing or refining. Queries construct no source locals and allocate no archive/NUM/backing, including repeated FailAfter(0) calls. Invalid Go copied/foreign/stale owner fixtures prove guard refusal/nonmutation. New sign/degree output assertions are independent checks, not invented registered ENSURE coverage. Existing registered algebraic root drivers provide reached cells; no whole algebraic or UP unit promotion."
+        "Selected IsPos/IsNeg and Degree queries dispatch to actual null/basic/algebraic cells. Root sign uses actual BinaryIntervalManager predicates; degree reports stored m_p_sz\u22121 without minimizing or refining. Queries construct no source locals and allocate no archive/NUM/backing, including repeated FailAfter(0) calls. Invalid Go copied/foreign/stale owner fixtures prove guard refusal/nonmutation. New sign/degree output assertions are independent checks, not invented registered ENSURE coverage. Existing registered algebraic root drivers provide reached cells; no whole algebraic or UP unit promotion.",
+        "Selected Neg ports algebraic_numbers.cpp:1565-1577,383-388,2933-2935 and its reached typed binary Horner child upolynomial.cpp:1734-1764 using literal r/ak declarations and ak then r destruction. Null returns without frame/history reservation, preserving older failed roots under FailAfter(0). Charged diagnostic-only records materialize at actual Integer/Natural allocating branches, retain final first body/source/own causes and captured child tuples through reuse, and carry no NUM/root/cleanup authority. Real MIN and BIG Horner prefixes audit named physical/cold ownership before fault lift. The returning-allocation plus signed-host TLS fixture reaches later ADD refusal with published BIG TMP, completed inline ak DT and consumed r DT Bounds; false child acknowledgment precedes caller Del and true exact unjoined abort. This qualifies the signed-host returning-transport guard domain, not ordinary native overflow. Copied/foreign/stale metadata guard fixtures are separate from source allocation credit. Actual Rational owner reentry RED is closed by an exact executing registered caller guard. Registered src/test/algebraic.cpp:376-379 reaches negation, but later multivariate evaluation is not claimed; new output assertions independently verify literal null/basic/root/p(-x)/lower-sign behavior. Public unrelated EvalSignBinary nil-route lifetimes remain separately qualified; no whole algebraic or UP driver/unit promotion. Actual core-owning lifecycle successor closes a genuine caller-Del then Close RED where header/history were refunded with BIG AddMul TMP still retained. CleanupRetained and Close now invoke exact false/true child acknowledgment; beginQ refuses actual pending Neg instead of silently aborting it. True abort refuses a still-live captured input token (a borrowed destruction-frontier identity, no INC/root acquisition). A real sticky Horner NUM-DT stop previously allowed direct caller Del to cross the younger stop; public Del/private delClosing/CleanupValue now protect only that exact caller token until completed-child false acknowledgment. The actual source/own TLS test proves caller-Del refusal with identical named graph, false ACK then caller Del, actual true-own Bounds protecting older core fields/header/history, and successful owning retry preserving original returned body/source/first-own histories and source cursor. Closed-core history queries end at the actual owner context; no archived diagnostic record authorizes cleanup."
       ]
     },
     {
@@ -37843,7 +37903,13 @@
         "mpnum/upolynomial_display.go",
         "mpnum/upolynomial_display_scope.go",
         "mpnum/upolynomial_display_source_test.go",
-        "mpnum/upolynomial_display_borrow_epoch_test.go"
+        "mpnum/upolynomial_display_borrow_epoch_test.go",
+        "mpnum/algebraic_neg_callback_source_test.go",
+        "mpnum/algebraic_neg_dt_source_test.go",
+        "mpnum/algebraic_neg_history_source_test.go",
+        "mpnum/algebraic_neg_invocation.go",
+        "mpnum/algebraic_neg_source_test.go",
+        "mpnum/algebraic_neg_owner_cleanup_source_test.go"
       ],
       "tests": [
         "TestUPolynomialScalarExtentAndLayout",
@@ -37995,7 +38061,15 @@
         "TestUPolynomialDisplayActualStoppedCharacterSuffix",
         "TestUPolynomialDisplayErasedRoutePreservesEarlierUnjoinedRAW",
         "TestUPolynomialDisplayBorrowRefusesLaterLiveEmbeddedCall",
-        "TestUPolynomialDisplayInsertionReceiptRefusesLaterEmbeddedCall"
+        "TestUPolynomialDisplayInsertionReceiptRefusesLaterEmbeddedCall",
+        "TestAlgebraicNegActualTransportOwnerAndTupleRefusal",
+        "TestAlgebraicNegActualHornerBodyAndYoungerDestructorStop",
+        "TestAlgebraicNegCoreCloseAfterStickySourceStop",
+        "TestAlgebraicNegActualHistoryLaterFailureAndErasedZero",
+        "TestAlgebraicNegCoreCloseOwnsActualRetainedHornerChild",
+        "TestAlgebraicNegLiteralNullBasicAndRoot",
+        "TestAlgebraicNegMinimumEveryActualReservationPrefix",
+        "TestAlgebraicNegRootHornerEveryActualReservationPrefix"
       ],
       "conditionals": [
         {
@@ -39044,6 +39118,21 @@
             "TestUPolynomialDisplayBorrowRefusesLaterLiveEmbeddedCall",
             "TestUPolynomialDisplayInsertionReceiptRefusesLaterEmbeddedCall"
           ]
+        },
+        {
+          "name": "algebraic_numbers.cpp:1565-1577 negation with literal binary Horner child upolynomial.cpp:1734-1764 and lower-sign update algebraic_numbers.cpp:383-388",
+          "status": "ported",
+          "go_target": "mpnum/algebraic_neg_invocation.go",
+          "tests": [
+            "TestAlgebraicNegActualTransportOwnerAndTupleRefusal",
+            "TestAlgebraicNegActualHornerBodyAndYoungerDestructorStop",
+            "TestAlgebraicNegCoreCloseAfterStickySourceStop",
+            "TestAlgebraicNegActualHistoryLaterFailureAndErasedZero",
+            "TestAlgebraicNegCoreCloseOwnsActualRetainedHornerChild",
+            "TestAlgebraicNegLiteralNullBasicAndRoot",
+            "TestAlgebraicNegMinimumEveryActualReservationPrefix",
+            "TestAlgebraicNegRootHornerEveryActualReservationPrefix"
+          ]
         }
       ],
       "ownership": [
@@ -39072,7 +39161,8 @@
         "Signed-host TLS postphysical release guards qualify Go continuation outside native signed-overflow accounting. No invented allocation or callback frontier.",
         "mpz.h:156-162 successful publication order is unchanged; released scratch descriptor remains exact disposal token and later capacity reuse refuses ErrInvalidSlot before freed reads.",
         "Count-zero/count-one erased SET issues no NUM/vector or per-call archival reserve. Stable call storage materializes only at actual Integer/Natural allocations. Field tests cover only literal count-one SET, not general field factorization. Native normalized SET completes PN without checked verification allocation; checked actual failed PN prefixes preserve exact child tuples.",
-        "Display drivers src/test/upolynomial.cpp:23-65,468-490 reach printing but contain no ENSURE assertions; these exact output assertions are independent new checks. No whole UP-unit promotion. Invalid-Go copied/stale view and insertion receipt fixtures prove lifetime guards, not native allocation credit. Root genuine stale view RED95325 and receipt RED36363 are corrected by captured display epoch, including receipt checks after character ownership ends. Signed-host TLS character-DT stops are qualified returning-transport guard profiles; the separate four-limb fixture reaches older NUM DT, not character heap DT. Nested scopes charge persistent metadata only at reached allocating leaves; repeated erased inline calls preserve older unjoined RAW without archival reservation."
+        "Display drivers src/test/upolynomial.cpp:23-65,468-490 reach printing but contain no ENSURE assertions; these exact output assertions are independent new checks. No whole UP-unit promotion. Invalid-Go copied/stale view and insertion receipt fixtures prove lifetime guards, not native allocation credit. Root genuine stale view RED95325 and receipt RED36363 are corrected by captured display epoch, including receipt checks after character ownership ends. Signed-host TLS character-DT stops are qualified returning-transport guard profiles; the separate four-limb fixture reaches older NUM DT, not character heap DT. Nested scopes charge persistent metadata only at reached allocating leaves; repeated erased inline calls preserve older unjoined RAW without archival reservation.",
+        "Selected Neg ports algebraic_numbers.cpp:1565-1577,383-388,2933-2935 and its reached typed binary Horner child upolynomial.cpp:1734-1764 using literal r/ak declarations and ak then r destruction. Null returns without frame/history reservation, preserving older failed roots under FailAfter(0). Charged diagnostic-only records materialize at actual Integer/Natural allocating branches, retain final first body/source/own causes and captured child tuples through reuse, and carry no NUM/root/cleanup authority. Real MIN and BIG Horner prefixes audit named physical/cold ownership before fault lift. The returning-allocation plus signed-host TLS fixture reaches later ADD refusal with published BIG TMP, completed inline ak DT and consumed r DT Bounds; false child acknowledgment precedes caller Del and true exact unjoined abort. This qualifies the signed-host returning-transport guard domain, not ordinary native overflow. Copied/foreign/stale metadata guard fixtures are separate from source allocation credit. Actual Rational owner reentry RED is closed by an exact executing registered caller guard. Registered src/test/algebraic.cpp:376-379 reaches negation, but later multivariate evaluation is not claimed; new output assertions independently verify literal null/basic/root/p(-x)/lower-sign behavior. Public unrelated EvalSignBinary nil-route lifetimes remain separately qualified; no whole algebraic or UP driver/unit promotion. Actual core-owning lifecycle successor closes a genuine caller-Del then Close RED where header/history were refunded with BIG AddMul TMP still retained. CleanupRetained and Close now invoke exact false/true child acknowledgment; beginQ refuses actual pending Neg instead of silently aborting it. True abort refuses a still-live captured input token (a borrowed destruction-frontier identity, no INC/root acquisition). A real sticky Horner NUM-DT stop previously allowed direct caller Del to cross the younger stop; public Del/private delClosing/CleanupValue now protect only that exact caller token until completed-child false acknowledgment. The actual source/own TLS test proves caller-Del refusal with identical named graph, false ACK then caller Del, actual true-own Bounds protecting older core fields/header/history, and successful owning retry preserving original returned body/source/first-own histories and source cursor. Closed-core history queries end at the actual owner context; no archived diagnostic record authorizes cleanup."
       ]
     },
     {

@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/algebraic_numbers.cpp:1565-1577; src/util/mpz.h:124-149.
 // Source: src/util/mpz.h:124-149; src/util/buffer.h:39-46;
 // src/math/polynomial/upolynomial.h:401-450.
 // Adapter diagnostic records are materialized only at reached allocations.
@@ -8,6 +9,12 @@ import "reflect"
 func (c integerAllocationInvocationContext) prepareFactorHistory(z *IntegerManager) error {
 	if c.pn != nil && c.pn.owner != nil && c.pn.owner.self == c.pn.owner && c.pn == &c.pn.owner.normalization && c.pn.invocation == c.pnInvocation && c.pn.active && c.pn.executing && c.pn.owner.manager == z {
 		return c.pn.factorHistoryContext.prepareFactorHistory(z)
+	}
+	if q := c.algebraicNegFrame(z); q != nil {
+		return q.prepareHistory()
+	}
+	if c.addMul != nil && c.addMul.manager == z && z.matchesAddMulInvocation(c.addMul) {
+		return c.addMul.frame.parentContext.prepareFactorHistory(z)
 	}
 	if r := c.factorNumeralVector; r != nil && z.factorNumeralVectorRoots(c) != nil {
 		return r.manager.archiveFactorNumeralVector()

@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.cpp:1594-1602.
 // Licensed under the MIT license.
 package mpnum
 
@@ -347,6 +348,9 @@ func (m *UPolynomialManager) ComposeRationalXViewInPlace(v UPolynomialView, q *R
 	return nil
 }
 func (m *UPolynomialManager) PMinusXViewInPlace(v UPolynomialView) error {
+	return m.pMinusXWithSourceContext(v, integerAllocationInvocationContext{})
+}
+func (m *UPolynomialManager) pMinusXWithSourceContext(v UPolynomialView, context integerAllocationInvocationContext) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -362,7 +366,7 @@ func (m *UPolynomialManager) PMinusXViewInPlace(v UPolynomialView) error {
 		if zero || i%2 == 0 {
 			continue
 		}
-		if e = m.modular.Neg(a); e != nil {
+		if e = m.modular.negWithSourceContext(a, context); e != nil {
 			return e
 		}
 	}

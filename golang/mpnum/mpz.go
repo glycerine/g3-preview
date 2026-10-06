@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/algebraic_numbers.cpp:1565-1577; src/util/mpz.h:124-149.
 // Source: src/util/mpz.h:698-707.
 // Licensed under the MIT license.
 // Translated from src/util/mpz.h and src/util/mpz.cpp (_MP_INTERNAL, 32-bit digits).
@@ -47,6 +48,7 @@ type IntegerConfig struct {
 // Cells, transitional Natural Words and the actual memory backend share one Budget.
 // Close invalidates every live numeral; a supplied Runtime is borrowed.
 type IntegerManager struct {
+	algebraicNegCaller                     *AlgebraicRootCore
 	dividesNumeral                         integerDividesNumeralScope
 	divisionRaw, extendedRaw, gcdRaw       integerRawScope
 	addMulInvocation                       integerAddMulScope

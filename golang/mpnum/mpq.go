@@ -1,3 +1,4 @@
+// Source: src/util/mpq.h:199-201.
 // Source: src/util/mpq.h; src/util/mpq.cpp. Licensed under the MIT license.
 // Source: src/util/mpq.h and src/util/mpq.cpp, Leonardo de Moura (2010-06-21).
 package mpnum
@@ -148,10 +149,13 @@ func (m *RationalManager) Reset(a *Rational) error {
 	return m.resetDenominator(a)
 }
 func (m *RationalManager) Neg(a *Rational) error {
+	return m.negWithSourceContext(a, integerAllocationInvocationContext{})
+}
+func (m *RationalManager) negWithSourceContext(a *Rational, context integerAllocationInvocationContext) error {
 	if e := m.checkScalarValue(a); e != nil {
 		return e
 	}
-	return m.z.Neg(&a.num)
+	return m.z.negWithAllocationContext(&a.num, context)
 }
 func (m *RationalManager) Abs(a *Rational) error {
 	if e := m.checkScalarValue(a); e != nil {

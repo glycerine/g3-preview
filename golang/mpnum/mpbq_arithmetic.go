@@ -1,3 +1,4 @@
+// Source: src/util/mpbq.h:116.
 // Licensed under the MIT license.
 // Source: src/util/mpbq.h/.cpp.
 package mpnum
@@ -180,10 +181,13 @@ func (m *BinaryRationalManager) AddMulInteger(a *BinaryRational, b *Int, c, r *B
 	return m.Add(a, &m.addMulTmp, r)
 }
 func (m *BinaryRationalManager) Neg(a *BinaryRational) error {
+	return m.negWithSourceContext(a, integerAllocationInvocationContext{})
+}
+func (m *BinaryRationalManager) negWithSourceContext(a *BinaryRational, context integerAllocationInvocationContext) error {
 	if e := m.check(a); e != nil {
 		return e
 	}
-	return m.z.Neg(&a.num)
+	return m.z.negWithAllocationContext(&a.num, context)
 }
 func (m *BinaryRationalManager) Div2(a *BinaryRational) error {
 	if e := m.check(a); e != nil {

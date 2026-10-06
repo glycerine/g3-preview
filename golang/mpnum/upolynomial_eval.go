@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.cpp:1734-1764.
 // Licensed under the MIT license.
 package mpnum
 
@@ -122,6 +123,9 @@ func (m *UPolynomialManager) EvalSignRational(v UPolynomialView, b *Rational) (i
 	return m.sign(&r)
 }
 func (m *UPolynomialManager) EvalSignBinary(v UPolynomialView, b *BinaryRational) (int, error) {
+	return m.evalSignBinaryWithNegScope(v, b, nil)
+}
+func (m *UPolynomialManager) evalSignBinaryWithNegScope(v UPolynomialView, b *BinaryRational, parent *algebraicNegScope) (value int, cause error) {
 	if e := m.check(); e != nil {
 		return 0, e
 	}
@@ -135,14 +139,44 @@ func (m *UPolynomialManager) EvalSignBinary(v UPolynomialView, b *BinaryRational
 		return 0, ErrUPolynomialOwner
 	}
 	ki := b.k
-	var r, ak Int
-	defer m.modular.Del(&r)
-	defer m.modular.Del(&ak)
+	var local [2]Int
+	values := &local
+	context := integerAllocationInvocationContext{}
+	var child *integerAddMulInvocationReceipt
+	if parent == nil {
+		defer m.modular.Del(&local[0])
+		defer m.modular.Del(&local[1])
+	} else {
+		if parent.context(false).algebraicNegFrame(m.config.Integer) == nil || parent.owner.config.Polynomials != m {
+			return 0, ErrAlgebraicOwner
+		}
+		if parent.eval.active {
+			return 0, ErrAlgebraicPending
+		}
+		evalInvocation := parent.eval.invocation + 1
+		if evalInvocation == 0 {
+			return 0, ErrAlgebraicPending
+		}
+		parent.eval = algebraicNegBinaryScope{invocation: evalInvocation, constructed: 2, sourceRemaining: 2, active: true, executing: true}
+		values = &parent.eval.values
+		context = parent.context(true)
+		child = &parent.eval.addMul
+		defer func() {
+			q := &parent.eval
+			q.executing = false
+			q.bodyReturned = true
+			if q.bodyCause == nil {
+				q.bodyCause = cause
+			}
+			cause = parent.finishBinarySource(cause)
+		}()
+	}
+	r, ak := &values[0], &values[1]
 	a, e := m.read(v, v.count-1)
 	if e != nil {
 		return 0, e
 	}
-	if e = m.modular.Copy(&r, a); e != nil {
+	if e = m.modular.copyWithSourceContext(r, a, context); e != nil {
 		return 0, e
 	}
 	for i := v.count - 1; i > 0; {
@@ -156,11 +190,11 @@ func (m *UPolynomialManager) EvalSignBinary(v UPolynomialView, b *BinaryRational
 			return 0, e
 		}
 		if zero {
-			e = m.modular.Mul(&r, &b.num, &r)
+			e = m.modular.mulWithSourceContext(r, &b.num, r, context)
 		} else {
-			e = m.modular.Mul2k(a, ki, &ak)
+			e = m.modular.mul2kWithSourceContext(a, ki, ak, context)
 			if e == nil {
-				e = m.modular.AddMul(&ak, &r, &b.num, &r)
+				e = m.modular.addMulWithSourceContext(ak, r, &b.num, r, child, context)
 			}
 		}
 		if e != nil {
@@ -168,7 +202,7 @@ func (m *UPolynomialManager) EvalSignBinary(v UPolynomialView, b *BinaryRational
 		}
 		ki += b.k
 	}
-	return m.sign(&r)
+	return m.sign(r)
 }
 func (m *UPolynomialManager) EvalSignZero(v UPolynomialView) (int, error) {
 	if e := m.check(); e != nil {

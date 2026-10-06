@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/algebraic_numbers.cpp:1565-1577; src/math/polynomial/upolynomial.cpp:1734-1764.
 // Source: src/math/polynomial/polynomial.cpp:4507-4528;
 // src/util/mpz.cpp; src/util/mpzzp.h.
 // Licensed under the MIT license. Source author: Leonardo de Moura.
@@ -26,6 +27,22 @@ func (m *IntegerModularManager) derivativeAllocationContext(r *polynomialDerivat
 }
 
 func (m *IntegerModularManager) normalizeWithSourceContext(out *Int, context integerAllocationInvocationContext) error {
+	if q := context.algebraicNegFrame(m.manager); q != nil && q.owner.config.Polynomials.modular == m {
+		child := &q.normalize
+		if context.algebraicNegEval {
+			child = &q.eval.normalize
+		}
+		e := m.pNormalizeWithFactorHistory(out, child, context)
+		cause := m.pNormalizeInvocationSourceCause(child)
+		if context.algebraicNegEval {
+			if q.eval.sourceCause == nil {
+				q.eval.sourceCause = cause
+			}
+		} else if q.sourceCause == nil {
+			q.sourceCause = cause
+		}
+		return e
+	}
 	if q := context.upolyDisplayFrame(m.manager); q != nil && q.owner.modular == m {
 		e := m.pNormalizeWithReceipt(out, &q.normalize)
 		if q.sourceCause == nil {

@@ -1,3 +1,4 @@
+// Source: src/util/basic_interval.h:159-163; src/util/mpbqi.h.
 // Licensed under the MIT license.
 // Concrete executable basic_interval<mpbq,false> and mpbqi.h specialization.
 package mpnum
@@ -234,13 +235,16 @@ func (m *BinaryIntervalManager) Swap(a, b *BinaryInterval) error {
 	return m.bounds.Swap(&a.upper, &b.upper)
 }
 func (m *BinaryIntervalManager) Neg(a *BinaryInterval) error {
+	return m.negWithSourceContext(a, integerAllocationInvocationContext{})
+}
+func (m *BinaryIntervalManager) negWithSourceContext(a *BinaryInterval, context integerAllocationInvocationContext) error {
 	if e := m.check(a); e != nil {
 		return e
 	}
-	if e := m.bounds.Neg(&a.lower); e != nil {
+	if e := m.bounds.negWithSourceContext(&a.lower, context); e != nil {
 		return e
 	}
-	if e := m.bounds.Neg(&a.upper); e != nil {
+	if e := m.bounds.negWithSourceContext(&a.upper, context); e != nil {
 		return e
 	}
 	return m.bounds.Swap(&a.lower, &a.upper)

@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.cpp:1734-1764.
 // Source: src/math/polynomial/upolynomial.cpp:138-157,187,1259-1265; src/util/mpzzp.h:97-105. Licensed under the MIT license.
 package mpnum
 
@@ -14,6 +15,9 @@ func (m *UPolynomialManager) sourceFinalizeWithHenselOwners(r *upolyHenselPairIn
 	return m.sourceFinalizeWithCallerOwners(r, c, nil)
 }
 func (m *UPolynomialManager) sourceFinalizeWithCallerOwners(r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope, p *upolyFactorPrimePreparationInvocationReceipt) error {
+	if m != nil && m.self == m && m.algebraicNegCaller != nil && m.algebraicNegCaller.negationExecuting() {
+		return ErrUPolynomialCleanupPending
+	}
 	if m == nil || m.self != m || m.config.Integer == nil {
 		return ErrUPolynomialOwner
 	}

@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/algebraic_numbers.cpp:1565-1577,2933-2935.
 // Licensed under the MIT license.
 // Selected algebraic_numbers.cpp cell/univariate bodies. This prerequisite
 // borrows real services; it is NOT the missing multivariate manager constructor.
@@ -45,6 +46,8 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	negation                                               algebraicNegScope
+	negationHistory                                        []algebraicNegHistory
 	predicate                                              algebraicPredicateScope
 	isRationalTmp                                          Int
 	rootSelection                                          *AlgebraicVector
@@ -125,6 +128,9 @@ func NewAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error) {
 	return m, nil
 }
 func (m *AlgebraicRootCore) check() error {
+	if m != nil && m.self == m && m.negationExecuting() {
+		return ErrAlgebraicPending
+	}
 	if m == nil || m.self != m {
 		return ErrAlgebraicOwner
 	}
@@ -299,6 +305,9 @@ func (m *AlgebraicRootCore) IsZero(a *Algebraic) (bool, error) {
 	return a != nil && a.slot == 0, e
 }
 func (m *AlgebraicRootCore) Del(a *Algebraic) error {
+	if m.negationProtectsCaller(a) {
+		return ErrAlgebraicPending
+	}
 	l, e := m.location(a)
 	if e != nil || l == nil {
 		return e
@@ -309,6 +318,9 @@ func (m *AlgebraicRootCore) Del(a *Algebraic) error {
 // Identity-only private destruction remains callable after owning Close stops
 // ordinary operations; it retains source Del guards and their completed cursor.
 func (m *AlgebraicRootCore) delClosing(a *Algebraic) error {
+	if m.negationProtectsCaller(a) {
+		return ErrAlgebraicPending
+	}
 	l, e := m.locationCleanup(a)
 	if e != nil || l == nil {
 		return e
@@ -435,6 +447,9 @@ func (m *AlgebraicRootCore) destroyPolynomial(l *algebraicLocation, r *algebraic
 	return m.store(l, r)
 }
 func (m *AlgebraicRootCore) beginQ() error {
+	if m.negation.active {
+		return ErrAlgebraicPending
+	}
 	if m.localActive {
 		return ErrAlgebraicPending
 	}
@@ -818,8 +833,14 @@ func (m *AlgebraicRootCore) Copy(dst, src *Algebraic) error {
 	return m.store(dl, &out)
 }
 func (m *AlgebraicRootCore) CleanupRetained() error {
+	if m != nil && m.self == m && m.negationExecuting() {
+		return ErrAlgebraicPending
+	}
 	if m == nil || m.self != m || m.closed {
 		return ErrAlgebraicOwner
+	}
+	if e := m.CleanupNegation(); e != nil {
+		return e
 	}
 	if m.localActive {
 		if e := m.finishQ(nil); e != nil {
@@ -839,6 +860,9 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	return m.comparisonCleanup()
 }
 func (m *AlgebraicRootCore) Close() error {
+	if m != nil && m.self == m && m.negationExecuting() {
+		return ErrAlgebraicPending
+	}
 	if m == nil || m.self != m {
 		return ErrAlgebraicOwner
 	}
@@ -857,6 +881,9 @@ func (m *AlgebraicRootCore) Close() error {
 	}
 	if m.callers != privateCallers || m.vectors != privateVectors {
 		return ErrAlgebraicLive
+	}
+	if e := m.CleanupNegation(); e != nil {
+		return e
 	}
 	m.closing = true
 	// The later lexical comparison sequence is destroyed before older owners.
@@ -899,6 +926,8 @@ func (m *AlgebraicRootCore) Close() error {
 	}
 	b := m.config.Rationals.budget
 	b.Release(uint64(cap(m.locations)) * uint64(reflect.TypeOf(algebraicLocation{}).Size()))
+	b.Release(uint64(cap(m.negationHistory)) * uint64(reflect.TypeOf(algebraicNegHistory{}).Size()))
+	m.negationHistory = nil
 	b.Release(m.header)
 	m.locations = nil
 	m.header = 0
@@ -932,6 +961,9 @@ func (m *AlgebraicRootCore) sourcePolynomial(r *algebraicRecord) (UPolynomialVie
 // CleanupValue is the explicit owning abort of one caller-provided reachable
 // value. It does not repair source metadata or discover roots from locations.
 func (m *AlgebraicRootCore) CleanupValue(a *Algebraic) error {
+	if m.negationProtectsCaller(a) {
+		return ErrAlgebraicPending
+	}
 	l, e := m.location(a)
 	if e != nil || l == nil {
 		return e

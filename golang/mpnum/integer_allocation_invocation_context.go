@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/algebraic_numbers.cpp:1565-1577; src/util/mpz.h:124-149.
 // Source: src/util/mpz.h:allocate; src/util/mpz.cpp scratch/publication callers.
 // Licensed under the MIT license. Source author: Leonardo de Moura.
 package mpnum
@@ -5,8 +6,12 @@ package mpnum
 // Explicit passed invocation identity. It carries no allocation snapshot and
 // creates no source numeral, reservation, or ambient callback owner hook.
 type integerAllocationInvocationContext struct {
-	upolyDisplay           *upolyDisplayScope
-	upolyDisplayInvocation uint64
+	algebraicNegEvalInvocation uint64
+	algebraicNeg               *algebraicNegScope
+	algebraicNegInvocation     uint64
+	algebraicNegEval           bool
+	upolyDisplay               *upolyDisplayScope
+	upolyDisplayInvocation     uint64
 
 	factorNumeralVector              *polynomialFactorNumeralVectorReceipt
 	factorNumeralVectorInvocation    uint64
@@ -106,6 +111,9 @@ func pnAllocationContext(pn *integerPNormalizeScope) integerAllocationInvocation
 	return c
 }
 func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomialNumericRoots {
+	if c.algebraicNeg != nil && c.algebraicNegFrame(m) == nil {
+		return nil
+	}
 	if c.upolyDisplay != nil && c.upolyDisplayFrame(m) == nil {
 		return nil
 	}
@@ -247,6 +255,12 @@ func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomial
 			return nil
 		}
 		return &s.numeric
+	}
+	if q := c.algebraicNegFrame(m); q != nil {
+		if c.algebraicNegEval {
+			return &q.eval.numeric
+		}
+		return &q.numeric
 	}
 	if r := c.primePreparationFrame(m); r != nil {
 		return &r.numeric

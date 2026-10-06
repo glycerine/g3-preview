@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/algebraic_numbers.cpp:1565-1577; src/util/mpq.h:199-201.
 // Licensed under the MIT license.
 package mpnum
 
@@ -23,7 +24,7 @@ func (m *RationalManager) CloseChecked() error {
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
 	}
-	if m.z != nil && (m.z.copyAllocation.executing || m.z.normalizationExecuting || m.z.factorNumeralExecuting || m.z.factorNumeralVectorCallerExecuting() || m.z.factorUnivariateCallerExecuting() || m.z.factorCoreCallerExecuting() || m.z.factorFrontendCallerExecuting() || m.z.upolyDisplayCallerExecuting()) {
+	if m.z != nil && (m.z.algebraicNegCallerExecuting() || m.z.copyAllocation.executing || m.z.normalizationExecuting || m.z.factorNumeralExecuting || m.z.factorNumeralVectorCallerExecuting() || m.z.factorUnivariateCallerExecuting() || m.z.factorCoreCallerExecuting() || m.z.factorFrontendCallerExecuting() || m.z.upolyDisplayCallerExecuting()) {
 		return ErrPolynomialPending
 	}
 	if m.closed {
