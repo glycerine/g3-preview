@@ -39302,7 +39302,15 @@
         "mpnum/upolynomial_factor_prime_preparation.go",
         "mpnum/upolynomial_factor_prime_preparation_allocation_context.go",
         "mpnum/upolynomial_factor_prime_preparation_invocation.go",
-        "mpnum/upolynomial_factor_prime_preparation_source_test.go"
+        "mpnum/upolynomial_factor_prime_preparation_source_test.go",
+        "mpnum/upolynomial_factor_saved_prime.go",
+        "mpnum/upolynomial_factor_prepared_factors.go",
+        "mpnum/upolynomial_factor_lift_preparation_source_test.go",
+        "mpnum/upolynomial_factor_lift_preparation_child_source_test.go",
+        "mpnum/upolynomial_factor_lift_preparation_context_source_test.go",
+        "mpnum/upolynomial_factor_lift_preparation_factors_source_test.go",
+        "mpnum/upolynomial_factor_lift_preparation_actual_child_source_test.go",
+        "mpnum/upolynomial_factor_lift_preparation_completed_child_source_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -39391,7 +39399,15 @@
         "TestUPolynomialFactorPrimePreparationExactContextHistoryGuards",
         "TestUPolynomialFactorPrimePreparationOldLeafPreservesForeignReplacement",
         "TestUPolynomialFactorPrimePreparationActualNumeralDestructorHistory",
-        "TestUPolynomialFactorPrimePreparationActualRelatedDestructorHistory"
+        "TestUPolynomialFactorPrimePreparationActualRelatedDestructorHistory",
+        "TestUPolynomialFactorLiftPreparationSavedModulusCallerTransport",
+        "TestUPolynomialFactorLiftPreparationEveryActualPrefix",
+        "TestUPolynomialFactorLiftPreparationCapturedCheckerSourceStop",
+        "TestUPolynomialFactorLiftPreparationActualRelatedCheckpointGuards",
+        "TestUPolynomialFactorLiftPreparationCopiedStaleFactorContexts",
+        "TestUPolynomialFactorLiftPreparationFactorsSourceCursorAndOwnHistory",
+        "TestUPolynomialFactorLiftPreparationActualHelperCheckerSourceStop",
+        "TestUPolynomialFactorLiftPreparationCompletedChildPrecedesOlderSource"
       ],
       "conditionals": [
         {
@@ -39699,6 +39715,29 @@
             "TestUPolynomialFactorPrimePreparationActualNumeralDestructorHistory",
             "TestUPolynomialFactorPrimePreparationActualRelatedDestructorHistory"
           ]
+        },
+        {
+          "name": "upolynomial_factorization.cpp:1153-1175 saved modulus, Mignotte and actual lifting constructors/caller",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_factor_saved_prime.go",
+          "tests": [
+            "TestUPolynomialFactorLiftPreparationSavedModulusCallerTransport",
+            "TestUPolynomialFactorLiftPreparationEveryActualPrefix",
+            "TestUPolynomialFactorLiftPreparationCapturedCheckerSourceStop",
+            "TestUPolynomialFactorLiftPreparationActualRelatedCheckpointGuards",
+            "TestUPolynomialFactorLiftPreparationCopiedStaleFactorContexts",
+            "TestUPolynomialFactorLiftPreparationFactorsSourceCursorAndOwnHistory",
+            "TestUPolynomialFactorLiftPreparationActualHelperCheckerSourceStop",
+            "TestUPolynomialFactorLiftPreparationCompletedChildPrecedesOlderSource"
+          ]
+        },
+        {
+          "name": "upolynomial_factorization.cpp:1153-1175,1238-1292 actual retained child and source class owning continuation",
+          "status": "partial",
+          "go_target": "upolynomial_factor_retained_scope_source_test.go",
+          "tests": [
+            "TestUPolynomialFactorRetainedLexicalCleanup"
+          ]
         }
       ],
       "ownership": [
@@ -39718,7 +39757,10 @@
         "upolynomial_factorization.cpp:1030-1050: separately charged real service members bind exact owner/frame/nonwrapping invocation and immutable captured context. DEBUG f_cont is declared before f_pp; odd-negative c is declared only after literal sign loop, with direct modular SET/NEG and fs constant publication.",
         "upolynomial_factorization.cpp:1030-1050: actual GCD RAW5 and PN child source stops protect older NUM/parent fields; exact false completed-child acknowledgment precedes older fields and true unjoined abort follows them. First body/source/own causes and returned errors remain immutable through acknowledgment/new invocation.",
         "upolynomial_factorization.cpp:1058-1094: actual charged enclosing frame binds owner/self/frame/nonwrapping invocation, borrowed iterator and root/related caller chain. p, related manager, zp_fs, bestP, degree set and gcd_tmp are constructed only at reached source declarations; checkpoint, Next, early Push, SET/set_zp, GCD and is_one retain literal order.",
-        "upolynomial_factorization.cpp:1058-1094: direct numeric/PN/RAW/Natural acquisition uses explicit captured contexts and actual leaf outcomes. False completed-child acknowledgment precedes older source locals; true unjoined abort follows them. Strict gcd_tmp and related private-member stops preserve older unread suffix, immutable first body/source/own causes and exact old/new/foreign tokens."
+        "upolynomial_factorization.cpp:1058-1094: direct numeric/PN/RAW/Natural acquisition uses explicit captured contexts and actual leaf outcomes. False completed-child acknowledgment precedes older source locals; true unjoined abort follows them. Strict gcd_tmp and related private-member stops preserve older unread suffix, immutable first body/source/own causes and exact old/new/foreign tokens.",
+        "upolynomial_factorization.cpp:1153-1175: exact actual enclosing prime-preparation frame retains root/prime/lift manager identities and captured Mignotte/Hensel tuples. Saved SET, Mignotte, zpe constructor, SET, factor constructor and Hensel caller preserve literal declaration order; no shadow NUM or algorithm substitution. Direct lower acquisition remains actual outcome-based and nonwrapping/callback-free.",
+        "upolynomial.cpp:33-54: actual constructed best/lifted factors have separate strict source row/column and explicit owning cursors. Source reset SET1 stops retain first cause and unread suffix; owning rescue consumes exact remaining class members without replaying SET1 against a failed modulus. Child false acknowledgment precedes older class/NUM destruction and true unjoined abort follows it. Actual stopped body/source/own histories remain immutable through acknowledgment.",
+        "upolynomial_factorization.cpp:1153-1175: actual source-completed Hensel children permit older lexical class/NUM destruction even when owning retention remains; only an actual sticky younger source stop protects that suffix. Cold header retention follows older source completion, with child false acknowledgment before older own fields and true abort afterward."
       ],
       "deviations": [
         "Selected Mignotte helper, enclosing epilogue and literal prime-trial lexical scope/RAW transport are closed. Pair-Hensel and generic nil to_zp helper scope closure remain open. No full factor_square_free completion or original registered driver assertion credit.",
@@ -39738,7 +39780,9 @@
         "upolynomial_factorization.cpp:1030-1050: explicit reflected Go adapter storage is charged once in actual enclosing service header; no C++ malloc geometry equivalence or whole factorization completion claim.",
         "upolynomial_factorization.cpp:1030-1050: signed-host TLS destructor proofs use the qualified compiled owner-primitive domain; actual ErrorTransport callback proofs are Go callback behavior, not a fabricated C++ malloc callback.",
         "upolynomial_factorization.cpp:1066: preserve prior concrete degree_set(zp_upm) adaptation through the actual already-created empty zp_fs; no new source NUM, INC or allocation parity claim.",
-        "upolynomial_factorization.cpp:1058-1094: explicit adapter storage is charged once in reflected parent header; no whole Factor/finite-field factorization completion claim. TLS release proofs are qualified signed-host owner-primitive guard profiles; foreign descriptor proof uses genuine held NUMs consuming source-recycled descriptor slots."
+        "upolynomial_factorization.cpp:1058-1094: explicit adapter storage is charged once in reflected parent header; no whole Factor/finite-field factorization completion claim. TLS release proofs are qualified signed-host owner-primitive guard profiles; foreign descriptor proof uses genuine held NUMs consuming source-recycled descriptor slots.",
+        "upolynomial_factorization.cpp:1153-1175: compiled eligible GF7 caller profile validates every actual helper reservation and independent lifted product; qualified signed-host TLS/compiled checker profiles test exact source destruction stops. These profiles do not claim a new ordinary allocation seam between publication actions. The source constant DEL follows successful SET1 and its valid output is inline; no fabricated BIG constant DEL failure is introduced. Whole factorization/recombination topology remains partial.",
+        "upolynomial_factorization.cpp:1153-1175: CapturedCheckerSourceStop is an explicitly compiled/seeded retirement-engine transport proof. ActualHelperCheckerSourceStop separately invokes prepareFactorLift with eligible uint32 GF7 and BIG primitive square-free input, literal Mignotte exponent32, actual captured debug checker and signed TLS source stop. The release profile erases that conditional checker and constructs no checker NUM. RetainedLexicalCleanup preserves original unmatched core/SetZ assertions and counts only actual returned InvalidSlot, stopped class cursor, live core.SetZ with identical graph and immutable tuple/cause after new exact owning rescue."
       ]
     },
     {

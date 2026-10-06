@@ -1,4 +1,4 @@
-// Source: src/math/polynomial/upolynomial_factorization.cpp:1030-1050;
+// Source: src/math/polynomial/upolynomial_factorization.cpp:1030-1050,1153-1175,1238-1292;
 // src/math/polynomial/upolynomial_factorization.h:85-89.
 // Actual explicit Go service binding and reflected enclosing cold storage.
 // Licensed under the MIT license.
@@ -36,6 +36,7 @@ type UPolynomialFactorizationStats struct {
 	RetainedScopes                 uint32
 	MignottePending                bool
 	PrimeTrialPending              bool
+	RecombinationPending           bool
 	HenselPending                  bool
 }
 
@@ -107,6 +108,8 @@ func (s *UPolynomialFactorizationService) Stats() UPolynomialFactorizationStats 
 		r.RetainedOwnerBytes = s.scope.header
 		r.MignottePending = s.scope.mignotte.active
 		r.PrimeTrialPending = s.scope.primeTrial.active
+		r.RecombinationPending = s.scope.recombinationStep.active
+		r.HenselPending = s.scope.hensel.active
 	}
 	for h := s.henselPairs; h != nil; h = h.next {
 		r.CachedOwnerBytes += h.header

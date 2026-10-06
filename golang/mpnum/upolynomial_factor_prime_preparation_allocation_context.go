@@ -1,4 +1,4 @@
-// Source: src/math/polynomial/upolynomial_factorization.cpp:1058-1094;
+// Source: src/math/polynomial/upolynomial_factorization.cpp:1058-1094,1153-1175;
 // src/util/mpz.h:680-707; src/util/mpz.cpp:560-843;
 // src/util/mpzzp.h:122-123,211-216,229-235.
 // Licensed under the MIT license. Source authors: Dejan (t-dejanj), 2011-11-15; Leonardo de Moura.
@@ -6,7 +6,7 @@ package mpnum
 
 func (c integerAllocationInvocationContext) primePreparationFrame(z *IntegerManager) *upolyFactorPrimePreparationScope {
 	q := c.primePreparation
-	if z == nil || z.self != z || q == nil || !q.matches() || !q.active || !q.executing || q.owner.constructed < 2 || c.primePreparationInvocation == 0 || c.primePreparationInvocation != q.invocation || q.owner.service.scope != q.owner || q.owner.manager.config.Integer != z {
+	if z == nil || z.self != z || q == nil || !q.matches() || !q.active || (!q.executing && !q.sourceExecuting) || q.owner.constructed < 2 || c.primePreparationInvocation == 0 || c.primePreparationInvocation != q.invocation || q.owner.service.scope != q.owner || q.owner.manager.config.Integer != z {
 		return nil
 	}
 	for _, m := range q.managers() {
@@ -18,7 +18,7 @@ func (c integerAllocationInvocationContext) primePreparationFrame(z *IntegerMana
 		}
 	}
 	m := c.primePreparationManager
-	if m != q.owner.manager && m != q.related {
+	if m != q.owner.manager && m != q.related && m != q.lift {
 		return nil
 	}
 	return q

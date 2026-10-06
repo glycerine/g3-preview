@@ -17,7 +17,10 @@ func (s *UPolynomialFactorizationService) FactorSquareFree(f UPolynomialView, fs
 func (s *UPolynomialFactorizationService) FactorSquareFreeDefault(f UPolynomialView, fs *UPolynomialFactors, params UPolynomialFactorParams) (bool, error) {
 	return s.FactorSquareFree(f, fs, 1, params)
 }
-func (s *UPolynomialFactorizationService) mignotteBound(f UPolynomialView, p *Int) (answer uint32, cause error) {
+func (s *UPolynomialFactorizationService) mignotteBound(f UPolynomialView, p *Int) (uint32, error) {
+	return s.mignotteBoundWithReceipt(f, p, nil)
+}
+func (s *UPolynomialFactorizationService) mignotteBoundWithReceipt(f UPolynomialView, p *Int, child *upolyMignotteInvocationReceipt) (answer uint32, cause error) {
 	m := s.manager
 	nm := m.modular
 	if modularSourceDebug && upolyViewDegree(f) < 2 {
@@ -27,6 +30,9 @@ func (s *UPolynomialFactorizationService) mignotteBound(f UPolynomialView, p *In
 	r, e := s.beginMignotteInvocation()
 	if e != nil {
 		return 0, e
+	}
+	if child != nil {
+		*child = r
 	}
 	q := r.frame
 	q.constructed = 1
@@ -203,34 +209,10 @@ func (s *UPolynomialFactorizationService) factorSquareFree(f UPolynomialView, fs
 			return true, nil
 		}
 	}
-	if e = zp.SetZP(&c.bestP); e != nil {
+	if e = s.prepareFactorLift(fs); e != nil {
 		return false, e
 	}
-	exponent, e := s.mignotteBound(m.stateView(&c.fpp), &c.bestP)
-	if e != nil {
-		return false, e
-	}
-	zpe, e := NewRelatedUPolynomialManager(m)
-	if e != nil {
-		return false, e
-	}
-	c.zpe = zpe
-	c.constructed = 8
-	if e = zpe.SetZP(&c.bestP); e != nil {
-		return false, e
-	}
-	lifted, e := zpe.NewFactors()
-	if e != nil {
-		return false, e
-	}
-	c.lifted = lifted
-	c.constructed = 9
-	if e = s.beginHenselCaller(c); e != nil {
-		return false, e
-	}
-	if e = s.henselFactorsWithCaller(m.stateView(&c.fpp), best, exponent, lifted, &c.hensel); e != nil {
-		return false, e
-	}
+	zpe, lifted := c.zpe, c.lifted
 	c.constructed = 10
 	top, e := m.read(m.stateView(&c.fpp), c.fpp.size-1)
 	if e != nil {

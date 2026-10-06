@@ -100,7 +100,6 @@ func (c *upolyFactorSquareFreeScope) cleanup() error {
 		if e := c.hensel.finish(); e != nil {
 			return e
 		}
-		return ErrUPolynomialCleanupPending
 	}
 	if q := &c.primeTrial; q.active {
 		if q.executing || q.callDepth != 0 {
@@ -123,7 +122,7 @@ func (c *upolyFactorSquareFreeScope) cleanup() error {
 	if e := c.cleanupMembersPhase(true); e != nil {
 		return e
 	}
-	if c.primePreparation.active || c.mignotte.active || c.primeTrial.active || c.trialHelper.active || c.recombinationStep.active || c.service.preparation.active {
+	if c.hensel.active || c.primePreparation.active || c.mignotte.active || c.primeTrial.active || c.trialHelper.active || c.recombinationStep.active || c.service.preparation.active {
 		return ErrUPolynomialCleanupPending
 	}
 	return nil
@@ -152,12 +151,20 @@ func (c *upolyFactorSquareFreeScope) cleanupMembersPhase(source bool) error {
 		case 10:
 			e = m.modular.Del(&c.leading)
 		case 9:
-			e = c.lifted.Close()
+			if c.primePreparation.matches() {
+				e = c.closePreparedFactors(c.lifted, 1, source)
+			} else {
+				e = c.lifted.Close()
+			}
 			if e == nil {
 				c.lifted = nil
 			}
 		case 8:
-			e = c.zpe.Close()
+			if c.primePreparation.matches() {
+				e = c.closePrimeRelated(source)
+			} else {
+				e = c.zpe.Close()
+			}
 			if e == nil {
 				c.zpe = nil
 			}
@@ -177,7 +184,11 @@ func (c *upolyFactorSquareFreeScope) cleanupMembersPhase(source bool) error {
 				e = m.modular.Del(&c.bestP)
 			}
 		case 4:
-			e = c.best.Close()
+			if c.primePreparation.matches() {
+				e = c.closePreparedFactors(c.best, 0, source)
+			} else {
+				e = c.best.Close()
+			}
 			if e == nil {
 				c.best = nil
 			}

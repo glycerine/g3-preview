@@ -1,4 +1,4 @@
-// Source: src/math/polynomial/upolynomial_factorization.cpp:1058-1094;
+// Source: src/math/polynomial/upolynomial_factorization.cpp:1058-1094,1153-1175;
 // src/util/mpz.cpp:560-843; src/util/mpzzp.h:211-216.
 // Concrete call adapter: p, saved prime and gcd_tmp remain actual parent NUMs.
 // Licensed under the MIT license. Source authors: Dejan (t-dejanj), 2011-11-15; Leonardo de Moura.
@@ -16,17 +16,22 @@ type upolyFactorPrimePreparationInvocationReceipt struct {
 }
 type upolyFactorPrimePreparationScope struct {
 	receipt                                          upolyFactorPrimePreparationInvocationReceipt
-	callerPrevious                                   [2]*upolyFactorPrimePreparationScope
+	callerPrevious                                   [3]*upolyFactorPrimePreparationScope
 	callDepth                                        uint32
 	self                                             *upolyFactorPrimePreparationScope
 	owner                                            *upolyFactorSquareFreeScope
 	factors                                          *UPolynomialFactors
-	related                                          *UPolynomialManager
+	related, lift                                    *UPolynomialManager
+	mignotte                                         upolyMignotteInvocationReceipt
+	factorSource                                     [2]upolyPreparedFactorCursor
+	factorOwn                                        [2]upolyPreparedFactorCursor
+	hensel                                           *upolyHenselCallerScope
+	henselInvocation                                 uint64
 	invocation                                       uint64
 	active, executing, sourceExecuting, ownExecuting bool
 	sourceEnded, ownEnded                            bool
 	numeric                                          polynomialNumericRoots
-	normalize                                        [2]integerPNormalizeInvocationReceipt
+	normalize                                        [3]integerPNormalizeInvocationReceipt
 	divisionRaw, extendedRaw, gcdRaw                 integerRawInvocationReceipt
 	buffers                                          [4]naturalPNBufferReceipt
 	verification                                     naturalPNVerificationReceipt
@@ -47,16 +52,22 @@ func (s *UPolynomialFactorizationService) beginPrimePreparation(fs *UPolynomialF
 	if q.active || q.invocation == ^uint64(0) {
 		return nil, ErrUPolynomialCleanupPending
 	}
-	*q = upolyFactorPrimePreparationScope{owner: s.scope, factors: fs, related: s.scope.zp, invocation: q.invocation + 1, active: true, executing: true}
+	*q = upolyFactorPrimePreparationScope{owner: s.scope, factors: fs, related: s.scope.zp, lift: s.scope.zpe, invocation: q.invocation + 1, active: true, executing: true}
 	q.self = q
 	q.receipt = upolyFactorPrimePreparationInvocationReceipt{q.owner, q, q.invocation}
 	return q, nil
 }
-func (q *upolyFactorPrimePreparationScope) managers() [2]*UPolynomialManager {
-	return [2]*UPolynomialManager{q.owner.manager, q.related}
+func (q *upolyFactorPrimePreparationScope) managers() [3]*UPolynomialManager {
+	return [3]*UPolynomialManager{q.owner.manager, q.related, q.lift}
 }
 func (q *upolyFactorPrimePreparationScope) childCause() error {
 	z := q.owner.manager.config.Integer
+	if e := q.owner.service.mignotteInvocationSourceCause(&q.mignotte); e != nil {
+		return e
+	}
+	if q.matchesHensel() && q.hensel.sourceCause != nil {
+		return q.hensel.sourceCause
+	}
 	for i, m := range q.managers() {
 		if m == nil {
 			continue
@@ -109,6 +120,9 @@ func (q *upolyFactorPrimePreparationScope) finish(r *upolyFactorPrimePreparation
 	return q.bodyCause
 }
 func (q *upolyFactorPrimePreparationScope) pending() bool {
+	if q.owner.service.matchesMignotteInvocation(&q.mignotte) || q.matchesHensel() && q.hensel.active {
+		return true
+	}
 	z := q.owner.manager.config.Integer
 	if polynomialNegNumericPending(&q.numeric) {
 		return true
@@ -159,6 +173,14 @@ func (q *upolyFactorPrimePreparationScope) own(r *upolyFactorPrimePreparationInv
 	q.enterCall()
 	defer q.leaveCall()
 	z := q.owner.manager.config.Integer
+	if e := q.owner.service.cleanupMignotteInvocation(&q.mignotte, false); e != nil {
+		return e
+	}
+	if q.matchesHensel() && q.hensel.active {
+		if e := q.hensel.own(false); e != nil {
+			return e
+		}
+	}
 	for i, m := range q.managers() {
 		if m == nil {
 			continue
@@ -177,6 +199,14 @@ func (q *upolyFactorPrimePreparationScope) own(r *upolyFactorPrimePreparationInv
 	}
 	q.ownEnded = true
 	if abort {
+		if e := q.owner.service.cleanupMignotteInvocation(&q.mignotte, true); e != nil {
+			return e
+		}
+		if q.matchesHensel() && q.hensel.active {
+			if e := q.hensel.own(true); e != nil {
+				return e
+			}
+		}
 		for _, r := range []*integerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw, &q.gcdRaw} {
 			if e := z.cleanupRawInvocation(r, true); e != nil {
 				return e
@@ -241,13 +271,15 @@ func (q *upolyFactorPrimePreparationScope) leaveCall() {
 
 func (m *UPolynomialManager) primePreparationCallPending() bool {
 	for q := m.primePreparationCaller; q != nil; {
-		if q.matches() && q.callDepth != 0 && (q.owner.manager == m || q.related == m) {
+		if q.matches() && q.callDepth != 0 && (q.owner.manager == m || q.related == m || q.lift == m) {
 			return true
 		}
 		if q.owner != nil && q.owner.manager == m {
 			q = q.callerPrevious[0]
-		} else {
+		} else if q.related == m {
 			q = q.callerPrevious[1]
+		} else {
+			q = q.callerPrevious[2]
 		}
 	}
 	return false
@@ -292,7 +324,7 @@ func (m *UPolynomialManager) primePreparationDestructorAuthorized(r *upolyFactor
 		return false
 	}
 	q := r.frame
-	if !q.matchesReceipt(r) || q.owner.service.scope != q.owner || q.owner.constructed != 3 || q.owner.zp != m || q.related != m || q.callDepth == 0 || q.executing {
+	if !q.matchesReceipt(r) || q.owner.service.scope != q.owner || !((q.owner.constructed == 3 && q.owner.zp == m && q.related == m) || (q.owner.constructed == 8 && q.owner.zpe == m && q.lift == m)) || q.callDepth == 0 || q.executing {
 		return false
 	}
 	if own {
@@ -302,7 +334,11 @@ func (m *UPolynomialManager) primePreparationDestructorAuthorized(r *upolyFactor
 }
 func (c *upolyFactorSquareFreeScope) closePrimeRelated(source bool) (cause error) {
 	q := &c.primePreparation
-	if !q.matches() || c.service.scope != c || c.constructed != 3 || c.zp != q.related {
+	target := c.zp
+	if c.constructed == 8 {
+		target = c.zpe
+	}
+	if !q.matches() || c.service.scope != c || !((c.constructed == 3 && target == q.related) || (c.constructed == 8 && target == q.lift)) || target == nil {
 		return ErrUPolynomialOwner
 	}
 	if q.executing || q.sourceExecuting || q.ownExecuting {
@@ -332,11 +368,34 @@ func (c *upolyFactorSquareFreeScope) closePrimeRelated(source bool) (cause error
 	}()
 	r := q.receipt
 	if source {
-		if e := c.zp.sourceFinalizeWithCallerOwners(nil, nil, &r); e != nil {
+		if e := target.sourceFinalizeWithCallerOwners(nil, nil, &r); e != nil {
 			return e
+		}
+	}
+	if !source { // Exact acquired class private NUMs; retain literal source history separately.
+		for _, n := range []*Int{&target.modular.p, &target.modular.lower, &target.modular.upper, &target.modular.invTmp1, &target.modular.invTmp2, &target.modular.invTmp3, &target.modular.divTmp} {
+			if e := c.manager.config.Integer.cleanupRawNumeral(n); e != nil {
+				return e
+			}
 		}
 	}
 	// Source private members are complete before the Go cold class storage
 	// can be refunded. Close cannot discover or consume caller descriptors.
-	return c.zp.closeWithCallerOwners(nil, nil, &r)
+	return target.closeWithCallerOwners(nil, nil, &r)
+}
+
+// Only actual guarded caller construction binds this child tuple.
+func (q *upolyFactorPrimePreparationScope) matchesHensel() bool {
+	return q.matches() && q.hensel != nil && q.hensel == &q.owner.hensel && q.hensel.owner == q.owner && q.henselInvocation != 0 && q.hensel.invocation == q.henselInvocation
+}
+func (q *upolyFactorPrimePreparationScope) bindLift(m *UPolynomialManager) error {
+	if !q.matches() || !q.active || !q.executing || q.owner.zpe != m || m == nil || m.self != m || m.config.Integer != q.owner.manager.config.Integer || q.lift != nil {
+		return ErrUPolynomialOwner
+	}
+	q.lift = m
+	if q.callDepth != 0 {
+		q.callerPrevious[2] = m.primePreparationCaller
+		m.primePreparationCaller = q
+	}
+	return nil
 }
