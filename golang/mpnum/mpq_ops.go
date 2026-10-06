@@ -63,6 +63,9 @@ func (m *RationalManager) MulInts(a, b *Int, out *Rational) error {
 	return m.resetDenominator(out)
 }
 func (m *RationalManager) MulInt(a *Int, b, out *Rational) error {
+	return m.mulIntWithAllocationContext(a, b, out, integerAllocationInvocationContext{})
+}
+func (m *RationalManager) mulIntWithAllocationContext(a *Int, b, out *Rational, context integerAllocationInvocationContext) error {
 	if e := m.z.check(a); e != nil {
 		return e
 	}
@@ -73,16 +76,16 @@ func (m *RationalManager) MulInt(a *Int, b, out *Rational) error {
 		return e
 	}
 	integer := isIntegerRational(b)
-	if e := m.z.Mul(a, &b.num, &out.num); e != nil {
+	if e := m.z.mulWithAllocationContext(a, &b.num, &out.num, context); e != nil {
 		return e
 	}
 	if integer {
 		return m.resetDenominator(out)
 	}
-	if e := m.z.Copy(&out.den, &b.den); e != nil {
+	if e := m.z.copyFromOwnerWithAllocationContext(&out.den, m.z, &b.den, nil, context); e != nil {
 		return e
 	}
-	return m.normalize(out)
+	return m.normalizeWithAllocationContext(out, context)
 }
 func (m *RationalManager) DivInt(a *Rational, b *Int, out *Rational) error {
 	return m.divIntWithAllocationContext(a, b, out, integerAllocationInvocationContext{})

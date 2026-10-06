@@ -61,6 +61,9 @@ func (c integerAllocationInvocationContext) prepareRoundHistory(z *IntegerManage
 	if s == nil {
 		return memory.ErrRuntimeOwner
 	}
+	if e := s.parentFormattedSet.prepareRationalSetHistory(z); e != nil {
+		return e
+	}
 	if e := s.parentFormattedSet.prepareFormattedSetHistory(z); e != nil {
 		return e
 	}

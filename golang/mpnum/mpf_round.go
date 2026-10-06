@@ -97,6 +97,10 @@ func (m *ArbitraryFloatManager) roundWithParentContext(mode ArbitraryFloatRoundi
 	}
 	invocation := s.invocation + 1
 	*s = arbitraryFloatRoundScope{manager: m, invocation: invocation, active: true, executing: true, receipt: receipt, parentFormattedSet: parent}
+	if rs := parent.rationalSetFrame(m.integer, true); rs != nil {
+		rs.roundFrame = s
+		rs.roundInvocation = invocation
+	}
 	if fs := parent.formattedSetFrame(m.integer, true); fs != nil {
 		fs.roundFrame = s
 		fs.roundInvocation = invocation

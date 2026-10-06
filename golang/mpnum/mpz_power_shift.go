@@ -171,7 +171,10 @@ func (m *IntegerManager) powerWithPhysicalAllocationContext(a *Int, p uint32, ou
 	return m.powerCoreWithPhysicalContext(a, p, out, receipt, context, receiver)
 }
 func (m *IntegerManager) powerCoreWithPhysicalContext(a *Int, p uint32, out *Int, receipt *integerPowerInvocationReceipt, context integerAllocationInvocationContext, receiver *integerRuntimeValueReceiver) (cause error) {
-	if context != (integerAllocationInvocationContext{}) && context.roots(m) == nil {
+	// A validated literal caller binding can precede its first allocating leaf.
+	// This grants no roots; the allocation leaf prepares its actual record.
+	rationalSetBinding := context.mpfRationalSet != nil && context.rationalSetFrame(m, true) != nil && context == context.mpfRationalSet.allocationContext()
+	if context != (integerAllocationInvocationContext{}) && context.roots(m) == nil && !rationalSetBinding {
 		return ErrUPolynomialOwner
 	}
 	if a.IsSmall() {

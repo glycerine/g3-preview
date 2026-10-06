@@ -367,6 +367,9 @@ func (m *IntegerManager) allocateWithSourceContext(capacity, size uint32, s *int
 	if e := context.prepareFactorFrontendConstantHistory(m); e != nil {
 		return 0, e
 	}
+	if e := context.prepareRationalSetHistory(m); e != nil {
+		return 0, e
+	}
 	if e := context.prepareFormattedSetHistory(m); e != nil {
 		return 0, e
 	}
@@ -417,6 +420,9 @@ func (m *IntegerManager) allocateWithSourceContext(capacity, size uint32, s *int
 		if transfer := m.captureRationalServiceAllocationOutcome(context, backing, &outcome); transfer != nil {
 			return 0, polynomialNewtonJoin(e, transfer)
 		}
+		if transfer := m.captureRationalSetAllocation(context, backing, &outcome); transfer != nil {
+			return 0, transfer
+		}
 		if transfer := m.captureFormattedSetAllocation(context, backing, &outcome); transfer != nil {
 			return 0, polynomialNewtonJoin(e, transfer)
 		}
@@ -453,6 +459,9 @@ func (m *IntegerManager) allocateWithSourceContext(capacity, size uint32, s *int
 	if e != nil {
 		if transfer := m.captureRationalServiceAllocationOutcome(context, backing, &outcome); transfer != nil {
 			return 0, polynomialNewtonJoin(e, transfer)
+		}
+		if transfer := m.captureRationalSetAllocation(context, backing, &outcome); transfer != nil {
+			return 0, transfer
 		}
 		if transfer := m.captureFormattedSetAllocation(context, backing, &outcome); transfer != nil {
 			return 0, polynomialNewtonJoin(e, transfer)

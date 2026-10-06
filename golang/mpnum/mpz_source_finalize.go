@@ -117,6 +117,14 @@ func (m *IntegerManager) markSourceFreedPools() error {
 				}
 			}
 		}
+		for h := parent.rationalSetHistories; h != nil; h = h.next {
+			if h.self != h || h.manager != parent || h.invocation == 0 {
+				return memory.ErrRuntimeOwner
+			}
+			if e := m.markSourceConsumedDetachedCell(&h.numeric.cell, &h.cellRetired); e != nil {
+				return e
+			}
+		}
 		for h := parent.formattedSetHistories; h != nil; h = h.next {
 			if h.self != h || h.manager != parent || h.issued.manager != parent || h.issued.frame != h || h.issued.invocation != h.invocation || h.invocation == 0 {
 				return memory.ErrRuntimeOwner

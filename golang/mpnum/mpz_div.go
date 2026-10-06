@@ -129,6 +129,7 @@ func (m *IntegerManager) divWithAllocationContext(a, b, c *Int, context integerA
 				return e
 			}
 			tmp = &public.values[0]
+			context.recordRationalSetRaw(m, receipt)
 			context.recordConversionRaw(m, receipt)
 			context.recordFormatRaw(m, receipt)
 			context.recordRecombinationRaw(m, receipt)

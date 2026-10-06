@@ -9,6 +9,7 @@ import "github.com/glycerine/g3/golang/memory"
 type naturalPNVerificationScope struct {
 	rootUpperBound                               *upolyRootUpperBoundScope
 	rootUpperInvocation                          uint64
+	rationalSetContext                           integerAllocationInvocationContext
 	factorFrontendContext                        integerAllocationInvocationContext
 	roundContext                                 integerAllocationInvocationContext
 	formatContext                                integerAllocationInvocationContext

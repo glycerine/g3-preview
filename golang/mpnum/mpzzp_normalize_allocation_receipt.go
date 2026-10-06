@@ -57,6 +57,7 @@ func (m *IntegerModularManager) cleanupPNormalizeInvocation(r *integerPNormalize
 type naturalPNBufferReceipt struct {
 	rootUpperBound          *upolyRootUpperBoundScope
 	rootUpperInvocation     uint64
+	rationalSetContext      integerAllocationInvocationContext
 	factorFrontendContext   integerAllocationInvocationContext
 	roundContext            integerAllocationInvocationContext
 	formatContext           integerAllocationInvocationContext
@@ -97,6 +98,21 @@ func (m *NaturalManager) pnBufferReceipt(pn *integerPNormalizeScope, i int) *nat
 func (r *naturalPNBufferReceipt) acquire(s *sourceLimbBuffer, block memory.Block) {
 	if r.buffer == s && r.bound(true) {
 		r.pending = block
+		if c := r.rationalSetContext; c.mpfRationalSet != nil {
+			q := c.rationalSetFrame(c.mpfRationalSet.manager.integer, true)
+			if q != nil && q.history != nil {
+				if r.private {
+					q.history.naturalOriginal[4] = block
+				} else {
+					for i := range q.buffers {
+						if r == &q.buffers[i] {
+							q.history.naturalOriginal[i] = block
+						}
+					}
+				}
+			}
+		}
+
 		if c := r.roundContext; c.mpfRound != nil {
 			q := c.roundFrame(c.mpfRound.manager.integer, true)
 			if q != nil && q.history != nil {
@@ -171,6 +187,23 @@ func (r *naturalPNBufferReceipt) bound(executing bool) bool {
 		}
 		return false
 	}
+	if c := r.rationalSetContext; c.mpfRationalSet != nil {
+		s := c.mpfRationalSet
+		if r.owner == nil || s.manager == nil || r.owner != s.manager.integer.natural || c.rationalSetFrame(s.manager.integer, executing) == nil || r.invocation != s.invocation {
+			return false
+		}
+		if r.private {
+			v := &r.owner.verificationInvocation
+			return r == &v.buffer && r.buffer == &r.owner.verification && v.rationalSetContext.mpfRationalSet == s && v.rationalSetContext.mpfRationalSetInvocation == s.invocation && r.owner.matchesPNVerification(&s.verification)
+		}
+		for i := range s.buffers {
+			if r == &s.buffers[i] {
+				return r.buffer == &r.owner.division[i]
+			}
+		}
+		return false
+	}
+
 	if c := r.roundContext; c.mpfRound != nil {
 		s := c.mpfRound
 		if r.owner == nil || s.manager == nil || r.owner != s.manager.integer.natural || c.roundFrame(s.manager.integer, executing) == nil || r.invocation != s.invocation {
@@ -477,6 +510,17 @@ func (m *NaturalManager) divisionBufferReceipt(context integerAllocationInvocati
 
 	if context.raw != nil {
 		return nil
+	}
+	if context.mpfRationalSet != nil {
+		s := context.rationalSetFrame(context.mpfRationalSet.manager.integer, true)
+		if s == nil || s.manager.integer.natural != m {
+			return nil
+		}
+		b := &s.buffers[i]
+		if b.owner == nil {
+			*b = naturalPNBufferReceipt{owner: m, rationalSetContext: context, invocation: s.invocation, buffer: &m.division[i]}
+		}
+		return b
 	}
 	if context.mpfFormat != nil {
 		q := context.formatFrame(context.mpfFormat.manager.integer, true)

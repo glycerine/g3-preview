@@ -6,33 +6,39 @@ package mpnum
 // negative-denominator raw values. It captures numerator sign before division
 // publishes into a caller that may alias either input component.
 func (m *RationalManager) roundCore(a *Rational, out *Int, ceil bool) error {
+	return m.roundCoreWithAllocationContext(a, out, ceil, integerAllocationInvocationContext{})
+}
+func (m *RationalManager) roundCoreWithAllocationContext(a *Rational, out *Int, ceil bool, context integerAllocationInvocationContext) error {
 	if isIntegerRational(a) {
-		return m.z.Copy(out, &a.num)
+		return m.z.copyFromOwnerWithAllocationContext(out, m.z, &a.num, nil, context)
 	}
 	correct := a.num.val < 0
 	if ceil {
 		correct = a.num.val > 0
 	}
-	if e := m.z.MachineDiv(&a.num, &a.den, out); e != nil {
+	if e := m.z.machineDivWithAllocationContext(&a.num, &a.den, out, context); e != nil {
 		return e
 	}
 	if correct {
 		one := NewInt(1)
 		if ceil {
-			return m.z.Add(out, &one, out)
+			return m.z.addSubWithAllocationContext(out, &one, out, false, context)
 		}
-		return m.z.Sub(out, &one, out)
+		return m.z.addSubWithAllocationContext(out, &one, out, true, context)
 	}
 	return nil
 }
 func (m *RationalManager) roundToInt(a *Rational, out *Int, ceil bool) error {
+	return m.roundToIntWithAllocationContext(a, out, ceil, integerAllocationInvocationContext{})
+}
+func (m *RationalManager) roundToIntWithAllocationContext(a *Rational, out *Int, ceil bool, context integerAllocationInvocationContext) error {
 	if e := m.check(a); e != nil {
 		return e
 	}
 	if e := m.z.check(out); e != nil {
 		return e
 	}
-	return m.roundCore(a, out, ceil)
+	return m.roundCoreWithAllocationContext(a, out, ceil, context)
 }
 
 // FloorToInt and CeilToInt publish the source Copy/quotient into the caller

@@ -159,10 +159,13 @@ func (m *RationalManager) negWithSourceContext(a *Rational, context integerAlloc
 	return m.z.negWithAllocationContext(&a.num, context)
 }
 func (m *RationalManager) Abs(a *Rational) error {
+	return m.absWithAllocationContext(a, integerAllocationInvocationContext{})
+}
+func (m *RationalManager) absWithAllocationContext(a *Rational, context integerAllocationInvocationContext) error {
 	if e := m.checkScalarValue(a); e != nil {
 		return e
 	}
-	return m.z.Abs(&a.num)
+	return m.z.absWithAllocationContext(&a.num, context)
 }
 func (m *RationalManager) Move(dst, src *Rational) error {
 	if e := m.checkScalarValue(dst); e != nil {
@@ -386,6 +389,9 @@ func (m *RationalManager) Inv(a, out *Rational) error {
 // A resulting denominator0 is invalid for ordinary reads but remains owned and
 // can be destroyed or explicitly Reset using cleanup-only validation.
 func (m *RationalManager) InvInPlace(a *Rational) error {
+	return m.invInPlaceWithAllocationContext(a, integerAllocationInvocationContext{})
+}
+func (m *RationalManager) invInPlaceWithAllocationContext(a *Rational, context integerAllocationInvocationContext) error {
 	if e := m.check(a); e != nil {
 		return e
 	}
@@ -393,10 +399,10 @@ func (m *RationalManager) InvInPlace(a *Rational) error {
 		return ErrIntegerAssertion
 	}
 	if a.num.val < 0 {
-		if e := m.z.Neg(&a.num); e != nil {
+		if e := m.z.negWithAllocationContext(&a.num, context); e != nil {
 			return e
 		}
-		if e := m.z.Neg(&a.den); e != nil {
+		if e := m.z.negWithAllocationContext(&a.den, context); e != nil {
 			return e
 		}
 	}
@@ -419,7 +425,10 @@ func (m *RationalManager) Equal(a, b *Rational) (bool, error) {
 }
 
 // Compare preserves source rat_lt's sign shortcuts and exact cross-products.
-func (m *RationalManager) Compare(a, b *Rational) (_rawValue int, _rawErr error) {
+func (m *RationalManager) Compare(a, b *Rational) (int, error) {
+	return m.compareWithAllocationContext(a, b, integerAllocationInvocationContext{})
+}
+func (m *RationalManager) compareWithAllocationContext(a, b *Rational, context integerAllocationInvocationContext) (_rawValue int, _rawErr error) {
 	if e := m.checkScalarValue(a); e != nil {
 		return 0, e
 	}
@@ -463,13 +472,13 @@ func (m *RationalManager) Compare(a, b *Rational) (_rawValue int, _rawErr error)
 		one, two = &r.compareOne, &r.compareTwo
 		defer m.finishRawCompare(&_rawErr)
 	}
-	if e := m.z.Mul(&a.num, &b.den, &one.num); e != nil {
+	if e := m.z.mulWithAllocationContext(&a.num, &b.den, &one.num, context); e != nil {
 		return 0, e
 	}
 	if e := m.resetDenominator(one); e != nil {
 		return 0, e
 	}
-	if e := m.z.Mul(&b.num, &a.den, &two.num); e != nil {
+	if e := m.z.mulWithAllocationContext(&b.num, &a.den, &two.num, context); e != nil {
 		return 0, e
 	}
 	if e := m.resetDenominator(two); e != nil {
@@ -489,7 +498,7 @@ func (m *RationalManager) Compare(a, b *Rational) (_rawValue int, _rawErr error)
 
 func (m *RationalManager) Add(a, b, out *Rational) error { return m.addSub(a, b, out, false) }
 func (m *RationalManager) Sub(a, b, out *Rational) error { return m.addSub(a, b, out, true) }
-func (m *RationalManager) addSub(a, b, out *Rational, subtract bool) (_rawErr error) {
+func (m *RationalManager) addSub(a, b, out *Rational, subtract bool) error {
 	return m.addSubWithAllocationContext(a, b, out, subtract, integerAllocationInvocationContext{})
 }
 func (m *RationalManager) addSubWithAllocationContext(a, b, out *Rational, subtract bool, context integerAllocationInvocationContext) (_rawErr error) {

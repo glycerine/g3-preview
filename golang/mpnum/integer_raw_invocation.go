@@ -8,6 +8,7 @@ package mpnum
 type integerRawScope struct {
 	rootUpperBound                                 *upolyRootUpperBoundScope
 	rootUpperInvocation                            uint64
+	rationalSetContext                             integerAllocationInvocationContext
 	formatContext                                  integerAllocationInvocationContext
 	conversionContext                              integerAllocationInvocationContext
 	somNormalize                                   polynomialSOMNormalizeInvocationReceipt
@@ -59,6 +60,9 @@ func (m *IntegerManager) rawAllocationRoots(r *integerRawInvocationReceipt) *pol
 		return nil
 	}
 	if q := r.frame.rootUpperBound; q != nil && (integerAllocationInvocationContext{rootUpperBound: q, rootUpperBoundInvocation: r.frame.rootUpperInvocation}).rootUpperBoundFrame(m) == nil {
+		return nil
+	}
+	if c := r.frame.rationalSetContext; c.mpfRationalSet != nil && c.rationalSetFrame(m, true) == nil {
 		return nil
 	}
 	if c := r.frame.conversionContext; c.mpfConversion != nil && c.conversionFrame(m, true) == nil {

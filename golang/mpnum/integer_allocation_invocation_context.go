@@ -14,6 +14,8 @@ type integerAllocationInvocationContext struct {
 	rootUpperBoundInvocation     uint64
 	integerEvaluation            *upolyIntegerEvaluationScope
 	integerEvaluationInvocation  uint64
+	mpfRationalSet               *arbitraryFloatRationalSetScope
+	mpfRationalSetInvocation     uint64
 	mpfFormattedSet              *arbitraryFloatFormattedSetScope
 	mpfFormattedSetInvocation    uint64
 	rationalEvaluation           *upolyRationalEvaluationScope
@@ -154,6 +156,9 @@ func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomial
 	if c.integerEvaluation != nil && c.integerEvaluationFrame(m) == nil {
 		return nil
 	}
+	if c.mpfRationalSet != nil && c.rationalSetFrame(m, true) == nil {
+		return nil
+	}
 	if c.rationalEvaluation != nil && c.rationalEvaluationFrame(m) == nil {
 		return nil
 	}
@@ -269,6 +274,12 @@ func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomial
 	}
 	if c.rationalService != nil {
 		return &c.rationalService.numeric
+	}
+	if c.mpfRationalSet != nil {
+		if h := c.mpfRationalSet.history; h != nil {
+			return &h.numeric
+		}
+		return nil
 	}
 	if c.mpfConversion != nil {
 		if c.mpfConversionOutput {

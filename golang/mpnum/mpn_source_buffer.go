@@ -71,6 +71,14 @@ func (s *sourceLimbBuffer) expandWithPNReceipt(r *memory.Runtime, receipt *natur
 		}
 	}
 
+	if receipt != nil && receipt.rationalSetContext.mpfRationalSet != nil {
+		if !receipt.bound(true) {
+			return memory.ErrRuntimeOwner
+		}
+		if e := receipt.rationalSetContext.prepareRationalSetHistory(receipt.rationalSetContext.mpfRationalSet.manager.integer); e != nil {
+			return e
+		}
+	}
 	if receipt != nil && receipt.roundContext.mpfRound != nil {
 		if !receipt.bound(true) {
 			return memory.ErrRuntimeOwner

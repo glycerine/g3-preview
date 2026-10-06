@@ -232,6 +232,33 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []mem
 				objects[c.object] = true
 			}
 		}
+
+		for h := parent.rationalSetHistories; h != nil; h = h.next {
+			if h.self != h || h.manager != parent || h.invocation == 0 {
+				t.Fatal("invalid actual rational SET record")
+			}
+			for _, block := range []memory.Block{h.transferred.Block(), h.numeric.allocator[0], h.numeric.allocator[1], h.numeric.allocator[2]} {
+				if block == (memory.Block{}) {
+					continue
+				}
+				if raw[block] {
+					t.Fatal("duplicate rational SET raw")
+				}
+				if _, e := m.memory.Size(block); e != nil {
+					t.Fatal(e)
+				}
+				raw[block] = true
+			}
+			if c := h.numeric.cell; c.object != (memory.ObjectRef{}) {
+				if objects[c.object] {
+					t.Fatal("duplicate rational SET object")
+				}
+				if _, e := m.allocator.ObjectExtent(c.object); e != nil {
+					t.Fatal(e)
+				}
+				objects[c.object] = true
+			}
+		}
 		for h := parent.formattedSetHistories; h != nil; h = h.next {
 			if h.self != h || h.manager != parent || h.issued.frame != h || h.issued.manager != parent || h.issued.invocation != h.invocation || h.invocation == 0 {
 				t.Fatal("invalid actual formatted SET record")

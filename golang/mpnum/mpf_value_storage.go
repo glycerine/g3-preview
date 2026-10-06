@@ -32,7 +32,7 @@ func (z *IntegerManager) mpfLifecycleCallbackActive() bool {
 		return false
 	}
 	p := z.mpfParent
-	if p == nil || (!p.valueExecuting && !(p.formattedSet.manager == p && p.formattedSet.invocation != 0 && (p.formattedSet.executing || p.formattedSet.finishing))) {
+	if p == nil || (!p.valueExecuting && !(p.rationalSet.manager == p && p.rationalSet.invocation != 0 && (p.rationalSet.executing || p.rationalSet.finishing)) && !(p.formattedSet.manager == p && p.formattedSet.invocation != 0 && (p.formattedSet.executing || p.formattedSet.finishing))) {
 		return false
 	}
 	return p.self == p && p.integer == z && p.rational != nil && p.rational.self == p.rational && p.rational.z == z && p.rational.mpfParent == p && p.memory == z.memory && p.memory != nil && p.memory.FailureTransportActive()

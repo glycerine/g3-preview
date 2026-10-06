@@ -1,6 +1,4 @@
 {
-  "schema": 1,
-  "baseline": "patched Z3 4.7.1.0",
   "units": [
     {
       "path": "CMakeLists.txt",
@@ -121993,7 +121991,22 @@
         "mpnum/mpf_formatted_set_own_stop_source_test.go",
         "mpnum/mpf_formatted_set_round_stop_source_test.go",
         "mpnum/mpf_formatted_set_scope.go",
-        "mpnum/mpf_formatted_set_source_test.go"
+        "mpnum/mpf_formatted_set_source_test.go",
+        "mpnum/mpf_rational_set.go",
+        "mpnum/mpf_rational_set_allocation.go",
+        "mpnum/mpf_rational_set_allocation_source_test.go",
+        "mpnum/mpf_rational_set_callback_source_test.go",
+        "mpnum/mpf_rational_set_history_source_test.go",
+        "mpnum/mpf_rational_set_modes_source_test.go",
+        "mpnum/mpf_rational_set_own_stop_source_test.go",
+        "mpnum/mpf_rational_set_prev_power.go",
+        "mpnum/mpf_rational_set_reached_prev_stop_source_test.go",
+        "mpnum/mpf_rational_set_reached_round_stop_source_test.go",
+        "mpnum/mpf_rational_set_round_stop_source_test.go",
+        "mpnum/mpf_rational_set_scope.go",
+        "mpnum/mpf_rational_set_source_test.go",
+        "mpnum/mpf_rational_set_zero_source_test.go",
+        "mpnum/mpf_rational_set_assertion_source_test.go"
       ],
       "tests": [
         "TestArbitraryFloatToStringLiteralSpecialBranches",
@@ -122065,7 +122078,21 @@
         "TestArbitraryFloatFormattedSetLiteralSelfAlias",
         "TestArbitraryFloatFormattedSetFirstOwnRawStopHistory",
         "TestArbitraryFloatFormattedSetRoundNUMStopProtectsOlderClass",
-        "TestArbitraryFloatFormattedSetLiteralPrecisionRoutes"
+        "TestArbitraryFloatFormattedSetLiteralPrecisionRoutes",
+        "TestArbitraryFloatExponentRationalSetEveryDirectPrefix",
+        "TestArbitraryFloatExponentRationalSetBIGRationalEveryPrefix",
+        "TestArbitraryFloatExponentRationalSetBIGBelowOneEveryPrefix",
+        "TestArbitraryFloatExponentRationalSetBIGAboveTwoEveryPrefix",
+        "TestArbitraryFloatExponentRationalSetCallbackOwnerRefusal",
+        "TestArbitraryFloatExponentRationalSetInlineZeroRetainsActualLeaf",
+        "TestArbitraryFloatExponentRationalSetIndependentModes",
+        "TestArbitraryFloatExponentRationalSetFirstOwnRawStopHistory",
+        "TestArbitraryFloatExponentRationalSetReachedPrevNUMStop",
+        "TestArbitraryFloatExponentRationalSetReachedRoundNUMStop",
+        "TestArbitraryFloatExponentRationalSetLiteralNormalization",
+        "TestArbitraryFloatExponentRationalSetSourceAliasAndBIGExponent",
+        "TestArbitraryFloatExponentRationalSetZeroUnreadForeignFields",
+        "TestArbitraryFloatExponentRationalSetAssertionHelperPrefix"
       ],
       "conditionals": [
         {
@@ -122547,6 +122574,27 @@
             "TestArbitraryFloatFormattedSetRoundNUMStopProtectsOlderClass",
             "TestArbitraryFloatFormattedSetLiteralPrecisionRoutes"
           ]
+        },
+        {
+          "name": "mpf.cpp:233-300 exponent+rational SET literal normalization and Round",
+          "status": "ported",
+          "go_target": "mpnum/mpf_rational_set.go",
+          "tests": [
+            "TestArbitraryFloatExponentRationalSetEveryDirectPrefix",
+            "TestArbitraryFloatExponentRationalSetBIGRationalEveryPrefix",
+            "TestArbitraryFloatExponentRationalSetBIGBelowOneEveryPrefix",
+            "TestArbitraryFloatExponentRationalSetBIGAboveTwoEveryPrefix",
+            "TestArbitraryFloatExponentRationalSetCallbackOwnerRefusal",
+            "TestArbitraryFloatExponentRationalSetInlineZeroRetainsActualLeaf",
+            "TestArbitraryFloatExponentRationalSetIndependentModes",
+            "TestArbitraryFloatExponentRationalSetFirstOwnRawStopHistory",
+            "TestArbitraryFloatExponentRationalSetReachedPrevNUMStop",
+            "TestArbitraryFloatExponentRationalSetReachedRoundNUMStop",
+            "TestArbitraryFloatExponentRationalSetLiteralNormalization",
+            "TestArbitraryFloatExponentRationalSetSourceAliasAndBIGExponent",
+            "TestArbitraryFloatExponentRationalSetZeroUnreadForeignFields",
+            "TestArbitraryFloatExponentRationalSetAssertionHelperPrefix"
+          ]
         }
       ],
       "ownership": [
@@ -122560,7 +122608,10 @@
         "mpf.cpp:373-391 sign mutation creates no NUM or RAW declarations. Copied overloads use the actual SET child and its existing allocation-only issued receipt; a failed SET stops before sign mutation. NaN classification retains actual persistent exponent/Power cache ownership. Every reached BIG SET reservation prefix checks an independent physical graph and explicit cold ownership before fault lift; completed-child ACK, actual destination cleanup, then unjoined abort preserve source cleanup order. Warm inline/self-copy paths reserve no history under FailAfter(0). Whole unit and original-driver credit remain unchanged.",
         "mpf.cpp:416-469 comparisons create no lexical NUM or RAW. Exact source NaN/zero/sign/exponent short circuits retain only actual persistent classification Power caches. Cold-cache every-reservation prefixes verify physical and explicit cold graph before fault lift without issuing a comparison caller history. A stale significand is read only after the source reaches it; checked/debug same-format assertions precede cache reads. Independent IEEE float32 bit patterns cover 256 pairs and all five comparisons, including signed zero, denormals, infinities and signed NaN.",
         "mpf.cpp:1487-1517 has no lexical NUM or RAW; exact source classification and repeated zero conditions precede the existing actual SET child. Selected BIG Copy every-reservation prefixes audit independent physical/cold ownership before fault lift; completion ACK precedes destination retirement and unjoined abort. Both NaNs copy the right operand unchanged. Mixed signed zeros reach the source UNREACHABLE guard before destination writes; aliases with either operand preserve source SET behavior.",
-        "mpf.cpp:335-374 declares no NUM/RAW locals. The embedded execution binding reserves no entry metadata; stable charged allocation-call records materialize only at actual Integer allocation branches and retain exact backing/pending tokens and called Copy/Round tuples. Inline zero, infinity, same-format and warmed NaN remain allocation-free under repeated FailAfter(0), including earlier unrelated retained unpack roots. Completed child false acknowledgment precedes caller-owned output NUM cleanup; exact unjoined true acknowledgment follows it. Original body/source/first-own causes and acquisition tokens survive acknowledgment and next invocation until actual manager end. Reached Round youngest sticky NUM DT protects the older MPF class suffix, with before-recovery physical/cold graphs. Exact copied/stale frame/receipt and actual returning-transport owner guards preserve foreign roots."
+        "mpf.cpp:335-374 declares no NUM/RAW locals. The embedded execution binding reserves no entry metadata; stable charged allocation-call records materialize only at actual Integer allocation branches and retain exact backing/pending tokens and called Copy/Round tuples. Inline zero, infinity, same-format and warmed NaN remain allocation-free under repeated FailAfter(0), including earlier unrelated retained unpack roots. Completed child false acknowledgment precedes caller-owned output NUM cleanup; exact unjoined true acknowledgment follows it. Original body/source/first-own causes and acquisition tokens survive acknowledgment and next invocation until actual manager end. Reached Round youngest sticky NUM DT protects the older MPF class suffix, with before-recovery physical/cold graphs. Exact copied/stale frame/receipt and actual returning-transport owner guards preserve foreign roots.",
+        "Actual sig/exp scoped declarations follow the nonzero branch; nested PrevPower tmp finishes before branch p2, then p/t/sq declarations and reverse source DT. Stable charged call records materialize only at reached Integer/Natural allocation leaves. Zero SET has no local constructors or history reservations, including unread foreign exponent/denominator. Exact original body/source/first-own and issued child tuples persist through owning acknowledgment and later invocation until actual manager end.",
+        "Checked assertion mpf.cpp:279 retains le(1,sig) first operand and short circuit before lt(sig,2). Its deliberately below-one helper-domain regression audits exact comparison scratch publication and does not claim public normalized SET reachability.",
+        "Never-entered exponent+rational scope (manager nil/invocation zero) erases all child cleanup reads after supplied receipt validation. Actual incomplete MPF/AST constructors may not yet publish Integer/Natural; unchanged constructor-prefix regressions prove this early source/own boundary. Entered and earlier issued-history cleanup routes retain exact identity guards."
       ],
       "deviations": [
         "mpf.cpp:1519-1569 numerical body and mpq.cpp:156-185 caller-specific decimal engine are private scoped proofs; complete root owned-string/printer integration remains pending. No new active original-driver assertions or whole MPF/rational unit completion credit. Default decimal/no-flags stream profile only; native locale/ABI profiles remain open. Qualified signed-host TLS test proves reached q NUM DT protection; guessed youngest verification-DT recipe is diagnostic only.",
@@ -122569,7 +122620,9 @@
         "mpf.cpp:1963-2098 represented undefined signed exponent arithmetic refuses at the reached expression without scoped NUM constructor credit. TLS negative-size stops are signed-host owner-primitive guard profile, not ordinary mathematical OOM. Independent branch tests add no active original-driver assertions; src/test/mpf.cpp:23-89 has only the earlier eighteen SET outputs. Literal scratch old-free/allocation-before-assignment may leave a guard-only InvalidSlot on retry; no scratch repair is inserted. TRACE remains diagnostic.",
         "mpf.cpp:2100-2131 independent forty-case guard-bit checks validate the literal specialized switch, not new src/test/mpf.cpp driver assertions. BIG raw-field profiles use defined source-object integer arithmetic; they do not claim normalized sqrt-caller mathematics. Real pooled/direct descriptor refusal after literal scratch publication leaves tmp0 null; the actual older Integer source destructor reaches its null-header guard before allocator end, preserving the detached descriptor until explicit owning abort. No allocator-source-end physical-consumption credit or scratch repair is inferred from this fixture. TLS first-own release stops are signed-host Runtime guard profile, not ordinary mathematical OOM.",
         "mpf.cpp:1493,1509 source mixed-signed-zero UNREACHABLE is guarded by ErrIntegerAssertion. No defined zero choice or compiler-undefined execution is invented; global assertion/debugger transport remains outside this selected numeric slice.",
-        "mpf.cpp:335-374 bounded fraction/mode and self-alias tests are independent checks, not additional src/test/mpf.cpp assertions. Self-alias x.sbits is read after output format publication. Signed ds follows unsigned32 subtraction then target signed32 conversion; test mathematics uses bounded supported formats rather than claiming enormous-loop/overflow domains. TLS source NUM DT and first-own raw release fixtures use the represented signed-host Runtime guard profile, not ordinary mathematical OOM. Old cold callback recipes reached cached classification Power rather than unpack; the warmed unpack callback RED is the authority. Narrow source scratch old-free/allocate-before-assignment holes are not repaired; owner source guards retain literal stopped frontier. Rational/exponent/string SET constructors mpf.cpp:186-300 remain separate uncompleted source spans; no whole MPF or driver-unit promotion."
+        "mpf.cpp:335-374 bounded fraction/mode and self-alias tests are independent checks, not additional src/test/mpf.cpp assertions. Self-alias x.sbits is read after output format publication. Signed ds follows unsigned32 subtraction then target signed32 conversion; test mathematics uses bounded supported formats rather than claiming enormous-loop/overflow domains. TLS source NUM DT and first-own raw release fixtures use the represented signed-host Runtime guard profile, not ordinary mathematical OOM. Old cold callback recipes reached cached classification Power rather than unpack; the warmed unpack callback RED is the authority. Narrow source scratch old-free/allocate-before-assignment holes are not repaired; owner source guards retain literal stopped frontier. Rational/exponent/string SET constructors mpf.cpp:186-300 remain separate uncompleted source spans; no whole MPF or driver-unit promotion.",
+        "mpf.cpp:233-300 only is completed by this slice; preceding plain-rational mpf.cpp:185-193 and formatted-string mpf.cpp:194-231 remain separate. No new original-driver or whole-unit credit. BIG negative exponent follows literal mk_inf. Source uint32 shifts and pp-to-signed32 constructor representation are retained. Signed-host TLS destructor stops use actual Runtime helper domain; reached Prev/Floor and Round transport fixtures lift allocation failure to arm release domain and do not claim allocation-before-fault-lift graphs. Initial straight TLS and missing comparison-one recipes remain diagnostic/RED evidence, not youngest-stop credit. Literal source scratch old-free then allocation-before-assignment holes are not repaired.",
+        "mpz.h:95 declares only mpz(int); the actual uint32 pp immediate converts through represented signed32 NewInt(int32(pp)), without substituting unsigned SET allocation."
       ]
     },
     {
@@ -122587,7 +122640,22 @@
         "mpnum/mpf_extrema.go",
         "mpnum/mpf_comparison_source_test.go",
         "mpnum/mpf_printer_parts.go",
-        "mpnum/mpf_printer_parts_source_test.go"
+        "mpnum/mpf_printer_parts_source_test.go",
+        "mpnum/mpf_rational_set.go",
+        "mpnum/mpf_rational_set_allocation.go",
+        "mpnum/mpf_rational_set_allocation_source_test.go",
+        "mpnum/mpf_rational_set_callback_source_test.go",
+        "mpnum/mpf_rational_set_history_source_test.go",
+        "mpnum/mpf_rational_set_modes_source_test.go",
+        "mpnum/mpf_rational_set_own_stop_source_test.go",
+        "mpnum/mpf_rational_set_prev_power.go",
+        "mpnum/mpf_rational_set_reached_prev_stop_source_test.go",
+        "mpnum/mpf_rational_set_reached_round_stop_source_test.go",
+        "mpnum/mpf_rational_set_round_stop_source_test.go",
+        "mpnum/mpf_rational_set_scope.go",
+        "mpnum/mpf_rational_set_source_test.go",
+        "mpnum/mpf_rational_set_zero_source_test.go",
+        "mpnum/mpf_rational_set_assertion_source_test.go"
       ],
       "tests": [
         "TestArbitraryFloatScalarCopyReceiptEveryPrefix",
@@ -122615,7 +122683,21 @@
         "TestArbitraryFloatOriginalSetIntAndDoubleDriverAssertions",
         "TestArbitraryFloatComparisonIndependentIEEEPairs",
         "TestArbitraryFloatPrinterSourceBiasAndScopedSignificand",
-        "TestArbitraryFloatPrinterSignificandEveryReservation"
+        "TestArbitraryFloatPrinterSignificandEveryReservation",
+        "TestArbitraryFloatExponentRationalSetEveryDirectPrefix",
+        "TestArbitraryFloatExponentRationalSetBIGRationalEveryPrefix",
+        "TestArbitraryFloatExponentRationalSetBIGBelowOneEveryPrefix",
+        "TestArbitraryFloatExponentRationalSetBIGAboveTwoEveryPrefix",
+        "TestArbitraryFloatExponentRationalSetCallbackOwnerRefusal",
+        "TestArbitraryFloatExponentRationalSetInlineZeroRetainsActualLeaf",
+        "TestArbitraryFloatExponentRationalSetIndependentModes",
+        "TestArbitraryFloatExponentRationalSetFirstOwnRawStopHistory",
+        "TestArbitraryFloatExponentRationalSetReachedPrevNUMStop",
+        "TestArbitraryFloatExponentRationalSetReachedRoundNUMStop",
+        "TestArbitraryFloatExponentRationalSetLiteralNormalization",
+        "TestArbitraryFloatExponentRationalSetSourceAliasAndBIGExponent",
+        "TestArbitraryFloatExponentRationalSetZeroUnreadForeignFields",
+        "TestArbitraryFloatExponentRationalSetAssertionHelperPrefix"
       ],
       "conditionals": [
         {
@@ -122690,14 +122772,40 @@
             "TestArbitraryFloatPrinterSourceBiasAndScopedSignificand",
             "TestArbitraryFloatPrinterSignificandEveryReservation"
           ]
+        },
+        {
+          "name": "mpf.h:82 exponent+rational SET explicit-owner Go entry",
+          "status": "ported",
+          "go_target": "mpnum/mpf_rational_set.go",
+          "tests": [
+            "TestArbitraryFloatExponentRationalSetEveryDirectPrefix",
+            "TestArbitraryFloatExponentRationalSetBIGRationalEveryPrefix",
+            "TestArbitraryFloatExponentRationalSetBIGBelowOneEveryPrefix",
+            "TestArbitraryFloatExponentRationalSetBIGAboveTwoEveryPrefix",
+            "TestArbitraryFloatExponentRationalSetCallbackOwnerRefusal",
+            "TestArbitraryFloatExponentRationalSetInlineZeroRetainsActualLeaf",
+            "TestArbitraryFloatExponentRationalSetIndependentModes",
+            "TestArbitraryFloatExponentRationalSetFirstOwnRawStopHistory",
+            "TestArbitraryFloatExponentRationalSetReachedPrevNUMStop",
+            "TestArbitraryFloatExponentRationalSetReachedRoundNUMStop",
+            "TestArbitraryFloatExponentRationalSetLiteralNormalization",
+            "TestArbitraryFloatExponentRationalSetSourceAliasAndBIGExponent",
+            "TestArbitraryFloatExponentRationalSetZeroUnreadForeignFields",
+            "TestArbitraryFloatExponentRationalSetAssertionHelperPrefix"
+          ]
         }
       ],
       "ownership": [
         "mpf.h:146-147 explicitly supplied Rational owner remains sole output owner; exact invocation context is distinct from source Integer context.",
-        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
+        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end.",
+        "Actual sig/exp scoped declarations follow the nonzero branch; nested PrevPower tmp finishes before branch p2, then p/t/sq declarations and reverse source DT. Stable charged call records materialize only at reached Integer/Natural allocation leaves. Zero SET has no local constructors or history reservations, including unread foreign exponent/denominator. Exact original body/source/first-own and issued child tuples persist through owning acknowledgment and later invocation until actual manager end.",
+        "Checked assertion mpf.cpp:279 retains le(1,sig) first operand and short circuit before lt(sig,2). Its deliberately below-one helper-domain regression audits exact comparison scratch publication and does not claim public normalized SET reachability.",
+        "Never-entered exponent+rational scope (manager nil/invocation zero) erases all child cleanup reads after supplied receipt validation. Actual incomplete MPF/AST constructors may not yet publish Integer/Natural; unchanged constructor-prefix regressions prove this early source/own boundary. Entered and earlier issued-history cleanup routes retain exact identity guards."
       ],
       "deviations": [
-        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
+        "mpf.cpp:233-300 only is completed by this slice; preceding plain-rational mpf.cpp:185-193 and formatted-string mpf.cpp:194-231 remain separate. No new original-driver or whole-unit credit. BIG negative exponent follows literal mk_inf. Source uint32 shifts and pp-to-signed32 constructor representation are retained. Signed-host TLS destructor stops use actual Runtime helper domain; reached Prev/Floor and Round transport fixtures lift allocation failure to arm release domain and do not claim allocation-before-fault-lift graphs. Initial straight TLS and missing comparison-one recipes remain diagnostic/RED evidence, not youngest-stop credit. Literal source scratch old-free then allocation-before-assignment holes are not repaired.",
+        "mpz.h:95 declares only mpz(int); the actual uint32 pp immediate converts through represented signed32 NewInt(int32(pp)), without substituting unsigned SET allocation."
       ]
     },
     {
@@ -150806,5 +150914,7 @@
       ],
       "status": "unported"
     }
-  ]
+  ],
+  "baseline": "patched Z3 4.7.1.0",
+  "schema": 1
 }
