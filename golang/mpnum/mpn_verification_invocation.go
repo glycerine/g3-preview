@@ -10,6 +10,7 @@ type naturalPNVerificationScope struct {
 	somNormalize                                 polynomialSOMNormalizeInvocationReceipt
 	normalization                                polynomialNormalizeInvocationReceipt
 	henselCallerContext                          integerAllocationInvocationContext
+	primePreparationContext                      integerAllocationInvocationContext
 	recombinationContext                         integerAllocationInvocationContext
 	henselPair                                   upolyHenselPairInvocationReceipt
 	divides                                      polynomialDividesInvocationReceipt

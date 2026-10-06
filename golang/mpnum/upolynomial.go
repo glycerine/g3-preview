@@ -26,6 +26,7 @@ type UPolynomialConfig struct {
 // are required, even though operations without a checkpoint do not call them.
 // Cold ownership and every actual typed backing are charged to Integer's budget.
 type UPolynomialManager struct {
+	primePreparationCaller *upolyFactorPrimePreparationScope
 	preparationCaller      *upolyFactorPreparationScope
 	henselPairCaller       *upolyHenselPairScope
 	henselCallerGuard      *upolyHenselCallerScope
@@ -214,10 +215,13 @@ func (m *UPolynomialManager) closeWithHensel(r *upolyHenselPairInvocationReceipt
 	return m.closeWithHenselOwners(r, nil)
 }
 func (m *UPolynomialManager) closeWithHenselOwners(r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope) error {
+	return m.closeWithCallerOwners(r, c, nil)
+}
+func (m *UPolynomialManager) closeWithCallerOwners(r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope, p *upolyFactorPrimePreparationInvocationReceipt) error {
 	if m == nil || m.self != m || m.config.Integer == nil {
 		return ErrUPolynomialOwner
 	}
-	if m.mignotteCallPending() && !m.henselDestructorAuthorized(r, true) && !m.henselCallerDestructorAuthorized(c, true) {
+	if m.mignotteCallPending() && !m.henselDestructorAuthorized(r, true) && !m.henselCallerDestructorAuthorized(c, true) && !m.primePreparationDestructorAuthorized(p, true) {
 		return ErrUPolynomialCleanupPending
 	}
 	if m.closed || m.config.Integer.closed {
@@ -228,7 +232,7 @@ func (m *UPolynomialManager) closeWithHenselOwners(r *upolyHenselPairInvocationR
 	}
 	m.closing = true
 	if m.sourceFinalizing && !m.sourceFinalized && m.sourceCause == nil {
-		if e := m.sourceFinalizeWithHenselOwners(r, c); e != nil {
+		if e := m.sourceFinalizeWithCallerOwners(r, c, p); e != nil {
 			return e
 		}
 	}

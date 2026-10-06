@@ -46,6 +46,8 @@ type polynomialCreation struct {
 	buffer             *polynomialSOM
 }
 type MultivariatePolynomialCore struct {
+	quasiResultant                                                                             polynomialQuasiResultantScope
+	quasiHistory                                                                               []polynomialQuasiResultantHistory
 	collectingVariables                                                                        bool
 	somNormalizationOwner                                                                      polynomialSOMNormalizeInvocationReceipt
 	normalizationOwner                                                                         polynomialNormalizeInvocationReceipt
@@ -450,6 +452,9 @@ func (m *MultivariatePolynomialCore) MkTerms(as []Int, ms []Monomial) (Polynomia
 	return m.som.mk(false)
 }
 func (m *MultivariatePolynomialCore) CloseChecked() error {
+	if m != nil && m.self == m && m.quasiResultant.active {
+		return ErrPolynomialPending
+	}
 	if m != nil && m.self == m && m.collectingVariables {
 		return ErrPolynomialPending
 	}
@@ -691,6 +696,8 @@ func (m *MultivariatePolynomialCore) CloseChecked() error {
 	m.linearGenerated = nil
 	m.integer.budget.Release(uint64(cap(m.locations)) * uint64(reflect.TypeOf(polynomialLocation{}).Size()))
 	m.locations = nil
+	m.integer.budget.Release(uint64(cap(m.quasiHistory)) * uint64(reflect.TypeOf(polynomialQuasiResultantHistory{}).Size()))
+	m.quasiHistory = nil
 	m.integer.budget.Release(m.header)
 	m.header = 0
 	m.closed = true

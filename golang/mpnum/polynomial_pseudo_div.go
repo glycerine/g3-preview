@@ -342,11 +342,14 @@ func (m *MultivariatePolynomialCore) exactPseudoRemainderWithReceipt(p, q Polyno
 	var d uint32
 	return m.pseudoCore(p, q, x, &d, &s.refs[pseudoQuotient], &R.root, true, false, false, nil)
 }
-func (m *MultivariatePolynomialCore) PseudoRemainder(p, q Polynomial, x uint32, d *uint32, R *PolynomialRef) (err error) {
+func (m *MultivariatePolynomialCore) PseudoRemainder(p, q Polynomial, x uint32, d *uint32, R *PolynomialRef) error {
+	return m.pseudoRemainderWithReceipt(p, q, x, d, R, nil)
+}
+func (m *MultivariatePolynomialCore) pseudoRemainderWithReceipt(p, q Polynomial, x uint32, d *uint32, R *PolynomialRef, receipt *polynomialPseudoDivisionInvocationReceipt) (err error) {
 	if d == nil {
 		return ErrPolynomialOwner
 	}
-	if e := m.pseudoEntry(nil, R); e != nil {
+	if e := m.pseudoEntryWithReceipt(nil, R, receipt); e != nil {
 		return e
 	}
 	defer m.pseudoFinish(&err)

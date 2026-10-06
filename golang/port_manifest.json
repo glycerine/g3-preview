@@ -29552,7 +29552,11 @@
         "mpnum/polynomial_sign.go",
         "mpnum/polynomial_sign_source_test.go",
         "mpnum/polynomial_vars.go",
-        "mpnum/polynomial_vars_source_test.go"
+        "mpnum/polynomial_vars_source_test.go",
+        "mpnum/polynomial_quasi_resultant.go",
+        "mpnum/polynomial_quasi_resultant_older_context_source_test.go",
+        "mpnum/polynomial_quasi_resultant_child_stop_source_test.go",
+        "mpnum/polynomial_quasi_resultant_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -30357,7 +30361,16 @@
         "TestPolynomialVarsEveryActualReservationAndNamedGraph",
         "TestPolynomialVarsFlagBeforePushAndNormalOnlyReset",
         "TestPolynomialVarsReturningTransportOwnerReentry",
-        "TestPolynomialVarsLiteralResetEmptyWarmAndBorrowGuards"
+        "TestPolynomialVarsLiteralResetEmptyWarmAndBorrowGuards",
+        "TestPolynomialQuasiResultantSuccessfulChildOlderNUMStopAndLaterHistory",
+        "TestPolynomialQuasiResultantYoungerPseudoSourceStopPreservesThreeRefs",
+        "TestPolynomialQuasiResultantLiteralBoundedChains",
+        "TestPolynomialQuasiResultantOriginalDisplayedFixture",
+        "TestPolynomialQuasiResultantEveryReservationAndOwnedRetry",
+        "TestPolynomialQuasiResultantConcreteFrameAndUnreadGuards",
+        "TestPolynomialQuasiResultantActualDestructorReentry",
+        "TestPolynomialQuasiResultantBIGEveryReservationAndOwnedRetry",
+        "TestPolynomialQuasiResultantActualCallerPublicationCallback"
       ],
       "conditionals": [
         {
@@ -34128,6 +34141,22 @@
             "TestPolynomialVarsReturningTransportOwnerReentry",
             "TestPolynomialVarsLiteralResetEmptyWarmAndBorrowGuards"
           ]
+        },
+        {
+          "name": "quasi_resultant polynomial.cpp:5193-5272,7320-7322: literal three-reference pseudo-remainder chain",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_quasi_resultant.go",
+          "tests": [
+            "TestPolynomialQuasiResultantSuccessfulChildOlderNUMStopAndLaterHistory",
+            "TestPolynomialQuasiResultantYoungerPseudoSourceStopPreservesThreeRefs",
+            "TestPolynomialQuasiResultantLiteralBoundedChains",
+            "TestPolynomialQuasiResultantOriginalDisplayedFixture",
+            "TestPolynomialQuasiResultantEveryReservationAndOwnedRetry",
+            "TestPolynomialQuasiResultantConcreteFrameAndUnreadGuards",
+            "TestPolynomialQuasiResultantActualDestructorReentry",
+            "TestPolynomialQuasiResultantBIGEveryReservationAndOwnedRetry",
+            "TestPolynomialQuasiResultantActualCallerPublicationCallback"
+          ]
         }
       ],
       "ownership": [
@@ -34257,7 +34286,9 @@
         "The standalone source owner refuses its older class-vector SourceFinalize prefix while an actual constructed helper g remains active. Exact source body/cleanup executing guards also precede standalone owning mutation. The guarded-child proof preserves the original Runtime state, source stage/start flag, raw vector and numeral token before explicit owning acknowledgment.",
         "polynomial.cpp:6101-6176: read-only borrowed polynomial/monomial/coefficient views; no NUM declarations, INC/DEC, reset, source destructor, pending acquisition or owning continuation occurs. Term size precedes coefficient is_pos; variable then degree precedes default-unknown sign lookup. Unknown/different term sign and odd-power rejection skip later source records.",
         "polynomial.cpp:3186-3205: actual caller-owned unsigned vector and persistent imp m_found_vars bool vector retain their own direct raw/pending leaves. No source NUM/ref local is declared, no INC/DEC or child receipt is invented. Failed push leaves preceding true flag, and final reset loop runs only after successful body; later source retry skips retained flag without adapter repair.",
-        "polynomial.cpp:3186-3205: executing metadata in actual core/output owners refuses returning Runtime ErrorTransport reentry before source/own destruction, output mutation or same-call reset. Reflected existing owner charges include these scalar fields; flags convey no raw/numeric acquisition authority."
+        "polynomial.cpp:3186-3205: executing metadata in actual core/output owners refuses returning Runtime ErrorTransport reentry before source/own destruction, output mutation or same-call reset. Reflected existing owner charges include these scalar fields; flags convey no raw/numeric acquisition authority.",
+        "polynomial.cpp:5193-5272: three actual default polynomial references precede degree swap; h2,h1,h0 source DT follows captured Pseudo child suffix. Partial caller output/incoming INC belongs actual caller reference and is never swept by parent owning acknowledgment. Exact guarded core/frame/nonwrap invocation and executing/finishing/callback guards precede mutation.",
+        "polynomial.cpp:5193-5272: charged diagnostic archive retains only body/source/first-own errors and captured child identity across completed invocation reuse until actual final core owner context end. Archive reservation refusal preserves old frame; archives grant no raw, polynomial, numeral or cleanup authority."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -34357,7 +34388,10 @@
         "Selected Normalize and reached nested SOM/Substitution continuation closure only; broader source unit remains partial and no dormant original driver assertion credit is added. Signed-host TLS destructor-stop tests are explicit owner-primitive guard profiles, not ordinary mathematical free OOM. Returning Runtime callbacks, copied metadata and saved-context refusal tests cover supported Go owner boundaries. Historical retained-Substitution broad RED and withdrawn initial source-stop recipe are preserved independently.",
         "polynomial.cpp:6101-6176: PolynomialSign is the concrete source int32 lbool representation because root package lbool is private; source enum values -1/0/1 are retained. Source predicates are intentionally incomplete: unknown even-power variable stays unknown, zero polynomial sign is unknown, zero polynomial satisfies both non-strict checks. No original active driver assertion credit.",
         "polynomial.cpp:3186-3205: returning allocation transport callbacks are a supported Go owner domain, separately qualified from original C++ source. Invalid Go polynomial borrow is guarded at reached p.size after literal output reset/reserve; invalid/copy output and manager guards precede source body.",
-        "src/test/polynomial.cpp:837-879,1824-1825,1853: seven literal dormant Vars cases retain seven size and twenty sorted variable ENSURE comparisons (27 source assertions). The driver returns at line1825 before Vars at line1853; active original-driver credit is zero. Existing pure-Go expression parser maps x0..x4 to a,b,c,d,x and evaluates original arithmetic."
+        "src/test/polynomial.cpp:837-879,1824-1825,1853: seven literal dormant Vars cases retain seven size and twenty sorted variable ENSURE comparisons (27 source assertions). The driver returns at line1825 before Vars at line1853; active original-driver credit is zero. Existing pure-Go expression parser maps x0..x4 to a,b,c,d,x and evaluates original arithmetic.",
+        "src/test/polynomial.cpp:140-163,1824-1825: original displayed quasi-resultant fixture has no ENSURE assertions and is dormant. Independent literal elimination expression and bounded supported degree-decreasing chains validate mathematics; active original driver assertion credit is zero.",
+        "mpz.h:156-164: old scratch free precedes replacement allocation; a refused replacement leaves the source dangling-pointer domain represented by exact tmp zero slot/ErrInvalidSlot in Go. Every-prefix graph and owning cleanup remain audited; no scratch repair or supported mathematical retry is claimed for that domain.",
+        "polynomial.cpp:5193-5272: signed-host TLS/direct allocator fixtures separately prove reached Pseudo RAW end-DEL stop and older scoped NUM physical-release stop. Returning deletion handlers are qualified Go owner callbacks; source/own reentry must refuse before exact cursor/RC/root/history mutation."
       ]
     },
     {
@@ -34584,7 +34618,11 @@
         "mpnum/polynomial_sign.go",
         "mpnum/polynomial_sign_source_test.go",
         "mpnum/polynomial_vars.go",
-        "mpnum/polynomial_vars_source_test.go"
+        "mpnum/polynomial_vars_source_test.go",
+        "mpnum/polynomial_quasi_resultant.go",
+        "mpnum/polynomial_quasi_resultant_older_context_source_test.go",
+        "mpnum/polynomial_quasi_resultant_child_stop_source_test.go",
+        "mpnum/polynomial_quasi_resultant_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -35105,7 +35143,16 @@
         "TestPolynomialVarsEveryActualReservationAndNamedGraph",
         "TestPolynomialVarsFlagBeforePushAndNormalOnlyReset",
         "TestPolynomialVarsReturningTransportOwnerReentry",
-        "TestPolynomialVarsLiteralResetEmptyWarmAndBorrowGuards"
+        "TestPolynomialVarsLiteralResetEmptyWarmAndBorrowGuards",
+        "TestPolynomialQuasiResultantSuccessfulChildOlderNUMStopAndLaterHistory",
+        "TestPolynomialQuasiResultantYoungerPseudoSourceStopPreservesThreeRefs",
+        "TestPolynomialQuasiResultantLiteralBoundedChains",
+        "TestPolynomialQuasiResultantOriginalDisplayedFixture",
+        "TestPolynomialQuasiResultantEveryReservationAndOwnedRetry",
+        "TestPolynomialQuasiResultantConcreteFrameAndUnreadGuards",
+        "TestPolynomialQuasiResultantActualDestructorReentry",
+        "TestPolynomialQuasiResultantBIGEveryReservationAndOwnedRetry",
+        "TestPolynomialQuasiResultantActualCallerPublicationCallback"
       ],
       "conditionals": [
         {
@@ -36706,6 +36753,22 @@
             "TestPolynomialVarsReturningTransportOwnerReentry",
             "TestPolynomialVarsLiteralResetEmptyWarmAndBorrowGuards"
           ]
+        },
+        {
+          "name": "quasi_resultant polynomial.cpp:5193-5272,7320-7322: literal three-reference pseudo-remainder chain",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_quasi_resultant.go",
+          "tests": [
+            "TestPolynomialQuasiResultantSuccessfulChildOlderNUMStopAndLaterHistory",
+            "TestPolynomialQuasiResultantYoungerPseudoSourceStopPreservesThreeRefs",
+            "TestPolynomialQuasiResultantLiteralBoundedChains",
+            "TestPolynomialQuasiResultantOriginalDisplayedFixture",
+            "TestPolynomialQuasiResultantEveryReservationAndOwnedRetry",
+            "TestPolynomialQuasiResultantConcreteFrameAndUnreadGuards",
+            "TestPolynomialQuasiResultantActualDestructorReentry",
+            "TestPolynomialQuasiResultantBIGEveryReservationAndOwnedRetry",
+            "TestPolynomialQuasiResultantActualCallerPublicationCallback"
+          ]
         }
       ],
       "ownership": [
@@ -36761,7 +36824,9 @@
         "SET source INC precedes actual vector operator[] assertion and old-slot read (ref_vector.h:128-132; vector.h:303-311). Actual n+1 unsigned wrap test retains incoming INC before checked assertion/native bounds guard; exact own abort never reads or writes an old slot that was not reached. Native invalid-range memory access remains a Go guard qualification, not C++ undefined-access equivalence.",
         "polynomial.cpp:6101-6176: read-only borrowed polynomial/monomial/coefficient views; no NUM declarations, INC/DEC, reset, source destructor, pending acquisition or owning continuation occurs. Term size precedes coefficient is_pos; variable then degree precedes default-unknown sign lookup. Unknown/different term sign and odd-power rejection skip later source records.",
         "polynomial.cpp:3186-3205: actual caller-owned unsigned vector and persistent imp m_found_vars bool vector retain their own direct raw/pending leaves. No source NUM/ref local is declared, no INC/DEC or child receipt is invented. Failed push leaves preceding true flag, and final reset loop runs only after successful body; later source retry skips retained flag without adapter repair.",
-        "polynomial.cpp:3186-3205: executing metadata in actual core/output owners refuses returning Runtime ErrorTransport reentry before source/own destruction, output mutation or same-call reset. Reflected existing owner charges include these scalar fields; flags convey no raw/numeric acquisition authority."
+        "polynomial.cpp:3186-3205: executing metadata in actual core/output owners refuses returning Runtime ErrorTransport reentry before source/own destruction, output mutation or same-call reset. Reflected existing owner charges include these scalar fields; flags convey no raw/numeric acquisition authority.",
+        "polynomial.cpp:5193-5272: three actual default polynomial references precede degree swap; h2,h1,h0 source DT follows captured Pseudo child suffix. Partial caller output/incoming INC belongs actual caller reference and is never swept by parent owning acknowledgment. Exact guarded core/frame/nonwrap invocation and executing/finishing/callback guards precede mutation.",
+        "polynomial.cpp:5193-5272: charged diagnostic archive retains only body/source/first-own errors and captured child identity across completed invocation reuse until actual final core owner context end. Archive reservation refusal preserves old frame; archives grant no raw, polynomial, numeral or cleanup authority."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -36815,7 +36880,10 @@
         "Literal uint32 arithmetic is retained for n+1 and degree/exponent differences; defective zero-gap loop casts unsigned endpoints to signed int32. Bounded owner budgets refuse oversized range allocation before signed-gap execution. Source signed overflow beyond defined loop domain gains no mathematical completion claim.",
         "polynomial.cpp:6101-6176: PolynomialSign is the concrete source int32 lbool representation because root package lbool is private; source enum values -1/0/1 are retained. Source predicates are intentionally incomplete: unknown even-power variable stays unknown, zero polynomial sign is unknown, zero polynomial satisfies both non-strict checks. No original active driver assertion credit.",
         "polynomial.cpp:3186-3205: returning allocation transport callbacks are a supported Go owner domain, separately qualified from original C++ source. Invalid Go polynomial borrow is guarded at reached p.size after literal output reset/reserve; invalid/copy output and manager guards precede source body.",
-        "src/test/polynomial.cpp:837-879,1824-1825,1853: seven literal dormant Vars cases retain seven size and twenty sorted variable ENSURE comparisons (27 source assertions). The driver returns at line1825 before Vars at line1853; active original-driver credit is zero. Existing pure-Go expression parser maps x0..x4 to a,b,c,d,x and evaluates original arithmetic."
+        "src/test/polynomial.cpp:837-879,1824-1825,1853: seven literal dormant Vars cases retain seven size and twenty sorted variable ENSURE comparisons (27 source assertions). The driver returns at line1825 before Vars at line1853; active original-driver credit is zero. Existing pure-Go expression parser maps x0..x4 to a,b,c,d,x and evaluates original arithmetic.",
+        "src/test/polynomial.cpp:140-163,1824-1825: original displayed quasi-resultant fixture has no ENSURE assertions and is dormant. Independent literal elimination expression and bounded supported degree-decreasing chains validate mathematics; active original driver assertion credit is zero.",
+        "mpz.h:156-164: old scratch free precedes replacement allocation; a refused replacement leaves the source dangling-pointer domain represented by exact tmp zero slot/ErrInvalidSlot in Go. Every-prefix graph and owning cleanup remain audited; no scratch repair or supported mathematical retry is claimed for that domain.",
+        "polynomial.cpp:5193-5272: signed-host TLS/direct allocator fixtures separately prove reached Pseudo RAW end-DEL stop and older scoped NUM physical-release stop. Returning deletion handlers are qualified Go owner callbacks; source/own reentry must refuse before exact cursor/RC/root/history mutation."
       ]
     },
     {
@@ -39164,7 +39232,13 @@
         "mpnum/upolynomial_factor_core.go",
         "mpnum/upolynomial_factor_preparation_allocation_context.go",
         "mpnum/upolynomial_factor_preparation_invocation.go",
-        "mpnum/upolynomial_factor_preparation_source_test.go"
+        "mpnum/upolynomial_factor_preparation_source_test.go",
+        "mpnum/mpz.go",
+        "mpnum/mpzzp.go",
+        "mpnum/upolynomial_factor_prime_preparation.go",
+        "mpnum/upolynomial_factor_prime_preparation_allocation_context.go",
+        "mpnum/upolynomial_factor_prime_preparation_invocation.go",
+        "mpnum/upolynomial_factor_prime_preparation_source_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -39246,7 +39320,14 @@
         "TestUPolynomialFactorPreparationActualConditionalDestructorHistory",
         "TestUPolynomialFactorPreparationExactContextHistoryGuards",
         "TestUPolynomialFactorPreparationDiagnosticOldLeafPreservesForeignReplacement",
-        "TestUPolynomialFactorPreparationDiagnosticEveryActualPrefix"
+        "TestUPolynomialFactorPreparationDiagnosticEveryActualPrefix",
+        "TestUPolynomialFactorPrimePreparationActualCheckpointOwnerRefusal",
+        "TestUPolynomialFactorPrimePreparationActualGCDLeafOwning",
+        "TestUPolynomialFactorPrimePreparationEveryActualPrefix",
+        "TestUPolynomialFactorPrimePreparationExactContextHistoryGuards",
+        "TestUPolynomialFactorPrimePreparationOldLeafPreservesForeignReplacement",
+        "TestUPolynomialFactorPrimePreparationActualNumeralDestructorHistory",
+        "TestUPolynomialFactorPrimePreparationActualRelatedDestructorHistory"
       ],
       "conditionals": [
         {
@@ -39540,6 +39621,20 @@
             "TestUPolynomialFactorPreparationDiagnosticOldLeafPreservesForeignReplacement",
             "TestUPolynomialFactorPreparationDiagnosticEveryActualPrefix"
           ]
+        },
+        {
+          "name": "upolynomial_factorization.cpp:1058-1094 actual prime-search declarations and candidate preparation",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_factor_prime_preparation_invocation.go",
+          "tests": [
+            "TestUPolynomialFactorPrimePreparationActualCheckpointOwnerRefusal",
+            "TestUPolynomialFactorPrimePreparationActualGCDLeafOwning",
+            "TestUPolynomialFactorPrimePreparationEveryActualPrefix",
+            "TestUPolynomialFactorPrimePreparationExactContextHistoryGuards",
+            "TestUPolynomialFactorPrimePreparationOldLeafPreservesForeignReplacement",
+            "TestUPolynomialFactorPrimePreparationActualNumeralDestructorHistory",
+            "TestUPolynomialFactorPrimePreparationActualRelatedDestructorHistory"
+          ]
         }
       ],
       "ownership": [
@@ -39557,7 +39652,9 @@
         "upolynomial_factorization.cpp:1238-1292: actual charged embedded source-call adapter binds real parent/frame/nonwrapping invocation, captured root and related manager, direct scalar MUL/SET/Div/GCD leaves, scoped Integer Divides NUM and explicit RAW AddMul/Div/ExtendedGCD/GCD children. This span constructs no new source NUM.",
         "upolynomial_factorization.cpp:1238-1292: first body/source/own causes survive exact false completed-child acknowledgment, older enclosing source fields, and true unjoined child abort. Successful factors remain caller-owned partial publication; no transactional rollback, clone, extra INC or whole-factor completion claim.",
         "upolynomial_factorization.cpp:1030-1050: separately charged real service members bind exact owner/frame/nonwrapping invocation and immutable captured context. DEBUG f_cont is declared before f_pp; odd-negative c is declared only after literal sign loop, with direct modular SET/NEG and fs constant publication.",
-        "upolynomial_factorization.cpp:1030-1050: actual GCD RAW5 and PN child source stops protect older NUM/parent fields; exact false completed-child acknowledgment precedes older fields and true unjoined abort follows them. First body/source/own causes and returned errors remain immutable through acknowledgment/new invocation."
+        "upolynomial_factorization.cpp:1030-1050: actual GCD RAW5 and PN child source stops protect older NUM/parent fields; exact false completed-child acknowledgment precedes older fields and true unjoined abort follows them. First body/source/own causes and returned errors remain immutable through acknowledgment/new invocation.",
+        "upolynomial_factorization.cpp:1058-1094: actual charged enclosing frame binds owner/self/frame/nonwrapping invocation, borrowed iterator and root/related caller chain. p, related manager, zp_fs, bestP, degree set and gcd_tmp are constructed only at reached source declarations; checkpoint, Next, early Push, SET/set_zp, GCD and is_one retain literal order.",
+        "upolynomial_factorization.cpp:1058-1094: direct numeric/PN/RAW/Natural acquisition uses explicit captured contexts and actual leaf outcomes. False completed-child acknowledgment precedes older source locals; true unjoined abort follows them. Strict gcd_tmp and related private-member stops preserve older unread suffix, immutable first body/source/own causes and exact old/new/foreign tokens."
       ],
       "deviations": [
         "Selected Mignotte helper, enclosing epilogue and literal prime-trial lexical scope/RAW transport are closed. Pair-Hensel and generic nil to_zp helper scope closure remain open. No full factor_square_free completion or original registered driver assertion credit.",
@@ -39575,7 +39672,9 @@
         "upolynomial_factorization.cpp:1238-1292: signed-host TLS destructor tests compose actual compiled child and real release under the qualified guarded owner-primitive profile, not ordinary mathematical OOM reachability. ErrorTransport tests are supported Go callback semantics, not C++ malloc callback equivalence.",
         "upolynomial_factorization.cpp:1238-1292: actual reflected cold parent/header storage carries the concrete adapter/receipts; no per-call reservation ticket or native malloc geometry claim. Remaining factorization/recombination topology outside this selected source block remains partial.",
         "upolynomial_factorization.cpp:1030-1050: explicit reflected Go adapter storage is charged once in actual enclosing service header; no C++ malloc geometry equivalence or whole factorization completion claim.",
-        "upolynomial_factorization.cpp:1030-1050: signed-host TLS destructor proofs use the qualified compiled owner-primitive domain; actual ErrorTransport callback proofs are Go callback behavior, not a fabricated C++ malloc callback."
+        "upolynomial_factorization.cpp:1030-1050: signed-host TLS destructor proofs use the qualified compiled owner-primitive domain; actual ErrorTransport callback proofs are Go callback behavior, not a fabricated C++ malloc callback.",
+        "upolynomial_factorization.cpp:1066: preserve prior concrete degree_set(zp_upm) adaptation through the actual already-created empty zp_fs; no new source NUM, INC or allocation parity claim.",
+        "upolynomial_factorization.cpp:1058-1094: explicit adapter storage is charged once in reflected parent header; no whole Factor/finite-field factorization completion claim. TLS release proofs are qualified signed-host owner-primitive guard profiles; foreign descriptor proof uses genuine held NUMs consuming source-recycled descriptor slots."
       ]
     },
     {
@@ -98729,7 +98828,11 @@
         "mpnum/polynomial_sqrt_test.go",
         "mpnum/polynomial_resultant_source_test.go",
         "mpnum/polynomial_vars.go",
-        "mpnum/polynomial_vars_source_test.go"
+        "mpnum/polynomial_vars_source_test.go",
+        "mpnum/polynomial_quasi_resultant.go",
+        "mpnum/polynomial_quasi_resultant_older_context_source_test.go",
+        "mpnum/polynomial_quasi_resultant_child_stop_source_test.go",
+        "mpnum/polynomial_quasi_resultant_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -98852,7 +98955,16 @@
         "TestPolynomialVarsEveryActualReservationAndNamedGraph",
         "TestPolynomialVarsFlagBeforePushAndNormalOnlyReset",
         "TestPolynomialVarsReturningTransportOwnerReentry",
-        "TestPolynomialVarsLiteralResetEmptyWarmAndBorrowGuards"
+        "TestPolynomialVarsLiteralResetEmptyWarmAndBorrowGuards",
+        "TestPolynomialQuasiResultantSuccessfulChildOlderNUMStopAndLaterHistory",
+        "TestPolynomialQuasiResultantYoungerPseudoSourceStopPreservesThreeRefs",
+        "TestPolynomialQuasiResultantLiteralBoundedChains",
+        "TestPolynomialQuasiResultantOriginalDisplayedFixture",
+        "TestPolynomialQuasiResultantEveryReservationAndOwnedRetry",
+        "TestPolynomialQuasiResultantConcreteFrameAndUnreadGuards",
+        "TestPolynomialQuasiResultantActualDestructorReentry",
+        "TestPolynomialQuasiResultantBIGEveryReservationAndOwnedRetry",
+        "TestPolynomialQuasiResultantActualCallerPublicationCallback"
       ],
       "conditionals": [
         {
@@ -99343,13 +99455,31 @@
             "TestPolynomialVarsReturningTransportOwnerReentry",
             "TestPolynomialVarsLiteralResetEmptyWarmAndBorrowGuards"
           ]
+        },
+        {
+          "name": "quasi_resultant polynomial.cpp:5193-5272,7320-7322: literal three-reference pseudo-remainder chain",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_quasi_resultant.go",
+          "tests": [
+            "TestPolynomialQuasiResultantSuccessfulChildOlderNUMStopAndLaterHistory",
+            "TestPolynomialQuasiResultantYoungerPseudoSourceStopPreservesThreeRefs",
+            "TestPolynomialQuasiResultantLiteralBoundedChains",
+            "TestPolynomialQuasiResultantOriginalDisplayedFixture",
+            "TestPolynomialQuasiResultantEveryReservationAndOwnedRetry",
+            "TestPolynomialQuasiResultantConcreteFrameAndUnreadGuards",
+            "TestPolynomialQuasiResultantActualDestructorReentry",
+            "TestPolynomialQuasiResultantBIGEveryReservationAndOwnedRetry",
+            "TestPolynomialQuasiResultantActualCallerPublicationCallback"
+          ]
         }
       ],
       "ownership": [
         "Concrete reflected composition scope borrows source degree2pos member, owns actual completed numeral/poly locals and exact created-outcome orphan cohort. Source auxiliary then degree then local destruction; matching younger constant numeral\u2192rational NUM/DEN stop preserves older locals and sticky causes. Explicit owning cleanup resumes matching callee first and acknowledges only its exact consumed returned result; physical pending ObjectRef/triples and borrowed callbacks remain separate, no registry-derived authority.",
         "Charged concrete scope owns actual four scoped NUMs, RAW two, monomial_ref, exact created-only cohort and matched callee/factory/physical receipts. Successful incoming INC transfers output before older DEC callback; source destruction is reverse lexical and stops before older fields, separate from explicit owning CleanupSqrt.",
         "polynomial.cpp:3186-3205: actual caller-owned unsigned vector and persistent imp m_found_vars bool vector retain their own direct raw/pending leaves. No source NUM/ref local is declared, no INC/DEC or child receipt is invented. Failed push leaves preceding true flag, and final reset loop runs only after successful body; later source retry skips retained flag without adapter repair.",
-        "polynomial.cpp:3186-3205: executing metadata in actual core/output owners refuses returning Runtime ErrorTransport reentry before source/own destruction, output mutation or same-call reset. Reflected existing owner charges include these scalar fields; flags convey no raw/numeric acquisition authority."
+        "polynomial.cpp:3186-3205: executing metadata in actual core/output owners refuses returning Runtime ErrorTransport reentry before source/own destruction, output mutation or same-call reset. Reflected existing owner charges include these scalar fields; flags convey no raw/numeric acquisition authority.",
+        "polynomial.cpp:5193-5272: three actual default polynomial references precede degree swap; h2,h1,h0 source DT follows captured Pseudo child suffix. Partial caller output/incoming INC belongs actual caller reference and is never swept by parent owning acknowledgment. Exact guarded core/frame/nonwrap invocation and executing/finishing/callback guards precede mutation.",
+        "polynomial.cpp:5193-5272: charged diagnostic archive retains only body/source/first-own errors and captured child identity across completed invocation reuse until actual final core owner context end. Archive reservation refusal preserves old frame; archives grant no raw, polynomial, numeral or cleanup authority."
       ],
       "deviations": [
         "No active source ENSURE credit: tst_polynomial1815ff invokes tst_psc and returns before tst_lex. Added comparator models are independent bounded regressions, not evidence of active PSC/resultant completion.",
@@ -99361,7 +99491,10 @@
         "Selected source algorithms and explicit Runtime profile only. Signed TLS stops and large factory/auxiliary receipts are guarded owner-primitive proofs, not ordinary mathematical exhaustion. Non-Z perfect-square remains the source unsupported operation. Registered polynomial driver returns before sqrt; dormant assertions give no active driver completion credit. Global diagnostics/native ABI and remaining source methods stay partial.",
         "Selected algorithms and explicit Runtime/NUM cohorts only. Actual signed-TLS/consumed-raw proofs exercise guarded owner domains, not claimed ordinary mathematical OOM reachability. Global mgcd_check/TRACE/assertion dispatcher/native ostream/other ABI and source expression-driver construction remain open. Original tst_polynomial returns after PSC: dormant GCD/primitive source fixture bodies have zero active-driver credit. Eight original PSC cases reach first coefficient8, second coefficient5 and Resultant8 selected ENSURE expressions (21 dynamic expressions at3 static sites); full original registered-driver lifecycle/printing is not promoted.",
         "polynomial.cpp:3186-3205: returning allocation transport callbacks are a supported Go owner domain, separately qualified from original C++ source. Invalid Go polynomial borrow is guarded at reached p.size after literal output reset/reserve; invalid/copy output and manager guards precede source body.",
-        "src/test/polynomial.cpp:837-879,1824-1825,1853: seven literal dormant Vars cases retain seven size and twenty sorted variable ENSURE comparisons (27 source assertions). The driver returns at line1825 before Vars at line1853; active original-driver credit is zero. Existing pure-Go expression parser maps x0..x4 to a,b,c,d,x and evaluates original arithmetic."
+        "src/test/polynomial.cpp:837-879,1824-1825,1853: seven literal dormant Vars cases retain seven size and twenty sorted variable ENSURE comparisons (27 source assertions). The driver returns at line1825 before Vars at line1853; active original-driver credit is zero. Existing pure-Go expression parser maps x0..x4 to a,b,c,d,x and evaluates original arithmetic.",
+        "src/test/polynomial.cpp:140-163,1824-1825: original displayed quasi-resultant fixture has no ENSURE assertions and is dormant. Independent literal elimination expression and bounded supported degree-decreasing chains validate mathematics; active original driver assertion credit is zero.",
+        "mpz.h:156-164: old scratch free precedes replacement allocation; a refused replacement leaves the source dangling-pointer domain represented by exact tmp zero slot/ErrInvalidSlot in Go. Every-prefix graph and owning cleanup remain audited; no scratch repair or supported mathematical retry is claimed for that domain.",
+        "polynomial.cpp:5193-5272: signed-host TLS/direct allocator fixtures separately prove reached Pseudo RAW end-DEL stop and older scoped NUM physical-release stop. Returning deletion handlers are qualified Go owner callbacks; source/own reentry must refuse before exact cursor/RC/root/history mutation."
       ]
     },
     {

@@ -11,10 +11,13 @@ func (m *UPolynomialManager) sourceFinalizeWithHensel(r *upolyHenselPairInvocati
 	return m.sourceFinalizeWithHenselOwners(r, nil)
 }
 func (m *UPolynomialManager) sourceFinalizeWithHenselOwners(r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope) error {
+	return m.sourceFinalizeWithCallerOwners(r, c, nil)
+}
+func (m *UPolynomialManager) sourceFinalizeWithCallerOwners(r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope, p *upolyFactorPrimePreparationInvocationReceipt) error {
 	if m == nil || m.self != m || m.config.Integer == nil {
 		return ErrUPolynomialOwner
 	}
-	if m.mignotteCallPending() && !m.henselDestructorAuthorized(r, false) && !m.henselCallerDestructorAuthorized(c, false) {
+	if m.mignotteCallPending() && !m.henselDestructorAuthorized(r, false) && !m.henselCallerDestructorAuthorized(c, false) && !m.primePreparationDestructorAuthorized(p, false) {
 		return ErrUPolynomialCleanupPending
 	}
 	if m.sourceFinalized {

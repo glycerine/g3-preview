@@ -1,4 +1,4 @@
-// Source: src/math/polynomial/upolynomial_factorization.cpp:979-1465.
+// Source: src/math/polynomial/upolynomial_factorization.cpp:979-1299.
 // Source author: Leonardo de Moura.
 // Licensed under the MIT license.
 // Source author: Dejan (t-dejanj), 2011-11-15.
@@ -17,6 +17,8 @@ var ErrUPolynomialCleanupPending = errors.New("mpnum: retained factorization lex
 // the unfinished reverse destruction cursor instead of losing its owner. This
 // additional charged header is a Go exception/lifetime adapter, not C++ malloc.
 type upolyFactorSquareFreeScope struct {
+	primePreparation  upolyFactorPrimePreparationScope
+	iterator          PrimeIterator
 	hensel            upolyHenselCallerScope
 	trialHelper       upolyRecombinationTrialScope
 	recombinationStep upolyRecombinationStepScope
@@ -63,6 +65,14 @@ func (s *UPolynomialFactorizationService) newSquareFreeScope() (*upolyFactorSqua
 // prime, prime factors, prime core, prime, primitive vector. Only constructed
 // objects participate; publication/cleanup advances one completed action.
 func (c *upolyFactorSquareFreeScope) cleanup() error {
+	if q := &c.primePreparation; q.active {
+		if q.executing || q.sourceExecuting || q.ownExecuting {
+			return ErrUPolynomialCleanupPending
+		}
+		if e := q.finish(&q.receipt, q.bodyCause); e != nil && q.sourceCause != nil {
+			return e
+		}
+	}
 	if q := &c.service.preparation; q.active && q.parent == c {
 		if e := q.finish(&q.receipt, q.bodyCause); e != nil && q.sourceCause != nil {
 			return e
@@ -110,15 +120,16 @@ func (c *upolyFactorSquareFreeScope) cleanup() error {
 			return q.sourceCause
 		}
 	}
-	if e := c.cleanupMembers(); e != nil {
+	if e := c.cleanupMembersPhase(true); e != nil {
 		return e
 	}
-	if c.mignotte.active || c.primeTrial.active || c.trialHelper.active || c.recombinationStep.active || c.service.preparation.active {
+	if c.primePreparation.active || c.mignotte.active || c.primeTrial.active || c.trialHelper.active || c.recombinationStep.active || c.service.preparation.active {
 		return ErrUPolynomialCleanupPending
 	}
 	return nil
 }
-func (c *upolyFactorSquareFreeScope) cleanupMembers() error {
+func (c *upolyFactorSquareFreeScope) cleanupMembers() error { return c.cleanupMembersPhase(false) }
+func (c *upolyFactorSquareFreeScope) cleanupMembersPhase(source bool) error {
 	m := c.manager
 	for c.constructed != 0 {
 		var e error
@@ -151,24 +162,40 @@ func (c *upolyFactorSquareFreeScope) cleanupMembers() error {
 				c.zpe = nil
 			}
 		case 7:
-			e = m.modular.Del(&c.gcdTmp)
+			if source {
+				e = c.sourcePrimeNumeral(&c.gcdTmp)
+			} else {
+				e = m.modular.Del(&c.gcdTmp)
+			}
 		case 6:
 			c.ds.close(m.config.Integer.budget)
 			c.ds = upolyFactorDegreeState{}
 		case 5:
-			e = m.modular.Del(&c.bestP)
+			if source {
+				e = c.sourcePrimeNumeral(&c.bestP)
+			} else {
+				e = m.modular.Del(&c.bestP)
+			}
 		case 4:
 			e = c.best.Close()
 			if e == nil {
 				c.best = nil
 			}
 		case 3:
-			e = c.zp.Close()
+			if c.primePreparation.matches() {
+				e = c.closePrimeRelated(source)
+			} else {
+				e = c.zp.Close()
+			}
 			if e == nil {
 				c.zp = nil
 			}
 		case 2:
-			e = m.modular.Del(&c.p)
+			if source {
+				e = c.sourcePrimeNumeral(&c.p)
+			} else {
+				e = m.modular.Del(&c.p)
+			}
 		case 1:
 			e = m.reset(&c.fpp)
 			if e == nil {
@@ -229,6 +256,11 @@ func (s *UPolynomialFactorizationService) CleanupRetained() error {
 		return ErrUPolynomialCleanupPending
 	}
 	caller := s.scope
+	if q := &caller.primePreparation; q.active {
+		if e := q.own(&q.receipt, false); e != nil {
+			return e
+		}
+	}
 	if caller.recombinationStep.active {
 		if e := caller.recombinationStep.own(&caller.recombinationStep.receipt, false); e != nil {
 			return e
@@ -296,6 +328,11 @@ func (s *UPolynomialFactorizationService) CleanupRetained() error {
 			}
 		}
 	}
+	if q := &caller.primePreparation; q.active {
+		if e := q.own(&q.receipt, true); e != nil {
+			return e
+		}
+	}
 	s.manager.config.Integer.budget.Release(s.scope.header)
 	s.scope = nil
 	return nil
@@ -358,6 +395,9 @@ func (s *UPolynomialFactorizationService) RetainedCleanupFactors(index uint32) (
 func (s *UPolynomialFactorizationService) finishSquareFreeScopeSource() error {
 	if e := s.checkOwner(); e != nil {
 		return e
+	}
+	if s.manager.primePreparationCallPending() {
+		return ErrUPolynomialCleanupPending
 	}
 	c := s.scope
 	if c == nil {

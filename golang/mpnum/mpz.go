@@ -1,3 +1,4 @@
+// Source: src/util/mpz.h:698-707.
 // Licensed under the MIT license.
 // Translated from src/util/mpz.h and src/util/mpz.cpp (_MP_INTERNAL, 32-bit digits).
 // Original author: Leonardo de Moura, 2010-06-17.
@@ -632,13 +633,16 @@ func (m *IntegerManager) setInt64WithAllocationContext(a *Int, v int64, context 
 
 // SetUint64 preserves the source's strict < INT_MAX inline threshold.
 func (m *IntegerManager) SetUint64(a *Int, v uint64) error {
+	return m.setUint64WithAllocationContext(a, v, integerAllocationInvocationContext{})
+}
+func (m *IntegerManager) setUint64WithAllocationContext(a *Int, v uint64, context integerAllocationInvocationContext) error {
 	if e := m.check(a); e != nil {
 		return e
 	}
 	if v < math.MaxInt32 {
-		return m.SetInt64(a, int64(v))
+		return m.setInt64WithAllocationContext(a, int64(v), context)
 	}
-	return m.setBig64(a, v, 1)
+	return m.setBig64WithAllocationContext(a, v, 1, context)
 }
 
 // SetLimbs is the source unsigned digit-vector setter, with trailing zeros

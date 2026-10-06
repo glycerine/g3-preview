@@ -5,54 +5,57 @@ package mpnum
 // Explicit passed invocation identity. It carries no allocation snapshot and
 // creates no source numeral, reservation, or ambient callback owner hook.
 type integerAllocationInvocationContext struct {
-	preparation             *upolyFactorPreparationScope
-	preparationInvocation   uint64
-	trial                   *upolyRecombinationTrialScope
-	recombination           *upolyRecombinationStepScope
-	recombinationInvocation uint64
-	recombinationManager    *UPolynomialManager
-	somNormalize            *polynomialSOMNormalizeInvocationReceipt
-	somNormalizeInvocation  uint64
-	normalization           *polynomialNormalizeInvocationReceipt
-	normalizationInvocation uint64
-	trialInvocation         uint64
-	trialManager            *UPolynomialManager
-	henselCaller            *upolyHenselCallerScope
-	henselCallerInvocation  uint64
-	henselCallerManager     *UPolynomialManager
-	henselPair              *upolyHenselPairInvocationReceipt
-	henselPairInvocation    uint64
-	henselManager           *UPolynomialManager
-	iccpConstant            *polynomialICCPConstantInvocationReceipt
-	iccpConstantInvocation  uint64
-	primeTrial              *upolyPrimeTrialInvocationReceipt
-	primeTrialInvocation    uint64
-	pseudo                  *polynomialPseudoDivisionInvocationReceipt
-	pseudoInvocation        uint64
-	mignotte                *upolyMignotteInvocationReceipt
-	mignotteInvocation      uint64
-	divides                 *polynomialDividesInvocationReceipt
-	dividesInvocation       uint64
-	boolDivides             *integerDividesNumeralInvocationReceipt
-	boolDividesInvocation   uint64
-	neg                     *polynomialNegInvocationReceipt
-	negInvocation           uint64
-	arithmeticInvocation    uint64
-	scalarExact             *polynomialScalarExactDivInvocationReceipt
-	scalarExactInvocation   uint64
-	exactDiv                *polynomialExactDivInvocationReceipt
-	exactDivInvocation      uint64
-	content                 *polynomialContentInvocationReceipt
-	contentInvocation       uint64
-	raw                     *integerRawInvocationReceipt
-	rawInvocation           uint64
-	pn                      *integerPNormalizeScope
-	pnInvocation            uint64
-	arithmetic              *polynomialArithmeticInvocationReceipt
-	addMul                  *integerAddMulInvocationReceipt
-	addMulInvocation        uint64
-	derivative              *polynomialDerivativeInvocationReceipt
-	scalarDiv               *polynomialScalarDivInvocationReceipt
+	primePreparation           *upolyFactorPrimePreparationScope
+	primePreparationInvocation uint64
+	primePreparationManager    *UPolynomialManager
+	preparation                *upolyFactorPreparationScope
+	preparationInvocation      uint64
+	trial                      *upolyRecombinationTrialScope
+	recombination              *upolyRecombinationStepScope
+	recombinationInvocation    uint64
+	recombinationManager       *UPolynomialManager
+	somNormalize               *polynomialSOMNormalizeInvocationReceipt
+	somNormalizeInvocation     uint64
+	normalization              *polynomialNormalizeInvocationReceipt
+	normalizationInvocation    uint64
+	trialInvocation            uint64
+	trialManager               *UPolynomialManager
+	henselCaller               *upolyHenselCallerScope
+	henselCallerInvocation     uint64
+	henselCallerManager        *UPolynomialManager
+	henselPair                 *upolyHenselPairInvocationReceipt
+	henselPairInvocation       uint64
+	henselManager              *UPolynomialManager
+	iccpConstant               *polynomialICCPConstantInvocationReceipt
+	iccpConstantInvocation     uint64
+	primeTrial                 *upolyPrimeTrialInvocationReceipt
+	primeTrialInvocation       uint64
+	pseudo                     *polynomialPseudoDivisionInvocationReceipt
+	pseudoInvocation           uint64
+	mignotte                   *upolyMignotteInvocationReceipt
+	mignotteInvocation         uint64
+	divides                    *polynomialDividesInvocationReceipt
+	dividesInvocation          uint64
+	boolDivides                *integerDividesNumeralInvocationReceipt
+	boolDividesInvocation      uint64
+	neg                        *polynomialNegInvocationReceipt
+	negInvocation              uint64
+	arithmeticInvocation       uint64
+	scalarExact                *polynomialScalarExactDivInvocationReceipt
+	scalarExactInvocation      uint64
+	exactDiv                   *polynomialExactDivInvocationReceipt
+	exactDivInvocation         uint64
+	content                    *polynomialContentInvocationReceipt
+	contentInvocation          uint64
+	raw                        *integerRawInvocationReceipt
+	rawInvocation              uint64
+	pn                         *integerPNormalizeScope
+	pnInvocation               uint64
+	arithmetic                 *polynomialArithmeticInvocationReceipt
+	addMul                     *integerAddMulInvocationReceipt
+	addMulInvocation           uint64
+	derivative                 *polynomialDerivativeInvocationReceipt
+	scalarDiv                  *polynomialScalarDivInvocationReceipt
 }
 
 func (c integerAllocationInvocationContext) withAddMulInvocation(r *integerAddMulInvocationReceipt) integerAllocationInvocationContext {
@@ -86,6 +89,9 @@ func pnAllocationContext(pn *integerPNormalizeScope) integerAllocationInvocation
 	return c
 }
 func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomialNumericRoots {
+	if c.primePreparation != nil && c.primePreparationFrame(m) == nil {
+		return nil
+	}
 	if c.preparation != nil && c.preparationFrame(m) == nil {
 		return nil
 	}
@@ -178,6 +184,9 @@ func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomial
 			return nil
 		}
 		return &s.numeric
+	}
+	if r := c.primePreparationFrame(m); r != nil {
+		return &r.numeric
 	}
 	if r := c.preparationFrame(m); r != nil {
 		return &r.numeric

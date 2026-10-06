@@ -327,13 +327,16 @@ func (m *IntegerModularManager) Swap(a, b *Int) error {
 	return m.manager.Swap(a, b)
 }
 func (m *IntegerModularManager) SetInt32(a *Int, v int32) error {
+	return m.setInt32WithSourceContext(a, v, integerAllocationInvocationContext{})
+}
+func (m *IntegerModularManager) setInt32WithSourceContext(a *Int, v int32, context integerAllocationInvocationContext) error {
 	if e := m.check(); e != nil {
 		return e
 	}
 	if e := m.manager.SetInt32(a, v); e != nil {
 		return e
 	}
-	return m.PNormalize(a)
+	return m.normalizeWithSourceContext(a, context)
 }
 func (m *IntegerModularManager) SetUint32(a *Int, v uint32) error {
 	return m.setUint32WithSourceContext(a, v, integerAllocationInvocationContext{})
@@ -363,13 +366,16 @@ func (m *IntegerModularManager) setInt64WithSourceContext(a *Int, v int64, conte
 	return m.normalizeWithSourceContext(a, context)
 }
 func (m *IntegerModularManager) SetUint64(a *Int, v uint64) error {
+	return m.setUint64WithSourceContext(a, v, integerAllocationInvocationContext{})
+}
+func (m *IntegerModularManager) setUint64WithSourceContext(a *Int, v uint64, context integerAllocationInvocationContext) error {
 	if e := m.check(); e != nil {
 		return e
 	}
-	if e := m.manager.SetUint64(a, v); e != nil {
+	if e := m.manager.setUint64WithAllocationContext(a, v, context); e != nil {
 		return e
 	}
-	return m.PNormalize(a)
+	return m.normalizeWithSourceContext(a, context)
 }
 func (m *IntegerModularManager) SetString(a *Int, v string) error {
 	if e := m.check(); e != nil {

@@ -130,6 +130,7 @@ func (m *IntegerManager) divWithAllocationContext(a, b, c *Int, context integerA
 			}
 			tmp = &public.values[0]
 			context.recordRecombinationRaw(m, receipt)
+			context.recordPrimePreparationRaw(m, receipt)
 			context.recordContentRaw(m, receipt)
 			context.recordNormalizationRaw(m, receipt)
 			context.recordSOMNormalizationRaw(m, receipt)

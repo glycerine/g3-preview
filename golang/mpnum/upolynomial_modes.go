@@ -9,7 +9,7 @@ func (m *UPolynomialManager) SetZ() error {
 	if e := m.check(); e != nil {
 		return e
 	}
-	if m.trialCallPending() || m.recombinationCallPending() || m.preparationCallPending() {
+	if m.trialCallPending() || m.recombinationCallPending() || m.preparationCallPending() || m.primePreparationCallPending() {
 		return ErrUPolynomialCleanupPending
 	}
 	return m.modular.SetZ()
@@ -18,7 +18,7 @@ func (m *UPolynomialManager) SetZP(p *Int) error {
 	if e := m.check(); e != nil {
 		return e
 	}
-	if m.trialCallPending() || m.recombinationCallPending() || m.preparationCallPending() {
+	if m.trialCallPending() || m.recombinationCallPending() || m.preparationCallPending() || m.primePreparationCallPending() {
 		return ErrUPolynomialCleanupPending
 	}
 	return m.modular.SetZP(p)
@@ -27,7 +27,7 @@ func (m *UPolynomialManager) SetZPUint64(p uint64) error {
 	if e := m.check(); e != nil {
 		return e
 	}
-	if m.trialCallPending() || m.recombinationCallPending() || m.preparationCallPending() {
+	if m.trialCallPending() || m.recombinationCallPending() || m.preparationCallPending() || m.primePreparationCallPending() {
 		return ErrUPolynomialCleanupPending
 	}
 	return m.modular.SetZPUint64(p)

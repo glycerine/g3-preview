@@ -33,6 +33,14 @@ func (m *IntegerModularManager) normalizeWithSourceContext(out *Int, context int
 		}
 		return e
 	}
+	if q := context.primePreparationFrame(m.manager); q != nil && context.primePreparationManager.modular == m {
+		child := q.normalizeReceipt(m)
+		e := m.pNormalizeWithReceipt(out, child)
+		if q.sourceCause == nil {
+			q.sourceCause = m.pNormalizeInvocationSourceCause(child)
+		}
+		return e
+	}
 	if q := context.recombinationFrame(m.manager); q != nil && context.recombinationManager.modular == m {
 		child := q.normalizeReceipt(m)
 		e := m.pNormalizeWithReceipt(out, child)

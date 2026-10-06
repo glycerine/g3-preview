@@ -402,6 +402,9 @@ func (m *IntegerModularManager) Divides(a, b *Int) (bool, error) {
 	return m.dividesWithAllocationContext(a, b, integerAllocationInvocationContext{})
 }
 func (m *IntegerModularManager) GCD(a, b, c *Int) error {
+	return m.gcdWithSourceContext(a, b, c, integerAllocationInvocationContext{})
+}
+func (m *IntegerModularManager) gcdWithSourceContext(a, b, c *Int, context integerAllocationInvocationContext) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -411,7 +414,7 @@ func (m *IntegerModularManager) GCD(a, b, c *Int) error {
 	if e := m.assertNormalized(b); e != nil {
 		return e
 	}
-	if e := m.manager.GCD(a, b, c); e != nil {
+	if e := m.manager.gcdWithAllocationContext(a, b, c, context); e != nil {
 		return e
 	}
 	return m.assertNormalized(c)

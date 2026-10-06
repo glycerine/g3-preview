@@ -166,7 +166,6 @@ func (s *UPolynomialFactorizationService) factorPrimeTrial(zp *UPolynomialManage
 }
 func (s *UPolynomialFactorizationService) factorSquareFree(f UPolynomialView, fs *UPolynomialFactors, k uint32, params UPolynomialFactorParams) (completed bool, failure error) {
 	m := s.manager
-	nm := m.modular
 	if modularSourceDebug {
 		if e := s.primitiveDiagnosticWithPreparation(f); e != nil {
 			return false, e
@@ -183,72 +182,18 @@ func (s *UPolynomialFactorizationService) factorSquareFree(f UPolynomialView, fs
 	if e := s.prepareSquareFree(f, fs, k); e != nil {
 		return false, e
 	}
-	c.constructed = 2
-	if e := nm.SetInt32(&c.p, 2); e != nil {
+	if e = s.preparePrimeSearch(fs); e != nil {
 		return false, e
 	}
-	zp, e := NewRelatedUPolynomialManager(m)
-	if e != nil {
-		return false, e
-	}
-	c.zp = zp
-	c.constructed = 3
-	if e = zp.SetZP(&c.p); e != nil {
-		return false, e
-	}
-	best, e := zp.NewFactors()
-	if e != nil {
-		return false, e
-	}
-	c.best = best
-	c.constructed = 4
-	c.constructed = 5
-	if e = nm.SetInt32(&c.bestP, 2); e != nil {
-		return false, e
-	}
-	c.constructed = 6
-	// Explicit construction adapter for the ill-formed C++ degree_set(zp_upm):
-	// run the existing factors constructor on its already created EMPTY zp_fs.
-	// That source body pushes true and gives max_degree()==0 for first swap.
-	if e = c.ds.init(best); e != nil {
-		return false, e
-	}
-	iterator, e := NewPrimeIterator(s.config.Primes)
-	if e != nil {
-		return false, e
-	}
-	c.constructed = 7
+	zp, best := c.zp, c.best
 	trials := uint32(0)
 	for trials < params.PrimeTrials {
-		if e = m.checkpoint(); e != nil {
-			return false, e
-		}
-		next, e := iterator.Next()
+		eligible, e := s.nextPreparedPrime(fs, k, params)
 		if e != nil {
 			return false, e
 		}
-		if next > uint64(params.MaxPrime) {
-			return false, fs.PushCopy(m.stateView(&c.fpp), k)
-		}
-		if e = nm.SetUint64(&c.p, next); e != nil {
-			return false, e
-		}
-		if e = zp.SetZP(&c.p); e != nil {
-			return false, e
-		}
-		top, e := m.read(m.stateView(&c.fpp), c.fpp.size-1)
-		if e != nil {
-			return false, e
-		}
-		if e = nm.GCD(&c.p, top, &c.gcdTmp); e != nil {
-			return false, e
-		}
-		one, e := nm.IsOne(&c.gcdTmp)
-		if e != nil {
-			return false, e
-		}
-		if !one {
-			continue
+		if !eligible {
+			return false, nil
 		}
 		route, e := s.factorPrimeTrial(zp, &c.fpp, fs, best, k, &c.p, &c.bestP, &c.ds, &trials)
 		if e != nil {
