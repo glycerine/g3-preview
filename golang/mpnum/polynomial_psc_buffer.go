@@ -12,6 +12,9 @@ import (
 // owner. Heap payload uses the actual Runtime only after the source16 capacity
 // is exhausted. Handle16 replaces native pointer width; this is not native ABI.
 type polynomialPSCRefBuffer struct {
+	nextFrame                                                                   *polynomialPSCNextScope
+	nextInvocation                                                              uint64
+	invocation                                                                  uint64
 	self                                                                        *polynomialPSCRefBuffer
 	owner                                                                       *MultivariatePolynomialCore
 	inline                                                                      [16]Polynomial
@@ -20,18 +23,29 @@ type polynomialPSCRefBuffer struct {
 	pendingOwns, rawDestroyed, interrupted, constructed, finalized, freeStarted bool
 	incoming                                                                    Polynomial
 	incomingDec, drainDec                                                       bool
+	finishing                                                                   bool
 	sourceCause, cleanupCause                                                   error
 }
 
 func (b *polynomialPSCRefBuffer) construct(m *MultivariatePolynomialCore) error {
+	return b.constructWithNextReceipt(m, nil)
+}
+func (b *polynomialPSCRefBuffer) constructWithNextReceipt(m *MultivariatePolynomialCore, r *polynomialPSCNextInvocationReceipt) error {
 	if e := m.check(); e != nil {
 		return e
 	}
-	if b.constructed && !b.finalized || b.incoming != (Polynomial{}) || b.pending != (memory.Block{}) {
+	if r != nil && (b != &m.pscBuffer || !m.matchesPSCNextInvocation(r) || !r.frame.executing) {
+		return ErrPolynomialOwner
+	}
+	if b.invocation == ^uint64(0) || b.constructed && !b.finalized || b.incoming != (Polynomial{}) || b.pending != (memory.Block{}) {
 		return ErrPolynomialPending
 	}
-	*b = polynomialPSCRefBuffer{owner: m, capacity: 16, constructed: true}
+	*b = polynomialPSCRefBuffer{owner: m, capacity: 16, constructed: true, invocation: b.invocation + 1}
 	b.self = b
+	if r != nil {
+		b.nextFrame = r.frame
+		b.nextInvocation = r.invocation
+	}
 	return nil
 }
 func (b *polynomialPSCRefBuffer) check(m *MultivariatePolynomialCore) error {
@@ -135,8 +149,16 @@ func (b *polynomialPSCRefBuffer) expand(m *MultivariatePolynomialCore) error {
 	return nil
 }
 func (b *polynomialPSCRefBuffer) push(m *MultivariatePolynomialCore, p Polynomial) error {
+	return b.pushWithNextReceipt(m, p, nil)
+}
+func (b *polynomialPSCRefBuffer) pushWithNextReceipt(m *MultivariatePolynomialCore, p Polynomial, r *polynomialPSCNextInvocationReceipt) error {
 	if e := b.check(m); e != nil {
 		return e
+	}
+	if b.nextFrame != nil {
+		if b != &m.pscBuffer || r == nil || !m.matchesPSCNextInvocation(r) || r.frame != b.nextFrame || r.invocation != b.nextInvocation || !r.frame.executing {
+			return ErrPolynomialPending
+		}
 	}
 	if b.interrupted || b.incoming != (Polynomial{}) {
 		return ErrPolynomialPending
@@ -181,6 +203,22 @@ func (b *polynomialPSCRefBuffer) finalizePhase(m *MultivariatePolynomialCore, ow
 	if b == nil || b.self != b || b.owner != m {
 		return ErrPolynomialOwner
 	}
+	if m == nil || m.self != m {
+		return ErrPolynomialOwner
+	}
+	if b.finishing || m.callbackDepth != 0 {
+		return ErrPolynomialPending
+	}
+	b.finishing = true
+	defer func() { b.finishing = false }()
+	if b.nextFrame != nil {
+		if m == nil || m.self != m || b != &m.pscBuffer || b.nextFrame != &m.pscNext || b.nextInvocation != m.pscNext.invocation {
+			return ErrPolynomialOwner
+		}
+		if b.nextFrame.executing {
+			return ErrPolynomialPending
+		}
+	}
 	if !b.finalized {
 		if b.cleanupCause != nil && !owning {
 			return b.cleanupCause
@@ -214,6 +252,9 @@ func (b *polynomialPSCRefBuffer) finalizePhase(m *MultivariatePolynomialCore, ow
 			}
 		}
 		b.finalized = true
+		if b.nextFrame != nil && b.nextFrame == &m.pscNext && b.nextInvocation == m.pscNext.invocation && b.invocation == m.pscNext.bufferInvocation {
+			m.pscNext.bufferDestroyed = true
+		}
 		b.cleanupCause = nil
 	}
 	if abort {

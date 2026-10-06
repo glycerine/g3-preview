@@ -29296,7 +29296,17 @@
         "mpnum/polynomial_psc_chain2.go",
         "mpnum/polynomial_psc_chain2_child_stop_source_test.go",
         "mpnum/polynomial_ref_vector_push_receipt.go",
-        "mpnum/polynomial_ref_vector_push_source_test.go"
+        "mpnum/polynomial_ref_vector_push_source_test.go",
+        "mpnum/polynomial_lazard_division_stop_source_test.go",
+        "mpnum/polynomial_lazard_invocation_source_test.go",
+        "mpnum/polynomial_psc_cleanup_reentry_source_test.go",
+        "mpnum/polynomial_psc_invocation.go",
+        "mpnum/polynomial_psc_next_invocation.go",
+        "mpnum/polynomial_psc_next_invocation_source_test.go",
+        "mpnum/polynomial_psc_optimized_invocation_source_test.go",
+        "mpnum/polynomial_variable_callback_source_test.go",
+        "mpnum/polynomial_variable_invocation.go",
+        "mpnum/polynomial_variable_invocation_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -30058,7 +30068,21 @@
         "TestPolynomialPSCChain2ActualEveryReservationPrefix",
         "TestPolynomialPSCChain2YoungerPowerSourceStopPreservesNineLocals",
         "TestPolynomialReferenceVectorPushActualINCBeforeGrowthAndExactAbort",
-        "TestPolynomialReferenceVectorPushGrowthTransportRefusesExecutingOwner"
+        "TestPolynomialReferenceVectorPushGrowthTransportRefusesExecutingOwner",
+        "TestPolynomialLazardYoungerDivisionSourceStopPreservesTwoReferences",
+        "TestPolynomialLazardActualInvocationZeroShortcutAndForeignRefusal",
+        "TestPolynomialLazardActualBigChildrenEveryReservationPrefix",
+        "TestPolynomialLazardUnsignedAssertionBeforeCConstruction",
+        "TestPolynomialPSCActualCleanupDeletionReentry",
+        "TestPolynomialPSCHActualCleanupDeletionReentry",
+        "TestPolynomialPSCNextActualChildInvocationEveryReservationPrefix",
+        "TestPolynomialPSCNextBorrowedHCallbackCannotMutateOwnedBuffer",
+        "TestPolynomialPSCNextExpiredCompletedChildrenPreserveLaterVariableAndH",
+        "TestPolynomialPSCOptimizedCapturedChildrenEveryReservationPrefix",
+        "TestPolynomialPSCOptimizedPublicReentryPreservesPartialOutput",
+        "TestPolynomialVariableActualTransportCannotRetireExecutingOwner",
+        "TestPolynomialVariableActualInvocationAndCopiedFrameRefusal",
+        "TestPolynomialVariableActualEveryReservationPrefix"
       ],
       "conditionals": [
         {
@@ -33702,6 +33726,50 @@
             "TestPolynomialReferenceVectorPushActualINCBeforeGrowthAndExactAbort",
             "TestPolynomialReferenceVectorPushGrowthTransportRefusesExecutingOwner"
           ]
+        },
+        {
+          "name": "Se_Lazard polynomial.cpp:5659-5692 literal dichotomy, guarded two-reference source lifetime and exact child invocation continuation",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_lazard.go",
+          "tests": [
+            "TestPolynomialLazardYoungerDivisionSourceStopPreservesTwoReferences",
+            "TestPolynomialLazardActualInvocationZeroShortcutAndForeignRefusal",
+            "TestPolynomialLazardActualBigChildrenEveryReservationPrefix",
+            "TestPolynomialLazardUnsignedAssertionBeforeCConstruction",
+            "TestPolynomialPSCActualCleanupDeletionReentry"
+          ]
+        },
+        {
+          "name": "optimized_S_e_1 polynomial.cpp:5694-5749 literal nine-reference/H-buffer source and matched Coeff/AR/ExactDiv/Neg/MkVariable children",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_psc_next.go",
+          "tests": [
+            "TestPolynomialPSCNextActualChildInvocationEveryReservationPrefix",
+            "TestPolynomialPSCNextBorrowedHCallbackCannotMutateOwnedBuffer",
+            "TestPolynomialPSCNextExpiredCompletedChildrenPreserveLaterVariableAndH",
+            "TestPolynomialPSCHActualCleanupDeletionReentry",
+            "TestPolynomialPSCActualCleanupDeletionReentry"
+          ]
+        },
+        {
+          "name": "psc_chain_optimized polynomial.cpp:5751-5831 and default dispatch polynomial.cpp:5897-5902 literal seven-reference source, captured Power/Pseudo/Lazard/Next/Neg children and output Push",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_psc.go",
+          "tests": [
+            "TestPolynomialPSCOptimizedCapturedChildrenEveryReservationPrefix",
+            "TestPolynomialPSCOptimizedPublicReentryPreservesPartialOutput",
+            "TestPolynomialPSCActualCleanupDeletionReentry"
+          ]
+        },
+        {
+          "name": "mk_polynomial variable overload polynomial.cpp:2536-2542 actual RAW one, generated monomial, singleton INC, and factory allocation/direct-return transfer",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_variable_invocation.go",
+          "tests": [
+            "TestPolynomialVariableActualTransportCannotRetireExecutingOwner",
+            "TestPolynomialVariableActualInvocationAndCopiedFrameRefusal",
+            "TestPolynomialVariableActualEveryReservationPrefix"
+          ]
         }
       ],
       "ownership": [
@@ -33818,7 +33886,11 @@
         "Actual embedded full-manager frame and nonwrapping invocation; only real SET incoming INC and three constructed references are acquired. Child completed source suffix precedes older newS/prem/R destruction; unjoined assignment/child ownership abort follows older declarations. Caller output range remains independent.",
         "SET source INC precedes actual vector operator[] assertion and old-slot read (ref_vector.h:128-132; vector.h:303-311). Actual n+1 unsigned wrap test retains incoming INC before checked assertion/native bounds guard; exact own abort never reads or writes an old slot that was not reached. Native invalid-range memory access remains a Go guard qualification, not C++ undefined-access equivalence.",
         "No lexical polynomial_ref or NUM is constructed by psc_chain1. Exact concrete Subchain tuple is captured only at actual guarded begin; false completes its real reference suffix, true aborts unjoined roots. Caller SET transfers Coeff factory only at successful incoming INC before old DEC callbacks. Size/index/phase are scalar diagnostics, not ownership authority.",
-        "Nine actual polynomial_ref declarations precede degree reads; youngest stopped child source DT blocks reverse reference destruction. Exact caller-vector Push tuple stamps at actual guarded push; completed incoming INC remains unjoined on growth failure and owning abort consumes only it after the nine older locals. Published range and vector backing remain caller-owned. Body/source/cleanup and child tuple history survive own acknowledgment; phase/index/degrees are diagnostics, never authority."
+        "Nine actual polynomial_ref declarations precede degree reads; youngest stopped child source DT blocks reverse reference destruction. Exact caller-vector Push tuple stamps at actual guarded push; completed incoming INC remains unjoined on growth failure and owning abort consumes only it after the nine older locals. Published range and vector backing remain caller-owned. Body/source/cleanup and child tuple history survive own acknowledgment; phase/index/degrees are diagnostics, never authority.",
+        "polynomial.cpp:5659-5831: each child tuple is captured only at its actual guarded frame begin, with exact manager/frame/nonwrapping invocation; source-only lifetime stops remain distinct from false completed-child acknowledgment and true unjoined abort after older references. Immutable body/source/first-own history survives acknowledgment until a new actual invocation.",
+        "polynomial.cpp:5694-5749: H is bound at real ref_buffer constructor to the actual Next frame and invocation. Each push captures actual incoming INC and allocation leaves. Successful H destruction acknowledges the exact parent at the real finalization leaf; expired child cleanup neither reads later variable active state nor drains later H invocation.",
+        "polynomial.cpp:2536-2542: default RAW one precedes actual generated monomial. Exact generated/allocator/singleton/factory transfer authority comes from actual returned creation/INC/slot publication and guarded allocator outcomes, never result/refcount/root-count inference.",
+        "polynomial.cpp:5659-5831: source/own finalization marks the exact actor as finishing before child cleanup or DEC. Actual delete-callback same-finalizer reentry refuses before cursor/root/history changes; H has an independent real-finalization guard. Source constructor order and DEC prefix are unchanged."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -33908,7 +33980,10 @@
         "Source remark equal-degree limitation and checked assertions retained. Default registered PSC dispatch uses optimized chain; dormant alternative gains zero active-driver credit. Pointer resize evidence covers only reached growth after completed reset, not ref_vector shrink. Signed-host TLS source release proof is an owner-primitive profile, not ordinary mathematical OOM. Actual mpz.h:156-163 old-TMP destruction before failing replacement leaves tmp[i]==0; only that literal dangling-pointer guard domain expects ErrInvalidSlot on retry. No scratch repair.",
         "Literal uint32 arithmetic is retained for n+1 and degree/exponent differences; defective zero-gap loop casts unsigned endpoints to signed int32. Bounded owner budgets refuse oversized range allocation before signed-gap execution. Source signed overflow beyond defined loop domain gains no mathematical completion claim.",
         "Dormant psc_chain1 gains zero active registered-driver assertion credit; polynomial.cpp:5897-5902 still dispatches optimized PSC. Degree-indexed zero slots and source equal-degree limitation remain inherited from literal Subchain. uint32 sz-1 expression retained. Source RAW DT proof is qualified signed-host TLS owner-primitive domain, callback/copied owner guards are separate Go owner-boundary coverage. Native invalid-index bounds guard is not C++ undefined-access equivalence.",
-        "Dormant psc_chain2 has zero active registered-driver assertion credit; default polynomial.cpp:5897-5902 remains optimized. uint32 d0-1, n1-n2 and index increment preserve source widths. Initial zero G2 reaches uninitialized n3 at polynomial.cpp:5647; Go guards that undefined source read with ErrRuntimeUninitialized, without inventing n3=0. Source child end-DT stop is qualified signed-host TLS owner-primitive domain, not ordinary mathematical OOM."
+        "Dormant psc_chain2 has zero active registered-driver assertion credit; default polynomial.cpp:5897-5902 remains optimized. uint32 d0-1, n1-n2 and index increment preserve source widths. Initial zero G2 reaches uninitialized n3 at polynomial.cpp:5647; Go guards that undefined source read with ErrRuntimeUninitialized, without inventing n3=0. Source child end-DT stop is qualified signed-host TLS owner-primitive domain, not ordinary mathematical OOM.",
+        "Selected optimized PSC caller lifetime closure preserves default dispatch and existing active source fixture assertions. Classic PSC1/PSC2 remain dormant with zero new registered-driver credit. Whole polynomial source unit, global DEBUG/TRACE and unselected algorithms remain partial.",
+        "Literal unsigned n=d-degree-1 and 2*a assertion width are retained. Lazard n==0 performs only source assignment and leaves earlier receipt/history unchanged, without X/C construction. Signed-host TLS reached ExactDiv verification destructor stop is a qualified owner-primitive profile, not ordinary mathematical free OOM; earlier guessed arithmetic-TLS and fixture setup diagnostics are preserved separately. Copied/stale owner and supported Go ErrorTransport/DeleteHandler reentry tests are owner-boundary coverage.",
+        "H uses concrete 16-byte polynomial handle storage rather than native pointer ABI. New helper tests do not increase historical active-driver assertion counts; original optimized source mathematics and alternative layouts remain unchanged."
       ]
     },
     {
@@ -133752,7 +133827,9 @@
         "mpnum/polynomial_psc_buffer_test.go",
         "mpnum/polynomial_psc_unwind_test.go",
         "mpnum/polynomial_gcd_monomial_buffer.go",
-        "mpnum/polynomial_gcd_buffer_stopped_growth_source_test.go"
+        "mpnum/polynomial_gcd_buffer_stopped_growth_source_test.go",
+        "mpnum/polynomial_psc_cleanup_reentry_source_test.go",
+        "mpnum/polynomial_psc_next_invocation_source_test.go"
       ],
       "tests": [
         "TestASTDependencyRefBufferInlineSourceRoutesAndCapturedAppend",
@@ -133791,7 +133868,11 @@
         "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
         "TestPolynomialPSCNextHeapBufferIndependentRemainder",
         "TestPolynomialPSCBufferDestructorStopsOlderSourceLocals",
-        "TestPolynomialGCDMonomialBufferConsumedOldGrowth"
+        "TestPolynomialGCDMonomialBufferConsumedOldGrowth",
+        "TestPolynomialPSCHActualCleanupDeletionReentry",
+        "TestPolynomialPSCNextActualChildInvocationEveryReservationPrefix",
+        "TestPolynomialPSCNextBorrowedHCallbackCannotMutateOwnedBuffer",
+        "TestPolynomialPSCNextExpiredCompletedChildrenPreserveLaterVariableAndH"
       ],
       "conditionals": [
         {
@@ -133888,10 +133969,13 @@
       "ownership": [
         "Actual dependency INC/DEC callbacks, raw scalar tokens and charged16-byte obj_ref/24-byte ref_vector/160-byte inline buffer records in existing real AST allocators. Source INC-before-growth, retained backing, captured-end append and consumed cleanup progress preserved. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
         "Actual completed lexical references and source INC-before-push incoming token, charged inline16/cold header and Runtime scalar-handle backing. Named failed allocation/consumed destructor state retained until owning abort. See PORT_PROGRESS.md.",
-        "Cold reflected GCD/ICCP/Normalize records acquire only actual guarded invocations. Receipts match exact manager, stable frame pointer and nonwrapping invocation nonce; common PSC generation is not invocation identity. Completed younger source locals precede older caller locals; explicit owning numeric/reference/buffer abort is a separate pass. Source pp moves its result to a named returned temporary, ends helper c/i before caller old-DEC, then ends the temporary. Named pending/raw/backing/retired/cold graph includes all reached records; no registry/RC/whole-call snapshot supplies ownership."
+        "Cold reflected GCD/ICCP/Normalize records acquire only actual guarded invocations. Receipts match exact manager, stable frame pointer and nonwrapping invocation nonce; common PSC generation is not invocation identity. Completed younger source locals precede older caller locals; explicit owning numeric/reference/buffer abort is a separate pass. Source pp moves its result to a named returned temporary, ends helper c/i before caller old-DEC, then ends the temporary. Named pending/raw/backing/retired/cold graph includes all reached records; no registry/RC/whole-call snapshot supplies ownership.",
+        "polynomial.cpp:5694-5749: H is bound at real ref_buffer constructor to the actual Next frame and invocation. Each push captures actual incoming INC and allocation leaves. Successful H destruction acknowledges the exact parent at the real finalization leaf; expired child cleanup neither reads later variable active state nor drains later H invocation.",
+        "polynomial.cpp:5659-5831: source/own finalization marks the exact actor as finishing before child cleanup or DEC. Actual delete-callback same-finalizer reentry refuses before cursor/root/history changes; H has an independent real-finalization guard. Source constructor order and DEC prefix are unchanged."
       ],
       "deviations": [
-        "Owning construction cleanup refusal publishes a nonzero partial token with original error; scalar pending target/cursor tracks consumed callbacks without changing raw retained slots. Explicit Go retry/cleanup protects source-undefined interrupted destruction. Preserved ref_buffer copy ctor dependent-base lookup is uninstantiable; no repaired copy API. General templates, other owners/configs and full consumers remain open. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md."
+        "Owning construction cleanup refusal publishes a nonzero partial token with original error; scalar pending target/cursor tracks consumed callbacks without changing raw retained slots. Explicit Go retry/cleanup protects source-undefined interrupted destruction. Preserved ref_buffer copy ctor dependent-base lookup is uninstantiable; no repaired copy API. General templates, other owners/configs and full consumers remain open. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
+        "H uses concrete 16-byte polynomial handle storage rather than native pointer ABI. New helper tests do not increase historical active-driver assertion counts; original optimized source mathematics and alternative layouts remain unchanged."
       ]
     },
     {

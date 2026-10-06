@@ -1,4 +1,4 @@
-// Source: src/math/polynomial/polynomial.cpp:5698-5704; src/util/ref_buffer.h; src/util/obj_ref.h.
+// Source: src/math/polynomial/polynomial.cpp:5698-5704; src/util/ref_buffer.h:38-99; src/util/obj_ref.h:31-112.
 // Licensed under the MIT license. Source author: Leonardo de Moura (leonardo).
 package mpnum
 
@@ -12,12 +12,18 @@ func TestPolynomialPSCBufferDestructorStopsOlderSourceLocals(t *testing.T) {
 	m := polynomialCellFixture(t)
 	p, e := m.MkVariable(0, 1)
 	serviceMust(t, e)
-	s := &m.pscNext
-	*s = polynomialPSCNextScope{active: true, constructed: 4}
+	// Use the same actual guarded four-reference begin and H constructor as
+	// optimized_S_e_1; the malformed Size below remains the guard-only fixture.
+	var receipt polynomialPSCNextInvocationReceipt
+	s, e := m.beginPSCNextInvocation(&receipt)
+	serviceMust(t, e)
 	serviceMust(t, s.refs[0].assign(m, m.unit))
-	serviceMust(t, m.pscBuffer.construct(m))
+	serviceMust(t, m.pscBuffer.constructWithNextReceipt(m, &receipt))
 	s.bufferConstructed = true
-	serviceMust(t, m.pscBuffer.push(m, p))
+	s.bufferInvocation = m.pscBuffer.invocation
+	serviceMust(t, m.pscBuffer.pushWithNextReceipt(m, p, &receipt))
+	s.executing = false
+	m.pscLeave()
 	// Explicit malformed Size fixture: one initialized coefficient/monomial,
 	// advertised Size2. This is a reached physical guard, not valid exhaustion.
 	serviceMust(t, m.writeWord(p, 8, 2))

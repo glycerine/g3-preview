@@ -166,11 +166,17 @@ func (m *MultivariatePolynomialCore) cleanupGeneratedMonomial() error {
 	return nil
 }
 func (m *MultivariatePolynomialCore) generatedVariable(v, k uint32) (Monomial, error) {
+	return m.generatedVariableWithOutcome(v, k, nil)
+}
+func (m *MultivariatePolynomialCore) generatedVariableWithOutcome(v, k uint32, result *monomialFactoryOutcome) (Monomial, error) {
 	if m.generatedActive {
 		return Monomial{}, ErrPolynomialPending
 	}
 	outcome := monomialFactoryOutcome{}
 	a, e := m.monomials.mkVariableCreated(v, k, &outcome)
+	if result != nil {
+		*result = outcome
+	}
 	if e != nil && outcome.started {
 		m.recordGeneratedCallee(outcome)
 	}

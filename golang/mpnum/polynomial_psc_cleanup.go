@@ -24,10 +24,10 @@ func (m *MultivariatePolynomialCore) pscEnter() error {
 		if m.pending.pscOwner != 0 || m.powerLocal.pscOwner != 0 || m.pseudoDivision.pscOwner != 0 || m.exactDivision.pscOwner != 0 || m.generatedPSC != 0 || r.factory != 0 {
 			return ErrPolynomialPending
 		}
-		r.generation++
-		if r.generation == 0 {
-			r.generation = 1
+		if r.generation == ^uint64(0) {
+			return ErrPolynomialPending
 		}
+		r.generation++
 	}
 	r.depth++
 	return nil
@@ -83,6 +83,18 @@ func (m *MultivariatePolynomialCore) cleanupPSCCompleted(g uint64) error {
 	if g != m.pscReceipts.generation {
 		return nil
 	}
+	// Compatibility generation selects a known actual parent frame. Its concrete
+	// child tuples, rather than the generation, grant every new callee authority.
+	if g != 0 && m.pscLocal.sourceGeneration == g {
+		return m.finishPSCPhase(true, false)
+	}
+	if g != 0 && m.pscNext.sourceGeneration == g {
+		return m.finishPSCNextPhase(true, false)
+	}
+	if g != 0 && m.lazardLocal.sourceGeneration == g {
+		return m.finishLazardPhase(true, false)
+	}
+
 	if m.powerLocal.pscOwner == g && g != 0 {
 		if e := m.cleanupPolynomialPowerPhase(true, false); e != nil {
 			return e
@@ -120,6 +132,18 @@ func (m *MultivariatePolynomialCore) cleanupPSCAborts(g uint64) error {
 	if g != m.pscReceipts.generation {
 		return nil
 	}
+	// Compatibility generation selects a known actual parent frame. Its concrete
+	// child tuples, rather than the generation, grant every new callee authority.
+	if g != 0 && m.pscLocal.sourceGeneration == g {
+		return m.finishPSCPhase(true, true)
+	}
+	if g != 0 && m.pscNext.sourceGeneration == g {
+		return m.finishPSCNextPhase(true, true)
+	}
+	if g != 0 && m.lazardLocal.sourceGeneration == g {
+		return m.finishLazardPhase(true, true)
+	}
+
 	r := &m.pscReceipts
 	if e := m.finishLazardPhase(true, true); e != nil {
 		return e

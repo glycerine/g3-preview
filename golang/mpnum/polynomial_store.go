@@ -555,6 +555,9 @@ func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []Int, ms [
 			if f := m.factorsOwner; f != nil && f.singleton == term && f.singletonGeneration == m.singletonGeneration {
 				f.singleton = Monomial{}
 			}
+			if s := &m.variableLocal; s.active && s.singleton == term && s.singletonGeneration == m.singletonGeneration {
+				s.singleton = Monomial{}
+			}
 			m.singletonReference = false
 			m.singletonMonomial = Monomial{}
 		}

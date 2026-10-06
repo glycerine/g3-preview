@@ -59,6 +59,7 @@ type MultivariatePolynomialCore struct {
 	pscLocal                                                                                   polynomialPSCScope
 	pscNext                                                                                    polynomialPSCNextScope
 	lazardLocal                                                                                polynomialLazardScope
+	variableLocal                                                                              polynomialVariableScope
 	pscBuffer                                                                                  polynomialPSCRefBuffer
 	translateBuffers                                                                           PolynomialSOMVector
 	translation                                                                                polynomialTranslationScope
@@ -349,6 +350,9 @@ func (m *MultivariatePolynomialCore) mkConstantTakeWithArithmeticReceipt(a *Int,
 	return m.mkConstCoreWithArithmeticReceipt(a, receipt)
 }
 func (m *MultivariatePolynomialCore) MkVariable(v, k uint32) (Polynomial, error) {
+	return m.mkVariableWithReceipt(v, k, nil)
+}
+func (m *MultivariatePolynomialCore) mkVariableWithReceipt(v, k uint32, receipt *polynomialVariableInvocationReceipt) (result Polynomial, err error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
@@ -358,7 +362,30 @@ func (m *MultivariatePolynomialCore) MkVariable(v, k uint32) (Polynomial, error)
 	if m.singletonReference {
 		return Polynomial{}, ErrPolynomialPending
 	}
-	b, e := m.generatedVariable(v, k)
+	as := [1]Int{NewInt(1)}
+	var scope *polynomialVariableScope
+	if receipt != nil {
+		scope = &m.variableLocal
+		if scope.active || scope.invocation == ^uint64(0) || m.callbackDepth != 0 {
+			return Polynomial{}, ErrPolynomialPending
+		}
+		*scope = polynomialVariableScope{active: true, executing: true, invocation: scope.invocation + 1}
+		*receipt = polynomialVariableInvocationReceipt{m, scope, scope.invocation}
+		defer func() { scope.executing = false; scope.bodyCause = err }()
+	}
+	var outcome monomialFactoryOutcome
+	b, e := m.generatedVariableWithOutcome(v, k, &outcome)
+	if scope != nil {
+		if outcome.started {
+			scope.allocator = outcome.allocatorInvocation
+		}
+		if e != nil && outcome.started {
+			scope.calleeGeneration = outcome.generation
+		}
+		if e == nil && outcome.created {
+			scope.generated = b
+		}
+	}
 	if e != nil {
 		return Polynomial{}, e
 	}
@@ -368,6 +395,11 @@ func (m *MultivariatePolynomialCore) MkVariable(v, k uint32) (Polynomial, error)
 	m.singletonMonomial = b
 	m.singletonReference = true
 	m.singletonGeneration++
+	if scope != nil {
+		scope.generated = Monomial{}
+		scope.singleton = b
+		scope.singletonGeneration = m.singletonGeneration
+	}
 	if f := m.factorsOwner; f != nil && f.executing && m.callbackDepth == 0 {
 		f.singleton = m.singletonMonomial
 		f.singletonGeneration = m.singletonGeneration
@@ -380,8 +412,18 @@ func (m *MultivariatePolynomialCore) MkVariable(v, k uint32) (Polynomial, error)
 		m.pscReceipts.singleton = b
 	}
 	m.transferGeneratedMonomial()
-	as := [1]Int{NewInt(1)}
-	return m.mkCell(1, as[:], []Monomial{b}, nil, nil)
+	if scope == nil {
+		return m.mkCell(1, as[:], []Monomial{b}, nil, nil)
+	}
+	result, err = m.mkCellWithReceipts(1, as[:], []Monomial{b}, nil, nil, &scope.factory, nil)
+	if err != nil {
+		return result, err
+	}
+	if err = m.transferFactoryResult(&scope.factory, result); err != nil {
+		return result, err
+	}
+	scope.active = false
+	return result, nil
 }
 func (m *MultivariatePolynomialCore) MkTerms(as []Int, ms []Monomial) (Polynomial, error) {
 	if e := m.check(); e != nil {
@@ -401,6 +443,9 @@ func (m *MultivariatePolynomialCore) MkTerms(as []Int, ms []Monomial) (Polynomia
 	return m.som.mk(false)
 }
 func (m *MultivariatePolynomialCore) CloseChecked() error {
+	if m != nil && m.self == m && m.variableLocal.active {
+		return ErrPolynomialPending
+	}
 	if m != nil && m.self == m && m.negativeActive && m.negativeExecuting {
 		return ErrPolynomialPending
 	}
