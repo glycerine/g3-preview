@@ -64,6 +64,15 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 			public = append(public, &a)
 		}
 	}
+	adapterBytes += uint64(cap(full.factorUnivariateHistory)) * uint64(reflect.TypeOf(polynomialFactorUnivariateHistory{}).Size())
+	adapterBytes += uint64(cap(full.factorNumeralVectorHistory)) * uint64(reflect.TypeOf(polynomialFactorNumeralVectorHistory{}).Size())
+	adapterBytes += uint64(cap(full.toPolynomialHistory)) * uint64(reflect.TypeOf(polynomialToPolynomialHistory{}).Size())
+	if full.factorNumeralVector.constructed {
+		polys = append(polys, full.factorNumeralVector.np.value, full.factorNumeralVector.np.incoming)
+	}
+	if full.toPolynomial.transportBound {
+		public = append(public, &full.toPolynomial.transport)
+	}
 	if b := &full.toPolynomial.buffer; b.constructed {
 		external = append(external, b.raw, b.pending)
 		for i := uint32(0); i < b.count; i++ {
@@ -135,6 +144,19 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 		adapterBytes += f.header
 	}
 	adapterBytes += uint64(cap(m.substitution.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size())
+	adapterBytes += uint64(cap(full.factorFrames)) * uint64(reflect.TypeOf((*polynomialFactorCoreFrame)(nil)).Size())
+	for _, frame := range full.factorFrames {
+		adapterBytes += frame.header
+		if frame.minimum != nil {
+			adapterBytes += frame.minimum.header
+		}
+		if frame.numeralConstructed {
+			public = append(public, &frame.numeral)
+		}
+		for i := uint8(0); i < frame.references; i++ {
+			polys = append(polys, frame.refs[i].value, frame.refs[i].incoming)
+		}
+	}
 	adapterBytes += externalHeaders
 	adapterBytes += uint64(cap(m.display.frames))*uint64(reflect.TypeOf((*polynomialDisplayFrame)(nil)).Size()) + uint64(len(m.display.frames))*uint64(reflect.TypeOf(polynomialDisplayFrame{}).Size())
 	for _, f := range m.display.frames {
@@ -160,21 +182,16 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	adapterBytes += uint64(cap(full.composition.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size())
 	adapterBytes += uint64(cap(full.derivative.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size())
 	adapterBytes += uint64(cap(full.derivative.orphanInvocations)) * 8
-	if full.upm != nil {
-		u := full.upm
-		if len(u.store.backings) != 0 || len(u.pages) != 0 {
-			t.Fatal("constructor census requires fresh actual UP member")
-		}
-		if !u.closed {
-			adapterBytes += u.header
-		}
-		if !u.modular.closed {
-			adapterBytes += u.modular.header
-		}
-		if !u.store.closed {
-			adapterBytes += u.store.header
-		}
+	backendNumerals, backendBytes := polynomialFactorBackendNamedRoots(t, full)
+	public = append(public, backendNumerals...)
+	adapterBytes += backendBytes
+	if full.factorUnivariate.constructed >= 2 {
+		polys = append(polys, full.factorUnivariate.p.value, full.factorUnivariate.p.incoming)
 	}
+	if full.factorUnivariate.conditionalReference {
+		polys = append(polys, full.factorUnivariate.f.value, full.factorUnivariate.f.incoming)
+	}
+
 	for i := range full.retirements {
 		r := &full.retirements[i]
 		adapterBytes += uint64(cap(r.fields)) * uint64(reflect.TypeOf(Int{}).Size())
@@ -352,9 +369,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	if full.conversion.ownsResult {
 		addPolynomial(full.conversion.result)
 	}
-	if full.toPolynomial.ownsResult {
-		addPolynomial(full.toPolynomial.result)
-	}
+
 	addPolynomial(m.exactDivision.returned)
 	addPolynomial(m.translation.freshResult)
 	for i := range m.pseudoDivision.refs {

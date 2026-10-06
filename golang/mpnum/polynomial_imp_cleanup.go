@@ -180,6 +180,15 @@ func (m *MultivariatePolynomialManager) callerGuard() error {
 	return nil
 }
 func (m *MultivariatePolynomialManager) CloseChecked() error {
+	if m != nil && m.self == m && m.factorInline.manager != nil && m.factorInline.manager.matchesFactorConstantInvocation(&m.factorInline) && m.factorInline.frame.active {
+		return ErrPolynomialPending
+	}
+	if m != nil && m.matchesFactorCore(&m.factorRoot) && m.factorRoot.frame.active {
+		return ErrPolynomialPending
+	}
+	if m != nil && m.self == m && m.core != nil && m.core.self == m.core && m.core.integer != nil && (m.core.factorConstantExecuting() || m.core.integer.factorNumeralVectorCallerExecuting() || m.core.integer.factorUnivariateCallerExecuting() || m.core.integer.factorCoreCallerExecuting()) {
+		return ErrPolynomialPending
+	}
 	if m != nil && m.self == m && m.core != nil && m.core.self == m.core && (m.core.quasiResultant.active || m.core.variableNumeral.active) {
 		return ErrPolynomialPending
 	}
@@ -204,7 +213,7 @@ func (m *MultivariatePolynomialManager) CloseChecked() error {
 	if m != nil && m.self == m && (m.conversion.active || m.conversionHasOrphans()) {
 		return ErrPolynomialPending
 	}
-	if m != nil && m.self == m && m.toPolynomial.active {
+	if m != nil && m.self == m && (m.toPolynomial.active || m.factorNumeralVector.active || m.factorUnivariate.active) {
 		return ErrPolynomialPending
 	}
 	if m != nil && m.self == m && (m.gcdPending() || m.iccpPending()) {
@@ -275,6 +284,10 @@ func (m *MultivariatePolynomialManager) CloseChecked() error {
 		return e
 	}
 	if m.core == nil {
+		m.closeToPolynomialHistory()
+		m.closeFactorNumeralVectorHistory()
+		m.closeFactorUnivariateHistory()
+		m.closeFactorCoreHistory()
 		m.originalBudget.Release(m.header)
 		m.header = 0
 		m.closed = true
@@ -339,6 +352,12 @@ func (m *MultivariatePolynomialManager) CloseChecked() error {
 			return e
 		}
 	}
+	if m.factorService != nil && !m.factorService.closed {
+		if e := m.factorService.Close(); e != nil {
+			m.cleanupCause = e
+			return e
+		}
+	}
 	if m.upm != nil && !m.upm.closed {
 		if e := m.upm.Close(); e != nil {
 			m.cleanupCause = e
@@ -359,6 +378,10 @@ func (m *MultivariatePolynomialManager) CloseChecked() error {
 			return e
 		}
 	}
+	m.closeToPolynomialHistory()
+	m.closeFactorNumeralVectorHistory()
+	m.closeFactorUnivariateHistory()
+	m.closeFactorCoreHistory()
 	m.originalBudget.Release(m.header)
 	m.header = 0
 	m.closed = true

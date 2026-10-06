@@ -229,18 +229,19 @@ func TestPolynomialToPolynomialReturnedResultBeforeRawDestructorStop(t *testing.
 	s := &m.toPolynomial
 	serviceMust(t, s.buffer.resize(16384))
 	one := NewInt(1)
-	serviceMust(t, s.buffer.set(0, &one))
+	serviceMust(t, s.buffer.setToPolynomial(0, &one, &s.direct))
 	view, e := s.buffer.view()
 	serviceMust(t, e)
-	p, e := m.core.mkUnivariateSource(x, 16383, polynomialUnivariateCoefficients{array: view, indexed: true})
+	p, e := m.core.mkUnivariateToPolynomial(x, 16383, polynomialUnivariateCoefficients{array: view, indexed: true}, &s.direct)
 	serviceMust(t, e)
-	if !s.ownsResult || s.result != p {
+	if !m.core.matchesFactoryInvocation(&s.factory) || s.factory.frame.result != p {
 		t.Fatal("actual callee result not retained before source local destructor")
 	}
 	polynomialImpPhysicalAuditNamed(t, m, nil, nil, 0)
+	s.executing = false // actual mk return expression has completed
 	contextTLSNearMinimum(t, rt)
 	cause := m.finishToPolynomial(nil)
-	if !errors.Is(cause, arena.ErrBounds) || s.buffer.raw != (memory.Block{}) || !s.ownsResult || s.result != p || s.buffer.count != 0 {
+	if !errors.Is(cause, arena.ErrBounds) || s.buffer.raw != (memory.Block{}) || !m.core.matchesFactoryInvocation(&s.factory) || s.factory.frame.result != p || s.buffer.count != 0 {
 		t.Fatal("actual raw release before result publication", cause)
 	}
 	polynomialImpPhysicalAuditNamed(t, m, nil, nil, 0)
@@ -250,8 +251,12 @@ func TestPolynomialToPolynomialReturnedResultBeforeRawDestructorStop(t *testing.
 		t.Fatal("source retry replayed release or changed cause", again)
 	}
 	saved := s.sourceCause
+	olderStarted, olderStage, olderCursor := m.sourceStarted, m.bodyStage, m.memberStage
+	if got := m.SourceFinalize(); got != saved || m.sourceStarted != olderStarted || m.bodyStage != olderStage || m.memberStage != olderCursor {
+		t.Errorf("younger conversion source stop did not protect older full class prefix: %v", got)
+	}
 	contextTLSFinish(t, rt, m.CleanupToPolynomial)
-	if s.result != (Polynomial{}) || s.sourceCause != saved || s.buffer.sourceCause != cause {
+	if m.core.matchesFactoryInvocation(&s.factory) || s.sourceCause != saved || s.buffer.sourceCause != cause {
 		t.Fatal("owning abort erased history or retained result")
 	}
 	polynomialImpPhysicalAuditNamed(t, m, nil, nil, 0)

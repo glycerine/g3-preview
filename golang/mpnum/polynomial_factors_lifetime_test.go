@@ -169,7 +169,13 @@ func TestPolynomialFactorsFreshNullVersusDestroyedConstant(t *testing.T) {
 			digits[79] = 1
 			serviceMust(t, m.core.integer.SetLimbs(&a, digits))
 			defer func() { serviceMust(t, m.core.integer.Del(&a)) }()
-			m.core.integer.budget.FailAfter(0)
+			prefix := int64(0)
+			if oldBig {
+				// The completed first SET needs one charged history reservation
+				// before the next actual source SET allocation is reached.
+				prefix = 1
+			}
+			m.core.integer.budget.FailAfter(prefix)
 			e = f.SetConstant(&a)
 			if !numericPhysicalReservationRefusal(e) {
 				t.Fatal("genuine reached replacement refusal", e)

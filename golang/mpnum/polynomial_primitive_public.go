@@ -23,13 +23,19 @@ func (m *MultivariatePolynomialManager) PrimitivePart(p Polynomial, x uint32, re
 
 // IsPrimitive evaluates the source ICCP result equality before destroying the
 // pp/c/i locals in reverse declaration order.
-func (m *MultivariatePolynomialManager) IsPrimitive(p Polynomial, x uint32) (result bool, err error) {
+func (m *MultivariatePolynomialManager) IsPrimitive(p Polynomial, x uint32) (bool, error) {
+	return m.isPrimitiveWithReceipt(p, x, nil)
+}
+func (m *MultivariatePolynomialManager) isPrimitiveWithReceipt(p Polynomial, x uint32, receipt *polynomialGCDInvocationReceipt) (result bool, err error) {
 	if e := m.ready(); e != nil {
 		return false, e
 	}
 	s, e := m.beginGCDFunction()
 	if e != nil {
 		return false, e
+	}
+	if receipt != nil {
+		*receipt = polynomialGCDInvocationReceipt{m, s, s.invocation}
 	}
 	c := m.core
 	s.constructNumeral(0)

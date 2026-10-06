@@ -37,12 +37,23 @@ func (as polynomialUnivariateCoefficients) store(m *MultivariatePolynomialCore, 
 	return nil // actual slice field already received the source mutation
 }
 func (m *MultivariatePolynomialCore) mkUnivariateSource(v, n uint32, as polynomialUnivariateCoefficients) (Polynomial, error) {
+	return m.mkUnivariateToPolynomial(v, n, as, nil)
+}
+func (m *MultivariatePolynomialCore) mkUnivariateToPolynomial(v, n uint32, as polynomialUnivariateCoefficients, r *polynomialToPolynomialInvocationReceipt) (Polynomial, error) {
 	size, e := m.cheap.ms.size(m)
 	if e != nil {
 		return Polynomial{}, e
 	}
 	if modularSourceDebug && size != 0 {
 		return Polynomial{}, ErrPolynomialAssertion
+	}
+	if r != nil {
+		if !r.manager.matchesToPolynomialInvocation(r) || r.manager.core != m || !r.frame.executing || m.callbackDepth != 0 {
+			return Polynomial{}, ErrPolynomialOwner
+		}
+		if e := m.cheap.acquireAppendInvocation(&r.frame.append, size); e != nil {
+			return Polynomial{}, e
+		}
 	}
 	k := n + 1
 	for k > 0 {
@@ -66,17 +77,29 @@ func (m *MultivariatePolynomialCore) mkUnivariateSource(v, n uint32, as polynomi
 			}
 			continue
 		}
-		term, e := m.generatedVariable(v, k)
+		var term Monomial
+		if r == nil {
+			term, e = m.generatedVariable(v, k)
+		} else {
+			term, e = m.generatedVariableToPolynomial(v, k, r)
+		}
 		if e != nil {
 			return Polynomial{}, e
 		}
-		e = m.cheap.add(a, term, true)
+		if r == nil {
+			e = m.cheap.add(a, term, true)
+		} else {
+			e = m.cheap.addWithAppendReceipt(a, term, true, &r.frame.append)
+		}
 		if w := as.store(m, k, a); w != nil {
 			return Polynomial{}, polynomialNewtonJoin(e, w)
 		}
 		if e != nil {
 			return Polynomial{}, e
 		}
+	}
+	if r != nil {
+		return m.cheap.mkWithAppendReceipt(false, &r.frame.append, &r.frame.factory)
 	}
 	return m.cheap.mk(false)
 }

@@ -57,7 +57,10 @@ func (m *MultivariatePolynomialManager) cleanupQuadraticChildren(s *polynomialGC
 
 // This is the literal quadratic helper; the enclosing Factor dispatcher and
 // univariate backend remain separate source obligations.
-func (m *MultivariatePolynomialManager) factorQuadraticSquareFreePrimitive(p Polynomial, r *PolynomialFactors, x, k uint32) (cause error) {
+func (m *MultivariatePolynomialManager) factorQuadraticSquareFreePrimitive(p Polynomial, r *PolynomialFactors, x, k uint32) error {
+	return m.factorQuadraticSquareFreePrimitiveWithReceipts(p, r, x, k, nil, nil, nil)
+}
+func (m *MultivariatePolynomialManager) factorQuadraticSquareFreePrimitiveWithReceipts(p Polynomial, r *PolynomialFactors, x, k uint32, guards *[2]polynomialGCDInvocationReceipt, body *polynomialGCDInvocationReceipt, phase *uint8) (cause error) {
 	if e := m.ready(); e != nil {
 		return e
 	}
@@ -76,14 +79,28 @@ func (m *MultivariatePolynomialManager) factorQuadraticSquareFreePrimitive(p Pol
 		if d != 2 {
 			return ErrPolynomialAssertion
 		}
-		primitive, e := m.IsPrimitive(p, x)
+		var guard *polynomialGCDInvocationReceipt
+		if guards != nil {
+			guard = &guards[0]
+		}
+		if phase != nil {
+			*phase = 13
+		}
+		primitive, e := m.isPrimitiveWithReceipt(p, x, guard)
 		if e != nil {
 			return e
 		}
 		if !primitive {
 			return ErrPolynomialAssertion
 		}
-		sqf, e := m.IsSquareFreeVariable(p, x)
+		guard = nil
+		if guards != nil {
+			guard = &guards[1]
+		}
+		if phase != nil {
+			*phase = 14
+		}
+		sqf, e := m.isSquareFreeWithReceipt(p, x, true, guard)
 		if e != nil {
 			return e
 		}
@@ -94,6 +111,12 @@ func (m *MultivariatePolynomialManager) factorQuadraticSquareFreePrimitive(p Pol
 	s, e := m.beginGCDFunction()
 	if e != nil {
 		return e
+	}
+	if phase != nil {
+		*phase = 12
+	}
+	if body != nil {
+		*body = polynomialGCDInvocationReceipt{m, s, s.invocation}
 	}
 	defer func() {
 		s.bodyCause = cause
@@ -316,6 +339,9 @@ func (m *MultivariatePolynomialManager) factorQuadraticSquareFreePrimitive(p Pol
 // The linear source helper constructs no lexical NUM/ref. Its only ordinary
 // body action is the existing factors pointer/degree push followed by INC.
 func (m *MultivariatePolynomialManager) factorLinearSquareFreePrimitive(p Polynomial, r *PolynomialFactors, x, k uint32) error {
+	return m.factorLinearSquareFreePrimitiveWithReceipts(p, r, x, k, nil, nil)
+}
+func (m *MultivariatePolynomialManager) factorLinearSquareFreePrimitiveWithReceipts(p Polynomial, r *PolynomialFactors, x, k uint32, guards *[2]polynomialGCDInvocationReceipt, phase *uint8) error {
 	if e := m.ready(); e != nil {
 		return e
 	}
@@ -333,14 +359,28 @@ func (m *MultivariatePolynomialManager) factorLinearSquareFreePrimitive(p Polyno
 		if d != 1 {
 			return ErrPolynomialAssertion
 		}
-		primitive, e := m.IsPrimitive(p, x)
+		var guard *polynomialGCDInvocationReceipt
+		if guards != nil {
+			guard = &guards[0]
+		}
+		if phase != nil {
+			*phase = 13
+		}
+		primitive, e := m.isPrimitiveWithReceipt(p, x, guard)
 		if e != nil {
 			return e
 		}
 		if !primitive {
 			return ErrPolynomialAssertion
 		}
-		squareFree, e := m.IsSquareFreeVariable(p, x)
+		guard = nil
+		if guards != nil {
+			guard = &guards[1]
+		}
+		if phase != nil {
+			*phase = 14
+		}
+		squareFree, e := m.isSquareFreeWithReceipt(p, x, true, guard)
 		if e != nil {
 			return e
 		}

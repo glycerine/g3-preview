@@ -176,13 +176,19 @@ func (m *MultivariatePolynomialManager) IsSquareFree(p Polynomial) (bool, error)
 func (m *MultivariatePolynomialManager) IsSquareFreeVariable(p Polynomial, x uint32) (bool, error) {
 	return m.isSquareFree(p, x, true)
 }
-func (m *MultivariatePolynomialManager) isSquareFree(p Polynomial, x uint32, byVariable bool) (result bool, err error) {
+func (m *MultivariatePolynomialManager) isSquareFree(p Polynomial, x uint32, byVariable bool) (bool, error) {
+	return m.isSquareFreeWithReceipt(p, x, byVariable, nil)
+}
+func (m *MultivariatePolynomialManager) isSquareFreeWithReceipt(p Polynomial, x uint32, byVariable bool, receipt *polynomialGCDInvocationReceipt) (result bool, err error) {
 	if e := m.ready(); e != nil {
 		return false, e
 	}
 	s, e := m.beginGCDFunction()
 	if e != nil {
 		return false, e
+	}
+	if receipt != nil {
+		*receipt = polynomialGCDInvocationReceipt{m, s, s.invocation}
 	}
 	c := m.core
 	s.constructReference(c, 0)

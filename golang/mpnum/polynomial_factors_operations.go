@@ -318,44 +318,11 @@ func (f *PolynomialFactors) DisplayInto(sink PolynomialTextSink) (cause error) {
 	}
 	return nil
 }
-func (m *MultivariatePolynomialManager) AccumulateFactorConstant(f *PolynomialFactors, c *Int) (cause error) {
-	if e := m.ready(); e != nil {
-		return e
-	}
-	if f == nil || f.manager != m {
-		return ErrPolynomialOwner
-	}
-	if e := f.open(); e != nil {
-		return e
-	}
-	f.local = Int{}
-	f.localActive = true
-	defer func() { cause = f.finishLocal(cause) }()
-	if e := f.numericCall(func() error { return m.core.modular.Mul(&f.constant, c, &f.local) }); e != nil {
-		return e
-	}
-	return f.numericCall(func() error { return m.core.modular.Copy(&f.constant, &f.local) })
+func (m *MultivariatePolynomialManager) AccumulateFactorConstant(f *PolynomialFactors, c *Int) error {
+	return m.accumulateFactorConstantWithReceipt(f, c, nil)
 }
-func (m *MultivariatePolynomialManager) FlipFactorSign(f *PolynomialFactors) (cause error) {
-	if e := m.ready(); e != nil {
-		return e
-	}
-	if f == nil || f.manager != m {
-		return ErrPolynomialOwner
-	}
-	if e := f.open(); e != nil {
-		return e
-	}
-	f.local = Int{}
-	f.localActive = true
-	defer func() { cause = f.finishLocal(cause) }()
-	if e := f.numericCall(func() error { return m.core.modular.Copy(&f.local, &f.constant) }); e != nil {
-		return e
-	}
-	if e := f.numericCall(func() error { return m.core.modular.Neg(&f.local) }); e != nil {
-		return e
-	}
-	return f.numericCall(func() error { return m.core.modular.Copy(&f.constant, &f.local) })
+func (m *MultivariatePolynomialManager) FlipFactorSign(f *PolynomialFactors) error {
+	return m.flipFactorSignWithReceipt(f, nil)
 }
 func (f *PolynomialFactors) finishLocal(body error) error {
 	if f.bodyCause == nil {

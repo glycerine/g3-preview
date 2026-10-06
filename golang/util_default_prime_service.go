@@ -112,3 +112,13 @@ func (it *PrimeServiceIterator) Next() (uint64, error) {
 	}
 	return it.generator.At(index)
 }
+
+// BorrowGenerator is an explicit Go binding for the default pointer selected
+// by prime_generator.cpp:99-107. It preserves the actual eager object, including
+// the empty-vector state after Finalize; the caller does not own the generator.
+func (s *DefaultPrimeService) BorrowGenerator() (*mpnum.PrimeGenerator, error) {
+	if e := s.open(); e != nil {
+		return nil, e
+	}
+	return s.generator, nil
+}

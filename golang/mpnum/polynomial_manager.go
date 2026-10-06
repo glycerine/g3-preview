@@ -28,24 +28,24 @@ type MultivariatePolynomialConfig struct {
 	Cooperation func() error
 }
 type polynomialCreation struct {
-	appendParent       *polynomialCheapAppendScope
-	factorsParent      *PolynomialFactors
-	conversionParent   *polynomialGlobalConversionScope
-	toPolynomialParent *polynomialToPolynomialScope
-	compositionParent  *polynomialCompositionScope
-	pscOwner           uint64
-	substitutionOwned  bool
-	translationOwned   bool
-	generation         uint64
-	squareRootParent   *polynomialSquareRootScope
-	derivativeParent   *polynomialDerivativeScope
-	raw                memory.ObjectRef
-	value              Polynomial
-	requested, id      uint32
-	idConsumed         bool
-	buffer             *polynomialSOM
+	appendParent      *polynomialCheapAppendScope
+	factorsParent     *PolynomialFactors
+	conversionParent  *polynomialGlobalConversionScope
+	compositionParent *polynomialCompositionScope
+	pscOwner          uint64
+	substitutionOwned bool
+	translationOwned  bool
+	generation        uint64
+	squareRootParent  *polynomialSquareRootScope
+	derivativeParent  *polynomialDerivativeScope
+	raw               memory.ObjectRef
+	value             Polynomial
+	requested, id     uint32
+	idConsumed        bool
+	buffer            *polynomialSOM
 }
 type MultivariatePolynomialCore struct {
+	toPolynomialCaller                                                                         *MultivariatePolynomialManager
 	quasiResultant                                                                             polynomialQuasiResultantScope
 	quasiHistory                                                                               []polynomialQuasiResultantHistory
 	variableNumeral                                                                            polynomialVariableNumeralScope
@@ -58,7 +58,6 @@ type MultivariatePolynomialCore struct {
 	powerGeneration                                                                            uint64
 	display                                                                                    polynomialDisplayState
 	conversionOwner                                                                            *polynomialGlobalConversionScope
-	toPolynomialOwner                                                                          *polynomialToPolynomialScope
 	dividesLocal                                                                               polynomialDividesScope
 	contentLocal                                                                               polynomialContentScope
 	pscReceipts                                                                                polynomialPSCReceipts
@@ -454,6 +453,9 @@ func (m *MultivariatePolynomialCore) MkTerms(as []Int, ms []Monomial) (Polynomia
 	return m.som.mk(false)
 }
 func (m *MultivariatePolynomialCore) CloseChecked() error {
+	if m != nil && m.self == m && m.integer != nil && (m.factorConstantExecuting() || m.toPolynomialCallerExecuting() || m.integer.factorNumeralVectorCallerExecuting() || m.integer.factorUnivariateCallerExecuting() || m.integer.factorCoreCallerExecuting()) {
+		return ErrPolynomialPending
+	}
 	if m != nil && m.self == m && (m.quasiResultant.active || m.variableNumeral.active) {
 		return ErrPolynomialPending
 	}

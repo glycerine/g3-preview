@@ -7,14 +7,15 @@ import "github.com/glycerine/g3/golang/memory"
 // Direct transport of actual integer-cell and source-buffer acquisition leaves.
 // Whole-parent and exhaustive prefix validation remain open.
 type integerPNormalizeScope struct {
-	owner             *IntegerModularManager
-	invocation        uint64
-	stage             uint8
-	active, executing bool
-	roots             polynomialNumericRoots
-	buffers           [4]naturalPNBufferReceipt
-	verification      naturalPNVerificationReceipt
-	sourceCause       error
+	factorHistoryContext integerAllocationInvocationContext
+	owner                *IntegerModularManager
+	invocation           uint64
+	stage                uint8
+	active, executing    bool
+	roots                polynomialNumericRoots
+	buffers              [4]naturalPNBufferReceipt
+	verification         naturalPNVerificationReceipt
+	sourceCause          error
 }
 type integerPNormalizeInvocationReceipt struct {
 	manager    *IntegerModularManager

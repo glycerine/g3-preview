@@ -26,6 +26,35 @@ func (m *IntegerModularManager) derivativeAllocationContext(r *polynomialDerivat
 }
 
 func (m *IntegerModularManager) normalizeWithSourceContext(out *Int, context integerAllocationInvocationContext) error {
+	if r := context.factorNumeralVector; r != nil && m.manager.factorNumeralVectorRoots(context) != nil && r.manager.upm.modular == m {
+		e := m.pNormalizeWithReceipt(out, &r.frame.normalize)
+		if r.frame.sourceCause == nil {
+			r.frame.sourceCause = m.pNormalizeInvocationSourceCause(&r.frame.normalize)
+		}
+		return e
+	}
+	if r := context.toPolynomial; r != nil && m.manager.toPolynomialAllocationRoots(context) != nil && r.manager.core.modular == m {
+		e := m.pNormalizeWithReceipt(out, &r.frame.normalize)
+		if r.frame.sourceCause == nil {
+			r.frame.sourceCause = m.pNormalizeInvocationSourceCause(&r.frame.normalize)
+		}
+		return e
+	}
+	if r := context.factorMemberSet; m.manager.factorMemberSetRoots(context) != nil && r.owner.manager.core.modular == m {
+		e := m.pNormalizeWithFactorHistory(out, &r.frame.normalize, context)
+		if r.frame.sourceCause == nil {
+			r.frame.sourceCause = m.pNormalizeInvocationSourceCause(&r.frame.normalize)
+		}
+		return e
+	}
+	if r := context.factorConstant; m.manager.factorConstantContextRoots(context) != nil && r.manager.manager.core.modular == m {
+		child := &r.frame.normalize[r.frame.phase]
+		e := m.pNormalizeWithFactorHistory(out, child, context)
+		if r.frame.sourceCause == nil {
+			r.frame.sourceCause = m.pNormalizeInvocationSourceCause(child)
+		}
+		return e
+	}
 	if q := context.preparationFrame(m.manager); q != nil && q.service.manager.modular == m {
 		e := m.pNormalizeWithReceipt(out, &q.normalize)
 		if q.sourceCause == nil {

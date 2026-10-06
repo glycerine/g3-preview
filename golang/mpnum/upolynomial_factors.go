@@ -11,6 +11,7 @@ import (
 )
 
 type UPolynomialFactors struct {
+	factorUnivariateCaller    *MultivariatePolynomialManager
 	self                      *UPolynomialFactors
 	manager                   *UPolynomialManager
 	factors                   []upolyVectorState
@@ -52,6 +53,9 @@ func (m *UPolynomialManager) NewFactors() (*UPolynomialFactors, error) {
 func (fs *UPolynomialFactors) checkCleanup() error {
 	if fs == nil || fs.self != fs || fs.manager == nil {
 		return ErrUPolynomialOwner
+	}
+	if m := fs.factorUnivariateCaller; m != nil && m.self == m && m.upm == fs.manager && m.factorUnivariate.fs == fs && (m.factorUnivariate.executing || m.factorUnivariate.finishing) {
+		return ErrPolynomialPending
 	}
 	if fs.closed {
 		return arena.ErrClosed
@@ -175,10 +179,16 @@ func (fs *UPolynomialFactors) ConstantCopy(out *Int) error {
 	return fs.manager.modular.Copy(out, &fs.constant)
 }
 func (fs *UPolynomialFactors) SetConstant(value *Int) error {
+	return fs.setConstantWithSourceContext(value, integerAllocationInvocationContext{})
+}
+func (fs *UPolynomialFactors) setConstantWithSourceContext(value *Int, context integerAllocationInvocationContext) error {
 	if e := fs.check(); e != nil {
 		return e
 	}
-	return fs.manager.modular.Copy(&fs.constant, value)
+	if context != (integerAllocationInvocationContext{}) && context.roots(fs.manager.config.Integer) == nil {
+		return ErrUPolynomialOwner
+	}
+	return fs.manager.modular.copyWithSourceContext(&fs.constant, value, context)
 }
 func (fs *UPolynomialFactors) FactorView(index uint32) (UPolynomialView, error) {
 	s, e := fs.factor(index)

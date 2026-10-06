@@ -171,6 +171,7 @@ func (m *MonomialManager) CleanupValue(a *Monomial) error {
 	if l.raw != (memory.ObjectRef{}) {
 		p, e := m.allocator.DeallocateTracked(uint64(l.requested), l.raw)
 		if p.PhysicalReleased || p.PooledLinked {
+			l.acknowledgeToPolynomialCreated(*a)
 			l.raw = memory.ObjectRef{}
 		}
 		if e != nil {
@@ -205,6 +206,7 @@ func (m *MonomialManager) CleanupValue(a *Monomial) error {
 	l.derivativeSlot = 0
 	l.acknowledgeArithmeticProduct(*a)
 	l.acknowledgePseudoCreated(*a)
+	l.acknowledgeToPolynomialCreated(*a)
 	l.live = false
 	*a = Monomial{}
 	return nil

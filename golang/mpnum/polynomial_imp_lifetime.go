@@ -226,6 +226,26 @@ func (v *PolynomialNewtonVector) sourceFinalizeMember() error {
 }
 
 func (m *MultivariatePolynomialManager) SourceFinalize() error {
+	if m != nil && m.self == m && m.factorInline.manager != nil {
+		if cause := m.factorInline.manager.factorConstantInvocationSourceCause(&m.factorInline); cause != nil {
+			return cause
+		}
+	}
+	if m != nil && m.matchesFactorCore(&m.factorRoot) && !m.factorRoot.frame.executing && !m.factorRoot.frame.finishing && m.factorRoot.frame.sourceCause != nil {
+		return m.factorRoot.frame.sourceCause
+	}
+	if m != nil && m.self == m && m.factorUnivariate.invocation != 0 && !m.factorUnivariate.executing && !m.factorUnivariate.finishing && m.factorUnivariate.sourceCause != nil {
+		return m.factorUnivariate.sourceCause
+	}
+	if m != nil && m.self == m && m.factorNumeralVector.invocation != 0 && !m.factorNumeralVector.executing && !m.factorNumeralVector.finishing && m.factorNumeralVector.sourceCause != nil {
+		return m.factorNumeralVector.sourceCause
+	}
+	if m != nil && m.self == m && m.toPolynomial.active && !m.toPolynomial.executing && !m.toPolynomial.finishing && m.toPolynomial.sourceCause != nil {
+		return m.toPolynomial.sourceCause
+	}
+	if m != nil && m.self == m && (m.core.factorConstantExecuting() || m.core.toPolynomialCallerExecuting() || m.core.integer.factorNumeralVectorCallerExecuting() || m.core.integer.factorUnivariateCallerExecuting() || m.core.integer.factorCoreCallerExecuting()) {
+		return ErrPolynomialPending
+	}
 	if m != nil && m.self == m && m.core != nil && m.core.self == m.core && (m.core.quasiResultant.active || m.core.variableNumeral.active) {
 		return ErrPolynomialPending
 	}

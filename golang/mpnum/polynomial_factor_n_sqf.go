@@ -5,6 +5,9 @@ package mpnum
 // The source degree-greater-than-two helper currently preserves p as one
 // factor. Its source TODO is retained; no alternative factorization is used.
 func (m *MultivariatePolynomialManager) factorHigherSquareFreePrimitive(p Polynomial, r *PolynomialFactors, x, k uint32) error {
+	return m.factorHigherSquareFreePrimitiveWithReceipts(p, r, x, k, nil, nil)
+}
+func (m *MultivariatePolynomialManager) factorHigherSquareFreePrimitiveWithReceipts(p Polynomial, r *PolynomialFactors, x, k uint32, guards *[2]polynomialGCDInvocationReceipt, phase *uint8) error {
 	if e := m.ready(); e != nil {
 		return e
 	}
@@ -22,14 +25,28 @@ func (m *MultivariatePolynomialManager) factorHigherSquareFreePrimitive(p Polyno
 		if degree <= 2 {
 			return ErrPolynomialAssertion
 		}
-		primitive, e := m.IsPrimitive(p, x)
+		var guard *polynomialGCDInvocationReceipt
+		if guards != nil {
+			guard = &guards[0]
+		}
+		if phase != nil {
+			*phase = 13
+		}
+		primitive, e := m.isPrimitiveWithReceipt(p, x, guard)
 		if e != nil {
 			return e
 		}
 		if !primitive {
 			return ErrPolynomialAssertion
 		}
-		squareFree, e := m.IsSquareFreeVariable(p, x)
+		guard = nil
+		if guards != nil {
+			guard = &guards[1]
+		}
+		if phase != nil {
+			*phase = 14
+		}
+		squareFree, e := m.isSquareFreeWithReceipt(p, x, true, guard)
 		if e != nil {
 			return e
 		}

@@ -366,10 +366,6 @@ func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []Int, ms [
 		m.pending.conversionParent = s
 		s.factoryGeneration = m.creationGeneration
 	}
-	if s := m.toPolynomialOwner; s != nil && s.executing && m.callbackDepth == 0 {
-		m.pending.toPolynomialParent = s
-		s.factoryGeneration = m.creationGeneration
-	}
 	if m.compositionOwner != nil && m.compositionOwner.executing {
 		m.pending.compositionParent = m.compositionOwner
 		m.compositionOwner.factoryGeneration = m.creationGeneration
@@ -385,7 +381,7 @@ func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []Int, ms [
 	observer := m.pending.compositionParent
 	squareObserver := m.pending.squareRootParent
 	var before [3]memory.Block
-	if observer != nil || squareObserver != nil || m.pending.toPolynomialParent != nil || m.pending.conversionParent != nil || m.pending.factorsParent != nil {
+	if observer != nil || squareObserver != nil || m.pending.conversionParent != nil || m.pending.factorsParent != nil {
 		var e error
 		before, e = m.monomials.allocator.PendingRoots()
 		if e != nil {
@@ -418,15 +414,6 @@ func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []Int, ms [
 			if squareObserver != nil {
 				squareObserver.monomialRaw = after
 			}
-		}
-		if probe != nil {
-			return Polynomial{}, errors.Join(e, probe)
-		}
-	}
-	if owner := m.pending.toPolynomialParent; owner != nil && before == ([3]memory.Block{}) {
-		after, probe := m.monomials.allocator.PendingRoots()
-		if after != ([3]memory.Block{}) {
-			owner.monomialRaw = after
 		}
 		if probe != nil {
 			return Polynomial{}, errors.Join(e, probe)
@@ -594,11 +581,6 @@ func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []Int, ms [
 	}
 	l.published = true
 	if owner := m.pending.conversionParent; owner != nil && owner.factoryGeneration == m.pending.generation {
-		owner.factoryGeneration = 0
-		owner.result = p
-		owner.ownsResult = true
-	}
-	if owner := m.pending.toPolynomialParent; owner != nil && owner.factoryGeneration == m.pending.generation {
 		owner.factoryGeneration = 0
 		owner.result = p
 		owner.ownsResult = true

@@ -260,6 +260,9 @@ func (m *IntegerModularManager) assertNormalized(a *Int) error {
 }
 func (m *IntegerModularManager) PNormalize(a *Int) error { return m.pNormalizeWithReceipt(a, nil) }
 func (m *IntegerModularManager) pNormalizeWithReceipt(a *Int, receipt *integerPNormalizeInvocationReceipt) error {
+	return m.pNormalizeWithFactorHistory(a, receipt, integerAllocationInvocationContext{})
+}
+func (m *IntegerModularManager) pNormalizeWithFactorHistory(a *Int, receipt *integerPNormalizeInvocationReceipt, history integerAllocationInvocationContext) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -279,7 +282,7 @@ func (m *IntegerModularManager) pNormalizeWithReceipt(a *Int, receipt *integerPN
 		if scope.active || scope.invocation == ^uint64(0) {
 			return ErrPolynomialPending
 		}
-		*scope = integerPNormalizeScope{owner: m, invocation: scope.invocation + 1, active: true, executing: true, stage: 1}
+		*scope = integerPNormalizeScope{factorHistoryContext: history, owner: m, invocation: scope.invocation + 1, active: true, executing: true, stage: 1}
 		*receipt = integerPNormalizeInvocationReceipt{m, scope, scope.invocation}
 		defer func() {
 			if scope.sourceCause == nil {

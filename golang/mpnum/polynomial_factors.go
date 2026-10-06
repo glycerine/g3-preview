@@ -14,6 +14,10 @@ import (
 // payload uses the existing 16-byte checked polynomial codec, not a shadow
 // handle slice. Charged byte phases record INC and destructive progress only.
 type PolynomialFactors struct {
+	memberSet                                                          polynomialFactorMemberSetScope
+	memberSetHistory                                                   []polynomialFactorMemberSetHistory
+	constantInvocation                                                 polynomialFactorConstantScope
+	constantHistory                                                    []polynomialFactorConstantHistory
 	displayReceipt                                                     *polynomialDisplayFrame
 	displayGeneration                                                  uint64
 	self                                                               *PolynomialFactors
@@ -64,7 +68,7 @@ func NewPolynomialFactors(m *MultivariatePolynomialManager) (*PolynomialFactors,
 	f := &PolynomialFactors{manager: m, header: h, factors: polynomialVector{width: 16}, degrees: polynomialVector{width: 4}}
 	f.self = f
 	// Empty vector members are complete before the constructor body SET.
-	if e := m.core.modular.SetInt32(&f.constant, 1); e != nil {
+	if e := f.setMemberConstantOne(); e != nil {
 		f.bodyCause = e
 		return f, e
 	}
@@ -96,7 +100,7 @@ func (f *PolynomialFactors) open() error {
 	if e := f.ready(); e != nil {
 		return e
 	}
-	if f.sourceCause != nil || f.resetting || f.multiplyActive || f.localActive || f.numeric.cell.object != (memory.ObjectRef{}) || f.numeric.allocator != ([3]memory.Block{}) {
+	if f.memberSet.active || f.constantInvocation.active || f.sourceCause != nil || f.resetting || f.multiplyActive || f.localActive || f.numeric.cell.object != (memory.ObjectRef{}) || f.numeric.allocator != ([3]memory.Block{}) {
 		return ErrPolynomialPending
 	}
 	if frame := f.displayReceipt; frame != nil && frame.generation == f.displayGeneration && frame.active && frame.sink == nil {
@@ -246,17 +250,7 @@ func (f *PolynomialFactors) numericCall(body func() error) error {
 	x := f.numeric.after(f.manager.core.integer, before)
 	return errors.Join(e, x)
 }
-func (f *PolynomialFactors) SetConstant(c *Int) error {
-	if e := f.open(); e != nil {
-		return e
-	}
-	e := f.numericCall(func() error { return f.manager.core.modular.Copy(&f.constant, c) })
-	if e != nil {
-		f.bodyCause = e
-		f.resetting = true
-	}
-	return e
-}
+func (f *PolynomialFactors) SetConstant(c *Int) error { return f.setConstantWithReceipt(c, nil) }
 func (f *PolynomialFactors) At(i uint32) (*PolynomialRef, error) {
 	if e := f.ready(); e != nil {
 		return nil, e
@@ -275,6 +269,9 @@ func (f *PolynomialFactors) At(i uint32) (*PolynomialRef, error) {
 	return r, nil
 }
 func (f *PolynomialFactors) sourceReset() error {
+	if f.factorCallerExecuting() {
+		return ErrPolynomialPending
+	}
 	if f.sourceCause != nil {
 		return f.sourceCause
 	}
@@ -329,7 +326,7 @@ func (f *PolynomialFactors) sourceReset() error {
 		f.sourceCause = e
 		return e
 	}
-	if e := f.numericCall(func() error { return m.modular.SetInt32(&f.constant, 1) }); e != nil {
+	if e := f.setMemberConstantOne(); e != nil {
 		f.sourceCause = e
 		return e
 	}
@@ -348,6 +345,23 @@ func (f *PolynomialFactors) SourceFinalize() error {
 	if e := f.identity(); e != nil {
 		return e
 	}
+	if f.factorCallerExecuting() || f.memberSet.executing || f.memberSet.finishing || f.constantInvocation.executing || f.constantInvocation.finishing {
+		return ErrPolynomialPending
+	}
+	// Finish the younger invoked helper's actual source suffix before entering
+	// the class Reset/member destructor. Unjoined allocation roots alone do
+	// not block the older source suffix once its scoped NUM DT has completed.
+	if f.memberSet.active {
+		if e := f.finishFactorMemberSetSource(); e != nil {
+			return e
+		}
+	}
+	if f.constantInvocation.active {
+		if e := f.finishFactorConstantSource(); e != nil {
+			return e
+		}
+	}
+
 	if f.sourceCause != nil {
 		return f.sourceCause
 	}
@@ -391,6 +405,15 @@ func (f *PolynomialFactors) Cleanup() error {
 	if e := f.identity(); e != nil {
 		return e
 	}
+	if f.factorCallerExecuting() || f.memberSet.executing || f.memberSet.finishing || f.constantInvocation.executing || f.constantInvocation.finishing {
+		return ErrPolynomialPending
+	}
+	if e := f.cleanupFactorMemberSet(false); e != nil {
+		return e
+	}
+	if e := f.cleanupFactorConstantInvocation(&f.constantInvocation.direct, false); e != nil {
+		return e
+	}
 	m := f.manager.core
 	if e := f.cleanupMultiply(); e != nil {
 		return e
@@ -427,6 +450,12 @@ func (f *PolynomialFactors) Cleanup() error {
 	if e := m.integer.Del(&f.constant); e != nil {
 		return e
 	}
+	if e := f.cleanupFactorMemberSet(true); e != nil {
+		return e
+	}
+	if e := f.cleanupFactorConstantInvocation(&f.constantInvocation.direct, true); e != nil {
+		return e
+	}
 	if e := f.numeric.cleanup(m.integer); e != nil {
 		return e
 	}
@@ -449,6 +478,9 @@ func (f *PolynomialFactors) CloseChecked() error {
 	if f.closed {
 		return nil
 	}
+	if f.factorCallerExecuting() || f.memberSet.executing || f.memberSet.finishing || f.constantInvocation.executing || f.constantInvocation.finishing {
+		return ErrPolynomialPending
+	}
 	f.closing = true
 	if e := f.Cleanup(); e != nil {
 		f.cleanupCause = e
@@ -460,7 +492,9 @@ func (f *PolynomialFactors) CloseChecked() error {
 	if e := f.factors.close(f.manager.core); e != nil {
 		return e
 	}
-	f.manager.core.integer.budget.Release(f.header + uint64(cap(f.phases)))
+	f.manager.core.integer.budget.Release(f.header + uint64(cap(f.phases)) + uint64(cap(f.memberSetHistory))*uint64(reflect.TypeOf(polynomialFactorMemberSetHistory{}).Size()) + uint64(cap(f.constantHistory))*uint64(reflect.TypeOf(polynomialFactorConstantHistory{}).Size()))
+	f.constantHistory = nil
+	f.memberSetHistory = nil
 	f.header = 0
 	f.phases = nil
 	f.closed = true

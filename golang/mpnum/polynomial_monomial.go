@@ -32,6 +32,8 @@ type MonomialManagerConfig struct {
 	Profile   memory.SmallAllocatorProfile
 }
 type monomialLocation struct {
+	toPolynomialCohort                 *polynomialToPolynomialScope
+	toPolynomialInvocation             uint64
 	pseudoCohort                       *polynomialPseudoDivisionScope
 	pseudoInvocation                   uint64
 	dividesCohort                      *polynomialDividesScope
@@ -56,6 +58,8 @@ type monomialLocation struct {
 	live, headerInitialized, published bool
 }
 type monomialCreation struct {
+	toPolynomialParent       *polynomialToPolynomialScope
+	toPolynomialInvocation   uint64
 	coefficientParent        *polynomialCoefficientScope
 	coefficientInvocation    uint64
 	generation               uint64
@@ -385,6 +389,7 @@ func (m *MonomialManager) incRefCore(a Monomial) error {
 	}
 	l.acknowledgeArithmeticProduct(a)
 	l.acknowledgeDividesCreated(a)
+	l.acknowledgeToPolynomialCreated(a)
 	l.acknowledgePseudoCreated(a)
 	if d := l.compositionCohort; d != nil && uint64(l.compositionSlot) < uint64(len(d.orphans)) && d.orphans[l.compositionSlot] == a {
 		d.orphans[l.compositionSlot] = Monomial{}

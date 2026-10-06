@@ -62,6 +62,11 @@ func (s *sourceLimbBuffer) expandWithPNReceipt(r *memory.Runtime, receipt *natur
 	if r.SizeTBits() == 32 {
 		request = uint64(uint32(request))
 	}
+	if receipt != nil && receipt.context != nil && receipt.bound(true) {
+		if e := receipt.context.factorHistoryContext.prepareFactorHistory(receipt.context.owner.manager); e != nil {
+			return e
+		}
+	}
 	block, e := r.Allocate(request)
 	if block != (memory.Block{}) {
 		s.pending = block

@@ -14,20 +14,32 @@ import (
 // generated global allocator binding is represented by the real borrowed
 // Integer Runtime when neither explicit source pointer is supplied.
 type MultivariatePolynomialManagerConfig struct {
-	Core      MultivariatePolynomialConfig
-	Allocator *memory.SmallAllocator
+	Core          MultivariatePolynomialConfig
+	Allocator     *memory.SmallAllocator
+	Factorization UPolynomialFactorizationConfig
 }
 
 // The core is the actual cell/arithmetic implementation object. These are real
 // remaining imp members, not separately initialized arithmetic shadows. Embedded
 // owners are charged by this class header and have no second standalone charge.
 type MultivariatePolynomialManager struct {
+	factorInline                                               polynomialFactorConstantInvocationReceipt
+	factorFrames                                               []*polynomialFactorCoreFrame
+	factorCoreInvocation                                       uint64
+	factorRoot                                                 polynomialFactorCoreInvocationReceipt
+	factorUnivariateHistory                                    []polynomialFactorUnivariateHistory
+	factorUnivariate                                           polynomialFactorUnivariateScope
+	factorNumeralVector                                        polynomialFactorNumeralVectorScope
+	factorNumeralVectorHistory                                 []polynomialFactorNumeralVectorHistory
+	factorConfig                                               UPolynomialFactorizationConfig
+	factorService                                              *UPolynomialFactorizationService
 	pscChain2                                                  polynomialPSCChain2Scope
 	pscChain1                                                  polynomialPSCChain1Scope
 	discriminant                                               polynomialDiscriminantScope
 	subresultant                                               polynomialSubresultantChainScope
 	conversion                                                 polynomialGlobalConversionScope
 	toPolynomial                                               polynomialToPolynomialScope
+	toPolynomialHistory                                        []polynomialToPolynomialHistory
 	gcdFrames                                                  []*polynomialGCDFunctionScope
 	gcdDepth                                                   uint32
 	normalization                                              polynomialNormalizeScope
@@ -83,7 +95,7 @@ func NewMultivariatePolynomialManager(c MultivariatePolynomialManagerConfig) (*M
 	if e := c.Core.Integer.budget.Reserve(h); e != nil {
 		return nil, e
 	}
-	m := &MultivariatePolynomialManager{header: h, originalBudget: c.Core.Integer.budget}
+	m := &MultivariatePolynomialManager{header: h, originalBudget: c.Core.Integer.budget, factorConfig: c.Factorization}
 	m.self = m
 	fail := func(e error) (*MultivariatePolynomialManager, error) {
 		if m.core != nil && e == m.core {

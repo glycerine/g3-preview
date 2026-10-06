@@ -52,6 +52,10 @@ type IntegerManager struct {
 	addMulInvocation                       integerAddMulScope
 	copyAllocation                         integerCopyAllocationScope
 	normalizationExecuting                 bool
+	factorNumeralExecuting                 bool
+	factorCoreCaller                       *polynomialFactorCoreFrame
+	factorUnivariateCaller                 *MultivariatePolynomialManager
+	factorNumeralVectorCaller              *MultivariatePolynomialManager
 	self                                   *IntegerManager
 	memory                                 *memory.Runtime
 	allocator                              *memory.SmallAllocator
@@ -346,6 +350,9 @@ func (m *IntegerManager) allocateWithSourceContext(capacity, size uint32, s *int
 	if roots != nil {
 		out = &outcome
 	}
+	if e := context.prepareFactorHistory(m); e != nil {
+		return 0, e
+	}
 	backing, e := allocateSourceCellWithOutcome(m.allocator, capacity, out)
 	// Capture the physical prefix before charged descriptor preparation.
 	m.pendingCell = backing
@@ -404,7 +411,7 @@ func (m *IntegerManager) CloseChecked() error {
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
 	}
-	if m.rawInvocationExecuting() || m.copyAllocation.executing || m.normalizationExecuting {
+	if m.rawInvocationExecuting() || m.copyAllocation.executing || m.normalizationExecuting || m.factorNumeralExecuting || m.factorNumeralVectorCallerExecuting() || m.factorUnivariateCallerExecuting() || m.factorCoreCallerExecuting() {
 		return ErrPolynomialPending
 	}
 	if m.closed {

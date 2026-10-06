@@ -64,7 +64,7 @@ func (m *RationalManager) SourceFinalize() error {
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
 	}
-	if m.z != nil && (m.z.copyAllocation.executing || m.z.normalizationExecuting) {
+	if m.z != nil && (m.z.copyAllocation.executing || m.z.normalizationExecuting || m.z.factorNumeralExecuting || m.z.factorNumeralVectorCallerExecuting() || m.z.factorUnivariateCallerExecuting() || m.z.factorCoreCallerExecuting()) {
 		return ErrPolynomialPending
 	}
 	if m.closed || m.sourceFinalized {
