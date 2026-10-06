@@ -37909,7 +37909,18 @@
         "mpnum/algebraic_neg_history_source_test.go",
         "mpnum/algebraic_neg_invocation.go",
         "mpnum/algebraic_neg_source_test.go",
-        "mpnum/algebraic_neg_owner_cleanup_source_test.go"
+        "mpnum/algebraic_neg_owner_cleanup_source_test.go",
+        "mpnum/integer_allocation_invocation_context.go",
+        "mpnum/integer_raw_invocation.go",
+        "mpnum/mpq_owner_cleanup.go",
+        "mpnum/mpq_source_finalize.go",
+        "mpnum/mpz.go",
+        "mpnum/polynomial_derivative_allocation_context.go",
+        "mpnum/polynomial_factor_history_allocation.go",
+        "mpnum/upolynomial_eval_binary_callback_source_test.go",
+        "mpnum/upolynomial_eval_binary_invocation.go",
+        "mpnum/upolynomial_eval_binary_prefix_source_test.go",
+        "mpnum/upolynomial_eval_binary_source_test.go"
       ],
       "tests": [
         "TestUPolynomialScalarExtentAndLayout",
@@ -38069,7 +38080,11 @@
         "TestAlgebraicNegCoreCloseOwnsActualRetainedHornerChild",
         "TestAlgebraicNegLiteralNullBasicAndRoot",
         "TestAlgebraicNegMinimumEveryActualReservationPrefix",
-        "TestAlgebraicNegRootHornerEveryActualReservationPrefix"
+        "TestAlgebraicNegRootHornerEveryActualReservationPrefix",
+        "TestUPolynomialEvalSignBinaryPublicBodyAndNumeralDT",
+        "TestUPolynomialEvalSignBinaryEveryActualReservationPrefix",
+        "TestUPolynomialEvalSignBinaryLiteralDyadicHornerBranches",
+        "TestUPolynomialEvalSignBinaryActualCallbackOwnerAndTupleRefusal"
       ],
       "conditionals": [
         {
@@ -39132,6 +39147,17 @@
             "TestAlgebraicNegLiteralNullBasicAndRoot",
             "TestAlgebraicNegMinimumEveryActualReservationPrefix",
             "TestAlgebraicNegRootHornerEveryActualReservationPrefix"
+          ]
+        },
+        {
+          "name": "upolynomial.cpp:1734-1764 public binary eval_sign_at direct lexical scope and source/own lifetimes",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_eval.go",
+          "tests": [
+            "TestUPolynomialEvalSignBinaryPublicBodyAndNumeralDT",
+            "TestUPolynomialEvalSignBinaryEveryActualReservationPrefix",
+            "TestUPolynomialEvalSignBinaryLiteralDyadicHornerBranches",
+            "TestUPolynomialEvalSignBinaryActualCallbackOwnerAndTupleRefusal"
           ]
         }
       ],

@@ -15,11 +15,17 @@ func (m *UPolynomialManager) sourceFinalizeWithHenselOwners(r *upolyHenselPairIn
 	return m.sourceFinalizeWithCallerOwners(r, c, nil)
 }
 func (m *UPolynomialManager) sourceFinalizeWithCallerOwners(r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope, p *upolyFactorPrimePreparationInvocationReceipt) error {
+	if m.binaryEvaluationExecuting() {
+		return ErrUPolynomialCleanupPending
+	}
 	if m != nil && m.self == m && m.algebraicNegCaller != nil && m.algebraicNegCaller.negationExecuting() {
 		return ErrUPolynomialCleanupPending
 	}
 	if m == nil || m.self != m || m.config.Integer == nil {
 		return ErrUPolynomialOwner
+	}
+	if m.binaryEvaluation.active && m.binaryEvaluation.sourceCause != nil {
+		return m.binaryEvaluation.sourceCause
 	}
 	if m.mignotteCallPending() && !m.henselDestructorAuthorized(r, false) && !m.henselCallerDestructorAuthorized(c, false) && !m.primePreparationDestructorAuthorized(p, false) {
 		return ErrUPolynomialCleanupPending

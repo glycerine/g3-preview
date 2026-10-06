@@ -138,14 +138,24 @@ func (m *UPolynomialManager) evalSignBinaryWithNegScope(v UPolynomialView, b *Bi
 	if b == nil {
 		return 0, ErrUPolynomialOwner
 	}
-	ki := b.k
-	var local [2]Int
-	values := &local
+	k := b.k
+	ki := k
+	var values *[2]Int
 	context := integerAllocationInvocationContext{}
 	var child *integerAddMulInvocationReceipt
 	if parent == nil {
-		defer m.modular.Del(&local[0])
-		defer m.modular.Del(&local[1])
+		q, e := m.beginBinaryEvaluation()
+		if e != nil {
+			return 0, e
+		}
+		q.target = v
+		values = &q.values
+		context = q.context()
+		child = &q.addMul
+		z := m.config.Integer
+		old := z.binaryEvaluationCaller
+		z.binaryEvaluationCaller = m
+		defer func() { q.executing = false; cause = q.finish(cause); z.binaryEvaluationCaller = old }()
 	} else {
 		if parent.context(false).algebraicNegFrame(m.config.Integer) == nil || parent.owner.config.Polynomials != m {
 			return 0, ErrAlgebraicOwner
@@ -200,7 +210,7 @@ func (m *UPolynomialManager) evalSignBinaryWithNegScope(v UPolynomialView, b *Bi
 		if e != nil {
 			return 0, e
 		}
-		ki += b.k
+		ki += k
 	}
 	return m.sign(r)
 }

@@ -7,6 +7,9 @@ package mpnum
 import "reflect"
 
 func (c integerAllocationInvocationContext) prepareFactorHistory(z *IntegerManager) error {
+	if q := c.binaryEvaluationFrame(z); q != nil {
+		return q.prepareHistory()
+	}
 	if c.pn != nil && c.pn.owner != nil && c.pn.owner.self == c.pn.owner && c.pn == &c.pn.owner.normalization && c.pn.invocation == c.pnInvocation && c.pn.active && c.pn.executing && c.pn.owner.manager == z {
 		return c.pn.factorHistoryContext.prepareFactorHistory(z)
 	}
