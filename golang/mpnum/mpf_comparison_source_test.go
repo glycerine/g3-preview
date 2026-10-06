@@ -35,7 +35,7 @@ func TestArbitraryFloatComparisonIndependentIEEEPairs(t *testing.T) {
 				call func(*ArbitraryFloat, *ArbitraryFloat) (bool, error)
 				want bool
 			}{
-				{"eq", m.Eq, fx == fy}, {"lt", m.Lt, fx < fy}, {"lte", m.Lte, fx <= fy}, {"gt", m.Gt, fx > fy}, {"gte", m.Gte, fx >= fy},
+				{"eq", m.Eq, fx == fy}, {"lt", m.Lt, fx < fy}, {"lte", m.Lte, fx <= fy}, {"le", m.Le, fx <= fy}, {"gt", m.Gt, fx > fy}, {"gte", m.Gte, fx >= fy}, {"ge", m.Ge, fx >= fy},
 			} {
 				got, e := op.call(&x, &y)
 				serviceMust(t, e)
