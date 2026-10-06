@@ -35,7 +35,7 @@ func (m *IntegerModularManager) normalizeWithSourceContext(out *Int, context int
 	}
 
 	if r := context.factorNumeralVector; r != nil && m.manager.factorNumeralVectorRoots(context) != nil && r.manager.upm.modular == m {
-		e := m.pNormalizeWithReceipt(out, &r.frame.normalize)
+		e := m.pNormalizeWithFactorHistory(out, &r.frame.normalize, context)
 		if r.frame.sourceCause == nil {
 			r.frame.sourceCause = m.pNormalizeInvocationSourceCause(&r.frame.normalize)
 		}

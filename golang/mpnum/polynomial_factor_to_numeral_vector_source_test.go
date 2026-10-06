@@ -101,13 +101,19 @@ func TestPolynomialFactorToNumeralVectorRetainsHistoryAcrossActualReuse(t *testi
 	z.budget.FailAfter(0)
 	archiveCause := full.toNumeralVectorWithReceipt(p, &output, nil)
 	if archiveCause == nil || !numericPhysicalReservationRefusal(archiveCause) {
-		t.Fatal("actual archive reservation", archiveCause)
+		t.Fatal("actual new source allocation frontier refusal", archiveCause)
 	}
 	retained, ok := full.factorNumeralVectorDiagnostic(&old)
-	if !ok || retained != before || invocation != full.factorNumeralVector.invocation {
-		t.Fatal("failed archive changed prior invocation")
+	if !ok || retained != before || invocation+1 != full.factorNumeralVector.invocation {
+		t.Fatal("allocation refusal changed prior history or did not begin actual new source invocation")
 	}
+	// This refusal is now inside a real new source call, so acknowledge its
+	// actual reached child tuple before the next invocation.
+	refused := full.factorNumeralVector.direct
+	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, nil, 0)
 	z.budget.FailAfter(-1)
+	serviceMust(t, full.cleanupFactorNumeralVector(&refused, false))
+	serviceMust(t, full.cleanupFactorNumeralVector(&refused, true))
 	var later polynomialFactorNumeralVectorReceipt
 	serviceMust(t, full.toNumeralVectorWithReceipt(p, &output, &later))
 	values := append([]Int(nil), full.upm.values(&output)...)

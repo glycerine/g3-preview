@@ -1,4 +1,5 @@
 // Licensed under the MIT license.
+// Source: src/util/vector.h:59-100; src/math/polynomial/upolynomial.cpp:164-203.
 // Concrete typed storage for actual svector<mpz> coefficient ownership.
 package mpnum
 
@@ -122,9 +123,20 @@ func (m *UPolynomialManager) backingSlot() (uint32, error) {
 	return uint32(len(m.store.backings)), nil
 }
 func (m *UPolynomialManager) grow(s *upolyVectorState) error {
+	return m.growWithFactorNumeralVectorReceipt(s, nil)
+}
+func (m *UPolynomialManager) growWithFactorNumeralVectorReceipt(s *upolyVectorState, r *polynomialFactorNumeralVectorReceipt) error {
 	n, bytes, e := upolyNextCapacity(uint64(s.capacity), uint64(reflect.TypeOf(Int{}).Size()), uint64(int(^uint(0)>>1)))
 	if e != nil {
 		return e
+	}
+	if r != nil {
+		if r.manager == nil || !r.manager.matchesFactorNumeralVector(r) || r.manager.upm != m || r.frame.output != s || !r.frame.active || !r.frame.executing || r.manager.core.callbackDepth != 0 {
+			return ErrUPolynomialOwner
+		}
+		if e := r.manager.archiveFactorNumeralVector(); e != nil {
+			return e
+		}
 	}
 	slot, e := m.backingSlot()
 	if e != nil {
@@ -164,11 +176,14 @@ func (m *UPolynomialManager) grow(s *upolyVectorState) error {
 	return nil
 }
 func (m *UPolynomialManager) reserve(s *upolyVectorState, n uint32) error {
+	return m.reserveWithFactorNumeralVectorReceipt(s, n, nil)
+}
+func (m *UPolynomialManager) reserveWithFactorNumeralVectorReceipt(s *upolyVectorState, n uint32, r *polynomialFactorNumeralVectorReceipt) error {
 	if n <= s.size {
 		return nil
 	}
 	for n > s.capacity {
-		if e := m.grow(s); e != nil {
+		if e := m.growWithFactorNumeralVectorReceipt(s, r); e != nil {
 			return e
 		}
 	}

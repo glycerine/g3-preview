@@ -9,6 +9,7 @@ import (
 )
 
 type polynomialNormalizeScope struct {
+	converterHistoryParent           polynomialFactorNumeralVectorReceipt
 	som                              polynomialSOMNormalizeInvocationReceipt
 	directReceipt                    polynomialNormalizeInvocationReceipt
 	executing, finishing             bool
@@ -192,9 +193,15 @@ func (m *MultivariatePolynomialManager) cleanupNormalizationPhase(abort bool) (e
 func (m *MultivariatePolynomialManager) Normalize(p Polynomial) (Polynomial, error) {
 	return m.normalizeWithReceipt(p, nil)
 }
-func (m *MultivariatePolynomialManager) normalizeWithReceipt(p Polynomial, receipt *polynomialNormalizeInvocationReceipt) (result Polynomial, err error) {
+func (m *MultivariatePolynomialManager) normalizeWithReceipt(p Polynomial, receipt *polynomialNormalizeInvocationReceipt) (Polynomial, error) {
+	return m.normalizeWithFactorNumeralVectorHistory(p, receipt, nil)
+}
+func (m *MultivariatePolynomialManager) normalizeWithFactorNumeralVectorHistory(p Polynomial, receipt *polynomialNormalizeInvocationReceipt, parent *polynomialFactorNumeralVectorReceipt) (result Polynomial, err error) {
 	if e := m.ready(); e != nil {
 		return Polynomial{}, e
+	}
+	if parent != nil && (!m.matchesFactorNumeralVector(parent) || !parent.frame.active || !parent.frame.executing || m.core.callbackDepth != 0) {
+		return Polynomial{}, ErrPolynomialPending
 	}
 	c := m.core
 	zero, e := c.IsZero(p)
@@ -269,6 +276,9 @@ func (m *MultivariatePolynomialManager) normalizeWithReceipt(p Polynomial, recei
 			}
 			started = true
 			m.normalization.executing = true
+			if parent != nil {
+				m.normalization.converterHistoryParent = *parent
+			}
 			if receipt != nil {
 				*receipt = polynomialNormalizeInvocationReceipt{m, &m.normalization, m.normalization.invocation}
 			}
@@ -302,6 +312,9 @@ func (m *MultivariatePolynomialManager) normalizeWithReceipt(p Polynomial, recei
 	}
 	started = true
 	m.normalization.executing = true
+	if parent != nil {
+		m.normalization.converterHistoryParent = *parent
+	}
 	if receipt != nil {
 		*receipt = polynomialNormalizeInvocationReceipt{m, &m.normalization, m.normalization.invocation}
 	}

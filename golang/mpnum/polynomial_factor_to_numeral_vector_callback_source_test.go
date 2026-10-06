@@ -9,6 +9,9 @@ import (
 )
 
 func TestPolynomialFactorToNumeralVectorTransportCannotRetireExecutingOwner(t *testing.T) {
+	polynomialToNumeralVectorTransportCannotRetireExecutingOwner(t, false)
+}
+func polynomialToNumeralVectorTransportCannotRetireExecutingOwner(t *testing.T, selected bool) {
 	for _, operation := range []string{"fullSource", "fullClose", "coreSource", "coreClose", "integerSource", "integerClose", "rationalSource", "rationalClose", "publicSet", "typedSource", "typedOwn"} {
 		t.Run(operation, func(t *testing.T) {
 			b := arena.NewBudget(1 << 27)
@@ -18,10 +21,12 @@ func TestPolynomialFactorToNumeralVectorTransportCannotRetireExecutingOwner(t *t
 			var callbackOut, callbackInput Int
 			var p Polynomial
 			var output upolyVectorState
+			var captured polynomialFactorNumeralVectorReceipt
 			active, seen := false, false
 			rt, e := memory.NewRuntime(memory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f memory.Failure) error {
 				if active {
 					seen = true
+					captured = full.factorNumeralVector.direct
 					before := rtStateForFactors(fs)
 					fullClosing, fullSource, fullStage := full.closing, full.sourceStarted, full.cleanupStage
 					coreClosing, coreSource, coreStage := full.core.closing, full.core.sourceStarted, full.core.closeStage
@@ -63,7 +68,7 @@ func TestPolynomialFactorToNumeralVectorTransportCannotRetireExecutingOwner(t *t
 					case "typedOwn":
 						err = full.cleanupFactorNumeralVector(&full.factorNumeralVector.direct, true)
 					case "publicSet":
-						err = full.toNumeralVectorWithReceipt(p, &output, nil)
+						err = full.toNumeralVectorSource(p, 0, selected, &output, nil)
 
 					}
 					newValue, inspectError := z.Compare(&callbackOut, &z.two64)
@@ -108,13 +113,32 @@ func TestPolynomialFactorToNumeralVectorTransportCannotRetireExecutingOwner(t *t
 			serviceMust(t, e)
 			serviceMust(t, rt.SetMaxSize(1))
 			active = true
-			cause := full.toNumeralVectorWithReceipt(p, &output, nil)
+			cause := full.toNumeralVectorSource(p, 0, selected, &output, nil)
 			active = false
 			if !seen || !numericPhysicalReservationRefusal(cause) {
 				t.Fatal("actual SET returning transport", seen, cause)
 			}
 			polynomialImpPhysicalAuditNamedRaw(t, full, []Polynomial{p}, []*Int{&a, &callbackInput, &callbackOut, &fs.constant, &fs.local}, fs.header+uint64(cap(fs.constantHistory))*uint64(reflect.TypeOf(polynomialFactorConstantHistory{}).Size()), []memory.Block{held})
 			serviceMust(t, rt.SetMaxSize(0))
+			serviceMust(t, full.cleanupFactorNumeralVector(&full.factorNumeralVector.direct, false))
+			serviceMust(t, full.upm.reset(&output))
+			full.upm.freeBacking(&output)
+			serviceMust(t, full.cleanupFactorNumeralVector(&full.factorNumeralVector.direct, true))
+			before, ok := full.factorNumeralVectorDiagnostic(&captured)
+			if !ok || before.bodyCause == nil || before != full.factorNumeralVectorSnapshot() {
+				t.Fatal("callback receipt did not retain FINAL source/own history", before, full.factorNumeralVectorSnapshot())
+			}
+			serviceMust(t, full.toNumeralVectorSource(full.core.zero, 0, selected, &output, nil))
+			after, ok := full.factorNumeralVectorDiagnostic(&captured)
+			if !ok || after != before {
+				t.Fatal("callback-captured old history changed on later call", after, before)
+			}
+			used := b.Used()
+			state := output
+			serviceMust(t, full.cleanupFactorNumeralVector(&captured, true))
+			if used != b.Used() || output != state {
+				t.Fatal("old callback receipt affected later output")
+			}
 			serviceMust(t, full.cleanupFactorNumeralVector(&full.factorNumeralVector.direct, false))
 			serviceMust(t, full.upm.reset(&output))
 			full.upm.freeBacking(&output)

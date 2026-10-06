@@ -39088,7 +39088,18 @@
         "mpnum/upolynomial_store_adoption.go",
         "upolynomial_coefficient_store_adoption_test.go",
         "mpnum/upolynomial_source_finalize.go",
-        "mpnum/upolynomial_source_finalize_test.go"
+        "mpnum/upolynomial_source_finalize_test.go",
+        "mpnum/polynomial_derivative_allocation_context.go",
+        "mpnum/polynomial_factor_history_allocation.go",
+        "mpnum/polynomial_factor_to_numeral_vector.go",
+        "mpnum/polynomial_factor_to_numeral_vector_callback_source_test.go",
+        "mpnum/polynomial_factor_to_numeral_vector_source_test.go",
+        "mpnum/polynomial_normalize.go",
+        "mpnum/polynomial_store.go",
+        "mpnum/polynomial_to_numeral_erased_history_source_test.go",
+        "mpnum/polynomial_to_numeral_own_history_source_test.go",
+        "mpnum/polynomial_to_numeral_variable.go",
+        "mpnum/polynomial_to_numeral_variable_source_test.go"
       ],
       "tests": [
         "TestUPolynomialScalarExtentAndLayout",
@@ -39188,7 +39199,16 @@
         "TestUPolynomialSourceFinalizeUnconstructedTailPrefix",
         "TestUPolynomialSourceFinalizeFirstEntryConsumedLeafGuard",
         "TestUPolynomialSourceFinalizeFreshNullMember",
-        "TestUPolynomialRecombinationTrialRelatedOwnerTransport"
+        "TestUPolynomialRecombinationTrialRelatedOwnerTransport",
+        "TestPolynomialToNumeralSelectedVariableLiteralFilter",
+        "TestPolynomialToNumeralSelectedVariableEveryBIGPrefix",
+        "TestPolynomialToNumeralSelectedVariablePublicOutputBinding",
+        "TestPolynomialToNumeralSelectedVariableActualOwnerReentry",
+        "TestPolynomialToNumeralSelectedVariableHistoryAcrossActualReuse",
+        "TestPolynomialToNumeralZeroReuseErasesHistoryReservation",
+        "TestPolynomialToNumeralSelectedVariableMatchedOwnHistory",
+        "TestPolynomialFactorToNumeralVectorRetainsHistoryAcrossActualReuse",
+        "TestPolynomialFactorToNumeralVectorTransportCannotRetireExecutingOwner"
       ],
       "conditionals": [
         {
@@ -39604,6 +39624,29 @@
           "tests": [
             "TestUPolynomialRecombinationTrialRelatedOwnerTransport"
           ]
+        },
+        {
+          "name": "upolynomial.h:426-450 selected-variable to_numeral_vector overload with literal Normalize then ORIGINAL-p degree/filter/SET/publication",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_to_numeral_variable.go",
+          "tests": [
+            "TestPolynomialToNumeralSelectedVariableLiteralFilter",
+            "TestPolynomialToNumeralSelectedVariableEveryBIGPrefix",
+            "TestPolynomialToNumeralSelectedVariablePublicOutputBinding",
+            "TestPolynomialToNumeralSelectedVariableActualOwnerReentry",
+            "TestPolynomialToNumeralSelectedVariableHistoryAcrossActualReuse"
+          ]
+        },
+        {
+          "name": "upolynomial.h:401-450 both converters: allocation-frontier diagnostic histories and repeated erased-zero reuse",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_factor_to_numeral_vector.go",
+          "tests": [
+            "TestPolynomialToNumeralZeroReuseErasesHistoryReservation",
+            "TestPolynomialToNumeralSelectedVariableMatchedOwnHistory",
+            "TestPolynomialFactorToNumeralVectorRetainsHistoryAcrossActualReuse",
+            "TestPolynomialFactorToNumeralVectorTransportCannotRetireExecutingOwner"
+          ]
         }
       ],
       "ownership": [
@@ -39623,7 +39666,10 @@
         "Selected sequence/Sturm/transform/Descartes/bounds algorithms translated. RowView binds source coeffs(i) plus size(i); source unsigned header8 is extent arithmetic while actual Go metadata arrays charge4*capacity and slice fields are in the charged cold owner. Source printers, full root isolation/refinement, multivariate conversion, factorization and algebraic consumers remain open; source units remain partial.",
         "Owning reads and checked scalar lifetimes are Go adapters. Full-capacity guard rejects undersized source wrapped allocations after separate literal uint32 growth checks; raw allocation/header publication for that undefined domain is not represented. Multivariate conversion, factorization, algebraic consumers, full printers/TRACE and nonselected alternatives remain open.",
         "Shared coefficient directory is a charged Go lifetime adapter for actual source buffers, without copying coefficients between related cores. Independent pools remain distinct. Prime/factor algorithms and multivariate conversion remain unported in this chunk.",
-        "Cold store-binding adoption is an explicit Go lifetime adapter, with retained successful metadata prefixes before source state swaps. Cross-IntegerManager buffer ownership still requires the real shared MPZ backend. Factor algorithms, multivariate conversion and whole source-unit completion remain open; these three tests add independent ownership evidence, not registered C++ assertions."
+        "Cold store-binding adoption is an explicit Go lifetime adapter, with retained successful metadata prefixes before source state swaps. Cross-IntegerManager buffer ownership still requires the real shared MPZ backend. Factor algorithms, multivariate conversion and whole source-unit completion remain open; these three tests add independent ownership evidence, not registered C++ assertions.",
+        "No registered source driver calls this selected-variable overload; the new assertions are independent semantic and actual ownership checks. Public output belongs to the borrowed actual full-manager UPolynomial manager. Normal/error source suffix completes only reached np/Normalize children; CleanupNumeralVectorConversion separately acknowledges exact unjoined child roots and never deletes caller output. Existing charged converter history is reused; this overload adds no new source NUM or pre-entry archival reserve. set_size trims leading zeros after selected-degree reserve. No whole UP unit promotion.",
+        "Genuine erased-zero RED47337 corrected: no history reservation before Normalize/inline reused zero conversion. Current immutable diagnostic records are materialized only at reached Integer/Natural/vector/factory allocation branches; exact returned inline receipt holds readonly final diagnostic values. Callback-captured old receipts retain final body/source/first-own and actual child tuple history across later reuse. Histories never supply acquisition or cleanup authority. Obsolete pre-entry archive-refusal fixture expectations were migrated to the reached new source invocation while preserving old history and named before-lift graph assertions.",
+        "The exported Full-manager selected-variable wrapper is bound to actual full.core/full.upm. UnivariateManager is a Go borrowing accessor, not a C++ getter. Source upolynomial.h:426-450 independently takes pm from p.m() and the UP target m(); arbitrary foreign-manager profiles and whole generic header completion remain unclaimed."
       ]
     },
     {

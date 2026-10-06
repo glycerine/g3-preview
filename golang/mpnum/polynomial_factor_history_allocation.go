@@ -1,4 +1,5 @@
-// Source leaves: src/util/mpz.cpp:allocate; src/util/buffer.h:expand.
+// Source: src/util/mpz.h:124-149; src/util/buffer.h:39-46;
+// src/math/polynomial/upolynomial.h:401-450.
 // Adapter diagnostic records are materialized only at reached allocations.
 package mpnum
 
@@ -7,6 +8,21 @@ import "reflect"
 func (c integerAllocationInvocationContext) prepareFactorHistory(z *IntegerManager) error {
 	if c.pn != nil && c.pn.owner != nil && c.pn.owner.self == c.pn.owner && c.pn == &c.pn.owner.normalization && c.pn.invocation == c.pnInvocation && c.pn.active && c.pn.executing && c.pn.owner.manager == z {
 		return c.pn.factorHistoryContext.prepareFactorHistory(z)
+	}
+	if r := c.factorNumeralVector; r != nil && z.factorNumeralVectorRoots(c) != nil {
+		return r.manager.archiveFactorNumeralVector()
+	}
+	if r := c.normalizationReceipt(z); r != nil {
+		return prepareConverterParentHistory(z, &r.frame.converterHistoryParent)
+	}
+	if r := c.rawReceipt(z); r != nil && r.frame.normalization.manager != nil && z.normalizationAllocationRoots(&r.frame.normalization) != nil {
+		return prepareConverterParentHistory(z, &r.frame.normalization.frame.converterHistoryParent)
+	}
+	if r := c.somNormalizeReceipt(z); r != nil {
+		return r.manager.prepareNormalizationConverterHistoryAtAllocation(nil, nil, r)
+	}
+	if r := c.rawReceipt(z); r != nil && r.frame.somNormalize.manager != nil && z.somNormalizeAllocationRoots(&r.frame.somNormalize) != nil {
+		return r.frame.somNormalize.manager.prepareNormalizationConverterHistoryAtAllocation(nil, nil, &r.frame.somNormalize)
 	}
 	if r := c.factorConstant; r != nil && z.factorConstantContextRoots(c) != nil {
 		return r.manager.archiveFactorConstantHistory()
@@ -44,4 +60,42 @@ func (f *PolynomialFactors) updateFactorMemberSetHistory() {
 	if s.historyRecorded {
 		f.memberSetHistory[s.historyIndex] = polynomialFactorMemberSetHistory{s.invocation, s.normalize, s.bodyCause, s.sourceCause, s.cleanupCause}
 	}
+}
+
+func prepareConverterParentHistory(z *IntegerManager, r *polynomialFactorNumeralVectorReceipt) error {
+	if r.manager == nil {
+		return nil
+	}
+	c := integerAllocationInvocationContext{factorNumeralVector: r, factorNumeralVectorInvocation: r.invocation}
+	if z.factorNumeralVectorRoots(c) == nil {
+		return ErrPolynomialPending
+	}
+	return r.manager.archiveFactorNumeralVector()
+}
+
+// Diagnostic-only allocation records follow concrete reached normalization
+// child tuples. They never acquire NUM, reference, vector or factory authority.
+func (c *MultivariatePolynomialCore) prepareNormalizationConverterHistoryAtAllocation(v *polynomialVector, f *polynomialFactoryInvocationReceipt, som *polynomialSOMNormalizeInvocationReceipt) error {
+	if c == nil || c.self != c || c.callbackDepth != 0 {
+		return nil
+	}
+	r := c.normalizationOwner
+	if r.manager == nil || r.manager.core != c || !r.manager.hasNormalizeInvocationHistory(&r) || !r.frame.active || !r.frame.executing {
+		return nil
+	}
+	s := r.frame
+	reached := false
+	if v != nil && (v == &c.cheap.as || v == &c.cheap.ms) && c.cheap.matchesAppendInvocation(&s.append) {
+		reached = true
+	}
+	if f != nil && c.matchesFactoryInvocation(f) && *f == s.factory {
+		reached = true
+	}
+	if som != nil && c.hasSOMNormalizeInvocationHistory(som) && *som == s.som {
+		reached = true
+	}
+	if !reached {
+		return nil
+	}
+	return prepareConverterParentHistory(c.integer, &s.converterHistoryParent)
 }

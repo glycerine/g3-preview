@@ -51,6 +51,9 @@ func (v *polynomialVector) expand(m *MultivariatePolynomialCore) error {
 	if v.raw != (memory.Block{}) && (old == 0 || n <= old || bytes <= oldBytes) {
 		return memory.Failure{Kind: memory.FailureVectorOverflow}
 	}
+	if e := m.prepareNormalizationConverterHistoryAtAllocation(v, nil, nil); e != nil {
+		return e
+	}
 	if v.raw == (memory.Block{}) {
 		v.pending, e = m.memory.Allocate(uint64(bytes))
 		if e != nil {
@@ -392,6 +395,9 @@ func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []Int, ms [
 	var e error
 	if outcome := m.factoryAllocationOutcome(receipt); outcome != nil {
 		var started bool
+		if e := m.prepareNormalizationConverterHistoryAtAllocation(nil, receipt, nil); e != nil {
+			return Polynomial{}, e
+		}
 		raw, started, e = m.monomials.allocator.AllocateWithOutcomeStarted(uint64(requested), outcome)
 		if started {
 			m.factoryInvocation.allocationStarted = true

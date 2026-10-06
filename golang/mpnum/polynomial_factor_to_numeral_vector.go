@@ -1,4 +1,4 @@
-// Source: src/math/polynomial/upolynomial.h:401-423.
+// Source: src/math/polynomial/upolynomial.h:401-450.
 package mpnum
 
 import (
@@ -7,11 +7,15 @@ import (
 )
 
 type polynomialFactorNumeralVectorReceipt struct {
+	diagnostic polynomialFactorNumeralVectorHistory
+	returned   bool
 	manager    *MultivariatePolynomialManager
 	frame      *polynomialFactorNumeralVectorScope
 	invocation uint64
 }
 type polynomialFactorNumeralVectorScope struct {
+	historyRecorded                           bool
+	historyIndex                              int
 	phase                                     uint8
 	referenceConstructed, sourceReferenceDone bool
 	invocation                                uint64
@@ -35,7 +39,13 @@ func (m *IntegerManager) factorNumeralVectorRoots(context integerAllocationInvoc
 	}
 	return &r.frame.numeric
 }
-func (m *MultivariatePolynomialManager) toNumeralVectorWithReceipt(p Polynomial, output *upolyVectorState, r *polynomialFactorNumeralVectorReceipt) (cause error) {
+func (m *MultivariatePolynomialManager) toNumeralVectorWithReceipt(p Polynomial, output *upolyVectorState, r *polynomialFactorNumeralVectorReceipt) error {
+	return m.toNumeralVectorSource(p, 0, false, output, r)
+}
+func (m *MultivariatePolynomialManager) toNumeralVectorVariableWithReceipt(p Polynomial, variable uint32, output *upolyVectorState, r *polynomialFactorNumeralVectorReceipt) error {
+	return m.toNumeralVectorSource(p, variable, true, output, r)
+}
+func (m *MultivariatePolynomialManager) toNumeralVectorSource(p Polynomial, variable uint32, selected bool, output *upolyVectorState, r *polynomialFactorNumeralVectorReceipt) (cause error) {
 	if e := m.ready(); e != nil {
 		return e
 	}
@@ -43,7 +53,7 @@ func (m *MultivariatePolynomialManager) toNumeralVectorWithReceipt(p Polynomial,
 		return ErrUPolynomialOwner
 	}
 	c := m.core
-	if modularSourceDebug {
+	if modularSourceDebug && !selected {
 		ok, e := c.IsUnivariate(p)
 		if e != nil {
 			return e
@@ -56,11 +66,8 @@ func (m *MultivariatePolynomialManager) toNumeralVectorWithReceipt(p Polynomial,
 	if s.active || s.executing || s.finishing || c.callbackDepth != 0 || s.invocation == ^uint64(0) {
 		return ErrPolynomialPending
 	}
-	if e := m.archiveFactorNumeralVector(); e != nil {
-		return e
-	}
 	*s = polynomialFactorNumeralVectorScope{invocation: s.invocation + 1, active: true, executing: true, constructed: true, referenceConstructed: true, output: output}
-	s.direct = polynomialFactorNumeralVectorReceipt{m, s, s.invocation}
+	s.direct = polynomialFactorNumeralVectorReceipt{manager: m, frame: s, invocation: s.invocation}
 	c.integer.factorNumeralVectorCaller = m
 	if r != nil {
 		*r = s.direct
@@ -72,8 +79,14 @@ func (m *MultivariatePolynomialManager) toNumeralVectorWithReceipt(p Polynomial,
 			s.bodyCause = cause
 		}
 		cause = errors.Join(cause, m.finishFactorNumeralVectorSource())
+		m.updateFactorNumeralVectorHistory()
+		s.direct.diagnostic = m.factorNumeralVectorSnapshot()
+		s.direct.returned = true
+		if r != nil {
+			*r = s.direct
+		}
 	}()
-	np, e := m.normalizeWithReceipt(p, &s.normalization)
+	np, e := m.normalizeWithFactorNumeralVectorHistory(p, &s.normalization, &s.direct)
 	if e != nil {
 		return e
 	}
@@ -85,11 +98,16 @@ func (m *MultivariatePolynomialManager) toNumeralVectorWithReceipt(p Polynomial,
 	if e != nil {
 		return e
 	}
-	degree, e := c.TotalDegree(p)
+	var degree uint32
+	if selected {
+		degree, e = c.Degree(p, variable)
+	} else {
+		degree, e = c.TotalDegree(p)
+	}
 	if e != nil {
 		return e
 	}
-	if e = m.upm.reserve(output, degree+1); e != nil {
+	if e = m.upm.reserveWithFactorNumeralVectorReceipt(output, degree+1, &s.direct); e != nil {
 		return e
 	}
 	for i := uint32(0); i <= degree; i++ {
@@ -106,11 +124,32 @@ func (m *MultivariatePolynomialManager) toNumeralVectorWithReceipt(p Polynomial,
 		if e != nil {
 			return e
 		}
-		k, e := c.monomials.degreeCore(term)
-		if e != nil {
-			return e
+		var k uint32
+		if selected {
+			monomialSize, err := c.monomials.sizeCore(term)
+			if err != nil {
+				return err
+			}
+			if monomialSize != 0 {
+				if monomialSize != 1 {
+					continue
+				}
+				power, err := c.monomials.powerCore(term, 0)
+				if err != nil {
+					return err
+				}
+				if power.Var != variable {
+					continue
+				}
+				k = power.Degree
+			}
+		} else {
+			k, e = c.monomials.degreeCore(term)
+			if e != nil {
+				return e
+			}
 		}
-		if modularSourceDebug && k > degree {
+		if modularSourceDebug && !selected && k > degree {
 			return ErrPolynomialAssertion
 		}
 		value, e := m.upm.read(m.upm.stateView(output), k)
@@ -183,6 +222,11 @@ func (m *MultivariatePolynomialManager) cleanupFactorNumeralVector(r *polynomial
 		if cause != nil && s.cleanupCause == nil {
 			s.cleanupCause = cause
 		}
+		m.updateFactorNumeralVectorHistory()
+		s.direct.diagnostic = m.factorNumeralVectorSnapshot()
+		s.direct.returned = true
+		r.diagnostic = s.direct.diagnostic
+		r.returned = true
 	}()
 	if e := m.upm.modular.cleanupPNormalizeInvocation(&s.normalize, false); e != nil {
 		return e
@@ -223,8 +267,11 @@ type polynomialFactorNumeralVectorHistory struct {
 
 func (m *MultivariatePolynomialManager) archiveFactorNumeralVector() error {
 	s := &m.factorNumeralVector
-	if s.invocation == 0 {
+	if s.historyRecorded {
 		return nil
+	}
+	if !s.active || !s.executing || m.core.callbackDepth != 0 {
+		return ErrPolynomialPending
 	}
 	old := cap(m.factorNumeralVectorHistory)
 	if len(m.factorNumeralVectorHistory) == old {
@@ -238,8 +285,19 @@ func (m *MultivariatePolynomialManager) archiveFactorNumeralVector() error {
 		m.factorNumeralVectorHistory = rows
 		m.originalBudget.Release(uint64(old) * stride)
 	}
-	m.factorNumeralVectorHistory = append(m.factorNumeralVectorHistory, polynomialFactorNumeralVectorHistory{s.invocation, s.phase, s.referenceConstructed, s.sourceReferenceDone, s.normalization, s.normalize, s.bodyCause, s.sourceCause, s.cleanupCause})
+	s.historyIndex, s.historyRecorded = len(m.factorNumeralVectorHistory), true
+	m.factorNumeralVectorHistory = append(m.factorNumeralVectorHistory, m.factorNumeralVectorSnapshot())
 	return nil
+}
+func (m *MultivariatePolynomialManager) factorNumeralVectorSnapshot() polynomialFactorNumeralVectorHistory {
+	s := &m.factorNumeralVector
+	return polynomialFactorNumeralVectorHistory{s.invocation, s.phase, s.referenceConstructed, s.sourceReferenceDone, s.normalization, s.normalize, s.bodyCause, s.sourceCause, s.cleanupCause}
+}
+func (m *MultivariatePolynomialManager) updateFactorNumeralVectorHistory() {
+	s := &m.factorNumeralVector
+	if s.historyRecorded {
+		m.factorNumeralVectorHistory[s.historyIndex] = m.factorNumeralVectorSnapshot()
+	}
 }
 func (m *MultivariatePolynomialManager) factorNumeralVectorDiagnostic(r *polynomialFactorNumeralVectorReceipt) (polynomialFactorNumeralVectorHistory, bool) {
 	if m == nil || m.self != m || r == nil || r.manager != m || r.frame != &m.factorNumeralVector || r.invocation == 0 {
@@ -253,6 +311,11 @@ func (m *MultivariatePolynomialManager) factorNumeralVectorDiagnostic(r *polynom
 		if row.invocation == r.invocation {
 			return row, true
 		}
+	}
+	// Completed allocation-free calls return a value-only diagnostic snapshot.
+	// It grants no source/own cleanup authority; active matching stays exact.
+	if r.returned && r.invocation <= s.invocation && r.diagnostic.invocation == r.invocation {
+		return r.diagnostic, true
 	}
 	return polynomialFactorNumeralVectorHistory{}, false
 }
