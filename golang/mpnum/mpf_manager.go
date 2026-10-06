@@ -17,6 +17,10 @@ import (
 // manager-local mpz-wrapper IDs. No wrapper exists in default empty maps.
 // MPF numeral algorithms and populated powers2 operations remain separate.
 type ArbitraryFloatManager struct {
+	formattedSet             arbitraryFloatFormattedSetScope
+	formattedSetHistories    *arbitraryFloatFormattedSetHistory
+	formattedSetHistoryBytes uint64
+
 	roundHistories                                          *arbitraryFloatRoundHistory
 	roundHistoryBytes                                       uint64
 	roundScope                                              arbitraryFloatRoundScope
@@ -116,7 +120,7 @@ func (m *ArbitraryFloatManager) SourceFinalize() error {
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
 	}
-	if m.rationalConversion.executing || m.rationalConversion.finishing || m.valueExecuting || m.formatInvocationExecuting() || (m.integer != nil && m.integer.mpfBorrowedSourceCallbackActive()) {
+	if m.formattedSet.executing || m.formattedSet.finishing || m.rationalConversion.executing || m.rationalConversion.finishing || m.valueExecuting || m.formatInvocationExecuting() || (m.integer != nil && m.integer.mpfBorrowedSourceCallbackActive()) {
 		return ErrPolynomialPending
 	}
 	// The caller-owned format context is a younger lexical scope. Query only
@@ -135,6 +139,12 @@ func (m *ArbitraryFloatManager) SourceFinalize() error {
 	}
 	if !m.constructorComplete {
 		return arena.ErrClosed
+	}
+	if e := m.finishFormattedSetSource(); e != nil {
+		if m.sourceCause == nil {
+			m.sourceCause = e
+		}
+		return e
 	}
 	if e := m.finishRoundSqrtSource(); e != nil {
 		if m.sourceCause == nil {
@@ -192,7 +202,7 @@ func (m *ArbitraryFloatManager) Close() error {
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
 	}
-	if m.rationalConversion.executing || m.rationalConversion.finishing || m.valueExecuting || m.formatInvocationExecuting() || (m.integer != nil && m.integer.mpfBorrowedSourceCallbackActive()) {
+	if m.formattedSet.executing || m.formattedSet.finishing || m.rationalConversion.executing || m.rationalConversion.finishing || m.valueExecuting || m.formatInvocationExecuting() || (m.integer != nil && m.integer.mpfBorrowedSourceCallbackActive()) {
 		return ErrPolynomialPending
 	}
 	// Registered diagnostic metadata is not ownership. Refuse only actual
@@ -210,6 +220,9 @@ func (m *ArbitraryFloatManager) Close() error {
 			m.ownCause = e
 		}
 		return e
+	}
+	if e := m.CleanupFormattedSet(); e != nil {
+		return stop(e)
 	}
 	if e := m.CleanupRoundSqrt(); e != nil {
 		return stop(e)
@@ -273,6 +286,7 @@ func (m *ArbitraryFloatManager) Close() error {
 	}
 	m.releasePowerWrapperHistory()
 	m.releaseValueCopyHistory()
+	m.releaseFormattedSetHistories()
 	m.releaseRoundHistory()
 	m.releaseValueInputHistory()
 	m.releaseRationalConversionHistory()
@@ -289,7 +303,7 @@ func (m *ArbitraryFloatManager) OwnedStorageBytes() uint64 {
 	if m == nil || m.self != m {
 		panic(memory.ErrRuntimeOwner)
 	}
-	n := m.header + m.roundHistoryBytes + m.valueHistoryBytes + m.powerWrapperBytes + m.conversionHistoryBytes + m.inputHistoryBytes
+	n := m.header + m.formattedSetHistoryBytes + m.roundHistoryBytes + m.valueHistoryBytes + m.powerWrapperBytes + m.conversionHistoryBytes + m.inputHistoryBytes
 	var z *IntegerManager
 	if m.rational != nil {
 		n += m.rational.headerBytes

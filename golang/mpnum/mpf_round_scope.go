@@ -8,6 +8,7 @@ import "github.com/glycerine/g3/golang/memory"
 // Actual lexical NUM storage is reflected in the MPF owner header. Declaration
 // flags change only at literal reached constructors; sticky is branch-scoped.
 type arbitraryFloatRoundScope struct {
+	parentFormattedSet                                  integerAllocationInvocationContext
 	receipt                                             *ArbitraryFloatRoundReceipt
 	numeric                                             polynomialNumericRoots
 	history                                             *arbitraryFloatRoundHistory

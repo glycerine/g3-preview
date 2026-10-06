@@ -5,6 +5,7 @@ package mpnum
 import (
 	"errors"
 	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/memory"
 	"math"
 )
 
@@ -77,9 +78,15 @@ func (m *ArbitraryFloatManager) roundOverflow(mode ArbitraryFloatRoundingMode, x
 func (m *ArbitraryFloatManager) Round(mode ArbitraryFloatRoundingMode, x *ArbitraryFloat) (err error) {
 	return m.RoundWithReceipt(mode, x, nil)
 }
-func (m *ArbitraryFloatManager) RoundWithReceipt(mode ArbitraryFloatRoundingMode, x *ArbitraryFloat, receipt *ArbitraryFloatRoundReceipt) (err error) {
+func (m *ArbitraryFloatManager) RoundWithReceipt(mode ArbitraryFloatRoundingMode, x *ArbitraryFloat, receipt *ArbitraryFloatRoundReceipt) error {
+	return m.roundWithParentContext(mode, x, receipt, integerAllocationInvocationContext{})
+}
+func (m *ArbitraryFloatManager) roundWithParentContext(mode ArbitraryFloatRoundingMode, x *ArbitraryFloat, receipt *ArbitraryFloatRoundReceipt, parent integerAllocationInvocationContext) (err error) {
 	if e := m.valueGuard(x); e != nil {
 		return e
+	}
+	if parent.mpfFormattedSet != nil && parent.formattedSetFrame(m.integer, true) == nil {
+		return memory.ErrRuntimeOwner
 	}
 	s := &m.roundScope
 	if s.active {
@@ -89,7 +96,11 @@ func (m *ArbitraryFloatManager) RoundWithReceipt(mode ArbitraryFloatRoundingMode
 		return ErrPolynomialPending
 	}
 	invocation := s.invocation + 1
-	*s = arbitraryFloatRoundScope{manager: m, invocation: invocation, active: true, executing: true, receipt: receipt}
+	*s = arbitraryFloatRoundScope{manager: m, invocation: invocation, active: true, executing: true, receipt: receipt, parentFormattedSet: parent}
+	if fs := parent.formattedSetFrame(m.integer, true); fs != nil {
+		fs.roundFrame = s
+		fs.roundInvocation = invocation
+	}
 	m.valueExecuting = true
 	defer func() {
 		m.valueExecuting = false

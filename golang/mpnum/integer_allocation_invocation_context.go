@@ -8,6 +8,8 @@ package mpnum
 type integerAllocationInvocationContext struct {
 	integerEvaluation            *upolyIntegerEvaluationScope
 	integerEvaluationInvocation  uint64
+	mpfFormattedSet              *arbitraryFloatFormattedSetScope
+	mpfFormattedSetInvocation    uint64
 	rationalEvaluation           *upolyRationalEvaluationScope
 	rationalEvaluationInvocation uint64
 	binaryEvaluation             *upolyBinaryEvaluationScope
@@ -144,6 +146,12 @@ func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomial
 		return nil
 	}
 	if c.upolyDisplay != nil && c.upolyDisplayFrame(m) == nil {
+		return nil
+	}
+	if c.mpfFormattedSet != nil {
+		if s := c.formattedSetFrame(m, true); s != nil && s.history != nil {
+			return &s.history.numeric
+		}
 		return nil
 	}
 	if c.mpfRound != nil || c.mpfRoundSqrt != nil {

@@ -76,6 +76,9 @@ func (z *IntegerManager) prepareFloatCopyRecord(c *arbitraryFloatCopyBinding) er
 	if e := z.validateFloatCopyBinding(c); e != nil {
 		return e
 	}
+	if e := c.conversionContext.prepareFormattedSetHistory(z); e != nil {
+		return e
+	}
 	if e := c.conversionContext.prepareConversionHistory(z); e != nil {
 		return e
 	}

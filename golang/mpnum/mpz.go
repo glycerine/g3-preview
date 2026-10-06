@@ -360,6 +360,9 @@ func (m *IntegerManager) allocateWithSourceContext(capacity, size uint32, s *int
 	if e := context.prepareFactorFrontendConstantHistory(m); e != nil {
 		return 0, e
 	}
+	if e := context.prepareFormattedSetHistory(m); e != nil {
+		return 0, e
+	}
 	if e := context.prepareRoundHistory(m); e != nil {
 		return 0, e
 	}
@@ -404,6 +407,9 @@ func (m *IntegerManager) allocateWithSourceContext(capacity, size uint32, s *int
 		}
 	}
 	if e != nil {
+		if transfer := m.captureFormattedSetAllocation(context, backing, &outcome); transfer != nil {
+			return 0, polynomialNewtonJoin(e, transfer)
+		}
 		if transfer := m.captureRoundAllocationOutcome(context, backing, &outcome); transfer != nil {
 			return 0, polynomialNewtonJoin(e, transfer)
 		}
@@ -435,6 +441,9 @@ func (m *IntegerManager) allocateWithSourceContext(capacity, size uint32, s *int
 	}
 	slot, gen, e := m.cells.Allocate()
 	if e != nil {
+		if transfer := m.captureFormattedSetAllocation(context, backing, &outcome); transfer != nil {
+			return 0, polynomialNewtonJoin(e, transfer)
+		}
 		if transfer := m.captureRoundAllocationOutcome(context, backing, &outcome); transfer != nil {
 			return 0, polynomialNewtonJoin(e, transfer)
 		}
