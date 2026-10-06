@@ -1,19 +1,25 @@
-// Licensed under the MIT license.
-// Source mpz.cpp display and util/buffer.h lexical sbuffer<char,1024>.
+// Licensed under the MIT license; see LICENSE.txt.
+// Source: src/util/mpz.cpp:1385-1410; src/util/buffer.h:84-95.
+// Source author: Leonardo de Moura.
 package mpnum
 
 import (
 	"github.com/glycerine/g3/golang/arena"
 	"github.com/glycerine/g3/golang/memory"
+	"math"
 )
 
 type integerCharacterScope struct {
 	buffer                      sourceCharBuffer
+	invocation                  uint64
 	active, completed, pending  bool
 	originalCause, cleanupCause error
 }
 
 func (m *NaturalManager) beginIntegerCharacters(n uint32) error {
+	return m.beginIntegerCharactersTracked(n, nil, nil)
+}
+func (m *NaturalManager) beginIntegerCharactersTracked(n uint32, service *RationalService, receipt *NumeralInsertionReceipt) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -21,7 +27,13 @@ func (m *NaturalManager) beginIntegerCharacters(n uint32) error {
 	if s.active || s.pending {
 		return arena.ErrInvalidSlot
 	}
-	*s = integerCharacterScope{active: true}
+	if s.invocation == math.MaxUint64 {
+		return arena.ErrBounds
+	}
+	*s = integerCharacterScope{active: true, invocation: s.invocation + 1}
+	if receipt != nil {
+		*receipt = NumeralInsertionReceipt{service: service, natural: m, character: s, invocation: s.invocation, active: true, characterOwned: true}
+	}
 	if e := s.buffer.resize(m.runtime, n); e != nil {
 		s.active = false
 		s.pending = true
@@ -29,6 +41,9 @@ func (m *NaturalManager) beginIntegerCharacters(n uint32) error {
 		return e // failed constructor's destructor must not run
 	}
 	s.completed = true
+	if receipt != nil {
+		receipt.characterCompleted = true
+	}
 	return nil
 }
 func (m *NaturalManager) destroyIntegerCharacters() error {
@@ -53,7 +68,7 @@ func (m *NaturalManager) destroyIntegerCharacters() error {
 		s.pending = true
 		return arena.ErrInvalidSlot
 	}
-	*s = integerCharacterScope{}
+	*s = integerCharacterScope{invocation: s.invocation}
 	return nil
 }
 
@@ -79,7 +94,7 @@ func (m *NaturalManager) cleanupOutputFormatting() error {
 			m.charFormatting.cleanupCause = e
 			return e
 		}
-		m.charFormatting = integerCharacterScope{}
+		m.charFormatting = integerCharacterScope{invocation: m.charFormatting.invocation}
 	}
 	return nil
 }

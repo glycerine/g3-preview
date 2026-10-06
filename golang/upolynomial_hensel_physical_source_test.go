@@ -392,6 +392,32 @@ func upolyHenselAuditPhysical(t *testing.T, cores []*mpnum.UPolynomialManager, f
 			}
 		}
 	}
+	// The explicitly passed manager owns these concrete lexical formatting
+	// fields. Enumerate only their actual returned acquisition tokens, never
+	// infer missing roots from Runtime live blocks.
+	formatOwner := z.FieldByName("natural").Elem()
+	addFormattingRaw := func(v reflect.Value) {
+		for _, field := range []string{"raw", "pending"} {
+			key := rawKey(v.FieldByName(field))
+			if key[1] != 0 {
+				if key[0] != runtime.FieldByName("origin").Uint() || rawRoots[key] {
+					t.Fatal("foreign or duplicate lexical formatting root", key)
+				}
+				rawRoots[key] = true
+			}
+		}
+	}
+	characters := formatOwner.FieldByName("charFormatting")
+	if characters.FieldByName("active").Bool() || characters.FieldByName("pending").Bool() || characters.FieldByName("completed").Bool() {
+		addFormattingRaw(characters.FieldByName("buffer"))
+	}
+	formatting := formatOwner.FieldByName("formatting")
+	if formatting.FieldByName("active").Bool() || formatting.FieldByName("pending").Bool() || formatting.FieldByName("completed").Uint() != 0 {
+		locals := formatting.FieldByName("locals")
+		for i := 0; i < locals.Len(); i++ {
+			addFormattingRaw(locals.Index(i))
+		}
+	}
 	for i := 0; i < blocks.Len(); i++ {
 		block := blocks.Index(i)
 		if block.FieldByName("live").Bool() {

@@ -246,6 +246,10 @@ func (m *ASTManager) registerNode(r astNodeRef) (astNodeRef, error) {
 		if x = m.incNode(child); x != nil {
 			return fail(x)
 		}
+		if frame := m.traceAcquisitionExecuting; frame != nil && frame.node == r {
+			frame.references[frame.acquired] = child
+			frame.acquired++
+		}
 		if m.nodeAt(r.slot).kind == ASTApp && children > 0 {
 			m.updateAppFlags(r, child)
 		}

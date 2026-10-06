@@ -148,7 +148,11 @@ func (m *ASTManager) MkVar(index uint32, sort ASTHandle) (ASTHandle, error) {
 		return ASTHandle{}, e
 	}
 	*m.varAt(r.slot) = astVarRecord{index: index, sort: s}
+	original := r
 	r, e = m.registerNode(r)
+	if e == nil && r == original {
+		e = m.traceVar(r)
+	}
 	return m.external(r), e
 }
 func (m *ASTManager) funcFlags(decl astNodeRef) (ASTFuncFlags, error) {
@@ -175,6 +179,11 @@ func (m *ASTManager) mkAppCore(decl astNodeRef, args []ASTHandle) (astNodeRef, e
 	return m.mkAppCoreArguments(decl, astAppArguments{slice: args, count: uint32(len(args))})
 }
 func (m *ASTManager) mkAppCoreArguments(decl astNodeRef, args astAppArguments) (astNodeRef, error) {
+	frame, prepareError := m.prepareTraceAcquisition(args.count)
+	if prepareError != nil {
+		return astNodeRef{}, prepareError
+	}
+	defer func() { m.finishTraceAcquisition(frame) }()
 	// Source allocates app storage before check_args/coercion. The arithmetic
 	// plugin is an explicit dependency; no fabricated int/real cast is emitted.
 	r, e := m.allocateNode(ASTApp)
@@ -229,7 +238,21 @@ func (m *ASTManager) mkAppCoreArguments(decl astNodeRef, args astAppArguments) (
 		m.freeNodeStorage(r)
 		return astNodeRef{}, e
 	}
-	return m.registerNode(r)
+	original := r
+	if frame != nil {
+		frame.node = r
+	}
+	r, e = m.registerNode(r)
+	if e == nil && r == original {
+		if frame != nil {
+			frame.hash = m.nodeAt(r.slot).hash
+		}
+		e = m.traceApp(r)
+		if e != nil {
+			e = m.catchTraceAllocation(frame, e)
+		}
+	}
+	return r, e
 }
 func (m *ASTManager) mkApp(decl astNodeRef, args []ASTHandle) (astNodeRef, error) {
 	if uint64(len(args)) > math.MaxUint32 {
@@ -456,6 +479,10 @@ func (m *ASTManager) MkQuantifier(spec ASTQuantifierSpec) (ASTHandle, error) {
 		m.freeNodeStorage(r)
 		return ASTHandle{}, e
 	}
+	original := r
 	r, e = m.registerNode(r)
+	if e == nil && r == original {
+		e = m.traceQuantifier(r)
+	}
 	return m.external(r), e
 }

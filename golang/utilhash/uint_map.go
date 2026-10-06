@@ -1,6 +1,6 @@
 // Licensed under the MIT license.
 // Concrete translation of u_map<unsigned> in src/util/map.h (2006-10-14)
-// and core_hashtable/default_hash_entry in hashtable.h (2006-09-11).
+// and core_hashtable/default_hash_entry in src/util/hashtable.h (2006-09-11).
 // Author: Leonardo de Moura.
 package utilhash
 
@@ -43,14 +43,35 @@ func newUintMapCapacity(config UintMapConfig, n uint32) (*UintMap, error) {
 	if e := config.Budget.Reserve(root); e != nil {
 		return nil, e
 	}
-	m := &UintMap{config: config, epoch: 1, rootBytes: root}
-	table, amount, e := m.allocateTable(n)
-	if e != nil {
+	m := &UintMap{rootBytes: root}
+	if e := m.constructMembers(config, n); e != nil {
 		config.Budget.Release(root)
 		return nil, e
 	}
-	m.table, m.tableBytes = table, amount
 	return m, nil
+}
+
+// InitializeInlineUintMap constructs the actual embedded u_map<unsigned> member
+// in src/ast/ast.h:1480. Its containing owner charges the concrete wrapper once;
+// the same src/util/hashtable.h:244-256 engine acquires only its entry array.
+// The receiver must be a fresh, unconstructed value. Failed construction leaves
+// no completed member or payload; Close is explicit Go owning retirement only.
+func InitializeInlineUintMap(m *UintMap, config UintMapConfig) error {
+	if m == nil || m.epoch != 0 || m.closed || m.table != nil || m.rootBytes != 0 || m.tableBytes != 0 || m.size != 0 || m.deleted != 0 {
+		return arena.ErrConfig
+	}
+	return m.constructMembers(config, 8)
+}
+
+func (m *UintMap) constructMembers(config UintMapConfig, n uint32) error {
+	m.config, m.epoch = config, 1
+	table, amount, e := m.allocateTable(n)
+	if e != nil {
+		return e
+	}
+	m.table, m.tableBytes = table, amount
+	m.size, m.deleted = 0, 0
+	return nil
 }
 func (m *UintMap) allocateTable(n uint32) ([]uintMapEntry, uint64, error) {
 	if n < 8 || n&(n-1) != 0 || n > 1<<30 || uint64(n) > uint64(^uint(0)>>1)/uintMapEntryBytes {
@@ -83,6 +104,10 @@ func (m *UintMap) Size() uint32     { return m.size }
 func (m *UintMap) Empty() bool      { return m.size == 0 }
 func (m *UintMap) Capacity() uint32 { return uint32(len(m.table)) }
 func (m *UintMap) Deleted() uint32  { return m.deleted }
+
+// StorageBytes names this concrete owner's actual header/entry backing, including
+// embedded construction whose header is charged by its containing owner.
+func (m *UintMap) StorageBytes() uint64 { return m.rootBytes + m.tableBytes }
 
 // The source HASHTABLE_STATISTICS definition is disabled in this baseline.
 func (m *UintMap) CollisionCount() uint64 { return 0 }

@@ -67,9 +67,15 @@ func readDecimalLimb(v limbView, i uint32) (uint32, error) {
 	return v.external[i], nil
 }
 func (m *NaturalManager) sourceToCString(a limbView, dst sourceDecimalDestination, lbuf uint64) error {
-	return m.sourceToCStringScoped(a, dst, lbuf, &m.formatting)
+	return m.sourceToCStringTracked(a, dst, lbuf, nil)
+}
+func (m *NaturalManager) sourceToCStringTracked(a limbView, dst sourceDecimalDestination, lbuf uint64, receipt *NumeralInsertionReceipt) error {
+	return m.sourceToCStringScopedTracked(a, dst, lbuf, &m.formatting, receipt)
 }
 func (m *NaturalManager) sourceToCStringScoped(a limbView, dst sourceDecimalDestination, lbuf uint64, scope *naturalFormattingScope) error {
+	return m.sourceToCStringScopedTracked(a, dst, lbuf, scope, nil)
+}
+func (m *NaturalManager) sourceToCStringScopedTracked(a limbView, dst sourceDecimalDestination, lbuf uint64, scope *naturalFormattingScope, receipt *NumeralInsertionReceipt) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -107,15 +113,19 @@ func (m *NaturalManager) sourceToCStringScoped(a limbView, dst sourceDecimalDest
 		}
 		return dst.write(count, 0)
 	}
-	if e := m.beginFormattingScope(scope, a.size); e != nil {
+	if e := m.beginFormattingScopeTracked(scope, a.size, receipt); e != nil {
 		return e
 	}
 	e := m.sourceCStringBodyScoped(a, dst, scope)
 	cleanup := m.finishFormattingScope(scope)
+	if cleanup == nil && receipt != nil {
+		receipt.formattingOwned = false
+	}
 	if e != nil {
 		if cleanup != nil {
 			scope.originalCause = e
 			scope.cleanupCause = cleanup
+			return &NumeralSourceFailure{BodyCause: e, DestructorCause: cleanup}
 		}
 		return e
 	}

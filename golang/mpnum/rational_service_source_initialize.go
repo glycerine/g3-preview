@@ -41,6 +41,9 @@ func (s *RationalService) InitializeSource() error {
 	if s == nil || s.self != s {
 		return ErrRationalServiceCopy
 	}
+	if s.sourceInsertionExecuting {
+		return arena.ErrInvalidSlot
+	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if s.closed || s.closing {

@@ -17,7 +17,7 @@ func (out *NumericTextStream) AppendCStringView(v ParamsStringView) error {
 	if e != nil {
 		return e
 	} // strlen precedes sentry/badbit.
-	if out.fileBad {
+	if out.fileBad || out.fileFail {
 		return nil
 	}
 	pad, e := out.fieldPadding(n)

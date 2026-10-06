@@ -2,6 +2,8 @@
 // Leonardo de Moura (2006-09-18). Licensed under the MIT license; see LICENSE.txt.
 package mpnum
 
+import "github.com/glycerine/g3/golang/arena"
+
 import "github.com/glycerine/g3/golang/memory"
 
 func (s *RationalService) Error() string { return "mpnum: retained rational service" }
@@ -29,6 +31,9 @@ func (s *RationalService) Cleanup() error { return s.CloseChecked() }
 func (s *RationalService) CloseChecked() error {
 	if s == nil || s.self != s {
 		return ErrRationalServiceCopy
+	}
+	if s.sourceInsertionExecuting {
+		return arena.ErrInvalidSlot
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()

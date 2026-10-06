@@ -172,7 +172,7 @@ func (out *NumericTextStream) appendQIString(s *qiOwnedString) error {
 	}
 	view := s.view()
 	n := s.length // actual data/size fields acquired before insertion.
-	if out.fileBad {
+	if out.fileBad || out.fileFail {
 		return nil
 	}
 	pad, e := out.fieldPadding(n)

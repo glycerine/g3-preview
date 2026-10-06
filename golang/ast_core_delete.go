@@ -1,4 +1,6 @@
-// Licensed under the MIT license.
+// Licensed under the MIT license; see LICENSE.txt.
+// Source: src/ast/ast.cpp:1781-1844.
+// Source author: Leonardo de Moura (2006-09-28).
 // Source delete_node ascending pushes/LIFO pops. Intrusive emergency metadata
 // is a Go continuation adapter only when source worklist allocation would throw.
 package g3
@@ -110,6 +112,9 @@ func (m *ASTManager) deleteNode(first astNodeRef) error {
 		if e := m.deletionAfter(current); e != nil {
 			return e
 		}
+		if astSourceDebug && m.debugRefCount && m.debugFreeIndices.Contains(n.id) {
+			return ErrASTDomain
+		}
 		n = m.nodeAt(current.slot)
 		generator := &m.exprIDs
 		if n.kind == ASTSort || n.kind == ASTFuncDecl {
@@ -117,10 +122,21 @@ func (m *ASTManager) deleteNode(first astNodeRef) error {
 		}
 		// Publication preflight normally makes this infallible. The source OOM
 		// callback still controls its real recycle skip at this exact action site.
-		note(generator.recycle(n.id))
+		if !m.debugRefCount {
+			note(generator.recycle(n.id))
+		}
 		n.deletePhase = 1
 		slot, generation := m.infoForNode(current)
-		if slot != 0 {
+		if slot != 0 && m.debugRefCount {
+			info, e := m.info(slot, generation)
+			if e != nil {
+				return e
+			}
+			// Actual source skips info->del_eh/dealloc at this branch. The Go
+			// containing owner retains this exact allocation for explicit Close.
+			info.retainedByDebug = true
+		}
+		if slot != 0 && !m.debugRefCount {
 			info, e := m.info(slot, generation)
 			if e != nil {
 				return e
@@ -171,6 +187,11 @@ func (m *ASTManager) deleteNode(first astNodeRef) error {
 			n.deleteIndex++
 		}
 		n.deletePhase = 3
+		if m.debugRefCount {
+			if e := m.debugFreeIndices.Insert(n.id, 0); e != nil {
+				return e
+			}
+		}
 		if e := m.freeNodeStorage(current); e != nil {
 			return e
 		}

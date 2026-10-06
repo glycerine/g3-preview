@@ -6,6 +6,7 @@ package mpnum
 import (
 	"github.com/glycerine/g3/golang/arena"
 	"github.com/glycerine/g3/golang/memory"
+	"math"
 )
 
 // Embedded cold ownership is charged by NaturalManager's actual header. Each
@@ -13,6 +14,7 @@ import (
 // scope. Failed constructors do not run the source object's destructor.
 // Their actual raw/pending blocks survive for explicitly named owning cleanup.
 type naturalFormattingScope struct {
+	invocation                  uint64
 	locals                      [3]sourceLimbBuffer
 	completed                   uint8
 	failedLocal                 uint8
@@ -24,13 +26,24 @@ func (m *NaturalManager) beginFormattingLocals(n uint32) error {
 	return m.beginFormattingScope(&m.formatting, n)
 }
 func (m *NaturalManager) beginFormattingScope(s *naturalFormattingScope, n uint32) error {
+	return m.beginFormattingScopeTracked(s, n, nil)
+}
+func (m *NaturalManager) beginFormattingScopeTracked(s *naturalFormattingScope, n uint32, receipt *NumeralInsertionReceipt) error {
 	if e := m.check(); e != nil {
 		return e
 	}
 	if s.active || s.pending {
 		return arena.ErrInvalidSlot
 	}
-	*s = naturalFormattingScope{active: true}
+	if s.invocation == math.MaxUint64 {
+		return arena.ErrBounds
+	}
+	*s = naturalFormattingScope{active: true, invocation: s.invocation + 1}
+	if receipt != nil {
+		receipt.formatting = s
+		receipt.formattingOwned = true
+		receipt.formattingInvocation = s.invocation
+	}
 	sizes := [3]uint32{n, n + 1, 1} // source size_t addition narrowed by mpn_sbuffer
 	for i, size := range sizes {
 		if e := s.locals[i].resize(m.runtime, size); e != nil {
@@ -41,6 +54,7 @@ func (m *NaturalManager) beginFormattingScope(s *naturalFormattingScope, n uint3
 			// Only previously completed local objects have source destructors.
 			if cleanup := m.unwindFormattingScope(s); cleanup != nil {
 				s.cleanupCause = cleanup
+				return &NumeralSourceFailure{BodyCause: e, DestructorCause: cleanup}
 			}
 			return e
 		}
@@ -81,7 +95,7 @@ func (m *NaturalManager) finishFormattingScope(s *naturalFormattingScope) error 
 		s.active = false
 		s.pending = true
 		s.originalCause = e
-		return e
+		return &NumeralSourceFailure{DestructorCause: e}
 	}
 	for i := range s.locals {
 		if s.locals[i].pending != (memory.Block{}) {
@@ -92,7 +106,7 @@ func (m *NaturalManager) finishFormattingScope(s *naturalFormattingScope) error 
 			return arena.ErrInvalidSlot
 		}
 	}
-	*s = naturalFormattingScope{}
+	*s = naturalFormattingScope{invocation: s.invocation}
 	return nil
 }
 
@@ -124,7 +138,7 @@ func (m *NaturalManager) cleanupFormattingScope(s *naturalFormattingScope) error
 			return e
 		}
 	}
-	*s = naturalFormattingScope{}
+	*s = naturalFormattingScope{invocation: s.invocation}
 	return nil
 }
 

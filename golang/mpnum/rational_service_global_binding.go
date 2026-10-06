@@ -32,6 +32,9 @@ func (s *RationalService) BindSourceGlobalSlot(slot **RationalManager) error {
 	if s == nil || s.self != s || slot == nil {
 		return ErrRationalServiceOwner
 	}
+	if s.sourceInsertionExecuting {
+		return arena.ErrInvalidSlot
+	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if s.closed || s.closing {
@@ -62,6 +65,9 @@ func (s *RationalService) SourceEndedStaticMask() (uint16, error) {
 	if s == nil || s.self != s {
 		return 0, ErrRationalServiceOwner
 	}
+	if s.sourceInsertionExecuting {
+		return 0, arena.ErrInvalidSlot
+	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return s.sourceEndedStatics, nil // diagnostic cold history, including stopped teardown
@@ -78,6 +84,9 @@ func (s *RationalService) checkSourceStaticLifetimeLocked(which RationalSourceSt
 func (s *RationalService) CheckSourceStaticLifetime(slot **RationalManager, which RationalSourceStatic) error {
 	if e := s.ValidateSourceGlobalSlot(slot); e != nil {
 		return e
+	}
+	if s.sourceInsertionExecuting {
+		return arena.ErrInvalidSlot
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -104,6 +113,9 @@ func (s *RationalService) InitializeReboundSourceConstants(slot **RationalManage
 	if m == nil || *slot != m {
 		return ErrRationalServiceOwner
 	}
+	if s.sourceInsertionExecuting {
+		return arena.ErrInvalidSlot
+	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return s.initializeConstantsSource(m)
@@ -116,6 +128,9 @@ func (s *RationalService) InitializeReboundSourceConstants(slot **RationalManage
 func (s *RationalService) PublishAcquiredSourceManager(slot **RationalManager, m *RationalManager) error {
 	if e := s.ValidateSourceGlobalSlot(slot); e != nil {
 		return e
+	}
+	if s.sourceInsertionExecuting {
+		return arena.ErrInvalidSlot
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()

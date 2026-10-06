@@ -75,11 +75,11 @@ func (m *ASTManager) infoParameter(r *astInfoRecord, i uint32) (ASTParameter, er
 	if i >= r.count {
 		return ASTParameter{}, ErrASTDomain
 	}
-	s, e := m.readWord(r.parameters, 8+i*8)
+	s, e := m.vectorWord(r.parameters, 8+i*8)
 	if e != nil {
 		return ASTParameter{}, e
 	}
-	g, e := m.readWord(r.parameters, 12+i*8)
+	g, e := m.vectorWord(r.parameters, 12+i*8)
 	return ASTParameter{m.origin, s, g}, e
 }
 func (m *ASTManager) growInfoParameters(slot uint32) error {
@@ -92,29 +92,29 @@ func (m *ASTManager) growInfoParameters(slot uint32) error {
 	if bytes > math.MaxUint32 {
 		return arena.ErrBounds
 	}
-	p, e := m.allocator.Allocate(uint32(bytes))
+	p, e := m.vectorAllocator.Allocate(uint32(bytes))
 	if e != nil {
 		return e
 	}
-	if e = m.writeWord(p, 0, n); e == nil {
-		e = m.writeWord(p, 4, r.count)
+	if e = m.vectorPutWord(p, 0, n); e == nil {
+		e = m.vectorPutWord(p, 4, r.count)
 	}
 	for i := uint32(0); e == nil && i < r.count; i++ {
 		v, x := m.infoParameter(r, i)
 		e = x
 		if e == nil {
-			e = m.writeWord(p, 8+i*8, v.slot)
+			e = m.vectorPutWord(p, 8+i*8, v.slot)
 		}
 		if e == nil {
-			e = m.writeWord(p, 12+i*8, v.generation)
+			e = m.vectorPutWord(p, 12+i*8, v.generation)
 		}
 	}
 	if e != nil {
-		m.allocator.Deallocate(uint32(bytes), p)
+		m.vectorAllocator.Deallocate(uint32(bytes), p)
 		return e
 	}
 	if r.capacity != 0 {
-		if e = m.allocator.Deallocate(r.capacity*8+8, r.parameters); e != nil {
+		if e = m.vectorAllocator.Deallocate(r.capacity*8+8, r.parameters); e != nil {
 			return e
 		}
 	}
@@ -134,15 +134,15 @@ func (m *ASTManager) pushInfoParameter(slot uint32, p ASTParameter) error {
 		return e
 	}
 	r = m.infoAt(slot)
-	if e = m.writeWord(r.parameters, 8+r.count*8, copy.slot); e == nil {
-		e = m.writeWord(r.parameters, 12+r.count*8, copy.generation)
+	if e = m.vectorPutWord(r.parameters, 8+r.count*8, copy.slot); e == nil {
+		e = m.vectorPutWord(r.parameters, 12+r.count*8, copy.generation)
 	}
 	if e != nil {
 		m.dropParameter(copy)
 		return e
 	}
 	r.count++
-	return m.writeWord(r.parameters, 4, r.count)
+	return m.vectorPutWord(r.parameters, 4, r.count)
 }
 
 // dropInfoStorage does not run attachment callbacks. The caller explicitly
@@ -162,7 +162,7 @@ func (m *ASTManager) dropInfoStorage(slot, generation uint32) error {
 		}
 	}
 	if r.capacity != 0 {
-		if e = m.allocator.Deallocate(r.capacity*8+8, r.parameters); e != nil {
+		if e = m.vectorAllocator.Deallocate(r.capacity*8+8, r.parameters); e != nil {
 			return e
 		}
 	}

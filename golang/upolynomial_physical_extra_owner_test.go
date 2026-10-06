@@ -20,6 +20,7 @@ type paramsPhysicalRationalOwner struct {
 }
 
 type upolyPhysicalExtraOwners struct {
+	ASTManagers          []*ASTManager
 	DebugContexts        []*DebugContext
 	ParamsRationalValues []paramsPhysicalRationalOwner
 	ParamsValues         []paramsPhysicalValueOwner
@@ -67,6 +68,28 @@ func upolyPhysicalExtraNumerals(extras []upolyPhysicalExtraOwners, addInt func(r
 			}
 			if raw.FieldByName("normActive").Bool() {
 				addInt(raw.FieldByName("norm"))
+			}
+		}
+		// Only the explicitly supplied owner supplies roots. Its initialized
+		// placement records and acquired lexical value are concrete acquisition
+		// fields, never discoveries from the numeric allocator directory.
+		for _, owner := range x.ASTManagers {
+			if owner == nil || owner.self != owner || owner.closed {
+				panic(ErrASTHandle)
+			}
+			for _, page := range owner.parameters {
+				if page == nil {
+					continue
+				}
+				for i := range page {
+					value := &page[i]
+					if value.live && value.kind == ASTParameterRational {
+						addRat(reflect.ValueOf(&value.rational).Elem().FieldByName("raw"))
+					}
+				}
+			}
+			if owner.lowLevel.active && owner.lowLevel.numeralAcquired {
+				addRat(reflect.ValueOf(&owner.lowLevel.numeral).Elem().FieldByName("raw"))
 			}
 		}
 		for _, owner := range x.ParamsRationalValues {

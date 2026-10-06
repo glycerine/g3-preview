@@ -1,4 +1,6 @@
-// Licensed under the MIT license.
+// Licensed under the MIT license; see LICENSE.txt.
+// Source: src/ast/ast.cpp:917-979.
+// Source author: Leonardo de Moura (2006-09-28).
 package g3
 
 import "reflect"
@@ -6,6 +8,9 @@ import "reflect"
 func (m *ASTManager) finalizeBasic() error {
 	var failure error
 	drop := func(r *astNodeRef) {
+		if m.sourceClosing && failure != nil {
+			return
+		}
 		if r.slot == 0 {
 			return
 		}
@@ -20,33 +25,75 @@ func (m *ASTManager) finalizeBasic() error {
 	array := func(v []astNodeRef) {
 		for i := range v {
 			drop(&v[i])
+			if m.sourceClosing && failure != nil {
+				return
+			}
 		}
 	}
 	drop(&m.basic.boolSort)
+	if m.sourceClosing && failure != nil {
+		return failure
+	}
 	for _, k := range [...]int32{ASTOpTrue, ASTOpFalse, ASTOpAnd, ASTOpOr, ASTOpNot, ASTOpInterp, ASTOpIff, ASTOpXor, ASTOpImplies} {
 		drop(&m.basic.declarations[k])
+		if m.sourceClosing && failure != nil {
+			return failure
+		}
 	}
 	array(m.basic.eq)
+	if m.sourceClosing && failure != nil {
+		return failure
+	}
 	array(m.basic.ite)
+	if m.sourceClosing && failure != nil {
+		return failure
+	}
 	array(m.basic.oeq)
+	if m.sourceClosing && failure != nil {
+		return failure
+	}
 	drop(&m.basic.proofSort)
+	if m.sourceClosing && failure != nil {
+		return failure
+	}
 	for _, k := range [...]int32{ASTPrUndef, ASTPrTrue, ASTPrAsserted, ASTPrGoal, ASTPrModusPonens, ASTPrReflexivity, ASTPrSymmetry, ASTPrTransitivity, ASTPrQuantIntro, ASTPrAndElim, ASTPrNotOrElim, ASTPrRewrite, ASTPrPullQuant, ASTPrPushQuant, ASTPrElimUnusedVars, ASTPrDER, ASTPrQuantInst} {
 		drop(&m.basic.declarations[k])
+		if m.sourceClosing && failure != nil {
+			return failure
+		}
 	}
 	for _, k := range [...]int32{ASTPrMonotonicity, ASTPrTransitivityStar, ASTPrDistributivity, ASTPrRewriteStar} {
 		array(m.basic.proofCaches[k])
+		if m.sourceClosing && failure != nil {
+			return failure
+		}
 	}
 	for _, k := range [...]int32{ASTPrHypothesis, ASTPrIffTrue, ASTPrIffFalse, ASTPrCommutativity, ASTPrDefAxiom, ASTPrLemma} {
 		drop(&m.basic.declarations[k])
+		if m.sourceClosing && failure != nil {
+			return failure
+		}
 	}
 	array(m.basic.proofCaches[ASTPrUnitResolution])
+	if m.sourceClosing && failure != nil {
+		return failure
+	}
 	for _, k := range [...]int32{ASTPrDefIntro, ASTPrIffOEq, ASTPrSkolemize, ASTPrModusPonensOEq} {
 		drop(&m.basic.declarations[k])
+		if m.sourceClosing && failure != nil {
+			return failure
+		}
 	}
 	for _, k := range [...]int32{ASTPrApplyDef, ASTPrNNFPos, ASTPrNNFNeg, ASTPrTheoryLemma} {
 		array(m.basic.proofCaches[k])
+		if m.sourceClosing && failure != nil {
+			return failure
+		}
 	}
 	drop(&m.basic.declarations[ASTPrHyperResolve])
+	if m.sourceClosing && failure != nil {
+		return failure
+	}
 	return failure
 }
 func (m *ASTManager) destroyPluginBacking() {

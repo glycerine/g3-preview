@@ -1,5 +1,5 @@
 // Licensed under the MIT license.
-// src/ast/ast.h::ast_table specialization of src/util/chashtable.h.
+// Source: src/ast/ast.h:920-924 (ast_table), src/util/chashtable.h.
 package g3
 
 import (
@@ -40,7 +40,7 @@ func (m *ASTManager) initTable() error {
 	m.table = astChainTable{cells: a, slots: 8, next: 8, free: chainEnd}
 	return nil
 }
-func (m *ASTManager) astCopyTable(a []astChainCell, slots uint32) (uint32, bool) {
+func (m *ASTManager) astCopyTable(a []astChainCell, slots uint32) (uint32, bool, error) {
 	t := &m.table
 	t.used = 0
 	next := slots
@@ -49,6 +49,9 @@ func (m *ASTManager) astCopyTable(a []astChainCell, slots uint32) (uint32, bool)
 			continue
 		}
 		for i := bucket; i != chainEnd; i = t.cells[i].next {
+			if e := m.validNode(t.cells[i].node); e != nil {
+				return next, false, e
+			}
 			index := m.nodeAt(t.cells[i].node.slot).hash & (slots - 1)
 			if a[index].next == chainFree {
 				a[index] = t.cells[i]
@@ -56,7 +59,7 @@ func (m *ASTManager) astCopyTable(a []astChainCell, slots uint32) (uint32, bool)
 				t.used++
 			} else {
 				if next == uint32(len(a)) {
-					return next, false
+					return next, false, nil
 				}
 				a[next] = a[index]
 				a[index] = t.cells[i]
@@ -65,7 +68,7 @@ func (m *ASTManager) astCopyTable(a []astChainCell, slots uint32) (uint32, bool)
 			}
 		}
 	}
-	return next, true
+	return next, true, nil
 }
 func (m *ASTManager) expandTable() error {
 	slots := uint64(m.table.slots) * 2
@@ -78,7 +81,11 @@ func (m *ASTManager) expandTable() error {
 		if e != nil {
 			return e
 		}
-		next, ok := m.astCopyTable(a, uint32(slots))
+		next, ok, copyError := m.astCopyTable(a, uint32(slots))
+		if copyError != nil {
+			m.budget.Release(astChainBytes(uint32(len(a))))
+			return copyError
+		}
 		if ok {
 			m.budget.Release(astChainBytes(uint32(len(m.table.cells))))
 			m.table.cells = a
@@ -100,6 +107,9 @@ func (m *ASTManager) tableFind(key astNodeRef) (astNodeRef, bool, error) {
 	}
 	for ; i != chainEnd; i = t.cells[i].next {
 		other := t.cells[i].node
+		if e := m.validNode(other); e != nil {
+			return astNodeRef{}, false, e
+		}
 		if hash == m.nodeAt(other.slot).hash {
 			eq, e := m.compareNodes(other, key)
 			if e != nil {
@@ -142,8 +152,14 @@ func (m *ASTManager) tableInsert(key astNodeRef) (astNodeRef, bool, error) {
 	return key, true, nil
 }
 func (m *ASTManager) tableEraseIdentity(key astNodeRef) error {
+	return m.tableEraseCaptured(key, m.nodeAt(key.slot).hash)
+}
+
+// Owning-only matching erasure uses the actual captured insertion token/hash,
+// without dereferencing a source-freed placement or a replacement generation.
+func (m *ASTManager) tableEraseCaptured(key astNodeRef, hash uint32) error {
 	t := &m.table
-	i := m.nodeAt(key.slot).hash & (t.slots - 1)
+	i := hash & (t.slots - 1)
 	prev := uint32(math.MaxUint32)
 	if t.cells[i].next == chainFree {
 		return ErrASTHandle

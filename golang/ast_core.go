@@ -1,15 +1,42 @@
-// Licensed under the MIT license.
+// Licensed under the MIT license; see LICENSE.txt.
+// Source: src/ast/ast.cpp:1297-1479; src/ast/ast.h:1454-1490.
+// Source author: Leonardo de Moura (2006-09-28).
 // Owner-confined ast_manager default no-trace normal and format constructors.
 package g3
 
 import (
+	"errors"
 	"github.com/glycerine/g3/golang/arena"
+	"github.com/glycerine/g3/golang/utilhash"
 	"reflect"
 )
 
 func NewASTManager(c ASTManagerConfig) (*ASTManager, error)       { return newASTManager(c, false) }
 func NewASTFormatManager(c ASTManagerConfig) (*ASTManager, error) { return newASTManager(c, true) }
 func newASTManager(c ASTManagerConfig, format bool) (*ASTManager, error) {
+	m, e := constructSourceASTManager(c, format, nil, nil)
+	if e != nil && m != nil {
+		if cleanup := m.AbortConstruction(); cleanup != nil {
+			return m, errors.Join(e, cleanup)
+		}
+		return nil, e
+	}
+	return m, e
+}
+
+// NewSourceASTManager retains the real failed placement-new context. A failed
+// constructor invokes only reverse completed member DT, never ast_manager's
+// destructor body. Body-acquired file/format pointers remain named for Abort.
+func NewSourceASTManager(c ASTManagerConfig, filename *ParamsStringView) (*ASTManager, error) {
+	var borrowed *astTraceFilename
+	if filename != nil {
+		n := astTraceFilename{params: *filename}
+		borrowed = &n
+	}
+	return constructSourceASTManager(c, false, borrowed, nil)
+}
+
+func constructSourceASTManager(c ASTManagerConfig, format bool, filename *astTraceFilename, borrowedTrace *NumericTextStream) (*ASTManager, error) {
 	if c.Symbols == nil || c.Numerals == nil || c.ProofMode > ASTProofEnabled {
 		return nil, ErrASTDomain
 	}
@@ -37,40 +64,70 @@ func newASTManager(c ASTManagerConfig, format bool) (*ASTManager, error) {
 	m.declIDs = newBudgetedUtilIDGen(1<<31, c.Budget, c.OutOfMemory)
 	// Completed constructor prefixes are owned immediately and unwound by the
 	// same real destructor actions, without touching caller-owned services.
-	fail := func(e error) (*ASTManager, error) { m.closeCore(); return nil, e }
+	fail := func(e error) (*ASTManager, error) {
+		if m.constructorBodyCause == nil {
+			m.constructorBodyCause = e
+		}
+		unwind := m.unwindConstructorMembers()
+		return m, errors.Join(e, unwind)
+	}
 	m.allocator, e = arena.NewSmallBytes(arena.SmallBytesConfig{Alignment: uint32(reflect.TypeOf((*ASTManager)(nil)).Size()), DirectOnly: astSourceDebug, Descriptors: arena.Config{Budget: c.Budget}})
 	if e != nil {
 		return fail(e)
 	}
-	m.vectorAllocator, e = arena.NewSmallBytes(arena.SmallBytesConfig{DirectOnly: true, Descriptors: arena.Config{Budget: c.Budget}})
-	if e != nil {
-		return fail(e)
-	}
-	m.exprArrays = astExprArrayManager{owner: m, allocator: m.allocator, budget: m.budget, id: m.origin, preserve: true}
-	m.dependencies = astDependencyManager{owner: m, allocator: m.allocator}
-	m.dependencyArrays = astDependencyArrayManager{owner: m, allocator: m.allocator, budget: m.budget, id: m.origin, preserve: true}
+	m.constructorMembers |= astCtorAllocator
 	m.families, e = NewFamilyManager(c.Symbols, c.Budget)
 	if e != nil {
 		return fail(e)
 	}
+	m.constructorMembers |= astCtorFamilies
+	m.vectorAllocator, e = arena.NewSmallBytes(arena.SmallBytesConfig{DirectOnly: true, Descriptors: arena.Config{Budget: c.Budget}})
+	if e != nil {
+		return fail(e)
+	}
+	m.constructorMembers |= astCtorVectorAllocator
+	m.exprArrays = astExprArrayManager{owner: m, allocator: m.allocator, budget: m.budget, id: m.origin, preserve: true}
+	m.dependencies = astDependencyManager{owner: m, allocator: m.allocator}
+	m.dependencyArrays = astDependencyArrayManager{owner: m, allocator: m.allocator, budget: m.budget, id: m.origin, preserve: true}
+	m.constructorMembers |= astCtorArrays
 	if e = m.initTable(); e != nil {
 		return fail(e)
 	}
+	m.constructorMembers |= astCtorTable | astCtorIDGenerators
+	if e = utilhash.InitializeInlineUintMap(&m.debugFreeIndices, utilhash.UintMapConfig{Budget: c.Budget, OutOfMemory: c.OutOfMemory}); e != nil {
+		return fail(e)
+	}
+	m.debugFreeComplete = true
+	m.constructorMembers |= astCtorDebugFree
 	m.recFun, e = m.symbols.Intern(":rec-fun")
 	if e != nil {
 		return fail(e)
 	}
+	m.traceStream = borrowedTrace
+	if filename != nil {
+		file, err := newASTTraceFileBorrowed(c.Budget, *filename)
+		if err != nil {
+			m.constructorPendingFile = file
+			return fail(err)
+		}
+		m.traceFile = file
+		m.traceStream = &file.stream
+		m.traceOwner = true
+	}
 	if !format {
 		nested := c
 		nested.ProofMode = ASTProofDisabled
-		m.format, e = newASTManager(nested, true)
-		if e != nil {
-			return fail(e)
+		child, err := constructSourceASTManager(nested, true, nil, m.traceStream)
+		if err != nil {
+			m.constructorPendingFormat = child
+			return fail(err)
 		}
+		m.format = child
 	}
 	if e = m.initManager(c.OutOfMemory); e != nil {
 		return fail(e)
 	}
+	m.constructorComplete = true
 	return m, nil
 }
 func (m *ASTManager) initManager(oom func() bool) error {
@@ -140,15 +197,38 @@ func (m *ASTManager) Close() error {
 	if m == nil || m.self != m {
 		return ErrASTHandle
 	}
+	if m.traceExecuting {
+		return ErrASTPending
+	}
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	if m.closed {
 		return nil
 	}
-	return m.closeCore()
+	if !m.constructorComplete {
+		return m.abortConstructionCore()
+	}
+	if m.sourceDTCompleted {
+		return m.closeSourceOwnedStorageCore()
+	}
+	e := m.closeCore(false)
+	if e != nil && m.errorOwnClose == nil {
+		m.errorOwnClose = e
+	}
+	return e
 }
-func (m *ASTManager) closeCore() error {
+func (m *ASTManager) closeCore(source bool) error {
+	if e := m.llFrameDestroy(!source); e != nil {
+		return e
+	}
+	if !source {
+		if e := m.cleanupTraceAcquisitions(); e != nil {
+			return e
+		}
+	}
 	m.closing = true
+	m.sourceClosing = source
+	defer func() { m.sourceClosing = false }()
 	var failure error
 	note := func(e error) {
 		if failure == nil {
@@ -162,10 +242,16 @@ func (m *ASTManager) closeCore() error {
 				*r = astNodeRef{}
 			}
 			note(e)
+			if source && failure != nil {
+				return failure
+			}
 		}
 	}
 	if m.plugins[0].present {
 		note(m.finalizeBasic())
+		if source && failure != nil {
+			return failure
+		}
 	}
 	m.destroyPluginBacking()
 	// The source manager collects every physical table root after plugins are
@@ -183,10 +269,16 @@ func (m *ASTManager) closeCore() error {
 			}
 			for j := bucket; j != chainEnd; j = m.table.cells[j].next {
 				r := m.table.cells[j].node
+				if e := m.validNode(r); e != nil {
+					return e
+				}
 				for c := uint32(0); c < m.nodeChildCount(r); c++ {
 					child, e := m.nodeChild(r, c)
 					if e != nil {
 						note(e)
+						if source && failure != nil {
+							return failure
+						}
 						continue
 					}
 					m.nodeAt(child.slot).closeMark = true
@@ -196,17 +288,26 @@ func (m *ASTManager) closeCore() error {
 					info, e := m.info(slot, g)
 					if e != nil {
 						note(e)
+						if source && failure != nil {
+							return failure
+						}
 						continue
 					}
 					for c := uint32(0); c < info.count; c++ {
 						p, e := m.infoParameter(info, c)
 						if e != nil {
 							note(e)
+							if source && failure != nil {
+								return failure
+							}
 							continue
 						}
 						v, e := m.parameter(p)
 						if e != nil {
 							note(e)
+							if source && failure != nil {
+								return failure
+							}
 							continue
 						}
 						if v.kind == ASTParameterAST && v.ast.slot != 0 {
@@ -248,6 +349,9 @@ func (m *ASTManager) closeCore() error {
 					}
 					if e != nil {
 						note(e)
+						if source && failure != nil {
+							return failure
+						}
 						emergency = true
 						continue
 					}
@@ -271,6 +375,9 @@ func (m *ASTManager) closeCore() error {
 			next := m.nodeAt(r.slot).closeNext
 			m.nodeAt(r.slot).rc = 0
 			note(m.deleteNode(r))
+			if source && failure != nil {
+				return failure
+			}
 			r = next
 		}
 		m.budget.Release(bytes)
@@ -279,42 +386,90 @@ func (m *ASTManager) closeCore() error {
 	// Caller-owned info/parameter wrapper tokens are invalidated after dropping
 	// their actual numeral payloads. Source allocator teardown has no callbacks;
 	// this explicit Go extension closes all independently owned wrapper records.
-	for s := uint32(1); s < m.nextInfo; s++ {
-		r := m.infoAt(s)
-		if r.live {
-			note(m.dropInfoStorage(s, r.generation))
+	if !source {
+		for s := uint32(1); s < m.nextInfo; s++ {
+			r := m.infoAt(s)
+			if r.live {
+				note(m.dropInfoStorage(s, r.generation))
+				if source && failure != nil {
+					return failure
+				}
+			}
 		}
-	}
-	for s := uint32(1); s < m.nextParameter; s++ {
-		r := m.parameterAt(s)
-		if r.live {
-			note(m.dropParameter(ASTParameter{m.origin, s, r.generation}))
+		for s := uint32(1); s < m.nextParameter; s++ {
+			r := m.parameterAt(s)
+			if r.live {
+				note(m.dropParameter(ASTParameter{m.origin, s, r.generation}))
+				if source && failure != nil {
+					return failure
+				}
+			}
 		}
 	}
 	if m.format != nil {
+		if source {
+			if e := m.format.SourceFinalize(); e != nil {
+				note(e)
+				return failure
+			}
+		}
 		note(m.format.Close())
+		if source && failure != nil {
+			return failure
+		}
 		m.format = nil
 	}
-	m.exprIDs.cleanup(0)
+	if m.traceOwner && m.traceFile != nil {
+		if !m.traceEOFReached {
+			m.traceEOFReached = true
+			note(m.traceStream.AppendCString("[eof]\n"))
+			if source && failure != nil {
+				return failure
+			}
+		}
+		note(m.traceFile.Close())
+		if source && failure != nil {
+			return failure
+		}
+		if m.traceFile.closed {
+			m.traceFile = nil
+			m.traceStream = nil
+			m.traceOwner = false
+		}
+	}
+	if m.debugFreeComplete {
+		m.debugFreeIndices.Close()
+		m.debugFreeComplete = false
+	}
 	m.declIDs.cleanup(1 << 31)
+	m.exprIDs.cleanup(0)
 	m.budget.Release(astChainBytes(uint32(len(m.table.cells))))
 	m.table.cells = nil
 	m.table.size = 0
-	if m.vectorAllocator != nil {
+	if !source && m.vectorAllocator != nil {
 		m.vectorAllocator.Close()
 		m.vectorAllocator = nil
+	}
+	m.dependencyArrays.closeAfterNodeTeardown()
+	m.dependencies.closeAfterNodeTeardown()
+	m.exprArrays.closeAfterNodeTeardown()
+	if m.families != nil {
+		note(m.families.Close())
+		if source && failure != nil {
+			return failure
+		}
+		m.families = nil
 	}
 	if m.allocator != nil {
 		m.allocator.Close()
 		m.allocator = nil
 	}
-	if m.families != nil {
-		note(m.families.Close())
-		m.families = nil
+	if source {
+		m.sourceDTCompleted = true
+		m.closing = false
+		return nil
 	}
-	m.exprArrays.closeAfterNodeTeardown()
-	m.dependencies.closeAfterNodeTeardown()
-	m.dependencyArrays.closeAfterNodeTeardown()
+	m.releaseTraceAcquisitionHistory()
 	m.releasePages()
 	m.closed = true
 	m.closing = false

@@ -1,0 +1,86 @@
+// Source: src/ast/ast.cpp:1297-1334,1474-1479.
+// Source author: Leonardo de Moura (2006-09-28).
+// Licensed under the MIT license; see LICENSE.txt.
+package g3
+
+import (
+	"github.com/glycerine/g3/golang/arena"
+	"os"
+	"reflect"
+	"strings"
+)
+
+// Actual cold file owner; its formatter is embedded, not a second heap wrapper.
+// The format manager borrows this exact stream. Go file emission is direct;
+// native filebuf buffering and host pathname allocations are OS adaptations.
+// No reservation here claims to account for the transient host Go allocations.
+type astTraceFile struct {
+	self             *astTraceFile
+	budget           *arena.Budget
+	header           uint64
+	stream           NumericTextStream
+	constructorCause error
+	closed           bool
+}
+
+func newASTTraceFile(b *arena.Budget, name ParamsStringView) (*astTraceFile, error) {
+	return newASTTraceFileBorrowed(b, astTraceFilename{params: name})
+}
+func newASTTraceFileBorrowed(b *arena.Budget, name astTraceFilename) (*astTraceFile, error) {
+	header := uint64(reflect.TypeOf(astTraceFile{}).Size())
+	if e := b.Reserve(header); e != nil {
+		return nil, e
+	}
+	f := &astTraceFile{budget: b, header: header}
+	f.self = f
+	f.stream = NumericTextStream{budget: b, fileMode: true, state: NumericStreamState{Precision: 6, IntegerBase: 10, Fill: ' '}}
+	f.stream.self = &f.stream
+	n, e := name.length()
+	if e != nil {
+		f.constructorCause = e
+		return f, e
+	}
+	// fopen's filename adapter consumes the actual CString at this source leaf.
+	// The host string is transient, not retained source storage or a Budget root.
+	var path strings.Builder
+	for i := uint64(0); i < n; i++ {
+		ch, e := name.byte(i)
+		if e != nil {
+			f.constructorCause = e
+			return f, e
+		}
+		path.WriteByte(ch)
+	}
+	fd, e := os.OpenFile(path.String(), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	if e != nil {
+		// Default fstream exceptions mask is empty: failed open is stream failbit,
+		// not a constructor exception. Actual output uses the same nonthrowing engine.
+		f.stream.fileFail = true
+		return f, nil
+	}
+	f.stream.file = fd
+	return f, nil
+}
+func (f *astTraceFile) Close() error {
+	if f == nil || f.self != f {
+		return ErrASTHandle
+	}
+	if f.closed {
+		return nil
+	}
+	// This owner is the sole authority for the acquired fd. The formatter's
+	// ordinary Close only closes its own formatting storage and never its borrow.
+	if f.stream.file != nil {
+		if e := f.stream.file.Close(); e != nil {
+			f.stream.fileFail = true
+		}
+		f.stream.file = nil
+	}
+	if e := f.stream.Close(); e != nil {
+		return e
+	}
+	f.budget.Release(f.header)
+	f.header = 0
+	f.closed = true
+	return nil
+}

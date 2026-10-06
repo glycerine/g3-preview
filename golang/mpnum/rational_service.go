@@ -42,6 +42,7 @@ type RationalServiceStats struct {
 // requires external owner confinement; independent service locks do not make
 // the Budget safe for concurrent use. Never shallow-copy this owner.
 type RationalService struct {
+	sourceInsertionExecuting                       bool
 	polynomialContext                              UPolynomialRationalContext
 	lexical                                        rationalLexicalScope
 	mu                                             sync.Mutex
@@ -115,6 +116,9 @@ func (s *RationalService) lock() error {
 	if s == nil || s.self != s {
 		return ErrRationalServiceCopy
 	}
+	if s.sourceInsertionExecuting {
+		return arena.ErrInvalidSlot
+	}
 	s.mu.Lock()
 	if s.closed || s.closing || s.sourceFinalizing || s.initializationStage != 6 {
 		s.mu.Unlock()
@@ -175,6 +179,9 @@ func (s *RationalService) CopyFrom(dst *OwnedRational, source *RationalService, 
 	first, second := s, source
 	if first.ownerID > second.ownerID {
 		first, second = second, first
+	}
+	if first.sourceInsertionExecuting || second.sourceInsertionExecuting {
+		return arena.ErrInvalidSlot
 	}
 	first.mu.Lock()
 	defer first.mu.Unlock()

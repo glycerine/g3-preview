@@ -9,6 +9,7 @@ import (
 	"errors"
 	"github.com/glycerine/g3/golang/arena"
 	"github.com/glycerine/g3/golang/mpnum"
+	"github.com/glycerine/g3/golang/utilhash"
 	"math"
 	"reflect"
 	"sync"
@@ -162,6 +163,7 @@ type astParameterRecord struct {
 type astInfoRecord struct {
 	generation, nextFree            uint32
 	live, isSort, private, attached bool
+	retainedByDebug                 bool
 	family                          FamilyID
 	kind                            int32
 	parameters                      arena.SmallBytesRef
@@ -216,6 +218,9 @@ type astBuiltinPluginState struct {
 }
 
 type ASTManager struct {
+	traceAcquisitionHistory                                                                            *astTraceAcquisition
+	traceAcquisitions, traceAcquisitionExecuting                                                       *astTraceAcquisition
+	traceAcquisitionSerial                                                                             uint64
 	mu                                                                                                 sync.Mutex
 	self                                                                                               *ASTManager
 	origin                                                                                             uint64
@@ -229,6 +234,22 @@ type ASTManager struct {
 	format                                                                                             *ASTManager
 	proofMode                                                                                          ASTProofMode
 	coercions, closed, closing, debugNondeterminism                                                    bool
+	sourceDTStarted, sourceDTCompleted, sourceClosing, traceEOFReached                                 bool
+	sourceDTCause, errorOwnClose                                                                       error
+	constructorComplete                                                                                bool
+	constructorBodyCause, constructorUnwindCause, constructorOwnCause                                  error
+	constructorMemberStage                                                                             uint8
+	constructorMembers                                                                                 uint32
+	constructorPendingFormat                                                                           *ASTManager
+	constructorPendingFile                                                                             *astTraceFile
+	traceFile                                                                                          *astTraceFile
+	traceStream                                                                                        *NumericTextStream
+	traceOwner                                                                                         bool
+	lowLevel                                                                                           astLowLevelFrame
+	traceExecuting                                                                                     bool
+	debugRefCount                                                                                      bool
+	debugFreeIndices                                                                                   utilhash.UintMap
+	debugFreeComplete                                                                                  bool
 	exprIDs, declIDs                                                                                   utilIDGen
 	nodes                                                                                              []*astNodePage
 	sorts                                                                                              []*astSortPage
@@ -349,10 +370,21 @@ func (m *ASTManager) lock() error {
 	if m == nil || m.self != m {
 		return ErrASTHandle
 	}
+	if m.traceExecuting {
+		return ErrASTPending
+	}
 	m.mu.Lock()
 	if m.closed {
 		m.mu.Unlock()
 		return arena.ErrClosed
+	}
+	if m.sourceDTStarted {
+		m.mu.Unlock()
+		return ErrASTPending
+	}
+	if !m.constructorComplete {
+		m.mu.Unlock()
+		return ErrASTDomain
 	}
 	return nil
 }

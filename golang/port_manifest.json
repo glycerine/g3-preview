@@ -9038,7 +9038,13 @@
         "ast_core_span_factories.go",
         "ast_core_span_factories_source_test.go",
         "ast_core_basic_convenience.go",
-        "ast_core_basic_convenience_source_test.go"
+        "ast_core_basic_convenience_source_test.go",
+        "ast_core_source_constructor.go",
+        "ast_core_source_finalize.go",
+        "ast_debug_ref_count.go",
+        "ast_trace_hooks.go",
+        "ast_trace_file.go",
+        "ast_trace_acquisition.go"
       ],
       "tests": [
         "TestASTAllEagerPluginBranches",
@@ -9194,7 +9200,21 @@
         "TestASTBasicConvenienceFactoriesPreserveLiteralKindsAndInputs",
         "TestASTDistinctExpandedLiteralNestedPairOrderAndNoEagerInputRead",
         "TestASTDistinctExpandedEveryActualReservationKeepsNamedGraph",
-        "TestASTBasicConvenienceInvalidBorrowAndSortFailure"
+        "TestASTBasicConvenienceInvalidBorrowAndSortFailure",
+        "TestASTSourceConstructorEveryPrefixRetainsBodyFilesAndUnwindsOnlyCompletedMembers",
+        "TestASTSourceFinalizeStoppedEOFProtectsAutomaticMembersAndOwnsFileUntilACK",
+        "TestASTDebugRefCountActualDeletedIDMapAndSkippedRecycle",
+        "TestASTDebugRefCountSkipsOwnedInfoDelButStillDecrementsNodeChildren",
+        "TestASTDebugRefCountDeletedMapGrowthStopRetainsExactLeafForOwningClose",
+        "TestASTSourceFinalizeRetainsDebugInfoParametersForExactOwningClose",
+        "TestASTTraceFactoriesOnlyActualNewNodesAndLiteralArgumentChains",
+        "TestASTSourceConstructorCopyAndBorrowedNamespaceGuardsPreserveActualOwners",
+        "TestASTTraceAppPostRegistrationAllocationCatchFreesLiteralNodeWithoutTableRepair",
+        "TestASTTraceCatchCapturesEachSuccessfulINCAndNeverFreesLaterSlotGeneration",
+        "TestASTSourceFinalizeKeepsFailedNumeralConstructorForExactOwnClose",
+        "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame",
+        "TestASTBorrowedFormatTraceCatchUsesReachedStreamWithoutFileOwnership",
+        "TestASTIncompleteBorrowedFormatConstructorRetainsCaughtHistoryUntilOwnAbort"
       ],
       "conditionals": [
         {
@@ -10165,6 +10185,39 @@
             "TestASTDistinctExpandedEveryActualReservationKeepsNamedGraph",
             "TestASTBasicConvenienceInvalidBorrowAndSortFailure"
           ]
+        },
+        {
+          "name": "Actual trace constructor/body/debug deletion and source destructor sites (src/ast/ast.cpp:1297-1479,1798-1844,2114-2128,2259-2261,2368-2373)",
+          "status": "partial",
+          "go_target": "ast_core_source_constructor.go",
+          "tests": [
+            "TestASTSourceConstructorEveryPrefixRetainsBodyFilesAndUnwindsOnlyCompletedMembers",
+            "TestASTSourceFinalizeStoppedEOFProtectsAutomaticMembersAndOwnsFileUntilACK",
+            "TestASTDebugRefCountActualDeletedIDMapAndSkippedRecycle",
+            "TestASTDebugRefCountSkipsOwnedInfoDelButStillDecrementsNodeChildren",
+            "TestASTDebugRefCountDeletedMapGrowthStopRetainsExactLeafForOwningClose",
+            "TestASTSourceFinalizeRetainsDebugInfoParametersForExactOwningClose",
+            "TestASTTraceFactoriesOnlyActualNewNodesAndLiteralArgumentChains",
+            "TestASTSourceConstructorCopyAndBorrowedNamespaceGuardsPreserveActualOwners"
+          ]
+        },
+        {
+          "name": "Actual post-registration trace catch placement release with unchanged table/INC prefix (src/ast/ast.cpp:1714-1733,2129-2134)",
+          "status": "partial",
+          "go_target": "ast_trace_acquisition.go",
+          "tests": [
+            "TestASTTraceAppPostRegistrationAllocationCatchFreesLiteralNodeWithoutTableRepair",
+            "TestASTTraceCatchCapturesEachSuccessfulINCAndNeverFreesLaterSlotGeneration"
+          ]
+        },
+        {
+          "name": "Actual borrowed-format trace-stream catch and incomplete constructor ended-member receipts (src/ast/ast.cpp:1297-1334,2114-2134)",
+          "status": "partial",
+          "go_target": "ast_core_source_constructor.go",
+          "tests": [
+            "TestASTBorrowedFormatTraceCatchUsesReachedStreamWithoutFileOwnership",
+            "TestASTIncompleteBorrowedFormatConstructorRetainsCaughtHistoryUntilOwnAbort"
+          ]
         }
       ],
       "ownership": [
@@ -10177,7 +10230,8 @@
         "Expression-array empty nonroot POP preserves the finite release unsigned size wrap; retained root SET increments the incoming AST before old physical access and never rolls it back at an invalid old pointer. See PORT_PROGRESS.md#audit-ast-expr-array-retained-status-md.",
         "Actual AST manager embeds dependency and array owners eagerly; FIFO identity traversal, real AST retain/release and LIFO deletion callbacks. Source RC30 wrapping, leaf/join16/24 versus actual charged24/32 intrusive continuation records, cold manager/scratch/header/payload and old/new overlaps charged. Persistent arrays have12-byte capacity/initialized backing and preserve finite retained pointer/patch behavior; see PORT_PROGRESS.md#audit-ast-dependency-packet-md.",
         "Fresh lexical func_decl_info resides in actual charged ASTManager header with exact epoch token and is cloned by real registerNode/copyInfo; stack StringBuffer64 uses existing formatter and borrowed byte interner, overflow arrays destroyed before fresh_id increment; acquired node/metadata belongs to actual ASTManager pages.",
-        "Convenience factories reach the existing application/cache/register engines without additional ownership or child cloning. Expanded distinct uses actual sixteen-inline non-owning ptr_buffer storage and ordered pair loop; its spill is released on source lexical exit without DEC of its unowned entries. Every actual reservation prefix checks complete named manager/symbol/budget graph before fault lift and successful same-owner retry."
+        "Convenience factories reach the existing application/cache/register engines without additional ownership or child cloning. Expanded distinct uses actual sixteen-inline non-owning ptr_buffer storage and ordered pair loop; its spill is released on source lexical exit without DEC of its unowned entries. Every actual reservation prefix checks complete named manager/symbol/budget graph before fault lift and successful same-owner retry.",
+        "Returned unfinished placement owns only actual completed members/body file-format pointers; automatic member unwind excludes source body DT. Completed body emits EOF before reverse members. Debug info numerals remain explicit original AST ownership until owning ACK."
       ],
       "deviations": [
         "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
@@ -10190,7 +10244,10 @@
         "Source-undefined allocation/lifetime domains have explicit Go continuation and typed guards. Temporary copied-prefix cleanup releases only successful ownership acquisitions; source write-before-INC and debug RC0 refusal consumption are distinct. Copy-only Get returns retained raw tokens; actual later dereference guards generation. Source internal parray/Reroot debug checkpoints, TRACE/address printing, owning aliases and scoped configurations remain open. No whole-unit audit or full solver claim; no generics.",
         "Selected AST sorting-network prerequisites only; no SMT kernel or psort_nw driver assertion credit. AST DEBUG assertions retain existing typed adapter/global-binding qualifications; lexical-info nonwrapping epoch is Go borrow guard, not source fresh_id arithmetic.",
         "Selected concrete AST Runtime/profile only; actual SMT kernel driver, native pretty/TRACE/global transport and other context/copy profiles remain separate obligations. Source-stopped destruction and explicit owning abort are distinct; pointer-free Go geometry is not native ABI credit.",
-        "Go distinct convenience wrappers preserve the source Bool IFF/term EQ selection and right-associated XOR expansion through the existing source application engine. Array factories remain distinct from ast_util singleton/empty shortcuts. Focused source shape and failure tests do not promote the whole AST class, generic parser/API driver, diagnostic TRACE or original AST test driver."
+        "Go distinct convenience wrappers preserve the source Bool IFF/term EQ selection and right-associated XOR expansion through the existing source application engine. Array factories remain distinct from ast_util singleton/empty shortcuts. Focused source shape and failure tests do not promote the whole AST class, generic parser/API driver, diagnostic TRACE or original AST test driver.",
+        "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit.",
+        "Concrete Go cold acquisition metadata is prepared before app placement, with pointer-free reference tokens stamped at actual successful INC leaves. Source catch releases placement without table/reference rollback. Reached dangling table reads use a typed slot/generation guard (native invalid-lifetime domain); separate owning ACK erases only captured insertion identity/hash and consumes stamped references. Completed caught tuples remain charged until this owning manager ends; no registered source driver credit.",
+        "Trace acquisition is gated by actual traceStream, including the format child borrowing the exact parent stream without owning traceFile. Completed member table release and allocator Close stamp source-ended state on matching cold caught contexts/history. Incomplete constructor own abort retires only metadata after those actual actions; it never replays table erasure or DEC in ended node context. Closed pointed-stream constructor is a Go lifetime-guard fixture, distinct from native ostream badbit; actual borrowed file remains caller-owned."
       ]
     },
     {
@@ -10279,7 +10336,9 @@
         "ast_core_span_factories_source_test.go",
         "ast_ref_vector_push_source_test.go",
         "ast_core_basic_convenience.go",
-        "ast_core_basic_convenience_source_test.go"
+        "ast_core_basic_convenience_source_test.go",
+        "ast_core_source_constructor.go",
+        "ast_debug_ref_count.go"
       ],
       "tests": [
         "TestASTAllEagerPluginBranches",
@@ -10492,7 +10551,14 @@
         "TestASTBasicConvenienceFactoriesPreserveLiteralKindsAndInputs",
         "TestASTDistinctExpandedLiteralNestedPairOrderAndNoEagerInputRead",
         "TestASTDistinctExpandedEveryActualReservationKeepsNamedGraph",
-        "TestASTBasicConvenienceInvalidBorrowAndSortFailure"
+        "TestASTBasicConvenienceInvalidBorrowAndSortFailure",
+        "TestASTSourceConstructorEveryPrefixRetainsBodyFilesAndUnwindsOnlyCompletedMembers",
+        "TestASTSourceFinalizeStoppedEOFProtectsAutomaticMembersAndOwnsFileUntilACK",
+        "TestASTDebugRefCountActualDeletedIDMapAndSkippedRecycle",
+        "TestASTDebugRefCountSkipsOwnedInfoDelButStillDecrementsNodeChildren",
+        "TestASTDebugRefCountDeletedMapGrowthStopRetainsExactLeafForOwningClose",
+        "TestASTSourceFinalizeRetainsDebugInfoParametersForExactOwningClose",
+        "TestASTSourceConstructorCopyAndBorrowedNamespaceGuardsPreserveActualOwners"
       ],
       "conditionals": [
         {
@@ -11288,6 +11354,20 @@
             "TestASTDistinctExpandedEveryActualReservationKeepsNamedGraph",
             "TestASTBasicConvenienceInvalidBorrowAndSortFailure"
           ]
+        },
+        {
+          "name": "Actual member declaration/destruction and debug-reference switch (src/ast/ast.h:1454-1490,1507-1508,1600)",
+          "status": "partial",
+          "go_target": "ast_core_source_constructor.go",
+          "tests": [
+            "TestASTSourceConstructorEveryPrefixRetainsBodyFilesAndUnwindsOnlyCompletedMembers",
+            "TestASTSourceFinalizeStoppedEOFProtectsAutomaticMembersAndOwnsFileUntilACK",
+            "TestASTDebugRefCountActualDeletedIDMapAndSkippedRecycle",
+            "TestASTDebugRefCountSkipsOwnedInfoDelButStillDecrementsNodeChildren",
+            "TestASTDebugRefCountDeletedMapGrowthStopRetainsExactLeafForOwningClose",
+            "TestASTSourceFinalizeRetainsDebugInfoParametersForExactOwningClose",
+            "TestASTSourceConstructorCopyAndBorrowedNamespaceGuardsPreserveActualOwners"
+          ]
         }
       ],
       "ownership": [
@@ -11302,7 +11382,8 @@
         "Concrete AST expr identity-table and shared-occurrence owners preserve source bucket-order callbacks, borrowing, actual node shared flags and charged backing/header peaks. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md.",
         "Actual dependency INC/DEC callbacks, raw scalar tokens and charged16-byte obj_ref/24-byte ref_vector/160-byte inline buffer records in existing real AST allocators. Source INC-before-growth, retained backing, captured-end append and consumed cleanup progress preserved. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
         "Fresh lexical func_decl_info resides in actual charged ASTManager header with exact epoch token and is cloned by real registerNode/copyInfo; stack StringBuffer64 uses existing formatter and borrowed byte interner, overflow arrays destroyed before fresh_id increment; acquired node/metadata belongs to actual ASTManager pages.",
-        "Convenience factories reach the existing application/cache/register engines without additional ownership or child cloning. Expanded distinct uses actual sixteen-inline non-owning ptr_buffer storage and ordered pair loop; its spill is released on source lexical exit without DEC of its unowned entries. Every actual reservation prefix checks complete named manager/symbol/budget graph before fault lift and successful same-owner retry."
+        "Convenience factories reach the existing application/cache/register engines without additional ownership or child cloning. Expanded distinct uses actual sixteen-inline non-owning ptr_buffer storage and ordered pair loop; its spill is released on source lexical exit without DEC of its unowned entries. Every actual reservation prefix checks complete named manager/symbol/budget graph before fault lift and successful same-owner retry.",
+        "Inline debug map/header fields charged once; no reconstructed owner from provider census."
       ],
       "deviations": [
         "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
@@ -11317,16 +11398,24 @@
         "Owning construction cleanup refusal publishes a nonzero partial token with original error; scalar pending target/cursor tracks consumed callbacks without changing raw retained slots. Explicit Go retry/cleanup protects source-undefined interrupted destruction. Preserved ref_buffer copy ctor dependent-base lookup is uninstantiable; no repaired copy API. General templates, other owners/configs and full consumers remain open. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
         "Selected AST sorting-network prerequisites only; no SMT kernel or psort_nw driver assertion credit. AST DEBUG assertions retain existing typed adapter/global-binding qualifications; lexical-info nonwrapping epoch is Go borrow guard, not source fresh_id arithmetic.",
         "Selected concrete AST Runtime/profile only; actual SMT kernel driver, native pretty/TRACE/global transport and other context/copy profiles remain separate obligations. Source-stopped destruction and explicit owning abort are distinct; pointer-free Go geometry is not native ABI credit.",
-        "Go distinct convenience wrappers preserve the source Bool IFF/term EQ selection and right-associated XOR expansion through the existing source application engine. Array factories remain distinct from ast_util singleton/empty shortcuts. Focused source shape and failure tests do not promote the whole AST class, generic parser/API driver, diagnostic TRACE or original AST test driver."
+        "Go distinct convenience wrappers preserve the source Bool IFF/term EQ selection and right-associated XOR expansion through the existing source application engine. Array factories remain distinct from ast_util singleton/empty shortcuts. Focused source shape and failure tests do not promote the whole AST class, generic parser/API driver, diagnostic TRACE or original AST test driver.",
+        "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit."
       ]
     },
     {
       "path": "src/ast/ast_ll_pp.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "ast_low_level_printer.go"
+      ],
+      "tests": [
+        "TestASTLowLevelPrinterActualPostorderAndBorrowedStreamFlags",
+        "TestASTLowLevelPrinterDeclarationMarksUseActualDeclarationIndex",
+        "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame",
+        "TestASTSourceFinalizeKeepsFailedNumeralConstructorForExactOwnClose"
+      ],
       "conditionals": [
         {
           "line": 234,
@@ -11339,9 +11428,33 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Actual trace overload low-level postorder and separate insertion chains (src/ast/ast_ll_pp.cpp:21-320)",
+          "status": "partial",
+          "go_target": "ast_low_level_printer.go",
+          "tests": [
+            "TestASTLowLevelPrinterActualPostorderAndBorrowedStreamFlags",
+            "TestASTLowLevelPrinterDeclarationMarksUseActualDeclarationIndex",
+            "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame"
+          ]
+        },
+        {
+          "name": "Exact younger numeral source-value ACK then older lexical DT then unjoined owning ACK (src/ast/ast_ll_pp.cpp:292-297; src/util/mpz.cpp:1385-1410)",
+          "status": "partial",
+          "go_target": "ast_low_level_printer.go",
+          "tests": [
+            "TestASTSourceFinalizeKeepsFailedNumeralConstructorForExactOwnClose",
+            "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame"
+          ]
+        }
+      ],
+      "ownership": [
+        "Two actual declaration/expression mark stores, exact nonowning raw traversal stack and acquired numeral. Younger reached source DT stop protects older NUM/stack/marks; own continuation consumes only actual retained tokens. Bounded/root overloads and AST_LL_PP_SHOW_FAMILY_NAME remain separate."
+      ],
+      "deviations": [
+        "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit."
+      ]
     },
     {
       "path": "src/ast/ast_ll_pp.h",
@@ -13196,9 +13309,14 @@
       "path": "src/ast/for_each_ast.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "ast_low_level_printer.go"
+      ],
+      "tests": [
+        "TestASTLowLevelPrinterActualPostorderAndBorrowedStreamFlags",
+        "TestASTLowLevelPrinterDeclarationMarksUseActualDeclarationIndex"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -13211,9 +13329,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Actual trace LL visitor LIFO/mark-after-proc order (src/ast/for_each_ast.h:27-125)",
+          "status": "partial",
+          "go_target": "ast_low_level_printer.go",
+          "tests": [
+            "TestASTLowLevelPrinterActualPostorderAndBorrowedStreamFlags",
+            "TestASTLowLevelPrinterDeclarationMarksUseActualDeclarationIndex"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete raw stack retains no INC/owning AST roots; source tuple/lifetime reads remain reached."
+      ],
+      "deviations": [
+        "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit."
+      ]
     },
     {
       "path": "src/ast/for_each_expr.cpp",
@@ -23312,7 +23444,8 @@
         "util_context_params_source_test.go",
         "util_param_descrs.go",
         "util_context_params_methods_source.go",
-        "util_context_params_methods_source_test.go"
+        "util_context_params_methods_source_test.go",
+        "util_context_params_ast_source.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -23336,7 +23469,9 @@
         "TestContextParamsGetSolverCopyOOMRetainsExactUntransferredNumeral",
         "TestContextParamsAllSetBooleanFieldsAndReachedBorrowedStringLifetime",
         "TestContextParamsEveryLiteralBoolAndUIntDiagnosticOutputReservation",
-        "TestContextParamsActualCOWAppendRefusalCleanupStopRetainsImmutableChildTuples"
+        "TestContextParamsActualCOWAppendRefusalCleanupStopRetainsImmutableChildTuples",
+        "TestContextParamsMkASTManagerActualTraceProofCoercionAndDebugActions",
+        "TestContextParamsMkASTManagerEveryReachedConstructorPrefix"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -23383,6 +23518,15 @@
             "TestContextParamsEveryLiteralBoolAndUIntDiagnosticOutputReservation",
             "TestContextParamsActualCOWAppendRefusalCleanupStopRetainsImmutableChildTuples"
           ]
+        },
+        {
+          "name": "Actual mk_ast_manager trace/proof/coercions/debug construction chain (src/cmd_context/context_params.cpp:198-209)",
+          "status": "partial",
+          "go_target": "util_context_params_ast_source.go",
+          "tests": [
+            "TestContextParamsMkASTManagerActualTraceProofCoercionAndDebugActions",
+            "TestContextParamsMkASTManagerEveryReachedConstructorPrefix"
+          ]
         }
       ],
       "ownership": [
@@ -23391,11 +23535,13 @@
         "Source setters use exact ASCII normalization and field routes, sequential strcmp branches, strlen then all-digit classification and selected LP64 strtol saturation followed by unsigned32 cast. Unknown-key value is unread; actual lexical owned key, embedded descriptor info/names/text members and inline64 diagnostic buffer use the same concrete source engines. Context lexical frame storage is real charged metadata, not a simulated native allocation. Merge contains any kind, actual source reference copy then COW SetBool, and return transfers only the actually held temporary. Solver outputs publish in source proofs/model/core order before merge and final params assignment. Failed COW init retains the exact returned ParamsSourceReceipt and actual untransferred POD numeral ParamsSetReceipt before source temporary destruction. Explicit owning close acknowledges younger numeral then older init-held reference; source epilogue never aborts the incomplete POD acquisition. Borrowed caller Params/context/symbol/AST/numeric owners are not adopted. All matched receipts are exact owner/slot/generation/invocation; source/body/own causes remain distinct and first causes sticky.",
         "The actual shared lexical epilogue engine is tested with a real final-reference NUM DT stop in the existing signed-counter guarded Runtime domain: younger source stop protects older allocated key storage, both body and destructor errors remain joined, and separate matched owning ACK preserves each frame history. No native signed-overflow destruction or high-level callback equivalence is claimed.",
         "Actual child receipt tuples remain immutable after matched owning acknowledgement; separate setAcknowledged/sourceAcknowledged booleans retire authority without clearing owner/slot/generation/invocation. Wrong primitive invocation is rejected by a separate direct CleanupSet call without overwriting acquired parent tuples. Genuine parent first ownCause ErrBounds comes from Close after fully backed NUM Copy and actual append refusal, with both child tuples unchanged; matched retry preserves exact tuples/body/source/own histories and separate ACK bits prevent repeated cleanup. Direct lexical older-key protection is epilogue-engine/signed-counter guard-domain evidence, not public call nesting or driver credit.",
-        "Genuine own-cause history is proved with fully backed NUM Copy followed by actual COW append refusal. The exact NUM matches the original payload and adds one independently named raw block before TLS stop. Context.Close with unchanged parent tuples reaches CleanupSet ErrBounds; parent first ownCause and child cleanupCause are ErrBounds while active/acquired remains true. Immediate physical/cold graph precedes fault lift and matching retry; both tuples and exact original body/source/own histories remain unchanged after ACK. Wrong primitive receipt is passed directly to ParamsContext.CleanupSet and never overwrites parent acquisition metadata."
+        "Genuine own-cause history is proved with fully backed NUM Copy followed by actual COW append refusal. The exact NUM matches the original payload and adds one independently named raw block before TLS stop. Context.Close with unchanged parent tuples reaches CleanupSet ErrBounds; parent first ownCause and child cleanupCause are ErrBounds while active/acquired remains true. Immediate physical/cold graph precedes fault lift and matching retry; both tuples and exact original body/source/own histories remain unchanged after ACK. Wrong primitive receipt is passed directly to ParamsContext.CleanupSet and never overwrites parent acquisition metadata.",
+        "Trace false erases filename pointer reads; source setters only after successful actual manager ctor; returned failure owner must explicitly abort."
       ],
       "deviations": [
         "Only context constructor, both direct/global updates and scalar rlimit setter/access are implemented here. m_interpolants is never initialized by this source; false Go storage with InterpolantsInitialized=false is diagnostic, not a source default. Failed constructor State is diagnostic and Update rejects it. Source set parsing, descriptor collectors, merge_default_params/get_solver_params, AST-manager construction and compiler-generated copies remain separate obligations. Existing independently ported collector evidence is preserved; no new driver/context/native ABI/global registration credit.",
-        "Selected GNU/LP64 parsing profile and existing inline15/external owned-string representation are explicit adaptations. std::stringstream character insertion uses the existing concrete inline64 StringBuffer engine; char-pointer strlen precedes reached byte emission. Native STL/global allocator/ostream locale/formatting and other long-width profiles remain open. Nil/stale/closed/copy/executing guards and unsigned strlen loop beyond MaxUint32 are Go domain guards, not native continuation credit. Real mk_ast_manager at src/cmd_context/context_params.cpp:198-209, parameter implicit owning copies, complete cmd_context/AST manager/SMT driver and globals remain open; no registered driver assertions added."
+        "Selected GNU/LP64 parsing profile and existing inline15/external owned-string representation are explicit adaptations. std::stringstream character insertion uses the existing concrete inline64 StringBuffer engine; char-pointer strlen precedes reached byte emission. Native STL/global allocator/ostream locale/formatting and other long-width profiles remain open. Nil/stale/closed/copy/executing guards and unsigned strlen loop beyond MaxUint32 are Go domain guards, not native continuation credit. Real mk_ast_manager at src/cmd_context/context_params.cpp:198-209, parameter implicit owning copies, complete cmd_context/AST manager/SMT driver and globals remain open; no registered driver assertions added.",
+        "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit."
       ]
     },
     {
@@ -121619,7 +121765,10 @@
         "mpnum/mpn_source_verify.go",
         "mpnum/mpn_verification_invocation.go",
         "mpnum/mpzzp_normalize_allocation_receipt.go",
-        "mpnum/integer_divides_numeral_source_test.go"
+        "mpnum/integer_divides_numeral_source_test.go",
+        "util_numeric_rational_source.go",
+        "mpnum/rational_source_stream.go",
+        "mpnum/numeral_insertion_receipt.go"
       ],
       "tests": [
         "TestNaturalArithmeticOracle",
@@ -121705,7 +121854,11 @@
         "TestIntegerDividesScopedNUMRuntimeCallbackHasNoAmbientAcquisition",
         "TestDividesNumericActualFrameAndImmutableContext",
         "TestDividesNumericLowerActualPrefixes",
-        "TestDividesNumericActualBoolChildAndErasedFieldRoute"
+        "TestDividesNumericActualBoolChildAndErasedFieldRoute",
+        "TestNumericRationalSourceInsertionPreservesActualFieldChains",
+        "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame",
+        "TestNumeralInsertionReceiptUnusedSmallBranchAndForeignTupleGuard",
+        "TestNumeralInsertionReceiptActualCharacterConstructorPrefixesAndTupleGuards"
       ],
       "conditionals": [
         {
@@ -122210,6 +122363,24 @@
             "TestDividesNumericLowerActualPrefixes",
             "TestDividesNumericActualBoolChildAndErasedFieldRoute"
           ]
+        },
+        {
+          "name": "Reached numeral ostream chain and lexical source stop transport (src/util/mpn.cpp:371-399)",
+          "status": "partial",
+          "go_target": "util_numeric_rational_source.go",
+          "tests": [
+            "TestNumericRationalSourceInsertionPreservesActualFieldChains",
+            "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame"
+          ]
+        },
+        {
+          "name": "Actual service/frame/nonwrapping character and formatting acquisition receipts with source/own continuation (src/util/mpq.cpp:130-141; src/util/mpz.cpp:1385-1410; src/util/mpn.cpp:371-399)",
+          "status": "partial",
+          "go_target": "mpnum/numeral_insertion_receipt.go",
+          "tests": [
+            "TestNumeralInsertionReceiptUnusedSmallBranchAndForeignTupleGuard",
+            "TestNumeralInsertionReceiptActualCharacterConstructorPrefixesAndTupleGuards"
+          ]
         }
       ],
       "ownership": [
@@ -122220,14 +122391,16 @@
         "Actual scalar core/embedded frame/nonwrapping invocation plus exact Integer/Modular receiver and executing callback-depth guard. Allocation capture/clear occurs only at actual existing integer, allocator and named Natural buffer leaves. Actual embedded RAW child and private buffer addresses reject copied owners. Successful persistent Inv/Natural publication stays member-owned; inactive same-invocation diagnostic history carries no numeric authority.",
         "Actual self/embedded frame/nonwrapping invocation validation before NUM/source reads; count marks actual one or four-to-six RAW declarations. Concrete receipt lives in charged Integer frame, not a heap temporary. Direct numeric acquisition and exact Natural member/private verification buffer binding; no snapshot or registry ownership. Published shared scratch remains member-owned. Runtime callbacks public empty-context acquisitions excluded, active same-frame public reentry refused. Source-finalize owning continuation uses exact named retained fields/captured pending cell only (mpz.h:124-149; mpz.cpp:142-161).",
         "Exact actual guarded Content owner/member/frame/nonwrapping immutable invocation; direct source allocation and actual pending-clear hooks only. Actual source child end/verification DT remains separate from false completed and true unjoined owning phases. Diagnostic child tuples survive own acknowledgment without numeric/root authority.",
-        "Actual self/embedded frame/nonwrapping captured invocation identities; direct cell/backing/allocator and Natural buffer acquisitions only. Scoped bool tmp construction precedes zero branch; all completed constructors run strict source DT. First source cause persists across separate false/true owning acknowledgment until next actual invocation. Successful shared Natural publications remain member-owned."
+        "Actual self/embedded frame/nonwrapping captured invocation identities; direct cell/backing/allocator and Natural buffer acquisitions only. Scoped bool tmp construction precedes zero branch; all completed constructors run strict source DT. First source cause persists across separate false/true owning acknowledgment until next actual invocation. Successful shared Natural publications remain member-owned.",
+        "Small signed insertion differs from big signed-char CString insertion; CString strlen precedes sentry. Exact active character invocation view, typed actual destructor cause and acquired NUM/char/local roots retained; existing Go ErrorTransport callback guard is an explicit adapter profile, not native callback equivalence."
       ],
       "deviations": [
         "Go guards actual endangered reads/writes and retained lexical-holder reuse without blocking source paths that never reach those holders. Algorithm D allocates add-back storage only at the source borrow branch. Runtime owns real source allocations and initialized-byte state; no Words shadows represent limb scratch. Final escaped Go strings are caller-owned. Exact character-buffer/output lifetime, broader public source span domains, diagnostic transport, architecture profiles and OMP/global integration remain separate obligations.",
         "Source char bytes use physical capacity/initialization independently of POS and unsigned11*size wrap. Selected non-Windows digit32 snprintf lbuf0/truncation and multi-limb ignored-lbuf behavior execute. Windows sprintf_s constraint handler, GMP/digit64, global/locale/ostream and literal std::string temporary allocation/evaluation remain open. No whole-unit or registered assertion completion is claimed.",
         "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open.",
         "Public/nil negative Div and ExtendedGCD now use the same literal engines with real IntegerManager RAW frames (mpz.h:468-485; mpz.cpp:915-985). Failed bodies retain reached declarations; successful bodies propagate strict end-DEL errors. Immutable source cause remains across exact owning acknowledgment until new guarded invocation. End-DEL Bounds proof is the real signed-host TLS guard domain, not ordinary mathematical OOM; checked diagnostic/verification failures remain literal failed-body prefixes. AddMul/SubMul public eager failure cleanup remains explicitly open. Shared polynomial cohorts, full Discriminant/Factor and whole source units remain partial; no original driver assertion credit added.",
-        "Selected concrete Content invocation closure only; unrelated polynomial parent/regular SOM/ExactDiv/Neg/Discriminant and whole unit remain partial. Signed-host TLS tests are guarded owner-primitive profiles, not ordinary mathematical free-OOM. No new registered C++ driver assertion credit."
+        "Selected concrete Content invocation closure only; unrelated polynomial parent/regular SOM/ExactDiv/Neg/Discriminant and whole unit remain partial. Signed-host TLS tests are guarded owner-primitive profiles, not ordinary mathematical free-OOM. No new registered C++ driver assertion credit.",
+        "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit."
       ]
     },
     {
@@ -122726,7 +122899,11 @@
         "mpnum/mp_display_scope.go",
         "mpnum/mp_display_scope_test.go",
         "mpnum/mpq_raw_arithmetic_scope.go",
-        "mpnum/mpq_raw_arithmetic_scope_test.go"
+        "mpnum/mpq_raw_arithmetic_scope_test.go",
+        "util_numeric_rational_source.go",
+        "mpnum/rational_source_stream.go",
+        "mpnum/mp_integer_output_scope.go",
+        "mpnum/numeral_insertion_receipt.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -122873,7 +123050,11 @@
         "TestIntegerSourceFreshNullAndDestructiveDangling",
         "TestPolynomialEvaluationRawReceiptForeignReplacement",
         "TestPolynomialEvaluationRawGroupIdentity",
-        "TestPolynomialEvaluationEveryReservationOwnedRaw"
+        "TestPolynomialEvaluationEveryReservationOwnedRaw",
+        "TestNumericRationalSourceInsertionPreservesActualFieldChains",
+        "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame",
+        "TestNumeralInsertionReceiptUnusedSmallBranchAndForeignTupleGuard",
+        "TestNumeralInsertionReceiptActualCharacterConstructorPrefixesAndTupleGuards"
       ],
       "assertions": [
         {
@@ -123383,6 +123564,24 @@
             "TestPolynomialEvaluationRawGroupIdentity",
             "TestPolynomialEvaluationEveryReservationOwnedRaw"
           ]
+        },
+        {
+          "name": "Reached numeral ostream chain and lexical source stop transport (src/util/mpq.cpp:130-141)",
+          "status": "partial",
+          "go_target": "util_numeric_rational_source.go",
+          "tests": [
+            "TestNumericRationalSourceInsertionPreservesActualFieldChains",
+            "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame"
+          ]
+        },
+        {
+          "name": "Actual service/frame/nonwrapping character and formatting acquisition receipts with source/own continuation (src/util/mpq.cpp:130-141; src/util/mpz.cpp:1385-1410; src/util/mpn.cpp:371-399)",
+          "status": "partial",
+          "go_target": "mpnum/numeral_insertion_receipt.go",
+          "tests": [
+            "TestNumeralInsertionReceiptUnusedSmallBranchAndForeignTupleGuard",
+            "TestNumeralInsertionReceiptActualCharacterConstructorPrefixesAndTupleGuards"
+          ]
         }
       ],
       "ownership": [
@@ -123399,7 +123598,8 @@
         "Checked owning cleanup retains a per-component source outer-field cursor and forwards real child failures. This is not full transitive source finalization.",
         "Selected source comparison/unary/reset/swap paths check cold ownership then each reached component action, preserving unread invalid fields and partial publication. Actual SYNCH RAW comparison locals are charged distinct manager fields, normal deletion cursor follows source, body failure retains real limbs for explicit owning cleanup. Service lexical bound9 unchanged; copied unary results use existing literal constructor/temporary machinery. Immediate caller-named physical censuses, cold reservation sweeps and warm allocation checks cover selected routes. Unrelated arithmetic and Go-extension Move preflights remain open.",
         "Two actual permanently dead charged Go descriptors precede Words/Natural construction. Actual six source numeric cells unchanged. Source fresh NULL comes only from exact setter branch, never registry/scope inference; reserve failure retains charged constructor owner. No source allocator event invented for Go metadata.",
-        "Concrete generation identity starts at real guarded RAW group entry and survives scope reset; generic cleanup retains its existing group order. Evaluation cleans only matching actual invocations."
+        "Concrete generation identity starts at real guarded RAW group entry and survives scope reset; generic cleanup retains its existing group order. Evaluation cleans only matching actual invocations.",
+        "Small signed insertion differs from big signed-char CString insertion; CString strlen precedes sentry. Exact active character invocation view, typed actual destructor cause and acquired NUM/char/local roots retained; existing Go ErrorTransport callback guard is an explicit adapter profile, not native callback equivalence."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -123415,7 +123615,8 @@
         "Selected Mul/Div entry boundaries validate ordinary Integer ownership without an ordinary rational-read DEN domain. Scalar projections, remaining raw-domain methods, TRACE and whole rational lifecycle stay open.",
         "No newly registered source assertion credit: sixteen added source-profile regressions complement existing active assertions. Selected ordinary whole-value preflights are replaced only where they precede actual source reads/mutations. Malformed ILP32 second temporary end-cursor test diagnoses physical requested-size guard after actual source first destruction, with no guard relabeling or allocator repair. Whole header and global service binding remain partial.",
         "Public failed-value reads still reject both dead Go descriptors; defined source-only NULL deletion is modeled independently. Postexception source small-scalar continuation, staged CopyFrom/ffSetInteger topology, process/TLS binding and complete source lifecycle remain separate obligations. Existing cleanupPending retry acknowledges Go owning continuation, not another literal source destructor. See PORT_PROGRESS.md.",
-        "Cold adapter generation metadata adds no source allocator event; no arithmetic algorithm changes."
+        "Cold adapter generation metadata adds no source allocator event; no arithmetic algorithm changes.",
+        "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit."
       ]
     },
     {
@@ -124844,7 +125045,10 @@
         "mpnum/polynomial_content_allocation_context.go",
         "mpnum/integer_divides_numeral_invocation.go",
         "mpnum/integer_divides_numeral_source_test.go",
-        "mpnum/integer_divides_numeral_callback_source_test.go"
+        "mpnum/integer_divides_numeral_callback_source_test.go",
+        "util_numeric_rational_source.go",
+        "mpnum/rational_source_stream.go",
+        "mpnum/numeral_insertion_receipt.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -125132,7 +125336,11 @@
         "TestUPolynomialHenselRepeatedActualQuadraticDeclarations",
         "TestUPolynomialHenselActualTaggedQuadraticEveryReservation",
         "TestUPolynomialHenselConditionalVerificationEveryReachedPrefix",
-        "TestUPolynomialHenselActualConditionalChildStopsOlderPair"
+        "TestUPolynomialHenselActualConditionalChildStopsOlderPair",
+        "TestNumericRationalSourceInsertionPreservesActualFieldChains",
+        "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame",
+        "TestNumeralInsertionReceiptUnusedSmallBranchAndForeignTupleGuard",
+        "TestNumeralInsertionReceiptActualCharacterConstructorPrefixesAndTupleGuards"
       ],
       "conditionals": [
         {
@@ -126991,6 +127199,24 @@
             "TestUPolynomialHenselConditionalVerificationEveryReachedPrefix",
             "TestUPolynomialHenselActualConditionalChildStopsOlderPair"
           ]
+        },
+        {
+          "name": "Reached numeral ostream chain and lexical source stop transport (src/util/mpz.cpp:1385-1410)",
+          "status": "partial",
+          "go_target": "util_numeric_rational_source.go",
+          "tests": [
+            "TestNumericRationalSourceInsertionPreservesActualFieldChains",
+            "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame"
+          ]
+        },
+        {
+          "name": "Actual service/frame/nonwrapping character and formatting acquisition receipts with source/own continuation (src/util/mpq.cpp:130-141; src/util/mpz.cpp:1385-1410; src/util/mpn.cpp:371-399)",
+          "status": "partial",
+          "go_target": "mpnum/numeral_insertion_receipt.go",
+          "tests": [
+            "TestNumeralInsertionReceiptUnusedSmallBranchAndForeignTupleGuard",
+            "TestNumeralInsertionReceiptActualCharacterConstructorPrefixesAndTupleGuards"
+          ]
         }
       ],
       "ownership": [
@@ -127024,7 +127250,8 @@
         "Actual Integer self/embedded gcdRaw frame/nonwrapping invocation; source mpz.cpp:730-817 RAW a1,b1,t,r,tmp is retained on failed bodies and explicit DEL order is a1,b1,r,t,tmp only after completed output. Real AddMul TMP allocation belongs to the exact child, ADD caller allocation belongs to the explicitly passed RAW parent; immutable captured child nonce rejects embedded receipt reuse. Actual lower allocation/publication and Natural bindings provide authority; no snapshots or registry/refcount inference. Source first release cause survives own acknowledgment until actual new invocation; source-finalize owning continuation names exact retained fields and matched child TMP.",
         "Exact actual guarded Content owner/member/frame/nonwrapping immutable invocation; direct source allocation and actual pending-clear hooks only. Actual source child end/verification DT remains separate from false completed and true unjoined owning phases. Diagnostic child tuples survive own acknowledgment without numeric/root authority.",
         "Actual self/embedded frame/nonwrapping captured invocation identities; direct cell/backing/allocator and Natural buffer acquisitions only. Scoped bool tmp construction precedes zero branch; all completed constructors run strict source DT. First source cause persists across separate false/true owning acknowledgment until next actual invocation. Successful shared Natural publications remain member-owned.",
-        "Selected direct caller context acquires only actual numeric allocation leaves; RAW Power receipt binds actual guarded member/nonce. Published checker output remains scoped caller-owned, and RAW body failures have no automatic source destructor. Legacy nil Power allocation snapshot adapter is not promoted by this selected route."
+        "Selected direct caller context acquires only actual numeric allocation leaves; RAW Power receipt binds actual guarded member/nonce. Published checker output remains scoped caller-owned, and RAW body failures have no automatic source destructor. Legacy nil Power allocation snapshot adapter is not promoted by this selected route.",
+        "Small signed insertion differs from big signed-char CString insertion; CString strlen precedes sentry. Exact active character invocation view, typed actual destructor cause and acquired NUM/char/local roots retained; existing Go ErrorTransport callback guard is an explicit adapter profile, not native callback equivalence."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -127054,7 +127281,8 @@
         "Selected scalar Lehmer lifetime now uses one literal GCD engine with concrete RAW/direct acquisition and reached end-DEL error propagation (mpz.cpp:560-817; mpz.h:632). Public AddMul/SubMul and the two reached internal Lehmer AddMul calls share the actual source-owned child engine (mpz.h:393-426); public failure and strict end-DEL prefixes now have exact owning acknowledgment. Signed-host TLS end-release proof is a guarded source domain, not ordinary mathematical OOM. Actual failed-body shared scratch holes remain guarded and are never repaired; source-finalize proof records the real destructor guard before separate exact owning cleanup. No Content/ICCP/Discriminant/regular-SOM/whole-unit promotion or original assertion credit.",
         "Returning Go allocation-error transport cannot destroy an executing Integer RAW owner: SourceFinalize and CloseChecked refuse before mutating source/own cleanup state. Actual GCD callback counterfactual REDs cover early source destruction and late owning refusal mutation; immediate named physical/cold graph, exact failed RAW acknowledgment and same-input successful retry are proved. This is an explicit guarded Go callback domain, not native defined destructor reentry; selected source mpz.cpp:730-817 and whole unit remain partial.",
         "Actual cold scratch free-before-replacement and result publication swap can leave a guarded shared tmp hole after allocation refusal. CleanupAddMulRaw never repairs this native-invalid pointer domain; retry remains ErrInvalidSlot. Signed-host TLS end-DEL stop proof is a guard-domain fixture, not ordinary mathematical OOM. Real returning Go failure transport refuses owner destruction while any RAW/AddMul child executes before mutation. Other backends/native ABI/global assertions and whole source unit remain partial; no original driver assertion or API credit.",
-        "Selected concrete Content invocation closure only; unrelated polynomial parent/regular SOM/ExactDiv/Neg/Discriminant and whole unit remain partial. Signed-host TLS tests are guarded owner-primitive profiles, not ordinary mathematical free-OOM. No new registered C++ driver assertion credit."
+        "Selected concrete Content invocation closure only; unrelated polynomial parent/regular SOM/ExactDiv/Neg/Discriminant and whole unit remain partial. Signed-host TLS tests are guarded owner-primitive profiles, not ordinary mathematical free-OOM. No new registered C++ driver assertion credit.",
+        "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit."
       ]
     },
     {
@@ -132930,7 +133158,8 @@
         "mpnum/rational_service_global_binding.go",
         "mpnum/rational_service_global_binding_test.go",
         "util_rational_global_service.go",
-        "util_rational_global_service_test.go"
+        "util_rational_global_service_test.go",
+        "util_numeric_rational_source.go"
       ],
       "tests": [
         "TestRationalServiceSourceConstructorAssertions",
@@ -132998,7 +133227,9 @@
         "TestRationalGlobalNeverInitializedFinalizeEndsFirstStaticBeforeNullGuard",
         "TestRationalGlobalOwnerCopiesAndForeignProviderRejected",
         "TestRationalServiceSourceGlobalSlotExactPublicationAndStaticEnd",
-        "TestRationalGlobalAcquiredConstructorNamedPhysicalPrefixes"
+        "TestRationalGlobalAcquiredConstructorNamedPhysicalPrefixes",
+        "TestNumericRationalSourceInsertionPreservesActualFieldChains",
+        "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame"
       ],
       "conditionals": [
         {
@@ -133136,13 +133367,23 @@
             "TestRationalServiceSourceGlobalSlotExactPublicationAndStaticEnd",
             "TestRationalGlobalAcquiredConstructorNamedPhysicalPrefixes"
           ]
+        },
+        {
+          "name": "Same-service source insertion borrow/callback exclusion (src/util/rational.cpp:64-83; src/util/mpq.cpp:130-141)",
+          "status": "partial",
+          "go_target": "util_numeric_rational_source.go",
+          "tests": [
+            "TestNumericRationalSourceInsertionPreservesActualFieldChains",
+            "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame"
+          ]
         }
       ],
       "ownership": [
         "Owner-local RationalService owns synchronized numerical manager, constants and pointer-free cache; scalar provenance on OwnedRational validates all public operands. Cold mutexes ordered by immutable ownerID for CopyFrom; all headers/backing/old+new charged. See PORT_PROGRESS.md#audit-rational-service-port-status-md.",
         "All six infinitesimal constants are actual pointer-free service fields included in reflected header bytes. Constructor order rational/InfRat/InfInt; finalization InfRat/InfInt/cache/rational constants/manager. Production hook traversal observed via free-slot reuse before manager close. See PORT_PROGRESS.md#audit-rational-inf-lifecycle-port-status-md.",
         "Prepared cold header/config is charged once; manager-nil returned Integer constructor failure is separate actual owner, not published manager. Standalone constructor forwards that child receipt after only outer header refund. Source finalizer stops at first unconditional null-manager access; explicit owning abort drains retained child and cold header. Exact named provider/slab/object/raw graphs precede fault disable.",
-        "Source current is a borrowed scalar slot, never a duplicate manager owning root. Failed returned children and post-finalization managers are concrete charged acquisition nodes; first completed manager transfers at source publication to original static context. Owning cleanup drains exact nodes then retained original context and detaches only after real closure."
+        "Source current is a borrowed scalar slot, never a duplicate manager owning root. Failed returned children and post-finalization managers are concrete charged acquisition nodes; first completed manager transfers at source publication to original static context. Owning cleanup drains exact nodes then retained original context and detaches only after real closure.",
+        "One reflected executing field, pre-lock callback guards reject destructive/read reentry before deadlock, retaining actual owner tuple and original source cause."
       ],
       "deviations": [
         "Global mutable numerical manager/cache/constants become an explicit owner-local service; getters produce independent values and scalar provenance guards service domains. Cache algorithms and outer hooks have bounded evidence; transitive source finalization and header facade remain partial. Windows compiler warning pragma has no Go runtime counterpart.",
@@ -133150,7 +133391,8 @@
         "Generated process memory initialize/finalize remains open. Pending failed-child source init retry is an explicit Go pending-own guard; source rational::initialize with null pointer would retry. Valid fresh source constants remain inline; no invented postmanager allocation failure. Cold ordinary service methods reject unavailable source state; OwnerID remains scalar inspection.",
         "Process-global generated memory lifecycle remains open. Explicit caller-confined namespace binding replaces native process globals; heterogeneous process initializer/finalizer orchestration is not claimed.",
         "Ended static objects are not reconstructed: source reinitialization and repeated finalization reach explicit invalid-lifetime guards after literal completed publication prefixes.",
-        "TLS signed-overflow release fixture is source-undefined guarded-domain evidence, not valid-source OOM. Cold acquisition nodes are actual Go ownership metadata, not source malloc events."
+        "TLS signed-overflow release fixture is source-undefined guarded-domain evidence, not valid-source OOM. Cold acquisition nodes are actual Go ownership metadata, not source malloc events.",
+        "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit."
       ]
     },
     {

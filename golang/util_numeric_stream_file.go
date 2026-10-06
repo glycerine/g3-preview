@@ -17,3 +17,12 @@ func (s *NumericTextStream) Bad() (bool, error) {
 	defer s.mu.Unlock()
 	return s.fileBad, nil
 }
+
+// Fail reads failbit or badbit, as basic_ios::fail does; it does not clear state.
+func (s *NumericTextStream) Fail() (bool, error) {
+	if e := s.lock(); e != nil {
+		return false, e
+	}
+	defer s.mu.Unlock()
+	return s.fileFail || s.fileBad, nil
+}

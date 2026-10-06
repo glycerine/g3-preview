@@ -71,6 +71,8 @@ type NumericTextStream struct {
 	fileByte     [1]byte
 	filePosition uint64
 	fileBad      bool
+	fileFail     bool // failbit is distinct from badbit (actual fstream open failure)
+	fileMode     bool // actual file provider even when a failed open has no fd
 	scratch      []byte
 	ownerBytes   uint64
 	state        NumericStreamState
@@ -121,7 +123,7 @@ func (s *NumericTextStream) Stats() NumericStreamStats {
 		return NumericStreamStats{}
 	}
 	defer s.mu.Unlock()
-	if s.file != nil {
+	if s.fileMode || s.file != nil {
 		return NumericStreamStats{OwnerBytes: s.ownerBytes, ScratchBytes: uint64(len(s.scratch)), Position: s.filePosition, State: s.state}
 	}
 	b := s.buffer.state.stats(true)
@@ -229,9 +231,12 @@ func (s *NumericTextStream) fieldPadding(n uint64) (uint64, error) {
 	return size - n, nil
 }
 func (s *NumericTextStream) emitByte(c byte) error {
-	if s.file != nil {
-		if s.fileBad {
+	if s.fileMode || s.file != nil {
+		if s.fileBad || s.fileFail {
 			return nil
+		}
+		if s.file == nil {
+			return ErrNumericStreamFile
 		}
 		s.fileByte[0] = c
 		n, e := s.file.Write(s.fileByte[:])
@@ -252,7 +257,7 @@ func (s *NumericTextStream) padding(n uint64) error {
 	return nil
 }
 func (s *NumericTextStream) emitBytes(v []byte, numeric bool) error {
-	if s.fileBad {
+	if s.fileBad || s.fileFail {
 		return nil
 	}
 	pad, e := s.fieldPadding(uint64(len(v)))
@@ -293,7 +298,7 @@ func (s *NumericTextStream) AppendCString(v string) error {
 	}
 	defer s.mu.Unlock()
 	n := cSymbolLength(v)
-	if s.fileBad {
+	if s.fileBad || s.fileFail {
 		return nil
 	}
 	pad, e := s.fieldPadding(uint64(n))
@@ -416,7 +421,7 @@ func (s *NumericTextStream) AppendFloat64(v float64) error {
 		return e
 	}
 	defer s.mu.Unlock()
-	if s.fileBad {
+	if s.fileBad || s.fileFail {
 		return nil
 	}
 	bits := math.Float64bits(v)
@@ -533,7 +538,7 @@ func (s *NumericTextStream) String() (string, error) {
 		return "", e
 	}
 	defer s.mu.Unlock()
-	if s.file != nil {
+	if s.fileMode || s.file != nil {
 		return "", ErrNumericStreamFile
 	}
 	return string(s.buffer.state.data(s.buffer.inline[:])[:s.buffer.state.pos]), nil
@@ -543,7 +548,7 @@ func (s *NumericTextStream) ResetText() error {
 		return e
 	}
 	defer s.mu.Unlock()
-	if s.file != nil {
+	if s.fileMode || s.file != nil {
 		return ErrNumericStreamFile
 	}
 	s.buffer.state.pos = 0
