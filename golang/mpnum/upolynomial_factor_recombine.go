@@ -413,29 +413,36 @@ func (s *UPolynomialFactorizationService) primitiveDiagnostic(f UPolynomialView)
 	}
 	return nil
 }
-func (s *UPolynomialFactorizationService) selectFactorTrial(it *upolyFactorCombinationState, leading *Int, fpp, trial *upolyVectorState, left bool) (bool, error) {
-	m := s.manager
-	var tmp Int
-	defer m.modular.Del(&tmp)
-	var e error
+func (s *UPolynomialFactorizationService) selectFactorTrial(it *upolyFactorCombinationState, leading *Int, fpp, trial *upolyVectorState, left bool) (used bool, failure error) {
+	q, e := s.beginRecombinationTrial(it.factors)
+	if e != nil {
+		return false, e
+	}
+	r := q.receipt
+	q.enterCall()
+	defer func() { q.executing = false; q.leaveCall(); failure = q.finish(&r, failure) }()
+	context := it.factors.manager.modular.trialAllocationContext(q)
+	if context.trialFrame(s.manager.config.Integer) == nil {
+		return false, ErrUPolynomialOwner
+	}
 	if left {
-		e = it.leftTail(leading, &tmp)
+		e = it.leftTailWithSourceContext(leading, &q.tmp, context)
 	} else {
-		e = it.right(leading, &tmp, nil)
+		e = it.rightWithSourceContext(leading, &q.tmp, nil, &q.addMul, context)
 	}
 	if e != nil {
 		return false, e
 	}
-	first, e := m.read(m.stateView(fpp), 0)
+	first, e := s.manager.read(s.manager.stateView(fpp), 0)
 	if e != nil {
 		return false, e
 	}
-	divides, e := m.modular.Divides(&tmp, first)
+	divides, e := s.manager.modular.dividesWithAllocationContext(&q.tmp, first, s.manager.modular.trialAllocationContext(q))
 	if e != nil || !divides {
 		return false, e
 	}
 	if left {
-		return true, it.left(trial)
+		return true, it.leftWithSourceContext(trial, &q.addMul, context)
 	}
-	return true, it.right(nil, nil, trial)
+	return true, it.rightWithSourceContext(nil, nil, trial, &q.addMul, context)
 }

@@ -116,7 +116,7 @@ func primeTrialPhysicalAuditAll(t *testing.T, q *RationalManager, s *UPolynomial
 	c := s.scope
 	managers := []*UPolynomialManager{s.manager}
 	if c != nil {
-		n += c.header + uint64(cap(c.ds.words))*4 + uint64(cap(c.primeTrial.degrees.words))*4
+		n += c.header + uint64(cap(c.ds.words))*4 + uint64(cap(c.primeTrial.degrees.words))*4 + uint64(cap(c.it.current))*4 + uint64(cap(c.it.enabled))
 		managers = append(managers, c.zp, c.zpe)
 		for _, m := range c.hensel.numericOwners() {
 			if m == nil || m.closed {
@@ -133,7 +133,7 @@ func primeTrialPhysicalAuditAll(t *testing.T, q *RationalManager, s *UPolynomial
 				managers = append(managers, m)
 			}
 		}
-		roots = append(roots, &c.p, &c.bestP, &c.gcdTmp, &c.leading, &c.trialContent, &c.mignotte.norm, &c.mignotte.bound, &c.mignotte.tmp)
+		roots = append(roots, &c.p, &c.bestP, &c.gcdTmp, &c.leading, &c.trialContent, &c.mignotte.norm, &c.mignotte.bound, &c.mignotte.tmp, &c.trialHelper.tmp)
 	}
 	for h := s.henselPairs; h != nil; h = h.next {
 		n += h.header

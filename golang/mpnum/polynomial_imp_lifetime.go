@@ -229,7 +229,7 @@ func (m *MultivariatePolynomialManager) SourceFinalize() error {
 	if e := m.identity(); e != nil {
 		return e
 	}
-	if m.discriminant.active || m.subresultant.active || m.pscChain1.active || m.pscChain2.active {
+	if m.discriminant.active || m.subresultant.active || m.pscChain1.active || m.pscChain2.active || m.core.pscClassic.active || m.core.pscClassic.executing {
 		return ErrPolynomialPending
 	}
 	if m.closing || !m.completed || m.originalCause != nil {

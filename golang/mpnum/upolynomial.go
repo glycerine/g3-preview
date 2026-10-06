@@ -31,6 +31,7 @@ type UPolynomialManager struct {
 	henselCallerInvocation uint64
 	callbackDepth          uint32
 	mignotteCaller         *upolyMignotteScope
+	trialCaller            *upolyRecombinationTrialScope
 	primeTrialCaller       *upolyPrimeTrialScope
 	squareFreeCaller       *upolyFactorSquareFreeScope
 	self                   *UPolynomialManager

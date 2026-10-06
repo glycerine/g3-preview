@@ -18,6 +18,7 @@ var ErrUPolynomialCleanupPending = errors.New("mpnum: retained factorization lex
 // additional charged header is a Go exception/lifetime adapter, not C++ malloc.
 type upolyFactorSquareFreeScope struct {
 	hensel          upolyHenselCallerScope
+	trialHelper     upolyRecombinationTrialScope
 	self            *upolyFactorSquareFreeScope
 	service         *UPolynomialFactorizationService
 	callerPrevious  *upolyFactorSquareFreeScope
@@ -61,6 +62,15 @@ func (s *UPolynomialFactorizationService) newSquareFreeScope() (*upolyFactorSqua
 // prime, prime factors, prime core, prime, primitive vector. Only constructed
 // objects participate; publication/cleanup advances one completed action.
 func (c *upolyFactorSquareFreeScope) cleanup() error {
+	if q := &c.trialHelper; q.active {
+		if q.executing || q.sourceExecuting || q.ownExecuting || q.callDepth != 0 {
+			return ErrUPolynomialCleanupPending
+		}
+		q.finish(&q.receipt, q.bodyCause)
+		if q.sourceCause != nil {
+			return q.sourceCause
+		}
+	}
 	if c.hensel.active {
 		if e := c.hensel.finish(); e != nil {
 			return e
@@ -88,7 +98,7 @@ func (c *upolyFactorSquareFreeScope) cleanup() error {
 	if e := c.cleanupMembers(); e != nil {
 		return e
 	}
-	if c.mignotte.active || c.primeTrial.active {
+	if c.mignotte.active || c.primeTrial.active || c.trialHelper.active {
 		return ErrUPolynomialCleanupPending
 	}
 	return nil
@@ -190,6 +200,11 @@ func (s *UPolynomialFactorizationService) CleanupRetained() error {
 		return ErrUPolynomialCleanupPending
 	}
 	caller := s.scope
+	if caller.trialHelper.active {
+		if e := caller.trialHelper.own(&caller.trialHelper.receipt, false); e != nil {
+			return e
+		}
+	}
 	caller.enterCall()
 	defer caller.leaveCall()
 	if s.scope.hensel.active {
@@ -227,6 +242,11 @@ func (s *UPolynomialFactorizationService) CleanupRetained() error {
 	}
 	if s.scope.hensel.active {
 		if e := s.scope.hensel.own(true); e != nil {
+			return e
+		}
+	}
+	if caller.trialHelper.active {
+		if e := caller.trialHelper.own(&caller.trialHelper.receipt, true); e != nil {
 			return e
 		}
 	}

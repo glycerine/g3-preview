@@ -165,7 +165,9 @@ func (s *UPolynomialFactorizationService) cleanupMignotteInvocation(r *upolyMign
 // Pending identity reads only acknowledge consumption or refuse unsafe cleanup.
 // No returned inventory is copied into the old invocation's acquired authority.
 func (q *upolyMignotteScope) cleanupNumeric(z *IntegerManager) error {
-	r := &q.numeric
+	return cleanupUPolynomialNumericRoots(z, &q.numeric)
+}
+func cleanupUPolynomialNumericRoots(z *IntegerManager, r *polynomialNumericRoots) error {
 	if r.cell.object != (memory.ObjectRef{}) {
 		old := r.cell
 		if z.pendingCell == old {
@@ -238,6 +240,16 @@ func (q *upolyMignotteScope) leaveCall(m *UPolynomialManager) {
 	}
 }
 func (m *UPolynomialManager) mignotteCallPending() bool {
+	for q := m.trialCaller; q != nil; {
+		if q.matches() && q.callDepth != 0 && (q.owner.manager == m || q.factors.manager == m) {
+			return true
+		}
+		if q.owner != nil && q.owner.manager == m {
+			q = q.callerPrevious[0]
+		} else {
+			q = q.callerPrevious[1]
+		}
+	}
 	if c := m.henselCallerGuard; c != nil && c.matches() && c.callDepth != 0 && m.henselCallerInvocation == c.invocation && c.ownsNumericManager(m) {
 		return true
 	}

@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial_factorization_int.h:124-417.
 // Licensed under the MIT license.
 // Concrete ufactorization_combination_iterator, without template dispatch.
 package mpnum
@@ -218,6 +219,9 @@ func (s *upolyFactorCombinationState) next(remove bool) (bool, error) {
 	}
 }
 func (s *upolyFactorCombinationState) left(out *upolyVectorState) error {
+	return s.leftWithSourceContext(out, nil, integerAllocationInvocationContext{})
+}
+func (s *upolyFactorCombinationState) leftWithSourceContext(out *upolyVectorState, child *integerAddMulInvocationReceipt, context integerAllocationInvocationContext) error {
 	m := s.factors.manager
 	if modularSourceDebug && s.size <= 0 {
 		return ErrUPolynomialAssertion
@@ -229,7 +233,7 @@ func (s *upolyFactorCombinationState) left(out *upolyVectorState) error {
 	if idx < 0 || uint32(idx) >= s.factors.count {
 		return arena.ErrBounds
 	}
-	if e := m.setView(out, m.stateView(&s.factors.factors[idx])); e != nil {
+	if e := m.setViewWithSourceContext(out, m.stateView(&s.factors.factors[idx]), context); e != nil {
 		return e
 	}
 	for i := int32(1); i < s.size; i++ {
@@ -237,15 +241,18 @@ func (s *upolyFactorCombinationState) left(out *upolyVectorState) error {
 		if idx < 0 || uint32(idx) >= s.factors.count {
 			return arena.ErrBounds
 		}
-		if e := m.mul(m.stateView(out), m.stateView(&s.factors.factors[idx]), out); e != nil {
+		if e := m.mulWithSourceContext(m.stateView(out), m.stateView(&s.factors.factors[idx]), out, child, context); e != nil {
 			return e
 		}
 	}
 	return nil
 }
 func (s *upolyFactorCombinationState) leftTail(value, out *Int) error {
+	return s.leftTailWithSourceContext(value, out, integerAllocationInvocationContext{})
+}
+func (s *upolyFactorCombinationState) leftTailWithSourceContext(value, out *Int, context integerAllocationInvocationContext) error {
 	m := s.factors.manager
-	if e := m.modular.Copy(out, value); e != nil {
+	if e := m.modular.copyWithSourceContext(out, value, context); e != nil {
 		return e
 	}
 	for i := int32(0); i < s.size; i++ {
@@ -257,13 +264,16 @@ func (s *upolyFactorCombinationState) leftTail(value, out *Int) error {
 		if e != nil {
 			return e
 		}
-		if e = m.modular.Mul(out, a, out); e != nil {
+		if e = m.modular.mulWithSourceContext(out, a, out, context); e != nil {
 			return e
 		}
 	}
 	return nil
 }
 func (s *upolyFactorCombinationState) right(value, out *Int, polynomial *upolyVectorState) error {
+	return s.rightWithSourceContext(value, out, polynomial, nil, integerAllocationInvocationContext{})
+}
+func (s *upolyFactorCombinationState) rightWithSourceContext(value, out *Int, polynomial *upolyVectorState, child *integerAddMulInvocationReceipt, context integerAllocationInvocationContext) error {
 	m := s.factors.manager
 	if polynomial != nil {
 		if modularSourceDebug && s.size <= 0 {
@@ -273,7 +283,7 @@ func (s *upolyFactorCombinationState) right(value, out *Int, polynomial *upolyVe
 			return e
 		}
 	} else {
-		if e := m.modular.Copy(out, value); e != nil {
+		if e := m.modular.copyWithSourceContext(out, value, context); e != nil {
 			return e
 		}
 	}
@@ -302,15 +312,15 @@ func (s *upolyFactorCombinationState) right(value, out *Int, polynomial *upolyVe
 				if e != nil {
 					return e
 				}
-				if e = m.modular.Mul(out, a, out); e != nil {
+				if e = m.modular.mulWithSourceContext(out, a, out, context); e != nil {
 					return e
 				}
 			} else if polynomial.size == 0 {
-				if e := m.setView(polynomial, fv); e != nil {
+				if e := m.setViewWithSourceContext(polynomial, fv, context); e != nil {
 					return e
 				}
 			} else {
-				if e := m.mul(m.stateView(polynomial), fv, polynomial); e != nil {
+				if e := m.mulWithSourceContext(m.stateView(polynomial), fv, polynomial, child, context); e != nil {
 					return e
 				}
 			}

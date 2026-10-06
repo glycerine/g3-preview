@@ -1,3 +1,5 @@
+// Source: src/math/polynomial/upolynomial.h:151-156;
+// src/math/polynomial/upolynomial_factorization.cpp:1213-1240.
 // Licensed under the MIT license.
 package mpnum
 
@@ -7,17 +9,26 @@ func (m *UPolynomialManager) SetZ() error {
 	if e := m.check(); e != nil {
 		return e
 	}
+	if m.trialCallPending() {
+		return ErrUPolynomialCleanupPending
+	}
 	return m.modular.SetZ()
 }
 func (m *UPolynomialManager) SetZP(p *Int) error {
 	if e := m.check(); e != nil {
 		return e
 	}
+	if m.trialCallPending() {
+		return ErrUPolynomialCleanupPending
+	}
 	return m.modular.SetZP(p)
 }
 func (m *UPolynomialManager) SetZPUint64(p uint64) error {
 	if e := m.check(); e != nil {
 		return e
+	}
+	if m.trialCallPending() {
+		return ErrUPolynomialCleanupPending
 	}
 	return m.modular.SetZPUint64(p)
 }

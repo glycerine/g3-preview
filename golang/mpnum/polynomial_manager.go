@@ -56,6 +56,7 @@ type MultivariatePolynomialCore struct {
 	contentLocal                                                                               polynomialContentScope
 	pscReceipts                                                                                polynomialPSCReceipts
 	generatedPSC                                                                               uint64
+	pscClassic                                                                                 polynomialPSCClassicScope
 	pscLocal                                                                                   polynomialPSCScope
 	pscNext                                                                                    polynomialPSCNextScope
 	lazardLocal                                                                                polynomialLazardScope
@@ -443,7 +444,7 @@ func (m *MultivariatePolynomialCore) MkTerms(as []Int, ms []Monomial) (Polynomia
 	return m.som.mk(false)
 }
 func (m *MultivariatePolynomialCore) CloseChecked() error {
-	if m != nil && m.self == m && m.variableLocal.active {
+	if m != nil && m.self == m && (m.variableLocal.active || m.pscClassic.active || m.pscClassic.executing) {
 		return ErrPolynomialPending
 	}
 	if m != nil && m.self == m && m.negativeActive && m.negativeExecuting {
