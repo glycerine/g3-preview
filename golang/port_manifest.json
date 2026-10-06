@@ -12922,9 +12922,15 @@
       "path": "src/ast/expr2var.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_goal_ast_map.go",
+        "sat_goal_to_sat.go"
+      ],
+      "tests": [
+        "TestSATGoalTranslatorAtomOwnershipAndClosedGuard",
+        "TestSATGoalTranslatorAtomMapGrowthAndModel"
+      ],
       "assertions": [
         {
           "line": 74,
@@ -12935,7 +12941,9 @@
       "ownership_audited": false,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Only translator atom insertion, lookup and retained key retirement are integrated; general expr2var scope push/pop/reset and recent-expression bookkeeping remain unported."
+      ]
     },
     {
       "path": "src/ast/expr2var.h",
@@ -68691,14 +68699,32 @@
       "path": "src/sat/tactic/atom2bool_var.cpp",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_goal_interface.go",
+        "sat_goal_ast_map.go",
+        "sat_goal_to_sat.go"
+      ],
+      "tests": [
+        "TestSATGoalTranslatorBooleanInterfaceAndInterpretedAtoms",
+        "TestSATGoalTranslatorAtomMapGrowthAndModel"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "collect_boolean_interface(array overload)",
+          "status": "ported",
+          "go_target": "sat_goal_interface.go",
+          "tests": [
+            "TestSATGoalTranslatorBooleanInterfaceAndInterpretedAtoms"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Goal-dependency traversal and mk_inv remain unported. The general expression visitor is specialized for collecting interface constants; broad quantifier and allocation-history qualification remains deferred."
+      ]
     },
     {
       "path": "src/sat/tactic/atom2bool_var.h",
@@ -68727,9 +68753,22 @@
       "path": "src/sat/tactic/goal2sat.cpp",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_goal_to_sat.go",
+        "sat_goal_ast_map.go",
+        "sat_goal_interface.go"
+      ],
+      "tests": [
+        "TestSATGoalTranslatorNestedBooleanTruthTableAndModel",
+        "TestSATGoalTranslatorConstants",
+        "TestSATGoalTranslatorConnectivesTruthTable",
+        "TestSATGoalTranslatorAtomOwnershipAndClosedGuard",
+        "TestSATGoalTranslatorBooleanInterfaceAndInterpretedAtoms",
+        "TestSATGoalTranslatorCancellationAndMemoryParams",
+        "TestSATGoalTranslatorAtomMapGrowthAndModel",
+        "TestSATGoalTranslatorRejectsUnnormalizedSourceOperators"
+      ],
       "assertions": [
         {
           "line": 117,
@@ -68818,9 +68857,29 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "imp::process / visit / Boolean clause conversion and array overload",
+          "status": "ported",
+          "go_target": "sat_goal_to_sat.go",
+          "tests": [
+            "TestSATGoalTranslatorNestedBooleanTruthTableAndModel",
+            "TestSATGoalTranslatorConstants",
+            "TestSATGoalTranslatorConnectivesTruthTable",
+            "TestSATGoalTranslatorAtomOwnershipAndClosedGuard",
+            "TestSATGoalTranslatorBooleanInterfaceAndInterpretedAtoms",
+            "TestSATGoalTranslatorCancellationAndMemoryParams",
+            "TestSATGoalTranslatorAtomMapGrowthAndModel",
+            "TestSATGoalTranslatorRejectsUnnormalizedSourceOperators"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete AST-hash linear-probing maps; atom keys and interpreted-atom trail retain AST references; explicit Close releases charged scalar storage."
+      ],
+      "deviations": [
+        "Goal dependencies, dep2asm, unsupported-operator SMT2 diagnostics, wrapper parameter updates and public tactic integration remain unported. This internal adapter borrows the solver resource limit until the context binds an AST-manager limit; no whole-unit or public API completion is claimed."
+      ]
     },
     {
       "path": "src/sat/tactic/goal2sat.h",
