@@ -17,15 +17,18 @@ type ContextParamsState struct {
 	DefaultsInitialized                                                                                                                                            bool
 }
 type ContextParams struct {
-	self                     *ContextParams
-	context                  *ParamsContext
-	globals                  *GlobalParamsService
-	budget                   *arena.Budget
-	dotProof, traceFile      qiOwnedString
-	state                    ContextParamsState
-	header                   uint64
-	ready, closed, executing bool
-	constructorCause         error
+	self                       *ContextParams
+	context                    *ParamsContext
+	globals                    *GlobalParamsService
+	budget                     *arena.Budget
+	dotProof, traceFile        qiOwnedString
+	state                      ContextParamsState
+	header                     uint64
+	ready, closed, executing   bool
+	constructorCause           error
+	bodyCause, destructorCause error
+	frames                     *contextParamsFrame
+	nextFrame                  uint64
 }
 
 func NewContextParams(c *ParamsContext, g *GlobalParamsService, b *arena.Budget) (*ContextParams, error) {
@@ -249,6 +252,9 @@ func (s *ContextParams) Close() error {
 	}
 	if s.executing {
 		return ErrParamsPrecondition
+	}
+	if e := s.closeSourceFrames(); e != nil {
+		return e
 	}
 	// Reverse actual automatic string members, then separate own unjoined arrays.
 	s.traceFile.sourceDestroy()

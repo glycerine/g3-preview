@@ -23309,7 +23309,10 @@
         "util_gparams_catalog_collectors.go",
         "util_gparams_catalog_dispatch.go",
         "util_context_params.go",
-        "util_context_params_source_test.go"
+        "util_context_params_source_test.go",
+        "util_param_descrs.go",
+        "util_context_params_methods_source.go",
+        "util_context_params_methods_source_test.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -23322,7 +23325,18 @@
         "TestContextParamsEveryConstructorReservationAndReverseStringUnwind",
         "TestContextParamsUpdateStringRefusalPrefixAndIncompleteOwnerGuards",
         "TestContextParamsEveryUpdateAllocationAndReachedStringViewLifetime",
-        "TestContextParamsAllBooleanUpdateFieldsWrongKindsAndGlobalReRead"
+        "TestContextParamsAllBooleanUpdateFieldsWrongKindsAndGlobalReRead",
+        "TestContextParamsSetASCIINormalizationLiteralBoolAndLP64UIntParsing",
+        "TestContextParamsUnknownSetNormalizedKeyLeavesUnusedValueUnreadAndListsExactDescriptors",
+        "TestContextParamsMergeDefaultAutoConfigUsesContainsAnyKindAndExactOwnedCopy",
+        "TestContextParamsGetSolverProofShortCircuitAndPublicationBeforeMergedParams",
+        "TestContextParamsEveryUnknownDescriptorAndErrorBufferReservation",
+        "TestContextParamsActualLongStringSetEveryAllocationAndErrorScanRefusal",
+        "TestContextParamsMergeEveryContextCOWReservationPreservesInputAndExactReturnOwnership",
+        "TestContextParamsGetSolverCopyOOMRetainsExactUntransferredNumeral",
+        "TestContextParamsAllSetBooleanFieldsAndReachedBorrowedStringLifetime",
+        "TestContextParamsEveryLiteralBoolAndUIntDiagnosticOutputReservation",
+        "TestContextParamsActualCOWAppendRefusalCleanupStopRetainsImmutableChildTuples"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -23351,14 +23365,37 @@
             "TestContextParamsEveryUpdateAllocationAndReachedStringViewLifetime",
             "TestContextParamsAllBooleanUpdateFieldsWrongKindsAndGlobalReRead"
           ]
+        },
+        {
+          "name": "Literal context set/parse, default parameter merge and ordered solver outputs (src/cmd_context/context_params.cpp:42-135,158-196)",
+          "status": "partial",
+          "go_target": "util_context_params_methods_source.go",
+          "tests": [
+            "TestContextParamsSetASCIINormalizationLiteralBoolAndLP64UIntParsing",
+            "TestContextParamsUnknownSetNormalizedKeyLeavesUnusedValueUnreadAndListsExactDescriptors",
+            "TestContextParamsMergeDefaultAutoConfigUsesContainsAnyKindAndExactOwnedCopy",
+            "TestContextParamsGetSolverProofShortCircuitAndPublicationBeforeMergedParams",
+            "TestContextParamsEveryUnknownDescriptorAndErrorBufferReservation",
+            "TestContextParamsActualLongStringSetEveryAllocationAndErrorScanRefusal",
+            "TestContextParamsMergeEveryContextCOWReservationPreservesInputAndExactReturnOwnership",
+            "TestContextParamsGetSolverCopyOOMRetainsExactUntransferredNumeral",
+            "TestContextParamsAllSetBooleanFieldsAndReachedBorrowedStringLifetime",
+            "TestContextParamsEveryLiteralBoolAndUIntDiagnosticOutputReservation",
+            "TestContextParamsActualCOWAppendRefusalCleanupStopRetainsImmutableChildTuples"
+          ]
         }
       ],
       "ownership": [
         "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open.",
-        "Actual two default std::string members construct in declaration order before twelve constructor-body scalar assignments; constructor then reaches global gparams::get_ref and the same direct update engine. UInt/Bool/string getter RHS values publish in literal source order, including inner well_sorted_check fallback before outer type_check. No lexical module helper, Params INC, clone or snapshot is invented. The reflected context wrapper charges both embedded inline strings once; external/pending arrays are actual qiOwnedString engine allocations. Constructor failure traverses completed strings trace-file then dot-proof before return; owning Close separately drains unjoined arrays."
+        "Actual two default std::string members construct in declaration order before twelve constructor-body scalar assignments; constructor then reaches global gparams::get_ref and the same direct update engine. UInt/Bool/string getter RHS values publish in literal source order, including inner well_sorted_check fallback before outer type_check. No lexical module helper, Params INC, clone or snapshot is invented. The reflected context wrapper charges both embedded inline strings once; external/pending arrays are actual qiOwnedString engine allocations. Constructor failure traverses completed strings trace-file then dot-proof before return; owning Close separately drains unjoined arrays.",
+        "Source setters use exact ASCII normalization and field routes, sequential strcmp branches, strlen then all-digit classification and selected LP64 strtol saturation followed by unsigned32 cast. Unknown-key value is unread; actual lexical owned key, embedded descriptor info/names/text members and inline64 diagnostic buffer use the same concrete source engines. Context lexical frame storage is real charged metadata, not a simulated native allocation. Merge contains any kind, actual source reference copy then COW SetBool, and return transfers only the actually held temporary. Solver outputs publish in source proofs/model/core order before merge and final params assignment. Failed COW init retains the exact returned ParamsSourceReceipt and actual untransferred POD numeral ParamsSetReceipt before source temporary destruction. Explicit owning close acknowledges younger numeral then older init-held reference; source epilogue never aborts the incomplete POD acquisition. Borrowed caller Params/context/symbol/AST/numeric owners are not adopted. All matched receipts are exact owner/slot/generation/invocation; source/body/own causes remain distinct and first causes sticky.",
+        "The actual shared lexical epilogue engine is tested with a real final-reference NUM DT stop in the existing signed-counter guarded Runtime domain: younger source stop protects older allocated key storage, both body and destructor errors remain joined, and separate matched owning ACK preserves each frame history. No native signed-overflow destruction or high-level callback equivalence is claimed.",
+        "Actual child receipt tuples remain immutable after matched owning acknowledgement; separate setAcknowledged/sourceAcknowledged booleans retire authority without clearing owner/slot/generation/invocation. Wrong primitive invocation is rejected by a separate direct CleanupSet call without overwriting acquired parent tuples. Genuine parent first ownCause ErrBounds comes from Close after fully backed NUM Copy and actual append refusal, with both child tuples unchanged; matched retry preserves exact tuples/body/source/own histories and separate ACK bits prevent repeated cleanup. Direct lexical older-key protection is epilogue-engine/signed-counter guard-domain evidence, not public call nesting or driver credit.",
+        "Genuine own-cause history is proved with fully backed NUM Copy followed by actual COW append refusal. The exact NUM matches the original payload and adds one independently named raw block before TLS stop. Context.Close with unchanged parent tuples reaches CleanupSet ErrBounds; parent first ownCause and child cleanupCause are ErrBounds while active/acquired remains true. Immediate physical/cold graph precedes fault lift and matching retry; both tuples and exact original body/source/own histories remain unchanged after ACK. Wrong primitive receipt is passed directly to ParamsContext.CleanupSet and never overwrites parent acquisition metadata."
       ],
       "deviations": [
-        "Only context constructor, both direct/global updates and scalar rlimit setter/access are implemented here. m_interpolants is never initialized by this source; false Go storage with InterpolantsInitialized=false is diagnostic, not a source default. Failed constructor State is diagnostic and Update rejects it. Source set parsing, descriptor collectors, merge_default_params/get_solver_params, AST-manager construction and compiler-generated copies remain separate obligations. Existing independently ported collector evidence is preserved; no new driver/context/native ABI/global registration credit."
+        "Only context constructor, both direct/global updates and scalar rlimit setter/access are implemented here. m_interpolants is never initialized by this source; false Go storage with InterpolantsInitialized=false is diagnostic, not a source default. Failed constructor State is diagnostic and Update rejects it. Source set parsing, descriptor collectors, merge_default_params/get_solver_params, AST-manager construction and compiler-generated copies remain separate obligations. Existing independently ported collector evidence is preserved; no new driver/context/native ABI/global registration credit.",
+        "Selected GNU/LP64 parsing profile and existing inline15/external owned-string representation are explicit adaptations. std::stringstream character insertion uses the existing concrete inline64 StringBuffer engine; char-pointer strlen precedes reached byte emission. Native STL/global allocator/ostream locale/formatting and other long-width profiles remain open. Nil/stale/closed/copy/executing guards and unsigned strlen loop beyond MaxUint32 are Go domain guards, not native continuation credit. Real mk_ast_manager at src/cmd_context/context_params.cpp:198-209, parameter implicit owning copies, complete cmd_context/AST manager/SMT driver and globals remain open; no registered driver assertions added."
       ]
     },
     {
@@ -23372,7 +23409,10 @@
         "util_gparams_catalog_collectors.go",
         "util_gparams_catalog_dispatch.go",
         "util_context_params.go",
-        "util_context_params_source_test.go"
+        "util_context_params_source_test.go",
+        "util_param_descrs.go",
+        "util_context_params_methods_source.go",
+        "util_context_params_methods_source_test.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -23385,7 +23425,18 @@
         "TestContextParamsEveryConstructorReservationAndReverseStringUnwind",
         "TestContextParamsUpdateStringRefusalPrefixAndIncompleteOwnerGuards",
         "TestContextParamsEveryUpdateAllocationAndReachedStringViewLifetime",
-        "TestContextParamsAllBooleanUpdateFieldsWrongKindsAndGlobalReRead"
+        "TestContextParamsAllBooleanUpdateFieldsWrongKindsAndGlobalReRead",
+        "TestContextParamsSetASCIINormalizationLiteralBoolAndLP64UIntParsing",
+        "TestContextParamsUnknownSetNormalizedKeyLeavesUnusedValueUnreadAndListsExactDescriptors",
+        "TestContextParamsMergeDefaultAutoConfigUsesContainsAnyKindAndExactOwnedCopy",
+        "TestContextParamsGetSolverProofShortCircuitAndPublicationBeforeMergedParams",
+        "TestContextParamsEveryUnknownDescriptorAndErrorBufferReservation",
+        "TestContextParamsActualLongStringSetEveryAllocationAndErrorScanRefusal",
+        "TestContextParamsMergeEveryContextCOWReservationPreservesInputAndExactReturnOwnership",
+        "TestContextParamsGetSolverCopyOOMRetainsExactUntransferredNumeral",
+        "TestContextParamsAllSetBooleanFieldsAndReachedBorrowedStringLifetime",
+        "TestContextParamsEveryLiteralBoolAndUIntDiagnosticOutputReservation",
+        "TestContextParamsActualCOWAppendRefusalCleanupStopRetainsImmutableChildTuples"
       ],
       "conditionals": [
         {
@@ -23424,14 +23475,37 @@
             "TestContextParamsEveryUpdateAllocationAndReachedStringViewLifetime",
             "TestContextParamsAllBooleanUpdateFieldsWrongKindsAndGlobalReRead"
           ]
+        },
+        {
+          "name": "Literal context set/parse, default parameter merge and ordered solver outputs (src/cmd_context/context_params.h:26-80)",
+          "status": "partial",
+          "go_target": "util_context_params_methods_source.go",
+          "tests": [
+            "TestContextParamsSetASCIINormalizationLiteralBoolAndLP64UIntParsing",
+            "TestContextParamsUnknownSetNormalizedKeyLeavesUnusedValueUnreadAndListsExactDescriptors",
+            "TestContextParamsMergeDefaultAutoConfigUsesContainsAnyKindAndExactOwnedCopy",
+            "TestContextParamsGetSolverProofShortCircuitAndPublicationBeforeMergedParams",
+            "TestContextParamsEveryUnknownDescriptorAndErrorBufferReservation",
+            "TestContextParamsActualLongStringSetEveryAllocationAndErrorScanRefusal",
+            "TestContextParamsMergeEveryContextCOWReservationPreservesInputAndExactReturnOwnership",
+            "TestContextParamsGetSolverCopyOOMRetainsExactUntransferredNumeral",
+            "TestContextParamsAllSetBooleanFieldsAndReachedBorrowedStringLifetime",
+            "TestContextParamsEveryLiteralBoolAndUIntDiagnosticOutputReservation",
+            "TestContextParamsActualCOWAppendRefusalCleanupStopRetainsImmutableChildTuples"
+          ]
         }
       ],
       "ownership": [
         "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open.",
-        "Actual two default std::string members construct in declaration order before twelve constructor-body scalar assignments; constructor then reaches global gparams::get_ref and the same direct update engine. UInt/Bool/string getter RHS values publish in literal source order, including inner well_sorted_check fallback before outer type_check. No lexical module helper, Params INC, clone or snapshot is invented. The reflected context wrapper charges both embedded inline strings once; external/pending arrays are actual qiOwnedString engine allocations. Constructor failure traverses completed strings trace-file then dot-proof before return; owning Close separately drains unjoined arrays."
+        "Actual two default std::string members construct in declaration order before twelve constructor-body scalar assignments; constructor then reaches global gparams::get_ref and the same direct update engine. UInt/Bool/string getter RHS values publish in literal source order, including inner well_sorted_check fallback before outer type_check. No lexical module helper, Params INC, clone or snapshot is invented. The reflected context wrapper charges both embedded inline strings once; external/pending arrays are actual qiOwnedString engine allocations. Constructor failure traverses completed strings trace-file then dot-proof before return; owning Close separately drains unjoined arrays.",
+        "Source setters use exact ASCII normalization and field routes, sequential strcmp branches, strlen then all-digit classification and selected LP64 strtol saturation followed by unsigned32 cast. Unknown-key value is unread; actual lexical owned key, embedded descriptor info/names/text members and inline64 diagnostic buffer use the same concrete source engines. Context lexical frame storage is real charged metadata, not a simulated native allocation. Merge contains any kind, actual source reference copy then COW SetBool, and return transfers only the actually held temporary. Solver outputs publish in source proofs/model/core order before merge and final params assignment. Failed COW init retains the exact returned ParamsSourceReceipt and actual untransferred POD numeral ParamsSetReceipt before source temporary destruction. Explicit owning close acknowledges younger numeral then older init-held reference; source epilogue never aborts the incomplete POD acquisition. Borrowed caller Params/context/symbol/AST/numeric owners are not adopted. All matched receipts are exact owner/slot/generation/invocation; source/body/own causes remain distinct and first causes sticky.",
+        "The actual shared lexical epilogue engine is tested with a real final-reference NUM DT stop in the existing signed-counter guarded Runtime domain: younger source stop protects older allocated key storage, both body and destructor errors remain joined, and separate matched owning ACK preserves each frame history. No native signed-overflow destruction or high-level callback equivalence is claimed.",
+        "Actual child receipt tuples remain immutable after matched owning acknowledgement; separate setAcknowledged/sourceAcknowledged booleans retire authority without clearing owner/slot/generation/invocation. Wrong primitive invocation is rejected by a separate direct CleanupSet call without overwriting acquired parent tuples. Genuine parent first ownCause ErrBounds comes from Close after fully backed NUM Copy and actual append refusal, with both child tuples unchanged; matched retry preserves exact tuples/body/source/own histories and separate ACK bits prevent repeated cleanup. Direct lexical older-key protection is epilogue-engine/signed-counter guard-domain evidence, not public call nesting or driver credit.",
+        "Genuine own-cause history is proved with fully backed NUM Copy followed by actual COW append refusal. The exact NUM matches the original payload and adds one independently named raw block before TLS stop. Context.Close with unchanged parent tuples reaches CleanupSet ErrBounds; parent first ownCause and child cleanupCause are ErrBounds while active/acquired remains true. Immediate physical/cold graph precedes fault lift and matching retry; both tuples and exact original body/source/own histories remain unchanged after ACK. Wrong primitive receipt is passed directly to ParamsContext.CleanupSet and never overwrites parent acquisition metadata."
       ],
       "deviations": [
-        "Only context constructor, both direct/global updates and scalar rlimit setter/access are implemented here. m_interpolants is never initialized by this source; false Go storage with InterpolantsInitialized=false is diagnostic, not a source default. Failed constructor State is diagnostic and Update rejects it. Source set parsing, descriptor collectors, merge_default_params/get_solver_params, AST-manager construction and compiler-generated copies remain separate obligations. Existing independently ported collector evidence is preserved; no new driver/context/native ABI/global registration credit."
+        "Only context constructor, both direct/global updates and scalar rlimit setter/access are implemented here. m_interpolants is never initialized by this source; false Go storage with InterpolantsInitialized=false is diagnostic, not a source default. Failed constructor State is diagnostic and Update rejects it. Source set parsing, descriptor collectors, merge_default_params/get_solver_params, AST-manager construction and compiler-generated copies remain separate obligations. Existing independently ported collector evidence is preserved; no new driver/context/native ABI/global registration credit.",
+        "Selected GNU/LP64 parsing profile and existing inline15/external owned-string representation are explicit adaptations. std::stringstream character insertion uses the existing concrete inline64 StringBuffer engine; char-pointer strlen precedes reached byte emission. Native STL/global allocator/ostream locale/formatting and other long-width profiles remain open. Nil/stale/closed/copy/executing guards and unsigned strlen loop beyond MaxUint32 are Go domain guards, not native continuation credit. Real mk_ast_manager at src/cmd_context/context_params.cpp:198-209, parameter implicit owning copies, complete cmd_context/AST manager/SMT driver and globals remain open; no registered driver assertions added."
       ]
     },
     {
@@ -29210,7 +29284,12 @@
         "mpnum/polynomial_subresultant_chain_callback_source_test.go",
         "mpnum/polynomial_subresultant_chain_child_stop_source_test.go",
         "mpnum/polynomial_subresultant_chain_prefix_source_test.go",
-        "mpnum/polynomial_subresultant_chain_source_test.go"
+        "mpnum/polynomial_subresultant_chain_source_test.go",
+        "mpnum/polynomial_psc_chain1.go",
+        "mpnum/polynomial_psc_chain1_callback_source_test.go",
+        "mpnum/polynomial_psc_chain1_child_stop_source_test.go",
+        "mpnum/polynomial_psc_chain1_prefix_source_test.go",
+        "mpnum/polynomial_psc_chain1_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -29959,7 +30038,13 @@
         "TestPolynomialSubresultantChainSourceRegularFixture",
         "TestPolynomialSubresultantChainDefectiveGapAndSwappedInputs",
         "TestPolynomialSubresultantChainCheckedSourceAssertions",
-        "TestPolynomialSubresultantChainActualUnsignedResizeWrap"
+        "TestPolynomialSubresultantChainActualUnsignedResizeWrap",
+        "TestPolynomialPSCChain1AscendingSetAndLastUnitCallbackRefuseOwnerReentry",
+        "TestPolynomialPSCChain1FactoryTransferBeforeCallbackPreservesForeignCoefficient",
+        "TestPolynomialPSCChain1SubchainSourceStopPreservesActualChildAndHistory",
+        "TestPolynomialPSCChain1ActualCoefficientAndSetEveryReservationPrefix",
+        "TestPolynomialPSCChain1SourceDegreeIndexedCoefficientLayout",
+        "TestPolynomialPSCChain1SubchainExactFrameAndCopiedOwnerRefuse"
       ],
       "conditionals": [
         {
@@ -33576,6 +33661,19 @@
             "TestPolynomialSubresultantChainCheckedSourceAssertions",
             "TestPolynomialSubresultantChainActualUnsignedResizeWrap"
           ]
+        },
+        {
+          "name": "psc_chain1 polynomial.cpp:5574-5583 actual Subchain caller, captured uint32 size, ascending Coeff/Get/SET then last unit SET",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_psc_chain1.go",
+          "tests": [
+            "TestPolynomialPSCChain1AscendingSetAndLastUnitCallbackRefuseOwnerReentry",
+            "TestPolynomialPSCChain1FactoryTransferBeforeCallbackPreservesForeignCoefficient",
+            "TestPolynomialPSCChain1SubchainSourceStopPreservesActualChildAndHistory",
+            "TestPolynomialPSCChain1ActualCoefficientAndSetEveryReservationPrefix",
+            "TestPolynomialPSCChain1SourceDegreeIndexedCoefficientLayout",
+            "TestPolynomialPSCChain1SubchainExactFrameAndCopiedOwnerRefuse"
+          ]
         }
       ],
       "ownership": [
@@ -33690,7 +33788,8 @@
         "Actual full-manager member frame with nonwrapping guarded invocation records only reached p_prime/lc/c declarations and exact child invocation tuples. Resultant publishes caller output before lc constructor. Exact completed child source phases precede older parent destruction; unjoined ownership abort follows completed parent locals. Strict lc source release and c reference destructor preserve first source/body/own cleanup causes and captured child diagnostics through owning acknowledgement; a new actual invocation alone replaces history.",
         "Shared cheap append and raw factory ownership are transported by the same actual default NUM/INC/slot publication and allocator leaf receipts accepted by the prerequisites; caller reference assignment transfers factory authority at incoming INC before older DEC callback. Known GCD frame address directory validates the captured identity, not discovered root authority.",
         "Actual embedded full-manager frame and nonwrapping invocation; only real SET incoming INC and three constructed references are acquired. Child completed source suffix precedes older newS/prem/R destruction; unjoined assignment/child ownership abort follows older declarations. Caller output range remains independent.",
-        "SET source INC precedes actual vector operator[] assertion and old-slot read (ref_vector.h:128-132; vector.h:303-311). Actual n+1 unsigned wrap test retains incoming INC before checked assertion/native bounds guard; exact own abort never reads or writes an old slot that was not reached. Native invalid-range memory access remains a Go guard qualification, not C++ undefined-access equivalence."
+        "SET source INC precedes actual vector operator[] assertion and old-slot read (ref_vector.h:128-132; vector.h:303-311). Actual n+1 unsigned wrap test retains incoming INC before checked assertion/native bounds guard; exact own abort never reads or writes an old slot that was not reached. Native invalid-range memory access remains a Go guard qualification, not C++ undefined-access equivalence.",
+        "No lexical polynomial_ref or NUM is constructed by psc_chain1. Exact concrete Subchain tuple is captured only at actual guarded begin; false completes its real reference suffix, true aborts unjoined roots. Caller SET transfers Coeff factory only at successful incoming INC before old DEC callbacks. Size/index/phase are scalar diagnostics, not ownership authority."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -33778,7 +33877,8 @@
         "The 24 original dormant fixtures from src/test/polynomial.cpp:341-451 provide zero active registered-driver assertion credit. Independent bounded degree-zero-through-four Sylvester determinant checks prove the result is constant before checking its numeric coefficient.",
         "Signed-host TLS source release stops and returning owner callback refusals are qualified Go owner-primitive/invalid metadata profiles, not ordinary mathematical free OOM or C++ source defects. Positive even composite-modulus fixture follows the literal accepted manager API and reaches upper-bound Neg normalization; it claims no prime-field theorem or invented inverse allocation on the zero polynomial route. Broader polynomial source unit remains partial.",
         "Source remark equal-degree limitation and checked assertions retained. Default registered PSC dispatch uses optimized chain; dormant alternative gains zero active-driver credit. Pointer resize evidence covers only reached growth after completed reset, not ref_vector shrink. Signed-host TLS source release proof is an owner-primitive profile, not ordinary mathematical OOM. Actual mpz.h:156-163 old-TMP destruction before failing replacement leaves tmp[i]==0; only that literal dangling-pointer guard domain expects ErrInvalidSlot on retry. No scratch repair.",
-        "Literal uint32 arithmetic is retained for n+1 and degree/exponent differences; defective zero-gap loop casts unsigned endpoints to signed int32. Bounded owner budgets refuse oversized range allocation before signed-gap execution. Source signed overflow beyond defined loop domain gains no mathematical completion claim."
+        "Literal uint32 arithmetic is retained for n+1 and degree/exponent differences; defective zero-gap loop casts unsigned endpoints to signed int32. Bounded owner budgets refuse oversized range allocation before signed-gap execution. Source signed overflow beyond defined loop domain gains no mathematical completion claim.",
+        "Dormant psc_chain1 gains zero active registered-driver assertion credit; polynomial.cpp:5897-5902 still dispatches optimized PSC. Degree-indexed zero slots and source equal-degree limitation remain inherited from literal Subchain. uint32 sz-1 expression retained. Source RAW DT proof is qualified signed-host TLS owner-primitive domain, callback/copied owner guards are separate Go owner-boundary coverage. Native invalid-index bounds guard is not C++ undefined-access equivalence."
       ]
     },
     {
@@ -129887,7 +129987,8 @@
         "util_params_set_replacement_source_test.go",
         "util_gparams_constructor_source.go",
         "util_params_string_view.go",
-        "util_params_string_view_source_test.go"
+        "util_params_string_view_source_test.go",
+        "util_context_params_methods_source_test.go"
       ],
       "tests": [
         "TestParamNameNormalizationSourceBranches",
@@ -129966,7 +130067,17 @@
         "TestGlobalParamsServiceCtorRefusalPreservesCurrentAndFailedHeaders",
         "TestParamsStringViewReturnedPointerNoFormatCopyAndInvalidation",
         "TestParamsStringViewFallbackNullAndProviderLifetime",
-        "TestParamsStringViewCStringSentryNullAndStaleBeforeBadbit"
+        "TestParamsStringViewCStringSentryNullAndStaleBeforeBadbit",
+        "TestContextParamsSetASCIINormalizationLiteralBoolAndLP64UIntParsing",
+        "TestContextParamsUnknownSetNormalizedKeyLeavesUnusedValueUnreadAndListsExactDescriptors",
+        "TestContextParamsMergeDefaultAutoConfigUsesContainsAnyKindAndExactOwnedCopy",
+        "TestContextParamsGetSolverProofShortCircuitAndPublicationBeforeMergedParams",
+        "TestContextParamsEveryUnknownDescriptorAndErrorBufferReservation",
+        "TestContextParamsActualLongStringSetEveryAllocationAndErrorScanRefusal",
+        "TestContextParamsMergeEveryContextCOWReservationPreservesInputAndExactReturnOwnership",
+        "TestContextParamsGetSolverCopyOOMRetainsExactUntransferredNumeral",
+        "TestContextParamsAllSetBooleanFieldsAndReachedBorrowedStringLifetime",
+        "TestContextParamsEveryLiteralBoolAndUIntDiagnosticOutputReservation"
       ],
       "conditionals": [
         {
@@ -130361,6 +130472,14 @@
             "TestParamsStringViewFallbackNullAndProviderLifetime",
             "TestParamsStringViewCStringSentryNullAndStaleBeforeBadbit"
           ]
+        },
+        {
+          "name": "Same descriptor constructor engine for actual lexical context unknown-key descriptor; reverse completed members distinct from incomplete owning abort (src/util/params.cpp:49-75,210-216)",
+          "status": "partial",
+          "go_target": "util_param_descrs.go",
+          "tests": [
+            "TestContextParamsEveryUnknownDescriptorAndErrorBufferReservation"
+          ]
         }
       ],
       "ownership": [
@@ -130378,7 +130497,8 @@
         "SET_RAT ADD stamps the actual NewValue result into precharged concrete setFrames.next.rat before Copy and retains it on actual Copy/append refusal. Source POD new_entry has no rational destructor; only true entry publication transfers ownership. Separate exact owning receipt or Context.Close releases this actual local, preserving first body and owning cleanup causes and actual consumed physical child frontier. SourceSetBytes is the independent reflected cold directory charge; audits name actual acquired tokens, not numeric live-count or RC inference.",
         "Concrete prepared per-block replacement frame binds actual matched index, old kind, slot/generation, nonwrapping invocation and borrowed current leaf identity at reached del_value. Actual owning NUM stays only in the entry, never copied into a second owning frame. Explicit CompleteSetReplacement acknowledges consumed physical child before kind then field publication; Context.Close instead discards prepared copied text and consumed old leaf before block teardown, with no setter body publication. Reflected ReplacementBytes cold directory and any actual acquired text are separately charged/named; no RC/count/registry authority.",
         "Nested unfinished ParamDescrs is named ctorPendingDescriptor only, never published as completed globalDescriptors. Prepared Go copied-text context/header persists until explicit owning abort; reached completed info/names members alone unwind. Public ergonomic constructors use same source engine followed by separate all-refund abort on failure.",
-        "The concrete call-local pointer view captures actual Words/ref/length or Symbol BytesRegion/ref/offset from the returned source entry. No RC, copied payload or formatting-workspace allocation is acquired. Each reached byte retains actual provider/generation/lifetime checks; returned symbol spelling may outlive ParamsContext while its provider remains live."
+        "The concrete call-local pointer view captures actual Words/ref/length or Symbol BytesRegion/ref/offset from the returned source entry. No RC, copied payload or formatting-workspace allocation is acquired. Each reached byte retains actual provider/generation/lifetime checks; returned symbol spelling may outlive ParamsContext while its provider remains live.",
+        "prepareSourceParamDescrs and constructSourceMembers factor the existing source engine without changing standalone header/text/info/name order. The actual call-local descriptor is embedded in the charged context frame and never runs a heap-wrapper constructor. Completed descriptor destruction remains names then info, copied-text adapter cleanup then actual wrapper header; incomplete placement construction retains actual child text owner until explicit abort."
       ],
       "deviations": [
         "Owner-local null replaces process-global empty reference. C strings become owned nullable first-NUL payloads; replacement stages new text. Detach error retains published partial block but cleans old reference. Pooled pages persist physically until Close; inline concrete numeric tokens replace separate heap objects. Provenance/overflow guards and libstdc++ null-C-string prefix error are explicit Go adapters; Z3DEBUG pp is explicit text API rather than global stdout.",
@@ -130391,7 +130511,8 @@
         "Only ADD/untransferred local path selected; existing-key exceptional destruction, native pointer ABI/global assertions and wider profiles stay partial. TLS signed-overflow guarded cleanup-stop proof is distinct from ordinary actual reservation/refusal campaigns. No source whole-class/ownership-audited promotion.",
         "Actual repeated ordinary setter consumed a callee owning receipt after postphysical TLS guard; this RED is Go stopped-owner safety-domain protocol, not first-call source math RED. Eleven source kind/name cases, pure absent RESET/Contains/scalar read and real Context.Close nonpublish stop are proved. Source borrowed C-string versus Go copied-text preparation is explicit; all preparation ordinals are independently audited. Whole params.cpp/h remain partial; source-global/native ABI/wider profiles and broader stopped-mutation domains stay open.",
         "Explicit borrowed-owner single-lane namespace service, not process singleton/generated memory lifecycle completion. Actual C++ placement delete is no-op on failed ctor; Go owning abort refunds concrete retained storage separately. Source TRACE, native ABI/global Runtime table allocation, full descendant exceptional paths and arbitrary global bindings remain open. Independent source branch fixtures give no registered test-driver credit. TLS signed-host overflow stop is guarded undefined-domain evidence, not ordinary free failure/OOM.",
-        "Existing string getter APIs remain unchanged. The existing Words text codec virtual terminator is a precise representation adaptation; native pointer ABI and standalone whole Params exceptional lifetime families remain open. Getter and view tests are independent, no registered driver credit."
+        "Existing string getter APIs remain unchanged. The existing Words text codec virtual terminator is a precise representation adaptation; native pointer ABI and standalone whole Params exceptional lifetime families remain open. Getter and view tests are independent, no registered driver credit.",
+        "This same-engine factoring adds no whole param_descrs lifecycle or source native ABI/registered-driver credit."
       ]
     },
     {
@@ -133651,7 +133772,12 @@
         "mpnum/polynomial_subresultant_chain_callback_source_test.go",
         "mpnum/polynomial_subresultant_chain_child_stop_source_test.go",
         "mpnum/polynomial_subresultant_chain_prefix_source_test.go",
-        "mpnum/polynomial_subresultant_chain_source_test.go"
+        "mpnum/polynomial_subresultant_chain_source_test.go",
+        "mpnum/polynomial_subresultant_chain.go",
+        "mpnum/polynomial_psc_chain1_callback_source_test.go",
+        "mpnum/polynomial_psc_chain1_child_stop_source_test.go",
+        "mpnum/polynomial_psc_chain1_prefix_source_test.go",
+        "mpnum/polynomial_psc_chain1_source_test.go"
       ],
       "tests": [
         "TestASTRefVectorBorrowedInputDefaultEraseAndMove",
@@ -133741,7 +133867,13 @@
         "TestPolynomialSubresultantChainSourceRegularFixture",
         "TestPolynomialSubresultantChainDefectiveGapAndSwappedInputs",
         "TestPolynomialSubresultantChainCheckedSourceAssertions",
-        "TestPolynomialSubresultantChainActualUnsignedResizeWrap"
+        "TestPolynomialSubresultantChainActualUnsignedResizeWrap",
+        "TestPolynomialPSCChain1AscendingSetAndLastUnitCallbackRefuseOwnerReentry",
+        "TestPolynomialPSCChain1FactoryTransferBeforeCallbackPreservesForeignCoefficient",
+        "TestPolynomialPSCChain1SubchainSourceStopPreservesActualChildAndHistory",
+        "TestPolynomialPSCChain1ActualCoefficientAndSetEveryReservationPrefix",
+        "TestPolynomialPSCChain1SourceDegreeIndexedCoefficientLayout",
+        "TestPolynomialPSCChain1SubchainExactFrameAndCopiedOwnerRefuse"
       ],
       "conditionals": [
         {
@@ -133907,6 +134039,19 @@
             "TestPolynomialSubresultantChainCheckedSourceAssertions",
             "TestPolynomialSubresultantChainActualUnsignedResizeWrap"
           ]
+        },
+        {
+          "name": "Concrete SET optional factory transfer at actual caller incoming INC before old-slot read/DEC (ref_vector.h:128-132)",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_ref_vector_set.go",
+          "tests": [
+            "TestPolynomialPSCChain1AscendingSetAndLastUnitCallbackRefuseOwnerReentry",
+            "TestPolynomialPSCChain1FactoryTransferBeforeCallbackPreservesForeignCoefficient",
+            "TestPolynomialPSCChain1SubchainSourceStopPreservesActualChildAndHistory",
+            "TestPolynomialPSCChain1ActualCoefficientAndSetEveryReservationPrefix",
+            "TestPolynomialPSCChain1SourceDegreeIndexedCoefficientLayout",
+            "TestPolynomialPSCChain1SubchainExactFrameAndCopiedOwnerRefuse"
+          ]
         }
       ],
       "ownership": [
@@ -133914,7 +134059,8 @@
         "Actual AST callbacks, source INC-before-growth/set-index ordering, ASC teardown, backing-bound views and charged initialized high-water metadata are recorded in PORT_PROGRESS.md#audit-ast-core-packet-md. No fake rollback consumes orphan INC prefixes; source manager teardown remains responsible for actual unowned nodes.",
         "Actual dependency INC/DEC callbacks, raw scalar tokens and charged16-byte obj_ref/24-byte ref_vector/160-byte inline buffer records in existing real AST allocators. Source INC-before-growth, retained backing, captured-end append and consumed cleanup progress preserved. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
         "Actual embedded full-manager frame and nonwrapping invocation; only real SET incoming INC and three constructed references are acquired. Child completed source suffix precedes older newS/prem/R destruction; unjoined assignment/child ownership abort follows older declarations. Caller output range remains independent.",
-        "SET source INC precedes actual vector operator[] assertion and old-slot read (ref_vector.h:128-132; vector.h:303-311). Actual n+1 unsigned wrap test retains incoming INC before checked assertion/native bounds guard; exact own abort never reads or writes an old slot that was not reached. Native invalid-range memory access remains a Go guard qualification, not C++ undefined-access equivalence."
+        "SET source INC precedes actual vector operator[] assertion and old-slot read (ref_vector.h:128-132; vector.h:303-311). Actual n+1 unsigned wrap test retains incoming INC before checked assertion/native bounds guard; exact own abort never reads or writes an old slot that was not reached. Native invalid-range memory access remains a Go guard qualification, not C++ undefined-access equivalence.",
+        "No lexical polynomial_ref or NUM is constructed by psc_chain1. Exact concrete Subchain tuple is captured only at actual guarded begin; false completes its real reference suffix, true aborts unjoined roots. Caller SET transfers Coeff factory only at successful incoming INC before old DEC callbacks. Size/index/phase are scalar diagnostics, not ownership authority."
       ],
       "deviations": [
         "This concrete specialization does not implement all AST/other source specializations or remaining generic helper/hash surfaces. Ref-vector null callbacks and nonempty self-append have explicit checked Go adaptations.",
@@ -133923,7 +134069,8 @@
         "Only selected default/INC-before-push/get/size/reset/assignment/destructor methods; full concrete equivalents of all source generic Ref/vector methods and global lifetime bindings remain open.",
         "Selected concrete AST Runtime/profile only; actual SMT kernel driver, native pretty/TRACE/global transport and other context/copy profiles remain separate obligations. Source-stopped destruction and explicit owning abort are distinct; pointer-free Go geometry is not native ABI credit.",
         "Source remark equal-degree limitation and checked assertions retained. Default registered PSC dispatch uses optimized chain; dormant alternative gains zero active-driver credit. Pointer resize evidence covers only reached growth after completed reset, not ref_vector shrink. Signed-host TLS source release proof is an owner-primitive profile, not ordinary mathematical OOM. Actual mpz.h:156-163 old-TMP destruction before failing replacement leaves tmp[i]==0; only that literal dangling-pointer guard domain expects ErrInvalidSlot on retry. No scratch repair.",
-        "Literal uint32 arithmetic is retained for n+1 and degree/exponent differences; defective zero-gap loop casts unsigned endpoints to signed int32. Bounded owner budgets refuse oversized range allocation before signed-gap execution. Source signed overflow beyond defined loop domain gains no mathematical completion claim."
+        "Literal uint32 arithmetic is retained for n+1 and degree/exponent differences; defective zero-gap loop casts unsigned endpoints to signed int32. Bounded owner budgets refuse oversized range allocation before signed-gap execution. Source signed overflow beyond defined loop domain gains no mathematical completion claim.",
+        "Dormant psc_chain1 gains zero active registered-driver assertion credit; polynomial.cpp:5897-5902 still dispatches optimized PSC. Degree-indexed zero slots and source equal-degree limitation remain inherited from literal Subchain. uint32 sz-1 expression retained. Source RAW DT proof is qualified signed-host TLS owner-primitive domain, callback/copied owner guards are separate Go owner-boundary coverage. Native invalid-index bounds guard is not C++ undefined-access equivalence."
       ]
     },
     {
@@ -140628,7 +140775,12 @@
         "mpnum/polynomial_subresultant_chain_callback_source_test.go",
         "mpnum/polynomial_subresultant_chain_child_stop_source_test.go",
         "mpnum/polynomial_subresultant_chain_prefix_source_test.go",
-        "mpnum/polynomial_subresultant_chain_source_test.go"
+        "mpnum/polynomial_subresultant_chain_source_test.go",
+        "mpnum/polynomial_subresultant_chain.go",
+        "mpnum/polynomial_psc_chain1_callback_source_test.go",
+        "mpnum/polynomial_psc_chain1_child_stop_source_test.go",
+        "mpnum/polynomial_psc_chain1_prefix_source_test.go",
+        "mpnum/polynomial_psc_chain1_source_test.go"
       ],
       "tests": [
         "TestParamDescrsBudgetFailuresAndWarmDuplicate",
@@ -141032,7 +141184,13 @@
         "TestPolynomialSubresultantChainSourceRegularFixture",
         "TestPolynomialSubresultantChainDefectiveGapAndSwappedInputs",
         "TestPolynomialSubresultantChainCheckedSourceAssertions",
-        "TestPolynomialSubresultantChainActualUnsignedResizeWrap"
+        "TestPolynomialSubresultantChainActualUnsignedResizeWrap",
+        "TestPolynomialPSCChain1AscendingSetAndLastUnitCallbackRefuseOwnerReentry",
+        "TestPolynomialPSCChain1FactoryTransferBeforeCallbackPreservesForeignCoefficient",
+        "TestPolynomialPSCChain1SubchainSourceStopPreservesActualChildAndHistory",
+        "TestPolynomialPSCChain1ActualCoefficientAndSetEveryReservationPrefix",
+        "TestPolynomialPSCChain1SourceDegreeIndexedCoefficientLayout",
+        "TestPolynomialPSCChain1SubchainExactFrameAndCopiedOwnerRefuse"
       ],
       "conditionals": [
         {
@@ -141777,6 +141935,19 @@
             "TestPolynomialSubresultantChainCheckedSourceAssertions",
             "TestPolynomialSubresultantChainActualUnsignedResizeWrap"
           ]
+        },
+        {
+          "name": "Literal SET checked operator[] after completed incoming INC (vector.h:303-311)",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_ref_vector_set.go",
+          "tests": [
+            "TestPolynomialPSCChain1AscendingSetAndLastUnitCallbackRefuseOwnerReentry",
+            "TestPolynomialPSCChain1FactoryTransferBeforeCallbackPreservesForeignCoefficient",
+            "TestPolynomialPSCChain1SubchainSourceStopPreservesActualChildAndHistory",
+            "TestPolynomialPSCChain1ActualCoefficientAndSetEveryReservationPrefix",
+            "TestPolynomialPSCChain1SourceDegreeIndexedCoefficientLayout",
+            "TestPolynomialPSCChain1SubchainExactFrameAndCopiedOwnerRefuse"
+          ]
         }
       ],
       "ownership": [
@@ -141820,7 +141991,8 @@
         "A real successful Assign may publish a live distinct current field while an earlier NULL-allocation token is still pending. Next ordinary growth archives only that exact earlier token after actual current capacity/lifetime reads; pendingReplaces/dangling realloc is never repaired. Real constructor/copy publication supplies current ownership independently of the archived token.",
         "One reflected class owner header includes true constructor-completion fields and both embedded vectors. Generated copy constructs currentv then nextv using source size/capacity/exact allocation/ascending SIZE placements. Only after completion do current/next copy original member addresses, borrowed until reached dereference. Next-member failure source-destructs completed current before return; failed member has no source DT, and actual returned allocation/published partial field stays named for distinct owning Close. Every actual constructor reservation and first/second postphysical failure retains original, caller output and separate failed/successful later class graphs before lift.",
         "Actual embedded full-manager frame and nonwrapping invocation; only real SET incoming INC and three constructed references are acquired. Child completed source suffix precedes older newS/prem/R destruction; unjoined assignment/child ownership abort follows older declarations. Caller output range remains independent.",
-        "SET source INC precedes actual vector operator[] assertion and old-slot read (ref_vector.h:128-132; vector.h:303-311). Actual n+1 unsigned wrap test retains incoming INC before checked assertion/native bounds guard; exact own abort never reads or writes an old slot that was not reached. Native invalid-range memory access remains a Go guard qualification, not C++ undefined-access equivalence."
+        "SET source INC precedes actual vector operator[] assertion and old-slot read (ref_vector.h:128-132; vector.h:303-311). Actual n+1 unsigned wrap test retains incoming INC before checked assertion/native bounds guard; exact own abort never reads or writes an old slot that was not reached. Native invalid-range memory access remains a Go guard qualification, not C++ undefined-access equivalence.",
+        "No lexical polynomial_ref or NUM is constructed by psc_chain1. Exact concrete Subchain tuple is captured only at actual guarded begin; false completes its real reference suffix, true aborts unjoined roots. Caller SET transfers Coeff factory only at successful incoming INC before old DEC callbacks. Size/index/phase are scalar diagnostics, not ownership authority."
       ],
       "deviations": [
         "Concrete solver-specific storage, not complete generic vector template surface. Owning model Clone/Assign, other specializations and source-undefined continuation behavior remain explicitly separate.",
@@ -141876,7 +142048,8 @@
         "Generated copy counterpart has no originating registered-driver copy assertion credit. Empty/cold/closed-provider/accidental-copy guards are Go representation/lifetime domains. Default reference-member assignment has no generated supported operator, so no assignment API is invented. Source scalar pointer aliases deliberately remain original; ended original is unread on zero input, then actual source kernel dereference returns typed lifetime guard after caller/own-member prefixes. GNU/default unsigned specialization only; other ext/AST/native global diagnostics/ABI remain separate obligations.",
         "Selected concrete AST Runtime/profile only; actual SMT kernel driver, native pretty/TRACE/global transport and other context/copy profiles remain separate obligations. Source-stopped destruction and explicit owning abort are distinct; pointer-free Go geometry is not native ABI credit.",
         "Source remark equal-degree limitation and checked assertions retained. Default registered PSC dispatch uses optimized chain; dormant alternative gains zero active-driver credit. Pointer resize evidence covers only reached growth after completed reset, not ref_vector shrink. Signed-host TLS source release proof is an owner-primitive profile, not ordinary mathematical OOM. Actual mpz.h:156-163 old-TMP destruction before failing replacement leaves tmp[i]==0; only that literal dangling-pointer guard domain expects ErrInvalidSlot on retry. No scratch repair.",
-        "Literal uint32 arithmetic is retained for n+1 and degree/exponent differences; defective zero-gap loop casts unsigned endpoints to signed int32. Bounded owner budgets refuse oversized range allocation before signed-gap execution. Source signed overflow beyond defined loop domain gains no mathematical completion claim."
+        "Literal uint32 arithmetic is retained for n+1 and degree/exponent differences; defective zero-gap loop casts unsigned endpoints to signed int32. Bounded owner budgets refuse oversized range allocation before signed-gap execution. Source signed overflow beyond defined loop domain gains no mathematical completion claim.",
+        "Dormant psc_chain1 gains zero active registered-driver assertion credit; polynomial.cpp:5897-5902 still dispatches optimized PSC. Degree-indexed zero slots and source equal-degree limitation remain inherited from literal Subchain. uint32 sz-1 expression retained. Source RAW DT proof is qualified signed-host TLS owner-primitive domain, callback/copied owner guards are separate Go owner-boundary coverage. Native invalid-index bounds guard is not C++ undefined-access equivalence."
       ]
     },
     {

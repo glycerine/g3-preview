@@ -148,26 +148,27 @@ func pdGrowth(n int) (int, error) {
 	}
 	return v, nil
 }
-func newSourceParamDescrs(m *SymbolManager, c ParamDescrsConfig) (*ParamDescrs, error) {
+func prepareSourceParamDescrs(m *SymbolManager, c ParamDescrsConfig) (ParamDescrsConfig, error) {
 	if m == nil {
-		return nil, ErrParamDescrsPrecondition
+		return c, ErrParamDescrsPrecondition
 	}
 	if _, e := m.Hash(Symbol{}); e != nil {
-		return nil, e
+		return c, e
 	}
 	n := c.InitialCapacity
 	if n == 0 {
 		n = 8
 	}
 	if n&(n-1) != 0 {
-		return nil, ErrParamDescrsPrecondition
+		return c, ErrParamDescrsPrecondition
 	}
 	if uint64(n) > uint64(^uint(0)>>1)/uint64(reflect.TypeOf(paramDescrEntry{}).Size()) {
-		return nil, arena.ErrBounds
+		return c, arena.ErrBounds
 	}
 	if c.Text.Descriptors.Budget != nil && c.Text.Descriptors.Budget != c.Budget {
-		return nil, ErrParamDescrsPrecondition
+		return c, ErrParamDescrsPrecondition
 	}
+	c.InitialCapacity = n
 	c.Text.Descriptors.Budget = c.Budget
 	if c.Text.PageSize == 0 {
 		c.Text.PageSize = 256
@@ -175,25 +176,40 @@ func newSourceParamDescrs(m *SymbolManager, c ParamDescrsConfig) (*ParamDescrs, 
 	if c.Text.Descriptors.PageSize == 0 {
 		c.Text.Descriptors.PageSize = 2
 	}
+	return c, nil
+}
+func newSourceParamDescrs(m *SymbolManager, c ParamDescrsConfig) (*ParamDescrs, error) {
+	c, e := prepareSourceParamDescrs(m, c)
+	if e != nil {
+		return nil, e
+	}
 	owner := uint64(reflect.TypeOf(ParamDescrs{}).Size())
 	if e := c.Budget.Reserve(owner); e != nil {
 		return nil, e
 	}
 	d := &ParamDescrs{manager: m, budget: c.Budget, outOfMemory: c.OutOfMemory, ownerBytes: owner}
 	d.self = d
+	if e := d.constructSourceMembers(c); e != nil {
+		return d, e
+	}
+	return d, nil
+}
+
+// Same placement member engine; embedded callers charge the actual containing header.
+func (d *ParamDescrs) constructSourceMembers(c ParamDescrsConfig) error {
 	// Copied-text storage is actual additional Go cold context, prepared before
 	// source m_info construction; it is not a native table allocation ticket.
 	text, e := arena.NewWords(c.Text)
 	if e != nil {
 		d.constructorCause = e
-		return d, e
+		return e
 	}
 	d.texts = text
-	if e = c.Budget.Reserve(pdEntryBytes(int(n))); e != nil {
+	if e = c.Budget.Reserve(pdEntryBytes(int(c.InitialCapacity))); e != nil {
 		d.constructorCause = e
-		return d, e
+		return e
 	}
-	d.entries = make([]paramDescrEntry, n)
+	d.entries = make([]paramDescrEntry, c.InitialCapacity)
 	for i := range d.entries {
 		d.entries[i].info.kind = ParamInvalid
 	}
@@ -201,7 +217,7 @@ func newSourceParamDescrs(m *SymbolManager, c ParamDescrsConfig) (*ParamDescrs, 
 	d.names = nil              // source null names vector default construction cannot fail
 	d.constructorCompleted = 2
 	d.constructorReady = true
-	return d, nil
+	return nil
 }
 func (d *ParamDescrs) open() error {
 	if d == nil || d.self != d {

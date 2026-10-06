@@ -22,7 +22,25 @@ type polynomialSubresultantChainScope struct {
 // REMARK from polynomial.cpp:5500: the source algorithm does not work when
 // the input degrees are equal. The source assertions and branch are retained;
 // this alternative is distinct from the default optimized PSCChain dispatch.
-func (m *MultivariatePolynomialManager) SubresultantChain(p, q Polynomial, x uint32, out *PolynomialRefVector) (err error) {
+type polynomialSubresultantChainInvocationReceipt struct {
+	manager    *MultivariatePolynomialManager
+	frame      *polynomialSubresultantChainScope
+	invocation uint64
+}
+
+func (m *MultivariatePolynomialManager) matchesSubresultantChainInvocation(r *polynomialSubresultantChainInvocationReceipt) bool {
+	return m != nil && m.self == m && r != nil && r.manager == m && r.frame == &m.subresultant && r.invocation != 0 && r.invocation == r.frame.invocation
+}
+func (m *MultivariatePolynomialManager) subresultantChainInvocationSourceCause(r *polynomialSubresultantChainInvocationReceipt) error {
+	if !m.matchesSubresultantChainInvocation(r) {
+		return nil
+	}
+	return r.frame.sourceCause
+}
+func (m *MultivariatePolynomialManager) SubresultantChain(p, q Polynomial, x uint32, out *PolynomialRefVector) error {
+	return m.subresultantChainWithReceipt(p, q, x, out, nil)
+}
+func (m *MultivariatePolynomialManager) subresultantChainWithReceipt(p, q Polynomial, x uint32, out *PolynomialRefVector, receipt *polynomialSubresultantChainInvocationReceipt) (err error) {
 	if e := m.ready(); e != nil {
 		return e
 	}
@@ -37,6 +55,9 @@ func (m *MultivariatePolynomialManager) SubresultantChain(p, q Polynomial, x uin
 		return ErrPolynomialPending
 	}
 	*s = polynomialSubresultantChainScope{active: true, executing: true, invocation: s.invocation + 1}
+	if receipt != nil {
+		*receipt = polynomialSubresultantChainInvocationReceipt{m, s, s.invocation}
+	}
 	defer func() {
 		s.executing = false
 		s.bodyCause = err
@@ -265,7 +286,14 @@ func (m *MultivariatePolynomialManager) subresultantChildSourceCause() error {
 	return c.coefficientInvocationSourceCause(&s.coefficient)
 }
 func (m *MultivariatePolynomialManager) finishSubresultantChainSource() error {
+	if e := m.identity(); e != nil {
+		return e
+	}
 	s := &m.subresultant
+	if s.executing {
+		return ErrPolynomialPending
+	}
+	// Source/history payload is read only after actual owner and phase guards.
 	if s.sourceCause != nil {
 		return s.sourceCause
 	}
@@ -328,22 +356,32 @@ func (m *MultivariatePolynomialManager) cleanupSubresultantChildren(abort bool) 
 	}
 	return nil
 }
-func (m *MultivariatePolynomialManager) CleanupSubresultantChain() (err error) {
+func (m *MultivariatePolynomialManager) CleanupSubresultantChain() error {
 	if e := m.identity(); e != nil {
 		return e
 	}
-	s := &m.subresultant
+	r := polynomialSubresultantChainInvocationReceipt{m, &m.subresultant, m.subresultant.invocation}
+	if e := m.cleanupSubresultantChainInvocation(&r, false); e != nil {
+		return e
+	}
+	return m.cleanupSubresultantChainInvocation(&r, true)
+}
+func (m *MultivariatePolynomialManager) cleanupSubresultantChainInvocation(r *polynomialSubresultantChainInvocationReceipt, abort bool) (err error) {
+	if !m.matchesSubresultantChainInvocation(r) {
+		return nil
+	}
+	s := r.frame
 	if s.executing {
 		return ErrPolynomialPending
+	}
+	if !s.active {
+		return nil
 	}
 	defer func() {
 		if err != nil && s.cleanupCause == nil {
 			s.cleanupCause = err
 		}
 	}()
-	if !s.active {
-		return nil
-	}
 	if e := m.cleanupSubresultantChildren(false); e != nil {
 		return e
 	}
@@ -353,8 +391,10 @@ func (m *MultivariatePolynomialManager) CleanupSubresultantChain() (err error) {
 		}
 		s.constructed--
 	}
-	// Incoming assignment INCs are owning-only continuations. Their source
-	// local values have already been destroyed in newS/prem/R order above.
+	if !abort {
+		return nil
+	}
+	// Only unjoined assignment INCs and raw children remain after all source refs.
 	for i := len(s.refs) - 1; i >= 0; i-- {
 		if e := s.refs[i].root.abort(m.core); e != nil {
 			return e

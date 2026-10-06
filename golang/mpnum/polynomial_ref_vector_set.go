@@ -11,7 +11,10 @@ type polynomialReferenceVectorSetReceipt struct {
 	invocation uint64
 }
 
-func (v *PolynomialRefVector) setWithReceipt(i uint32, p Polynomial, r *polynomialReferenceVectorSetReceipt) (err error) {
+func (v *PolynomialRefVector) setWithReceipt(i uint32, p Polynomial, r *polynomialReferenceVectorSetReceipt) error {
+	return v.setWithFactoryReceipt(i, p, r, nil)
+}
+func (v *PolynomialRefVector) setWithFactoryReceipt(i uint32, p Polynomial, r *polynomialReferenceVectorSetReceipt, factory *polynomialFactoryInvocationReceipt) (err error) {
 	if e := v.open(); e != nil {
 		return e
 	}
@@ -36,6 +39,9 @@ func (v *PolynomialRefVector) setWithReceipt(i uint32, p Polynomial, r *polynomi
 			s.setBodyCause = err
 		}
 	}()
+	if v.owner.matchesFactoryInvocation(factory) && factory.frame.result != p {
+		return ErrPolynomialOwner
+	}
 	if p != (Polynomial{}) {
 		if e := v.owner.incRefCore(p); e != nil {
 			s.setActive = false
@@ -43,6 +49,10 @@ func (v *PolynomialRefVector) setWithReceipt(i uint32, p Polynomial, r *polynomi
 		}
 	}
 	s.incoming = p
+	// Caller vector has completed its real INC before raw factory transfer.
+	if e := v.owner.transferFactoryResult(factory, p); e != nil {
+		return e
+	}
 	old, e := s.get(v.owner, i)
 	if e != nil {
 		return e
