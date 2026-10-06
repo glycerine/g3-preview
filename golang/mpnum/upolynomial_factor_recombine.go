@@ -170,10 +170,19 @@ func (s *UPolynomialFactorizationService) factorPrimeTrial(zp *UPolynomialManage
 	}
 	return 1, nil
 }
-func (s *UPolynomialFactorizationService) factorSquareFree(f UPolynomialView, fs *UPolynomialFactors, k uint32, params UPolynomialFactorParams) (completed bool, failure error) {
+func (s *UPolynomialFactorizationService) factorSquareFree(f UPolynomialView, fs *UPolynomialFactors, k uint32, params UPolynomialFactorParams) (bool, error) {
+	return s.factorSquareFreeWithReceipt(f, fs, k, params, nil)
+}
+func (s *UPolynomialFactorizationService) factorSquareFreeWithReceipt(f UPolynomialView, fs *UPolynomialFactors, k uint32, params UPolynomialFactorParams, receipt *upolyFactorSquareFreeInvocationReceipt) (completed bool, failure error) {
+	if e := s.check(); e != nil {
+		return false, e
+	}
+	if e := s.manager.checkFactors(fs); e != nil {
+		return false, e
+	}
 	m := s.manager
 	if modularSourceDebug {
-		if e := s.primitiveDiagnosticWithPreparation(f); e != nil {
+		if e := s.primitiveDiagnosticWithPreparationReceipt(f, receipt); e != nil {
 			return false, e
 		}
 	}
@@ -181,7 +190,20 @@ func (s *UPolynomialFactorizationService) factorSquareFree(f UPolynomialView, fs
 	if e != nil {
 		return false, e
 	}
+	c.executing = true
+	c.enterCall()
+	if receipt != nil {
+		d, h := receipt.diagnostic, receipt.history
+		c.historyRequired = true
+		*receipt = upolyFactorSquareFreeInvocationReceipt{service: s, frame: c, invocation: c.invocation, diagnostic: d, history: h}
+		c.issuedReceipt = *receipt
+	}
 	defer func() {
+		c.executing = false
+		c.leaveCall()
+		if c.bodyCause == nil {
+			c.bodyCause = failure
+		}
 		failure = s.finishSquareFreeScopeError(failure)
 	}()
 	c.constructed = 1

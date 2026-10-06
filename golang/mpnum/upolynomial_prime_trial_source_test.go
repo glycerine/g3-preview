@@ -113,6 +113,12 @@ func primeTrialPhysicalAuditExternal(t *testing.T, q *RationalManager, s *UPolyn
 func primeTrialPhysicalAuditAll(t *testing.T, q *RationalManager, s *UPolynomialFactorizationService, externalFactors []*UPolynomialFactors, external []memory.Block, extra ...*Int) {
 	roots := append(extra, []*Int{&q.nTmp, &q.addTmp1, &q.addTmp2, &q.addMulTmp.num, &q.addMulTmp.den, &q.ltTmp1.num, &q.ltTmp1.den, &q.ltTmp2.num, &q.ltTmp2.den}...)
 	n := q.headerBytes + integerActualOwnedBytes(q.z) + s.header + s.config.Primes.Stats().TotalBytes
+	for c := s.squareFreeHistory; c != nil; c = c.historyNext {
+		n += c.header
+	}
+	for h := s.squareFreeDiagnosticHistory; h != nil; h = h.next {
+		n += h.header
+	}
 	c := s.scope
 	managers := []*UPolynomialManager{s.manager}
 	if c != nil {

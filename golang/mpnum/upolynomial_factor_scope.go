@@ -17,44 +17,51 @@ var ErrUPolynomialCleanupPending = errors.New("mpnum: retained factorization lex
 // the unfinished reverse destruction cursor instead of losing its owner. This
 // additional charged header is a Go exception/lifetime adapter, not C++ malloc.
 type upolyFactorSquareFreeScope struct {
-	primePreparation  upolyFactorPrimePreparationScope
-	iterator          PrimeIterator
-	hensel            upolyHenselCallerScope
-	trialHelper       upolyRecombinationTrialScope
-	recombinationStep upolyRecombinationStepScope
-	self              *upolyFactorSquareFreeScope
-	service           *UPolynomialFactorizationService
-	callerPrevious    *upolyFactorSquareFreeScope
-	callDepth         uint32
-	mignotte          upolyMignotteScope
-	primeTrial        upolyPrimeTrialScope
-	manager           *UPolynomialManager
-	fpp               upolyVectorState
-	p                 Int
-	zp                *UPolynomialManager
-	best              *UPolynomialFactors
-	bestP             Int
-	ds                upolyFactorDegreeState
-	gcdTmp            Int
-	zpe               *UPolynomialManager
-	lifted            *UPolynomialFactors
-	leading           Int
-	it                upolyFactorCombinationState
-	trial, quotient   upolyVectorState
-	trialContent      Int
-	constructed       uint8
-	header            uint64
+	issuedReceipt                                     upolyFactorSquareFreeInvocationReceipt
+	historyNext                                       *upolyFactorSquareFreeScope
+	historyRequired                                   bool
+	invocation                                        uint64
+	executing, sourceExecuting, ownExecuting, retired bool
+	bodyCause, sourceCause, ownCause                  error
+	primePreparation                                  upolyFactorPrimePreparationScope
+	iterator                                          PrimeIterator
+	hensel                                            upolyHenselCallerScope
+	trialHelper                                       upolyRecombinationTrialScope
+	recombinationStep                                 upolyRecombinationStepScope
+	self                                              *upolyFactorSquareFreeScope
+	service                                           *UPolynomialFactorizationService
+	callerPrevious                                    *upolyFactorSquareFreeScope
+	callDepth                                         uint32
+	mignotte                                          upolyMignotteScope
+	primeTrial                                        upolyPrimeTrialScope
+	manager                                           *UPolynomialManager
+	fpp                                               upolyVectorState
+	p                                                 Int
+	zp                                                *UPolynomialManager
+	best                                              *UPolynomialFactors
+	bestP                                             Int
+	ds                                                upolyFactorDegreeState
+	gcdTmp                                            Int
+	zpe                                               *UPolynomialManager
+	lifted                                            *UPolynomialFactors
+	leading                                           Int
+	it                                                upolyFactorCombinationState
+	trial, quotient                                   upolyVectorState
+	trialContent                                      Int
+	constructed                                       uint8
+	header                                            uint64
 }
 
 func (s *UPolynomialFactorizationService) newSquareFreeScope() (*upolyFactorSquareFreeScope, error) {
-	if s.scope != nil {
+	if s.scope != nil || s.squareFreeInvocation == ^uint64(0) {
 		return nil, ErrUPolynomialCleanupPending
 	}
 	n := uint64(reflect.TypeOf(upolyFactorSquareFreeScope{}).Size())
 	if e := s.manager.config.Integer.budget.Reserve(n); e != nil {
 		return nil, e
 	}
-	c := &upolyFactorSquareFreeScope{manager: s.manager, service: s, header: n}
+	s.squareFreeInvocation++
+	c := &upolyFactorSquareFreeScope{manager: s.manager, service: s, header: n, invocation: s.squareFreeInvocation}
 	c.self = c
 	s.scope = c
 	return c, nil
@@ -230,6 +237,9 @@ func (s *UPolynomialFactorizationService) CleanupRetained() error {
 	if s.closed {
 		return arena.ErrClosed
 	}
+	if c := s.scope; c != nil && (c.executing || c.sourceExecuting || c.ownExecuting || c.callDepth != 0) {
+		return ErrUPolynomialCleanupPending
+	}
 	for _, q := range []*upolyFactorPreparationScope{&s.diagnostic, &s.preparation} {
 		if q.active {
 			if e := q.own(&q.receipt, false); e != nil {
@@ -267,70 +277,11 @@ func (s *UPolynomialFactorizationService) CleanupRetained() error {
 		return ErrUPolynomialCleanupPending
 	}
 	caller := s.scope
-	if q := &caller.primePreparation; q.active {
-		if e := q.own(&q.receipt, false); e != nil {
-			return e
-		}
-	}
-	if caller.recombinationStep.active {
-		if e := caller.recombinationStep.own(&caller.recombinationStep.receipt, false); e != nil {
-			return e
-		}
-	}
-	if caller.trialHelper.active {
-		if e := caller.trialHelper.own(&caller.trialHelper.receipt, false); e != nil {
-			return e
-		}
-	}
-	caller.enterCall()
-	defer caller.leaveCall()
-	if s.scope.hensel.active {
-		if e := s.scope.hensel.own(false); e != nil {
-			return e
-		}
-	}
-	prime := &s.scope.primeTrial
-	if prime.active {
-		if e := s.cleanupPrimeTrialInvocation(&prime.receipt, false); e != nil {
-			return e
-		}
-	}
-	q := &s.scope.mignotte
-	if q.executing || q.callDepth != 0 {
-		return ErrUPolynomialCleanupPending
-	}
-	if q.active {
-		if e := s.cleanupMignotteInvocation(&q.receipt, false); e != nil {
-			return e
-		}
-	}
-	if e := s.scope.cleanupMembers(); e != nil {
+	if e := s.cleanupSquareFreeMembers(caller, false); e != nil {
 		return e
 	}
-	if q.active {
-		if e := s.cleanupMignotteInvocation(&q.receipt, true); e != nil {
-			return e
-		}
-	}
-	if prime.active {
-		if e := s.cleanupPrimeTrialInvocation(&prime.receipt, true); e != nil {
-			return e
-		}
-	}
-	if s.scope.hensel.active {
-		if e := s.scope.hensel.own(true); e != nil {
-			return e
-		}
-	}
-	if caller.recombinationStep.active {
-		if e := caller.recombinationStep.own(&caller.recombinationStep.receipt, true); e != nil {
-			return e
-		}
-	}
-	if caller.trialHelper.active {
-		if e := caller.trialHelper.own(&caller.trialHelper.receipt, true); e != nil {
-			return e
-		}
+	if e := s.cleanupSquareFreeMembers(caller, true); e != nil {
+		return e
 	}
 	for _, q := range []*upolyFactorPreparationScope{&s.diagnostic, &s.preparation} {
 		if q.active {
@@ -339,13 +290,7 @@ func (s *UPolynomialFactorizationService) CleanupRetained() error {
 			}
 		}
 	}
-	if q := &caller.primePreparation; q.active {
-		if e := q.own(&q.receipt, true); e != nil {
-			return e
-		}
-	}
-	s.manager.config.Integer.budget.Release(s.scope.header)
-	s.scope = nil
+	s.releaseSquareFreeScope(caller)
 	return nil
 }
 
@@ -414,13 +359,27 @@ func (s *UPolynomialFactorizationService) finishSquareFreeScopeSource() error {
 	if c == nil {
 		return nil
 	}
+	if c.executing || c.sourceExecuting || c.ownExecuting || c.callDepth != 0 {
+		return ErrUPolynomialCleanupPending
+	}
 	c.enterCall()
 	defer c.leaveCall()
-	if e := c.cleanup(); e != nil {
+	if c.sourceCause != nil {
+		return c.sourceCause
+	}
+	c.sourceExecuting = true
+	e := c.cleanup()
+	c.sourceExecuting = false
+	if e != nil {
+		if e != ErrUPolynomialCleanupPending && c.sourceCause == nil {
+			c.sourceCause = c.squareFreeChildSourceCause()
+			if c.sourceCause == nil {
+				c.sourceCause = e
+			}
+		}
 		return e
 	}
-	s.manager.config.Integer.budget.Release(c.header)
-	s.scope = nil
+	s.releaseSquareFreeScope(c)
 	return nil
 }
 
@@ -443,4 +402,94 @@ func (c *upolyFactorSquareFreeScope) leaveCall() {
 
 func (s *UPolynomialFactorizationService) finishSquareFreeScopeError(body error) error {
 	return errors.Join(body, s.finishSquareFreeScopeSource())
+}
+
+func (s *UPolynomialFactorizationService) cleanupSquareFreeMembers(caller *upolyFactorSquareFreeScope, abort bool) error {
+	if !abort {
+		if q := &caller.primePreparation; q.active {
+			if e := q.own(&q.receipt, false); e != nil {
+				return e
+			}
+		}
+		if caller.recombinationStep.active {
+			if e := caller.recombinationStep.own(&caller.recombinationStep.receipt, false); e != nil {
+				return e
+			}
+		}
+		if caller.trialHelper.active {
+			if e := caller.trialHelper.own(&caller.trialHelper.receipt, false); e != nil {
+				return e
+			}
+		}
+		caller.enterCall()
+		defer caller.leaveCall()
+		if caller.hensel.active {
+			if e := caller.hensel.own(false); e != nil {
+				return e
+			}
+		}
+		prime := &caller.primeTrial
+		if prime.active {
+			if e := s.cleanupPrimeTrialInvocation(&prime.receipt, false); e != nil {
+				return e
+			}
+		}
+		q := &caller.mignotte
+		if q.executing || q.callDepth != 0 {
+			return ErrUPolynomialCleanupPending
+		}
+		if q.active {
+			if e := s.cleanupMignotteInvocation(&q.receipt, false); e != nil {
+				return e
+			}
+		}
+		if e := caller.cleanupMembers(); e != nil {
+			return e
+		}
+		return nil
+	}
+	caller.enterCall()
+	defer caller.leaveCall()
+	q := &caller.mignotte
+	prime := &caller.primeTrial
+
+	if q.active {
+		if e := s.cleanupMignotteInvocation(&q.receipt, true); e != nil {
+			return e
+		}
+	}
+	if prime.active {
+		if e := s.cleanupPrimeTrialInvocation(&prime.receipt, true); e != nil {
+			return e
+		}
+	}
+	if caller.hensel.active {
+		if e := caller.hensel.own(true); e != nil {
+			return e
+		}
+	}
+	if caller.recombinationStep.active {
+		if e := caller.recombinationStep.own(&caller.recombinationStep.receipt, true); e != nil {
+			return e
+		}
+	}
+	if caller.trialHelper.active {
+		if e := caller.trialHelper.own(&caller.trialHelper.receipt, true); e != nil {
+			return e
+		}
+	}
+	for _, q := range []*upolyFactorPreparationScope{&s.preparation} {
+		if q.active && q.parent == caller {
+			if e := q.own(&q.receipt, true); e != nil {
+				return e
+			}
+		}
+	}
+	if q := &caller.primePreparation; q.active {
+		if e := q.own(&q.receipt, true); e != nil {
+			return e
+		}
+	}
+
+	return nil
 }

@@ -221,15 +221,29 @@ func (s *UPolynomialFactorizationService) prepareSquareFree(f UPolynomialView, f
 	}
 	return fs.manager.modular.copyWithSourceContext(&fs.constant, &q.numeral, context)
 }
-func (s *UPolynomialFactorizationService) primitiveDiagnosticWithPreparation(f UPolynomialView) (failure error) {
+func (s *UPolynomialFactorizationService) primitiveDiagnosticWithPreparation(f UPolynomialView) error {
+	return s.primitiveDiagnosticWithPreparationReceipt(f, nil)
+}
+func (s *UPolynomialFactorizationService) primitiveDiagnosticWithPreparationReceipt(f UPolynomialView, receipt *upolyFactorSquareFreeInvocationReceipt) (failure error) {
 	q, e := s.beginFactorPreparation(true)
 	if e != nil {
 		return e
 	}
+	if e := s.captureSquareFreeDiagnostic(q, receipt); e != nil {
+		q.executing = false
+		return q.finish(&q.receipt, e)
+	}
 	r := q.receipt
 	q.enterCall()
 	defer q.leaveCall()
-	defer func() { q.executing = false; failure = q.finish(&r, failure) }()
+	defer func() {
+		q.executing = false
+		failure = q.finish(&r, failure)
+		if receipt != nil {
+			receipt.history.bodyCause = q.bodyCause
+			receipt.history.sourceCause = q.sourceCause
+		}
+	}()
 	q.constructed = true
 	m := s.manager
 	context := m.modular.preparationAllocationContext(q)

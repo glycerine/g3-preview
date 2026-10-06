@@ -20,14 +20,17 @@ type UPolynomialFactorizationConfig struct {
 	FactorizationDebugTag bool
 }
 type UPolynomialFactorizationService struct {
-	diagnostic, preparation upolyFactorPreparationScope
-	self                    *UPolynomialFactorizationService
-	manager                 *UPolynomialManager
-	config                  UPolynomialFactorizationConfig
-	scope                   *upolyFactorSquareFreeScope
-	henselPairs             *upolyHenselPairScope
-	header                  uint64
-	closed                  bool
+	squareFreeHistory           *upolyFactorSquareFreeScope
+	squareFreeDiagnosticHistory *upolySquareFreeDiagnosticHistory
+	squareFreeInvocation        uint64
+	diagnostic, preparation     upolyFactorPreparationScope
+	self                        *UPolynomialFactorizationService
+	manager                     *UPolynomialManager
+	config                      UPolynomialFactorizationConfig
+	scope                       *upolyFactorSquareFreeScope
+	henselPairs                 *upolyHenselPairScope
+	header                      uint64
+	closed                      bool
 }
 type UPolynomialFactorizationStats struct {
 	OwnerBytes, RetainedOwnerBytes uint64
@@ -94,6 +97,16 @@ func (s *UPolynomialFactorizationService) Close() error {
 		s.manager.config.Integer.budget.Release(h.header)
 	}
 	s.henselPairs = nil
+	for c := s.squareFreeHistory; c != nil; c = c.historyNext {
+		s.manager.config.Integer.budget.Release(c.header)
+		c.header = 0
+	}
+	s.squareFreeHistory = nil
+	for h := s.squareFreeDiagnosticHistory; h != nil; h = h.next {
+		s.manager.config.Integer.budget.Release(h.header)
+		h.header = 0
+	}
+	s.squareFreeDiagnosticHistory = nil
 	s.manager.config.Integer.budget.Release(s.header)
 	s.closed = true
 	return nil
@@ -103,6 +116,14 @@ func (s *UPolynomialFactorizationService) Stats() UPolynomialFactorizationStats 
 		return UPolynomialFactorizationStats{}
 	}
 	r := UPolynomialFactorizationStats{OwnerBytes: s.header}
+	for c := s.squareFreeHistory; c != nil; c = c.historyNext {
+		r.CachedOwnerBytes += c.header
+		r.CachedScopes++
+	}
+	for h := s.squareFreeDiagnosticHistory; h != nil; h = h.next {
+		r.CachedOwnerBytes += h.header
+		r.CachedScopes++
+	}
 	if s.scope != nil {
 		r.RetainedScopes = 1
 		r.RetainedOwnerBytes = s.scope.header
