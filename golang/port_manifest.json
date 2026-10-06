@@ -121395,7 +121395,17 @@
         "mpnum/mpf_value_input_history_source_test.go",
         "mpnum/mpf_value_input_callback_source_test.go",
         "mpnum/mpf_value_input_source_end_test.go",
-        "mpnum/mpf_value_input_guard_source_test.go"
+        "mpnum/mpf_value_input_guard_source_test.go",
+        "mpnum/mpf_round.go",
+        "mpnum/mpf_round_allocation.go",
+        "mpnum/mpf_round_branch_source_test.go",
+        "mpnum/mpf_round_cache_source_test.go",
+        "mpnum/mpf_round_callback_source_test.go",
+        "mpnum/mpf_round_numeric_source_test.go",
+        "mpnum/mpf_round_scope.go",
+        "mpnum/mpf_round_source_stop_test.go",
+        "mpnum/mpf_round_source_test.go",
+        "mpnum/mpf_round_tls_source_test.go"
       ],
       "tests": [
         "TestArbitraryFloatToStringLiteralSpecialBranches",
@@ -121435,7 +121445,15 @@
         "TestArbitraryFloatInputMultiplePendingAndInlineHistory",
         "TestArbitraryFloatInputActualAllocationTransportOwnerGuards",
         "TestArbitraryFloatInputDescriptorSourceEndHistory",
-        "TestArbitraryFloatInputCapturedContextExactFrameAndNonce"
+        "TestArbitraryFloatInputCapturedContextExactFrameAndNonce",
+        "TestArbitraryFloatRoundActualTLSAllocationReceipt",
+        "TestArbitraryFloatRoundReachedNumericLeafAuthority",
+        "TestArbitraryFloatRoundLiteralOverflowDenormalCarry",
+        "TestArbitraryFloatRoundReachedSignedExpressionGuard",
+        "TestArbitraryFloatRoundActualTransportOwnerGuards",
+        "TestArbitraryFloatRoundYoungerStickyNUMStopsOlderClass",
+        "TestArbitraryFloatRoundColdCachedPowerAndNumericPrefixes",
+        "TestArbitraryFloatRoundLiteralHalfwayModes"
       ],
       "conditionals": [
         {
@@ -121843,6 +121861,21 @@
             "TestArbitraryFloatInputDescriptorSourceEndHistory",
             "TestArbitraryFloatInputCapturedContextExactFrameAndNonce"
           ]
+        },
+        {
+          "name": "mpf.cpp:1948-2098 mk_round_inf and literal five-mode round",
+          "status": "ported",
+          "go_target": "mpnum/mpf_round.go",
+          "tests": [
+            "TestArbitraryFloatRoundActualTLSAllocationReceipt",
+            "TestArbitraryFloatRoundReachedNumericLeafAuthority",
+            "TestArbitraryFloatRoundLiteralOverflowDenormalCarry",
+            "TestArbitraryFloatRoundReachedSignedExpressionGuard",
+            "TestArbitraryFloatRoundActualTransportOwnerGuards",
+            "TestArbitraryFloatRoundYoungerStickyNUMStopsOlderClass",
+            "TestArbitraryFloatRoundColdCachedPowerAndNumericPrefixes",
+            "TestArbitraryFloatRoundLiteralHalfwayModes"
+          ]
         }
       ],
       "ownership": [
@@ -121850,12 +121883,14 @@
         "mpf.cpp:1695-1711 real a/n/d declarations, exact Copy child and captured source/output Integer contexts; foreign Rational SET/normalize actual GCD/Div and Natural children. Source d/n/a DT protects older MPF cached/member suffix on youngest stop; own completed child ACK then older local NUM disposal then exact unjoined abort. Issued backing/outcome tokens retain original acquisition and allocation-only charged immutable history through actual MPF context end. Actual pooled source physical retirement differs from direct raw surviving allocator-directory end. No pending-count/registry acquisition authority.",
         "mpf.cpp:1712-1769 declares no NUM/RAW locals. Reached top/bottom bound cache calls reuse exact persistent Power wrapper owners; original input is borrowed, no mirrored acquisition scope. Actual cache reservation prefixes name physical/cold graph before fault lift; actual returning Runtime transport refuses same caller and lower-owner lifecycle before mutation. Later successful call retains earlier failed cache tuple until actual class end.",
         "mpf.cpp:1712-1737 nonnegative signed-left shifts follow the C++11 CWG1457 corrected rule when the result fits corresponding uint64, with two's-complement signed conversion; sign-bit results from exponent and significand remain literal bits, including noncanonical raw field inputs. Shift count/unsigned-result overflow and initially negative signed operand still refuse at reached undefined-source expression. No extra numerical constructor or owning scope is introduced.",
-        "mpf.cpp:69-106,114-181 declares no lexical NUM/RAW. Source widths/sign/exponent precede literal significand SET and alignment. Embedded nonwrapping body binding allocates no metadata on inline/repeated SET; charged per-call records materialize only at actual Integer allocation branch. Exact failed backing/outcome transfers name independent pending roots, original issued token/body and first owning cause survive acknowledgment until actual MPF context end. Source allocator physical consumption retires only actual captured pooled token; direct captured token survives directory end for exact owning cleanup. Before-lift named cold/physical graphs, multiple stopped calls, actual returning allocation transport and exact copied/stale context guards are tested; undefined source shift argument domains are explicit reached Go guards."
+        "mpf.cpp:69-106,114-181 declares no lexical NUM/RAW. Source widths/sign/exponent precede literal significand SET and alignment. Embedded nonwrapping body binding allocates no metadata on inline/repeated SET; charged per-call records materialize only at actual Integer allocation branch. Exact failed backing/outcome transfers name independent pending roots, original issued token/body and first owning cause survive acknowledgment until actual MPF context end. Source allocator physical consumption retires only actual captured pooled token; direct captured token survives directory end for exact owning cleanup. Before-lift named cold/physical graphs, multiple stopped calls, actual returning allocation transport and exact copied/stale context guards are tested; undefined source shift argument domains are explicit reached Go guards.",
+        "mpf.cpp:1963-2098 actual branch-scoped sticky NUM, then sigma_cap and sigma source DT. Explicit captured Round context acquires Integer/Natural leaves only at reached allocations; charged history materializes there, preserving issued backing/outcome/body/source/first-own until actual MPF class context end. Cached Power wrappers remain actual persistent members; cold-cache failures create no fictional Round NUM authority. Completed child ACK precedes older NUM owning retirement, and exact unjoined abort follows. Real before-lift cold/physical graphs, TLS body/NUM-DT/own-release stops, returning transport, copied history and stale saved context proofs preserve source and ownership distinctions."
       ],
       "deviations": [
         "mpf.cpp:1519-1569 numerical body and mpq.cpp:156-185 caller-specific decimal engine are private scoped proofs; complete root owned-string/printer integration remains pending. No new active original-driver assertions or whole MPF/rational unit completion credit. Default decimal/no-flags stream profile only; native locale/ABI profiles remain open. Qualified signed-host TLS test proves reached q NUM DT protection; guessed youngest verification-DT recipe is diagnostic only.",
         "mpf.cpp:1695-1711 represented Go INT64_MIN input refuses at reached undefined signed negation; no C++ assertion-prefix equivalence claimed. Signed-host TLS destructor-stop tests are actual owner-primitive guard domain, not ordinary mathematical allocation failure. New ToRational tests are adapted source assertions; no direct original mpf.cpp driver coverage or whole-unit completion credit.",
-        "mpf.cpp:1712-1769 C++ undefined signed shifts/addition and oversized shift counts have explicit reached represented-Go guard, distinct from compiled SASSERT width checks. uint32 exponent/float shift/addition source wrapping is retained. Narrow denormal to_double follows literal double bottom-exponent mapping rather than a general format conversion. src/test/mpf.cpp:23-82 all18 ENSURE output values adapted using explicit source fields; original int/double/float SET dependencies remain separately unported, so no complete active-driver or whole MPF unit credit."
+        "mpf.cpp:1712-1769 C++ undefined signed shifts/addition and oversized shift counts have explicit reached represented-Go guard, distinct from compiled SASSERT width checks. uint32 exponent/float shift/addition source wrapping is retained. Narrow denormal to_double follows literal double bottom-exponent mapping rather than a general format conversion. src/test/mpf.cpp:23-82 all18 ENSURE output values adapted using explicit source fields; original int/double/float SET dependencies remain separately unported, so no complete active-driver or whole MPF unit credit.",
+        "mpf.cpp:1963-2098 represented undefined signed exponent arithmetic refuses at the reached expression without scoped NUM constructor credit. TLS negative-size stops are signed-host owner-primitive guard profile, not ordinary mathematical OOM. Independent branch tests add no active original-driver assertions; src/test/mpf.cpp:23-89 has only the earlier eighteen SET outputs. Literal scratch old-free/allocation-before-assignment may leave a guard-only InvalidSlot on retry; no scratch repair is inserted. TRACE remains diagnostic."
       ]
     },
     {

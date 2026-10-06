@@ -17,6 +17,9 @@ import (
 // manager-local mpz-wrapper IDs. No wrapper exists in default empty maps.
 // MPF numeral algorithms and populated powers2 operations remain separate.
 type ArbitraryFloatManager struct {
+	roundHistories                                          *arbitraryFloatRoundHistory
+	roundHistoryBytes                                       uint64
+	roundScope                                              arbitraryFloatRoundScope
 	inputBinding                                            arbitraryFloatInputBinding
 	inputInvocation, inputHistoryBytes                      uint64
 	inputCalls                                              *arbitraryFloatValueInputCall
@@ -132,6 +135,12 @@ func (m *ArbitraryFloatManager) SourceFinalize() error {
 	if !m.constructorComplete {
 		return arena.ErrClosed
 	}
+	if e := m.finishRoundSource(); e != nil {
+		if m.sourceCause == nil {
+			m.sourceCause = e
+		}
+		return e
+	}
 	if m.sourceCause != nil {
 		return m.sourceCause
 	}
@@ -195,6 +204,9 @@ func (m *ArbitraryFloatManager) Close() error {
 		}
 		return e
 	}
+	if e := m.CleanupRound(); e != nil {
+		return stop(e)
+	}
 	// Retire the exact younger lexical conversion before older class members.
 	// Its helper acknowledges completed children, owns local NUMs, then aborts
 	// only the captured unjoined allocation children.
@@ -251,6 +263,7 @@ func (m *ArbitraryFloatManager) Close() error {
 	}
 	m.releasePowerWrapperHistory()
 	m.releaseValueCopyHistory()
+	m.releaseRoundHistory()
 	m.releaseValueInputHistory()
 	m.releaseRationalConversionHistory()
 	m.budget.Release(m.header)
@@ -266,7 +279,7 @@ func (m *ArbitraryFloatManager) OwnedStorageBytes() uint64 {
 	if m == nil || m.self != m {
 		panic(memory.ErrRuntimeOwner)
 	}
-	n := m.header + m.valueHistoryBytes + m.powerWrapperBytes + m.conversionHistoryBytes + m.inputHistoryBytes
+	n := m.header + m.roundHistoryBytes + m.valueHistoryBytes + m.powerWrapperBytes + m.conversionHistoryBytes + m.inputHistoryBytes
 	var z *IntegerManager
 	if m.rational != nil {
 		n += m.rational.headerBytes

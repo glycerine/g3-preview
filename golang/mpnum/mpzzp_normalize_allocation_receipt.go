@@ -56,6 +56,7 @@ func (m *IntegerModularManager) cleanupPNormalizeInvocation(r *integerPNormalize
 // Successful publication returns authority to the persistent Natural member.
 type naturalPNBufferReceipt struct {
 	factorFrontendContext   integerAllocationInvocationContext
+	roundContext            integerAllocationInvocationContext
 	formatContext           integerAllocationInvocationContext
 	primePreparationContext integerAllocationInvocationContext
 	henselCallerContext     integerAllocationInvocationContext
@@ -94,6 +95,21 @@ func (m *NaturalManager) pnBufferReceipt(pn *integerPNormalizeScope, i int) *nat
 func (r *naturalPNBufferReceipt) acquire(s *sourceLimbBuffer, block memory.Block) {
 	if r.buffer == s && r.bound(true) {
 		r.pending = block
+		if c := r.roundContext; c.mpfRound != nil {
+			q := c.roundFrame(c.mpfRound.manager.integer, true)
+			if q != nil && q.history != nil {
+				if r.private {
+					q.history.naturalOriginal[4] = block
+				} else {
+					for i := range q.buffers {
+						if r == &q.buffers[i] {
+							q.history.naturalOriginal[i] = block
+						}
+					}
+				}
+			}
+		}
+
 	}
 }
 func (r *naturalPNBufferReceipt) publish(s *sourceLimbBuffer, block memory.Block) {
@@ -148,6 +164,22 @@ func (r *naturalPNBufferReceipt) bound(executing bool) bool {
 		}
 		for i := range q.buffers {
 			if r == &q.buffers[i] {
+				return r.buffer == &r.owner.division[i]
+			}
+		}
+		return false
+	}
+	if c := r.roundContext; c.mpfRound != nil {
+		s := c.mpfRound
+		if r.owner == nil || s.manager == nil || r.owner != s.manager.integer.natural || c.roundFrame(s.manager.integer, executing) == nil || r.invocation != s.invocation {
+			return false
+		}
+		if r.private {
+			v := &r.owner.verificationInvocation
+			return r == &v.buffer && r.buffer == &r.owner.verification && v.roundContext.mpfRound == s && v.roundContext.mpfRoundInvocation == s.invocation && r.owner.matchesPNVerification(&s.verification)
+		}
+		for i := range s.buffers {
+			if r == &s.buffers[i] {
 				return r.buffer == &r.owner.division[i]
 			}
 		}
@@ -395,6 +427,18 @@ func (r *naturalPNBufferReceipt) bound(executing bool) bool {
 	return r.context != nil && r.context.active && r.invocation == r.context.invocation && (!executing || r.context.executing)
 }
 func (m *NaturalManager) divisionBufferReceipt(context integerAllocationInvocationContext, i int) *naturalPNBufferReceipt {
+	if context.mpfRound != nil {
+		s := context.roundFrame(context.mpfRound.manager.integer, true)
+		if s == nil || s.manager.integer.natural != m {
+			return nil
+		}
+		b := &s.buffers[i]
+		if b.owner == nil {
+			*b = naturalPNBufferReceipt{owner: m, roundContext: context, invocation: s.invocation, buffer: &m.division[i]}
+		}
+		return b
+	}
+
 	if r := context.boolDivides; r != nil {
 		if r.manager == nil || r.manager.natural != m || r.manager.dividesNumeralContextRoots(context) == nil {
 			return nil

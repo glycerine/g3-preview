@@ -232,6 +232,40 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []mem
 				objects[c.object] = true
 			}
 		}
+		if s := &parent.roundScope; s.manager == parent && s.invocation != 0 {
+			if block := s.transferred.Block(); block != (memory.Block{}) {
+				if raw[block] {
+					t.Fatal("duplicate round transferred raw")
+				}
+				if _, e := m.memory.Size(block); e != nil {
+					t.Fatal(e)
+				}
+				raw[block] = true
+			}
+			if c := s.numeric.cell; c.object != (memory.ObjectRef{}) {
+				if objects[c.object] {
+					t.Fatal("duplicate round cell")
+				}
+				ended, e := m.allocator.SourceObjectOwnerEnded()
+				if e != nil {
+					t.Fatal(e)
+				}
+				if ended && c.offset == 0 {
+					if raw[c.raw] {
+						t.Fatal("duplicate round direct raw")
+					}
+					if _, e := m.memory.Size(c.raw); e != nil {
+						t.Fatal(e)
+					}
+					raw[c.raw] = true
+				} else {
+					if _, e := m.allocator.ObjectExtent(c.object); e != nil {
+						t.Fatal(e)
+					}
+					objects[c.object] = true
+				}
+			}
+		}
 		for q := parent.inputCalls; q != nil; q = q.next {
 			if q.self != q || q.manager != parent || q.issued.manager != parent || q.issued.frame != q || q.issued.invocation == 0 {
 				t.Fatal("invalid actual input call owner")

@@ -70,6 +70,15 @@ func (s *sourceLimbBuffer) expandWithPNReceipt(r *memory.Runtime, receipt *natur
 			return e
 		}
 	}
+
+	if receipt != nil && receipt.roundContext.mpfRound != nil {
+		if !receipt.bound(true) {
+			return memory.ErrRuntimeOwner
+		}
+		if e := receipt.roundContext.prepareRoundHistory(receipt.roundContext.mpfRound.manager.integer); e != nil {
+			return e
+		}
+	}
 	block, e := r.Allocate(request)
 	if block != (memory.Block{}) {
 		s.pending = block

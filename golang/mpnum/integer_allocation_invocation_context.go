@@ -22,6 +22,8 @@ type integerAllocationInvocationContext struct {
 	mpfPowerInvocation         uint64
 	upolyDisplay               *upolyDisplayScope
 	upolyDisplayInvocation     uint64
+	mpfRound                   *arbitraryFloatRoundScope
+	mpfRoundInvocation         uint64
 
 	factorNumeralVector              *polynomialFactorNumeralVectorReceipt
 	factorNumeralVectorInvocation    uint64
@@ -125,6 +127,12 @@ func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomial
 		return nil
 	}
 	if c.upolyDisplay != nil && c.upolyDisplayFrame(m) == nil {
+		return nil
+	}
+	if c.mpfRound != nil {
+		if s := c.roundFrame(m, true); s != nil {
+			return &s.numeric
+		}
 		return nil
 	}
 	if c.mpfInput != nil {
