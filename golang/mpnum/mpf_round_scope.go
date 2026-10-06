@@ -1,3 +1,4 @@
+// Source: src/util/mpf.cpp:2100-2131 (shared concrete allocation/lifetime engine).
 // Source: src/util/mpf.cpp:1963-2098.
 // Licensed under the MIT license. Source author: Christoph Wintersteiger.
 package mpnum
@@ -23,7 +24,15 @@ type arbitraryFloatRoundScope struct {
 }
 
 func (m *ArbitraryFloatManager) finishRoundSource() error {
-	s := &m.roundScope
+	return m.finishRoundScopeSource(&m.roundScope)
+}
+func (m *ArbitraryFloatManager) finishRoundSqrtSource() error {
+	return m.finishRoundScopeSource(&m.roundSqrtScope)
+}
+func (m *ArbitraryFloatManager) finishRoundScopeSource(s *arbitraryFloatRoundScope) error {
+	if m == nil || m.self != m || (s != &m.roundScope && s != &m.roundSqrtScope) {
+		return memory.ErrRuntimeOwner
+	}
 	if s.sourceCause != nil {
 		return s.sourceCause
 	}
@@ -76,11 +85,28 @@ func (m *ArbitraryFloatManager) CleanupRoundWithReceipt(r *ArbitraryFloatRoundRe
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
 	}
-	s := &m.roundScope
-	if s.manager == nil {
-		return nil
+	return m.cleanupRoundScope(&m.roundScope, r, abort)
+}
+func (m *ArbitraryFloatManager) CleanupRoundSqrt() error {
+	if e := m.CleanupRoundSqrtWithReceipt(nil, false); e != nil {
+		return e
 	}
-	if s.executing || s.finishing || m.valueExecuting || m.memory.FailureTransportActive() {
+	return m.CleanupRoundSqrtWithReceipt(nil, true)
+}
+func (m *ArbitraryFloatManager) CleanupRoundSqrtWithReceipt(r *ArbitraryFloatRoundReceipt, abort bool) error {
+	if m == nil || m.self != m {
+		return memory.ErrRuntimeOwner
+	}
+	return m.cleanupRoundScope(&m.roundSqrtScope, r, abort)
+}
+func (m *ArbitraryFloatManager) cleanupRoundScope(s *arbitraryFloatRoundScope, r *ArbitraryFloatRoundReceipt, abort bool) error {
+	if m == nil || m.self != m {
+		return memory.ErrRuntimeOwner
+	}
+	if s != &m.roundScope && s != &m.roundSqrtScope {
+		return memory.ErrRuntimeOwner
+	}
+	if s.executing || s.finishing || m.valueExecuting || m.memory != nil && m.memory.FailureTransportActive() {
 		return ErrPolynomialPending
 	}
 
@@ -98,6 +124,9 @@ func (m *ArbitraryFloatManager) CleanupRoundWithReceipt(r *ArbitraryFloatRoundRe
 		if s.history != h || s.invocation != h.invocation {
 			return memory.ErrRuntimeOwner
 		}
+	}
+	if s.manager == nil {
+		return nil
 	}
 	s.finishing = true
 	defer func() { s.finishing = false; s.recordRoundHistory() }()

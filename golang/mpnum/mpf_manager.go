@@ -20,6 +20,7 @@ type ArbitraryFloatManager struct {
 	roundHistories                                          *arbitraryFloatRoundHistory
 	roundHistoryBytes                                       uint64
 	roundScope                                              arbitraryFloatRoundScope
+	roundSqrtScope                                          arbitraryFloatRoundScope
 	inputBinding                                            arbitraryFloatInputBinding
 	inputInvocation, inputHistoryBytes                      uint64
 	inputCalls                                              *arbitraryFloatValueInputCall
@@ -135,6 +136,12 @@ func (m *ArbitraryFloatManager) SourceFinalize() error {
 	if !m.constructorComplete {
 		return arena.ErrClosed
 	}
+	if e := m.finishRoundSqrtSource(); e != nil {
+		if m.sourceCause == nil {
+			m.sourceCause = e
+		}
+		return e
+	}
 	if e := m.finishRoundSource(); e != nil {
 		if m.sourceCause == nil {
 			m.sourceCause = e
@@ -203,6 +210,9 @@ func (m *ArbitraryFloatManager) Close() error {
 			m.ownCause = e
 		}
 		return e
+	}
+	if e := m.CleanupRoundSqrt(); e != nil {
+		return stop(e)
 	}
 	if e := m.CleanupRound(); e != nil {
 		return stop(e)

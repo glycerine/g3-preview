@@ -1,3 +1,4 @@
+// Source: src/util/mpf.cpp:2100-2131 (shared concrete allocation/lifetime engine).
 // Source: src/util/mpf.cpp:1963-2098; explicit reached Integer allocation leaves.
 // Licensed under the MIT license. Source author: Christoph Wintersteiger.
 package mpnum
@@ -29,7 +30,22 @@ type arbitraryFloatRoundHistory struct {
 
 func (c integerAllocationInvocationContext) roundFrame(z *IntegerManager, executing bool) *arbitraryFloatRoundScope {
 	s := c.mpfRound
-	if z == nil || z.self != z || s == nil || s.manager == nil || s.manager.self != s.manager || s.manager.integer != z || s != &s.manager.roundScope || c.mpfRoundInvocation == 0 || s.invocation != c.mpfRoundInvocation {
+	invocation := c.mpfRoundInvocation
+	if c.mpfRoundSqrt != nil {
+		if s != nil {
+			return nil
+		}
+		s = c.mpfRoundSqrt
+		invocation = c.mpfRoundSqrtInvocation
+	}
+	if z == nil || z.self != z || s == nil || s.manager == nil || s.manager.self != s.manager || s.manager.integer != z || invocation == 0 || invocation != s.invocation {
+		return nil
+	}
+	if c.mpfRoundSqrt != nil {
+		if s != &s.manager.roundSqrtScope {
+			return nil
+		}
+	} else if s != &s.manager.roundScope {
 		return nil
 	}
 	if executing && (!s.active || !s.executing || s.finishing || !s.manager.valueExecuting || z.memory.FailureTransportActive()) {
@@ -38,7 +54,7 @@ func (c integerAllocationInvocationContext) roundFrame(z *IntegerManager, execut
 	return s
 }
 func (c integerAllocationInvocationContext) prepareRoundHistory(z *IntegerManager) error {
-	if c.mpfRound == nil {
+	if c.mpfRound == nil && c.mpfRoundSqrt == nil {
 		return nil
 	}
 	s := c.roundFrame(z, true)
@@ -99,6 +115,8 @@ func (m *ArbitraryFloatManager) releaseRoundHistory() {
 	}
 	m.roundScope.history = nil
 	m.roundScope.receipt = nil
+	m.roundSqrtScope.history = nil
+	m.roundSqrtScope.receipt = nil
 	m.roundHistories = nil
 	m.roundHistoryBytes = 0
 }

@@ -93,9 +93,11 @@ func (m *IntegerManager) SourceFinalize() error {
 
 func (m *IntegerManager) markSourceFreedPools() error {
 	if parent := m.mpfParent; parent != nil && parent.self == parent && parent.integer == m {
-		if s := &parent.roundScope; s.manager == parent && s.invocation != 0 {
-			if e := m.markSourceConsumedDetachedCell(&s.numeric.cell, &s.cellRetired); e != nil {
-				return e
+		for _, s := range []*arbitraryFloatRoundScope{&parent.roundScope, &parent.roundSqrtScope} {
+			if s.manager == parent && s.invocation != 0 {
+				if e := m.markSourceConsumedDetachedCell(&s.numeric.cell, &s.cellRetired); e != nil {
+					return e
+				}
 			}
 		}
 		for q := parent.inputCalls; q != nil; q = q.next {
