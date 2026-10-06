@@ -1,28 +1,39 @@
 // Source: src/math/polynomial/upolynomial_factorization_int.h:32-52;
-// src/math/polynomial/upolynomial_factorization.cpp:583-843.
-// Source authors: Leonardo de Moura; Dejan (t-dejanj), 2011-11-29.
+// src/math/polynomial/upolynomial_factorization.cpp:583-977.
+// Source authors: Leonardo de Moura; Dejan (t-dejanj), 2011-11-15.
 // Licensed under the MIT license.
 package mpnum
 
-import "math"
-
 // Both literal to_zp_manager overloads, with reads at each source dereference.
 func (m *UPolynomialManager) toZPInPlace(p *upolyVectorState) error {
+	return m.toZPInPlaceWithHensel(p, nil)
+}
+func (m *UPolynomialManager) toZPInPlaceWithHensel(p *upolyVectorState, receipt *upolyHenselPairInvocationReceipt) error {
+	context := m.modular.henselPairAllocationContext(receipt)
+	if receipt != nil && context.henselPairReceipt(m.config.Integer) == nil {
+		return ErrUPolynomialOwner
+	}
+	return m.toZPInPlaceWithSourceContext(p, context)
+}
+func (m *UPolynomialManager) toZPInPlaceWithSourceContext(p *upolyVectorState, context integerAllocationInvocationContext) error {
 	for i := uint32(0); i < p.size; i++ {
 		a, e := m.read(m.stateView(p), i)
 		if e != nil {
 			return e
 		}
-		if e = m.modular.PNormalize(a); e != nil {
+		if e = m.modular.normalizeWithSourceContext(a, context); e != nil {
 			return e
 		}
 	}
 	return m.trim(p)
 }
 func (m *UPolynomialManager) toZPCopy(p UPolynomialView, out *upolyVectorState) error {
-	return m.toZPCopyEngine(p, out, nil)
+	return m.toZPCopyEngine(p, out, nil, nil)
 }
-func (m *UPolynomialManager) toZPCopyEngine(p UPolynomialView, out *upolyVectorState, r *upolyPrimeTrialInvocationReceipt) error {
+func (m *UPolynomialManager) toZPCopyEngine(p UPolynomialView, out *upolyVectorState, r *upolyPrimeTrialInvocationReceipt, h *upolyHenselPairInvocationReceipt) error {
+	return m.toZPCopyWithOwners(p, out, r, h, nil)
+}
+func (m *UPolynomialManager) toZPCopyWithOwners(p UPolynomialView, out *upolyVectorState, r *upolyPrimeTrialInvocationReceipt, h *upolyHenselPairInvocationReceipt, caller *upolyHenselCallerScope) error {
 	if e := m.reset(out); e != nil {
 		return e
 	}
@@ -33,6 +44,16 @@ func (m *UPolynomialManager) toZPCopyEngine(p UPolynomialView, out *upolyVectorS
 			r.frame.transport = Int{}
 			r.frame.transportBound = true
 			value = &r.frame.transport
+		}
+		if h != nil {
+			h.frame.check.transport = Int{}
+			h.frame.check.transportBound = true
+			value = &h.frame.check.transport
+		}
+		if caller != nil {
+			caller.transport = Int{}
+			caller.transportBound = true
+			value = &caller.transport
 		}
 		a, e := m.read(p, i)
 		if e != nil {
@@ -45,23 +66,43 @@ func (m *UPolynomialManager) toZPCopyEngine(p UPolynomialView, out *upolyVectorS
 				return ErrUPolynomialOwner
 			}
 		}
+		if h != nil {
+			context = m.modular.henselPairAllocationContext(h)
+			if context.henselPairReceipt(m.config.Integer) == nil {
+				return ErrUPolynomialOwner
+			}
+		}
+		if caller != nil {
+			context = m.modular.henselCallerAllocationContext(caller)
+			if context.henselCallerFrame(m.config.Integer) == nil {
+				return ErrUPolynomialOwner
+			}
+		}
 		if e = m.modular.copyWithSourceContext(value, a, context); e != nil {
-			if r == nil {
+			if r == nil && h == nil && caller == nil {
 				m.modular.Del(value)
 			}
 			return e
 		}
 		target, e := m.pushDefault(out)
 		if e != nil {
-			if r == nil {
+			if r == nil && h == nil && caller == nil {
 				m.modular.Del(value)
 			}
 			return e
 		}
 		*target = *value // literal nontrivial mpz move, no coefficient copy or replay
+		if caller != nil {
+			caller.transport = Int{}
+			caller.transportBound = false
+		}
 		if r != nil {
 			r.frame.transport = Int{}
 			r.frame.transportBound = false
+		}
+		if h != nil {
+			h.frame.check.transport = Int{}
+			h.frame.check.transportBound = false
 		}
 	}
 	return m.trim(out)
@@ -81,70 +122,89 @@ func (s *UPolynomialFactorizationService) HenselLiftPair(a, b, r *Int, u, A, v, 
 	}
 	return s.henselPair(a, b, r, u, A, v, B, C, &da.state, &db.state)
 }
-func (s *UPolynomialFactorizationService) henselPair(a, b, r *Int, u, A, v, B, C UPolynomialView, outA, outB *upolyVectorState) error {
+func (s *UPolynomialFactorizationService) henselPair(a, b, r *Int, u, A, v, B, C UPolynomialView, outA, outB *upolyVectorState) (failure error) {
+	return s.henselPairWithCaller(a, b, r, u, A, v, B, C, outA, outB, nil)
+}
+func (s *UPolynomialFactorizationService) henselPairWithCaller(a, b, r *Int, u, A, v, B, C UPolynomialView, outA, outB *upolyVectorState, caller *upolyHenselCallerScope) (failure error) {
 	m := s.manager
+	receipt, e := s.beginHenselPairWithCaller(caller)
+	if e != nil {
+		return e
+	}
+	h := receipt.frame
+	h.bindInputs([5]UPolynomialView{u, A, v, B, C}, outA, outB)
+	h.enterCall()
+	defer func() {
+		h.executing = false
+		h.leaveCall()
+		failure = s.finishHenselPairSource(&receipt, failure)
+		if failure == nil {
+			failure = s.cleanupHenselPairInvocation(&receipt, false)
+			if failure == nil {
+				failure = s.cleanupHenselPairInvocation(&receipt, true)
+			}
+		}
+	}()
 	rm, e := NewRelatedUPolynomialManager(m)
 	if e != nil {
 		return e
 	}
-	defer rm.Close()
-	if e = rm.modular.SetZP(r); e != nil {
+	h.rm = rm
+	h.attachRelated()
+	h.constructed = 1
+	if e = rm.modular.setZPWithAllocationContext(r, rm.modular.henselPairAllocationContext(&receipt)); e != nil {
 		return e
 	}
 	if modularSourceDebug {
-		if upolyViewDegree(C) != upolyViewDegree(A)+upolyViewDegree(B) || upolyViewDegree(u) >= upolyViewDegree(B) || upolyViewDegree(v) >= upolyViewDegree(A) {
+		if upolyViewDegree(h.borrowedInput(4)) != upolyViewDegree(h.borrowedInput(1))+upolyViewDegree(h.borrowedInput(3)) || upolyViewDegree(h.borrowedInput(0)) >= upolyViewDegree(h.borrowedInput(3)) || upolyViewDegree(h.borrowedInput(2)) >= upolyViewDegree(h.borrowedInput(1)) {
 			return ErrUPolynomialAssertion
 		}
 	}
-	var f, Vf, t, S, T, tmp upolyVectorState
-	defer m.dropLocalVector(&f)
-	if e = m.mul(A, B, &f); e != nil {
+	h.constructed = 2
+	if e = m.mulWithHensel(h.borrowedInput(1), h.borrowedInput(3), &h.f, &receipt); e != nil {
 		return e
 	}
-	if e = m.addSubState(C, m.stateView(&f), &f, true); e != nil {
+	if e = m.addSubStateWithHensel(h.borrowedInput(4), m.stateView(&h.f), &h.f, true, &receipt); e != nil {
 		return e
 	}
-	if e = m.divScalar(m.stateView(&f), b); e != nil {
+	if e = m.divScalarWithHensel(m.stateView(&h.f), b, &receipt); e != nil {
 		return e
 	}
-	if e = rm.toZPInPlace(&f); e != nil {
+	if e = rm.toZPInPlaceWithHensel(&h.f, &receipt); e != nil {
 		return e
 	}
-	defer rm.dropLocalVector(&Vf)
-	defer rm.dropLocalVector(&t)
-	defer rm.dropLocalVector(&S)
-	if e = rm.mul(v, rm.stateView(&f), &Vf); e != nil {
+	h.constructed = 5
+	if e = rm.mulWithHensel(h.borrowedInput(2), rm.stateView(&h.f), &h.Vf, &receipt); e != nil {
 		return e
 	}
 	var d uint32
-	if e = rm.divRemCore(rm.stateView(&Vf), A, &d, &t, &S); e != nil {
+	if e = rm.divRemCoreWithHensel(rm.stateView(&h.Vf), h.borrowedInput(1), &d, &h.t, &h.S, &receipt); e != nil {
 		return e
 	}
-	defer rm.dropLocalVector(&T)
-	defer rm.dropLocalVector(&tmp)
-	if e = rm.mul(u, rm.stateView(&f), &T); e != nil {
+	h.constructed = 7
+	if e = rm.mulWithHensel(h.borrowedInput(0), rm.stateView(&h.f), &h.T, &receipt); e != nil {
 		return e
 	}
-	if e = rm.mul(B, rm.stateView(&t), &tmp); e != nil {
+	if e = rm.mulWithHensel(h.borrowedInput(3), rm.stateView(&h.t), &h.tmp, &receipt); e != nil {
 		return e
 	}
-	if e = rm.addSubState(rm.stateView(&T), rm.stateView(&tmp), &T, false); e != nil {
+	if e = rm.addSubStateWithHensel(rm.stateView(&h.T), rm.stateView(&h.tmp), &h.T, false, &receipt); e != nil {
 		return e
 	}
-	if e = m.mulScalarState(&S, b); e != nil {
+	if e = m.mulScalarStateWithHensel(&h.S, b, &receipt); e != nil {
 		return e
 	}
-	if e = m.mulScalarState(&T, b); e != nil {
+	if e = m.mulScalarStateWithHensel(&h.T, b, &receipt); e != nil {
 		return e
 	}
-	if e = m.addSubState(A, m.stateView(&S), outA, false); e != nil {
+	if e = m.addSubStateWithHensel(h.borrowedInput(1), m.stateView(&h.S), outA, false, &receipt); e != nil {
 		return e
 	}
-	if e = m.addSubState(B, m.stateView(&T), outB, false); e != nil {
+	if e = m.addSubStateWithHensel(h.borrowedInput(3), m.stateView(&h.T), outB, false, &receipt); e != nil {
 		return e
 	}
 	if modularSourceDebug && s.config.FactorizationDebugTag {
-		ok, e := s.checkHenselPair(C, a, b, r, A, B, m.stateView(outA), m.stateView(outB))
+		ok, e := s.checkHenselPair(h.borrowedInput(4), a, b, r, h.borrowedInput(1), h.borrowedInput(3), m.stateView(outA), m.stateView(outB), &receipt)
 		if e != nil {
 			return e
 		}
@@ -155,31 +215,62 @@ func (s *UPolynomialFactorizationService) henselPair(a, b, r *Int, u, A, v, B, C
 	return nil
 }
 func (s *UPolynomialFactorizationService) henselQuadratic(C UPolynomialView, zpe *UPolynomialManager, A, B *upolyVectorState, e uint32) error {
+	return s.henselQuadraticWithCaller(C, zpe, A, B, e, nil)
+}
+func (s *UPolynomialFactorizationService) henselQuadraticWithCaller(C UPolynomialView, zpe *UPolynomialManager, A, B *upolyVectorState, e uint32, caller *upolyHenselCallerScope) (failure error) {
 	m := s.manager
+	if caller != nil {
+		caller.enterCall()
+		defer caller.leaveCall()
+	}
 	zp, err := NewRelatedUPolynomialManager(m)
 	if err != nil {
 		return err
 	}
-	defer zp.Close()
+	if caller == nil {
+		defer zp.Close()
+	} else {
+		caller.related = zp
+		caller.ownRelatedStage = 0
+		caller.ownRelatedIndex = 0
+		caller.attachRelated()
+		defer func() {
+			body := failure
+			failure = joinHenselCaller(failure, caller.finishQuadratic())
+			if body == nil && failure == nil {
+				failure = caller.completeQuadraticStorage()
+			}
+		}()
+	}
 	p, err := zpe.modular.borrowedModulus()
 	if err != nil {
 		return err
 	}
-	if err = zp.modular.SetZP(p); err != nil {
+	if err = zp.modular.setZPWithAllocationContext(p, zp.modular.henselCallerAllocationContext(caller)); err != nil {
 		return err
 	}
-	var U, V, D, Al, Bl upolyVectorState
-	defer m.dropLocalVector(&U)
-	defer m.dropLocalVector(&V)
-	defer m.dropLocalVector(&D)
-	if err = zp.extendedGCD(zp.stateView(A), zp.stateView(B), &U, &V, &D); err != nil {
+	var locals [5]upolyVectorState
+	U, V, D, Al, Bl := &locals[0], &locals[1], &locals[2], &locals[3], &locals[4]
+	if caller != nil {
+		U, V, D, Al, Bl = &caller.quadratic[0], &caller.quadratic[1], &caller.quadratic[2], &caller.quadratic[3], &caller.quadratic[4]
+		// This is a new reached U/V/D declaration block, after SetZP.
+		caller.quadraticSourceStarted = false
+		caller.quadraticOwnStarted = false
+		caller.quadraticConstructed = 3
+	}
+	if caller == nil {
+		defer m.dropLocalVector(U)
+		defer m.dropLocalVector(V)
+		defer m.dropLocalVector(D)
+	}
+	if err = zp.extendedGCDWithCaller(zp.stateView(A), zp.stateView(B), U, V, D, caller); err != nil {
 		return err
 	}
 	if modularSourceDebug {
 		if D.size != 1 {
 			return ErrUPolynomialAssertion
 		}
-		one, err := zp.modular.IsOne(&zp.values(&D)[0])
+		one, err := zp.modular.IsOne(&zp.values(D)[0])
 		if err != nil {
 			return err
 		}
@@ -187,8 +278,12 @@ func (s *UPolynomialFactorizationService) henselQuadratic(C UPolynomialView, zpe
 			return ErrUPolynomialAssertion
 		}
 	}
-	defer m.dropLocalVector(&Al)
-	defer m.dropLocalVector(&Bl)
+	if caller == nil {
+		defer m.dropLocalVector(Al)
+		defer m.dropLocalVector(Bl)
+	} else {
+		caller.quadraticConstructed = 5
+	}
 	for k := uint32(1); k < e; {
 		if err = m.checkpoint(); err != nil {
 			return err
@@ -197,54 +292,68 @@ func (s *UPolynomialFactorizationService) henselQuadratic(C UPolynomialView, zpe
 		if err != nil {
 			return err
 		}
-		if err = s.henselPair(pe, pe, pe, m.stateView(&U), m.stateView(A), m.stateView(&V), m.stateView(B), C, &Al, &Bl); err != nil {
+		if err = s.henselPairWithCaller(pe, pe, pe, m.stateView(U), m.stateView(A), m.stateView(V), m.stateView(B), C, Al, Bl, caller); err != nil {
 			return err
 		}
-		if err = s.henselQuadraticIteration(zpe, pe, &U, &V, A, B, &Al, &Bl); err != nil {
+		if err = s.henselQuadraticIterationWithCaller(zpe, pe, U, V, A, B, Al, Bl, caller); err != nil {
 			return err
-		}
-		if k > math.MaxUint32/2 {
-			return ErrUPolynomialNontermination
 		}
 		k *= 2
 	}
 	return nil
 }
 func (s *UPolynomialFactorizationService) henselQuadraticIteration(zpe *UPolynomialManager, pe *Int, U, V, A, B, Al, Bl *upolyVectorState) error {
+	return s.henselQuadraticIterationWithCaller(zpe, pe, U, V, A, B, Al, Bl, nil)
+}
+func (s *UPolynomialFactorizationService) henselQuadraticIterationWithCaller(zpe *UPolynomialManager, pe *Int, U, V, A, B, Al, Bl *upolyVectorState, caller *upolyHenselCallerScope) (failure error) {
 	m := s.manager
-	var tmp1, g, S, T, t, tmp2 upolyVectorState
-	defer m.dropLocalVector(&tmp1)
-	defer m.dropLocalVector(&g)
+	var locals [6]upolyVectorState
+	tmp1, g, S, T, t, tmp2 := &locals[0], &locals[1], &locals[2], &locals[3], &locals[4], &locals[5]
+	if caller != nil {
+		tmp1, g, S, T, t, tmp2 = &caller.iteration[0], &caller.iteration[1], &caller.iteration[2], &caller.iteration[3], &caller.iteration[4], &caller.iteration[5]
+		caller.iterationConstructed = 2
+		caller.iterationSourceStarted = false
+		caller.iterationOwnStarted = false
+		defer func() { failure = joinHenselCaller(failure, caller.finishIteration()) }()
+	}
+	if caller == nil {
+		defer m.dropLocalVector(tmp1)
+		defer m.dropLocalVector(g)
+	}
 	zero := NewInt(0)
-	if e := m.scopedPush(&g, &zero); e != nil {
+	if e := m.scopedPush(g, &zero); e != nil {
 		return e
 	}
-	if e := m.config.Integer.SetInt64(&m.values(&g)[g.size-1], 1); e != nil {
+	if e := m.config.Integer.SetInt64(&m.values(g)[g.size-1], 1); e != nil {
 		return e
 	}
-	if e := m.mul(m.stateView(Al), m.stateView(U), &tmp1); e != nil {
+	if e := m.mulWithCaller(m.stateView(Al), m.stateView(U), tmp1, caller); e != nil {
 		return e
 	}
-	if e := m.addSubState(m.stateView(&g), m.stateView(&tmp1), &g, true); e != nil {
+	if e := m.addSubWithCaller(m.stateView(g), m.stateView(tmp1), g, true, caller); e != nil {
 		return e
 	}
-	if e := m.mul(m.stateView(Bl), m.stateView(V), &tmp1); e != nil {
+	if e := m.mulWithCaller(m.stateView(Bl), m.stateView(V), tmp1, caller); e != nil {
 		return e
 	}
-	if e := m.addSubState(m.stateView(&g), m.stateView(&tmp1), &g, true); e != nil {
+	if e := m.addSubWithCaller(m.stateView(g), m.stateView(tmp1), g, true, caller); e != nil {
 		return e
 	}
-	if e := m.divScalar(m.stateView(&g), pe); e != nil {
+	if e := m.divScalarWithCaller(m.stateView(g), pe, caller); e != nil {
 		return e
 	}
-	if e := zpe.toZPInPlace(&g); e != nil {
+	if e := zpe.toZPInPlaceWithCaller(g, caller); e != nil {
 		return e
 	}
-	defer m.dropLocalVector(&S)
-	defer m.dropLocalVector(&T)
-	defer m.dropLocalVector(&t)
-	defer m.dropLocalVector(&tmp2)
-	if e := zpe.mul(m.stateView(&g), m.stateView(V), &tmp1); e != nil {
+	if caller == nil {
+		defer m.dropLocalVector(S)
+		defer m.dropLocalVector(T)
+		defer m.dropLocalVector(t)
+		defer m.dropLocalVector(tmp2)
+	} else {
+		caller.iterationConstructed = 6
+	}
+	if e := zpe.mulWithCaller(m.stateView(g), m.stateView(V), tmp1, caller); e != nil {
 		return e
 	}
 	var d uint32
@@ -253,45 +362,45 @@ func (s *UPolynomialFactorizationService) henselQuadraticIteration(zpe *UPolynom
 	if e := zpe.adoptState(m, A); e != nil {
 		return e
 	}
-	if e := zpe.divRemCore(m.stateView(&tmp1), m.stateView(A), &d, &t, &T); e != nil {
+	if e := zpe.divRemWithCaller(m.stateView(tmp1), m.stateView(A), &d, t, T, caller); e != nil {
 		return e
 	}
-	if e := zpe.mul(m.stateView(&g), m.stateView(U), &tmp1); e != nil {
+	if e := zpe.mulWithCaller(m.stateView(g), m.stateView(U), tmp1, caller); e != nil {
 		return e
 	}
 	if e := zpe.adoptState(m, B); e != nil {
 		return e
 	}
-	if e := zpe.mul(m.stateView(&t), m.stateView(B), &tmp2); e != nil {
+	if e := zpe.mulWithCaller(m.stateView(t), m.stateView(B), tmp2, caller); e != nil {
 		return e
 	}
-	if e := zpe.addSubState(m.stateView(&tmp1), m.stateView(&tmp2), &S, false); e != nil {
+	if e := zpe.addSubWithCaller(m.stateView(tmp1), m.stateView(tmp2), S, false, caller); e != nil {
 		return e
 	}
-	if e := m.mulScalarState(&S, pe); e != nil {
+	if e := m.scalarWithCaller(S, pe, caller); e != nil {
 		return e
 	}
-	if e := m.mulScalarState(&T, pe); e != nil {
+	if e := m.scalarWithCaller(T, pe, caller); e != nil {
 		return e
 	}
-	if e := m.addSubState(m.stateView(U), m.stateView(&S), U, false); e != nil {
+	if e := m.addSubWithCaller(m.stateView(U), m.stateView(S), U, false, caller); e != nil {
 		return e
 	}
-	if e := m.addSubState(m.stateView(V), m.stateView(&T), V, false); e != nil {
+	if e := m.addSubWithCaller(m.stateView(V), m.stateView(T), V, false, caller); e != nil {
 		return e
 	}
-	if e := zpe.modular.SetPSquare(); e != nil {
+	if e := zpe.modular.setPSquareWithAllocationContext(zpe.modular.henselCallerAllocationContext(caller)); e != nil {
 		return e
 	}
 	for _, vec := range [4]*upolyVectorState{U, V, Al, Bl} {
-		if e := zpe.toZPInPlace(vec); e != nil {
+		if e := zpe.toZPInPlaceWithCaller(vec, caller); e != nil {
 			return e
 		}
 	}
 	*A, *Al = *Al, *A
 	*B, *Bl = *Bl, *B
 	if modularSourceDebug && s.config.FactorizationDebugTag {
-		ok, e := s.checkQuadraticHensel(zpe, m.stateView(U), m.stateView(A), m.stateView(V), m.stateView(B))
+		ok, e := s.checkQuadraticHenselWithCaller(zpe, m.stateView(U), m.stateView(A), m.stateView(V), m.stateView(B), caller)
 		if e != nil {
 			return e
 		}
@@ -344,9 +453,43 @@ func (s *UPolynomialFactorizationService) HenselLiftFactors(f UPolynomialView, p
 	return s.henselFactors(f, pf, e, lf)
 }
 func (s *UPolynomialFactorizationService) henselFactors(f UPolynomialView, pf *UPolynomialFactors, e uint32, lf *UPolynomialFactors) error {
+	// The public facade owns a factual charged Go lifetime adapter, not pf/lf.
+	// Internal factor_square_free passes its actual caller directly instead.
+	owner, err := s.newSquareFreeScope()
+	if err != nil {
+		return err
+	}
+	if err = s.beginHenselCaller(owner); err != nil {
+		return err
+	}
+	err = s.henselFactorsWithCaller(f, pf, e, lf, &owner.hensel)
+	if err == nil {
+		// Successful source/own completion consumed only this exact adapter's fields.
+		// Do not invoke manager-wide cleanup of independent cached pair invocations.
+		if s.scope != owner || owner.hensel.active || owner.constructed != 0 {
+			return ErrUPolynomialCleanupPending
+		}
+		s.manager.config.Integer.budget.Release(owner.header)
+		s.scope = nil
+	}
+	return err
+}
+func (s *UPolynomialFactorizationService) henselFactorsWithCaller(f UPolynomialView, pf *UPolynomialFactors, e uint32, lf *UPolynomialFactors, caller *upolyHenselCallerScope) (failure error) {
 	m := s.manager
 	zp := pf.manager
 	zpe := lf.manager
+	if caller != nil {
+		caller.prime = zp
+		caller.lift = zpe
+		caller.enterCall()
+		defer caller.leaveCall()
+		defer func() {
+			if caller.outerConstructed == 0 && caller.bodyCause == nil {
+				caller.bodyCause = failure
+			}
+			caller.executing = false
+		}()
+	}
 	if modularSourceDebug {
 		if pf.totalFactors == 0 {
 			return ErrUPolynomialAssertion
@@ -363,15 +506,34 @@ func (s *UPolynomialFactorizationService) henselFactors(f UPolynomialView, pf *U
 	if err != nil {
 		return err
 	}
-	if err = zpe.modular.SetZP(p); err != nil {
+	if err = zpe.modular.setZPWithAllocationContext(p, zpe.modular.henselCallerAllocationContext(caller)); err != nil {
 		return err
 	}
-	var A, B, C, parts upolyVectorState
-	defer m.dropLocalVector(&A)
-	defer m.dropLocalVector(&B)
-	defer m.dropLocalVector(&C)
-	defer m.dropLocalVector(&parts)
-	if err = m.setView(&parts, f); err != nil {
+	var locals [4]upolyVectorState
+	A, B, C, parts := &locals[0], &locals[1], &locals[2], &locals[3]
+	if caller == nil {
+		defer m.dropLocalVector(A)
+		defer m.dropLocalVector(B)
+		defer m.dropLocalVector(C)
+		defer m.dropLocalVector(parts)
+	} else {
+		A, B, C, parts = &caller.outer[0], &caller.outer[1], &caller.outer[2], &caller.outer[3]
+		caller.outerConstructed = 4
+		defer func() {
+			if caller.bodyCause == nil {
+				caller.bodyCause = failure
+			}
+			caller.executing = false
+			failure = joinHenselCaller(failure, caller.finish())
+			if failure == nil {
+				failure = caller.own(false)
+				if failure == nil {
+					failure = caller.own(true)
+				}
+			}
+		}()
+	}
+	if err = m.setViewWithCaller(parts, f, caller); err != nil {
 		return err
 	}
 	// Source converts unsigned count-1 to signed int for loop endpoint.
@@ -386,38 +548,38 @@ func (s *UPolynomialFactorizationService) henselFactors(f UPolynomialView, pf *U
 				return ErrUPolynomialAssertion
 			}
 		}
-		if err = zp.setView(&A, zp.stateView(&pf.factors[i])); err != nil {
+		if err = zp.setViewWithCaller(A, zp.stateView(&pf.factors[i]), caller); err != nil {
 			return err
 		}
 		if i > 0 {
 			// parts was grown by the lifted core in the prior source division.
 			// Adopt its actual physical origin at this subsequent cross-core read.
-			if err = zp.adoptState(m, &parts); err != nil {
+			if err = zp.adoptState(m, parts); err != nil {
 				return err
 			}
-			if err = zp.toZPCopy(m.stateView(&parts), &C); err != nil {
+			if err = zp.toZPCopyWithOwners(m.stateView(parts), C, nil, nil, caller); err != nil {
 				return err
 			}
 		} else {
-			if err = s.henselInitialC(f, pf, &C); err != nil {
+			if err = s.henselInitialCWithCaller(f, pf, C, caller); err != nil {
 				return err
 			}
 		}
-		if err = zp.divState(m.stateView(&C), m.stateView(&A), &B); err != nil {
+		if err = zp.divWithCaller(m.stateView(C), m.stateView(A), B, caller); err != nil {
 			return err
 		}
 		p, err := zp.modular.borrowedModulus()
 		if err != nil {
 			return err
 		}
-		if err = zpe.modular.SetZP(p); err != nil {
+		if err = zpe.modular.setZPWithAllocationContext(p, zpe.modular.henselCallerAllocationContext(caller)); err != nil {
 			return err
 		}
-		if err = s.henselQuadratic(m.stateView(&parts), zpe, &A, &B, e); err != nil {
+		if err = s.henselQuadraticWithCaller(m.stateView(parts), zpe, A, B, e, caller); err != nil {
 			return err
 		}
 		if modularSourceDebug && s.config.FactorizationDebugTag {
-			ok, err := s.checkIndividualLift(zp, zp.stateView(&pf.factors[i]), zpe, m.stateView(&A))
+			ok, err := s.checkIndividualLiftWithCaller(zp, zp.stateView(&pf.factors[i]), zpe, m.stateView(A), caller)
 			if err != nil {
 				return err
 			}
@@ -426,37 +588,44 @@ func (s *UPolynomialFactorizationService) henselFactors(f UPolynomialView, pf *U
 			}
 		}
 		if i == 0 {
-			if err = zpe.toZPCopy(f, &parts); err != nil {
+			if err = zpe.toZPCopyWithOwners(f, parts, nil, nil, caller); err != nil {
 				return err
 			}
 		}
-		if err = zpe.divState(m.stateView(&parts), m.stateView(&A), &parts); err != nil {
+		if err = zpe.divWithCaller(m.stateView(parts), m.stateView(A), parts, caller); err != nil {
 			return err
 		}
-		if err = lf.pushSwap(m, &A, 1); err != nil {
+		if err = lf.pushSwap(m, A, 1); err != nil {
 			return err
 		}
 	}
-	var lcInv Int
-	defer m.config.Integer.Del(&lcInv)
+	var localLCInv Int
+	lcInv := &localLCInv
+	if caller == nil {
+		defer m.config.Integer.Del(lcInv)
+	} else {
+		lcInv = &caller.finalLCInv
+		caller.finalLCInvConstructed = true
+		defer func() { failure = joinHenselCaller(failure, caller.finishCallerNumeral(false)) }()
+	}
 	top, err := m.read(f, f.count-1)
 	if err != nil {
 		return err
 	}
-	if err = zpe.modular.Copy(&lcInv, top); err != nil {
+	if err = zpe.modular.copyWithSourceContext(lcInv, top, zpe.modular.henselCallerAllocationContext(caller)); err != nil {
 		return err
 	}
-	if err = zpe.modular.Inv(&lcInv); err != nil {
+	if err = zpe.modular.invWithAllocationContext(lcInv, zpe.modular.henselCallerAllocationContext(caller)); err != nil {
 		return err
 	}
-	if err = zpe.mulScalarState(&B, &lcInv); err != nil {
+	if err = zpe.scalarWithCaller(B, lcInv, caller); err != nil {
 		return err
 	}
-	if err = lf.pushSwap(m, &B, 1); err != nil {
+	if err = lf.pushSwap(m, B, 1); err != nil {
 		return err
 	}
 	if modularSourceDebug && s.config.FactorizationDebugTag {
-		ok, err := s.checkHenselFactors(f, pf, lf, e)
+		ok, err := s.checkHenselFactorsWithCaller(f, pf, lf, e, caller)
 		if err != nil {
 			return err
 		}
@@ -467,19 +636,29 @@ func (s *UPolynomialFactorizationService) henselFactors(f UPolynomialView, pf *U
 	return nil
 }
 func (s *UPolynomialFactorizationService) henselInitialC(f UPolynomialView, pf *UPolynomialFactors, C *upolyVectorState) error {
+	return s.henselInitialCWithCaller(f, pf, C, nil)
+}
+func (s *UPolynomialFactorizationService) henselInitialCWithCaller(f UPolynomialView, pf *UPolynomialFactors, C *upolyVectorState, caller *upolyHenselCallerScope) (failure error) {
 	m := s.manager
 	zp := pf.manager
-	if e := pf.multiply(C); e != nil {
+	if e := pf.multiplyWithCaller(C, caller); e != nil {
 		return e
 	}
-	var lc Int
-	defer m.config.Integer.Del(&lc)
+	var localLC Int
+	lc := &localLC
+	if caller == nil {
+		defer m.config.Integer.Del(lc)
+	} else {
+		lc = &caller.initialLC
+		caller.initialLCConstructed = true
+		defer func() { failure = joinHenselCaller(failure, caller.finishCallerNumeral(true)) }()
+	}
 	top, e := m.read(f, f.count-1)
 	if e != nil {
 		return e
 	}
-	if e = zp.modular.Copy(&lc, top); e != nil {
+	if e = zp.modular.copyWithSourceContext(lc, top, zp.modular.henselCallerAllocationContext(caller)); e != nil {
 		return e
 	}
-	return zp.mulScalarState(C, &lc)
+	return zp.scalarWithCaller(C, lc, caller)
 }

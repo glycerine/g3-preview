@@ -54,21 +54,24 @@ func (m *IntegerModularManager) cleanupPNormalizeInvocation(r *integerPNormalize
 // A receipt exists only for a real pending growth of the named source buffer.
 // Successful publication returns authority to the persistent Natural member.
 type naturalPNBufferReceipt struct {
-	divides     polynomialDividesInvocationReceipt
-	boolDivides integerDividesNumeralInvocationReceipt
-	scalarExact polynomialScalarExactDivInvocationReceipt
-	exactDiv    polynomialExactDivInvocationReceipt
-	raw         integerRawInvocationReceipt
-	scalar      polynomialScalarDivInvocationReceipt
-	content     polynomialContentInvocationReceipt
-	owner       *NaturalManager
-	context     *integerPNormalizeScope
-	invocation  uint64
-	buffer      *sourceLimbBuffer
-	pending     memory.Block
-	stage       uint8
-	private     bool
-	published   memory.Block
+	henselCallerContext integerAllocationInvocationContext
+	henselPair          upolyHenselPairInvocationReceipt
+	henselManager       *UPolynomialManager
+	divides             polynomialDividesInvocationReceipt
+	boolDivides         integerDividesNumeralInvocationReceipt
+	scalarExact         polynomialScalarExactDivInvocationReceipt
+	exactDiv            polynomialExactDivInvocationReceipt
+	raw                 integerRawInvocationReceipt
+	scalar              polynomialScalarDivInvocationReceipt
+	content             polynomialContentInvocationReceipt
+	owner               *NaturalManager
+	context             *integerPNormalizeScope
+	invocation          uint64
+	buffer              *sourceLimbBuffer
+	pending             memory.Block
+	stage               uint8
+	private             bool
+	published           memory.Block
 }
 
 func (m *NaturalManager) pnBufferReceipt(pn *integerPNormalizeScope, i int) *naturalPNBufferReceipt {
@@ -123,6 +126,42 @@ func (s *integerPNormalizeScope) pending() bool {
 }
 
 func (r *naturalPNBufferReceipt) bound(executing bool) bool {
+	if context := r.henselCallerContext; context.henselCaller != nil {
+		q := context.henselCaller
+		if !q.matches() || r.owner != q.owner.manager.config.Integer.natural || context.henselCallerInvocation != q.invocation || r.invocation != q.invocation || (executing && context.henselCallerFrame(q.owner.manager.config.Integer) == nil) {
+			return false
+		}
+		if r.private {
+			v := &r.owner.verificationInvocation
+			return r == &v.buffer && r.buffer == &r.owner.verification && v.henselCallerContext.henselCaller == q && v.henselCallerContext.henselCallerInvocation == q.invocation && r.owner.matchesPNVerification(&q.verification)
+		}
+		for i := range q.buffers {
+			if r == &q.buffers[i] {
+				return r.buffer == &r.owner.division[i]
+			}
+		}
+		return false
+	}
+
+	if s := r.henselPair; s.service != nil {
+		if !s.service.matchesHenselPairInvocation(&s) || r.owner != s.service.manager.config.Integer.natural || r.invocation != s.invocation {
+			return false
+		}
+		if executing && (integerAllocationInvocationContext{henselPair: &s, henselPairInvocation: s.invocation, henselManager: r.henselManager}).henselPairReceipt(s.service.manager.config.Integer) == nil {
+			return false
+		}
+		if r.private {
+			v := &r.owner.verificationInvocation
+			return r == &v.buffer && r.buffer == &r.owner.verification && v.henselPair == s && r.owner.matchesPNVerification(&s.frame.verification)
+		}
+		for i := range s.frame.buffers {
+			if r == &s.frame.buffers[i] {
+				return r.buffer == &r.owner.division[i]
+			}
+		}
+		return false
+	}
+
 	if s := r.boolDivides; s.manager != nil {
 		if !s.manager.matchesDividesNumeralInvocation(&s) || r.owner != s.manager.natural || r.invocation != s.invocation || (executing && s.manager.dividesNumeralContextRoots(integerAllocationInvocationContext{boolDivides: &s, boolDividesInvocation: s.invocation}) == nil) {
 			return false
@@ -262,6 +301,32 @@ func (m *NaturalManager) divisionBufferReceipt(context integerAllocationInvocati
 		return nil
 	}
 
+	if q := context.henselCaller; q != nil {
+		z := q.owner.manager.config.Integer
+		if z.natural != m || context.henselCallerFrame(z) == nil {
+			return nil
+		}
+		b := &q.buffers[i]
+		if b.owner == nil {
+			*b = naturalPNBufferReceipt{owner: m, henselCallerContext: context, invocation: q.invocation, buffer: &m.division[i]}
+		}
+		return b
+	}
+	if context.henselPair != nil {
+		r := context.henselPair
+		if r.service == nil || r.service.manager == nil {
+			return nil
+		}
+		z := r.service.manager.config.Integer
+		if z.natural != m || context.henselPairReceipt(z) == nil {
+			return nil
+		}
+		b := &r.frame.buffers[i]
+		if b.owner == nil {
+			*b = naturalPNBufferReceipt{owner: m, henselPair: *r, henselManager: context.henselManager, invocation: r.invocation, buffer: &m.division[i]}
+		}
+		return b
+	}
 	if r := context.divides; r != nil {
 		if r.core == nil || r.core.integer.natural != m || r.core.integer.dividesContextRoots(context) == nil {
 			return nil

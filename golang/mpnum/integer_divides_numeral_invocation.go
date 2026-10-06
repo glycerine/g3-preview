@@ -42,6 +42,12 @@ func (m *IntegerManager) beginDividesNumeralInvocation(parent integerAllocationI
 	if m.scalarExactContextRoots(parent) != nil {
 		parent.scalarExact.frame.boolNumeral = s.receipt
 	}
+	if q := parent.henselCallerFrame(m); q != nil {
+		q.boolNumeral = s.receipt
+	}
+	if r := parent.henselPairReceipt(m); r != nil {
+		r.frame.boolNumeral = s.receipt
+	}
 	return &s.receipt, nil
 }
 

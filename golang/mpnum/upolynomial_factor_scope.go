@@ -1,6 +1,7 @@
 // Source: src/math/polynomial/upolynomial_factorization.cpp:979-1465.
 // Source author: Leonardo de Moura.
 // Licensed under the MIT license.
+// Source author: Dejan (t-dejanj), 2011-11-15.
 package mpnum
 
 import (
@@ -16,6 +17,7 @@ var ErrUPolynomialCleanupPending = errors.New("mpnum: retained factorization lex
 // the unfinished reverse destruction cursor instead of losing its owner. This
 // additional charged header is a Go exception/lifetime adapter, not C++ malloc.
 type upolyFactorSquareFreeScope struct {
+	hensel          upolyHenselCallerScope
 	self            *upolyFactorSquareFreeScope
 	service         *UPolynomialFactorizationService
 	callerPrevious  *upolyFactorSquareFreeScope
@@ -59,6 +61,12 @@ func (s *UPolynomialFactorizationService) newSquareFreeScope() (*upolyFactorSqua
 // prime, prime factors, prime core, prime, primitive vector. Only constructed
 // objects participate; publication/cleanup advances one completed action.
 func (c *upolyFactorSquareFreeScope) cleanup() error {
+	if c.hensel.active {
+		if e := c.hensel.finish(); e != nil {
+			return e
+		}
+		return ErrUPolynomialCleanupPending
+	}
 	if q := &c.primeTrial; q.active {
 		if q.executing || q.callDepth != 0 {
 			return ErrUPolynomialCleanupPending
@@ -159,6 +167,17 @@ func (s *UPolynomialFactorizationService) CleanupRetained() error {
 	if s.closed {
 		return arena.ErrClosed
 	}
+	if s.scope != nil {
+		c := &s.scope.hensel
+		if c.active && (c.executing || c.sourceExecuting || c.ownExecuting || c.callDepth != 0) {
+			return ErrUPolynomialCleanupPending
+		}
+	}
+	if s.scope == nil || !s.scope.hensel.active {
+		if e := s.cleanupHenselPairs(); e != nil {
+			return e
+		}
+	}
 	// Empty-service Close still refunds its own header after a borrowed owner
 	// closes; no manager/prime access is needed without a retained scope.
 	if s.scope == nil {
@@ -173,6 +192,11 @@ func (s *UPolynomialFactorizationService) CleanupRetained() error {
 	caller := s.scope
 	caller.enterCall()
 	defer caller.leaveCall()
+	if s.scope.hensel.active {
+		if e := s.scope.hensel.own(false); e != nil {
+			return e
+		}
+	}
 	prime := &s.scope.primeTrial
 	if prime.active {
 		if e := s.cleanupPrimeTrialInvocation(&prime.receipt, false); e != nil {
@@ -201,6 +225,11 @@ func (s *UPolynomialFactorizationService) CleanupRetained() error {
 			return e
 		}
 	}
+	if s.scope.hensel.active {
+		if e := s.scope.hensel.own(true); e != nil {
+			return e
+		}
+	}
 	s.manager.config.Integer.budget.Release(s.scope.header)
 	s.scope = nil
 	return nil
@@ -214,8 +243,21 @@ func (s *UPolynomialFactorizationService) RetainedCleanupCore(index uint32) (*UP
 		return nil, e
 	}
 	if s.scope != nil {
-		for _, m := range [2]*UPolynomialManager{s.scope.zpe, s.scope.zp} {
+		for _, m := range [3]*UPolynomialManager{s.scope.zpe, s.scope.zp, s.scope.hensel.related} {
 			if m != nil {
+				if index == 0 {
+					return m, nil
+				}
+				index--
+			}
+		}
+	}
+	for h := s.henselPairs; h != nil; h = h.next {
+		if h.executing || h.sourceExecuting || h.callDepth != 0 {
+			return nil, ErrUPolynomialCleanupPending
+		}
+		for _, m := range []*UPolynomialManager{h.check.bCore, h.check.brCore, h.rm} {
+			if m != nil && !m.closed {
 				if index == 0 {
 					return m, nil
 				}

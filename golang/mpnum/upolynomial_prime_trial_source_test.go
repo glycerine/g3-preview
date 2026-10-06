@@ -1,6 +1,7 @@
 // Source: src/math/polynomial/upolynomial_factorization.cpp:1097-1145;
 // src/math/polynomial/upolynomial_factorization_int.h:42-52.
 // Licensed under the MIT license. Source author: Leonardo de Moura.
+// Source author: Dejan (t-dejanj), 2011-11-15.
 package mpnum
 
 import (
@@ -117,7 +118,54 @@ func primeTrialPhysicalAuditAll(t *testing.T, q *RationalManager, s *UPolynomial
 	if c != nil {
 		n += c.header + uint64(cap(c.ds.words))*4 + uint64(cap(c.primeTrial.degrees.words))*4
 		managers = append(managers, c.zp, c.zpe)
+		for _, m := range c.hensel.numericOwners() {
+			if m == nil || m.closed {
+				continue
+			}
+			seen := false
+			for _, named := range managers {
+				if named == m {
+					seen = true
+					break
+				}
+			}
+			if !seen {
+				managers = append(managers, m)
+			}
+		}
 		roots = append(roots, &c.p, &c.bestP, &c.gcdTmp, &c.leading, &c.trialContent, &c.mignotte.norm, &c.mignotte.bound, &c.mignotte.tmp)
+	}
+	for h := s.henselPairs; h != nil; h = h.next {
+		n += h.header
+		roots = append(roots, &h.am, &h.check.br)
+		if h.check.transportBound {
+			roots = append(roots, &h.check.transport)
+		}
+		for _, m := range []*UPolynomialManager{h.check.brCore, h.check.bCore} {
+			if m != nil && !m.closed {
+				managers = append(managers, m)
+			}
+		}
+		if h.rm != nil && !h.rm.closed {
+			managers = append(managers, h.rm)
+		}
+	}
+	// Explicit external factors are actual caller-owned managers even when no
+	// service lexical scope has been constructed at an early public refusal.
+	for _, fs := range externalFactors {
+		if fs == nil || fs.manager == nil || fs.manager.closed {
+			continue
+		}
+		seen := false
+		for _, named := range managers {
+			if named == fs.manager {
+				seen = true
+				break
+			}
+		}
+		if !seen {
+			managers = append(managers, fs.manager)
+		}
 	}
 	stores := map[*UPolynomialCoefficientStore]bool{}
 	appendState := func(m *UPolynomialManager, v *upolyVectorState) {
@@ -147,22 +195,50 @@ func primeTrialPhysicalAuditAll(t *testing.T, q *RationalManager, s *UPolynomial
 			}
 		}
 	}
-	if c != nil {
-		roots = append(roots, &c.primeTrial.transport)
-		for _, v := range []*upolyVectorState{&c.fpp, &c.trial, &c.quotient, &c.primeTrial.fzp} {
-			appendState(s.manager, v)
+	for h := s.henselPairs; h != nil; h = h.next {
+		for i := uint8(2); i <= h.constructed; i++ {
+			m, v := h.vector(i)
+			appendState(m, v)
 		}
-		for _, fs := range append(externalFactors, c.best, c.lifted, c.primeTrial.current) {
-			if fs == nil {
-				continue
-			}
-			n += fs.header + uint64(cap(fs.degrees.values))*4 + uint64(cap(fs.factors))*uint64(reflect.TypeOf(upolyVectorState{}).Size())
-			roots = append(roots, &fs.constant)
-			for i := uint32(0); i < fs.count; i++ {
-				appendState(fs.manager, &fs.factors[i])
+	}
+	for h := s.henselPairs; h != nil; h = h.next {
+		for i := uint8(3); i <= h.check.constructed; i++ {
+			if v := h.checkVector(i); v != nil {
+				appendState(s.manager, v)
 			}
 		}
 	}
+	if c != nil {
+		roots = append(roots, &c.primeTrial.transport, &c.hensel.am, &c.hensel.monicRaw[0], &c.hensel.monicRaw[1], &c.hensel.extendedScoped[0], &c.hensel.extendedScoped[1], &c.hensel.initialLC, &c.hensel.finalLCInv, &c.hensel.checkPower)
+		if c.hensel.transportBound {
+			roots = append(roots, &c.hensel.transport)
+		}
+		for _, v := range []*upolyVectorState{&c.fpp, &c.trial, &c.quotient, &c.primeTrial.fzp} {
+			appendState(s.manager, v)
+		}
+		for _, group := range [][]upolyVectorState{c.hensel.outer[:], c.hensel.quadratic[:], c.hensel.iteration[:], c.hensel.extended[:], c.hensel.extendedDebug[:], c.hensel.quadraticCheck[:], c.hensel.individual[:], c.hensel.checkVectors[:]} {
+			for i := range group {
+				appendState(s.manager, &group[i])
+			}
+		}
+	}
+	factorOwners := append([]*UPolynomialFactors{}, externalFactors...)
+	if c != nil {
+		factorOwners = append(factorOwners, c.best, c.lifted, c.primeTrial.current)
+	}
+	namedFactors := map[*UPolynomialFactors]bool{}
+	for _, fs := range factorOwners {
+		if fs == nil || namedFactors[fs] {
+			continue
+		}
+		namedFactors[fs] = true
+		n += fs.header + uint64(cap(fs.degrees.values))*4 + uint64(cap(fs.factors))*uint64(reflect.TypeOf(upolyVectorState{}).Size())
+		roots = append(roots, &fs.constant)
+		for i := uint32(0); i < fs.count; i++ {
+			appendState(fs.manager, &fs.factors[i])
+		}
+	}
+
 	mignotteNamedIntegerPhysicalAudit(t, q.z, external, roots...)
 	if n != q.budget.Used() {
 		t.Fatal("actual named prime trial cold ownership", n, q.budget.Used())

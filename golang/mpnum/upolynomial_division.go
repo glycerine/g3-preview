@@ -5,6 +5,16 @@ package mpnum
 import "github.com/glycerine/g3/golang/arena"
 
 func (m *UPolynomialManager) divScalar(v UPolynomialView, b *Int) error {
+	return m.divScalarWithHensel(v, b, nil)
+}
+func (m *UPolynomialManager) divScalarWithHensel(v UPolynomialView, b *Int, receipt *upolyHenselPairInvocationReceipt) error {
+	context := m.modular.henselPairAllocationContext(receipt)
+	if receipt != nil && context.henselPairReceipt(m.config.Integer) == nil {
+		return ErrUPolynomialOwner
+	}
+	return m.divScalarWithSourceContext(v, b, context)
+}
+func (m *UPolynomialManager) divScalarWithSourceContext(v UPolynomialView, b *Int, context integerAllocationInvocationContext) error {
 	if modularSourceDebug {
 		zero, e := m.modular.IsZero(b)
 		if e != nil {
@@ -24,7 +34,7 @@ func (m *UPolynomialManager) divScalar(v UPolynomialView, b *Int) error {
 			return e
 		}
 		if modularSourceDebug {
-			ok, e := m.modular.Divides(b, x)
+			ok, e := m.modular.dividesWithHenselContext(b, x, context)
 			if e != nil {
 				return e
 			}
@@ -32,7 +42,7 @@ func (m *UPolynomialManager) divScalar(v UPolynomialView, b *Int) error {
 				return ErrUPolynomialAssertion
 			}
 		}
-		if e = m.modular.Div(x, b, x); e != nil {
+		if e = m.modular.divWithAllocationContext(x, b, x, context); e != nil {
 			return e
 		}
 	}
@@ -84,6 +94,20 @@ func (m *UPolynomialManager) divRemCore(a, b UPolynomialView, d *uint32, q, r *u
 	return m.divRemCoreSpan(a, &span, d, q, r)
 }
 func (m *UPolynomialManager) divRemCoreSpan(a UPolynomialView, b *upolyDivisorSpan, d *uint32, q, r *upolyVectorState) error {
+	return m.divRemCoreSpanWithHensel(a, b, d, q, r, nil)
+}
+func (m *UPolynomialManager) divRemCoreWithHensel(a, b UPolynomialView, d *uint32, q, r *upolyVectorState, receipt *upolyHenselPairInvocationReceipt) error {
+	span := upolyDivisorSpan{view: b}
+	return m.divRemCoreSpanWithHensel(a, &span, d, q, r, receipt)
+}
+func (m *UPolynomialManager) divRemCoreSpanWithHensel(a UPolynomialView, b *upolyDivisorSpan, d *uint32, q, r *upolyVectorState, receipt *upolyHenselPairInvocationReceipt) (failure error) {
+	context := m.modular.henselPairAllocationContext(receipt)
+	if receipt != nil && context.henselPairReceipt(m.config.Integer) == nil {
+		return ErrUPolynomialOwner
+	}
+	return m.divRemCoreSpanWithSourceContext(a, b, d, q, r, receipt, nil, context)
+}
+func (m *UPolynomialManager) divRemCoreSpanWithSourceContext(a UPolynomialView, b *upolyDivisorSpan, d *uint32, q, r *upolyVectorState, receipt *upolyHenselPairInvocationReceipt, caller *upolyHenselCallerScope, context integerAllocationInvocationContext) (failure error) {
 	if d == nil {
 		return arena.ErrBounds
 	}
@@ -95,7 +119,7 @@ func (m *UPolynomialManager) divRemCoreSpan(a UPolynomialView, b *upolyDivisorSp
 		return ErrUPolynomialAssertion
 	}
 	if b.count() == 1 {
-		if e := m.setView(q, a); e != nil {
+		if e := m.setViewWithSourceContext(q, a, context); e != nil {
 			return e
 		}
 		field, e := m.modular.Field()
@@ -107,7 +131,7 @@ func (m *UPolynomialManager) divRemCoreSpan(a UPolynomialView, b *upolyDivisorSp
 			if e != nil {
 				return e
 			}
-			if e = m.divScalar(m.stateView(q), bn); e != nil {
+			if e = m.divScalarWithSourceContext(m.stateView(q), bn, context); e != nil {
 				return e
 			}
 		}
@@ -116,7 +140,7 @@ func (m *UPolynomialManager) divRemCoreSpan(a UPolynomialView, b *upolyDivisorSp
 	if e := m.reset(q); e != nil {
 		return e
 	}
-	if e := m.setView(r, a); e != nil {
+	if e := m.setViewWithSourceContext(r, a, context); e != nil {
 		return e
 	}
 	if a.count <= 1 {
@@ -142,10 +166,30 @@ func (m *UPolynomialManager) divRemCoreSpan(a UPolynomialView, b *upolyDivisorSp
 			return ErrUPolynomialAssertion
 		}
 	}
-	var am Int
+	var local Int
+	am := &local
+	if receipt != nil {
+		h := receipt.frame
+		h.am = Int{}
+		h.amConstructed = true
+		am = &h.am
+	}
 	// Source scoped_numeral destructor; cleanup on Go errors is the safe
 	// exception adapter. The counter and caller/scratch prefixes stay published.
-	defer m.modular.Del(&am)
+	if caller != nil {
+		caller.am = Int{}
+		caller.amConstructed = true
+		caller.amEnded = false
+		caller.amOwned = false
+		am = &caller.am
+	}
+	if receipt == nil && caller == nil {
+		defer m.modular.Del(am)
+	} else if caller != nil {
+		defer func() { failure = joinHenselCaller(failure, caller.finishAmSource(failure)) }()
+	} else {
+		defer func() { failure = receipt.service.finishHenselAmSource(receipt, failure) }()
+	}
 	for {
 		if e = m.checkpoint(); e != nil {
 			return e
@@ -164,15 +208,15 @@ func (m *UPolynomialManager) divRemCoreSpan(a UPolynomialView, b *upolyDivisorSp
 			return e
 		}
 		if field {
-			if e = m.modular.Div(&m.values(r)[n-1], bn, &am); e != nil {
+			if e = m.modular.divWithAllocationContext(&m.values(r)[n-1], bn, am, context); e != nil {
 				return e
 			}
-			if e = m.modular.Add(&m.values(q)[delta], &am, &m.values(q)[delta]); e != nil {
+			if e = m.modular.addWithSourceContext(&m.values(q)[delta], am, &m.values(q)[delta], context); e != nil {
 				return e
 			}
 		} else {
 			*d++
-			if e = m.modular.Copy(&am, &m.values(r)[n-1]); e != nil {
+			if e = m.modular.copyWithSourceContext(am, &m.values(r)[n-1], context); e != nil {
 				return e
 			}
 			for i := uint32(0); i < n-1; i++ {
@@ -180,7 +224,7 @@ func (m *UPolynomialManager) divRemCoreSpan(a UPolynomialView, b *upolyDivisorSp
 				if e != nil {
 					return e
 				}
-				if e = m.modular.Mul(&m.values(r)[i], bn, &m.values(r)[i]); e != nil {
+				if e = m.modular.mulWithSourceContext(&m.values(r)[i], bn, &m.values(r)[i], context); e != nil {
 					return e
 				}
 			}
@@ -189,11 +233,11 @@ func (m *UPolynomialManager) divRemCoreSpan(a UPolynomialView, b *upolyDivisorSp
 				if e != nil {
 					return e
 				}
-				if e = m.modular.Mul(&m.values(q)[i], bn, &m.values(q)[i]); e != nil {
+				if e = m.modular.mulWithSourceContext(&m.values(q)[i], bn, &m.values(q)[i], context); e != nil {
 					return e
 				}
 			}
-			if e = m.modular.Add(&m.values(q)[delta], &am, &m.values(q)[delta]); e != nil {
+			if e = m.modular.addWithSourceContext(&m.values(q)[delta], am, &m.values(q)[delta], context); e != nil {
 				return e
 			}
 		}
@@ -203,7 +247,7 @@ func (m *UPolynomialManager) divRemCoreSpan(a UPolynomialView, b *upolyDivisorSp
 				return e
 			}
 			dst := &m.values(r)[i+delta]
-			if e = m.modular.SubMul(dst, &am, x, dst); e != nil {
+			if e = m.modular.subMulWithSourceContext(dst, am, x, dst, henselNumericAddMulChild(receipt, caller), context); e != nil {
 				return e
 			}
 		}

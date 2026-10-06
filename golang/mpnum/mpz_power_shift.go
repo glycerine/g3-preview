@@ -134,12 +134,27 @@ func (m *IntegerManager) powerWithReceipt(a *Int, p uint32, out *Int, receipt *i
 	if e := m.check(out); e != nil {
 		return e
 	}
-	return m.powerCoreWithReceipt(a, p, out, receipt)
+	return m.powerCoreWithContext(a, p, out, receipt, integerAllocationInvocationContext{})
 }
 func (m *IntegerManager) powerCore(a *Int, p uint32, out *Int) error {
 	return m.powerCoreWithReceipt(a, p, out, nil)
 }
-func (m *IntegerManager) powerCoreWithReceipt(a *Int, p uint32, out *Int, receipt *integerPowerInvocationReceipt) (cause error) {
+func (m *IntegerManager) powerCoreWithReceipt(a *Int, p uint32, out *Int, receipt *integerPowerInvocationReceipt) error {
+	return m.powerCoreWithContext(a, p, out, receipt, integerAllocationInvocationContext{})
+}
+func (m *IntegerManager) powerWithAllocationContext(a *Int, p uint32, out *Int, receipt *integerPowerInvocationReceipt, context integerAllocationInvocationContext) error {
+	if e := m.check(a); e != nil {
+		return e
+	}
+	if e := m.check(out); e != nil {
+		return e
+	}
+	return m.powerCoreWithContext(a, p, out, receipt, context)
+}
+func (m *IntegerManager) powerCoreWithContext(a *Int, p uint32, out *Int, receipt *integerPowerInvocationReceipt, context integerAllocationInvocationContext) (cause error) {
+	if context != (integerAllocationInvocationContext{}) && context.roots(m) == nil {
+		return ErrUPolynomialOwner
+	}
 	if a.IsSmall() {
 		switch a.val {
 		case 2:
@@ -155,7 +170,7 @@ func (m *IntegerManager) powerCoreWithReceipt(a *Int, p uint32, out *Int, receip
 			if modularSourceDebug && size == 0 {
 				return ErrIntegerAssertion
 			}
-			if e := m.allocateIfNeeded(out, size); e != nil {
+			if e := m.allocateIfNeededWithAllocationContext(out, size, context); e != nil {
 				return e
 			}
 			if modularSourceDebug && m.cell(out.cell).capacity < size {
@@ -180,7 +195,7 @@ func (m *IntegerManager) powerCoreWithReceipt(a *Int, p uint32, out *Int, receip
 			}
 			return m.Reset(out)
 		case 1:
-			return m.SetInt64(out, 1)
+			return m.setInt64WithAllocationContext(out, 1, context)
 		}
 	}
 	if e := m.beginPowerRawScopeWithReceipt(receipt); e != nil {
@@ -193,10 +208,10 @@ func (m *IntegerManager) powerCoreWithReceipt(a *Int, p uint32, out *Int, receip
 		}
 	}()
 	power := &s.value
-	if e := m.powerRawCall(0, a, nil, power); e != nil {
+	if e := m.powerRawCallWithContext(0, a, nil, power, context); e != nil {
 		return e
 	}
-	if e := m.SetInt64(out, 1); e != nil {
+	if e := m.setInt64WithAllocationContext(out, 1, context); e != nil {
 		return e
 	}
 	for mask := uint32(1); mask <= p; mask <<= 1 {
@@ -204,12 +219,12 @@ func (m *IntegerManager) powerCoreWithReceipt(a *Int, p uint32, out *Int, receip
 			return &PowerDomainError{Exponent: p, Reason: PowerMaskOverflow}
 		}
 		if mask&p != 0 {
-			if e := m.Mul(out, power, out); e != nil {
+			if e := m.mulWithAllocationContext(out, power, out, context); e != nil {
 				return e
 			}
 		}
 		// The final square is deliberately retained, even when its value is unused.
-		if e := m.powerRawCall(1, power, power, power); e != nil {
+		if e := m.powerRawCallWithContext(1, power, power, power, context); e != nil {
 			return e
 		}
 	}

@@ -387,6 +387,9 @@ func (fs *UPolynomialFactors) Close() error {
 	return nil
 }
 func (fs *UPolynomialFactors) multiply(out *upolyVectorState) error {
+	return fs.multiplyWithCaller(out, nil)
+}
+func (fs *UPolynomialFactors) multiplyWithCaller(out *upolyVectorState, caller *upolyHenselCallerScope) error {
 	m := fs.manager
 	if e := m.reset(out); e != nil {
 		return e
@@ -405,7 +408,7 @@ func (fs *UPolynomialFactors) multiply(out *upolyVectorState) error {
 	if e != nil {
 		return e
 	}
-	if e = m.modular.Copy(value, &fs.constant); e != nil {
+	if e = m.modular.copyWithSourceContext(value, &fs.constant, m.modular.henselCallerAllocationContext(caller)); e != nil {
 		return e
 	}
 	for i := uint32(0); i < fs.count; i++ {
@@ -422,7 +425,7 @@ func (fs *UPolynomialFactors) multiply(out *upolyVectorState) error {
 				return e
 			}
 		} else {
-			if e = m.mul(m.stateView(out), v, out); e != nil {
+			if e = m.mulWithCaller(m.stateView(out), v, out, caller); e != nil {
 				return e
 			}
 		}

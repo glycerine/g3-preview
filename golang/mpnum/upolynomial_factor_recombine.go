@@ -2,6 +2,7 @@
 // Source author: Leonardo de Moura.
 // Licensed under the MIT license.
 // Actual Mignotte bound, prime image trials and subset recombination.
+// Source author: Dejan (t-dejanj), 2011-11-15.
 package mpnum
 
 func (s *UPolynomialFactorizationService) FactorSquareFree(f UPolynomialView, fs *UPolynomialFactors, k uint32, params UPolynomialFactorParams) (bool, error) {
@@ -282,7 +283,10 @@ func (s *UPolynomialFactorizationService) factorSquareFree(f UPolynomialView, fs
 	}
 	c.lifted = lifted
 	c.constructed = 9
-	if e = s.henselFactors(m.stateView(&c.fpp), best, exponent, lifted); e != nil {
+	if e = s.beginHenselCaller(c); e != nil {
+		return false, e
+	}
+	if e = s.henselFactorsWithCaller(m.stateView(&c.fpp), best, exponent, lifted, &c.hensel); e != nil {
 		return false, e
 	}
 	c.constructed = 10

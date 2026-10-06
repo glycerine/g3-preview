@@ -77,6 +77,26 @@ func (m *NaturalManager) sourceVerifyDivisionWithAllocationContext(a, b, q, r li
 		r.frame.verification = naturalPNVerificationReceipt{m, frame, frame.invocation}
 		defer func() { frame.executing = false }()
 	}
+	if q := context.henselCaller; context.raw == nil && q != nil && q.owner.manager.config.Integer.natural == m && context.henselCallerFrame(q.owner.manager.config.Integer) != nil {
+		frame = &m.verificationInvocation
+		if frame.active || frame.invocation == ^uint64(0) {
+			return ErrPolynomialPending
+		}
+		*frame = naturalPNVerificationScope{active: true, executing: true, invocation: frame.invocation + 1, henselCallerContext: context}
+		frame.buffer = naturalPNBufferReceipt{owner: m, henselCallerContext: context, invocation: q.invocation, buffer: &m.verification, private: true}
+		q.verification = naturalPNVerificationReceipt{m, frame, frame.invocation}
+		defer func() { frame.executing = false }()
+	}
+	if r := context.henselPair; context.raw == nil && r != nil && r.service != nil && r.service.manager != nil && r.service.manager.config.Integer.natural == m && context.henselPairReceipt(r.service.manager.config.Integer) != nil {
+		frame = &m.verificationInvocation
+		if frame.active || frame.invocation == ^uint64(0) {
+			return ErrPolynomialPending
+		}
+		*frame = naturalPNVerificationScope{active: true, executing: true, invocation: frame.invocation + 1, henselPair: *r}
+		frame.buffer = naturalPNBufferReceipt{owner: m, henselPair: *r, henselManager: context.henselManager, invocation: r.invocation, buffer: &m.verification, private: true}
+		r.frame.verification = naturalPNVerificationReceipt{m, frame, frame.invocation}
+		defer func() { frame.executing = false }()
+	}
 	if r := context.content; context.raw == nil && r != nil && r.manager != nil && r.manager.integer != nil && r.manager.integer.natural == m && context.contentReceipt(r.manager.integer) != nil {
 		frame = &m.verificationInvocation
 		if frame.active || frame.invocation == ^uint64(0) {

@@ -26,6 +26,24 @@ func (m *IntegerModularManager) derivativeAllocationContext(r *polynomialDerivat
 }
 
 func (m *IntegerModularManager) normalizeWithSourceContext(out *Int, context integerAllocationInvocationContext) error {
+	if q := context.henselCallerFrame(m.manager); q != nil && context.henselCallerManager.modular == m {
+		child := q.normalizeReceipt(m)
+		e := m.pNormalizeWithReceipt(out, child)
+		if q.sourceCause == nil {
+			q.sourceCause = m.pNormalizeInvocationSourceCause(child)
+		}
+		return e
+	}
+
+	if r := context.henselPairReceipt(m.manager); r != nil && context.henselManager.modular == m {
+		child := r.frame.normalizeReceipt(m)
+		e := m.pNormalizeWithReceipt(out, child)
+		if r.frame.sourceCause == nil {
+			r.frame.sourceCause = m.pNormalizeInvocationSourceCause(child)
+		}
+		return e
+	}
+
 	if r := context.iccpConstant; m.manager.iccpConstantContextRoots(context) != nil && r.manager.core.modular == m {
 		e := m.pNormalizeWithReceipt(out, &r.frame.normalize)
 		if r.frame.sourceCause == nil {

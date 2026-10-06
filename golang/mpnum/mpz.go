@@ -547,6 +547,9 @@ func (m *IntegerManager) Reset(a *Int) error {
 // old limbs. A failed replacement leaves the already-published positive sign
 // and the owner's dead allocation token; only cleanup may consume that token.
 func (m *IntegerManager) allocateIfNeeded(a *Int, capacity uint32) error {
+	return m.allocateIfNeededWithAllocationContext(a, capacity, integerAllocationInvocationContext{})
+}
+func (m *IntegerManager) allocateIfNeededWithAllocationContext(a *Int, capacity uint32, context integerAllocationInvocationContext) error {
 	if e := m.check(a); e != nil {
 		return e
 	}
@@ -565,7 +568,7 @@ func (m *IntegerManager) allocateIfNeeded(a *Int, capacity uint32) error {
 		if aWasSmall {
 			a.cell = m.failedNullRef
 		}
-		ref, e := m.allocate(capacity, 0)
+		ref, e := m.allocateWithSourceContext(capacity, 0, nil, context)
 		if e != nil {
 			return e
 		}

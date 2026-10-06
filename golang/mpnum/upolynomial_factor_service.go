@@ -17,18 +17,22 @@ type UPolynomialFactorizationConfig struct {
 	FactorizationDebugTag bool
 }
 type UPolynomialFactorizationService struct {
-	self    *UPolynomialFactorizationService
-	manager *UPolynomialManager
-	config  UPolynomialFactorizationConfig
-	scope   *upolyFactorSquareFreeScope
-	header  uint64
-	closed  bool
+	self        *UPolynomialFactorizationService
+	manager     *UPolynomialManager
+	config      UPolynomialFactorizationConfig
+	scope       *upolyFactorSquareFreeScope
+	henselPairs *upolyHenselPairScope
+	header      uint64
+	closed      bool
 }
 type UPolynomialFactorizationStats struct {
 	OwnerBytes, RetainedOwnerBytes uint64
+	CachedOwnerBytes               uint64
+	CachedScopes                   uint32
 	RetainedScopes                 uint32
 	MignottePending                bool
 	PrimeTrialPending              bool
+	HenselPending                  bool
 }
 
 func NewUPolynomialFactorizationService(m *UPolynomialManager, c UPolynomialFactorizationConfig) (*UPolynomialFactorizationService, error) {
@@ -81,6 +85,10 @@ func (s *UPolynomialFactorizationService) Close() error {
 	if e := s.CleanupRetained(); e != nil {
 		return e
 	}
+	for h := s.henselPairs; h != nil; h = h.next {
+		s.manager.config.Integer.budget.Release(h.header)
+	}
+	s.henselPairs = nil
 	s.manager.config.Integer.budget.Release(s.header)
 	s.closed = true
 	return nil
@@ -95,6 +103,15 @@ func (s *UPolynomialFactorizationService) Stats() UPolynomialFactorizationStats 
 		r.RetainedOwnerBytes = s.scope.header
 		r.MignottePending = s.scope.mignotte.active
 		r.PrimeTrialPending = s.scope.primeTrial.active
+	}
+	for h := s.henselPairs; h != nil; h = h.next {
+		r.CachedOwnerBytes += h.header
+		r.CachedScopes++
+		if h.active {
+			r.RetainedOwnerBytes += h.header
+			r.RetainedScopes++
+			r.HenselPending = true
+		}
 	}
 	return r
 }

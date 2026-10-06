@@ -1,6 +1,7 @@
 // Source: src/math/polynomial/upolynomial_factorization.cpp:979-1017;
 // src/util/scoped_numeral.h:31-33.
 // Licensed under the MIT license. Source author: Leonardo de Moura.
+// Source author: Dejan (t-dejanj), 2011-11-15.
 package mpnum
 
 import (
@@ -237,6 +238,23 @@ func (q *upolyMignotteScope) leaveCall(m *UPolynomialManager) {
 	}
 }
 func (m *UPolynomialManager) mignotteCallPending() bool {
+	if c := m.henselCallerGuard; c != nil && c.matches() && c.callDepth != 0 && m.henselCallerInvocation == c.invocation && c.ownsNumericManager(m) {
+		return true
+	}
+	for h := m.henselPairCaller; h != nil; {
+		if h.self == h && h.service != nil && h.service.self == h.service && h.callDepth != 0 && h.ownsNumericManager(m) {
+			return true
+		}
+		if h.service != nil && h.service.manager == m {
+			h = h.rootPrevious
+		} else if h.check.brCore == m {
+			h = h.check.brPrevious
+		} else if h.check.bCore == m {
+			h = h.check.bPrevious
+		} else {
+			h = h.rmPrevious
+		}
+	}
 	for q := m.primeTrialCaller; q != nil; {
 		if q.self == q && q.service != nil && q.service.self == q.service && q.callDepth != 0 && (q.zp == m || q.service.manager == m) {
 			return true

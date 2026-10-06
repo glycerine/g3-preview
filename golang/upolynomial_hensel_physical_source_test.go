@@ -203,11 +203,38 @@ func upolyHenselAuditPhysical(t *testing.T, cores []*mpnum.UPolynomialManager, f
 	upolyPhysicalExtraNumerals(extras, addInt)
 	for _, extra := range extras {
 		for _, service := range extra.Services {
+			for pair := reflect.ValueOf(service).Elem().FieldByName("henselPairs"); !pair.IsNil(); pair = pair.Elem().FieldByName("next") {
+				h := pair.Elem()
+				if h.FieldByName("amConstructed").Bool() {
+					addInt(h.FieldByName("am"))
+				}
+				check := h.FieldByName("check")
+				if check.FieldByName("constructed").Uint() >= 1 {
+					addInt(check.FieldByName("br"))
+				}
+				if check.FieldByName("transportBound").Bool() {
+					addInt(check.FieldByName("transport"))
+				}
+			}
 			scope := reflect.ValueOf(service).Elem().FieldByName("scope")
 			if scope.IsNil() {
 				continue
 			}
 			scope = scope.Elem()
+			caller := scope.FieldByName("hensel")
+			for _, n := range []struct{ flag, value string }{{"amConstructed", "am"}, {"initialLCConstructed", "initialLC"}, {"finalLCInvConstructed", "finalLCInv"}, {"checkPowerConstructed", "checkPower"}, {"transportBound", "transport"}} {
+				if caller.FieldByName(n.flag).Bool() {
+					addInt(caller.FieldByName(n.value))
+				}
+			}
+			if caller.FieldByName("extendedRawConstructed").Bool() {
+				for i := 0; i < 2; i++ {
+					addInt(caller.FieldByName("monicRaw").Index(i))
+				}
+			}
+			for i := 0; i < int(caller.FieldByName("extendedScopedConstructed").Uint()); i++ {
+				addInt(caller.FieldByName("extendedScoped").Index(i))
+			}
 			prime := scope.FieldByName("primeTrial")
 			if prime.FieldByName("transportBound").Bool() {
 				addInt(prime.FieldByName("transport"))
@@ -534,13 +561,13 @@ func upolyHenselCallerSetZForDeadBounds(t *testing.T, cores []*mpnum.UPolynomial
 
 func TestUPolynomialHenselDeadLowerGuardedCloseAndCallerSetZ(t *testing.T) {
 	if !cooperationSourceDebug {
-		t.Skip("exact ordinal157 belongs to source debug direct allocator profile")
+		t.Skip("exact ordinal159 belongs to source debug direct allocator profile")
 	}
 	m, prime, lift, donor, pf, lf, service, f, _, b := upolyHenselPhysicalFixture(t)
 	allocator := reflect.ValueOf(m.IntegerManager()).Elem().FieldByName("allocator").Elem()
 	profile := allocator.FieldByName("config").FieldByName("Profile")
 	if !profile.FieldByName("Debug").Bool() || profile.FieldByName("Windows").Bool() {
-		t.Skip("ordinal157 requires actual non-Windows debug direct allocator profile")
+		t.Skip("ordinal159 requires actual non-Windows debug direct allocator profile")
 	}
 	locations := allocator.FieldByName("locations")
 	chunks, direct := 0, 0
@@ -560,7 +587,10 @@ func TestUPolynomialHenselDeadLowerGuardedCloseAndCallerSetZ(t *testing.T) {
 	}
 	cores := []*mpnum.UPolynomialManager{m, prime, lift, donor}
 	owners := []*mpnum.UPolynomialFactors{pf, lf}
-	b.FailAfter(157)
+	// The cached pair frame and public caller adapter are real cold owners.
+	// Their two reservations precede this unchanged setup_p lower Copy;
+	// the independent exact physical frontier probe reaches it at159.
+	b.FailAfter(159)
 	err := service.HenselLiftFactors(f, pf, 16, lf)
 	var failure memory.Failure
 	if !errors.As(err, &failure) || failure.Kind != memory.FailureMemout || !m.IntegerManager().RuntimeOwner().State().OutOfMemory {

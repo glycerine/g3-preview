@@ -54,6 +54,8 @@ func (m *IntegerManager) extendedGCDWithAllocationContext(r1, r2, a, b, g *Int, 
 		}
 		values = &public.values
 		context.recordContentRaw(m, receipt)
+		m.bindHenselRaw(context, receipt, false)
+		m.bindHenselCallerRaw(context, receipt, false)
 		m.bindExactDivRaw(context, receipt, false)
 		m.bindScalarExactDivRaw(context, receipt, false)
 		m.bindDividesRaw(context, receipt, false)

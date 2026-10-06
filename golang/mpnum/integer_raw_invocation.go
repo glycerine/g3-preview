@@ -5,6 +5,9 @@ package mpnum
 // Real retained RAW declarations in the charged Integer owner. Count marks
 // reached declarations; values beyond count carry no source constructor credit.
 type integerRawScope struct {
+	henselCallerContext                            integerAllocationInvocationContext
+	henselPair                                     upolyHenselPairInvocationReceipt
+	henselManager                                  *UPolynomialManager
 	divides                                        polynomialDividesInvocationReceipt
 	content                                        polynomialContentInvocationReceipt
 	addMul                                         integerAddMulInvocationReceipt
@@ -46,6 +49,12 @@ func (m *IntegerManager) matchesRawInvocation(r *integerRawInvocationReceipt) bo
 func (m *IntegerManager) rawAllocationRoots(r *integerRawInvocationReceipt) *polynomialNumericRoots {
 
 	if !m.matchesRawInvocation(r) || !r.frame.executing || m.closed || m.sourceFinalizing || m.constructionFailed {
+		return nil
+	}
+	if c := r.frame.henselCallerContext; c.henselCaller != nil && c.henselCallerFrame(m) == nil {
+		return nil
+	}
+	if p := &r.frame.henselPair; p.service != nil && (integerAllocationInvocationContext{henselPair: p, henselPairInvocation: p.invocation, henselManager: r.frame.henselManager}).henselPairReceipt(m) == nil {
 		return nil
 	}
 	if p := &r.frame.divides; p.core != nil && m.dividesAllocationRoots(p) == nil {

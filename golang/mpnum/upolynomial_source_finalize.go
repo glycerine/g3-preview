@@ -6,11 +6,15 @@ import "github.com/glycerine/g3/golang/arena"
 // SourceFinalize runs only the source private-member destructor sequence.
 // Caller-owned polynomial descriptors and all cold ownership metadata survive
 // for explicit owning cleanup. No descriptor-directory scan acquires ownership.
-func (m *UPolynomialManager) SourceFinalize() error {
+func (m *UPolynomialManager) SourceFinalize() error { return m.sourceFinalizeWithHensel(nil) }
+func (m *UPolynomialManager) sourceFinalizeWithHensel(r *upolyHenselPairInvocationReceipt) error {
+	return m.sourceFinalizeWithHenselOwners(r, nil)
+}
+func (m *UPolynomialManager) sourceFinalizeWithHenselOwners(r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope) error {
 	if m == nil || m.self != m || m.config.Integer == nil {
 		return ErrUPolynomialOwner
 	}
-	if m.mignotteCallPending() {
+	if m.mignotteCallPending() && !m.henselDestructorAuthorized(r, false) && !m.henselCallerDestructorAuthorized(c, false) {
 		return ErrUPolynomialCleanupPending
 	}
 	if m.sourceFinalized {

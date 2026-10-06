@@ -130,6 +130,8 @@ func (m *IntegerManager) divWithAllocationContext(a, b, c *Int, context integerA
 			}
 			tmp = &public.values[0]
 			context.recordContentRaw(m, receipt)
+			m.bindHenselRaw(context, receipt, true)
+			m.bindHenselCallerRaw(context, receipt, true)
 			m.bindExactDivRaw(context, receipt, true)
 			m.bindScalarExactDivRaw(context, receipt, true)
 			m.bindDividesRaw(context, receipt, true)

@@ -54,13 +54,19 @@ func TestUPolynomialFactorRetainedLexicalCleanup(t *testing.T) {
 				t.Fatal("uncharged lexical scope")
 			}
 			core, e := service.RetainedCleanupCore(0)
-			if errors.Is(e, arena.ErrBounds) && (stats.MignottePending || stats.PrimeTrialPending) {
+			pair := reflect.ValueOf(service).Elem().FieldByName("henselPairs")
+			preRelatedPair := stats.HenselPending && !pair.IsNil() && pair.Elem().FieldByName("active").Bool() && pair.Elem().FieldByName("constructed").Uint() == 0 && pair.Elem().FieldByName("rm").IsNil()
+			if errors.Is(e, arena.ErrBounds) && (stats.MignottePending || stats.PrimeTrialPending || preRelatedPair) {
 				// Source completed older declarations, leaving an exact unjoined
-				// Mignotte or Prime RAW child. A related core is no longer a universal scope invariant.
+				// Mignotte or Prime RAW child, or the exact pair constructor
+				// frontier before the related manager is published.
 				// This new case must not replace the original later core/set_z campaign.
 				b.FailAfter(-1)
 				if e = service.CleanupRetained(); e != nil {
 					t.Fatal("exact retained child owning acknowledgment", e)
+				}
+				if preRelatedPair && (pair.Elem().FieldByName("active").Bool() || service.Stats().CachedOwnerBytes != stats.CachedOwnerBytes || service.Stats().CachedScopes != stats.CachedScopes || service.Stats().HenselPending) {
+					t.Fatal("exact pre-related invocation not retired into charged idle cache", service.Stats())
 				}
 				if service.Stats().RetainedScopes != 0 {
 					t.Fatal("unjoined retained child scope not consumed")
@@ -78,6 +84,53 @@ func TestUPolynomialFactorRetainedLexicalCleanup(t *testing.T) {
 			}
 			if e != nil {
 				t.Fatal(e)
+			}
+			enclosing := reflect.ValueOf(service).Elem().FieldByName("scope")
+			matchedCaller := !enclosing.IsNil() && enclosing.Elem().FieldByName("hensel").FieldByName("active").Bool()
+			if matchedCaller {
+				// Close is explicitly owning CleanupRetained, not a source retry.
+				// This exact newly captured child can now be rescued. The original
+				// source/caller-set_z assertions below remain for the old scope route.
+				caller := enclosing.Elem().FieldByName("hensel")
+				callerCauseNil := caller.FieldByName("sourceCause").IsNil()
+				var child reflect.Value
+				var invocation, sourceRemaining, sourceIndex uint64
+				causeNil, bodyNil := true, true
+				if !pair.IsNil() {
+					child = pair.Elem()
+					invocation = child.FieldByName("invocation").Uint()
+					sourceRemaining = child.FieldByName("sourceRemaining").Uint()
+					sourceIndex = child.FieldByName("sourceIndex").Uint()
+					causeNil = child.FieldByName("sourceCause").IsNil()
+					bodyNil = child.FieldByName("bodyCause").IsNil()
+				}
+				if _, e = service.Factor(mustUPolyView(t, m, p), fs, mpnum.DefaultUPolynomialFactorParams()); !errors.Is(e, mpnum.ErrUPolynomialCleanupPending) {
+					t.Fatal("matched caller refused new operation", e)
+				}
+				b.FailAfter(-1)
+				e = service.Close()
+				if e != nil && !errors.Is(e, arena.ErrInvalidSlot) {
+					t.Fatal("actual matched owning result", ordinal, e)
+				}
+				if e == nil {
+					if child.IsValid() && (child.FieldByName("active").Bool() || child.FieldByName("invocation").Uint() != invocation || child.FieldByName("sourceRemaining").Uint() != sourceRemaining || child.FieldByName("sourceIndex").Uint() != sourceIndex || child.FieldByName("sourceCause").IsNil() != causeNil || child.FieldByName("bodyCause").IsNil() != bodyNil) {
+						t.Fatal("owning changed child source history")
+					}
+					if caller.FieldByName("active").Bool() || caller.FieldByName("sourceCause").IsNil() != callerCauseNil {
+						t.Fatal("captured older caller not retired")
+					}
+					upolyHenselAuditPhysical(t, []*mpnum.UPolynomialManager{m}, []*mpnum.UPolynomialFactors{fs})
+					if e = service.Close(); !errors.Is(e, arena.ErrClosed) {
+						t.Fatal("owning repeated consumption", e)
+					}
+					if e = fs.Close(); e != nil {
+						t.Fatal(e)
+					}
+					if e = primes.Close(); e != nil {
+						t.Fatal(e)
+					}
+					continue
+				}
 			}
 			found = true
 			if _, e = service.Factor(mustUPolyView(t, m, p), fs, mpnum.DefaultUPolynomialFactorParams()); !errors.Is(e, mpnum.ErrUPolynomialCleanupPending) {

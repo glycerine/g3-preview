@@ -26,14 +26,17 @@ type UPolynomialConfig struct {
 // are required, even though operations without a checkpoint do not call them.
 // Cold ownership and every actual typed backing are charged to Integer's budget.
 type UPolynomialManager struct {
-	callbackDepth    uint32
-	mignotteCaller   *upolyMignotteScope
-	primeTrialCaller *upolyPrimeTrialScope
-	squareFreeCaller *upolyFactorSquareFreeScope
-	self             *UPolynomialManager
-	origin           uint64
-	config           UPolynomialConfig
-	modular          *IntegerModularManager
+	henselPairCaller       *upolyHenselPairScope
+	henselCallerGuard      *upolyHenselCallerScope
+	henselCallerInvocation uint64
+	callbackDepth          uint32
+	mignotteCaller         *upolyMignotteScope
+	primeTrialCaller       *upolyPrimeTrialScope
+	squareFreeCaller       *upolyFactorSquareFreeScope
+	self                   *UPolynomialManager
+	origin                 uint64
+	config                 UPolynomialConfig
+	modular                *IntegerModularManager
 	// Actual source members: 16 core and five derived numeral vectors.
 	basic, div1, div2, exactDiv, gcd1, gcd2, cra   upolyVectorState
 	mgcd                                           [6]upolyVectorState
@@ -203,11 +206,15 @@ func (m *UPolynomialManager) DelPolynomial(p *UPolynomial) error {
 	*p = UPolynomial{}
 	return nil
 }
-func (m *UPolynomialManager) Close() error {
+func (m *UPolynomialManager) Close() error { return m.closeWithHensel(nil) }
+func (m *UPolynomialManager) closeWithHensel(r *upolyHenselPairInvocationReceipt) error {
+	return m.closeWithHenselOwners(r, nil)
+}
+func (m *UPolynomialManager) closeWithHenselOwners(r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope) error {
 	if m == nil || m.self != m || m.config.Integer == nil {
 		return ErrUPolynomialOwner
 	}
-	if m.mignotteCallPending() {
+	if m.mignotteCallPending() && !m.henselDestructorAuthorized(r, true) && !m.henselCallerDestructorAuthorized(c, true) {
 		return ErrUPolynomialCleanupPending
 	}
 	if m.closed || m.config.Integer.closed {
@@ -218,7 +225,7 @@ func (m *UPolynomialManager) Close() error {
 	}
 	m.closing = true
 	if m.sourceFinalizing && !m.sourceFinalized && m.sourceCause == nil {
-		if e := m.SourceFinalize(); e != nil {
+		if e := m.sourceFinalizeWithHenselOwners(r, c); e != nil {
 			return e
 		}
 	}

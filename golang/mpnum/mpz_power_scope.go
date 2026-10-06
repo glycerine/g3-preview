@@ -131,6 +131,22 @@ func (m *IntegerManager) powerRawCall(op uint8, a, b, out *Int) (cause error) {
 	return errors.Join(cause, e)
 }
 
+// The passed concrete caller context stamps actual allocation leaves. Published
+// RAW value belongs to this actual Power frame; unpublished leaves remain in
+// the caller's direct roots until its later owning abort. No inventory capture.
+func (m *IntegerManager) powerRawCallWithContext(op uint8, a, b, out *Int, context integerAllocationInvocationContext) error {
+	if context == (integerAllocationInvocationContext{}) {
+		return m.powerRawCall(op, a, b, out)
+	}
+	switch op {
+	case 0:
+		return m.copyFromOwnerWithAllocationContext(out, m, a, nil, context)
+	case 1:
+		return m.mulWithAllocationContext(a, b, out, context)
+	}
+	return ErrIntegerAssertion
+}
+
 type integerPowerInvocationReceipt struct {
 	manager    *IntegerManager
 	scope      *integerPowerScope
@@ -138,10 +154,11 @@ type integerPowerInvocationReceipt struct {
 }
 
 func (m *IntegerManager) matchesPowerInvocation(r *integerPowerInvocationReceipt) bool {
-	return r != nil && r.manager == m && r.scope == &m.powerRaw && r.invocation != 0 && r.scope.generation == r.invocation && r.scope.active
+	return m != nil && m.self == m && r != nil && r.manager == m && r.scope == &m.powerRaw && r.invocation != 0 && r.scope.generation == r.invocation && r.scope.active
 }
 func (m *IntegerManager) powerInvocationSourceCause(r *integerPowerInvocationReceipt) error {
-	if m.matchesPowerInvocation(r) && r.scope.stopped {
+	// Readonly history is exact owner/member/nonce, independent of live cleanup.
+	if m != nil && m.self == m && r != nil && r.manager == m && r.scope == &m.powerRaw && r.invocation != 0 && r.scope.generation == r.invocation && r.scope.stopped {
 		return r.scope.sourceCause
 	}
 	return nil

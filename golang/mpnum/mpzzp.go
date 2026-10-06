@@ -143,6 +143,9 @@ func (m *IntegerModularManager) Modulus(out *Int) error {
 	return m.manager.Copy(out, &m.p)
 }
 func (m *IntegerModularManager) setupP() error {
+	return m.setupPWithAllocationContext(integerAllocationInvocationContext{})
+}
+func (m *IntegerModularManager) setupPWithAllocationContext(context integerAllocationInvocationContext) error {
 	z := m.manager
 	if modularSourceDebug {
 		pos, e := z.IsPos(&m.p)
@@ -165,17 +168,18 @@ func (m *IntegerModularManager) setupP() error {
 		return e
 	}
 	two := NewInt(2)
-	if e = z.Div(&m.p, &two, &m.upper); e != nil {
+	if e = z.divWithAllocationContext(&m.p, &two, &m.upper, context); e != nil {
 		return e
 	}
-	if e = z.Copy(&m.lower, &m.upper); e != nil {
+	if e = z.copyFromOwnerWithAllocationContext(&m.lower, z, &m.upper, nil, context); e != nil {
 		return e
 	}
-	if e = z.Neg(&m.lower); e != nil {
+	if e = z.negWithAllocationContext(&m.lower, context); e != nil {
 		return e
 	}
 	if even {
-		return z.Inc(&m.lower)
+		one := NewInt(1)
+		return z.addSubWithAllocationContext(&m.lower, &one, &m.lower, false, context)
 	}
 	return nil
 }
@@ -187,16 +191,19 @@ func (m *IntegerModularManager) SetZ() error {
 	return nil
 }
 func (m *IntegerModularManager) SetZP(p *Int) error {
+	return m.setZPWithAllocationContext(p, integerAllocationInvocationContext{})
+}
+func (m *IntegerModularManager) setZPWithAllocationContext(p *Int, context integerAllocationInvocationContext) error {
 	if e := m.check(); e != nil {
 		return e
 	}
 	m.z = false
 	m.prime = true
 	m.primeKnown = true
-	if e := m.manager.Copy(&m.p, p); e != nil {
+	if e := m.manager.copyFromOwnerWithAllocationContext(&m.p, m.manager, p, nil, context); e != nil {
 		return e
 	}
-	return m.setupP()
+	return m.setupPWithAllocationContext(context)
 }
 func (m *IntegerModularManager) SetZPUint64(p uint64) error {
 	if e := m.check(); e != nil {
@@ -211,18 +218,7 @@ func (m *IntegerModularManager) SetZPUint64(p uint64) error {
 	return m.setupP()
 }
 func (m *IntegerModularManager) SetPSquare() error {
-	if e := m.check(); e != nil {
-		return e
-	}
-	if modularSourceDebug && m.z {
-		return ErrModularAssertion
-	}
-	m.prime = false
-	m.primeKnown = true
-	if e := m.manager.Mul(&m.p, &m.p, &m.p); e != nil {
-		return e
-	}
-	return m.setupP()
+	return m.setPSquareWithAllocationContext(integerAllocationInvocationContext{})
 }
 func (m *IntegerModularManager) SetZPSwap(p *Int) error {
 	if e := m.check(); e != nil {

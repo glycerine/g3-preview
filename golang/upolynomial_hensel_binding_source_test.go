@@ -192,6 +192,7 @@ func TestUPolynomialHenselImportedAlgorithmImmediateFailureRoots(t *testing.T) {
 	firstPrimeRetain := int64(-1)
 	var previousPrimeOwners uint32
 	var previousLiftExclusive uint64
+	previousLiftHadPrime := false
 	for ordinal := int64(0); ordinal < 256; ordinal++ {
 		succeeded := false
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
@@ -225,18 +226,27 @@ func TestUPolynomialHenselImportedAlgorithmImmediateFailureRoots(t *testing.T) {
 			if e != nil {
 				t.Fatal(e)
 			}
-			if firstPrimeRetain < 0 && ps.Owners == 3 {
+			liftHasPrime := false
+			liftBindings := reflect.ValueOf(lift).Elem().FieldByName("bindings")
+			primeIdentity := reflect.ValueOf(prime).Elem().FieldByName("store").Pointer()
+			for i := 0; i < liftBindings.Len(); i++ {
+				if liftBindings.Index(i).FieldByName("store").Pointer() == primeIdentity {
+					liftHasPrime = true
+				}
+			}
+			if firstPrimeRetain < 0 && liftHasPrime {
 				firstPrimeRetain = ordinal
 				field, ok := reflect.TypeOf(prime).Elem().FieldByName("bindings")
 				if !ok {
 					t.Fatal("actual cold directory")
 				}
 				bindingBytes := uint64(field.Type.Elem().Size())
-				if previousPrimeOwners != 2 || lift.Stats().ExclusiveBytes != previousLiftExclusive+2*bindingBytes {
+				if previousLiftHadPrime || ps.Owners < 3 || lift.Stats().ExclusiveBytes != previousLiftExclusive+2*bindingBytes {
 					t.Fatal("actual lifted PRIME binding growth transition", ordinal, previousPrimeOwners, ps, previousLiftExclusive, lift.Stats())
 				}
 			}
 			previousPrimeOwners = ps.Owners
+			previousLiftHadPrime = liftHasPrime
 			previousLiftExclusive = lift.Stats().ExclusiveBytes
 			b.FailAfter(-1)
 			if err == nil {

@@ -109,6 +109,17 @@ func (m *UPolynomialManager) addSubViews(a, b UPolynomialView, out UPolynomial, 
 	return m.addSubState(a, b, &d.state, sub)
 }
 func (m *UPolynomialManager) addSubState(a, b UPolynomialView, out *upolyVectorState, sub bool) error {
+	return m.addSubStateWithHensel(a, b, out, sub, nil)
+}
+func (m *UPolynomialManager) addSubStateWithHensel(a, b UPolynomialView, out *upolyVectorState, sub bool, receipt *upolyHenselPairInvocationReceipt) error {
+	context := m.modular.henselPairAllocationContext(receipt)
+	if receipt != nil && context.henselPairReceipt(m.config.Integer) == nil {
+		return ErrUPolynomialOwner
+	}
+	return m.addSubStateWithSourceContext(a, b, out, sub, context)
+}
+func (m *UPolynomialManager) addSubStateWithSourceContext(a, b UPolynomialView, out *upolyVectorState, sub bool, context integerAllocationInvocationContext) error {
+
 	var e error
 	s := &m.basic
 	if modularSourceDebug && (m.alias(a, s) || m.alias(b, s)) {
@@ -133,9 +144,9 @@ func (m *UPolynomialManager) addSubState(a, b UPolynomialView, out *upolyVectorS
 		}
 		dst := &m.values(s)[i]
 		if sub {
-			e = m.modular.Sub(x, y, dst)
+			e = m.modular.subWithSourceContext(x, y, dst, context)
 		} else {
-			e = m.modular.Add(x, y, dst)
+			e = m.modular.addWithSourceContext(x, y, dst, context)
 		}
 		if e != nil {
 			return e
@@ -146,7 +157,7 @@ func (m *UPolynomialManager) addSubState(a, b UPolynomialView, out *upolyVectorS
 		if e != nil {
 			return e
 		}
-		if e = m.modular.Copy(&m.values(s)[i], x); e != nil {
+		if e = m.modular.copyWithSourceContext(&m.values(s)[i], x, context); e != nil {
 			return e
 		}
 	}
@@ -156,11 +167,11 @@ func (m *UPolynomialManager) addSubState(a, b UPolynomialView, out *upolyVectorS
 			return e
 		}
 		dst := &m.values(s)[i]
-		if e = m.modular.Copy(dst, y); e != nil {
+		if e = m.modular.copyWithSourceContext(dst, y, context); e != nil {
 			return e
 		}
 		if sub {
-			if e = m.modular.Neg(dst); e != nil {
+			if e = m.modular.negWithSourceContext(dst, context); e != nil {
 				return e
 			}
 		}
@@ -200,6 +211,17 @@ func (m *UPolynomialManager) SubViews(a, b UPolynomialView, out UPolynomial) err
 	return m.addSubViews(a, b, out, true)
 }
 func (m *UPolynomialManager) mul(a, b UPolynomialView, out *upolyVectorState) error {
+	return m.mulWithHensel(a, b, out, nil)
+}
+func (m *UPolynomialManager) mulWithHensel(a, b UPolynomialView, out *upolyVectorState, receipt *upolyHenselPairInvocationReceipt) error {
+	context := m.modular.henselPairAllocationContext(receipt)
+	if receipt != nil && context.henselPairReceipt(m.config.Integer) == nil {
+		return ErrUPolynomialOwner
+	}
+	return m.mulWithSourceContext(a, b, out, henselAddMulChild(receipt), context)
+}
+func (m *UPolynomialManager) mulWithSourceContext(a, b UPolynomialView, out *upolyVectorState, child *integerAddMulInvocationReceipt, context integerAllocationInvocationContext) error {
+
 	s := &m.basic
 	if modularSourceDebug && (m.alias(a, s) || m.alias(b, s)) {
 		return ErrUPolynomialAssertion
@@ -256,7 +278,7 @@ func (m *UPolynomialManager) mul(a, b UPolynomialView, out *upolyVectorState) er
 					continue
 				}
 				dst := &m.values(s)[i+j]
-				if e = m.modular.AddMul(dst, x, y, dst); e != nil {
+				if e = m.modular.addMulWithSourceContext(dst, x, y, dst, child, context); e != nil {
 					return e
 				}
 			}
@@ -427,6 +449,17 @@ func (m *UPolynomialManager) MulScalar(p UPolynomial, b *Int) error {
 	return m.MulScalarView(m.stateView(&d.state), b)
 }
 func (m *UPolynomialManager) MulScalarView(v UPolynomialView, b *Int) error {
+	return m.MulScalarViewWithHensel(v, b, nil)
+}
+func (m *UPolynomialManager) MulScalarViewWithHensel(v UPolynomialView, b *Int, receipt *upolyHenselPairInvocationReceipt) error {
+	context := m.modular.henselPairAllocationContext(receipt)
+	if receipt != nil && context.henselPairReceipt(m.config.Integer) == nil {
+		return ErrUPolynomialOwner
+	}
+	return m.mulScalarViewWithSourceContext(v, b, context)
+}
+func (m *UPolynomialManager) mulScalarViewWithSourceContext(v UPolynomialView, b *Int, context integerAllocationInvocationContext) error {
+
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -451,7 +484,7 @@ func (m *UPolynomialManager) MulScalarView(v UPolynomialView, b *Int) error {
 		if e != nil {
 			return e
 		}
-		if e = m.modular.Mul(a, b, a); e != nil {
+		if e = m.modular.mulWithSourceContext(a, b, a, context); e != nil {
 			return e
 		}
 	}

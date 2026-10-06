@@ -125,11 +125,39 @@ func upolyHenselCheckVectorOwners(cores []*mpnum.UPolynomialManager, factors []*
 	}
 	for _, extra := range extras {
 		for _, service := range extra.Services {
+			for pair := reflect.ValueOf(service).Elem().FieldByName("henselPairs"); !pair.IsNil(); pair = pair.Elem().FieldByName("next") {
+				h := pair.Elem()
+				root := h.FieldByName("service").Elem().FieldByName("manager").Elem()
+				for _, field := range []string{"f", "Vf", "t", "S", "T", "tmp"} {
+					owner := root
+					if field != "f" && !h.FieldByName("rm").IsNil() {
+						owner = h.FieldByName("rm").Elem()
+					}
+					if e := add(owner, h.FieldByName(field), "retained henselPair."+field); e != nil {
+						return e
+					}
+				}
+				check := h.FieldByName("check")
+				for _, field := range []string{"test1", "test2a", "test2b", "test3a", "test3b"} {
+					if e := add(root, check.FieldByName(field), "retained henselCheck."+field); e != nil {
+						return e
+					}
+				}
+			}
 			scope := reflect.ValueOf(service).Elem().FieldByName("scope")
 			if scope.IsNil() {
 				continue
 			}
 			scope = scope.Elem()
+			caller := scope.FieldByName("hensel")
+			for _, name := range []string{"outer", "quadratic", "iteration"} {
+				group := caller.FieldByName(name)
+				for i := 0; i < group.Len(); i++ {
+					if e := add(scope.FieldByName("manager").Elem(), group.Index(i), "retained henselCaller."+name); e != nil {
+						return e
+					}
+				}
+			}
 			prime := scope.FieldByName("primeTrial")
 			if !prime.FieldByName("zp").IsNil() {
 				if e := add(prime.FieldByName("zp").Elem(), prime.FieldByName("fzp"), "retained primeTrial.f_pp_zp"); e != nil {
@@ -166,7 +194,7 @@ func upolyPhysicalRetainedOwners(cores []*mpnum.UPolynomialManager, factors []*m
 	fs := append([]*mpnum.UPolynomialFactors(nil), factors...)
 	for _, extra := range extras {
 		for _, service := range extra.Services {
-			for i := uint32(0); i < 2; i++ {
+			for i := uint32(0); ; i++ {
 				c, e := service.RetainedCleanupCore(i)
 				if errors.Is(e, arena.ErrBounds) {
 					break

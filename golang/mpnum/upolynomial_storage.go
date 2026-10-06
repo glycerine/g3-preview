@@ -415,6 +415,16 @@ func (m *UPolynomialManager) read(v UPolynomialView, index uint32) (*Int, error)
 	return &b.values[v.start+index], nil
 }
 func (m *UPolynomialManager) setView(s *upolyVectorState, v UPolynomialView) error {
+	return m.setViewWithHensel(s, v, nil)
+}
+func (m *UPolynomialManager) setViewWithHensel(s *upolyVectorState, v UPolynomialView, receipt *upolyHenselPairInvocationReceipt) error {
+	context := m.modular.henselPairAllocationContext(receipt)
+	if receipt != nil && context.henselPairReceipt(m.config.Integer) == nil {
+		return ErrUPolynomialOwner
+	}
+	return m.setViewWithSourceContext(s, v, context)
+}
+func (m *UPolynomialManager) setViewWithSourceContext(s *upolyVectorState, v UPolynomialView, context integerAllocationInvocationContext) error {
 	if m.alias(v, s) {
 		if modularSourceDebug && s.size != v.count {
 			return ErrUPolynomialAssertion
@@ -429,7 +439,7 @@ func (m *UPolynomialManager) setView(s *upolyVectorState, v UPolynomialView) err
 		if e != nil {
 			return e
 		}
-		if e = m.modular.Copy(&m.values(s)[i], a); e != nil {
+		if e = m.modular.copyWithSourceContext(&m.values(s)[i], a, context); e != nil {
 			return e
 		}
 	}

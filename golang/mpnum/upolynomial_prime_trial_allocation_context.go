@@ -1,6 +1,6 @@
 // Source: src/math/polynomial/upolynomial_factorization.cpp:1097-1145;
 // src/math/polynomial/upolynomial_factorization_int.h:42-52.
-// Licensed under the MIT license. Source authors: Leonardo de Moura; Dejan (t-dejanj), 2011-11-29.
+// Licensed under the MIT license. Source authors: Leonardo de Moura; Dejan (t-dejanj), 2011-11-15.
 package mpnum
 
 func (c integerAllocationInvocationContext) primeTrialReceipt(m *IntegerManager) *upolyPrimeTrialInvocationReceipt {
@@ -26,5 +26,5 @@ func (m *UPolynomialManager) toZPCopyWithPrimeReceipt(p UPolynomialView, out *up
 	}
 	r.frame.enterCall()
 	defer r.frame.leaveCall()
-	return m.toZPCopyEngine(p, out, r)
+	return m.toZPCopyEngine(p, out, r, nil)
 }

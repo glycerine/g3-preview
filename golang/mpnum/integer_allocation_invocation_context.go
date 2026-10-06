@@ -5,6 +5,12 @@ package mpnum
 // Explicit passed invocation identity. It carries no allocation snapshot and
 // creates no source numeral, reservation, or ambient callback owner hook.
 type integerAllocationInvocationContext struct {
+	henselCaller           *upolyHenselCallerScope
+	henselCallerInvocation uint64
+	henselCallerManager    *UPolynomialManager
+	henselPair             *upolyHenselPairInvocationReceipt
+	henselPairInvocation   uint64
+	henselManager          *UPolynomialManager
 	iccpConstant           *polynomialICCPConstantInvocationReceipt
 	iccpConstantInvocation uint64
 	primeTrial             *upolyPrimeTrialInvocationReceipt
@@ -68,6 +74,12 @@ func pnAllocationContext(pn *integerPNormalizeScope) integerAllocationInvocation
 	return c
 }
 func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomialNumericRoots {
+	if c.henselCaller != nil && c.henselCallerFrame(m) == nil {
+		return nil
+	}
+	if c.henselPair != nil && c.henselPairReceipt(m) == nil {
+		return nil
+	}
 	if c.iccpConstant != nil && m.iccpConstantContextRoots(c) == nil {
 		return nil
 	}
@@ -136,6 +148,12 @@ func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomial
 	}
 	if r := c.primeTrialReceipt(m); r != nil {
 		return &r.frame.numeric
+	}
+	if r := c.henselPairReceipt(m); r != nil {
+		return &r.frame.numeric
+	}
+	if r := c.henselCallerFrame(m); r != nil {
+		return &r.numeric
 	}
 	if r := c.mignotteReceipt(m); r != nil {
 		return &r.frame.numeric

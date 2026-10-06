@@ -36869,7 +36869,9 @@
         "upolynomial_coefficient_store_adoption_test.go",
         "mpnum/upolynomial_source_finalize.go",
         "mpnum/upolynomial_source_finalize_test.go",
-        "upolynomial_hensel_physical_source_test.go"
+        "upolynomial_hensel_physical_source_test.go",
+        "mpnum/upolynomial_hensel_extended_scope.go",
+        "mpnum/upolynomial_hensel_caller_engines.go"
       ],
       "tests": [
         "TestUPolynomialScalarExtentAndLayout",
@@ -36968,7 +36970,9 @@
         "TestUPolynomialSourceFinalizeDoesNotOwnReleasedLeafRetry",
         "TestUPolynomialSourceFinalizeUnconstructedTailPrefix",
         "TestUPolynomialSourceFinalizeFirstEntryConsumedLeafGuard",
-        "TestUPolynomialSourceFinalizeFreshNullMember"
+        "TestUPolynomialSourceFinalizeFreshNullMember",
+        "TestUPolynomialHenselActualExtendedGCDCallerIndependentIdentity",
+        "TestUPolynomialHenselActualExtendedGCDEveryBIGReservation"
       ],
       "conditionals": [
         {
@@ -37936,6 +37940,15 @@
             "TestUPolynomialSourceFinalizeFirstEntryConsumedLeafGuard",
             "TestUPolynomialSourceFinalizeFreshNullMember"
           ]
+        },
+        {
+          "name": "upolynomial.cpp:1045-1105 reached ext_gcd exact U=1/D=A initialization, source swaps and dynamic scoped DEBUG/final NUM suffix",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_gcd_extended.go",
+          "tests": [
+            "TestUPolynomialHenselActualExtendedGCDCallerIndependentIdentity",
+            "TestUPolynomialHenselActualExtendedGCDEveryBIGReservation"
+          ]
         }
       ],
       "ownership": [
@@ -37946,7 +37959,8 @@
         "Related cores retain one charged concrete coefficient store and borrowed IntegerManager. Descriptors and twenty-one scratch vectors remain core-owned; closing a parent releases its scratch without destroying child buffers. Sum core ExclusiveBytes and one store TotalBytes. See PORT_PROGRESS.md#audit-upolynomial-factorization-packet-md.",
         "Independent stores borrowing the same actual IntegerManager transfer scalar buffer states without coefficient copies. Charged cold bindings retain each distinct imported store once; captured physical views survive transfer and original-core close until actual backing growth/free. Related constructors inherit bindings and unwind retained refs on refusal. Sum core ExclusiveBytes plus each distinct store TotalBytes once; numeral cells belong to the shared IntegerManager. See PORT_PROGRESS.md#audit-upolynomial-store-adoption-port-status-md.",
         "Literal ascending private numeral deletion and reverse backing destruction retain exact stopped cause/cursor. Caller descriptors survive source finalization and require explicit caller-field cleanup. No registry-derived ownership or acknowledgement of consumed physical release on source retry. Whole imp/global bindings remain open.",
-        "Upper isolation/Sturm tests account for exact external shared Integer gcdRaw five declarations and matched AddMul child TMP separately from UPolynomial-owned/cached stats. Actual Integer self/frame/count and immutable child/parent invocation identities name roots; live/generation metadata only validates those exact tokens. Physical anonymous-root audits remain intact. This is Go allocation-failure observation coverage, not additional registered C++ assertion credit."
+        "Upper isolation/Sturm tests account for exact external shared Integer gcdRaw five declarations and matched AddMul child TMP separately from UPolynomial-owned/cached stats. Actual Integer self/frame/count and immutable child/parent invocation identities name roots; live/generation metadata only validates those exact tokens. Physical anonymous-root audits remain intact. This is Go allocation-failure observation coverage, not additional registered C++ assertion credit.",
+        "Actual caller-owned stable V1/V3/Q/R/T/V1Q, conditional BV/expectedD and final lc_inv/lc frontiers; source youngest stop precedes older vectors and related owner."
       ],
       "deviations": [
         "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full isolation/refinement/conversion/factorization/algebraic and printers remain open; input conversion adapters do not establish complete registered tests.",
@@ -38563,7 +38577,46 @@
         "mpnum/upolynomial_prime_trial_owner_transport_source_test.go",
         "mpnum/upolynomial_prime_trial_source_test.go",
         "mpnum/upolynomial_prime_trial_invocation.go",
-        "mpnum/upolynomial_prime_trial_allocation_context.go"
+        "mpnum/upolynomial_prime_trial_allocation_context.go",
+        "mpnum/upolynomial_division.go",
+        "mpnum/upolynomial_factor_hensel_debug.go",
+        "mpnum/upolynomial_factors.go",
+        "mpnum/upolynomial_gcd.go",
+        "mpnum/upolynomial_gcd_extended.go",
+        "mpnum/upolynomial_hensel_caller_allocation_context.go",
+        "mpnum/upolynomial_hensel_caller_engines.go",
+        "mpnum/upolynomial_hensel_caller_guard.go",
+        "mpnum/upolynomial_hensel_caller_owner_transport_source_test.go",
+        "mpnum/upolynomial_hensel_caller_scope.go",
+        "mpnum/upolynomial_hensel_caller_source_test.go",
+        "mpnum/upolynomial_hensel_check_invocation.go",
+        "mpnum/upolynomial_hensel_conditional_scope.go",
+        "mpnum/upolynomial_hensel_conditional_source_test.go",
+        "mpnum/upolynomial_hensel_extended_scope.go",
+        "mpnum/upolynomial_hensel_extended_source_test.go",
+        "mpnum/upolynomial_hensel_pair_addmul_source_test.go",
+        "mpnum/upolynomial_hensel_pair_alias_source_test.go",
+        "mpnum/upolynomial_hensel_pair_allocation_context.go",
+        "mpnum/upolynomial_hensel_pair_allocation_context_test.go",
+        "mpnum/upolynomial_hensel_pair_big_source_test.go",
+        "mpnum/upolynomial_hensel_pair_cancellation_source_test.go",
+        "mpnum/upolynomial_hensel_pair_check_source_test.go",
+        "mpnum/upolynomial_hensel_pair_check_tls_source_test.go",
+        "mpnum/upolynomial_hensel_pair_destructor_source_test.go",
+        "mpnum/upolynomial_hensel_pair_foreign_source_test.go",
+        "mpnum/upolynomial_hensel_pair_frame_source_test.go",
+        "mpnum/upolynomial_hensel_pair_invocation.go",
+        "mpnum/upolynomial_hensel_pair_nonconstant_source_test.go",
+        "mpnum/upolynomial_hensel_pair_owner_transport_source_test.go",
+        "mpnum/upolynomial_hensel_pair_tls_source_test.go",
+        "mpnum/upolynomial_hensel_pair_whole_source_test.go",
+        "mpnum/upolynomial_ops.go",
+        "mpnum/upolynomial_scoped_vector_source.go",
+        "mpnum/upolynomial_storage.go",
+        "upolynomial_hensel_binding_source_test.go",
+        "upolynomial_hensel_lower_frontier_source_test.go",
+        "mpnum/upolynomial_hensel_own_history_source_test.go",
+        "mpnum/upolynomial_hensel_public_caller_source_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -38583,7 +38636,46 @@
         "TestUPolynomialPrimeTrialEveryActualReservation",
         "TestUPolynomialPrimeTrialCapturedContextRejectsReuseCopiesAndForeign",
         "TestUPolynomialPrimeToZPCompletedPrefixAndPublishedRawPushFailure",
-        "TestUPolynomialPrimeTrialEnclosingOwnContinuationEveryHelperPrefix"
+        "TestUPolynomialPrimeTrialEnclosingOwnContinuationEveryHelperPrefix",
+        "TestUPolynomialHenselQuadraticTransportCannotRetireRelatedCaller",
+        "TestUPolynomialHenselActualCallerChildStopProtectsOlderFields",
+        "TestUPolynomialHenselActualConditionalCheckerDeclarations",
+        "TestUPolynomialHenselActualCheckerEveryBIGReservation",
+        "TestUPolynomialHenselActualTaggedEnclosingEveryReservation",
+        "TestUPolynomialHenselActualCheckerSourceStopProtectsOlderDeclarations",
+        "TestUPolynomialHenselCheckerPowerContextRejectsCopiedStaleForeign",
+        "TestUPolynomialHenselActualExtendedGCDCallerIndependentIdentity",
+        "TestUPolynomialHenselActualExtendedGCDEveryBIGReservation",
+        "TestUPolynomialHenselActualQuadraticEveryReservation",
+        "TestUPolynomialHenselRepeatedActualQuadraticDeclarations",
+        "TestUPolynomialHenselActualTaggedQuadraticEveryReservation",
+        "TestUPolynomialHenselAddMulEndStopProtectsScopedAmAndPair",
+        "TestUPolynomialHenselSourceBorrowedInputOutputAlias",
+        "TestUPolynomialHenselPairNumericContextActualFrameAndCapturedNonce",
+        "TestUPolynomialHenselPairBIGEveryReachedSourcePrefix",
+        "TestUPolynomialHenselEveryReachedCancellation",
+        "TestUPolynomialHenselConditionalVerificationEveryReachedPrefix",
+        "TestUPolynomialHenselActualConditionalChildStopsOlderPair",
+        "TestUPolynomialHenselReachedVectorSourceStopPreservesBacking",
+        "TestUPolynomialHenselExactOldLeafPreservesForeignReplacement",
+        "TestUPolynomialHenselActualTmpStopProtectsOlderPairFields",
+        "TestUPolynomialHenselPairNonconstantDivisionEveryReachedPrefix",
+        "TestUPolynomialHenselTransportCannotRetireActualCallerOwner",
+        "TestUPolynomialHenselActualTmpPostphysicalStopsOlderPair",
+        "TestUPolynomialHenselPairEveryReachedReservationAndOwnChild",
+        "TestUPolynomialHenselImportedBindingFailurePrefixes",
+        "TestUPolynomialHenselImportedOriginAndCapturedView",
+        "TestUPolynomialHenselImportedAlgorithmImmediateFailureRoots",
+        "TestUPolynomialHenselActualLowerCopyFrontierDiagnostic",
+        "TestUPolynomialHenselImportedBigModulusPhysicalFailureRoots",
+        "TestUPolynomialHenselDeadLowerGuardedCloseAndCallerSetZ",
+        "TestUPolynomialHenselConcreteVectorOwnerCensus",
+        "TestUPolynomialHenselSourceContinuationCannotReenterExecutingPair",
+        "TestUPolynomialHenselWholeCallerSourceContinuationCannotReenterBody",
+        "TestUPolynomialHenselActualOwningRefusalRetainsFirstHistory",
+        "TestUPolynomialHenselActualCallerOwningRefusalRetainsFirstHistory",
+        "TestUPolynomialHenselInitialSetZPFailureRetainsActualBodyCause",
+        "TestUPolynomialHenselPublicFactorsEveryActualReservation"
       ],
       "conditionals": [
         {
@@ -38735,13 +38827,116 @@
             "TestUPolynomialPrimeToZPCompletedPrefixAndPublishedRawPushFailure",
             "TestUPolynomialPrimeTrialEnclosingOwnContinuationEveryHelperPrefix"
           ]
+        },
+        {
+          "name": "upolynomial_factorization.cpp:583-674 actual pair-Hensel source lexical frames and exact lower acquisition",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_factor_hensel.go",
+          "tests": [
+            "TestUPolynomialHenselQuadraticTransportCannotRetireRelatedCaller",
+            "TestUPolynomialHenselActualCallerChildStopProtectsOlderFields",
+            "TestUPolynomialHenselActualConditionalCheckerDeclarations",
+            "TestUPolynomialHenselActualCheckerEveryBIGReservation",
+            "TestUPolynomialHenselActualTaggedEnclosingEveryReservation",
+            "TestUPolynomialHenselActualCheckerSourceStopProtectsOlderDeclarations",
+            "TestUPolynomialHenselCheckerPowerContextRejectsCopiedStaleForeign",
+            "TestUPolynomialHenselActualExtendedGCDCallerIndependentIdentity",
+            "TestUPolynomialHenselActualExtendedGCDEveryBIGReservation",
+            "TestUPolynomialHenselActualQuadraticEveryReservation",
+            "TestUPolynomialHenselRepeatedActualQuadraticDeclarations",
+            "TestUPolynomialHenselActualTaggedQuadraticEveryReservation",
+            "TestUPolynomialHenselAddMulEndStopProtectsScopedAmAndPair",
+            "TestUPolynomialHenselSourceBorrowedInputOutputAlias",
+            "TestUPolynomialHenselPairNumericContextActualFrameAndCapturedNonce",
+            "TestUPolynomialHenselPairBIGEveryReachedSourcePrefix",
+            "TestUPolynomialHenselEveryReachedCancellation",
+            "TestUPolynomialHenselConditionalVerificationEveryReachedPrefix",
+            "TestUPolynomialHenselActualConditionalChildStopsOlderPair",
+            "TestUPolynomialHenselReachedVectorSourceStopPreservesBacking",
+            "TestUPolynomialHenselExactOldLeafPreservesForeignReplacement",
+            "TestUPolynomialHenselActualTmpStopProtectsOlderPairFields",
+            "TestUPolynomialHenselPairNonconstantDivisionEveryReachedPrefix",
+            "TestUPolynomialHenselTransportCannotRetireActualCallerOwner",
+            "TestUPolynomialHenselActualTmpPostphysicalStopsOlderPair",
+            "TestUPolynomialHenselPairEveryReachedReservationAndOwnChild"
+          ]
+        },
+        {
+          "name": "upolynomial_factorization.cpp:677-700,703-801,805-977 actual quadratic/enclosing Hensel caller and conditional checker declaration frontiers",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_factor_hensel_debug.go",
+          "tests": [
+            "TestUPolynomialHenselActualConditionalCheckerDeclarations",
+            "TestUPolynomialHenselActualCheckerEveryBIGReservation",
+            "TestUPolynomialHenselActualTaggedEnclosingEveryReservation",
+            "TestUPolynomialHenselActualCheckerSourceStopProtectsOlderDeclarations",
+            "TestUPolynomialHenselCheckerPowerContextRejectsCopiedStaleForeign",
+            "TestUPolynomialHenselActualQuadraticEveryReservation",
+            "TestUPolynomialHenselRepeatedActualQuadraticDeclarations",
+            "TestUPolynomialHenselActualTaggedQuadraticEveryReservation",
+            "TestUPolynomialHenselConditionalVerificationEveryReachedPrefix",
+            "TestUPolynomialHenselActualConditionalChildStopsOlderPair"
+          ]
+        },
+        {
+          "name": "upolynomial_factorization.cpp:583-977 pair and direct exported Hensel caller exact source/own history and actual guarded public adapter",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_factor_hensel.go",
+          "tests": [
+            "TestUPolynomialHenselSourceContinuationCannotReenterExecutingPair",
+            "TestUPolynomialHenselWholeCallerSourceContinuationCannotReenterBody",
+            "TestUPolynomialHenselActualOwningRefusalRetainsFirstHistory",
+            "TestUPolynomialHenselActualCallerOwningRefusalRetainsFirstHistory",
+            "TestUPolynomialHenselInitialSetZPFailureRetainsActualBodyCause",
+            "TestUPolynomialHenselPublicFactorsEveryActualReservation"
+          ]
+        },
+        {
+          "name": "upolynomial_factorization.cpp:583-977 exported Hensel wrapper imported binding, actual lower frontier and caller ownership evidence (upolynomial_hensel_binding_source_test.go)",
+          "status": "partial",
+          "go_target": "upolynomial_hensel_binding_source_test.go",
+          "tests": [
+            "TestUPolynomialHenselImportedBindingFailurePrefixes",
+            "TestUPolynomialHenselImportedOriginAndCapturedView",
+            "TestUPolynomialHenselImportedAlgorithmImmediateFailureRoots"
+          ]
+        },
+        {
+          "name": "upolynomial_factorization.cpp:583-977 exported Hensel wrapper imported binding, actual lower frontier and caller ownership evidence (upolynomial_hensel_lower_frontier_source_test.go)",
+          "status": "partial",
+          "go_target": "upolynomial_hensel_lower_frontier_source_test.go",
+          "tests": [
+            "TestUPolynomialHenselActualLowerCopyFrontierDiagnostic"
+          ]
+        },
+        {
+          "name": "upolynomial_factorization.cpp:583-977 exported Hensel wrapper imported binding, actual lower frontier and caller ownership evidence (upolynomial_hensel_physical_source_test.go)",
+          "status": "partial",
+          "go_target": "upolynomial_hensel_physical_source_test.go",
+          "tests": [
+            "TestUPolynomialHenselImportedBigModulusPhysicalFailureRoots",
+            "TestUPolynomialHenselDeadLowerGuardedCloseAndCallerSetZ"
+          ]
+        },
+        {
+          "name": "upolynomial_factorization.cpp:583-977 exported Hensel wrapper imported binding, actual lower frontier and caller ownership evidence (upolynomial_hensel_vector_owner_source_test.go)",
+          "status": "partial",
+          "go_target": "upolynomial_hensel_vector_owner_source_test.go",
+          "tests": [
+            "TestUPolynomialHenselConcreteVectorOwnerCensus"
+          ]
         }
       ],
       "ownership": [
         "Actual charged enclosing frame owns norm/bound/tmp at their literal declaration frontiers; direct Integer acquisition leaves plus exact Root/AddMul/PN child receipts; source reverse destruction and separate false/true owning cleanup preserve first causes and foreign roots.",
         "Actual source epilogue never invokes automatic owning abort. Executing caller chain protects reached numeric/destructor callbacks; idle retained invocation permits explicit exact owning cleanup.",
         "Actual charged enclosing prime frame owns reached RAW transport and lexical f_pp_zp/current_fs/current_degree_set at actual declaration frontiers; direct Integer acquisition and exact PN child; immutable first source causes and matched false/true owning continuation.",
-        "Actual related/root manager executing caller chain protects source body and destructor callbacks before owning or SourceFinalize mutation; idle retained scopes permit explicit owning abort."
+        "Actual related/root manager executing caller chain protects source body and destructor callbacks before owning or SourceFinalize mutation; idle retained scopes permit explicit owning abort.",
+        "Actual charged pair and enclosing factor-square-free Hensel frames bind concrete manager/member/nonwrapping invocation; direct NUM allocation leaves, RAW adapter transports, related-manager and exact Root/Power/AddMul/PN/RAW/Natural child tuples.",
+        "Strict first-stop reverse source suffix preserves older unread fields and original body/source causes; completed-child false owning acknowledgment precedes older locals and true unjoined retirement follows. Actual body/destructor guard chain excludes whole-owner reentry before mutation.",
+        "The outer check_all scoped Power numeral calls the actual Integer Power engine with direct caller context. Real RAW temporary belongs to exact Power invocation; pending lower leaves bind caller roots at real publication; no new PendingRoots/pendingCell snapshot authority.",
+        "Exact matched cleanup retains first owning error only after real owner/frame/nonce and executing guards; source finalization callback refuses before mutation and source history remains immutable after own acknowledgment.",
+        "Direct exported HenselLiftFactors owns one reflected cold caller adapter, constructed zero before literal first SetZP; earliest body cause retained independently of source suffix; caller pf/lf and already-published output prefix are not adopted."
       ],
       "deviations": [
         "Selected Mignotte helper, enclosing epilogue and literal prime-trial lexical scope/RAW transport are closed. Pair-Hensel and generic nil to_zp helper scope closure remain open. No full factor_square_free completion or original registered driver assertion credit.",
@@ -38749,7 +38944,11 @@
         "Destroyed-old source guard is owner-primitive/dangling checked domain, not ordinary mathematical OOM.",
         "Runtime signed-TLS transport owner proof uses actual returning ErrorTransport callback.",
         "The nil toZPCopy adapter retains historical eager deletion and is outside the corrected actual Prime receipt route; pair-Hensel closure remains open.",
-        "Dormant original registered source driver assertions receive zero credit."
+        "Dormant original registered source driver assertions receive zero credit.",
+        "Conditional Go profile uses FactorizationDebugTag with checked build; source CASSERT factorizatio::bughunt typo differs from TRACE factorization::bughunt. These actual reached profiles do not claim source-global tag equivalence.",
+        "Source signed-TLS destructor stop and destroyed-pointer guard proofs are owner-primitive guarded profiles, not ordinary mathematical OOM. Invalid copied/stale/callback context fixtures prove guard authority only.",
+        "No whole factorization class or dormant registered driver completion. Direct exported HenselLiftFactors is closed through its actual charged caller adapter; helpers outside the selected concrete caller remain separate.",
+        "Actual public cold-adapter charge shifts the independently proved checked setup_p lower destroyed-Copy frontier 158 to159; all original InvalidSlot, one caller SetZ, named physical and retry assertions remain. Direct helper whole-finish fixture first proves executing rejection, then marks actual helper return before source completion; it is a helper/guard profile, not a nested source driver."
       ]
     },
     {
@@ -124758,7 +124957,17 @@
         "TestIntegerDividesScopedNUMSourceDTAndImmutableHistory",
         "TestIntegerDividesScopedNUMCopiedAndRetargetedContextsRefuse",
         "TestIntegerDividesScopedNUMExecutingOwnerRefusal",
-        "TestIntegerDividesScopedNUMRuntimeCallbackHasNoAmbientAcquisition"
+        "TestIntegerDividesScopedNUMRuntimeCallbackHasNoAmbientAcquisition",
+        "TestUPolynomialHenselActualConditionalCheckerDeclarations",
+        "TestUPolynomialHenselActualCheckerEveryBIGReservation",
+        "TestUPolynomialHenselActualTaggedEnclosingEveryReservation",
+        "TestUPolynomialHenselActualCheckerSourceStopProtectsOlderDeclarations",
+        "TestUPolynomialHenselCheckerPowerContextRejectsCopiedStaleForeign",
+        "TestUPolynomialHenselActualQuadraticEveryReservation",
+        "TestUPolynomialHenselRepeatedActualQuadraticDeclarations",
+        "TestUPolynomialHenselActualTaggedQuadraticEveryReservation",
+        "TestUPolynomialHenselConditionalVerificationEveryReachedPrefix",
+        "TestUPolynomialHenselActualConditionalChildStopsOlderPair"
       ],
       "conditionals": [
         {
@@ -126600,6 +126809,23 @@
             "TestIntegerDividesScopedNUMExecutingOwnerRefusal",
             "TestIntegerDividesScopedNUMRuntimeCallbackHasNoAmbientAcquisition"
           ]
+        },
+        {
+          "name": "mpz.cpp:1453-1507 selected Integer Power same-engine passed Hensel context; literal fast2/0/1 and general RAW final square",
+          "status": "partial",
+          "go_target": "mpnum/mpz_power_shift.go",
+          "tests": [
+            "TestUPolynomialHenselActualConditionalCheckerDeclarations",
+            "TestUPolynomialHenselActualCheckerEveryBIGReservation",
+            "TestUPolynomialHenselActualTaggedEnclosingEveryReservation",
+            "TestUPolynomialHenselActualCheckerSourceStopProtectsOlderDeclarations",
+            "TestUPolynomialHenselCheckerPowerContextRejectsCopiedStaleForeign",
+            "TestUPolynomialHenselActualQuadraticEveryReservation",
+            "TestUPolynomialHenselRepeatedActualQuadraticDeclarations",
+            "TestUPolynomialHenselActualTaggedQuadraticEveryReservation",
+            "TestUPolynomialHenselConditionalVerificationEveryReachedPrefix",
+            "TestUPolynomialHenselActualConditionalChildStopsOlderPair"
+          ]
         }
       ],
       "ownership": [
@@ -126632,7 +126858,8 @@
         "Actual self/embedded frame/nonwrapping invocation validation before NUM/source reads; count marks actual one or four-to-six RAW declarations. Concrete receipt lives in charged Integer frame, not a heap temporary. Direct numeric acquisition and exact Natural member/private verification buffer binding; no snapshot or registry ownership. Published shared scratch remains member-owned. Runtime callbacks public empty-context acquisitions excluded, active same-frame public reentry refused. Source-finalize owning continuation uses exact named retained fields/captured pending cell only (mpz.h:124-149; mpz.cpp:142-161).",
         "Actual Integer self/embedded gcdRaw frame/nonwrapping invocation; source mpz.cpp:730-817 RAW a1,b1,t,r,tmp is retained on failed bodies and explicit DEL order is a1,b1,r,t,tmp only after completed output. Real AddMul TMP allocation belongs to the exact child, ADD caller allocation belongs to the explicitly passed RAW parent; immutable captured child nonce rejects embedded receipt reuse. Actual lower allocation/publication and Natural bindings provide authority; no snapshots or registry/refcount inference. Source first release cause survives own acknowledgment until actual new invocation; source-finalize owning continuation names exact retained fields and matched child TMP.",
         "Exact actual guarded Content owner/member/frame/nonwrapping immutable invocation; direct source allocation and actual pending-clear hooks only. Actual source child end/verification DT remains separate from false completed and true unjoined owning phases. Diagnostic child tuples survive own acknowledgment without numeric/root authority.",
-        "Actual self/embedded frame/nonwrapping captured invocation identities; direct cell/backing/allocator and Natural buffer acquisitions only. Scoped bool tmp construction precedes zero branch; all completed constructors run strict source DT. First source cause persists across separate false/true owning acknowledgment until next actual invocation. Successful shared Natural publications remain member-owned."
+        "Actual self/embedded frame/nonwrapping captured invocation identities; direct cell/backing/allocator and Natural buffer acquisitions only. Scoped bool tmp construction precedes zero branch; all completed constructors run strict source DT. First source cause persists across separate false/true owning acknowledgment until next actual invocation. Successful shared Natural publications remain member-owned.",
+        "Selected direct caller context acquires only actual numeric allocation leaves; RAW Power receipt binds actual guarded member/nonce. Published checker output remains scoped caller-owned, and RAW body failures have no automatic source destructor. Legacy nil Power allocation snapshot adapter is not promoted by this selected route."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",

@@ -23,16 +23,25 @@ func (m *IntegerModularManager) Del(a *Int) error {
 }
 func (m *IntegerModularManager) Neg(a *Int) error { return m.negWithPNReceipt(a, nil) }
 
-// Source mpzzp.h:131: Neg mutates the numeral before reaching PN.
-// A caller receipt is acquired only by that real reached normalization guard.
+// Source: src/util/mpzzp.h:131. Both concrete caller routes use this same
+// mutation engine; a PN receipt is acquired only at its real reached guard.
 func (m *IntegerModularManager) negWithPNReceipt(a *Int, receipt *integerPNormalizeInvocationReceipt) error {
+	return m.negWithOwners(a, receipt, integerAllocationInvocationContext{})
+}
+func (m *IntegerModularManager) negWithSourceContext(a *Int, context integerAllocationInvocationContext) error {
+	return m.negWithOwners(a, nil, context)
+}
+func (m *IntegerModularManager) negWithOwners(a *Int, receipt *integerPNormalizeInvocationReceipt, context integerAllocationInvocationContext) error {
 	if e := m.check(); e != nil {
 		return e
 	}
-	if e := m.manager.Neg(a); e != nil {
+	if e := m.manager.negWithAllocationContext(a, context); e != nil {
 		return e
 	}
-	return m.pNormalizeWithReceipt(a, receipt)
+	if receipt != nil {
+		return m.pNormalizeWithReceipt(a, receipt)
+	}
+	return m.normalizeWithSourceContext(a, context)
 }
 
 func (m *IntegerModularManager) Abs(a *Int) error {
@@ -93,6 +102,9 @@ func (m *IntegerModularManager) addWithSourceContext(a, b, c *Int, context integ
 	return m.normalizeWithSourceContext(c, context)
 }
 func (m *IntegerModularManager) Sub(a, b, c *Int) error {
+	return m.subWithSourceContext(a, b, c, integerAllocationInvocationContext{})
+}
+func (m *IntegerModularManager) subWithSourceContext(a, b, c *Int, context integerAllocationInvocationContext) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -102,10 +114,10 @@ func (m *IntegerModularManager) Sub(a, b, c *Int) error {
 	if e := m.assertNormalized(b); e != nil {
 		return e
 	}
-	if e := m.manager.Sub(a, b, c); e != nil {
+	if e := m.manager.addSubWithAllocationContext(a, b, c, true, context); e != nil {
 		return e
 	}
-	return m.PNormalize(c)
+	return m.normalizeWithSourceContext(c, context)
 }
 func (m *IntegerModularManager) Mul(a, b, c *Int) error {
 	return m.mulWithArithmeticReceipt(a, b, c, nil)
@@ -159,6 +171,9 @@ func (m *IntegerModularManager) addMulWithSourceContext(a, b, c, d *Int, child *
 	return m.normalizeWithSourceContext(d, context)
 }
 func (m *IntegerModularManager) SubMul(a, b, c, d *Int) error {
+	return m.subMulWithSourceContext(a, b, c, d, nil, integerAllocationInvocationContext{})
+}
+func (m *IntegerModularManager) subMulWithSourceContext(a, b, c, d *Int, child *integerAddMulInvocationReceipt, context integerAllocationInvocationContext) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -171,10 +186,10 @@ func (m *IntegerModularManager) SubMul(a, b, c, d *Int) error {
 	if e := m.assertNormalized(c); e != nil {
 		return e
 	}
-	if e := m.manager.SubMul(a, b, c, d); e != nil {
+	if e := m.manager.addSubMulWithAllocationContext(a, b, c, d, true, child, context); e != nil {
 		return e
 	}
-	return m.PNormalize(d)
+	return m.normalizeWithSourceContext(d, context)
 }
 func (m *IntegerModularManager) IsZero(a *Int) (bool, error) {
 	if e := m.check(); e != nil {

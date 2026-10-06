@@ -1,20 +1,28 @@
 // Licensed under the MIT license.
+// Source: src/math/polynomial/upolynomial_factorization.cpp:513-568,677-700,805-871.
 // Source runtime CASSERT tag helpers, independent of g3debug build selection.
+// Source author: Dejan (t-dejanj), 2011-11-15.
 package mpnum
 
-func (s *UPolynomialFactorizationService) checkHenselPair(C UPolynomialView, a, b, r *Int, A, B, Al, Bl UPolynomialView) (bool, error) {
+func (s *UPolynomialFactorizationService) checkHenselPair(C UPolynomialView, a, b, r *Int, A, B, Al, Bl UPolynomialView, receipt *upolyHenselPairInvocationReceipt) (ok bool, failure error) {
 	m := s.manager
-	var br Int
-	defer m.config.Integer.Del(&br)
-	if e := m.config.Integer.Mul(b, r, &br); e != nil {
+	h := receipt.frame
+	c := &h.check
+	defer func() { failure = h.finishHenselCheckSource(failure) }()
+	br := &c.br
+	c.constructed = 1
+	context := m.modular.henselPairAllocationContext(receipt)
+	if e := m.config.Integer.mulWithAllocationContext(b, r, br, context); e != nil {
 		return false, e
 	}
 	brCore, e := NewRelatedUPolynomialManager(m)
 	if e != nil {
 		return false, e
 	}
-	defer brCore.Close()
-	if e = brCore.SetZP(&br); e != nil {
+	c.brCore = brCore
+	c.constructed = 2
+	h.attachCheckManager(brCore, true)
+	if e = brCore.modular.setZPWithAllocationContext(br, brCore.modular.henselPairAllocationContext(receipt)); e != nil {
 		return false, e
 	}
 	if Al.count != A.count {
@@ -35,15 +43,15 @@ func (s *UPolynomialFactorizationService) checkHenselPair(C UPolynomialView, a, 
 	if e != nil || !same {
 		return false, e
 	}
-	var test1 upolyVectorState
-	defer m.dropLocalVector(&test1)
-	if e = m.mul(Al, Bl, &test1); e != nil {
+	test1 := &c.test1
+	c.constructed = 3
+	if e = m.mulWithHensel(Al, Bl, test1, receipt); e != nil {
 		return false, e
 	}
-	if e = m.addSubState(C, m.stateView(&test1), &test1, true); e != nil {
+	if e = m.addSubStateWithHensel(C, m.stateView(test1), test1, true, receipt); e != nil {
 		return false, e
 	}
-	if e = brCore.toZPInPlace(&test1); e != nil {
+	if e = brCore.toZPInPlaceWithHensel(test1, receipt); e != nil {
 		return false, e
 	}
 	if test1.size != 0 {
@@ -53,63 +61,94 @@ func (s *UPolynomialFactorizationService) checkHenselPair(C UPolynomialView, a, 
 	if e != nil {
 		return false, e
 	}
-	defer bCore.Close()
-	if e = bCore.SetZP(b); e != nil {
+	c.bCore = bCore
+	c.constructed = 4
+	h.attachCheckManager(bCore, false)
+	if e = bCore.modular.setZPWithAllocationContext(b, bCore.modular.henselPairAllocationContext(receipt)); e != nil {
 		return false, e
 	}
-	var test2a, test2b upolyVectorState
-	defer m.dropLocalVector(&test2a)
-	defer m.dropLocalVector(&test2b)
-	if e = bCore.toZPCopy(A, &test2a); e != nil {
+	test2a, test2b := &c.test2a, &c.test2b
+	c.constructed = 6
+	if e = bCore.toZPCopyWithHensel(A, test2a, receipt); e != nil {
 		return false, e
 	}
-	if e = bCore.toZPCopy(Al, &test2b); e != nil {
+	if e = bCore.toZPCopyWithHensel(Al, test2b, receipt); e != nil {
 		return false, e
 	}
-	same, e = m.EqualViews(m.stateView(&test2a), m.stateView(&test2b))
+	same, e = m.EqualViews(m.stateView(test2a), m.stateView(test2b))
 	if e != nil || !same {
 		return false, e
 	}
-	var test3a, test3b upolyVectorState
-	defer m.dropLocalVector(&test3a)
-	defer m.dropLocalVector(&test3b)
-	if e = bCore.toZPCopy(B, &test3a); e != nil {
+	test3a, test3b := &c.test3a, &c.test3b
+	c.constructed = 8
+	if e = bCore.toZPCopyWithHensel(B, test3a, receipt); e != nil {
 		return false, e
 	}
-	if e = bCore.toZPCopy(Bl, &test3b); e != nil {
+	if e = bCore.toZPCopyWithHensel(Bl, test3b, receipt); e != nil {
 		return false, e
 	}
-	return m.EqualViews(m.stateView(&test3a), m.stateView(&test3b))
+	return m.EqualViews(m.stateView(test3a), m.stateView(test3b))
 }
 func (s *UPolynomialFactorizationService) checkQuadraticHensel(zpe *UPolynomialManager, U, A, V, B UPolynomialView) (bool, error) {
+	return s.checkQuadraticHenselWithCaller(zpe, U, A, V, B, nil)
+}
+func (s *UPolynomialFactorizationService) checkQuadraticHenselWithCaller(zpe *UPolynomialManager, U, A, V, B UPolynomialView, caller *upolyHenselCallerScope) (ok bool, failure error) {
 	m := s.manager
-	var tmp1, tmp2, one upolyVectorState
-	defer m.dropLocalVector(&tmp1)
-	defer m.dropLocalVector(&tmp2)
-	defer m.dropLocalVector(&one)
-	if e := zpe.mul(U, A, &tmp1); e != nil {
+	var locals [3]upolyVectorState
+	tmp1, tmp2, one := &locals[0], &locals[1], &locals[2]
+	if caller == nil {
+		defer m.dropLocalVector(tmp1)
+		defer m.dropLocalVector(tmp2)
+		defer m.dropLocalVector(one)
+	} else {
+		tmp1, tmp2, one = &caller.quadraticCheck[0], &caller.quadraticCheck[1], &caller.quadraticCheck[2]
+		caller.quadraticCheckConstructed = 2
+		caller.quadraticCheckSource = 2
+		caller.quadraticCheckOwn = 2
+		defer func() { failure = joinHenselCaller(failure, caller.finishQuadraticCheckSource()) }()
+	}
+	if e := zpe.mulWithCaller(U, A, tmp1, caller); e != nil {
 		return false, e
 	}
-	if e := zpe.mul(V, B, &tmp2); e != nil {
+	if e := zpe.mulWithCaller(V, B, tmp2, caller); e != nil {
 		return false, e
 	}
-	if e := zpe.addSubState(m.stateView(&tmp1), m.stateView(&tmp2), &one, false); e != nil {
+	if caller != nil {
+		caller.quadraticCheckConstructed = 3
+		caller.quadraticCheckSource = 3
+		caller.quadraticCheckOwn = 3
+	}
+	if e := zpe.addSubWithCaller(m.stateView(tmp1), m.stateView(tmp2), one, false, caller); e != nil {
 		return false, e
 	}
 	if one.size != 1 {
 		return false, nil
 	}
-	return m.config.Integer.IsOne(&m.values(&one)[0])
+	return m.config.Integer.IsOne(&m.values(one)[0])
 }
 func (s *UPolynomialFactorizationService) checkIndividualLift(zp *UPolynomialManager, A UPolynomialView, zpe *UPolynomialManager, Al UPolynomialView) (bool, error) {
-	var converted upolyVectorState
-	defer zp.dropLocalVector(&converted)
-	if e := zp.toZPCopy(Al, &converted); e != nil {
+	return s.checkIndividualLiftWithCaller(zp, A, zpe, Al, nil)
+}
+func (s *UPolynomialFactorizationService) checkIndividualLiftWithCaller(zp *UPolynomialManager, A UPolynomialView, zpe *UPolynomialManager, Al UPolynomialView, caller *upolyHenselCallerScope) (ok bool, failure error) {
+	var local upolyVectorState
+	converted := &local
+	if caller == nil {
+		defer zp.dropLocalVector(converted)
+	} else {
+		converted = &caller.individual[0]
+		caller.individualSource = 1
+		caller.individualOwn = 1
+		defer func() { failure = joinHenselCaller(failure, caller.finishIndividualSource()) }()
+	}
+	if e := zp.toZPCopyWithOwners(Al, converted, nil, nil, caller); e != nil {
 		return false, e
 	}
-	return zp.EqualViews(A, zp.stateView(&converted))
+	return zp.EqualViews(A, zp.stateView(converted))
 }
 func (s *UPolynomialFactorizationService) checkHenselFactors(f UPolynomialView, pf, lf *UPolynomialFactors, e uint32) (bool, error) {
+	return s.checkHenselFactorsWithCaller(f, pf, lf, e, nil)
+}
+func (s *UPolynomialFactorizationService) checkHenselFactorsWithCaller(f UPolynomialView, pf, lf *UPolynomialFactors, e uint32, caller *upolyHenselCallerScope) (ok bool, failure error) {
 	m := s.manager
 	zp, zpe := pf.manager, lf.manager
 	p, err := zp.modular.borrowedModulus()
@@ -120,53 +159,80 @@ func (s *UPolynomialFactorizationService) checkHenselFactors(f UPolynomialView, 
 	if err != nil {
 		return false, err
 	}
-	var power Int
-	defer m.modular.Del(&power)
-	if err = m.modular.Power(p, e, &power); err != nil {
+	var localPower Int
+	power := &localPower
+	context := integerAllocationInvocationContext{}
+	var receipt *integerPowerInvocationReceipt
+	if caller == nil {
+		defer m.config.Integer.Del(power)
+	} else {
+		power = &caller.checkPower
+		caller.checkPowerConstructed = true
+		caller.checkPowerEnded = false
+		caller.checkPowerOwned = false
+		context = m.modular.henselCallerAllocationContext(caller)
+		receipt = &caller.checkPowerInvocation
+		defer func() { failure = joinHenselCaller(failure, caller.finishConditionalSource()) }()
+	}
+	if err = m.config.Integer.powerWithAllocationContext(p, e, power, receipt, context); err != nil {
 		return false, err
 	}
-	ge, err := m.modular.GreaterEqual(pe, &power)
+	ge, err := m.config.Integer.GreaterEqual(pe, power)
 	if err != nil || !ge {
 		return false, err
 	}
-	var multp, fp upolyVectorState
-	defer m.dropLocalVector(&multp)
-	defer m.dropLocalVector(&fp)
-	if err = pf.multiply(&multp); err != nil {
+	var first [2]upolyVectorState
+	multp, fp := &first[0], &first[1]
+	if caller == nil {
+		defer m.dropLocalVector(multp)
+		defer m.dropLocalVector(fp)
+	} else {
+		multp, fp = &caller.checkVectors[0], &caller.checkVectors[1]
+		caller.checkSource = 2
+		caller.checkOwn = 2
+	}
+	if err = pf.multiplyWithCaller(multp, caller); err != nil {
 		return false, err
 	}
-	if err = zp.toZPCopy(f, &fp); err != nil {
+	if err = zp.toZPCopyWithOwners(f, fp, nil, nil, caller); err != nil {
 		return false, err
 	}
-	top, err := m.read(m.stateView(&fp), fp.size-1)
+	top, err := m.read(m.stateView(fp), fp.size-1)
 	if err != nil {
 		return false, err
 	}
-	if err = zp.mulScalarState(&multp, top); err != nil {
+	if err = zp.scalarWithCaller(multp, top, caller); err != nil {
 		return false, err
 	}
-	same, err := m.EqualViews(m.stateView(&multp), m.stateView(&fp))
+	same, err := m.EqualViews(m.stateView(multp), m.stateView(fp))
 	if err != nil || !same {
 		return false, err
 	}
 	if lf.count != pf.count {
 		return false, nil
 	}
-	var multpe, fpe upolyVectorState
-	defer m.dropLocalVector(&multpe)
-	defer m.dropLocalVector(&fpe)
-	if err = lf.multiply(&multpe); err != nil {
+	var second [2]upolyVectorState
+	multpe, fpe := &second[0], &second[1]
+	if caller == nil {
+		defer m.dropLocalVector(multpe)
+		defer m.dropLocalVector(fpe)
+	} else {
+		multpe, fpe = &caller.checkVectors[2], &caller.checkVectors[3]
+		caller.checkSource = 4
+		caller.checkOwn = 4
+	}
+	if err = lf.multiplyWithCaller(multpe, caller); err != nil {
 		return false, err
 	}
-	if err = zpe.toZPCopy(f, &fpe); err != nil {
+	if err = zpe.toZPCopyWithOwners(f, fpe, nil, nil, caller); err != nil {
 		return false, err
 	}
-	top, err = m.read(m.stateView(&fpe), fpe.size-1)
+	top, err = m.read(m.stateView(fpe), fpe.size-1)
 	if err != nil {
 		return false, err
 	}
-	if err = zpe.mulScalarState(&multpe, top); err != nil {
+	if err = zpe.scalarWithCaller(multpe, top, caller); err != nil {
 		return false, err
 	}
-	return m.EqualViews(m.stateView(&multpe), m.stateView(&fpe))
+	return m.EqualViews(m.stateView(multpe), m.stateView(fpe))
 }

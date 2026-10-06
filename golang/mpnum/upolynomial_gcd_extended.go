@@ -1,4 +1,5 @@
-// Licensed under the MIT license.
+// Source: src/math/polynomial/upolynomial.cpp:1045-1105; src/math/polynomial/upolynomial.h:361-364.
+// Licensed under the MIT license. Source author: Leonardo de Moura.
 package mpnum
 
 func (m *UPolynomialManager) dropLocalVector(s *upolyVectorState) { m.reset(s); m.freeBacking(s) }
@@ -22,6 +23,16 @@ func (m *UPolynomialManager) extendedGCDDiagnostic(a, b UPolynomialView, u, v, d
 	return nil
 }
 func (m *UPolynomialManager) extendedGCD(a, b UPolynomialView, u, v, d *upolyVectorState) error {
+	return m.extendedGCDWithCaller(a, b, u, v, d, nil)
+}
+func (m *UPolynomialManager) extendedGCDWithCaller(a, b UPolynomialView, u, v, d *upolyVectorState, caller *upolyHenselCallerScope) (failure error) {
+	context := integerAllocationInvocationContext{}
+	if caller != nil {
+		context = m.modular.henselCallerAllocationContext(caller)
+		if context.henselCallerFrame(m.config.Integer) == nil {
+			return ErrUPolynomialOwner
+		}
+	}
 	if modularSourceDebug {
 		if m.alias(a, u) || m.alias(a, v) || m.alias(a, d) || m.alias(b, u) || m.alias(b, v) || m.alias(b, d) {
 			return ErrUPolynomialAssertion
@@ -34,13 +45,54 @@ func (m *UPolynomialManager) extendedGCD(a, b UPolynomialView, u, v, d *upolyVec
 			return ErrUPolynomialAssertion
 		}
 	}
-	var v1, v3, q, r, t, v1q upolyVectorState
-	defer m.dropLocalVector(&v1)
-	defer m.dropLocalVector(&v3)
-	defer m.dropLocalVector(&q)
-	defer m.dropLocalVector(&r)
-	defer m.dropLocalVector(&t)
-	defer m.dropLocalVector(&v1q)
+	var locals [6]upolyVectorState
+	v1, v3, q, r, t, v1q := &locals[0], &locals[1], &locals[2], &locals[3], &locals[4], &locals[5]
+	if caller == nil {
+		defer m.dropLocalVector(v1)
+		defer m.dropLocalVector(v3)
+		defer m.dropLocalVector(q)
+		defer m.dropLocalVector(r)
+		defer m.dropLocalVector(t)
+		defer m.dropLocalVector(v1q)
+	} else {
+		caller.enterCall()
+		defer caller.leaveCall()
+		if caller.extendedActive {
+			return ErrUPolynomialCleanupPending
+		}
+		// A new reached invocation may replace only a completed source scope.
+		caller.extended = [6]upolyVectorState{}
+		caller.extendedDebug = [2]upolyVectorState{}
+		caller.extendedScoped = [2]Int{}
+		caller.monicRaw = [2]Int{}
+		caller.extendedDebugConstructed = 0
+		caller.extendedDebugSource = 0
+		caller.extendedDebugOwn = 0
+		caller.extendedScopedConstructed = 0
+		caller.extendedScopedSource = 0
+		caller.extendedScopedOwn = 0
+		caller.extendedRawConstructed = false
+		caller.extendedRawEndEntered = false
+		caller.extendedRawEnded = false
+		caller.extendedRawSource = 0
+		caller.extendedRawOwn = 0
+		caller.extendedActive = true
+		caller.extendedConstructed = 6
+		caller.extendedSource = 6
+		caller.extendedOwn = 6
+		v1, v3, q, r, t, v1q = &caller.extended[0], &caller.extended[1], &caller.extended[2], &caller.extended[3], &caller.extended[4], &caller.extended[5]
+		defer func() {
+			failure = joinHenselCaller(failure, caller.finishExtendedSource())
+			if failure == nil {
+				caller.extendedActive = false
+				// Every scoped field and the reached RAW end sequence actually completed.
+				caller.extendedOwn = 0
+				caller.extendedDebugOwn = 0
+				caller.extendedScopedOwn = 0
+				caller.extendedRawOwn = 2
+			}
+		}()
+	}
 	if e := m.reset(u); e != nil {
 		return e
 	}
@@ -48,57 +100,57 @@ func (m *UPolynomialManager) extendedGCD(a, b UPolynomialView, u, v, d *upolyVec
 	if e != nil {
 		return e
 	}
-	if e = m.modular.SetInt32(one, 1); e != nil {
+	if e = m.modular.setInt64WithSourceContext(one, 1, context); e != nil {
 		return e
 	}
-	if e = m.setView(d, a); e != nil {
+	if e = m.setViewWithSourceContext(d, a, context); e != nil {
 		return e
 	}
-	if e = m.monicLocal(m.stateView(d).WithCount(a.count)); e != nil {
+	if e = m.monicLocalWithCaller(m.stateView(d).WithCount(a.count), caller, context); e != nil {
 		return e
 	}
-	if e = m.reset(&v1); e != nil {
+	if e = m.reset(v1); e != nil {
 		return e
 	}
-	if e = m.setView(&v3, b); e != nil {
+	if e = m.setViewWithSourceContext(v3, b, context); e != nil {
 		return e
 	}
 	for {
 		if v3.size == 0 {
-			au, minus := &v1, &v3
-			if e = m.mul(a, m.stateView(u), au); e != nil {
+			au, minus := v1, v3
+			if e = m.mulWithSourceContext(a, m.stateView(u), au, henselNumericAddMulChild(nil, caller), context); e != nil {
 				return e
 			}
-			if e = m.addSubState(m.stateView(d), m.stateView(au), minus, true); e != nil {
+			if e = m.addSubStateWithSourceContext(m.stateView(d), m.stateView(au), minus, true, context); e != nil {
 				return e
 			}
-			if e = m.divState(m.stateView(minus), b, v); e != nil {
+			if e = m.divStateWithCaller(m.stateView(minus), b, v, caller, context); e != nil {
 				return e
 			}
 			if modularSourceDebug {
-				if e = m.extendedGCDDiagnostic(a, b, u, v, d, au); e != nil {
+				if e = m.extendedGCDDiagnosticWithCaller(a, b, u, v, d, au, caller, context); e != nil {
 					return e
 				}
 			}
 			// Declaration order lc_inv then lc => destruct lc before lc_inv.
-			return m.extendedGCDFinish(u, v, d)
+			return m.extendedGCDFinishWithCaller(u, v, d, caller, context)
 		}
 		var power uint32
-		if e = m.divRemCore(m.stateView(d), m.stateView(&v3), &power, &m.div2, &m.div1); e != nil {
+		if e = m.divRemCoreSpanWithSourceContext(m.stateView(d), &upolyDivisorSpan{view: m.stateView(v3)}, &power, &m.div2, &m.div1, nil, caller, context); e != nil {
 			return e
 		}
-		r, m.div1 = m.div1, r
-		q, m.div2 = m.div2, q
-		if e = m.mul(m.stateView(&v1), m.stateView(&q), &v1q); e != nil {
+		*r, m.div1 = m.div1, *r
+		*q, m.div2 = m.div2, *q
+		if e = m.mulWithSourceContext(m.stateView(v1), m.stateView(q), v1q, henselNumericAddMulChild(nil, caller), context); e != nil {
 			return e
 		}
-		if e = m.addSubState(m.stateView(u), m.stateView(&v1q), &t, true); e != nil {
+		if e = m.addSubStateWithSourceContext(m.stateView(u), m.stateView(v1q), t, true, context); e != nil {
 			return e
 		}
-		*u, v1 = v1, *u
-		*d, v3 = v3, *d
-		v1, t = t, v1
-		v3, r = r, v3
+		*u, *v1 = *v1, *u
+		*d, *v3 = *v3, *d
+		*v1, *t = *t, *v1
+		*v3, *r = *r, *v3
 	}
 }
 func (m *UPolynomialManager) extendedGCDFinish(u, v, d *upolyVectorState) error {

@@ -43,6 +43,9 @@ func (m *UPolynomialManager) flipSign(s *upolyVectorState) error {
 	return nil
 }
 func (m *UPolynomialManager) mulScalarState(s *upolyVectorState, b *Int) error {
+	return m.mulScalarStateWithHensel(s, b, nil)
+}
+func (m *UPolynomialManager) mulScalarStateWithHensel(s *upolyVectorState, b *Int, receipt *upolyHenselPairInvocationReceipt) error {
 	zero, e := m.modular.IsZero(b)
 	if e != nil {
 		return e
@@ -50,13 +53,16 @@ func (m *UPolynomialManager) mulScalarState(s *upolyVectorState, b *Int) error {
 	if zero {
 		return m.reset(s)
 	}
-	return m.MulScalarView(m.stateView(s), b)
+	return m.MulScalarViewWithHensel(m.stateView(s), b, receipt)
 }
 func (m *UPolynomialManager) monic(v UPolynomialView, lc, inv *Int) error {
-	if e := m.modular.SetInt32(lc, 1); e != nil {
+	return m.monicWithSourceContext(v, lc, inv, integerAllocationInvocationContext{})
+}
+func (m *UPolynomialManager) monicWithSourceContext(v UPolynomialView, lc, inv *Int, context integerAllocationInvocationContext) error {
+	if e := m.modular.setInt64WithSourceContext(lc, 1, context); e != nil {
 		return e
 	}
-	if e := m.modular.SetInt32(inv, 1); e != nil {
+	if e := m.modular.setInt64WithSourceContext(inv, 1, context); e != nil {
 		return e
 	}
 	if v.count == 0 {
@@ -71,10 +77,10 @@ func (m *UPolynomialManager) monic(v UPolynomialView, lc, inv *Int) error {
 		return e
 	}
 	*lc, *top = *top, *lc
-	if e = m.modular.Copy(inv, lc); e != nil {
+	if e = m.modular.copyWithSourceContext(inv, lc, context); e != nil {
 		return e
 	}
-	if e = m.modular.Inv(inv); e != nil {
+	if e = m.modular.invWithAllocationContext(inv, context); e != nil {
 		return e
 	}
 	for i := v.count - 1; i > 0; i-- {
@@ -82,7 +88,7 @@ func (m *UPolynomialManager) monic(v UPolynomialView, lc, inv *Int) error {
 		if e != nil {
 			return e
 		}
-		if e = m.modular.Mul(x, inv, x); e != nil {
+		if e = m.modular.mulWithSourceContext(x, inv, x, context); e != nil {
 			return e
 		}
 	}

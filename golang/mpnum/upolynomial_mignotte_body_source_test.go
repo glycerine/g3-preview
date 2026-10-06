@@ -1,5 +1,6 @@
 // Source: src/math/polynomial/upolynomial_factorization.cpp:979-1017.
 // Licensed under the MIT license. Source author: Leonardo de Moura.
+// Source author: Dejan (t-dejanj), 2011-11-15.
 package mpnum
 
 import (
@@ -9,15 +10,21 @@ import (
 )
 
 func mignotteDirectFixture(t *testing.T) (*RationalManager, *UPolynomialFactorizationService) {
+	return henselDirectFixtureWithCheckpoint(t, func() bool { return true })
+}
+func henselDirectFixtureWithCheckpoint(t *testing.T, checkpoint func() bool) (*RationalManager, *UPolynomialFactorizationService) {
+	return henselDirectFixtureWithConfig(t, checkpoint, false)
+}
+func henselDirectFixtureWithConfig(t *testing.T, checkpoint func() bool, debugTag bool) (*RationalManager, *UPolynomialFactorizationService) {
 	t.Helper()
 	b := arena.NewBudget(1 << 26)
 	q, e := NewRationalManager(RationalConfig{Integers: serviceConfig(b).Integers})
 	serviceMust(t, e)
-	u, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.z, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
+	u, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.z, Checkpoint: checkpoint, Cooperation: func() error { return nil }})
 	serviceMust(t, e)
 	primes, e := NewPrimeGenerator(b)
 	serviceMust(t, e)
-	s, e := NewUPolynomialFactorizationService(u, UPolynomialFactorizationConfig{Primes: primes})
+	s, e := NewUPolynomialFactorizationService(u, UPolynomialFactorizationConfig{Primes: primes, FactorizationDebugTag: debugTag})
 	serviceMust(t, e)
 	t.Cleanup(func() {
 		serviceMust(t, s.Close())
