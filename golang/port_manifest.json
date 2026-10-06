@@ -44202,9 +44202,13 @@
       "path": "src/model/model.cpp",
       "component": "model",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "model_core.go"
+      ],
+      "tests": [
+        "TestModelCoreHashGrowthCopyAndIndependentOwnership"
+      ],
       "assertions": [
         {
           "line": 114,
@@ -44217,9 +44221,20 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "model::copy_const_interps",
+          "status": "ported",
+          "go_target": "model_core.go",
+          "tests": [
+            "TestModelCoreHashGrowthCopyAndIndependentOwnership"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Only constant-copy registration is integrated here; derived model constructors, function/universe interpretation, model evaluation, copying and translation remain obligations."
+      ]
     },
     {
       "path": "src/model/model.h",
@@ -44284,9 +44299,21 @@
       "path": "src/model/model_core.cpp",
       "component": "model",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "model_core.go",
+        "model_constant_map.go"
+      ],
+      "tests": [
+        "TestModelCoreConstantRegistrationReplacementAndReferences",
+        "TestModelCoreEvalDeclarationAndMissingResult",
+        "TestModelCoreUnregisterPreservesLiteralSourceDeclarationVector",
+        "TestModelCoreHashGrowthCopyAndIndependentOwnership",
+        "TestModelCoreRejectsForeignAndNonconstantDeclarations",
+        "TestModelCoreFinalReferenceAndCopiedOwnerGuard",
+        "TestModelCoreConstantLookupAcceptsFunctionDeclaration",
+        "TestSATBooleanModelRetainsBindingsAfterEngineAndAtomsClose"
+      ],
       "assertions": [
         {
           "line": 49,
@@ -44303,17 +44330,49 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "constant register/replace/unregister, lookup, reference controls and constant-branch retirement",
+          "status": "partial",
+          "go_target": "model_core.go",
+          "tests": [
+            "TestModelCoreConstantRegistrationReplacementAndReferences",
+            "TestModelCoreEvalDeclarationAndMissingResult",
+            "TestModelCoreUnregisterPreservesLiteralSourceDeclarationVector",
+            "TestModelCoreHashGrowthCopyAndIndependentOwnership",
+            "TestModelCoreRejectsForeignAndNonconstantDeclarations",
+            "TestModelCoreFinalReferenceAndCopiedOwnerGuard",
+            "TestModelCoreConstantLookupAcceptsFunctionDeclaration",
+            "TestSATBooleanModelRetainsBindingsAfterEngineAndAtomsClose"
+          ]
+        }
+      ],
+      "ownership": [
+        "Constant table keys and values retain independent AST references. Declaration vectors are source non-owning insertion-order vectors; constant replacement acquires the new value before releasing the previous value."
+      ],
+      "deviations": [
+        "Function interpretations, full eval(func_decl), universe/value virtual operations and whole derived model construction remain unported. Broad allocation-failure and exception-history qualification remain deferred; completion is limited to ordinary constant interpretation behavior and the tested Boolean model path."
+      ]
     },
     {
       "path": "src/model/model_core.h",
       "component": "model",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "model_core.go",
+        "model_constant_map.go"
+      ],
+      "tests": [
+        "TestModelCoreConstantRegistrationReplacementAndReferences",
+        "TestModelCoreEvalDeclarationAndMissingResult",
+        "TestModelCoreUnregisterPreservesLiteralSourceDeclarationVector",
+        "TestModelCoreHashGrowthCopyAndIndependentOwnership",
+        "TestModelCoreRejectsForeignAndNonconstantDeclarations",
+        "TestModelCoreFinalReferenceAndCopiedOwnerGuard",
+        "TestModelCoreConstantLookupAcceptsFunctionDeclaration",
+        "TestSATBooleanModelRetainsBindingsAfterEngineAndAtomsClose"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -44326,9 +44385,29 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "constant register/replace/unregister, lookup, reference controls and constant-branch retirement",
+          "status": "partial",
+          "go_target": "model_core.go",
+          "tests": [
+            "TestModelCoreConstantRegistrationReplacementAndReferences",
+            "TestModelCoreEvalDeclarationAndMissingResult",
+            "TestModelCoreUnregisterPreservesLiteralSourceDeclarationVector",
+            "TestModelCoreHashGrowthCopyAndIndependentOwnership",
+            "TestModelCoreRejectsForeignAndNonconstantDeclarations",
+            "TestModelCoreFinalReferenceAndCopiedOwnerGuard",
+            "TestModelCoreConstantLookupAcceptsFunctionDeclaration",
+            "TestSATBooleanModelRetainsBindingsAfterEngineAndAtomsClose"
+          ]
+        }
+      ],
+      "ownership": [
+        "Constant table keys and values retain independent AST references. Declaration vectors are source non-owning insertion-order vectors; constant replacement acquires the new value before releasing the previous value."
+      ],
+      "deviations": [
+        "Function interpretations, full eval(func_decl), universe/value virtual operations and whole derived model construction remain unported. Broad allocation-failure and exception-history qualification remain deferred; completion is limited to ordinary constant interpretation behavior and the tested Boolean model path."
+      ]
     },
     {
       "path": "src/model/model_evaluator.cpp",
@@ -68908,9 +68987,16 @@
       "path": "src/sat/tactic/sat_tactic.cpp",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "sat_boolean_model.go"
+      ],
+      "tests": [
+        "TestSATBooleanModelRetainsBindingsAfterEngineAndAtomsClose",
+        "TestSATBooleanModelSkipsUndefinedSourceRows",
+        "TestSATBooleanModelMatchesOriginalGoalTruthTable",
+        "TestSATBooleanModelRejectsInterpretedRecoveryBranch"
+      ],
       "conditionals": [
         {
           "line": 117,
@@ -68941,9 +69027,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "imp::operator() Boolean model registration fragment",
+          "status": "partial",
+          "go_target": "sat_boolean_model.go",
+          "tests": [
+            "TestSATBooleanModelRetainsBindingsAfterEngineAndAtomsClose",
+            "TestSATBooleanModelSkipsUndefinedSourceRows",
+            "TestSATBooleanModelMatchesOriginalGoalTruthTable",
+            "TestSATBooleanModelRejectsInterpretedRecoveryBranch"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The helper reads an actual or explicitly identified source-row SAT model and registers defined Boolean bindings in atom-table bucket order. It does not implement the SAT tactic, model converters, proof/core paths, UNKNOWN/interpreted sat2goal recovery or public solver/context APIs."
+      ]
     },
     {
       "path": "src/sat/tactic/sat_tactic.h",
