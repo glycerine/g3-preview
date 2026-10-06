@@ -95,10 +95,34 @@ func (m *UPolynomialManager) monicWithSourceContext(v UPolynomialView, lc, inv *
 	return nil
 }
 func (m *UPolynomialManager) monicLocal(v UPolynomialView) error {
-	var lc, inv Int
-	// Source explicit del(lc); del(lc_inv), not lexical reverse destruction.
-	defer func() { m.modular.Del(&lc); m.modular.Del(&inv) }()
-	return m.monic(v, &lc, &inv)
+	return m.monicLocalWithSourceContext(v, integerAllocationInvocationContext{})
+}
+
+// Source: src/math/polynomial/upolynomial.h:361-364.
+func (m *UPolynomialManager) monicLocalWithSourceContext(v UPolynomialView, context integerAllocationInvocationContext) (cause error) {
+	owner := context.factorFrontendFrame(m.config.Integer)
+	if owner == nil {
+		var lc, inv Int
+		defer func() { m.modular.Del(&lc); m.modular.Del(&inv) }()
+		return m.monicWithSourceContext(v, &lc, &inv, context)
+	}
+	q := &owner.monic
+	if q.active || q.invocation == ^uint64(0) {
+		return ErrUPolynomialCleanupPending
+	}
+	*q = upolyFactorMonicScope{owner: owner, invocation: q.invocation + 1, active: true, executing: true}
+	defer func() {
+		q.executing = false
+		if q.bodyCause == nil {
+			q.bodyCause = cause
+		}
+	}()
+	if e := m.monicWithSourceContext(v, &q.lc, &q.inv, context); e != nil {
+		return e
+	}
+	q.endEntered = true
+	// These are explicit ascending end DELs, not automatic lexical destruction.
+	return q.finishEnd()
 }
 func (m *UPolynomialManager) MakeMonicView(v UPolynomialView) error {
 	if e := m.check(); e != nil {
@@ -160,6 +184,9 @@ func (m *UPolynomialManager) gcdEmpty(a, b UPolynomialView, out *upolyVectorStat
 	return false, nil
 }
 func (m *UPolynomialManager) euclidGCD(a, b UPolynomialView, out *upolyVectorState) error {
+	return m.euclidGCDWithSourceContext(a, b, out, integerAllocationInvocationContext{})
+}
+func (m *UPolynomialManager) euclidGCDWithSourceContext(a, b UPolynomialView, out *upolyVectorState, context integerAllocationInvocationContext) error {
 	done, e := m.gcdEmpty(a, b, out)
 	if done {
 		return e
@@ -169,10 +196,10 @@ func (m *UPolynomialManager) euclidGCD(a, b UPolynomialView, out *upolyVectorSta
 		return e
 	}
 	A, B := &m.gcd1, &m.gcd2
-	if e = m.setView(A, a); e != nil {
+	if e = m.setViewWithSourceContext(A, a, context); e != nil {
 		return e
 	}
-	if e = m.setView(B, b); e != nil {
+	if e = m.setViewWithSourceContext(B, b, context); e != nil {
 		return e
 	}
 	for {
@@ -182,12 +209,12 @@ func (m *UPolynomialManager) euclidGCD(a, b UPolynomialView, out *upolyVectorSta
 			}
 			*out, *A = *A, *out
 			if field {
-				return m.monicLocal(m.stateView(out))
+				return m.monicLocalWithSourceContext(m.stateView(out), context)
 			}
 			return m.flipSign(out)
 		}
 		var d uint32
-		if e = m.remState(m.stateView(A), m.stateView(B), &d, out); e != nil {
+		if e = m.remStateWithSourceContext(m.stateView(A), m.stateView(B), &d, out, context); e != nil {
 			return e
 		}
 		if e = m.normalize(m.stateView(out)); e != nil {

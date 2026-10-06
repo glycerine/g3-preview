@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/glycerine/g3/golang/arena"
 	"github.com/glycerine/g3/golang/memory"
+	"reflect"
 	"testing"
 )
 
@@ -460,7 +461,12 @@ func TestPolynomialSOMBufferSourceMaxAndDisplay(t *testing.T) {
 // The public TLS recipe reaches signed-host/source undefined arithmetic;
 // this is stopped postphysical sync evidence, not ordinary OOM/free refusal.
 func TestPolynomialSOMVectorSourceFinalizeStickyPostPhysicalSuffix(t *testing.T) {
-	b := arena.NewBudget(1 << 27)
+	const lastChild = 13000
+	// This fixture targets the later pointer-vector TLS release, rather than
+	// setup OOM. Fund the actual reflected child headers independently of the
+	// setup headroom so added cold invocation fields do not prevent that free.
+	childBytes := uint64(lastChild+1) * uint64(reflect.TypeOf(PolynomialSOMBuffer{}).Size())
+	b := arena.NewBudget(childBytes + 1<<27)
 	r, e := memory.NewRuntime(memory.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
 	profile := memory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
@@ -474,7 +480,7 @@ func TestPolynomialSOMVectorSourceFinalizeStickyPostPhysicalSuffix(t *testing.T)
 	v, e := NewPolynomialSOMVector(m)
 	serviceMust(t, e)
 	serviceMust(t, v.SetOwner(m))
-	_, e = v.At(13000)
+	_, e = v.At(lastChild)
 	serviceMust(t, e)
 	// Completed empty SOM children remain source members until the vector dtor.
 	cap, e := v.data.capacity(m)

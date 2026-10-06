@@ -16,7 +16,7 @@ func (m *IntegerManager) SourceFinalize() error {
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
 	}
-	if m.rawInvocationExecuting() || m.copyAllocation.executing || m.normalizationExecuting || m.factorNumeralExecuting || m.factorNumeralVectorCallerExecuting() || m.factorUnivariateCallerExecuting() || m.factorCoreCallerExecuting() {
+	if m.rawInvocationExecuting() || m.copyAllocation.executing || m.normalizationExecuting || m.factorNumeralExecuting || m.factorNumeralVectorCallerExecuting() || m.factorUnivariateCallerExecuting() || m.factorCoreCallerExecuting() || m.factorFrontendCallerExecuting() {
 		return ErrPolynomialPending
 	}
 	if m.closed || m.sourceFinalized {

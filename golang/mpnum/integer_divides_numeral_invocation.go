@@ -54,6 +54,9 @@ func (m *IntegerManager) beginDividesNumeralInvocation(parent integerAllocationI
 	if r := parent.henselPairReceipt(m); r != nil {
 		r.frame.boolNumeral = s.receipt
 	}
+	if q := parent.factorFrontendFrame(m); q != nil {
+		q.boolNumeral = s.receipt
+	}
 	return &s.receipt, nil
 }
 

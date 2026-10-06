@@ -113,6 +113,12 @@ func primeTrialPhysicalAuditExternal(t *testing.T, q *RationalManager, s *UPolyn
 func primeTrialPhysicalAuditAll(t *testing.T, q *RationalManager, s *UPolynomialFactorizationService, externalFactors []*UPolynomialFactors, external []memory.Block, extra ...*Int) {
 	roots := append(extra, []*Int{&q.nTmp, &q.addTmp1, &q.addTmp2, &q.addMulTmp.num, &q.addMulTmp.den, &q.ltTmp1.num, &q.ltTmp1.den, &q.ltTmp2.num, &q.ltTmp2.den}...)
 	n := q.headerBytes + integerActualOwnedBytes(q.z) + s.header + s.config.Primes.Stats().TotalBytes
+	for q := s.frontendConstantCalls; q != nil; q = q.next {
+		n += q.header
+	}
+	for h := s.frontendHistory; h != nil; h = h.next {
+		n += h.header
+	}
 	for c := s.squareFreeHistory; c != nil; c = c.historyNext {
 		n += c.header
 	}
@@ -182,8 +188,22 @@ func primeTrialPhysicalAuditAll(t *testing.T, q *RationalManager, s *UPolynomial
 			}
 		}
 	}
+	roots = append(roots, &s.frontend.content, &s.frontend.vectorNormalize.g, &s.frontend.vectorNormalize.old, &s.frontend.vectorNormalize.tmp, &s.frontend.modularPower.power, &s.frontend.quadratic.values[0], &s.frontend.quadratic.values[1], &s.frontend.quadratic.values[2], &s.frontend.quadratic.values[3], &s.frontend.flip.c, &s.frontend.image.old, &s.frontend.image.c, &s.frontend.remainder.am, &s.frontend.monic.lc, &s.frontend.monic.inv, &s.frontend.derivative.d, &s.frontend.divisibility.ratio, &s.frontend.primitive.cont)
+	for r := s.frontend.derivative.retired; r != nil; r = r.next {
+		roots = append(roots, &r.value)
+		n += r.header
+	}
+	for i := range s.frontend.cra.values {
+		roots = append(roots, &s.frontend.cra.values[i])
+	}
+	for i := range s.frontend.modularGCD.values {
+		roots = append(roots, &s.frontend.modularGCD.values[i])
+	}
+	for _, v := range []*upolyVectorState{&s.frontend.quadratic.f1, &s.frontend.quadratic.f2, &s.frontend.quadratic.product, &s.frontend.pp, &s.frontend.prime, &s.frontend.A, &s.frontend.B, &s.frontend.D} {
+		appendState(s.manager, v)
+	}
 	for _, m := range managers {
-		if m == nil {
+		if m == nil || m.closed {
 			continue
 		}
 		n += m.header + m.modular.header + uint64(cap(m.pages))*uint64(reflect.TypeOf((*upolyDescriptorPage)(nil)).Size()) + uint64(len(m.pages))*uint64(reflect.TypeOf(upolyDescriptorPage{}).Size()) + uint64(cap(m.bindings))*uint64(reflect.TypeOf(upolyStoreBinding{}).Size())

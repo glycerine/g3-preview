@@ -131,6 +131,7 @@ func (m *IntegerManager) divWithAllocationContext(a, b, c *Int, context integerA
 			tmp = &public.values[0]
 			context.recordRecombinationRaw(m, receipt)
 			context.recordPrimePreparationRaw(m, receipt)
+			context.recordFactorFrontendRaw(m, receipt)
 			context.recordContentRaw(m, receipt)
 			context.recordNormalizationRaw(m, receipt)
 			context.recordSOMNormalizationRaw(m, receipt)
@@ -164,19 +165,22 @@ func (m *IntegerManager) divWithAllocationContext(a, b, c *Int, context integerA
 // Mod implements source nonnegative modulus, including its reread of an
 // overwritten divisor when c==b (the source alias defect).
 func (m *IntegerManager) Mod(a, b, c *Int) error {
+	return m.modWithAllocationContext(a, b, c, integerAllocationInvocationContext{})
+}
+func (m *IntegerManager) modWithAllocationContext(a, b, c *Int, context integerAllocationInvocationContext) error {
 	for _, n := range []*Int{a, b, c} {
 		if e := m.check(n); e != nil {
 			return e
 		}
 	}
-	if e := m.Rem(a, b, c); e != nil {
+	if e := m.remWithAllocationContext(a, b, c, context); e != nil {
 		return e
 	}
 	if c.val < 0 {
 		if b.val > 0 {
-			return m.Add(c, b, c)
+			return m.addSubWithAllocationContext(c, b, c, false, context)
 		}
-		return m.Sub(c, b, c)
+		return m.addSubWithAllocationContext(c, b, c, true, context)
 	}
 	return nil
 }

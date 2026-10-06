@@ -1,3 +1,4 @@
+// Source: src/math/polynomial/upolynomial.cpp:663-826;
 // Licensed under the MIT license.
 package mpnum
 
@@ -5,38 +6,56 @@ package mpnum
 // copy goes through mpzzp Copy, including source normalization. In modular
 // GCD the entering mode is always Z. Cleanup on Go failure is explicit safe
 // ownership adaptation; a restoration failure stays visible.
-func (m *UPolynomialManager) modularImage(u, v, q *upolyVectorState, p, lc *Int, du, dv uint32) (bad bool, err error) {
+func (m *UPolynomialManager) modularImage(u, v, q *upolyVectorState, p, lc *Int, du, dv uint32) (bool, error) {
+	return m.modularImageWithSourceContext(u, v, q, p, lc, du, dv, integerAllocationInvocationContext{})
+}
+func (m *UPolynomialManager) modularImageWithSourceContext(u, v, q *upolyVectorState, p, lc *Int, du, dv uint32, context integerAllocationInvocationContext) (bad bool, err error) {
 	oldMode, e := m.modular.Modular()
 	if e != nil {
 		return false, e
 	}
-	var old Int
-	defer m.modular.Del(&old)
-	if e = m.modular.Copy(&old, &m.modular.p); e != nil {
+	var localOld, localC Int
+	old, c := &localOld, &localC
+	var frame *upolyFactorImageScope
+	if owner := context.factorFrontendFrame(m.config.Integer); owner != nil {
+		frame = &owner.image
+		if frame.savedConstructed || frame.classConstructed || frame.cConstructed || frame.invocation == ^uint64(0) {
+			return false, ErrUPolynomialCleanupPending
+		}
+		*frame = upolyFactorImageScope{owner: owner, invocation: frame.invocation + 1, oldMode: oldMode, savedConstructed: true, executing: true}
+		old, c = &frame.old, &frame.c
+		defer func() { frame.executing = false; err = frame.finish(err) }()
+	} else {
+		defer m.modular.Del(old)
+	}
+	if e = m.modular.copyWithSourceContext(old, &m.modular.p, context); e != nil {
 		return false, e
 	}
-	defer func() {
-		var restore error
-		if oldMode {
-			restore = m.modular.SetZP(&old)
-		} else {
-			restore = m.modular.SetZ()
-		}
-		// Return the actual typed restoration failure if cleanup cannot restore
-		// mode; otherwise retain the body error directly. Error wrappers would
-		// allocate an uncharged intermediary on every canceled image.
-		if restore != nil {
-			err = restore
-		}
-	}()
-	if e = m.modular.SetZP(p); e != nil {
+	if frame == nil {
+		defer func() {
+			var restore error
+			if oldMode {
+				restore = m.modular.SetZP(old)
+			} else {
+				restore = m.modular.SetZ()
+			}
+			if restore != nil {
+				err = restore
+			}
+		}()
+	}
+
+	if e = m.modular.setZPWithAllocationContext(p, context); e != nil {
 		return false, e
+	}
+	if frame != nil {
+		frame.classConstructed = true
 	}
 	U, V := &m.mgcd[2], &m.mgcd[3]
-	if e = m.setView(U, m.stateView(u)); e != nil {
+	if e = m.setViewWithSourceContext(U, m.stateView(u), context); e != nil {
 		return false, e
 	}
-	if e = m.setView(V, m.stateView(v)); e != nil {
+	if e = m.setViewWithSourceContext(V, m.stateView(v), context); e != nil {
 		return false, e
 	}
 	ud, vd := uint32(0), uint32(0)
@@ -52,20 +71,26 @@ func (m *UPolynomialManager) modularImage(u, v, q *upolyVectorState, p, lc *Int,
 	if vd < dv {
 		return true, nil
 	}
-	if e = m.euclidGCD(m.stateView(U), m.stateView(V), q); e != nil {
+	if e = m.euclidGCDWithSourceContext(m.stateView(U), m.stateView(V), q, context); e != nil {
 		return false, e
 	}
-	if e = m.monicLocal(m.stateView(q)); e != nil {
+	if e = m.monicLocalWithSourceContext(m.stateView(q), context); e != nil {
 		return false, e
 	}
-	var c Int
-	defer m.modular.Del(&c)
-	if e = m.modular.Copy(&c, lc); e != nil {
+	if frame != nil {
+		frame.cConstructed = true
+	} else {
+		defer m.modular.Del(c)
+	}
+	if e = m.modular.copyWithSourceContext(c, lc, context); e != nil {
 		return false, e
 	}
-	return false, m.mulScalarState(q, &c)
+	return false, m.mulScalarViewWithSourceContext(m.stateView(q), c, context)
 }
 func (m *UPolynomialManager) combineImages(c1 *upolyVectorState, b1 *Int, c2 *upolyVectorState, b2 *Int) error {
+	return m.combineImagesWithSourceContext(c1, b1, c2, b2, integerAllocationInvocationContext{})
+}
+func (m *UPolynomialManager) combineImagesWithSourceContext(c1 *upolyVectorState, b1 *Int, c2 *upolyVectorState, b2 *Int, context integerAllocationInvocationContext) (cause error) {
 	if modularSourceDebug {
 		even, e := m.config.Integer.IsEven(b1)
 		if e != nil {
@@ -86,17 +111,37 @@ func (m *UPolynomialManager) combineImages(c1 *upolyVectorState, b1 *Int, c2 *up
 	if e := m.reset(R); e != nil {
 		return e
 	}
-	var inv1, inv2, g, a1, a2, bound, lower, upper, newA, tmp1, tmp2, tmp3 Int
-	defer func() {
-		for _, x := range []*Int{&tmp3, &tmp2, &tmp1, &newA, &upper, &lower, &bound, &a2, &a1, &g, &inv2, &inv1} {
-			m.modular.Del(x)
+	var local [12]Int
+	values := &local
+	var frame *upolyFactorCRAScope
+	if owner := context.factorFrontendFrame(m.config.Integer); owner != nil {
+		frame = &owner.cra
+		if frame.constructed != 0 || frame.executing || frame.invocation == ^uint64(0) {
+			return ErrUPolynomialCleanupPending
 		}
-	}()
-	if e := m.modular.ExtendedGCD(b1, b2, &inv1, &inv2, &g); e != nil {
+		*frame = upolyFactorCRAScope{owner: owner, invocation: frame.invocation + 1, constructed: 3, peak: 3, executing: true}
+		values = &frame.values
+		defer func() { frame.executing = false; cause = frame.finish(cause) }()
+	} else {
+		defer func() {
+			for i := 11; i >= 0; i-- {
+				m.modular.Del(&local[i])
+			}
+		}()
+	}
+	inv1, inv2, g, a1, a2, bound, lower, upper, newA, tmp1, tmp2, tmp3 := &values[0], &values[1], &values[2], &values[3], &values[4], &values[5], &values[6], &values[7], &values[8], &values[9], &values[10], &values[11]
+	construct := func(n uint8) {
+		if frame != nil {
+			frame.constructed = n
+			frame.peak = n
+		}
+	}
+
+	if e := m.modular.extendedGCDWithSourceContext(b1, b2, inv1, inv2, g, context); e != nil {
 		return e
 	}
 	if modularSourceDebug {
-		one, e := m.modular.IsOne(&g)
+		one, e := m.modular.IsOne(g)
 		if e != nil {
 			return e
 		}
@@ -105,29 +150,32 @@ func (m *UPolynomialManager) combineImages(c1 *upolyVectorState, b1 *Int, c2 *up
 		}
 	}
 	z := m.config.Integer
-	if e := z.Mod(&inv1, b2, &inv1); e != nil {
+	if e := z.modWithAllocationContext(inv1, b2, inv1, context); e != nil {
 		return e
 	}
-	if e := z.Mod(&inv2, b1, &inv2); e != nil {
+	if e := z.modWithAllocationContext(inv2, b1, inv2, context); e != nil {
 		return e
 	}
-	if e := m.modular.Mul(b2, &inv2, &a1); e != nil {
+	construct(5)
+	if e := m.modular.mulWithSourceContext(b2, inv2, a1, context); e != nil {
 		return e
 	}
-	if e := m.modular.Mul(b1, &inv1, &a2); e != nil {
+	if e := m.modular.mulWithSourceContext(b1, inv1, a2, context); e != nil {
 		return e
 	}
-	if e := m.modular.Mul(b1, b2, &bound); e != nil {
+	construct(6)
+	if e := m.modular.mulWithSourceContext(b1, b2, bound, context); e != nil {
 		return e
 	}
+	construct(12)
 	two := NewInt(2)
-	if e := m.modular.Div(&bound, &two, &upper); e != nil {
+	if e := m.modular.divWithAllocationContext(bound, &two, upper, context); e != nil {
 		return e
 	}
-	if e := m.modular.Copy(&lower, &upper); e != nil {
+	if e := m.modular.copyWithSourceContext(lower, upper, context); e != nil {
 		return e
 	}
-	if e := m.modular.Neg(&lower); e != nil {
+	if e := m.modular.negWithSourceContext(lower, context); e != nil {
 		return e
 	}
 	zero := NewInt(0)
@@ -137,24 +185,24 @@ func (m *UPolynomialManager) combineImages(c1 *upolyVectorState, b1 *Int, c2 *up
 		n = n2
 	}
 	add := func(x, y *Int) error {
-		if e := m.modular.Mul(x, &a1, &tmp1); e != nil {
+		if e := m.modular.mulWithSourceContext(x, a1, tmp1, context); e != nil {
 			return e
 		}
-		if e := m.modular.Mul(y, &a2, &tmp2); e != nil {
+		if e := m.modular.mulWithSourceContext(y, a2, tmp2, context); e != nil {
 			return e
 		}
-		if e := m.modular.Add(&tmp1, &tmp2, &tmp3); e != nil {
+		if e := m.modular.addWithSourceContext(tmp1, tmp2, tmp3, context); e != nil {
 			return e
 		}
-		if e := z.Mod(&tmp3, &bound, &newA); e != nil {
+		if e := z.modWithAllocationContext(tmp3, bound, newA, context); e != nil {
 			return e
 		}
-		greater, e := m.modular.Greater(&newA, &upper)
+		greater, e := m.modular.Greater(newA, upper)
 		if e != nil {
 			return e
 		}
 		if greater {
-			if e = m.modular.Sub(&newA, &bound, &newA); e != nil {
+			if e = m.modular.subWithSourceContext(newA, bound, newA, context); e != nil {
 				return e
 			}
 		}
@@ -162,7 +210,7 @@ func (m *UPolynomialManager) combineImages(c1 *upolyVectorState, b1 *Int, c2 *up
 		if e != nil {
 			return e
 		}
-		return m.modular.Copy(dst, &newA)
+		return m.modular.copyWithSourceContext(dst, newA, context)
 	}
 	i := uint32(0)
 	for ; i < n; i++ {
@@ -180,13 +228,16 @@ func (m *UPolynomialManager) combineImages(c1 *upolyVectorState, b1 *Int, c2 *up
 			return e
 		}
 	}
-	if e := m.modular.Copy(b2, &bound); e != nil {
+	if e := m.modular.copyWithSourceContext(b2, bound, context); e != nil {
 		return e
 	}
 	*R, *c2 = *c2, *R
 	return nil
 }
 func (m *UPolynomialManager) modularGCD(a, b UPolynomialView, out *upolyVectorState) error {
+	return m.modularGCDWithSourceContext(a, b, out, integerAllocationInvocationContext{})
+}
+func (m *UPolynomialManager) modularGCDWithSourceContext(a, b UPolynomialView, out *upolyVectorState, context integerAllocationInvocationContext) (cause error) {
 	if modularSourceDebug {
 		if a.count == 0 || b.count == 0 {
 			return ErrUPolynomialAssertion
@@ -199,23 +250,36 @@ func (m *UPolynomialManager) modularGCD(a, b UPolynomialView, out *upolyVectorSt
 			return ErrUPolynomialAssertion
 		}
 	}
-	var cu, cv, cg, lcg, p, bound Int
-	defer func() {
-		m.modular.Del(&bound)
-		m.modular.Del(&p)
-		m.modular.Del(&lcg)
-		m.modular.Del(&cg)
-		m.modular.Del(&cv)
-		m.modular.Del(&cu)
-	}()
+	var local [6]Int
+	values := &local
+	var frame *upolyFactorModularGCDScope
+	if owner := context.factorFrontendFrame(m.config.Integer); owner != nil {
+		frame = &owner.modularGCD
+		if frame.constructed != 0 || frame.invocation == ^uint64(0) {
+			return ErrUPolynomialCleanupPending
+		}
+		*frame = upolyFactorModularGCDScope{owner: owner, invocation: frame.invocation + 1, constructed: 2, executing: true}
+		values = &frame.values
+		defer func() { frame.executing = false; cause = frame.finish(cause) }()
+	} else {
+		defer func() {
+			for i := 5; i >= 0; i-- {
+				m.modular.Del(&local[i])
+			}
+		}()
+	}
+	cu, cv, cg, lcg, p, bound := &values[0], &values[1], &values[2], &values[3], &values[4], &values[5]
 	u, v, q, C := &m.mgcd[0], &m.mgcd[1], &m.mgcd[4], &m.mgcd[5]
-	if e := m.primitiveState(a, u, &cu); e != nil {
+	if e := m.primitiveStateWithSourceContext(a, u, cu, context); e != nil {
 		return e
 	}
-	if e := m.primitiveState(b, v, &cv); e != nil {
+	if e := m.primitiveStateWithSourceContext(b, v, cv, context); e != nil {
 		return e
 	}
-	if e := m.modular.GCD(&cu, &cv, &cg); e != nil {
+	if frame != nil {
+		frame.constructed = 3
+	}
+	if e := m.modular.gcdWithSourceContext(cu, cv, cg, context); e != nil {
 		return e
 	}
 	du, dv := a.count-1, b.count-1
@@ -227,14 +291,20 @@ func (m *UPolynomialManager) modularGCD(a, b UPolynomialView, out *upolyVectorSt
 	if e != nil {
 		return e
 	}
-	if e = m.modular.GCD(lu, lv, &lcg); e != nil {
+	if frame != nil {
+		frame.constructed = 4
+	}
+	if e = m.modular.gcdWithSourceContext(lu, lv, lcg, context); e != nil {
 		return e
 	}
+	if frame != nil {
+		frame.constructed = 6
+	}
 	for i, prime := range upolyBigPrimes {
-		if e = m.modular.SetUint32(&p, prime); e != nil {
+		if e = m.modular.setUint32WithSourceContext(p, prime, context); e != nil {
 			return e
 		}
-		bad, e := m.modularImage(u, v, q, &p, &lcg, du, dv)
+		bad, e := m.modularImageWithSourceContext(u, v, q, p, lcg, du, dv, context)
 		if e != nil {
 			return e
 		}
@@ -252,37 +322,37 @@ func (m *UPolynomialManager) modularGCD(a, b UPolynomialView, out *upolyVectorSt
 			if e != nil {
 				return e
 			}
-			return m.modular.Copy(dst, &cg)
+			return m.modular.copyWithSourceContext(dst, cg, context)
 		}
 		discard := i == 0
 		if !discard {
 			discard = q.size < C.size
 			if !discard {
-				discard, e = m.config.Integer.IsEven(&p)
+				discard, e = m.config.Integer.IsEven(p)
 				if e != nil {
 					return e
 				}
 			}
 			if !discard {
-				discard, e = m.config.Integer.IsEven(&bound)
+				discard, e = m.config.Integer.IsEven(bound)
 				if e != nil {
 					return e
 				}
 			}
 		}
 		if discard {
-			if e = m.setView(C, m.stateView(q)); e != nil {
+			if e = m.setViewWithSourceContext(C, m.stateView(q), context); e != nil {
 				return e
 			}
-			if e = m.modular.Copy(&bound, &p); e != nil {
+			if e = m.modular.copyWithSourceContext(bound, p, context); e != nil {
 				return e
 			}
 		} else {
-			if e = m.combineImages(q, &p, C, &bound); e != nil {
+			if e = m.combineImagesWithSourceContext(q, p, C, bound, context); e != nil {
 				return e
 			}
 		}
-		if e = m.primitive(m.stateView(C), q); e != nil {
+		if e = m.primitiveWithSourceContext(m.stateView(C), q, context); e != nil {
 			return e
 		}
 		if modularSourceDebug && q.size == 0 {
@@ -292,24 +362,24 @@ func (m *UPolynomialManager) modularGCD(a, b UPolynomialView, out *upolyVectorSt
 		if e != nil {
 			return e
 		}
-		ok, e := m.modular.Divides(last, &lcg)
+		ok, e := m.modular.dividesWithAllocationContext(last, lcg, context)
 		if e != nil {
 			return e
 		}
 		if ok {
-			ok, e = m.dividesViews(m.stateView(u), m.stateView(q))
+			ok, e = m.dividesViewsWithSourceContext(m.stateView(u), m.stateView(q), context)
 			if e != nil {
 				return e
 			}
 		}
 		if ok {
-			ok, e = m.dividesViews(m.stateView(v), m.stateView(q))
+			ok, e = m.dividesViewsWithSourceContext(m.stateView(v), m.stateView(q), context)
 			if e != nil {
 				return e
 			}
 		}
 		if ok {
-			if e = m.mulScalarState(q, &cg); e != nil {
+			if e = m.mulScalarState(q, cg); e != nil {
 				return e
 			}
 			if e = m.flipSign(q); e != nil {
@@ -322,6 +392,9 @@ func (m *UPolynomialManager) modularGCD(a, b UPolynomialView, out *upolyVectorSt
 	return m.euclidGCD(a, b, out)
 }
 func (m *UPolynomialManager) gcd(a, b UPolynomialView, out *upolyVectorState) error {
+	return m.gcdWithSourceContext(a, b, out, integerAllocationInvocationContext{})
+}
+func (m *UPolynomialManager) gcdWithSourceContext(a, b UPolynomialView, out *upolyVectorState, context integerAllocationInvocationContext) error {
 	done, e := m.gcdEmpty(a, b, out)
 	if done {
 		return e
@@ -331,9 +404,9 @@ func (m *UPolynomialManager) gcd(a, b UPolynomialView, out *upolyVectorState) er
 		return e
 	}
 	if !finite {
-		return m.modularGCD(a, b, out)
+		return m.modularGCDWithSourceContext(a, b, out, context)
 	}
-	return m.euclidGCD(a, b, out)
+	return m.euclidGCDWithSourceContext(a, b, out, context)
 }
 func (m *UPolynomialManager) GCDViews(a, b UPolynomialView, g UPolynomial) error {
 	out, e := m.descriptor(g)

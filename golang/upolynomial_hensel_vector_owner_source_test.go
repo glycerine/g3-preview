@@ -125,6 +125,18 @@ func upolyHenselCheckVectorOwners(cores []*mpnum.UPolynomialManager, factors []*
 	}
 	for _, extra := range extras {
 		for _, service := range extra.Services {
+			front := reflect.ValueOf(service).Elem().FieldByName("frontend")
+			root := reflect.ValueOf(service).Elem().FieldByName("manager").Elem()
+			for _, name := range []string{"pp", "prime", "A", "B", "D"} {
+				if e := add(root, front.FieldByName(name), "actual factorFrontend."+name); e != nil {
+					return e
+				}
+			}
+			for _, name := range []string{"f1", "f2", "product"} {
+				if e := add(root, front.FieldByName("quadratic").FieldByName(name), "actual factorFrontend.quadratic."+name); e != nil {
+					return e
+				}
+			}
 			for pair := reflect.ValueOf(service).Elem().FieldByName("henselPairs"); !pair.IsNil(); pair = pair.Elem().FieldByName("next") {
 				h := pair.Elem()
 				root := h.FieldByName("service").Elem().FieldByName("manager").Elem()

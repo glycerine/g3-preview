@@ -37792,7 +37792,22 @@
         "mpnum/upolynomial_hensel_extended_scope.go",
         "mpnum/upolynomial_hensel_caller_engines.go",
         "mpnum/upolynomial_recombination_step_allocation_context.go",
-        "mpnum/upolynomial_recombination_publication_source_test.go"
+        "mpnum/upolynomial_recombination_publication_source_test.go",
+        "mpnum/upolynomial_factor_frontend_allocation_context.go",
+        "mpnum/upolynomial_factor_frontend_constant_invocation.go",
+        "mpnum/upolynomial_factor_frontend_constant_source_test.go",
+        "mpnum/upolynomial_factor_frontend_copy_owner_source_test.go",
+        "mpnum/upolynomial_factor_frontend_cra_source_test.go",
+        "mpnum/upolynomial_factor_frontend_flip_source_test.go",
+        "mpnum/upolynomial_factor_frontend_foreign_modular_source_test.go",
+        "mpnum/upolynomial_factor_frontend_history_source_test.go",
+        "mpnum/upolynomial_factor_frontend_invocation.go",
+        "mpnum/upolynomial_factor_frontend_monic_source_test.go",
+        "mpnum/upolynomial_factor_frontend_numeric_source_test.go",
+        "mpnum/upolynomial_factor_frontend_outer_stop_source_test.go",
+        "mpnum/upolynomial_factor_frontend_owner_source_test.go",
+        "mpnum/upolynomial_factor_frontend_quadratic_source_test.go",
+        "mpnum/upolynomial_factor_frontend_subscope_reentry_root_test.go"
       ],
       "tests": [
         "TestUPolynomialScalarExtentAndLayout",
@@ -37901,7 +37916,32 @@
         "TestUPolynomialRecombinationPublicationExactCapturedContext",
         "TestUPolynomialRecombinationPublicationActualChildStopAndOwningHistory",
         "TestUPolynomialRecombinationPublicationExactOldLeafPreservesForeignReplacement",
-        "TestUPolynomialRecombinationPublicationNumericAbortBeforeFaultLift"
+        "TestUPolynomialRecombinationPublicationNumericAbortBeforeFaultLift",
+        "TestUPolynomialFactorFrontendActualCRAConstructorFrontiers",
+        "TestUPolynomialFactorFrontendActualCRAEveryBIGPrefix",
+        "TestUPolynomialFactorFrontendActualCopyIntegerOwnerTransport",
+        "TestUPolynomialFactorFrontendActualFlipBIGPrefixes",
+        "TestUPolynomialFactorFrontendActualFlipNumeral",
+        "TestUPolynomialFactorFrontendActualHistoryReservation",
+        "TestUPolynomialFactorFrontendActualMonicEndOnly",
+        "TestUPolynomialFactorFrontendActualOuterVectorSourceStop",
+        "TestUPolynomialFactorFrontendActualPrimitiveGCDCapture",
+        "TestUPolynomialFactorFrontendActualQuadraticFrontiers",
+        "TestUPolynomialFactorFrontendActualQuadraticPerfectSquareBIGPrefixes",
+        "TestUPolynomialFactorFrontendActualQuadraticPowerFailedBodyRetainsRAW",
+        "TestUPolynomialFactorFrontendConstantDirectLeafAfterIntegerSourceEnd",
+        "TestUPolynomialFactorFrontendConstantOldACKPreservesLaterPending",
+        "TestUPolynomialFactorFrontendCopiedSubscopeOwnerRefused",
+        "TestUPolynomialFactorFrontendErasedBIGSETOwnsActualPendingLeaf",
+        "TestUPolynomialFactorFrontendErasedFieldSETActualPNPrefixes",
+        "TestUPolynomialFactorFrontendErasedSETActualOwnerTransport",
+        "TestUPolynomialFactorFrontendForeignFactorsClose",
+        "TestUPolynomialFactorFrontendForeignPerfectSquareReceiver",
+        "TestUPolynomialFactorFrontendPriorCapturedChildACKPreservesLater",
+        "TestUPolynomialFactorFrontendReachedGCDOwnerTransport",
+        "TestUPolynomialFactorFrontendReachedSubscopeOwningReentry",
+        "TestUPolynomialFactorFrontendReachedSubscopeReentry",
+        "TestUPolynomialFactorFrontendRepeatedErasedSETWithRetainedRAW"
       ],
       "conditionals": [
         {
@@ -38893,6 +38933,38 @@
             "TestUPolynomialRecombinationPublicationExactOldLeafPreservesForeignReplacement",
             "TestUPolynomialRecombinationPublicationNumericAbortBeforeFaultLift"
           ]
+        },
+        {
+          "name": "upolynomial.cpp:2960-3118 actual Factor frontend NUM/vector frontiers, modular image/CRA/Euclid, flip/quadratic and whole square-free child",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_factor_core.go",
+          "tests": [
+            "TestUPolynomialFactorFrontendActualCRAConstructorFrontiers",
+            "TestUPolynomialFactorFrontendActualCRAEveryBIGPrefix",
+            "TestUPolynomialFactorFrontendActualCopyIntegerOwnerTransport",
+            "TestUPolynomialFactorFrontendActualFlipBIGPrefixes",
+            "TestUPolynomialFactorFrontendActualFlipNumeral",
+            "TestUPolynomialFactorFrontendActualHistoryReservation",
+            "TestUPolynomialFactorFrontendActualMonicEndOnly",
+            "TestUPolynomialFactorFrontendActualOuterVectorSourceStop",
+            "TestUPolynomialFactorFrontendActualPrimitiveGCDCapture",
+            "TestUPolynomialFactorFrontendActualQuadraticFrontiers",
+            "TestUPolynomialFactorFrontendActualQuadraticPerfectSquareBIGPrefixes",
+            "TestUPolynomialFactorFrontendActualQuadraticPowerFailedBodyRetainsRAW",
+            "TestUPolynomialFactorFrontendConstantDirectLeafAfterIntegerSourceEnd",
+            "TestUPolynomialFactorFrontendConstantOldACKPreservesLaterPending",
+            "TestUPolynomialFactorFrontendCopiedSubscopeOwnerRefused",
+            "TestUPolynomialFactorFrontendErasedBIGSETOwnsActualPendingLeaf",
+            "TestUPolynomialFactorFrontendErasedFieldSETActualPNPrefixes",
+            "TestUPolynomialFactorFrontendErasedSETActualOwnerTransport",
+            "TestUPolynomialFactorFrontendForeignFactorsClose",
+            "TestUPolynomialFactorFrontendForeignPerfectSquareReceiver",
+            "TestUPolynomialFactorFrontendPriorCapturedChildACKPreservesLater",
+            "TestUPolynomialFactorFrontendReachedGCDOwnerTransport",
+            "TestUPolynomialFactorFrontendReachedSubscopeOwningReentry",
+            "TestUPolynomialFactorFrontendReachedSubscopeReentry",
+            "TestUPolynomialFactorFrontendRepeatedErasedSETWithRetainedRAW"
+          ]
         }
       ],
       "ownership": [
@@ -38905,7 +38977,9 @@
         "Literal ascending private numeral deletion and reverse backing destruction retain exact stopped cause/cursor. Caller descriptors survive source finalization and require explicit caller-field cleanup. No registry-derived ownership or acknowledgement of consumed physical release on source retry. Whole imp/global bindings remain open.",
         "Upper isolation/Sturm tests account for exact external shared Integer gcdRaw five declarations and matched AddMul child TMP separately from UPolynomial-owned/cached stats. Actual Integer self/frame/count and immutable child/parent invocation identities name roots; live/generation metadata only validates those exact tokens. Physical anonymous-root audits remain intact. This is Go allocation-failure observation coverage, not additional registered C++ assertion credit.",
         "Actual caller-owned stable V1/V3/Q/R/T/V1Q, conditional BV/expectedD and final lc_inv/lc frontiers; source youngest stop precedes older vectors and related owner.",
-        "upolynomial.cpp:213-232,609-651: same actual array reads, scalar SET/Div, persistent quotient/remainder scratch, scoped compiled divisibility child and explicit RAW SubMul temporary; direct child acquisition and exact cleanup replace omitted source-call ownership transport without substituting algorithms."
+        "upolynomial.cpp:213-232,609-651: same actual array reads, scalar SET/Div, persistent quotient/remainder scratch, scoped compiled divisibility child and explicit RAW SubMul temporary; direct child acquisition and exact cleanup replace omitted source-call ownership transport without substituting algorithms.",
+        "Exact owner/self/member/captured nonwrapping nonce and direct actual allocation outcomes grant authority. Completed child false phase precedes older lexical destruction; unjoined true phase follows it. Charged readonly histories preserve child tuples and original body/source/first-own causes to service end.",
+        "Executing source/own children refuse actual checkpoint and returning transport owner reentry before mutation. No census, registry, or before/after pending acquisition."
       ],
       "deviations": [
         "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full isolation/refinement/conversion/factorization/algebraic and printers remain open; input conversion adapters do not establish complete registered tests.",
@@ -38914,7 +38988,11 @@
         "Selected sequence/Sturm/transform/Descartes/bounds algorithms translated. RowView binds source coeffs(i) plus size(i); source unsigned header8 is extent arithmetic while actual Go metadata arrays charge4*capacity and slice fields are in the charged cold owner. Source printers, full root isolation/refinement, multivariate conversion, factorization and algebraic consumers remain open; source units remain partial.",
         "Owning reads and checked scalar lifetimes are Go adapters. Full-capacity guard rejects undersized source wrapped allocations after separate literal uint32 growth checks; raw allocation/header publication for that undefined domain is not represented. Multivariate conversion, factorization, algebraic consumers, full printers/TRACE and nonselected alternatives remain open.",
         "Shared coefficient directory is a charged Go lifetime adapter for actual source buffers, without copying coefficients between related cores. Independent pools remain distinct. Prime/factor algorithms and multivariate conversion remain unported in this chunk.",
-        "Cold store-binding adoption is an explicit Go lifetime adapter, with retained successful metadata prefixes before source state swaps. Cross-IntegerManager buffer ownership still requires the real shared MPZ backend. Factor algorithms, multivariate conversion and whole source-unit completion remain open; these three tests add independent ownership evidence, not registered C++ assertions."
+        "Cold store-binding adoption is an explicit Go lifetime adapter, with retained successful metadata prefixes before source state swaps. Cross-IntegerManager buffer ownership still requires the real shared MPZ backend. Factor algorithms, multivariate conversion and whole source-unit completion remain open; these three tests add independent ownership evidence, not registered C++ assertions.",
+        "Source unit remains partial; this closes the selected existing UP frontend and actual reached child lifetime/leaf transports, without whole factorization promotion.",
+        "Signed-host TLS postphysical release guards qualify Go continuation outside native signed-overflow accounting. No invented allocation or callback frontier.",
+        "mpz.h:156-162 successful publication order is unchanged; released scratch descriptor remains exact disposal token and later capacity reuse refuses ErrInvalidSlot before freed reads.",
+        "Count-zero/count-one erased SET issues no NUM/vector or per-call archival reserve. Stable call storage materializes only at actual Integer/Natural allocations. Field tests cover only literal count-one SET, not general field factorization. Native normalized SET completes PN without checked verification allocation; checked actual failed PN prefixes preserve exact child tuples."
       ]
     },
     {

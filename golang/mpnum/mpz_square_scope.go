@@ -11,20 +11,38 @@ var ErrPerfectSquarePending = errors.New("mpnum: retained perfect-square raw inv
 
 // Actual six source RAW numerals, embedded in the charged Integer header. They
 // have no automatic destructor: source Del is reached only at the end label.
+type integerPerfectSquareInvocationReceipt struct {
+	manager    *IntegerManager
+	frame      *integerPerfectSquareScope
+	invocation uint64
+}
+
 type integerPerfectSquareScope struct {
-	values                               [6]Int
-	pending                              memory.ObjectRef
-	raw                                  [3]memory.Block
-	outputStarted                        bool
-	outputChoice                         uint8
-	generation                           uint64
-	active, endEntered, stopped          bool
-	sourceIndex, cleanupIndex            uint8
-	bodyCause, sourceCause, cleanupCause error
+	owner                                    *IntegerManager
+	numeric                                  polynomialNumericRoots
+	directReceipt                            integerPerfectSquareInvocationReceipt
+	parentContext                            integerAllocationInvocationContext
+	executing, sourceExecuting, ownExecuting bool
+	values                                   [6]Int
+	pending                                  memory.ObjectRef
+	raw                                      [3]memory.Block
+	outputStarted                            bool
+	outputChoice                             uint8
+	generation                               uint64
+	active, endEntered, stopped              bool
+	sourceIndex, cleanupIndex                uint8
+	bodyCause, sourceCause, cleanupCause     error
 }
 
 func (m *IntegerManager) finishPerfectSquare() error {
 	s := &m.perfectSquare
+	if s.directReceipt.invocation != 0 {
+		if !s.executing || s.sourceExecuting || s.ownExecuting {
+			return ErrPolynomialPending
+		}
+		s.sourceExecuting = true
+		defer func() { s.sourceExecuting = false }()
+	}
 	if s.stopped {
 		return s.sourceCause
 	}
@@ -50,6 +68,12 @@ func (m *IntegerManager) CleanupPerfectSquare() error {
 		return memory.ErrRuntimeOwner
 	}
 	s := &m.perfectSquare
+	if s.directReceipt.invocation != 0 {
+		return m.cleanupPerfectSquareInvocation(&s.directReceipt, true)
+	}
+	if s.directReceipt.invocation != 0 && (s.executing || s.sourceExecuting || s.ownExecuting) {
+		return ErrPolynomialPending
+	}
 	if !s.active {
 		return nil
 	}
@@ -138,15 +162,108 @@ func (m *IntegerManager) perfectSquareCall(op uint8, a, b, out *Int) (cause erro
 }
 
 func (m *IntegerManager) beginPerfectSquareRawScope() error {
+	return m.beginPerfectSquareRawScopeWithContext(integerAllocationInvocationContext{})
+}
+func (m *IntegerManager) beginPerfectSquareRawScopeWithContext(context integerAllocationInvocationContext) error {
 	s := &m.perfectSquare
 	if s.active {
 		return ErrPerfectSquarePending
 	}
+	if m.perfectSquareGeneration == ^uint64(0) || (context != (integerAllocationInvocationContext{}) && context.factorFrontendFrame(m) == nil) {
+		return ErrPolynomialPending
+	}
 	m.perfectSquareGeneration++
-	*s = integerPerfectSquareScope{active: true, generation: m.perfectSquareGeneration}
+	*s = integerPerfectSquareScope{owner: m, active: true, generation: m.perfectSquareGeneration, parentContext: context}
+	if context != (integerAllocationInvocationContext{}) {
+		s.directReceipt = integerPerfectSquareInvocationReceipt{m, s, s.generation}
+		context.factorFrontend.perfectSquare = s.directReceipt
+	}
 	return nil
 }
 func (m *IntegerManager) endPerfectSquareRawScope() error {
 	m.perfectSquare.endEntered = true
 	return m.finishPerfectSquare()
+}
+
+// Actual direct allocation identity is stamped at the real six-RAW start.
+func (m *IntegerManager) matchesPerfectSquareHistory(r *integerPerfectSquareInvocationReceipt) bool {
+	return m != nil && m.self == m && r != nil && r.manager == m && r.frame == &m.perfectSquare && r.frame.owner == m && r.invocation != 0 && r.invocation == r.frame.generation && r.frame.directReceipt == *r
+}
+func (m *IntegerManager) matchesPerfectSquareInvocation(r *integerPerfectSquareInvocationReceipt) bool {
+	return m.matchesPerfectSquareHistory(r) && r.frame.active
+}
+func (m *IntegerManager) perfectSquareContextRoots(c integerAllocationInvocationContext) *polynomialNumericRoots {
+	r := c.perfectSquare
+	if !m.matchesPerfectSquareInvocation(r) || c.perfectSquareInvocation != r.invocation || !r.frame.executing || r.frame.sourceExecuting || r.frame.ownExecuting {
+		return nil
+	}
+	if r.frame.parentContext != (integerAllocationInvocationContext{}) && r.frame.parentContext.roots(m) == nil {
+		return nil
+	}
+	return &r.frame.numeric
+}
+func (m *IntegerManager) perfectSquareCallWithContext(op uint8, a, b, out *Int, context integerAllocationInvocationContext) (cause error) {
+	if context == (integerAllocationInvocationContext{}) {
+		return m.perfectSquareCall(op, a, b, out)
+	}
+	if m.perfectSquareContextRoots(context) == nil {
+		return ErrPolynomialPending
+	}
+	switch op {
+	case 0:
+		cause = m.copyFromOwnerWithAllocationContext(out, m, a, nil, context)
+	case 1:
+		cause = m.addSubWithAllocationContext(a, b, out, false, context)
+	case 2:
+		cause = m.mulWithAllocationContext(a, b, out, context)
+	case 3:
+		cause = m.divWithAllocationContext(a, b, out, context)
+	}
+	s := &m.perfectSquare
+	if s.sourceCause == nil && s.parentContext.factorFrontend != nil {
+		q := s.parentContext.factorFrontend
+		s.sourceCause = m.rawInvocationSourceCause(&q.divisionRaw)
+		if s.sourceCause == nil {
+			s.sourceCause = q.numericSourceCause()
+		}
+	}
+	return cause
+}
+func (m *IntegerManager) perfectSquareInvocationSourceCause(r *integerPerfectSquareInvocationReceipt) error {
+	if !m.matchesPerfectSquareHistory(r) {
+		return nil
+	}
+	return r.frame.sourceCause
+}
+func (m *IntegerManager) cleanupPerfectSquareInvocation(r *integerPerfectSquareInvocationReceipt, abort bool) (cause error) {
+	if !m.matchesPerfectSquareInvocation(r) {
+		return nil
+	}
+	s := r.frame
+	if s.executing || s.sourceExecuting || s.ownExecuting {
+		return ErrPolynomialPending
+	}
+	if !abort && !s.endEntered {
+		return nil
+	}
+	s.ownExecuting = true
+	defer func() {
+		s.ownExecuting = false
+		if cause != nil && s.cleanupCause == nil {
+			s.cleanupCause = cause
+		}
+	}()
+	for s.cleanupIndex < 6 {
+		if e := m.cleanupRawNumeral(&s.values[s.cleanupIndex]); e != nil {
+			return e
+		}
+		s.cleanupIndex++
+	}
+	if abort {
+		if e := cleanupUPolynomialNumericRoots(m, &s.numeric); e != nil {
+			return e
+		}
+		s.active = false
+	}
+	return nil
 }

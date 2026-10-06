@@ -26,21 +26,23 @@ type UPolynomialConfig struct {
 // are required, even though operations without a checkpoint do not call them.
 // Cold ownership and every actual typed backing are charged to Integer's budget.
 type UPolynomialManager struct {
-	primePreparationCaller *upolyFactorPrimePreparationScope
-	preparationCaller      *upolyFactorPreparationScope
-	henselPairCaller       *upolyHenselPairScope
-	henselCallerGuard      *upolyHenselCallerScope
-	henselCallerInvocation uint64
-	callbackDepth          uint32
-	mignotteCaller         *upolyMignotteScope
-	trialCaller            *upolyRecombinationTrialScope
-	recombinationCaller    *upolyRecombinationStepScope
-	primeTrialCaller       *upolyPrimeTrialScope
-	squareFreeCaller       *upolyFactorSquareFreeScope
-	self                   *UPolynomialManager
-	origin                 uint64
-	config                 UPolynomialConfig
-	modular                *IntegerModularManager
+	factorFrontendCaller         *upolyFactorFrontendScope
+	factorFrontendConstantCaller *UPolynomialFactorizationService
+	primePreparationCaller       *upolyFactorPrimePreparationScope
+	preparationCaller            *upolyFactorPreparationScope
+	henselPairCaller             *upolyHenselPairScope
+	henselCallerGuard            *upolyHenselCallerScope
+	henselCallerInvocation       uint64
+	callbackDepth                uint32
+	mignotteCaller               *upolyMignotteScope
+	trialCaller                  *upolyRecombinationTrialScope
+	recombinationCaller          *upolyRecombinationStepScope
+	primeTrialCaller             *upolyPrimeTrialScope
+	squareFreeCaller             *upolyFactorSquareFreeScope
+	self                         *UPolynomialManager
+	origin                       uint64
+	config                       UPolynomialConfig
+	modular                      *IntegerModularManager
 	// Actual source members: 16 core and five derived numeral vectors.
 	basic, div1, div2, exactDiv, gcd1, gcd2, cra   upolyVectorState
 	mgcd                                           [6]upolyVectorState

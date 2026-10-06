@@ -5,65 +5,71 @@ package mpnum
 // Explicit passed invocation identity. It carries no allocation snapshot and
 // creates no source numeral, reservation, or ambient callback owner hook.
 type integerAllocationInvocationContext struct {
-	factorNumeralVector           *polynomialFactorNumeralVectorReceipt
-	factorNumeralVectorInvocation uint64
-	toPolynomial                  *polynomialToPolynomialInvocationReceipt
-	toPolynomialInvocation        uint64
-	factorMemberSet               *polynomialFactorMemberSetReceipt
-	factorMemberSetInvocation     uint64
-	factorConstant                *polynomialFactorConstantInvocationReceipt
-	factorConstantInvocation      uint64
-	primePreparation              *upolyFactorPrimePreparationScope
-	primePreparationInvocation    uint64
-	primePreparationManager       *UPolynomialManager
-	preparation                   *upolyFactorPreparationScope
-	preparationInvocation         uint64
-	trial                         *upolyRecombinationTrialScope
-	recombination                 *upolyRecombinationStepScope
-	recombinationInvocation       uint64
-	recombinationManager          *UPolynomialManager
-	somNormalize                  *polynomialSOMNormalizeInvocationReceipt
-	somNormalizeInvocation        uint64
-	normalization                 *polynomialNormalizeInvocationReceipt
-	normalizationInvocation       uint64
-	trialInvocation               uint64
-	trialManager                  *UPolynomialManager
-	henselCaller                  *upolyHenselCallerScope
-	henselCallerInvocation        uint64
-	henselCallerManager           *UPolynomialManager
-	henselPair                    *upolyHenselPairInvocationReceipt
-	henselPairInvocation          uint64
-	henselManager                 *UPolynomialManager
-	iccpConstant                  *polynomialICCPConstantInvocationReceipt
-	iccpConstantInvocation        uint64
-	primeTrial                    *upolyPrimeTrialInvocationReceipt
-	primeTrialInvocation          uint64
-	pseudo                        *polynomialPseudoDivisionInvocationReceipt
-	pseudoInvocation              uint64
-	mignotte                      *upolyMignotteInvocationReceipt
-	mignotteInvocation            uint64
-	divides                       *polynomialDividesInvocationReceipt
-	dividesInvocation             uint64
-	boolDivides                   *integerDividesNumeralInvocationReceipt
-	boolDividesInvocation         uint64
-	neg                           *polynomialNegInvocationReceipt
-	negInvocation                 uint64
-	arithmeticInvocation          uint64
-	scalarExact                   *polynomialScalarExactDivInvocationReceipt
-	scalarExactInvocation         uint64
-	exactDiv                      *polynomialExactDivInvocationReceipt
-	exactDivInvocation            uint64
-	content                       *polynomialContentInvocationReceipt
-	contentInvocation             uint64
-	raw                           *integerRawInvocationReceipt
-	rawInvocation                 uint64
-	pn                            *integerPNormalizeScope
-	pnInvocation                  uint64
-	arithmetic                    *polynomialArithmeticInvocationReceipt
-	addMul                        *integerAddMulInvocationReceipt
-	addMulInvocation              uint64
-	derivative                    *polynomialDerivativeInvocationReceipt
-	scalarDiv                     *polynomialScalarDivInvocationReceipt
+	factorNumeralVector              *polynomialFactorNumeralVectorReceipt
+	factorNumeralVectorInvocation    uint64
+	toPolynomial                     *polynomialToPolynomialInvocationReceipt
+	toPolynomialInvocation           uint64
+	factorMemberSet                  *polynomialFactorMemberSetReceipt
+	factorMemberSetInvocation        uint64
+	factorConstant                   *polynomialFactorConstantInvocationReceipt
+	factorConstantInvocation         uint64
+	primePreparation                 *upolyFactorPrimePreparationScope
+	primePreparationInvocation       uint64
+	primePreparationManager          *UPolynomialManager
+	preparation                      *upolyFactorPreparationScope
+	preparationInvocation            uint64
+	trial                            *upolyRecombinationTrialScope
+	recombination                    *upolyRecombinationStepScope
+	recombinationInvocation          uint64
+	recombinationManager             *UPolynomialManager
+	somNormalize                     *polynomialSOMNormalizeInvocationReceipt
+	somNormalizeInvocation           uint64
+	normalization                    *polynomialNormalizeInvocationReceipt
+	normalizationInvocation          uint64
+	trialInvocation                  uint64
+	trialManager                     *UPolynomialManager
+	henselCaller                     *upolyHenselCallerScope
+	henselCallerInvocation           uint64
+	henselCallerManager              *UPolynomialManager
+	henselPair                       *upolyHenselPairInvocationReceipt
+	henselPairInvocation             uint64
+	henselManager                    *UPolynomialManager
+	iccpConstant                     *polynomialICCPConstantInvocationReceipt
+	iccpConstantInvocation           uint64
+	primeTrial                       *upolyPrimeTrialInvocationReceipt
+	primeTrialInvocation             uint64
+	pseudo                           *polynomialPseudoDivisionInvocationReceipt
+	pseudoInvocation                 uint64
+	mignotte                         *upolyMignotteInvocationReceipt
+	mignotteInvocation               uint64
+	divides                          *polynomialDividesInvocationReceipt
+	dividesInvocation                uint64
+	boolDivides                      *integerDividesNumeralInvocationReceipt
+	boolDividesInvocation            uint64
+	neg                              *polynomialNegInvocationReceipt
+	negInvocation                    uint64
+	arithmeticInvocation             uint64
+	scalarExact                      *polynomialScalarExactDivInvocationReceipt
+	scalarExactInvocation            uint64
+	exactDiv                         *polynomialExactDivInvocationReceipt
+	exactDivInvocation               uint64
+	content                          *polynomialContentInvocationReceipt
+	contentInvocation                uint64
+	raw                              *integerRawInvocationReceipt
+	rawInvocation                    uint64
+	pn                               *integerPNormalizeScope
+	pnInvocation                     uint64
+	arithmetic                       *polynomialArithmeticInvocationReceipt
+	addMul                           *integerAddMulInvocationReceipt
+	addMulInvocation                 uint64
+	derivative                       *polynomialDerivativeInvocationReceipt
+	scalarDiv                        *polynomialScalarDivInvocationReceipt
+	factorFrontendConstant           *upolyFactorConstantBinding
+	factorFrontendConstantInvocation uint64
+	perfectSquare                    *integerPerfectSquareInvocationReceipt
+	perfectSquareInvocation          uint64
+	factorFrontend                   *upolyFactorFrontendScope
+	factorFrontendInvocation         uint64
 }
 
 func (c integerAllocationInvocationContext) withAddMulInvocation(r *integerAddMulInvocationReceipt) integerAllocationInvocationContext {
@@ -107,6 +113,15 @@ func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomial
 		return nil
 	}
 	if c.factorConstant != nil && m.factorConstantContextRoots(c) == nil {
+		return nil
+	}
+	if c.factorFrontendConstant != nil && c.factorFrontendConstantFrame(m) == nil {
+		return nil
+	}
+	if c.perfectSquare != nil && m.perfectSquareContextRoots(c) == nil {
+		return nil
+	}
+	if c.factorFrontend != nil && c.factorFrontendFrame(m) == nil {
 		return nil
 	}
 	if c.primePreparation != nil && c.primePreparationFrame(m) == nil {
@@ -177,6 +192,9 @@ func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomial
 	if c.toPolynomial != nil {
 		return m.toPolynomialAllocationRoots(c)
 	}
+	if c.perfectSquare != nil {
+		return m.perfectSquareContextRoots(c)
+	}
 	if c.iccpConstant != nil {
 		return m.iccpConstantContextRoots(c)
 	}
@@ -221,6 +239,15 @@ func (c integerAllocationInvocationContext) roots(m *IntegerManager) *polynomial
 		return &s.numeric
 	}
 	if r := c.primePreparationFrame(m); r != nil {
+		return &r.numeric
+	}
+	if b := c.factorFrontendConstantFrame(m); b != nil {
+		if b.record != nil {
+			return &b.record.numeric
+		}
+		return &b.numeric
+	}
+	if r := c.factorFrontendFrame(m); r != nil {
 		return &r.numeric
 	}
 	if r := c.preparationFrame(m); r != nil {

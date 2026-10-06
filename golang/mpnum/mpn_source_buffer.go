@@ -63,6 +63,9 @@ func (s *sourceLimbBuffer) expandWithPNReceipt(r *memory.Runtime, receipt *natur
 		request = uint64(uint32(request))
 	}
 	if receipt != nil && receipt.context != nil && receipt.bound(true) {
+		if e := receipt.context.factorHistoryContext.prepareFactorFrontendConstantHistory(receipt.context.owner.manager); e != nil {
+			return e
+		}
 		if e := receipt.context.factorHistoryContext.prepareFactorHistory(receipt.context.owner.manager); e != nil {
 			return e
 		}

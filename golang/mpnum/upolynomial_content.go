@@ -125,9 +125,24 @@ func (m *UPolynomialManager) PrimitiveAndContent(p, pp UPolynomial, cont *Int) e
 	return m.PrimitiveAndContentViews(v, pp, cont)
 }
 func (m *UPolynomialManager) primitive(v UPolynomialView, pp *upolyVectorState) error {
-	var cont Int
-	defer m.modular.Del(&cont)
-	return m.primitiveState(v, pp, &cont)
+	return m.primitiveWithSourceContext(v, pp, integerAllocationInvocationContext{})
+}
+
+// Source: src/math/polynomial/upolynomial.h:212-215.
+func (m *UPolynomialManager) primitiveWithSourceContext(v UPolynomialView, pp *upolyVectorState, context integerAllocationInvocationContext) (cause error) {
+	owner := context.factorFrontendFrame(m.config.Integer)
+	if owner == nil {
+		var cont Int
+		defer m.modular.Del(&cont)
+		return m.primitiveStateWithSourceContext(v, pp, &cont, context)
+	}
+	q := &owner.primitive
+	if q.constructed || q.executing || q.invocation == ^uint64(0) {
+		return ErrUPolynomialCleanupPending
+	}
+	*q = upolyFactorPrimitiveScope{owner: owner, invocation: q.invocation + 1, constructed: true, executing: true}
+	defer func() { q.executing = false; cause = q.finish(cause) }()
+	return m.primitiveStateWithSourceContext(v, pp, &q.cont, context)
 }
 func (m *UPolynomialManager) PrimitiveView(v UPolynomialView, pp UPolynomial) error {
 	out, e := m.descriptor(pp)
@@ -144,6 +159,11 @@ func (m *UPolynomialManager) Primitive(p, pp UPolynomial) error {
 	return m.PrimitiveView(v, pp)
 }
 func (m *UPolynomialManager) normalize(v UPolynomialView) error {
+	return m.normalizeWithSourceContext(v, integerAllocationInvocationContext{})
+}
+
+// Source: src/math/polynomial/upolynomial.cpp:366-401.
+func (m *UPolynomialManager) normalizeWithSourceContext(v UPolynomialView, context integerAllocationInvocationContext) (cause error) {
 	if v.count == 0 {
 		return nil
 	}
@@ -157,36 +177,68 @@ func (m *UPolynomialManager) normalize(v UPolynomialView) error {
 			return e
 		}
 		if positive {
-			return m.modular.SetInt32(x, 1)
+			return m.modular.setInt64WithSourceContext(x, 1, context)
 		}
-		return m.modular.SetInt32(x, -1)
+		return m.modular.setInt64WithSourceContext(x, -1, context)
 	}
-	var g Int
-	defer m.modular.Del(&g)
-	if e := m.gcdSpan(v, &g); e != nil {
+	var legacy Int
+	g := &legacy
+	var q *upolyFactorVectorNormalizeScope
+	if context != (integerAllocationInvocationContext{}) {
+		o := context.factorFrontendFrame(m.config.Integer)
+		if o == nil || !o.executing || o.service.manager != m {
+			return ErrUPolynomialOwner
+		}
+		q = &o.vectorNormalize
+		if q.constructed != 0 || q.executing || q.invocation == ^uint64(0) {
+			return ErrUPolynomialCleanupPending
+		}
+		*q = upolyFactorVectorNormalizeScope{owner: o, invocation: q.invocation + 1, constructed: 1, peak: 1, executing: true}
+		g = &q.g
+		defer func() { q.executing = false; cause = q.finish(cause) }()
+	} else {
+		defer m.modular.Del(g)
+	}
+	if e := m.gcdSpanWithSourceContext(v, g, context); e != nil {
 		return e
 	}
-	one, e := m.modular.IsOne(&g)
+	one, e := m.modular.IsOne(g)
 	if e != nil || one {
 		return e
 	}
 	for i := uint32(0); i < v.count; i++ {
-		if e = m.normalizeCoefficient(v, i, &g); e != nil {
+		if e = m.normalizeCoefficientWithSourceContext(v, i, g, q, context); e != nil {
 			return e
 		}
 	}
 	return nil
 }
 func (m *UPolynomialManager) normalizeCoefficient(v UPolynomialView, i uint32, g *Int) error {
-	var old, tmp Int
+	return m.normalizeCoefficientWithSourceContext(v, i, g, nil, integerAllocationInvocationContext{})
+}
+func (m *UPolynomialManager) normalizeCoefficientWithSourceContext(v UPolynomialView, i uint32, g *Int, q *upolyFactorVectorNormalizeScope, context integerAllocationInvocationContext) (cause error) {
+	var legacyOld, legacyTmp Int
+	old, tmp := &legacyOld, &legacyTmp
 	// Source Z3DEBUG lexical temporaries are destroyed tmp then old.
 	if modularSourceDebug {
-		defer m.modular.Del(&old)
+		if q != nil {
+			if !q.valid() || !q.executing || q.constructed != 1 {
+				return ErrUPolynomialOwner
+			}
+			q.old = Int{}
+			q.constructed = 2
+			q.peak = 2
+			q.coefficientExecuting = true
+			old, tmp = &q.old, &q.tmp
+			defer func() { q.coefficientExecuting = false; cause = q.finishCoefficient(cause) }()
+		} else {
+			defer m.modular.Del(old)
+		}
 		x, e := m.read(v, i)
 		if e != nil {
 			return e
 		}
-		if e = m.modular.Copy(&old, x); e != nil {
+		if e = m.modular.copyWithSourceContext(old, x, context); e != nil {
 			return e
 		}
 	}
@@ -194,15 +246,21 @@ func (m *UPolynomialManager) normalizeCoefficient(v UPolynomialView, i uint32, g
 	if e != nil {
 		return e
 	}
-	if e = m.modular.Div(x, g, x); e != nil {
+	if e = m.modular.divWithAllocationContext(x, g, x, context); e != nil {
 		return e
 	}
 	if modularSourceDebug {
-		defer m.modular.Del(&tmp)
-		if e = m.modular.Mul(g, x, &tmp); e != nil {
+		if q != nil {
+			q.tmp = Int{}
+			q.constructed = 3
+			q.peak = 3
+		} else {
+			defer m.modular.Del(tmp)
+		}
+		if e = m.modular.mulWithSourceContext(g, x, tmp, context); e != nil {
 			return e
 		}
-		ok, e := m.modular.Equal(&tmp, &old)
+		ok, e := m.modular.Equal(tmp, old)
 		if e != nil {
 			return e
 		}

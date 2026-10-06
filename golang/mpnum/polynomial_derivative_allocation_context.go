@@ -55,6 +55,16 @@ func (m *IntegerModularManager) normalizeWithSourceContext(out *Int, context int
 		}
 		return e
 	}
+	if b := context.factorFrontendConstantFrame(m.manager); b != nil && b.service.manager.modular == m {
+		return m.pNormalizeWithFactorHistory(out, &b.normalize, context)
+	}
+	if q := context.factorFrontendFrame(m.manager); q != nil && q.service.manager.modular == m {
+		e := m.pNormalizeWithReceipt(out, &q.normalize)
+		if q.sourceCause == nil {
+			q.sourceCause = m.pNormalizeInvocationSourceCause(&q.normalize)
+		}
+		return e
+	}
 	if q := context.preparationFrame(m.manager); q != nil && q.service.manager.modular == m {
 		e := m.pNormalizeWithReceipt(out, &q.normalize)
 		if q.sourceCause == nil {

@@ -55,6 +55,7 @@ func (m *IntegerModularManager) cleanupPNormalizeInvocation(r *integerPNormalize
 // A receipt exists only for a real pending growth of the named source buffer.
 // Successful publication returns authority to the persistent Natural member.
 type naturalPNBufferReceipt struct {
+	factorFrontendContext   integerAllocationInvocationContext
 	primePreparationContext integerAllocationInvocationContext
 	henselCallerContext     integerAllocationInvocationContext
 	recombinationContext    integerAllocationInvocationContext
@@ -131,6 +132,27 @@ func (s *integerPNormalizeScope) pending() bool {
 }
 
 func (r *naturalPNBufferReceipt) bound(executing bool) bool {
+	if context := r.factorFrontendContext; context.factorFrontend != nil {
+		q := context.factorFrontend
+		if q.service == nil || q.service.manager == nil {
+			return false
+		}
+		z := q.service.manager.config.Integer
+		if context.factorFrontendHistoryFrame(z) != q || r.owner != z.natural || r.invocation != q.invocation || (executing && context.factorFrontendFrame(z) == nil) {
+			return false
+		}
+		if r.private {
+			v := &r.owner.verificationInvocation
+			return r == &v.buffer && r.buffer == &r.owner.verification && v.factorFrontendContext == context && r.owner.matchesPNVerification(&q.verification)
+		}
+		for i := range q.buffers {
+			if r == &q.buffers[i] {
+				return r.buffer == &r.owner.division[i]
+			}
+		}
+		return false
+	}
+
 	if context := r.primePreparationContext; context.primePreparation != nil {
 		q := context.primePreparation
 		if !q.matches() || r.owner != q.owner.manager.config.Integer.natural || context.primePreparationInvocation != q.invocation || r.invocation != q.invocation || (executing && context.primePreparationFrame(q.owner.manager.config.Integer) == nil) {
@@ -372,6 +394,20 @@ func (m *NaturalManager) divisionBufferReceipt(context integerAllocationInvocati
 		return nil
 	}
 
+	if q := context.factorFrontend; q != nil && context.pn == nil {
+		if q.service == nil || q.service.manager == nil {
+			return nil
+		}
+		z := q.service.manager.config.Integer
+		if z.natural != m || context.factorFrontendFrame(z) == nil {
+			return nil
+		}
+		r := &q.buffers[i]
+		if r.owner == nil {
+			*r = naturalPNBufferReceipt{owner: m, factorFrontendContext: context, invocation: q.invocation, buffer: &m.division[i]}
+		}
+		return r
+	}
 	if q := context.primePreparation; q != nil {
 		z := q.owner.manager.config.Integer
 		if z.natural != m || context.primePreparationFrame(z) == nil {

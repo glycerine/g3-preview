@@ -50,6 +50,9 @@ func (m *UPolynomialManager) NegInPlace(p UPolynomial) error {
 	return m.NegViewInPlace(v)
 }
 func (m *UPolynomialManager) NegViewInPlace(v UPolynomialView) error {
+	return m.negViewInPlaceWithSourceContext(v, integerAllocationInvocationContext{})
+}
+func (m *UPolynomialManager) negViewInPlaceWithSourceContext(v UPolynomialView, context integerAllocationInvocationContext) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -58,7 +61,7 @@ func (m *UPolynomialManager) NegViewInPlace(v UPolynomialView) error {
 		if e != nil {
 			return e
 		}
-		if e = m.modular.Neg(a); e != nil {
+		if e = m.modular.negWithSourceContext(a, context); e != nil {
 			return e
 		}
 	}
@@ -323,6 +326,11 @@ func (m *UPolynomialManager) DerivativeView(v UPolynomialView, out UPolynomial) 
 	return m.derivativeState(v, &d.state)
 }
 func (m *UPolynomialManager) derivativeState(v UPolynomialView, s *upolyVectorState) error {
+	return m.derivativeStateWithSourceContext(v, s, integerAllocationInvocationContext{})
+}
+
+// Source: src/math/polynomial/upolynomial.cpp:351-363 (plain RAW multiplier).
+func (m *UPolynomialManager) derivativeStateWithSourceContext(v UPolynomialView, s *upolyVectorState, context integerAllocationInvocationContext) (cause error) {
 	var e error
 	if v.count <= 1 {
 		return m.reset(s)
@@ -330,17 +338,48 @@ func (m *UPolynomialManager) derivativeState(v UPolynomialView, s *upolyVectorSt
 	if e = m.reserve(s, v.count-1); e != nil {
 		return e
 	}
+	var frame *upolyFactorDerivativeScope
+	if owner := context.factorFrontendFrame(m.config.Integer); owner != nil {
+		frame = &owner.derivative
+		if frame.executing || frame.d.cell != 0 || frame.retired != nil || frame.invocation == ^uint64(0) {
+			return ErrUPolynomialCleanupPending
+		}
+		*frame = upolyFactorDerivativeScope{owner: owner, invocation: frame.invocation + 1, executing: true}
+		defer func() {
+			frame.executing = false
+			frame.bodyReturned = true
+			if frame.bodyCause == nil {
+				frame.bodyCause = cause
+			}
+		}()
+	}
 	for i := uint32(1); i < v.count; i++ {
-		var multiplier Int
-		if e = m.modular.SetUint32(&multiplier, i); e != nil {
+		var local Int
+		multiplier := &local
+		if frame != nil {
+			if e = frame.retireMultiplier(); e != nil {
+				return e
+			}
+			frame.d = Int{}
+			frame.constructed = true
+			frame.phase = 1
+			multiplier = &frame.d
+		}
+		if e = m.modular.setUint32WithSourceContext(multiplier, i, context); e != nil {
 			return e
 		}
 		x, e := m.read(v, i)
 		if e != nil {
 			return e
 		}
-		if e = m.modular.Mul(x, &multiplier, &m.values(s)[i-1]); e != nil {
+		if frame != nil {
+			frame.phase = 2
+		}
+		if e = m.modular.mulWithSourceContext(x, multiplier, &m.values(s)[i-1], context); e != nil {
 			return e
+		}
+		if frame != nil {
+			frame.phase = 3
 		}
 	}
 	return m.setSize(s, v.count-1)

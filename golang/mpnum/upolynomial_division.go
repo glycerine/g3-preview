@@ -318,6 +318,11 @@ func (m *UPolynomialManager) Div(a, b, q UPolynomial) error {
 }
 
 func (m *UPolynomialManager) dividesViews(a, b UPolynomialView) (bool, error) {
+	return m.dividesViewsWithSourceContext(a, b, integerAllocationInvocationContext{})
+}
+
+// Source: src/math/polynomial/upolynomial.cpp:579-607.
+func (m *UPolynomialManager) dividesViewsWithSourceContext(a, b UPolynomialView, context integerAllocationInvocationContext) (answer bool, cause error) {
 	if b.count == 0 {
 		return false, nil
 	}
@@ -335,14 +340,26 @@ func (m *UPolynomialManager) dividesViews(a, b UPolynomialView) (bool, error) {
 	if e != nil {
 		return false, e
 	}
-	ok, e := m.modular.Divides(bn, an)
+	ok, e := m.modular.dividesWithAllocationContext(bn, an, context)
 	if e != nil || !ok {
 		return false, e
 	}
-	var ratio Int
-	defer m.modular.Del(&ratio)
+	var local Int
+	ratio := &local
+	var frame *upolyFactorDivisibilityScope
+	if owner := context.factorFrontendFrame(m.config.Integer); owner != nil {
+		frame = &owner.divisibility
+		if frame.constructed || frame.executing || frame.invocation == ^uint64(0) {
+			return false, ErrUPolynomialCleanupPending
+		}
+		*frame = upolyFactorDivisibilityScope{owner: owner, invocation: frame.invocation + 1, executing: true, constructed: true}
+		ratio = &frame.ratio
+		defer func() { frame.executing = false; cause = frame.finish(cause) }()
+	} else {
+		defer m.modular.Del(ratio)
+	}
 	r := &m.div1
-	if e = m.setView(r, a); e != nil {
+	if e = m.setViewWithSourceContext(r, a, context); e != nil {
 		return false, e
 	}
 	n := a.count
@@ -357,12 +374,12 @@ func (m *UPolynomialManager) dividesViews(a, b UPolynomialView) (bool, error) {
 		if e != nil {
 			return false, e
 		}
-		ok, e = m.modular.Divides(bn, &m.values(r)[n-1])
+		ok, e = m.modular.dividesWithAllocationContext(bn, &m.values(r)[n-1], context)
 		if e != nil || !ok {
 			return false, e
 		}
 		delta := n - b.count
-		if e = m.modular.Div(&m.values(r)[n-1], bn, &ratio); e != nil {
+		if e = m.modular.divWithAllocationContext(&m.values(r)[n-1], bn, ratio, context); e != nil {
 			return false, e
 		}
 		for i := uint32(0); i < b.count-1; i++ {
@@ -376,7 +393,11 @@ func (m *UPolynomialManager) dividesViews(a, b UPolynomialView) (bool, error) {
 			}
 			if !zero {
 				dst := &m.values(r)[i+delta]
-				if e = m.modular.SubMul(dst, &ratio, x, dst); e != nil {
+				var child *integerAddMulInvocationReceipt
+				if frame != nil {
+					child = &frame.addMul
+				}
+				if e = m.modular.subMulWithSourceContext(dst, ratio, x, dst, child, context); e != nil {
 					return false, e
 				}
 			}

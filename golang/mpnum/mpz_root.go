@@ -205,6 +205,9 @@ func (m *IntegerManager) rootCoreWithReceipt(a *Int, n uint32, receipt *integerR
 // defect: resetting a nonnegative aliased output makes the input zero, so the
 // result is true with output zero. Negative inputs leave out unchanged.
 func (m *IntegerManager) IsPerfectSquare(a, out *Int) (bool, error) {
+	return m.isPerfectSquareWithAllocationContext(a, out, integerAllocationInvocationContext{})
+}
+func (m *IntegerManager) isPerfectSquareWithAllocationContext(a, out *Int, context integerAllocationInvocationContext) (bool, error) {
 	if e := m.check(a); e != nil {
 		return false, e
 	}
@@ -214,10 +217,16 @@ func (m *IntegerManager) IsPerfectSquare(a, out *Int) (bool, error) {
 	if a.val < 0 {
 		return false, nil
 	}
-	return m.squareCore(a, out)
+	return m.squareCoreWithContext(a, out, context)
 }
 
-func (m *IntegerManager) squareCore(a, out *Int) (exact bool, cause error) {
+func (m *IntegerManager) squareCore(a, out *Int) (bool, error) {
+	return m.squareCoreWithContext(a, out, integerAllocationInvocationContext{})
+}
+func (m *IntegerManager) squareCoreWithContext(a, out *Int, context integerAllocationInvocationContext) (exact bool, cause error) {
+	if context != (integerAllocationInvocationContext{}) && context.roots(m) == nil {
+		return false, ErrPolynomialPending
+	}
 	if e := m.Reset(out); e != nil {
 		return false, e
 	}
@@ -230,28 +239,37 @@ func (m *IntegerManager) squareCore(a, out *Int) (exact bool, cause error) {
 		return false, e
 	}
 	if same {
-		return true, m.SetInt64(out, 1)
+		return true, m.setInt64WithAllocationContext(out, 1, context)
 	}
-	if e = m.beginPerfectSquareRawScope(); e != nil {
+	if e = m.beginPerfectSquareRawScopeWithContext(context); e != nil {
 		return false, e
 	}
 	s := &m.perfectSquare
+	if context != (integerAllocationInvocationContext{}) {
+		s.executing = true
+		defer func() { s.executing = false }()
+	}
+	childContext := context
+	if context != (integerAllocationInvocationContext{}) {
+		childContext.perfectSquare = &s.directReceipt
+		childContext.perfectSquareInvocation = s.generation
+	}
 	defer func() {
 		if cause != nil && !s.endEntered && s.bodyCause == nil {
 			s.bodyCause = cause
 		}
 	}()
 	lo, hi, mid, sqLo, sqHi, sqMid := &s.values[0], &s.values[1], &s.values[2], &s.values[3], &s.values[4], &s.values[5]
-	if e = m.SetInt64(lo, 1); e != nil {
+	if e = m.setInt64WithAllocationContext(lo, 1, childContext); e != nil {
 		return false, e
 	}
-	if e = m.perfectSquareCall(0, a, nil, hi); e != nil {
+	if e = m.perfectSquareCallWithContext(0, a, nil, hi, childContext); e != nil {
 		return false, e
 	}
-	if e = m.SetInt64(sqLo, 1); e != nil {
+	if e = m.setInt64WithAllocationContext(sqLo, 1, childContext); e != nil {
 		return false, e
 	}
-	if e = m.perfectSquareCall(2, hi, hi, sqHi); e != nil {
+	if e = m.perfectSquareCallWithContext(2, hi, hi, sqHi, childContext); e != nil {
 		return false, e
 	}
 	two := NewInt(2)
@@ -286,13 +304,13 @@ func (m *IntegerManager) squareCore(a, out *Int) (exact bool, cause error) {
 		if same {
 			s.outputStarted = true
 			s.outputChoice = 0
-			if e = m.Copy(out, lo); e != nil {
+			if e = m.copyFromOwnerWithAllocationContext(out, m, lo, nil, context); e != nil {
 				return false, e
 			}
 			exact = true
 			break
 		}
-		if e = m.perfectSquareCall(1, lo, &one, mid); e != nil {
+		if e = m.perfectSquareCallWithContext(1, lo, &one, mid, childContext); e != nil {
 			return false, e
 		}
 		same, e = m.Equal(mid, hi)
@@ -302,16 +320,16 @@ func (m *IntegerManager) squareCore(a, out *Int) (exact bool, cause error) {
 		if same {
 			s.outputStarted = true
 			s.outputChoice = 1
-			if e = m.Copy(out, hi); e != nil {
+			if e = m.copyFromOwnerWithAllocationContext(out, m, hi, nil, context); e != nil {
 				return false, e
 			}
 			exact = false
 			break
 		}
-		if e = m.perfectSquareCall(1, hi, lo, mid); e != nil {
+		if e = m.perfectSquareCallWithContext(1, hi, lo, mid, childContext); e != nil {
 			return false, e
 		}
-		if e = m.perfectSquareCall(3, mid, &two, mid); e != nil {
+		if e = m.perfectSquareCallWithContext(3, mid, &two, mid, childContext); e != nil {
 			return false, e
 		}
 		if modularSourceDebug {
@@ -330,7 +348,7 @@ func (m *IntegerManager) squareCore(a, out *Int) (exact bool, cause error) {
 				return false, ErrIntegerAssertion
 			}
 		}
-		if e = m.perfectSquareCall(2, mid, mid, sqMid); e != nil {
+		if e = m.perfectSquareCallWithContext(2, mid, mid, sqMid, childContext); e != nil {
 			return false, e
 		}
 		cmp, x := m.Compare(sqMid, a)
@@ -338,17 +356,17 @@ func (m *IntegerManager) squareCore(a, out *Int) (exact bool, cause error) {
 			return false, x
 		}
 		if cmp > 0 {
-			if e = m.perfectSquareCall(0, mid, nil, hi); e != nil {
+			if e = m.perfectSquareCallWithContext(0, mid, nil, hi, childContext); e != nil {
 				return false, e
 			}
-			if e = m.perfectSquareCall(0, sqMid, nil, sqHi); e != nil {
+			if e = m.perfectSquareCallWithContext(0, sqMid, nil, sqHi, childContext); e != nil {
 				return false, e
 			}
 		} else {
-			if e = m.perfectSquareCall(0, mid, nil, lo); e != nil {
+			if e = m.perfectSquareCallWithContext(0, mid, nil, lo, childContext); e != nil {
 				return false, e
 			}
-			if e = m.perfectSquareCall(0, sqMid, nil, sqLo); e != nil {
+			if e = m.perfectSquareCallWithContext(0, sqMid, nil, sqLo, childContext); e != nil {
 				return false, e
 			}
 		}

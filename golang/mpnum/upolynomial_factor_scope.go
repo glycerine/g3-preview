@@ -234,11 +234,28 @@ func (s *UPolynomialFactorizationService) CleanupRetained() error {
 	if s == nil || s.self != s || s.manager == nil {
 		return ErrUPolynomialOwner
 	}
+	if s.constantCallerExecuting() {
+		return ErrUPolynomialCleanupPending
+	}
+	if q := &s.frontend; q.active && (q.executing || q.sourceExecuting || q.ownExecuting) {
+		return ErrUPolynomialCleanupPending
+	}
 	if s.closed {
 		return arena.ErrClosed
 	}
 	if c := s.scope; c != nil && (c.executing || c.sourceExecuting || c.ownExecuting || c.callDepth != 0) {
 		return ErrUPolynomialCleanupPending
+	}
+	if q := &s.frontend; q.active {
+		if e := q.own(false); e != nil {
+			return e
+		}
+		if e := q.own(true); e != nil {
+			return e
+		}
+	}
+	if e := s.cleanupFrontendConstantCalls(); e != nil {
+		return e
 	}
 	for _, q := range []*upolyFactorPreparationScope{&s.diagnostic, &s.preparation} {
 		if q.active {

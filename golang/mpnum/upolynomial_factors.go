@@ -51,6 +51,9 @@ func (m *UPolynomialManager) NewFactors() (*UPolynomialFactors, error) {
 	return fs, nil
 }
 func (fs *UPolynomialFactors) checkCleanup() error {
+	if fs.factorFrontendExecuting() {
+		return ErrUPolynomialCleanupPending
+	}
 	if fs == nil || fs.self != fs || fs.manager == nil {
 		return ErrUPolynomialOwner
 	}

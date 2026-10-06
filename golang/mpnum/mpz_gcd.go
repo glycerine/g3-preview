@@ -188,6 +188,7 @@ func (m *IntegerManager) gcdWithAllocationContext(a, b, c *Int, context integerA
 	}
 	context.recordRecombinationRaw(m, receipt)
 	context.recordPrimePreparationRaw(m, receipt)
+	context.recordFactorFrontendRaw(m, receipt)
 	context.recordPreparationRaw(m, receipt)
 	context.recordContentRaw(m, receipt)
 	context.recordNormalizationRaw(m, receipt)

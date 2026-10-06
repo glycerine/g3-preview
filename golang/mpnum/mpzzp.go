@@ -437,6 +437,9 @@ func (m *IntegerModularManager) GCDMany(as []Int, g *Int) error {
 	return m.assertNormalized(g)
 }
 func (m *IntegerModularManager) ExtendedGCD(r1, r2, a, b, g *Int) error {
+	return m.extendedGCDWithSourceContext(r1, r2, a, b, g, integerAllocationInvocationContext{})
+}
+func (m *IntegerModularManager) extendedGCDWithSourceContext(r1, r2, a, b, g *Int, context integerAllocationInvocationContext) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -446,36 +449,62 @@ func (m *IntegerModularManager) ExtendedGCD(r1, r2, a, b, g *Int) error {
 	if e := m.assertNormalized(r2); e != nil {
 		return e
 	}
-	if e := m.manager.ExtendedGCD(r1, r2, a, b, g); e != nil {
+	if e := m.manager.extendedGCDWithAllocationContext(r1, r2, a, b, g, context); e != nil {
 		return e
 	}
-	if e := m.PNormalize(a); e != nil {
+	if e := m.normalizeWithSourceContext(a, context); e != nil {
 		return e
 	}
-	return m.PNormalize(b)
+	return m.normalizeWithSourceContext(b, context)
 }
 func (m *IntegerModularManager) Power(a *Int, k uint32, b *Int) error {
+	return m.powerWithSourceContext(a, k, b, integerAllocationInvocationContext{})
+}
+
+// Source: src/util/mpzzp.h:242-254. The local power is RAW, with end-only DEL.
+func (m *IntegerModularManager) powerWithSourceContext(a *Int, k uint32, b *Int, context integerAllocationInvocationContext) (cause error) {
 	if e := m.check(); e != nil {
 		return e
 	}
 	if e := m.assertNormalized(a); e != nil {
 		return e
 	}
-	var power Int
-	defer m.manager.Del(&power)
-	if e := m.Copy(&power, a); e != nil {
+	var legacy Int
+	power := &legacy
+	var child *upolyFactorModularPowerScope
+	if context != (integerAllocationInvocationContext{}) {
+		o := context.factorFrontendFrame(m.manager)
+		if o == nil || o.service.manager.modular != m || !o.executing {
+			return ErrUPolynomialOwner
+		}
+		child = &o.modularPower
+		if child.active || child.invocation == ^uint64(0) {
+			return ErrUPolynomialCleanupPending
+		}
+		*child = upolyFactorModularPowerScope{owner: o, invocation: child.invocation + 1, active: true, executing: true}
+		power = &child.power
+		defer func() {
+			child.executing = false
+			if cause != nil && !child.endEntered && child.bodyCause == nil {
+				child.bodyCause = cause
+			}
+		}()
+	} else {
+		defer m.manager.Del(power)
+	}
+	if e := m.copyWithSourceContext(power, a, context); e != nil {
 		return e
 	}
-	if e := m.SetInt32(b, 1); e != nil {
+	if e := m.setInt64WithSourceContext(b, 1, context); e != nil {
 		return e
 	}
 	for mask := uint32(1); mask <= k; {
 		if mask&k != 0 {
-			if e := m.Mul(b, &power, b); e != nil {
+			if e := m.mulWithSourceContext(b, power, b, context); e != nil {
 				return e
 			}
 		}
-		if e := m.Mul(&power, &power, &power); e != nil {
+		if e := m.mulWithSourceContext(power, power, power, context); e != nil {
 			return e
 		}
 		mask <<= 1
@@ -483,16 +512,29 @@ func (m *IntegerModularManager) Power(a *Int, k uint32, b *Int) error {
 			return &PowerDomainError{Exponent: k, Reason: PowerMaskOverflow}
 		}
 	}
+	if child != nil {
+		child.endEntered = true
+		return child.finishEnd()
+	}
 	return nil
 }
 func (m *IntegerModularManager) IsPerfectSquare(a, out *Int) (bool, error) {
+	return m.isPerfectSquareWithSourceContext(a, out, integerAllocationInvocationContext{})
+}
+func (m *IntegerModularManager) isPerfectSquareWithSourceContext(a, out *Int, context integerAllocationInvocationContext) (bool, error) {
 	if e := m.check(); e != nil {
 		return false, e
+	}
+	if context.factorFrontend != nil {
+		q := context.factorFrontendFrame(m.manager)
+		if q == nil || q.service.manager.modular != m {
+			return false, ErrModularOwner
+		}
 	}
 	if !m.z {
 		return false, ErrModularUnsupported
 	}
-	return m.manager.IsPerfectSquare(a, out)
+	return m.manager.isPerfectSquareWithAllocationContext(a, out, context)
 }
 func (m *IntegerModularManager) Root(a *Int, n uint32, out *Int) (bool, error) {
 	if e := m.check(); e != nil {

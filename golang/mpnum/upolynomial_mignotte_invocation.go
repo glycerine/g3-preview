@@ -293,5 +293,13 @@ func (m *UPolynomialManager) mignotteCallPending() bool {
 			return true
 		}
 	}
+	if s := m.factorFrontendConstantCaller; s != nil && s.manager == m && s.constantCallerExecuting() {
+		return true
+	}
+	for q := m.factorFrontendCaller; q != nil; q = q.previous {
+		if q.self == q && q.service != nil && q.service.self == q.service && q.service.manager == m && (q.executing || q.sourceExecuting || q.ownExecuting) {
+			return true
+		}
+	}
 	return false
 }

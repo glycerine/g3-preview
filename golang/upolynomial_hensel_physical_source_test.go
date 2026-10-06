@@ -203,6 +203,20 @@ func upolyHenselAuditPhysical(t *testing.T, cores []*mpnum.UPolynomialManager, f
 	upolyPhysicalExtraNumerals(extras, addInt)
 	for _, extra := range extras {
 		for _, service := range extra.Services {
+			front := reflect.ValueOf(service).Elem().FieldByName("frontend")
+			addInt(front.FieldByName("content"))
+			for _, x := range []struct{ scope, value string }{{"vectorNormalize", "g"}, {"vectorNormalize", "old"}, {"vectorNormalize", "tmp"}, {"modularPower", "power"}, {"flip", "c"}, {"image", "old"}, {"image", "c"}, {"remainder", "am"}, {"monic", "lc"}, {"monic", "inv"}, {"derivative", "d"}, {"divisibility", "ratio"}, {"primitive", "cont"}} {
+				addInt(front.FieldByName(x.scope).FieldByName(x.value))
+			}
+			for _, name := range []string{"quadratic", "modularGCD", "cra"} {
+				values := front.FieldByName(name).FieldByName("values")
+				for i := 0; i < values.Len(); i++ {
+					addInt(values.Index(i))
+				}
+			}
+			for r := front.FieldByName("derivative").FieldByName("retired"); !r.IsNil(); r = r.Elem().FieldByName("next") {
+				addInt(r.Elem().FieldByName("value"))
+			}
 			for pair := reflect.ValueOf(service).Elem().FieldByName("henselPairs"); !pair.IsNil(); pair = pair.Elem().FieldByName("next") {
 				h := pair.Elem()
 				if h.FieldByName("amConstructed").Bool() {

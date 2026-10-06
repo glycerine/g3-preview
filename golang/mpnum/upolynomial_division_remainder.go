@@ -1,9 +1,13 @@
-// Licensed under the MIT license.
+// Source: src/math/polynomial/upolynomial.cpp:516-567.
+// Licensed under the MIT license. Source author: Leonardo de Moura.
 package mpnum
 
 import "github.com/glycerine/g3/golang/arena"
 
 func (m *UPolynomialManager) remState(a, b UPolynomialView, d *uint32, r *upolyVectorState) error {
+	return m.remStateWithSourceContext(a, b, d, r, integerAllocationInvocationContext{})
+}
+func (m *UPolynomialManager) remStateWithSourceContext(a, b UPolynomialView, d *uint32, r *upolyVectorState, context integerAllocationInvocationContext) (cause error) {
 	if d == nil {
 		return arena.ErrBounds
 	}
@@ -17,7 +21,7 @@ func (m *UPolynomialManager) remState(a, b UPolynomialView, d *uint32, r *upolyV
 	if b.count == 1 {
 		return m.reset(r)
 	}
-	if e := m.setView(r, a); e != nil {
+	if e := m.setViewWithSourceContext(r, a, context); e != nil {
 		return e
 	}
 	if a.count <= 1 {
@@ -36,8 +40,20 @@ func (m *UPolynomialManager) remState(a, b UPolynomialView, d *uint32, r *upolyV
 			return ErrUPolynomialAssertion
 		}
 	}
-	var am Int
-	defer m.modular.Del(&am)
+	var local Int
+	am := &local
+	var frame *upolyFactorRemainderScope
+	if owner := context.factorFrontendFrame(m.config.Integer); owner != nil {
+		frame = &owner.remainder
+		if frame.constructed || frame.executing || frame.invocation == ^uint64(0) {
+			return ErrUPolynomialCleanupPending
+		}
+		*frame = upolyFactorRemainderScope{owner: owner, invocation: frame.invocation + 1, constructed: true, executing: true}
+		am = &frame.am
+		defer func() { frame.executing = false; cause = frame.finish(cause) }()
+	} else {
+		defer m.modular.Del(am)
+	}
 	for {
 		if e = m.checkpoint(); e != nil {
 			return e
@@ -56,12 +72,12 @@ func (m *UPolynomialManager) remState(a, b UPolynomialView, d *uint32, r *upolyV
 			return e
 		}
 		if field {
-			if e = m.modular.Div(&m.values(r)[n-1], bn, &am); e != nil {
+			if e = m.modular.divWithAllocationContext(&m.values(r)[n-1], bn, am, context); e != nil {
 				return e
 			}
 		} else {
 			*d++
-			if e = m.modular.Copy(&am, &m.values(r)[n-1]); e != nil {
+			if e = m.modular.copyWithSourceContext(am, &m.values(r)[n-1], context); e != nil {
 				return e
 			}
 			for i := uint32(0); i < n-1; i++ {
@@ -69,7 +85,7 @@ func (m *UPolynomialManager) remState(a, b UPolynomialView, d *uint32, r *upolyV
 				if e != nil {
 					return e
 				}
-				if e = m.modular.Mul(&m.values(r)[i], bn, &m.values(r)[i]); e != nil {
+				if e = m.modular.mulWithSourceContext(&m.values(r)[i], bn, &m.values(r)[i], context); e != nil {
 					return e
 				}
 			}
@@ -80,7 +96,11 @@ func (m *UPolynomialManager) remState(a, b UPolynomialView, d *uint32, r *upolyV
 				return e
 			}
 			dst := &m.values(r)[i+delta]
-			if e = m.modular.SubMul(dst, &am, x, dst); e != nil {
+			var child *integerAddMulInvocationReceipt
+			if frame != nil {
+				child = &frame.addMul
+			}
+			if e = m.modular.subMulWithSourceContext(dst, am, x, dst, child, context); e != nil {
 				return e
 			}
 		}

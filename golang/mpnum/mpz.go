@@ -56,6 +56,8 @@ type IntegerManager struct {
 	factorCoreCaller                       *polynomialFactorCoreFrame
 	factorUnivariateCaller                 *MultivariatePolynomialManager
 	factorNumeralVectorCaller              *MultivariatePolynomialManager
+	factorFrontendCaller                   *upolyFactorFrontendScope
+	factorFrontendConstantCaller           *UPolynomialFactorizationService
 	self                                   *IntegerManager
 	memory                                 *memory.Runtime
 	allocator                              *memory.SmallAllocator
@@ -338,6 +340,9 @@ func (m *IntegerManager) allocateWithSourceContext(capacity, size uint32, s *int
 	if m.pendingCell.object != (memory.ObjectRef{}) {
 		return 0, memory.ErrAllocatorPending
 	}
+	if e := context.prepareFactorFrontendConstantHistory(m); e != nil {
+		return 0, e
+	}
 	var outcome memory.SmallAllocatorAllocationOutcome
 	var out *memory.SmallAllocatorAllocationOutcome
 	var roots *polynomialNumericRoots
@@ -411,7 +416,7 @@ func (m *IntegerManager) CloseChecked() error {
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
 	}
-	if m.rawInvocationExecuting() || m.copyAllocation.executing || m.normalizationExecuting || m.factorNumeralExecuting || m.factorNumeralVectorCallerExecuting() || m.factorUnivariateCallerExecuting() || m.factorCoreCallerExecuting() {
+	if m.rawInvocationExecuting() || m.copyAllocation.executing || m.normalizationExecuting || m.factorNumeralExecuting || m.factorNumeralVectorCallerExecuting() || m.factorUnivariateCallerExecuting() || m.factorCoreCallerExecuting() || m.factorFrontendCallerExecuting() {
 		return ErrPolynomialPending
 	}
 	if m.closed {
@@ -906,6 +911,13 @@ func (m *IntegerManager) ensureTmpWithPNReceipt(idx int, size uint32, pn *intege
 }
 func (m *IntegerManager) ensureTmpWithAllocationContext(idx int, size uint32, context integerAllocationInvocationContext) error {
 	if idx < 0 || idx >= len(m.tmp) || m.tmp[idx] == 0 {
+		return arena.ErrInvalidSlot
+	}
+	// Source: src/util/mpz.h:156-162. A returning release guard can follow
+	// physical consumption before replacement publication. The retained token
+	// still owns its descriptor for disposal, but cannot name readable scratch.
+	// Refuse the failed lifetime before the capacity shortcut, without repair.
+	if !validNumericRef(m.cells, m.tmp[idx]) || m.cell(m.tmp[idx]).released {
 		return arena.ErrInvalidSlot
 	}
 	if m.cell(m.tmp[idx]).capacity >= size {

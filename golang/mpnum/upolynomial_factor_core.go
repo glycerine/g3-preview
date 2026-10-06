@@ -12,17 +12,26 @@ func (s *UPolynomialFactorizationService) Factor(f UPolynomialView, out *UPolyno
 	}
 	return s.factorCore(f, out, params)
 }
-func (s *UPolynomialFactorizationService) flipFactorConstant(fs *UPolynomialFactors) error {
-	z := s.manager.config.Integer
-	var c Int
-	defer z.Del(&c)
-	if e := z.Copy(&c, &fs.constant); e != nil {
+func (s *UPolynomialFactorizationService) flipFactorConstant(fs *UPolynomialFactors) (cause error) {
+	m := s.manager
+	o := m.factorFrontendCaller
+	if o == nil || !o.actual() || !o.executing || o.result != fs {
+		return ErrUPolynomialOwner
+	}
+	q := &o.flip
+	if q.constructed || q.executing || q.invocation == ^uint64(0) {
+		return ErrUPolynomialCleanupPending
+	}
+	*q = upolyFactorFlipScope{owner: o, invocation: q.invocation + 1, constructed: true, executing: true}
+	defer func() { q.executing = false; cause = q.finish(cause) }()
+	context := m.modular.factorFrontendAllocationContext(o)
+	if e := m.modular.copyWithSourceContext(&q.c, &fs.constant, context); e != nil {
 		return e
 	}
-	if e := z.Neg(&c); e != nil {
+	if e := m.modular.negWithSourceContext(&q.c, context); e != nil {
 		return e
 	}
-	return fs.SetConstant(&c)
+	return fs.setConstantWithSourceContext(&q.c, context)
 }
 func (s *UPolynomialFactorizationService) flipLeadingIfNegative(p *upolyVectorState, fs *UPolynomialFactors, k uint32) error {
 	m := s.manager
@@ -37,7 +46,7 @@ func (s *UPolynomialFactorizationService) flipLeadingIfNegative(p *upolyVectorSt
 	if e != nil || !negative {
 		return e
 	}
-	if e = m.flipSign(p); e != nil {
+	if e = m.negViewInPlaceWithSourceContext(m.stateView(p), m.modular.factorFrontendAllocationContext(m.factorFrontendCaller)); e != nil {
 		return e
 	}
 	if k%2 == 1 {
@@ -45,7 +54,7 @@ func (s *UPolynomialFactorizationService) flipLeadingIfNegative(p *upolyVectorSt
 	}
 	return nil
 }
-func (s *UPolynomialFactorizationService) factorQuadratic(p *upolyVectorState, fs *UPolynomialFactors, k uint32) error {
+func (s *UPolynomialFactorizationService) factorQuadratic(p *upolyVectorState, fs *UPolynomialFactors, k uint32) (cause error) {
 	m := s.manager
 	if modularSourceDebug && p.size != 3 {
 		return ErrUPolynomialAssertion
@@ -62,22 +71,30 @@ func (s *UPolynomialFactorizationService) factorQuadratic(p *upolyVectorState, f
 	if e != nil {
 		return e
 	}
-	var b2, ac, disc, root Int
-	defer m.modular.Del(&b2)
-	defer m.modular.Del(&ac)
-	defer m.modular.Del(&disc)
-	if e = m.modular.Power(b, 2, &b2); e != nil {
+	o := m.factorFrontendCaller
+	if o == nil || !o.actual() || !o.executing || o.result != fs {
+		return ErrUPolynomialOwner
+	}
+	q := &o.quadratic
+	if q.constructed != 0 || q.executing || q.invocation == ^uint64(0) {
+		return ErrUPolynomialCleanupPending
+	}
+	*q = upolyFactorQuadraticScope{owner: o, invocation: q.invocation + 1, constructed: 3, peak: 3, executing: true}
+	defer func() { q.executing = false; cause = q.finish(cause) }()
+	b2, ac, disc, root := &q.values[0], &q.values[1], &q.values[2], &q.values[3]
+	context := m.modular.factorFrontendAllocationContext(o)
+	if e = m.modular.powerWithSourceContext(b, 2, b2, context); e != nil {
 		return e
 	}
-	if e = m.modular.Mul(a, c, &ac); e != nil {
+	if e = m.modular.mulWithSourceContext(a, c, ac, context); e != nil {
 		return e
 	}
 	minus4 := NewInt(-4)
-	if e = m.modular.AddMul(&b2, &minus4, &ac, &disc); e != nil {
+	if e = m.modular.addMulWithSourceContext(b2, &minus4, ac, disc, &o.addMul, context); e != nil {
 		return e
 	}
 	if modularSourceDebug {
-		zero, e := m.modular.IsZero(&disc)
+		zero, e := m.modular.IsZero(disc)
 		if e != nil {
 			return e
 		}
@@ -85,66 +102,68 @@ func (s *UPolynomialFactorizationService) factorQuadratic(p *upolyVectorState, f
 			return ErrUPolynomialAssertion
 		}
 	}
-	defer m.modular.Del(&root)
-	square, e := m.modular.IsPerfectSquare(&disc, &root)
+	q.constructed = 4
+	q.peak = 4
+	square, e := m.modular.isPerfectSquareWithSourceContext(disc, root, context)
 	if e != nil {
 		return e
 	}
 	if !square {
-		return fs.PushCopy(m.stateView(p), k)
+		return fs.pushCopyWithSourceContext(m.stateView(p), k, m.modular.factorFrontendAllocationContext(m.factorFrontendCaller))
 	}
-	var f1, f2 upolyVectorState
-	defer m.dropLocalVector(&f1)
-	defer m.dropLocalVector(&f2)
-	if e = m.reserve(&f1, 2); e != nil {
+	f1, f2 := &q.f1, &q.f2
+	q.constructed = 6
+	q.peak = 6
+	if e = m.reserve(f1, 2); e != nil {
 		return e
 	}
-	if e = m.reserve(&f2, 2); e != nil {
+	if e = m.reserve(f2, 2); e != nil {
 		return e
 	}
-	if e = m.modular.Sub(b, &root, &m.values(&f1)[0]); e != nil {
+	if e = m.modular.subWithSourceContext(b, root, &m.values(f1)[0], context); e != nil {
 		return e
 	}
-	if e = m.modular.Add(b, &root, &m.values(&f2)[0]); e != nil {
+	if e = m.modular.addWithSourceContext(b, root, &m.values(f2)[0], context); e != nil {
 		return e
 	}
 	two := NewInt(2)
-	if e = m.modular.Mul(a, &two, &m.values(&f1)[1]); e != nil {
+	if e = m.modular.mulWithSourceContext(a, &two, &m.values(f1)[1], context); e != nil {
 		return e
 	}
-	if e = m.modular.Mul(a, &two, &m.values(&f2)[1]); e != nil {
+	if e = m.modular.mulWithSourceContext(a, &two, &m.values(f2)[1], context); e != nil {
 		return e
 	}
-	if e = m.setSize(&f1, 2); e != nil {
+	if e = m.setSize(f1, 2); e != nil {
 		return e
 	}
-	if e = m.setSize(&f2, 2); e != nil {
+	if e = m.setSize(f2, 2); e != nil {
 		return e
 	}
-	if e = m.normalize(m.stateView(&f1)); e != nil {
+	if e = m.normalizeWithSourceContext(m.stateView(f1), context); e != nil {
 		return e
 	}
-	if e = m.normalize(m.stateView(&f2)); e != nil {
+	if e = m.normalizeWithSourceContext(m.stateView(f2), context); e != nil {
 		return e
 	}
 	if modularSourceDebug {
-		if e = s.quadraticDiagnostic(p, &f1, &f2); e != nil {
+		if e = s.quadraticDiagnosticWithFrontend(p, f1, f2, q, context); e != nil {
 			return e
 		}
 	}
-	if e = fs.PushCopy(m.stateView(&f1), k); e != nil {
+	if e = fs.pushCopyWithSourceContext(m.stateView(f1), k, context); e != nil {
 		return e
 	}
-	return fs.PushCopy(m.stateView(&f2), k)
+	return fs.pushCopyWithSourceContext(m.stateView(f2), k, context)
 }
-func (s *UPolynomialFactorizationService) quadraticDiagnostic(p, f1, f2 *upolyVectorState) error {
+func (s *UPolynomialFactorizationService) quadraticDiagnosticWithFrontend(p, f1, f2 *upolyVectorState, q *upolyFactorQuadraticScope, context integerAllocationInvocationContext) (cause error) {
 	m := s.manager
-	var product upolyVectorState
-	defer m.dropLocalVector(&product)
-	if e := m.mul(m.stateView(f1), m.stateView(f2), &product); e != nil {
+	q.constructed = 7
+	q.peak = 7
+	defer func() { cause = q.finishProduct(cause) }()
+	if e := m.mulWithSourceContext(m.stateView(f1), m.stateView(f2), &q.product, &q.owner.addMul, context); e != nil {
 		return e
 	}
-	same, e := m.EqualViews(m.stateView(&product), m.stateView(p))
+	same, e := m.EqualViews(m.stateView(&q.product), m.stateView(p))
 	if e != nil {
 		return e
 	}
@@ -154,6 +173,9 @@ func (s *UPolynomialFactorizationService) quadraticDiagnostic(p, f1, f2 *upolyVe
 	return nil
 }
 func (s *UPolynomialFactorizationService) factorSqfPrimitive(p *upolyVectorState, fs *UPolynomialFactors, k uint32, params UPolynomialFactorParams) (bool, error) {
+	return s.factorSqfPrimitiveWithReceipt(p, fs, k, params, nil)
+}
+func (s *UPolynomialFactorizationService) factorSqfPrimitiveWithReceipt(p *upolyVectorState, fs *UPolynomialFactors, k uint32, params UPolynomialFactorParams, r *upolyFactorSquareFreeInvocationReceipt) (bool, error) {
 	m := s.manager
 	if modularSourceDebug && p.size != 0 {
 		top, e := m.read(m.stateView(p), p.size-1)
@@ -169,15 +191,18 @@ func (s *UPolynomialFactorizationService) factorSqfPrimitive(p *upolyVectorState
 		}
 	}
 	if p.size <= 2 {
-		return true, fs.PushCopy(m.stateView(p), k)
+		return true, fs.pushCopyWithSourceContext(m.stateView(p), k, m.modular.factorFrontendAllocationContext(m.factorFrontendCaller))
 	}
 	if p.size == 3 {
 		return true, s.factorQuadratic(p, fs, k)
 	}
-	return s.factorSquareFree(m.stateView(p), fs, k, params)
+	return s.factorSquareFreeWithReceipt(m.stateView(p), fs, k, params, r)
 }
 func (s *UPolynomialFactorizationService) exactDivVerify(a, b UPolynomialView, out *upolyVectorState) error {
-	yes, e := s.manager.exactDivState(a, b, out)
+	return s.exactDivVerifyWithSourceContext(a, b, out, nil, integerAllocationInvocationContext{})
+}
+func (s *UPolynomialFactorizationService) exactDivVerifyWithSourceContext(a, b UPolynomialView, out *upolyVectorState, child *integerAddMulInvocationReceipt, context integerAllocationInvocationContext) error {
+	yes, e := s.manager.exactDivStateWithSourceContext(a, b, out, child, context)
 	if e != nil {
 		return e
 	}
@@ -186,37 +211,40 @@ func (s *UPolynomialFactorizationService) exactDivVerify(a, b UPolynomialView, o
 	}
 	return nil
 }
-func (s *UPolynomialFactorizationService) factorCore(f UPolynomialView, fs *UPolynomialFactors, params UPolynomialFactorParams) (bool, error) {
+func (s *UPolynomialFactorizationService) factorCore(f UPolynomialView, fs *UPolynomialFactors, params UPolynomialFactorParams) (completed bool, failure error) {
 	m := s.manager
 	if f.count == 0 {
 		zero := NewInt(0)
-		return true, fs.SetConstant(&zero)
+		return true, s.setFrontendConstant(fs, &zero)
 	}
 	if f.count == 1 {
 		a, e := m.read(f, 0)
 		if e != nil {
 			return false, e
 		}
-		return true, fs.SetConstant(a)
+		return true, s.setFrontendConstant(fs, a)
 	}
-	var content Int
-	defer m.modular.Del(&content)
-	var pp, prime, A, B, D upolyVectorState
-	defer m.dropLocalVector(&pp)
-	if e := m.primitiveState(f, &pp, &content); e != nil {
+	q, e := s.beginFactorFrontend()
+	if e != nil {
 		return false, e
 	}
-	if e := fs.SetConstant(&content); e != nil {
+	q.result = fs
+	defer func() { q.bodyReturned(); failure = q.finish(failure) }()
+	content := &q.content
+	pp, prime, A, B, D := &q.pp, &q.prime, &q.A, &q.B, &q.D
+	q.constructed = 2
+	if e := m.primitiveStateWithSourceContext(f, pp, content, m.modular.factorFrontendAllocationContext(q)); e != nil {
 		return false, e
 	}
-	defer m.dropLocalVector(&prime)
-	if e := m.derivativeState(m.stateView(&pp), &prime); e != nil {
+	if e := fs.setConstantWithSourceContext(content, m.modular.factorFrontendAllocationContext(q)); e != nil {
 		return false, e
 	}
-	defer m.dropLocalVector(&A)
-	defer m.dropLocalVector(&B)
-	defer m.dropLocalVector(&D)
-	if e := m.gcd(m.stateView(&pp), m.stateView(&prime), &B); e != nil {
+	q.constructed = 3
+	if e := m.derivativeStateWithSourceContext(m.stateView(pp), prime, m.modular.factorFrontendAllocationContext(q)); e != nil {
+		return false, e
+	}
+	q.constructed = 6
+	if e := m.gcdWithSourceContext(m.stateView(pp), m.stateView(prime), B, m.modular.factorFrontendAllocationContext(q)); e != nil {
 		return false, e
 	}
 	result := true
@@ -224,10 +252,10 @@ func (s *UPolynomialFactorizationService) factorCore(f UPolynomialView, fs *UPol
 		if modularSourceDebug && pp.size <= 1 {
 			return false, ErrUPolynomialAssertion
 		}
-		if e := s.flipLeadingIfNegative(&pp, fs, 1); e != nil {
+		if e := s.flipLeadingIfNegative(pp, fs, 1); e != nil {
 			return false, e
 		}
-		yes, e := s.factorSqfPrimitive(&pp, fs, 1, params)
+		yes, e := s.factorSqfPrimitiveWithReceipt(pp, fs, 1, params, &q.squareFree)
 		if e != nil {
 			return false, e
 		}
@@ -235,24 +263,24 @@ func (s *UPolynomialFactorizationService) factorCore(f UPolynomialView, fs *UPol
 			result = false
 		}
 	} else {
-		if e := s.exactDivVerify(m.stateView(&pp), m.stateView(&B), &A); e != nil {
+		if e := s.exactDivVerifyWithSourceContext(m.stateView(pp), m.stateView(B), A, &q.addMul, m.modular.factorFrontendAllocationContext(q)); e != nil {
 			return false, e
 		}
 		for j := uint32(1); A.size > 1; j++ {
 			if e := m.checkpoint(); e != nil {
 				return false, e
 			}
-			if e := m.gcd(m.stateView(&A), m.stateView(&B), &D); e != nil {
+			if e := m.gcdWithSourceContext(m.stateView(A), m.stateView(B), D, m.modular.factorFrontendAllocationContext(q)); e != nil {
 				return false, e
 			}
-			if e := s.exactDivVerify(m.stateView(&A), m.stateView(&D), &pp); e != nil {
+			if e := s.exactDivVerifyWithSourceContext(m.stateView(A), m.stateView(D), pp, &q.addMul, m.modular.factorFrontendAllocationContext(q)); e != nil {
 				return false, e
 			}
 			if pp.size > 1 {
-				if e := s.flipLeadingIfNegative(&pp, fs, j); e != nil {
+				if e := s.flipLeadingIfNegative(pp, fs, j); e != nil {
 					return false, e
 				}
-				yes, e := s.factorSqfPrimitive(&pp, fs, j, params)
+				yes, e := s.factorSqfPrimitiveWithReceipt(pp, fs, j, params, &q.squareFree)
 				if e != nil {
 					return false, e
 				}
@@ -263,7 +291,7 @@ func (s *UPolynomialFactorizationService) factorCore(f UPolynomialView, fs *UPol
 				if modularSourceDebug && pp.size != 1 {
 					return false, ErrUPolynomialAssertion
 				}
-				a, e := m.read(m.stateView(&pp), 0)
+				a, e := m.read(m.stateView(pp), 0)
 				if e != nil {
 					return false, e
 				}
@@ -292,16 +320,16 @@ func (s *UPolynomialFactorizationService) factorCore(f UPolynomialView, fs *UPol
 					}
 				}
 			}
-			if e := s.exactDivVerify(m.stateView(&B), m.stateView(&D), &B); e != nil {
+			if e := s.exactDivVerifyWithSourceContext(m.stateView(B), m.stateView(D), B, &q.addMul, m.modular.factorFrontendAllocationContext(q)); e != nil {
 				return false, e
 			}
-			A, D = D, A
+			*A, *D = *D, *A
 		}
 		if modularSourceDebug {
 			if A.size != 1 {
 				return false, ErrUPolynomialAssertion
 			}
-			one, e := m.modular.IsOne(&m.values(&A)[0])
+			one, e := m.modular.IsOne(&m.values(A)[0])
 			if e != nil {
 				return false, e
 			}

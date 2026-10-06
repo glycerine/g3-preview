@@ -20,6 +20,11 @@ type UPolynomialFactorizationConfig struct {
 	FactorizationDebugTag bool
 }
 type UPolynomialFactorizationService struct {
+	frontend                    upolyFactorFrontendScope
+	frontendHistory             *upolyFactorFrontendHistory
+	frontendConstant            upolyFactorConstantBinding
+	frontendConstantCalls       *upolyFactorConstantCall
+	frontendConstantOwn         *upolyFactorConstantCall
 	squareFreeHistory           *upolyFactorSquareFreeScope
 	squareFreeDiagnosticHistory *upolySquareFreeDiagnosticHistory
 	squareFreeInvocation        uint64
@@ -107,6 +112,16 @@ func (s *UPolynomialFactorizationService) Close() error {
 		h.header = 0
 	}
 	s.squareFreeDiagnosticHistory = nil
+	for h := s.frontendHistory; h != nil; h = h.next {
+		s.manager.config.Integer.budget.Release(h.header)
+		h.header = 0
+	}
+	s.frontendHistory = nil
+	for q := s.frontendConstantCalls; q != nil; q = q.next {
+		s.manager.config.Integer.budget.Release(q.header)
+		q.header = 0
+	}
+	s.frontendConstantCalls = nil
 	s.manager.config.Integer.budget.Release(s.header)
 	s.closed = true
 	return nil
@@ -116,6 +131,18 @@ func (s *UPolynomialFactorizationService) Stats() UPolynomialFactorizationStats 
 		return UPolynomialFactorizationStats{}
 	}
 	r := UPolynomialFactorizationStats{OwnerBytes: s.header}
+	for q := s.frontendConstantCalls; q != nil; q = q.next {
+		r.CachedOwnerBytes += q.header
+		r.CachedScopes++
+	}
+	for t := s.frontend.derivative.retired; t != nil; t = t.next {
+		r.CachedOwnerBytes += t.header
+		r.CachedScopes++
+	}
+	for h := s.frontendHistory; h != nil; h = h.next {
+		r.CachedOwnerBytes += h.header
+		r.CachedScopes++
+	}
 	for c := s.squareFreeHistory; c != nil; c = c.historyNext {
 		r.CachedOwnerBytes += c.header
 		r.CachedScopes++
