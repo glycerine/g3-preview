@@ -37924,7 +37924,11 @@
         "mpnum/upolynomial_eval_rational_callback_source_test.go",
         "mpnum/upolynomial_eval_rational_invocation.go",
         "mpnum/upolynomial_eval_rational_prefix_source_test.go",
-        "mpnum/upolynomial_eval_rational_source_test.go"
+        "mpnum/upolynomial_eval_rational_source_test.go",
+        "mpnum/upolynomial_eval_integer_callback_source_test.go",
+        "mpnum/upolynomial_eval_integer_invocation.go",
+        "mpnum/upolynomial_eval_integer_prefix_source_test.go",
+        "mpnum/upolynomial_eval_integer_source_test.go"
       ],
       "tests": [
         "TestUPolynomialScalarExtentAndLayout",
@@ -38092,7 +38096,11 @@
         "TestUPolynomialEvalSignRationalPublicBodyAndNumeralDT",
         "TestUPolynomialEvalSignRationalEveryActualReservationPrefix",
         "TestUPolynomialEvalSignRationalLiteralHornerBranches",
-        "TestUPolynomialEvalSignRationalActualCallbackOwnerAndTupleRefusal"
+        "TestUPolynomialEvalSignRationalActualCallbackOwnerAndTupleRefusal",
+        "TestUPolynomialEvalSignIntPublicBodyAndNumeralDT",
+        "TestUPolynomialEvalSignIntEveryActualReservationPrefix",
+        "TestUPolynomialEvalSignIntLiteralHornerBranches",
+        "TestUPolynomialEvalSignIntActualCallbackOwnerAndTupleRefusal"
       ],
       "conditionals": [
         {
@@ -39177,6 +39185,17 @@
             "TestUPolynomialEvalSignRationalEveryActualReservationPrefix",
             "TestUPolynomialEvalSignRationalLiteralHornerBranches",
             "TestUPolynomialEvalSignRationalActualCallbackOwnerAndTupleRefusal"
+          ]
+        },
+        {
+          "name": "upolynomial.cpp:1801-1820 public integer eval_sign_at direct single-r lexical source/own lifetime",
+          "status": "partial",
+          "go_target": "mpnum/upolynomial_eval.go",
+          "tests": [
+            "TestUPolynomialEvalSignIntPublicBodyAndNumeralDT",
+            "TestUPolynomialEvalSignIntEveryActualReservationPrefix",
+            "TestUPolynomialEvalSignIntLiteralHornerBranches",
+            "TestUPolynomialEvalSignIntActualCallbackOwnerAndTupleRefusal"
           ]
         }
       ],

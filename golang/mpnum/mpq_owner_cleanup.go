@@ -26,7 +26,7 @@ func (m *RationalManager) CloseChecked() error {
 	if m == nil || m.self != m {
 		return memory.ErrRuntimeOwner
 	}
-	if m.z != nil && (m.z.rationalEvaluationCallerExecuting() || m.z.binaryEvaluationCallerExecuting() || m.z.algebraicNegCallerExecuting() || m.z.conversionCallerExecuting() || m.z.copyAllocation.executing || m.z.normalizationExecuting || m.z.factorNumeralExecuting || m.z.factorNumeralVectorCallerExecuting() || m.z.factorUnivariateCallerExecuting() || m.z.factorCoreCallerExecuting() || m.z.factorFrontendCallerExecuting() || m.z.upolyDisplayCallerExecuting()) || (m.mpfParent != nil && m.mpfParent.formatInvocationExecuting()) || m.mpfLifecycleCallbackActive() || (m.z != nil && m.z.mpfBorrowedSourceCallbackActive()) {
+	if m.z != nil && (m.z.integerEvaluationCallerExecuting() || m.z.rationalEvaluationCallerExecuting() || m.z.binaryEvaluationCallerExecuting() || m.z.algebraicNegCallerExecuting() || m.z.conversionCallerExecuting() || m.z.copyAllocation.executing || m.z.normalizationExecuting || m.z.factorNumeralExecuting || m.z.factorNumeralVectorCallerExecuting() || m.z.factorUnivariateCallerExecuting() || m.z.factorCoreCallerExecuting() || m.z.factorFrontendCallerExecuting() || m.z.upolyDisplayCallerExecuting()) || (m.mpfParent != nil && m.mpfParent.formatInvocationExecuting()) || m.mpfLifecycleCallbackActive() || (m.z != nil && m.z.mpfBorrowedSourceCallbackActive()) {
 		return ErrPolynomialPending
 	}
 	if m.closed {

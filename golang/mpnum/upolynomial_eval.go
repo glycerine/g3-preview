@@ -1,4 +1,4 @@
-// Source: src/math/polynomial/upolynomial.cpp:1734-1797.
+// Source: src/math/polynomial/upolynomial.cpp:1734-1820.
 // Licensed under the MIT license.
 package mpnum
 
@@ -26,7 +26,7 @@ func (m *UPolynomialManager) signAt(v UPolynomialView, i uint32) (int, error) {
 	}
 	return m.sign(a)
 }
-func (m *UPolynomialManager) EvalSignInt(v UPolynomialView, b *Int) (int, error) {
+func (m *UPolynomialManager) EvalSignInt(v UPolynomialView, b *Int) (sign int, cause error) {
 	if e := m.check(); e != nil {
 		return 0, e
 	}
@@ -36,13 +36,25 @@ func (m *UPolynomialManager) EvalSignInt(v UPolynomialView, b *Int) (int, error)
 	if v.count == 1 {
 		return m.signAt(v, 0)
 	}
-	var r Int
-	defer m.modular.Del(&r)
+	if b == nil {
+		return 0, ErrUPolynomialOwner
+	}
+	q, e := m.beginIntegerEvaluation()
+	if e != nil {
+		return 0, e
+	}
+	q.target = v
+	context := q.context()
+	z := m.config.Integer
+	prior := z.integerEvaluationCaller
+	z.integerEvaluationCaller = m
+	defer func() { q.executing = false; cause = q.finish(cause); z.integerEvaluationCaller = prior }()
+	r := &q.values[0]
 	a, e := m.read(v, v.count-1)
 	if e != nil {
 		return 0, e
 	}
-	if e = m.modular.Copy(&r, a); e != nil {
+	if e = m.modular.copyWithSourceContext(r, a, context); e != nil {
 		return 0, e
 	}
 	for i := v.count - 1; i > 0; {
@@ -56,15 +68,15 @@ func (m *UPolynomialManager) EvalSignInt(v UPolynomialView, b *Int) (int, error)
 			return 0, e
 		}
 		if zero {
-			e = m.modular.Mul(&r, b, &r)
+			e = m.modular.mulWithSourceContext(r, b, r, context)
 		} else {
-			e = m.modular.AddMul(a, &r, b, &r)
+			e = m.modular.addMulWithSourceContext(a, r, b, r, &q.addMul, context)
 		}
 		if e != nil {
 			return 0, e
 		}
 	}
-	return m.sign(&r)
+	return m.sign(r)
 }
 func (m *UPolynomialManager) EvalSignRational(v UPolynomialView, b *Rational) (sign int, cause error) {
 	if e := m.check(); e != nil {
