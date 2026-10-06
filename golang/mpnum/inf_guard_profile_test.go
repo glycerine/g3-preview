@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-// Added branch fixtures for inf_rational.cpp80-111,169-179; no new source ENSURE credit.
+// Added branch fixtures for inf_rational.cpp:80-111,169-179; no new source ENSURE credit.
 func TestInfGuardZeroFirstDivisionProfiles(t *testing.T) {
 	for _, divisorEPS := range []string{"0", "-1", "1"} {
 		for _, upper := range []bool{false, true} {

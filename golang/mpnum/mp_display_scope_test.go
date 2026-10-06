@@ -1,5 +1,5 @@
 // Licensed under the MIT license.
-// Source: src/util/mpq.cpp156-184 raw locals do not have numeral destructors.
+// Source: src/util/mpq.cpp:156-184 raw locals do not have numeral destructors.
 package mpnum
 
 import (

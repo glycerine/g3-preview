@@ -1,5 +1,5 @@
 // Licensed under the MIT license.
-// Source: sat_solver.cpp2218-2238; independent finite level-set oracle.
+// Source: sat_solver.cpp:2218-2238; independent finite level-set oracle.
 package g3
 
 import (

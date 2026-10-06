@@ -76,7 +76,7 @@ func algebraicSourceView(t *testing.T, p *mpnum.UPolynomialManager, v mpnum.UPol
 }
 func TestAlgebraicRegisteredUnivariateRootCounts(t *testing.T) {
 	f := algebraicSourceFixture(t)
-	// algebraic.cpp57,65,91,107. The third row is independently expanded from
+	// algebraic.cpp:57,65,91,107. The third row is independently expanded from
 	// (x^5-x-1)*(x-1)*(x-2). Full tst1 arithmetic/printers remain separate.
 	cases := []struct {
 		coeff []int32
@@ -105,7 +105,7 @@ func TestAlgebraicRegisteredUnivariateRootCounts(t *testing.T) {
 }
 func TestAlgebraicRegisteredWilkinsonTwentyIntegerRoots(t *testing.T) {
 	f := algebraicSourceFixture(t)
-	// algebraic.cpp224-248: build the same twenty factors using actual dense
+	// algebraic.cpp:224-248: build the same twenty factors using actual dense
 	// polynomial multiplication, then retain the count and all twenty IsInt ENSUREs.
 	p := upolySourceNew(t, f.polynomial, []int32{-1, 1})
 	factor := upolySourceNew(t, f.polynomial, []int32{0, 1})

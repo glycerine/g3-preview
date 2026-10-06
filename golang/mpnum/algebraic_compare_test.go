@@ -155,7 +155,7 @@ func TestAlgebraicCompareBasicAndRationalDispatch(t *testing.T) {
 	}
 }
 
-// Source tst1 algebraic.cpp96/112 are printed comparison operations, not
+// Source tst1 algebraic.cpp:96/112 are printed comparison operations, not
 // ENSUREs. These exact selected polynomial roots carry added finite expectations;
 // the original multivariate expression-builder/print trace remains separate.
 func TestAlgebraicCompareSourceOverlappingRootFixture(t *testing.T) {

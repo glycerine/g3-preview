@@ -1,6 +1,6 @@
 // Licensed under the MIT license.
-// Added profile/ownership tests for inf_int_rational.h98-119,
-// inf_rational.h111-132, inf_eps_rational.h107-128 and rational.h101-125.
+// Added profile/ownership tests for inf_int_rational.h:98-119,
+// inf_rational.h:111-132, inf_eps_rational.h:107-128 and rational.h:101-125.
 package mpnum
 
 import (
@@ -241,7 +241,7 @@ func TestInfScalarProjectionOwnershipAndWarmGraph(t *testing.T) {
 }
 
 func TestInfScalarProjectionRegisteredDefaultGetter(t *testing.T) {
-	// Existing src/test/inf_rational.cpp105 ENSURE, already counted among80.
+	// Existing src/test/inf_rational.cpp:105 ENSURE, already counted among80.
 	// This extra route does not add registered source assertion credit.
 	s, _ := serviceNew(t)
 	v, e := s.NewInfValue()

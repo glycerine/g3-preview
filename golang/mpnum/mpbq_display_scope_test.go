@@ -1,5 +1,5 @@
 // Licensed under the MIT license.
-// Source mpbq.cpp426–515 raw mpz locals.
+// Source mpbq.cpp:426–515 raw mpz locals.
 package mpnum
 
 import (

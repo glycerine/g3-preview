@@ -1,5 +1,5 @@
 // Licensed under the MIT license.
-// Source mpbq.cpp426–515.
+// Source mpbq.cpp:426–515.
 package mpnum
 
 import (

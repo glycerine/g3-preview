@@ -20,6 +20,8 @@ passing suites do not satisfy this objective.
 
 ## Current facts and conflict resolution
 
+- Current Go source annotations consistently use filename:line. Thirty historical comment references corrected without changing executable tokens or assertions.
+
 - Verified1496-Go snapshot completes literal PSCChain2 and exact incoming vector Push ownership, preserving source widths, caller range and immutable child history. Full native/checked-debug, vets and source audit pass. Full fork, GoIvy and interpolation remain active.
 
 - Verified1489-Go snapshot completes literal PSCChain1 and context setter/parse/merge/solver-output methods, with immutable child receipt histories after genuine cleanup refusal and acknowledgment. Full native/checked-debug, vets and source audit pass. Full fork, GoIvy and interpolation remain active.
@@ -27655,3 +27657,8 @@ The concrete ref_vector Push at src/util/ref_vector.h:96-100 performs actual inc
 Every reached allocation prefix checks the immediate independently named Runtime/NUM/PN/reference/output/cold graph before fault lift, then performs matched cleanup and ordinary zero-byte teardown. Native first success44 and checked64; seven new tests plus broader related PSC/Subresultant/reference-vector groups are scoped green. Evidence .cache/polynomial-psc-chain2-final-inventory.json, .cache/polynomial-psc-chain2-final-proof-map.json and its additive source proposal.
 
 Root composed12 selected Go paths (7 new/5 modified) on committed6115804, preserving all1484 unselected current ancestors including accepted Context methods and PSCChain1. The fresh module contains1496 Go files and no .cache before/after. Full uncached CGO_ENABLED=0 native terminal0 387.903s; checked/debug terminal0 849.977s with unchanged exhaustive100-bit/every-reservation campaign and30m timeout; whole vets terminal0 7.58s/7.724s; absolute source/no-generics audit terminal0 3.743s. Go/canonical bytes are immutable and match main. Evidence .cache/psc2-root-current1496-frozen-inventory.json and .cache/psc2-root-current1496-evidence/. Coverage remains34 ported/231 partial/1837 unported of2102 units;677 APIs remain unported. Actual optimized PSC lifetime, Hensel checker/caller and AST construction dependencies continue; whole fork, GoIvy and interpolation remain active. WASM/WASI/race checks deferred.
+
+
+### Normalize source file and line references
+
+Corrected30 older source references in16 Go files to filename:line form, including sat_solver.cpp:2218-2238 and mpz.cpp:142–161. Every changed Go line is a comment. The Go scanner proves all executable tokens, literals and semicolon insertions are identical to the just-verified5014a1b implementation; no test assertion, build tag or source algorithm changes. Canonical metadata remains unchanged. Full native/checked-debug tests, both vets and source audit passed for the immediately preceding1496-Go snapshot; this annotation-only correction preserves that executable program. A fresh source audit and both vets validate the edited tree. Evidence .cache/source-reference-colon-audit.json and .cache/reference-comment-verify.go. The project remains active; no whole-unit/API/driver promotion.
