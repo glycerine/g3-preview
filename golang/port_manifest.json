@@ -88873,9 +88873,16 @@
       "path": "src/tactic/converter.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["tactic_model_converter.go"],
+      "tests": [
+        "TestTacticModelReferenceOwningAliasAndReplacement",
+        "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
+        "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
+        "TestTacticModelConcatShortcutsNullBranchesAndSharedOwners",
+        "TestTacticModelConcatStopsAtChildErrorAndRejectsCopiedOwner",
+        "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -88888,9 +88895,20 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "model converter specialisation: counts, concat/star construction, cancellation and destruction",
+          "status": "ported",
+          "go_target": "tactic_model_converter.go",
+          "tests": [
+            "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
+            "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
+            "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Concrete model-converter specialisation only; proof converters, AST translation, display and broad constructor/destructor failure histories remain unported or deferred. Interfaces reference cold virtual converter owners, never boxed AST/solver records."]
     },
     {
       "path": "src/tactic/core/CMakeLists.txt",
@@ -91010,9 +91028,16 @@
       "path": "src/tactic/model_converter.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["tactic_model_converter.go"],
+      "tests": [
+        "TestTacticModelReferenceOwningAliasAndReplacement",
+        "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
+        "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
+        "TestTacticModelConcatShortcutsNullBranchesAndSharedOwners",
+        "TestTacticModelConcatStopsAtChildErrorAndRejectsCopiedOwner",
+        "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild"
+      ],
       "assertions": [
         {
           "line": 112,
@@ -91021,17 +91046,35 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "concat/concat_star model and label application; apply null forwarding",
+          "status": "ported",
+          "go_target": "tactic_model_converter.go",
+          "tests": [
+            "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
+            "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
+            "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Original converter composition applies children in reverse source order and routes flattened subgoal indices; it does not manufacture a model or solver status. model2mc, model_converter2model, derived models, concrete recovery converters, translation and display remain required."]
     },
     {
       "path": "src/tactic/model_converter.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["tactic_model_converter.go"],
+      "tests": [
+        "TestTacticModelReferenceOwningAliasAndReplacement",
+        "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
+        "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
+        "TestTacticModelConcatShortcutsNullBranchesAndSharedOwners",
+        "TestTacticModelConcatStopsAtChildErrorAndRejectsCopiedOwner",
+        "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -91050,9 +91093,20 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "cold model converter application/reference declarations",
+          "status": "partial",
+          "go_target": "tactic_model_converter.go",
+          "tests": [
+            "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
+            "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
+            "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Application/refcount boundary uses the actual model_core constant portion; derived model ownership and translation/display declarations remain pending. No public API or concrete model-producing converter completion is claimed."]
     },
     {
       "path": "src/tactic/nlsat_smt/CMakeLists.txt",
@@ -136946,9 +137000,16 @@
       "path": "src/util/ref.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["tactic_model_converter.go"],
+      "tests": [
+        "TestTacticModelReferenceOwningAliasAndReplacement",
+        "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
+        "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
+        "TestTacticModelConcatShortcutsNullBranchesAndSharedOwners",
+        "TestTacticModelConcatStopsAtChildErrorAndRejectsCopiedOwner",
+        "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -136961,9 +137022,20 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "model-core owning reference assignment/destruction specialisation",
+          "status": "partial",
+          "go_target": "tactic_model_converter.go",
+          "tests": [
+            "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
+            "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
+            "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Only the concrete owning model-core reference portion is implemented, with explicit alias-safe assignment and copied/retired owner guards. General copy/move/detach reference facades, derived model dispatch and failure histories remain open."]
     },
     {
       "path": "src/util/ref_buffer.h",
