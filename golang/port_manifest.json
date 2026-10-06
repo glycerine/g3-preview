@@ -33762,7 +33762,7 @@
           ]
         },
         {
-          "name": "mk_polynomial variable overload polynomial.cpp:2536-2542 actual RAW one, generated monomial, singleton INC, and factory allocation/direct-return transfer",
+          "name": "mk_polynomial variable overload polynomial.cpp:2538-2544 actual RAW one, generated monomial, singleton INC, and factory allocation/direct-return transfer",
           "status": "ported",
           "go_target": "mpnum/polynomial_variable_invocation.go",
           "tests": [
@@ -33889,7 +33889,7 @@
         "Nine actual polynomial_ref declarations precede degree reads; youngest stopped child source DT blocks reverse reference destruction. Exact caller-vector Push tuple stamps at actual guarded push; completed incoming INC remains unjoined on growth failure and owning abort consumes only it after the nine older locals. Published range and vector backing remain caller-owned. Body/source/cleanup and child tuple history survive own acknowledgment; phase/index/degrees are diagnostics, never authority.",
         "polynomial.cpp:5659-5831: each child tuple is captured only at its actual guarded frame begin, with exact manager/frame/nonwrapping invocation; source-only lifetime stops remain distinct from false completed-child acknowledgment and true unjoined abort after older references. Immutable body/source/first-own history survives acknowledgment until a new actual invocation.",
         "polynomial.cpp:5694-5749: H is bound at real ref_buffer constructor to the actual Next frame and invocation. Each push captures actual incoming INC and allocation leaves. Successful H destruction acknowledges the exact parent at the real finalization leaf; expired child cleanup neither reads later variable active state nor drains later H invocation.",
-        "polynomial.cpp:2536-2542: default RAW one precedes actual generated monomial. Exact generated/allocator/singleton/factory transfer authority comes from actual returned creation/INC/slot publication and guarded allocator outcomes, never result/refcount/root-count inference.",
+        "polynomial.cpp:2538-2544: default RAW one precedes actual generated monomial. Exact generated/allocator/singleton/factory transfer authority comes from actual returned creation/INC/slot publication and guarded allocator outcomes, never result/refcount/root-count inference.",
         "polynomial.cpp:5659-5831: source/own finalization marks the exact actor as finishing before child cleanup or DEC. Actual delete-callback same-finalizer reentry refuses before cursor/root/history changes; H has an independent real-finalization guard. Source constructor order and DEC prefix are unchanged."
       ],
       "deviations": [

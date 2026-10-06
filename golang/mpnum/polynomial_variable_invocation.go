@@ -1,4 +1,4 @@
-// Source: src/math/polynomial/polynomial.cpp:2536-2542,2481-2495.
+// Source: src/math/polynomial/polynomial.cpp:2538-2544,2481-2495.
 // Licensed under the MIT license. Source author: Leonardo de Moura.
 package mpnum
 
