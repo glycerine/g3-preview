@@ -29289,7 +29289,14 @@
         "mpnum/polynomial_psc_chain1_callback_source_test.go",
         "mpnum/polynomial_psc_chain1_child_stop_source_test.go",
         "mpnum/polynomial_psc_chain1_prefix_source_test.go",
-        "mpnum/polynomial_psc_chain1_source_test.go"
+        "mpnum/polynomial_psc_chain1_source_test.go",
+        "mpnum/polynomial_psc_chain2_callback_source_test.go",
+        "mpnum/polynomial_psc_chain2_source_test.go",
+        "mpnum/polynomial_psc_chain2_prefix_source_test.go",
+        "mpnum/polynomial_psc_chain2.go",
+        "mpnum/polynomial_psc_chain2_child_stop_source_test.go",
+        "mpnum/polynomial_ref_vector_push_receipt.go",
+        "mpnum/polynomial_ref_vector_push_source_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -30044,7 +30051,14 @@
         "TestPolynomialPSCChain1SubchainSourceStopPreservesActualChildAndHistory",
         "TestPolynomialPSCChain1ActualCoefficientAndSetEveryReservationPrefix",
         "TestPolynomialPSCChain1SourceDegreeIndexedCoefficientLayout",
-        "TestPolynomialPSCChain1SubchainExactFrameAndCopiedOwnerRefuse"
+        "TestPolynomialPSCChain1SubchainExactFrameAndCopiedOwnerRefuse",
+        "TestPolynomialPSCChain2ResetCallbackNineReferencesAndOwnerRefusal",
+        "TestPolynomialPSCChain2LiteralRegularAndDefectiveReverse",
+        "TestPolynomialPSCChain2FirstZeroDivisorGuardsUninitializedN3",
+        "TestPolynomialPSCChain2ActualEveryReservationPrefix",
+        "TestPolynomialPSCChain2YoungerPowerSourceStopPreservesNineLocals",
+        "TestPolynomialReferenceVectorPushActualINCBeforeGrowthAndExactAbort",
+        "TestPolynomialReferenceVectorPushGrowthTransportRefusesExecutingOwner"
       ],
       "conditionals": [
         {
@@ -33674,6 +33688,20 @@
             "TestPolynomialPSCChain1SourceDegreeIndexedCoefficientLayout",
             "TestPolynomialPSCChain1SubchainExactFrameAndCopiedOwnerRefuse"
           ]
+        },
+        {
+          "name": "psc_chain2 polynomial.cpp:5588-5658 literal nine references, defined-read n3 guard, unsigned degree/exponent transitions and compact reverse",
+          "status": "ported",
+          "go_target": "mpnum/polynomial_psc_chain2.go",
+          "tests": [
+            "TestPolynomialPSCChain2ResetCallbackNineReferencesAndOwnerRefusal",
+            "TestPolynomialPSCChain2LiteralRegularAndDefectiveReverse",
+            "TestPolynomialPSCChain2FirstZeroDivisorGuardsUninitializedN3",
+            "TestPolynomialPSCChain2ActualEveryReservationPrefix",
+            "TestPolynomialPSCChain2YoungerPowerSourceStopPreservesNineLocals",
+            "TestPolynomialReferenceVectorPushActualINCBeforeGrowthAndExactAbort",
+            "TestPolynomialReferenceVectorPushGrowthTransportRefusesExecutingOwner"
+          ]
         }
       ],
       "ownership": [
@@ -33789,7 +33817,8 @@
         "Shared cheap append and raw factory ownership are transported by the same actual default NUM/INC/slot publication and allocator leaf receipts accepted by the prerequisites; caller reference assignment transfers factory authority at incoming INC before older DEC callback. Known GCD frame address directory validates the captured identity, not discovered root authority.",
         "Actual embedded full-manager frame and nonwrapping invocation; only real SET incoming INC and three constructed references are acquired. Child completed source suffix precedes older newS/prem/R destruction; unjoined assignment/child ownership abort follows older declarations. Caller output range remains independent.",
         "SET source INC precedes actual vector operator[] assertion and old-slot read (ref_vector.h:128-132; vector.h:303-311). Actual n+1 unsigned wrap test retains incoming INC before checked assertion/native bounds guard; exact own abort never reads or writes an old slot that was not reached. Native invalid-range memory access remains a Go guard qualification, not C++ undefined-access equivalence.",
-        "No lexical polynomial_ref or NUM is constructed by psc_chain1. Exact concrete Subchain tuple is captured only at actual guarded begin; false completes its real reference suffix, true aborts unjoined roots. Caller SET transfers Coeff factory only at successful incoming INC before old DEC callbacks. Size/index/phase are scalar diagnostics, not ownership authority."
+        "No lexical polynomial_ref or NUM is constructed by psc_chain1. Exact concrete Subchain tuple is captured only at actual guarded begin; false completes its real reference suffix, true aborts unjoined roots. Caller SET transfers Coeff factory only at successful incoming INC before old DEC callbacks. Size/index/phase are scalar diagnostics, not ownership authority.",
+        "Nine actual polynomial_ref declarations precede degree reads; youngest stopped child source DT blocks reverse reference destruction. Exact caller-vector Push tuple stamps at actual guarded push; completed incoming INC remains unjoined on growth failure and owning abort consumes only it after the nine older locals. Published range and vector backing remain caller-owned. Body/source/cleanup and child tuple history survive own acknowledgment; phase/index/degrees are diagnostics, never authority."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -33878,7 +33907,8 @@
         "Signed-host TLS source release stops and returning owner callback refusals are qualified Go owner-primitive/invalid metadata profiles, not ordinary mathematical free OOM or C++ source defects. Positive even composite-modulus fixture follows the literal accepted manager API and reaches upper-bound Neg normalization; it claims no prime-field theorem or invented inverse allocation on the zero polynomial route. Broader polynomial source unit remains partial.",
         "Source remark equal-degree limitation and checked assertions retained. Default registered PSC dispatch uses optimized chain; dormant alternative gains zero active-driver credit. Pointer resize evidence covers only reached growth after completed reset, not ref_vector shrink. Signed-host TLS source release proof is an owner-primitive profile, not ordinary mathematical OOM. Actual mpz.h:156-163 old-TMP destruction before failing replacement leaves tmp[i]==0; only that literal dangling-pointer guard domain expects ErrInvalidSlot on retry. No scratch repair.",
         "Literal uint32 arithmetic is retained for n+1 and degree/exponent differences; defective zero-gap loop casts unsigned endpoints to signed int32. Bounded owner budgets refuse oversized range allocation before signed-gap execution. Source signed overflow beyond defined loop domain gains no mathematical completion claim.",
-        "Dormant psc_chain1 gains zero active registered-driver assertion credit; polynomial.cpp:5897-5902 still dispatches optimized PSC. Degree-indexed zero slots and source equal-degree limitation remain inherited from literal Subchain. uint32 sz-1 expression retained. Source RAW DT proof is qualified signed-host TLS owner-primitive domain, callback/copied owner guards are separate Go owner-boundary coverage. Native invalid-index bounds guard is not C++ undefined-access equivalence."
+        "Dormant psc_chain1 gains zero active registered-driver assertion credit; polynomial.cpp:5897-5902 still dispatches optimized PSC. Degree-indexed zero slots and source equal-degree limitation remain inherited from literal Subchain. uint32 sz-1 expression retained. Source RAW DT proof is qualified signed-host TLS owner-primitive domain, callback/copied owner guards are separate Go owner-boundary coverage. Native invalid-index bounds guard is not C++ undefined-access equivalence.",
+        "Dormant psc_chain2 has zero active registered-driver assertion credit; default polynomial.cpp:5897-5902 remains optimized. uint32 d0-1, n1-n2 and index increment preserve source widths. Initial zero G2 reaches uninitialized n3 at polynomial.cpp:5647; Go guards that undefined source read with ErrRuntimeUninitialized, without inventing n3=0. Source child end-DT stop is qualified signed-host TLS owner-primitive domain, not ordinary mathematical OOM."
       ]
     },
     {
@@ -133777,7 +133807,9 @@
         "mpnum/polynomial_psc_chain1_callback_source_test.go",
         "mpnum/polynomial_psc_chain1_child_stop_source_test.go",
         "mpnum/polynomial_psc_chain1_prefix_source_test.go",
-        "mpnum/polynomial_psc_chain1_source_test.go"
+        "mpnum/polynomial_psc_chain1_source_test.go",
+        "mpnum/polynomial_ref_vector_push_receipt.go",
+        "mpnum/polynomial_ref_vector_push_source_test.go"
       ],
       "tests": [
         "TestASTRefVectorBorrowedInputDefaultEraseAndMove",
@@ -133873,7 +133905,14 @@
         "TestPolynomialPSCChain1SubchainSourceStopPreservesActualChildAndHistory",
         "TestPolynomialPSCChain1ActualCoefficientAndSetEveryReservationPrefix",
         "TestPolynomialPSCChain1SourceDegreeIndexedCoefficientLayout",
-        "TestPolynomialPSCChain1SubchainExactFrameAndCopiedOwnerRefuse"
+        "TestPolynomialPSCChain1SubchainExactFrameAndCopiedOwnerRefuse",
+        "TestPolynomialPSCChain2ResetCallbackNineReferencesAndOwnerRefusal",
+        "TestPolynomialPSCChain2LiteralRegularAndDefectiveReverse",
+        "TestPolynomialPSCChain2FirstZeroDivisorGuardsUninitializedN3",
+        "TestPolynomialPSCChain2ActualEveryReservationPrefix",
+        "TestPolynomialPSCChain2YoungerPowerSourceStopPreservesNineLocals",
+        "TestPolynomialReferenceVectorPushActualINCBeforeGrowthAndExactAbort",
+        "TestPolynomialReferenceVectorPushGrowthTransportRefusesExecutingOwner"
       ],
       "conditionals": [
         {
@@ -134052,6 +134091,20 @@
             "TestPolynomialPSCChain1SourceDegreeIndexedCoefficientLayout",
             "TestPolynomialPSCChain1SubchainExactFrameAndCopiedOwnerRefuse"
           ]
+        },
+        {
+          "name": "Concrete source push_back INC then growth, actual caller-vector incoming acquisition ref_vector.h:96-100",
+          "status": "partial",
+          "go_target": "mpnum/polynomial_ref_vector_push_receipt.go",
+          "tests": [
+            "TestPolynomialPSCChain2ResetCallbackNineReferencesAndOwnerRefusal",
+            "TestPolynomialPSCChain2LiteralRegularAndDefectiveReverse",
+            "TestPolynomialPSCChain2FirstZeroDivisorGuardsUninitializedN3",
+            "TestPolynomialPSCChain2ActualEveryReservationPrefix",
+            "TestPolynomialPSCChain2YoungerPowerSourceStopPreservesNineLocals",
+            "TestPolynomialReferenceVectorPushActualINCBeforeGrowthAndExactAbort",
+            "TestPolynomialReferenceVectorPushGrowthTransportRefusesExecutingOwner"
+          ]
         }
       ],
       "ownership": [
@@ -134060,7 +134113,8 @@
         "Actual dependency INC/DEC callbacks, raw scalar tokens and charged16-byte obj_ref/24-byte ref_vector/160-byte inline buffer records in existing real AST allocators. Source INC-before-growth, retained backing, captured-end append and consumed cleanup progress preserved. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
         "Actual embedded full-manager frame and nonwrapping invocation; only real SET incoming INC and three constructed references are acquired. Child completed source suffix precedes older newS/prem/R destruction; unjoined assignment/child ownership abort follows older declarations. Caller output range remains independent.",
         "SET source INC precedes actual vector operator[] assertion and old-slot read (ref_vector.h:128-132; vector.h:303-311). Actual n+1 unsigned wrap test retains incoming INC before checked assertion/native bounds guard; exact own abort never reads or writes an old slot that was not reached. Native invalid-range memory access remains a Go guard qualification, not C++ undefined-access equivalence.",
-        "No lexical polynomial_ref or NUM is constructed by psc_chain1. Exact concrete Subchain tuple is captured only at actual guarded begin; false completes its real reference suffix, true aborts unjoined roots. Caller SET transfers Coeff factory only at successful incoming INC before old DEC callbacks. Size/index/phase are scalar diagnostics, not ownership authority."
+        "No lexical polynomial_ref or NUM is constructed by psc_chain1. Exact concrete Subchain tuple is captured only at actual guarded begin; false completes its real reference suffix, true aborts unjoined roots. Caller SET transfers Coeff factory only at successful incoming INC before old DEC callbacks. Size/index/phase are scalar diagnostics, not ownership authority.",
+        "Nine actual polynomial_ref declarations precede degree reads; youngest stopped child source DT blocks reverse reference destruction. Exact caller-vector Push tuple stamps at actual guarded push; completed incoming INC remains unjoined on growth failure and owning abort consumes only it after the nine older locals. Published range and vector backing remain caller-owned. Body/source/cleanup and child tuple history survive own acknowledgment; phase/index/degrees are diagnostics, never authority."
       ],
       "deviations": [
         "This concrete specialization does not implement all AST/other source specializations or remaining generic helper/hash surfaces. Ref-vector null callbacks and nonempty self-append have explicit checked Go adaptations.",
@@ -134070,7 +134124,8 @@
         "Selected concrete AST Runtime/profile only; actual SMT kernel driver, native pretty/TRACE/global transport and other context/copy profiles remain separate obligations. Source-stopped destruction and explicit owning abort are distinct; pointer-free Go geometry is not native ABI credit.",
         "Source remark equal-degree limitation and checked assertions retained. Default registered PSC dispatch uses optimized chain; dormant alternative gains zero active-driver credit. Pointer resize evidence covers only reached growth after completed reset, not ref_vector shrink. Signed-host TLS source release proof is an owner-primitive profile, not ordinary mathematical OOM. Actual mpz.h:156-163 old-TMP destruction before failing replacement leaves tmp[i]==0; only that literal dangling-pointer guard domain expects ErrInvalidSlot on retry. No scratch repair.",
         "Literal uint32 arithmetic is retained for n+1 and degree/exponent differences; defective zero-gap loop casts unsigned endpoints to signed int32. Bounded owner budgets refuse oversized range allocation before signed-gap execution. Source signed overflow beyond defined loop domain gains no mathematical completion claim.",
-        "Dormant psc_chain1 gains zero active registered-driver assertion credit; polynomial.cpp:5897-5902 still dispatches optimized PSC. Degree-indexed zero slots and source equal-degree limitation remain inherited from literal Subchain. uint32 sz-1 expression retained. Source RAW DT proof is qualified signed-host TLS owner-primitive domain, callback/copied owner guards are separate Go owner-boundary coverage. Native invalid-index bounds guard is not C++ undefined-access equivalence."
+        "Dormant psc_chain1 gains zero active registered-driver assertion credit; polynomial.cpp:5897-5902 still dispatches optimized PSC. Degree-indexed zero slots and source equal-degree limitation remain inherited from literal Subchain. uint32 sz-1 expression retained. Source RAW DT proof is qualified signed-host TLS owner-primitive domain, callback/copied owner guards are separate Go owner-boundary coverage. Native invalid-index bounds guard is not C++ undefined-access equivalence.",
+        "Dormant psc_chain2 has zero active registered-driver assertion credit; default polynomial.cpp:5897-5902 remains optimized. uint32 d0-1, n1-n2 and index increment preserve source widths. Initial zero G2 reaches uninitialized n3 at polynomial.cpp:5647; Go guards that undefined source read with ErrRuntimeUninitialized, without inventing n3=0. Source child end-DT stop is qualified signed-host TLS owner-primitive domain, not ordinary mathematical OOM."
       ]
     },
     {

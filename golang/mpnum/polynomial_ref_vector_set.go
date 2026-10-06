@@ -19,7 +19,7 @@ func (v *PolynomialRefVector) setWithFactoryReceipt(i uint32, p Polynomial, r *p
 		return e
 	}
 	s := &v.state
-	if s.setActive || s.draining || s.incoming != (Polynomial{}) || s.setInvocation == ^uint64(0) {
+	if s.pushActive || s.setActive || s.draining || s.incoming != (Polynomial{}) || s.setInvocation == ^uint64(0) {
 		return ErrPolynomialPending
 	}
 	s.setInvocation++
@@ -138,7 +138,7 @@ func (v *PolynomialRefVector) resizeZeroRange(n uint32) error {
 		return e
 	}
 	s := &v.state
-	if s.setActive || s.draining || s.incoming != (Polynomial{}) {
+	if s.pushActive || s.setActive || s.draining || s.incoming != (Polynomial{}) {
 		return ErrPolynomialPending
 	}
 	old, e := s.values.size(v.owner)
