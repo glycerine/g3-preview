@@ -17621,22 +17621,22 @@
       "path": "src/ast/reg_decl_plugins.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "status": "ported",
+      "go_targets": ["ast_reg_decl_plugins.go"],
+      "tests": ["TestASTRegisterDeclarationPluginsSourceOrder", "TestASTRegisterDeclarationPluginsPreservesExisting", "TestASTRegisterDeclarationPluginsStopsAtError"],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "reg_decl_plugins", "status": "ported", "go_target": "ast_reg_decl_plugins.go", "tests": ["TestASTRegisterDeclarationPluginsSourceOrder", "TestASTRegisterDeclarationPluginsPreservesExisting", "TestASTRegisterDeclarationPluginsStopsAtError"]}],
+      "ownership": ["The wrapper borrows ASTManager. Existing plugins are preserved. Each actual constructor publishes its owned plugin to the manager; errors stop registration and preserve the reached manager-owned prefix. Family creation precedes constructor allocation."],
       "deviations": []
     },
     {
       "path": "src/ast/reg_decl_plugins.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["ast_reg_decl_plugins.go"],
+      "tests": ["TestASTRegisterDeclarationPluginsSourceOrder", "TestASTRegisterDeclarationPluginsPreservesExisting", "TestASTRegisterDeclarationPluginsStopsAtError"],
       "conditionals": [
         {
           "line": 20,
@@ -17647,10 +17647,10 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "reg_decl_plugins", "status": "ported", "go_target": "ast_reg_decl_plugins.go", "tests": ["TestASTRegisterDeclarationPluginsSourceOrder", "TestASTRegisterDeclarationPluginsPreservesExisting", "TestASTRegisterDeclarationPluginsStopsAtError"]}],
+      "ownership": ["The declared function borrows its AST manager; registration ownership belongs to the existing original plugin constructors."],
       "deviations": []
     },
     {
