@@ -3649,9 +3649,9 @@
       "path": "src/api/api_context.cpp",
       "component": "api",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["api_context_results.go", "api_goal_object.go"],
+      "tests": ["TestAPIContextResultsExplicitReferencesAndAlias", "TestAPIContextResultsAutomaticReferencesAllASTKinds", "TestAPIContextObjectReferenceAssignmentAndRecycledIDs", "TestAPIContextGoalRootSurvivesExplicitResultResetAndDrains", "TestAPIContextResultsCopiedAndForeignOwnerGuards", "TestAPIContextObjectTeardownRestartsOriginalHashIterator", "TestAPIContextObjectCloseRetainsRefusedFreeListPrefix"],
       "assertions": [
         {
           "line": 39,
@@ -3676,9 +3676,9 @@
       "path": "src/api/api_context.h",
       "component": "api",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["api_context_results.go"],
+      "tests": ["TestAPIContextResultsExplicitReferencesAndAlias", "TestAPIContextResultsAutomaticReferencesAllASTKinds", "TestAPIContextObjectReferenceAssignmentAndRecycledIDs", "TestAPIContextGoalRootSurvivesExplicitResultResetAndDrains", "TestAPIContextResultsCopiedAndForeignOwnerGuards", "TestAPIContextObjectTeardownRestartsOriginalHashIterator", "TestAPIContextObjectCloseRetainsRefusedFreeListPrefix"],
       "conditionals": [
         {
           "line": 20,
@@ -3879,9 +3879,9 @@
       "path": "src/api/api_goal.h",
       "component": "api",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["api_goal_object.go"],
+      "tests": ["TestAPIContextObjectReferenceAssignmentAndRecycledIDs", "TestAPIContextGoalRootSurvivesExplicitResultResetAndDrains", "TestAPIContextResultsCopiedAndForeignOwnerGuards"],
       "conditionals": [
         {
           "line": 18,
@@ -4383,9 +4383,9 @@
       "path": "src/api/api_util.h",
       "component": "api",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["api_context_results.go"],
+      "tests": ["TestAPIContextObjectReferenceAssignmentAndRecycledIDs", "TestAPIContextObjectTeardownRestartsOriginalHashIterator", "TestAPIContextObjectCloseRetainsRefusedFreeListPrefix"],
       "conditionals": [
         {
           "line": 18,
