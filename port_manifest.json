@@ -22144,7 +22144,8 @@
         "pkg/ast/rewriter/rewriter_core.go",
         "pkg/ast/rewriter/var_shifter.go",
         "pkg/ast/rewriter/rewriter_engine.go",
-        "pkg/ast/rewriter/rewriter_configuration.go"
+        "pkg/ast/rewriter/rewriter_configuration.go",
+        "pkg/ast/rewriter/traversal.go"
       ],
       "tests": [
         "TestRewriterCoreOriginalScopedCachesAndRootRestoration",
@@ -22163,7 +22164,12 @@
         "TestRewriterEngineOriginalMaxStepsResumeAndCleanup",
         "TestRewriterEngineOriginalMacroExpansionUnderBinder",
         "TestBetaReducerOriginalPatternAndNoPatternReplacement",
-        "TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel"
+        "TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel",
+        "TestTraversalClientResourceFailureAndResume",
+        "TestTraversalAtomicRootDoesNotCheckResourceCallback",
+        "TestTraversalBindingsAndDisabledCancellation",
+        "TestTraversalColdConstructionCleanup",
+        "TestTraversalExternalDefaultConfiguration"
       ],
       "conditionals": [
         {
@@ -22257,7 +22263,8 @@
         "Concrete iterative frames/scopes and borrowed scalar binding/shift vectors retain original growth and state transitions. Base cores, shifters and Boolean helper are embedded; complete cold wrapper header is charged once. Result/temp/annotation vectors own real AST references. Builtin revisit pops occur in original reverse order; quantifier annotation copies retire in reverse declaration order. Output acquisition precedes pop, and delayed builtin/macro states preserve retained m_r. Full failure/ownership campaigns remain deferred."
       ],
       "deviations": [
-        "Original base rewriting infrastructure, forward/inverse shifting and no-proof traversal/configuration are translated. Proof-generating rewriter traversal, trace display, whole-unit method/ownership auditing and exhaustive failure campaigns remain incomplete. Unsupported REWRITE_RULE preserves the source's unimplemented state. Cancellation resets; step-limit interruption preserves frames for Resume. No whole rewriting source unit, model evaluator or public API completion is credited."
+        "Original base rewriting infrastructure, forward/inverse shifting and no-proof traversal/configuration are translated. Proof-generating rewriter traversal, trace display, whole-unit method/ownership auditing and exhaustive failure campaigns remain incomplete. Unsupported REWRITE_RULE preserves the source's unimplemented state. Cancellation resets; step-limit interruption preserves frames for Resume. No whole rewriting source unit, model evaluator or public API completion is credited.",
+        "The public concrete Traversal exposes the same no-proof engine to other Go packages through an inline borrowed configuration adapter. MaxStepsExceeded propagates resource errors before testing the source step limit, preserving the model evaluator memory exception call point. This boundary does not implement model evaluator theory reduction, completion or proof generation."
       ]
     },
     {
@@ -22280,7 +22287,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/rewriter/rewriter_engine.go",
-        "pkg/ast/rewriter/rewriter_configuration.go"
+        "pkg/ast/rewriter/rewriter_configuration.go",
+        "pkg/ast/rewriter/traversal.go"
       ],
       "tests": [
         "TestBoolRewriterStarOriginalTraversalAndIndependentTruthTables",
@@ -22290,7 +22298,12 @@
         "TestRewriterEngineOriginalMaxStepsResumeAndCleanup",
         "TestRewriterEngineOriginalMacroExpansionUnderBinder",
         "TestBetaReducerOriginalPatternAndNoPatternReplacement",
-        "TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel"
+        "TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel",
+        "TestTraversalClientResourceFailureAndResume",
+        "TestTraversalAtomicRootDoesNotCheckResourceCallback",
+        "TestTraversalBindingsAndDisabledCancellation",
+        "TestTraversalColdConstructionCleanup",
+        "TestTraversalExternalDefaultConfiguration"
       ],
       "conditionals": [
         {
@@ -22503,7 +22516,8 @@
         "Concrete iterative frames/scopes and borrowed scalar binding/shift vectors retain original growth and state transitions. Base cores, shifters and Boolean helper are embedded; complete cold wrapper header is charged once. Result/temp/annotation vectors own real AST references. Builtin revisit pops occur in original reverse order; quantifier annotation copies retire in reverse declaration order. Output acquisition precedes pop, and delayed builtin/macro states preserve retained m_r. Full failure/ownership campaigns remain deferred."
       ],
       "deviations": [
-        "Original base rewriting infrastructure, forward/inverse shifting and no-proof traversal/configuration are translated. Proof-generating rewriter traversal, trace display, whole-unit method/ownership auditing and exhaustive failure campaigns remain incomplete. Unsupported REWRITE_RULE preserves the source's unimplemented state. Cancellation resets; step-limit interruption preserves frames for Resume. No whole rewriting source unit, model evaluator or public API completion is credited."
+        "Original base rewriting infrastructure, forward/inverse shifting and no-proof traversal/configuration are translated. Proof-generating rewriter traversal, trace display, whole-unit method/ownership auditing and exhaustive failure campaigns remain incomplete. Unsupported REWRITE_RULE preserves the source's unimplemented state. Cancellation resets; step-limit interruption preserves frames for Resume. No whole rewriting source unit, model evaluator or public API completion is credited.",
+        "The public concrete Traversal exposes the same no-proof engine to other Go packages through an inline borrowed configuration adapter. MaxStepsExceeded propagates resource errors before testing the source step limit, preserving the model evaluator memory exception call point. This boundary does not implement model evaluator theory reduction, completion or proof generation."
       ]
     },
     {

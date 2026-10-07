@@ -240,8 +240,8 @@ func (c *rewriterTestConfig) getSubst(t ast.ASTHandle) (ast.ASTHandle, ast.ASTHa
 func (c *rewriterTestConfig) getMacro(d ast.ASTHandle) (ast.ASTHandle, ast.ASTHandle, ast.ASTHandle, bool, error) {
 	return c.macroBody, ast.ASTHandle{}, ast.ASTHandle{}, d == c.macroDecl, nil
 }
-func (c *rewriterTestConfig) maxStepsExceeded(n uint32) bool {
-	return c.stepLimit != 0 && n > c.stepLimit
+func (c *rewriterTestConfig) maxStepsExceeded(n uint32) (bool, error) {
+	return c.stepLimit != 0 && n > c.stepLimit, nil
 }
 func (c *rewriterTestConfig) maxFramesExceeded(n uint32) bool {
 	return c.frameLimit != 0 && n >= c.frameLimit

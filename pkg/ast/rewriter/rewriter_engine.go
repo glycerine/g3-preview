@@ -1007,7 +1007,11 @@ func (r *rewriterEngine) Resume(out ast.ASTRef) error {
 			return e
 		}
 		r.numSteps++
-		if r.cfg.maxStepsExceeded(r.numSteps) {
+		exceeded, err := r.cfg.maxStepsExceeded(r.numSteps)
+		if err != nil {
+			return err
+		}
+		if exceeded {
 			return rewriterException{util.Z3MaxStepsMessage}
 		}
 		fr := c.frames[len(c.frames)-1]

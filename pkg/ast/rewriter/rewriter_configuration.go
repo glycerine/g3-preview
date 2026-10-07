@@ -19,7 +19,7 @@ type rewriterConfiguration interface {
 	rewritePatterns() bool
 	maxScopesExceeded(uint32) bool
 	maxFramesExceeded(uint32) bool
-	maxStepsExceeded(uint32) bool
+	maxStepsExceeded(uint32) (bool, error)
 	preVisit(ast.ASTHandle) (bool, error)
 	reduceApp(ast.ASTHandle, ast.AppArguments, ast.ASTRef, ast.ASTRef) (brStatus, error)
 	reduceVar(ast.ASTHandle, ast.ASTRef, ast.ASTRef) (bool, error)
@@ -37,7 +37,7 @@ func (*defaultRewriterConfig) flatAssoc(ast.ASTHandle) (bool, error) { return fa
 func (*defaultRewriterConfig) rewritePatterns() bool                 { return true }
 func (*defaultRewriterConfig) maxScopesExceeded(uint32) bool         { return false }
 func (*defaultRewriterConfig) maxFramesExceeded(uint32) bool         { return false }
-func (*defaultRewriterConfig) maxStepsExceeded(uint32) bool          { return false }
+func (*defaultRewriterConfig) maxStepsExceeded(uint32) (bool, error) { return false, nil }
 func (*defaultRewriterConfig) preVisit(ast.ASTHandle) (bool, error)  { return true, nil }
 func (*defaultRewriterConfig) reduceApp(ast.ASTHandle, ast.AppArguments, ast.ASTRef, ast.ASTRef) (brStatus, error) {
 	return brFailed, nil
