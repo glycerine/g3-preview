@@ -13016,7 +13016,9 @@
         "pkg/ast/ast_bv_inverse.go",
         "pkg/ast/ast_bv_inverse_test.go",
         "pkg/ast/ast_bv_sign_bit.go",
-        "pkg/ast/ast_bv_sign_bit_test.go"
+        "pkg/ast/ast_bv_sign_bit_test.go",
+        "pkg/ast/ast_bv_numeral_sort.go",
+        "pkg/ast/ast_bv_numeral_sort_test.go"
       ],
       "tests": [
         "TestASTBitVectorSourceEagerSortsAndPinnedDeclarations",
@@ -13084,7 +13086,11 @@
         "TestASTBitVectorOriginalSignBitNormalizesInput",
         "TestASTBitVectorSignBitZeroWidthAssertionBeforeInput",
         "TestASTBitVectorSignBitEveryNestedNumericalReservation",
-        "TestASTBitVectorSignBitTransportOwnerGuard"
+        "TestASTBitVectorSignBitTransportOwnerGuard",
+        "TestASTBitVectorNumeralForSortGuardErasesNumericalRead",
+        "TestASTBitVectorNumeralForSortOriginalWidthAndIdentity",
+        "TestASTBitVectorSortRecognizerDoesNotReadParameterKind",
+        "TestASTBitVectorNumeralForSortZeroWidthPreservesInputCopy"
       ],
       "conditionals": [
         {
@@ -13322,6 +13328,17 @@
             "TestASTBitVectorSignBitEveryNestedNumericalReservation",
             "TestASTBitVectorSignBitTransportOwnerGuard"
           ]
+        },
+        {
+          "name": "original is_bv_sort family/kind/exact parameter count recognizer and mk_numeral(value,sort) guard/width delegation (src/ast/bv_decl_plugin.cpp:774-776,858-864; src/ast/bv_decl_plugin.h:390-394)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_numeral_sort.go",
+          "tests": [
+            "TestASTBitVectorNumeralForSortGuardErasesNumericalRead",
+            "TestASTBitVectorNumeralForSortOriginalWidthAndIdentity",
+            "TestASTBitVectorSortRecognizerDoesNotReadParameterKind",
+            "TestASTBitVectorNumeralForSortZeroWidthPreservesInputCopy"
+          ]
         }
       ],
       "ownership": [
@@ -13337,7 +13354,8 @@
         "Zero recognition borrows the stored rational without copying or allocating. All-one recognition owns the read numeral, power, rational-one, subtraction receiver and copied return value in the address-stable numerical frame; operator- retains its original copy/compound-subtract/return-copy operations. The receiver ends at return, expression temporaries end after comparison, and the read numeral ends at method exit. Actual invocation receipts preserve interrupted numeric owners; seven actual Runtime allocation refusals and final graph restoration are tested. Extract/bv2int recognizers borrow the original operand without INC, append nothing and leave unmatched output pointers unread. Extract publishes low, high and base in source order, including unsigned conversion of a negative stored low.",
         "Generic BV family sort construction borrows the integer parameter and delegates to the existing explicit sort cache, retaining its actual successful INC receipts. It checks count before reading parameters, kind before width, and zero width before numerical/cache work. The original mk_sort ignores declaration kind and explicitly caches large widths, unlike get_bv_sort which bypasses cache growth above 4095. Cold reservation tests preserve reached cache state and complete source finalization; a 4096-bit regression verifies exactly the cache-owned reference and canonical getter identity.",
         "Multiplicative inverse owns the original parity rational/mod full-expression, default g/x/y values, gcd return and assignment, optional correction and debug expression values in the shared address-stable BV frame. Thirteen exact child invocations capture copies, powers, gcd, products and moduli. Full-expression values end at their original boundaries and y/x/g drain in reverse declaration order. Failure retains exact owners for whole-context abort. Output assignment preserves aliasing and source publication prefixes; even parity never accesses output. Runtime transport rejects AST cleanup/factory reentry and restores the previous execution guard.",
-        "Sign-bit recognition owns the nested normalization receipt captured at actual frame entry and the returned normalized rational and half-modulus values. Source cleanup joins the nested child before older caller values; owning cleanup acknowledges its exact source and abort phases. Successful normalization retires before its returned value is placed in the caller frame, and p then m end in reverse declaration order. Numerical transport spans both caller and nested call and restores the predecessor guard."
+        "Sign-bit recognition owns the nested normalization receipt captured at actual frame entry and the returned normalized rational and half-modulus values. Source cleanup joins the nested child before older caller values; owning cleanup acknowledges its exact source and abort phases. Successful normalization retires before its returned value is placed in the caller frame, and p then m end in reverse declaration order. Numerical transport spans both caller and nested call and restores the predecessor guard.",
+        "Sort-taking numeral construction borrows sort metadata, erases the numerical input on a failed recognizer guard, and delegates to the existing exact numeral frame only after reading width. The returned numeral uses the source width-based canonical sort, without acquiring the caller raw sort. Original input rational parameter copy precedes the inner zero-width guard; existing numeric invocation owners retain failure cleanup authority. Transport guard saves and restores its predecessor."
       ],
       "deviations": [
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
@@ -13352,7 +13370,8 @@
         "Selected BV recognizers are now exposed through manager-bound Go methods. Neither zero nor all-one recognition assumes factory normalization: raw stored values are inspected exactly. All-one follows copy/power/subtraction/equality rather than a host-bitset shortcut. The explicit concrete Go scalar/temporary and deterministic operand evaluation representation claims no native rational/parameter/header/operand-order/allocator ABI equivalence; original TRACE output and whole-unit assertion/exception/ownership audits remain required. Modular inverse, remaining recognizer/utility interfaces, evaluator/reducer consumers and full pretty-print diagnostics are still open.",
         "The original BV mk_sort route is now connected to generic MkFamilySort. Parser/default SMT2 environment consumers remain separate obligations; this route does not claim they are ported. Signed input widths retain source unsigned conversion and existing checked width+1/index overflow handling. The sort cache acquisition-receipt and reflected-header representation retains prior Go/native allocation/ABI qualifications; complete native assertion/exception/ownership audit is still required.",
         "The selected modular inverse is now implemented using the original rational/extended-GCD algorithm. Go math/big.ModInverse appears only in independent tests. SASSERT numeric expressions are erased in release and gated independently in debug; zero width with nonunit odd input follows original assertion/release behavior. Deterministic Go operand evaluation and reflected larger numerical-frame headers retain explicit native rational/temporary/ABI/allocation qualifications. Actual Runtime failures prove owning cleanup, not resumability of source process-fatal operations. Remaining utility/recognizer consumers, reducers/evaluation, full pretty-print diagnostics and whole-unit native ownership/representation audit remain open.",
-        "Selected has_sign_bit follows original unsigned normalization and rational comparison; it does not inspect host bits or assume canonical input. The original DEBUG width assertion precedes input/plugin reads. Release retains source unsigned bits-1 arithmetic and existing checked power/cache bounds. The nested normalization and reflected caller-header representation retains explicit concrete Go/native rational, return-value, pointer/header, allocator/assertion/exception ABI qualifications. BV rewriter shift consumers and whole-unit ownership/representation audit remain to be ported; no source operation resumability is claimed after Runtime process-fatal refusal."
+        "Selected has_sign_bit follows original unsigned normalization and rational comparison; it does not inspect host bits or assume canonical input. The original DEBUG width assertion precedes input/plugin reads. Release retains source unsigned bits-1 arithmetic and existing checked power/cache bounds. The nested normalization and reflected caller-header representation retains explicit concrete Go/native rational, return-value, pointer/header, allocator/assertion/exception ABI qualifications. BV rewriter shift consumers and whole-unit ownership/representation audit remain to be ported; no source operation resumability is claimed after Runtime process-fatal refusal.",
+        "The recognizer checks exactly one sort parameter, unlike the original plugin internal get_bv_size helper, which intentionally remains unchanged. Recognition does not inspect parameter kind; the reached width getter uses the prior checked wrong-kind rejection. No registered BV plugin yields false in this manager-bound adapter; native bv_util construction requires its plugin. Concrete Go sort/parameter/return/numeric-frame representation and existing native allocator/assertion/exception qualifications remain. BV uint64 numeral/conversion/construction utilities and full reducer/whole-unit audits remain required."
       ]
     },
     {
