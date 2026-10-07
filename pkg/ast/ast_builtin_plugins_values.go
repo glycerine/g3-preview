@@ -118,10 +118,19 @@ func (m *ASTManager) AreDistinct(a, b ASTHandle) (bool, error) {
 		return false, nil
 	}
 	first, e := m.pluginUniqueValue(fid, x)
-	if e != nil || !first {
+	if e != nil {
 		return false, e
 	}
-	return m.pluginUniqueValue(fid, y)
+	if first {
+		second, e := m.pluginUniqueValue(fid, y)
+		if e != nil || second {
+			return second, e
+		}
+	}
+	if m.pluginAt(fid).kind == astArithmeticPlugin {
+		return m.arithmeticOffsetDistinct(fid, x, y)
+	}
+	return false, nil
 }
 
 // SomeValueProc is the borrowed source some_value_proc override. It receives
