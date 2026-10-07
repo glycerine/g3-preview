@@ -20865,8 +20865,15 @@
       "component": "ast",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "pkg/ast/rewriter/bv_rewriter_bitwise.go",
+        "pkg/ast/rewriter/bv_rewriter_bitwise_test.go"
+      ],
+      "tests": [
+        "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
+        "TestBVRewriterNANDWarmSpillRefusalPreservesOutput",
+        "TestBVRewriterBitwiseEveryColdReservation"
+      ],
       "conditionals": [
         {
           "line": 55,
@@ -21321,9 +21328,24 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "original mk_bv_nand/mk_bv_nor/mk_bv_xnor algorithms and BR_REWRITE2 publication (src/ast/rewriter/bv_rewriter.cpp:1981-2002; src/util/buffer.h:25-48,98-104,250-258)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_bitwise.go",
+          "tests": [
+            "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
+            "TestBVRewriterNANDWarmSpillRefusalPreservesOutput",
+            "TestBVRewriterBitwiseEveryColdReservation"
+          ]
+        }
+      ],
+      "ownership": [
+        "Core algorithm adapters borrow AST manager and operand slices. NAND uses the existing inline16/doubling ASTHandleBuffer for source ptr_buffer<expr>, with nonowning generated node handles and deferred spill release on every exit. NOR/XNOR introduce no argument buffer. Output SetRef occurs only after all application factories succeed; cold refusal and warm spill tests preserve prior output and actual shared graph budget closes to zero."
+      ],
+      "deviations": [
+        "Only the three original negated-bitwise reducer bodies are selected, exposed as standalone core adapters for later BV rewriter dispatch/traversal. They preserve source operand order, generated operator nesting and BR_REWRITE2; they do not normalize or evaluate operands. Full BV rewriter constructor/parameters/poly/trailing/extract/dispatch/traversal algorithms, native pointer/buffer/exception ABI and whole-unit ownership audit remain uncredited. Invalid/nil Go manager/reference boundaries use existing checked Go transport."
+      ]
     },
     {
       "path": "src/ast/rewriter/bv_rewriter.h",
