@@ -36,6 +36,15 @@ func NewVarSubstitution(m *ast.ASTManager, standardOrder bool) (*VarSubstitution
 }
 func (s *VarSubstitution) StandardOrder() bool { return s.standardOrder }
 func (s *VarSubstitution) Substitute(term ast.ASTHandle, args []ast.ASTHandle, out ast.ASTRef) error {
+	if uint64(len(args)) > uint64(^uint32(0)) {
+		return ast.ErrASTDomain
+	}
+	return s.SubstituteArguments(term, ast.SliceArguments(args), out)
+}
+
+// SubstituteArguments preserves the original binding copies while borrowing the
+// input argument view, without an additional pointer-array allocation.
+func (s *VarSubstitution) SubstituteArguments(term ast.ASTHandle, args ast.AppArguments, out ast.ASTRef) error {
 	if s == nil {
 		return ast.ErrASTHandle
 	}
@@ -43,13 +52,7 @@ func (s *VarSubstitution) Substitute(term ast.ASTHandle, args []ast.ASTHandle, o
 	if e := r.Reset(); e != nil {
 		return e
 	}
-	var e error
-	if s.standardOrder {
-		e = r.SetInvBindings(args)
-	} else {
-		e = r.SetBindings(args)
-	}
-	if e != nil {
+	if e := r.setBindingArguments(args, s.standardOrder); e != nil {
 		return e
 	}
 	return r.Rewrite(term, out)

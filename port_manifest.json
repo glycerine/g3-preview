@@ -23212,7 +23212,8 @@
         "TestVarSubstitutionOrderResetNullAndGround",
         "TestVarSubstitutionCancellationPreservesOutputAndReuses",
         "TestVarSubstitutionColdConstructionCleanup",
-        "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal"
+        "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal",
+        "TestVarSubstitutionBorrowedAppArgumentsOrderAndReset"
       ],
       "assertions": [
         {
@@ -23260,7 +23261,8 @@
             "TestVarSubstitutionOrderResetNullAndGround",
             "TestVarSubstitutionCancellationPreservesOutputAndReuses",
             "TestVarSubstitutionColdConstructionCleanup",
-            "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal"
+            "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal",
+            "TestVarSubstitutionBorrowedAppArgumentsOrderAndReset"
           ]
         },
         {
@@ -23272,15 +23274,17 @@
             "TestVarSubstitutionOrderResetNullAndGround",
             "TestVarSubstitutionCancellationPreservesOutputAndReuses",
             "TestVarSubstitutionColdConstructionCleanup",
-            "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal"
+            "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal",
+            "TestVarSubstitutionBorrowedAppArgumentsOrderAndReset"
           ]
         }
       ],
       "ownership": [
-        "Complete enclosing header charged once; beta_reducer and its original engine/shifter/cache/ref members constructed in place. Partial construction returns the actual owner for Close; constructor-refusal tests warm the AST manager retained ref directory before measuring independent empty member constructions. Borrowed caller bindings retain the original engine protocol; output is an owning ASTRef."
+        "Complete enclosing header charged once; beta_reducer and its original engine/shifter/cache/ref members constructed in place. Partial construction returns the actual owner for Close; constructor-refusal tests warm the AST manager retained ref directory before measuring independent empty member constructions. Borrowed caller bindings retain the original engine protocol; output is an owning ASTRef.",
+        "Borrowed AppArguments input is copied directly by the existing binding engine in source normal/inverse order; Substitute and SubstituteArguments share the same reset/binding/traversal path."
       ],
       "deviations": [
-        "is_well_sorted pre/post SASSERT and TRACE formatting remain unported dependencies; operator gains only partial credit. The two registered var_subst.cpp ENSURE canonical identities are replayed through the new owner. Other var_subst translation-unit facilities (unused-variable elimination, instantiate, free-variable enumeration) remain unported. Explicit boolean constructor argument supplies the C++ standard-order option; model function interpretation/evaluator integration remains pending."
+        "is_well_sorted pre/post SASSERT and TRACE formatting remain unported dependencies; operator gains only partial credit. The two registered var_subst.cpp ENSURE canonical identities are replayed through the new owner. Other var_subst translation-unit facilities (unused-variable elimination, instantiate, free-variable enumeration) remain unported. Explicit boolean constructor argument supplies the C++ standard-order option; selected model function interpretation/evaluator integration now uses this owner; broader theory integration remains open."
       ]
     },
     {
@@ -23297,7 +23301,8 @@
         "TestVarSubstitutionOrderResetNullAndGround",
         "TestVarSubstitutionCancellationPreservesOutputAndReuses",
         "TestVarSubstitutionColdConstructionCleanup",
-        "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal"
+        "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal",
+        "TestVarSubstitutionBorrowedAppArgumentsOrderAndReset"
       ],
       "conditionals": [
         {
@@ -23321,7 +23326,8 @@
             "TestVarSubstitutionOrderResetNullAndGround",
             "TestVarSubstitutionCancellationPreservesOutputAndReuses",
             "TestVarSubstitutionColdConstructionCleanup",
-            "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal"
+            "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal",
+            "TestVarSubstitutionBorrowedAppArgumentsOrderAndReset"
           ]
         },
         {
@@ -23333,15 +23339,17 @@
             "TestVarSubstitutionOrderResetNullAndGround",
             "TestVarSubstitutionCancellationPreservesOutputAndReuses",
             "TestVarSubstitutionColdConstructionCleanup",
-            "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal"
+            "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal",
+            "TestVarSubstitutionBorrowedAppArgumentsOrderAndReset"
           ]
         }
       ],
       "ownership": [
-        "Complete enclosing header charged once; beta_reducer and its original engine/shifter/cache/ref members constructed in place. Partial construction returns the actual owner for Close; constructor-refusal tests warm the AST manager retained ref directory before measuring independent empty member constructions. Borrowed caller bindings retain the original engine protocol; output is an owning ASTRef."
+        "Complete enclosing header charged once; beta_reducer and its original engine/shifter/cache/ref members constructed in place. Partial construction returns the actual owner for Close; constructor-refusal tests warm the AST manager retained ref directory before measuring independent empty member constructions. Borrowed caller bindings retain the original engine protocol; output is an owning ASTRef.",
+        "Borrowed AppArguments input is copied directly by the existing binding engine in source normal/inverse order; Substitute and SubstituteArguments share the same reset/binding/traversal path."
       ],
       "deviations": [
-        "is_well_sorted pre/post SASSERT and TRACE formatting remain unported dependencies; operator gains only partial credit. The two registered var_subst.cpp ENSURE canonical identities are replayed through the new owner. Other var_subst translation-unit facilities (unused-variable elimination, instantiate, free-variable enumeration) remain unported. Explicit boolean constructor argument supplies the C++ standard-order option; model function interpretation/evaluator integration remains pending."
+        "is_well_sorted pre/post SASSERT and TRACE formatting remain unported dependencies; operator gains only partial credit. The two registered var_subst.cpp ENSURE canonical identities are replayed through the new owner. Other var_subst translation-unit facilities (unused-variable elimination, instantiate, free-variable enumeration) remain unported. Explicit boolean constructor argument supplies the C++ standard-order option; selected model function interpretation/evaluator integration now uses this owner; broader theory integration remains open."
       ]
     },
     {
@@ -45826,7 +45834,10 @@
         "TestModelEvaluatorPartialFunctionAndUniverseCompletion",
         "TestModelEvaluatorConstructorRefusalsAndParameterPrecedence",
         "TestModelEvaluatorIndependentBooleanModelsAndDirectMacroOrder",
-        "TestModelEvaluatorUnportedTheoryDoesNotReturnSuccess"
+        "TestModelEvaluatorUnportedTheoryDoesNotReturnSuccess",
+        "TestModelEvaluatorOriginalArrayStoreSelectDispatch",
+        "TestModelEvaluatorArrayIdentityAndDisabledEquality",
+        "TestModelEvaluatorArrayPartialTheoryGraphCompletion"
       ],
       "assertions": [
         {
@@ -45874,13 +45885,24 @@
             "TestModelEvaluatorIndependentBooleanModelsAndDirectMacroOrder",
             "TestModelEvaluatorUnportedTheoryDoesNotReturnSuccess"
           ]
+        },
+        {
+          "name": "original array reducer construction, forced expansion flags, array dispatch and partial theory function graph substitution; identity/disabled array equality branches",
+          "status": "partial",
+          "go_target": "pkg/model/model_evaluator.go",
+          "tests": [
+            "TestModelEvaluatorOriginalArrayStoreSelectDispatch",
+            "TestModelEvaluatorArrayIdentityAndDisabledEquality",
+            "TestModelEvaluatorArrayPartialTheoryGraphCompletion"
+          ]
         }
       ],
       "ownership": [
-        "Evaluator borrows model, parameter, Runtime and Cooperation services. Concrete cold evaluator header embeds its configuration and parameter owner; separately charged public traversal and Boolean reducer keep existing member cleanup. Failed unpublished function graph remains named until Close; successful registration transfers it to the model. Function entries read the original borrowed argument view without allocating a copied array."
+        "Evaluator borrows model, parameter, Runtime and Cooperation services. Concrete cold evaluator header embeds its configuration and parameter owner; separately charged public traversal and Boolean reducer keep existing member cleanup. Failed unpublished function graph remains named until Close; successful registration transfers it to the model. Function entries read the original borrowed argument view without allocating a copied array.",
+        "Array reducer is constructed after Boolean reducer with evaluator constructor parameters and closed before it. Partial theory graph substitution keeps its lexical var_subst owner named through reverse cleanup; failed cleanup prevents another invocation from overwriting the owner. Borrowed argument bindings reuse the original beta engine copy protocol without a second argument array."
       ],
       "deviations": [
-        "Only existing base AST and Boolean/uninterpreted evaluator paths are integrated. Arithmetic/BV/array/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch, evaluate_partial_theory_func, array equality/extraction and expand_value remain unported. Reached non-base theory applications return ErrModelEvaluatorTheory rather than claim successful evaluation. Runtime AllocationSize is the existing source memory accounting owner; runtime-wide typed allocator wiring remains open. Cooperate and memory-before-step-limit order are preserved; no Budget count substitutes for source memory accounting. Proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited."
+        "Boolean/uninterpreted and selected original array store/select evaluation paths are integrated. Arithmetic/BV/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch, nonidentity enabled array equality/extraction, map/set/as-array rules and expand_value remain open. Array equality identity is handled before the expansion flag; disabled expansion falls through to the original Boolean reducer. Partial theory graph fallback is integrated for the known array dispatch, including source unconditional partial-graph completion and direct-order var_subst. Reached remaining unsupported theory paths explicitly refuse. Runtime AllocationSize remains the existing memory accounting owner; runtime-wide typed allocator wiring, proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited."
       ]
     },
     {
@@ -45898,7 +45920,10 @@
         "TestModelEvaluatorPartialFunctionAndUniverseCompletion",
         "TestModelEvaluatorConstructorRefusalsAndParameterPrecedence",
         "TestModelEvaluatorIndependentBooleanModelsAndDirectMacroOrder",
-        "TestModelEvaluatorUnportedTheoryDoesNotReturnSuccess"
+        "TestModelEvaluatorUnportedTheoryDoesNotReturnSuccess",
+        "TestModelEvaluatorOriginalArrayStoreSelectDispatch",
+        "TestModelEvaluatorArrayIdentityAndDisabledEquality",
+        "TestModelEvaluatorArrayPartialTheoryGraphCompletion"
       ],
       "conditionals": [
         {
@@ -45926,13 +45951,24 @@
             "TestModelEvaluatorIndependentBooleanModelsAndDirectMacroOrder",
             "TestModelEvaluatorUnportedTheoryDoesNotReturnSuccess"
           ]
+        },
+        {
+          "name": "original array reducer construction, forced expansion flags, array dispatch and partial theory function graph substitution; identity/disabled array equality branches",
+          "status": "partial",
+          "go_target": "pkg/model/model_evaluator.go",
+          "tests": [
+            "TestModelEvaluatorOriginalArrayStoreSelectDispatch",
+            "TestModelEvaluatorArrayIdentityAndDisabledEquality",
+            "TestModelEvaluatorArrayPartialTheoryGraphCompletion"
+          ]
         }
       ],
       "ownership": [
-        "Evaluator borrows model, parameter, Runtime and Cooperation services. Concrete cold evaluator header embeds its configuration and parameter owner; separately charged public traversal and Boolean reducer keep existing member cleanup. Failed unpublished function graph remains named until Close; successful registration transfers it to the model. Function entries read the original borrowed argument view without allocating a copied array."
+        "Evaluator borrows model, parameter, Runtime and Cooperation services. Concrete cold evaluator header embeds its configuration and parameter owner; separately charged public traversal and Boolean reducer keep existing member cleanup. Failed unpublished function graph remains named until Close; successful registration transfers it to the model. Function entries read the original borrowed argument view without allocating a copied array.",
+        "Array reducer is constructed after Boolean reducer with evaluator constructor parameters and closed before it. Partial theory graph substitution keeps its lexical var_subst owner named through reverse cleanup; failed cleanup prevents another invocation from overwriting the owner. Borrowed argument bindings reuse the original beta engine copy protocol without a second argument array."
       ],
       "deviations": [
-        "Only existing base AST and Boolean/uninterpreted evaluator paths are integrated. Arithmetic/BV/array/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch, evaluate_partial_theory_func, array equality/extraction and expand_value remain unported. Reached non-base theory applications return ErrModelEvaluatorTheory rather than claim successful evaluation. Runtime AllocationSize is the existing source memory accounting owner; runtime-wide typed allocator wiring remains open. Cooperate and memory-before-step-limit order are preserved; no Budget count substitutes for source memory accounting. Proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited."
+        "Boolean/uninterpreted and selected original array store/select evaluation paths are integrated. Arithmetic/BV/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch, nonidentity enabled array equality/extraction, map/set/as-array rules and expand_value remain open. Array equality identity is handled before the expansion flag; disabled expansion falls through to the original Boolean reducer. Partial theory graph fallback is integrated for the known array dispatch, including source unconditional partial-graph completion and direct-order var_subst. Reached remaining unsupported theory paths explicitly refuse. Runtime AllocationSize remains the existing memory accounting owner; runtime-wide typed allocator wiring, proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited."
       ]
     },
     {

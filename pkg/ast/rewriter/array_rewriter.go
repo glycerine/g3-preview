@@ -554,3 +554,11 @@ func (rw *ArrayRewriter) makeFallback(op int32, args ast.AppArguments, out ast.A
 	}
 	return rw.manager.SetRef(out, h)
 }
+
+// Source: src/ast/rewriter/array_rewriter.h:51.
+func (rw *ArrayRewriter) FamilyID() (ast.FamilyID, error) {
+	if e := rw.open(); e != nil {
+		return ast.NullFamilyID, e
+	}
+	return rw.family, nil
+}

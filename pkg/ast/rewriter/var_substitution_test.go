@@ -211,3 +211,34 @@ func TestVarSubstitutionFreeReplacementShiftAndDeepTraversal(t *testing.T) {
 		t.Fatal("completed substitution retained frames")
 	}
 }
+
+func TestVarSubstitutionBorrowedAppArgumentsOrderAndReset(t *testing.T) {
+	m := astTestManager(t)
+	a, b := goalTestAtom(t, m, "borrowed-subst-a"), goalTestAtom(t, m, "borrowed-subst-b")
+	app := goalTestApp(t, m, ast.ASTOpOr, a, b)
+	args, e := m.AppArgumentView(app)
+	satOK(t, e)
+	variable := shiftTestVar(t, m, 0)
+	out := astTestPin(t, m, ast.ASTHandle{})
+	for _, standard := range []bool{false, true} {
+		s, e := NewVarSubstitution(m, standard)
+		satOK(t, e)
+		satOK(t, s.SubstituteArguments(variable, args, out))
+		got, e := m.RefGet(out)
+		satOK(t, e)
+		want := a
+		if standard {
+			want = b
+		}
+		if got != want {
+			t.Fatal("borrowed binding order", standard, got, want)
+		}
+		satOK(t, s.SubstituteArguments(variable, ast.SliceArguments(nil), out))
+		got, e = m.RefGet(out)
+		satOK(t, e)
+		if got != variable {
+			t.Fatal("borrowed invocation reset")
+		}
+		satOK(t, s.Close())
+	}
+}

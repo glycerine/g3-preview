@@ -133,18 +133,31 @@ func (r *rewriterEngine) setBindings(values []ast.ASTHandle, inverse bool) error
 	if e := r.open(); e != nil {
 		return e
 	}
-	if len(r.core.frames) != 0 || uint64(len(values)) > uint64(^uint32(0)) {
+	if uint64(len(values)) > uint64(^uint32(0)) {
+		return ast.ErrASTDomain
+	}
+	return r.setBindingArguments(ast.SliceArguments(values), inverse)
+}
+func (r *rewriterEngine) setBindingArguments(values ast.AppArguments, inverse bool) error {
+	if e := r.open(); e != nil {
+		return e
+	}
+	if len(r.core.frames) != 0 {
 		return ast.ErrASTDomain
 	}
 	r.bindings = r.bindings[:0]
 	r.shifts = r.shifts[:0]
-	n := uint32(len(values))
+	n := values.Count()
 	for i := uint32(0); i < n; i++ {
 		j := n - i - 1
 		if inverse {
 			j = i
 		}
-		if e := r.pushBinding(values[j], n); e != nil {
+		h, e := values.At(j)
+		if e != nil {
+			return e
+		}
+		if e = r.pushBinding(h, n); e != nil {
 			return e
 		}
 	}

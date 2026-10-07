@@ -1,4 +1,4 @@
-// Source: src/model/model_evaluator.cpp:41-203,233-253,282-290,502-579;
+// Source: src/model/model_evaluator.cpp:41-203,233-302,502-579;
 // src/model/model_evaluator.h:30-64; src/model/model_evaluator_params.pyg.
 package model
 
@@ -39,6 +39,9 @@ type evaluatorConfiguration struct {
 	rewriter.DefaultConfiguration
 	owner                              *ModelEvaluator
 	boolean                            *rewriter.BoolRewriter
+	array                              *rewriter.ArrayRewriter
+	arrayFamily                        ast.FamilyID
+	substitution                       *rewriter.VarSubstitution
 	params                             util.ModuleParamsOwner
 	pending                            *FunctionInterpretation
 	maxMemory                          uint64
@@ -87,7 +90,21 @@ func (ev *ModelEvaluator) init(p *util.ParamsRef) error {
 	if e != nil {
 		return e
 	}
+	ev.cfg.array, e = rewriter.NewArrayRewriter(ev.model.manager, ev.services.Context, ev.services.Globals, p)
+	if e != nil {
+		return e
+	}
+	ev.cfg.arrayFamily, e = ev.cfg.array.FamilyID()
+	if e != nil {
+		return e
+	}
 	if e = ev.cfg.boolean.SetFlat(true); e != nil {
+		return e
+	}
+	if e = ev.cfg.array.SetExpandSelectStore(true); e != nil {
+		return e
+	}
+	if e = ev.cfg.array.SetExpandSelectIte(true); e != nil {
 		return e
 	}
 	if e = ev.cfg.updateParams(p); e != nil {
@@ -106,7 +123,7 @@ func (ev *ModelEvaluator) open() error {
 	if ev.closed {
 		return arena.ErrClosed
 	}
-	if !ev.ready || ev.cfg.pending != nil {
+	if !ev.ready || ev.cfg.pending != nil || ev.cfg.substitution != nil {
 		return util.ErrParamsPrecondition
 	}
 	return ev.model.open()
@@ -154,6 +171,12 @@ func (ev *ModelEvaluator) NumSteps() (uint32, error) {
 }
 func (ev *ModelEvaluator) closeImp() error {
 	ev.ready = false
+	if ev.cfg.substitution != nil {
+		if e := ev.cfg.substitution.Close(); e != nil {
+			return e
+		}
+		ev.cfg.substitution = nil
+	}
 	if ev.cfg.pending != nil {
 		if e := ev.cfg.pending.Close(); e != nil {
 			return e
@@ -162,6 +185,12 @@ func (ev *ModelEvaluator) closeImp() error {
 	}
 	if e := ev.cfg.params.CloseHelpers(); e != nil {
 		return e
+	}
+	if ev.cfg.array != nil {
+		if e := ev.cfg.array.Close(); e != nil {
+			return e
+		}
+		ev.cfg.array = nil
 	}
 	if ev.cfg.boolean != nil {
 		if e := ev.cfg.boolean.Close(); e != nil {
@@ -355,11 +384,36 @@ func (c *evaluatorConfiguration) ReduceApp(d ast.ASTHandle, args ast.AppArgument
 				return rewriter.RewriteFailed, e
 			}
 			// The source consults the sort's theory equality reducer first.
-			if sortFamily > 4 {
+			if sortFamily == c.arrayFamily {
+				right, e := args.At(1)
+				if e != nil {
+					return rewriter.RewriteFailed, e
+				}
+				if arg == right {
+					yes, e := m.MkTrue()
+					if e != nil {
+						return rewriter.RewriteFailed, e
+					}
+					return rewriter.RewriteDone, m.SetRef(out, yes)
+				}
+				if c.arrayEqualities {
+					return rewriter.RewriteFailed, ErrModelEvaluatorTheory
+				}
+			} else if sortFamily > 4 {
 				return rewriter.RewriteFailed, ErrModelEvaluatorTheory
 			}
 		}
 		return c.boolean.MkAppCore(d, args, out)
+	}
+	if fid == c.arrayFamily {
+		status, e := c.array.MkAppCore(d, args, out)
+		if e != nil {
+			return rewriter.RewriteFailed, e
+		}
+		if status == rewriter.RewriteFailed {
+			return c.evaluatePartialTheory(d, args, out, proof)
+		}
+		return c.evaluateReducedApp(status, out)
 	}
 	if fid == 1 && args.Count() == 1 {
 		value, e := args.At(0)
@@ -369,29 +423,7 @@ func (c *evaluatorConfiguration) ReduceApp(d ast.ASTHandle, args ast.AppArgument
 		if e = m.SetRef(out, value); e != nil {
 			return rewriter.RewriteFailed, e
 		}
-		kind, e := m.GetKind(value)
-		if e != nil {
-			return rewriter.RewriteFailed, e
-		}
-		if kind != ast.ASTApp {
-			return rewriter.RewriteDone, nil
-		}
-		decl, e := m.GetDecl(value)
-		if e != nil {
-			return rewriter.RewriteFailed, e
-		}
-		values, e := m.AppArgumentView(value)
-		if e != nil {
-			return rewriter.RewriteFailed, e
-		}
-		found, e := c.evaluate(decl, values, out)
-		if e != nil {
-			return rewriter.RewriteFailed, e
-		}
-		if found {
-			return rewriter.Rewrite1, nil
-		}
-		return rewriter.RewriteDone, nil
+		return c.evaluateReducedApp(rewriter.RewriteDone, out)
 	}
 	if fid > 4 {
 		return rewriter.RewriteFailed, ErrModelEvaluatorTheory
@@ -404,6 +436,94 @@ func (c *evaluatorConfiguration) ReduceApp(d ast.ASTHandle, args ast.AppArgument
 		return rewriter.Rewrite1, nil
 	}
 	return rewriter.RewriteFailed, nil
+}
+
+// Source: src/model/model_evaluator.cpp:194-202.
+func (c *evaluatorConfiguration) evaluateReducedApp(status rewriter.RewriteStatus, out ast.ASTRef) (rewriter.RewriteStatus, error) {
+	if status != rewriter.RewriteDone {
+		return status, nil
+	}
+	m := c.owner.model.manager
+	value, e := m.RefGet(out)
+	if e != nil {
+		return rewriter.RewriteFailed, e
+	}
+	kind, e := m.GetKind(value)
+	if e != nil {
+		return rewriter.RewriteFailed, e
+	}
+	if kind != ast.ASTApp {
+		return status, nil
+	}
+	d, e := m.GetDecl(value)
+	if e != nil {
+		return rewriter.RewriteFailed, e
+	}
+	args, e := m.AppArgumentView(value)
+	if e != nil {
+		return rewriter.RewriteFailed, e
+	}
+	found, e := c.evaluate(d, args, out)
+	if e != nil {
+		return rewriter.RewriteFailed, e
+	}
+	if found {
+		return rewriter.Rewrite1, nil
+	}
+	return status, nil
+}
+
+// Source: src/model/model_evaluator.cpp:254-276.
+func (c *evaluatorConfiguration) evaluatePartialTheory(d ast.ASTHandle, args ast.AppArguments, out, proof ast.ASTRef) (status rewriter.RewriteStatus, err error) {
+	m := c.owner.model.manager
+	if err = m.ResetRef(out); err != nil {
+		return rewriter.RewriteFailed, err
+	}
+	if err = m.ResetRef(proof); err != nil {
+		return rewriter.RewriteFailed, err
+	}
+	fi, e := c.owner.model.FunctionInterpretation(d)
+	if e != nil || fi == nil {
+		return rewriter.RewriteFailed, e
+	}
+	partial, e := fi.IsPartial()
+	if e != nil {
+		return rewriter.RewriteFailed, e
+	}
+	if partial {
+		sort, e := m.GetRange(d)
+		if e != nil {
+			return rewriter.RewriteFailed, e
+		}
+		value, e := m.GetSomeValue(sort)
+		if e != nil {
+			return rewriter.RewriteFailed, e
+		}
+		if e = fi.SetElse(value); e != nil {
+			return rewriter.RewriteFailed, e
+		}
+	}
+	c.substitution, e = rewriter.NewVarSubstitution(m, false)
+	defer func() {
+		if c.substitution != nil {
+			e := c.substitution.Close()
+			err = errors.Join(err, e)
+			if e == nil {
+				c.substitution = nil
+			}
+		}
+	}()
+	if e != nil {
+		return rewriter.RewriteFailed, e
+	}
+	term, e := fi.Interpretation()
+	if e != nil {
+		return rewriter.RewriteFailed, e
+	}
+	if e = c.substitution.SubstituteArguments(term, args, out); e != nil {
+		return rewriter.RewriteFailed, e
+	}
+	return rewriter.RewriteFull, nil
 }
 func (c *evaluatorConfiguration) GetMacro(d ast.ASTHandle) (ast.ASTHandle, ast.ASTHandle, ast.ASTHandle, bool, error) {
 	md := c.owner.model
