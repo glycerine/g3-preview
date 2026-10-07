@@ -18847,9 +18847,15 @@
       "path": "src/ast/rewriter/bool_rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "bool_rewriter.go"
+      ],
+      "tests": [
+        "TestBoolRewriterACSourceStatusesOrderAndOutputOwnership",
+        "TestBoolRewriterACOneLevelFlatteningAndSpill",
+        "TestBoolRewriterACIndependentAssignmentsThroughCDCL"
+      ],
       "conditionals": [
         {
           "line": 499,
@@ -18912,17 +18918,48 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "mk_nflat_and_core / mk_flat_and_core",
+          "status": "ported",
+          "go_target": "bool_rewriter.go",
+          "tests": [
+            "TestBoolRewriterACSourceStatusesOrderAndOutputOwnership",
+            "TestBoolRewriterACOneLevelFlatteningAndSpill",
+            "TestBoolRewriterACIndependentAssignmentsThroughCDCL"
+          ]
+        },
+        {
+          "name": "mk_nflat_or_core / mk_flat_or_core (local-context branch outstanding)",
+          "status": "partial",
+          "go_target": "bool_rewriter.go",
+          "tests": [
+            "TestBoolRewriterACSourceStatusesOrderAndOutputOwnership",
+            "TestBoolRewriterACOneLevelFlatteningAndSpill",
+            "TestBoolRewriterACIndependentAssignmentsThroughCDCL"
+          ]
+        }
+      ],
+      "ownership": [
+        "Borrowed input handles use original sixteen-slot inline/doubling pointer buffers; output assignment retains AST ownership; source negative/positive fast marks retire in reverse declaration order."
+      ],
+      "deviations": [
+        "Full constructor/parameter updates, dispatch, local-context simplification, NOT/equality/ITE/distinct/XOR/implication/NAND/NOR rules and the recursive rewriter engine remain unported. Default local_ctx=false AND/OR cores follow source; enabled reached local-context requests report an explicit unported error. No whole rewriter or public evaluator completion is credited."
+      ]
     },
     {
       "path": "src/ast/rewriter/bool_rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "bool_rewriter.go"
+      ],
+      "tests": [
+        "TestBoolRewriterACSourceStatusesOrderAndOutputOwnership",
+        "TestBoolRewriterACOneLevelFlatteningAndSpill",
+        "TestBoolRewriterACIndependentAssignmentsThroughCDCL"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -18941,9 +18978,24 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "private AND/OR core declarations and borrowed inline state fragment",
+          "status": "partial",
+          "go_target": "bool_rewriter.go",
+          "tests": [
+            "TestBoolRewriterACSourceStatusesOrderAndOutputOwnership",
+            "TestBoolRewriterACOneLevelFlatteningAndSpill",
+            "TestBoolRewriterACIndependentAssignmentsThroughCDCL"
+          ]
+        }
+      ],
+      "ownership": [
+        "Borrowed input handles use original sixteen-slot inline/doubling pointer buffers; output assignment retains AST ownership; source negative/positive fast marks retire in reverse declaration order."
+      ],
+      "deviations": [
+        "Full constructor/parameter updates, dispatch, local-context simplification, NOT/equality/ITE/distinct/XOR/implication/NAND/NOR rules and the recursive rewriter engine remain unported. Default local_ctx=false AND/OR cores follow source; enabled reached local-context requests report an explicit unported error. No whole rewriter or public evaluator completion is credited."
+      ]
     },
     {
       "path": "src/ast/rewriter/bool_rewriter_params.hpp",
@@ -21937,9 +21989,15 @@
       "path": "src/ast/rewriter/rewriter_types.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "rewriter_types.go"
+      ],
+      "tests": [
+        "TestBoolRewriterACSourceStatusesOrderAndOutputOwnership",
+        "TestBoolRewriterACOneLevelFlatteningAndSpill",
+        "TestBoolRewriterACIndependentAssignmentsThroughCDCL"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -21970,9 +22028,20 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "br_status and unsigned2br_status",
+          "status": "ported",
+          "go_target": "rewriter_types.go",
+          "tests": [
+            "TestBoolRewriterACOneLevelFlatteningAndSpill"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The source rewriter_exception wrapper remains unported; all six status codes and bounded/unbounded depth conversion are translated."
+      ]
     },
     {
       "path": "src/ast/rewriter/seq_rewriter.cpp",
