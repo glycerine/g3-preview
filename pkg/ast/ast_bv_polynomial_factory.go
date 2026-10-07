@@ -46,7 +46,7 @@ func (m *ASTManager) bitVectorPolynomialApp(sort ASTHandle, args AppArguments, k
 		previous := m.formatExecuting
 		m.formatExecuting = true
 		defer func() { m.formatExecuting = previous }()
-		r, e := m.bitVectorPolynomialIdentity(sort, unit, receipt)
+		r, e := m.bitVectorPolynomialIdentity(sort, unit, receipt, nil, false)
 		return m.external(r), e
 	case 1:
 		return args.At(0)
@@ -55,7 +55,7 @@ func (m *ASTManager) bitVectorPolynomialApp(sort ASTHandle, args AppArguments, k
 	}
 }
 
-func (m *ASTManager) bitVectorPolynomialIdentity(sort ASTHandle, unit int64, receipt *astBVNormalizationReceipt) (node astNodeRef, result error) {
+func (m *ASTManager) bitVectorPolynomialIdentity(sort ASTHandle, unit int64, receipt *astBVNormalizationReceipt, publish *ASTHandle, assign bool) (node astNodeRef, result error) {
 	f, e := m.beginBVNumeralFrame()
 	if e != nil {
 		return node, e
@@ -90,7 +90,56 @@ func (m *ASTManager) bitVectorPolynomialIdentity(sort ASTHandle, unit int64, rec
 	if e = f.copyConstruct(0, &f.values[5]); e != nil {
 		return node, e
 	}
-	return m.bitVectorNumeralAppCore(f, width)
+	node, result = m.bitVectorNumeralAppCore(f, width)
+	if result != nil || !assign {
+		return node, result
+	}
+	// Finish the numeral factory's locals before returning its pointer to the
+	// caller assignment. The outer integer literal stays live through the store.
+	if result = f.joinNormalizationChild(false, false); result != nil {
+		return node, result
+	}
+	for _, i := range f.childOrder() {
+		if i >= 0 {
+			if result = f.children[i].SourceReady(); result != nil {
+				f.sourceCause = result
+				return node, result
+			}
+		}
+	}
+	for _, i := range f.valueOrder() {
+		if i != 5 {
+			if result = f.destroyOne(i, false); result != nil {
+				return node, result
+			}
+		}
+	}
+	if publish == nil {
+		return node, ErrASTHandle
+	}
+	*publish = m.external(node)
+	return node, nil
+}
+
+// AssignBitVectorPolynomialZeroWithInvocation preserves the caller's pointer
+// assignment before the rational(0) full-expression temporary ends.
+func (m *ASTManager) AssignBitVectorPolynomialZeroWithInvocation(sort ASTHandle, out *ASTHandle, c *ASTBitVectorNumeralInvocation) (result error) {
+	if c == nil {
+		return ErrASTHandle
+	}
+	if e := m.lock(); e != nil {
+		return e
+	}
+	defer m.mu.Unlock()
+	if e := c.prepare(m); e != nil {
+		return e
+	}
+	defer c.finish(&result)
+	previous := m.formatExecuting
+	m.formatExecuting = true
+	defer func() { m.formatExecuting = previous }()
+	_, result = m.bitVectorPolynomialIdentity(sort, 0, &c.receipt, out, true)
+	return result
 }
 
 func (m *ASTManager) MkBitVectorPolynomialCoefficient(value *util.OwnedRational, sort, arg ASTHandle) (ASTHandle, error) {
