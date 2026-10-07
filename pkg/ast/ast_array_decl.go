@@ -61,6 +61,9 @@ func (m *ASTManager) arrayDecl(k int32, ps []ASTParameter, domain []ASTHandle, r
 	if k == ASTArrayOpMap {
 		return m.arrayMapDecl(ps, domain)
 	}
+	if k >= ASTArrayOpSetUnion && k <= ASTArrayOpSetSubset {
+		return m.arraySetDecl(k, domain)
+	}
 	if k == ASTArrayOpConst {
 		var sort astNodeRef
 		if len(ps) == 1 {

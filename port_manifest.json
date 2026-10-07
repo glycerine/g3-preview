@@ -9025,7 +9025,8 @@
         "pkg/ast/ast_array_decl.go",
         "pkg/ast/ast_array_util.go",
         "pkg/ast/ast_array_as_array.go",
-        "pkg/ast/ast_array_map.go"
+        "pkg/ast/ast_array_map.go",
+        "pkg/ast/ast_array_set.go"
       ],
       "tests": [
         "TestASTArraySourceConstructorAndInfiniteSortParameters",
@@ -9050,7 +9051,9 @@
         "TestASTArrayMapOriginalDomainsRangeFlagsAndFunction",
         "TestASTArrayMapOriginalValidation",
         "TestASTArrayMapOriginalParameterVectorRefusalAndReuse",
-        "TestASTArraySortUtilityAbsentPluginAndDomainBounds"
+        "TestASTArraySortUtilityAbsentPluginAndDomainBounds",
+        "TestASTArraySetOriginalDeclarationsParametersFlagsAndAssociativeApps",
+        "TestASTArraySetOriginalValidation"
       ],
       "assertions": [
         {
@@ -9144,17 +9147,27 @@
             "TestASTArrayMapOriginalParameterVectorRefusalAndReuse",
             "TestASTArraySortUtilityAbsentPluginAndDomainBounds"
           ]
+        },
+        {
+          "name": "original check_set_arguments and union/intersect/difference/complement/subset declarations, retained union sort, binary associative flags and constant/empty/full-set utility (src/ast/array_decl_plugin.cpp:329-431; src/ast/array_decl_plugin.h:176-185)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_array_set.go",
+          "tests": [
+            "TestASTArraySetOriginalDeclarationsParametersFlagsAndAssociativeApps",
+            "TestASTArraySetOriginalValidation"
+          ]
         }
       ],
       "ownership": [
         "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end.",
         "Select/store build source inline16/doubling normalized domain buffers and release them after declaration factory dispatch. Const declarations retain the private array-sort parameter through the actual copied info owner, retiring the lexical parameter afterward. Existing AST declaration/application factories retain node/domain references and canonical identity.",
         "As-array builds its function domain/range parameters in a concrete lexical source vector with original growth, releases its descriptors/storage on refusal and publication, and publishes the actual function AST parameter in the canonical declaration info. The referenced function remains owned by that declaration.",
-        "Map declarations retain the original mapped function parameter and output array sort. Actual lexical vector<parameter> owns Go parameter descriptors and source-grown storage; borrowed array-map arguments use the existing domain buffer/application path without a second argument copy. Every warm parameter-vector refusal restores live descriptor count and charge. Sort utility handles absent plugin and scalar domain bounds explicitly."
+        "Map declarations retain the original mapped function parameter and output array sort. Actual lexical vector<parameter> owns Go parameter descriptors and source-grown storage; borrowed array-map arguments use the existing domain buffer/application path without a second argument copy. Every warm parameter-vector refusal restores live descriptor count and charge. Sort utility handles absent plugin and scalar domain bounds explicitly.",
+        "Set declarations use the original exact sort identity and Boolean-range checks. Union retains its single sort parameter; intersection retains no parameter. Union/intersection canonicalize to nonflat binary declarations and applications use the existing source right-association path. Constant/empty/full-set utilities borrow source Boolean values and keep lexical parameter descriptors through publication and cleanup."
       ],
       "deviations": [
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
-        "Selected array select/store/const declaration and expression-overload dispatch is now implemented. Optional explicit range is used by the const-array fallback; valid sort parameters take priority. Select/store normalize compatible arithmetic domains using the actual registered arithmetic family and coercion flag; const preserves its supplied domain. Existing application coercion insertion remains unported, without a fabricated cast. Other array declaration kinds/utilities beyond as-array and map, value creation, exact source exception diagnostics and whole-unit ownership/allocator ABI campaigns remain open."
+        "Selected array select/store/const declaration and expression-overload dispatch is now implemented. Optional explicit range is used by the const-array fallback; valid sort parameters take priority. Select/store normalize compatible arithmetic domains using the actual registered arithmetic family and coercion flag; const preserves its supplied domain. Existing application coercion insertion remains unported, without a fabricated cast. Other array declaration kinds/utilities beyond as-array, map and set operations, value creation, exact source exception diagnostics and whole-unit ownership/allocator ABI campaigns remain open."
       ]
     },
     {
@@ -9166,7 +9179,8 @@
         "pkg/ast/ast_array_decl.go",
         "pkg/ast/ast_array_util.go",
         "pkg/ast/ast_array_as_array.go",
-        "pkg/ast/ast_array_map.go"
+        "pkg/ast/ast_array_map.go",
+        "pkg/ast/ast_array_set.go"
       ],
       "tests": [
         "TestASTArrayOriginalSelectStoreConstDeclarationsAndApplications",
@@ -9182,7 +9196,9 @@
         "TestASTArrayMapOriginalDomainsRangeFlagsAndFunction",
         "TestASTArrayMapOriginalValidation",
         "TestASTArrayMapOriginalParameterVectorRefusalAndReuse",
-        "TestASTArraySortUtilityAbsentPluginAndDomainBounds"
+        "TestASTArraySortUtilityAbsentPluginAndDomainBounds",
+        "TestASTArraySetOriginalDeclarationsParametersFlagsAndAssociativeApps",
+        "TestASTArraySetOriginalValidation"
       ],
       "conditionals": [
         {
@@ -9237,15 +9253,25 @@
             "TestASTArrayMapOriginalParameterVectorRefusalAndReuse",
             "TestASTArraySortUtilityAbsentPluginAndDomainBounds"
           ]
+        },
+        {
+          "name": "original check_set_arguments and union/intersect/difference/complement/subset declarations, retained union sort, binary associative flags and constant/empty/full-set utility (src/ast/array_decl_plugin.cpp:329-431; src/ast/array_decl_plugin.h:176-185)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_array_set.go",
+          "tests": [
+            "TestASTArraySetOriginalDeclarationsParametersFlagsAndAssociativeApps",
+            "TestASTArraySetOriginalValidation"
+          ]
         }
       ],
       "ownership": [
         "Select/store build source inline16/doubling normalized domain buffers and release them after declaration factory dispatch. Const declarations retain the private array-sort parameter through the actual copied info owner, retiring the lexical parameter afterward. Existing AST declaration/application factories retain node/domain references and canonical identity.",
         "As-array builds its function domain/range parameters in a concrete lexical source vector with original growth, releases its descriptors/storage on refusal and publication, and publishes the actual function AST parameter in the canonical declaration info. The referenced function remains owned by that declaration.",
-        "Map declarations retain the original mapped function parameter and output array sort. Actual lexical vector<parameter> owns Go parameter descriptors and source-grown storage; borrowed array-map arguments use the existing domain buffer/application path without a second argument copy. Every warm parameter-vector refusal restores live descriptor count and charge. Sort utility handles absent plugin and scalar domain bounds explicitly."
+        "Map declarations retain the original mapped function parameter and output array sort. Actual lexical vector<parameter> owns Go parameter descriptors and source-grown storage; borrowed array-map arguments use the existing domain buffer/application path without a second argument copy. Every warm parameter-vector refusal restores live descriptor count and charge. Sort utility handles absent plugin and scalar domain bounds explicitly.",
+        "Set declarations use the original exact sort identity and Boolean-range checks. Union retains its single sort parameter; intersection retains no parameter. Union/intersection canonicalize to nonflat binary declarations and applications use the existing source right-association path. Constant/empty/full-set utilities borrow source Boolean values and keep lexical parameter descriptors through publication and cleanup."
       ],
       "deviations": [
-        "Selected array select/store/const declaration and expression-overload dispatch is now implemented. Optional explicit range is used by the const-array fallback; valid sort parameters take priority. Select/store normalize compatible arithmetic domains using the actual registered arithmetic family and coercion flag; const preserves its supplied domain. Existing application coercion insertion remains unported, without a fabricated cast. Other array declaration kinds/utilities beyond as-array and map, value creation, exact source exception diagnostics and whole-unit ownership/allocator ABI campaigns remain open."
+        "Selected array select/store/const declaration and expression-overload dispatch is now implemented. Optional explicit range is used by the const-array fallback; valid sort parameters take priority. Select/store normalize compatible arithmetic domains using the actual registered arithmetic family and coercion flag; const preserves its supplied domain. Existing application coercion insertion remains unported, without a fabricated cast. Other array declaration kinds/utilities beyond as-array, map and set operations, value creation, exact source exception diagnostics and whole-unit ownership/allocator ABI campaigns remain open."
       ]
     },
     {
@@ -18435,7 +18461,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/rewriter/array_rewriter.go",
-        "pkg/ast/rewriter/array_rewriter_map.go"
+        "pkg/ast/rewriter/array_rewriter_map.go",
+        "pkg/ast/rewriter/array_rewriter_set.go"
       ],
       "tests": [
         "TestArrayRewriterOriginalStoreSelectAndFirstUncertainIndex",
@@ -18446,7 +18473,9 @@
         "TestArrayRewriterOriginalSelectAsArray",
         "TestArrayRewriterOriginalMapStoreConstAndDecline",
         "TestArrayRewriterOriginalMapMultiConstRangeAndUnaryRangeGuard",
-        "TestArrayRewriterOriginalMapManyArraysBufferRefusals"
+        "TestArrayRewriterOriginalMapManyArraysBufferRefusals",
+        "TestArrayRewriterOriginalSetStatusesAndSourceTrees",
+        "TestArrayRewriterOriginalSetSubsetFailurePublicationAndReuse"
       ],
       "assertions": [
         {
@@ -18558,15 +18587,26 @@
             "TestArrayRewriterOriginalMapMultiConstRangeAndUnaryRangeGuard",
             "TestArrayRewriterOriginalMapManyArraysBufferRefusals"
           ]
+        },
+        {
+          "name": "original set union/intersection bounded rewrite status, complement map-core refusal, difference map construction and subset difference-before-equality publication (src/ast/rewriter/array_rewriter.cpp:340-388)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/array_rewriter_set.go",
+          "tests": [
+            "TestArrayRewriterOriginalSetStatusesAndSourceTrees",
+            "TestArrayRewriterOriginalSetSubsetFailurePublicationAndReuse"
+          ]
         }
       ],
       "ownership": [
         "Configured owner borrows AST/parameter services, charges its concrete header and retains reached helper continuations for Close. Original ptr_buffer temporaries retain inline16/doubling allocation and reset capacity; select-ITE uses original ptr_vector growth. Output references are published only after successful construction.",
-        "Map store rules borrow actual source ptr_buffers for base/value/new arguments; multi-constant rules use the source growing domain ptr_vector, lexical owning output sort reference and parameter. Warm every-reservation campaigns cover two and eighteen mapped arrays, real buffer/vector growth, output preservation, charge restoration and successful reuse. Raw intermediate AST publication and source cleanup order remain unchanged."
+        "Map store rules borrow actual source ptr_buffers for base/value/new arguments; multi-constant rules use the source growing domain ptr_vector, lexical owning output sort reference and parameter. Warm every-reservation campaigns cover two and eighteen mapped arrays, real buffer/vector growth, output preservation, charge restoration and successful reuse. Raw intermediate AST publication and source cleanup order remain unchanged.",
+        "Set reduction retains source raw map intermediates and the existing out reference. Subset first publishes the difference; later empty-set/equality refusal preserves that prefix instead of rolling output back. Warm every-reservation tests observe that real prefix, restore output and budget, and verify successful reuse."
       ],
       "deviations": [
-        "Store/select rules preserve first-uncertain-index comparison, original structural store sorting and rewrite statuses. Parameter lookup follows local/module/default order and resets select-ITE expansion. Array set rules, equality expansion, parameter-description wrapper, TRACE, complete ownership/allocator campaigns and exact native exception/assertion transport remain open. Unported reached operation rules return an explicit error. These focused tests add no registered source driver credit.",
-        "Original unary map over a constant array explicitly reuses its input array sort; a mapped function with a different output range reaches the existing type precondition, whereas the multi-array constant rule constructs the new range. This source limitation is exposed by a focused test and preserved rather than silently corrected. Selected map rules add no registered driver or whole-unit native allocator/assertion credit."
+        "Store/select rules preserve first-uncertain-index comparison, original structural store sorting and rewrite statuses. Parameter lookup follows local/module/default order and resets select-ITE expansion. Store equality expansion, parameter-description wrapper, TRACE, complete ownership/allocator campaigns and exact native exception/assertion transport remain open. These focused tests add no registered source driver credit.",
+        "Original unary map over a constant array explicitly reuses its input array sort; a mapped function with a different output range reaches the existing type precondition, whereas the multi-array constant rule constructs the new range. This source limitation is exposed by a focused test and preserved rather than silently corrected. Selected map rules add no registered driver or whole-unit native allocator/assertion credit.",
+        "Set app rules are integrated into the original switch. Bare-array complement declines rather than inventing a raw-map fallback. Union/intersection applications with more than two operands are source right-associated binary trees; a direct variadic core callback reaches the original map factory exact Boolean function arity guard. Unknown-index/mixed-shape maps and their select/subset residuals are preserved; no new select-over-map algorithm is fabricated. Native exception/assertion and whole-unit ABI/allocator campaigns remain open."
       ]
     },
     {
@@ -18576,7 +18616,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/rewriter/array_rewriter.go",
-        "pkg/ast/rewriter/array_rewriter_map.go"
+        "pkg/ast/rewriter/array_rewriter_map.go",
+        "pkg/ast/rewriter/array_rewriter_set.go"
       ],
       "tests": [
         "TestArrayRewriterOriginalStoreSelectAndFirstUncertainIndex",
@@ -18587,7 +18628,9 @@
         "TestArrayRewriterOriginalSelectAsArray",
         "TestArrayRewriterOriginalMapStoreConstAndDecline",
         "TestArrayRewriterOriginalMapMultiConstRangeAndUnaryRangeGuard",
-        "TestArrayRewriterOriginalMapManyArraysBufferRefusals"
+        "TestArrayRewriterOriginalMapManyArraysBufferRefusals",
+        "TestArrayRewriterOriginalSetStatusesAndSourceTrees",
+        "TestArrayRewriterOriginalSetSubsetFailurePublicationAndReuse"
       ],
       "conditionals": [
         {
@@ -18631,15 +18674,26 @@
             "TestArrayRewriterOriginalMapMultiConstRangeAndUnaryRangeGuard",
             "TestArrayRewriterOriginalMapManyArraysBufferRefusals"
           ]
+        },
+        {
+          "name": "original set union/intersection bounded rewrite status, complement map-core refusal, difference map construction and subset difference-before-equality publication (src/ast/rewriter/array_rewriter.cpp:340-388)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/array_rewriter_set.go",
+          "tests": [
+            "TestArrayRewriterOriginalSetStatusesAndSourceTrees",
+            "TestArrayRewriterOriginalSetSubsetFailurePublicationAndReuse"
+          ]
         }
       ],
       "ownership": [
         "Configured owner borrows AST/parameter services, charges its concrete header and retains reached helper continuations for Close. Original ptr_buffer temporaries retain inline16/doubling allocation and reset capacity; select-ITE uses original ptr_vector growth. Output references are published only after successful construction.",
-        "Map store rules borrow actual source ptr_buffers for base/value/new arguments; multi-constant rules use the source growing domain ptr_vector, lexical owning output sort reference and parameter. Warm every-reservation campaigns cover two and eighteen mapped arrays, real buffer/vector growth, output preservation, charge restoration and successful reuse. Raw intermediate AST publication and source cleanup order remain unchanged."
+        "Map store rules borrow actual source ptr_buffers for base/value/new arguments; multi-constant rules use the source growing domain ptr_vector, lexical owning output sort reference and parameter. Warm every-reservation campaigns cover two and eighteen mapped arrays, real buffer/vector growth, output preservation, charge restoration and successful reuse. Raw intermediate AST publication and source cleanup order remain unchanged.",
+        "Set reduction retains source raw map intermediates and the existing out reference. Subset first publishes the difference; later empty-set/equality refusal preserves that prefix instead of rolling output back. Warm every-reservation tests observe that real prefix, restore output and budget, and verify successful reuse."
       ],
       "deviations": [
-        "Store/select rules preserve first-uncertain-index comparison, original structural store sorting and rewrite statuses. Parameter lookup follows local/module/default order and resets select-ITE expansion. Array set rules, equality expansion, parameter-description wrapper, TRACE, complete ownership/allocator campaigns and exact native exception/assertion transport remain open. Unported reached operation rules return an explicit error. These focused tests add no registered source driver credit.",
-        "Original unary map over a constant array explicitly reuses its input array sort; a mapped function with a different output range reaches the existing type precondition, whereas the multi-array constant rule constructs the new range. This source limitation is exposed by a focused test and preserved rather than silently corrected. Selected map rules add no registered driver or whole-unit native allocator/assertion credit."
+        "Store/select rules preserve first-uncertain-index comparison, original structural store sorting and rewrite statuses. Parameter lookup follows local/module/default order and resets select-ITE expansion. Store equality expansion, parameter-description wrapper, TRACE, complete ownership/allocator campaigns and exact native exception/assertion transport remain open. These focused tests add no registered source driver credit.",
+        "Original unary map over a constant array explicitly reuses its input array sort; a mapped function with a different output range reaches the existing type precondition, whereas the multi-array constant rule constructs the new range. This source limitation is exposed by a focused test and preserved rather than silently corrected. Selected map rules add no registered driver or whole-unit native allocator/assertion credit.",
+        "Set app rules are integrated into the original switch. Bare-array complement declines rather than inventing a raw-map fallback. Union/intersection applications with more than two operands are source right-associated binary trees; a direct variadic core callback reaches the original map factory exact Boolean function arity guard. Unknown-index/mixed-shape maps and their select/subset residuals are preserved; no new select-over-map algorithm is fabricated. Native exception/assertion and whole-unit ABI/allocator campaigns remain open."
       ]
     },
     {
@@ -45991,7 +46045,8 @@
         "TestArrayTupleOriginalCompositeHashGoldenAndReadOrder",
         "TestArrayTupleOriginalReplacementGrowthAndLastTombstone",
         "TestArrayTupleOriginalDeletedCleanupAndResizeRefusal",
-        "TestModelEvaluatorOriginalArrayMapTraversalAndSelection"
+        "TestModelEvaluatorOriginalArrayMapTraversalAndSelection",
+        "TestModelEvaluatorOriginalSetOperationsAndMembership"
       ],
       "assertions": [
         {
@@ -46049,7 +46104,8 @@
             "TestModelEvaluatorArrayIdentityAndDisabledEquality",
             "TestModelEvaluatorArrayPartialTheoryGraphCompletion",
             "TestModelEvaluatorOriginalFunctionBackedArraySelection",
-            "TestModelEvaluatorOriginalArrayMapTraversalAndSelection"
+            "TestModelEvaluatorOriginalArrayMapTraversalAndSelection",
+            "TestModelEvaluatorOriginalSetOperationsAndMembership"
           ]
         },
         {
@@ -46085,9 +46141,10 @@
         "Embedded equality continuation owns both extracted row vectors/else references, conjunction and fallback argument vectors, lexical select references and two borrowed-row tables. Actual INC-before-growth receipts retain unpublished acquisitions until cleanup; tables release before borrowed rows. Source raw select/equality intermediates created before failed ITE publication remain with the AST manager until Close; evaluator reset must not fabricate ownership of them."
       ],
       "deviations": [
-        "Boolean/uninterpreted and selected original array store/select and value extraction/expansion and nonidentity equality paths are integrated. Arithmetic/BV/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch, set rules remain open. Array equality identity is handled before the expansion flag; disabled expansion falls through to the original Boolean reducer. Partial theory graph fallback is integrated for the known array dispatch, including source unconditional partial-graph completion and direct-order var_subst. Reached remaining unsupported theory paths explicitly refuse. Runtime AllocationSize remains the existing memory accounting owner; runtime-wide typed allocator wiring, proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited.",
+        "Boolean/uninterpreted and selected original array store/select and value extraction/expansion and nonidentity equality paths are integrated. Arithmetic/BV/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch remain open. Array equality identity is handled before the expansion flag; disabled expansion falls through to the original Boolean reducer. Partial theory graph fallback is integrated for the known array dispatch, including source unconditional partial-graph completion and direct-order var_subst. Reached remaining unsupported theory paths explicitly refuse. Runtime AllocationSize remains the existing memory accounting owner; runtime-wide typed allocator wiring, proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited.",
         "Selected extraction preserves store-prefix and function-entry order, all-entry groundness rejection, missing/nonground else rejection, and backwards else-equal pruning only while index values permit it. Concrete Go scalar owners and lexical vector storage remain explicit representations, without whole native allocation ABI credit.",
-        "Original equality constraints deliberately retain two source limitations: finite-domain default equality is required even when explicit entries cover every index, and unknown matched rows remain in table1 for a later comparison with else2. Independent truth-table tests expose these source false negatives. No source algorithm correction or whole-unit native allocation/assertion credit is claimed."
+        "Original equality constraints deliberately retain two source limitations: finite-domain default equality is required even when explicit entries cover every index, and unknown matched rows remain in table1 for a later comparison with else2. Independent truth-table tests expose these source false negatives. No source algorithm correction or whole-unit native allocation/assertion credit is claimed.",
+        "Original set declarations/reducers now reach evaluator traversal. Independent concrete Boolean membership/subset tests cover reducible aligned-store/constant cases and exact unresolved select/map/equality residuals for mismatched-index or mixed constant/store inputs. This preserves the source evaluator limitation rather than claiming full concrete set decision coverage."
       ]
     },
     {
@@ -46124,7 +46181,8 @@
         "TestArrayTupleOriginalCompositeHashGoldenAndReadOrder",
         "TestArrayTupleOriginalReplacementGrowthAndLastTombstone",
         "TestArrayTupleOriginalDeletedCleanupAndResizeRefusal",
-        "TestModelEvaluatorOriginalArrayMapTraversalAndSelection"
+        "TestModelEvaluatorOriginalArrayMapTraversalAndSelection",
+        "TestModelEvaluatorOriginalSetOperationsAndMembership"
       ],
       "conditionals": [
         {
@@ -46162,7 +46220,8 @@
             "TestModelEvaluatorArrayIdentityAndDisabledEquality",
             "TestModelEvaluatorArrayPartialTheoryGraphCompletion",
             "TestModelEvaluatorOriginalFunctionBackedArraySelection",
-            "TestModelEvaluatorOriginalArrayMapTraversalAndSelection"
+            "TestModelEvaluatorOriginalArrayMapTraversalAndSelection",
+            "TestModelEvaluatorOriginalSetOperationsAndMembership"
           ]
         },
         {
@@ -46198,9 +46257,10 @@
         "Embedded equality continuation owns both extracted row vectors/else references, conjunction and fallback argument vectors, lexical select references and two borrowed-row tables. Actual INC-before-growth receipts retain unpublished acquisitions until cleanup; tables release before borrowed rows. Source raw select/equality intermediates created before failed ITE publication remain with the AST manager until Close; evaluator reset must not fabricate ownership of them."
       ],
       "deviations": [
-        "Boolean/uninterpreted and selected original array store/select and value extraction/expansion and nonidentity equality paths are integrated. Arithmetic/BV/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch, set rules remain open. Array equality identity is handled before the expansion flag; disabled expansion falls through to the original Boolean reducer. Partial theory graph fallback is integrated for the known array dispatch, including source unconditional partial-graph completion and direct-order var_subst. Reached remaining unsupported theory paths explicitly refuse. Runtime AllocationSize remains the existing memory accounting owner; runtime-wide typed allocator wiring, proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited.",
+        "Boolean/uninterpreted and selected original array store/select and value extraction/expansion and nonidentity equality paths are integrated. Arithmetic/BV/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch remain open. Array equality identity is handled before the expansion flag; disabled expansion falls through to the original Boolean reducer. Partial theory graph fallback is integrated for the known array dispatch, including source unconditional partial-graph completion and direct-order var_subst. Reached remaining unsupported theory paths explicitly refuse. Runtime AllocationSize remains the existing memory accounting owner; runtime-wide typed allocator wiring, proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited.",
         "Selected extraction preserves store-prefix and function-entry order, all-entry groundness rejection, missing/nonground else rejection, and backwards else-equal pruning only while index values permit it. Concrete Go scalar owners and lexical vector storage remain explicit representations, without whole native allocation ABI credit.",
-        "Original equality constraints deliberately retain two source limitations: finite-domain default equality is required even when explicit entries cover every index, and unknown matched rows remain in table1 for a later comparison with else2. Independent truth-table tests expose these source false negatives. No source algorithm correction or whole-unit native allocation/assertion credit is claimed."
+        "Original equality constraints deliberately retain two source limitations: finite-domain default equality is required even when explicit entries cover every index, and unknown matched rows remain in table1 for a later comparison with else2. Independent truth-table tests expose these source false negatives. No source algorithm correction or whole-unit native allocation/assertion credit is claimed.",
+        "Original set declarations/reducers now reach evaluator traversal. Independent concrete Boolean membership/subset tests cover reducible aligned-store/constant cases and exact unresolved select/map/equality residuals for mismatched-index or mixed constant/store inputs. This preserves the source evaluator limitation rather than claiming full concrete set decision coverage."
       ]
     },
     {

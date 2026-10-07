@@ -22,8 +22,6 @@ type ArrayRewriter struct {
 	sortStore, expandSelectStore, expandStoreEq, expandSelectIte bool
 }
 
-var ErrArrayRewriterRule = errors.New("array rewrite rule not yet ported")
-
 // A nonnil partial constructor result must be closed after an error.
 func NewArrayRewriter(m *ast.ASTManager, c *util.ParamsContext, g *util.GlobalParamsService, p *util.ParamsRef) (*ArrayRewriter, error) {
 	if m == nil || c == nil || g == nil || c.SymbolsField != m.Symbols || g.Context != c {
@@ -221,8 +219,33 @@ func (rw *ArrayRewriter) MkAppCore(d ast.ASTHandle, args ast.AppArguments, out a
 			return RewriteFailed, e
 		}
 		return rw.mapCore(f, args, out)
-	case ast.ASTArrayOpSetUnion, ast.ASTArrayOpSetIntersect, ast.ASTArrayOpSetSubset, ast.ASTArrayOpSetComplement, ast.ASTArrayOpSetDifference:
-		return RewriteFailed, ErrArrayRewriterRule
+	case ast.ASTArrayOpSetUnion, ast.ASTArrayOpSetIntersect:
+		return rw.setUnionIntersection(op, args, out)
+	case ast.ASTArrayOpSetComplement:
+		if args.Count() != 1 {
+			return RewriteFailed, ast.ErrASTDomain
+		}
+		a, e := args.At(0)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		return rw.setComplement(a, out)
+	case ast.ASTArrayOpSetDifference, ast.ASTArrayOpSetSubset:
+		if args.Count() != 2 {
+			return RewriteFailed, ast.ErrASTDomain
+		}
+		a, e := args.At(0)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		b, e := args.At(1)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		if op == ast.ASTArrayOpSetDifference {
+			return rw.setDifference(a, b, out)
+		}
+		return rw.setSubset(a, b, out)
 	default:
 		return RewriteFailed, nil
 	}
