@@ -123,6 +123,8 @@ The first 16 pushes fit inline; the spill path divides by zero. `SourceVectorCap
 
 **Validation after fixing:** Run the complete portcheck command, including evidence validation. Confirm that all referenced Go files/tests exist, and that incomplete entries remain explicitly incomplete unless their behavior has actually been implemented and validated.
 
+note: I restored these files from the parent comment at the top level of the repo.
+
 ## A6. Incorrect C++ provenance paths
 
 The following headers are demonstrably invalid against both the canonical source tree and its package mirrors:
