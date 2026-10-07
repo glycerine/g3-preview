@@ -129743,7 +129743,9 @@
         "pkg/math/polynomial/polynomial_variable_recognition_owner_source_test.go",
         "pkg/util/rational_service.go",
         "pkg/util/rational_service_invocation.go",
-        "pkg/util/rational_service_unsigned_invocation_test.go"
+        "pkg/util/rational_service_unsigned_invocation_test.go",
+        "pkg/util/rational_service_mod_into_invocation_test.go",
+        "pkg/util/rational_service_mod_into_callback_source_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -129973,7 +129975,10 @@
         "TestPolynomialVariableRecognitionExecutingIntegerOwnerRefusesFinalize",
         "TestIntegerPNormalizeNilReturningTransportOwnerRefusal",
         "TestRationalServiceUnsignedInvocationOriginalBoundary",
-        "TestRationalServiceSourceUnsignedConstructorBoundary"
+        "TestRationalServiceSourceUnsignedConstructorBoundary",
+        "TestRationalServiceModIntoInvocationAliasesAndInline",
+        "TestRationalServiceModIntoInvocationEveryActualReservation",
+        "TestRationalServiceModIntoInvocationActualTransportRefusesHeldOwner"
       ],
       "conditionals": [
         {
@@ -130992,6 +130997,16 @@
             "TestRationalServiceUnsignedInvocationOriginalBoundary",
             "TestRationalServiceSourceUnsignedConstructorBoundary"
           ]
+        },
+        {
+          "name": "original void mod(a,b,out) direct physical receiver with caller-local allocation context and NUM-before-DEN publication (src/util/rational.h:198-200; src/util/mpq.h:549-553; src/util/mpz.h:487-497)",
+          "status": "partial",
+          "go_target": "pkg/util/rational_service_invocation.go",
+          "tests": [
+            "TestRationalServiceModIntoInvocationAliasesAndInline",
+            "TestRationalServiceModIntoInvocationEveryActualReservation",
+            "TestRationalServiceModIntoInvocationActualTransportRefusesHeldOwner"
+          ]
         }
       ],
       "ownership": [
@@ -131016,7 +131031,8 @@
         "Selected source comparison/unary/reset/swap paths check cold ownership then each reached component action, preserving unread invalid fields and partial publication. Actual SYNCH RAW comparison locals are charged distinct manager fields, normal deletion cursor follows source, body failure retains real limbs for explicit owning cleanup. Service lexical bound9 unchanged; copied unary results use existing literal constructor/temporary machinery. Immediate caller-named physical censuses, cold reservation sweeps and warm allocation checks cover selected routes. Unrelated arithmetic and Go-extension Move preflights remain open.",
         "Selected alias division owns a real retained raw Int; source body failure skips explicit Del, source end precedes sign/normalize, and owning cleanup is separate. The raw scope is ten Int fields charged by the manager header; facade lexical bound remains nine. Named physical audits include active div and retain exact equality.",
         "mpz.cpp:1186-1207; mpzzp.h:58-68,111-114: returning Runtime transport cannot destroy executing Copy/PN Integer or enclosing Rational owner. Non-Z normalization execution scalar is a lifecycle guard only, set/restored around the same nil/receipt body; allocation authority remains exclusively explicit receipts.",
-        "Unsigned32 invocation passes the original caller allocation context to the existing integer uint32 overload and resets DEN only after successful NUM publication. Owned values retain previous setter destruction rules; actual facade lexical scopes join through the caller receipt. Tests replace big numerator/denominator, check inclusive INT_MAX, reject copied contexts and end source/own contexts."
+        "Unsigned32 invocation passes the original caller allocation context to the existing integer uint32 overload and resets DEN only after successful NUM publication. Owned values retain previous setter destruction rules; actual facade lexical scopes join through the caller receipt. Tests replace big numerator/denominator, check inclusive INT_MAX, reject copied contexts and end source/own contexts.",
+        "The void modulo invocation writes the caller-owned rational directly, without a returned value or copy temporary. It passes the exact allocation context into the existing literal manager operation, records sticky child source causes and transfers reached lexical/allocation roots at the actual service epilogue. Actual Runtime callback tests reject caller/output/service cleanup during the held invocation, name its transferred allocation in the immediate physical audit and close the entire graph to zero budget."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -131037,7 +131053,8 @@
         "Rational scalar getter predicates remain correct, but source getters assert rational range only in debug before inherited integer access. Current getters universally reject fractional numerals. Selected integer accessor/cast profiles require separate audit and implementation; see PORT_PROGRESS.md#audit-mpq-rounding-publication-packet-md.",
         "Malformed32-bit requested-byte layouts are labelled guarded Go boundary evidence, not ordinary valid C++ destructor allocation failure. Budget supplies actual allocation refusal/failed-copy token only, never simulated Del failure. Selected scope records preserve original vs cleanup causes; broader raw constructor/reset/alias/default-copy-constructor arithmetic temporaries, registry/global ownership and transport remain partial. Cross-owner staged CopyFrom is explicit Go ownership bridge, not a source alias transaction. No whole-unit/API/registered assertion promotion.",
         "No newly registered source assertion credit: sixteen added source-profile regressions complement existing active assertions. Selected ordinary whole-value preflights are replaced only where they precede actual source reads/mutations. Malformed ILP32 second temporary end-cursor test diagnoses physical requested-size guard after actual source first destruction, with no guard relabeling or allocator repair. Whole header and global service binding remain partial.",
-        "The existing unsigned service setter now names the original uint32 manager overload rather than the numerically equivalent signed64 facade shortcut. Small uint32 uses original int32 publication; larger values still reach original int64 path. Native rational/union/allocator/exception ABI and whole-unit ownership audits remain uncredited; integration faults are separately covered at the BV caller."
+        "The existing unsigned service setter now names the original uint32 manager overload rather than the numerically equivalent signed64 facade shortcut. Small uint32 uses original int32 publication; larger values still reach original int64 path. Native rational/union/allocator/exception ABI and whole-unit ownership audits remain uncredited; integration faults are separately covered at the BV caller.",
+        "The selected caller-local void overload is a prerequisite of original sign-extension numeral rewriting. It preserves the native negative-dividend/divisor-output alias defect: correction rereads the overwritten divisor and produces zero. Tests do not pre-copy the divisor to repair source behavior. Source denominator reset follows successful numerator publication; failure leaves original DEN untouched. Native pointer/stack/assertion/exception/allocator ABI and whole-unit ownership audits remain uncredited; Runtime returning transport closure does not prove native-fatal resumability."
       ]
     },
     {
@@ -139677,7 +139694,9 @@
         "pkg/util/util_rational_global_service_test.go",
         "pkg/util/rational_service_invocation.go",
         "pkg/util/rational_service_gcd_invocation_test.go",
-        "pkg/util/rational_service_unsigned_invocation_test.go"
+        "pkg/util/rational_service_unsigned_invocation_test.go",
+        "pkg/util/rational_service_mod_into_invocation_test.go",
+        "pkg/util/rational_service_mod_into_callback_source_test.go"
       ],
       "tests": [
         "TestSourceRationalConversionAssertions",
@@ -139823,7 +139842,10 @@
         "TestRationalGlobalAcquiredConstructorNamedPhysicalPrefixes",
         "TestRationalServiceGCDCoefficientsInvocation",
         "TestRationalServiceGCDCoefficientsInvocationEveryRuntimeReservation",
-        "TestRationalServiceUnsignedInvocationOriginalBoundary"
+        "TestRationalServiceUnsignedInvocationOriginalBoundary",
+        "TestRationalServiceModIntoInvocationAliasesAndInline",
+        "TestRationalServiceModIntoInvocationEveryActualReservation",
+        "TestRationalServiceModIntoInvocationActualTransportRefusesHeldOwner"
       ],
       "conditionals": [
         {
@@ -140367,6 +140389,16 @@
             "TestRationalServiceUnsignedInvocationOriginalBoundary",
             "TestRationalServiceSourceUnsignedConstructorBoundary"
           ]
+        },
+        {
+          "name": "original void mod(a,b,out) direct physical receiver with caller-local allocation context and NUM-before-DEN publication (src/util/rational.h:198-200; src/util/mpq.h:549-553; src/util/mpz.h:487-497)",
+          "status": "partial",
+          "go_target": "pkg/util/rational_service_invocation.go",
+          "tests": [
+            "TestRationalServiceModIntoInvocationAliasesAndInline",
+            "TestRationalServiceModIntoInvocationEveryActualReservation",
+            "TestRationalServiceModIntoInvocationActualTransportRefusesHeldOwner"
+          ]
         }
       ],
       "ownership": [
@@ -140381,7 +140413,8 @@
         "Source current is a borrowed scalar slot, never a duplicate manager owning root. Failed returned children and post-finalization managers are concrete charged acquisition nodes; first completed manager transfers at source publication to original static context. Owning cleanup drains exact nodes then retained original context and detaches only after real closure.",
         "GCDCoefficientsWithInvocation embeds its lexical ownership in the caller and captures the actual extended-GCD child receipt at integer algorithm entry. Allocation context reaches the existing manager algorithm; explicit source/own cleanup drains this exact child before EndContext. The source output denominator and coefficient prefixes remain published on error; no staging, rollback or substitute host GCD is introduced.",
         "The ui64 constructor entry now passes an explicit caller-local allocation context through the rational manager uint64 setter to its existing integer implementation, before resetting the output denominator. The original public setter shares that implementation with an empty context; successful/failure output publication prefixes are preserved.",
-        "Unsigned32 invocation passes the original caller allocation context to the existing integer uint32 overload and resets DEN only after successful NUM publication. Owned values retain previous setter destruction rules; actual facade lexical scopes join through the caller receipt. Tests replace big numerator/denominator, check inclusive INT_MAX, reject copied contexts and end source/own contexts."
+        "Unsigned32 invocation passes the original caller allocation context to the existing integer uint32 overload and resets DEN only after successful NUM publication. Owned values retain previous setter destruction rules; actual facade lexical scopes join through the caller receipt. Tests replace big numerator/denominator, check inclusive INT_MAX, reject copied contexts and end source/own contexts.",
+        "The void modulo invocation writes the caller-owned rational directly, without a returned value or copy temporary. It passes the exact allocation context into the existing literal manager operation, records sticky child source causes and transfers reached lexical/allocation roots at the actual service epilogue. Actual Runtime callback tests reject caller/output/service cleanup during the held invocation, name its transferred allocation in the immediate physical audit and close the entire graph to zero budget."
       ],
       "deviations": [
         "Explicit manager projects rational.h inclusive32-bit wrappers, distinct from strict MPZ boundaries; global wrapper remains incomplete. Float positive converted denominator SASSERT becomes typed ErrRationalFloatDomain. Source raw component alias publication can leave denominator zero; subsequent operations diagnose initialization.",
@@ -140397,7 +140430,8 @@
         "Ended static objects are not reconstructed: source reinitialization and repeated finalization reach explicit invalid-lifetime guards after literal completed publication prefixes.",
         "TLS signed-overflow release fixture is source-undefined guarded-domain evidence, not valid-source OOM. Cold acquisition nodes are actual Go ownership metadata, not source malloc events.",
         "The selected gcd wrapper now supports caller-local invocation ownership needed by BV modular inverse. The BV inverse caller remains to be ported; concrete Go scalar/header and native allocator/assertion/exception ABI qualifications remain. Actual Runtime refusal tests prove explicit owning release of interrupted invocations, not resumability of the process-fatal source operation.",
-        "The existing unsigned service setter now names the original uint32 manager overload rather than the numerically equivalent signed64 facade shortcut. Small uint32 uses original int32 publication; larger values still reach original int64 path. Native rational/union/allocator/exception ABI and whole-unit ownership audits remain uncredited; integration faults are separately covered at the BV caller."
+        "The existing unsigned service setter now names the original uint32 manager overload rather than the numerically equivalent signed64 facade shortcut. Small uint32 uses original int32 publication; larger values still reach original int64 path. Native rational/union/allocator/exception ABI and whole-unit ownership audits remain uncredited; integration faults are separately covered at the BV caller.",
+        "The selected caller-local void overload is a prerequisite of original sign-extension numeral rewriting. It preserves the native negative-dividend/divisor-output alias defect: correction rereads the overwritten divisor and produces zero. Tests do not pre-copy the divisor to repair source behavior. Source denominator reset follows successful numerator publication; failure leaves original DEN untouched. Native pointer/stack/assertion/exception/allocator ABI and whole-unit ownership audits remain uncredited; Runtime returning transport closure does not prove native-fatal resumability."
       ]
     },
     {

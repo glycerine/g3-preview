@@ -503,3 +503,36 @@ func (s *RationalService) SetUint64WithInvocation(out *OwnedRational, n uint64, 
 	defer s.endLexicalError(&e)
 	return s.Manager.setUint64WithAllocationContext(&out.Raw, n, c.allocationContext())
 }
+
+// Source: src/util/rational.h:198-200; src/util/mpq.h:549-553.
+// The void overload writes the caller's physical receiver directly. It does
+// not construct a returned rational or copy a temporary into the receiver.
+func (s *RationalService) ModIntoWithInvocation(a, b, out *OwnedRational, c *RationalServiceInvocation) (e error) {
+	if e = s.lock(); e != nil {
+		return e
+	}
+	defer s.mu.Unlock()
+	for _, value := range []*OwnedRational{a, b, out} {
+		if e = s.rationalScalarOwner(value); e != nil {
+			return e
+		}
+	}
+	if e = s.prepareLexicalInvocation(c); e != nil {
+		return e
+	}
+	defer func() { e = s.finishLexicalInvocation(c, e) }()
+	atomic.StoreUint32(&s.sourceRuntimeExecuting, 1)
+	defer atomic.StoreUint32(&s.sourceRuntimeExecuting, 0)
+	if e = s.beginLexical(); e != nil {
+		return e
+	}
+	defer s.endLexicalError(&e)
+	e = s.Manager.modWithAllocationContext(&a.Raw, &b.Raw, &out.Raw, c.allocationContext())
+	if cause := c.childSource(); cause != nil {
+		if s.Lexical.Cause == nil {
+			s.Lexical.Cause = cause
+		}
+		e = errors.Join(e, cause)
+	}
+	return e
+}
