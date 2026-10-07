@@ -11,6 +11,8 @@ var errBoolRewriterLocalContext = errors.New("Boolean rewriter: local-context si
 // its AST manager. Full parameter construction, local-context simplification,
 // other operators and the recursive rewriter engine remain dependencies.
 type boolRewriter struct {
+	blastDistinct                       bool
+	blastDistinctThreshold              uint32
 	manager                             *ASTManager
 	flat, iteExtraRules                 bool
 	localContext                        bool

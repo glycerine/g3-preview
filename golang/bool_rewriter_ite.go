@@ -1,0 +1,432 @@
+// Source: src/ast/rewriter/bool_rewriter.cpp:724-938;
+// src/ast/rewriter/bool_rewriter.h:159-163.
+// Licensed under the MIT license. Source author: Leonardo de Moura.
+package g3
+
+import "errors"
+
+func (rw *boolRewriter) mkDistinctCore(args []ASTHandle, out ASTRef) (status brStatus, err error) {
+	m := rw.manager
+	if len(args) <= 1 {
+		h, e := m.MkTrue()
+		if e != nil {
+			return brFailed, e
+		}
+		return brDone, m.SetRef(out, h)
+	}
+	if len(args) == 2 {
+		// The source's unused local expr_ref stays null throughout this branch.
+		eq, e := m.MkEq(args[0], args[1])
+		if e != nil {
+			return brFailed, e
+		}
+		h, e := m.MkNot(eq)
+		if e != nil {
+			return brFailed, e
+		}
+		return brRewrite2, m.SetRef(out, h)
+	}
+	visited, e := NewASTFastMark1(m)
+	if e != nil {
+		return brFailed, e
+	}
+	defer func() { err = errors.Join(err, visited.Close()) }()
+	allValue := true
+	for _, arg := range args {
+		marked, e := visited.IsMarked(arg)
+		if e != nil {
+			return brFailed, e
+		}
+		if marked {
+			h, e := m.MkFalse()
+			if e != nil {
+				return brFailed, e
+			}
+			return brDone, m.SetRef(out, h)
+		}
+		if e = visited.Mark(arg, true); e != nil {
+			return brFailed, e
+		}
+		value, e := m.IsUniqueValue(arg)
+		if e != nil {
+			return brFailed, e
+		}
+		if !value {
+			allValue = false
+		}
+	}
+	if allValue {
+		h, e := m.MkTrue()
+		if e != nil {
+			return brFailed, e
+		}
+		return brDone, m.SetRef(out, h)
+	}
+	boolean, e := rw.isBool(args[0])
+	if e != nil {
+		return brFailed, e
+	}
+	if boolean {
+		h, e := m.MkFalse()
+		if e != nil {
+			return brFailed, e
+		}
+		return brDone, m.SetRef(out, h)
+	}
+	if rw.blastDistinct && uint64(len(args)) < uint64(rw.blastDistinctThreshold) {
+		var diseqs astProofArguments
+		defer diseqs.close(m)
+		for i := 0; i < len(args); i++ {
+			for j := i + 1; j < len(args); j++ {
+				eq, e := m.MkEq(args[i], args[j])
+				if e != nil {
+					return brFailed, e
+				}
+				h, e := m.MkNot(eq)
+				if e != nil {
+					return brFailed, e
+				}
+				if e = diseqs.push(m, h); e != nil {
+					return brFailed, e
+				}
+			}
+		}
+		h, e := m.MkAndArgs(diseqs.slice())
+		if e != nil {
+			return brFailed, e
+		}
+		return brRewrite3, m.SetRef(out, h)
+	}
+	return brFailed, nil
+}
+
+func (rw *boolRewriter) mkITECore(c, t, f ASTHandle, out ASTRef) (status brStatus, err error) {
+	m := rw.manager
+	// Lexical source references, constructed only at the reached declaration
+	// and retired in reverse order. Five is the largest source branch.
+	var temps [5]ASTRef
+	size := 0
+	newTemp := func() (ASTRef, error) {
+		if size == len(temps) {
+			return ASTRef{}, ErrASTDomain
+		}
+		r, e := m.NewRef(ASTHandle{})
+		if e != nil {
+			return ASTRef{}, e
+		}
+		temps[size] = r
+		size++
+		return r, nil
+	}
+	defer func() {
+		for size > 0 {
+			size--
+			err = errors.Join(err, m.DelRef(&temps[size]))
+		}
+	}()
+	changed := false
+	negative, inner, e := m.IsNot(c)
+	if e != nil {
+		return brFailed, e
+	}
+	if negative {
+		c = inner
+		t, f = f, t
+		changed = true
+	}
+	nested, cond, a, b, e := rw.ite(t)
+	if e != nil {
+		return brFailed, e
+	}
+	if nested && cond == c {
+		t = a
+		changed = true
+	}
+	nested, cond, a, b, e = rw.ite(f)
+	if e != nil {
+		return brFailed, e
+	}
+	if nested && cond == c {
+		f = b
+		changed = true
+	}
+	truth, e := m.MkTrue()
+	if e != nil {
+		return brFailed, e
+	}
+	falsity, e := m.MkFalse()
+	if e != nil {
+		return brFailed, e
+	}
+	if c == truth {
+		return brDone, m.SetRef(out, t)
+	}
+	if c == falsity {
+		return brDone, m.SetRef(out, f)
+	}
+	if t == f {
+		return brDone, m.SetRef(out, t)
+	}
+	boolean, e := rw.isBool(t)
+	if e != nil {
+		return brFailed, e
+	}
+	if boolean {
+		if t == truth {
+			if f == falsity {
+				return brDone, m.SetRef(out, c)
+			}
+			return brDone, rw.mkOr([]ASTHandle{c, f}, out)
+		}
+		if t == falsity {
+			if f == truth {
+				return brDone, rw.mkNot(c, out)
+			}
+			tmp, e := newTemp()
+			if e != nil {
+				return brFailed, e
+			}
+			if e = rw.mkNot(c, tmp); e != nil {
+				return brFailed, e
+			}
+			nc, e := m.RefGet(tmp)
+			if e != nil {
+				return brFailed, e
+			}
+			return brDone, rw.mkAnd([]ASTHandle{nc, f}, out)
+		}
+		if f == truth {
+			tmp, e := newTemp()
+			if e != nil {
+				return brFailed, e
+			}
+			if e = rw.mkNot(c, tmp); e != nil {
+				return brFailed, e
+			}
+			nc, e := m.RefGet(tmp)
+			if e != nil {
+				return brFailed, e
+			}
+			return brDone, rw.mkOr([]ASTHandle{nc, t}, out)
+		}
+		if f == falsity || c == f {
+			return brDone, rw.mkAnd([]ASTHandle{c, t}, out)
+		}
+		if c == t {
+			return brDone, rw.mkOr([]ASTHandle{c, f}, out)
+		}
+		comp, e := rw.complement(t, f)
+		if e != nil {
+			return brFailed, e
+		}
+		if comp {
+			return brDone, rw.mkEq(c, t, out)
+		}
+	}
+	tITE, c2, t1, t2, e := rw.ite(t)
+	if e != nil {
+		return brFailed, e
+	}
+	if tITE && rw.iteExtraRules {
+		if f == t1 {
+			notc2, e := newTemp()
+			if e != nil {
+				return brFailed, e
+			}
+			if e = rw.mkNot(c2, notc2); e != nil {
+				return brFailed, e
+			}
+			newc, e := newTemp()
+			if e != nil {
+				return brFailed, e
+			}
+			nc2, e := m.RefGet(notc2)
+			if e != nil {
+				return brFailed, e
+			}
+			if e = rw.mkAnd([]ASTHandle{c, nc2}, newc); e != nil {
+				return brFailed, e
+			}
+			h, e := m.RefGet(newc)
+			if e != nil {
+				return brFailed, e
+			}
+			result, e := m.MkIte(h, t2, f)
+			if e != nil {
+				return brFailed, e
+			}
+			return brRewrite1, m.SetRef(out, result)
+		}
+		if f == t2 {
+			newc, e := newTemp()
+			if e != nil {
+				return brFailed, e
+			}
+			if e = rw.mkAnd([]ASTHandle{c, c2}, newc); e != nil {
+				return brFailed, e
+			}
+			h, e := m.RefGet(newc)
+			if e != nil {
+				return brFailed, e
+			}
+			result, e := m.MkIte(h, t1, f)
+			if e != nil {
+				return brFailed, e
+			}
+			return brRewrite1, m.SetRef(out, result)
+		}
+		eITE, c3, e1, e2, e := rw.ite(f)
+		if e != nil {
+			return brFailed, e
+		}
+		same, swapped := t1 == e1 && t2 == e2, t1 == e2 && t2 == e1
+		if eITE && (same || swapped) {
+			and1, e := newTemp()
+			if e != nil {
+				return brFailed, e
+			}
+			and2, e := newTemp()
+			if e != nil {
+				return brFailed, e
+			}
+			notc, e := newTemp()
+			if e != nil {
+				return brFailed, e
+			}
+			if e = rw.mkAnd([]ASTHandle{c, c2}, and1); e != nil {
+				return brFailed, e
+			}
+			if e = rw.mkNot(c, notc); e != nil {
+				return brFailed, e
+			}
+			nc, e := m.RefGet(notc)
+			if e != nil {
+				return brFailed, e
+			}
+			if !same {
+				notc3, e := newTemp()
+				if e != nil {
+					return brFailed, e
+				}
+				if e = rw.mkNot(c3, notc3); e != nil {
+					return brFailed, e
+				}
+				c3, e = m.RefGet(notc3)
+				if e != nil {
+					return brFailed, e
+				}
+			}
+			if e = rw.mkAnd([]ASTHandle{nc, c3}, and2); e != nil {
+				return brFailed, e
+			}
+			newc, e := newTemp()
+			if e != nil {
+				return brFailed, e
+			}
+			h1, e := m.RefGet(and1)
+			if e != nil {
+				return brFailed, e
+			}
+			h2, e := m.RefGet(and2)
+			if e != nil {
+				return brFailed, e
+			}
+			if e = rw.mkOr([]ASTHandle{h1, h2}, newc); e != nil {
+				return brFailed, e
+			}
+			h, e := m.RefGet(newc)
+			if e != nil {
+				return brFailed, e
+			}
+			result, e := m.MkIte(h, t1, t2)
+			if e != nil {
+				return brFailed, e
+			}
+			return brRewrite1, m.SetRef(out, result)
+		}
+	}
+	eITE, c2, e1, e2, e := rw.ite(f)
+	if e != nil {
+		return brFailed, e
+	}
+	if eITE && rw.iteExtraRules {
+		if t == e1 {
+			newc, e := newTemp()
+			if e != nil {
+				return brFailed, e
+			}
+			if e = rw.mkOr([]ASTHandle{c, c2}, newc); e != nil {
+				return brFailed, e
+			}
+			h, e := m.RefGet(newc)
+			if e != nil {
+				return brFailed, e
+			}
+			result, e := m.MkIte(h, t, e2)
+			if e != nil {
+				return brFailed, e
+			}
+			return brRewrite1, m.SetRef(out, result)
+		}
+		if t == e2 {
+			notc2, e := newTemp()
+			if e != nil {
+				return brFailed, e
+			}
+			if e = rw.mkNot(c2, notc2); e != nil {
+				return brFailed, e
+			}
+			newc, e := newTemp()
+			if e != nil {
+				return brFailed, e
+			}
+			nc2, e := m.RefGet(notc2)
+			if e != nil {
+				return brFailed, e
+			}
+			if e = rw.mkOr([]ASTHandle{c, nc2}, newc); e != nil {
+				return brFailed, e
+			}
+			h, e := m.RefGet(newc)
+			if e != nil {
+				return brFailed, e
+			}
+			result, e := m.MkIte(h, t, e1)
+			if e != nil {
+				return brFailed, e
+			}
+			return brRewrite1, m.SetRef(out, result)
+		}
+	}
+	if changed {
+		h, e := m.MkIte(c, t, f)
+		if e != nil {
+			return brFailed, e
+		}
+		return brDone, m.SetRef(out, h)
+	}
+	return brFailed, nil
+}
+
+func (rw *boolRewriter) mkITE(c, t, f ASTHandle, out ASTRef) error {
+	status, e := rw.mkITECore(c, t, f, out)
+	if e != nil || status != brFailed {
+		return e
+	}
+	h, e := rw.manager.MkIte(c, t, f)
+	if e != nil {
+		return e
+	}
+	return rw.manager.SetRef(out, h)
+}
+func (rw *boolRewriter) mkDistinct(args []ASTHandle, out ASTRef) error {
+	status, e := rw.mkDistinctCore(args, out)
+	if e != nil || status != brFailed {
+		return e
+	}
+	h, e := rw.manager.MkDistinct(args)
+	if e != nil {
+		return e
+	}
+	return rw.manager.SetRef(out, h)
+}

@@ -18850,7 +18850,8 @@
       "status": "partial",
       "go_targets": [
         "bool_rewriter.go",
-        "bool_rewriter_eq.go"
+        "bool_rewriter_eq.go",
+        "bool_rewriter_ite.go"
       ],
       "tests": [
         "TestBoolRewriterACSourceStatusesOrderAndOutputOwnership",
@@ -18859,7 +18860,10 @@
         "TestBoolRewriterEqualitySourceCasesAndNegation",
         "TestBoolRewriterITEValueEqualityStatusesAndSourceStructure",
         "TestBoolRewriterDerivedConnectivesIndependentTruthTables",
-        "TestBoolRewriterITEEqualityIndependentPartialBranchTruthTables"
+        "TestBoolRewriterITEEqualityIndependentPartialBranchTruthTables",
+        "TestBoolRewriterITEExactBranchesAndIndependentTruthTables",
+        "TestBoolRewriterDistinctCardinalityThresholdAndPairOrder",
+        "TestBoolRewriterITENonBooleanBranchesPreserveSourceSortAndShape"
       ],
       "conditionals": [
         {
@@ -18962,13 +18966,30 @@
           "tests": [
             "TestBoolRewriterDerivedConnectivesIndependentTruthTables"
           ]
+        },
+        {
+          "name": "mk_distinct_core",
+          "status": "ported",
+          "go_target": "bool_rewriter_ite.go",
+          "tests": [
+            "TestBoolRewriterDistinctCardinalityThresholdAndPairOrder"
+          ]
+        },
+        {
+          "name": "mk_ite_core control flow (configurable AND/OR wrapper dependencies outstanding)",
+          "status": "partial",
+          "go_target": "bool_rewriter_ite.go",
+          "tests": [
+            "TestBoolRewriterITEExactBranchesAndIndependentTruthTables",
+            "TestBoolRewriterITENonBooleanBranchesPreserveSourceSortAndShape"
+          ]
         }
       ],
       "ownership": [
         "Borrowed input handles use original sixteen-slot inline/doubling pointer buffers; output assignment retains AST ownership; source negative/positive fast marks retire in reverse declaration order."
       ],
       "deviations": [
-        "Equality, value-leaf ITE equality, negation and derived connective rules now follow source with owning temporary references and bounded rewrite statuses. Full constructor/parameter updates, dispatch, local-context simplification, mk_and_as_or elimination, general ITE and distinct rules and the recursive rewriter engine remain unported. AND wrappers cover elim_and=false; enabled reached local-context requests report an explicit unported error. No whole rewriter or public evaluator completion is credited."
+        "Equality, negation, general ITE and distinct core rules now follow source with owning output/temporary references and exact bounded rewrite statuses. Full constructor/parameter updates, dispatch, local-context simplification, mk_and_as_or elimination and the recursive rewriter engine remain unported. ITE/derived-connective credit stays partial through incomplete configurable AND/OR wrappers. No whole rewriter or public evaluator completion is credited."
       ]
     },
     {
@@ -18978,7 +18999,8 @@
       "status": "partial",
       "go_targets": [
         "bool_rewriter.go",
-        "bool_rewriter_eq.go"
+        "bool_rewriter_eq.go",
+        "bool_rewriter_ite.go"
       ],
       "tests": [
         "TestBoolRewriterACSourceStatusesOrderAndOutputOwnership",
@@ -18987,7 +19009,10 @@
         "TestBoolRewriterEqualitySourceCasesAndNegation",
         "TestBoolRewriterITEValueEqualityStatusesAndSourceStructure",
         "TestBoolRewriterDerivedConnectivesIndependentTruthTables",
-        "TestBoolRewriterITEEqualityIndependentPartialBranchTruthTables"
+        "TestBoolRewriterITEEqualityIndependentPartialBranchTruthTables",
+        "TestBoolRewriterITEExactBranchesAndIndependentTruthTables",
+        "TestBoolRewriterDistinctCardinalityThresholdAndPairOrder",
+        "TestBoolRewriterITENonBooleanBranchesPreserveSourceSortAndShape"
       ],
       "conditionals": [
         {
@@ -19033,13 +19058,23 @@
           "tests": [
             "TestBoolRewriterDerivedConnectivesIndependentTruthTables"
           ]
+        },
+        {
+          "name": "mk_ite / mk_distinct fallback forwarding",
+          "status": "ported",
+          "go_target": "bool_rewriter_ite.go",
+          "tests": [
+            "TestBoolRewriterITEExactBranchesAndIndependentTruthTables",
+            "TestBoolRewriterDistinctCardinalityThresholdAndPairOrder",
+            "TestBoolRewriterITENonBooleanBranchesPreserveSourceSortAndShape"
+          ]
         }
       ],
       "ownership": [
         "Borrowed input handles use original sixteen-slot inline/doubling pointer buffers; output assignment retains AST ownership; source negative/positive fast marks retire in reverse declaration order."
       ],
       "deviations": [
-        "Equality, value-leaf ITE equality, negation and derived connective rules now follow source with owning temporary references and bounded rewrite statuses. Full constructor/parameter updates, dispatch, local-context simplification, mk_and_as_or elimination, general ITE and distinct rules and the recursive rewriter engine remain unported. AND wrappers cover elim_and=false; enabled reached local-context requests report an explicit unported error. No whole rewriter or public evaluator completion is credited."
+        "Equality, negation, general ITE and distinct core rules now follow source with owning output/temporary references and exact bounded rewrite statuses. Full constructor/parameter updates, dispatch, local-context simplification, mk_and_as_or elimination and the recursive rewriter engine remain unported. ITE/derived-connective credit stays partial through incomplete configurable AND/OR wrappers. No whole rewriter or public evaluator completion is credited."
       ]
     },
     {
