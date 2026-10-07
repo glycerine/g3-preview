@@ -82,7 +82,9 @@ func TestASTArithmeticOriginalConvertedNumeralsAndDeclaration(t *testing.T) {
 	fid, e := m.RegisterArithmeticPlugin()
 	astTestMust(t, e)
 	p := m.arithmeticPlugin
-	p.convertIntNumerals = true // state selected by the original nonlinear-real logic path
+	var names ASTBuiltinNames
+	astTestMust(t, m.GetArithmeticSortNames(&names, astTestSymbol(t, m, "NRA")))
+	names.Close()
 	n, e := m.numerals.NewValue()
 	astTestMust(t, e)
 	defer func() { astTestMust(t, m.numerals.Del(&n)) }()
