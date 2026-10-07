@@ -21573,7 +21573,9 @@
         "pkg/ast/ast_bv_unsigned_numeral_test.go",
         "pkg/ast/ast_bv_zero_bit.go",
         "pkg/ast/rewriter/bv_rewriter_add.go",
-        "pkg/ast/rewriter/bv_rewriter_add_test.go"
+        "pkg/ast/rewriter/bv_rewriter_add_test.go",
+        "pkg/ast/ast_bv_coefficient.go",
+        "pkg/ast/ast_bv_coefficient_test.go"
       ],
       "tests": [
         "TestASTBitVectorUnsignedNumeralConstructorBoundary",
@@ -21587,7 +21589,11 @@
         "TestBVRewriterAdditionAfterCoreSymbolicDisjointSemantics",
         "TestBVRewriterAdditionAfterCoreEveryColdReservation",
         "TestBVRewriterAdditionAfterCoreAssignmentDECRefusal",
-        "TestBVRewriterAdditionAfterCoreActualRuntimeNumeralChild"
+        "TestBVRewriterAdditionAfterCoreActualRuntimeNumeralChild",
+        "TestASTBitVectorCoefficientNormalizationIndependentModulo",
+        "TestASTBitVectorCoefficientSortGuardBeforeNumericalAcquisition",
+        "TestASTBitVectorCoefficientEveryActualNormalizationAndAssignmentReservation",
+        "TestASTBitVectorCoefficientZeroWidthDoesNotUseNumeralFactoryGuard"
       ],
       "conditionals": [
         {
@@ -21634,6 +21640,17 @@
             "TestBVRewriterAdditionAfterCoreAssignmentDECRefusal",
             "TestBVRewriterAdditionAfterCoreActualRuntimeNumeralChild"
           ]
+        },
+        {
+          "name": "original BV polynomial configuration normalize hook: source sort width, unsigned norm return, rational copy assignment and full-expression return-temporary DT (src/ast/rewriter/bv_rewriter.h:39; src/ast/bv_decl_plugin.cpp:753-765; src/util/rational.h:131-134)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_coefficient.go",
+          "tests": [
+            "TestASTBitVectorCoefficientNormalizationIndependentModulo",
+            "TestASTBitVectorCoefficientSortGuardBeforeNumericalAcquisition",
+            "TestASTBitVectorCoefficientEveryActualNormalizationAndAssignmentReservation",
+            "TestASTBitVectorCoefficientZeroWidthDoesNotUseNumeralFactoryGuard"
+          ]
         }
       ],
       "ownership": [
@@ -21643,7 +21660,8 @@
       "deviations": [
         "Selected unsigned numeral overload preserves original constructor width and inclusive unsigned32 inline boundary. Existing numeral copy/normalization/parameter/header/exception ABI qualifications remain; actual Runtime failures prove owner cleanup rather than resumability. Full BV rewriter header audits remain uncredited.",
         "The complete selected is_zero_bit helper resides in ast to use private numerical/reference owners without a reverse import; the ADD post-core reduction now calls it, while the complete ADD core and OR consumers remain required. Numerical bits inspect stored values without width normalization or a new index/width guard. Unknown bits return false; an exhausted/out-of-range concat reaches source UNREACHABLE/release undefined behavior and the Go boundary returns ErrASTDomain. Wrapper/token/stack/pointer/allocator/assertion/fatal/exception ABI and whole-unit ownership remain uncredited; Go returning-error cleanup is not native-fatal resumability. This selection does not promote the whole BV rewriter source unit.",
-        "Only the original active post-mk_add_core BV addition reduction is implemented by RewriteBitVectorAdditionAfterCore; callers supply the actual core status/output. No polynomial-core stub or substitute is provided. Bit-major/operand-order reads and early conflict exits are retained. Successful OR construction acquires operand references before assignment deletes the sole-owned old sum. Final assignment can publish OR together with a returned old-deletion worklist error after DEC consumption, matching the existing checked reference adapter. The stage has no owned reference/numerical locals; the actual AST plugin owns failed numerical child contexts and the manager owns deletion worklists. Go error cleanup does not credit native fatal/exception/stack/pointer/allocator ABI or full rewriter ownership, dispatch, solver integration or whole-unit completion."
+        "Only the original active post-mk_add_core BV addition reduction is implemented by RewriteBitVectorAdditionAfterCore; callers supply the actual core status/output. No polynomial-core stub or substitute is provided. Bit-major/operand-order reads and early conflict exits are retained. Successful OR construction acquires operand references before assignment deletes the sole-owned old sum. Final assignment can publish OR together with a returned old-deletion worklist error after DEC consumption, matching the existing checked reference adapter. The stage has no owned reference/numerical locals; the actual AST plugin owns failed numerical child contexts and the manager owns deletion worklists. Go error cleanup does not credit native fatal/exception/stack/pointer/allocator ABI or full rewriter ownership, dispatch, solver integration or whole-unit completion.",
+        "Selected BV coefficient normalization resides in ast to use existing private numerical owners without a reverse import. It retains unsigned norm followed by actual rational copy assignment into the existing receiver, with a distinct returned temporary until the full-expression source exit. A tracked invocation names the actual outer frame and captured inner norm before numerical acquisition; stopped call sites cannot be reused after owning cleanup, which does not change recorded source readiness. Two real Runtime campaigns cover a cold 65-bit power cache with a stored negative 1024-bit receiver and normalization/final-copy reservations at width 4097 after pre-populating only that large power cache. Checked raw zero-width sorts retain norm modulo-one behavior rather than introducing the unrelated numeral-constructor rejection. Concrete wrapper/token/stack/return-value/pointer/allocator/assertion/fatal/exception ABI and whole-unit ownership remain uncredited. The full polynomial core, current-sort owner, rewriter dispatch and solver integration remain required; Go returning-error cleanup is not native-fatal resumability."
       ]
     },
     {
