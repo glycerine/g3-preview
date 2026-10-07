@@ -45,7 +45,11 @@ func TestASTBitVectorOriginalApplicationConstructors(t *testing.T) {
 		astTestPin(t, m, expected)
 		before := m.Stats()
 		// The warm path must reuse the same cached declaration and hash-consed app.
-		m.Budget().FailAfter(0)
+		// Native allocation pools reuse the candidate block; g3debug uses
+		// direct allocations even when hash-consing returns the existing node.
+		if !ASTSourceDebug {
+			m.Budget().FailAfter(0)
+		}
 		actual, e := test.build(x, y)
 		m.Budget().FailAfter(-1)
 		astTestMust(t, e)

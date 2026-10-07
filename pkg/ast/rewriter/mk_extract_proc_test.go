@@ -52,7 +52,11 @@ func TestMkExtractProcOriginalCacheIdentityAndReferenceOrder(t *testing.T) {
 		t.Fatal("cache separately acquired domain sort", beforeSort, afterSort)
 	}
 	beforeHit := m.Stats()
-	m.Budget().FailAfter(0)
+	// Native allocation pools reuse the candidate block; g3debug uses
+	// direct allocations even when hash-consing returns the existing node.
+	if !ast.ASTSourceDebug {
+		m.Budget().FailAfter(0)
+	}
 	again, e := p.Apply(6, 2, x)
 	m.Budget().FailAfter(-1)
 	satOK(t, e)

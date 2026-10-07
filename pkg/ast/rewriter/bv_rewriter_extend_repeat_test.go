@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestBVRewriterOriginalRepeatAndZeroExtend(t *testing.T) {
@@ -123,7 +124,10 @@ func TestBVRewriterRepeatAndZeroExtendEveryColdReservation(t *testing.T) {
 				if body != nil {
 					failures++
 					if !errors.Is(body, arena.ErrInjectedFailure) {
-						t.Fatal("unexpected refusal", body)
+						var f util.Failure
+						if !errors.As(body, &f) || f.Kind != util.FailureMemout {
+							t.Fatal("unexpected refusal", body)
+						}
 					}
 					got, e := m.RefGet(out)
 					satOK(t, e)
