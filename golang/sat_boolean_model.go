@@ -20,10 +20,11 @@ func buildSATBooleanModel(tr *satGoalTranslator, values satModel) (md *modelCore
 	if interpreted {
 		return nil, ErrSATBooleanModelInterpreted
 	}
-	md, err = newModelCore(tr.manager)
+	derived, err := newSolverModel(tr.manager)
 	if err != nil {
 		return nil, err
 	}
+	md = &derived.core
 	defer func() {
 		if err != nil {
 			if cleanup := md.Close(); cleanup != nil {

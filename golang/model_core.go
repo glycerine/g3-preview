@@ -1,4 +1,4 @@
-// Source: src/model/model_core.h:37-87; src/model/model_core.cpp:21-66,85-109;
+// Source: src/model/model_core.h:31-78; src/model/model_core.cpp:21-66,85-109;
 // src/model/model.cpp:44-50.
 // Licensed under the MIT license. Source author: Leonardo de Moura (2011).
 package g3
@@ -10,12 +10,16 @@ import (
 )
 
 // Constant interpretation portion of the original model_core, used by the
-// Boolean SAT model path. Function interpretations and derived model universes
-// remain explicit unported dependencies, not alternative evaluators.
+// Boolean SAT model path. The derived owner supplies universe lifetimes and
+// virtual final-reference destruction. Function interpretation operations
+// remain an explicit unported dependency, not an alternative evaluator.
 type modelCore struct {
 	self                               *modelCore
 	manager                            *ASTManager
 	constants                          modelConstantMap
+	functions                          modelFunctionMap
+	functionDeclarations               modelDeclarationVector
+	derived                            *solverModel
 	declarations, constantDeclarations modelDeclarationVector
 	references                         uint32
 	ownerBytes                         uint64
@@ -36,6 +40,10 @@ func newModelCore(m *ASTManager) (md *modelCore, err error) {
 	md = &modelCore{manager: m, ownerBytes: amount}
 	md.self = md
 	if err = md.constants.resize(m, 8); err != nil {
+		err = errors.Join(err, md.Close())
+		return nil, err
+	}
+	if err = md.functions.initialize(m); err != nil {
 		err = errors.Join(err, md.Close())
 		return nil, err
 	}
@@ -249,10 +257,22 @@ func (md *modelCore) Close() error {
 	if md == nil || md.self != md {
 		return ErrASTHandle
 	}
+	if md.derived != nil {
+		return md.derived.Close()
+	}
+	return md.closeCoreMembers()
+}
+func (md *modelCore) closeCoreMembers() error {
+	if md == nil || md.self != md {
+		return ErrASTHandle
+	}
 	if md.closed {
 		return nil
 	}
 	m := md.manager
+	if e := md.functions.empty(); e != nil {
+		return e
+	}
 	// Source map bucket iteration, key retirement followed by value retirement.
 	for i := range md.constants.cells {
 		entry := &md.constants.cells[i]
@@ -272,9 +292,11 @@ func (md *modelCore) Close() error {
 			entry.valueOwned = false
 		}
 	}
-	md.constants.close(m)
-	md.declarations.close(m)
+	md.functionDeclarations.close(m)
 	md.constantDeclarations.close(m)
+	md.declarations.close(m)
+	md.functions.close(m)
+	md.constants.close(m)
 	m.budget.Release(md.ownerBytes)
 	md.ownerBytes = 0
 	md.closed = true

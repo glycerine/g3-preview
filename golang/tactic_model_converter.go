@@ -14,8 +14,9 @@ var errTacticModelConverterOwner = errors.New("model converter: invalid, copied 
 var errTacticModelConverterGoal = errors.New("model converter: unreachable goal index or unindexed star application")
 
 // Cold virtual-owner boundary for original model converters. Models currently
-// expose their ported model_core constant portion; derived models, evaluator,
-// translation and display remain separate source dependencies. These methods
+// expose model_core through the original derived lifetime dispatch. Function
+// interpretation operations, evaluator, translation and display remain separate
+// source dependencies. These methods
 // dispatch original converter operations; they never perform a solver check.
 type tacticModelConverter interface {
 	IncRef() error

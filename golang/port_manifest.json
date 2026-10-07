@@ -44218,9 +44218,16 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "model_lifecycle.go",
         "model_core.go"
       ],
       "tests": [
+        "TestModelDerivedConstructorAndVirtualReferenceDestruction",
+        "TestModelDerivedUniverseOwnershipCopyAndInsertionOrder",
+        "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
+        "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
+        "TestModelConverterToModelOriginalAllocationAndApplication",
+        "TestModelDerivedConstructorFinalMemberRefusalUnwinds",
         "TestModelCoreHashGrowthCopyAndIndependentOwnership"
       ],
       "assertions": [
@@ -44237,6 +44244,19 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "derived construction, universe ownership/query/copy and virtual final-reference destruction (function operations unported)",
+          "status": "partial",
+          "go_target": "model_lifecycle.go",
+          "tests": [
+            "TestModelDerivedConstructorAndVirtualReferenceDestruction",
+            "TestModelDerivedUniverseOwnershipCopyAndInsertionOrder",
+            "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
+            "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
+            "TestModelConverterToModelOriginalAllocationAndApplication",
+            "TestModelDerivedConstructorFinalMemberRefusalUnwinds"
+          ]
+        },
+        {
           "name": "model::copy_const_interps",
           "status": "ported",
           "go_target": "model_core.go",
@@ -44246,17 +44266,22 @@
         }
       ],
       "ownership": [],
-      "deviations": [
-        "Only constant-copy registration is integrated here; derived model constructors, function/universe interpretation, model evaluation, copying and translation remain obligations."
-      ]
+      "deviations": ["Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration/evaluation/copy/destruction for populated function maps, get_some_value's callback, full model copy, AST translation/display and public API integration remain unported; empty function storage is not a fabricated function interpretation. Broad failure histories remain deferred."]
     },
     {
       "path": "src/model/model.h",
       "component": "model",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["model_lifecycle.go"],
+      "tests": [
+        "TestModelDerivedConstructorAndVirtualReferenceDestruction",
+        "TestModelDerivedUniverseOwnershipCopyAndInsertionOrder",
+        "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
+        "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
+        "TestModelConverterToModelOriginalAllocationAndApplication",
+        "TestModelDerivedConstructorFinalMemberRefusalUnwinds"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -44269,9 +44294,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "derived construction, universe ownership/query/copy and virtual final-reference destruction (function operations unported)",
+          "status": "partial",
+          "go_target": "model_lifecycle.go",
+          "tests": [
+            "TestModelDerivedConstructorAndVirtualReferenceDestruction",
+            "TestModelDerivedUniverseOwnershipCopyAndInsertionOrder",
+            "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
+            "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
+            "TestModelConverterToModelOriginalAllocationAndApplication",
+            "TestModelDerivedConstructorFinalMemberRefusalUnwinds"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration/evaluation/copy/destruction for populated function maps, get_some_value's callback, full model copy, AST translation/display and public API integration remain unported; empty function storage is not a fabricated function interpretation. Broad failure histories remain deferred."]
     },
     {
       "path": "src/model/model2expr.cpp",
@@ -44315,10 +44354,17 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "model_lifecycle.go",
         "model_core.go",
         "model_constant_map.go"
       ],
       "tests": [
+        "TestModelDerivedConstructorAndVirtualReferenceDestruction",
+        "TestModelDerivedUniverseOwnershipCopyAndInsertionOrder",
+        "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
+        "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
+        "TestModelConverterToModelOriginalAllocationAndApplication",
+        "TestModelDerivedConstructorFinalMemberRefusalUnwinds",
         "TestModelCoreConstantRegistrationReplacementAndReferences",
         "TestModelCoreEvalDeclarationAndMissingResult",
         "TestModelCoreUnregisterPreservesLiteralSourceDeclarationVector",
@@ -44346,6 +44392,19 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "initial constant/function member tables and actual derived final-reference dispatch",
+          "status": "partial",
+          "go_target": "model_lifecycle.go",
+          "tests": [
+            "TestModelDerivedConstructorAndVirtualReferenceDestruction",
+            "TestModelDerivedUniverseOwnershipCopyAndInsertionOrder",
+            "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
+            "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
+            "TestModelConverterToModelOriginalAllocationAndApplication",
+            "TestModelDerivedConstructorFinalMemberRefusalUnwinds"
+          ]
+        },
+        {
           "name": "constant register/replace/unregister, lookup, reference controls and constant-branch retirement",
           "status": "partial",
           "go_target": "model_core.go",
@@ -44364,9 +44423,7 @@
       "ownership": [
         "Constant table keys and values retain independent AST references. Declaration vectors are source non-owning insertion-order vectors; constant replacement acquires the new value before releasing the previous value."
       ],
-      "deviations": [
-        "Function interpretations, full eval(func_decl), universe/value virtual operations and whole derived model construction remain unported. Broad allocation-failure and exception-history qualification remain deferred; completion is limited to ordinary constant interpretation behavior and the tested Boolean model path."
-      ]
+      "deviations": ["Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration/evaluation/copy/destruction for populated function maps, get_some_value's callback, full model copy, AST translation/display and public API integration remain unported; empty function storage is not a fabricated function interpretation. Broad failure histories remain deferred."]
     },
     {
       "path": "src/model/model_core.h",
@@ -44374,10 +44431,17 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "model_lifecycle.go",
         "model_core.go",
         "model_constant_map.go"
       ],
       "tests": [
+        "TestModelDerivedConstructorAndVirtualReferenceDestruction",
+        "TestModelDerivedUniverseOwnershipCopyAndInsertionOrder",
+        "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
+        "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
+        "TestModelConverterToModelOriginalAllocationAndApplication",
+        "TestModelDerivedConstructorFinalMemberRefusalUnwinds",
         "TestModelCoreConstantRegistrationReplacementAndReferences",
         "TestModelCoreEvalDeclarationAndMissingResult",
         "TestModelCoreUnregisterPreservesLiteralSourceDeclarationVector",
@@ -44401,6 +44465,19 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "initial constant/function member tables and actual derived final-reference dispatch",
+          "status": "partial",
+          "go_target": "model_lifecycle.go",
+          "tests": [
+            "TestModelDerivedConstructorAndVirtualReferenceDestruction",
+            "TestModelDerivedUniverseOwnershipCopyAndInsertionOrder",
+            "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
+            "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
+            "TestModelConverterToModelOriginalAllocationAndApplication",
+            "TestModelDerivedConstructorFinalMemberRefusalUnwinds"
+          ]
+        },
+        {
           "name": "constant register/replace/unregister, lookup, reference controls and constant-branch retirement",
           "status": "partial",
           "go_target": "model_core.go",
@@ -44419,9 +44496,7 @@
       "ownership": [
         "Constant table keys and values retain independent AST references. Declaration vectors are source non-owning insertion-order vectors; constant replacement acquires the new value before releasing the previous value."
       ],
-      "deviations": [
-        "Function interpretations, full eval(func_decl), universe/value virtual operations and whole derived model construction remain unported. Broad allocation-failure and exception-history qualification remain deferred; completion is limited to ordinary constant interpretation behavior and the tested Boolean model path."
-      ]
+      "deviations": ["Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration/evaluation/copy/destruction for populated function maps, get_some_value's callback, full model copy, AST translation/display and public API integration remain unported; empty function storage is not a fabricated function interpretation. Broad failure histories remain deferred."]
     },
     {
       "path": "src/model/model_evaluator.cpp",
@@ -69036,9 +69111,16 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "model_lifecycle.go",
         "sat_boolean_model.go"
       ],
       "tests": [
+        "TestModelDerivedConstructorAndVirtualReferenceDestruction",
+        "TestModelDerivedUniverseOwnershipCopyAndInsertionOrder",
+        "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
+        "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
+        "TestModelConverterToModelOriginalAllocationAndApplication",
+        "TestModelDerivedConstructorFinalMemberRefusalUnwinds",
         "TestSATBooleanModelRetainsBindingsAfterEngineAndAtomsClose",
         "TestSATBooleanModelSkipsUndefinedSourceRows",
         "TestSATBooleanModelMatchesOriginalGoalTruthTable",
@@ -69076,6 +69158,19 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "SAT Boolean registration fragment allocates original derived model",
+          "status": "partial",
+          "go_target": "model_lifecycle.go",
+          "tests": [
+            "TestModelDerivedConstructorAndVirtualReferenceDestruction",
+            "TestModelDerivedUniverseOwnershipCopyAndInsertionOrder",
+            "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
+            "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
+            "TestModelConverterToModelOriginalAllocationAndApplication",
+            "TestModelDerivedConstructorFinalMemberRefusalUnwinds"
+          ]
+        },
+        {
           "name": "imp::operator() Boolean model registration fragment",
           "status": "partial",
           "go_target": "sat_boolean_model.go",
@@ -69088,9 +69183,7 @@
         }
       ],
       "ownership": [],
-      "deviations": [
-        "The helper reads an actual or explicitly identified source-row SAT model and registers defined Boolean bindings in atom-table bucket order. It does not implement the SAT tactic, model converters, proof/core paths, UNKNOWN/interpreted sat2goal recovery or public solver/context APIs."
-      ]
+      "deviations": ["The Boolean registration fragment now constructs the original derived model with its initial constant/function/universe tables. It does not implement the SAT tactic, proof/core paths, UNKNOWN/interpreted recovery converters or public context/solver APIs."]
     },
     {
       "path": "src/sat/tactic/sat_tactic.h",
@@ -91030,8 +91123,15 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "model_lifecycle.go",
         "tactic_stored_model.go","tactic_model_converter.go"],
       "tests": [
+        "TestModelDerivedConstructorAndVirtualReferenceDestruction",
+        "TestModelDerivedUniverseOwnershipCopyAndInsertionOrder",
+        "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
+        "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
+        "TestModelConverterToModelOriginalAllocationAndApplication",
+        "TestModelDerivedConstructorFinalMemberRefusalUnwinds",
         "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
         "TestTacticStoredModelLabelsSnapshotInlineSpillAndAppend",
         "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
@@ -91052,6 +91152,19 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "model_converter2model original derived allocation, owning assignment, indexed0 application",
+          "status": "partial",
+          "go_target": "model_lifecycle.go",
+          "tests": [
+            "TestModelDerivedConstructorAndVirtualReferenceDestruction",
+            "TestModelDerivedUniverseOwnershipCopyAndInsertionOrder",
+            "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
+            "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
+            "TestModelConverterToModelOriginalAllocationAndApplication",
+            "TestModelDerivedConstructorFinalMemberRefusalUnwinds"
+          ]
+        },
         {
           "name": "model2mc ownership, indexed/unindexed/label application, cancel and factories (model-core portion)",
           "status": "partial",
@@ -91075,7 +91188,7 @@
         }
       ],
       "ownership": [],
-      "deviations": ["Original converter composition applies children in reverse source order and routes flattened subgoal indices; it does not manufacture a model or solver status. model2mc ownership/application and label copying now wrap the actual model_core constant portion. Derived-model dispatch, model_converter2model's original derived-model allocation, concrete recovery converters, translation and display remain required."]
+      "deviations": ["Stored wrappers and composition now use actual derived lifetime dispatch. model_converter2model allocates the original derived model, assigns it before indexed0 application, and preserves the assigned model on converter error; null converter leaves the output unchanged. Function interpretation operations, concrete recovery converters, model evaluation, translation/display and public API integration remain required."]
     },
     {
       "path": "src/tactic/model_converter.h",
@@ -91083,8 +91196,15 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "model_lifecycle.go",
         "tactic_stored_model.go","tactic_model_converter.go"],
       "tests": [
+        "TestModelDerivedConstructorAndVirtualReferenceDestruction",
+        "TestModelDerivedUniverseOwnershipCopyAndInsertionOrder",
+        "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
+        "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
+        "TestModelConverterToModelOriginalAllocationAndApplication",
+        "TestModelDerivedConstructorFinalMemberRefusalUnwinds",
         "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
         "TestTacticStoredModelLabelsSnapshotInlineSpillAndAppend",
         "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
@@ -91116,6 +91236,19 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "model_converter2model original derived allocation, owning assignment, indexed0 application",
+          "status": "partial",
+          "go_target": "model_lifecycle.go",
+          "tests": [
+            "TestModelDerivedConstructorAndVirtualReferenceDestruction",
+            "TestModelDerivedUniverseOwnershipCopyAndInsertionOrder",
+            "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
+            "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
+            "TestModelConverterToModelOriginalAllocationAndApplication",
+            "TestModelDerivedConstructorFinalMemberRefusalUnwinds"
+          ]
+        },
+        {
           "name": "model2mc ownership, indexed/unindexed/label application, cancel and factories (model-core portion)",
           "status": "partial",
           "go_target": "tactic_stored_model.go",
@@ -91138,7 +91271,7 @@
         }
       ],
       "ownership": [],
-      "deviations": ["Application/refcount boundary uses the actual model_core constant portion; derived model ownership and translation/display declarations remain pending. Stored-model factory/application ownership now follows source model2mc on the constant-model portion; it does not allocate or evaluate a model. No public API or full derived-model/converter completion is claimed."]
+      "deviations": ["Stored wrappers and composition now use actual derived lifetime dispatch. model_converter2model allocates the original derived model, assigns it before indexed0 application, and preserves the assigned model on converter error; null converter leaves the output unchanged. Function interpretation operations, concrete recovery converters, model evaluation, translation/display and public API integration remain required."]
     },
     {
       "path": "src/tactic/nlsat_smt/CMakeLists.txt",
