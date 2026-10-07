@@ -13,6 +13,7 @@ import (
 // ArrayRewriter is the original core reducer, borrowing its AST services.
 // Traversal is supplied by the caller, as for the source theory reducers.
 type ArrayRewriter struct {
+	equality                                                     arrayStoreEquality
 	self                                                         *ArrayRewriter
 	manager                                                      *ast.ASTManager
 	params                                                       util.ModuleParamsOwner
@@ -57,6 +58,9 @@ func (rw *ArrayRewriter) open() error {
 	if !rw.ready {
 		return util.ErrParamsPrecondition
 	}
+	if rw.equality.active {
+		return ast.ErrASTPending
+	}
 	_, e := rw.manager.ProofsEnabled()
 	return e
 }
@@ -66,6 +70,9 @@ func (rw *ArrayRewriter) Close() error {
 	}
 	if rw.closed {
 		return nil
+	}
+	if e := rw.equality.close(rw.manager); e != nil {
+		return e
 	}
 	if rw.params.Self != nil {
 		if e := rw.params.CloseHelpers(); e != nil {

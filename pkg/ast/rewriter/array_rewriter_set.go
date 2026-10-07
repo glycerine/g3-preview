@@ -86,3 +86,35 @@ func (rw *ArrayRewriter) setSubset(a, b ast.ASTHandle, out ast.ASTRef) (RewriteS
 	}
 	return Rewrite3, m.SetRef(out, equality)
 }
+
+// Source: src/ast/rewriter/array_rewriter.h:63-67.
+func (rw *ArrayRewriter) MkSetUnion(args ast.AppArguments, out ast.ASTRef) (RewriteStatus, error) {
+	if e := rw.open(); e != nil {
+		return RewriteFailed, e
+	}
+	return rw.setUnionIntersection(ast.ASTArrayOpSetUnion, args, out)
+}
+func (rw *ArrayRewriter) MkSetIntersect(args ast.AppArguments, out ast.ASTRef) (RewriteStatus, error) {
+	if e := rw.open(); e != nil {
+		return RewriteFailed, e
+	}
+	return rw.setUnionIntersection(ast.ASTArrayOpSetIntersect, args, out)
+}
+func (rw *ArrayRewriter) MkSetComplement(a ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
+	if e := rw.open(); e != nil {
+		return RewriteFailed, e
+	}
+	return rw.setComplement(a, out)
+}
+func (rw *ArrayRewriter) MkSetDifference(a, b ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
+	if e := rw.open(); e != nil {
+		return RewriteFailed, e
+	}
+	return rw.setDifference(a, b, out)
+}
+func (rw *ArrayRewriter) MkSetSubset(a, b ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
+	if e := rw.open(); e != nil {
+		return RewriteFailed, e
+	}
+	return rw.setSubset(a, b, out)
+}

@@ -79,6 +79,25 @@ func TestArrayRewriterOriginalSetStatusesAndSourceTrees(t *testing.T) {
 		if st != row.status || got != row.want {
 			t.Fatal("set reduction", row.op, st, row.status, got, row.want)
 		}
+		satOK(t, m.SetRef(out, yes))
+		switch row.op {
+		case ast.ASTArrayOpSetUnion:
+			st, e = rw.MkSetUnion(ast.SliceArguments(row.args), out)
+		case ast.ASTArrayOpSetIntersect:
+			st, e = rw.MkSetIntersect(ast.SliceArguments(row.args), out)
+		case ast.ASTArrayOpSetComplement:
+			st, e = rw.MkSetComplement(row.args[0], out)
+		case ast.ASTArrayOpSetDifference:
+			st, e = rw.MkSetDifference(row.args[0], row.args[1], out)
+		case ast.ASTArrayOpSetSubset:
+			st, e = rw.MkSetSubset(row.args[0], row.args[1], out)
+		}
+		satOK(t, e)
+		got, e = m.RefGet(out)
+		satOK(t, e)
+		if st != row.status || got != row.want {
+			t.Fatal("public set method", row.op, st, got, row.want)
+		}
 	}
 	d, e := m.MkFuncDecl(astTestSymbol(t, m, "unreduced-set"), nil, s, ast.ASTFuncDeclInfo{})
 	satOK(t, e)
