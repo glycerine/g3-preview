@@ -16,7 +16,7 @@ var errTacticModelConverterGoal = errors.New("model converter: unreachable goal 
 // Cold virtual-owner boundary for original model converters. Models currently
 // expose their ported model_core constant portion; derived models, evaluator,
 // translation and display remain separate source dependencies. These methods
-// compose converters, never supply a model or a solver result themselves.
+// dispatch original converter operations; they never perform a solver check.
 type tacticModelConverter interface {
 	IncRef() error
 	DecRef() error

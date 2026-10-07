@@ -91029,8 +91029,13 @@
       "component": "tactic",
       "role": "production",
       "status": "partial",
-      "go_targets": ["tactic_model_converter.go"],
+      "go_targets": [
+        "tactic_stored_model.go","tactic_model_converter.go"],
       "tests": [
+        "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
+        "TestTacticStoredModelLabelsSnapshotInlineSpillAndAppend",
+        "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
+        "TestTacticStoredModelLabelAppendRefusalKeepsSourcePrefix",
         "TestTacticModelReferenceOwningAliasAndReplacement",
         "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
         "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
@@ -91048,6 +91053,17 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "model2mc ownership, indexed/unindexed/label application, cancel and factories (model-core portion)",
+          "status": "partial",
+          "go_target": "tactic_stored_model.go",
+          "tests": [
+            "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
+            "TestTacticStoredModelLabelsSnapshotInlineSpillAndAppend",
+            "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
+            "TestTacticStoredModelLabelAppendRefusalKeepsSourcePrefix"
+          ]
+        },
+        {
           "name": "concat/concat_star model and label application; apply null forwarding",
           "status": "ported",
           "go_target": "tactic_model_converter.go",
@@ -91059,15 +91075,20 @@
         }
       ],
       "ownership": [],
-      "deviations": ["Original converter composition applies children in reverse source order and routes flattened subgoal indices; it does not manufacture a model or solver status. model2mc, model_converter2model, derived models, concrete recovery converters, translation and display remain required."]
+      "deviations": ["Original converter composition applies children in reverse source order and routes flattened subgoal indices; it does not manufacture a model or solver status. model2mc ownership/application and label copying now wrap the actual model_core constant portion. Derived-model dispatch, model_converter2model's original derived-model allocation, concrete recovery converters, translation and display remain required."]
     },
     {
       "path": "src/tactic/model_converter.h",
       "component": "tactic",
       "role": "production",
       "status": "partial",
-      "go_targets": ["tactic_model_converter.go"],
+      "go_targets": [
+        "tactic_stored_model.go","tactic_model_converter.go"],
       "tests": [
+        "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
+        "TestTacticStoredModelLabelsSnapshotInlineSpillAndAppend",
+        "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
+        "TestTacticStoredModelLabelAppendRefusalKeepsSourcePrefix",
         "TestTacticModelReferenceOwningAliasAndReplacement",
         "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
         "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
@@ -91095,6 +91116,17 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "model2mc ownership, indexed/unindexed/label application, cancel and factories (model-core portion)",
+          "status": "partial",
+          "go_target": "tactic_stored_model.go",
+          "tests": [
+            "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
+            "TestTacticStoredModelLabelsSnapshotInlineSpillAndAppend",
+            "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
+            "TestTacticStoredModelLabelAppendRefusalKeepsSourcePrefix"
+          ]
+        },
+        {
           "name": "cold model converter application/reference declarations",
           "status": "partial",
           "go_target": "tactic_model_converter.go",
@@ -91106,7 +91138,7 @@
         }
       ],
       "ownership": [],
-      "deviations": ["Application/refcount boundary uses the actual model_core constant portion; derived model ownership and translation/display declarations remain pending. No public API or concrete model-producing converter completion is claimed."]
+      "deviations": ["Application/refcount boundary uses the actual model_core constant portion; derived model ownership and translation/display declarations remain pending. Stored-model factory/application ownership now follows source model2mc on the constant-model portion; it does not allocate or evaluate a model. No public API or full derived-model/converter completion is claimed."]
     },
     {
       "path": "src/tactic/nlsat_smt/CMakeLists.txt",
@@ -106115,6 +106147,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "tactic_stored_model.go",
         "util_sexpr.go",
         "ast_shared_occs_mark.go",
         "mpnum/mp_integer_output_scope.go",
@@ -106135,6 +106168,10 @@
         "mpnum/mpn_source_buffer.go"
       ],
       "tests": [
+        "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
+        "TestTacticStoredModelLabelsSnapshotInlineSpillAndAppend",
+        "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
+        "TestTacticStoredModelLabelAppendRefusalKeepsSourcePrefix",
         "TestSexprBVSourceInlineBufferAndTemporaryLifetime",
         "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
         "TestASTSharedOccurrencesAllTraversalPolicies",
@@ -106265,6 +106302,17 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "model2mc buffer<symbol> copy, sixteen inline entries, doubling spill and destruction",
+          "status": "ported",
+          "go_target": "tactic_stored_model.go",
+          "tests": [
+            "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
+            "TestTacticStoredModelLabelsSnapshotInlineSpillAndAppend",
+            "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
+            "TestTacticStoredModelLabelAppendRefusalKeepsSourcePrefix"
+          ]
+        },
         {
           "name": "actual sexpr BV sbuffer<char,false,16> construction/push/doubling/reverse/terminator/destruction",
           "status": "ported",
