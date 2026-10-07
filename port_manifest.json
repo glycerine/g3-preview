@@ -12972,7 +12972,10 @@
         "pkg/ast/ast_bv_values.go",
         "pkg/ast/ast_bv_values_test.go",
         "pkg/ast/ast_builtin_plugins_values.go",
-        "pkg/model/model_bv_values_test.go"
+        "pkg/model/model_bv_values_test.go",
+        "pkg/ast/ast_bv_names.go",
+        "pkg/ast/ast_bv_names_test.go",
+        "pkg/ast/ast_builtin_names.go"
       ],
       "tests": [
         "TestASTBitVectorSourceEagerSortsAndPinnedDeclarations",
@@ -12986,7 +12989,9 @@
         "TestASTBitVectorOriginalValueCallbacks",
         "TestASTBitVectorSomeValueEveryWarmReservation",
         "TestASTBitVectorSomeValueNumericalTransportOwnerGuard",
-        "TestModelOriginalBitVectorZeroCompletion"
+        "TestModelOriginalBitVectorZeroCompletion",
+        "TestASTBitVectorOriginalNameCallbacks",
+        "TestASTBitVectorNameVectorEveryWarmReservationAndAppend"
       ],
       "conditionals": [
         {
@@ -13086,15 +13091,26 @@
           "tests": [
             "TestModelOriginalBitVectorZeroCompletion"
           ]
+        },
+        {
+          "name": "original get_sort_names/get_op_names, exact aliases/kinds/order and null/ALL legacy/internal-name guards (src/ast/bv_decl_plugin.cpp:672-743)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_names.go",
+          "tests": [
+            "TestASTBitVectorOriginalNameCallbacks",
+            "TestASTBitVectorNameVectorEveryWarmReservationAndAppend"
+          ]
         }
       ],
       "ownership": [
         "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end.",
-        "Zero callback reads the source sort width and constructs its lexical small-zero parameter in the existing numeral continuation. Actual power/mod/copy temporaries retain their numeric invocation owners through failed construction and manager closure. The active AST owner rejects numerical transport reentry before taking its mutex and restores the previous execution guard on every exit. Warm reservation tests exercise refusal, separate-continuation retry and final budget restoration; a bounded child reaches actual Runtime max-count transport and verifies cleanup/public factory reentry refusal."
+        "Zero callback reads the source sort width and constructs its lexical small-zero parameter in the existing numeral continuation. Actual power/mod/copy temporaries retain their numeric invocation owners through failed construction and manager closure. The active AST owner rejects numerical transport reentry before taking its mutex and restores the previous execution guard on every exit. Warm reservation tests exercise refusal, separate-continuation retry and final budget restoration; a bounded child reaches actual Runtime max-count transport and verifies cleanup/public factory reentry refusal.",
+        "Name callbacks append borrowed symbol records into the shared caller-owned concrete builtin-name vector. Each literal is interned before its push, with original geometric growth and preserved publication prefixes on refusal. The null/ALL guard precedes sort appends but follows the 39 ordinary operator appends; null skips constructing the ALL symbol. Vector backing is released by its caller; the SymbolManager retains interned aliases. No numerical copy, cache INC or owning BV declaration is created by this name callback."
       ],
       "deviations": [
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
-        "Selected numeral is_value and zero get_some_value callbacks are integrated, including scoped override priority and model/evaluator completion. The small literal and its lexical parameter use the explicit Go owned-value representation; no native rational temporary/parameter allocator ABI credit is claimed. Original are_distinct offset-term arithmetic, other BV declarations/reducers, native SASSERT/TRACE/exception transport and whole-unit ownership/representation audits remain open. Base unique-value comparison now recognizes BV numerals without claiming the offset algorithm."
+        "Selected numeral is_value and zero get_some_value callbacks are integrated, including scoped override priority and model/evaluator completion. The small literal and its lexical parameter use the explicit Go owned-value representation; no native rational temporary/parameter allocator ABI credit is claimed. Original are_distinct offset-term arithmetic, other BV declarations/reducers, native SASSERT/TRACE/exception transport and whole-unit ownership/representation audits remain open. Base unique-value comparison now recognizes BV numerals without claiming the offset algorithm.",
+        "Selected original sort/operator name callbacks are implemented: null/ALL includes legacy bv and 19 extended/internal operator aliases, other logics always retain BitVec and exactly 39 ordinary operators. bv2int and bv2nat retain the same original declaration kind. Parser symbol-table consumers and unsupported BV operator declaration/evaluation dependencies remain required; offering source names does not claim those factories or reducers are complete. The caller-owned vector remains the explicit Go representation, without native record/header/copy/allocator ABI or whole-unit ownership credit."
       ]
     },
     {

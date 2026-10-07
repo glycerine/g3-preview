@@ -54,3 +54,21 @@ func (v *ASTBuiltinNames) push(b *arena.Budget, name util.Symbol, kind int32) er
 	v.items = append(v.items, ASTBuiltinName{Kind: kind, Name: name})
 	return nil
 }
+
+func (m *ASTManager) appendBuiltinName(names *ASTBuiltinNames, text string, kind int32) error {
+	s, e := m.Symbols.Intern(text)
+	if e != nil {
+		return e
+	}
+	return names.push(m.BudgetField, s, kind)
+}
+
+// Source: src/ast/arith_decl_plugin.cpp:542;
+// src/ast/bv_decl_plugin.cpp:673,720.
+func (m *ASTManager) builtinAllLogic(logic util.Symbol) (bool, error) {
+	if logic.IsNull() {
+		return true, nil
+	}
+	all, e := m.Symbols.Intern("ALL")
+	return logic == all, e
+}
