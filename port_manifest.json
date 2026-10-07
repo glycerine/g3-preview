@@ -13414,7 +13414,7 @@
         "Selected has_sign_bit follows original unsigned normalization and rational comparison; it does not inspect host bits or assume canonical input. The original DEBUG width assertion precedes input/plugin reads. Release retains source unsigned bits-1 arithmetic and existing checked power/cache bounds. The nested normalization and reflected caller-header representation retains explicit concrete Go/native rational, return-value, pointer/header, allocator/assertion/exception ABI qualifications. BV rewriter shift consumers and whole-unit ownership/representation audit remain to be ported; no source operation resumability is claimed after Runtime process-fatal refusal.",
         "The recognizer checks exactly one sort parameter, unlike the original plugin internal get_bv_size helper, which intentionally remains unchanged. Recognition does not inspect parameter kind; the reached width getter uses the prior checked wrong-kind rejection. No registered BV plugin yields false in this manager-bound adapter; native bv_util construction requires its plugin. Concrete Go sort/parameter/return/numeric-frame representation and existing native allocator/assertion/exception qualifications remain. BV uint64 numeral/conversion/construction utilities and full reducer/whole-unit audits remain required.",
         "Selected parameterized utility calls preserve signed int32 conversion of unsigned counts/bounds and original factory guards, including accepted negative extract low versus rejected negative extension. mk_bv2int performs arith family lookup and Int-sort factory before creating its borrowed AST parameter; the source BV2INT declaration erases that parameter. The generic sort dispatcher body is shared without branch changes. Two high parameter-token slots are reserved, reducing the checked arena slot limit; scoped epoch exhaustion and missing plugin remain checked Go adapter boundaries. Native stack/union/assertion/exception ABI and complete whole-unit/reducer ownership audit remain uncredited.",
-        "Borrowed OR uses checked Go application/ref-vector argument readers without an additional operand-buffer copy. The existing application candidate still allocates before hash-cons lookup. No native pointer/layout/allocation ABI or whole-unit completion is credited; BV addition still requires its original polynomial core and post-core reduction."
+        "Borrowed OR uses checked Go application/ref-vector argument readers without an additional operand-buffer copy. The existing application candidate still allocates before hash-cons lookup. No native pointer/layout/allocation ABI or whole-unit completion is credited; BV addition now uses this factory in its post-core reduction and still requires its original polynomial core."
       ]
     },
     {
@@ -13605,7 +13605,7 @@
         "Selected get_div0_op/get_div0_decl preserve the five ordinary division/remainder/modulus mappings, family and first domain, erasing input parameters/remaining domains/range. The shared family declaration dispatcher was extracted without changing its branches. Invalid kinds at native UNREACHABLE, invalid handles and empty domain pointers receive checked Go errors; native assertion/compiler-unreachable behavior and whole-header ABI/ownership audits remain uncredited. Full BV rewriter consumers remain separate work.",
         "Selected parameterized utility calls preserve signed int32 conversion of unsigned counts/bounds and original factory guards, including accepted negative extract low versus rejected negative extension. mk_bv2int performs arith family lookup and Int-sort factory before creating its borrowed AST parameter; the source BV2INT declaration erases that parameter. The generic sort dispatcher body is shared without branch changes. Two high parameter-token slots are reserved, reducing the checked arena slot limit; scoped epoch exhaustion and missing plugin remain checked Go adapter boundaries. Native stack/union/assertion/exception ABI and complete whole-unit/reducer ownership audit remain uncredited.",
         "Selected parameter-free numeral predicate exposes the existing original identity algorithm for BV reducers. Missing registered plugin and invalid Go handle/kind domains retain checked adapter behavior; native whole-header pointer/union/assertion/ownership audit is not credited.",
-        "Borrowed OR uses checked Go application/ref-vector argument readers without an additional operand-buffer copy. The existing application candidate still allocates before hash-cons lookup. No native pointer/layout/allocation ABI or whole-unit completion is credited; BV addition still requires its original polynomial core and post-core reduction."
+        "Borrowed OR uses checked Go application/ref-vector argument readers without an additional operand-buffer copy. The existing application candidate still allocates before hash-cons lookup. No native pointer/layout/allocation ABI or whole-unit completion is credited; BV addition now uses this factory in its post-core reduction and still requires its original polynomial core."
       ]
     },
     {
@@ -20942,7 +20942,9 @@
         "pkg/ast/ast_bv_unsigned_numeral.go",
         "pkg/ast/ast_bv_sign_extend.go",
         "pkg/ast/rewriter/bv_rewriter_sign_extend.go",
-        "pkg/ast/ast_bv_zero_bit.go"
+        "pkg/ast/ast_bv_zero_bit.go",
+        "pkg/ast/rewriter/bv_rewriter_add.go",
+        "pkg/ast/rewriter/bv_rewriter_add_test.go"
       ],
       "tests": [
         "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
@@ -20967,7 +20969,13 @@
         "TestBVRewriterANDWarmSpillRefusalPreservesOutput",
         "TestASTBitVectorOriginalZeroBitStoredNumerals",
         "TestASTBitVectorZeroBitConcatRoutingAndErasedReads",
-        "TestASTBitVectorZeroBitEveryActualReservation"
+        "TestASTBitVectorZeroBitEveryActualReservation",
+        "TestBVRewriterAdditionAfterCoreStatusAndUnreadOperands",
+        "TestBVRewriterAdditionAfterCoreNumeralsAndBorrowedResult",
+        "TestBVRewriterAdditionAfterCoreSymbolicDisjointSemantics",
+        "TestBVRewriterAdditionAfterCoreEveryColdReservation",
+        "TestBVRewriterAdditionAfterCoreAssignmentDECRefusal",
+        "TestBVRewriterAdditionAfterCoreActualRuntimeNumeralChild"
       ],
       "conditionals": [
         {
@@ -21518,6 +21526,19 @@
             "TestASTBitVectorZeroBitConcatRoutingAndErasedReads",
             "TestASTBitVectorZeroBitEveryActualReservation"
           ]
+        },
+        {
+          "name": "original active mk_bv_add reduction after mk_add_core: incoming status guards, borrowed original/core-result operands, bit-major disjointness test, original OR construction and output assignment (src/ast/rewriter/bv_rewriter.cpp:2078-2079,2109-2137; src/ast/rewriter/bv_rewriter.h:105)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_add.go",
+          "tests": [
+            "TestBVRewriterAdditionAfterCoreStatusAndUnreadOperands",
+            "TestBVRewriterAdditionAfterCoreNumeralsAndBorrowedResult",
+            "TestBVRewriterAdditionAfterCoreSymbolicDisjointSemantics",
+            "TestBVRewriterAdditionAfterCoreEveryColdReservation",
+            "TestBVRewriterAdditionAfterCoreAssignmentDECRefusal",
+            "TestBVRewriterAdditionAfterCoreActualRuntimeNumeralChild"
+          ]
         }
       ],
       "ownership": [
@@ -21538,7 +21559,8 @@
         "The owner-sensitive numerical core resides in ast so it can use existing private manager-owned frames and reference publication without reverse imports; rewriter supplies the original status adapter, preserving pkg boundaries. Non-numeral guard erases Go bookkeeping for the source allocation-free default rational. The common all-one arithmetic condition is shared while its original predicate retains its earlier full-expression DT point. Native global rational init, stack/union/allocator/assertion/exception ABI and full BV reducer/dispatch/evaluator/whole-unit audits remain uncredited; actual Runtime faults prove closure, not native-fatal resumability.",
         "Selected complete sign-extension body uses an ast numerical core and rewriter adapter to preserve private numerical/reference ownership without reverse package imports. Unsigned result-width addition retains wraparound, with the original inner NUM width guard reached after norm/copy/modulo. Symbolic source default rational requires no allocation, so the Go numeral identity guard erases its bookkeeping. The checked adapter validates the borrowed extraction owner; full BV constructor/dispatch/traversal/evaluator and native stack/allocator/assertion/exception/pointer ABI and whole-unit ownership remain open. Fault cleanup does not claim native-fatal resumability.",
         "Selected complete mk_bv_and body expands by De Morgan rather than folding values or emitting a raw AND node, with original BR_REWRITE3. Standalone core remains pending full BV dispatch/traversal; native buffer/pointer/exception ABI and whole-unit ownership remain uncredited.",
-        "The complete selected is_zero_bit helper resides in ast to use private numerical/reference owners without a reverse import; its ADD/OR consumers remain required. Numerical bits inspect stored values without width normalization or a new index/width guard. Unknown bits return false; an exhausted/out-of-range concat reaches source UNREACHABLE/release undefined behavior and the Go boundary returns ErrASTDomain. Wrapper/token/stack/pointer/allocator/assertion/fatal/exception ABI and whole-unit ownership remain uncredited; Go returning-error cleanup is not native-fatal resumability. This selection does not promote the whole BV rewriter source unit."
+        "The complete selected is_zero_bit helper resides in ast to use private numerical/reference owners without a reverse import; the ADD post-core reduction now calls it, while the complete ADD core and OR consumers remain required. Numerical bits inspect stored values without width normalization or a new index/width guard. Unknown bits return false; an exhausted/out-of-range concat reaches source UNREACHABLE/release undefined behavior and the Go boundary returns ErrASTDomain. Wrapper/token/stack/pointer/allocator/assertion/fatal/exception ABI and whole-unit ownership remain uncredited; Go returning-error cleanup is not native-fatal resumability. This selection does not promote the whole BV rewriter source unit.",
+        "Only the original active post-mk_add_core BV addition reduction is implemented by RewriteBitVectorAdditionAfterCore; callers supply the actual core status/output. No polynomial-core stub or substitute is provided. Bit-major/operand-order reads and early conflict exits are retained. Successful OR construction acquires operand references before assignment deletes the sole-owned old sum. Final assignment can publish OR together with a returned old-deletion worklist error after DEC consumption, matching the existing checked reference adapter. The stage has no owned reference/numerical locals; the actual AST plugin owns failed numerical child contexts and the manager owns deletion worklists. Go error cleanup does not credit native fatal/exception/stack/pointer/allocator ABI or full rewriter ownership, dispatch, solver integration or whole-unit completion."
       ]
     },
     {
@@ -21549,7 +21571,9 @@
       "go_targets": [
         "pkg/ast/ast_bv_unsigned_numeral.go",
         "pkg/ast/ast_bv_unsigned_numeral_test.go",
-        "pkg/ast/ast_bv_zero_bit.go"
+        "pkg/ast/ast_bv_zero_bit.go",
+        "pkg/ast/rewriter/bv_rewriter_add.go",
+        "pkg/ast/rewriter/bv_rewriter_add_test.go"
       ],
       "tests": [
         "TestASTBitVectorUnsignedNumeralConstructorBoundary",
@@ -21557,7 +21581,13 @@
         "TestASTBitVectorUnsignedNumeralEveryNumericalReservation",
         "TestASTBitVectorOriginalZeroBitStoredNumerals",
         "TestASTBitVectorZeroBitConcatRoutingAndErasedReads",
-        "TestASTBitVectorZeroBitEveryActualReservation"
+        "TestASTBitVectorZeroBitEveryActualReservation",
+        "TestBVRewriterAdditionAfterCoreStatusAndUnreadOperands",
+        "TestBVRewriterAdditionAfterCoreNumeralsAndBorrowedResult",
+        "TestBVRewriterAdditionAfterCoreSymbolicDisjointSemantics",
+        "TestBVRewriterAdditionAfterCoreEveryColdReservation",
+        "TestBVRewriterAdditionAfterCoreAssignmentDECRefusal",
+        "TestBVRewriterAdditionAfterCoreActualRuntimeNumeralChild"
       ],
       "conditionals": [
         {
@@ -21591,6 +21621,19 @@
             "TestASTBitVectorZeroBitConcatRoutingAndErasedReads",
             "TestASTBitVectorZeroBitEveryActualReservation"
           ]
+        },
+        {
+          "name": "original active mk_bv_add reduction after mk_add_core: incoming status guards, borrowed original/core-result operands, bit-major disjointness test, original OR construction and output assignment (src/ast/rewriter/bv_rewriter.cpp:2078-2079,2109-2137; src/ast/rewriter/bv_rewriter.h:105)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_add.go",
+          "tests": [
+            "TestBVRewriterAdditionAfterCoreStatusAndUnreadOperands",
+            "TestBVRewriterAdditionAfterCoreNumeralsAndBorrowedResult",
+            "TestBVRewriterAdditionAfterCoreSymbolicDisjointSemantics",
+            "TestBVRewriterAdditionAfterCoreEveryColdReservation",
+            "TestBVRewriterAdditionAfterCoreAssignmentDECRefusal",
+            "TestBVRewriterAdditionAfterCoreActualRuntimeNumeralChild"
+          ]
         }
       ],
       "ownership": [
@@ -21599,7 +21642,8 @@
       ],
       "deviations": [
         "Selected unsigned numeral overload preserves original constructor width and inclusive unsigned32 inline boundary. Existing numeral copy/normalization/parameter/header/exception ABI qualifications remain; actual Runtime failures prove owner cleanup rather than resumability. Full BV rewriter header audits remain uncredited.",
-        "The complete selected is_zero_bit helper resides in ast to use private numerical/reference owners without a reverse import; its ADD/OR consumers remain required. Numerical bits inspect stored values without width normalization or a new index/width guard. Unknown bits return false; an exhausted/out-of-range concat reaches source UNREACHABLE/release undefined behavior and the Go boundary returns ErrASTDomain. Wrapper/token/stack/pointer/allocator/assertion/fatal/exception ABI and whole-unit ownership remain uncredited; Go returning-error cleanup is not native-fatal resumability. This selection does not promote the whole BV rewriter source unit."
+        "The complete selected is_zero_bit helper resides in ast to use private numerical/reference owners without a reverse import; the ADD post-core reduction now calls it, while the complete ADD core and OR consumers remain required. Numerical bits inspect stored values without width normalization or a new index/width guard. Unknown bits return false; an exhausted/out-of-range concat reaches source UNREACHABLE/release undefined behavior and the Go boundary returns ErrASTDomain. Wrapper/token/stack/pointer/allocator/assertion/fatal/exception ABI and whole-unit ownership remain uncredited; Go returning-error cleanup is not native-fatal resumability. This selection does not promote the whole BV rewriter source unit.",
+        "Only the original active post-mk_add_core BV addition reduction is implemented by RewriteBitVectorAdditionAfterCore; callers supply the actual core status/output. No polynomial-core stub or substitute is provided. Bit-major/operand-order reads and early conflict exits are retained. Successful OR construction acquires operand references before assignment deletes the sole-owned old sum. Final assignment can publish OR together with a returned old-deletion worklist error after DEC consumption, matching the existing checked reference adapter. The stage has no owned reference/numerical locals; the actual AST plugin owns failed numerical child contexts and the manager owns deletion worklists. Go error cleanup does not credit native fatal/exception/stack/pointer/allocator ABI or full rewriter ownership, dispatch, solver integration or whole-unit completion."
       ]
     },
     {
