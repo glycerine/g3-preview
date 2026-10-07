@@ -218,38 +218,7 @@ func (m *ASTManager) mkBitVectorNumeralInput(value *util.OwnedRational, bits uin
 	if receipt != nil {
 		*receipt = astBVNormalizationReceipt{frame: f, invocation: f.invocation}
 	}
-	defer func() {
-		defer func() {
-			if receipt != nil {
-				receipt.retired = f.retired
-			}
-		}()
-		f.bodyCause = result
-		result = errors.Join(result, f.destroy(false))
-		if receipt != nil {
-			receipt.sourceDone = f.sourceDone
-			receipt.bodyCause = f.bodyCause
-			receipt.sourceCause = f.sourceCause
-		}
-		if result == nil && f.sourceDone {
-			result = f.destroy(true)
-			if result == nil {
-				for _, i := range f.childOrder() {
-					if i < 0 {
-						continue
-					}
-					if e := f.children[i].EndContext(); e != nil {
-						result = e
-						return
-					}
-				}
-				f.owner.numeralFrames = f.next
-				m.BudgetField.Release(f.header)
-				f.header = 0
-				f.retired = true
-			}
-		}
-	}()
+	defer f.finishNumeral(&result, receipt)
 	if zero {
 		// get_some_value's parameter(rational(0)) owns a small zero.
 		// Keep that owner in the same continuation as numeral normalization.
@@ -263,41 +232,97 @@ func (m *ASTManager) mkBitVectorNumeralInput(value *util.OwnedRational, bits uin
 			return node, e
 		}
 	}
+	decl, e := m.bitVectorNumeralDeclCore(f, &f.values[0], bits)
+	if e != nil {
+		return node, e
+	}
+	for _, i := range f.childOrder() {
+		if i >= 0 {
+			if e = f.children[i].SourceReady(); e != nil {
+				return node, e
+			}
+		}
+	}
+	// mk_num_decl's local ps then p0 end before bv_util constructs the app.
+	if e = f.destroyOne(4, false); e != nil {
+		return node, e
+	}
+	if e = f.destroyOne(3, false); e != nil {
+		return node, e
+	}
+	return m.mkApp(decl, nil)
+}
+
+func (f *astBVNumeralFrame) finishNumeral(result *error, receipt *astBVNormalizationReceipt) {
+	defer func() {
+		if receipt != nil {
+			receipt.retired = f.retired
+		}
+	}()
+	f.bodyCause = *result
+	*result = errors.Join(*result, f.destroy(false))
+	if receipt != nil {
+		receipt.sourceDone = f.sourceDone
+		receipt.bodyCause = f.bodyCause
+		receipt.sourceCause = f.sourceCause
+	}
+	if *result == nil && f.sourceDone {
+		*result = f.destroy(true)
+		if *result == nil {
+			for _, i := range f.childOrder() {
+				if i < 0 {
+					continue
+				}
+				if e := f.children[i].EndContext(); e != nil {
+					*result = e
+					return
+				}
+			}
+			f.owner.numeralFrames = f.next
+			f.owner.owner.BudgetField.Release(f.header)
+			f.header = 0
+			f.retired = true
+		}
+	}
+}
+
+func (m *ASTManager) bitVectorNumeralDeclCore(f *astBVNumeralFrame, value *util.OwnedRational, bits uint32) (astNodeRef, error) {
+	var e error
 	// The inner plugin checks parameter kinds/count before unsigned width.
 	if bits == 0 {
-		return node, ASTException{util.NewDefaultException("bit-vector size must be greater than zero")}
+		return astNodeRef{}, ASTException{util.NewDefaultException("bit-vector size must be greater than zero")}
 	}
 	q := m.numerals
 	f.values[1], e = q.PowerOfTwoWithInvocation(bits, &f.children[0])
 	if e != nil {
-		return node, e
+		return astNodeRef{}, e
 	}
 	f.placed[1], f.complete[1] = true, true
-	f.values[2], e = q.ModWithInvocation(&f.values[0], &f.values[1], &f.children[1])
+	f.values[2], e = q.ModWithInvocation(value, &f.values[1], &f.children[1])
 	if e != nil {
-		return node, e
+		return astNodeRef{}, e
 	}
 	f.placed[2], f.complete[2] = true, true
 	if e = f.copyConstruct(3, &f.values[2]); e != nil {
-		return node, e
+		return astNodeRef{}, e
 	}
 	// Full-expression temporary order is mod result, then power return value.
 	if e = f.destroyOne(2, false); e != nil {
-		return node, e
+		return astNodeRef{}, e
 	}
 	if e = f.destroyOne(1, false); e != nil {
-		return node, e
+		return astNodeRef{}, e
 	}
 	if e = f.copyConstruct(4, &f.values[3]); e != nil {
-		return node, e
+		return astNodeRef{}, e
 	}
-	sort, e := f.owner.mkSort(bits)
+	sort, e := f.owner.getSort(bits)
 	if e != nil {
-		return node, e
+		return astNodeRef{}, e
 	}
 	parameter := astParameterRecord{Kind: ASTParameterRational, Rational: f.values[4]}
 	if e = m.beginFormatInfo(false, f.owner.family, 0, &parameter); e != nil {
-		return node, e
+		return astNodeRef{}, e
 	}
 	defer m.endFormatInfo()
 	m.formatLexical.secondParameter = astParameterRecord{Kind: ASTParameterInt, integer: int32(bits)}
@@ -307,10 +332,11 @@ func (m *ASTManager) mkBitVectorNumeralInput(value *util.OwnedRational, bits uin
 	ps := [2]ASTParameter{{m.origin, math.MaxUint32 - 1, epoch}, {m.origin, math.MaxUint32 - 1, epoch + 1}}
 	decl, e := m.pluginDecl(f.owner.names[0], f.owner.family, 0, ps[:], nil, sort, ASTFuncFlags{}, false)
 	if e != nil {
-		return node, e
+		return astNodeRef{}, e
 	}
-	return m.mkApp(decl, nil)
+	return decl, nil
 }
+
 func (m *ASTManager) BitVectorNumeral(value *util.OwnedRational, bits uint32) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
 		return ASTHandle{}, e

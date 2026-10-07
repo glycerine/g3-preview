@@ -179,7 +179,8 @@ func (m *ASTManager) bitVectorExprDecl(k int32, ps []ASTParameter, args []ASTHan
 	case 60:
 		return p.fields[3], true, nil
 	case 0:
-		return astNodeRef{}, true, ErrASTDomain // raw numeral factory remains required
+		decl, e := m.bitVectorNumeralDecl(ps, len(args))
+		return decl, true, e
 	case 56, 57:
 		return astNodeRef{}, false, nil
 	}

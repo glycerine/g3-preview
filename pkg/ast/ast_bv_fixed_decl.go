@@ -168,6 +168,8 @@ func (m *ASTManager) bitVectorDecl(k int32, ps []ASTParameter, domain []ASTHandl
 		return astNodeRef{}, ErrASTHandle
 	}
 	switch k {
+	case 0:
+		return m.bitVectorNumeralDecl(ps, len(domain))
 	case 1:
 		return p.fields[1], nil
 	case 2:
@@ -178,7 +180,7 @@ func (m *ASTManager) bitVectorDecl(k int32, ps []ASTParameter, domain []ASTHandl
 		return p.fields[3], nil
 	}
 	// Numerals and parameterized operators require their own source factories.
-	if k == 0 || k == 56 || k == 57 {
+	if k == 56 || k == 57 {
 		return astNodeRef{}, ErrASTDomain
 	}
 	fail := func(message string) (astNodeRef, error) {
