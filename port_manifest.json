@@ -13423,7 +13423,9 @@
         "pkg/ast/ast_bv_div0.go",
         "pkg/ast/ast_bv_div0_test.go",
         "pkg/ast/ast_bv_app_parameter_util.go",
-        "pkg/ast/ast_bv_app_parameter_util_test.go"
+        "pkg/ast/ast_bv_app_parameter_util_test.go",
+        "pkg/ast/ast_bv_numeral_identity.go",
+        "pkg/ast/ast_bv_numeral_identity_test.go"
       ],
       "tests": [
         "TestASTOriginalPluginUninterpretedClassification",
@@ -13443,7 +13445,8 @@
         "TestASTBitVectorOriginalParameterizedUtilities",
         "TestASTBitVectorOriginalToIntUtility",
         "TestASTBitVectorUtilityEveryColdReservation",
-        "TestASTBitVectorUtilityRejectsUnsignedNegativeExtension"
+        "TestASTBitVectorUtilityRejectsUnsignedNegativeExtension",
+        "TestASTBitVectorNumeralPredicateOnlyReadsIdentity"
       ],
       "conditionals": [
         {
@@ -13538,6 +13541,14 @@
             "TestASTBitVectorUtilityEveryColdReservation",
             "TestASTBitVectorUtilityRejectsUnsignedNegativeExtension"
           ]
+        },
+        {
+          "name": "original parameter-free is_numeral(expr) app/family/kind overload (src/ast/bv_decl_plugin.h:298)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_numeral_identity.go",
+          "tests": [
+            "TestASTBitVectorNumeralPredicateOnlyReadsIdentity"
+          ]
         }
       ],
       "ownership": [
@@ -13547,7 +13558,8 @@
         "Binary operand matchers return borrowed original nodes and never acquire or release references. Family/kind and exact two-argument guards precede output reads. Tests compare actual argument RCs and AST stats under FailAfter(0), and aliased output references receive argument zero then argument one in source order.",
         "Parameter-free application utilities borrow operand handles/slices and delegate to the original family declaration and application factories. Warm binary calls reuse cached declarations and hash-consed applications under FailAfter(0), with unchanged actual AST stats. No extra INC, DEC or argument buffer is introduced by the utility wrapper.",
         "Division-by-zero declaration helpers borrow the original declaration metadata and first domain. New declaration ownership follows the unchanged family factory and fixed BV cache. Warm helpers retain identical stats under FailAfter(0); twelve cold reservation refusals before success each end with zero shared budget after the actual owning closure.",
-        "One/two scalar source stack parameters are represented by two embedded cold-manager records with scoped epoch tokens, separately from declaration-info scratch. They borrow values and do not allocate arena parameter slots or INC an AST sort. Factory metadata copies retain their existing ownership. Scope ends on success/refusal; stale tokens reject. Every cold constructor reservation campaign closes actual shared owners with zero budget."
+        "One/two scalar source stack parameters are represented by two embedded cold-manager records with scoped epoch tokens, separately from declaration-info scratch. They borrow values and do not allocate arena parameter slots or INC an AST sort. Factory metadata copies retain their existing ownership. Scope ends on success/refusal; stale tokens reject. Every cold constructor reservation campaign closes actual shared owners with zero budget.",
+        "The numeral identity overload borrows app/declaration tags without reading or copying parameters or acquiring any reference. Tests use parameterless raw NUM metadata and actual unchanged AST stats under FailAfter(0), including wrong family/kind and variable branches."
       ],
       "deviations": [
         "The selected predicate is connected to model interpretation/completion; whole-header and native representation/assertion/ownership audit are not credited. A declaration naming an unregistered plugin receives false in the checked Go adapter; native consumers require a nonnull registered plugin. Declaration-only numeral identity is a checked consumer adapter of the original app/decl identity recognizers, with no application construction or numerical parameter reads.",
@@ -13556,7 +13568,8 @@
         "The selected named Go methods implement all fifteen source MATCH_BINARY overloads. Invalid Go output pointers are a checked adapter boundary and can preserve a reached left-output publication before rejecting the right pointer; native C++ references cannot be nil. Missing plugin/invalid handles retain existing checked owner behavior. Native pointer/reference/assertion/ABI and whole-header ownership audits remain uncredited; full BV rewriter consumers and remaining utility construction interfaces remain open.",
         "Twenty parameter-free application utility overloads are selected: comparisons, unary/binary arithmetic and bitwise/shift operations, three overflow predicates, variadic concat/or/xor/mkbv and binary concat. The three multiplication overflow predicates intentionally reverse source operands. Missing registered BV plugin is rejected by the checked Go utility adapter. Parameterized extract/extension helpers, bv2int utility and full rewriter consumers remain separate work; whole-header native representation/assertion/ownership audits remain uncredited.",
         "Selected get_div0_op/get_div0_decl preserve the five ordinary division/remainder/modulus mappings, family and first domain, erasing input parameters/remaining domains/range. The shared family declaration dispatcher was extracted without changing its branches. Invalid kinds at native UNREACHABLE, invalid handles and empty domain pointers receive checked Go errors; native assertion/compiler-unreachable behavior and whole-header ABI/ownership audits remain uncredited. Full BV rewriter consumers remain separate work.",
-        "Selected parameterized utility calls preserve signed int32 conversion of unsigned counts/bounds and original factory guards, including accepted negative extract low versus rejected negative extension. mk_bv2int performs arith family lookup and Int-sort factory before creating its borrowed AST parameter; the source BV2INT declaration erases that parameter. The generic sort dispatcher body is shared without branch changes. Two high parameter-token slots are reserved, reducing the checked arena slot limit; scoped epoch exhaustion and missing plugin remain checked Go adapter boundaries. Native stack/union/assertion/exception ABI and complete whole-unit/reducer ownership audit remain uncredited."
+        "Selected parameterized utility calls preserve signed int32 conversion of unsigned counts/bounds and original factory guards, including accepted negative extract low versus rejected negative extension. mk_bv2int performs arith family lookup and Int-sort factory before creating its borrowed AST parameter; the source BV2INT declaration erases that parameter. The generic sort dispatcher body is shared without branch changes. Two high parameter-token slots are reserved, reducing the checked arena slot limit; scoped epoch exhaustion and missing plugin remain checked Go adapter boundaries. Native stack/union/assertion/exception ABI and complete whole-unit/reducer ownership audit remain uncredited.",
+        "Selected parameter-free numeral predicate exposes the existing original identity algorithm for BV reducers. Missing registered plugin and invalid Go handle/kind domains retain checked adapter behavior; native whole-header pointer/union/assertion/ownership audit is not credited."
       ]
     },
     {
@@ -20882,7 +20895,9 @@
         "pkg/ast/rewriter/bv_rewriter_rotate.go",
         "pkg/ast/rewriter/bv_rewriter_rotate_test.go",
         "pkg/ast/rewriter/bv_rewriter_extend_repeat.go",
-        "pkg/ast/rewriter/bv_rewriter_extend_repeat_test.go"
+        "pkg/ast/rewriter/bv_rewriter_extend_repeat_test.go",
+        "pkg/ast/rewriter/bv_rewriter_compare.go",
+        "pkg/ast/rewriter/bv_rewriter_compare_test.go"
       ],
       "tests": [
         "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
@@ -20892,7 +20907,10 @@
         "TestBVRewriterRotationIdentityErasesExtractionWork",
         "TestBVRewriterRotationEveryColdReservation",
         "TestBVRewriterOriginalRepeatAndZeroExtend",
-        "TestBVRewriterRepeatAndZeroExtendEveryColdReservation"
+        "TestBVRewriterRepeatAndZeroExtendEveryColdReservation",
+        "TestBVRewriterOriginalCompareAndReductionOR",
+        "TestBVRewriterComparisonNumeralIdentityErasesParameters",
+        "TestBVRewriterCompareAndReductionOREveryColdReservation"
       ],
       "conditionals": [
         {
@@ -21377,17 +21395,29 @@
             "TestBVRewriterOriginalRepeatAndZeroExtend",
             "TestBVRewriterRepeatAndZeroExtendEveryColdReservation"
           ]
+        },
+        {
+          "name": "original mk_bv_redor numeral/borrowed-zero guard and mk_bv_comp identity/short-circuit numeral/ITE branches (src/ast/rewriter/bv_rewriter.cpp:2040-2046,2058-2074)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_compare.go",
+          "tests": [
+            "TestBVRewriterOriginalCompareAndReductionOR",
+            "TestBVRewriterComparisonNumeralIdentityErasesParameters",
+            "TestBVRewriterCompareAndReductionOREveryColdReservation"
+          ]
         }
       ],
       "ownership": [
         "Core algorithm adapters borrow AST manager and operand slices. NAND uses the existing inline16/doubling ASTHandleBuffer for source ptr_buffer<expr>, with nonowning generated node handles and deferred spill release on every exit. NOR/XNOR introduce no argument buffer. Output SetRef occurs only after all application factories succeed; cold refusal and warm spill tests preserve prior output and actual shared graph budget closes to zero.",
         "Fixed rotation reducers borrow the caller-owned MkExtractProc and retain its original cache replacement reference ordering. Left creates low then high extraction, concatenates their borrowed app handles, and only then SetRef publishes output. Identity rotation allocates/acquires no extraction/cache state. Cold refusal campaigns preserve the previous output and close the actual cache/AST/numeric/symbol owner graph with zero shared budget.",
-        "Repeat borrows the same argument into the original inline16/doubling handle buffer and releases its spill on all exits. Zero-extension calls the unsigned32 numeral constructor, borrows that application, concatenates before output SetRef. Identity paths do no numeric/buffer/cache work. Both cold refusal campaigns close actual shared owners to zero budget."
+        "Repeat borrows the same argument into the original inline16/doubling handle buffer and releases its spill on all exits. Zero-extension calls the unsigned32 numeral constructor, borrows that application, concatenates before output SetRef. Identity paths do no numeric/buffer/cache work. Both cold refusal campaigns close actual shared owners to zero budget.",
+        "Comparison/reduction-OR borrow inputs, use source unsigned32 one-bit numeral construction and SetRef only after factories succeed. Numeral identity predicates copy no numeric metadata. Symbolic reduction-OR erases output and numerical/factory reads. Actual cold refusal campaigns preserve prior output and close reached numeric/AST/symbol owner graph with zero budget."
       ],
       "deviations": [
         "Only the three original negated-bitwise reducer bodies are selected, exposed as standalone core adapters for later BV rewriter dispatch/traversal. They preserve source operand order, generated operator nesting and BR_REWRITE2; they do not normalize or evaluate operands. Full BV rewriter constructor/parameters/poly/trailing/extract/dispatch/traversal algorithms, native pointer/buffer/exception ABI and whole-unit ownership audit remain uncredited. Invalid/nil Go manager/reference boundaries use existing checked Go transport.",
         "Selected fixed left/right rotation bodies preserve uint32 modulo and right delegation with a second width read. They expose standalone core algorithms pending full BV rewriter dispatch/traversal. Width zero at the native SASSERT/modulo-invalid domain is rejected by checked Go transport; no native debugger/undefined-behavior equivalence is credited. Closed/copied/pending extraction owners are checked adapter errors. Extended numeral-shift rotations, other reducers and whole-unit ABI/ownership audit remain open.",
-        "Selected complete repeat/zero-extension bodies retain BR_DONE identity and BR_REWRITE1 concat statuses. No extra flattening, evaluation or bounds guard is introduced. Unsigned zero construction is delegated to the original rational(unsigned) path, not uint64 substitution. Full BV constructor/dispatch/sign-extension/trailing/reducer/evaluator and native ownership/ABI audits remain open."
+        "Selected complete repeat/zero-extension bodies retain BR_DONE identity and BR_REWRITE1 concat statuses. No extra flattening, evaluation or bounds guard is introduced. Unsigned zero construction is delegated to the original rational(unsigned) path, not uint64 substitution. Full BV constructor/dispatch/sign-extension/trailing/reducer/evaluator and native ownership/ABI audits remain open.",
+        "Selected complete comparison/reduction-OR bodies preserve source identity-first and short-circuit predicates, BR_DONE folds and BR_REWRITE2 equality ITE. Distinct raw NUM nodes are false by identity without reading parameter values. The Go adapter orders the nested equality/one/zero constructor calls explicitly; native C++ nested function argument evaluation is not a portable fixed allocation order. Full BV constructor/dispatch, reduction-AND and other reducer/evaluator/whole-unit ownership/ABI work remain open."
       ]
     },
     {
