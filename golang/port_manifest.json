@@ -90612,9 +90612,15 @@
       "path": "src/tactic/filter_model_converter.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "tactic_filter_model.go"
+      ],
+      "tests": [
+        "TestTacticFilterModelRealSATBindingsUniverseAndReplacement",
+        "TestTacticFilterModelEmptyFilterExternalModelAndNoopCallbacks",
+        "TestTacticFilterModelDeclarationTrailGrowthDuplicatesAndOwnership"
+      ],
       "assertions": [
         {
           "line": 46,
@@ -90623,17 +90629,47 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "operator()(model_ref&, unsigned) constant/universe copying fragment",
+          "status": "partial",
+          "go_target": "tactic_filter_model.go",
+          "tests": [
+            "TestTacticFilterModelRealSATBindingsUniverseAndReplacement",
+            "TestTacticFilterModelEmptyFilterExternalModelAndNoopCallbacks",
+            "TestTacticFilterModelDeclarationTrailGrowthDuplicatesAndOwnership"
+          ]
+        },
+        {
+          "name": "destructor and no-op label callback",
+          "status": "ported",
+          "go_target": "tactic_filter_model.go",
+          "tests": [
+            "TestTacticFilterModelEmptyFilterExternalModelAndNoopCallbacks",
+            "TestTacticFilterModelDeclarationTrailGrowthDuplicatesAndOwnership"
+          ]
+        }
+      ],
+      "ownership": [
+        "Owning declaration reference trail retains duplicate entries and releases forward; filtered derived model is published after constant/universe copying."
+      ],
+      "deviations": [
+        "Function interpretation copying, AST translation and display remain unported. Current modelCore exposes no function insertion API; a nonempty function member is rejected explicitly. No whole converter or public solver API completion is credited. Go errors before publication retire the reached replacement model. Broad failure-history qualification is deferred."
+      ]
     },
     {
       "path": "src/tactic/filter_model_converter.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "tactic_filter_model.go"
+      ],
+      "tests": [
+        "TestTacticFilterModelRealSATBindingsUniverseAndReplacement",
+        "TestTacticFilterModelEmptyFilterExternalModelAndNoopCallbacks",
+        "TestTacticFilterModelDeclarationTrailGrowthDuplicatesAndOwnership"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -90646,9 +90682,24 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "constructor, insert, unindexed forwarding and no-op cancel",
+          "status": "ported",
+          "go_target": "tactic_filter_model.go",
+          "tests": [
+            "TestTacticFilterModelRealSATBindingsUniverseAndReplacement",
+            "TestTacticFilterModelEmptyFilterExternalModelAndNoopCallbacks",
+            "TestTacticFilterModelDeclarationTrailGrowthDuplicatesAndOwnership"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete func_decl_ref_vector storage increments before append and keeps source duplicate reference ownership; manager is borrowed."
+      ],
+      "deviations": [
+        "AST translation and display declarations remain without implementations; the model application function-copy branch remains unported."
+      ]
     },
     {
       "path": "src/tactic/fpa/CMakeLists.txt",
