@@ -2,7 +2,7 @@
 
 Audited 2026-10-07 at commit `fba0ad7` against parent `d959ab8` and the local C++ sources. Module: `pkg/go.mod`, `github.com/glycerine/g3/pkg`.
 
-Follow-up scope: A1 is declined. A2–A5 are approved for repair. All attempted A6 source-header changes were reverted at the user's request; A6 and placement questions D1/D2 remain untouched.
+Follow-up scope: A1 is declined. A2–A5 are repaired. All attempted A6 source-header changes were reverted at the user's request. The later D1/D2 study below updates recommendations only; their implementations and A6 headers remain untouched.
 
 Repair verification: A2–A5 are complete. Full uncached native tests (`go test -count=1 ./... -timeout=30m`), full native vet, focused checked/debug tests for containers, capacity bounds, proofs, rewriters and filter models, and `go run ./cmd/portcheck -source ..` passed. All pre-existing Go source headers were checked against the pre-task commit `c954fc0` and remain unchanged. The original audit evidence below is historical.
 
@@ -155,19 +155,82 @@ The param_descrs implementation is visible at `src/util/params.cpp:49` and `src/
 
 ## Placement decisions requiring review
 
-### D1. A sorting-network test adapter lives in production ast
+Follow-up study at `e89da4f`: recommendations only; no Go files, source annotations, or coverage claims were changed.
 
-`pkg/ast/util_psort_ast_context.go:1` cites `src/test/sorting_network.cpp:150-181`, the `ast_ext2` test adapter, rather than an AST production implementation. Its public PsortASTContext owns clause/trail state and is used by the production AST sorting-network specialization.
+### D1. Keep the concrete AST specialization in ast; distinguish it from solver integration
 
-This is a real mismatch of source category, but not enough evidence to declare the package placement wrong: the port may intentionally promote the adapter into a reusable context.
+**Recommendation:** Retain `PsortASTContext`, `PsortASTNetwork`, and their AST literal-vector support in `pkg/ast/`. Close the placement question as an acceptable concrete specialization. Record that the context ports a C++ test adapter and that production solver integration remains a separate obligation. Do not move the context alone into `pkg/test`, introduce a callback/interface layer solely to relocate it, or move AST-dependent code into util.
 
-**Proposed resolution:** Decide whether this is a test fixture or an intended production adapter. If test-only, move the adapter to `pkg/test` and decouple the AST sorting network from its concrete test context using a narrow non-generic contract. If intentional production functionality, document that promotion, its owning behavior, and its difference from the original test adapter. Keep the actual network algorithm's provenance as `src/util/sorting_network.h`.
+**What is actually being ported:**
 
-### D2. The independent max-cliques algorithm is embedded in sat
+- `src/test/sorting_network.cpp:150-181` defines `ast_ext2`, a clause-collecting AST adapter. It borrows an ast_manager, owns reference-counted clause/trail vectors, creates fresh `"x"` Booleans, and builds AND/OR/NOT terms. That corresponds to `pkg/ast/util_psort_ast_context.go`.
+- The cardinality/sorting algorithm is production utility code, `src/util/sorting_network.h:120-1046`, instantiated in Go for ASTHandle by the `util_psort_ast_{network,bounds,costs,sorting}.go` files. Its location in ast is a consequence of its concrete element type and ownership, not evidence that the C++ utility belongs to the AST directory.
+- Current repository callers of NewPsortASTContext/NewPsortASTNetwork are AST tests. There is no production integration caller outside this specialization. The tests consume the context's private clause vectors and use independent propositional oracles.
 
-`pkg/sat/sat_solver_max_cliques.go` and `pkg/sat/sat_solver_max_cliques_rows.go` implement `src/util/max_cliques.h`; `pkg/sat/sat_solver_max_cliques_set.go` supplies its set support. The SAT caller is `src/sat/sat_solver.cpp:3113-3117`. The Go implementation is coupled to SAT literal rows/runtime storage.
+**Why the proposed context-only move is unsuitable:** `NewPsortASTNetwork` accepts `*PsortASTContext` directly (`pkg/ast/util_psort_ast_network.go:79-95`). Moving that type to a package that imports ast would require ast to import its own client, creating a cycle. The context also uses private manager locking/origin data and private acquired/published push-receipt fields (`pkg/ast/util_psort_ast_context.go:33-58,85-99,243-250`). Its lifetime code is part of the tested AST ownership boundary, not just a small adapter over public MkAnd/MkOr calls. RuntimeASTLiteralVector additionally carries a private psort construction-frame link (`pkg/ast/util_ast_literal_vector.go:30`). Moving the whole specialization instead would require a larger ownership/API extraction, without a demonstrated current consumer that benefits from it.
 
-**Proposed resolution:** Review whether the graph algorithm should be a concrete util implementation with a SAT conversion wrapper, or remain an explicitly documented SAT specialization. Extract only the independent graph operations if moving it; do not introduce util-to-sat dependencies. Current placement alone is not evidence of incorrect clique results.
+**Production C++ contexts are materially different:**
+
+| C++ consumer | Required context behavior |
+| --- | --- |
+| `src/ast/rewriter/pb2bv_rewriter.cpp:386-397` | Fresh `"sn"` variables are registered in the enclosing rewriter's declaration vector; clauses are appended to its lemma vector. |
+| `src/opt/sortmax.cpp:136-154` | Fresh declarations are tracked and inserted into a model filter; clauses are asserted directly into the optimization solver. |
+| `src/smt/theory_pb.cpp:1165-1217` | The network works on SMT literals rather than ASTHandle values, internalizes Boolean terms, and emits justified auxiliary clauses into the SMT context. |
+| `src/tactic/arith/card2bv_tactic.h:35-73` | Declares its own AST rewriter context, including lemma/trail ownership and its own fresh/clause operations. |
+
+Consequently, the test collector cannot simply stand in for all of these consumers. In particular, exporting the current test-backed constructor does not establish model filtering, lemma publication, SMT clause justification, or the full registered C++ sorting-network driver.
+
+**A concrete integration limitation:** The Go context exposes Clause to append a clause but has no public clause-count/read/reset API. The existing tests can inspect `c.clauses` because they are inside ast; an ordinary external caller cannot. Where the encoder introduces fresh variables, asserting only its returned result and omitting its generated clauses does not enforce the intended cardinality constraint. This is an incomplete external integration surface, not a demonstrated failure in the existing test consumers.
+
+**Recommended follow-up when porting the first production consumer:**
+
+1. Keep its concrete fresh-variable bookkeeping and clause/lemma/model-filter actions with that consumer. Port those actions from its actual C++ context; do not replace them with ast_ext2's collecting semantics.
+2. If an external AST consumer deliberately uses a collecting encoder, provide bounded borrowed clause reads and an explicit reference-safe reset operation in ast. Do not expose mutable owning vectors or private ownership receipts merely to make relocation possible. Define context/result lifetimes and require all emitted clauses to reach the solver before checking the result.
+3. Keep production specializations concrete and non-generic. The SMT-literal specialization will need its own scalar storage/owner integration. Any sharing of AST encoders should follow an actual consumer requirement and preserve the timing of source factory and publication actions.
+4. Put registered solver-driven tests in `pkg/test` once the relevant real solver entry points exist. Keep the current AST ownership/failure tests close to the internals they audit.
+
+**Evidence and acceptance:** Existing tests exercise actual factory/trail ownership, constructor refusals, unpublished clause cleanup and stopped destructors; the bounded cardinality oracle covers sizes 0–4 and the recursive oracle covers selected sizes 5, 10 and 12. These tests passed during this study. Before claiming production integration, add tests that assert the collected clauses through the real consumer, validate model filtering/lemma lifetime where relevant, and run the original solver-driven push/assert/check/pop cases. Preserve the ledger's current partial sorting-network/test-driver statuses.
+
+### D2. Extract the shared negated-literal clique utility into util
+
+**Recommendation:** Extract the clique engine and its unsigned storage into `pkg/util/`, retaining a thin SAT caller/conversion layer. Use a concrete complement-paired uint32 implementation, for example `NegatedLiteralCliques` in `pkg/util/max_cliques.go`. This is justified shared production functionality, rather than a move based only on the header's directory. Complete the extraction and SAT integration as one green implementation chunk before porting the SMT consumer; do not leave a second divergent copy behind.
+
+**The second production consumer changes the assessment:**
+
+- `src/sat/sat_solver.cpp:3113-3150` constructs max_cliques<neg_literal>, collects/deduplicates binary clauses, converts its requested SAT literals to unsigned indices, and converts unsigned output rows back to SAT literals.
+- `src/smt/smt_consequences.cpp:577-614` independently constructs the same utility. It converts internalized AST expressions to SMT literal indices, reads the SMT watch lists, and converts the returned rows back to reference-counted AST expressions.
+- Both negate policies flip the low bit, as shown by `src/sat/sat_types.h:76-85` and `src/smt/smt_literal.h:52-85`. There is no need for a generic type parameter or callback to support the two source instantiations currently present.
+
+The present Go type is private to sat. Sharing it would otherwise require exporting SAT-specific storage machinery to smtcore or copying the algorithm into that package. The source utility takes unsigned vertices and does not know about solver objects or AST ownership. Neither collection policy belongs inside the shared utility.
+
+**Correct abstraction:** This is not a general maximum-clique solver or an enumeration of all maximal cliques. `src/util/max_cliques.h:34-80,91-134` implements a greedy partition using complement-aware reachability and cached traversal. It appends groups of size greater than one and drops singletons. The concrete API should explicitly state the `vertex ^ 1` complement encoding and preserve this algorithm, output order and append behavior.
+
+**The actual extraction seam:**
+
+| Part | Recommended owner |
+| --- | --- |
+| Clique adjacency, cached closure, reachable/seen sets, todo list, greedy partition | util |
+| Nested unsigned rows and their concrete Runtime allocation/copy/destruction support | util |
+| SAT binary-watch collection, learned/user clause handling, pair deduplication, Literal conversion, enclosing mutex frame | sat |
+| SMT internalization checks, SMT watches, literal2expr conversion and owning expression rows | smtcore, preserving its deliberate amalgam |
+
+`RuntimeUintColumn` in sat is already an alias of `util.RuntimeUintColumn` (`pkg/sat/sat_solver_scalar_runtime.go:8`), so the graph's scalar vectors are not intrinsically SAT types. The difficult dependency is `satSolverLiteralRows`: its raw same-Runtime unsigned storage is shared with SAT literal presentation (`pkg/sat/sat_solver_literal_rows.go:15-30,93-126,234-267`). The graph uses its unsignedRow/reserveEmptyRows/appendColumn operations rather than SAT literal semantics.
+
+**Concrete proposed implementation:**
+
+1. Add a util-owned concrete unsigned-row container, extracting the existing raw storage and ownership protocol. It must retain real Runtime headers, scalar slot/generation provenance, charged cold metadata, failed-construction roots, and source/owning finalization. Keep SAT literal-span/read/conversion helpers in sat. Share the extracted storage where the protocols are identical instead of widening SAT internals for util access.
+2. Move the clique engine, its raw-row operations, and its concrete embedded bit-set helper to util. Inputs/output rows remain unsigned; no util-to-sat or util-to-smtcore import is needed. The useful public surface is construction with Runtime/Budget, AddEdge, Cliques, and checked cleanup; avoid exposing the mutable graph internals.
+3. Adapt satMutexFrame's graph and intermediate unsigned results to those util types. Keep `findMutexes` edge gathering and final row conversion exactly where they are. Preserve its current allocation/publication sequence and cleanup cursor (`pkg/sat/sat_solver_find_mutexes.go:10-20,34-78,140-247`). Do not introduce an additional whole-graph or whole-result copy just to cross a package boundary.
+4. Move graph-only and unsigned-container tests into util; retain SAT watch-to-mutex integration and enclosing failure-root audits in sat. Tests that currently inspect private graph fields should move with those fields, rather than motivating public mutable debug fields.
+5. Wire the SMT consumer to the same utility when its real context implementation is ported. `src/smt/smt_consequences.cpp` currently remains unported in the ledger; this extraction does not implement that caller or justify promoting its status.
+
+**Preserve the existing source details:** Keep ascending uint-set selection, duplicate edge handling, wrapped unsigned max-plus-one, reserve/resize publication timing, append-to-existing-output behavior, and retained m_seen2/m_tc caches. In particular, `TestSATMaxCliquesRetainsGoalSpecificSourceCacheAcrossCalls` records that reusing a graph with a different goal can differ from a fresh graph. Both real C++ callers construct a fresh graph for each find_mutexes invocation. Do not reset the cache or "improve" that behavior during relocation.
+
+Existing `util.RuntimeUnsignedVector` and `util.RuntimeUintSet` are useful storage references, but their standalone constructors charge separate owners and implement their own continuation/guard protocols. They are not automatic drop-in replacements for the engine's embedded columns/sets. First preserve the current embedded allocation/destructor sequence; any further storage unification needs its own failure-prefix evidence.
+
+**Acceptance criteria:** Retain the independent eight three-vertex mutex-graph cases, output order, repeated-query/cache tests, unsigned-wrap boundaries, warmed budget plateau, nested resize refusal, stopped-owner cleanup and every actual SAT findMutexes reservation refusal. The existing independent graph oracle uses canonical negative-pair clauses; extend independent coverage to mixed literal polarities and transitive implication paths. Add a util-only consumer test that constructs and uses the graph without importing sat; add SMT-level conversion/integration tests with the later SMT port. Check that util has no higher-level imports, that no generics enter the new API, and run the full native suite before committing an extraction. Moving files alone is insufficient.
+
+**Study validation:** Native and focused checked/debug runs of `go test -count=1 -run 'TestPsortAST|TestPsortASTCost|TestSATMaxCliques|TestSATSolverFindMutexes|TestSATMutexPairSet' ./ast ./sat` passed (with `-tags g3checked,g3debug` on the second run). This validates the existing baseline; it does not claim that the proposed extraction has been implemented or tested.
 
 ## Placement differences that should not be mechanically reversed
 
