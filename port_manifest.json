@@ -45234,7 +45234,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration/evaluation/copy/destruction for populated function maps, get_some_value's callback, full model copy, AST translation/display and public API integration remain unported; empty function storage is not a fabricated function interpretation. Broad failure histories remain deferred."
+        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying, get_some_value's callback, full model copy, AST translation/display and public API integration remain unported. Broad failure histories remain deferred."
       ]
     },
     {
@@ -45282,7 +45282,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration/evaluation/copy/destruction for populated function maps, get_some_value's callback, full model copy, AST translation/display and public API integration remain unported; empty function storage is not a fabricated function interpretation. Broad failure histories remain deferred."
+        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying, get_some_value's callback, full model copy, AST translation/display and public API integration remain unported. Broad failure histories remain deferred."
       ]
     },
     {
@@ -45329,7 +45329,10 @@
       "go_targets": [
         "pkg/model/model_lifecycle.go",
         "pkg/model/model_core.go",
-        "pkg/model/model_constant_map.go"
+        "pkg/model/model_constant_map.go",
+        "pkg/model/model_function_map.go",
+        "pkg/model/model_functions.go",
+        "pkg/model/model_functions_test.go"
       ],
       "tests": [
         "TestModelDerivedConstructorAndVirtualReferenceDestruction",
@@ -45345,7 +45348,12 @@
         "TestModelCoreRejectsForeignAndNonconstantDeclarations",
         "TestModelCoreFinalReferenceAndCopiedOwnerGuard",
         "TestModelCoreConstantLookupAcceptsFunctionDeclaration",
-        "TestSATBooleanModelRetainsBindingsAfterEngineAndAtomsClose"
+        "TestSATBooleanModelRetainsBindingsAfterEngineAndAtomsClose",
+        "TestModelCoreFunctionRegistrationReplacementAndSamePointer",
+        "TestModelCoreFunctionEvalMissingPartialAndUnregistration",
+        "TestModelCoreFunctionTableGrowthRemovalReuseAndDerivedClose",
+        "TestModelCoreFunctionGuardsAndConstantDispatch",
+        "TestModelCoreFunctionRegistrationRefusalsPreserveCallerOwnership"
       ],
       "assertions": [
         {
@@ -45391,13 +45399,32 @@
             "TestModelCoreConstantLookupAcceptsFunctionDeclaration",
             "TestSATBooleanModelRetainsBindingsAfterEngineAndAtomsClose"
           ]
+        },
+        {
+          "name": "Original function register/replace/same-pointer ownership transfer, general eval misses, active/historical declaration queries, unregister and function-map destruction (model_core.cpp:21-42,68-109; model_core.h:45-64)",
+          "status": "partial",
+          "go_target": "pkg/model/model_functions.go",
+          "go_targets": [
+            "pkg/model/model_core.go",
+            "pkg/model/model_function_map.go",
+            "pkg/model/model_functions_test.go"
+          ],
+          "tests": [
+            "TestModelCoreFunctionRegistrationReplacementAndSamePointer",
+            "TestModelCoreFunctionEvalMissingPartialAndUnregistration",
+            "TestModelCoreFunctionTableGrowthRemovalReuseAndDerivedClose",
+            "TestModelCoreFunctionGuardsAndConstantDispatch",
+            "TestModelCoreFunctionRegistrationRefusalsPreserveCallerOwnership"
+          ]
         }
       ],
       "ownership": [
-        "Constant table keys and values retain independent AST references. Declaration vectors are source non-owning insertion-order vectors; constant replacement acquires the new value before releasing the previous value."
+        "Constant table keys and values retain independent AST references. Declaration vectors are source non-owning insertion-order vectors; constant replacement acquires the new value before releasing the previous value.",
+        "Function table cells hold scalar handles and indices; a charged cold directory owns FunctionInterpretation pointers. Successful registration transfers graph ownership, with identical-pointer replacement remaining live. Cold directory is prepared before source declaration-vector publication; registration refusals before graph publication retain caller ownership. Source constants retire before function table bucket iteration, with each function key retired before its graph. Interrupted unregister retains detached key/graph owners in named ModelCore fields for later owning cleanup."
       ],
       "deviations": [
-        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration/evaluation/copy/destruction for populated function maps, get_some_value's callback, full model copy, AST translation/display and public API integration remain unported; empty function storage is not a fabricated function interpretation. Broad failure histories remain deferred."
+        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying, get_some_value's callback, full model copy, AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
+        "Function registration now implemented for concrete FunctionInterpretation; original allocator ABI/pooling, source hash-table replacement geometry and broad stopped-AST-destructor campaigns remain qualified. Cold pointer directory is separately charged Go provenance, not a native malloc equivalence claim. Explicit foreign/closed/wrong-arity guards are Go owner/domain checks. Historical m_decls intentionally survives unregister. Function-aware model converters/copy and original model evaluator remain pending; constant-only consumers retain an explicit guard. No whole-unit promotion."
       ]
     },
     {
@@ -45408,7 +45435,10 @@
       "go_targets": [
         "pkg/model/model_lifecycle.go",
         "pkg/model/model_core.go",
-        "pkg/model/model_constant_map.go"
+        "pkg/model/model_constant_map.go",
+        "pkg/model/model_function_map.go",
+        "pkg/model/model_functions.go",
+        "pkg/model/model_functions_test.go"
       ],
       "tests": [
         "TestModelDerivedConstructorAndVirtualReferenceDestruction",
@@ -45424,7 +45454,12 @@
         "TestModelCoreRejectsForeignAndNonconstantDeclarations",
         "TestModelCoreFinalReferenceAndCopiedOwnerGuard",
         "TestModelCoreConstantLookupAcceptsFunctionDeclaration",
-        "TestSATBooleanModelRetainsBindingsAfterEngineAndAtomsClose"
+        "TestSATBooleanModelRetainsBindingsAfterEngineAndAtomsClose",
+        "TestModelCoreFunctionRegistrationReplacementAndSamePointer",
+        "TestModelCoreFunctionEvalMissingPartialAndUnregistration",
+        "TestModelCoreFunctionTableGrowthRemovalReuseAndDerivedClose",
+        "TestModelCoreFunctionGuardsAndConstantDispatch",
+        "TestModelCoreFunctionRegistrationRefusalsPreserveCallerOwnership"
       ],
       "conditionals": [
         {
@@ -45466,13 +45501,32 @@
             "TestModelCoreConstantLookupAcceptsFunctionDeclaration",
             "TestSATBooleanModelRetainsBindingsAfterEngineAndAtomsClose"
           ]
+        },
+        {
+          "name": "Original function register/replace/same-pointer ownership transfer, general eval misses, active/historical declaration queries, unregister and function-map destruction (model_core.cpp:21-42,68-109; model_core.h:45-64)",
+          "status": "partial",
+          "go_target": "pkg/model/model_functions.go",
+          "go_targets": [
+            "pkg/model/model_core.go",
+            "pkg/model/model_function_map.go",
+            "pkg/model/model_functions_test.go"
+          ],
+          "tests": [
+            "TestModelCoreFunctionRegistrationReplacementAndSamePointer",
+            "TestModelCoreFunctionEvalMissingPartialAndUnregistration",
+            "TestModelCoreFunctionTableGrowthRemovalReuseAndDerivedClose",
+            "TestModelCoreFunctionGuardsAndConstantDispatch",
+            "TestModelCoreFunctionRegistrationRefusalsPreserveCallerOwnership"
+          ]
         }
       ],
       "ownership": [
-        "Constant table keys and values retain independent AST references. Declaration vectors are source non-owning insertion-order vectors; constant replacement acquires the new value before releasing the previous value."
+        "Constant table keys and values retain independent AST references. Declaration vectors are source non-owning insertion-order vectors; constant replacement acquires the new value before releasing the previous value.",
+        "Function table cells hold scalar handles and indices; a charged cold directory owns FunctionInterpretation pointers. Successful registration transfers graph ownership, with identical-pointer replacement remaining live. Cold directory is prepared before source declaration-vector publication; registration refusals before graph publication retain caller ownership. Source constants retire before function table bucket iteration, with each function key retired before its graph. Interrupted unregister retains detached key/graph owners in named ModelCore fields for later owning cleanup."
       ],
       "deviations": [
-        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration/evaluation/copy/destruction for populated function maps, get_some_value's callback, full model copy, AST translation/display and public API integration remain unported; empty function storage is not a fabricated function interpretation. Broad failure histories remain deferred."
+        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying, get_some_value's callback, full model copy, AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
+        "Function registration now implemented for concrete FunctionInterpretation; original allocator ABI/pooling, source hash-table replacement geometry and broad stopped-AST-destructor campaigns remain qualified. Cold pointer directory is separately charged Go provenance, not a native malloc equivalence claim. Explicit foreign/closed/wrong-arity guards are Go owner/domain checks. Historical m_decls intentionally survives unregister. Function-aware model converters/copy and original model evaluator remain pending; constant-only consumers retain an explicit guard. No whole-unit promotion."
       ]
     },
     {

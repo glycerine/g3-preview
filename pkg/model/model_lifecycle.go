@@ -12,36 +12,6 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-// Initial decl2finterp storage. Function registration/interpretation operations
-// remain unported; only empty source member construction/destruction is used
-// by the current constant/Boolean path. No function values are fabricated.
-type modelFunctionCell struct {
-	declaration ast.ASTHandle
-	hash, index uint32
-	state       uint8
-}
-type modelFunctionMap struct{ Cells []modelFunctionCell }
-
-func (t *modelFunctionMap) initialize(m *ast.ASTManager) error {
-	if e := m.Budget().Reserve(8 * uint64(reflect.TypeOf(modelFunctionCell{}).Size())); e != nil {
-		return e
-	}
-	t.Cells = make([]modelFunctionCell, 8)
-	return nil
-}
-func (t *modelFunctionMap) empty() error {
-	for _, cell := range t.Cells {
-		if cell.state != modelMapFree {
-			return errors.New("model: function interpretation operations remain unported")
-		}
-	}
-	return nil
-}
-func (t *modelFunctionMap) close(m *ast.ASTManager) {
-	m.Budget().Release(uint64(len(t.Cells)) * uint64(reflect.TypeOf(modelFunctionCell{}).Size()))
-	t.Cells = nil
-}
-
 type modelUniverseCell struct {
 	sort        ast.ASTHandle
 	hash, index uint32

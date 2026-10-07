@@ -10,15 +10,18 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 )
 
-// Constant interpretation portion of the original model_core, used by the
-// Boolean SAT model path. The derived owner supplies universe lifetimes and
-// virtual final-reference destruction. Function interpretation operations
-// remain an explicit unported dependency, not an alternative evaluator.
+// Original constant/function interpretation ownership. The derived model
+// supplies universe lifetimes and virtual final-reference destruction.
 type ModelCore struct {
 	self                               *ModelCore
 	manager                            *ast.ASTManager
 	Constants                          modelConstantMap
 	Functions                          modelFunctionMap
+	functionDirectory                  []*FunctionInterpretation
+	functionDirectoryBytes             uint64
+	removedFunction                    *FunctionInterpretation
+	removedDeclaration                 ast.ASTHandle
+	removedDeclarationOwned            bool
 	functionDeclarations               modelDeclarationVector
 	Derived                            *Model
 	declarations, ConstantDeclarations modelDeclarationVector
@@ -271,9 +274,6 @@ func (md *ModelCore) closeCoreMembers() error {
 		return nil
 	}
 	m := md.manager
-	if e := md.Functions.empty(); e != nil {
-		return e
-	}
 	// Source map bucket iteration, key retirement followed by value retirement.
 	for i := range md.Constants.Cells {
 		entry := &md.Constants.Cells[i]
@@ -293,6 +293,36 @@ func (md *ModelCore) closeCoreMembers() error {
 			entry.valueOwned = false
 		}
 	}
+	// Source constants retire before function-map bucket iteration.
+	for i := range md.Functions.Cells {
+		entry := &md.Functions.Cells[i]
+		if entry.state != modelMapUsed {
+			continue
+		}
+		if entry.declarationOwned {
+			if e := m.DecRef(entry.declaration); e != nil {
+				return e
+			}
+			entry.declarationOwned = false
+		}
+		if entry.index != 0 {
+			fi := md.functionDirectory[entry.index-1]
+			if fi != nil {
+				if e := fi.Close(); e != nil {
+					return e
+				}
+				md.functionDirectory[entry.index-1] = nil
+			}
+			entry.index = 0
+		}
+	}
+	// A stopped unregister has separately retained the removed lexical owners.
+	if e := md.finishFunctionRemoval(); e != nil {
+		return e
+	}
+	m.Budget().Release(md.functionDirectoryBytes)
+	md.functionDirectoryBytes = 0
+	md.functionDirectory = nil
 	md.functionDeclarations.close(m)
 	md.ConstantDeclarations.close(m)
 	md.declarations.close(m)
