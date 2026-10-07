@@ -20915,7 +20915,8 @@
         "pkg/ast/ast_bv_recognizers.go",
         "pkg/ast/ast_bv_unsigned_numeral.go",
         "pkg/ast/ast_bv_sign_extend.go",
-        "pkg/ast/rewriter/bv_rewriter_sign_extend.go"
+        "pkg/ast/rewriter/bv_rewriter_sign_extend.go",
+        "pkg/ast/ast_bv_zero_bit.go"
       ],
       "tests": [
         "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
@@ -20937,7 +20938,10 @@
         "TestASTBitVectorSignExtensionPublicationAfterNumericalConstructor",
         "TestBVRewriterOriginalSignExtend",
         "TestBVRewriterSignExtendEverySymbolicReservation",
-        "TestBVRewriterANDWarmSpillRefusalPreservesOutput"
+        "TestBVRewriterANDWarmSpillRefusalPreservesOutput",
+        "TestASTBitVectorOriginalZeroBitStoredNumerals",
+        "TestASTBitVectorZeroBitConcatRoutingAndErasedReads",
+        "TestASTBitVectorZeroBitEveryActualReservation"
       ],
       "conditionals": [
         {
@@ -21478,6 +21482,16 @@
             "TestBVRewriterBitwiseEveryColdReservation",
             "TestBVRewriterANDWarmSpillRefusalPreservesOutput"
           ]
+        },
+        {
+          "name": "original complete is_zero_bit: copied stored numeral, zero shortcut, void div by power return temporary, modulo-two return expression and reverse concat/goto routing (src/ast/rewriter/bv_rewriter.cpp:2141-2168; src/ast/rewriter/bv_rewriter.h:71)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_zero_bit.go",
+          "tests": [
+            "TestASTBitVectorOriginalZeroBitStoredNumerals",
+            "TestASTBitVectorZeroBitConcatRoutingAndErasedReads",
+            "TestASTBitVectorZeroBitEveryActualReservation"
+          ]
         }
       ],
       "ownership": [
@@ -21487,7 +21501,8 @@
         "Comparison/reduction-OR borrow inputs, use source unsigned32 one-bit numeral construction and SetRef only after factories succeed. Numeral identity predicates copy no numeric metadata. Symbolic reduction-OR erases output and numerical/factory reads. Actual cold refusal campaigns preserve prior output and close reached numeric/AST/symbol owner graph with zero budget.",
         "Reduction-AND retains its copied local rational plus power/one/returned subtraction condition values through nested unsigned numeral construction and output assignRef. The nested numeral owner is captured at entry in the existing BV frame receipt and joined before older value DT, including constructor refusal. operator- local copy ends before comparison; full-expression values end after output assignment; the function-local rational ends last. Fault campaigns inspect these actual consumed flags at nested source stops and close shared owners to zero budget.",
         "Sign extension owns the read local rational through result assignment, captures the signed normalization child, copies its returned rational before ending that full expression, and applies void modulo to the same physical local. The power temporary ends after modulo; the captured nested numeral constructor joins before the older local DT. A retired normalization receipt is replaced only after its returned value has been assigned and destroyed. Actual Runtime numerical and symbolic cold failure campaigns preserve output and close shared graphs to zero budget; reached invalid output and uint32 width-wrap tests inspect completed source DT and captured NUM ownership.",
-        "AND borrows the input slice, creates each NOT in order, pushes into the original inline16/doubling buffer, builds OR and outer NOT, and publishes the output only after all factories succeed. Spill storage is released on every exit. The 17-operand cold fault campaign includes buffer growth and final factories, preserves prior output and closes actual shared owners with zero budget."
+        "AND borrows the input slice, creates each NOT in order, pushes into the original inline16/doubling buffer, builds OR and outer NOT, and publishes the output only after all factories succeed. Spill storage is released on every exit. The 17-operand cold fault campaign includes buffer growth and final factories, preserves prior output and closes actual shared owners with zero budget.",
+        "Zero-bit numerical calls use the existing AST-owned address-stable frame. The copied val stays live through the entire helper. PowerOfTwo returns a source temporary; direct division mutates the physical val receiver, then the power ends before two and the value-returning modulo temporary are constructed. Source exit ends modulo return then two then val. An optional exact invocation token captures the actual frame at entry before numerical acquisition, preserves body/source history and permits cleanup without ambient adoption. Failed call sites reject reuse after owning cleanup. Nonnumeral/default-rational bookkeeping is erased through iterative reverse-concat traversal. Actual Runtime cold copy/power/negative-division/modulo campaigns refuse every reached reservation until success and close shared graphs to zero budget."
       ],
       "deviations": [
         "Only the three original negated-bitwise reducer bodies are selected, exposed as standalone core adapters for later BV rewriter dispatch/traversal. They preserve source operand order, generated operator nesting and BR_REWRITE2; they do not normalize or evaluate operands. Full BV rewriter constructor/parameters/poly/trailing/extract/dispatch/traversal algorithms, native pointer/buffer/exception ABI and whole-unit ownership audit remain uncredited. Invalid/nil Go manager/reference boundaries use existing checked Go transport.",
@@ -21496,7 +21511,8 @@
         "Selected complete comparison/reduction-OR bodies preserve source identity-first and short-circuit predicates, BR_DONE folds and BR_REWRITE2 equality ITE. Distinct raw NUM nodes are false by identity without reading parameter values. The Go adapter orders the nested equality/one/zero constructor calls explicitly; native C++ nested function argument evaluation is not a portable fixed allocation order. Full BV constructor/dispatch, reduction-AND and other reducer/evaluator/whole-unit ownership/ABI work remain open.",
         "The owner-sensitive numerical core resides in ast so it can use existing private manager-owned frames and reference publication without reverse imports; rewriter supplies the original status adapter, preserving pkg boundaries. Non-numeral guard erases Go bookkeeping for the source allocation-free default rational. The common all-one arithmetic condition is shared while its original predicate retains its earlier full-expression DT point. Native global rational init, stack/union/allocator/assertion/exception ABI and full BV reducer/dispatch/evaluator/whole-unit audits remain uncredited; actual Runtime faults prove closure, not native-fatal resumability.",
         "Selected complete sign-extension body uses an ast numerical core and rewriter adapter to preserve private numerical/reference ownership without reverse package imports. Unsigned result-width addition retains wraparound, with the original inner NUM width guard reached after norm/copy/modulo. Symbolic source default rational requires no allocation, so the Go numeral identity guard erases its bookkeeping. The checked adapter validates the borrowed extraction owner; full BV constructor/dispatch/traversal/evaluator and native stack/allocator/assertion/exception/pointer ABI and whole-unit ownership remain open. Fault cleanup does not claim native-fatal resumability.",
-        "Selected complete mk_bv_and body expands by De Morgan rather than folding values or emitting a raw AND node, with original BR_REWRITE3. Standalone core remains pending full BV dispatch/traversal; native buffer/pointer/exception ABI and whole-unit ownership remain uncredited."
+        "Selected complete mk_bv_and body expands by De Morgan rather than folding values or emitting a raw AND node, with original BR_REWRITE3. Standalone core remains pending full BV dispatch/traversal; native buffer/pointer/exception ABI and whole-unit ownership remain uncredited.",
+        "The complete selected is_zero_bit helper resides in ast to use private numerical/reference owners without a reverse import; its ADD/OR consumers remain required. Numerical bits inspect stored values without width normalization or a new index/width guard. Unknown bits return false; an exhausted/out-of-range concat reaches source UNREACHABLE/release undefined behavior and the Go boundary returns ErrASTDomain. Wrapper/token/stack/pointer/allocator/assertion/fatal/exception ABI and whole-unit ownership remain uncredited; Go returning-error cleanup is not native-fatal resumability. This selection does not promote the whole BV rewriter source unit."
       ]
     },
     {
@@ -21506,12 +21522,16 @@
       "status": "unported",
       "go_targets": [
         "pkg/ast/ast_bv_unsigned_numeral.go",
-        "pkg/ast/ast_bv_unsigned_numeral_test.go"
+        "pkg/ast/ast_bv_unsigned_numeral_test.go",
+        "pkg/ast/ast_bv_zero_bit.go"
       ],
       "tests": [
         "TestASTBitVectorUnsignedNumeralConstructorBoundary",
         "TestASTBitVectorUnsignedConstructorInclusiveBoundaryBeforeWidthGuard",
-        "TestASTBitVectorUnsignedNumeralEveryNumericalReservation"
+        "TestASTBitVectorUnsignedNumeralEveryNumericalReservation",
+        "TestASTBitVectorOriginalZeroBitStoredNumerals",
+        "TestASTBitVectorZeroBitConcatRoutingAndErasedReads",
+        "TestASTBitVectorZeroBitEveryActualReservation"
       ],
       "conditionals": [
         {
@@ -21535,13 +21555,25 @@
             "TestASTBitVectorUnsignedConstructorInclusiveBoundaryBeforeWidthGuard",
             "TestASTBitVectorUnsignedNumeralEveryNumericalReservation"
           ]
+        },
+        {
+          "name": "original complete is_zero_bit: copied stored numeral, zero shortcut, void div by power return temporary, modulo-two return expression and reverse concat/goto routing (src/ast/rewriter/bv_rewriter.cpp:2141-2168; src/ast/rewriter/bv_rewriter.h:71)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_zero_bit.go",
+          "tests": [
+            "TestASTBitVectorOriginalZeroBitStoredNumerals",
+            "TestASTBitVectorZeroBitConcatRoutingAndErasedReads",
+            "TestASTBitVectorZeroBitEveryActualReservation"
+          ]
         }
       ],
       "ownership": [
-        "The unsigned32 temporary uses existing charged address-stable BV numeral frame value five, capture child nine and source outer/inner temporary DT ordering. No second numeric frame is allocated. INT_MAX stays inline; UINT_MAX reaches actual signed64 large setter and captured failure roots."
+        "The unsigned32 temporary uses existing charged address-stable BV numeral frame value five, capture child nine and source outer/inner temporary DT ordering. No second numeric frame is allocated. INT_MAX stays inline; UINT_MAX reaches actual signed64 large setter and captured failure roots.",
+        "Zero-bit numerical calls use the existing AST-owned address-stable frame. The copied val stays live through the entire helper. PowerOfTwo returns a source temporary; direct division mutates the physical val receiver, then the power ends before two and the value-returning modulo temporary are constructed. Source exit ends modulo return then two then val. An optional exact invocation token captures the actual frame at entry before numerical acquisition, preserves body/source history and permits cleanup without ambient adoption. Failed call sites reject reuse after owning cleanup. Nonnumeral/default-rational bookkeeping is erased through iterative reverse-concat traversal. Actual Runtime cold copy/power/negative-division/modulo campaigns refuse every reached reservation until success and close shared graphs to zero budget."
       ],
       "deviations": [
-        "Selected unsigned numeral overload preserves original constructor width and inclusive unsigned32 inline boundary. Existing numeral copy/normalization/parameter/header/exception ABI qualifications remain; actual Runtime failures prove owner cleanup rather than resumability. Full BV rewriter header audits remain uncredited."
+        "Selected unsigned numeral overload preserves original constructor width and inclusive unsigned32 inline boundary. Existing numeral copy/normalization/parameter/header/exception ABI qualifications remain; actual Runtime failures prove owner cleanup rather than resumability. Full BV rewriter header audits remain uncredited.",
+        "The complete selected is_zero_bit helper resides in ast to use private numerical/reference owners without a reverse import; its ADD/OR consumers remain required. Numerical bits inspect stored values without width normalization or a new index/width guard. Unknown bits return false; an exhausted/out-of-range concat reaches source UNREACHABLE/release undefined behavior and the Go boundary returns ErrASTDomain. Wrapper/token/stack/pointer/allocator/assertion/fatal/exception ABI and whole-unit ownership remain uncredited; Go returning-error cleanup is not native-fatal resumability. This selection does not promote the whole BV rewriter source unit."
       ]
     },
     {

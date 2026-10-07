@@ -1,4 +1,5 @@
 // Source: src/ast/bv_decl_plugin.cpp:416-435,778-789,865-868.
+// Source: src/ast/rewriter/bv_rewriter.cpp:2141-2168 (zero-bit local mode).
 package ast
 
 import (
@@ -28,12 +29,16 @@ type astBVNumeralFrame struct {
 	allOne                           bool
 	signExtension                    bool
 	trailingNumeral                  bool
+	zeroBit                          bool
 	inverse                          bool
 	unsignedNumeral                  bool
 	bodyCause, sourceCause, ownCause error
 }
 
 func (f *astBVNumeralFrame) childOrder() [13]int {
+	if f.zeroBit {
+		return [13]int{4, 3, 1, 0, 2, -1, -1, -1, -1, -1, -1, -1, -1}
+	}
 	if f.trailingNumeral {
 		return [13]int{1, 0, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
 	}
