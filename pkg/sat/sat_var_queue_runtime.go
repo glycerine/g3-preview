@@ -1,5 +1,4 @@
 // Source: src/util/heap.h:24-257; src/sat/sat_var_queue.h:31-67; src/util/vector.h.
-// Licensed under the MIT license. Source author: Leonardo de Moura, 2011-05-21.
 package sat
 
 import (

@@ -1,6 +1,4 @@
 // Source: src/ast/ast.cpp:349-355,2064-2135; src/ast/ast.h:665-683.
-// Source author: Leonardo de Moura.
-// Licensed under the MIT license; see LICENSE.txt.
 // Scalar payload encoding. No unsafe or borrowed slice escapes.
 package ast
 

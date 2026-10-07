@@ -1,5 +1,4 @@
 // Source: src/sat/sat_solver.cpp:1257–1346; src/sat/sat_clause.cpp.
-// Licensed under the MIT license. Source author: Leonardo de Moura, 2011.
 package sat
 
 import (

@@ -1,5 +1,4 @@
 // Source: src/util/bit_vector.h; src/util/bit_vector.cpp; src/util/memory_manager.h.
-// Licensed under the MIT license. Source author: Leonardo de Moura, 2006-10-03.
 package util
 
 import (

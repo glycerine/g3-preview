@@ -1,6 +1,5 @@
 // Source: src/util/hashtable.h:45-64,139-620; src/util/hash.h:58-63,217-229;
 // src/sat/sat_types.h:90-109; src/sat/sat_solver.cpp:3125-3136.
-// Licensed under the MIT license. Source authors: Leonardo de Moura; Nikolaj Bjorner.
 package sat
 
 import (

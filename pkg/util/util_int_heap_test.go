@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source assertions: src/test/heap.cpp, including its original finite counts.
 package util
 

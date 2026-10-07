@@ -1,6 +1,5 @@
 // Source: src/math/polynomial/upolynomial.cpp:33-54;
 // src/math/polynomial/upolynomial_factorization.cpp:1062,1120-1139,1172-1175.
-// Licensed under the MIT license. Source authors: Leonardo de Moura; Dejan (t-dejanj).
 package polynomial
 
 type upolyPreparedFactorCursor struct {

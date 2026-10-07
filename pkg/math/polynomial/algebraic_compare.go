@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: algebraic_numbers.cpp comparison, including Sturm–Tarski fallback.
 package polynomial
 

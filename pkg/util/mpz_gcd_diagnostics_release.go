@@ -1,6 +1,5 @@
 //go:build !g3debug
 
-// Licensed under the MIT license.
 package util
 
 const sourceGCDDebug = false

@@ -1,7 +1,5 @@
-// Licensed under the MIT license.
 // Source: src/math/polynomial/upolynomial_factorization.cpp:513-568,677-700,805-871.
 // Source runtime CASSERT tag helpers, independent of g3debug build selection.
-// Source author: Dejan (t-dejanj), 2011-11-15.
 package polynomial
 
 import (

@@ -1,5 +1,4 @@
 // Source: src/util/max_cliques.h concrete named owners; src/sat/sat_solver.cpp:3119-3150.
-// Licensed under the MIT license. Source author: Nikolaj Bjorner.
 package sat
 
 import (

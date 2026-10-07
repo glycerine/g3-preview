@@ -1,7 +1,5 @@
 // Source: scripts/mk_genfile_common.py:895-939; src/util/gparams.cpp:598-605;
 // src/util/params.cpp:325-339,639-648,902-928; src/smt/params/smt_params_helper.pyg:59-66.
-// Source author: Leonardo de Moura (params: 2011-05-09; gparams: 2012-11-29).
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

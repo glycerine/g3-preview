@@ -1,6 +1,5 @@
 // Source: src/util/common_msgs.h:22-39; src/util/common_msgs.cpp:21-27;
 // src/util/rlimit.cpp:62-68; src/sat/sat_solver.h:268-282.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package util
 
 import (

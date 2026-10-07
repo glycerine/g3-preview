@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/util/mpz.cpp:142–161 and reverse member destruction in src/util/mpz.h and src/util/mpn.h.
 package util
 

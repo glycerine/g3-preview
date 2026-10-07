@@ -1,5 +1,4 @@
 // Source: src/util/max_cliques.h; src/util/vector.h:342-387.
-// Licensed under the MIT license. Source author: Nikolaj Bjorner.
 package sat
 
 import (

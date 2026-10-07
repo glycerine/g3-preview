@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 package util
 
 // Counter-only source component from memory_manager.cpp. It is embedded, with

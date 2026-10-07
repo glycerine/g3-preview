@@ -1,5 +1,4 @@
-// Source: src/sat/sat_elim_eqs.cpp; src/sat/sat_elim_eqs.h. Licensed under the MIT license.
-// Source author: Leonardo de Moura, 2011.
+// Source: src/sat/sat_elim_eqs.cpp; src/sat/sat_elim_eqs.h.
 package sat
 
 import (

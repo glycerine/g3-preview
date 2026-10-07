@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Actual label, pattern, model-value, and user-sort decl plugins in ast.cpp.
 package ast
 

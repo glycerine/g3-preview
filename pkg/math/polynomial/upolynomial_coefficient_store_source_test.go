@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Tests FIRST: real sibling cores share physical storage, not arithmetic modes.
 package polynomial
 

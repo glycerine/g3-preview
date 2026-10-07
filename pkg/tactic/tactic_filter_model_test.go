@@ -1,6 +1,5 @@
 // Source: src/tactic/filter_model_converter.cpp:23-57;
 // src/tactic/filter_model_converter.h:26-49.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package tactic
 
 import (

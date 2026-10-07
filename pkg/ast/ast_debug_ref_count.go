@@ -1,6 +1,4 @@
-// Licensed under the MIT license; see LICENSE.txt.
 // Source: src/ast/ast.h:1507-1508,1600; src/ast/ast.cpp:1798-1844.
-// Source author: Leonardo de Moura.
 package ast
 
 // EnableDebugRefCount performs the actual source one-way flag publication.

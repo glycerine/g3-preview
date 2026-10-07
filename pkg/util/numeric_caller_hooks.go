@@ -1,5 +1,4 @@
 // Source: src/util/mpz.cpp, mpn.cpp, mpzzp.h: primitive invocation boundaries.
-// Licensed under the MIT license.
 package util
 
 import (

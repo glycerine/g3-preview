@@ -1,4 +1,4 @@
-// Source: src/sat/sat_solver.cpp:2091–2219. Licensed under the MIT license.
+// Source: src/sat/sat_solver.cpp:2091–2219.
 package sat
 
 func (s *satSolverConflictResolution) getMaxLevel(consequent Literal, j satJustification) (uint32, error) {

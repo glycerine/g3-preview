@@ -1,5 +1,4 @@
 // Source: src/sat/sat_solver.cpp:2818-2838,2852-2857,2901-2924; src/sat/sat_solver.h:286,543,566.
-// Licensed under the MIT license. Source author: Leonardo de Moura, 2011-05-21.
 package sat
 
 func (s *Solver) numClauses() (uint32, error) {

@@ -1,6 +1,5 @@
 // Source: src/math/polynomial/polynomial.cpp:6436-6522; src/util/mpq.cpp;
-// src/util/memory_manager.cpp. Licensed under the MIT license.
-// Author: Leonardo de Moura.
+// src/util/memory_manager.cpp.
 package polynomial
 
 import (

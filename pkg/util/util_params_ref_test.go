@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/util/params.cpp action traces; added bounded ownership expectations.
 package util
 

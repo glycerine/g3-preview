@@ -1,4 +1,4 @@
-// Source: src/sat/sat_simplifier.cpp register_clauses/scoped_finalize; Go owning abort. Licensed under the MIT license.
+// Source: src/sat/sat_simplifier.cpp register_clauses/scoped_finalize; Go owning abort.
 package sat
 
 import (

@@ -1,7 +1,6 @@
 // Source: src/math/polynomial/upolynomial_factorization.cpp:1058-1094,1153-1175;
 // src/util/mpz.cpp:560-843; src/util/mpzzp.h:211-216.
 // Concrete call adapter: p, saved prime and gcd_tmp remain actual parent NUMs.
-// Licensed under the MIT license. Source authors: Dejan (t-dejanj), 2011-11-15; Leonardo de Moura.
 package polynomial
 
 import (

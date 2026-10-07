@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete pointer-free payload adapter for source nested watch vectors.
 package sat
 

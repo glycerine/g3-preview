@@ -1,6 +1,4 @@
 // Source: src/math/polynomial/upolynomial.cpp:56-63.
-// Source author: Leonardo de Moura.
-// Licensed under the MIT license.
 // Concrete core_manager::factors, actual scoped coefficient ownership.
 package polynomial
 

@@ -1,5 +1,4 @@
 // Source: src/util/uint_set.h; src/test/uint_set.cpp.
-// Licensed under the MIT license. Source author: Leonardo de Moura, 2006-12-07.
 package util
 
 import (

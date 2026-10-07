@@ -1,6 +1,4 @@
 // Source: src/util/ref_vector.h:28-217; src/ast/ast.h:2273-2277.
-// Source author: Leonardo de Moura.
-// Licensed under the MIT license; see LICENSE.txt.
 // Concrete ast_ref_vector specialization; encoded cold owners, scalar entries.
 package ast
 

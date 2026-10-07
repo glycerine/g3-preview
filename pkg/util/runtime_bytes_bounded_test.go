@@ -1,5 +1,4 @@
 // Source: src/util/hash.cpp:26-102; src/util/fixed_bit_vector.cpp:138-140.
-// Licensed under the MIT license. Source author: Leonardo de Moura, 2006-09-11.
 package util
 
 import (

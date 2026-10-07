@@ -1,6 +1,4 @@
 // Source: src/util/debug.h:60-65; src/util/debug.cpp:37-42,73-117.
-// Source author: Leonardo de Moura (2006-09-11).
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source mpz.cpp:1385-1395; mpn.cpp:360-399; buffer.h:84-95.
 package util
 

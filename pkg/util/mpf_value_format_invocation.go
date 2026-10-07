@@ -1,6 +1,5 @@
 // Source: src/util/mpf.cpp:1519-1569; src/util/mpq.cpp:156-185.
-// Licensed under the MIT license. Source author: Christoph Wintersteiger;
-// rational display source author: Leonardo de Moura.
+// rational display
 package util
 
 import (

@@ -1,7 +1,5 @@
 // Concrete source specialization: src/util/map.h:24-196; src/util/hashtable.h:44-63.
 // Source: src/util/hashtable.h:259-283,287-322,613-623.
-// Source author: Leonardo de Moura (2006-09-11).
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

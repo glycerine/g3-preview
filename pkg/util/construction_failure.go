@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 package util
 
 // ConstructionFailure is the already charged owner retaining real cleanup

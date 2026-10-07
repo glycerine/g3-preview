@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Parameter collectors remain with the C++ definitions they translate.
 package smtlogics
 

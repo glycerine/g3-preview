@@ -1,5 +1,4 @@
-// Source: src/util/rational.h; src/util/rational.cpp. Licensed under the MIT license.
-// Source author: Leonardo de Moura (2006-09-18). See LICENSE.txt.
+// Source: src/util/rational.h; src/util/rational.cpp.
 // Concrete owner-local core of src/util/rational.h/.cpp and vector.h.
 package util
 

@@ -1,6 +1,4 @@
 // Source: src/util/sorting_network.h:28-115; src/test/sorting_network.cpp:41-131,422-449.
-// Source author: Nikolaj Bjorner (2013-11-07).
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

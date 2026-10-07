@@ -1,4 +1,4 @@
-// Source: src/util/vector.h:82-100; src/util/mpz.h:97-99. Licensed under the MIT license.
+// Source: src/util/vector.h:82-100; src/util/mpz.h:97-99.
 package polynomial
 
 import (

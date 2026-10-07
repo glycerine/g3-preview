@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // No registered shared_occs test exists; these are additional finite source models.
 package ast
 

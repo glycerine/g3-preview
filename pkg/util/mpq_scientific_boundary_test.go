@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Added source-action coverage: mpq.cpp:186-276 and mpq.h:140-145,324-332,443-480.
 package util
 

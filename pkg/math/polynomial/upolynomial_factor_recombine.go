@@ -1,8 +1,5 @@
 // Source: src/math/polynomial/upolynomial_factorization.cpp:979-1299.
-// Source author: Leonardo de Moura.
-// Licensed under the MIT license.
 // Actual Mignotte bound, prime image trials and subset recombination.
-// Source author: Dejan (t-dejanj), 2011-11-15.
 package polynomial
 
 import (

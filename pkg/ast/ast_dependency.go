@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete AST-valued specialization of util/dependency.h.
 package ast
 

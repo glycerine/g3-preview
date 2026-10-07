@@ -1,5 +1,4 @@
 // Source: src/sat/sat_mus.cpp; measured owner-local warm behavior.
-// Licensed under the MIT license. Source author: Nikolaj Bjorner, 2014.
 package sat
 
 import (

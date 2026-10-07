@@ -1,8 +1,6 @@
 //go:build linux
 
 // Source: src/util/debug.cpp:88-107.
-// Source author: Leonardo de Moura (2006-09-11).
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

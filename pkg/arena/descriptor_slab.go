@@ -1,5 +1,3 @@
-// Licensed under the MIT license.
-// Licensed under the MIT license; see LICENSE.txt in the source distribution.
 package arena
 
 import (

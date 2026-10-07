@@ -1,5 +1,4 @@
-// Source: src/util/obj_ref.h; src/util/ref_vector.h; src/math/polynomial/polynomial.h:108-109. Licensed under the MIT license.
-// Author: Leonardo de Moura. Concrete selected polynomial reference specialization.
+// Source: src/util/obj_ref.h; src/util/ref_vector.h; src/math/polynomial/polynomial.h:108-109.
 package polynomial
 
 import (

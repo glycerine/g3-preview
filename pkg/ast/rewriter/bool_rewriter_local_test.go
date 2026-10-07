@@ -1,5 +1,4 @@
 // Source: src/ast/rewriter/bool_rewriter.cpp:268-579.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package rewriter
 
 import (

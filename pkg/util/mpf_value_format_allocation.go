@@ -1,6 +1,4 @@
 // Source: src/util/mpf.cpp:1519-1569; src/util/mpq.cpp:156-185.
-// Licensed under the MIT license. Source authors: Christoph Wintersteiger,
-// Leonardo de Moura.
 package util
 
 func (c integerAllocationInvocationContext) formatFrame(z *IntegerManager, executing bool) *ArbitraryFloatFormatInvocation {

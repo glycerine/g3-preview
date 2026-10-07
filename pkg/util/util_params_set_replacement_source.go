@@ -1,6 +1,4 @@
 // Source: src/util/params.cpp:753-763,946-1014,1017-1033.
-// Author: Leonardo de Moura (2011-05-09).
-// Licensed under the MIT license; see LICENSE.txt in the source distribution.
 package util
 
 import (

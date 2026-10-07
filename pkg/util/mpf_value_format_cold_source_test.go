@@ -1,5 +1,4 @@
 // Source: src/util/mpf.cpp:1519-1569; src/util/mpq.cpp:156-185.
-// Licensed under the MIT license. Source author: Christoph Wintersteiger.
 package util
 
 import (

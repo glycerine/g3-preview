@@ -1,5 +1,4 @@
 // Source: src/util/mpq.cpp:130-141; explicit Go owning continuation.
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 // CleanupValue owns only this caller's actual NUM/DEN fields. Unjoined lower

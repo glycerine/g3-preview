@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Translation of literal/model parts of src/sat/sat_types.h, Leonardo de Moura.
 package sat
 

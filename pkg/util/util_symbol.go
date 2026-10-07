@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Translation of src/util/symbol.h/.cpp, Leonardo de Moura, 2006-09-11.
 package util
 

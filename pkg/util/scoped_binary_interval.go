@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete scoped_interval.
 package util
 

@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Additional finite specialized identity-table tests; no registered sparse-mark test.
 package ast
 

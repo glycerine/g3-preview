@@ -1,6 +1,4 @@
-// Licensed under the MIT license.
 // Source: src/util/mpz.cpp; src/util/mpz.h (root/is_perfect_square and copy wrapper).
-// Source author: Leonardo de Moura.
 package util
 
 import (

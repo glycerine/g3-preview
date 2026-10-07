@@ -1,4 +1,4 @@
-// Source: src/sat/sat_simplifier.cpp:1085–1480. Licensed under the MIT license.
+// Source: src/sat/sat_simplifier.cpp:1085–1480.
 package sat
 
 import (

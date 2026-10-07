@@ -1,6 +1,4 @@
 // Source: src/util/sorting_network.h:125-147,523-528,593-639,680-702,754-797,888-916,968-978,1003-1013.
-// Source author: Nikolaj Bjorner (2013-11-07).
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 // These are source unsigned costs, including each intermediate wrap. They

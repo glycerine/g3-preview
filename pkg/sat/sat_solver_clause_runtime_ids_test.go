@@ -1,5 +1,4 @@
 // Source: src/sat/sat_clause.h/.cpp; src/util/id_gen.h; src/util/vector.h.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package sat
 
 import (

@@ -1,5 +1,4 @@
 // Source: src/util/mpz.cpp:2054-2069; explicit returning-transport helper profile.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package util
 
 import (

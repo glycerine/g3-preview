@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // No registered source inf_eps_rational tests exist; these are additional tests.
 package util
 

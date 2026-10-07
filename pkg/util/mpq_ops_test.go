@@ -1,4 +1,4 @@
-// Source: src/util/mpq.h; src/util/mpq.cpp. Licensed under the MIT license.
+// Source: src/util/mpq.h; src/util/mpq.cpp.
 // Source: mpq.h mixed/fused overloads; rational.cpp active tst9 assertions.
 package util
 

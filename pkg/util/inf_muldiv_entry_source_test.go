@@ -1,4 +1,4 @@
-// Source: src/util/rational.h; src/util/inf_rational.h; src/util/inf_int_rational.h; src/util/inf_eps_rational.h. Licensed under the MIT license.
+// Source: src/util/rational.h; src/util/inf_rational.h; src/util/inf_int_rational.h; src/util/inf_eps_rational.h.
 package util
 
 import (

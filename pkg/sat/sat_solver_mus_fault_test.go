@@ -1,5 +1,4 @@
 // Source: src/sat/sat_mus.cpp:52–209; actual allocation-prefix ownership campaign.
-// Licensed under the MIT license. Source author: Nikolaj Bjorner, 2014.
 package sat
 
 import (

@@ -1,5 +1,4 @@
 // Source: src/util/mpz.h:393-426 (plain RAW tmp; end-only explicit DEL).
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package util
 
 // This is actual source invocation state in the charged Integer owner. Body

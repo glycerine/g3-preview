@@ -1,6 +1,5 @@
 // Source: src/ast/rewriter/rewriter.cpp:23-204;
 // src/ast/rewriter/rewriter.h:31-119.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package rewriter
 
 import (

@@ -1,5 +1,4 @@
 // Source: src/math/polynomial/upolynomial.cpp caller invocation ownership.
-// Licensed under the MIT license; see LICENSE.txt.
 package polynomial
 
 import (

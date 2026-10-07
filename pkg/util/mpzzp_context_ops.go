@@ -1,4 +1,4 @@
-// Source: src/util/mpzzp.h. Licensed under the MIT license.
+// Source: src/util/mpzzp.h.
 package util
 
 func (m *IntegerModularManager) dividesWithAllocationContext(a, b *Int, c integerAllocationInvocationContext) (bool, error) {

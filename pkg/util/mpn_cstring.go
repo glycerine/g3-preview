@@ -1,6 +1,4 @@
-// Licensed under the MIT license.
 // Source: src/util/mpn.cpp:360-399; src/util/buffer.h.
-// Source author: Leonardo de Moura. Selected non-Windows snprintf conversion.
 package util
 
 import (

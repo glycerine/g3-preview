@@ -1,6 +1,4 @@
 // Source: src/util/symbol.cpp:70-83; internal_symbol_table members:33-35.
-// Licensed under the MIT license. See LICENSE.txt.
-// Source author: Leonardo de Moura, 2006-09-11.
 package util
 
 import (

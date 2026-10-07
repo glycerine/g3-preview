@@ -1,5 +1,4 @@
 // Source: src/sat/sat_params.pyg; src/sat/sat_config.cpp.
-// Licensed under the MIT license.
 package sat
 
 import (

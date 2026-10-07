@@ -1,5 +1,4 @@
 // Source: src/util/mpf.cpp:1857-1919.
-// Licensed under the MIT license. Source author: Christoph Wintersteiger.
 package util
 
 import (

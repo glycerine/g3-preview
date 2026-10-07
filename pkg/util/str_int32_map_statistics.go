@@ -1,7 +1,5 @@
 // Concrete source specialization: src/util/map.h:24-196; src/util/hashtable.h:44-63.
 // Source: src/util/hashtable.h:33-36,138-140,254-256,267-269,281-283,359-373,409-424,481-491,533-543,649-653.
-// Source author: Leonardo de Moura (2006-09-11).
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 func (h *StrInt32Map) runtimeObjectExtent() uint64 {

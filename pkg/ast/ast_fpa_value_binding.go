@@ -1,6 +1,4 @@
 // Source: src/ast/fpa_decl_plugin.h:96-108; src/util/mpf.cpp:23-59.
-// Source author: Leonardo de Moura; Christoph Wintersteiger.
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 import (

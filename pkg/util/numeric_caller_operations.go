@@ -1,5 +1,4 @@
 // Source: src/util/mpz.cpp; src/util/mpzzp.h (caller lifetime adaptation).
-// Licensed under the MIT license.
 package util
 
 import (

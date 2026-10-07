@@ -1,5 +1,4 @@
 // Source: src/math/polynomial/polynomial.cpp:1464-1475,6070-6097,7356-7357.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package polynomial
 
 func (m *MultivariatePolynomialCore) makeFirstMaximal(p Polynomial) error {

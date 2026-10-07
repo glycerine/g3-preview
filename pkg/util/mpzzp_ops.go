@@ -1,6 +1,4 @@
 // Source: src/util/mpzzp.h; src/util/mpzzp.cpp.
-// Source author: Leonardo de Moura.
-// Licensed under the MIT license.
 package util
 
 func (m *IntegerModularManager) Reset(a *Int) error {

@@ -1,5 +1,4 @@
 // Source: src/ast/ast.h:1662,2033-2063; src/ast/ast.cpp:2503-2527.
-// Licensed under the MIT license; source authors: Leonardo de Moura; Nikolaj Bjorner.
 package ast
 
 func (m *ASTManager) mkEquality(lhs, rhs ASTHandle) (astNodeRef, error) {

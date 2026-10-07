@@ -1,5 +1,4 @@
 // Source: src/math/polynomial/polynomial.cpp:2117-2139,6898-6927.
-// Licensed under the MIT license.
 package polynomial
 
 // Both source loops read VAR, then the mapping, and only then a reached DEG.

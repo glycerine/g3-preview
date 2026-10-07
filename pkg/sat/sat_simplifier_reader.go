@@ -1,4 +1,4 @@
-// Source: src/sat/sat_simplifier.cpp:451–458; src/sat/sat_clause.h tmp_clause. Licensed under the MIT license.
+// Source: src/sat/sat_simplifier.cpp:451–458; src/sat/sat_clause.h tmp_clause.
 package sat
 
 // One concrete borrowed dummy owner is part of the actual simplifier. This

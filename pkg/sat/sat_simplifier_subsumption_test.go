@@ -1,4 +1,4 @@
-// Source: src/sat/sat_simplifier.cpp:421–681. Licensed under the MIT license.
+// Source: src/sat/sat_simplifier.cpp:421–681.
 // Independent finite branch oracles; no registered full-solver claim.
 package sat
 

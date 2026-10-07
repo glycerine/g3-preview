@@ -1,7 +1,5 @@
 // Source: src/smt/params/theory_bv_params.cpp:23-29;
 // scripts/mk_genfile_common.py:895-939.
-// Source author: Leonardo de Moura (2012-12-02).
-// Licensed under the MIT license; see LICENSE.txt.
 package smtcore
 
 import (

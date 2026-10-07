@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source AST scalar/indexed readers. All public borrows remain handle values.
 package ast
 

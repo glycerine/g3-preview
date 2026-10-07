@@ -1,5 +1,4 @@
 // Source: src/math/polynomial/upolynomial_factorization.cpp:979-1299.
-// Licensed under the MIT license.
 package polynomial
 
 import (

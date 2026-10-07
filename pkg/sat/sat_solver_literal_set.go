@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete sat::literal_set specialization of src/sat/sat_types.h.
 package sat
 

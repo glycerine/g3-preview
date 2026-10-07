@@ -1,6 +1,4 @@
 // Source: src/ast/fpa_decl_plugin.cpp:176-180; src/util/mpf.cpp:327-333.
-// Source authors: Christoph Wintersteiger; Leonardo de Moura.
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

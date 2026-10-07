@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Added exact format expectations.
 package util
 

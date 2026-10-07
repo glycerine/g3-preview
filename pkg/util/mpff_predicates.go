@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source MPFF predicates/getters.
 package util
 

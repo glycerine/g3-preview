@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 package sat
 
 // satWatchSortWork is optional caller-owned diagnostic work, never retained.

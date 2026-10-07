@@ -1,5 +1,4 @@
 // Source: src/util/mpz.cpp:730-817; Go returning-transport owner boundary.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package util
 
 import (

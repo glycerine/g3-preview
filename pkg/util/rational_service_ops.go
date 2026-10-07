@@ -1,6 +1,5 @@
-// Source: src/util/rational.h; src/util/rational.cpp. Licensed under the MIT license.
+// Source: src/util/rational.h; src/util/rational.cpp.
 // Source: src/util/rational.h owner-local operator facade.
-// Source author: Leonardo de Moura (2006-09-18). See LICENSE.txt.
 package util
 
 import (

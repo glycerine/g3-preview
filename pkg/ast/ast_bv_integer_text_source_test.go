@@ -1,5 +1,4 @@
 // Source: src/util/mpq.cpp:123-126; src/util/mpz.cpp:1432-1436.
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 import (

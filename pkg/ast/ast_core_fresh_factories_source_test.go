@@ -1,6 +1,4 @@
 // Source: src/ast/ast.cpp:1354,2213-2238; src/ast/ast.h:1811-1825; src/test/sorting_network.cpp:150-181,184-199.
-// Source author: Leonardo de Moura; Nikolaj Bjorner.
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 import (

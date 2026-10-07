@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete ast_ref specialization of src/util/obj_ref.h.
 package ast
 

@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/util/mpn.cpp:206-217 and actual Algorithm M/A bodies.
 package util
 

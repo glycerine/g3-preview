@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source symbol interning byte-input boundary used by actual AST name buffers.
 package ast
 

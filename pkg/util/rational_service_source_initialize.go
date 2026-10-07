@@ -1,5 +1,5 @@
 // Source: src/util/rational.cpp:64-83; src/util/rational.h:67.
-// Leonardo de Moura, 2006-09-18. Licensed under the MIT license; see LICENSE.txt.
+// Leonardo de Moura, 2006-09-18.
 package util
 
 import (

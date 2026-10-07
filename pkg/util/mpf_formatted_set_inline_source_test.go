@@ -1,5 +1,4 @@
 // Source: src/util/mpf.cpp:335-374; no lexical NUM/RAW declarations.
-// Licensed under the MIT license. Source author: Christoph Wintersteiger.
 package util
 
 import (

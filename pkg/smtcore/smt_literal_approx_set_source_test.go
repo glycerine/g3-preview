@@ -1,6 +1,4 @@
 // Source: src/util/approx_set.h:43-154; src/smt/smt_literal.h:114-116.
-// Source author: Leonardo de Moura (2007-03-02; 2008-02-18).
-// Licensed under the MIT license; see LICENSE.txt.
 package smtcore
 
 import (

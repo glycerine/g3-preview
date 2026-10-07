@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/util/mpn.cpp, Knuth Algorithm D.
 package util
 

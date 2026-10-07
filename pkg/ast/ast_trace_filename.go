@@ -1,4 +1,3 @@
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 // TraceFilename borrows the caller's CString without acquiring or copying it.

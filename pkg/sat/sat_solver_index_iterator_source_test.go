@@ -1,5 +1,4 @@
 // Source: src/util/hashtable.h:328-352,576-589; actual nested begin pointer.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package sat
 
 import (

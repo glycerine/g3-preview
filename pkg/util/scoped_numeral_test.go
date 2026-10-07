@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/util/scoped_numeral.h, src/util/scoped_numeral_vector.h.
 package util
 

@@ -1,7 +1,5 @@
 // Source: src/ast/ast.h:1455,1549-1550; src/util/rlimit.cpp:23-71;
 // src/sat/tactic/goal2sat.cpp:384-392.
-// Source authors: Leonardo de Moura and Nikolaj Bjorner.
-// Licensed under the MIT license; see LICENSE.txt.
 package ast_test
 
 import (

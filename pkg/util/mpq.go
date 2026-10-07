@@ -1,5 +1,5 @@
 // Source: src/util/mpq.h:199-201.
-// Source: src/util/mpq.h; src/util/mpq.cpp. Licensed under the MIT license.
+// Source: src/util/mpq.h; src/util/mpq.cpp.
 // Source: src/util/mpq.h and src/util/mpq.cpp, Leonardo de Moura (2010-06-21).
 package util
 

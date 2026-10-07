@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Additional finite tests; no registered hyper-resolution source test exists.
 package ast
 

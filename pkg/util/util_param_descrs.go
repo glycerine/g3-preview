@@ -1,7 +1,4 @@
 // Source: src/util/params.cpp:59-86; src/util/params.h.
-// Author: Leonardo de Moura (2011-05-09).
-// Licensed under the MIT license.
-// Licensed under the MIT license; see LICENSE.txt in the source distribution.
 // Concrete translation of util/params.cpp param_descrs and dictionary<info>.
 package util
 

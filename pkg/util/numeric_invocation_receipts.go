@@ -1,5 +1,4 @@
 // Source: src/util/mpz.cpp, mpzzp.h and mpn.cpp.
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 // These opaque receipts identify actual primitive invocations. Their ownership

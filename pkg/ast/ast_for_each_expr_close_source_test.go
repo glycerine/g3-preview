@@ -1,6 +1,4 @@
-// Licensed under the MIT license; see LICENSE.txt.
 // Source: src/ast/for_each_expr.h:27-105; src/ast/ast_ll_pp.cpp:292-297; src/ast/ast.cpp:1397-1479.
-// Source author: Leonardo de Moura.
 package ast
 
 import (

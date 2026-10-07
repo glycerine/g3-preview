@@ -1,6 +1,5 @@
 // Source: src/math/polynomial/polynomial.cpp:862-884;
 // src/util/small_object_allocator.cpp:104-145.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package polynomial
 
 import (

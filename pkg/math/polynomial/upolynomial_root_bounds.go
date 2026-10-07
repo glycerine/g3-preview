@@ -2,7 +2,6 @@
 // Source: src/math/polynomial/upolynomial.cpp:1298-1321.
 // Source: src/math/polynomial/upolynomial.cpp:1906-1951 (Cauchy bound),
 // src/math/polynomial/upolynomial.cpp:1995-2074 (Knuth/nonzero bounds), related root-bound bodies.
-// Licensed under the MIT license.
 package polynomial
 
 import (

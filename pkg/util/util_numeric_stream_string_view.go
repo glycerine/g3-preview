@@ -1,7 +1,6 @@
 // Source: src/smt/params/qi_params.cpp:43-64; src/util/params.cpp:928-930.
 // Selected libstdc++ numeric/C-string ostream profile; direct Go file emission
-// is an explicit adapter. Source author: Leonardo de Moura (2012-12-02).
-// Licensed under the MIT license; see LICENSE.txt.
+// is an explicit adapter.
 package util
 
 func (out *NumericTextStream) AppendCStringView(v ParamsStringView) error {

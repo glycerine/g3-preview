@@ -1,5 +1,4 @@
 // Source: src/util/vector.h:420-433,509-511; max_cliques owning nested rows.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package sat
 
 import (

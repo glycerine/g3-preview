@@ -1,4 +1,4 @@
-// Source: src/math/polynomial/polynomial.cpp:1863-1876; src/util/mpz.cpp array gcd. Licensed under the MIT license.
+// Source: src/math/polynomial/polynomial.cpp:1863-1876; src/util/mpz.cpp array gcd.
 package polynomial
 
 import (

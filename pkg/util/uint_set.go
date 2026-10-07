@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Translation of src/util/uint_set.h, Leonardo de Moura, 2006-12-07.
 package util
 

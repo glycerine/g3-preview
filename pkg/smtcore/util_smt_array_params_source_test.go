@@ -1,7 +1,5 @@
 // Source: src/smt/params/theory_array_params.h:31-59,61-75;
 // src/smt/params/theory_array_params.cpp:22-40; src/smt/params/smt_params_helper.pyg:59-60.
-// Source author: Leonardo de Moura (2008-06-01; 2008-05-06).
-// Licensed under the MIT license; see LICENSE.txt.
 package smtcore
 
 import (

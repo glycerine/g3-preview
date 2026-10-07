@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source tst5 in src/test/uint_set.cpp and finite container/lifetime coverage.
 package util
 

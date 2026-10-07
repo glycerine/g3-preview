@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Translation of src/util/util.h/.cpp::escaped, Leonardo de Moura.
 package util
 

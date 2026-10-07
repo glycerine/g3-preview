@@ -1,7 +1,5 @@
-// Licensed under the MIT license; see LICENSE.txt.
 // Source: src/cmd_context/context_params.cpp:198-209;
 // src/ast/ast.cpp:1297-1334,2114-2128; src/ast/ast.h:1507-1508,1600.
-// Source author: Leonardo de Moura.
 package smtcore
 
 import (

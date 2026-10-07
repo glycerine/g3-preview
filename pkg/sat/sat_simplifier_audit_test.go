@@ -1,4 +1,4 @@
-// Source: src/sat/sat_solver.cpp decision and GC member ownership; independent named physical census. Licensed under the MIT license.
+// Source: src/sat/sat_solver.cpp decision and GC member ownership; independent named physical census.
 package sat
 
 import (

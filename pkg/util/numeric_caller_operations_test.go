@@ -1,5 +1,4 @@
 // Source: src/util/mpz.cpp (caller lifetime boundary tests).
-// Licensed under the MIT license.
 package util
 
 import (

@@ -1,5 +1,4 @@
 // Source: src/util/symbol.cpp:56-79; src/ast/format.cpp:147-152.
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 import (

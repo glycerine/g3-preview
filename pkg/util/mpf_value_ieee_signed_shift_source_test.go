@@ -1,5 +1,4 @@
 // Source: src/util/mpf.cpp:1712-1737; CMakeLists.txt:224-229.
-// Licensed under the MIT license. Source author: Christoph Wintersteiger.
 package util
 
 import (

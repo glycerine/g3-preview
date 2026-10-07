@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 package util
 
 var catalogDescriptionLiterals = [...]struct{ module, text string }{

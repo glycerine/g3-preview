@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Formatting expectations project src/util/mpn.cpp to_string and mpz/mpq display.
 package util
 

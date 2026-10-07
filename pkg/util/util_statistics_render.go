@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // statistics.cpp map construction and rendering; external std::sort is adapted
 // to an allocation-free concrete heap sort on borrowed scalar key references.
 package util

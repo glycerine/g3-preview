@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Translation of selected LAZY_USE_LIST in src/sat/sat_clause_use_list.h/.cpp.
 package sat
 

@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/util/mpq.cpp:28-34 destructor body followed by mpz_manager base destruction.
 package util
 

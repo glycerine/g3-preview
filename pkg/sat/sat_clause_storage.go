@@ -1,4 +1,4 @@
-// Source: src/sat/sat_solver.cpp; src/sat/sat_clause.h. Licensed under the MIT license.
+// Source: src/sat/sat_solver.cpp; src/sat/sat_clause.h.
 // Concrete standalone storage translation of sat_clause.h/.cpp.
 package sat
 

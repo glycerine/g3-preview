@@ -1,6 +1,4 @@
 // Source: src/util/gparams.cpp:150-160,446-550,623-627; src/util/gparams.h.
-// Author: Leonardo de Moura (2012-11-29).
-// Licensed under the MIT license; see LICENSE.txt in the source distribution.
 package util
 
 import (

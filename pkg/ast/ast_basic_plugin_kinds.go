@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Exact src/ast/ast.h basic_op_kind enumeration (including sentinel gap).
 package ast
 

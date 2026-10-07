@@ -1,5 +1,4 @@
 // Source: src/util/mpz.h; src/util/mpz.cpp (_MP_INTERNAL, digit32).
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 // Actual mpz.h cell allocation and object-bounded initialized-byte access.
 package util
 

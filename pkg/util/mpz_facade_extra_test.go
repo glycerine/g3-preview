@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: mpz.h public methods; test/mpz.cpp and test/mpq.cpp tst1.
 // Source: src/util/mpz.h, src/util/mpz.cpp, src/util/mpq.h.
 package util

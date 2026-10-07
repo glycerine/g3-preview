@@ -1,5 +1,4 @@
 // Source: src/util/buffer.h:25-63,261-268; src/ast/ast_smt2_pp.cpp:185-229.
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 import (

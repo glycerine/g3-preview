@@ -1,5 +1,4 @@
 // Source: src/util/small_object_allocator.cpp:allocate/deallocate.
-// Licensed under the MIT license.
 package util
 
 import (

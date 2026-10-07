@@ -1,6 +1,4 @@
 // Source: src/util/memory_manager.cpp:102.
-// Licensed under the MIT license; see LICENSE.txt.
-// Source author: Nikolaj Bjorner (nbjorner), 2007-07-24.
 package util
 
 // ClearOutOfMemoryForInitialization implements the scalar assignment reached

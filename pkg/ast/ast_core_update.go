@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source ast.cpp same_patterns/same_no_patterns and six update overloads.
 package ast
 

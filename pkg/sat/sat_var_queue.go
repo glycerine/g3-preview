@@ -1,5 +1,4 @@
 // Source: src/sat/sat_var_queue.h:31-67; src/util/heap.h; src/sat/sat_simplifier.cpp:875–919 and src/sat/sat_solver.h case_split_queue.
-// Licensed under the MIT license.
 package sat
 
 import (

@@ -1,5 +1,4 @@
 // Source: src/sat/sat_solver.h:245-286,318-323,539-542.
-// Licensed under the MIT license. Source author: Leonardo de Moura, 2011-05-21.
 package sat
 
 import (

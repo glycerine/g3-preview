@@ -1,6 +1,4 @@
 // Source: src/ast/array_decl_plugin.cpp:25-114; src/ast/array_decl_plugin.h:67-130.
-// Source author: Leonardo de Moura (2008-01-09).
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 import (

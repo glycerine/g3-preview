@@ -1,5 +1,4 @@
 // Source: src/util/heap.h:61-78,126,136-145; src/util/debug.h:60-65; src/test/heap.cpp.
-// Licensed under the MIT license. Source author: Leonardo de Moura, 2006-09-14.
 package util
 
 import (

@@ -1,7 +1,5 @@
 // Source: src/util/memory_manager.cpp:124-149,274-305,326-377;
 // src/util/memory_manager.h:49-71.
-// Licensed under the MIT license. See LICENSE.txt.
-// Source author: Nikolaj Bjorner (nbjorner), 2007-07-24.
 package util
 
 import (

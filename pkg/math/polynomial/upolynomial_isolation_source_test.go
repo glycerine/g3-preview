@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Tests FIRST: actual registered root-isolation inputs and assertion routes.
 package polynomial
 

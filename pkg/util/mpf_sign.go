@@ -1,5 +1,4 @@
 // Source: src/util/mpf.cpp:373-391; src/util/mpf.h:92-96.
-// Licensed under the MIT license. Source author: Christoph Wintersteiger.
 package util
 
 // Abs clears only the source sign bit, including for NaN.

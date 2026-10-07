@@ -1,5 +1,4 @@
 // Source: src/util/ref_vector.h:67-71,128-132; src/util/vector.h:422-433.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package polynomial
 
 // This receipt names only one actual guarded caller-vector SET. It does not

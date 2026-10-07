@@ -1,6 +1,4 @@
 // Source: src/util/small_object_allocator.h:48; src/util/small_object_allocator.cpp:147-171.
-// Licensed under the MIT license.
-// Source author: Nikolaj bjorner (nbjorner) 2007-08-06.
 // Source revision: Leonardo de Moura (leonardo) 2011-04-27; rewrote/simplified allocator.
 package util
 

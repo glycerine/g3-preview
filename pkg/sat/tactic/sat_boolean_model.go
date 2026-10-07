@@ -1,5 +1,4 @@
 // Source: src/sat/tactic/sat_tactic.cpp:89-112.
-// Licensed under the MIT license. Source author: Leonardo de Moura (2011).
 package tactic
 
 import (

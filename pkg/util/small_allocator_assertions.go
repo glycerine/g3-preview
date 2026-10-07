@@ -1,6 +1,4 @@
 // Source: src/util/debug.h:63; src/util/small_object_allocator.cpp:72-145,198.
-// Licensed under the MIT license.
-// Source authors: Leonardo de Moura, 2006/2011; Nikolaj bjorner (nbjorner), 2007-08-06.
 package util
 
 // AllocatorAssertionControl is one cold borrowed actual assertion owner. No

@@ -1,5 +1,4 @@
 // Source: src/util/mpf.cpp:1519-1569.
-// Licensed under the MIT license. Source author: Christoph Wintersteiger.
 package util
 
 // ToStringInto writes the source result into its actual owned text context.

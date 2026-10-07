@@ -1,5 +1,4 @@
 // Source: src/util/mpz.h:468-485; src/util/mpz.cpp:730-817,915-985.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package util
 
 // Real retained RAW declarations in the charged Integer owner. Count marks

@@ -1,5 +1,4 @@
 // Source: src/sat/sat_mus.cpp:149–174; independent checked lifetime fixtures.
-// Licensed under the MIT license. Source author: Nikolaj Bjorner, 2014.
 package sat
 
 import (

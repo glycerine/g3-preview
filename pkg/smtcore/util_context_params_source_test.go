@@ -1,7 +1,5 @@
 // Source: src/cmd_context/context_params.h:26-55;
 // src/cmd_context/context_params.cpp:26-40,137-156.
-// Source author: Leonardo de Moura (2012-12-01).
-// Licensed under the MIT license; see LICENSE.txt.
 package smtcore
 
 import (

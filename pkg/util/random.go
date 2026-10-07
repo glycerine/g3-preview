@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Translation of random_gen and shuffle in src/util/util.h.
 package util
 

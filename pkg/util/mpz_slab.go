@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete numeric-cell specialization of the reviewed slab storage algorithm.
 // Slot/generation/budget semantics are preserved without generic declarations.
 package util

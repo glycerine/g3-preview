@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/util/inf_int_rational.h, src/util/inf_int_rational.cpp.
 package util
 

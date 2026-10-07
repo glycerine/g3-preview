@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Selected registered algebraic.cpp inputs, through actual resource services.
 package polynomial
 

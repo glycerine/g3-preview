@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete expr_dependency_ref_vector specialization; encoded cold owners, scalar entries.
 package ast
 

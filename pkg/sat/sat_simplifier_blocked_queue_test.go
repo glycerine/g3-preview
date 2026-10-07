@@ -1,4 +1,4 @@
-// Source: src/sat/sat_simplifier.cpp:875–919; src/util/heap.h. Licensed under the MIT license.
+// Source: src/sat/sat_simplifier.cpp:875–919; src/util/heap.h.
 package sat
 
 import (

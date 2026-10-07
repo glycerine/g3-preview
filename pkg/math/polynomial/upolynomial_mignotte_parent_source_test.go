@@ -1,6 +1,5 @@
 // Source: src/math/polynomial/upolynomial_factorization.cpp:979-1017,1023-1465;
-// src/util/scoped_numeral.h:31-33. Licensed under the MIT license.
-// Source author: Leonardo de Moura.
+// src/util/scoped_numeral.h:31-33.
 package polynomial
 
 import (

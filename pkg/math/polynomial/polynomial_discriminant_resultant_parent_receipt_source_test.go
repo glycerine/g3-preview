@@ -1,6 +1,5 @@
 // Source: src/math/polynomial/polynomial.cpp:5473-5500;
 // Go exact invoked Resultant/GCD frame boundary (invalid copied metadata).
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package polynomial
 
 import (

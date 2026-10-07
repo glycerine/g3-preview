@@ -1,5 +1,4 @@
 // Source: src/math/polynomial/upolynomial.cpp:1324-1329,432-513.
-// Licensed under the MIT license.
 // Source: src/util/vector.h:59-100; src/math/polynomial/upolynomial.cpp:164-203.
 // Concrete typed storage for actual svector<mpz> coefficient ownership.
 package polynomial

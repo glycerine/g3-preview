@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/util/mpq.cpp:156-184 raw decimal-display locals.
 package util
 

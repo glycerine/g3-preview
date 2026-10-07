@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 package ast
 
 func (m *ASTManager) ExprArrayMk(out *ASTExprArray) error {

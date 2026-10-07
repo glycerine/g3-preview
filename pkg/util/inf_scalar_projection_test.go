@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Added profile/ownership tests for inf_int_rational.h:98-119,
 // inf_rational.h:111-132, inf_eps_rational.h:107-128 and rational.h:101-125.
 package util

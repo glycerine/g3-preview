@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source assertions from src/test/rational.cpp; test helpers own every returned token.
 package util
 

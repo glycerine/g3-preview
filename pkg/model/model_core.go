@@ -1,6 +1,5 @@
 // Source: src/model/model_core.h:31-78; src/model/model_core.cpp:21-66,85-109;
 // src/model/model.cpp:44-50.
-// Licensed under the MIT license. Source author: Leonardo de Moura (2011).
 package model
 
 import (

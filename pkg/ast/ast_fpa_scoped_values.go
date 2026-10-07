@@ -1,6 +1,4 @@
 // Source: src/util/scoped_numeral_vector.h:25-72; src/util/vector.h:59-100,407-420,509-512.
-// Source author: Leonardo de Moura.
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 import (

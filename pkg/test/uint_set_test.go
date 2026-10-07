@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Assertion ports from src/test/uint_set.cpp, registered in src/test/main.cpp.
 package test
 

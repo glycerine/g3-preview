@@ -1,6 +1,4 @@
 // Source: src/util/util.cpp:22-40; src/util/util.h:176-186.
-// Licensed under the MIT license. See LICENSE.txt.
-// Source author: Leonardo de Moura (leonardo), 2006.
 package util
 
 import (

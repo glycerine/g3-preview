@@ -1,6 +1,4 @@
 // Source: src/util/gparams.cpp:106-123; src/util/params.cpp:325-339,510-513.
-// Licensed under the MIT license. See LICENSE.txt.
-// Source authors: Leonardo de Moura, 2011-2012.
 package util
 
 import (

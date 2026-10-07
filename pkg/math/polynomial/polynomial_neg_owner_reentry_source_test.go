@@ -1,7 +1,6 @@
 // Source: src/math/polynomial/polynomial.cpp:5940-5951.
 // Returning Runtime allocation-error transport is an explicit Go owner guard
 // profile; native destructor reentry is not asserted.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package polynomial
 
 import (

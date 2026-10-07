@@ -1,6 +1,4 @@
 // Source: src/ast/array_decl_plugin.cpp:86-113; src/util/rational.h:67,110-181.
-// Source author: Leonardo de Moura (2008-01-09).
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 import (

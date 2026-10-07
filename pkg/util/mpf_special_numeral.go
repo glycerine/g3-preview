@@ -1,5 +1,4 @@
 // Source: src/util/mpf.cpp:1857-1891,1907-1919.
-// Licensed under the MIT license. Source author: Christoph Wintersteiger.
 package util
 
 // Each bitfield assignment is a literal source action. The final sign write in

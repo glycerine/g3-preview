@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Original source allocator tests; source actions and names preserved.
 package util
 

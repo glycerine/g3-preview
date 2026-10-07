@@ -1,6 +1,5 @@
 // Source: src/util/approx_set.h:43-158; src/sat/sat_types.h:115-119;
 // src/sat/sat_solver.h:419; src/smt/smt_conflict_resolution.h:34.
-// Licensed under the MIT license; see LICENSE.txt.
 package sat
 
 import (

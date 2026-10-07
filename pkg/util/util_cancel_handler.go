@@ -1,6 +1,4 @@
-// Licensed under the MIT license.
 // Concrete reslimit specialization of src/util/event_handler.h/cancel_eh.h.
-// Original author: Leonardo de Moura.
 package util
 
 type utilEventCaller uint32

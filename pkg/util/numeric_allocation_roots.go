@@ -1,5 +1,4 @@
 // Source: src/util/mpz.cpp and source numeric-call ownership adapters.
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

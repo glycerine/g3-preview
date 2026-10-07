@@ -1,5 +1,4 @@
 // Source: src/math/polynomial/polynomial.h:62-69; src/math/polynomial/polynomial.cpp:66-82; src/util/vector.h:101-116,160-210,530-546.
-// Licensed under the MIT license.
 package polynomial
 
 import (

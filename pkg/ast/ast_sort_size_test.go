@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Standalone source sort_size boundary checks; no active source ENSURE exists.
 package ast
 

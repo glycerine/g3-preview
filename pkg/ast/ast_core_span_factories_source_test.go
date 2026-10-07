@@ -1,6 +1,4 @@
 // Source: src/ast/ast_util.cpp:173-180; src/ast/ast.cpp:2064-2211.
-// Source authors: Leonardo de Moura; Nikolaj Bjorner.
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 import (

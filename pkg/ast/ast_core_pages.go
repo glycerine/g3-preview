@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete typed page growth; each actual old/new directory overlap is charged.
 package ast
 

@@ -1,5 +1,4 @@
 // Source: src/util/scoped_numeral_buffer.h; src/util/buffer.h.
-// Licensed under the MIT license. Author: Leonardo de Moura.
 package util
 
 import (

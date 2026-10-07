@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/util/mpz.cpp display_smt2, mpq.cpp display_smt2/display_decimal,
 // and mpq.h to_rational_string/display_pp forwarding wrappers.
 package util

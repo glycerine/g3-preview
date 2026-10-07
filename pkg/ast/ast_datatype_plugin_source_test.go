@@ -1,7 +1,5 @@
 // Source: src/ast/datatype_decl_plugin.h:237-246,314-334;
 // src/ast/datatype_decl_plugin.cpp:739-750.
-// Source author: Leonardo de Moura.
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 import (

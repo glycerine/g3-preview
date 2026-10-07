@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source mpff.cpp display and memory_manager.cpp TLS paths.
 package util
 

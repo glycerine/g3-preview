@@ -1,5 +1,4 @@
 // Source: src/test/bit_vector.cpp:104-309; src/util/bit_vector.h; src/util/bit_vector.cpp.
-// Licensed under the MIT license. Source author: Leonardo de Moura, 2006-10-03.
 package util
 
 import (

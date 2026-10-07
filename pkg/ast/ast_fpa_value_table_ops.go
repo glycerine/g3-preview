@@ -1,6 +1,4 @@
 // Source: src/util/chashtable.h:91-584; src/ast/fpa_decl_plugin.h:96-108.
-// Source author: Leonardo de Moura (2011-04-14).
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 import (

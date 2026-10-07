@@ -1,7 +1,5 @@
 // Source: src/smt/params/theory_arith_params.h:53-164;
 // src/smt/params/theory_arith_params.cpp:23-94.
-// Source author: Leonardo de Moura (2008-05-06).
-// Licensed under the MIT license; see LICENSE.txt.
 package smtcore
 
 import (

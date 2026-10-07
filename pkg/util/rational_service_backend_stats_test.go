@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/util/rational.cpp, src/util/mpz.h.
 package util
 

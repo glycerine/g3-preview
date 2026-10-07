@@ -1,4 +1,4 @@
-// Source: src/sat/sat_solver.cpp:933–988; src/sat/sat_solver.h:337–338. Licensed under the MIT license.
+// Source: src/sat/sat_solver.cpp:933–988; src/sat/sat_solver.h:337–338.
 package sat
 
 import (

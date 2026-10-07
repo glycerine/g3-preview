@@ -1,7 +1,5 @@
 // Concrete source specialization: src/util/map.h:24-196; src/util/hashtable.h:44-63.
 // Source: src/util/str_hashtable.h:24-31; src/util/hashtable.h:375-435,465-522.
-// Source author: Leonardo de Moura (2006-09-13 / 2006-09-11).
-// Licensed under the MIT license; see LICENSE.txt.
 // Borrowed byte-input adapter for the source CString query. No byte slice is
 // retained; the hash/probe/equality and prepare/publication actions are those
 // of the existing concrete source string table.

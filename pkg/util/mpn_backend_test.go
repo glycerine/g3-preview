@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Real mpn.h member sbuffers and mpn.cpp division storage action ordering.
 package util
 

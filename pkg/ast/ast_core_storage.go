@@ -1,6 +1,4 @@
 // Source: src/ast/ast.h; src/ast/ast.cpp:1354,2213-2238.
-// Source author: Leonardo de Moura (2006-09-18; 2006-09-28).
-// Licensed under the MIT license; see LICENSE.txt.
 // Concrete pointer-free storage for src/ast/ast.h. Domain destruction is
 // performed by ast_manager action translations, never by page reclamation.
 package ast

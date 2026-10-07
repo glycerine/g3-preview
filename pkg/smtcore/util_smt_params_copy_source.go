@@ -1,7 +1,5 @@
 // Source: src/smt/params/smt_params.h:75-318; src/smt/params/qi_params.h:31-109;
 // src/qe/qe_sat_tactic.cpp:632; src/muz/pdr/pdr_farkas_learner.cpp:390.
-// Source author: Leonardo de Moura (2008-02-20; 2008-06-15).
-// Licensed under the MIT license; see LICENSE.txt.
 package smtcore
 
 import (

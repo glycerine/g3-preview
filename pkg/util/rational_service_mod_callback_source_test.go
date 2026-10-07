@@ -1,5 +1,4 @@
 // Source: src/util/rational.h; src/util/mpq.cpp; src/util/memory_manager.cpp:274-285.
-// Licensed under the MIT license.
 package util
 
 import (

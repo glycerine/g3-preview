@@ -1,5 +1,4 @@
 // Source: src/math/polynomial/linear_eq_solver.h:140-150.
-// Licensed under the MIT license. Source author: Leonardo de Moura, 2012.
 package polynomial
 
 import (

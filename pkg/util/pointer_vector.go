@@ -1,4 +1,4 @@
-// Source: src/util/vector.h, ptr_vector. Licensed under the MIT license.
+// Source: src/util/vector.h, ptr_vector.
 package util
 
 import (

@@ -1,6 +1,5 @@
 // Source: src/util/hashtable.h:183-230,244-256,378-408;
 // src/util/obj_hashtable.h; src/ast/expr2var.cpp:25-54.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package tactic
 
 import (

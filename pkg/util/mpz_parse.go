@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/util/mpz.cpp set(mpz &, char const *), _MP_INTERNAL backend.
 package util
 

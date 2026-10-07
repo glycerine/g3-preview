@@ -1,4 +1,4 @@
-// Source: src/math/polynomial/polynomial.cpp; src/math/polynomial/polynomial.h. Licensed under the MIT license.
+// Source: src/math/polynomial/polynomial.cpp; src/math/polynomial/polynomial.h.
 // Concrete source polynomial.cpp tmp_monomial; actual Runtime byte storage.
 package polynomial
 

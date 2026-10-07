@@ -1,8 +1,6 @@
 // Source: src/ast/format.cpp:119-145; src/ast/recurse_expr.h:28-60;
 // src/ast/recurse_expr_def.h:25-107; src/util/obj_hashtable.h:65-125;
 // src/util/hashtable.h:186-226,247-256,371-398,497-517.
-// Source author: Leonardo de Moura (2008-01-11; 2008-01-20).
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 import (

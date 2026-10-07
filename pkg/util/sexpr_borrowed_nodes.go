@@ -1,5 +1,4 @@
 // Source: src/util/sexpr.h/.cpp: borrowed nodes in synchronous source traversals.
-// Licensed under the MIT license.
 package util
 
 import "github.com/glycerine/g3/pkg/arena"

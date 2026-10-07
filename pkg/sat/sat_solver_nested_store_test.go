@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete storage adapter checks for source nested literal vectors.
 package sat
 

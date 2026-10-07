@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source MPFF arithmetic/control.
 package util
 

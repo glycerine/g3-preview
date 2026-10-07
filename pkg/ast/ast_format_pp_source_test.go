@@ -1,6 +1,4 @@
 // Source: src/ast/pp.cpp:22-132; src/ast/pp_params.pyg:1-23.
-// Source author: Leonardo de Moura.
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 import (

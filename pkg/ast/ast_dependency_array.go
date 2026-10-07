@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete actual ast_manager::dep_array_cfg specialization of parray.h.
 package ast
 

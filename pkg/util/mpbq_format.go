@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: MPBQ display methods.
 package util
 

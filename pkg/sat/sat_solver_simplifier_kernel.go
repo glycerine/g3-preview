@@ -1,5 +1,4 @@
 // Source: src/sat/sat_simplifier.cpp; src/sat/sat_simplifier.h.
-// Licensed under the MIT license.
 // Concrete extracted state for sat::simplifier's solver-independent algorithms.
 package sat
 

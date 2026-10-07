@@ -1,7 +1,5 @@
 // Source: src/util/vector.h:43-125,215-240,303-310,350-365,389-433,449-455,531-546.
 // Source: src/test/sorting_network.cpp:150-181.
-// Source author: Leonardo de Moura; Nikolaj Bjorner.
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 import (

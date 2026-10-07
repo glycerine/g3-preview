@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source set/copy semantics, adapted to the explicit numerical owner boundary
 // required by GO_PORT_PLAN.md B12. C++ rational uses one global manager instead.
 package util

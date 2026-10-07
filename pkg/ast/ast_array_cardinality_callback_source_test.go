@@ -1,6 +1,4 @@
 // Source: src/ast/array_decl_plugin.cpp:86-113; src/util/memory_manager.cpp:274-289.
-// Source authors: Leonardo de Moura; Nikolaj Bjorner.
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 import (

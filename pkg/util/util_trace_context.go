@@ -1,6 +1,4 @@
 // Source: src/util/trace.cpp:25-62; src/util/trace.h:38-49.
-// Licensed under the MIT license. See LICENSE.txt.
-// Source author: Leonardo de Moura (leonardo), 2006.
 package util
 
 import (

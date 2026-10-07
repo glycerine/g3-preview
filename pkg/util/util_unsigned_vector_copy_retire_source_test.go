@@ -1,6 +1,4 @@
 // Source: src/util/vector.h:102-120,159-167,191-202.
-// Source author: Leonardo de Moura.
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

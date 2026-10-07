@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete int32 configurations of src/util/parray.h.
 package util
 

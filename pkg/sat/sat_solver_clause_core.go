@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/sat/sat_solver.cpp:367–465; src/sat/sat_solver.h value/lvl accessors.
 package sat
 

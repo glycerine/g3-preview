@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Additional finite source-model coverage: no registered mark-specific test.
 package ast
 

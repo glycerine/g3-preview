@@ -1,4 +1,4 @@
-// Source: src/test/sat_user_scope.cpp. Licensed under the MIT license.
+// Source: src/test/sat_user_scope.cpp.
 // Finite translation of src/test/sat_user_scope.cpp; exact oracle is Go-only.
 package sat
 

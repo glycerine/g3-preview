@@ -1,6 +1,4 @@
 // Source: src/util/mpz.cpp:big_set; src/util/mpf.cpp:327-333.
-// Source author: Leonardo de Moura; Christoph Wintersteiger.
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

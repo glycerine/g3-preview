@@ -1,6 +1,4 @@
 // Source: src/tactic/probe.h:30-61; src/tactic/probe.cpp:39-70,180-192.
-// Source author: Leonardo de Moura.
-// Licensed under the MIT license; see LICENSE.txt.
 package tactic
 
 import (

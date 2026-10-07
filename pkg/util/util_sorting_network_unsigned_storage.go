@@ -1,6 +1,4 @@
 // Source: src/util/sorting_network.h:36-37,42-45,98-108; src/util/vector.h:303-329,350-365,437-440.
-// Source author: Nikolaj Bjorner (2013-11-07); Leonardo de Moura.
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

@@ -1,4 +1,4 @@
-// Source: src/util/heap.h; src/util/vector.h. Licensed under the MIT license.
+// Source: src/util/heap.h; src/util/vector.h.
 package util
 
 import (

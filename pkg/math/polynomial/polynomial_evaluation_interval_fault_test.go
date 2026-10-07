@@ -1,6 +1,5 @@
 // Source: src/math/polynomial/polynomial.cpp:6436-6550; src/util/mpbqi.h;
-// src/util/basic_interval.h. Licensed under the MIT license.
-// Author: Leonardo de Moura.
+// src/util/basic_interval.h.
 package polynomial
 
 import (

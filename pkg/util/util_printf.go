@@ -1,7 +1,4 @@
-// Licensed under the MIT license.
-// Licensed under the MIT license; see LICENSE.txt in the source distribution.
 // Source: src/util/warning.cpp:105-169.
-// Source author: Leonardo de Moura (2006-12-01).
 // Explicit-argument integer/C-string subset of format2ostream.
 package util
 

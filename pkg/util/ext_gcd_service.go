@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/util/ext_gcd.h, concrete rational specialization.
 package util
 

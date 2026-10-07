@@ -1,7 +1,5 @@
 // Source: src/util/mpf.cpp:316-333; src/util/mpf.h:88-90;
 // src/util/mpz.cpp:big_set; src/util/vector.h:423-435.
-// Source author: Christoph Wintersteiger; Leonardo de Moura.
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

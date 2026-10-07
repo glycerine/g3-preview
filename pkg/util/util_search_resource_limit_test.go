@@ -1,5 +1,4 @@
 // Source: src/util/resource_limit.h:49-164.
-// Licensed under the MIT license. Source author: Leonardo de Moura, 2007-04-18.
 package util
 
 import (

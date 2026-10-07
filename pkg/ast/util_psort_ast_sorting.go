@@ -1,6 +1,4 @@
 // Source: src/util/sorting_network.h:597-1046.
-// Source author: Nikolaj Bjorner (2013-11-07).
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 func (s *PsortASTNetwork) card(k, n uint32, p psortASTPointer, out *RuntimeASTLiteralVector) (err error) {

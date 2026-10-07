@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 package util
 
 import "testing"

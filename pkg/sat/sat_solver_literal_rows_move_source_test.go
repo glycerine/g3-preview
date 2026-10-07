@@ -1,5 +1,4 @@
 // Source: src/util/vector.h:68-94,169-170; actual nested move pointer reads.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package sat
 
 import (

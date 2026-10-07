@@ -1,6 +1,5 @@
 // Source: src/math/polynomial/polynomial.cpp:4990-4995;
 // src/math/polynomial/polynomial.cpp:810-851.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package polynomial
 
 func (l *monomialLocation) acknowledgePseudoCreated(a Monomial) {

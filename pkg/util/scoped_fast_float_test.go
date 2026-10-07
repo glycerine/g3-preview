@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete owner/domain regressions.
 package util
 

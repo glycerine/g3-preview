@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete numeric-cell storage adaptation tests.
 package util
 

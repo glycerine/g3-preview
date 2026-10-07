@@ -1,5 +1,4 @@
 // Source: src/math/polynomial/polynomial.cpp:6727-6735.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package polynomial
 
 // The source degree-greater-than-two helper currently preserves p as one

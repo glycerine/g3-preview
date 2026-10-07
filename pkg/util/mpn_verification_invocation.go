@@ -1,5 +1,4 @@
 // Source: src/util/mpn.cpp:206-217; src/util/buffer.h.
-// Licensed under the MIT license. Source author: Christoph Wintersteiger.
 package util
 
 // The reached lexical constructor has its own identity. An unfinished

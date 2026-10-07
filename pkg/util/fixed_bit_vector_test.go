@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Tests translated from src/test/fixed_bit_vector.cpp, Nikolaj Bjorner.
 package util
 

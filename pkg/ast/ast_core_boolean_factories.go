@@ -1,6 +1,4 @@
 // Source: src/ast/ast.h:1984,2008-2018,2031-2060; src/ast/ast_util.cpp:173-180.
-// Source author: Leonardo de Moura; Nikolaj Bjorner.
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 func (m *ASTManager) MkFalse() (ASTHandle, error) {

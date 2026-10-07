@@ -1,8 +1,6 @@
 // Source: src/util/small_object_allocator.cpp:72-96,98-145; src/util/fixed_bit_vector.cpp:78-80.
-// Licensed under the MIT license.
-// Source author: Nikolaj bjorner (nbjorner) 2007-08-06.
 // Source revision: Leonardo de Moura (leonardo) 2011-04-27; rewrote/simplified allocator.
-// Fixed-vector source authors: Nikolaj Bjorner, 2014-9-15; Leonardo de Moura, 2006-10-03.
+// Fixed-vector
 package util
 
 import (

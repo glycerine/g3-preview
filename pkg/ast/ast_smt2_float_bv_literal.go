@@ -1,5 +1,4 @@
 // Source: src/ast/ast_smt2_pp.cpp:270-291.
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 import (

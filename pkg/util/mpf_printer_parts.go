@@ -1,6 +1,5 @@
 // Source: src/util/mpf.h:152-153,192-193;
 // src/ast/ast_smt2_pp.cpp:277-288.
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

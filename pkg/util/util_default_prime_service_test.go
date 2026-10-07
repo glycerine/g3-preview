@@ -1,6 +1,4 @@
 // Source: src/util/prime_generator.cpp:23-27,99-130; src/util/prime_generator.h:29-52.
-// Licensed under the MIT license. See LICENSE.txt.
-// Source author: Leonardo de Moura (leonardo), 2011-12-23.
 package util
 
 import (

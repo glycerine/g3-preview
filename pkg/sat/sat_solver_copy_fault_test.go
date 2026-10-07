@@ -1,5 +1,4 @@
 // Source: src/sat/sat_solver.cpp:75-127. Actual destination refusal prefixes.
-// Licensed under the MIT license. Source authors: Leonardo de Moura (leonardo), 2011-05-21; Nikolaj Bjorner.
 package sat
 
 import (

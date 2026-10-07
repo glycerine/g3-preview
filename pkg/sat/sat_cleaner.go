@@ -1,5 +1,4 @@
-// Source: src/sat/sat_cleaner.h and .cpp:26–229; src/sat/sat_solver.cpp:3082–3087. Licensed under the MIT license.
-// Author of the source cleaner: Leonardo de Moura, 2011.
+// Source: src/sat/sat_cleaner.h and .cpp:26–229; src/sat/sat_solver.cpp:3082–3087.
 package sat
 
 import (

@@ -1,6 +1,4 @@
 // Source: src/util/symbol.h:97-110; src/smt/params/smt_params.cpp:138.
-// Source author: Leonardo de Moura (2006-09-11; 2008-02-20).
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

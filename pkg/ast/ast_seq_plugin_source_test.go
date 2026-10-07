@@ -1,7 +1,5 @@
 // Source: src/ast/seq_decl_plugin.cpp:343-357,500-610;
 // src/ast/seq_decl_plugin.h:126-175.
-// Source authors: Nikolaj Bjorner (2012-02-08); Leonardo de Moura.
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 import (

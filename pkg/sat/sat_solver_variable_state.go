@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Actual solver member owners and complete sat_solver.cpp:135-160 mk_var body.
 package sat
 

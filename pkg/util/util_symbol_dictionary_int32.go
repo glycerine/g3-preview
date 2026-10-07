@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete dictionary<int>: dictionary.h -> map.h -> default_hash_entry/core_hashtable.
 package util
 

@@ -1,7 +1,5 @@
 // Source: src/smt/params/qi_params.h:31-109; src/smt/params/qi_params.cpp:23-64;
 // src/smt/params/smt_params_helper.pyg:24-37; scripts/mk_genfile_common.py:895-939.
-// Source author: Leonardo de Moura (2008-06-15; 2012-12-02).
-// Licensed under the MIT license; see LICENSE.txt.
 package smtcore
 
 import (

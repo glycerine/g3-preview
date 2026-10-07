@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source arithmetic: src/util/mpn.cpp. Source regression projections:
 // src/test/mpz.cpp tst2 and bug1
 package util

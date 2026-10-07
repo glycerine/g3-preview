@@ -1,6 +1,5 @@
 // Test fixtures copied from the source-owned collectors. These supply upper-package
 // registrations to the utility dispatcher tests without reversing the dependency.
-// Licensed under the MIT license.
 package util
 
 func catalogCollectQfufbvTacticParams(d *ParamDescrs) error {

@@ -1,7 +1,7 @@
 // Source: src/math/polynomial/upolynomial.cpp:1324-1329,432-513.
 // Source: src/math/polynomial/upolynomial.cpp:1298-1321.
 // Source: src/math/polynomial/upolynomial.cpp:1734-1764.
-// Source: src/math/polynomial/upolynomial.cpp:138-157,187,1259-1265; src/util/mpzzp.h:97-105. Licensed under the MIT license.
+// Source: src/math/polynomial/upolynomial.cpp:138-157,187,1259-1265; src/util/mpzzp.h:97-105.
 package polynomial
 
 import (

@@ -1,5 +1,4 @@
 // Source: src/util/rational.cpp:50-62; src/util/rational.h; src/util/scoped_numeral.h.
-// Licensed under the MIT license.
 package util
 
 import (

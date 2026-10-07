@@ -1,4 +1,4 @@
-// Source: src/util/mpz.h:132-164; src/util/mpz.cpp:306-349,1186-1212. Licensed under the MIT license.
+// Source: src/util/mpz.h:132-164; src/util/mpz.cpp:306-349,1186-1212.
 package util
 
 import (

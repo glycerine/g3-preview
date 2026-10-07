@@ -1,4 +1,4 @@
-// Source: src/sat/sat_types.h; src/sat/sat_probing.cpp. Licensed under the MIT license.
+// Source: src/sat/sat_types.h; src/sat/sat_probing.cpp.
 package sat
 
 import (

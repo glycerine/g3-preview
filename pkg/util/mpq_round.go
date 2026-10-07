@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/util/mpq.cpp floor/ceil/prev_power_of_two and mpq.h wrappers.
 package util
 

@@ -1,5 +1,4 @@
 // Source: src/sat/sat_solver.cpp:34–58; src/util/memory_manager.cpp; src/util/gparams.cpp.
-// Licensed under the MIT license. Source author: Leonardo de Moura, 2011.
 package sat
 
 import (

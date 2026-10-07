@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Selected obj_map/core_hashtable algorithms, with explicit callback metadata.
 package ast
 

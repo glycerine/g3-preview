@@ -1,5 +1,4 @@
 // Source: src/ast/ast_smt2_pp.cpp:165-291; src/util/rational.cpp:64-83.
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 import (

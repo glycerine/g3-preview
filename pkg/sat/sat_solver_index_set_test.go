@@ -1,5 +1,4 @@
 // Source: src/util/hashtable.h:139–620; src/util/map.h:24–163; src/sat/sat_solver.h:481–483.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package sat
 
 import (

@@ -1,6 +1,4 @@
 // Source: src/smt/params/smt_params.h:75-318; src/smt/params/smt_params.cpp:24-164.
-// Source author: Leonardo de Moura (2008-02-20).
-// Licensed under the MIT license; see LICENSE.txt.
 package smtcore
 
 import (

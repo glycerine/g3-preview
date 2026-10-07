@@ -1,5 +1,4 @@
 // Source: src/util/mpf.cpp:1984-2027; Runtime signed-host guard helper profile.
-// Licensed under the MIT license. Source author: Christoph Wintersteiger.
 package util
 
 import (

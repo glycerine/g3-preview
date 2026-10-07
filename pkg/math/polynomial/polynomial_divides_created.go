@@ -1,6 +1,5 @@
 // Source: src/math/polynomial/polynomial.cpp:5177-5182;
 // src/math/polynomial/polynomial.cpp:810-851.
-// Licensed under the MIT license. Source author: Leonardo de Moura (leonardo).
 package polynomial
 
 func (m *MultivariatePolynomialCore) dividesCreatedQuotient(a, b Monomial, r *polynomialDividesInvocationReceipt) (Monomial, bool, error) {

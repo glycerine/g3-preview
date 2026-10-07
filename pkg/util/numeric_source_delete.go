@@ -1,5 +1,4 @@
 // Source: src/math/polynomial/linear_eq_solver.h:38-49; src/util/mpz.cpp.
-// Licensed under the MIT license. Source author: Leonardo de Moura, 2012.
 package util
 
 import (

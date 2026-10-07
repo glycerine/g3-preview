@@ -1,5 +1,4 @@
-// Source: src/util/debug.cpp:28–79 and src/util/debug.h:63–65. Licensed under the MIT license.
-// Source author: Leonardo de Moura, 2006. Independent finite state and owning-prefix tests.
+// Source: src/util/debug.cpp:28–79 and src/util/debug.h:63–65.
 package util
 
 import (

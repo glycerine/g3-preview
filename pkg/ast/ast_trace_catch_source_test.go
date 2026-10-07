@@ -1,6 +1,4 @@
-// Licensed under the MIT license; see LICENSE.txt.
 // Source: src/ast/ast.cpp:2114-2134 (actual post-registration exception catch).
-// Source author: Leonardo de Moura.
 package ast
 
 import (

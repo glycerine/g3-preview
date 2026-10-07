@@ -1,5 +1,4 @@
 // Source: src/util/mpz.cpp:1385-1410; src/util/mpn.cpp:371-399; src/util/buffer.h.
-// Licensed under the MIT license.
 package util
 
 // SourceCharacterBuffer is the actual source character buffer embedded in a

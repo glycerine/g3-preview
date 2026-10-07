@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Actual basic_decl_plugin constructor, lazy declaration caches, and dispatch.
 package ast
 

@@ -1,5 +1,4 @@
 // Source: src/util/mpz.h:393-426. Literal RAW tmp, Mul then Add/Sub, end-only DEL.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package util
 
 import (

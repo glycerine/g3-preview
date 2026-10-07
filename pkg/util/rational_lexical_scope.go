@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/util/mpq.cpp; src/util/scoped_numeral.h.
 package util
 

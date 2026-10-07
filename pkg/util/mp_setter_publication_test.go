@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/util/mpq.h paired setter branch and caller publication actions.
 package util
 

@@ -1,5 +1,4 @@
 // Source: src/util/mpf.cpp:1487-1517; src/util/mpf.h:119,122,137-138.
-// Licensed under the MIT license. Source author: Christoph Wintersteiger.
 package util
 
 func (m *ArbitraryFloatManager) Le(x, y *ArbitraryFloat) (bool, error) { return m.Lte(x, y) }

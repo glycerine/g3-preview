@@ -1,6 +1,5 @@
 //go:build g3debug
 
-// Licensed under the MIT license.
 // Source: src/util/mpz.cpp selected Lehmer and ExtendedGCD SASSERT sites.
 package util
 

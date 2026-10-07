@@ -1,5 +1,4 @@
 // Source: src/test/polynomial.cpp:741-821; src/math/polynomial/polynomial.cpp:5896-5901.
-// Licensed under the MIT license. Source author: Leonardo de Moura (leonardo).
 package polynomial
 
 var polynomialPSCOriginalCases = []struct {

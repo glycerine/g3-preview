@@ -1,6 +1,4 @@
 // Source: src/util/fixed_bit_vector.cpp:78-80; src/util/small_object_allocator.cpp:72-96.
-// Licensed under the MIT license. Source authors: Nikolaj Bjorner, 2014-9-15;
-// Leonardo de Moura, 2006-10-03.
 package util
 
 import (

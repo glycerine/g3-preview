@@ -1,5 +1,4 @@
 // Source: src/util/small_object_allocator.cpp:allocate/deallocate.
-// Licensed under the MIT license.
 package util
 
 // Embedded in the charged caller frame. This owns only a failed raw allocation

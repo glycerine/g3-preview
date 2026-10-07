@@ -1,5 +1,4 @@
 // Source: src/sat/sat_mus.cpp:60–127,210–229; independent source value fixtures.
-// Licensed under the MIT license. Source author: Nikolaj Bjorner, 2014.
 package sat
 
 import (

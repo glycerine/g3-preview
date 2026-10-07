@@ -1,7 +1,6 @@
 // Source: src/util/prime_generator.cpp:99-107.
 // This Go binding accessor exposes the exact pointer selected by the literal
 // null-generator iterator constructor; it is not a named C++ getter port.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package util
 
 import (

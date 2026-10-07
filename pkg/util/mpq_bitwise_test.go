@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source mpq.h delegates to mpz and resets the output denominator afterward.
 package util
 

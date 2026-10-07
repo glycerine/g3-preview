@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete ast_fast_mark<1/2> and ast_ref_fast_mark<1/2> specializations.
 package ast
 

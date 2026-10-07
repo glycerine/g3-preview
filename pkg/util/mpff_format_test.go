@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Actual registered print routes.
 package util
 

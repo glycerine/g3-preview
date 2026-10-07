@@ -1,7 +1,5 @@
 // Source: src/ast/fpa_decl_plugin.cpp:23-49,182-231;
 // src/ast/fpa_decl_plugin.h:109-122; src/ast/ast.cpp:1406-1414,1635-1638.
-// Source author: Leonardo de Moura (2012-01-15).
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 import (

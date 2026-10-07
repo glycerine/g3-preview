@@ -1,5 +1,4 @@
 // Source: src/math/polynomial/upolynomial.cpp:3042-3118.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package polynomial
 
 import (

@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 package ast
 
 // Iterator borrows the collector. A scalar epoch checks the Go lifetime

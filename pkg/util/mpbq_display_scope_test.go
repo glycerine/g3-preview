@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source mpbq.cpp:426–515 raw mpz locals.
 package util
 

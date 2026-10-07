@@ -1,6 +1,4 @@
 // Source: src/util/mpf.cpp:1519-1569; selected libstdc++ basic_string.tcc:326-344,414-429.
-// Source author: Christoph Wintersteiger. Concrete library profile is a Go adapter.
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete source util/prime_generator.{h,cpp}, caller-confined owner profile.
 package util
 

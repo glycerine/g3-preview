@@ -1,4 +1,4 @@
-// Source: src/math/polynomial/polynomial.cpp:449-505; src/math/polynomial/polynomial.h. Licensed under the MIT license.
+// Source: src/math/polynomial/polynomial.cpp:449-505; src/math/polynomial/polynomial.h.
 // Concrete translation of src/math/polynomial/polynomial.cpp:449-505 monomial2pos.
 package polynomial
 

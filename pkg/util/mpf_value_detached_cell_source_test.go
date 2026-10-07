@@ -1,5 +1,4 @@
 // Source: src/util/mpz.h:156-164; src/util/small_object_allocator.cpp:allocate/deallocate.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package util
 
 import (

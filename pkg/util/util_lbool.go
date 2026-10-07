@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Translation of src/util/lbool.h and lbool.cpp, Leonardo de Moura.
 package util
 

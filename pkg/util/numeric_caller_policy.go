@@ -1,5 +1,4 @@
 // Source: src/util numeric primitive caller boundaries.
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 // NumericCallerPolicy borrows an existing caller-owned value. Interface

@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/util/ext_gcd.h and src/test/rational.cpp::tst7.
 package util
 

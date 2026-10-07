@@ -1,5 +1,4 @@
 // Source: src/util/mpf.cpp:1695-1711,1922-1945; src/util/mpz.h:133-164.
-// Licensed under the MIT license. Source author: Christoph Wintersteiger.
 package util
 
 func (c integerAllocationInvocationContext) conversionFrame(z *IntegerManager, executing bool) *arbitraryFloatRationalConversionScope {

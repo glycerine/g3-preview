@@ -1,7 +1,5 @@
 // Source: src/smt/smt_statistics.h:26-54; src/smt/smt_statistics.cpp:24-26;
 // src/smt/smt_context.h:70.
-// Source author: Leonardo de Moura (2008-02-21).
-// Licensed under the MIT license; see LICENSE.txt.
 package smtcore
 
 import (

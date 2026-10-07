@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete expr_substitution: scalar owners and actual encoded backing.
 package ast
 

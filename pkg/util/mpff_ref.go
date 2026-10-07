@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 //go:build !g3checked
 
 // Concrete MPFF scalar packing.

@@ -1,5 +1,4 @@
-// Source: src/sat/sat_asymm_branch.cpp:81–82,92–119. Licensed under the MIT license.
-// Source author: Leonardo de Moura, 2011.
+// Source: src/sat/sat_asymm_branch.cpp:81–82,92–119.
 package sat
 
 import (

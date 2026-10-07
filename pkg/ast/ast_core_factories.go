@@ -1,6 +1,4 @@
 // Source: src/ast/ast.cpp:2064-2211.
-// Source author: Leonardo de Moura.
-// Licensed under the MIT license; see LICENSE.txt.
 // Source node construction. Results are non-owning source RC0 handles.
 package ast
 

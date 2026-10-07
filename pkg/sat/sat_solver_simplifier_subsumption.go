@@ -1,5 +1,4 @@
 // Source: src/sat/sat_simplifier.cpp; src/sat/sat_simplifier.h.
-// Licensed under the MIT license.
 package sat
 
 func (k *satSimplifierKernel) occurrenceCount(l Literal) (uint32, error) {

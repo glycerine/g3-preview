@@ -1,7 +1,5 @@
 // Source: src/util/map.h:24-196; src/util/hashtable.h:159-215,249,371-451,559,643-644.
 // src/util/debug.h:60-65,76-89; src/util/debug.cpp:37-68.
-// Source author: Leonardo de Moura (2006-10-14; 2006-09-11).
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

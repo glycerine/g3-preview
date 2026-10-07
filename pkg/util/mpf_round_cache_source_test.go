@@ -1,5 +1,4 @@
 // Source: src/util/mpf.cpp:1984-2027; actual reached scoped NUM/division leaves.
-// Licensed under the MIT license. Source author: Christoph Wintersteiger.
 package util
 
 import (

@@ -1,6 +1,4 @@
 // Source: src/util/warning.cpp:63-89,109-169; src/util/warning.h:24-57.
-// Source author: Leonardo de Moura (2006-12-01).
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

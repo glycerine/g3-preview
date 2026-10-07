@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Independent test-only physical roots for the source-backed Integer owner.
 // Source: src/util/mpz.h, src/util/mpz.cpp, src/util/mpq.h.
 package util

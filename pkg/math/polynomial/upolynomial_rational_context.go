@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: math/polynomial/sexpr2upolynomial.cpp; util scoped-numeral lifetimes.
 package polynomial
 

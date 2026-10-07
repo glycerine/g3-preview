@@ -1,6 +1,4 @@
 // Source: src/ast/reg_decl_plugins.cpp:30-55.
-// Source author: Leonardo de Moura.
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 import (

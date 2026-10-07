@@ -1,7 +1,5 @@
 // Source: src/math/polynomial/polynomial.cpp:1315-1366,1440-1448;
 // src/util/permutation.h:56-91; src/util/vector.h:449-451.
-// Source author: Leonardo de Moura (leonardo), 2011-11-15.
-// Licensed under the MIT license; see LICENSE.txt.
 package polynomial
 
 import (

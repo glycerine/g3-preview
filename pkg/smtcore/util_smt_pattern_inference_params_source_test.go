@@ -1,7 +1,5 @@
 // Source: src/ast/pattern/pattern_inference_params.h:30-50;
 // src/ast/pattern/pattern_inference_params.cpp:22-47; src/ast/pattern/pattern_inference_params_helper.pyg:1-12.
-// Source author: Leonardo de Moura (2008-03-24; 2012-12-02).
-// Licensed under the MIT license; see LICENSE.txt.
 package smtcore
 
 import (

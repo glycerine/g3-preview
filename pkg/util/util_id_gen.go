@@ -1,4 +1,4 @@
-// Source: src/util/id_gen.h; src/util/vector.h. Licensed under the MIT license.
+// Source: src/util/id_gen.h; src/util/vector.h.
 // Translation of src/util/id_gen.h, Leonardo de Moura, 2008-02-02.
 package util
 

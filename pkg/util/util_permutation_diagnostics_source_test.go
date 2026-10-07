@@ -1,6 +1,4 @@
 // Source: src/util/permutation.cpp:21-76; src/util/debug.h:60-65.
-// Source author: Leonardo de Moura (2011-06-10).
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

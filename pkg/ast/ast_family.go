@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Translation of ast.h/ast.cpp::family_manager, Leonardo de Moura.
 package ast
 

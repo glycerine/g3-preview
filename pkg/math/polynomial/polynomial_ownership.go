@@ -1,7 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:1392-1423,2481-2495. Licensed under the MIT license.
+// Source: src/math/polynomial/polynomial.cpp:1392-1423,2481-2495.
 // Explicit owning abort for retained incomplete placement; not a C++ destructor
 // of an object whose constructor did not complete.
-// Source author: Leonardo de Moura (leonardo), 2011-11-15.
 package polynomial
 
 import (

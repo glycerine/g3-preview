@@ -1,6 +1,5 @@
 // Source: selected libstdc++ basic_string.h/basic_string.tcc and
 // src/smt/params/qi_params.cpp:43-64; src/util/params.cpp:928-930.
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

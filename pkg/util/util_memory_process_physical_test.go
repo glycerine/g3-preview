@@ -1,6 +1,4 @@
 // Source: src/util/memory_manager.cpp:89-113,153-160; src/util/gparams.cpp:81-105.
-// Source author: Nikolaj Bjorner (2007-07-24); Leonardo de Moura (2012-11-29).
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

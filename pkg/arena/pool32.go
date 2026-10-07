@@ -1,5 +1,3 @@
-// Licensed under the MIT license.
-// Licensed under the MIT license; see LICENSE.txt in the source distribution.
 // Concrete constructed<true> scalar lifecycle adaptation of object_allocator.h.
 package arena
 

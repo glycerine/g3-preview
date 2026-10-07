@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/util/mpz.cpp, src/util/mpq.h.
 package util
 

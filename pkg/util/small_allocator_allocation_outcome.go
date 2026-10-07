@@ -1,5 +1,4 @@
 // Source: src/util/small_object_allocator.cpp:allocate.
-// Licensed under the MIT license.
 package util
 
 type smallAllocatorAllocationScope struct {

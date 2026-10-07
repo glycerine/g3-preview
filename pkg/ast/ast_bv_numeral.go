@@ -1,5 +1,4 @@
 // Source: src/ast/bv_decl_plugin.cpp:416-435,778-789,865-868.
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 import (

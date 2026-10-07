@@ -1,6 +1,4 @@
-// Licensed under the MIT license.
 // Translated from src/util/mpn.h and src/util/mpn.cpp.
-// Original author: Christoph Wintersteiger, 2011-11-16.
 
 // Package mpnum contains the fork's independent exact numerical algorithms.
 package util

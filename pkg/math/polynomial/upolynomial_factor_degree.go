@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete factorization_degree_set and its actual bit_vector specialization.
 package polynomial
 

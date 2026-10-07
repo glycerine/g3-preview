@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Tests-first concrete shared memory owner contract; no duplicate implementation.
 package util
 

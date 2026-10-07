@@ -1,5 +1,4 @@
 // Source: src/util/mpq.h/.cpp: caller observations of actual RAW invocations.
-// Licensed under the MIT license.
 package util
 
 type RationalRawInvocationState struct {

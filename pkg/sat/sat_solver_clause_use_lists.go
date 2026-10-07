@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Selected LAZY_USE_LIST specialization of sat_simplifier.h/.cpp and vector.h.
 package sat
 

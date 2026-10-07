@@ -1,5 +1,4 @@
 // Source: src/sat/sat_solver.h; src/sat/sat_solver.cpp; src/sat/sat_var_queue.h; src/util/vector.h; src/util/memory_manager.cpp.
-// Licensed under the MIT license.
 package sat
 
 import (

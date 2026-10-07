@@ -1,4 +1,4 @@
-// Source: src/tactic/model_converter.cpp:176-181. Licensed under the MIT license.
+// Source: src/tactic/model_converter.cpp:176-181.
 package tactic
 
 import (

@@ -1,5 +1,4 @@
 // Source: src/ast/format.cpp:147-152; src/util/string_buffer.h:62-65.
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 import (

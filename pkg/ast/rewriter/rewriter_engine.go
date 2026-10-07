@@ -1,6 +1,5 @@
 // Source: src/ast/rewriter/rewriter_def.h:23-750;
 // src/ast/rewriter/rewriter.h:194-363; src/util/vector.h:59-99.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package rewriter
 
 import (

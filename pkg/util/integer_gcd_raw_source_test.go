@@ -1,5 +1,4 @@
 // Source: src/util/mpz.cpp:730-817 (LEHMER_GCD), src/util/mpz.h:393-407.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package util
 
 import (

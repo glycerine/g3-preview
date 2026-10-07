@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source lexical sbuffer<char,1024> from util/buffer.h and mpz.cpp display.
 package util
 

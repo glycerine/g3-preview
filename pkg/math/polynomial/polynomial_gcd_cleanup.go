@@ -1,6 +1,5 @@
 // Source: src/math/polynomial/polynomial.cpp:3555-4506;
 // src/util/obj_ref.h; src/util/ref_buffer.h; src/util/scoped_numeral.h.
-// Licensed under the MIT license. Source author: Leonardo de Moura (leonardo).
 package polynomial
 
 // Explicit owning acknowledgement. Completed concrete local destruction is

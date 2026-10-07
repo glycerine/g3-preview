@@ -1,5 +1,4 @@
 // Source: src/math/polynomial/upolynomial_factorization_int.h:124-417.
-// Licensed under the MIT license.
 // Concrete ufactorization_combination_iterator, without template dispatch.
 package polynomial
 

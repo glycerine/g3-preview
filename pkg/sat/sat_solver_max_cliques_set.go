@@ -1,5 +1,4 @@
 // Source: src/util/uint_set.h:24-225; src/util/vector.h:191-216.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package sat
 
 // Actual uint_set bit words, distinct from sat::literal_set's char membership.

@@ -1,6 +1,4 @@
 // Source: src/ast/ast.cpp:36-130; src/ast/ast.h:156-242.
-// Source author: Leonardo de Moura.
-// Licensed under the MIT license.
 // Source parameter constructors, copy/move, destruction, equality and hash.
 package ast
 

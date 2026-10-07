@@ -1,5 +1,4 @@
 // Source: src/util/mpq.cpp:156-185.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package util
 
 // These are the four literal RAW declarations. Failure omits the end label's

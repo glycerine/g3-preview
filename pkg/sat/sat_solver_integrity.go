@@ -1,5 +1,4 @@
-// Source: src/sat/sat_solver.cpp:711–716,2845–2850,3053–3075. Licensed under the MIT license.
-// Source author: Leonardo de Moura, 2011.
+// Source: src/sat/sat_solver.cpp:711–716,2845–2850,3053–3075.
 package sat
 
 func (l *satSolverClauseLifecycle) bindIntegrity(g *satSolverGC) error {

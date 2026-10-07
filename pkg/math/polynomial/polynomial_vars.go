@@ -1,6 +1,5 @@
 // Source: src/math/polynomial/polynomial.cpp:3186-3205,7359-7361;
-// src/math/polynomial/polynomial.h:924. Licensed under the MIT license.
-// Source author: Leonardo de Moura.
+// src/math/polynomial/polynomial.h:924.
 package polynomial
 
 // Vars resets xs, then publishes distinct variables in first-encounter order.

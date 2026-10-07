@@ -1,5 +1,4 @@
 // Source: src/math/polynomial/polynomial.cpp:5574-5583,5897-5902.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package polynomial
 
 type polynomialPSCChain1Scope struct {

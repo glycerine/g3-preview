@@ -1,6 +1,4 @@
-// Licensed under the MIT license; see LICENSE.txt.
 // Source: src/util/mpz.cpp:1385-1410; src/util/mpq.cpp:130-141.
-// Source author: Leonardo de Moura.
 package util
 
 func (out *NumericTextStream) AppendNumeralCString(v NumeralCStringView) error {

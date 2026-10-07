@@ -1,5 +1,4 @@
 // Source: src/util/mpz.cpp:big_set; src/util/mpz.h:allocate.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package util
 
 import (

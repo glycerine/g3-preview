@@ -1,5 +1,4 @@
 // Source: src/util/vector.h:45–201; actual nested output ownership and lifetime.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package sat
 
 import (

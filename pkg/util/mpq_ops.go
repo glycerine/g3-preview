@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/util/mpq.h mixed arithmetic and fused operations.
 package util
 

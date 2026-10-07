@@ -1,6 +1,5 @@
 // Source: src/math/polynomial/polynomial.cpp:1315-1366,1440-1460,2462-2464,7022-7024;
-// src/util/permutation.h:57-91. Licensed under the MIT license.
-// Source author: Leonardo de Moura (leonardo), 2011-11-15.
+// src/util/permutation.h:57-91.
 package polynomial
 
 import (

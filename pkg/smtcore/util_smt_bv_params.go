@@ -1,8 +1,6 @@
 // Source: src/smt/params/theory_bv_params.h:24-50;
 // src/smt/params/theory_bv_params.cpp:23-40; src/smt/params/smt_params_helper.pyg:38-39;
 // src/ast/rewriter/bv_rewriter_params.pyg:1-9; scripts/mk_genfile_common.py:895-939.
-// Source author: Leonardo de Moura (2008-06-06; 2012-12-02).
-// Licensed under the MIT license; see LICENSE.txt.
 package smtcore
 
 import (

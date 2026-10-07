@@ -1,5 +1,4 @@
 // Source: src/util/mpz.cpp/mpn.cpp; diagnostics of actual numeric storage.
-// Licensed under the MIT license.
 package util
 
 type NumericStorageStats struct {

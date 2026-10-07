@@ -1,5 +1,4 @@
 // Source: src/util/string_buffer.h:67-76; src/ast/ast_smt2_pp.cpp:262-268.
-// Licensed under the MIT license. Source authors: Leonardo de Moura; Christoph Wintersteiger.
 package util
 
 import (

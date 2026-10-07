@@ -1,7 +1,5 @@
 // Source: src/smt/params/dyn_ack_params.h:24-51; src/smt/params/dyn_ack_params.cpp:22-41;
 // src/smt/params/smt_params_helper.pyg:61-66; scripts/mk_genfile_common.py:895-939.
-// Source author: Leonardo de Moura (2007-05-18).
-// Licensed under the MIT license; see LICENSE.txt.
 package smtcore
 
 import (

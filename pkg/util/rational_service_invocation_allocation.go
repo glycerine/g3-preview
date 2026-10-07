@@ -1,5 +1,4 @@
 // Source: src/util/rational.h; src/util/mpz.h:allocate.
-// Licensed under the MIT license.
 package util
 
 func (c *RationalServiceInvocation) allocationContext() integerAllocationInvocationContext {

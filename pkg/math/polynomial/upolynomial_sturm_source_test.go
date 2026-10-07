@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Tests-first source routes from src/test/upolynomial.cpp.
 package polynomial
 

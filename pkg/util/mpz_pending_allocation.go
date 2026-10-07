@@ -1,5 +1,4 @@
 // Source: src/util/mpz.h:124-149; src/util/mpz.cpp:142-161.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package util
 
 import (

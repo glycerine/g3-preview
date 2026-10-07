@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/util/mpz.cpp:1412 and src/util/scoped_numeral.h:31-33.
 package util
 

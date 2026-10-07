@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 package polynomial
 
 // Exact active source constant table; never mutated. The #if 0 table is not selected.

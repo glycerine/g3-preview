@@ -1,5 +1,4 @@
 // Source: src/math/polynomial caller scopes: synchronous primitive borrows.
-// Licensed under the MIT license.
 package polynomial
 
 import (

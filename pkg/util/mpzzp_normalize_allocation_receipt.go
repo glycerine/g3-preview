@@ -1,5 +1,4 @@
 // Source: src/util/mpzzp.h:58-68,111-114; src/util/mpz.cpp:quot_rem_core.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package util
 
 // Direct transport of actual integer-cell and source-buffer acquisition leaves.

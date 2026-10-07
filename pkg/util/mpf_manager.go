@@ -1,7 +1,5 @@
 // Source: src/util/mpf.cpp:61-67,1519-1569; src/util/mpf.h:65-73,241-259;
 // src/util/map.h:285; src/util/hashtable.h:245-257.
-// Source author: Christoph Wintersteiger (2011-12-01).
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

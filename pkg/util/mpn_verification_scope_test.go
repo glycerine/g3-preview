@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/util/mpn.cpp:158-168 and 206-217.
 package util
 

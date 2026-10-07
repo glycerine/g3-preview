@@ -1,7 +1,5 @@
 // Source: src/util/vector.h:59-100,178-189,215-240,350-365,531-546;
 // src/util/permutation.cpp:21-32.
-// Source author: Leonardo de Moura.
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

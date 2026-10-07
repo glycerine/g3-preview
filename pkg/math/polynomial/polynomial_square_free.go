@@ -1,6 +1,5 @@
 // Source: src/math/polynomial/polynomial.cpp:4529-4598,7232-7246;
 // src/math/polynomial/polynomial.h; src/util/obj_ref.h.
-// Licensed under the MIT license. Source author: Leonardo de Moura (leonardo).
 package polynomial
 
 import (

@@ -1,4 +1,4 @@
-// Source: src/sat/sat_solver.cpp:898–926,1141–1167,1822–1883,1999–2087,2545–2549. Licensed under the MIT license.
+// Source: src/sat/sat_solver.cpp:898–926,1141–1167,1822–1883,1999–2087,2545–2549.
 package sat
 
 func (s *satSolverConflictResolution) trackingAssumptions() (bool, error) {

@@ -1,6 +1,4 @@
 // Source: src/util/debug.cpp:79-80 (formatted std::cin sentry tie()->flush()).
-// Source author: Leonardo de Moura (2006-09-11).
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 // Flush is the selected direct-emission stream adapter. Every prior file byte

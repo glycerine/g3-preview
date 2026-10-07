@@ -1,5 +1,3 @@
-// Licensed under the MIT license.
-// Source authors: Nikolaj bjorner (nbjorner), 2007-08-06; Leonardo de Moura (leonardo), 2011-04-27.
 // Source: src/util/small_object_allocator.h; src/util/small_object_allocator.cpp; explicit scalar pointer codec.
 package util
 

@@ -1,5 +1,4 @@
 // Source: src/math/polynomial/polynomial.cpp:5499-5572.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package polynomial
 
 type polynomialSubresultantChainScope struct {

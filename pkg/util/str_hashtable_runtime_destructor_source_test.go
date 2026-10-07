@@ -1,7 +1,5 @@
 // Source: src/util/hashtable.h:146-148,259-261,287-322;
 // src/util/memory_manager.h:112-119; src/util/memory_manager.cpp:274-325.
-// Source author: Leonardo de Moura (2006-09-11).
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

@@ -1,5 +1,4 @@
 // Source: src/util/permutation.h; src/test/permutation.cpp.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package util
 
 import (

@@ -1,4 +1,4 @@
-// Source: src/test/vector.cpp. Licensed under the MIT license.
+// Source: src/test/vector.cpp.
 package test
 
 import (

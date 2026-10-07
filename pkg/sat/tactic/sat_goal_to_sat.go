@@ -1,6 +1,5 @@
 // Source: src/sat/tactic/goal2sat.cpp:41-423,488-500;
 // src/ast/expr2var.cpp:25-54.
-// Licensed under the MIT license. Source author: Leonardo de Moura (2011).
 package tactic
 
 import (

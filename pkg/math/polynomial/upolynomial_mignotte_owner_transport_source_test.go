@@ -1,6 +1,5 @@
 // Source: src/math/polynomial/upolynomial_factorization.cpp:979-1017;
-// src/util/memory_manager.cpp:274-285. Licensed under the MIT license.
-// Source author: Leonardo de Moura.
+// src/util/memory_manager.cpp:274-285.
 package polynomial
 
 import (

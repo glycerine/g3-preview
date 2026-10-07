@@ -1,5 +1,4 @@
 // Source: src/util/mpz.cpp:2054-2069; src/util/scoped_numeral.h:31-33.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package util
 
 // The actual Integer method owns its scoped tmp NUM, including the zero

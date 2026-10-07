@@ -1,5 +1,4 @@
 // Source: src/math/polynomial/polynomial.cpp:5356-5480.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package polynomial
 
 func (m *MultivariatePolynomialManager) resultantLeadingCoefficient(s *polynomialGCDFunctionScope, p Polynomial, x uint32) (Polynomial, error) {

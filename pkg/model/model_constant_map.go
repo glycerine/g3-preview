@@ -1,5 +1,4 @@
 // Source: src/util/obj_hashtable.h:61-154; src/util/hashtable.h:183-256,403-476,533-577.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package model
 
 import (

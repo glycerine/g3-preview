@@ -2,7 +2,6 @@
 // Source: src/math/polynomial/upolynomial.cpp:1298-1321.
 // Source: src/math/polynomial/algebraic_numbers.cpp:1565-1577; src/util/mpz.h:124-149.
 // Source: src/util/mpz.h:allocate; src/util/mpz.cpp scratch/publication callers.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package polynomial
 
 import (

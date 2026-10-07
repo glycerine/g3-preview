@@ -1,7 +1,5 @@
 // Source: src/util/util.cpp:22-40; src/util/util.h:176-186;
 // src/util/small_object_allocator.cpp:172-242.
-// Licensed under the MIT license. See LICENSE.txt.
-// Source author: Leonardo de Moura (leonardo), 2006.
 package util
 
 import (

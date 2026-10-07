@@ -1,6 +1,4 @@
 // Source: src/util/debug.h:63-92; src/util/error_codes.h:29.
-// Source author: Leonardo de Moura (2006-09-11).
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

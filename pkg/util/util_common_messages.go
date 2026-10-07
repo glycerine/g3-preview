@@ -1,5 +1,4 @@
 // Source: src/util/common_msgs.h:22-39; src/util/common_msgs.cpp:21-27.
-// Licensed under the MIT license. Source author: Leonardo de Moura (2012-10-25).
 package util
 
 // Each variable represents both the source static pointer binding and its

@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Translation of src/sat/sat_model_converter.h/.cpp, Leonardo de Moura.
 package sat
 

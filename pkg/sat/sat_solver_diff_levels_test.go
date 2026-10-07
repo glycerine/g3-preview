@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: sat_solver.cpp:2218-2238; independent finite level-set oracle.
 package sat
 

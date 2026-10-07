@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Checked scalar replacements for borrowed ast.h field accessors.
 package ast
 

@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete scoped_numeral_vector.
 package util
 

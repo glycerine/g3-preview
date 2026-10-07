@@ -1,6 +1,5 @@
 // Source: src/util/mpz.cpp:big_set; src/util/mpz.h:allocate;
 // src/math/polynomial/polynomial.cpp:3318-3338.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package util
 
 import (

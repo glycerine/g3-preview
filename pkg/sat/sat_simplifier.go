@@ -1,5 +1,4 @@
-// Source: src/sat/sat_simplifier.h; src/sat/sat_simplifier.cpp:29–205,1482–1522. Licensed under the MIT license.
-// Source author: Leonardo de Moura, 2011.
+// Source: src/sat/sat_simplifier.h; src/sat/sat_simplifier.cpp:29–205,1482–1522.
 package sat
 
 import (

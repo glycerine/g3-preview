@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/util/mpq.cpp, src/util/rational.cpp, and infinitesimal headers.
 // Reverse member destruction and separate owning cleanup.
 package util

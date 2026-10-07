@@ -1,5 +1,4 @@
 // Source: math/polynomial numerical calls; synchronous utility owner exclusion.
-// Licensed under the MIT license.
 package polynomial
 
 import (

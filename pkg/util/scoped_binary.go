@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete MPBQ instantiation of scoped_numeral[_vector].h and MPBQ macros.
 package util
 

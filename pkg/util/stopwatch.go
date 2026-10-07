@@ -1,4 +1,4 @@
-// Source: src/util/stopwatch.h. Licensed under the MIT license.
+// Source: src/util/stopwatch.h.
 // Translation of src/util/stopwatch.h's POSIX control flow.
 package util
 

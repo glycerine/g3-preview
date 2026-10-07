@@ -1,6 +1,4 @@
 // Source: src/util/memory_manager.cpp:89-113,153-160.
-// Source author: Nikolaj Bjorner (2007-07-24).
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 // Close is owning abort of only actual parent acquisitions. It never simulates

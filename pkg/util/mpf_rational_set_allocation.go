@@ -1,5 +1,4 @@
 // Source: src/util/mpf.cpp:233-300; src/util/mpz.h:156-164.
-// Licensed under the MIT license. Source authors: Christoph Wintersteiger; Leonardo de Moura.
 package util
 
 import (

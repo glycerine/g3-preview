@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Actual flat upolynomial_sequence and svector<unsigned> specialization.
 package polynomial
 

@@ -1,5 +1,4 @@
 // Source: src/sat/sat_solver.cpp:3157-3249. Actual allocation and owner prefixes.
-// Licensed under the MIT license. Source author: Nikolaj Bjorner.
 package sat
 
 import (

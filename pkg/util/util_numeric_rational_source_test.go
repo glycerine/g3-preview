@@ -1,6 +1,4 @@
-// Licensed under the MIT license; see LICENSE.txt.
 // Source: src/util/mpq.cpp:130-141; src/util/mpz.cpp:1385-1410.
-// Source author: Leonardo de Moura.
 package util
 
 import (

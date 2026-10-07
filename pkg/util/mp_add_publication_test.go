@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Added action-order tests for the additive and mixed-product mpq.h family.
 // Source: src/util/mpz.h, src/util/mpz.cpp, src/util/mpq.h.
 package util

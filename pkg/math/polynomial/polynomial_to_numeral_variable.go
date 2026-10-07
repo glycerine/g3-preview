@@ -1,5 +1,4 @@
 // Source: src/math/polynomial/upolynomial.h:426-450.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package polynomial
 
 // UnivariateManager returns the actual dense manager owned by this manager.

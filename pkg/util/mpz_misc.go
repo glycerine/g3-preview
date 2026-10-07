@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Scalar inspection from src/util/mpz.h/.cpp, internal 32-bit digit baseline.
 package util
 

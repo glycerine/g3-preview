@@ -1,5 +1,5 @@
 // Source dependency: src/math/polynomial/polynomial.cpp:4053-4068;
-// src/test/lp.cpp:1459. Licensed under the MIT license.
+// src/test/lp.cpp:1459.
 package clibrand
 
 import (

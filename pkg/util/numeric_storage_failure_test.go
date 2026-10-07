@@ -1,4 +1,4 @@
-// Source: src/util/mpq.h; src/util/rational.h (ownership audit adaptation). Licensed under the MIT license.
+// Source: src/util/mpq.h; src/util/rational.h (ownership audit adaptation).
 package util
 
 import (

@@ -1,6 +1,4 @@
-// Licensed under the MIT license.
 // Translation of src/util/bit_vector.h and bit_vector.cpp.
-// Author: Leonardo de Moura (leonardo), 2006-10-03.
 package util
 
 import (

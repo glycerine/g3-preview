@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete ast_manager proof construction/inspection from ast.h and ast.cpp.
 package ast
 

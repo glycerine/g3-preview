@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Explicit little-endian word views over the sole initialized-byte backing.
 package util
 

@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Assertions translated from src/test/bit_vector.cpp.
 package util
 

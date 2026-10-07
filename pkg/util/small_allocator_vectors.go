@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source vector.h pointer specializations: actual runtime-backed lexical values.
 package util
 

@@ -1,5 +1,4 @@
 // Source: src/test/bits.cpp; src/util/bit_util.h; src/util/bit_util.cpp.
-// Licensed under the MIT license. Source utility author: Leonardo de Moura, 2012.
 package util
 
 import (

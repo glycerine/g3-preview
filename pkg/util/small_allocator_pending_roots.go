@@ -1,5 +1,4 @@
 // Source: src/util/small_object_allocator.cpp; src/util/memory_manager.cpp.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package util
 
 // PendingRoots exposes only the actual allocation and two lexical scratch

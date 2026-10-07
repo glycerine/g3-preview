@@ -1,6 +1,5 @@
-// Licensed under the MIT license.
 // Source: src/util/mpz.cpp:49-84,560-817 (_MP_INTERNAL / LEHMER_GCD);
-// src/util/mpz.h:393-426 addmul/submul. Original author: Leonardo de Moura.
+// src/util/mpz.h:393-426 addmul/submul.
 package util
 
 import (

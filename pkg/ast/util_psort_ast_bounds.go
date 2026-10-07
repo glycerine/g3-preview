@@ -1,6 +1,4 @@
 // Source: src/util/sorting_network.h:190-260,269-494,507-520.
-// Source author: Nikolaj Bjorner (2013-11-07).
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 func (s *PsortASTNetwork) ge(full bool, k, n uint32, p psortASTPointer) (result ASTHandle, err error) {

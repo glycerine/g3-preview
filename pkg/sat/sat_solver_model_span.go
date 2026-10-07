@@ -1,5 +1,4 @@
 // Source: src/sat/sat_types.h:138; src/util/lbool.h; src/util/vector.h:407–420; src/sat/sat_model_converter.cpp:35–114.
-// Licensed under the MIT license. Source author: Leonardo de Moura, 2011.
 package sat
 
 import (

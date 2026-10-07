@@ -1,6 +1,4 @@
 // Source: src/util/small_object_allocator.h; src/util/small_object_allocator.cpp; src/util/debug.h:63.
-// Licensed under the MIT license.
-// Source authors: Nikolaj bjorner (nbjorner), 2007-08-06; Leonardo de Moura (leonardo), 2006/2011.
 // Charged main adapter; all allocation algorithms live solely in memory.
 package util
 

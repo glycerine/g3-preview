@@ -1,5 +1,4 @@
 // Source: src/util/mpf.cpp:416-469; src/util/mpf.h:116-123.
-// Licensed under the MIT license. Source author: Christoph Wintersteiger.
 package util
 
 func (m *ArbitraryFloatManager) comparisonGuard(x, y *ArbitraryFloat) error {

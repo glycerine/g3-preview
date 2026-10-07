@@ -1,5 +1,4 @@
-// Source: src/util/bit_util.cpp; src/util/bit_util.h. Licensed under the MIT license.
-// Source author: Leonardo de Moura, 2012-09-11.
+// Source: src/util/bit_util.cpp; src/util/bit_util.h.
 package util
 
 import (

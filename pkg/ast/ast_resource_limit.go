@@ -1,6 +1,4 @@
 // Source: src/ast/ast.h:1455,1549-1550.
-// Source author: Leonardo de Moura.
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 // Canceled increments the manager's source resource count before testing the

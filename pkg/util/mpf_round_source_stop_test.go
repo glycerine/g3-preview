@@ -1,5 +1,4 @@
 // Source: src/util/mpf.cpp:2016-2027,1963-2098; real signed-host TLS guard profile.
-// Licensed under the MIT license. Source author: Christoph Wintersteiger.
 package util
 
 import (

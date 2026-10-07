@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Translation of src/util/smt2_util.h/.cpp, Leonardo de Moura.
 package util
 

@@ -1,6 +1,4 @@
 // Source: src/util/warning.cpp:109-159; src/util/vector.h:59-100,422-435,182-184.
-// Source author: Leonardo de Moura (2006-12-01).
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

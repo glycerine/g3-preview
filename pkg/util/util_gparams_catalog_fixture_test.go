@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 package util
 
 // Frozen exact source metadata, never read reference files at Go test runtime.

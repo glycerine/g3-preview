@@ -1,6 +1,4 @@
 // Source: src/smt/params/dyn_ack_params.h:24-51; src/smt/params/dyn_ack_params.cpp:22-41.
-// Source author: Leonardo de Moura (2007-05-18).
-// Licensed under the MIT license; see LICENSE.txt.
 package smtcore
 
 import (

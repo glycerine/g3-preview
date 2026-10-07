@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/math/polynomial/algebraic_numbers.cpp:383-388,1565-1577;
 // src/math/polynomial/upolynomial.cpp:1734-1764.
 package polynomial

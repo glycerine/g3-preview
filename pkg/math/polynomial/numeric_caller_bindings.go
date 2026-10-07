@@ -1,5 +1,4 @@
 // Source: src/math/polynomial caller-owned invocation state.
-// Licensed under the MIT license.
 package polynomial
 
 type integerManagerPolynomialBindings struct {

@@ -1,5 +1,4 @@
 // Source: src/tactic/goal.h:39-143; src/tactic/goal.cpp:26-329,488-631,656-707.
-// Licensed under the MIT license. Source author: Leonardo de Moura (2011).
 package tactic
 
 import (

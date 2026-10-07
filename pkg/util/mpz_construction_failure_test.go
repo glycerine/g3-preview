@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // mpz.cpp:87-140 constructor; mpz.h member order; implicit failed-constructor
 // member unwind excludes the completed mpz_manager destructor body.
 package util

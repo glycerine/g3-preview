@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source action-prefix regressions: src/util/mpz.h:156–163 and
 // src/util/mpz.cpp:274–279, 315–334, 1183–1207, 1556–1594.
 package util

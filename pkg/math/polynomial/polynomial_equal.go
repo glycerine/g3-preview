@@ -1,5 +1,4 @@
 // Source: src/math/polynomial/polynomial.cpp:449-505,4631-4655.
-// Licensed under the MIT license.
 package polynomial
 
 // queryPositions is the ONE concrete source m_m2pos member, not a private map.

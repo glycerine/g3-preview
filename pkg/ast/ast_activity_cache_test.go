@@ -1,6 +1,5 @@
 // Source: src/ast/act_cache.cpp:56-225; src/ast/act_cache.h:23-53;
 // src/util/chashtable.h:106-174,312-348,443-479.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package ast
 
 import (

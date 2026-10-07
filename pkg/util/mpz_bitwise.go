@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/util/mpz.cpp bitwise_or/and/xor/not, _MP_INTERNAL branch.
 package util
 

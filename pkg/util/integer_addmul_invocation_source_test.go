@@ -1,5 +1,4 @@
-// Source: src/util/mpz.h:393-407. Licensed under the MIT license.
-// Source author: Leonardo de Moura.
+// Source: src/util/mpz.h:393-407.
 package util
 
 import (

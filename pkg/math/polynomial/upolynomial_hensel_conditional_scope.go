@@ -1,6 +1,5 @@
 // Source: src/math/polynomial/upolynomial_factorization.cpp:805-871;
 // src/util/mpz.cpp:1453-1507.
-// Licensed under the MIT license. Source author: Dejan (t-dejanj), 2011-11-15.
 package polynomial
 
 func (c *upolyHenselCallerScope) finishIndividualSource() error {

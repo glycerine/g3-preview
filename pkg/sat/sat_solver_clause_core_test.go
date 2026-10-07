@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: sat_solver.cpp:367–465. Independent finite clause/watch oracles.
 package sat
 

@@ -1,5 +1,4 @@
 // Source: src/util/heap.h:27-28,272-285; src/util/vector.h:102-129,191-202.
-// Licensed under the MIT license. Source author: Leonardo de Moura, 2006-09-14.
 package util
 
 import (

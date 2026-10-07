@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete sbuffer<uint32,1024> storage from util/buffer.h and util/mpn.h.
 package util
 

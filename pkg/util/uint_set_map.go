@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete map<uint_set, unsigned, uint_set::hash, uint_set::eq> translation
 // from src/util/map.h, hashtable.h and uint_set.h; Leonardo de Moura.
 package util

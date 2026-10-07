@@ -1,6 +1,4 @@
 // Source: src/ast/bv_decl_plugin.cpp:26-178; src/ast/bv_decl_plugin.h:143-208.
-// Source author: Leonardo de Moura (2008-01-09).
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 import (

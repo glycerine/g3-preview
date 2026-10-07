@@ -1,4 +1,4 @@
-// Source: src/util/buffer.h:25-48. Licensed under the MIT license.
+// Source: src/util/buffer.h:25-48.
 package util
 
 import (

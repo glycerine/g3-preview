@@ -1,4 +1,4 @@
-// Source: src/sat/sat_cleaner.cpp:87–166. Licensed under the MIT license.
+// Source: src/sat/sat_cleaner.cpp:87–166.
 package sat
 
 import (

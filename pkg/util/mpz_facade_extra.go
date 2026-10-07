@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete public-method closure of src/util/mpz.h, internal 32-bit digits.
 package util
 

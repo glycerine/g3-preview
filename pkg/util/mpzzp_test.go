@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Added finite source-action fixtures: no registered direct mpzzp test exists.
 package util
 

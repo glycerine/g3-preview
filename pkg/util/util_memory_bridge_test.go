@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source-owner extraction bridge charges and nominal errors, tests first.
 package util
 

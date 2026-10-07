@@ -1,5 +1,4 @@
 // Source: src/util/mpz.h, mpq.h, mpbq.h, mpbqi.h, mpzzp.h.
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import "github.com/glycerine/g3/pkg/arena"

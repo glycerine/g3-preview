@@ -1,6 +1,4 @@
 // Source: src/util/approx_set.h:43-158,162-233; src/util/approx_set.cpp:22-51.
-// Source author: Leonardo de Moura (2007-03-02).
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

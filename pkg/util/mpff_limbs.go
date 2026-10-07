@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete indexed bit_util and source MPN Algorithms A/S/M, no borrowed slice.
 package util
 

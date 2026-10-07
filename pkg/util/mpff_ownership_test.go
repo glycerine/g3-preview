@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Owned-storage regressions for MPFF.
 package util
 

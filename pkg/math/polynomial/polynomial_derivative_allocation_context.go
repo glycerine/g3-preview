@@ -3,7 +3,6 @@
 // Source: src/math/polynomial/algebraic_numbers.cpp:1565-1577; src/math/polynomial/upolynomial.cpp:1734-1764.
 // Source: src/math/polynomial/polynomial.cpp:4507-4528;
 // src/util/mpz.cpp; src/util/mpzzp.h.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package polynomial
 
 import (

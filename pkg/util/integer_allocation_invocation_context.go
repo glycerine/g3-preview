@@ -1,5 +1,4 @@
 // Source: src/util/mpz.h:allocate; src/util/mpz.cpp scratch/publication callers.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package util
 
 // Explicit passed invocation identity. It carries no allocation snapshot and

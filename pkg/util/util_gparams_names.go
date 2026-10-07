@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 package util
 
 // Exact source static literal tables, borrowed read-only metadata, not cache.

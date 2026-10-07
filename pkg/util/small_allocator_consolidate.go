@@ -1,5 +1,3 @@
-// Licensed under the MIT license.
-// Source authors: Nikolaj bjorner (nbjorner), 2007-08-06; Leonardo de Moura (leonardo), 2006/2011.
 // Source: src/util/small_object_allocator.cpp:172–242; src/util/debug.h:63.
 package util
 

@@ -1,6 +1,4 @@
 // Source: src/util/mpq.cpp:28-34; src/util/mpf.cpp:61-67.
-// Source author: Leonardo de Moura; Christoph Wintersteiger.
-// Licensed under the MIT license.
 package util
 
 func (m *RationalManager) Error() string { return "mpnum: retained rational manager" }

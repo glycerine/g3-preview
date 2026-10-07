@@ -1,5 +1,4 @@
 // Source: src/util/small_object_allocator.cpp:72-96.
-// Licensed under the MIT license. Source author: Nikolaj Bjorner.
 package util
 
 import (

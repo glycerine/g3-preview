@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 package ast
 
 func (m *ASTManager) DependencyArrayMk(out *ASTDependencyArray) error {

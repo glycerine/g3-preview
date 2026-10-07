@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete finite-field square-free decomposition and Berlekamp source bodies.
 package polynomial
 

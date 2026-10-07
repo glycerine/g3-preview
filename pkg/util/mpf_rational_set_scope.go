@@ -1,5 +1,4 @@
 // Source: src/util/mpf.cpp:233-300; src/util/mpq.cpp:312-315.
-// Licensed under the MIT license. Source authors: Christoph Wintersteiger; Leonardo de Moura.
 package util
 
 // These are the actual reached lexical holders. Branch p2 and the nested

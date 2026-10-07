@@ -1,5 +1,4 @@
 // Source: src/sat/sat_solver.cpp:3252–3636; src/util/vector.h; src/util/hashtable.h.
-// Licensed under the MIT license. Source author: Nikolaj Bjorner.
 package sat
 
 import (

@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 package ast
 
 func (m *ASTManager) dependencyAppendVectorValues(v ASTDependencyRefVector, values []ASTDependency) error {

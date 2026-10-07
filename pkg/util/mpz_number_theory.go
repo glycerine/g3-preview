@@ -1,4 +1,4 @@
-// Source: src/util/mpz.cpp. Licensed under the MIT license.
+// Source: src/util/mpz.cpp.
 // Source: src/util/mpz.cpp array gcd, extended Euclid, lcm, divides.
 package util
 

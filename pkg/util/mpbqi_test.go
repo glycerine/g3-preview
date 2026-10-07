@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: old_interval.cpp tst2.
 package util
 

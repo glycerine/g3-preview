@@ -1,6 +1,4 @@
-// Licensed under the MIT license; see LICENSE.txt.
 // Source: src/ast/ast.cpp:917-979.
-// Source author: Leonardo de Moura (2006-09-28).
 package ast
 
 import (

@@ -1,6 +1,4 @@
 // Source: src/util/util.h:181; src/util/small_object_allocator.cpp:172-242.
-// Source authors: Leonardo de Moura; Nikolaj bjorner.
-// Licensed under the MIT license.
 // One borrowed cold dispatcher. Byte formatting remains in the caller package.
 package util
 

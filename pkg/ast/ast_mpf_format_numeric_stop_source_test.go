@@ -1,7 +1,6 @@
 //go:build g3checked && g3debug
 
 // Source: src/util/mpf.cpp:1519-1569; src/ast/fpa/fpa_decl_plugin.cpp.
-// Licensed under the MIT license.
 package ast
 
 import (

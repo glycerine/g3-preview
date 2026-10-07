@@ -1,7 +1,5 @@
 // Source: src/util/mpz.h:698-707.
-// Licensed under the MIT license.
 // Translated from src/util/mpz.h and src/util/mpz.cpp (_MP_INTERNAL, 32-bit digits).
-// Original author: Leonardo de Moura, 2010-06-17.
 package util
 
 import (

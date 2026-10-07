@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source math/polynomial/sexpr2upolynomial.cpp, recursive source parser.
 package polynomial
 

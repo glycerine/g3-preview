@@ -1,6 +1,4 @@
 // Source: src/util/hashtable.h:159-215,249,371,395,422,451,559,643-644.
-// Source author: Leonardo de Moura (2006-09-11).
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

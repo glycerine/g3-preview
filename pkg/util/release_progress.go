@@ -1,6 +1,5 @@
 // Source: src/util/small_object_allocator.cpp:72-96; src/util/memory_manager.cpp.
-// Licensed under the MIT license.
-// Small-allocator source author: Nikolaj bjorner (nbjorner) 2007-08-06.
+// Small-allocator
 // Source revision: Leonardo de Moura (leonardo) 2011-04-27; rewrote/simplified allocator.
 // Explicit Go cleanup authority for completed source deallocation prefixes.
 package util

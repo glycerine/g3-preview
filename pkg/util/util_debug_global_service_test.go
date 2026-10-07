@@ -1,7 +1,5 @@
 // Source: src/util/debug.cpp:28-68,73-117; src/util/debug.h:42-65;
 // src/test/mem_initializer.cpp:13-20; src/util/gparams.cpp:609.
-// Source author: Leonardo de Moura (2006-09-11; gparams: 2012-11-29).
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

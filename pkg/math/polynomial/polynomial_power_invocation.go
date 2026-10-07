@@ -1,5 +1,4 @@
 // Source: src/math/polynomial/polynomial.cpp:4600-4614; src/util/obj_ref.h.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package polynomial
 
 type polynomialPowerInvocationReceipt struct {

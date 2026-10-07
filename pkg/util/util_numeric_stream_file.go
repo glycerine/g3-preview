@@ -1,6 +1,4 @@
 // Source: src/util/memory_manager.cpp:55-72; src/util/small_object_allocator.cpp:172-242.
-// Licensed under the MIT license. See LICENSE.txt.
-// Source author: Nikolaj Bjorner (nbjorner), 2007.
 package util
 
 import (

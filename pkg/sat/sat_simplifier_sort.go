@@ -1,5 +1,4 @@
-// Source: src/sat/sat_simplifier.cpp:83–96; std::stable_sort invocation. Licensed under the MIT license.
-// Source author: Leonardo de Moura, 2011.
+// Source: src/sat/sat_simplifier.cpp:83–96; std::stable_sort invocation.
 package sat
 
 import (

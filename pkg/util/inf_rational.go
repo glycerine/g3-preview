@@ -1,4 +1,4 @@
-// Source: src/util/inf_rational.h; src/util/inf_rational.cpp. Licensed under the MIT license.
+// Source: src/util/inf_rational.h; src/util/inf_rational.cpp.
 // Source: src/util/inf_rational.h/.cpp; owner-local rational manager adaptation.
 package util
 

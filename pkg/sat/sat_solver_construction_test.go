@@ -1,5 +1,4 @@
 // Source: src/sat/sat_solver.h:74–136; src/sat/sat_solver.cpp:34–58; src/sat/sat_var_queue.h:35.
-// Licensed under the MIT license. Source author: Leonardo de Moura, 2011.
 package sat
 
 import (

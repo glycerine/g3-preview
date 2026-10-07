@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source assertions: src/test/mpz.cpp, especially bug3. Added bounded
 // lifecycle and exact arithmetic tests cover the Go ownership adaptation.
 package util

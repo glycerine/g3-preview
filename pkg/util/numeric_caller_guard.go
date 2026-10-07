@@ -1,5 +1,4 @@
 // Source: src/util numeric manager caller/reentry boundary.
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 // NumericCallerGuard is borrowed from an enclosing source invocation. Bindings

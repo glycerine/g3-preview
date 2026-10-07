@@ -1,5 +1,4 @@
 // Source: src/util/mpzzp.h numeric manager members, with caller-owned cursors.
-// Licensed under the MIT license.
 package util
 
 // FinalizeSourceMembers runs the literal source member destructions in order.

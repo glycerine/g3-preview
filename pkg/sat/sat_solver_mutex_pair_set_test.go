@@ -1,5 +1,4 @@
 // Source: src/util/hashtable.h; actual literal pair specialization growth/copies.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package sat
 
 import (

@@ -1,5 +1,4 @@
 // Source: src/math/polynomial/polynomial.cpp actual four imp SOM members.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package polynomial
 
 import (

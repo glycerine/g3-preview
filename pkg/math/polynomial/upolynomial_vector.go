@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete _scoped_numeral_vector<mpzzp_manager> scalar ownership methods.
 package polynomial
 

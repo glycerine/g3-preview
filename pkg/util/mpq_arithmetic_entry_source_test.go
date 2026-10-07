@@ -1,4 +1,4 @@
-// Source: src/util/mpq.h:140-145,324-332,456-482. Licensed under the MIT license.
+// Source: src/util/mpq.h:140-145,324-332,456-482.
 package util
 
 import (

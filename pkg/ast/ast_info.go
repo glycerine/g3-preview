@@ -1,6 +1,4 @@
 // Source: src/ast/ast.h; src/ast/ast.cpp:2213-2238.
-// Source author: Leonardo de Moura (2006-09-18; 2006-09-28).
-// Licensed under the MIT license; see LICENSE.txt.
 // Concrete decl_info, sort_info and func_decl_info storage/action translation.
 package ast
 

@@ -1,6 +1,4 @@
 // Source: src/util/mpf.cpp:316-333; src/util/scoped_numeral_vector.h:25-65.
-// Source authors: Christoph Wintersteiger; Leonardo de Moura.
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

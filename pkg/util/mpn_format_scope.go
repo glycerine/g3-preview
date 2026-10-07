@@ -1,6 +1,4 @@
-// Licensed under the MIT license.
 // Source: src/util/mpn.cpp:371-399; src/util/buffer.h:84-95.
-// Source author: Leonardo de Moura.
 package util
 
 import (

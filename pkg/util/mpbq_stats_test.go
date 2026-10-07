@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/util/mpbq.cpp, src/util/mpbq.h.
 package util
 

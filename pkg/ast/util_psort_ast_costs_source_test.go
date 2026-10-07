@@ -1,6 +1,4 @@
 // Source: src/util/sorting_network.h:125-147,167-180,593-595,968-978,1003-1013.
-// Source author: Nikolaj Bjorner (2013-11-07).
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 import (

@@ -1,5 +1,4 @@
 // Source: src/util/gparams.cpp:23,93; generated gparams_register_modules.cpp.
-// Licensed under the MIT license.
 package util
 
 import (

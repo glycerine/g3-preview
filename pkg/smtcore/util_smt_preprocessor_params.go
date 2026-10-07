@@ -1,7 +1,5 @@
 // Source: src/smt/params/preprocessor_params.h:31-81;
 // src/smt/params/preprocessor_params.cpp:22-61; src/smt/params/smt_params_helper.pyg:9-11,19-20.
-// Source author: Leonardo de Moura (2008-01-17; 2012-12-02).
-// Licensed under the MIT license; see LICENSE.txt.
 package smtcore
 
 import (

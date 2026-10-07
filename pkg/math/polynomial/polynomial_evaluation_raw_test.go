@@ -1,5 +1,4 @@
 // Source: src/util/mpq.cpp; src/math/polynomial/polynomial.cpp:6436-6522.
-// Licensed under the MIT license. Author: Leonardo de Moura.
 package polynomial
 
 import (

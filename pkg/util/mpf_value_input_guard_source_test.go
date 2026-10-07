@@ -1,5 +1,4 @@
 // Source: src/util/mpf.cpp:69-181; explicit Go borrowed-context guard domain.
-// Licensed under the MIT license. Source authors: Christoph Wintersteiger; Leonardo de Moura.
 package util
 
 import (

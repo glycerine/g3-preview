@@ -1,8 +1,6 @@
 // Concrete source specialization: src/util/map.h:24-196; src/util/hashtable.h:44-63.
 // Source: src/util/hashtable.h:44-63,142-147,222-238,243-272,287-322,375-645;
 // src/util/memory_manager.h:103-120; src/util/debug.cpp:44-68.
-// Source author: Leonardo de Moura, 2006-09-11.
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

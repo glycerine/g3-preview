@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source-action/domain tests for mpq.h:191-237,562,666-669 and Inf reference adapters.
 // Source: src/util/mpz.h, src/util/mpz.cpp, src/util/mpq.h.
 package util

@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Added source-action/profile tests for selected internal32 GCD methods.
 package util
 

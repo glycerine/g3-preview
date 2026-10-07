@@ -1,5 +1,4 @@
 // Source: src/util/basic_interval.h:159-163; src/util/mpbqi.h.
-// Licensed under the MIT license.
 // Concrete executable basic_interval<mpbq,false> and mpbqi.h specialization.
 package util
 

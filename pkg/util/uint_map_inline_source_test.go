@@ -1,7 +1,5 @@
-// Licensed under the MIT license. See LICENSE.txt.
 // Source: src/ast/ast.h:1480; src/util/map.h:285;
 // src/util/hashtable.h:244-256,272-274.
-// Author: Leonardo de Moura.
 package util
 
 import (

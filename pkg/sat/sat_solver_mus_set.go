@@ -1,5 +1,4 @@
 // Source: src/sat/sat_types.h:153–289; src/util/vector.h:102–120,187–201.
-// Licensed under the MIT license. Source authors: Leonardo de Moura; Nikolaj Bjorner.
 package sat
 
 import (

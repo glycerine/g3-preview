@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source mpff.cpp display locals.
 package util
 

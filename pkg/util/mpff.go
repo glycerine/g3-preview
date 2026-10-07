@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source src/util/mpff.h/.cpp.
 package util
 

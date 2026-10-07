@@ -1,7 +1,5 @@
 // Source: src/smt/params/theory_pb_params.h:25-39;
 // src/smt/params/theory_pb_params.cpp:22-37; src/smt/params/smt_params_helper.pyg:55-58.
-// Source author: Nikolaj Bjorner (2014-01-01).
-// Licensed under the MIT license; see LICENSE.txt.
 package smtcore
 
 import (

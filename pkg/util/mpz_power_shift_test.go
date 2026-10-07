@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source assertions: src/test/mpz.cpp tst_2k; print-only cases receive labeled
 // independent expectations. Fixtures are embedded and never read source at runtime.
 package util

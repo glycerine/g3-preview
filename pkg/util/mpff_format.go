@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source all MPFF displays.
 package util
 

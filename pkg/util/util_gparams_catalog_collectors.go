@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 package util
 
 func catalogInsert(d *ParamDescrs, key string, kind ParamKind, descr, def, module string) error {

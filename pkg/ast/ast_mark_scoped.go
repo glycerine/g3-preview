@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Full default scoped_mark action order and actual AST owning callbacks.
 package ast
 

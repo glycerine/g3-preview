@@ -1,5 +1,4 @@
 // Source: src/math/polynomial/algebraic_numbers.cpp:1565-1577,2933-2935.
-// Licensed under the MIT license.
 // Selected algebraic_numbers.cpp cell/univariate bodies. This prerequisite
 // borrows real services; it is NOT the missing multivariate manager constructor.
 package polynomial

@@ -1,6 +1,4 @@
-// Licensed under the MIT license; see LICENSE.txt.
 // Source: src/util/map.h:24-196; src/util/str_hashtable.h:24-31; src/util/hashtable.h:44-63,138-140,222-653.
-// Source author: Leonardo de Moura (2006-09-13 / 2006-09-11).
 package util
 
 import (

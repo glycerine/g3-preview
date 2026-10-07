@@ -1,4 +1,4 @@
-// Source: src/util/symbol.cpp. Licensed under the MIT license.
+// Source: src/util/symbol.cpp.
 package util
 
 import (

@@ -1,6 +1,4 @@
 // Source: src/util/ref_vector.h:96-100; src/ast/ast.h:2273-2277.
-// Source author: Leonardo de Moura (2008-01-04).
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 import (

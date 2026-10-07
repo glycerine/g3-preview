@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete sequence ownership tests; runtime binds actual source services.
 package polynomial
 

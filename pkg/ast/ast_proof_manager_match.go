@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 package ast
 
 func (m *ASTManager) proofMatchUnary(h ASTHandle, k int32, out *ASTHandle) (bool, error) {

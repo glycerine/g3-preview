@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source mpn.h manager member destruction: t_ab,t_ms,v,u.
 package util
 

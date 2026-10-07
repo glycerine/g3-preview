@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete int32 specializations of src/util/chashtable.h.
 package util
 

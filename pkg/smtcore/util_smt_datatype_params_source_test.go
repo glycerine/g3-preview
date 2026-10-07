@@ -1,6 +1,4 @@
 // Source: src/smt/params/theory_datatype_params.h:22-35.
-// Source author: Leonardo de Moura (2008-11-04).
-// Licensed under the MIT license; see LICENSE.txt.
 package smtcore
 
 import (

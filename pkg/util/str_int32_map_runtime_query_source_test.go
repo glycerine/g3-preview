@@ -1,5 +1,4 @@
 // Source: src/util/str_hashtable.h:28-30; src/util/hashtable.h:375-435,465-522.
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

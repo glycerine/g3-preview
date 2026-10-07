@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/ast/ast.h:920-924 (ast_table), src/util/chashtable.h.
 package ast
 

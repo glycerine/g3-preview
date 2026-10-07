@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // uint32 SAT specialization of src/util/approx_set.h; unsigned low 5 bits.
 package sat
 

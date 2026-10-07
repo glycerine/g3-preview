@@ -1,4 +1,4 @@
-// Source: src/util/inf_eps_rational.h. Licensed under the MIT license.
+// Source: src/util/inf_eps_rational.h.
 // Translation of src/util/inf_eps_rational.h<inf_rational>. Selected raw-domain
 // projections/sign/hash retain source reads; diagnostic cleanup-refusal ownership
 // and other raw-domain arithmetic adapters remain separate obligations.

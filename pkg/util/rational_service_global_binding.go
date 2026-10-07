@@ -1,7 +1,5 @@
 // Source: src/util/rational.cpp:64-83; src/util/rational.h:67;
 // src/util/inf_rational.cpp:195-198; src/util/inf_int_rational.cpp:56-59.
-// Source authors: Leonardo de Moura (2006-09-18); Nikolaj Bjorner (2006-12-05).
-// Licensed under the MIT license; see LICENSE.txt in the source distribution.
 package util
 
 import (

@@ -1,6 +1,5 @@
 // Source: src/math/polynomial/polynomial.cpp:6978-6980;
 // src/nlsat/nlsat_solver.cpp:2467-2485; src/util/mpn.cpp:206-217.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package polynomial
 
 import (

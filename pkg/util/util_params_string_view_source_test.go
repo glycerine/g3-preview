@@ -1,6 +1,4 @@
 // Source: src/util/params.cpp:639-648,902-930; src/smt/params/qi_params.cpp:23-39.
-// Source author: Leonardo de Moura (2011-05-09; 2012-12-02).
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

@@ -1,5 +1,4 @@
-// Source: src/sat/sat_integrity_checker.cpp and .h; src/sat/sat_solver.cpp:2845–2850. Licensed under the MIT license.
-// Source author: Leonardo de Moura, 2011.
+// Source: src/sat/sat_integrity_checker.cpp and .h; src/sat/sat_solver.cpp:2845–2850.
 package sat
 
 import (

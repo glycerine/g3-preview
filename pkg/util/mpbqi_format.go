@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source basic_interval display.
 package util
 

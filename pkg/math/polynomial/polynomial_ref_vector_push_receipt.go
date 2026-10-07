@@ -1,5 +1,4 @@
 // Source: src/util/ref_vector.h:96-100; src/math/polynomial/polynomial.cpp:5626.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package polynomial
 
 type polynomialReferenceVectorPushReceipt struct {

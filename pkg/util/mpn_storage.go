@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/util/mpn.h manager scratch and util/buffer.h growth policy.
 package util
 

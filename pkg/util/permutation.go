@@ -1,5 +1,4 @@
 // Source: src/util/permutation.h:59-111.
-// Licensed under the MIT license. Source author: Leonardo de Moura, 2011-06-10.
 package util
 
 import (

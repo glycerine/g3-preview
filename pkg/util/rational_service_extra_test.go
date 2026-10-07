@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Remaining source rational.h wrappers; tst_rational.cpp::tst8 assertions.
 package util
 

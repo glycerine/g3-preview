@@ -1,6 +1,5 @@
 // Source: src/util/mpf.cpp:2100-2131 (shared concrete allocation/lifetime engine).
 // Source: src/util/mpf.cpp:1963-2098; explicit reached Integer allocation leaves.
-// Licensed under the MIT license. Source author: Christoph Wintersteiger.
 package util
 
 import (

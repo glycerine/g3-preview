@@ -1,5 +1,4 @@
 // Source: src/util/vector.h:59-100,303-310,389-405.
-// Licensed under the MIT license; see LICENSE.txt.
 package sat
 
 import (

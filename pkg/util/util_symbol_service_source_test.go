@@ -1,5 +1,4 @@
 // Source: src/util/symbol.cpp:70-83.
-// Licensed under the MIT license. See LICENSE.txt.
 package util
 
 import (

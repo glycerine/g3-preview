@@ -1,5 +1,4 @@
 // Source: src/util/max_cliques.h; independent bounded canonical mutex CNFs.
-// Licensed under the MIT license. Source author: Nikolaj Bjorner.
 package sat
 
 import (

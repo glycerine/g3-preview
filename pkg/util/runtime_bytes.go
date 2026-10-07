@@ -1,5 +1,4 @@
 // Source: src/util/hash.cpp:26-102.
-// Licensed under the MIT license. Source author: Leonardo de Moura, 2006-09-11.
 package util
 
 // RuntimeBytes reads actual little-endian raw words and source signed-char tails.

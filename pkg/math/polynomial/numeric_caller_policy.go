@@ -1,5 +1,4 @@
 // Source: src/math/polynomial/upolynomial.cpp; caller-owned numeric lifetimes.
-// Licensed under the MIT license.
 package polynomial
 
 import (

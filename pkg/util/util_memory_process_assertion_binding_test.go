@@ -1,7 +1,5 @@
 // Source: src/util/memory_manager.cpp:103; scripts/mk_genfile_common.py:742-802;
 // src/util/gparams.cpp:557-631; src/util/debug.h:63; src/util/symbol.h:96.
-// Source authors: Nikolaj Bjorner; Leonardo de Moura.
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

@@ -1,6 +1,5 @@
 // Source: src/util/mpz.cpp:915-985; src/util/memory_manager.cpp.
 // This is the real guarded signed-host TLS arithmetic domain, not ordinary mathematical exhaustion.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package util
 
 import (

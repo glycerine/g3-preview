@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source assertions/scenarios: src/test/mpz.cpp tst1, tst2, tst2b.
 // Additional finite expectations use independent integer arithmetic.
 package util

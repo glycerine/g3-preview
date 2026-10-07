@@ -1,6 +1,5 @@
-// Source: src/math/polynomial/polynomial.cpp:2308-2370,2481-2633. Licensed under the MIT license.
+// Source: src/math/polynomial/polynomial.cpp:2308-2370,2481-2633.
 // Selected multivariate cell/SOM prerequisite owner, not manager::imp.
-// Source author: Leonardo de Moura (leonardo), 2011-11-15.
 package polynomial
 
 import (

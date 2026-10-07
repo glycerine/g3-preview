@@ -1,4 +1,4 @@
-// Source: src/util/vector.h: source 3/2 capacity growth. Licensed under the MIT license.
+// Source: src/util/vector.h: source 3/2 capacity growth.
 package util
 
 import "github.com/glycerine/g3/pkg/arena"

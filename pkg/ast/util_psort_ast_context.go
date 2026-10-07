@@ -1,6 +1,4 @@
 // Source: src/test/sorting_network.cpp:150-181; src/util/ref_vector.h:53,96-100.
-// Source author: Nikolaj Bjorner; Leonardo de Moura.
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 import (

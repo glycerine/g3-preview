@@ -1,4 +1,4 @@
-// Source: src/util/symbol.cpp:50-74. Licensed under the MIT license.
+// Source: src/util/symbol.cpp:50-74.
 package util
 
 func (m *SymbolManager) InternBorrowedSymbolCString(s Symbol) (Symbol, error) {

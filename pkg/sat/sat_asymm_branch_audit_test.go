@@ -1,4 +1,4 @@
-// Source: src/sat/sat_asymm_branch.cpp owning source roots. Licensed under the MIT license.
+// Source: src/sat/sat_asymm_branch.cpp owning source roots.
 package sat
 
 import (

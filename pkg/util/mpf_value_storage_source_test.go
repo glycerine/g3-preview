@@ -1,7 +1,5 @@
 // Source: src/util/vector.h:59-100; src/util/mpf.h:65-73;
 // src/util/memory_manager.cpp:274-289.
-// Source author: Leonardo de Moura; Christoph Wintersteiger.
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

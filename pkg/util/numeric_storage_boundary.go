@@ -1,5 +1,4 @@
 // Source: src/util/mpz.h, mpq.h and mpbq.h: numeral fields in source aggregates.
-// Licensed under the MIT license.
 package util
 
 // NativeWords encodes a borrowed numeral for pointer-free source aggregate

@@ -1,5 +1,4 @@
 // Source: src/sat/sat_solver.h owning members; independent actual Runtime root census.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package sat
 
 import (

@@ -1,6 +1,4 @@
 // Source: src/ast/format.cpp:35-117,147-212; src/ast/format.h:29-66.
-// Source author: Leonardo de Moura (2008-01-20).
-// Licensed under the MIT license; see LICENSE.txt.
 package ast
 
 import (

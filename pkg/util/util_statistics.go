@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete translation of util/statistics.h and statistics.cpp.
 package util
 

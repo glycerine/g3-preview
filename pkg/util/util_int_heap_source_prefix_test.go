@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Regression fixtures follow the statement order in src/util/heap.h.
 package util
 

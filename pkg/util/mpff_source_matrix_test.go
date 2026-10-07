@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Active src/test/mpff.cpp routes.
 package util
 

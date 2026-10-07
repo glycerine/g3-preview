@@ -1,5 +1,4 @@
 // Source: src/util/uint_set.h:35-40; src/util/vector.h:125-129.
-// Licensed under the MIT license. Source author: Leonardo de Moura, 2006-12-07.
 package util
 
 import (

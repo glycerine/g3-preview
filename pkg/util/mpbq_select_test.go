@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Added independent MPBQ tests.
 package util
 

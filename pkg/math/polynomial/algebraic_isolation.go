@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // algebraic_numbers.cpp:541–684, real univariate factor/isolation pipeline.
 package polynomial
 

@@ -1,7 +1,5 @@
 // Source: src/util/params.cpp:639-648,902-930; src/util/symbol.h:96;
 // scripts/mk_genfile_common.py:895-939.
-// Source author: Leonardo de Moura (2011-05-09).
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

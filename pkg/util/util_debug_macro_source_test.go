@@ -1,7 +1,5 @@
 // Source: src/util/debug.h:63-92; src/util/heap.h:57-66,79-239,258-265.
 // Source: src/util/vector.h:303-344,389-403.
-// Source author: Leonardo de Moura (2006-09-11; 2006-09-14).
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

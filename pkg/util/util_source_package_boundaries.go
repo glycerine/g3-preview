@@ -1,4 +1,3 @@
-// Licensed under the MIT license; see LICENSE.txt.
 // Source value and borrowed-owner boundaries used by AST and parameter consumers.
 package util
 

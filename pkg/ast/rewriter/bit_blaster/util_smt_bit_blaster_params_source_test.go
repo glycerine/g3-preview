@@ -1,6 +1,4 @@
 // Source: src/ast/rewriter/bit_blaster/bit_blaster_params.h:22-40.
-// Source author: Leonardo de Moura (2008-10-02).
-// Licensed under the MIT license; see LICENSE.txt.
 package bit_blaster
 
 import (

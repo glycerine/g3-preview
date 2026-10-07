@@ -1,7 +1,6 @@
 // Source: src/math/polynomial/upolynomial_factorization.cpp:1097-1145;
 // src/math/polynomial/upolynomial_factorization_int.h:42-52;
 // src/math/polynomial/upolynomial.cpp:32-54; src/util/scoped_numeral_vector.h:29-40.
-// Licensed under the MIT license. Source authors: Leonardo de Moura; Dejan (t-dejanj), 2011-11-29.
 package polynomial
 
 import (

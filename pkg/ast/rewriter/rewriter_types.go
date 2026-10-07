@@ -1,5 +1,4 @@
 // Source: src/ast/rewriter/rewriter_types.h:29-49.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package rewriter
 
 type brStatus uint32

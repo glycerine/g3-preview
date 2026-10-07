@@ -1,6 +1,6 @@
 //go:build linux
 
-// Source: src/util/stopwatch.h. Licensed under the MIT license.
+// Source: src/util/stopwatch.h.
 package util
 
 import (

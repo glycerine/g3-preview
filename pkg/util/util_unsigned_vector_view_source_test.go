@@ -1,6 +1,4 @@
 // Source: src/util/vector.h:449-451; src/util/permutation.h:56-91.
-// Source author: Leonardo de Moura.
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

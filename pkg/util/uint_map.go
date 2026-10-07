@@ -1,7 +1,5 @@
-// Licensed under the MIT license.
 // Concrete translation of u_map<unsigned> in src/util/map.h (2006-10-14)
 // and core_hashtable/default_hash_entry in src/util/hashtable.h (2006-09-11).
-// Author: Leonardo de Moura.
 package util
 
 import (

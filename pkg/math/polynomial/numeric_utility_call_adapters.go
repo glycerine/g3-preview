@@ -1,5 +1,4 @@
 // Source: src/math/polynomial numeric invocation adapters.
-// Licensed under the MIT license.
 package polynomial
 
 import (

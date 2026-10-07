@@ -1,6 +1,4 @@
-// Licensed under the MIT license; see LICENSE.txt.
 // Source: src/ast/ast.cpp:1297-1479; src/ast/ast.h:1454-1490.
-// Source author: Leonardo de Moura (2006-09-28).
 // Owner-confined ast_manager default no-trace normal and format constructors.
 package ast
 

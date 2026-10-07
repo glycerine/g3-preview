@@ -1,6 +1,4 @@
 // Source: src/util/mpf.cpp:1519-1569; selected libstdc++ basic_string.tcc:414-429.
-// Source author: Christoph Wintersteiger; library policy is a Go adaptation.
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

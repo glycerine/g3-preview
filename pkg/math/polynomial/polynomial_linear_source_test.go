@@ -1,5 +1,4 @@
 // Source: src/test/polynomial.cpp:1712-1739; src/math/polynomial/linear_eq_solver.h.
-// Licensed under the MIT license. Source author: Leonardo de Moura, 2012.
 package polynomial
 
 import (

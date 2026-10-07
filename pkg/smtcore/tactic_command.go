@@ -1,7 +1,5 @@
 // Source: src/cmd_context/tactic_cmds.h:30-63;
 // src/cmd_context/tactic_cmds.cpp:35-50; src/tactic/tactic.h:140-144.
-// Source author: Leonardo de Moura.
-// Licensed under the MIT license; see LICENSE.txt.
 package smtcore
 
 import (

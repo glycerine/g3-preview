@@ -1,7 +1,5 @@
-// Licensed under the MIT license; see LICENSE.txt.
 // Source: src/ast/ast_ll_pp.cpp:21-320; src/ast/for_each_ast.h:27-125;
 // src/ast/for_each_ast.cpp:37-48; src/util/vector.h:43-125,303-355.
-// Source author: Leonardo de Moura (2006-10-18; 2006-10-19).
 package ast
 
 import (

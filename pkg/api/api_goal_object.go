@@ -1,6 +1,4 @@
 // Source: src/api/api_goal.h:25-30; src/api/api_goal.cpp:35-37.
-// Source author: Leonardo de Moura.
-// Licensed under the MIT license; see LICENSE.txt.
 package api
 
 import (

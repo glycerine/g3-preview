@@ -1,4 +1,4 @@
-// Source: src/sat/sat_simplifier_params.pyg; sat_simplifier.cpp:1482–1522. Licensed under the MIT license.
+// Source: src/sat/sat_simplifier_params.pyg; sat_simplifier.cpp:1482–1522.
 package sat
 
 import (

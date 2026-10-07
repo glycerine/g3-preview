@@ -1,6 +1,4 @@
 // Source: src/util/hash.cpp:26-102; src/util/str_hashtable.h:28-30.
-// Source author: Leonardo de Moura (2006-09-11; 2006-09-13).
-// Licensed under the MIT license; see LICENSE.txt.
 package util
 
 import (

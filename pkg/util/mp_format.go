@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/util/mpn.cpp to_string and src/util/mpz.cpp/src/util/mpq.cpp display.
 package util
 

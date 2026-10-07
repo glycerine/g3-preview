@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete AST-valued util/ref_buffer.h specialization with actual inline16.
 package ast
 

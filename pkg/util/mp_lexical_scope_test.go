@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Source: src/util/scoped_numeral.h, src/util/inf_eps_rational.h.
 package util
 

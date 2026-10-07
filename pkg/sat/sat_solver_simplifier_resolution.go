@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 package sat
 
 // resolve appends to the caller's real literal-vector storage. It marks only

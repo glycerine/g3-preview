@@ -1,6 +1,5 @@
 // Source: src/sat/tactic/atom2bool_var.cpp:45-126;
 // src/ast/for_each_expr.h:26-103,134-136.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package tactic
 
 import (

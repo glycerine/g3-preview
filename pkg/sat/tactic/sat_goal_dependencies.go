@@ -1,6 +1,5 @@
 // Source: src/sat/tactic/goal2sat.cpp:425-485;
 // src/sat/tactic/atom2bool_var.cpp:88-111; src/sat/tactic/sat_tactic.cpp:133-138.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package tactic
 
 import (

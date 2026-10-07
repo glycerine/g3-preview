@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // register_node_core action order; post-publication exception unwind is an
 // explicit adapter for source partially constructed/invalid continuations.
 package ast

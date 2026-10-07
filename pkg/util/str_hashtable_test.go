@@ -1,6 +1,4 @@
-// Licensed under the MIT license.
 // Source: src/util/str_hashtable.h:24-31; src/util/hashtable.h:259-322,613-623.
-// Source author: Leonardo de Moura (2006-09-13 / 2006-09-11).
 // See LICENSE.txt.
 // Concrete str_hashtable coverage; the active string->int map is separate.
 package util

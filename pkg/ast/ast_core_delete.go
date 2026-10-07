@@ -1,6 +1,4 @@
-// Licensed under the MIT license; see LICENSE.txt.
 // Source: src/ast/ast.cpp:1781-1844.
-// Source author: Leonardo de Moura (2006-09-28).
 // Source delete_node ascending pushes/LIFO pops. Intrusive emergency metadata
 // is a Go continuation adapter only when source worklist allocation would throw.
 package ast

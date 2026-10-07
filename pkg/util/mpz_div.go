@@ -1,7 +1,5 @@
-// Licensed under the MIT license.
 // Source: src/util/mpz.h and src/util/mpz.cpp internal signed division wrappers/core.
 // Knuth division translated from src/util/mpn.cpp.
-// Source author: Christoph Wintersteiger.
 package util
 
 import (

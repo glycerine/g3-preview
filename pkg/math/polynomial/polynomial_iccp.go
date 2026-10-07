@@ -1,6 +1,5 @@
 // Source: src/math/polynomial/polynomial.cpp:3432-3534;
 // src/math/polynomial/polynomial.h:polynomial manager content overloads.
-// Licensed under the MIT license. Source author: Leonardo de Moura (leonardo).
 package polynomial
 
 import (

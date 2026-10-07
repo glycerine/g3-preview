@@ -1,4 +1,3 @@
-// Licensed under the MIT license.
 // Concrete expr_dependency_ref specialization of util/obj_ref.h.
 package ast
 

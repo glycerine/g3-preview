@@ -1,7 +1,6 @@
 // Source: src/ast/rewriter/rewriter.cpp:23-204;
 // src/ast/rewriter/rewriter.h:31-119; src/ast/ast.h:845-853;
 // src/util/vector.h:59-99; src/util/ref_vector.h:45-72,140-172.
-// Licensed under the MIT license. Source author: Leonardo de Moura.
 package rewriter
 
 import (
