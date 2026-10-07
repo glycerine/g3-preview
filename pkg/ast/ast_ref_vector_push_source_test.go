@@ -17,6 +17,11 @@ func TestASTRefVectorPushExactAcquiredReferenceBeforeGrowthRefusal(t *testing.T)
 	v, e := m.NewRefVector()
 	astTestMust(t, e)
 	var receipt ASTRefVectorPushReceipt
+	held, e := receipt.Unpublished()
+	astTestMust(t, e)
+	if held {
+		t.Fatal("empty receipt owns a reference")
+	}
 	m.BudgetField.FailAfter(0)
 	cause := m.RefVectorPushTracked(v, h, &receipt)
 	if !errors.Is(cause, arena.ErrInjectedFailure) {
@@ -35,10 +40,24 @@ func TestASTRefVectorPushExactAcquiredReferenceBeforeGrowthRefusal(t *testing.T)
 	if !receipt.acquired || receipt.published {
 		t.Fatal("real acquired-reference stamp", receipt)
 	}
+	held, e = receipt.Unpublished()
+	astTestMust(t, e)
+	if !held {
+		t.Fatal("unpublished acquisition not reported")
+	}
+	copied := receipt
+	if _, e = copied.Unpublished(); e != ErrASTHandle {
+		t.Fatal("copied receipt accepted", e)
+	}
 	m.BudgetField.FailAfter(-1)
 	// Source member DT ends the vector but cannot consume the unjoined reference.
 	astTestMust(t, m.DelRefVector(&v))
 	astTestMust(t, m.CompleteRefVectorPush(receipt.vector, h, &receipt))
+	held, e = receipt.Unpublished()
+	astTestMust(t, e)
+	if held {
+		t.Fatal("acknowledged receipt still owns a reference")
+	}
 	if _, e = m.GetRefCount(h); e == nil {
 		t.Fatal("exact acquired ref not released")
 	}
@@ -114,6 +133,11 @@ func TestASTRefVectorPushSuccessfulTransferAndNullReceiptErasure(t *testing.T) {
 	astTestMust(t, e)
 	var held ASTRefVectorPushReceipt
 	astTestMust(t, m.RefVectorPushTracked(v, h, &held))
+	unpublished, e := held.Unpublished()
+	astTestMust(t, e)
+	if unpublished {
+		t.Fatal("published reference remains caller-owned")
+	}
 	if !held.acquired || !held.published {
 		t.Fatal("actual pointer ownership transfer", held)
 	}

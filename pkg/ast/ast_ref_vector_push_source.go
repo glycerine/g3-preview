@@ -76,3 +76,18 @@ func (m *ASTManager) CompleteRefVectorPush(v ASTRefVector, h ASTHandle, r *ASTRe
 	r.acknowledged = true
 	return nil
 }
+
+// Unpublished reports this receipt's actual acquired reference awaiting caller
+// cleanup. Published references belong to the vector, and empty receipts own none.
+func (r *ASTRefVectorPushReceipt) Unpublished() (bool, error) {
+	if r == nil {
+		return false, ErrASTHandle
+	}
+	if r.self == nil {
+		return false, nil
+	}
+	if r.self != r {
+		return false, ErrASTHandle
+	}
+	return r.acquired && !r.published && !r.acknowledged, nil
+}

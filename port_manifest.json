@@ -45897,7 +45897,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/model/model_evaluator.go"
+        "pkg/model/model_evaluator.go",
+        "pkg/model/model_evaluator_array_expansion.go"
       ],
       "tests": [
         "TestModelEvaluatorConstantCompletionAndBooleanReduction",
@@ -45910,7 +45911,10 @@
         "TestModelEvaluatorOriginalArrayStoreSelectDispatch",
         "TestModelEvaluatorArrayIdentityAndDisabledEquality",
         "TestModelEvaluatorArrayPartialTheoryGraphCompletion",
-        "TestModelEvaluatorOriginalFunctionBackedArraySelection"
+        "TestModelEvaluatorOriginalFunctionBackedArraySelection",
+        "TestModelEvaluatorOriginalFunctionArrayValueExpansionAndPrecedence",
+        "TestModelEvaluatorOriginalArrayExpansionPruningAndGroundness",
+        "TestModelEvaluatorOriginalArrayExpansionAllocationRefusals"
       ],
       "assertions": [
         {
@@ -45969,14 +45973,26 @@
             "TestModelEvaluatorArrayPartialTheoryGraphCompletion",
             "TestModelEvaluatorOriginalFunctionBackedArraySelection"
           ]
+        },
+        {
+          "name": "original args_are_values, extract_array_func_interp and expand_value after evaluator traversal over existing AST value/groundness/equality primitives",
+          "status": "partial",
+          "go_target": "pkg/model/model_evaluator_array_expansion.go",
+          "tests": [
+            "TestModelEvaluatorOriginalFunctionArrayValueExpansionAndPrecedence",
+            "TestModelEvaluatorOriginalArrayExpansionPruningAndGroundness",
+            "TestModelEvaluatorOriginalArrayExpansionAllocationRefusals"
+          ]
         }
       ],
       "ownership": [
         "Evaluator borrows model, parameter, Runtime and Cooperation services. Concrete cold evaluator header embeds its configuration and parameter owner; separately charged public traversal and Boolean reducer keep existing member cleanup. Failed unpublished function graph remains named until Close; successful registration transfers it to the model. Function entries read the original borrowed argument view without allocating a copied array.",
-        "Array reducer is constructed after Boolean reducer with evaluator constructor parameters and closed before it. Partial theory graph substitution keeps its lexical var_subst owner named through reverse cleanup; failed cleanup prevents another invocation from overwriting the owner. Borrowed argument bindings reuse the original beta engine copy protocol without a second argument array."
+        "Array reducer is constructed after Boolean reducer with evaluator constructor parameters and closed before it. Partial theory graph substitution keeps its lexical var_subst owner named through reverse cleanup; failed cleanup prevents another invocation from overwriting the owner. Borrowed argument bindings reuse the original beta engine copy protocol without a second argument array.",
+        "Extraction owns the original vector of owning expression vectors, copied store rows and else expression. Actual row-copy/growth order, tail reset/append/pop pruning and reverse reconstruction are retained. An embedded evaluator continuation names current row/copy/argument vectors, else reference, parameter and actual unjoined vector INC receipt; interrupted cleanup blocks reuse until Close completes. Expansion preserves source const/store output publication prefixes on later failure rather than fabricating rollback."
       ],
       "deviations": [
-        "Boolean/uninterpreted and selected original array store/select evaluation paths are integrated. Arithmetic/BV/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch, nonidentity enabled array equality/extraction, map/set rules and expand_value remain open. Array equality identity is handled before the expansion flag; disabled expansion falls through to the original Boolean reducer. Partial theory graph fallback is integrated for the known array dispatch, including source unconditional partial-graph completion and direct-order var_subst. Reached remaining unsupported theory paths explicitly refuse. Runtime AllocationSize remains the existing memory accounting owner; runtime-wide typed allocator wiring, proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited."
+        "Boolean/uninterpreted and selected original array store/select and value extraction/expansion paths are integrated. Arithmetic/BV/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch, nonidentity enabled array equality, map/set rules remain open. Array equality identity is handled before the expansion flag; disabled expansion falls through to the original Boolean reducer. Partial theory graph fallback is integrated for the known array dispatch, including source unconditional partial-graph completion and direct-order var_subst. Reached remaining unsupported theory paths explicitly refuse. Runtime AllocationSize remains the existing memory accounting owner; runtime-wide typed allocator wiring, proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited.",
+        "Selected extraction preserves store-prefix and function-entry order, all-entry groundness rejection, missing/nonground else rejection, and backwards else-equal pruning only while index values permit it. No hash-table array-equality algorithm is claimed by this value-expansion chunk. Concrete Go scalar owners and lexical vector storage remain explicit representations, without whole native allocation ABI credit."
       ]
     },
     {
@@ -45985,7 +46001,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/model/model_evaluator.go"
+        "pkg/model/model_evaluator.go",
+        "pkg/model/model_evaluator_array_expansion.go"
       ],
       "tests": [
         "TestModelEvaluatorConstantCompletionAndBooleanReduction",
@@ -45998,7 +46015,10 @@
         "TestModelEvaluatorOriginalArrayStoreSelectDispatch",
         "TestModelEvaluatorArrayIdentityAndDisabledEquality",
         "TestModelEvaluatorArrayPartialTheoryGraphCompletion",
-        "TestModelEvaluatorOriginalFunctionBackedArraySelection"
+        "TestModelEvaluatorOriginalFunctionBackedArraySelection",
+        "TestModelEvaluatorOriginalFunctionArrayValueExpansionAndPrecedence",
+        "TestModelEvaluatorOriginalArrayExpansionPruningAndGroundness",
+        "TestModelEvaluatorOriginalArrayExpansionAllocationRefusals"
       ],
       "conditionals": [
         {
@@ -46037,14 +46057,26 @@
             "TestModelEvaluatorArrayPartialTheoryGraphCompletion",
             "TestModelEvaluatorOriginalFunctionBackedArraySelection"
           ]
+        },
+        {
+          "name": "original args_are_values, extract_array_func_interp and expand_value after evaluator traversal over existing AST value/groundness/equality primitives",
+          "status": "partial",
+          "go_target": "pkg/model/model_evaluator_array_expansion.go",
+          "tests": [
+            "TestModelEvaluatorOriginalFunctionArrayValueExpansionAndPrecedence",
+            "TestModelEvaluatorOriginalArrayExpansionPruningAndGroundness",
+            "TestModelEvaluatorOriginalArrayExpansionAllocationRefusals"
+          ]
         }
       ],
       "ownership": [
         "Evaluator borrows model, parameter, Runtime and Cooperation services. Concrete cold evaluator header embeds its configuration and parameter owner; separately charged public traversal and Boolean reducer keep existing member cleanup. Failed unpublished function graph remains named until Close; successful registration transfers it to the model. Function entries read the original borrowed argument view without allocating a copied array.",
-        "Array reducer is constructed after Boolean reducer with evaluator constructor parameters and closed before it. Partial theory graph substitution keeps its lexical var_subst owner named through reverse cleanup; failed cleanup prevents another invocation from overwriting the owner. Borrowed argument bindings reuse the original beta engine copy protocol without a second argument array."
+        "Array reducer is constructed after Boolean reducer with evaluator constructor parameters and closed before it. Partial theory graph substitution keeps its lexical var_subst owner named through reverse cleanup; failed cleanup prevents another invocation from overwriting the owner. Borrowed argument bindings reuse the original beta engine copy protocol without a second argument array.",
+        "Extraction owns the original vector of owning expression vectors, copied store rows and else expression. Actual row-copy/growth order, tail reset/append/pop pruning and reverse reconstruction are retained. An embedded evaluator continuation names current row/copy/argument vectors, else reference, parameter and actual unjoined vector INC receipt; interrupted cleanup blocks reuse until Close completes. Expansion preserves source const/store output publication prefixes on later failure rather than fabricating rollback."
       ],
       "deviations": [
-        "Boolean/uninterpreted and selected original array store/select evaluation paths are integrated. Arithmetic/BV/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch, nonidentity enabled array equality/extraction, map/set rules and expand_value remain open. Array equality identity is handled before the expansion flag; disabled expansion falls through to the original Boolean reducer. Partial theory graph fallback is integrated for the known array dispatch, including source unconditional partial-graph completion and direct-order var_subst. Reached remaining unsupported theory paths explicitly refuse. Runtime AllocationSize remains the existing memory accounting owner; runtime-wide typed allocator wiring, proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited."
+        "Boolean/uninterpreted and selected original array store/select and value extraction/expansion paths are integrated. Arithmetic/BV/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch, nonidentity enabled array equality, map/set rules remain open. Array equality identity is handled before the expansion flag; disabled expansion falls through to the original Boolean reducer. Partial theory graph fallback is integrated for the known array dispatch, including source unconditional partial-graph completion and direct-order var_subst. Reached remaining unsupported theory paths explicitly refuse. Runtime AllocationSize remains the existing memory accounting owner; runtime-wide typed allocator wiring, proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited.",
+        "Selected extraction preserves store-prefix and function-entry order, all-entry groundness rejection, missing/nonground else rejection, and backwards else-equal pruning only while index values permit it. No hash-table array-equality algorithm is claimed by this value-expansion chunk. Concrete Go scalar owners and lexical vector storage remain explicit representations, without whole native allocation ABI credit."
       ]
     },
     {
@@ -139812,6 +139844,15 @@
             "TestPolynomialPSCChain2YoungerPowerSourceStopPreservesNineLocals",
             "TestPolynomialReferenceVectorPushActualINCBeforeGrowthAndExactAbort",
             "TestPolynomialReferenceVectorPushGrowthTransportRefusesExecutingOwner"
+          ]
+        },
+        {
+          "name": "concrete acquired-reference receipt observation for lexical caller cleanup after source INC-before-growth failure",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_ref_vector_push_source.go",
+          "tests": [
+            "TestASTRefVectorPushExactAcquiredReferenceBeforeGrowthRefusal",
+            "TestASTRefVectorPushSuccessfulTransferAndNullReceiptErasure"
           ]
         }
       ],

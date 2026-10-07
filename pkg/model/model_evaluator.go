@@ -36,6 +36,7 @@ type ModelEvaluator struct {
 	ready, closed bool
 }
 type evaluatorConfiguration struct {
+	expansion arrayExpansion
 	rewriter.DefaultConfiguration
 	owner                              *ModelEvaluator
 	boolean                            *rewriter.BoolRewriter
@@ -123,7 +124,7 @@ func (ev *ModelEvaluator) open() error {
 	if ev.closed {
 		return arena.ErrClosed
 	}
-	if !ev.ready || ev.cfg.pending != nil || ev.cfg.substitution != nil {
+	if !ev.ready || ev.cfg.pending != nil || ev.cfg.substitution != nil || ev.cfg.expansion.active {
 		return util.ErrParamsPrecondition
 	}
 	return ev.model.open()
@@ -132,7 +133,10 @@ func (ev *ModelEvaluator) Evaluate(t ast.ASTHandle, out ast.ASTRef) error {
 	if e := ev.open(); e != nil {
 		return e
 	}
-	return ev.traversal.Rewrite(t, out)
+	if e := ev.traversal.Rewrite(t, out); e != nil {
+		return e
+	}
+	return ev.cfg.expandValue(out)
 }
 func (ev *ModelEvaluator) UpdtParams(p *util.ParamsRef) error {
 	if e := ev.open(); e != nil {
@@ -171,6 +175,9 @@ func (ev *ModelEvaluator) NumSteps() (uint32, error) {
 }
 func (ev *ModelEvaluator) closeImp() error {
 	ev.ready = false
+	if e := ev.cfg.expansion.close(ev.model.manager); e != nil {
+		return e
+	}
 	if ev.cfg.substitution != nil {
 		if e := ev.cfg.substitution.Close(); e != nil {
 			return e
