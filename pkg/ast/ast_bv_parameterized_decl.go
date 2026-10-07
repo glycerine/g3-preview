@@ -172,6 +172,10 @@ func (m *ASTManager) bitVectorParameterizedDecl(k int32, ps []ASTParameter, doma
 // Return handled=false only where the source calls the base domain-buffer
 // overload. Fixed cached operators never build that buffer.
 func (m *ASTManager) bitVectorExprDecl(k int32, ps []ASTParameter, args []ASTHandle) (astNodeRef, bool, error) {
+	return m.bitVectorExprDeclArguments(k, ps, SliceArguments(args))
+}
+
+func (m *ASTManager) bitVectorExprDeclArguments(k int32, ps []ASTParameter, args AppArguments) (astNodeRef, bool, error) {
 	p := m.bitVectorPlugin
 	if k == 57 {
 		_, found, e := m.int2BVSize(ps)
@@ -192,15 +196,19 @@ func (m *ASTManager) bitVectorExprDecl(k int32, ps []ASTParameter, args []ASTHan
 	case 60:
 		return p.fields[3], true, nil
 	case 0:
-		decl, e := m.bitVectorNumeralDecl(ps, len(args))
+		decl, e := m.bitVectorNumeralDecl(ps, int(args.count))
 		return decl, true, e
 	case 56:
 		return astNodeRef{}, false, nil
 	}
-	if len(args) == 0 {
+	if args.count == 0 {
 		return astNodeRef{}, true, bvDeclarationError("operator is applied to arguments of the wrong sort")
 	}
-	r, e := m.requireExpr(args[0])
+	first, e := args.at(0)
+	if e != nil {
+		return astNodeRef{}, true, e
+	}
+	r, e := m.requireExpr(first)
 	if e != nil {
 		return astNodeRef{}, true, e
 	}
@@ -227,13 +235,17 @@ func (m *ASTManager) bitVectorExprDecl(k int32, ps []ASTParameter, args []ASTHan
 	if e != nil {
 		return astNodeRef{}, true, e
 	}
-	count := len(args)
+	count := int(args.count)
 	mismatch := count != int(record.arity)
 	associative := flags.LeftAssociative && flags.RightAssociative
 	if mismatch && !associative {
 		return astNodeRef{}, true, bvDeclarationError("declared arity mismatches supplied arity")
 	}
-	for i, h := range args {
+	for i := uint32(0); i < args.count; i++ {
+		h, e := args.at(i)
+		if e != nil {
+			return astNodeRef{}, true, e
+		}
 		argument, e := m.requireExpr(h)
 		if e != nil {
 			return astNodeRef{}, true, e
@@ -242,7 +254,7 @@ func (m *ASTManager) bitVectorExprDecl(k int32, ps []ASTParameter, args []ASTHan
 		if e != nil {
 			return astNodeRef{}, true, e
 		}
-		index := uint32(i)
+		index := i
 		if mismatch && associative {
 			index = 0
 		}

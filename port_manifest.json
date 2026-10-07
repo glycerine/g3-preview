@@ -13031,7 +13031,8 @@
         "pkg/ast/ast_bv_numeral_sort.go",
         "pkg/ast/ast_bv_numeral_sort_test.go",
         "pkg/ast/ast_bv_app_parameter_util.go",
-        "pkg/ast/ast_bv_app_parameter_util_test.go"
+        "pkg/ast/ast_bv_app_parameter_util_test.go",
+        "pkg/ast/ast_bv_arguments.go"
       ],
       "tests": [
         "TestASTBitVectorSourceEagerSortsAndPinnedDeclarations",
@@ -13107,7 +13108,9 @@
         "TestASTBitVectorOriginalParameterizedUtilities",
         "TestASTBitVectorOriginalToIntUtility",
         "TestASTBitVectorUtilityEveryColdReservation",
-        "TestASTBitVectorUtilityRejectsUnsignedNegativeExtension"
+        "TestASTBitVectorUtilityRejectsUnsignedNegativeExtension",
+        "TestASTBitVectorBorrowedORArguments",
+        "TestASTBitVectorBorrowedORGuardsAndLifetime"
       ],
       "conditionals": [
         {
@@ -13367,6 +13370,15 @@
             "TestASTBitVectorUtilityEveryColdReservation",
             "TestASTBitVectorUtilityRejectsUnsignedNegativeExtension"
           ]
+        },
+        {
+          "name": "original variadic mk_bv_or with borrowed application/ref-vector argument readers through shared fixed-declaration domain checks and application candidate factory (src/ast/bv_decl_plugin.h:406; src/ast/bv_decl_plugin.cpp:571-630; src/ast/ast.cpp:1863-1881,2064-2211)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_arguments.go",
+          "tests": [
+            "TestASTBitVectorBorrowedORArguments",
+            "TestASTBitVectorBorrowedORGuardsAndLifetime"
+          ]
         }
       ],
       "ownership": [
@@ -13401,7 +13413,8 @@
         "The selected modular inverse is now implemented using the original rational/extended-GCD algorithm. Go math/big.ModInverse appears only in independent tests. SASSERT numeric expressions are erased in release and gated independently in debug; zero width with nonunit odd input follows original assertion/release behavior. Deterministic Go operand evaluation and reflected larger numerical-frame headers retain explicit native rational/temporary/ABI/allocation qualifications. Actual Runtime failures prove owning cleanup, not resumability of source process-fatal operations. Remaining utility/recognizer consumers, reducers/evaluation, full pretty-print diagnostics and whole-unit native ownership/representation audit remain open.",
         "Selected has_sign_bit follows original unsigned normalization and rational comparison; it does not inspect host bits or assume canonical input. The original DEBUG width assertion precedes input/plugin reads. Release retains source unsigned bits-1 arithmetic and existing checked power/cache bounds. The nested normalization and reflected caller-header representation retains explicit concrete Go/native rational, return-value, pointer/header, allocator/assertion/exception ABI qualifications. BV rewriter shift consumers and whole-unit ownership/representation audit remain to be ported; no source operation resumability is claimed after Runtime process-fatal refusal.",
         "The recognizer checks exactly one sort parameter, unlike the original plugin internal get_bv_size helper, which intentionally remains unchanged. Recognition does not inspect parameter kind; the reached width getter uses the prior checked wrong-kind rejection. No registered BV plugin yields false in this manager-bound adapter; native bv_util construction requires its plugin. Concrete Go sort/parameter/return/numeric-frame representation and existing native allocator/assertion/exception qualifications remain. BV uint64 numeral/conversion/construction utilities and full reducer/whole-unit audits remain required.",
-        "Selected parameterized utility calls preserve signed int32 conversion of unsigned counts/bounds and original factory guards, including accepted negative extract low versus rejected negative extension. mk_bv2int performs arith family lookup and Int-sort factory before creating its borrowed AST parameter; the source BV2INT declaration erases that parameter. The generic sort dispatcher body is shared without branch changes. Two high parameter-token slots are reserved, reducing the checked arena slot limit; scoped epoch exhaustion and missing plugin remain checked Go adapter boundaries. Native stack/union/assertion/exception ABI and complete whole-unit/reducer ownership audit remain uncredited."
+        "Selected parameterized utility calls preserve signed int32 conversion of unsigned counts/bounds and original factory guards, including accepted negative extract low versus rejected negative extension. mk_bv2int performs arith family lookup and Int-sort factory before creating its borrowed AST parameter; the source BV2INT declaration erases that parameter. The generic sort dispatcher body is shared without branch changes. Two high parameter-token slots are reserved, reducing the checked arena slot limit; scoped epoch exhaustion and missing plugin remain checked Go adapter boundaries. Native stack/union/assertion/exception ABI and complete whole-unit/reducer ownership audit remain uncredited.",
+        "Borrowed OR uses checked Go application/ref-vector argument readers without an additional operand-buffer copy. The existing application candidate still allocates before hash-cons lookup. No native pointer/layout/allocation ABI or whole-unit completion is credited; BV addition still requires its original polynomial core and post-core reduction."
       ]
     },
     {
@@ -13426,7 +13439,8 @@
         "pkg/ast/ast_bv_app_parameter_util_test.go",
         "pkg/ast/ast_bv_numeral_identity.go",
         "pkg/ast/ast_bv_numeral_identity_test.go",
-        "pkg/ast/ast_bv_operation_identity.go"
+        "pkg/ast/ast_bv_operation_identity.go",
+        "pkg/ast/ast_bv_arguments.go"
       ],
       "tests": [
         "TestASTOriginalPluginUninterpretedClassification",
@@ -13448,7 +13462,9 @@
         "TestASTBitVectorUtilityEveryColdReservation",
         "TestASTBitVectorUtilityRejectsUnsignedNegativeExtension",
         "TestASTBitVectorNumeralPredicateOnlyReadsIdentity",
-        "TestASTBitVectorOperationIdentityErasesMetadata"
+        "TestASTBitVectorOperationIdentityErasesMetadata",
+        "TestASTBitVectorBorrowedORArguments",
+        "TestASTBitVectorBorrowedORGuardsAndLifetime"
       ],
       "conditionals": [
         {
@@ -13559,6 +13575,15 @@
           "tests": [
             "TestASTBitVectorOperationIdentityErasesMetadata"
           ]
+        },
+        {
+          "name": "original variadic mk_bv_or with borrowed application/ref-vector argument readers through shared fixed-declaration domain checks and application candidate factory (src/ast/bv_decl_plugin.h:406; src/ast/bv_decl_plugin.cpp:571-630; src/ast/ast.cpp:1863-1881,2064-2211)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_arguments.go",
+          "tests": [
+            "TestASTBitVectorBorrowedORArguments",
+            "TestASTBitVectorBorrowedORGuardsAndLifetime"
+          ]
         }
       ],
       "ownership": [
@@ -13579,7 +13604,8 @@
         "Twenty parameter-free application utility overloads are selected: comparisons, unary/binary arithmetic and bitwise/shift operations, three overflow predicates, variadic concat/or/xor/mkbv and binary concat. The three multiplication overflow predicates intentionally reverse source operands. Missing registered BV plugin is rejected by the checked Go utility adapter. Parameterized extract/extension helpers, bv2int utility and full rewriter consumers remain separate work; whole-header native representation/assertion/ownership audits remain uncredited.",
         "Selected get_div0_op/get_div0_decl preserve the five ordinary division/remainder/modulus mappings, family and first domain, erasing input parameters/remaining domains/range. The shared family declaration dispatcher was extracted without changing its branches. Invalid kinds at native UNREACHABLE, invalid handles and empty domain pointers receive checked Go errors; native assertion/compiler-unreachable behavior and whole-header ABI/ownership audits remain uncredited. Full BV rewriter consumers remain separate work.",
         "Selected parameterized utility calls preserve signed int32 conversion of unsigned counts/bounds and original factory guards, including accepted negative extract low versus rejected negative extension. mk_bv2int performs arith family lookup and Int-sort factory before creating its borrowed AST parameter; the source BV2INT declaration erases that parameter. The generic sort dispatcher body is shared without branch changes. Two high parameter-token slots are reserved, reducing the checked arena slot limit; scoped epoch exhaustion and missing plugin remain checked Go adapter boundaries. Native stack/union/assertion/exception ABI and complete whole-unit/reducer ownership audit remain uncredited.",
-        "Selected parameter-free numeral predicate exposes the existing original identity algorithm for BV reducers. Missing registered plugin and invalid Go handle/kind domains retain checked adapter behavior; native whole-header pointer/union/assertion/ownership audit is not credited."
+        "Selected parameter-free numeral predicate exposes the existing original identity algorithm for BV reducers. Missing registered plugin and invalid Go handle/kind domains retain checked adapter behavior; native whole-header pointer/union/assertion/ownership audit is not credited.",
+        "Borrowed OR uses checked Go application/ref-vector argument readers without an additional operand-buffer copy. The existing application candidate still allocates before hash-cons lookup. No native pointer/layout/allocation ABI or whole-unit completion is credited; BV addition still requires its original polynomial core and post-core reduction."
       ]
     },
     {
