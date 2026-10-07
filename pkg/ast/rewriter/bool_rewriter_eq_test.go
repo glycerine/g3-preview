@@ -4,7 +4,6 @@ package rewriter
 
 import (
 	"github.com/glycerine/g3/pkg/ast"
-	sattactic "github.com/glycerine/g3/pkg/sat/tactic"
 
 	"github.com/glycerine/g3/pkg/util"
 	"testing"
@@ -179,7 +178,7 @@ func TestBoolRewriterDerivedConnectivesIndependentTruthTables(t *testing.T) {
 				want = !(a || b)
 			}
 			s, _, _ := satSolverCheckFixture(t)
-			tr, e := sattactic.NewGoalTranslator(m, s)
+			tr, e := TestNewGoalTranslator(m, s)
 			satOK(t, e)
 			forms := []ast.ASTHandle{formula}
 			for i, h := range []ast.ASTHandle{p, q} {
@@ -241,7 +240,7 @@ func TestBoolRewriterITEEqualityIndependentPartialBranchTruthTables(t *testing.T
 						want := actual == value
 						for _, formula := range []ast.ASTHandle{original, result} {
 							s, _, _ := satSolverCheckFixture(t)
-							tr, e := sattactic.NewGoalTranslator(m, s)
+							tr, e := TestNewGoalTranslator(m, s)
 							satOK(t, e)
 							forms := []ast.ASTHandle{formula}
 							for i, h := range []ast.ASTHandle{c, q} {

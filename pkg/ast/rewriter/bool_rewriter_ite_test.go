@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
-	sat_tactic "github.com/glycerine/g3/pkg/sat/tactic"
 	"github.com/glycerine/g3/pkg/util"
 )
 
@@ -89,7 +88,7 @@ func TestBoolRewriterITEExactBranchesAndIndependentTruthTables(t *testing.T) {
 					want := tc.eval(values)
 					for _, formula := range []ast.ASTHandle{original, rewritten} {
 						s, _, _ := satSolverCheckFixture(t)
-						tr, e := sat_tactic.NewGoalTranslator(m, s)
+						tr, e := TestNewGoalTranslator(m, s)
 						satOK(t, e)
 						forms := []ast.ASTHandle{formula}
 						for i, h := range vars {

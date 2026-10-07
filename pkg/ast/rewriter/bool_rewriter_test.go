@@ -5,7 +5,6 @@ package rewriter
 import (
 	"fmt"
 	"github.com/glycerine/g3/pkg/ast"
-	sattactic "github.com/glycerine/g3/pkg/sat/tactic"
 
 	"github.com/glycerine/g3/pkg/util"
 	"reflect"
@@ -216,7 +215,7 @@ func TestBoolRewriterACIndependentAssignmentsThroughCDCL(t *testing.T) {
 				}
 				for _, formula := range []ast.ASTHandle{original, rewritten} {
 					s, _, _ := satSolverCheckFixture(t)
-					tr, e := sattactic.NewGoalTranslator(m, s)
+					tr, e := TestNewGoalTranslator(m, s)
 					satOK(t, e)
 					forms := []ast.ASTHandle{formula}
 					for i, h := range []ast.ASTHandle{p, q} {

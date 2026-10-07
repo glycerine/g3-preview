@@ -10,7 +10,6 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
-	sat_tactic "github.com/glycerine/g3/pkg/sat/tactic"
 	"github.com/glycerine/g3/pkg/util"
 )
 
@@ -124,7 +123,7 @@ func TestBoolRewriterConjunctionEliminationOwningBufferAndTruthTables(t *testing
 			if n == 3 {
 				for bits := 0; bits < 8; bits++ {
 					s, _, _ := satSolverCheckFixture(t)
-					tr, e := sat_tactic.NewGoalTranslator(m, s)
+					tr, e := TestNewGoalTranslator(m, s)
 					satOK(t, e)
 					forms := []ast.ASTHandle{got}
 					for i, h := range args {

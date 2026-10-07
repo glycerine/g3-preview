@@ -44993,9 +44993,23 @@
       "path": "src/model/func_interp.cpp",
       "component": "model",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/model/function_entry.go",
+        "pkg/model/function_interpretation.go",
+        "pkg/model/function_interpretation_expr.go",
+        "pkg/model/function_interpretation_counts.go",
+        "pkg/model/function_interpretation_test.go"
+      ],
+      "tests": [
+        "TestFunctionInterpretationEntriesReplaceAndReferences",
+        "TestFunctionInterpretationElsePeelingCacheAndCompression",
+        "TestFunctionInterpretationElseDirectOrderAndCopy",
+        "TestFunctionInterpretationBooleanIffRemainsElseAndTieOrder",
+        "TestFunctionInterpretationMultiArgumentPeelingAndElseMiss",
+        "TestFunctionInterpretationInsertionRefusalsReleaseReferences",
+        "TestFunctionInterpretationCopyEntriesAndOwningOutput"
+      ],
       "assertions": [
         {
           "line": 27,
@@ -45020,17 +45034,83 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete func_entry construction, retained argument/result references, equality lookup, result replacement and ascending destruction (func_interp.cpp:24-69)",
+          "status": "partial",
+          "go_target": "pkg/model/function_entry.go",
+          "go_targets": [
+            "pkg/model/function_interpretation_test.go"
+          ],
+          "tests": [
+            "TestFunctionInterpretationEntriesReplaceAndReferences",
+            "TestFunctionInterpretationElsePeelingCacheAndCompression",
+            "TestFunctionInterpretationElseDirectOrderAndCopy",
+            "TestFunctionInterpretationBooleanIffRemainsElseAndTieOrder",
+            "TestFunctionInterpretationMultiArgumentPeelingAndElseMiss",
+            "TestFunctionInterpretationInsertionRefusalsReleaseReferences",
+            "TestFunctionInterpretationCopyEntriesAndOwningOutput"
+          ]
+        },
+        {
+          "name": "Original ordered function graph insertion/copy/cache reset, ITE entry peeling, direct-order var_subst fallback, constant/partial/simple queries, compression and ITE interpretation (func_interp.cpp:71-326)",
+          "status": "partial",
+          "go_target": "pkg/model/function_interpretation.go",
+          "go_targets": [
+            "pkg/model/function_interpretation_expr.go",
+            "pkg/model/function_interpretation_counts.go",
+            "pkg/model/function_interpretation_test.go"
+          ],
+          "tests": [
+            "TestFunctionInterpretationEntriesReplaceAndReferences",
+            "TestFunctionInterpretationElsePeelingCacheAndCompression",
+            "TestFunctionInterpretationElseDirectOrderAndCopy",
+            "TestFunctionInterpretationBooleanIffRemainsElseAndTieOrder",
+            "TestFunctionInterpretationMultiArgumentPeelingAndElseMiss",
+            "TestFunctionInterpretationInsertionRefusalsReleaseReferences",
+            "TestFunctionInterpretationCopyEntriesAndOwningOutput"
+          ]
+        },
+        {
+          "name": "Concrete borrowed-handle occurrence map and original running maximum/tie order (func_interp.cpp:234-255)",
+          "status": "partial",
+          "go_target": "pkg/model/function_interpretation_counts.go",
+          "go_targets": [
+            "pkg/model/function_interpretation_test.go"
+          ],
+          "tests": [
+            "TestFunctionInterpretationBooleanIffRemainsElseAndTieOrder"
+          ]
+        }
+      ],
+      "ownership": [
+        "Each entry owns a concrete ground handle array and result; result INC precedes old-result DEC. Entry/graph headers and actual arrays/vector backing are charged to the manager Budget. Parent retains failed unpublished constructors for owning cleanup; graph destruction retires published entries, else and cache before pending owning cleanup. Cached ITE has its own reference; explicit output ASTRefs survive graph close. EvalElse constructs and closes the original VarSubstitution lexical owner with direct index order."
+      ],
+      "deviations": [
+        "Selected concrete AST/Budget representation; native small_object_allocator ABI, allocator pooling, global DEBUG/TRACE transport and whole-unit allocation/ownership audits are not claimed. Existing AST equality/value theory dispatch qualifications apply. AST translation remains unported and no Translate replacement is invented. Function registration in model_core and model_evaluator integration remain pending. The var_subst is_well_sorted debug predicates remain an explicitly partial dependency. Return/retain partial Copy owners for explicit Go cleanup. Source OP_EQ recognition deliberately excludes Boolean OP_IFF; do not widen the predicate to satisfy a fixture. Source occurrence count strict-greater running tie policy is preserved; concrete linear-probing handle/count cells qualify the obj_map representation."
+      ]
     },
     {
       "path": "src/model/func_interp.h",
       "component": "model",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/model/function_entry.go",
+        "pkg/model/function_interpretation.go",
+        "pkg/model/function_interpretation_expr.go",
+        "pkg/model/function_interpretation_counts.go",
+        "pkg/model/function_interpretation_test.go"
+      ],
+      "tests": [
+        "TestFunctionInterpretationEntriesReplaceAndReferences",
+        "TestFunctionInterpretationElsePeelingCacheAndCompression",
+        "TestFunctionInterpretationElseDirectOrderAndCopy",
+        "TestFunctionInterpretationBooleanIffRemainsElseAndTieOrder",
+        "TestFunctionInterpretationMultiArgumentPeelingAndElseMiss",
+        "TestFunctionInterpretationInsertionRefusalsReleaseReferences",
+        "TestFunctionInterpretationCopyEntriesAndOwningOutput"
+      ],
       "conditionals": [
         {
           "line": 30,
@@ -45043,9 +45123,61 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete func_entry construction, retained argument/result references, equality lookup, result replacement and ascending destruction (func_interp.cpp:24-69)",
+          "status": "partial",
+          "go_target": "pkg/model/function_entry.go",
+          "go_targets": [
+            "pkg/model/function_interpretation_test.go"
+          ],
+          "tests": [
+            "TestFunctionInterpretationEntriesReplaceAndReferences",
+            "TestFunctionInterpretationElsePeelingCacheAndCompression",
+            "TestFunctionInterpretationElseDirectOrderAndCopy",
+            "TestFunctionInterpretationBooleanIffRemainsElseAndTieOrder",
+            "TestFunctionInterpretationMultiArgumentPeelingAndElseMiss",
+            "TestFunctionInterpretationInsertionRefusalsReleaseReferences",
+            "TestFunctionInterpretationCopyEntriesAndOwningOutput"
+          ]
+        },
+        {
+          "name": "Original ordered function graph insertion/copy/cache reset, ITE entry peeling, direct-order var_subst fallback, constant/partial/simple queries, compression and ITE interpretation (func_interp.cpp:71-326)",
+          "status": "partial",
+          "go_target": "pkg/model/function_interpretation.go",
+          "go_targets": [
+            "pkg/model/function_interpretation_expr.go",
+            "pkg/model/function_interpretation_counts.go",
+            "pkg/model/function_interpretation_test.go"
+          ],
+          "tests": [
+            "TestFunctionInterpretationEntriesReplaceAndReferences",
+            "TestFunctionInterpretationElsePeelingCacheAndCompression",
+            "TestFunctionInterpretationElseDirectOrderAndCopy",
+            "TestFunctionInterpretationBooleanIffRemainsElseAndTieOrder",
+            "TestFunctionInterpretationMultiArgumentPeelingAndElseMiss",
+            "TestFunctionInterpretationInsertionRefusalsReleaseReferences",
+            "TestFunctionInterpretationCopyEntriesAndOwningOutput"
+          ]
+        },
+        {
+          "name": "Concrete borrowed-handle occurrence map and original running maximum/tie order (func_interp.cpp:234-255)",
+          "status": "partial",
+          "go_target": "pkg/model/function_interpretation_counts.go",
+          "go_targets": [
+            "pkg/model/function_interpretation_test.go"
+          ],
+          "tests": [
+            "TestFunctionInterpretationBooleanIffRemainsElseAndTieOrder"
+          ]
+        }
+      ],
+      "ownership": [
+        "Each entry owns a concrete ground handle array and result; result INC precedes old-result DEC. Entry/graph headers and actual arrays/vector backing are charged to the manager Budget. Parent retains failed unpublished constructors for owning cleanup; graph destruction retires published entries, else and cache before pending owning cleanup. Cached ITE has its own reference; explicit output ASTRefs survive graph close. EvalElse constructs and closes the original VarSubstitution lexical owner with direct index order."
+      ],
+      "deviations": [
+        "Selected concrete AST/Budget representation; native small_object_allocator ABI, allocator pooling, global DEBUG/TRACE transport and whole-unit allocation/ownership audits are not claimed. Existing AST equality/value theory dispatch qualifications apply. AST translation remains unported and no Translate replacement is invented. Function registration in model_core and model_evaluator integration remain pending. The var_subst is_well_sorted debug predicates remain an explicitly partial dependency. Return/retain partial Copy owners for explicit Go cleanup. Source OP_EQ recognition deliberately excludes Boolean OP_IFF; do not widen the predicate to satisfy a fixture. Source occurrence count strict-greater running tie policy is preserved; concrete linear-probing handle/count cells qualify the obj_map representation."
+      ]
     },
     {
       "path": "src/model/model.cpp",

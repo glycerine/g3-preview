@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
-	sat_tactic "github.com/glycerine/g3/pkg/sat/tactic"
 	"github.com/glycerine/g3/pkg/util"
 )
 
@@ -63,7 +62,7 @@ func TestBoolRewriterStarOriginalTraversalAndIndependentTruthTables(t *testing.T
 			// be simplified first. Check the emitted formula with actual CDCL.
 			for _, term := range []ast.ASTHandle{got} {
 				solver, _, _ := satSolverCheckFixture(t)
-				tr, e := sat_tactic.NewGoalTranslator(m, solver)
+				tr, e := TestNewGoalTranslator(m, solver)
 				satOK(t, e)
 				forms := []ast.ASTHandle{term}
 				for i, v := range []ast.ASTHandle{a, b, d} {
