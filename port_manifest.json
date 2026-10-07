@@ -109924,7 +109924,9 @@
         "pkg/math/polynomial/polynomial_invocation_receipts_source_test.go",
         "pkg/util/mpn_source_buffer.go",
         "pkg/ast/ast_handle_buffer.go",
-        "pkg/ast/ast_handle_containers_test.go"
+        "pkg/ast/ast_handle_containers_test.go",
+        "pkg/util/rational_buffer.go",
+        "pkg/util/rational_buffer_test.go"
       ],
       "tests": [
         "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
@@ -109994,7 +109996,11 @@
         "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
         "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix",
         "TestPointerBufferSourceSpillRefusal",
-        "TestASTHandleBufferResetRetainsSpillCapacity"
+        "TestASTHandleBufferResetRetainsSpillCapacity",
+        "TestRationalBuffer16InlineCopiesAndStorageRelocation",
+        "TestRationalBuffer16SourceDestructionStopsBeforeLaterElements",
+        "TestRationalBuffer16ConstructionAndShallowCopyGuards",
+        "TestRationalBuffer16EveryGrowthAndActualCopyReservation"
       ],
       "conditionals": [
         {
@@ -110202,6 +110208,17 @@
           "tests": [
             "TestASTHandleBufferResetRetainsSpillCapacity"
           ]
+        },
+        {
+          "name": "selected concrete buffer<rational> with initial raw storage for 16 elements, doubling relocation, placement copy construction before position publication, borrowed coefficient access and ascending destruction (src/util/buffer.h:29-75,90-96,146-151,194-210; src/util/rational.h:41-43,67; src/ast/rewriter/poly_rewriter_def.h:570-586)",
+          "status": "partial",
+          "go_target": "pkg/util/rational_buffer.go",
+          "tests": [
+            "TestRationalBuffer16InlineCopiesAndStorageRelocation",
+            "TestRationalBuffer16SourceDestructionStopsBeforeLaterElements",
+            "TestRationalBuffer16ConstructionAndShallowCopyGuards",
+            "TestRationalBuffer16EveryGrowthAndActualCopyReservation"
+          ]
         }
       ],
       "ownership": [
@@ -110217,7 +110234,8 @@
         "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md.",
         "Source char bytes use physical capacity/initialization independently of POS and unsigned11*size wrap. Selected non-Windows digit32 snprintf lbuf0/truncation and multi-limb ignored-lbuf behavior execute. Windows sprintf_s constraint handler, GMP/digit64, global/locale/ostream and literal std::string temporary allocation/evaluation remain open. No whole-unit or registered assertion completion is claimed.",
         "Concrete prerequisite does not implement all source buffer types or complete ICCP algorithm.",
-        "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open."
+        "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open.",
+        "RationalBuffer16 is the nongeneric concrete buffer<rational> dependency for polynomial coefficient collection, with sixteen raw inline slots and double-capacity relocation without numeric copies/destructors. Each appended value is copy-constructed into its physical slot through an exact invocation embedded in the charged header, and count advances only after construction returns. Expanded storage and the reflected Go owner are charged through Budget rather than claiming native allocation/layout/stack/pointer ABI. At borrows an address only until expansion/end; aliases retained across expansion are outside the source consumer contract. Successful source scopes explicitly run SourceEnd in ascending element order before backing release. Failed body calls retain their actual partial slot/child and stop; SourceEnd rejects simulated native unwinding, while explicit two-phase Go cleanup consumes the real fields without altering failure history. The stale-element DT test proves the checked boundary traversal prefix, not native fatal/exception resumability. General buffer APIs/reset/finalize and integration into the whole polynomial current-sort/mark/core owner remain required; no whole-unit completion is credited."
       ]
     },
     {
