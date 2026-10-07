@@ -126,7 +126,7 @@ func (p *astBitVectorPluginOwner) fixedDecl(k int32, width uint32) (astNodeRef, 
 	if e != nil || r.slot != 0 {
 		return r, e
 	}
-	s, e := p.mkSort(width)
+	s, e := p.getSort(width)
 	if e != nil {
 		return astNodeRef{}, e
 	}
@@ -139,7 +139,7 @@ func (p *astBitVectorPluginOwner) fixedDecl(k int32, width uint32) (astNodeRef, 
 		result = p.owner.boolSort
 	}
 	if k == 42 || k == 43 || k == 44 {
-		result, e = p.mkSort(1)
+		result, e = p.getSort(1)
 		if e != nil {
 			return astNodeRef{}, e
 		}
@@ -217,7 +217,7 @@ func (m *ASTManager) bitVectorDecl(k int32, ps []ASTParameter, domain []ASTHandl
 		return astNodeRef{}, e
 	}
 	if r.slot == 0 {
-		return astNodeRef{}, ErrASTDomain
+		return m.bitVectorParameterizedDecl(k, ps, domain, value.integer)
 	}
 	arity := int(m.declAt(r.slot).arity)
 	count := len(domain)

@@ -12981,7 +12981,10 @@
         "pkg/ast/ast_ref_cache_resize.go",
         "pkg/ast/ast_bv_distinct.go",
         "pkg/ast/ast_bv_distinct_test.go",
-        "pkg/ast/rewriter/bool_rewriter_bv_distinct_test.go"
+        "pkg/ast/rewriter/bool_rewriter_bv_distinct_test.go",
+        "pkg/ast/ast_bv_parameterized_decl.go",
+        "pkg/ast/ast_bv_parameterized_decl_test.go",
+        "pkg/ast/ast_core_plugin_dispatch.go"
       ],
       "tests": [
         "TestASTBitVectorSourceEagerSortsAndPinnedDeclarations",
@@ -13008,7 +13011,13 @@
         "TestASTBitVectorOffsetEveryWarmNumericalReservation",
         "TestASTBitVectorOffsetIdenticalOperandsStillReachNumericalCopy",
         "TestASTBitVectorOffsetNumericalTransportOwnerGuard",
-        "TestBoolRewriterOriginalBitVectorOffsetEquality"
+        "TestBoolRewriterOriginalBitVectorOffsetEquality",
+        "TestASTBitVectorOriginalParameterizedDeclarations",
+        "TestASTBitVectorFixedExprOverloadBypassesSortBuffer",
+        "TestASTBitVectorParameterizedValidationAndIgnoredConcatParameters",
+        "TestASTBitVectorParameterizedLargeSortIsUncached",
+        "TestASTBitVectorParameterizedEveryFactoryReservation",
+        "TestASTBitVectorParameterizedExpressionFallbackKeepsSortBuffer"
       ],
       "conditionals": [
         {
@@ -13149,6 +13158,19 @@
           "tests": [
             "TestBoolRewriterOriginalBitVectorOffsetEquality"
           ]
+        },
+        {
+          "name": "original concat/extend/extract/repeat/fixed-rotation declarations, get_bv_sort large-width path and specialized fixed-operator expression dispatch (src/ast/bv_decl_plugin.cpp:155-164,360-403,530-576,584-628)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_parameterized_decl.go",
+          "tests": [
+            "TestASTBitVectorOriginalParameterizedDeclarations",
+            "TestASTBitVectorFixedExprOverloadBypassesSortBuffer",
+            "TestASTBitVectorParameterizedValidationAndIgnoredConcatParameters",
+            "TestASTBitVectorParameterizedLargeSortIsUncached",
+            "TestASTBitVectorParameterizedEveryFactoryReservation",
+            "TestASTBitVectorParameterizedExpressionFallbackKeepsSortBuffer"
+          ]
         }
       ],
       "ownership": [
@@ -13156,14 +13178,16 @@
         "Zero callback reads the source sort width and constructs its lexical small-zero parameter in the existing numeral continuation. Actual power/mod/copy temporaries retain their numeric invocation owners through failed construction and manager closure. The active AST owner rejects numerical transport reentry before taking its mutex and restores the previous execution guard on every exit. Warm reservation tests exercise refusal, separate-continuation retry and final budget restoration; a bounded child reaches actual Runtime max-count transport and verifies cleanup/public factory reentry refusal.",
         "Name callbacks append borrowed symbol records into the shared caller-owned concrete builtin-name vector. Each literal is interned before its push, with original geometric growth and preserved publication prefixes on refusal. The null/ALL guard precedes sort appends but follows the 39 ordinary operator appends; null skips constructing the ALL symbol. Vector backing is released by its caller; the SymbolManager retains interned aliases. No numerical copy, cache INC or owning BV declaration is created by this name callback.",
         "Fixed declaration caches resize through original geometric expansions while retaining the old logical size, construct only after resize, publish the canonical declaration before INC, and record an interrupted INC explicitly. Validation errors retain the published cache reference. Finalization drains caches in original source order after eager fields and sorts, clearing only consumed references. Own abort removes the exact unacquired pending slot without fabricating DEC; source finalization refuses that interrupted acquisition. Cache backing is charged and released as actual Go manager-local reference storage.",
-        "Offset distinctness owns both default-constructed lexical offsets and both power/mod full-expression temporaries in the existing address-stable BV numeral continuation. Each matched operand copies the stored rational, reads width/base, computes power/mod, then copies the result back through the original const-reference assignment. Mod and power temporaries end before the next operand; final offsets drain in reverse order. Numeric children retain their exact invocation contexts on failure. A bounded actual Runtime transport verifies AST cleanup/factory reentry refusal. Both operand reservation campaigns reach six actual allocation refusals and whole-context release with no residual charges."
+        "Offset distinctness owns both default-constructed lexical offsets and both power/mod full-expression temporaries in the existing address-stable BV numeral continuation. Each matched operand copies the stored rational, reads width/base, computes power/mod, then copies the result back through the original const-reference assignment. Mod and power temporaries end before the next operand; final offsets drain in reverse order. Numeric children retain their exact invocation contexts on failure. A bounded actual Runtime transport verifies AST cleanup/factory reentry refusal. Both operand reservation campaigns reach six actual allocation refusals and whole-context release with no residual charges.",
+        "Parameterized declarations retain original domain/parameter metadata, except concat discards parameters. They have no independent cache INC; canonical declaration storage owns domain/range/parameter acquisitions. get_bv_sort caches widths below 4096 and constructs larger VeryBig sorts without cache growth or cache INC. Fixed-width factories now use that same source getter. Source BV expression dispatch reads the first sort and uses fixed caches directly; only uncached/parameterized cases fall back to the base sort buffer. Both routes preserve the active numerical transport guard."
       ],
       "deviations": [
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
         "Selected numeral is_value and zero get_some_value callbacks are integrated, including scoped override priority and model/evaluator completion. The small literal and its lexical parameter use the explicit Go owned-value representation; no native rational temporary/parameter allocator ABI credit is claimed. Original are_distinct offset-term arithmetic, other BV declarations/reducers, native SASSERT/TRACE/exception transport and whole-unit ownership/representation audits remain open. Base unique-value comparison now recognizes BV numerals without claiming the offset algorithm.",
         "Selected original sort/operator name callbacks are implemented: null/ALL includes legacy bv and 19 extended/internal operator aliases, other logics always retain BitVec and exactly 39 ordinary operators. bv2int and bv2nat retain the same original declaration kind. Parser symbol-table consumers and unsupported BV operator declaration/evaluation dependencies remain required; offering source names does not claim those factories or reducers are complete. The caller-owned vector remains the explicit Go representation, without native record/header/copy/allocator ABI or whole-unit ownership credit.",
-        "Selected 45 fixed-width cache factories and four eager declaration returns are implemented. The inherited expression overload retains its source domain-buffer spill. Associative domain-overload validation checks only the two formal domains; application construction independently validates every argument. A single-argument associative domain input would read out of bounds in C++; the Go adapter rejects that undefined input after cache publication. Raw NUM, concat/extensions/extract/repeat/parameterized rotations, bit2bool/mkbv and integer conversion factories, BV reducers/evaluation and offset distinctness remain required. The 61-slot concrete Go cache-owner representation and scalar pointer codecs claim no native header/pointer/allocator ABI equivalence or whole-unit ownership/assertion/exception transport credit.",
-        "Original offset distinctness is now integrated before base unique-value fallback, including identical-app inputs; the numeral-first/exactly-two-argument restriction remains conservative. Raw numeral parameters are explicitly reduced modulo their stored width rather than trusting canonical factory normalization. Small default-zero/assignment use the explicit Go scalar rational representation without native lexical temporary/allocator ABI credit. Actual Runtime memout is process-fatal in C++; the returning-error adapter retains interrupted raw numeric owners for whole-context owning cleanup and does not claim source-operation retry after that failure. TRACE output, native exception/allocator transport equivalence, remaining BV factories/reducers and whole-unit ownership audit remain open."
+        "Selected 45 fixed-width cache factories and four eager declaration returns are implemented. The specialized expression overload bypasses the sort buffer for fixed cached operators; parameterized/uncached operators retain the base overload spill. Associative domain-overload validation checks only the two formal domains; application construction independently validates every argument. A single-argument associative domain input would read out of bounds in C++; the Go adapter rejects that undefined input after cache publication. Raw NUM, bit2bool/mkbv and integer conversion factories and BV reducers/evaluation remain required; concat/extensions/extract/repeat/fixed rotations and offset distinctness are now implemented. The 61-slot concrete Go cache-owner representation and scalar pointer codecs claim no native header/pointer/allocator ABI equivalence or whole-unit ownership/assertion/exception transport credit.",
+        "Original offset distinctness is now integrated before base unique-value fallback, including identical-app inputs; the numeral-first/exactly-two-argument restriction remains conservative. Raw numeral parameters are explicitly reduced modulo their stored width rather than trusting canonical factory normalization. Small default-zero/assignment use the explicit Go scalar rational representation without native lexical temporary/allocator ABI credit. Actual Runtime memout is process-fatal in C++; the returning-error adapter retains interrupted raw numeric owners for whole-context owning cleanup and does not claim source-operation retry after that failure. TRACE output, native exception/allocator transport equivalence, remaining BV factories/reducers and whole-unit ownership audit remain open.",
+        "Corrected the earlier inherited-expression-overload claim by implementing src/ast/bv_decl_plugin.cpp:584-628 selected direct cached dispatch. Fixed associative expression factories check every supplied sort when arity differs and accept a singleton; the domain overload preserves its distinct two-formal-domain behavior. Same-arity wrong-sort expression rejection remains ErrASTDomain because original mk_pp/ostringstream SMT2 diagnostic formatting is still required. Parameterized factories preserve negative extraction lows, nonzero negative repeats and arbitrary rotation parameters. Signed size overflow is C++ undefined behavior and is rejected by a checked Go adapter; defined negative results retain unsigned conversion and the uncached large-sort path. No native parameter/header/pointer/allocator ABI, complete diagnostic transport or whole-unit audit credit is inferred."
       ]
     },
     {

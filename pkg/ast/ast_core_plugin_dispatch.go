@@ -25,6 +25,21 @@ func (m *ASTManager) mkFamilyApp(fid FamilyID, k int32, ps []ASTParameter, args 
 		}
 		return m.mkApp(d, args)
 	}
+	if m.pluginAt(fid).kind == astBitVectorPlugin {
+		previous := m.formatExecuting
+		m.formatExecuting = true
+		defer func() { m.formatExecuting = previous }()
+		d, handled, e := m.bitVectorExprDecl(k, ps, args)
+		if e != nil {
+			return astNodeRef{}, e
+		}
+		if handled {
+			if d.slot == 0 {
+				return astNodeRef{}, nil
+			}
+			return m.mkApp(d, args)
+		}
+	}
 	// The basic expr overload bypasses decl_plugin's domain buffer for these
 	// branches. This matters for overflow-reservation actions on large arities.
 	if fid == 0 {
