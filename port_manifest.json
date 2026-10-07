@@ -9580,7 +9580,8 @@
         "pkg/ast/ast_rewriter_access.go",
         "pkg/ast/ast_array_callbacks.go",
         "pkg/ast/ast_app_coercion.go",
-        "pkg/ast/ast_arith_decl_test.go"
+        "pkg/ast/ast_arith_decl_test.go",
+        "pkg/ast/ast_dec_ref_consumed_test.go"
       ],
       "tests": [
         "TestASTResourceLimitSourceCanceledCountsAndScopes",
@@ -9770,7 +9771,8 @@
         "TestASTArithmeticOriginalOperatorDeclarationSelection",
         "TestASTArithmeticOriginalMixedApplications",
         "TestASTArithmeticExpressionOverloadReadErasure",
-        "TestASTArithmeticAppCoercionEveryWarmReservation"
+        "TestASTArithmeticAppCoercionEveryWarmReservation",
+        "TestASTDecRefConsumedActualDeletionRefusal"
       ],
       "conditionals": [
         {
@@ -10836,6 +10838,14 @@
             "TestASTArithmeticOriginalMixedApplications",
             "TestASTArithmeticAppCoercionEveryWarmReservation"
           ]
+        },
+        {
+          "name": "checked cross-package exposure of original decNode reference-consumption flag for cached extraction cleanup (src/ast/ast.cpp:1781-1844)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_core_accessors.go",
+          "tests": [
+            "TestASTDecRefConsumedActualDeletionRefusal"
+          ]
         }
       ],
       "ownership": [
@@ -10871,7 +10881,8 @@
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
         "Scoped some_value_proc restoration now covers success, nested internal calls, callback errors and fallback reservation failures. Callback receives the validated sort and stored hash while manager is locked, avoiding public-manager reentry for model universe lookup. Existing base-plugin fallback is retained; unported theory-plugin get_some_value implementations remain separate dependencies.",
         "AppArgumentView exposes borrowed application storage to the evaluator. Indexed reads validate the application handle and support factory callbacks under the manager lock without public-manager reentry; original application ownership must outlive the view.",
-        "The selected original Int/Real coercion pass is now implemented for associative and ordinary arithmetic domains, including other-family declarations such as array select/store. Cast direction follows the expected sort kind, calls the actual arithmetic OP_TO_REAL/OP_TO_INT declaration dispatch and leaves nonarithmetic mismatches for check_args rejection. The explicit Go returning-error continuation names unpublished INCs and qualifies cleanup refusal; native allocation/exception/TRACE and complete owner/representation audits remain open."
+        "The selected original Int/Real coercion pass is now implemented for associative and ordinary arithmetic domains, including other-family declarations such as array select/store. Cast direction follows the expected sort kind, calls the actual arithmetic OP_TO_REAL/OP_TO_INT declaration dispatch and leaves nonarithmetic mismatches for check_args rejection. The explicit Go returning-error continuation names unpublished INCs and qualifies cleanup refusal; native allocation/exception/TRACE and complete owner/representation audits remain open.",
+        "DecRefConsumed exposes the existing Go deletion transport consumption result so extraction cache owners retire acquired references on later deletion failure. The original DecRef API retains its behavior. This is a checked Go ownership adapter, not an added native algorithm or whole-unit pointer/destructor/ABI audit credit."
       ]
     },
     {
@@ -22564,21 +22575,51 @@
       "component": "ast",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "pkg/ast/rewriter/mk_extract_proc.go",
+        "pkg/ast/rewriter/mk_extract_proc_test.go",
+        "pkg/ast/ast_dec_ref_consumed_test.go"
+      ],
+      "tests": [
+        "TestMkExtractProcOriginalCacheIdentityAndReferenceOrder",
+        "TestMkExtractProcReplacementEveryColdReservation",
+        "TestASTDecRefConsumedActualDeletionRefusal"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "original mk_extract_proc constructor, cached operator and acquired declaration destructor with first-domain borrow (src/ast/rewriter/mk_extract_proc.cpp:19-52; src/ast/rewriter/mk_extract_proc.h:22-35)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/mk_extract_proc.go",
+          "tests": [
+            "TestMkExtractProcOriginalCacheIdentityAndReferenceOrder",
+            "TestMkExtractProcReplacementEveryColdReservation"
+          ]
+        }
+      ],
+      "ownership": [
+        "The cache acquires exactly one declaration reference; its domain is borrowed through that declaration. Replacement DEC occurs before extraction factory work; bounds/domain/declaration publication occurs before INC. Owning Close tracks actual acquisition and does not decrement an already-consumed old cache after failure. The existing decNode consumed flag is exposed across the pkg boundary so later deletion errors do not lose reference consumption. Cold failure subtests close actual shared owner graph to zero budget."
+      ],
+      "deviations": [
+        "All selected source methods are represented, but whole-unit native ownership/ABI audit remains uncredited. The standalone Go owner charges its own cold header and rejects copies/closed/reentrant calls. A source prefix failure blocks retry through the checked Go adapter; Close is an owning cleanup of reached references, not a claim that native dangling-pointer destructor/fatal operation is resumable. The source raw-pointer cache is retained in its original publication order with separate acquired state for checked cleanup. Rotation/trailing/full BV rewriter consumers remain separate port work."
+      ]
     },
     {
       "path": "src/ast/rewriter/mk_extract_proc.h",
       "component": "ast",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "pkg/ast/rewriter/mk_extract_proc.go",
+        "pkg/ast/rewriter/mk_extract_proc_test.go",
+        "pkg/ast/ast_dec_ref_consumed_test.go"
+      ],
+      "tests": [
+        "TestMkExtractProcOriginalCacheIdentityAndReferenceOrder",
+        "TestMkExtractProcReplacementEveryColdReservation",
+        "TestASTDecRefConsumedActualDeletionRefusal"
+      ],
       "conditionals": [
         {
           "line": 17,
@@ -22591,9 +22632,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "original mk_extract_proc constructor, cached operator and acquired declaration destructor with first-domain borrow (src/ast/rewriter/mk_extract_proc.cpp:19-52; src/ast/rewriter/mk_extract_proc.h:22-35)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/mk_extract_proc.go",
+          "tests": [
+            "TestMkExtractProcOriginalCacheIdentityAndReferenceOrder",
+            "TestMkExtractProcReplacementEveryColdReservation"
+          ]
+        }
+      ],
+      "ownership": [
+        "The cache acquires exactly one declaration reference; its domain is borrowed through that declaration. Replacement DEC occurs before extraction factory work; bounds/domain/declaration publication occurs before INC. Owning Close tracks actual acquisition and does not decrement an already-consumed old cache after failure. The existing decNode consumed flag is exposed across the pkg boundary so later deletion errors do not lose reference consumption. Cold failure subtests close actual shared owner graph to zero budget."
+      ],
+      "deviations": [
+        "All selected source methods are represented, but whole-unit native ownership/ABI audit remains uncredited. The standalone Go owner charges its own cold header and rejects copies/closed/reentrant calls. A source prefix failure blocks retry through the checked Go adapter; Close is an owning cleanup of reached references, not a claim that native dangling-pointer destructor/fatal operation is resumable. The source raw-pointer cache is retained in its original publication order with separate acquired state for checked cleanup. Rotation/trailing/full BV rewriter consumers remain separate port work."
+      ]
     },
     {
       "path": "src/ast/rewriter/mk_simplified_app.cpp",

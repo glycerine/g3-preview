@@ -220,19 +220,26 @@ func (m *ASTManager) IncRef(h ASTHandle) error {
 	return m.incNode(r)
 }
 func (m *ASTManager) DecRef(h ASTHandle) error {
+	_, e := m.DecRefConsumed(h)
+	return e
+}
+
+// DecRefConsumed reports the existing deletion transport's consumption flag.
+// A caller must retire its ownership when deletion consumes the reference,
+// including a later worklist reservation or destructor error.
+func (m *ASTManager) DecRefConsumed(h ASTHandle) (bool, error) {
 	if e := m.lock(); e != nil {
-		return e
+		return false, e
 	}
 	defer m.mu.Unlock()
 	if h.IsNull() {
-		return nil
+		return true, nil
 	}
 	r, e := m.internal(h)
 	if e != nil {
-		return e
+		return false, e
 	}
-	_, e = m.decNode(r)
-	return e
+	return m.decNode(r)
 }
 func (m *ASTManager) BasicFamilyID() FamilyID { return 0 }
 func (m *ASTManager) IsFormatManager() bool   { return m != nil && m.Format == nil }
