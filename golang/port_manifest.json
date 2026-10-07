@@ -8706,9 +8706,16 @@
       "path": "src/ast/act_cache.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "ast_activity_cache.go"
+      ],
+      "tests": [
+        "TestASTActivityCacheSourceOwnershipReplacementAndReset",
+        "TestASTActivityCacheOldestUnusedEvictionAndQueueCompression",
+        "TestASTActivityCacheUsedReplacementPreservesSourceCounterQuirk",
+        "TestASTActivityCacheOriginalChainDisplacementRehashAndErase"
+      ],
       "conditionals": [
         {
           "line": 144,
@@ -8779,17 +8786,40 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "constructor overloads / compress_queue / init / dec_refs / del_unused / insert / find / reset / cleanup / destructor / size / capacity / empty / check_invariant",
+          "status": "ported",
+          "go_target": "ast_activity_cache.go",
+          "tests": [
+            "TestASTActivityCacheSourceOwnershipReplacementAndReset",
+            "TestASTActivityCacheOldestUnusedEvictionAndQueueCompression",
+            "TestASTActivityCacheUsedReplacementPreservesSourceCounterQuirk",
+            "TestASTActivityCacheOriginalChainDisplacementRehashAndErase"
+          ]
+        }
+      ],
+      "ownership": [
+        "Each live map entry retains its key and untagged value; null proof values retain only the key. Queue handles borrow map ownership. Replacement increments incoming value before decrementing old value and publishing. Eviction erases before releasing key then value; whole-map teardown follows source bucket/chain order. Reached Go failures retain explicit incoming/evicted roots for Close. Full allocation-failure/ownership campaigns remain deferred."
+      ],
+      "deviations": [
+        "Source activity flags use explicit fields rather than tagged addresses; concrete pointer-free handle cells preserve the original chaining algorithm and deterministic iteration. Immutable AST hash values are cached. Replacing an accessed entry preserves the original missing unused-counter increment and queue append; subsequent native lookup can underflow exactly as source, while debug lookup reports the reached assertion. Checked owner/handle guards and retained failed roots adapt fatal source failures to Go errors. Whole-class ownership auditing remains incomplete; recursive rewriter integration remains required."
+      ]
     },
     {
       "path": "src/ast/act_cache.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "ast_activity_cache.go"
+      ],
+      "tests": [
+        "TestASTActivityCacheSourceOwnershipReplacementAndReset",
+        "TestASTActivityCacheOldestUnusedEvictionAndQueueCompression",
+        "TestASTActivityCacheUsedReplacementPreservesSourceCounterQuirk",
+        "TestASTActivityCacheOriginalChainDisplacementRehashAndErase"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -8802,9 +8832,25 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "constructor overloads / compress_queue / init / dec_refs / del_unused / insert / find / reset / cleanup / destructor / size / capacity / empty / check_invariant",
+          "status": "ported",
+          "go_target": "ast_activity_cache.go",
+          "tests": [
+            "TestASTActivityCacheSourceOwnershipReplacementAndReset",
+            "TestASTActivityCacheOldestUnusedEvictionAndQueueCompression",
+            "TestASTActivityCacheUsedReplacementPreservesSourceCounterQuirk",
+            "TestASTActivityCacheOriginalChainDisplacementRehashAndErase"
+          ]
+        }
+      ],
+      "ownership": [
+        "Each live map entry retains its key and untagged value; null proof values retain only the key. Queue handles borrow map ownership. Replacement increments incoming value before decrementing old value and publishing. Eviction erases before releasing key then value; whole-map teardown follows source bucket/chain order. Reached Go failures retain explicit incoming/evicted roots for Close. Full allocation-failure/ownership campaigns remain deferred."
+      ],
+      "deviations": [
+        "Source activity flags use explicit fields rather than tagged addresses; concrete pointer-free handle cells preserve the original chaining algorithm and deterministic iteration. Immutable AST hash values are cached. Replacing an accessed entry preserves the original missing unused-counter increment and queue append; subsequent native lookup can underflow exactly as source, while debug lookup reports the reached assertion. Checked owner/handle guards and retained failed roots adapt fatal source failures to Go errors. Whole-class ownership auditing remains incomplete; recursive rewriter integration remains required."
+      ]
     },
     {
       "path": "src/ast/arith_decl_plugin.cpp",
@@ -107012,7 +107058,8 @@
       "status": "partial",
       "go_targets": [
         "util_chain_table.go",
-        "mpnum/polynomial_monomial_table.go"
+        "mpnum/polynomial_monomial_table.go",
+        "ast_activity_cache.go"
       ],
       "tests": [
         "TestChainSourceTst1",
@@ -107060,7 +107107,11 @@
         "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
         "TestMonomialSourceSingletonValidityDoesNotReadPower",
         "TestMonomialSourceDegreeSumDoesNotReadVariable",
-        "TestMonomialSourceValidityFieldShortCircuit"
+        "TestMonomialSourceValidityFieldShortCircuit",
+        "TestASTActivityCacheSourceOwnershipReplacementAndReset",
+        "TestASTActivityCacheOldestUnusedEvictionAndQueueCompression",
+        "TestASTActivityCacheUsedReplacementPreservesSourceCounterQuirk",
+        "TestASTActivityCacheOriginalChainDisplacementRehashAndErase"
       ],
       "conditionals": [
         {
@@ -107519,15 +107570,21 @@
         },
         {
           "name": "automatic Z3DEBUG CASSERT routing and pointer visited-set check_invariant actions",
-          "status": "unported"
+          "status": "unported",
+          "go_target": "",
+          "tests": null
         },
         {
           "name": "other HashProc/EqProc/value/destructor specializations, AST structural/identity table",
-          "status": "unported"
+          "status": "unported",
+          "go_target": "",
+          "tests": null
         },
         {
           "name": "disabled #if0 trace and destructor output",
-          "status": "unported"
+          "status": "unported",
+          "go_target": "",
+          "tests": null
         },
         {
           "name": "Concrete monomial chained table specialization: actual primary/cellar/free-list traversal, counters, insert/erase/expand and retained source prefixes; native pointer cell replaced by scalar16-byte codec, conditional visited-set diagnostics remain open",
@@ -107563,6 +107620,17 @@
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit"
+          ]
+        },
+        {
+          "name": "concrete AST activity-cache map: init/expand/copy/insert-if-absent/find/erase/bucket-chain iteration/reset/finalize",
+          "status": "ported",
+          "go_target": "ast_activity_cache.go",
+          "tests": [
+            "TestASTActivityCacheSourceOwnershipReplacementAndReset",
+            "TestASTActivityCacheOldestUnusedEvictionAndQueueCompression",
+            "TestASTActivityCacheUsedReplacementPreservesSourceCounterQuirk",
+            "TestASTActivityCacheOriginalChainDisplacementRehashAndErase"
           ]
         }
       ],
