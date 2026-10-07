@@ -26,6 +26,7 @@ type RationalServiceInvocation struct {
 	numeric                       NumericAllocationRoots
 	division, gcd, extended       integerRawInvocationReceipt
 	addGeneration, normGeneration uint64
+	compareGeneration             uint64
 	transferred                   SmallAllocatorPendingAllocation
 	originalCell                  SourceCellBacking
 	originalPending               Block

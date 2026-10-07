@@ -30,6 +30,7 @@ type rationalRawArithmeticScope struct {
 	powerCursor, addCursor                         uint8
 	powerCause, addCause, normCause                error
 	PowerGeneration, addGeneration, normGeneration uint64
+	compareGeneration                              uint64
 }
 
 type RationalRawArithmeticState struct {

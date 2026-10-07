@@ -36,12 +36,16 @@ type astBVNumeralFrame struct {
 	coefficientNormalization          bool
 	polynomialZero, polynomialLiteral bool
 	polynomialPowerProduct            bool
+	polynomialHoistCompare            bool
 	inverse                           bool
 	unsignedNumeral                   bool
 	bodyCause, sourceCause, ownCause  error
 }
 
 func (f *astBVNumeralFrame) childOrder() [13]int {
+	if f.polynomialHoistCompare {
+		return [13]int{3, 2, 1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1}
+	}
 	if f.polynomialPowerProduct {
 		return [13]int{1, 0, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
 	}

@@ -23425,7 +23425,9 @@
         "pkg/ast/ast_bv_power_product.go",
         "pkg/ast/ast_bv_power_product_test.go",
         "pkg/ast/rewriter/bv_polynomial_positions.go",
-        "pkg/ast/rewriter/bv_polynomial_positions_test.go"
+        "pkg/ast/rewriter/bv_polynomial_positions_test.go",
+        "pkg/ast/ast_bv_polynomial_hoist_order.go",
+        "pkg/ast/ast_bv_polynomial_hoist_order_test.go"
       ],
       "tests": [
         "TestBVPolynomialMonomialOrdinalOriginalBranchesAndTies",
@@ -23444,7 +23446,10 @@
         "TestASTBitVectorPolynomialPowerProductEveryActualReadReservation",
         "TestBVPolynomialPositionsGrowthBeforeDuplicateAndBorrowedKeys",
         "TestBVPolynomialPositionsCollisionWrapAndStaleKeyReset",
-        "TestBVPolynomialPositionsEveryConstructionAndSparseResetReservation"
+        "TestBVPolynomialPositionsEveryConstructionAndSparseResetReservation",
+        "TestASTBitVectorPolynomialHoistOrderOriginalBranches",
+        "TestASTBitVectorPolynomialHoistOrderBothReadsBeforeShortcut",
+        "TestASTBitVectorPolynomialHoistOrderEveryActualCopyReservation"
       ],
       "conditionals": [
         {
@@ -23552,6 +23557,16 @@
             "TestBVPolynomialPositionsCollisionWrapAndStaleKeyReset",
             "TestBVPolynomialPositionsEveryConstructionAndSparseResetReservation"
           ]
+        },
+        {
+          "name": "complete selected BV-specialized hoist_cmul_lt comparator: default coefficient locals, both coefficient-product reads, nonproducts first, unsigned expression IDs, separate less/greater calls and borrowed pp ID tie break (src/ast/rewriter/poly_rewriter_def.h:428-451; src/ast/rewriter/poly_rewriter.h:84)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_polynomial_hoist_order.go",
+          "tests": [
+            "TestASTBitVectorPolynomialHoistOrderOriginalBranches",
+            "TestASTBitVectorPolynomialHoistOrderBothReadsBeforeShortcut",
+            "TestASTBitVectorPolynomialHoistOrderEveryActualCopyReservation"
+          ]
         }
       ],
       "ownership": [],
@@ -23560,7 +23575,8 @@
         "Selected is_mul coefficient matcher is implemented for the original BV Config with its actual caller coefficient receiver and exact numerical invocation. Unmatched inputs erase coefficient/product/invocation reads; matched publication borrows the second operand without INC only after stored-rational copy and width read complete. A reached width error keeps the copied coefficient prefix and leaves the product unchanged. It has no owned numerical/reference locals and does not normalize or construct another copied numeral. The hoist comparator/algorithm, polynomial current-sort/mark/coefficient owner, full core/rewriter/solver integration and arith specialization remain required; no native pointer/layout/allocation/assertion/fatal/exception ABI or whole-unit ownership/completion credit is claimed.",
         "Selected add/mul expression-factory bodies are complete for the original BV Config whose use_power is false; the current sort is supplied by the future concrete caller rather than implementing the whole polynomial owner. Empty factories construct the original numeral(int) temporary before the sort-based numeral factory and end it at the return full expression. Only empty factories consult the current sort; singleton handles are borrowed without manager/sort/handle validation and multi-operand applications borrow their actual argument reader through the existing fixed-declaration/app factories. Coefficient multiplication retains original c.is_one then copied stored-value is_zero: no coefficient-zero shortcut, no operand normalization during zero testing, and no new one shortcut after coefficient numeral normalization. Actual invocation receipts capture numerical children at entry; stopped contexts remain with the AST plugin and source history is unaffected by owning cleanup. The AST placement avoids reverse imports. Arith use_power folding, hoisting, full polynomial current-sort/mark/coefficient owner/core and rewriter/solver integration remain required. Native wrapper/stack/pointer/return-value/allocator/assertion/fatal/exception ABI and whole-unit ownership/completion are not credited; returning Go cleanup is not native-fatal resumability.",
         "Selected coefficient-valued power-product reader is complete for BV Config. Stored coefficients are copied into the physical caller receiver without normalization. The fallback constructs a separate numeral(int) one, copy-assigns it and ends it at the full expression, rather than directly setting/swapping the receiver. Actual invocation receipts capture the read or constructor/assignment child before acquisition; stopped calls reject reuse after owning cleanup and retain recorded source history. Return handles are borrowed without INC. Symbolic/nary/unary/empty/bare-numeral shapes preserve the source guards and unread metadata; a small-inline fallback introduces no numeric allocation. The AST numerical wrapper/header is charged where physically allocated; native stack/pointer/allocator/assertion/fatal/exception ABI and whole-unit ownership/completion are uncredited. Arith specialization, hoisting, full current-sort/mark/coefficient owner, polynomial core and overall rewriter/solver integration remain required. Returning Go cleanup is not native-fatal resumability.",
-        "Concrete m_expr2pos dependency implements only the operations used by polynomial coefficient collection: construction, insert/find/reset and destruction, with no erase/tombstones or key INC/DEC. Original reset clears key fields only, retains dense backing and halves sparse backing above 16 after freeing the old buffer. A refused replacement leaves the released-buffer prefix and a stopped checked Go adapter, with cleanup allowed but retry rejected; native fatal/allocator/pointer/layout/stack ABI is not claimed. Actual reflected Go header and bucket backing are charged. This table is not yet wired into the full polynomial current-sort/mark/coefficient owner and core; it does not establish whole polynomial or general obj_map completion."
+        "Concrete m_expr2pos dependency implements only the operations used by polynomial coefficient collection: construction, insert/find/reset and destruction, with no erase/tombstones or key INC/DEC. Original reset clears key fields only, retains dense backing and halves sparse backing above 16 after freeing the old buffer. A refused replacement leaves the released-buffer prefix and a stopped checked Go adapter, with cleanup allowed but retry rejected; native fatal/allocator/pointer/layout/stack ABI is not claimed. Actual reflected Go header and bucket backing are charged. This table is not yet wired into the full polynomial current-sort/mark/coefficient owner and core; it does not establish whole polynomial or general obj_map completion.",
+        "Selected comparator uses the actual AST numerical frame to own two default-constructed coefficient locals and exact copy/comparison invocations. Both coefficient reads occur before classification shortcuts; stored values are not normalized. Source DT ends c2 before c1 after joining reached children, with stopped call sites and stable failure history. AST placement accesses private numerical owners without a reverse import; operands and power products acquire no references. Wrapper storage is charged at actual Go width, without native stack/pointer/layout/allocator/assertion/fatal/exception ABI or whole-unit credit. Full coefficient-hoist sorting/grouping, multiplication hoist, polynomial current-sort/mark/coefficient owner, addition/multiplication cores, arith specialization and rewriter/solver integration remain required."
       ]
     },
     {
@@ -23576,7 +23592,9 @@
         "pkg/ast/ast_bv_polynomial_factory.go",
         "pkg/ast/ast_bv_polynomial_factory_test.go",
         "pkg/ast/ast_bv_power_product.go",
-        "pkg/ast/ast_bv_power_product_test.go"
+        "pkg/ast/ast_bv_power_product_test.go",
+        "pkg/ast/ast_bv_polynomial_hoist_order.go",
+        "pkg/ast/ast_bv_polynomial_hoist_order_test.go"
       ],
       "tests": [
         "TestBVPolynomialMonomialOrdinalOriginalBranchesAndTies",
@@ -23592,7 +23610,10 @@
         "TestASTBitVectorPolynomialCoefficientEveryActualReservation",
         "TestASTBitVectorPolynomialPowerProductCoefficientAndFallbackOne",
         "TestASTBitVectorPolynomialPowerProductFallbackTemporaryBeforeReceiverGuard",
-        "TestASTBitVectorPolynomialPowerProductEveryActualReadReservation"
+        "TestASTBitVectorPolynomialPowerProductEveryActualReadReservation",
+        "TestASTBitVectorPolynomialHoistOrderOriginalBranches",
+        "TestASTBitVectorPolynomialHoistOrderBothReadsBeforeShortcut",
+        "TestASTBitVectorPolynomialHoistOrderEveryActualCopyReservation"
       ],
       "assertions": [
         {
@@ -140437,7 +140458,9 @@
         "pkg/util/rational_service_gcd_invocation_test.go",
         "pkg/util/rational_service_unsigned_invocation_test.go",
         "pkg/util/rational_service_mod_into_invocation_test.go",
-        "pkg/util/rational_service_mod_into_callback_source_test.go"
+        "pkg/util/rational_service_mod_into_callback_source_test.go",
+        "pkg/util/rational_service_compare_invocation.go",
+        "pkg/util/rational_service_compare_invocation_test.go"
       ],
       "tests": [
         "TestSourceRationalConversionAssertions",
@@ -140589,7 +140612,9 @@
         "TestRationalServiceModIntoInvocationActualTransportRefusesHeldOwner",
         "TestRationalServiceIDivIntoInvocationAliasesAndInline",
         "TestRationalServiceIDivIntoInvocationEveryActualReservation",
-        "TestRationalServiceIDivIntoInvocationActualTransportRefusesHeldOwner"
+        "TestRationalServiceIDivIntoInvocationActualTransportRefusesHeldOwner",
+        "TestRationalServiceComparisonInvocationSourceBranches",
+        "TestRationalServiceComparisonInvocationEveryActualReservation"
       ],
       "conditionals": [
         {
@@ -141153,6 +141178,15 @@
             "TestRationalServiceIDivIntoInvocationEveryActualReservation",
             "TestRationalServiceIDivIntoInvocationActualTransportRefusesHeldOwner"
           ]
+        },
+        {
+          "name": "tracked original operator< and operator> delegation through exact synchronized mpq comparison with integer/sign shortcuts and source-ordered cross-products (src/util/rational.h:238-240,421-423; src/util/mpq.h:572-579; src/util/mpq.cpp:39-75)",
+          "status": "partial",
+          "go_target": "pkg/util/rational_service_compare_invocation.go",
+          "tests": [
+            "TestRationalServiceComparisonInvocationSourceBranches",
+            "TestRationalServiceComparisonInvocationEveryActualReservation"
+          ]
         }
       ],
       "ownership": [
@@ -141187,7 +141221,8 @@
         "The selected gcd wrapper now supports caller-local invocation ownership needed by BV modular inverse. The BV inverse caller remains to be ported; concrete Go scalar/header and native allocator/assertion/exception ABI qualifications remain. Actual Runtime refusal tests prove explicit owning release of interrupted invocations, not resumability of the process-fatal source operation.",
         "The existing unsigned service setter now names the original uint32 manager overload rather than the numerically equivalent signed64 facade shortcut. Small uint32 uses original int32 publication; larger values still reach original int64 path. Native rational/union/allocator/exception ABI and whole-unit ownership audits remain uncredited; integration faults are separately covered at the BV caller.",
         "The selected caller-local void overload is a prerequisite of original sign-extension numeral rewriting. It preserves the native negative-dividend/divisor-output alias defect: correction rereads the overwritten divisor and produces zero. Tests do not pre-copy the divisor to repair source behavior. Source denominator reset follows successful numerator publication; failure leaves original DEN untouched. Native pointer/stack/assertion/exception/allocator ABI and whole-unit ownership audits remain uncredited; Runtime returning transport closure does not prove native-fatal resumability.",
-        "The source divisor/output alias defect is preserved: after machine quotient publication, negative correction rereads the overwritten divisor and follows quotient sign. Other valid cases use independent Euclidean arithmetic test oracles. The returning Go failure transport remains a qualified adapter; no native-fatal resumability, allocator/pointer/stack/assertion/exception ABI or whole-unit completion is credited. This ports the direct division dependency used by bv_trailing; its analyzer/cache/removal algorithms remain open."
+        "The source divisor/output alias defect is preserved: after machine quotient publication, negative correction rereads the overwritten divisor and follows quotient sign. Other valid cases use independent Euclidean arithmetic test oracles. The returning Go failure transport remains a qualified adapter; no native-fatal resumability, allocator/pointer/stack/assertion/exception ABI or whole-unit completion is credited. This ports the direct division dependency used by bv_trailing; its analyzer/cache/removal algorithms remain open.",
+        "Added exact invocation forms for less/greater without changing the comparison algorithm. Greater reverses operands as original operator> does. The caller embeds/charges its invocation; no per-call numeric header is introduced. A reached synchronized raw comparison cohort receives a generation captured at entry by its actual invocation; cleanup only joins matching cohorts, so an older completed call cannot adopt a newer failed comparison. Source end stops retain cursor/cause independently of owning cleanup; native allocator/stack/pointer/assertion/fatal/exception ABI and native-fatal resumability are uncredited. The BV hoist comparator consumes these operations, while whole polynomial core/hoisting integration remains required."
       ]
     },
     {

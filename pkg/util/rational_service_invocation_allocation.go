@@ -42,6 +42,9 @@ func (c *RationalServiceInvocation) childSource() error {
 		return nil
 	}
 	r := &c.manager.RawArithmetic
+	if c.compareGeneration != 0 && c.compareGeneration == r.compareGeneration && r.compareEnd && r.compareCause != nil {
+		return r.compareCause
+	}
 	if c.normGeneration != 0 && c.normGeneration == r.normGeneration && r.normEnd && r.normCause != nil {
 		return r.normCause
 	}
@@ -71,6 +74,15 @@ func (c integerAllocationInvocationContext) recordRationalServiceRaw(z *IntegerM
 
 func (c *RationalServiceInvocation) cleanupRationalRaw(abort bool) error {
 	r := &c.manager.RawArithmetic
+	if c.compareGeneration != 0 && c.compareGeneration == r.compareGeneration && r.CompareActive && (abort || r.compareEnd) {
+		for r.compareCursor < 4 {
+			if e := c.integer.CleanupRawNumeral(r.compareField()); e != nil {
+				return e
+			}
+			r.compareCursor++
+		}
+		r.CompareActive = false
+	}
 	if c.normGeneration != 0 && c.normGeneration == r.normGeneration && r.NormActive && (abort || r.normEnd) {
 		if e := c.integer.CleanupRawNumeral(&r.Norm); e != nil {
 			return e

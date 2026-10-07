@@ -462,6 +462,14 @@ func (m *RationalManager) compareWithAllocationContext(a, b *Rational, context i
 		if r.CompareActive {
 			return 0, ErrRationalRawArithmeticPending
 		}
+		generation, e := m.beginRawGeneration()
+		if e != nil {
+			return 0, e
+		}
+		r.compareGeneration = generation
+		if c := context.rationalServiceFrame(m.Z); c != nil {
+			c.compareGeneration = generation
+		}
 		r.CompareOne, r.CompareTwo = NewRational(), NewRational()
 		r.CompareActive = true
 		r.compareEnd = false
