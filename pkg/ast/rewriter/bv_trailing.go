@@ -1,4 +1,4 @@
-// Source: src/ast/rewriter/bv_trailing.cpp:24-51,87-103,338-389,395-397,403-405;
+// Source: src/ast/rewriter/bv_trailing.cpp:24-244,338-405;
 // src/ast/rewriter/bv_trailing.h:24-44.
 package rewriter
 
@@ -10,18 +10,21 @@ import (
 
 const bvTrailingDepth uint32 = 5
 
-// BVTrailing borrows the extraction procedure/manager and owns the five lazy
-// count caches. The standalone Go header is charged once; do not copy it.
+// BVTrailing borrows the extraction procedure/manager and owns five lazy
+// count caches and reached local frames. Its Go header is charged once;
+// do not copy it.
 type BVTrailing struct {
-	self            *BVTrailing
-	extract         *MkExtractProc
-	manager         *ast.ASTManager
-	tables          [6]*bvTrailingTable
-	pending         ast.ASTHandle
-	pendingOwned    bool
-	header          uint64
-	running, closed bool
-	failure         error
+	self                          *BVTrailing
+	extract                       *MkExtractProc
+	manager                       *ast.ASTManager
+	tables                        [6]*bvTrailingTable
+	pending                       ast.ASTHandle
+	pendingOwned                  bool
+	header                        uint64
+	running, closed               bool
+	failure                       error
+	frames                        *bvTrailingFrame
+	countCall, removeCall, eqCall bvTrailingCall
 }
 
 func NewBVTrailing(extract *MkExtractProc) (*BVTrailing, error) {
@@ -73,6 +76,9 @@ func (p *BVTrailing) Count(arg ast.ASTHandle) (min, max uint32, body error) {
 }
 
 func (p *BVTrailing) count(arg ast.ASTHandle, depth uint32) (min, max uint32, body error) {
+	return p.countTracked(arg, depth, &p.countCall)
+}
+func (p *BVTrailing) countTracked(arg ast.ASTHandle, depth uint32, call *bvTrailingCall) (min, max uint32, body error) {
 	m := p.manager
 	if ast.ASTSourceDebug {
 		yes, e := m.IsBitVector(arg)
@@ -99,7 +105,7 @@ func (p *BVTrailing) count(arg ast.ASTHandle, depth uint32) (min, max uint32, bo
 			return entry.min, entry.max, nil
 		}
 	}
-	min, max, body = p.countCore(arg, depth)
+	min, max, body = p.countCore(arg, depth, call)
 	if body != nil {
 		return
 	}
@@ -182,6 +188,21 @@ func (p *BVTrailing) Close() error {
 	}
 	if p.running {
 		return ast.ErrASTPending
+	}
+	for p.frames != nil {
+		f := p.frames
+		if e := f.destroy(true); e != nil {
+			return e
+		}
+		p.frames = f.next
+		p.manager.Budget().Release(f.header)
+		f.header = 0
+		f.retired = true
+	}
+	for _, call := range []*bvTrailingCall{&p.removeCall, &p.eqCall, &p.countCall} {
+		if e := call.cleanup(p.manager); e != nil {
+			return e
+		}
 	}
 	if p.pendingOwned {
 		consumed, e := p.manager.DecRefConsumed(p.pending)

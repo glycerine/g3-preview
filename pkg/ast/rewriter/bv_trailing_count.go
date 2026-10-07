@@ -3,9 +3,9 @@ package rewriter
 
 import "github.com/glycerine/g3/pkg/ast"
 
-func (p *BVTrailing) countCore(arg ast.ASTHandle, depth uint32) (min, max uint32, body error) {
+func (p *BVTrailing) countCore(arg ast.ASTHandle, depth uint32, call *bvTrailingCall) (min, max uint32, body error) {
 	m := p.manager
-	matched, count, e := m.CountBitVectorNumeralTrailingZeros(arg)
+	matched, count, e := m.CountBitVectorNumeralTrailingZerosWithInvocation(arg, &call.numeral)
 	if e != nil || matched {
 		return count, count, e
 	}
@@ -19,18 +19,18 @@ func (p *BVTrailing) countCore(arg ast.ASTHandle, depth uint32) (min, max uint32
 		}
 		switch kind {
 		case 6:
-			return p.countMul(arg, depth)
+			return p.countMul(arg, depth, call)
 		case 4:
-			return p.countAdd(arg, depth)
+			return p.countAdd(arg, depth, call)
 		case 37:
-			return p.countConcat(arg, depth)
+			return p.countConcat(arg, depth, call)
 		}
 	}
 	max, body = m.BitVectorSize(arg)
 	return 0, max, body
 }
 
-func (p *BVTrailing) countConcat(arg ast.ASTHandle, depth uint32) (min, max uint32, body error) {
+func (p *BVTrailing) countConcat(arg ast.ASTHandle, depth uint32, call *bvTrailingCall) (min, max uint32, body error) {
 	m := p.manager
 	// Source's shallow guard reads width but does not return before the scan.
 	if depth <= 1 {
@@ -53,7 +53,7 @@ func (p *BVTrailing) countConcat(arg ast.ASTHandle, depth uint32) (min, max uint
 		if e != nil {
 			return min, max, e
 		}
-		lo, hi, e := p.count(curr, depth-1)
+		lo, hi, e := p.countTracked(curr, depth-1, call)
 		if e != nil {
 			return min, max, e
 		}
@@ -70,7 +70,7 @@ func (p *BVTrailing) countConcat(arg ast.ASTHandle, depth uint32) (min, max uint
 	return min, max, nil
 }
 
-func (p *BVTrailing) countAdd(arg ast.ASTHandle, depth uint32) (min, max uint32, body error) {
+func (p *BVTrailing) countAdd(arg ast.ASTHandle, depth uint32, call *bvTrailingCall) (min, max uint32, body error) {
 	m := p.manager
 	if depth <= 1 {
 		if _, e := m.BitVectorSize(arg); e != nil {
@@ -92,7 +92,7 @@ func (p *BVTrailing) countAdd(arg ast.ASTHandle, depth uint32) (min, max uint32,
 		if e != nil {
 			return min, max, e
 		}
-		lo, hi, e := p.count(curr, depth-1)
+		lo, hi, e := p.countTracked(curr, depth-1, call)
 		if e != nil {
 			return min, max, e
 		}
@@ -115,7 +115,7 @@ func (p *BVTrailing) countAdd(arg ast.ASTHandle, depth uint32) (min, max uint32,
 	return min, max, nil
 }
 
-func (p *BVTrailing) countMul(arg ast.ASTHandle, depth uint32) (min, max uint32, body error) {
+func (p *BVTrailing) countMul(arg ast.ASTHandle, depth uint32, call *bvTrailingCall) (min, max uint32, body error) {
 	m := p.manager
 	if depth <= 1 {
 		if _, e := m.BitVectorSize(arg); e != nil {
@@ -133,7 +133,7 @@ func (p *BVTrailing) countMul(arg ast.ASTHandle, depth uint32) (min, max uint32,
 	if e != nil {
 		return 0, 0, e
 	}
-	min, max, body = p.count(curr, depth-1)
+	min, max, body = p.countTracked(curr, depth-1, call)
 	if body != nil {
 		return
 	}

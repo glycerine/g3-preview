@@ -5,7 +5,7 @@ import "github.com/glycerine/g3/pkg/util"
 
 // beginBitVectorTrailingNumeral guards the allocation-free default rational
 // on the nonnumeral path; matched calls own its copied stored value and two.
-func (m *ASTManager) beginBitVectorTrailingNumeral(arg ASTHandle) (f *astBVNumeralFrame, r astNodeRef, width uint32, matched bool, result error) {
+func (m *ASTManager) beginBitVectorTrailingNumeral(arg ASTHandle, receipt *astBVNormalizationReceipt) (f *astBVNumeralFrame, r astNodeRef, width uint32, matched bool, result error) {
 	r, result = m.requireExpr(arg)
 	if result != nil {
 		return
@@ -17,6 +17,9 @@ func (m *ASTManager) beginBitVectorTrailingNumeral(arg ASTHandle) (f *astBVNumer
 	f, result = m.beginBVNumeralFrame()
 	if result != nil {
 		return
+	}
+	if receipt != nil {
+		*receipt = astBVNormalizationReceipt{frame: f, invocation: f.invocation}
 	}
 	f.trailingNumeral = true
 	q := m.numerals
@@ -85,16 +88,27 @@ func (m *ASTManager) bitVectorTrailingDivide(f *astBVNumeralFrame, limit uint32,
 // CountBitVectorNumeralTrailingZeros implements the numeral branch, including
 // its width cap. Structural analysis and depth caches belong to the caller.
 func (m *ASTManager) CountBitVectorNumeralTrailingZeros(arg ASTHandle) (matched bool, count uint32, result error) {
+	return m.countBitVectorNumeralTrailingZeros(arg, nil)
+}
+func (m *ASTManager) countBitVectorNumeralTrailingZeros(arg ASTHandle, c *ASTBitVectorNumeralInvocation) (matched bool, count uint32, result error) {
 	if e := m.lock(); e != nil {
 		return false, 0, e
 	}
 	defer m.mu.Unlock()
+	var receipt *astBVNormalizationReceipt
+	if c != nil {
+		if e := c.prepare(m); e != nil {
+			return false, 0, e
+		}
+		defer c.finish(&result)
+		receipt = &c.receipt
+	}
 	previous := m.formatExecuting
 	m.formatExecuting = true
 	defer func() { m.formatExecuting = previous }()
-	f, _, width, matched, e := m.beginBitVectorTrailingNumeral(arg)
+	f, _, width, matched, e := m.beginBitVectorTrailingNumeral(arg, receipt)
 	if f != nil {
-		defer f.finishNumeral(&result, nil)
+		defer f.finishNumeral(&result, receipt)
 	}
 	if e != nil || !matched {
 		return matched, 0, e
@@ -107,19 +121,30 @@ func (m *ASTManager) CountBitVectorNumeralTrailingZeros(arg ASTHandle) (matched 
 // retains raw identity when no bit was removed, and constructs the reduced
 // numeral otherwise. Zero limit and nonnumeral input leave output unread.
 func (m *ASTManager) RemoveBitVectorNumeralTrailingZeros(arg ASTHandle, n uint32, out ASTRef) (matched bool, removed uint32, result error) {
+	return m.removeBitVectorNumeralTrailingZeros(arg, n, out, nil)
+}
+func (m *ASTManager) removeBitVectorNumeralTrailingZeros(arg ASTHandle, n uint32, out ASTRef, c *ASTBitVectorNumeralInvocation) (matched bool, removed uint32, result error) {
 	if e := m.lock(); e != nil {
 		return false, 0, e
 	}
 	defer m.mu.Unlock()
+	var receipt *astBVNormalizationReceipt
+	if c != nil {
+		if e := c.prepare(m); e != nil {
+			return false, 0, e
+		}
+		defer c.finish(&result)
+		receipt = &c.receipt
+	}
 	if n == 0 {
 		return false, 0, nil
 	}
 	previous := m.formatExecuting
 	m.formatExecuting = true
 	defer func() { m.formatExecuting = previous }()
-	f, r, width, matched, e := m.beginBitVectorTrailingNumeral(arg)
+	f, r, width, matched, e := m.beginBitVectorTrailingNumeral(arg, receipt)
 	if f != nil {
-		defer f.finishNumeral(&result, nil)
+		defer f.finishNumeral(&result, receipt)
 	}
 	if e != nil || !matched {
 		return matched, 0, e

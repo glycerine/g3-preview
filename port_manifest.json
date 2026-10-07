@@ -21650,13 +21650,17 @@
       "path": "src/ast/rewriter/bv_trailing.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
+      "status": "partial",
       "go_targets": [
         "pkg/ast/ast_bv_trailing_numeral.go",
         "pkg/ast/rewriter/bv_trailing.go",
         "pkg/ast/rewriter/bv_trailing_count.go",
         "pkg/ast/rewriter/bv_trailing_table.go",
-        "pkg/ast/ast_bv_numeral_scope.go"
+        "pkg/ast/ast_bv_numeral_scope.go",
+        "pkg/ast/rewriter/bv_trailing_remove.go",
+        "pkg/ast/rewriter/bv_trailing_eq.go",
+        "pkg/ast/rewriter/bv_trailing_frame.go",
+        "pkg/ast/ast_bv_trailing_invocation.go"
       ],
       "tests": [
         "TestASTBitVectorOriginalNumeralTrailingZeros",
@@ -21674,7 +21678,20 @@
         "TestASTBitVectorNumeralScopeErasedGuard",
         "TestASTBitVectorNumeralScopeEveryReachedReservation",
         "TestASTBitVectorNumeralScopeStoppedAndForeignChildren",
-        "TestASTBitVectorNumeralScopeStoredOnePredicate"
+        "TestASTBitVectorNumeralScopeStoredOnePredicate",
+        "TestBVTrailingOriginalStructuralRemoval",
+        "TestBVTrailingRemovalUnknownAndShallowGuards",
+        "TestBVTrailingRemovalZeroCoefficientReachedInvalidRead",
+        "TestBVTrailingRemovalEveryColdReservation",
+        "TestBVTrailingRemovalSourceRefDTConsumedBeforeOlderVector",
+        "TestBVTrailingRemovalConcatUnchangedOutputSourceEdge",
+        "TestBVTrailingRemovalActualRuntimeNumeralChild",
+        "TestBVTrailingOriginalEqualityReduction",
+        "TestBVTrailingEqualityEveryColdReservation",
+        "TestBVTrailingEqualityReachedVerifyOverRemovalDomain",
+        "TestASTBitVectorTrailingInvocationNamesActualChild",
+        "TestASTBitVectorTrailingInvocationEveryActualReservation",
+        "TestBVTrailingRemovalUnreadOperandsAndZeroInputGuard"
       ],
       "assertions": [
         {
@@ -21804,28 +21821,65 @@
             "TestASTBitVectorNumeralScopeStoppedAndForeignChildren",
             "TestASTBitVectorNumeralScopeStoredOnePredicate"
           ]
+        },
+        {
+          "name": "exact counted/removed numeral child captured at frame entry for structural caller source readiness and owning cleanup (src/ast/rewriter/bv_trailing.cpp:213-234,311-327)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_trailing_invocation.go",
+          "tests": [
+            "TestASTBitVectorTrailingInvocationNamesActualChild",
+            "TestASTBitVectorTrailingInvocationEveryActualReservation"
+          ]
+        },
+        {
+          "name": "original complete depth-five remove_trailing core and add/mul/concat bodies, reference/vector locals and source destructor order (src/ast/rewriter/bv_trailing.cpp:98-244,399-401)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_trailing_remove.go",
+          "tests": [
+            "TestBVTrailingOriginalStructuralRemoval",
+            "TestBVTrailingRemovalUnknownAndShallowGuards",
+            "TestBVTrailingRemovalZeroCoefficientReachedInvalidRead",
+            "TestBVTrailingRemovalEveryColdReservation",
+            "TestBVTrailingRemovalSourceRefDTConsumedBeforeOlderVector",
+            "TestBVTrailingRemovalConcatUnchangedOutputSourceEdge",
+            "TestBVTrailingRemovalActualRuntimeNumeralChild",
+            "TestBVTrailingRemovalUnreadOperandsAndZeroInputGuard"
+          ]
+        },
+        {
+          "name": "original complete eq_remove_trailing bounds tests, no-removal failed status with equality publication, full-width true and exact removal/identity reduction (src/ast/rewriter/bv_trailing.cpp:51-85,392-394)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_trailing_eq.go",
+          "tests": [
+            "TestBVTrailingOriginalEqualityReduction",
+            "TestBVTrailingEqualityEveryColdReservation",
+            "TestBVTrailingEqualityReachedVerifyOverRemovalDomain"
+          ]
         }
       ],
       "ownership": [
         "AST-owned address-stable numerical frame owns copied e_val and helper-local two. Direct division operates on e_val in place, increments count before the call in counting and after the call in removal, and retires each successful invocation completely before reusing that call site. Failed child contexts are retained for checked owning cleanup. Removal destroys two before nested NUM construction/publication; the copied numeral remains alive until caller exit. Exact nested constructor receipt joins before older DT. Actual cold numerical reservation campaigns retain source counts/output behavior and close shared graphs to zero budget.",
         "Five lazy depth caches each own one reference per inserted expression. Depth zero performs no cache allocation or INC. Table construction precedes key INC; growth/insertion follows it. A refused insertion retains that exact pending INC for owning closure. Reset visits depths one through five and table buckets in source order, resets only size>=condition or condition zero, and records actual DEC consumption even when child deletion returns an error. Owning Close resumes that cleanup cursor without a second DEC. Successful cache hits read only key/hash/bounds, erasing numeral/child traversal. Fresh cold campaigns close cache/extraction/AST/numeric/symbol owners to zero shared budget.",
-        "The AST-owned address-stable c_val scope copies stored numerical metadata without normalization and holds that rational across subsequent AST calls through output publication. Nonnumeral default rational bookkeeping is erased. The unsigned numeral constructor is captured before entry, joined before older c_val DT and never retried at the same call site. Body and source-DT completion are separate; source readiness does not become true merely because owning cleanup ran. Successful scopes retire their exact invocation; failed scopes retain their actual plugin-list frame/context/header until plugin owning Close. Copied, ended, premature cleanup and uncaptured stopped-younger scopes reject. Actual Runtime campaigns refuse every reached read/constructor reservation until success and close the shared graph to zero budget."
+        "The AST-owned address-stable c_val scope copies stored numerical metadata without normalization and holds that rational across subsequent AST calls through output publication. Nonnumeral default rational bookkeeping is erased. The unsigned numeral constructor is captured before entry, joined before older c_val DT and never retried at the same call site. Body and source-DT completion are separate; source readiness does not become true merely because owning cleanup ran. Successful scopes retire their exact invocation; failed scopes retain their actual plugin-list frame/context/header until plugin owning Close. Copied, ended, premature cleanup and uncaptured stopped-younger scopes reject. Actual Runtime campaigns refuse every reached read/constructor reservation until success and close the shared graph to zero budget.",
+        "Actual recursive call sites retain their entered structural frame and exact numerical invocation, captured at numerical frame entry before copy/two/division allocations. Successful returns retire before loop reuse; failed call sites reject reuse after owning cleanup. ADD constructs vector then tmp and destroys tmp then vector; MUL constructs tmp then vector/c_val and ends c_val then vector then tmp; CONCAT constructs new_last then vector and ends vector then new_last; equality constructs out1 then out2 and ends out2 then out1. A stopped exact child blocks older source DT. Failed vector pushes retain their exact unpublished INC receipt and original vector token across vector destruction, and owning closure acknowledges that acquisition once. AST ref/vector APIs record physical DEC consumption independently of later deletion errors. Reached frames remain on the actual owner list after body/source failure; owning Close drains youngest frames and numerical calls before pending cache INC/reset, without source replay or ambient-frame adoption."
       ],
       "deviations": [
-        "The numerical branch algorithms are provided as AST cores to use private numeral/reference ownership without reverse imports. Nonnumeral identity guards erase bookkeeping for the native allocation-free default rational; zero-limit numeral removal erases input/output numerical reads after existing manager boundary checks. Counting and its caches are now selected separately, while structural add/mul/concat removal, removal depth/BV preconditions and equality reduction remain required. Native stack/pointer/allocator/assertion/exception ABI and whole-unit ownership remain uncredited; actual Runtime fault cleanup is not native-fatal resumability.",
-        "Complete counting and count-cache algorithms are selected; structural removal and equality reduction remain unported. The typed append-only obj_map specialization resides in rewriter to avoid generics and reverse util/ast imports. Go header and concrete entry-slice backing are charged to the shared budget, with origin/generation handles and explicit ownership/cursors; native inline-wrapper/vtable/key-pointer/free-sentinel layout, Runtime allocation/fatal/exception ABI and whole-unit audit are uncredited. Checked closed/copied/reentrant/stopped owners reject; cleanup after reached failure is owning closure, not a resumable source operation. Shallow structural count guards retain their source width read without inventing an early return.",
-        "The copied c_val/is_one operation and its source lifetime are selected as an AST core to preserve pkg import boundaries. It is the dependency for the remaining structural multiplication removal, not a claim that remove_trailing_mul or equality reduction is complete. Native allocation-free default rational erasure remains for nonnumerals. Checked Go scope tokens, returning failure transport and address-stable owner frames do not establish native stack/pointer/allocator/assertion/exception ABI, native-fatal resumability or whole-unit ownership completion."
+        "All count/cache/removal/equality algorithm bodies are now selected, but whole-unit methods/ownership and native ABI are not credited. Standalone checked Go owners preserve pkg import boundaries and charge wrapper headers plus actual vector/table backing. The ref-vector-to-slice factory bridge adds a budgeted, non-owning handle buffer (inline sixteen then spill), whereas native c_ptr is borrowed directly; its layout/allocation ABI remains uncredited. Source TRACE/CTRACE diagnostics and native stack/vtable/pointer/allocator/fatal/assertion/exception ABI remain open. Go returning-error cleanup is not native-fatal resumability. Whole-unit status is partial, not ported.",
+        "Source edge behavior is retained: concat passes the full request to every child and can over-remove; an unknown child leaves new_last unchanged, so concat(x,zero4) removal of six returns four/null in release and reaches the full-width SASSERT in g3debug. Complete coefficient removal in MUL reaches is_numeral(null) before its zero-width guard; the Go boundary returns ErrASTHandle for that native invalid-pointer domain. ADD/equality VERIFY checks run in all source builds and a failed exact-removal check reaches release UNREACHABLE/undefined behavior; Go rejects that domain with ErrASTDomain and retains unchanged final output. These are qualifications, not repaired algorithms."
       ]
     },
     {
       "path": "src/ast/rewriter/bv_trailing.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
+      "status": "partial",
       "go_targets": [
         "pkg/ast/rewriter/bv_trailing.go",
         "pkg/ast/rewriter/bv_trailing_count.go",
-        "pkg/ast/rewriter/bv_trailing_table.go"
+        "pkg/ast/rewriter/bv_trailing_table.go",
+        "pkg/ast/rewriter/bv_trailing_remove.go",
+        "pkg/ast/rewriter/bv_trailing_eq.go",
+        "pkg/ast/rewriter/bv_trailing_frame.go"
       ],
       "tests": [
         "TestBVTrailingOriginalCountingAlgorithms",
@@ -21835,7 +21889,18 @@
         "TestBVTrailingConstructorBorrowsExtractionOwner",
         "TestBVTrailingCacheReferencesGrowthAndResetThreshold",
         "TestBVTrailingCacheGrowthAndEqualThresholdReset",
-        "TestBVTrailingResetConsumedKeyAfterDeletionFailure"
+        "TestBVTrailingResetConsumedKeyAfterDeletionFailure",
+        "TestBVTrailingOriginalStructuralRemoval",
+        "TestBVTrailingRemovalUnknownAndShallowGuards",
+        "TestBVTrailingRemovalZeroCoefficientReachedInvalidRead",
+        "TestBVTrailingRemovalEveryColdReservation",
+        "TestBVTrailingRemovalSourceRefDTConsumedBeforeOlderVector",
+        "TestBVTrailingRemovalConcatUnchangedOutputSourceEdge",
+        "TestBVTrailingRemovalActualRuntimeNumeralChild",
+        "TestBVTrailingOriginalEqualityReduction",
+        "TestBVTrailingEqualityEveryColdReservation",
+        "TestBVTrailingEqualityReachedVerifyOverRemovalDomain",
+        "TestBVTrailingRemovalUnreadOperandsAndZeroInputGuard"
       ],
       "conditionals": [
         {
@@ -21871,13 +21936,40 @@
             "TestBVTrailingCacheGrowthAndEqualThresholdReset",
             "TestBVTrailingResetConsumedKeyAfterDeletionFailure"
           ]
+        },
+        {
+          "name": "original complete depth-five remove_trailing core and add/mul/concat bodies, reference/vector locals and source destructor order (src/ast/rewriter/bv_trailing.cpp:98-244,399-401)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_trailing_remove.go",
+          "tests": [
+            "TestBVTrailingOriginalStructuralRemoval",
+            "TestBVTrailingRemovalUnknownAndShallowGuards",
+            "TestBVTrailingRemovalZeroCoefficientReachedInvalidRead",
+            "TestBVTrailingRemovalEveryColdReservation",
+            "TestBVTrailingRemovalSourceRefDTConsumedBeforeOlderVector",
+            "TestBVTrailingRemovalConcatUnchangedOutputSourceEdge",
+            "TestBVTrailingRemovalActualRuntimeNumeralChild",
+            "TestBVTrailingRemovalUnreadOperandsAndZeroInputGuard"
+          ]
+        },
+        {
+          "name": "original complete eq_remove_trailing bounds tests, no-removal failed status with equality publication, full-width true and exact removal/identity reduction (src/ast/rewriter/bv_trailing.cpp:51-85,392-394)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_trailing_eq.go",
+          "tests": [
+            "TestBVTrailingOriginalEqualityReduction",
+            "TestBVTrailingEqualityEveryColdReservation",
+            "TestBVTrailingEqualityReachedVerifyOverRemovalDomain"
+          ]
         }
       ],
       "ownership": [
-        "Five lazy depth caches each own one reference per inserted expression. Depth zero performs no cache allocation or INC. Table construction precedes key INC; growth/insertion follows it. A refused insertion retains that exact pending INC for owning closure. Reset visits depths one through five and table buckets in source order, resets only size>=condition or condition zero, and records actual DEC consumption even when child deletion returns an error. Owning Close resumes that cleanup cursor without a second DEC. Successful cache hits read only key/hash/bounds, erasing numeral/child traversal. Fresh cold campaigns close cache/extraction/AST/numeric/symbol owners to zero shared budget."
+        "Five lazy depth caches each own one reference per inserted expression. Depth zero performs no cache allocation or INC. Table construction precedes key INC; growth/insertion follows it. A refused insertion retains that exact pending INC for owning closure. Reset visits depths one through five and table buckets in source order, resets only size>=condition or condition zero, and records actual DEC consumption even when child deletion returns an error. Owning Close resumes that cleanup cursor without a second DEC. Successful cache hits read only key/hash/bounds, erasing numeral/child traversal. Fresh cold campaigns close cache/extraction/AST/numeric/symbol owners to zero shared budget.",
+        "Actual recursive call sites retain their entered structural frame and exact numerical invocation, captured at numerical frame entry before copy/two/division allocations. Successful returns retire before loop reuse; failed call sites reject reuse after owning cleanup. ADD constructs vector then tmp and destroys tmp then vector; MUL constructs tmp then vector/c_val and ends c_val then vector then tmp; CONCAT constructs new_last then vector and ends vector then new_last; equality constructs out1 then out2 and ends out2 then out1. A stopped exact child blocks older source DT. Failed vector pushes retain their exact unpublished INC receipt and original vector token across vector destruction, and owning closure acknowledges that acquisition once. AST ref/vector APIs record physical DEC consumption independently of later deletion errors. Reached frames remain on the actual owner list after body/source failure; owning Close drains youngest frames and numerical calls before pending cache INC/reset, without source replay or ambient-frame adoption."
       ],
       "deviations": [
-        "Complete counting and count-cache algorithms are selected; structural removal and equality reduction remain unported. The typed append-only obj_map specialization resides in rewriter to avoid generics and reverse util/ast imports. Go header and concrete entry-slice backing are charged to the shared budget, with origin/generation handles and explicit ownership/cursors; native inline-wrapper/vtable/key-pointer/free-sentinel layout, Runtime allocation/fatal/exception ABI and whole-unit audit are uncredited. Checked closed/copied/reentrant/stopped owners reject; cleanup after reached failure is owning closure, not a resumable source operation. Shallow structural count guards retain their source width read without inventing an early return."
+        "All count/cache/removal/equality algorithm bodies are now selected, but whole-unit methods/ownership and native ABI are not credited. Standalone checked Go owners preserve pkg import boundaries and charge wrapper headers plus actual vector/table backing. The ref-vector-to-slice factory bridge adds a budgeted, non-owning handle buffer (inline sixteen then spill), whereas native c_ptr is borrowed directly; its layout/allocation ABI remains uncredited. Source TRACE/CTRACE diagnostics and native stack/vtable/pointer/allocator/fatal/assertion/exception ABI remain open. Go returning-error cleanup is not native-fatal resumability. Whole-unit status is partial, not ported.",
+        "Source edge behavior is retained: concat passes the full request to every child and can over-remove; an unknown child leaves new_last unchanged, so concat(x,zero4) removal of six returns four/null in release and reaches the full-width SASSERT in g3debug. Complete coefficient removal in MUL reaches is_numeral(null) before its zero-width guard; the Go boundary returns ErrASTHandle for that native invalid-pointer domain. ADD/equality VERIFY checks run in all source builds and a failed exact-removal check reaches release UNREACHABLE/undefined behavior; Go rejects that domain with ErrASTDomain and retains unchanged final output. These are qualifications, not repaired algorithms."
       ]
     },
     {
