@@ -2,6 +2,7 @@
 // Source: src/ast/rewriter/bv_rewriter.cpp:2141-2168 (zero-bit local mode).
 // Source: src/ast/rewriter/bv_rewriter.h:39 (coefficient return temporary).
 // Source: src/ast/rewriter/poly_rewriter_def.h:47-53,70-74,78-124 (factory locals).
+// Source: src/ast/rewriter/poly_rewriter_def.h:410-416 (coefficient reader).
 package ast
 
 import (
@@ -34,12 +35,16 @@ type astBVNumeralFrame struct {
 	zeroBit                           bool
 	coefficientNormalization          bool
 	polynomialZero, polynomialLiteral bool
+	polynomialPowerProduct            bool
 	inverse                           bool
 	unsignedNumeral                   bool
 	bodyCause, sourceCause, ownCause  error
 }
 
 func (f *astBVNumeralFrame) childOrder() [13]int {
+	if f.polynomialPowerProduct {
+		return [13]int{1, 0, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
+	}
 	if f.polynomialZero {
 		return [13]int{2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
 	}

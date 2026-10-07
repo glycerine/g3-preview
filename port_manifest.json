@@ -21595,7 +21595,9 @@
         "pkg/ast/ast_bv_numeral_read.go",
         "pkg/ast/ast_bv_numeral_read_test.go",
         "pkg/ast/ast_bv_polynomial_factory.go",
-        "pkg/ast/ast_bv_polynomial_factory_test.go"
+        "pkg/ast/ast_bv_polynomial_factory_test.go",
+        "pkg/ast/ast_bv_power_product.go",
+        "pkg/ast/ast_bv_power_product_test.go"
       ],
       "tests": [
         "TestASTBitVectorUnsignedNumeralConstructorBoundary",
@@ -21621,7 +21623,10 @@
         "TestASTBitVectorPolynomialLiteralConstructedBeforeSortGuard",
         "TestASTBitVectorPolynomialEmptyFactoriesEveryActualReservation",
         "TestASTBitVectorPolynomialCoefficientFactoryOriginalShortcuts",
-        "TestASTBitVectorPolynomialCoefficientEveryActualReservation"
+        "TestASTBitVectorPolynomialCoefficientEveryActualReservation",
+        "TestASTBitVectorPolynomialPowerProductCoefficientAndFallbackOne",
+        "TestASTBitVectorPolynomialPowerProductFallbackTemporaryBeforeReceiverGuard",
+        "TestASTBitVectorPolynomialPowerProductEveryActualReadReservation"
       ],
       "conditionals": [
         {
@@ -21701,6 +21706,16 @@
             "TestASTBitVectorPolynomialCoefficientFactoryOriginalShortcuts",
             "TestASTBitVectorPolynomialCoefficientEveryActualReservation"
           ]
+        },
+        {
+          "name": "BV Config stored-numeral reader consumed by the complete selected coefficient-valued power-product helper and exact fallback-one full expression (src/ast/rewriter/bv_rewriter.h:36; src/ast/rewriter/poly_rewriter_def.h:410-416)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_power_product.go",
+          "tests": [
+            "TestASTBitVectorPolynomialPowerProductCoefficientAndFallbackOne",
+            "TestASTBitVectorPolynomialPowerProductFallbackTemporaryBeforeReceiverGuard",
+            "TestASTBitVectorPolynomialPowerProductEveryActualReadReservation"
+          ]
         }
       ],
       "ownership": [
@@ -21713,7 +21728,8 @@
         "Only the original active post-mk_add_core BV addition reduction is implemented by RewriteBitVectorAdditionAfterCore; callers supply the actual core status/output. No polynomial-core stub or substitute is provided. Bit-major/operand-order reads and early conflict exits are retained. Successful OR construction acquires operand references before assignment deletes the sole-owned old sum. Final assignment can publish OR together with a returned old-deletion worklist error after DEC consumption, matching the existing checked reference adapter. The stage has no owned reference/numerical locals; the actual AST plugin owns failed numerical child contexts and the manager owns deletion worklists. Go error cleanup does not credit native fatal/exception/stack/pointer/allocator ABI or full rewriter ownership, dispatch, solver integration or whole-unit completion.",
         "Selected BV coefficient normalization resides in ast to use existing private numerical owners without a reverse import. It retains unsigned norm followed by actual rational copy assignment into the existing receiver, with a distinct returned temporary until the full-expression source exit. A tracked invocation names the actual outer frame and captured inner norm before numerical acquisition; stopped call sites cannot be reused after owning cleanup, which does not change recorded source readiness. Two real Runtime campaigns cover a cold 65-bit power cache with a stored negative 1024-bit receiver and normalization/final-copy reservations at width 4097 after pre-populating only that large power cache. Checked raw zero-width sorts retain norm modulo-one behavior rather than introducing the unrelated numeral-constructor rejection. Concrete wrapper/token/stack/return-value/pointer/allocator/assertion/fatal/exception ABI and whole-unit ownership remain uncredited. The full polynomial core, current-sort owner, rewriter dispatch and solver integration remain required; Go returning-error cleanup is not native-fatal resumability.",
         "Tracked numeral reading delegates the existing original body directly into the physical caller receiver, without an additional AST numerical wrapper or value-return temporary. Unmatched inputs leave receiver/width/invocation unread; a reached NUM copy requires a nonnil exact caller invocation. Width is published after copy, preserving a modified-coefficient prefix on a reached missing-width domain error. Actual Runtime allocation refusals with a stored negative 4098-bit magnitude are named by the copy child; successful/failed cleanup preserves recorded source readiness and owner graphs close to zero. The future polynomial owner must embed/charge and retain this caller invocation through source exit; native stack/pointer/allocator/assertion/fatal/exception ABI and whole-unit ownership are not credited. Returning Go cleanup is not native-fatal resumability.",
-        "Selected polynomial factories now consume the existing BV Config numeral construction path, with separate integer-zero/one and copied-zero frame modes. The shared borrowed BV argument factory accepts an operator kind without changing declaration/application branches. The whole current-sort polynomial owner and full BV rewriter remain unported; Go frame/token/layout/allocator/assertion/fatal/exception ABI and whole-unit ownership remain uncredited."
+        "Selected polynomial factories now consume the existing BV Config numeral construction path, with separate integer-zero/one and copied-zero frame modes. The shared borrowed BV argument factory accepts an operator kind without changing declaration/application branches. The whole current-sort polynomial owner and full BV rewriter remain unported; Go frame/token/layout/allocator/assertion/fatal/exception ABI and whole-unit ownership remain uncredited.",
+        "The coefficient-valued power-product helper now uses the existing exact copied-numeral body and an actual one-temporary frame mode within AST, avoiding reverse imports. It does not implement the full polynomial owner, core or solver integration; native wrapper/stack/pointer/allocation/assertion/fatal/exception ABI and whole-unit ownership remain uncredited."
       ]
     },
     {
@@ -23405,7 +23421,9 @@
         "pkg/ast/rewriter/bv_polynomial_coefficient.go",
         "pkg/ast/rewriter/bv_polynomial_coefficient_test.go",
         "pkg/ast/ast_bv_polynomial_factory.go",
-        "pkg/ast/ast_bv_polynomial_factory_test.go"
+        "pkg/ast/ast_bv_polynomial_factory_test.go",
+        "pkg/ast/ast_bv_power_product.go",
+        "pkg/ast/ast_bv_power_product_test.go"
       ],
       "tests": [
         "TestBVPolynomialMonomialOrdinalOriginalBranchesAndTies",
@@ -23418,7 +23436,10 @@
         "TestASTBitVectorPolynomialLiteralConstructedBeforeSortGuard",
         "TestASTBitVectorPolynomialEmptyFactoriesEveryActualReservation",
         "TestASTBitVectorPolynomialCoefficientFactoryOriginalShortcuts",
-        "TestASTBitVectorPolynomialCoefficientEveryActualReservation"
+        "TestASTBitVectorPolynomialCoefficientEveryActualReservation",
+        "TestASTBitVectorPolynomialPowerProductCoefficientAndFallbackOne",
+        "TestASTBitVectorPolynomialPowerProductFallbackTemporaryBeforeReceiverGuard",
+        "TestASTBitVectorPolynomialPowerProductEveryActualReadReservation"
       ],
       "conditionals": [
         {
@@ -23506,13 +23527,24 @@
             "TestASTBitVectorPolynomialCoefficientFactoryOriginalShortcuts",
             "TestASTBitVectorPolynomialCoefficientEveryActualReservation"
           ]
+        },
+        {
+          "name": "original coefficient-valued get_power_product for BV Config: multiplication/binary-arity guards, stored numeral copy into caller receiver, borrowed product return, or distinct numeral-one construction/copy assignment/full-expression DT (src/ast/rewriter/poly_rewriter_def.h:410-416; src/ast/rewriter/poly_rewriter.h:61; src/ast/rewriter/bv_rewriter.h:36)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_power_product.go",
+          "tests": [
+            "TestASTBitVectorPolynomialPowerProductCoefficientAndFallbackOne",
+            "TestASTBitVectorPolynomialPowerProductFallbackTemporaryBeforeReceiverGuard",
+            "TestASTBitVectorPolynomialPowerProductEveryActualReadReservation"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "Only the complete selected monomial-order and identity-only power-product bodies are specialized for the original BV Config, whose use_power returns false. The source unused default rational k has no numerical acquisition and its Go bookkeeping is erased. Structural mode delegates to the already-ported ASTLess body; ordinal mode retains the source absence of a binary-arity guard and signed conversion of unsigned IDs for the 32-bit-int source profile. Native missing-operand/assertion/compiler-unreachable domains receive checked Go errors. Power-product return handles are borrowed with no INC, slice clone or numerical metadata read. Arith/use_power specialization, the coefficient-valued get_power_product overload, full polynomial core/hoisting/mark/coefficient owner and rewriter/solver integration remain required. No native stack/pointer/allocator/assertion/fatal/exception ABI or whole-unit ownership/completion credit is claimed.",
-        "Selected is_mul coefficient matcher is implemented for the original BV Config with its actual caller coefficient receiver and exact numerical invocation. Unmatched inputs erase coefficient/product/invocation reads; matched publication borrows the second operand without INC only after stored-rational copy and width read complete. A reached width error keeps the copied coefficient prefix and leaves the product unchanged. It has no owned numerical/reference locals and does not normalize or construct another copied numeral. The coefficient-valued get_power_product fallback assignment, hoist comparator/algorithm, polynomial current-sort/mark/coefficient owner, full core/rewriter/solver integration and arith specialization remain required; no native pointer/layout/allocation/assertion/fatal/exception ABI or whole-unit ownership/completion credit is claimed.",
-        "Selected add/mul expression-factory bodies are complete for the original BV Config whose use_power is false; the current sort is supplied by the future concrete caller rather than implementing the whole polynomial owner. Empty factories construct the original numeral(int) temporary before the sort-based numeral factory and end it at the return full expression. Only empty factories consult the current sort; singleton handles are borrowed without manager/sort/handle validation and multi-operand applications borrow their actual argument reader through the existing fixed-declaration/app factories. Coefficient multiplication retains original c.is_one then copied stored-value is_zero: no coefficient-zero shortcut, no operand normalization during zero testing, and no new one shortcut after coefficient numeral normalization. Actual invocation receipts capture numerical children at entry; stopped contexts remain with the AST plugin and source history is unaffected by owning cleanup. The AST placement avoids reverse imports. Arith use_power folding, coefficient-valued get_power_product, hoisting, full polynomial current-sort/mark/coefficient owner/core and rewriter/solver integration remain required. Native wrapper/stack/pointer/return-value/allocator/assertion/fatal/exception ABI and whole-unit ownership/completion are not credited; returning Go cleanup is not native-fatal resumability."
+        "Only the complete selected monomial-order and identity-only power-product bodies are specialized for the original BV Config, whose use_power returns false. The source unused default rational k has no numerical acquisition and its Go bookkeeping is erased. Structural mode delegates to the already-ported ASTLess body; ordinal mode retains the source absence of a binary-arity guard and signed conversion of unsigned IDs for the 32-bit-int source profile. Native missing-operand/assertion/compiler-unreachable domains receive checked Go errors. Power-product return handles are borrowed with no INC, slice clone or numerical metadata read. Arith/use_power specialization, full polynomial core/hoisting/mark/coefficient owner and rewriter/solver integration remain required. No native stack/pointer/allocator/assertion/fatal/exception ABI or whole-unit ownership/completion credit is claimed.",
+        "Selected is_mul coefficient matcher is implemented for the original BV Config with its actual caller coefficient receiver and exact numerical invocation. Unmatched inputs erase coefficient/product/invocation reads; matched publication borrows the second operand without INC only after stored-rational copy and width read complete. A reached width error keeps the copied coefficient prefix and leaves the product unchanged. It has no owned numerical/reference locals and does not normalize or construct another copied numeral. The hoist comparator/algorithm, polynomial current-sort/mark/coefficient owner, full core/rewriter/solver integration and arith specialization remain required; no native pointer/layout/allocation/assertion/fatal/exception ABI or whole-unit ownership/completion credit is claimed.",
+        "Selected add/mul expression-factory bodies are complete for the original BV Config whose use_power is false; the current sort is supplied by the future concrete caller rather than implementing the whole polynomial owner. Empty factories construct the original numeral(int) temporary before the sort-based numeral factory and end it at the return full expression. Only empty factories consult the current sort; singleton handles are borrowed without manager/sort/handle validation and multi-operand applications borrow their actual argument reader through the existing fixed-declaration/app factories. Coefficient multiplication retains original c.is_one then copied stored-value is_zero: no coefficient-zero shortcut, no operand normalization during zero testing, and no new one shortcut after coefficient numeral normalization. Actual invocation receipts capture numerical children at entry; stopped contexts remain with the AST plugin and source history is unaffected by owning cleanup. The AST placement avoids reverse imports. Arith use_power folding, hoisting, full polynomial current-sort/mark/coefficient owner/core and rewriter/solver integration remain required. Native wrapper/stack/pointer/return-value/allocator/assertion/fatal/exception ABI and whole-unit ownership/completion are not credited; returning Go cleanup is not native-fatal resumability.",
+        "Selected coefficient-valued power-product reader is complete for BV Config. Stored coefficients are copied into the physical caller receiver without normalization. The fallback constructs a separate numeral(int) one, copy-assigns it and ends it at the full expression, rather than directly setting/swapping the receiver. Actual invocation receipts capture the read or constructor/assignment child before acquisition; stopped calls reject reuse after owning cleanup and retain recorded source history. Return handles are borrowed without INC. Symbolic/nary/unary/empty/bare-numeral shapes preserve the source guards and unread metadata; a small-inline fallback introduces no numeric allocation. The AST numerical wrapper/header is charged where physically allocated; native stack/pointer/allocator/assertion/fatal/exception ABI and whole-unit ownership/completion are uncredited. Arith specialization, hoisting, full current-sort/mark/coefficient owner, polynomial core and overall rewriter/solver integration remain required. Returning Go cleanup is not native-fatal resumability."
       ]
     },
     {
@@ -23526,7 +23558,9 @@
         "pkg/ast/rewriter/bv_polynomial_coefficient.go",
         "pkg/ast/rewriter/bv_polynomial_coefficient_test.go",
         "pkg/ast/ast_bv_polynomial_factory.go",
-        "pkg/ast/ast_bv_polynomial_factory_test.go"
+        "pkg/ast/ast_bv_polynomial_factory_test.go",
+        "pkg/ast/ast_bv_power_product.go",
+        "pkg/ast/ast_bv_power_product_test.go"
       ],
       "tests": [
         "TestBVPolynomialMonomialOrdinalOriginalBranchesAndTies",
@@ -23539,7 +23573,10 @@
         "TestASTBitVectorPolynomialLiteralConstructedBeforeSortGuard",
         "TestASTBitVectorPolynomialEmptyFactoriesEveryActualReservation",
         "TestASTBitVectorPolynomialCoefficientFactoryOriginalShortcuts",
-        "TestASTBitVectorPolynomialCoefficientEveryActualReservation"
+        "TestASTBitVectorPolynomialCoefficientEveryActualReservation",
+        "TestASTBitVectorPolynomialPowerProductCoefficientAndFallbackOne",
+        "TestASTBitVectorPolynomialPowerProductFallbackTemporaryBeforeReceiverGuard",
+        "TestASTBitVectorPolynomialPowerProductEveryActualReadReservation"
       ],
       "assertions": [
         {
@@ -23701,13 +23738,24 @@
             "TestASTBitVectorPolynomialCoefficientFactoryOriginalShortcuts",
             "TestASTBitVectorPolynomialCoefficientEveryActualReservation"
           ]
+        },
+        {
+          "name": "original coefficient-valued get_power_product for BV Config: multiplication/binary-arity guards, stored numeral copy into caller receiver, borrowed product return, or distinct numeral-one construction/copy assignment/full-expression DT (src/ast/rewriter/poly_rewriter_def.h:410-416; src/ast/rewriter/poly_rewriter.h:61; src/ast/rewriter/bv_rewriter.h:36)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_power_product.go",
+          "tests": [
+            "TestASTBitVectorPolynomialPowerProductCoefficientAndFallbackOne",
+            "TestASTBitVectorPolynomialPowerProductFallbackTemporaryBeforeReceiverGuard",
+            "TestASTBitVectorPolynomialPowerProductEveryActualReadReservation"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "Only the complete selected monomial-order and identity-only power-product bodies are specialized for the original BV Config, whose use_power returns false. The source unused default rational k has no numerical acquisition and its Go bookkeeping is erased. Structural mode delegates to the already-ported ASTLess body; ordinal mode retains the source absence of a binary-arity guard and signed conversion of unsigned IDs for the 32-bit-int source profile. Native missing-operand/assertion/compiler-unreachable domains receive checked Go errors. Power-product return handles are borrowed with no INC, slice clone or numerical metadata read. Arith/use_power specialization, the coefficient-valued get_power_product overload, full polynomial core/hoisting/mark/coefficient owner and rewriter/solver integration remain required. No native stack/pointer/allocator/assertion/fatal/exception ABI or whole-unit ownership/completion credit is claimed.",
-        "Selected is_mul coefficient matcher is implemented for the original BV Config with its actual caller coefficient receiver and exact numerical invocation. Unmatched inputs erase coefficient/product/invocation reads; matched publication borrows the second operand without INC only after stored-rational copy and width read complete. A reached width error keeps the copied coefficient prefix and leaves the product unchanged. It has no owned numerical/reference locals and does not normalize or construct another copied numeral. The coefficient-valued get_power_product fallback assignment, hoist comparator/algorithm, polynomial current-sort/mark/coefficient owner, full core/rewriter/solver integration and arith specialization remain required; no native pointer/layout/allocation/assertion/fatal/exception ABI or whole-unit ownership/completion credit is claimed.",
-        "Selected add/mul expression-factory bodies are complete for the original BV Config whose use_power is false; the current sort is supplied by the future concrete caller rather than implementing the whole polynomial owner. Empty factories construct the original numeral(int) temporary before the sort-based numeral factory and end it at the return full expression. Only empty factories consult the current sort; singleton handles are borrowed without manager/sort/handle validation and multi-operand applications borrow their actual argument reader through the existing fixed-declaration/app factories. Coefficient multiplication retains original c.is_one then copied stored-value is_zero: no coefficient-zero shortcut, no operand normalization during zero testing, and no new one shortcut after coefficient numeral normalization. Actual invocation receipts capture numerical children at entry; stopped contexts remain with the AST plugin and source history is unaffected by owning cleanup. The AST placement avoids reverse imports. Arith use_power folding, coefficient-valued get_power_product, hoisting, full polynomial current-sort/mark/coefficient owner/core and rewriter/solver integration remain required. Native wrapper/stack/pointer/return-value/allocator/assertion/fatal/exception ABI and whole-unit ownership/completion are not credited; returning Go cleanup is not native-fatal resumability."
+        "Only the complete selected monomial-order and identity-only power-product bodies are specialized for the original BV Config, whose use_power returns false. The source unused default rational k has no numerical acquisition and its Go bookkeeping is erased. Structural mode delegates to the already-ported ASTLess body; ordinal mode retains the source absence of a binary-arity guard and signed conversion of unsigned IDs for the 32-bit-int source profile. Native missing-operand/assertion/compiler-unreachable domains receive checked Go errors. Power-product return handles are borrowed with no INC, slice clone or numerical metadata read. Arith/use_power specialization, full polynomial core/hoisting/mark/coefficient owner and rewriter/solver integration remain required. No native stack/pointer/allocator/assertion/fatal/exception ABI or whole-unit ownership/completion credit is claimed.",
+        "Selected is_mul coefficient matcher is implemented for the original BV Config with its actual caller coefficient receiver and exact numerical invocation. Unmatched inputs erase coefficient/product/invocation reads; matched publication borrows the second operand without INC only after stored-rational copy and width read complete. A reached width error keeps the copied coefficient prefix and leaves the product unchanged. It has no owned numerical/reference locals and does not normalize or construct another copied numeral. The hoist comparator/algorithm, polynomial current-sort/mark/coefficient owner, full core/rewriter/solver integration and arith specialization remain required; no native pointer/layout/allocation/assertion/fatal/exception ABI or whole-unit ownership/completion credit is claimed.",
+        "Selected add/mul expression-factory bodies are complete for the original BV Config whose use_power is false; the current sort is supplied by the future concrete caller rather than implementing the whole polynomial owner. Empty factories construct the original numeral(int) temporary before the sort-based numeral factory and end it at the return full expression. Only empty factories consult the current sort; singleton handles are borrowed without manager/sort/handle validation and multi-operand applications borrow their actual argument reader through the existing fixed-declaration/app factories. Coefficient multiplication retains original c.is_one then copied stored-value is_zero: no coefficient-zero shortcut, no operand normalization during zero testing, and no new one shortcut after coefficient numeral normalization. Actual invocation receipts capture numerical children at entry; stopped contexts remain with the AST plugin and source history is unaffected by owning cleanup. The AST placement avoids reverse imports. Arith use_power folding, hoisting, full polynomial current-sort/mark/coefficient owner/core and rewriter/solver integration remain required. Native wrapper/stack/pointer/return-value/allocator/assertion/fatal/exception ABI and whole-unit ownership/completion are not credited; returning Go cleanup is not native-fatal resumability.",
+        "Selected coefficient-valued power-product reader is complete for BV Config. Stored coefficients are copied into the physical caller receiver without normalization. The fallback constructs a separate numeral(int) one, copy-assigns it and ends it at the full expression, rather than directly setting/swapping the receiver. Actual invocation receipts capture the read or constructor/assignment child before acquisition; stopped calls reject reuse after owning cleanup and retain recorded source history. Return handles are borrowed without INC. Symbolic/nary/unary/empty/bare-numeral shapes preserve the source guards and unread metadata; a small-inline fallback introduces no numeric allocation. The AST numerical wrapper/header is charged where physically allocated; native stack/pointer/allocator/assertion/fatal/exception ABI and whole-unit ownership/completion are uncredited. Arith specialization, hoisting, full current-sort/mark/coefficient owner, polynomial core and overall rewriter/solver integration remain required. Returning Go cleanup is not native-fatal resumability."
       ]
     },
     {
