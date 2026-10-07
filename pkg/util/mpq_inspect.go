@@ -312,10 +312,13 @@ func (m *RationalManager) setIntegerFromOwnerWithAllocationContext(a *Rational, 
 	return m.resetDenominator(a)
 }
 func (m *RationalManager) SetUint64(a *Rational, n uint64) error {
+	return m.setUint64WithAllocationContext(a, n, integerAllocationInvocationContext{})
+}
+func (m *RationalManager) setUint64WithAllocationContext(a *Rational, n uint64, context integerAllocationInvocationContext) error {
 	if e := m.checkSetter(a); e != nil {
 		return e
 	}
-	if e := m.Z.SetUint64(&a.Num, n); e != nil {
+	if e := m.Z.setUint64WithAllocationContext(&a.Num, n, context); e != nil {
 		return e
 	}
 	return m.resetDenominator(a)

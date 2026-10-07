@@ -13381,10 +13381,15 @@
       "status": "unported",
       "go_targets": [
         "pkg/ast/ast_uninterpreted_plugin.go",
-        "pkg/ast/ast_uninterpreted_plugin_test.go"
+        "pkg/ast/ast_uninterpreted_plugin_test.go",
+        "pkg/ast/ast_bv_uint64_numeral.go",
+        "pkg/ast/ast_bv_uint64_numeral_test.go"
       ],
       "tests": [
-        "TestASTOriginalPluginUninterpretedClassification"
+        "TestASTOriginalPluginUninterpretedClassification",
+        "TestASTBitVectorOriginalUint64Numeral",
+        "TestASTBitVectorUint64ConstructorStrictBoundaryBeforeWidthGuard",
+        "TestASTBitVectorUint64NumeralEveryNumericalReservation"
       ],
       "conditionals": [
         {
@@ -13420,13 +13425,25 @@
           "tests": [
             "TestASTOriginalPluginUninterpretedClassification"
           ]
+        },
+        {
+          "name": "original mk_numeral(uint64_t,unsigned) ui64 rational construction, full-expression temporary lifetime and delegated numeral algorithm (src/ast/bv_decl_plugin.h:387; src/util/rational.h:65)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_uint64_numeral.go",
+          "tests": [
+            "TestASTBitVectorOriginalUint64Numeral",
+            "TestASTBitVectorUint64ConstructorStrictBoundaryBeforeWidthGuard",
+            "TestASTBitVectorUint64NumeralEveryNumericalReservation"
+          ]
         }
       ],
       "ownership": [
-        "Plugin classification reads borrowed declaration metadata and acquires no references or allocations. Registered plugin tags preserve family identity without assuming numeric family IDs. Tests inspect actual stats under FailAfter(0)."
+        "Plugin classification reads borrowed declaration metadata and acquires no references or allocations. Registered plugin tags preserve family identity without assuming numeric family IDs. Tests inspect actual stats under FailAfter(0).",
+        "The uint64 constructor temporary occupies its own slot in the existing address-stable numeral frame. Its captured SetUint64 invocation owns reached constructor allocations, including incomplete failure roots. Inner p0/ps values end before application construction; the input parameter copy ends before the outer ui64 temporary. No second numerical frame or extra parameter-copy operation is introduced."
       ],
       "deviations": [
-        "The selected predicate is connected to model interpretation/completion; whole-header and native representation/assertion/ownership audit are not credited. A declaration naming an unregistered plugin receives false in the checked Go adapter; native consumers require a nonnull registered plugin. Declaration-only numeral identity is a checked consumer adapter of the original app/decl identity recognizers, with no application construction or numerical parameter reads."
+        "The selected predicate is connected to model interpretation/completion; whole-header and native representation/assertion/ownership audit are not credited. A declaration naming an unregistered plugin receives false in the checked Go adapter; native consumers require a nonnull registered plugin. Declaration-only numeral identity is a checked consumer adapter of the original app/decl identity recognizers, with no application construction or numerical parameter reads.",
+        "Selected uint64 numeral construction preserves the strict uint64 setter boundary: values at INT_MAX allocate big backing, unlike the unsigned32 overload. The concrete shared Go frame represents nested source lexical lifetimes and retains existing rational/temporary/header/allocator/assertion/exception ABI qualifications. Runtime refusal tests prove graph ownership and release, not resumability of process-fatal native operations. Other BV construction/conversion utilities and complete rewriter/whole-unit audits remain open."
       ]
     },
     {
@@ -140044,7 +140061,8 @@
         "Selected alias division owns a real retained raw Int; source body failure skips explicit Del, source end precedes sign/normalize, and owning cleanup is separate. The raw scope is ten Int fields charged by the manager header; facade lexical bound remains nine. Named physical audits include active div and retain exact equality.",
         "Prepared cold header/config is charged once; manager-nil returned Integer constructor failure is separate actual owner, not published manager. Standalone constructor forwards that child receipt after only outer header refund. Source finalizer stops at first unconditional null-manager access; explicit owning abort drains retained child and cold header. Exact named provider/slab/object/raw graphs precede fault disable.",
         "Source current is a borrowed scalar slot, never a duplicate manager owning root. Failed returned children and post-finalization managers are concrete charged acquisition nodes; first completed manager transfers at source publication to original static context. Owning cleanup drains exact nodes then retained original context and detaches only after real closure.",
-        "GCDCoefficientsWithInvocation embeds its lexical ownership in the caller and captures the actual extended-GCD child receipt at integer algorithm entry. Allocation context reaches the existing manager algorithm; explicit source/own cleanup drains this exact child before EndContext. The source output denominator and coefficient prefixes remain published on error; no staging, rollback or substitute host GCD is introduced."
+        "GCDCoefficientsWithInvocation embeds its lexical ownership in the caller and captures the actual extended-GCD child receipt at integer algorithm entry. Allocation context reaches the existing manager algorithm; explicit source/own cleanup drains this exact child before EndContext. The source output denominator and coefficient prefixes remain published on error; no staging, rollback or substitute host GCD is introduced.",
+        "The ui64 constructor entry now passes an explicit caller-local allocation context through the rational manager uint64 setter to its existing integer implementation, before resetting the output denominator. The original public setter shares that implementation with an empty context; successful/failure output publication prefixes are preserved."
       ],
       "deviations": [
         "Explicit manager projects rational.h inclusive32-bit wrappers, distinct from strict MPZ boundaries; global wrapper remains incomplete. Float positive converted denominator SASSERT becomes typed ErrRationalFloatDomain. Source raw component alias publication can leave denominator zero; subsequent operations diagnose initialization.",

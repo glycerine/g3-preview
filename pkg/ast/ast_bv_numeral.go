@@ -27,10 +27,14 @@ type astBVNumeralFrame struct {
 	offsetDistinct                   bool
 	allOne                           bool
 	inverse                          bool
+	unsignedNumeral                  bool
 	bodyCause, sourceCause, ownCause error
 }
 
 func (f *astBVNumeralFrame) childOrder() [13]int {
+	if f.unsignedNumeral {
+		return [13]int{6, 5, 1, 0, 2, 9, -1, -1, -1, -1, -1, -1, -1}
+	}
 	if f.inverse {
 		return [13]int{12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0}
 	}
@@ -119,7 +123,7 @@ func (f *astBVNumeralFrame) destroyPhase(own, abort bool) error {
 			return e
 		}
 	}
-	for _, i := range [...]int{7, 6, 5, 4, 3, 2, 1, 0} {
+	for _, i := range f.valueOrder() {
 		if e := f.destroyOne(i, own); e != nil {
 			return e
 		}
@@ -149,6 +153,13 @@ abortChildren:
 		f.sourceDone = true
 	}
 	return nil
+}
+
+func (f *astBVNumeralFrame) valueOrder() [8]int {
+	if f.unsignedNumeral {
+		return [8]int{7, 6, 4, 3, 2, 1, 0, 5}
+	}
+	return [8]int{7, 6, 5, 4, 3, 2, 1, 0}
 }
 
 func (f *astBVNumeralFrame) joinNormalizationChild(own, abort bool) error {
@@ -266,23 +277,27 @@ func (m *ASTManager) mkBitVectorNumeralInput(value *util.OwnedRational, bits uin
 			return node, e
 		}
 	}
+	return m.bitVectorNumeralAppCore(f, bits)
+}
+
+func (m *ASTManager) bitVectorNumeralAppCore(f *astBVNumeralFrame, bits uint32) (astNodeRef, error) {
 	decl, e := m.bitVectorNumeralDeclCore(f, &f.values[0], bits)
 	if e != nil {
-		return node, e
+		return astNodeRef{}, e
 	}
 	for _, i := range f.childOrder() {
 		if i >= 0 {
 			if e = f.children[i].SourceReady(); e != nil {
-				return node, e
+				return astNodeRef{}, e
 			}
 		}
 	}
 	// mk_num_decl's local ps then p0 end before bv_util constructs the app.
 	if e = f.destroyOne(4, false); e != nil {
-		return node, e
+		return astNodeRef{}, e
 	}
 	if e = f.destroyOne(3, false); e != nil {
-		return node, e
+		return astNodeRef{}, e
 	}
 	return m.mkApp(decl, nil)
 }

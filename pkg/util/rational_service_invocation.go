@@ -459,3 +459,25 @@ func (s *RationalService) SetInt64WithInvocation(out *OwnedRational, n int64, c 
 	defer s.endLexicalError(&e)
 	return s.Manager.setInt64WithAllocationContext(&out.Raw, n, c.allocationContext())
 }
+
+// Source: src/util/rational.h:65; src/util/mpq.h:set.
+func (s *RationalService) SetUint64WithInvocation(out *OwnedRational, n uint64, c *RationalServiceInvocation) (e error) {
+	if e = s.lock(); e != nil {
+		return e
+	}
+	defer s.mu.Unlock()
+	if e = s.rationalScalarOwner(out); e != nil {
+		return e
+	}
+	if e = s.prepareLexicalInvocation(c); e != nil {
+		return e
+	}
+	defer func() { e = s.finishLexicalInvocation(c, e) }()
+	atomic.StoreUint32(&s.sourceRuntimeExecuting, 1)
+	defer atomic.StoreUint32(&s.sourceRuntimeExecuting, 0)
+	if e = s.beginLexical(); e != nil {
+		return e
+	}
+	defer s.endLexicalError(&e)
+	return s.Manager.setUint64WithAllocationContext(&out.Raw, n, c.allocationContext())
+}
