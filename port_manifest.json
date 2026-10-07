@@ -20878,12 +20878,17 @@
       "status": "unported",
       "go_targets": [
         "pkg/ast/rewriter/bv_rewriter_bitwise.go",
-        "pkg/ast/rewriter/bv_rewriter_bitwise_test.go"
+        "pkg/ast/rewriter/bv_rewriter_bitwise_test.go",
+        "pkg/ast/rewriter/bv_rewriter_rotate.go",
+        "pkg/ast/rewriter/bv_rewriter_rotate_test.go"
       ],
       "tests": [
         "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
         "TestBVRewriterNANDWarmSpillRefusalPreservesOutput",
-        "TestBVRewriterBitwiseEveryColdReservation"
+        "TestBVRewriterBitwiseEveryColdReservation",
+        "TestBVRewriterOriginalFixedRotations",
+        "TestBVRewriterRotationIdentityErasesExtractionWork",
+        "TestBVRewriterRotationEveryColdReservation"
       ],
       "conditionals": [
         {
@@ -21349,13 +21354,25 @@
             "TestBVRewriterNANDWarmSpillRefusalPreservesOutput",
             "TestBVRewriterBitwiseEveryColdReservation"
           ]
+        },
+        {
+          "name": "original fixed mk_bv_rotate_left/right modulo, identity, ordered cached extraction/concat and right-to-left delegation (src/ast/rewriter/bv_rewriter.cpp:2000-2021)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_rotate.go",
+          "tests": [
+            "TestBVRewriterOriginalFixedRotations",
+            "TestBVRewriterRotationIdentityErasesExtractionWork",
+            "TestBVRewriterRotationEveryColdReservation"
+          ]
         }
       ],
       "ownership": [
-        "Core algorithm adapters borrow AST manager and operand slices. NAND uses the existing inline16/doubling ASTHandleBuffer for source ptr_buffer<expr>, with nonowning generated node handles and deferred spill release on every exit. NOR/XNOR introduce no argument buffer. Output SetRef occurs only after all application factories succeed; cold refusal and warm spill tests preserve prior output and actual shared graph budget closes to zero."
+        "Core algorithm adapters borrow AST manager and operand slices. NAND uses the existing inline16/doubling ASTHandleBuffer for source ptr_buffer<expr>, with nonowning generated node handles and deferred spill release on every exit. NOR/XNOR introduce no argument buffer. Output SetRef occurs only after all application factories succeed; cold refusal and warm spill tests preserve prior output and actual shared graph budget closes to zero.",
+        "Fixed rotation reducers borrow the caller-owned MkExtractProc and retain its original cache replacement reference ordering. Left creates low then high extraction, concatenates their borrowed app handles, and only then SetRef publishes output. Identity rotation allocates/acquires no extraction/cache state. Cold refusal campaigns preserve the previous output and close the actual cache/AST/numeric/symbol owner graph with zero shared budget."
       ],
       "deviations": [
-        "Only the three original negated-bitwise reducer bodies are selected, exposed as standalone core adapters for later BV rewriter dispatch/traversal. They preserve source operand order, generated operator nesting and BR_REWRITE2; they do not normalize or evaluate operands. Full BV rewriter constructor/parameters/poly/trailing/extract/dispatch/traversal algorithms, native pointer/buffer/exception ABI and whole-unit ownership audit remain uncredited. Invalid/nil Go manager/reference boundaries use existing checked Go transport."
+        "Only the three original negated-bitwise reducer bodies are selected, exposed as standalone core adapters for later BV rewriter dispatch/traversal. They preserve source operand order, generated operator nesting and BR_REWRITE2; they do not normalize or evaluate operands. Full BV rewriter constructor/parameters/poly/trailing/extract/dispatch/traversal algorithms, native pointer/buffer/exception ABI and whole-unit ownership audit remain uncredited. Invalid/nil Go manager/reference boundaries use existing checked Go transport.",
+        "Selected fixed left/right rotation bodies preserve uint32 modulo and right delegation with a second width read. They expose standalone core algorithms pending full BV rewriter dispatch/traversal. Width zero at the native SASSERT/modulo-invalid domain is rejected by checked Go transport; no native debugger/undefined-behavior equivalence is credited. Closed/copied/pending extraction owners are checked adapter errors. Extended numeral-shift rotations, other reducers and whole-unit ABI/ownership audit remain open."
       ]
     },
     {
