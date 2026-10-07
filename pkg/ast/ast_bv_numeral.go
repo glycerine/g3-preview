@@ -23,10 +23,14 @@ type astBVNumeralFrame struct {
 	sourceDone, ownDone, retired     bool
 	ownPrefixDone                    bool
 	normalization                    bool
+	offsetDistinct                   bool
 	bodyCause, sourceCause, ownCause error
 }
 
 func (f *astBVNumeralFrame) childOrder() [10]int {
+	if f.offsetDistinct {
+		return [10]int{7, 6, 5, 4, 3, 2, 1, 0, -1, -1}
+	}
 	if f.normalization {
 		return [10]int{9, 8, 7, 6, 5, 4, 3, 1, 0, -1}
 	}

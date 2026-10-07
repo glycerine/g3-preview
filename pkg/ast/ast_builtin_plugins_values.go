@@ -114,7 +114,13 @@ func (m *ASTManager) AreDistinct(a, b ASTHandle) (bool, error) {
 			return false, e
 		}
 	}
-	if fid < 0 || !m.pluginAt(fid).present || x == y {
+	if fid < 0 || !m.pluginAt(fid).present {
+		return false, nil
+	}
+	if m.pluginAt(fid).kind == astBitVectorPlugin {
+		return m.bitVectorOffsetDistinct(fid, x, y)
+	}
+	if x == y {
 		return false, nil
 	}
 	first, e := m.pluginUniqueValue(fid, x)
