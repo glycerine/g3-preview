@@ -16,6 +16,7 @@ type astBVNumeralFrame struct {
 	self                             *astBVNumeralFrame
 	owner                            *astBitVectorPluginOwner
 	next                             *astBVNumeralFrame
+	normalizationChild               astBVNormalizationReceipt
 	children                         [13]util.RationalServiceInvocation
 	values                           [8]util.OwnedRational // utility p[0], power, mod, p0, ps[0]
 	placed, complete, consumed       [8]bool
@@ -92,6 +93,9 @@ func (f *astBVNumeralFrame) destroyPhase(own, abort bool) error {
 	if own && f.ownPrefixDone {
 		return nil
 	}
+	if e := f.joinNormalizationChild(own, false); e != nil {
+		return e
+	}
 	for _, i := range f.childOrder() {
 		if i < 0 {
 			continue
@@ -126,6 +130,9 @@ func (f *astBVNumeralFrame) destroyPhase(own, abort bool) error {
 	}
 abortChildren:
 	if own {
+		if e := f.joinNormalizationChild(true, true); e != nil {
+			return e
+		}
 		for _, i := range f.childOrder() {
 			if i < 0 {
 				continue
@@ -142,6 +149,25 @@ abortChildren:
 		f.sourceDone = true
 	}
 	return nil
+}
+
+func (f *astBVNumeralFrame) joinNormalizationChild(own, abort bool) error {
+	var e error
+	if own {
+		e = f.normalizationChild.cleanup(f.owner, abort)
+	} else {
+		e = f.normalizationChild.sourceReady(f.owner)
+	}
+	if e != nil {
+		if own {
+			if f.ownCause == nil {
+				f.ownCause = e
+			}
+		} else if f.sourceCause == nil {
+			f.sourceCause = e
+		}
+	}
+	return e
 }
 func (p *astBitVectorPluginOwner) numeralBytes() uint64 {
 	var n uint64
