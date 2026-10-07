@@ -13389,7 +13389,9 @@
         "pkg/ast/ast_bv_binary_match.go",
         "pkg/ast/ast_bv_binary_match_test.go",
         "pkg/ast/ast_bv_app_util.go",
-        "pkg/ast/ast_bv_app_util_test.go"
+        "pkg/ast/ast_bv_app_util_test.go",
+        "pkg/ast/ast_bv_div0.go",
+        "pkg/ast/ast_bv_div0_test.go"
       ],
       "tests": [
         "TestASTOriginalPluginUninterpretedClassification",
@@ -13401,7 +13403,11 @@
         "TestASTBitVectorOriginalBinaryOperandMatchers",
         "TestASTBitVectorBinaryMatcherUnmatchedOutputsUnread",
         "TestASTBitVectorOriginalApplicationConstructors",
-        "TestASTBitVectorOriginalVariadicConstructors"
+        "TestASTBitVectorOriginalVariadicConstructors",
+        "TestASTBitVectorOriginalDivZeroKindMapping",
+        "TestASTBitVectorOriginalDivZeroDeclaration",
+        "TestASTBitVectorDivZeroDeclarationOnlyUsesFirstDomain",
+        "TestASTBitVectorDivZeroEveryColdReservation"
       ],
       "conditionals": [
         {
@@ -13474,6 +13480,17 @@
             "TestASTBitVectorOriginalApplicationConstructors",
             "TestASTBitVectorOriginalVariadicConstructors"
           ]
+        },
+        {
+          "name": "original get_div0_op five-operation mapping and get_div0_decl family-preserving unary first-domain factory delegation (src/ast/bv_decl_plugin.h:107-126)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_div0.go",
+          "tests": [
+            "TestASTBitVectorOriginalDivZeroKindMapping",
+            "TestASTBitVectorOriginalDivZeroDeclaration",
+            "TestASTBitVectorDivZeroDeclarationOnlyUsesFirstDomain",
+            "TestASTBitVectorDivZeroEveryColdReservation"
+          ]
         }
       ],
       "ownership": [
@@ -13481,14 +13498,16 @@
         "The uint64 constructor temporary occupies its own slot in the existing address-stable numeral frame. Its captured SetUint64 invocation owns reached constructor allocations, including incomplete failure roots. Inner p0/ps values end before application construction; the input parameter copy ends before the outer ui64 temporary. No second numerical frame or extra parameter-copy operation is introduced.",
         "BV size and expression recognition borrow sort/parameter metadata and acquire no references or numerical allocations. The sort-taking numeral utility now uses the original gated width getter after its existing strict recognition guard. Tests verify unchanged actual AST stats under FailAfter(0).",
         "Binary operand matchers return borrowed original nodes and never acquire or release references. Family/kind and exact two-argument guards precede output reads. Tests compare actual argument RCs and AST stats under FailAfter(0), and aliased output references receive argument zero then argument one in source order.",
-        "Parameter-free application utilities borrow operand handles/slices and delegate to the original family declaration and application factories. Warm binary calls reuse cached declarations and hash-consed applications under FailAfter(0), with unchanged actual AST stats. No extra INC, DEC or argument buffer is introduced by the utility wrapper."
+        "Parameter-free application utilities borrow operand handles/slices and delegate to the original family declaration and application factories. Warm binary calls reuse cached declarations and hash-consed applications under FailAfter(0), with unchanged actual AST stats. No extra INC, DEC or argument buffer is introduced by the utility wrapper.",
+        "Division-by-zero declaration helpers borrow the original declaration metadata and first domain. New declaration ownership follows the unchanged family factory and fixed BV cache. Warm helpers retain identical stats under FailAfter(0); twelve cold reservation refusals before success each end with zero shared budget after the actual owning closure."
       ],
       "deviations": [
         "The selected predicate is connected to model interpretation/completion; whole-header and native representation/assertion/ownership audit are not credited. A declaration naming an unregistered plugin receives false in the checked Go adapter; native consumers require a nonnull registered plugin. Declaration-only numeral identity is a checked consumer adapter of the original app/decl identity recognizers, with no application construction or numerical parameter reads.",
         "Selected uint64 numeral construction preserves the strict uint64 setter boundary: values at INT_MAX allocate big backing, unlike the unsigned32 overload. The concrete shared Go frame represents nested source lexical lifetimes and retains existing rational/temporary/header/allocator/assertion/exception ABI qualifications. Runtime refusal tests prove graph ownership and release, not resumability of process-fatal native operations. Other BV construction/conversion utilities and complete rewriter/whole-unit audits remain open.",
         "The selected width getter preserves source release assertion erasure: wrong family/kind or extra parameters do not block reading a present integer parameter zero. Debug invokes the existing optional namespace assertion adapter before that read. Wrong AST kinds, missing parameters or noninteger parameter access retain checked Go rejection of native invalid/undefined domains. Native global assertion/parameter union/ABI and whole-header ownership audits remain uncredited; remaining BV utility/reducer work is still open.",
         "The selected named Go methods implement all fifteen source MATCH_BINARY overloads. Invalid Go output pointers are a checked adapter boundary and can preserve a reached left-output publication before rejecting the right pointer; native C++ references cannot be nil. Missing plugin/invalid handles retain existing checked owner behavior. Native pointer/reference/assertion/ABI and whole-header ownership audits remain uncredited; full BV rewriter consumers and remaining utility construction interfaces remain open.",
-        "Twenty parameter-free application utility overloads are selected: comparisons, unary/binary arithmetic and bitwise/shift operations, three overflow predicates, variadic concat/or/xor/mkbv and binary concat. The three multiplication overflow predicates intentionally reverse source operands. Missing registered BV plugin is rejected by the checked Go utility adapter. Parameterized extract/extension helpers, bv2int utility and full rewriter consumers remain separate work; whole-header native representation/assertion/ownership audits remain uncredited."
+        "Twenty parameter-free application utility overloads are selected: comparisons, unary/binary arithmetic and bitwise/shift operations, three overflow predicates, variadic concat/or/xor/mkbv and binary concat. The three multiplication overflow predicates intentionally reverse source operands. Missing registered BV plugin is rejected by the checked Go utility adapter. Parameterized extract/extension helpers, bv2int utility and full rewriter consumers remain separate work; whole-header native representation/assertion/ownership audits remain uncredited.",
+        "Selected get_div0_op/get_div0_decl preserve the five ordinary division/remainder/modulus mappings, family and first domain, erasing input parameters/remaining domains/range. The shared family declaration dispatcher was extracted without changing its branches. Invalid kinds at native UNREACHABLE, invalid handles and empty domain pointers receive checked Go errors; native assertion/compiler-unreachable behavior and whole-header ABI/ownership audits remain uncredited. Full BV rewriter consumers remain separate work."
       ]
     },
     {

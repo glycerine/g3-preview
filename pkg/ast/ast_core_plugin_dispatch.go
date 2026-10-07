@@ -214,6 +214,10 @@ func (m *ASTManager) MkFamilyFuncDecl(fid FamilyID, k int32, ps []ASTParameter, 
 		return ASTHandle{}, e
 	}
 	defer m.mu.Unlock()
+	return m.mkFamilyFuncDecl(fid, k, ps, domain, rangeSort)
+}
+
+func (m *ASTManager) mkFamilyFuncDecl(fid FamilyID, k int32, ps []ASTParameter, domain []ASTHandle, rangeSort ASTHandle) (ASTHandle, error) {
 	if fid < 0 || !m.pluginAt(fid).present {
 		return ASTHandle{}, nil
 	}
