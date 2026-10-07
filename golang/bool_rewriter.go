@@ -5,11 +5,8 @@ package g3
 
 import "errors"
 
-var errBoolRewriterLocalContext = errors.New("Boolean rewriter: local-context simplification remains unported")
-
 // Original Boolean rewriter's AND/OR core fragment. This inline helper borrows
-// its AST manager. Local-context simplification and the recursive rewriter
-// engine remain dependencies.
+// its AST manager. The recursive rewriter engine remains a dependency.
 type boolRewriter struct {
 	self                                *boolRewriter
 	params                              smtModuleParamsOwner
@@ -138,7 +135,13 @@ func (rw *boolRewriter) mkNFlatCore(args []ASTHandle, out ASTRef, disjunction bo
 		if e = pos.Reset(); e != nil {
 			return brFailed, e
 		}
-		return brFailed, errBoolRewriterLocalContext
+		simplified, e := rw.localContextSimplify(remaining, out)
+		if e != nil {
+			return brFailed, e
+		}
+		if simplified {
+			return brDone, nil
+		}
 	}
 	if !changed {
 		return brFailed, nil

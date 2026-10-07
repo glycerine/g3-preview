@@ -9,12 +9,18 @@ type astAppArguments struct {
 	slice       []ASTHandle
 	format      *astFormatRefVector
 	formatOwner *ASTManager
+	vector      astRefVectorState
+	refVector   bool
 	span        ASTLiteralVectorSpan
 	count       uint32
 	raw         bool
 }
 
 func (a astAppArguments) at(i uint32) (ASTHandle, error) {
+	if a.refVector {
+		r, e := a.formatOwner.vectorValue(a.vector, i)
+		return a.formatOwner.external(r), e
+	}
 	if a.format != nil {
 		r, e := a.format.at(i)
 		if e != nil {
