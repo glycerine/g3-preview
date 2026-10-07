@@ -16,7 +16,7 @@ type astBVNumeralFrame struct {
 	self                             *astBVNumeralFrame
 	owner                            *astBitVectorPluginOwner
 	next                             *astBVNumeralFrame
-	children                         [10]util.RationalServiceInvocation
+	children                         [13]util.RationalServiceInvocation
 	values                           [8]util.OwnedRational // utility p[0], power, mod, p0, ps[0]
 	placed, complete, consumed       [8]bool
 	header, invocation               uint64
@@ -25,20 +25,24 @@ type astBVNumeralFrame struct {
 	normalization                    bool
 	offsetDistinct                   bool
 	allOne                           bool
+	inverse                          bool
 	bodyCause, sourceCause, ownCause error
 }
 
-func (f *astBVNumeralFrame) childOrder() [10]int {
+func (f *astBVNumeralFrame) childOrder() [13]int {
+	if f.inverse {
+		return [13]int{12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0}
+	}
 	if f.allOne {
-		return [10]int{6, 4, 5, 1, 0, 2, -1, -1, -1, -1}
+		return [13]int{6, 4, 5, 1, 0, 2, -1, -1, -1, -1, -1, -1, -1}
 	}
 	if f.offsetDistinct {
-		return [10]int{7, 6, 5, 4, 3, 2, 1, 0, -1, -1}
+		return [13]int{7, 6, 5, 4, 3, 2, 1, 0, -1, -1, -1, -1, -1}
 	}
 	if f.normalization {
-		return [10]int{9, 8, 7, 6, 5, 4, 3, 1, 0, -1}
+		return [13]int{9, 8, 7, 6, 5, 4, 3, 1, 0, -1, -1, -1, -1}
 	}
-	return [10]int{6, 5, 1, 0, 2, -1, -1, -1, -1, -1}
+	return [13]int{6, 5, 1, 0, 2, -1, -1, -1, -1, -1, -1, -1, -1}
 }
 
 func (f *astBVNumeralFrame) destroyOne(i int, own bool) error {

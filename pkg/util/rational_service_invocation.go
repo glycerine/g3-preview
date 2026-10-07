@@ -234,6 +234,9 @@ func (s *RationalService) ModWithInvocation(a, b *OwnedRational, c *RationalServ
 func (s *RationalService) AddWithInvocation(a, b *OwnedRational, c *RationalServiceInvocation) (OwnedRational, error) {
 	return s.valueWithInvocation(a, b, c, rationalFacadeAdd)
 }
+func (s *RationalService) MulWithInvocation(a, b *OwnedRational, c *RationalServiceInvocation) (OwnedRational, error) {
+	return s.valueWithInvocation(a, b, c, rationalFacadeMul)
+}
 
 // Source: src/util/rational.h:519-523. The result is returned by value; x and y
 // publish in the original manager order, including prefixes before failure.

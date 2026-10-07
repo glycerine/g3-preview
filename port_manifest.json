@@ -12994,7 +12994,9 @@
         "pkg/ast/ast_bv_recognizers.go",
         "pkg/ast/ast_bv_recognizers_test.go",
         "pkg/ast/ast_bv_sort.go",
-        "pkg/ast/ast_bv_sort_test.go"
+        "pkg/ast/ast_bv_sort_test.go",
+        "pkg/ast/ast_bv_inverse.go",
+        "pkg/ast/ast_bv_inverse_test.go"
       ],
       "tests": [
         "TestASTBitVectorSourceEagerSortsAndPinnedDeclarations",
@@ -13054,7 +13056,11 @@
         "TestASTBitVectorOriginalFamilySortDispatch",
         "TestASTBitVectorOriginalFamilySortGuards",
         "TestASTBitVectorFamilySortEveryColdReservationAndFinalize",
-        "TestASTBitVectorFamilySortUsesExplicitCacheBeyondGetterCutoff"
+        "TestASTBitVectorFamilySortUsesExplicitCacheBeyondGetterCutoff",
+        "TestASTBitVectorOriginalMultiplicativeInverse",
+        "TestASTBitVectorInverseZeroWidthSourceAssertion",
+        "TestASTBitVectorInverseEveryNumericalReservation",
+        "TestASTBitVectorInverseTransportOwnerGuard"
       ],
       "conditionals": [
         {
@@ -13270,6 +13276,17 @@
             "TestASTBitVectorFamilySortEveryColdReservationAndFinalize",
             "TestASTBitVectorFamilySortUsesExplicitCacheBeyondGetterCutoff"
           ]
+        },
+        {
+          "name": "original mult_inverse one/parity branches, gcd coefficient assignment, negative correction and gated numeric assertions (src/ast/bv_decl_plugin.cpp:827-848)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_inverse.go",
+          "tests": [
+            "TestASTBitVectorOriginalMultiplicativeInverse",
+            "TestASTBitVectorInverseZeroWidthSourceAssertion",
+            "TestASTBitVectorInverseEveryNumericalReservation",
+            "TestASTBitVectorInverseTransportOwnerGuard"
+          ]
         }
       ],
       "ownership": [
@@ -13283,7 +13300,8 @@
         "Conversion caches use concrete width-indexed reference vectors and shared assignment-before-INC receipts. They resize before arity checks; zero int2bv width is rejected before resize. Cache hits preserve the first declaration domain and parameters. int2bv info owns supplied parameters, including AST-valued width expressions; bv2int drops all parameters and owns the source pinned Int range. Both caches drain after extended rotations in original finalize order. Rational parser parameters are copied and destroyed through an actual numerical invocation even though their kind is rejected; failed copies retain their exact owner for explicit cleanup.",
         "bit2bool outer vector grows geometrically with old logical size until completed, transferring existing inner vector backing without extra node references. Its selected inner vector reserves the full source width before publication. mkbv validates all Boolean domains before cache growth and retains zero-arity/zero-width source behavior. Both factories assign before INC and retain the exact interrupted-acquisition receipt; explicit own abort clears only the unacquired nested slot without DEC. Finalize drains conversion caches, then nested rows/indices, then mkbv in original source order. Actual outer record/inner scalar-reference backing is charged and released separately from the reflected owner header.",
         "Zero recognition borrows the stored rational without copying or allocating. All-one recognition owns the read numeral, power, rational-one, subtraction receiver and copied return value in the address-stable numerical frame; operator- retains its original copy/compound-subtract/return-copy operations. The receiver ends at return, expression temporaries end after comparison, and the read numeral ends at method exit. Actual invocation receipts preserve interrupted numeric owners; seven actual Runtime allocation refusals and final graph restoration are tested. Extract/bv2int recognizers borrow the original operand without INC, append nothing and leave unmatched output pointers unread. Extract publishes low, high and base in source order, including unsigned conversion of a negative stored low.",
-        "Generic BV family sort construction borrows the integer parameter and delegates to the existing explicit sort cache, retaining its actual successful INC receipts. It checks count before reading parameters, kind before width, and zero width before numerical/cache work. The original mk_sort ignores declaration kind and explicitly caches large widths, unlike get_bv_sort which bypasses cache growth above 4095. Cold reservation tests preserve reached cache state and complete source finalization; a 4096-bit regression verifies exactly the cache-owned reference and canonical getter identity."
+        "Generic BV family sort construction borrows the integer parameter and delegates to the existing explicit sort cache, retaining its actual successful INC receipts. It checks count before reading parameters, kind before width, and zero width before numerical/cache work. The original mk_sort ignores declaration kind and explicitly caches large widths, unlike get_bv_sort which bypasses cache growth above 4095. Cold reservation tests preserve reached cache state and complete source finalization; a 4096-bit regression verifies exactly the cache-owned reference and canonical getter identity.",
+        "Multiplicative inverse owns the original parity rational/mod full-expression, default g/x/y values, gcd return and assignment, optional correction and debug expression values in the shared address-stable BV frame. Thirteen exact child invocations capture copies, powers, gcd, products and moduli. Full-expression values end at their original boundaries and y/x/g drain in reverse declaration order. Failure retains exact owners for whole-context abort. Output assignment preserves aliasing and source publication prefixes; even parity never accesses output. Runtime transport rejects AST cleanup/factory reentry and restores the previous execution guard."
       ],
       "deviations": [
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
@@ -13296,7 +13314,8 @@
         "Original integer conversion caches and parameter parser are integrated. The source width-only int2bv cache preserves its first domain and parameter list without requiring an Int domain. An AST expression parameter supplies its BV sort width; a non-BV expression parameter returns false and falls through to the original first-domain/argument width path. Expression dispatch parses the width before the base domain-buffer fallback, preserving source validation order. Source uint width+1/index overflow is rejected by the checked Go adapter. Small scalar parameter copies and concrete encoded cache headers retain explicit Go representation qualifications; native exception/parameter/header/allocator ABI and whole-unit ownership credit are not inferred. Reducers and full pretty-print diagnostics remain required.",
         "Original Boolean-bit declaration factories are integrated with inherited expression fallback, exact parameter/domain/arity rules, width/index and arity cache identities and source destruction order. mkbv zero arity retains the source zero-width result despite the ordinary sort factory rejecting zero width. A negative bit2bool index passes the source signed comparison and then reads out of bounds after unsigned conversion; the Go adapter rejects that undefined access after preserving the reached outer/inner resize prefix. Source width+1 overflow is also rejected. Concrete Go row/slice headers and encoded references do not claim native pointer/header/reallocation/move/allocator ABI, source assertion/exception transport or whole-unit ownership equivalence. BV evaluation/reducers and exact same-arity pretty-print diagnostics remain open.",
         "Selected BV recognizers are now exposed through manager-bound Go methods. Neither zero nor all-one recognition assumes factory normalization: raw stored values are inspected exactly. All-one follows copy/power/subtraction/equality rather than a host-bitset shortcut. The explicit concrete Go scalar/temporary and deterministic operand evaluation representation claims no native rational/parameter/header/operand-order/allocator ABI equivalence; original TRACE output and whole-unit assertion/exception/ownership audits remain required. Modular inverse, remaining recognizer/utility interfaces, evaluator/reducer consumers and full pretty-print diagnostics are still open.",
-        "The original BV mk_sort route is now connected to generic MkFamilySort. Parser/default SMT2 environment consumers remain separate obligations; this route does not claim they are ported. Signed input widths retain source unsigned conversion and existing checked width+1/index overflow handling. The sort cache acquisition-receipt and reflected-header representation retains prior Go/native allocation/ABI qualifications; complete native assertion/exception/ownership audit is still required."
+        "The original BV mk_sort route is now connected to generic MkFamilySort. Parser/default SMT2 environment consumers remain separate obligations; this route does not claim they are ported. Signed input widths retain source unsigned conversion and existing checked width+1/index overflow handling. The sort cache acquisition-receipt and reflected-header representation retains prior Go/native allocation/ABI qualifications; complete native assertion/exception/ownership audit is still required.",
+        "The selected modular inverse is now implemented using the original rational/extended-GCD algorithm. Go math/big.ModInverse appears only in independent tests. SASSERT numeric expressions are erased in release and gated independently in debug; zero width with nonunit odd input follows original assertion/release behavior. Deterministic Go operand evaluation and reflected larger numerical-frame headers retain explicit native rational/temporary/ABI/allocation qualifications. Actual Runtime failures prove owning cleanup, not resumability of source process-fatal operations. Remaining utility/recognizer consumers, reducers/evaluation, full pretty-print diagnostics and whole-unit native ownership/representation audit remain open."
       ]
     },
     {
