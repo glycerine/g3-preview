@@ -57,6 +57,12 @@ func (f *arrayExpansion) append(m *ast.ASTManager, v ast.ASTRefVector, args ast.
 	return nil
 }
 func (f *arrayExpansion) publishRow(m *ast.ASTManager) error {
+	if e := f.appendRowCopy(m, f.row); e != nil {
+		return e
+	}
+	return m.DelRefVector(&f.row)
+}
+func (f *arrayExpansion) appendRowCopy(m *ast.ASTManager, input ast.ASTRefVector) error {
 	if len(f.stores) == cap(f.stores) {
 		width := uint64(reflect.TypeOf(ast.ASTRefVector{}).Size())
 		n, e := util.SourceVectorCapacity(cap(f.stores), width)
@@ -78,7 +84,7 @@ func (f *arrayExpansion) publishRow(m *ast.ASTManager) error {
 	if e != nil {
 		return e
 	}
-	args, e := m.RewriterVectorArguments(f.row)
+	args, e := m.RewriterVectorArguments(input)
 	if e != nil {
 		return e
 	}
@@ -87,7 +93,7 @@ func (f *arrayExpansion) publishRow(m *ast.ASTManager) error {
 	}
 	f.stores = append(f.stores, f.copyRow)
 	f.copyRow = ast.ASTRefVector{}
-	return m.DelRefVector(&f.row)
+	return nil
 }
 func (f *arrayExpansion) removeRow(m *ast.ASTManager, index int) error {
 	for j := index + 1; j < len(f.stores); j++ {
@@ -109,10 +115,7 @@ func (f *arrayExpansion) removeRow(m *ast.ASTManager, index int) error {
 	f.stores = f.stores[:last]
 	return nil
 }
-func (f *arrayExpansion) close(m *ast.ASTManager) error {
-	if !f.active {
-		return nil
-	}
+func (f *arrayExpansion) closeLexical(m *ast.ASTManager) error {
 	if f.pendingPush {
 		if e := m.CompleteRefVectorPush(f.pendingVector, f.pendingHandle, &f.receipt); e != nil {
 			return e
@@ -133,11 +136,15 @@ func (f *arrayExpansion) close(m *ast.ASTManager) error {
 			}
 		}
 	}
+	return nil
+}
+func (f *arrayExpansion) closeElse(m *ast.ASTManager) error {
 	if f.elseCase != (ast.ASTRef{}) {
-		if e := m.DelRef(&f.elseCase); e != nil {
-			return e
-		}
+		return m.DelRef(&f.elseCase)
 	}
+	return nil
+}
+func (f *arrayExpansion) closeStores(m *ast.ASTManager) error {
 	for f.drain < len(f.stores) {
 		if e := m.DelRefVector(&f.stores[f.drain]); e != nil {
 			return e
@@ -147,6 +154,18 @@ func (f *arrayExpansion) close(m *ast.ASTManager) error {
 	m.Budget().Release(f.bytes)
 	*f = arrayExpansion{}
 	return nil
+}
+func (f *arrayExpansion) close(m *ast.ASTManager) error {
+	if !f.active {
+		return nil
+	}
+	if e := f.closeLexical(m); e != nil {
+		return e
+	}
+	if e := f.closeElse(m); e != nil {
+		return e
+	}
+	return f.closeStores(m)
 }
 func (c *evaluatorConfiguration) arrayOp(h ast.ASTHandle, op int32) (bool, error) {
 	m := c.owner.model.manager

@@ -37,6 +37,7 @@ type ModelEvaluator struct {
 }
 type evaluatorConfiguration struct {
 	expansion arrayExpansion
+	equality  arrayEquality
 	rewriter.DefaultConfiguration
 	owner                              *ModelEvaluator
 	boolean                            *rewriter.BoolRewriter
@@ -124,7 +125,7 @@ func (ev *ModelEvaluator) open() error {
 	if ev.closed {
 		return arena.ErrClosed
 	}
-	if !ev.ready || ev.cfg.pending != nil || ev.cfg.substitution != nil || ev.cfg.expansion.active {
+	if !ev.ready || ev.cfg.pending != nil || ev.cfg.substitution != nil || ev.cfg.expansion.active || ev.cfg.equality.active {
 		return util.ErrParamsPrecondition
 	}
 	return ev.model.open()
@@ -175,6 +176,9 @@ func (ev *ModelEvaluator) NumSteps() (uint32, error) {
 }
 func (ev *ModelEvaluator) closeImp() error {
 	ev.ready = false
+	if e := ev.cfg.equality.close(ev.model.manager); e != nil {
+		return e
+	}
 	if e := ev.cfg.expansion.close(ev.model.manager); e != nil {
 		return e
 	}
@@ -396,15 +400,9 @@ func (c *evaluatorConfiguration) ReduceApp(d ast.ASTHandle, args ast.AppArgument
 				if e != nil {
 					return rewriter.RewriteFailed, e
 				}
-				if arg == right {
-					yes, e := m.MkTrue()
-					if e != nil {
-						return rewriter.RewriteFailed, e
-					}
-					return rewriter.RewriteDone, m.SetRef(out, yes)
-				}
-				if c.arrayEqualities {
-					return rewriter.RewriteFailed, ErrModelEvaluatorTheory
+				status, e := c.arrayEq(arg, right, out)
+				if e != nil || status != rewriter.RewriteFailed {
+					return status, e
 				}
 			} else if sortFamily > 4 {
 				return rewriter.RewriteFailed, ErrModelEvaluatorTheory

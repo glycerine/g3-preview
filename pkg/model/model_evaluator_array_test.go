@@ -115,14 +115,14 @@ func TestModelEvaluatorArrayIdentityAndDisabledEquality(t *testing.T) {
 	}
 	astTestMust(t, ev.Reset(nil))
 	astTestMust(t, m.SetRef(out, yes))
-	if e = ev.Evaluate(unknown, out); e != model.ErrModelEvaluatorTheory {
-		t.Fatal("unported array extraction accepted", e)
-	}
+	// Extraction now follows the source refusal/fallback path for bare arrays.
+	astTestMust(t, ev.Evaluate(unknown, out))
 	got, e = m.RefGet(out)
 	astTestMust(t, e)
-	if got != yes {
-		t.Fatal("equality error changed output")
+	if got != unknown {
+		t.Fatal("unextractable equality changed output")
 	}
+
 }
 
 func TestModelEvaluatorArrayPartialTheoryGraphCompletion(t *testing.T) {

@@ -45898,7 +45898,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/model/model_evaluator.go",
-        "pkg/model/model_evaluator_array_expansion.go"
+        "pkg/model/model_evaluator_array_expansion.go",
+        "pkg/model/model_evaluator_array_equality.go",
+        "pkg/model/model_array_tuple_table.go"
       ],
       "tests": [
         "TestModelEvaluatorConstantCompletionAndBooleanReduction",
@@ -45914,7 +45916,15 @@
         "TestModelEvaluatorOriginalFunctionBackedArraySelection",
         "TestModelEvaluatorOriginalFunctionArrayValueExpansionAndPrecedence",
         "TestModelEvaluatorOriginalArrayExpansionPruningAndGroundness",
-        "TestModelEvaluatorOriginalArrayExpansionAllocationRefusals"
+        "TestModelEvaluatorOriginalArrayExpansionAllocationRefusals",
+        "TestModelEvaluatorOriginalArrayEqualityTablesAndStorePrecedence",
+        "TestModelEvaluatorOriginalArrayEqualitySymbolicIndexFallback",
+        "TestModelEvaluatorOriginalArrayEqualityMatchedUnknownValueConstraints",
+        "TestModelEvaluatorOriginalArrayEqualityAllocationRefusals",
+        "TestModelEvaluatorOriginalArrayEqualityFiniteAndInfiniteElseCases",
+        "TestArrayTupleOriginalCompositeHashGoldenAndReadOrder",
+        "TestArrayTupleOriginalReplacementGrowthAndLastTombstone",
+        "TestArrayTupleOriginalDeletedCleanupAndResizeRefusal"
       ],
       "assertions": [
         {
@@ -45983,16 +45993,33 @@
             "TestModelEvaluatorOriginalArrayExpansionPruningAndGroundness",
             "TestModelEvaluatorOriginalArrayExpansionAllocationRefusals"
           ]
+        },
+        {
+          "name": "original mk_array_eq and mk_array_eq_core, args_hash/args_eq with borrowed-row concrete source table; value/unknown-index equality paths and exact source constraints (src/model/model_evaluator.cpp:292-420)",
+          "status": "partial",
+          "go_target": "pkg/model/model_evaluator_array_equality.go",
+          "tests": [
+            "TestModelEvaluatorOriginalArrayEqualityTablesAndStorePrecedence",
+            "TestModelEvaluatorOriginalArrayEqualitySymbolicIndexFallback",
+            "TestModelEvaluatorOriginalArrayEqualityMatchedUnknownValueConstraints",
+            "TestModelEvaluatorOriginalArrayEqualityAllocationRefusals",
+            "TestModelEvaluatorOriginalArrayEqualityFiniteAndInfiniteElseCases",
+            "TestArrayTupleOriginalCompositeHashGoldenAndReadOrder",
+            "TestArrayTupleOriginalReplacementGrowthAndLastTombstone",
+            "TestArrayTupleOriginalDeletedCleanupAndResizeRefusal"
+          ]
         }
       ],
       "ownership": [
         "Evaluator borrows model, parameter, Runtime and Cooperation services. Concrete cold evaluator header embeds its configuration and parameter owner; separately charged public traversal and Boolean reducer keep existing member cleanup. Failed unpublished function graph remains named until Close; successful registration transfers it to the model. Function entries read the original borrowed argument view without allocating a copied array.",
         "Array reducer is constructed after Boolean reducer with evaluator constructor parameters and closed before it. Partial theory graph substitution keeps its lexical var_subst owner named through reverse cleanup; failed cleanup prevents another invocation from overwriting the owner. Borrowed argument bindings reuse the original beta engine copy protocol without a second argument array.",
-        "Extraction owns the original vector of owning expression vectors, copied store rows and else expression. Actual row-copy/growth order, tail reset/append/pop pruning and reverse reconstruction are retained. An embedded evaluator continuation names current row/copy/argument vectors, else reference, parameter and actual unjoined vector INC receipt; interrupted cleanup blocks reuse until Close completes. Expansion preserves source const/store output publication prefixes on later failure rather than fabricating rollback."
+        "Extraction owns the original vector of owning expression vectors, copied store rows and else expression. Actual row-copy/growth order, tail reset/append/pop pruning and reverse reconstruction are retained. An embedded evaluator continuation names current row/copy/argument vectors, else reference, parameter and actual unjoined vector INC receipt; interrupted cleanup blocks reuse until Close completes. Expansion preserves source const/store output publication prefixes on later failure rather than fabricating rollback.",
+        "Embedded equality continuation owns both extracted row vectors/else references, conjunction and fallback argument vectors, lexical select references and two borrowed-row tables. Actual INC-before-growth receipts retain unpublished acquisitions until cleanup; tables release before borrowed rows. Source raw select/equality intermediates created before failed ITE publication remain with the AST manager until Close; evaluator reset must not fabricate ownership of them."
       ],
       "deviations": [
-        "Boolean/uninterpreted and selected original array store/select and value extraction/expansion paths are integrated. Arithmetic/BV/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch, nonidentity enabled array equality, map/set rules remain open. Array equality identity is handled before the expansion flag; disabled expansion falls through to the original Boolean reducer. Partial theory graph fallback is integrated for the known array dispatch, including source unconditional partial-graph completion and direct-order var_subst. Reached remaining unsupported theory paths explicitly refuse. Runtime AllocationSize remains the existing memory accounting owner; runtime-wide typed allocator wiring, proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited.",
-        "Selected extraction preserves store-prefix and function-entry order, all-entry groundness rejection, missing/nonground else rejection, and backwards else-equal pruning only while index values permit it. No hash-table array-equality algorithm is claimed by this value-expansion chunk. Concrete Go scalar owners and lexical vector storage remain explicit representations, without whole native allocation ABI credit."
+        "Boolean/uninterpreted and selected original array store/select and value extraction/expansion and nonidentity equality paths are integrated. Arithmetic/BV/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch, map/set rules remain open. Array equality identity is handled before the expansion flag; disabled expansion falls through to the original Boolean reducer. Partial theory graph fallback is integrated for the known array dispatch, including source unconditional partial-graph completion and direct-order var_subst. Reached remaining unsupported theory paths explicitly refuse. Runtime AllocationSize remains the existing memory accounting owner; runtime-wide typed allocator wiring, proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited.",
+        "Selected extraction preserves store-prefix and function-entry order, all-entry groundness rejection, missing/nonground else rejection, and backwards else-equal pruning only while index values permit it. Concrete Go scalar owners and lexical vector storage remain explicit representations, without whole native allocation ABI credit.",
+        "Original equality constraints deliberately retain two source limitations: finite-domain default equality is required even when explicit entries cover every index, and unknown matched rows remain in table1 for a later comparison with else2. Independent truth-table tests expose these source false negatives. No source algorithm correction or whole-unit native allocation/assertion credit is claimed."
       ]
     },
     {
@@ -46002,7 +46029,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/model/model_evaluator.go",
-        "pkg/model/model_evaluator_array_expansion.go"
+        "pkg/model/model_evaluator_array_expansion.go",
+        "pkg/model/model_evaluator_array_equality.go",
+        "pkg/model/model_array_tuple_table.go"
       ],
       "tests": [
         "TestModelEvaluatorConstantCompletionAndBooleanReduction",
@@ -46018,7 +46047,15 @@
         "TestModelEvaluatorOriginalFunctionBackedArraySelection",
         "TestModelEvaluatorOriginalFunctionArrayValueExpansionAndPrecedence",
         "TestModelEvaluatorOriginalArrayExpansionPruningAndGroundness",
-        "TestModelEvaluatorOriginalArrayExpansionAllocationRefusals"
+        "TestModelEvaluatorOriginalArrayExpansionAllocationRefusals",
+        "TestModelEvaluatorOriginalArrayEqualityTablesAndStorePrecedence",
+        "TestModelEvaluatorOriginalArrayEqualitySymbolicIndexFallback",
+        "TestModelEvaluatorOriginalArrayEqualityMatchedUnknownValueConstraints",
+        "TestModelEvaluatorOriginalArrayEqualityAllocationRefusals",
+        "TestModelEvaluatorOriginalArrayEqualityFiniteAndInfiniteElseCases",
+        "TestArrayTupleOriginalCompositeHashGoldenAndReadOrder",
+        "TestArrayTupleOriginalReplacementGrowthAndLastTombstone",
+        "TestArrayTupleOriginalDeletedCleanupAndResizeRefusal"
       ],
       "conditionals": [
         {
@@ -46067,16 +46104,33 @@
             "TestModelEvaluatorOriginalArrayExpansionPruningAndGroundness",
             "TestModelEvaluatorOriginalArrayExpansionAllocationRefusals"
           ]
+        },
+        {
+          "name": "original mk_array_eq and mk_array_eq_core, args_hash/args_eq with borrowed-row concrete source table; value/unknown-index equality paths and exact source constraints (src/model/model_evaluator.cpp:292-420)",
+          "status": "partial",
+          "go_target": "pkg/model/model_evaluator_array_equality.go",
+          "tests": [
+            "TestModelEvaluatorOriginalArrayEqualityTablesAndStorePrecedence",
+            "TestModelEvaluatorOriginalArrayEqualitySymbolicIndexFallback",
+            "TestModelEvaluatorOriginalArrayEqualityMatchedUnknownValueConstraints",
+            "TestModelEvaluatorOriginalArrayEqualityAllocationRefusals",
+            "TestModelEvaluatorOriginalArrayEqualityFiniteAndInfiniteElseCases",
+            "TestArrayTupleOriginalCompositeHashGoldenAndReadOrder",
+            "TestArrayTupleOriginalReplacementGrowthAndLastTombstone",
+            "TestArrayTupleOriginalDeletedCleanupAndResizeRefusal"
+          ]
         }
       ],
       "ownership": [
         "Evaluator borrows model, parameter, Runtime and Cooperation services. Concrete cold evaluator header embeds its configuration and parameter owner; separately charged public traversal and Boolean reducer keep existing member cleanup. Failed unpublished function graph remains named until Close; successful registration transfers it to the model. Function entries read the original borrowed argument view without allocating a copied array.",
         "Array reducer is constructed after Boolean reducer with evaluator constructor parameters and closed before it. Partial theory graph substitution keeps its lexical var_subst owner named through reverse cleanup; failed cleanup prevents another invocation from overwriting the owner. Borrowed argument bindings reuse the original beta engine copy protocol without a second argument array.",
-        "Extraction owns the original vector of owning expression vectors, copied store rows and else expression. Actual row-copy/growth order, tail reset/append/pop pruning and reverse reconstruction are retained. An embedded evaluator continuation names current row/copy/argument vectors, else reference, parameter and actual unjoined vector INC receipt; interrupted cleanup blocks reuse until Close completes. Expansion preserves source const/store output publication prefixes on later failure rather than fabricating rollback."
+        "Extraction owns the original vector of owning expression vectors, copied store rows and else expression. Actual row-copy/growth order, tail reset/append/pop pruning and reverse reconstruction are retained. An embedded evaluator continuation names current row/copy/argument vectors, else reference, parameter and actual unjoined vector INC receipt; interrupted cleanup blocks reuse until Close completes. Expansion preserves source const/store output publication prefixes on later failure rather than fabricating rollback.",
+        "Embedded equality continuation owns both extracted row vectors/else references, conjunction and fallback argument vectors, lexical select references and two borrowed-row tables. Actual INC-before-growth receipts retain unpublished acquisitions until cleanup; tables release before borrowed rows. Source raw select/equality intermediates created before failed ITE publication remain with the AST manager until Close; evaluator reset must not fabricate ownership of them."
       ],
       "deviations": [
-        "Boolean/uninterpreted and selected original array store/select and value extraction/expansion paths are integrated. Arithmetic/BV/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch, nonidentity enabled array equality, map/set rules remain open. Array equality identity is handled before the expansion flag; disabled expansion falls through to the original Boolean reducer. Partial theory graph fallback is integrated for the known array dispatch, including source unconditional partial-graph completion and direct-order var_subst. Reached remaining unsupported theory paths explicitly refuse. Runtime AllocationSize remains the existing memory accounting owner; runtime-wide typed allocator wiring, proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited.",
-        "Selected extraction preserves store-prefix and function-entry order, all-entry groundness rejection, missing/nonground else rejection, and backwards else-equal pruning only while index values permit it. No hash-table array-equality algorithm is claimed by this value-expansion chunk. Concrete Go scalar owners and lexical vector storage remain explicit representations, without whole native allocation ABI credit."
+        "Boolean/uninterpreted and selected original array store/select and value extraction/expansion and nonidentity equality paths are integrated. Arithmetic/BV/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch, map/set rules remain open. Array equality identity is handled before the expansion flag; disabled expansion falls through to the original Boolean reducer. Partial theory graph fallback is integrated for the known array dispatch, including source unconditional partial-graph completion and direct-order var_subst. Reached remaining unsupported theory paths explicitly refuse. Runtime AllocationSize remains the existing memory accounting owner; runtime-wide typed allocator wiring, proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited.",
+        "Selected extraction preserves store-prefix and function-entry order, all-entry groundness rejection, missing/nonground else rejection, and backwards else-equal pruning only while index values permit it. Concrete Go scalar owners and lexical vector storage remain explicit representations, without whole native allocation ABI credit.",
+        "Original equality constraints deliberately retain two source limitations: finite-domain default equality is required even when explicit entries cover every index, and unknown matched rows remain in table1 for a later comparison with else2. Independent truth-table tests expose these source false negatives. No source algorithm correction or whole-unit native allocation/assertion credit is claimed."
       ]
     },
     {
@@ -112468,14 +112522,16 @@
       "go_targets": [
         "pkg/util/hash.go",
         "pkg/sat/sat_solver_mutex_pair_set.go",
-        "pkg/sat/sat_solver_mutex_pair_set_test.go"
+        "pkg/sat/sat_solver_mutex_pair_set_test.go",
+        "pkg/model/model_array_tuple_table.go"
       ],
       "tests": [
         "TestSourceHashVectors",
         "TestCompositeVisitOrder",
         "TestSATMutexPairSetGrowBeforeDuplicateAndEveryPhysicalRefusal",
         "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
-        "TestSATMutexPairSetWrappedCopyGuardAtActualDestination"
+        "TestSATMutexPairSetWrappedCopyGuardAtActualDestination",
+        "TestArrayTupleOriginalCompositeHashGoldenAndReadOrder"
       ],
       "conditionals": [
         {
@@ -112568,6 +112624,14 @@
             "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
             "TestSATMutexPairSetWrappedCopyGuardAtActualDestination"
           ]
+        },
+        {
+          "name": "selected original get_composite_hash tuple consumer and full MIX state through MixState (src/util/hash.h:72-122)",
+          "status": "partial",
+          "go_target": "pkg/model/model_array_tuple_table.go",
+          "tests": [
+            "TestArrayTupleOriginalCompositeHashGoldenAndReadOrder"
+          ]
         }
       ],
       "ownership": [
@@ -112638,7 +112702,8 @@
         "pkg/util/str_int32_map_statistics.go",
         "pkg/util/str_int32_map_runtime_destructor_source_test.go",
         "pkg/util/str_int32_map_runtime.go",
-        "pkg/util/str_int32_map_owner_identity_source_test.go"
+        "pkg/util/str_int32_map_owner_identity_source_test.go",
+        "pkg/model/model_array_tuple_table.go"
       ],
       "tests": [
         "TestUintMapSourceMapAssertions",
@@ -112890,7 +112955,9 @@
         "TestStrInt32MapRuntimeBodyReleaseStopReachesOwnDestructorBoundary",
         "TestStrInt32MapRuntimeReplacementEveryRefusalThenSourceDestructor",
         "TestStrInt32MapLegacyAccidentalGoCopyCannotOwnSourceActions",
-        "TestStrInt32MapZeroGoWrapperCannotOwnCleanup"
+        "TestStrInt32MapZeroGoWrapperCannotOwnCleanup",
+        "TestArrayTupleOriginalReplacementGrowthAndLastTombstone",
+        "TestArrayTupleOriginalDeletedCleanupAndResizeRefusal"
       ],
       "conditionals": [
         {
@@ -113825,6 +113892,15 @@
           "go_target": "pkg/util/str_int32_map_statistics.go",
           "tests": [
             "TestStrInt32MapStatisticsIndependentDefaultEntryProbeCounts"
+          ]
+        },
+        {
+          "name": "selected args_table borrowed AST-row specialization: growth before replacement, last tombstone, physical bucket order, deletion cleanup and reservation refusal (src/util/hashtable.h:183-256,351-403,494-509,546-577)",
+          "status": "partial",
+          "go_target": "pkg/model/model_array_tuple_table.go",
+          "tests": [
+            "TestArrayTupleOriginalReplacementGrowthAndLastTombstone",
+            "TestArrayTupleOriginalDeletedCleanupAndResizeRefusal"
           ]
         }
       ],
