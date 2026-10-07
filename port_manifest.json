@@ -20926,7 +20926,8 @@
         "TestASTBitVectorSignExtensionWidthWrapAfterArithmetic",
         "TestASTBitVectorSignExtensionPublicationAfterNumericalConstructor",
         "TestBVRewriterOriginalSignExtend",
-        "TestBVRewriterSignExtendEverySymbolicReservation"
+        "TestBVRewriterSignExtendEverySymbolicReservation",
+        "TestBVRewriterANDWarmSpillRefusalPreservesOutput"
       ],
       "conditionals": [
         {
@@ -21457,6 +21458,16 @@
             "TestBVRewriterOriginalSignExtend",
             "TestBVRewriterSignExtendEverySymbolicReservation"
           ]
+        },
+        {
+          "name": "original mk_bv_and ordered NOT buffer, OR then outer NOT and BR_REWRITE3 publication (src/ast/rewriter/bv_rewriter.cpp:1971-1979)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_bitwise.go",
+          "tests": [
+            "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
+            "TestBVRewriterBitwiseEveryColdReservation",
+            "TestBVRewriterANDWarmSpillRefusalPreservesOutput"
+          ]
         }
       ],
       "ownership": [
@@ -21465,7 +21476,8 @@
         "Repeat borrows the same argument into the original inline16/doubling handle buffer and releases its spill on all exits. Zero-extension calls the unsigned32 numeral constructor, borrows that application, concatenates before output SetRef. Identity paths do no numeric/buffer/cache work. Both cold refusal campaigns close actual shared owners to zero budget.",
         "Comparison/reduction-OR borrow inputs, use source unsigned32 one-bit numeral construction and SetRef only after factories succeed. Numeral identity predicates copy no numeric metadata. Symbolic reduction-OR erases output and numerical/factory reads. Actual cold refusal campaigns preserve prior output and close reached numeric/AST/symbol owner graph with zero budget.",
         "Reduction-AND retains its copied local rational plus power/one/returned subtraction condition values through nested unsigned numeral construction and output assignRef. The nested numeral owner is captured at entry in the existing BV frame receipt and joined before older value DT, including constructor refusal. operator- local copy ends before comparison; full-expression values end after output assignment; the function-local rational ends last. Fault campaigns inspect these actual consumed flags at nested source stops and close shared owners to zero budget.",
-        "Sign extension owns the read local rational through result assignment, captures the signed normalization child, copies its returned rational before ending that full expression, and applies void modulo to the same physical local. The power temporary ends after modulo; the captured nested numeral constructor joins before the older local DT. A retired normalization receipt is replaced only after its returned value has been assigned and destroyed. Actual Runtime numerical and symbolic cold failure campaigns preserve output and close shared graphs to zero budget; reached invalid output and uint32 width-wrap tests inspect completed source DT and captured NUM ownership."
+        "Sign extension owns the read local rational through result assignment, captures the signed normalization child, copies its returned rational before ending that full expression, and applies void modulo to the same physical local. The power temporary ends after modulo; the captured nested numeral constructor joins before the older local DT. A retired normalization receipt is replaced only after its returned value has been assigned and destroyed. Actual Runtime numerical and symbolic cold failure campaigns preserve output and close shared graphs to zero budget; reached invalid output and uint32 width-wrap tests inspect completed source DT and captured NUM ownership.",
+        "AND borrows the input slice, creates each NOT in order, pushes into the original inline16/doubling buffer, builds OR and outer NOT, and publishes the output only after all factories succeed. Spill storage is released on every exit. The 17-operand cold fault campaign includes buffer growth and final factories, preserves prior output and closes actual shared owners with zero budget."
       ],
       "deviations": [
         "Only the three original negated-bitwise reducer bodies are selected, exposed as standalone core adapters for later BV rewriter dispatch/traversal. They preserve source operand order, generated operator nesting and BR_REWRITE2; they do not normalize or evaluate operands. Full BV rewriter constructor/parameters/poly/trailing/extract/dispatch/traversal algorithms, native pointer/buffer/exception ABI and whole-unit ownership audit remain uncredited. Invalid/nil Go manager/reference boundaries use existing checked Go transport.",
@@ -21473,7 +21485,8 @@
         "Selected complete repeat/zero-extension bodies retain BR_DONE identity and BR_REWRITE1 concat statuses. No extra flattening, evaluation or bounds guard is introduced. Unsigned zero construction is delegated to the original rational(unsigned) path, not uint64 substitution. Full BV constructor/dispatch/sign-extension/trailing/reducer/evaluator and native ownership/ABI audits remain open.",
         "Selected complete comparison/reduction-OR bodies preserve source identity-first and short-circuit predicates, BR_DONE folds and BR_REWRITE2 equality ITE. Distinct raw NUM nodes are false by identity without reading parameter values. The Go adapter orders the nested equality/one/zero constructor calls explicitly; native C++ nested function argument evaluation is not a portable fixed allocation order. Full BV constructor/dispatch, reduction-AND and other reducer/evaluator/whole-unit ownership/ABI work remain open.",
         "The owner-sensitive numerical core resides in ast so it can use existing private manager-owned frames and reference publication without reverse imports; rewriter supplies the original status adapter, preserving pkg boundaries. Non-numeral guard erases Go bookkeeping for the source allocation-free default rational. The common all-one arithmetic condition is shared while its original predicate retains its earlier full-expression DT point. Native global rational init, stack/union/allocator/assertion/exception ABI and full BV reducer/dispatch/evaluator/whole-unit audits remain uncredited; actual Runtime faults prove closure, not native-fatal resumability.",
-        "Selected complete sign-extension body uses an ast numerical core and rewriter adapter to preserve private numerical/reference ownership without reverse package imports. Unsigned result-width addition retains wraparound, with the original inner NUM width guard reached after norm/copy/modulo. Symbolic source default rational requires no allocation, so the Go numeral identity guard erases its bookkeeping. The checked adapter validates the borrowed extraction owner; full BV constructor/dispatch/traversal/evaluator and native stack/allocator/assertion/exception/pointer ABI and whole-unit ownership remain open. Fault cleanup does not claim native-fatal resumability."
+        "Selected complete sign-extension body uses an ast numerical core and rewriter adapter to preserve private numerical/reference ownership without reverse package imports. Unsigned result-width addition retains wraparound, with the original inner NUM width guard reached after norm/copy/modulo. Symbolic source default rational requires no allocation, so the Go numeral identity guard erases its bookkeeping. The checked adapter validates the borrowed extraction owner; full BV constructor/dispatch/traversal/evaluator and native stack/allocator/assertion/exception/pointer ABI and whole-unit ownership remain open. Fault cleanup does not claim native-fatal resumability.",
+        "Selected complete mk_bv_and body expands by De Morgan rather than folding values or emitting a raw AND node, with original BR_REWRITE3. Standalone core remains pending full BV dispatch/traversal; native buffer/pointer/exception ABI and whole-unit ownership remain uncredited."
       ]
     },
     {

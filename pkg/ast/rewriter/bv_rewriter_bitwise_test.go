@@ -1,4 +1,4 @@
-// Source: src/ast/rewriter/bv_rewriter.cpp:1981-2002.
+// Source: src/ast/rewriter/bv_rewriter.cpp:1971-1998.
 package rewriter
 
 import (
@@ -56,18 +56,18 @@ func TestBVRewriterOriginalNegatedBitwiseAlgorithms(t *testing.T) {
 			}
 			return value
 		}
-		for op, rewrite := range []func(*ast.ASTManager, []ast.ASTHandle, ast.ASTRef) (RewriteStatus, error){RewriteBitVectorNAND, RewriteBitVectorNOR, RewriteBitVectorXNOR} {
+		for op, rewrite := range []func(*ast.ASTManager, []ast.ASTHandle, ast.ASTRef) (RewriteStatus, error){RewriteBitVectorNAND, RewriteBitVectorNOR, RewriteBitVectorXNOR, RewriteBitVectorAND} {
 			status, e := rewrite(m, args, out)
 			satOK(t, e)
 			got, e := m.RefGet(out)
 			satOK(t, e)
 			want := uint64(0)
-			if op == 0 {
+			if op == 0 || op == 3 {
 				want = 255
 			}
 			for _, arg := range args {
 				switch op {
-				case 0:
+				case 0, 3:
 					want &= values[arg]
 				case 1:
 					want |= values[arg]
@@ -75,27 +75,54 @@ func TestBVRewriterOriginalNegatedBitwiseAlgorithms(t *testing.T) {
 					want ^= values[arg]
 				}
 			}
-			want = (^want) & 255
-			if status != Rewrite2 || eval(got) != want {
+			expectedStatus := Rewrite2
+			if op == 3 {
+				expectedStatus = Rewrite3
+			} else {
+				want = (^want) & 255
+			}
+			if status != expectedStatus || eval(got) != want {
 				t.Fatal("bitwise meaning/status", num, op, status, eval(got), want)
 			}
-			if op == 0 {
-				kind, e := m.GetDeclKind(got)
+			if op == 3 {
+				for pattern := uint64(0); pattern < 256; pattern++ {
+					for _, arg := range args {
+						values[arg] = pattern
+					}
+					if eval(got) != pattern {
+						t.Fatal("AND uniform truth table", num, pattern, eval(got))
+					}
+				}
+			}
+			if op == 0 || op == 3 {
+				source := got
+				if op == 3 {
+					k, e := m.GetDeclKind(got)
+					satOK(t, e)
+					n, e := m.GetNumArgs(got)
+					satOK(t, e)
+					if k != 32 || n != 1 {
+						t.Fatal("AND outer NOT", k, n)
+					}
+					source, e = m.GetArg(got, 0)
+					satOK(t, e)
+				}
+				kind, e := m.GetDeclKind(source)
 				satOK(t, e)
-				n, e := m.GetNumArgs(got)
+				n, e := m.GetNumArgs(source)
 				satOK(t, e)
 				if kind != 31 || n != uint32(num) {
-					t.Fatal("NAND source shape", kind, n)
+					t.Fatal("De Morgan OR shape", op, kind, n)
 				}
 				for i, arg := range args {
-					neg, e := m.GetArg(got, uint32(i))
+					neg, e := m.GetArg(source, uint32(i))
 					satOK(t, e)
 					k, e := m.GetDeclKind(neg)
 					satOK(t, e)
 					base, e := m.GetArg(neg, 0)
 					satOK(t, e)
 					if k != 32 || base != arg {
-						t.Fatal("NAND source argument order", i)
+						t.Fatal("De Morgan argument order", op, i)
 					}
 				}
 			} else {
@@ -148,7 +175,7 @@ func TestBVRewriterNANDWarmSpillRefusalPreservesOutput(t *testing.T) {
 }
 
 func TestBVRewriterBitwiseEveryColdReservation(t *testing.T) {
-	for op, rewrite := range []func(*ast.ASTManager, []ast.ASTHandle, ast.ASTRef) (RewriteStatus, error){RewriteBitVectorNAND, RewriteBitVectorNOR, RewriteBitVectorXNOR} {
+	for op, rewrite := range []func(*ast.ASTManager, []ast.ASTHandle, ast.ASTRef) (RewriteStatus, error){RewriteBitVectorNAND, RewriteBitVectorNOR, RewriteBitVectorXNOR, RewriteBitVectorAND} {
 		success := false
 		failures := 0
 		for ordinal := int64(0); ordinal < 128; ordinal++ {
@@ -168,7 +195,17 @@ func TestBVRewriterBitwiseEveryColdReservation(t *testing.T) {
 				astTestPin(t, m, y)
 				out := astTestPin(t, m, x)
 				m.Budget().FailAfter(ordinal)
-				status, body := rewrite(m, []ast.ASTHandle{x, y, x}, out)
+				args := []ast.ASTHandle{x, y, x}
+				if op == 3 {
+					args = make([]ast.ASTHandle, 17)
+					for i := range args {
+						args[i] = x
+						if i%2 != 0 {
+							args[i] = y
+						}
+					}
+				}
+				status, body := rewrite(m, args, out)
 				m.Budget().FailAfter(-1)
 				if body != nil {
 					failures++
@@ -182,7 +219,11 @@ func TestBVRewriterBitwiseEveryColdReservation(t *testing.T) {
 					}
 				} else {
 					success = true
-					if status != Rewrite2 {
+					expected := Rewrite2
+					if op == 3 {
+						expected = Rewrite3
+					}
+					if status != expected {
 						t.Fatal("rewrite depth", status)
 					}
 				}
@@ -194,5 +235,35 @@ func TestBVRewriterBitwiseEveryColdReservation(t *testing.T) {
 		if !success || failures == 0 {
 			t.Fatal("cold reservation horizon", op, success, failures)
 		}
+	}
+}
+
+func TestBVRewriterANDWarmSpillRefusalPreservesOutput(t *testing.T) {
+	m := astTestManager(t)
+	_, e := m.RegisterArithmeticPlugin()
+	satOK(t, e)
+	_, e = m.RegisterBitVectorPlugin()
+	satOK(t, e)
+	sort, e := m.BitVectorSort(8)
+	satOK(t, e)
+	x, e := m.MkVar(0, sort)
+	satOK(t, e)
+	astTestPin(t, m, x)
+	args := make([]ast.ASTHandle, 17)
+	for i := range args {
+		args[i] = x
+	}
+	out := astTestPin(t, m, x)
+	_, e = RewriteBitVectorAND(m, args, out)
+	satOK(t, e)
+	satOK(t, m.SetRef(out, x))
+	before := m.Budget().Used()
+	m.Budget().FailAfter(0)
+	_, body := RewriteBitVectorAND(m, args, out)
+	m.Budget().FailAfter(-1)
+	got, e := m.RefGet(out)
+	satOK(t, e)
+	if !errors.Is(body, arena.ErrInjectedFailure) || got != x || m.Budget().Used() != before {
+		t.Fatal("spill failure output/charge", body, got, before, m.Budget().Used())
 	}
 }

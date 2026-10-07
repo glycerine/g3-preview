@@ -1,4 +1,4 @@
-// Source: src/ast/rewriter/bv_rewriter.cpp:1981-2002.
+// Source: src/ast/rewriter/bv_rewriter.cpp:1971-1998.
 package rewriter
 
 import "github.com/glycerine/g3/pkg/ast"
@@ -55,4 +55,31 @@ func RewriteBitVectorXNOR(m *ast.ASTManager, args []ast.ASTHandle, out ast.ASTRe
 		return RewriteFailed, e
 	}
 	return Rewrite2, m.SetRef(out, h)
+}
+
+// RewriteBitVectorAND preserves the original De Morgan expansion and depth.
+func RewriteBitVectorAND(m *ast.ASTManager, args []ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
+	if m == nil {
+		return RewriteFailed, ast.ErrASTHandle
+	}
+	var newArgs ast.ASTHandleBuffer
+	defer newArgs.Close(m.Budget())
+	for _, arg := range args {
+		neg, e := m.MkBitVectorNot(arg)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		if e = newArgs.Push(m.Budget(), neg); e != nil {
+			return RewriteFailed, e
+		}
+	}
+	inner, e := m.MkBitVectorOr(newArgs.Slice())
+	if e != nil {
+		return RewriteFailed, e
+	}
+	h, e := m.MkBitVectorNot(inner)
+	if e != nil {
+		return RewriteFailed, e
+	}
+	return Rewrite3, m.SetRef(out, h)
 }
