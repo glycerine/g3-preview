@@ -6,6 +6,9 @@ package g3
 import "errors"
 
 func (tr *satGoalTranslator) collectInterface(formulas []ASTHandle) (err error) {
+	return tr.collectInterfaceWithDependencies(formulas, nil)
+}
+func (tr *satGoalTranslator) collectInterfaceWithDependencies(formulas, dependencies []ASTHandle) (err error) {
 	fvisited, err := NewASTFastMark2(tr.manager)
 	if err != nil {
 		return err
@@ -16,6 +19,11 @@ func (tr *satGoalTranslator) collectInterface(formulas []ASTHandle) (err error) 
 		return err
 	}
 	defer func() { err = errors.Join(err, tvisited.Close()) }()
+	for _, dependency := range dependencies {
+		if err = tr.collectGeneralInterface(dependency, tvisited); err != nil {
+			return err
+		}
+	}
 	// The source todo and traversal stacks reuse the concrete frame backing at
 	// disjoint times. Keep the outer todo in its own charged vector because a
 	// general expression walk may start while other formulas are still pending.

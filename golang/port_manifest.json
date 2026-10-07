@@ -68880,7 +68880,10 @@
         "TestSATGoalRecoveryFreshUnitsLearnedAndCheckpoints",
         "TestSATGoalRecoveryLongClauseBufferGrowth",
         "TestSATGoalTranslatorBooleanInterfaceAndInterpretedAtoms",
-        "TestSATGoalTranslatorAtomMapGrowthAndModel"
+        "TestSATGoalTranslatorAtomMapGrowthAndModel",
+        "TestSATGoalDependenciesSignedAssumptionsAndCore",
+        "TestSATGoalDependenciesFormulaLabelShortcutAndInterface",
+        "TestSATGoalDependenciesCompoundGuardOriginalFreshnessAndTruthTable"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -68903,11 +68906,21 @@
           "tests": [
             "TestSATGoalTranslatorBooleanInterfaceAndInterpretedAtoms"
           ]
+        },
+        {
+          "name": "collect_boolean_interface(goal dependency traversal)",
+          "status": "ported",
+          "go_target": "sat_goal_interface.go",
+          "tests": [
+            "TestSATGoalDependenciesSignedAssumptionsAndCore",
+            "TestSATGoalDependenciesFormulaLabelShortcutAndInterface",
+            "TestSATGoalDependenciesCompoundGuardOriginalFreshnessAndTruthTable"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "Goal-dependency traversal remains unported. Source mk_inv now owns both literal polarities through a concrete reference vector. The general expression visitor is specialized for collecting interface constants; broad quantifier and allocation-history qualification remains deferred."
+        "Goal dependencies now traverse the general expression visitor before formulas with shared marks. Source mk_inv owns both literal polarities through a concrete reference vector. Broad quantifier and allocation-history qualification remains deferred."
       ]
     },
     {
@@ -68942,7 +68955,8 @@
         "sat_goal_recovery.go",
         "sat_goal_to_sat.go",
         "sat_goal_ast_map.go",
-        "sat_goal_interface.go"
+        "sat_goal_interface.go",
+        "sat_goal_dependencies.go"
       ],
       "tests": [
         "TestSATGoalInverseLiteralOwnership",
@@ -68957,7 +68971,10 @@
         "TestSATGoalTranslatorCancellationAndMemoryParams",
         "TestSATGoalTranslatorAtomMapGrowthAndModel",
         "TestSATGoalTranslatorRejectsUnnormalizedSourceOperators",
-        "TestSATGoalTranslatorUsesASTManagerResourceLimit"
+        "TestSATGoalTranslatorUsesASTManagerResourceLimit",
+        "TestSATGoalDependenciesSignedAssumptionsAndCore",
+        "TestSATGoalDependenciesFormulaLabelShortcutAndInterface",
+        "TestSATGoalDependenciesCompoundGuardOriginalFreshnessAndTruthTable"
       ],
       "assertions": [
         {
@@ -69073,13 +69090,24 @@
             "TestSATGoalTranslatorAtomMapGrowthAndModel",
             "TestSATGoalTranslatorRejectsUnnormalizedSourceOperators"
           ]
+        },
+        {
+          "name": "imp::insert_dep and goal overload",
+          "status": "ported",
+          "go_target": "sat_goal_dependencies.go",
+          "tests": [
+            "TestSATGoalDependenciesSignedAssumptionsAndCore",
+            "TestSATGoalDependenciesFormulaLabelShortcutAndInterface",
+            "TestSATGoalDependenciesCompoundGuardOriginalFreshnessAndTruthTable"
+          ]
         }
       ],
       "ownership": [
-        "Concrete AST-hash linear-probing maps; atom keys and interpreted-atom trail retain AST references; explicit Close releases charged scalar storage."
+        "Concrete AST-hash linear-probing maps; atom keys and interpreted-atom trail retain AST references; explicit Close releases charged scalar storage.",
+        "Fresh compound dependency guards retain owning trail references; dep2asm original label keys remain borrowed as in source."
       ],
       "deviations": [
-        "Goal dependencies, dep2asm, unsupported-operator SMT2 diagnostics, wrapper parameter updates and public tactic integration remain unported. sat2goal formula recovery now follows source units/binaries/originals/optional-learned order with fresh auxiliary atoms; its model-converter construction/application remains unported. Translation checkpoints now borrow the AST manager's actual inline resource limit; no whole-unit or public API completion is claimed."
+        "Goal dependency guards and dep2asm now follow the source goal overload, including signed labels, fresh compound guards, repeated-key replacement and skip_dep. Unsupported-operator SMT2 diagnostics, wrapper parameter updates and public tactic integration remain unported. sat2goal formula recovery follows source units/binaries/originals/optional-learned order with fresh auxiliary atoms; its model-converter construction/application remains unported. Translation checkpoints borrow the AST manager's actual inline resource limit; no whole-unit or public API completion is claimed."
       ]
     },
     {
@@ -69112,7 +69140,8 @@
       "status": "partial",
       "go_targets": [
         "model_lifecycle.go",
-        "sat_boolean_model.go"
+        "sat_boolean_model.go",
+        "sat_goal_dependencies.go"
       ],
       "tests": [
         "TestModelDerivedConstructorAndVirtualReferenceDestruction",
@@ -69124,7 +69153,10 @@
         "TestSATBooleanModelRetainsBindingsAfterEngineAndAtomsClose",
         "TestSATBooleanModelSkipsUndefinedSourceRows",
         "TestSATBooleanModelMatchesOriginalGoalTruthTable",
-        "TestSATBooleanModelRejectsInterpretedRecoveryBranch"
+        "TestSATBooleanModelRejectsInterpretedRecoveryBranch",
+        "TestSATGoalDependenciesSignedAssumptionsAndCore",
+        "TestSATGoalDependenciesFormulaLabelShortcutAndInterface",
+        "TestSATGoalDependenciesCompoundGuardOriginalFreshnessAndTruthTable"
       ],
       "conditionals": [
         {
@@ -69179,6 +69211,16 @@
             "TestSATBooleanModelSkipsUndefinedSourceRows",
             "TestSATBooleanModelMatchesOriginalGoalTruthTable",
             "TestSATBooleanModelRejectsInterpretedRecoveryBranch"
+          ]
+        },
+        {
+          "name": "imp::dep2assumptions bucket-order collection fragment",
+          "status": "ported",
+          "go_target": "sat_goal_dependencies.go",
+          "tests": [
+            "TestSATGoalDependenciesSignedAssumptionsAndCore",
+            "TestSATGoalDependenciesFormulaLabelShortcutAndInterface",
+            "TestSATGoalDependenciesCompoundGuardOriginalFreshnessAndTruthTable"
           ]
         }
       ],

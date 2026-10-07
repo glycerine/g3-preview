@@ -32,6 +32,8 @@ type satGoalTranslator struct {
 	limit                                     *utilReslimit
 	cooperation                               *utilCooperation
 	cache, atoms, interfaces                  satGoalASTMap
+	dependencies                              satGoalASTMap
+	dependencyTrail                           []ASTHandle
 	frames                                    []satGoalFrame
 	results                                   []satLiteral
 	interpreted                               []ASTHandle
@@ -105,6 +107,13 @@ func (tr *satGoalTranslator) Close() error {
 	if tr.closed {
 		return nil
 	}
+	for len(tr.dependencyTrail) > 0 {
+		i := len(tr.dependencyTrail) - 1
+		if e := tr.manager.DecRef(tr.dependencyTrail[i]); e != nil {
+			return e
+		}
+		tr.dependencyTrail = tr.dependencyTrail[:i]
+	}
 	for len(tr.interpreted) > 0 {
 		i := len(tr.interpreted) - 1
 		if e := tr.manager.DecRef(tr.interpreted[i]); e != nil {
@@ -131,6 +140,9 @@ func (tr *satGoalTranslator) Close() error {
 	tr.cache.close(b)
 	tr.atoms.close(b)
 	tr.interfaces.close(b)
+	tr.dependencies.close(b)
+	b.Release(uint64(cap(tr.dependencyTrail)) * uint64(reflect.TypeOf(ASTHandle{}).Size()))
+	tr.dependencyTrail = nil
 	b.Release(uint64(cap(tr.frames)) * uint64(reflect.TypeOf(satGoalFrame{}).Size()))
 	b.Release(uint64(cap(tr.results)) * 4)
 	b.Release(uint64(cap(tr.interpreted)) * uint64(reflect.TypeOf(ASTHandle{}).Size()))
