@@ -23347,8 +23347,16 @@
       "component": "ast",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "pkg/ast/rewriter/bv_polynomial_order.go",
+        "pkg/ast/rewriter/bv_polynomial_order_test.go"
+      ],
+      "tests": [
+        "TestBVPolynomialMonomialOrdinalOriginalBranchesAndTies",
+        "TestBVPolynomialMonomialStructuralOrderIgnoresAllocationIDs",
+        "TestBVPolynomialMonomialOrdinalSignedIDConversion",
+        "TestBVPolynomialPowerProductBorrowingAndUnreadNumeralMetadata"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -23379,17 +23387,46 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "original mon_lt comparator/ordinal specialized for BV use_power()==false: structural AST ordering or signed monomial ordinal, essentially-variable family guard, numeral-first multiplication and constant minus-one ordinal (src/ast/rewriter/poly_rewriter_def.h:490-523; src/ast/rewriter/poly_rewriter.h:88-94; src/ast/rewriter/bv_rewriter.h:43)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_polynomial_order.go",
+          "tests": [
+            "TestBVPolynomialMonomialOrdinalOriginalBranchesAndTies",
+            "TestBVPolynomialMonomialStructuralOrderIgnoresAllocationIDs",
+            "TestBVPolynomialMonomialOrdinalSignedIDConversion"
+          ]
+        },
+        {
+          "name": "original identity-only get_power_product overload with multiplication/exact-two-arity/numeral guards and borrowed second-operand return (src/ast/rewriter/poly_rewriter_def.h:403-408)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_polynomial_order.go",
+          "tests": [
+            "TestBVPolynomialPowerProductBorrowingAndUnreadNumeralMetadata"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Only the complete selected monomial-order and identity-only power-product bodies are specialized for the original BV Config, whose use_power returns false. The source unused default rational k has no numerical acquisition and its Go bookkeeping is erased. Structural mode delegates to the already-ported ASTLess body; ordinal mode retains the source absence of a binary-arity guard and signed conversion of unsigned IDs for the 32-bit-int source profile. Native missing-operand/assertion/compiler-unreachable domains receive checked Go errors. Power-product return handles are borrowed with no INC, slice clone or numerical metadata read. Arith/use_power specialization, coefficient-valued readers, full polynomial core/hoisting/mark/coefficient owner and rewriter/solver integration remain required. No native stack/pointer/allocator/assertion/fatal/exception ABI or whole-unit ownership/completion credit is claimed."
+      ]
     },
     {
       "path": "src/ast/rewriter/poly_rewriter_def.h",
       "component": "ast",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "pkg/ast/rewriter/bv_polynomial_order.go",
+        "pkg/ast/rewriter/bv_polynomial_order_test.go"
+      ],
+      "tests": [
+        "TestBVPolynomialMonomialOrdinalOriginalBranchesAndTies",
+        "TestBVPolynomialMonomialStructuralOrderIgnoresAllocationIDs",
+        "TestBVPolynomialMonomialOrdinalSignedIDConversion",
+        "TestBVPolynomialPowerProductBorrowingAndUnreadNumeralMetadata"
+      ],
       "assertions": [
         {
           "line": 112,
@@ -23494,9 +23531,30 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "original mon_lt comparator/ordinal specialized for BV use_power()==false: structural AST ordering or signed monomial ordinal, essentially-variable family guard, numeral-first multiplication and constant minus-one ordinal (src/ast/rewriter/poly_rewriter_def.h:490-523; src/ast/rewriter/poly_rewriter.h:88-94; src/ast/rewriter/bv_rewriter.h:43)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_polynomial_order.go",
+          "tests": [
+            "TestBVPolynomialMonomialOrdinalOriginalBranchesAndTies",
+            "TestBVPolynomialMonomialStructuralOrderIgnoresAllocationIDs",
+            "TestBVPolynomialMonomialOrdinalSignedIDConversion"
+          ]
+        },
+        {
+          "name": "original identity-only get_power_product overload with multiplication/exact-two-arity/numeral guards and borrowed second-operand return (src/ast/rewriter/poly_rewriter_def.h:403-408)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_polynomial_order.go",
+          "tests": [
+            "TestBVPolynomialPowerProductBorrowingAndUnreadNumeralMetadata"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Only the complete selected monomial-order and identity-only power-product bodies are specialized for the original BV Config, whose use_power returns false. The source unused default rational k has no numerical acquisition and its Go bookkeeping is erased. Structural mode delegates to the already-ported ASTLess body; ordinal mode retains the source absence of a binary-arity guard and signed conversion of unsigned IDs for the 32-bit-int source profile. Native missing-operand/assertion/compiler-unreachable domains receive checked Go errors. Power-product return handles are borrowed with no INC, slice clone or numerical metadata read. Arith/use_power specialization, coefficient-valued readers, full polynomial core/hoisting/mark/coefficient owner and rewriter/solver integration remain required. No native stack/pointer/allocator/assertion/fatal/exception ABI or whole-unit ownership/completion credit is claimed."
+      ]
     },
     {
       "path": "src/ast/rewriter/poly_rewriter_params.hpp",
