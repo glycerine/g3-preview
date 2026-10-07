@@ -16,6 +16,9 @@ func (m *ASTManager) pluginValue(fid FamilyID, r astNodeRef) (bool, error) {
 	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astBitVectorPlugin {
 		return m.isBitVectorNumeral(r)
 	}
+	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astArithmeticPlugin {
+		return m.arithmeticValue(fid, r, false)
+	}
 	return false, nil
 }
 func (m *ASTManager) isValue(r astNodeRef) (bool, error) {
@@ -43,8 +46,30 @@ func (m *ASTManager) IsValue(h ASTHandle) (bool, error) {
 	return m.isValue(r)
 }
 
-// The currently implemented value predicates also identify unique values.
-func (m *ASTManager) IsUniqueValue(h ASTHandle) (bool, error) { return m.IsValue(h) }
+func (m *ASTManager) pluginUniqueValue(fid FamilyID, r astNodeRef) (bool, error) {
+	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astArithmeticPlugin {
+		return m.arithmeticValue(fid, r, true)
+	}
+	return m.pluginValue(fid, r)
+}
+func (m *ASTManager) IsUniqueValue(h ASTHandle) (bool, error) {
+	if e := m.lock(); e != nil {
+		return false, e
+	}
+	defer m.mu.Unlock()
+	r, e := m.internal(h)
+	if e != nil {
+		return false, e
+	}
+	if m.nodeAt(r.slot).kind != ASTApp {
+		return false, nil
+	}
+	fid, _, e := m.declIdentity(m.appAt(r.slot).decl)
+	if e != nil || fid < 0 || !m.pluginAt(fid).present {
+		return false, e
+	}
+	return m.pluginUniqueValue(fid, r)
+}
 func (m *ASTManager) AreEqual(a, b ASTHandle) (bool, error) {
 	if e := m.lock(); e != nil {
 		return false, e
@@ -92,11 +117,11 @@ func (m *ASTManager) AreDistinct(a, b ASTHandle) (bool, error) {
 	if fid < 0 || !m.pluginAt(fid).present || x == y {
 		return false, nil
 	}
-	first, e := m.pluginValue(fid, x)
+	first, e := m.pluginUniqueValue(fid, x)
 	if e != nil || !first {
 		return false, e
 	}
-	return m.pluginValue(fid, y)
+	return m.pluginUniqueValue(fid, y)
 }
 
 // SomeValueProc is the borrowed source some_value_proc override. It receives
@@ -164,6 +189,9 @@ func (m *ASTManager) getSomeValue(r astNodeRef) (ASTHandle, error) {
 	}
 	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astBitVectorPlugin {
 		return m.bitVectorSomeValue(r)
+	}
+	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astArithmeticPlugin {
+		return m.arithmeticSomeValue(r)
 	}
 	// Actual manager fallback constructs two lexical parameters; AST-valued
 	// parameter construction doesn't retain until its declaration info attaches.

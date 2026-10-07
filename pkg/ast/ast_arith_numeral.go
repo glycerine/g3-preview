@@ -1,0 +1,221 @@
+// Source: src/ast/arith_decl_plugin.cpp:400-449;
+// src/util/vector.h:407-421,489-494.
+package ast
+
+import (
+	"errors"
+	"math"
+
+	"github.com/glycerine/g3/pkg/util"
+)
+
+// The lexical rational parameter stays at this address if cleanup stops.
+type astArithNumeralFrame struct {
+	value                                util.OwnedRational
+	copy                                 util.RationalServiceInvocation
+	active, placed, complete, sourceDone bool
+	sourceCause                          error
+}
+
+func (f *astArithNumeralFrame) destroy(m *ASTManager, own bool) error {
+	if !f.active {
+		return nil
+	}
+	if !f.sourceDone && f.sourceCause == nil {
+		f.sourceCause = f.copy.SourceReady()
+		if f.sourceCause == nil && f.placed && f.complete {
+			f.sourceCause = m.numerals.Del(&f.value)
+			if f.sourceCause == nil {
+				f.placed = false
+			}
+		}
+		f.sourceDone = f.sourceCause == nil
+	}
+	if !own {
+		return f.sourceCause
+	}
+	if e := f.copy.Cleanup(false); e != nil {
+		return e
+	}
+	if f.placed {
+		if e := m.numerals.CleanupValue(&f.value); e != nil {
+			return e
+		}
+		f.placed = false
+	}
+	if e := f.copy.Cleanup(true); e != nil {
+		return e
+	}
+	if e := f.copy.EndContext(); e != nil {
+		return e
+	}
+	*f = astArithNumeralFrame{}
+	return nil
+}
+
+// Source resize keeps the old size during every reached geometric expansion.
+// Filling the gaps and publishing the new size happen only after all growth.
+func (p *astArithmeticPluginOwner) cacheNumeral(which int, index uint32, r astNodeRef) error {
+	v := &p.small[which]
+	size := v.size()
+	capacity := uint32(0)
+	if len(v.words) != 0 {
+		capacity = v.words[0]
+	}
+	for capacity <= index {
+		n := (capacity*3 + 1) / 2
+		if n < 2 {
+			n = 2
+		}
+		bytes := uint64(n*2+2) * 4
+		if e := p.owner.BudgetField.Reserve(bytes); e != nil {
+			return e
+		}
+		words := make([]uint32, n*2+2)
+		words[0], words[1] = n, size
+		for i := uint32(0); i < size*2; i++ {
+			words[2+i] = v.words[2+i]
+		}
+		p.owner.BudgetField.Release(v.bytes())
+		v.words, capacity = words, n
+	}
+	if size <= index {
+		for i := size; i <= index; i++ {
+			v.words[2+i*2], v.words[3+i*2] = 0, 0
+		}
+		v.words[1] = index + 1
+	}
+	v.words[2+index*2], v.words[3+index*2] = r.slot, r.generation
+	return nil
+}
+
+func (m *ASTManager) mkArithmeticNumeral(value *util.OwnedRational, integer bool, zero bool) (result astNodeRef, err error) {
+	p := m.arithmeticPlugin
+	if p == nil || !p.published {
+		return result, ErrASTHandle
+	}
+	if p.numeral.active || p.cachePending.slot != 0 {
+		return result, ErrASTPending
+	}
+	if integer && !zero {
+		isInt, e := m.numerals.IsInt(value)
+		if e != nil {
+			return result, e
+		}
+		if !isInt {
+			return result, ASTException{util.NewDefaultException("invalid rational value passed as an integer")}
+		}
+	}
+	u, cached := uint32(0), zero
+	if !zero {
+		unsigned, e := m.numerals.IsUnsigned(value)
+		if e != nil {
+			return result, e
+		}
+		if unsigned {
+			u, e = m.numerals.Unsigned(value)
+			if e != nil {
+				return result, e
+			}
+			cached = u < 16
+		}
+	}
+	which, sortIndex, flag := 1, 0, int32(0)
+	if integer && !p.convertIntNumerals {
+		which, sortIndex = 0, 1
+	}
+	if integer && (!cached || !p.convertIntNumerals) {
+		flag = 1
+	}
+	if cached && u < p.small[which].size() {
+		r, e := p.small[which].at(u)
+		if e != nil || r.slot != 0 {
+			return r, e
+		}
+	}
+	f := &p.numeral
+	f.active = true
+	defer func() {
+		source := f.destroy(m, false)
+		err = errors.Join(err, source)
+		if source == nil {
+			err = errors.Join(err, f.destroy(m, true))
+		}
+	}()
+	f.value, err = m.numerals.NewValue()
+	if err != nil {
+		return result, err
+	}
+	f.placed = true
+	if !zero {
+		if err = m.numerals.CopyWithInvocation(&f.value, value, &f.copy); err != nil {
+			return result, err
+		}
+	}
+	f.complete = true
+	parameter := astParameterRecord{Kind: ASTParameterRational, Rational: f.value}
+	if err = m.beginFormatInfo(false, p.family, 0, &parameter); err != nil {
+		return result, err
+	}
+	defer m.endFormatInfo()
+	m.formatLexical.secondParameter = astParameterRecord{Kind: ASTParameterInt, integer: flag}
+	m.formatLexical.localPair = true
+	m.formatLexical.info.count = 2
+	epoch := m.formatLexical.epoch * 2
+	ps := [2]ASTParameter{{m.origin, math.MaxUint32 - 1, epoch}, {m.origin, math.MaxUint32 - 1, epoch + 1}}
+	nameIndex := 1
+	if sortIndex == 1 {
+		nameIndex = 0
+	}
+	decl, e := m.pluginDecl(p.names[nameIndex], p.family, 0, ps[:], nil, p.fields[sortIndex], ASTFuncFlags{}, false)
+	if e != nil {
+		return result, e
+	}
+	result, err = m.mkApp(decl, nil)
+	if err != nil || !cached {
+		return result, err
+	}
+	if err = m.incNode(result); err != nil {
+		return result, err
+	}
+	p.cachePending = result
+	if err = p.cacheNumeral(which, u, result); err != nil {
+		return result, err
+	}
+	p.cachePending = astNodeRef{}
+	return result, nil
+}
+
+func (m *ASTManager) ArithmeticNumeral(value *util.OwnedRational, integer bool) (ASTHandle, error) {
+	if e := m.lock(); e != nil {
+		return ASTHandle{}, e
+	}
+	defer m.mu.Unlock()
+	m.formatExecuting = true
+	defer func() { m.formatExecuting = false }()
+	r, e := m.mkArithmeticNumeral(value, integer, false)
+	return m.external(r), e
+}
+
+func (m *ASTManager) arithmeticNumeralDecl(ps []ASTParameter, arity int) (astNodeRef, error) {
+	if len(ps) != 2 || arity != 0 {
+		return astNodeRef{}, ASTException{util.NewDefaultException("invalid numeral declaration")}
+	}
+	v, e := m.parameter(ps[0])
+	if e != nil {
+		return astNodeRef{}, e
+	}
+	flag, e := m.parameter(ps[1])
+	if e != nil {
+		return astNodeRef{}, e
+	}
+	if v.Kind != ASTParameterRational || flag.Kind != ASTParameterInt {
+		return astNodeRef{}, ASTException{util.NewDefaultException("invalid numeral declaration")}
+	}
+	p := m.arithmeticPlugin
+	name, sort := p.names[1], p.fields[0]
+	if flag.integer != 0 {
+		name, sort = p.names[0], p.fields[1]
+	}
+	return m.pluginDecl(name, p.family, 0, ps, nil, sort, ASTFuncFlags{}, false)
+}

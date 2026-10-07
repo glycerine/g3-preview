@@ -8901,14 +8901,27 @@
       "status": "unported",
       "go_targets": [
         "pkg/ast/ast_arith_plugin.go",
-        "pkg/ast/ast_arith_plugin_source_test.go"
+        "pkg/ast/ast_arith_plugin_source_test.go",
+        "pkg/ast/ast_arith_numeral.go",
+        "pkg/ast/ast_arith_numeral_test.go",
+        "pkg/ast/ast_arith_values.go",
+        "pkg/ast/ast_builtin_plugins.go",
+        "pkg/ast/ast_builtin_plugins_values.go",
+        "pkg/model/model_arith_values_test.go"
       ],
       "tests": [
         "TestASTArithmeticSourceRegistrationAndDeclarations",
         "TestASTArithmeticSourceEveryRegistrationReservation",
         "TestASTArithmeticSourceEverySymbolAndMemberAcquisition",
         "TestASTArithmeticSourceFinalizeActualFieldOrderAndSeparateOwnClose",
-        "TestASTArithmeticReusedRealSortRejectedINCOwnAbort"
+        "TestASTArithmeticReusedRealSortRejectedINCOwnAbort",
+        "TestASTArithmeticOriginalNumeralFactory",
+        "TestASTArithmeticOriginalConvertedNumeralsAndDeclaration",
+        "TestASTArithmeticNumeralEveryCachePublicationReservation",
+        "TestASTArithmeticBigNumeralEveryCopyReservation",
+        "TestASTArithmeticNumeralCachesSourceFinalize",
+        "TestASTArithmeticOriginalValueAndZeroCallbacks",
+        "TestModelOriginalArithmeticZeroCompletion"
       ],
       "assertions": [
         {
@@ -8966,13 +8979,52 @@
             "TestASTArithmeticSourceFinalizeActualFieldOrderAndSeparateOwnClose",
             "TestASTArithmeticReusedRealSortRejectedINCOwnAbort"
           ]
+        },
+        {
+          "name": "original mk_numeral and mk_num_decl, small Int/Real cache lookup and INC-before-setx growth, fraction guard and conversion-state retained flags (src/ast/arith_decl_plugin.cpp:400-449)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_arith_numeral.go",
+          "tests": [
+            "TestASTArithmeticOriginalNumeralFactory",
+            "TestASTArithmeticOriginalConvertedNumeralsAndDeclaration",
+            "TestASTArithmeticNumeralEveryCachePublicationReservation",
+            "TestASTArithmeticBigNumeralEveryCopyReservation",
+            "TestASTArithmeticNumeralCachesSourceFinalize"
+          ]
+        },
+        {
+          "name": "original is_value/is_unique_value distinction and zero get_some_value callback, selected manager dispatch (src/ast/arith_decl_plugin.cpp:561-577,627-630)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_arith_values.go",
+          "tests": [
+            "TestASTArithmeticOriginalValueAndZeroCallbacks"
+          ]
+        },
+        {
+          "name": "original finalize small_ints then small_reals DEC_ARRAY_REF after existing fields; separate owned cleanup of unpublished cache INC and lexical rational parameter",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_arith_plugin.go",
+          "tests": [
+            "TestASTArithmeticNumeralEveryCachePublicationReservation",
+            "TestASTArithmeticNumeralCachesSourceFinalize"
+          ]
+        },
+        {
+          "name": "original Int/Real zero completion through evaluator constant registration",
+          "status": "partial",
+          "go_target": "pkg/model/model_arith_values_test.go",
+          "tests": [
+            "TestModelOriginalArithmeticZeroCompletion"
+          ]
         }
       ],
       "ownership": [
-        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
+        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end.",
+        "Each lexical rational parameter lives in an embedded owner continuation with its actual numeric copy invocation. Source cleanup checks completed numeric children before parameter destruction; separate owning cleanup handles incomplete payloads and aborts invocation children before reuse. The original cache INC is recorded before setx; every geometric expansion preserves old size until complete gap filling/publication. Unjoined cache INC blocks further numeral publication and source finalization until explicit owned manager cleanup drains it. Source finalize decrements original fields before small Int then Real entries; cache buffers close with the owner. Reflected Go header includes actual continuation/vector fields, and cache capacities are separately charged."
       ],
       "deviations": [
-        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
+        "Selected numeral factories and numeric value/unique-value/zero callbacks are implemented. Source utility rejects fractional Int inputs, while raw numeral declarations retain any rational with a nonzero integer flag. Converted small integer inputs retain Real flag zero, while converted uncached integer inputs retain Int flag one with a Real range, as the source does. Conversion-state tests select the native nonlinear-real mode directly; get_sort_names/logic-name registration remains open. The explicit Go returning-error profile keeps unjoined INCs named and refuses source finalization before publication cleanup; native allocation-fatal/exception behavior and allocator ABI equivalence are not claimed. Algebraic-number factory/comparison, arithmetic nonzero-offset distinctness, other arithmetic factories/reducers, native assertions/TRACE/exception transport and complete ownership/representation audits remain open."
       ]
     },
     {

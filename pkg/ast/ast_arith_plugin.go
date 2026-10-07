@@ -9,10 +9,13 @@ import (
 
 // Actual cold new-expression owner. The pointer-free field array follows
 // finalize's source member order, not the different set_manager action order.
-// Zero-size source small_ints/small_reals vectors and the lazy m_aw have no
-// acquired payload in this constructor profile.
+// The source numeral cache vectors and lazy m_aw start empty.
 
 type astArithmeticPluginOwner struct {
+	numeral                    astArithNumeralFrame
+	small                      [2]astFormatRefVector // Int, Real source ptr_vectors
+	cachePending               astNodeRef            // actual INC before setx publication
+	convertIntNumerals         bool
 	acquired                   [46]bool // exact successful INC leaves, distinct from published raw fields
 	next                       *astArithmeticPluginOwner
 	self                       *astArithmeticPluginOwner
@@ -29,7 +32,7 @@ type astArithmeticPluginOwner struct {
 func (m *ASTManager) arithmeticPluginBytes() uint64 {
 	var n uint64
 	if m.arithmeticPlugin != nil {
-		n += m.arithmeticPlugin.header
+		n += m.arithmeticPlugin.header + m.arithmeticPlugin.small[0].bytes() + m.arithmeticPlugin.small[1].bytes()
 	}
 	for p := m.arithmeticPluginFailed; p != nil; p = p.next {
 		n += p.header
@@ -38,6 +41,11 @@ func (m *ASTManager) arithmeticPluginBytes() uint64 {
 }
 func (m *ASTManager) releaseArithmeticPluginHeaders() {
 	if p := m.arithmeticPlugin; p != nil {
+		if p.numeral.active || p.cachePending.slot != 0 {
+			return
+		}
+		p.small[1].close(m.BudgetField)
+		p.small[0].close(m.BudgetField)
 		m.BudgetField.Release(p.header)
 		p.header = 0
 		m.arithmeticPlugin = nil
@@ -58,6 +66,21 @@ func (m *ASTManager) finalizeArithmeticPlugin() error {
 	if p == nil {
 		return nil
 	}
+	if m.sourceClosing && p.cachePending.slot != 0 {
+		return ErrASTPending
+	}
+	if e := p.numeral.destroy(m, !m.sourceClosing); e != nil {
+		return e
+	}
+	if !m.sourceClosing && p.cachePending.slot != 0 {
+		consumed, e := m.decNode(p.cachePending)
+		if consumed {
+			p.cachePending = astNodeRef{}
+		}
+		if e != nil {
+			return e
+		}
+	}
 	for j := range p.fields {
 		if p.fields[j].slot == 0 {
 			continue
@@ -76,6 +99,25 @@ func (m *ASTManager) finalizeArithmeticPlugin() error {
 				p.destructorCause = e
 			}
 			return e
+		}
+	}
+	for j := range p.small {
+		v := &p.small[j]
+		for i := uint32(0); i < v.size(); i++ {
+			r, e := v.at(i)
+			if e != nil {
+				return e
+			}
+			if r.slot == 0 {
+				continue
+			}
+			consumed, e := m.decNode(r)
+			if consumed {
+				v.words[2+i*2], v.words[3+i*2] = 0, 0
+			}
+			if e != nil {
+				return e
+			}
 		}
 	}
 	return nil
