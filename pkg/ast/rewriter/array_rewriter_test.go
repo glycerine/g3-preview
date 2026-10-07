@@ -333,3 +333,42 @@ func TestArrayRewriterRegistersFamilyWithoutDeclarationPlugin(t *testing.T) {
 		t.Fatal("array_util family registration changed ID")
 	}
 }
+
+func TestArrayRewriterOriginalSelectAsArray(t *testing.T) {
+	m, c, g, p := boolRewriterConfigFixture(t)
+	fid, e := m.RegisterArrayPlugin()
+	satOK(t, e)
+	rw, e := NewArrayRewriter(m, c, g, p)
+	satOK(t, e)
+	defer func() { satOK(t, rw.Close()) }()
+	bs, e := m.MkBoolSort()
+	satOK(t, e)
+	yes, e := m.MkTrue()
+	satOK(t, e)
+	no, e := m.MkFalse()
+	satOK(t, e)
+	f, e := m.MkFuncDecl(astTestSymbol(t, m, "array-select-function"), []ast.ASTHandle{bs, bs}, bs, ast.ASTFuncDeclInfo{})
+	satOK(t, e)
+	astTestPin(t, m, f)
+	array, e := m.MkAsArray(f)
+	satOK(t, e)
+	astTestPin(t, m, array)
+	selected, e := m.MkFamilyApp(fid, ast.ASTArrayOpSelect, nil, []ast.ASTHandle{array, yes, no})
+	satOK(t, e)
+	astTestPin(t, m, selected)
+	d, e := m.GetDecl(selected)
+	satOK(t, e)
+	args, e := m.AppArgumentView(selected)
+	satOK(t, e)
+	want, e := m.MkApp(f, []ast.ASTHandle{yes, no})
+	satOK(t, e)
+	astTestPin(t, m, want)
+	out := astTestPin(t, m, ast.ASTHandle{})
+	status, e := rw.MkAppCore(d, args, out)
+	satOK(t, e)
+	got, e := m.RefGet(out)
+	satOK(t, e)
+	if status != Rewrite1 || got != want {
+		t.Fatal("source select(as-array[f], I)", status, got, want)
+	}
+}

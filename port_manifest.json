@@ -9023,7 +9023,8 @@
         "pkg/ast/ast_array_cardinality.go",
         "pkg/ast/ast_array_cardinality_callback_source_test.go",
         "pkg/ast/ast_array_decl.go",
-        "pkg/ast/ast_array_util.go"
+        "pkg/ast/ast_array_util.go",
+        "pkg/ast/ast_array_as_array.go"
       ],
       "tests": [
         "TestASTArraySourceConstructorAndInfiniteSortParameters",
@@ -9039,7 +9040,12 @@
         "TestASTArrayDeclarationRejectsInvalidAritiesAndSorts",
         "TestASTArrayDeclarationsNormalizeCompatibleArithmeticDomains",
         "TestASTArrayDeclarationLexicalSpillRefusalAndReuse",
-        "TestASTArrayUtilFamilyAndBorrowedApplications"
+        "TestASTArrayUtilFamilyAndBorrowedApplications",
+        "TestASTArrayAsArrayOriginalDeclarationsAndRecognizer",
+        "TestASTArrayAsArrayRejectsOriginalInvalidParameters",
+        "TestASTArrayAsArrayParameterVectorRefusalAndReuse",
+        "TestASTAppArgumentSubrangesRemainBorrowedAndBounded",
+        "TestASTArrayAsArrayPreservesHeterogeneousDomainOrder"
       ],
       "assertions": [
         {
@@ -9111,15 +9117,27 @@
           "tests": [
             "TestASTArrayUtilFamilyAndBorrowedApplications"
           ]
+        },
+        {
+          "name": "original mk_as_array factory, selected dispatch, array_util construction and as-array function recognizer",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_array_as_array.go",
+          "tests": [
+            "TestASTArrayAsArrayOriginalDeclarationsAndRecognizer",
+            "TestASTArrayAsArrayRejectsOriginalInvalidParameters",
+            "TestASTArrayAsArrayParameterVectorRefusalAndReuse",
+            "TestASTArrayAsArrayPreservesHeterogeneousDomainOrder"
+          ]
         }
       ],
       "ownership": [
         "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end.",
-        "Select/store build source inline16/doubling normalized domain buffers and release them after declaration factory dispatch. Const declarations retain the private array-sort parameter through the actual copied info owner, retiring the lexical parameter afterward. Existing AST declaration/application factories retain node/domain references and canonical identity."
+        "Select/store build source inline16/doubling normalized domain buffers and release them after declaration factory dispatch. Const declarations retain the private array-sort parameter through the actual copied info owner, retiring the lexical parameter afterward. Existing AST declaration/application factories retain node/domain references and canonical identity.",
+        "As-array builds its function domain/range parameters in a concrete lexical source vector with original growth, releases its descriptors/storage on refusal and publication, and publishes the actual function AST parameter in the canonical declaration info. The referenced function remains owned by that declaration."
       ],
       "deviations": [
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
-        "Selected array select/store/const declaration and expression-overload dispatch is now implemented. Optional explicit range is used by the const-array fallback; valid sort parameters take priority. Select/store normalize compatible arithmetic domains using the actual registered arithmetic family and coercion flag; const preserves its supplied domain. Existing application coercion insertion remains unported, without a fabricated cast. Other array declaration kinds/utilities, value creation, array rewriter/evaluator rules, exact source exception diagnostics and whole-unit ownership/allocator ABI campaigns remain open."
+        "Selected array select/store/const declaration and expression-overload dispatch is now implemented. Optional explicit range is used by the const-array fallback; valid sort parameters take priority. Select/store normalize compatible arithmetic domains using the actual registered arithmetic family and coercion flag; const preserves its supplied domain. Existing application coercion insertion remains unported, without a fabricated cast. Other array declaration kinds/utilities beyond as-array, value creation, array rewriter/evaluator rules, exact source exception diagnostics and whole-unit ownership/allocator ABI campaigns remain open."
       ]
     },
     {
@@ -9129,14 +9147,20 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/ast_array_decl.go",
-        "pkg/ast/ast_array_util.go"
+        "pkg/ast/ast_array_util.go",
+        "pkg/ast/ast_array_as_array.go"
       ],
       "tests": [
         "TestASTArrayOriginalSelectStoreConstDeclarationsAndApplications",
         "TestASTArrayDeclarationRejectsInvalidAritiesAndSorts",
         "TestASTArrayDeclarationsNormalizeCompatibleArithmeticDomains",
         "TestASTArrayDeclarationLexicalSpillRefusalAndReuse",
-        "TestASTArrayUtilFamilyAndBorrowedApplications"
+        "TestASTArrayUtilFamilyAndBorrowedApplications",
+        "TestASTArrayAsArrayOriginalDeclarationsAndRecognizer",
+        "TestASTArrayAsArrayRejectsOriginalInvalidParameters",
+        "TestASTArrayAsArrayParameterVectorRefusalAndReuse",
+        "TestASTAppArgumentSubrangesRemainBorrowedAndBounded",
+        "TestASTArrayAsArrayPreservesHeterogeneousDomainOrder"
       ],
       "conditionals": [
         {
@@ -9169,13 +9193,25 @@
           "tests": [
             "TestASTArrayUtilFamilyAndBorrowedApplications"
           ]
+        },
+        {
+          "name": "original mk_as_array factory, selected dispatch, array_util construction and as-array function recognizer",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_array_as_array.go",
+          "tests": [
+            "TestASTArrayAsArrayOriginalDeclarationsAndRecognizer",
+            "TestASTArrayAsArrayRejectsOriginalInvalidParameters",
+            "TestASTArrayAsArrayParameterVectorRefusalAndReuse",
+            "TestASTArrayAsArrayPreservesHeterogeneousDomainOrder"
+          ]
         }
       ],
       "ownership": [
-        "Select/store build source inline16/doubling normalized domain buffers and release them after declaration factory dispatch. Const declarations retain the private array-sort parameter through the actual copied info owner, retiring the lexical parameter afterward. Existing AST declaration/application factories retain node/domain references and canonical identity."
+        "Select/store build source inline16/doubling normalized domain buffers and release them after declaration factory dispatch. Const declarations retain the private array-sort parameter through the actual copied info owner, retiring the lexical parameter afterward. Existing AST declaration/application factories retain node/domain references and canonical identity.",
+        "As-array builds its function domain/range parameters in a concrete lexical source vector with original growth, releases its descriptors/storage on refusal and publication, and publishes the actual function AST parameter in the canonical declaration info. The referenced function remains owned by that declaration."
       ],
       "deviations": [
-        "Selected array select/store/const declaration and expression-overload dispatch is now implemented. Optional explicit range is used by the const-array fallback; valid sort parameters take priority. Select/store normalize compatible arithmetic domains using the actual registered arithmetic family and coercion flag; const preserves its supplied domain. Existing application coercion insertion remains unported, without a fabricated cast. Other array declaration kinds/utilities, value creation, array rewriter/evaluator rules, exact source exception diagnostics and whole-unit ownership/allocator ABI campaigns remain open."
+        "Selected array select/store/const declaration and expression-overload dispatch is now implemented. Optional explicit range is used by the const-array fallback; valid sort parameters take priority. Select/store normalize compatible arithmetic domains using the actual registered arithmetic family and coercion flag; const preserves its supplied domain. Existing application coercion insertion remains unported, without a fabricated cast. Other array declaration kinds/utilities beyond as-array, value creation, array rewriter/evaluator rules, exact source exception diagnostics and whole-unit ownership/allocator ABI campaigns remain open."
       ]
     },
     {
@@ -9447,7 +9483,8 @@
         "TestVariableShifterSharedTermDifferentBinderDepthAndOutputLifetime",
         "TestASTSomeValueProcScopedPriorityAndFailureRestoration",
         "TestASTSomeValueProcFallbackReservationFailureRestores",
-        "TestASTAppArgumentViewBorrowAndLockedFactory"
+        "TestASTAppArgumentViewBorrowAndLockedFactory",
+        "TestASTAppArgumentSubrangesRemainBorrowedAndBounded"
       ],
       "conditionals": [
         {
@@ -10486,6 +10523,14 @@
             "TestASTSomeValueProcScopedPriorityAndFailureRestoration",
             "TestASTSomeValueProcFallbackReservationFailureRestores"
           ]
+        },
+        {
+          "name": "concrete borrowed expression-argument subrange adapter for original pointer-array offset",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_core_span_factories.go",
+          "tests": [
+            "TestASTAppArgumentSubrangesRemainBorrowedAndBounded"
+          ]
         }
       ],
       "ownership": [
@@ -10838,7 +10883,8 @@
         "TestASTSourceConstructorCopyAndBorrowedNamespaceGuardsPreserveActualOwners",
         "TestASTSomeValueProcScopedPriorityAndFailureRestoration",
         "TestASTSomeValueProcFallbackReservationFailureRestores",
-        "TestASTAppArgumentViewBorrowAndLockedFactory"
+        "TestASTAppArgumentViewBorrowAndLockedFactory",
+        "TestASTAppArgumentSubrangesRemainBorrowedAndBounded"
       ],
       "conditionals": [
         {
@@ -11659,6 +11705,14 @@
           "tests": [
             "TestASTSomeValueProcScopedPriorityAndFailureRestoration",
             "TestASTSomeValueProcFallbackReservationFailureRestores"
+          ]
+        },
+        {
+          "name": "concrete borrowed expression-argument subrange adapter for original pointer-array offset",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_core_span_factories.go",
+          "tests": [
+            "TestASTAppArgumentSubrangesRemainBorrowedAndBounded"
           ]
         }
       ],
@@ -18353,7 +18407,8 @@
         "TestArrayRewriterOriginalSortingConstantAndIteRules",
         "TestArrayRewriterOriginalStoreBufferSpillRefusal",
         "TestArrayRewriterConstructorRefusalsAndParameterFallback",
-        "TestArrayRewriterRegistersFamilyWithoutDeclarationPlugin"
+        "TestArrayRewriterRegistersFamilyWithoutDeclarationPlugin",
+        "TestArrayRewriterOriginalSelectAsArray"
       ],
       "assertions": [
         {
@@ -18447,13 +18502,21 @@
             "TestArrayRewriterConstructorRefusalsAndParameterFallback",
             "TestArrayRewriterRegistersFamilyWithoutDeclarationPlugin"
           ]
+        },
+        {
+          "name": "original select(as-array[f], I) to f(I) with BR_REWRITE1",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/array_rewriter.go",
+          "tests": [
+            "TestArrayRewriterOriginalSelectAsArray"
+          ]
         }
       ],
       "ownership": [
         "Configured owner borrows AST/parameter services, charges its concrete header and retains reached helper continuations for Close. Original ptr_buffer temporaries retain inline16/doubling allocation and reset capacity; select-ITE uses original ptr_vector growth. Output references are published only after successful construction."
       ],
       "deviations": [
-        "Store/select rules preserve first-uncertain-index comparison, original structural store sorting and rewrite statuses. Parameter lookup follows local/module/default order and resets select-ITE expansion. Array map/set rules, as-array selection, equality expansion, parameter-description wrapper, TRACE, complete ownership/allocator campaigns and exact native exception/assertion transport remain open. Unported reached operation rules return an explicit error. These focused tests add no registered source driver credit."
+        "Store/select rules preserve first-uncertain-index comparison, original structural store sorting and rewrite statuses. Parameter lookup follows local/module/default order and resets select-ITE expansion. Array map/set rules, equality expansion, parameter-description wrapper, TRACE, complete ownership/allocator campaigns and exact native exception/assertion transport remain open. Unported reached operation rules return an explicit error. These focused tests add no registered source driver credit."
       ]
     },
     {
@@ -18469,7 +18532,8 @@
         "TestArrayRewriterOriginalSortingConstantAndIteRules",
         "TestArrayRewriterOriginalStoreBufferSpillRefusal",
         "TestArrayRewriterConstructorRefusalsAndParameterFallback",
-        "TestArrayRewriterRegistersFamilyWithoutDeclarationPlugin"
+        "TestArrayRewriterRegistersFamilyWithoutDeclarationPlugin",
+        "TestArrayRewriterOriginalSelectAsArray"
       ],
       "conditionals": [
         {
@@ -18495,13 +18559,21 @@
             "TestArrayRewriterConstructorRefusalsAndParameterFallback",
             "TestArrayRewriterRegistersFamilyWithoutDeclarationPlugin"
           ]
+        },
+        {
+          "name": "original select(as-array[f], I) to f(I) with BR_REWRITE1",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/array_rewriter.go",
+          "tests": [
+            "TestArrayRewriterOriginalSelectAsArray"
+          ]
         }
       ],
       "ownership": [
         "Configured owner borrows AST/parameter services, charges its concrete header and retains reached helper continuations for Close. Original ptr_buffer temporaries retain inline16/doubling allocation and reset capacity; select-ITE uses original ptr_vector growth. Output references are published only after successful construction."
       ],
       "deviations": [
-        "Store/select rules preserve first-uncertain-index comparison, original structural store sorting and rewrite statuses. Parameter lookup follows local/module/default order and resets select-ITE expansion. Array map/set rules, as-array selection, equality expansion, parameter-description wrapper, TRACE, complete ownership/allocator campaigns and exact native exception/assertion transport remain open. Unported reached operation rules return an explicit error. These focused tests add no registered source driver credit."
+        "Store/select rules preserve first-uncertain-index comparison, original structural store sorting and rewrite statuses. Parameter lookup follows local/module/default order and resets select-ITE expansion. Array map/set rules, equality expansion, parameter-description wrapper, TRACE, complete ownership/allocator campaigns and exact native exception/assertion transport remain open. Unported reached operation rules return an explicit error. These focused tests add no registered source driver credit."
       ]
     },
     {
@@ -45837,7 +45909,8 @@
         "TestModelEvaluatorUnportedTheoryDoesNotReturnSuccess",
         "TestModelEvaluatorOriginalArrayStoreSelectDispatch",
         "TestModelEvaluatorArrayIdentityAndDisabledEquality",
-        "TestModelEvaluatorArrayPartialTheoryGraphCompletion"
+        "TestModelEvaluatorArrayPartialTheoryGraphCompletion",
+        "TestModelEvaluatorOriginalFunctionBackedArraySelection"
       ],
       "assertions": [
         {
@@ -45893,7 +45966,8 @@
           "tests": [
             "TestModelEvaluatorOriginalArrayStoreSelectDispatch",
             "TestModelEvaluatorArrayIdentityAndDisabledEquality",
-            "TestModelEvaluatorArrayPartialTheoryGraphCompletion"
+            "TestModelEvaluatorArrayPartialTheoryGraphCompletion",
+            "TestModelEvaluatorOriginalFunctionBackedArraySelection"
           ]
         }
       ],
@@ -45902,7 +45976,7 @@
         "Array reducer is constructed after Boolean reducer with evaluator constructor parameters and closed before it. Partial theory graph substitution keeps its lexical var_subst owner named through reverse cleanup; failed cleanup prevents another invocation from overwriting the owner. Borrowed argument bindings reuse the original beta engine copy protocol without a second argument array."
       ],
       "deviations": [
-        "Boolean/uninterpreted and selected original array store/select evaluation paths are integrated. Arithmetic/BV/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch, nonidentity enabled array equality/extraction, map/set/as-array rules and expand_value remain open. Array equality identity is handled before the expansion flag; disabled expansion falls through to the original Boolean reducer. Partial theory graph fallback is integrated for the known array dispatch, including source unconditional partial-graph completion and direct-order var_subst. Reached remaining unsupported theory paths explicitly refuse. Runtime AllocationSize remains the existing memory accounting owner; runtime-wide typed allocator wiring, proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited."
+        "Boolean/uninterpreted and selected original array store/select evaluation paths are integrated. Arithmetic/BV/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch, nonidentity enabled array equality/extraction, map/set rules and expand_value remain open. Array equality identity is handled before the expansion flag; disabled expansion falls through to the original Boolean reducer. Partial theory graph fallback is integrated for the known array dispatch, including source unconditional partial-graph completion and direct-order var_subst. Reached remaining unsupported theory paths explicitly refuse. Runtime AllocationSize remains the existing memory accounting owner; runtime-wide typed allocator wiring, proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited."
       ]
     },
     {
@@ -45923,7 +45997,8 @@
         "TestModelEvaluatorUnportedTheoryDoesNotReturnSuccess",
         "TestModelEvaluatorOriginalArrayStoreSelectDispatch",
         "TestModelEvaluatorArrayIdentityAndDisabledEquality",
-        "TestModelEvaluatorArrayPartialTheoryGraphCompletion"
+        "TestModelEvaluatorArrayPartialTheoryGraphCompletion",
+        "TestModelEvaluatorOriginalFunctionBackedArraySelection"
       ],
       "conditionals": [
         {
@@ -45959,7 +46034,8 @@
           "tests": [
             "TestModelEvaluatorOriginalArrayStoreSelectDispatch",
             "TestModelEvaluatorArrayIdentityAndDisabledEquality",
-            "TestModelEvaluatorArrayPartialTheoryGraphCompletion"
+            "TestModelEvaluatorArrayPartialTheoryGraphCompletion",
+            "TestModelEvaluatorOriginalFunctionBackedArraySelection"
           ]
         }
       ],
@@ -45968,7 +46044,7 @@
         "Array reducer is constructed after Boolean reducer with evaluator constructor parameters and closed before it. Partial theory graph substitution keeps its lexical var_subst owner named through reverse cleanup; failed cleanup prevents another invocation from overwriting the owner. Borrowed argument bindings reuse the original beta engine copy protocol without a second argument array."
       ],
       "deviations": [
-        "Boolean/uninterpreted and selected original array store/select evaluation paths are integrated. Arithmetic/BV/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch, nonidentity enabled array equality/extraction, map/set/as-array rules and expand_value remain open. Array equality identity is handled before the expansion flag; disabled expansion falls through to the original Boolean reducer. Partial theory graph fallback is integrated for the known array dispatch, including source unconditional partial-graph completion and direct-order var_subst. Reached remaining unsupported theory paths explicitly refuse. Runtime AllocationSize remains the existing memory accounting owner; runtime-wide typed allocator wiring, proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited."
+        "Boolean/uninterpreted and selected original array store/select evaluation paths are integrated. Arithmetic/BV/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch, nonidentity enabled array equality/extraction, map/set rules and expand_value remain open. Array equality identity is handled before the expansion flag; disabled expansion falls through to the original Boolean reducer. Partial theory graph fallback is integrated for the known array dispatch, including source unconditional partial-graph completion and direct-order var_subst. Reached remaining unsupported theory paths explicitly refuse. Runtime AllocationSize remains the existing memory accounting owner; runtime-wide typed allocator wiring, proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited."
       ]
     },
     {

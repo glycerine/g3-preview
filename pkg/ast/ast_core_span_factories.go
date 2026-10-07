@@ -4,20 +4,25 @@ package ast
 // This concrete call-local argument reader selects actual borrowed storage.
 // It never clones a pointer array or grants ownership of its elements.
 type AppArguments struct {
-	app          ASTHandle
-	appOwner     *ASTManager
-	slice        []ASTHandle
-	format       *astFormatRefVector
-	formatOwner  *ASTManager
-	vector       astRefVectorState
-	vectorOffset uint32
-	refVector    bool
-	span         ASTLiteralVectorSpan
-	count        uint32
-	raw          bool
+	argumentOffset uint32
+	app            ASTHandle
+	appOwner       *ASTManager
+	slice          []ASTHandle
+	format         *astFormatRefVector
+	formatOwner    *ASTManager
+	vector         astRefVectorState
+	vectorOffset   uint32
+	refVector      bool
+	span           ASTLiteralVectorSpan
+	count          uint32
+	raw            bool
 }
 
 func (a AppArguments) at(i uint32) (ASTHandle, error) {
+	if i >= a.count || i > ^uint32(0)-a.argumentOffset {
+		return ASTHandle{}, ErrASTDomain
+	}
+	i += a.argumentOffset
 	if a.appOwner != nil {
 		m := a.appOwner
 		r, e := m.requireKind(a.app, ASTApp)
@@ -51,12 +56,7 @@ func (a AppArguments) at(i uint32) (ASTHandle, error) {
 	return a.slice[i], nil
 }
 
-func (a AppArguments) size() uint64 {
-	if a.appOwner != nil || a.refVector || a.raw || a.format != nil {
-		return uint64(a.count)
-	}
-	return uint64(len(a.slice))
-}
+func (a AppArguments) size() uint64 { return uint64(a.count) }
 func (m *ASTManager) MkOrSpan(n uint32, span ASTLiteralVectorSpan) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
 		return ASTHandle{}, e
@@ -99,4 +99,17 @@ func (m *ASTManager) RefVectorArgumentsRange(v ASTRefVector, offset, count uint3
 }
 func (m *ASTManager) UpdateQuantifierArguments(q, body ASTHandle, patterns, noPatterns AppArguments) (ASTHandle, error) {
 	return m.updateQuantifierArguments(q, body, false, 0, patterns, noPatterns, astUpdatePatterns|astUpdateNoPatterns)
+}
+
+// Range borrows a checked subrange without copying its backing arguments.
+func (a AppArguments) Range(offset, count uint32) (AppArguments, error) {
+	if offset > a.count || count > a.count-offset {
+		return AppArguments{}, ErrASTDomain
+	}
+	if offset > ^uint32(0)-a.argumentOffset {
+		return AppArguments{}, ErrASTDomain
+	}
+	a.argumentOffset += offset
+	a.count = count
+	return a, nil
 }

@@ -1,5 +1,5 @@
 // Source: src/ast/array_decl_plugin.h:41-61;
-// src/ast/array_decl_plugin.cpp:120-137,235-306,446-465;
+// src/ast/array_decl_plugin.cpp:120-137,235-306,446-465,498-512;
 // src/ast/ast.cpp:2030-2036.
 package ast
 
@@ -54,6 +54,9 @@ func (m *ASTManager) arrayDecl(k int32, ps []ASTParameter, domain []ASTHandle, r
 	p := m.arrayPlugin
 	if p == nil {
 		return astNodeRef{}, ErrASTDomain
+	}
+	if k == ASTArrayOpAsArray {
+		return m.arrayAsArrayDecl(ps)
 	}
 	if k == ASTArrayOpConst {
 		var sort astNodeRef

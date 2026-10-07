@@ -162,3 +162,41 @@ func TestModelEvaluatorArrayPartialTheoryGraphCompletion(t *testing.T) {
 		t.Fatal("source theory graph completion", got, fallback)
 	}
 }
+
+func TestModelEvaluatorOriginalFunctionBackedArraySelection(t *testing.T) {
+	m, md, ev, _, _, _ := evaluatorFixture(t)
+	fid, e := m.RegisterArrayPlugin()
+	astTestMust(t, e)
+	bs := mustBoolSort(t, m)
+	yes, e := m.MkTrue()
+	astTestMust(t, e)
+	no, e := m.MkFalse()
+	astTestMust(t, e)
+	f, e := m.MkFuncDecl(astTestSymbol(t, m, "model-array-function"), []ast.ASTHandle{bs, bs}, bs, ast.ASTFuncDeclInfo{})
+	astTestMust(t, e)
+	astTestPin(t, m, f)
+	fi, e := model.NewFunctionInterpretation(m, 2)
+	astTestMust(t, e)
+	astTestMust(t, fi.SetElse(yes))
+	astTestMust(t, fi.InsertEntry([]ast.ASTHandle{yes, no}, no))
+	astTestMust(t, md.Core().RegisterFunction(f, fi))
+	array, e := m.MkAsArray(f)
+	astTestMust(t, e)
+	astTestPin(t, m, array)
+	out := astTestPin(t, m, ast.ASTHandle{})
+	for _, indices := range [][]ast.ASTHandle{{yes, no}, {no, yes}} {
+		selected, e := m.MkFamilyApp(fid, ast.ASTArrayOpSelect, nil, []ast.ASTHandle{array, indices[0], indices[1]})
+		astTestMust(t, e)
+		astTestPin(t, m, selected)
+		astTestMust(t, ev.Evaluate(selected, out))
+		got, e := m.RefGet(out)
+		astTestMust(t, e)
+		want := yes
+		if indices[0] == yes {
+			want = no
+		}
+		if got != want {
+			t.Fatal("function-backed array interpretation", got, want)
+		}
+	}
+}

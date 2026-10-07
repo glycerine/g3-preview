@@ -444,7 +444,20 @@ func (rw *ArrayRewriter) selectCore(args ast.AppArguments, out ast.ASTRef) (Rewr
 		return RewriteFailed, e
 	}
 	if asArray {
-		return RewriteFailed, ErrArrayRewriterRule
+		f, e := m.AsArrayFunction(base)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		// The source passes the existing select-index array directly to mk_app.
+		indices, e := args.Range(1, n-1)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		h, e := m.RewriterMakeApp(f, indices)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		return Rewrite1, m.SetRef(out, h)
 	}
 	if rw.expandSelectIte {
 		kind, e := m.GetKind(base)
