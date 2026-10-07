@@ -4,7 +4,9 @@ Audited 2026-10-07 at commit `fba0ad7` against parent `d959ab8` and the local C+
 
 Follow-up scope: A1 is declined. A2–A5 are approved for repair. All attempted A6 source-header changes were reverted at the user's request; A6 and placement questions D1/D2 remain untouched.
 
-The initial audit changed no implementation or test files. At the user's subsequent request, `pkg/gparams_production_test.go` now contains an intentionally failing regression test for A1; no implementation fix was made. `smtcore/` is deliberately an amalgam of C++ packages to avoid Go import cycles. Its mixed source origins are not placement defects.
+Repair verification: A2–A5 are complete. Full uncached native tests (`go test -count=1 ./... -timeout=30m`), full native vet, focused checked/debug tests for containers, capacity bounds, proofs, rewriters and filter models, and `go run ./cmd/portcheck -source ..` passed. All pre-existing Go source headers were checked against the pre-task commit `c954fc0` and remain unchanged. The original audit evidence below is historical.
+
+The initial audit changed no implementation or test files. At the user's subsequent request, an intentionally failing regression test was added for A1 and later removed when the finding was declined. `smtcore/` is deliberately an amalgam of C++ packages to avoid Go import cycles. Its mixed source origins are not placement defects.
 
 ## Findings at a glance
 

@@ -107244,7 +107244,9 @@
         "pkg/math/polynomial/polynomial_gcd_power_buffer_source_test.go",
         "pkg/math/polynomial/polynomial_gcd_variable_buffer_source_test.go",
         "pkg/math/polynomial/polynomial_invocation_receipts_source_test.go",
-        "pkg/util/mpn_source_buffer.go"
+        "pkg/util/mpn_source_buffer.go",
+        "pkg/ast/ast_handle_buffer.go",
+        "pkg/ast/ast_handle_containers_test.go"
       ],
       "tests": [
         "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
@@ -107312,7 +107314,8 @@
         "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
         "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
         "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
-        "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix"
+        "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix",
+        "TestPointerBufferSourceSpillRefusal"
       ],
       "conditionals": [
         {
@@ -145681,7 +145684,11 @@
         "pkg/math/polynomial/polynomial_psc_chain1_callback_source_test.go",
         "pkg/math/polynomial/polynomial_psc_chain1_child_stop_source_test.go",
         "pkg/math/polynomial/polynomial_psc_chain1_prefix_source_test.go",
-        "pkg/math/polynomial/polynomial_psc_chain1_source_test.go"
+        "pkg/math/polynomial/polynomial_psc_chain1_source_test.go",
+        "pkg/ast/ast_handle_vector.go",
+        "pkg/util/source_vector_capacity.go",
+        "pkg/ast/ast_handle_containers_test.go",
+        "pkg/util/source_vector_capacity_test.go"
       ],
       "tests": [
         "TestParamDescrsBudgetFailuresAndWarmDuplicate",
@@ -146091,7 +146098,10 @@
         "TestPolynomialPSCChain1SubchainSourceStopPreservesActualChildAndHistory",
         "TestPolynomialPSCChain1ActualCoefficientAndSetEveryReservationPrefix",
         "TestPolynomialPSCChain1SourceDegreeIndexedCoefficientLayout",
-        "TestPolynomialPSCChain1SubchainExactFrameAndCopiedOwnerRefuse"
+        "TestPolynomialPSCChain1SubchainExactFrameAndCopiedOwnerRefuse",
+        "TestPointerVectorSourceGrowthAndErase",
+        "TestASTHandleVectorGrowthPeakAndFailurePublication",
+        "TestSourceVectorCapacityInvalidWidthsAndBounds"
       ],
       "conditionals": [
         {

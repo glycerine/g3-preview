@@ -22,6 +22,8 @@ passing suites do not satisfy this objective.
 
 ## Current facts and conflict resolution
 
+- Reorganization A2–A5 are repaired: all generic declarations and production instantiations are replaced by concrete AST containers and polynomial caller lookups; static-width charges match releases; zero-stride capacity requests return a configuration error. The root ledger now maps current package owners and explicit split-method evidence without promoting any source/API status. Full uncached native `go test -count=1 ./... -timeout=30m`, full native vet, focused checked/debug container/proof/rewriter/filter-model tests, and `go run ./cmd/portcheck -source ..` pass. Counts remain 37 ported, 270 partial, 1,795 unported, and 677 API entries. A1 is declined; all A6 header edits were reverted. Placement questions remain unmodified.
+
 - Whole FactorSquareFree caller receipts now capture actual DEBUG diagnostics and real callee scopes, preserve charged issued histories, and reject complete-tuple splicing into later acquisitions. The nine-file current composition passes full native/checked-debug/static gates. Whole multivariate/UP frontend Factor and formatter/SMT2 dependencies continue.
 
 - Saved-prime lift preparation is complete through actual Mignotte, zpe/factors construction and Hensel capture; source and owning destructor order is proved through real helper failures. The selected14 current composition passes full native/checked-debug/static gates. Whole Factor caller and formatter/SMT2 dependencies continue.
@@ -1295,6 +1297,8 @@ extension/search and registered bounded user-scope checks remain real obligation
   currently deferred checks while completing the single-goroutine port stage.
 
 ## FINISHED — committed subset, with explicit limits
+
+- [x] Reorganization A2–A5: concrete AST handle storage and typed polynomial caller lookups, matched storage accounting, defensive capacity validation, root-level ledger/progress integration, current target/test mappings, and explicit multi-package method evidence. All native tests and vet pass; focused checked/debug tests and the complete no-generics/source/evidence checker pass. This repairs reorganization regressions and verification infrastructure; it adds no whole-source/API completion credit.
 
 - [x] Recursive source polynomial expression conversion through actual Sexpr,
   Rational and UPolynomial owners; source justification Runtime storage with
