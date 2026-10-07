@@ -11757,9 +11757,17 @@
       "path": "src/ast/ast_lt.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/ast_lt.go"
+      ],
+      "tests": [
+        "TestASTLessOriginalFieldOrderAndTailTransitions",
+        "TestASTLexLessAndSortedOriginalFirstDifferentSlot",
+        "TestASTLessOriginalParameterKindsAndValues",
+        "TestASTLessOriginalQuantifierPriority",
+        "TestASTLessRationalParameterCopyRefusalCleanup"
+      ],
       "assertions": [
         {
           "line": 65,
@@ -11768,17 +11776,42 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "ast_lt, lex_lt and is_sorted original structural field order and iterative tail transitions",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_lt.go",
+          "tests": [
+            "TestASTLessOriginalFieldOrderAndTailTransitions",
+            "TestASTLexLessAndSortedOriginalFirstDifferentSlot",
+            "TestASTLessOriginalParameterKindsAndValues",
+            "TestASTLessOriginalQuantifierPriority",
+            "TestASTLessRationalParameterCopyRefusalCleanup"
+          ]
+        }
+      ],
+      "ownership": [
+        "Both compared declaration parameters are copied into actual lexical parameter owners and retired in reverse order, including refusal cleanup. The comparator borrows AST nodes and follows the original iterative first-different-AST tail transitions."
+      ],
+      "deviations": [
+        "Selected original structural comparison and public Go manager boundaries are implemented; whole-unit allocation/ownership campaigns, exact native exception transport, and numeric/AST representation equivalence remain open. No registered source driver credit is claimed by these focused tests."
+      ]
     },
     {
       "path": "src/ast/ast_lt.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/ast_lt.go"
+      ],
+      "tests": [
+        "TestASTLessOriginalFieldOrderAndTailTransitions",
+        "TestASTLexLessAndSortedOriginalFirstDifferentSlot",
+        "TestASTLessOriginalParameterKindsAndValues",
+        "TestASTLessOriginalQuantifierPriority",
+        "TestASTLessRationalParameterCopyRefusalCleanup"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -11791,9 +11824,26 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "ast_lt, lex_lt and is_sorted original structural field order and iterative tail transitions",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_lt.go",
+          "tests": [
+            "TestASTLessOriginalFieldOrderAndTailTransitions",
+            "TestASTLexLessAndSortedOriginalFirstDifferentSlot",
+            "TestASTLessOriginalParameterKindsAndValues",
+            "TestASTLessOriginalQuantifierPriority",
+            "TestASTLessRationalParameterCopyRefusalCleanup"
+          ]
+        }
+      ],
+      "ownership": [
+        "Both compared declaration parameters are copied into actual lexical parameter owners and retired in reverse order, including refusal cleanup. The comparator borrows AST nodes and follows the original iterative first-different-AST tail transitions."
+      ],
+      "deviations": [
+        "Selected original structural comparison and public Go manager boundaries are implemented; whole-unit allocation/ownership campaigns, exact native exception transport, and numeric/AST representation equivalence remain open. No registered source driver credit is claimed by these focused tests."
+      ]
     },
     {
       "path": "src/ast/ast_pp.h",
