@@ -349,7 +349,14 @@ func (c *evaluatorConfiguration) ReduceApp(d ast.ASTHandle, args ast.AppArgument
 	if e != nil {
 		return rewriter.RewriteFailed, e
 	}
-	if args.Count() == 0 && fid == ast.NullFamilyID {
+	consideredUninterpreted := false
+	if fid != ast.NullFamilyID {
+		consideredUninterpreted, e = m.IsConsideredUninterpreted(d)
+		if e != nil {
+			return rewriter.RewriteFailed, e
+		}
+	}
+	if args.Count() == 0 && (fid == ast.NullFamilyID || consideredUninterpreted) {
 		value, e := md.ConstantInterpretation(d)
 		if e != nil {
 			return rewriter.RewriteFailed, e
@@ -429,6 +436,20 @@ func (c *evaluatorConfiguration) ReduceApp(d ast.ASTHandle, args ast.AppArgument
 			return rewriter.RewriteFailed, e
 		}
 		return c.evaluateReducedApp(rewriter.RewriteDone, out)
+	}
+	// The original arithmetic/BV reducers leave their unspecified symbols at
+	// BR_FAILED, then invoke the existing partial-theory interpretation path.
+	if consideredUninterpreted {
+		return c.evaluatePartialTheory(d, args, out, proof)
+	}
+	// Source arithmetic/BV numeral reducers return BR_FAILED, allowing the
+	// original traversal to retain values reached through a theory macro.
+	numeral, e := m.IsNumeralDeclaration(d)
+	if e != nil {
+		return rewriter.RewriteFailed, e
+	}
+	if numeral {
+		return c.evaluatePartialTheory(d, args, out, proof)
 	}
 	if fid > 4 {
 		return rewriter.RewriteFailed, ErrModelEvaluatorTheory
@@ -561,12 +582,21 @@ func (c *evaluatorConfiguration) GetMacro(d ast.ASTHandle) (ast.ASTHandle, ast.A
 		def, e := fi.Interpretation()
 		return def, ast.ASTHandle{}, ast.ASTHandle{}, e == nil, e
 	}
+	if !c.completion {
+		return ast.ASTHandle{}, ast.ASTHandle{}, ast.ASTHandle{}, false, nil
+	}
 	fid, e := m.GetFamilyID(d)
 	if e != nil {
 		return ast.ASTHandle{}, ast.ASTHandle{}, ast.ASTHandle{}, false, e
 	}
-	if !c.completion || fid != ast.NullFamilyID {
-		return ast.ASTHandle{}, ast.ASTHandle{}, ast.ASTHandle{}, false, nil
+	if fid != ast.NullFamilyID {
+		considered, e := m.IsConsideredUninterpreted(d)
+		if e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, ast.ASTHandle{}, false, e
+		}
+		if !considered {
+			return ast.ASTHandle{}, ast.ASTHandle{}, ast.ASTHandle{}, false, nil
+		}
 	}
 	s, e := m.GetRange(d)
 	if e != nil {

@@ -9094,8 +9094,13 @@
       "component": "ast",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "pkg/ast/ast_uninterpreted_plugin.go",
+        "pkg/ast/ast_uninterpreted_plugin_test.go"
+      ],
+      "tests": [
+        "TestASTOriginalPluginUninterpretedClassification"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -9122,9 +9127,22 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "original is_considered_uninterpreted family/kind predicate and borrowed numeral declaration identity adapter (src/ast/arith_decl_plugin.h:202-217)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_uninterpreted_plugin.go",
+          "tests": [
+            "TestASTOriginalPluginUninterpretedClassification"
+          ]
+        }
+      ],
+      "ownership": [
+        "Plugin classification reads borrowed declaration metadata and acquires no references or allocations. Registered plugin tags preserve family identity without assuming numeric family IDs. Tests inspect actual stats under FailAfter(0)."
+      ],
+      "deviations": [
+        "The selected predicate is connected to model interpretation/completion; whole-header and native representation/assertion/ownership audit are not credited. A declaration naming an unregistered plugin receives false in the checked Go adapter; native consumers require a nonnull registered plugin. Declaration-only numeral identity is a checked consumer adapter of the original app/decl identity recognizers, with no application construction or numerical parameter reads."
+      ]
     },
     {
       "path": "src/ast/array_decl_plugin.cpp",
@@ -13342,8 +13360,13 @@
       "component": "ast",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "pkg/ast/ast_uninterpreted_plugin.go",
+        "pkg/ast/ast_uninterpreted_plugin_test.go"
+      ],
+      "tests": [
+        "TestASTOriginalPluginUninterpretedClassification"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -13370,9 +13393,22 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "original is_considered_uninterpreted family/kind predicate and borrowed numeral declaration identity adapter (src/ast/bv_decl_plugin.h:271-285)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_uninterpreted_plugin.go",
+          "tests": [
+            "TestASTOriginalPluginUninterpretedClassification"
+          ]
+        }
+      ],
+      "ownership": [
+        "Plugin classification reads borrowed declaration metadata and acquires no references or allocations. Registered plugin tags preserve family identity without assuming numeric family IDs. Tests inspect actual stats under FailAfter(0)."
+      ],
+      "deviations": [
+        "The selected predicate is connected to model interpretation/completion; whole-header and native representation/assertion/ownership audit are not credited. A declaration naming an unregistered plugin receives false in the checked Go adapter; native consumers require a nonnull registered plugin. Declaration-only numeral identity is a checked consumer adapter of the original app/decl identity recognizers, with no application construction or numerical parameter reads."
+      ]
     },
     {
       "path": "src/ast/datatype_decl_plugin.cpp",
@@ -46595,7 +46631,8 @@
         "pkg/model/model_evaluator.go",
         "pkg/model/model_evaluator_array_expansion.go",
         "pkg/model/model_evaluator_array_equality.go",
-        "pkg/model/model_array_tuple_table.go"
+        "pkg/model/model_array_tuple_table.go",
+        "pkg/model/model_evaluator_bv_unspecified_test.go"
       ],
       "tests": [
         "TestModelEvaluatorConstantCompletionAndBooleanReduction",
@@ -46621,7 +46658,11 @@
         "TestArrayTupleOriginalReplacementGrowthAndLastTombstone",
         "TestArrayTupleOriginalDeletedCleanupAndResizeRefusal",
         "TestModelEvaluatorOriginalArrayMapTraversalAndSelection",
-        "TestModelEvaluatorOriginalSetOperationsAndMembership"
+        "TestModelEvaluatorOriginalSetOperationsAndMembership",
+        "TestModelEvaluatorBVUnspecifiedFunctionCompletion",
+        "TestModelEvaluatorArithmeticUnspecifiedRegisteredInterpretations",
+        "TestModelEvaluatorBVUnspecifiedConstantLookupAndCompletion",
+        "TestModelEvaluatorBVUnspecifiedCompletionEveryReservation"
       ],
       "assertions": [
         {
@@ -46707,19 +46748,32 @@
             "TestArrayTupleOriginalReplacementGrowthAndLastTombstone",
             "TestArrayTupleOriginalDeletedCleanupAndResizeRefusal"
           ]
+        },
+        {
+          "name": "original plugin-uninterpreted zero-arity constant lookup/completion, partial-theory interpretation and macro completion, plus arithmetic/BV numeral unchanged reducer paths (src/model/model_evaluator.cpp:121-140,244-276; src/ast/rewriter/bv_rewriter.cpp:60-208; src/ast/rewriter/arith_rewriter.cpp:56-57)",
+          "status": "partial",
+          "go_target": "pkg/model/model_evaluator.go",
+          "tests": [
+            "TestModelEvaluatorBVUnspecifiedFunctionCompletion",
+            "TestModelEvaluatorArithmeticUnspecifiedRegisteredInterpretations",
+            "TestModelEvaluatorBVUnspecifiedConstantLookupAndCompletion",
+            "TestModelEvaluatorBVUnspecifiedCompletionEveryReservation"
+          ]
         }
       ],
       "ownership": [
         "Evaluator borrows model, parameter, Runtime and Cooperation services. Concrete cold evaluator header embeds its configuration and parameter owner; separately charged public traversal and Boolean reducer keep existing member cleanup. Failed unpublished function graph remains named until Close; successful registration transfers it to the model. Function entries read the original borrowed argument view without allocating a copied array.",
         "Array reducer is constructed after Boolean reducer with evaluator constructor parameters and closed before it. Partial theory graph substitution keeps its lexical var_subst owner named through reverse cleanup; failed cleanup prevents another invocation from overwriting the owner. Borrowed argument bindings reuse the original beta engine copy protocol without a second argument array.",
         "Extraction owns the original vector of owning expression vectors, copied store rows and else expression. Actual row-copy/growth order, tail reset/append/pop pruning and reverse reconstruction are retained. An embedded evaluator continuation names current row/copy/argument vectors, else reference, parameter and actual unjoined vector INC receipt; interrupted cleanup blocks reuse until Close completes. Expansion preserves source const/store output publication prefixes on later failure rather than fabricating rollback.",
-        "Embedded equality continuation owns both extracted row vectors/else references, conjunction and fallback argument vectors, lexical select references and two borrowed-row tables. Actual INC-before-growth receipts retain unpublished acquisitions until cleanup; tables release before borrowed rows. Source raw select/equality intermediates created before failed ITE publication remain with the AST manager until Close; evaluator reset must not fabricate ownership of them."
+        "Embedded equality continuation owns both extracted row vectors/else references, conjunction and fallback argument vectors, lexical select references and two borrowed-row tables. Actual INC-before-growth receipts retain unpublished acquisitions until cleanup; tables release before borrowed rows. Source raw select/equality intermediates created before failed ITE publication remain with the AST manager until Close; evaluator reset must not fabricate ownership of them.",
+        "Unspecified BV/arithmetic declarations reuse existing constant registration and partial-theory substitution/function-interpretation owners. Macro completion publishes the exact new interpretation after its else value; pending owners remain available to evaluator close on failed allocation. New plugin predicates borrow declaration metadata and do not construct an application or acquire numerical references."
       ],
       "deviations": [
         "Boolean/uninterpreted and selected original array store/select and value extraction/expansion and nonidentity equality paths are integrated. Arithmetic/BV/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch remain open. Array equality identity is handled before the expansion flag; disabled expansion falls through to the original Boolean reducer. Partial theory graph fallback is integrated for the known array dispatch, including source unconditional partial-graph completion and direct-order var_subst. Reached remaining unsupported theory paths explicitly refuse. Runtime AllocationSize remains the existing memory accounting owner; runtime-wide typed allocator wiring, proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited.",
         "Selected extraction preserves store-prefix and function-entry order, all-entry groundness rejection, missing/nonground else rejection, and backwards else-equal pruning only while index values permit it. Concrete Go scalar owners and lexical vector storage remain explicit representations, without whole native allocation ABI credit.",
         "Original equality constraints deliberately retain two source limitations: finite-domain default equality is required even when explicit entries cover every index, and unknown matched rows remain in table1 for a later comparison with else2. Independent truth-table tests expose these source false negatives. No source algorithm correction or whole-unit native allocation/assertion credit is claimed.",
-        "Original set declarations/reducers now reach evaluator traversal. Independent concrete Boolean membership/subset tests cover reducible aligned-store/constant cases and exact unresolved select/map/equality residuals for mismatched-index or mixed constant/store inputs. This preserves the source evaluator limitation rather than claiming full concrete set decision coverage."
+        "Original set declarations/reducers now reach evaluator traversal. Independent concrete Boolean membership/subset tests cover reducible aligned-store/constant cases and exact unresolved select/map/equality residuals for mismatched-index or mixed constant/store inputs. This preserves the source evaluator limitation rather than claiming full concrete set decision coverage.",
+        "The five BV zero-divisor symbols and three arithmetic unspecified symbols now follow original plugin-uninterpreted interpretation/completion paths. Arithmetic/BV NUM declarations preserve original BR_FAILED then macro fallback rather than rejecting values returned by interpretations. Other theory reducers remain unported and retain explicit unsupported errors; this is not whole BV/arithmetic evaluation credit. Registered plugin family tags replace native plugin-pointer dispatch, with checked false for absent bindings; native ABI/assertion/exception/TRACE and whole-unit ownership audits remain separate."
       ]
     },
     {
