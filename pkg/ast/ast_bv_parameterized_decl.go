@@ -66,6 +66,8 @@ func (m *ASTManager) bitVectorParameterizedDecl(k int32, ps []ASTParameter, doma
 	var e error
 	kept := ps
 	switch k {
+	case 57, 58:
+		return p.conversionDecl(k, uint32(width), ps, domain)
 	case 37:
 		nameIndex = 1
 		var total int64
@@ -169,6 +171,15 @@ func (m *ASTManager) bitVectorParameterizedDecl(k int32, ps []ASTParameter, doma
 // overload. Fixed cached operators never build that buffer.
 func (m *ASTManager) bitVectorExprDecl(k int32, ps []ASTParameter, args []ASTHandle) (astNodeRef, bool, error) {
 	p := m.bitVectorPlugin
+	if k == 57 {
+		_, found, e := m.int2BVSize(ps)
+		if e != nil {
+			return astNodeRef{}, true, e
+		}
+		if found {
+			return astNodeRef{}, false, nil
+		}
+	}
 	switch k {
 	case 1:
 		return p.fields[1], true, nil
@@ -181,7 +192,7 @@ func (m *ASTManager) bitVectorExprDecl(k int32, ps []ASTParameter, args []ASTHan
 	case 0:
 		decl, e := m.bitVectorNumeralDecl(ps, len(args))
 		return decl, true, e
-	case 56, 57:
+	case 56:
 		return astNodeRef{}, false, nil
 	}
 	if len(args) == 0 {

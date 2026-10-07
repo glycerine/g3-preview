@@ -8,7 +8,7 @@ import (
 )
 
 // The order after bcomp follows finalize(), rather than enum order.
-var astBVFixedOrder = [...]int32{3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 42, 43, 44, 52, 53, 54, 45, 46, 47, 50, 51}
+var astBVFixedOrder = [...]int32{3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 42, 43, 44, 52, 53, 54, 45, 46, 47, 50, 51, 57, 58}
 
 func bvFixedName(k int32) string {
 	switch k {
@@ -151,21 +151,35 @@ func (p *astBitVectorPluginOwner) fixedDecl(k int32, width uint32) (astNodeRef, 
 	if e != nil {
 		return astNodeRef{}, e
 	}
+	return r, p.publishFixed(k, width, r)
+}
+
+func (p *astBitVectorPluginOwner) publishFixed(k int32, width uint32, r astNodeRef) error {
+	v := &p.fixed[k]
 	// Source assigns before INC. Remember an interrupted INC explicitly, never
 	// infer acquisition from a non-null slot or the node's current reference count.
 	v.words[2+width*2], v.words[3+width*2] = r.slot, r.generation
 	p.fixedPending, p.fixedPendingKind, p.fixedPendingWidth = r, k, width
-	if e = p.owner.incNode(r); e != nil {
-		return r, e
+	if e := p.owner.incNode(r); e != nil {
+		return e
 	}
 	p.fixedPending = astNodeRef{}
-	return r, nil
+	return nil
 }
 
 func (m *ASTManager) bitVectorDecl(k int32, ps []ASTParameter, domain []ASTHandle) (astNodeRef, error) {
 	p := m.bitVectorPlugin
 	if p == nil || !p.published {
 		return astNodeRef{}, ErrASTHandle
+	}
+	if k == 57 {
+		width, found, e := m.int2BVSize(ps)
+		if e != nil {
+			return astNodeRef{}, e
+		}
+		if found {
+			return p.conversionDecl(k, uint32(width), ps, domain)
+		}
 	}
 	switch k {
 	case 0:
@@ -179,8 +193,8 @@ func (m *ASTManager) bitVectorDecl(k int32, ps []ASTParameter, domain []ASTHandl
 	case 60:
 		return p.fields[3], nil
 	}
-	// Numerals and parameterized operators require their own source factories.
-	if k == 56 || k == 57 {
+	// The Boolean-bit constructor requires its own source factory.
+	if k == 56 {
 		return astNodeRef{}, ErrASTDomain
 	}
 	fail := func(message string) (astNodeRef, error) {
