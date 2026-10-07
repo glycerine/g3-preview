@@ -19031,7 +19031,8 @@
         "pkg/ast/rewriter/bool_rewriter_config.go",
         "pkg/ast/rewriter/bool_rewriter_local.go",
         "pkg/ast/rewriter/rewriter_engine.go",
-        "pkg/ast/rewriter/rewriter_configuration.go"
+        "pkg/ast/rewriter/rewriter_configuration.go",
+        "pkg/ast/rewriter/bool_rewriter_public.go"
       ],
       "tests": [
         "TestBoolRewriterACSourceStatusesOrderAndOutputOwnership",
@@ -19059,7 +19060,8 @@
         "TestRewriterEngineOriginalMaxStepsResumeAndCleanup",
         "TestRewriterEngineOriginalMacroExpansionUnderBinder",
         "TestBetaReducerOriginalPatternAndNoPatternReplacement",
-        "TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel"
+        "TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel",
+        "TestBoolRewriterPublicCoreThroughOriginalTraversal"
       ],
       "conditionals": [
         {
@@ -19248,7 +19250,8 @@
         "Borrowed input handles use original sixteen-slot inline/doubling pointer buffers; output assignment retains AST ownership; source negative/positive fast marks retire in reverse declaration order."
       ],
       "deviations": [
-        "Boolean callbacks now integrate with the original no-proof bool_rewriter_star iterative engine through actual borrowed result-stack arguments. Default pattern skipping, associative flattening and source family dispatch are preserved. Whole-class method/ownership audits and exhaustive failure campaigns remain incomplete. Go guards reject invalid short arrays outside the source defined domain; family assertion is debug-only. No whole Boolean source unit, model evaluator or public API completion is credited."
+        "Boolean callbacks now integrate with the original no-proof bool_rewriter_star iterative engine through actual borrowed result-stack arguments. Default pattern skipping, associative flattening and source family dispatch are preserved. Whole-class method/ownership audits and exhaustive failure campaigns remain incomplete. Go guards reject invalid short arrays outside the source defined domain; family assertion is debug-only. No whole Boolean source unit, model evaluator or public API completion is credited.",
+        "The exported BoolRewriter names the existing concrete reducer without another owner allocation or duplicated algorithm. NewBoolRewriter uses its existing constructor; Flat, SetFlat and MkAppCore expose the original evaluator dependency with configured-owner guards. This does not credit theory-aware model evaluation or remaining Boolean source methods."
       ]
     },
     {
@@ -19263,7 +19266,8 @@
         "pkg/ast/rewriter/bool_rewriter_config.go",
         "pkg/ast/rewriter/bool_rewriter_local.go",
         "pkg/ast/rewriter/rewriter_engine.go",
-        "pkg/ast/rewriter/rewriter_configuration.go"
+        "pkg/ast/rewriter/rewriter_configuration.go",
+        "pkg/ast/rewriter/bool_rewriter_public.go"
       ],
       "tests": [
         "TestBoolRewriterACSourceStatusesOrderAndOutputOwnership",
@@ -19291,7 +19295,8 @@
         "TestRewriterEngineOriginalMaxStepsResumeAndCleanup",
         "TestRewriterEngineOriginalMacroExpansionUnderBinder",
         "TestBetaReducerOriginalPatternAndNoPatternReplacement",
-        "TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel"
+        "TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel",
+        "TestBoolRewriterPublicCoreThroughOriginalTraversal"
       ],
       "conditionals": [
         {
@@ -19386,7 +19391,8 @@
         "Borrowed input handles use original sixteen-slot inline/doubling pointer buffers; output assignment retains AST ownership; source negative/positive fast marks retire in reverse declaration order."
       ],
       "deviations": [
-        "Boolean callbacks now integrate with the original no-proof bool_rewriter_star iterative engine through actual borrowed result-stack arguments. Default pattern skipping, associative flattening and source family dispatch are preserved. Whole-class method/ownership audits and exhaustive failure campaigns remain incomplete. Go guards reject invalid short arrays outside the source defined domain; family assertion is debug-only. No whole Boolean source unit, model evaluator or public API completion is credited."
+        "Boolean callbacks now integrate with the original no-proof bool_rewriter_star iterative engine through actual borrowed result-stack arguments. Default pattern skipping, associative flattening and source family dispatch are preserved. Whole-class method/ownership audits and exhaustive failure campaigns remain incomplete. Go guards reject invalid short arrays outside the source defined domain; family assertion is debug-only. No whole Boolean source unit, model evaluator or public API completion is credited.",
+        "The exported BoolRewriter names the existing concrete reducer without another owner allocation or duplicated algorithm. NewBoolRewriter uses its existing constructor; Flat, SetFlat and MkAppCore expose the original evaluator dependency with configured-owner guards. This does not credit theory-aware model evaluation or remaining Boolean source methods."
       ]
     },
     {
