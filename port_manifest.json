@@ -20880,7 +20880,9 @@
         "pkg/ast/rewriter/bv_rewriter_bitwise.go",
         "pkg/ast/rewriter/bv_rewriter_bitwise_test.go",
         "pkg/ast/rewriter/bv_rewriter_rotate.go",
-        "pkg/ast/rewriter/bv_rewriter_rotate_test.go"
+        "pkg/ast/rewriter/bv_rewriter_rotate_test.go",
+        "pkg/ast/rewriter/bv_rewriter_extend_repeat.go",
+        "pkg/ast/rewriter/bv_rewriter_extend_repeat_test.go"
       ],
       "tests": [
         "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
@@ -20888,7 +20890,9 @@
         "TestBVRewriterBitwiseEveryColdReservation",
         "TestBVRewriterOriginalFixedRotations",
         "TestBVRewriterRotationIdentityErasesExtractionWork",
-        "TestBVRewriterRotationEveryColdReservation"
+        "TestBVRewriterRotationEveryColdReservation",
+        "TestBVRewriterOriginalRepeatAndZeroExtend",
+        "TestBVRewriterRepeatAndZeroExtendEveryColdReservation"
       ],
       "conditionals": [
         {
@@ -21364,15 +21368,26 @@
             "TestBVRewriterRotationIdentityErasesExtractionWork",
             "TestBVRewriterRotationEveryColdReservation"
           ]
+        },
+        {
+          "name": "original mk_repeat inline-buffer/concat and mk_zero_extend unsigned-rational zero-prefix concat with identity branches (src/ast/rewriter/bv_rewriter.cpp:1513-1523,1555-1566; src/ast/rewriter/bv_rewriter.h:177)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_extend_repeat.go",
+          "tests": [
+            "TestBVRewriterOriginalRepeatAndZeroExtend",
+            "TestBVRewriterRepeatAndZeroExtendEveryColdReservation"
+          ]
         }
       ],
       "ownership": [
         "Core algorithm adapters borrow AST manager and operand slices. NAND uses the existing inline16/doubling ASTHandleBuffer for source ptr_buffer<expr>, with nonowning generated node handles and deferred spill release on every exit. NOR/XNOR introduce no argument buffer. Output SetRef occurs only after all application factories succeed; cold refusal and warm spill tests preserve prior output and actual shared graph budget closes to zero.",
-        "Fixed rotation reducers borrow the caller-owned MkExtractProc and retain its original cache replacement reference ordering. Left creates low then high extraction, concatenates their borrowed app handles, and only then SetRef publishes output. Identity rotation allocates/acquires no extraction/cache state. Cold refusal campaigns preserve the previous output and close the actual cache/AST/numeric/symbol owner graph with zero shared budget."
+        "Fixed rotation reducers borrow the caller-owned MkExtractProc and retain its original cache replacement reference ordering. Left creates low then high extraction, concatenates their borrowed app handles, and only then SetRef publishes output. Identity rotation allocates/acquires no extraction/cache state. Cold refusal campaigns preserve the previous output and close the actual cache/AST/numeric/symbol owner graph with zero shared budget.",
+        "Repeat borrows the same argument into the original inline16/doubling handle buffer and releases its spill on all exits. Zero-extension calls the unsigned32 numeral constructor, borrows that application, concatenates before output SetRef. Identity paths do no numeric/buffer/cache work. Both cold refusal campaigns close actual shared owners to zero budget."
       ],
       "deviations": [
         "Only the three original negated-bitwise reducer bodies are selected, exposed as standalone core adapters for later BV rewriter dispatch/traversal. They preserve source operand order, generated operator nesting and BR_REWRITE2; they do not normalize or evaluate operands. Full BV rewriter constructor/parameters/poly/trailing/extract/dispatch/traversal algorithms, native pointer/buffer/exception ABI and whole-unit ownership audit remain uncredited. Invalid/nil Go manager/reference boundaries use existing checked Go transport.",
-        "Selected fixed left/right rotation bodies preserve uint32 modulo and right delegation with a second width read. They expose standalone core algorithms pending full BV rewriter dispatch/traversal. Width zero at the native SASSERT/modulo-invalid domain is rejected by checked Go transport; no native debugger/undefined-behavior equivalence is credited. Closed/copied/pending extraction owners are checked adapter errors. Extended numeral-shift rotations, other reducers and whole-unit ABI/ownership audit remain open."
+        "Selected fixed left/right rotation bodies preserve uint32 modulo and right delegation with a second width read. They expose standalone core algorithms pending full BV rewriter dispatch/traversal. Width zero at the native SASSERT/modulo-invalid domain is rejected by checked Go transport; no native debugger/undefined-behavior equivalence is credited. Closed/copied/pending extraction owners are checked adapter errors. Extended numeral-shift rotations, other reducers and whole-unit ABI/ownership audit remain open.",
+        "Selected complete repeat/zero-extension bodies retain BR_DONE identity and BR_REWRITE1 concat statuses. No extra flattening, evaluation or bounds guard is introduced. Unsigned zero construction is delegated to the original rational(unsigned) path, not uint64 substitution. Full BV constructor/dispatch/sign-extension/trailing/reducer/evaluator and native ownership/ABI audits remain open."
       ]
     },
     {
@@ -21380,8 +21395,15 @@
       "component": "ast",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "pkg/ast/ast_bv_unsigned_numeral.go",
+        "pkg/ast/ast_bv_unsigned_numeral_test.go"
+      ],
+      "tests": [
+        "TestASTBitVectorUnsignedNumeralConstructorBoundary",
+        "TestASTBitVectorUnsignedConstructorInclusiveBoundaryBeforeWidthGuard",
+        "TestASTBitVectorUnsignedNumeralEveryNumericalReservation"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -21394,9 +21416,24 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "original mk_numeral(unsigned,unsigned) rational(unsigned) construction and delegated BV numeral application (src/ast/rewriter/bv_rewriter.h:177; src/util/rational.h:48)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_unsigned_numeral.go",
+          "tests": [
+            "TestASTBitVectorUnsignedNumeralConstructorBoundary",
+            "TestASTBitVectorUnsignedConstructorInclusiveBoundaryBeforeWidthGuard",
+            "TestASTBitVectorUnsignedNumeralEveryNumericalReservation"
+          ]
+        }
+      ],
+      "ownership": [
+        "The unsigned32 temporary uses existing charged address-stable BV numeral frame value five, capture child nine and source outer/inner temporary DT ordering. No second numeric frame is allocated. INT_MAX stays inline; UINT_MAX reaches actual signed64 large setter and captured failure roots."
+      ],
+      "deviations": [
+        "Selected unsigned numeral overload preserves original constructor width and inclusive unsigned32 inline boundary. Existing numeral copy/normalization/parameter/header/exception ABI qualifications remain; actual Runtime failures prove owner cleanup rather than resumability. Full BV rewriter header audits remain uncredited."
+      ]
     },
     {
       "path": "src/ast/rewriter/bv_rewriter_params.hpp",
@@ -129645,7 +129682,10 @@
         "pkg/util/rational_lexical_scope.go",
         "pkg/util/transitive_source_finalize_test.go",
         "pkg/util/mpq_arithmetic_entry_source_test.go",
-        "pkg/math/polynomial/polynomial_variable_recognition_owner_source_test.go"
+        "pkg/math/polynomial/polynomial_variable_recognition_owner_source_test.go",
+        "pkg/util/rational_service.go",
+        "pkg/util/rational_service_invocation.go",
+        "pkg/util/rational_service_unsigned_invocation_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -129873,7 +129913,9 @@
         "TestRationalArithmeticEntryDivAliasRetainsRawLocal",
         "TestRationalArithmeticEntryDivEndGuardAndOwningRetry",
         "TestPolynomialVariableRecognitionExecutingIntegerOwnerRefusesFinalize",
-        "TestIntegerPNormalizeNilReturningTransportOwnerRefusal"
+        "TestIntegerPNormalizeNilReturningTransportOwnerRefusal",
+        "TestRationalServiceUnsignedInvocationOriginalBoundary",
+        "TestRationalServiceSourceUnsignedConstructorBoundary"
       ],
       "conditionals": [
         {
@@ -130883,6 +130925,15 @@
             "TestRationalArithmeticEntryDivAliasRetainsRawLocal",
             "TestRationalArithmeticEntryDivEndGuardAndOwningRetry"
           ]
+        },
+        {
+          "name": "original rational(unsigned) caller-local invocation through uint32 NUM setter before DEN reset (src/util/rational.h:48; src/util/mpq.h:712-715)",
+          "status": "partial",
+          "go_target": "pkg/util/rational_service_invocation.go",
+          "tests": [
+            "TestRationalServiceUnsignedInvocationOriginalBoundary",
+            "TestRationalServiceSourceUnsignedConstructorBoundary"
+          ]
         }
       ],
       "ownership": [
@@ -130906,7 +130957,8 @@
         "Real remaining temporary Rational records are moved into charged embedded service9/manager1 storage before stack owners vanish; completed source destruction and partial-constructor owning abort are distinguished. Named-return finishers propagate refused cleanup and retain unpublished result roots. Public Inf Del retains caller suffix in actual source component order; pure queries and caller cleanup remain usable. Explicit CleanupLexical is Go owning recovery, not source destructor retry equivalence.",
         "Selected source comparison/unary/reset/swap paths check cold ownership then each reached component action, preserving unread invalid fields and partial publication. Actual SYNCH RAW comparison locals are charged distinct manager fields, normal deletion cursor follows source, body failure retains real limbs for explicit owning cleanup. Service lexical bound9 unchanged; copied unary results use existing literal constructor/temporary machinery. Immediate caller-named physical censuses, cold reservation sweeps and warm allocation checks cover selected routes. Unrelated arithmetic and Go-extension Move preflights remain open.",
         "Selected alias division owns a real retained raw Int; source body failure skips explicit Del, source end precedes sign/normalize, and owning cleanup is separate. The raw scope is ten Int fields charged by the manager header; facade lexical bound remains nine. Named physical audits include active div and retain exact equality.",
-        "mpz.cpp:1186-1207; mpzzp.h:58-68,111-114: returning Runtime transport cannot destroy executing Copy/PN Integer or enclosing Rational owner. Non-Z normalization execution scalar is a lifecycle guard only, set/restored around the same nil/receipt body; allocation authority remains exclusively explicit receipts."
+        "mpz.cpp:1186-1207; mpzzp.h:58-68,111-114: returning Runtime transport cannot destroy executing Copy/PN Integer or enclosing Rational owner. Non-Z normalization execution scalar is a lifecycle guard only, set/restored around the same nil/receipt body; allocation authority remains exclusively explicit receipts.",
+        "Unsigned32 invocation passes the original caller allocation context to the existing integer uint32 overload and resets DEN only after successful NUM publication. Owned values retain previous setter destruction rules; actual facade lexical scopes join through the caller receipt. Tests replace big numerator/denominator, check inclusive INT_MAX, reject copied contexts and end source/own contexts."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -130926,7 +130978,8 @@
         "The registered randomized GCD campaign preserves all 168 primes, conditional Power/Mul and sign draw order using an explicit hermetic RNG adapter, not libc sequence identity. Independent table enumeration and arithmetic checks add no ENSURE credit; print-only minimum GCD expectation is additional verification. Actual allocator topology, cleanup exceptions, alternate backends and full source-unit completion remain open.",
         "Rational scalar getter predicates remain correct, but source getters assert rational range only in debug before inherited integer access. Current getters universally reject fractional numerals. Selected integer accessor/cast profiles require separate audit and implementation; see PORT_PROGRESS.md#audit-mpq-rounding-publication-packet-md.",
         "Malformed32-bit requested-byte layouts are labelled guarded Go boundary evidence, not ordinary valid C++ destructor allocation failure. Budget supplies actual allocation refusal/failed-copy token only, never simulated Del failure. Selected scope records preserve original vs cleanup causes; broader raw constructor/reset/alias/default-copy-constructor arithmetic temporaries, registry/global ownership and transport remain partial. Cross-owner staged CopyFrom is explicit Go ownership bridge, not a source alias transaction. No whole-unit/API/registered assertion promotion.",
-        "No newly registered source assertion credit: sixteen added source-profile regressions complement existing active assertions. Selected ordinary whole-value preflights are replaced only where they precede actual source reads/mutations. Malformed ILP32 second temporary end-cursor test diagnoses physical requested-size guard after actual source first destruction, with no guard relabeling or allocator repair. Whole header and global service binding remain partial."
+        "No newly registered source assertion credit: sixteen added source-profile regressions complement existing active assertions. Selected ordinary whole-value preflights are replaced only where they precede actual source reads/mutations. Malformed ILP32 second temporary end-cursor test diagnoses physical requested-size guard after actual source first destruction, with no guard relabeling or allocator repair. Whole header and global service binding remain partial.",
+        "The existing unsigned service setter now names the original uint32 manager overload rather than the numerically equivalent signed64 facade shortcut. Small uint32 uses original int32 publication; larger values still reach original int64 path. Native rational/union/allocator/exception ABI and whole-unit ownership audits remain uncredited; integration faults are separately covered at the BV caller."
       ]
     },
     {
@@ -139565,7 +139618,8 @@
         "pkg/util/util_rational_global_service.go",
         "pkg/util/util_rational_global_service_test.go",
         "pkg/util/rational_service_invocation.go",
-        "pkg/util/rational_service_gcd_invocation_test.go"
+        "pkg/util/rational_service_gcd_invocation_test.go",
+        "pkg/util/rational_service_unsigned_invocation_test.go"
       ],
       "tests": [
         "TestSourceRationalConversionAssertions",
@@ -139710,7 +139764,8 @@
         "TestRationalServiceSourceGlobalSlotExactPublicationAndStaticEnd",
         "TestRationalGlobalAcquiredConstructorNamedPhysicalPrefixes",
         "TestRationalServiceGCDCoefficientsInvocation",
-        "TestRationalServiceGCDCoefficientsInvocationEveryRuntimeReservation"
+        "TestRationalServiceGCDCoefficientsInvocationEveryRuntimeReservation",
+        "TestRationalServiceUnsignedInvocationOriginalBoundary"
       ],
       "conditionals": [
         {
@@ -140245,6 +140300,15 @@
             "TestRationalServiceGCDCoefficientsInvocation",
             "TestRationalServiceGCDCoefficientsInvocationEveryRuntimeReservation"
           ]
+        },
+        {
+          "name": "original rational(unsigned) caller-local invocation through uint32 NUM setter before DEN reset (src/util/rational.h:48; src/util/mpq.h:712-715)",
+          "status": "partial",
+          "go_target": "pkg/util/rational_service_invocation.go",
+          "tests": [
+            "TestRationalServiceUnsignedInvocationOriginalBoundary",
+            "TestRationalServiceSourceUnsignedConstructorBoundary"
+          ]
         }
       ],
       "ownership": [
@@ -140258,7 +140322,8 @@
         "Prepared cold header/config is charged once; manager-nil returned Integer constructor failure is separate actual owner, not published manager. Standalone constructor forwards that child receipt after only outer header refund. Source finalizer stops at first unconditional null-manager access; explicit owning abort drains retained child and cold header. Exact named provider/slab/object/raw graphs precede fault disable.",
         "Source current is a borrowed scalar slot, never a duplicate manager owning root. Failed returned children and post-finalization managers are concrete charged acquisition nodes; first completed manager transfers at source publication to original static context. Owning cleanup drains exact nodes then retained original context and detaches only after real closure.",
         "GCDCoefficientsWithInvocation embeds its lexical ownership in the caller and captures the actual extended-GCD child receipt at integer algorithm entry. Allocation context reaches the existing manager algorithm; explicit source/own cleanup drains this exact child before EndContext. The source output denominator and coefficient prefixes remain published on error; no staging, rollback or substitute host GCD is introduced.",
-        "The ui64 constructor entry now passes an explicit caller-local allocation context through the rational manager uint64 setter to its existing integer implementation, before resetting the output denominator. The original public setter shares that implementation with an empty context; successful/failure output publication prefixes are preserved."
+        "The ui64 constructor entry now passes an explicit caller-local allocation context through the rational manager uint64 setter to its existing integer implementation, before resetting the output denominator. The original public setter shares that implementation with an empty context; successful/failure output publication prefixes are preserved.",
+        "Unsigned32 invocation passes the original caller allocation context to the existing integer uint32 overload and resets DEN only after successful NUM publication. Owned values retain previous setter destruction rules; actual facade lexical scopes join through the caller receipt. Tests replace big numerator/denominator, check inclusive INT_MAX, reject copied contexts and end source/own contexts."
       ],
       "deviations": [
         "Explicit manager projects rational.h inclusive32-bit wrappers, distinct from strict MPZ boundaries; global wrapper remains incomplete. Float positive converted denominator SASSERT becomes typed ErrRationalFloatDomain. Source raw component alias publication can leave denominator zero; subsequent operations diagnose initialization.",
@@ -140273,7 +140338,8 @@
         "Process-global generated memory lifecycle remains open. Explicit caller-confined namespace binding replaces native process globals; heterogeneous process initializer/finalizer orchestration is not claimed.",
         "Ended static objects are not reconstructed: source reinitialization and repeated finalization reach explicit invalid-lifetime guards after literal completed publication prefixes.",
         "TLS signed-overflow release fixture is source-undefined guarded-domain evidence, not valid-source OOM. Cold acquisition nodes are actual Go ownership metadata, not source malloc events.",
-        "The selected gcd wrapper now supports caller-local invocation ownership needed by BV modular inverse. The BV inverse caller remains to be ported; concrete Go scalar/header and native allocator/assertion/exception ABI qualifications remain. Actual Runtime refusal tests prove explicit owning release of interrupted invocations, not resumability of the process-fatal source operation."
+        "The selected gcd wrapper now supports caller-local invocation ownership needed by BV modular inverse. The BV inverse caller remains to be ported; concrete Go scalar/header and native allocator/assertion/exception ABI qualifications remain. Actual Runtime refusal tests prove explicit owning release of interrupted invocations, not resumability of the process-fatal source operation.",
+        "The existing unsigned service setter now names the original uint32 manager overload rather than the numerically equivalent signed64 facade shortcut. Small uint32 uses original int32 publication; larger values still reach original int64 path. Native rational/union/allocator/exception ABI and whole-unit ownership audits remain uncredited; integration faults are separately covered at the BV caller."
       ]
     },
     {

@@ -254,7 +254,7 @@ func (s *RationalService) SetUnsigned(v *OwnedRational, n uint32) error {
 	if e := s.check(v); e != nil {
 		return e
 	}
-	return s.Manager.SetInt64(&v.Raw, int64(n))
+	return s.Manager.SetUnsigned(&v.Raw, n)
 }
 func (s *RationalService) SetUint64(v *OwnedRational, n uint64) error {
 	if e := s.lock(); e != nil {
