@@ -12837,7 +12837,11 @@
         "pkg/ast/ast_bv_plugin_source_test.go",
         "pkg/ast/ast_bv_numeral.go",
         "pkg/ast/ast_bv_numeral_source_test.go",
-        "pkg/ast/ast_bv_normalization.go"
+        "pkg/ast/ast_bv_normalization.go",
+        "pkg/ast/ast_bv_values.go",
+        "pkg/ast/ast_bv_values_test.go",
+        "pkg/ast/ast_builtin_plugins_values.go",
+        "pkg/model/model_bv_values_test.go"
       ],
       "tests": [
         "TestASTBitVectorSourceEagerSortsAndPinnedDeclarations",
@@ -12847,7 +12851,11 @@
         "TestASTBitVectorNumeralUnmatchedLeavesArgumentsUnread",
         "TestASTBitVectorBigNumeralEveryConstructorReservation",
         "TestASTBitVectorSignedNormalizationIndependentOracle",
-        "TestASTBitVectorSignedNormalizationEveryReservation"
+        "TestASTBitVectorSignedNormalizationEveryReservation",
+        "TestASTBitVectorOriginalValueCallbacks",
+        "TestASTBitVectorSomeValueEveryWarmReservation",
+        "TestASTBitVectorSomeValueNumericalTransportOwnerGuard",
+        "TestModelOriginalBitVectorZeroCompletion"
       ],
       "conditionals": [
         {
@@ -12929,13 +12937,33 @@
             "TestASTBitVectorSignedNormalizationIndependentOracle",
             "TestASTBitVectorSignedNormalizationEveryReservation"
           ]
+        },
+        {
+          "name": "original is_value numeral recognition and get_some_value zero-numeral callback with actual manager dispatch (src/ast/bv_decl_plugin.cpp:632-634,746-751)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_values.go",
+          "tests": [
+            "TestASTBitVectorOriginalValueCallbacks",
+            "TestASTBitVectorSomeValueEveryWarmReservation",
+            "TestASTBitVectorSomeValueNumericalTransportOwnerGuard"
+          ]
+        },
+        {
+          "name": "original numeric plugin completion through model/evaluator constant registration and recursive array range completion",
+          "status": "partial",
+          "go_target": "pkg/model/model_bv_values_test.go",
+          "tests": [
+            "TestModelOriginalBitVectorZeroCompletion"
+          ]
         }
       ],
       "ownership": [
-        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
+        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end.",
+        "Zero callback reads the source sort width and constructs its lexical small-zero parameter in the existing numeral continuation. Actual power/mod/copy temporaries retain their numeric invocation owners through failed construction and manager closure. The active AST owner rejects numerical transport reentry before taking its mutex and restores the previous execution guard on every exit. Warm reservation tests exercise refusal, separate-continuation retry and final budget restoration; a bounded child reaches actual Runtime max-count transport and verifies cleanup/public factory reentry refusal."
       ],
       "deviations": [
-        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
+        "Selected numeral is_value and zero get_some_value callbacks are integrated, including scoped override priority and model/evaluator completion. The small literal and its lexical parameter use the explicit Go owned-value representation; no native rational temporary/parameter allocator ABI credit is claimed. Original are_distinct offset-term arithmetic, other BV declarations/reducers, native SASSERT/TRACE/exception transport and whole-unit ownership/representation audits remain open. Base unique-value comparison now recognizes BV numerals without claiming the offset algorithm."
       ]
     },
     {

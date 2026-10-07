@@ -203,6 +203,10 @@ func (m *ASTManager) mkBitVectorNumeral(value *util.OwnedRational, bits uint32) 
 	return m.mkBitVectorNumeralCaptured(value, bits, nil)
 }
 func (m *ASTManager) mkBitVectorNumeralCaptured(value *util.OwnedRational, bits uint32, receipt *astBVNormalizationReceipt) (node astNodeRef, result error) {
+	return m.mkBitVectorNumeralInput(value, bits, receipt, false)
+}
+
+func (m *ASTManager) mkBitVectorNumeralInput(value *util.OwnedRational, bits uint32, receipt *astBVNormalizationReceipt, zero bool) (node astNodeRef, result error) {
 	f, e := m.beginBVNumeralFrame()
 	if e != nil {
 		return node, e
@@ -242,8 +246,18 @@ func (m *ASTManager) mkBitVectorNumeralCaptured(value *util.OwnedRational, bits 
 			}
 		}
 	}()
-	if e = f.copyConstruct(0, value); e != nil {
-		return node, e
+	if zero {
+		// get_some_value's parameter(rational(0)) owns a small zero.
+		// Keep that owner in the same continuation as numeral normalization.
+		f.values[0], e = m.numerals.NewValue()
+		if e != nil {
+			return node, e
+		}
+		f.placed[0], f.complete[0] = true, true
+	} else {
+		if e = f.copyConstruct(0, value); e != nil {
+			return node, e
+		}
 	}
 	// The inner plugin checks parameter kinds/count before unsigned width.
 	if bits == 0 {

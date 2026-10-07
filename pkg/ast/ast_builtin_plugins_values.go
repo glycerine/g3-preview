@@ -13,6 +13,9 @@ func (m *ASTManager) pluginValue(fid FamilyID, r astNodeRef) (bool, error) {
 		f, k, e := m.declIdentity(decl)
 		return f == 3 && k == 0, e
 	}
+	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astBitVectorPlugin {
+		return m.isBitVectorNumeral(r)
+	}
 	return false, nil
 }
 func (m *ASTManager) isValue(r astNodeRef) (bool, error) {
@@ -40,7 +43,7 @@ func (m *ASTManager) IsValue(h ASTHandle) (bool, error) {
 	return m.isValue(r)
 }
 
-// All five actual base plugins use the same is_value/is_unique_value routes.
+// The currently implemented value predicates also identify unique values.
 func (m *ASTManager) IsUniqueValue(h ASTHandle) (bool, error) { return m.IsValue(h) }
 func (m *ASTManager) AreEqual(a, b ASTHandle) (bool, error) {
 	if e := m.lock(); e != nil {
@@ -158,6 +161,9 @@ func (m *ASTManager) getSomeValue(r astNodeRef) (ASTHandle, error) {
 	}
 	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astArrayPlugin {
 		return m.arraySomeValue(r)
+	}
+	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astBitVectorPlugin {
+		return m.bitVectorSomeValue(r)
 	}
 	// Actual manager fallback constructs two lexical parameters; AST-valued
 	// parameter construction doesn't retain until its declaration info attaches.
