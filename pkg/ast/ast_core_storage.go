@@ -225,6 +225,7 @@ type astBuiltinPluginState struct {
 }
 
 type ASTManager struct {
+	someValueProc              SomeValueProc
 	ArrayCardinality           *astArrayCardinalityFrame
 	arrayCardinalityInvocation uint64
 	exprVisitHistory           *astExprPendingMark

@@ -9202,7 +9202,8 @@
         "pkg/ast/ast_trace_file.go",
         "pkg/ast/ast_trace_acquisition.go",
         "pkg/ast/ast_auxiliary_plugins_source_test.go",
-        "pkg/ast/rewriter/var_shifter_test.go"
+        "pkg/ast/rewriter/var_shifter_test.go",
+        "pkg/ast/ast_some_value_proc_test.go"
       ],
       "tests": [
         "TestASTResourceLimitSourceCanceledCountsAndScopes",
@@ -9381,7 +9382,9 @@
         "TestVariableShifterNestedBindersPatternsAndAnnotations",
         "TestVariableShifterSharedCacheGroundShortcutAndDeepTraversal",
         "TestInverseVariableShifterNativeWrapAndDebugBoundary",
-        "TestVariableShifterSharedTermDifferentBinderDepthAndOutputLifetime"
+        "TestVariableShifterSharedTermDifferentBinderDepthAndOutputLifetime",
+        "TestASTSomeValueProcScopedPriorityAndFailureRestoration",
+        "TestASTSomeValueProcFallbackReservationFailureRestores"
       ],
       "conditionals": [
         {
@@ -10411,6 +10414,15 @@
           "go_targets": [
             "pkg/ast/rewriter/var_shifter_test.go"
           ]
+        },
+        {
+          "name": "ast_manager::get_some_value scoped some_value_proc override and callback-first fallback routing",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_builtin_plugins_values.go",
+          "tests": [
+            "TestASTSomeValueProcScopedPriorityAndFailureRestoration",
+            "TestASTSomeValueProcFallbackReservationFailureRestores"
+          ]
         }
       ],
       "ownership": [
@@ -10442,7 +10454,8 @@
         "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit.",
         "Concrete Go cold acquisition metadata is prepared before app placement, with pointer-free reference tokens stamped at actual successful INC leaves. Source catch releases placement without table/reference rollback. Reached dangling table reads use a typed slot/generation guard (native invalid-lifetime domain); separate owning ACK erases only captured insertion identity/hash and consumes stamped references. Completed caught tuples remain charged until this owning manager ends; no registered source driver credit.",
         "Trace acquisition is gated by actual traceStream, including the format child borrowing the exact parent stream without owning traceFile. Completed member table release and allocator Close stamp source-ended state on matching cold caught contexts/history. Incomplete constructor own abort retires only metadata after those actual actions; it never replays table erasure or DEC in ended node context. Closed pointed-stream constructor is a Go lifetime-guard fixture, distinct from native ostream badbit; actual borrowed file remains caller-owned.",
-        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
+        "Scoped some_value_proc restoration now covers success, nested internal calls, callback errors and fallback reservation failures. Callback receives the validated sort and stored hash while manager is locked, avoiding public-manager reentry for model universe lookup. Existing base-plugin fallback is retained; unported theory-plugin get_some_value implementations remain separate dependencies."
       ]
     },
     {
@@ -10534,7 +10547,8 @@
         "pkg/ast/ast_core_basic_convenience.go",
         "pkg/ast/ast_core_basic_convenience_source_test.go",
         "pkg/ast/ast_core_source_constructor.go",
-        "pkg/ast/ast_debug_ref_count.go"
+        "pkg/ast/ast_debug_ref_count.go",
+        "pkg/ast/ast_some_value_proc_test.go"
       ],
       "tests": [
         "TestASTResourceLimitSourceCanceledCountsAndScopes",
@@ -10756,7 +10770,9 @@
         "TestASTDebugRefCountSkipsOwnedInfoDelButStillDecrementsNodeChildren",
         "TestASTDebugRefCountDeletedMapGrowthStopRetainsExactLeafForOwningClose",
         "TestASTSourceFinalizeRetainsDebugInfoParametersForExactOwningClose",
-        "TestASTSourceConstructorCopyAndBorrowedNamespaceGuardsPreserveActualOwners"
+        "TestASTSourceConstructorCopyAndBorrowedNamespaceGuardsPreserveActualOwners",
+        "TestASTSomeValueProcScopedPriorityAndFailureRestoration",
+        "TestASTSomeValueProcFallbackReservationFailureRestores"
       ],
       "conditionals": [
         {
@@ -11569,6 +11585,15 @@
             "TestASTSourceFinalizeRetainsDebugInfoParametersForExactOwningClose",
             "TestASTSourceConstructorCopyAndBorrowedNamespaceGuardsPreserveActualOwners"
           ]
+        },
+        {
+          "name": "ast_manager::get_some_value scoped some_value_proc override and callback-first fallback routing",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_builtin_plugins_values.go",
+          "tests": [
+            "TestASTSomeValueProcScopedPriorityAndFailureRestoration",
+            "TestASTSomeValueProcFallbackReservationFailureRestores"
+          ]
         }
       ],
       "ownership": [
@@ -11600,7 +11625,8 @@
         "Selected AST sorting-network prerequisites only; no SMT kernel or psort_nw driver assertion credit. AST DEBUG assertions retain existing typed adapter/global-binding qualifications; lexical-info nonwrapping epoch is Go borrow guard, not source fresh_id arithmetic.",
         "Selected concrete AST Runtime/profile only; actual SMT kernel driver, native pretty/TRACE/global transport and other context/copy profiles remain separate obligations. Source-stopped destruction and explicit owning abort are distinct; pointer-free Go geometry is not native ABI credit.",
         "Go distinct convenience wrappers preserve the source Bool IFF/term EQ selection and right-associated XOR expansion through the existing source application engine. Array factories remain distinct from ast_util singleton/empty shortcuts. Focused source shape and failure tests do not promote the whole AST class, generic parser/API driver, diagnostic TRACE or original AST test driver.",
-        "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit."
+        "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit.",
+        "Scoped some_value_proc restoration now covers success, nested internal calls, callback errors and fallback reservation failures. Callback receives the validated sort and stored hash while manager is locked, avoiding public-manager reentry for model universe lookup. Existing base-plugin fallback is retained; unported theory-plugin get_some_value implementations remain separate dependencies."
       ]
     },
     {
@@ -45206,7 +45232,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/model/model_lifecycle.go",
-        "pkg/model/model_core.go"
+        "pkg/model/model_core.go",
+        "pkg/model/model_value.go"
       ],
       "tests": [
         "TestModelDerivedConstructorAndVirtualReferenceDestruction",
@@ -45215,7 +45242,9 @@
         "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
         "TestModelConverterToModelOriginalAllocationAndApplication",
         "TestModelDerivedConstructorFinalMemberRefusalUnwinds",
-        "TestModelCoreHashGrowthCopyAndIndependentOwnership"
+        "TestModelCoreHashGrowthCopyAndIndependentOwnership",
+        "TestModelSomeValuePrefersFirstUniverseAndBorrows",
+        "TestModelSomeValueMissingEmptyAndBooleanFallback"
       ],
       "assertions": [
         {
@@ -45250,11 +45279,21 @@
           "tests": [
             "TestModelCoreHashGrowthCopyAndIndependentOwnership"
           ]
+        },
+        {
+          "name": "model::value_proc and get_some_value; model_core derived value-provider dispatch",
+          "status": "ported",
+          "go_target": "pkg/model/model_value.go",
+          "tests": [
+            "TestModelSomeValuePrefersFirstUniverseAndBorrows",
+            "TestModelSomeValueMissingEmptyAndBooleanFallback"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying, get_some_value's callback, full model copy, AST translation/display and public API integration remain unported. Broad failure histories remain deferred."
+        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying, full model copy, AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
+        "Derived GetSomeValue installs the original scoped callback and borrows the first universe member; missing/empty universes delegate to AST value creation. Bare ModelCore has no implementation of the source abstract value-provider method. Theory plugins and evaluator integration remain incomplete; base AST fallback qualifications apply."
       ]
     },
     {
@@ -45263,7 +45302,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/model/model_lifecycle.go"
+        "pkg/model/model_lifecycle.go",
+        "pkg/model/model_value.go"
       ],
       "tests": [
         "TestModelDerivedConstructorAndVirtualReferenceDestruction",
@@ -45271,7 +45311,9 @@
         "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
         "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
         "TestModelConverterToModelOriginalAllocationAndApplication",
-        "TestModelDerivedConstructorFinalMemberRefusalUnwinds"
+        "TestModelDerivedConstructorFinalMemberRefusalUnwinds",
+        "TestModelSomeValuePrefersFirstUniverseAndBorrows",
+        "TestModelSomeValueMissingEmptyAndBooleanFallback"
       ],
       "conditionals": [
         {
@@ -45298,11 +45340,21 @@
             "TestModelConverterToModelOriginalAllocationAndApplication",
             "TestModelDerivedConstructorFinalMemberRefusalUnwinds"
           ]
+        },
+        {
+          "name": "model::value_proc and get_some_value; model_core derived value-provider dispatch",
+          "status": "ported",
+          "go_target": "pkg/model/model_value.go",
+          "tests": [
+            "TestModelSomeValuePrefersFirstUniverseAndBorrows",
+            "TestModelSomeValueMissingEmptyAndBooleanFallback"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying, get_some_value's callback, full model copy, AST translation/display and public API integration remain unported. Broad failure histories remain deferred."
+        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying, full model copy, AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
+        "Derived GetSomeValue installs the original scoped callback and borrows the first universe member; missing/empty universes delegate to AST value creation. Bare ModelCore has no implementation of the source abstract value-provider method. Theory plugins and evaluator integration remain incomplete; base AST fallback qualifications apply."
       ]
     },
     {
@@ -45458,7 +45510,8 @@
         "pkg/model/model_constant_map.go",
         "pkg/model/model_function_map.go",
         "pkg/model/model_functions.go",
-        "pkg/model/model_functions_test.go"
+        "pkg/model/model_functions_test.go",
+        "pkg/model/model_value.go"
       ],
       "tests": [
         "TestModelDerivedConstructorAndVirtualReferenceDestruction",
@@ -45479,7 +45532,9 @@
         "TestModelCoreFunctionEvalMissingPartialAndUnregistration",
         "TestModelCoreFunctionTableGrowthRemovalReuseAndDerivedClose",
         "TestModelCoreFunctionGuardsAndConstantDispatch",
-        "TestModelCoreFunctionRegistrationRefusalsPreserveCallerOwnership"
+        "TestModelCoreFunctionRegistrationRefusalsPreserveCallerOwnership",
+        "TestModelSomeValuePrefersFirstUniverseAndBorrows",
+        "TestModelSomeValueMissingEmptyAndBooleanFallback"
       ],
       "conditionals": [
         {
@@ -45538,6 +45593,15 @@
             "TestModelCoreFunctionGuardsAndConstantDispatch",
             "TestModelCoreFunctionRegistrationRefusalsPreserveCallerOwnership"
           ]
+        },
+        {
+          "name": "model::value_proc and get_some_value; model_core derived value-provider dispatch",
+          "status": "ported",
+          "go_target": "pkg/model/model_value.go",
+          "tests": [
+            "TestModelSomeValuePrefersFirstUniverseAndBorrows",
+            "TestModelSomeValueMissingEmptyAndBooleanFallback"
+          ]
         }
       ],
       "ownership": [
@@ -45545,8 +45609,9 @@
         "Function table cells hold scalar handles and indices; a charged cold directory owns FunctionInterpretation pointers. Successful registration transfers graph ownership, with identical-pointer replacement remaining live. Cold directory is prepared before source declaration-vector publication; registration refusals before graph publication retain caller ownership. Source constants retire before function table bucket iteration, with each function key retired before its graph. Interrupted unregister retains detached key/graph owners in named ModelCore fields for later owning cleanup."
       ],
       "deviations": [
-        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying, get_some_value's callback, full model copy, AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
-        "Function registration now implemented for concrete FunctionInterpretation; original allocator ABI/pooling, source hash-table replacement geometry and broad stopped-AST-destructor campaigns remain qualified. Cold pointer directory is separately charged Go provenance, not a native malloc equivalence claim. Explicit foreign/closed/wrong-arity guards are Go owner/domain checks. Historical m_decls intentionally survives unregister. Function-aware model converters/copy and original model evaluator remain pending; constant-only consumers retain an explicit guard. No whole-unit promotion."
+        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying, full model copy, AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
+        "Function registration now implemented for concrete FunctionInterpretation; original allocator ABI/pooling, source hash-table replacement geometry and broad stopped-AST-destructor campaigns remain qualified. Cold pointer directory is separately charged Go provenance, not a native malloc equivalence claim. Explicit foreign/closed/wrong-arity guards are Go owner/domain checks. Historical m_decls intentionally survives unregister. Function-aware model converters/copy and original model evaluator remain pending; constant-only consumers retain an explicit guard. No whole-unit promotion.",
+        "Derived GetSomeValue installs the original scoped callback and borrows the first universe member; missing/empty universes delegate to AST value creation. Bare ModelCore has no implementation of the source abstract value-provider method. Theory plugins and evaluator integration remain incomplete; base AST fallback qualifications apply."
       ]
     },
     {

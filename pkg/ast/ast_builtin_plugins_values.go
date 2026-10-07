@@ -95,6 +95,15 @@ func (m *ASTManager) AreDistinct(a, b ASTHandle) (bool, error) {
 	}
 	return m.pluginValue(fid, y)
 }
+
+// SomeValueProc is the borrowed source some_value_proc override. It receives
+// the sort's stored hash because the manager is locked during the callback;
+// callbacks must use borrowed scalar storage and must not reenter public manager
+// methods. A null result delegates to the plugin and model-value fallback.
+type SomeValueProc interface {
+	SomeValue(sort ASTHandle, hash uint32) (ASTHandle, error)
+}
+
 func (m *ASTManager) GetSomeValue(sort ASTHandle) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
 		return ASTHandle{}, e
@@ -103,6 +112,41 @@ func (m *ASTManager) GetSomeValue(sort ASTHandle) (ASTHandle, error) {
 	r, e := m.requireKind(sort, ASTSort)
 	if e != nil {
 		return ASTHandle{}, e
+	}
+	return m.getSomeValue(r)
+}
+
+// GetSomeValueWithProc installs the source lexical override and restores its
+// predecessor on all exits, including callback and allocation failures.
+func (m *ASTManager) GetSomeValueWithProc(sort ASTHandle, proc SomeValueProc) (ASTHandle, error) {
+	if e := m.lock(); e != nil {
+		return ASTHandle{}, e
+	}
+	defer m.mu.Unlock()
+	r, e := m.requireKind(sort, ASTSort)
+	if e != nil {
+		return ASTHandle{}, e
+	}
+	return m.getSomeValueWithProc(r, proc)
+}
+func (m *ASTManager) getSomeValueWithProc(r astNodeRef, proc SomeValueProc) (ASTHandle, error) {
+	previous := m.someValueProc
+	m.someValueProc = proc
+	defer func() { m.someValueProc = previous }()
+	return m.getSomeValue(r)
+}
+func (m *ASTManager) getSomeValue(r astNodeRef) (ASTHandle, error) {
+	if m.someValueProc != nil {
+		value, e := m.someValueProc.SomeValue(m.external(r), m.nodeAt(r.slot).hash)
+		if e != nil {
+			return ASTHandle{}, e
+		}
+		if !value.IsNull() {
+			if _, e = m.internal(value); e != nil {
+				return ASTHandle{}, e
+			}
+			return value, nil
+		}
 	}
 	fid, _, e := m.declIdentity(r)
 	if e != nil {
