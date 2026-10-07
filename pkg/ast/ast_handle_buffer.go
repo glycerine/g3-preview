@@ -1,4 +1,4 @@
-// Source: src/util/buffer.h:25-48.
+// Source: src/util/buffer.h:25-48,98-104.
 package ast
 
 import (
@@ -63,4 +63,12 @@ func (a *ASTHandleBuffer) Close(budget *arena.Budget) {
 	a.spill = nil
 	a.count = 0
 	a.charged = 0
+}
+
+// Reset follows buffer::reset: clear the logical size and retain spill capacity.
+func (a *ASTHandleBuffer) Reset() {
+	a.count = 0
+	if a.spill != nil {
+		a.spill = a.spill[:0]
+	}
 }

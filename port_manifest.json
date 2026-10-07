@@ -9022,7 +9022,8 @@
         "pkg/ast/ast_array_plugin_source_test.go",
         "pkg/ast/ast_array_cardinality.go",
         "pkg/ast/ast_array_cardinality_callback_source_test.go",
-        "pkg/ast/ast_array_decl.go"
+        "pkg/ast/ast_array_decl.go",
+        "pkg/ast/ast_array_util.go"
       ],
       "tests": [
         "TestASTArraySourceConstructorAndInfiniteSortParameters",
@@ -9037,7 +9038,8 @@
         "TestASTArrayOriginalSelectStoreConstDeclarationsAndApplications",
         "TestASTArrayDeclarationRejectsInvalidAritiesAndSorts",
         "TestASTArrayDeclarationsNormalizeCompatibleArithmeticDomains",
-        "TestASTArrayDeclarationLexicalSpillRefusalAndReuse"
+        "TestASTArrayDeclarationLexicalSpillRefusalAndReuse",
+        "TestASTArrayUtilFamilyAndBorrowedApplications"
       ],
       "assertions": [
         {
@@ -9101,6 +9103,14 @@
             "TestASTArrayDeclarationsNormalizeCompatibleArithmeticDomains",
             "TestASTArrayDeclarationLexicalSpillRefusalAndReuse"
           ]
+        },
+        {
+          "name": "array_util family-name constructor and borrowed select/store application overload bridge",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_array_util.go",
+          "tests": [
+            "TestASTArrayUtilFamilyAndBorrowedApplications"
+          ]
         }
       ],
       "ownership": [
@@ -9118,13 +9128,15 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/ast/ast_array_decl.go"
+        "pkg/ast/ast_array_decl.go",
+        "pkg/ast/ast_array_util.go"
       ],
       "tests": [
         "TestASTArrayOriginalSelectStoreConstDeclarationsAndApplications",
         "TestASTArrayDeclarationRejectsInvalidAritiesAndSorts",
         "TestASTArrayDeclarationsNormalizeCompatibleArithmeticDomains",
-        "TestASTArrayDeclarationLexicalSpillRefusalAndReuse"
+        "TestASTArrayDeclarationLexicalSpillRefusalAndReuse",
+        "TestASTArrayUtilFamilyAndBorrowedApplications"
       ],
       "conditionals": [
         {
@@ -9148,6 +9160,14 @@
             "TestASTArrayDeclarationRejectsInvalidAritiesAndSorts",
             "TestASTArrayDeclarationsNormalizeCompatibleArithmeticDomains",
             "TestASTArrayDeclarationLexicalSpillRefusalAndReuse"
+          ]
+        },
+        {
+          "name": "array_util family-name constructor and borrowed select/store application overload bridge",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_array_util.go",
+          "tests": [
+            "TestASTArrayUtilFamilyAndBorrowedApplications"
           ]
         }
       ],
@@ -18324,9 +18344,17 @@
       "path": "src/ast/rewriter/array_rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/rewriter/array_rewriter.go"
+      ],
+      "tests": [
+        "TestArrayRewriterOriginalStoreSelectAndFirstUncertainIndex",
+        "TestArrayRewriterOriginalSortingConstantAndIteRules",
+        "TestArrayRewriterOriginalStoreBufferSpillRefusal",
+        "TestArrayRewriterConstructorRefusalsAndParameterFallback",
+        "TestArrayRewriterRegistersFamilyWithoutDeclarationPlugin"
+      ],
       "assertions": [
         {
           "line": 37,
@@ -18407,17 +18435,42 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "configured constructor/update, compare_args, selected store/select core and fallback wrappers",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/array_rewriter.go",
+          "tests": [
+            "TestArrayRewriterOriginalStoreSelectAndFirstUncertainIndex",
+            "TestArrayRewriterOriginalSortingConstantAndIteRules",
+            "TestArrayRewriterOriginalStoreBufferSpillRefusal",
+            "TestArrayRewriterConstructorRefusalsAndParameterFallback",
+            "TestArrayRewriterRegistersFamilyWithoutDeclarationPlugin"
+          ]
+        }
+      ],
+      "ownership": [
+        "Configured owner borrows AST/parameter services, charges its concrete header and retains reached helper continuations for Close. Original ptr_buffer temporaries retain inline16/doubling allocation and reset capacity; select-ITE uses original ptr_vector growth. Output references are published only after successful construction."
+      ],
+      "deviations": [
+        "Store/select rules preserve first-uncertain-index comparison, original structural store sorting and rewrite statuses. Parameter lookup follows local/module/default order and resets select-ITE expansion. Array map/set rules, as-array selection, equality expansion, parameter-description wrapper, TRACE, complete ownership/allocator campaigns and exact native exception/assertion transport remain open. Unported reached operation rules return an explicit error. These focused tests add no registered source driver credit."
+      ]
     },
     {
       "path": "src/ast/rewriter/array_rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/rewriter/array_rewriter.go"
+      ],
+      "tests": [
+        "TestArrayRewriterOriginalStoreSelectAndFirstUncertainIndex",
+        "TestArrayRewriterOriginalSortingConstantAndIteRules",
+        "TestArrayRewriterOriginalStoreBufferSpillRefusal",
+        "TestArrayRewriterConstructorRefusalsAndParameterFallback",
+        "TestArrayRewriterRegistersFamilyWithoutDeclarationPlugin"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -18430,9 +18483,26 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "configured constructor/update, compare_args, selected store/select core and fallback wrappers",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/array_rewriter.go",
+          "tests": [
+            "TestArrayRewriterOriginalStoreSelectAndFirstUncertainIndex",
+            "TestArrayRewriterOriginalSortingConstantAndIteRules",
+            "TestArrayRewriterOriginalStoreBufferSpillRefusal",
+            "TestArrayRewriterConstructorRefusalsAndParameterFallback",
+            "TestArrayRewriterRegistersFamilyWithoutDeclarationPlugin"
+          ]
+        }
+      ],
+      "ownership": [
+        "Configured owner borrows AST/parameter services, charges its concrete header and retains reached helper continuations for Close. Original ptr_buffer temporaries retain inline16/doubling allocation and reset capacity; select-ITE uses original ptr_vector growth. Output references are published only after successful construction."
+      ],
+      "deviations": [
+        "Store/select rules preserve first-uncertain-index comparison, original structural store sorting and rewrite statuses. Parameter lookup follows local/module/default order and resets select-ITE expansion. Array map/set rules, as-array selection, equality expansion, parameter-description wrapper, TRACE, complete ownership/allocator campaigns and exact native exception/assertion transport remain open. Unported reached operation rules return an explicit error. These focused tests add no registered source driver credit."
+      ]
     },
     {
       "path": "src/ast/rewriter/array_rewriter_params.hpp",
@@ -107984,7 +108054,8 @@
         "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
         "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
         "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix",
-        "TestPointerBufferSourceSpillRefusal"
+        "TestPointerBufferSourceSpillRefusal",
+        "TestASTHandleBufferResetRetainsSpillCapacity"
       ],
       "conditionals": [
         {
@@ -108183,6 +108254,14 @@
           ],
           "go_targets": [
             "pkg/math/polynomial/polynomial_constant_normalize_receipt_source_test.go"
+          ]
+        },
+        {
+          "name": "concrete AST pointer buffer reset retains spill capacity",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_handle_buffer.go",
+          "tests": [
+            "TestASTHandleBufferResetRetainsSpillCapacity"
           ]
         }
       ],
