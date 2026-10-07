@@ -61,6 +61,12 @@ func (m *ASTManager) arrayDecl(k int32, ps []ASTParameter, domain []ASTHandle, r
 	if k == ASTArrayOpMap {
 		return m.arrayMapDecl(ps, domain)
 	}
+	if k == ASTArrayOpDefault {
+		return m.arrayDefaultDecl(domain)
+	}
+	if k == ASTArrayOpExt {
+		return m.arrayExtDecl(ps, domain)
+	}
 	if k >= ASTArrayOpSetUnion && k <= ASTArrayOpSetSubset {
 		return m.arraySetDecl(k, domain)
 	}

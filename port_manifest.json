@@ -9026,7 +9026,8 @@
         "pkg/ast/ast_array_util.go",
         "pkg/ast/ast_array_as_array.go",
         "pkg/ast/ast_array_map.go",
-        "pkg/ast/ast_array_set.go"
+        "pkg/ast/ast_array_set.go",
+        "pkg/ast/ast_array_default_ext.go"
       ],
       "tests": [
         "TestASTArraySourceConstructorAndInfiniteSortParameters",
@@ -9053,7 +9054,10 @@
         "TestASTArrayMapOriginalParameterVectorRefusalAndReuse",
         "TestASTArraySortUtilityAbsentPluginAndDomainBounds",
         "TestASTArraySetOriginalDeclarationsParametersFlagsAndAssociativeApps",
-        "TestASTArraySetOriginalValidation"
+        "TestASTArraySetOriginalValidation",
+        "TestASTArrayOriginalDefaultAndExtensionalityDeclarations",
+        "TestASTArrayDefaultExtensionalityOriginalValidationAndStructuralSorts",
+        "TestASTArrayExtensionalityWarmRefusalAndParameterCleanup"
       ],
       "assertions": [
         {
@@ -9156,6 +9160,16 @@
             "TestASTArraySetOriginalDeclarationsParametersFlagsAndAssociativeApps",
             "TestASTArraySetOriginalValidation"
           ]
+        },
+        {
+          "name": "original mk_default lexical parameter copy and mk_array_ext indexed result sort, optional zero index, integer parameter validation and utility declaration wrapper (src/ast/array_decl_plugin.cpp:211-232,307-325,478-487,598-602)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_array_default_ext.go",
+          "tests": [
+            "TestASTArrayOriginalDefaultAndExtensionalityDeclarations",
+            "TestASTArrayDefaultExtensionalityOriginalValidationAndStructuralSorts",
+            "TestASTArrayExtensionalityWarmRefusalAndParameterCleanup"
+          ]
         }
       ],
       "ownership": [
@@ -9163,11 +9177,13 @@
         "Select/store build source inline16/doubling normalized domain buffers and release them after declaration factory dispatch. Const declarations retain the private array-sort parameter through the actual copied info owner, retiring the lexical parameter afterward. Existing AST declaration/application factories retain node/domain references and canonical identity.",
         "As-array builds its function domain/range parameters in a concrete lexical source vector with original growth, releases its descriptors/storage on refusal and publication, and publishes the actual function AST parameter in the canonical declaration info. The referenced function remains owned by that declaration.",
         "Map declarations retain the original mapped function parameter and output array sort. Actual lexical vector<parameter> owns Go parameter descriptors and source-grown storage; borrowed array-map arguments use the existing domain buffer/application path without a second argument copy. Every warm parameter-vector refusal restores live descriptor count and charge. Sort utility handles absent plugin and scalar domain bounds explicitly.",
-        "Set declarations use the original exact sort identity and Boolean-range checks. Union retains its single sort parameter; intersection retains no parameter. Union/intersection canonicalize to nonflat binary declarations and applications use the existing source right-association path. Constant/empty/full-set utilities borrow source Boolean values and keep lexical parameter descriptors through publication and cleanup."
+        "Set declarations use the original exact sort identity and Boolean-range checks. Union retains its single sort parameter; intersection retains no parameter. Union/intersection canonicalize to nonflat binary declarations and applications use the existing source right-association path. Constant/empty/full-set utilities borrow source Boolean values and keep lexical parameter descriptors through publication and cleanup.",
+        "Default copies the source final sort parameter into an actual lexical Go descriptor before validation and drops it after declaration publication/refusal. Extensionality creates its own retained integer index parameter, while the utility owns a separate caller parameter through the source declaration overload. Warm refusal tests restore temporary descriptor count and failed-call charge, preserve canonical declaration identity, and account successful checked/debug capacity growth to the actual manager storage; final fixture closure restores total charge."
       ],
       "deviations": [
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
-        "Selected array select/store/const declaration and expression-overload dispatch is now implemented. Optional explicit range is used by the const-array fallback; valid sort parameters take priority. Select/store normalize compatible arithmetic domains using the actual registered arithmetic family and coercion flag; const preserves its supplied domain. Existing application coercion insertion remains unported, without a fabricated cast. Other array declaration kinds/utilities beyond as-array, map and set operations, value creation, exact source exception diagnostics and whole-unit ownership/allocator ABI campaigns remain open."
+        "Selected array select/store/const declaration and expression-overload dispatch is now implemented. Optional explicit range is used by the const-array fallback; valid sort parameters take priority. Select/store normalize compatible arithmetic domains using the actual registered arithmetic family and coercion flag; const preserves its supplied domain. Existing application coercion insertion remains unported, without a fabricated cast. Other array declaration kinds/utilities beyond as-array, map and set operations, value creation, exact source exception diagnostics and whole-unit ownership/allocator ABI campaigns remain open.",
+        "Selected default/extensionality factories preserve structural sort-parameter reads without adding an array-family restriction absent from these C++ methods. Malformed kind/arity/index and UNREACHABLE routes use the existing checked Go typed precondition profile, not native assertion/exception/undefined-execution equivalence. Indexed extensionality returns the index-domain sort, not the array value range. Source-native allocator/ABI/whole-unit audits and remaining theory callbacks remain open."
       ]
     },
     {
@@ -9180,7 +9196,8 @@
         "pkg/ast/ast_array_util.go",
         "pkg/ast/ast_array_as_array.go",
         "pkg/ast/ast_array_map.go",
-        "pkg/ast/ast_array_set.go"
+        "pkg/ast/ast_array_set.go",
+        "pkg/ast/ast_array_default_ext.go"
       ],
       "tests": [
         "TestASTArrayOriginalSelectStoreConstDeclarationsAndApplications",
@@ -9198,7 +9215,10 @@
         "TestASTArrayMapOriginalParameterVectorRefusalAndReuse",
         "TestASTArraySortUtilityAbsentPluginAndDomainBounds",
         "TestASTArraySetOriginalDeclarationsParametersFlagsAndAssociativeApps",
-        "TestASTArraySetOriginalValidation"
+        "TestASTArraySetOriginalValidation",
+        "TestASTArrayOriginalDefaultAndExtensionalityDeclarations",
+        "TestASTArrayDefaultExtensionalityOriginalValidationAndStructuralSorts",
+        "TestASTArrayExtensionalityWarmRefusalAndParameterCleanup"
       ],
       "conditionals": [
         {
@@ -9262,16 +9282,28 @@
             "TestASTArraySetOriginalDeclarationsParametersFlagsAndAssociativeApps",
             "TestASTArraySetOriginalValidation"
           ]
+        },
+        {
+          "name": "original mk_default lexical parameter copy and mk_array_ext indexed result sort, optional zero index, integer parameter validation and utility declaration wrapper (src/ast/array_decl_plugin.cpp:211-232,307-325,478-487,598-602)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_array_default_ext.go",
+          "tests": [
+            "TestASTArrayOriginalDefaultAndExtensionalityDeclarations",
+            "TestASTArrayDefaultExtensionalityOriginalValidationAndStructuralSorts",
+            "TestASTArrayExtensionalityWarmRefusalAndParameterCleanup"
+          ]
         }
       ],
       "ownership": [
         "Select/store build source inline16/doubling normalized domain buffers and release them after declaration factory dispatch. Const declarations retain the private array-sort parameter through the actual copied info owner, retiring the lexical parameter afterward. Existing AST declaration/application factories retain node/domain references and canonical identity.",
         "As-array builds its function domain/range parameters in a concrete lexical source vector with original growth, releases its descriptors/storage on refusal and publication, and publishes the actual function AST parameter in the canonical declaration info. The referenced function remains owned by that declaration.",
         "Map declarations retain the original mapped function parameter and output array sort. Actual lexical vector<parameter> owns Go parameter descriptors and source-grown storage; borrowed array-map arguments use the existing domain buffer/application path without a second argument copy. Every warm parameter-vector refusal restores live descriptor count and charge. Sort utility handles absent plugin and scalar domain bounds explicitly.",
-        "Set declarations use the original exact sort identity and Boolean-range checks. Union retains its single sort parameter; intersection retains no parameter. Union/intersection canonicalize to nonflat binary declarations and applications use the existing source right-association path. Constant/empty/full-set utilities borrow source Boolean values and keep lexical parameter descriptors through publication and cleanup."
+        "Set declarations use the original exact sort identity and Boolean-range checks. Union retains its single sort parameter; intersection retains no parameter. Union/intersection canonicalize to nonflat binary declarations and applications use the existing source right-association path. Constant/empty/full-set utilities borrow source Boolean values and keep lexical parameter descriptors through publication and cleanup.",
+        "Default copies the source final sort parameter into an actual lexical Go descriptor before validation and drops it after declaration publication/refusal. Extensionality creates its own retained integer index parameter, while the utility owns a separate caller parameter through the source declaration overload. Warm refusal tests restore temporary descriptor count and failed-call charge, preserve canonical declaration identity, and account successful checked/debug capacity growth to the actual manager storage; final fixture closure restores total charge."
       ],
       "deviations": [
-        "Selected array select/store/const declaration and expression-overload dispatch is now implemented. Optional explicit range is used by the const-array fallback; valid sort parameters take priority. Select/store normalize compatible arithmetic domains using the actual registered arithmetic family and coercion flag; const preserves its supplied domain. Existing application coercion insertion remains unported, without a fabricated cast. Other array declaration kinds/utilities beyond as-array, map and set operations, value creation, exact source exception diagnostics and whole-unit ownership/allocator ABI campaigns remain open."
+        "Selected array select/store/const declaration and expression-overload dispatch is now implemented. Optional explicit range is used by the const-array fallback; valid sort parameters take priority. Select/store normalize compatible arithmetic domains using the actual registered arithmetic family and coercion flag; const preserves its supplied domain. Existing application coercion insertion remains unported, without a fabricated cast. Other array declaration kinds/utilities beyond as-array, map and set operations, value creation, exact source exception diagnostics and whole-unit ownership/allocator ABI campaigns remain open.",
+        "Selected default/extensionality factories preserve structural sort-parameter reads without adding an array-family restriction absent from these C++ methods. Malformed kind/arity/index and UNREACHABLE routes use the existing checked Go typed precondition profile, not native assertion/exception/undefined-execution equivalence. Indexed extensionality returns the index-domain sort, not the array value range. Source-native allocator/ABI/whole-unit audits and remaining theory callbacks remain open."
       ]
     },
     {
