@@ -536,3 +536,36 @@ func (s *RationalService) ModIntoWithInvocation(a, b, out *OwnedRational, c *Rat
 	}
 	return e
 }
+
+// Source: src/util/rational.h:182-184; src/util/mpq.h:523-527.
+// The void overload writes the caller's physical receiver directly. It does
+// not construct a returned rational or copy a temporary into the receiver.
+func (s *RationalService) IDivIntoWithInvocation(a, b, out *OwnedRational, c *RationalServiceInvocation) (e error) {
+	if e = s.lock(); e != nil {
+		return e
+	}
+	defer s.mu.Unlock()
+	for _, value := range []*OwnedRational{a, b, out} {
+		if e = s.rationalScalarOwner(value); e != nil {
+			return e
+		}
+	}
+	if e = s.prepareLexicalInvocation(c); e != nil {
+		return e
+	}
+	defer func() { e = s.finishLexicalInvocation(c, e) }()
+	atomic.StoreUint32(&s.sourceRuntimeExecuting, 1)
+	defer atomic.StoreUint32(&s.sourceRuntimeExecuting, 0)
+	if e = s.beginLexical(); e != nil {
+		return e
+	}
+	defer s.endLexicalError(&e)
+	e = s.Manager.integerOpRationalWithAllocationContext(&a.Raw, &b.Raw, &out.Raw, qIntegerDiv, c.allocationContext())
+	if cause := c.childSource(); cause != nil {
+		if s.Lexical.Cause == nil {
+			s.Lexical.Cause = cause
+		}
+		e = errors.Join(e, cause)
+	}
+	return e
+}

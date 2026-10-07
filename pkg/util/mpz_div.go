@@ -137,6 +137,7 @@ func (m *IntegerManager) divWithAllocationContext(a, b, c *Int, context integerA
 			context.recordRationalSetRaw(m, receipt)
 			context.recordConversionRaw(m, receipt)
 			context.recordFormatRaw(m, receipt)
+			context.recordRationalServiceRaw(m, receipt)
 			context.recordCaller(m, "division", NumericInvocationReceipt{Raw: receipt})
 			context = context.withRawInvocation(receipt)
 			defer func() {
