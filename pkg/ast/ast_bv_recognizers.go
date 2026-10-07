@@ -81,6 +81,23 @@ func (m *ASTManager) IsBitVectorAllOne(h ASTHandle) (all bool, result error) {
 	}
 	f.allOne = true
 	defer f.finishNumeral(&result, nil)
+	all, e = m.bitVectorAllOneCondition(f, r)
+	if e != nil {
+		return false, e
+	}
+	// Full expression: returned subtraction value, rational(1), then power.
+	for _, i := range []int{4, 2, 1} {
+		if e = f.destroyOne(i, false); e != nil {
+			return false, e
+		}
+	}
+	return all, nil
+}
+
+// The common source arithmetic condition leaves its full-expression values
+// alive. Its caller chooses the source full-expression destruction point.
+func (m *ASTManager) bitVectorAllOneCondition(f *astBVNumeralFrame, r astNodeRef) (bool, error) {
+	var e error
 	q := m.numerals
 	f.values[0], e = q.NewValue()
 	if e != nil {
@@ -127,12 +144,6 @@ func (m *ASTManager) IsBitVectorAllOne(h ASTHandle) (all bool, result error) {
 	different, e := q.NotEqual(&f.values[0], &f.values[4])
 	if e != nil {
 		return false, e
-	}
-	// Full expression: returned subtraction value, rational(1), then power.
-	for _, i := range []int{4, 2, 1} {
-		if e = f.destroyOne(i, false); e != nil {
-			return false, e
-		}
 	}
 	return !different, nil
 }

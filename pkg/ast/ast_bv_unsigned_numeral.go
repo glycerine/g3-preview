@@ -14,12 +14,18 @@ func (m *ASTManager) BitVectorNumeralUnsigned(value uint32, bits uint32) (ASTHan
 }
 
 func (m *ASTManager) bitVectorNumeralUnsigned(value uint32, bits uint32) (node astNodeRef, result error) {
+	return m.bitVectorNumeralUnsignedCaptured(value, bits, nil)
+}
+func (m *ASTManager) bitVectorNumeralUnsignedCaptured(value uint32, bits uint32, receipt *astBVNormalizationReceipt) (node astNodeRef, result error) {
 	f, e := m.beginBVNumeralFrame()
 	if e != nil {
 		return node, e
 	}
+	if receipt != nil {
+		*receipt = astBVNormalizationReceipt{frame: f, invocation: f.invocation}
+	}
 	f.unsignedNumeral = true
-	defer f.finishNumeral(&result, nil)
+	defer f.finishNumeral(&result, receipt)
 	// The outer rational(unsigned) temporary ends after the numeral call's
 	// parameter temporary. Constructor failure retains an incomplete owner.
 	f.values[5], e = m.numerals.NewValue()
